@@ -54,7 +54,7 @@ and every mode. A Python script needs only the standard library unless its docst
 | `curated_source.py`, `curated_incidence.py` | The curated source, its pinned cut and flat twin; the admitted relations on the cut | `HOLONICS_ROOT=$PWD python3 research/notebook/hnn_design/curated_source.py 1048576` | [the receiving population](../../records/2026-09-27_THE_RECEIVING_POPULATION_WAS_BUILT_ON_TERRAIN_WITH_KNOWN_TRUTH_AND_THE_CURATED_SOURCE_NOW_CODES_BELOW_THE_FLAT_STREAM.md) |
 | `development_families.py`, `family_passage.py` | The split by conversation with the development reserve (U6), the spent family splits (F-items, U2) behind `--read-reserve`, and their joined passages | `HOLONICS_ROOT=$PWD python3 research/notebook/hnn_design/development_families.py [U6]` | [F4](../../records/2026-09-27_F4_DEVELOPMENT_FAMILY_SPLIT_AND_RELEASE_GATE.md), [U2's acceptance run](../../records/2026-09-28_U2_F0S_MEMORY_ACCEPTANCE_RUN_PINNED_BEFORE_ITS_SPLIT_IS_READ.md) |
 | `f5_context.py` (tests: `f5_context_tests.py`) | F5's request context from declared provider-parent incidence (an exterior source codec) | `python3 research/notebook/hnn_design/f5_context_tests.py` | [F5](../../records/2026-09-27_F5_DEVELOPMENT_AND_BLIND_GATE.md) |
-| `athena_protocol.py`, `athena_file_protocol.py`, `athena_file_checkpoint.py`, `athena_blind.py` (tests: `athena_*_tests.py`) | Athena-0's exterior protocol, checkpoint transport and blind judging surface | `python3 research/notebook/hnn_design/athena_protocol_tests.py` | [F5](../../records/2026-09-27_F5_DEVELOPMENT_AND_BLIND_GATE.md), [the atomic standing audit](../../records/2026-09-27_F5_ATOMIC_STANDING_OWNER_AUDIT.md) |
+| `athena_protocol.py`, `athena_file_protocol.py`, `athena_file_checkpoint.py` (tests: `athena_*_tests.py`) | Athena-0's exterior protocol and checkpoint transport | `python3 research/notebook/hnn_design/athena_protocol_tests.py` | [F5](../../records/2026-09-27_F5_DEVELOPMENT_AND_BLIND_GATE.md), [the atomic standing audit](../../records/2026-09-27_F5_ATOMIC_STANDING_OWNER_AUDIT.md) |
 
 ## The baseline replay
 
@@ -417,8 +417,10 @@ Record: [F5](../../records/2026-09-27_F5_DEVELOPMENT_AND_BLIND_GATE.md), [the at
 Retired September 30 (at `d4596102`): the native paths below (`hnn_population f5-native`,
 `f5-family`, `f5-family-verify`, `f5-bundle`, `f5-checkpoint-census`, `f5-checkpoint-restore`) and
 the split scripts (`f5_retrospective.py`, `f5_dev_request.py`, `f5_request_bundle.py`,
-`f5_blind_input.py`, `athena_dev_gate.py`). The protocol fixtures, `f5_context.py` and
-`athena_blind.py` remain.
+`f5_blind_input.py`, `athena_dev_gate.py`). The protocol fixtures and `f5_context.py` remain;
+`athena_blind.py`, the side-by-side surface against a retrieval control, was retired October 5
+([at `9a62a685`](https://github.com/brandonrdug/holonics/blob/9a62a68515ebc824d583539e53b1a2d5973a82a3/research/notebook/hnn_design/athena_blind.py)):
+F5 shows each release whole with its copy length, beside no control.
 
 The [F5 pin and receipt](../../records/2026-09-27_F5_DEVELOPMENT_AND_BLIND_GATE.md) fix a separate
 hash-seeded development-family split, prospective-request order, context rule, blind rubric and
@@ -443,8 +445,7 @@ complete frame until its native result commits; presenting the provisional nativ
 path without health/provenance/fibre produces the typed `incomplete-release-receipt` refusal and
 replays it with zero new native calls. `f5_context.py` recovers actual provider-parent context:
 21 complete one-occurrence packets and 11 unresolved-parent refusals on the diagnostic requests.
-`athena_blind.py` has a 32-case owner-only development package with source-hidden sides, no marks
-or unblinding key; it has not been shown for judgment. Exact native standing codecs now cover
+Exact native standing codecs now cover
 Landmarks, PassageCode, TreeFamily, BoundaryEgg, AdmittedEgg and a tagged Population on small
 continuation fixtures. A choosing-only `f5-checkpoint-census` measured 6,256,005,521 bytes in
 the eight family payloads and 6,256,005,986 bytes in the full population stream; the complete

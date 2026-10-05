@@ -511,14 +511,160 @@ named, and the program's loop stays its own counter, disclosed as such.
     wall times masked (354 lines; capture ticks 164 / 3,704 / 366); the switch clock is untouched.
   - *Verdict.* Every clock corresponds; none is left a counter but the program's own, disclosed.
 
+#### The library spine (October 5)
+
+[project-postulate; the order agent-inferred from the object-to-owner audit] Brandon, October 5: the framework is "applied and frayed" in the code. The
+measured cause: each elementary object the HNN executes has a library owner, and the HNN beside it
+re-implements the object under another name. The parametron's pump, period map and lock live in
+`hnn::ring` (3,640 lines) beside `holon::parametron` and `holon::element::Pump` (680); the
+Holarchy is built at the mount and discarded but for its parametric orientation, while the executed
+tick is `hnn::propagation` (1,634) and `hnn::word` (3,327); the pair contact's material is a private
+`hnn::constitution::ContactMaterial` beside `holon::contact::ContactMaterial`; and `HolonLaw`,
+`JointLaw`, `Holon::with_pump` and `Holarchy::{view, count, refine, pump_lock}` have no HNN caller.
+
+**The rule.** A lane's law lands in its object's library owner. The HNN module keeps only the
+boundary adapter that reads it (the loaded port, the exterior chart, the exposure), and the local
+copy is deleted in the same commit. The commit updates the object's operator contract row and its
+atlas rows, and the Lean HNN file imports the object's Lean owner (`Objects/*`, `Holon/*`,
+`Holarchy/*`, `Geometry/Motion`). A new HNN noun that is not an object or a composition of them is
+refused before it is built. Parity (host against the exact law, card against host) is each step's
+gate, beside its lane's own acceptance.
+
+| Step (lane) | Single owner | HNN code that becomes its use (deleted local copy) | Consumer equation at the join | Lessons it avoids |
+|---|---|---|---|---|
+| S0 (E, landed with this plan) | the operator contract and the guides | the contract's Parametron target names `hnn::ring`; its HNN row omits `executed` and `prediction`; the Lean targets `Holonics.Ratio` and `Holonics.Navigator` exist in no file; THE_MACHINE names the retired `holon::reaction` and `receiver::standing`; the October 5 block cites guard 13 for the release guard, which is 18 | every target in the contract names a built owner, and every HNN module is a row's use | D8 (the question changing at each owner); lessons §3.10 |
+| S1 (A) | `holon::parametron` (storage, period map, lock) and `holon::element::Pump` | `hnn::ring`'s pump (`PumpStep`, `PumpDeclaration`, `PumpSchedule`, `pump_block`, `sheets`, `ring.rs:351–641`) and its Floquet and lock (`Floquet`, `FloquetCertificate`, `FloquetBound`, `Growth`, `attain_metric`, `lock`, `ring.rs:1399–2283`); `ReceivingBank` reads the owner's lock; `holon::parametron::Population` takes its sheets from it | the ring's tick is `ReferenceHolon::advance` of the ring Holon with its `Pump` (the exact law); `Φ_T = Parametron::period_map` over one `aeon::Cycle` of the pump's clock; `Lock::certificate ⇒ Φ_T(B_G(x*, r)) ⊆ B_G(x*, ρr)`, `ρ < 1`; Lean `HNN/{Ring, Floquet}` import `Objects/{Parametron, ParametronLock}` | failure 4 and lesson 3 (the linear lock, a located cause, carried into new consumers); failure 5 and lesson 6 (the certificate enforced in the owner); lesson 11 (modes, not arrays) |
+| S2 (B) | `compression::keys` (the Bombe), `navigator` (keys), `holon::deposition` (the certified step) | `hnn::keys` (unchanged use); `hnn::executed`'s own move (`Trial`, `ExecutedMove`, the ladder, `executed.rs:3016–3960`, `executed_move` and its arms) retires once B's acceptance reads, replaced by key location then deposition | `Menu::fibre = {σ : ∏_(ij ∈ ℓ) σ_i σ_j s_ij = 1 for every closed loop ℓ}` up to the global half-turn, `s_ij` from the ratio's covector at contact `ij`; `Θ′|_U = Θ|_U + η Γ_U(j|_∂U)` only at loci `U` the located keys reach, with `CertifiedStep::holds` | failure 1 (no authored routine: `s_ij` is read from the comparison); failure 4 (executed never called keys); failure 5; failure 8 (a sheet's flip is a jump decided by the exact comparison, not a capped step) |
+| S3 (C) | `receiver::release` and `receiver::receipt` inside `hnn::prediction::generate_by_bank` | `ExecutionPort::release` (`hnn/reference.rs:1728`, card `holonics-cuda/src/hnn/port.rs:1674`), which reads the receiving storage through `ReceivingPhases::read(&impl ConstitutionRead)` (`hnn/receiving.rs:1474`), folds into the one owner taking `&impl FieldMaterial` | `release = section_release(sheets(Φ_Tⁿ(clamp(request))))`; on a terrain that knows `T`, `ρ(F^K(I_h)) = T(request)` (`HNN/Prediction.consumer_eq`); the receipt is one region per station in the receiving ring's clock | failures 2 and 3 (recitation; text as the exception: one release on text and one non-text terrain); failures 6 and 7; D1 |
+| S4 (after A's merge) | `holarchy::Holarchy` and `holon::law` (a scattering scheme, and the descriptor midpoint step for a singular contact storage) | `Field::ring_holon` (`hnn/field.rs:1722`) gains the resonator storage and `with_pump`; `Field::contact_holon` (`field.rs:1814`) reads `holon::contact::ContactMaterial`, deleting the private copy (`hnn/constitution.rs:2751`); the resident holds the Holarchy (`hnn/reference.rs:468`, and the card's), not only its `parametric()`; `hnn::propagation`'s junction half-turn, element Cayley step and contact two-port become the constituents' advances | `TickBalance(t) = Holarchy::power_balance(bonds_t)`, interface power cancelling once on every contact end (`shared_face_cancels`); per constituent `x_(t+1) = advance(x_t, waves_t)` (the equalities of `hnn/tests/propagation.rs:199–333`, now the executed path); every solve stays constituent-local (guard 14) | the lessons record §2 ("the seams had no shared law"); lesson 11; D2 |
+| S5 (D) | the same owners on the card | `holonics-cuda::hnn::publication` (`ring_operator`, `contact_operator`, `ResonatorOperands`) reads `holon::parametron` and the Holarchy's constituents; the partition is the constituents, the gluing the contact ends | the card's readout equals the host Holarchy's advance line for line | failure 9 (no raised limit: the throughput gate changes the partition); D6 |
+| S6 (E, beside B and C) | `aeon` (`Aeon`, `Epochs`, `Cycle`, `EnclosedLedger`) and `holarchy::view` | `AeonState` (`hnn/reference.rs:451`) becomes an open `aeon::Aeon<ClockLift>` on the Holarchy's parametric orientation; `AeonBoundary.cells` becomes the cell clock's `aeon::Reading`; `AeonBoundary.view` reads `Holarchy::{view, count}` once the rings' complexes are glued along the contact channels; the 126 bare `standing` identifiers (`Locus::Standing`, `ConstitutionRead::standing`, …) are renamed for what they carry, the ring's sheets | an aeon closes exactly at the joint clock's carry-out, and its readings are `aeon::reading` of every clock of the lift; retention is the quotient taken there | D3 (retention by archive); the retired-vocabulary rule |
+
+**Order.** S0 lands with this plan. S1, S2 and S3 are lanes A, B and C, concurrent: B and C read
+A's lock interface on the present bank until A merges. S4 follows A's merge and precedes D's kernel
+(the card realizes the constituent advance once). S5 is lane D. S6 runs beside B and C; its gluing
+part waits on S4. Each step's acceptance is its lane's, plus parity and the deletion of the copy it
+replaces.
+
+**The Lean side keeps the same spine.** 36 of the 52 `HNN/*.lean` files import no object owner;
+`HNN/{Ring, Floquet, FloquetPassage}` (1,816 lines) import neither `Objects/Parametron` nor
+`Objects/ParametronLock`, and `Geometry/Motion` is imported by no `HNN` or `Objects` file. Each step
+moves its statements to the object's Lean owner, or joins them to it by a proved bridge, in the same
+commit; what it cannot join is named in #62.
+
 #### U6. The text chart
+
+**U6's order from October 5** (Brandon, October 5: review the design for conservatism and
+contamination, then "proceed into your campaign immediately"; the lanes were agreed between Claude
+and Codex as peers in the mailbox, topic `responsibility-split`; restated in the elementary objects
+after Brandon's October 5 lens that the framework is "applied and frayed" in the code). This block
+replaces the September 30 block below as the current order, which stays as history.
+
+**The object the lanes build** [definition; agent-inferred, from objects §5, §11, §12 and the
+operator contract]. The HNN is one Holarchy,
+
+```text
+H_HNN = interconnect( ⊕_g P_g , ⊕_a C_a ; 𝒟 glued at every contact end )
+P_g  a parametron ring Holon: ring complex of d_g nodes; ports = its contact ends, its source port,
+     its receiving port; Kirchhoff interconnection; constitution 𝓔_g = storage (C, K), resistance D,
+     the active contrast W_c, and the pump (a periodic modulation of K on the pump's own clock);
+     navigator = the rotor with its key (initial configuration) and clock
+C_a  a helical pair contact Holon: slip J_a = [v_g | −v_h], contact material M_a = Σ w J*DJ,
+     storage (K_a, C_a), its Farey lock address
+```
+
+Its passage is an **aeon** on the Holarchy's parametric orientation (the lift of the rings' joint
+clock torus). A receiver's **epochs** are the crossings of its section; a pump period is a
+**cycle**; the aeon boundary is where the **retention quotient** is taken (action-sufficient, objects
+§8). Every move is a **swing**: the junction is the half-turn about the participation anchor; a
+pump period's map turns below the bifurcation, falls freely (a shear) at the edge, and boosts past
+it. **Learning** is locating keys (the navigators' configurations and the rings' sheets, by loop
+closure over the menu of pair contacts) and **deposition** at the loci those keys reach.
+**Release** is a receiver's reception at the request boundary, returning a receipt.
+
+**Measured reasons**, each stated as the object it misses:
+- *A Holarchy shown no release.* The strict chain held the work on step 1's 40-cell terrain from
+  September 30 to October 4, through about 20 sub-loops, with no release shown to Brandon. Its last
+  reading is 0 of 128 whole sections (record §11).
+- *No key was located.* The learner never inferred a navigator's configuration or a ring's sheet:
+  `hnn::executed` does not call `hnn::keys`. The terrain pins order-2 in 7 readings
+  ([unicity](../../research/records/2026-09-30_UNICITY_THE_READINGS_LEAVE_ONE_KEY_AND_THE_HELIXS_CELLS_ARE_THE_FAREY_SEQUENCE.md)),
+  but the certified descent read 1,024 without locking it. A strict descent cannot cross the
+  lock's flip, a half-turn of a sheet (record §9: one flip costs `34037/4096` nats).
+- *The parametron does not lock.* `hnn::ring::Growth::is_locked` reads `ρ ≥ lower > 1`: the growth
+  rate of a boost, not a held sheet. Lean `Objects/Parametron` states that the linear law holds no
+  saturated amplitude, and the coupled parametron population "takes its sheets as given"
+  (`holon/parametron.rs`).
+- *The Holarchy is a chart, not the executed object.* `hnn::Field::holarchy` is built at the mount
+  and only its parametric orientation is kept (`hnn/reference.rs`, `mount_with_family`); its ring
+  Holons carry neither the pump nor the resonator; the executed tick is `hnn::propagation`, equal to
+  the Holon law's midpoint advance only in tests. The parametron's pump, period map and lock are
+  owned by `hnn::ring`, beside `holon::parametron` and `holon::element::Pump`.
+
+The lanes run concurrently. A failed gate is the next subject of its own lane, and the other lanes
+proceed. **Each lane lands its law in its object's library owner** ([the library spine](#the-library-spine-october-5) above); the
+HNN keeps the boundary adapter that reads it, and the local copy is deleted in the same commit.
+
+- **A, the saturating parametron (Codex).** Object: the parametron's storage, pump, period map and
+  lock. Owner: `holon::parametron` (the storage law, the period map, the lock) with the pump as
+  `holon::element::Pump` on its own clock; `hnn::ring` keeps the ring's loaded port.
+  - The ring's storage gains the quartic element relation `V(u) = κu²/2 + βu⁴/4`, `β > 0`, advanced
+    through the exact shear pair (each half-step a shear: the swing's free fall), with its energy
+    defect carried as a residual. The loaded reverse (the adjoint) and the constitution's resonator
+    family extend with it (`port.rs`, `constitution.rs`).
+  - `α = 0` is the symmetric lock. A cubic `α ≠ 0` is a later, declared asymmetric family member.
+  - The pump's work (a boost) against the dissipation (friction) balances, and the period map's
+    stability, are proved, not assumed. No linear monodromy stands in for the nonlinear certificate.
+  - **Interface (the lock):** `Φ_T`, the executed step composed over one cycle of the pump's clock
+    (`aeon::Cycle`), and a per-ring reading `Lock { sheet ∈ {+1, −1}, amplitude enclosure,
+    certificate }` or `Unresolved`. The certificate is a `G`-ball about the fixed point that `Φ_T`
+    maps into itself, contracting with `ρ < 1`: past the bifurcation the in-phase axis boosts until
+    the quartic storage turns it about the held sheet.
+- **B, the learner locates keys (Claude).** Object: the navigators' keys and deposition. Owners:
+  `compression::keys` (`Menu`, `Candidate`, `Gauge`: the Bombe), `navigator` (configuration and
+  re-keying), `holon::deposition` (the certified step); `hnn::keys` and `executed`'s move become
+  their use.
+  - Survivor elimination over the menu of pair contacts reads `σ_i σ_j = s_ij` on every closed
+    loop, with `s_ij` read from the comparison (the ratio's covector at the contact); the fibre is
+    taken up to the global half-turn, the gauge. Deposition then refines the constitution at the
+    loci the located keys reach, under the existing certificate (`CertifiedStep`).
+  - **Acceptance on step 1's terrains:** readings to lock against `n*_terrain`, measured in the
+    same unit, with the final confirmation unread until the law is fixed.
+  - Until A lands, B runs on the present bank's sheets through A's lock interface, and no key-lock
+    claim is made.
+- **C, the release (Claude).** Object: the receiver's reception and its receipt. Owner:
+  `receiver::release` (the one decision law) inside one HNN owner, `hnn::prediction::generate_by_bank`.
+  - The request is a boundary condition clamped at the source port; the Holarchy moves by whole
+    pump cycles; the receiving ring's receiver reads each station's lock:
+    `release = section_release(sheets(Φ_Tⁿ(clamp(request))))`, where `n` is the first cycle at which
+    every release station certifies. The return is an `InteractionReturn` whose receipt has one
+    region per station, each in the receiving ring's clock.
+  - The port's own `release` (`hnn/reference.rs`, which reads the receiving storage through
+    `ReceivingPhases::read`) folds into this one owner and takes the field's material alone.
+  - Every loop shows Brandon one release whole, on text and on one non-text terrain, under the
+    [release guards](../THE_MACHINE.md#guards-that-make-the-rejected-forms-impossible) (18 and 19).
+- **D, the card (Codex).** Object: the same Holarchy under the hardware law. The constituents (rings,
+  contacts) are the co-present regions, and their only shared ports are the contact ends. The exact
+  integer realization of A's step, under a certified partition with a capacity-derived launch,
+  realizing the library owner's step at parity. It follows A's merge. Throughput is a capability
+  gate (the field window runs 46 times its passage budget), not U8's later optimization.
+- **E, plan and integration (Claude).** This order, the guards, CONSTRUCTION_STATE, the library
+  spine, and landing each lane's work with its gates; the operator contract row of each object a
+  lane touches is updated in the same commit.
+- **Moved behind useful output:** cold card restore (`ExposedResident::continuing`: an aeon's
+  quotient reopened on the card) and atomic whole-resident publication. The signed phase return
+  stays ahead of them: energy alone is blind to the half-turn, and the sign is the sheet, which
+  changes what is learned.
+- **The context-count tree is an exterior receiver, a yardstick.** No release reads it (guard 18).
+  It leaves the constitution once lane A's locks carry the receiving storage (the receiving ring's
+  sheets). Until then, its bits are reported as the tree's, never as the field's.
 
 **U6's order from here** (September 30, agent-inferred and revised after Astra's review; it replaces
 the order stated only in the
 [diagnosis](../../research/records/2026-09-30_THE_LEARNING_FAILURE_DIAGNOSED_THE_TRAINED_COMPARISON_IS_NOT_THE_ONE_THE_RELEASE_EXECUTES.md)
-§5 and in conversation). This block is the current order; the dated entries below it are its
-history, newest first. A step starts only when the step before it passes its acceptance. A falsifier
-that fires becomes the next loop's subject, and nothing downstream starts.
+§5 and in conversation). It was the current order until October 5 (above); the dated entries below
+it are its history, newest first. Under it, a step started only when the step before it passed its
+acceptance, a falsifier that fired became the next loop's subject, and nothing downstream started.
 
 - **The goal step 1 serves.** The goal stays the native, continuing adaptation (no frozen phase) with
   a concrete consumer of the persistent state: the retained constitution that the next aeon reads.
@@ -2049,8 +2195,11 @@ terms; this is not F4 acceptance.
     after a future-equivalent key is located.
   - On stochastic terrain the conditional faces are compared with the known source, never one
     drawn stream against its entropy.
-- **Curated.** Development responses are inspected against a request-aware retrieval control:
-  answering with the most similar earlier request's recorded response.
+- **Curated.** Development releases are shown to Brandon whole, each with its copy length
+  ([guard 19](../THE_MACHINE.md#guards-that-make-the-rejected-forms-impossible)). No control,
+  recorded reply or retrieved response stands beside them (October 5: the retrieval control
+  rewarded resemblance to recorded replies, the form every copy pipeline took; the
+  [contamination record](../../research/records/2026-10-05_THE_CONTAMINATION_CYCLES_EVERY_COPY_PIPELINE_FOLLOWED_A_DEMAND_FOR_OUTPUT_BEFORE_THE_FIELD_COULD_RELEASE.md)).
 - **Deadline.** A warm-response deadline is pinned.
 - **If it fails.** The machine is a predictor, not yet a releasing product.
 
@@ -2095,18 +2244,14 @@ and pin a fresh untouched development split before F5's acceptance pass or evalu
 - **Evaluation, once.** On every eligible evaluation request, Athena releases before its recorded
   reply is read. **Brandon judges** (September 27: "I'd want to do it"), blind, under a rubric
   frozen before the split is read.
-  - For each request he sees two responses side by side in a hash-seeded random order, Athena's
-    and the retrieval control's, with nothing that names their source.
-  - He marks each response as answers, justified refusal, or fails, and marks which of the two is
-    better or that they tie.
-  - The judging surface shows him the request, its declared context and the two responses, and
-    nothing private beyond what he already owns.
-  - The unblinding key is written after his marks are committed.
+  - For each request he reads Athena's one release whole, as it is, with its copy length beside
+    it as a receipt. No second response, control or recorded reply is shown.
+  - He marks each release as answers, justified refusal, or fails.
+  - The judging surface shows him the request, its declared context and the release, and nothing
+    private beyond what he already owns.
 - **Acceptance.**
   - More than half of the outputs answer, or justifiably refuse; an answerable refusal counts as a
     failure.
-  - The releases win more than they lose against the request-aware retrieval control built from
-    development only.
   - Nothing private is disclosed.
   - A warm response returns within one minute, within the declared memory limits.
 - **Reported beside it, not as acceptance.** The conditional code of the recorded replies, against
