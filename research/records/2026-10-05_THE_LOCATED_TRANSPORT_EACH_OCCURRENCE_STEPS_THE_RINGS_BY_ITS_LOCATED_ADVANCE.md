@@ -299,3 +299,164 @@ fibre: classes_t = ∪_(members m kept) {λ_m(c(ℓ)) : ℓ ∈ L_t^m};  release
   the repair releases only truth and reopens every passage.
 - `research/notebook/hnn_design/hnn_transport_loop.rs`: `executed transport <seed> <read keys>
   <length> <out> [locate]`.
+
+## 4. Measured: the read, once each (at `59281dc5`'s build)
+
+[measured] `executed transport <seed> 48 120`, the four draws together, one thread each; receipts
+`2026-10-05_THE_LOCATED_TRANSPORT_receipts/s<seed>{_log.txt, _scope.txt, .sections, .curve.gz}`.
+Nothing changed after the amendment. The amended claim of §0.6 holds on every count; the pinned
+claim of §0.5 fails where §0.6 says it was refuted in development (two draws plural; `n*_machine`
+past 240 on all four).
+
+**Location** (5,760 observations a draw; `n_U = 16`):
+
+| Draw | Fibre | Members | `n*_machine` | Peak survivors | Survivors explored | Generator a member | Every member regenerates |
+|---|---|---|---|---|---|---|---|
+| `…911` | one | 1 | 376 = 2³·47 | 73,140 | 213,507 | yes | yes |
+| `…912` | one | 1 | 1,219 = 23·53 | 33,772 | 101,409 | yes | yes |
+| `…913` | plural | 3 | 4,453 = 61·73 | 29,808 | 2,701,845 | yes | yes |
+| `…914` | plural | 2 | 5,658 = 2·3·23·41 | 38,772 | 399,623 | yes | yes |
+
+- **The located transports** (each class's advance in `ℤ/60`, then as odometer digits `(a_0, a_1, a_2)`
+  and CRT residues `(mod 3, mod 4, mod 5)`), the generator's, read only to score:
+  - `…911`: `A = (11, 45, 33, 23, 23)`; digits `(2,3,0), (0,3,3), (0,3,2), (2,3,1), (2,3,1)`; residues
+    `(2,3,1), (0,1,0), (0,1,3), (2,3,3), (2,3,3)`. The located representative is its reflection,
+    `(49, 15, 27, 37, 37) = −A`, with the labels reflected.
+  - `…912`: `A = (56, 29, 51, 15, 54)`, located as itself.
+- **The plural fibres.** On `…913` the three members agree everywhere but one class's advance, which
+  the read set leaves in a window of three consecutive lifts, `23, 24, 25` in the representative's
+  chart, the generator's at the centre: no read orbit meets a cell boundary at that class's step
+  closely enough to separate them. On `…914` the second member swaps the labels of cells 1 and 3 and
+  changes four advances (`(14, 33, 56, 23) → (46, 39, 4, 25)`), and each member regenerates every read passage
+  from its own keys. These are differences the receiving grain does not distinguish on the read set:
+  a kernel of the read, not a failure of the elimination (the brute-force test holds the survivors
+  exact).
+- **The curve** (`.curve.gz`, survivors and lifts at every observation): on `…913` the survivors run
+  `1, 92, 1588, 772, 500, 364, 340, 228, …` over the first observations as each class's first step
+  branches its advance and the next cell prunes it, and settle at 6 survivors (3 members, each with
+  its reflection) from observation 4,453.
+
+**Relabelling** (24 permutations a draw, every fifth of the 120, the identity first): on every
+draw the fibre is carried by every permutation (each member's advance at `π u`, each label
+`π(λ(c))`), `n*_machine` is equal under all 24, and the located code is 338 bits under all 24. The
+residue chart's code length takes 22 to 24 distinct values over the same 24 permutations on each
+draw:
+
+| Draw | Residue chart, identity labels | Least and greatest over the 24 |
+|---|---|---|
+| `…911` | 61,640 = 2³·5·23·67 | 43,730 to 65,795 |
+| `…912` | 60,560 = 2⁴·5·757 | 54,695 to 67,370 |
+| `…913` | 58,700 = 2²·5²·587 | **13,685 = 5·7·17·23** to 67,160 |
+| `…914` | 65,975 = 5²·7·13·29 | 49,520 to 67,745 |
+
+On `…913` one relabelling brings the residue chart below the literal: a chart a code chooses can
+compress or not by the accident of the labels, which is why guard 9 refuses it.
+
+**Founding** (`hnn::encoding`, unchanged): on every draw the advances generate `ℤ/60` (their gcd with
+60 is 1), all 60 lifts are reached, the founded dimension is **49 = 7² = 60 − 11**, and the squares
+`D E = ρ`, `E T_u = U_u E` hold on all 60 reached states under all 5 located transports.
+
+**Code**: the located navigator's code is **338 = 2·13² bits** on every draw and reads the read set
+back exactly, against the literal **17,280 = 2⁷·3³·5 bits** (ratio `169/8640`); the residue chart at
+its identity labels takes 58,700 to 65,975 bits, above the literal.
+
+**Repair** (12 passages of 60 cells a draw from the held-out keys, 276 = 2²·3·23 erased cells):
+
+| Draw | Released (equal to the truth) | Held (family size) | Members kept / refused | Residual / literal (bits) | Reopened |
+|---|---|---|---|---|---|
+| `…911` | 276 (276) | 0 | 12 / 0 | 0 / 828 | 12 of 12 |
+| `…912` | 276 (276) | 0 | 12 / 0 | 0 / 828 | 12 of 12 |
+| `…913` | 275 (275) | 1 (2) | 35 / 1 | 1 / 828 | 12 of 12 |
+| `…914` | 276 (276) | 0 | 24 / 0 | 0 / 828 | 12 of 12 |
+
+Every released cell equals its truth: 1,103 of 1,103. On `…913` a held-out passage refused one member
+(its restriction emptied a family), and one cell stayed held with two classes where the kept members
+disagree; its one-bit residual reopens the passage. A repaired passage, whole (synthetic `ℤ/5`;
+`·` erased; `…913`, passage 0, key 48):
+
+```text
+damaged  241·11····0311111111·····11111111····3111111····1031111·····
+repaired 241111111103111111111110311111111111031111111111103111111111
+truth    241111111103111111111110311111111111031111111111103111111111
+```
+
+The tail `[55, 60)` is continuation as the special case; the opening's cell 3 is restored from both
+sides once the later intact cells pin the lift.
+
+## 5. What the read shows
+
+1. **The missing operation exists and is located without a class's code.** On every draw the
+   generator's transport is a member of the fibre, located from the emitted classes alone, and the
+   relabelling law holds on every permutation read; the residue chart's code length moves by up to
+   53,475 bits under relabelling on one draw.
+2. **The receiving grain leaves a kernel.** Two of four draws keep a plural fibre after every key but
+   twelve was read twice around the joint clock. The members are what the receiving grain does not
+   separate on the read set; the repair reads through all of them and releases only where they agree,
+   so the plurality costs one held cell in 1,104 and never a wrong one.
+3. **The founded encoding is the helix less the grain's silent modes.** The located transports give
+   `hnn::encoding` non-identity `T_u`, and it founds 49 of the helix's 60 states: the 11 Fourier
+   modes an interval of 12 lifts annihilates are the hidden rings' part the receiving ring never
+   reads linearly.
+4. **The lock is slow against the unicity count.** `n*_machine` runs from 376 to 5,658 observations
+   against `n_U = 16`: the counting bound separates transports in principle, but the autonomous
+   orbits meet the cell boundaries that separate neighbouring advances rarely, in late passages.
+
+## 6. The interfaces
+
+- **Lane E, the field's selective step** (`hnn::field::Field::selective_step`, Codex's entrance; not
+  edited here). Equation at the consumer: ring `g` advances by `a_g(class) + carry_g` with
+  `a_g(class) = digits(A(class))_g` from `LocatedTransport::digits`, in place of
+  `[port_g(code) ∈ N_g]`; the moment then reads each occurrence at the lift `ℓ(0) + Σ_(j<k) A(u_j)`.
+  The class reaches the field as the encoding's class (`Encoded`), never as a code.
+- **Merges.** A word `u·v` steps the lift by `A(u) + A(v)`, and `E T_v T_u = U_v U_u E` follows from
+  the two squares, so a merged unit is founded on the composed transport without a new square; its
+  pricing by the code-length pair (the landmarks record §5) is not built here.
+- **Deposition.** The location here is exact elimination, the zero-likelihood limit of the population
+  over key families; no constitution moved. Depositing a located advance as the ring's stepping law
+  is the lane E consumer above.
+
+## 7. Time and memory
+
+Projection and deadline from §0.6 (800,000 ms a draw, deadline 1,000 s); four draws together, one
+thread each; peaks from each systemd scope (`_scope.txt`) and the process's own `VmHWM`.
+
+| Run | Projection / deadline (ms) | Measured wall (ms) | Peak (scope; `VmHWM` bytes) |
+|---|---|---|---|
+| development `…901` | — / 1,200,000 | 6,387 (service) | 25.4M; 16,306,176 |
+| `…911` | 800,000 / 1,000,000 | 6,545 | 16.7M; 16,453,632 |
+| `…912` | 800,000 / 1,000,000 | 6,081 | 16.2M; 16,396,288 |
+| `…913` | 800,000 / 1,000,000 | 8,798 | 20.5M; 16,093,184 |
+| `…914` | 800,000 / 1,000,000 | 6,257 | 15.8M; 16,232,448 |
+
+Measured over projected, the slowest draw: `8798/800000 = 4399/400000`. The projection took the
+slowest location measured before launch (30,985 ms, an exploration draw with 313 members) for all 25
+locations of a draw; the read draws' locations took 10 to 136 ms. The projection's error is that
+choice of the worst measured unit, reported as such.
+
+## 8. Owed in #62
+
+1. **The two charts are one lift**: for pairwise coprime `d_g`, the odometer's step with carries gives
+   the digits of `ℓ + A`, and the CRT residues of `ℓ + A` are the residues' sums (an instance of
+   `Geometry/PhaseCarry.winding_add` and the Chinese remainder isomorphism).
+2. **The dihedral gauge**: `c(D − 1 − ℓ) = d_last − 1 − c(ℓ)`, and the passage of
+   `(−A, λ∘(c ↦ −c), D_low − 1 − ℓ(0))` is the passage of `(A, λ, ℓ(0))`.
+3. **The relabelling law**: the survivors on `π∘x` are those on `x` carried by `π`, so the located code
+   length is invariant; a transport defined from the classes' codes is not carried.
+4. **The founded dimension**: the shifts of an interval indicator of length `L | D` on `ℤ/D` span
+   `D − (L − 1)` dimensions (the zeros of `Σ_(j<L) ω^(jk)`), joined to `HNN/Encoding.hankel_rank_eq`.
+5. **The lift restriction** is the joint fibre's projection on a chain (the repair owner's item 1,
+   for a function on hidden states), and the release over a fibre's union is sound: a released class
+   is the truth's whenever the truth's member is kept.
+
+## 9. Commits and gates
+
+- `7fe3cc4c`: the claim and the pins, before any read. `59281dc5`: the owner, its tests, the harness,
+  the development receipts and the pin's amendment (§0.6), before the read. This record's commit:
+  the read's receipts, §4–§9.
+- Gate 1, `bash tools/gate.sh` at the owner's build: check, guard lints and guard doctests ok
+  (12,922; 18,148; 21,035 ms); the lints add only `result_large_err` in the new owner, which every
+  `CompressionError` owner carries.
+- Gate 2, `cargo test -p holonics --lib -- --test-threads=4` at the owner's build: 1,043 passed, 0
+  failed, 411,970 ms of tests (417,968 ms wall with its build; four threads, beside the read's four,
+  within the budget of 8); receipt `lib_tests.txt`. The owner's nine tests are among them. No Lean
+  changed (§8 names the obligations); no card run (no kernel or card path changed).
