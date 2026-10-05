@@ -1,0 +1,19 @@
+# A ring of period 16 (lane B's test field pair_field(5): one ring, |A| = 5), the order-2 pair deposited at δ = 2 on its declared opening; request seed 41 (8 cells); the four-member bank of hnn/tests/executed.rs (declared_bank), read at the grain 2^(−12); members [Stand, Quarter, Half, ThreeQuarters]; each growth's lower end at the grain 1/16 (⌊16 L⌋/16); along the target's trajectory (each station placed at f of its antecedent once read). Read by a development test that was not kept (lane C's record §5.4).
+station 0: antecedent 2, f(antecedent) 3
+  class 0: pair ["19/16", "10/16", "25/16", "10/16"] alone ["22/16", "29/16", "30/16", "15/16"]
+  class 1: pair ["93/16", "16/16", "31/16", "34/16"] alone ["44/16", "19/16", "14/16", "20/16"]
+  class 2: pair ["13/16", "61/16", "66/16", "40/16"] alone ["14/16", "12/16", "10/16", "12/16"]
+  class 3: pair ["14/16", "222/16", "79/16", "46/16"] alone ["10/16", "10/16", "24/16", "10/16"]
+  class 4: pair ["13/16", "10/16", "35/16", "33/16"] alone ["10/16", "20/16", "22/16", "14/16"]
+station 1: antecedent 0, f(antecedent) 1
+  class 0: pair ["10/16", "133/16", "12/16", "95/16"] alone ["22/16", "29/16", "30/16", "15/16"]
+  class 1: pair ["75/16", "83/16", "187/16", "98/16"] alone ["44/16", "19/16", "14/16", "20/16"]
+  class 2: pair ["10/16", "73/16", "21/16", "55/16"] alone ["14/16", "12/16", "10/16", "12/16"]
+  class 3: pair ["40/16", "55/16", "29/16", "64/16"] alone ["10/16", "10/16", "24/16", "10/16"]
+  class 4: pair ["19/16", "20/16", "56/16", "37/16"] alone ["10/16", "20/16", "22/16", "14/16"]
+station 2: antecedent 3, f(antecedent) 0
+  class 0: pair ["42/16", "155/16", "11/16", "71/16"] alone ["22/16", "29/16", "30/16", "15/16"]
+  class 1: pair ["65/16", "14/16", "106/16", "25/16"] alone ["44/16", "19/16", "14/16", "20/16"]
+  class 2: pair ["17/16", "149/16", "50/16", "108/16"] alone ["14/16", "12/16", "10/16", "12/16"]
+  class 3: pair ["17/16", "442/16", "61/16", "131/16"] alone ["10/16", "10/16", "24/16", "10/16"]
+  class 4: pair ["30/16", "102/16", "35/16", "127/16"] alone ["10/16", "20/16", "22/16", "14/16"]

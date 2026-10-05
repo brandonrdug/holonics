@@ -3409,6 +3409,30 @@ fn locus_code(kind: u64, index: usize, part: usize) -> u64 {
     (kind << 40) + ((index as u64) << 20) + part as u64
 }
 
+/// [definition] **The declared source port `E_0`** of a source ring (`None` on any other ring): the
+/// declared sign sequence times ½ (locus kind 0), `2d_g × |A|`. It is the opening's port and the
+/// prior `B_0 = E_0` its normal law keeps ([`Constitution::initial`]), declared by the field alone:
+/// every opening of one field holds it, so a learned part `E − E_0` is read against it
+/// (`hnn::executed::pair_deposit`; the release's pair contacts, `hnn::prediction`).
+pub fn declared_source_port(field: &Field, ring: usize) -> Result<Option<ExactRatMatrix>, HnnError> {
+    if !field.is_source(ring) {
+        return Ok(None);
+    }
+    let n = field.ring(ring).width();
+    let a = field.alphabet();
+    Ok(Some(ExactRatMatrix::shaped(
+        n,
+        a,
+        (0..n)
+            .map(|i| {
+                (0..a)
+                    .map(|j| declared_sign(locus_code(0, ring, 0), i as u64, j as u64) * rat(1, 2))
+                    .collect()
+            })
+            .collect(),
+    )?))
+}
+
 fn scaled_identity(n: usize, value: Rat) -> ExactRatMatrix {
     ExactRatMatrix::identity(n)
         .expect("a positive extent")
@@ -3787,26 +3811,7 @@ impl Constitution {
                 // quadrature) was retired on September 29 with the founded charts: many codes shared
                 // one node, aliasing cells, and on the prediction field it alone made the
                 // refinement's exact cost grow past its bound (the lessons record, §4; `96d8940b`).
-                let source = field
-                    .is_source(g)
-                    .then(|| {
-                        let map = ExactRatMatrix::shaped(
-                            n,
-                            a,
-                            (0..n)
-                                .map(|i| {
-                                    (0..a)
-                                        .map(|j| {
-                                            declared_sign(locus_code(0, g, 0), i as u64, j as u64)
-                                                * rat(1, 2)
-                                        })
-                                        .collect()
-                                })
-                                .collect(),
-                        )?;
-                        Ok::<_, HnnError>(NormalLaw::with_prior(map))
-                    })
-                    .transpose()?;
+                let source = declared_source_port(field, g)?.map(NormalLaw::with_prior);
                 let pairs = if field.is_source(g) {
                     field
                         .offsets()

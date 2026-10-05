@@ -253,3 +253,61 @@ pub(super) fn keys_probe(terrain: &str, seed: u64, count: usize, scale: &str, ou
         std::fs::write(format!("{out}.{label}"), write_state(&theta, ring)).expect("write the state");
     }
 }
+
+/// [measured-diagnostic; agent-inferred, October 5; lane C's
+/// [record](../../records/2026-10-05_THE_RELEASE_READS_THE_LOCATED_PAIR_ON_EQUAL_MATERIAL.md) §3;
+/// never a law] **`executed pair-members <terrain> <seed> <count> <state>`**: on each request, along
+/// the target's trajectory (each station's target placed once the station is read, the forced
+/// release's reading context, never a commit), every candidate's pair storage and its own column
+/// alone (`BankPlacement::pair_storage`), read by every member of the bank, each member's growth's
+/// lower end at the grain `1/16`, and the candidate's gain on equal material (the least member's
+/// ratio). It reads why the least member decides: a candidate that fits the closed contact gains at
+/// every member, the antecedent's copy only at the members where the contact's distance carries
+/// its line to itself.
+pub(super) fn pair_members(terrain: &str, seed: u64, count: usize, state: &str) {
+    use holonics::hnn::prediction::BankPlacement;
+    use holonics::hnn::ring::turn;
+    let declared = order_declared();
+    let engine = Engine::new(declared);
+    let ring = engine.refinement.ring();
+    let bank = bank_of(declared.period, &bank_strength());
+    let theta = executed_loop::mount(&engine.theta, ring, state);
+    let at = |x: &Rat| executed_loop::cell(&ExactInterval { lower: x.clone(), upper: x.clone() }, 16);
+    for (request, target) in &terrain_pairs(terrain, &declared, seed, count) {
+        let (current, moment) = ingest(&engine.field, request);
+        let placement =
+            BankPlacement::of(&engine.field, &theta, &current, &moment, &engine.refinement).expect("the placement");
+        println!(
+            "request tail {:?} | target {target:?} | closed contacts {:?}",
+            &request[request.len() - 2..],
+            placement.contacts()
+        );
+        let mut cells: Vec<Option<usize>> = vec![None; declared.stations];
+        for station in 0..declared.stations {
+            println!("  station {station}:");
+            for class in 0..declared.alphabet {
+                match placement.pair_storage(station, class, &cells) {
+                    Some((pair, alone)) => {
+                        let pair = bank.read_turn(&turn(&pair), BANK_GRAIN).expect("a reading");
+                        let alone = bank.read_turn(&turn(&alone), BANK_GRAIN).expect("a reading");
+                        let least = pair
+                            .members
+                            .iter()
+                            .zip(&alone.members)
+                            .map(|(p, a)| &p.lower / &a.upper)
+                            .min()
+                            .expect("a member");
+                        println!(
+                            "    class {class}: pair {:?} alone {:?} least ratio ≥ {}",
+                            pair.members.iter().map(|m| at(&m.lower)).collect::<Vec<_>>(),
+                            alone.members.iter().map(|m| at(&m.lower)).collect::<Vec<_>>(),
+                            at(&least)
+                        );
+                    }
+                    None => println!("    class {class}: no closed contact joins a placed crossing"),
+                }
+            }
+            cells[station] = Some(target[station]);
+        }
+    }
+}
