@@ -265,4 +265,122 @@ deadline is its upper end, `5/4` of it:
 | alternation | `5531/8` | `50182/64` | `13935/8` | `208635/64` | 829,090 ms | 1,037 s |
 | line | `5879/8` | `5865/8` | `21601/64` | `154427/64` | 539,960 ms | 675 s |
 
-(Read after this section is committed; appended below.)
+### 7.1 The readings, read once (at `2773a788`'s build, the source unchanged since `44f98303`)
+
+[measured] No law, state or declaration changed after the validation read. Receipts: `final/`.
+
+**The alternation** (`2_026_093_036`; 91 nonconstant requests, 37 constant):
+
+| State | Released / held | Whole: nonconstant, constant | Stations right (nonconstant of 728, constant of 296) | By station | First lock right | ms |
+|---|---|---|---|---|---|---|
+| keys on the founded opening | 128 / 0 | **0 of 91**, 13 of 37 | 538 (366, 172) | 34 33 101 101 34 33 101 101 | 28 | 93,830 |
+| keys on the lossless opening | 128 / 0 | 0 of 91, 13 of 37 | 538 (366, 172) | 34 33 101 101 34 33 101 101 | 28 | 100,062 |
+| lossless opening | 8 / 120 | 0 of 91, 8 of 37 | 399 (222, 177) | 60 46 53 55 49 41 49 46 | 8 | 60,034 |
+| founded opening | 121 / 7 | 0 of 91, 8 of 37 | 289 (189, 100) | 43 59 25 54 27 36 18 27 | 27 | 379,948 |
+
+The keys states' 13 constant sections whole are the 13 constant requests of the class `0`; the
+constant `2 2 2 …` requests are released `0 0 0 …` (7), the `1 1 1 …` ones `3 3 1 1 3 3 1 1` (9) and
+the `3 3 3 …` ones `1 1 3 3 1 1 3 3` (8). Released nonconstant stations follow `x_t = x_(t−2)` at 284
+of 728.
+
+**The line** (`2_026_093_039`; 96 nonconstant requests, 32 constant):
+
+| State | Released / held | Whole: nonconstant, constant | Stations right (nonconstant of 768, constant of 256) | By station | First lock right | ms |
+|---|---|---|---|---|---|---|
+| keys on the founded opening | 128 / 0 | **96 of 96**, 32 of 32 | **1,024** (768, 256) | 128 128 128 128 128 128 128 128 | 128 | 77,862 |
+| keys on the lossless opening | 128 / 0 | 96 of 96, 32 of 32 | 1,024 (768, 256) | 128 128 128 128 128 128 128 128 | 128 | 82,374 |
+| lossless opening | 13 / 115 | 0 of 96, 13 of 32 | 345 (180, 165) | 39 32 43 45 39 43 57 47 | 13 | 73,969 |
+| founded opening | 121 / 7 | 0 of 96, 13 of 32 | 275 (151, 124) | 36 51 34 55 30 28 23 18 | 18 | 366,593 |
+
+No certificate was refused on any state; no keys section reached the termination (the lossless
+opening's line sections reached it on 33 requests, the founded opening's on 11).
+
+**The regressions, read once.** The line, with its key located from 24 observations (`n*_terrain`
+20), releases all 128 sections whole on both keys states (all 1,024 stations follow `x_t = x_(t−4)`)
+against 0 nonconstant for both openings: the success rule holds. The alternation, with its key
+located from 33 observations (`n*_terrain` 33), releases 0 of 91 nonconstant sections whole on every
+state: the claim fails there, by the measured blocker of §8. As regressions both readings repeat
+training content by construction (16-member request spaces); neither is a transfer reading.
+
+## 8. The measured blocker, and the next loop's subject
+
+**The alternation's release** [measured]. With its key located (`(2, id)` from 33 observations,
+the terrain's own count) and deposited exactly, the release (`hnn::prediction::generate_by_bank`,
+lane C's law, unchanged) releases 0 of 46 nonconstant validation sections whole and 0 of 91
+on the final confirmation. The located map fixes its antecedent, so the fit at every station is the
+antecedent's copy. Lane C chose the least member's gain to make the copy lose where the contact's
+transport half-turns it (its §3.3; in a member's first-order chart the copy's pair term is
+`(1 + e^{iωδ}) Ê_a`), and on the alternation that rejection falls on the fit: on the development
+request of §5 the fit gains by more than `2⁴` on three members and loses the least-member comparison
+on Stand (`[25/16, 26/16)` against its column alone's `[8/16, 9/16)`) to a class whose column alone
+reads `[3/16, 4/16)` there. The gain cannot tell the copy as a wrong class (order-2, `c = 15`) from
+the copy as the fit (the alternation, `c = 0`): it reads the members' lines and the transport `P^δ`,
+never the located turn. **The next loop's subject**: the release's comparison on equal material
+when the located map fixes its antecedent, read where the decision belongs (the contact's own map,
+which the deposited columns hold) rather than on the members where `P^δ` half-turns the fit. It is
+not built or tuned here; the alternation's readings stand as this law's regression.
+
+**The line** carries no blocker: neither item 4 condition fired (the global fibre kept the windings
+of 4, and no per-request translation needed representing), and lane C's `δ ≡ 0 (mod 4)` cause did
+not bite, since its copy is its fit.
+
+## 9. Time and memory
+
+Thread budget 12 (`RAYON_NUM_THREADS=12`) on every release read; the terrains' reads ran one after
+the other (one read holds the budget beside the other agent's). Peak resident sets are the systemd
+scope's cgroup `memory.peak` read inside the unit (exact bytes) where marked "scope", else the
+program's own peak resident (`VmHWM`), since the first runs' scope summary prints only a rounded
+display.
+
+| Run | Projection / deadline | Measured wall ms | Peak resident bytes |
+|---|---|---|---|
+| keys, unchanged law, the two training passages | — / 120,000 each (first read) | 82; 75 | 31,612,928; 31,510,528 (program) |
+| keys, the windings law, order-2 re-read | 4,000 / 120,000 | 487 (program) | 148,144,128 (program) |
+| keys, development `041` (16 requests), both terrains | — / 120,000 each | 473; 463 (program) | 147,435,520; 146,239,488 (program) |
+| keys, the two training passages | 4,000 / 120,000 each | 523; 500 | 149,082,112; 148,983,808 (scope) |
+| release, development `042` (8 requests × 4 states), alternation; line | — / 120,000 each (first read) | 45,933; 32,275 | 141,373,440; 148,398,080 (program) |
+| `pair-members`, development (2 requests) | — / 120,000 | not read | not read |
+| release, validation (64 × 4), alternation | 363,032 (upper 453,790) / 454,000 | 328,621 | 157,536,256 (scope) |
+| release, validation (64 × 4), line | 254,184 (upper 317,730) / 318,000 | 252,825 | 158,535,680 (scope) |
+| release, final (128 × 4), alternation | 829,090 (upper `2072725/2`) / 1,037,000 | 634,587 | 159,129,600 (scope) |
+| release, final (128 × 4), line | 539,960 (upper 674,950) / 675,000 | 601,387 | 155,308,032 (scope) |
+
+The validation projection took each state's development time times 8 (`ms/8` a request, times 64),
+the upper end `5/4` of it. Measured over projected: the alternation `328621/363032`, the line
+`252825/254184`, both inside. One state ran past its own upper bound inside an on-time run: the
+alternation's founded opening read in 208,635 ms against its share `163,440` (upper 204,300), an
+overrun of `4,335` ms on that state; the run's deadline held, and the final's projection takes that
+state's validation time a request. The final: the alternation `634587/829090`, inside its projection;
+the line `601387/539960` (1 rem `61427/539960`), past its projection and inside its upper end and
+deadline. Two of the line's states passed their own shares: the lossless opening read in 73,969 ms
+against `43,202` (upper `108005/2`), a rate a request of `73969/128` against the validation's
+`21601/64`, and the founded opening in 366,593 against `308,854` (inside its upper `772135/2`). The
+per-state watch read each state at its end, not per request, so the lossless state's overrun was not
+stopped early; the run ended inside its fixed deadline and nothing was relaunched.
+
+## 10. Owed in #62
+
+1. **The windings law**: `k` closed contacts at `δ₀` with the map `f₀` compose into a closed contact at
+   `kδ₀` with the map `f₀^k` and the turn `k c₀`; a survivor set that is one family of windings is
+   generated by its least member, and on any passage where every winding survives, each winding's
+   emissions are the generator's composed.
+2. **The line's global key**: `x_t = x_0 + s t (mod 4)` satisfies `x_t = x_(t−4)` for every slope
+   (`4s ≡ 0`), so the turn menu at every multiple of 4 survives every line passage with the identity.
+3. **The fit as the copy**: with `(E − B) e_a = P^δ B e_a` and `f(a) = a`, the fit's pair storage is
+   `(1 + P^δ)² B e_a` against its column's `(1 + P^δ) B e_a`, so on a line `ω` with `e^{iωδ} = −1` both
+   vanish in the first-order chart (lane C's §8.2 statement extended to the case where the copy is
+   the fit).
+
+## 11. Commits and gates
+
+- `44f98303`: the windings law (`hnn::keys::PairSurvivors::located`), its two tests, the harness's
+  boundary deposit, the atlas row `hnn.pair-location`, this record through §5 and the claim, and the
+  receipts of loops 1 and 2 and the development. `2773a788`: the validation readings and the final's
+  pin. The final readings' commit: §7.1, §8–§11, the receipts in `final/`, the records README's route.
+- Gates: `cargo check --workspace --all-targets` clean (the pre-existing dead-code warning
+  `ReceivingPhases::with_rank` only); `cargo test -p holonics --lib -- hnn::tests::keys`, 12 passed
+  and 0 failed. The guard lints (`cargo clippy -p holonics --lib -- -D clippy::disallowed_types -D
+  clippy::disallowed_methods -D clippy::float_arithmetic`) report nothing in the files this loop
+  changed; the run stops on the pre-existing deny-by-default `while_immutable_condition` at
+  `hnn/reference.rs:3766`, as lane C recorded. No Lean changed (the three statements of §10 are owed in #62). No card
+  run: no kernel or card path changed.

@@ -1,0 +1,10 @@
+  keys-founded (transport modulus 102837/131072; closed pair contacts at [4]): released 128, held 0, refused 0, refused certificates 0; whole sections 128 of 128 (nonconstant 96 of 96, constant 32 of 32); the success rule (every nonconstant section whole): holds; incorrect releases 0; reaching the termination 0; stations right 1024 by station [128, 128, 128, 128, 128, 128, 128, 128]; first lock at a request-reading station (0 or 1) 104, first lock right 128; 77862 ms
+  keys-lossless (transport modulus 1; closed pair contacts at [4]): released 128, held 0, refused 0, refused certificates 0; whole sections 128 of 128 (nonconstant 96 of 96, constant 32 of 32); the success rule (every nonconstant section whole): holds; incorrect releases 0; reaching the termination 0; stations right 1024 by station [128, 128, 128, 128, 128, 128, 128, 128]; first lock at a request-reading station (0 or 1) 104, first lock right 128; 82374 ms
+  lossless (transport modulus 1; closed pair contacts at []): released 13, held 115, refused 0, refused certificates 0; whole sections 13 of 128 (nonconstant 0 of 96, constant 13 of 32); the success rule (every nonconstant section whole): does not hold; incorrect releases 0; reaching the termination 33; stations right 345 by station [39, 32, 43, 45, 39, 43, 57, 47]; first lock at a request-reading station (0 or 1) 0, first lock right 13; 73969 ms
+  opening (transport modulus 102837/131072; closed pair contacts at []): released 121, held 7, refused 0, refused certificates 0; whole sections 13 of 128 (nonconstant 0 of 96, constant 13 of 32); the success rule (every nonconstant section whole): does not hold; incorrect releases 108; reaching the termination 11; stations right 275 by station [36, 51, 34, 55, 30, 28, 23, 18]; first lock at a request-reading station (0 or 1) 13, first lock right 18; 366593 ms
+executed evaluate: 601340 ms; resident 151158784 now, 151158784 peak
+--- scope: exit 0; memory.peak 155308032 bytes
+Main processes terminated with: code=exited, status=0/SUCCESS
+               Service runtime: 10min 1.376s
+             CPU time consumed: 1h 42min 28.847s
+wall 601387 ms

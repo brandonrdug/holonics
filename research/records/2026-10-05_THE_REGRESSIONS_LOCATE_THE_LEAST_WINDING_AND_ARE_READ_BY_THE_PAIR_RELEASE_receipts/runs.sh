@@ -47,3 +47,13 @@ RAYON_NUM_THREADS=12 measured $out/validation_alternation_log.txt timeout 454 $b
 RAYON_NUM_THREADS=12 measured $out/validation_line_log.txt timeout 318 $bin executed evaluate line 2026093038 64 \
   $out/validation_line_sections.txt keys-founded=$out/state_line_keys_founded.txt \
   keys-lossless=$out/state_line_keys_lossless.txt lossless opening
+# The final confirmation, read once (128 requests): alternation 2_026_093_036, projection 829,090 ms,
+# deadline 1,037 s; line 2_026_093_039, projection 539,960 ms, deadline 675 s.
+mkdir -p $out/final
+RAYON_NUM_THREADS=12 measured $out/final/final_alternation_log.txt timeout 1037 $bin executed evaluate alternation 2026093036 128 \
+  $out/final/final_alternation_sections.txt keys-founded=$out/state_alternation_keys_founded.txt \
+  keys-lossless=$out/state_alternation_keys_lossless.txt lossless opening
+RAYON_NUM_THREADS=12 measured $out/final/final_line_log.txt timeout 675 $bin executed evaluate line 2026093039 128 \
+  $out/final/final_line_sections.txt keys-founded=$out/state_line_keys_founded.txt \
+  keys-lossless=$out/state_line_keys_lossless.txt lossless opening
+# The readings in the record's tables: python3 $out/tally.py <sections listing> <δ> (2 for the alternation, 4 for the line).
