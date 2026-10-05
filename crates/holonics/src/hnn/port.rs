@@ -771,14 +771,14 @@ pub struct ResonatorTick {
     pub output: Vec<Rat>,
 }
 
-/// One resonator's four gain covectors, accumulated in its declared basis family.
+/// One resonator's declared gain covectors, accumulated in its declared basis family.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ResonatorPullback {
     pub ring: usize,
-    /// Loss gradients with respect to `(g_C,g_K,g_D,g_pump)`.
-    pub gains: [Rat; 4],
+    /// Loss gradients with respect to `(g_C,g_K,g_D,g_pump[,g_beta])`.
+    pub gains: Vec<Rat>,
     /// Exact feature energies used by the factor law.
-    pub energy: [Rat; 4],
+    pub energy: Vec<Rat>,
 }
 
 /// [definition; agent-inferred] **A covector on a word's change** (U6's native generation, whose
@@ -819,6 +819,32 @@ impl ChangeCovector {
 }
 
 impl<'c> Word<'c> {
+    /// The exact differential of one receiving anchor through this word's producing operands.
+    /// This declaration-time reading borrows the zero-motion word; it publishes no learned
+    /// covector and retains no word. A nonlinear receiving declaration uses these rows only
+    /// as a tangent at rest, never as a global linear response map.
+    pub(crate) fn anchor_differential(
+        &self,
+        anchors: Vec<Option<Vec<Rat>>>,
+        receiving: usize,
+    ) -> Result<ChangeCovector, HnnError> {
+        if self.operands().lattice().is_some() {
+            return Err(HnnError::Shape {
+                what: "an exact word for a declaration-time anchor differential",
+                expected: 0,
+                found: 1,
+            });
+        }
+        if anchors.len() != self.recorded().len() {
+            return Err(HnnError::Shape {
+                what: "one anchor covector slot per junction step of the word",
+                expected: self.recorded().len(),
+                found: anchors.len(),
+            });
+        }
+        Ok(reverse_core(self, anchors, receiving, None)?.1)
+    }
+
     /// **The word's return over its own per-tick waves** (module header). `map` is the receiving
     /// map `R` and `lift` the receiving ring's lift `τ_R` the read used.
     pub fn pull_back(
@@ -1150,8 +1176,10 @@ fn reverse_core(
                     expected: 1,
                     found: 0,
                 })?;
+                let nonlinear = resonator.material().saturation().is_some();
+                let velocity_factor = if nonlinear { integer(1) } else { integer(2) };
                 let z_image = entries(widths[r], |i| {
-                    &h * &state_bar[0][i] + integer(2) * &state_bar[1][i]
+                    &h * &state_bar[0][i] + &velocity_factor * &state_bar[1][i]
                         - integer(2) / resonator.admittance() * &storage_bar[r][i]
                 });
                 let (zbar, zbar_remainder) =
@@ -1163,12 +1191,19 @@ fn reverse_core(
                 let (drive, drive_remainder) =
                     split(lattice.as_ref(), drive_image, &carried.resonator_drive[r]);
                 let capacity = resonator.material().forms().0;
-                let stiffness = resonator.stiffness(step.phase);
-                let u_image = sub(&state_bar[0], &scale(&h, &apply_rows(stiffness, &solved)?));
-                let w_image = add(
-                    &scale(&integer(-1), &state_bar[1]),
-                    &scale(&integer(2), &apply_rows(capacity, &solved)?),
-                );
+                // The Hessian is read at the displacement that produced this tick, with its
+                // own executed transpose solve. The nonlinear kick has w'=omega, not 2omega-w.
+                let hessian = resonator.force_hessian(step.phase, &step.input[0])?;
+                let u_image = sub(&state_bar[0], &scale(&h, &apply_rows(&hessian, &solved)?));
+                let capacity_return = apply_rows(capacity, &solved)?;
+                let w_image = if nonlinear {
+                    capacity_return
+                } else {
+                    add(
+                        &scale(&integer(-1), &state_bar[1]),
+                        &scale(&integer(2), &capacity_return),
+                    )
+                };
                 let (u_bar, u_remainder) = split(
                     lattice.as_ref(),
                     u_image,

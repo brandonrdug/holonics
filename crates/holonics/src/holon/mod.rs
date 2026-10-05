@@ -522,6 +522,7 @@ pub struct Holon {
     port: PortLaw,
     active: ActiveRelation,
     pump: Option<Pump>,
+    loaded_parametron: Option<parametron::LoadedParametron>,
     ports: Option<Vec<Port>>,
     complex: Option<CellComplex>,
     connection: Option<ConnectionIncidence>,
@@ -539,6 +540,7 @@ impl Holon {
             port: PortLaw::Declared(port_holon),
             active: ActiveRelation::new(ExactRatMatrix::zero(alpha, alpha)?)?,
             pump: None,
+            loaded_parametron: None,
             ports: None,
             complex: None,
             connection: None,
@@ -572,6 +574,7 @@ impl Holon {
             },
             active,
             pump: None,
+            loaded_parametron: None,
             ports: None,
             complex: None,
             connection: None,
@@ -599,6 +602,12 @@ impl Holon {
 
     /// Declare a storage pump; its schedule must match the storage extent.
     pub fn with_pump(mut self, pump: Pump) -> Result<Self, HolonError> {
+        if self.loaded_parametron.is_some() {
+            return Err(HolonError::Unsupported {
+                what: "a quadratic pump on a loaded quartic element",
+                reason: "declare each actual material phase in the quartic period law",
+            });
+        }
         if pump.schedule.extent() != self.counts().storage {
             return Err(HolonError::Shape {
                 what: "pump storage extent",
@@ -756,13 +765,45 @@ impl Holon {
         }
     }
 
+    /// The loaded nonlinear element relation. Its port Holon's storage is only its
+    /// quadratic facet; the complete energy and mixed scheme are this relation's.
+    pub fn loaded_parametron(&self) -> Option<&parametron::LoadedParametron> {
+        self.loaded_parametron.as_ref()
+    }
+
+    /// Only the element's own validated port construction installs this relation.
+    pub(crate) fn with_loaded_parametron(
+        mut self,
+        element: parametron::LoadedParametron,
+    ) -> Result<Self, HolonError> {
+        let n = element.width();
+        if self.counts()
+            != (PortCounts {
+                storage: 2 * n,
+                resistive: n,
+                external: n,
+                active: 0,
+            })
+        {
+            return Err(HolonError::ConformanceFailed {
+                what: "loaded element port kinds",
+            });
+        }
+        self.loaded_parametron = Some(element);
+        Ok(self)
+    }
+
     /// The element relations as a list, each on its kind.
     pub fn elements(&self) -> Vec<ElementRelation> {
         let port_holon = self.port_holon();
-        let mut out = vec![
-            ElementRelation::Storage {
+        let storage = match &self.loaded_parametron {
+            Some(element) => ElementRelation::LoadedParametron(element.clone()),
+            None => ElementRelation::Storage {
                 form: port_holon.storage.clone(),
             },
+        };
+        let mut out = vec![
+            storage,
             ElementRelation::Resistive(port_holon.resistance.clone()),
             ElementRelation::Source {
                 ports: port_holon.counts.external,

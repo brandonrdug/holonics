@@ -71,7 +71,8 @@ pub struct EnergyBalance {
     pub active: Rat,
     /// `½⟨x⁺, (Q⁺ − Q) x⁺⟩`: work done by changing the constitution.
     pub deposition_work: Rat,
-    /// The scheme's own term: `0` for the implicit midpoint, `−½⟨Δq, QΔq⟩` for backward Euler.
+    /// The scheme's own term: `0` for midpoint, `−½⟨Δq,QΔq⟩` for backward Euler,
+    /// or the signed constitutive drift defect for quartic kick/drift. Closure is not stability.
     pub discretization_defect: Rat,
     /// What the other terms do not account for. Zero for a conforming law.
     pub residual: Rat,
@@ -133,6 +134,9 @@ pub enum Scheme {
     Midpoint,
     /// `ē = Q x⁺`: carries `−½⟨Δq, QΔq⟩`.
     BackwardEuler,
+    /// `Nω=Cw+he−h(Ku+∇Q(u))`, `(u⁺,w⁺)=(u+hω,ω)`.
+    /// This requires the explicit loaded nonlinear element relation, not a quadratic surrogate.
+    QuarticKickDrift,
 }
 
 /// One word of motion: the reached state, the step bond it was admitted with, and its balance.
@@ -157,7 +161,8 @@ pub trait HolonLaw {
     /// The law this motion realizes.
     fn holon(&self) -> &Holon;
 
-    /// One word of motion from `state` under the external efforts `input`, with its balance.
+    /// One word of motion from `state` under the declared external input chart, with its balance.
+    /// The loaded quartic scheme reads an incoming wave; its bond carries `input−ω/Y`.
     fn advance(&self, state: &HolonState, input: &[Rat]) -> Result<Advance, HolonError>;
 
     /// **interconnect**: the law on the whole of the Holarchy that [`Holon::interconnect`] returns
@@ -229,6 +234,7 @@ pub struct ReferenceHolon {
     holon: Holon,
     step: Rat,
     scheme: Scheme,
+    loaded_solve: Option<ExactRatMatrix>,
 }
 
 impl ReferenceHolon {
@@ -236,10 +242,21 @@ impl ReferenceHolon {
         if step <= Rat::zero() {
             return Err(HolonError::NonpositiveStep);
         }
+        let loaded_solve = match (holon.loaded_parametron(), scheme) {
+            (Some(element), Scheme::QuarticKickDrift) => Some(element.operator(&step)?.inverse()?),
+            (None, Scheme::Midpoint | Scheme::BackwardEuler) => None,
+            _ => {
+                return Err(HolonError::Unsupported {
+                    what: "the constitutive relation and stepping scheme",
+                    reason: "quartic storage needs its declared mixed kick/drift; quadratic schemes do not consume it",
+                });
+            }
+        };
         Ok(Self {
             holon,
             step,
             scheme,
+            loaded_solve,
         })
     }
 
@@ -262,6 +279,12 @@ impl ReferenceHolon {
         active: &ExactRatMatrix,
         deposit: &SymmetricForm,
     ) -> Result<CommitCoefficients, HolonError> {
+        if self.scheme == Scheme::QuarticKickDrift {
+            return Err(HolonError::Unsupported {
+                what: "quadratic commit coefficients for a quartic law",
+                reason: "advance consumes the explicit loaded constitutive relation",
+            });
+        }
         let port_holon = self.holon.port_holon();
         let c = port_holon.counts();
         if storage.extent() != c.storage || deposit.extent() != c.storage {
@@ -302,6 +325,7 @@ impl ReferenceHolon {
         let weight = match self.scheme {
             Scheme::Midpoint => rat(1, 2),
             Scheme::BackwardEuler => Rat::one(),
+            Scheme::QuarticKickDrift => unreachable!("refused before quadratic assembly"),
         };
         // Unknowns z = (x⁺, f_R, f_P, f_A). Step bond: f = A_f z + c_f, e = A_e z + c_e.
         let (xo, ro, po, ao) = (0, sigma, sigma + rho, sigma + rho + pi);
@@ -425,6 +449,7 @@ impl ReferenceHolon {
         let discretization_defect = match self.scheme {
             Scheme::Midpoint => Rat::zero(),
             Scheme::BackwardEuler => -(rat(1, 2) * quad(&q, &delta)?),
+            Scheme::QuarticKickDrift => unreachable!("refused before quadratic assembly"),
         };
         let deposition_work = storage_energy(deposit, &x_next)? - storage_energy(storage, &x_next)?;
         let balance = EnergyBalance::closed(
@@ -458,6 +483,16 @@ impl HolonLaw for ReferenceHolon {
 
     /// The word at the material in force; a pumped Holon deposits its next scheduled storage.
     fn advance(&self, state: &HolonState, input: &[Rat]) -> Result<Advance, HolonError> {
+        if let (Some(element), Some(solve)) = (self.holon.loaded_parametron(), &self.loaded_solve) {
+            let rate = solve.apply(&element.right(&self.step, &state.configuration, input)?)?;
+            let advanced = element.executed(&self.step, state, input, &rate)?;
+            if !self.holon.port_holon().dirac().contains(&advanced.bond)?
+                || !advanced.balance.is_exact()
+            {
+                return Err(HolonError::NotAdmitted);
+            }
+            return Ok(advanced);
+        }
         let storage = self.holon.storage_at(state.commit);
         let deposit = self.holon.storage_at(state.commit + 1);
         self.commit(

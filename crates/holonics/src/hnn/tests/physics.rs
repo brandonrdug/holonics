@@ -638,10 +638,11 @@ fn the_loaded_resonator_returns_to_storage_and_closes_at_every_tick() {
 
 /// **A wrong resonator solve fails the word's balance** (`hnn::ring::ResonatorStep::bound`, summed
 /// into `FieldBalance` and `WordBalance`). The loaded word executed with one phase's solve replaced
-/// by `(9/8)M⁻¹` still satisfies every energy identity, since the chart term `⟨ω, Mω − r⟩` absorbs
-/// any solve, but its chart term leaves the certified bound (the chart's certificate kept), so the
-/// resonator's steps, the ticks' combined balances and the word's balance no longer close; the
-/// same word with the executed solve closes, on the exact law and on the lattices alike.
+/// by `(9/8)M⁻¹` would still satisfy every energy identity, since the chart term `⟨ω, Mω − r⟩`
+/// absorbs any solve, but its chart term leaves the certified bound. Since October 5 each tick's
+/// chart and split are accepted at the tick (lane A), so the word refuses that tick as it executes
+/// rather than closing an unbounded balance later; the same word with the executed solve closes,
+/// on the exact law and on the lattices alike.
 #[test]
 fn a_perturbed_resonator_solve_fails_the_word_balance() {
     use crate::hnn::propagation::Operands;
@@ -664,35 +665,21 @@ fn a_perturbed_resonator_solve_fails_the_word_balance() {
         let storage = moment.open_storage(field, &declared, &current).unwrap();
         let run = |operands: Operands| {
             let mut word = Word::on_operands(field, operands, storage.clone()).unwrap();
-            word.forward(&phases).unwrap();
-            word
+            word.forward(&phases).map(|_| word)
         };
         let operands = Operands::at_cut(field, &declared, &current).unwrap();
-        let executed = run(operands.clone());
+        let executed = run(operands.clone()).unwrap();
         assert!(executed.word_balance().unwrap().closes());
         let mut perturbed = operands;
         let resonator = perturbed.resonators_mut()[0].take().unwrap();
         let wrong = resonator.operator(0).inverse().unwrap().scaled(&rat(9, 8));
         perturbed.resonators_mut()[0] = Some(resonator.with_executed_solve(0, wrong));
-        let word = run(perturbed);
-        let steps = &word.resonances()[0].as_ref().unwrap().steps;
-        assert!(
-            steps
-                .iter()
-                .any(|step| step.phase == 0 && !step.chart.is_zero())
-        );
-        for step in steps {
-            // Every identity still closes; only the bound refuses the wrong phase's ticks.
-            assert_eq!(
-                &step.after - &step.before,
-                &step.pump + &step.port - &step.dissipation + &step.chart + &step.split
-            );
+        match run(perturbed) {
+            Err(HnnError::Resonator { ring: 0, what }) => {
+                assert_eq!(what, "an executed tick exceeds its chart or split certificate")
+            }
+            other => panic!("the perturbed solve must be refused at its tick, got {:?}", other.map(|_| ())),
         }
-        assert!(steps.iter().any(|step| !step.closes()));
-        assert!(word.field_balances().iter().any(|tick| !tick.closes()));
-        let balance = word.word_balance().unwrap();
-        assert!(balance.residual().abs() > balance.bound, "{balance:?}");
-        assert!(!balance.closes());
     }
 }
 

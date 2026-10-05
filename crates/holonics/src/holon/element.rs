@@ -201,6 +201,8 @@ pub struct Pump {
 pub enum ElementRelation {
     /// Quadratic storage `½⟨x, Qx⟩` on the storage ports.
     Storage { form: SymmetricForm },
+    /// The loaded quartic parametron storage and wave-port relation, with its actual material.
+    LoadedParametron(crate::holon::parametron::LoadedParametron),
     /// `e_R = −R f_R`, certified passive.
     Resistive(ResistiveRelation),
     /// Free external ports; their power is what the balance returns.

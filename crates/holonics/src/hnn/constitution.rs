@@ -487,10 +487,10 @@ use crate::hnn::port::Deposit;
 use crate::hnn::propagation::gram;
 use crate::hnn::realization::{indexed, outer_integral};
 use crate::hnn::receiving::{ReceivingStep, landmark_declaration, receiving_population};
-use crate::hnn::word::ReceptionCarry;
 use crate::hnn::ring::{
     Floquet, FloquetBound, FloquetReading, ResonatorMaterial, ResonatorOperands, attain_metric,
 };
+use crate::hnn::word::ReceptionCarry;
 use crate::holon::deposition::{
     CertifiedStep, CommittedEnergyBound, JointReading, root_ceiling, schur_norms, significant,
     span_factors, spectral_norm, sqrt_ceiling,
@@ -1017,7 +1017,7 @@ pub enum Locus {
     SourcePort(usize),
     /// Ring `g`'s standing `q_g`.
     Standing(usize),
-    /// Ring `g`'s loaded resonator's four squared gain coordinates `(C,K,D,pump)`.
+    /// Ring `g`'s loaded resonator's declared squared gains `(C,K,D,pump[,beta])`.
     Resonator(usize),
     /// Ring `g`'s receiving map `R`.
     ReceivingMap(usize),
@@ -1733,7 +1733,12 @@ impl SolvedChart {
     /// previous chart itself would leave the residual `1 − x⁻¹` on the support, outside the
     /// contraction at `x = ½`. It is then refined and certified against `H′` as a deposit's chart is
     /// ([`SolvedChart`]), and refused when `δ_ℓ` is not reached.
-    fn moved(&self, gram: &[Vec<Rat>], scale: u32, rule: &ChartRule) -> Result<(Self, Refinement), HnnError> {
+    fn moved(
+        &self,
+        gram: &[Vec<Rat>],
+        scale: u32,
+        rule: &ChartRule,
+    ) -> Result<(Self, Refinement), HnnError> {
         let n = gram.len();
         let moved = Self::founded(scale);
         let carried = GramBlock::of(gram, &moved.prior())?;
@@ -2349,7 +2354,10 @@ impl LocatedPrior {
         };
         let (a0, a1, s) = (&self.a0, &self.a1, &self.s);
         let two = Rat::from_integer(BigInt::from(2));
-        let (three, four) = (Rat::from_integer(BigInt::from(3)), Rat::from_integer(BigInt::from(4)));
+        let (three, four) = (
+            Rat::from_integer(BigInt::from(3)),
+            Rat::from_integer(BigInt::from(4)),
+        );
         // V + a ≤ 0 is A₀ + (S + A₁) ln 2 ≤ 0.
         match at_most_zero(a0.clone(), s + a1) {
             None => return Ok((0, Some(PriorHeld::Undecided))),
@@ -2367,10 +2375,15 @@ impl LocatedPrior {
         // 2(V + a) ≤ 3xV: the Newton point is at most 3x/2.
         let below_high = |x: &Rat| at_most_zero(&two * a0, &two * s + &two * a1 - &three * x * s);
         // 3xV ≤ 4(V + a): the Newton point is at least 3x/4.
-        let above_low = |x: &Rat| at_most_zero(-(&four * a0), &three * x * s - &four * s - &four * a1);
+        let above_low =
+            |x: &Rat| at_most_zero(-(&four * a0), &three * x * s - &four * s - &four * a1);
         let power = |j: i64| -> Rat {
             let p = BigInt::one() << j.unsigned_abs() as usize;
-            if j >= 0 { Rat::from_integer(p) } else { Rat::new(BigInt::one(), p) }
+            if j >= 0 {
+                Rat::from_integer(p)
+            } else {
+                Rat::new(BigInt::one(), p)
+            }
         };
         match below_high(&Rat::one()) {
             None => return Ok((0, Some(PriorHeld::Undecided))),
@@ -2542,7 +2555,13 @@ pub fn prequential_terms(samples: &[Sample], map: &ExactRatMatrix) -> Option<(Ra
         let mean: Rat = masses.iter().zip(&read).map(|(p, d)| p * d).sum();
         let second: Rat = masses.iter().zip(&read).map(|(p, d)| p * d * d).sum();
         alignment += &sample.weight
-            * sample.covector.iter().step_by(2).zip(&read).map(|(g, d)| g * d).sum::<Rat>();
+            * sample
+                .covector
+                .iter()
+                .step_by(2)
+                .zip(&read)
+                .map(|(g, d)| g * d)
+                .sum::<Rat>();
         curvature += sample.weight.abs() * (second - &mean * &mean);
     }
     Some((alignment, curvature))
@@ -2737,7 +2756,7 @@ struct RingMaterial {
     /// The ring's loaded resonator: immutable base forms with learned scalar amplitudes.
     resonator: Option<ResonatorMaterial>,
     /// The four factor-family statistics for its squared gain coordinates.
-    resonator_scales: [Rat; 4],
+    resonator_scales: Vec<Rat>,
     /// The hop at which every candidate resonator material is certified.
     resonator_step: Option<Rat>,
     /// [definition; agent-inferred, September 30] **The source navigator's transport modulus**
@@ -3074,9 +3093,8 @@ impl Family {
             | (Family::Passive, Carrier::Passive)
             | (Family::Slices, Carrier::Slices)
             | (Family::Standing, Carrier::Standing) => true,
-            (Family::Resonator(f), Carrier::Resonator(c)) | (Family::Factor(f), Carrier::Factor(c)) => {
-                f == *c
-            }
+            (Family::Resonator(f), Carrier::Resonator(c))
+            | (Family::Factor(f), Carrier::Factor(c)) => f == *c,
             (Family::Pair(o), Carrier::Pair { offset, .. }) => o == *offset,
             _ => false,
         }
@@ -3528,12 +3546,7 @@ impl LockChart {
             .iter()
             .map(|ring| {
                 ring.iter()
-                    .map(|terms| {
-                        terms
-                            .iter()
-                            .map(|(g, j, w)| w * &standings[*g][*j])
-                            .sum()
-                    })
+                    .map(|terms| terms.iter().map(|(g, j, w)| w * &standings[*g][*j]).sum())
                     .collect()
             })
             .collect()
@@ -3574,7 +3587,10 @@ impl LockChart {
         for (r, ring) in self.rows.iter().enumerate() {
             for (rho, terms) in ring.iter().enumerate() {
                 for (g, j, _) in terms {
-                    let (x, y) = (root(&mut parent, base[r] + rho), root(&mut parent, base[*g] + j));
+                    let (x, y) = (
+                        root(&mut parent, base[r] + rho),
+                        root(&mut parent, base[*g] + j),
+                    );
                     if x != y {
                         parent[x.max(y)] = x.min(y);
                     }
@@ -3866,7 +3882,7 @@ impl Constitution {
                     population: receivers.contains_key(&g).then(receiving_population),
                     tree: tree(g)?,
                     resonator: None,
-                    resonator_scales: std::array::from_fn(|_| Rat::one()),
+                    resonator_scales: Vec::new(),
                     resonator_step: None,
                     transport: Rat::one(),
                 })
@@ -4139,6 +4155,7 @@ impl Constitution {
         }
         material.certify(ring, field.step())?;
         let lattice = Lattice::new(lattice_exponent(self.grain, material.width() as u128));
+        self.rings[ring].resonator_scales = vec![Rat::one(); material.gain_count()];
         self.rings[ring].resonator = Some(material);
         self.rings[ring].resonator_step = Some(field.step().clone());
         self.lattices.insert(Locus::Resonator(ring), lattice);
@@ -4192,7 +4209,16 @@ impl Constitution {
                     );
                 }
             }
-            natural(&mut code, 4);
+            // The family and its immutable coefficient are part of the declaration, not a
+            // learned readout. The asymmetric cubic family is not declared here.
+            match material.base_saturation() {
+                None => natural(&mut code, 0),
+                Some(law) => {
+                    natural(&mut code, 1); // alpha=0, radial quartic per complex node
+                    rational(&mut code, law.coefficient());
+                }
+            }
+            natural(&mut code, material.gain_count() as u64);
             for gain in material.gains() {
                 rational(&mut code, gain);
             }
@@ -4240,7 +4266,7 @@ impl Constitution {
     /// The current scalar gain amplitudes for every declared resonator, in ring order. Their
     /// material forms scale by these amplitudes squared. This is a compact constitutive reading,
     /// not an event log.
-    pub fn resonator_gains(&self) -> Vec<(usize, [Rat; 4])> {
+    pub fn resonator_gains(&self) -> Vec<(usize, Vec<Rat>)> {
         self.rings
             .iter()
             .enumerate()
@@ -4253,34 +4279,49 @@ impl Constitution {
             .collect()
     }
 
-    /// The carried remainders of every declared resonator's four gain amplitudes, in ring order:
+    /// The carried remainders of every declared resonator's gain amplitudes, in ring order:
     /// what reached a family below its lattice's unit and has not moved its amplitude (zero where
     /// nothing is carried).
-    pub fn resonator_gain_remainders(&self) -> Vec<(usize, [Rat; 4])> {
+    pub fn resonator_gain_remainders(&self) -> Vec<(usize, Vec<Rat>)> {
         self.rings
             .iter()
             .enumerate()
             .filter(|(_, material)| material.resonator.is_some())
-            .map(|(ring, _)| {
-                let remainders = std::array::from_fn(|family| {
-                    self.carries
-                        .get(&(Locus::Resonator(ring), Carrier::Resonator(family)))
-                        .map_or_else(Rat::zero, |carry| carry.at(0))
-                });
+            .map(|(ring, material)| {
+                let remainders = (0..material
+                    .resonator
+                    .as_ref()
+                    .expect("filtered resonator")
+                    .gain_count())
+                    .map(|family| {
+                        self.carries
+                            .get(&(Locus::Resonator(ring), Carrier::Resonator(family)))
+                            .map_or_else(Rat::zero, |carry| carry.at(0))
+                    })
+                    .collect();
                 (ring, remainders)
             })
             .collect()
     }
 
-    /// The carried feature-energy scales for a ring's four scalar gain families, if it declares a
+    /// The carried feature-energy scales for a ring's declared scalar gain families, if it declares a
     /// loaded resonator.
-    pub fn resonator_scales(&self, ring: usize) -> Option<&[Rat; 4]> {
+    pub fn resonator_scales(&self, ring: usize) -> Option<&Vec<Rat>> {
         self.rings.get(ring).and_then(|material| {
             material
                 .resonator
                 .as_ref()
                 .map(|_| &material.resonator_scales)
         })
+    }
+
+    /// The operator-entry count in the declared material. Resonator family counts survive
+    /// release as the shape of their zero scales; the field alone cannot distinguish four and five.
+    pub fn locus_entries(&self, field: &Field, locus: Locus) -> usize {
+        match locus {
+            Locus::Resonator(ring) => self.rings[ring].resonator_scales.len(),
+            _ => locus.entries(field),
+        }
     }
 
     /// The loaded resonator on ring `g`, if that ring declares one.
@@ -4799,7 +4840,7 @@ impl Constitution {
                     let mut gains = material.gains().clone();
                     let gain = gains.get_mut(family).ok_or(HnnError::Resonator {
                         ring,
-                        what: "a resonator gain family is one of C, K, D, or pump",
+                        what: "a gain family lies outside the declared resonator material",
                     })?;
                     *gain += &r;
                     let candidate = material.with_gains(gains)?;
@@ -4809,7 +4850,7 @@ impl Constitution {
                     let scale = exact.rings[ring].resonator_scales.get_mut(family).ok_or(
                         HnnError::Resonator {
                             ring,
-                            what: "a resonator gain family is one of C, K, D, or pump",
+                            what: "a gain family lies outside the declared resonator material",
                         },
                     )?;
                     *scale += &r;
@@ -5077,6 +5118,13 @@ impl Constitution {
                 let (capacity, stiffness, _) = resonator.forms();
                 forms.push(capacity.clone());
                 forms.push(stiffness.clone());
+                if let Some(law) = resonator.saturation() {
+                    // Q_beta(u) is linear in beta. The scalar coefficient comparison
+                    // certifies its storage growth for every displacement, of any amplitude.
+                    forms.push(ExactRatMatrix::from_diagonal(vec![
+                        law.coefficient().clone(),
+                    ])?);
+                }
             }
         }
         Ok(forms)
@@ -5439,7 +5487,18 @@ impl Constitution {
         let span = reach.stations.iter().max().copied().unwrap_or(0);
         // Only the rings the word's diamond holds carry the stepped difference to a station
         // (`Reach::reads_ring`, record B §8).
-        let rings = self.ring_reaches(span, |ring| reach.reads_ring(ring))?;
+        let silent = readout_base.is_zero()
+            && !parts.iter().any(|(locus, family, _)| {
+                *locus == Locus::ReceivingMap(reach.receiver) && *family == Family::Map
+            });
+        let rings = self.ring_reaches(span, |ring| {
+            reach.reads_ring(ring)
+                && !(silent
+                    && self.rings[ring]
+                        .resonator
+                        .as_ref()
+                        .is_some_and(|law| law.saturation().is_some() && !pumped(law)))
+        })?;
         let factors = (!rings.is_empty()).then(|| Self::factors_of(&rings, span));
         let mut held = Vec::new();
         if !rings.is_empty() {
@@ -5505,7 +5564,7 @@ impl Constitution {
             })
             .collect();
         // Each loaded resonator's gains and its storage bases' Schur products.
-        let resonator_base: Vec<Option<([Rat; 4], Rat, Rat)>> = self
+        let resonator_base: Vec<Option<(Vec<Rat>, Rat, Rat)>> = self
             .rings
             .iter()
             .map(|material| {
@@ -5836,7 +5895,10 @@ impl Constitution {
     /// [definition; agent-inferred, October 4; record B §8] **Every unreleased locus**, the
     /// retention of a resident that admits no collapse family.
     pub fn held(&self) -> BTreeSet<Locus> {
-        self.bits_by_locus().into_iter().map(|(locus, _)| locus).collect()
+        self.bits_by_locus()
+            .into_iter()
+            .map(|(locus, _)| locus)
+            .collect()
     }
 
     /// [definition; agent-inferred, October 4; record B §8] **The successor of a staged deposit
@@ -6089,7 +6151,9 @@ impl Constitution {
             .iter()
             .filter(|(_, reading)| reading.step.step.is_positive())
             .filter(|((locus, family), _)| {
-                strokes.get(locus).is_none_or(|at| !at.family_moved(*family))
+                strokes
+                    .get(locus)
+                    .is_none_or(|at| !at.family_moved(*family))
             })
             .map(|(key, _)| *key)
             .collect();
@@ -6210,26 +6274,27 @@ impl Constitution {
                 .filter(|&(r, _)| reach.reads_ring(r))
                 .collect()
         };
-        let trial = |g: usize, gradient: &[Rat], scale: &Rat, step: &Rat| -> Result<Trial, HnnError> {
-            let locus = Locus::Standing(g);
-            let mut carry = self
-                .carries
-                .get(&(locus, Carrier::Standing))
-                .cloned()
-                .unwrap_or_default();
-            let mut at = BudgetedCarry::new(self.lattice(locus)?, self.clock(locus) + 1);
-            let mut standing = self.rings[g].standing.clone();
-            let rate = step / scale;
-            for (i, (x, dx)) in standing.iter_mut().zip(gradient).enumerate() {
-                carry.deposit(&mut at, Carrier::Standing, i, x, &rate_times(&rate, dx));
-            }
-            Ok(Trial {
-                standing,
-                carry,
-                clock: at.clock(),
-                released: at.released(),
-            })
-        };
+        let trial =
+            |g: usize, gradient: &[Rat], scale: &Rat, step: &Rat| -> Result<Trial, HnnError> {
+                let locus = Locus::Standing(g);
+                let mut carry = self
+                    .carries
+                    .get(&(locus, Carrier::Standing))
+                    .cloned()
+                    .unwrap_or_default();
+                let mut at = BudgetedCarry::new(self.lattice(locus)?, self.clock(locus) + 1);
+                let mut standing = self.rings[g].standing.clone();
+                let rate = step / scale;
+                for (i, (x, dx)) in standing.iter_mut().zip(gradient).enumerate() {
+                    carry.deposit(&mut at, Carrier::Standing, i, x, &rate_times(&rate, dx));
+                }
+                Ok(Trial {
+                    standing,
+                    carry,
+                    clock: at.clock(),
+                    released: at.released(),
+                })
+            };
         let before_standings: Vec<&[Rat]> = self
             .rings
             .iter()
@@ -6237,25 +6302,26 @@ impl Constitution {
             .collect();
         let before = self.lock.contrast(&before_standings);
         // The successor's contrasts at the families' steps (`None`: the family does not step).
-        let successor = |steps: &[Option<Rat>]| -> Result<(Vec<Option<Trial>>, Vec<Vec<Rat>>), HnnError> {
-            let trials: Vec<Option<Trial>> = families
-                .iter()
-                .zip(steps)
-                .map(|((g, gradient, scale, ..), step)| {
-                    step.as_ref()
-                        .map(|step| trial(*g, gradient, scale, step))
-                        .transpose()
-                })
-                .collect::<Result<_, HnnError>>()?;
-            let mut standings = before_standings.clone();
-            for ((g, ..), moved) in families.iter().zip(&trials) {
-                if let Some(moved) = moved {
-                    standings[*g] = moved.standing.as_slice();
+        let successor =
+            |steps: &[Option<Rat>]| -> Result<(Vec<Option<Trial>>, Vec<Vec<Rat>>), HnnError> {
+                let trials: Vec<Option<Trial>> = families
+                    .iter()
+                    .zip(steps)
+                    .map(|((g, gradient, scale, ..), step)| {
+                        step.as_ref()
+                            .map(|step| trial(*g, gradient, scale, step))
+                            .transpose()
+                    })
+                    .collect::<Result<_, HnnError>>()?;
+                let mut standings = before_standings.clone();
+                for ((g, ..), moved) in families.iter().zip(&trials) {
+                    if let Some(moved) = moved {
+                        standings[*g] = moved.standing.as_slice();
+                    }
                 }
-            }
-            let after = self.lock.contrast(&standings);
-            Ok((trials, after))
-        };
+                let after = self.lock.contrast(&standings);
+                Ok((trials, after))
+            };
         let chart_steps: Vec<Option<Rat>> = families
             .iter()
             .map(|(.., step, _)| Some(step.step.clone()))
@@ -6348,7 +6414,7 @@ impl Constitution {
                 });
             }
         }
-        let lock =(!proposal_crossings.is_empty()).then(|| LockProposal {
+        let lock = (!proposal_crossings.is_empty()).then(|| LockProposal {
             commit: self.commit + 1,
             standings,
             crossings: proposal_crossings,
@@ -6703,7 +6769,7 @@ impl Constitution {
                 Locus::Resonator(g) => {
                     let material = &mut self.rings[g];
                     material.resonator = None;
-                    material.resonator_scales = std::array::from_fn(|_| Rat::zero());
+                    material.resonator_scales.fill(Rat::zero());
                     material.resonator_step = None;
                 }
                 Locus::SourcePort(g) => {
@@ -6837,7 +6903,13 @@ fn receiving_fisher_face(samples: &[Sample], unit: &[Vec<Rat>]) -> Option<(Rat, 
         let second: Rat = masses.iter().zip(&real).map(|(p, d)| p * *d * *d).sum();
         let variance = second - &mean * &mean;
         let phase: Rat = imaginary.iter().map(|d| *d * *d).sum();
-        alignment += &sample.weight * sample.covector.iter().zip(&delta).map(|(g, d)| g * d).sum::<Rat>();
+        alignment += &sample.weight
+            * sample
+                .covector
+                .iter()
+                .zip(&delta)
+                .map(|(g, d)| g * d)
+                .sum::<Rat>();
         curvature += sample.weight.abs()
             * (Rat::new(BigInt::from(119), BigInt::from(80)) * variance
                 + phase / Rat::from_integer(BigInt::from(4)));
@@ -6845,7 +6917,11 @@ fn receiving_fisher_face(samples: &[Sample], unit: &[Vec<Rat>]) -> Option<(Rat, 
             oscillation = oscillation.max(*high - *low);
         }
     }
-    Some((Rat::from_integer(BigInt::from(2)) * curvature, oscillation, alignment))
+    Some((
+        Rat::from_integer(BigInt::from(2)) * curvature,
+        oscillation,
+        alignment,
+    ))
 }
 
 /// The receiving Fisher face's three readings for a test: its curvature, oscillation and the
@@ -7159,13 +7235,13 @@ fn factor_prepared(
                 ..
             },
         ) if ring == material_ring => {
-            if *family >= 4 {
+            let current = material.as_ref().ok_or(HnnError::Lattice { locus })?;
+            if *family >= current.gain_count() {
                 return Err(HnnError::Resonator {
                     ring: *ring,
-                    what: "a resonator gain family is one of C, K, D, or pump",
+                    what: "a gain family lies outside the declared resonator material",
                 });
             }
-            let current = material.as_ref().ok_or(HnnError::Lattice { locus })?;
             let gain = current.gains()[*family].abs();
             let scale = advance(
                 carries,
@@ -7281,7 +7357,9 @@ fn pumped(resonator: &ResonatorMaterial) -> bool {
 /// `HNN/Floquet.storage_form_certifies_passive`). Otherwise (a pump, or a signed stiffness) its
 /// growth is its Floquet reach.
 fn certified_passive(resonator: &ResonatorMaterial) -> Result<bool, HnnError> {
-    if pumped(resonator) {
+    // Quartic positivity is a storage fact, not a passivity certificate for the loaded
+    // kick/drift step: its signed integration defect need not be nonpositive.
+    if pumped(resonator) || resonator.saturation().is_some() {
         return Ok(false);
     }
     let (_, stiffness, _) = resonator.forms();
@@ -7329,7 +7407,7 @@ enum LocusMaterial<'a> {
     Resonator {
         ring: usize,
         material: &'a mut Option<ResonatorMaterial>,
-        scales: &'a mut [Rat; 4],
+        scales: &'a mut Vec<Rat>,
         step: &'a mut Option<Rat>,
     },
     Channel(&'a mut ContactMaterial),
@@ -7518,13 +7596,13 @@ fn factor_step(
                 ..
             },
         ) if ring == material_ring => {
-            if *family >= 4 {
+            let current = material.as_ref().ok_or(HnnError::Lattice { locus })?;
+            if *family >= current.gain_count() {
                 return Err(HnnError::Resonator {
                     ring: *ring,
-                    what: "a resonator gain family is one of C, K, D, or pump",
+                    what: "a gain family lies outside the declared resonator material",
                 });
             }
-            let current = material.as_ref().ok_or(HnnError::Lattice { locus })?;
             // The candidate step, carried on copies of the entry's carry; kept when the carried
             // gain stays positive, backtracked otherwise ([`GainBacktrack`]).
             let carrier = Carrier::Resonator(*family);
@@ -7701,7 +7779,7 @@ fn certify_storage_growth(
 ///   whole (the map `E`, the carried Gram `H`, the solved chart `X̂` with its lattice, support and
 ///   certificate, and the carried remainders) with its pair ports and the navigator's transport
 ///   modulus `ρ`, its receiving map's normal law whole with its located prior's pair, its landmark
-///   tree's executed standing, its population's reading, and its resonator's four gains with their
+///   tree's executed standing, its population's reading, and its resonator's declared gains with their
 ///   statistics;
 /// - every contact's channel factors `c`, `b`, `F` and their statistics;
 /// - every locus's lattice (a rebase moves it), the factor families' carried remainders, every
@@ -7776,9 +7854,9 @@ struct LearnedRing {
     receiving: Option<NormalLaw>,
     tree: Option<TreeStanding>,
     population: Option<PortReading>,
-    /// The resonator's four gains (`None` once released).
-    resonator: Option<[Rat; 4]>,
-    resonator_scales: [Rat; 4],
+    /// The resonator's declared gains (`None` once released).
+    resonator: Option<Vec<Rat>>,
+    resonator_scales: Vec<Rat>,
 }
 
 /// [definition; agent-inferred, October 4; the reception carry §9] **A contact's learned material**:
@@ -7825,12 +7903,19 @@ impl LearnedRing {
             slice_scale: material.slice_scale.clone(),
             source: material.source.clone(),
             transport: material.transport.clone(),
-            pairs: material.pairs.iter().map(|(_, pair)| pair.clone()).collect(),
+            pairs: material
+                .pairs
+                .iter()
+                .map(|(_, pair)| pair.clone())
+                .collect(),
             pair_scale: material.pair_scale.clone(),
             receiving: material.receiving.clone(),
             tree: material.tree.as_ref().map(Landmarks::standing),
             population: material.population.as_ref().map(PortPopulation::reading),
-            resonator: material.resonator.as_ref().map(|resonator| resonator.gains().clone()),
+            resonator: material
+                .resonator
+                .as_ref()
+                .map(|resonator| resonator.gains().clone()),
             resonator_scales: material.resonator_scales.clone(),
         }
     }
@@ -7871,9 +7956,20 @@ impl LearnedRing {
             }
             || self.tree.is_some() != material.tree.is_some()
             || self.population.is_some() != material.population.is_some()
-            || self.resonator.is_some() != material.resonator.is_some();
+            || match (&self.resonator, &material.resonator) {
+                (Some(gains), Some(law)) => gains.len() != law.gain_count(),
+                (None, None) => false,
+                _ => true,
+            }
+            || self.resonator_scales.len() != material.resonator_scales.len()
+            || self
+                .resonator_scales
+                .iter()
+                .any(|scale| scale.is_negative());
         if mismatched {
-            return Err(refuse("a ring's saved material off its declared shape or founding"));
+            return Err(refuse(
+                "a ring's saved material off its declared shape or founding",
+            ));
         }
         let tree = match (&self.tree, &material.tree) {
             (Some(standing), Some(tree)) => Some(
@@ -7975,15 +8071,19 @@ impl RingMaterial {
         // A moved prior or a grown pair leaves the identity, the founding member stays in it.
         if let Some(law) = &self.receiving {
             let prior = law.receiving_prior().unwrap_or(0);
-            self.receiving = Some(NormalLaw::with_receiving_prior(law.map.scaled(&zero), prior));
+            self.receiving = Some(NormalLaw::with_receiving_prior(
+                law.map.scaled(&zero),
+                prior,
+            ));
         }
         self.tree = self.tree.as_ref().map(Landmarks::founding);
         self.population = self.population.as_ref().map(PortPopulation::founding);
-        self.resonator = self
-            .resonator
-            .as_ref()
-            .and_then(|resonator| resonator.with_gains(std::array::from_fn(|_| Rat::one())).ok());
-        self.resonator_scales = std::array::from_fn(|_| zero.clone());
+        self.resonator = self.resonator.as_ref().and_then(|resonator| {
+            resonator
+                .with_gains(vec![Rat::one(); resonator.gain_count()])
+                .ok()
+        });
+        self.resonator_scales.fill(zero.clone());
     }
 }
 
@@ -8111,10 +8211,14 @@ impl Constitution {
             || !self.released.is_empty()
             || self.carries.values().any(|carry| !carry.0.is_empty())
         {
-            return Err(refuse("the constitution it is restored onto is not the declared opening"));
+            return Err(refuse(
+                "the constitution it is restored onto is not the declared opening",
+            ));
         }
         if self.rings.len() != state.rings.len() || self.contacts.len() != state.contacts.len() {
-            return Err(refuse("the state continues another opening's material (its rings or contacts)"));
+            return Err(refuse(
+                "the state continues another opening's material (its rings or contacts)",
+            ));
         }
         if !state
             .released
@@ -8124,7 +8228,9 @@ impl Constitution {
             .all(|locus| self.declares(locus))
             || !state.lattices.keys().eq(self.lattices.keys())
         {
-            return Err(refuse("the state continues another opening's material (its loci)"));
+            return Err(refuse(
+                "the state continues another opening's material (its loci)",
+            ));
         }
         self.release(&state.released)?;
         if self.material_identity() != state.material {
@@ -8142,6 +8248,19 @@ impl Constitution {
                 self = self.with_transport(g, saved.transport.clone())?;
             } else if !saved.transport.is_one() {
                 return Err(refuse("a transport modulus off a source ring"));
+            }
+        }
+        for ((locus, carrier), carry) in &state.carries {
+            if let Carrier::Resonator(family) | Carrier::ResonatorScale(family) = carrier {
+                let Locus::Resonator(ring) = locus else {
+                    return Err(refuse("a resonator remainder outside its locus"));
+                };
+                if *family >= self.rings[*ring].resonator_scales.len()
+                    || carry.0.keys().any(|entry| *entry != 0)
+                    || self.released.contains(locus)
+                {
+                    return Err(refuse("a remainder outside its declared resonator family"));
+                }
             }
         }
         self.carries = state.carries.clone();
@@ -8172,9 +8291,9 @@ fn write_locus(locus: &Locus) -> String {
 
 /// A locus read from its kind and index ([`write_locus`]).
 fn read_locus(kind: &str, index: &str) -> Result<Locus, HnnError> {
-    let index: usize = index
-        .parse()
-        .map_err(|_| HnnError::ContinuingState { what: "a locus's index" })?;
+    let index: usize = index.parse().map_err(|_| HnnError::ContinuingState {
+        what: "a locus's index",
+    })?;
     Ok(match kind {
         "element" => Locus::Element(index),
         "junction" => Locus::Junction(index),
@@ -8211,8 +8330,9 @@ fn write_carrier(carrier: &Carrier) -> String {
 /// A carrier read from its words ([`write_carrier`]).
 fn read_carrier(words: &[&str]) -> Result<Carrier, HnnError> {
     let index = |word: &str| -> Result<usize, HnnError> {
-        word.parse()
-            .map_err(|_| HnnError::ContinuingState { what: "a carrier's index" })
+        word.parse().map_err(|_| HnnError::ContinuingState {
+            what: "a carrier's index",
+        })
     };
     Ok(match words {
         ["map"] => Carrier::Map,
@@ -8238,7 +8358,10 @@ fn read_carrier(words: &[&str]) -> Result<Carrier, HnnError> {
 
 /// Exact values on one line.
 fn write_values<'v>(s: &mut String, values: impl Iterator<Item = &'v Rat>) {
-    *s += &values.map(ToString::to_string).collect::<Vec<_>>().join(" ");
+    *s += &values
+        .map(ToString::to_string)
+        .collect::<Vec<_>>()
+        .join(" ");
     s.push('\n');
 }
 
@@ -8293,8 +8416,17 @@ fn read_optional_law(
 }
 
 /// Exact values of a keyed line, `count` of them ([`write_keyed`]).
-fn read_keyed(line: &str, key: &str, count: usize, what: &'static str) -> Result<Vec<Rat>, HnnError> {
-    let values = rats(line.strip_prefix(key).ok_or(HnnError::ContinuingState { what })?, what)?;
+fn read_keyed(
+    line: &str,
+    key: &str,
+    count: usize,
+    what: &'static str,
+) -> Result<Vec<Rat>, HnnError> {
+    let values = rats(
+        line.strip_prefix(key)
+            .ok_or(HnnError::ContinuingState { what })?,
+        what,
+    )?;
     if values.len() != count {
         return refuse(what);
     }
@@ -8352,13 +8484,28 @@ impl LearnedRing {
 
     /// The ring's learned material read from its text ([`LearnedRing::write`]), the head's source
     /// law placed where the text writes `source state`.
-    fn read(lines: &mut std::str::Lines<'_>, head_law: &NormalLaw, is_head: bool) -> Result<Self, HnnError> {
-        let n = number(head(next(lines, "a ring's standing")?, "standing", "a ring's standing")?.first(), "a ring's standing")?;
+    fn read(
+        lines: &mut std::str::Lines<'_>,
+        head_law: &NormalLaw,
+        is_head: bool,
+    ) -> Result<Self, HnnError> {
+        let n = number(
+            head(
+                next(lines, "a ring's standing")?,
+                "standing",
+                "a ring's standing",
+            )?
+            .first(),
+            "a ring's standing",
+        )?;
         let standing = rats(next(lines, "a ring's standing")?, "a ring's standing")?;
         if standing.len() != n {
             return refuse("a ring's standing");
         }
-        let scalar = |lines: &mut std::str::Lines<'_>, key: &str, what: &'static str| -> Result<Rat, HnnError> {
+        let scalar = |lines: &mut std::str::Lines<'_>,
+                      key: &str,
+                      what: &'static str|
+         -> Result<Rat, HnnError> {
             Ok(read_keyed(next(lines, what)?, key, 1, what)?.remove(0))
         };
         let standing_scale = scalar(lines, "standing-scale", "a ring's standing scale")?;
@@ -8366,7 +8513,10 @@ impl LearnedRing {
         let passive_scale = scalar(lines, "passive-scale", "a ring's passive scale")?;
         let contrast_map = read_matrix(lines, "contrast", "a ring's contrast")?;
         let contrast = read_law(lines, contrast_map)?;
-        let count = number(head(next(lines, "a ring's slices")?, "slices", "a ring's slices")?.first(), "a ring's slices")?;
+        let count = number(
+            head(next(lines, "a ring's slices")?, "slices", "a ring's slices")?.first(),
+            "a ring's slices",
+        )?;
         let mut slices = Vec::with_capacity(count);
         for _ in 0..count {
             let u = rats(next(lines, "a slice")?, "a slice")?;
@@ -8388,12 +8538,18 @@ impl LearnedRing {
             }
         }
         let transport = scalar(lines, "transport", "a ring's transport modulus")?;
-        let count = number(head(next(lines, "a ring's pairs")?, "pairs", "a ring's pairs")?.first(), "a ring's pairs")?;
+        let count = number(
+            head(next(lines, "a ring's pairs")?, "pairs", "a ring's pairs")?.first(),
+            "a ring's pairs",
+        )?;
         let mut pairs = Vec::with_capacity(count);
         for _ in 0..count {
             let mut families = Vec::with_capacity(3);
             for _ in 0..3 {
-                let m = number(head(next(lines, "a pair's family")?, "family", "a pair's family")?.first(), "a pair's family")?;
+                let m = number(
+                    head(next(lines, "a pair's family")?, "family", "a pair's family")?.first(),
+                    "a pair's family",
+                )?;
                 families.push(
                     (0..m)
                         .map(|_| rats(next(lines, "a pair's member")?, "a pair's member"))
@@ -8423,10 +8579,27 @@ impl LearnedRing {
         let resonator = if line == "resonator none" {
             None
         } else {
-            let gains = read_keyed(line, "resonator", 4, "a ring's resonator gains")?;
-            Some(std::array::from_fn(|i| gains[i].clone()))
+            let count = line.split_whitespace().count().saturating_sub(1);
+            if !matches!(count, 4 | 5) {
+                return refuse("a ring's declared resonator gain family (four or five)");
+            }
+            Some(read_keyed(
+                line,
+                "resonator",
+                count,
+                "a ring's resonator gains",
+            )?)
         };
-        let scales = read_keyed(next(lines, "a ring's resonator scales")?, "resonator-scales", 4, "a ring's resonator scales")?;
+        let line = next(lines, "a ring's resonator scales")?;
+        let count = line.split_whitespace().count().saturating_sub(1);
+        // Released material keeps its declared family count; placement checks it against the
+        // opening. An undeclared resonator has no gain scales.
+        if !matches!(count, 0 | 4 | 5)
+            || resonator.as_ref().is_some_and(|gains| gains.len() != count)
+        {
+            return refuse("a ring's scales off its declared resonator gain family");
+        }
+        let scales = read_keyed(line, "resonator-scales", count, "a ring's resonator scales")?;
         Ok(Self {
             standing,
             standing_scale,
@@ -8443,7 +8616,7 @@ impl LearnedRing {
             tree,
             population,
             resonator,
-            resonator_scales: std::array::from_fn(|i| scales[i].clone()),
+            resonator_scales: scales,
         })
     }
 }
@@ -8474,7 +8647,10 @@ impl ContinuingState {
 
     /// The source port's deposit clock.
     pub fn clock(&self) -> u64 {
-        self.clocks.get(&Locus::SourcePort(self.ring)).copied().unwrap_or(0)
+        self.clocks
+            .get(&Locus::SourcePort(self.ring))
+            .copied()
+            .unwrap_or(0)
     }
 
     /// [definition; agent-inferred, October 3; the reception carry §2.4] The reception's carried
@@ -8517,7 +8693,11 @@ impl ContinuingState {
         s += &format!("rho {}\n", self.transport());
         s += &format!("state {}\n", self.ring);
         write_law(&mut s, law);
-        s += &format!("rings {} contacts {}\n", self.rings.len(), self.contacts.len());
+        s += &format!(
+            "rings {} contacts {}\n",
+            self.rings.len(),
+            self.contacts.len()
+        );
         for (h, ring) in self.rings.iter().enumerate() {
             s += &format!("ring {h}\n");
             ring.write(&mut s, h == self.ring);
@@ -8535,7 +8715,12 @@ impl ContinuingState {
         }
         s += &format!("carries {}\n", self.carries.len());
         for ((locus, carrier), carry) in &self.carries {
-            s += &format!("{} {} {}\n", write_locus(locus), write_carrier(carrier), carry.0.len());
+            s += &format!(
+                "{} {} {}\n",
+                write_locus(locus),
+                write_carrier(carrier),
+                carry.0.len()
+            );
             for (index, value) in &carry.0 {
                 s += &format!("{index} {value}\n");
             }
@@ -8586,7 +8771,9 @@ impl ContinuingState {
             line == "end" || line.starts_with("material ") || line.starts_with("check ")
         };
         if !rest.lines().all(stamp) || rest.lines().last() != Some("end") {
-            return Err(refuse("the stamp (only `end` or an earlier stamp follows the storage product)"));
+            return Err(refuse(
+                "the stamp (only `end` or an earlier stamp follows the storage product)",
+            ));
         }
         let mut s = body.to_string();
         s += &format!("material {}\n", opening.material_identity());
@@ -8600,9 +8787,9 @@ impl ContinuingState {
     /// it is partial).
     pub fn from_text(text: &str) -> Result<Self, HnnError> {
         // The check covers every byte before its own line: a damaged state is refused whole.
-        let at = text
-            .rfind("\ncheck ")
-            .ok_or(HnnError::ContinuingState { what: "the check line" })?;
+        let at = text.rfind("\ncheck ").ok_or(HnnError::ContinuingState {
+            what: "the check line",
+        })?;
         let body = &text[..at + 1];
         // The check is verified before any line is read, so no value (a scale's `2^k` among them)
         // is formed from damaged text.
@@ -8620,10 +8807,12 @@ impl ContinuingState {
         let mut lines = text.lines();
         let map = read_matrix(&mut lines, "E", "the port's head")?;
         let rho = head(next(&mut lines, "the modulus")?, "rho", "the modulus")?;
-        let transport = rho
-            .first()
-            .and_then(|x| x.parse::<Rat>().ok())
-            .ok_or(HnnError::ContinuingState { what: "the modulus" })?;
+        let transport =
+            rho.first()
+                .and_then(|x| x.parse::<Rat>().ok())
+                .ok_or(HnnError::ContinuingState {
+                    what: "the modulus",
+                })?;
         let ring = number(
             head(
                 next(&mut lines, "the state line (a partial remount has none)")?,
@@ -8634,17 +8823,28 @@ impl ContinuingState {
             "the state's ring",
         )?;
         let law = read_law(&mut lines, map)?;
-        let counts = head(next(&mut lines, "the rings' head")?, "rings", "the rings' head")?;
+        let counts = head(
+            next(&mut lines, "the rings' head")?,
+            "rings",
+            "the rings' head",
+        )?;
         if counts.get(1).map(String::as_str) != Some("contacts") || counts.len() != 3 {
             return refuse("the rings' head");
         }
-        let (count, contacts) = (number(counts.first(), "the rings' count")?, number(counts.get(2), "the contacts' count")?);
+        let (count, contacts) = (
+            number(counts.first(), "the rings' count")?,
+            number(counts.get(2), "the contacts' count")?,
+        );
         if ring >= count {
             return refuse("the state's ring among the rings");
         }
         let mut rings = Vec::with_capacity(count);
         for h in 0..count {
-            if number(head(next(&mut lines, "a ring's head")?, "ring", "a ring's head")?.first(), "a ring's head")? != h {
+            if number(
+                head(next(&mut lines, "a ring's head")?, "ring", "a ring's head")?.first(),
+                "a ring's head",
+            )? != h
+            {
                 return refuse("a ring's head (in order)");
             }
             rings.push(LearnedRing::read(&mut lines, &law, h == ring)?);
@@ -8654,13 +8854,27 @@ impl ContinuingState {
         }
         let mut learned = Vec::with_capacity(contacts);
         for a in 0..contacts {
-            if number(head(next(&mut lines, "a contact's head")?, "contact", "a contact's head")?.first(), "a contact's head")? != a {
+            if number(
+                head(
+                    next(&mut lines, "a contact's head")?,
+                    "contact",
+                    "a contact's head",
+                )?
+                .first(),
+                "a contact's head",
+            )? != a
+            {
                 return refuse("a contact's head (in order)");
             }
             let storage = read_matrix(&mut lines, "storage", "a contact's storage")?;
             let stiffness = read_matrix(&mut lines, "stiffness", "a contact's stiffness")?;
             let dissipation = read_matrix(&mut lines, "dissipation", "a contact's dissipation")?;
-            let scales = read_keyed(next(&mut lines, "a contact's scales")?, "scales", 3, "a contact's scales")?;
+            let scales = read_keyed(
+                next(&mut lines, "a contact's scales")?,
+                "scales",
+                3,
+                "a contact's scales",
+            )?;
             learned.push(LearnedContact {
                 storage,
                 stiffness,
@@ -8668,22 +8882,35 @@ impl ContinuingState {
                 scales: std::array::from_fn(|i| scales[i].clone()),
             });
         }
-        let count = number(head(next(&mut lines, "the lattices")?, "lattices", "the lattices")?.first(), "the lattices")?;
+        let count = number(
+            head(
+                next(&mut lines, "the lattices")?,
+                "lattices",
+                "the lattices",
+            )?
+            .first(),
+            "the lattices",
+        )?;
         let mut lattices = BTreeMap::new();
         for _ in 0..count {
             let words: Vec<&str> = next(&mut lines, "a lattice")?.split_whitespace().collect();
             let [kind, index, exponent] = words[..] else {
                 return refuse("a lattice");
             };
-            let exponent: u32 = exponent
-                .parse()
-                .map_err(|_| HnnError::ContinuingState { what: "a lattice's exponent" })?;
+            let exponent: u32 = exponent.parse().map_err(|_| HnnError::ContinuingState {
+                what: "a lattice's exponent",
+            })?;
             lattices.insert(read_locus(kind, index)?, Lattice::new(exponent));
         }
-        let count = number(head(next(&mut lines, "the carries")?, "carries", "the carries")?.first(), "the carries")?;
+        let count = number(
+            head(next(&mut lines, "the carries")?, "carries", "the carries")?.first(),
+            "the carries",
+        )?;
         let mut carries = Carries::new();
         for _ in 0..count {
-            let words: Vec<&str> = next(&mut lines, "a carry's head")?.split_whitespace().collect();
+            let words: Vec<&str> = next(&mut lines, "a carry's head")?
+                .split_whitespace()
+                .collect();
             if words.len() < 4 {
                 return refuse("a carry's head");
             }
@@ -8692,16 +8919,18 @@ impl ContinuingState {
             let entries = number(Some(&words[words.len() - 1].to_string()), "a carry's count")?;
             let mut carry = BTreeMap::new();
             for _ in 0..entries {
-                let pair: Vec<&str> = next(&mut lines, "a carried remainder")?.split_whitespace().collect();
+                let pair: Vec<&str> = next(&mut lines, "a carried remainder")?
+                    .split_whitespace()
+                    .collect();
                 let [index, value] = pair[..] else {
                     return refuse("a carried remainder");
                 };
-                let index: usize = index
-                    .parse()
-                    .map_err(|_| HnnError::ContinuingState { what: "a remainder's index" })?;
-                let value: Rat = value
-                    .parse()
-                    .map_err(|_| HnnError::ContinuingState { what: "a remainder's value" })?;
+                let index: usize = index.parse().map_err(|_| HnnError::ContinuingState {
+                    what: "a remainder's index",
+                })?;
+                let value: Rat = value.parse().map_err(|_| HnnError::ContinuingState {
+                    what: "a remainder's value",
+                })?;
                 if value.is_zero() {
                     return refuse("a zero remainder (never stored)");
                 }
@@ -8709,7 +8938,10 @@ impl ContinuingState {
             }
             carries.insert((locus, carrier), Carry(carry));
         }
-        let count = number(head(next(&mut lines, "the clocks")?, "clocks", "the clocks")?.first(), "the clocks")?;
+        let count = number(
+            head(next(&mut lines, "the clocks")?, "clocks", "the clocks")?.first(),
+            "the clocks",
+        )?;
         let mut clocks = BTreeMap::new();
         for _ in 0..count {
             let words: Vec<&str> = next(&mut lines, "a clock")?.split_whitespace().collect();
@@ -8721,10 +8953,20 @@ impl ContinuingState {
                 .map_err(|_| HnnError::ContinuingState { what: "a clock" })?;
             clocks.insert(read_locus(kind, index)?, clock);
         }
-        let count = number(head(next(&mut lines, "the released loci")?, "released", "the released loci")?.first(), "the released loci")?;
+        let count = number(
+            head(
+                next(&mut lines, "the released loci")?,
+                "released",
+                "the released loci",
+            )?
+            .first(),
+            "the released loci",
+        )?;
         let mut released = BTreeSet::new();
         for _ in 0..count {
-            let words: Vec<&str> = next(&mut lines, "a released locus")?.split_whitespace().collect();
+            let words: Vec<&str> = next(&mut lines, "a released locus")?
+                .split_whitespace()
+                .collect();
             let [kind, index] = words[..] else {
                 return refuse("a released locus");
             };
@@ -8765,11 +9007,19 @@ impl ContinuingState {
         };
         let storage_product: Rat = scalar("storage-product", "the storage product")?
             .parse()
-            .map_err(|_| HnnError::ContinuingState { what: "the storage product" })?;
+            .map_err(|_| HnnError::ContinuingState {
+                what: "the storage product",
+            })?;
         let material: u128 = scalar("material", "the material identity")?
             .parse()
-            .map_err(|_| HnnError::ContinuingState { what: "the material identity" })?;
-        head(next(&mut lines, "the check line")?, "check", "the check line")?;
+            .map_err(|_| HnnError::ContinuingState {
+                what: "the material identity",
+            })?;
+        head(
+            next(&mut lines, "the check line")?,
+            "check",
+            "the check line",
+        )?;
         if next(&mut lines, "the end")?.trim() != "end" {
             return refuse("the end");
         }
@@ -8818,7 +9068,10 @@ fn number(word: Option<&String>, what: &'static str) -> Result<usize, HnnError> 
 /// A line read as exact values.
 fn rats(line: &str, what: &'static str) -> Result<Vec<Rat>, HnnError> {
     line.split_whitespace()
-        .map(|x| x.parse::<Rat>().map_err(|_| HnnError::ContinuingState { what }))
+        .map(|x| {
+            x.parse::<Rat>()
+                .map_err(|_| HnnError::ContinuingState { what })
+        })
         .collect()
 }
 
@@ -8863,14 +9116,20 @@ fn write_law(s: &mut String, law: &NormalLaw) {
         s.push('\n');
     }
     let chart = &law.chart;
-    *s += &format!("chart {} {} {}\n", chart.exponent, chart.certificate, chart.scale);
+    *s += &format!(
+        "chart {} {} {}\n",
+        chart.exponent, chart.certificate, chart.scale
+    );
     *s += &format!("support {}\n", chart.support.len());
     *s += &join(&mut chart.support.iter().map(ToString::to_string));
     s.push('\n');
     *s += "block\n";
     *s += &join(&mut chart.block.iter().map(ToString::to_string));
     s.push('\n');
-    for (name, carry) in [("map-carry", &law.map_carry), ("gram-carry", &law.gram_carry)] {
+    for (name, carry) in [
+        ("map-carry", &law.map_carry),
+        ("gram-carry", &law.gram_carry),
+    ] {
         *s += &format!("{name} {}\n", carry.0.len());
         for (index, value) in &carry.0 {
             *s += &format!("{index} {value}\n");
@@ -8886,7 +9145,10 @@ fn write_law(s: &mut String, law: &NormalLaw) {
 /// support is not exactly the Gram's rows that leave the scale's prior `2^k I`, or its lattice is
 /// coarser than its scale.
 fn read_law(lines: &mut std::str::Lines<'_>, map: ExactRatMatrix) -> Result<NormalLaw, HnnError> {
-    let n = number(head(next(lines, "the Gram's head")?, "gram", "the Gram's head")?.first(), "the Gram's width")?;
+    let n = number(
+        head(next(lines, "the Gram's head")?, "gram", "the Gram's head")?.first(),
+        "the Gram's width",
+    )?;
     let mut gram = Vec::with_capacity(n);
     for _ in 0..n {
         let row = rats(next(lines, "a Gram row")?, "a Gram row")?;
@@ -8895,46 +9157,87 @@ fn read_law(lines: &mut std::str::Lines<'_>, map: ExactRatMatrix) -> Result<Norm
         }
         gram.push(row);
     }
-    let chart_head = head(next(lines, "the chart's head")?, "chart", "the chart's head")?;
-    let exponent = u32::try_from(number(chart_head.first(), "the chart's exponent")?)
-        .map_err(|_| HnnError::ContinuingState { what: "the chart's exponent" })?;
+    let chart_head = head(
+        next(lines, "the chart's head")?,
+        "chart",
+        "the chart's head",
+    )?;
+    let exponent =
+        u32::try_from(number(chart_head.first(), "the chart's exponent")?).map_err(|_| {
+            HnnError::ContinuingState {
+                what: "the chart's exponent",
+            }
+        })?;
     let certificate = chart_head
         .get(1)
         .and_then(|x| x.parse::<Rat>().ok())
-        .ok_or(HnnError::ContinuingState { what: "the chart's certificate" })?;
-    let scale = u32::try_from(number(chart_head.get(2), "the chart's scale")?)
-        .map_err(|_| HnnError::ContinuingState { what: "the chart's scale" })?;
-    let k = number(head(next(lines, "the support's head")?, "support", "the support's head")?.first(), "the support's size")?;
+        .ok_or(HnnError::ContinuingState {
+            what: "the chart's certificate",
+        })?;
+    let scale = u32::try_from(number(chart_head.get(2), "the chart's scale")?).map_err(|_| {
+        HnnError::ContinuingState {
+            what: "the chart's scale",
+        }
+    })?;
+    let k = number(
+        head(
+            next(lines, "the support's head")?,
+            "support",
+            "the support's head",
+        )?
+        .first(),
+        "the support's size",
+    )?;
     let support: Vec<usize> = next(lines, "the support")?
         .split_whitespace()
-        .map(|x| x.parse().map_err(|_| HnnError::ContinuingState { what: "the support" }))
+        .map(|x| {
+            x.parse().map_err(|_| HnnError::ContinuingState {
+                what: "the support",
+            })
+        })
         .collect::<Result<_, _>>()?;
     if support.len() != k {
         return refuse("the support's size");
     }
-    head(next(lines, "the block's head")?, "block", "the block's head")?;
+    head(
+        next(lines, "the block's head")?,
+        "block",
+        "the block's head",
+    )?;
     let block: Vec<i128> = next(lines, "the block")?
         .split_whitespace()
-        .map(|x| x.parse().map_err(|_| HnnError::ContinuingState { what: "the block" }))
+        .map(|x| {
+            x.parse()
+                .map_err(|_| HnnError::ContinuingState { what: "the block" })
+        })
         .collect::<Result<_, _>>()?;
     if block.len() != k * k {
         return refuse("the block's size");
     }
     let mut carries = Vec::with_capacity(2);
     for key in ["map-carry", "gram-carry"] {
-        let count = number(head(next(lines, "a carry's head")?, key, "a carry's head")?.first(), "a carry's count")?;
+        let count = number(
+            head(next(lines, "a carry's head")?, key, "a carry's head")?.first(),
+            "a carry's count",
+        )?;
         let mut carry = BTreeMap::new();
         for _ in 0..count {
             let line = next(lines, "a carried remainder")?;
             let mut words = line.split_whitespace();
-            let index: usize = words
-                .next()
-                .and_then(|w| w.parse().ok())
-                .ok_or(HnnError::ContinuingState { what: "a remainder's index" })?;
-            let value: Rat = words
-                .next()
-                .and_then(|w| w.parse().ok())
-                .ok_or(HnnError::ContinuingState { what: "a remainder's value" })?;
+            let index: usize =
+                words
+                    .next()
+                    .and_then(|w| w.parse().ok())
+                    .ok_or(HnnError::ContinuingState {
+                        what: "a remainder's index",
+                    })?;
+            let value: Rat =
+                words
+                    .next()
+                    .and_then(|w| w.parse().ok())
+                    .ok_or(HnnError::ContinuingState {
+                        what: "a remainder's value",
+                    })?;
             if value.is_zero() {
                 return refuse("a zero remainder (never stored)");
             }
@@ -8942,14 +9245,24 @@ fn read_law(lines: &mut std::str::Lines<'_>, map: ExactRatMatrix) -> Result<Norm
         }
         carries.push(Carry(carry));
     }
-    let located = match head(next(lines, "the located pair")?, "located", "the located pair")?.as_slice() {
+    let located = match head(
+        next(lines, "the located pair")?,
+        "located",
+        "the located pair",
+    )?
+    .as_slice()
+    {
         [none] if none == "none" => None,
         [from, a0, a1, s] => {
-            let exact = |x: &String| x.parse::<Rat>().map_err(|_| HnnError::ContinuingState { what: "the located pair" });
+            let exact = |x: &String| {
+                x.parse::<Rat>().map_err(|_| HnnError::ContinuingState {
+                    what: "the located pair",
+                })
+            };
             Some(LocatedPrior {
-                from: from
-                    .parse()
-                    .map_err(|_| HnnError::ContinuingState { what: "the located pair's founding" })?,
+                from: from.parse().map_err(|_| HnnError::ContinuingState {
+                    what: "the located pair's founding",
+                })?,
                 a0: exact(a0)?,
                 a1: exact(a1)?,
                 s: exact(s)?,

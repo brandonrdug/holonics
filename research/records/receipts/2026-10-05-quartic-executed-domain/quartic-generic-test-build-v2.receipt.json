@@ -1,0 +1,32 @@
+{
+  "exit_code": 0,
+  "wall_ns": 9048366394,
+  "user_cpu_ns": 7744724000,
+  "system_cpu_ns": 2204160000,
+  "peak_RSS_KiB": 1436664,
+  "fixed_projection_ms": 65000,
+  "argv": [
+    "systemd-run",
+    "--user",
+    "--scope",
+    "--quiet",
+    "-p",
+    "MemoryMax=4294967296",
+    "-p",
+    "MemorySwapMax=0",
+    "timeout",
+    "--signal=TERM",
+    "--kill-after=2s",
+    "65s",
+    "cargo",
+    "test",
+    "--offline",
+    "--locked",
+    "-p",
+    "holonics",
+    "--lib",
+    "--no-run",
+    "-j8"
+  ],
+  "source_unchanged": true
+}

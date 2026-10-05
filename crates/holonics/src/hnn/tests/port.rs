@@ -1493,3 +1493,104 @@ fn every_gain_family_covector_is_the_exact_tangent_on_signed_and_pumped_bases() 
         }
     }
 }
+
+#[test]
+fn a_quartic_comparison_returns_all_five_reached_gain_features() {
+    // Three receiving sections include the second source-ring tick: the first starts at
+    // u=0, so its quartic feature is zero. Keep the linear calibration's declared phases;
+    // this fixture checks the nonlinear comparison, not a nonlinear observability theorem.
+    let mut declaration = super::learning::chain_declaration(1 << 16);
+    declaration.receivers[0].aperture = 3;
+    let field = Field::declare(declaration.by_lattice_rule())
+        .unwrap()
+        .with_exact_word();
+    let width = field.ring(0).width();
+    let material = ResonatorMaterial::new(
+        ExactRatMatrix::identity(width)
+            .unwrap()
+            .scaled(&integer(16)),
+        ExactRatMatrix::zero(width, width).unwrap(),
+        ExactRatMatrix::zero(width, width).unwrap(),
+        None,
+    )
+    .unwrap()
+    .with_symmetric_saturation(rat(1, 65536))
+    .unwrap();
+    let calibration = generic(&field, 310);
+    let (current, open) = moment(&field, 66, 13);
+    let phases = phases(&field, &calibration, &current);
+    let theta = calibration
+        .with_ring_resonator(&field, 0, material.clone())
+        .unwrap();
+    let pending = PendingRatio::produce(
+        &current,
+        &open,
+        &ActiveAddress::boundary(phases.depth()),
+        &phases,
+        0,
+    )
+    .unwrap();
+    let (word, faces) = pending.read(&field, &theta).unwrap();
+    let targets = [2, 1, 0];
+    let target = target_phases(&field, pending.anchor(), 2, &targets).unwrap();
+    let combined = pending.against(&theta, &faces, &targets).unwrap().faces;
+    let covector = HolonRatio::compare(combined, &targets, &target)
+        .unwrap()
+        .covector()
+        .unwrap();
+    let back = word
+        .pull_back(
+            &covector,
+            theta.receiving_map(2).unwrap(),
+            &pending.anchor()[2],
+            &phases,
+        )
+        .unwrap();
+    let (pullback, deposit) = compose(
+        &field,
+        &theta,
+        &pending,
+        &crate::hnn::WordOpening::Rest,
+        &back,
+        &targets,
+        &[],
+    )
+    .unwrap();
+    let pull = pullback.resonators.iter().find(|p| p.ring == 0).unwrap();
+    assert_eq!(pull.gains.len(), 5);
+    assert_eq!(pull.energy.len(), 5);
+    assert!(!pull.energy[4].is_zero());
+    assert!(!pull.gains[4].is_zero());
+    let reached: Vec<_> = deposit
+        .factors()
+        .iter()
+        .filter_map(|step| match &step.gradient {
+            FactorGradient::Resonator {
+                ring: 0,
+                family,
+                gradient,
+            } => Some((*family, gradient)),
+            _ => None,
+        })
+        .collect();
+    assert_eq!(reached.len(), 5);
+    for (family, gradient) in reached {
+        assert_eq!(gradient, &(-pull.gains[family].clone()));
+    }
+    let expected: Rat = back.resonators[0]
+        .iter()
+        .map(|tick| {
+            let features = material
+                .gain_features(
+                    tick.phase,
+                    field.step(),
+                    &tick.displacement,
+                    &tick.velocity,
+                    &tick.rate,
+                )
+                .unwrap();
+            dot(&tick.solved, &features[4])
+        })
+        .sum();
+    assert_eq!(pull.gains[4], expected);
+}

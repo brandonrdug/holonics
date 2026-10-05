@@ -7,7 +7,9 @@
 //! `e_max = e_0 + A` junction steps), its grain `L_R = ⌈1/ε_bits⌉`, derived from the receiver's
 //! declared code tolerance `ε_bits` per cell (R2 M2), and the depth `D` of its landmark tree's
 //! address (the landmark tree). It refuses `A` beyond the rank of the receiving ring's observability
-//! over the word, and reports that rank (review C7).
+//! over the word, and reports that rank (review C7). A nonlinear declaration instead reads the
+//! exact differential at zero motion and publishes `RankScope::TangentAtRest`. This is a local
+//! dimension reading; it certifies neither global nonlinear observability nor a later motion.
 //!
 //! ```text
 //! a_j = [x_(p+j−1), …, x_p, x_(p−1), …]_D        phase j's address: the epoch's earlier targets, then the active suffix address
@@ -801,13 +803,17 @@ impl ActiveAddress {
         line(s, "clocks", self.reader.clocks.iter().map(Clock::ticks));
         match &self.reader.kinds {
             None => line(s, "site-kinds", ["-"]),
-            Some(kinds) => line(s, "site-kinds", kinds.iter().map(|kind| match kind {
-                SiteKind::Rotation => "rotation",
-                SiteKind::Null => "null",
-                SiteKind::Boost => "boost",
-                SiteKind::Reflection => "reflection",
-                SiteKind::Degenerate => "degenerate",
-            })),
+            Some(kinds) => line(
+                s,
+                "site-kinds",
+                kinds.iter().map(|kind| match kind {
+                    SiteKind::Rotation => "rotation",
+                    SiteKind::Null => "null",
+                    SiteKind::Boost => "boost",
+                    SiteKind::Reflection => "reflection",
+                    SiteKind::Degenerate => "degenerate",
+                }),
+            ),
         }
     }
 
@@ -828,7 +834,9 @@ impl ActiveAddress {
                     (Some("b"), Some("")) => Letter::Boundary,
                     (Some("c"), Some(code)) => Letter::Cell(value(Some(&code), what)?),
                     (Some("f"), Some(rest)) => {
-                        let (cell, features) = rest.split_once('.').ok_or(HnnError::ContinuingState { what })?;
+                        let (cell, features) = rest
+                            .split_once('.')
+                            .ok_or(HnnError::ContinuingState { what })?;
                         Letter::Bundle(Bundle {
                             cell: value(Some(&cell), what)?,
                             features: value(Some(&features), what)?,
@@ -838,7 +846,10 @@ impl ActiveAddress {
                 })
             })
             .collect::<Result<Vec<_>, HnnError>>()?;
-        let ticks: Vec<BigUint> = values(&keyed(next("the register's clocks")?, "clocks", what)?, what)?;
+        let ticks: Vec<BigUint> = values(
+            &keyed(next("the register's clocks")?, "clocks", what)?,
+            what,
+        )?;
         if letters.len() != self.letters.len() || ticks.len() != self.reader.clocks.len() {
             return refused("the address register against the field's declaration");
         }
@@ -846,14 +857,19 @@ impl ActiveAddress {
         let kinds = if kind_words.as_slice() == ["-"] {
             None
         } else {
-            Some(kind_words.into_iter().map(|kind| match kind {
-                "rotation" => Ok(SiteKind::Rotation),
-                "null" => Ok(SiteKind::Null),
-                "boost" => Ok(SiteKind::Boost),
-                "reflection" => Ok(SiteKind::Reflection),
-                "degenerate" => Ok(SiteKind::Degenerate),
-                _ => refused("the register's held site kinds"),
-            }).collect::<Result<Vec<_>, HnnError>>()?)
+            Some(
+                kind_words
+                    .into_iter()
+                    .map(|kind| match kind {
+                        "rotation" => Ok(SiteKind::Rotation),
+                        "null" => Ok(SiteKind::Null),
+                        "boost" => Ok(SiteKind::Boost),
+                        "reflection" => Ok(SiteKind::Reflection),
+                        "degenerate" => Ok(SiteKind::Degenerate),
+                        _ => refused("the register's held site kinds"),
+                    })
+                    .collect::<Result<Vec<_>, HnnError>>()?,
+            )
         };
         if let Some(kinds) = kinds {
             self.reader.hold_kinds(kinds)?;
@@ -861,7 +877,13 @@ impl ActiveAddress {
             self.reader.kinds = None;
         }
         self.letters = letters;
-        for ((clock, ring), ticks) in self.reader.clocks.iter_mut().zip(&self.reader.rings).zip(&ticks) {
+        for ((clock, ring), ticks) in self
+            .reader
+            .clocks
+            .iter_mut()
+            .zip(&self.reader.rings)
+            .zip(&ticks)
+        {
             *clock = ring.rest.clone();
             clock.advance(ticks);
         }
@@ -1238,6 +1260,14 @@ fn face_enclosure(face: &Face, class: usize) -> Result<ExactInterval, HnnError> 
 // -------------------------------------------------------------------------------------------
 // the receiving phases
 
+/// The domain of the rank read at the declaring medium. A nonlinear word has no global linear
+/// response matrix. Its differential at zero motion is a local reading, not a global certificate.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum RankScope {
+    Linear,
+    TangentAtRest,
+}
+
 /// [definition] **The receiving phases** of one admitted receiver. See the module header.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ReceivingPhases {
@@ -1248,35 +1278,63 @@ pub struct ReceivingPhases {
     tolerance: Rat,
     depth: usize,
     rank: usize,
+    rank_scope: RankScope,
 }
 
 impl ReceivingPhases {
     /// [definition; agent-inferred, October 4] The saved declaring phases. The rank belongs
     /// to the declaring medium; restoring it does not execute a new observability experiment.
     pub(crate) fn write_saved(&self, s: &mut String) {
-        crate::hnn::state_text::line(s, "phases", [
-            self.ring.to_string(), self.first_epoch.to_string(), self.aperture.to_string(),
-            self.grain.to_string(), self.tolerance.to_string(), self.depth.to_string(),
-            self.rank.to_string(),
-        ]);
+        crate::hnn::state_text::line(
+            s,
+            "phases",
+            [
+                self.ring.to_string(),
+                self.first_epoch.to_string(),
+                self.aperture.to_string(),
+                self.grain.to_string(),
+                self.tolerance.to_string(),
+                self.depth.to_string(),
+                self.rank.to_string(),
+                match self.rank_scope {
+                    RankScope::Linear => "linear".to_owned(),
+                    RankScope::TangentAtRest => "tangent-at-rest".to_owned(),
+                },
+            ],
+        );
     }
 
-    /// Read saved operands, checking their declaration and finite linear-map shape. No
+    /// Read saved operands, checking their declaration, finite differential shape and rank scope. No
     /// contemporary material, emitted word or answer enters this constructor.
     pub(crate) fn read_saved(field: &Field, head: &str) -> Result<Self, HnnError> {
         use crate::hnn::state_text::{keyed, refused, value};
         let what = "the saved declaring phases";
         let words = keyed(head, "phases", what)?;
-        let [ring, first, aperture, grain, tolerance, depth, rank] = words[..] else {
+        let [ring, first, aperture, grain, tolerance, depth, rank, scope] = words[..] else {
             return refused(what);
         };
-        let (ring, first_epoch, aperture, grain, tolerance, depth, rank):
-            (usize, usize, usize, u64, Rat, usize, usize) = (
-                value(Some(&ring), what)?, value(Some(&first), what)?,
-                value(Some(&aperture), what)?, value(Some(&grain), what)?,
-                value(Some(&tolerance), what)?, value(Some(&depth), what)?,
-                value(Some(&rank), what)?,
-            );
+        let (ring, first_epoch, aperture, grain, tolerance, depth, rank): (
+            usize,
+            usize,
+            usize,
+            u64,
+            Rat,
+            usize,
+            usize,
+        ) = (
+            value(Some(&ring), what)?,
+            value(Some(&first), what)?,
+            value(Some(&aperture), what)?,
+            value(Some(&grain), what)?,
+            value(Some(&tolerance), what)?,
+            value(Some(&depth), what)?,
+            value(Some(&rank), what)?,
+        );
+        let rank_scope = match scope {
+            "linear" => RankScope::Linear,
+            "tangent-at-rest" => RankScope::TangentAtRest,
+            _ => return refused("a declared receiving rank scope"),
+        };
         if ring >= field.rings().len()
             || field.first_epoch(ring) != Some(first_epoch)
             || aperture == 0
@@ -1285,15 +1343,31 @@ impl ReceivingPhases {
         {
             return refused(what);
         }
-        let columns = field.sources().iter().try_fold(0usize, |width, &source| {
-            width.checked_add(field.ring(source).width())
-        }).ok_or(HnnError::ContinuingState { what })?;
-        let rows = field.ring(ring).width().checked_mul(aperture)
+        let columns = field
+            .sources()
+            .iter()
+            .try_fold(0usize, |width, &source| {
+                width.checked_add(field.ring(source).width())
+            })
+            .ok_or(HnnError::ContinuingState { what })?;
+        let rows = field
+            .ring(ring)
+            .width()
+            .checked_mul(aperture)
             .ok_or(HnnError::ContinuingState { what })?;
         if aperture > rank || rank > rows.min(columns) {
             return refused("the saved rank against its declaring map's shape");
         }
-        Ok(Self { ring, first_epoch, aperture, grain, tolerance, depth, rank })
+        Ok(Self {
+            ring,
+            first_epoch,
+            aperture,
+            grain,
+            tolerance,
+            depth,
+            rank,
+            rank_scope,
+        })
     }
 
     /// The saved admitted family may be a restriction of the field's initial family,
@@ -1311,8 +1385,9 @@ impl ReceivingPhases {
     }
 
     /// **Declare an admitted receiver's phases** at the medium `(Θ, λ)`: its first epoch from the
-    /// source rings, its grain from its code tolerance, and its observability rank over the word,
-    /// refusing an aperture beyond it.
+    /// source rings, its grain from its code tolerance, and its rank over the word, refusing an
+    /// aperture beyond it. Linear words read global linear rank; nonlinear words read only their
+    /// exact tangent at zero motion. The scope travels with the declaration and saved family.
     pub fn declare(
         field: &Field,
         constitution: &impl ConstitutionRead,
@@ -1345,8 +1420,21 @@ impl ReceivingPhases {
             tolerance: receiver.tolerance.clone(),
             depth: receiver.depth,
             rank: 0,
+            rank_scope: RankScope::Linear,
         };
-        phases.rank = phases.observability(field, constitution, current)?;
+        let nonlinear = field.rings().iter().enumerate().any(|(ring, _)| {
+            constitution
+                .ring_resonator(ring)
+                .is_some_and(|law| law.saturation().is_some())
+        });
+        phases.rank = if nonlinear {
+            phases.rank_scope = RankScope::TangentAtRest;
+            phases
+                .tangent_at_rest(field, constitution, current)?
+                .rank()?
+        } else {
+            phases.observability(field, constitution, current)?
+        };
         if phases.aperture > phases.rank {
             return Err(HnnError::Observability {
                 aperture: phases.aperture,
@@ -1368,6 +1456,16 @@ impl ReceivingPhases {
         constitution: &impl ConstitutionRead,
         current: &Current,
     ) -> Result<usize, HnnError> {
+        if let Some(ring) = (0..field.rings().len()).find(|&ring| {
+            constitution
+                .ring_resonator(ring)
+                .is_some_and(|law| law.saturation().is_some())
+        }) {
+            return Err(HnnError::Resonator {
+                ring,
+                what: "a nonlinear word has no global linear observability matrix",
+            });
+        }
         let operands = Operands::exact_at_cut(field, constitution, current)?;
         let mut columns: Vec<Vec<Rat>> = Vec::new();
         for &source in field.sources() {
@@ -1391,6 +1489,51 @@ impl ReceivingPhases {
                 .collect(),
         )?;
         Ok(matrix.rank()?)
+    }
+
+    /// The exact differential `D F(0)` of the anchor map from source storage, with every interior
+    /// motion at rest. The current supplies the clocks and material cut, not a nonzero carried
+    /// state. Each row is the matched return of a receiving coordinate through the producing
+    /// zero-motion word, including the loaded nonlinear branch and its Hessian. This is not a
+    /// finite unit-response matrix, and its rank establishes no global nonlinear injectivity.
+    pub(crate) fn tangent_at_rest(
+        &self,
+        field: &Field,
+        constitution: &impl ConstitutionRead,
+        current: &Current,
+    ) -> Result<ExactRatMatrix, HnnError> {
+        let operands = Operands::exact_at_cut(field, constitution, current)?;
+        let storage = field
+            .rings()
+            .iter()
+            .map(|ring| vec![Rat::zero(); ring.width()])
+            .collect();
+        let mut word = Word::on_operands(field, operands, storage)?;
+        word.forward(self)?;
+        let width = field.ring(self.ring).width();
+        let columns = field
+            .sources()
+            .iter()
+            .map(|&ring| field.ring(ring).width())
+            .sum();
+        let mut rows = Vec::with_capacity(self.aperture * width);
+        for epoch in self.epochs() {
+            for coordinate in 0..width {
+                let mut anchors = vec![None; word.recorded().len()];
+                let mut face = vec![Rat::zero(); width];
+                face[coordinate] = Rat::one();
+                anchors[epoch] = Some(face);
+                let returned = word.anchor_differential(anchors, self.ring)?;
+                rows.push(
+                    field
+                        .sources()
+                        .iter()
+                        .flat_map(|&ring| returned.storage[ring].iter().cloned())
+                        .collect(),
+                );
+            }
+        }
+        ExactRatMatrix::shaped(rows.len(), columns, rows).map_err(Into::into)
     }
 
     pub fn ring(&self) -> usize {
@@ -1466,6 +1609,11 @@ impl ReceivingPhases {
     /// past the declaration's refusal of a wider aperture.
     pub fn rank(&self) -> usize {
         self.rank
+    }
+
+    /// Whether `rank()` belongs to a global linear response or the local tangent at rest.
+    pub fn rank_scope(&self) -> RankScope {
+        self.rank_scope
     }
 
     /// **The wave's read at one receiving epoch**: `R · P_R^(τ_R) v_R`, each class's real logit read

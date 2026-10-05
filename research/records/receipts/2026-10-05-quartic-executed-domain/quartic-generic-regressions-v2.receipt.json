@@ -1,0 +1,31 @@
+{
+  "exit_code": 0,
+  "wall_ns": 26650039,
+  "user_cpu_ns": 30243000,
+  "system_cpu_ns": 28633000,
+  "peak_RSS_KiB": 23152,
+  "fixed_projection_ms": 16000,
+  "argv": [
+    "systemd-run",
+    "--user",
+    "--scope",
+    "--quiet",
+    "-p",
+    "MemoryMax=4294967296",
+    "-p",
+    "MemorySwapMax=0",
+    "timeout",
+    "--signal=TERM",
+    "--kill-after=2s",
+    "16s",
+    "target/debug/deps/holonics-2a96462c8d73f617",
+    "hnn::tests::floquet::a_closed_quartic_balance_does_not_bound_the_executed_orbit",
+    "hnn::tests::floquet::the_quartic_generic_advance_is_the_executed_ring_tick",
+    "hnn::tests::floquet::a_quartic_lock_consumes_its_executed_period_domain",
+    "hnn::tests::floquet::a_quartic_domain_refuses_a_bad_step_residual_or_rounding_claim",
+    "--exact",
+    "--test-threads=8",
+    "--nocapture"
+  ],
+  "source_unchanged": true
+}

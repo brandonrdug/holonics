@@ -168,7 +168,11 @@ impl Carried {
 #[derive(Debug)]
 pub struct Word<'c> {
     /// The native source/material producer of a source-bound continuing word.
-    native_source: Option<(crate::hnn::constitution::Constitution, Current, std::sync::Arc<SourceMoment>)>,
+    native_source: Option<(
+        crate::hnn::constitution::Constitution,
+        Current,
+        std::sync::Arc<SourceMoment>,
+    )>,
     field: &'c Field,
     operands: Operands,
     clock: Clock,
@@ -227,6 +231,9 @@ pub struct ResonatorBalance {
     pub pump: Rat,
     pub port: Rat,
     pub dissipation: Rat,
+    /// The signed defect of the executed nonlinear constitutive integration, separate from
+    /// the numerical solve and split certificates. Zero for the quadratic midpoint law.
+    pub integration: Rat,
     pub chart: Rat,
     pub split: Rat,
     /// The certified bound on `|chart + split|`, the ticks' bounds summed.
@@ -250,6 +257,7 @@ impl ResonatorBalance {
             pump: sum(|step| &step.pump),
             port: sum(|step| &step.port),
             dissipation: sum(|step| &step.dissipation),
+            integration: sum(|step| &step.integration),
             chart: sum(|step| &step.chart),
             split: sum(|step| &step.split),
             bound: sum(|step| &step.bound),
@@ -260,7 +268,11 @@ impl ResonatorBalance {
     /// **It closes**: `E_end − E_open = pump + port − dissipation + chart + split`,
     /// with `|chart + split| ≤ bound`.
     pub fn closes(&self) -> bool {
-        &self.end - &self.open == &self.pump + &self.port - &self.dissipation + &self.chart + &self.split
+        &self.end - &self.open
+            == &self.pump + &self.port - &self.dissipation
+                + &self.integration
+                + &self.chart
+                + &self.split
             && (&self.chart + &self.split).abs() <= self.bound
     }
 }
@@ -292,6 +304,7 @@ pub struct FieldBalance {
     pub pump: Rat,
     pub port: Rat,
     pub resonator_dissipation: Rat,
+    pub resonator_integration: Rat,
     pub resonator_chart: Rat,
     pub resonator_split: Rat,
     /// The field's signed port term, equal to minus the loaded resonator's received port work.
@@ -334,6 +347,7 @@ impl FieldBalance {
         &self.after + &self.resonator_after - &self.before - &self.resonator_before
             == -&self.dissipation + &self.resist + &self.contrast + self.residual() + &self.pump
                 - &self.resonator_dissipation
+                + &self.resonator_integration
                 + &self.resonator_chart
                 + &self.resonator_split
                 + &self.interconnection
@@ -545,7 +559,10 @@ impl ReceptionCarry {
         storage: &[&ExactRatMatrix],
         resonators: &[Option<&ExactRatMatrix>],
     ) -> Result<EndChange, HnnError> {
-        Ok(interior_of(field, self.crossed(conductances, storage, resonators)?))
+        Ok(interior_of(
+            field,
+            self.crossed(conductances, storage, resonators)?,
+        ))
     }
 
     /// [definition; agent-inferred, October 3; the reception carry §2.2] **The carry after the
@@ -645,7 +662,11 @@ impl ReceptionCarry {
     /// [`crate::hnn::constitution::ContinuingState`] carries it inside its check.
     pub fn write(&self, s: &mut String) {
         let line = |s: &mut String, wave: &[Rat]| {
-            *s += &wave.iter().map(ToString::to_string).collect::<Vec<_>>().join(" ");
+            *s += &wave
+                .iter()
+                .map(ToString::to_string)
+                .collect::<Vec<_>>()
+                .join(" ");
             s.push('\n');
         };
         let change = &self.change;
@@ -708,7 +729,10 @@ impl ReceptionCarry {
         fn wave(next: Next<'_, '_>, what: &'static str) -> Result<Vec<Rat>, HnnError> {
             next(what)?
                 .split_whitespace()
-                .map(|x| x.parse::<Rat>().map_err(|_| HnnError::ContinuingState { what }))
+                .map(|x| {
+                    x.parse::<Rat>()
+                        .map_err(|_| HnnError::ContinuingState { what })
+                })
                 .collect()
         }
         fn pairs(
@@ -731,7 +755,10 @@ impl ReceptionCarry {
             return Err(refuse("the carry's reference"));
         }
         let conductances = words
-            .map(|g| g.parse::<Rat>().map_err(|_| refuse("the carry's reference")))
+            .map(|g| {
+                g.parse::<Rat>()
+                    .map_err(|_| refuse("the carry's reference"))
+            })
             .collect::<Result<Vec<_>, _>>()?;
         if conductances.len() != contacts {
             return Err(refuse("the carry's reference"));
@@ -791,18 +818,24 @@ impl ReceptionCarry {
         let widths: Vec<usize> = field.rings().iter().map(|ring| ring.width()).collect();
         let contacts = field.contacts();
         change.storage.len() == widths.len()
-            && change.storage.iter().zip(&widths).all(|(wave, n)| wave.len() == *n)
+            && change
+                .storage
+                .iter()
+                .zip(&widths)
+                .all(|(wave, n)| wave.len() == *n)
             && change.arrivals.len() == contacts.len()
             && change.states.len() == contacts.len()
-            && contacts.iter().zip(&change.arrivals).zip(&change.states).all(
-                |((contact, [from, to]), [u, w])| {
+            && contacts
+                .iter()
+                .zip(&change.arrivals)
+                .zip(&change.states)
+                .all(|((contact, [from, to]), [u, w])| {
                     let (a, b) = contact.ends();
                     from.len() == widths[a]
                         && to.len() == widths[b]
                         && u.len() == contact.width()
                         && w.len() == contact.width()
-                },
-            )
+                })
             && self.conductances.len() == contacts.len()
             && self.conductances.iter().all(Signed::is_positive)
             && self.momenta.len() == contacts.len()
@@ -941,7 +974,12 @@ impl PowerForm {
     /// [`ReceptionCarry::opening`] at this form's conductances and storage.
     pub fn opening(&self, field: &Field, carry: &ReceptionCarry) -> Result<EndChange, HnnError> {
         let storage: Vec<&ExactRatMatrix> = self.storage.iter().collect();
-        carry.opening(field, &self.conductances, &storage, &self.resonator_capacities())
+        carry.opening(
+            field,
+            &self.conductances,
+            &storage,
+            &self.resonator_capacities(),
+        )
     }
 
     /// Each ring's declared resonator capacity `C_r` under this form, `None` where none is declared.
@@ -1037,8 +1075,12 @@ impl PowerForm {
             if old == new {
                 continue;
             }
-            let stiffness = new.pumped_stiffness(phase)?.subtract(&old.pumped_stiffness(phase)?)?;
-            resonator_work += dot(&state[0], &stiffness.apply(&state[0])?) / integer(2);
+            let stiffness = new
+                .pumped_stiffness(phase)?
+                .subtract(&old.pumped_stiffness(phase)?)?;
+            resonator_work += dot(&state[0], &stiffness.apply(&state[0])?) / integer(2)
+                + new.quartic_energy(&state[0])?
+                - old.quartic_energy(&state[0])?;
             let (before, moved) = (old.forms().0, new.forms().0);
             if before == moved {
                 continue;
@@ -1107,6 +1149,12 @@ impl PowerForm {
                 change.resonator_phases.get(ring).copied().flatten(),
             ) {
                 (Some(old), Some(new), Some(state), Some(phase)) if old != new => {
+                    if old.base_saturation() != new.base_saturation() {
+                        return Err(HnnError::Resonator {
+                            ring,
+                            what: "a deposit preserves the declared quartic family and coefficient",
+                        });
+                    }
                     let (old_c, _, _) = old.forms();
                     let (new_c, _, _) = new.forms();
                     let old_k = old.pumped_stiffness(phase)?;
@@ -1115,7 +1163,9 @@ impl PowerForm {
                     let dk = new_k.subtract(&old_k)?;
                     stored += (dot(&state[1], &dc.apply(&state[1])?)
                         + dot(&state[0], &dk.apply(&state[0])?))
-                        / integer(2);
+                        / integer(2)
+                        + new.quartic_energy(&state[0])?
+                        - old.quartic_energy(&state[0])?;
                 }
                 (None, None, None, _) | (Some(_), Some(_), None, _) => {}
                 (a, b, _, _) if a == b => {}
@@ -1176,6 +1226,7 @@ pub struct WordBalance {
     pub pump: Rat,
     pub port: Rat,
     pub resonator_dissipation: Rat,
+    pub resonator_integration: Rat,
     pub resonator_chart: Rat,
     pub resonator_split: Rat,
     /// The resonators' certified bound on their chart and split terms, summed into `bound`.
@@ -1227,6 +1278,7 @@ impl WordBalance {
             loaded_split,
             port,
             resonator_dissipation: resonators(|r| &r.dissipation),
+            resonator_integration: resonators(|r| &r.integration),
             resonator_chart: resonators(|r| &r.chart),
             resonator_split: resonators(|r| &r.split),
             change: released.end.clone(),
@@ -1314,6 +1366,7 @@ impl WordBalance {
             + self.residual()
             + &self.pump
             - &self.resonator_dissipation
+            + &self.resonator_integration
             + &self.interconnection;
         let identity = match &self.commit {
             Some(commit) => &commit.committed + &self.resonator_end == terms + &commit.deposition,
@@ -1415,11 +1468,14 @@ impl ChainedBalance {
                 commit.committed.clone(),
                 commit.resonator_before.clone(),
             ),
-            None => (Rat::zero(), previous.end.clone(), previous.resonator_end.clone()),
+            None => (
+                Rat::zero(),
+                previous.end.clone(),
+                previous.resonator_end.clone(),
+            ),
         };
         let storage: Vec<&ExactRatMatrix> = form.storage.iter().collect();
-        let crossed =
-            carry.crossed(&form.conductances, &storage, &form.resonator_capacities())?;
+        let crossed = carry.crossed(&form.conductances, &storage, &form.resonator_capacities())?;
         let (mut absorbed, mut imposed) = (Rat::zero(), Rat::zero());
         for ring in (0..field.rings().len()).filter(|ring| field.is_source(*ring)) {
             absorbed += form.ring_power(ring, &carry.change.storage[ring]);
@@ -1493,7 +1549,11 @@ impl ChainedBalance {
     /// The work beyond the next word's loss: `(deposition + ingest − L)₊`.
     pub fn excess(&self) -> Rat {
         let excess = self.work() - &self.loss;
-        if excess.is_positive() { excess } else { Rat::zero() }
+        if excess.is_positive() {
+            excess
+        } else {
+            Rat::zero()
+        }
     }
 }
 
@@ -1674,8 +1734,7 @@ impl<'c> Word<'c> {
                 let contacts = operands.contacts();
                 let conductances: Vec<Rat> =
                     contacts.iter().map(|c| c.conductance().clone()).collect();
-                let storage: Vec<&ExactRatMatrix> =
-                    contacts.iter().map(|c| c.forms().0).collect();
+                let storage: Vec<&ExactRatMatrix> = contacts.iter().map(|c| c.forms().0).collect();
                 let resonators: Vec<Option<&ExactRatMatrix>> = operands
                     .resonators()
                     .iter()
@@ -1725,12 +1784,7 @@ impl<'c> Word<'c> {
                 found: storage.len(),
             });
         }
-        Self::on_change(
-            field,
-            operands,
-            EndChange { storage, ..rest },
-            0,
-        )
+        Self::on_change(field, operands, EndChange { storage, ..rest }, 0)
     }
 
     /// [definition; agent-inferred] **Open a continuing word** (module header, "Continuing motion
@@ -1794,7 +1848,10 @@ impl<'c> Word<'c> {
         } = change;
         let widths: Vec<usize> = field.rings().iter().map(|ring| ring.width()).collect();
         let shaped = storage.len() == widths.len()
-            && storage.iter().zip(&widths).all(|(wave, n)| wave.len() == *n)
+            && storage
+                .iter()
+                .zip(&widths)
+                .all(|(wave, n)| wave.len() == *n)
             && arrivals.len() == field.contacts().len()
             && states.len() == field.contacts().len()
             && field
@@ -1830,22 +1887,30 @@ impl<'c> Word<'c> {
         // An absent state/phase opens at rest in that clock. A supplied phase must fit even at
         // rest; a present state must supply its frame. No phase exists on an undeclared resonator.
         for (ring, ((state, phase), declared)) in resonator_states
-            .iter().zip(&resonator_phases).zip(operands.resonators()).enumerate()
+            .iter()
+            .zip(&resonator_phases)
+            .zip(operands.resonators())
+            .enumerate()
         {
             match declared {
                 Some(resonator) => {
                     let expected = resonator.phase_at(opened_at.saturating_sub(1));
-                    if phase.is_some_and(|phase|phase!=expected) || (state.is_some() && phase.is_none()) {
+                    if phase.is_some_and(|phase| phase != expected)
+                        || (state.is_some() && phase.is_none())
+                    {
                         return Err(HnnError::Resonator {
                             ring,
                             what: "the carried resonator phase does not fit the opening clock",
                         });
                     }
                 }
-                None if phase.is_some() => return Err(HnnError::Resonator {
-                    ring, what:"an opening phase was supplied without a declared resonator",
-                }),
-                None => {},
+                None if phase.is_some() => {
+                    return Err(HnnError::Resonator {
+                        ring,
+                        what: "an opening phase was supplied without a declared resonator",
+                    });
+                }
+                None => {}
             }
         }
         let lattice = operands.lattice().map(|word| word.transient());
@@ -1905,32 +1970,38 @@ impl<'c> Word<'c> {
             .resonators()
             .iter()
             .zip(resonator_states)
-            .map(|(resonator, state)| -> Result<Option<Resonance>, HnnError> {
-                let Some(resonator) = resonator else { return Ok(None) };
-                let n = resonator.width();
-                let (state, remainders) = match state {
-                    Some(state) => {
-                        let ([u, w], [u_rest, w_rest]) = split_pair(state);
-                        (
-                            [u, w],
-                            ResonatorRemainders {
-                                rate: zeros(n),
-                                state: [u_rest, w_rest],
-                            },
-                        )
-                    }
-                    None => ([zeros(n), zeros(n)], ResonatorRemainders::default()),
-                };
-                let open = resonator.energy_at(
-                    resonator.phase_at(opened_at.saturating_sub(1)), &state[0], &state[1],
-                )?;
-                Ok(Some(Resonance {
-                    open,
-                    state,
-                    remainders,
-                    steps: Vec::new(),
-                }))
-            })
+            .map(
+                |(resonator, state)| -> Result<Option<Resonance>, HnnError> {
+                    let Some(resonator) = resonator else {
+                        return Ok(None);
+                    };
+                    let n = resonator.width();
+                    let (state, remainders) = match state {
+                        Some(state) => {
+                            let ([u, w], [u_rest, w_rest]) = split_pair(state);
+                            (
+                                [u, w],
+                                ResonatorRemainders {
+                                    rate: zeros(n),
+                                    state: [u_rest, w_rest],
+                                },
+                            )
+                        }
+                        None => ([zeros(n), zeros(n)], ResonatorRemainders::default()),
+                    };
+                    let open = resonator.energy_at(
+                        resonator.phase_at(opened_at.saturating_sub(1)),
+                        &state[0],
+                        &state[1],
+                    )?;
+                    Ok(Some(Resonance {
+                        open,
+                        state,
+                        remainders,
+                        steps: Vec::new(),
+                    }))
+                },
+            )
             .collect::<Result<Vec<_>, HnnError>>()?;
         // The hop clock reads the refinement's ticks: a continuing word's clock opens where the
         // previous word's stopped.
@@ -2069,7 +2140,10 @@ impl<'c> Word<'c> {
         let mut change = self.end_change();
         let mut ticks = self.opened_at + self.passage.len();
         if self.ended {
-            let crossing = self.passage.last().ok_or(HnnError::WordEnded { ticks: 0 })?;
+            let crossing = self
+                .passage
+                .last()
+                .ok_or(HnnError::WordEnded { ticks: 0 })?;
             change.storage = crossing.storage.clone();
             change.arrivals = crossing.arrivals.clone();
             change.states = crossing.states.clone();
@@ -2341,6 +2415,14 @@ impl<'c> Word<'c> {
                         &resonance.remainders,
                         lattice.as_ref(),
                     )?;
+                    // Enforce each producing tick's independent numerical certificates before
+                    // aggregation; errors at different ticks must not cancel into acceptance.
+                    if !driven.closes() {
+                        return Err(HnnError::Resonator {
+                            ring,
+                            what: "an executed tick exceeds its chart or split certificate",
+                        });
+                    }
                     let (next, remainder) =
                         split(lattice.as_ref(), driven.output.clone(), &remainders[ring]);
                     let (element_power, element_bound) = split_energy(&drive, &element.next, &unit);
@@ -2397,7 +2479,7 @@ impl<'c> Word<'c> {
         let mut midpoints = Vec::with_capacity(steps.len());
         let mut loaded_port = Rat::zero();
         let mut loaded_split = Rat::zero();
-        let mut resonance_terms: [Rat; 8] = std::array::from_fn(|_| Rat::zero());
+        let mut resonance_terms: [Rat; 9] = std::array::from_fn(|_| Rat::zero());
         for (ring, step) in steps.into_iter().enumerate() {
             resist += step.resist;
             contrast += step.drive;
@@ -2418,6 +2500,7 @@ impl<'c> Word<'c> {
                     &step.pump,
                     &step.port,
                     &step.dissipation,
+                    &step.integration,
                     &step.chart,
                     &step.split,
                     &step.bound,
@@ -2573,6 +2656,7 @@ impl<'c> Word<'c> {
             pump,
             port,
             resonator_dissipation,
+            resonator_integration,
             resonator_chart,
             resonator_split,
             resonator_bound,
@@ -2596,6 +2680,7 @@ impl<'c> Word<'c> {
             interconnection: &port + &loaded_port,
             port,
             resonator_dissipation,
+            resonator_integration,
             resonator_chart,
             resonator_split,
             bound: balance.bound.clone(),

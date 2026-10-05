@@ -308,7 +308,7 @@ fn resonator_balance(
     plan: &WordPlan,
     record: &ForwardRecord,
     resonator: &crate::hnn::execute::LoadedResonatorPlan,
-) -> holonics::hnn::word::ResonatorBalance {
+) -> Result<holonics::hnn::word::ResonatorBalance, HnnError> {
     let n = resonator.width;
     let capacity = resonator_matrix(plan, resonator.capacity_offset, n, resonator.material_exp);
     let dissipation = resonator_matrix(
@@ -317,12 +317,27 @@ fn resonator_balance(
         n,
         resonator.material_exp,
     );
+    let saturation = resonator.saturation.map(|(beta, exponent)| {
+        holonics::holon::parametron::SymmetricQuartic::new(rat(BigInt::from(beta), exponent))
+            .expect("the plan carries a declared positive quartic coefficient")
+    });
+    let quartic = |coordinates: &[BigInt]| -> Rat {
+        saturation.as_ref().map_or_else(Rat::zero, |law| {
+            let state: Vec<Rat> = coordinates
+                .iter()
+                .map(|x| rat(x.clone(), plan.lw))
+                .collect();
+            law.energy(&state)
+                .expect("the declared realified resonator width")
+        })
+    };
     let h = &plan.step;
     let full = plan.steps.saturating_sub(1);
     let mut end = Rat::zero();
     let mut pump = Rat::zero();
     let mut port = Rat::zero();
     let mut dissipation_work = Rat::zero();
+    let mut integration = Rat::zero();
     let mut chart_work = Rat::zero();
     let mut split_work = Rat::zero();
     let mut bound = Rat::zero();
@@ -371,18 +386,29 @@ fn resonator_balance(
             pump += quadratic(&delta, &displacement, plan.lw) / integer(2);
         }
 
-        let displacement_after: Vec<BigInt> = displacement
+        let displacement_image: Vec<BigInt> = displacement
             .iter()
             .zip(&rate)
             .map(|(u, w)| u + (w << resonator.hop_exp as usize))
             .collect();
-        // The velocity's image `2ω − w` and the velocity the word carried, its split: on the
-        // dyadics the image itself; after a rate held at momentum at the open, the split over the
-        // jump's denominator (record B §2.4), whose energy difference is the split term.
+        // Read both carried states from the resident word. Their images use this law's
+        // recurrence, and the split term includes a held rate's continuing error feedback.
+        let displacement_at = if tick + 1 < full {
+            slice(&record.resonator_u, at + plan.n, n)
+        } else {
+            slice(&record.resonator_final_u, ring.rows, n)
+        };
+        let displacement_after = wide(displacement_at);
         let velocity_image: Vec<BigInt> = rate
             .iter()
             .zip(&velocity)
-            .map(|(w, previous)| (w << 1usize) - previous)
+            .map(|(w, previous)| {
+                if saturation.is_some() {
+                    w.clone()
+                } else {
+                    (w << 1usize) - previous
+                }
+            })
             .collect();
         let carried_at = if tick + 1 < full {
             slice(&record.resonator_w, at + plan.n, n)
@@ -392,10 +418,34 @@ fn resonator_balance(
         let velocity_after: Vec<BigInt> = carried_at.iter().map(|x| BigInt::from(*x)).collect();
         end = (quadratic(&capacity, &velocity_after, plan.lw)
             + quadratic(&stiffness, &displacement_after, plan.lw))
-            / integer(2);
+            / integer(2)
+            + quartic(&displacement_after);
+        let quartic_split = quartic(&displacement_after) - quartic(&displacement_image);
+        let split_before = split_work.clone();
         split_work += (quadratic(&capacity, &velocity_after, plan.lw)
-            - quadratic(&capacity, &velocity_image, plan.lw))
-            / integer(2);
+            - quadratic(&capacity, &velocity_image, plan.lw)
+            + quadratic(&stiffness, &displacement_after, plan.lw)
+            - quadratic(&stiffness, &displacement_image, plan.lw))
+            / integer(2)
+            + &quartic_split;
+        if let Some(law) = &saturation {
+            let drift: Vec<BigInt> = rate
+                .iter()
+                .map(|w| w << resonator.hop_exp as usize)
+                .collect();
+            let rate_change: Vec<BigInt> = rate.iter().zip(&velocity).map(|(a, b)| a - b).collect();
+            let state: Vec<Rat> = displacement
+                .iter()
+                .map(|x| rat(x.clone(), plan.lw))
+                .collect();
+            let drift_rat: Vec<Rat> = drift.iter().map(|x| rat(x.clone(), plan.lw)).collect();
+            integration += (quadratic(&stiffness, &drift, plan.lw)
+                - quadratic(&capacity, &rate_change, plan.lw))
+                / integer(2)
+                + law
+                    .drift_defect(&state, &drift_rat)
+                    .expect("the declared realified resonator width");
+        }
 
         let drive_rat: Vec<Rat> = drive.iter().map(|x| rat(x.clone(), plan.lw)).collect();
         let output = loaded_output(plan, record, resonator, tick);
@@ -409,51 +459,79 @@ fn resonator_balance(
         let mut rhs: Vec<BigInt> = capacity
             .apply(&velocity)
             .into_iter()
-            .map(|x| x << 1usize)
+            .map(|x| if saturation.is_some() { x } else { x << 1usize })
+            .map(|x| x << (resonator.force_exp - resonator.material_exp) as usize)
             .collect();
         let h_exp = resonator.hop_exp as usize;
         let ku = stiffness.apply(&displacement);
         for i in 0..n {
-            rhs[i] += &drive[i] << (resonator.material_exp as usize + h_exp);
-            rhs[i] -= &ku[i] << h_exp;
+            rhs[i] += &drive[i] << (resonator.force_exp as usize + h_exp);
+            rhs[i] -= &ku[i] << (h_exp + (resonator.force_exp - resonator.material_exp) as usize);
+        }
+        if let Some((beta, exponent)) = resonator.saturation {
+            let shift = h_exp + (resonator.force_exp - exponent - 2 * plan.lw) as usize;
+            for node in (0..n).step_by(2) {
+                let radius = &displacement[node] * &displacement[node]
+                    + &displacement[node + 1] * &displacement[node + 1];
+                for coordinate in node..node + 2 {
+                    rhs[coordinate] -=
+                        (BigInt::from(beta) * &radius * &displacement[coordinate]) << shift;
+                }
+            }
         }
         let image = operator.apply(&rate);
-        let common = resonator.operator_exp.max(resonator.material_exp) + plan.lw;
+        let common = resonator.operator_exp.max(resonator.force_exp) + plan.lw;
         let op_shift = common - (resonator.operator_exp + plan.lw);
-        let rhs_shift = common - (resonator.material_exp + plan.lw);
+        let rhs_shift = common - (resonator.force_exp + plan.lw);
         let rhs_at_scale = rhs.clone();
         let residual: Vec<BigInt> = image
             .iter()
             .zip(rhs)
             .map(|(left, right)| (left << op_shift as usize) - (right << rhs_shift as usize))
             .collect();
-        chart_work += rat(dot(&rate, &residual), plan.lw + common);
-        // |⟨ω, M ω − r⟩| ≤ ‖ω‖₁(δ‖r‖∞ + ‖M‖∞u); the split's cells on the carried state, which is
-        // its image here (the sums are twice the images).
-        bound += rat(l1(&rate), plan.lw)
+        let tick_chart = rat(dot(&rate, &residual), plan.lw + common);
+        chart_work += &tick_chart;
+        // The solve and state split retain their separate numerical bounds. The signed
+        // constitutive integration defect never enters either bound.
+        let tick_chart_bound = rat(l1(&rate), plan.lw)
             * (&resonator.certificates[phase]
-                * rat(sup(&rhs_at_scale), resonator.material_exp + plan.lw)
+                * rat(sup(&rhs_at_scale), resonator.force_exp + plan.lw)
                 + operator.row_norm() * &unit);
-        let doubled =
-            |values: &[BigInt]| -> Vec<BigInt> { values.iter().map(|x| x << 1usize).collect() };
+        let displacement_sum: Vec<BigInt> = displacement_after
+            .iter()
+            .zip(&displacement_image)
+            .map(|(carried, image)| carried + image)
+            .collect();
         let velocity_sum: Vec<BigInt> = velocity_after
             .iter()
             .zip(&velocity_image)
             .map(|(carried, image)| carried + image)
             .collect();
         let stored = capacity.apply(&velocity_sum);
-        let stiffened = stiffness.apply(&doubled(&displacement_after));
-        bound += &unit
+        let stiffened = stiffness.apply(&displacement_sum);
+        let tick_split_bound = &unit
             * (rat(l1(&stored), capacity.exponent + plan.lw)
                 + rat(l1(&stiffened), stiffness.exponent + plan.lw))
-            / integer(2);
+            / integer(2)
+            + quartic_split.abs();
+        // Check each producing tick, before summing signed defects: neither the integration
+        // term nor a residual of opposite sign at another tick may hide a wrong solve.
+        if tick_chart.abs() > tick_chart_bound
+            || (&split_work - split_before).abs() > tick_split_bound
+        {
+            return Err(HnnError::Resonator {
+                ring: resonator.ring,
+                what: "a device tick exceeds its chart or split certificate",
+            });
+        }
+        bound += tick_chart_bound + tick_split_bound;
     }
     let mut released = Vec::new();
     for i in 0..n {
         let row = resonator.rows + i;
         released.push(rat(
             BigInt::from(record.resonator_remainders[0][row]),
-            plan.lw + resonator.material_exp + resonator.chart_exp,
+            plan.lw + resonator.force_exp + resonator.chart_exp,
         ));
         released.push(rat(
             BigInt::from(record.resonator_remainders[1][row]),
@@ -486,8 +564,9 @@ fn resonator_balance(
     );
     let open = (quadratic(&capacity, &wide(open_w), plan.lw)
         + quadratic(&open_stiffness, &wide(open_u), plan.lw))
-        / integer(2);
-    holonics::hnn::word::ResonatorBalance {
+        / integer(2)
+        + quartic(&wide(open_u));
+    Ok(holonics::hnn::word::ResonatorBalance {
         ring: resonator.ring,
         ticks: full,
         open,
@@ -495,11 +574,12 @@ fn resonator_balance(
         pump,
         port,
         dissipation: dissipation_work,
+        integration,
         chart: chart_work,
         split: split_work,
         bound,
         released: Remainders::of(&released),
-    }
+    })
 }
 
 /// The signed field-port work and its separate returned-wave lattice split for one tick.
@@ -817,7 +897,7 @@ pub(crate) fn released(
     loci: &Loci,
     record: &ForwardRecord,
     executed: &Executed<'_>,
-) -> Released {
+) -> Result<Released, HnnError> {
     let (steps, lw) = (plan.steps, plan.lw);
     let rings = plan.rings.len();
     let certificate = |pair: usize| &executed.readings[pair].certificate;
@@ -935,8 +1015,8 @@ pub(crate) fn released(
         .resonators
         .iter()
         .map(|resonator| resonator_balance(plan, record, resonator))
-        .collect();
-    Released {
+        .collect::<Result<Vec<_>, _>>()?;
+    Ok(Released {
         power: power(plan, loci, &Change::after(plan, record)),
         ticks: steps,
         peak_bits: peak,
@@ -947,7 +1027,7 @@ pub(crate) fn released(
         remainders: Remainders::of(&remainders),
         charts: executed.readings.to_vec(),
         resonators: resonator_balances,
-    }
+    })
 }
 
 /// [definition; record B §2.4] **The word's last crossing** (`Word::reception_end`), read from its
@@ -1239,7 +1319,7 @@ pub(crate) fn word_return(
             remainders.push(Rat::zero());
             remainders.push(rat(
                 BigInt::from(reverse.resonator_remainders[2][row]),
-                lw + resonator.material_exp,
+                lw + resonator.force_exp,
             ));
             remainders.push(rat(
                 BigInt::from(reverse.resonator_remainders[3][row]),

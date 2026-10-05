@@ -89,8 +89,9 @@ impl Refusal {
 
 /// [definition] **The loaded resonators' plan** (campaign 2, `holonics::hnn::ring`; the loaded resonator):
 /// every declared resonator's storage, dissipation and pumped stiffnesses as dyadic words at one
-/// exponent `L_m`, each phase's operator at `L_operator`, its executed charts (the host's certified
-/// lattice charts, at `L_c`), and the hop `h = 2^(e_h)`. It refuses what the card's dyadic words
+/// exponent `L_m`, the optional symmetric quartic coefficient `beta` at `L_beta`, each phase's
+/// operator at `L_operator`, its executed charts (the host's certified lattice charts, at `L_c`),
+/// and the hop `h = 2^(e_h)`. It refuses what the card's dyadic words
 /// cannot carry: a hop that is not a nonnegative power of two, material off the dyadics, a word
 /// under the exact law (no chart), or charts of different exponents. The resident word embeds these
 /// operands in `execute::WordPlan` and runs them inside its forward and reverse kernels
@@ -113,6 +114,10 @@ pub struct ResonatorPlan {
     l_operator: u32,
     l_c: u32,
     l_w: u32,
+    /// Effective beta, its exponent, and L_f=max(L_m,L_beta+2L_w), per declared ring.
+    /// None keeps the quadratic midpoint law. The cubic effort and its Hessian return use
+    /// this same scale, with no intermediate split.
+    saturation: Vec<Option<(i64, u32, u32)>>,
 }
 
 fn hop_exponent(hop: &Rat) -> Option<u32> {
@@ -178,10 +183,31 @@ impl ResonatorPlan {
             l_operator,
             l_c: 0,
             l_w: transient,
+            saturation: Vec::new(),
         };
         let mut chart_exponent: Option<u32> = None;
         for resonator in resonators {
             let n = resonator.width();
+            let saturation = resonator
+                .material()
+                .saturation()
+                .map(|law| {
+                    use crate::hnn::dyadic::{exponent_of, word};
+                    if n == 0 || !n.is_multiple_of(2) {
+                        return Err(refused("a saturation's nonempty realified node width"));
+                    }
+                    let exponent = exponent_of(law.coefficient())
+                        .ok_or_else(|| refused("a resonator's saturation on the dyadics"))?;
+                    let beta = word(law.coefficient(), exponent, "a resonator's saturation word")?;
+                    let force_exponent = transient
+                        .checked_mul(2)
+                        .and_then(|grain| exponent.checked_add(grain))
+                        .map(|nonlinear| l_m.max(nonlinear))
+                        .ok_or_else(|| refused("a resonator's force exponent"))?;
+                    Ok::<_, holonics::hnn::HnnError>((beta, exponent, force_exponent))
+                })
+                .transpose()?;
+            plan.saturation.push(saturation);
             plan.rings.push(resonator.ring());
             plan.widths.push(n);
             plan.capacity_base.push(plan.capacity.len() as u64);
@@ -227,6 +253,18 @@ impl ResonatorPlan {
             }
         }
         plan.l_c = chart_exponent.unwrap_or(0);
+        // The existing nearest-point splitter carries shifts through i128::BITS-1. A finer
+        // nonlinear image needs another exact carrier; it must not acquire an extra split.
+        for (_, _, force_exponent) in plan.saturation.iter().flatten() {
+            if force_exponent
+                .checked_add(plan.l_c)
+                .is_none_or(|shift| shift >= i128::BITS)
+            {
+                return Err(refused(
+                    "a saturation's rate split beyond the integer carrier",
+                ));
+            }
+        }
         Ok(plan)
     }
 
@@ -262,6 +300,11 @@ impl ResonatorPlan {
             &self.operator_base,
             &self.charts,
         )
+    }
+
+    /// Each ring's effective saturation coefficient and force scale, in declaration order.
+    pub(crate) fn execution_saturation(&self) -> &[Option<(i64, u32, u32)>] {
+        &self.saturation
     }
 
     /// Per-resonator declaration tables for the coupled word kernel: the rings, their widths, and

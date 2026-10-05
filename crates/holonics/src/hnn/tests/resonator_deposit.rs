@@ -490,3 +490,95 @@ fn a_refused_deposit_keeps_the_staged_deposit_and_all_published_state() {
             .any(|(handle, _)| *handle == Handle::Staged(staged))
     );
 }
+
+#[test]
+fn the_quartic_gain_is_deposited_saved_and_counted_in_its_declared_family() {
+    use crate::hnn::constitution::ContinuingState;
+    let field = chain();
+    let opening = silent(&field, 308)
+        .with_ring_resonator(
+            &field,
+            0,
+            material(&field, 0)
+                .with_symmetric_saturation(Rat::one())
+                .unwrap(),
+        )
+        .unwrap();
+    let identity = opening.material_identity();
+    let declaration = opening.describe_physics();
+    assert_eq!(opening.locus_entries(&field, Locus::Resonator(0)), 5);
+    let (next, reading) = opening
+        .deposited(&one_gain_step(0, 4, Rat::one(), Rat::one()))
+        .unwrap();
+    let law = next.resonator(0).unwrap();
+    assert_eq!(law.gain_count(), 5);
+    assert_eq!(law.gains()[4], rat(5, 4));
+    assert_eq!(law.saturation().unwrap().coefficient(), &rat(25, 16));
+    assert_eq!(next.resonator_scales(0).unwrap()[4], integer(2));
+    assert_eq!(next.resonator_gain_remainders()[0].1.len(), 5);
+    assert_eq!(next.material_identity(), identity);
+    assert!(reading.storage_growth >= rat(9, 16));
+    let state = next.continuing_state(0).unwrap();
+    let text = state.to_text();
+    let restored = opening
+        .clone()
+        .continued(&ContinuingState::from_text(&text).unwrap())
+        .unwrap();
+    assert_eq!(restored.resonator_gains(), next.resonator_gains());
+    assert_eq!(restored.resonator_scales(0), next.resonator_scales(0));
+    assert_eq!(restored.carried_remainders(), next.carried_remainders());
+    assert_eq!(restored.material_identity(), identity);
+    let different = silent(&field, 308)
+        .with_ring_resonator(
+            &field,
+            0,
+            material(&field, 0)
+                .with_symmetric_saturation(integer(2))
+                .unwrap(),
+        )
+        .unwrap();
+    assert_ne!(different.material_identity(), identity);
+    assert_ne!(different.describe_physics(), declaration);
+    assert!(different.continued(&state).is_err());
+    // A declared fifth family is admitted; a sixth is refused by the same owner check.
+    assert!(matches!(
+        opening.deposited(&one_gain_step(0, 5, Rat::one(), Rat::one())),
+        Err(HnnError::Resonator { ring: 0, .. })
+    ));
+}
+
+#[test]
+fn a_quartic_deposit_accounts_for_same_state_and_held_momentum_work() {
+    let field = chain();
+    let old = silent(&field, 309)
+        .with_ring_resonator(
+            &field,
+            0,
+            material(&field, 0)
+                .with_symmetric_saturation(Rat::one())
+                .unwrap(),
+        )
+        .unwrap();
+    let (new, _) = old
+        .deposited(&one_gain_step(0, 4, Rat::one(), Rat::one()))
+        .unwrap();
+    let current = Current::at_rest(&field);
+    let before = PowerForm::read(&field, &old, &current).unwrap();
+    let after = PowerForm::read(&field, &new, &current).unwrap();
+    let mut change = EndChange::rest(
+        &field,
+        &crate::hnn::propagation::Operands::at_cut(&field, &old, &current).unwrap(),
+    );
+    let state = change.resonators[0].as_mut().unwrap();
+    state[0][0] = integer(2);
+    state[1][0] = Rat::one();
+    // Q_new(2,0)-Q_old(2,0) = (25/16-1)*16/4 = 9/4.
+    assert_eq!(before.deposition_work(&after, &change).unwrap(), rat(9, 4));
+    let held = before.held(&after, &change).unwrap();
+    assert_eq!(held.change, change);
+    assert_eq!(held.deposition, rat(9, 4));
+    assert_eq!(
+        after.resonator_power(&held.change).unwrap() - before.resonator_power(&change).unwrap(),
+        held.deposition
+    );
+}

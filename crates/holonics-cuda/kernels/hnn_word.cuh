@@ -108,7 +108,7 @@
 #define WR_RESONATOR 10
 
 // A loaded ring resonator's plan row (`execute.rs`, RZ_*).
-#define RZ_STRIDE 15
+#define RZ_STRIDE 19
 #define RZ_RING 0
 #define RZ_WIDTH 1
 #define RZ_ROWS 2
@@ -124,6 +124,10 @@
 #define RZ_DISSIPATION 12
 #define RZ_OPERATOR 13
 #define RZ_OPERATOR_EXP 14
+#define RZ_SATURATION 15
+#define RZ_BETA 16
+#define RZ_BETA_EXP 17
+#define RZ_FORCE_EXP 18
 
 #define WI_STRIDE 3
 #define WI_CONTACT 0
@@ -312,6 +316,48 @@ __device__ __forceinline__ wide hnn_shifted(wide v, long long s, uint32_t *statu
         return 0;
     }
     return (wide)((uwide)v << s);
+}
+
+// A word times a carrier word, read through the same l1 certificate as a matrix term.
+__device__ __forceinline__ wide hnn_scaled(int64_t a, wide b, uint32_t *status) {
+    HnnSum product = hnn_sum();
+    hnn_add_scaled(product, a, b);
+    return hnn_read(product, status);
+}
+
+// [definition; agent-inferred] The symmetric quartic on one complex parametron node.
+// u=U 2^-Lw and beta=B 2^-Lbeta: effort has scale Lbeta+3Lw; its Hessian
+// applied to a return on Lw has the same scale. All products are certified before reuse;
+// an overflowing intermediate is a carrier refusal, never an additional split.
+__device__ __forceinline__ wide hnn_node_radius(int64_t x, int64_t y, uint32_t *status) {
+    HnnSum radius = hnn_sum();
+    hnn_add_words(radius, x, x);
+    hnn_add_words(radius, y, y);
+    return hnn_read(radius, status);
+}
+
+__device__ __forceinline__ wide hnn_quartic_effort(
+    int64_t beta, int64_t x, int64_t y, int64_t coordinate, uint32_t *status
+) {
+    const wide radius = hnn_node_radius(x, y, status);
+    const wide feature = hnn_scaled(coordinate, radius, status);
+    return hnn_scaled(beta, feature, status);
+}
+
+__device__ __forceinline__ wide hnn_quartic_return(
+    int64_t beta, int64_t x, int64_t y, int64_t rx, int64_t ry, bool imaginary,
+    uint32_t *status
+) {
+    const wide radius = hnn_node_radius(x, y, status);
+    HnnSum pairing = hnn_sum();
+    hnn_add_words(pairing, x, rx);
+    hnn_add_words(pairing, y, ry);
+    const wide paired = hnn_read(pairing, status);
+    HnnSum image = hnn_sum();
+    hnn_add_scaled(image, imaginary ? ry : rx, radius);
+    const wide axial = hnn_scaled(imaginary ? y : x, paired, status);
+    hnn_add(image, hnn_shifted(axial, 1, status));
+    return hnn_scaled(beta, hnn_read(image, status), status);
 }
 
 // The split onto a state word: `s = q·2^shift + r`, ties upward; `q` kept only as a signed 64-bit
@@ -970,25 +1016,36 @@ extern "C" __global__ void hnn_word_forward(
                 const int64_t *stiffness =
                     operands + res[RZ_STIFFNESS] + phase * n * n;
                 const long long row = e - base;
-                HnnSum image = hnn_sum();
+                const bool nonlinear = res[RZ_SATURATION] != 0;
+                const long long lf = res[RZ_FORCE_EXP];
+                HnnSum linear = hnn_sum();
                 for (long long j = 0; j < n; ++j) {
-                    hnn_add_scaled(image, capacity[row * n + j], 2 * (wide)res_w[base + j]);
+                    hnn_add_scaled(linear, capacity[row * n + j],
+                        (nonlinear ? 1 : 2) * (wide)res_w[base + j]);
                     hnn_add_scaled(
-                        image, stiffness[row * n + j],
+                        linear, stiffness[row * n + j],
                         -hnn_shifted((wide)res_u[base + j], eh, &st)
                     );
                 }
-                const wide source = hnn_shifted(
-                    (wide)storage[e], lm + eh, &st
-                );
-                hnn_add(image, source);
+                hnn_add(linear, hnn_shifted((wide)storage[e], lm + eh, &st));
+                HnnSum image = hnn_sum();
+                hnn_add(image, hnn_shifted(hnn_read(linear, &st), lf - lm, &st));
+                if (nonlinear) {
+                    const long long node = base + 2 * (row / 2);
+                    const wide effort = hnn_quartic_effort(
+                        res[RZ_BETA], res_u[node], res_u[node + 1], res_u[e], &st
+                    );
+                    // The cubic lies on Lbeta+3Lw; the RHS lies on Lf+Lw.
+                    hnn_add(image, -hnn_shifted(effort,
+                        eh + lf - res[RZ_BETA_EXP] - 2 * Lw, &st));
+                }
                 res_rho[e] = hnn_read(image, &st);
                 res_status[e] = st;
                 res_operand_status[e] = st;
                 hnn_note(st, STAGE_RESONATOR, (uint32_t)e, &bits, &first);
             }
             __syncthreads();
-            // X̂ maps the integer right side on Lm+Lw through the executed solve chart.
+            // X̂ maps the integer right side on Lf+Lw through the executed solve chart.
             int64_t *rate_record = HNN_AT(int64_t, WL_REC_RES_RATE);
             for (long long e = t; e < N; e += T) {
                 const long long ring_index = row_ring[e];
@@ -1000,7 +1057,7 @@ extern "C" __global__ void hnn_word_forward(
                 const long long *res = resonators + rix * RZ_STRIDE;
                 const long long n = res[RZ_WIDTH], base = res[RZ_ROWS];
                 const long long phase = (plan[WP_OPENED] + step) % res[RZ_PHASES];
-                const long long shift = res[RZ_LC] + res[RZ_LM];
+                const long long shift = res[RZ_LC] + res[RZ_FORCE_EXP];
                 const int64_t *chart = operands + res[RZ_CHARTS] + phase * n * n;
                 for (long long j = 0; j < n; ++j) {
                     if (res_operand_status[base + j] != HNN_EXACT) st |= HNN_REFUSED_OPERAND;
@@ -1034,11 +1091,12 @@ extern "C" __global__ void hnn_word_forward(
                 const int64_t rate = rate_record[step * N + e];
                 const wide next_u = (wide)old_u + hnn_shifted((wide)rate, eh, &st);
                 // A velocity held at momentum at the open carries its remainder's fixed fraction
-                // (`hnn_split_held` at `L_w`); on the dyadics `2ω − w` lies on the lattice and
-                // splits to itself.
+                // (`hnn_split_held` at Lw). The nonlinear kick/drift has w'=omega; the quadratic
+                // midpoint has w'=2omega-w. Both retain the open's error feedback.
                 const long long high = carry ? carry[2 * C + 3 * K + 3 * e + 2] == 2 : 0;
                 HnnSum velocity = hnn_sum();
-                hnn_add(velocity, 2 * (wide)rate - (wide)old_w);
+                hnn_add(velocity, res[RZ_SATURATION] ? (wide)rate
+                    : 2 * (wide)rate - (wide)old_w);
                 hnn_add(velocity, res_rem_w[e]);
                 wide velocity_remainder = 0;
                 const wide next_w =
@@ -1188,6 +1246,7 @@ extern "C" __global__ void hnn_word_reverse(
     const int64_t *rec_arrivals = HNN_AT(int64_t, WL_REC_ARRIVALS);
     const int64_t *rec_anchor = HNN_AT(int64_t, WL_REC_ANCHOR);
     const wide *rec_omega = HNN_AT(wide, WL_REC_OMEGA);
+    const int64_t *rec_res_u = HNN_AT(int64_t, WL_REC_RES_U);
     // The return's carried covectors, remainders and scratch.
     int64_t *storage_bar = HNN_AT(int64_t, WL_BAR_STORAGE);
     int64_t *arrival_bar = HNN_AT(int64_t, WL_BAR_ARRIVAL);
@@ -1284,7 +1343,7 @@ extern "C" __global__ void hnn_word_reverse(
                 const long long gain = res[RZ_RETURN_GAIN];
                 HnnSum image = hnn_sum();
                 hnn_add(image, hnn_shifted(res_u_bar[e], eh + qexp, &st));
-                hnn_add(image, hnn_shifted(res_w_bar[e], 1 + qexp, &st));
+                hnn_add(image, hnn_shifted(res_w_bar[e], (res[RZ_SATURATION] ? 0 : 1) + qexp, &st));
                 hnn_add(image, -hnn_word_product((int64_t)gain, storage_bar[e]));
                 hnn_add(image, res_rem_z[e]);
                 wide remainder = 0;
@@ -1349,24 +1408,38 @@ extern "C" __global__ void hnn_word_reverse(
                 hnn_add(drive_bar, hnn_shifted((wide)rbar, eh, &st));
                 storage_bar[e] = hnn_word_of(hnn_read(drive_bar, &st), &st);
 
-                HnnSum ub = hnn_sum();
-                hnn_add(ub, hnn_shifted(res_u_bar[e], lm, &st));
+                const bool nonlinear = res[RZ_SATURATION] != 0;
+                const long long lf = res[RZ_FORCE_EXP];
+                HnnSum linear = hnn_sum();
+                hnn_add(linear, hnn_shifted(res_u_bar[e], lm, &st));
                 for (long long j = 0; j < n; ++j) {
                     hnn_add_scaled(
-                        ub, stiffness[j * n + row],
+                        linear, stiffness[j * n + row],
                         -hnn_shifted(rec_res_solved[step * N + base + j], eh, &st)
                     );
                 }
+                HnnSum ub = hnn_sum();
+                hnn_add(ub, hnn_shifted(hnn_read(linear, &st), lf - lm, &st));
+                if (nonlinear) {
+                    const long long node = base + 2 * (row / 2), at = step * N + node;
+                    const wide returned = hnn_quartic_return(
+                        res[RZ_BETA], rec_res_u[at], rec_res_u[at + 1],
+                        (int64_t)rec_res_solved[at], (int64_t)rec_res_solved[at + 1],
+                        row % 2 != 0, &st
+                    );
+                    hnn_add(ub, -hnn_shifted(returned,
+                        eh + lf - res[RZ_BETA_EXP] - 2 * Lw, &st));
+                }
                 hnn_add(ub, res_rem_u[e]);
                 wide urem = 0;
-                const int64_t uprev = hnn_split(hnn_read(ub, &st), lm, &urem, &st);
+                const int64_t uprev = hnn_split(hnn_read(ub, &st), lf, &urem, &st);
 
                 HnnSum wb = hnn_sum();
-                hnn_add(wb, -hnn_shifted(res_w_bar[e], lm, &st));
+                if (!nonlinear) hnn_add(wb, -hnn_shifted(res_w_bar[e], lm, &st));
                 for (long long j = 0; j < n; ++j) {
                     hnn_add_scaled(
                         wb, capacity[j * n + row],
-                        2 * (wide)rec_res_solved[step * N + base + j]
+                        (nonlinear ? 1 : 2) * (wide)rec_res_solved[step * N + base + j]
                     );
                 }
                 hnn_add(wb, res_rem_w[e]);

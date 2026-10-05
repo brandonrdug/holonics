@@ -483,12 +483,12 @@ pub fn collapse(
     let total_entries = loci(field)
         .iter()
         .filter(|locus| materialized(locus))
-        .map(|locus| locus.entries(field))
+        .map(|locus| constitution.locus_entries(field, *locus))
         .sum();
     let released_entries = constitution
         .released()
         .iter()
-        .map(|locus| locus.entries(field))
+        .map(|locus| constitution.locus_entries(field, *locus))
         .sum();
     Ok(Collapse {
         retained: kept,
