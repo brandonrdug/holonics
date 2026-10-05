@@ -37,11 +37,16 @@ admitted) cancels between the resolved and subgrain balances.
 - **One physics in two charts.** In the reference chart the flux is `ĵ = JF⁻¹(j − ρw)` (TUBE §4). In
   Eulerian coefficients, `E = ½xᵀQ(τ)x` with `Q_ij = ∫_Ω(τ) ρ φ_i·φ_j`, so `½xᵀQ̇_geom x = ∮ ē w·n`:
   the moving metric's term is the `w`-part of the relative flux, counted in one chart only (the same
-  once-only rule as the admission term `a_j`, FND §3).
+  once-only rule as the admission term `a_j`, FND §3). [Qualified after Codex's review] This holds for
+  the domain variation with a fixed Eulerian integrand and basis and the matching energy flux; a
+  transported or time-dependent basis, a changing density or a changing coarse-graining keeps its own
+  bulk, basis and projection terms (`ChangingReceiver.affine_cell_transport` exposes the bulk time
+  derivative as a separate operand). It is not an identity for every geometric metric change.
 - **`Ġ` in `Ė = xᵀGBx + ½xᵀĠx + xᵀGf` (MO:920, 941) is four things.** `Ġ_geom`, the region's motion
   above; `Ġ_rechart`, a pure chart change, which cancels exactly (MO:963; keeping the Euclidean form
   instead invents the work `3/2`, STEP §7); `Ġ_dep`, material work at a commit (MO:980, STEP §4);
-  `Ġ_pump = ½⟨u, (K_t − K_(t−1))u⟩` (`hnn/ring.rs:18`). Holding momentum instead of rate gives
+  `Ġ_pump`, the pump's matrix rate, whose finite-step energy contribution is `½⟨u, (K_t − K_(t−1))u⟩`
+  (`hnn/ring.rs:18`): a rate of the form and an energy in `J` are different operands. Holding momentum instead of rate gives
   `−½⟨w′, ΔC w′⟩ − ½⟨δ, Cδ⟩` (`HolonicsResearch/HNN/MoveDirection.lean:580`): the momentum chart's
   Reynolds term with zero incoming momentum.
 - **Traction.** `t·u = t·(u − w) + t·w`. The support's work `t·w` is not removed by using the relative
@@ -57,7 +62,8 @@ admitted) cancels between the resolved and subgrain balances.
 
 ## 3. Heat, and what is not heat
 
-- **Heat (nonnegative, entering entropy):** `Φ̄` (CV:190–204, `is_dissipative`) and `ε_h`; contact and
+- **Heat (nonnegative, entering entropy):** `Φ̄` (CV:190–204, `is_dissipative`) and `ε_h` (`ε_h ≥ 0` a constitutive hypothesis until its physical
+  dissipation/thermal consumer exists, not a consequence of a signed subgrain transfer); contact and
   resonator dissipation, `resist ≤ 0` (`hnn/propagation.rs:1510–1527`); the thermal port's production
   `W/T` (`physics/thermal/port.rs:72`); the held-momentum sticking loss where `ΔC ⪰ 0` is physical
   accretion (MoveDirection:594).
@@ -121,7 +127,7 @@ partition by element carries no mixed term. A moving or deforming region adds wh
 redistribute it), the shed ring's energy leaving the blade's region (M1, M2), entrainment of still water
 at conserved impulse (exactly held-momentum deposition with `π_in = 0`, which `deposition` books as
 learning, not heat: M8), turbulence (M6) and surface waves leaving (M7). **A real risk:** `Π_c` and the
-pump are unsigned, so paddle work hidden in them still closes the balance. Only independently computed
+pump are sign-unconstrained (signed exact rationals with no sign law), so paddle work hidden in them still closes the balance. Only independently computed
 port work (FND §3) catches it.
 
 **The whip.** In the material chart the rod is a fixed interval, and the Word suffices once the
