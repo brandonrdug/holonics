@@ -160,7 +160,7 @@ use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, ToPrimitive, Zero};
 
 use crate::hnn::HnnError;
-use crate::hnn::field::{ConstitutionRead, Current, Field};
+use crate::hnn::field::{ConstitutionRead, Current, Field, FieldMaterial};
 use crate::ratio::Rat;
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::vector::integral;
@@ -1342,7 +1342,7 @@ impl SourceMoment {
     pub fn open_parts(
         &self,
         field: &Field,
-        constitution: &impl ConstitutionRead,
+        constitution: &impl FieldMaterial,
         current: &Current,
         ring: usize,
     ) -> Result<(Vec<(usize, Vec<Rat>)>, Vec<Rat>), HnnError> {
@@ -1365,7 +1365,7 @@ impl SourceMoment {
     fn moment_parts(
         &self,
         field: &Field,
-        constitution: &impl ConstitutionRead,
+        constitution: &impl FieldMaterial,
         ring: usize,
     ) -> Result<(Vec<(usize, Vec<Rat>)>, Vec<Rat>), HnnError> {
         let counts = self.counts(ring)?;
