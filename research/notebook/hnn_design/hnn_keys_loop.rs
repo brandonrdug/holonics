@@ -11,14 +11,22 @@
 //! order, one observation a seen station (the request's cells are context, the stations are the
 //! readings), each read against every earlier cell of its passage at every distance of the span
 //! (`hnn::keys::station_pairs`). The turn machine's menus (`hnn::keys::PairLocation`) print their
-//! survivors at every observation: the read distances, those alive, and the located pair once one
-//! distance survives with a published map. The machine's count is the first observation from which
-//! the pair stays located to the passage's end (and the first at which it locks at all). At its
-//! first lock the machine deposits the located pair on both openings
-//! (`hnn::executed::pair_deposit`, against the declared prior `E₀`), and writes each complete
-//! continuing state to `<out>.lossless` and `<out>.founded` for `executed evaluate` to read. Only the
-//! seen passage enters: the terrain's request and its stations, read in order; nothing of the
-//! validation or confirmation sets, of the declared reference family or of the rule is read.
+//! survivors at every observation: the read distances, those alive, and the located pair once the
+//! survivors are one distance or the windings of the least (`hnn::keys`, "A class of windings is one
+//! key"). The machine's count is the first observation from which the pair stays located to the
+//! passage's end (and the first at which it locks at all). At the passage's end, the aeon's boundary
+//! where the retention quotient is taken, the machine deposits the pair located there on both
+//! openings (`hnn::executed::pair_deposit`, against the declared prior `E₀`), and writes each
+//! complete continuing state to `<out>.lossless` and `<out>.founded` for `executed evaluate` to read.
+//! [agent-inferred, October 5; the regressions'
+//! [record](../../records/2026-10-05_THE_REGRESSIONS_LOCATE_THE_LEAST_WINDING_AND_ARE_READ_BY_THE_PAIR_RELEASE.md)
+//! §3] The boundary's pair, not the first lock's: a key whose map is still growing at its first lock
+//! (on the alternation's training passage the windings of distance 2 publish the identity on two
+//! classes at observation 16, three at 18 and four at 33, after a constant first request located
+//! distance 1 on one class) would leave the classes it reaches later at their prior. On order-2 the
+//! two are one pair (located at 16 and held to the end), so its deposit is unchanged. Only the seen
+//! passage enters: the terrain's request and its stations, read in order; nothing of the validation
+//! or confirmation sets, of the declared reference family or of the rule is read.
 
 use super::*;
 use holonics::hnn::executed::pair_deposit;
@@ -139,11 +147,11 @@ pub(super) fn keys(terrain: &str, seed: u64, count: usize, out: &str) {
         ),
         None => println!("  no single map class at the passage's end"),
     }
-    let Some((k, pair)) = first_lock else {
+    let Some((k, pair)) = stable else {
         println!("executed keys: {} ms; resident {}", clock.elapsed().as_millis(), resident());
         return;
     };
-    if stable.as_ref().is_none_or(|(_, known)| known != &pair) {
+    if first_lock.as_ref().is_some_and(|(_, first)| first != &pair) {
         println!("  the first lock's pair is not the pair located at the passage's end");
     }
     let prior = engine.theta.source_port(ring).expect("the opening's source port").clone();

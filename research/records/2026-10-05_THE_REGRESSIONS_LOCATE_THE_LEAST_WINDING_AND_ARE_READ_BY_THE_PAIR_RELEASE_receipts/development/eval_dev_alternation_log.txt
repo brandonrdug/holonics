@@ -1,0 +1,11 @@
+  lossless (transport modulus 1; closed pair contacts at []): released 1, held 7, refused 0, refused certificates 0; whole sections 1 of 8 (nonconstant 0 of 7, constant 1 of 1); the success rule (every nonconstant section whole): does not hold; incorrect releases 0; reaching the termination 0; stations right 36 by station [7, 3, 5, 4, 5, 3, 5, 4]; first lock at a request-reading station (0 or 1) 0, first lock right 1; 13935 ms
+  opening (transport modulus 102837/131072; closed pair contacts at []): released 8, held 0, refused 0, refused certificates 0; whole sections 1 of 8 (nonconstant 0 of 7, constant 1 of 1); the success rule (every nonconstant section whole): does not hold; incorrect releases 7; reaching the termination 0; stations right 27 by station [4, 5, 4, 5, 2, 3, 2, 2]; first lock at a request-reading station (0 or 1) 2, first lock right 2; 20430 ms
+  keys-lossless (transport modulus 1; closed pair contacts at [2]): released 8, held 0, refused 0, refused certificates 0; whole sections 0 of 8 (nonconstant 0 of 7, constant 0 of 1); the success rule (every nonconstant section whole): does not hold; incorrect releases 8; reaching the termination 0; stations right 38 by station [2, 3, 7, 7, 2, 3, 7, 7]; first lock at a request-reading station (0 or 1) 8, first lock right 2; 5483 ms
+  keys-founded (transport modulus 102837/131072; closed pair contacts at [2]): released 8, held 0, refused 0, refused certificates 0; whole sections 0 of 8 (nonconstant 0 of 7, constant 0 of 1); the success rule (every nonconstant section whole): does not hold; incorrect releases 8; reaching the termination 0; stations right 38 by station [2, 3, 7, 7, 2, 3, 7, 7]; first lock at a request-reading station (0 or 1) 8, first lock right 2; 5531 ms
+executed evaluate: 45882 ms; resident 141373440 now, 141373440 peak
+--- scope
+Main processes terminated with: code=exited, status=0/SUCCESS
+               Service runtime: 45.914s
+             CPU time consumed: 5min 8.536s
+                   Memory peak: 137.6M (swap: 43.5M)
+wall 45933 ms

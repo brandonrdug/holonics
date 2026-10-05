@@ -54,10 +54,24 @@
 //! `ord(c)`, shorter paths, disjoint cosets). This module keeps the boundary adapter: the data → menu map
 //! reads each seen station against every earlier cell of its passage at every distance below the
 //! period ([`station_pairs`]); no distance is declared, and [`PairLocation`] keeps one turn menu a
-//! distance and locates the pair when exactly one read distance survives with its map published
-//! ([`LocatedPair`]). The crib is seen cells only: a request and the stations already read. Its
-//! consumer is `hnn::executed::pair_deposit`, which makes the located pair the source port's pair
-//! component, `(E − B) T = P^δ B` on the menu's classes.
+//! distance and locates the pair when the read distances that survive are the windings of the
+//! least one ([`LocatedPair`]; one surviving distance is its own only winding). The crib is seen
+//! cells only: a request and the stations already read. Its consumer is
+//! `hnn::executed::pair_deposit`, which makes the located pair the source port's pair component,
+//! `(E − B) T = P^δ B` on the menu's classes.
+//!
+//! [definition; agent-inferred, October 5; the
+//! [regressions record](../../../../research/records/2026-10-05_THE_REGRESSIONS_LOCATE_THE_LEAST_WINDING_AND_ARE_READ_BY_THE_PAIR_RELEASE.md)]
+//! **A class of windings is one key.** Contacts compose along the ring's clock: `k` contacts at
+//! `δ₀`, each `y ↦ f₀(y)`, joined end to end, are one contact at `k δ₀` with the map `f₀^k`, and its
+//! holonomy is the sum of theirs (`Σ c = k c₀`). When every surviving distance is such a winding of
+//! the least survivor, `δ = k δ₀` with its published map `f₀^k` on its ports, the survivors are one
+//! cyclic family and its generator `(δ₀, f₀)` is the key; each winding adds no reading the generator
+//! lacks on the passage, so retention (a quotient sufficient for the admitted future) keeps the
+//! generator alone. The alternation's even distances `2k` with the identity and the line's `4k`
+//! with the identity are such families; a plural survivor set with any distance that is not a
+//! winding of the least (two coprime distances, or a map other than `f₀^k`) stays plural, never a
+//! key.
 //!
 //! | Lean | Rust |
 //! |---|---|
@@ -448,9 +462,10 @@ pub fn station_pairs(
         .collect())
 }
 
-/// [definition; agent-inferred, October 5] **A located pair**: the one distance whose turn menu
-/// survives with a published map, the map on its menu ports, its cycles' length and the surviving
-/// turns.
+/// [definition; agent-inferred, October 5] **A located pair**: the generator of the surviving
+/// distances (the one survivor, or the least survivor when every other is its winding; module
+/// section "A class of windings is one key"), its published map on its menu ports, its cycles'
+/// length and the surviving turns.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct LocatedPair {
     pub offset: usize,
@@ -462,9 +477,9 @@ pub struct LocatedPair {
 /// [definition; agent-inferred, October 5] **Pair location over the span's distances**: one turn
 /// menu per distance `δ ∈ [1, d − 1]`, each observation (a seen station) reading its edge at every
 /// distance its span reaches ([`station_pairs`]). A distance whose menu read no edge is unread, not
-/// a survivor. The pair is **located** when exactly one read distance survives and its map is
-/// published ([`TurnMenu`]); several surviving distances are a plural class (the alternation's
-/// aliases), never a key.
+/// a survivor. The pair is **located** when the least surviving distance has its map published
+/// ([`TurnMenu`]) and every other survivor is its winding (`δ = k δ₀`, map `f₀^k`); several surviving
+/// distances that are not one family of windings are a plural class, never a key.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PairLocation {
     menus: Vec<TurnMenu>,
@@ -481,17 +496,30 @@ pub struct PairSurvivors {
 }
 
 impl PairSurvivors {
-    /// The located pair, when exactly one read distance survives with a published map.
+    /// **The located pair**: the least surviving distance `δ₀` with its published map `f₀`, when
+    /// every other survivor `δ` is its winding: `δ = k δ₀` and its published map is `f₀^k` on its
+    /// ports (module section "A class of windings is one key"). One survivor is located alone.
     pub fn located(&self) -> Option<LocatedPair> {
-        match self.alive.as_slice() {
-            [(offset, reading)] => Some(LocatedPair {
-                offset: *offset,
-                map: reading.map.clone()?,
-                cycle: reading.cycle?,
-                turns: reading.turns.clone(),
-            }),
-            _ => None,
+        let ((least, generator), others) = self.alive.split_first()?;
+        let map = generator.map.clone()?;
+        let image = |port: usize| map.iter().find(|(from, _)| *from == port).map(|(_, to)| *to);
+        let wound = others.iter().all(|(offset, reading)| {
+            offset % least == 0
+                && reading.map.as_ref().is_some_and(|pairs| {
+                    pairs.iter().all(|&(from, to)| {
+                        (0..offset / least).try_fold(from, |port, _| image(port)) == Some(to)
+                    })
+                })
+        });
+        if !wound {
+            return None;
         }
+        Some(LocatedPair {
+            offset: *least,
+            cycle: generator.cycle?,
+            turns: generator.turns.clone(),
+            map,
+        })
     }
 
     /// The surviving distances with a nonempty turn set.
