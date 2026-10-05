@@ -560,6 +560,33 @@ and Codex as peers in the mailbox, topic `responsibility-split`; restated in the
 after Brandon's October 5 lens that the framework is "applied and frayed" in the code). This block
 replaces the September 30 block below as the current order, which stays as history.
 
+**The task is repair, not continuation** (Brandon, October 5, after the text loop (#363) released
+invalid bytes: "the predicting next tokens is just not a good computational ontology"; the use-case
+is "repairing/decrypting information generally in order to produce codecs/generators about the
+information"). This restates generation as earlier curves had it: the progressive restriction of a
+compatible family, `F_(k+1) = T_(g_k)(F_k) ∩ C_k` (September 18), the plural predictive release,
+HNN_FORMULA's "Generation as field refinement", and the egg-packing record's generation as the
+reverse of key location.
+- **Terrain.** An intact passage under a declared damage (erasures, a scramble or noise) anywhere
+  in it. Continuation is the special case whose damage is the tail.
+- **Differentiate.** The ratio covector and loop closure over the intact part locate the
+  navigators that generate the passage (its keys).
+- **Integrate by reflection.** The located navigators run through the damage from both sides, and
+  the compatible family is restricted jointly over every damaged cell (the Fold: the fold and its
+  side residual reconstruct the incoming point). A cell is released where its fibre is one and
+  certified; elsewhere it is held with its plural fibre, never guessed.
+- **Product and measure.** The codec (the located navigators and their residual) and the repaired
+  passage, measured three ways:
+  - whether each repaired cell decodes to a valid unit of the passage's own alphabet;
+  - fidelity on the certified cells;
+  - the codec's description length against the literal.
+  Exact next-cell match is one face of fidelity on a known-truth terrain. It is not the measure.
+- **Text.** Keys on text are plural and local. Exact elimination over byte residues empties
+  within 4 windows (#363). How plural keys are admitted (the egg population over key families,
+  with exact elimination as its zero-likelihood limit, and keys located on the field's own
+  encoding) is the next text loop's subject. A skip-relation count model is refused: it is the
+  context tree under another name.
+
 **The object the lanes build** [definition; agent-inferred, from objects §5, §11, §12 and the
 operator contract]. The HNN is one Holarchy,
 
