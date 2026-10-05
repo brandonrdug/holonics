@@ -944,7 +944,7 @@ impl PowerForm {
     /// **The power form at a cut** from the field, a constitution and the lift point.
     pub fn read(
         field: &Field,
-        constitution: &impl crate::hnn::field::FieldMaterial,
+        constitution: &dyn crate::hnn::field::FieldMaterial,
         current: &Current,
     ) -> Result<Self, HnnError> {
         let contacts = field.contacts().len();
@@ -1768,6 +1768,8 @@ impl<'c> Word<'c> {
     /// contemporary material, continuing its received interior and imposing this source once.
     /// The material-only interface admits no receiving storage, target or reference family.
     /// SourceMoment supplies the source chart; it is never a loaded displacement.
+    /// The material is read once at the cut through its shared read face; the Word owns
+    /// the copied operands, so this interface carries no material borrow into a tick.
     ///
     /// The receipt starts after the declared absorption and material/reference crossing:
     /// E_after - E_before = imposed - absorbed. Previous crossing/deposition work belongs
@@ -1776,7 +1778,7 @@ impl<'c> Word<'c> {
     /// this opening does not certify a frozen-drive periodic component or release a symbol.
     pub fn open_exact_received(
         field: &'c Field,
-        material: &impl crate::hnn::field::FieldMaterial,
+        material: &dyn crate::hnn::field::FieldMaterial,
         current: &Current,
         source: &SourceMoment,
         opening: &WordOpening,
@@ -1785,7 +1787,10 @@ impl<'c> Word<'c> {
         let operands = Operands::exact_at_cut(field, material, current)?;
         let (change, opened_at) = match opening {
             WordOpening::Rest => (EndChange::rest(field, &operands), 0),
-            WordOpening::Received { carry, absorption: Absorption::Complete } => (
+            WordOpening::Received {
+                carry,
+                absorption: Absorption::Complete,
+            } => (
                 EndChange {
                     resonators: vec![None; field.rings().len()],
                     resonator_phases: vec![None; field.rings().len()],
@@ -1793,7 +1798,10 @@ impl<'c> Word<'c> {
                 },
                 carry.ticks,
             ),
-            WordOpening::Received { carry, absorption: Absorption::Nothing } => {
+            WordOpening::Received {
+                carry,
+                absorption: Absorption::Nothing,
+            } => {
                 let contacts = operands.contacts();
                 let conductances: Vec<Rat> =
                     contacts.iter().map(|c| c.conductance().clone()).collect();
@@ -1816,7 +1824,10 @@ impl<'c> Word<'c> {
         let before_change = entered.change()?;
         let form = PowerForm::read(field, material, current)?;
         let before = form.power(&before_change)? + form.resonator_power(&before_change)?;
-        let absorbed: Rat = before_change.storage.iter().enumerate()
+        let absorbed: Rat = before_change
+            .storage
+            .iter()
+            .enumerate()
             .filter(|(ring, _)| field.is_source(*ring))
             .map(|(ring, wave)| form.ring_power(ring, wave))
             .sum();
@@ -1824,11 +1835,18 @@ impl<'c> Word<'c> {
         let word = Self::continuing(field, operands, &interior, &injection, opened_at)?;
         let after_change = word.change()?;
         let after = form.power(&after_change)? + form.resonator_power(&after_change)?;
-        let imposed: Rat = injection.iter().enumerate()
+        let imposed: Rat = injection
+            .iter()
+            .enumerate()
             .filter(|(ring, _)| field.is_source(*ring))
             .map(|(ring, wave)| form.ring_power(ring, wave))
             .sum();
-        let receipt = SourceOpeningReceipt { before, after, absorbed, imposed };
+        let receipt = SourceOpeningReceipt {
+            before,
+            after,
+            absorbed,
+            imposed,
+        };
         if !receipt.closes() {
             return Err(HnnError::ContinuingState {
                 what: "the exact source imposition does not close its work balance",

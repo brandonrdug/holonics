@@ -1266,7 +1266,7 @@ impl SourceMoment {
     pub fn encode(
         &self,
         field: &Field,
-        constitution: &impl FieldMaterial,
+        constitution: &dyn FieldMaterial,
         ring: usize,
     ) -> Result<Vec<Rat>, HnnError> {
         let modulus = constitution.transport(ring);
@@ -1342,7 +1342,7 @@ impl SourceMoment {
     pub fn open_parts(
         &self,
         field: &Field,
-        constitution: &impl FieldMaterial,
+        constitution: &dyn FieldMaterial,
         current: &Current,
         ring: usize,
     ) -> Result<(Vec<(usize, Vec<Rat>)>, Vec<Rat>), HnnError> {
@@ -1365,7 +1365,7 @@ impl SourceMoment {
     fn moment_parts(
         &self,
         field: &Field,
-        constitution: &impl FieldMaterial,
+        constitution: &dyn FieldMaterial,
         ring: usize,
     ) -> Result<(Vec<(usize, Vec<Rat>)>, Vec<Rat>), HnnError> {
         let counts = self.counts(ring)?;
@@ -1434,7 +1434,7 @@ impl SourceMoment {
     pub fn open_storage(
         &self,
         field: &Field,
-        constitution: &impl FieldMaterial,
+        constitution: &dyn FieldMaterial,
         current: &Current,
     ) -> Result<Vec<Vec<Rat>>, HnnError> {
         let mut storage: Vec<Vec<Rat>> = field

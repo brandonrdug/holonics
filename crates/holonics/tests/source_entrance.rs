@@ -78,13 +78,17 @@ fn chain() -> Field {
 }
 
 fn pair_field(alphabet: usize) -> Field {
+    pair_field_with_offsets(alphabet, Vec::new())
+}
+
+fn pair_field_with_offsets(alphabet: usize, offsets: Vec<usize>) -> Field {
     Field::declare(
         FieldDeclaration {
             rings: vec![ring(16, (0..16).collect())],
             contacts: Vec::new(),
             loops: Vec::new(),
             sources: vec![0],
-            offsets: Vec::new(),
+            offsets,
             alphabet,
             step: integer(1),
             exponent_grain: 1,
@@ -112,8 +116,8 @@ fn material(field: &Field, ring: usize) -> ResonatorMaterial {
     .unwrap()
 }
 
-// The following are proposed unit tests of an entrance and its actual physical consumer.
-// The synthetic passage in the last test supplies lawful unit-test truth; it is not a
+// These unit tests exercise the entrance and its actual physical consumer.
+// The synthetic passage supplies lawful unit-test truth; it is not a
 // scientific validation set, training curriculum or evidence of text repair.
 
 #[test]
@@ -147,12 +151,35 @@ fn sparse_source_moments_enter_the_actual_loaded_port_with_exact_work() {
     assert_eq!(receipt.before, Rat::zero());
     assert_eq!(receipt.absorbed, Rat::zero());
     assert!(receipt.imposed > Rat::zero());
+    println!(
+        "source entrance: before={} after={} absorbed={} imposed={}",
+        receipt.before, receipt.after, receipt.absorbed, receipt.imposed
+    );
     assert_eq!(word.change().unwrap().storage, expected);
+    word.tick().unwrap();
+    assert!(word.field_balances().last().unwrap().closes());
+    let first_crossing = word.change().unwrap();
+    let [u, w] = first_crossing.resonators[0].as_ref().unwrap();
+    // At this cut Y_source = G_contact: the first scattering transmits the pulse
+    // into the contact and leaves zero at the source storage/loaded port.
+    assert!(u.iter().chain(w).all(Zero::is_zero));
+    assert!(
+        first_crossing
+            .arrivals
+            .iter()
+            .flatten()
+            .flatten()
+            .any(|x| !x.is_zero())
+    );
+    // The next crossing reads that actual contact return, without resetting the Word.
     word.tick().unwrap();
     assert!(word.field_balances().last().unwrap().closes());
     let change = word.change().unwrap();
     let [u, w] = change.resonators[0].as_ref().unwrap();
     assert!(u.iter().chain(w).any(|x| !x.is_zero()));
+    println!(
+        "source passage: first loaded point at rest, second loaded point reached through contact return"
+    );
 }
 
 #[test]
@@ -190,6 +217,13 @@ fn exact_source_reentry_preserves_the_entered_interior_and_counts_source_once() 
         Word::open_exact_received(&field, &theta, &current, &source, &opening).unwrap();
     assert!(receipt.closes());
     assert_eq!(next.opened_at(), carry.ticks);
+    println!(
+        "source re-entry: carried_crossing={} opened_at={} source_absorbed={} source_imposed={}",
+        carry.ticks,
+        next.opened_at(),
+        receipt.absorbed,
+        receipt.imposed
+    );
     let change = next.change().unwrap();
     assert_eq!(change.arrivals, carry.change.arrivals);
     assert_eq!(change.states, carry.change.states);
@@ -213,6 +247,81 @@ fn exact_source_reentry_preserves_the_entered_interior_and_counts_source_once() 
     );
     next.tick().unwrap();
     assert!(next.field_balances().last().unwrap().closes());
+}
+
+#[test]
+fn nonzero_offset_moments_drive_the_actual_loaded_port_without_marginal_source() {
+    use holonics::hnn::field::ConstitutionRead;
+    use holonics::hnn::moment::PairPort;
+    let field = pair_field_with_offsets(4, vec![1]);
+    let mut current = Current::at_rest(&field);
+    let mut source = SourceMoment::open(&field, &current);
+    let ingested = source.ingest(&field, &mut current, &[0, 1]).unwrap();
+    assert_eq!(ingested.cells, 2);
+    let theta = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET)
+        .unwrap()
+        .with_ring_resonator(
+            &field,
+            0,
+            material(&field, 0)
+                .with_symmetric_saturation(Rat::one())
+                .unwrap(),
+        )
+        .unwrap()
+        // A declared probe isolates the factored offset port with marginal E zero.
+        .with_ports(
+            0,
+            None,
+            Some(ExactRatMatrix::zero(field.ring(0).width(), field.alphabet()).unwrap()),
+            None,
+        )
+        .unwrap();
+    // Initial E^(1) has zero outputs. Declare one unit output along its existing
+    // factored read axes so the probe exercises a nonzero pair material, without
+    // pretending that this fixture material was located or learned.
+    let pair = theta.pair_port(0, 1).unwrap();
+    let mut outputs = pair.outputs().to_vec();
+    outputs[0][0] = Rat::one();
+    let pair = PairPort::new(
+        outputs,
+        pair.current_reads().to_vec(),
+        pair.earlier_reads().to_vec(),
+    )
+    .unwrap();
+    let theta = theta.with_pair(0, 1, pair).unwrap();
+    let table = source.offset_table(&field, 0, 1).unwrap().unwrap();
+    assert_eq!(table.population, 1);
+    let (marginal, pairs) = source.open_parts(&field, &theta, &current, 0).unwrap();
+    assert!(
+        marginal
+            .iter()
+            .flat_map(|(_, values)| values)
+            .all(Zero::is_zero)
+    );
+    assert!(pairs.iter().any(|x| !x.is_zero()));
+    assert_eq!(
+        source.open_storage(&field, &theta, &current).unwrap()[0],
+        pairs
+    );
+    let (mut word, receipt) = Word::open_source_exact_received(
+        &field,
+        &theta,
+        &current,
+        Arc::new(source),
+        &WordOpening::Rest,
+    )
+    .unwrap();
+    assert!(receipt.closes());
+    assert!(receipt.imposed > Rat::zero());
+    word.tick().unwrap();
+    assert!(word.field_balances().last().unwrap().closes());
+    let change = word.change().unwrap();
+    let [u, w] = change.resonators[0].as_ref().unwrap();
+    assert!(u.iter().chain(w).any(|x| !x.is_zero()));
+    println!(
+        "offset-only source entrance: pair_population={} pair_weight={} source_imposed={}",
+        table.population, table.weight, receipt.imposed
+    );
 }
 
 #[test]
@@ -284,6 +393,17 @@ fn an_observed_pair_deposit_changes_the_later_continuing_loaded_response() {
     after.tick().unwrap();
     assert!(before.field_balances().last().unwrap().closes());
     assert!(after.field_balances().last().unwrap().closes());
+    let before_change = before.change().unwrap();
+    let after_change = after.change().unwrap();
+    let before_state = before_change.resonators[0].as_ref().unwrap();
+    let after_state = after_change.resonators[0].as_ref().unwrap();
+    println!(
+        "reached source relation: slip_before={} slip_after={} next_ring0_delta_u0={} next_ring0_delta_w0={}",
+        deposit.slip_before,
+        deposit.slip_after,
+        &after_state[0][0] - &before_state[0][0],
+        &after_state[1][0] - &before_state[1][0]
+    );
     assert_ne!(
         before.change().unwrap().resonators,
         after.change().unwrap().resonators
