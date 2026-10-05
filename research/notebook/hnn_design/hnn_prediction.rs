@@ -22,7 +22,7 @@
 //! cargo run --release -p holonics --example hnn_prediction -- executed joined <terrain> <seed> <count> <arm> <label=source>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed keys <terrain> <training seed> <count> <out>
 //! cargo run --release -p holonics --example hnn_prediction -- executed pair-members <terrain> <seed> <count> <state>
-//! cargo run --release -p holonics --example hnn_prediction -- executed text <cut> <private out dir> <dev|run> [<state>]
+//! cargo run --release -p holonics --example hnn_prediction -- executed text <cut> <private out dir> <dev|run> [<state> [<from> <to> [<unit bound ms>]]]
 //! ```
 //!
 //! [definition; agent-inferred, the order pin and the bank pin] **The declaration**
@@ -589,7 +589,10 @@ fn main() {
         // Lane B's key location and lane C's release, unchanged, on a text cut through the byte
         // chart (research/records/2026-10-05_THE_SAME_PATH_ON_TEXT_KEY_LOCATION_AND_THE_RELEASE_ON_THE_BYTE_CHART.md).
         (Some("executed"), Some("text")) => {
-            keys_loop::text(&arguments[3], &arguments[4], &arguments[5], arguments.get(6).map(String::as_str))
+            let at = |k: usize| arguments.get(k).map(|a| a.parse().expect("a count"));
+            let range = at(7).zip(at(8));
+            let bound = arguments.get(9).map(|a| a.parse().expect("a bound in ms"));
+            keys_loop::text(&arguments[3], &arguments[4], &arguments[5], arguments.get(6).map(String::as_str), range, bound)
         }
         (Some("executed"), Some("keys-probe")) => keys_loop::keys_probe(
             &arguments[3],

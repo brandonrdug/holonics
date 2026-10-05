@@ -343,7 +343,7 @@ fn text_declared() -> Declared {
     }
 }
 
-/// [measured; agent-inferred, October 5; the record above] **`executed text <cut> <out dir> <dev|run> [<state>]`**:
+/// [measured; agent-inferred, October 5; the record above] **`executed text <cut> <out dir> <dev|run> [<state> [<from> <to> [<unit bound ms>]]]`**:
 /// lane B's key location and lane C's release, unchanged, on a text cut through the byte chart
 /// ([`text_declared`]). The training passage is read as `executed keys` reads a terrain's (each window
 /// a request and its section, one observation a station, read against every earlier cell of its
@@ -356,12 +356,21 @@ fn text_declared() -> Declared {
 /// two openings. The release is `hnn::prediction::generate_by_bank`, one per request, read whole.
 /// `dev` reads one development window (the one after the training passage) on each state, for the
 /// projection; `run` reads the pinned requests. With a state's label (`lossless`, `founded`, or a
-/// deposit's `keys-…`), only that state is read. The requests are read one after another, each
-/// with the whole thread budget (the unit the development read measures), one progress line each.
+/// deposit's `keys-…`), only that state is read; with `<from> <to>`, only the requests `from..to`;
+/// with `<unit bound ms>`, the read stops after a request that took longer. The requests are read
+/// one after another, each with the whole thread budget (the unit the development read measures),
+/// each written to `<out dir>` as it completes, one progress line each.
 /// Stdout carries counts only; every byte (the training passage, each request, its truth and each
 /// state's release) is written to `<out dir>`, which must be a private directory (`.local/`).
 #[allow(clippy::disallowed_methods)]
-pub(super) fn text(cut: &str, out: &str, which: &str, only: Option<&str>) {
+pub(super) fn text(
+    cut: &str,
+    out: &str,
+    which: &str,
+    only: Option<&str>,
+    range: Option<(usize, usize)>,
+    unit_bound: Option<u128>,
+) {
     use holonics::compression::keys::TurnMenu;
     use std::fmt::Write as _;
     let clock = Instant::now();
@@ -520,82 +529,75 @@ pub(super) fn text(cut: &str, out: &str, which: &str, only: Option<&str>) {
         None => states.extend(openings.into_iter().map(|(name, theta)| (name.to_string(), theta))),
     }
 
-    // The release: one per request on each state, read whole.
+    // The release: one per request on each state, read whole, each request written as it completes
+    // (a stopped run keeps every request it read); requests `from..to`, each held to the unit bound.
     let bank = bank_of(declared.period, &bank_strength());
+    let (from, to) = range.unwrap_or((0, requests.len()));
     for (name, theta) in states.iter().filter(|(name, _)| only.is_none_or(|only| only == name)) {
         let started = Instant::now();
-        let generated: Vec<_> = requests
-            .iter()
-            .enumerate()
-            .map(|(i, (request, _))| {
-                let at = Instant::now();
-                let (current, moment) = ingest(field, request);
-                let generation =
-                    generate_by_bank(field, theta, &current, &moment, &engine.refinement, &bank, BANK_GRAIN);
-                println!(
-                    "    {name} request {i}: {}, {} ms; the state's elapsed {} ms",
-                    match &generation {
-                        Ok(g) if g.release.released() => "released",
-                        Ok(_) => "held",
-                        Err(_) => "refused",
-                    },
-                    at.elapsed().as_millis(),
-                    started.elapsed().as_millis()
-                );
-                (generation, at.elapsed().as_millis())
-            })
-            .collect();
-        let (mut released, mut held_count, mut refused, mut whole, mut right, mut tops_right) = (0, 0, 0, 0, 0, 0);
-        let (mut emitted_bytes, mut terminated, mut uncertified) = (0, 0, 0);
+        let (mut released, mut held_count, mut refused, mut whole, mut right) = (0, 0, 0, 0, 0);
         let mut by_station = vec![0usize; declared.stations];
-        let mut sections = String::new();
         let mut times = Vec::new();
-        for (i, ((_, target), (generation, ms))) in requests.iter().zip(&generated).enumerate() {
-            times.push(*ms);
-            let Ok(generation) = generation else {
-                refused += 1;
-                writeln!(sections, "request {i}: refused").unwrap();
-                std::fs::write(format!("{out}/{name}_{i}.release"), b"").expect("write");
-                continue;
-            };
-            let release = &generation.release;
-            uncertified += usize::from(generation.uncertified.is_some());
-            terminated += usize::from(release.terminated.is_some());
-            for (j, (class, truth)) in release.classes.iter().zip(target).enumerate() {
-                tops_right += usize::from(class == truth);
-                if release.released() && j < release.emitted.len() && class == truth {
-                    right += 1;
-                    by_station[j] += 1;
+        for (i, (request, target)) in requests.iter().enumerate().take(to).skip(from) {
+            let at = Instant::now();
+            let (current, moment) = ingest(field, request);
+            let generation =
+                generate_by_bank(field, theta, &current, &moment, &engine.refinement, &bank, BANK_GRAIN);
+            let ms = at.elapsed().as_millis();
+            times.push(ms);
+            let (line, emitted): (String, Vec<u8>) = match &generation {
+                Err(refusal) => {
+                    refused += 1;
+                    (format!("request {i}: refused ({refusal}) | {ms} ms"), Vec::new())
                 }
+                Ok(generation) => {
+                    let release = &generation.release;
+                    if release.released() {
+                        released += 1;
+                        whole += usize::from(release.emitted == *target);
+                        for (j, (class, truth)) in release.emitted.iter().zip(target).enumerate() {
+                            if class == truth {
+                                right += 1;
+                                by_station[j] += 1;
+                            }
+                        }
+                    } else {
+                        held_count += 1;
+                    }
+                    (
+                        format!(
+                            "request {i}: {} | classes {:?} | plural {:?} | terminated {:?} | locks {:?} | refinements {} | uncertified {:?} | {ms} ms",
+                            if release.released() { "released" } else { "held" },
+                            release.classes,
+                            release.plural,
+                            release.terminated,
+                            generation.locks,
+                            generation.refinements,
+                            generation.uncertified,
+                        ),
+                        release.emitted.iter().map(|&c| u8::try_from(c).expect("a byte")).collect(),
+                    )
+                }
+            };
+            std::fs::write(format!("{out}/{name}_{i}.release"), &emitted).expect("write the release");
+            std::fs::write(format!("{out}/{name}_{i}.section"), format!("{line}\n")).expect("write the section");
+            println!(
+                "    {name} request {i}: {}, {ms} ms; the state's elapsed {} ms",
+                match &generation {
+                    Ok(g) if g.release.released() => "released",
+                    Ok(_) => "held",
+                    Err(_) => "refused",
+                },
+                started.elapsed().as_millis()
+            );
+            if unit_bound.is_some_and(|bound| ms > bound) {
+                println!("  stopped: request {i} took {ms} ms, above the unit bound {} ms: INCOMPLETE", unit_bound.unwrap_or(0));
+                break;
             }
-            if release.released() {
-                released += 1;
-                emitted_bytes += release.emitted.len();
-                whole += usize::from(release.emitted.len() == target.len() && release.emitted == *target);
-            } else {
-                held_count += 1;
-            }
-            let emitted: Vec<u8> = release.emitted.iter().map(|&c| u8::try_from(c).expect("a byte")).collect();
-            std::fs::write(format!("{out}/{name}_{i}.release"), &emitted).expect("write");
-            writeln!(
-                sections,
-                "request {i}: {} | classes {:?} | plural {:?} | terminated {:?} | locks {:?} | refinements {} | uncertified {:?} | {} ms",
-                if release.released() { "released" } else { "held" },
-                release.classes,
-                release.plural,
-                release.terminated,
-                generation.locks,
-                generation.refinements,
-                generation.uncertified,
-                ms
-            )
-            .unwrap();
         }
-        std::fs::write(format!("{out}/{name}_sections.txt"), &sections).expect("write the sections");
         println!(
-            "  release on {name} ({} requests): released {released}, held {held_count}, refused {refused}, refused certificates {uncertified}; whole sections {whole}; released bytes {emitted_bytes}, right {right} of {} by station {by_station:?}; reaching the termination {terminated}; top classes right (held included) {tops_right}; ms a request {times:?}; {} ms",
-            requests.len(),
-            requests.len() * declared.stations,
+            "  release on {name} (requests {from}..{to}, {} read): released {released}, held {held_count}, refused {refused}; whole sections {whole}; released bytes right {right} by station {by_station:?}; ms a request {times:?}; {} ms",
+            times.len(),
             started.elapsed().as_millis()
         );
     }

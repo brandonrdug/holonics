@@ -83,6 +83,24 @@ projection, 1 rem `51625/99328`). The deadline is not raised; the declared read 
   later than `k · 60,040` ms (`60,040 = 48,032 · 5/4`);
 - **launched when no other run holds the cores** (no other `hnn_prediction` process at launch).
 
+**The founded read stopped, and the partitioned read, fixed before its launch** [measured;
+agent-inferred]. The founded read launched with no other run on the cores, but another worker's
+12-thread runs began beside it; its requests took `47,080, 63,675, 66,496, 67,522, 60,335, 70,629,
+75,556, 72,986, 73,359, 64,494` ms, and request 3's line came at `244,774` ms, past its bound
+`4 · 60,040 = 240,160` ms. It was stopped at about `663,000` ms after 10 requests (all released),
+since the remaining six could not meet the 961 s deadline at that rate. Its releases are lost: the
+harness wrote a state's releases only when the state finished, which is the defect this read
+repairs. No deadline is raised; the partition and the declared read change:
+- **each request is written as it completes** (its release and its section), so a stopped read keeps
+  every request it read;
+- **four partitions of four requests** (`0..4`, `4..8`, `8..12`, `12..16`), launched one after
+  another (each holds the whole 12-thread budget; the host's other 12 threads are held by another
+  worker's runs);
+- **the unit is re-measured**: the largest founded request before launch, `75,556` ms (under the
+  shared host). A partition's projection is `4 · 75,556 = 302,224` ms, its deadline the upper end
+  `377,780` ms (`timeout 378`); **early stop inside the harness**: a request above
+  `94,445 = ⌈75,556 · 5/4⌉` ms stops its partition, reported incomplete.
+
 ## 1. The recorded failures this loop could repeat, and how each was held
 
 From the [lessons](2026-09-29_LESSONS_THE_FAILURES_THAT_REPEATED_AFTER_THEY_WERE_RECORDED.md), the
@@ -144,10 +162,12 @@ From observation 16 to 31 the one survivor is `δ = 47`, holding one to three ed
 last stations), all on paths: its map is never published (plural), and its fourth edge empties it.
 
 Each distance empties by one of two events, read separately:
-- **The turn set empties** (the menu is still a partial injection, but no single turn `c ∈ ℤ/60`
-  admits its components). Most often a fixed point: a byte that recurs at the distance (`x → x`)
-  forces `ord(c) = 1`, so `c = 0`, and then any other edge, a path of one edge, needs `ord(c) > 1`.
-  The observation at which each distance's turns emptied:
+- **The turn set empties.** At 33 of the 47 distances it empties at the observation at which the
+  relation fails (below). At 13 it empties earlier, while the relation is still a partial
+  injection, by a fixed point: a port that recurs at the distance (`x → x`) forces `ord(c) = 1`, so
+  `c = 0`, and any other edge, a path of one edge, then needs `ord(c) > 1`. At 1 it empties by its
+  components' lengths (no `c` whose order fits every cycle and path). The observation at which each
+  distance's turns emptied:
   `1:6 2:7 3:5 4:2 5:5 6:6 7:9 8:4 9:2 10:8 11:10 12:8 13:10 14:9 15:2 16:5 17:6 18:7 19:4 20:12
   21:8 22:6 23:7 24:8 25:5 26:4 27:5 28:6 29:4 30:8 31:11 32:9 33:6 34:5 35:2 36:8 37:7 38:6 39:7 40:4
   41:10 42:12 43:13 44:13 45:15 46:16 47:32`.
