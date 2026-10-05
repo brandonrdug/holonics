@@ -164,6 +164,7 @@ use crate::hnn::constitution::{
 };
 use crate::hnn::contact::{SiteReading, site_readings};
 use crate::hnn::field::{ConstitutionRead, Current, Field};
+use crate::hnn::encoding::Encoded;
 use crate::hnn::keys::{self, KeyLocation};
 use crate::hnn::moment::{Ingested, PopulationChart, SourceMoment};
 use crate::hnn::pending::{Against, PendingRatio};
@@ -664,8 +665,11 @@ pub fn compare_phase(
     constitution: &impl ConstitutionRead,
     ratio: &PendingRatio,
     against: Against,
-    targets: &[usize],
+    target: &Encoded,
 ) -> Result<ComparePhase, HnnError> {
+    field.admit(target)?;
+    let classes: Vec<usize> = target.classes_read().collect();
+    let targets = classes.as_slice();
     if against.trees.len() != targets.len() {
         return Err(HnnError::Shape {
             what: "one tree face per target",
@@ -682,7 +686,7 @@ pub fn compare_phase(
         },
         || -> Result<(Scored, HolonRatio, RatioCovector), HnnError> {
             let scored = ratio.scored(constitution, &against, targets)?;
-            let anchors = target_phases(field, ratio.anchor(), phases.ring(), targets)?;
+            let anchors = target_phases(field, ratio.anchor(), phases.ring(), target)?;
             let holon = HolonRatio::compare(against.faces.clone(), targets, &anchors)?;
             let covector = holon.covector()?;
             Ok((scored, holon, covector))
@@ -1104,32 +1108,6 @@ impl Reference {
     }
 }
 
-/// One-hot exterior cells as their codes.
-fn codes(cells: &[Vec<(usize, Rat)>], alphabet: usize) -> Result<Vec<usize>, HnnError> {
-    cells
-        .iter()
-        .enumerate()
-        .map(|(position, cell)| match cell.as_slice() {
-            [(code, value)] if value.is_one() => {
-                if *code >= alphabet {
-                    Err(HnnError::CellOutside {
-                        code: *code,
-                        alphabet,
-                    })
-                } else {
-                    Ok(*code)
-                }
-            }
-            _ => Err(HnnError::CellNotOneHot { position }),
-        })
-        .collect()
-}
-
-/// The exterior chart's one-hot cells of codes.
-pub fn one_hot(codes: &[usize]) -> Vec<Vec<(usize, Rat)>> {
-    codes.iter().map(|code| vec![(*code, Rat::one())]).collect()
-}
-
 /// Per-ring regions in their own clocks: each ring's tick count, a count (clock exponent 0) whose
 /// clock unit is the ring's step.
 fn receipt(
@@ -1184,7 +1162,7 @@ impl ExecutionPort for Reference {
         &self,
         resident: &mut Resident,
         moment: Option<&MomentId>,
-        cells: &[Vec<(usize, Rat)>],
+        cells: &Encoded,
     ) -> Result<
         (
             MomentId,
@@ -1196,7 +1174,7 @@ impl ExecutionPort for Reference {
             return Err(HnnError::AeonAwaitingClose);
         }
         let field = resident.field.clone();
-        let codes = codes(cells, field.alphabet())?;
+        field.admit(cells)?;
         let id = match moment {
             Some(id) if resident.moments.contains_key(id) => *id,
             Some(id) => {
@@ -1219,13 +1197,13 @@ impl ExecutionPort for Reference {
             .get_mut(&id)
             .expect("the moment was checked or opened");
         let start = Instant::now();
-        let ingested = open.ingest(&field, &mut resident.current, &codes)?;
+        let ingested = open.ingest(&field, &mut resident.current, cells)?;
         // The receiving parametron's active suffix address receives the cells the moment took, each
         // tick's letter read by its register's clock, which stays the lift point's (its windings
         // since the aeon's opening, which the carry-out moves to its own lift point), and its
         // contact letters' site kinds then refresh from the published constitution, after the
         // ingest and never inside it (`hnn::receiving::LetterReader`).
-        for &code in &codes[..ingested.cells] {
+        for code in cells.classes_read().take(ingested.cells) {
             resident.address.receive(code)?;
         }
         let opening = if ingested.carry_out {
@@ -1294,7 +1272,7 @@ impl ExecutionPort for Reference {
     fn locate_keys(
         &self,
         resident: &mut Resident,
-        crib: &[Vec<(usize, Rat)>],
+        crib: &Encoded,
         offset: usize,
     ) -> Result<
         InteractionReturn<KeyLocation, (), Vec<Option<Clock>>, Vec<ReceivingPhases>, PortReceipt>,
@@ -1304,15 +1282,15 @@ impl ExecutionPort for Reference {
             return Err(HnnError::KeysNotAdmitted);
         }
         let field = resident.field.clone();
-        let codes = codes(crib, field.alphabet())?;
-        if codes.len() as u64 > resident.aeon.closed {
+        field.admit(crib)?;
+        if crib.len() as u64 > resident.aeon.closed {
             return Err(HnnError::Shape {
                 what: "a closing crib's cells against the closed aeon's",
                 expected: usize::try_from(resident.aeon.closed).unwrap_or(usize::MAX),
-                found: codes.len(),
+                found: crib.len(),
             });
         }
-        let location = keys::locate_closing(&field, &resident.current, &codes, offset)?;
+        let location = keys::locate_closing(&field, &resident.current, crib, offset)?;
         let jumps = location.rekey(&field, &mut resident.current)?;
         resident.address.synchronize(&field, &resident.current)?;
         resident.aeon.opening = resident.current.lift().to_vec();
@@ -1346,7 +1324,7 @@ impl ExecutionPort for Reference {
         for ring in &location.rings {
             work.added(ring.work);
         }
-        let order = source_order(&field, resident.current.lift(), codes.len() as u64);
+        let order = source_order(&field, resident.current.lift(), crib.len() as u64);
         let zero_ticks = vec![0u64; field.rings().len()];
         Ok(InteractionReturn {
             forward: Component::Present(location),
@@ -1503,7 +1481,7 @@ impl ExecutionPort for Reference {
         &self,
         resident: &mut Resident,
         pending: PendingId,
-        target: &[Vec<(usize, Rat)>],
+        target: &Encoded,
     ) -> Result<
         (
             StagedId,
@@ -1521,7 +1499,8 @@ impl ExecutionPort for Reference {
             .ok_or(HnnError::UnknownHandle {
                 handle: Handle::Pending(pending),
             })?;
-        let targets = codes(target, field.alphabet())?;
+        field.admit(target)?;
+        let targets: Vec<usize> = target.classes_read().collect();
         let phases = slot.ratio.phases().clone();
         if targets.len() != phases.aperture() {
             return Err(HnnError::Shape {
@@ -1573,7 +1552,7 @@ impl ExecutionPort for Reference {
             scored,
             holon,
             covector,
-        } = compare_phase(&field, &resident.constitution, ratio, against, &targets)?;
+        } = compare_phase(&field, &resident.constitution, ratio, against, target)?;
         let map = resident
             .constitution
             .receiving_map(phases.ring())
@@ -2860,12 +2839,13 @@ fn sheet_classes(
 // -------------------------------------------------------------------------------------------
 // the exposure
 
-/// [definition] **A cut**: the exterior stream's codes in order, and its pinned held-out positions.
+/// [definition] **A cut**: the stream's encoded cells in order (THE_MACHINE guard 9: a stream enters
+/// only as `hnn::encoding::Encoded`, never as exterior codes), and its pinned held-out positions.
 /// Every cell is compared and then deposited (prequential scoring): "held out" means only that no design
 /// choice (depth, precision, step, grain) was made on those cells, and that no crib reads them.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Cut {
-    pub cells: Vec<usize>,
+    pub cells: Encoded,
     pub held_out: Vec<Range<usize>>,
 }
 
@@ -3518,7 +3498,7 @@ pub struct ReceiverStep {
 pub fn contact_ablation(
     reference: &Reference,
     field: &Field,
-    cells: &[usize],
+    cells: &Encoded,
     windows: usize,
     options: AblationOptions,
     on_boundary: &mut dyn FnMut(
@@ -3582,15 +3562,15 @@ pub fn contact_ablation(
         })?;
     let aperture = phases.aperture();
     let spans: Vec<Range<usize>> = phases.windows(cells.len())?.into_iter().collect();
-    let (moment, _) = reference.ingest(&mut resident, None, &[])?;
+    let (moment, _) = reference.ingest(&mut resident, None, &cells.part(0..0)?)?;
     let feed = |reference: &Reference,
                 resident: &mut Resident,
-                window: &[usize]|
+                window: &Encoded|
      -> Result<bool, HnnError> {
         let mut fed = 0;
         while fed < window.len() {
             let (_, ingested) =
-                reference.ingest(resident, Some(&moment), &one_hot(&window[fed..]))?;
+                reference.ingest(resident, Some(&moment), &window.part(fed..window.len())?)?;
             let ingested = ingested.forward.into_present().expect("ingest returns");
             fed += ingested.cells;
             if ingested.carry_out {
@@ -3602,7 +3582,7 @@ pub fn contact_ablation(
     type Read = (ExactInterval, Vec<[Vec<Rat>; 2]>, Option<Faces>);
     let read = |reference: &Reference,
                 resident: &mut Resident,
-                window: &[usize]|
+                window: &Encoded|
      -> Result<Read, HnnError> {
         let (pending, refined) = reference.refine(resident, &moment, &phases)?;
         let states = match &refined.receipt.detail {
@@ -3610,7 +3590,7 @@ pub fn contact_ablation(
             _ => Vec::new(),
         };
         let faces = refined.forward.into_present();
-        let (_, compared) = reference.compare(resident, pending, &one_hot(window))?;
+        let (_, compared) = reference.compare(resident, pending, window)?;
         let holon = compared
             .forward
             .into_present()
@@ -3689,13 +3669,14 @@ pub fn contact_ablation(
     };
     let mut out = Vec::new();
     for (k, span) in spans.iter().enumerate().take(windows) {
-        let window = &cells[span.clone()];
+        let window = &cells.part(span.clone())?;
         if window.len() != aperture {
             break;
         }
         let next = spans
             .get(k + 1)
-            .map(|s| &cells[s.clone()])
+            .map(|s| cells.part(s.clone()))
+            .transpose()?
             .filter(|w| w.len() == aperture);
         if std::mem::take(&mut boundary) {
             let mut reverted = resident.constitution().clone();
@@ -3792,19 +3773,19 @@ pub fn contact_ablation(
                             }
                         }
                     }
-                    if !feed(reference, &mut held, &cells[spans[j].clone()])?
-                        || !feed(reference, &mut back, &cells[spans[j].clone()])?
+                    if !feed(reference, &mut held, &cells.part(spans[j].clone())?)?
+                        || !feed(reference, &mut back, &cells.part(spans[j].clone())?)?
                     {
                         break;
                     }
                     j += 1;
                     if j >= spans.len()
                         || j >= k + options.information
-                        || cells[spans[j].clone()].len() != aperture
+                        || spans[j].len() != aperture
                     {
                         break;
                     }
-                    let next_window = &cells[spans[j].clone()];
+                    let next_window = &cells.part(spans[j].clone())?;
                     let (ca, _, fa) = read(reference, &mut held, next_window)?;
                     let (cb, _, fb) = read(reference, &mut back, next_window)?;
                     let d = interval_difference(&cb, &ca)?;
@@ -3884,8 +3865,9 @@ pub fn contact_ablation(
         let (pending, refined) = reference.refine(&mut resident, &moment, &phases)?;
         if options.samples {
             if let Some(inputs) = resident.receiving_inputs(&pending, &phases)? {
-                let tree = resident.receiving_tree_exponents(&pending, window)?;
-                for (j, (z, &target)) in inputs.into_iter().zip(window).enumerate() {
+                let known: Vec<usize> = window.classes_read().collect();
+                let tree = resident.receiving_tree_exponents(&pending, &known)?;
+                for (j, (z, target)) in inputs.into_iter().zip(window.classes_read()).enumerate() {
                     samples.push((aeon, z, target));
                     trees.push(tree.as_ref().map(|t| t[j].clone()));
                 }
@@ -3901,7 +3883,7 @@ pub fn contact_ablation(
                 });
             }
         };
-        let (staged, compared) = reference.compare(&mut resident, pending, &one_hot(window))?;
+        let (staged, compared) = reference.compare(&mut resident, pending, window)?;
         if let (Some(next), Component::Present(deposit)) = (next, &compared.deposit) {
             let theta = resident.constitution().clone();
             let contacts: Vec<FactorStep> = deposit
@@ -3954,9 +3936,9 @@ pub fn contact_ablation(
                     feed(reference, &mut moved_res, window)?,
                 );
                 if open_held && open_moved {
-                    let (held_code, held_states, held_faces) = read(reference, &mut held, next)?;
+                    let (held_code, held_states, held_faces) = read(reference, &mut held, &next)?;
                     let (moved_code, moved_states, moved_faces) =
-                        read(reference, &mut moved_res, next)?;
+                        read(reference, &mut moved_res, &next)?;
                     out.push(ContactAblation {
                         position: span.start,
                         aeon,
@@ -4058,7 +4040,7 @@ pub fn contact_ablation(
                                 + Rat::new(BigInt::from(c.phase), BigInt::from(grain))
                                 + &c.fibre
                         };
-                        for ((x, y), &target) in fa.faces.iter().zip(&fb.faces).zip(window) {
+                        for ((x, y), target) in fa.faces.iter().zip(&fb.faces).zip(window.classes_read()) {
                             let masses = x.odometer_masses()?;
                             let delta: Vec<Rat> = x
                                 .cells()
@@ -4115,7 +4097,7 @@ pub fn contact_ablation(
         let mut fed = 0;
         while fed < window.len() {
             let (_, ingested) =
-                reference.ingest(&mut resident, Some(&moment), &one_hot(&window[fed..]))?;
+                reference.ingest(&mut resident, Some(&moment), &window.part(fed..window.len())?)?;
             let ingested = ingested.forward.into_present().expect("ingest returns");
             fed += ingested.cells;
             if ingested.carry_out {
@@ -4315,7 +4297,7 @@ where
     let mut locate = |resident: &mut P::Resident, span: Range<usize>| -> Result<(), HnnError> {
         if span.len() > crib.offset {
             let at = span.end as u64;
-            let located = port.locate_keys(resident, &one_hot(&cells[span]), crib.offset)?;
+            let located = port.locate_keys(resident, &cells.part(span)?, crib.offset)?;
             keys.push(KeyReport {
                 cell: at,
                 detail: located.receipt.detail,
@@ -4327,7 +4309,7 @@ where
     // moment opened at cell zero.
     let (moment, aeon_cells) = match resident.continuing() {
         Some(continuing) => continuing,
-        None => (port.ingest(&mut resident, None, &[])?.0, 0),
+        None => (port.ingest(&mut resident, None, &cells.part(0..0)?)?.0, 0),
     };
     let start = resident
         .moment(&moment)
@@ -4392,7 +4374,7 @@ where
         let unit = Instant::now();
         position = span.start;
         let end = span.end;
-        let window = &cells[position..end];
+        let window = &cells.part(position..end)?;
         if window.len() == aperture && declared.deadline.is_some_and(|windows| compares >= windows)
         {
             deadline = Some(position as u64);
@@ -4460,7 +4442,7 @@ where
                     field, previous, form, carried, opened, &word,
                 )?);
             }
-            let (staged, compared) = port.compare(&mut resident, pending, &one_hot(window))?;
+            let (staged, compared) = port.compare(&mut resident, pending, window)?;
             work = work.then(&compared.receipt.work);
             if let ReceiptDetail::Compare { released, .. } = &compared.receipt.detail {
                 adjoint = adjoint.join(released);
@@ -4489,13 +4471,13 @@ where
                     });
                 }
             };
-            for (offset, ((((phase, tree), grained), model), &code)) in holon
+            for (offset, ((((phase, tree), grained), model), code)) in holon
                 .phases()
                 .iter()
                 .zip(&tree)
                 .zip(&tree_grain)
                 .zip(&model)
-                .zip(window)
+                .zip(window.classes_read())
                 .enumerate()
             {
                 let bits = if cut.held_out(position + offset) {
@@ -4594,14 +4576,14 @@ where
                 unit.elapsed().as_millis()
             );
         } else {
-            for &code in window {
+            for code in window.classes_read() {
                 baselines.update(code);
             }
         }
         let mut fed = 0;
         while fed < window.len() {
             let (_, ingested) =
-                port.ingest(&mut resident, Some(&moment), &one_hot(&window[fed..]))?;
+                port.ingest(&mut resident, Some(&moment), &window.part(fed..window.len())?)?;
             let ingested = ingested.forward.into_present().expect("ingest returns");
             fed += ingested.cells;
             if ingested.carry_out {
@@ -4855,9 +4837,10 @@ pub fn prequential(
     declaration: &LandmarkDeclaration,
 ) -> Result<Prequential, HnnError> {
     let held_out = |position: usize| cut.held_out(position);
+    let classes: Vec<usize> = cut.cells.classes_read().collect();
     let (tree, baselines) = rayon::join(
-        || run_tree(&cut.cells, letters, &held_out, declaration),
-        || run_baselines(&cut.cells, &held_out, declaration.alphabet),
+        || run_tree(&classes, letters, &held_out, declaration),
+        || run_baselines(&classes, &held_out, declaration.alphabet),
     );
     let ([development_tree, held_tree], run) = tree?;
     let ([development, held], counts) = baselines?;

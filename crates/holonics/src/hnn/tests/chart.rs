@@ -359,8 +359,11 @@ fn a_resident_reads_again_its_certified_charts() {
 #[test]
 fn a_deposit_moves_the_charts_by_warm_refinement() {
     let field = super::learning::chain();
-    let theta = generic(&field, 26);
-    let (current, _) = moment(&field, 27, 9);
+    // [agent-inferred, October 5] The generic material at seed 26 and the cut at 27 pass the 128-bit
+    // carrier on the fold-free chain (its source ring of period 4); the next draws, 27 and 28, lie
+    // within it.
+    let theta = generic(&field, 27);
+    let (current, _) = moment(&field, 28, 9);
     let mut charts = Charts::new();
     Operands::at_cut_charted(&field, &theta, &current, &mut charts).unwrap();
     let passive = theta.passive_factor(1).clone();

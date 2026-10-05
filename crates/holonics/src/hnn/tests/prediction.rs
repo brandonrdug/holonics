@@ -6,6 +6,7 @@ use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
 
 use super::learning::{chain, generic, moment};
+use crate::hnn::tests::support::encoded;
 use super::support::Draw;
 use crate::hnn::constitution::Constitution;
 use crate::hnn::field::{ConstitutionRead, Current, Field};
@@ -314,13 +315,13 @@ fn one_passage_weighs_every_datum_alike() {
     let (whole_current, whole) = {
         let mut current = Current::at_rest(&field);
         let mut moment = SourceMoment::open(&field, &current);
-        moment.ingest(&field, &mut current, &cells).unwrap();
+        moment.ingest(&field, &mut current, &encoded(&field, &cells)).unwrap();
         (current, moment)
     };
     let (current, request) = {
         let mut current = Current::at_rest(&field);
         let mut moment = SourceMoment::open(&field, &current);
-        moment.ingest(&field, &mut current, &cells[..7]).unwrap();
+        moment.ingest(&field, &mut current, &encoded(&field, &cells[..7])).unwrap();
         (current, moment)
     };
     // The joint field's receiving ring steps every cell, so the continuation's station 0 is the
@@ -945,7 +946,7 @@ fn native_opening_uses_the_scheduled_previous_phase() {
     use crate::hnn::ring::{PumpSchedule,ResonatorOperands};
     use crate::hnn::word::{ResonatorBalance,WordBalance};
     let field=chain().with_exact_word();
-    let material=ResonatorMaterial::of_parametron(&cycle(2),&rat(1,8),None).unwrap();
+    let material=ResonatorMaterial::of_parametron(&cycle(4),&rat(1,8),None).unwrap();
     let theta=Constitution::initial(&field,super::learning::OPEN_BUDGET).unwrap()
         .with_ring_resonator(&field,0,material.clone()).unwrap();
     let current=Current::at_rest(&field);
@@ -957,8 +958,9 @@ fn native_opening_uses_the_scheduled_previous_phase() {
     let scheduled=ResonatorOperands::scheduled(0,&material,&schedule,field.ring(0).admittance(),field.step(),None).unwrap();
     *operands.resonators_mut().get_mut(0).unwrap()=Some(scheduled.clone());
     let mut carried=EndChange::rest(&field,&operands);
-    let input=[vec![rat(1,2),Rat::zero(),Rat::zero(),Rat::zero()],
-               vec![Rat::zero(),Rat::zero(),rat(1,4),Rat::zero()]];
+    let width=field.ring(0).width();
+    let unit=|at:usize,value:Rat|(0..width).map(|j|if j==at{value.clone()}else{Rat::zero()}).collect::<Vec<_>>();
+    let input=[unit(0,rat(1,2)),unit(2,rat(1,4))];
     carried.resonators[0]=Some(input.clone());
     carried.resonator_phases[0]=Some(scheduled.phase_at(1));
     let expected=scheduled.energy_at(scheduled.phase_at(1),&input[0],&input[1]).unwrap();
@@ -1009,7 +1011,7 @@ fn symbols_request(field: &Field, seed: u64, n: usize) -> (Current, SourceMoment
     let mut moment = SourceMoment::open(field, &current);
     let mut fed = 0;
     while fed < cells.len() {
-        fed += moment.ingest(field, &mut current, &cells[fed..]).unwrap().cells;
+        fed += moment.ingest(field, &mut current, &encoded(field, &cells[fed..])).unwrap().cells;
     }
     (current, moment, cells)
 }

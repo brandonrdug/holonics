@@ -144,6 +144,8 @@ use holonics::aeon::{EnclosedBalance, LiteralComparison};
 use holonics::compression::cost::ceil_log2;
 use holonics::compression::landmark::context::baseline::PPM_ORDER;
 use holonics::compression::landmark::context::{Landmarks, cell_letters, letter_address};
+use holonics::compression::keys::transport::{CarryHelix, TransportLocation};
+use holonics::hnn::encoding::{Encoded, Encoding, EncodingError, PassageChart};
 use holonics::hnn::constitution::CAMPAIGN_ONE_BUDGET;
 use holonics::hnn::port::{ExecutionPort, ReceiptDetail};
 use holonics::hnn::receiving::landmark_declaration;
@@ -218,6 +220,23 @@ fn component<T>(value: &Component<T>, present: impl Fn(&T) -> String) -> String 
 
 // -------------------------------------------------------------------------------------------
 // the run
+
+/// [definition; agent-inferred, October 5; THE_MACHINE guard 9] **The cut's bytes through the one
+/// route a passage has into the field**: a located chart (the field's own key location over the
+/// bytes on the helix of its rings, `compression::keys::transport`), its founded encoding, then
+/// `Encoded::through`. Campaign 1's byte exposure read them through the residue chart `code mod d_g`,
+/// deleted October 5; on its rings `(5, 7, 11, 13)` the helix's joint period `5,005 = 5·7·11·13`
+/// passes the location's ceiling and 256 classes pass its receiving cells, so the route refuses and
+/// the run reports the refusal as its result.
+fn encoded_text(field: &Field, bytes: &[u8]) -> Result<Encoded, EncodingError> {
+    let periods = field.rings().iter().map(|ring| ring.period()).collect();
+    let helix = CarryHelix::new(periods)?;
+    let codes = vec![bytes.iter().map(|&byte| usize::from(byte)).collect::<Vec<usize>>()];
+    let location = TransportLocation::locate(helix, 256, &codes)?;
+    let chart = PassageChart::located(&location, &codes)?;
+    let encoding = Encoding::found(&chart)?;
+    Ok(Encoded::through(&encoding, &chart, field, &codes)?.remove(0))
+}
 
 fn main() {
     let arguments: Vec<String> = std::env::args().skip(1).collect();
@@ -334,11 +353,20 @@ fn main() {
         }
         None => length.saturating_sub(held_out.unwrap_or(HELD_OUT))..length,
     };
+    // THE_MACHINE guard 9: the cut's bytes enter the field only as an `Encoded`, built from a
+    // founded encoding; the run reports the route's refusal as its result.
+    let cells = match encoded_text(&field, &text[..length]) {
+        Ok(cells) => cells,
+        Err(refusal) => {
+            println!(
+                "hnn_exposure: {source}, {length} cells; refused: {refusal} (THE_MACHINE guard 9: a \
+                 byte passage enters the field only through a founded encoding)"
+            );
+            return;
+        }
+    };
     let cut = Cut {
-        cells: text[..length]
-            .iter()
-            .map(|&byte| usize::from(byte))
-            .collect(),
+        cells,
         held_out: vec![tail.clone()],
     };
     let reference = match deadline {
@@ -1595,7 +1623,8 @@ fn tree_alone(field: &Field, cut: &Cut, scored: usize) -> TreeAlone {
     let declaration =
         landmark_declaration(field, &field.receivers()[0]).expect("the receiver's declared tree");
     let depth = declaration.depth;
-    let cells = &cut.cells[..scored];
+    let classes: Vec<usize> = cut.cells.classes_read().take(scored).collect();
+    let cells = &classes[..];
     let letters = cell_letters(cells);
     let mut tree = Landmarks::new(declaration).expect("the receiver's tree");
     let mut population = PortPopulation::new(&[0]).expect("one family at prior one");
@@ -1653,7 +1682,8 @@ fn prior_mass_ladder(
     }
     let grain = base.grain;
     let digits = holonics::compression::landmark::context::odometer_digits(base.alphabet) as u32;
-    let letters = cell_letters(&cut.cells);
+    let classes: Vec<usize> = cut.cells.classes_read().collect();
+    let letters = cell_letters(&classes);
     println!(
         "prior-mass ladder over the cut's {} cells (B = {digits}, depth {}, base {:?})",
         cut.cells.len(),
@@ -1669,7 +1699,7 @@ fn prior_mass_ladder(
         let mut tree = Landmarks::new(declaration).expect("the receiver's tree at the prior mass");
         let zero = ExactInterval::point(Rat::zero());
         let (mut training, mut held_out) = (zero.clone(), zero);
-        for (position, &class) in cut.cells.iter().enumerate() {
+        for (position, &class) in classes.iter().enumerate() {
             let reading = tree
                 .receive(&letter_address(&letters, position, base.depth), class)
                 .expect("the tree receives the cell");

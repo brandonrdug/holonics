@@ -7,10 +7,11 @@
 use num_traits::Zero;
 
 use super::learning::{chain, generic};
+use crate::hnn::tests::support::encoded;
 use super::support::Draw;
 use crate::hnn::field::Current;
 use crate::hnn::port::{ExecutionPort, ReceiptDetail};
-use crate::hnn::reference::{Reference, one_hot};
+use crate::hnn::reference::{Reference};
 
 /// A cut on the chain: a generic constitution, or the declared initial one (whose first deposit
 /// keeps the constitution small).
@@ -33,7 +34,7 @@ fn cut(
     let mut draw = Draw::new(32);
     let cells: Vec<usize> = (0..9).map(|_| draw.below(4)).collect();
     let (moment, _) = reference
-        .ingest(&mut resident, None, &one_hot(&cells))
+        .ingest(&mut resident, None, &encoded(&field, &cells))
         .unwrap();
     (reference, resident, moment)
 }
@@ -49,12 +50,12 @@ fn a_delayed_compare_with_no_deposit_equals_the_immediate_one() {
     let (first, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
     let mut at_once = resident.clone();
     let (_, immediate) = reference
-        .compare(&mut at_once, first, &one_hot(&[3, 1]))
+        .compare(&mut at_once, first, &encoded(&chain(), &[3, 1]))
         .unwrap();
     reference.refine(&mut resident, &moment, &phases).unwrap();
     reference.refine(&mut resident, &moment, &phases).unwrap();
     let (_, delayed) = reference
-        .compare(&mut resident, first, &one_hot(&[3, 1]))
+        .compare(&mut resident, first, &encoded(&chain(), &[3, 1]))
         .unwrap();
     assert_eq!(delayed.forward, immediate.forward);
     assert_eq!(delayed.pullback, immediate.pullback);
@@ -75,7 +76,7 @@ fn a_compare_across_an_ingest_equals_one_taken_before_it() {
     // five cells that step ring 0 at most once cannot carry it out again.
     while !resident.awaiting_boundary() {
         reference
-            .ingest(&mut resident, Some(&moment), &one_hot(&[2]))
+            .ingest(&mut resident, Some(&moment), &encoded(&chain(), &[2]))
             .unwrap();
     }
     let admitted = resident.admitted().to_vec();
@@ -84,19 +85,19 @@ fn a_compare_across_an_ingest_equals_one_taken_before_it() {
     let (pending, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
     let mut before = resident.clone();
     let (_, immediate) = reference
-        .compare(&mut before, pending, &one_hot(&[3, 1]))
+        .compare(&mut before, pending, &encoded(&chain(), &[3, 1]))
         .unwrap();
     let lift = resident.current().lift().to_vec();
     let cells = resident.moment(&moment).unwrap().cells();
     let (_, ingested) = reference
-        .ingest(&mut resident, Some(&moment), &one_hot(&[1, 2, 1, 1, 2]))
+        .ingest(&mut resident, Some(&moment), &encoded(&chain(), &[1, 2, 1, 1, 2]))
         .unwrap();
     let ingested = ingested.forward.into_present().unwrap();
     assert_eq!((ingested.cells, ingested.carry_out), (5, false));
     assert_eq!(resident.moment(&moment).unwrap().cells(), cells + 5);
     assert_ne!(resident.current().lift(), lift.as_slice());
     let (_, delayed) = reference
-        .compare(&mut resident, pending, &one_hot(&[3, 1]))
+        .compare(&mut resident, pending, &encoded(&chain(), &[3, 1]))
         .unwrap();
     assert_eq!(delayed.forward, immediate.forward);
     assert_eq!(delayed.pullback, immediate.pullback);
@@ -130,7 +131,7 @@ fn after_a_deposit_the_compare_returns_the_residual_against_the_emitted_face() {
     let emitted = emitted.forward.into_present().unwrap();
     let (second, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
     let (staged, _) = reference
-        .compare(&mut resident, second, &one_hot(&[2, 0]))
+        .compare(&mut resident, second, &encoded(&chain(), &[2, 0]))
         .unwrap();
     reference.deposit(&mut resident, staged).unwrap();
     let (_, contemporary) = ratio
@@ -142,7 +143,7 @@ fn after_a_deposit_the_compare_returns_the_residual_against_the_emitted_face() {
         )
         .unwrap();
     let (_, delayed) = reference
-        .compare(&mut resident, first, &one_hot(&[2, 0]))
+        .compare(&mut resident, first, &encoded(&chain(), &[2, 0]))
         .unwrap();
     let ratio = delayed.forward.present().unwrap();
     let address = resident.address().truncated(phases.depth()).unwrap();

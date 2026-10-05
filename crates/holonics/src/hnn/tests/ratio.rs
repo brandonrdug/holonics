@@ -6,6 +6,7 @@ use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
 
 use super::learning::chain;
+use crate::hnn::tests::support::encoded;
 use super::support::Draw;
 use crate::hnn::field::Current;
 use crate::hnn::moment::SourceMoment;
@@ -14,7 +15,7 @@ use crate::hnn::ratio::{
     Face, Faces, HolonRatio, TargetPhases, power_of_two_enclosure, target_phases,
 };
 use crate::hnn::receiving::ReceivingRead;
-use crate::hnn::reference::{Reference, one_hot};
+use crate::hnn::reference::{Reference};
 use crate::ratio::algebraic::{ExactInterval, interval_difference, log2_of_enclosure};
 use crate::ratio::exponentiated::{CarriedPower, PhaseField, power_of_two};
 use crate::ratio::{Rat, integer, rat};
@@ -149,7 +150,7 @@ fn the_windowed_gap_stays_bounded_over_a_long_stream() {
     let zeros = read(vec![Rat::zero(); 2 * alphabet], 16);
     for (start, cells) in stream.chunks(aperture).enumerate() {
         if cells.len() == aperture && start % 29 == 0 {
-            let window = target_phases(field, current.lift(), ring, cells).unwrap();
+            let window = target_phases(field, current.lift(), ring, &encoded(field, cells)).unwrap();
             assert_eq!(window.branch, current.winding(field, ring).unwrap());
             for phase in &window.phases {
                 assert!(!phase.is_negative() && phase < &bound, "{phase}");
@@ -164,7 +165,7 @@ fn the_windowed_gap_stays_bounded_over_a_long_stream() {
             }
         }
         for &code in cells {
-            current.step(field, code).unwrap();
+            current.step(field, &encoded(field, &[code]), 0).unwrap();
         }
     }
     let turns = Rat::new(current.lift()[ring].clone(), period);
@@ -186,18 +187,18 @@ fn a_targets_phase_is_its_clock_and_ingesting_the_targets_reaches_it() {
     let mut fed = 0;
     while fed < history.len() {
         fed += moment
-            .ingest(field, &mut current, &history[fed..])
+            .ingest(field, &mut current, &encoded(field, &history[fed..]))
             .unwrap()
             .cells;
     }
     let targets = [0usize, 3, 2, 0, 3, 1];
-    let window = target_phases(field, current.lift(), 2, &targets).unwrap();
+    let window = target_phases(field, current.lift(), 2, &encoded(field, &targets)).unwrap();
     assert_eq!(window.branch, current.winding(field, 2).unwrap());
     let floor = &window.branch * &period;
     let mut fed = 0;
     while fed < targets.len() {
         fed += moment
-            .ingest(field, &mut current, &targets[fed..])
+            .ingest(field, &mut current, &encoded(field, &targets[fed..]))
             .unwrap()
             .cells;
     }
@@ -366,7 +367,7 @@ fn the_initial_faces_are_uniform_at_the_log_of_the_alphabet() {
     let reference = Reference::campaign_one();
     let mut resident = reference.mount(field, &Current::at_rest(field)).unwrap();
     let (moment, _) = reference
-        .ingest(&mut resident, None, &one_hot(&[3, 1, 1, 2, 0]))
+        .ingest(&mut resident, None, &encoded(&field, &[3, 1, 1, 2, 0]))
         .unwrap();
     let phases = resident.admitted()[0].clone();
     let (_, refined) = reference.refine(&mut resident, &moment, &phases).unwrap();

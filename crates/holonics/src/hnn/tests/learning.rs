@@ -2,6 +2,7 @@
 //! [`release.py`](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/release.py), a small chain for the return's exactness,
 //! and generic exact constitutions (control charts).
 
+use crate::hnn::tests::support::encoded;
 use super::support::{Draw, contact, ring};
 use crate::hnn::constitution::{Constitution, Reach};
 use crate::hnn::field::{
@@ -70,9 +71,12 @@ pub(super) fn six_path(aperture: usize) -> Field {
     path_with(aperture, &vec![integer(2); 6], &vec![integer(2); 5])
 }
 
-/// **A small chain**: rings of periods 2, 3, 2 joined `0–1–2` on their common nodes, exponents 2
+/// **A small chain**: rings of periods 4, 3, 2 joined `0–1–2` on their common nodes, exponents 2
 /// and 0, source ring 0, receiving ring 2 with aperture 2, `|A| = 4`, `Δ = {1}`; the first contact's
-/// admittance as declared.
+/// admittance as declared. [agent-inferred, October 5; THE_MACHINE guard 9] The source ring's
+/// period was 2, which held the four classes only through the residue chart `c mod 2`; it is 4, the
+/// least period on which they inject, so every declared test word keeps its classes, and its lock is
+/// `{0, 2}`, so each class fits the source ring as it did under the fold (the even classes).
 pub(super) fn chain_with(first_admittance: Rat) -> Field {
     chain_declared(first_admittance, 1 << 16, vec![1])
 }
@@ -98,7 +102,7 @@ fn chain_declared(first_admittance: Rat, population: u64, offsets: Vec<usize>) -
 /// lattices by rule): the fixture of the declaration's own laws. Its capacity is `n* = 71`.
 pub(super) fn chain_declaration(population: u64) -> FieldDeclaration {
     FieldDeclaration {
-        rings: vec![ring(2, vec![0]), ring(3, vec![0]), ring(2, vec![])],
+        rings: vec![ring(4, vec![0, 2]), ring(3, vec![0]), ring(2, vec![])],
         contacts: vec![contact(0, 1, 2, 2), contact(1, 2, 2, 0)],
         loops: Vec::new(),
         sources: vec![0],
@@ -206,13 +210,13 @@ pub(crate) fn generic_within(field: &Field, seed: u64, budget: u64) -> Constitut
 /// continues; only the resident waits for the boundary).
 pub(crate) fn moment(field: &Field, seed: u64, cells: usize) -> (Current, SourceMoment) {
     let mut draw = Draw::new(seed);
-    let codes: Vec<usize> = (0..cells).map(|_| draw.below(field.alphabet())).collect();
+    let codes: Vec<usize> = (0..cells).map(|_| draw.below(super::support::classes(&field))).collect();
     let mut current = Current::at_rest(field);
     let mut open = SourceMoment::open(field, &current);
     let mut fed = 0;
     while fed < codes.len() {
         fed += open
-            .ingest(field, &mut current, &codes[fed..])
+            .ingest(field, &mut current, &encoded(field, &codes[fed..]))
             .unwrap()
             .cells;
     }

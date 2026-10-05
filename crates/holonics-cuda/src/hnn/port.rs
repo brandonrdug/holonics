@@ -53,6 +53,7 @@ use holonics::hnn::constitution::{
     CAMPAIGN_ONE_BUDGET, Carrier, DepositReading, LandmarkStep, LinearLocus, gamma_length,
 };
 use holonics::hnn::keys::{self, KeyLocation};
+use holonics::hnn::encoding::Encoded;
 use holonics::hnn::moment::Ingested;
 use holonics::hnn::pending::Against;
 use holonics::hnn::port::{
@@ -487,27 +488,6 @@ pub struct Resident<'c> {
     tree_times: Rc<Cell<TreeTimes>>,
 }
 
-/// One-hot exterior cells as their codes (the reference's reading of a cell).
-fn codes(cells: &[Vec<(usize, Rat)>], alphabet: usize) -> Result<Vec<usize>, HnnError> {
-    cells
-        .iter()
-        .enumerate()
-        .map(|(position, cell)| match cell.as_slice() {
-            [(code, value)] if value.is_one() => {
-                if *code >= alphabet {
-                    Err(HnnError::CellOutside {
-                        code: *code,
-                        alphabet,
-                    })
-                } else {
-                    Ok(*code)
-                }
-            }
-            _ => Err(HnnError::CellNotOneHot { position }),
-        })
-        .collect()
-}
-
 impl<'c> Resident<'c> {
     /// Campaign 1's declarations on a card: `B_Θ = 2^33` and a pending capacity of 64 (the
     /// reference's), every locus's step certified at its deposit.
@@ -793,9 +773,11 @@ impl<'c> Resident<'c> {
         resident: &mut Mounted<'c>,
         slot: &PendingSlot<'c>,
         kept: Option<KeptRead<'c>>,
-        targets: &[usize],
+        target: &Encoded,
         field: &Field,
     ) -> Result<Compared<'c>, HnnError> {
+        let classes: Vec<usize> = target.classes_read().collect();
+        let targets = classes.as_slice();
         let commit = resident.constitution.commit();
         let ratio = &slot.ratio;
         let phases = ratio.phases().clone();
@@ -846,7 +828,7 @@ impl<'c> Resident<'c> {
             scored,
             holon,
             covector,
-        } = compare_phase(field, &resident.constitution, ratio, against, targets)?;
+        } = compare_phase(field, &resident.constitution, ratio, against, target)?;
         resident.constitution.receiving_map(phases.ring()).ok_or(
             HnnError::MissingReceivingMap {
                 ring: phases.ring(),
@@ -979,7 +961,7 @@ impl<'c> ExecutionPort for Resident<'c> {
         &self,
         resident: &mut Mounted<'c>,
         moment: Option<&MomentId>,
-        cells: &[Vec<(usize, Rat)>],
+        cells: &Encoded,
     ) -> Result<
         (
             MomentId,
@@ -991,7 +973,15 @@ impl<'c> ExecutionPort for Resident<'c> {
             return Err(HnnError::AeonAwaitingClose);
         }
         let field = resident.field.clone();
-        let codes = codes(cells, field.alphabet())?;
+        field.admit(cells)?;
+        // The card's kernel steps a ring by its lock's fit plus the carry (two ticks at most); a
+        // located route's digits are the host's alone until the kernel takes them (#76).
+        if cells.located().is_some() {
+            return Err(HnnError::Unadmitted {
+                reason: "the card steps by the lock's fit; a located route's digits are host-only",
+            });
+        }
+        let codes: Vec<usize> = cells.classes_read().collect();
         let id = match moment {
             Some(id) if resident.moments.contains_key(id) => *id,
             Some(id) => {
@@ -1032,7 +1022,7 @@ impl<'c> ExecutionPort for Resident<'c> {
         } else {
             open.card.ingest(&codes).map_err(device)?
         };
-        let ingested = open.host.ingest(&field, &mut resident.current, &codes)?;
+        let ingested = open.host.ingest(&field, &mut resident.current, cells)?;
         if carded != ingested || open.card.lift() != resident.current.lift() {
             return Err(HnnError::Realization {
                 what: "the card's ingest against the host's moment",
@@ -1119,7 +1109,7 @@ impl<'c> ExecutionPort for Resident<'c> {
     fn locate_keys(
         &self,
         resident: &mut Mounted<'c>,
-        crib: &[Vec<(usize, Rat)>],
+        crib: &Encoded,
         offset: usize,
     ) -> Result<
         InteractionReturn<KeyLocation, (), Vec<Option<Clock>>, Vec<ReceivingPhases>, PortReceipt>,
@@ -1129,15 +1119,15 @@ impl<'c> ExecutionPort for Resident<'c> {
             return Err(HnnError::KeysNotAdmitted);
         }
         let field = resident.field.clone();
-        let codes = codes(crib, field.alphabet())?;
-        if codes.len() as u64 > resident.aeon.closed {
+        field.admit(crib)?;
+        if crib.len() as u64 > resident.aeon.closed {
             return Err(HnnError::Shape {
                 what: "a closing crib's cells against the closed aeon's",
                 expected: usize::try_from(resident.aeon.closed).unwrap_or(usize::MAX),
-                found: codes.len(),
+                found: crib.len(),
             });
         }
-        let location = keys::locate_closing(&field, &resident.current, &codes, offset)?;
+        let location = keys::locate_closing(&field, &resident.current, crib, offset)?;
         let jumps = location.rekey(&field, &mut resident.current)?;
         resident.address.synchronize(&field, &resident.current)?;
         // Re-keying moves only the lift's phase classes: every resident moment steps from them.
@@ -1176,7 +1166,7 @@ impl<'c> ExecutionPort for Resident<'c> {
         for ring in &location.rings {
             holonics::hnn::port::added(&mut work, ring.work);
         }
-        let order = source_order(&field, resident.current.lift(), codes.len() as u64);
+        let order = source_order(&field, resident.current.lift(), crib.len() as u64);
         Ok(InteractionReturn {
             forward: Component::Present(location),
             pullback: Component::Absent("key location is discrete; the key covector is a reading"),
@@ -1347,7 +1337,7 @@ impl<'c> ExecutionPort for Resident<'c> {
         &self,
         resident: &mut Mounted<'c>,
         pending: PendingId,
-        target: &[Vec<(usize, Rat)>],
+        target: &Encoded,
     ) -> Result<
         (
             StagedId,
@@ -1362,7 +1352,8 @@ impl<'c> ExecutionPort for Resident<'c> {
             .ok_or(HnnError::UnknownHandle {
                 handle: Handle::Pending(pending),
             })?;
-        let targets = codes(target, field.alphabet())?;
+        field.admit(target)?;
+        let targets: Vec<usize> = target.classes_read().collect();
         let aperture = slot.ratio.phases().aperture();
         if targets.len() != aperture {
             return Err(HnnError::Shape {
@@ -1379,7 +1370,7 @@ impl<'c> ExecutionPort for Resident<'c> {
             .remove(&pending)
             .expect("the slot was read");
         let kept = slot.kept.take();
-        match self.compared(resident, &slot, kept, &targets, &field) {
+        match self.compared(resident, &slot, kept, target, &field) {
             Ok((holon, pullback, deposit, receipt, order, phases, wall, code_length)) => {
                 let PendingSlot {
                     ratio,

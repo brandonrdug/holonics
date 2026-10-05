@@ -5,6 +5,7 @@ use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
 
 use super::learning::chain;
+use crate::hnn::tests::support::encoded;
 use super::support::{
     Draw, Medium, Parts, chorded_field, injection, lift, ring, six_cycle, small_field,
 };
@@ -1122,7 +1123,7 @@ fn the_integral_chart_equals_the_termwise_arithmetic() {
     let mut current = Current::at_rest(&field);
     let mut moment = SourceMoment::open(&field, &current);
     let cells: Vec<usize> = (0..11).map(|_| draw.below(2)).collect();
-    moment.ingest(&field, &mut current, &cells).unwrap();
+    moment.ingest(&field, &mut current, &encoded(&field, &cells)).unwrap();
     let ring = field.ring(0);
     let covector = draw.vector(ring.width());
     let chart = moment

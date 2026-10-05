@@ -12,6 +12,7 @@ use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
 
 use super::learning::{OPEN_BUDGET, chain, chain_reach, generic, moment, phases, six_path};
+use crate::hnn::tests::support::encoded;
 use super::support::Draw;
 use crate::hnn::HnnError;
 use crate::hnn::constitution::{
@@ -25,7 +26,7 @@ use crate::hnn::port::{Deposit, ExecutionPort};
 use crate::hnn::propagation::Operands;
 use crate::hnn::ratio::{HolonRatio, target_phases};
 use crate::hnn::receiving::ActiveAddress;
-use crate::hnn::reference::{Reference, compose, one_hot};
+use crate::hnn::reference::{Reference, compose};
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::inertia::inertia;
 use crate::ratio::linear::vector::matrix_form;
@@ -737,7 +738,7 @@ fn chain_run() -> &'static [Deposited] {
         let reference = Reference::new(8, OPEN_BUDGET);
         let mut resident = reference.mount(&field, &Current::at_rest(&field)).unwrap();
         let (moment_id, _) = reference
-            .ingest(&mut resident, None, &one_hot(&[1, 2, 3, 0, 2]))
+            .ingest(&mut resident, None, &encoded(&field, &[1, 2, 3, 0, 2]))
             .unwrap();
         let phases = resident.admitted()[0].clone();
         let targets = [[2usize, 1], [0, 3], [1, 1], [3, 0], [0, 0], [2, 2], [1, 3]];
@@ -751,7 +752,7 @@ fn chain_run() -> &'static [Deposited] {
                     .compare(
                         &mut resident,
                         pending,
-                        &one_hot(&targets[k % targets.len()]),
+                        &encoded(&field, &targets[k % targets.len()]),
                     )
                     .unwrap();
                 let deposit = compared.deposit.into_present().unwrap();
@@ -1397,7 +1398,7 @@ fn every_family_steps_by_its_certificate() {
         .mount_with(&field, &Current::at_rest(&field), generic(&field, 71))
         .unwrap();
     let (moment_id, _) = reference
-        .ingest(&mut resident, None, &one_hot(&[1, 2, 3, 0, 2]))
+        .ingest(&mut resident, None, &encoded(&field, &[1, 2, 3, 0, 2]))
         .unwrap();
     let phases = resident.admitted()[0].clone();
     let targets = [[2usize, 1], [0, 3], [1, 1], [3, 0]];
@@ -1407,7 +1408,7 @@ fn every_family_steps_by_its_certificate() {
             .refine(&mut resident, &moment_id, &phases)
             .unwrap();
         let (staged, compared) = reference
-            .compare(&mut resident, pending, &one_hot(target))
+            .compare(&mut resident, pending, &encoded(&field, target))
             .unwrap();
         let deposit = compared.deposit.into_present().unwrap();
         let before = resident.constitution().clone();
@@ -1646,7 +1647,7 @@ fn the_budget_refuses_the_successor_and_keeps_the_predecessor() {
     let mut resident = reference.mount_with(&field, &current, tight).unwrap();
     let before = resident.constitution().clone();
     let (moment_id, _) = reference
-        .ingest(&mut resident, None, &one_hot(&[1, 2, 3, 0, 2, 1, 3]))
+        .ingest(&mut resident, None, &encoded(&field, &[1, 2, 3, 0, 2, 1, 3]))
         .unwrap();
     let phases = resident.admitted()[0].clone();
     let mut refused = None;
@@ -1655,7 +1656,7 @@ fn the_budget_refuses_the_successor_and_keeps_the_predecessor() {
             .refine(&mut resident, &moment_id, &phases)
             .unwrap();
         let (staged, _) = reference
-            .compare(&mut resident, pending, &one_hot(&[2, 1]))
+            .compare(&mut resident, pending, &encoded(&field, &[2, 1]))
             .unwrap();
         match reference.deposit(&mut resident, staged) {
             Ok(_) => continue,
@@ -1684,7 +1685,7 @@ fn the_budget_refuses_the_successor_and_keeps_the_predecessor() {
         .refine(&mut resident, &moment_id, &phases)
         .unwrap();
     let (staged, _) = reference
-        .compare(&mut resident, pending, &one_hot(&[0, 0]))
+        .compare(&mut resident, pending, &encoded(&field, &[0, 0]))
         .unwrap();
     assert!(matches!(
         reference.deposit(&mut resident, staged),
@@ -1793,9 +1794,10 @@ fn the_standing_is_founded_off_its_nodes() {
     for (g, contrast) in theta.standing_contrasts().iter().enumerate() {
         assert_eq!(&field.standing_contrast(&theta, g).unwrap(), contrast);
         for (rho, x) in contrast.iter().enumerate() {
-            // Ring 1's third node meets no channel: its component is its own, `Δ = −q`.
-            let first = if g == 1 && rho >= 4 {
-                unit(1)
+            // Ring 0's third and fourth nodes and ring 1's third meet no channel: their components
+            // are their own, `Δ = −q`.
+            let first = if (g == 0 || g == 1) && rho >= 4 {
+                unit(g)
             } else {
                 coarsest.clone()
             };
@@ -1805,7 +1807,7 @@ fn the_standing_is_founded_off_its_nodes() {
     let current = Current::at_rest(&field);
     let operands = Operands::at_cut(&field, &theta, &current).unwrap();
     assert!(operands.rings().iter().all(|ring| ring.sheets().iter().all(|s| *s)));
-    // The chain at one matched coordinate founds at (2, 3, 2) units.
+    // The chain at one matched coordinate founds at (4, 3, 2) units.
     assert_eq!(theta.standing(0)[0], &coarsest * integer(2));
     assert_eq!(theta.standing(1)[0], &coarsest * integer(3));
     assert_eq!(theta.standing(2)[0], &coarsest * integer(2));
@@ -1865,7 +1867,7 @@ fn a_deposit_reaches_only_the_diamond_and_sums_only_its_window() {
     .unwrap();
     let (word, faces) = pending.read(&field, &theta).unwrap();
     let targets = [1usize, 0];
-    let anchors = target_phases(&field, pending.anchor(), 2, &targets).unwrap();
+    let anchors = target_phases(&field, pending.anchor(), 2, &encoded(&field, &targets)).unwrap();
     let ratio = HolonRatio::compare(faces, &targets, &anchors).unwrap();
     let back = word
         .pull_back(
@@ -1974,7 +1976,7 @@ fn the_initial_constitution_is_the_declared_one() {
     let field = chain();
     let theta = Constitution::initial(&field, OPEN_BUDGET).unwrap();
     let source = theta.source_port(0).unwrap();
-    assert!((source.rows(), source.columns()) == (4, 4));
+    assert!((source.rows(), source.columns()) == (8, 4));
     assert!(source.entries().iter().all(|x| x.abs() == rat(1, 2)));
     assert_eq!(
         source.get(3, 2).unwrap(),
@@ -1989,7 +1991,7 @@ fn the_initial_constitution_is_the_declared_one() {
         (0, 0, 2)
     );
     let pair = theta.pair_port(0, 1).unwrap();
-    assert_eq!(pair.rank(), 4);
+    assert_eq!(pair.rank(), field.ring(0).width());
     assert!(pair.outputs().iter().flatten().all(Zero::is_zero));
     for g in 0..field.rings().len() {
         let n = field.ring(g).width();
@@ -2232,7 +2234,7 @@ fn a_contacts_channel_rebases_with_its_carried_remainders() {
         .unwrap();
         let (word, faces) = pending.read(&field, theta).unwrap();
         let targets = [1usize, 0];
-        let anchors = target_phases(&field, pending.anchor(), 2, &targets).unwrap();
+        let anchors = target_phases(&field, pending.anchor(), 2, &encoded(&field, &targets)).unwrap();
         let ratio = HolonRatio::compare(faces, &targets, &anchors).unwrap();
         let back = word
             .pull_back(

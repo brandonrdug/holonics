@@ -8,6 +8,7 @@ use num_bigint::{BigInt, BigUint};
 use num_traits::{Signed, Zero};
 
 use super::learning::chain;
+use crate::hnn::tests::support::encoded;
 use super::support::{Draw, Medium, Parts, contact, small_field};
 use crate::hnn::field::{ConstitutionRead, Current, Field};
 use crate::hnn::moment::{SourceMoment, capacity};
@@ -27,15 +28,22 @@ fn the_capacity_is_the_least_lossy_population_by_counting() {
     }
 }
 
-/// Campaign 1's declared source state (periods 5, 7, 11, 13; source ring 0; bytes; `Δ = {1}`),
-/// counted without declaring the field: `n* = 6,148`, certified by exact integers at `n* − 1` and
-/// `n*`.
+/// Campaign 1's declared source state (periods 5, 7, 11, 13; source ring 0; its five classes,
+/// THE_MACHINE guard 9; `Δ = {1}`), counted without declaring the field: `n* = 190 = 2·5·19`,
+/// certified by exact integers at `n* − 1` and `n*`. [historical] On the bytes it read through the
+/// residue chart, `|A| = 256`, the count was `6,148`; the formula still reads it.
 #[test]
 fn campaign_one_capacity_is_certified_at_its_crossover() {
-    let capacity = capacity(&[5, 7, 11, 13], &[0], 256, &[1]).unwrap();
-    assert_eq!(capacity.n_star(), 6_148);
-    assert!(!capacity.lossy_at(6_147));
-    assert!(capacity.lossy_at(6_148));
+    let capacity = capacity(&[5, 7, 11, 13], &[0], 5, &[1]).unwrap();
+    assert_eq!(capacity.n_star(), 190);
+    assert!(!capacity.lossy_at(189));
+    assert!(capacity.lossy_at(190));
+    assert_eq!(
+        crate::hnn::moment::capacity(&[5, 7, 11, 13], &[0], 256, &[1])
+            .unwrap()
+            .n_star(),
+        6_148
+    );
 }
 
 /// The clocked closed form of selective stepping, computed independently: ring `g`'s lift after
@@ -87,7 +95,7 @@ fn per_cell_ingest_equals_the_clocked_closed_form() {
     let mut fed = 0;
     while fed < cells.len() {
         fed += moment
-            .ingest(field, &mut current, &cells[fed..])
+            .ingest(field, &mut current, &encoded(field, &cells[fed..]))
             .unwrap()
             .cells;
     }
@@ -135,12 +143,12 @@ fn the_moment_contracts_to_the_streamed_encoder_sum() {
     let mut phases = Vec::new();
     let mut probe = current.clone();
     for &code in &cells {
-        probe.step(&field, code).unwrap();
+        probe.step(&field, &encoded(&field, &[code]), 0).unwrap();
         phases.push(probe.lift()[0].clone());
     }
     while fed < cells.len() {
         fed += moment
-            .ingest(&field, &mut current, &cells[fed..])
+            .ingest(&field, &mut current, &encoded(&field, &cells[fed..]))
             .unwrap()
             .cells;
     }
@@ -187,8 +195,8 @@ fn the_encoder_covector_is_the_exact_directional_derivative() {
     let cells: Vec<usize> = (0..10).map(|_| draw.below(4)).collect();
     let mut current = Current::at_rest(field);
     let mut moment = SourceMoment::open(field, &current);
-    moment.ingest(field, &mut current, &cells).unwrap();
-    let covector = draw.vector(4);
+    moment.ingest(field, &mut current, &encoded(field, &cells)).unwrap();
+    let covector = draw.vector(field.ring(0).width());
     let base = dot(
         &covector,
         &moment.open_storage(field, &medium, &current).unwrap()[0],
@@ -196,7 +204,7 @@ fn the_encoder_covector_is_the_exact_directional_derivative() {
     let gradient = moment
         .encoder_covector(field, &current, 0, &covector, &crate::ratio::integer(1))
         .unwrap();
-    let direction = draw.matrix(4, 4);
+    let direction = draw.matrix(field.ring(0).width(), field.alphabet());
     let pairing: Rat = gradient
         .entries()
         .iter()
@@ -220,12 +228,12 @@ fn the_pair_buffer_overwrites_and_its_bits_are_counted() {
     let mut moment = SourceMoment::open(field, &current);
     assert_eq!(moment.window(), vec![None]);
     let empty = moment.dense_bits();
-    moment.ingest(field, &mut current, &[3, 1, 2]).unwrap();
+    moment.ingest(field, &mut current, &encoded(field, &[3, 1, 2])).unwrap();
     assert_eq!(moment.window(), vec![Some(2)]);
     // Slots are fixed: only their widths change. The held cell's 3 bits are in the empty code too
-    // (`d = 2`, `|A| = 4`).
+    // (`d = 4`, `|A| = 4`).
     assert!(moment.dense_bits() >= empty);
-    assert_eq!(empty, 2 * (2 * 4 + 2 * 4 * 4) + 3);
+    assert_eq!(empty, 2 * (4 * 4 + 4 * 4 * 4) + 3);
 }
 
 /// Ingest stops at the joint clock's carry-out: the aeon boundary belongs to the winding.
@@ -235,11 +243,11 @@ fn ingest_stops_at_the_carry_out() {
     let mut current = Current::at_rest(&field);
     let mut moment = SourceMoment::open(&field, &current);
     // Code 0 steps both rings: ring 1 wraps at the second cell (1 + 1 + carry).
-    let ingested = moment.ingest(&field, &mut current, &[0, 0, 0, 0]).unwrap();
+    let ingested = moment.ingest(&field, &mut current, &encoded(&field, &[0, 0, 0, 0])).unwrap();
     assert!(ingested.carry_out);
     assert_eq!(ingested.cells, 2);
     assert_eq!(moment.cells(), 2);
-    let rest = moment.ingest(&field, &mut current, &[1, 1]).unwrap();
+    let rest = moment.ingest(&field, &mut current, &encoded(&field, &[1, 1])).unwrap();
     assert!(!rest.carry_out);
     assert_eq!(rest.cells, 2);
 }
@@ -278,7 +286,7 @@ fn the_open_reads_the_normalized_counts_and_no_window() {
     let mut fed = 0;
     while fed < cells.len() {
         fed += moment
-            .ingest(field, &mut current, &cells[fed..])
+            .ingest(field, &mut current, &encoded(field, &cells[fed..]))
             .unwrap()
             .cells;
     }
@@ -311,7 +319,7 @@ fn ingest_split(field: &Field, cells: &[usize], splits: &[usize]) -> (SourceMome
         let mut fed = start;
         while fed < end {
             fed += moment
-                .ingest(field, &mut current, &cells[fed..end])
+                .ingest(field, &mut current, &encoded(field, &cells[fed..end]))
                 .unwrap()
                 .cells;
         }
@@ -329,7 +337,7 @@ fn the_moment_is_one_across_every_split() {
     let field = &chain();
     let medium = Medium::generic(field, 11, Parts::default());
     let mut draw = Draw::new(29);
-    let cells: Vec<usize> = (0..4096).map(|_| draw.below(field.alphabet())).collect();
+    let cells: Vec<usize> = (0..4096).map(|_| draw.below(super::support::classes(&field))).collect();
     let (whole, lift) = ingest_split(field, &cells, &[]);
     let open = whole.open_storage(field, &medium, &lift).unwrap();
     let same = |(moment, current): (SourceMoment, Current)| {
@@ -406,7 +414,7 @@ fn the_leaky_count_reads_the_transported_weights_over_many_turns() {
     let modulus = founded.transport(0);
     assert!(modulus < Rat::from_integer(1.into()));
     let mut draw = Draw::new(24);
-    let cells: Vec<usize> = (0..400).map(|_| draw.below(256)).collect();
+    let cells: Vec<usize> = (0..400).map(|_| draw.below(super::support::classes(&field))).collect();
     let chart = PopulationChart::of(field);
     let unit = Rat::new(BigInt::from(1), BigInt::from(1u64 << chart.exponent()));
 
@@ -415,7 +423,7 @@ fn the_leaky_count_reads_the_transported_weights_over_many_turns() {
     let mut entered = Vec::new();
     let mut ticks = 0u64;
     for &code in &cells {
-        let step = walk.step(field, code).unwrap();
+        let step = walk.step(field, &encoded(field, &[code]), 0).unwrap();
         ticks += u64::from(step.ticks[0]);
         entered.push((walk.phase(field, 0).unwrap() as usize, code, ticks));
         if step.carry_out {
@@ -431,13 +439,13 @@ fn the_leaky_count_reads_the_transported_weights_over_many_turns() {
 
     let mut current = Current::at_rest(field);
     let mut moment = SourceMoment::open_with(field, &current, &founded).unwrap();
-    moment.ingest(field, &mut current, &cells[..fed]).unwrap();
+    moment.ingest(field, &mut current, &encoded(field, &cells[..fed])).unwrap();
     let mut plain_current = Current::at_rest(field);
     let mut plain = SourceMoment::open_with(field, &plain_current, &lossless).unwrap();
-    plain.ingest(field, &mut plain_current, &cells[..fed]).unwrap();
+    plain.ingest(field, &mut plain_current, &encoded(field, &cells[..fed])).unwrap();
     let mut reference_current = Current::at_rest(field);
     let mut reference = SourceMoment::open(field, &reference_current);
-    reference.ingest(field, &mut reference_current, &cells[..fed]).unwrap();
+    reference.ingest(field, &mut reference_current, &encoded(field, &cells[..fed])).unwrap();
     let one = Rat::from_integer(1.into());
     for phase in 0..field.ring(0).period() as usize {
         let read = moment.normalized_counts(field, 0, phase, &modulus).unwrap();
@@ -464,44 +472,87 @@ fn the_leaky_count_reads_the_transported_weights_over_many_turns() {
     assert!(moment.normalized_counts(field, 0, 0, &one).is_err());
 }
 
+/// A field of one closing source ring of period 256 at the quarter turns, its lock `{0}`, reading
+/// 256 classes (each its own port: no fold), over campaign 1's population.
+fn wide_field() -> Field {
+    use crate::geometry::RatVec3;
+    use crate::geometry::screw::ScrewGenerator;
+    use crate::hnn::field::{CribDeclaration, FieldDeclaration, ReceiverDeclaration, RingDeclaration};
+    let d = 256u64;
+    Field::declare(
+        FieldDeclaration {
+            rings: vec![RingDeclaration {
+                period: d,
+                screw: ScrewGenerator::new(RatVec3::from_i64(0, 0, 1), RatVec3::zero()),
+                placements: (0..d).map(|node| FieldDeclaration::quarter_turn(node, d)).collect(),
+                lock: vec![0],
+                reflector: (0..d).map(|port| ((d - port) % d) as usize).collect(),
+                admittance: crate::ratio::integer(2),
+                initial: 0,
+            }],
+            contacts: Vec::new(),
+            loops: Vec::new(),
+            sources: vec![0],
+            offsets: Vec::new(),
+            alphabet: 256,
+            step: crate::ratio::integer(1),
+            exponent_grain: 1,
+            receivers: vec![ReceiverDeclaration {
+                ring: 0,
+                aperture: 1,
+                tolerance: crate::ratio::rat(1, 16),
+                depth: 2,
+                prior: crate::compression::landmark::context::StopPrior::half(),
+                mass: 1,
+                base: crate::compression::landmark::context::BaseMeasure::Even,
+                receiving_prior: 0,
+            }],
+            crib: CribDeclaration { window: 64, offset: 1 },
+            population: 6_148,
+            lattice: Default::default(),
+        }
+        .by_lattice_rule(),
+    )
+    .unwrap()
+}
+
 /// The leaky read is not within one chart unit in general, on the ingest's own path (Lean
-/// `HNN/IndexedOpen.leaky_read_exceeds_chart_unit`). On campaign 1's field at the founded transport
-/// `ρ₀ = 10809/2^17` (chart `2^(−18)`, lattice `2^(−19)`), ring 0 ticks only at the codes its lock
-/// selects (`x ≡ 0 mod 5`, the residue port chart), and each tick's datum enters at the new phase.
-/// Code 5 and the 204 codes the lock does not select enter 205 slots of phase 1; codes 0 and 10
-/// tick the ring to phases 2 and 3. Each phase-1 slot carries `3566` against its exact
-/// `ρ₀² 2^19 = 116834481/2^15`, phase 2's carries `43236 = ρ₀ 2^19` exactly, and the newest
-/// datum's read `chart(2^19/(2^19 + 43236 + 205 · 3566)) = 105840/2^18` is more than eight chart
-/// units below its transported weight `1/(1 + ρ₀ + 205 ρ₀²)`.
+/// `HNN/IndexedOpen.leaky_read_exceeds_chart_unit`). On a ring of period 256 reading 256 classes
+/// (each its own port: THE_MACHINE guard 9; the counterexample was built on campaign 1's bytes
+/// through the residue port chart until October 5), at campaign 1's founded transport
+/// `ρ₀ = 10809/2^17` (chart `2^(−18)` at its population), ring 0 ticks only at class 0, and each
+/// tick's datum enters at the new phase. Class 0 and the 204 classes `1 … 204` the lock does not
+/// select enter 205 slots of phase 1; two more cells of class 0 tick the ring to phases 2 and 3.
+/// Each phase-1 slot carries `3566` against its exact `ρ₀² 2^19 = 116834481/2^15`, phase 2's
+/// carries `43236 = ρ₀ 2^19` exactly, and the newest datum's read
+/// `chart(2^19/(2^19 + 43236 + 205 · 3566)) = 105840/2^18` is more than eight chart units below its
+/// transported weight `1/(1 + ρ₀ + 205 ρ₀²)`.
 #[test]
 fn the_leaky_read_is_not_within_one_chart_unit_in_general() {
     use crate::hnn::constitution::{Constitution, Locus};
-    use crate::hnn::field::FieldDeclaration;
     use crate::hnn::moment::PopulationChart;
-    let field = &Field::declare(FieldDeclaration::campaign_one(6_148)).unwrap();
-    let founded = Constitution::initial(field, 1 << 33)
-        .unwrap()
-        .founded_transport(field, 0)
-        .unwrap();
-    let modulus = founded.transport(0);
+    let field = &wide_field();
     let dyadic = |numerator: u64, exponent: u32| {
         Rat::new(BigInt::from(numerator), BigInt::from(1u64 << exponent))
     };
-    assert_eq!(modulus, dyadic(10_809, 17));
+    let modulus = dyadic(10_809, 17);
+    let founded = Constitution::initial(field, 1 << 33)
+        .unwrap()
+        .with_transport(0, modulus.clone())
+        .unwrap();
     assert_eq!(
         founded.lattice(Locus::SourcePort(0)).unwrap().exponent(),
         18
     );
     assert_eq!(PopulationChart::of(field).exponent(), 18);
 
-    let mut cells = vec![5usize];
-    cells.extend((0..256).filter(|code| code % 5 != 0));
-    cells.extend([0, 10]);
+    let mut cells = vec![0usize];
+    cells.extend(1..205);
+    cells.extend([0, 0]);
     let mut walk = Current::at_rest(field);
-    let phases: Vec<u64> = cells
-        .iter()
-        .map(|&code| {
-            walk.step(field, code).unwrap();
+    let phases: Vec<u64> = (0..cells.len())
+        .map(|k| {
+            walk.step(field, &encoded(field, &cells[k..=k]), 0).unwrap();
             walk.phase(field, 0).unwrap()
         })
         .collect();
@@ -510,9 +561,9 @@ fn the_leaky_read_is_not_within_one_chart_unit_in_general() {
 
     let mut current = Current::at_rest(field);
     let mut moment = SourceMoment::open_with(field, &current, &founded).unwrap();
-    let ingested = moment.ingest(field, &mut current, &cells).unwrap();
+    let ingested = moment.ingest(field, &mut current, &encoded(field, &cells)).unwrap();
     assert_eq!((ingested.cells, ingested.carry_out), (207, false));
-    let newest = moment.normalized_counts(field, 0, 3, &modulus).unwrap()[10].clone();
+    let newest = moment.normalized_counts(field, 0, 3, &modulus).unwrap()[0].clone();
     assert_eq!(newest, dyadic(105_840, 18));
     let one = Rat::from_integer(1.into());
     let weight =

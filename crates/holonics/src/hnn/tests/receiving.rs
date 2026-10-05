@@ -12,6 +12,7 @@ use num_bigint::BigInt;
 use num_traits::{One, Zero};
 
 use super::learning::{OPEN_BUDGET, chain, chain_declaration, moment, phases};
+use crate::hnn::tests::support::encoded;
 use super::support::{Draw, Medium, Parts, lift, small_field};
 use crate::compression::landmark::context::{
     Landmarks, Letter, LetterFamily, Widths, address, letter_address,
@@ -28,7 +29,7 @@ use crate::hnn::receiving::{
     ActiveAddress, Feature, FeatureFamily, LetterReader, RankScope, ReceivingPhases, ReceivingRead,
     clock_letters, grain_logits, landmark_declaration, tree_code_length,
 };
-use crate::hnn::reference::{Reference, compose, one_hot};
+use crate::hnn::reference::{Reference, compose};
 use crate::hnn::ring::ResonatorMaterial;
 use crate::hnn::word::Word;
 use crate::ratio::algebraic::{ExactInterval, log2_enclosure};
@@ -240,9 +241,10 @@ fn the_phase_address_is_the_trees_causal_address() {
 
 /// **The receiver declares its tree, and the field codes it** (guard 13): the tree's declaration
 /// is the field's `|A|` and population, the receiver's depth and grain, the cell emitted as its odometer digits, with
-/// no forced split; campaign 1 declares `D = 63`, the prior mass `2^(−3)` and the root's base, and at
-/// `n* = 6,148 = 2²·29·53`, `L_R = 16`, `B = 8` the owner derives the path lattice `M_p = 50` (its
-/// floor `1/(2(2³n* + 2))` at the root's base, the path depth 63) and the β carrier `W = 37`. A change of prior mass changes the field's code too. A change of depth changes the field's code; the initial
+/// no forced split; campaign 1 declares `D = 63`, the prior mass `2^(−3)` and the root's base, and on
+/// its five classes (THE_MACHINE guard 9) at `n* = 190 = 2·5·19`, `L_R = 16`, `B = 3` the owner
+/// derives the path lattice `M_p = 49` (its floor `1/(2(2³n* + 2))` at the root's base, the path
+/// depth 63) and the β carrier `W = 35` (`6,148`, `8`, `50` and `37` on the bytes before October 5). A change of prior mass changes the field's code too. A change of depth changes the field's code; the initial
 /// constitution carries a tree on the receiving ring only, empty, and its receiving map `R_0 = 0`
 /// and source port `E_0` the declared sign sequence times ½ (entries `±½`).
 #[test]
@@ -257,18 +259,18 @@ fn the_field_declares_the_tree_and_codes_it() {
     );
     let campaign = Field::declare(FieldDeclaration::campaign_one(6_148)).unwrap();
     assert_eq!(campaign.receivers()[0].depth, 63);
-    assert_eq!(campaign.capacity().n_star(), 6_148);
+    assert_eq!(campaign.capacity().n_star(), 190);
     let declared = landmark_declaration(&campaign, &campaign.receivers()[0]).unwrap();
     assert_eq!(
         (declared.alphabet, declared.depth, declared.forced),
-        (256, 63, 0)
+        (5, 63, 0)
     );
     assert_eq!(
         (declared.population, declared.grain, declared.mass),
         (6_148, 16, 3)
     );
     let widths = Widths::derived(&declared);
-    assert_eq!((widths.digits, widths.face, widths.carrier), (8, 50, 37));
+    assert_eq!((widths.digits, widths.face, widths.carrier), (3, 49, 35));
     assert_eq!(
         declared.base,
         crate::compression::landmark::context::BaseMeasure::Root
@@ -405,7 +407,7 @@ fn the_compare_deposits_its_targets_on_their_own_addresses() {
     let (word, wave) = pending.read(&field, &theta).unwrap();
     let against = pending.against(&theta, &wave, &targets).unwrap();
     let scored = pending.scored(&theta, &against, &targets).unwrap();
-    let anchors = target_phases(&field, pending.anchor(), 2, &targets).unwrap();
+    let anchors = target_phases(&field, pending.anchor(), 2, &encoded(&field, &targets)).unwrap();
     let ratio = HolonRatio::compare(against.faces, &targets, &anchors).unwrap();
     let back = word
         .pull_back(
@@ -474,7 +476,7 @@ fn the_wave_is_inert_when_every_map_opens_at_zero() {
     let a = field.alphabet();
     let initial = Constitution::initial(&field, OPEN_BUDGET).unwrap();
     let silent = initial
-        .with_ports(0, None, Some(ExactRatMatrix::zero(4, a).unwrap()), None)
+        .with_ports(0, None, Some(ExactRatMatrix::zero(field.ring(0).width(), a).unwrap()), None)
         .unwrap();
     let reference = Reference::campaign_one();
     let mut resident = reference
@@ -483,14 +485,14 @@ fn the_wave_is_inert_when_every_map_opens_at_zero() {
     let mut draw = Draw::new(91);
     let cells: Vec<usize> = (0..12).map(|_| draw.below(a)).collect();
     let (moment_id, _) = reference
-        .ingest(&mut resident, None, &one_hot(&cells[..6]))
+        .ingest(&mut resident, None, &encoded(&field, &cells[..6]))
         .unwrap();
     let phases = resident.admitted()[0].clone();
     let (pending, _) = reference
         .refine(&mut resident, &moment_id, &phases)
         .unwrap();
     let (staged, compared) = reference
-        .compare(&mut resident, pending, &one_hot(&cells[6..8]))
+        .compare(&mut resident, pending, &encoded(&field, &cells[6..8]))
         .unwrap();
     let pullback = compared.pullback.present().unwrap();
     assert!(
@@ -532,14 +534,14 @@ fn r_opens_at_zero_and_learns_from_the_first_deposit() {
     let mut resident = reference.mount(&field, &Current::at_rest(&field)).unwrap();
     let mut draw = Draw::new(92);
     let cells: Vec<usize> = (0..14).map(|_| draw.below(a)).collect();
-    let (moment_id, _) = reference.ingest(&mut resident, None, &[]).unwrap();
+    let (moment_id, _) = reference.ingest(&mut resident, None, &encoded(&field, &[])).unwrap();
     let phases = resident.admitted()[0].clone();
     // The cells in order, each aeon closed at the joint clock's carry-out.
     let feed = |resident: &mut crate::hnn::Resident, cells: &[usize]| {
         let mut fed = 0;
         while fed < cells.len() {
             let (_, ingested) = reference
-                .ingest(resident, Some(&moment_id), &one_hot(&cells[fed..]))
+                .ingest(resident, Some(&moment_id), &encoded(&field, &cells[fed..]))
                 .unwrap();
             let ingested = ingested.forward.into_present().unwrap();
             fed += ingested.cells;
@@ -553,7 +555,7 @@ fn r_opens_at_zero_and_learns_from_the_first_deposit() {
     let window = |resident: &mut crate::hnn::Resident, at: usize| {
         let (pending, _) = reference.refine(resident, &moment_id, &phases).unwrap();
         let (staged, compared) = reference
-            .compare(resident, pending, &one_hot(&cells[at..at + 2]))
+            .compare(resident, pending, &encoded(&field, &cells[at..at + 2]))
             .unwrap();
         let tree = match &compared.receipt.detail {
             ReceiptDetail::Compare { tree_grain, .. } => tree_grain.clone(),
@@ -792,15 +794,18 @@ fn the_receiving_face_codes_within_one_bit_of_the_better_face() {
     let field = chain_of(length as u64);
     let mut draw = Draw::new(97);
     let cut = Cut {
-        cells: (0..length)
-            .map(|k| {
-                if draw.below(8) == 0 {
-                    draw.below(4)
-                } else {
-                    [0, 1, 2, 1][k % 4]
-                }
-            })
-            .collect(),
+        cells: encoded(
+            &field,
+            &(0..length)
+                .map(|k| {
+                    if draw.below(8) == 0 {
+                        draw.below(4)
+                    } else {
+                        [0, 1, 2, 1][k % 4]
+                    }
+                })
+                .collect::<Vec<_>>(),
+        ),
         held_out: std::iter::once(length - 4..length).collect(),
     };
     let exposure = Reference::new(64, OPEN_BUDGET)
@@ -837,7 +842,7 @@ fn the_receiving_face_codes_within_one_bit_of_the_better_face() {
     // The tree read in cell order is the count-only prequential tree, exactly.
     let receiver = &field.receivers()[0];
     let declared = landmark_declaration(&field, receiver).unwrap();
-    let letters = crate::compression::landmark::context::cell_letters(&cut.cells);
+    let letters = crate::compression::landmark::context::cell_letters(&cut.cells.classes_read().collect::<Vec<_>>());
     let alone = crate::hnn::reference::prequential(&cut, &letters, &declared).unwrap();
     let narrow = Rat::new(1.into(), num_bigint::BigInt::from(1u8) << 60usize);
     for (exposed, measured) in [
@@ -884,8 +889,8 @@ fn the_bundle_letters_are_read_from_the_clock_before_the_cell_they_predict() {
     let field = campaign_field();
     let family = clock_family();
     let mut draw = Draw::new(29);
-    let cells: Vec<usize> = (0..3_000).map(|_| (draw.next() % 256) as usize).collect();
-    let letters = clock_letters(&field, &family, &cells, &[]).unwrap();
+    let cells: Vec<usize> = (0..3_000).map(|_| (draw.next() % super::support::classes(&field) as u64) as usize).collect();
+    let letters = clock_letters(&field, &family, &encoded(&field, &cells), &[]).unwrap();
     assert!(matches!(letters[0], Letter::Bundle(_)));
     let depth = 3;
     let aperture = 2;
@@ -912,14 +917,14 @@ fn the_bundle_letters_are_read_from_the_clock_before_the_cell_they_predict() {
             );
         }
         for (offset, &cell) in targets.iter().enumerate() {
-            let step = current.step(&field, cell).unwrap();
+            let step = current.step(&field, &encoded(&field, &[cell]), 0).unwrap();
             register.receive(cell).unwrap();
             assert!(register.reader().agrees(&field, &current, current.lift()));
             if step.carry_out {
                 let end = p + offset + 1;
                 let from = end.saturating_sub(crib.window).max(aeon_start);
                 let location =
-                    keys::locate_closing(&field, &current, &cells[from..end], crib.offset).unwrap();
+                    keys::locate_closing(&field, &current, &encoded(&field, &cells[from..end]), crib.offset).unwrap();
                 location.rekey(&field, &mut current).unwrap();
                 register.synchronize(&field, &current).unwrap();
                 aeon_start = end;
@@ -932,9 +937,9 @@ fn the_bundle_letters_are_read_from_the_clock_before_the_cell_they_predict() {
     for j in [1usize, 17, 400, 1_500, 2_999] {
         let mut changed = cells.clone();
         for cell in &mut changed[j..] {
-            *cell = 255 - *cell;
+            *cell = super::support::classes(&field) - 1 - *cell;
         }
-        let again = clock_letters(&field, &family, &changed, &[]).unwrap();
+        let again = clock_letters(&field, &family, &encoded(&field, &changed), &[]).unwrap();
         assert_eq!(
             letter_address(&again, j, depth),
             letter_address(&letters, j, depth),
@@ -959,9 +964,9 @@ fn the_address_restricts_by_whole_bundles_and_the_sheets_are_a_scale_square() {
     ])
     .unwrap();
     let mut draw = Draw::new(41);
-    let cells: Vec<usize> = (0..1_500).map(|_| (draw.next() % 256) as usize).collect();
-    let letters = clock_letters(&field, &family, &cells, &[]).unwrap();
-    let coarse = clock_letters(&field, &sheets, &cells, &[]).unwrap();
+    let cells: Vec<usize> = (0..1_500).map(|_| (draw.next() % super::support::classes(&field) as u64) as usize).collect();
+    let letters = clock_letters(&field, &family, &encoded(&field, &cells), &[]).unwrap();
+    let coarse = clock_letters(&field, &sheets, &encoded(&field, &cells), &[]).unwrap();
     let declared =
         |family: LetterFamily| crate::compression::landmark::context::LandmarkDeclaration {
             alphabet: 256,
@@ -1194,7 +1199,7 @@ fn the_contact_letters_are_read_from_the_register_before_the_cell_they_predict()
         })
         .collect();
     let mut draw = Draw::new(53);
-    let cells: Vec<usize> = (0..3_000).map(|_| (draw.next() % 256) as usize).collect();
+    let cells: Vec<usize> = (0..3_000).map(|_| (draw.next() % super::support::classes(&field) as u64) as usize).collect();
     let (depth, aperture) = (3, 2);
     let mut current = Current::at_rest(&field);
     let mut opening = current.clone();
@@ -1228,7 +1233,7 @@ fn the_contact_letters_are_read_from_the_register_before_the_cell_they_predict()
             predicted.push((p + j, cut.phase(targets, j).unwrap()));
         }
         for &cell in targets {
-            let step = current.step(&field, cell).unwrap();
+            let step = current.step(&field, &encoded(&field, &[cell]), 0).unwrap();
             register.receive(cell).unwrap();
             let letter = register.letters()[0];
             received.push(letter);
@@ -1254,7 +1259,7 @@ fn the_contact_letters_are_read_from_the_register_before_the_cell_they_predict()
                 let end = received.len();
                 let from = end.saturating_sub(crib.window).max(aeon_start);
                 let location =
-                    keys::locate_closing(&field, &current, &cells[from..end], crib.offset).unwrap();
+                    keys::locate_closing(&field, &current, &encoded(&field, &cells[from..end]), crib.offset).unwrap();
                 location.rekey(&field, &mut current).unwrap();
                 register.synchronize(&field, &current).unwrap();
                 opening = current.clone();
@@ -1275,14 +1280,14 @@ fn the_contact_letters_are_read_from_the_register_before_the_cell_they_predict()
             "cell {position}"
         );
     }
-    let replayed = clock_letters(&field, &family, &cells[..received.len()], &held).unwrap();
+    let replayed = clock_letters(&field, &family, &encoded(&field, &cells[..received.len()]), &held).unwrap();
     assert_eq!(replayed, received);
     for j in [1usize, 17, 400, 1_500, 2_999] {
         let mut changed = cells[..received.len()].to_vec();
         for cell in &mut changed[j..] {
-            *cell = 255 - *cell;
+            *cell = super::support::classes(&field) - 1 - *cell;
         }
-        let again = clock_letters(&field, &family, &changed, &held).unwrap();
+        let again = clock_letters(&field, &family, &encoded(&field, &changed), &held).unwrap();
         assert_eq!(
             letter_address(&again, j, depth),
             letter_address(&received, j, depth),
@@ -1453,7 +1458,7 @@ fn cold_v3_initial_state(
         .mount(field, &crate::hnn::Current::at_rest(field))
         .unwrap();
     let (moment, ingested) = reference
-        .ingest(&mut resident, None, &crate::hnn::reference::one_hot(&[0]))
+        .ingest(&mut resident, None, &encoded(&field, &[0]))
         .unwrap();
     assert!(!ingested.forward.present().unwrap().carry_out);
     let state = resident.continuing_state(field.sources()[0]).unwrap();
@@ -1541,7 +1546,7 @@ fn cold_restore_preserves_empty_window_zero_cursor_and_rejects_nonzero() {
         .ingest(
             &mut restored,
             Some(&moment),
-            &crate::hnn::reference::one_hot(&[0]),
+            &encoded(&field, &[0]),
         )
         .unwrap();
     assert_eq!(
@@ -1593,7 +1598,7 @@ fn cold_restore_handle_exhaustion_is_typed_before_new_ingest_work() {
     // Allocate the last identifier without advancing the clock, so the next call is
     // admitted to ingest and cannot be intercepted by the carry-out boundary.
     let (last, _) = reference
-        .ingest(&mut restored, None, &crate::hnn::reference::one_hot(&[]))
+        .ingest(&mut restored, None, &encoded(&field, &[]))
         .unwrap();
     assert_eq!(last.0, u64::MAX);
     let (_, before_current, before_handles) = reference.read(&restored).unwrap();
@@ -1601,7 +1606,7 @@ fn cold_restore_handle_exhaustion_is_typed_before_new_ingest_work() {
     let before_material = restored.constitution().clone();
     let before_balance = restored.ledger().balance().clone();
     assert!(matches!(
-        reference.ingest(&mut restored, None, &crate::hnn::reference::one_hot(&[0])),
+        reference.ingest(&mut restored, None, &encoded(&field, &[0])),
         Err(crate::hnn::HnnError::HandleCounterExhausted)
     ));
     let (_, after_current, after_handles) = reference.read(&restored).unwrap();

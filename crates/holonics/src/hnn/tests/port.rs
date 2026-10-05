@@ -9,6 +9,7 @@ use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
 
 use super::learning::{chain, chain_with, generic, moment, pairing, phases};
+use crate::hnn::tests::support::encoded;
 use super::support::Draw;
 use crate::hnn::HnnError;
 use crate::hnn::constitution::{Carrier, Constitution, FactorGradient, Family, Locus};
@@ -23,7 +24,7 @@ use crate::hnn::propagation::{
 };
 use crate::hnn::ratio::{Faces, HolonRatio, RatioCovector, TargetPhases, target_phases};
 use crate::hnn::receiving::ActiveAddress;
-use crate::hnn::reference::{Reference, compose, one_hot};
+use crate::hnn::reference::{Reference, compose};
 use crate::hnn::ring::ResonatorMaterial;
 use crate::hnn::word::Word;
 use crate::ratio::exponentiated::power_of_two;
@@ -199,7 +200,7 @@ pub(super) fn cut_at(field: Field, theta: Constitution) -> Cut {
     let (word, faces) = pending.read(&field, &theta).unwrap();
     let operands = word.operands().clone();
     let targets = [2usize, 1];
-    let anchors = target_phases(&field, pending.anchor(), 2, &targets).unwrap();
+    let anchors = target_phases(&field, pending.anchor(), 2, &encoded(&field, &targets)).unwrap();
     let faces_logits = faces.logits.clone();
     // The covector is the combined face's (the tree's at each phase's address plus the wave's); the
     // functional pairs it with the wave's logits, the tree part being a stored face.
@@ -802,7 +803,7 @@ fn every_linear_locus_gradient_is_the_exact_difference_quotient() {
         cut.quotient(&moved, &unit),
         frobenius(map_gradient, &direction)
     );
-    let direction = draw.matrix(4, 4);
+    let direction = draw.matrix(cut.field.ring(0).width(), cut.field.alphabet());
     let moved = theta
         .clone()
         .with_ports(
@@ -829,8 +830,13 @@ fn every_linear_locus_gradient_is_the_exact_difference_quotient() {
         .into_iter()
         .enumerate()
     {
-        // The outputs live on ring 0's width and the reads on the exterior chart: four each.
-        let by: Vec<Vec<Rat>> = (0..pair.rank()).map(|_| draw.vector(4)).collect();
+        // The outputs live on ring 0's width and the reads on the encoding's classes.
+        let width = if family == 0 {
+            cut.field.ring(0).width()
+        } else {
+            cut.field.alphabet()
+        };
+        let by: Vec<Vec<Rat>> = (0..pair.rank()).map(|_| draw.vector(width)).collect();
         let mut parts = [
             pair.outputs().to_vec(),
             pair.current_reads().to_vec(),
@@ -1008,7 +1014,7 @@ fn the_moment_covector_is_the_derivative_in_the_phase_counts() {
     // the same anchor moves `J` by their pairing with it (ruling B: the open reads `M ν̂(n)`, linear
     // in the counts at a held population).
     let silent = PairPort::new(
-        vec![vec![Rat::zero(); 4]; pair.rank()],
+        vec![vec![Rat::zero(); chain().ring(0).width()]; pair.rank()],
         pair.current_reads().to_vec(),
         pair.earlier_reads().to_vec(),
     )
@@ -1086,7 +1092,7 @@ fn every_port_method_returns_its_six_components() {
     let rings = field.rings().len();
     let stream = [0, 1, 2, 3, 0, 2, 1, 3].repeat(8);
     let (moment, ingested) = reference
-        .ingest(&mut resident, None, &one_hot(&stream))
+        .ingest(&mut resident, None, &encoded(&field, &stream))
         .unwrap();
     assert_eq!(shape(&ingested), [true, false, false, true, false]);
     let ingested = ingested.forward.into_present().unwrap();
@@ -1096,7 +1102,7 @@ fn every_port_method_returns_its_six_components() {
     assert_eq!(shape(&closed), [true, true, false, true, true]);
     let crib = &stream[ingested.cells.saturating_sub(8)..ingested.cells];
     let keys = reference
-        .locate_keys(&mut resident, &one_hot(crib), 1)
+        .locate_keys(&mut resident, &encoded(&field, crib), 1)
         .unwrap();
     assert_eq!(shape(&keys), [true, false, true, true, false]);
     let location = keys.forward.present().unwrap();
@@ -1113,7 +1119,7 @@ fn every_port_method_returns_its_six_components() {
         }
     }
     let (_, ingested) = reference
-        .ingest(&mut resident, Some(&moment), &one_hot(&[1, 3, 2]))
+        .ingest(&mut resident, Some(&moment), &encoded(&field, &[1, 3, 2]))
         .unwrap();
     assert_eq!(shape(&ingested), [true, false, false, true, false]);
     let phases = resident.admitted()[0].clone();
@@ -1128,7 +1134,7 @@ fn every_port_method_returns_its_six_components() {
         .unwrap();
     assert_eq!(shape(&held), [false, false, false, true, true]);
     let (staged, compared) = reference
-        .compare(&mut resident, pending, &one_hot(&[0, 3]))
+        .compare(&mut resident, pending, &encoded(&field, &[0, 3]))
         .unwrap();
     assert_eq!(shape(&compared), [true, true, true, true, true]);
     let deposited = reference.deposit(&mut resident, staged).unwrap();
@@ -1166,7 +1172,7 @@ fn the_release_reads_its_width_and_the_boundary_returns_the_transpose() {
     let mut resident = reference.mount(&field, &Current::at_rest(&field)).unwrap();
     let stream = [0, 1, 2, 3, 0, 2, 1, 3].repeat(8);
     let (moment, _) = reference
-        .ingest(&mut resident, None, &one_hot(&stream[..4]))
+        .ingest(&mut resident, None, &encoded(&field, &stream[..4]))
         .unwrap();
     let phases = resident.admitted()[0].clone();
     let (pending, refined) = reference.refine(&mut resident, &moment, &phases).unwrap();
@@ -1204,7 +1210,7 @@ fn the_release_reads_its_width_and_the_boundary_returns_the_transpose() {
             .all(|part| matches!(part, Component::Absent(reason) if reason.contains("singular")))
     );
     let (_, ingested) = reference
-        .ingest(&mut resident, Some(&moment), &one_hot(&stream[4..]))
+        .ingest(&mut resident, Some(&moment), &encoded(&field, &stream[4..]))
         .unwrap();
     assert!(ingested.forward.present().unwrap().carry_out);
     let admitted = resident.admitted().to_vec();
@@ -1227,34 +1233,34 @@ fn the_clock_law_of_ingest_and_keys() {
     let mut resident = reference.mount(&field, &Current::at_rest(&field)).unwrap();
     assert_eq!(
         reference
-            .locate_keys(&mut resident, &one_hot(&[0; 4]), 1)
+            .locate_keys(&mut resident, &encoded(&field, &[0; 4]), 1)
             .unwrap_err(),
         HnnError::KeysNotAdmitted
     );
-    let zeros = one_hot(&vec![0; 64]);
+    let zeros = encoded(&field, &vec![0; 64]);
     let (moment, ingested) = reference.ingest(&mut resident, None, &zeros).unwrap();
     let ingested = ingested.forward.into_present().unwrap();
     assert!(ingested.carry_out && ingested.cells < zeros.len());
-    let crib = one_hot(&vec![0; ingested.cells]);
+    let crib = encoded(&field, &vec![0; ingested.cells]);
     assert_eq!(
         reference.locate_keys(&mut resident, &crib, 1).unwrap_err(),
         HnnError::KeysNotAdmitted
     );
     assert_eq!(
         reference
-            .ingest(&mut resident, Some(&moment), &one_hot(&[1]))
+            .ingest(&mut resident, Some(&moment), &encoded(&field, &[1]))
             .unwrap_err(),
         HnnError::AeonAwaitingClose
     );
     let admitted = resident.admitted().to_vec();
     reference.close_aeon(&mut resident, &admitted).unwrap();
     assert!(matches!(
-        reference.locate_keys(&mut resident, &one_hot(&vec![0; ingested.cells + 1]), 1),
+        reference.locate_keys(&mut resident, &encoded(&field, &vec![0; ingested.cells + 1]), 1),
         Err(HnnError::Shape { .. })
     ));
     reference.locate_keys(&mut resident, &crib, 1).unwrap();
     reference
-        .ingest(&mut resident, Some(&moment), &one_hot(&[1]))
+        .ingest(&mut resident, Some(&moment), &encoded(&field, &[1]))
         .unwrap();
     assert_eq!(
         reference.close_aeon(&mut resident, &admitted).unwrap_err(),
@@ -1262,9 +1268,11 @@ fn the_clock_law_of_ingest_and_keys() {
     );
     assert_eq!(
         reference
-            .ingest(&mut resident, None, &[vec![(0, rat(1, 2))]])
+            .ingest(&mut resident, None, &super::support::encoded_classes(2, &[0]))
             .unwrap_err(),
-        HnnError::CellNotOneHot { position: 0 }
+        HnnError::Unadmitted {
+            reason: "it was encoded against another field's source rings"
+        }
     );
 }
 
@@ -1277,7 +1285,7 @@ fn per_ring_receipts_are_read_in_their_own_clocks() {
     let mut resident = reference.mount(&field, &Current::at_rest(&field)).unwrap();
     let before = resident.current().lift().to_vec();
     let (moment, ingested) = reference
-        .ingest(&mut resident, None, &one_hot(&[0, 3, 0, 2, 0]))
+        .ingest(&mut resident, None, &encoded(&field, &[0, 3, 0, 2, 0]))
         .unwrap();
     let ticks: Vec<Rat> = resident
         .current()
@@ -1311,7 +1319,7 @@ fn refine_refuses_beyond_the_pending_capacity() {
     let reference = Reference::new(2, 1 << 40);
     let mut resident = reference.mount(&field, &Current::at_rest(&field)).unwrap();
     let (moment, _) = reference
-        .ingest(&mut resident, None, &one_hot(&[1, 2]))
+        .ingest(&mut resident, None, &encoded(&field, &[1, 2]))
         .unwrap();
     let phases = resident.admitted()[0].clone();
     let (first, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
@@ -1342,7 +1350,7 @@ fn a_refused_compare_or_deposit_leaves_its_handle_and_the_resident() {
     let reference = Reference::new(4, 1 << 40);
     let mut resident = reference.mount(&field, &Current::at_rest(&field)).unwrap();
     let (moment, _) = reference
-        .ingest(&mut resident, None, &one_hot(&[1, 2]))
+        .ingest(&mut resident, None, &encoded(&field, &[1, 2]))
         .unwrap();
     let phases = resident.admitted()[0].clone();
     let (pending, refined) = reference.refine(&mut resident, &moment, &phases).unwrap();
@@ -1363,7 +1371,7 @@ fn a_refused_compare_or_deposit_leaves_its_handle_and_the_resident() {
         .1;
     assert!(emitted > 0 && bits > emitted);
     assert!(matches!(
-        reference.compare(&mut resident, pending, &one_hot(&[1])),
+        reference.compare(&mut resident, pending, &encoded(&field, &[1])),
         Err(HnnError::Shape { .. })
     ));
     assert_eq!(
@@ -1371,17 +1379,19 @@ fn a_refused_compare_or_deposit_leaves_its_handle_and_the_resident() {
             .compare(
                 &mut resident,
                 pending,
-                &[vec![(1, rat(1, 2))], vec![(0, Rat::one())]]
+                &super::support::encoded_classes(2, &[1, 0])
             )
             .unwrap_err(),
-        HnnError::CellNotOneHot { position: 0 }
+        HnnError::Unadmitted {
+            reason: "it was encoded against another field's source rings"
+        }
     );
     let (first, _) = reference
-        .compare(&mut resident, pending, &one_hot(&[1, 0]))
+        .compare(&mut resident, pending, &encoded(&field, &[1, 0]))
         .unwrap();
     let (again, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
     let (second, _) = reference
-        .compare(&mut resident, again, &one_hot(&[2, 3]))
+        .compare(&mut resident, again, &encoded(&field, &[2, 3]))
         .unwrap();
     reference.deposit(&mut resident, first).unwrap();
     let (published, ledger) = (resident.constitution().clone(), resident.ledger().clone());
@@ -1532,7 +1542,7 @@ fn a_quartic_comparison_returns_all_five_reached_gain_features() {
     .unwrap();
     let (word, faces) = pending.read(&field, &theta).unwrap();
     let targets = [2, 1, 0];
-    let target = target_phases(&field, pending.anchor(), 2, &targets).unwrap();
+    let target = target_phases(&field, pending.anchor(), 2, &encoded(&field, &targets)).unwrap();
     let combined = pending.against(&theta, &faces, &targets).unwrap().faces;
     let covector = HolonRatio::compare(combined, &targets, &target)
         .unwrap()

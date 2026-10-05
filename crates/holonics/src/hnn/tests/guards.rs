@@ -11,6 +11,7 @@
 //! [`Current`]: crate::hnn::Current
 //! [`RingDeclaration`]: crate::hnn::RingDeclaration
 
+use crate::hnn::tests::support::encoded;
 use super::support::Draw;
 use crate::hnn::HnnError;
 use crate::hnn::field::{Current, Field};
@@ -43,7 +44,7 @@ fn guard_one_the_moment_is_sized_once_and_lossy_past_its_capacity() {
     let mut fed = 0;
     while fed < cells.len() {
         fed += moment
-            .ingest(&field, &mut current, &cells[fed..])
+            .ingest(&field, &mut current, &encoded(&field, &cells[fed..]))
             .unwrap()
             .cells;
     }
@@ -104,7 +105,7 @@ use crate::hnn::constitution::{
 };
 use crate::hnn::field::ConstitutionRead;
 use crate::hnn::port::{Deposit, ExecutionPort};
-use crate::hnn::reference::{Reference, one_hot};
+use crate::hnn::reference::{Reference};
 use crate::ratio::linear::ExactRatMatrix;
 use num_traits::{One, Zero};
 
@@ -237,14 +238,14 @@ fn guard_eleven_refine_and_compare_leave_the_constitution() {
         .unwrap();
     let published = resident.constitution().clone();
     let (moment, _) = reference
-        .ingest(&mut resident, None, &one_hot(&[2, 2, 1]))
+        .ingest(&mut resident, None, &encoded(&field, &[2, 2, 1]))
         .unwrap();
     let phases = resident.admitted()[0].clone();
     reference.refine(&mut resident, &moment, &phases).unwrap();
     let (pending, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
     assert_eq!(resident.constitution(), &published);
     reference
-        .compare(&mut resident, pending, &one_hot(&[1, 2]))
+        .compare(&mut resident, pending, &encoded(&field, &[1, 2]))
         .unwrap();
     assert_eq!(resident.constitution(), &published);
 }
@@ -261,7 +262,7 @@ fn guard_five_the_collapse_runs_only_at_the_carry_out() {
         HnnError::NotAtCarryOut
     );
     reference
-        .ingest(&mut resident, None, &one_hot(&[1, 3]))
+        .ingest(&mut resident, None, &encoded(&field, &[1, 3]))
         .unwrap();
     assert_eq!(
         reference.close_aeon(&mut resident, &admitted).unwrap_err(),

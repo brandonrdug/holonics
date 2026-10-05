@@ -34,7 +34,7 @@ use holonics::compression::keys::repair::{
 use holonics::hnn::keys::{LocatedPair, PairLocation, damaged_station_pairs};
 use num_bigint::BigUint;
 
-use executed_loop::terrain_pairs;
+use executed_loop::{terrain_encoded, terrain_pairs};
 
 /// The declared opening `o` and the stations after it (the record's §0).
 const OPENING: usize = 8;
@@ -217,14 +217,14 @@ pub(super) fn repair(terrain: &str, damage_name: &str, seed: u64, count: usize, 
         })
         .collect();
     let erased = damage(damage_name);
-    let damaged: Vec<Vec<Option<usize>>> = truths
+    // The damaged passages enter encoded (THE_MACHINE guard 9): the terrain's declared identity,
+    // its erased cells removed (`DamagedPassage::encoded`).
+    let passages: Vec<DamagedPassage> = terrain_encoded(terrain, &shape, &field, seed, count)
         .iter()
-        .map(|truth| {
-            (0..truth.len())
-                .map(|t| (!erased.contains(&t)).then_some(truth[t]))
-                .collect()
-        })
+        .map(|truth| DamagedPassage::encoded(truth, &erased, OPENING).expect("a passage"))
         .collect();
+    let damaged: Vec<Vec<Option<usize>>> =
+        passages.iter().map(|passage| passage.cells().to_vec()).collect();
     let truths = truths; // read again only after every release (below)
     println!(
         "executed repair: {terrain}, damage {damage_name}, seed {seed}, {count} passages of {} cells (opening {OPENING}); erased cells {erased:?} ({} of {})",
@@ -241,9 +241,9 @@ pub(super) fn repair(terrain: &str, damage_name: &str, seed: u64, count: usize, 
     let mut curve = String::new();
     let mut per_passage_located = 0usize;
     let mut per = 0usize;
-    for (index, cells) in damaged.iter().enumerate() {
+    for (index, passage) in passages.iter().enumerate() {
         let observations =
-            damaged_station_pairs(&field, ring, cells, OPENING).expect("the damaged menu");
+            damaged_station_pairs(&field, ring, passage).expect("the damaged menu");
         per = observations.len();
         let mut own = PairLocation::open(&field, ring);
         for (t, readings) in &observations {
@@ -323,10 +323,6 @@ pub(super) fn repair(terrain: &str, damage_name: &str, seed: u64, count: usize, 
 
     // 2. Integrate by reflection: restrict and release, reading the damaged cells only.
     let integrate = Instant::now();
-    let passages: Vec<DamagedPassage> = damaged
-        .iter()
-        .map(|cells| DamagedPassage::new(cells.clone(), CLASSES, OPENING).expect("a passage"))
-        .collect();
     let mut restrictions = Vec::new();
     let mut releases = Vec::new();
     for passage in &passages {

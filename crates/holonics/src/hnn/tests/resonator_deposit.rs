@@ -5,13 +5,14 @@ use super::learning::{chain, chain_declaration, chain_reach, generic, phases};
 
 use num_traits::{One, Zero};
 
+use crate::hnn::tests::support::encoded;
 use crate::hnn::HnnError;
 use crate::hnn::constitution::{
     Carrier, Constitution, FactorGradient, FactorStep, GainBacktrack, Locus,
 };
 use crate::hnn::field::{Current, Field};
 use crate::hnn::port::{Deposit, ExecutionPort, Handle};
-use crate::hnn::reference::{Reference, one_hot};
+use crate::hnn::reference::{Reference};
 use crate::hnn::retention::{Opens, collapse, loci, retained};
 use crate::hnn::ring::{
     PumpDeclaration, PumpStep, ResonatorMaterial, ResonatorOperands, ResonatorRemainders,
@@ -454,12 +455,12 @@ fn a_refused_deposit_keeps_the_staged_deposit_and_all_published_state() {
         .mount_with(&field, &current, constitution)
         .unwrap();
     let (moment, _) = reference
-        .ingest(&mut resident, None, &one_hot(&[0]))
+        .ingest(&mut resident, None, &encoded(&field, &[0]))
         .unwrap();
     let phases = resident.admitted()[0].clone();
     let (pending, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
     let (staged, compared) = reference
-        .compare(&mut resident, pending, &one_hot(&[0, 1]))
+        .compare(&mut resident, pending, &encoded(&field, &[0, 1]))
         .unwrap();
     let deposit = compared.deposit.into_present().unwrap();
 

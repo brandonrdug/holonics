@@ -358,20 +358,22 @@ fn the_located_pairs_deposit_closes_its_slip_and_its_consumer_holds() {
     ));
 }
 
-/// [implemented-exact] **A located port must hold one class of the exterior chart**: on a chart of
-/// 20 classes over a ring of period 16, port 0 holds classes 0 and 16, so the located map on ports
-/// is not a map of classes and the deposit is refused.
+/// [implemented-exact] **A located port must hold one class of the encoding**: each class is its
+/// own port (THE_MACHINE guard 9; the residue chart that put classes 0 and 16 at one port of a
+/// period-16 ring is deleted), so a port holds at most one; on two classes over a ring of period 16
+/// the order-2 pair's ports 2 and 3 hold none, the located map on ports is not a map of classes and
+/// the deposit is refused.
 #[test]
-fn a_port_holding_two_classes_refuses_the_pair_deposit() {
+fn a_port_holding_no_class_refuses_the_pair_deposit() {
     use crate::hnn::constitution::{CAMPAIGN_ONE_BUDGET, Constitution};
     use crate::hnn::executed::pair_deposit;
     use crate::hnn::field::ConstitutionRead;
-    let field = pair_field(20);
+    let field = pair_field(2);
     let opening = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap();
     let prior = opening.source_port(0).unwrap().clone();
     assert!(matches!(
         pair_deposit(&field, &opening, &prior, 0, &order_two_pair()),
-        Err(HnnError::Shape { expected: 1, found: 2, .. })
+        Err(HnnError::Shape { expected: 1, found: 0, .. })
     ));
 }
 

@@ -9,6 +9,7 @@ use num_bigint::BigInt;
 use num_traits::{One, Zero};
 
 use super::learning::{chain_declaration, chain_reach};
+use crate::hnn::tests::support::encoded;
 use crate::hnn::HnnError;
 use crate::hnn::constitution::{
     BudgetedCarry, ChartRule, Constitution, ContinuingState, Lattice, LinearLocus, LinearStep,
@@ -393,19 +394,19 @@ fn exposed(
 ) -> (u64, Vec<crate::hnn::constitution::PriorMove>, NormalLaw) {
     use crate::hnn::field::Current;
     use crate::hnn::port::{ExecutionPort, Handle};
-    use crate::hnn::reference::{Reference, one_hot};
+    use crate::hnn::reference::{Reference};
 
     let reference = Reference::campaign_one().with_reception(reception);
     let mut resident = reference.mount(field, &Current::at_rest(field)).unwrap();
     let phases = resident.admitted()[0].clone();
     let family = resident.admitted().to_vec();
-    let (moment, _) = reference.ingest(&mut resident, None, &[]).unwrap();
+    let (moment, _) = reference.ingest(&mut resident, None, &encoded(&field, &[])).unwrap();
     let (mut deposits, mut reads) = (0u64, Vec::new());
     for span in cells.chunks(phases.aperture()) {
         if span.len() == phases.aperture() {
             let (pending, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
             let (staged, _) = reference
-                .compare(&mut resident, pending, &one_hot(span))
+                .compare(&mut resident, pending, &encoded(&field, span))
                 .unwrap();
             if resident.stopped().is_some() {
                 reference
@@ -428,7 +429,7 @@ fn exposed(
         let mut fed = 0;
         while fed < span.len() {
             let (_, ingested) = reference
-                .ingest(&mut resident, Some(&moment), &one_hot(&span[fed..]))
+                .ingest(&mut resident, Some(&moment), &encoded(&field, &span[fed..]))
                 .unwrap();
             let ingested = ingested.forward.into_present().expect("the ingest returns");
             fed += ingested.cells;

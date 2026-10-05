@@ -160,6 +160,7 @@ use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, ToPrimitive, Zero};
 
 use crate::hnn::HnnError;
+use crate::hnn::encoding::Encoded;
 use crate::hnn::field::{ConstitutionRead, Current, Field, FieldMaterial};
 use crate::ratio::Rat;
 use crate::ratio::linear::ExactRatMatrix;
@@ -743,25 +744,44 @@ impl SourceMoment {
         Ok(moment)
     }
 
-    /// **Ingest cells in order**: the lift point's selective step, then the phase-binned and offset
-    /// counts on every source ring, then the held cells. Stops after the cell whose step carries
-    /// the joint clock out, and reports it.
+    /// **Ingest an encoded passage in order** (THE_MACHINE guard 9: the encoding's classes, never an
+    /// exterior code): the lift point's selective step on each occurrence (a located route's digits
+    /// and its squares at the consumer, `Field::selective_step`), then the phase-binned and offset
+    /// counts on every source ring at the occurrence's class, then the held cells. Stops after the
+    /// occurrence whose step carries the joint clock out, and reports it; the rest of the passage
+    /// is its `Encoded::part`. Refused unless the field admits the passage (`Field::admit`).
+    ///
+    /// ```compile_fail,E0308
+    /// use holonics::hnn::{Current, Field, SourceMoment};
+    /// fn ingest(moment: &mut SourceMoment, field: &Field, current: &mut Current, codes: &[usize]) {
+    ///     let _ = moment.ingest(field, current, codes);
+    /// }
+    /// ```
+    ///
+    /// ```compile_fail,E0308
+    /// use holonics::hnn::{Current, Field, SourceMoment};
+    /// use holonics::ratio::Rat;
+    /// fn ingest(moment: &mut SourceMoment, field: &Field, current: &mut Current, cells: &[Vec<(usize, Rat)>]) {
+    ///     let _ = moment.ingest(field, current, cells);
+    /// }
+    /// ```
     pub fn ingest(
         &mut self,
         field: &Field,
         current: &mut Current,
-        cells: &[usize],
+        cells: &Encoded,
     ) -> Result<Ingested, HnnError> {
         let a = self.alphabet;
-        for (consumed, &code) in cells.iter().enumerate() {
-            let step = current.step(field, code)?;
+        field.admit(cells)?;
+        for (consumed, code) in cells.classes_read().enumerate() {
+            let step = current.step(field, cells, consumed)?;
             for counts in &mut self.rings {
                 let phase = current.phase(field, counts.ring)? as usize;
                 counts.end = phase as u64;
-                counts.ticks += u64::from(step.ticks[counts.ring]);
+                counts.ticks += step.ticks[counts.ring];
                 bump(&mut counts.first[phase * a + code])?;
                 if let Some(leaky) = &mut counts.leaky {
-                    leaky.decay(u64::from(step.ticks[counts.ring]));
+                    leaky.decay(step.ticks[counts.ring]);
                     let one = BigInt::one() << leaky.unit as usize;
                     *leaky.first.entry(phase * a + code).or_insert_with(BigInt::zero) += &one;
                 }

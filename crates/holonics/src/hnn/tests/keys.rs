@@ -6,6 +6,7 @@
 
 use num_bigint::BigUint;
 
+use crate::hnn::tests::support::encoded;
 use super::support::{Draw, contact, ring};
 use crate::compression::{Candidate, Menu, PortImages};
 use crate::hnn::HnnError;
@@ -20,9 +21,12 @@ use crate::holon::contact::menu::PortPermutation;
 use crate::navigator::Clock;
 use crate::ratio::{integer, rat};
 
-/// A field of rings with the declared periods and locks (in carry order), joined in a path, over
-/// an exterior chart of 16 classes, so a cell's code is its port on every ring of period ≤ 16.
+/// A field of rings with the declared periods and locks (in carry order), joined in a path, whose
+/// source is its widest ring and whose classes are that ring's ports, so a class is its own port on
+/// every ring at least as wide (THE_MACHINE guard 9: no residue; it read 16 classes through
+/// `code mod d_g` before October 5).
 fn rotor_field(rings: &[(u64, Vec<u64>)]) -> Field {
+    let widest = (0..rings.len()).max_by_key(|&g| (rings[g].0, std::cmp::Reverse(g))).unwrap();
     Field::declare(
         FieldDeclaration {
             rings: rings
@@ -31,9 +35,9 @@ fn rotor_field(rings: &[(u64, Vec<u64>)]) -> Field {
                 .collect(),
             contacts: (1..rings.len()).map(|g| contact(g - 1, g, 1, 0)).collect(),
             loops: Vec::new(),
-            sources: vec![0],
+            sources: vec![widest],
             offsets: vec![1],
-            alphabet: 16,
+            alphabet: rings[widest].0 as usize,
             step: integer(1),
             exponent_grain: 1,
             receivers: vec![ReceiverDeclaration {
@@ -72,7 +76,7 @@ fn a_known_key_is_recovered_as_its_gauge_orbit_and_published_by_the_convention()
     let board = PortPermutation::new(vec![0, 4, 6, 2, 1, 5, 3]).unwrap();
     let key = 3;
     let crib = rotor_crib(&field, 0, key, &board, &[0, 0], 64, 0).unwrap();
-    let located = locate_ring(&field, 0, &crib, 1, &[0, 0], 0).unwrap();
+    let located = locate_ring(&field, 0, &encoded(&field, &crib), 1, &[0, 0], 0).unwrap();
     assert_eq!(
         located.fibre.len(),
         7,
@@ -97,7 +101,7 @@ fn a_known_key_is_recovered_as_its_gauge_orbit_and_published_by_the_convention()
     // A plugboard that does not fix the least port publishes the gauge-fixed member instead.
     let turned = PortPermutation::new(vec![2, 4, 6, 0, 1, 5, 3]).unwrap();
     let crib = rotor_crib(&field, 0, key, &turned, &[0, 0], 64, 0).unwrap();
-    let located = locate_ring(&field, 0, &crib, 1, &[0, 0], 0).unwrap();
+    let located = locate_ring(&field, 0, &encoded(&field, &crib), 1, &[0, 0], 0).unwrap();
     // The gauge-fixed member is `(key + t, S − t)` with `S(0) − t = 0`, so `t = S(0) = 2`.
     assert_eq!(located.published, Some((key + 2) % 7));
 }
@@ -111,7 +115,7 @@ fn a_drawn_crib_keeps_its_key_and_plugboard_in_the_located_fibre() {
     let crib = RotorCrib::draw(&field, 0, &[0, 0], 64, &mut Draw::new(41)).unwrap();
     assert_eq!(crib.truth.key_bits, 16);
     assert_eq!(crib.cells[0], crib.truth.start);
-    let located = locate_ring(&field, 0, &crib.cells, 1, &[0, 0], 0).unwrap();
+    let located = locate_ring(&field, 0, &encoded(&field, &crib.cells), 1, &[0, 0], 0).unwrap();
     assert_eq!(located.fibre.len(), 7);
     let truth = located
         .fibre
@@ -177,7 +181,7 @@ fn propagation_equals_brute_force_on_ring_menus() {
         let crib = rotor_crib(&field, 0, 2, &board, &[0, 0], length, draw.below(7)).unwrap();
         let random: Vec<usize> = (0..length).map(|_| draw.below(7)).collect();
         for cells in [crib, random] {
-            let menu = crib_menu(&field, 0, &cells, 1, &[0, 0]).unwrap();
+            let menu = crib_menu(&field, 0, &encoded(&field, &cells), 1, &[0, 0]).unwrap();
             let keys = candidate_keys(&field, 0).unwrap();
             let propagated = menu.propagate(&keys).unwrap();
             assert_eq!(
@@ -196,7 +200,7 @@ fn gauge_fixing_picks_one_member_per_orbit() {
     let field = rotor_field(&[(7, vec![1, 4]), (2, vec![])]);
     let board = PortPermutation::new(vec![4, 0, 6, 2, 1, 5, 3]).unwrap();
     let crib = rotor_crib(&field, 0, 5, &board, &[0, 0], 12, 1).unwrap();
-    let located = locate_ring(&field, 0, &crib, 1, &[0, 0], 0).unwrap();
+    let located = locate_ring(&field, 0, &encoded(&field, &crib), 1, &[0, 0], 0).unwrap();
     assert!(
         located.orbits > 1,
         "the δ = 1 chain leaves the fibre plural"
@@ -229,7 +233,7 @@ fn adding_an_edge_only_shrinks_the_fibre() {
     };
     let mut previous: Option<(Vec<usize>, Vec<(u64, Vec<Option<usize>>)>)> = None;
     for length in 2..=crib.len() {
-        let menu = crib_menu(&field, 0, &crib[..length], 1, &[0, 0]).unwrap();
+        let menu = crib_menu(&field, 0, &encoded(&field, &crib[..length]), 1, &[0, 0]).unwrap();
         let ports = menu.menu_ports();
         let fibre = classes(&menu.propagate(&keys).unwrap().candidates, 7);
         assert!(fibre.iter().any(|(key, images)| {
@@ -260,7 +264,7 @@ fn an_empty_fibre_falls_back_to_the_current_configuration() {
     // Two self-edges at port 0 at consecutive positions each force `S(0)` to their stage's one
     // fixed point, `−(key + m)`, which differ: no key closes both.
     let crib: Vec<usize> = vec![0, 0, 0, 3, 5];
-    let located = locate_ring(&field, 0, &crib, 1, &[4, 0], 4).unwrap();
+    let located = locate_ring(&field, 0, &encoded(&field, &crib), 1, &[4, 0], 4).unwrap();
     assert!(located.fibre.is_empty());
     assert_eq!(located.orbits, 0);
     assert_eq!(located.published, None);
@@ -269,7 +273,7 @@ fn an_empty_fibre_falls_back_to_the_current_configuration() {
     let failing = located.failing_loop.expect("a failing loop is reported");
     assert!(!failing.is_empty());
     let mut current = Current::at(&field, vec![4.into(), 0.into()]).unwrap();
-    let location = locate_keys(&field, &current, &crib, 1).unwrap();
+    let location = locate_keys(&field, &current, &encoded(&field, &crib), 1).unwrap();
     assert_eq!(location.configurations()[0], 4);
     let before = current.clone();
     location.rekey(&field, &mut current).unwrap();
@@ -285,21 +289,21 @@ fn a_ring_is_located_under_the_earlier_rings_configurations() {
     let field = rotor_field(&[(3, vec![0, 1, 2]), (5, vec![])]);
     let board = PortPermutation::new(vec![3, 0, 4, 1, 2]).unwrap();
     let crib = rotor_crib(&field, 1, 2, &board, &[1, 0], 40, 0).unwrap();
-    let under_truth = locate_ring(&field, 1, &crib, 1, &[1, 0], 0).unwrap();
+    let under_truth = locate_ring(&field, 1, &encoded(&field, &crib), 1, &[1, 0], 0).unwrap();
     let truth = |fibre: &[Candidate<Clock>]| {
         fibre
             .iter()
             .any(|c| key_class(c, 5) == 2 && c.images.image(0) == Some(board.apply(0).unwrap()))
     };
     assert!(truth(&under_truth.fibre));
-    let under_other = locate_ring(&field, 1, &crib, 1, &[0, 0], 0).unwrap();
+    let under_other = locate_ring(&field, 1, &encoded(&field, &crib), 1, &[0, 0], 0).unwrap();
     assert!(!truth(&under_other.fibre));
     assert_ne!(
-        ring_steps(&field, 1, &crib, &[1, 0]).unwrap(),
-        ring_steps(&field, 1, &crib, &[0, 0]).unwrap()
+        ring_steps(&field, 1, &encoded(&field, &crib), &[1, 0]).unwrap(),
+        ring_steps(&field, 1, &encoded(&field, &crib), &[0, 0]).unwrap()
     );
     let current = Current::at(&field, vec![1.into(), 0.into()]).unwrap();
-    let location = locate_keys(&field, &current, &crib, 1).unwrap();
+    let location = locate_keys(&field, &current, &encoded(&field, &crib), 1).unwrap();
     assert!(location.rings[0].fell_back);
     assert_eq!(location.rings[0].configuration, 1);
     assert!(truth(&location.rings[1].fibre));
@@ -314,11 +318,11 @@ fn rekeying_leaves_the_open_moment_untouched() {
     let mut current = Current::at_rest(&field);
     let mut moment = SourceMoment::open(&field, &current);
     let mut draw = Draw::new(61);
-    let cells: Vec<usize> = (0..30).map(|_| draw.below(16)).collect();
+    let cells: Vec<usize> = (0..30).map(|_| draw.below(7)).collect();
     let mut fed = 0;
     while fed < cells.len() {
         fed += moment
-            .ingest(&field, &mut current, &cells[fed..])
+            .ingest(&field, &mut current, &encoded(&field, &cells[fed..]))
             .unwrap()
             .cells;
     }
@@ -327,7 +331,7 @@ fn rekeying_leaves_the_open_moment_untouched() {
         .map(|g| current.winding(&field, g).unwrap())
         .collect();
     let crib = rotor_crib(&field, 0, 3, &board, &[0, 0], 64, 0).unwrap();
-    let location = locate_keys(&field, &current, &crib, 1).unwrap();
+    let location = locate_keys(&field, &current, &encoded(&field, &crib), 1).unwrap();
     assert_eq!(location.rings[0].published, Some(3));
     let jumps = location.rekey(&field, &mut current).unwrap();
     assert_eq!(current.phase(&field, 0).unwrap(), 3);
@@ -354,21 +358,21 @@ fn a_closing_crib_is_stepped_back_and_its_key_carried_to_the_boundary() {
     let opening = Current::at(&field, vec![5.into(), 1.into()]).unwrap();
     let mut current = opening.clone();
     for &code in &crib {
-        current.step(&field, code).unwrap();
+        current.step(&field, &encoded(&field, &[code]), 0).unwrap();
     }
     assert_eq!(
-        crib_opening(&field, current.lift(), &crib).unwrap(),
+        crib_opening(&field, current.lift(), &encoded(&field, &crib)).unwrap(),
         opening.lift()
     );
-    let location = locate_closing(&field, &current, &crib, 1).unwrap();
+    let location = locate_closing(&field, &current, &encoded(&field, &crib), 1).unwrap();
     assert_eq!(location.rings[0].published, Some(3));
-    let ticks = crib_ticks(&field, 0, &crib, &location.configurations()).unwrap();
+    let ticks = crib_ticks(&field, 0, &encoded(&field, &crib), &location.configurations()).unwrap();
     assert_eq!(ticks, 64);
     assert_eq!(location.rings[0].carried, Some((3 + 64) % 7));
     location.rekey(&field, &mut current).unwrap();
     assert_eq!(current.phase(&field, 0).unwrap(), (3 + 64) % 7);
     assert_eq!(
-        crib_opening(&field, Current::at_rest(&field).lift(), &crib).unwrap_err(),
+        crib_opening(&field, Current::at_rest(&field).lift(), &encoded(&field, &crib)).unwrap_err(),
         HnnError::NegativeLift { ring: 0 }
     );
 }
@@ -405,7 +409,7 @@ fn the_pair_menu_locates_order_two_and_the_alternation_as_its_least_winding() {
     let field = rotor_field(&[(16, (0..16).collect())]);
     let mut location = PairLocation::open(&field, 0);
     for passage in order_two(2_026_100_502, 12, 10, 4) {
-        for observation in station_pairs(&field, 0, &passage, 10).unwrap() {
+        for observation in station_pairs(&field, 0, &encoded(&field, &passage), 10).unwrap() {
             location.observe(&observation);
         }
     }
@@ -422,7 +426,7 @@ fn the_pair_menu_locates_order_two_and_the_alternation_as_its_least_winding() {
     for _ in 0..6 {
         let (a, b) = (draw.below(4) as usize, draw.below(4) as usize);
         let passage: Vec<usize> = (0..14).map(|t| if t % 2 == 0 { a } else { b }).collect();
-        for observation in station_pairs(&field, 0, &passage, 10).unwrap() {
+        for observation in station_pairs(&field, 0, &encoded(&field, &passage), 10).unwrap() {
             alternation.observe(&observation);
         }
     }
@@ -487,22 +491,26 @@ fn a_class_of_windings_locates_its_least_distance_and_any_other_class_stays_plur
 
 /// [implemented-exact] **The pair menu reads only the passage it is given**: one observation per
 /// station after the opening, each at every distance below the period that its passage reaches;
-/// a passage with no station or a cell outside the chart is refused.
+/// a passage with no station is refused, and a class outside the chart has no encoding.
 #[test]
 fn the_pair_menu_reads_each_station_at_every_distance_its_passage_reaches() {
     let field = rotor_field(&[(16, (0..16).collect())]);
     let passage: Vec<usize> = (0..20).map(|t| t % 4).collect();
-    let readings = station_pairs(&field, 0, &passage, 18).unwrap();
+    let readings = station_pairs(&field, 0, &encoded(&field, &passage), 18).unwrap();
     assert_eq!(readings.len(), 2);
     assert_eq!(readings[0].len(), 15);
     assert_eq!(readings[0][1], PairReading { offset: 2, from: 0, to: 2 });
     assert!(matches!(
-        station_pairs(&field, 0, &passage, 0),
+        station_pairs(&field, 0, &encoded(&field, &passage), 0),
         Err(HnnError::Crib { .. })
     ));
+    // A class past the ring's ports has no encoding for it (THE_MACHINE guard 9).
     assert!(matches!(
-        station_pairs(&field, 0, &[0, 1, 99], 1),
-        Err(HnnError::CellOutside { code: 99, .. })
+        crate::hnn::encoding::Encoded::identity(
+            &crate::holarchy::terrain::KnownTruth::declared(100, vec![vec![0, 1, 99]]),
+            &field
+        ),
+        Err(crate::hnn::encoding::EncodingError::Fold { classes: 100, .. })
     ));
 }
 
@@ -530,7 +538,7 @@ fn a_damaged_passage_locates_its_pair_from_intact_cells_and_is_repaired_through_
     let mut location = PairLocation::open(&field, 0);
     for passage in &passages {
         let cells = damage(passage);
-        let observations = damaged_station_pairs(&field, 0, &cells, 4).unwrap();
+        let observations = damaged_station_pairs(&field, 0, &DamagedPassage::new(cells.clone(), field.alphabet(), 4).unwrap()).unwrap();
         let stations: Vec<usize> = observations.iter().map(|(t, _)| *t).collect();
         assert_eq!(stations, vec![4, 7, 8, 10, 11, 12, 13]);
         let (_, at_seven) = &observations[1];

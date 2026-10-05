@@ -7,7 +7,8 @@
 //! [`Candidate`], [`crate::compression::Gauge`] and [`crate::compression::ReflectorMachine`] owners
 //! and the new menu edges with their propagation ([`Menu::propagate`]):
 //!
-//! - **ports** are `ℤ/d_g`, and the port chart `port_g(x) = code(x) mod d_g` is known before any key;
+//! - **ports** are `ℤ/d_g`, and a crib's cells are the encoding's classes, each its own port on a
+//!   source ring (`port_g(c) = c`, THE_MACHINE guard 9: no residue), known before any key;
 //! - **edges**: every pair `(x_k, x_(k+δ))` of the crib at the declared offset `δ` is an edge
 //!   `port_g(x_k) — port_g(x_(k+δ))`, labelled by its position `k` from the crib's opening. No
 //!   admission depends on the key; a pair the machine does not carry shows as a failing loop;
@@ -94,8 +95,10 @@
 use num_bigint::{BigInt, BigUint};
 use num_traits::ToPrimitive;
 
+use crate::compression::keys::repair::DamagedPassage;
 use crate::compression::{Candidate, Menu, PairRelation, TurnMenu, TurnReading};
 use crate::hnn::HnnError;
+use crate::hnn::encoding::Encoded;
 use crate::hnn::field::{Current, Field, ring_digit};
 use crate::navigator::Clock;
 
@@ -154,9 +157,10 @@ impl KeyLocation {
 pub fn ring_steps(
     field: &Field,
     ring: usize,
-    crib: &[usize],
+    crib: &Encoded,
     configurations: &[u64],
 ) -> Result<Vec<u64>, HnnError> {
+    field.admit(crib)?;
     if configurations.len() != field.rings().len() {
         return Err(HnnError::Shape {
             what: "ring configurations",
@@ -167,10 +171,10 @@ pub fn ring_steps(
     let mut lift: Vec<BigInt> = configurations.iter().map(|c| BigInt::from(*c)).collect();
     let mut steps = Vec::with_capacity(crib.len());
     let mut taken = 0u64;
-    for &code in crib {
+    for (at, code) in crib.classes_read().enumerate() {
         steps.push(taken);
-        let step = field.selective_step(&mut lift, code)?;
-        taken += u64::from(step.ticks[ring]);
+        let step = field.step_class(&mut lift, code, crib.advance(at))?;
+        taken += step.ticks[ring];
     }
     Ok(steps)
 }
@@ -180,13 +184,14 @@ pub fn ring_steps(
 pub fn crib_ticks(
     field: &Field,
     ring: usize,
-    crib: &[usize],
+    crib: &Encoded,
     configurations: &[u64],
 ) -> Result<u64, HnnError> {
+    field.admit(crib)?;
     let mut lift: Vec<BigInt> = configurations.iter().map(|c| BigInt::from(*c)).collect();
     let mut taken = 0u64;
-    for &code in crib {
-        taken += u64::from(field.selective_step(&mut lift, code)?.ticks[ring]);
+    for (at, code) in crib.classes_read().enumerate() {
+        taken += field.step_class(&mut lift, code, crib.advance(at))?.ticks[ring];
     }
     Ok(taken)
 }
@@ -199,8 +204,9 @@ pub fn crib_ticks(
 pub fn crib_opening(
     field: &Field,
     now: &[BigInt],
-    crib: &[usize],
+    crib: &Encoded,
 ) -> Result<Vec<BigInt>, HnnError> {
+    field.admit(crib)?;
     if now.len() != field.rings().len() {
         return Err(HnnError::Shape {
             what: "lift point",
@@ -208,19 +214,14 @@ pub fn crib_opening(
             found: now.len(),
         });
     }
-    if let Some(&code) = crib.iter().find(|&&code| code >= field.alphabet()) {
-        return Err(HnnError::CellOutside {
-            code,
-            alphabet: field.alphabet(),
-        });
-    }
     let mut carries = vec![0u64; crib.len()];
     let mut opening = Vec::with_capacity(now.len());
     for (g, ring) in field.rings().iter().enumerate() {
         let advances: Vec<u64> = crib
-            .iter()
+            .classes_read()
             .zip(&carries)
-            .map(|(&code, carry)| u64::from(ring.fits(ring.port(code))) + carry)
+            .enumerate()
+            .map(|(at, (code, carry))| field.advance_of(g, code, crib.advance(at)) + carry)
             .collect();
         let start = &now[g] - BigInt::from(advances.iter().sum::<u64>());
         if start.sign() == num_bigint::Sign::Minus {
@@ -230,7 +231,7 @@ pub fn crib_opening(
         let mut clock = ring.clock_at(&start)?;
         for (carry, advance) in carries.iter_mut().zip(&advances) {
             *carry = clock.advance(&BigUint::from(*advance)).to_u64().expect(
-                "a ring of period at least 2 advanced at most two ticks jumps at most once",
+                "a ring advanced by at most its period from a phase below it jumps at most once",
             );
         }
         opening.push(start);
@@ -238,12 +239,12 @@ pub fn crib_opening(
     Ok(opening)
 }
 
-/// **The data → menu map for one ring**: one edge per crib pair at the offset, its stage the
-/// reflected return at the earlier cell's position.
+/// **The data → menu map for one ring**: one edge per crib pair at the offset whose two classes are
+/// ports of the ring, its stage the reflected return at the earlier cell's position.
 pub fn crib_menu(
     field: &Field,
     ring: usize,
-    crib: &[usize],
+    crib: &Encoded,
     offset: usize,
     configurations: &[u64],
 ) -> Result<Menu<Clock>, HnnError> {
@@ -256,11 +257,18 @@ pub fn crib_menu(
     let steps = ring_steps(field, ring, crib, configurations)?;
     let geometry = field.ring(ring);
     let machine = geometry.machine()?;
+    let cells = crib.cells();
+    let period = geometry.period();
+    // A class past the ring's ports reads no port there (no residue, THE_MACHINE guard 9): its crib
+    // pair is no edge of this ring's menu.
     let edges = (0..crib.len() - offset)
+        .filter(|&k| {
+            (cells[k].class() as u64) < period && (cells[k + offset].class() as u64) < period
+        })
         .map(|k| {
             machine.edge_at(
-                geometry.port(crib[k]),
-                geometry.port(crib[k + offset]),
+                geometry.port(cells[k].class()),
+                geometry.port(cells[k + offset].class()),
                 BigUint::from(steps[k]),
             )
         })
@@ -295,7 +303,7 @@ fn class(candidate: &Candidate<Clock>, period: u64) -> (u64, Vec<Option<usize>>)
 pub fn locate_ring(
     field: &Field,
     ring: usize,
-    crib: &[usize],
+    crib: &Encoded,
     offset: usize,
     configurations: &[u64],
     fallback: u64,
@@ -362,13 +370,22 @@ pub fn locate_ring(
 
 /// **Locate every ring's key** at a crib's opening (the lift `current`), per ring in carry order:
 /// ring `g` is located under the published or fallen-back configurations of rings `0 … g−1`, and a
-/// ring whose fibre is not one orbit keeps the current configuration.
+/// ring whose fibre is not one orbit keeps the current configuration. The crib is an encoded
+/// passage (THE_MACHINE guard 9; structural, `E0308` on a code list):
+///
+/// ```compile_fail,E0308
+/// use holonics::hnn::{Current, Field, locate_keys};
+/// fn locate(field: &Field, current: &Current, codes: &[usize]) {
+///     let _ = locate_keys(field, current, codes, 1);
+/// }
+/// ```
 pub fn locate_keys(
     field: &Field,
     current: &Current,
-    crib: &[usize],
+    crib: &Encoded,
     offset: usize,
 ) -> Result<KeyLocation, HnnError> {
+    field.admit(crib)?;
     let mut configurations: Vec<u64> = (0..field.rings().len())
         .map(|ring| current.phase(field, ring))
         .collect::<Result<_, _>>()?;
@@ -396,7 +413,7 @@ pub fn locate_keys(
 pub fn locate_closing(
     field: &Field,
     current: &Current,
-    crib: &[usize],
+    crib: &Encoded,
     offset: usize,
 ) -> Result<KeyLocation, HnnError> {
     let opening = Current::at(field, crib_opening(field, current.lift(), crib)?)?;
@@ -436,20 +453,24 @@ pub struct PairReading {
 /// index `opening` of its first station, each station `t ≥ opening` is one observation, read
 /// against every earlier cell of its passage at its distance `δ = t − s ∈ [1, t]`, held below the
 /// ring's period so each distance is one residue of the ring's clock. No distance is selected: the
-/// survivors decide. Refused when the passage holds a cell outside the exterior chart or opens no
-/// station.
+/// survivors decide. Refused unless the field admits the encoded passage (`Field::admit`), or when
+/// it opens no station. No code list enters (THE_MACHINE guard 9; structural, `E0308`):
+///
+/// ```compile_fail,E0308
+/// use holonics::hnn::Field;
+/// use holonics::hnn::keys::station_pairs;
+/// fn read(field: &Field, codes: &[usize]) {
+///     let _ = station_pairs(field, 0, codes, 1);
+/// }
+/// ```
 pub fn station_pairs(
     field: &Field,
     ring: usize,
-    passage: &[usize],
+    passage: &Encoded,
     opening: usize,
 ) -> Result<Vec<Vec<PairReading>>, HnnError> {
-    if let Some(&code) = passage.iter().find(|&&code| code >= field.alphabet()) {
-        return Err(HnnError::CellOutside {
-            code,
-            alphabet: field.alphabet(),
-        });
-    }
+    field.admit(passage)?;
+    let passage: Vec<usize> = passage.classes_read().collect();
     if opening == 0 || opening > passage.len() {
         return Err(HnnError::Crib {
             cells: passage.len(),
@@ -472,15 +493,17 @@ pub fn station_pairs(
 }
 
 /// **The data → menu map on a damaged passage** (module section "A damaged passage's menu"): each
-/// intact station `t ≥ opening` is one observation, returned with its station, read against every
-/// earlier intact cell at its distance `δ ∈ [1, min(t, d − 1)]`. An erased cell is no station and
-/// no antecedent. Refused as [`station_pairs`] is.
+/// intact station `t ≥ opening` (the passage's own opening) is one observation, returned with its
+/// station, read against every earlier intact cell at its distance `δ ∈ [1, min(t, d − 1)]`. An
+/// erased cell is no station and no antecedent. The passage is an encoded passage with its erasures
+/// (`compression::keys::repair::DamagedPassage::encoded`; THE_MACHINE guard 9). Refused at a class
+/// past the field's, or when it opens no station.
 pub fn damaged_station_pairs(
     field: &Field,
     ring: usize,
-    passage: &[Option<usize>],
-    opening: usize,
+    passage: &DamagedPassage,
 ) -> Result<Vec<(usize, Vec<PairReading>)>, HnnError> {
+    let (opening, passage) = (passage.opening(), passage.cells());
     if let Some(&code) = passage.iter().flatten().find(|&&code| code >= field.alphabet()) {
         return Err(HnnError::CellOutside {
             code,

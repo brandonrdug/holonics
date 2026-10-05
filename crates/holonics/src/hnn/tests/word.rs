@@ -5,6 +5,7 @@ use num_bigint::BigInt;
 use num_traits::Zero;
 
 use super::learning::chain;
+use crate::hnn::tests::support::encoded;
 use super::support::Medium;
 use crate::hnn::HnnError;
 use crate::hnn::field::{Current, Field};
@@ -13,7 +14,7 @@ use crate::hnn::receiving::{ActiveAddress, ReceivingPhases, ReceivingRead, grain
 use crate::hnn::word::Word;
 use crate::ratio::{Rat, integer};
 
-/// A cut of the chain control (rings of periods 2, 3, 2, source ring 0, receiving ring 2 with
+/// A cut of the chain control (rings of periods 4, 3, 2, source ring 0, receiving ring 2 with
 /// aperture 2): a constitution with a nonzero encoder, and a moment of 40 cells that fit no lock
 /// (code 1: odd and not divisible by 3), so every ring stays dormant at rest and every contact's
 /// exponent is zero: the word's laws, not the exponent's bits.
@@ -22,7 +23,7 @@ fn cut(field: &Field) -> (Medium, Current, SourceMoment) {
     let cells = vec![1usize; 40];
     let mut current = Current::at_rest(field);
     let mut moment = SourceMoment::open(field, &current);
-    moment.ingest(field, &mut current, &cells).unwrap();
+    moment.ingest(field, &mut current, &encoded(field, &cells)).unwrap();
     (medium, current, moment)
 }
 

@@ -60,6 +60,7 @@ use num_traits::{One, ToPrimitive, Zero};
 
 use crate::aeon::Reading;
 use crate::hnn::HnnError;
+use crate::hnn::encoding::Encoded;
 use crate::hnn::field::Field;
 use crate::hnn::realization::indexed;
 use crate::hnn::receiving::ReceivingRead;
@@ -265,16 +266,19 @@ pub struct TargetPhases {
 }
 
 /// **The target phases** of an epoch: the receiving ring's lift from the anchor `λ`, advanced by
-/// selective stepping over `t_0 … t_j` (with carries, as ingest would, without ingesting), read
-/// relative to the cut's winding `w = ⌊λ_R/d_R⌋`, which is returned as the branch. Each phase lies
-/// in `[0, 1 + 2(j+1)/d_R)`, the anchor's open phase plus at most two ticks a cell (a step and a
-/// carry), however long the stream before the cut.
+/// selective stepping over the encoded targets `t_0 … t_j` (with carries, as ingest would, without
+/// ingesting; a located route's digits and its squares at the consumer), read relative to the cut's
+/// winding `w = ⌊λ_R/d_R⌋`, which is returned as the branch. On an identity each phase lies in
+/// `[0, 1 + 2(j+1)/d_R)`, the anchor's open phase plus at most two ticks a cell (a step and a
+/// carry), however long the stream before the cut; a located step advances a ring by at most its
+/// period. Refused unless the field admits the targets (`Field::admit`).
 pub fn target_phases(
     field: &Field,
     anchor: &[BigInt],
     ring: usize,
-    targets: &[usize],
+    targets: &Encoded,
 ) -> Result<TargetPhases, HnnError> {
+    field.admit(targets)?;
     let declared = field.rings().get(ring).ok_or(HnnError::RingOutside {
         ring,
         rings: field.rings().len(),
@@ -289,10 +293,9 @@ pub fn target_phases(
     let branch = BigInt::from(declared.clock_at(at)?.winding().clone());
     let floor = &branch * BigInt::from(period);
     let mut lift = anchor.to_vec();
-    let phases = targets
-        .iter()
-        .map(|&code| {
-            field.selective_step(&mut lift, code)?;
+    let phases = (0..targets.len())
+        .map(|at| {
+            field.step_occurrence(&mut lift, targets, at)?;
             Ok(Rat::new(&lift[ring] - &floor, BigInt::from(period)))
         })
         .collect::<Result<_, HnnError>>()?;

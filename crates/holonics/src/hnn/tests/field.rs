@@ -3,6 +3,7 @@
 use num_bigint::{BigInt, BigUint};
 
 use super::learning::{OPEN_BUDGET, chain_declaration, generic};
+use crate::hnn::tests::support::encoded;
 use super::support::{Draw, chorded_field, contact, ring, small_field};
 use crate::geometry::RatVec3;
 use crate::hnn::HnnError;
@@ -20,9 +21,10 @@ use crate::ratio::{integer, rat};
 /// reflectors `p ↦ −p`, every ring at phase 0 with `Y_g = 2`, node `k` at the quarter turn `⌊4k/d⌋`
 /// (nodes 0 and 1 of ring 0 share `(1, 0)`: the period is combinatorial, review C2), the 4-cycle
 /// with channels matching node `i < min(d_g, d_h)`, `β_a = 2`, `Y_a = 2`, its one loop, `𝒮 = {0}`,
-/// `Δ = {1}`, `|A| = 256`, `h = 1`, `L = 1`, the receiver on ring 2 with aperture 2 and tolerance
-/// 1/16, and the crib `W = 64` at offset 1. The field these declare is not built here (no test
-/// builds a campaign's declared field): its capacity `n* = 6,148` is counted without declaring it
+/// `Δ = {1}`, `|A| = 5` (its source ring's ports; the bytes it read through the residue chart are
+/// refused by THE_MACHINE guard 9), `h = 1`, `L = 1`, the receiver on ring 2 with aperture 2 and
+/// tolerance 1/16, and the crib `W = 64` at offset 1. The field these declare is not built here (no
+/// test builds a campaign's declared field): its capacity `n* = 190 = 2·5·19` is counted without declaring it
 /// (`tests/moment.rs`), each law the declaration relies on is tested on the chain control or smaller,
 /// and its readings are the notebook's release receipts (`research/notebook/hnn_design`).
 #[test]
@@ -77,7 +79,7 @@ fn campaign_one_declares_its_values() {
     );
     assert_eq!(
         (declared.alphabet, declared.step.clone()),
-        (256, integer(1))
+        (5, integer(1))
     );
     assert_eq!(declared.exponent_grain, 1);
     let receiver = &declared.receivers[..];
@@ -95,16 +97,16 @@ fn campaign_one_declares_its_values() {
 }
 
 /// Guard 1: a population shorter than `n*` would leave the moment lossless, so it is refused, and
-/// the capacity itself is admitted (the chain control, `n* = 71`).
+/// the capacity itself is admitted (the chain control, `n* = 134 = 2·67`).
 #[test]
 fn a_population_below_capacity_is_refused() {
-    let n_star = capacity(&[2, 3, 2], &[0], 4, &[1]).unwrap().n_star();
-    assert_eq!(n_star, 71);
+    let n_star = capacity(&[4, 3, 2], &[0], 4, &[1]).unwrap().n_star();
+    assert_eq!(n_star, 134);
     assert_eq!(
         Field::declare(chain_declaration(n_star - 1)),
         Err(HnnError::BelowCapacity {
-            population: 70,
-            n_star: 71
+            population: 133,
+            n_star: 134
         })
     );
     assert!(Field::declare(chain_declaration(n_star)).is_ok());
@@ -210,7 +212,7 @@ fn only_closing_rings_on_their_circle_are_declared() {
         HnnError::Reflector { ring: 1 }
     ));
     assert!(matches!(
-        refuse(&|d| d.rings[0].lock = vec![2]),
+        refuse(&|d| d.rings[0].lock = vec![4]),
         HnnError::Notch { ring: 0, .. }
     ));
     assert!(matches!(
@@ -245,17 +247,17 @@ fn selective_stepping_steps_by_lock_and_carry_and_a_dormant_ring_keeps_its_phase
     // Locks {0} on every ring; code 1 has port 1 on every ring, so nothing steps.
     let mut current = Current::at_rest(&field);
     for _ in 0..5 {
-        let step = current.step(&field, 1).unwrap();
+        let step = current.step(&field, &encoded(&field, &[1]), 0).unwrap();
         assert_eq!(step.ticks, vec![0, 0, 0]);
     }
     assert_eq!(current.lift(), Current::at_rest(&field).lift());
     // Code 0 fits ring 0's lock (0 mod 2) and ring 1's (0 mod 3) and ring 2's (0 mod 2).
     let mut current = Current::at_rest(&field);
-    let first = current.step(&field, 0).unwrap();
+    let first = current.step(&field, &encoded(&field, &[0]), 0).unwrap();
     assert_eq!(first.ticks, vec![1, 1, 1]);
     // Ring 0 wraps at its second step and carries into ring 1, which wraps and carries into
     // ring 2: each later ring takes its lock step plus the carry.
-    let second = current.step(&field, 0).unwrap();
+    let second = current.step(&field, &encoded(&field, &[0]), 0).unwrap();
     assert_eq!(second.ticks, vec![1, 2, 2]);
     assert!(second.carry_out, "ring 2 steps 1 → 3 and wraps");
     assert_eq!(
@@ -264,10 +266,18 @@ fn selective_stepping_steps_by_lock_and_carry_and_a_dormant_ring_keeps_its_phase
     );
     assert_eq!(current.phase(&field, 1).unwrap(), 0);
     assert_eq!(current.winding(&field, 1).unwrap(), BigInt::from(1));
-    assert!(matches!(
-        current.step(&field, 2),
-        Err(HnnError::CellOutside { code: 2, .. })
-    ));
+    // A class past the source ring's ports has no encoding for this field (THE_MACHINE guard 9).
+    assert_eq!(
+        crate::hnn::encoding::Encoded::identity(
+            &crate::holarchy::terrain::KnownTruth::declared(3, vec![vec![2]]),
+            &field
+        ),
+        Err(crate::hnn::encoding::EncodingError::Fold {
+            classes: 3,
+            ring: 0,
+            period: 2
+        })
+    );
 }
 
 /// Re-keying sets a ring's phase class and keeps its winding; the jump is reported.

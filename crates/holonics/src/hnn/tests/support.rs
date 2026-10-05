@@ -136,6 +136,16 @@ pub(crate) fn small_field(
     contacts: Vec<ContactDeclaration>,
     receiver: usize,
 ) -> Field {
+    small_field_of(periods, contacts, receiver, 2)
+}
+
+/// [`small_field`] reading an encoding of `classes` classes.
+pub(crate) fn small_field_of(
+    periods: &[u64],
+    contacts: Vec<ContactDeclaration>,
+    receiver: usize,
+    classes: usize,
+) -> Field {
     Field::declare(
         FieldDeclaration {
             rings: periods
@@ -146,7 +156,7 @@ pub(crate) fn small_field(
             loops: Vec::new(),
             sources: vec![0],
             offsets: vec![1],
-            alphabet: 2,
+            alphabet: classes,
             step: integer(1),
             exponent_grain: 1,
             receivers: vec![ReceiverDeclaration {
@@ -515,4 +525,37 @@ pub(super) fn injection(field: &Field, seed: u64) -> Vec<Vec<Rat>> {
         .iter()
         .map(|ring| draw.vector(ring.width()))
         .collect()
+}
+
+/// **A declared word, encoded for the field** (THE_MACHINE guard 9): the tests' word as a known
+/// truth (`KnownTruth::declared`, in-crate tests only) on the widest class chart the field reads
+/// without a fold, its class count and every source ring's period at most, through its declared
+/// identity, so the field's entries read it as every source reaches them.
+pub(crate) fn encoded(field: &Field, word: &[usize]) -> crate::hnn::encoding::Encoded {
+    crate::hnn::encoding::Encoded::identity(
+        &crate::holarchy::terrain::KnownTruth::declared(classes(field), vec![word.to_vec()]),
+        field,
+    )
+    .expect("a test's declared word on the field's classes")
+    .remove(0)
+}
+
+/// **A declared word on `classes` classes with no field of its own** (a reading that steps no
+/// field: the prequential replay, a tree's letters): encoded for a one-ring field of period
+/// `max(classes, 2)` that reads them.
+pub(crate) fn encoded_classes(classes: usize, word: &[usize]) -> crate::hnn::encoding::Encoded {
+    encoded(
+        &small_field_of(&[classes.max(2) as u64], Vec::new(), 0, classes),
+        word,
+    )
+}
+
+/// **The widest class chart the field reads without a fold**: its class count and every source
+/// ring's period at most (THE_MACHINE guard 9). A test draws its words below it.
+pub(crate) fn classes(field: &Field) -> usize {
+    field
+        .sources()
+        .iter()
+        .map(|&ring| field.ring(ring).period() as usize)
+        .fold(field.alphabet(), usize::min)
 }
