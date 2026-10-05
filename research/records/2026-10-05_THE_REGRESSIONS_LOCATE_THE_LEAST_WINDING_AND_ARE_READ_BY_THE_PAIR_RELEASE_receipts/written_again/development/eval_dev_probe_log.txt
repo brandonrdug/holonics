@@ -1,0 +1,7 @@
+  probe-founded (transport modulus 102837/131072; closed pair contacts at []): released 3, held 5, refused 0, refused certificates 0; whole sections 0 of 8 (nonconstant 0 of 8, constant 0 of 0); the success rule (every nonconstant section whole): does not hold; incorrect releases 3; reaching the termination 1; stations right 16 by station [2, 1, 4, 0, 3, 0, 3, 3]; first lock at a request-reading station (0 or 1) 0, first lock right 6; 11767 ms
+executed evaluate: 12011 ms; resident 119160832 now, 123146240 peak
+--- scope: exit 0; memory.peak 120303616 bytes
+Main processes terminated with: code=exited, status=0/SUCCESS
+               Service runtime: 12.032s
+             CPU time consumed: 1min 35.899s
+wall 12040 ms

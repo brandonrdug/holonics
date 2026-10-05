@@ -1,0 +1,6 @@
+# The validation read of line over the keys states written again (`executed evaluate line 2026093038 64`,
+# both keys states), read once after the passages and the development reads; #365 read 48 of 48 nonconstant and 16 of 16 constant whole there.
+command = executed evaluate
+projection = 64 requests on two states, each state at its largest measured time a request before launch (the development read at this build on 2_026_093_042, #365's development reads on 042 and 043 and its validation read): the founded 6147/8 and the lossless 6153/8 (this build, 042), so 64 · 12300/8 = 98,400 ms, upper 123,000 ms; the deadline is the upper end, 5/4 of it, in whole seconds
+deadline_ms = 123000
+threads = 12

@@ -1,0 +1,13 @@
+keys on alternation, seed 2026093034, 128 requests: 1024 observations read
+  first lock at 1 observations (0 requests plus 1 stations): δ 1, map [(1, 1)], cycle 1, turns [0]
+  located from 33 observations (4 requests plus 1 stations) to the passage's end: δ 2, map [(0, 0), (1, 1), (2, 2), (3, 3)]
+  one map class from 39 observations (4 requests plus 7 stations) to the passage's end: the distances [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46] each publish one map
+  the first lock's pair is not the pair located at the passage's end
+  deposit on the lossless opening at observation 33: δ 2, classes [(0, 0), (1, 1), (2, 2), (3, 3)], slip 120 → 0, certified step η 2 (a 120, C 60, c 1/2, decrease 120), consumer (E − B) T = U B holds, storage growth 0, largest entry 1, bits 385348, transport 1; 51 ms
+  deposit on the founded opening at observation 33: δ 2, classes [(0, 0), (1, 1), (2, 2), (3, 3)], slip 120 → 0, certified step η 2 (a 120, C 60, c 1/2, decrease 120), consumer (E − B) T = U B holds, storage growth 0, largest entry 1, bits 385348, transport 102837/131072; 29 ms
+executed keys: 499 ms; resident 125677568 now, 145412096 peak
+--- scope: exit 0; memory.peak 144265216 bytes
+Main processes terminated with: code=exited, status=0/SUCCESS
+               Service runtime: 534ms
+             CPU time consumed: 513ms
+wall 541 ms

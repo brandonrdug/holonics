@@ -1,0 +1,6 @@
+keys-probe at observation 16: δ 2, turn 15, images [Some(0), Some(15), Some(30), Some(45), None], wave nodes 0 and 47, scale 4
+--- scope: exit 0; memory.peak 121143296 bytes
+Main processes terminated with: code=exited, status=0/SUCCESS
+               Service runtime: 414ms
+             CPU time consumed: 405ms
+wall 421 ms

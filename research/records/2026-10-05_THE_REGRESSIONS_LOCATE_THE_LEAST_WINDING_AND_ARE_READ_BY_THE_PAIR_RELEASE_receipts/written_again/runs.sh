@@ -7,7 +7,7 @@
 # (2_026_093_033, 036, 039) are spent: no run reads them.
 #   bash runs.sh passages     the training passages and the probe (keys.pin, keys-probe.pin)
 #   bash runs.sh development  the development reads on 2_026_093_042 (evaluate-dev.pin)
-#   bash runs.sh validation   the validation reads, 64 requests each (evaluate-validation.pin)
+#   bash runs.sh validation   the validation reads, 64 requests each (evaluate-validation-<terrain>.pin)
 set -u
 bin=./target/release/examples/hnn_prediction
 out=research/records/2026-10-05_THE_REGRESSIONS_LOCATE_THE_LEAST_WINDING_AND_ARE_READ_BY_THE_PAIR_RELEASE_receipts/written_again
@@ -70,10 +70,11 @@ development)
     $out/development/eval_dev_probe_sections.txt probe-founded=$out/state_probe_order2_founded.txt
   ;;
 validation)
-  # #365's validation reads (64 requests, the keys states only), each read once, one after the other.
-  limits evaluate-validation.pin
+  # #365's validation reads (64 requests, the keys states only), each read once, one after the other
+  # (one read holds the thread budget), each under its own pin.
   for t in "order2 2026093032" "alternation 2026093035" "line 2026093038"; do
     set -- $t
+    limits evaluate-validation-$1.pin
     measured $out/validation_$1_log.txt timeout $deadline $bin executed evaluate $1 $2 64 \
       $out/validation_$1_sections.txt $(states $1)
   done
