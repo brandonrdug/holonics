@@ -340,7 +340,7 @@ fn text_declared() -> Declared {
     }
 }
 
-/// [measured; agent-inferred, October 5; the record above] **`executed text <cut> <out dir> <dev|run> [<state> [<from> <to> [<unit bound ms>]]]`**:
+/// [measured; agent-inferred, October 5; the record above] **`executed text <cut> <out dir> <pin> <dev|run> [<state> [<from> <to>]]`**:
 /// lane B's key location and lane C's release, unchanged, on a text cut through the byte chart
 /// ([`text_declared`]). The training passage is read as `executed keys` reads a terrain's (each window
 /// a request and its section, one observation a station, read against every earlier cell of its
@@ -353,12 +353,17 @@ fn text_declared() -> Declared {
 /// two openings. The release is `hnn::prediction::generate_by_bank`, one per request, read whole.
 /// `dev` reads one development window (the one after the training passage) on each state, for the
 /// projection; `run` reads the pinned requests. With a state's label (`lossless`, `founded`, or a
-/// deposit's `keys-…`), only that state is read; with `<from> <to>`, only the requests `from..to`;
-/// with `<unit bound ms>`, the read stops after a request that took longer. The requests are read
+/// deposit's `keys-…`), only that state is read; with `<from> <to>`, only the requests `from..to`.
+/// The committed pin (THE_MACHINE guard 22; `exterior::Pin`) holds the deadline, the thread budget
+/// and the unit bound: the read stops after a request that took longer. The requests are read
 /// one after another, each with the whole thread budget (the unit the development read measures),
 /// each written to `<out dir>` as it completes, one progress line each.
 /// Stdout carries counts only; every byte (the training passage, each request, its truth and each
 /// state's release) is written to `<out dir>`, which must be a private directory (`.local/`).
+/// [agent-inferred, October 5; guards 21 and 19] The training passage and the development window
+/// are read from the cut's `Seen` range, and the pinned requests from its `Held` range, taken by
+/// value ([`held_requests`]); each release is shown whole through `exterior::show_release`, with
+/// its copy length against the passages the machine admitted (the training passage and its request).
 #[allow(clippy::disallowed_methods)]
 pub(super) fn text(
     cut: &str,
@@ -376,25 +381,31 @@ pub(super) fn text(
     let ring = engine.refinement.ring();
     let field = &engine.field;
     let period = usize::try_from(field.ring(ring).period()).expect("a period fits");
-    let (bytes, population, held) = exterior::read_cut(cut);
+    let exterior::Cut { population, seen, held } = exterior::read_cut(cut);
     let window = declared.request + declared.stations;
-    let pair_at = |start: usize| -> (Vec<usize>, Vec<usize>) {
-        let cells: Vec<usize> = bytes[start..start + window].iter().map(|&b| usize::from(b)).collect();
+    let split = |cells: &[u8]| -> (Vec<usize>, Vec<usize>) {
+        let cells: Vec<usize> = cells.iter().map(|&b| usize::from(b)).collect();
         let (request, target) = cells.split_at(declared.request);
         (request.to_vec(), target.to_vec())
     };
-    assert!(TEXT_TRAINING_WINDOWS * window <= held.start, "the training passage lies before the held-out range");
-    let training: Vec<_> = (0..TEXT_TRAINING_WINDOWS).map(|i| pair_at(i * window)).collect();
-    let stride = (held.end - held.start) / TEXT_REQUESTS;
+    let seen_at = |start: usize| split(&seen.bytes()[start..start + window]);
+    let held_range = held.range();
+    assert!(TEXT_TRAINING_WINDOWS * window <= seen.range().end, "the training passage lies in the seen range");
+    let training: Vec<_> = (0..TEXT_TRAINING_WINDOWS).map(|i| seen_at(i * window)).collect();
+    let stride = (held_range.end - held_range.start) / TEXT_REQUESTS;
     assert!(stride >= window, "the requests are disjoint");
     let (starts, label): (Vec<usize>, &str) = match which {
         "dev" => (vec![TEXT_TRAINING_WINDOWS * window], "development window"),
-        "run" => ((0..TEXT_REQUESTS).map(|i| held.start + i * stride).collect(), "pinned requests"),
-        _ => panic!("executed text <cut> <out dir> <dev|run>"),
+        "run" => ((0..TEXT_REQUESTS).map(|i| held_range.start + i * stride).collect(), "pinned requests"),
+        _ => panic!("executed text <cut> <out dir> <pin> <dev|run>"),
     };
-    let requests: Vec<_> = starts.iter().map(|&start| pair_at(start)).collect();
+    let requests: Vec<_> = match which {
+        "dev" => starts.iter().map(|&start| seen_at(start)).collect(),
+        _ => held_requests(held, &starts, window).iter().map(|cells| split(cells)).collect(),
+    };
     std::fs::create_dir_all(out).expect("the private directory");
-    std::fs::write(format!("{out}/training.bin"), &bytes[..TEXT_TRAINING_WINDOWS * window]).expect("write");
+    let training_bytes = &seen.bytes()[..TEXT_TRAINING_WINDOWS * window];
+    std::fs::write(format!("{out}/training.bin"), training_bytes).expect("write");
     for (i, (request, target)) in requests.iter().enumerate() {
         let as_bytes = |cells: &[usize]| cells.iter().map(|&c| u8::try_from(c).expect("a byte")).collect::<Vec<u8>>();
         std::fs::write(format!("{out}/request_{i}.bin"), as_bytes(request)).expect("write");
@@ -402,8 +413,8 @@ pub(super) fn text(
     }
     println!(
         "executed text ({which}): the cut {population} bytes, held-out range {}..{}; training passage bytes 0..{} ({} windows of {window}, {} observations); {} {label} of {window} bytes at stride {stride} from {}; d = {period}, |A| = {}, ports code mod {period}",
-        held.start,
-        held.end,
+        held_range.start,
+        held_range.end,
         TEXT_TRAINING_WINDOWS * window,
         TEXT_TRAINING_WINDOWS,
         TEXT_TRAINING_WINDOWS * declared.stations,
@@ -576,7 +587,8 @@ pub(super) fn text(
                     )
                 }
             };
-            std::fs::write(format!("{out}/{name}_{i}.release"), &emitted).expect("write the release");
+            let request_bytes: Vec<u8> = request.iter().map(|&c| u8::try_from(c).expect("a byte")).collect();
+            exterior::show_release(out, &format!("{name}_{i}.release"), &emitted, &[training_bytes, &request_bytes]);
             std::fs::write(format!("{out}/{name}_{i}.section"), format!("{line}\n")).expect("write the section");
             println!(
                 "    {name} request {i}: {}, {ms} ms; the state's elapsed {} ms",
@@ -599,4 +611,12 @@ pub(super) fn text(
         );
     }
     println!("executed text: {} ms; resident {}", clock.elapsed().as_millis(), resident());
+}
+
+/// [definition; agent-inferred, October 5; THE_MACHINE guard 21] **The pinned requests, read from
+/// the held-out range**: the cut's `Held`, taken by value and read once at the declared windows. A
+/// `Seen` range is refused here (`E0308`), so the requests graded as held out are material no run
+/// read; the development window is read from the `Seen` range instead.
+fn held_requests(held: exterior::Held, starts: &[usize], window: usize) -> Vec<Vec<u8>> {
+    held.windows(starts, window)
 }

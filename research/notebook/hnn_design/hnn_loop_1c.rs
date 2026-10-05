@@ -6,9 +6,9 @@
 //! ```sh
 //! cargo run --release -p holonics --example hnn_prediction -- executed restore <label=state>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed replay <terrain> <seed> <count> <label=state|label=partial:file>…
-//! cargo run --release -p holonics --example hnn_prediction -- executed coupling <terrain> <seed> <count> <deadline ms> <label=state|label=partial:file|label=opening>…
-//! cargo run --release -p holonics --example hnn_prediction -- executed represent <terrain> <seed> <count> <iterates> <deadline ms> <out> [<held-out seed>]
-//! cargo run --release -p holonics --example hnn_prediction -- executed resume-coupling <terrain> <seed> <count> <c1 state> <gate A receipt> <move bound ms> <capture dir>
+//! cargo run --release -p holonics --example hnn_prediction -- executed coupling <terrain> <seed> <count> <pin> <label=state|label=partial:file|label=opening>…
+//! cargo run --release -p holonics --example hnn_prediction -- executed represent <terrain> <seed> <count> <iterates> <pin> <out> [<held-out seed>]
+//! cargo run --release -p holonics --example hnn_prediction -- executed resume-coupling <terrain> <seed> <count> <c1 state> <gate A receipt> <pin> <capture dir>
 //! ```
 //!
 //! **Fail-closed** (Astra's review of `722c3334`). Every arm is declared (`label=<state>`, a
@@ -148,7 +148,8 @@ fn summary_line(label: &str, theta: &Constitution, batch: &BatchComparison, targ
 
 /// The exit status of a run stopped incomplete: its own deadline reached, or a pinned bound passed
 /// before a unit was read (the pin §6.2, §6.4). Never a valid result, and never truncated into one.
-pub(super) const INCOMPLETE: i32 = 3;
+/// It is the exterior's (`exterior::INCOMPLETE`), where a run's pin stops it at its deadline.
+pub(super) use super::exterior::INCOMPLETE;
 /// The exit status of a refused input: a checkpoint that does not restore whole or does not write
 /// back to its own text, a witness file outside the representation's bounds (the pin §3.1), or a
 /// reading the release refuses.

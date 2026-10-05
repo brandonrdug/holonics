@@ -466,9 +466,58 @@ pub enum Readout {
     Keys(KeyReadout),
 }
 
+/// [definition] **The seal on the receiver's families** (THE_MACHINE guard 20; the lessons' most
+/// repeated failure, "an authored routine stood in for learning", and the antipattern record "No
+/// catered machinery"). `Family`, `Emitters`, `Layered`, `Keystone` and `PortReader` are
+/// the population's entries: whatever implements them is read as a navigator family whose keys the
+/// receiver locates. Each has `Sealed` as a supertrait, and `Sealed` lives in this private module,
+/// so only this crate can implement them: an outside crate (the notebook, an example, an
+/// application) cannot hand the population a task's solution routine as a family, an emitter, a
+/// keystone or a port reader. The implementors are the library's own navigator families, each built
+/// from a terrain's or the field's declarations: `KeyFamily` (over `Survivors` of
+/// `GratingSheet`, `GratingParity`, `RotorKeys` or `PortedEmitters`), `DormantFamily`
+/// (over a `Layered` grating), `FoundedFamily`, `ChaseFamily`, `Unheld` and `Composed`.
+/// No library type implements `Keystone` or `PortReader` yet; the composition's tests declare
+/// theirs (rings and phase readers), and the in-crate tests' scripted families (`Fixed`,
+/// `Refusing`, `Scripted`, `ByPhase`) are test scaffolding of the population's laws, never read by a
+/// run. Structural: the `compile_fail` doctests on each trait.
+mod sealed {
+    /// Implemented only inside `holonics`, by the library's own navigator families.
+    pub trait Sealed {}
+}
+pub(crate) use sealed::Sealed;
+
 /// [definition] **A declared navigator family** (module header): a candidate egg read by the
-/// receiver.
-pub trait Family: Send {
+/// receiver. Sealed (THE_MACHINE guard 20; the seal above): only this crate's
+/// navigator families implement it.
+///
+/// An outside type cannot be a family (structural, `E0277`: `Sealed` is not implemented for it):
+///
+/// ```compile_fail,E0277
+/// use holonics::ratio::Rat;
+/// use holonics::receiver::population::{
+///     Declaration, Family, Likelihood, PopulationError, Readout,
+/// };
+/// struct Authored;
+/// impl Family for Authored {
+///     fn label(&self) -> String { unimplemented!() }
+///     fn alphabet(&self) -> usize { unimplemented!() }
+///     fn description(&self) -> u64 { unimplemented!() }
+///     fn face(&self) -> Result<Vec<Rat>, PopulationError> { unimplemented!() }
+///     fn receive(&mut self, _: usize) -> Result<Rat, PopulationError> { unimplemented!() }
+///     fn likelihood(&self) -> Likelihood { unimplemented!() }
+///     fn readout(&self) -> Readout { unimplemented!() }
+///     fn declaration(&self) -> Declaration { unimplemented!() }
+/// }
+/// ```
+///
+/// and the seal cannot be named from outside (structural, `E0603`: the module is private):
+///
+/// ```compile_fail,E0603
+/// struct Authored;
+/// impl holonics::receiver::population::sealed::Sealed for Authored {}
+/// ```
+pub trait Family: Sealed + Send {
     /// The family's declaration, for a receipt.
     fn label(&self) -> String;
     /// The declared cell alphabet.
@@ -573,8 +622,23 @@ pub(crate) fn mixed_radix(radices: impl Iterator<Item = usize>, mut cell: usize)
 
 /// [definition] **A declared finite key space of deterministic emitters** (module header, "A
 /// deterministic family"): key `k < |K|` emits one class a tick; the emitters' navigators advance
-/// together past each received cell.
-pub trait Emitters: Send {
+/// together past each received cell. Sealed (THE_MACHINE guard 20): a [`KeyFamily`] is built over
+/// this crate's emitters only, so an authored emitter cannot enter through [`Survivors`]
+/// (structural, `E0277`):
+///
+/// ```compile_fail,E0277
+/// use holonics::receiver::population::{Declaration, Emitters, PopulationError};
+/// struct Authored;
+/// impl Emitters for Authored {
+///     fn alphabet(&self) -> usize { unimplemented!() }
+///     fn keys(&self) -> u64 { unimplemented!() }
+///     fn emit(&self, _: u64) -> usize { unimplemented!() }
+///     fn advance(&mut self, _: usize) -> Result<(), PopulationError> { unimplemented!() }
+///     fn coordinates(&self, _: u64) -> Vec<u64> { unimplemented!() }
+///     fn declaration(&self) -> Declaration { unimplemented!() }
+/// }
+/// ```
+pub trait Emitters: Sealed + Send {
     /// The emitted classes' alphabet.
     fn alphabet(&self) -> usize;
     /// `|K|`.
@@ -932,6 +996,8 @@ impl KeyFamily {
         )
     }
 }
+
+impl Sealed for KeyFamily {}
 
 impl Family for KeyFamily {
     fn label(&self) -> String {

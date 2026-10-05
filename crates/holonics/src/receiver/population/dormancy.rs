@@ -79,7 +79,28 @@ use crate::compression::landmark::context::PassageCode;
 use crate::ratio::Rat;
 
 /// [definition] **A layered key space** (module header): each key sounds one bit a layer at the
-/// current tick, and its class is read from the sounding bits of its active layers.
+/// current tick, and its class is read from the sounding bits of its active layers. Sealed through
+/// [`Emitters`] (THE_MACHINE guard 20): an outside layered key space is refused (structural,
+/// `E0277`):
+///
+/// ```compile_fail,E0277
+/// use holonics::receiver::population::{Declaration, Emitters, Layered, PopulationError};
+/// struct Authored;
+/// impl Emitters for Authored {
+///     fn alphabet(&self) -> usize { unimplemented!() }
+///     fn keys(&self) -> u64 { unimplemented!() }
+///     fn emit(&self, _: u64) -> usize { unimplemented!() }
+///     fn advance(&mut self, _: usize) -> Result<(), PopulationError> { unimplemented!() }
+///     fn coordinates(&self, _: u64) -> Vec<u64> { unimplemented!() }
+///     fn declaration(&self) -> Declaration { unimplemented!() }
+/// }
+/// impl Layered for Authored {
+///     fn layers(&self) -> usize { unimplemented!() }
+///     fn sounding(&self, _: u64) -> usize { unimplemented!() }
+///     fn class(&self, _: usize, _: usize) -> usize { unimplemented!() }
+///     fn wind(&mut self, _: u64) { unimplemented!() }
+/// }
+/// ```
 pub trait Layered: Emitters + Sync {
     /// The layers `L` a key reads through.
     fn layers(&self) -> usize;
@@ -635,6 +656,8 @@ impl DormantFamily {
         )
     }
 }
+
+impl super::Sealed for DormantFamily {}
 
 impl Family for DormantFamily {
     fn label(&self) -> String {

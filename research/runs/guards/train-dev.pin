@@ -1,0 +1,6 @@
+# A small read of `executed train` (one move on one request) that shows the deadline moved from the
+# command line to a pin leaves its readings unchanged.
+command = executed train
+projection = one move on one request, measured 53,216 ms at 8 threads before the change; the deadline, checked before each move, is the one the measurement ran under
+deadline_ms = 120000
+threads = 8

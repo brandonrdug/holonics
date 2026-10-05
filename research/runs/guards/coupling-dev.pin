@@ -1,0 +1,6 @@
+# A small read of `executed coupling` (one request at the opening) that shows the deadline moved
+# from the command line to a pin leaves its readings unchanged.
+command = executed coupling
+projection = one constitution on one request, measured 18,727 ms at 8 threads before the change; the deadline, checked before each constitution, is the one the measurement ran under
+deadline_ms = 120000
+threads = 8

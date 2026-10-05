@@ -860,6 +860,8 @@ impl FoundedFamily {
     }
 }
 
+impl super::Sealed for FoundedFamily {}
+
 impl Family for FoundedFamily {
     fn label(&self) -> String {
         self.label.clone()

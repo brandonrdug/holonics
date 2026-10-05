@@ -1,0 +1,7 @@
+# Loop 1c's run `replay` (research/notebook/hnn_design/loop_1c_runs.sh; the pin
+# research/records/2026-10-01_LOOP_1C_PERSISTENCE_REPRESENTATION_AND_REACH_PINNED_BEFORE_ITS_RUNS.md §6).
+# Its limits moved unchanged from the launcher's command line on October 5 (THE_MACHINE guard 22).
+command = executed witness
+projection = 306738 ms a move upper (§6.2′); the procedure's own deadline, checked before each move, leaves one move and the last read (45592 ms) inside the outer guard of 4954 s (projection upper 4953400 ms)
+deadline_ms = 4601070
+threads = 12

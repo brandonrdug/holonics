@@ -187,6 +187,8 @@ impl ChaseFamily {
     }
 }
 
+impl super::Sealed for ChaseFamily {}
+
 impl Family for ChaseFamily {
     fn label(&self) -> String {
         self.label.clone()

@@ -53,7 +53,7 @@ echo "$*" >> "$STUB_LOG"
 case "$2" in
   restore) exec "$REAL_BIN" "$@" ;;
   witness)
-    # executed witness order2 <seed> <count> <moves> <deadline> <best> <states dir>
+    # executed witness order2 <seed> <count> <moves> <pin> <best> <states dir>
     states=$9
     case "${STUB_REPLAY:-match}" in
       timeout) exec sleep 30 ;;
@@ -76,7 +76,7 @@ case "$2" in
     ;;
   coupling) echo "executed coupling: a stub" ;;
   represent)
-    # executed represent order2 <seed> <count> <iterates> <deadline> <out> [<held-out seed>]
+    # executed represent order2 <seed> <count> <iterates> <pin> <out> [<held-out seed>]
     head -n 122 "$GATE_A/witness_best.state" > "$8"
     if [[ ${STUB_REPRESENT:-none} == witness ]]; then
       echo "executed represent: a witness FOUND at iterate 2, trial 0: the strict test holds at all 64 decision terms of its own release; E and ρ written to $8 (a representation diagnostic, not a learning result)"
@@ -98,7 +98,7 @@ case "$2" in
     esac
     ;;
   resume-coupling)
-    # executed resume-coupling order2 <seed> <count> <c1 state> <receipt> <move bound ms> <capture>
+    # executed resume-coupling order2 <seed> <count> <c1 state> <receipt> <pin> <capture>
     echo "RAYON_NUM_THREADS=${RAYON_NUM_THREADS:-unset}" >> "$STUB_LOG"
     receipt=$7
     capture=$9
@@ -387,7 +387,7 @@ rel=research/records/2026-09-30_STEP_1B_GATE_A_receipts
 expect "positive control: a run that reproduces gate A is verified: $status" is "$status" 0
 expect "  stamped" test -s "$dir/stamps/c2.ok"
 expect "  launched once, with the declared arguments" \
-  is "$(launched "$dir" "^executed resume-coupling order2 2026093061 8 $rel/witness_best.state $rel/witness.txt 210496 $dir/c2_capture\$")" 1
+  is "$(launched "$dir" "^executed resume-coupling order2 2026093061 8 $rel/witness_best.state $rel/witness.txt research/runs/loop-1c/c2.pin $dir/c2_capture\$")" 1
 expect "  at 12 threads" is "$(launched "$dir" '^RAYON_NUM_THREADS=12$')" 1
 expect "  under its outer guard of 257 s" grep -q '^exit 0 (124: the outer guard of 257 s)' "$dir/c2.time"
 expect "  the stamp covers the listing and the capture" \

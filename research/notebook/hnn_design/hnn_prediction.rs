@@ -8,22 +8,23 @@
 //!
 //! ```sh
 //! cargo run --release -p holonics --example hnn_prediction -- executed move <seed> <requests>
-//! cargo run --release -p holonics --example hnn_prediction -- executed train <arm> <terrain> <seed> <batch> <moves> <deadline ms> <out>
+//! cargo run --release -p holonics --example hnn_prediction -- executed train <arm> <terrain> <seed> <batch> <moves> <pin> <out>
 //! cargo run --release -p holonics --example hnn_prediction -- executed evaluate <terrain> <seed> <count> <out> <label[=E]>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed spread <terrain> <seed> <count> <label[=E]>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed slopes <terrain> <seed> <count> <label[=E]>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed counts <terrain> <training seed> <count> <validation seed> <count> <out>
-//! cargo run --release -p holonics --example hnn_prediction -- executed witness <terrain> <seed> <count> <moves> <deadline ms> <out> [<states dir>]
-//! cargo run --release -p holonics --example hnn_prediction -- executed run <terrain> <seed> <count> <out> <label=state> <arm> <metric> <cap|none> <deadline ms>
+//! cargo run --release -p holonics --example hnn_prediction -- executed witness <terrain> <seed> <count> <moves> <pin> <out> [<states dir>]
+//! cargo run --release -p holonics --example hnn_prediction -- executed run <terrain> <seed> <count> <out> <label=state> <arm> <metric> <cap|none> <pin>
 //! cargo run --release -p holonics --example hnn_prediction -- executed replay <terrain> <seed> <count> <label=state>…
-//! cargo run --release -p holonics --example hnn_prediction -- executed coupling <terrain> <seed> <count> <deadline ms> <label=state|label=opening>…
-//! cargo run --release -p holonics --example hnn_prediction -- executed represent <terrain> <seed> <count> <iterates> <deadline ms> <out> [<held-out seed>]
-//! cargo run --release -p holonics --example hnn_prediction -- executed resume-coupling <terrain> <seed> <count> <c1 state> <gate A receipt> <move bound ms> <capture dir>
+//! cargo run --release -p holonics --example hnn_prediction -- executed coupling <terrain> <seed> <count> <pin> <label=state|label=opening>…
+//! cargo run --release -p holonics --example hnn_prediction -- executed represent <terrain> <seed> <count> <iterates> <pin> <out> [<held-out seed>]
+//! cargo run --release -p holonics --example hnn_prediction -- executed resume-coupling <terrain> <seed> <count> <c1 state> <gate A receipt> <pin> <capture dir>
 //! cargo run --release -p holonics --example hnn_prediction -- executed causal <terrain> <seed> <count> <label[=E]>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed joined <terrain> <seed> <count> <arm> <label=source>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed keys <terrain> <training seed> <count> <out>
 //! cargo run --release -p holonics --example hnn_prediction -- executed pair-members <terrain> <seed> <count> <state>
-//! cargo run --release -p holonics --example hnn_prediction -- executed text <cut> <private out dir> <dev|run> [<state> [<from> <to> [<unit bound ms>]]]
+//! cargo run --release -p holonics --example hnn_prediction -- executed text <cut> <private out dir> <pin> <dev|run> [<state> [<from> <to>]]
+//! cargo run --release -p holonics --example hnn_prediction -- executed text-repair <cut> <private out dir> <pin> <dev|run>
 //! cargo run --release -p holonics --example hnn_prediction -- executed repair <terrain> <A|B> <seed> <count> <out>
 //! ```
 //!
@@ -51,6 +52,15 @@
 //! `text`, `probe`, `develop`: native generation, the order repair, the bank's generation and
 //! learning path, the pumped receiving ring) and the executed loop's `face` arm were retired on
 //! September 30 (THE_REBUILD U6, batch N2); their source is at commit `7ca300bb`.
+//!
+//! [definition; agent-inferred, October 5; THE_MACHINE guard 22] **A run's limits are its pin's.**
+//! Every mode bounded in time names a committed pin (`exterior::Pin`) where it took a deadline or a
+//! bound in milliseconds: the pin holds the deadline, the unit bound and the thread budget with
+//! their projection, and is refused when missing, uncommitted, changed since its commit or
+//! committed twice. The modes that check their own deadline before each unit (`train`, `witness`,
+//! `coupling`, `represent`, `run`, `resume-coupling`'s move bound) read it there; `text` and
+//! `text-repair`, which have no check of their own, stop at the pinned deadline. Counts that
+//! declare the read (moves, iterates, a cap, a read budget) stay its arguments.
 
 #[path = "exterior.rs"]
 mod exterior;
@@ -290,7 +300,21 @@ fn order_pairs(declared: &Declared, seed: u64, count: usize) -> Vec<(Vec<usize>,
         .collect()
 }
 
+/// **The run's pin** (module header, guard 22): read, launched from the process's clock (`arm` for
+/// a mode with no deadline check of its own), and its thread budget installed as the host's pool
+/// before any parallel read.
+fn pinned(path: &str, command: &str, clock: Instant, arm: bool) -> exterior::Pin {
+    let pin = exterior::Pin::read(path, command);
+    pin.launch(clock, arm);
+    rayon::ThreadPoolBuilder::new()
+        .num_threads(pin.threads())
+        .build_global()
+        .expect("the pinned thread budget is the host's first pool");
+    pin
+}
+
 fn main() {
+    let clock = Instant::now();
     let arguments: Vec<String> = std::env::args().collect();
     match (arguments.get(1).map(String::as_str), arguments.get(2).map(String::as_str)) {
         (Some("executed"), Some("move")) => executed_loop::stage_one(
@@ -303,7 +327,7 @@ fn main() {
             arguments[5].parse().expect("a seed"),
             arguments[6].parse().expect("a batch"),
             arguments[7].parse().expect("moves"),
-            arguments[8].parse().expect("a deadline in ms"),
+            pinned(&arguments[8], "executed train", clock, false).deadline_ms(),
             &arguments[9],
         ),
         (Some("executed"), Some("spread")) => executed_loop::spread(
@@ -335,7 +359,7 @@ fn main() {
             arguments[4].parse().expect("a seed"),
             arguments[5].parse().expect("a count"),
             arguments[6].parse().expect("moves"),
-            arguments[7].parse().expect("a deadline in ms"),
+            pinned(&arguments[7], "executed witness", clock, false).deadline_ms(),
             &arguments[8],
             arguments.get(9).map(String::as_str),
         ),
@@ -355,7 +379,7 @@ fn main() {
             &arguments[3],
             arguments[4].parse().expect("a seed"),
             arguments[5].parse().expect("a count"),
-            arguments[6].parse().expect("a deadline in ms"),
+            pinned(&arguments[6], "executed coupling", clock, false).deadline_ms(),
             &arguments[7..],
         ),
         // Loop 1c's c2 diagnostic: gate A's saved constitution 1 resumed by one native update, its
@@ -366,7 +390,9 @@ fn main() {
             arguments[5].parse().expect("a count"),
             &arguments[6],
             &arguments[7],
-            arguments[8].parse().expect("the move's bound in ms"),
+            pinned(&arguments[8], "executed resume-coupling", clock, false)
+                .unit_bound_ms()
+                .expect("refused: the pin declares the move's bound as its unit_bound_ms"),
             &arguments[9],
         ),
         (Some("executed"), Some("represent")) => loop_1c::represent(
@@ -374,7 +400,7 @@ fn main() {
             arguments[4].parse().expect("a seed"),
             arguments[5].parse().expect("a count"),
             arguments[6].parse().expect("iterates"),
-            arguments[7].parse().expect("a deadline in ms"),
+            pinned(&arguments[7], "executed represent", clock, false).deadline_ms(),
             &arguments[8],
             arguments.get(9).map(|s| s.parse().expect("a held-out seed")),
         ),
@@ -500,7 +526,7 @@ fn main() {
             &arguments[8],
             &arguments[9],
             &arguments[10],
-            arguments[11].parse().expect("a deadline in ms"),
+            pinned(&arguments[11], "executed run", clock, false).deadline_ms(),
         ),
         // An accepted move read decision by decision (the record
         // research/records/2026-10-01_THE_DECISION_MARGINS_THROUGH_THE_ACCEPTED_MOVE.md): read-only.
@@ -595,10 +621,17 @@ fn main() {
         // Lane B's key location and lane C's release, unchanged, on a text cut through the byte
         // chart (research/records/2026-10-05_THE_SAME_PATH_ON_TEXT_KEY_LOCATION_AND_THE_RELEASE_ON_THE_BYTE_CHART.md).
         (Some("executed"), Some("text")) => {
+            let pin = pinned(&arguments[5], "executed text", clock, true);
             let at = |k: usize| arguments.get(k).map(|a| a.parse().expect("a count"));
-            let range = at(7).zip(at(8));
-            let bound = arguments.get(9).map(|a| a.parse().expect("a bound in ms"));
-            keys_loop::text(&arguments[3], &arguments[4], &arguments[5], arguments.get(6).map(String::as_str), range, bound)
+            let range = at(8).zip(at(9));
+            keys_loop::text(
+                &arguments[3],
+                &arguments[4],
+                &arguments[6],
+                arguments.get(7).map(String::as_str),
+                range,
+                pin.unit_bound_ms(),
+            )
         }
         // The first repair terrain: the located pair restricts the erased cells from both sides
         // (research/records/2026-10-05_REPAIR_BY_REFLECTION_THE_LOCATED_PAIR_RESTRICTS_THE_ERASED_CELLS_FROM_BOTH_SIDES.md).
@@ -612,7 +645,8 @@ fn main() {
         // Text repair by local keys glued on overlaps
         // (research/records/2026-10-05_TEXT_REPAIR_BY_LOCAL_KEYS_GLUED_ON_OVERLAPS.md).
         (Some("executed"), Some("text-repair")) => {
-            text_repair::run(&arguments[3], &arguments[4], &arguments[5])
+            pinned(&arguments[5], "executed text-repair", clock, true);
+            text_repair::run(&arguments[3], &arguments[4], &arguments[6])
         }
         (Some("executed"), Some("keys-probe")) => keys_loop::keys_probe(
             &arguments[3],
@@ -622,7 +656,7 @@ fn main() {
             &arguments[7],
         ),
         _ => panic!(
-            "executed move <seed> <requests> | train <arm> <terrain> <seed> <batch> <moves> <deadline ms> <out> | evaluate <terrain> <seed> <count> <out> <label[=E]>… | spread <terrain> <seed> <count> <label[=E]>… | slopes <terrain> <seed> <count> <label[=E]>… | counts <terrain> <training seed> <count> <validation seed> <count> <out> | witness <terrain> <seed> <count> <moves> <deadline ms> <out> [<states dir>] | causal <terrain> <seed> <count> <label[=E]>… | restore <label=state>… | replay <terrain> <seed> <count> <label=state|label=partial:file>… | coupling <terrain> <seed> <count> <deadline ms> <label=state|label=partial:file|label=opening>… | represent <terrain> <seed> <count> <iterates> <deadline ms> <out> [<held-out seed>] | resume-coupling <terrain> <seed> <count> <c1 state> <gate A receipt> <move bound ms> <capture dir>"
+            "executed move <seed> <requests> | train <arm> <terrain> <seed> <batch> <moves> <pin> <out> | evaluate <terrain> <seed> <count> <out> <label[=E]>… | spread <terrain> <seed> <count> <label[=E]>… | slopes <terrain> <seed> <count> <label[=E]>… | counts <terrain> <training seed> <count> <validation seed> <count> <out> | witness <terrain> <seed> <count> <moves> <pin> <out> [<states dir>] | causal <terrain> <seed> <count> <label[=E]>… | restore <label=state>… | replay <terrain> <seed> <count> <label=state|label=partial:file>… | coupling <terrain> <seed> <count> <pin> <label=state|label=partial:file|label=opening>… | represent <terrain> <seed> <count> <iterates> <pin> <out> [<held-out seed>] | resume-coupling <terrain> <seed> <count> <c1 state> <gate A receipt> <pin> <capture dir> | run <terrain> <seed> <count> <out> <label=state> <arm> <metric> <cap|none> <pin> | text <cut> <out dir> <pin> <dev|run> [<state> [<from> <to>]] | text-repair <cut> <out dir> <pin> <dev|run>"
         ),
     }
 }

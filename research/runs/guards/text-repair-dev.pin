@@ -1,0 +1,6 @@
+# The development read of `executed text-repair` that shows the October 5 guards leave its readings
+# unchanged: the record's 4 development passages.
+command = executed text-repair
+projection = 4 passages, measured 166 ms at 1 thread before the change; the deadline is the record's own development guard
+deadline_ms = 300000
+threads = 1

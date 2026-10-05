@@ -38,6 +38,8 @@ impl Fixed {
     }
 }
 
+impl super::Sealed for Fixed {}
+
 impl Family for Fixed {
     fn label(&self) -> String {
         "fixed".to_string()
@@ -800,6 +802,8 @@ struct Refusing {
     inner: Fixed,
     refused: usize,
 }
+
+impl super::Sealed for Refusing {}
 
 impl Family for Refusing {
     fn label(&self) -> String {

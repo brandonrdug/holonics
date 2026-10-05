@@ -476,6 +476,8 @@ fn a_rotor_gauge_orbit_is_one_species() {
 /// A keystone of four phases keyed by its offset, reading the passage's clock.
 struct Clock;
 
+impl super::Sealed for Clock {}
+
 impl Keystone for Clock {
     fn label(&self) -> String {
         "clock of 4".to_string()
@@ -499,6 +501,8 @@ impl Keystone for Clock {
 
 /// A reader of the phase's half-turn sheet: the phase mod 2.
 struct Half;
+
+impl super::Sealed for Half {}
 
 impl PortReader for Half {
     fn label(&self) -> String {

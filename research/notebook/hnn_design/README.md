@@ -27,13 +27,18 @@ output. The development control's cut is pinned: `docs/plans/THE_REBUILD.md` at 
 `fed5488ce70eb5ffbc90f2f03d23638be9d69189` (171,754 bytes). Each example reads it with `git show`,
 never from the live file.
 
-`exterior.rs` is the notebook's shared exterior boundary: the cut file and its manifest
-(`read_cut`, `manifest_number`), the curated cut with its declared relations and aeons
-(`read_curated`, `read_incidence`, `read_aeons`; the relations' kinds `Relation` and `RelationKind`
-live here, since dataset roles are exterior codec information), the development reserve's guard
-(`admit_reserve_flag`), the process's resident set (`resident_set`, read from the kernel's status
-for the harnesses' memory receipts) and the exact presentation of readings. The examples include
-it by `#[path]`.
+`exterior.rs` is the notebook's shared exterior boundary: the cut file and its manifest, read as
+its two parts (`read_cut` returns a `Cut` of the development range `Seen` and the held-out range
+`Held`, which a grading takes by value; `manifest_number`), with the development reserve's refusal
+and no bypass (THE_MACHINE guard 21); the one show of a release, whole, with its copy length
+(`show_release`, `copy_length`: `tools/copy_length.py`'s law ported; guard 19); a run's committed
+pin (`Pin`: the deadline, the unit bound and the threads a run reads from a committed file, never
+its command line; guard 22; loop 1c's are in `research/runs/loop-1c/`); the process's resident set
+(`resident_set`, read from the kernel's status for the harnesses' memory receipts) and the exact
+presentation of readings. The examples include it by `#[path]`; its guards' doctests
+(`crates/holonics/src/exterior_guards.rs`) include it the same way. The curated cut's readers
+(`read_curated`, `read_incidence`, `read_aeons`), unconsumed since September 30 and returning codes
+beside a held range, were retired on October 5 (history at `48f00eff`).
 
 ## Index
 
@@ -544,7 +549,8 @@ HOLONICS_ROOT=$PWD python3 research/notebook/hnn_design/development_families.py 
   messages are not read, not even for their ports.
 - **The guard**: every script that reads the source, a cut or a receipt refuses the reserve's
   material unless `--read-reserve` is passed, logged to `.local/cuts/reserve-reads.log`; no run
-  passed it. Every artifact written before the reserve was named is refused (the spent F4, F1, F2,
+  passed it. Since October 5 the Rust boundary (`exterior.rs`) has no such flag: a cut that does not
+  name the reserve as excluded is refused (THE_MACHINE guard 21). Every artifact written before the reserve was named is refused (the spent F4, F1, F2,
   F2V2, F5, U2 and F0 splits are reshuffles of read material).
 - **Checked on a synthetic source** (24 made-up conversations, no private data): the scripts emit the
   roles, their incidence, the joined passage and its aeons end to end, and `hnn_population f0-acceptance` (retired September 30, at `d4596102`) read it

@@ -56,6 +56,10 @@ cd "$root"
 out=${LOOP_1C_OUT:-.local/1c}
 bin=${LOOP_1C_BIN:-target/release/examples/hnn_prediction}
 gate_a=research/records/2026-09-30_STEP_1B_GATE_A_receipts
+# Each run's deadline (or the move's bound) is its committed pin's (THE_MACHINE guard 22): the
+# harness reads it from research/runs/loop-1c/<run>.pin and refuses a pin that is missing,
+# uncommitted, edited or committed twice. The numbers moved there unchanged on October 5.
+pins=research/runs/loop-1c
 reservation=19
 stamps=$out/stamps
 ledger=$out/threads
@@ -205,7 +209,7 @@ exp_replay() {
   rm -f "$stamps/replay.ok"
   rm -rf "$out/states"
   mkdir -p "$out/states"
-  run replay 12 4954 executed witness order2 2026093061 8 16 4601070 \
+  run replay 12 4954 executed witness order2 2026093061 8 16 "$pins/replay.pin" \
     "$out/replay_best.state" "$out/states" \
     || refuse $? "the replay failed, was refused, stopped incomplete or reached its guard"
 }
@@ -246,7 +250,7 @@ exp_coupling() {
   # harness stops incomplete (the pin §6.2).
   require replay "check-replay"
   mapfile -t arms < <(states)
-  run coupling 12 2693 executed coupling order2 2026093061 8 2502740 "${arms[@]}" \
+  run coupling 12 2693 executed coupling order2 2026093061 8 "$pins/coupling.pin" "${arms[@]}" \
     || refuse $? "the coupling failed, was refused, stopped incomplete or reached its guard"
 }
 
@@ -257,7 +261,7 @@ exp_represent() {
   # 13783 s (projection
   # upper 13754940 ms).
   rm -f "$stamps/witness.ok"
-  run represent 7 13783 executed represent order2 2026093061 8 16 12743355 \
+  run represent 7 13783 executed represent order2 2026093061 8 16 "$pins/represent.pin" \
     "$out/represent_best.txt" 2026100101 \
     || refuse $? "the representation search failed, was refused, stopped incomplete or reached its guard"
 }
@@ -279,7 +283,7 @@ check_witness() {
     || refuse 10 "the witness's fresh read printed no admissibility: the claim is withdrawn"
   stamp witness "$out/represent.txt" "$out/represent_best.txt" "$out/witness_check.txt"
   require witness "check-witness"
-  run witness_coupling 12 127 executed coupling order2 2026093061 8 126822 \
+  run witness_coupling 12 127 executed coupling order2 2026093061 8 "$pins/witness-coupling.pin" \
     "witness=partial:$out/represent_best.txt" \
     || refuse $? "the witness's coupling reads failed, were refused, stopped incomplete or reached their guard"
   echo "check-witness: the witness reproduces in a fresh process, admissible and certified, all 64 solved; stamped; its coupling read"
@@ -313,7 +317,7 @@ exp_c2() {
   rm -rf "$out/c2_capture"
   mkdir -p "$out/c2_capture"
   run c2 12 257 executed resume-coupling order2 2026093061 8 \
-    "$gate_a/witness_best.state" "$gate_a/witness.txt" 210496 "$out/c2_capture" \
+    "$gate_a/witness_best.state" "$gate_a/witness.txt" "$pins/c2.pin" "$out/c2_capture" \
     || refuse $? "the c2 diagnostic failed, was refused, stopped at an identity mismatch, stopped incomplete or reached its guard"
   check_c2
 }
@@ -382,16 +386,16 @@ cost_split() {
   # coupling reads at 12 beside the continuing fit.
   rm -rf "$out/cost_move_12_states"
   mkdir -p "$out/cost_move_12_states"
-  run cost_move_12 12 900 executed witness order2 2026093061 8 1 494208 \
+  run cost_move_12 12 900 executed witness order2 2026093061 8 1 "$pins/cost-move-12.pin" \
     "$out/cost_move_12_best.state" "$out/cost_move_12_states" &
   local move=$!
-  run cost_represent_7 7 2400 executed represent order2 2026093062 8 1 2000000 \
+  run cost_represent_7 7 2400 executed represent order2 2026093062 8 1 "$pins/cost-represent-7.pin" \
     "$out/cost_represent_7_best.txt" &
   local fit=$!
   local moved=0 coupled=0 fitted=0
   wait "$move" || moved=$?
   if (( moved == 0 )); then
-    run cost_coupling_12 12 1800 executed coupling order2 2026093062 8 1200000 opening=opening || coupled=$?
+    run cost_coupling_12 12 1800 executed coupling order2 2026093062 8 "$pins/cost-coupling-12.pin" opening=opening || coupled=$?
   fi
   wait "$fit" || fitted=$?
   (( moved == 0 )) || refuse "$moved" "the move's cost read failed or reached its guard"
@@ -421,7 +425,7 @@ case "${1:-}" in
   cost-move)
     rm -rf "$out/cost_move_states"
     mkdir -p "$out/cost_move_states"
-    run cost_move 19 900 executed witness order2 2026093061 8 1 494208 \
+    run cost_move 19 900 executed witness order2 2026093061 8 1 "$pins/cost-move.pin" \
       "$out/cost_move_best.state" "$out/cost_move_states" \
       || refuse $? "the cost read failed or reached its guard"
     ;;
@@ -436,17 +440,17 @@ case "${1:-}" in
     echo "gate A's first move replays exactly: 3 lines, and constitution 1's complete continuing state is byte-identical to gate A's saved state"
     ;;
   cost-coupling)
-    run cost_coupling 19 1800 executed coupling order2 2026093062 8 1200000 opening=opening \
+    run cost_coupling 19 1800 executed coupling order2 2026093062 8 "$pins/cost-coupling.pin" opening=opening \
       || refuse $? "the cost read failed, stopped incomplete or reached its guard"
     ;;
   cost-coupling-12)
     # Phase 2's schedule: one constitution's coupling reads at 12 threads, read while the exterior
     # fit holds its 7 (launch it while `cost-split`'s fit runs).
-    run cost_coupling_12 12 1800 executed coupling order2 2026093062 8 1200000 opening=opening \
+    run cost_coupling_12 12 1800 executed coupling order2 2026093062 8 "$pins/cost-coupling-12.pin" opening=opening \
       || refuse $? "the cost read failed, stopped incomplete or reached its guard"
     ;;
   cost-represent)
-    run cost_represent 19 1800 executed represent order2 2026093062 8 1 1200000 \
+    run cost_represent 19 1800 executed represent order2 2026093062 8 1 "$pins/cost-represent.pin" \
       "$out/cost_represent_best.txt" \
       || refuse $? "the cost read failed, stopped incomplete or reached its guard"
     ;;
