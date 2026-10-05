@@ -1522,7 +1522,7 @@ impl Field {
     /// (`sign 0 = +1`) are the element's lock classes.
     pub fn standing_contrast(
         &self,
-        constitution: &impl ConstitutionRead,
+        constitution: &impl FieldMaterial,
         ring: usize,
     ) -> Result<Vec<Rat>, HnnError> {
         let standings: Vec<&[Rat]> = (0..self.rings.len())

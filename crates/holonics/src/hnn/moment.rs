@@ -1266,7 +1266,7 @@ impl SourceMoment {
     pub fn encode(
         &self,
         field: &Field,
-        constitution: &impl ConstitutionRead,
+        constitution: &impl FieldMaterial,
         ring: usize,
     ) -> Result<Vec<Rat>, HnnError> {
         let modulus = constitution.transport(ring);
@@ -1434,7 +1434,7 @@ impl SourceMoment {
     pub fn open_storage(
         &self,
         field: &Field,
-        constitution: &impl ConstitutionRead,
+        constitution: &impl FieldMaterial,
         current: &Current,
     ) -> Result<Vec<Vec<Rat>>, HnnError> {
         let mut storage: Vec<Vec<Rat>> = field

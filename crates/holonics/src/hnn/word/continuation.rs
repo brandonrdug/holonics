@@ -59,6 +59,22 @@ impl<'c> Word<'c> {
         Ok(word)
     }
 
+    /// Enter the exact physical field with this native producer binding, on its carried
+    /// interior. The target-independent opening uses the same source chart as open_source;
+    /// a later comparison uses this producing constitution/current/source identity.
+    pub fn open_source_exact_received(
+        field: &'c Field,
+        producing: &Constitution,
+        current: &Current,
+        source: Arc<SourceMoment>,
+        opening: &WordOpening,
+    ) -> Result<(Self, SourceOpeningReceipt), HnnError> {
+        let (mut word, receipt) =
+            Self::open_exact_received(field, producing, current, &source, opening)?;
+        word.native_source = Some((producing.clone(), current.clone(), source));
+        Ok((word, receipt))
+    }
+
     /// Compare the actual receiving anchors and compose contact storage from that same return.
     /// [agent-inferred] The first admitted material family is C at one reached contact; K and D
     /// remain fixed. The receiver declaration, phases, map and lift come from this producer.

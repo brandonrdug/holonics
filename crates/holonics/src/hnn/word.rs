@@ -868,6 +868,24 @@ pub enum Absorption {
     Nothing,
 }
 
+/// The source port's exact imposition after the declared boundary absorption and crossing.
+/// Both energy readings include contact storage and loaded resonator energy. This receipt
+/// measures no earlier deposition, reflection, pump advance or complete-absorption emission.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct SourceOpeningReceipt {
+    pub before: Rat,
+    pub after: Rat,
+    pub absorbed: Rat,
+    pub imposed: Rat,
+}
+
+impl SourceOpeningReceipt {
+    /// E_after - E_before = imposed - absorbed, at the same contemporary power form.
+    pub fn closes(&self) -> bool {
+        &self.after - &self.before == &self.imposed - &self.absorbed
+    }
+}
+
 /// [definition; agent-inferred, October 3; the reception carry §2.1] **What a reception's word
 /// opens on**: at rest at tick zero (today's reception, [`Word::open_charted`]), or on the previous
 /// reception's carried end under a declared absorption ([`Word::open_received`]).
@@ -926,7 +944,7 @@ impl PowerForm {
     /// **The power form at a cut** from the field, a constitution and the lift point.
     pub fn read(
         field: &Field,
-        constitution: &impl ConstitutionRead,
+        constitution: &impl crate::hnn::field::FieldMaterial,
         current: &Current,
     ) -> Result<Self, HnnError> {
         let contacts = field.contacts().len();
@@ -1746,6 +1764,79 @@ impl<'c> Word<'c> {
         Self::continuing(field, operands, &change, &storage, carry.ticks)
     }
 
+    /// [definition; agent-inferred, October 5] Enter the exact physical field on its
+    /// contemporary material, continuing its received interior and imposing this source once.
+    /// The material-only interface admits no receiving storage, target or reference family.
+    /// SourceMoment supplies the source chart; it is never a loaded displacement.
+    ///
+    /// The receipt starts after the declared absorption and material/reference crossing:
+    /// E_after - E_before = imposed - absorbed. Previous crossing/deposition work belongs
+    /// to PowerForm::held and ChainedBalance, not to this source-imposition receipt.
+    /// Subsequent Word::tick executes the actual junction, element and loaded port drive;
+    /// this opening does not certify a frozen-drive periodic component or release a symbol.
+    pub fn open_exact_received(
+        field: &'c Field,
+        material: &impl crate::hnn::field::FieldMaterial,
+        current: &Current,
+        source: &SourceMoment,
+        opening: &WordOpening,
+    ) -> Result<(Self, SourceOpeningReceipt), HnnError> {
+        let injection = source.open_storage(field, material, current)?;
+        let operands = Operands::exact_at_cut(field, material, current)?;
+        let (change, opened_at) = match opening {
+            WordOpening::Rest => (EndChange::rest(field, &operands), 0),
+            WordOpening::Received { carry, absorption: Absorption::Complete } => (
+                EndChange {
+                    resonators: vec![None; field.rings().len()],
+                    resonator_phases: vec![None; field.rings().len()],
+                    ..EndChange::rest(field, &operands)
+                },
+                carry.ticks,
+            ),
+            WordOpening::Received { carry, absorption: Absorption::Nothing } => {
+                let contacts = operands.contacts();
+                let conductances: Vec<Rat> =
+                    contacts.iter().map(|c| c.conductance().clone()).collect();
+                let capacities: Vec<&ExactRatMatrix> =
+                    contacts.iter().map(|c| c.forms().0).collect();
+                let resonators: Vec<Option<&ExactRatMatrix>> = operands
+                    .resonators()
+                    .iter()
+                    .map(|r| r.as_ref().map(|r| r.material().forms().0))
+                    .collect();
+                (
+                    carry.crossed(&conductances, &capacities, &resonators)?,
+                    carry.ticks,
+                )
+            }
+        };
+        // Validate the entered state and its actual pump phase before reading any energy.
+        // Exact operands split nothing; an absent declared state is its clock's rest point.
+        let entered = Self::on_change(field, operands.clone(), change, opened_at)?;
+        let before_change = entered.change()?;
+        let form = PowerForm::read(field, material, current)?;
+        let before = form.power(&before_change)? + form.resonator_power(&before_change)?;
+        let absorbed: Rat = before_change.storage.iter().enumerate()
+            .filter(|(ring, _)| field.is_source(*ring))
+            .map(|(ring, wave)| form.ring_power(ring, wave))
+            .sum();
+        let interior = interior_of(field, before_change);
+        let word = Self::continuing(field, operands, &interior, &injection, opened_at)?;
+        let after_change = word.change()?;
+        let after = form.power(&after_change)? + form.resonator_power(&after_change)?;
+        let imposed: Rat = injection.iter().enumerate()
+            .filter(|(ring, _)| field.is_source(*ring))
+            .map(|(ring, wave)| form.ring_power(ring, wave))
+            .sum();
+        let receipt = SourceOpeningReceipt { before, after, absorbed, imposed };
+        if !receipt.closes() {
+            return Err(HnnError::ContinuingState {
+                what: "the exact source imposition does not close its work balance",
+            });
+        }
+        Ok((word, receipt))
+    }
+
     /// Open a word on a declared storage injection (every wave and contact state still zero), every
     /// solve seeded afresh: the impulse of the law's own tests.
     #[cfg(test)]
@@ -2136,7 +2227,7 @@ impl<'c> Word<'c> {
     /// `T − 1` left them, at tick `T`. The next word opens there and scatters crossing `T` in the
     /// medium the reception leaves, and its first hop is `T`, at pump phase `T`. A word not ended at
     /// a junction carries its full-tick change at `opened_at + ticks`, the within-refinement cut.
-    pub(crate) fn reception_end(&self) -> Result<ReceptionCarry, HnnError> {
+    pub fn reception_end(&self) -> Result<ReceptionCarry, HnnError> {
         let mut change = self.end_change();
         let mut ticks = self.opened_at + self.passage.len();
         if self.ended {
