@@ -1,0 +1,11 @@
+executed text (run): the cut 523215 bytes, held-out range 457751..523215; training passage bytes 0..6144 (128 windows of 48, 1024 observations); 16 pinned requests of 48 bytes at stride 4091 from 457751; d = 60, |A| = 257, ports code mod 60
+  key location: 1024 observations, 47 distances read, 0 alive at the end; the fibre emptied at observation 32; 2 ms
+  ports, δ:observation/edges at the menu's failure: 1:6/6 2:7/7 3:5/5 4:6/6 5:7/7 6:8/8 7:9/9 8:6/6 9:7/7 10:8/8 11:10/10 12:8/8 13:10/10 14:9/9 15:9/9 16:5/5 17:6/6 18:7/7 19:8/8 20:12/12 21:10/10 22:6/6 23:7/7 24:8/8 25:10/10 26:4/4 27:5/5 28:6/6 29:7/7 30:8/8 31:11/11 32:9/9 33:6/6 34:6/6 35:7/7 36:8/8 37:10/10 38:6/6 39:7/7 40:8/8 41:10/8 42:12/8 43:13/7 44:13/5 45:15/5 46:16/4 47:32/4
+  bytes (terrain-side), δ:observation/edges at the relation's failure: 1:6/6 2:7/7 3:5/5 4:6/6 5:7/7 6:8/8 7:9/9 8:6/6 9:7/7 10:8/8 11:10/10 12:8/8 13:10/10 14:9/9 15:9/9 16:5/5 17:6/6 18:7/7 19:8/8 20:12/12 21:10/10 22:6/6 23:7/7 24:8/8 25:10/10 26:4/4 27:5/5 28:6/6 29:7/7 30:8/8 31:11/11 32:9/9 33:6/6 34:6/6 35:7/7 36:8/8 37:10/10 38:6/6 39:7/7 40:8/8 41:10/8 42:12/8 43:13/7 44:13/5 45:15/5 46:16/4 47:32/4; every distance failed by observation 32
+  no lock in the passage: no distance's menu survived alone with a published map
+    founded request 4: released, 71550 ms; the state's elapsed 71550 ms
+    founded request 5: released, 71598 ms; the state's elapsed 143149 ms
+    founded request 6: released, 56461 ms; the state's elapsed 199610 ms
+    founded request 7: released, 48504 ms; the state's elapsed 248115 ms
+  release on founded (requests 4..8, 4 read): released 4, held 0, refused 0; whole sections 0; released bytes right 0 by station [0, 0, 0, 0, 0, 0, 0, 0]; ms a request [71550, 71598, 56461, 48504]; 248115 ms
+executed text: 248200 ms; resident 119504896 now, 136921088 peak

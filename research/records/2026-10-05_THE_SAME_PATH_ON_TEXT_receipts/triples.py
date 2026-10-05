@@ -15,7 +15,8 @@ section is read from `<state>_<i>.section` (written as it completes) or `<state>
 
 Escaping: valid UTF-8 is shown as its characters; a backslash as `\\\\`; newline, tab and carriage
 return as `\\n`, `\\t`, `\\r`; every other control byte and every byte that is not valid UTF-8 as
-`\\xNN`; the termination class as `<end>`.
+`\\xNN`; the termination class as `<end>`. Each text is bounded by `⟦ ⟧`, so its leading and trailing
+spaces show.
 """
 
 import importlib.util
@@ -106,6 +107,8 @@ def main(argv):
                  "bytes right": 0, "plural stations": 0}
         by_station = [0] * 8
         copies = []
+        shape = {"adjacent equal": 0, "constant sections": 0, "printable ASCII bytes": 0}
+        released_bytes = []
         for i in range(count):
             if i not in sections:
                 continue
@@ -126,19 +129,26 @@ def main(argv):
                         tally["bytes right"] += 1
                         by_station[j] += 1
                 copies.append(against_training)
+                shape["adjacent equal"] += sum(a == b for a, b in zip(release, release[1:]))
+                shape["constant sections"] += int(len(set(release)) == 1)
+                shape["printable ASCII bytes"] += sum(0x20 <= b < 0x7F for b in release)
+                released_bytes.extend(release)
             print(f"{state} request {i}: {decision}, released bytes {len(release)}, copy length "
                   f"against the training passage {against_training}, against its request {against_request}, "
                   f"plural stations {len(plural)}")
             lines.append(f"-- request {i}")
-            lines.append(f"request (last 40 bytes): {escape(request)}")
+            lines.append(f"request (last 40 bytes): ⟦{escape(request)}⟧")
             if decision == "released":
-                lines.append(f"released ({len(release)} bytes): {escape(release)}")
+                lines.append(f"released ({len(release)} bytes): ⟦{escape(release)}⟧")
             else:
-                lines.append(f"{decision}; top classes per station: {classes_text(classes)}; plural stations {plural}")
-            lines.append(f"truth (next 8 bytes):    {escape(truth)}")
+                lines.append(f"{decision}; top classes per station: ⟦{classes_text(classes)}⟧; plural stations {plural}")
+            lines.append(f"truth (next 8 bytes): ⟦{escape(truth)}⟧")
             lines.append(f"copy length: against the training passage {against_training}, against its request {against_request}")
         print(f"{state}: " + ", ".join(f"{k} {v}" for k, v in tally.items())
-              + f", right by station {by_station}, copy lengths against the training passage {sorted(copies)}")
+              + f", right by station {by_station}, copy lengths against the training passage {sorted(copies)}; "
+              + ", ".join(f"{k} {v}" for k, v in shape.items())
+              + f", distinct bytes released {len(set(released_bytes))}, distinct ports (byte mod 60) {len({b % 60 for b in released_bytes})}"
+              + f", the most frequent byte's count {max((released_bytes.count(b) for b in set(released_bytes)), default=0)}")
     path = os.path.join(out, "triples.txt")
     descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
     with os.fdopen(descriptor, "w", encoding="utf-8") as handle:

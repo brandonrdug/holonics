@@ -181,3 +181,79 @@ edge count at every one of the 47 distances: no failure is made by two bytes sha
 (`x mod 60`). It is the passage's own relation that leaves no stationary turn at any distance: in
 4 windows of text, every distance from 1 to 47 already pairs some byte with two different bytes
 (or two bytes with one).
+
+## 4. Measured: the release on the two openings
+
+[measured] Nothing located, so nothing was deposited: no closed pair contact, and the release reads
+the span's law (`generate_by_bank`, unchanged). Counts from `copy_lengths.txt` (written by
+`triples.py`; integers only), over the 16 pinned requests, 128 stations:
+
+| State | Released / held | Whole | Bytes right of 128 | Plural stations | Constant sections | Adjacent stations equal (of 112) | Copy length against the training passage |
+|---|---|---|---|---|---|---|---|
+| lossless opening | 0 / 16 | 0 | none released | 128 | — | — | — |
+| founded opening | 16 / 0 | 0 | **0** | 0 | 11 | 77 | 0 at 10 releases, 1 at 6 (the longest run 1 byte) |
+
+- **The lossless opening holds every section** at its first refinement: no lock is certified at any
+  station, so all eight stations of every request stay plural (as on order-2's final confirmation,
+  where the lossless opening also held every section).
+- **The founded opening releases every section, and none of it is the text's.** Every request takes
+  8 refinements, one lock each; at 12 of 16 the first lock is at station 7 (10) or 6 (2), the
+  stations farthest from the request, and at 8 the order is exactly `7, 6, 5, 4, 3, 2, 1, 0`. Each later
+  lock continues its locked neighbour: 77 of 112 adjacent station pairs are equal, and 11 of the 16
+  sections are one byte repeated, ten of them the same byte at all eight stations. That one byte
+  fills 80 of the 128 released stations, whatever the request. 91 of the 128 bytes are printable
+  ASCII; 23 distinct bytes on 21 ports appear in all. Against its own request, the copy length is 1
+  at one release (the repeated byte also occurs in that request) and 0 at the rest.
+- These are lane B's located causes ([§5 wall 1](2026-10-05_LOCATED_KEYS_BECOME_THE_SOURCE_PORTS_PAIR_COMPONENT.md#5-the-walls-by-their-measurements))
+  on text, unrepaired where no contact is closed: the nearest lock decides each later station, and
+  one class's own column decides between classes. On order-2's four classes that class was `3`; on
+  the byte chart's 257 it is one byte [agent-inferred from the counts: the same byte at 80 of 128
+  stations across unrelated requests; its column's resonance on the bank was not read].
+- The 16 releases, each with its request's last 40 bytes, its true next 8 bytes and its copy
+  lengths, are in the private `.local/text_loop/run/triples.txt` only.
+
+## 5. The blocker, by its measurement
+
+**No distance's stationary turn survives four windows of text.** On the training passage every
+distance `δ ∈ [1, 47]` meets a port with two consequences or two antecedents within 4 to 12 edges,
+and 13 distances lose every turn earlier still to a recurring byte (a fixed point). The fibre is
+empty from observation 32 to the passage's end (1,024), on the bytes exactly as on the ports. The
+turn menu's law reads one turn shared by every edge at a distance: a global bijection of the
+classes, which order-2 has and text, at no distance, does. So nothing is located, nothing is
+deposited, no pair contact closes, and lane C's pair release has nothing to read. Without it the
+openings release nothing (lossless: 128 of 128 stations plural) or the prior's own preference
+(founded: 0 of 128 bytes right, one byte at 80 of 128 stations).
+
+The cost is also measured. The founded release takes `47,231` to `83,393` ms a request at
+`|A| = 257` (8 refinements of up to `8 · 257 = 2,056` candidate readings) on a host shared with
+another worker's runs, against `23,527/8` ms a request at `|A| = 5` (lane B's development read).
+
+## 6. Time and memory
+
+Thread budget 12 (`RAYON_NUM_THREADS=12`) on every read. Peak resident sets are the harness's own
+reading of the process (`resident`, at its end); a stopped run printed none.
+
+| Run | Projection / deadline | Measured ms | Peak resident bytes |
+|---|---|---|---|
+| development (1 window, both openings; key location) | — / 600,000 (first read) | 54,319 (location 2; lossless 6,209; founded 48,033) | 134,774,784 |
+| pinned run (16 requests, both openings, requests in parallel; build of `1199350c`) | 867,840 / 1,085,000 | lossless state 150,140 (its share 99,328; ratio `150140/99328`); stopped at 189,102 | not read |
+| founded read (16 requests in turn; build of `4612f267`) | 768,512 / 960,640 | stopped at about 663,000 after 10 requests; request 3's line at 244,774 against 240,160 | not read |
+| founded, requests 0..4 | 302,224 / 377,780 | 273,002 (`66,786; 61,830; 72,126; 72,152`) | 136,912,896 |
+| founded, requests 4..8 | 302,224 / 377,780 | 248,200 (`71,550; 71,598; 56,461; 48,504`) | 136,921,088 |
+| founded, requests 8..12 | 302,224 / 377,780 | 267,838 (`47,231; 69,883; 83,393; 67,246`) | 135,958,528 |
+| founded, requests 12..16 | 302,224 / 377,780 | 223,168 (`63,736; 60,439; 50,139; 48,751`) | 136,310,784 |
+
+The four partitions read in `1,012,208` ms against their projection `1,208,896` (ratio
+`1012208/1208896`); every request stayed under the unit bound `94,445` ms (the largest `83,393`).
+Another worker's 12-thread runs shared the host through every read after the development read.
+
+## 7. Commits and gates
+
+- The pins and the harness mode before any read (`b815a449`); the development read and the
+  projection before the run (`1199350c`); the stopped run and the founded read declared
+  (`4612f267`); the stopped founded read and the partitions declared (`b919bb40`); this record's
+  measurements with their receipts (`runs.sh`, the logs, `location.curve`, `copy_lengths.txt`:
+  counts and distances only; no byte of text is committed).
+- Gates: `cargo check --workspace --all-targets` clean at the final harness (one pre-existing
+  dead-code warning, `ReceivingPhases::with_rank`). No library code changed, so no library test was
+  touched; no Lean changed; no card run.
