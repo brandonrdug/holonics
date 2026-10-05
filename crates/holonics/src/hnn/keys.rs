@@ -591,27 +591,15 @@ impl LocatedPair {
 impl PairSurvivors {
     /// **The located pair**: the least surviving distance `δ₀` with its published map `f₀`, when
     /// every other survivor `δ` is its winding: `δ = k δ₀` and its published map is `f₀^k` on its
-    /// ports (module section "A class of windings is one key"). One survivor is located alone.
+    /// ports (module section "A class of windings is one key"). One survivor is located alone. The
+    /// law is the turn menu owner's ([`crate::compression::keys::generator`]); this reads it.
     pub fn located(&self) -> Option<LocatedPair> {
-        let ((least, generator), others) = self.alive.split_first()?;
-        let map = generator.map.clone()?;
-        let image = |port: usize| map.iter().find(|(from, _)| *from == port).map(|(_, to)| *to);
-        let wound = others.iter().all(|(offset, reading)| {
-            offset % least == 0
-                && reading.map.as_ref().is_some_and(|pairs| {
-                    pairs.iter().all(|&(from, to)| {
-                        (0..offset / least).try_fold(from, |port, _| image(port)) == Some(to)
-                    })
-                })
-        });
-        if !wound {
-            return None;
-        }
+        let (offset, reading) = crate::compression::keys::generator(&self.alive)?;
         Some(LocatedPair {
-            offset: *least,
-            cycle: generator.cycle?,
-            turns: generator.turns.clone(),
-            map,
+            offset: *offset,
+            cycle: reading.cycle?,
+            turns: reading.turns.clone(),
+            map: reading.map.clone()?,
         })
     }
 

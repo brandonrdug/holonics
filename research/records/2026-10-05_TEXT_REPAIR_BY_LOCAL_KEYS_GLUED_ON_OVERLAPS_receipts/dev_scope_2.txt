@@ -1,0 +1,6 @@
+Running as unit: run-p416827-i4661418.service
+          Finished with result: success
+Main processes terminated with: code=exited, status=0/SUCCESS
+               Service runtime: 173ms
+             CPU time consumed: 155ms
+                   Memory peak: 3.1M (swap: 0B)

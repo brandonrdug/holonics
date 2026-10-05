@@ -111,6 +111,16 @@ impl TurnMenu {
         }
     }
 
+    /// **The relation as read**: each port whose consequence was read, with it, sorted by port. On a
+    /// live menu every surviving candidate reads it (the type's header: each edge `u → v` is
+    /// `S(v) = S(u) + c`, so the candidate's map sends `u` to `v`); a port whose consequence was not
+    /// read is absent, plural.
+    pub fn relation(&self) -> Vec<(usize, usize)> {
+        (0..self.image.len())
+            .filter_map(|port| self.image[port].map(|image| (port, image)))
+            .collect()
+    }
+
     /// The menu's ports: every port an edge reached, sorted.
     pub fn menu_ports(&self) -> Vec<usize> {
         (0..self.image.len())
@@ -200,6 +210,31 @@ impl TurnMenu {
             edges: self.edges,
         }
     }
+}
+
+/// [definition; agent-inferred, October 5; the
+/// [regressions record](../../../../../research/records/2026-10-05_THE_REGRESSIONS_LOCATE_THE_LEAST_WINDING_AND_ARE_READ_BY_THE_PAIR_RELEASE.md)]
+/// **The windings law: a class of windings is one key.** Contacts compose along the ring's clock:
+/// `k` contacts at `δ₀`, each `y ↦ f₀(y)`, joined end to end, are one contact at `k δ₀` with the map
+/// `f₀^k`. Over the surviving distances in increasing order, each with its reading, the generator is
+/// the least survivor `(δ₀, f₀)` when its map is published and every other survivor `δ` is its
+/// winding: `δ = k δ₀` and its published map is `f₀^k` on its ports. One survivor is its own only
+/// winding. Several survivors that are not one family of windings are a plural class, never a key
+/// (`None`).
+pub fn generator(alive: &[(usize, TurnReading)]) -> Option<&(usize, TurnReading)> {
+    let ((least, reading), others) = alive.split_first()?;
+    let map = reading.map.as_ref()?;
+    reading.cycle?;
+    let image = |port: usize| map.iter().find(|(from, _)| *from == port).map(|(_, to)| *to);
+    let wound = others.iter().all(|(offset, other)| {
+        offset % least == 0
+            && other.map.as_ref().is_some_and(|pairs| {
+                pairs.iter().all(|&(from, to)| {
+                    (0..offset / least).try_fold(from, |port, _| image(port)) == Some(to)
+                })
+            })
+    });
+    wound.then_some(&alive[0])
 }
 
 /// Whether the runs pack into the bins (each run within one bin's free slots), by exact search
