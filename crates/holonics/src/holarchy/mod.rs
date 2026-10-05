@@ -150,6 +150,12 @@ impl Holon {
     /// whole of an earlier join, still unassembled, so a Holarchy of many small Holons costs what
     /// its blocks cost.
     pub fn interconnect(&self, other: &Holon, gluing: &Gluing) -> Result<Holarchy, GluingDefect> {
+        if self.loaded_parametron().is_some() || other.loaded_parametron().is_some() {
+            return Err(GluingDefect::Malformed(HolonError::Unsupported {
+                what: "joining loaded quartic elements",
+                reason: "the joined nonlinear constitutive relation must be retained before this join is admitted",
+            }));
+        }
         let layout = Layout::new(self.counts(), other.counts(), gluing.shared())
             .map_err(GluingDefect::Malformed)?;
         check_cell_shapes(self, other, gluing).map_err(GluingDefect::Malformed)?;

@@ -159,8 +159,8 @@ use crate::geometry::RatVec3;
 use crate::hnn::HnnError;
 use crate::hnn::chart::{ChartReading, ChartStart, Charts, Remainders};
 use crate::hnn::constitution::{
-    CAMPAIGN_ONE_BUDGET, Carrier, CarrierBits, Constitution, DepositReading, FactorGradient, FactorStep,
-    Family, LandmarkStep, LinearLocus, LinearStep, Locus, Reach, Sample,
+    CAMPAIGN_ONE_BUDGET, Carrier, CarrierBits, Constitution, DepositReading, FactorGradient,
+    FactorStep, Family, LandmarkStep, LinearLocus, LinearStep, Locus, Reach, Sample,
 };
 use crate::hnn::contact::{SiteReading, site_readings};
 use crate::hnn::field::{ConstitutionRead, Current, Field};
@@ -190,7 +190,7 @@ use crate::navigator::Clock;
 use crate::ratio::algebraic::{ExactInterval, interval_difference, interval_sum};
 use crate::ratio::exponentiated::power_of_two;
 use crate::ratio::linear::ExactRatMatrix;
-use crate::ratio::linear::vector::{add, dot, scale, sub};
+use crate::ratio::linear::vector::{add, dot, scale};
 use crate::ratio::work::ExactWork;
 use crate::ratio::{Rat, integer};
 use crate::receiver::population::PortPopulation;
@@ -243,8 +243,12 @@ impl Resident {
         pending: &PendingId,
         phases: &ReceivingPhases,
     ) -> Result<Option<Vec<Vec<Rat>>>, HnnError> {
-        let Some(slot) = self.pending.get(pending) else { return Ok(None) };
-        let Some(kept) = &slot.kept else { return Ok(None) };
+        let Some(slot) = self.pending.get(pending) else {
+            return Ok(None);
+        };
+        let Some(kept) = &slot.kept else {
+            return Ok(None);
+        };
         let current = slot.ratio.current(&self.field)?;
         let ring = self.field.ring(phases.ring());
         Ok(phases
@@ -267,7 +271,9 @@ impl Resident {
         pending: &PendingId,
         known: &[usize],
     ) -> Result<Option<Vec<Vec<Rat>>>, HnnError> {
-        let Some(slot) = self.pending.get(pending) else { return Ok(None) };
+        let Some(slot) = self.pending.get(pending) else {
+            return Ok(None);
+        };
         let trees = slot.ratio.tree_faces(&self.constitution, known)?;
         Ok(Some(
             trees
@@ -789,7 +795,9 @@ impl Resident {
     /// Preview a handle before any producing work mutates the resident. The caller holds the
     /// resident exclusively and commits this exact counter only when it publishes that handle.
     fn next_handle(&self) -> Result<u64, HnnError> {
-        self.next.checked_add(1).ok_or(HnnError::HandleCounterExhausted)
+        self.next
+            .checked_add(1)
+            .ok_or(HnnError::HandleCounterExhausted)
     }
 
     /// **Drop every kept read** when a constitution is published (a deposit's successor, a
@@ -992,7 +1000,9 @@ impl Reference {
         }
         let admitted = match saved_family {
             Some(admitted) => admitted,
-            None => field.receivers().iter()
+            None => field
+                .receivers()
+                .iter()
                 .map(|receiver| ReceivingPhases::declare(field, &constitution, current, receiver))
                 .collect::<Result<Vec<_>, _>>()?,
         };
@@ -1081,9 +1091,8 @@ impl Reference {
                     what: "a carried end mounted at rest or of another field's shape",
                 });
             }
-            let mut resident = self.mount_with_family(
-                field, &saved_current, constitution, Some(family),
-            )?;
+            let mut resident =
+                self.mount_with_family(field, &saved_current, constitution, Some(family))?;
             resident.carried = state.carry().cloned();
             return resident.with_passage(passage);
         }
@@ -1197,7 +1206,8 @@ impl ExecutionPort for Reference {
             }
             None => {
                 let id = MomentId(resident.next_handle()?);
-                let opened = SourceMoment::open_with(&field, &resident.current, &resident.constitution)?;
+                let opened =
+                    SourceMoment::open_with(&field, &resident.current, &resident.constitution)?;
                 resident.next = id.0;
                 resident.moments.insert(id, opened);
                 id
@@ -1369,15 +1379,13 @@ impl ExecutionPort for Reference {
         // read, whether or not that word's comparison is still pending (the reception carry §8).
         let opening = match self.reception {
             Reception::Rest => WordOpening::Rest,
-            Reception::Carry(absorption) => {
-                match &resident.carried {
-                    Some(carry) => WordOpening::Received {
-                        carry: carry.clone(),
-                        absorption,
-                    },
-                    None => WordOpening::Rest,
-                }
-            }
+            Reception::Carry(absorption) => match &resident.carried {
+                Some(carry) => WordOpening::Received {
+                    carry: carry.clone(),
+                    absorption,
+                },
+                None => WordOpening::Rest,
+            },
         };
         let source = resident
             .moments
@@ -1395,8 +1403,12 @@ impl ExecutionPort for Reference {
         let id = PendingId(resident.next_handle()?);
         let field = &resident.field;
         let start = Instant::now();
-        let (word, faces) =
-            ratio.read_on(field, &resident.constitution, &mut resident.charts, &opening)?;
+        let (word, faces) = ratio.read_on(
+            field,
+            &resident.constitution,
+            &mut resident.charts,
+            &opening,
+        )?;
         let read = start.elapsed();
         let ended = match self.reception {
             Reception::Rest => None,
@@ -1669,7 +1681,10 @@ impl ExecutionPort for Reference {
         })?;
         let start = Instant::now();
         let retention = resident.retention();
-        let (next, reading) = match resident.constitution.deposited_within(&slot.deposit, &retention) {
+        let (next, reading) = match resident
+            .constitution
+            .deposited_within(&slot.deposit, &retention)
+        {
             Ok(published) => published,
             Err(refusal @ HnnError::ConstitutionBudget { .. }) => {
                 resident.staged.remove(&staged);
@@ -2025,26 +2040,6 @@ fn negated(values: &[Rat]) -> Vec<Rat> {
 
 fn matrix_of(rows: Vec<Vec<Rat>>, columns: usize) -> Result<ExactRatMatrix, HnnError> {
     Ok(ExactRatMatrix::shaped(rows.len(), columns, rows)?)
-}
-
-/// **The base pump form at one phase**, before the learned squared amplitude `g_P²` scales its
-/// strength. Its node blocks are assembled on the ring's declared realified coordinates.
-fn resonator_pump_base_form(
-    pump: &crate::hnn::ring::PumpDeclaration,
-    phase: usize,
-    width: usize,
-) -> Result<ExactRatMatrix, HnnError> {
-    let unit = pump.with_strength(Rat::one())?;
-    let block = unit.block(phase);
-    let mut rows = vec![vec![Rat::zero(); width]; width];
-    for node in 0..(width / 2) {
-        for i in 0..2 {
-            for j in 0..2 {
-                rows[2 * node + i][2 * node + j] = block[i][j].clone();
-            }
-        }
-    }
-    matrix_of(rows, width)
 }
 
 /// **The compare's composition** (module header): the complete pullback and the deposit staged
@@ -2424,7 +2419,7 @@ pub fn compose_return(
     }
 
     // The loaded resonators: reverse their transient local state in reverse tick order (the word
-    // returns each tick's transposed solve and operands), then pull the four scalar amplitudes onto
+    // returns each tick's transposed solve and operands), then pull the declared scalar amplitudes onto
     // their immutable base forms. The exact inverse/material derivative and the executed chart's
     // adjoint residual remain separate readings in `WordReturn`.
     if back.resonators.len() != field.rings().len() {
@@ -2445,10 +2440,8 @@ pub fn compose_return(
             }
             continue;
         };
-        let (capacity, stiffness, dissipation, pump_strength) = material.gain_bases();
-        let gains = material.gains();
-        let mut loss_gradients = std::array::from_fn(|_| Rat::zero());
-        let mut energies = std::array::from_fn(|_| Rat::zero());
+        let mut loss_gradients = vec![Rat::zero(); material.gain_count()];
+        let mut energies = vec![Rat::zero(); material.gain_count()];
         let mut reached = false;
         // The covector one tick carries at the resolvent's right-hand side, its solved `r̄`.
         let mut covector = Rat::zero();
@@ -2462,39 +2455,17 @@ pub fn compose_return(
                     covector = value.abs();
                 }
             }
-            let hω = scale(&(&h / integer(2)), &tick.rate);
-            let midpoint = add(&tick.displacement, &hω);
-            let w_minus_ω = sub(&tick.velocity, &tick.rate);
-            let feature_c = scale(
-                &(integer(4) * &gains[0]),
-                &apply_rows(capacity, &w_minus_ω)?,
-            );
-            let feature_k = scale(
-                &(integer(2) * &h * &gains[1]),
-                &apply_rows(stiffness, &midpoint)?,
-            );
-            let feature_d = scale(
-                &(integer(2) * &h * &gains[2]),
-                &apply_rows(dissipation, &tick.rate)?,
-            );
-            let feature_p = match (material.base_pump(), pump_strength) {
-                (Some(pump), Some(strength)) => scale(
-                    &(integer(2) * &h * &gains[3] * strength),
-                    &apply_rows(
-                        &resonator_pump_base_form(pump, tick.phase, material.width())?,
-                        &midpoint,
-                    )?,
-                ),
-                _ => vec![Rat::zero(); material.width()],
-            };
-            loss_gradients[0] += dot(&tick.solved, &feature_c);
-            loss_gradients[1] -= dot(&tick.solved, &feature_k);
-            loss_gradients[2] -= dot(&tick.solved, &feature_d);
-            loss_gradients[3] -= dot(&tick.solved, &feature_p);
-            for (energy, feature) in energies
-                .iter_mut()
-                .zip([&feature_c, &feature_k, &feature_d, &feature_p])
+            let features = material.gain_features(
+                tick.phase,
+                &h,
+                &tick.displacement,
+                &tick.velocity,
+                &tick.rate,
+            )?;
+            for ((gradient, energy), feature) in
+                loss_gradients.iter_mut().zip(&mut energies).zip(&features)
             {
+                *gradient += dot(&tick.solved, feature);
                 *energy += dot(feature, feature);
             }
         }
@@ -2504,7 +2475,7 @@ pub fn compose_return(
             energy: energies.clone(),
         };
         if retained(Locus::Resonator(g)) && reached {
-            for family in 0..4 {
+            for family in 0..material.gain_count() {
                 factors.push(FactorStep {
                     gradient: FactorGradient::Resonator {
                         ring: g,
@@ -2521,16 +2492,7 @@ pub fn compose_return(
 
     // The contacts: their channel factors, conductance and pair geometry, the contacts together.
     let parts = indexed(field.contacts().len(), |a| {
-        compose_contact(
-            field,
-            constitution,
-            back,
-            diamond,
-            &retained,
-            anchor,
-            &h,
-            a,
-        )
+        compose_contact(field, constitution, back, diamond, &retained, anchor, &h, a)
     })?;
     let mut contact_pullbacks = Vec::with_capacity(parts.len());
     for (steps, pullback) in parts {
@@ -3059,10 +3021,10 @@ pub struct Exposure {
     pub description_bits: u64,
     /// Final scalar gains of declared resonators, in ring order (a constitutive reading, not an
     /// event archive).
-    pub resonator_gains: Vec<(usize, [Rat; 4])>,
+    pub resonator_gains: Vec<(usize, Vec<Rat>)>,
     /// The carried remainders of those gains, in ring order: what reached each family below its
     /// lattice's unit.
-    pub resonator_remainders: Vec<(usize, [Rat; 4])>,
+    pub resonator_remainders: Vec<(usize, Vec<Rat>)>,
     pub key_bits: u64,
     pub kt: ExactInterval,
     pub literal_bits: u64,
@@ -3345,12 +3307,7 @@ impl Reference {
     /// exactly the field's declared population, which `Field::declare` checked against `n*`. Under a
     /// deadline ([`Reference::with_deadline`]) the reading stops after that many receiving windows.
     pub fn expose(&self, field: &Field, cut: &Cut) -> Result<Exposure, HnnError> {
-        expose(
-            self,
-            &self.declared(),
-            field,
-            cut,
-        )
+        expose(self, &self.declared(), field, cut)
     }
 
     /// The declarations an exposure reads off this reference.
@@ -3384,13 +3341,7 @@ impl Reference {
     ) -> Result<Exposure, HnnError> {
         let current = Current::at_rest(field);
         let resident = self.mount_with(field, &current, constitution)?;
-        expose_from(
-            self,
-            &self.declared(),
-            field,
-            cut,
-            resident,
-        )
+        expose_from(self, &self.declared(), field, cut, resident)
     }
 }
 
@@ -3498,7 +3449,6 @@ pub struct AblationOptions {
     pub memory: Option<u32>,
 }
 
-
 /// [measured-diagnostic; agent-inferred, October 2; the contact loop record §15] **One deposit's
 /// realized descent, split** (the Lean thread's condition, PR #151): the window read against its own
 /// targets at the predecessor and at the successor. At each phase, with `δ_c` the change of class
@@ -3601,7 +3551,11 @@ pub fn contact_ablation(
         .admitted()
         .first()
         .map(|p| p.ring())
-        .ok_or(HnnError::Shape { what: "a declared receiver", expected: 1, found: 0 })?;
+        .ok_or(HnnError::Shape {
+            what: "a declared receiver",
+            expected: 1,
+            found: 0,
+        })?;
     let mut last_receiving = opening.receiving_map(receiving_ring).cloned();
     let family = resident.admitted().to_vec();
     let mut aeon = 0usize;
@@ -3610,22 +3564,33 @@ pub fn contact_ablation(
     let mut descents = Vec::new();
     let mut samples = Vec::new();
     let mut trees: Vec<Option<Vec<Rat>>> = Vec::new();
-    let mut receiving_maps: Vec<crate::ratio::linear::ExactRatMatrix> =
-        opening.receiving_map(receiving_ring).cloned().into_iter().collect();
+    let mut receiving_maps: Vec<crate::ratio::linear::ExactRatMatrix> = opening
+        .receiving_map(receiving_ring)
+        .cloned()
+        .into_iter()
+        .collect();
     let mut released: BTreeMap<(Locus, Carrier, usize), Released> = BTreeMap::new();
     let mut boundary = false;
     let phases = resident
         .admitted()
         .first()
         .cloned()
-        .ok_or(HnnError::Shape { what: "a declared receiver", expected: 1, found: 0 })?;
+        .ok_or(HnnError::Shape {
+            what: "a declared receiver",
+            expected: 1,
+            found: 0,
+        })?;
     let aperture = phases.aperture();
     let spans: Vec<Range<usize>> = phases.windows(cells.len())?.into_iter().collect();
     let (moment, _) = reference.ingest(&mut resident, None, &[])?;
-    let feed = |reference: &Reference, resident: &mut Resident, window: &[usize]| -> Result<bool, HnnError> {
+    let feed = |reference: &Reference,
+                resident: &mut Resident,
+                window: &[usize]|
+     -> Result<bool, HnnError> {
         let mut fed = 0;
         while fed < window.len() {
-            let (_, ingested) = reference.ingest(resident, Some(&moment), &one_hot(&window[fed..]))?;
+            let (_, ingested) =
+                reference.ingest(resident, Some(&moment), &one_hot(&window[fed..]))?;
             let ingested = ingested.forward.into_present().expect("ingest returns");
             fed += ingested.cells;
             if ingested.carry_out {
@@ -3635,7 +3600,10 @@ pub fn contact_ablation(
         Ok(true)
     };
     type Read = (ExactInterval, Vec<[Vec<Rat>; 2]>, Option<Faces>);
-    let read = |reference: &Reference, resident: &mut Resident, window: &[usize]| -> Result<Read, HnnError> {
+    let read = |reference: &Reference,
+                resident: &mut Resident,
+                window: &[usize]|
+     -> Result<Read, HnnError> {
         let (pending, refined) = reference.refine(resident, &moment, &phases)?;
         let states = match &refined.receipt.detail {
             ReceiptDetail::Refine { word, .. } => word.change.states.clone(),
@@ -3643,7 +3611,10 @@ pub fn contact_ablation(
         };
         let faces = refined.forward.into_present();
         let (_, compared) = reference.compare(resident, pending, &one_hot(window))?;
-        let holon = compared.forward.into_present().expect("a compare returns its ratio");
+        let holon = compared
+            .forward
+            .into_present()
+            .expect("a compare returns its ratio");
         let mut total = ExactInterval::point(Rat::zero());
         for phase in holon.phases() {
             total = interval_sum(&total, &phase.code_length)?;
@@ -3655,30 +3626,44 @@ pub fn contact_ablation(
         faces.map(|f| {
             f.faces
                 .iter()
-                .map(|face| face.cells().iter().map(|c| (c.carry.clone(), c.phase)).collect())
+                .map(|face| {
+                    face.cells()
+                        .iter()
+                        .map(|c| (c.carry.clone(), c.phase))
+                        .collect()
+                })
                 .collect()
         })
     };
     // The largest exponent change between two windows' faces, in bits.
     let shift = |a: Option<&Faces>, b: Option<&Faces>| -> Rat {
-        let (Some(a), Some(b)) = (a, b) else { return Rat::zero() };
+        let (Some(a), Some(b)) = (a, b) else {
+            return Rat::zero();
+        };
         let value = |c: &crate::receiver::face::GrainCell, grain: u64| {
-            Rat::from_integer(c.carry.clone()) + Rat::new(BigInt::from(c.phase), BigInt::from(grain)) + &c.fibre
+            Rat::from_integer(c.carry.clone())
+                + Rat::new(BigInt::from(c.phase), BigInt::from(grain))
+                + &c.fibre
         };
         a.faces
             .iter()
             .zip(&b.faces)
             .flat_map(|(x, y)| {
-                x.cells().iter().zip(y.cells()).map(move |(p, q)| {
-                    (value(p, x.grain()) - value(q, y.grain())).abs()
-                })
+                x.cells()
+                    .iter()
+                    .zip(y.cells())
+                    .map(move |(p, q)| (value(p, x.grain()) - value(q, y.grain())).abs())
             })
             .max()
             .unwrap_or_else(Rat::zero)
     };
     let factor_change = |a: &Constitution, b: &Constitution| -> Rat {
         let largest = |m: &crate::ratio::linear::ExactRatMatrix| {
-            m.entries().iter().map(|x| x.abs()).max().unwrap_or_else(Rat::zero)
+            m.entries()
+                .iter()
+                .map(|x| x.abs())
+                .max()
+                .unwrap_or_else(Rat::zero)
         };
         let mut most = Rat::zero();
         for c in 0..field.contacts().len() {
@@ -3708,7 +3693,10 @@ pub fn contact_ablation(
         if window.len() != aperture {
             break;
         }
-        let next = spans.get(k + 1).map(|s| &cells[s.clone()]).filter(|w| w.len() == aperture);
+        let next = spans
+            .get(k + 1)
+            .map(|s| &cells[s.clone()])
+            .filter(|w| w.len() == aperture);
         if std::mem::take(&mut boundary) {
             let mut reverted = resident.constitution().clone();
             for c in 0..field.contacts().len() {
@@ -3736,7 +3724,10 @@ pub fn contact_ablation(
                                 .iter()
                                 .map(|c| {
                                     Rat::from_integer(c.carry.clone())
-                                        + Rat::new(BigInt::from(c.phase), BigInt::from(face.grain()))
+                                        + Rat::new(
+                                            BigInt::from(c.phase),
+                                            BigInt::from(face.grain()),
+                                        )
                                         + &c.fibre
                                 })
                                 .collect();
@@ -3785,8 +3776,14 @@ pub fn contact_ablation(
                             .collect::<Result<_, _>>()?;
                         let total: Rat = masses.iter().sum();
                         if total.is_positive() {
-                            let mean: Rat = masses.iter().zip(&delta).map(|(p, d)| p * d).sum::<Rat>() / &total;
-                            let second: Rat = masses.iter().zip(&delta).map(|(p, d)| p * d * d).sum::<Rat>() / &total;
+                            let mean: Rat =
+                                masses.iter().zip(&delta).map(|(p, d)| p * d).sum::<Rat>() / &total;
+                            let second: Rat = masses
+                                .iter()
+                                .zip(&delta)
+                                .map(|(p, d)| p * d * d)
+                                .sum::<Rat>()
+                                / &total;
                             variance += second - &mean * &mean;
                             readings += 1;
                         }
@@ -3798,7 +3795,10 @@ pub fn contact_ablation(
                     break;
                 }
                 j += 1;
-                if j >= spans.len() || j >= k + options.information || cells[spans[j].clone()].len() != aperture {
+                if j >= spans.len()
+                    || j >= k + options.information
+                    || cells[spans[j].clone()].len() != aperture
+                {
                     break;
                 }
                 let next_window = &cells[spans[j].clone()];
@@ -3825,13 +3825,27 @@ pub fn contact_ablation(
                 receiving_largest: resident
                     .constitution()
                     .receiving_map(receiving_ring)
-                    .map(|m| m.entries().iter().map(|x| x.abs()).max().unwrap_or_else(Rat::zero))
+                    .map(|m| {
+                        m.entries()
+                            .iter()
+                            .map(|x| x.abs())
+                            .max()
+                            .unwrap_or_else(Rat::zero)
+                    })
                     .unwrap_or_else(Rat::zero),
                 receiving_change: {
-                    let now = resident.constitution().receiving_map(receiving_ring).cloned();
+                    let now = resident
+                        .constitution()
+                        .receiving_map(receiving_ring)
+                        .cloned();
                     let change = match (&last_receiving, &now) {
                         (Some(a), Some(b)) => {
-                            let scale = b.entries().iter().map(|x| x.abs()).max().unwrap_or_else(Rat::zero);
+                            let scale = b
+                                .entries()
+                                .iter()
+                                .map(|x| x.abs())
+                                .max()
+                                .unwrap_or_else(Rat::zero);
                             let moved = a
                                 .entries()
                                 .iter()
@@ -3839,7 +3853,11 @@ pub fn contact_ablation(
                                 .map(|(x, y)| (x - y).abs())
                                 .max()
                                 .unwrap_or_else(Rat::zero);
-                            if scale.is_positive() { moved / scale } else { Rat::zero() }
+                            if scale.is_positive() {
+                                moved / scale
+                            } else {
+                                Rat::zero()
+                            }
                         }
                         _ => Rat::zero(),
                     };
@@ -3850,7 +3868,14 @@ pub fn contact_ablation(
                     change
                 },
             });
-            on_boundary(cumulative.last().expect("pushed"), &out, &receiver, &samples, &trees, &receiving_maps);
+            on_boundary(
+                cumulative.last().expect("pushed"),
+                &out,
+                &receiver,
+                &samples,
+                &trees,
+                &receiving_maps,
+            );
         }
         let (pending, refined) = reference.refine(&mut resident, &moment, &phases)?;
         if options.samples {
@@ -3864,7 +3889,13 @@ pub fn contact_ablation(
         }
         let word = match &refined.receipt.detail {
             ReceiptDetail::Refine { word, .. } => word.as_ref().clone(),
-            _ => return Err(HnnError::Shape { what: "a refine's word balance", expected: 1, found: 0 }),
+            _ => {
+                return Err(HnnError::Shape {
+                    what: "a refine's word balance",
+                    expected: 1,
+                    found: 0,
+                });
+            }
         };
         let (staged, compared) = reference.compare(&mut resident, pending, &one_hot(window))?;
         if let (Some(next), Component::Present(deposit)) = (next, &compared.deposit) {
@@ -3885,8 +3916,12 @@ pub fn contact_ablation(
                 let successor_kept = successor.clone();
                 let continued = |c: &Constitution| -> Result<(Vec<Vec<Rat>>, Faces), HnnError> {
                     let operands = Operands::at_cut(field, c, resident.current())?;
-                    let nothing: Vec<Vec<Rat>> =
-                        word.change.storage.iter().map(|w| vec![Rat::zero(); w.len()]).collect();
+                    let nothing: Vec<Vec<Rat>> = word
+                        .change
+                        .storage
+                        .iter()
+                        .map(|w| vec![Rat::zero(); w.len()])
+                        .collect();
                     let mut carried = Word::continuing(
                         field,
                         operands,
@@ -3916,7 +3951,8 @@ pub fn contact_ablation(
                 );
                 if open_held && open_moved {
                     let (held_code, held_states, held_faces) = read(reference, &mut held, next)?;
-                    let (moved_code, moved_states, moved_faces) = read(reference, &mut moved_res, next)?;
+                    let (moved_code, moved_states, moved_faces) =
+                        read(reference, &mut moved_res, next)?;
                     out.push(ContactAblation {
                         position: span.start,
                         aeon,
@@ -3944,9 +3980,18 @@ pub fn contact_ablation(
                         factor_change: factor_change(&theta, &successor_kept),
                         contact_families: reading.steps.len(),
                         contact_vanished: reading.vanished.len(),
-                        contact_alignment: reading.steps.iter().map(|(_, s)| s.step.alignment.clone()).sum(),
+                        contact_alignment: reading
+                            .steps
+                            .iter()
+                            .map(|(_, s)| s.step.alignment.clone())
+                            .sum(),
                         anchor_change: {
-                            let scale = held_anchors.iter().flatten().map(|x| x.abs()).max().unwrap_or_else(Rat::zero);
+                            let scale = held_anchors
+                                .iter()
+                                .flatten()
+                                .map(|x| x.abs())
+                                .max()
+                                .unwrap_or_else(Rat::zero);
                             let moved = held_anchors
                                 .iter()
                                 .flatten()
@@ -3954,7 +3999,11 @@ pub fn contact_ablation(
                                 .map(|(p, q)| (p - q).abs())
                                 .max()
                                 .unwrap_or_else(Rat::zero);
-                            if scale.is_positive() { moved / scale } else { Rat::zero() }
+                            if scale.is_positive() {
+                                moved / scale
+                            } else {
+                                Rat::zero()
+                            }
                         },
                         exponent_spread: held_continued
                             .faces
@@ -3965,7 +4014,10 @@ pub fn contact_ablation(
                                     .iter()
                                     .map(|c| {
                                         Rat::from_integer(c.carry.clone())
-                                            + Rat::new(BigInt::from(c.phase), BigInt::from(face.grain()))
+                                            + Rat::new(
+                                                BigInt::from(c.phase),
+                                                BigInt::from(face.grain()),
+                                            )
                                             + &c.fibre
                                     })
                                     .collect();
@@ -3976,7 +4028,10 @@ pub fn contact_ablation(
                             .max()
                             .unwrap_or_else(Rat::zero),
                         exponent_shift: shift(held_faces.as_ref(), moved_faces.as_ref()),
-                        continued_exponent_shift: shift(Some(&held_continued), Some(&moved_continued)),
+                        continued_exponent_shift: shift(
+                            Some(&held_continued),
+                            Some(&moved_continued),
+                        ),
                     });
                 }
             }
@@ -3990,43 +4045,43 @@ pub fn contact_ablation(
         match reference.deposit(&mut resident, staged) {
             Ok(returned) => {
                 if let Some((before_code, _, before_faces)) = before {
-                let mut post = resident.clone();
-                let (after_code, _, after_faces) = read(reference, &mut post, window)?;
-                let (mut a_plus, mut a_minus) = (Rat::zero(), Rat::zero());
-                if let (Some(fa), Some(fb)) = (&before_faces, &after_faces) {
-                    let value = |c: &crate::receiver::face::GrainCell, grain: u64| {
-                        Rat::from_integer(c.carry.clone())
-                            + Rat::new(BigInt::from(c.phase), BigInt::from(grain))
-                            + &c.fibre
-                    };
-                    for ((x, y), &target) in fa.faces.iter().zip(&fb.faces).zip(window) {
-                        let masses = x.odometer_masses()?;
-                        let delta: Vec<Rat> = x
-                            .cells()
-                            .iter()
-                            .zip(y.cells())
-                            .map(|(p, q)| value(q, y.grain()) - value(p, x.grain()))
-                            .collect();
-                        for (c, (d, p)) in delta.iter().zip(&masses).enumerate() {
-                            if c == target {
-                                continue;
-                            }
-                            let relative = d - &delta[target];
-                            if relative.is_negative() {
-                                a_plus -= p * &relative;
-                            } else {
-                                a_minus += p * &relative;
+                    let mut post = resident.clone();
+                    let (after_code, _, after_faces) = read(reference, &mut post, window)?;
+                    let (mut a_plus, mut a_minus) = (Rat::zero(), Rat::zero());
+                    if let (Some(fa), Some(fb)) = (&before_faces, &after_faces) {
+                        let value = |c: &crate::receiver::face::GrainCell, grain: u64| {
+                            Rat::from_integer(c.carry.clone())
+                                + Rat::new(BigInt::from(c.phase), BigInt::from(grain))
+                                + &c.fibre
+                        };
+                        for ((x, y), &target) in fa.faces.iter().zip(&fb.faces).zip(window) {
+                            let masses = x.odometer_masses()?;
+                            let delta: Vec<Rat> = x
+                                .cells()
+                                .iter()
+                                .zip(y.cells())
+                                .map(|(p, q)| value(q, y.grain()) - value(p, x.grain()))
+                                .collect();
+                            for (c, (d, p)) in delta.iter().zip(&masses).enumerate() {
+                                if c == target {
+                                    continue;
+                                }
+                                let relative = d - &delta[target];
+                                if relative.is_negative() {
+                                    a_plus -= p * &relative;
+                                } else {
+                                    a_minus += p * &relative;
+                                }
                             }
                         }
                     }
-                }
-                descents.push(DepositDescent {
-                    aeon,
-                    a_plus,
-                    a_minus,
-                    before: before_code,
-                    after: after_code,
-                });
+                    descents.push(DepositDescent {
+                        aeon,
+                        a_plus,
+                        a_minus,
+                        before: before_code,
+                        after: after_code,
+                    });
                 }
                 if let Component::Present(reading) = &returned.deposit {
                     for (locus, carrier, entry, residual) in &reading.released {
@@ -4492,7 +4547,10 @@ where
                             PowerForm::read(field, resident.constitution(), resident.current())?;
                         // Under the carry the motion crosses the deposit at held momentum (the
                         // deposit record §3); at rest the end is emitted and read at its state.
-                        if resident.carried().is_some_and(|carry| carry.change == word.change) {
+                        if resident
+                            .carried()
+                            .is_some_and(|carry| carry.change == word.change)
+                        {
                             word.commit_held(&before, &after)?;
                         } else {
                             word.commit(&before, &after)?;
@@ -4813,7 +4871,6 @@ pub fn prequential(
         run,
     })
 }
-
 
 #[cfg(test)]
 mod continuation;

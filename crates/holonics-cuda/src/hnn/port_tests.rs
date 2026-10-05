@@ -911,6 +911,147 @@ fn the_card_carries_the_pump_as_the_reference() {
     );
 }
 
+/// The same per-node quartic kick/drift and its producing-state Hessian return on both ports.
+/// Three receptions retain the real carry, then a changed capacity holds the carried rate off
+/// the dyadics and a changed fifth gain publishes beta'=beta*(3/2)^2. Two more receptions compare
+/// every return, balance and saved carry exactly. The integration defect must be nonzero.
+/// This is transition/publication parity, not a nonlinear stability or pump-lock certificate.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn the_card_saturating_ring_matches_the_reference_with_carry() {
+    fn reception(both: &mut Pair<'_>, span: &[usize]) -> bool {
+        let phases = both.h.admitted()[0].clone();
+        same(
+            "ingest the source",
+            both.host
+                .ingest(&mut both.h, Some(&both.moment), &one_hot(span)),
+            both.device
+                .ingest(&mut both.d, Some(&both.moment), &one_hot(span)),
+        )
+        .unwrap();
+        let (pending, refined) = same(
+            "the quartic refine",
+            both.host.refine(&mut both.h, &both.moment, &phases),
+            both.device.refine(&mut both.d, &both.moment, &phases),
+        )
+        .unwrap();
+        let ReceiptDetail::Refine {
+            resonators, word, ..
+        } = &refined.receipt.detail
+        else {
+            panic!("refine returns its balance receipt");
+        };
+        assert!(resonators.iter().all(|balance| balance.closes()));
+        assert!(word.closes());
+        let integration_seen = resonators
+            .iter()
+            .any(|balance| !balance.integration.is_zero());
+        let (staged, _) = same(
+            "the quartic Hessian return",
+            both.host.compare(&mut both.h, pending, &one_hot(span)),
+            both.device.compare(&mut both.d, pending, &one_hot(span)),
+        )
+        .unwrap();
+        let host_carry = carry_text(both.h.carried()).expect("comparison retains the carry");
+        assert_eq!(
+            Some(host_carry),
+            carry_text(ExposedResident::carried(&both.d))
+        );
+        same(
+            "discard the staged variation",
+            both.host.discard(&mut both.h, Handle::Staged(staged)),
+            both.device.discard(&mut both.d, Handle::Staged(staged)),
+        )
+        .unwrap();
+        integration_seen
+    }
+
+    let (field, cut) = carry_chain();
+    let mut theta = pumped(&field);
+    for ring in 0..field.rings().len() {
+        let material = theta
+            .ring_resonator(ring)
+            .unwrap()
+            .clone()
+            .with_symmetric_saturation(rat(1, 16))
+            .unwrap();
+        assert_eq!(material.gain_count(), 5);
+        theta = theta.with_ring_resonator(&field, ring, material).unwrap();
+    }
+    let card = card();
+    let mut both = pair(&card, &field, Some(theta));
+    assert!(both.h.admitted().iter().all(|phases| {
+        phases.rank_scope() == holonics::hnn::receiving::RankScope::TangentAtRest
+    }));
+    let mut integration_seen = false;
+    for window in 0..3 {
+        integration_seen |= reception(&mut both, &cut.cells[2 * window..2 * window + 2]);
+    }
+
+    let saved = carry_text(both.h.carried()).expect("the comparison writes the carry");
+    let mut lines = saved.lines();
+    let restored = ReceptionCarry::read(lines.next().unwrap(), &mut |what| {
+        lines.next().ok_or(HnnError::ContinuingState { what })
+    })
+    .unwrap();
+    let current = both.h.current().clone();
+    let mut moved = both.h.constitution().clone();
+    for ring in 0..field.rings().len() {
+        let material = moved.ring_resonator(ring).unwrap().clone();
+        let mut gains = material.gains().clone();
+        gains[0] = rat(3, 4);
+        gains[4] = rat(3, 2);
+        let material = material.with_gains(gains).unwrap();
+        assert_eq!(material.saturation().unwrap().coefficient(), &rat(9, 64));
+        moved = moved.with_ring_resonator(&field, ring, material).unwrap();
+    }
+    let form = holonics::hnn::word::PowerForm::read(&field, &moved, &current).unwrap();
+    let opened = form.opening(&field, &restored).unwrap();
+    let off_dyadic = opened
+        .resonators
+        .iter()
+        .zip(&restored.change.resonators)
+        .filter_map(|(after, before)| Some((after.as_ref()?, before.as_ref()?)))
+        .flat_map(|(after, before)| after[1].iter().zip(&before[1]))
+        .filter(|(after, before)| after != before)
+        .filter(|(after, _)| exponent_of(after).is_none())
+        .count();
+    assert!(
+        off_dyadic > 0,
+        "the quartic carry is held off the dyadics after C'=9C/16"
+    );
+    let mut h = both
+        .host
+        .mount_carried(&field, &current, moved.clone(), restored.clone())
+        .unwrap();
+    let mut d = both
+        .device
+        .mount_carried(&field, &current, moved.clone(), restored)
+        .unwrap();
+    assert_eq!(h.constitution(), &moved);
+    assert_eq!(d.constitution(), &moved);
+    let (moment, _) = same(
+        "the moved publication opens",
+        both.host.ingest(&mut h, None, &[]),
+        both.device.ingest(&mut d, None, &[]),
+    )
+    .unwrap();
+    let mut both = Pair {
+        host: both.host,
+        device: both.device,
+        h,
+        d,
+        moment,
+    };
+    for window in 3..5 {
+        integration_seen |= reception(&mut both, &cut.cells[2 * window..2 * window + 2]);
+    }
+    assert!(
+        integration_seen,
+        "the quartic transition exposes its signed integration defect"
+    );
+}
+
 /// **The card holds a carried resonator's momentum across a moved capacity as the reference does**
 /// (record B §2.4; `ReceptionCarry::crossed`, `held_resonator_rate`): on the pumped chain under
 /// `Carry(Nothing)`, three receptions run in lockstep and their carry is saved as text; the

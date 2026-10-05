@@ -1,0 +1,33 @@
+{
+  "exit_code": 0,
+  "wall_ns": 55609117,
+  "user_cpu_ns": 45431000,
+  "system_cpu_ns": 32886000,
+  "peak_RSS_KiB": 23236,
+  "fixed_projection_ms": 16000,
+  "argv": [
+    "systemd-run",
+    "--user",
+    "--scope",
+    "--quiet",
+    "-p",
+    "MemoryMax=4294967296",
+    "-p",
+    "MemorySwapMax=0",
+    "timeout",
+    "--signal=TERM",
+    "--kill-after=2s",
+    "16s",
+    "target/debug/deps/holonics-2a96462c8d73f617",
+    "hnn::tests::floquet::a_quartic_integration_defect_does_not_hide_a_wrong_solve",
+    "holon::conformance::tests::the_medium_balances_exactly",
+    "holon::conformance::tests::backward_euler_carries_its_defect",
+    "holon::conformance::tests::the_commits_coefficients_are_the_ones_it_solves",
+    "holon::conformance::tests::the_pumped_lc_loop_changes_energy_by_pump_work_only",
+    "holon::conformance::tests::a_holon_of_holons_is_a_holon",
+    "--exact",
+    "--test-threads=8",
+    "--nocapture"
+  ],
+  "source_unchanged": true
+}

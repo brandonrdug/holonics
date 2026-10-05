@@ -332,12 +332,13 @@ use crate::hnn::HnnError;
 use crate::hnn::chart::{ChartKey, ChartReading, ChartWords, WordLattice, carry, refine};
 use crate::hnn::constitution::Lattice;
 use crate::hnn::contact::symmetric;
+use crate::holon::law::HolonLaw;
 use crate::holon::parametron::{Carrier, Parametron, threshold_sheet};
-use crate::ratio::linear::ExactRatMatrix;
-use crate::ratio::linear::inertia::{Inertia, inertia};
-use crate::ratio::gaussian::GaussianRat;
 use crate::ratio::algebraic::ExactInterval;
 use crate::ratio::disk::{Disk, DyadicDisk, attained_roots, isolate, quotient, root_upper};
+use crate::ratio::gaussian::GaussianRat;
+use crate::ratio::linear::ExactRatMatrix;
+use crate::ratio::linear::inertia::{Inertia, inertia};
 use crate::ratio::linear::vector::{add, common_denominator, dot, scale, sub};
 use crate::ratio::polynomial::{RationalPolynomial, half_plane_count};
 use crate::ratio::{Rat, integer};
@@ -518,7 +519,10 @@ pub struct PumpSchedule {
 impl PumpSchedule {
     /// A schedule of at least one tick at a nonnegative strength, one unit carrier a tick.
     pub fn new(strength: Rat, carriers: Vec<Carrier>) -> Result<Self, HnnError> {
-        Self::of_amplitudes(strength, carriers.iter().map(Carrier::as_gaussian).collect())
+        Self::of_amplitudes(
+            strength,
+            carriers.iter().map(Carrier::as_gaussian).collect(),
+        )
     }
 
     /// A schedule of at least one tick at a nonnegative strength, one placed amplitude a tick.
@@ -656,7 +660,10 @@ pub struct ResonatorMaterial {
     base_stiffness: ExactRatMatrix,
     base_dissipation: ExactRatMatrix,
     base_pump: Option<PumpDeclaration>,
-    gains: [Rat; 4],
+    gains: Vec<Rat>,
+    /// Symmetric (alpha=0) nonlinear storage, with its immutable declared coefficient.
+    saturation: Option<crate::holon::parametron::SymmetricQuartic>,
+    base_saturation: Option<crate::holon::parametron::SymmetricQuartic>,
 }
 
 impl ResonatorMaterial {
@@ -702,14 +709,49 @@ impl ResonatorMaterial {
             stiffness,
             dissipation,
             pump,
-            gains: std::array::from_fn(|_| Rat::one()),
+            gains: vec![Rat::one(); 4],
+            saturation: None,
+            base_saturation: None,
         })
     }
 
     /// The trainable amplitudes of the declared storage, stiffness, dissipation and pump forms.
     /// Their squares scale immutable declared bases, so positive semidefiniteness is structural.
-    pub fn gains(&self) -> &[Rat; 4] {
+    pub fn gains(&self) -> &Vec<Rat> {
         &self.gains
+    }
+
+    /// Declare the symmetric nonlinear family on the already certified semidefinite C and D.
+    /// The positive loaded-port term (h/Y)I makes its phase solve definite without an inverse of C.
+    pub fn with_symmetric_saturation(mut self, coefficient: Rat) -> Result<Self, HnnError> {
+        let law = crate::holon::parametron::SymmetricQuartic::new(coefficient)?;
+        self.base_saturation = Some(law.clone());
+        self.saturation = Some(law);
+        self.gains.resize(5, Rat::one());
+        self.gains[4] = Rat::one();
+        Ok(self)
+    }
+
+    pub fn saturation(&self) -> Option<&crate::holon::parametron::SymmetricQuartic> {
+        self.saturation.as_ref()
+    }
+
+    pub fn base_saturation(&self) -> Option<&crate::holon::parametron::SymmetricQuartic> {
+        self.base_saturation.as_ref()
+    }
+
+    /// The nonlinear storage face, zero for the quadratic family.
+    pub fn quartic_energy(&self, displacement: &[Rat]) -> Result<Rat, HnnError> {
+        Ok(self
+            .saturation
+            .as_ref()
+            .map(|law| law.energy(displacement))
+            .transpose()?
+            .unwrap_or_else(Rat::zero))
+    }
+
+    pub fn gain_count(&self) -> usize {
+        self.gains.len()
     }
 
     /// Rebuild the material from its declared forms and squared scalar amplitudes. The caller
@@ -721,7 +763,15 @@ impl ResonatorMaterial {
     /// belongs to campaign 3's collapse law, with its receipt; a deposit step that would carry an
     /// amplitude to `g ≤ 0` backtracks instead (`hnn::constitution::GainBacktrack`). A
     /// nonpositive amplitude is refused here.
-    pub fn with_gains(&self, gains: [Rat; 4]) -> Result<Self, HnnError> {
+    pub fn with_gains(&self, gains: impl AsRef<[Rat]>) -> Result<Self, HnnError> {
+        let gains = gains.as_ref().to_vec();
+        if gains.len() != self.gain_count() {
+            return Err(HnnError::Shape {
+                what: "the declared resonator gain family",
+                expected: self.gain_count(),
+                found: gains.len(),
+            });
+        }
         if gains.iter().any(|gain| !gain.is_positive()) {
             return Err(HnnError::Resonator {
                 ring: usize::MAX,
@@ -743,6 +793,16 @@ impl ResonatorMaterial {
             base_stiffness: self.base_stiffness.clone(),
             base_dissipation: self.base_dissipation.clone(),
             base_pump: self.base_pump.clone(),
+            saturation: self
+                .base_saturation
+                .as_ref()
+                .map(|law| {
+                    crate::holon::parametron::SymmetricQuartic::new(
+                        law.coefficient() * &gains[4] * &gains[4],
+                    )
+                })
+                .transpose()?,
+            base_saturation: self.base_saturation.clone(),
             gains,
         })
     }
@@ -767,6 +827,61 @@ impl ResonatorMaterial {
     /// The immutable declared pump chart, before its learned amplitude is applied.
     pub fn base_pump(&self) -> Option<&PumpDeclaration> {
         self.base_pump.as_ref()
+    }
+
+    /// The reached RHS-minus-operator variation for each declared gain, at this producing tick.
+    /// The reference composition contracts these vectors with the actual transpose-solve carrier.
+    pub fn gain_features(
+        &self,
+        phase: usize,
+        hop: &Rat,
+        displacement: &[Rat],
+        velocity: &[Rat],
+        rate: &[Rat],
+    ) -> Result<Vec<Vec<Rat>>, HnnError> {
+        let nonlinear = self.saturation.is_some();
+        let point = if nonlinear {
+            displacement.to_vec()
+        } else {
+            add(displacement, &scale(&(hop / integer(2)), rate))
+        };
+        let capacity_factor = if nonlinear { integer(2) } else { integer(4) };
+        let mut features = vec![
+            scale(
+                &(capacity_factor * &self.gains[0]),
+                &self.base_capacity.apply(&sub(velocity, rate))?,
+            ),
+            scale(
+                &(-integer(2) * hop * &self.gains[1]),
+                &self.base_stiffness.apply(&point)?,
+            ),
+            scale(
+                &(-integer(2) * hop * &self.gains[2]),
+                &self.base_dissipation.apply(rate)?,
+            ),
+        ];
+        let pump = match &self.base_pump {
+            Some(pump) => {
+                let unit = pump.with_strength(Rat::one())?;
+                let form = stiffened(
+                    &ExactRatMatrix::zero(self.width(), self.width())?,
+                    &unit.block(phase),
+                )?;
+                scale(
+                    &(-integer(2) * hop * &self.gains[3] * pump.strength()),
+                    &form.apply(&point)?,
+                )
+            }
+            None => vec![Rat::zero(); self.width()],
+        };
+        features.push(pump);
+        if let Some(base) = &self.base_saturation {
+            features.push(scale(
+                &(-integer(2) * hop * &self.gains[4] * base.coefficient()),
+                &crate::holon::parametron::SymmetricQuartic::feature(displacement)?,
+            ));
+        }
+        Ok(features)
     }
 
     /// **The parametron's resonator** (module header): `C = BᵀW_C B` and `K = BᵀW_K B` on the real and
@@ -835,6 +950,11 @@ impl ResonatorMaterial {
     /// form `2C + hD + (h²/2) K_j` is positive semidefinite, so each phase's operator solves
     /// uniquely; refused with the first phase that is not.
     pub fn certify(&self, ring: usize, step: &Rat) -> Result<(), HnnError> {
+        if self.saturation.is_some() {
+            // This certifies the loaded solve only. A nonlinear lock needs its period-domain
+            // certificate; a positive quartic is not a Floquet or stability certificate.
+            return Ok(());
+        }
         for phase in 0..self.phases() {
             if !self.signed_form_holds(&self.pumped_stiffness(phase)?, step)? {
                 return Err(HnnError::UncertifiedResonator { ring, phase });
@@ -863,7 +983,13 @@ impl ResonatorMaterial {
         let stiffness = self.pumped_stiffness(phase)?;
         Ok((dot(rate, &self.capacity.apply(rate)?)
             + dot(displacement, &stiffness.apply(displacement)?))
-            / integer(2))
+            / integer(2)
+            + self
+                .saturation
+                .as_ref()
+                .map(|law| law.energy(displacement))
+                .transpose()?
+                .unwrap_or_else(Rat::zero))
     }
 }
 
@@ -911,6 +1037,7 @@ struct Phase {
     operator_norm: Rat,
     solve: PhaseSolve,
     reading: Option<ResonatorChart>,
+    loaded_law: Option<crate::holon::law::ReferenceHolon>,
 }
 
 impl Phase {
@@ -927,11 +1054,18 @@ impl Phase {
     ) -> Result<Self, HnnError> {
         let (capacity, _, dissipation) = material.forms();
         let n = material.width();
-        let operator = capacity
-            .scaled(&integer(2))
+        let factor = if material.saturation.is_some() {
+            integer(1)
+        } else {
+            integer(2)
+        };
+        let mut operator = capacity
+            .scaled(&factor)
             .add(&ExactRatMatrix::identity(n)?.scaled(&(step / admittance)))?
-            .add(&dissipation.scaled(step))?
-            .add(&stiffness.scaled(&(step * step / integer(2))))?;
+            .add(&dissipation.scaled(step))?;
+        if material.saturation.is_none() {
+            operator = operator.add(&stiffness.scaled(&(step * step / integer(2))))?;
+        }
         let operator_norm = (0..n)
             .map(|i| {
                 operator
@@ -960,12 +1094,27 @@ impl Phase {
                 )
             }
         };
+        let loaded_law = material
+            .saturation
+            .as_ref()
+            .map(|saturation| {
+                crate::holon::parametron::LoadedParametron::new(
+                    capacity.clone(),
+                    stiffness.clone(),
+                    dissipation.clone(),
+                    saturation.clone(),
+                    admittance.clone(),
+                )?
+                .law(step.clone())
+            })
+            .transpose()?;
         Ok(Self {
             stiffness,
             operator,
             operator_norm,
             solve,
             reading,
+            loaded_law,
         })
     }
 }
@@ -1013,10 +1162,16 @@ pub struct ResonatorStep {
     pub pump: Rat,
     pub port: Rat,
     pub dissipation: Rat,
+    /// Exact constitutive integration defect of the declared loaded kick/drift; zero at midpoint.
+    pub integration: Rat,
     pub chart: Rat,
     pub split: Rat,
     pub state: [Vec<Rat>; 2],
     pub rate: Vec<Rat>,
+    /// The solve certificate bounds chart work independently of the signed integration defect.
+    pub chart_bound: Rat,
+    /// The state-split certificate, including the declared nonlinear storage difference.
+    pub split_bound: Rat,
     /// **The certified bound on `|chart + split|`** (module header): `‖ω‖₁(δ‖r‖∞ + ‖M‖∞u)` for the
     /// executed solve and `(u/2)(‖C(ŵ′ + w′)‖₁ + ‖K(û′ + u′)‖₁)` for the state's split; zero under
     /// the exact law.
@@ -1047,12 +1202,18 @@ impl ResonatorRemainders {
 
 impl ResonatorStep {
     /// **The executed balance closes exactly** (Lean `HNN/Ring.ring_tick_executed_energy_balance`):
-    /// `after − before = pump + port − dissipation + chart + split`, and the executed solve's and
-    /// split's residual lies within its certified bound, `|chart + split| ≤ bound`.
+    /// `after − before = pump + port − dissipation + integration + chart + split`.
+    /// The signed constitutive integration defect cannot certify a numerical solve or split:
+    /// each is checked against its own bound before their total is read.
     pub fn closes(&self) -> bool {
         &self.after - &self.before
-            == &self.pump + &self.port - &self.dissipation + &self.chart + &self.split
-            && (&self.chart + &self.split).abs() <= self.bound
+            == &self.pump + &self.port - &self.dissipation
+                + &self.integration
+                + &self.chart
+                + &self.split
+            && self.chart.abs() <= self.chart_bound
+            && self.split.abs() <= self.split_bound
+            && self.bound == &self.chart_bound + &self.split_bound
     }
 
     /// The carried remainders this tick leaves.
@@ -1253,14 +1414,113 @@ impl ResonatorOperands {
             .collect()
     }
 
-    pub(crate) fn energy_at(&self, phase: usize, displacement: &[Rat], rate: &[Rat]) -> Result<Rat, HnnError> {
+    pub(crate) fn energy_at(
+        &self,
+        phase: usize,
+        displacement: &[Rat],
+        rate: &[Rat],
+    ) -> Result<Rat, HnnError> {
         let (capacity, _, _) = self.material.forms();
         Ok((dot(rate, &capacity.apply(rate)?)
             + dot(
                 displacement,
                 &self.phases[phase].stiffness.apply(displacement)?,
             ))
-            / integer(2))
+            / integer(2)
+            + self
+                .material
+                .saturation
+                .as_ref()
+                .map(|law| law.energy(displacement))
+                .transpose()?
+                .unwrap_or_else(Rat::zero))
+    }
+
+    /// The actual force derivative, at its producing displacement, not a frozen linear K.
+    pub fn force_hessian(
+        &self,
+        phase: usize,
+        displacement: &[Rat],
+    ) -> Result<ExactRatMatrix, HnnError> {
+        match &self.material.saturation {
+            Some(law) => Ok(self.phases[phase]
+                .stiffness
+                .add(&law.hessian(displacement)?)?),
+            None => Ok(self.phases[phase].stiffness.clone()),
+        }
+    }
+
+    /// Certify the actual smooth nonlinear period and read its separated half-turn sheet.
+    /// This refuses charted solves: their rounding/remainder fibre has no domain envelope here.
+    /// The proposals cover the pump's executed phase order, with centres and residuals checked.
+    pub fn nonlinear_lock(
+        &self,
+        proposals: &[crate::holon::parametron::DomainProposal],
+        phase: usize,
+        axis: usize,
+    ) -> Result<crate::holon::parametron::PeriodicLock, HnnError> {
+        let domain = self.exact_period_domain(proposals)?;
+        Ok(crate::holon::parametron::PeriodicLock::read(
+            domain, phase, axis,
+        )?)
+    }
+
+    /// Mount the actual exact quartic component on its declared pump cycle.
+    /// The current point enters at a phase-zero closing boundary; repeated cycles
+    /// carry it forward. This does not mount the rounded Word or whole-field Holarchy.
+    pub fn mount_periodic(
+        &self,
+        proposals: &[crate::holon::parametron::DomainProposal],
+        point: crate::holon::HolonState,
+    ) -> Result<crate::holon::parametron::MountedParametron, HnnError> {
+        let pump = self
+            .material
+            .pump()
+            .filter(|_| self.schedule.is_none())
+            .ok_or(HnnError::Resonator {
+                ring: self.ring,
+                what: "a component mount needs its declared pump clock and cycle",
+            })?;
+        let domain = self.exact_period_domain(proposals)?;
+        Ok(crate::holon::parametron::MountedParametron::mount(
+            domain,
+            pump.clock(),
+            pump.period()?,
+            point,
+        )?)
+    }
+
+    fn exact_period_domain(
+        &self,
+        proposals: &[crate::holon::parametron::DomainProposal],
+    ) -> Result<crate::holon::parametron::PeriodicDomain, HnnError> {
+        let mut laws = Vec::with_capacity(self.phases.len());
+        for tick in 0..self.phases.len() {
+            let phase_operands = &self.phases[self.phase_at(tick)];
+            if phase_operands.reading.is_some()
+                || phase_operands
+                    .operator
+                    .multiply(&phase_operands.solve.matrix()?)?
+                    != ExactRatMatrix::identity(self.width())?
+            {
+                return Err(HnnError::Resonator {
+                    ring: self.ring,
+                    what: "a nonlinear smooth domain does not certify a charted or inexact executed solve",
+                });
+            }
+            laws.push(
+                phase_operands
+                    .loaded_law
+                    .clone()
+                    .ok_or(HnnError::Resonator {
+                        ring: self.ring,
+                        what: "a nonlinear period needs the explicit quartic element relation",
+                    })?,
+            );
+        }
+        Ok(crate::holon::parametron::PeriodicDomain::certify(
+            &laws, proposals,
+        )?)
     }
 
     /// **One executed resonator tick** at word tick `t` (module header): the drive `β` (the storage
@@ -1297,11 +1557,30 @@ impl ResonatorOperands {
         let h = &self.step;
         let (capacity, _, dissipation) = self.material.forms();
         let stiffness = &self.phases[phase].stiffness;
-        // r = 2C w + h β − h K_j u
-        let right = sub(
-            &add(&scale(&integer(2), &capacity.apply(w)?), &scale(h, drive)),
-            &scale(h, &stiffness.apply(u)?),
+        let nonlinear = self.material.saturation.as_ref();
+        let factor = if nonlinear.is_some() {
+            integer(1)
+        } else {
+            integer(2)
+        };
+        let loaded = self.phases[phase]
+            .loaded_law
+            .as_ref()
+            .and_then(|law| law.holon().loaded_parametron());
+        let producing = crate::holon::HolonState::at(
+            [u.to_vec(), w.to_vec()].concat(),
+            u64::try_from(tick).map_err(|_| crate::holon::HolonError::ConformanceFailed {
+                what: "the loaded tick fits its material clock",
+            })?,
         );
+        // The nonlinear branch consumes the generic element's actual mixed scheme.
+        let right = match loaded {
+            Some(element) => element.right(h, &producing.configuration, drive)?,
+            None => sub(
+                &add(&scale(&factor, &capacity.apply(w)?), &scale(h, drive)),
+                &scale(h, &stiffness.apply(u)?),
+            ),
+        };
         let image = self.phases[phase].solve.apply(&right)?;
         let split = |image: Vec<Rat>, remainder: &[Rat]| -> (Vec<Rat>, Vec<Rat>) {
             match lattice {
@@ -1314,8 +1593,17 @@ impl ResonatorOperands {
             }
         };
         let (rate, rate_remainder) = split(image, &remainders.rate);
-        let displacement_image = add(u, &scale(h, &rate));
-        let velocity_image = sub(&scale(&integer(2), &rate), w);
+        let constitutive = loaded
+            .map(|element| element.executed(h, &producing, drive, &rate))
+            .transpose()?;
+        let displacement_image = constitutive.as_ref().map_or_else(
+            || add(u, &scale(h, &rate)),
+            |step| step.state.configuration[..n].to_vec(),
+        );
+        let velocity_image = constitutive.as_ref().map_or_else(
+            || sub(&scale(&integer(2), &rate), w),
+            |step| step.state.configuration[n..].to_vec(),
+        );
         let (displacement, displacement_remainder) =
             split(displacement_image.clone(), &remainders.state[0]);
         let (velocity, velocity_remainder) = split(velocity_image.clone(), &remainders.state[1]);
@@ -1333,6 +1621,9 @@ impl ResonatorOperands {
         let out = sub(drive, &scale(&(integer(2) / &self.admittance), &rate));
         let port = h * &self.admittance / integer(4) * (dot(drive, drive) - dot(&out, &out));
         let dissipation_work = h * dot(&rate, &dissipation.apply(&rate)?);
+        let integration = constitutive
+            .as_ref()
+            .map_or_else(Rat::zero, |step| step.balance.discretization_defect.clone());
         let chart = dot(
             &rate,
             &sub(&self.phases[phase].operator.apply(&rate)?, &right),
@@ -1340,7 +1631,7 @@ impl ResonatorOperands {
         let after = self.energy_at(phase, &displacement, &velocity)?;
         let split_term = &after - self.energy_at(phase, &displacement_image, &velocity_image)?;
         // |⟨ω, M ω − r⟩| ≤ ‖ω‖₁(δ‖r‖∞ + ‖M‖∞u) and |E(x̂) − E(x)| ≤ (u/2)(‖C(ŵ + w)‖₁ + ‖K(û + u)‖₁).
-        let bound = match lattice {
+        let (chart_bound, quadratic_split_bound) = match lattice {
             Some(lattice) => {
                 let unit = lattice.unit();
                 let solve = l1(&rate)
@@ -1348,10 +1639,21 @@ impl ResonatorOperands {
                         + &self.phases[phase].operator_norm * &unit);
                 let stored = capacity.apply(&add(&velocity, &velocity_image))?;
                 let stiffened = stiffness.apply(&add(&displacement, &displacement_image))?;
-                solve + unit * (l1(&stored) + l1(&stiffened)) / integer(2)
+                (solve, unit * (l1(&stored) + l1(&stiffened)) / integer(2))
             }
-            None => l1(&rate) * self.certificate(phase) * sup(&right),
+            None => (
+                l1(&rate) * self.certificate(phase) * sup(&right),
+                Rat::zero(),
+            ),
         };
+        let split_bound = quadratic_split_bound
+            + nonlinear
+                .map(|law| -> Result<Rat, HnnError> {
+                    Ok((law.energy(&displacement)? - law.energy(&displacement_image)?).abs())
+                })
+                .transpose()?
+                .unwrap_or_else(Rat::zero);
+        let bound = &chart_bound + &split_bound;
         Ok(ResonatorStep {
             drive: drive.to_vec(),
             input: [u.to_vec(), w.to_vec()],
@@ -1363,10 +1665,13 @@ impl ResonatorOperands {
             pump,
             port,
             dissipation: dissipation_work,
+            integration,
             chart,
             split: split_term,
             state: [displacement, velocity],
             rate,
+            chart_bound,
+            split_bound,
             bound,
             remainders: ResonatorRemainders {
                 rate: rate_remainder,
@@ -1474,6 +1779,12 @@ impl Floquet {
     /// pump's order, a schedule's period, one tick unpumped), each tick's solve the executed one:
     /// the law's inverse, or the certified chart's exact matrix.
     pub fn of(operands: &ResonatorOperands) -> Result<Self, HnnError> {
+        if operands.material().saturation().is_some() {
+            return Err(HnnError::Resonator {
+                ring: operands.ring(),
+                what: "a nonlinear period needs its executed domain certificate, not a linear Floquet map",
+            });
+        }
         let (capacity, _, _) = operands.material().forms();
         let ticks = operands
             .phases
@@ -1532,7 +1843,10 @@ impl Floquet {
     /// [`Floquet::decide`] it encloses a passive monodromy's radius too, so two passages' readings
     /// are ordered exactly on either side of the bifurcation.
     pub fn growth(&self, grain: u32) -> Growth {
-        bisect(|radius: &Rat| !strictly_inside(&self.characteristic, radius), grain)
+        bisect(
+            |radius: &Rat| !strictly_inside(&self.characteristic, radius),
+            grain,
+        )
     }
 
     /// [proved-derived; implemented-exact] **The Floquet certificate** (module header): a metric
@@ -1810,7 +2124,9 @@ fn strictly_inside(characteristic: &RationalPolynomial, radius: &Rat) -> bool {
     let Some(degree) = characteristic.degree() else {
         return true;
     };
-    let coefficients: Vec<Rat> = (0..=degree).map(|k| characteristic.coefficient(k)).collect();
+    let coefficients: Vec<Rat> = (0..=degree)
+        .map(|k| characteristic.coefficient(k))
+        .collect();
     let common = common_denominator(coefficients.iter());
     let integral: Vec<BigInt> = coefficients
         .iter()
@@ -2290,7 +2606,9 @@ pub struct ReceivingBank {
 }
 
 impl ReceivingBank {
-    /// A bank of at least one member on an unpumped material, a positive port and hop.
+    /// A linear Floquet bank of at least one member on an unpumped quadratic
+    /// material, a positive port and hop. A quartic relation needs its actual
+    /// state, executed-domain certificate and phase-bearing nonlinear consumer.
     pub fn new(
         material: ResonatorMaterial,
         pumps: Vec<PumpDeclaration>,
@@ -2302,6 +2620,12 @@ impl ReceivingBank {
             return Err(HnnError::Resonator {
                 ring: usize::MAX,
                 what: "a receiving bank is one unpumped material and at least one declared pump",
+            });
+        }
+        if material.saturation().is_some() {
+            return Err(HnnError::Resonator {
+                ring: usize::MAX,
+                what: "a linear receiving bank cannot read quartic material without its executed state and domain",
             });
         }
         if !admittance.is_positive() || !hop.is_positive() {
@@ -2359,7 +2683,11 @@ impl ReceivingBank {
     /// matrix `N = N_(T−1) ⋯ N_0` over `Δ = ∏ L_t` and the multipliers of `M_T = N/Δ` at radius `r` are
     /// those of `N` at `rΔ`: the same monodromy, without a common-denominator reduction at every
     /// product.
-    pub fn read_turn(&self, amplitudes: &[GaussianRat], grain: u32) -> Result<TurnReading, HnnError> {
+    pub fn read_turn(
+        &self,
+        amplitudes: &[GaussianRat],
+        grain: u32,
+    ) -> Result<TurnReading, HnnError> {
         let members = (0..self.pumps.len())
             .map(|member| {
                 let (_, product, scale) = self.turn_monodromy(member, amplitudes)?;
@@ -2436,7 +2764,12 @@ impl ReceivingBank {
             None,
             tick,
         )?;
-        tick_map(&phase.solve.matrix()?, capacity, &phase.stiffness, &self.hop)
+        tick_map(
+            &phase.solve.matrix()?,
+            capacity,
+            &phase.stiffness,
+            &self.hop,
+        )
     }
 
     /// [proved-derived; implemented-exact] **The certificate of a turn's reading**: each member's
@@ -2825,7 +3158,10 @@ pub fn dominant_multiplier(
     }
     let near_real = |z: &GaussianRat| -> bool {
         let grain = root_upper(&z.norm_sq())
-            * Rat::new(BigInt::one(), BigInt::one() << (ROOT_ATTAINMENT_BITS / 2) as usize);
+            * Rat::new(
+                BigInt::one(),
+                BigInt::one() << (ROOT_ATTAINMENT_BITS / 2) as usize,
+            );
         z.im.abs() <= grain
     };
     let isolated: Vec<Option<Disk>> = attained
@@ -2880,12 +3216,7 @@ pub fn dominant_multiplier(
         let conjugate = isolated[dominant].as_ref().expect("isolated").conj();
         let partners: Vec<usize> = (0..n)
             .filter(|&j| j != dominant)
-            .filter(|&j| {
-                !isolated[j]
-                    .as_ref()
-                    .expect("isolated")
-                    .disjoint(&conjugate)
-            })
+            .filter(|&j| !isolated[j].as_ref().expect("isolated").disjoint(&conjugate))
             .collect();
         if pair && partners.len() != 1 {
             return Ok(Err(CovectorRefusal::Collision));
@@ -3021,7 +3352,9 @@ impl EigenDisks {
                         exponent * depth as i64,
                         COVECTOR_BITS,
                     );
-                    adjugate[i][j] = adjugate[i][j].mul(&s, COVECTOR_BITS).add(&term, COVECTOR_BITS);
+                    adjugate[i][j] = adjugate[i][j]
+                        .mul(&s, COVECTOR_BITS)
+                        .add(&term, COVECTOR_BITS);
                 }
             }
         }
@@ -3094,7 +3427,10 @@ impl ReceivingBank {
         let pump = &self.pumps[member];
         let carrier = pump.carrier(tick % pump.phases()).as_gaussian();
         let (capacity, stiffness, _) = self.material.forms();
-        let pumped = stiffened(stiffness, &pump_block(pump.strength(), &carrier.mul(amplitude)))?;
+        let pumped = stiffened(
+            stiffness,
+            &pump_block(pump.strength(), &carrier.mul(amplitude)),
+        )?;
         if !self.material.signed_form_holds(&pumped, &self.hop)? {
             return Err(HnnError::UncertifiedResonator {
                 ring: member,
@@ -3161,7 +3497,10 @@ impl ReceivingBank {
         let (_, stiffness, _) = self.material.forms();
         for pump in &self.pumps {
             for (tick, amplitude) in amplitudes.iter().enumerate() {
-                let carrier = pump.carrier(tick % pump.phases()).as_gaussian().mul(amplitude);
+                let carrier = pump
+                    .carrier(tick % pump.phases())
+                    .as_gaussian()
+                    .mul(amplitude);
                 let pumped = stiffened(stiffness, &pump_block(pump.strength(), &carrier))?;
                 if !self.material.signed_form_holds(&pumped, &self.hop)? {
                     return Ok(false);
@@ -3178,8 +3517,16 @@ impl ReceivingBank {
         &self,
         amplitudes: &[GaussianRat],
         grain: u32,
-    ) -> Result<Vec<(Vec<ExactRatMatrix>, Vec<Vec<BigInt>>, BigInt, Vec<BigInt>, Growth)>, HnnError>
-    {
+    ) -> Result<
+        Vec<(
+            Vec<ExactRatMatrix>,
+            Vec<Vec<BigInt>>,
+            BigInt,
+            Vec<BigInt>,
+            Growth,
+        )>,
+        HnnError,
+    > {
         (0..self.pumps.len())
             .map(|member| {
                 let (maps, product, scale) = self.turn_monodromy(member, amplitudes)?;
@@ -3214,7 +3561,15 @@ impl ReceivingBank {
             .filter(|&member| reading.members[member].upper >= reading.joint.lower)
             .map(|member| {
                 let (maps, product, scale, characteristic, growth) = &turns[member];
-                self.member_covector(member, amplitudes, maps, product, scale, characteristic, growth)
+                self.member_covector(
+                    member,
+                    amplitudes,
+                    maps,
+                    product,
+                    scale,
+                    characteristic,
+                    growth,
+                )
             })
             .collect::<Result<Vec<_>, HnnError>>()?;
         Ok(TurnCovector { reading, active })
@@ -3232,7 +3587,10 @@ impl ReceivingBank {
         let pump = &self.pumps[member];
         let carrier = pump.carrier(tick % pump.phases()).as_gaussian();
         let (_, stiffness, _) = self.material.forms();
-        let pumped = stiffened(stiffness, &pump_block(pump.strength(), &carrier.mul(amplitude)))?;
+        let pumped = stiffened(
+            stiffness,
+            &pump_block(pump.strength(), &carrier.mul(amplitude)),
+        )?;
         if !self.material.signed_form_holds(&pumped, &self.hop)? {
             return Err(HnnError::UncertifiedResonator {
                 ring: member,
@@ -3340,26 +3698,27 @@ impl ReceivingBank {
             matrix
                 .iter()
                 .map(|row| {
-                    row.iter().zip(vector).fold(DyadicDisk::zero(), |sum, (m, v)| {
-                        if m.is_zero() {
-                            sum
-                        } else {
-                            sum.add(&m.mul(v, COVECTOR_BITS), COVECTOR_BITS)
-                        }
-                    })
+                    row.iter()
+                        .zip(vector)
+                        .fold(DyadicDisk::zero(), |sum, (m, v)| {
+                            if m.is_zero() {
+                                sum
+                            } else {
+                                sum.add(&m.mul(v, COVECTOR_BITS), COVECTOR_BITS)
+                            }
+                        })
                 })
                 .collect()
         };
-        let combine =
-            |a: &[DyadicDisk], x: &Rat, b: &[DyadicDisk], y: &Rat| -> Vec<DyadicDisk> {
-                a.iter()
-                    .zip(b)
-                    .map(|(p, q)| {
-                        p.scale(x, COVECTOR_BITS)
-                            .add(&q.scale(y, COVECTOR_BITS), COVECTOR_BITS)
-                    })
-                    .collect()
-            };
+        let combine = |a: &[DyadicDisk], x: &Rat, b: &[DyadicDisk], y: &Rat| -> Vec<DyadicDisk> {
+            a.iter()
+                .zip(b)
+                .map(|(p, q)| {
+                    p.scale(x, COVECTOR_BITS)
+                        .add(&q.scale(y, COVECTOR_BITS), COVECTOR_BITS)
+                })
+                .collect()
+        };
         let of = |v: &[Disk]| -> Vec<DyadicDisk> {
             v.iter().map(|d| DyadicDisk::of(d, COVECTOR_BITS)).collect()
         };
@@ -3373,7 +3732,9 @@ impl ReceivingBank {
                 (0..2 * n)
                     .map(|i| {
                         (0..2 * n)
-                            .map(|j| DyadicDisk::real(map.get(i, j).expect("in range"), COVECTOR_BITS))
+                            .map(|j| {
+                                DyadicDisk::real(map.get(i, j).expect("in range"), COVECTOR_BITS)
+                            })
                             .collect()
                     })
                     .collect()
@@ -3391,7 +3752,10 @@ impl ReceivingBank {
             let (first, second) = vector.split_at(n);
             let pushed = apply(stiffness, first);
             let stored = apply(&capacity, second);
-            let y = apply(solve, &combine(&pushed, &-h_square.clone(), &stored, &twice_h));
+            let y = apply(
+                solve,
+                &combine(&pushed, &-h_square.clone(), &stored, &twice_h),
+            );
             residues.push(combine(&y, &-half.clone(), first, &-Rat::one()));
             vector = apply(map, &vector);
         }
@@ -3546,7 +3910,10 @@ impl ReceivingBank {
             for j in 0..n {
                 let entry = variation.get(j, i)?;
                 if !entry.is_zero() {
-                    trace = trace.add(&eigen.adjugate[i][j].scale(entry, COVECTOR_BITS), COVECTOR_BITS);
+                    trace = trace.add(
+                        &eigen.adjugate[i][j].scale(entry, COVECTOR_BITS),
+                        COVECTOR_BITS,
+                    );
                 }
             }
         }

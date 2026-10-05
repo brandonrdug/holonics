@@ -1,0 +1,32 @@
+{
+  "kind": "targeted native component-law validation; no scientific training or generation",
+  "existing_wrapper": "run_check.py",
+  "build_wall_guard_s": 65,
+  "check_wall_guard_s": 16,
+  "test_wall_guard_s": 16,
+  "threads": 8,
+  "memory_max_bytes": 4294967296,
+  "previous_largest_quartic_build": {
+    "wall_ns": 19713107003,
+    "user_cpu_ns": 34770522000,
+    "system_cpu_ns": 4799785000,
+    "peak_RSS_KiB": 3052180
+  },
+  "previous_typecheck": {
+    "wall_ns": 10813037695,
+    "user_cpu_ns": 15540506000,
+    "system_cpu_ns": 1307299000,
+    "peak_RSS_KiB": 1469312
+  },
+  "aggregate_cpu_enforced": false,
+  "continuous_available_floor_enforced": false,
+  "admission_v1_used": false,
+  "offline_locked": true,
+  "existing_executable": {
+    "name": "holonics-2a96462c8d73f617",
+    "bytes": 274521552,
+    "sha256": "a82697763701eebcf1fc6b68281b0acc13601f375a1afafcdbf37ecb75457e13"
+  },
+  "cargo_lock_sha256": "82d493bdc422e3b6ebbca3f5997b23e256834c56291ab14751a514e051543282",
+  "preexisting_dependencies": 53
+}

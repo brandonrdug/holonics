@@ -67,9 +67,7 @@ use holonics::hnn::reference::{
     BudgetStop, ChartTally, ComparePhase, Cut, Declared, ExposedResident, Exposure, Reception,
     WallTimes, carry_bits, compare_phase, compose, expose, expose_from, window_code_length,
 };
-use holonics::hnn::retention::{
-    Diamond, aeon_readings, collapse, contained, retained, separator,
-};
+use holonics::hnn::retention::{Diamond, aeon_readings, collapse, contained, retained, separator};
 use holonics::hnn::{
     Absorption, ActiveAddress, AeonBoundary, ChartKey, ChartReading, Constitution,
     ConstitutionRead, Current, Faces, Field, HnnError, Locus, PendingRatio, ReceivingPhases,
@@ -1209,15 +1207,13 @@ impl<'c> ExecutionPort for Resident<'c> {
         // One chain in refine order under the carry, as the reference's (the reception carry §8).
         let opening = match self.reception {
             Reception::Rest => CardOpening::Rest,
-            Reception::Carry(absorption) => {
-                match &resident.carried {
-                    Some(carry) => CardOpening::Received {
-                        carry: Rc::clone(carry),
-                        absorption,
-                    },
-                    None => CardOpening::Rest,
-                }
-            }
+            Reception::Carry(absorption) => match &resident.carried {
+                Some(carry) => CardOpening::Received {
+                    carry: Rc::clone(carry),
+                    absorption,
+                },
+                None => CardOpening::Rest,
+            },
         };
         let source = resident
             .moments
@@ -1261,7 +1257,7 @@ impl<'c> ExecutionPort for Resident<'c> {
             &publication.loci,
             &word.word.record,
             &executed,
-        );
+        )?;
         resident.tally.read(&released.charts);
         // Loaded resonators ran inside this word. The release reads their actual state and
         // balance from that same record; no separate forward evaluation follows it.
@@ -1491,7 +1487,11 @@ impl<'c> ExecutionPort for Resident<'c> {
                 }
                 let locus = step.locus.locus();
                 let moved = reading.charts.iter().any(|(at, chart)| {
-                    *at == locus && chart.prior.as_ref().is_some_and(|read| read.to != read.from)
+                    *at == locus
+                        && chart
+                            .prior
+                            .as_ref()
+                            .is_some_and(|read| read.to != read.from)
                 });
                 if moved {
                     tally.moved += 1;
@@ -1870,8 +1870,7 @@ impl<'c> ExecutionPort for Resident<'c> {
                         arrived_opening.clone().expect("formed above"),
                     )
                 });
-                let read =
-                    resident.arrived_code_length(&descended, Some(&constitution), self.card);
+                let read = resident.arrived_code_length(&descended, Some(&constitution), self.card);
                 let (reread, readings) = match read {
                     Ok(read) => read,
                     Err(refusal) => {

@@ -76,6 +76,506 @@ fn run(operands: &ResonatorOperands, state: &[Rat], ticks: usize) -> Vec<Rat> {
     [state[0].clone(), state[1].clone()].concat()
 }
 
+/// A signed constitutive drift defect cannot certify a wrong executed solve. This concrete
+/// counterexample satisfies the energy telescope but violates the retained zero solve certificate.
+#[test]
+fn a_quartic_integration_defect_does_not_hide_a_wrong_solve() {
+    let material = node(Rat::zero(), None)
+        .with_symmetric_saturation(Rat::one())
+        .unwrap();
+    let operands = ResonatorOperands::at_cut(0, &material, &Rat::one(), &Rat::one(), None).unwrap();
+    let displacement = vec![integer(2), Rat::zero()];
+    let quiet = vec![Rat::zero(); 2];
+    let step = |owner: &ResonatorOperands| {
+        owner
+            .step(
+                0,
+                &quiet,
+                [&displacement, &quiet],
+                &ResonatorRemainders::default(),
+                None,
+            )
+            .unwrap()
+    };
+    let correct = step(&operands);
+    assert_eq!(correct.rate, vec![integer(-4), Rat::zero()]);
+    assert!(correct.closes());
+    let wrong = step(&operands.with_executed_solve(0, identity(2).scaled(&rat(3, 8))));
+    assert_eq!(wrong.rate, vec![integer(-3), Rat::zero()]);
+    assert_eq!(wrong.integration, rat(63, 4));
+    assert_eq!(wrong.chart, integer(-6));
+    assert_eq!(wrong.split, Rat::zero());
+    assert_eq!(wrong.chart_bound, Rat::zero());
+    assert!(!wrong.closes());
+}
+
+/// A correct signed work account must never be treated as a bounded-orbit certificate.
+#[test]
+fn a_closed_quartic_balance_does_not_bound_the_executed_orbit() {
+    let material = ResonatorMaterial::new(zero(2), zero(2), zero(2), None)
+        .unwrap()
+        .with_symmetric_saturation(Rat::one())
+        .unwrap();
+    let owner = ResonatorOperands::at_cut(0, &material, &Rat::one(), &Rat::one(), None).unwrap();
+    let quiet = vec![Rat::zero(); 2];
+    let step = owner
+        .step(
+            0,
+            &quiet,
+            [&[integer(2), Rat::zero()], &quiet],
+            &ResonatorRemainders::default(),
+            None,
+        )
+        .unwrap();
+    assert_eq!(
+        step.state,
+        [
+            vec![integer(-6), Rat::zero()],
+            vec![integer(-8), Rat::zero()]
+        ]
+    );
+    assert_eq!(step.before, integer(4));
+    assert_eq!(step.after, integer(324));
+    assert_eq!(step.port, integer(-64));
+    assert_eq!(step.integration, integer(384));
+    assert!(step.closes());
+    assert!(step.after > step.before);
+}
+
+fn quartic_standing_material() -> ResonatorMaterial {
+    node(Rat::one(), Some(standing(rat(3, 4))))
+        .with_symmetric_saturation(rat(1, 2))
+        .unwrap()
+}
+
+fn quartic_domain(sheet: i64) -> crate::holon::parametron::DomainProposal {
+    crate::holon::parametron::DomainProposal {
+        centre: vec![integer(sheet), Rat::zero(), Rat::zero(), Rat::zero()],
+        drive: vec![Rat::zero(); 2],
+        // At the actual standing sheet, Jᵀ G J = G/2 in this material's node frame.
+        metric: ExactRatMatrix::new(vec![
+            vec![integer(1), integer(0), integer(0), integer(0)],
+            vec![integer(0), integer(6), integer(0), integer(-2)],
+            vec![integer(0), integer(0), integer(1), integer(0)],
+            vec![integer(0), integer(-2), integer(0), integer(2)],
+        ])
+        .unwrap(),
+        radius: rat(1, 100),
+        metric_lower: Rat::one(),
+        euclidean_radius: rat(1, 100),
+        lipschitz: rat(4, 5),
+        centre_residual: Rat::zero(),
+        young: rat(1, 4),
+    }
+}
+
+#[test]
+fn the_quartic_generic_advance_is_the_executed_ring_tick() {
+    use crate::holon::HolonState;
+    use crate::holon::law::{HolonLaw, ReferenceHolon, Scheme};
+    use crate::holon::parametron::LoadedParametron;
+    let material = quartic_standing_material();
+    let owner = ResonatorOperands::at_cut(0, &material, &Rat::one(), &Rat::one(), None).unwrap();
+    let (c, _, d) = material.forms();
+    let element = LoadedParametron::new(
+        c.clone(),
+        owner.stiffness(0).clone(),
+        d.clone(),
+        material.saturation().unwrap().clone(),
+        Rat::one(),
+    )
+    .unwrap();
+    let law = element.law(Rat::one()).unwrap();
+    assert!(ReferenceHolon::new(law.holon().clone(), Rat::one(), Scheme::Midpoint).is_err());
+    let u = vec![rat(101, 100), rat(1, 1000)];
+    let w = vec![rat(1, 500), rat(-1, 700)];
+    let drive = vec![rat(1, 11), rat(-1, 13)];
+    let generic = law
+        .advance(&HolonState::new([u.clone(), w.clone()].concat()), &drive)
+        .unwrap();
+    assert!(
+        element
+            .executed(
+                &Rat::zero(),
+                &HolonState::new([u.clone(), w.clone()].concat()),
+                &drive,
+                &w
+            )
+            .is_err()
+    );
+    let native = owner
+        .step(0, &drive, [&u, &w], &ResonatorRemainders::default(), None)
+        .unwrap();
+    assert_eq!(generic.state.configuration, native.state.concat());
+    assert_eq!(
+        generic.balance.stored_change,
+        &native.after - &native.before
+    );
+    assert_eq!(generic.balance.port, native.port);
+    assert_eq!(generic.balance.dissipated, native.dissipation);
+    assert_eq!(generic.balance.discretization_defect, native.integration);
+    assert!(generic.balance.is_exact());
+    assert!(
+        law.holon()
+            .port_holon()
+            .dirac()
+            .contains(&generic.bond)
+            .unwrap()
+    );
+    assert!(native.closes());
+}
+
+#[test]
+fn a_quartic_lock_consumes_its_executed_period_domain() {
+    use crate::holon::HolonState;
+    let material = quartic_standing_material();
+    let owner = ResonatorOperands::at_cut(0, &material, &Rat::one(), &Rat::one(), None).unwrap();
+    for sheet in [-1, 1] {
+        let p = quartic_domain(sheet);
+        let lock = owner.nonlinear_lock(&[p], 0, 0).unwrap();
+        assert_eq!(lock.sheet(), sheet as i8);
+        assert_eq!(lock.phase_class(), 0);
+        assert_eq!(lock.domain().contraction(), &rat(4, 5));
+        assert_eq!(
+            lock.domain().step(0).unwrap().hessian_variation(),
+            &rat(603, 20000)
+        );
+        assert_eq!(
+            lock.amplitude_squared(),
+            &[rat(9801, 10000), rat(5101, 5000)]
+        );
+        let boundary = HolonState::new(vec![
+            integer(sheet) * rat(101, 100),
+            Rat::zero(),
+            Rat::zero(),
+            Rat::zero(),
+        ]);
+        let next = lock.advance(&boundary).unwrap();
+        assert!(
+            lock.domain()
+                .step(0)
+                .unwrap()
+                .contains(&next.configuration)
+                .unwrap()
+        );
+        let native = owner
+            .step(
+                0,
+                &[Rat::zero(), Rat::zero()],
+                [&boundary.configuration[..2], &boundary.configuration[2..]],
+                &ResonatorRemainders::default(),
+                None,
+            )
+            .unwrap();
+        assert_eq!(next.configuration, native.state.concat());
+        let outside = HolonState::new(vec![
+            integer(sheet) * rat(102, 100),
+            Rat::zero(),
+            Rat::zero(),
+            Rat::zero(),
+        ]);
+        assert!(lock.advance(&outside).is_err());
+    }
+}
+
+#[test]
+fn a_quartic_domain_refuses_a_bad_step_residual_or_rounding_claim() {
+    let material = quartic_standing_material();
+    let owner = ResonatorOperands::at_cut(0, &material, &Rat::one(), &Rat::one(), None).unwrap();
+    let mut wrong_centre = quartic_domain(1);
+    wrong_centre.centre[0] += rat(1, 1000);
+    assert!(owner.nonlinear_lock(&[wrong_centre], 0, 0).is_err());
+    let mut oversized = quartic_domain(1);
+    oversized.radius = rat(1, 2);
+    oversized.euclidean_radius = rat(1, 2);
+    assert!(owner.nonlinear_lock(&[oversized], 0, 0).is_err());
+    let too_large_step =
+        ResonatorOperands::at_cut(0, &material, &Rat::one(), &integer(4), None).unwrap();
+    assert!(
+        too_large_step
+            .nonlinear_lock(&[quartic_domain(1)], 0, 0)
+            .is_err()
+    );
+    let lattice = WordLattice::by_rule(16, 6, 6, 4);
+    let charted =
+        ResonatorOperands::at_cut(0, &material, &Rat::one(), &Rat::one(), Some(&lattice)).unwrap();
+    assert!(charted.nonlinear_lock(&[quartic_domain(1)], 0, 0).is_err());
+}
+
+fn half_pump_domains(owner: &ResonatorOperands) -> Vec<crate::holon::parametron::DomainProposal> {
+    use crate::holon::parametron::DomainProposal;
+    let centre = vec![rat(1, 10000), Rat::zero(), Rat::zero(), Rat::zero()];
+    let next = owner
+        .step(
+            2,
+            &[Rat::zero(), Rat::zero()],
+            [&centre[..2], &centre[2..]],
+            &ResonatorRemainders::default(),
+            None,
+        )
+        .unwrap()
+        .state
+        .concat();
+    // At zero G_1=2 J_1ᵀJ_1; the actual nonzero centres and the quartic
+    // variation are checked by the same certificate used by the mount.
+    let second_metric = ExactRatMatrix::new(vec![
+        vec![rat(41, 25), integer(0), rat(-4, 5), integer(0)],
+        vec![integer(0), rat(41, 25), integer(0), rat(4, 5)],
+        vec![rat(-4, 5), integer(0), integer(1), integer(0)],
+        vec![integer(0), rat(4, 5), integer(0), integer(1)],
+    ])
+    .unwrap();
+    vec![
+        DomainProposal {
+            centre,
+            drive: vec![Rat::zero(); 2],
+            metric: identity(4),
+            radius: rat(1, 100),
+            metric_lower: Rat::one(),
+            euclidean_radius: rat(1, 100),
+            lipschitz: rat(13, 10),
+            centre_residual: Rat::zero(),
+            young: rat(1, 100),
+        },
+        DomainProposal {
+            centre: next,
+            drive: vec![Rat::zero(); 2],
+            metric: second_metric,
+            radius: rat(13, 1000),
+            metric_lower: rat(1, 4),
+            euclidean_radius: rat(13, 500),
+            lipschitz: rat(3, 4),
+            centre_residual: rat(1, 5000),
+            young: rat(1, 100),
+        },
+    ]
+}
+
+fn half_pumped_quartic() -> ResonatorMaterial {
+    node(
+        Rat::one(),
+        Some(PumpDeclaration::new(rat(2, 5), quarter(0), PumpStep::Half).unwrap()),
+    )
+    .with_symmetric_saturation(rat(1, 16))
+    .unwrap()
+}
+
+#[test]
+fn a_native_quartic_mount_carries_an_expanding_tick_through_its_pump_cycle() {
+    use crate::holon::HolonState;
+    let material = half_pumped_quartic();
+    let owner = ResonatorOperands::at_cut(0, &material, &Rat::one(), &Rat::one(), None).unwrap();
+    let proposals = half_pump_domains(&owner);
+    let mut point = proposals[0].centre.clone();
+    point[0] += rat(1, 100);
+    let entered = HolonState::at(point, 2);
+    let mut mounted = owner.mount_periodic(&proposals, entered.clone()).unwrap();
+    assert_eq!(mounted.domain().contraction(), &rat(39, 40));
+    assert_eq!(mounted.clock(), &material.pump().unwrap().clock());
+    assert_eq!(
+        mounted.primitive_cycle().aeon(),
+        material.pump().unwrap().period().unwrap().aeon()
+    );
+    assert_eq!(
+        mounted
+            .held_holon()
+            .unwrap()
+            .loaded_parametron()
+            .unwrap()
+            .stiffness(),
+        owner.stiffness(1)
+    );
+    let domain = mounted.domain();
+    assert!(domain.step(0).unwrap().centre_residual_squared().is_zero());
+    assert!(
+        domain
+            .step(1)
+            .unwrap()
+            .centre_residual_squared()
+            .is_positive()
+    );
+    // An actual tangent expands in the transported metric at the first tick,
+    // although the admitted two-tick composition contracts by at most 39/40.
+    let direction = vec![Rat::one(), Rat::zero(), Rat::zero(), Rat::zero()];
+    let image = domain
+        .step(0)
+        .unwrap()
+        .jacobian()
+        .apply(&direction)
+        .unwrap();
+    assert!(dot(&image, &proposals[1].metric.apply(&image).unwrap()) > Rat::one());
+    // A contracting origin domain is not a separated half-turn Lock.
+    assert!(owner.nonlinear_lock(&proposals, 0, 0).is_err());
+    let mut false_residual = proposals.clone();
+    false_residual[1].centre_residual = Rat::zero();
+    assert!(
+        owner
+            .mount_periodic(&false_residual, entered.clone())
+            .is_err()
+    );
+    let mut native_point = entered;
+    for _ in 0..2 {
+        let before = native_point.clone();
+        let mut pump = Rat::zero();
+        let mut port = Rat::zero();
+        let mut dissipated = Rat::zero();
+        let mut defect = Rat::zero();
+        let mut stored = Rat::zero();
+        for phase in 0..2 {
+            let tick = usize::try_from(native_point.commit).unwrap();
+            let native = owner
+                .step(
+                    tick,
+                    &proposals[phase].drive,
+                    [
+                        &native_point.configuration[..2],
+                        &native_point.configuration[2..],
+                    ],
+                    &ResonatorRemainders::default(),
+                    None,
+                )
+                .unwrap();
+            assert!(native.closes());
+            assert!(native.chart.is_zero() && native.split.is_zero());
+            stored += &native.after - &native.before;
+            pump += native.pump;
+            port += native.port;
+            dissipated += native.dissipation;
+            defect += native.integration;
+            native_point = native_point.committed(native.state.concat()).unwrap();
+        }
+        let advanced = mounted.advance_cycle().unwrap();
+        assert_eq!(&advanced.state, &native_point);
+        assert_eq!(mounted.point(), &native_point);
+        assert_ne!(mounted.point().configuration, before.configuration);
+        assert!(advanced.balance.is_exact());
+        assert_eq!(advanced.balance.stored_change, stored);
+        assert_eq!(advanced.balance.deposition_work, pump);
+        assert_eq!(advanced.balance.port, port);
+        assert_eq!(advanced.balance.dissipated, dissipated);
+        assert_eq!(advanced.balance.discretization_defect, defect);
+        assert!(!advanced.balance.deposition_work.is_zero());
+        assert_eq!(
+            advanced.cycle.aeon().start(),
+            &[BigInt::from(before.commit)]
+        );
+        assert_eq!(
+            advanced.cycle.aeon().end(),
+            &[BigInt::from(native_point.commit)]
+        );
+        assert!(
+            mounted
+                .domain()
+                .step(0)
+                .unwrap()
+                .contains(&native_point.configuration)
+                .unwrap()
+        );
+    }
+    assert_eq!(mounted.point().commit, 6);
+}
+
+#[test]
+fn a_native_quartic_mount_refuses_a_false_cycle_and_keeps_its_point_on_failure() {
+    use crate::aeon::{ClockLift, Cycle};
+    use crate::holon::HolonState;
+    use crate::holon::parametron::MountedParametron;
+    let material = half_pumped_quartic();
+    let owner = ResonatorOperands::at_cut(0, &material, &Rat::one(), &Rat::one(), None).unwrap();
+    let proposals = half_pump_domains(&owner);
+    let point = HolonState::at(proposals[0].centre.clone(), 2);
+    let mounted = owner.mount_periodic(&proposals, point.clone()).unwrap();
+    assert!(
+        owner
+            .mount_periodic(&proposals, HolonState::new(point.configuration.clone()))
+            .is_err()
+    );
+    assert!(
+        owner
+            .mount_periodic(&proposals, HolonState::at(point.configuration.clone(), 1))
+            .is_err()
+    );
+    let mut outside = point.clone();
+    outside.configuration[0] += rat(1, 50);
+    assert!(owner.mount_periodic(&proposals, outside).is_err());
+    let clock = mounted.clock().clone();
+    let twice = Cycle::close(
+        &clock,
+        clock
+            .forward(vec![BigInt::zero()], &[BigInt::from(4)])
+            .unwrap(),
+    )
+    .unwrap();
+    assert!(
+        MountedParametron::mount(
+            mounted.domain().clone(),
+            clock.clone(),
+            twice,
+            point.clone()
+        )
+        .is_err()
+    );
+    let reverse = Cycle::close(&clock, mounted.primitive_cycle().aeon().reverse()).unwrap();
+    assert!(
+        MountedParametron::mount(
+            mounted.domain().clone(),
+            clock.clone(),
+            reverse,
+            point.clone()
+        )
+        .is_err()
+    );
+    let wrong_clock = ClockLift::new(vec![num_bigint::BigUint::from(1u8)]).unwrap();
+    assert!(
+        MountedParametron::mount(
+            mounted.domain().clone(),
+            wrong_clock,
+            mounted.primitive_cycle().clone(),
+            point.clone()
+        )
+        .is_err()
+    );
+    let charted = ResonatorOperands::at_cut(
+        0,
+        &material,
+        &Rat::one(),
+        &Rat::one(),
+        Some(&WordLattice::by_rule(16, 6, 6, 4)),
+    )
+    .unwrap();
+    assert!(charted.mount_periodic(&proposals, point.clone()).is_err());
+    let wrong_solve = owner.clone().with_executed_solve(1, identity(2));
+    assert!(
+        wrong_solve
+            .mount_periodic(&proposals, point.clone())
+            .is_err()
+    );
+    // Material-clock overflow is refused before any successor is published.
+    let almost_end = HolonState::at(point.configuration, u64::MAX - 1);
+    let mut overflow = owner
+        .mount_periodic(&proposals, almost_end.clone())
+        .unwrap();
+    assert!(overflow.advance_cycle().is_err());
+    assert_eq!(overflow.point(), &almost_end);
+}
+
+/// `read_turn` constructs state-independent linear maps. It must never silently
+/// certify the quartic loaded relation, whose force is state dependent and whose
+/// actual map requires the admitted domain. The ordinary quadratic bank remains
+/// a valid linear caller.
+#[test]
+fn the_linear_receiving_bank_refuses_quartic_material() {
+    let pumps = vec![standing(rat(1, 4))];
+    let quadratic = node(Rat::one(), None);
+    let bank =
+        ReceivingBank::new(quadratic.clone(), pumps.clone(), Rat::one(), Rat::one(), 8).unwrap();
+    assert!(bank.read_turn(&[GaussianRat::one()], 8).is_ok());
+    let quartic = quadratic.with_symmetric_saturation(rat(1, 16)).unwrap();
+    let owner = ResonatorOperands::at_cut(0, &quartic, &Rat::one(), &Rat::one(), None).unwrap();
+    assert!(Floquet::of(&owner).is_err());
+    assert!(ReceivingBank::new(quartic, pumps, Rat::one(), Rat::one(), 8).is_err());
+}
+
 /// Lean `HNN/Floquet.{standing_fixed_point_iff, pumped_inphase_axis, floquet_passive}`: a standing
 /// pump's bifurcation is where its in-phase stiffness `k − 2p` vanishes. Below it every multiplier is
 /// inside the unit circle and the storage is certified at `ρ = 1`; at it a multiplier sits on the
@@ -602,7 +1102,14 @@ fn a_member_reads_a_turn_only_when_its_period_divides_it() {
         6,
     )
     .unwrap();
-    assert_eq!(commensurate.read_turn(&amplitudes, 8).unwrap().members.len(), 2);
+    assert_eq!(
+        commensurate
+            .read_turn(&amplitudes, 8)
+            .unwrap()
+            .members
+            .len(),
+        2
+    );
 }
 
 /// **The bank reads a passage's spectral line, and its lock's flip continues it** (known truth of
@@ -719,4 +1226,68 @@ fn the_executed_turn_reads_a_passage_and_its_conjugate_alike() {
     let turn = drawn_turn(3, 8, 5);
     let conjugate: Vec<GaussianRat> = turn.iter().map(GaussianRat::conj).collect();
     assert_ne!(kicked_trace(&turn), kicked_trace(&conjugate));
+}
+
+#[test]
+fn the_quartic_loaded_solve_needs_no_inverse_capacity() {
+    let material = ResonatorMaterial::new(zero(2), zero(2), zero(2), None)
+        .unwrap()
+        .with_symmetric_saturation(Rat::one())
+        .unwrap();
+    let ops = ResonatorOperands::at_cut(0, &material, &Rat::one(), &Rat::one(), None).unwrap();
+    assert_eq!(ops.operator(0), &identity(2));
+    let u = vec![Rat::one(), Rat::zero()];
+    let w = vec![integer(3), integer(4)];
+    let step = ops
+        .step(
+            0,
+            &vec![Rat::zero(); 2],
+            [&u, &w],
+            &ResonatorRemainders::default(),
+            None,
+        )
+        .unwrap();
+    assert_eq!(step.rate, vec![-Rat::one(), Rat::zero()]);
+    assert!(step.closes());
+    assert!(Floquet::of(&ops).is_err()); // the linear certificate is not inherited
+}
+
+#[test]
+fn the_fifth_gain_feature_is_the_exact_quartic_amplitude_derivative() {
+    let base = node(Rat::one(), None)
+        .with_symmetric_saturation(rat(3, 2))
+        .unwrap();
+    let mut gains = vec![Rat::one(); 5];
+    gains[4] = integer(2);
+    let material = base.with_gains(&gains).unwrap();
+    let ops = operands(&material);
+    let u = vec![rat(1, 2), rat(1, 3)];
+    let w = vec![rat(1, 4), rat(-1, 5)];
+    let drive = vec![rat(1, 7), rat(-1, 11)];
+    let step = ops
+        .step(0, &drive, [&u, &w], &ResonatorRemainders::default(), None)
+        .unwrap();
+    let features = material
+        .gain_features(0, ops.hop(), &u, &w, &step.rate)
+        .unwrap();
+    assert_eq!(features.len(), 5);
+    let epsilon = rat(1, 8);
+    let varied = |offset: Rat| {
+        let mut varied = gains.clone();
+        varied[4] += offset;
+        operands(&base.with_gains(varied).unwrap())
+            .step(0, &drive, [&u, &w], &ResonatorRemainders::default(), None)
+            .unwrap()
+            .rate
+    };
+    let plus = varied(epsilon.clone());
+    let minus = varied(-epsilon.clone());
+    let difference: Vec<_> = plus
+        .iter()
+        .zip(&minus)
+        .map(|(p, m)| (p - m) / (integer(2) * &epsilon))
+        .collect();
+    // N is independent of beta; centered differentiation of g_beta squared is exact here.
+    assert_eq!(ops.operator(0).apply(&difference).unwrap(), features[4]);
+    assert_eq!(material.saturation().unwrap().coefficient(), &integer(6));
 }

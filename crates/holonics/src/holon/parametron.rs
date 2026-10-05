@@ -27,9 +27,11 @@
 //! [proved-derived; re-derived September 29] The pump's locking is the pumped ring's Floquet growth,
 //! owned by `hnn::ring` (Lean `HNN/Floquet`): past the bifurcation the two sheets are the rays of the
 //! growing Floquet mode, and the seed's growing coordinate chooses between them; the lock's exchange
-//! polynomial, capacity, winding and coupled pivots are Lean `Objects/ParametronLock`. [open] The
-//! law is linear, so no saturation holds a locked amplitude; this population takes its sheets as
-//! given.
+//! polynomial, capacity, winding and coupled pivots are Lean `Objects/ParametronLock`. That bank
+//! law is linear and this population takes its sheets as given. The separate [`LoadedParametron`]
+//! executes the symmetric quartic kick/drift through the generic Holon advance; [`PeriodicDomain`]
+//! and [`PeriodicLock`] check local domains for that actual nonlinear map. They do not certify
+//! the bank's linear rays, a global nonlinear orbit, or a charted/rounded realization.
 //!
 //! | Lean | Rust |
 //! |---|---|
@@ -51,6 +53,11 @@ use crate::geometry::screw::RationalPhase;
 use crate::ratio::linear::{ExactLinearError, ExactRatMatrix};
 use crate::ratio::{GaussianRat, Rat, integer};
 
+pub mod loaded;
+pub use loaded::{DomainProposal, LoadedParametron, PeriodicDomain, PeriodicLock};
+pub mod mounted;
+pub use mounted::{MountedParametron, PeriodAdvance};
+
 /// Every refusal of a parametron. Bad input is a typed return, never a panic.
 #[derive(Debug, Error, PartialEq, Eq)]
 pub enum ParametronError {
@@ -66,6 +73,8 @@ pub enum ParametronError {
     NegativeWeight { weight: Rat },
     #[error("an LC ring needs a positive inductance and capacitance")]
     NonpositiveElement,
+    #[error("symmetric quartic storage needs a positive coefficient, found {coefficient}")]
+    NonpositiveQuartic { coefficient: Rat },
     #[error("({cos}, {sin}) is not a point of the unit circle")]
     NotOnCircle { cos: Rat, sin: Rat },
     #[error("site {site} lies outside a population of {sites}")]
@@ -219,7 +228,120 @@ impl Parametron {
 }
 
 // -------------------------------------------------------------------------------------------
-// the carrier, the pump and the half-turn sheets
+// symmetric nonlinear storage; the carrier, the pump and the half-turn sheets
+
+/// The symmetric nonlinear storage of a complex parametron, in its declared node frame.
+///
+/// For each realified node `u=(x,y)`, `V=beta*(x²+y²)²/4` and its effort is
+/// `beta*(x²+y²)*u`. This type declares **alpha=0**: a cubic asymmetric storage is a
+/// different material family and cannot inherit the half-turn symmetry. Positive beta
+/// confines this storage; it does not certify a pumped trajectory or a numerical step.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct SymmetricQuartic {
+    coefficient: Rat,
+}
+
+impl SymmetricQuartic {
+    pub fn new(coefficient: Rat) -> Result<Self, ParametronError> {
+        if !coefficient.is_positive() {
+            return Err(ParametronError::NonpositiveQuartic { coefficient });
+        }
+        Ok(Self { coefficient })
+    }
+
+    pub fn coefficient(&self) -> &Rat {
+        &self.coefficient
+    }
+
+    fn shape(state: &[Rat]) -> Result<(), ParametronError> {
+        if state.is_empty() || !state.len().is_multiple_of(2) {
+            return Err(ParametronError::Shape {
+                what: "nonempty realified parametron nodes",
+                expected: 2,
+                found: state.len(),
+            });
+        }
+        Ok(())
+    }
+
+    pub fn energy(&self, state: &[Rat]) -> Result<Rat, ParametronError> {
+        Self::shape(state)?;
+        Ok(state
+            .chunks_exact(2)
+            .map(|u| {
+                let radius = &u[0] * &u[0] + &u[1] * &u[1];
+                &self.coefficient * &radius * radius / integer(4)
+            })
+            .sum())
+    }
+
+    /// The effort per unit coefficient, reused by material variation.
+    pub fn feature(state: &[Rat]) -> Result<Vec<Rat>, ParametronError> {
+        Self::shape(state)?;
+        Ok(state
+            .chunks_exact(2)
+            .flat_map(|u| {
+                let radius = &u[0] * &u[0] + &u[1] * &u[1];
+                [&radius * &u[0], &radius * &u[1]]
+            })
+            .collect())
+    }
+
+    pub fn effort(&self, state: &[Rat]) -> Result<Vec<Rat>, ParametronError> {
+        Ok(Self::feature(state)?
+            .into_iter()
+            .map(|v| &self.coefficient * v)
+            .collect())
+    }
+
+    /// `beta*(|u|² I + 2 u uᵀ)` on each node, at the actual producing state.
+    pub fn hessian(&self, state: &[Rat]) -> Result<ExactRatMatrix, ParametronError> {
+        Self::shape(state)?;
+        Ok(ExactRatMatrix::shaped(
+            state.len(),
+            state.len(),
+            (0..state.len())
+                .map(|i| {
+                    (0..state.len())
+                        .map(|j| {
+                            if i / 2 != j / 2 {
+                                return Rat::zero();
+                            }
+                            let node = 2 * (i / 2);
+                            let radius =
+                                &state[node] * &state[node] + &state[node + 1] * &state[node + 1];
+                            &self.coefficient
+                                * (integer(2) * &state[i] * &state[j]
+                                    + if i == j { radius } else { Rat::zero() })
+                        })
+                        .collect()
+                })
+                .collect(),
+        )?)
+    }
+
+    /// Exact finite drift defect `V(u+d)-V(u)-<effort(u),d>`, independently expanded.
+    pub fn drift_defect(&self, state: &[Rat], drift: &[Rat]) -> Result<Rat, ParametronError> {
+        Self::shape(state)?;
+        if drift.len() != state.len() {
+            return Err(ParametronError::Shape {
+                what: "quartic drift coordinates",
+                expected: state.len(),
+                found: drift.len(),
+            });
+        }
+        Ok(state
+            .chunks_exact(2)
+            .zip(drift.chunks_exact(2))
+            .map(|(u, d)| {
+                let r = &u[0] * &u[0] + &u[1] * &u[1];
+                let s = &d[0] * &d[0] + &d[1] * &d[1];
+                let t = &u[0] * &d[0] + &u[1] * &d[1];
+                &self.coefficient * (r * &s / integer(2) + &t * &t + t * &s + &s * &s / integer(4))
+            })
+            .sum())
+    }
+}
 
 /// **The phase carrier** `e^{iθ}` as a rational point `(cos θ, sin θ)` of the unit circle.
 #[derive(Clone, Debug, PartialEq, Eq)]

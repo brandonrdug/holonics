@@ -98,7 +98,7 @@ const WR_WEIGHTS: usize = 8;
 const WR_ANCHOR_EXP: usize = 9;
 const WR_RESONATOR: usize = 10;
 
-const RZ_STRIDE: usize = 15;
+const RZ_STRIDE: usize = 19;
 const RZ_RING: usize = 0;
 const RZ_WIDTH: usize = 1;
 const RZ_ROWS: usize = 2;
@@ -114,6 +114,10 @@ const RZ_RETURN_EXP: usize = 11;
 const RZ_DISSIPATION: usize = 12;
 const RZ_OPERATOR: usize = 13;
 const RZ_OPERATOR_EXP: usize = 14;
+const RZ_SATURATION: usize = 15;
+const RZ_BETA: usize = 16;
+const RZ_BETA_EXP: usize = 17;
+const RZ_FORCE_EXP: usize = 18;
 
 const WC_STRIDE: usize = 20;
 const WC_WIDTH: usize = 0;
@@ -196,6 +200,10 @@ pub(crate) struct LoadedResonatorPlan {
     pub(crate) material_exp: u32,
     pub(crate) chart_exp: u32,
     pub(crate) operator_exp: u32,
+    /// Effective beta on its exact dyadic scale; None selects the quadratic midpoint law.
+    pub(crate) saturation: Option<(i64, u32)>,
+    /// RHS and Hessian coefficient scale L_f=max(L_m,L_beta+2L_w).
+    pub(crate) force_exp: u32,
     pub(crate) capacity_offset: usize,
     pub(crate) stiffness_offset: usize,
     pub(crate) dissipation_offset: usize,
@@ -731,6 +739,12 @@ impl WordPlan {
                 row[RZ_DISSIPATION] = (dissipation_at + dissipation_base[index] as usize) as i64;
                 row[RZ_OPERATOR] = (operator_at + operator_base[index] as usize) as i64;
                 row[RZ_OPERATOR_EXP] = i64::from(l_operator);
+                let saturation = resonator_plan.execution_saturation()[index];
+                let force_exp = saturation.map_or(l_m, |(_, _, exponent)| exponent);
+                row[RZ_SATURATION] = if saturation.is_some() { 1 } else { 0 };
+                row[RZ_BETA] = saturation.map_or(0, |(beta, _, _)| beta);
+                row[RZ_BETA_EXP] = saturation.map_or(0, |(_, exponent, _)| i64::from(exponent));
+                row[RZ_FORCE_EXP] = i64::from(force_exp);
                 chart_offset += width * width * phase_count;
                 out_bases.push((ring, index));
                 loaded_resonators.push(LoadedResonatorPlan {
@@ -744,6 +758,8 @@ impl WordPlan {
                     material_exp: l_m,
                     chart_exp: l_c,
                     operator_exp: l_operator,
+                    saturation: saturation.map(|(beta, exponent, _)| (beta, exponent)),
+                    force_exp,
                     capacity_offset: capacity_at + capacity_base[index] as usize,
                     stiffness_offset: stiffness_at + phase_base[index] as usize,
                     dissipation_offset: dissipation_at + dissipation_base[index] as usize,
