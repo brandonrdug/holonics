@@ -1,1 +1,0 @@
-branch claude/independent-derivations-wvtfpc b1d37a84; RAYON_NUM_THREADS=2, nice 5, beside the Q2 control chain

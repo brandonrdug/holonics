@@ -1,8 +1,9 @@
 //! The executed growth's covector (`hnn::ring`, "The executed growth's covector"; Lean
 //! `HNN/ExecutedComparison`): the executed monodromy's variation through the executed tick and its
 //! solve, the certified dominant multiplier and its typed refusals, and the eigen-derivative against
-//! the exact variation. The release's own comparison and its committed move are tested beside the
-//! bank's generation (`hnn::tests::prediction`). One test per stated law and per refusal.
+//! the exact variation; the located pair's deposit (`hnn::executed`, S2) and the complete continuing
+//! state of a deposited constitution, restored and continued exactly. One test per stated law and
+//! per refusal.
 
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
@@ -242,33 +243,6 @@ fn the_covector_predicts_the_executed_growths_change() {
     assert!(upper >= low - &slack && lower <= high + slack, "{lower} {upper} {predicted}");
 }
 
-/// **A station's predicates are read exactly, or left undecided** (`hnn::executed`, "The
-/// comparison"): on enclosures of the target and its rivals, the class holds when the target's lower
-/// end exceeds every rival's upper, fails when a rival's lower end reaches the target's upper, and is
-/// undecided on an overlap; the threshold holds past one, fails at or below it, and is undecided on
-/// an enclosure straddling one; the term `f = max(max ln(a_x/a_t), −ln a_t)` is negative exactly when
-/// both hold.
-#[test]
-fn a_stations_predicates_are_read_exactly_or_left_undecided() {
-    use crate::hnn::executed::{Predicate, station_predicates};
-    use crate::hnn::ring::Growth;
-    let g = |lower: Rat, upper: Rat| Growth { lower, upper };
-    let read = |joints: &[Growth]| station_predicates(joints, 0).unwrap();
-    let (value, class, threshold) = read(&[g(integer(3), integer(4)), g(integer(1), integer(2))]);
-    assert_eq!((class, threshold), (Predicate::Holds, Predicate::Holds));
-    assert!(value.upper.is_negative());
-    let (value, class, threshold) = read(&[g(rat(1, 2), rat(3, 4)), g(rat(1, 8), rat(1, 4))]);
-    assert_eq!((class, threshold), (Predicate::Holds, Predicate::Fails));
-    assert!(value.lower.is_positive());
-    let (_, _, threshold) = read(&[g(rat(7, 8), rat(9, 8)), g(rat(1, 8), rat(1, 4))]);
-    assert_eq!(threshold, Predicate::Undecided);
-    let (_, class, _) = read(&[g(integer(4), integer(6)), g(integer(3), integer(5))]);
-    assert_eq!(class, Predicate::Undecided);
-    let (value, class, _) = read(&[g(integer(4), integer(6)), g(integer(7), integer(8))]);
-    assert_eq!(class, Predicate::Fails);
-    assert!(value.lower.is_positive());
-}
-
 /// **Two members tied in growth are both active branches** (the max comparison's active set): on the
 /// spectral line of 8 unit cells, the two quarter-turn neighbours read `[1061/16, 531/8]` each, so
 /// both reach the joint's lower end and both return a covector.
@@ -287,62 +261,6 @@ fn two_members_tied_in_growth_are_both_active() {
         .active
         .iter()
         .all(|member| matches!(member, MemberCovector::Resolved { .. })));
-}
-
-/// The released code length's excursion (`HNN/ExecutedComparison` §12, `checkpoint_one_iff`,
-/// `excursion_enclosure`): strict descent is the decrease by disjoint enclosures; a held opening
-/// state with a height admits a rise below its lower end plus the height and refuses one at or
-/// above it; an interval closes only strictly below its opening state less the certified decrease.
-#[test]
-fn the_monotone_excursion_is_the_strict_decrease_and_a_height_admits_a_bounded_rise() {
-    use crate::hnn::executed::ReleaseExcursion;
-    use crate::ratio::algebraic::ExactInterval;
-    let interval = |lower: i64, upper: i64| ExactInterval {
-        lower: integer(lower),
-        upper: integer(upper),
-    };
-    let before = interval(10, 11);
-    let monotone = ReleaseExcursion::monotone();
-    for upper in 7..14 {
-        let own = interval(upper - 1, upper);
-        assert_eq!(monotone.admits(&before, &own), own.upper < before.lower);
-    }
-    let excursion = ReleaseExcursion {
-        checkpoint: Some(interval(9, 10)),
-        height: Some(integer(3)),
-    };
-    assert!(excursion.admits(&before, &interval(10, 11)));
-    assert!(!excursion.admits(&before, &interval(11, 12)));
-    assert!(
-        ReleaseExcursion::from_checkpoint(interval(9, 10)).admits(&before, &interval(99, 100))
-    );
-    let checkpoint = interval(9, 10);
-    assert_eq!(ReleaseExcursion::closes(&checkpoint, &interval(5, 6), &integer(2)), Ok(true));
-    assert_eq!(ReleaseExcursion::closes(&checkpoint, &interval(6, 7), &integer(2)), Ok(false));
-    // A negative decrease would close an interval above its opening state, and a negative height
-    // states no `CheckpointGuard` (the opening state itself would breach its excursion): both are
-    // refused.
-    assert_eq!(
-        ReleaseExcursion::closes(&checkpoint, &interval(9, 10), &integer(-2)),
-        Err(HnnError::WindowDecrease {
-            decrease: integer(-2)
-        })
-    );
-    assert!(monotone.checked().is_ok() && excursion.checked().is_ok());
-    assert!(ReleaseExcursion::from_checkpoint(checkpoint.clone()).checked().is_ok());
-    let sunk = ReleaseExcursion {
-        checkpoint: None,
-        height: Some(integer(-1)),
-    };
-    assert_eq!(
-        sunk.checked(),
-        Err(HnnError::ExcursionHeight {
-            height: integer(-1)
-        })
-    );
-    // One grain of `1/16` bit over 64 decisions is `4 ln 2` nats, read above `ln 2`.
-    let grain = ReleaseExcursion::grain(64, &rat(1, 16)).unwrap();
-    assert!(grain > rat(2772, 1000) && grain < rat(2773, 1000));
 }
 
 // -------------------------------------------------------------------------------------------
@@ -454,5 +372,273 @@ fn a_port_holding_two_classes_refuses_the_pair_deposit() {
     assert!(matches!(
         pair_deposit(&field, &opening, &prior, 0, &order_two_pair()),
         Err(HnnError::Shape { expected: 1, found: 2, .. })
+    ));
+}
+
+// -------------------------------------------------------------------------------------------
+// the continuing state of a deposited constitution
+
+/// A located pair on the joint field's ring 0 at distance `offset`, its map on ports (each of the
+/// three classes at its own port).
+fn joint_pair(offset: usize, map: &[(usize, usize)]) -> crate::hnn::keys::LocatedPair {
+    crate::hnn::keys::LocatedPair {
+        offset,
+        map: map.to_vec(),
+        cycle: map.len() as u64,
+        turns: Vec::new(),
+    }
+}
+
+/// The successive receptions' located pairs: a 3-cycle at distance 1, the swap of two classes at
+/// distance 2, and the inverse 3-cycle at distance 3.
+fn joint_pairs() -> [crate::hnn::keys::LocatedPair; 3] {
+    [
+        joint_pair(1, &[(0, 1), (1, 2), (2, 0)]),
+        joint_pair(2, &[(0, 1), (1, 0)]),
+        joint_pair(3, &[(0, 2), (1, 0), (2, 1)]),
+    ]
+}
+
+/// The joint field's opening at the modulus `3/4` and its source port, the deposits' declared prior.
+fn joint_opening(
+    field: &crate::hnn::field::Field,
+    seed: u64,
+) -> (crate::hnn::constitution::Constitution, ExactRatMatrix) {
+    use crate::hnn::field::ConstitutionRead;
+    let opening = super::learning::generic(field, seed).with_transport(0, rat(3, 4)).unwrap();
+    let prior = opening.source_port(0).unwrap().clone();
+    (opening, prior)
+}
+
+/// [implemented-exact] **A restored checkpoint continues exactly, over successive deposits**: after
+/// one located pair's deposit, the complete continuing state written as text and restored onto the
+/// declared opening is the continued constitution exactly (the port, the carried Gram, the chart,
+/// the remainders, the modulus, the clock, the commit and the storage product); then over two
+/// further located pairs the restored and the continued constitutions read the same slips and make
+/// the same deposits (each certified step and carried source step), the same clock and the same
+/// subsequent state. A remount of `E` and `ρ` alone is partial: its text has no state and is refused
+/// as a continuing state, its constitution loses the Gram, and its next deposit reads the same slip
+/// and deposits otherwise.
+#[test]
+fn a_restored_checkpoint_continues_exactly_over_successive_deposits() {
+    use crate::hnn::constitution::{ContinuingState, Locus};
+    use crate::hnn::executed::pair_deposit;
+    use crate::hnn::field::ConstitutionRead;
+    let field = super::prediction::joint();
+    let (opening, prior) = joint_opening(&field, 94);
+    let pairs = joint_pairs();
+    let (continued, first) = pair_deposit(&field, &opening, &prior, 0, &pairs[0]).unwrap();
+    assert!(first.certificate.holds() && first.slip_after < first.slip_before);
+    let locus = Locus::SourcePort(0);
+    assert!(continued.clock(locus) >= 1);
+    let text = continued.continuing_state(0).unwrap().to_text();
+    let state = ContinuingState::from_text(&text).unwrap();
+    assert_eq!(state, continued.continuing_state(0).unwrap());
+    let restored = opening.clone().continued(&state).unwrap();
+    assert_eq!(restored, continued);
+    let (mut a, mut b) = (continued.clone(), restored);
+    for pair in &pairs[1..] {
+        let (sa, da) = pair_deposit(&field, &a, &prior, 0, pair).unwrap();
+        let (sb, db) = pair_deposit(&field, &b, &prior, 0, pair).unwrap();
+        assert_eq!(da, db);
+        assert_eq!(sa.clock(locus), sb.clock(locus));
+        assert_eq!(sa, sb);
+        a = sa;
+        b = sb;
+        let state = a.continuing_state(0).unwrap();
+        assert_eq!(ContinuingState::from_text(&state.to_text()).unwrap(), state);
+    }
+    // The partial remount: E and ρ alone.
+    let rows = continued.source_port(0).unwrap().rows();
+    let partial_text: String = text
+        .lines()
+        .take(rows + 2)
+        .map(|line| format!("{line}\n"))
+        .collect();
+    assert!(matches!(
+        ContinuingState::from_text(&partial_text),
+        Err(HnnError::ContinuingState { .. })
+    ));
+    let partial = opening
+        .clone()
+        .with_ports(0, None, Some(continued.source_port(0).unwrap().clone()), None)
+        .unwrap()
+        .with_transport(0, continued.transport(0))
+        .unwrap();
+    assert_ne!(partial, continued);
+    assert_ne!(
+        partial.source_law(0).unwrap().gram(),
+        continued.source_law(0).unwrap().gram()
+    );
+    let (p, dp) = pair_deposit(&field, &partial, &prior, 0, &pairs[1]).unwrap();
+    let (c, dc) = pair_deposit(&field, &continued, &prior, 0, &pairs[1]).unwrap();
+    assert_eq!(dp.slip_before, dc.slip_before);
+    assert_ne!(dp.source, dc.source);
+    assert_ne!(p, c);
+    // A checkpoint is refused onto a constitution that is not the declared opening.
+    assert!(matches!(
+        continued.clone().continued(&continued.continuing_state(0).unwrap()),
+        Err(HnnError::ContinuingState { .. })
+    ));
+}
+
+/// [implemented-exact] **A restored checkpoint authenticates the declared material it continues and
+/// refuses damage**: a state carries the identity of its opening's declared material
+/// ([`crate::hnn::constitution::Constitution::material_identity`]) and a check over its text. The
+/// state carries every learned value whole, so an opening founded from another seed (the same
+/// declared material, other learned founding values) restores it to the same constitution, while an
+/// opening of another declared material (here another budget) is refused, and a text damaged in
+/// one byte is refused before it mounts.
+#[test]
+fn a_checkpoint_is_refused_onto_foreign_material_and_when_damaged() {
+    use super::learning::{OPEN_BUDGET, generic_within};
+    use crate::hnn::constitution::ContinuingState;
+    use crate::hnn::executed::pair_deposit;
+    let field = super::prediction::joint();
+    let (opening, prior) = joint_opening(&field, 94);
+    let (reseeded, _) = joint_opening(&field, 95);
+    let foreign = generic_within(&field, 94, OPEN_BUDGET - 1)
+        .with_transport(0, rat(3, 4))
+        .unwrap();
+    assert_ne!(opening, reseeded);
+    assert_eq!(opening.material_identity(), reseeded.material_identity());
+    assert_ne!(opening.material_identity(), foreign.material_identity());
+    let (continued, _) = pair_deposit(&field, &opening, &prior, 0, &joint_pairs()[0]).unwrap();
+    // No deposit changes the declared material.
+    assert_eq!(continued.material_identity(), opening.material_identity());
+    let text = continued.continuing_state(0).unwrap().to_text();
+    let state = ContinuingState::from_text(&text).unwrap();
+    assert_eq!(opening.clone().continued(&state).unwrap(), continued);
+    assert_eq!(reseeded.clone().continued(&state).unwrap(), continued);
+    assert!(matches!(
+        foreign.clone().continued(&state),
+        Err(HnnError::ContinuingState { what }) if what.contains("another opening")
+    ));
+    // One byte of the port's first row changed, still a well-formed rational: refused by the check.
+    let row = text.lines().nth(1).expect("the port's first row");
+    let at = text.find(row).expect("the row") + row.find(|c: char| c.is_ascii_digit()).expect("a digit");
+    let mut damaged = text.clone().into_bytes();
+    damaged[at] = if damaged[at] == b'7' { b'8' } else { b'7' };
+    let damaged = String::from_utf8(damaged).unwrap();
+    assert_ne!(damaged, text);
+    assert!(matches!(
+        ContinuingState::from_text(&damaged),
+        Err(HnnError::ContinuingState { what }) if what.contains("damaged")
+    ));
+    // A changed material line is caught by the check as well.
+    let material = format!("material {}", opening.material_identity());
+    let relabelled = text.replace(&material, &format!("material {}", foreign.material_identity()));
+    assert_ne!(relabelled, text);
+    assert!(ContinuingState::from_text(&relabelled).is_err());
+}
+
+/// [implemented-exact; the reception carry §2.4] **A continuing state carries the reception's end
+/// inside its check**: a state written with a carried end reads back whole (every storage wave,
+/// arriving pair and contact state, and the elapsed ticks), a state at rest writes no carry and
+/// reads back at rest (every state written before the carry), the carry is resident motion that
+/// [`crate::hnn::constitution::Constitution::continued`] does not read, the stamp still replaces
+/// only what follows the storage product, and one byte changed inside the carry is refused as
+/// damage. Under the default reception a saved state mounts through one owner
+/// (`Reference::mount_continued`, the reception carry §8).
+#[test]
+fn a_continuing_state_carries_the_receptions_end_inside_its_check() {
+    use super::learning::{OPEN_BUDGET, generic_within};
+    use crate::hnn::constitution::ContinuingState;
+    use crate::hnn::executed::pair_deposit;
+    use crate::hnn::field::Current;
+    use crate::hnn::reference::{Reception, Reference};
+    use crate::hnn::word::{EndChange, ReceptionCarry};
+    let field = super::prediction::joint();
+    let (opening, prior) = joint_opening(&field, 94);
+    let (continued, _) = pair_deposit(&field, &opening, &prior, 0, &joint_pairs()[0]).unwrap();
+    let at_rest = continued.continuing_state(0).unwrap();
+    assert!(at_rest.carry().is_none());
+    assert!(!at_rest.to_text().contains("\ncarry "));
+    // A carried end of the field's shape, every value a distinct exact rational.
+    let mut k = 0i64;
+    let mut wave = |n: usize| -> Vec<Rat> {
+        (0..n)
+            .map(|_| {
+                k += 1;
+                rat(if k % 2 == 0 { -k } else { k }, 2 * k + 1)
+            })
+            .collect()
+    };
+    let widths: Vec<usize> = field.rings().iter().map(|ring| ring.width()).collect();
+    let storage = widths.iter().map(|n| wave(*n)).collect();
+    let arrivals = field
+        .contacts()
+        .iter()
+        .map(|contact| {
+            let (a, b) = contact.ends();
+            [wave(widths[a]), wave(widths[b])]
+        })
+        .collect();
+    let states = field
+        .contacts()
+        .iter()
+        .map(|contact| [wave(contact.width()), wave(contact.width())])
+        .collect();
+    let momenta = field.contacts().iter().map(|contact| wave(contact.width())).collect();
+    let conductances = (0..field.contacts().len())
+        .map(|a| rat(2 * a as i64 + 3, 4))
+        .collect();
+    let carry = ReceptionCarry {
+        change: EndChange {
+            storage,
+            arrivals,
+            states,
+            resonators: vec![None, Some([wave(2), wave(2)])],
+            resonator_phases: vec![None, Some(3)],
+        },
+        ticks: 27,
+        conductances,
+        momenta,
+        resonator_momenta: vec![None, Some(wave(2))],
+    };
+    assert!(carry.fits(&field));
+    let carried = at_rest.clone().with_carry(Some(carry.clone()));
+    let text = carried.to_text();
+    let read = ContinuingState::from_text(&text).unwrap();
+    assert_eq!(read, carried);
+    assert_eq!(read.carry(), Some(&carry));
+    assert_eq!(opening.clone().continued(&read).unwrap(), continued);
+    // The stamp replaces only what follows the storage product, so the carry stays inside it.
+    let stamped = ContinuingState::stamped(&text, &opening).unwrap();
+    assert_eq!(stamped, text);
+    // One byte inside the carry changed: refused by the check.
+    let at = text.find("\ncarry ").unwrap() + "\ncarry ".len();
+    let mut damaged = text.clone().into_bytes();
+    damaged[at] = if damaged[at] == b'7' { b'8' } else { b'7' };
+    let damaged = String::from_utf8(damaged).unwrap();
+    assert!(matches!(
+        ContinuingState::from_text(&damaged),
+        Err(HnnError::ContinuingState { what }) if what.contains("damaged")
+    ));
+    // A state at rest mounts with no carry, so its next reception opens with zero carry; a carried
+    // state mounts its end beside the continued constitution; another declared material is
+    // refused; a carried state is refused by a reference declared at rest.
+    let current = Current::at_rest(&field);
+    let reference = Reference::campaign_one();
+    assert_eq!(reference.reception(), Reception::Carry(crate::hnn::Absorption::Nothing));
+    let rested = reference
+        .mount_continued(&field, &current, opening.clone(), &at_rest)
+        .unwrap();
+    assert!(rested.carried().is_none());
+    assert_eq!(rested.constitution(), &continued);
+    let resumed = reference
+        .mount_continued(&field, &current, opening.clone(), &read)
+        .unwrap();
+    assert_eq!(resumed.carried(), Some(&carry));
+    assert_eq!(resumed.constitution(), &continued);
+    assert!(matches!(
+        reference.mount_continued(&field, &current, generic_within(&field, 94, OPEN_BUDGET - 1), &at_rest),
+        Err(HnnError::ContinuingState { .. })
+    ));
+    assert!(matches!(
+        reference
+            .with_reception(Reception::Rest)
+            .mount_continued(&field, &current, opening.clone(), &read),
+        Err(HnnError::ContinuingState { .. })
     ));
 }

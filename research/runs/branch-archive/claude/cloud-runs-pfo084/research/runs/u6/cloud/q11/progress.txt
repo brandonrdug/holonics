@@ -1,1 +1,0 @@
-q11 exit 0 wall 1400 s

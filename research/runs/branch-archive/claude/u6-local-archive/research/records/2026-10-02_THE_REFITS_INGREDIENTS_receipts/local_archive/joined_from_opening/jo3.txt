@@ -1,2 +1,0 @@
-  the release guard: ReleaseExcursion { checkpoint: Some(ExactInterval { lower: Ratio { numer: 2083076169432255744402963914347, denom: 19807040628566084398385987584 }, upper: Ratio { numer: 4166194493967218422003472623807, denom: 39614081257132168796771975168 } }), height: None }
-executed move-once: 8 order2 requests at development seed 2026093061, the candidate arm, from jo3 (ρ 410859/524288); the bank p = 5/8, grain 2^(-16)

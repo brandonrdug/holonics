@@ -126,7 +126,7 @@ SHA-256 of each file at the baseline commit. Receipts directories:
 
 ## 5. The minimal replay
 
-[`replay_baseline.sh`](../notebook/hnn_design/replay_baseline.sh) builds the harness and runs one
+[`replay_baseline.sh`](https://github.com/brandonrdug/holonics/blob/9078f103/research/notebook/hnn_design/replay_baseline.sh) builds the harness and runs one
 development read:
 
 ```sh

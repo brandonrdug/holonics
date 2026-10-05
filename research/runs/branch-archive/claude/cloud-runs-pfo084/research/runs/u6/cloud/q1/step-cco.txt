@@ -1,2 +1,0 @@
-executed step-state from cco at η 1/1024: incumbent L ∈ [500197/4096, 500203/4096); held-sheet [499620/4096, 499625/4096), released [499620/4096, 499625/4096); 284679 ms
-  written out/q1/cco-1024.state

@@ -1,0 +1,13 @@
+# bash tools/gate.sh, cargo test -p holonics --example hnn_prediction, cargo check -p holonics-cuda --all-targets
+gate check: ok (2145 ms)
+gate guard-lints: ok (6569 ms)
+test result: ok. 33 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.46s
+gate guard-doctests: ok (4821 ms)
+exit 0 wall 13542 ms
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+exit 0 wall 16766 ms
+exit 0 wall 1330 ms
+# bash tools/gate.sh again after the last documentation edit of crates/holonics/src/hnn/executed.rs
+gate check: ok (2332 ms)
+gate guard-lints: ok (6586 ms)
+gate guard-doctests: ok (17623 ms)

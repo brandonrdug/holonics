@@ -1,7 +1,0 @@
-step-cco exit 0 wall 284716 ms
-step-cwi exit 0 wall 249144 ms
-dir-cco-1024 exit 0 wall 397269 ms
-dir-cwi-1024 exit 0 wall 318577 ms
-dir-k1_from_opening exit 0 wall 397550 ms
-metric-steps exit 0 wall 782898 ms
-q1 done

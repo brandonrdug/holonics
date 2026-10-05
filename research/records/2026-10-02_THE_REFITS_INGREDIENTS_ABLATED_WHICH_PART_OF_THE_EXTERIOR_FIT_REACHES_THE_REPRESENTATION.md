@@ -468,7 +468,7 @@ successor's released code length is unchecked until the interval closes. At C0 t
 lies above the opening's `[500197, 500203)`, so strict descent refuses it and the throw adopts η 1/4
 at `[495714, 495719)`. The Coordinate chain adopts η 1/2 with its run open. The throw is read against
 a control run on the same driver with `coordinate` in place of `throw`. That control's first move is
-byte-identical to the throw's first move, `m0`. [PC_QUEUE](../runs/u6/PC_QUEUE.md) P5 reads all four
+byte-identical to the throw's first move, `m0`. [PC_QUEUE](https://github.com/brandonrdug/holonics/blob/9078f103/research/runs/u6/PC_QUEUE.md) P5 reads all four
 move-16 states.
 
 At `m0`, the slope along `m0`'s own move is positive: `G` at `m0` pairs positively with
@@ -651,8 +651,8 @@ largest measured time. A sample maximum is not an upper time: if a kind's times 
 exchangeable, the next sample passes the largest of `n` with chance `1/(n+1)`, so a chain held to it
 stops on the host's variance, and the stop says nothing about the move. Each kind is therefore bounded
 by `3` times its largest time measured on the same host before launch. [agent-inferred] The factor is
-the queues' own for P2 and P5 in [PC_QUEUE](../runs/u6/PC_QUEUE.md) and the Q2 chains' `1900` s in
-[CLOUD_QUEUE](../runs/u6/CLOUD_QUEUE.md). [Corrected October 3: not every deadline was; P3's `7200` s
+the queues' own for P2 and P5 in [PC_QUEUE](https://github.com/brandonrdug/holonics/blob/9078f103/research/runs/u6/PC_QUEUE.md) and the Q2 chains' `1900` s in
+[CLOUD_QUEUE](https://github.com/brandonrdug/holonics/blob/9078f103/research/runs/u6/CLOUD_QUEUE.md). [Corrected October 3: not every deadline was; P3's `7200` s
 had no projection, and P4's `36000` s was `4000000/3571621` of one (§12).] A unit past it is a change of regime, not variance. It ends the chain
 incomplete, the factor is never raised, and its cost becomes the next subject. Bounds are fixed at
 launch, from that host's own measurements; one host's maxima are never applied to another.
@@ -724,7 +724,7 @@ content).
 ## 11. The arms' end states held out: no declared pair separates
 
 The receipts are under `s11/`, copied from `claude/pc-receipts` (`5fb7e96b`). The run is P5 of
-[PC_QUEUE](../runs/u6/PC_QUEUE.md): held out, order 2, seed `2026093012`, 128 requests, one
+[PC_QUEUE](https://github.com/brandonrdug/holonics/blob/9078f103/research/runs/u6/PC_QUEUE.md): held out, order 2, seed `2026093012`, 128 requests, one
 `evaluate` call at 16 threads, with coast-alone m9 read in a second call. `p5.sections` is split into
 one file per state; the six files concatenate back to it byte for byte. Stations are counted of 1024
 (8 per request); "first lock right" counts requests whose first lock is right.
@@ -773,7 +773,7 @@ projection. Coast-alone m9's call took `519226` ms, peak `85889024` bytes.
 ## 12. The exposure gate at m6 and w16 is not read: both runs passed their deadline
 
 The receipts are under `s12/`, copied from `claude/pc-receipts` (`697a89ed`). This is P4 of
-[PC_QUEUE](../runs/u6/PC_QUEUE.md), the gate §7 restates: from m6 and from w16, everything else equal,
+[PC_QUEUE](https://github.com/brandonrdug/holonics/blob/9078f103/research/runs/u6/PC_QUEUE.md), the gate §7 restates: from m6 and from w16, everything else equal,
 `executed expose 2026093061 2026093012 128 all`, at 2 threads per source, both sources at once on the
 PC, under `timeout 36000`.
 
@@ -874,4 +874,4 @@ cut instead of shortening it.
   outside the chain's rule. Those three are measurements outside the rule, not chain moves.
 
 The pre-launch conditions these failures call for are at the top of
-[PC_QUEUE](../runs/u6/PC_QUEUE.md) and [CLOUD_QUEUE](../runs/u6/CLOUD_QUEUE.md).
+[PC_QUEUE](https://github.com/brandonrdug/holonics/blob/9078f103/research/runs/u6/PC_QUEUE.md) and [CLOUD_QUEUE](https://github.com/brandonrdug/holonics/blob/9078f103/research/runs/u6/CLOUD_QUEUE.md).

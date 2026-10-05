@@ -1,6 +1,0 @@
-05320f4a000e57875ef7f82c507edbbf3cbd954b
-f67254e7be794c891f39da3e5debb9a45ac44b22a34bc09e54249d55ebaf2878
-517ef998f3e80efcdb56fad0443bbab796cdf4425b26123bcf17317a312ef847  .local/diag-m7/in.state
-args executed move-once order2 2026093061 8 .local/diag-m7 m7=.local/diag-m7/in.state lock-dec coordinate
-RAYON_NUM_THREADS=4 timeout 4049
-pid 732

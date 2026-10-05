@@ -1,2 +1,0 @@
-  the release guard: ReleaseExcursion { checkpoint: None, height: Some(Ratio { numer: 0, denom: 1 }) }
-executed move-once: 8 order2 requests at development seed 2026093061, the candidate arm, from m10 (ρ 102837/131072); the bank p = 5/8, grain 2^(-16)

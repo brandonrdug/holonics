@@ -1,27 +1,16 @@
-//! **`hnn_prediction`: step 1's harness, the executed comparison on known-truth terrain**
-//! (THE_REBUILD U6, step 1; #73, #148, #63). Its modes are the `executed …` subcommands of
-//! `hnn_executed_loop.rs` and, for loop 1c, `hnn_loop_1c.rs`, whose headers state each mode and its
-//! pins, for lane B's keys and lane C's pair diagnostic `hnn_keys_loop.rs`, and for the first
-//! repair terrain `hnn_repair_loop.rs`; this file holds the
-//! declaration they share and dispatches to them. Committed commands run once in release, never a
-//! test.
+//! **`hnn_prediction`: step 1's harness on known-truth terrain** (THE_REBUILD U6, step 1; #73, #148,
+//! #63). Its modes are the `executed …` subcommands of `hnn_executed_loop.rs` (the release read on a
+//! terrain and the terrain's own counts), of `hnn_keys_loop.rs` (lane B's key location and its
+//! deposit, lane C's pair diagnostic and the text path), of `hnn_repair_loop.rs` (the first repair
+//! terrain) and of `hnn_text_repair.rs` (text repair by local keys), whose headers state each mode
+//! and its pins; this file holds the declaration they share and dispatches to them. Committed
+//! commands run once in release, never a test.
 //!
 //! ```sh
-//! cargo run --release -p holonics --example hnn_prediction -- executed move <seed> <requests>
-//! cargo run --release -p holonics --example hnn_prediction -- executed train <arm> <terrain> <seed> <batch> <moves> <pin> <out>
-//! cargo run --release -p holonics --example hnn_prediction -- executed evaluate <terrain> <seed> <count> <out> <label[=E]>…
-//! cargo run --release -p holonics --example hnn_prediction -- executed spread <terrain> <seed> <count> <label[=E]>…
-//! cargo run --release -p holonics --example hnn_prediction -- executed slopes <terrain> <seed> <count> <label[=E]>…
+//! cargo run --release -p holonics --example hnn_prediction -- executed evaluate <terrain> <seed> <count> <out> <label[=state]>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed counts <terrain> <training seed> <count> <validation seed> <count> <out>
-//! cargo run --release -p holonics --example hnn_prediction -- executed witness <terrain> <seed> <count> <moves> <pin> <out> [<states dir>]
-//! cargo run --release -p holonics --example hnn_prediction -- executed run <terrain> <seed> <count> <out> <label=state> <arm> <metric> <cap|none> <pin>
-//! cargo run --release -p holonics --example hnn_prediction -- executed replay <terrain> <seed> <count> <label=state>…
-//! cargo run --release -p holonics --example hnn_prediction -- executed coupling <terrain> <seed> <count> <pin> <label=state|label=opening>…
-//! cargo run --release -p holonics --example hnn_prediction -- executed represent <terrain> <seed> <count> <iterates> <pin> <out> [<held-out seed>]
-//! cargo run --release -p holonics --example hnn_prediction -- executed resume-coupling <terrain> <seed> <count> <c1 state> <gate A receipt> <pin> <capture dir>
-//! cargo run --release -p holonics --example hnn_prediction -- executed causal <terrain> <seed> <count> <label[=E]>…
-//! cargo run --release -p holonics --example hnn_prediction -- executed joined <terrain> <seed> <count> <arm> <label=source>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed keys <terrain> <training seed> <count> <out>
+//! cargo run --release -p holonics --example hnn_prediction -- executed keys-probe <terrain> <training seed> <count> <scale> <out>
 //! cargo run --release -p holonics --example hnn_prediction -- executed pair-members <terrain> <seed> <count> <state>
 //! cargo run --release -p holonics --example hnn_prediction -- executed text <cut> <private out dir> <pin> <dev|run> [<state> [<from> <to>]]
 //! cargo run --release -p holonics --example hnn_prediction -- executed text-repair <cut> <private out dir> <pin> <dev|run>
@@ -51,23 +40,23 @@
 //! The modes before the executed comparison (`copy`, `moire`, `divergence`, `order2`, `pumped`,
 //! `text`, `probe`, `develop`: native generation, the order repair, the bank's generation and
 //! learning path, the pumped receiving ring) and the executed loop's `face` arm were retired on
-//! September 30 (THE_REBUILD U6, batch N2); their source is at commit `7ca300bb`.
+//! September 30 (THE_REBUILD U6, batch N2); their source is at commit `7ca300bb`. The certified
+//! descent's modes and loop 1c's (`move`, `train`, `witness`, `coupling`, `represent`, `run`,
+//! `kinetic`, `joined` and their read-only diagnostics) retired with `hnn::executed`'s comparison
+//! and move on October 5 (the library spine's S2); their source is at commit `9078f103`.
 //!
 //! [definition; agent-inferred, October 5; THE_MACHINE guard 22] **A run's limits are its pin's.**
 //! Every mode bounded in time names a committed pin (`exterior::Pin`) where it took a deadline or a
 //! bound in milliseconds: the pin holds the deadline, the unit bound and the thread budget with
 //! their projection, and is refused when missing, uncommitted, changed since its commit or
-//! committed twice. The modes that check their own deadline before each unit (`train`, `witness`,
-//! `coupling`, `represent`, `run`, `resume-coupling`'s move bound) read it there; `text` and
-//! `text-repair`, which have no check of their own, stop at the pinned deadline. Counts that
-//! declare the read (moves, iterates, a cap, a read budget) stay its arguments.
+//! committed twice. `text` reads its unit bound there; `text` and `text-repair`, which have no
+//! deadline check of their own, stop at the pinned deadline. Counts that declare the read stay its
+//! arguments.
 
 #[path = "exterior.rs"]
 mod exterior;
 #[path = "hnn_executed_loop.rs"]
 mod executed_loop;
-#[path = "hnn_loop_1c.rs"]
-mod loop_1c;
 #[path = "hnn_keys_loop.rs"]
 mod keys_loop;
 #[path = "hnn_repair_loop.rs"]
@@ -94,7 +83,7 @@ use holonics::holon::parametron::Carrier;
 use holonics::ratio::algebraic::ExactInterval;
 use holonics::ratio::linear::ExactRatMatrix;
 use holonics::ratio::{Rat, rat};
-use num_traits::{Signed, Zero};
+use num_traits::Zero;
 
 use exterior::resident_set;
 
@@ -317,280 +306,12 @@ fn main() {
     let clock = Instant::now();
     let arguments: Vec<String> = std::env::args().collect();
     match (arguments.get(1).map(String::as_str), arguments.get(2).map(String::as_str)) {
-        (Some("executed"), Some("move")) => executed_loop::stage_one(
-            arguments[3].parse().expect("a seed"),
-            arguments[4].parse().expect("a count"),
-        ),
-        (Some("executed"), Some("train")) => executed_loop::train(
-            &arguments[3],
-            &arguments[4],
-            arguments[5].parse().expect("a seed"),
-            arguments[6].parse().expect("a batch"),
-            arguments[7].parse().expect("moves"),
-            pinned(&arguments[8], "executed train", clock, false).deadline_ms(),
-            &arguments[9],
-        ),
-        (Some("executed"), Some("spread")) => executed_loop::spread(
-            &arguments[3],
-            arguments[4].parse().expect("a seed"),
-            arguments[5].parse().expect("a count"),
-            &arguments[6..],
-        ),
-        (Some("executed"), Some("slopes")) => executed_loop::slopes(
-            &arguments[3],
-            arguments[4].parse().expect("a seed"),
-            arguments[5].parse().expect("a count"),
-            &arguments[6..],
-        ),
         (Some("executed"), Some("evaluate")) => executed_loop::evaluate(
             &arguments[3],
             arguments[4].parse().expect("a seed"),
             arguments[5].parse().expect("a count"),
             &arguments[6],
             &arguments[7..],
-        ),
-        // Step 1b's gate A: the constrained feasibility witness (the pin
-        // research/records/2026-09-30_STEP_1B_THE_CANDIDATE_COMPARISON_PINNED_BEFORE_ITS_RUNS.md
-        // §13.3 and its gate-A addendum).
-        // With a ninth argument, every constitution read is written as its complete continuing
-        // state into that directory (loop 1c's replay, its pin §1.1).
-        (Some("executed"), Some("witness")) => executed_loop::witness(
-            &arguments[3],
-            arguments[4].parse().expect("a seed"),
-            arguments[5].parse().expect("a count"),
-            arguments[6].parse().expect("moves"),
-            pinned(&arguments[7], "executed witness", clock, false).deadline_ms(),
-            &arguments[8],
-            arguments.get(9).map(String::as_str),
-        ),
-        // Loop 1c (the pin
-        // research/records/2026-10-01_LOOP_1C_PERSISTENCE_REPRESENTATION_AND_REACH_PINNED_BEFORE_ITS_RUNS.md):
-        // the exact replay of written states, persistence and coupling, and the representation
-        // search; the restore check of complete states, no reading made (the launcher's
-        // `check-replay`).
-        (Some("executed"), Some("restore")) => loop_1c::restore(&arguments[3..]),
-        (Some("executed"), Some("replay")) => loop_1c::replay(
-            &arguments[3],
-            arguments[4].parse().expect("a seed"),
-            arguments[5].parse().expect("a count"),
-            &arguments[6..],
-        ),
-        (Some("executed"), Some("coupling")) => loop_1c::coupling(
-            &arguments[3],
-            arguments[4].parse().expect("a seed"),
-            arguments[5].parse().expect("a count"),
-            pinned(&arguments[6], "executed coupling", clock, false).deadline_ms(),
-            &arguments[7..],
-        ),
-        // Loop 1c's c2 diagnostic: gate A's saved constitution 1 resumed by one native update, its
-        // identity checked against gate A's receipt, then the re-reads at constitution 2.
-        (Some("executed"), Some("resume-coupling")) => loop_1c::resume_coupling(
-            &arguments[3],
-            arguments[4].parse().expect("a seed"),
-            arguments[5].parse().expect("a count"),
-            &arguments[6],
-            &arguments[7],
-            pinned(&arguments[8], "executed resume-coupling", clock, false)
-                .unit_bound_ms()
-                .expect("refused: the pin declares the move's bound as its unit_bound_ms"),
-            &arguments[9],
-        ),
-        (Some("executed"), Some("represent")) => loop_1c::represent(
-            &arguments[3],
-            arguments[4].parse().expect("a seed"),
-            arguments[5].parse().expect("a count"),
-            arguments[6].parse().expect("iterates"),
-            pinned(&arguments[7], "executed represent", clock, false).deadline_ms(),
-            &arguments[8],
-            arguments.get(9).map(|s| s.parse().expect("a held-out seed")),
-        ),
-        // Step 1b's causal reading (I6).
-        // The segment probe (the pin
-        // research/records/2026-10-01_THE_SEGMENT_PROBE_PINNED_BEFORE_ITS_RUN.md): read-only.
-        // The whole-turn commitment turns beside the gap order (the turn-clock record §4, §9):
-        // read-only.
-        (Some("executed"), Some("instants")) => executed_loop::instants(
-            &arguments[3],
-            arguments[4].parse().expect("a seed"),
-            arguments[5].parse().expect("a count"),
-            &arguments[6..],
-        ),
-        (Some("executed"), Some("segment")) => executed_loop::segment(
-            &arguments[3],
-            arguments[4].parse().expect("a seed"),
-            arguments[5].parse().expect("a count"),
-            &arguments[6..],
-        ),
-        // The modulus's slope (the pin
-        // research/records/2026-10-01_THE_MODULUS_SLOPE_PINNED_BEFORE_ITS_RUN.md): read-only.
-        (Some("executed"), Some("rho-slopes")) => executed_loop::rho_slopes(
-            &arguments[3],
-            arguments[4].parse().expect("a seed"),
-            arguments[5].parse().expect("a count"),
-            &arguments[6],
-            &arguments[7..],
-        ),
-        // The native direction (the pin
-        // research/records/2026-10-01_THE_NATIVE_DIRECTION_PINNED_BEFORE_ITS_RUN.md): read-only.
-        (Some("executed"), Some("direction")) => executed_loop::direction(
-            &arguments[3],
-            arguments[4].parse().expect("a seed"),
-            arguments[5].parse().expect("a count"),
-            &arguments[6],
-            &arguments[7],
-            &arguments[8],
-            &arguments[9],
-            &arguments[10..],
-        ),
-        // The move's plane read by its witness (the record
-        // research/records/2026-10-01_THE_MOVES_METRIC_IS_ITS_WITNESSS_THE_LOCKS_FISHER_FORM_ON_THE_MOVES_PLANE.md):
-        // read-only.
-        (Some("executed"), Some("witness-plane")) => executed_loop::witness_plane(
-            &arguments[3],
-            arguments[4].parse().expect("a seed"),
-            arguments[5].parse().expect("a count"),
-            &arguments[6],
-            &arguments[7],
-            &arguments[8],
-            &arguments[9..],
-        ),
-        // One committed move from a state under each declared metric (the pin
-        // research/records/2026-10-01_ONE_GUARDED_MOVE_FROM_THE_STUCK_STATE_PINNED_BEFORE_ITS_RUN.md).
-        // Where along one move's direction the release's decisions change (record §5 of
-        // research/records/2026-10-02_THE_REFITS_INGREDIENTS_ABLATED_WHICH_PART_OF_THE_EXTERIOR_FIT_REACHES_THE_REPRESENTATION.md).
-        (Some("executed"), Some("pairs")) => executed_loop::print_pairs(
-            &arguments[3],
-            arguments[4].parse().expect("a seed"),
-            arguments[5].parse().expect("a count"),
-        ),
-        (Some("executed"), Some("step-state")) => executed_loop::step_state(
-            &arguments[3],
-            arguments[4].parse().expect("a seed"),
-            arguments[5].parse().expect("a count"),
-            &arguments[6],
-            &arguments[7],
-            &arguments[8],
-            &arguments[9],
-            &arguments[10],
-        ),
-        (Some("executed"), Some("expose")) => executed_loop::expose_read(
-            arguments[3].parse().expect("a training seed"),
-            arguments[4].parse().expect("a held-out seed"),
-            arguments[5].parse().expect("a held-out count"),
-            &arguments[6],
-            &arguments[7..],
-        ),
-        (Some("executed"), Some("word-read")) => executed_loop::word_read(
-            &arguments[3],
-            arguments[4].parse().expect("a seed"),
-            arguments[5].parse().expect("a count"),
-            &arguments[6..],
-        ),
-        (Some("executed"), Some("locks")) => executed_loop::locks(
-            &arguments[3],
-            arguments[4].parse().expect("a seed"),
-            arguments[5].parse().expect("a count"),
-            &arguments[6],
-            &arguments[7],
-            arguments.get(8).map(|r| r.parse().expect("a request index")),
-        ),
-        (Some("executed"), Some("spectrum")) => executed_loop::spectrum(
-            &arguments[3],
-            arguments[4].parse().expect("a seed"),
-            arguments[5].parse().expect("a count"),
-            &arguments[6],
-            &arguments[7],
-            &arguments[8],
-            &arguments[9],
-            &arguments[10],
-            arguments[11].parse().expect("a grid count"),
-            arguments[12].parse().expect("a read budget"),
-        ),
-        (Some("executed"), Some("move-once")) => executed_loop::move_once(
-            &arguments[3],
-            arguments[4].parse().expect("a seed"),
-            arguments[5].parse().expect("a count"),
-            &arguments[6],
-            &arguments[7],
-            &arguments[8],
-            &arguments[9..],
-        ),
-        // A release run from an opening state to its close or a refusal (the record
-        // research/records/2026-10-02_A_RUN_CLOSES_ON_A_CONDITION_NOT_A_LENGTH_AND_THE_HALVINGS_END_AT_THE_LATTICE.md).
-        (Some("executed"), Some("run")) => executed_loop::run(
-            &arguments[3],
-            arguments[4].parse().expect("a seed"),
-            arguments[5].parse().expect("a count"),
-            &arguments[6],
-            &arguments[7],
-            &arguments[8],
-            &arguments[9],
-            &arguments[10],
-            pinned(&arguments[11], "executed run", clock, false).deadline_ms(),
-        ),
-        // An accepted move read decision by decision (the record
-        // research/records/2026-10-01_THE_DECISION_MARGINS_THROUGH_THE_ACCEPTED_MOVE.md): read-only.
-        (Some("executed"), Some("margins")) => executed_loop::margins(
-            &arguments[3],
-            arguments[4].parse().expect("a seed"),
-            arguments[5].parse().expect("a count"),
-            &arguments[6],
-            &arguments[7],
-        ),
-        // The witness's plane along the port's move and along the route (the record
-        // research/records/2026-10-01_THE_STIFFNESS_IN_RHO.md): read-only.
-        (Some("executed"), Some("route-plane")) => executed_loop::route_plane(
-            &arguments[3],
-            arguments[4].parse().expect("a seed"),
-            arguments[5].parse().expect("a count"),
-            &arguments[6],
-            &arguments[7],
-            &arguments[8],
-            &arguments[9..],
-        ),
-        // The witness's direction in the span of the returns (the record
-        // research/records/2026-10-01_THE_WITNESSS_DIRECTION_IN_THE_SPAN_OF_THE_RETURNS.md): read-only.
-        (Some("executed"), Some("span")) => executed_loop::span(
-            &arguments[3],
-            arguments[4].parse().expect("a seed"),
-            arguments[5].parse().expect("a count"),
-            &arguments[6],
-            &arguments[7],
-            &arguments[8..],
-        ),
-        // The receiver's minimum-energy move against a declared E leg (the record
-        // research/records/2026-10-02_THE_REPRESENTATION_THE_REFITS_E_MAKES_RHO_A_MONOTONE_PATH_TO_THE_DECISIONS.md): read-only.
-        (Some("executed"), Some("kinetic")) => executed_loop::kinetic(
-            &arguments[3],
-            arguments[4].parse().expect("a seed"),
-            arguments[5].parse().expect("a count"),
-            &arguments[6],
-            &arguments[7],
-            &arguments[8..],
-        ),
-        // The joined move's direction at each source (the record
-        // research/records/2026-10-02_THE_TRANSPORT_MODULUS_JOINS_THE_RECEIVERS_MINIMUM_ENERGY_MOVE.md §4c): read-only.
-        (Some("executed"), Some("joined")) => executed_loop::joined(
-            &arguments[3],
-            arguments[4].parse().expect("a seed"),
-            arguments[5].parse().expect("a count"),
-            &arguments[6],
-            &arguments[7..],
-        ),
-        // Each constitution under several declared comparisons (the record
-        // research/records/2026-10-01_THE_COMPARISONS_AGREEMENT_WITH_THE_DECISIONS.md): read-only.
-        (Some("executed"), Some("agreement")) => executed_loop::agreement(
-            &arguments[3],
-            arguments[4].parse().expect("a seed"),
-            arguments[5].parse().expect("a count"),
-            &arguments[6],
-            &arguments[7..],
-        ),
-        (Some("executed"), Some("causal")) => executed_loop::causal(
-            &arguments[3],
-            arguments[4].parse().expect("a seed"),
-            arguments[5].parse().expect("a count"),
-            &arguments[6..],
         ),
         // The two counts' terrain reading (the pin
         // research/records/2026-09-30_THE_TWO_COUNTS_PINNED_BEFORE_ITS_RUNS.md).
@@ -656,7 +377,7 @@ fn main() {
             &arguments[7],
         ),
         _ => panic!(
-            "executed move <seed> <requests> | train <arm> <terrain> <seed> <batch> <moves> <pin> <out> | evaluate <terrain> <seed> <count> <out> <label[=E]>… | spread <terrain> <seed> <count> <label[=E]>… | slopes <terrain> <seed> <count> <label[=E]>… | counts <terrain> <training seed> <count> <validation seed> <count> <out> | witness <terrain> <seed> <count> <moves> <pin> <out> [<states dir>] | causal <terrain> <seed> <count> <label[=E]>… | restore <label=state>… | replay <terrain> <seed> <count> <label=state|label=partial:file>… | coupling <terrain> <seed> <count> <pin> <label=state|label=partial:file|label=opening>… | represent <terrain> <seed> <count> <iterates> <pin> <out> [<held-out seed>] | resume-coupling <terrain> <seed> <count> <c1 state> <gate A receipt> <pin> <capture dir> | run <terrain> <seed> <count> <out> <label=state> <arm> <metric> <cap|none> <pin> | text <cut> <out dir> <pin> <dev|run> [<state> [<from> <to>]] | text-repair <cut> <out dir> <pin> <dev|run>"
+            "executed evaluate <terrain> <seed> <count> <out> <label[=state]>… | counts <terrain> <training seed> <count> <validation seed> <count> <out> | keys <terrain> <training seed> <count> <out> | keys-probe <terrain> <training seed> <count> <scale> <out> | pair-members <terrain> <seed> <count> <state> | text <cut> <out dir> <pin> <dev|run> [<state> [<from> <to>]] | text-repair <cut> <out dir> <pin> <dev|run> | repair <terrain> <A|B> <seed> <count> <out>"
         ),
     }
 }

@@ -1,0 +1,4 @@
+
+thread 'main' (609134) panicked at crates/holonics/../../research/notebook/hnn_design/hnn_executed_loop.rs:103:39:
+the state continues the declared opening: ContinuingState { what: "the state continues another opening's material" }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

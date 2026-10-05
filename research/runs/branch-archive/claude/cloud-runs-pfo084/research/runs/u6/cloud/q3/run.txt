@@ -1,8 +1,0 @@
-executed run: 8 order2 requests at development seed 2026093061, the arm lock-dec, Kinetic, from m7 (ρ 102837/131072; the source port's lattice 2^(-21)); σ over 64 decisions [11356/4096, 11357/4096) nats; cap Some(1), deadline 1800000 ms; the bank p = 5/8, grain 2^(-16)
-  the opening: L ∈ [337896/4096, 337901/4096) nats; solved 1 of 64; whole 0 (released 7, stations right 13)
-    move 0: adopted at step 1/16; the ladder's start Some((Ratio { numer: 1, denom: 16 }, KineticEntryScale)); trials η 1/16 None; persistence Persistence { locks: 63, solved: 4, reread: 3, stay: 2, fall: 1, reversed: 1, uncertified: 0 }; 1068183 ms
-      trials: η 1/16 ρ unmoved mask [304334/4096, 304339/4096) own [378440/4096, 378445/4096) adopted; γ_ρ [584710/4096, 584711/4096)
-  move 0: adopted; ρ 102837/131072; L ∈ [378440/4096, 378445/4096) nats; solved 2 of 64; whole 0 (released 8, stations right 18); 1068183 ms
-  the opening L ∈ [337896/4096, 337901/4096) nats, σ [11356/4096, 11357/4096) nats
-executed run: INCOMPLETE at its cap Some(1), after 1 adopted moves, neither closed nor refused
-executed run: 1068191 ms; resident 207429632 now, 216883200 peak

@@ -4,7 +4,6 @@
 mod chart;
 mod constitution;
 mod contact_residual;
-mod coupling;
 mod encoding;
 mod executed;
 mod field;
@@ -13,7 +12,6 @@ mod guards;
 mod keys;
 pub(crate) mod learning;
 mod loaded_scalar;
-mod lock_face;
 mod moment;
 mod pending;
 mod prior_carry;

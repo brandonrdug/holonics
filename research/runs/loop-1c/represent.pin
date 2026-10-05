@@ -1,7 +1,0 @@
-# Loop 1c's run `represent` (research/notebook/hnn_design/loop_1c_runs.sh; the pin
-# research/records/2026-10-01_LOOP_1C_PERSISTENCE_REPRESENTATION_AND_REACH_PINNED_BEFORE_ITS_RUNS.md §6).
-# Its limits moved unchanged from the launcher's command line on October 5 (THE_MACHINE guard 22).
-command = executed represent
-projection = 849557 ms an iterate upper over 16 iterates; the run's own deadline, checked before each iterate, leaves an iterate, the last read and the scope read (94874 ms each, §6.2′) inside the outer guard of 13783 s (projection upper 13754940 ms)
-deadline_ms = 12743355
-threads = 7

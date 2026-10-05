@@ -738,21 +738,21 @@ tests can comb through anything valuable").
     `Held` forged from bytes (`E0451`), its bytes read by reference (`E0599`) and a second read
     (`E0382`) do not compile, and the lawful forms do. Whether a grading function names its input
     `Held` is a review rule; the types make the substitution impossible once it does.
-22. **A run's limits are a committed pin's** (October 5; lesson 9, "a refusal changes the law or
-    the partition, never the limit", against 29 raised limits; CLAUDE.md, "Waiting, deadlines and
+22. **A run's limits are a committed pin's** (October 5; lesson 9, "a refusal changes the law or the
+    partition, never the limit", against 29 raised limits; CLAUDE.md, "Waiting, deadlines and
     concurrency"). Every `hnn_prediction` mode bounded in time takes a pin's path where it took a
-    deadline or a bound in milliseconds (`train`, `witness`, `coupling`, `represent`, `run`,
-    `resume-coupling`, `text`, `text-repair`): `exterior::Pin::read(path, command)` reads the
-    command, the projection, `deadline_ms`, the optional `unit_bound_ms` and `threads` from a file
-    and refuses the run when it is missing, untracked, different from its commit, committed more
-    than once, or of another command. A pin is therefore fixed once: a limit is never raised by
-    editing it, a run past it is reported incomplete, and the next loop commits a new pin for a
-    changed law, partition or read, with its reason. The harness installs the pin's threads as the
-    host's pool; the modes that check their own deadline before each unit read the pin's there, and
-    `text` and `text-repair` stop at the pinned deadline (`Pin::launch`, exit `INCOMPLETE`). Counts
-    that declare the read (moves, iterates, a cap, a read budget, the exposure's windows) stay
-    arguments. Structural: a `Pin` is built only by `read` (`E0451`) and its deadline has no setter
-    (`E0616`); the refusals are runtime laws, each run by a doctest in a scratch repository
-    (missing, untracked, edited, recommitted, another command). That a new pin for the same read
-    is not a disguised raise stays a review rule: the pin's projection line says where its numbers
-    come from.
+    deadline or a bound in milliseconds (`text`, `text-repair`; the descent's `train`, `witness`,
+    `coupling`, `represent`, `run` and `resume-coupling` retired with S2 on October 5):
+    `exterior::Pin::read(path, command)` reads the command, the projection, `deadline_ms`, the
+    optional `unit_bound_ms` and `threads` from a file and refuses the run when it is missing,
+    untracked, different from its commit, committed more than once, or of another command. A pin is
+    therefore fixed once: a limit is never raised by editing it, a run past it is reported
+    incomplete, and the next loop commits a new pin for a changed law, partition or read, with its
+    reason. The harness installs the pin's threads as the host's pool; `text` reads the pin's unit
+    bound, and `text` and `text-repair` stop at the pinned deadline (`Pin::launch`, exit
+    `INCOMPLETE`). Counts that declare the read (moves, iterates, a cap, a read budget, the
+    exposure's windows) stay arguments. Structural: a `Pin` is built only by `read` (`E0451`) and
+    its deadline has no setter (`E0616`); the refusals are runtime laws, each run by a doctest in a
+    scratch repository (missing, untracked, edited, recommitted, another command). That a new pin
+    for the same read is not a disguised raise stays a review rule: the pin's projection line says
+    where its numbers come from.

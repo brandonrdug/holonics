@@ -1,8 +1,0 @@
-db2d7d874e7ed1ff892403e2da7fb499b7e6aa70
-9eeab3f12a8673b303ea077ed884fbdba3df122d2a450b0c48905ea0c9f6f5cc
-args executed move-once order2 2026093061 8 .local/throw/m9 m9=.local/throw/m9/in.state lock-dec throw
-note: the ported build (cargo build --release, -j 2, nice 19) ran on the same 4 cores from about 23:37:50 to 23:40:00 UTC while this move was in flight, so this move's wall time includes that load
-note: two debug cargo checks (nice 19, -j 2, about 22 s and 6 s) also ran between 23:26 and 23:33 UTC during this move
-note: host check of the per-kind bounds (incumbent 166264, persistence 1814, slope 32691, reread 207135 ms) against m0..m8, figure 200769 + trials x 207135 ms: m0 477281 (2 trials, 615039) fits; m1 402362 (1, 407904) fits; m2 521484 (1, 407904) exceeds; m3 391459 (1, 407904) fits; m4 698809 (2, 615039) exceeds; m5 585842 (2, 615039) fits; m6 973667 (4, 1029309) fits; m7 857745 (4, 1029309) fits; m8 370911 (1, 407904) fits. The switch is held; the chain stays on its build and the 1349692 ms per-move bound.
-note: superseded at 23:42 UTC by the main line's ruling: per-kind bounds are measured on this host from the first ported move (m10)
-wall 1171255 ms; exit 0; early stop 0

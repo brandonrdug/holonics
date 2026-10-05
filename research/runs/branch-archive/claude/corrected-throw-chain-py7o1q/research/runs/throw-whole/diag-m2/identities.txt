@@ -1,6 +1,0 @@
-DIAGNOSTIC of m2 from m1 (not the chain's m2): outer timeout 4049 s, no per-move deadline, 4 threads; build 5f254c2d + 7a650e6b (print-only, cherry-picked as 5f59550)
-5f59550949c0eb1d8eb3a6ff17e7e62ab7463f75
-a2c0d5c8bda67439834c0c9d52c23d69bbf1cd12378a7bc1d1446482fe8cf4f6
-d29465f16f15b063d65b0b705ad3aeb4a275791c8684c469ae0e02e116c35895  .local/diag-m2/in.state
-fc7d9f8d0a125c8f5cd7f62d8ed3abd53829278888e7f06835c6f5d3bbd3a64c  .local/diag-m2/in.state.flight
-args executed move-once order2 2026093061 8 .local/diag-m2 m2=.local/diag-m2/in.state lock-dec throw
