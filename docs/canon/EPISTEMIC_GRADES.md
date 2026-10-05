@@ -41,6 +41,22 @@ the next claim; it does not silently upgrade the rest of the correspondence.
 | `source-audit` | A declared source or dependency closure was searched for presence, absence, reachability, or contamination. | Exact revision, complete aperture, reproducible command or traversal, and every excluded root. |
 | `process-audit` | Process chronology, repetition, timeout, exit, or validation cadence supports the claim. | Exact command, source/input closure, start/end or elapsed time, exit status, and disposition. |
 
+## Convergence, independence and redundancy
+
+[project-postulate] Brandon, October 5: "I'm saying you couldn't avoid it. That's convergence;
+infinitely many more agreements is not convergence, that's redundancy." These are three different
+things, and a claim names which one it rests on
+([record](../../research/records/2026-10-05_THE_GHOST_LIVES_IN_THE_GAP_THE_JOINTS_OF_THE_LENS.md) §3).
+- **Convergence** is arrival that no route can avoid: a property of the problem (an attractor), read
+  by changing the route and finding the same place.
+- **Independence** is arrival along routes that share no step forcing the agreement. Only
+  independent arrivals are evidence about what was arrived at.
+- **Redundancy** is agreement repeated along one route: one tutor, one prompt, one corpus, one
+  model family. It counts once, however many times it repeats.
+
+An agent's agreement with Brandon's framework, or two agents' agreement with each other, shares
+their context and is redundancy unless the shared step is named and removed.
+
 ## Imported synopsis crosswalk
 
 - Synopsis `identity` is treated as `proved-derived` only when the displayed derivation and its
