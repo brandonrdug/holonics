@@ -183,11 +183,16 @@
 //!   section's locked stations), through the contact's own channel, the turn `P^δ` the deposit
 //!   carried (modulus one, so without the tube's contraction `ρ^δ`), beside its own column alone at
 //!   the same weight;
-//! - **the gain on equal material** (`gain`), read mode by mode: at each member of the bank, the
-//!   ratio of the pair storage's growth to the column's alone, and the least of them over the members,
-//!   with no scalar weight chosen, which the lock
-//!   iteration's flip and gap read in place of the joint growth; the bank locks on the pair
-//!   storage's own joint growth and certifies it there.
+//! - **the gain on equal material** ([`gain`]), read by the joined bank: the relative transport from
+//!   the column alone to the pair storage, its determinant over the members' lines,
+//!   `Γ = ∏_m g_m(z_pair)/g_m(z_alone)` (`log Γ` the sum of the members' Floquet exponent shifts),
+//!   with no scalar weight chosen, which the lock iteration's flip and gap read in place of the
+//!   joint growth; the bank locks on the pair storage's own joint growth and certifies it there.
+//!   [agent-inferred, October 5, the
+//!   [joint gain's record](../../../../research/records/2026-10-05_THE_PAIR_GAIN_IS_THE_JOINED_BANKS_LOG_DETERMINANT.md)]
+//!   It replaces lane C's least member, which read one member and was capped by a neutral one: on
+//!   the alternation, whose located map fixes its antecedent, it released no nonconstant section
+//!   whole.
 //!
 //! The release stays one joint refinement: every open station a closed contact joins to a placed
 //! crossing is read in each refinement, the largest gaps lock together, and a locked station is
@@ -207,7 +212,7 @@
 //! | a landing's normalization and entry, read apart (loop 1c's diagnostic, never a law) | `HNN/IndexedOpen.{transported_weight_insert, transported_weight_insert_scale}` | [`BankPlacement::storage_over`] |
 //! | the release's order read as a diagnostic factor (the law is [`LockOrder::Gap`]) | abstracted in `HNN/ExecutedComparison.decisions_release_the_section` | [`LockOrder`], [`bank_release_ordered`] |
 //! | the lock set: every station the readings do not certify below the largest gap | `HNN/ExecutedComparison.{certifiedLock_largest, leader_locks, lone_lock_is_largest, certified_order_needs_crossing, certifiedLock_exact}` | [`uncertified_largest`] |
-//! | the closed pair contacts, the pair storage and the gain on equal material | owed in #62 (lane C's record §8) | [`closed_pairs`], [`BankPlacement::pair_storage`], `gain` |
+//! | the closed pair contacts, the pair storage and the gain on equal material | owed in #62 (lane C's record §8; the joint gain's record §8); the full work form's chart transport `Geometry/Motion.finite_work_form_rechart` | [`closed_pairs`], [`BankPlacement::pair_storage`], [`gain`] |
 
 use num_bigint::BigInt;
 use num_traits::{One, Signed, ToPrimitive, Zero};
@@ -434,7 +439,7 @@ pub fn mask(draw: &mut Draw, stations: usize) -> Vec<bool> {
 /// refused, if one was, where the release stopped and held (September 30: a refused certificate
 /// refuses the lock, never a tally). Where the material holds pair contacts closed (their distances
 /// in `contacts`; [`BankPlacement::contacts`]), each decision's enclosures are the candidates' gains
-/// over their own columns read alone ([`BankPlacement::pair_storage`]), not their growths.
+/// over their own columns read alone ([`gain`], [`BankPlacement::pair_storage`]), not their growths.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct BankGeneration {
     pub release: SectionRelease,
@@ -450,40 +455,51 @@ pub struct BankGeneration {
     pub contacts: Vec<usize>,
 }
 
-/// [definition; agent-inferred, October 5; lane C's
-/// [record](../../../../research/records/2026-10-05_THE_RELEASE_READS_THE_LOCATED_PAIR_ON_EQUAL_MATERIAL.md)
-/// §3] **A candidate's gain on equal material**: at each member of the bank (each pump phase), the
-/// ratio of its pair storage's growth to its own column's read alone, enclosed exactly
-/// (`[L_pair/U_alone, U_pair/L_alone]`), and the least of them over the members
-/// ([`BankPlacement::pair_storage`]). A growth is a multiplier over the turn, so the gain is a
-/// ratio, and a class's own column, whatever its resonance power, enters both of its terms. The
-/// least member reads the gain that holds in every frame of the bank: a candidate that fits the
-/// contact adds its antecedent's image coherently on every spectral line, at every member, while a
-/// class whose line the contact's distance carries to itself only at some members (the copy of
-/// the antecedent at `δ = 2`, where on the flat ring `P^δ = +1` at two of the four quarter-turn
-/// members and `−1` at the other two) gains at those and loses at the rest. The members resolve the
-/// reading by mode: no scalar weight is set between the members or between the two storages.
-/// Refused, typed, on a reading alone whose
-/// lower end is not positive.
-fn gain(pair: &TurnReading, alone: &TurnReading) -> Result<Growth, HnnError> {
-    let mut least: Option<Growth> = None;
+/// [definition; agent-inferred, October 5; the
+/// [joint gain's record](../../../../research/records/2026-10-05_THE_PAIR_GAIN_IS_THE_JOINED_BANKS_LOG_DETERMINANT.md)
+/// §3, revising lane C's least member] **A candidate's gain on equal material, read by the joined
+/// bank**: the bank's relative transport from the candidate's column alone to its pair storage
+/// ([`BankPlacement::pair_storage`]), read by its members together, its determinant on their lines,
+///
+/// ```text
+/// Γ(j, x) = ∏_m g_m(z_pair) / g_m(z_alone),   log Γ = Σ_m (λ_m(z_pair) − λ_m(z_alone)),   λ_m = log g_m
+/// enclosed exactly: [∏_m L_pair,m / U_alone,m,  ∏_m U_pair,m / L_alone,m]
+/// ```
+///
+/// with `g_m` member `m`'s growth over the turn (its Floquet multiplier's modulus, enclosed by
+/// [`ReceivingBank::read_turn`]). Why the determinant ([proved-derived], the record §3): the bank's
+/// joint monodromy is its members' block sum ([`ReceivingBank::read_turn`]), so the full work form
+/// over the joint state, `TᵀG₁T − rG₀`, is the direct sum of the members' and no cross term is
+/// dropped by reading them one by one; each member is recharted on its own (its metric is attained,
+/// any positive multiple certifying alike), so a ratio of joint quadratic forms reads a weight
+/// between members that no owner supplies, and its weight-free limit, the joint growth, is the
+/// largest member's alone; the ratio's additive chart (`ℓ = log R`, the loss law) on the direct sum
+/// `R = ⊕_m R_m` is `log det R = Σ_m log det R_m`, the one joint reading in which a member whose two
+/// storages turn alike (neutral, `g_m(z_pair) = g_m(z_alone)`) does not move the comparison. The
+/// least member is not that reading: it is one member's, and a neutral member caps it at one. On
+/// the alternation (`f = id`) every column is `(1 + P^δ) B e_x`, so on the members where `P^δ`
+/// half-turns the contact's line every candidate's two storages vanish in the first-order chart and
+/// the member is neutral for every class, and the least member decided on what remained past first
+/// order (the regressions' record §8). On order-2 the antecedent's copy is anti-aligned with its
+/// partner on those members and pays there what it gains on the others; the fit gains on every
+/// member. No weight is set between the members or the two storages. Refused, typed, on a reading
+/// alone whose lower end is not positive, or on two readings of different banks.
+pub fn gain(pair: &TurnReading, alone: &TurnReading) -> Result<Growth, HnnError> {
+    if pair.members.is_empty() || pair.members.len() != alone.members.len() {
+        return Err(HnnError::NonpositiveDeclaration);
+    }
+    let mut joined = Growth {
+        lower: Rat::one(),
+        upper: Rat::one(),
+    };
     for (p, a) in pair.members.iter().zip(&alone.members) {
         if !a.lower.is_positive() {
             return Err(HnnError::NonpositiveDeclaration);
         }
-        let ratio = Growth {
-            lower: &p.lower / &a.upper,
-            upper: &p.upper / &a.lower,
-        };
-        least = Some(match least {
-            None => ratio,
-            Some(least) => Growth {
-                lower: least.lower.min(ratio.lower),
-                upper: least.upper.min(ratio.upper),
-            },
-        });
+        joined.lower *= &p.lower / &a.upper;
+        joined.upper *= &p.upper / &a.lower;
     }
-    least.ok_or(HnnError::NonpositiveDeclaration)
+    Ok(joined)
 }
 
 /// [definition; agent-inferred, September 30] **One refinement of the bank's lock iteration**

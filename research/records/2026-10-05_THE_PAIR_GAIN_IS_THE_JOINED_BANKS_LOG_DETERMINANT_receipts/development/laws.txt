@@ -1,0 +1,6 @@
+members_alternation_2026093042.txt: stations 64; decided right along the target's trajectory: least 20, joint 64, energy 64, product 64
+members_alternation_2026093043.txt: stations 64; decided right along the target's trajectory: least 4, joint 64, energy 64, product 64
+members_line_2026093042.txt: stations 64; decided right along the target's trajectory: least 64, joint 64, energy 64, product 64
+members_line_2026093043.txt: stations 64; decided right along the target's trajectory: least 64, joint 64, energy 64, product 64
+members_order2_2026093042.txt: stations 64; decided right along the target's trajectory: least 64, joint 32, energy 48, product 64
+members_order2_2026093043.txt: stations 64; decided right along the target's trajectory: least 64, joint 32, energy 48, product 64
