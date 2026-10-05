@@ -182,6 +182,87 @@ lane C's gain was built to reject the copy, and on the alternation the copy is t
 The line's key `(4, id)` is also the copy, at a distance where the contact's transport carries every
 member's line to itself, and its development sections are all whole.
 
-## 6. Validation
+## 6. Validation, read once after the pin (`44f98303`)
 
-(Read after this section's pin is committed; appended below.)
+[measured] `executed evaluate`, 64 requests a terrain, 12 threads, the keys states of §4 mounted from
+the receipts. The stations right are of 512 (nonconstant and constant apart in the receipts'
+`tally.py` reading of the sections listing).
+
+**The alternation** (`2_026_093_035`; 46 nonconstant requests, 18 constant):
+
+| State | Closed contacts | Released / held | Whole: nonconstant, constant | Stations right (nonconstant of 368, constant of 144) | By station | First lock right | ms |
+|---|---|---|---|---|---|---|---|
+| keys on the founded opening | `{2}` | 64 / 0 | **0 of 46**, 11 of 18 | 286 (178, 108) | 19 23 48 53 19 23 48 53 | 17 | 37,271 |
+| keys on the lossless opening | `{2}` | 64 / 0 | 0 of 46, 11 of 18 | 286 (178, 108) | 19 23 48 53 19 23 48 53 | 17 | 50,182 |
+| lossless opening | none | 3 / 61 | 0 of 46, 3 of 18 | 219 (105, 114) | 37 24 31 26 27 23 27 24 | 3 | 31,978 |
+| founded opening | none | 62 / 2 | 0 of 46, 3 of 18 | 127 (95, 32) | 26 23 17 22 10 10 11 8 | 8 | 208,635 |
+
+**The line** (`2_026_093_038`; 48 nonconstant requests, 16 constant):
+
+| State | Closed contacts | Released / held | Whole: nonconstant, constant | Stations right (nonconstant of 384, constant of 128) | By station | First lock right | ms |
+|---|---|---|---|---|---|---|---|
+| keys on the founded opening | `{4}` | 64 / 0 | **48 of 48**, 16 of 16 | **512** (384, 128) | 64 64 64 64 64 64 64 64 | 64 | 38,619 |
+| keys on the lossless opening | `{4}` | 64 / 0 | 48 of 48, 16 of 16 | 512 (384, 128) | 64 64 64 64 64 64 64 64 | 64 | 37,639 |
+| lossless opening | none | 3 / 61 | 0 of 48, 3 of 16 | 147 (81, 66) | 17 18 20 15 17 22 20 18 | 3 | 21,601 |
+| founded opening | none | 58 / 6 | 0 of 48, 3 of 16 | 103 (71, 32) | 16 21 12 24 10 7 8 5 | 5 | 154,427 |
+
+No certificate was refused and no section reached the termination on any keys state. The openings
+close no contact and read the span's law: on both terrains they reproduce the two counts' readings of
+the same validation sets exactly (the two counts' measured record, the tables "Alternation" and
+"Line", rows `lossless` and `opening`: the same released, whole and by-station counts).
+
+**The claim of §0.** It **holds on the line**: 48 of 48 nonconstant sections whole on both keys
+states against 0 for both openings, and all 512 released stations follow `x_t = x_(t−4)`; the
+success rule (every nonconstant section whole) holds. It **does not hold on the alternation**: 0 of
+46 nonconstant sections whole on every state, so the keys states are not strictly above the
+openings; their 11 constant sections whole (against 3) are all requests of the class `0` (§6.2).
+
+**6.1 The line's sections, one per slope** (keys on the founded opening; the request's last eight
+cells, then the released section; synthetic `ℤ/4` terrain):
+
+```text
+s = 1   request …0 1 2 3 0 1 2 3 | released 0 1 2 3 0 1 2 3 | locks [0], [4], [1], [5], [3], [7], [2], [6]
+s = 2   request …2 0 2 0 2 0 2 0 | released 2 0 2 0 2 0 2 0 | locks [1, 3], [5, 7], [0, 2], [4, 6]
+s = 3   request …3 2 1 0 3 2 1 0 | released 3 2 1 0 3 2 1 0 | locks [3], [7], [2], [6], [0], [4], [1], [5]
+s = 0   request …2 2 2 2 2 2 2 2 | released 2 2 2 2 2 2 2 2 | locks [0, 1, 2, 3], [4, 5, 6, 7]   (constant)
+```
+
+Each station `j < 4` continues the request's cell four ticks back, and station `j + 4` continues
+station `j`: the four chains of the contact at distance 4 run interleaved, and a request's slope
+reaches its section only through those cells. The translation the hierarchical family keeps per
+request (the two counts §2) is never located or represented: the request carries it.
+
+**6.2 The alternation's sections** (keys on the founded opening). The 64 releases take 16 shapes; the
+most frequent, with their counts:
+
+```text
+11   request …0 0 0 0 | released 0 0 0 0 0 0 0 0        (constant, whole)
+ 6   request …2 3 2 3 | released 0 1 0 3 0 1 0 3        (target 2 3 2 3 2 3 2 3)
+ 6   request …2 1 2 1 | released 0 3 0 1 0 3 0 1        (target 2 1 2 1 2 1 2 1)
+ 6   request …1 3 1 3 | released 3 1 1 3 3 1 1 3        (target 1 3 1 3 1 3 1 3)
+ 6   request …1 0 1 0 | released 3 0 1 0 3 0 1 0        (target 1 0 1 0 1 0 1 0)
+ 3   request …3 3 3 3 | released 1 1 3 3 1 1 3 3        (constant, target 3 3 3 3 3 3 3 3)
+```
+
+The first lock is at a station the contact joins to the request on all 64 requests and is right on
+17. Released stations follow `x_t = x_(t−2)` at 149 of 368 nonconstant stations: each chain of the
+contact alternates between the copy and a class that avoids it, which is expected blocker 1 as §5
+measured it. Of the 226 wrong stations, 108 release the class `0`, 60 the class `1` and 58 the class
+`3` (none `2`), and the 11 constant sections whole are the 11 constant requests of the class `0`
+(the constant `2 2 2 …` requests are released `0 0 0 …`): a class preference of the gain, not the
+key.
+
+## 7. The final confirmation (pinned before its read)
+
+Read once, at the build of the commit that adds this section, with the states of §4 and nothing else
+changed: alternation `2_026_093_036` and line `2_026_093_039`, 128 requests each, the same four
+states, 12 threads, the two terrains one after the other. The projection takes each state's largest
+measured time a request before launch (development `ms/8`, validation `ms/64`) times 128, and the
+deadline is its upper end, `5/4` of it:
+
+| Terrain | keys founded | keys lossless | lossless | founded opening | Projection | Deadline |
+|---|---|---|---|---|---|---|
+| alternation | `5531/8` | `50182/64` | `13935/8` | `208635/64` | 829,090 ms | 1,037 s |
+| line | `5879/8` | `5865/8` | `21601/64` | `154427/64` | 539,960 ms | 675 s |
+
+(Read after this section is committed; appended below.)
