@@ -174,7 +174,7 @@ pub use contact::{
 
 pub use encoding::{Encoding, EncodingError, PassageChart};
 pub use field::{
-    ConstitutionRead, Contact, ContactDeclaration, Current, Field, FieldDeclaration, PortChart, Ring,
+    ConstitutionRead, Contact, FieldMaterial, ContactDeclaration, Current, Field, FieldDeclaration, PortChart, Ring,
     RingDeclaration,
 };
 pub use keys::{KeyLocation, RingKeys, locate_keys};

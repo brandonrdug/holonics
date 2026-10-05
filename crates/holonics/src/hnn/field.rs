@@ -188,6 +188,90 @@ pub trait ConstitutionRead: Sync {
     }
 }
 
+/// [definition; agent-inferred, October 5] **The field's own material: what a release reads of
+/// the constitution.** It is [`ConstitutionRead`] without the receiving storage read at compare,
+/// so no receiving map, landmark tree or population. Every `ConstitutionRead` is one, through the
+/// view below. A release bounded on it cannot read the tree's counts or a seen context (THE_MACHINE,
+/// guard 18): the release is the field's motion, never a lookup of stored passages.
+///
+/// ```compile_fail,E0599
+/// use holonics::hnn::FieldMaterial;
+/// // A release generic over the field's material cannot read the landmark tree (guard 18).
+/// fn release_reads_the_tree(material: &impl FieldMaterial) {
+///     let _ = material.landmarks(0);
+/// }
+/// ```
+pub trait FieldMaterial: Sync {
+    /// The standing `q_g`. ([`ConstitutionRead::standing`])
+    fn standing(&self, ring: usize) -> &[Rat];
+    /// The passive factor `f_g`. ([`ConstitutionRead::passive_factor`])
+    fn passive_factor(&self, ring: usize) -> &ExactRatMatrix;
+    /// The contrast port `W_c,g`. ([`ConstitutionRead::contrast_port`])
+    fn contrast_port(&self, ring: usize) -> &ExactRatMatrix;
+    /// The skew slices. ([`ConstitutionRead::slices`])
+    fn slices(&self, ring: usize) -> &[(Vec<Rat>, Vec<Rat>)];
+    /// The source port `E_g` on a source ring. ([`ConstitutionRead::source_port`])
+    fn source_port(&self, ring: usize) -> Option<&ExactRatMatrix>;
+    /// The factored pair port at a declared offset. ([`ConstitutionRead::pair_port`])
+    fn pair_port(&self, ring: usize, offset: usize) -> Option<&PairPort>;
+    /// The contact storage factor `c_a`. ([`ConstitutionRead::contact_storage`])
+    fn contact_storage(&self, contact: usize) -> &ExactRatMatrix;
+    /// The contact stiffness factor `b_a`. ([`ConstitutionRead::contact_stiffness`])
+    fn contact_stiffness(&self, contact: usize) -> &ExactRatMatrix;
+    /// The contact dissipation factor `F_a`. ([`ConstitutionRead::contact_dissipation`])
+    fn contact_dissipation(&self, contact: usize) -> &ExactRatMatrix;
+    /// A contact's stiffness signature. ([`ConstitutionRead::contact_stiffness_signature`])
+    fn contact_stiffness_signature(&self, contact: usize) -> Option<&[bool]>;
+    /// A contact's surface-storage density. ([`ConstitutionRead::contact_surface_storage`])
+    fn contact_surface_storage(&self, contact: usize) -> Option<&Rat>;
+    /// A ring's resonator. ([`ConstitutionRead::ring_resonator`])
+    fn ring_resonator(&self, ring: usize) -> Option<&crate::hnn::ring::ResonatorMaterial>;
+    /// A source navigator's transport modulus. ([`ConstitutionRead::transport`])
+    fn transport(&self, ring: usize) -> Rat;
+}
+
+impl<T: ConstitutionRead + ?Sized> FieldMaterial for T {
+    fn standing(&self, ring: usize) -> &[Rat] {
+        ConstitutionRead::standing(self, ring)
+    }
+    fn passive_factor(&self, ring: usize) -> &ExactRatMatrix {
+        ConstitutionRead::passive_factor(self, ring)
+    }
+    fn contrast_port(&self, ring: usize) -> &ExactRatMatrix {
+        ConstitutionRead::contrast_port(self, ring)
+    }
+    fn slices(&self, ring: usize) -> &[(Vec<Rat>, Vec<Rat>)] {
+        ConstitutionRead::slices(self, ring)
+    }
+    fn source_port(&self, ring: usize) -> Option<&ExactRatMatrix> {
+        ConstitutionRead::source_port(self, ring)
+    }
+    fn pair_port(&self, ring: usize, offset: usize) -> Option<&PairPort> {
+        ConstitutionRead::pair_port(self, ring, offset)
+    }
+    fn contact_storage(&self, contact: usize) -> &ExactRatMatrix {
+        ConstitutionRead::contact_storage(self, contact)
+    }
+    fn contact_stiffness(&self, contact: usize) -> &ExactRatMatrix {
+        ConstitutionRead::contact_stiffness(self, contact)
+    }
+    fn contact_dissipation(&self, contact: usize) -> &ExactRatMatrix {
+        ConstitutionRead::contact_dissipation(self, contact)
+    }
+    fn contact_stiffness_signature(&self, contact: usize) -> Option<&[bool]> {
+        ConstitutionRead::contact_stiffness_signature(self, contact)
+    }
+    fn contact_surface_storage(&self, contact: usize) -> Option<&Rat> {
+        ConstitutionRead::contact_surface_storage(self, contact)
+    }
+    fn ring_resonator(&self, ring: usize) -> Option<&crate::hnn::ring::ResonatorMaterial> {
+        ConstitutionRead::ring_resonator(self, ring)
+    }
+    fn transport(&self, ring: usize) -> Rat {
+        ConstitutionRead::transport(self, ring)
+    }
+}
+
 // -------------------------------------------------------------------------------------------
 // the declaration
 

@@ -622,3 +622,19 @@ tests can comb through anything valuable").
     fitted to a test's layouts. A terrain generates its truth; the machine locates it. The
     arithmetic calculator and the arithmetic eggs are retired, and the byte-tree text line's
     catered layers are retired when the native encoding and prediction land.
+18. **A release reads the field, never the receiving storage** (October 5,
+    [contamination history](../research/records/2026-10-05_THE_CONTAMINATION_CYCLES_EVERY_COPY_PIPELINE_FOLLOWED_A_DEMAND_FOR_OUTPUT_BEFORE_THE_FIELD_COULD_RELEASE.md)).
+    `FieldMaterial` is the field's own material: rings, contacts, ports, resonators and transport.
+    It is `ConstitutionRead` without the receiving map, the landmark tree and the receiver's
+    population, which are read at compare, and every `ConstitutionRead` is one through a blanket
+    view. `generate_by_bank`, `BankPlacement::of` and the moment's `open_parts` take
+    `&impl FieldMaterial`, so the release cannot read the tree's counts or a seen context. This
+    is structural: a `compile_fail` doctest (E0599) on `FieldMaterial` shows it. A release is a joint refinement of its open stations. No
+    class is drawn and fed back as the next source cell: an emitter of one cell at a time over the
+    combined face is the recitation form.
+19. **One release per request, shown whole.** There is no search, rerank, retry or selection
+    among releases, and nothing compares a release with reference text before it is shown. Every
+    text release shown carries its copy length, the longest run it shares with the admitted
+    passage. An exterior notebook tool reads it outside the HNN, so recitation is visible at once.
+    It is a receipt, never a control and never a grade. This is a review rule, not a type
+    guarantee.

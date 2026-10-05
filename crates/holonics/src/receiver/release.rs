@@ -248,6 +248,10 @@ pub enum DrawRefusal {
     /// A class whose upper bound exceeds one.
     #[error("class {class} has mass bound {bound} above one")]
     MassAboveOne { class: usize, bound: Rat },
+    /// A class whose bounds are reversed: the interval encloses no mass. `ExactInterval`'s fields
+    /// are public, so a face can reach the draw without passing [`ExactInterval::new`].
+    #[error("class {class} has reversed mass bounds [{lower}, {upper}]")]
+    ReversedMass { class: usize, lower: Rat, upper: Rat },
     /// Interval bounds that enclose no normalized face.
     #[error("the lower bounds total {lower_total} and the upper bounds {upper_total}; no normalized face lies between")]
     InvalidNormalization { lower_total: Rat, upper_total: Rat },
@@ -281,6 +285,13 @@ pub fn draw(face: &[ExactInterval], key: &Rat) -> Result<ReleaseReturn, DrawRefu
     let mut lower_total = Rat::zero();
     let mut upper_total = Rat::zero();
     for (class, mass) in face.iter().enumerate() {
+        if ExactInterval::new(mass.lower.clone(), mass.upper.clone()).is_err() {
+            return Err(DrawRefusal::ReversedMass {
+                class,
+                lower: mass.lower.clone(),
+                upper: mass.upper.clone(),
+            });
+        }
         if mass.lower < Rat::zero() {
             return Err(DrawRefusal::NegativeMass {
                 class,

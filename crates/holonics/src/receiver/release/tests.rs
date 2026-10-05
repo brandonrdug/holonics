@@ -685,6 +685,25 @@ fn invalid_normalization_is_refused() {
     );
 }
 
+/// A reversed class interval, built past `ExactInterval::new` through its public fields, is refused
+/// before the inverse CDF reads it: unchecked, `[3/4, 1/4], [0, 3/4]` at key `1/2` drew class 0,
+/// whose interval holds no mass.
+#[test]
+fn reversed_mass_bounds_are_refused() {
+    let face = vec![
+        ExactInterval { lower: ratio(3, 4), upper: ratio(1, 4) },
+        ExactInterval::new(ratio(0, 1), ratio(3, 4)).unwrap(),
+    ];
+    assert_eq!(
+        draw(&face, &ratio(1, 2)),
+        Err(DrawRefusal::ReversedMass {
+            class: 0,
+            lower: ratio(3, 4),
+            upper: ratio(1, 4),
+        })
+    );
+}
+
 /// The stop class of the curated section chart (268 classes) is drawable.
 #[test]
 fn stop_class_is_selectable_in_a_268_class_chart() {

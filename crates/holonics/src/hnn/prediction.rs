@@ -181,7 +181,7 @@ use num_bigint::BigInt;
 use num_traits::{One, Signed, ToPrimitive, Zero};
 
 use crate::hnn::HnnError;
-use crate::hnn::field::{ConstitutionRead, Current, Field};
+use crate::hnn::field::{Current, Field, FieldMaterial};
 use crate::hnn::moment::{PopulationChart, SourceMoment};
 use crate::hnn::ring::{Growth, ReceivingBank, TurnCovector, TurnReading, turn};
 use crate::holarchy::terrain::Draw;
@@ -474,7 +474,7 @@ impl JointGrowth for TurnCovector {
 #[allow(clippy::too_many_arguments)]
 pub fn generate_by_bank(
     field: &Field,
-    constitution: &impl ConstitutionRead,
+    constitution: &impl FieldMaterial,
     current: &Current,
     moment: &SourceMoment,
     declared: &Refinement,
@@ -842,7 +842,7 @@ impl BankPlacement {
     /// turn ([`HnnError::AliasedAges`]).
     pub fn of(
         field: &Field,
-        constitution: &impl ConstitutionRead,
+        constitution: &impl FieldMaterial,
         current: &Current,
         moment: &SourceMoment,
         declared: &Refinement,
