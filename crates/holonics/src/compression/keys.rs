@@ -50,9 +50,11 @@ use crate::holon::contact::menu::{
 use crate::navigator::Clock;
 
 mod edges;
+pub mod repair;
 mod turns;
 
 pub use edges::{Edge, Propagation};
+pub use repair::{CellRelease, DamagedPassage, PairRelation, Restriction};
 pub use turns::{TurnMenu, TurnReading};
 
 /// The ceiling on the candidate boundary images one enumeration forms.

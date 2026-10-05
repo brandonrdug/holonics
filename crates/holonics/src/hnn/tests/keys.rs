@@ -505,3 +505,57 @@ fn the_pair_menu_reads_each_station_at_every_distance_its_passage_reaches() {
         Err(HnnError::CellOutside { code: 99, .. })
     ));
 }
+
+/// [implemented-exact] **A damaged passage's menu reads only its intact cells, and the located
+/// pair repairs it from both sides** (`hnn::keys`, "A damaged passage's menu"; the consumer
+/// `compression::keys::repair`). On a ring of period 16, order-2 passages of 4 drawn cells and 12
+/// stations with the cells `1`, `5`, `6`, `9` and the tail `14, 15` erased: an erased station is no
+/// observation and an erased cell no antecedent, so the stations read are `4, 7, 8, 10 … 13` and the
+/// station 7 reads only the distances `3, 4, 5, 7` (its antecedents `6, 5, 1` are erased). The
+/// menus still locate `(2, y ↦ y + 1)`, its relation on the four classes is `y ↦ y + 1`, and the
+/// restriction releases every erased cell a station joins to an intact cell, equal to its truth,
+/// holding cell 1 (the opening's, joined by no station) with the four classes.
+#[test]
+fn a_damaged_passage_locates_its_pair_from_intact_cells_and_is_repaired_through_it() {
+    use crate::compression::keys::repair::{CellRelease, DamagedPassage, restrict};
+    use crate::hnn::keys::damaged_station_pairs;
+    let field = rotor_field(&[(16, (0..16).collect())]);
+    let erased = [1usize, 5, 6, 9, 14, 15];
+    let damage = |passage: &[usize]| -> Vec<Option<usize>> {
+        (0..passage.len())
+            .map(|t| (!erased.contains(&t)).then_some(passage[t]))
+            .collect()
+    };
+    let passages = order_two(2_026_100_742, 12, 4, 12);
+    let mut location = PairLocation::open(&field, 0);
+    for passage in &passages {
+        let cells = damage(passage);
+        let observations = damaged_station_pairs(&field, 0, &cells, 4).unwrap();
+        let stations: Vec<usize> = observations.iter().map(|(t, _)| *t).collect();
+        assert_eq!(stations, vec![4, 7, 8, 10, 11, 12, 13]);
+        let (_, at_seven) = &observations[1];
+        let distances: Vec<usize> = at_seven.iter().map(|reading| reading.offset).collect();
+        assert_eq!(distances, vec![3, 4, 5, 7]);
+        for (_, observation) in &observations {
+            location.observe(observation);
+        }
+    }
+    let located = location.survivors().located().expect("order-2 located from intact cells");
+    assert_eq!((located.offset, located.map.clone()), (2, vec![(0, 1), (1, 2), (2, 3), (3, 0)]));
+    let relation = located.relation(&field, 0, 4).unwrap();
+    assert_eq!(relation.map(), &[Some(1), Some(2), Some(3), Some(0)]);
+    for passage in &passages {
+        let damaged = DamagedPassage::new(damage(passage), 4, 4).unwrap();
+        let releases = restrict(&damaged, &relation).unwrap().release().unwrap();
+        for &t in &erased {
+            match &releases[t] {
+                CellRelease::Released(class) => assert_eq!(*class, passage[t], "cell {t}"),
+                CellRelease::Held(family) => {
+                    assert_eq!(t, 1);
+                    assert_eq!(family, &vec![0, 1, 2, 3]);
+                }
+                CellRelease::Intact(_) => panic!("cell {t} was erased"),
+            }
+        }
+    }
+}

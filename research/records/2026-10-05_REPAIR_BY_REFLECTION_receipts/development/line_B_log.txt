@@ -1,0 +1,19 @@
+Running as unit: run-p355297-i4592888.service
+executed repair: line, damage B, seed 2026100701, 64 passages of 48 cells (opening 8); erased cells [7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47] (21 of 48)
+  first lock at 40 observations (2 passages plus 0): δ 4, map [(0, 0), (2, 2)]
+  n*_machine: located from 121 observations (6 passages plus 1) to the read set's end (1280 observations): δ 4, map [(0, 0), (1, 1), (2, 2), (3, 3)], cycle 1, turns [0]; survivors at the end [4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44]
+  the relation on ℤ/4: δ 4, consequences [Some(0), Some(1), Some(2), Some(3)]; 0 of 64 passages locate it from their own intact cells alone
+  released 640, held 704 of 1344 erased cells; released equal to the truth 640 of 640; valid classes of ℤ/4 640 of 640; sweeps at most 2; 1 ms
+  held, by cell: {7: 64, 11: 64, 15: 64, 19: 64, 23: 64, 27: 64, 31: 64, 35: 64, 39: 64, 43: 64, 47: 64}; by family: {[0, 1, 2, 3]: 704}
+  joint fibres N (passages): {4: 64}
+  the codec: key 18 bits + residual 128 bits (longest a passage 2; the Fold's bound Σ⌈log₂ N⌉ = 128) = 146 bits, against the literal 2688 bits; decoded: 64 of 64 passages reopened exactly, trailing bits 0
+  per passage: the key 18 + its residual against its literal 42 bits
+  the generating key [Some(0), Some(1), Some(2), Some(3)] is the located relation
+  n*_terrain (the repair's grain): the stopping object does not hold at the read set's end (1280 observations); 0 ms
+  n*_terrain (the syntactic class, S_k unchanged from here): 137 observations (6 passages plus 17); survivors at the end: 11 alive: ℓ 1 [· · · ·]; ℓ 4 [0 1 2 3]; ℓ 8 [0 1 2 3]; ℓ 12 [0 1 2 3]; ℓ 16 [0 1 2 3]; ℓ 20 [0 1 2 3]; ℓ 24 [0 1 2 3]; ℓ 28 [0 1 2 3]
+executed repair: 26 ms; resident 10211328 now, 10211328 peak
+          Finished with result: success
+Main processes terminated with: code=exited, status=0/SUCCESS
+               Service runtime: 40ms
+             CPU time consumed: 30ms
+                   Memory peak: 5.5M (swap: 0B)

@@ -1,7 +1,8 @@
 //! **`hnn_prediction`: step 1's harness, the executed comparison on known-truth terrain**
 //! (THE_REBUILD U6, step 1; #73, #148, #63). Its modes are the `executed …` subcommands of
 //! `hnn_executed_loop.rs` and, for loop 1c, `hnn_loop_1c.rs`, whose headers state each mode and its
-//! pins, and for lane B's keys and lane C's pair diagnostic `hnn_keys_loop.rs`; this file holds the
+//! pins, for lane B's keys and lane C's pair diagnostic `hnn_keys_loop.rs`, and for the first
+//! repair terrain `hnn_repair_loop.rs`; this file holds the
 //! declaration they share and dispatches to them. Committed commands run once in release, never a
 //! test.
 //!
@@ -23,6 +24,7 @@
 //! cargo run --release -p holonics --example hnn_prediction -- executed keys <terrain> <training seed> <count> <out>
 //! cargo run --release -p holonics --example hnn_prediction -- executed pair-members <terrain> <seed> <count> <state>
 //! cargo run --release -p holonics --example hnn_prediction -- executed text <cut> <private out dir> <dev|run> [<state> [<from> <to> [<unit bound ms>]]]
+//! cargo run --release -p holonics --example hnn_prediction -- executed repair <terrain> <A|B> <seed> <count> <out>
 //! ```
 //!
 //! [definition; agent-inferred, the order pin and the bank pin] **The declaration**
@@ -58,6 +60,8 @@ mod executed_loop;
 mod loop_1c;
 #[path = "hnn_keys_loop.rs"]
 mod keys_loop;
+#[path = "hnn_repair_loop.rs"]
+mod repair_loop;
 
 use std::collections::BTreeMap;
 use std::time::Instant;
@@ -594,6 +598,15 @@ fn main() {
             let bound = arguments.get(9).map(|a| a.parse().expect("a bound in ms"));
             keys_loop::text(&arguments[3], &arguments[4], &arguments[5], arguments.get(6).map(String::as_str), range, bound)
         }
+        // The first repair terrain: the located pair restricts the erased cells from both sides
+        // (research/records/2026-10-05_REPAIR_BY_REFLECTION_THE_LOCATED_PAIR_RESTRICTS_THE_ERASED_CELLS_FROM_BOTH_SIDES.md).
+        (Some("executed"), Some("repair")) => repair_loop::repair(
+            &arguments[3],
+            &arguments[4],
+            arguments[5].parse().expect("a seed"),
+            arguments[6].parse().expect("a count"),
+            &arguments[7],
+        ),
         (Some("executed"), Some("keys-probe")) => keys_loop::keys_probe(
             &arguments[3],
             arguments[4].parse().expect("a training seed"),

@@ -1,0 +1,19 @@
+Running as unit: run-p355268-i4533712.service
+executed repair: order2, damage A, seed 2026100701, 64 passages of 48 cells (opening 8); erased cells [3, 6, 7, 8, 9, 20, 21, 22, 23, 24, 33, 34, 35, 36, 44, 45, 46, 47] (18 of 48)
+  first lock at 50 observations (2 passages plus 0): δ 2, map [(0, 1), (1, 2), (2, 3), (3, 0)]
+  n*_machine: located from 50 observations (2 passages plus 0) to the read set's end (1600 observations): δ 2, map [(0, 1), (1, 2), (2, 3), (3, 0)], cycle 4, turns [15, 45]; survivors at the end [2, 4]
+  the relation on ℤ/4: δ 2, consequences [Some(1), Some(2), Some(3), Some(0)]; 0 of 64 passages locate it from their own intact cells alone
+  released 1088, held 64 of 1152 erased cells; released equal to the truth 1088 of 1088; valid classes of ℤ/4 1088 of 1088; sweeps at most 2; 1 ms
+  held, by cell: {3: 64}; by family: {[0, 1, 2, 3]: 64}
+  joint fibres N (passages): {4: 64}
+  the codec: key 18 bits + residual 128 bits (longest a passage 2; the Fold's bound Σ⌈log₂ N⌉ = 128) = 146 bits, against the literal 2304 bits; decoded: 64 of 64 passages reopened exactly, trailing bits 0
+  per passage: the key 18 + its residual against its literal 36 bits
+  the generating key [Some(1), Some(2), Some(3), Some(0)] is the located relation
+  n*_terrain (the repair's grain): 48 observations (1 passages plus 23) (the global family, lags [1, 40]); survivors there: 3 alive: ℓ 2 [1 2 3 0]; ℓ 4 [2 3 0 1]; ℓ 34 [1 0 2 0]; 4 ms
+  n*_terrain (the syntactic class, S_k unchanged from here): 70 observations (2 passages plus 20); survivors at the end: 2 alive: ℓ 2 [1 2 3 0]; ℓ 4 [2 3 0 1]
+executed repair: 22 ms; resident 10211328 now, 10211328 peak
+          Finished with result: success
+Main processes terminated with: code=exited, status=0/SUCCESS
+               Service runtime: 44ms
+             CPU time consumed: 28ms
+                   Memory peak: 7.3M (swap: 0B)
