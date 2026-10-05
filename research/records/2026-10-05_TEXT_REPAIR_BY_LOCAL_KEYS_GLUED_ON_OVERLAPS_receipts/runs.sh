@@ -19,7 +19,8 @@ timeout 7 systemd-run --user --wait --collect --pipe -p MemoryAccounting=yes \
   "$PWD/.local/text_repair/run" run > "$RECEIPTS/run_log.txt" 2> "$RECEIPTS/run_scope.txt"
 # The copy length of each released span against the training text (the cut's bytes [0, 6144)).
 for span in .local/text_repair/run/spans/*.bin; do
-  [ -e "$span" ] || continue
-  printf '%s ' "$(basename "$span" .bin)"
-  python3 tools/copy_length.py --release "$span" --passage .local/text_repair/run/training.bin
+  python3 tools/copy_length.py --release "$span" --passage .local/text_repair/run/training.bin --json \
+    | python3 -c "import json,sys; d=json.load(sys.stdin); print('$(basename "$span" .bin)', 'span', $(stat -c %s "$span"), 'copy_length', d['copy_length'])"
 done > "$RECEIPTS/copy_lengths.txt"
+# Paths in the logs are made relative to the worktree.
+sed -i "s#$PWD/##g" "$RECEIPTS"/*.txt

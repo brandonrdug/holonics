@@ -97,7 +97,7 @@ impl Cover {
         if region - stride < 2 * reach {
             return Err(refused(2 * reach, region - stride));
         }
-        if (length - region) % stride != 0 {
+        if !(length - region).is_multiple_of(stride) {
             return Err(refused(0, (length - region) % stride));
         }
         Ok(Self {

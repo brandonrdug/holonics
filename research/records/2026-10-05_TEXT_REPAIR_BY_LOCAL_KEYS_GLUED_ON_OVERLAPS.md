@@ -2,7 +2,10 @@
 
 **Date.** October 5. **Issues.** #73, #148, #63, #62. **Lanes.** B and C of U6 (THE_REBUILD, "U6's
 order from October 5", the paragraph "The task is repair, not continuation", its **Text** item).
-**Grade.** [definition; agent-inferred] for the pins of §0, fixed and committed before any read.
+**Grade.** [definition; agent-inferred] for the pins of §0, fixed and committed before any read
+(`a1a9de31`), amended after the development read and before the read (`f28373bf`); [measured] for
+every count of §4–§7 (`2026-10-05_TEXT_REPAIR_BY_LOCAL_KEYS_GLUED_ON_OVERLAPS_receipts/runs.sh` at
+`f28373bf`'s build).
 
 **Occasion.** The repair by reflection released every erased cell it certified on the synthetic
 terrains ([record](2026-10-05_REPAIR_BY_REFLECTION_THE_LOCATED_PAIR_RESTRICTS_THE_ERASED_CELLS_FROM_BOTH_SIDES.md)),
@@ -155,3 +158,173 @@ projection is the read count times the largest development unit, its deadline th
 upper end (`5/4`) under an outer `timeout`, launched in the background past 60 s; peak memory through
 `systemd-run --user --wait --collect -p MemoryAccounting=yes`; one thread (the harness is serial,
 within the budget of 8); stopped early past the unit bound; no limit raised.
+
+The computational object is the helical pair interaction. Of the
+[winding guide](../../docs/WINDING_CARRY_AND_PLACEMENT.md)'s six objects this loop touched **the
+pair** (the contact between crossings `δ` ticks apart, read per region), **the helix** (a distance is
+a residue of the source ring's clock; a relation's chains are the residue classes of `ℤ/δ`), **the
+tower thread** (the keys as sections over a cover, glued on the overlaps: unique, plural, obstructed)
+and **the tube** (the restriction `F_(k+1) = T(F_k) ∩ C_k` per glued region). The cell holonomy (the
+turn menu's loop law, unchanged) and faces and placement (not read) stay attached.
+
+## 1. The recorded failures this loop could repeat, and how each was held
+
+From the [lessons](2026-09-29_LESSONS_THE_FAILURES_THAT_REPEATED_AFTER_THEY_WERE_RECORDED.md), the
+[prototypes' lessons](2026-09-24_LESSONS_FROM_THE_WORKBENCH_AND_ATHENA_PROTOTYPES.md) and the
+[contamination cycles](2026-10-05_THE_CONTAMINATION_CYCLES_EVERY_COPY_PIPELINE_FOLLOWED_A_DEMAND_FOR_OUTPUT_BEFORE_THE_FIELD_COULD_RELEASE.md):
+- **2, recitation or an index of contexts.** The pinned step 3 repeated it: a plural fibre's
+  unpublished survivor restricts an erased cell through a pair read once elsewhere at the same
+  distance, a one-occurrence skip-relation index. The development read caught it (§0 amendment); the
+  library refuses it, and the read measures it once beside the located law (§4). The located law
+  reads only the passage's own intact cells through a published, located map; nothing is copied from
+  another passage, and each released span carries its copy length.
+- **3, text as the exception.** The cover, the gluing and the restriction read a clock, a relation
+  between two ticks and a class chart: a scan line of an 8-bit image, a μ-law sample stream or a
+  motor word's steps enter the same owner. The byte chart (`2⁸` ports) is the boundary codec, chosen
+  because the located relation refuses a folded port.
+- **Lesson 3, a located cause carried into a new consumer.** The text record's located cause (every
+  stationary turn fails within 4 to 12 edges) was named as this loop's expected blocker in the claim;
+  §5 measures where it binds at the regions' grain.
+- **1, an authored routine.** No distance, map or class is declared to the machine; the turn menus
+  decide each region's fibre, and the cover is derived from the menu's certificate and the declared
+  damage, not tuned.
+- **6, seen graded as unseen.** Nothing carries between passages: each passage's keys are located
+  from its own intact cells, and its erased cells' truths are read only after the release. The read
+  positions are fresh to the October 5 loops, and the development passages lie apart.
+- **7, bits read as progress.** The codec is reported beside the release, never as its success.
+- **9, a larger limit.** One deadline from the development read, not raised (§7).
+- **11, the programming language.** Stated as residue chains of `ℤ/δ`, turns of `ℤ/2⁸`, and
+  sections of a cover glued on overlaps.
+
+## 2. The design
+
+As fixed in §0 and its amendment. The equations at the consumer: per glued region `G` with located
+key `(δ, f)` and cells `C_G`,
+
+```text
+F_t = ⋂_(G ∋ t, keyed) proj_t { x ∈ ∏_(s ∈ C_G) F_s⁽⁰⁾ : x_s = f(x_(s−δ)) ∀ s, s − δ ∈ C_G }
+release_t ⇔ |F_t| = 1, t in exactly one keyed glued region, its restriction certified   (receiver::release, tolerance 0)
+reopen(damage(x), residual(x)) = x                                                       (the keys relocated from damage(x))
+```
+
+and the gluing of two regions `U, V` at `δ`: a compatible section exists exactly when the joint menu
+over `E_U(δ) ∪ E_V(δ)` admits a turn, the rotor gauge keeping every turn.
+
+## 3. What was built
+
+- `crates/holonics/src/compression/keys/local.rs`: `Cover` (its certificate `ω ≥ 2r` and tiling
+  refused otherwise), `menus`, `survivors`, `LocalKey`, `relation`, `fibre`, `Join`, `GluedRegion`,
+  `LocalRepair::{families, release, residual_code, reopen}`, `locate`; its tests
+  (`keys/local/tests.rs`): the cover's refusals; two local keys (an alternation and a constant) glued
+  within their halves, open across the empty seam region, every erased cell released equal to its
+  truth; and the brute-force check (400 drawn passages over `ℤ/4` where every key and join kind
+  occurs: a glued region has a member exactly when its key is one, its family is the member's
+  brute-force projection, a member is refused exactly when no completion satisfies it, every released
+  cell is its projection's one class, every residual reopens its passage).
+- `crates/holonics/src/compression/keys/turns.rs`: the windings law moves here as
+  `compression::keys::generator` (the library spine's S2), with `TurnMenu::relation` (the relation as
+  read); `hnn::keys::PairSurvivors::located` reads it, its local copy deleted.
+- `crates/holonics/src/compression/keys/repair.rs`: the one release decision factored as `decide`,
+  read by `Restriction::release` and `LocalRepair::release`.
+- `research/notebook/hnn_design/hnn_text_repair.rs`: `executed text-repair <cut> <out> <dev|run>`,
+  the located law and the pinned arm (`pinned_arm`, harness only); stdout counts only, every byte to
+  the private `<out>`.
+
+## 4. Measured: the read, once
+
+[measured] `run_log.txt` (64 passages, 768 erased cells, 320 regions, 256 joins). The two arms read
+the same keys and joins.
+
+| | Located law (the library) | Pinned step 3 (refused, measured) |
+|---|---|---|
+| regions: unread / empty / one / plural | 0 / 187 / 3 / 130 | the same |
+| joins: unique / plural / obstructed / open | 1 / 17 / 27 / 211 | the same |
+| glued regions; members; members the passage refused | 319; 2; 0 | 303; 173; 49 |
+| erased cells released | **11** (all spaces) | 40 (24 alphanumeric, 16 other) |
+| released equal to the truth | **11 of 11** | 15 of 40 (outside passage 58: 4 of 29, on 22 passages) |
+| held; with the whole alphabet; family holding the truth | 757; 757; 757 | 728; 446; 670 |
+| released bytes in their passage's alphabet | 11 of 11 | 40 of 40 |
+| passages reading as UTF-8 (damaged / repaired) | 64 / 64 | 64 / 63 |
+| residual against the literal (bits) | 6,056 = 2³·757 against 6,144 = 2¹¹·3 | 2,216 on the 24 passages it reopens; 40 refused |
+| keys by `key_code` (bits) | 4,624 = 2·2³·17² | 399,976 |
+
+- **The located law.** The three located regions are one passage's (58): an indentation run of
+  spaces, regions 0, 3 and 4 each the identity at `δ = 1`, the join of regions 3 and 4 the read's one
+  unique join. It releases 11 of that passage's 12 erased cells, every one equal to its truth; the
+  twelfth, inside a three-byte UTF-8 sequence beside the run, is held with the whole alphabet. On the
+  other 63 passages nothing is located and every erased cell is held with the whole alphabet. No
+  certificate failed.
+- **The codec.** The residual is the literal less 8 bits for each released cell (`6144 − 8·11`); the
+  64 passages reopen exactly. The keys, if coded rather than relocated, cost `2,312` bits a member,
+  above the literal on passage 58 (`4,624 + 8` against 96).
+- **The pinned step 3** releases 29 cells outside the indentation run, 25 of them wrong, and 58 of its
+  held families exclude their truth: the certificate failure the amendment predicted (most of its
+  releases wrong). Its 173 members are the plural fibres' unpublished survivors; the passage itself
+  refuses 49 of them (a family emptied through an erased chain).
+- **Copy lengths** (`copy_lengths.txt`). The located arm's five released spans (lengths 1, 1, 2, 3, 4)
+  have copy lengths 1, 1, 2, 2, 2 against the training text and equal to their lengths against their
+  own passage's intact cells (spaces). The pinned arm's 33 spans: copy length 0 at 2, 1 at 27, 2 at 4.
+- **Inside words.** 584 of the 768 erased truths are alphanumeric; the located law releases none of
+  them.
+
+## 5. The show, and the blocker
+
+The read set's passages 0 to 7, as pinned, are in `.local/text_repair/run/shown.txt` (private, not
+committed), with passage 58 beside them as the read's only located release. On all eight the located
+law holds every erased cell with the whole alphabet (96 cells); the pinned arm released 5 cells on
+four of them, 2 equal to their truth.
+
+**The blocker, by its measurement.** At the regions' grain (16 bytes, distances 1 to 4), no
+stationary turn of `ℤ/2⁸` publishes its map on text outside a run of one byte: 187 of 320 regions
+lose every distance, 130 keep only unpublished survivors (paths), and 3, all in one indentation run,
+locate. The gluing does not repair it: 211 of 256 joins have an unkeyed side, and of the 45 between
+keyed regions, 27 are obstructed and 17 plural. So the located law releases only inside a run of one
+byte (11 of 768, all right), and the plural fibres, read through their read pairs, release mostly
+wrong bytes (25 of 29 outside the run). The local stationary-turn family is not the passage's
+relation on text at this grain; its plural fibres are evidence of absence of a conflict, not of a key.
+
+## 6. Owed in #62
+
+1. **The gluing through the rotor gauge**: two regions' turn-menu fibres at `δ` have a compatible
+   section, up to the gauge, exactly when the joint menu over their edges admits a turn; with the
+   tower's trichotomy (`Foundation/ContinuingTower.gluingResult_total`) over the cover's chain.
+2. **The cover's certificate**: `ω ≥ 2r` puts every pair `(t − δ, t)`, `δ ≤ r`, inside one region, and
+   gives each overlap an edge on every residue chain of every read distance.
+3. **A located glued region's family is its member's projection**: the repair's projection law (owed
+   by the repair record) on the glued region's cells; the intersection across an unglued overlap
+   encloses the joint projection.
+
+## 7. Time and memory
+
+One thread (the harness is serial, within the budget of 8); `run_log.txt`, `run_scope.txt`,
+`dev_log_{1,2,3}.txt`.
+
+| Run | Projection / deadline (ms) | Measured (ms) | Peak resident |
+|---|---|---|---|
+| development (4 passages, both arms), three reads | — / guard 300,000 | 154, 152, 150 (units at most 85) | `VmHWM` at most 5,873,664 bytes; scope at most `4.4M` |
+| development, the pinned arm alone (before the amendment) | — / guard 300,000 | 154 (units at most 86) | `VmHWM` 5,947,392 bytes |
+| the read (64 passages, both arms) | 5,504 / 6,880 | 4,971 (scope runtime 4,993) | `VmHWM` 6,160,384 bytes; scope `7.5M` |
+
+Measured over projected: `4971/5504`. The per-unit bound `108 = ⌈86·5/4⌉` ms was passed by 19 units
+(the first, passage 2, at 121 ms; the largest, passage 12, at 487 ms), all by the pinned arm's
+certificates over plural glued regions of up to 4 members (the development passages held at most 2).
+The harness declared no in-run stop and no watcher applied the bound, so the read was not stopped
+early: a departure from the waiting standard, reported as such. It finished inside its projection and
+deadline.
+
+## 8. Commits and gates
+
+- `a1a9de31`: the claim and the pins, before any read. `f28373bf`: the owner, the harness, the
+  development receipts and the amendment, before the read. This record's commit: the read's receipts
+  (counts only: `run_log.txt`, `run_scope.txt`, `copy_lengths.txt`, `runs.sh`), §1–§8, the atlas row
+  `compression.local-keys-glue` and `hnn.pair-location`'s owner, the operator contract's `local`, and
+  the records README route. No byte of text is committed.
+- Gates: `cargo check --workspace --all-targets` clean (the one pre-existing dead-code warning,
+  `ReceivingPhases::with_rank`); `cargo test -p holonics --lib -- --test-threads=8 compression::keys
+  hnn::tests::keys`, 37 passed and 0 failed (14,795 ms wall with its build); the guard lints
+  (`cargo clippy -p holonics --lib -- -D clippy::disallowed_types -D clippy::disallowed_methods -D
+  clippy::float_arithmetic`) report nothing in the changed files beyond `result_large_err`, which every
+  `CompressionError` owner carries (the run stops at a pre-existing default-deny
+  `while_immutable_condition` in `hnn/reference.rs`, untouched here); `Cover::declare`'s tiling test
+  reads `is_multiple_of` after the read, the same condition. No Lean changed (§6 names the
+  obligations); no card run (no kernel or card path changed).
