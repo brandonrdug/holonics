@@ -132,4 +132,6 @@ pub enum CompressionError {
     Contradicted { cell: usize },
     #[error("the release law refused the repair's width: {0}")]
     ReleaseLaw(String),
+    #[error("the carry helix refuses its declaration: {reason}")]
+    Helix { reason: &'static str },
 }

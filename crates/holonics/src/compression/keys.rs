@@ -52,6 +52,7 @@ use crate::navigator::Clock;
 mod edges;
 pub mod local;
 pub mod repair;
+pub mod transport;
 mod turns;
 
 pub use edges::{Edge, Propagation};

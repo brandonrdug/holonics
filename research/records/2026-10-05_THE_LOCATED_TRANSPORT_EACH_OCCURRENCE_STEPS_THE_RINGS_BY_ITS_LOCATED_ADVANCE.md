@@ -140,6 +140,61 @@ A located class other than the generator's, a fibre without the truth, a relabel
 the located transport or the code length, a square that fails, a released cell that differs from
 its truth, or a code at or above the literal falsifies the claim.
 
+### 0.6 Amendment, after the development reads and before the read
+
+[measured; agent-inferred; receipts `2026-10-05_THE_LOCATED_TRANSPORT_receipts/development/`]
+The owner's tests, the development read (`2_026_100_901`) and location-only reads on draws no read
+uses (`2_026_100_941` to `956`) found five defects in §0 as pinned. None is in the location's
+exactness: the brute-force test holds the survivors, with their lifts, equal to the fibre.
+1. **The read set's shape.** On 16 passages of 60 cells from drawn keys the autonomous orbits fall
+   into short attractor cycles. A class visited only at a passage's start is probed at few lifts,
+   and its advance stays plural within a window (one of four exploration draws was one class). The
+   read set becomes the helix's 60 keys in their drawn order (`Draw::new(seed)` after the terrain,
+   each key a uniform pick among those left). The first 48 open passages of 120 cells, two turns of
+   the joint clock (5,760 observations). The 12 keys left open the repair passages of 60 cells:
+   openings no read passage used. The repair seeds `2_026_100_92x` are not used.
+2. **The fibre can stay plural with every key read.** Of the 16 exploration draws, 7 locate one
+   gauge class at 48 keys and 9 at all 60. The rest keep 2 to 313 classes. The members are not
+   only the dihedral images: on the development draw the second member shifts three classes'
+   advances by multiples of the grain (`28 → 16`, `24 → 48`, `17 → 29`) with relabelled cells, and
+   every member regenerates every read passage from some key. The receiving grain does not
+   separate them on the read set. "One gauge class on every draw" is withdrawn, refuted in
+   development. The read reports the fibre with its members, and the repair restricts through
+   every member (`restrict_fibre`): a cell is released only where every kept member's certified
+   family is the same one class.
+3. **`n*_machine ≤ 240` is refuted in development.** The exploration reads 260 to 7,095 and the
+   development draw 3,485: the last members die at a rare boundary crossing in a late passage.
+   `n*_machine` is reported against `n_U = 16`.
+4. **The founded dimension is `D − (D_low − 1) = 49`, not 60.** The receiving forms are the shifts of
+   one cell's indicator, an interval of 12 lifts. Its discrete Fourier transform vanishes at the 11
+   nonzero multiples of 5, so the readings span 49 dimensions of `ℚ^60` [proved-derived; the
+   owner's test reads `25 = 30 − 5` on `(2, 3, 5)`, and the development read 49].
+5. **Relabelling reads 24 permutations a draw**: every fifth of the 120 in lexicographic order, the
+   identity first. One exploration draw's location took 30,985 ms, so all 120 would take about an
+   hour on such a draw. The owner's test reads 12 permutations on its small helix.
+
+**The amended claim**, on every read draw (`2_026_100_911` to `914`):
+- **Location.** The generator's gauge representative is a member, and every member regenerates
+  every read passage from some key. The outcome is reported with its member count, and
+  `n*_machine ≥ n_U = 16` where the fibre is one class.
+- **Relabelling.** For the 24 permutations, the fibre is carried, `n*_machine` is equal and the
+  code length is equal. The residue chart's code length changes under at least one permutation.
+- **Founding.** The squares hold. Where the advances generate `ℤ/60`, 60 lifts are reached and the
+  founded dimension is 49.
+- **Code.** The located code, `30 + 7 + 48·6 + ⌈log₂ 5761⌉ = 338` bits, reopens the read set
+  against the literal of `17,280`. The residue chart's code is longer.
+- **Repair.** Every released cell equals its truth, and every passage reopens from its residual.
+  On a one-class draw at least nine tenths of the 276 erased cells are released. The residual is
+  below the literal of `828` bits.
+
+**The projection** [measured]. The development draw took 6,354 ms in all and peaked at 25.4 MB
+(systemd scope), its location 39 ms. The largest location measured before launch is 30,985 ms
+(exploration seed `953` at 60 keys, first read; its receipt's re-read gives 30,555 ms). A draw's unit is then at most 25 locations (the read and 24 relabellings),
+`25 · 30,985 = 774,625` ms, plus the residue chart's 25 codes, the founding and the repair. The
+development read gives 6,354 − 25 · 39 ms for those, so 800,000 ms a draw is the projection. The
+deadline is `5/4` of it, 1,000 s under an outer `timeout`. The four draws run together, one thread
+each (4 of the budget of 8), each in its own systemd scope.
+
 The computational object is the helical pair interaction. Of the
 [winding guide](../../docs/WINDING_CARRY_AND_PLACEMENT.md)'s six objects this loop touches **the
 helix** (circle + carry: the odometer's carries are the hidden rings' winding read by the receiving
@@ -174,3 +229,73 @@ the [prototypes' lessons](2026-09-24_LESSONS_FROM_THE_WORKBENCH_AND_ATHENA_PROTO
   measurement; none is relaunched past it.
 - **11, the programming language.** The design is stated as a lift on a helix, its charts (digits
   with carry, CRT residues), loop closure at a grain, a dihedral gauge and a fibre.
+
+## 2. The design, and its equations
+
+**The helix and its two charts** (`compression::keys::transport::CarryHelix`). The rings' lift
+`ℓ ∈ ℤ/D` read as digits with carry (`digits`, `step_digits`, checked against
+`geometry::winding::Odometer` on every lift and advance of `(3, 4, 5)`) and as CRT residues
+(`residues`, adding with no carry). The receiving cell is the last digit, `c(ℓ) = ⌊ℓ / D_low⌋`.
+
+**The terrain** (`SteppedTerrain`, known truth by an exact routine): `u_k = λ(c(ℓ(k)))`,
+`ℓ(k+1) = ℓ(k) + A(u_k)`. Its step map `F(ℓ) = ℓ + A(λ(c(ℓ)))` translates each cell by its class's
+advance: the passage is the receiving reading of one orbit of `F` on `ℤ/D`, eventually periodic, and
+one class is followed by different classes as the hidden lift's carry differs.
+
+**Location by loop closure** (`TransportLocation::locate`). A survivor is `(A|_seen, λ|_seen, L)`,
+the advances read so far, the labels read so far and the lifts it admits at the current emission.
+At each emission `u_(k+1)` after `u_k`:
+
+```text
+moved = L + A(u_k)                      (each a ∈ ℤ/D when A(u_k) is unread: the branch)
+L′ = moved ∩ cell(λ⁻¹(u_(k+1)))         when u_(k+1) is labelled
+   = moved ∩ cell(c), λ(c) := u_(k+1)   for each unlabelled c otherwise (the branch)
+a passage's first emission: moved = ℤ/D; the read set's first: L = cell 0, λ(0) := u_0 (the rotation gauge)
+```
+
+A survivor dies when `L′` is empty: the loop from the class's last visit does not close at the
+receiving grain. The survivors are explored depth first; the count at each observation is the
+number of survivors there. The fibre's members are the complete survivors' gauge classes, each
+represented by itself or its reflection, whichever orders first in the classes' first-occurrence
+order (`gauge_representative`).
+
+**The code** (`located_code`, `read_located`; `residual_code`, `read_residual` for any fixed
+transport): description `d_r ⌈log₂ D⌉`, labels `⌈log₂ |A|!⌉`, keys `P ⌈log₂ D⌉`, patch count
+`⌈log₂(n + 1)⌉`, patches `⌈log₂ n⌉ + ⌈log₂(|A| − 1)⌉` each; decoded by stepping the lift by each
+decoded class.
+
+**The consumer** (`LocatedTransport::chart`, read by `hnn::encoding::{PassageChart, Encoding}`
+unchanged): `ℚ^D`, `T_u e_ℓ = e_(ℓ + A(u))`, `ρ_c = Σ_(λ(c(ℓ)) = c) e_ℓ*`, openings at the located
+keys; `Encoding::squares` checks `D E = ρ`, `E T_u = U_u E` on every reached state.
+[proved-derived] Where the advances generate `ℤ/D` every lift is reached, and the readings are
+the shifts of one cell's indicator, an interval of `D_low` lifts. Its discrete Fourier transform
+`Σ_(j<D_low) ω^(jk)` vanishes exactly at the `D_low − 1` nonzero multiples of `D/D_low`, so the
+founded dimension is `D − (D_low − 1)`: the receiving grain is silent on those modes of the hidden
+rings.
+
+**Repair** (`LocatedTransport::restrict`, `restrict_fibre`, `lift_residual`, `lift_reopen`):
+
+```text
+L_t⁽⁰⁾ = cell(λ⁻¹(x_t)) intact, ℤ/D erased
+L_(t+1) ← L_(t+1) ∩ F(L_t);   L_t ← L_t ∩ F⁻¹(L_(t+1))       to the fixed point (a chain: the projection)
+certified ⇔ L_t = {F^t(k) : k a key whose orbit meets every intact cell}
+fibre: classes_t = ∪_(members m kept) {λ_m(c(ℓ)) : ℓ ∈ L_t^m};  released ⇔ one class and every kept m certified
+```
+
+## 3. What was built
+
+- `crates/holonics/src/compression/keys/transport.rs`: `CarryHelix`, `SteppedTerrain`,
+  `LocatedTransport` (`digits`, `residues`, `reflected`, `regenerate`, `keys`, `chart`,
+  `restrict`), `TransportLocation` (`locate`, `curve`, `located_from`, `members`, `fibre`),
+  `gauge_representative`, `unicity_count`, the code (`located_code`, `read_located`,
+  `residual_code`, `read_residual`), the repair (`LiftRestriction`, `restrict_fibre`,
+  `FibreRestriction`, `lift_residual`, `lift_reopen`); `CompressionError::Helix`.
+- Its tests (`transport/tests.rs`): the two charts are one lift (against `Odometer`); the reflection
+  is a gauge (every key, two helices); the location equals the brute-force fibre (24 drawn read
+  sets on `(2, 3)`, survivors with their lifts, in reflection pairs); the generator is a member and
+  every member regenerates the read set (`(2, 3, 5)`, every key); the unicity count `16`; the
+  relabelling law (12 permutations, against the residue chart); the located code reopens its read
+  set (143 bits for sixteen passages of sixty cells); the encoding founds the helix (`25 = 30 − 5`);
+  the repair releases only truth and reopens every passage.
+- `research/notebook/hnn_design/hnn_transport_loop.rs`: `executed transport <seed> <read keys>
+  <length> <out> [locate]`.
