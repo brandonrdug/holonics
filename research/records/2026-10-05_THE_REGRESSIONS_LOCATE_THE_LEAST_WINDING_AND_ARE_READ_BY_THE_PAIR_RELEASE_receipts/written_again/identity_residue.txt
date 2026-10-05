@@ -1,0 +1,6 @@
+# python3 identity_residue.py <the blanked form of 9914bc5a's order-2 opening>
+the current form: 9592855 bytes, residue 104264994666183845477397678652967047577
+rings writing `resonator_scales: []`: 3
+with the four zero scales back: 9593209 bytes, residue 103161117504419837108713553728969586688
+the identity every October 5 state carries: 103161117504419837108713553728969586688
+the identity every state written again carries: 104264994666183845477397678652967047577

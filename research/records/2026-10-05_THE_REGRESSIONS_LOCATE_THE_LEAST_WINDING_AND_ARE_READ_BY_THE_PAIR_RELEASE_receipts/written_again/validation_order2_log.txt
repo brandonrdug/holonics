@@ -1,0 +1,8 @@
+  keys-founded (transport modulus 102837/131072; closed pair contacts at [2]): released 64, held 0, refused 0, refused certificates 0; whole sections 64 of 64 (nonconstant 64 of 64, constant 0 of 0); the success rule (every nonconstant section whole): holds; incorrect releases 0; reaching the termination 0; stations right 512 by station [64, 64, 64, 64, 64, 64, 64, 64]; first lock at a request-reading station (0 or 1) 64, first lock right 64; 38682 ms
+  keys-lossless (transport modulus 1; closed pair contacts at [2]): released 64, held 0, refused 0, refused certificates 0; whole sections 64 of 64 (nonconstant 64 of 64, constant 0 of 0); the success rule (every nonconstant section whole): holds; incorrect releases 0; reaching the termination 0; stations right 512 by station [64, 64, 64, 64, 64, 64, 64, 64]; first lock at a request-reading station (0 or 1) 64, first lock right 64; 42965 ms
+executed evaluate: 82184 ms; resident 44449792 now, 141385728 peak
+--- scope: exit 0; memory.peak 138326016 bytes
+Main processes terminated with: code=exited, status=0/SUCCESS
+               Service runtime: 1min 22.240s
+             CPU time consumed: 14min 335ms
+wall 82257 ms
