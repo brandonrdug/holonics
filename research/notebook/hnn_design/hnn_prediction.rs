@@ -1,7 +1,7 @@
 //! **`hnn_prediction`: step 1's harness, the executed comparison on known-truth terrain**
 //! (THE_REBUILD U6, step 1; #73, #148, #63). Its modes are the `executed …` subcommands of
 //! `hnn_executed_loop.rs` and, for loop 1c, `hnn_loop_1c.rs`, whose headers state each mode and its
-//! pins, and for lane B's keys `hnn_keys_loop.rs`; this file holds the
+//! pins, and for lane B's keys and lane C's pair diagnostic `hnn_keys_loop.rs`; this file holds the
 //! declaration they share and dispatches to them. Committed commands run once in release, never a
 //! test.
 //!
@@ -21,6 +21,7 @@
 //! cargo run --release -p holonics --example hnn_prediction -- executed causal <terrain> <seed> <count> <label[=E]>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed joined <terrain> <seed> <count> <arm> <label=source>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed keys <terrain> <training seed> <count> <out>
+//! cargo run --release -p holonics --example hnn_prediction -- executed pair-members <terrain> <seed> <count> <state>
 //! ```
 //!
 //! [definition; agent-inferred, the order pin and the bank pin] **The declaration**
@@ -574,6 +575,14 @@ fn main() {
             &arguments[3],
             arguments[4].parse().expect("a training seed"),
             arguments[5].parse().expect("a training count"),
+            &arguments[6],
+        ),
+        // Lane C: the pair storage's members along the target's trajectory (a diagnostic,
+        // research/records/2026-10-05_THE_RELEASE_READS_THE_LOCATED_PAIR_ON_EQUAL_MATERIAL.md).
+        (Some("executed"), Some("pair-members")) => keys_loop::pair_members(
+            &arguments[3],
+            arguments[4].parse().expect("a seed"),
+            arguments[5].parse().expect("a count"),
             &arguments[6],
         ),
         (Some("executed"), Some("keys-probe")) => keys_loop::keys_probe(

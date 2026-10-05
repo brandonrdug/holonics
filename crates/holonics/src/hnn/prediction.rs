@@ -166,6 +166,37 @@
 //! acoustic stream's samples at theirs cross the section as a text's bytes do, and a periodic
 //! component of any stream is a spectral line the bank's lock's flip continues.
 //!
+//! [definition; agent-inferred, October 5; lane C (S3) of U6, the
+//! [record](../../../../research/records/2026-10-05_THE_RELEASE_READS_THE_LOCATED_PAIR_ON_EQUAL_MATERIAL.md)]
+//! **The release reads the located pair on equal material.** Learning locates a key, a pair contact
+//! between two crossings `δ` ticks apart with its class map `f`, and deposits it as the source port's
+//! pair component, `(E − B) T = P^δ B` on the located classes (`hnn::executed::pair_deposit`). The
+//! span's reading cannot consume it: each datum enters at `ρ^|distance|`, so the nearest lock
+//! outweighs the pair, and a class's own column's resonance power decides between classes (the
+//! record's §1). The release now reads, from the material alone:
+//!
+//! - **which contacts are closed** ([`closed_pairs`]): the distances at which a pair contact on the
+//!   source port has zero slip against the field's declared port, the deposit's consumer read back;
+//!   the key's distance is never passed in by a caller;
+//! - **each candidate's pair storage** ([`BankPlacement::pair_storage`]): the candidate's datum and
+//!   the crossings a closed contact joins to it (residues `c_j ± δ`, from the request or from the
+//!   section's locked stations), through the contact's own channel, the turn `P^δ` the deposit
+//!   carried (modulus one, so without the tube's contraction `ρ^δ`), beside its own column alone at
+//!   the same weight;
+//! - **the gain on equal material** (`gain`), read mode by mode: at each member of the bank, the
+//!   ratio of the pair storage's growth to the column's alone, and the least of them over the members,
+//!   with no scalar weight chosen, which the lock
+//!   iteration's flip and gap read in place of the joint growth; the bank locks on the pair
+//!   storage's own joint growth and certifies it there.
+//!
+//! The release stays one joint refinement: every open station a closed contact joins to a placed
+//! crossing is read in each refinement, the largest gaps lock together, and a locked station is
+//! placed for the next; a station no contact joins yet waits (its antecedent, or its consequence,
+//! locks first). Nothing is drawn and re-ingested, and nothing is compared with a target. The
+//! consumer equation on a terrain that knows `T`: the released class at `t` is `f` of the class at
+//! `t − δ`, `ρ(F^K(I_h)) = T(request)`. A material with no closed contact (every opening) is read
+//! by the span's law above, unchanged.
+//!
 //! | Law | Lean | Rust |
 //! |---|---|---|
 //! | the joint section is not the product of its marginals | `HNN/Prediction.joint_not_marginals` (and `Computation/JointReceiverWitness`) | [`bank_release`] reads every station from one placement |
@@ -176,6 +207,7 @@
 //! | a landing's normalization and entry, read apart (loop 1c's diagnostic, never a law) | `HNN/IndexedOpen.{transported_weight_insert, transported_weight_insert_scale}` | [`BankPlacement::storage_over`] |
 //! | the release's order read as a diagnostic factor (the law is [`LockOrder::Gap`]) | abstracted in `HNN/ExecutedComparison.decisions_release_the_section` | [`LockOrder`], [`bank_release_ordered`] |
 //! | the lock set: every station the readings do not certify below the largest gap | `HNN/ExecutedComparison.{certifiedLock_largest, leader_locks, lone_lock_is_largest, certified_order_needs_crossing, certifiedLock_exact}` | [`uncertified_largest`] |
+//! | the closed pair contacts, the pair storage and the gain on equal material | owed in #62 (lane C's record §8) | [`closed_pairs`], [`BankPlacement::pair_storage`], `gain` |
 
 use num_bigint::BigInt;
 use num_traits::{One, Signed, ToPrimitive, Zero};
@@ -400,7 +432,9 @@ pub fn mask(draw: &mut Draw, stations: usize) -> Vec<bool> {
 /// reading's growth, and the executed turn's ticks whose balance closed, of those run), with each
 /// lock's station, class, growth and runner-up growth; and the lock whose Floquet certificate was
 /// refused, if one was, where the release stopped and held (September 30: a refused certificate
-/// refuses the lock, never a tally).
+/// refuses the lock, never a tally). Where the material holds pair contacts closed (their distances
+/// in `contacts`; [`BankPlacement::contacts`]), each decision's enclosures are the candidates' gains
+/// over their own columns read alone ([`BankPlacement::pair_storage`]), not their growths.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct BankGeneration {
     pub release: SectionRelease,
@@ -413,6 +447,43 @@ pub struct BankGeneration {
     pub ticks: usize,
     pub decisions: Vec<(usize, usize, Growth, Growth)>,
     pub uncertified: Option<(usize, usize)>,
+    pub contacts: Vec<usize>,
+}
+
+/// [definition; agent-inferred, October 5; lane C's
+/// [record](../../../../research/records/2026-10-05_THE_RELEASE_READS_THE_LOCATED_PAIR_ON_EQUAL_MATERIAL.md)
+/// §3] **A candidate's gain on equal material**: at each member of the bank (each pump phase), the
+/// ratio of its pair storage's growth to its own column's read alone, enclosed exactly
+/// (`[L_pair/U_alone, U_pair/L_alone]`), and the least of them over the members
+/// ([`BankPlacement::pair_storage`]). A growth is a multiplier over the turn, so the gain is a
+/// ratio, and a class's own column, whatever its resonance power, enters both of its terms. The
+/// least member reads the gain that holds in every frame of the bank: a candidate that fits the
+/// contact adds its antecedent's image coherently on every spectral line, at every member, while a
+/// class whose line the contact's distance carries to itself only at some members (the copy of
+/// the antecedent at `δ = 2`, where on the flat ring `P^δ = +1` at two of the four quarter-turn
+/// members and `−1` at the other two) gains at those and loses at the rest. The members resolve the
+/// reading by mode: no scalar weight is set between the members or between the two storages.
+/// Refused, typed, on a reading alone whose
+/// lower end is not positive.
+fn gain(pair: &TurnReading, alone: &TurnReading) -> Result<Growth, HnnError> {
+    let mut least: Option<Growth> = None;
+    for (p, a) in pair.members.iter().zip(&alone.members) {
+        if !a.lower.is_positive() {
+            return Err(HnnError::NonpositiveDeclaration);
+        }
+        let ratio = Growth {
+            lower: &p.lower / &a.upper,
+            upper: &p.upper / &a.lower,
+        };
+        least = Some(match least {
+            None => ratio,
+            Some(least) => Growth {
+                lower: least.lower.min(ratio.lower),
+                upper: least.upper.min(ratio.upper),
+            },
+        });
+    }
+    least.ok_or(HnnError::NonpositiveDeclaration)
 }
 
 /// [definition; agent-inferred, September 30] **One refinement of the bank's lock iteration**
@@ -471,6 +542,13 @@ impl JointGrowth for TurnCovector {
 /// is deposited: the constitution is read at its cut (`E`, placed through the source port), and the
 /// bank's members are declared. The readings of one refinement are co-present regions: shared
 /// immutable input, one output each, so they run on the host's cores.
+///
+/// [definition; agent-inferred, October 5] **Where the material holds a pair contact closed**
+/// ([`closed_pairs`], read at the placement from the material and the field's declared port), each
+/// candidate's storage is its pair storage and its decision enclosure its gain on equal material
+/// (module header, "The release reads the located pair on equal material";
+/// [`BankPlacement::pair_storage`]); only the stations a closed contact joins to a placed crossing
+/// are read in a refinement, and the bank locks on the pair storage's joint growth.
 #[allow(clippy::too_many_arguments)]
 pub fn generate_by_bank(
     field: &Field,
@@ -622,58 +700,83 @@ fn release_iteration<R: JointGrowth + Send + Sync>(
     let mut uncertified = None;
     let (mut refinements, mut readings, mut certified, mut members) = (0, 0, 0, 0);
     let (mut ticks_closed, mut ticks) = (0, 0);
+    // The pair contacts the material holds closed: with any, every candidate reads its own pair
+    // storage against its own column alone (`BankPlacement::pair_storage`).
+    let joined = !placement.contacts().is_empty();
     while locked.iter().any(Option::is_none) {
         let placed = locked.clone();
-        // Each candidate reads the span from its own station (the station-framed law).
+        // Each candidate reads the span from its own station (the station-framed law), or, where
+        // the material carries pair contacts, the crossings its contacts join to it.
         let storage = |station: usize, class: usize| -> Vec<Rat> {
+            if joined {
+                let (pair, _) = placement
+                    .pair_storage(station, class, &placed)
+                    .expect("a station joined to a placed crossing");
+                return pair;
+            }
             let mut cells = placed.clone();
             cells[station] = Some(class);
             placement.storage(station, &cells)
         };
         let open: Vec<(usize, usize)> = (0..stations)
             .filter(|&station| locked[station].is_none())
+            .filter(|&station| !joined || placement.joins(station, &placed))
             .flat_map(|station| (0..alphabet).map(move |class| (station, class)))
             .collect();
-        let read: Vec<R> = open
+        let both: Vec<(R, Option<R>)> = open
             .par_iter()
-            .map(|&(station, class)| read(&turn(&storage(station, class))))
+            .map(|&(station, class)| {
+                if joined {
+                    let (pair, alone) = placement
+                        .pair_storage(station, class, &placed)
+                        .expect("a station joined to a placed crossing");
+                    Ok((read(&turn(&pair))?, Some(read(&turn(&alone))?)))
+                } else {
+                    Ok((read(&turn(&storage(station, class)))?, None))
+                }
+            })
+            .collect::<Result<Vec<_>, HnnError>>()?;
+        // Each candidate's decision enclosure: its joint growth, or, on equal material, its gain
+        // over its own column read alone.
+        let decided: Vec<Growth> = both
+            .iter()
+            .map(|(reading, alone)| match alone {
+                Some(alone) => gain(reading.reading(), alone.reading()),
+                None => Ok(reading.joint().clone()),
+            })
             .collect::<Result<Vec<_>, HnnError>>()?;
         refinements += 1;
-        readings += read.len();
+        readings += both.iter().map(|(_, alone)| 1 + usize::from(alone.is_some())).sum::<usize>();
+        let read: Vec<R> = both.into_iter().map(|(reading, _)| reading).collect();
         // Each unlocked station's lock's flip: its top candidate and its gap's enclosure, the
         // certain gap `L_top − max U` (the gap read) and its upper end `U_top − max L`.
         let mut gaps: Vec<(usize, usize, Rat)> = Vec::new();
         let mut gap_uppers: Vec<Rat> = Vec::new();
         let mut station_tops = Vec::new();
-        for (index, chunk) in read.chunks(alphabet).enumerate() {
+        for (index, chunk) in decided.chunks(alphabet).enumerate() {
             let station = open[index * alphabet].0;
             let best = (0..alphabet)
-                .max_by(|&a, &b| {
-                    chunk[a]
-                        .joint()
-                        .lower
-                        .cmp(&chunk[b].joint().lower)
-                        .then(b.cmp(&a))
-                })
+                .max_by(|&a, &b| chunk[a].lower.cmp(&chunk[b].lower).then(b.cmp(&a)))
                 .expect("a class");
             tops[station] = best;
             station_tops.push((station, best));
-            let top = chunk[best].joint();
+            let top = &chunk[best];
             let runner = (0..alphabet)
                 .filter(|&class| class != best)
-                .map(|class| chunk[class].joint().upper.clone())
+                .map(|class| chunk[class].upper.clone())
                 .max();
             let flips = (0..alphabet)
                 .filter(|&class| class != best)
-                .all(|class| top.exceeds(chunk[class].joint()));
-            if flips && top.is_locked() {
+                .all(|class| top.exceeds(&chunk[class]));
+            // The bank locks on the candidate's own storage: its joint growth past one.
+            if flips && read[index * alphabet + best].joint().is_locked() {
                 let gap = match &runner {
                     Some(runner) => &top.lower - runner,
                     None => top.lower.clone(),
                 };
                 let floor = (0..alphabet)
                     .filter(|&class| class != best)
-                    .map(|class| chunk[class].joint().lower.clone())
+                    .map(|class| chunk[class].lower.clone())
                     .max();
                 let gap_upper = match &floor {
                     Some(floor) => &top.upper - floor,
@@ -695,7 +798,7 @@ fn release_iteration<R: JointGrowth + Send + Sync>(
                 .iter()
                 .position(|&pair| pair == (station, class))
                 .expect("a read candidate");
-            let reading = read[index].joint().clone();
+            let reading = decided[index].clone();
             let amplitudes = turn(&storage(station, class));
             let certificate = if forced.is_some() {
                 Ok(None)
@@ -722,7 +825,7 @@ fn release_iteration<R: JointGrowth + Send + Sync>(
             members += bank.pumps().len();
             let runner = (0..alphabet)
                 .filter(|&other| other != class)
-                .map(|other| read[index - class + other].joint().clone())
+                .map(|other| decided[index - class + other].clone())
                 .max_by(|a, b| a.upper.cmp(&b.upper))
                 .expect("a runner-up");
             decisions.push((station, class, reading, runner));
@@ -773,6 +876,7 @@ fn release_iteration<R: JointGrowth + Send + Sync>(
             ticks,
             decisions,
             uncertified,
+            contacts: placement.contacts().to_vec(),
         },
         kept,
     ))
@@ -834,6 +938,10 @@ pub struct BankPlacement {
     /// `ρ^r` for every distance `r < d + m`.
     powers: Vec<Rat>,
     population: u64,
+    /// The receiving ring's period `d`.
+    period: u64,
+    /// The distances at which the source port holds a pair contact closed ([`closed_pairs`]).
+    contacts: Vec<usize>,
 }
 
 impl BankPlacement {
@@ -902,12 +1010,106 @@ impl BankPlacement {
             stations,
             powers,
             population: moment.population(ring)?,
+            period,
+            contacts: closed_pairs(field, constitution, ring)?,
         })
     }
 
     /// The navigator's transport modulus the placement weighs at.
     pub fn modulus(&self) -> &Rat {
         &self.modulus
+    }
+
+    /// **The pair contacts the release reads**: the distances `δ` at which the source port holds a
+    /// pair contact closed ([`closed_pairs`]), read from the material at the placement; empty on a
+    /// port that carries no located pair.
+    pub fn contacts(&self) -> &[usize] {
+        &self.contacts
+    }
+
+    /// Whether a residue lies `δ` ticks from another on the receiving ring, either way round, for
+    /// a closed contact's `δ`: `r ≡ ±δ (mod d)`.
+    fn contact_distance(&self, distance: u64) -> bool {
+        let r = distance % self.period;
+        self.contacts.iter().any(|&delta| {
+            let delta = delta as u64 % self.period;
+            r == delta || r == (self.period - delta) % self.period
+        })
+    }
+
+    /// **The crossings a closed pair contact joins to station `j`**: every request phase and every
+    /// placed station whose residue lies `δ` ticks from `c_j`, either way round, for each closed
+    /// contact's `δ`; each with its count and its read (a request phase's raw counts read, a
+    /// station's class image).
+    fn partners<'a>(&'a self, station: usize, cells: &[Option<usize>]) -> Vec<(u64, &'a Vec<Rat>)> {
+        let mut partners: Vec<(u64, &Vec<Rat>)> = self
+            .reads
+            .iter()
+            .filter(|(lag, _, _)| self.contact_distance(Self::request_distance(station, *lag)))
+            .map(|(_, count, read)| (*count, read))
+            .collect();
+        for (placed, cell) in cells.iter().enumerate() {
+            if let Some(class) = cell
+                && placed != station
+                && self.contact_distance(Self::station_distance(station, placed))
+            {
+                partners.push((1, &self.images[placed][*class]));
+            }
+        }
+        partners
+    }
+
+    /// Whether a closed pair contact joins station `j` to a placed crossing ([`BankPlacement::partners`]).
+    pub fn joins(&self, station: usize, cells: &[Option<usize>]) -> bool {
+        !self.partners(station, cells).is_empty()
+    }
+
+    /// [definition; agent-inferred, October 5; lane C's
+    /// [record](../../../../research/records/2026-10-05_THE_RELEASE_READS_THE_LOCATED_PAIR_ON_EQUAL_MATERIAL.md)]
+    /// **A candidate's pair storage and its own column alone, on equal material.** The candidate
+    /// `x` at station `j` and the crossings the source port's closed pair contacts join to it
+    /// ([`BankPlacement::partners`]: residues `c_j ± δ`, from the request or from the section's
+    /// locked stations), as one population at the contact's own weight. The contact's channel is the
+    /// turn the deposit carried, `U = P^δ` (`(E − B) T = P^δ B`): a rotation of the ring, a mode of
+    /// modulus one, stored and carried without loss. So the partner is read through it without the
+    /// tube's contraction `ρ^δ`, which every datum of the span takes alike (one scalar modulus a
+    /// ring) and which made the nearest lock outweigh the pair; no weight is chosen, and none is cut
+    /// off,
+    ///
+    /// ```text
+    /// z_pair(j, x) = ν̂(N) ( P^(λ−c_j) E e_x + Σ_(p joined to j) P^(λ−c_p) E M[p] ),   N = 1 + Σ_p n(p)
+    /// z_alone(j, x) = ν̂(N) P^(λ−c_j) E e_x
+    /// ```
+    ///
+    /// With `(E − B) e_x = P^δ B e_y` (the deposit's consumer, `hnn::executed::pair_deposit`), a
+    /// candidate that fits the contact carries, at its antecedent's placement, the antecedent's
+    /// prior image a second time, `P^(λ−c_j) (E − B) e_x = P^(λ−c_(j−δ)) B e_y`: the two add
+    /// coherently. The release compares the bank's reading of `z_pair` against the same bank's
+    /// reading of `z_alone` (the gain), so a class's own column, whatever its resonance power,
+    /// enters both and only what the contact adds decides. `None` when no closed contact joins `j`
+    /// to a placed crossing: the station waits for its antecedent (or its consequence) to lock.
+    /// Every modality reads it the same way: a contact joins two ticks of the ring's clock.
+    pub fn pair_storage(
+        &self,
+        station: usize,
+        class: usize,
+        cells: &[Option<usize>],
+    ) -> Option<(Vec<Rat>, Vec<Rat>)> {
+        let partners = self.partners(station, cells);
+        if partners.is_empty() {
+            return None;
+        }
+        let population = 1 + partners.iter().map(|(count, _)| count).sum::<u64>();
+        let nu = self.chart.value(population);
+        let own = &self.images[station][class];
+        let alone: Vec<Rat> = own.iter().map(|x| x * &nu).collect();
+        let mut pair = own.clone();
+        for (_, read) in &partners {
+            for (value, add) in pair.iter_mut().zip(read.iter()) {
+                *value += add;
+            }
+        }
+        Some((pair.iter().map(|x| x * &nu).collect(), alone))
     }
 
     /// The declared stations `m`.
@@ -1198,3 +1400,71 @@ impl BankPlacement {
 /// above every consumer's own grain (`JOINT_BITS = 128` in the joint direction, the witness's `δ` at
 /// 128 bits).
 const DERIVATIVE_BITS: u32 = 192;
+
+/// [definition; agent-inferred, October 5; lane C's
+/// [record](../../../../research/records/2026-10-05_THE_RELEASE_READS_THE_LOCATED_PAIR_ON_EQUAL_MATERIAL.md)]
+/// **The pair contacts the source port holds closed**: the distances `δ ∈ [1, d)` of the receiving
+/// ring at which some pair contact `y → x` has zero slip, `P^δ B e_y − (E − B) e_x = 0` with
+/// `B e_y ≠ 0` (`hnn::executed::pair_slip`), `E` the material's source port and `B` the field's
+/// declared one (`hnn::constitution::declared_source_port`). It is the located pair's deposit read
+/// back from the material: the key's distance is read where its deposit left it, never declared by
+/// the caller, and a port that carries no located pair (every opening) closes none. Only the
+/// distance is read: which class follows which stays in `E`'s columns, where the bank's reading of
+/// each candidate's pair storage meets it ([`BankPlacement::pair_storage`]). The closure is exact:
+/// a later deposit that moves a located column opens its contact again.
+pub fn closed_pairs(
+    field: &Field,
+    material: &impl FieldMaterial,
+    ring: usize,
+) -> Result<Vec<usize>, HnnError> {
+    let Some(prior) = crate::hnn::constitution::declared_source_port(field, ring)? else {
+        return Ok(Vec::new());
+    };
+    let port = material
+        .source_port(ring)
+        .ok_or(HnnError::MissingSourcePort { ring })?;
+    if port.rows() != prior.rows() || port.columns() != prior.columns() {
+        return Err(HnnError::Shape {
+            what: "the source port against its declared prior",
+            expected: prior.rows() * prior.columns(),
+            found: port.rows() * port.columns(),
+        });
+    }
+    let alphabet = field.alphabet();
+    let column = |matrix: &crate::ratio::linear::ExactRatMatrix, class: usize| -> Result<Vec<Rat>, HnnError> {
+        (0..matrix.rows())
+            .map(|row| Ok(matrix.get(row, class)?.clone()))
+            .collect()
+    };
+    // The classes whose column carries a learned part, and the prior's nonzero columns.
+    let mut learned = Vec::new();
+    for class in 0..alphabet {
+        if column(port, class)? != column(&prior, class)? {
+            learned.push(class);
+        }
+    }
+    let mut antecedents = Vec::new();
+    for class in 0..alphabet {
+        if column(&prior, class)?.iter().any(|x| !x.is_zero()) {
+            antecedents.push(class);
+        }
+    }
+    let period = field.ring(ring).period() as usize;
+    let mut closed = Vec::new();
+    for offset in 1..period {
+        let mut found = false;
+        'pairs: for &x in &learned {
+            for &y in &antecedents {
+                let slip = crate::hnn::executed::pair_slip(field, ring, port, &prior, offset, (y, x))?;
+                if slip.iter().all(Zero::is_zero) {
+                    found = true;
+                    break 'pairs;
+                }
+            }
+        }
+        if found {
+            closed.push(offset);
+        }
+    }
+    Ok(closed)
+}

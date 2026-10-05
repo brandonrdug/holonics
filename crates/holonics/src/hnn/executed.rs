@@ -1469,7 +1469,7 @@ fn compare_request(
     let alphabet = field.alphabet();
     let termination = declared.termination();
     let read = |amplitudes: &[GaussianRat]| bank.read_turn(amplitudes, grain);
-    let placement = BankPlacement::of(field, constitution, &request.current, &request.moment, declared)?;
+    let placement = span_placement(field, constitution, &request.current, &request.moment, declared)?;
     let (generation, refinements) =
         release_of(&placement, request, declared, alphabet, bank, grain, &read)?;
     let (stations, orders) = receipts(request, &refinements, alphabet, termination)?;
@@ -1614,7 +1614,7 @@ fn incumbent_request(
             reads,
         ));
     }
-    let placement = BankPlacement::of(field, constitution, &request.current, &request.moment, declared)?;
+    let placement = span_placement(field, constitution, &request.current, &request.moment, declared)?;
     // Under a forced reading the release's own refinements carry only its receipts: they are read
     // by value, and only the forced release's candidates carry covectors (its terms' sections).
     let forced_reading = matches!(comparison.reading, Reading::Forced | Reading::ForcedDecisions)
@@ -2367,7 +2367,7 @@ fn placements_of(
     use rayon::prelude::*;
     requests
         .par_iter()
-        .map(|r| BankPlacement::of(field, constitution, &r.current, &r.moment, declared))
+        .map(|r| span_placement(field, constitution, &r.current, &r.moment, declared))
         .collect()
 }
 
@@ -3789,7 +3789,7 @@ fn persistence(
                 section[*station] = Some(*class);
             }
             let placement =
-                BankPlacement::of(field, constitution, &request.current, &request.moment, declared)?;
+                span_placement(field, constitution, &request.current, &request.moment, declared)?;
             for order in &compared.orders {
                 for &station in &order.locked {
                     out.locks += 1;
@@ -5531,7 +5531,7 @@ pub fn pairing_receipt(
         let request = &requests[contribution.request];
         let at = |constitution: &Constitution| -> Result<TurnCovector, HnnError> {
             let placement =
-                BankPlacement::of(field, constitution, &request.current, &request.moment, declared)?;
+                span_placement(field, constitution, &request.current, &request.moment, declared)?;
             bank.read_turn_covector(
                 &turn(&placement.storage(contribution.station, &contribution.cells)),
                 grain,
@@ -5555,6 +5555,34 @@ pub fn pairing_receipt(
         });
     }
     Ok(out)
+}
+
+// -------------------------------------------------------------------------------------------
+// the comparison's placement
+
+/// [definition; agent-inferred, October 5; lane C's
+/// [record](../../../../research/records/2026-10-05_THE_RELEASE_READS_THE_LOCATED_PAIR_ON_EQUAL_MATERIAL.md)]
+/// **The comparison's placement**: the release's own (`prediction::BankPlacement::of`), refused,
+/// typed, where the material holds a pair contact closed. There the release reads each candidate's
+/// pair storage on equal material (`prediction::BankPlacement::pair_storage`), which this
+/// comparison's predicates and covectors (the span's joint growths) do not read; the comparison
+/// retires under S2 (key location, then deposition), so it is not extended to the pair release.
+fn span_placement(
+    field: &Field,
+    constitution: &impl crate::hnn::field::FieldMaterial,
+    current: &Current,
+    moment: &SourceMoment,
+    declared: &Refinement,
+) -> Result<BankPlacement, HnnError> {
+    let placement = BankPlacement::of(field, constitution, current, moment, declared)?;
+    if !placement.contacts().is_empty() {
+        return Err(HnnError::Shape {
+            what: "a material the executed comparison reads (no pair contact closed)",
+            expected: 0,
+            found: placement.contacts().len(),
+        });
+    }
+    Ok(placement)
 }
 
 // -------------------------------------------------------------------------------------------
@@ -5631,6 +5659,28 @@ fn column(matrix: &ExactRatMatrix, class: usize) -> Result<Vec<Rat>, HnnError> {
         .collect()
 }
 
+/// **One pair contact's slip on the source port** ([`PairDeposit`]): the contact `y → x` at
+/// distance `δ` on ring `g`, `Δ = P^δ B e_y − (E − B) e_x`, with `E` the port and `B` its declared
+/// prior. It vanishes exactly when the port's learned part on `x` is `y`'s prior carried over `δ`
+/// ticks: the deposit's consumer on that pair, and the release's reading of which pair contacts the
+/// port holds closed (`hnn::prediction::BankPlacement::contacts`).
+pub fn pair_slip(
+    field: &Field,
+    ring: usize,
+    port: &ExactRatMatrix,
+    prior: &ExactRatMatrix,
+    offset: usize,
+    (y, x): (usize, usize),
+) -> Result<Vec<Rat>, HnnError> {
+    let image = field.ring(ring).rotate(&column(prior, y)?, &BigInt::from(offset));
+    let (learned, base) = (column(port, x)?, column(prior, x)?);
+    Ok(image
+        .iter()
+        .zip(learned.iter().zip(&base))
+        .map(|(u, (e, b))| u - (e - b))
+        .collect())
+}
+
 /// The slips `Δ_y` of every located class at the port `E`.
 fn pair_slips(
     field: &Field,
@@ -5640,19 +5690,9 @@ fn pair_slips(
     offset: usize,
     classes: &[(usize, usize)],
 ) -> Result<Vec<Vec<Rat>>, HnnError> {
-    let geometry = field.ring(ring);
-    let carried = BigInt::from(offset);
     classes
         .iter()
-        .map(|&(y, x)| {
-            let image = geometry.rotate(&column(prior, y)?, &carried);
-            let (learned, base) = (column(port, x)?, column(prior, x)?);
-            Ok(image
-                .iter()
-                .zip(learned.iter().zip(&base))
-                .map(|(u, (e, b))| u - (e - b))
-                .collect())
-        })
+        .map(|&pair| pair_slip(field, ring, port, prior, offset, pair))
         .collect()
 }
 

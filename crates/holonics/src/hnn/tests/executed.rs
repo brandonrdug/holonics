@@ -29,7 +29,7 @@ fn quarter(k: usize) -> Carrier {
 }
 
 /// The declared bank: one node `C = I`, `K = I`, `Y = 16`, `h = 1`, four members at `p = 5/8`.
-fn declared_bank() -> ReceivingBank {
+pub(super) fn declared_bank() -> ReceivingBank {
     let identity = ExactRatMatrix::identity(2).unwrap();
     let material = ResonatorMaterial::new(
         identity.clone(),
@@ -350,7 +350,7 @@ fn the_monotone_excursion_is_the_strict_decrease_and_a_height_admits_a_bounded_r
 
 /// A field of one closing ring of period 16, its lock every port, over an exterior chart of
 /// `alphabet` classes (one class a port when `alphabet ≤ 16`).
-fn pair_field(alphabet: usize) -> crate::hnn::field::Field {
+pub(super) fn pair_field(alphabet: usize) -> crate::hnn::field::Field {
     use crate::hnn::field::{CribDeclaration, Field, FieldDeclaration, ReceiverDeclaration};
     Field::declare(
         FieldDeclaration {
@@ -385,7 +385,7 @@ fn pair_field(alphabet: usize) -> crate::hnn::field::Field {
 }
 
 /// The order-2 pair the menu locates: distance 2, `y ↦ y + 1` on four symbols, turns of order 4.
-fn order_two_pair() -> crate::hnn::keys::LocatedPair {
+pub(super) fn order_two_pair() -> crate::hnn::keys::LocatedPair {
     crate::hnn::keys::LocatedPair {
         offset: 2,
         map: vec![(0, 1), (1, 2), (2, 3), (3, 0)],

@@ -607,6 +607,7 @@ fn the_bank_generates_by_its_certified_locks() {
     let generated =
         generate_by_bank(&field, &theta, &current, &request, &refinement, &bank, 12).unwrap();
     let locked: usize = generated.locks.iter().map(Vec::len).sum();
+    assert!(generated.contacts.is_empty());
     assert_eq!(generated.decisions.len(), locked);
     assert_eq!(generated.members, 2 * locked);
     assert_eq!(generated.certified, generated.members);
@@ -1342,4 +1343,227 @@ fn a_gap_the_readings_do_not_order_below_the_largest_locks_with_it() {
     assert_eq!(uncertified_largest(&gaps, &exact), vec![0, 3]);
     // No eligible station: nothing locks.
     assert!(uncertified_largest(&[], &[]).is_empty());
+}
+
+// -------------------------------------------------------------------------------------------
+// the release reads the located pair on equal material (lane C, October 5)
+
+/// A request of `n` cells over the four symbols of `pair_field(5)` (the termination `4` never
+/// drawn), ingested from rest, with its cells.
+fn symbols_request(field: &Field, seed: u64, n: usize) -> (Current, SourceMoment, Vec<usize>) {
+    let mut draw = Draw::new(seed);
+    let cells: Vec<usize> = (0..n).map(|_| draw.below(4)).collect();
+    let mut current = Current::at_rest(field);
+    let mut moment = SourceMoment::open(field, &current);
+    let mut fed = 0;
+    while fed < cells.len() {
+        fed += moment.ingest(field, &mut current, &cells[fed..]).unwrap().cells;
+    }
+    (current, moment, cells)
+}
+
+/// The order-2 deposit on `pair_field(5)`'s declared opening, at a declared distance.
+fn deposited(field: &Field, offset: usize) -> Constitution {
+    use crate::hnn::constitution::CAMPAIGN_ONE_BUDGET;
+    let opening = Constitution::initial(field, CAMPAIGN_ONE_BUDGET).unwrap();
+    let prior = opening.source_port(0).unwrap().clone();
+    let pair = crate::hnn::keys::LocatedPair {
+        offset,
+        ..super::executed::order_two_pair()
+    };
+    crate::hnn::executed::pair_deposit(field, &opening, &prior, 0, &pair).unwrap().0
+}
+
+/// [implemented-exact] **The closed pair contacts are read from the material**
+/// (`prediction::closed_pairs`): the declared opening closes none; after the located pair's deposit
+/// at distance `δ` the source port closes exactly `δ`, whatever `δ` the key carried (2 and 3 here),
+/// so the release's distance is the deposit's, never a caller's; the field's declared port is the
+/// opening's.
+#[test]
+fn the_closed_pair_contacts_are_the_deposits_distance() {
+    use crate::hnn::constitution::{CAMPAIGN_ONE_BUDGET, declared_source_port};
+    use crate::hnn::prediction::closed_pairs;
+    let field = super::executed::pair_field(5);
+    let opening = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap();
+    assert_eq!(
+        declared_source_port(&field, 0).unwrap().as_ref(),
+        opening.source_port(0)
+    );
+    assert!(closed_pairs(&field, &opening, 0).unwrap().is_empty());
+    for offset in [2usize, 3] {
+        assert_eq!(closed_pairs(&field, &deposited(&field, offset), 0).unwrap(), vec![offset]);
+    }
+}
+
+/// [implemented-exact] **A candidate's pair storage is its datum and the crossings its closed
+/// contact joins to it, at the contact's own weight, beside its column alone**
+/// (`prediction::BankPlacement::pair_storage`): at station 0 the contact at `δ = 2` joins the
+/// request's cell `τ − 1` (lag 1), so `z_pair = ν̂(2) (P^(λ−c_0) E e_x + P^(λ−c_0+2) E e_a)` and
+/// `z_alone = ν̂(2) P^(λ−c_0) E e_x` exactly; the candidate that fits, `x = f(a)`, carries the
+/// antecedent's prior image a second time,
+/// `z_pair = ν̂(2) (P^(λ−c_0) B e_x + 2 P^(λ−c_0+2) B e_a + P^(λ−c_0+2) (E − B) e_a)`. Station 3 is
+/// joined to no placed crossing until station 1 (or 5) is placed, and then to it.
+#[test]
+fn a_candidates_pair_storage_joins_its_antecedent_at_the_contacts_weight() {
+    use crate::hnn::constitution::declared_source_port;
+    use crate::hnn::moment::PopulationChart;
+    let field = super::executed::pair_field(5);
+    let theta = deposited(&field, 2);
+    let prior = declared_source_port(&field, 0).unwrap().unwrap();
+    let (current, moment, cells) = symbols_request(&field, 41, 8);
+    let refinement = Refinement::declare(&field, 0, 2, 1, 6, 4).unwrap();
+    let placement = BankPlacement::of(&field, &theta, &current, &moment, &refinement).unwrap();
+    assert_eq!(placement.contacts(), &[2]);
+    let ring = field.ring(0);
+    let lift = current.lift()[0].clone();
+    let phase = current.phase(&field, 0).unwrap();
+    let column = |m: &ExactRatMatrix, c: usize| -> Vec<Rat> {
+        (0..m.rows()).map(|r| m.get(r, c).unwrap().clone()).collect()
+    };
+    let port = theta.source_port(0).unwrap();
+    let placed_at = |v: &[Rat], residue: u64| ring.rotate(v, &(&lift - BigInt::from(residue)));
+    let nu = PopulationChart::of(&field).value(2);
+    let scale = |v: Vec<Rat>| -> Vec<Rat> { v.iter().map(|x| x * &nu).collect() };
+    let add = |a: &[Rat], b: &[Rat]| -> Vec<Rat> { a.iter().zip(b).map(|(x, y)| x + y).collect() };
+    let antecedent = cells[cells.len() - 2];
+    let (c0, ca) = ((phase + 1) % 16, (phase + 15) % 16);
+    let open = vec![None; 6];
+    for x in 0..5 {
+        let (pair, alone) = placement.pair_storage(0, x, &open).unwrap();
+        let own = placed_at(&column(port, x), c0);
+        assert_eq!(alone, scale(own.clone()));
+        assert_eq!(pair, scale(add(&own, &placed_at(&column(port, antecedent), ca))));
+    }
+    let fits = (antecedent + 1) % 4;
+    let (pair, _) = placement.pair_storage(0, fits, &open).unwrap();
+    let learned: Vec<Rat> = column(port, antecedent)
+        .iter()
+        .zip(column(&prior, antecedent))
+        .map(|(e, b)| e - b)
+        .collect();
+    let doubled: Vec<Rat> = placed_at(&column(&prior, antecedent), ca).iter().map(|x| x + x).collect();
+    let expected = add(
+        &add(&placed_at(&column(&prior, fits), c0), &doubled),
+        &placed_at(&learned, ca),
+    );
+    assert_eq!(pair, scale(expected));
+    // Station 3: its residues c_3 ± 2 hold station 1 and station 5, neither placed.
+    assert!(!placement.joins(3, &open));
+    assert!(placement.pair_storage(3, 0, &open).is_none());
+    let mut one = open.clone();
+    one[1] = Some(2);
+    assert!(placement.joins(3, &one));
+    let (pair, _) = placement.pair_storage(3, 0, &one).unwrap();
+    let own = placed_at(&column(port, 0), (phase + 4) % 16);
+    assert_eq!(pair, scale(add(&own, &placed_at(&column(port, 2), (phase + 2) % 16))));
+}
+
+/// One closing ring of the harness's period `60 = 2²·3·5` (its lock every port, quarter-turn
+/// placements), source and receiving ring, over `|A| = 5` (four symbols and the termination): the
+/// order-2 field's receiving ring without its carry rings, which the release does not read.
+fn sixty_field() -> Field {
+    use crate::hnn::field::{CribDeclaration, FieldDeclaration, ReceiverDeclaration, RingDeclaration};
+    let ring = RingDeclaration {
+        period: 60,
+        placements: (0..60).map(|node| FieldDeclaration::quarter_turn(node, 60)).collect(),
+        ..super::support::ring(16, (0..60).collect())
+    };
+    Field::declare(
+        FieldDeclaration {
+            rings: vec![RingDeclaration {
+                reflector: (0..60).map(|p| ((60 - p) % 60) as usize).collect(),
+                ..ring
+            }],
+            contacts: Vec::new(),
+            loops: Vec::new(),
+            sources: vec![0],
+            offsets: Vec::new(),
+            alphabet: 5,
+            step: integer(1),
+            exponent_grain: 1,
+            receivers: vec![ReceiverDeclaration {
+                ring: 0,
+                aperture: 3,
+                tolerance: rat(1, 16),
+                depth: 1,
+                prior: crate::compression::landmark::context::StopPrior::half(),
+                mass: 1,
+                base: crate::compression::landmark::context::BaseMeasure::Even,
+                receiving_prior: 0,
+            }],
+            crib: CribDeclaration {
+                window: 16,
+                offset: 1,
+            },
+            population: 1 << 16,
+            lattice: Default::default(),
+        }
+        .by_lattice_rule(),
+    )
+    .unwrap()
+}
+
+/// [implemented-exact; the consumer equation] **The release reads the located pair: the released
+/// class at `t` is `f` of the class at `t − δ`** (`prediction::generate_by_bank` on a material
+/// holding the order-2 contact closed; `ρ(F^K(I_h)) = T(request)`): on a ring of the harness's
+/// period 60 with the order-2 pair deposited at `δ = 2`, each drawn request's six stations are
+/// released whole at width zero, each released class the located map of its antecedent (the
+/// request's last two cells, then the section's own locks), every lock certified on all four
+/// members with every executed tick closed; the first refinement locks only among stations 0 and 1
+/// (the only stations a closed contact joins to a placed crossing). The declared opening closes no
+/// contact, so it reads the span's law (`the_bank_generates_by_its_certified_locks`). [measured, the
+/// record's §5] On a ring of period 16 the bank's growths sit near one and the least member does not
+/// separate the fit from the antecedent's copy; the law is read here in the harness's regime.
+#[test]
+fn the_release_reads_the_located_pair_and_its_consumer_holds() {
+    use crate::hnn::constitution::CAMPAIGN_ONE_BUDGET;
+    let field = sixty_field();
+    let theta = deposited(&field, 2);
+    let bank = super::executed::declared_bank();
+    let refinement = Refinement::declare(&field, 0, 2, 1, 6, 4).unwrap();
+    for seed in [41u64, 42] {
+        let (current, moment, cells) = symbols_request(&field, seed, 8);
+        let generated =
+            generate_by_bank(&field, &theta, &current, &moment, &refinement, &bank, 12).unwrap();
+        assert_eq!(generated.contacts, vec![2]);
+        assert!(generated.release.released(), "seed {seed}: {:?}", generated.release);
+        assert!(generated.release.width.is_zero());
+        let mut passage = cells.clone();
+        passage.extend(&generated.release.classes);
+        for t in 0..6 {
+            let at = cells.len() + t;
+            assert_eq!(passage[at], (passage[at - 2] + 1) % 4, "seed {seed}, station {t}");
+        }
+        assert!(generated.locks[0].iter().all(|&station| station < 2));
+        let locked: usize = generated.locks.iter().map(Vec::len).sum();
+        assert_eq!(generated.members, 4 * locked);
+        assert_eq!(generated.certified, generated.members);
+        assert_eq!(generated.ticks_closed, generated.ticks);
+    }
+    let opening = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap();
+    assert!(crate::hnn::prediction::closed_pairs(&field, &opening, 0).unwrap().is_empty());
+}
+
+/// [implemented-exact] **The executed comparison refuses a material holding a pair contact closed**
+/// (`hnn::executed`'s placement): it compares the span's joint growths, which the pair release does
+/// not read, so it is refused, typed, rather than compared against a release it does not execute.
+#[test]
+fn the_executed_comparison_refuses_a_closed_pair_contact() {
+    use crate::hnn::executed::{Comparison, Context, Request, compare};
+    use crate::hnn::HnnError;
+    let field = super::executed::pair_field(5);
+    let theta = deposited(&field, 2);
+    let bank = super::executed::declared_bank();
+    let refinement = Refinement::declare(&field, 0, 2, 1, 6, 4).unwrap();
+    let (current, moment, _) = symbols_request(&field, 41, 8);
+    let requests = vec![Request {
+        current,
+        moment,
+        targets: vec![0; 6],
+        context: Context::Open,
+    }];
+    assert!(matches!(
+        compare(&field, &theta, &requests, &refinement, &bank, 12, Comparison::HINGE_EVERY),
+        Err(HnnError::Shape { expected: 0, found: 1, .. })
+    ));
 }

@@ -768,8 +768,13 @@ pub(super) fn evaluate(terrain: &str, seed: u64, count: usize, out: &str, arms: 
             )
             .unwrap();
         }
+        // The pair contacts the material holds closed, as the release read them (lane C).
+        let contacts = generated
+            .iter()
+            .find_map(|generation| generation.as_ref().ok().map(|g| g.contacts.clone()))
+            .unwrap_or_default();
         println!(
-            "  {label} (transport modulus {}): released {released}, held {held}, refused {refused}, refused certificates {uncertified}; whole sections {whole} of {count} (nonconstant {whole_nonconstant} of {nonconstant}, constant {whole_constant} of {}); the success rule (every nonconstant section whole): {}; incorrect releases {incorrect}; reaching the termination {terminated}; stations right {} by station {by_station:?}; first lock at a request-reading station (0 or 1) {first_request}, first lock right {first_right}; {} ms",
+            "  {label} (transport modulus {}; closed pair contacts at {contacts:?}): released {released}, held {held}, refused {refused}, refused certificates {uncertified}; whole sections {whole} of {count} (nonconstant {whole_nonconstant} of {nonconstant}, constant {whole_constant} of {}); the success rule (every nonconstant section whole): {}; incorrect releases {incorrect}; reaching the termination {terminated}; stations right {} by station {by_station:?}; first lock at a request-reading station (0 or 1) {first_request}, first lock right {first_right}; {} ms",
             theta.transport(ring),
             count - nonconstant,
             if whole_nonconstant == nonconstant { "holds" } else { "does not hold" },
