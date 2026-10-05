@@ -343,7 +343,7 @@ fn text_declared() -> Declared {
     }
 }
 
-/// [measured; agent-inferred, October 5; the record above] **`executed text <cut> <out dir> <dev|run>`**:
+/// [measured; agent-inferred, October 5; the record above] **`executed text <cut> <out dir> <dev|run> [<state>]`**:
 /// lane B's key location and lane C's release, unchanged, on a text cut through the byte chart
 /// ([`text_declared`]). The training passage is read as `executed keys` reads a terrain's (each window
 /// a request and its section, one observation a station, read against every earlier cell of its
@@ -355,13 +355,14 @@ fn text_declared() -> Declared {
 /// (`hnn::executed::pair_deposit`) and the release reads the deposits; otherwise the release reads the
 /// two openings. The release is `hnn::prediction::generate_by_bank`, one per request, read whole.
 /// `dev` reads one development window (the one after the training passage) on each state, for the
-/// projection; `run` reads the pinned requests. Stdout carries counts only; every byte (the
-/// training passage, each request, its truth and each state's release) is written to `<out dir>`,
-/// which must be a private directory (`.local/`).
+/// projection; `run` reads the pinned requests. With a state's label (`lossless`, `founded`, or a
+/// deposit's `keys-…`), only that state is read. The requests are read one after another, each
+/// with the whole thread budget (the unit the development read measures), one progress line each.
+/// Stdout carries counts only; every byte (the training passage, each request, its truth and each
+/// state's release) is written to `<out dir>`, which must be a private directory (`.local/`).
 #[allow(clippy::disallowed_methods)]
-pub(super) fn text(cut: &str, out: &str, which: &str) {
+pub(super) fn text(cut: &str, out: &str, which: &str, only: Option<&str>) {
     use holonics::compression::keys::TurnMenu;
-    use rayon::prelude::*;
     use std::fmt::Write as _;
     let clock = Instant::now();
     let declared = text_declared();
@@ -521,15 +522,26 @@ pub(super) fn text(cut: &str, out: &str, which: &str) {
 
     // The release: one per request on each state, read whole.
     let bank = bank_of(declared.period, &bank_strength());
-    for (name, theta) in &states {
+    for (name, theta) in states.iter().filter(|(name, _)| only.is_none_or(|only| only == name)) {
         let started = Instant::now();
         let generated: Vec<_> = requests
-            .par_iter()
-            .map(|(request, _)| {
+            .iter()
+            .enumerate()
+            .map(|(i, (request, _))| {
                 let at = Instant::now();
                 let (current, moment) = ingest(field, request);
                 let generation =
                     generate_by_bank(field, theta, &current, &moment, &engine.refinement, &bank, BANK_GRAIN);
+                println!(
+                    "    {name} request {i}: {}, {} ms; the state's elapsed {} ms",
+                    match &generation {
+                        Ok(g) if g.release.released() => "released",
+                        Ok(_) => "held",
+                        Err(_) => "refused",
+                    },
+                    at.elapsed().as_millis(),
+                    started.elapsed().as_millis()
+                );
                 (generation, at.elapsed().as_millis())
             })
             .collect();

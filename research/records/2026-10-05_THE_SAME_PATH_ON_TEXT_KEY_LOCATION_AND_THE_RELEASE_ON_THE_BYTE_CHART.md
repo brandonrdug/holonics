@@ -68,6 +68,21 @@ alone at 12 threads, the bank's own candidates in parallel). The projection is 1
 `timeout 1085`). Early stop: the lossless state's line is due by `16 · 6,208 · 5/4 = 124,160` ms; a
 later line stops the run, reported incomplete.
 
+**The run stopped early, and the next read, fixed before its launch** [measured; agent-inferred].
+The pinned run's lossless line came at `150,953` ms, past its early-stop bound `124,160` ms, and the
+run was stopped at `189,102` ms (`run_log.txt`), its lossless state complete and its founded state
+unread. The projection error is measured: another worker's 12-thread run (`executed evaluate`, a
+454 s deadline) started 48 s before it on this host of 12 physical cores with two threads each, so
+the two runs shared the cores the development read had alone (lossless: `150953/99328` of its
+projection, 1 rem `51625/99328`). The deadline is not raised; the declared read changes:
+- **the founded opening alone** on the same 16 pinned requests (the lossless state is complete), the
+  requests read **one after another**, each with the whole thread budget: the unit the development
+  read measured, with one progress line a request (`executed text … run founded`);
+- **the projection** is the founded state's share of the pinned one: `16 · 48,032 = 768,512` ms, the
+  deadline its upper end `960,640` ms (`timeout 961`); **early stop** when request `k`'s line comes
+  later than `k · 60,040` ms (`60,040 = 48,032 · 5/4`);
+- **launched when no other run holds the cores** (no other `hnn_prediction` process at launch).
+
 ## 1. The recorded failures this loop could repeat, and how each was held
 
 From the [lessons](2026-09-29_LESSONS_THE_FAILURES_THAT_REPEATED_AFTER_THEY_WERE_RECORDED.md), the
@@ -107,3 +122,42 @@ From the [lessons](2026-09-29_LESSONS_THE_FAILURES_THAT_REPEATED_AFTER_THEY_WERE
   boundary (`generate_by_bank`); with no closed pair contact it reads the span's law, each
   candidate's storage from its own station. The receipt is one region per station: its top class,
   whether its lock is certified, and the plural stations where none is.
+
+## 3. Measured: key location on the training passage
+
+[measured] `run_log.txt`, `location.curve` (the survivors at every observation: distances and
+counts, no byte). Every observation reads the distances `1 … t` of its window, so `δ ≤ 40` is read
+at every observation and `δ = 47` only at a window's last station; `δ ∈ [48, 59]` is never read (a
+window spans 48 ticks).
+
+**The fibre empties at observation 32** (4 windows, `32 = 2⁵`), against order-2's lock at 16. No
+distance ever survives alone with a published map, so nothing locates and nothing is deposited.
+The surviving distances, on the field's ports (a distance survives while its menu admits a turn),
+by observation:
+
+```text
+observation  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 … 31 32
+alive       40 37 38 34 29 23 19 14 11  8  7  5  3  3  2  1 …  1  0
+```
+
+From observation 16 to 31 the one survivor is `δ = 47`, holding one to three edges (the windows'
+last stations), all on paths: its map is never published (plural), and its fourth edge empties it.
+
+Each distance empties by one of two events, read separately:
+- **The turn set empties** (the menu is still a partial injection, but no single turn `c ∈ ℤ/60`
+  admits its components). Most often a fixed point: a byte that recurs at the distance (`x → x`)
+  forces `ord(c) = 1`, so `c = 0`, and then any other edge, a path of one edge, needs `ord(c) > 1`.
+  The observation at which each distance's turns emptied:
+  `1:6 2:7 3:5 4:2 5:5 6:6 7:9 8:4 9:2 10:8 11:10 12:8 13:10 14:9 15:2 16:5 17:6 18:7 19:4 20:12
+  21:8 22:6 23:7 24:8 25:5 26:4 27:5 28:6 29:4 30:8 31:11 32:9 33:6 34:5 35:2 36:8 37:7 38:6 39:7 40:4
+  41:10 42:12 43:13 44:13 45:15 46:16 47:32`.
+- **The relation fails** (a port with two consequences or two antecedents at that distance): at
+  `δ ≤ 40` between observations 4 and 12 (`δ = 26` at 4, `δ = 20` at 12), at `41 ≤ δ ≤ 47` between
+  10 and 32, each after 4 to 12 edges (`run_log.txt`, `δ:observation/edges`).
+
+**The fold is not the cause** [measured]. The same edges read on the bytes themselves (a menu a
+distance on 256 ports, the terrain-side reading) fail at exactly the same observation with the same
+edge count at every one of the 47 distances: no failure is made by two bytes sharing a port
+(`x mod 60`). It is the passage's own relation that leaves no stationary turn at any distance: in
+4 windows of text, every distance from 1 to 47 already pairs some byte with two different bytes
+(or two bytes with one).
