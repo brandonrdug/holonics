@@ -2,6 +2,8 @@
 //! `D E = ρ`, `E T = U E` and the injection square, exact on the known-truth terrains' declared
 //! charts, with the founded dimension equal to the emission's Hankel rank on the reached orbit
 //! (acceptance 1); the moment chart's reduced recurrence joined to `SourceMoment`; the separator.
+//! The one source type (`Encoded`, THE_MACHINE guard 9): the identity refuses a fold, the byte chart
+//! and every declared chart are no founded encoding, and a cut keeps its encoding.
 //! The passage's own transports, the charged founding and the founded port chart were retired on
 //! September 29 (the lessons record); their tests are at `96d8940b`.
 
@@ -10,12 +12,15 @@ use num_traits::{One, Zero};
 
 use super::support::{Draw, contact, ring};
 use crate::compression::landmark::context::StopPrior;
-use crate::hnn::encoding::{Encoding, EncodingError, PassageChart};
+use crate::geometry::RatVec3;
+use crate::geometry::screw::ScrewGenerator;
+use crate::hnn::encoding::{Encoded, Encoding, EncodingError, PassageChart};
 use crate::hnn::field::{
-    CribDeclaration, Current, Field, FieldDeclaration, ReceiverDeclaration, ring_digit,
+    CribDeclaration, Current, Field, FieldDeclaration, ReceiverDeclaration, RingDeclaration,
+    ring_digit,
 };
 use crate::hnn::moment::SourceMoment;
-use crate::holarchy::terrain::{Grating, Moire, MoireClass, RotorCrib};
+use crate::holarchy::terrain::{CyclicLaw, Grating, KnownTruth, Moire, MoireClass, RotorCrib};
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::vector::dot;
 use crate::ratio::{Rat, integer, rat};
@@ -338,4 +343,150 @@ fn the_passage_chart_refuses_what_it_cannot_found() {
     )
     .unwrap();
     assert_eq!(Encoding::found(&blind), Err(EncodingError::Blind));
+}
+
+/// The order-2 declaration's field (the step-1 harness's `declare`): three closing rings of period
+/// `60 = 2²·3·5` in a chain at the quarter turns, ring 0 the source and the receiving ring.
+fn sixty_field() -> Field {
+    let d = 60u64;
+    let axis = ScrewGenerator::new(RatVec3::from_i64(0, 0, 1), RatVec3::zero());
+    let declared = |lock: Vec<u64>| RingDeclaration {
+        period: d,
+        screw: axis.clone(),
+        placements: (0..d)
+            .map(|node| FieldDeclaration::quarter_turn(node, d))
+            .collect(),
+        lock,
+        reflector: (0..d).map(|port| ((d - port) % d) as usize).collect(),
+        admittance: integer(2),
+        initial: 0,
+    };
+    Field::declare(
+        FieldDeclaration {
+            rings: vec![
+                declared((0..d).collect()),
+                declared(Vec::new()),
+                declared(Vec::new()),
+            ],
+            contacts: vec![contact(0, 1, 60, 0), contact(1, 2, 60, 0)],
+            loops: Vec::new(),
+            sources: vec![0],
+            offsets: Vec::new(),
+            alphabet: 5,
+            step: integer(1),
+            exponent_grain: 1,
+            receivers: vec![ReceiverDeclaration {
+                ring: 0,
+                aperture: 3,
+                tolerance: rat(1, 16),
+                depth: 1,
+                prior: StopPrior::half(),
+                mass: 1,
+                base: crate::compression::landmark::context::BaseMeasure::Even,
+                receiving_prior: 0,
+            }],
+            crib: CribDeclaration {
+                window: 16,
+                offset: 1,
+            },
+            population: 1 << 16,
+            lattice: Default::default(),
+        }
+        .by_lattice_rule(),
+    )
+    .unwrap()
+}
+
+/// [implemented-exact] **The identity refuses a fold** (THE_MACHINE guard 9, "Tests that fail on
+/// the rejected form"): on the order-2 field's source ring of period 60, a known truth of 257
+/// classes (the byte chart's count, bytes and the termination) is refused, as is 61; 60 classes
+/// inject and are accepted. The order-2 terrain's four classes enter as themselves, with the
+/// identity decoder, an empty fibre, each class its own label and no located advance.
+#[test]
+fn the_identity_refuses_a_terrain_whose_classes_fold_onto_a_source_ring() {
+    let field = sixty_field();
+    for classes in [257, 61] {
+        let truth = KnownTruth::cyclic(CyclicLaw::Line, classes, 1, 2, 48).unwrap();
+        assert_eq!(
+            Encoded::identity(&truth, &field),
+            Err(EncodingError::Fold {
+                classes,
+                ring: 0,
+                period: 60,
+            })
+        );
+    }
+    let widest = KnownTruth::cyclic(CyclicLaw::Line, 60, 1, 2, 48).unwrap();
+    assert_eq!(Encoded::identity(&widest, &field).unwrap().len(), 2);
+    let truth = KnownTruth::cyclic(CyclicLaw::OrderTwo { opening: 40 }, 4, 3, 5, 48).unwrap();
+    let encoded = Encoded::identity(&truth, &field).unwrap();
+    assert_eq!(encoded.len(), 5);
+    for (passage, encoded) in truth.passages().iter().zip(&encoded) {
+        let classes: Vec<usize> = encoded.cells().iter().map(|cell| cell.class()).collect();
+        assert_eq!(&classes, passage);
+        assert_eq!(encoded.classes(), 4);
+        assert_eq!(encoded.sources(), &[(0, 60)]);
+        assert_eq!(encoded.decoder(), &ExactRatMatrix::identity(4).unwrap());
+        assert!(encoded.fibre().is_empty());
+        assert!(encoded.located().is_none());
+        for &cell in encoded.cells() {
+            assert_eq!(encoded.label(cell), Some(cell.class()));
+        }
+    }
+    // A cut keeps its encoding: the request and its stations.
+    let (request, stations) = encoded[0].clone().split_at(40).unwrap();
+    assert_eq!((request.len(), stations.len()), (40, 8));
+    assert_eq!(request.decoder(), encoded[0].decoder());
+    assert_eq!(
+        [request.cells(), stations.cells()].concat(),
+        encoded[0].cells()
+    );
+    assert!(encoded[0].clone().split_at(49).is_err());
+}
+
+/// [implemented-exact] **The byte chart is no founded encoding** (THE_MACHINE guard 9, "Exterior
+/// data waits for its encoding"): a copy ring holding a byte passage on the byte alphabet, and the
+/// "code itself" chart (each code its own port under the identity transport), are founded as
+/// mathematics by `Encoding::found`, and their squares hold; but nothing the field located reads
+/// them, so the byte passage through either is refused (`EncodingError::Unencoded`), as is the
+/// field's own moment chart, whose classes are the exterior codes.
+#[test]
+fn through_refuses_an_unfounded_byte_chart() {
+    let field = sixty_field();
+    let bytes: Vec<usize> = b"Holonics".iter().map(|&byte| usize::from(byte)).collect();
+    let copy = PassageChart::copy(&bytes, 256).unwrap();
+    let encoding = Encoding::found(&copy).unwrap();
+    encoding.squares(&copy).unwrap();
+    assert_eq!(
+        Encoded::through(&encoding, &copy, &field, std::slice::from_ref(&bytes)),
+        Err(EncodingError::Unencoded)
+    );
+    let codes = 8;
+    let unit = |i: usize| -> Vec<Rat> {
+        (0..codes)
+            .map(|j| if i == j { Rat::one() } else { Rat::zero() })
+            .collect()
+    };
+    let itself = PassageChart::new(
+        codes,
+        vec![ExactRatMatrix::identity(codes).unwrap()],
+        (0..codes).map(unit).collect(),
+        (0..codes).map(unit).collect(),
+        (0..codes).map(unit).collect(),
+    )
+    .unwrap();
+    let encoding = Encoding::found(&itself).unwrap();
+    encoding.squares(&itself).unwrap();
+    let passage: Vec<usize> = (0..48).map(|t| t % codes).collect();
+    assert_eq!(
+        Encoded::through(&encoding, &itself, &field, &[passage]),
+        Err(EncodingError::Unencoded)
+    );
+    let crib = crib_field();
+    let moment = PassageChart::moment(&crib, 0).unwrap();
+    let encoding = Encoding::found(&moment).unwrap();
+    assert_eq!(
+        Encoded::through(&encoding, &moment, &crib, &[vec![0, 1, 2]]),
+        Err(EncodingError::Unencoded)
+    );
 }
