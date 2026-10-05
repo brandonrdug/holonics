@@ -1,0 +1,6 @@
+# Lane B's probe written again at main (9914bc5a): `executed keys-probe order2 2026093031 128 4`, read
+# once after the passages.
+command = executed keys-probe
+projection = one training passage of 128 requests at the scale 4, the same passage as `executed keys` (468 to 492 ms measured there at e237c941); a first read at this build, so the deadline is the records' first-read guard
+deadline_ms = 120000
+threads = 1

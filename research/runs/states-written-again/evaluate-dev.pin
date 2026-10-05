@@ -1,0 +1,7 @@
+# The development reads over the states written again (`executed evaluate <terrain> 2026093042 8`):
+# both keys states per terrain, compared with #365's development sections, and the probe's state on
+# order-2. Four reads, one after the other; they are the development unit of the validation reads.
+command = executed evaluate
+projection = 8 requests on two keys states, measured 10,896 to 12,381 ms at 12 threads at a00fec4e (#365's development receipts, the line's 12,381 ms the largest); a first read at this build, so the deadline is the records' first-read guard
+deadline_ms = 120000
+threads = 12
