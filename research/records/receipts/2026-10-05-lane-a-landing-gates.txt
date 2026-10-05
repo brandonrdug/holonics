@@ -1,0 +1,13 @@
+check ms=11578
+test hnn::tests::physics::a_perturbed_resonator_solve_fails_the_word_balance ... FAILED
+thread 'hnn::tests::physics::a_perturbed_resonator_solve_fails_the_word_balance' (392444) panicked at crates/holonics/src/hnn/tests/physics.rs:667:35:
+test result: FAILED. 1030 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 249.42s
+lib ms=278086
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.16s
+restore ms=16674
+test result: ok. 41 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 231.36s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+gpu ms=234470
+
+[exited with code 0]

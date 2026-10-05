@@ -1,0 +1,17 @@
+gate check: ok (11279 ms)
+gate guard-lints: ok (13456 ms)
+gate guard-doctests: ok (17097 ms)
+test an_observed_pair_deposit_changes_the_later_continuing_loaded_response ... ok
+test exact_source_reentry_preserves_the_entered_interior_and_counts_source_once ... ok
+test nonzero_offset_moments_drive_the_actual_loaded_port_without_marginal_source ... ok
+test sparse_source_moments_enter_the_actual_loaded_port_with_exact_work ... ok
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.27s
+source_entrance ms=18634
+test result: ok. 1003 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 158.74s
+lib ms=182954
+test result: ok. 41 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 222.61s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+gpu ms=225646
+
+[exited with code 0]
