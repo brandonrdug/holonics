@@ -1,0 +1,13 @@
+executed transport: helix [3, 4, 5] (D = 60, grain 12), 5 classes, seed 2026100901; read set 48 keys × 120 cells = 5760 observations; held-out keys 12
+  locate: 39 ms; fibre plural (2 gauge classes); members 2; survivors at the end 4; peak survivors 137028; nodes explored 454619
+  n*_machine Some(3485); unicity count n_U 16; first-occurrence order [0, 2, 4, 3, 1]
+  truth: A [28, 24, 2, 3, 17] (digits [[1, 1, 2], [0, 0, 2], [2, 0, 0], [0, 1, 0], [2, 1, 1]]; CRT [[1, 0, 3], [0, 0, 4], [2, 2, 2], [0, 3, 3], [2, 1, 2]]); the generator's representative is a member: true
+    member A [16, 48, 2, 3, 29] labels [Some(0), Some(2), Some(4), Some(1), Some(3)]; differs from the generator at classes [0, 1, 4]
+    member A [28, 24, 2, 3, 17] labels [Some(0), Some(1), Some(2), Some(4), Some(3)]; differs from the generator at classes []
+  every member regenerates every passage from some key: true
+  relabel: 6046 ms; of 24 permutations, fibre carried 24, n* equal 24, located code length equal 24 (338 bits); the residue chart's code lengths (bits: permutations) {56165: 1, 56345: 1, 60425: 1, 61550: 1, 62075: 1, 62120: 1, 63185: 1, 63470: 1, 63785: 1, 64145: 1, 64280: 1, 64370: 1, 64385: 1, 64475: 1, 64505: 1, 64520: 1, 65150: 1, 65570: 1, 65855: 1, 66380: 1, 67865: 1, 67895: 3}
+  found: 258 ms; chart 60, reached 60, founded dimension 49; squares held on 60 states × 5 transports; gcd of the advances with D 1
+  code: located 338 bits (reopens the read set: true); literal 17280 bits; the residue chart 64280 bits
+  repair: 1 ms; 12 passages from the held-out keys; erased 276: released 270 (equal to the truth 270), held 6 (families by size {2: 6}); members kept 24, refused 0; residual 3 bits against the literal 828; reopened 12 of 12
+executed transport: 6354 ms; resident 16306176 now, 16306176 peak
+exit 0

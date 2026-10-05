@@ -1,0 +1,12 @@
+executed transport: helix [3, 4, 5] (D = 60, grain 12), 5 classes, seed 2026100941; read set 60 keys × 120 cells = 7200 observations; held-out keys 0
+  locate: 137 ms; fibre one; members 1; survivors at the end 2; peak survivors 248832; nodes explored 2434415
+  n*_machine Some(6126); unicity count n_U 16; first-occurrence order [1, 2, 4, 3, 0]
+  truth: A [9, 39, 59, 29, 17] (digits [[0, 3, 0], [0, 1, 3], [2, 3, 4], [2, 1, 2], [2, 1, 1]]; CRT [[0, 1, 4], [0, 3, 4], [2, 3, 4], [2, 1, 4], [2, 1, 2]]); the generator's representative is a member: true
+    member A [51, 21, 1, 31, 43] labels [Some(1), Some(3), Some(2), Some(4), Some(0)]; differs from the generator at classes []
+  every member regenerates every passage from some key: true
+  relabel: 47673 ms; of 120 permutations, fibre carried 120, n* equal 120, located code length equal 120 (410 bits); the residue chart's code lengths (bits: permutations) {62072: 2, 62177: 2, 68132: 6, 68672: 2, 69047: 2, 69122: 2, 69377: 2, 69557: 2, 72737: 2, 73412: 2, 74027: 2, 74402: 2, 75047: 2, 75182: 2, 79292: 4, 79352: 2, 79367: 2, 79382: 2, 79397: 8, 79412: 4, 79442: 2, 79517: 2, 79637: 2, 80192: 2, 80252: 2, 80282: 2, 80327: 4, 80342: 2, 81152: 2, 81197: 2, 81212: 2, 81257: 4, 81677: 2, 82067: 4, 82082: 2, 82172: 2, 82532: 4, 82652: 2, 83012: 2, 83042: 2, 83162: 2, 83387: 2, 83432: 2, 83462: 2, 83597: 2, 83882: 2, 83942: 2, 84122: 2, 84227: 2}
+  found: 254 ms; chart 60, reached 60, founded dimension 49; squares held on 60 states × 5 transports; gcd of the advances with D 1
+  code: located 410 bits (reopens the read set: true); literal 21600 bits; the residue chart 79397 bits
+  repair: 4 ms; 60 passages from the read keys; erased 1380: released 1380 (equal to the truth 1380), held 0 (families by size {}); members kept 60, refused 0; residual 0 bits against the literal 4140; reopened 60 of 60
+executed transport: 48075 ms; resident 16863232 now, 16863232 peak
+exit 0

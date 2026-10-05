@@ -63,6 +63,8 @@ mod keys_loop;
 mod repair_loop;
 #[path = "hnn_text_repair.rs"]
 mod text_repair;
+#[path = "hnn_transport_loop.rs"]
+mod transport_loop;
 
 use std::collections::BTreeMap;
 use std::time::Instant;
@@ -369,6 +371,15 @@ fn main() {
             pinned(&arguments[5], "executed text-repair", clock, true);
             text_repair::run(&arguments[3], &arguments[4], &arguments[6])
         }
+        // The located transport: each occurrence steps the rings by its located advance
+        // (research/records/2026-10-05_THE_LOCATED_TRANSPORT_EACH_OCCURRENCE_STEPS_THE_RINGS_BY_ITS_LOCATED_ADVANCE.md).
+        (Some("executed"), Some("transport")) => transport_loop::transport(
+            arguments[3].parse().expect("a seed"),
+            arguments[4].parse().expect("a count of read keys"),
+            arguments[5].parse().expect("a length"),
+            &arguments[6],
+            arguments.get(7).map(String::as_str) == Some("locate"),
+        ),
         (Some("executed"), Some("keys-probe")) => keys_loop::keys_probe(
             &arguments[3],
             arguments[4].parse().expect("a training seed"),

@@ -1,0 +1,6 @@
+Running as unit: transport-read-2026100911.service
+          Finished with result: success
+Main processes terminated with: code=exited, status=0/SUCCESS
+               Service runtime: 6.524s
+             CPU time consumed: 6.528s
+                   Memory peak: 16.7M (swap: 12K)

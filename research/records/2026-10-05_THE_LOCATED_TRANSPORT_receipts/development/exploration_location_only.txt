@@ -1,0 +1,313 @@
+== seed 2026100941, 48 keys x 120
+executed transport: helix [3, 4, 5] (D = 60, grain 12), 5 classes, seed 2026100941; read set 48 keys × 120 cells = 5760 observations; held-out keys 12
+  locate: 141 ms; fibre plural (2 gauge classes); members 2; survivors at the end 4; peak survivors 248832; nodes explored 2430805
+  n*_machine Some(5407); unicity count n_U 16; first-occurrence order [1, 2, 4, 3, 0]
+  truth: A [9, 39, 59, 29, 17] (digits [[0, 3, 0], [0, 1, 3], [2, 3, 4], [2, 1, 2], [2, 1, 1]]; CRT [[0, 1, 4], [0, 3, 4], [2, 3, 4], [2, 1, 4], [2, 1, 2]]); the generator's representative is a member: true
+    member A [51, 20, 1, 31, 43] labels [Some(1), Some(3), Some(2), Some(4), Some(0)]; differs from the generator at classes [1]
+    member A [51, 21, 1, 31, 43] labels [Some(1), Some(3), Some(2), Some(4), Some(0)]; differs from the generator at classes []
+  every member regenerates every passage from some key: true
+executed transport (location only): 148 ms; resident 4972544 now, 4972544 peak
+== seed 2026100942, 48 keys x 120
+executed transport: helix [3, 4, 5] (D = 60, grain 12), 5 classes, seed 2026100942; read set 48 keys × 120 cells = 5760 observations; held-out keys 12
+  locate: 39 ms; fibre one; members 1; survivors at the end 2; peak survivors 14292; nodes explored 772111
+  n*_machine Some(2532); unicity count n_U 16; first-occurrence order [1, 2, 3, 4, 0]
+  truth: A [33, 24, 59, 51, 52] (digits [[0, 3, 2], [0, 0, 2], [2, 3, 4], [0, 1, 4], [1, 1, 4]]; CRT [[0, 1, 3], [0, 0, 4], [2, 3, 4], [0, 3, 1], [1, 0, 2]]); the generator's representative is a member: true
+    member A [33, 24, 59, 51, 52] labels [Some(1), Some(3), Some(2), Some(0), Some(4)]; differs from the generator at classes []
+  every member regenerates every passage from some key: true
+executed transport (location only): 43 ms; resident 4874240 now, 4874240 peak
+== seed 2026100943, 48 keys x 120
+executed transport: helix [3, 4, 5] (D = 60, grain 12), 5 classes, seed 2026100943; read set 48 keys × 120 cells = 5760 observations; held-out keys 12
+  locate: 584 ms; fibre plural (35 gauge classes); members 35; survivors at the end 70; peak survivors 9844; nodes explored 9398852
+  n*_machine Some(5288); unicity count n_U 16; first-occurrence order [4, 2, 1, 3, 0]
+  truth: A [30, 25, 9, 26, 2] (digits [[0, 2, 2], [1, 0, 2], [0, 3, 0], [2, 0, 2], [2, 0, 0]]; CRT [[0, 2, 0], [1, 1, 0], [0, 1, 4], [2, 2, 1], [2, 2, 2]]); the generator's representative is a member: true
+    member A [27, 25, 10, 25, 2] labels [Some(4), Some(2), Some(1), Some(0), Some(3)]; differs from the generator at classes [0, 2, 3]
+    member A [28, 25, 9, 26, 2] labels [Some(4), Some(2), Some(1), Some(0), Some(3)]; differs from the generator at classes [0]
+    member A [28, 25, 10, 25, 2] labels [Some(4), Some(2), Some(1), Some(0), Some(3)]; differs from the generator at classes [0, 2, 3]
+    member A [28, 26, 9, 25, 2] labels [Some(4), Some(2), Some(1), Some(0), Some(3)]; differs from the generator at classes [0, 1, 3]
+    member A [29, 25, 8, 27, 2] labels [Some(4), Some(2), Some(1), Some(0), Some(3)]; differs from the generator at classes [0, 2, 3]
+    member A [29, 25, 9, 26, 2] labels [Some(4), Some(2), Some(1), Some(0), Some(3)]; differs from the generator at classes [0]
+  every member regenerates every passage from some key: true
+executed transport (location only): 688 ms; resident 5111808 now, 5111808 peak
+== seed 2026100944, 48 keys x 120
+executed transport: helix [3, 4, 5] (D = 60, grain 12), 5 classes, seed 2026100944; read set 48 keys × 120 cells = 5760 observations; held-out keys 12
+  locate: 53 ms; fibre one; members 1; survivors at the end 2; peak survivors 103680; nodes explored 441341
+  n*_machine Some(260); unicity count n_U 16; first-occurrence order [2, 0, 3, 4, 1]
+  truth: A [37, 11, 43, 22, 13] (digits [[1, 0, 3], [2, 3, 0], [1, 2, 3], [1, 3, 1], [1, 0, 1]]; CRT [[1, 1, 2], [2, 3, 1], [1, 3, 3], [1, 2, 2], [1, 1, 3]]); the generator's representative is a member: true
+    member A [23, 49, 17, 38, 47] labels [Some(2), Some(1), Some(0), Some(4), Some(3)]; differs from the generator at classes []
+  every member regenerates every passage from some key: true
+executed transport (location only): 57 ms; resident 4837376 now, 4837376 peak
+== seed 2026100945, 48 keys x 120
+executed transport: helix [3, 4, 5] (D = 60, grain 12), 5 classes, seed 2026100945; read set 48 keys × 120 cells = 5760 observations; held-out keys 12
+  locate: 1737 ms; fibre one; members 1; survivors at the end 2; peak survivors 4565652; nodes explored 22690712
+  n*_machine Some(3250); unicity count n_U 16; first-occurrence order [4, 1, 2, 3, 0]
+  truth: A [24, 41, 36, 14, 3] (digits [[0, 0, 2], [2, 1, 3], [0, 0, 3], [2, 0, 1], [0, 1, 0]]; CRT [[0, 0, 4], [2, 1, 1], [0, 0, 1], [2, 2, 4], [0, 3, 3]]); the generator's representative is a member: true
+    member A [24, 41, 36, 14, 3] labels [Some(4), Some(1), Some(3), Some(0), Some(2)]; differs from the generator at classes []
+  every member regenerates every passage from some key: true
+executed transport (location only): 1741 ms; resident 4800512 now, 4800512 peak
+== seed 2026100946, 48 keys x 120
+executed transport: helix [3, 4, 5] (D = 60, grain 12), 5 classes, seed 2026100946; read set 48 keys × 120 cells = 5760 observations; held-out keys 12
+  locate: 638 ms; fibre plural (46 gauge classes); members 46; survivors at the end 92; peak survivors 69828; nodes explored 9747368
+  n*_machine Some(4329); unicity count n_U 16; first-occurrence order [1, 0, 2, 4, 3]
+  truth: A [0, 5, 58, 23, 36] (digits [[0, 0, 0], [2, 1, 0], [1, 3, 4], [2, 3, 1], [0, 0, 3]]; CRT [[0, 0, 0], [2, 1, 0], [1, 2, 3], [2, 3, 3], [0, 0, 1]]); the generator's representative is a member: true
+    member A [0, 2, 58, 23, 35] labels [Some(1), Some(0), Some(2), Some(3), Some(4)]; differs from the generator at classes [1, 4]
+    member A [0, 2, 58, 23, 36] labels [Some(1), Some(0), Some(2), Some(3), Some(4)]; differs from the generator at classes [1]
+    member A [0, 2, 59, 23, 30] labels [Some(1), Some(0), Some(2), Some(3), Some(4)]; differs from the generator at classes [1, 2, 4]
+    member A [0, 3, 58, 22, 35] labels [Some(1), Some(0), Some(2), Some(3), Some(4)]; differs from the generator at classes [1, 3, 4]
+    member A [0, 3, 58, 22, 36] labels [Some(1), Some(0), Some(2), Some(3), Some(4)]; differs from the generator at classes [1, 3]
+    member A [0, 3, 58, 22, 37] labels [Some(1), Some(0), Some(2), Some(3), Some(4)]; differs from the generator at classes [1, 3, 4]
+  every member regenerates every passage from some key: true
+executed transport (location only): 772 ms; resident 5160960 now, 5160960 peak
+== seed 2026100947, 48 keys x 120
+executed transport: helix [3, 4, 5] (D = 60, grain 12), 5 classes, seed 2026100947; read set 48 keys × 120 cells = 5760 observations; held-out keys 12
+  locate: 31 ms; fibre one; members 1; survivors at the end 2; peak survivors 73140; nodes explored 249883
+  n*_machine Some(2402); unicity count n_U 16; first-occurrence order [3, 2, 0, 1, 4]
+  truth: A [58, 54, 57, 31, 11] (digits [[1, 3, 4], [0, 2, 4], [0, 3, 4], [1, 2, 2], [2, 3, 0]]; CRT [[1, 2, 3], [0, 2, 4], [0, 1, 2], [1, 3, 1], [2, 3, 1]]); the generator's representative is a member: true
+    member A [2, 6, 3, 29, 49] labels [Some(3), Some(4), Some(2), Some(0), Some(1)]; differs from the generator at classes []
+  every member regenerates every passage from some key: true
+executed transport (location only): 35 ms; resident 4771840 now, 4771840 peak
+== seed 2026100948, 48 keys x 120
+executed transport: helix [3, 4, 5] (D = 60, grain 12), 5 classes, seed 2026100948; read set 48 keys × 120 cells = 5760 observations; held-out keys 12
+  locate: 164 ms; fibre plural (4 gauge classes); members 4; survivors at the end 8; peak survivors 8280; nodes explored 3457404
+  n*_machine Some(3842); unicity count n_U 16; first-occurrence order [3, 2, 0, 1, 4]
+  truth: A [6, 37, 51, 54, 13] (digits [[0, 2, 0], [1, 0, 3], [0, 1, 4], [0, 2, 4], [1, 0, 1]]; CRT [[0, 2, 1], [1, 1, 2], [0, 3, 1], [0, 2, 4], [1, 1, 3]]); the generator's representative is a member: true
+    member A [54, 22, 9, 7, 47] labels [Some(3), Some(2), Some(0), Some(1), Some(4)]; differs from the generator at classes [1, 3]
+    member A [54, 23, 9, 6, 47] labels [Some(3), Some(2), Some(0), Some(1), Some(4)]; differs from the generator at classes []
+    member A [54, 23, 9, 7, 46] labels [Some(3), Some(2), Some(0), Some(1), Some(4)]; differs from the generator at classes [3, 4]
+    member A [54, 23, 9, 7, 47] labels [Some(3), Some(2), Some(0), Some(1), Some(4)]; differs from the generator at classes [3]
+  every member regenerates every passage from some key: true
+executed transport (location only): 177 ms; resident 4890624 now, 4890624 peak
+== seed 2026100949, 48 keys x 120
+executed transport: helix [3, 4, 5] (D = 60, grain 12), 5 classes, seed 2026100949; read set 48 keys × 120 cells = 5760 observations; held-out keys 12
+  locate: 97 ms; fibre one; members 1; survivors at the end 2; peak survivors 254628; nodes explored 1113357
+  n*_machine Some(1580); unicity count n_U 16; first-occurrence order [4, 2, 0, 1, 3]
+  truth: A [25, 52, 27, 45, 15] (digits [[1, 0, 2], [1, 1, 4], [0, 1, 2], [0, 3, 3], [0, 1, 1]]; CRT [[1, 1, 0], [1, 0, 2], [0, 3, 2], [0, 1, 0], [0, 3, 0]]); the generator's representative is a member: true
+    member A [25, 52, 27, 45, 15] labels [Some(4), Some(2), Some(1), Some(0), Some(3)]; differs from the generator at classes []
+  every member regenerates every passage from some key: true
+executed transport (location only): 100 ms; resident 5062656 now, 5062656 peak
+== seed 2026100950, 48 keys x 120
+executed transport: helix [3, 4, 5] (D = 60, grain 12), 5 classes, seed 2026100950; read set 48 keys × 120 cells = 5760 observations; held-out keys 12
+  locate: 112 ms; fibre one; members 1; survivors at the end 2; peak survivors 254628; nodes explored 1093827
+  n*_machine Some(3604); unicity count n_U 16; first-occurrence order [1, 0, 3, 2, 4]
+  truth: A [33, 42, 36, 38, 26] (digits [[0, 3, 2], [0, 2, 3], [0, 0, 3], [2, 0, 3], [2, 0, 2]]; CRT [[0, 1, 3], [0, 2, 2], [0, 0, 1], [2, 2, 3], [2, 2, 1]]); the generator's representative is a member: true
+    member A [27, 18, 24, 22, 34] labels [Some(1), Some(0), Some(2), Some(4), Some(3)]; differs from the generator at classes []
+  every member regenerates every passage from some key: true
+executed transport (location only): 115 ms; resident 4763648 now, 4763648 peak
+== seed 2026100951, 48 keys x 120
+executed transport: helix [3, 4, 5] (D = 60, grain 12), 5 classes, seed 2026100951; read set 48 keys × 120 cells = 5760 observations; held-out keys 12
+  locate: 131 ms; fibre plural (6 gauge classes); members 6; survivors at the end 12; peak survivors 73140; nodes explored 2120935
+  n*_machine Some(4082); unicity count n_U 16; first-occurrence order [1, 4, 3, 0, 2]
+  truth: A [0, 47, 54, 34, 40] (digits [[0, 0, 0], [2, 3, 3], [0, 2, 4], [1, 3, 2], [1, 1, 3]]; CRT [[0, 0, 0], [2, 3, 2], [0, 2, 4], [1, 2, 4], [1, 0, 0]]); the generator's representative is a member: true
+    member A [0, 13, 5, 25, 21] labels [Some(1), Some(4), Some(0), Some(3), Some(2)]; differs from the generator at classes [2, 3, 4]
+    member A [0, 13, 6, 25, 21] labels [Some(1), Some(4), Some(0), Some(3), Some(2)]; differs from the generator at classes [3, 4]
+    member A [0, 13, 6, 26, 20] labels [Some(1), Some(4), Some(0), Some(3), Some(2)]; differs from the generator at classes []
+    member A [0, 13, 7, 26, 20] labels [Some(1), Some(4), Some(0), Some(3), Some(2)]; differs from the generator at classes [2]
+    member A [0, 14, 5, 25, 20] labels [Some(1), Some(4), Some(0), Some(3), Some(2)]; differs from the generator at classes [1, 2, 3]
+    member A [0, 14, 6, 25, 20] labels [Some(1), Some(4), Some(0), Some(3), Some(2)]; differs from the generator at classes [1, 3]
+  every member regenerates every passage from some key: true
+executed transport (location only): 149 ms; resident 4952064 now, 4952064 peak
+== seed 2026100952, 48 keys x 120
+executed transport: helix [3, 4, 5] (D = 60, grain 12), 5 classes, seed 2026100952; read set 48 keys × 120 cells = 5760 observations; held-out keys 12
+  locate: 58 ms; fibre plural (2 gauge classes); members 2; survivors at the end 4; peak survivors 73140; nodes explored 967933
+  n*_machine Some(5647); unicity count n_U 16; first-occurrence order [2, 4, 3, 1, 0]
+  truth: A [33, 16, 48, 8, 45] (digits [[0, 3, 2], [1, 1, 1], [0, 0, 4], [2, 2, 0], [0, 3, 3]]; CRT [[0, 1, 3], [1, 0, 1], [0, 0, 3], [2, 0, 3], [0, 1, 0]]); the generator's representative is a member: true
+    member A [15, 44, 24, 52, 15] labels [Some(2), Some(0), Some(4), Some(3), Some(1)]; differs from the generator at classes [0, 2]
+    member A [27, 44, 12, 52, 15] labels [Some(2), Some(4), Some(3), Some(1), Some(0)]; differs from the generator at classes []
+  every member regenerates every passage from some key: true
+executed transport (location only): 65 ms; resident 4825088 now, 4825088 peak
+== seed 2026100953, 48 keys x 120
+executed transport: helix [3, 4, 5] (D = 60, grain 12), 5 classes, seed 2026100953; read set 48 keys × 120 cells = 5760 observations; held-out keys 12
+  locate: 30555 ms; fibre plural (313 gauge classes); members 313; survivors at the end 626; peak survivors 3782616; nodes explored 514033351
+  n*_machine Some(614); unicity count n_U 16; first-occurrence order [4, 0, 3, 1, 2]
+  truth: A [28, 52, 48, 47, 45] (digits [[1, 1, 2], [1, 1, 4], [0, 0, 4], [2, 3, 3], [0, 3, 3]]; CRT [[1, 0, 3], [1, 0, 2], [0, 0, 3], [2, 3, 2], [0, 1, 0]]); the generator's representative is a member: true
+    member A [25, 4, 12, 17, 18] labels [Some(4), Some(0), Some(1), Some(2), Some(3)]; differs from the generator at classes [0, 1, 3, 4]
+    member A [25, 4, 12, 18, 17] labels [Some(4), Some(0), Some(1), Some(2), Some(3)]; differs from the generator at classes [0, 1, 3, 4]
+    member A [25, 5, 11, 18, 17] labels [Some(4), Some(0), Some(1), Some(2), Some(3)]; differs from the generator at classes [0, 1, 2, 3, 4]
+    member A [25, 5, 11, 19, 16] labels [Some(4), Some(0), Some(1), Some(2), Some(3)]; differs from the generator at classes [0, 1, 2, 3, 4]
+    member A [25, 5, 12, 15, 20] labels [Some(4), Some(0), Some(1), Some(2), Some(3)]; differs from the generator at classes [0, 1, 3, 4]
+    member A [25, 5, 12, 16, 19] labels [Some(4), Some(0), Some(1), Some(2), Some(3)]; differs from the generator at classes [0, 1, 3, 4]
+  every member regenerates every passage from some key: true
+executed transport (location only): 31428 ms; resident 5488640 now, 5488640 peak
+== seed 2026100954, 48 keys x 120
+executed transport: helix [3, 4, 5] (D = 60, grain 12), 5 classes, seed 2026100954; read set 48 keys × 120 cells = 5760 observations; held-out keys 12
+  locate: 6 ms; fibre plural (2 gauge classes); members 2; survivors at the end 4; peak survivors 3312; nodes explored 115329
+  n*_machine Some(3244); unicity count n_U 16; first-occurrence order [4, 1, 3, 2, 0]
+  truth: A [49, 5, 51, 55, 51] (digits [[1, 0, 4], [2, 1, 0], [0, 1, 4], [1, 2, 4], [0, 1, 4]]; CRT [[1, 1, 4], [2, 1, 0], [0, 3, 1], [1, 3, 0], [0, 3, 1]]); the generator's representative is a member: true
+    member A [11, 55, 9, 5, 9] labels [Some(4), Some(1), Some(0), Some(2), Some(3)]; differs from the generator at classes []
+    member A [12, 55, 9, 5, 9] labels [Some(4), Some(1), Some(0), Some(2), Some(3)]; differs from the generator at classes [0]
+  every member regenerates every passage from some key: true
+executed transport (location only): 13 ms; resident 4968448 now, 4968448 peak
+== seed 2026100955, 48 keys x 120
+executed transport: helix [3, 4, 5] (D = 60, grain 12), 5 classes, seed 2026100955; read set 48 keys × 120 cells = 5760 observations; held-out keys 12
+  locate: 539 ms; fibre one; members 1; survivors at the end 2; peak survivors 2106744; nodes explored 4912923
+  n*_machine Some(371); unicity count n_U 16; first-occurrence order [2, 3, 0, 4, 1]
+  truth: A [21, 56, 35, 14, 43] (digits [[0, 3, 1], [2, 2, 4], [2, 3, 2], [2, 0, 1], [1, 2, 3]]; CRT [[0, 1, 1], [2, 0, 1], [2, 3, 0], [2, 2, 4], [1, 3, 3]]); the generator's representative is a member: true
+    member A [39, 4, 25, 46, 17] labels [Some(2), Some(0), Some(3), Some(1), Some(4)]; differs from the generator at classes []
+  every member regenerates every passage from some key: true
+executed transport (location only): 543 ms; resident 4898816 now, 4898816 peak
+== seed 2026100956, 48 keys x 120
+executed transport: helix [3, 4, 5] (D = 60, grain 12), 5 classes, seed 2026100956; read set 48 keys × 120 cells = 5760 observations; held-out keys 12
+  locate: 1304 ms; fibre plural (7 gauge classes); members 7; survivors at the end 14; peak survivors 895860; nodes explored 26795969
+  n*_machine Some(3606); unicity count n_U 16; first-occurrence order [2, 3, 1, 0, 4]
+  truth: A [53, 40, 11, 46, 44] (digits [[2, 1, 4], [1, 1, 3], [2, 3, 0], [1, 3, 3], [2, 2, 3]]; CRT [[2, 1, 3], [1, 0, 0], [2, 3, 1], [1, 2, 1], [2, 0, 4]]); the generator's representative is a member: true
+    member A [52, 40, 10, 47, 44] labels [Some(2), Some(3), Some(4), Some(0), Some(1)]; differs from the generator at classes [0, 2, 3]
+    member A [52, 40, 11, 46, 45] labels [Some(2), Some(3), Some(4), Some(0), Some(1)]; differs from the generator at classes [0, 4]
+    member A [52, 41, 11, 46, 44] labels [Some(2), Some(3), Some(4), Some(0), Some(1)]; differs from the generator at classes [0, 1]
+    member A [53, 40, 10, 47, 43] labels [Some(2), Some(3), Some(4), Some(0), Some(1)]; differs from the generator at classes [2, 3, 4]
+    member A [53, 40, 11, 46, 44] labels [Some(2), Some(3), Some(4), Some(0), Some(1)]; differs from the generator at classes []
+    member A [53, 41, 11, 46, 43] labels [Some(2), Some(3), Some(4), Some(0), Some(1)]; differs from the generator at classes [1, 4]
+  every member regenerates every passage from some key: true
+executed transport (location only): 1324 ms; resident 4829184 now, 4829184 peak
+== seed 2026100941, 60 keys x 120
+executed transport: helix [3, 4, 5] (D = 60, grain 12), 5 classes, seed 2026100941; read set 60 keys × 120 cells = 7200 observations; held-out keys 0
+  locate: 138 ms; fibre one; members 1; survivors at the end 2; peak survivors 248832; nodes explored 2434415
+  n*_machine Some(6126); unicity count n_U 16; first-occurrence order [1, 2, 4, 3, 0]
+  truth: A [9, 39, 59, 29, 17] (digits [[0, 3, 0], [0, 1, 3], [2, 3, 4], [2, 1, 2], [2, 1, 1]]; CRT [[0, 1, 4], [0, 3, 4], [2, 3, 4], [2, 1, 4], [2, 1, 2]]); the generator's representative is a member: true
+    member A [51, 21, 1, 31, 43] labels [Some(1), Some(3), Some(2), Some(4), Some(0)]; differs from the generator at classes []
+  every member regenerates every passage from some key: true
+executed transport (location only): 143 ms; resident 5029888 now, 5029888 peak
+== seed 2026100942, 60 keys x 120
+executed transport: helix [3, 4, 5] (D = 60, grain 12), 5 classes, seed 2026100942; read set 60 keys × 120 cells = 7200 observations; held-out keys 0
+  locate: 39 ms; fibre one; members 1; survivors at the end 2; peak survivors 14292; nodes explored 774991
+  n*_machine Some(2532); unicity count n_U 16; first-occurrence order [1, 2, 3, 4, 0]
+  truth: A [33, 24, 59, 51, 52] (digits [[0, 3, 2], [0, 0, 2], [2, 3, 4], [0, 1, 4], [1, 1, 4]]; CRT [[0, 1, 3], [0, 0, 4], [2, 3, 4], [0, 3, 1], [1, 0, 2]]); the generator's representative is a member: true
+    member A [33, 24, 59, 51, 52] labels [Some(1), Some(3), Some(2), Some(0), Some(4)]; differs from the generator at classes []
+  every member regenerates every passage from some key: true
+executed transport (location only): 44 ms; resident 5025792 now, 5025792 peak
+== seed 2026100943, 60 keys x 120
+executed transport: helix [3, 4, 5] (D = 60, grain 12), 5 classes, seed 2026100943; read set 60 keys × 120 cells = 7200 observations; held-out keys 0
+  locate: 586 ms; fibre plural (35 gauge classes); members 35; survivors at the end 70; peak survivors 9844; nodes explored 9499652
+  n*_machine Some(5288); unicity count n_U 16; first-occurrence order [4, 2, 1, 3, 0]
+  truth: A [30, 25, 9, 26, 2] (digits [[0, 2, 2], [1, 0, 2], [0, 3, 0], [2, 0, 2], [2, 0, 0]]; CRT [[0, 2, 0], [1, 1, 0], [0, 1, 4], [2, 2, 1], [2, 2, 2]]); the generator's representative is a member: true
+    member A [27, 25, 10, 25, 2] labels [Some(4), Some(2), Some(1), Some(0), Some(3)]; differs from the generator at classes [0, 2, 3]
+    member A [28, 25, 9, 26, 2] labels [Some(4), Some(2), Some(1), Some(0), Some(3)]; differs from the generator at classes [0]
+    member A [28, 25, 10, 25, 2] labels [Some(4), Some(2), Some(1), Some(0), Some(3)]; differs from the generator at classes [0, 2, 3]
+    member A [28, 26, 9, 25, 2] labels [Some(4), Some(2), Some(1), Some(0), Some(3)]; differs from the generator at classes [0, 1, 3]
+    member A [29, 25, 8, 27, 2] labels [Some(4), Some(2), Some(1), Some(0), Some(3)]; differs from the generator at classes [0, 2, 3]
+    member A [29, 25, 9, 26, 2] labels [Some(4), Some(2), Some(1), Some(0), Some(3)]; differs from the generator at classes [0]
+  every member regenerates every passage from some key: true
+executed transport (location only): 715 ms; resident 5369856 now, 5369856 peak
+== seed 2026100944, 60 keys x 120
+executed transport: helix [3, 4, 5] (D = 60, grain 12), 5 classes, seed 2026100944; read set 60 keys × 120 cells = 7200 observations; held-out keys 0
+  locate: 50 ms; fibre one; members 1; survivors at the end 2; peak survivors 103680; nodes explored 444221
+  n*_machine Some(260); unicity count n_U 16; first-occurrence order [2, 0, 3, 4, 1]
+  truth: A [37, 11, 43, 22, 13] (digits [[1, 0, 3], [2, 3, 0], [1, 2, 3], [1, 3, 1], [1, 0, 1]]; CRT [[1, 1, 2], [2, 3, 1], [1, 3, 3], [1, 2, 2], [1, 1, 3]]); the generator's representative is a member: true
+    member A [23, 49, 17, 38, 47] labels [Some(2), Some(1), Some(0), Some(4), Some(3)]; differs from the generator at classes []
+  every member regenerates every passage from some key: true
+executed transport (location only): 54 ms; resident 4943872 now, 4943872 peak
+== seed 2026100945, 60 keys x 120
+executed transport: helix [3, 4, 5] (D = 60, grain 12), 5 classes, seed 2026100945; read set 60 keys × 120 cells = 7200 observations; held-out keys 0
+  locate: 1563 ms; fibre one; members 1; survivors at the end 2; peak survivors 4565652; nodes explored 22693592
+  n*_machine Some(3250); unicity count n_U 16; first-occurrence order [4, 1, 2, 3, 0]
+  truth: A [24, 41, 36, 14, 3] (digits [[0, 0, 2], [2, 1, 3], [0, 0, 3], [2, 0, 1], [0, 1, 0]]; CRT [[0, 0, 4], [2, 1, 1], [0, 0, 1], [2, 2, 4], [0, 3, 3]]); the generator's representative is a member: true
+    member A [24, 41, 36, 14, 3] labels [Some(4), Some(1), Some(3), Some(0), Some(2)]; differs from the generator at classes []
+  every member regenerates every passage from some key: true
+executed transport (location only): 1567 ms; resident 5120000 now, 5120000 peak
+== seed 2026100946, 60 keys x 120
+executed transport: helix [3, 4, 5] (D = 60, grain 12), 5 classes, seed 2026100946; read set 60 keys × 120 cells = 7200 observations; held-out keys 0
+  locate: 639 ms; fibre plural (46 gauge classes); members 46; survivors at the end 92; peak survivors 69828; nodes explored 9879848
+  n*_machine Some(4329); unicity count n_U 16; first-occurrence order [1, 0, 2, 4, 3]
+  truth: A [0, 5, 58, 23, 36] (digits [[0, 0, 0], [2, 1, 0], [1, 3, 4], [2, 3, 1], [0, 0, 3]]; CRT [[0, 0, 0], [2, 1, 0], [1, 2, 3], [2, 3, 3], [0, 0, 1]]); the generator's representative is a member: true
+    member A [0, 2, 58, 23, 35] labels [Some(1), Some(0), Some(2), Some(3), Some(4)]; differs from the generator at classes [1, 4]
+    member A [0, 2, 58, 23, 36] labels [Some(1), Some(0), Some(2), Some(3), Some(4)]; differs from the generator at classes [1]
+    member A [0, 2, 59, 23, 30] labels [Some(1), Some(0), Some(2), Some(3), Some(4)]; differs from the generator at classes [1, 2, 4]
+    member A [0, 3, 58, 22, 35] labels [Some(1), Some(0), Some(2), Some(3), Some(4)]; differs from the generator at classes [1, 3, 4]
+    member A [0, 3, 58, 22, 36] labels [Some(1), Some(0), Some(2), Some(3), Some(4)]; differs from the generator at classes [1, 3]
+    member A [0, 3, 58, 22, 37] labels [Some(1), Some(0), Some(2), Some(3), Some(4)]; differs from the generator at classes [1, 3, 4]
+  every member regenerates every passage from some key: true
+executed transport (location only): 805 ms; resident 5447680 now, 5447680 peak
+== seed 2026100947, 60 keys x 120
+executed transport: helix [3, 4, 5] (D = 60, grain 12), 5 classes, seed 2026100947; read set 60 keys × 120 cells = 7200 observations; held-out keys 0
+  locate: 32 ms; fibre one; members 1; survivors at the end 2; peak survivors 73140; nodes explored 252763
+  n*_machine Some(2402); unicity count n_U 16; first-occurrence order [3, 2, 0, 1, 4]
+  truth: A [58, 54, 57, 31, 11] (digits [[1, 3, 4], [0, 2, 4], [0, 3, 4], [1, 2, 2], [2, 3, 0]]; CRT [[1, 2, 3], [0, 2, 4], [0, 1, 2], [1, 3, 1], [2, 3, 1]]); the generator's representative is a member: true
+    member A [2, 6, 3, 29, 49] labels [Some(3), Some(4), Some(2), Some(0), Some(1)]; differs from the generator at classes []
+  every member regenerates every passage from some key: true
+executed transport (location only): 37 ms; resident 5087232 now, 5087232 peak
+== seed 2026100948, 60 keys x 120
+executed transport: helix [3, 4, 5] (D = 60, grain 12), 5 classes, seed 2026100948; read set 60 keys × 120 cells = 7200 observations; held-out keys 0
+  locate: 163 ms; fibre plural (4 gauge classes); members 4; survivors at the end 8; peak survivors 8280; nodes explored 3468924
+  n*_machine Some(3842); unicity count n_U 16; first-occurrence order [3, 2, 0, 1, 4]
+  truth: A [6, 37, 51, 54, 13] (digits [[0, 2, 0], [1, 0, 3], [0, 1, 4], [0, 2, 4], [1, 0, 1]]; CRT [[0, 2, 1], [1, 1, 2], [0, 3, 1], [0, 2, 4], [1, 1, 3]]); the generator's representative is a member: true
+    member A [54, 22, 9, 7, 47] labels [Some(3), Some(2), Some(0), Some(1), Some(4)]; differs from the generator at classes [1, 3]
+    member A [54, 23, 9, 6, 47] labels [Some(3), Some(2), Some(0), Some(1), Some(4)]; differs from the generator at classes []
+    member A [54, 23, 9, 7, 46] labels [Some(3), Some(2), Some(0), Some(1), Some(4)]; differs from the generator at classes [3, 4]
+    member A [54, 23, 9, 7, 47] labels [Some(3), Some(2), Some(0), Some(1), Some(4)]; differs from the generator at classes [3]
+  every member regenerates every passage from some key: true
+executed transport (location only): 178 ms; resident 4829184 now, 4829184 peak
+== seed 2026100949, 60 keys x 120
+executed transport: helix [3, 4, 5] (D = 60, grain 12), 5 classes, seed 2026100949; read set 60 keys × 120 cells = 7200 observations; held-out keys 0
+  locate: 96 ms; fibre one; members 1; survivors at the end 2; peak survivors 254628; nodes explored 1116237
+  n*_machine Some(1580); unicity count n_U 16; first-occurrence order [4, 2, 0, 1, 3]
+  truth: A [25, 52, 27, 45, 15] (digits [[1, 0, 2], [1, 1, 4], [0, 1, 2], [0, 3, 3], [0, 1, 1]]; CRT [[1, 1, 0], [1, 0, 2], [0, 3, 2], [0, 1, 0], [0, 3, 0]]); the generator's representative is a member: true
+    member A [25, 52, 27, 45, 15] labels [Some(4), Some(2), Some(1), Some(0), Some(3)]; differs from the generator at classes []
+  every member regenerates every passage from some key: true
+executed transport (location only): 101 ms; resident 4894720 now, 4894720 peak
+== seed 2026100950, 60 keys x 120
+executed transport: helix [3, 4, 5] (D = 60, grain 12), 5 classes, seed 2026100950; read set 60 keys × 120 cells = 7200 observations; held-out keys 0
+  locate: 111 ms; fibre one; members 1; survivors at the end 2; peak survivors 254628; nodes explored 1096707
+  n*_machine Some(3604); unicity count n_U 16; first-occurrence order [1, 0, 3, 2, 4]
+  truth: A [33, 42, 36, 38, 26] (digits [[0, 3, 2], [0, 2, 3], [0, 0, 3], [2, 0, 3], [2, 0, 2]]; CRT [[0, 1, 3], [0, 2, 2], [0, 0, 1], [2, 2, 3], [2, 2, 1]]); the generator's representative is a member: true
+    member A [27, 18, 24, 22, 34] labels [Some(1), Some(0), Some(2), Some(4), Some(3)]; differs from the generator at classes []
+  every member regenerates every passage from some key: true
+executed transport (location only): 116 ms; resident 5193728 now, 5193728 peak
+== seed 2026100951, 60 keys x 120
+executed transport: helix [3, 4, 5] (D = 60, grain 12), 5 classes, seed 2026100951; read set 60 keys × 120 cells = 7200 observations; held-out keys 0
+  locate: 128 ms; fibre plural (6 gauge classes); members 6; survivors at the end 12; peak survivors 73140; nodes explored 2138215
+  n*_machine Some(4082); unicity count n_U 16; first-occurrence order [1, 4, 3, 0, 2]
+  truth: A [0, 47, 54, 34, 40] (digits [[0, 0, 0], [2, 3, 3], [0, 2, 4], [1, 3, 2], [1, 1, 3]]; CRT [[0, 0, 0], [2, 3, 2], [0, 2, 4], [1, 2, 4], [1, 0, 0]]); the generator's representative is a member: true
+    member A [0, 13, 5, 25, 21] labels [Some(1), Some(4), Some(0), Some(3), Some(2)]; differs from the generator at classes [2, 3, 4]
+    member A [0, 13, 6, 25, 21] labels [Some(1), Some(4), Some(0), Some(3), Some(2)]; differs from the generator at classes [3, 4]
+    member A [0, 13, 6, 26, 20] labels [Some(1), Some(4), Some(0), Some(3), Some(2)]; differs from the generator at classes []
+    member A [0, 13, 7, 26, 20] labels [Some(1), Some(4), Some(0), Some(3), Some(2)]; differs from the generator at classes [2]
+    member A [0, 14, 5, 25, 20] labels [Some(1), Some(4), Some(0), Some(3), Some(2)]; differs from the generator at classes [1, 2, 3]
+    member A [0, 14, 6, 25, 20] labels [Some(1), Some(4), Some(0), Some(3), Some(2)]; differs from the generator at classes [1, 3]
+  every member regenerates every passage from some key: true
+executed transport (location only): 151 ms; resident 5156864 now, 5156864 peak
+== seed 2026100952, 60 keys x 120
+executed transport: helix [3, 4, 5] (D = 60, grain 12), 5 classes, seed 2026100952; read set 60 keys × 120 cells = 7200 observations; held-out keys 0
+  locate: 57 ms; fibre plural (2 gauge classes); members 2; survivors at the end 4; peak survivors 73140; nodes explored 973693
+  n*_machine Some(5647); unicity count n_U 16; first-occurrence order [2, 4, 3, 1, 0]
+  truth: A [33, 16, 48, 8, 45] (digits [[0, 3, 2], [1, 1, 1], [0, 0, 4], [2, 2, 0], [0, 3, 3]]; CRT [[0, 1, 3], [1, 0, 1], [0, 0, 3], [2, 0, 3], [0, 1, 0]]); the generator's representative is a member: true
+    member A [15, 44, 24, 52, 15] labels [Some(2), Some(0), Some(4), Some(3), Some(1)]; differs from the generator at classes [0, 2]
+    member A [27, 44, 12, 52, 15] labels [Some(2), Some(4), Some(3), Some(1), Some(0)]; differs from the generator at classes []
+  every member regenerates every passage from some key: true
+executed transport (location only): 65 ms; resident 4931584 now, 4931584 peak
+== seed 2026100953, 60 keys x 120
+executed transport: helix [3, 4, 5] (D = 60, grain 12), 5 classes, seed 2026100953; read set 60 keys × 120 cells = 7200 observations; held-out keys 0
+  locate: 30513 ms; fibre plural (313 gauge classes); members 313; survivors at the end 626; peak survivors 3782616; nodes explored 514934791
+  n*_machine Some(614); unicity count n_U 16; first-occurrence order [4, 0, 3, 1, 2]
+  truth: A [28, 52, 48, 47, 45] (digits [[1, 1, 2], [1, 1, 4], [0, 0, 4], [2, 3, 3], [0, 3, 3]]; CRT [[1, 0, 3], [1, 0, 2], [0, 0, 3], [2, 3, 2], [0, 1, 0]]); the generator's representative is a member: true
+    member A [25, 4, 12, 17, 18] labels [Some(4), Some(0), Some(1), Some(2), Some(3)]; differs from the generator at classes [0, 1, 3, 4]
+    member A [25, 4, 12, 18, 17] labels [Some(4), Some(0), Some(1), Some(2), Some(3)]; differs from the generator at classes [0, 1, 3, 4]
+    member A [25, 5, 11, 18, 17] labels [Some(4), Some(0), Some(1), Some(2), Some(3)]; differs from the generator at classes [0, 1, 2, 3, 4]
+    member A [25, 5, 11, 19, 16] labels [Some(4), Some(0), Some(1), Some(2), Some(3)]; differs from the generator at classes [0, 1, 2, 3, 4]
+    member A [25, 5, 12, 15, 20] labels [Some(4), Some(0), Some(1), Some(2), Some(3)]; differs from the generator at classes [0, 1, 3, 4]
+    member A [25, 5, 12, 16, 19] labels [Some(4), Some(0), Some(1), Some(2), Some(3)]; differs from the generator at classes [0, 1, 3, 4]
+  every member regenerates every passage from some key: true
+executed transport (location only): 31606 ms; resident 5586944 now, 5586944 peak
+== seed 2026100954, 60 keys x 120
+executed transport: helix [3, 4, 5] (D = 60, grain 12), 5 classes, seed 2026100954; read set 60 keys × 120 cells = 7200 observations; held-out keys 0
+  locate: 6 ms; fibre one; members 1; survivors at the end 2; peak survivors 3312; nodes explored 118211
+  n*_machine Some(5762); unicity count n_U 16; first-occurrence order [4, 1, 3, 2, 0]
+  truth: A [49, 5, 51, 55, 51] (digits [[1, 0, 4], [2, 1, 0], [0, 1, 4], [1, 2, 4], [0, 1, 4]]; CRT [[1, 1, 4], [2, 1, 0], [0, 3, 1], [1, 3, 0], [0, 3, 1]]); the generator's representative is a member: true
+    member A [11, 55, 9, 5, 9] labels [Some(4), Some(1), Some(0), Some(2), Some(3)]; differs from the generator at classes []
+  every member regenerates every passage from some key: true
+executed transport (location only): 11 ms; resident 4866048 now, 4866048 peak
+== seed 2026100955, 60 keys x 120
+executed transport: helix [3, 4, 5] (D = 60, grain 12), 5 classes, seed 2026100955; read set 60 keys × 120 cells = 7200 observations; held-out keys 0
+  locate: 530 ms; fibre one; members 1; survivors at the end 2; peak survivors 2106744; nodes explored 4915803
+  n*_machine Some(371); unicity count n_U 16; first-occurrence order [2, 3, 0, 4, 1]
+  truth: A [21, 56, 35, 14, 43] (digits [[0, 3, 1], [2, 2, 4], [2, 3, 2], [2, 0, 1], [1, 2, 3]]; CRT [[0, 1, 1], [2, 0, 1], [2, 3, 0], [2, 2, 4], [1, 3, 3]]); the generator's representative is a member: true
+    member A [39, 4, 25, 46, 17] labels [Some(2), Some(0), Some(3), Some(1), Some(4)]; differs from the generator at classes []
+  every member regenerates every passage from some key: true
+executed transport (location only): 535 ms; resident 4857856 now, 4857856 peak
+== seed 2026100956, 60 keys x 120
+executed transport: helix [3, 4, 5] (D = 60, grain 12), 5 classes, seed 2026100956; read set 60 keys × 120 cells = 7200 observations; held-out keys 0
+  locate: 1306 ms; fibre plural (2 gauge classes); members 2; survivors at the end 4; peak survivors 895860; nodes explored 26814047
+  n*_machine Some(7095); unicity count n_U 16; first-occurrence order [2, 3, 1, 0, 4]
+  truth: A [53, 40, 11, 46, 44] (digits [[2, 1, 4], [1, 1, 3], [2, 3, 0], [1, 3, 3], [2, 2, 3]]; CRT [[2, 1, 3], [1, 0, 0], [2, 3, 1], [1, 2, 1], [2, 0, 4]]); the generator's representative is a member: true
+    member A [53, 40, 11, 46, 44] labels [Some(2), Some(3), Some(4), Some(0), Some(1)]; differs from the generator at classes []
+    member A [54, 40, 11, 46, 43] labels [Some(2), Some(3), Some(4), Some(0), Some(1)]; differs from the generator at classes [0, 4]
+  every member regenerates every passage from some key: true
+executed transport (location only): 1314 ms; resident 5062656 now, 5062656 peak
+exit 0
