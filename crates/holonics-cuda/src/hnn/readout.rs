@@ -1257,9 +1257,3 @@ pub(crate) fn word_return(
         released: Remainders::of(&remainders),
     }
 }
-
-/// Zero test for a coordinate (a helper for readings that skip zero terms).
-#[allow(dead_code)]
-fn is_zero(value: &BigInt) -> bool {
-    value.is_zero() || value.abs().is_zero()
-}

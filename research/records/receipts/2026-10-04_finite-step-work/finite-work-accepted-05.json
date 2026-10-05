@@ -1,0 +1,98 @@
+{
+  "status": "accepted isolated module",
+  "label": "finite-endpoint-development-05",
+  "source": "FiniteEndpointWorkFinal.lean",
+  "source_sha256": "ef0fdcdae1dfec7b1028be7509ccccdd57688f09af89be4d72d2d15fc10d2347",
+  "axiom_audits": [
+    {
+      "declaration": "Holonics.Geometry.Motion.finite_work_form_rechart",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "declaration": "Holonics.Geometry.Motion.affine_quadratic_work",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    }
+  ],
+  "warnings_errors_sorry": false,
+  "complete_import_parts_unchanged_after_execution": true,
+  "complete_import_seal_sha256": "fd7951ac5326fd7f9a2c9cfa93156bf8ce7815ac85cf0a82fed74b50642dfe08",
+  "compiler_output": {
+    "exit": 0,
+    "wall_ns": 946103970,
+    "CPU_count": 1,
+    "CPU_affinity": [
+      0
+    ],
+    "CPU_user_us": 620551,
+    "CPU_system_us": 289383,
+    "CPU_reading_grain_ns": 1000,
+    "timing_source": "monotonic_ns wall; glibc wait4 integer timeval CPU",
+    "peak_child_RSS_KiB": 1792272,
+    "cap_ns": 17000000000,
+    "projection_ns": 17000000000,
+    "projection_kill_triggered": false,
+    "system_floor_breached": false,
+    "system_floor_sampling_period_ns": 10000000,
+    "group_memory_max_bytes": 4294967296,
+    "group_memory_peak_bytes": 2410860544,
+    "group_memory_current_bytes": 2253799424,
+    "memory_events_after": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0,
+      "sock_throttled": 0
+    },
+    "memory_events_delta": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0,
+      "sock_throttled": 0
+    },
+    "stdout": {
+      "sha256": "e59aa68a87390f9562915fce44a8cf4f925e8489978998a6d7ac70580259d1f6",
+      "bytes": 219
+    },
+    "stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "outputs": {
+      "/home/b/Workspaces/holonics/.local/hnn-athena-foundation/lean-geometric-runner/FiniteEndpointWorkFinal.olean": {
+        "sha256": "158fea96fad8943ffcd38876a94e99f33841a130d7b49e49f11fcf85bd670cb5",
+        "bytes": 132880
+      },
+      "/home/b/Workspaces/holonics/.local/hnn-athena-foundation/lean-geometric-runner/FiniteEndpointWorkFinal.ilean": {
+        "sha256": "8516a767f2b82a667bfb47c142bb98c658399b5cf7f9e3e07bfb7b6e84feb43f",
+        "bytes": 4775
+      }
+    },
+    "all_outputs_present": true,
+    "inputs_unchanged": true,
+    "within_projection": true,
+    "sealed_before_audit": true
+  },
+  "lifecycle": {
+    "released_after_publication": true,
+    "child_reaped": true,
+    "own_group_other_PIDs": [],
+    "monotonic_ns": 115313554602423
+  },
+  "measured_wall_to_projected": "94610397/1700000000",
+  "source_owner_integration": "pending; no canonical Lean edit",
+  "source_scope": "same theorem bodies/types proposed for existing Motion owner; standalone check imports only cached Mathlib Mul and Ring",
+  "memory_interpretation": "Wait4 child RSS and cgroup charged-page peak are separate readings; each actual child stayed below 4 GiB. Cgroup charge peak need not bound shared file-mapped RSS."
+}

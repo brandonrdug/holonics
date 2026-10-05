@@ -786,9 +786,10 @@ impl Resident {
         &self.wall
     }
 
-    fn fresh(&mut self) -> u64 {
-        self.next += 1;
-        self.next
+    /// Preview a handle before any producing work mutates the resident. The caller holds the
+    /// resident exclusively and commits this exact counter only when it publishes that handle.
+    fn next_handle(&self) -> Result<u64, HnnError> {
+        self.next.checked_add(1).ok_or(HnnError::HandleCounterExhausted)
     }
 
     /// **Drop every kept read** when a constitution is published (a deposit's successor, a
@@ -969,6 +970,18 @@ impl Reference {
         current: &Current,
         constitution: Constitution,
     ) -> Result<Resident, HnnError> {
+        self.mount_with_family(field, current, constitution, None)
+    }
+
+    /// A restored declaring family is already read from the saved operands. A new mount
+    /// declares one at its current material; a cold passage restore must not do that again.
+    fn mount_with_family(
+        &self,
+        field: &Field,
+        current: &Current,
+        constitution: Constitution,
+        saved_family: Option<Vec<ReceivingPhases>>,
+    ) -> Result<Resident, HnnError> {
         let parametric = field.holarchy(&constitution)?.parametric();
         if parametric != field.parametric() {
             return Err(HnnError::Shape {
@@ -977,11 +990,12 @@ impl Reference {
                 found: parametric.navigators(),
             });
         }
-        let admitted = field
-            .receivers()
-            .iter()
-            .map(|receiver| ReceivingPhases::declare(field, &constitution, current, receiver))
-            .collect::<Result<Vec<_>, _>>()?;
+        let admitted = match saved_family {
+            Some(admitted) => admitted,
+            None => field.receivers().iter()
+                .map(|receiver| ReceivingPhases::declare(field, &constitution, current, receiver))
+                .collect::<Result<Vec<_>, _>>()?,
+        };
         Ok(Resident {
             field: field.clone(),
             current: current.clone(),
@@ -1042,8 +1056,9 @@ impl Reference {
     /// ([`Reference::mount_carried`]). A state written at rest carries none and mounts with none, so
     /// its next reception opens with zero carry at tick zero, the `A = I` opening from which the
     /// chain carries. A state that carries the resident's passage ([`Resident::continuing_state`])
-    /// mounts with its lift point, moment, aeon, balance, charts, register and ranks, and `current`
-    /// gives way to its lift point.
+    /// mounts its versioned passage: the lift, optional moment, aeon, balance, charts, register
+    /// with held site kinds, declaring family and one arrived comparison/opening. Saved declaring
+    /// phases are restored before mounting, and `current` gives way to the saved lift point.
     pub fn mount_continued(
         &self,
         field: &Field,
@@ -1052,16 +1067,30 @@ impl Reference {
         state: &crate::hnn::constitution::ContinuingState,
     ) -> Result<Resident, HnnError> {
         let constitution = opening.continued(state)?;
-        let resident = match state.carry() {
+        if let Some(passage) = state.passage() {
+            let (saved_current, family, opens) = Resident::passage_opening(field, passage)?;
+            if opens != self.reception.opens() {
+                return Err(HnnError::ContinuingState {
+                    what: "the saved passage against the declared reception",
+                });
+            }
+            if let Some(carry) = state.carry()
+                && (!matches!(self.reception, Reception::Carry(_)) || !carry.fits(field))
+            {
+                return Err(HnnError::ContinuingState {
+                    what: "a carried end mounted at rest or of another field's shape",
+                });
+            }
+            let mut resident = self.mount_with_family(
+                field, &saved_current, constitution, Some(family),
+            )?;
+            resident.carried = state.carry().cloned();
+            return resident.with_passage(passage);
+        }
+        // A constitution-only save remains a declared narrower material/carry remount.
+        match state.carry() {
             Some(carry) => self.mount_carried(field, current, constitution, carry.clone()),
             None => self.mount_with(field, current, constitution),
-        }?;
-        // The resident's passage, where the state carries one (§10): the mount's lift point and
-        // moment give way to the saved ones, so the next exposure continues the cut where it
-        // stopped.
-        match state.passage() {
-            Some(passage) => resident.with_passage(passage),
-            None => Ok(resident),
         }
     }
 }
@@ -1167,10 +1196,10 @@ impl ExecutionPort for Reference {
                 });
             }
             None => {
-                let id = MomentId(resident.fresh());
-                resident
-                    .moments
-                    .insert(id, SourceMoment::open_with(&field, &resident.current, &resident.constitution)?);
+                let id = MomentId(resident.next_handle()?);
+                let opened = SourceMoment::open_with(&field, &resident.current, &resident.constitution)?;
+                resident.next = id.0;
+                resident.moments.insert(id, opened);
                 id
             }
         };
@@ -1363,6 +1392,7 @@ impl ExecutionPort for Reference {
             phases,
             resident.constitution.commit(),
         )?;
+        let id = PendingId(resident.next_handle()?);
         let field = &resident.field;
         let start = Instant::now();
         let (word, faces) =
@@ -1427,7 +1457,7 @@ impl ExecutionPort for Reference {
         };
         resident.wall.refine_read += read;
         resident.wall.release += start.elapsed();
-        let id = PendingId(resident.fresh());
+        resident.next = id.0;
         resident.pending.insert(
             id,
             PendingSlot {
@@ -1475,7 +1505,7 @@ impl ExecutionPort for Reference {
         let commit = resident.constitution.commit();
         let slot = resident
             .pending
-            .get_mut(&pending)
+            .get(&pending)
             .ok_or(HnnError::UnknownHandle {
                 handle: Handle::Pending(pending),
             })?;
@@ -1488,6 +1518,8 @@ impl ExecutionPort for Reference {
                 found: targets.len(),
             });
         }
+        let id = StagedId(resident.next_handle()?);
+        let slot = resident.pending.get_mut(&pending).expect("checked above");
         // The kept read is the contemporary read when the constitution is still the one it was
         // read at; otherwise the word is read again at the published constitution (module header,
         // "The kept read").
@@ -1584,7 +1616,7 @@ impl ExecutionPort for Reference {
         };
         resident.ledger.arrive(code_length, targets.len() as u64);
         resident.wall += wall;
-        let id = StagedId(resident.fresh());
+        resident.next = id.0;
         resident.staged.insert(
             id,
             StagedSlot {

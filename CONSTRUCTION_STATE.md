@@ -8,6 +8,12 @@ keeps the steps, campaigns and forward plan it replaced, and THE_REBUILD's
 The repository was reset on September 24; the pre-reset tree is
 [`13f8c734`](https://github.com/brandonrdug/holonics/tree/13f8c734).
 
+The October 4 [HNN/Athena foundation supplement](docs/plans/HNN_ATHENA_FOUNDATION.md) records
+the common equations, accepted isolated geometry joins and exact dimensional/decoder checks.
+Its pinned public-source update credits whole-material and resident-passage host continuation,
+while keeping card restore, adaptive retention and useful autonomous output under their actual gates.
+The retained independent briefs are paused with Claude; the product acceptance below is unchanged.
+
 ## Current construction
 
 | Part | State | Plan |

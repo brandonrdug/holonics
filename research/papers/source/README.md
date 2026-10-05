@@ -45,6 +45,14 @@ navigation layer and the reusable relational vector grammar used by the geometry
 
 ## Standalone studies
 
+- [`papers/hnn-athena-foundation/main.typ`](papers/hnn-athena-foundation/main.typ) presents the
+  common constitution, moving geometry, stateful coupled dynamics, exact decoder/dimension,
+  power/phase and future-observability relations around native HNN contact-C and host passage
+  continuation. Its constructive derivations and source routes retain
+  the distinction between proved, executable, unformalized and proposed joins; the
+  [foundation supplement](../../../docs/plans/HNN_ATHENA_FOUNDATION.md) owns the independent
+  derivation briefs and consuming acceptance under THE_REBUILD.
+
 - [`papers/categorical-holonics/main.typ`](papers/categorical-holonics/main.typ) formalizes the
   agnostic causal-compositional carrier. It now separates evolution shape, monoidal
   juxtaposition, typed interaction, enriched parameters, receiver fibers, local observation,

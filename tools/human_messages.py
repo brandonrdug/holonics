@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Brandon's direct messages about this repository, from both harnesses' local logs.
+"""Brandon's messages about this repository, with their provenance, from local logs.
 
 CLAUDE.md and AGENTS.md ("Evidence"): Brandon's direct messages govern, and they live in the
 harnesses' private logs. This prints them in time order, so that recovering them is one command
@@ -18,7 +18,12 @@ What is a human message:
   sessions only). A `user` record's text, or a `queued_command` attachment in `prompt` mode (a
   message typed while a turn ran, which exists only as the attachment). Tool results, task
   notifications, local-command echoes, meta records, compaction summaries and
-  `<system-reminder>` text are the harness's.
+  `<system-reminder>` text are the harness's. A `<wake>` envelope contributes only explicit
+  `from="human" trust="principal"` messages, at their `sent-at` times. Coordinator relays are
+  not direct messages: their user citations are labelled `claude-relayed`, at their `at` times;
+  coordinator notes are omitted. Unrecognized or malformed envelopes are preserved as
+  `claude-ambiguous`, with a diagnostic, rather than attributed to Brandon. These labels do not
+  establish fresh user authorization. Envelope-like quotations inside ordinary prose stay prose.
 - **Codex** (`~/.codex/sessions/**/rollout-*.jsonl`). Only Brandon's interactive threads (the
   terminal, `codex-tui`/`cli`, and Codex Desktop, `vscode`) whose working directory is this
   checkout. Workers, `codex exec` consultations and threads launched by Claude are agents'. A
@@ -40,6 +45,7 @@ import os
 import re
 import subprocess
 import sys
+import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 
 def main_checkout():
@@ -67,17 +73,95 @@ CODEX_HUMAN_THREADS = {("codex-tui", "cli"), ("Codex Desktop", "vscode")}
 REMINDER = re.compile(r"<system-reminder>.*?</system-reminder>", re.S)
 REQUEST = re.compile(r"^## My request[^\n]*:\s*$", re.M)
 BARE_COMMAND = re.compile(r"^/[\w:-]+$")  # `/compact` alone: an operation, not a message
+CLAUDE_ENVELOPE = re.compile(r"^<(wake|project_claude_message|relay)(?=[\s/>])")
 
 
-def claude_text(content):
+def envelope_stamp(value):
+    """Envelope times must declare their zone; comparisons and display use UTC."""
+    try:
+        stamp = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        if stamp.tzinfo is not None:
+            return stamp.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+    except (AttributeError, ValueError):
+        pass
+    return ""
+
+
+def claude_entries(content, record_stamp):
+    """Return (time, provenance, text) entries and metadata-only ambiguity diagnostics.
+
+    Agent-inferred: parse only a whole, anchored envelope and its declared paths. Searching
+    arbitrary descendants would promote quoted tags or coordinator notes into principal input.
+    """
     blocks = [content] if isinstance(content, str) else [
         block.get("text", "") for block in content if block.get("type") == "text"]
-    kept = []
+    entries, ordinary, diagnostics = [], [], []
+
+    def ambiguous(text, reason, stamp=record_stamp):
+        entries.append((stamp, "claude-ambiguous", text))
+        diagnostics.append(reason)
+
+    def ambiguous_envelope(root, text, reason, fallback_stamp=record_stamp):
+        # An unrecognized path can still carry an evaluation citation. Fail closed on its
+        # inner times before preserving the whole envelope at the outer record's time.
+        stamps = [envelope_stamp(node.get("sent-at" if node.tag == "message" else "at"))
+                  for node in root.iter() if node.tag in ("message", "cited")]
+        safe = all(stamp and not EVALUATION_WINDOW[0] <= stamp[:19] < EVALUATION_WINDOW[1]
+                   for stamp in stamps)
+        ambiguous(text, reason, fallback_stamp if safe else "")
+
     for text in blocks:
         text = REMINDER.sub("", text).strip()
-        if text and not text.startswith(CLAUDE_HARNESS):
-            kept.append(text)
-    return "\n\n".join(kept)
+        if not text or text.startswith(CLAUDE_HARNESS):
+            continue
+        if not CLAUDE_ENVELOPE.match(text):
+            ordinary.append(text)
+            continue
+        try:
+            if "<!DOCTYPE" in text or "<!ENTITY" in text:
+                raise ET.ParseError("declaration")
+            root = ET.fromstring(text)
+        except ET.ParseError:
+            ambiguous(text, "malformed or unsupported envelope; inner time cannot be verified", "")
+            continue
+
+        if root.tag == "wake":
+            messages = root.findall("./project/message") + root.findall("./project/thread/message")
+            if not messages or len(messages) != len(list(root.iter("message"))):
+                ambiguous_envelope(root, text, "wake has no messages at the declared principal paths")
+                continue
+            for message in messages:
+                stamp = envelope_stamp(message.get("sent-at"))
+                if message.get("from") != "human" or message.get("trust") != "principal":
+                    ambiguous(ET.tostring(message, encoding="unicode"),
+                              "wake message has unrecognized principal provenance", stamp)
+                elif list(message):
+                    ambiguous_envelope(message, ET.tostring(message, encoding="unicode"),
+                                       "principal message has unrecognized nested markup", stamp)
+                elif not stamp:
+                    ambiguous(ET.tostring(message, encoding="unicode"),
+                              "principal message has no valid zoned sent-at time", "")
+                elif (message.text or "").strip():
+                    entries.append((stamp, "claude", message.text.strip()))
+            continue
+
+        relay = root if root.tag == "relay" else root.find("./relay")
+        if relay is None or relay.get("from") != "coordinator" \
+                or (root.tag == "project_claude_message" and list(root) != [relay]) \
+                or any(child.tag not in ("cited", "note") for child in relay):
+            ambiguous_envelope(root, text, "unrecognized coordinator relay structure")
+            continue
+        # Only direct citations are relayed user content. A <cited> inside <note> is a quotation.
+        for cited in relay.findall("./cited"):
+            stamp = envelope_stamp(cited.get("at"))
+            if cited.get("author") != "user" or list(cited) or not stamp:
+                ambiguous(ET.tostring(cited, encoding="unicode"),
+                          "relay citation has unrecognized author, markup or time", stamp)
+            elif (cited.text or "").strip():
+                entries.append((stamp, "claude-relayed", cited.text.strip()))
+    if ordinary:
+        entries.append((record_stamp, "claude", "\n\n".join(ordinary)))
+    return entries, diagnostics
 
 
 def claude_messages(since):
@@ -96,14 +180,18 @@ def claude_messages(since):
                     kind = record.get("type")
                     if kind == "user" and not record.get("isMeta") \
                             and not record.get("isCompactSummary"):
-                        text = claude_text(record.get("message", {}).get("content", ""))
+                        content = record.get("message", {}).get("content", "")
                     elif kind == "attachment" and record.get("attachment", {}).get("type") \
                             == "queued_command" and record["attachment"].get("commandMode") == "prompt":
-                        text = claude_text(record["attachment"].get("prompt", ""))
+                        content = record["attachment"].get("prompt", "")
                     else:
                         continue
-                    if text:
-                        yield record.get("timestamp", ""), "claude", session, text
+                    entries, diagnostics = claude_entries(content, record.get("timestamp", ""))
+                    for reason in diagnostics:
+                        print(f"ambiguous Claude envelope: {session} "
+                              f"{record.get('timestamp', '')}: {reason}", file=sys.stderr)
+                    for stamp, provenance, text in entries:
+                        yield stamp, provenance, session, text
 
 
 def codex_text(content):
@@ -171,29 +259,32 @@ def main():
         sources.append(claude_messages(args.since))
     if args.harness in (None, "codex"):
         sources.append(codex_messages(args.since))
-    seen, messages, withheld = set(), [], 0
+    selected, messages, withheld = {}, [], 0
+    rank = {"claude": 2, "codex": 2, "claude-relayed": 1, "claude-ambiguous": 0}
     for source in sources:
         for stamp, harness, session, text in source:
             key = hashlib.sha256((stamp[:19] + "\0" + text).encode("utf-8")).digest()
-            if key in seen:
-                continue
-            seen.add(key)
-            if not stamp or EVALUATION_WINDOW[0] <= stamp[:19] < EVALUATION_WINDOW[1]:  # fail closed
-                withheld += 1
-                continue
-            if (args.since and stamp < args.since) or (args.until and stamp >= args.until):
-                continue
-            if BARE_COMMAND.match(text):
-                continue
-            if pattern and not pattern.search(text):
-                continue
-            messages.append((stamp, harness, session, text))
+            # A relay encountered first must not hide the same directly witnessed message.
+            previous = selected.get(key)
+            if previous is None or rank[harness] > rank[previous[1]]:
+                selected[key] = (stamp, harness, session, text)
+    for stamp, harness, session, text in selected.values():
+        if not stamp or EVALUATION_WINDOW[0] <= stamp[:19] < EVALUATION_WINDOW[1]:  # fail closed
+            withheld += 1
+            continue
+        if (args.since and stamp < args.since) or (args.until and stamp >= args.until):
+            continue
+        if BARE_COMMAND.match(text):
+            continue
+        if pattern and not pattern.search(text):
+            continue
+        messages.append((stamp, harness, session, text))
     messages.sort()
     if args.last is not None:
         messages = messages[max(0, len(messages) - args.last):]
 
     if args.count:
-        for harness in ("claude", "codex"):
+        for harness in ("claude", "codex", "claude-relayed", "claude-ambiguous"):
             print(harness, sum(1 for m in messages if m[1] == harness))
     else:
         for stamp, harness, session, text in messages:

@@ -1,0 +1,20 @@
+reject float coefficient
+reject float dimension exponent
+reject float power
+reject adding length to dimensionless section coordinate
+reject same units, wrong quantity role
+reject same units, substituted source clock
+reject same units, substituted phase branch
+reject same units, substituted phase carry
+reject same M L^2 T^-2 units do not identify torque with stored energy
+reject phase increment on another receiver clock
+reject factor-two C_phys breaks storage-energy normalization
+reject same units, another family's exact area
+reject section formula mixed with another producing family
+reject swapped section-column orientation
+pass dimensions: candidate pulled-back balance terms, mixed metric, declared torsional port
+pass clock identities: alpha*(j-rho*w), alpha*sigma, alpha*w on addressed clocks
+pass exact witnesses: source area=1; alternate epsilon area=45/32
+pass affine work: rational source/target scales, map, and additive term retained
+pass storage normalization: nonzero-rate physical energy equals E_* native energy
+receipt monotonic_ns start=120121264018524 stop=120121267021714 maxrss=16276 unit=KiB

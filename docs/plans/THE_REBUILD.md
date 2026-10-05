@@ -6,6 +6,12 @@ guides and owners; [CONSTRUCTION_STATE](../../CONSTRUCTION_STATE.md) is the posi
 keeps the history this plan replaced: steps 0–8, the step-4 design and its five campaigns, and the
 forward plan F0–F6 as it stood.
 
+The October 4 [HNN/Athena foundation supplement](HNN_ATHENA_FOUNDATION.md) supplies the common
+material, moving geometry, coupled dynamics, power/phase and future-observability equations.
+It credits pinned host passage continuation, retains the exact missing consumers and canonical
+proof-integration gates, and fixes the next bounded nonzero reached-deposit relation. The independent
+briefs are retained with Claude paused. This plan remains the construction order and product gates.
+
 ## The unified plan (September 28)
 
 [definition; agent-inferred] Brandon, September 28: "tie together all of our plans and designs and then

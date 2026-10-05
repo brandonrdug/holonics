@@ -1,3 +1,5 @@
+import Mathlib.Analysis.Calculus.FDeriv.Mul
+import Mathlib.Analysis.Calculus.FDeriv.Prod
 import Mathlib.Analysis.InnerProductSpace.PiL2
 import Mathlib.Analysis.InnerProductSpace.Orthonormal
 import Mathlib.LinearAlgebra.CrossProduct
@@ -169,6 +171,115 @@ theorem cross_second_third (f : Frame3) :
   ext i
   simp only [coords, cross3, ofCoords, WithLp.ofLp_toLp]
   exact congrFun hcross i
+
+/-! [proved-derived; formal-checked in isolated development] Proposed insertion immediately after
+`cross_second_third` in Geometry/FrameTransport. The columns are the actual
+u/v derivatives of the polynomial disk section in TUBE_GEOMETRY_DERIVATION.md.
+No positivity is needed for this polynomial identity; invertibility, longitudinal derivative, 3D continuity and native physical joins are
+separate; the transverse derivative is identified by the declarations below. -/
+
+/-- Oriented section area for q₁=a*u*(1+ε*u), q₂=b*v*(1+ε*u). -/
+theorem tube_section_area_vector (f : Frame3) (a b ε u v : ℝ) :
+    cross3 ((a * (1 + 2 * ε * u)) • f.basis 1 +
+        (b * ε * v) • f.basis 2) ((b * (1 + ε * u)) • f.basis 2) =
+      (a * b * (1 + ε * u) * (1 + 2 * ε * u)) • f.basis 0 := by
+  have hframe : coords (f.basis 1) ⨯₃ coords (f.basis 2) =
+      coords (f.basis 0) := by
+    have h := congrArg coords (cross_second_third f)
+    simpa only [coords, cross3, ofCoords, WithLp.ofLp_toLp] using h
+  have harea :
+      ((a * (1 + 2 * ε * u)) • coords (f.basis 1) +
+        (b * ε * v) • coords (f.basis 2)) ⨯₃
+          ((b * (1 + ε * u)) • coords (f.basis 2)) =
+      ((a * (1 + 2 * ε * u)) * (b * (1 + ε * u))) •
+        coords (f.basis 0) := by
+    rw [LinearMap.map_add₂, LinearMap.map_smul₂, LinearMap.map_smul₂]
+    simp only [map_smul, cross_self, smul_zero, add_zero, smul_smul]
+    rw [hframe]
+  have hcoef : (a * (1 + 2 * ε * u)) * (b * (1 + ε * u)) =
+      a * b * (1 + ε * u) * (1 + 2 * ε * u) := by ring
+  ext i
+  change (((a * (1 + 2 * ε * u)) • coords (f.basis 1) +
+      (b * ε * v) • coords (f.basis 2)) ⨯₃
+        ((b * (1 + ε * u)) • coords (f.basis 2))) i =
+    ((a * b * (1 + ε * u) * (1 + 2 * ε * u)) • coords (f.basis 0)) i
+  rw [harea, hcoef]
+
+/-- The section reading of an actual relative current; its continuity law is owed. -/
+theorem tube_section_flux (f : Frame3) (a b ε u v : ℝ) (j : Vec3) :
+    dot3 j (cross3 ((a * (1 + 2 * ε * u)) • f.basis 1 +
+        (b * ε * v) • f.basis 2) ((b * (1 + ε * u)) • f.basis 2)) =
+      (a * b * (1 + ε * u) * (1 + 2 * ε * u)) * dot3 j (f.basis 0) := by
+  rw [tube_section_area_vector]
+  simp only [dot3, real_inner_smul_right]
+
+/-! The actual fixed-spine-position polynomial section derivative. The complete
+isolated module is accepted; full 3D moving continuity and native decoder remain
+separate consumers. Refs #62, #73. -/
+
+/-- The explicit transverse section of the asymmetric tube at a fixed spine point. -/
+def tube_section_chart (f : Frame3) (c : Vec3) (a b ε : ℝ) (z : ℝ × ℝ) : Vec3 :=
+  c + (a * z.1 * (1 + ε * z.1)) • f.basis 1 +
+    (b * z.2 * (1 + ε * z.1)) • f.basis 2
+
+/-- Its derivative, expressed as a continuous linear map on actual coordinate increments. -/
+def tube_section_derivative (f : Frame3) (a b ε : ℝ) (z : ℝ × ℝ) :
+    (ℝ × ℝ) →L[ℝ] Vec3 :=
+  ((a * (1 + 2 * ε * z.1)) • ContinuousLinearMap.fst ℝ ℝ ℝ).smulRight
+      (f.basis 1) +
+    ((b * ε * z.2) • ContinuousLinearMap.fst ℝ ℝ ℝ +
+      (b * (1 + ε * z.1)) • ContinuousLinearMap.snd ℝ ℝ ℝ).smulRight
+      (f.basis 2)
+
+/-- Identification of the displayed section columns with an actual Fréchet derivative. -/
+theorem tube_section_hasFDerivAt (f : Frame3) (c : Vec3) (a b ε : ℝ) (z : ℝ × ℝ) :
+    HasFDerivAt (tube_section_chart f c a b ε)
+      (tube_section_derivative f a b ε z) z := by
+  have hu : HasFDerivAt (fun y : ℝ × ℝ => y.1)
+      (ContinuousLinearMap.fst ℝ ℝ ℝ) z := hasFDerivAt_fst
+  have hv : HasFDerivAt (fun y : ℝ × ℝ => y.2)
+      (ContinuousLinearMap.snd ℝ ℝ ℝ) z := hasFDerivAt_snd
+  have hh := (hasFDerivAt_const (1 : ℝ) z).add (hu.const_smul ε)
+  have hq1 := (hu.const_smul a).mul hh
+  have hq2 := (hv.const_smul b).mul hh
+  have hX := ((hasFDerivAt_const c z).add (hq1.smul_const (f.basis 1))).add
+    (hq2.smul_const (f.basis 2))
+  convert! hX using 1
+  apply ContinuousLinearMap.ext
+  intro δ
+  ext i
+  simp [tube_section_derivative, smul_eq_mul]
+  ring
+
+theorem tube_section_fderiv_first (f : Frame3) (c : Vec3) (a b ε u v : ℝ) :
+    fderiv ℝ (tube_section_chart f c a b ε) (u, v) (1, 0) =
+      (a * (1 + 2 * ε * u)) • f.basis 1 + (b * ε * v) • f.basis 2 := by
+  rw [(tube_section_hasFDerivAt f c a b ε (u, v)).fderiv]
+  simp [tube_section_derivative]
+
+theorem tube_section_fderiv_second (f : Frame3) (c : Vec3) (a b ε u v : ℝ) :
+    fderiv ℝ (tube_section_chart f c a b ε) (u, v) (0, 1) =
+      (b * (1 + ε * u)) • f.basis 2 := by
+  rw [(tube_section_hasFDerivAt f c a b ε (u, v)).fderiv]
+  simp [tube_section_derivative]
+
+/-- The oriented area is now a reading of the constructed chart's derivative. -/
+theorem tube_section_actual_area (f : Frame3) (c : Vec3) (a b ε u v : ℝ) :
+    cross3 (fderiv ℝ (tube_section_chart f c a b ε) (u, v) (1, 0))
+      (fderiv ℝ (tube_section_chart f c a b ε) (u, v) (0, 1)) =
+      (a * b * (1 + ε * u) * (1 + 2 * ε * u)) • f.basis 0 := by
+  rw [tube_section_fderiv_first, tube_section_fderiv_second]
+  exact tube_section_area_vector f a b ε u v
+
+/-- The section pairs an actual current with the constructed chart's oriented area.
+Supplying a continuity current, moving-relative current or balance is a separate consumer. -/
+theorem tube_section_actual_flux (f : Frame3) (c : Vec3) (a b ε u v : ℝ) (j : Vec3) :
+    dot3 j (cross3 (fderiv ℝ (tube_section_chart f c a b ε) (u, v) (1, 0))
+      (fderiv ℝ (tube_section_chart f c a b ε) (u, v) (0, 1))) =
+      (a * b * (1 + ε * u) * (1 + 2 * ε * u)) * dot3 j (f.basis 0) := by
+  rw [tube_section_fderiv_first, tube_section_fderiv_second]
+  exact tube_section_flux f a b ε u v j
+
 
 theorem frame_standard_determinant (f : Frame3) :
     Matrix.det ![coords (f.basis 0), coords (f.basis 1), coords (f.basis 2)] = 1 := by
@@ -465,3 +576,6 @@ theorem transport_ambient_contract (s t : Frame3) (x y z d : Vec3) :
     transport_first_axis s t d⟩
 
 end Holonics.Geometry.FrameTransport
+
+#print axioms Holonics.Geometry.FrameTransport.tube_section_area_vector
+#print axioms Holonics.Geometry.FrameTransport.tube_section_flux

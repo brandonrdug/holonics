@@ -1,0 +1,65 @@
+{
+  "status": "derived-source-only; candidate-unapplied; Lean-uncompiled",
+  "local_head": "3a242c990e2fc5bfd31fea7c194372168db8ba09",
+  "unchanged_canonical_input_sha256": {
+    "lean/Holonics/Geometry/Motion.lean": "4f7a584b746aeaa63baee5c16623589fe89492e8da73ce93e5f6493d48e88510",
+    "docs/atlas/geometry.tsv": "1d5577e31c01d931d0a96f8042635bfafb7b7f719a019504ed49ea19c99d7463",
+    "docs/plans/HNN_ATHENA_FOUNDATION.md": "185e3f58304d214428eb73aca5339feb9ebf38e1b98a54d1f7db38036fdc93af",
+    "research/records/README.md": "062449af0bd6ff4f1d1a6a35aa49e3dc37470c76d7e77be8b0fbad15e8c29c54"
+  },
+  "exact_checks": [
+    {
+      "name": "pure_chart",
+      "work": "0",
+      "wrong_untransported_metric_work": "3/2"
+    },
+    {
+      "name": "material_change",
+      "work": "1/2"
+    },
+    {
+      "name": "affine_source",
+      "work": "3/2",
+      "homogeneous_work": "0",
+      "cross_work": "1",
+      "source_work": "1/2"
+    },
+    {
+      "name": "unresolved_opening",
+      "work": "21/8",
+      "unresolved_work": "9/8"
+    },
+    {
+      "name": "future_separator",
+      "present": "0",
+      "future": "-1",
+      "energy_change": "0"
+    },
+    {
+      "name": "non_diagonal_endpoint_case_1",
+      "undivided_work": "1927/400",
+      "homogeneous": "181/48",
+      "cross": "-13/90",
+      "source": "268/225",
+      "undivided_unresolved_work": "841/588",
+      "gain_form_r": "9/4"
+    },
+    {
+      "name": "non_diagonal_endpoint_case_2",
+      "undivided_work": "-14221/99225",
+      "homogeneous": "-421/1225",
+      "cross": "32/315",
+      "source": "8/81",
+      "undivided_unresolved_work": "-1804/6615",
+      "gain_form_r": "9/4"
+    }
+  ],
+  "checked_source_links": 13,
+  "elapsed_ns": 6956621,
+  "peak_rss_kib": 24404,
+  "compiler_invocations": 0,
+  "shared_lease_attempts": 0,
+  "training_runs": 0,
+  "method": "Python standard-library Fraction; exact matrix operations; seven fixtures; no floating arithmetic in mathematical operands",
+  "formal_check": "not run; ownership/resource admission pending"
+}

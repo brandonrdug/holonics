@@ -785,7 +785,8 @@ impl ActiveAddress {
     /// part of a continuing state: `address` with its letters newest first (`b` the boundary, `c` a
     /// cell's code, `f` a bundle's cell and features), and `clocks` with each read ring's ticks
     /// since the aeon's opening. The reader's family, rings and ends are the field's, and its site
-    /// kinds are the constitution's, read again at the restore.
+    /// kinds are the held reading at the last refresh, written explicitly after the clocks;
+    /// a later deposit need not leave them equal to the contemporary constitution.
     pub fn write(&self, s: &mut String) {
         use crate::hnn::state_text::line;
         line(
@@ -798,6 +799,16 @@ impl ActiveAddress {
             }),
         );
         line(s, "clocks", self.reader.clocks.iter().map(Clock::ticks));
+        match &self.reader.kinds {
+            None => line(s, "site-kinds", ["-"]),
+            Some(kinds) => line(s, "site-kinds", kinds.iter().map(|kind| match kind {
+                SiteKind::Rotation => "rotation",
+                SiteKind::Null => "null",
+                SiteKind::Boost => "boost",
+                SiteKind::Reflection => "reflection",
+                SiteKind::Degenerate => "degenerate",
+            })),
+        }
     }
 
     /// **The register continued from its text** ([`ActiveAddress::write`]) on a register of the
@@ -830,6 +841,24 @@ impl ActiveAddress {
         let ticks: Vec<BigUint> = values(&keyed(next("the register's clocks")?, "clocks", what)?, what)?;
         if letters.len() != self.letters.len() || ticks.len() != self.reader.clocks.len() {
             return refused("the address register against the field's declaration");
+        }
+        let kind_words = keyed(next("the register's held site kinds")?, "site-kinds", what)?;
+        let kinds = if kind_words.as_slice() == ["-"] {
+            None
+        } else {
+            Some(kind_words.into_iter().map(|kind| match kind {
+                "rotation" => Ok(SiteKind::Rotation),
+                "null" => Ok(SiteKind::Null),
+                "boost" => Ok(SiteKind::Boost),
+                "reflection" => Ok(SiteKind::Reflection),
+                "degenerate" => Ok(SiteKind::Degenerate),
+                _ => refused("the register's held site kinds"),
+            }).collect::<Result<Vec<_>, HnnError>>()?)
+        };
+        if let Some(kinds) = kinds {
+            self.reader.hold_kinds(kinds)?;
+        } else {
+            self.reader.kinds = None;
         }
         self.letters = letters;
         for ((clock, ring), ticks) in self.reader.clocks.iter_mut().zip(&self.reader.rings).zip(&ticks) {
@@ -1222,6 +1251,65 @@ pub struct ReceivingPhases {
 }
 
 impl ReceivingPhases {
+    /// [definition; agent-inferred, October 4] The saved declaring phases. The rank belongs
+    /// to the declaring medium; restoring it does not execute a new observability experiment.
+    pub(crate) fn write_saved(&self, s: &mut String) {
+        crate::hnn::state_text::line(s, "phases", [
+            self.ring.to_string(), self.first_epoch.to_string(), self.aperture.to_string(),
+            self.grain.to_string(), self.tolerance.to_string(), self.depth.to_string(),
+            self.rank.to_string(),
+        ]);
+    }
+
+    /// Read saved operands, checking their declaration and finite linear-map shape. No
+    /// contemporary material, emitted word or answer enters this constructor.
+    pub(crate) fn read_saved(field: &Field, head: &str) -> Result<Self, HnnError> {
+        use crate::hnn::state_text::{keyed, refused, value};
+        let what = "the saved declaring phases";
+        let words = keyed(head, "phases", what)?;
+        let [ring, first, aperture, grain, tolerance, depth, rank] = words[..] else {
+            return refused(what);
+        };
+        let (ring, first_epoch, aperture, grain, tolerance, depth, rank):
+            (usize, usize, usize, u64, Rat, usize, usize) = (
+                value(Some(&ring), what)?, value(Some(&first), what)?,
+                value(Some(&aperture), what)?, value(Some(&grain), what)?,
+                value(Some(&tolerance), what)?, value(Some(&depth), what)?,
+                value(Some(&rank), what)?,
+            );
+        if ring >= field.rings().len()
+            || field.first_epoch(ring) != Some(first_epoch)
+            || aperture == 0
+            || first_epoch.checked_add(aperture).is_none()
+            || grain != grain_of(&tolerance)?
+        {
+            return refused(what);
+        }
+        let columns = field.sources().iter().try_fold(0usize, |width, &source| {
+            width.checked_add(field.ring(source).width())
+        }).ok_or(HnnError::ContinuingState { what })?;
+        let rows = field.ring(ring).width().checked_mul(aperture)
+            .ok_or(HnnError::ContinuingState { what })?;
+        if aperture > rank || rank > rows.min(columns) {
+            return refused("the saved rank against its declaring map's shape");
+        }
+        Ok(Self { ring, first_epoch, aperture, grain, tolerance, depth, rank })
+    }
+
+    /// The saved admitted family may be a restriction of the field's initial family,
+    /// as close_aeon's existing containment law permits. Depth and rank are held operands.
+    pub(crate) fn is_declared_restriction(&self, field: &Field) -> Result<bool, HnnError> {
+        for receiver in field.receivers() {
+            if self.ring == receiver.ring
+                && self.grain == grain_of(&receiver.tolerance)?
+                && self.aperture <= receiver.aperture
+            {
+                return Ok(true);
+            }
+        }
+        Ok(false)
+    }
+
     /// **Declare an admitted receiver's phases** at the medium `(Θ, λ)`: its first epoch from the
     /// source rings, its grain from its code tolerance, and its observability rank over the word,
     /// refusing an aperture beyond it.
