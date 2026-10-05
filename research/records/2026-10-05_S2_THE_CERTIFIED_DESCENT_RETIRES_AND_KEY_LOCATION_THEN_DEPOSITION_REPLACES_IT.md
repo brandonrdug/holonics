@@ -148,11 +148,11 @@ its owner's next change:
 - `hnn/constitution.rs` (`Constitution::material_identity`, `continued`): every complete state
   written before #367, the October 5 keys states included, is refused at `9078f103` as another
   opening's material (§5), so no committed keys state mounts until the states are written again or
-  the identity stops reading the constitution's printed layout.
+  the identity stops reading the constitution's printed layout. [Resolved October 5: the states were written again at `9914bc5a` and every validation reading reproduces byte for byte; #367 changed the stored material (scale statistics only for a declared gain family), so the earlier saves are superseded, with no decoder; the regressions record §12.]
 - Lean: `HNN.lean:103–104`, `HNN/ExecutedComparison.lean:45, 404, 1443, 2174`,
   `HNN/ReleaseRun.lean:14`, `HNN/BankFace.lean:19` and `HolonicsResearch/HNN/OrderTemperature.lean:390`
   name the retired Rust owners in comments. They are repinned at the next Lean change of those
-  files: `HNN.lean` is imported through `Framework` by 62 modules, so a comment there rebuilds them. [Resolved October 5: the states were written again at `9914bc5a` and every validation reading reproduces byte for byte; #367 changed the stored material (scale statistics only for a declared gain family), so the earlier saves are superseded, with no decoder; the regressions record §12.]
+  files: `HNN.lean` is imported through `Framework` by 62 modules, so a comment there rebuilds them.
 
 ## 5. Gates and time
 
