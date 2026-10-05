@@ -66,7 +66,7 @@ fn width(population: usize) -> u64 {
 }
 
 /// Write `index` in `bits` bits, most significant first.
-fn write_index(code: &mut Vec<bool>, index: usize, bits: u64) {
+pub(crate) fn write_index(code: &mut Vec<bool>, index: usize, bits: u64) {
     for place in (0..bits).rev() {
         let bit = u32::try_from(place)
             .ok()
@@ -77,7 +77,7 @@ fn write_index(code: &mut Vec<bool>, index: usize, bits: u64) {
 }
 
 /// Read a `bits`-bit index below `population`, most significant first.
-fn read_index(
+pub(crate) fn read_index(
     code: &mut impl Iterator<Item = bool>,
     bits: u64,
     population: usize,

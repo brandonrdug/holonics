@@ -73,6 +73,15 @@
 //! winding of the least (two coprime distances, or a map other than `f₀^k`) stays plural, never a
 //! key.
 //!
+//! [definition; agent-inferred, October 5; the
+//! [repair record](../../../../research/records/2026-10-05_REPAIR_BY_REFLECTION_THE_LOCATED_PAIR_RESTRICTS_THE_ERASED_CELLS_FROM_BOTH_SIDES.md)]
+//! **A damaged passage's menu, and the located pair as a class relation.** On a passage under
+//! declared damage an erased cell contributes no edge, as station or as antecedent
+//! ([`damaged_station_pairs`]); the turn menus and the windings law read the rest unchanged. The
+//! located pair's consumer is then `compression::keys::repair`, which restricts the erased cells
+//! from both sides; [`LocatedPair::relation`] reads the located map on ports as the relation on the
+//! passage's classes, refused where a port holds two classes (as `pair_deposit` refuses).
+//!
 //! | Lean | Rust |
 //! |---|---|
 //! | `Keys.fibre_cons` (a distance's menu only shrinks; the turn menu's law is `compression::keys::TurnMenu`'s) | [`PairLocation::observe`] |
@@ -85,7 +94,7 @@
 use num_bigint::{BigInt, BigUint};
 use num_traits::ToPrimitive;
 
-use crate::compression::{Candidate, Menu, TurnMenu, TurnReading};
+use crate::compression::{Candidate, Menu, PairRelation, TurnMenu, TurnReading};
 use crate::hnn::HnnError;
 use crate::hnn::field::{Current, Field, ring_digit};
 use crate::navigator::Clock;
@@ -462,6 +471,47 @@ pub fn station_pairs(
         .collect())
 }
 
+/// **The data → menu map on a damaged passage** (module section "A damaged passage's menu"): each
+/// intact station `t ≥ opening` is one observation, returned with its station, read against every
+/// earlier intact cell at its distance `δ ∈ [1, min(t, d − 1)]`. An erased cell is no station and
+/// no antecedent. Refused as [`station_pairs`] is.
+pub fn damaged_station_pairs(
+    field: &Field,
+    ring: usize,
+    passage: &[Option<usize>],
+    opening: usize,
+) -> Result<Vec<(usize, Vec<PairReading>)>, HnnError> {
+    if let Some(&code) = passage.iter().flatten().find(|&&code| code >= field.alphabet()) {
+        return Err(HnnError::CellOutside {
+            code,
+            alphabet: field.alphabet(),
+        });
+    }
+    if opening == 0 || opening > passage.len() {
+        return Err(HnnError::Crib {
+            cells: passage.len(),
+            offset: opening,
+        });
+    }
+    let geometry = field.ring(ring);
+    let period = usize::try_from(geometry.period()).expect("a period fits");
+    Ok((opening..passage.len())
+        .filter_map(|t| {
+            let to = passage[t]?;
+            let readings = (1..=t.min(period - 1))
+                .filter_map(|offset| {
+                    passage[t - offset].map(|from| PairReading {
+                        offset,
+                        from: geometry.port(from),
+                        to: geometry.port(to),
+                    })
+                })
+                .collect();
+            Some((t, readings))
+        })
+        .collect())
+}
+
 /// [definition; agent-inferred, October 5] **A located pair**: the generator of the surviving
 /// distances (the one survivor, or the least survivor when every other is its winding; module
 /// section "A class of windings is one key"), its published map on its menu ports, its cycles'
@@ -493,6 +543,49 @@ pub struct PairSurvivors {
     pub observations: u64,
     pub alive: Vec<(usize, TurnReading)>,
     pub read: usize,
+}
+
+impl LocatedPair {
+    /// **The located pair as a relation on the passage's classes `0 … classes − 1`** (module section
+    /// "A damaged passage's menu"): each class's consequence is the class at its port's published
+    /// image, unread where its port is not on the menu. Refused where a port of the passage's
+    /// classes holds two of them, or a published image holds none.
+    pub fn relation(
+        &self,
+        field: &Field,
+        ring: usize,
+        classes: usize,
+    ) -> Result<PairRelation, HnnError> {
+        let geometry = field.ring(ring);
+        let ports: Vec<usize> = (0..classes).map(|class| geometry.port(class)).collect();
+        let class_at = |port: usize| -> Result<Option<usize>, HnnError> {
+            let held: Vec<usize> = (0..classes).filter(|&c| ports[c] == port).collect();
+            match held.as_slice() {
+                [] => Ok(None),
+                [class] => Ok(Some(*class)),
+                _ => Err(HnnError::Shape {
+                    what: "a located port holding one class of the passage",
+                    expected: 1,
+                    found: held.len(),
+                }),
+            }
+        };
+        let map = (0..classes)
+            .map(|class| {
+                let Some(&(_, image)) = self.map.iter().find(|(from, _)| *from == ports[class])
+                else {
+                    return Ok(None);
+                };
+                class_at(ports[class])?;
+                class_at(image)?.map(Some).ok_or(HnnError::Shape {
+                    what: "a located image holding a class of the passage",
+                    expected: 1,
+                    found: 0,
+                })
+            })
+            .collect::<Result<Vec<_>, HnnError>>()?;
+        Ok(PairRelation::new(self.offset, map)?)
+    }
 }
 
 impl PairSurvivors {

@@ -88,3 +88,119 @@ On every terrain the machine locates the generating key: order-2 `(2, y ↦ y + 
 
 A released cell that differs from its truth, a located key other than the generating one, or a
 codec at or above the literal falsifies the claim.
+
+**Amendment, after the development read (`2_026_100_701`) and before the read** [agent-inferred;
+receipts `development/`]. The development read met the claim's every count on all six units, and
+found two defects in the read-only `n*_terrain` instrumentation, none in the machine's path:
+- **The repair's grain is ill-posed where the reference keeps weak aliases.** On the line and the
+  alternation under damage A the stopping object does not hold even at the read set's end: lags
+  such as `(40, id)` on the line are true of the terrain, so no observation removes them, and they
+  restrict less (cell 6 is joined only to cell 46, itself erased), so the union over independent
+  keys stays wider than the generating key's family. The reference treats each lag as a separate
+  emitter and cannot prefer the generator over its windings.
+- **It is degenerate under damage B** on order-2 and the alternation: the generating key releases
+  no cell there, so the union equals its families before any observation (`n*_terrain = 0`).
+
+Both are reported as pinned. Beside them the read reports the two counts' own **syntactic class**
+(their pin §4): the least observation count from which the reference survivors (each lag's life
+and map) no longer change, well-posed on every terrain and damage. Nothing else changed.
+
+The computational object is the helical pair interaction. Of the
+[winding guide](../../docs/WINDING_CARRY_AND_PLACEMENT.md)'s six objects this loop touched **the
+pair** (the contact between crossings `δ` ticks apart, now read in both directions: `f` from the
+antecedent, `f⁻¹` from the consequent), **the tube** (generation as a tube whose cross-section is
+restricted, `F_(k+1) = T(F_k) ∩ C_k`) and **the helix** (a distance is a residue of the source
+ring's clock; the relation's chains are the residue classes of `ℤ/δ`). The cell holonomy (the turn
+menu's loop law, which locates the pair unchanged), faces and placement (the bank's reading, not
+read here) and the tower thread stay attached and unchanged.
+
+## 1. The recorded failures this loop could repeat, and how each was held
+
+From the [lessons](2026-09-29_LESSONS_THE_FAILURES_THAT_REPEATED_AFTER_THEY_WERE_RECORDED.md), the
+[prototypes' lessons](2026-09-24_LESSONS_FROM_THE_WORKBENCH_AND_ATHENA_PROTOTYPES.md) and the
+[contamination cycles](2026-10-05_THE_CONTAMINATION_CYCLES_EVERY_COPY_PIPELINE_FOLLOWED_A_DEMAND_FOR_OUTPUT_BEFORE_THE_FIELD_COULD_RELEASE.md):
+- **1, an authored routine standing in for learning.** The restriction reads no rule: it applies
+  whatever pair the turn menus located from the intact cells, in both directions. No distance,
+  map or terrain is named to it; the harness's generating key is read-only instrumentation for
+  `n*_terrain` and enters no restriction the machine runs. A wrong key is refused (an emptied
+  family), never repaired around.
+- **2, recitation or an index of contexts.** The repair reads the passage's own intact cells and the
+  located pair (one distance, four consequences). Nothing is copied from another passage; a held
+  cell is held, never filled from a seen one.
+- **3, text as the exception.** A relation joins two ticks of a clock: a pixel's scan ticks, a
+  sample's ticks and a motor step's join alike, and a damaged image or recording is restricted by
+  the same law. The class relation is read from the located map through the port chart, refused
+  where a port holds two classes (as the deposit refuses), so the byte chart's folded ports are a
+  typed refusal here, not a special case.
+- **Lesson 3, a located cause carried into a new consumer.** The bank's release is not this loop's
+  consumer: the restriction reads the located pair directly, so the bank's open causes (the
+  members' quarter-turn lines, the Lock interface) are not inherited. The located pair's
+  location law is lane B's, unchanged.
+- **6, seen graded as unseen.** The erased cells' truths are read by no run before the release; the
+  read seeds are fresh (§0), distinct per terrain and damage, and the development seed is apart.
+- **7, bits read as progress.** The codec's bits are reported beside the repaired passages and their
+  fidelity, never as the success.
+- **9, a refusal answered with a larger limit.** Each run has its deadline from a development
+  measurement (§6).
+- **11, the programming language.** The design is stated as a relation's chains (residue classes of
+  `ℤ/δ`), a family's restriction from both sides of the clock, and the joint fibre's count.
+
+## 2. The design, and its equations
+
+**Differentiate** (`hnn::keys::damaged_station_pairs`, then lane B's `PairLocation` unchanged). An
+observation is an intact station `t ≥ o`; it reads `port(x_(t−δ)) → port(x_t)` at every
+`δ ∈ [1, min(t, d − 1)]` with `x_(t−δ)` intact. The pair is located by the windings law at the read
+set's end (the aeon's boundary), and read as a relation on the classes
+(`hnn::keys::LocatedPair::relation`): `R(a, b) :⇔ f(a) unread ∨ f(a) = b`.
+
+**Integrate by reflection** (`compression::keys::repair`, the library owner; it lives beside the
+turn menu because it is the Bombe's relation read the other way: the key known, the cells unknown).
+With `D = [max(o, δ), L)` the stations where the relation holds:
+
+```text
+F_t⁽⁰⁾ = {x_t} (intact),  A (erased)
+F_t ← F_t ∩ R(F_(t−δ))      if t ∈ D             the antecedent's side, f
+F_t ← F_t ∩ R⁻¹(F_(t+δ))    if t + δ ∈ D         the consequent's side, f⁻¹
+each sweep along the clock and back, until no family changes; an empty family refuses the key
+```
+
+The edges `(t − δ, t)`, `t ∈ D`, join each residue class of `ℤ/δ` into chains: a forest of paths.
+On a forest the fixed point is the joint fibre's projection at every cell [proved-derived: arc
+consistency on an acyclic constraint graph is global consistency; Lean owed, #62], and the owner
+checks it exactly: along each chain, the members holding class `a` at cell `t` number
+`fwd_t(a) · bwd_t(a)`, and the certificate holds at `t` when every class of `F_t` has a positive
+count. The joint fibre is `N = Π_chains Σ_a fwd_end(a)`. An erased cell is decided by
+`receiver::release` at tolerance zero on its class reading over the joint fibre: width `0` when its
+certified family is one class (released), `1` otherwise (held with its family).
+
+**The codec** (the Fold's side residual; Lean `Transport/Fold.reopen_apply_fold`,
+`residual_injective_on_fibre`). The damage is the transition that drops the erased cells; the key
+and the residual reopen them:
+
+```text
+key       = (δ − 1 in ⌈log₂(d − 1)⌉ bits) · (each class's consequence or "unread" in ⌈log₂(|A| + 1)⌉ bits)
+residual  = while a cell is held: index of the truth in the first held F_t, ⌈log₂ |F_t|⌉ bits; pin; restrict
+reopen(damage(x), key, residual(x)) = x         (decode(T_native(encode x)) = x at the consumer)
+```
+
+The residuals over one passage's joint fibre are a prefix code (each reopens its member and reads
+no further), so Kraft's sum is at most one and the longest is at least `⌈log₂ N⌉`; when `f` is a
+bijection each held chain costs one patch, whatever its length.
+
+## 3. What was built
+
+- `crates/holonics/src/compression/keys/repair.rs`: `PairRelation`, `DamagedPassage`, `restrict`,
+  `Restriction::{families, chains, joint, support, release}`, `CellRelease`, `key_code`,
+  `read_key`, `residual_code`, `reopen`; its tests (`keys/repair/tests.rs`): interior spans
+  restored from both sides with a held cell in the opening; **a held chain where both sides leave
+  the family plural** (every odd cell from 3 on order-2: every cell held with `ℤ/4`, `N = 4`, one
+  2-bit patch reopens the chain); an unread consequence restricting nothing from its side; a key the
+  intact cells refuse; and the brute-force check (400 drawn passages: the families are the joint
+  fibre's projections, `N` its count, the restriction refuses exactly when the fibre is empty, the
+  certificate holds, every member reopens from its residual, the residuals are a prefix code).
+- `crates/holonics/src/compression/{mod.rs, cost.rs}`: the refusals `ZeroOffset`, `Contradicted`,
+  `ReleaseLaw`; the cost owner's fixed-width index writer and reader opened to the crate.
+- `crates/holonics/src/hnn/keys.rs`: `damaged_station_pairs`, `LocatedPair::relation`; the test
+  `a_damaged_passage_locates_its_pair_from_intact_cells_and_is_repaired_through_it`.
+- `research/notebook/hnn_design/hnn_repair_loop.rs`: `executed repair <terrain> <A|B> <seed>
+  <count> <out>`, no per-terrain branch in the machine's path.

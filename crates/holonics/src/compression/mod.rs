@@ -14,7 +14,9 @@
 //!   `Kt < ℓ`; a partial pivot adds the residual faces it founds as patches.
 //! - [`keys`]: locating keys. The consistent keys of a menu of pair contacts are the fibre of the
 //!   loop-closure map over the boundary images at the menu's ports; each added loop only shrinks
-//!   it, and the key is located only up to the machine's gauge.
+//!   it, and the key is located only up to the machine's gauge. Read the other way, a located pair
+//!   repairs a damaged passage: [`keys::repair`] restricts its cells' compatible family from both
+//!   sides and prices the codec (the key and the Fold's side residual) against the literal.
 //!
 //! The face map `F x (ρ, w) = ρ(T_w x)` of a navigator family against terrain and an admitted
 //! receiver family is Lean's (`Compression/Core/FaceMap`): its **kernel** is the relevance kernel,
@@ -62,8 +64,8 @@ pub use cost::{
     Alphabet, CodecFamily, CodecPivot, CompressionCost, NavigatorCodec, PivotForm, literal_bits,
 };
 pub use keys::{
-    Candidate, Edge, Gauge, Loop, Menu, PortImages, Propagation, ReflectorMachine, TurnMenu,
-    TurnReading,
+    Candidate, CellRelease, DamagedPassage, Edge, Gauge, Loop, Menu, PairRelation, PortImages,
+    Propagation, ReflectorMachine, Restriction, TurnMenu, TurnReading,
 };
 pub use resonance::{ResonanceSplit, resonance_split};
 
@@ -124,4 +126,10 @@ pub enum CompressionError {
         at: usize,
         ceiling: usize,
     },
+    #[error("a pair relation joins cells at least one tick apart")]
+    ZeroOffset,
+    #[error("the pair relation empties cell {cell}'s compatible family: the key does not fit the passage")]
+    Contradicted { cell: usize },
+    #[error("the release law refused the repair's width: {0}")]
+    ReleaseLaw(String),
 }
