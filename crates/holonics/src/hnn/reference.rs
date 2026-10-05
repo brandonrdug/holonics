@@ -3754,60 +3754,64 @@ pub fn contact_ablation(
             tally(&code_difference.clone(), &mut counts);
             let mut faces_pair = (held_faces.clone(), back_faces.clone());
             let mut j = k;
-            while options.information > 0 {
-                if let (Some(a), Some(b)) = (&faces_pair.0, &faces_pair.1) {
-                    for (fa, fb) in a.faces.iter().zip(&b.faces) {
-                        let value = |c: &crate::receiver::face::GrainCell, grain: u64| {
-                            Rat::from_integer(c.carry.clone())
-                                + Rat::new(BigInt::from(c.phase), BigInt::from(grain))
-                                + &c.fibre
-                        };
-                        let delta: Vec<Rat> = fa
-                            .cells()
-                            .iter()
-                            .zip(fb.cells())
-                            .map(|(p, q)| value(q, fb.grain()) - value(p, fa.grain()))
-                            .collect();
-                        let masses: Vec<Rat> = (0..delta.len())
-                            .map(|c| -> Result<Rat, HnnError> {
-                                let e = fa.mass(c)?.enclosure()?;
-                                Ok((&e.lower + &e.upper) / Rat::from_integer(BigInt::from(2)))
-                            })
-                            .collect::<Result<_, _>>()?;
-                        let total: Rat = masses.iter().sum();
-                        if total.is_positive() {
-                            let mean: Rat =
-                                masses.iter().zip(&delta).map(|(p, d)| p * d).sum::<Rat>() / &total;
-                            let second: Rat = masses
+            // The information windows: none when the option declares none; each ends at a failed feed,
+            // the span's end or the declared count.
+            if options.information > 0 {
+                loop {
+                    if let (Some(a), Some(b)) = (&faces_pair.0, &faces_pair.1) {
+                        for (fa, fb) in a.faces.iter().zip(&b.faces) {
+                            let value = |c: &crate::receiver::face::GrainCell, grain: u64| {
+                                Rat::from_integer(c.carry.clone())
+                                    + Rat::new(BigInt::from(c.phase), BigInt::from(grain))
+                                    + &c.fibre
+                            };
+                            let delta: Vec<Rat> = fa
+                                .cells()
                                 .iter()
-                                .zip(&delta)
-                                .map(|(p, d)| p * d * d)
-                                .sum::<Rat>()
-                                / &total;
-                            variance += second - &mean * &mean;
-                            readings += 1;
+                                .zip(fb.cells())
+                                .map(|(p, q)| value(q, fb.grain()) - value(p, fa.grain()))
+                                .collect();
+                            let masses: Vec<Rat> = (0..delta.len())
+                                .map(|c| -> Result<Rat, HnnError> {
+                                    let e = fa.mass(c)?.enclosure()?;
+                                    Ok((&e.lower + &e.upper) / Rat::from_integer(BigInt::from(2)))
+                                })
+                                .collect::<Result<_, _>>()?;
+                            let total: Rat = masses.iter().sum();
+                            if total.is_positive() {
+                                let mean: Rat =
+                                    masses.iter().zip(&delta).map(|(p, d)| p * d).sum::<Rat>() / &total;
+                                let second: Rat = masses
+                                    .iter()
+                                    .zip(&delta)
+                                    .map(|(p, d)| p * d * d)
+                                    .sum::<Rat>()
+                                    / &total;
+                                variance += second - &mean * &mean;
+                                readings += 1;
+                            }
                         }
                     }
+                    if !feed(reference, &mut held, &cells[spans[j].clone()])?
+                        || !feed(reference, &mut back, &cells[spans[j].clone()])?
+                    {
+                        break;
+                    }
+                    j += 1;
+                    if j >= spans.len()
+                        || j >= k + options.information
+                        || cells[spans[j].clone()].len() != aperture
+                    {
+                        break;
+                    }
+                    let next_window = &cells[spans[j].clone()];
+                    let (ca, _, fa) = read(reference, &mut held, next_window)?;
+                    let (cb, _, fb) = read(reference, &mut back, next_window)?;
+                    let d = interval_difference(&cb, &ca)?;
+                    tally(&d, &mut counts);
+                    code_difference = interval_sum(&code_difference, &d)?;
+                    faces_pair = (fa, fb);
                 }
-                if !feed(reference, &mut held, &cells[spans[j].clone()])?
-                    || !feed(reference, &mut back, &cells[spans[j].clone()])?
-                {
-                    break;
-                }
-                j += 1;
-                if j >= spans.len()
-                    || j >= k + options.information
-                    || cells[spans[j].clone()].len() != aperture
-                {
-                    break;
-                }
-                let next_window = &cells[spans[j].clone()];
-                let (ca, _, fa) = read(reference, &mut held, next_window)?;
-                let (cb, _, fb) = read(reference, &mut back, next_window)?;
-                let d = interval_difference(&cb, &ca)?;
-                tally(&d, &mut counts);
-                code_difference = interval_sum(&code_difference, &d)?;
-                faces_pair = (fa, fb);
             }
             cumulative.push(CumulativeContacts {
                 aeon,

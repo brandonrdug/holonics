@@ -1161,6 +1161,7 @@ pub(super) fn witness(
     // Loop 1c's launcher (Astra's review of `722c3334`): a procedure stopped by its own deadline is
     // incomplete and exits so, never read as success; its listing is unchanged.
     if incomplete {
+        #[allow(clippy::disallowed_methods)] // exterior notebook: an incomplete run exits so (guard 7)
         std::process::exit(super::loop_1c::INCOMPLETE);
     }
 }
@@ -1740,6 +1741,7 @@ pub(super) fn run(
     };
     println!("executed run: {} ms; resident {}", clock.elapsed().as_millis(), resident());
     if incomplete {
+        #[allow(clippy::disallowed_methods)] // exterior notebook: an incomplete run exits so (guard 7)
         std::process::exit(super::loop_1c::INCOMPLETE);
     }
 }
