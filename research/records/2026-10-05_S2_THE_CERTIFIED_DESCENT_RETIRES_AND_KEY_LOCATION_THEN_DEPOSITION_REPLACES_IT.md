@@ -3,7 +3,7 @@
 **Date.** October 5. **Issues.** #73, #148, #63, #62. **Lanes.** B and E of U6 (THE_REBUILD, "U6's
 order from October 5"): the library spine's S2 row, "`hnn::executed`'s own move … retires once B's
 acceptance reads, replaced by key location then deposition". **Grade.** [measured] for the counts
-of §1 and §5 (this record's commit against `9078f103`); [definition] for the laws restated in §2,
+of §1 and §5 (the retirement commit `2636aaa7` against `9078f103`); [definition] for the laws restated in §2,
 each with its first owner; [agent-inferred] for what was kept and what was retired.
 
 **Occasion.** B's acceptance has read. With its key located by loop closure (16 observations against
