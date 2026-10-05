@@ -560,15 +560,58 @@ tests can comb through anything valuable").
    the `std::fs` and `std::process` entry points, denied in `hnn` (an exterior notebook allows
    them where it reads).
 8. **No templates.** Output faces are `ρ_R` readings, and no port method returns a string.
-9. **The codec is not the architecture.** `Field::declare` fixes the ring count and widths without
-   the exterior alphabet. A test changes the alphabet and checks that they do not change. The
-   stepping classes are the field's declared port chart (`hnn::field::PortChart`), the codec's
-   residue chart `code mod d_g`, the one exterior chart the field reads (the guard's stated
-   exception). [open] The passage-founded chart (placed at first arrival, its classes priced by
-   counts) was retired September 29 with the passage's founding
-   ([lessons](../research/records/2026-09-29_LESSONS_THE_FAILURES_THAT_REPEATED_AFTER_THEY_WERE_RECORDED.md)
-   §4), so a text field steps on its codec's residues until the stepping classes are located by the
-   field's own keys and deposition.
+9. **The codec is not the architecture: every source enters encoded, and no exterior code reaches
+   the field** (lessons, [September 24](../research/records/2026-09-24_LESSONS_FROM_THE_WORKBENCH_AND_ATHENA_PROTOTYPES.md)
+   D2, and [September 29](../research/records/2026-09-29_LESSONS_THE_FAILURES_THAT_REPEATED_AFTER_THEY_WERE_RECORDED.md)
+   §1.3, "text run on its codec's grain"; recurred October 5 in the byte-chart key location and
+   the 2⁸-port text repair).
+   - **One source type.** The field reads only `Encoded` cells (`hnn::encoding::Encoded`, to
+     build): on each source ring, classes of its own port chart `ℤ/d_g`, carried with the decoder
+     `D` and the Preimage Fibre of the encoding that produced them. Its fields are private, and only
+     `hnn::encoding` constructs one, in two ways:
+     - `Encoded::identity`: the declared identity encoding of a known-truth terrain
+       (`holarchy::terrain::KnownTruth`, built only by a terrain's generator, never from a file).
+       It is refused unless the terrain's classes inject into every source ring's ports
+       (`|A| ≤ d_g`): no fold, no residue.
+     - `Encoded::through`: the image `E` of a founded `Encoding` (`Encoding::found`), whose squares
+       `D E = ρ`, `E T_a = U_a E` and the injection square are checked on every reached state.
+   - **The field's entries take it, and nothing else.** `SourceMoment::ingest`, `Current::step`,
+     `ExecutionPort::{ingest, locate_keys, compare}`, `hnn::keys::station_pairs` and
+     `compression::keys::local::locate` accept `&Encoded` (or its `PortCell`) only. An exterior
+     code (a byte, a code point, a sample, a joint angle) has no path into the field.
+     `compile_fail` doctests show it: `E0308` on `&[usize]` and on one-hot cells where `&Encoded`
+     goes, and `E0451` on a forged `Encoded`. No `From<Faces>`, `From<Released>` or `From<Vec<_>>`
+     exists, so a release cannot be fed back as the next source cell.
+   - **No residue chart.** No constructor exists for `code mod d_g`, for `code` itself on a ring
+     of period `|A|`, or for a chart founded from a passage's counts or placed at first arrival.
+     `PortChart` is built only by `hnn::encoding`, from the encoding's classes.
+   - **Exterior data waits for its encoding.** Text, image, acoustic and motor passages enter only
+     through `Encoded::through`. Until the field's own keys and deposition found their encoding,
+     `Encoding::found` refuses the exterior chart (`EncodingError::Unencoded`), and a run reports
+     that refusal as its result. A declared identity is never the bypass, since a cut file is not
+     a `KnownTruth`.
+   - **The alphabet fixes nothing.** `FieldDeclaration` has no exterior alphabet. `Field::declare`
+     fixes the ring count and widths, the contacts and the complex. The moment's slots and the
+     receiving classes are the encoding's classes, never the codec's.
+   - **Tests that fail on the rejected form.**
+     - One field is declared under two encodings of different exterior alphabets. Its widths,
+       channels, complex, moment slot count and receiving class count must be equal.
+     - `Encoded::identity` must refuse a terrain of `257` classes on `d_g = 60`, and
+       `Encoding::found` must refuse the byte chart.
+   - **The code length does not see the labels.** For every permutation `π` of an exterior
+     alphabet, `L(field; π∘x) = L(field; x)`: the field's description length of a passage is
+     unchanged when its symbols are relabelled (code length is invariant under relabelling; keys are
+     not, [the egg's genome](../research/records/2026-09-27_THE_EGG_IS_A_GENERATORS_GENOME_SELECTION_IS_BAYES_AND_THE_FACES_OF_INTEGERS_ARE_MOIRES_OF_GRATINGS.md) §5).
+     The residue chart breaks it; a test that relabels and compares fails on any chart a code
+     chooses.
+   - **Status (October 5).** `Encoded` and its constructors are the next build (lane E). Until
+     it lands, this guard is a rule with named entries, not yet a type: the byte-chart harness
+     modes of October 5 (`executed text`, `hnn_text_repair`) are evidence of the failure, not a
+     route, and no new run enters exterior data through `one_hot`, `PortChart::residue` or
+     `SourceMoment::ingest(&[usize])`.
+   - **What is structural.** The type and its constructors. The refusals are runtime laws, each
+     pinned by a test. Supersedes the residue chart's "stated exception" and its September 29
+     `[open]` (`hnn::field`, "The port chart").
 10. **No scalar operand.** `Word::pull_back` accepts only a `RatioCovector`, which only a
     `HolonRatio` constructs (`compile_fail`).
 11. **Learning is locating keys and depositing covectors,** never "a current changes a later

@@ -413,7 +413,8 @@ paths. Dataset roles and provenance are exterior codec information, not native s
 Commands use Bash; with a fish shell, invoke Bash explicitly. CUDA may need
 `PATH=/opt/cuda/bin:$PATH`. The gates, lowest first:
 
-1. any code change: `cargo check --workspace --all-targets`;
+1. any code change: `bash tools/gate.sh` (the workspace check, THE_MACHINE's guard lints and the
+   guards' `compile_fail` doctests; a guard that is not run does not hold);
 2. once per step or PR: the tests of the laws that step wrote or changed. Inherited tests count
    only after rebuild step 1 has audited them.
 3. at the end of a step that changes HNN behaviour or a kernel: the GPU suite, alone on an idle

@@ -158,6 +158,7 @@ pub(super) const REFUSED: i32 = 4;
 pub(super) fn stop(status: i32, reason: &str) -> ! {
     println!("{reason}");
     eprintln!("{reason}");
+    #[allow(clippy::disallowed_methods)] // exterior notebook: an incomplete run exits so (guard 7)
     std::process::exit(status)
 }
 
