@@ -282,10 +282,12 @@ import HolonicsResearch.Foundation.HolonicMembraneActionTransport
 import HolonicsResearch.Foundation.HolonicGranularBoundaryRadiation
 import HolonicsResearch.Foundation.HolonicBoundaryCycleReflection
 import HolonicsResearch.Holon.HolonicQuadraticMomentCondensation
+import HolonicsResearch.Holon.RingCellHolonomy
 import HolonicsResearch.Transport.HolonicGeneratedPortMomentPassage
 import Holonics.Transport.ContinuingTube
 import HolonicsResearch.Transport.ArtifactRelease
 import HolonicsResearch.Transport.Fold
+import HolonicsResearch.Transport.ForestRestriction
 import Holonics.Transport.EditRigidity
 import Holonics.Transport.JunctionLaw
 import Holonics.Transport.JetStaircase
@@ -1184,3 +1186,4 @@ import HolonicsResearch.Holon.HolonicStateAddressedQuadratic
 import HolonicsResearch.Mathematics.PiIterationConstraint
 import HolonicsResearch.Transport.GenerativeTransport
 import HolonicsResearch.Computation.NavigatorObservationScope
+import HolonicsResearch.Compression.Relabelling

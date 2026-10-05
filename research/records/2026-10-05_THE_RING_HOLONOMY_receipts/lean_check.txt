@@ -1,0 +1,78 @@
+command: timeout 2400 bash tools/lean_check.sh HolonicsResearch
+worktree base: origin/main f91666c0, Lean build cache copied from the main checkout
+projection: about 130 s with cache (brief); deadline 2400 s (outer timeout)
+measured: exit=0 wall_ms=153681
+result: Build completed successfully (10328 jobs).
+sorryAx occurrences in the log: 0
+peak resident set: not measured
+
+ℹ [10139/10309] Built HolonicsResearch.Transport.ForestRestriction
+ℹ [10144/10328] Built HolonicsResearch.Compression.Relabelling
+ℹ [10145/10328] Built HolonicsResearch.Holon.RingCellHolonomy
+
+info: HolonicsResearch/Transport/ForestRestriction.lean:551:0: 'Holonics.Transport.ForestRestriction.PairForest.revise_proj' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: HolonicsResearch/Transport/ForestRestriction.lean:552:0: 'Holonics.Transport.ForestRestriction.PairForest.exists_fixed_iterate' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: HolonicsResearch/Transport/ForestRestriction.lean:553:0: 'Holonics.Transport.ForestRestriction.PairForest.fixed_subset_proj' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: HolonicsResearch/Transport/ForestRestriction.lean:554:0: 'Holonics.Transport.ForestRestriction.PairForest.restriction_eq_projection' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: HolonicsResearch/Transport/ForestRestriction.lean:555:0: 'Holonics.Transport.ForestRestriction.PairForest.restriction_empties_iff' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: HolonicsResearch/Transport/ForestRestriction.lean:556:0: 'Holonics.Transport.ForestRestriction.PairForest.fixed_empty_spreads' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: HolonicsResearch/Transport/ForestRestriction.lean:557:0: 'Holonics.Transport.ForestRestriction.PairForest.tree_restriction_eq_projection' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: HolonicsResearch/Transport/ForestRestriction.lean:558:0: 'Holonics.Transport.ForestRestriction.PairForest.released_class_is_truth' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: HolonicsResearch/Transport/ForestRestriction.lean:559:0: 'Holonics.Transport.ForestRestriction.PairForest.jointFibre_eq_step' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: HolonicsResearch/Transport/ForestRestriction.lean:560:0: 'Holonics.Transport.ForestRestriction.PairForest.jointFibre_width_le' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: HolonicsResearch/Transport/ForestRestriction.lean:561:0: 'Holonics.Transport.ForestRestriction.PairForest.releasable_iff_one_class' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: HolonicsResearch/Transport/ForestRestriction.lean:562:0: 'Holonics.Transport.ForestRestriction.triangle_supported_but_empty' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: HolonicsResearch/Compression/Relabelling.lean:260:0: 'Holonics.Compression.Relabelling.encode_relabel' depends on axioms: [propext, Quot.sound]
+info: HolonicsResearch/Compression/Relabelling.lean:261:0: 'Holonics.Compression.Relabelling.codeLength_relabel' depends on axioms: [propext, Quot.sound]
+info: HolonicsResearch/Compression/Relabelling.lean:262:0: 'Holonics.Compression.Relabelling.prefixFree_relabel' depends on axioms: [propext, Quot.sound]
+info: HolonicsResearch/Compression/Relabelling.lean:263:0: 'Holonics.Compression.Relabelling.kraftSum_relabel' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: HolonicsResearch/Compression/Relabelling.lean:264:0: 'Holonics.Compression.Relabelling.passageMass_relabel' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: HolonicsResearch/Compression/Relabelling.lean:265:0: 'Holonics.Compression.Relabelling.passageMass_dyadic' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: HolonicsResearch/Compression/Relabelling.lean:266:0: 'Holonics.Compression.Relabelling.carried_codeLength' depends on axioms: [propext, Quot.sound]
+info: HolonicsResearch/Compression/Relabelling.lean:267:0: 'Holonics.Compression.Relabelling.firstOccurrence_carried' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: HolonicsResearch/Compression/Relabelling.lean:268:0: 'Holonics.Compression.Relabelling.totalLength_relabel' depends on axioms: [propext, Quot.sound]
+info: HolonicsResearch/Compression/Relabelling.lean:269:0: 'Holonics.Compression.Relabelling.countLengths_carried' depends on axioms: [propext, Quot.sound]
+info: HolonicsResearch/Compression/Relabelling.lean:270:0: 'Holonics.Compression.Relabelling.literalCode_length_relabel' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: HolonicsResearch/Compression/Relabelling.lean:271:0: 'Holonics.Compression.Relabelling.residueCode_prefixFree' depends on axioms: [propext, Quot.sound]
+info: HolonicsResearch/Compression/Relabelling.lean:272:0: 'Holonics.Compression.Relabelling.residueCode_kraftSum' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: HolonicsResearch/Compression/Relabelling.lean:273:0: 'Holonics.Compression.Relabelling.residue_codeLength_moves' depends on axioms: [propext, Quot.sound]
+info: HolonicsResearch/Compression/Relabelling.lean:274:0: 'Holonics.Compression.Relabelling.residue_mass_moves' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: HolonicsResearch/Compression/Relabelling.lean:275:0: 'Holonics.Compression.Relabelling.residue_not_carried' depends on axioms: [propext, Quot.sound]
+info: HolonicsResearch/Holon/RingCellHolonomy.lean:319:0: 'Holonics.HolonCore.RingCell.pow_step_cycle' depends on axioms: [propext, Quot.sound]
+info: HolonicsResearch/Holon/RingCellHolonomy.lean:320:0: 'Holonics.HolonCore.RingCell.connectionIncidence_eq_step_sub_one' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: HolonicsResearch/Holon/RingCellHolonomy.lean:321:0: 'Holonics.HolonCore.RingCell.ringHolonomy_eq_prod' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: HolonicsResearch/Holon/RingCellHolonomy.lean:322:0: 'Holonics.HolonCore.RingCell.ring_cell_curvature' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: HolonicsResearch/Holon/RingCellHolonomy.lean:323:0: 'Holonics.HolonCore.RingCell.ringHolonomy_regauge' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: HolonicsResearch/Holon/RingCellHolonomy.lean:324:0: 'Holonics.HolonCore.RingCell.seam_ringHolonomy' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: HolonicsResearch/Holon/RingCellHolonomy.lean:325:0: 'Holonics.HolonCore.RingCell.ringStep_pow_period' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: HolonicsResearch/Holon/RingCellHolonomy.lean:326:0: 'Holonics.HolonCore.RingCell.carries_pow_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: HolonicsResearch/Holon/RingCellHolonomy.lean:327:0: 'Holonics.HolonCore.RingCell.ring_carries_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: HolonicsResearch/Holon/RingCellHolonomy.lean:328:0: 'Holonics.HolonCore.RingCell.flat_ring_carries_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: HolonicsResearch/Holon/RingCellHolonomy.lean:329:0: 'Holonics.HolonCore.RingCell.carries_iff_remainder' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: HolonicsResearch/Holon/RingCellHolonomy.lean:330:0: 'Holonics.HolonCore.RingCell.sixty_mobius_carries_i' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: HolonicsResearch/Holon/RingCellHolonomy.lean:331:0: 'Holonics.HolonCore.RingCell.sixty_flat_refuses_i' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: HolonicsResearch/Holon/RingCellHolonomy.lean:332:0: 'Holonics.HolonCore.RingCell.sixty_seam_carries_i' depends on axioms: [propext, Classical.choice, Quot.sound]
