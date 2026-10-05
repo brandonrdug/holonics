@@ -1,0 +1,10 @@
+build exit 0 wall 31495 ms
+order2 exit 101 wall 243 ms
+order2 sections: DIFFER
+order2 counts: DIFFER
+alternation exit 101 wall 239 ms
+alternation sections: DIFFER
+alternation counts: DIFFER
+line exit 101 wall 239 ms
+line sections: DIFFER
+line counts: DIFFER

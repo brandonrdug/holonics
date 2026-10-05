@@ -1,0 +1,4 @@
+build exit 0 wall 70861 ms
+thread 'main' (612279) panicked at crates/holonics/../../research/notebook/hnn_design/hnn_executed_loop.rs:322:39:
+the checkpoint continues the declared opening: ContinuingState { what: "the state continues another opening's material" }
+run exit 101

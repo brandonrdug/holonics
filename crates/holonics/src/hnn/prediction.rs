@@ -23,11 +23,13 @@
 //!   `Holon.ofEvolution_receive_eq_encoded` (`HNN/Prediction.consumer_eq`): read exactly where a
 //!   terrain knows `T` (the notebook's `hnn_prediction … executed` terrains, order-2, the alternation
 //!   and the line).
-//! - **Learning** is the release's own comparison (`hnn::executed`): the bank's class, threshold,
-//!   order and section predicates along the machine's own trajectory, pulled back to `E` through
-//!   the executed monodromy's eigen-derivative, and a carried update adopted only where its re-read
-//!   comparison is certified lower. The lock iteration has one owner, [`bank_release`], which
-//!   generation and the comparison both read.
+//! - **Learning** is locating keys, then deposition: the pair menu's loop closure locates a pair
+//!   `(δ, f)` over the seen passage (`hnn::keys`) and one certified deposition makes it the source
+//!   port's pair component (`hnn::executed::pair_deposit`), which the release reads on equal
+//!   material (below). The release's own comparison and its certified descent move, which read the
+//!   lock iteration with each candidate's covector, retired October 5 (the library spine's S2;
+//!   source at [`9078f103`](https://github.com/brandonrdug/holonics/blob/9078f103/crates/holonics/src/hnn/executed.rs)).
+//!   The lock iteration has one owner, [`bank_release`].
 //! - **No datum is cut off by its age.** The path reads the request only through its phase-carried
 //!   moment and the section only through its own placement (below); it reads no landmark tree, no
 //!   suffix address, no copy stage and no byte context.
@@ -90,7 +92,7 @@
 //! `hnn::moment`, "One passage, its transported weights"; Lean
 //! `HNN/IndexedOpen.{transportedWeight, passage_weight_split_invariant, decayed_weight_frame_free}`):
 //! a datum `a` ticks old at the span's end weighs `ρ^a / Σ_k ρ^(a_k)`, `ρ ∈ (0, 1]` the
-//! transport's modulus, a constitution locus the executed comparison learns (one at the founding,
+//! transport's modulus, a constitution locus (one at the founding,
 //! where every datum weighs `ν̂(n + v)`). The weights are set by the span, not by where the request
 //! ends, so a relation the release reads among the section's stations reads the same across the
 //! request's last tick. The retired reading placed the section over its own population and the
@@ -149,9 +151,8 @@
 //! - **the release**: every station locked, at width zero through `receiver::release`; no station
 //!   with a positive gap, held with the unlocked stations plural;
 //! - **one owner** [agent-inferred, September 30]: the lock iteration is [`bank_release`], which
-//!   `generate_by_bank` reads with the turn's reading and the release's own comparison
-//!   (`hnn::executed`) with each candidate's covector, so the comparison compares exactly what the
-//!   release executes;
+//!   `generate_by_bank` reads with the turn's reading (the retired comparison read it with each
+//!   candidate's covector, so it compared exactly what the release executes);
 //! - **a refused certificate refuses the release** [proved-derived, September 30]: a lock whose
 //!   Floquet certificate is refused stops the release, held with the refused station first
 //!   ([`BankGeneration::uncertified`]). A certificate decides whether the lock stands, never a
@@ -593,8 +594,8 @@ pub fn generate_by_bank(
 }
 
 /// [definition; agent-inferred, September 30] **The bank's lock iteration, its one owner**
-/// ([`generate_by_bank`]'s law, read by the release's own comparison `hnn::executed` with each
-/// candidate's covector): every refinement reads every open candidate by `read`, decides each
+/// ([`generate_by_bank`]'s law; the retired comparison read it with each candidate's covector,
+/// S2): every refinement reads every open candidate by `read`, decides each
 /// open station's lock's flip and gap, locks together the stations not certified below the largest
 /// positive gap,
 /// certifies each lock's reading, and stops at the whole section, at a plural refinement, or at a
@@ -641,7 +642,7 @@ pub enum LockOrder {
 /// (`lone_lock_is_largest`), so no move makes a station certified below another lock alone before it
 /// unless their true gaps cross (`certified_order_needs_crossing`). On exact readings it is the
 /// largest gap with its ties (`certifiedLock_exact`). The comparison's order term reads the same
-/// two ends (`hnn::executed::OrderTerm`; `order_solved_locks_no_wrong`).
+/// two ends (the retired `hnn::executed::OrderTerm` at `9078f103`; `order_solved_locks_no_wrong`).
 pub(crate) fn uncertified_largest(gaps: &[(usize, usize, Rat)], gap_uppers: &[Rat]) -> Vec<usize> {
     let largest = gaps.iter().map(|(_, _, gap)| gap).max();
     match largest {
@@ -1319,7 +1320,8 @@ impl BankPlacement {
     /// modulus**, read from a station, at the exact weights `w_k = ρ^(r_k)/mass`:
     /// `∂w_k/∂ρ = w_k (r_k − r̄)/ρ`, `r_k` the datum's distance from the station read and `r̄` the
     /// span's weighted mean distance, so `∂z/∂ρ = Σ_k ∂w_k/∂ρ · (datum k's read)`; the modulus's
-    /// covector pairs with it (`hnn::executed`, "The committed move"). The one-way law's form with
+    /// covector paired with it in the retired descent move (`hnn::executed` at `9078f103`, "The
+    /// committed move"). The one-way law's form with
     /// each age replaced by the distance from the station read.
     pub fn modulus_derivative(&self, station: usize, cells: &[Option<usize>]) -> Vec<Rat> {
         let data = self.data(station, cells);

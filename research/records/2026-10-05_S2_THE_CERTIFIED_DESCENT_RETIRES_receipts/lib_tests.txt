@@ -1,0 +1,55 @@
+# cargo test -p holonics --lib -j 12 -- --test-threads=12, at 9078f103 (before) and at this change (after)
+## before
+test result: ok. 1034 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 292.77s
+exit 0 wall 322707 ms
+## after
+test result: ok. 994 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 163.91s
+exit 0 wall 169841 ms
+## retired or renamed (in before, not after)
+hnn::tests::coupling::a_landing_splits_into_its_normalization_and_its_entry
+hnn::tests::coupling::each_decision_terms_gradient_is_its_pullback_to_e
+hnn::tests::coupling::the_frozen_sites_at_their_own_constitution_are_its_terms
+hnn::tests::coupling::the_release_under_a_declared_order_keeps_the_releases_rules
+hnn::tests::executed::a_stations_predicates_are_read_exactly_or_left_undecided
+hnn::tests::executed::the_monotone_excursion_is_the_strict_decrease_and_a_height_admits_a_bounded_rise
+hnn::tests::lock_face::a_checkpoint_is_refused_onto_foreign_material_and_when_damaged
+hnn::tests::lock_face::a_continuing_state_carries_the_receptions_end_inside_its_check
+hnn::tests::lock_face::active_face_ties_are_read_by_every_active_member
+hnn::tests::lock_face::a_hold_keeps_every_station_obligation
+hnn::tests::lock_face::an_unresolved_active_member_refuses_every_composition
+hnn::tests::lock_face::a_restored_checkpoint_continues_exactly_over_successive_receptions
+hnn::tests::lock_face::a_zero_or_unsupported_target_is_refused_typed
+hnn::tests::lock_face::dropping_the_cross_term_changes_the_step_only_where_the_witness_couples_the_plane
+hnn::tests::lock_face::each_readings_gradient_in_e_is_its_storage_moves_pairing
+hnn::tests::lock_face::e_can_supply_more_than_the_readings_ask_and_turn_the_modulus
+hnn::tests::lock_face::one_lock_reading_serves_the_comparison_the_covector_and_the_metric
+hnn::tests::lock_face::the_bound_holds_an_upward_ask_and_the_move_is_e_alone
+hnn::tests::lock_face::the_decisions_read_each_station_once_along_the_consistent_prefix
+hnn::tests::lock_face::the_fixed_mask_rereads_the_incumbents_sections
+hnn::tests::lock_face::the_forced_release_reads_every_decision_along_the_right_trajectory
+hnn::tests::lock_face::the_founding_bound_holds_the_coordinate_and_witness_moduli
+hnn::tests::lock_face::the_guards_hold_symmetrically_on_every_arm
+hnn::tests::lock_face::the_joined_move_carries_the_modulus_and_keeps_every_guard
+hnn::tests::lock_face::the_joined_solve_splits_the_readings_change_at_least_storage_energy
+hnn::tests::lock_face::the_kinetic_move_deposits_the_solve_and_keeps_every_guard
+hnn::tests::lock_face::the_ladder_starts_from_the_excess_and_never_divides_by_zero
+hnn::tests::lock_face::the_lock_face_reads_the_lock_whole_against_its_resting_sheet
+hnn::tests::lock_face::the_machines_plane_reading_agrees_with_its_move
+hnn::tests::lock_face::the_order_is_solved_past_the_wrong_gaps_and_absent_without_a_right_top
+hnn::tests::lock_face::the_order_term_reads_the_first_lock_as_a_lock_over_the_stations
+hnn::tests::lock_face::the_order_term_reads_the_wrong_sheets_at_the_upper_end_the_lock_rule_compares
+hnn::tests::lock_face::the_release_run_ends_at_its_close_a_refusal_or_its_declared_cap
+hnn::tests::lock_face::the_slope_is_read_on_the_joint_direction
+hnn::tests::lock_face::the_solve_lifts_the_witnesss_newton_change_at_least_energy
+hnn::tests::lock_face::the_witness_form_is_the_locks_normalized_jacobian_pulled_back
+hnn::tests::lock_face::the_witness_step_is_chart_free_and_the_coordinate_control_is_not
+hnn::tests::prediction::the_committed_move_carries_the_transport_modulus
+hnn::tests::prediction::the_committed_move_descends_or_refuses_by_type
+hnn::tests::prediction::the_executed_comparison_refuses_a_closed_pair_contact
+hnn::tests::prediction::the_moves_receipts_read_its_certificate
+hnn::tests::prediction::the_proposals_returns_are_its_pullback_to_e
+hnn::tests::prediction::the_release_comparison_reads_the_bank_release
+## added (in after, not before)
+hnn::tests::executed::a_checkpoint_is_refused_onto_foreign_material_and_when_damaged
+hnn::tests::executed::a_continuing_state_carries_the_receptions_end_inside_its_check
+hnn::tests::executed::a_restored_checkpoint_continues_exactly_over_successive_deposits

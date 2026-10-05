@@ -1,8 +1,0 @@
-# Loop 1c's run `c2` (research/notebook/hnn_design/loop_1c_runs.sh; the pin
-# research/records/2026-10-01_LOOP_1C_PERSISTENCE_REPRESENTATION_AND_REACH_PINNED_BEFORE_ITS_RUNS.md §6).
-# Its limits moved unchanged from the launcher's command line on October 5 (THE_MACHINE guard 22).
-command = executed resume-coupling
-projection = the move's bound: gate A's move 1 (145447 ms at 24 threads) times move 0's measured 159075/109917 at 12 threads over 24, ceiling 210496 ms; the narrowed operation's budget (setup and restore 256, the move 210496, the 105 turn readings at most 45592) 256344 ms, the outer guard 257 s
-deadline_ms = 256344
-unit_bound_ms = 210496
-threads = 12

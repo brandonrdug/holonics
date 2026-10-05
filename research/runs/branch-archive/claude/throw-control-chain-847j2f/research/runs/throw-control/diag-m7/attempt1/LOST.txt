@@ -1,1 +1,0 @@
-lost at a container restart about 23:52 UTC, during the fourth trial's reread (last stderr line at 921362 ms)

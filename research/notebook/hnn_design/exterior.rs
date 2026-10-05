@@ -652,7 +652,7 @@ pub fn show_release(out: &str, name: &str, release: &[u8], admitted: &[&[u8]]) -
 // -------------------------------------------------------------------------------------------
 // a run's pin (guard 22)
 
-/// The exit status of a run stopped at its pinned deadline (loop 1c's `INCOMPLETE`): never a
+/// The exit status of a run stopped at its pinned deadline (`INCOMPLETE`, first loop 1c's): never a
 /// result, and never truncated into one.
 pub const INCOMPLETE: i32 = 3;
 

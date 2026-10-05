@@ -280,9 +280,8 @@ pub(super) fn pair_members(terrain: &str, seed: u64, count: usize, state: &str) 
     use holonics::hnn::ring::turn;
     let declared = order_declared();
     let engine = Engine::new(declared);
-    let ring = engine.refinement.ring();
     let bank = bank_of(declared.period, &bank_strength());
-    let theta = executed_loop::mount(&engine.theta, ring, state);
+    let theta = executed_loop::mount(&engine.theta, state);
     let at = |x: &Rat| executed_loop::cell(&ExactInterval { lower: x.clone(), upper: x.clone() }, 16);
     for (request, target) in &terrain_pairs(terrain, &declared, seed, count) {
         let (current, moment) = ingest(&engine.field, request);

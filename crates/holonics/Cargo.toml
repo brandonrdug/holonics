@@ -28,15 +28,10 @@ path = "../../research/notebook/hnn_design/hnn_exposure.rs"
 name = "hnn_chase"
 path = "../../research/notebook/hnn_design/hnn_chase.rs"
 
-# The notebook's step-1 harness (THE_REBUILD U6): the release's own comparison (`hnn::executed`)
-# over the receiving bank's release (`hnn::prediction`) on known-truth terrains, order-2, the
-# alternation and the line (research/notebook/hnn_design/README.md): run once in release, never a
-# test.
+# The notebook's step-1 harness (THE_REBUILD U6): key location and the located pair's deposit
+# (`hnn::keys`, `hnn::executed`), the release (`hnn::prediction`) and repair on known-truth terrains,
+# order-2, the alternation and the line, and on text (research/notebook/hnn_design/README.md): run
+# once in release, never a test.
 [[example]]
 name = "hnn_prediction"
 path = "../../research/notebook/hnn_design/hnn_prediction.rs"
-
-[dev-dependencies]
-# The notebook names a state written before the material identity by the sha256 its receipts cite
-# (research/runs/u6/LEGACY_STATES.txt); never inside a law.
-sha2 = "0.11.0"

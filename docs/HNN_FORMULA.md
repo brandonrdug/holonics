@@ -5,7 +5,7 @@
 [operator contract](ELEMENTARY_OBJECTS.md#operator-contract)'s HNN row: the word, deposition and
 the collapse of campaigns 1–2 and the loaded resonator (`hnn::ring`); a loaded ring's mode quotient
 (campaign 3's first construction) is Lean's `HNN/ModeQuotient` ([§4](#the-loaded-rings-mode-quotient)).
-Holonic Encoding's founding law on declared transports is `hnn::encoding` (Lean `HNN/Encoding`, [below](#holonic-encoding)); joint prediction's native form is `hnn::prediction`, the receiving bank's lock iteration, with its learning signal the release's own comparison `hnn::executed` (U6, [below](#generation-as-field-refinement-and-boundary-radiation)); release through modes has no owner yet. [THE_MACHINE](THE_MACHINE.md) states the object,
+Holonic Encoding's founding law on declared transports is `hnn::encoding` (Lean `HNN/Encoding`, [below](#holonic-encoding)); joint prediction's native form is `hnn::prediction`, the receiving bank's lock iteration, with learning as key location then deposition (`hnn::keys`, `hnn::executed::pair_deposit`; the release's own comparison and its descent move retired October 5, the library spine's S2) (U6, [below](#generation-as-field-refinement-and-boundary-radiation)); release through modes has no owner yet. [THE_MACHINE](THE_MACHINE.md) states the object,
 [THE_REBUILD](plans/THE_REBUILD.md) the order and [CONSTRUCTION_STATE](../CONSTRUCTION_STATE.md) the
 position; the [elementary objects](ELEMENTARY_OBJECTS.md) own the vocabulary.
 The HNN is the compression machine at scale ([the line](THE_MACHINE.md#the-line-the-rebuild-serves)):
@@ -555,7 +555,9 @@ and so is the bank's face that was trained beside it (the
 [diagnosis](../research/records/2026-09-30_THE_LEARNING_FAILURE_DIAGNOSED_THE_TRAINED_COMPARISON_IS_NOT_THE_ONE_THE_RELEASE_EXECUTES.md)
 §3: the trained comparison was not the one the release executes). Generation is the receiving
 bank's lock iteration over the passage's station-framed placement (`hnn::prediction::{bank_release,
-generate_by_bank, BankPlacement}`), and learning the release's own comparison (`hnn::executed`).
+generate_by_bank, BankPlacement}`), and learning was the release's own comparison (`hnn::executed`)
+until October 5, when key location then deposition replaced it (S2; the comparison's source at
+`9078f103`).
 The readout's checks, stated here so the laws outlive their code:
 - **The refinement's balance.** Over the `K` words the field's power plus the resonators' energy
   telescopes: `end = open − dissipation + resist + Π_c + residual + pump − resonator dissipation +

@@ -1,2 +1,0 @@
-executed step-state from cwi at η 1/1024: incumbent L ∈ [500197/4096, 500203/4096); held-sheet [499624/4096, 499629/4096), released [499624/4096, 499629/4096); 249099 ms
-  written out/q1/cwi-1024.state
