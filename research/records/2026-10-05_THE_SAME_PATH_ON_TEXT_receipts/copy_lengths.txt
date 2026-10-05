@@ -1,0 +1,34 @@
+lossless request 0: held, released bytes 0, copy length against the training passage 0, against its request 0, plural stations 8
+lossless request 1: held, released bytes 0, copy length against the training passage 0, against its request 0, plural stations 8
+lossless request 2: held, released bytes 0, copy length against the training passage 0, against its request 0, plural stations 8
+lossless request 3: held, released bytes 0, copy length against the training passage 0, against its request 0, plural stations 8
+lossless request 4: held, released bytes 0, copy length against the training passage 0, against its request 0, plural stations 8
+lossless request 5: held, released bytes 0, copy length against the training passage 0, against its request 0, plural stations 8
+lossless request 6: held, released bytes 0, copy length against the training passage 0, against its request 0, plural stations 8
+lossless request 7: held, released bytes 0, copy length against the training passage 0, against its request 0, plural stations 8
+lossless request 8: held, released bytes 0, copy length against the training passage 0, against its request 0, plural stations 8
+lossless request 9: held, released bytes 0, copy length against the training passage 0, against its request 0, plural stations 8
+lossless request 10: held, released bytes 0, copy length against the training passage 0, against its request 0, plural stations 8
+lossless request 11: held, released bytes 0, copy length against the training passage 0, against its request 0, plural stations 8
+lossless request 12: held, released bytes 0, copy length against the training passage 0, against its request 0, plural stations 8
+lossless request 13: held, released bytes 0, copy length against the training passage 0, against its request 0, plural stations 8
+lossless request 14: held, released bytes 0, copy length against the training passage 0, against its request 0, plural stations 8
+lossless request 15: held, released bytes 0, copy length against the training passage 0, against its request 0, plural stations 8
+lossless: read 16, released 0, held 16, refused 0, whole 0, bytes released 0, bytes right 0, plural stations 128, right by station [0, 0, 0, 0, 0, 0, 0, 0], copy lengths against the training passage []; adjacent equal 0, constant sections 0, printable ASCII bytes 0, distinct bytes released 0, distinct ports (byte mod 60) 0, the most frequent byte's count 0
+founded request 0: released, released bytes 8, copy length against the training passage 1, against its request 0, plural stations 0
+founded request 1: released, released bytes 8, copy length against the training passage 1, against its request 0, plural stations 0
+founded request 2: released, released bytes 8, copy length against the training passage 0, against its request 0, plural stations 0
+founded request 3: released, released bytes 8, copy length against the training passage 1, against its request 0, plural stations 0
+founded request 4: released, released bytes 8, copy length against the training passage 0, against its request 1, plural stations 0
+founded request 5: released, released bytes 8, copy length against the training passage 0, against its request 0, plural stations 0
+founded request 6: released, released bytes 8, copy length against the training passage 0, against its request 0, plural stations 0
+founded request 7: released, released bytes 8, copy length against the training passage 0, against its request 0, plural stations 0
+founded request 8: released, released bytes 8, copy length against the training passage 0, against its request 0, plural stations 0
+founded request 9: released, released bytes 8, copy length against the training passage 1, against its request 0, plural stations 0
+founded request 10: released, released bytes 8, copy length against the training passage 0, against its request 0, plural stations 0
+founded request 11: released, released bytes 8, copy length against the training passage 0, against its request 0, plural stations 0
+founded request 12: released, released bytes 8, copy length against the training passage 0, against its request 0, plural stations 0
+founded request 13: released, released bytes 8, copy length against the training passage 1, against its request 0, plural stations 0
+founded request 14: released, released bytes 8, copy length against the training passage 0, against its request 0, plural stations 0
+founded request 15: released, released bytes 8, copy length against the training passage 1, against its request 0, plural stations 0
+founded: read 16, released 16, held 0, refused 0, whole 0, bytes released 128, bytes right 0, plural stations 0, right by station [0, 0, 0, 0, 0, 0, 0, 0], copy lengths against the training passage [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1]; adjacent equal 77, constant sections 11, printable ASCII bytes 91, distinct bytes released 23, distinct ports (byte mod 60) 21, the most frequent byte's count 80

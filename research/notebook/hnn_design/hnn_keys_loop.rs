@@ -319,3 +319,287 @@ pub(super) fn pair_members(terrain: &str, seed: u64, count: usize, state: &str) 
         }
     }
 }
+
+// -------------------------------------------------------------------------------------------
+// the same path on text
+
+/// [definition; agent-inferred, October 5; the
+/// [record](../../records/2026-10-05_THE_SAME_PATH_ON_TEXT_KEY_LOCATION_AND_THE_RELEASE_ON_THE_BYTE_CHART.md)
+/// §0's pins] **The text pins**: the training passage is the cut's first `128` windows of
+/// `n + m = 48` bytes (a request of `40` cells and its section of `8` stations, the order-2 terrain's
+/// training shape: `1,024` observations); the requests are `16` windows of `48` bytes in the cut's
+/// held-out range, the `i`-th at `start + i·⌊(end − start)/16⌋`.
+const TEXT_TRAINING_WINDOWS: usize = 128;
+const TEXT_REQUESTS: usize = 16;
+
+/// [definition; agent-inferred, October 5] **The text declaration**: the order-2 field, refinement,
+/// bank and opening unchanged ([`order_declared`]), with the exterior chart the byte chart:
+/// `|A| = 257`, the bytes `0 … 255` and the termination `256`. The ring's ports are its residue chart
+/// `code mod 60` (guard 9), so a port holds four or five bytes.
+fn text_declared() -> Declared {
+    Declared {
+        alphabet: 257,
+        ..order_declared()
+    }
+}
+
+/// [measured; agent-inferred, October 5; the record above] **`executed text <cut> <out dir> <dev|run> [<state> [<from> <to> [<unit bound ms>]]]`**:
+/// lane B's key location and lane C's release, unchanged, on a text cut through the byte chart
+/// ([`text_declared`]). The training passage is read as `executed keys` reads a terrain's (each window
+/// a request and its section, one observation a station, read against every earlier cell of its
+/// window at every distance; `hnn::keys::{station_pairs, PairLocation}`), and each distance's menu
+/// is followed to the observation at which it fails, with the edges it had read. Beside it, a
+/// terrain-side reading only: the same edges on the bytes themselves (one `TurnMenu` a distance on
+/// the byte chart's `256` ports), to separate the residue chart's fold from the passage's own
+/// relation. If a pair locates at a first lock, it is deposited on both openings
+/// (`hnn::executed::pair_deposit`) and the release reads the deposits; otherwise the release reads the
+/// two openings. The release is `hnn::prediction::generate_by_bank`, one per request, read whole.
+/// `dev` reads one development window (the one after the training passage) on each state, for the
+/// projection; `run` reads the pinned requests. With a state's label (`lossless`, `founded`, or a
+/// deposit's `keys-…`), only that state is read; with `<from> <to>`, only the requests `from..to`;
+/// with `<unit bound ms>`, the read stops after a request that took longer. The requests are read
+/// one after another, each with the whole thread budget (the unit the development read measures),
+/// each written to `<out dir>` as it completes, one progress line each.
+/// Stdout carries counts only; every byte (the training passage, each request, its truth and each
+/// state's release) is written to `<out dir>`, which must be a private directory (`.local/`).
+#[allow(clippy::disallowed_methods)]
+pub(super) fn text(
+    cut: &str,
+    out: &str,
+    which: &str,
+    only: Option<&str>,
+    range: Option<(usize, usize)>,
+    unit_bound: Option<u128>,
+) {
+    use holonics::compression::keys::TurnMenu;
+    use std::fmt::Write as _;
+    let clock = Instant::now();
+    let declared = text_declared();
+    let engine = Engine::new(declared);
+    let ring = engine.refinement.ring();
+    let field = &engine.field;
+    let period = usize::try_from(field.ring(ring).period()).expect("a period fits");
+    let (bytes, population, held) = exterior::read_cut(cut);
+    let window = declared.request + declared.stations;
+    let pair_at = |start: usize| -> (Vec<usize>, Vec<usize>) {
+        let cells: Vec<usize> = bytes[start..start + window].iter().map(|&b| usize::from(b)).collect();
+        let (request, target) = cells.split_at(declared.request);
+        (request.to_vec(), target.to_vec())
+    };
+    assert!(TEXT_TRAINING_WINDOWS * window <= held.start, "the training passage lies before the held-out range");
+    let training: Vec<_> = (0..TEXT_TRAINING_WINDOWS).map(|i| pair_at(i * window)).collect();
+    let stride = (held.end - held.start) / TEXT_REQUESTS;
+    assert!(stride >= window, "the requests are disjoint");
+    let (starts, label): (Vec<usize>, &str) = match which {
+        "dev" => (vec![TEXT_TRAINING_WINDOWS * window], "development window"),
+        "run" => ((0..TEXT_REQUESTS).map(|i| held.start + i * stride).collect(), "pinned requests"),
+        _ => panic!("executed text <cut> <out dir> <dev|run>"),
+    };
+    let requests: Vec<_> = starts.iter().map(|&start| pair_at(start)).collect();
+    std::fs::create_dir_all(out).expect("the private directory");
+    std::fs::write(format!("{out}/training.bin"), &bytes[..TEXT_TRAINING_WINDOWS * window]).expect("write");
+    for (i, (request, target)) in requests.iter().enumerate() {
+        let as_bytes = |cells: &[usize]| cells.iter().map(|&c| u8::try_from(c).expect("a byte")).collect::<Vec<u8>>();
+        std::fs::write(format!("{out}/request_{i}.bin"), as_bytes(request)).expect("write");
+        std::fs::write(format!("{out}/truth_{i}.bin"), as_bytes(target)).expect("write");
+    }
+    println!(
+        "executed text ({which}): the cut {population} bytes, held-out range {}..{}; training passage bytes 0..{} ({} windows of {window}, {} observations); {} {label} of {window} bytes at stride {stride} from {}; d = {period}, |A| = {}, ports code mod {period}",
+        held.start,
+        held.end,
+        TEXT_TRAINING_WINDOWS * window,
+        TEXT_TRAINING_WINDOWS,
+        TEXT_TRAINING_WINDOWS * declared.stations,
+        requests.len(),
+        starts[0],
+        declared.alphabet
+    );
+
+    // Key location on the field's ports, and the terrain-side reading on the bytes.
+    let located_clock = Instant::now();
+    let mut location = PairLocation::open(field, ring);
+    let mut on_bytes: Vec<TurnMenu> = (1..period).map(|_| TurnMenu::open(256)).collect();
+    // Per distance: the observation at which its menu failed and the edges it had read then.
+    let mut died: Vec<Option<(u64, u64)>> = vec![None; period];
+    let mut died_bytes: Vec<Option<(u64, u64)>> = vec![None; period];
+    let mut first_lock: Option<(u64, LocatedPair)> = None;
+    let mut curve = String::new();
+    let mut emptied: Option<u64> = None;
+    let mut emptied_bytes: Option<u64> = None;
+    for (request, target) in &training {
+        let mut passage = request.clone();
+        passage.extend(target);
+        let readings = station_pairs(field, ring, &passage, request.len()).expect("the pair menu");
+        for (station, observation) in readings.iter().enumerate() {
+            location.observe(observation);
+            let t = request.len() + station;
+            for reading in observation {
+                on_bytes[reading.offset - 1].observe(passage[t - reading.offset], passage[t]);
+            }
+            let k = location.survivors().observations;
+            for offset in 1..period {
+                let menu = location.menu(offset);
+                if died[offset].is_none() && menu.edges() > 0 && !menu.alive() {
+                    died[offset] = Some((k, menu.edges()));
+                }
+                let menu = &on_bytes[offset - 1];
+                if died_bytes[offset].is_none() && menu.edges() > 0 && !menu.alive() {
+                    died_bytes[offset] = Some((k, menu.edges()));
+                }
+            }
+            let survivors = location.survivors();
+            if first_lock.is_none() {
+                if let Some(pair) = survivors.located() {
+                    first_lock = Some((k, pair));
+                }
+            }
+            let alive_bytes = on_bytes.iter().filter(|m| m.edges() > 0 && m.alive()).count();
+            if emptied.is_none() && survivors.alive.is_empty() {
+                emptied = Some(k);
+            }
+            if emptied_bytes.is_none() && alive_bytes == 0 {
+                emptied_bytes = Some(k);
+            }
+            writeln!(
+                curve,
+                "observation {k}: ports read {}, alive {} {:?}; bytes read {}, alive {alive_bytes}",
+                survivors.read,
+                survivors.alive.len(),
+                survivors.distances(),
+                on_bytes.iter().filter(|m| m.edges() > 0).count(),
+            )
+            .unwrap();
+        }
+    }
+    std::fs::write(format!("{out}/location.curve"), &curve).expect("write the curve");
+    let survivors = location.survivors();
+    println!(
+        "  key location: {} observations, {} distances read, {} alive at the end; the fibre emptied at observation {}; {} ms",
+        survivors.observations,
+        survivors.read,
+        survivors.alive.len(),
+        emptied.map_or("never".to_string(), |k| k.to_string()),
+        located_clock.elapsed().as_millis()
+    );
+    for (offset, reading) in &survivors.alive {
+        println!(
+            "    alive δ {offset}: {} turns, cycle {:?}, map {} ({} edges)",
+            reading.turns.len(),
+            reading.cycle,
+            reading.map.as_ref().map_or("plural".to_string(), |m| format!("published on {} ports", m.len())),
+            reading.edges
+        );
+    }
+    let deaths = |died: &[Option<(u64, u64)>]| -> String {
+        (1..period)
+            .filter_map(|offset| died[offset].map(|(k, edges)| format!("{offset}:{k}/{edges}")))
+            .collect::<Vec<_>>()
+            .join(" ")
+    };
+    println!("  ports, δ:observation/edges at the menu's failure: {}", deaths(&died));
+    println!(
+        "  bytes (terrain-side), δ:observation/edges at the relation's failure: {}; every distance failed by observation {}",
+        deaths(&died_bytes),
+        emptied_bytes.map_or("never".to_string(), |k| k.to_string())
+    );
+    match &first_lock {
+        Some((k, pair)) => println!("  first lock at observation {k}: δ {}, cycle {}, {} turns", pair.offset, pair.cycle, pair.turns.len()),
+        None => println!("  no lock in the passage: no distance's menu survived alone with a published map"),
+    }
+
+    // The states: the located pair's deposits, or the two openings.
+    let mut states: Vec<(String, Constitution)> = Vec::new();
+    let openings = [("lossless", engine.theta.clone()), ("founded", founded_opening(&engine))];
+    match &first_lock {
+        Some((_, pair)) => {
+            let prior = engine.theta.source_port(ring).expect("the opening's source port").clone();
+            for (name, opening) in openings {
+                match pair_deposit(field, &opening, &prior, ring, pair) {
+                    Ok((theta, deposit)) => {
+                        println!("  deposit on the {name} opening: slip {} → {}, η {}", deposit.slip_before, deposit.slip_after, deposit.certificate.step);
+                        states.push((format!("keys-{name}"), theta));
+                    }
+                    Err(refusal) => {
+                        println!("  deposit on the {name} opening refused: {refusal}; the release reads the opening");
+                        states.push((name.to_string(), opening));
+                    }
+                }
+            }
+        }
+        None => states.extend(openings.into_iter().map(|(name, theta)| (name.to_string(), theta))),
+    }
+
+    // The release: one per request on each state, read whole, each request written as it completes
+    // (a stopped run keeps every request it read); requests `from..to`, each held to the unit bound.
+    let bank = bank_of(declared.period, &bank_strength());
+    let (from, to) = range.unwrap_or((0, requests.len()));
+    for (name, theta) in states.iter().filter(|(name, _)| only.is_none_or(|only| only == name)) {
+        let started = Instant::now();
+        let (mut released, mut held_count, mut refused, mut whole, mut right) = (0, 0, 0, 0, 0);
+        let mut by_station = vec![0usize; declared.stations];
+        let mut times = Vec::new();
+        for (i, (request, target)) in requests.iter().enumerate().take(to).skip(from) {
+            let at = Instant::now();
+            let (current, moment) = ingest(field, request);
+            let generation =
+                generate_by_bank(field, theta, &current, &moment, &engine.refinement, &bank, BANK_GRAIN);
+            let ms = at.elapsed().as_millis();
+            times.push(ms);
+            let (line, emitted): (String, Vec<u8>) = match &generation {
+                Err(refusal) => {
+                    refused += 1;
+                    (format!("request {i}: refused ({refusal}) | {ms} ms"), Vec::new())
+                }
+                Ok(generation) => {
+                    let release = &generation.release;
+                    if release.released() {
+                        released += 1;
+                        whole += usize::from(release.emitted == *target);
+                        for (j, (class, truth)) in release.emitted.iter().zip(target).enumerate() {
+                            if class == truth {
+                                right += 1;
+                                by_station[j] += 1;
+                            }
+                        }
+                    } else {
+                        held_count += 1;
+                    }
+                    (
+                        format!(
+                            "request {i}: {} | classes {:?} | plural {:?} | terminated {:?} | locks {:?} | refinements {} | uncertified {:?} | {ms} ms",
+                            if release.released() { "released" } else { "held" },
+                            release.classes,
+                            release.plural,
+                            release.terminated,
+                            generation.locks,
+                            generation.refinements,
+                            generation.uncertified,
+                        ),
+                        release.emitted.iter().map(|&c| u8::try_from(c).expect("a byte")).collect(),
+                    )
+                }
+            };
+            std::fs::write(format!("{out}/{name}_{i}.release"), &emitted).expect("write the release");
+            std::fs::write(format!("{out}/{name}_{i}.section"), format!("{line}\n")).expect("write the section");
+            println!(
+                "    {name} request {i}: {}, {ms} ms; the state's elapsed {} ms",
+                match &generation {
+                    Ok(g) if g.release.released() => "released",
+                    Ok(_) => "held",
+                    Err(_) => "refused",
+                },
+                started.elapsed().as_millis()
+            );
+            if unit_bound.is_some_and(|bound| ms > bound) {
+                println!("  stopped: request {i} took {ms} ms, above the unit bound {} ms: INCOMPLETE", unit_bound.unwrap_or(0));
+                break;
+            }
+        }
+        println!(
+            "  release on {name} (requests {from}..{to}, {} read): released {released}, held {held_count}, refused {refused}; whole sections {whole}; released bytes right {right} by station {by_station:?}; ms a request {times:?}; {} ms",
+            times.len(),
+            started.elapsed().as_millis()
+        );
+    }
+    println!("executed text: {} ms; resident {}", clock.elapsed().as_millis(), resident());
+}
