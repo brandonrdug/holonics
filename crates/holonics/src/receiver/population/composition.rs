@@ -101,8 +101,21 @@ impl Port {
 }
 
 /// [definition] **A keystone** (module header): a declared finite key space of navigators, each
-/// exposing its state at a port given the port it reads upstream.
-pub trait Keystone: Send + Sync {
+/// exposing its state at a port given the port it reads upstream. Sealed (THE_MACHINE guard 20): a
+/// port path runs through this crate's keystones only (structural, `E0277`):
+///
+/// ```compile_fail,E0277
+/// use holonics::receiver::population::{Declaration, Keystone, Port};
+/// struct Authored;
+/// impl Keystone for Authored {
+///     fn label(&self) -> String { unimplemented!() }
+///     fn keys(&self) -> u64 { unimplemented!() }
+///     fn port(&self, _: u64, _: Port) -> Port { unimplemented!() }
+///     fn coordinates(&self, _: u64) -> Vec<u64> { unimplemented!() }
+///     fn declaration(&self) -> Declaration { unimplemented!() }
+/// }
+/// ```
+pub trait Keystone: super::Sealed + Send + Sync {
     /// The keystone's declaration, for a receipt.
     fn label(&self) -> String;
     /// `|K_A|`.
@@ -178,8 +191,20 @@ impl PortPath {
 }
 
 /// [definition] **A deterministic egg reading a port** (module header): the class it emits at each
-/// port reading.
-pub trait PortReader: Send + Sync {
+/// port reading. Sealed (THE_MACHINE guard 20): an authored reader of a port, the form a task's
+/// answer routine would take, cannot be keyed through a keystone (structural, `E0277`):
+///
+/// ```compile_fail,E0277
+/// use holonics::receiver::population::{Declaration, Port, PortReader};
+/// struct Authored;
+/// impl PortReader for Authored {
+///     fn label(&self) -> String { unimplemented!() }
+///     fn alphabet(&self) -> usize { unimplemented!() }
+///     fn emit(&self, _: Port) -> usize { unimplemented!() }
+///     fn declaration(&self) -> Declaration { unimplemented!() }
+/// }
+/// ```
+pub trait PortReader: super::Sealed + Send + Sync {
     /// The reader's declaration, for a receipt.
     fn label(&self) -> String;
     /// The emitted classes' alphabet.
@@ -242,6 +267,8 @@ impl PortedEmitters {
         self.keystone.as_ref()
     }
 }
+
+impl super::Sealed for PortedEmitters {}
 
 impl Emitters for PortedEmitters {
     fn alphabet(&self) -> usize {
@@ -320,6 +347,8 @@ impl Unheld {
         }
     }
 }
+
+impl super::Sealed for Unheld {}
 
 impl Family for Unheld {
     fn label(&self) -> String {
@@ -517,6 +546,8 @@ impl Composed {
             .map(|member| member.family.as_ref())
     }
 }
+
+impl super::Sealed for Composed {}
 
 impl Family for Composed {
     fn label(&self) -> String {

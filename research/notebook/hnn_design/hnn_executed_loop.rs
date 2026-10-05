@@ -4,11 +4,11 @@
 //!
 //! ```sh
 //! cargo run --release -p holonics --example hnn_prediction -- executed move <seed> <requests>
-//! cargo run --release -p holonics --example hnn_prediction -- executed train <arm> <terrain> <seed> <batch> <moves> <deadline ms> <out>
+//! cargo run --release -p holonics --example hnn_prediction -- executed train <arm> <terrain> <seed> <batch> <moves> <pin> <out>
 //! cargo run --release -p holonics --example hnn_prediction -- executed evaluate <terrain> <seed> <count> <out> opening <label=E>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed spread <terrain> <seed> <count> opening <label=E>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed counts <terrain> <training seed> <count> <validation seed> <count> <out>
-//! cargo run --release -p holonics --example hnn_prediction -- executed witness <terrain> <seed> <count> <moves> <deadline ms> <out>
+//! cargo run --release -p holonics --example hnn_prediction -- executed witness <terrain> <seed> <count> <moves> <pin> <out>
 //! cargo run --release -p holonics --example hnn_prediction -- executed causal <terrain> <seed> <count> <label[=E]>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed segment <terrain> <seed> <count> <label=source>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed instants <terrain> <seed> <count> <label=source>…
@@ -476,7 +476,7 @@ pub(super) fn founded_opening(engine: &Engine) -> Constitution {
 /// The partitions' seed of Stage 2's partition arms (the readout's `mask` law), pinned.
 const STAGE_TWO_MASK_SEED: u64 = 2_026_093_004;
 
-/// **One arm's training** (`executed train <arm> <terrain> <seed> <batch> <moves> <deadline ms>
+/// **One arm's training** (`executed train <arm> <terrain> <seed> <batch> <moves> <pin>
 /// <out>`; Stage 2, and step 1b's gate-B arms). The arm is `<composition>-<reading>`
 /// ([`arm_comparison`]) with its opening: `<arm>@ρ` the declared opening at the modulus `ρ` (a
 /// development read), `<arm>~<checkpoint>` a complete continuing state restored onto the declared
@@ -1007,8 +1007,8 @@ pub(super) fn trial_line(moved: &ExecutedMove) -> String {
 }
 
 /// [definition; agent-inferred, step 1b's gate A: the pin §13.3 and its gate-A addendum] **The
-/// constrained feasibility witness** (`executed witness <terrain> <seed> <count> <moves> <deadline
-/// ms> <out>`). From the founded opening, the candidate's own certified move (the lock face at the
+/// constrained feasibility witness** (`executed witness <terrain> <seed> <count> <moves> <pin>
+/// <out>`, the deadline the committed pin's). From the founded opening, the candidate's own certified move (the lock face at the
 /// decisions, every commit guard) is iterated on one declared development batch, every epoch the
 /// same `count` requests, read from the open section by the release's actual executed contexts.
 /// It stops at a witness (the strict solved test `1 + Σ_(x≠t) U_x < L_t` at every station's
@@ -1617,7 +1617,7 @@ pub(super) fn move_once(terrain: &str, seed: u64, count: usize, out: &str, sourc
 /// [measured-diagnostic; agent-inferred, October 2; the
 /// [run-end record](../../records/2026-10-02_A_RUN_CLOSES_ON_A_CONDITION_NOT_A_LENGTH_AND_THE_HALVINGS_END_AT_THE_LATTICE.md)
 /// §6] **A release run from an opening state to its close or a refusal** (`executed run <terrain>
-/// <seed> <count> <out> <label=state> <arm> <metric> <cap> <deadline ms>`, the arm as
+/// <seed> <count> <out> <label=state> <arm> <metric> <cap> <pin>`, the arm as
 /// [`arm_comparison`], `metric` as [`move_once`], `cap` the most adopted moves or `none`, the state a
 /// complete continuing state restored with no fallback ([`remounted`])): `hnn::executed::release_run`
 /// with `σ` one receiver grain over every declared decision term, `stations · count` at the declared

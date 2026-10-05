@@ -48,6 +48,8 @@ fn log2_of(value: i64) -> SymbolicSurprisal {
 /// A ring of `period` phases keyed by its offset, reading the passage's clock.
 struct Ring(u64);
 
+impl super::Sealed for Ring {}
+
 impl Keystone for Ring {
     fn label(&self) -> String {
         format!("ring of period {}", self.0)
@@ -90,6 +92,8 @@ impl ByPhase {
         &self.table[self.upstream.read(self.tick).phase as usize]
     }
 }
+
+impl super::Sealed for ByPhase {}
 
 impl Family for ByPhase {
     fn label(&self) -> String {
@@ -211,6 +215,8 @@ fn the_composed_face_is_a_face_and_telescopes_to_the_keystone_mixture() {
 /// A reader emitting the phase, keyed through a ring.
 struct Phase(usize);
 
+impl super::Sealed for Phase {}
+
 impl PortReader for Phase {
     fn label(&self) -> String {
         "phase".to_string()
@@ -312,6 +318,8 @@ impl GratingRing {
     }
 }
 
+impl super::Sealed for GratingRing {}
+
 impl Keystone for GratingRing {
     fn label(&self) -> String {
         format!("grating ring, q ≤ {}", self.denominator)
@@ -341,6 +349,8 @@ impl Keystone for GratingRing {
 /// grain `L`, which is the grating's own sheet `[2 · port ≥ q]` (`Grating::sheet`).
 pub(super) struct Sheet(pub(super) u64);
 
+impl super::Sealed for Sheet {}
+
 impl PortReader for Sheet {
     fn label(&self) -> String {
         "half-turn sheet".to_string()
@@ -358,6 +368,8 @@ impl PortReader for Sheet {
 
 /// A keystone of one key passing its port through.
 pub(super) struct Pass;
+
+impl super::Sealed for Pass {}
 
 impl Keystone for Pass {
     fn label(&self) -> String {

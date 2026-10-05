@@ -1,0 +1,6 @@
+# The development read of `executed text` that shows the October 5 guards (THE_MACHINE 19, 21, 22)
+# leave its readings unchanged: the window after the training passage on both openings.
+command = executed text
+projection = one development window on two states, measured 68,846 ms at 8 threads before the change (the founded state 59,789 ms); the deadline is the record's own development guard
+deadline_ms = 600000
+threads = 8

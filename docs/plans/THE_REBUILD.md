@@ -1066,7 +1066,10 @@ acceptance, a falsifier that fired became the next loop's subject, and nothing d
     scripts are retired. The replay matched twice, and the library tests stayed at 976.
     - `exterior.rs`'s `read_curated`, `read_incidence` and `read_aeons` have no caller after the
       strip. They read the kept data-protocol scripts' outputs and are held for step 4, the corpus,
-      which consumes them or retires them (U0's rule: a consumer or a date).
+      which consumes them or retires them (U0's rule: a consumer or a date). [October 5] Retired
+      before step 4: `read_curated` returned the codes beside the held range, the form THE_MACHINE
+      guard 21 excludes; step 4's reader of the curated cut returns its `Seen` and `Held` parts as
+      `read_cut` does (history at `48f00eff`).
     - For H, crate prose that still names retired notebook pieces: `hnn/tests/propagation.rs`
       (`power.py`), `hnn/constitution.rs`, and `hnn/prediction.rs` (the copy and moiré terrains).
       For P: `admitted.rs`'s `Relation`/`RelationKind`/`HUMAN`/`AGENT` and `TreeFamily` no longer

@@ -4,7 +4,7 @@
 //! every declaration below; #73, #148, #63).
 //!
 //! ```sh
-//! cargo run --release -p holonics --example hnn_prediction -- executed text-repair <cut> <out dir> <dev|run>
+//! cargo run --release -p holonics --example hnn_prediction -- executed text-repair <cut> <out dir> <pin> <dev|run>
 //! ```
 //!
 //! [definition; agent-inferred, the record's §0] Each passage of 48 bytes of the cut's development
@@ -15,6 +15,11 @@
 //! measurement of its certificate failure. Only then is the truth read, to score. Stdout carries counts only; every byte (damaged, repaired and true passages,
 //! the released spans, the training text) is written to `<out dir>`, which must be private
 //! (`.local/`).
+//!
+//! [agent-inferred, October 5; THE_MACHINE guards 19, 21 and 22] The passages are read from the
+//! cut's `Seen` range alone (the record's §0: development text; the `Held` range is dropped unread),
+//! each released span is shown whole through `exterior::show_release` with its copy length against
+//! the passage's own intact cells, and the run's deadline and threads are its committed pin's.
 
 use super::*;
 use holonics::compression::keys::local::{
@@ -38,15 +43,9 @@ const DEV_COUNT: usize = 4;
 const TRAINING: usize = 6144;
 const SHOWN: usize = 8;
 
-/// A cell for the eye: printable ASCII as itself, every other byte escaped.
+/// A cell for the eye (`exterior::eye`): printable ASCII as itself, every other byte escaped.
 fn shown(byte: usize) -> String {
-    match byte {
-        0x5c => "\\\\".to_string(),
-        0x0a => "\\n".to_string(),
-        0x09 => "\\t".to_string(),
-        0x20..=0x7e => char::from(u8::try_from(byte).expect("a byte")).to_string(),
-        _ => format!("\\x{byte:02x}"),
-    }
+    exterior::eye(u8::try_from(byte).expect("a byte"))
 }
 
 /// Whether a run of known bytes reads as UTF-8, an incomplete sequence at either end excused.
@@ -95,21 +94,6 @@ fn known_runs(cells: &[Option<usize>], released: &[bool]) -> Vec<(Vec<u8>, bool)
         runs.push(current);
     }
     runs
-}
-
-/// The longest common substring of two byte strings (the copy length's law, `tools/copy_length.py`).
-fn common(a: &[u8], b: &[u8]) -> usize {
-    let mut best = 0;
-    for i in 0..a.len() {
-        for j in 0..b.len() {
-            let mut k = 0;
-            while i + k < a.len() && j + k < b.len() && a[i + k] == b[j + k] {
-                k += 1;
-            }
-            best = best.max(k);
-        }
-    }
-    best
 }
 
 /// [definition; the record's §0, step 3 as pinned, refused by its amendment] **The pinned arm**: a
@@ -265,12 +249,12 @@ fn score(
             let span: Vec<u8> = (t..end)
                 .map(|k| u8::try_from(repaired[k].expect("released")).expect("a byte"))
                 .collect();
-            std::fs::write(format!("{out}/spans/{label}_p{i}_c{t}.bin"), &span).expect("write");
-            let own = known_runs(cells, &[false; LENGTH])
-                .iter()
-                .map(|(run, _)| common(&span, run))
-                .max()
-                .unwrap_or(0);
+            // Shown whole with its copy length against the passage's own intact runs, each a
+            // separate admitted passage (a run never spans two).
+            let runs = known_runs(cells, &[false; LENGTH]);
+            let admitted: Vec<&[u8]> = runs.iter().map(|(run, _)| run.as_slice()).collect();
+            let own = exterior::show_release(&format!("{out}/spans"), &format!("{label}_p{i}_c{t}.bin"), &span, &admitted)
+                .copy_length;
             *tally.span_own_copy.entry(own).or_default() += 1;
             tally.spans += 1;
             t = end;
@@ -354,24 +338,25 @@ fn report(label: &str, tally: &Tally, passages: usize, out: &str) {
     );
 }
 
-/// **`executed text-repair <cut> <out dir> <dev|run>`** (module header).
+/// **`executed text-repair <cut> <out dir> <pin> <dev|run>`** (module header).
 #[allow(clippy::disallowed_methods)]
 pub(super) fn run(cut: &str, out: &str, which: &str) {
     let clock = Instant::now();
-    let (bytes, population, held) = exterior::read_cut(cut);
+    let exterior::Cut { population, seen, .. } = exterior::read_cut(cut);
+    let bytes = seen.bytes();
     let starts: Vec<usize> = match which {
         "dev" => (0..DEV_COUNT).map(|j| DEV_FIRST + LENGTH * j).collect(),
         "run" => (0..READ_COUNT).map(|i| READ_FIRST + READ_STRIDE * i).collect(),
-        _ => panic!("executed text-repair <cut> <out dir> <dev|run>"),
+        _ => panic!("executed text-repair <cut> <out dir> <pin> <dev|run>"),
     };
-    assert!(starts.iter().all(|&s| s + LENGTH <= held.start), "the development range only");
+    assert!(starts.iter().all(|&s| s + LENGTH <= seen.range().end), "the development range only");
     assert!(READ_FIRST >= DEV_FIRST + LENGTH * DEV_COUNT, "the read set apart from development");
     std::fs::create_dir_all(format!("{out}/spans")).expect("the private directory");
     std::fs::write(format!("{out}/training.bin"), &bytes[..TRAINING]).expect("write");
     let cover = Cover::declare(LENGTH, REGION, STRIDE, REACH).expect("the pinned cover");
     println!(
         "executed text-repair ({which}): the cut {population} bytes, development range 0..{}; {} passages of {LENGTH} bytes from {} ; erased {:?}; cover regions {REGION} stride {STRIDE} reach {REACH} on {PORTS} ports",
-        held.start,
+        seen.range().end,
         starts.len(),
         starts[0],
         ERASED

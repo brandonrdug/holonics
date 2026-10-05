@@ -518,8 +518,12 @@ rustdoc `compile_fail` doctest, which needs no new dependency. Lints are enforce
 `hnn` and by `crates/holonics/clippy.toml`'s `disallowed-methods` and `disallowed-types`; the
 receipt runs `cargo clippy -p holonics --all-targets -- -D clippy::disallowed_types -D
 clippy::disallowed_methods -D clippy::float_arithmetic`. Each `compile_fail` doctest states its
-error code, checked with `RUSTC_BOOTSTRAP=1 cargo test -p holonics --doc hnn` (stable rustdoc
-ignores the codes), and says whether its guarantee is structural. No guard is a source-text scan
+error code, checked with `RUSTC_BOOTSTRAP=1 cargo test -p holonics --doc` (stable rustdoc
+ignores the codes; gate 1, `tools/gate.sh`, runs every library doctest), and says whether its
+guarantee is structural. A guard built at the notebook's exterior boundary
+(`research/notebook/hnn_design/exterior.rs`) is proved by the doctests of
+`crates/holonics/src/exterior_guards.rs`, which include that file as a module and exist only while
+rustdoc collects doctests. No guard is a source-text scan
 (review A8; agent-inferred from Brandon's September 24 message on tests, "I do not trust that the
 tests can comb through anything valuable").
 1. **No tape in the moment; no lossless source below capacity presented as lossy (R2 H1).**
@@ -664,7 +668,10 @@ tests can comb through anything valuable").
     port computes a task's answer by an authored routine or recognizes its inputs by a grammar
     fitted to a test's layouts. A terrain generates its truth; the machine locates it. The
     arithmetic calculator and the arithmetic eggs are retired, and the byte-tree text line's
-    catered layers are retired when the native encoding and prediction land.
+    catered layers are retired when the native encoding and prediction land. The population's
+    entries are sealed (guard 20), so no code outside the crate can hand the receiver a family;
+    whether an in-crate family is the machine's own navigator or an authored answer stays a review
+    rule.
 18. **A release reads the field, never the receiving storage** (October 5,
     [contamination history](../research/records/2026-10-05_THE_CONTAMINATION_CYCLES_EVERY_COPY_PIPELINE_FOLLOWED_A_DEMAND_FOR_OUTPUT_BEFORE_THE_FIELD_COULD_RELEASE.md)).
     `FieldMaterial` is the field's own material: rings, contacts, ports, resonators and transport.
@@ -679,5 +686,73 @@ tests can comb through anything valuable").
     among releases, and nothing compares a release with reference text before it is shown. Every
     text release shown carries its copy length, the longest run it shares with the admitted
     passage. An exterior notebook tool reads it outside the HNN, so recitation is visible at once.
-    It is a receipt, never a control and never a grade. This is a review rule, not a type
-    guarantee.
+    It is a receipt, never a control and never a grade.
+    - **The one show** (October 5). `exterior::show_release(out, name, release, admitted)` is the
+      notebook's only path for a text release: it writes the release whole to `<out>/<name>`,
+      appends it whole, each byte for the eye, with its copy length to the private show
+      `<out>/releases.show`, and prints the copy length's integers on stdout (never the bytes: the
+      release may derive from private data). The copy length is `tools/copy_length.py`'s law ported
+      exactly (`exterior::copy_length`, the suffix automaton of the release with its matching
+      statistics, the same `key value` output), checked against the quadratic definition on 300
+      pseudo-random cases and the tool's own cases (`exterior_guards`). The text harnesses show
+      through it: `executed text` each request's release against the training passage and its
+      request, `executed text-repair` each released span against its passage's intact runs (the
+      local `common` it replaced is retired).
+    - **What is structural.** Within the exterior: a release shown through `show_release` cannot be
+      shown without its receipt, and nothing there cuts, selects or compares it. That a harness
+      shows its text releases through it rather than writing them itself, and that no search or
+      rerank exists, remain review rules; the terrain modes' class vectors on `ℤ/4` are readings of
+      decisions, not text releases.
+20. **The receiver's families are sealed** (October 5; the lessons' most repeated failure, "an
+    authored routine stood in for learning", about seven recurrences, and guard 17).
+    `receiver::population::{Family, Emitters, Layered, Keystone, PortReader}`, the entries through
+    which a population reads a candidate navigator family, each have the private
+    `population::sealed::Sealed` as a supertrait, so only `holonics` implements them. The
+    implementors are the library's navigator families, built from a terrain's or the field's
+    declarations: `KeyFamily` over `Survivors` of `GratingSheet`, `GratingParity`, `RotorKeys` or
+    `PortedEmitters`; `DormantFamily` over a layered grating; `FoundedFamily`, `ChaseFamily`,
+    `Unheld` and `Composed`. No library type implements `Keystone` or `PortReader`; the in-crate
+    tests' rings, phase readers and scripted families (`Fixed`, `Refusing`, `Scripted`, `ByPhase`)
+    are test scaffolding of the population's laws. No notebook file or example implemented any of
+    them, so nothing moved. Structural: `compile_fail` doctests on each trait (`E0277`: an outside
+    type does not implement `Sealed`; `E0603`: the seal's module is private), each checked to
+    compile once the seal is removed. The terrain's `Chaser` is not sealed: it is the pursuer the
+    machine plays against (`PurePursuit`, `ConstantBearing`) or a trace wrapped around the
+    machine's own (`hnn_chase`'s `Traced`), never a family the receiver reads.
+21. **Seen material is never graded as unseen** (October 5; lesson 8, "unseen means unread by any
+    run", against the failure that recurred six times: F0, F2, F4 and U2's splits, `athena_field`,
+    the moiré's training windows). The notebook reads a cut only through `exterior::read_cut`,
+    which returns a `Cut` of two types with private fields: `Seen`, the development range
+    `[0, s)` read by reference (training passages, development reads, a repair's passages), and
+    `Held`, the held-out range `[s, population)`, whose positions are readable and whose bytes are
+    read once, by value, at declared windows (`Held::windows`). No caller receives the bytes with a
+    range to slice. `executed text` reads its training passage and development window from the
+    `Seen` and its pinned requests through `held_requests(held: Held, …)`; `executed text-repair`
+    reads the `Seen` alone (its read is development text by its pins) and drops the `Held` unread;
+    the prequential exposure (`hnn_exposure cut-file`) takes the cut whole by `Cut::prequential`,
+    whose library `Cut` compares every held cell before it deposits it. The `--read-reserve`
+    bypass is removed: a cut that does not name the development reserve as excluded is refused,
+    with no flag (no run had passed it). The curated cut's readers (`read_curated`, its incidence
+    and aeons), which returned codes beside a held range and had no consumer since September 30,
+    are retired. Structural (`exterior_guards`): a `Seen` where a `Held` is required (`E0308`), a
+    `Held` forged from bytes (`E0451`), its bytes read by reference (`E0599`) and a second read
+    (`E0382`) do not compile, and the lawful forms do. Whether a grading function names its input
+    `Held` is a review rule; the types make the substitution impossible once it does.
+22. **A run's limits are a committed pin's** (October 5; lesson 9, "a refusal changes the law or
+    the partition, never the limit", against 29 raised limits; CLAUDE.md, "Waiting, deadlines and
+    concurrency"). Every `hnn_prediction` mode bounded in time takes a pin's path where it took a
+    deadline or a bound in milliseconds (`train`, `witness`, `coupling`, `represent`, `run`,
+    `resume-coupling`, `text`, `text-repair`): `exterior::Pin::read(path, command)` reads the
+    command, the projection, `deadline_ms`, the optional `unit_bound_ms` and `threads` from a file
+    and refuses the run when it is missing, untracked, different from its commit, committed more
+    than once, or of another command. A pin is therefore fixed once: a limit is never raised by
+    editing it, a run past it is reported incomplete, and the next loop commits a new pin for a
+    changed law, partition or read, with its reason. The harness installs the pin's threads as the
+    host's pool; the modes that check their own deadline before each unit read the pin's there, and
+    `text` and `text-repair` stop at the pinned deadline (`Pin::launch`, exit `INCOMPLETE`). Counts
+    that declare the read (moves, iterates, a cap, a read budget, the exposure's windows) stay
+    arguments. Structural: a `Pin` is built only by `read` (`E0451`) and its deadline has no setter
+    (`E0616`); the refusals are runtime laws, each run by a doctest in a scratch repository
+    (missing, untracked, edited, recommitted, another command). That a new pin for the same read
+    is not a disguised raise stays a review rule: the pin's projection line says where its numbers
+    come from.

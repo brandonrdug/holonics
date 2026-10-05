@@ -220,7 +220,7 @@ fn component<T>(value: &Component<T>, present: impl Fn(&T) -> String) -> String 
 // the run
 
 fn main() {
-    let arguments: Vec<String> = exterior::admit_reserve_flag(std::env::args().skip(1).collect());
+    let arguments: Vec<String> = std::env::args().skip(1).collect();
     let (mut cells, mut held_out, mut deadline): (Option<String>, Option<usize>, Option<u64>) =
         (None, None, None);
     let mut cut_file: Option<String> = None;
@@ -291,7 +291,9 @@ fn main() {
     let setup = Instant::now();
     let (text, source, manifest) = match cut_file.as_deref() {
         Some(path) => {
-            let (text, _, range) = read_cut(path);
+            // The prequential exposure reads the cut whole, its held cells each compared before it
+            // is deposited (THE_MACHINE guard 21: the `Held` range is taken by value, here only).
+            let (text, range) = read_cut(path).prequential();
             (
                 text,
                 format!("the cut file {path} (held out {range:?} from its manifest)"),

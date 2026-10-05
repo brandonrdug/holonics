@@ -1,0 +1,7 @@
+# Loop 1c's run `cost-coupling` (research/notebook/hnn_design/loop_1c_runs.sh; the pin
+# research/records/2026-10-01_LOOP_1C_PERSISTENCE_REPRESENTATION_AND_REACH_PINNED_BEFORE_ITS_RUNS.md §6).
+# Its limits moved unchanged from the launcher's command line on October 5 (THE_MACHINE guard 22).
+command = executed coupling
+projection = one constitution's coupling reads at 19 threads (the pin §6.1), inside the outer guard of 1800 s
+deadline_ms = 1200000
+threads = 19

@@ -50,3 +50,9 @@ pub mod navigator;
 pub mod physics;
 pub mod ratio;
 pub mod receiver;
+
+// The proofs of THE_MACHINE's guards 19, 21 and 22, whose constructions live at the notebook's
+// exterior boundary (`research/notebook/hnn_design/exterior.rs`): compiled only while rustdoc
+// collects doctests, never part of the library.
+#[cfg(doctest)]
+mod exterior_guards;

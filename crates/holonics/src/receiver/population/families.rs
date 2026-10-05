@@ -124,6 +124,8 @@ impl GratingSheet {
     }
 }
 
+impl super::Sealed for GratingSheet {}
+
 impl Emitters for GratingSheet {
     fn alphabet(&self) -> usize {
         2
@@ -216,6 +218,8 @@ impl GratingParity {
         })
     }
 }
+
+impl super::Sealed for GratingParity {}
 
 impl Emitters for GratingParity {
     fn alphabet(&self) -> usize {
@@ -412,6 +416,8 @@ impl RotorKeys {
         ((rest / ports) as usize, rest % ports, board)
     }
 }
+
+impl super::Sealed for RotorKeys {}
 
 impl Emitters for RotorKeys {
     fn alphabet(&self) -> usize {

@@ -29,6 +29,8 @@ impl Scripted {
     }
 }
 
+impl super::Sealed for Scripted {}
+
 impl Family for Scripted {
     fn label(&self) -> String {
         "scripted".to_string()
