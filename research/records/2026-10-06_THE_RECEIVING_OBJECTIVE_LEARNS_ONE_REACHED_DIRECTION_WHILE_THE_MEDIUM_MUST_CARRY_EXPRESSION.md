@@ -122,6 +122,68 @@ room return and source-detached continuation. Its retired prototype is not an
 extant acceptance for the rebuilt HNN, and none of its mechanisms is restored
 wholesale here.
 
+## Compression carried by material and admitted action
+
+The later medium-retention lens keeps task structure in the participating
+geometry/material and its admitted continuation, rather than requiring a
+separate symbolic compressor. Recovery joins the existing atlas owners
+`navigator.dormant-direction`, `navigator.action-domain-retained`,
+`receipt.retention-contract` and `hnn.mode-quotient-learning-chart` to
+`Foundation/{Standing,CausalRelevance}`, `Objects/Deposition`,
+`HNN/{Retention,ModeQuotient}` and Rust `hnn::{constitution,retention}`.
+The [September retention audit](2026-09-22_RETENTION_IS_A_QUOTIENT_NOT_A_TAPE_AND_THE_SOURCE_ENTERS_AS_PHASE_CARRIED_MOMENTS.md)
+separates material sufficiency from an occurrence archive. The older
+`receiver/native.rs` at `13f8c734` describes an induced action and receiver image;
+it is historical recovery material, not a restored owner in this integration.
+
+The constitutive state in this control actually changes: R's map, local Gram,
+solved chart and carry statistics survive the observed comparison. The source
+and transient Word do not become a retained example lookup. R was zero and
+therefore read no source distinction; the nonzero successor changes future
+faces. The existing teaching control also perturbs an intact source under
+that successor and obtains a different read and motion. This is a measured
+downstream distinguishing relation, even though its reconstruction output
+remains wrong. It is more than a class-count change.
+
+The retained reception includes interior waves/contact and resonator state,
+phase and pump tick. Under `WordOpening::Received`, that actual state changes
+the next executed passage. Source phase moments carry order without one
+nonlinear Word per source occurrence. Material configuration elsewhere can
+change element response, contact slip/dissipation and modulated stiffness.
+Those are existing mechanisms by which structure constrains subsequent work;
+the present receiving-only comparison does not train those loci.
+
+The action-sufficient quotient must satisfy both receiving and continuation
+squares for every admitted action, including the action's applicability:
+
+`D_ret E_ret = rho`, and `E_ret,next T_a = U_a E_ret`.
+
+Here `E_ret` is the retained representation and `D_ret` its decoder; the
+physical source port E still injects the classes into the field.
+
+In a linear chart, its retained kernel must lie in every admitted receiving
+kernel and remain invariant under every admitted `T_a`. Equal present class
+images are insufficient: a probe or a later deposit may expose a presently
+silent direction. `HNN/ModeQuotient` additionally retains the directions
+needed by the comparison's gain covectors; its descended-run/costate laws are
+conditional on those actual squares. The native `retention::collapse` performs
+structural causal-diamond release, keeping a continuing word's reachable loci
+and their material. Its value-level quotient remains an explicit separate
+obligation. The finite nonlinear tube does not automatically instantiate the
+frozen linear mode quotient.
+
+No storage or execution reduction is measured by the thirteen physical
+controls. Their wall readings include teaching constructors and completion
+oracles, rather than isolating a reduced downstream word. The shared-clock
+source bound counts its fixed carrier and independent clock coordinates,
+not adaptive Theta, its learned keys or a minimal whole-material quotient.
+The full medium/carry/normal chart and exact coefficient sizes must count in
+any such memory claim. An honest cost claim compares the same admitted future
+before and after a certified material/geometry quotient, preserving its
+emitted faces, source/clock/phase and reached deposition, and accounts for
+the work of constructing/using that quotient. There is no measured cost or
+compression milestone in the class-two singleton result.
+
 The missing consumed relation at this repaired class-reading boundary is an
 explicit physical port/decoder join from the continuing HNN motion to an
 emitted field, with the same units, source, clock, phase, material and carry.
