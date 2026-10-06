@@ -343,3 +343,58 @@ declared grain. Refine before that bound is exhausted, and count the preparation
 bound evaluation, continued hidden motion and update. The present exact resident still executes
 the full law; a measured cheaper consumer needs its own source-matched admission and equal
 tolerance/detection comparison before it can replace any of those operations.
+
+## A dual-weighted numerical defect has a conditional consuming law
+
+[derived; implementation join open] The existing `TickFamily.word_variation_at` gives the exact
+tick-indexed Duhamel identity for two linear operator families, using their producing states
+and the downstream family. `sweepAt_pairing` supplies its adjoint pairing. A numerical-defect
+specialization must fix signs and indices. Let the exact law be x_(t+1)=F_t x_t+b_t, let the
+computed state be xhat_t, and define the signed defect
+`d_t=F_t xhat_t+b_t-xhat_(t+1)` and delta_t=x_t-xhat_t. Then
+
+`delta_j=Phi_(j,0)delta_0+sum_(t<j) Phi_(j,t+1)d_t`.
+
+For a *linear* received functional g_j C_j, lambda_t=Phi_(j,t)^* C_j^* g_j, so its exact error
+is `<lambda_0,delta_0>+sum_(t<j)<lambda_(t+1),d_t>`.
+The initial/source/carry error and the post-tick index t+1 cannot be omitted. The exact signed
+pairing preserves correlation; replacing it by dual-norm bounds is a later conservative read.
+The local inverse residual ||I-A Xhat|| is not itself d_t: deriving d_t also uses the actual
+input, inverse bound, junction/split/error-feedback returns and operator/phase bindings.
+
+For nonlinear F_t use A_t=DF_t(xhat_t) and the actual Taylor remainder
+`rho_t=F_t(xhat_t+delta_t)-F_t(xhat_t)-A_t delta_t`.
+The same identity for the tangent family carries d_t+rho_t, and a nonlinear receiving functional
+has its own ending remainder. With a valid whole-tube Hessian bound H_t and ||delta_t||<=r_t,
+the conservative remainder cost is
+`sum_(t<j) ||lambda_(t+1)||_* H_t r_t^2/2`, plus the receiver's ending remainder.
+An unweighted sum of local Hessian terms misses downstream leverage. The native quartic
+`Parametron::hessian` is beta*(|u|^2 I+2 u u^T), the Jacobian of its cubic effort. The existing
+coupled domain uses it to bound a finite effort difference over an entire box; it is not,
+without the additional derivatives/solve chain, the Hessian bound of the whole loaded tick.
+Two varying pair endpoints likewise put their mixed bilinear product in the finite remainder
+relative to raw source cells, or require a declared lifted pair feature carrier.
+
+A known smooth candidate-versus-rival margin can consume this error bound within its fixed
+chart branch. A maximum/leader selection is nonsmooth at ties, and the actual GrainCell face
+must certify all relevant competitors, thresholds and compatible completion fibres. Matching
+the point leader alone does not preserve a Held fibre or the release certificate. A mode
+in the exact output kernel can still carry storage, physical port work or a reached deposition;
+those admitted receivers remain in the future family. Certifying that silence also costs work.
+
+The concrete native seams remain: `Word::pull_back` consumes a declared `RatioCovector`,
+`pull_back_continuing` consumes the Word and explicitly supplied anchor/end covectors, and
+the crate-private `anchor_differential` is a declaration-time exact tangent at rest.
+They do not already expose a borrowing nonlinear margin-bound consumer over a charted Word.
+`ReceptionCarry` retains its physical state/momentum/remainders, but no implemented error tube
+against an exact counterfactual. `WordLattice::by_rule` fixes a grain-derived target; it does
+not already choose targets from a reached decision margin. Thus exposing a margin adjoint alone
+does not close the counterfactual, carry, grain, nonlinear remainder and physical-balance joins.
+
+An exact-versus-charted comparison must hold source, material, entered carry, receiving chart,
+grain, tolerated error and detection coverage fixed. A learned-versus-fresh comparison separately
+reports their different material and full outputs; Rest is not the learned physical entered state.
+Neither equal request strings nor fewer refinements establishes equal observable quality.
+Any new approximate/pruned realization must close these squares and price its forward/adjoint,
+bound/certification, preparation/refinement/update and retained representation before an adaptive
+gain is credited. The current exact reader and its accepted certificates remain the reference.
