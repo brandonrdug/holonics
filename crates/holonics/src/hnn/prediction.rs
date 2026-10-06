@@ -2386,6 +2386,27 @@ pub struct PhysicalTeaching {
     pub pullback: crate::hnn::port::Pullback,
     pub constitution: crate::hnn::constitution::Constitution,
     pub publication: crate::hnn::constitution::DepositReading,
+    /// The source consumer's certificate of the applied map, including map-carry corrections.
+    /// The normal publication's step readings describe its proposed ray separately.
+    pub source_certificate: Option<PhysicalSourceCertificate>,
+}
+
+/// One source law's actual applied feature moves and their physical source-to-receiver bound.
+#[derive(Debug)]
+pub struct PhysicalSourceMove {
+    pub ring: usize,
+    pub alignment: Rat,
+    pub moves: Rat,
+    pub gain: Rat,
+    pub bound: Rat,
+}
+
+/// The existing joint-step law evaluated on the actual carried E maps, with R and the exact
+/// linear Word fixed. A refused certificate publishes no successor and retains the blind carry.
+#[derive(Debug)]
+pub struct PhysicalSourceCertificate {
+    pub sources: Vec<PhysicalSourceMove>,
+    pub joint: crate::holon::deposition::JointReading,
 }
 
 /// A comparison refusal preserves the physical motion already reached, including the carry.
@@ -2431,7 +2452,12 @@ impl PhysicalPrediction<'_, '_> {
         observed: &Encoded,
         compared: &[bool],
     ) -> Result<PhysicalTeaching, PhysicalTeachingRefusal> {
-        self.observe_at(contemporary, observed, compared, PhysicalLearning::Receiving)
+        self.observe_at(
+            contemporary,
+            observed,
+            compared,
+            PhysicalLearning::Receiving,
+        )
     }
 
     /// An observed source-port comparison through the same blind Word, with R and every internal
@@ -2443,13 +2469,24 @@ impl PhysicalPrediction<'_, '_> {
     /// before E can be stepped. Only nonzero reached source samples enter their existing normal
     /// laws. Their certificate reads the whole executed source-to-comparison diamond, including
     /// its element/contact growth, rather than just the stepped source locus.
+    /// With these fixed exact linear operands, the consuming equation is
+    /// `delta_logits_j = R P_R^tau T_j delta_source_open(E)`. Its adjoint pairs the same difference
+    /// with the returned E gradient; the source gain bounds the compared logit moves by the
+    /// occupied source features' squared moves. The native fixture checks both on the physical
+    /// Word. Map-carry remainders need not vanish: the existing joint-step law is evaluated on the
+    /// actual applied E difference before a successor is returned, alongside the proposed ray.
     pub fn observe_source_ports(
         self,
         contemporary: &crate::hnn::constitution::Constitution,
         observed: &Encoded,
         compared: &[bool],
     ) -> Result<PhysicalTeaching, PhysicalTeachingRefusal> {
-        self.observe_at(contemporary, observed, compared, PhysicalLearning::SourcePorts)
+        self.observe_at(
+            contemporary,
+            observed,
+            compared,
+            PhysicalLearning::SourcePorts,
+        )
     }
 
     fn observe_at(
@@ -2518,8 +2555,9 @@ impl PhysicalPrediction<'_, '_> {
                     });
                 }
                 if field.rings().iter().enumerate().any(|(ring, _)| {
-                    full_reach.contains(&Locus::Element(ring))
-                        && material.ring_resonator(ring)
+                    full_reach.contains(&Locus::Resonator(ring))
+                        && material
+                            .ring_resonator(ring)
                             .is_some_and(|law| law.saturation().is_some())
                 }) {
                     return Err(HnnError::Unadmitted {
@@ -2606,7 +2644,9 @@ impl PhysicalPrediction<'_, '_> {
             }
             let reached: Vec<_> = linear.iter().map(|step| step.locus.locus()).collect();
             if reached.is_empty()
-                || reached.iter().any(|locus| !composed.reached.contains(locus))
+                || reached
+                    .iter()
+                    .any(|locus| !composed.reached.contains(locus))
             {
                 return Err(HnnError::Unadmitted {
                     reason: "the physical comparison reaches no nonzero sample at the selected relation",
@@ -2626,19 +2666,89 @@ impl PhysicalPrediction<'_, '_> {
                     PhysicalLearning::SourcePorts => full_reach,
                 },
             };
-            let deposit = Deposit::new(material.commit(), linear, Vec::new(), reached)
-                .with_reach(reach);
+            let deposit =
+                Deposit::new(material.commit(), linear, Vec::new(), reached).with_reach(reach);
             let (constitution, publication) = contemporary.deposited(&deposit)?;
-            Ok((ratio, composed.pullback, constitution, publication))
-        })();
-        match joined {
-            Ok((ratio, pullback, constitution, publication)) => Ok(PhysicalTeaching {
-                prediction,
+            let source_certificate = if learning == PhysicalLearning::SourcePorts {
+                // The budgeted map carry need not equal eta*D: old/new remainders and releases
+                // complete that accounting. Certify the *applied* E move with the existing joint
+                // law, using its actual alignment and feature moves, before returning a successor.
+                let mut sources = Vec::new();
+                for step in deposit.linear() {
+                    let LinearLocus::SourcePort(ring) = step.locus else {
+                        unreachable!()
+                    };
+                    let delta = constitution
+                        .source_port(ring)
+                        .ok_or(HnnError::MissingSourcePort { ring })?
+                        .subtract(
+                            material
+                                .source_port(ring)
+                                .ok_or(HnnError::MissingSourcePort { ring })?,
+                        )?;
+                    let (mut moved, mut alignment) = (Rat::zero(), Rat::zero());
+                    for sample in &step.samples {
+                        let output = delta.apply(&sample.feature)?;
+                        moved += &sample.weight * output.iter().map(|x| x * x).sum::<Rat>();
+                        alignment += &sample.weight
+                            * sample
+                                .covector
+                                .iter()
+                                .zip(&output)
+                                .map(|(g, x)| g * x)
+                                .sum::<Rat>();
+                    }
+                    let reading = publication.steps.iter()
+                        .find(|(at, reading)| *at == Locus::SourcePort(ring)
+                            && reading.family == crate::hnn::constitution::Family::Map)
+                        .ok_or(HnnError::Unadmitted {
+                            reason: "the physical E successor has no source feature-move certificate",
+                        })?;
+                    let gain = reading.1.gain.clone();
+                    let bound = crate::holon::deposition::root_ceiling(&(&gain * &moved));
+                    sources.push(PhysicalSourceMove {
+                        ring,
+                        alignment,
+                        moves: moved,
+                        gain,
+                        bound,
+                    });
+                }
+                let one = Rat::one();
+                let joint = crate::holon::deposition::JointReading::read(
+                    &crate::ratio::rat(1, 2),
+                    sources
+                        .iter()
+                        .map(|source| (&one, &source.alignment, &source.bound)),
+                );
+                if !joint.holds() {
+                    return Err(HnnError::Unadmitted {
+                        reason: "the actual carried source move fails its physical joint-step certificate",
+                    });
+                }
+                Some(PhysicalSourceCertificate { sources, joint })
+            } else {
+                None
+            };
+            Ok((
                 ratio,
-                pullback,
+                composed.pullback,
                 constitution,
                 publication,
-            }),
+                source_certificate,
+            ))
+        })();
+        match joined {
+            Ok((ratio, pullback, constitution, publication, source_certificate)) => {
+                Ok(PhysicalTeaching {
+                    prediction,
+                    ratio,
+                    pullback,
+                    constitution,
+                    publication,
+                    source_certificate,
+                })
+            }
             Err(error) => Err(PhysicalTeachingRefusal { prediction, error }),
         }
     }

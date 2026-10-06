@@ -1915,6 +1915,7 @@ mod physical_repair {
         .unwrap()
         .observe(&initial, &observed, &compared)
         .unwrap();
+        assert!(receiving.source_certificate.is_none());
         assert_eq!(receiving.constitution.source_law(0), initial.source_law(0));
         let producing = &receiving.constitution;
         let opening = WordOpening::Received {
@@ -1924,6 +1925,18 @@ mod physical_repair {
         let pending =
             predict_by_field(&field, producing, &current, &damaged, &opening, &phases).unwrap();
         let blind = pending.prediction().clone();
+        // Source-swap sensitivity already belongs to the leaky encoding before E teaching.
+        let untaught_swap =
+            repair_by_field(&field, producing, &current, &swapped, &opening, &phases).unwrap();
+        assert_ne!(blind.carry.change, untaught_swap.carry.change);
+        assert_ne!(blind.reads, untaught_swap.reads);
+        assert!(untaught_swap.opening.closes() && untaught_swap.word.closes());
+        assert!(
+            untaught_swap
+                .balances
+                .iter()
+                .all(|balance| balance.closes())
+        );
         let taught = pending
             .observe_source_ports(producing, &observed, &compared)
             .unwrap();
@@ -2007,6 +2020,135 @@ mod physical_repair {
         assert_eq!(taught.ratio.stations(), matched_ratio.stations());
         assert!(matched.opening.closes() && matched.word.closes());
         assert!(matched.balances.iter().all(|balance| balance.closes()));
+        // The consumer equation is checked on this physical Word, including its actual carried
+        // map change: <g, logits(E')-logits(E)> = <d_E log ratio, E'-E>.
+        use crate::ratio::linear::vector::dot;
+        let delta_e = taught
+            .constitution
+            .source_port(0)
+            .unwrap()
+            .subtract(producing.source_port(0).unwrap())
+            .unwrap();
+        let gradient = taught.ratio.covector().unwrap();
+        let delta_logits: Vec<Vec<Rat>> = matched
+            .reads
+            .iter()
+            .zip(&blind.reads)
+            .map(|(after, before)| {
+                after
+                    .read
+                    .logits
+                    .iter()
+                    .zip(&before.read.logits)
+                    .map(|(a, b)| a - b)
+                    .collect()
+            })
+            .collect();
+        let at_receiver: Rat = gradient
+            .logits()
+            .iter()
+            .zip(&delta_logits)
+            .map(|(g, delta)| dot(g, delta))
+            .sum();
+        let source_gradient = taught.pullback.rings[0].source.as_ref().unwrap();
+        let at_source = dot(source_gradient.entries(), delta_e.entries());
+        assert_eq!(
+            at_receiver, at_source,
+            "same executed physical Word/source adjoint"
+        );
+        let source_step = taught
+            .publication
+            .steps
+            .iter()
+            .find(|(at, read)| {
+                *at == Locus::SourcePort(0) && read.family == crate::hnn::constitution::Family::Map
+            })
+            .unwrap();
+        let logit_move: Rat = delta_logits
+            .iter()
+            .zip(&compared)
+            .filter(|(_, crossed)| **crossed)
+            .map(|(delta, _)| dot(delta, delta))
+            .sum();
+        let actual_source_moves: Rat = (0..field.ring(0).placements().len())
+            .map(|phase| {
+                let feature = source
+                    .normalized_counts(&field, 0, phase, &modulus)
+                    .unwrap();
+                let moved = delta_e.apply(&feature).unwrap();
+                dot(&moved, &moved)
+            })
+            .sum();
+        assert!(
+            logit_move <= &source_step.1.gain * &actual_source_moves,
+            "the declared source gain must bound the actual physical Word"
+        );
+        let eta = &source_step.1.step.step;
+        let ideal_move = eta * eta * &source_step.1.gain * &source_step.1.moves;
+        let applied = taught.source_certificate.as_ref().unwrap();
+        assert_eq!(applied.sources.len(), 1);
+        let applied_source = &applied.sources[0];
+        assert_eq!(applied_source.ring, 0);
+        assert_eq!(applied_source.moves, actual_source_moves);
+        assert_eq!(applied_source.alignment, -&at_source);
+        assert_eq!(applied_source.gain, source_step.1.gain);
+        assert!(
+            &applied_source.bound * &applied_source.bound
+                >= &applied_source.gain * &applied_source.moves
+        );
+        assert!(applied.joint.holds());
+        assert_eq!(applied.joint.decrease, -&at_receiver);
+        assert!(rat(1, 2) * &logit_move <= applied.joint.curvature);
+        // The carried update completes eta*D with the actual old/new map remainders and release.
+        // They are not the solved chart's separate prox residual and are not assumed to vanish.
+        let source_law = taught.constitution.source_law(0).unwrap();
+        let unit_e = source_gradient
+            .scaled(&integer(-1))
+            .multiply(&source_law.solved())
+            .unwrap();
+        let ideal_delta = unit_e.scaled(eta);
+        let previous_remainder = producing.source_law(0).unwrap().map_remainder();
+        let remainder = source_law.map_remainder();
+        for (index, (actual, ideal)) in delta_e
+            .entries()
+            .iter()
+            .zip(ideal_delta.entries())
+            .enumerate()
+        {
+            let released: Rat = taught
+                .publication
+                .released
+                .iter()
+                .filter(|(at, carrier, entry, _)| {
+                    *at == Locus::SourcePort(0)
+                        && *carrier == crate::hnn::constitution::Carrier::Map
+                        && *entry == index
+                })
+                .map(|(_, _, _, value)| value.clone())
+                .sum();
+            assert_eq!(
+                actual + &remainder.entries()[index] - &previous_remainder.entries()[index]
+                    + released,
+                *ideal
+            );
+        }
+        println!(
+            "physical E consumer: adjoint pairing {}; actual logit move squared {}; actual source moves {}; gain {}; ideal normal-ray eta^2*kappa^2*b {}; actual carried joint certificate {:?}; source map carry {:?}; source map releases {:?}",
+            at_receiver,
+            logit_move,
+            actual_source_moves,
+            source_step.1.gain,
+            ideal_move,
+            applied.joint,
+            taught.constitution.source_law(0).unwrap().map_remainder(),
+            taught
+                .publication
+                .released
+                .iter()
+                .filter(|(at, carrier, _, _)| *at == Locus::SourcePort(0)
+                    && *carrier == crate::hnn::constitution::Carrier::Map)
+                .collect::<Vec<_>>()
+        );
         println!(
             "matched observed station comparison: before {:?}; after {:?}; imposed source work {} -> {}; quantized strict descent is not asserted",
             taught.ratio.phases(),
@@ -2063,12 +2205,14 @@ mod physical_repair {
             )));
         }
         println!(
-            "actual source teaching: rho {}; source clock {} -> {}; R unchanged; blind output {:?}; later target-free output {:?}; source-swap logits {:?} / {:?}",
+            "actual source teaching: rho {}; source clock {} -> {}; R unchanged; blind output {:?}; later target-free output {:?}; pre-teaching encoding swap logits {:?} / {:?}; post-teaching source-swap logits {:?} / {:?}",
             modulus,
             producing.clock(Locus::SourcePort(0)),
             taught.constitution.clock(Locus::SourcePort(0)),
             taught.prediction.cells,
             after.cells,
+            blind.reads[1].read.logits,
+            untaught_swap.reads[1].read.logits,
             after.reads[1].read.logits,
             other.reads[1].read.logits,
         );

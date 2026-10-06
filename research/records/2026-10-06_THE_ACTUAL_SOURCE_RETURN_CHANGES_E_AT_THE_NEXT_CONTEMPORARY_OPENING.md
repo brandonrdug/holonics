@@ -8,7 +8,7 @@ October 6, 2026. Refs #73, #148, #63, #62.
 frozen combined integration remain unchanged. No compiler, training passage or scientific
 experiment was launched in preparing this change. Static Rust parsing and whitespace checks
 pass; the selected native assertions and their actual output await the shared validation queue.
-The [static source receipt](receipts/physical-source-deposition-20261006/source-review.v1.json)
+The [static source receipt](receipts/physical-source-deposition-20261006/source-review.v2.json)
 pins both implementation hashes and the unchanged alias, cleanup, formal leaf and PTX inputs.
 
 The computational object is the helical pair interaction. The **helix** carries the source clock,
@@ -91,6 +91,26 @@ element/contact/pump growth for `source_gain`, while only the selected SourcePor
 deposited. The existing normal and certified-step owners choose the scale. No clipping,
 teacher-selected transport, rank guard or extra normalization is introduced.
 
+The normal-law proposal is not silently equated with its published map. The budgeted carrier
+obeys `delta E = eta D + r_before - r_after - released_map_residual`; the solved chart's prox
+residual is a separate reading. This distinction requires a term at the physical consumer:
+
+```text
+a_applied,g = sum_c w_c <descent_c, delta E_g f_c>
+b_applied,g = sum_c w_c ||delta E_g f_c||^2
+m_applied,g >= sqrt(kappa_E,g^2 b_applied,g)
+joint: (1/2)(sum_g m_applied,g)^2 <= sum_g a_applied,g
+```
+
+`PhysicalSourceCertificate` evaluates the existing `JointReading` on these actual applied
+differences before returning a successor. It uses the existing relative root ceiling for the
+norm bound, retains the normal publication's proposed-ray receipt separately, and refuses a
+failed actual certificate while preserving the blind physical receipt. This is an exact
+comparison of the same reached source features, not a new fitted scale or a rerun until a
+teacher is pleased. Each source-phase covector is an invertible cyclic rotation of one opening
+covector, so a source ring has either all of those covectors zero or none; omitting the zero
+return cannot omit another occupied nonzero feature within that stepped source.
+
 E changes the next contemporary imposition once. It does not change R, contact C/K/D, the
 storage metric, transport or a Word already executing. The next opening separately reports
 its changed imposed work; every Word retains its opening, tick and whole-word balances.
@@ -104,6 +124,8 @@ nine-station section has two intact classes one source period apart. The test fi
 their complete moment equality at unit transport. `Constitution::founded_transport` then
 chooses its existing modulus from the declared source period and grains, independently of
 any teacher or task score. The actual leaky moments and imposed source openings must differ.
+The physical source-swap distinction is also asserted before E teaching; it is a property of
+the existing encoding, rather than a gain attributed to deposition.
 
 The fixture performs the existing post-blind R comparison, then a separate E-only comparison
 at one declared station. It asserts a changed E map/source clock, unchanged complete receiving
@@ -120,9 +142,22 @@ contain no target, but still belong to this fixed unit fixture; they are not ind
 scientific replicates or a generalization estimate. No seed search, score-selected source,
 training sweep or acceptance target was generated.
 
+Two equations are asserted on those matched physical forwards, using their actual applied map:
+`<ratio_gradient, delta logits> = <source_gradient, delta E>` and
+`sum_(compared j)||delta logits_j||^2 <= kappa_E^2 b_applied`.
+The existing exact Word adjoint owner is `hnn::port::reverse` with
+`hnn::tests::port::the_word_return_is_the_exact_adjoint_of_its_tangent_map`; the new assertion
+also checks its particular continued physical opening and actual source clock. The fixture
+checks the actual joint certificate's alignment and curvature and the entrywise carrier
+accounting above. Whole output includes the proposed ray's bound separately, actual certificate,
+map remainder and releases. A certificate on an ideal update is not presented as a certificate
+on a different carried update.
+
 `source_teaching_refuses_a_zero_return_and_a_reached_uncertified_quartic` checks the two refusal
 paths, including preservation of the earlier receipt and carry. The zero-R case cannot deposit
 input-only statistics; the quartic case explicitly names the missing Word-Hessian certificate.
+The nonlinear admission checks the retained resonator's own locus. The shared exact-word
+predicate remains precisely the earlier coupled-domain predicate.
 The original physical chart, stale-material, ignored-observation and carry controls remain
 selected alongside these two and the unchanged source alias regression.
 
@@ -131,5 +166,9 @@ the sole queue: the prior thirteen physical controls, these two, sibling-clock l
 and the source-period alias control. It requires cache/input preflight, a measured fixed
 projection, exact test counts and raw whole output. Existing limits are retained; a timeout,
 compile error or changed assertion is an incomplete/failed gate, never an E-learning result.
+The notebook's physical receipt caller also consumes the actual `PluralDomain` enum variant,
+with a separate held-plural count. This is the minimal repair of its exhaustive-match compile
+refusal; no truth, task generator or physical algorithm is changed, and notebook linkage is
+still part of the pending coherent compile.
 No erasure-fidelity, product output, arbitrary nonlinear step or scientific training claim is
 made before or after this finite structural gate alone.

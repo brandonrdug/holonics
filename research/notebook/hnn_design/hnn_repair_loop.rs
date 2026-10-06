@@ -598,7 +598,8 @@ pub(super) fn physical(
             .relation(&field, ring, CLASSES)
             .expect("the located pair as a relation on the classes");
         let truths: Vec<Vec<usize>> = encoded.iter().map(|e| e.classes_read().collect()).collect();
-        let (mut released, mut unread, mut uncertified) = (0usize, 0usize, 0usize);
+        let (mut released, mut unread, mut uncertified, mut plural) =
+            (0usize, 0usize, 0usize, 0usize);
         let (mut agree, mut beside_reference, mut wrong, mut contains, mut held_cells) =
             (0usize, 0usize, 0usize, 0usize, 0usize);
         let (mut opening_closes, mut ticks_closing, mut ticks, mut words_close) = (0usize, 0usize, 0usize, 0usize);
@@ -640,6 +641,7 @@ pub(super) fn physical(
                         match unresolved {
                             Unresolved::Unread => unread += 1,
                             Unresolved::UncertifiedDomain => uncertified += 1,
+                            Unresolved::PluralDomain => plural += 1,
                         }
                         contains += usize::from(families[t].iter().all(|c| fibre.contains(c)));
                     }
@@ -669,7 +671,7 @@ pub(super) fn physical(
         }
         let erased_total = erased.len() * count;
         println!(
-            "  {terrain}: released {released} of {erased_total} erased (equal to the reference's release {agree}, released where the reference holds {beside_reference}, unequal to the truth {wrong}); held {held_cells} (uncertified domain {uncertified}, unread {unread}), held fibres containing the reference's family {contains} of {held_cells}"
+            "  {terrain}: released {released} of {erased_total} erased (equal to the reference's release {agree}, released where the reference holds {beside_reference}, unequal to the truth {wrong}); held {held_cells} (uncertified domain {uncertified}, plural domain {plural}, unread {unread}), held fibres containing the reference's family {contains} of {held_cells}"
         );
         println!(
             "  {terrain}: openings closing {opening_closes} of {count}; executed ticks closing {ticks_closing} of {ticks}; words closing {words_close} of {count}; carried ends by tick {carries:?}; reads with every logit zero {zero_faces}; reads by leading classes {leaders:?}; unit at most {unit_max} ms; {} ms",

@@ -1,0 +1,68 @@
+{
+  "version": 2,
+  "grade": "static source consumer review; native/type acceptance pending",
+  "base_commit": "1ba64477cebb07296a755e531a8affac38083613",
+  "rustfmt_edition": 2024,
+  "parse_only": true,
+  "full_file_formatter_output_not_applied": true,
+  "syntax_checks": [
+    {
+      "path": "crates/holonics/src/hnn/prediction.rs",
+      "bytes": 135749,
+      "sha256": "f8c60da4195ca5889cef8698c1f22ccac2b13c2448b3e2a71f3d340be0e8fd93",
+      "parser_exit": 0,
+      "parser_stderr_bytes": 0
+    },
+    {
+      "path": "crates/holonics/src/hnn/tests/prediction.rs",
+      "bytes": 120582,
+      "sha256": "d9f3e30ffbcbc227f362ea957f9582bb27cfc1e30ed84a2201fd2ad20e526a3c",
+      "parser_exit": 0,
+      "parser_stderr_bytes": 0
+    },
+    {
+      "path": "research/notebook/hnn_design/hnn_repair_loop.rs",
+      "bytes": 31329,
+      "sha256": "2939d7c6adf418e51ee9556a63ca2e9f815d9d8986f30b527a94312e31e22d94",
+      "parser_exit": 0,
+      "parser_stderr_bytes": 0
+    }
+  ],
+  "diff_check_exit": 0,
+  "preserved_inputs": [
+    {
+      "path": "crates/holonics/src/hnn/receiving.rs",
+      "unchanged_since_d00": true,
+      "sha256": "10cea7efc861f33530ec65bf3a901726850ae2677dfc2d622e494de9359abac4"
+    },
+    {
+      "path": "crates/holonics/tests/source_entrance.rs",
+      "unchanged_since_d00": true,
+      "sha256": "5308ebf2d6cba10019952e1e9023d3b085349d12b3c6df61833cba8b863d9baf"
+    },
+    {
+      "path": "lean/Holonics/HNN/ReframedMoment.lean",
+      "unchanged_since_d00": true,
+      "sha256": "4ffc65a60f4e72c8bc63c637d7e6480ada2e8721a002e53c487635e64cd93f2e"
+    },
+    {
+      "path": "accelerators/cuda-smoke/mount_smoke_kernel.ptx",
+      "unchanged_since_d00": true,
+      "sha256": "0310be86a54b08c4234f6a39b69805b72d8610bb55cee5aef7caf387a0c8a2cd"
+    }
+  ],
+  "consumer_equations": [
+    "<g,delta_logits>=<dE_log_ratio,actual_deltaE>",
+    "actual_deltaE=etaD+r_before-r_after-released_Map",
+    "sum_compared||delta_logits||^2<=gain*sum_phase||actual_deltaE feature||^2",
+    "existing joint-step certificate on actual carried E differences; proposed normal ray separate"
+  ],
+  "read_only_independent_review": "same affine Word derivative recovered; ideal etaD certificate requires actual carry correction; no review run",
+  "notebook_patch": "exact queue-supplied three-hunk PluralDomain match/count/display repair; no physical algorithm/target edit",
+  "native_controls": 17,
+  "compiler_runs": 0,
+  "native_runs": 0,
+  "training_runs": 0,
+  "claimed_runtime_outputs": [],
+  "claim_limit": "fixed native structural fixture; matched observed comparison is training-side; no strict quantized descent, erasure fidelity or general source injectivity"
+}
