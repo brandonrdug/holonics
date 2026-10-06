@@ -650,7 +650,7 @@ fn moment_ingest_matches_the_host_moment() {
 /// equals the host moment's; `E_0 M_0[c]` (`10 × 5` on its lattice, against the
 /// resident counts) equals the host's product per phase and, over the population chart (ruling B),
 /// folds to `SourceMoment::encode`; and
-/// `R P_R^(τ_R) v` (`512 × 22` on `2^(−10)ℤ`, the initial and a drawn map, against lattice anchors
+/// `R P_R^(τ_R) v` (`2|A| × 22 = 10 × 22` on `2^(−10)ℤ`, the initial and a drawn map, against lattice anchors
 /// with the rotation as a gather) equals `ReceivingPhases::read`'s logits.
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
@@ -765,7 +765,7 @@ fn campaign_one_reads_and_ingest_match_the_host() {
         &LatticeCoordinates::of_vectors(&anchors, Lattice::new(20)).unwrap(),
     )
     .unwrap();
-    let drawn = draw.lattice_matrix(512, 22, 10, 50);
+    let drawn = draw.lattice_matrix(2 * field.alphabet(), 22, 10, 50);
     for (name, theta) in [
         ("initial", initial.clone()),
         (

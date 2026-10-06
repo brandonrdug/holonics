@@ -675,11 +675,12 @@ fn the_card_port_returns_the_reference_on_the_chain() {
 /// constitutions are compared after every deposit); the normal-law mirror skips a deposit whose
 /// prior moved, since its kernel steps a fixed `2^k`, and counts it.
 ///
-/// At rest this cut cannot move the prior, by the law: the receiving map's moves stay below its
-/// lattice's grain at `2^6`, so the map in force reads zero at every window, the code along `φ W`
-/// is the same at every member and every read holds for want of curvature (the host's
-/// `holonics::hnn::tests::prior_carry::at_rest_the_cards_chain_holds_its_prior_and_under_the_carry_it_moves`,
-/// on this fixture: 33 reads at rest, none moved; 33 under the carry, 22 moved).
+/// [historical; restated October 5 with THE_MACHINE guard 9] On the folded chain (four classes on a
+/// period-2 source ring through `c mod 2`) this cut held the prior at rest and moved it only under
+/// the carry (33 reads at rest, none moved; 33 under the carry, 22 moved). The chain is fold-free
+/// now (its source ring of period 4), and the host's conditional law, a map that never leaves zero
+/// holds its prior, is read on the two-class chain
+/// (`holonics::hnn::tests::prior_carry::at_rest_a_map_that_never_leaves_zero_holds_its_prior`).
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_card_port_returns_the_reference_across_a_moved_receiving_prior() {
@@ -754,7 +755,8 @@ fn the_card_carries_each_reception_as_the_reference() {
     println!("chain, Carry(Nothing): {compared:?}");
     assert_eq!(compared.compares, windows);
     assert_eq!(
-        compared.received, 8,
+        compared.received,
+        windows - 1,
         "every reception after the first opens on a carry"
     );
     assert!(
@@ -772,7 +774,7 @@ fn the_card_carries_each_reception_as_the_reference() {
     let reference = without_wall(host.expose(&field, &cut).unwrap());
     let carried = without_wall(device.expose(&field, &cut).unwrap());
     let chained = &reference.word.chained;
-    assert_eq!(chained.read, 8);
+    assert_eq!(chained.read, reference.compares - 1);
     assert!(chained.closed && chained.dissipative == chained.read);
     assert!(
         !chained.split.is_zero(),
@@ -898,9 +900,10 @@ fn the_card_carries_the_pump_as_the_reference() {
     let compared = lockstep_receiving(&field, &cut, windows, Some(theta.clone()), 3, carry);
     println!("pumped chain, Carry(Nothing): {compared:?}");
     assert_eq!(compared.compares, windows);
-    assert_eq!(compared.received, 8);
+    assert_eq!(compared.received, windows - 1);
     assert_eq!(
-        compared.pumped, 8,
+        compared.pumped,
+        windows - 1,
         "every carry holds the resonators' states"
     );
     let card = card();
@@ -909,7 +912,7 @@ fn the_card_carries_the_pump_as_the_reference() {
     let reference = without_wall(host.expose_with(&field, &cut, theta.clone()).unwrap());
     let carried = without_wall(device.expose_with(&field, &cut, theta).unwrap());
     let chained = &reference.word.chained;
-    assert_eq!(chained.read, 8);
+    assert_eq!(chained.read, reference.compares - 1);
     assert!(chained.closed && chained.dissipative == chained.read);
     assert_eq!(
         carried, reference,
@@ -1272,7 +1275,7 @@ fn the_card_absorbs_each_reception_as_the_reference() {
     );
     println!("chain, Carry(Complete): {compared:?}");
     assert_eq!(compared.compares, windows);
-    assert_eq!(compared.received, 8);
+    assert_eq!(compared.received, windows - 1);
     // With a pumped resonator on every ring the word opens at rest at the carried tick, its pump
     // phases reading the field's elapsed ticks.
     let compared = lockstep_receiving(
@@ -1285,7 +1288,7 @@ fn the_card_absorbs_each_reception_as_the_reference() {
     );
     println!("pumped chain, Carry(Complete): {compared:?}");
     assert_eq!(compared.compares, windows);
-    assert_eq!(compared.received, 8);
+    assert_eq!(compared.received, windows - 1);
 }
 
 /// The chain from a generic constitution on half-integers (every locus live: the contrast port,
@@ -1480,7 +1483,7 @@ fn a_refused_deposit_restores_host_and_card_predecessors() {
     let (moment, _) = same(
         "open and ingest a tiny source moment",
         host.ingest(&mut h, None, &word(&field, 1, 101)),
-        device.ingest(&mut d, None, &word(&field, 1, 102)),
+        device.ingest(&mut d, None, &word(&field, 1, 101)),
     )
     .unwrap();
     let phases = h.admitted()[0].clone();
@@ -1493,7 +1496,7 @@ fn a_refused_deposit_restores_host_and_card_predecessors() {
     let (staged, compared) = same(
         "stage a valid comparison",
         host.compare(&mut h, pending, &word(&field, 2, 103)),
-        device.compare(&mut d, pending, &word(&field, 2, 104)),
+        device.compare(&mut d, pending, &word(&field, 2, 103)),
     )
     .unwrap();
     let deposit = compared
@@ -1561,7 +1564,7 @@ fn a_refused_deposit_restores_host_and_card_predecessors() {
     let retried = same(
         "compare again after the refusal",
         host.compare(&mut h, host_pending, &word(&field, 2, 105)),
-        device.compare(&mut d, device_pending, &word(&field, 2, 106)),
+        device.compare(&mut d, device_pending, &word(&field, 2, 105)),
     );
     assert!(retried.is_some());
 }
@@ -1581,7 +1584,7 @@ fn the_card_port_refuses_as_the_reference() {
     same(
         "ingest",
         host.ingest(&mut h, Some(&moment), &word(&field, 4, 107)),
-        device.ingest(&mut d, Some(&moment), &word(&field, 4, 108)),
+        device.ingest(&mut d, Some(&moment), &word(&field, 4, 107)),
     );
     let phases = h.admitted()[0].clone();
     let (pending, _) = same(
@@ -1593,7 +1596,7 @@ fn the_card_port_refuses_as_the_reference() {
     same(
         "a short target",
         host.compare(&mut h, pending, &word(&field, 1, 109)),
-        device.compare(&mut d, pending, &word(&field, 1, 110)),
+        device.compare(&mut d, pending, &word(&field, 1, 109)),
     );
     same(
         "an unknown handle",
@@ -1604,7 +1607,7 @@ fn the_card_port_refuses_as_the_reference() {
     let compared = same(
         "compare",
         host.compare(&mut h, pending, &word(&field, 2, 111)),
-        device.compare(&mut d, pending, &word(&field, 2, 112)),
+        device.compare(&mut d, pending, &word(&field, 2, 111)),
     );
     assert!(compared.is_some());
     let _ = ReceiptDetail::Boundary;
@@ -1796,7 +1799,7 @@ fn the_card_port_returns_the_reference_through_a_releasing_collapse() {
     same(
         "compare",
         both.host.compare(&mut both.h, other, &word(&field, 2, 113)),
-        both.device.compare(&mut both.d, other, &word(&field, 2, 114)),
+        both.device.compare(&mut both.d, other, &word(&field, 2, 113)),
     );
     let boundary = same(
         "close_aeon onto no receiver",
@@ -1809,7 +1812,7 @@ fn the_card_port_returns_the_reference_through_a_releasing_collapse() {
     same(
         "compare a refused pending ratio",
         both.host.compare(&mut both.h, id, &word(&field, 2, 115)),
-        both.device.compare(&mut both.d, id, &word(&field, 2, 116)),
+        both.device.compare(&mut both.d, id, &word(&field, 2, 115)),
     );
     let (fresh, _) = same(
         "refine on the collapsed medium",
@@ -1825,7 +1828,7 @@ fn the_card_port_returns_the_reference_through_a_releasing_collapse() {
     same(
         "compare on the collapsed medium",
         both.host.compare(&mut both.h, fresh, &word(&field, 2, 117)),
-        both.device.compare(&mut both.d, fresh, &word(&field, 2, 118)),
+        both.device.compare(&mut both.d, fresh, &word(&field, 2, 117)),
     );
     same("read", both.host.read(&both.h), both.device.read(&both.d));
 }

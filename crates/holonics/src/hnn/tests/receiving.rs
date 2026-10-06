@@ -528,7 +528,7 @@ fn the_wave_is_inert_when_every_map_opens_at_zero() {
 /// moves is the second.
 #[test]
 fn r_opens_at_zero_and_learns_from_the_first_deposit() {
-    let field = chain();
+    let field = super::learning::chain_two();
     let a = field.alphabet();
     let reference = Reference::campaign_one();
     let mut resident = reference.mount(&field, &Current::at_rest(&field)).unwrap();
@@ -787,7 +787,7 @@ fn the_receivers_population_weighs_by_likelihood_cell_by_cell() {
 /// make, so every phase of every epoch read the tree after every earlier cell.
 #[test]
 fn the_receiving_face_codes_within_one_bit_of_the_better_face() {
-    use super::learning::chain_of;
+    use super::learning::chain_two_of as chain_of;
     use crate::hnn::reference::Cut;
     let n_star = chain_of(1 << 16).capacity().n_star() as usize;
     let length = n_star + n_star % 2;
@@ -799,9 +799,9 @@ fn the_receiving_face_codes_within_one_bit_of_the_better_face() {
             &(0..length)
                 .map(|k| {
                     if draw.below(8) == 0 {
-                        draw.below(4)
+                        draw.below(2)
                     } else {
-                        [0, 1, 2, 1][k % 4]
+                        [0, 1, 2, 1][k % 4] % 2
                     }
                 })
                 .collect::<Vec<_>>(),

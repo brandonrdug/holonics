@@ -3,6 +3,12 @@
 //! the notebook's receipt of `Reference::campaign_one().expose(&field, &cut)`, a committed command run
 //! once in release, never a test.
 //!
+//! [definition; agent-inferred, October 5; THE_MACHINE guard 9] A cut's bytes enter the field only as
+//! an `Encoded` built from a founded encoding ([`encoded_text`]); campaign 1 read them through the
+//! residue chart `code mod d_g`, which is deleted, and it reads five classes now. No encoding of the
+//! bytes is founded, so every mode below reports the route's refusal as its result; the readouts and
+//! counts this header states (`n* = 6,148` on the bytes) are the byte chart's history.
+//!
 //! ```sh
 //! # campaign 1's exposure: the standing real cut (THE_REBUILD Decision 23), written by standing_cut.py
 //! cargo run --release -p holonics --example hnn_exposure -- cut-file .local/cuts/standing-real-cut-campaign-1.bin cells all

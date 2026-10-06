@@ -1,0 +1,21 @@
+   Compiling holonics-cuda v0.1.0 (./crates/holonics-cuda)
+warning: method `with_rank` is never used
+    --> crates/holonics/src/hnn/receiving.rs:1588:19
+     |
+1285 | impl ReceivingPhases {
+     | -------------------- method in this implementation
+...
+1588 |     pub(crate) fn with_rank(self, rank: usize) -> Self {
+     |                   ^^^^^^^^^
+     |
+     = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `holonics` (lib) generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.68s
+     Running unittests src/lib.rs (target/debug/deps/holonics_cuda-162b84abbaed056d)
+
+running 7 tests
+test hnn::port_tests::a_refused_deposit_restores_host_and_card_predecessors ... ok
+test hnn::port_tests::the_card_absorbs_each_reception_as_the_reference ... ok
+test hnn::port_tests::the_card_carries_each_reception_as_the_reference ... ok
+test hnn::port_tests::the_card_carries_the_pump_as_the_reference ... exit 124 wall 180004 ms

@@ -445,7 +445,7 @@ fn exposed(
 /// The chain located from `2^6`, at its capacity, its rings placed as `place` declares.
 fn located_chain(place: impl Fn(&mut crate::hnn::field::RingDeclaration)) -> Field {
     let declared = |population: u64| {
-        let mut declaration = chain_declaration(population);
+        let mut declaration = super::learning::chain_two_declaration(population);
         declaration.receivers[0].receiving_prior = 6;
         declaration.rings.iter_mut().for_each(&place);
         Field::declare(declaration.by_lattice_rule()).unwrap()
@@ -465,7 +465,7 @@ fn an_exposed_located_chain_reads_its_pair_where_the_map_is_stepped_and_moves_it
 
     let field = located_chain(|_| {});
     let mut draw = Draw::new(7);
-    let cells: Vec<usize> = (0..field.population()).map(|_| draw.below(4)).collect();
+    let cells: Vec<usize> = (0..field.population()).map(|_| draw.below(2)).collect();
     let reception = crate::hnn::reference::Reference::campaign_one().reception();
     let (deposits, reads, last) = exposed(&field, &cells, reception);
     let moves: Vec<_> = reads.iter().filter(|read| read.to != read.from).collect();
@@ -476,19 +476,25 @@ fn an_exposed_located_chain_reads_its_pair_where_the_map_is_stepped_and_moves_it
     assert_eq!(last.chart().scale(), moves.last().unwrap().to);
 }
 
-/// **At rest a map that never leaves zero locates nothing** (§3, step 1), on the card's own chain
-/// (its rings placed on the quarter turns) and cut (the periodic source with one draw in eight, seed
-/// 3): the fixture of `holonics_cuda::hnn::port_tests::the_card_port_returns_the_reference_across_a_moved_receiving_prior`.
-/// At rest the deposits' moves of the receiving map stay below its lattice's grain at the prior
-/// `2^6` (each is carried as the map's remainder), so the map in force reads zero at every window:
-/// the code along `φ W` is the same at every member, `S = 0`, and every read holds `k` for want of
-/// curvature. That is the law, not a stall: no member is distinguishable by the readings. Under the
-/// production reception the carried motion reaches the map, which leaves zero, and the same cut
-/// moves the prior; so the card's test runs there.
+/// **At rest a map that never leaves zero locates nothing** (§3, step 1), on the two-class chain
+/// (`super::learning::chain_two_declaration`, its rings placed on the quarter turns) and its cut
+/// (the periodic source with one draw in eight, seed 3, read on its two classes). At rest the
+/// deposits' moves of the receiving map stay below its lattice's grain at the prior `2^6` (each is
+/// carried as the map's remainder), so the map in force reads zero at every window: the code along
+/// `φ W` is the same at every member, `S = 0`, and every read holds `k` for want of curvature. That
+/// is the law, not a stall: no member is distinguishable by the readings.
+///
+/// [agent-inferred, October 5; THE_MACHINE guard 9] Restated. Until October 5 the test also
+/// asserted that the same cut moves the prior under the production reception, on the folded chain
+/// (four classes read on a period-2 source ring through `c mod 2`): a fact of that fixture's
+/// magnitudes, not a law. On the fold-free fixtures it does not separate: on the two-class chain the
+/// carried motion does not take the map off zero either (19 reads under the carry, none moved), and
+/// on the period-4 chain the map leaves zero at rest. The conditional law is what the test holds;
+/// the card's moved prior is read on its own chain
+/// (`holonics_cuda::hnn::port_tests::the_card_port_returns_the_reference_across_a_moved_receiving_prior`).
 #[test]
-fn at_rest_the_cards_chain_holds_its_prior_and_under_the_carry_it_moves() {
+fn at_rest_a_map_that_never_leaves_zero_holds_its_prior() {
     use super::support::Draw;
-    use crate::hnn::Absorption;
     use crate::hnn::field::FieldDeclaration;
     use crate::hnn::reference::Reception;
 
@@ -502,9 +508,9 @@ fn at_rest_the_cards_chain_holds_its_prior_and_under_the_carry_it_moves() {
     let cells: Vec<usize> = (0..field.population() as usize)
         .map(|k| {
             if draw.below(8) == 0 {
-                draw.below(4)
+                draw.below(2)
             } else {
-                [0, 1, 2, 1][k % 4]
+                [0, 1, 2, 1][k % 4] % 2
             }
         })
         .collect();
@@ -516,8 +522,4 @@ fn at_rest_the_cards_chain_holds_its_prior_and_under_the_carry_it_moves() {
             .all(|read| (read.from, read.to, read.held) == (6, 6, Some(PriorHeld::NoCurvature)))
     );
     assert!(rest_law.map().entries().iter().all(Zero::is_zero));
-    let (_, carried, _) = exposed(&field, &cells, Reception::Carry(Absorption::Nothing));
-    let moves = carried.iter().filter(|read| read.to != read.from).count();
-    println!("at rest {} reads, none moved; under the carry {} reads, {moves} moved", at_rest.len(), carried.len());
-    assert!(moves > 0);
 }

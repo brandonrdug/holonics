@@ -531,3 +531,5 @@ wall), the eleven `hnn::encoding` doctests among them, each `compile_fail` repor
 Gate 2, `cargo test -p holonics --lib -- --test-threads=8` in a transient systemd service: 1,007
 passed, 0 failed, 171,930 ms of tests and 177,390 ms wall against the brief's projection of about
 190 s, peak 2.3G. No Lean changed (item 6 above is owed); no kernel or card path changed.
+
+**The join** (phase 2) is its own record: [the field's entries take only the encoded source](2026-10-05_THE_FIELDS_ENTRIES_TAKE_ONLY_THE_ENCODED_SOURCE.md).

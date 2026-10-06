@@ -99,7 +99,8 @@ fn chain_declared(first_admittance: Rat, population: u64, offsets: Vec<usize>) -
 }
 
 /// **The chain control's declaration** over a population of `population` cells (`Δ = {1}`, carrier
-/// lattices by rule): the fixture of the declaration's own laws. Its capacity is `n* = 71`.
+/// lattices by rule): the fixture of the declaration's own laws. Its capacity is `n* = 134 = 2·67`
+/// (`71` on the folded chain before October 5).
 pub(super) fn chain_declaration(population: u64) -> FieldDeclaration {
     FieldDeclaration {
         rings: vec![ring(4, vec![0, 2]), ring(3, vec![0]), ring(2, vec![])],
@@ -132,6 +133,32 @@ pub(super) fn chain_declaration(population: u64) -> FieldDeclaration {
 
 pub(super) fn chain() -> Field {
     chain_with(integer(2))
+}
+
+/// [agent-inferred, October 5; THE_MACHINE guard 9] **The two-class chain**: the chain's former
+/// geometry, rings of periods 2, 3, 2 with locks `{0}`, `{0}`, `∅` joined on the same channels and
+/// read by the same receiver, reading the two classes its period-2 source ring holds without a fold
+/// (`Δ = {1}`, carrier lattices by rule). It is the smallest fold-free fixture of the chain's
+/// laws: the claims below that need neither four classes nor a wider source ring run on it, at the
+/// configurations and in the carrier the folded chain ran them in.
+pub(super) fn chain_two_declaration(population: u64) -> FieldDeclaration {
+    let mut declared = chain_declaration(population);
+    declared.rings[0] = ring(2, vec![0]);
+    declared.alphabet = 2;
+    declared.lattice = Default::default();
+    declared.by_lattice_rule()
+}
+
+/// The two-class chain over a population of `2^16` cells.
+pub(super) fn chain_two() -> Field {
+    Field::declare(chain_two_declaration(1 << 16)).unwrap()
+}
+
+/// The two-class chain with no pair offset, over `population` cells (the exposure's chain).
+pub(super) fn chain_two_of(population: u64) -> Field {
+    let mut declared = chain_two_declaration(population);
+    declared.offsets = Vec::new();
+    Field::declare(declared.by_lattice_rule()).unwrap()
 }
 
 /// **A hand-built deposit's reach** on the chain (its receiver ring 2 read at ticks 1 and 2, the

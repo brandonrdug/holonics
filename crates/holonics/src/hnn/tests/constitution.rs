@@ -734,14 +734,14 @@ type Deposited = (Constitution, Deposit, Constitution, DepositReading);
 fn chain_run() -> &'static [Deposited] {
     static RUN: OnceLock<Vec<Deposited>> = OnceLock::new();
     RUN.get_or_init(|| {
-        let field = chain();
+        let field = super::learning::chain_two();
         let reference = Reference::new(8, OPEN_BUDGET);
         let mut resident = reference.mount(&field, &Current::at_rest(&field)).unwrap();
         let (moment_id, _) = reference
-            .ingest(&mut resident, None, &encoded(&field, &[1, 2, 3, 0, 2]))
+            .ingest(&mut resident, None, &encoded(&field, &[1, 0, 1, 0, 0]))
             .unwrap();
         let phases = resident.admitted()[0].clone();
-        let targets = [[2usize, 1], [0, 3], [1, 1], [3, 0], [0, 0], [2, 2], [1, 3]];
+        let targets = [[0usize, 1], [0, 1], [1, 1], [1, 0], [0, 0], [0, 0], [1, 1]];
         (0..CHAIN_DEPOSITS)
             .map(|k| {
                 let before = resident.constitution().clone();
@@ -1392,16 +1392,16 @@ fn the_factor_carriers_stay_positive_semidefinite_with_no_clamp() {
 /// its budgeted carry holds and releases.
 #[test]
 fn every_family_steps_by_its_certificate() {
-    let field = chain();
+    let field = super::learning::chain_two();
     let reference = Reference::new(8, OPEN_BUDGET);
     let mut resident = reference
         .mount_with(&field, &Current::at_rest(&field), generic(&field, 71))
         .unwrap();
     let (moment_id, _) = reference
-        .ingest(&mut resident, None, &encoded(&field, &[1, 2, 3, 0, 2]))
+        .ingest(&mut resident, None, &encoded(&field, &[1, 0, 1, 0, 0]))
         .unwrap();
     let phases = resident.admitted()[0].clone();
-    let targets = [[2usize, 1], [0, 3], [1, 1], [3, 0]];
+    let targets = [[0usize, 1], [0, 1], [1, 1], [1, 0]];
     let mut factor_families = 0;
     for target in &targets {
         let (pending, _) = reference
