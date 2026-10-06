@@ -615,9 +615,11 @@ impl<'c> Resident<'c> {
 
     /// [definition; the reception carry §2.4] **Mount on a declared constitution with a
     /// reception's carried end restored** (`Reference::mount_carried`): the carry uploaded to the
-    /// card, so the next reception's word opens on it exactly as in the uninterrupted chain.
-    /// Refused where the carry has another field's shape, lies off the transients' lattice, or this
-    /// port receives at rest.
+    /// card, so the next reception's word opens on it as the reference's does. Refused where the
+    /// carry has another field's shape, lies off the transients' lattice, or this port receives at
+    /// rest. Like the reference's, it is the narrower remount: the card's store holds no kept chart,
+    /// so the next word is the uninterrupted chain's only where every kept chart is its operator's
+    /// cold chart (October 5; the whole continuation carries the kept charts in the passage).
     pub fn mount_carried(
         &self,
         field: &Field,

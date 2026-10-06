@@ -766,10 +766,20 @@ fn the_chained_balance_closes_on_a_pumped_field() {
 /// ran, §2.4), its compare leaves it, and the next reception's word opens on its interior with the
 /// source rings imposed by the moment: the refine's faces are the read on that opening, and they
 /// differ from the read at rest.
+///
+/// [agent-inferred, October 5; the lattice word, `hnn::reference`'s header] A word is a function of
+/// the pending ratio's operands, the published constitution **and the kept charts**, so the read
+/// that reproduces the refine opens on the carry and the kept charts, each as saved and read back
+/// (the carry in the state's carry line, the charts in its passage, §10). The carry alone is not the
+/// state the word opens on. A read on fresh charts (`Charts::new()`) is another certified
+/// representative: where a deposit moved an operator and its kept chart still certifies within the
+/// target, the warm start keeps it (no step), and the cold start reaches another lattice point at
+/// the same target. On this fold-free chain it separates at window 6 (face 0, cell 0: fibre
+/// `4177/2^19` on the kept charts, `4181/2^19` on fresh ones; every grain cell equal, the logits
+/// within `7/2^17`), the probe that keeps the charts in the retained quotient.
 #[test]
-#[ignore = "defect: the word read on fresh charts differs from the resident's warm-chart read at window 6 on the fold-free chain (face 0, cell 0: fibre 4177/2^19 against 4181/2^19), so the carry's cold continuation is not exact; refs #73"]
 fn the_carry_passes_each_receptions_end_to_the_next() {
-    use crate::hnn::{Absorption, PendingRatio, WordOpening};
+    use crate::hnn::{Absorption, Charts, PendingRatio, WordOpening};
     let length = cut_length();
     let field = chain_of(length as u64);
     let cells = source(length, 81);
@@ -781,13 +791,27 @@ fn the_carry_passes_each_receptions_end_to_the_next() {
     let (moment, _) = reference.ingest(&mut resident, None, &encoded(&field, &[])).unwrap();
     assert!(resident.carried().is_none());
     let mut position = 0;
-    let (mut receptions, mut moved) = (0, 0);
+    let (mut receptions, mut moved, mut separated) = (0, 0, 0);
     for span in phases.windows(cells.len()).unwrap().into_iter().take(24) {
         let window = &cells[span.clone()];
         if window.len() == phases.aperture() {
             let before = resident.carried().cloned();
-            // The opening is read from the carry as saved and read back (§2.4): the saved carry is
-            // the carried state whole, so the word it opens is the uninterrupted chain's exactly.
+            // The opening is read from the carry as saved and read back (§2.4), and the kept charts
+            // from their own saved text (§10): together with the constitution they are the operands
+            // the word reads, so the word they open is the uninterrupted chain's exactly.
+            let kept = {
+                let mut text = String::new();
+                resident.charts().write(&mut text);
+                let mut lines = text.lines();
+                let head = lines.next().unwrap();
+                let kept = Charts::read(head, &mut |what| {
+                    lines.next().ok_or(HnnError::ContinuingState { what })
+                })
+                .unwrap();
+                assert_eq!(&kept, resident.charts());
+                assert!(lines.next().is_none());
+                kept
+            };
             let opening = match &before {
                 Some(carry) => {
                     let mut text = String::new();
@@ -818,10 +842,14 @@ fn the_carry_passes_each_receptions_end_to_the_next() {
             let (pending, refined) = reference.refine(&mut resident, &moment, &phases).unwrap();
             let faces = refined.forward.into_present().unwrap();
             let theta = resident.constitution().clone();
-            let (_, on) = ratio
-                .read_on(&field, &theta, &mut crate::hnn::Charts::new(), &opening)
-                .unwrap();
+            let mut charts = kept.clone();
+            let (_, on) = ratio.read_on(&field, &theta, &mut charts, &opening).unwrap();
             assert_eq!(faces, on);
+            assert_eq!(&charts, resident.charts(), "the read keeps the refine's charts");
+            let (_, fresh) = ratio
+                .read_on(&field, &theta, &mut Charts::new(), &opening)
+                .unwrap();
+            separated += usize::from(fresh != faces);
             let moving = |carry: &crate::hnn::ReceptionCarry| {
                 let change = &carry.change;
                 change
@@ -833,7 +861,10 @@ fn the_carry_passes_each_receptions_end_to_the_next() {
                     .any(|x| !x.is_zero())
             };
             if before.as_ref().is_some_and(moving) {
-                let (_, at_rest) = ratio.read(&field, &theta).unwrap();
+                // At rest on the same kept charts, so a difference is the carry's motion alone.
+                let (_, at_rest) = ratio
+                    .read_on(&field, &theta, &mut kept.clone(), &WordOpening::Rest)
+                    .unwrap();
                 moved += usize::from(faces != at_rest);
             }
             receptions += 1;
@@ -863,13 +894,19 @@ fn the_carry_passes_each_receptions_end_to_the_next() {
     }
     // The carried interior moves the read once the constitution reads the receiving ring.
     assert!(moved >= 1 && position > 0);
+    // Fresh charts separate from the kept ones on this chain (window 6), so the kept charts are a
+    // retained operand: the quotient must not merge two residents that differ only in them.
+    assert!(separated >= 1);
     // The carry mounts beside a declared constitution (§2.4), and only under a carrying reception:
-    // the rest limit refuses it.
+    // the rest limit refuses it. That mount is the narrower remount: it holds no kept chart, so its
+    // next word is the uninterrupted chain's only where the kept charts are their operators' cold
+    // charts; the whole continuation is `mount_continued` on the resident's state (its passage).
     let carry = resident.carried().cloned().expect("the chain carries");
     let mounted = reference
         .mount_carried(&field, resident.current(), resident.constitution().clone(), carry.clone())
         .unwrap();
     assert_eq!(mounted.carried(), Some(&carry));
+    assert!(mounted.charts().is_empty() && !resident.charts().is_empty());
     assert!(matches!(
         Reference::new(64, OPEN_BUDGET)
             .with_reception(Reception::Rest)
@@ -881,6 +918,97 @@ fn the_carry_passes_each_receptions_end_to_the_next() {
             ),
         Err(HnnError::ContinuingState { .. })
     ));
+}
+
+/// [agent-inferred, October 5; the reception carry §10 and the lattice word] **A cold restore
+/// continues the carry chain exactly where the kept charts have moved.** On the fold-free chain
+/// under `Carry(Nothing)`, the resident's whole state (`Resident::continuing_state`: the
+/// constitution's learned material, the carried end, and the passage with the kept charts) is saved
+/// before every reception, read back from its text and mounted cold on a fresh founding
+/// constitution (`Reference::mount_continued`). The restored resident's reception is the
+/// uninterrupted one's at every window, faces, compare and deposit alike, and leaves the same
+/// constitution, carry and charts:
+/// `compare(refine(mount_continued(save(r)), m, φ), t) = compare(refine(r, m, φ), t)`. From window 6
+/// on, a deposit has moved operators whose kept charts a cold start does not reproduce (a read on
+/// fresh charts separates there), so the equality rests on the charts the passage carries.
+#[test]
+fn a_cold_restore_continues_the_carry_chain_where_the_kept_charts_have_moved() {
+    use crate::hnn::constitution::{Constitution, ContinuingState};
+    use crate::hnn::{Absorption, Charts, PendingRatio, WordOpening};
+    let length = cut_length();
+    let field = chain_of(length as u64);
+    let cells = source(length, 81);
+    let reference =
+        Reference::new(64, OPEN_BUDGET).with_reception(Reception::Carry(Absorption::Nothing));
+    let mut resident = reference.mount(&field, &Current::at_rest(&field)).unwrap();
+    let phases = resident.admitted()[0].clone();
+    let ring = field.sources()[0];
+    let (moment, _) = reference.ingest(&mut resident, None, &encoded(&field, &[])).unwrap();
+    let (mut receptions, mut separated) = (0, 0);
+    for span in phases.windows(cells.len()).unwrap().into_iter().take(24) {
+        let window = &cells[span.clone()];
+        if window.len() == phases.aperture() {
+            let state = resident.continuing_state(ring).unwrap();
+            let read = ContinuingState::from_text(&state.to_text()).unwrap();
+            assert_eq!(read, state);
+            let opening = Constitution::initial(&field, OPEN_BUDGET).unwrap();
+            let mut restored = reference
+                .mount_continued(&field, &Current::at_rest(&field), opening, &read)
+                .unwrap();
+            assert_eq!(restored.charts(), resident.charts());
+            assert_eq!(restored.carried(), resident.carried());
+            // The witness that the kept charts carry the equality: the same word on fresh charts.
+            let ratio = PendingRatio::produce(
+                resident.current(),
+                resident.moment(&moment).unwrap(),
+                resident.address(),
+                &phases,
+                resident.constitution().commit(),
+            )
+            .unwrap();
+            let word_opening = match resident.carried() {
+                Some(carry) => WordOpening::Received {
+                    carry: carry.clone(),
+                    absorption: Absorption::Nothing,
+                },
+                None => WordOpening::Rest,
+            };
+            let (_, fresh) = ratio
+                .read_on(&field, resident.constitution(), &mut Charts::new(), &word_opening)
+                .unwrap();
+            let (whole, refined) = reference.refine(&mut resident, &moment, &phases).unwrap();
+            let (cold, restored_refined) =
+                reference.refine(&mut restored, &moment, &phases).unwrap();
+            assert_eq!(restored_refined.forward, refined.forward);
+            separated += usize::from(refined.forward.present() != Some(&fresh));
+            let target = encoded(&field, window);
+            let (staged, compared) = reference.compare(&mut resident, whole, &target).unwrap();
+            let (restored_staged, restored_compared) =
+                reference.compare(&mut restored, cold, &target).unwrap();
+            assert_eq!(restored_compared.forward, compared.forward);
+            assert_eq!(restored_compared.deposit, compared.deposit);
+            reference.deposit(&mut resident, staged).unwrap();
+            reference.deposit(&mut restored, restored_staged).unwrap();
+            assert_eq!(restored.constitution(), resident.constitution());
+            assert_eq!(restored.carried(), resident.carried());
+            assert_eq!(restored.charts(), resident.charts());
+            receptions += 1;
+        }
+        let mut fed = 0;
+        while fed < window.len() {
+            let (_, ingested) = reference
+                .ingest(&mut resident, Some(&moment), &encoded(&field, &window[fed..]))
+                .unwrap();
+            let ingested = ingested.forward.into_present().unwrap();
+            fed += ingested.cells;
+            if ingested.carry_out {
+                let family = resident.admitted().to_vec();
+                reference.close_aeon(&mut resident, &family).unwrap();
+            }
+        }
+    }
+    assert_eq!(receptions, 14);
+    assert!(separated >= 1, "a cold start separates from the kept charts on this chain");
 }
 
 /// The reception carry §8: several pending ratios are one chain in refine order. Each refine runs

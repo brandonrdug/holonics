@@ -754,6 +754,11 @@ impl Charts {
         self.charts.get(key)
     }
 
+    /// The keys of the charts kept, in order.
+    pub fn keys(&self) -> impl Iterator<Item = &ChartKey> {
+        self.charts.keys()
+    }
+
     pub(crate) fn insert(&mut self, key: ChartKey, chart: ChartWords) {
         self.charts.insert(key, chart);
     }

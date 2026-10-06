@@ -1,0 +1,81 @@
+window 0: refine==kept true refine==fresh true cells(refine,fresh) equal true charts(refine)==charts(kept-read) true kept 0 fresh 5
+window 1: refine==kept true refine==fresh true cells(refine,fresh) equal true charts(refine)==charts(kept-read) true kept 5 fresh 5
+   Ring(0): kept start Warm steps 0 cert 8775/536870912 | fresh start Transpose steps 6 cert 8775/536870912 | words differ false
+   Ring(1): kept start Warm steps 0 cert 35101/2147483648 | fresh start Transpose steps 6 cert 35101/2147483648 | words differ false
+   Ring(2): kept start Warm steps 0 cert 35101/2147483648 | fresh start Transpose steps 6 cert 35101/2147483648 | words differ false
+   Contact { contact: 0, carry: 0 }: kept start Warm steps 0 cert 50941/1073741824 | fresh start Transpose steps 3 cert 50941/1073741824 | words differ false
+   Contact { contact: 1, carry: 0 }: kept start Warm steps 0 cert 50941/1073741824 | fresh start Transpose steps 3 cert 50941/1073741824 | words differ false
+window 2: refine==kept true refine==fresh true cells(refine,fresh) equal true charts(refine)==charts(kept-read) true kept 5 fresh 5
+   Ring(0): kept start Warm steps 0 cert 8775/536870912 | fresh start Transpose steps 6 cert 8775/536870912 | words differ false
+   Ring(1): kept start Warm steps 0 cert 35101/2147483648 | fresh start Transpose steps 6 cert 35101/2147483648 | words differ false
+   Ring(2): kept start Warm steps 0 cert 35101/2147483648 | fresh start Transpose steps 6 cert 35101/2147483648 | words differ false
+   Contact { contact: 1, carry: 0 }: kept start Warm steps 0 cert 50941/1073741824 | fresh start Transpose steps 3 cert 50941/1073741824 | words differ false
+window 3: refine==kept true refine==fresh true cells(refine,fresh) equal true charts(refine)==charts(kept-read) true kept 6 fresh 5
+   Ring(0): kept start Warm steps 0 cert 8775/536870912 | fresh start Transpose steps 6 cert 8775/536870912 | words differ false
+   Ring(1): kept start Warm steps 0 cert 35101/2147483648 | fresh start Transpose steps 6 cert 35101/2147483648 | words differ false
+   Ring(2): kept start Warm steps 0 cert 35101/2147483648 | fresh start Transpose steps 6 cert 35101/2147483648 | words differ false
+   Contact { contact: 1, carry: 0 }: kept start Warm steps 0 cert 50941/1073741824 | fresh start Transpose steps 3 cert 50941/1073741824 | words differ false
+window 4: refine==kept true refine==fresh true cells(refine,fresh) equal true charts(refine)==charts(kept-read) true kept 7 fresh 5
+   Ring(0): kept start Warm steps 0 cert 8775/536870912 | fresh start Transpose steps 6 cert 8775/536870912 | words differ false
+   Ring(1): kept start Warm steps 0 cert 35101/2147483648 | fresh start Transpose steps 6 cert 35101/2147483648 | words differ false
+   Ring(2): kept start Warm steps 0 cert 35101/2147483648 | fresh start Transpose steps 6 cert 35101/2147483648 | words differ false
+   Contact { contact: 0, carry: 0 }: kept start Warm steps 0 cert 50941/1073741824 | fresh start Transpose steps 3 cert 50941/1073741824 | words differ false
+   Contact { contact: 1, carry: 0 }: kept start Warm steps 0 cert 50941/1073741824 | fresh start Transpose steps 3 cert 50941/1073741824 | words differ false
+window 5: refine==kept true refine==fresh true cells(refine,fresh) equal true charts(refine)==charts(kept-read) true kept 7 fresh 5
+   Ring(0): kept start Warm steps 0 cert 8775/536870912 | fresh start Transpose steps 6 cert 8775/536870912 | words differ false
+   Ring(1): kept start Warm steps 0 cert 35101/2147483648 | fresh start Transpose steps 6 cert 35101/2147483648 | words differ false
+   Ring(2): kept start Warm steps 0 cert 35101/2147483648 | fresh start Transpose steps 6 cert 35101/2147483648 | words differ false
+   Contact { contact: 0, carry: 0 }: kept start Warm steps 0 cert 50941/1073741824 | fresh start Transpose steps 3 cert 50941/1073741824 | words differ false
+   Contact { contact: 1, carry: 0 }: kept start Warm steps 0 cert 50941/1073741824 | fresh start Transpose steps 3 cert 50941/1073741824 | words differ false
+window 6: refine==kept true refine==fresh false cells(refine,fresh) equal true charts(refine)==charts(kept-read) true kept 7 fresh 5
+   Ring(0): kept start Warm steps 0 cert 8775/536870912 | fresh start Transpose steps 6 cert 8775/536870912 | words differ false
+   Ring(1): kept start Warm steps 0 cert 19/2147483648 | fresh start Transpose steps 6 cert 586809557/35184372088832 | words differ true
+   Ring(2): kept start Warm steps 0 cert 22738133/4398046511104 | fresh start Transpose steps 6 cert 9370083/549755813888 | words differ true
+   Contact { contact: 0, carry: -18 }: kept start Warm steps 0 cert 8587961453/562949953421312 | fresh start Transpose steps 4 cert 8587961453/562949953421312 | words differ false
+   Contact { contact: 1, carry: 0 }: kept start Warm steps 0 cert 10989743/8796093022208 | fresh start Transpose steps 3 cert 50941/1073741824 | words differ true
+   face 0 cell 0: refine (0, 0, 4177/524288) fresh (0, 0, 4181/524288)
+   face 0 cell 1: refine (0, 0, 1313/262144) fresh (0, 0, 2649/524288)
+   face 0 cell 3: refine (-1, 15, 15741/262144) fresh (-1, 15, 15727/262144)
+   logits 0: largest |refine − fresh| = 7/131072
+   logits 1: largest |refine − fresh| = 0
+window 7: refine==kept true refine==fresh true cells(refine,fresh) equal true charts(refine)==charts(kept-read) true kept 7 fresh 5
+   Ring(0): kept start Warm steps 0 cert 8775/536870912 | fresh start Transpose steps 6 cert 8775/536870912 | words differ false
+   Ring(1): kept start Warm steps 0 cert 2092467/17592186044416 | fresh start Transpose steps 6 cert 639314573/35184372088832 | words differ true
+   Ring(2): kept start Warm steps 0 cert 1796257/4398046511104 | fresh start Transpose steps 6 cert 146737779/8796093022208 | words differ true
+   Contact { contact: 1, carry: 0 }: kept start Warm steps 0 cert 242011/8796093022208 | fresh start Transpose steps 4 cert 5373/274877906944 | words differ true
+window 8: refine==kept true refine==fresh true cells(refine,fresh) equal true charts(refine)==charts(kept-read) true kept 8 fresh 5
+   Ring(0): kept start Warm steps 0 cert 8775/536870912 | fresh start Transpose steps 6 cert 8775/536870912 | words differ false
+   Ring(1): kept start Warm steps 0 cert 30600203/35184372088832 | fresh start Transpose steps 6 cert 620230781/35184372088832 | words differ true
+   Ring(2): kept start Warm steps 0 cert 17061999/4398046511104 | fresh start Transpose steps 6 cert 34542607/2199023255552 | words differ true
+   Contact { contact: 0, carry: -52 }: kept start Warm steps 0 cert 36028797017718803/2361183241434822606848 | fresh start Transpose steps 4 cert 36028797017718803/2361183241434822606848 | words differ false
+   Contact { contact: 1, carry: 0 }: kept start Warm steps 0 cert 633821/4398046511104 | fresh start Transpose steps 4 cert 52803/2199023255552 | words differ true
+window 9: refine==kept true refine==fresh true cells(refine,fresh) equal true charts(refine)==charts(kept-read) true kept 8 fresh 5
+   Ring(0): kept start Warm steps 0 cert 8775/536870912 | fresh start Transpose steps 6 cert 8775/536870912 | words differ false
+   Ring(1): kept start Warm steps 0 cert 20191441/8796093022208 | fresh start Transpose steps 6 cert 612772035/35184372088832 | words differ true
+   Ring(2): kept start Warm steps 0 cert 6288599/2199023255552 | fresh start Transpose steps 6 cert 4369765/274877906944 | words differ true
+   Contact { contact: 0, carry: -10 }: kept start Warm steps 0 cert 31149731/2199023255552 | fresh start Transpose steps 4 cert 31149731/2199023255552 | words differ false
+   Contact { contact: 1, carry: 0 }: kept start Warm steps 0 cert 3599087/8796093022208 | fresh start Transpose steps 4 cert 179673/8796093022208 | words differ true
+window 10: refine==kept true refine==fresh true cells(refine,fresh) equal true charts(refine)==charts(kept-read) true kept 8 fresh 5
+   Ring(0): kept start Warm steps 0 cert 8775/536870912 | fresh start Transpose steps 6 cert 8775/536870912 | words differ false
+   Ring(1): kept start Warm steps 0 cert 699277555/35184372088832 | fresh start Transpose steps 6 cert 684492591/35184372088832 | words differ true
+   Ring(2): kept start Warm steps 0 cert 28012477/8796093022208 | fresh start Transpose steps 6 cert 33720501/2199023255552 | words differ true
+   Contact { contact: 0, carry: -52 }: kept start Warm steps 0 cert 36028797017718803/2361183241434822606848 | fresh start Transpose steps 4 cert 36028797017718803/2361183241434822606848 | words differ false
+   Contact { contact: 1, carry: 0 }: kept start Warm steps 0 cert 432835/549755813888 | fresh start Transpose steps 4 cert 221903/8796093022208 | words differ true
+window 11: refine==kept true refine==fresh true cells(refine,fresh) equal true charts(refine)==charts(kept-read) true kept 8 fresh 5
+   Ring(0): kept start Warm steps 0 cert 8775/536870912 | fresh start Transpose steps 6 cert 8775/536870912 | words differ false
+   Ring(1): kept start Warm steps 0 cert 98807271/35184372088832 | fresh start Transpose steps 6 cert 357410767/17592186044416 | words differ true
+   Ring(2): kept start Warm steps 0 cert 8363433/8796093022208 | fresh start Transpose steps 6 cert 559671/34359738368 | words differ true
+   Contact { contact: 0, carry: -52 }: kept start Warm steps 0 cert 36028797017718803/2361183241434822606848 | fresh start Transpose steps 4 cert 36028797017718803/2361183241434822606848 | words differ false
+   Contact { contact: 1, carry: 0 }: kept start Warm steps 0 cert 262076991/8796093022208 | fresh start Transpose steps 4 cert 2080309/8796093022208 | words differ true
+window 12: refine==kept true refine==fresh true cells(refine,fresh) equal true charts(refine)==charts(kept-read) true kept 8 fresh 5
+   Ring(0): kept start Warm steps 0 cert 8775/536870912 | fresh start Transpose steps 6 cert 8775/536870912 | words differ false
+   Ring(1): kept start Warm steps 0 cert 86629985/35184372088832 | fresh start Transpose steps 6 cert 684640193/35184372088832 | words differ true
+   Ring(2): kept start Warm steps 0 cert 6508193/8796093022208 | fresh start Transpose steps 6 cert 133159781/8796093022208 | words differ true
+   Contact { contact: 0, carry: -18 }: kept start Warm steps 0 cert 8587961453/562949953421312 | fresh start Transpose steps 4 cert 8587961453/562949953421312 | words differ false
+   Contact { contact: 1, carry: 0 }: kept start Warm steps 0 cert 29633621/2199023255552 | fresh start Transpose steps 4 cert 1141659/2199023255552 | words differ true
+window 13: refine==kept true refine==fresh true cells(refine,fresh) equal true charts(refine)==charts(kept-read) true kept 8 fresh 5
+   Ring(0): kept start Warm steps 0 cert 8775/536870912 | fresh start Transpose steps 6 cert 8775/536870912 | words differ false
+   Ring(1): kept start Warm steps 0 cert 19172417/35184372088832 | fresh start Transpose steps 6 cert 344701853/17592186044416 | words differ true
+   Ring(2): kept start Warm steps 0 cert 61051/549755813888 | fresh start Transpose steps 6 cert 71980623/4398046511104 | words differ true
+   Contact { contact: 0, carry: -52 }: kept start Warm steps 0 cert 36028797017718803/2361183241434822606848 | fresh start Transpose steps 4 cert 36028797017718803/2361183241434822606848 | words differ false
+   Contact { contact: 1, carry: 0 }: kept start Warm steps 0 cert 487785/274877906944 | fresh start Transpose steps 4 cert 2237573/8796093022208 | words differ true

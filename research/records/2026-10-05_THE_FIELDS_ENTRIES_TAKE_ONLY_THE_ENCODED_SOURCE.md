@@ -97,7 +97,7 @@ four ticks, where the folded chain reached `[3, 3, 1]` (class 3 fitting ring 1 a
 | `chart::a_deposit_moves_the_charts_by_warm_refinement` | (a), carrier | Its draws (material 26, cut 27) reach `2^129` on the period-4 chain; on the two-class chain they refine warm, every certificate at the target. |
 | `reference::the_chained_balance_closes_and_the_chain_is_dissipative` | (b) | Restated on the period-4 chain, which exercises the carry (reflected power positive): it closes, is dissipative and the lift only emits at all thirteen receptions. Retired: `work = −reflected` and the stronger reading at every reception, which held because no deposit moved a contact's storage on the folded chain (`work = deposition + ingest`); the honest chain's deposits move it. |
 | `prior_carry::at_rest_the_cards_chain_holds_its_prior_and_under_the_carry_it_moves` | (b) | Restated as `at_rest_a_map_that_never_leaves_zero_holds_its_prior` on the two-class chain: every read holds `k = 6` for want of curvature. Retired: "under the carry the same cut moves the prior", a fact of the folded fixture's magnitudes (two-class chain: 19 reads under the carry, none moved; period-4 chain: the map leaves zero at rest). |
-| `reference::the_carry_passes_each_receptions_end_to_the_next` | (c) | Defect, below. |
+| `reference::the_carry_passes_each_receptions_end_to_the_next` | (c) | Defect, below; its cause located and the claim restated (§2a). |
 
 Carrier verdict: the three overflows are fixtures larger than their claims need. None of these claims
 is about the carrier, and each holds on the two-class chain, whose quadrances are the folded chain's.
@@ -114,6 +114,71 @@ So the saved carry's cold continuation (fresh charts) is not exact where the war
 the lattice word's faces depend on the charts' history. The test stays failing under `#[ignore]`
 with the defect named, routed to its owner. The two-class chain does not reach it (and there the
 carry moves no read, so it would not test the claim).
+
+## 2a. The defect's cause: the carry is not the whole state the word reads
+
+[measured] On the period-4 chain under `Carry(Nothing)`, over the 14 receptions, the word read on
+the resident's **kept charts as saved and read back** (`Charts::write`, `Charts::read`) equals the
+refine at every reception. On fresh charts it equals the refine at 13 of 14, and window 6 separates.
+At window 6 three operators a deposit moved (`ring 1`, `ring 2`, `contact 1` at conductance carry 0)
+keep their charts warm with **no step**, each certificate already within the target. Ring 1's, for
+example, is `19/2^31` against the moved operator. The cold start from the scaled transpose reaches
+another lattice point in 6 steps (ring 1: `586809557/2^45`). Both are within the target, and they
+are different representatives. The faces agree on every grain cell `(carry, phase)` at every
+reception. At window 6 the fibres differ (face 0: `4177/2^19` against `4181/2^19`,
+`2626/2^19` against `2649/2^19`, `15741/2^18` against `15727/2^18`), and the largest logit
+difference is `7/2^17`. From window 7 on the charts still differ but the reads coincide.
+
+[definition; agent-inferred] **The cause** is the test's claim, not the saved state.
+- A word is a function of the pending ratio's operands, the published constitution **and the kept
+  charts** (`hnn/reference.rs:29`). `chart::refine` keeps a warm chart whose certificate is at most
+  `1/2` (`hnn/chart.rs:684`, `:687`) and refines only while it is above the target (`:705`), so after
+  a deposit the kept chart is history: a function of its operator only through its certificate
+  (`Charts`'s own doc).
+- The test read the word on `Charts::new()` (`hnn/tests/reference.rs:822` at `c0275dd0`), and it
+  and `Reference::mount_carried`'s doc called the saved carry "the carried state whole". The carry
+  is the carried end only. `mount_carried` mounts through `mount_with` on no chart
+  (`hnn/reference.rs:1035`, `:1069`).
+- The whole state carries the kept charts. The resident's passage writes them
+  (`hnn/reference/passage.rs:59`), `mount_continued` restores them (`passage.rs:162`), and a cold
+  restore of `Resident::continuing_state` is exact at every reception, window 6 included.
+  Dropping them at restore (a mutation at `passage.rs:162`, reverted) separates the restored
+  refine at window 6 exactly. So retention holds: the charts are an operand the admitted future
+  reads, a probe separates them, and the quotient keeps them.
+- Hypothesis (a) of the brief (the charts missing from the continuing state) is refuted by the
+  passage.
+- Hypothesis (b) names the mechanism (two certified representatives), but comparing at the grain
+  is not the law. Two reads each within `1/(2L_R)` of the exact word can straddle a cell, and that
+  bound's counterfactual part is owed in #62. The law is exact equality on the kept charts.
+
+[definition; agent-inferred] **The restatement.**
+- `the_carry_passes_each_receptions_end_to_the_next` reads the word on the carry and the kept
+  charts, each round-tripped through its text, exactly. It counts the fresh-chart read as the probe
+  that separates the charts (at least once). Its at-rest comparison reads on the same kept charts,
+  so `moved` counts the carry's motion alone.
+- The new `a_cold_restore_continues_the_carry_chain_where_the_kept_charts_have_moved` saves the
+  whole state before every reception, mounts it cold on a fresh founding constitution and runs
+  refine, compare and deposit in lockstep with the uninterrupted resident. Faces, compare,
+  deposit, constitution, carry and charts are all equal at all 14 receptions. Before it,
+  `a_saved_passage_continues_at_its_epoch_as_the_whole_run` saved at window 4, where the kept
+  charts were still the cold ones, and would not have caught a dropped chart.
+- `Reference::mount_carried` (and the card's) is documented as the narrower remount, exact only
+  where every kept chart is its operator's cold chart.
+- `a_collapsed_constitution_remounts_and_reads_alike` states that hypothesis and reads it: every
+  chart the remount's word read is the resident's at its key, through the new reading
+  `Charts::keys`. The resident also keeps contact 0's chart at conductance carry 0, which that word
+  does not read.
+
+[measured] Receipts (`…_receipts/cold-carry/`), at the worktree's own target with a thread budget
+of 8, run in sequence because they share the target's lock:
+- the diagnostic's per-reception chart readings;
+- gate 1, `bash tools/gate.sh`: check, guard lints and guard doctests all ok (10,531, 14,269 and
+  17,748 ms), 42,591 ms wall against a 900 s deadline, peak resident set 1,661,176 KiB;
+- `cargo test -p holonics --lib`: 1,008 passed, 0 failed, 0 ignored, 235,237 ms wall. It was
+  projected at about 350 s from §3's 212,410 ms at 12 threads, so measured over projected is
+  `235,237/350,000`, against a 600 s deadline; peak resident set 1,267,848 KiB;
+- `cargo test -p holonics --test resident_cold_restore`: 4 passed, 15,478 ms wall against a
+  300 s deadline; peak resident set 1,873,320 KiB.
 
 ## 3. Gates and receipts
 
