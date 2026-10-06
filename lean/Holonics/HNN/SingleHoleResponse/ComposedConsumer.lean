@@ -151,56 +151,31 @@ theorem normalizedSource_loadedWord_grain_singleton_release
           (anchor + response c) ticks) := by
         rw [absoluteLoaded_response_add, map_add]
   have hfaceAdd (c : Label) := congrArg grainCell (hread c)
-  have hreadingFull : (fun c j => score (grainCell (receiver (trajectoryAt
-      (absoluteLoadedFamily T res h openedAt) (openComplete c) ticks)) j)) = reading := by
+  -- Share the actual completed receiver/score term once. This proof-only expression sharing
+  -- preserves the source/clock/grain operands and consumes their existing accepted owners.
+  let fullValue (c : Label) := receiver (trajectoryAt
+    (absoluteLoadedFamily T res h openedAt) (openComplete c) ticks)
+  let fullReading (c : Label) (j : Class) := score (grainCell (fullValue c)) j
+  have hreadingFull : fullReading = reading := by
     rw [hreading]
     funext c j
+    dsimp [fullReading, fullValue]
     exact congrArg (fun z => score (grainCell z) j) (hcomputed c)
-  have hunionFull : exactLeaderUnion
-      (fun c => score (grainCell (receiver (trajectoryAt
-        (absoluteLoadedFamily T res h openedAt) (openComplete c) ticks)))) greatest compatible =
-      {winner} := by
+  have hunionFull : exactLeaderUnion fullReading greatest compatible = {winner} := by
     rw [hreadingFull]
     exact hunion
   have hmaximumFull : ∀ c ∈ compatible,
-      (∀ j, score (grainCell (receiver (trajectoryAt
-        (absoluteLoadedFamily T res h openedAt) (openComplete c) ticks)) j) ≤ greatest c) ∧
-      ∃ j, score (grainCell (receiver (trajectoryAt
-        (absoluteLoadedFamily T res h openedAt) (openComplete c) ticks)) j) = greatest c := by
-    intro c hc
-    have hrc : (fun j => score (grainCell (receiver (trajectoryAt
-        (absoluteLoadedFamily T res h openedAt) (openComplete c) ticks)) j)) = reading c :=
-      congrFun hreadingFull c
-    rcases hmaximum c hc with ⟨hle, hex⟩
-    constructor
-    · intro j
-      rw [congrFun hrc j]
-      exact hle j
-    · obtain ⟨j, hj⟩ := hex
-      exact ⟨j, by rw [congrFun hrc j]; exact hj⟩
-  have hemitsFull : ∀ c ∈ compatible, emit c ∈ exactLeaders
-      (fun j => score (grainCell (receiver (trajectoryAt
-        (absoluteLoadedFamily T res h openedAt) (openComplete c) ticks)) j)) (greatest c) := by
-    intro c hc
-    have hrc : (fun j => score (grainCell (receiver (trajectoryAt
-        (absoluteLoadedFamily T res h openedAt) (openComplete c) ticks)) j)) = reading c :=
-      congrFun hreadingFull c
-    change emit c ∈ Finset.univ.filter
-      (fun j => score (grainCell (receiver (trajectoryAt
-        (absoluteLoadedFamily T res h openedAt) (openComplete c) ticks)) j) = greatest c)
-    rw [Finset.mem_filter]
-    constructor
-    · exact Finset.mem_univ _
-    · rw [congrFun hrc (emit c)]
-      exact (Finset.mem_filter.mp (hemits c hc)).2
-  have hsound := exactLeaderUnion_sound
-    (fun c => score (grainCell (receiver (trajectoryAt
-      (absoluteLoadedFamily T res h openedAt) (openComplete c) ticks)))) greatest compatible
-    hmaximumFull
+      (∀ j, fullReading c j ≤ greatest c) ∧
+      ∃ j, fullReading c j = greatest c := by
+    rw [hreadingFull]
+    exact hmaximum
+  have hemitsFull : ∀ c ∈ compatible,
+      emit c ∈ exactLeaders (fullReading c) (greatest c) := by
+    rw [hreadingFull]
+    exact hemits
+  have hsound := exactLeaderUnion_sound fullReading greatest compatible hmaximumFull
   have hfromSound (c : Label) (hc : c ∈ compatible) :
-      emit c ∈ exactLeaderUnion
-        (fun x => score (grainCell (receiver (trajectoryAt
-          (absoluteLoadedFamily T res h openedAt) (openComplete x) ticks)))) greatest compatible := by
+      emit c ∈ exactLeaderUnion fullReading greatest compatible := by
     apply (hsound (emit c)).2
     refine ⟨c, hc, (hmaximumFull c hc).1, ?_⟩
     exact (Finset.mem_filter.mp (hemitsFull c hc)).2
