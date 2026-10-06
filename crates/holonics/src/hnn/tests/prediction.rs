@@ -2757,6 +2757,141 @@ mod physical_repair {
             .with_ports(0, None, None, Some(receiving)).unwrap()
     }
 
+    /// Two bounded actual receiving comparisons break R's initial zero symmetry. Pair outputs
+    /// and their declared read factors remain the default material. No calibrated R is supplied.
+    fn pair_teaching_opening(field: &Field) -> (Constitution, crate::hnn::word::ReceptionCarry) {
+        let current = Current::at_rest(field);
+        let mut material = Constitution::initial(field, CAMPAIGN_ONE_BUDGET).unwrap();
+        let mut opening = WordOpening::Rest;
+        let mut carry = None;
+        for observed in [[0, 2], [1, 1]] {
+            let observed = crate::hnn::tests::support::encoded(field, &observed);
+            let damaged = DamagedSection::damage(&observed, &[1]).unwrap();
+            let phases = ReceivingPhases::declare(field, &material, &current, &section(2)).unwrap();
+            let pending = crate::hnn::prediction::predict_by_field(field, &material, &current,
+                &damaged, &opening, &phases).unwrap();
+            println!("pair consumer R opening: blind whole cells {:?}; actual logits {:?}",
+                pending.prediction().cells,
+                pending.prediction().reads.iter().map(|r| &r.read.logits).collect::<Vec<_>>());
+            let taught = pending.observe(&material, &observed, &[false, true]).unwrap();
+            assert!(taught.constitution.pair_port(0, 1).unwrap().outputs().iter().flatten().all(Zero::is_zero));
+            let reached = taught.prediction.carry;
+            opening = WordOpening::Received { carry: reached.clone(), absorption: Absorption::Nothing };
+            carry = Some(reached);
+            material = taught.constitution;
+        }
+        (material, carry.unwrap())
+    }
+
+    #[test]
+    fn the_observed_pair_outputs_change_the_next_target_free_source_conditioned_word() {
+        use crate::hnn::prediction::predict_by_field;
+        let field = field_with_lock_and_offsets((0..8).collect(), vec![1]);
+        let current = Current::at_rest(&field);
+        let (before, entering) = pair_teaching_opening(&field);
+        let observed = crate::hnn::tests::support::encoded(&field, &[0, 1, 2]);
+        let opposite = crate::hnn::tests::support::encoded(&field, &[0, 1, 1]);
+        let damaged = DamagedSection::damage(&observed, &[2]).unwrap();
+        assert_eq!(damaged, DamagedSection::damage(&opposite, &[2]).unwrap());
+        let phases = ReceivingPhases::declare(&field, &before, &current, &section(3)).unwrap();
+        let opening = WordOpening::Received { carry: entering, absorption: Absorption::Nothing };
+        let no_deposit = predict_by_field(&field, &before, &current, &damaged, &opening, &phases).unwrap().finish();
+        let plus = predict_by_field(&field, &before, &current, &damaged, &opening, &phases).unwrap()
+            .observe_pair_outputs(&before, &observed, &[false, false, true]).unwrap();
+        let minus = predict_by_field(&field, &before, &current, &damaged, &opening, &phases).unwrap()
+            .observe_pair_outputs(&before, &opposite, &[false, false, true]).unwrap();
+        let ignored = crate::hnn::tests::support::encoded(&field, &[3, 3, 2]);
+        let equivalent = predict_by_field(&field, &before, &current, &damaged, &opening, &phases).unwrap()
+            .observe_pair_outputs(&before, &ignored, &[false, false, true]).unwrap();
+        assert_eq!(equivalent.constitution, plus.constitution, "uncompared teacher cells supply no pair statistic");
+        assert_eq!(plus.prediction, no_deposit);
+        assert_eq!(minus.prediction, no_deposit);
+        let old = before.pair_port(0, 1).unwrap();
+        let learned = plus.constitution.pair_port(0, 1).unwrap();
+        assert_ne!(learned.outputs(), old.outputs());
+        assert_ne!(learned.outputs(), minus.constitution.pair_port(0, 1).unwrap().outputs());
+        assert_eq!(learned.current_reads(), old.current_reads());
+        assert_eq!(learned.earlier_reads(), old.earlier_reads());
+        assert_eq!(plus.constitution.source_port(0), before.source_port(0));
+        assert_eq!(plus.constitution.receiving_map(0), before.receiving_map(0));
+        assert_eq!(plus.constitution.commit(), before.commit()+1);
+        let applied = plus.source_certificate.as_ref().unwrap();
+        assert_eq!(applied.sources.len(), 1);
+        assert!(applied.sources[0].moves > Rat::zero() && applied.joint.holds());
+        // A matched forward checks the applied source gain and adjoint against actual logit moves.
+        let matched = repair_by_field(&field, &plus.constitution, &current, &damaged, &opening, &phases).unwrap();
+        let gradient = plus.ratio.covector().unwrap();
+        let deltas: Vec<Vec<Rat>> = matched.reads.iter().zip(&no_deposit.reads)
+            .map(|(new, old)| new.read.logits.iter().zip(&old.read.logits).map(|(n,o)| n-o).collect()).collect();
+        let paired: Rat = gradient.logits().iter().zip(&deltas)
+            .map(|(g,d)| g.iter().zip(d).map(|(g,d)| g*d).sum::<Rat>()).sum();
+        assert_eq!(-paired, applied.sources[0].alignment);
+        let logit_move: Rat = deltas[2].iter().map(|v| v*v).sum();
+        assert!(logit_move <= &applied.sources[0].gain * &applied.sources[0].moves);
+        println!("actual learned pair outputs: before {:?}; after {:?}; opposite {:?}; applied joint {:?}; matched logit moves {}",
+            old.outputs(), learned.outputs(), minus.constitution.pair_port(0,1).unwrap().outputs(), applied.joint, logit_move);
+        // Independent target-free probes: same-phase intact swaps have equal first-only moments.
+        // They ask no expected class. All material stages use the identical reached blind carry.
+        let mut left = vec![2; 9]; left[0]=0; left[8]=1;
+        let mut right=left.clone(); right.swap(0,8);
+        let left = DamagedSection::damage(&crate::hnn::tests::support::encoded(&field,&left), &[1]).unwrap();
+        let right = DamagedSection::damage(&crate::hnn::tests::support::encoded(&field,&right), &[1]).unwrap();
+        let source = SourceMoment::open_with(&field, &current, &before).unwrap();
+        assert_eq!(source.continued(&field,&current,0,&left.placed()).unwrap(),
+            source.continued(&field,&current,0,&right.placed()).unwrap());
+        let probe_phases = ReceivingPhases::declare(&field,&before,&current,&section(2)).unwrap();
+        let carried = WordOpening::Received { carry: no_deposit.carry.clone(), absorption: Absorption::Nothing };
+        let mut images=Vec::new();
+        for (label, material) in [("no-deposit",&before),("observed",&plus.constitution),("opposite-observation",&minus.constitution)] {
+            let mut reads=Vec::new();
+            for (source_label, source) in [("left",&left),("right",&right)] {
+                let repair = repair_by_field(&field,material,&current,source,&carried,&probe_phases).unwrap();
+                assert!(repair.opening.closes() && repair.word.closes());
+                assert!(repair.balances.iter().all(|b| b.closes()));
+                println!("learned-pair target-free {label}/{source_label}: actual intact source {:?}; whole cells {:?}; leaders {:?}; complex logits {:?}; carry tick {}",
+                    source.placed(), repair.cells, repair.reads.iter().map(|read| read.leaders()).collect::<Vec<_>>(),
+                    repair.reads.iter().map(|r| &r.read.logits).collect::<Vec<_>>(), repair.carry.change.ticks);
+                reads.push(repair.reads);
+            }
+            images.push(reads);
+        }
+        assert_eq!(images[0][0],images[0][1], "default zero pair outputs preserve the first-marginal alias");
+        assert_ne!(images[1][0],images[1][1], "the learned pair outputs distinguish actual source arrangements");
+        assert_ne!(images[1],images[0]);
+        assert_ne!(images[1],images[2]);
+    }
+
+    #[test]
+    fn pair_output_teaching_refuses_absent_comparisons_zero_returns_and_uncertified_quartics() {
+        use crate::hnn::prediction::predict_by_field;
+        let field=field_with_lock_and_offsets((0..8).collect(),vec![1]);
+        let current=Current::at_rest(&field);
+        let observed=crate::hnn::tests::support::encoded(&field,&[0,1,2]);
+        let damaged=DamagedSection::damage(&observed,&[2]).unwrap();
+        for (material, compared, expected) in [
+            (Constitution::initial(&field,CAMPAIGN_ONE_BUDGET).unwrap(), [false,false,false], "no observation crosses"),
+            (Constitution::initial(&field,CAMPAIGN_ONE_BUDGET).unwrap(), [false,false,true], "no nonzero sample"),
+            (quartic_material(&field), [false,false,true], "Word-Hessian certificate"),
+        ] {
+            let phases=ReceivingPhases::declare(&field,&material,&current,&section(3)).unwrap();
+            let pending=predict_by_field(&field,&material,&current,&damaged,&WordOpening::Rest,&phases).unwrap();
+            let blind=pending.prediction().clone();
+            let refusal=pending.observe_pair_outputs(&material,&observed,&compared).unwrap_err();
+            assert_eq!(refusal.prediction,blind);
+            assert!(matches!(refusal.error,crate::hnn::HnnError::Unadmitted{reason} if reason.contains(expected)));
+            assert_eq!(material.commit(),0);
+        }
+        let (material, carry) = pair_teaching_opening(&field);
+        let no_edge=DamagedSection::damage(&observed,&[1]).unwrap();
+        let phases=ReceivingPhases::declare(&field,&material,&current,&section(3)).unwrap();
+        let opening=WordOpening::Received{carry,absorption:Absorption::Nothing};
+        let pending=predict_by_field(&field,&material,&current,&no_edge,&opening,&phases).unwrap();
+        let blind=pending.prediction().clone();
+        let refusal=pending.observe_pair_outputs(&material,&observed,&[false,true,false]).unwrap_err();
+        assert_eq!(refusal.prediction,blind);
+        assert!(matches!(refusal.error,crate::hnn::HnnError::Unadmitted{reason} if reason.contains("no nonzero sample")));
+    }
+
     #[test]
     fn the_station_pair_source_preserves_actual_offsets_and_refuses_a_reused_opening() {
         let field = field_with_lock_and_offsets((0..8).collect(), vec![1, 2]);

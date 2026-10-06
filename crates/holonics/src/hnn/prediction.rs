@@ -2008,7 +2008,7 @@ fn physical_word_is_exact(operands: &crate::hnn::propagation::Operands) -> bool 
         })
 }
 
-/// All physical forward relations except the selected E maps stay fixed. The field/current and
+/// All physical forward relations except the selected source relations stay fixed. The field/current and
 /// imposition are the same borrowed operands. FieldMaterial exposes E's map, never its normal-law
 /// carried remainder; SourceMoment::open_storage consumes precisely that view.
 fn physical_source_only_change(
@@ -2016,6 +2016,7 @@ fn physical_source_only_change(
     before: &dyn FieldMaterial,
     after: &dyn FieldMaterial,
     selected: &[crate::hnn::constitution::Locus],
+    selected_pairs: &[(usize, usize)],
 ) -> bool {
     use crate::hnn::constitution::Locus;
     field.rings().iter().enumerate().all(|(ring, _)| {
@@ -2029,7 +2030,16 @@ fn physical_source_only_change(
             && (selected.contains(&Locus::SourcePort(ring))
                 || before.source_port(ring) == after.source_port(ring))
             && field.offsets().iter().all(|&offset| {
-                before.pair_port(ring, offset) == after.pair_port(ring, offset)
+                let old = before.pair_port(ring, offset);
+                let new = after.pair_port(ring, offset);
+                if selected_pairs.contains(&(ring, offset)) {
+                    old.zip(new).is_some_and(|(old, new)| {
+                        old.current_reads() == new.current_reads()
+                            && old.earlier_reads() == new.earlier_reads()
+                    })
+                } else {
+                    old == new
+                }
             })
     }) && field.contacts().iter().enumerate().all(|(contact, _)| {
         before.contact_storage(contact) == after.contact_storage(contact)
@@ -2039,6 +2049,69 @@ fn physical_source_only_change(
                 == after.contact_stiffness_signature(contact)
             && before.contact_surface_storage(contact) == after.contact_surface_storage(contact)
     })
+}
+
+/// Read the applied output-row move on the same pair tables that produced the source.
+/// The read factors are fixed by the caller's executable other-relation check, hence this is
+/// the actual affine output difference, including any budgeted output carry/release.
+fn physical_pair_output_certificate(
+    field: &Field,
+    before: &dyn FieldMaterial,
+    after: &dyn FieldMaterial,
+    source: &SourceMoment,
+    steps: &[crate::hnn::constitution::FactorStep],
+    publication: &crate::hnn::constitution::DepositReading,
+) -> Result<PhysicalSourceCertificate, HnnError> {
+    use crate::hnn::constitution::{FactorGradient, Family, Locus};
+    let mut groups = std::collections::BTreeMap::<usize, Vec<_>>::new();
+    for step in steps {
+        let FactorGradient::PairPort { ring, offset, outputs, .. } = &step.gradient else {
+            return Err(HnnError::Unadmitted {
+                reason: "the pair-output certificate contains another factor relation",
+            });
+        };
+        groups.entry(*ring).or_default().push((*offset, outputs));
+    }
+    let mut sources = Vec::new();
+    for (ring, pairs) in groups {
+        let geometry = field.ring(ring);
+        let mut by_phase = vec![vec![Rat::zero(); geometry.width()]; geometry.placements().len()];
+        let (mut alignment, mut gain) = (Rat::zero(), Rat::zero());
+        for (offset, gradient) in pairs {
+            let old = before.pair_port(ring, offset).ok_or(HnnError::MissingSourcePort { ring })?;
+            let new = after.pair_port(ring, offset).ok_or(HnnError::MissingSourcePort { ring })?;
+            alignment += gradient.iter().flatten()
+                .zip(old.outputs().iter().flatten().zip(new.outputs().iter().flatten()))
+                .map(|(g, (old, new))| g * (new - old)).sum::<Rat>();
+            let reading = publication.steps.iter().find(|(at, read)| {
+                *at == Locus::SourcePort(ring) && read.family == Family::Pair(offset)
+            }).ok_or(HnnError::Unadmitted {
+                reason: "the pair-output successor has no physical source gain reading",
+            })?;
+            gain = gain.max(reading.1.gain.clone());
+            if let Some(table) = source.offset_table(field, ring, offset)? {
+                for (phase, moved) in by_phase.iter_mut().enumerate() {
+                    let old = old.apply_table(&table, phase, field.alphabet(), geometry.width());
+                    let new = new.apply_table(&table, phase, field.alphabet(), geometry.width());
+                    for (value, (old, new)) in moved.iter_mut().zip(old.iter().zip(new)) {
+                        *value += new - old;
+                    }
+                }
+            }
+        }
+        let moves: Rat = by_phase.iter().flatten().map(|value| value * value).sum();
+        let bound = crate::holon::deposition::root_ceiling(&(&gain * &moves));
+        sources.push(PhysicalSourceMove { ring, alignment, moves, gain, bound });
+    }
+    let one = Rat::one();
+    let joint = crate::holon::deposition::JointReading::read(&crate::ratio::rat(1, 2),
+        sources.iter().map(|source| (&one, &source.alignment, &source.bound)));
+    if !joint.holds() {
+        return Err(HnnError::Unadmitted {
+            reason: "the actual carried pair-output move fails its physical joint-step certificate",
+        });
+    }
+    Ok(PhysicalSourceCertificate { sources, joint })
 }
 
 /// The box is derived, never chosen: complete every missing station with any admitted class,
@@ -2586,7 +2659,7 @@ pub struct PhysicalTeaching {
     pub pullback: crate::hnn::port::Pullback,
     pub constitution: crate::hnn::constitution::Constitution,
     pub publication: crate::hnn::constitution::DepositReading,
-    /// The source consumer's certificate of the applied map, including map-carry corrections.
+    /// The source consumer's certificate of its applied relation, including carried corrections.
     /// The normal publication's step readings describe its proposed ray separately.
     pub source_certificate: Option<PhysicalSourceCertificate>,
 }
@@ -2601,7 +2674,7 @@ pub struct PhysicalSourceMove {
     pub bound: Rat,
 }
 
-/// The existing joint-step law evaluated on the actual carried E maps, with R and the exact
+/// The existing joint-step law evaluated on the actual carried E maps or pair outputs, with R and the exact
 /// linear Word fixed. A refused certificate publishes no successor and retains the blind carry.
 #[derive(Debug)]
 pub struct PhysicalSourceCertificate {
@@ -2622,6 +2695,7 @@ pub struct PhysicalTeachingRefusal {
 enum PhysicalLearning {
     Receiving,
     SourcePorts,
+    PairOutputs,
 }
 
 impl PhysicalPrediction<'_, '_> {
@@ -2696,6 +2770,23 @@ impl PhysicalPrediction<'_, '_> {
         )
     }
 
+    /// A declared comparison changes the reached pair outputs through the same blind Word.
+    /// The existing current/earlier reads, first source E, R and internal physical laws stay fixed.
+    /// For each declared offset the supported relation is affine in its output rows:
+    /// `delta_source_c = sum_rho delta_e_rho * a_rho^T C_c b_rho` with the actual normalized table.
+    /// The general pair FactorStep supplies its carried metric, source gain and certified ray;
+    /// zero directions constrain the two read factors. No output calibration is installed.
+    /// The actual carried output difference must also satisfy the existing joint-step law.
+    /// Rounded Words and reached quartics still refuse: their source-ray certificate is owed #62.
+    pub fn observe_pair_outputs(
+        self,
+        contemporary: &crate::hnn::constitution::Constitution,
+        observed: &Encoded,
+        compared: &[bool],
+    ) -> Result<PhysicalTeaching, PhysicalTeachingRefusal> {
+        self.observe_at(contemporary, observed, compared, PhysicalLearning::PairOutputs)
+    }
+
     fn observe_at(
         self,
         contemporary: &crate::hnn::constitution::Constitution,
@@ -2703,7 +2794,7 @@ impl PhysicalPrediction<'_, '_> {
         compared: &[bool],
         learning: PhysicalLearning,
     ) -> Result<PhysicalTeaching, PhysicalTeachingRefusal> {
-        use crate::hnn::constitution::{LinearLocus, Locus, Reach};
+        use crate::hnn::constitution::{FactorGradient, LinearLocus, Locus, Reach};
         use crate::hnn::port::Deposit;
         use crate::hnn::ratio::{Faces, HolonRatio, target_phases};
         use crate::hnn::retention::Diamond;
@@ -2755,10 +2846,14 @@ impl PhysicalPrediction<'_, '_> {
             }
             let diamond = Diamond::opened(field, &phases, &opening_support);
             let full_reach = diamond.retained(field);
-            if learning == PhysicalLearning::SourcePorts {
+            if learning != PhysicalLearning::Receiving {
                 if !physical_word_is_exact(word.operands()) {
                     return Err(HnnError::Unadmitted {
-                        reason: "source-port learning has no certificate through a rounded Word",
+                        reason: if learning == PhysicalLearning::SourcePorts {
+                            "source-port learning has no certificate through a rounded Word"
+                        } else {
+                            "pair-output learning has no certificate through a rounded Word"
+                        },
                     });
                 }
                 if field.rings().iter().enumerate().any(|(ring, _)| {
@@ -2768,7 +2863,11 @@ impl PhysicalPrediction<'_, '_> {
                             .is_some_and(|law| law.saturation().is_some())
                 }) {
                     return Err(HnnError::Unadmitted {
-                        reason: "source-port learning through a reached quartic needs the Word-Hessian certificate",
+                        reason: if learning == PhysicalLearning::SourcePorts {
+                            "source-port learning through a reached quartic needs the Word-Hessian certificate"
+                        } else {
+                            "pair-output learning through a reached quartic needs the Word-Hessian certificate"
+                        },
                     });
                 }
             }
@@ -2805,6 +2904,22 @@ impl PhysicalPrediction<'_, '_> {
                 &source,
                 &back,
             )?;
+            let mut factors = Vec::new();
+            if learning == PhysicalLearning::PairOutputs {
+                for mut step in composed.factors {
+                    if let FactorGradient::PairPort { outputs, current, earlier, .. } = &mut step.gradient {
+                        if step.energy.is_zero() || outputs.iter().flatten().all(Zero::is_zero) {
+                            continue;
+                        }
+                        // The chosen general subfamily changes output rows only. A comparison-free
+                        // read-factor direction contributes neither a move nor a fabricated gradient.
+                        for value in current.iter_mut().chain(earlier.iter_mut()).flatten() {
+                            *value = Rat::zero();
+                        }
+                        factors.push(step);
+                    }
+                }
+            }
             let mut linear: Vec<_> = composed
                 .linear
                 .into_iter()
@@ -2815,6 +2930,7 @@ impl PhysicalPrediction<'_, '_> {
                     PhysicalLearning::SourcePorts => {
                         matches!(step.locus, LinearLocus::SourcePort(_))
                     }
+                    PhysicalLearning::PairOutputs => false,
                 })
                 .collect();
             match learning {
@@ -2848,8 +2964,11 @@ impl PhysicalPrediction<'_, '_> {
                     }
                     linear.retain(|step| !step.samples.is_empty());
                 }
+                PhysicalLearning::PairOutputs => {}
             }
-            let reached: Vec<_> = linear.iter().map(|step| step.locus.locus()).collect();
+            let reached: Vec<_> = linear.iter().map(|step| step.locus.locus())
+                .chain(factors.iter().map(|step| step.gradient.locus()))
+                .collect::<std::collections::BTreeSet<_>>().into_iter().collect();
             if reached.is_empty()
                 || reached
                     .iter()
@@ -2870,14 +2989,14 @@ impl PhysicalPrediction<'_, '_> {
                 phases: composed.phases,
                 loci: match learning {
                     PhysicalLearning::Receiving => reached.iter().copied().collect(),
-                    PhysicalLearning::SourcePorts => full_reach,
+                    PhysicalLearning::SourcePorts | PhysicalLearning::PairOutputs => full_reach,
                 },
             };
             let deposit =
-                Deposit::new(material.commit(), linear, Vec::new(), reached).with_reach(reach);
+                Deposit::new(material.commit(), linear, factors, reached).with_reach(reach);
             let (constitution, publication) = contemporary.deposited(&deposit)?;
             let source_certificate = if learning == PhysicalLearning::SourcePorts {
-                if !physical_source_only_change(field, material, &constitution, &publication.loci)
+                if !physical_source_only_change(field, material, &constitution, &publication.loci, &[])
                     || material.released() != constitution.released()
                     || material.storage_product() != constitution.storage_product()
                 {
@@ -2942,6 +3061,23 @@ impl PhysicalPrediction<'_, '_> {
                     });
                 }
                 Some(PhysicalSourceCertificate { sources, joint })
+            } else if learning == PhysicalLearning::PairOutputs {
+                let selected: Vec<_> = deposit.factors().iter().filter_map(|step| {
+                    match &step.gradient {
+                        FactorGradient::PairPort { ring, offset, .. } => Some((*ring, *offset)),
+                        _ => None,
+                    }
+                }).collect();
+                if !physical_source_only_change(field, material, &constitution, &[], &selected)
+                    || material.released() != constitution.released()
+                    || material.storage_product() != constitution.storage_product()
+                {
+                    return Err(HnnError::Unadmitted {
+                        reason: "the physical pair-output successor changes another forward relation",
+                    });
+                }
+                Some(physical_pair_output_certificate(field, material, &constitution,
+                    &source, deposit.factors(), &publication)?)
             } else {
                 None
             };
