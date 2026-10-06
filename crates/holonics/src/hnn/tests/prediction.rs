@@ -2850,7 +2850,7 @@ mod physical_repair {
                 assert!(repair.balances.iter().all(|b| b.closes()));
                 println!("learned-pair target-free {label}/{source_label}: actual intact source {:?}; whole cells {:?}; leaders {:?}; complex logits {:?}; carry tick {}",
                     source.placed(), repair.cells, repair.reads.iter().map(|read| read.leaders()).collect::<Vec<_>>(),
-                    repair.reads.iter().map(|r| &r.read.logits).collect::<Vec<_>>(), repair.carry.change.ticks);
+                    repair.reads.iter().map(|r| &r.read.logits).collect::<Vec<_>>(), repair.carry.ticks);
                 reads.push(repair.reads);
             }
             images.push(reads);
