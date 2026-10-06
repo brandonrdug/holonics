@@ -23,9 +23,9 @@
 //!   carrier lattice `2^(−L_ℓ)ℤ` of
 //!   every learned locus
 //!   ([`FieldDeclaration::lattice_by_rule`]). [`Field::declare`] computes the identity route's
-//!   capacity `n*` by counting and refuses a declared population shorter than it (guard 1; the
-//!   located route's certificate is owed, refs #62: `hnn::moment`, "The located route's capacity
-//!   is owed"), and declares the word's
+//!   capacity `n*` by counting and refuses a declared population shorter than it (guard 1), carries
+//!   the located clock's certificate beside it ([`Field::capacity_for`]; `hnn::moment`, "The
+//!   capacity on an admitted clock"), and declares the word's
 //!   precisions by rule ([`Field::word_lattice`], [`crate::hnn::WordLattice::by_rule`], the lattice word):
 //!   the certificate's target `2^(−D_c)`, the charts' lattice `L_c = 2D_c` and the transients'
 //!   lattice `L_w`, from the finest receiver grain, the receiving fan-in, the widest local solve
@@ -115,7 +115,7 @@ use crate::hnn::HnnError;
 use crate::hnn::chart::WordLattice;
 use crate::hnn::constitution::{Lattice, Locus};
 use crate::hnn::encoding::Encoded;
-use crate::hnn::moment::{Capacity, PairPort, capacity};
+use crate::hnn::moment::{Capacity, PairPort, capacity, capacity_located};
 #[cfg(test)]
 use crate::holarchy::GluingDefect;
 use crate::holarchy::{Gluing, Holarchy};
@@ -1041,6 +1041,8 @@ pub struct Field {
     crib: CribDeclaration,
     population: u64,
     capacity: Capacity,
+    /// The located clock's certificate (`rate_g = d_g`), derived once at the declaration.
+    located_capacity: Capacity,
     distances: Vec<Vec<Option<usize>>>,
     lattices: BTreeMap<Locus, Lattice>,
     /// The word's declared precisions by rule ([`WordLattice::by_rule`]); `None` only for the
@@ -1051,10 +1053,11 @@ pub struct Field {
 impl Field {
     /// **Declare a field**: every ring and contact checked, the complex built with `∂∘∂ = 0`, one
     /// exponent per contact on its lattice `(2q_Q/L)ℤ`, every ring reached from a source ring, and
-    /// the identity route's capacity `n*` counted, refusing a population shorter than it. The
-    /// refusal certifies a lossy moment for identity-route cells only; a located source's
-    /// certificate is owed (refs #62), and its moment refuses the reading
-    /// (`SourceMoment::capacity`).
+    /// the identity route's capacity `n*` counted, refusing a population shorter than it, and the
+    /// located clock's certificate counted once beside it (`hnn::moment::capacity_located`). The
+    /// declaration's refusal reads the identity route's `n*` only; a located moment's population is
+    /// checked against the located `n*` where its capacity is read ([`Field::capacity_for`],
+    /// `SourceMoment::capacity`).
     ///
     /// The ring count and widths are fixed without any exterior alphabet: `|A|` bounds the class
     /// count of the encodings the field reads, and it enters only `n*` and the moment's slots. A
@@ -1195,6 +1198,7 @@ impl Field {
         offsets.dedup();
         let periods: Vec<u64> = rings.iter().map(Ring::period).collect();
         let capacity = capacity(&periods, &sources, declared.alphabet, &offsets)?;
+        let located_capacity = capacity_located(&periods, &sources, declared.alphabet, &offsets)?;
         let word = Some(word_by_rule(
             &rings,
             &contacts,
@@ -1225,6 +1229,7 @@ impl Field {
             crib: declared.crib,
             population: declared.population,
             capacity,
+            located_capacity,
             distances,
             lattices,
             word,
@@ -1341,9 +1346,37 @@ impl Field {
     }
 
     /// The identity route's capacity crossover `n*` and its certificate; a moment reads it through
-    /// `SourceMoment::capacity`, which refuses it once a located occurrence is counted.
+    /// `SourceMoment::capacity`, which reads the located clock's once a located occurrence is
+    /// counted.
     pub fn capacity(&self) -> &Capacity {
         &self.capacity
+    }
+
+    /// [definition; agent-inferred, October 6] **The capacity certificate of the entire admitted
+    /// clock family** an encoded passage enters on, checked before use (`hnn::moment`, "The capacity
+    /// on an admitted clock"). A continuing moment chooses from its persistent family flag, not its
+    /// latest batch (`SourceMoment::capacity`).
+    pub fn capacity_for(&self, encoded: &Encoded) -> Result<&Capacity, HnnError> {
+        self.admit(encoded)?;
+        let capacity = if encoded.located().is_some() {
+            self.located_capacity()?
+        } else {
+            self.capacity()
+        };
+        capacity.admit(encoded)?;
+        Ok(capacity)
+    }
+
+    /// The full-period clock certificate; no per-batch crossover recomputation. Refused, typed,
+    /// where the declared population is shorter than its `n*`.
+    pub(crate) fn located_capacity(&self) -> Result<&Capacity, HnnError> {
+        if self.population < self.located_capacity.n_star() {
+            return Err(HnnError::BelowCapacity {
+                population: self.population,
+                n_star: self.located_capacity.n_star(),
+            });
+        }
+        Ok(&self.located_capacity)
     }
 
     /// The contact-hop distance between two rings, when joined.

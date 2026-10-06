@@ -1,0 +1,6 @@
+cmd: cargo test -p holonics --test ranged_capacity -- --test-threads=1
+cwd: <worktree>
+deadline_s: 120
+status: exit 0
+wall_ms: 414
+peak_rss_kib_largest_process: 28240

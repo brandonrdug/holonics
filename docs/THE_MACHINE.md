@@ -530,10 +530,14 @@ tests can comb through anything valuable").
    - `SourceMoment` is sized once, from the `Field`, and accepts closing source rings only. A
      rotation transport has no ingest port (`compile_fail`).
    - `Field::declare` computes `n*` by the counting formula, on exact integers, and refuses a
-     declared population shorter than it. The formula is the identity route's (a ring steps by
-     its lock's Boolean fit plus the carry); a moment that has counted a located occurrence refuses
-     the reading (`SourceMoment::capacity`, `HnnError::CapacityOwed`), and the located route's
-     certificate is owed (#62).
+     declared population shorter than it. The formula's lift factor is the admitted clock's: `2n + d_g`
+     on the identity route (a ring steps by its lock's Boolean fit plus the carry) and `d_g n + d_g`
+     on the located route (a digit below the period plus the carry; Lean `HNN/RangedMoment`), which
+     the field carries beside it (`Field::capacity_for`). A moment that has counted a located
+     occurrence reads the located certificate persistently. The reading is checked against the
+     moment's producing partition and reached lift (`SourceCapacity::checked_of`): a continued
+     section or a re-keyed lift is refused, and retained leaky coordinates add their finite box
+     (`SourceCapacity::Retained`, Lean `HNN/LeakyCapacity`).
    - A capacity test checks the count, not one slot's bits: `log₂N(n)` per source bit is at least 1
      below `n*` and below 1 past it, at `n` = 2 … 4,096 on the three-ring control (R3 H1).
 2. **No word outlives its return.** `Word<'c>` borrows `&'c Field` and owns its tick operands.

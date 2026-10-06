@@ -1,0 +1,6 @@
+cmd: lake build Holonics.Foundation.Standing.Law Holonics.Transport.ChangingReceiver.Defect Holonics.Foundation.RelationLadder.Comparison Holonics.Foundation.CausalChord
+cwd: <worktree>/lean
+deadline_s: 900
+status: exit 0
+wall_ms: 9371
+peak_rss_kib_largest_process: 3426084

@@ -1,0 +1,6 @@
+cmd: cargo test -p holonics --lib -- --test-threads=19
+cwd: <worktree>
+deadline_s: 219
+status: DEADLINE (incomplete)
+wall_ms: 219003
+peak_rss_kib_largest_process: 28840

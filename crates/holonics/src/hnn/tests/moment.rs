@@ -19,7 +19,7 @@ use crate::hnn::field::{
     ConstitutionRead, CribDeclaration, Current, Field, FieldDeclaration, ReceiverDeclaration,
     RingDeclaration,
 };
-use crate::hnn::moment::{SourceCapacity, SourceMoment, capacity};
+use crate::hnn::moment::{CapacityClock, SourceCapacity, SourceMoment, capacity};
 use crate::ratio::{integer, rat};
 use crate::ratio::Rat;
 use crate::ratio::linear::vector::{add, dot};
@@ -708,26 +708,44 @@ fn a_refused_located_step_leaves_the_current_and_the_moment_unchanged() {
     }
 }
 
-/// [definition; agent-inferred, October 5] **The counted capacity is the identity route's**
-/// (`hnn::moment`, "The located route's capacity is owed"): a moment that has counted a located
-/// occurrence refuses its capacity, typed, and its receipt reads it as owed; its text keeps the
-/// route and reads back equal. A moment of identity-route cells reads the field's certificate.
+/// [definition; agent-inferred, October 6] **A located moment reads the located clock's capacity,
+/// persistently** (`hnn::moment`, "The capacity on an admitted clock" and "The checked reading"): a
+/// moment that has counted a located occurrence reads the located certificate at its cells, checked
+/// against its partition and reached lift, and a later identity or empty ingest does not downgrade
+/// it. A moment of identity-route cells reads the field's identity certificate.
 #[test]
 fn a_located_moment_refuses_the_identity_capacity() {
     let field = helix_field();
     let (passage, key) = partial_span(&field);
     let mut current = at_helix(&field, key);
     let mut moment = SourceMoment::open(&field, &current);
-    assert_eq!(moment.capacity(&field), Ok(field.capacity()));
+    let identity_at = |cells: u64| SourceCapacity::Identity {
+        state_bits: field.capacity().state_bits(cells),
+        n_star: field.capacity().n_star(),
+    };
+    assert_eq!(moment.capacity(&field, &current), Ok(identity_at(0)));
     let empty = passage.part(0..0).unwrap();
     moment.ingest(&field, &mut current, &empty).unwrap();
-    assert_eq!(moment.capacity(&field), Ok(field.capacity()), "no located cell is counted");
+    assert_eq!(
+        moment.capacity(&field, &current),
+        Ok(identity_at(0)),
+        "no located cell is counted"
+    );
     moment.ingest(&field, &mut current, &passage).unwrap();
-    assert_eq!(moment.capacity(&field), Err(HnnError::CapacityOwed));
-    assert_eq!(SourceCapacity::of(&moment, &field), SourceCapacity::Owed);
+    let located = field.capacity_for(&passage).unwrap();
+    assert_eq!(located.clock(), CapacityClock::Located);
+    let located_at = |cells: u64| SourceCapacity::Located {
+        state_bits: located.state_bits(cells),
+        n_star: located.n_star(),
+    };
+    assert_eq!(moment.capacity(&field, &current), Ok(located_at(moment.cells())));
+    assert!(matches!(
+        field.capacity().admit(&passage),
+        Err(HnnError::Unadmitted { .. })
+    ));
     // A later identity-route or empty ingest does not downgrade the moment.
     moment.ingest(&field, &mut current, &empty).unwrap();
-    assert_eq!(moment.capacity(&field), Err(HnnError::CapacityOwed));
+    assert_eq!(moment.capacity(&field, &current), Ok(located_at(moment.cells())));
     // The identity route reads the certificate at the moment's cells.
     let chain = chain();
     let mut current = Current::at_rest(&chain);
@@ -736,11 +754,11 @@ fn a_located_moment_refuses_the_identity_capacity() {
         .ingest(&chain, &mut current, &encoded(&chain, &[0, 1, 1, 0, 1]))
         .unwrap();
     assert_eq!(
-        SourceCapacity::of(&identity, &chain),
-        SourceCapacity::Identity {
+        SourceCapacity::checked_of(&identity, &chain, &current),
+        Ok(SourceCapacity::Identity {
             state_bits: chain.capacity().state_bits(identity.cells()),
             n_star: chain.capacity().n_star(),
-        }
+        })
     );
 }
 

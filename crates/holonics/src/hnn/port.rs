@@ -149,9 +149,10 @@ pub fn source_order(field: &Field, lift: &[BigInt], cells: u64) -> SourceOrder {
 /// [definition] **What a method's receipt reads beyond the common fields**, one arm per method.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ReceiptDetail {
-    /// `ingest`: cells accessed, the moment's dense bits, its source-state capacity (`⌈log₂N(n)⌉`
-    /// and `n*` on the identity route, owed on the located route: `hnn::moment::SourceCapacity`)
-    /// against the source's `n ⌈log₂|A|⌉`, and whether the joint clock carried out.
+    /// `ingest`: cells accessed, the moment's dense bits, its source-state capacity (the checked
+    /// reading on its admitted clock, with the retained leaky coordinates where carried:
+    /// `hnn::moment::SourceCapacity::checked_of`) against the source's `n ⌈log₂|A|⌉`, and whether the
+    /// joint clock carried out.
     Ingest {
         cells: u64,
         moment_bits: u64,

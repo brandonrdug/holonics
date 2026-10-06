@@ -1182,8 +1182,20 @@ impl ExecutionPort for Reference {
         }
         let field = resident.field.clone();
         field.admit(cells)?;
+        // [definition; agent-inferred, October 6] **The capacity preflight, before anything moves**
+        // (`hnn::moment`, "The checked reading"): a nonempty passage's clock family must have a
+        // certificate this field admits (`Field::capacity_for`: a located passage on a field whose
+        // population is below the located `n*` is refused here), and a continuing moment must read
+        // its capacity at its current state. A refusal leaves the lift, the moments, the address and
+        // the aeon as the call found them.
+        if !cells.is_empty() {
+            field.capacity_for(cells)?;
+        }
         let id = match moment {
-            Some(id) if resident.moments.contains_key(id) => *id,
+            Some(id) if resident.moments.contains_key(id) => {
+                SourceCapacity::checked_of(&resident.moments[id], &field, &resident.current)?;
+                *id
+            }
             Some(id) => {
                 return Err(HnnError::UnknownHandle {
                     handle: Handle::Moment(*id),
@@ -1199,6 +1211,7 @@ impl ExecutionPort for Reference {
             }
         };
         let before = resident.current.lift().to_vec();
+        let found = resident.current.clone();
         let open = resident
             .moments
             .get_mut(&id)
@@ -1213,6 +1226,20 @@ impl ExecutionPort for Reference {
             Ok(ingested) => ingested,
             Err(error) => {
                 resident.moments.remove(&id);
+                return Err(error);
+            }
+        };
+        // [definition; agent-inferred, October 6] The receipt's capacity is the checked reading
+        // against the moment's producing partition and the reached lift point
+        // (`SourceCapacity::checked_of`). The preflight admitted the clock family and the moment's
+        // state, so a refusal here is a reached state outside the certificate: the whole open is
+        // discarded (the failed-open disposition), and the lift returns to where the call found it,
+        // so the address and aeon, which have not received the cells, stay consistent with it.
+        let capacity = match SourceCapacity::checked_of(open, &field, &resident.current) {
+            Ok(capacity) => capacity,
+            Err(error) => {
+                resident.moments.remove(&id);
+                resident.current = found;
                 return Err(error);
             }
         };
@@ -1262,7 +1289,7 @@ impl ExecutionPort for Reference {
         let detail = ReceiptDetail::Ingest {
             cells: ingested.cells as u64,
             moment_bits: open.dense_bits(),
-            capacity: SourceCapacity::of(open, &field),
+            capacity,
             source_bits: n * ceil_log2(&BigUint::from(field.alphabet())),
             carry_out: ingested.carry_out,
         };
@@ -2946,8 +2973,9 @@ pub struct KeyReport {
 /// [definition] **The state against the source, in bits**: the lift point, the open moment, the
 /// constitution, and the whole resident with and without the collapse
 /// ([`Resident::state_bits_without_collapse`]: equal on a field inside one diamond, review D6); the
-/// moment's dense bits and its source-state capacity (`⌈log₂N(n)⌉` with `n*` on the identity
-/// route, owed on the located route: [`SourceCapacity`]) against the source's `n ⌈log₂|A|⌉`.
+/// moment's dense bits and its source-state capacity (the checked reading on its admitted clock,
+/// with the retained leaky coordinates where carried: [`SourceCapacity`]) against the source's
+/// `n ⌈log₂|A|⌉`.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct StateReport {
     pub lift_bits: u64,
@@ -4644,7 +4672,7 @@ where
     let state = StateReport {
         lift_bits: resident.current().lift().iter().map(|x| x.bits() + 1).sum(),
         moment_bits: open.dense_bits(),
-        moment_capacity: SourceCapacity::of(open, field),
+        moment_capacity: SourceCapacity::checked_of(open, field, resident.current())?,
         constitution_bits: resident.constitution().exact_bits(),
         resident_bits: resident.state_bits(),
         resident_bits_without_collapse: resident.state_bits_without_collapse(),

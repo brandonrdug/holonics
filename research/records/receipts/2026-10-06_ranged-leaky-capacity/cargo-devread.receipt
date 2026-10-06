@@ -1,0 +1,6 @@
+cmd: cargo check -p holonics --lib --message-format=short
+cwd: <worktree>
+deadline_s: 600
+status: exit 0
+wall_ms: 7169
+peak_rss_kib_largest_process: 855344

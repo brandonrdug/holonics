@@ -2,6 +2,7 @@ import Holonics.HNN.Propagation
 import Holonics.HNN.Word
 import Holonics.HNN.TickBlocks
 import Holonics.HNN.Moment
+import Holonics.HNN.RangedMoment
 import Holonics.HNN.Normal
 import Holonics.HNN.LatticeDeposit
 import Holonics.HNN.LatticeDeposit.Freeze
@@ -13,6 +14,7 @@ import Holonics.HNN.Ratio.Certificate
 import Holonics.HNN.TargetFace
 import Holonics.HNN.StandingRead
 import Holonics.HNN.IndexedOpen
+import Holonics.HNN.LeakyCapacity
 import Holonics.HNN.Encoding
 import Holonics.HNN.RegionCounts
 import Holonics.HNN.Retention

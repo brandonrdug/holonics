@@ -1,0 +1,6 @@
+cmd: bash tools/lean_check.sh Holonics.HNN.LeakyCapacity
+cwd: <worktree>
+deadline_s: 20
+status: exit 0
+wall_ms: 3566
+peak_rss_kib_largest_process: 3645276

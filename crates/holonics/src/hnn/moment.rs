@@ -129,28 +129,52 @@
 //! counts on the exterior chart are independent of the learned `E` and `E^(δ)`, so the moment stays
 //! tape-free when either changes (Lean `HNN/Moment.exteriorOffset_independent_of_E`).
 //!
-//! [established-bounded; implemented-exact] **The capacity, on the identity route** ([`capacity`],
-//! design (a), R3 H1): on the identity route (THE_MACHINE guard 9; a ring advances by its lock's
-//! Boolean fit `[c ∈ N_g]` plus the carry, so at most two ticks a cell), the persisting source
-//! state after `n` cells takes at most
+//! [established-bounded; implemented-exact] **The capacity on an admitted clock** ([`capacity`],
+//! [`capacity_located`], design (a), R3 H1; Lean `HNN/Moment.moment_capacity`,
+//! `HNN/RangedMoment.SourceDecl.{located_moment_capacity, located_prefix_lift_range,
+//! capacityWith_persists}`). A ring advances per consumed occurrence by its admitted digit plus its
+//! predecessor's carry, at most `b_g` ticks (`HNN/RangedMoment.RangedClock.advance_range`): `b_g = 2` on
+//! the identity route (THE_MACHINE guard 9: the lock's Boolean fit plus the carry) and `b_g = d_g` on
+//! the located route (a located digit `a_g(c) < d_g` plus the carry). At one opening, without
+//! re-keying, the persisting source state after `n` cells takes at most
 //!
 //! ```text
-//! N(n) = |A|^(max Δ) · ∏_g (2n + d_g) · ∏_(g∈𝒮) [ C(n + d_g|A| − 1, d_g|A| − 1) · ∏_(δ∈Δ) C(n − δ + d_g|A|² − 1, d_g|A|² − 1) ]
+//! N_b(n) = |A|^(max Δ) · ∏_g (b_g n + d_g) · ∏_(g∈𝒮) [ C(n + d_g|A| − 1, d_g|A| − 1) · ∏_(δ∈Δ) C(n − δ + d_g|A|² − 1, d_g|A|² − 1) ]
 //! ```
 //!
-//! values. `n*` is the least `n` with `N(n) < |A|^n`; past it the source → state map is not
-//! injective (pigeonhole), so the moment is lossy by construction, and by convexity at every
-//! `n ≥ n*`. It is found by bisection on exact integers and certified at `n* − 1` and `n*`
-//! (Lean `HNN/Moment.moment_capacity`). The binomials are exact products formed by binary
-//! splitting. For `n < δ` there are no offset counts, and the factor is 1.
+//! values. `n*` is the least `n` with `N_b(n) < |A|^n`; past it a total source map on the full
+//! declared `A^n` into the state is not injective (pigeonhole), so the moment is lossy by
+//! construction, and by convexity at every `n ≥ n*`. It is found by bisection on exact integers and
+//! certified at `n* − 1` and `n*`; the binomials are exact products formed by binary splitting, and
+//! for `n < δ` there are no offset counts, and the factor is 1. The located bound also bounds identity
+//! steps and changing charts, so a moment that has counted a located occurrence keeps the located
+//! clock: a later identity or empty passage never downgrades it (`capacityWith_persists`). A field
+//! carries both certificates ([`crate::hnn::Field::capacity_for`]). The bound is on the source state,
+//! not on learned constitutions, and a restricted terrain family is not a total map on `A^n`.
 //!
-//! [definition; agent-inferred, October 5] **The located route's capacity is owed** (refs #62). On
-//! the located route a ring advances by its class's located digit `a_g(c) < d_g` plus the carry,
-//! so its lift factor is not `2n + d_g` and the counted `N(n)` certifies nothing there. The
-//! formula is the identity route's and is not widened: a moment that has counted a located
-//! occurrence refuses its capacity, typed ([`SourceMoment::capacity`], `HnnError::CapacityOwed`),
-//! and a receipt reads it as owed ([`SourceCapacity::Owed`]). The located certificate, with its
-//! Lean ranged-clock join, is Codex's follow-up.
+//! [definition; agent-inferred, October 6; the
+//! [record](../../../../research/records/2026-10-06_THE_SOURCE_CAPACITY_BOUNDS_THE_ADMITTED_CLOCK_NOT_THE_OBSERVED_BATCH.md)]
+//! **The checked reading** ([`SourceCapacity::checked_of`], [`SourceMoment::capacity`]). A capacity is
+//! read only against the moment's producing partition ([`SourcePartition`]: the periods, source
+//! rings, alphabet and offsets of the field it was opened on, carried from the open and written in
+//! its text, never borrowed from the reader's field) and the reached lift point. The moment must lie
+//! on its ingest-only carrier: no continued station extent, its window and cursor those of `n`
+//! ingested cells, its phase and offset masses `n` and `max(n − δ, 0)`, its opening, end and ticks
+//! those of the reached lift's advance; and the full lift's advance must lie within `b_g n`. A moment
+//! outside it (a continued section, a re-keyed lift, another partition) is refused, typed, and no
+//! reading bypasses the check.
+//!
+//! [definition; agent-inferred, October 6; the
+//! [record](../../../../research/records/2026-10-06_THE_LEAKY_COORDINATES_ARE_BOUNDED_BY_THE_ADMITTED_DRIVE_COUNT.md)]
+//! **The leaky coordinates' factor** (Lean `HNN/LeakyCapacity.{tick_nonexpansive, empty_carried_bound,
+//! card_coordinateBox, joint_card_bound, no_uniform_bound_without_ticks}`). A moment carrying the
+//! leaky count retains coordinates the histogram does not count. Each starts at zero, a tick cannot
+//! increase a nonnegative integer at `0 ≤ ρ ≤ 1`, and each injected cell adds at most `U = 2^unit`, so
+//! each of a leaky ring's `S = d|A| + |Δ|d|A|²` slots lies in `[0, nU]`, a factor `(nU + 1)^S` at
+//! fixed opening metadata. The reading is then [`SourceCapacity::Retained`]:
+//! `⌈log₂N_b(n)⌉ + Σ S(⌊log₂ n⌋ + 1 + unit)`, an upper bound, with the histogram's crossover kept
+//! apart, never read as the whole moment's. No amplitude bound uniform over all counts holds:
+//! zero-tick drives grow a coordinate as `nU` at any modulus.
 //!
 //! | Lean `HNN/Moment` | Rust |
 //! |---|---|
@@ -159,7 +183,8 @@
 //! | `encoder_covector_tape_free` | [`SourceMoment::encoder_covector`] |
 //! | `exteriorOffset_independent_of_E` | [`SourceMoment::offset_counts`], [`PairPort::apply_table`] |
 //! | `HNN/IndexedOpen.{normalized_phase_counts_mass, normalized_open_population_invariant, normalized_zero_population}`; `HNN/Encoding.{whole_pair_read_counts, whole_pair_read_population_invariant, whole_pair_read_tape_free}` (the open reads no held cell) | [`PopulationChart`], [`SourceMoment::normalized_counts`], [`SourceMoment::offset_table`], [`SourceMoment::encode`] |
-//! | `moment_capacity` | [`capacity`], [`Capacity`] |
+//! | `moment_capacity`; `HNN/RangedMoment.{RangedClock.advance_range, SourceDecl.located_moment_capacity, SourceDecl.located_prefix_lift_range, SourceDecl.capacityWith_persists}` (the capacity on the identity and located clocks, its lift range and persistence) | [`capacity`], [`capacity_located`], [`Capacity`], [`Capacity::check_lift`], [`SourceCapacity::checked_of`] |
+//! | `HNN/LeakyCapacity.{tick_nonexpansive, empty_carried_bound, no_uniform_bound_without_ticks, card_coordinateBox, joint_card_bound, coordinate_factor_logConcave}` (the retained leaky coordinates' finite box at each count) | [`SourceCapacity::Retained`] |
 //! | `HNN/Prediction.{placed_at_station, joint_residue_determines_position}` (a locked datum at its station's residue; a ring of period `∏ dᵢ`, pairwise coprime, places each datum at its joint residue class); `HNN/IndexedOpen.{passage_population, passage_read, passage_weight_one_population, separate_populations_ratio, transportedWeight, transported_weight_mass, transported_weight_frame_invariant, transported_weight_unitary, passage_weight_split_invariant, decayed_weight_antitone, decayed_weight_frame_free, decayed_weight_lossless, lossless_term_modulus, dissipative_term_modulus}` (the section continues the passage; each datum at its transported weight) | [`SourceMoment::continued`], [`SourceMoment::phase_weights`], [`SourceMoment::open_parts`] |
 //! | `HNN/IndexedOpen.{framedWeight, framed_weight_mass, framed_weight_pos, framed_weight_one_sided, framed_weight_ratio, framed_weight_le_pow, oneway_later_weight_ratio, framed_weight_symmetric, framed_weight_translation, framed_weight_lossless}` (a candidate reads the span from its own station, each datum at its two-sided transport distance; the one-way law on data no later than the station) | `hnn::prediction::BankPlacement::{weights, storage, modulus_derivative}`; [`SourceMoment::phase_weights`] is the law read from the span's last datum |
 //! | `HNN/IndexedOpen.{nearest_sub_le, leaky_tick_eq_nearest, leaky_count_error_le, leaky_count_ingest, leaky_lattice_le_half_chart, leaky_read_error, campaign_one_founding, leaky_read_exceeds_chart_unit}` (the leaky count: the ingest's counts within half a chart unit over any length, a section's rounded entry adding half a lattice unit, the read's error carried by the mass) | `Leaky::{decay, enter, normalized}`, [`SourceMoment::open_with`], [`SourceMoment::normalized_counts`] |
@@ -179,140 +204,255 @@ use crate::ratio::linear::vector::integral;
 // -------------------------------------------------------------------------------------------
 // the capacity
 
+/// [established-bounded; implemented-exact] **The clock family** whose whole admitted source passage a
+/// [`Capacity`] bounds (module header, "The capacity on an admitted clock"; Lean
+/// `HNN/RangedMoment.RangedClock.advance_range`).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum CapacityClock {
+    /// A Boolean lock fit plus at most one predecessor carry: at most two ticks.
+    Identity,
+    /// Any admitted digit below the period plus one carry: at most the period.
+    Located,
+}
+
 /// [established-bounded; implemented-exact] **The capacity crossover** of a declared source state on
-/// the identity route (module header, "The capacity, on the identity route"; the located route's is
-/// owed, refs #62): `n*` with its exact certificate. [definition; agent-inferred] **Its scope: the
-/// re-keys.** The
-/// lift factor `2n + d_g` counts ring `g`'s own steps and carries over `n` cells from one opening.
-/// Each aeon boundary within the `n` cells re-keys the ring, a jump of its phase class by less than
-/// `d_g` that keeps its winding, so after `b` boundaries the lift takes at most `2n + (b + 1)d_g`
-/// values: a factor the counted `N(n)` does not carry (review C4). Campaign 1's mean aeon on uniform
-/// bytes is `1,281,280/1,077 ≈ 1,190` cells (design (a)), so about five boundaries fall within
-/// `n* = 6,148` cells, and the factor is below `1 + 5·13/12,296` per ring: over the four rings it
-/// moves `log₂N(n)` by less than a thirtieth of a bit. A reading of the capacity's scope; the
-/// refusal below `n*` uses the counted `N(n)`.
+/// an admitted clock (module header, "The capacity on an admitted clock"; Lean
+/// `HNN/Moment.moment_capacity`, `HNN/RangedMoment.SourceDecl.located_moment_capacity`): `n*` with its
+/// exact certificate, the clock family it bounds, and each ring's advance bound per consumed
+/// occurrence. [definition; agent-inferred] **Its scope: one opening, no re-key.** The lift factor
+/// `b_g n + d_g` counts ring `g`'s own steps and carries over `n` cells from one opening. Each aeon
+/// boundary within the `n` cells re-keys the ring, a jump of its phase class by less than `d_g` that
+/// keeps its winding, so after `b` boundaries the lift takes at most `b_g n + (b + 1)d_g` values: a
+/// factor the counted `N(n)` does not carry (review C4). A re-keyed source needs its separately
+/// declared jump bound and is outside this certificate: the checked reading
+/// ([`SourceCapacity::checked_of`]) refuses a moment whose ticks are not its reached lift's advance.
+///
+/// A bound on the source-state cardinality at one opening, without re-keying.
+/// It counts the lift, source/offset counts and held cells, not learned constitutions.
+/// `N(n) < |A|^n` implies noninjectivity only for a total map on the full declared `A^n`;
+/// it is not a lossiness certificate for an arbitrary restricted terrain family.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Capacity {
     n_star: u64,
     periods: Vec<u64>,
+    rates: Vec<u64>,
     sources: Vec<usize>,
     alphabet: usize,
     offsets: Vec<usize>,
+    clock: CapacityClock,
 }
 
 impl Capacity {
-    /// `n*`: the least `n` with `N(n) < |A|^n`, on the identity route.
     pub fn n_star(&self) -> u64 {
         self.n_star
     }
 
-    /// **`N(n)`**, the count of distinct persisting source states after `n` identity-route cells,
-    /// exactly.
+    pub fn clock(&self) -> CapacityClock {
+        self.clock
+    }
+
+    /// The bound on each ring's advance per consumed occurrence, including carry.
+    pub fn advance_bounds(&self) -> &[u64] {
+        &self.rates
+    }
+
+    /// `N(n)`, an exact upper bound, not the observed number of distinct states.
     pub fn states(&self, n: u64) -> BigUint {
         state_count(
             n,
             &self.periods,
+            &self.rates,
             &self.sources,
             self.alphabet,
             &self.offsets,
         )
     }
 
-    /// Whether the moment is lossy at `n` by counting: `N(n) < |A|^n`.
     #[cfg(test)]
     pub(crate) fn lossy_at(&self, n: u64) -> bool {
+        self.certifies(n)
+            .expect("the test population fits the exact comparison's exponent")
+    }
+
+    /// Exact comparison with `|A|^n`. The comparison exponent's wire is `u32`; a larger
+    /// population is refused, not narrowed. `states` itself admits every `u64` population.
+    pub fn certifies(&self, n: u64) -> Result<bool, HnnError> {
         lossy(
             n,
             &self.periods,
+            &self.rates,
             &self.sources,
             self.alphabet,
             &self.offsets,
         )
     }
 
-    /// The source-state bits `⌈log₂ N(n)⌉` as a reading, against the source's `n log₂|A|`, on the
-    /// identity route ([`SourceCapacity`] reads a moment's route).
+    /// The exact ceiling `ceil(log2 N(n))`, including powers of two.
     pub fn state_bits(&self, n: u64) -> u64 {
-        self.states(n).bits()
+        (self.states(n) - 1u32).bits()
     }
-}
 
-/// [definition] **The source-state capacity a receipt reads** at a moment's `n` cells: the identity
-/// route's certificate (`⌈log₂N(n)⌉` and `n*`), or owed once the moment has counted a located
-/// occurrence ([`SourceMoment::capacity`]; the located route's certificate is owed, refs #62). No
-/// identity count is asserted for a located source.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum SourceCapacity {
-    Identity { state_bits: u64, n_star: u64 },
-    Owed,
-}
-
-impl SourceCapacity {
-    /// The reading of `moment` on `field`.
-    pub fn of(moment: &SourceMoment, field: &Field) -> Self {
-        match moment.capacity(field) {
-            Ok(capacity) => Self::Identity {
-                state_bits: capacity.state_bits(moment.cells()),
-                n_star: capacity.n_star(),
-            },
-            Err(_) => Self::Owed,
+    /// Check the source/clock family before this certificate is consumed. A located
+    /// certificate also bounds the identity; an identity certificate cannot admit located digits.
+    /// This check does not bind a continuing moment to a narrower chart retroactively.
+    pub fn admit(&self, encoded: &Encoded) -> Result<(), HnnError> {
+        if encoded.classes() > self.alphabet
+            || encoded.sources().len() != self.sources.len()
+            || encoded
+                .sources()
+                .iter()
+                .zip(&self.sources)
+                .any(|(&(g, d), &source)| g != source || d != self.periods[source])
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "the capacity certificate has another source partition or alphabet",
+            });
         }
+        if let Some(located) = encoded.located() {
+            if self.clock == CapacityClock::Identity {
+                return Err(HnnError::Unadmitted {
+                    reason: "the identity capacity does not admit a located clock",
+                });
+            }
+            if located.periods() != self.periods {
+                return Err(HnnError::Unadmitted {
+                    reason: "the capacity certificate has another located helix",
+                });
+            }
+        }
+        Ok(())
+    }
+
+    /// The explicit source-to-observable join for a consumed prefix. Lift points keep their
+    /// unbounded winding; all arithmetic widens before multiplying the word-sized `n` and rate.
+    /// A re-keyed source needs its separately declared jump bound and is outside this certificate.
+    pub fn check_lift(
+        &self,
+        opening: &[BigInt],
+        reached: &[BigInt],
+        n: u64,
+    ) -> Result<(), HnnError> {
+        for found in [opening.len(), reached.len()] {
+            if found != self.rates.len() {
+                return Err(HnnError::Shape {
+                    what: "a capacity reading's full lift",
+                    expected: self.rates.len(),
+                    found,
+                });
+            }
+        }
+        for ((before, after), &rate) in opening.iter().zip(reached).zip(&self.rates) {
+            let advance = after - before;
+            if before.is_negative()
+                || advance.is_negative()
+                || advance > BigInt::from(rate) * BigInt::from(n)
+            {
+                return Err(HnnError::Unadmitted {
+                    reason: "the consumed prefix's lift lies outside its capacity clock bound",
+                });
+            }
+        }
+        Ok(())
     }
 }
 
-/// **The capacity `n*`** of source rings of the declared periods over `|A|` with offsets `Δ`, by
-/// bisection on exact integers, certified at `n* − 1` and `n*`.
+/// The established Boolean-fit identity count, `rate_g = 2`.
 pub fn capacity(
     periods: &[u64],
     sources: &[usize],
     alphabet: usize,
     offsets: &[usize],
 ) -> Result<Capacity, HnnError> {
-    if alphabet < 2 {
+    capacity_with_clock(periods, sources, alphabet, offsets, CapacityClock::Identity)
+}
+
+/// The bound for all admitted located digits, `rate_g = d_g`. It also admits identity
+/// steps and changing charts, so a later identity/empty passage cannot downgrade the bound.
+pub fn capacity_located(
+    periods: &[u64],
+    sources: &[usize],
+    alphabet: usize,
+    offsets: &[usize],
+) -> Result<Capacity, HnnError> {
+    capacity_with_clock(periods, sources, alphabet, offsets, CapacityClock::Located)
+}
+
+fn capacity_with_clock(
+    periods: &[u64],
+    sources: &[usize],
+    alphabet: usize,
+    offsets: &[usize],
+    clock: CapacityClock,
+) -> Result<Capacity, HnnError> {
+    if alphabet < 2 || periods.iter().any(|&d| d < 2) || offsets.contains(&0) {
         return Err(HnnError::NonpositiveDeclaration);
     }
-    let test = |n: u64| lossy(n, periods, sources, alphabet, offsets);
-    // N(0) ≥ 1 = |A|⁰, so 0 is never lossy; double until lossy, then bisect.
+    if offsets.iter().any(|&offset| u32::try_from(offset).is_err()) {
+        return Err(HnnError::CountOverflow);
+    }
+    if let Some(&source) = sources.iter().find(|&&source| source >= periods.len()) {
+        return Err(HnnError::Shape {
+            what: "a capacity source within its declared rings",
+            expected: periods.len(),
+            found: source,
+        });
+    }
+    let rates = match clock {
+        CapacityClock::Identity => vec![2; periods.len()],
+        CapacityClock::Located => periods.to_vec(),
+    };
+    let test = |n| lossy(n, periods, &rates, sources, alphabet, offsets);
     let (mut below, mut above) = (0u64, 1u64);
-    while !test(above) {
+    while !test(above)? {
         below = above;
         above = above.checked_mul(2).ok_or(HnnError::CountOverflow)?;
     }
     while above - below > 1 {
         let middle = below + (above - below) / 2;
-        if test(middle) {
+        if test(middle)? {
             above = middle;
         } else {
             below = middle;
         }
     }
-    debug_assert!(test(above) && !test(above - 1));
+    debug_assert!(test(above)? && !test(above - 1)?);
     Ok(Capacity {
         n_star: above,
         periods: periods.to_vec(),
+        rates,
         sources: sources.to_vec(),
         alphabet,
         offsets: offsets.to_vec(),
+        clock,
     })
 }
 
-fn lossy(n: u64, periods: &[u64], sources: &[usize], alphabet: usize, offsets: &[usize]) -> bool {
-    let bound = BigUint::from(alphabet).pow(u32::try_from(n).expect("a declared population fits"));
-    state_count(n, periods, sources, alphabet, offsets) < bound
+fn lossy(
+    n: u64,
+    periods: &[u64],
+    rates: &[u64],
+    sources: &[usize],
+    alphabet: usize,
+    offsets: &[usize],
+) -> Result<bool, HnnError> {
+    let exponent = u32::try_from(n).map_err(|_| HnnError::CountOverflow)?;
+    let bound = BigUint::from(alphabet).pow(exponent);
+    Ok(state_count(n, periods, rates, sources, alphabet, offsets) < bound)
 }
 
 fn state_count(
     n: u64,
     periods: &[u64],
+    rates: &[u64],
     sources: &[usize],
     alphabet: usize,
     offsets: &[usize],
 ) -> BigUint {
     let a = BigUint::from(alphabet);
     let window = offsets.iter().copied().max().unwrap_or(0);
-    let mut count = a.pow(u32::try_from(window).expect("a declared offset fits"));
-    for &period in periods {
-        count *= BigUint::from(2 * n + period);
+    let mut count = a.pow(u32::try_from(window).expect("the capacity offset was admitted"));
+    for (&period, &rate) in periods.iter().zip(rates) {
+        count *= BigUint::from(rate) * BigUint::from(n) + BigUint::from(period);
     }
     for &source in sources {
         let d = BigUint::from(periods[source]);
@@ -325,6 +465,323 @@ fn state_count(
         }
     }
     count
+}
+
+/// [definition; agent-inferred, October 6] **The moment's producing source partition**: the periods,
+/// source rings, alphabet and offsets of the field the moment was opened on (module header, "The
+/// checked reading"). It is fixed declaration metadata, not a retained passage. A saved moment
+/// carries it explicitly and is refused unless it matches the restored field; an absent tag is
+/// refused, never reconstructed from the reading field.
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct SourcePartition {
+    periods: Vec<u64>,
+    sources: Vec<usize>,
+    alphabet: usize,
+    offsets: Vec<usize>,
+}
+
+impl SourcePartition {
+    fn of(field: &Field) -> Self {
+        Self {
+            periods: field.rings().iter().map(|ring| ring.period()).collect(),
+            sources: field.sources().to_vec(),
+            alphabet: field.alphabet(),
+            offsets: field.offsets().to_vec(),
+        }
+    }
+
+    // Opus joins these to the opening, writer and saved-state reader. The tag is mandatory;
+    // an absent old tag is refused rather than reconstructed from the requested reading field.
+    fn write(&self, text: &mut String) {
+        fn row(text: &mut String, key: &str, values: impl IntoIterator<Item = u64>) {
+            text.push_str(key);
+            for value in values {
+                text.push_str(&format!(" {value}"));
+            }
+            text.push('\n');
+        }
+        text.push_str(&format!(
+            "source-partition {} {} {} {}\n",
+            self.alphabet,
+            self.periods.len(),
+            self.sources.len(),
+            self.offsets.len()
+        ));
+        row(text, "source-periods", self.periods.iter().copied());
+        row(text, "source-rings", self.sources.iter().map(|&x| x as u64));
+        row(
+            text,
+            "source-offsets",
+            self.offsets.iter().map(|&x| x as u64),
+        );
+    }
+
+    fn read_against<'a>(
+        field: &Field,
+        next: crate::hnn::state_text::Next<'_, 'a>,
+    ) -> Result<Self, HnnError> {
+        use crate::hnn::state_text::{counted, refused};
+        let what = "the moment's producing source partition";
+        let expected = Self::of(field);
+        let header: Vec<u64> = counted(next(what)?, "source-partition", 4, what)?;
+        if header
+            != [
+                expected.alphabet as u64,
+                expected.periods.len() as u64,
+                expected.sources.len() as u64,
+                expected.offsets.len() as u64,
+            ]
+        {
+            return refused(what);
+        }
+        let periods: Vec<u64> =
+            counted(next(what)?, "source-periods", expected.periods.len(), what)?;
+        let sources: Vec<u64> = counted(next(what)?, "source-rings", expected.sources.len(), what)?;
+        let offsets: Vec<u64> =
+            counted(next(what)?, "source-offsets", expected.offsets.len(), what)?;
+        if periods != expected.periods
+            || sources
+                != expected
+                    .sources
+                    .iter()
+                    .map(|&x| x as u64)
+                    .collect::<Vec<_>>()
+            || offsets
+                != expected
+                    .offsets
+                    .iter()
+                    .map(|&x| x as u64)
+                    .collect::<Vec<_>>()
+        {
+            return refused(what);
+        }
+        Ok(expected)
+    }
+}
+
+/// [definition; agent-inferred, October 6] **The source-state capacity a receipt reads** at a moment's
+/// `n` cells, checked against its producing partition and reached lift point
+/// ([`SourceCapacity::checked_of`]): `⌈log₂N_b(n)⌉` and `n*` on the identity or located clock, or,
+/// where the moment retains leaky coordinates, the complete count-dependent upper bound with the
+/// histogram's crossover kept apart (module header, "The leaky coordinates' factor").
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum SourceCapacity {
+    Identity {
+        state_bits: u64,
+        n_star: u64,
+    },
+    Located {
+        state_bits: u64,
+        n_star: u64,
+    },
+    /// Complete count-dependent upper bound, including retained Leaky coordinates.
+    /// The crossover below belongs only to the histogram factor; it is not the whole bound's.
+    Retained {
+        clock: CapacityClock,
+        state_bits_upper: u64,
+        histogram_n_star: u64,
+    },
+}
+
+impl SourceCapacity {
+    pub fn checked_of(
+        moment: &SourceMoment,
+        field: &Field,
+        current: &Current,
+    ) -> Result<Self, HnnError> {
+        // These checks precede every numerical or nonnumerical disposition.
+        moment.admit_ingest_carrier(field, current)?;
+        let capacity = moment.histogram_capacity(field)?;
+        capacity.check_lift(moment.opening(), current.lift(), moment.cells())?;
+        let state_bits = capacity.state_bits(moment.cells());
+        let n_star = capacity.n_star();
+        if moment.rings.iter().any(|counts| counts.leaky.is_some()) {
+            return Ok(Self::Retained {
+                clock: capacity.clock(),
+                state_bits_upper: state_bits
+                    .checked_add(moment.leaky_coordinate_bits(field)?)
+                    .ok_or(HnnError::CountOverflow)?,
+                histogram_n_star: n_star,
+            });
+        }
+        Ok(match capacity.clock() {
+            CapacityClock::Identity => Self::Identity { state_bits, n_star },
+            CapacityClock::Located => Self::Located { state_bits, n_star },
+        })
+    }
+}
+
+impl SourceMoment {
+    fn histogram_capacity<'f>(&self, field: &'f Field) -> Result<&'f Capacity, HnnError> {
+        if self.located {
+            field.located_capacity()
+        } else {
+            Ok(field.capacity())
+        }
+    }
+
+    /// The complete checked reading, including retained coordinates where present.
+    /// A reached Current is required; there is no partition/continuation/lift bypass.
+    pub fn capacity(&self, field: &Field, current: &Current) -> Result<SourceCapacity, HnnError> {
+        SourceCapacity::checked_of(self, field, current)
+    }
+
+    fn admit_partition(&self, field: &Field) -> Result<(), HnnError> {
+        if self.partition != SourcePartition::of(field)
+            || self.alphabet != field.alphabet()
+            || self.offsets != field.offsets()
+            || self.rings.len() != field.sources().len()
+            || self.opening.len() != field.rings().len()
+            || self.rings.iter().zip(field.sources()).any(|(counts, &g)| {
+                counts.ring != g || counts.period as u64 != field.ring(g).period()
+            })
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "the moment and capacity reader have different producing partitions",
+            });
+        }
+        Ok(())
+    }
+
+    /// The proved ingest carrier: continued station extents have another carrier and refuse.
+    fn admit_ingest_carrier(&self, field: &Field, current: &Current) -> Result<(), HnnError> {
+        self.admit_partition(field)?;
+        let refused = || HnnError::Unadmitted {
+            reason: "the moment is outside its proved ingest-only source carrier",
+        };
+        if current.lift().len() != self.opening.len()
+            || self.opening.iter().any(BigInt::is_negative)
+        {
+            return Err(refused());
+        }
+        let reach = self.offsets.iter().copied().max().unwrap_or(0);
+        let reach_word = u64::try_from(reach).map_err(|_| HnnError::CountOverflow)?;
+        let expected_cursor = if reach == 0 {
+            0
+        } else {
+            (self.cells % reach_word) as usize
+        };
+        if self.window.len() != reach || self.cursor != expected_cursor {
+            return Err(refused());
+        }
+        for (i, cell) in self.window.iter().enumerate() {
+            let occupied = self.cells >= reach_word || (i as u64) < self.cells;
+            if cell.is_some() != occupied || cell.is_some_and(|code| code >= self.alphabet) {
+                return Err(refused());
+            }
+        }
+        let n = BigUint::from(self.cells);
+        let sum = |counts: &[u64]| counts.iter().map(|&x| BigUint::from(x)).sum::<BigUint>();
+        for counts in &self.rings {
+            let width = counts
+                .period
+                .checked_mul(self.alphabet)
+                .ok_or(HnnError::CountOverflow)?;
+            let pair_width = width
+                .checked_mul(self.alphabet)
+                .ok_or(HnnError::CountOverflow)?;
+            if counts.extent != 0
+                || counts.first.len() != width
+                || counts.offset.len() != self.offsets.len()
+                || sum(&counts.first) != n
+                || counts
+                    .offset
+                    .iter()
+                    .zip(&self.offsets)
+                    .any(|(bins, &delta)| {
+                        bins.len() != pair_width
+                            || sum(bins) != BigUint::from(self.cells.saturating_sub(delta as u64))
+                    })
+            {
+                return Err(refused());
+            }
+            let g = counts.ring;
+            let opened_phase = u64::try_from(&self.opening[g] % BigInt::from(counts.period))
+                .map_err(|_| refused())?;
+            if counts.start != opened_phase
+                || counts.end != current.phase(field, g)?
+                || BigInt::from(counts.ticks) != &current.lift()[g] - &self.opening[g]
+            {
+                return Err(refused());
+            }
+        }
+        Ok(())
+    }
+
+    /// Sum of ceil-log bounds of all Leaky coordinate factors, at fixed opened metadata.
+    /// For n>0, ceil(log2(n*2^unit+1)) = bit_length(n)+unit. No giant shifted
+    /// bound or crossover search is allocated at each reading.
+    fn leaky_coordinate_bits(&self, field: &Field) -> Result<u64, HnnError> {
+        let refused = || HnnError::Unadmitted {
+            reason: "the leaky coordinates or opening metadata violate their finite box",
+        };
+        let chart = PopulationChart::of(field).exponent();
+        let mut bits = 0u64;
+        for counts in &self.rings {
+            let Some(leaky) = &counts.leaky else { continue };
+            if !leaky.modulus.is_positive()
+                || leaky.modulus >= Rat::one()
+                || leaky.modulus.denom().magnitude().count_ones() != 1
+                || leaky.numerator != *leaky.modulus.numer()
+                || leaky.shift as u64
+                    != leaky.modulus.denom().trailing_zeros().ok_or_else(refused)?
+            {
+                return Err(refused());
+            }
+            // m = ceil(log2(den/(den-num))) = shift - floor(log2(den-num)).
+            // This validates the constructor's least m without a large shift or a tick loop.
+            let gap = leaky.modulus.denom() - leaky.modulus.numer();
+            let floor_gap =
+                u32::try_from(gap.magnitude().bits() - 1).map_err(|_| HnnError::CountOverflow)?;
+            let m = leaky.shift.checked_sub(floor_gap).ok_or_else(refused)?;
+            if chart.checked_add(m) != Some(leaky.unit) || leaky.offset.len() != self.offsets.len()
+            {
+                return Err(refused());
+            }
+            let valid_map = |map: &BTreeMap<usize, BigInt>, width: usize| {
+                map.iter().all(|(&slot, value)| {
+                    if slot >= width || !value.is_positive() {
+                        return false;
+                    }
+                    // v <= n*2^unit, using quotient/remainder instead of allocating that bound.
+                    let q = value >> leaky.unit as usize;
+                    let n = BigInt::from(self.cells);
+                    q < n
+                        || (q == n
+                            && value
+                                .trailing_zeros()
+                                .is_some_and(|z| z >= leaky.unit as u64))
+                })
+            };
+            let first = counts
+                .period
+                .checked_mul(self.alphabet)
+                .ok_or(HnnError::CountOverflow)?;
+            let pairs = first
+                .checked_mul(self.alphabet)
+                .ok_or(HnnError::CountOverflow)?;
+            if !valid_map(&leaky.first, first)
+                || leaky.offset.iter().any(|map| !valid_map(map, pairs))
+            {
+                return Err(refused());
+            }
+            let slots = pairs
+                .checked_mul(self.offsets.len())
+                .and_then(|x| x.checked_add(first))
+                .ok_or(HnnError::CountOverflow)?;
+            let per_slot = if self.cells == 0 {
+                0
+            } else {
+                u64::from(u64::BITS - self.cells.leading_zeros()) + u64::from(leaky.unit)
+            };
+            let ring_bits = u64::try_from(slots)
+                .map_err(|_| HnnError::CountOverflow)?
+                .checked_mul(per_slot)
+                .ok_or(HnnError::CountOverflow)?;
+            bits = bits.checked_add(ring_bits).ok_or(HnnError::CountOverflow)?;
+        }
+        Ok(bits)
+    }
 }
 
 /// `C(m, k)` exactly: the product of `k` consecutive integers over `k!`, each by binary splitting.
@@ -718,9 +1175,11 @@ pub struct SourceMoment {
     cursor: usize,
     cells: u64,
     opening: Vec<BigInt>,
-    /// Whether a located occurrence has been counted: the capacity the moment reads
-    /// ([`SourceMoment::capacity`]) is then owed.
+    /// Whether a located occurrence has been counted: the moment's capacity is then the located
+    /// clock's, persistently ([`SourceMoment::capacity`]; no later identity or empty passage clears it).
     located: bool,
+    /// The producing source partition of the field the moment was opened on ([`SourcePartition`]).
+    partition: SourcePartition,
 }
 
 impl SourceMoment {
@@ -762,6 +1221,7 @@ impl SourceMoment {
             cells: 0,
             opening: current.lift().to_vec(),
             located: false,
+            partition: SourcePartition::of(field),
         }
     }
 
@@ -926,9 +1386,11 @@ impl SourceMoment {
     /// [definition; agent-inferred, October 4; the reception carry §10] **The moment's text**, a
     /// part of a continuing state: `moment n cursor rings profile` (the cells ingested, the held
     /// cells' cursor, the source rings counted, and the route profile, `identity` or `located` once
-    /// a located occurrence is counted, whose capacity is owed: [`SourceMoment::capacity`]; an
-    /// unmarked line is refused), `window` (each held cell's code or `-`), `opening` (the
-    /// lift point at the open), then per source ring `counts g d start end ticks extent leaky`, its
+    /// a located occurrence is counted, whose capacity is the located clock's:
+    /// [`SourceMoment::capacity`]; an unmarked line is refused), `window` (each held cell's code or
+    /// `-`), `opening` (the lift point at the open), the producing partition's four mandatory rows
+    /// (October 6: `source-partition |A| rings sources offsets`, `source-periods`, `source-rings`,
+    /// `source-offsets`; [`SourcePartition`]), then per source ring `counts g d start end ticks extent leaky`, its
     /// phase counts `first`, one `offset` line per declared offset, and, where it counts leakily,
     /// `leaky ρ k s unit` with its maps (`map` lines of `slot value` pairs, the phase map first).
     /// The alphabet and offsets are the field's and are not written.
@@ -949,6 +1411,7 @@ impl SourceMoment {
                 .map(|code| code.map_or("-".to_string(), |code| code.to_string())),
         );
         line(s, "opening", &self.opening);
+        self.partition.write(s);
         let map = |s: &mut String, map: &BTreeMap<usize, BigInt>| {
             line(
                 s,
@@ -986,7 +1449,8 @@ impl SourceMoment {
 
     /// **The moment read back from its text** ([`SourceMoment::write`]) on a field: refused, typed,
     /// where a line is out of its form or a count has another shape than the field declares (its
-    /// source rings, their periods, the alphabet and the offsets).
+    /// source rings, their periods, the alphabet and the offsets), or where its producing partition
+    /// is absent or is not the field's.
     pub fn read<'a>(
         field: &Field,
         head: &str,
@@ -1035,6 +1499,9 @@ impl SourceMoment {
         {
             return refused("the moment against the field's declaration");
         }
+        // The producing partition is mandatory and read against the restored field before the
+        // ring counts: an absent or different tag is refused, never borrowed from the reader.
+        let partition = SourcePartition::read_against(field, next)?;
         let read_map = |next: &mut dyn FnMut(&'static str) -> Result<&'a str, HnnError>| -> Result<BTreeMap<usize, BigInt>, HnnError> {
             let words = keyed(next("a leaky map")?, "map", "a leaky map")?;
             if words.len() % 2 != 0 {
@@ -1105,6 +1572,7 @@ impl SourceMoment {
             cells,
             opening,
             located,
+            partition,
         })
     }
 
@@ -1121,18 +1589,6 @@ impl SourceMoment {
     /// The lift point at the open.
     pub fn opening(&self) -> &[BigInt] {
         &self.opening
-    }
-
-    /// **The capacity this moment's cells are certified by** (module header, "The capacity"):
-    /// the field's, on the identity route only. Refused, typed ([`HnnError::CapacityOwed`]), once
-    /// a located occurrence is counted: `N(n)`'s lift factor `2n + d_g` bounds a ring's steps by
-    /// the Boolean fit plus the carry, and a located digit steps a ring by up to `d_g − 1` plus the
-    /// carry; the located route's certificate is owed (refs #62).
-    pub fn capacity<'f>(&self, field: &'f Field) -> Result<&'f Capacity, HnnError> {
-        if self.located {
-            return Err(HnnError::CapacityOwed);
-        }
-        Ok(field.capacity())
     }
 
     fn counts(&self, ring: usize) -> Result<&RingCounts, HnnError> {

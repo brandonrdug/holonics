@@ -1,0 +1,6 @@
+cmd: cargo check --workspace --all-targets --message-format=short
+cwd: <worktree>
+deadline_s: 101
+status: exit 0
+wall_ms: 2966
+peak_rss_kib_largest_process: 794296

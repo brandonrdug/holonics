@@ -114,7 +114,7 @@
 //! | the contact two-port | `HNN/Propagation.{partialIsometry_transit, transit_balance, tick_well_defined}` | [`propagation::transit`], [`Contact`] |
 //! | the causal cone | `HNN/Word.word_tick_cone` (the concrete tick) | [`Word::support`] |
 //! | the word on declared lattices: certified inverse charts, error feedback, the executed adjoint, the balance up to the residual | `HNN/LatticeWord.{nsStep, rounded_refinement_certificate, roundedIter_certificate, warm_start_certificate, inverse_chart_deviation, feedback_tick, carried_word_accounting, executed_adjoint_unique, executed_adjoint_deviation, cayley_chart_energy}` | [`chart`], [`Word`], [`Word::pull_back`], [`propagation::TickBalance`] |
-//! | the moment | `HNN/Moment.{encoderMoment_contract, encoder_covector_tape_free, closingRing_moment_is_phaseBinned, exteriorOffset_independent_of_E, selective_position, moment_capacity}`; the open that reads no held cell `HNN/Encoding.{whole_pair_read_counts, whole_pair_read_offset_moment}` | [`SourceMoment`], [`moment::capacity`] |
+//! | the moment | `HNN/Moment.{encoderMoment_contract, encoder_covector_tape_free, closingRing_moment_is_phaseBinned, exteriorOffset_independent_of_E, selective_position, moment_capacity}`; the capacity on the located clock and the retained leaky coordinates `HNN/RangedMoment.SourceDecl.located_moment_capacity`, `HNN/LeakyCapacity.joint_card_bound`; the open that reads no held cell `HNN/Encoding.{whole_pair_read_counts, whole_pair_read_offset_moment}` | [`SourceMoment`], [`moment::capacity`], [`moment::capacity_located`], [`moment::SourceCapacity::checked_of`] |
 //! | Holonic Encoding (U6) | `HNN/Encoding.{injection_square, encoding_reduced_recurrence, moment_reduced_recurrence, encoding_separator, encoding_descends_iff}`, `Compression/Landmark/Context/Birth.founding_intertwines` | [`encoding`] |
 //! | the receiving face: the landmark tree's face at each phase's causal address, read at the grain, plus the wave (the region table and the landmark tree; the region table is the depth-one forced case of the whole-cell emission, kept in Lean, not of the digit tree) | `HNN/RegionCounts.{grain_log_iff_pow_bounds, grain_code_residual, combined_face_pullback}`, `Compression/Landmark/Context/Tree.{depth_one_is_the_whole_cell_table, release_rule}` | [`receiving`], [`ReceivingRead::combined`], [`ActiveAddress`]; the grain read is [`crate::receiver::face::grain_exponent`]'s |
 //! | the receiving face compresses landmarks: the tree's path face, its opened-path deposit and telescope, the executed dyadic face (the landmark tree) | `Compression/Landmark/Context/Tree.{path_face_normalized, weight_step, landmark_step, path_telescope_exact, depth_one_is_the_whole_cell_table, executed_split_laws, cell_faces_partition, digit_log_residual}` (the owner's header has the rest) | [`crate::compression::landmark::context`] |
@@ -303,10 +303,6 @@ pub enum HnnError {
         "the declared population of {population} cells is shorter than the capacity n* = {n_star}: the moment would be lossless"
     )]
     BelowCapacity { population: u64, n_star: u64 },
-    #[error(
-        "the moment has counted a located occurrence: its capacity N(n) is the identity route's, and the located route's certificate is owed (#62)"
-    )]
-    CapacityOwed,
     #[error("class {code} lies outside the field's {alphabet} classes")]
     CellOutside { code: usize, alphabet: usize },
     /// THE_MACHINE guard 9: an encoded passage this field does not read.

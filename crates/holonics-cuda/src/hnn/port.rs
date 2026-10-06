@@ -1035,8 +1035,20 @@ impl<'c> ExecutionPort for Resident<'c> {
         // the lock's fit, a located passage by its classes' digits at their exact width, mounted by
         // the native owner (`ResidentMoment::ingest`; #76).
         let codes: Vec<usize> = cells.classes_read().collect();
+        // [definition; agent-inferred, October 6] **The capacity preflight, before anything moves**
+        // (`hnn::moment`, "The checked reading"): a nonempty passage's clock family must have a
+        // certificate this field admits (`Field::capacity_for`: a located passage on a field whose
+        // population is below the located `n*` is refused here), and a continuing moment must read
+        // its capacity at its current state. A refusal leaves the lift, the moments, the address and
+        // the aeon as the call found them.
+        if !cells.is_empty() {
+            field.capacity_for(cells)?;
+        }
         let id = match moment {
-            Some(id) if resident.moments.contains_key(id) => *id,
+            Some(id) if resident.moments.contains_key(id) => {
+                SourceCapacity::checked_of(&resident.moments[id].host, &field, &resident.current)?;
+                *id
+            }
             Some(id) => {
                 return Err(HnnError::UnknownHandle {
                     handle: Handle::Moment(*id),
@@ -1057,6 +1069,7 @@ impl<'c> ExecutionPort for Resident<'c> {
             }
         };
         let before = resident.current.lift().to_vec();
+        let found = resident.current.clone();
         let start = Instant::now();
         // The cells' 32-bit classes and the lift's and phases' words, and on the located route the
         // located chart, one `u64` digit per ring and class (`8·rings·|A|` octets), counted once the
@@ -1089,7 +1102,23 @@ impl<'c> ExecutionPort for Resident<'c> {
                 return Err(error);
             }
         };
+        // [definition; agent-inferred, October 6] The receipt's capacity is the host mirror's checked
+        // reading against its producing partition and the reached lift point, as the reference's
+        // (`SourceCapacity::checked_of`). The preflight admitted the clock family and the moment's
+        // state, so a refusal here is a reached state outside the certificate: the whole open, card
+        // and host, is discarded (the failed-open disposition), and the host lift returns to where
+        // the call found it (no other moment's card has been re-keyed yet). The card launched and
+        // returned, so its traffic is counted either way.
+        let capacity = SourceCapacity::checked_of(&open.host, &field, &resident.current);
         resident.count(|traffic| traffic.ingest += octets);
+        let capacity = match capacity {
+            Ok(capacity) => capacity,
+            Err(error) => {
+                resident.moments.remove(&id);
+                resident.current = found;
+                return Err(error);
+            }
+        };
         // The receiving parametron's active suffix address receives the cells the moment took,
         // and its contact letters' site kinds refresh after the ingest, as the reference's.
         for &code in &codes[..ingested.cells] {
@@ -1138,7 +1167,7 @@ impl<'c> ExecutionPort for Resident<'c> {
         let detail = ReceiptDetail::Ingest {
             cells: ingested.cells as u64,
             moment_bits: open.host.dense_bits(),
-            capacity: SourceCapacity::of(&open.host, &field),
+            capacity,
             source_bits: n * ceil_log2(&BigUint::from(field.alphabet())),
             carry_out: ingested.carry_out,
         };

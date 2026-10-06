@@ -910,13 +910,29 @@ fn report(field: &Field, exposure: &Exposure) {
             ))
         }
     };
-    // The counted capacity is the identity route's; a located source's is owed (refs #62).
+    // The checked capacity on the moment's admitted clock; where it retains leaky coordinates the
+    // count is an upper bound and its crossover is the histogram factor's only.
     let (n_star, counted) = match state.moment_capacity {
         SourceCapacity::Identity { state_bits, n_star } => (
-            n_star.to_string(),
+            format!("{n_star} (identity clock)"),
             format!("{} bits, per source bit {}", state_bits, over_source(state_bits)),
         ),
-        SourceCapacity::Owed => ("owed".to_string(), "owed on the located route".to_string()),
+        SourceCapacity::Located { state_bits, n_star } => (
+            format!("{n_star} (located clock)"),
+            format!("{} bits, per source bit {}", state_bits, over_source(state_bits)),
+        ),
+        SourceCapacity::Retained {
+            clock,
+            state_bits_upper,
+            histogram_n_star,
+        } => (
+            format!("{histogram_n_star} (the {clock:?} histogram factor's only)"),
+            format!(
+                "at most {} bits with the retained leaky coordinates, per source bit {}",
+                state_bits_upper,
+                over_source(state_bits_upper)
+            ),
+        ),
     };
     println!(
         "source: {} bits ({} cells ingested, n* = {})",

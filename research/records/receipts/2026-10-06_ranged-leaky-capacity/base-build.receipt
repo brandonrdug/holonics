@@ -1,0 +1,6 @@
+cmd: cargo test -p holonics --lib --no-run --message-format=short
+cwd: <baseline worktree at 3c67beee>
+deadline_s: 30
+status: exit 0
+wall_ms: 28236
+peak_rss_kib_largest_process: 2463456

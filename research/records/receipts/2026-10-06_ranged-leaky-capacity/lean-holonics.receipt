@@ -1,0 +1,6 @@
+cmd: bash tools/lean_check.sh Holonics
+cwd: <worktree>
+deadline_s: 3011
+status: exit 0
+wall_ms: 116613
+peak_rss_kib_largest_process: 7062044
