@@ -804,6 +804,12 @@ fn a_releasing_collapse_releases_the_carried_motion_its_material_held() {
 /// constitution mounts with the resident's lift point and carried end, and the remounted
 /// resident's next reading is the un-remounted one's, faces, ratio and deposit alike:
 /// `compare(refine(mount(Θ_collapsed, λ, carry), m, φ), t) = compare(refine(resident, m, φ), t)`.
+///
+/// [agent-inferred, October 5] `mount_carried` is the narrower remount (no kept chart), so the
+/// equality also needs the resident's kept charts, on the keys the word reads, to be what a cold
+/// start founds. Here they are: no deposit moved an operator (the one staged deposit is discarded)
+/// before the collapse released every contact's channel to the pure transmission. Every chart the
+/// remount's word read is the resident's at its key, which is that hypothesis read.
 #[test]
 fn a_collapsed_constitution_remounts_and_reads_alike() {
     let field = super::learning::chain();
@@ -848,6 +854,13 @@ fn a_collapsed_constitution_remounts_and_reads_alike() {
         (refined.forward, compared.forward, compared.deposit)
     };
     assert_eq!(next(&mut remounted), next(&mut resident));
+    // Every chart the remount's word read is the resident's kept chart at that key (the resident
+    // also keeps a contact's chart at a conductance carry this word does not read).
+    assert!(!remounted.charts().is_empty());
+    assert!(remounted
+        .charts()
+        .keys()
+        .all(|key| remounted.charts().get(key) == resident.charts().get(key)));
 }
 
 /// The six rings of the six-ring path split in two: `0–1–2` (source ring 0, receiver ring 2) and

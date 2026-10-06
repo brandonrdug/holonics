@@ -1,0 +1,6 @@
+gate exit 0 wall 42591 ms deadline 900s
+gate peak_rss_kb 1661176
+libtests exit 0 wall 235237 ms deadline 600s
+libtests peak_rss_kb 1267848
+coldrestore exit 0 wall 15478 ms deadline 300s
+coldrestore peak_rss_kb 1873320

@@ -659,6 +659,13 @@ determines. The rest of the reference resident (its open moments and the aeon in
 saved object of this path; it is restored only where the executed path's continuing state already
 restores it.
 
+[agent-inferred, October 5; correction] The word also reads the resident's kept charts. A warm
+chart kept within the target after a deposit and the operator's cold chart are two lattice points at
+one certificate, and a read can separate them (the fold-free chain's window 6). So the carry's
+restore is exact at the word only beside the kept charts, which §10's passage carries.
+`mount_carried` alone is the narrower remount
+([October 5 record §2a](2026-10-05_THE_FIELDS_ENTRIES_TAKE_ONLY_THE_ENCODED_SOURCE.md)).
+
 The chained balance's Lean statement is `HNN/ChainedBalance` (#293). The device word is built with
 host-card parity (§7). The within-refinement continuation (`ContactCut::continue_deposited`) now
 holds the momentum across its contact deposit as well (the deposit record §5 item 2). Its law is

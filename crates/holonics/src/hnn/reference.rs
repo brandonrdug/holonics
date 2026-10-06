@@ -1042,11 +1042,18 @@ impl Reference {
 
     /// [definition; agent-inferred, October 3; the reception carry §2.4] **Mount on a declared
     /// constitution with a reception's carried end restored** ([`Reference::mount_with`]): the next
-    /// reception's word opens on the restored carry's interior exactly as it would have opened in
-    /// the uninterrupted chain (the saved carry is the carried state whole: its end change and its
-    /// elapsed ticks, read back from [`crate::hnn::constitution::ContinuingState`]). Refused where
-    /// the carry has another field's shape ([`ReceptionCarry::fits`]) or this reference receives at
-    /// rest.
+    /// reception's word opens on the restored carry's interior (its end change and its elapsed
+    /// ticks, read back from [`crate::hnn::constitution::ContinuingState`]). Refused where the carry
+    /// has another field's shape ([`ReceptionCarry::fits`]) or this reference receives at rest.
+    ///
+    /// [agent-inferred, October 5] This is the **narrower remount**: it holds no kept chart, and a
+    /// word is a function of its operands, the constitution and the kept charts (module header). Its
+    /// next word is the uninterrupted chain's exactly where every kept chart is its operator's cold
+    /// chart (no deposit has moved the operator since its chart was founded, or the warm certificate
+    /// was above `1/2`); where a deposit moved an operator whose kept chart still certifies within the
+    /// target, a cold start reaches another lattice point at the same target, and the read
+    /// separates (the fold-free chain's window 6). The whole continuation, the kept charts included,
+    /// is [`Reference::mount_continued`] on a resident's state, whose passage carries them.
     pub fn mount_carried(
         &self,
         field: &Field,
