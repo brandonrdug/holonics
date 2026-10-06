@@ -316,6 +316,7 @@ reports that its kernels are absent and refuses to open a card.
 ```bash
 cargo check --workspace --all-targets          # everything compiles
 cargo test -p holonics                         # the host laws
+mkdir -p .local
 flock .local/gpu.lock cargo test -p holonics-cuda -- --include-ignored --test-threads=1
 bash tools/lean_check.sh                       # the Lean foundation, Holonics
 bash tools/lean_check.sh HolonicsResearch      # the research library
