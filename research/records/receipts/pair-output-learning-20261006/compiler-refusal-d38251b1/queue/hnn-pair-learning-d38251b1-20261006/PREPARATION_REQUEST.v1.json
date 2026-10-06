@@ -1,0 +1,20 @@
+{
+  "output_root": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-d38251b1-20261006",
+  "cache_origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/cache-v2",
+  "cache_paths": [
+    "debug/deps",
+    "debug/build",
+    "debug/.fingerprint",
+    ".rustc_info.json"
+  ],
+  "source_manifest_pin": {
+    "bytes": 47694,
+    "sha256": "b71497ea0c49e7024a08cc050745dcdcffab4ae320f6e5d0a6a6d11b27466899"
+  },
+  "owner_request": "/home/b/Workspaces/holonics/.local/wt/material-learning/.local/material-learning-followup-01a1030c-20261006/COHERENT_FOLLOWUP_CANDIDATE.v9.json",
+  "owner_request_pin": {
+    "bytes": 31451,
+    "sha256": "a54dea08a11a8e576dfb6f5ad374d8eb8d52d47d725070b6c3f00835b0682a52"
+  },
+  "preserved_failure": "All old sources/cache/native failures preserved; new d382 source, declared26 controls with namespace exclusions preventing duplicate new tests; selected cache copied to private output, no old runtime acceptance inherited."
+}

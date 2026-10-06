@@ -1,0 +1,12 @@
+{
+  "wall_ns": 7023311690,
+  "peak_RSS_KiB": 30084,
+  "source_manifest": {
+    "sha256": "b71497ea0c49e7024a08cc050745dcdcffab4ae320f6e5d0a6a6d11b27466899",
+    "bytes": 47694
+  },
+  "current_source_verified": true,
+  "cache_count": 2388,
+  "compiler_launched": false,
+  "preserved_full_preparation_failure": "All old sources/cache/native failures preserved; new d382 source, declared26 controls with namespace exclusions preventing duplicate new tests; selected cache copied to private output, no old runtime acceptance inherited."
+}

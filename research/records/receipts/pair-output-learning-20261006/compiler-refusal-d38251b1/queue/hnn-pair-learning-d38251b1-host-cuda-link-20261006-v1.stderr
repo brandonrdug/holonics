@@ -1,0 +1,13 @@
+   Compiling holonics-cuda v0.1.0 (/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-d38251b1-20261006/source-v1/crates/holonics-cuda)
+   Compiling holonics v0.1.0 (/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-d38251b1-20261006/source-v1/crates/holonics)
+error[E0609]: no field `ticks` on type `hnn::word::EndChange`
+    --> crates/holonics/src/hnn/tests/prediction.rs:2853:106
+     |
+2853 |                     repair.reads.iter().map(|r| &r.read.logits).collect::<Vec<_>>(), repair.carry.change.ticks);
+     |                                                                                                          ^^^^^ unknown field
+     |
+     = note: available fields are: `storage`, `arrivals`, `states`, `resonators`, `resonator_phases`
+
+For more information about this error, try `rustc --explain E0609`.
+error: could not compile `holonics` (lib test) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

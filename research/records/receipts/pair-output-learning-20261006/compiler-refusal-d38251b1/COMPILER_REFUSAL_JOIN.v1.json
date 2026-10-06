@@ -1,0 +1,433 @@
+{
+  "source_commit": "d38251b1280e7e2e4f73f4480e067ff5f2d992a9",
+  "source_base": "a8cf6c551a943441708fd1fb788aadbae700f9c4",
+  "all_original_artifacts_rehashed": 1491,
+  "original_artifact_bytes": 858840448,
+  "source_snapshot_and_git_inputs_verified": 286,
+  "native_build_bindings_verified": 285,
+  "accepted": false,
+  "runtime_controls_launched": 0,
+  "exact_compiler_error": {
+    "file": "crates/holonics/src/hnn/tests/prediction.rs",
+    "line": 2853,
+    "column": 106,
+    "field": "repair.carry.change.ticks",
+    "actual_owner": "ReceptionCarry.ticks"
+  },
+  "stages": {
+    "hnn-pair-learning-d38251b1-cache-preparation-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 7172835588,
+      "projection_ns": 17000000000,
+      "measured_to_projected_ratio": [
+        7172835588,
+        17000000000
+      ],
+      "aggregate_CPU_ns": 5878805000,
+      "group_peak_bytes": 4294967296,
+      "peak_child_RSS_KiB": 30084,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 274,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-pair-learning-d38251b1-host-cuda-link-20261006-v1": {
+      "accepted": false,
+      "wall_ns": 12972642247,
+      "projection_ns": 65000000000,
+      "measured_to_projected_ratio": [
+        12972642247,
+        65000000000
+      ],
+      "aggregate_CPU_ns": 30612952000,
+      "group_peak_bytes": 2796441600,
+      "peak_child_RSS_KiB": 1500604,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    }
+  },
+  "all_caps_and_cleanup_pass": true,
+  "partial_compiler_artifacts_are_not_native_acceptance": true,
+  "selected_preserved_artifacts": {
+    "queue/hnn-pair-learning-d38251b1-cache-preparation-20261006-v1.config.json": {
+      "bytes": 5840,
+      "sha256": "f5d468a876a4cef93c51d766f37c2193451a36ea9729d92f5d7c94d9529f385c"
+    },
+    "queue/hnn-pair-learning-d38251b1-cache-preparation-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "9f976040a9bfd7731b358ba3c51421474360ed88131d0851a8c1df323afb9d59"
+    },
+    "queue/hnn-pair-learning-d38251b1-cache-preparation-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "27e5ec2a57063d6c727e3f331b79dc2ea14a1e6b929eb71e5f6a4aa87a73549e"
+    },
+    "queue/hnn-pair-learning-d38251b1-cache-preparation-20261006-v1.input_seal.json": {
+      "bytes": 4484,
+      "sha256": "febb4272e983fdeaf4e74ef4eec6cff319561da429b0f20aedf2bc7d3a526f42"
+    },
+    "queue/hnn-pair-learning-d38251b1-cache-preparation-20261006-v1.stdout": {
+      "bytes": 507,
+      "sha256": "1767afa3c62f3accc3ef35e4766c59446a4dc4e121b5e12840a870721697f671"
+    },
+    "queue/hnn-pair-learning-d38251b1-cache-preparation-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "queue/hnn-pair-learning-d38251b1-cache-preparation-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "32ab96bfff13f61fc80b919ea9fb7bc69c86a5373a7dc58982f8fe9a051b8821"
+    },
+    "queue/hnn-pair-learning-d38251b1-cache-preparation-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "4e4b42bf688941fbd7fa48a12103e20621fa359e7392d9249f2e77ff983cc87e"
+    },
+    "queue/hnn-pair-learning-d38251b1-cache-preparation-20261006-v1.system-floor.json": {
+      "bytes": 55032,
+      "sha256": "2334aa49e234103f0a5a65650422cc6289ee061d9ed2d9e02ccbd7bbdb2ec657"
+    },
+    "queue/hnn-pair-learning-d38251b1-cache-preparation-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "fb146a34a9d021d47be178b14c388ef29837f68a25d0754d8dc49ac1c626cbad"
+    },
+    "queue/hnn-pair-learning-d38251b1-cache-preparation-20261006-v1.output_seal.json": {
+      "bytes": 465444,
+      "sha256": "8baa6071649ba7547a32bafbc68b7a906887d309285ae420bfcbcf89c47d447c"
+    },
+    "queue/hnn-pair-learning-d38251b1-cache-preparation-20261006-v1.publication.json": {
+      "bytes": 3336,
+      "sha256": "073dcdd195b3b8ce6a4d6298e5bb95254e9573dc602a3f0c8020148412f89780"
+    },
+    "queue/hnn-pair-learning-d38251b1-cache-preparation-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "05f5a712fd73a9a9fed92b3b9917858d31cb532bf7197e8775f2099560484b6a"
+    },
+    "queue/hnn-pair-learning-d38251b1-cache-preparation-20261006-v1.final.json": {
+      "bytes": 5011,
+      "sha256": "b375b9f06834fe0456da0ab9192cb7dfa0fb58a6bf6a52e28de51968ca78f05d"
+    },
+    "queue/hnn-pair-learning-d38251b1-cache-preparation-20261006-v1.unit-cleanup.json": {
+      "bytes": 739,
+      "sha256": "49407ef7d4caed74283258317bafa48a36e6d1e80a23a86e505ce788b85900e7"
+    },
+    "queue/hnn-pair-learning-d38251b1-cache-preparation-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "abe7a3efa140f0f955b841e3c273b0219e50230126d4aa78f4d26d645df8f862"
+    },
+    "queue/hnn-pair-learning-d38251b1-cache-preparation-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "100a18ea05eb8fc591e140e09819fb442cf2cc3442329c616f00840d8e59b50f"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/PREPARATION_REQUEST.v1.json": {
+      "bytes": 1043,
+      "sha256": "147baeae3d41d54129ad83740a407c3b0be4f2f527ddb9d549a62dea360b5dbc"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/SOURCE_SNAPSHOT.v1.json": {
+      "bytes": 47694,
+      "sha256": "b71497ea0c49e7024a08cc050745dcdcffab4ae320f6e5d0a6a6d11b27466899"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/QUEUE_SOURCE_REVIEW.v1.json": {
+      "bytes": 1618,
+      "sha256": "acd8fd8ec2a497126feb4a4d7524bc0161b7b80d07c3e44f4bb423bb6d98e492"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/RUNTIME_GROUPS.v1.json": {
+      "bytes": 21673,
+      "sha256": "c6785a7357d74734fb47bec90fce8fee7ef637878af4697eba2212f5c7f426d8"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/CACHE_SNAPSHOT.v2.json": {
+      "bytes": 426856,
+      "sha256": "47f5be40860b275e2a4a14284944689be265574cae697c2e70c955c153fdd82e"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/PREPARATION.v2.json": {
+      "bytes": 535,
+      "sha256": "df5d2fd914d2012c5b09f2bf3e44a68e77a0e9d9dd1b45a21d9020fb060db50a"
+    },
+    "queue/hnn-pair-learning-d38251b1-host-cuda-link-20261006-v1.config.json": {
+      "bytes": 531902,
+      "sha256": "ff6f0457d39d2de6344ec62fcde122ece5864aabe3049010e7c27ec8d88344ce"
+    },
+    "queue/hnn-pair-learning-d38251b1-host-cuda-link-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "b8bb38d3ba45bdb267657498ef233d6fb663f26d89459cb6593d22e81fba4159"
+    },
+    "queue/hnn-pair-learning-d38251b1-host-cuda-link-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "6088b4dbdff06a28be1367f45895dd4c814c12198a8b527b2c353ea0936d4e14"
+    },
+    "queue/hnn-pair-learning-d38251b1-host-cuda-link-20261006-v1.input_seal.json": {
+      "bytes": 345302,
+      "sha256": "859a51b254c936685709185b52b320a676cceb83d3d4401c117adac2220cc482"
+    },
+    "queue/hnn-pair-learning-d38251b1-host-cuda-link-20261006-v1.stdout": {
+      "bytes": 29246,
+      "sha256": "eb6185a9b50a2036e34e2e1b40af6d97520f8b3e582b2e3b332794454ee53efe"
+    },
+    "queue/hnn-pair-learning-d38251b1-host-cuda-link-20261006-v1.stderr": {
+      "bytes": 1017,
+      "sha256": "d7aa425bd8360e3a985df740ceaefb3739def4fb0056175ae1fdf62fba4fc599"
+    },
+    "queue/hnn-pair-learning-d38251b1-host-cuda-link-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "09d984e31d61d4d70a29fa35bdd88fe5fe4f6da139e9de21762f2640e2ffa43e"
+    },
+    "queue/hnn-pair-learning-d38251b1-host-cuda-link-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "bbea14bc8e8ee09920556c41f3c00f8e30e86d72db9cdcd8c4053135483e104c"
+    },
+    "queue/hnn-pair-learning-d38251b1-host-cuda-link-20261006-v1.system-floor.json": {
+      "bytes": 88869,
+      "sha256": "b04d655afeaa17265c5a690b95091c9a7800f9f5a5aaa6c8faf7cd90bc7e0f28"
+    },
+    "queue/hnn-pair-learning-d38251b1-host-cuda-link-20261006-v1.quiescence.json": {
+      "bytes": 132,
+      "sha256": "c0bfc8d70aae659edc54c8c1fc6088244f8067970b5fe9db69573c1284a2294a"
+    },
+    "queue/hnn-pair-learning-d38251b1-host-cuda-link-20261006-v1.output_seal.json": {
+      "bytes": 808244,
+      "sha256": "2002404b1c7f77e291447f2484a3c17be97ed1f7018b2363c05e4a626b43199c"
+    },
+    "queue/hnn-pair-learning-d38251b1-host-cuda-link-20261006-v1.failure.json": {
+      "bytes": 255,
+      "sha256": "982eb2b71ab6944e34b8c347d87d4561c4428acf76e53d11e3c4720a6e1da7a4"
+    },
+    "queue/hnn-pair-learning-d38251b1-host-cuda-link-20261006-v1.publication.json": {
+      "bytes": 3039,
+      "sha256": "a9fd5e99b5ea04bb3b32440e716b0169a0a18af5afe4e73725f51fd9b264a6f8"
+    },
+    "queue/hnn-pair-learning-d38251b1-host-cuda-link-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "c33c90850e085bdd7ae3654815c4e8c5f6205dc94df43c18fa0936c0d1d7c69a"
+    },
+    "queue/hnn-pair-learning-d38251b1-host-cuda-link-20261006-v1.final.json": {
+      "bytes": 5238,
+      "sha256": "6a088f5c25ced283bfe84f742bdd70e196957bc64927f4a85cfebc0635dfa8ef"
+    },
+    "queue/hnn-pair-learning-d38251b1-host-cuda-link-20261006-v1.unit-cleanup.json": {
+      "bytes": 794,
+      "sha256": "3b09d683b98b8c64445f897380812419fc67d82b3b2d214d8529758ae15d2b6f"
+    },
+    "queue/hnn-pair-learning-d38251b1-host-cuda-link-20261006-v1.acceptance.json": {
+      "bytes": 379,
+      "sha256": "1672db63cbc47709bca457a6ee91ab1a08ac0f52bf40ec2a1396265afb21c4e9"
+    },
+    "queue/hnn-pair-learning-d38251b1-host-cuda-link-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "d6c6b9e2568a3948dded9d289147bc9003fc05a6b224a32dfcfeef5274f32b98"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/LOCAL_SOURCE_BINDING_PREFLIGHT.v1.json": {
+      "bytes": 696,
+      "sha256": "47903057834ad836899e4a487ce4269477c4fc6519b2771531b130d48e4be9a7"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/FIX_DIAGNOSTIC_CARRY.v1.patch": {
+      "bytes": 796,
+      "sha256": "6b642e82929765f434767efbc4e831c58b07cb0fc72486d6eaa858da238479cb"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-02407331bdf682dc/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-02407331bdf682dc/dep-lib-holonics": {
+      "bytes": 4592,
+      "sha256": "9f1817721ec954054cc4d40325a0254041ea81359348d30931eb09812cfcea69"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-02407331bdf682dc/lib-holonics": {
+      "bytes": 16,
+      "sha256": "6304d59d6385115a7b9449c78746ac11059ce0dc229f67b249e21d2086347c61"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-02407331bdf682dc/lib-holonics.json": {
+      "bytes": 655,
+      "sha256": "fca0bdf54a0e37dac6d614e5a11fd8cd6b56846d3ab3eed7085cc23f87d2bc2d"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-3dfaf698dddeb1a6/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-3dfaf698dddeb1a6/dep-test-integration-test-source_entrance": {
+      "bytes": 44,
+      "sha256": "3cbeb95fb8a3e7af62122c9ddca89765b8b5d2af7668bbb7c4aaaa1b582d4a9f"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-3dfaf698dddeb1a6/test-integration-test-source_entrance": {
+      "bytes": 16,
+      "sha256": "cc1575537914c534c5975b4b5be220db5b396b5d762737ef336255c520be4e4a"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-3dfaf698dddeb1a6/test-integration-test-source_entrance.json": {
+      "bytes": 741,
+      "sha256": "1ae7c323d91753d33f7406a036b13f8346a9368e5ee61358474ea747ff16f3ef"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-70b68d2f7e1f6408/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-70b68d2f7e1f6408/dep-test-lib-holonics": {
+      "bytes": 6734,
+      "sha256": "9e870b3e8ae8a05fc487d70158468c48f063a26d29e9a1aecece2461c6f80407"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-70b68d2f7e1f6408/test-lib-holonics": {
+      "bytes": 16,
+      "sha256": "22a78e88c7a82cb1b9f6c908a7365ea7e6ee2ded05671cd3303c8dcd279d2f09"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-70b68d2f7e1f6408/test-lib-holonics.json": {
+      "bytes": 660,
+      "sha256": "c8233c12907db3e23a65e5814adf3def58a6f86bc60a43b9f390b02c9eb021f2"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-8cd4a578e626a457/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-8cd4a578e626a457/dep-test-example-hnn_prediction": {
+      "bytes": 1304,
+      "sha256": "a6baa9a021141985bf927737dd96ec3d0eff1f981e57877df5a87b5eca16d6e5"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-8cd4a578e626a457/test-example-hnn_prediction": {
+      "bytes": 16,
+      "sha256": "5420dea12371857d845a91f729f3e9ec6b27bb41facf7a0c8ad5d8f385d5d6a3"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-8cd4a578e626a457/test-example-hnn_prediction.json": {
+      "bytes": 731,
+      "sha256": "6b8795a6673f9ae61e247ea99343e3e43b4da8c321b5ab7fd3cb93d6d105dbf9"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-bd29e6ac6f6167da/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-bd29e6ac6f6167da/dep-test-integration-test-ranged_capacity": {
+      "bytes": 44,
+      "sha256": "992a84355f8fe8356ea38bba60f35a3f813f7590e77a1951c3798579201e5aa0"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-bd29e6ac6f6167da/test-integration-test-ranged_capacity": {
+      "bytes": 16,
+      "sha256": "5addb1095112c0a1ab93fbd7e887513eceebe929f05c507f61ca962846868be0"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-bd29e6ac6f6167da/test-integration-test-ranged_capacity.json": {
+      "bytes": 741,
+      "sha256": "ded6e673675625369d3dbc2758ac5954c84c1dd17849b3b9c6e470be5cf8336e"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-cuda-2b2d6cef9fd78c5f/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-cuda-2b2d6cef9fd78c5f/dep-test-integration-test-located_ingest": {
+      "bytes": 43,
+      "sha256": "7e0b95fbabf30a14579f290ae1ab78d17c2a51b7e3cccd20873fe279e52ac527"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-cuda-2b2d6cef9fd78c5f/test-integration-test-located_ingest": {
+      "bytes": 16,
+      "sha256": "02ecc9ef609271a13240b5c94389e0ff05b42c7487984d9d1e5a957065921929"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-cuda-2b2d6cef9fd78c5f/test-integration-test-located_ingest.json": {
+      "bytes": 757,
+      "sha256": "01bcb383ec29b0ab09f4f61170e7924aaec44c319b1a6af8e15b21b23a760326"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-cuda-3a3d38defac6a12c/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-cuda-3a3d38defac6a12c/dep-test-lib-holonics_cuda": {
+      "bytes": 584,
+      "sha256": "edf5b6d8257a58bb90c5bc095b28eb329804a35e50494946babf92296145effe"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-cuda-3a3d38defac6a12c/test-lib-holonics_cuda": {
+      "bytes": 16,
+      "sha256": "2ac74d3144c0398f3e87641a997396ebdb266835e32aa55c4c7e74176f487a6f"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-cuda-3a3d38defac6a12c/test-lib-holonics_cuda.json": {
+      "bytes": 680,
+      "sha256": "5b10be0333f8a955553a422a8f77439f133c2479c18b8728ec2a72cb41281898"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-cuda-5cc32226864d0eaa/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-cuda-5cc32226864d0eaa/dep-bin-mount-smoke": {
+      "bytes": 245,
+      "sha256": "8857e397e61a60a137ef9da61eb19b020ceaf17bf41134365e6ea568275432aa"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-cuda-5cc32226864d0eaa/bin-mount-smoke": {
+      "bytes": 16,
+      "sha256": "bf8460f95e46075c9aa0fa2b16cfd84de21df0472ffbc221f373e58474b44316"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-cuda-5cc32226864d0eaa/bin-mount-smoke.json": {
+      "bytes": 736,
+      "sha256": "5d624f9a9f86be19a189290f2d8f1234348339e2a619c92b76b35014f7d5b3aa"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-cuda-c82bf91515d93d4b/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-cuda-c82bf91515d93d4b/dep-build-script-build-script-build": {
+      "bytes": 28,
+      "sha256": "a71f952e7f3252ef5608298951fd55b25f3590c98bc0765ae4145e623604ee7d"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-cuda-c82bf91515d93d4b/build-script-build-script-build": {
+      "bytes": 16,
+      "sha256": "dcab605d8b024cdf6df0091b2363713976c61f814202b7e0320074392e027b00"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-cuda-c82bf91515d93d4b/build-script-build-script-build.json": {
+      "bytes": 373,
+      "sha256": "42af5ee2dbddb0ccadd1d7819991de66100a21f8a5cd26be8bdfa7e7919ab9ea"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-cuda-d9ad51fae469d445/run-build-script-build-script-build": {
+      "bytes": 16,
+      "sha256": "9b13f4cb63611fc4acd18834939a6bf8112eeb126d5ac003bd48e123730a7e84"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-cuda-d9ad51fae469d445/run-build-script-build-script-build.json": {
+      "bytes": 772,
+      "sha256": "105d99957d6c037d53e7f83d4455619105b39c9754826243ac8fe144b32465d9"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-cuda-fe78e545d18196b4/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-cuda-fe78e545d18196b4/dep-lib-holonics_cuda": {
+      "bytes": 478,
+      "sha256": "decc889b43789a9c4411670f635b52ed690e099fb2f48245638e746e8bc98dbc"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-cuda-fe78e545d18196b4/lib-holonics_cuda": {
+      "bytes": 16,
+      "sha256": "7701b7b976b162606bccc3add4d40e257c97bc161bc188f1bf93ad54ebdba1f8"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-cuda-fe78e545d18196b4/lib-holonics_cuda.json": {
+      "bytes": 675,
+      "sha256": "642365446babd7b03cdac06bc2db87b0a22c7150c9049185aa2a1ef4565b2869"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-d85475b8f5abeb14/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-d85475b8f5abeb14/dep-test-integration-test-resident_cold_restore": {
+      "bytes": 50,
+      "sha256": "26bc6934c48949cb289aa74274df47f2717e5366f8bec1d7e88bc82df668b3e1"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-d85475b8f5abeb14/test-integration-test-resident_cold_restore": {
+      "bytes": 16,
+      "sha256": "072d33738cbc66bb884abab6b7cccc751b47f7aa9bfae702dd569c446d006a33"
+    },
+    "queue/hnn-pair-learning-d38251b1-20261006/preserved-local-fingerprints-v1/holonics-d85475b8f5abeb14/test-integration-test-resident_cold_restore.json": {
+      "bytes": 746,
+      "sha256": "b00b7a64164b4779eff4bf6e369c2da7710914a20ab4b62126155c85bbf3e54c"
+    },
+    "VALIDATION.json": {
+      "bytes": 644947,
+      "sha256": "c0946972dba42bca8b3073ac5b9a26562bba150e986e229d0400cfcc569497df"
+    }
+  },
+  "large_binaries_toolchain_cache_not_committed": true,
+  "scientific_job": false,
+  "GPU_runtime": false,
+  "unchanged_Lean_not_recompiled": true
+}

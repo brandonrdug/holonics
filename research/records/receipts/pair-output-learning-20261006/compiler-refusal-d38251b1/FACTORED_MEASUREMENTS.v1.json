@@ -1,0 +1,194 @@
+{
+  "validation": {
+    "path": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-d38251b1-compiler-refusal/VALIDATION.json",
+    "bytes": 644947,
+    "sha256": "c0946972dba42bca8b3073ac5b9a26562bba150e986e229d0400cfcc569497df"
+  },
+  "wall_and_CPU_grain": "integer nanoseconds; CPU kernel grain1000ns",
+  "group_peak_grain": "integer bytes",
+  "child_RSS_grain": "integer KiB",
+  "measurements": {
+    "hnn-pair-learning-d38251b1-cache-preparation-20261006-v1": {
+      "wall_ns": {
+        "value": 7172835588,
+        "prime_factors": [
+          [
+            2,
+            2
+          ],
+          [
+            3,
+            2
+          ],
+          [
+            271,
+            2
+          ],
+          [
+            2713,
+            1
+          ]
+        ]
+      },
+      "projection_ns": {
+        "value": 17000000000,
+        "prime_factors": [
+          [
+            2,
+            9
+          ],
+          [
+            5,
+            9
+          ],
+          [
+            17,
+            1
+          ]
+        ]
+      },
+      "aggregate_CPU_ns": {
+        "value": 5878805000,
+        "prime_factors": [
+          [
+            2,
+            3
+          ],
+          [
+            5,
+            4
+          ],
+          [
+            587,
+            1
+          ],
+          [
+            2003,
+            1
+          ]
+        ]
+      },
+      "group_peak_bytes": {
+        "value": 4294967296,
+        "prime_factors": [
+          [
+            2,
+            32
+          ]
+        ]
+      },
+      "peak_child_RSS_KiB": {
+        "value": 30084,
+        "prime_factors": [
+          [
+            2,
+            2
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            23,
+            1
+          ],
+          [
+            109,
+            1
+          ]
+        ]
+      }
+    },
+    "hnn-pair-learning-d38251b1-host-cuda-link-20261006-v1": {
+      "wall_ns": {
+        "value": 12972642247,
+        "prime_factors": [
+          [
+            14081,
+            1
+          ],
+          [
+            921287,
+            1
+          ]
+        ]
+      },
+      "projection_ns": {
+        "value": 65000000000,
+        "prime_factors": [
+          [
+            2,
+            9
+          ],
+          [
+            5,
+            10
+          ],
+          [
+            13,
+            1
+          ]
+        ]
+      },
+      "aggregate_CPU_ns": {
+        "value": 30612952000,
+        "prime_factors": [
+          [
+            2,
+            6
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            19,
+            1
+          ],
+          [
+            201401,
+            1
+          ]
+        ]
+      },
+      "group_peak_bytes": {
+        "value": 2796441600,
+        "prime_factors": [
+          [
+            2,
+            12
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            5,
+            2
+          ],
+          [
+            9103,
+            1
+          ]
+        ]
+      },
+      "peak_child_RSS_KiB": {
+        "value": 1500604,
+        "prime_factors": [
+          [
+            2,
+            2
+          ],
+          [
+            7,
+            1
+          ],
+          [
+            53593,
+            1
+          ]
+        ]
+      }
+    }
+  }
+}

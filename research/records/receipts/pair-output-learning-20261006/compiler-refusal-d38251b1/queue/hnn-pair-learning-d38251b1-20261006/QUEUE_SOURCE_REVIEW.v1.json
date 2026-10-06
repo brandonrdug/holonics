@@ -1,0 +1,23 @@
+{
+  "passed": true,
+  "native_inputs_verified": 285,
+  "changed_native_paths": [
+    "crates/holonics/src/hnn/prediction.rs",
+    "crates/holonics/src/hnn/tests/prediction.rs"
+  ],
+  "source_commit": "d38251b1280e7e2e4f73f4480e067ff5f2d992a9",
+  "source_base": "a8cf6c551a943441708fd1fb788aadbae700f9c4",
+  "existing_owners": "predict_by_field transient same blind Word/source; reference::compose_return factor pullback; Constitution::deposited carried normal law; existing JointReading on actual applied pair-output move",
+  "new_consumer": "observe_pair_outputs selects reached PairPort output covectors while fixing current/earlier factors,E,R,internal law and exact Word; rounded Words/reached quartics refuse",
+  "native_fixture": "two real R-only opening observations, same blind prediction for no-deposit/opposite/ignored observations, actual learned pair outputs and six independent target-free probes; no authored answer or prescribed class",
+  "default_pair_read_rank": "14 of16 remains an explicit obligation; no rank improvement inferred from outputs row count",
+  "source_review": {
+    "path": "/home/b/Workspaces/holonics/.local/wt/material-learning/.local/material-learning-followup-01a1030c-20261006/PAIR_OUTPUT_SOURCE_REVIEW.v1.json",
+    "bytes": 1134,
+    "sha256": "1f247da071b87313101a6fd88522045bce5003bb7b443bd67278923868cb2a8a"
+  },
+  "selector_adaptation": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-d38251b1-20261006/RUNTIME_GROUPS.v1.json",
+  "source_unchanged_Lean": true,
+  "scientific_job": false,
+  "useful_reconstruction_established": false
+}

@@ -155,3 +155,29 @@ cubic source ray and its reached certificates remain owed. This algebraic kernel
 a proof that every such contrast is realizable by admitted finite source cells with the same
 first marginals and clocks. Source-family injectivity and task fidelity remain receiver-relative
 obligations, rather than a full-rank inference.
+
+## First compiler receipt and its exact correction
+
+[compiler refusal; zero runtime controls] The sole queue's immutable `d38251b1`
+link failed at a diagnostic expression in the target-free probe:
+`repair.carry.change.ticks` asks `EndChange` for a field it does not own.
+`ReceptionCarry` owns `ticks`; `4432a4b9` changes that one expression to
+`repair.carry.ticks`. The learning law, operands, assertions and admission caps
+are unchanged. Static syntax/whitespace checks pass; this correction is not a
+claim that the native controls passed. The corrected source is frozen for the
+same queue, with all 285 native inputs pinned and exactly one input changed.
+
+The [compiler-refusal join](receipts/pair-output-learning-20261006/compiler-refusal-d38251b1/COMPILER_REFUSAL_JOIN.v1.json)
+verifies all 1,491 original archived artifacts, 286 git/snapshot inputs and 285
+native compile bindings. The whole compiler output, fixed projection, aggregate
+CPU accounting, peak memory, final cleanup and external-lease release remain in
+its compact queue receipts. [Exact factored measurements](receipts/pair-output-learning-20261006/compiler-refusal-d38251b1/FACTORED_MEASUREMENTS.v1.json)
+preserve the readings and measured/projected ratios. The failed compile consumed
+its bounded admission and ran zero controls; its partial compiled artifacts do
+not establish build or behavioral acceptance. The independent `518e1e3f` controls
+remain earlier evidence on their own source.
+
+The successor request carries the existing queue's two namespace exclusions for
+the separately scheduled new controls: 26 unique controls in 16 groups, each
+once. Compile/runtime validation and any resulting behavioral diagnosis are
+pending on `4432a4b9`; no output has been substituted for an actual native read.

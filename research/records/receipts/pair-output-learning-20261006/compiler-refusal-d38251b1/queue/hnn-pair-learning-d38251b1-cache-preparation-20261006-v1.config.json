@@ -1,0 +1,99 @@
+{
+  "label": "hnn-pair-learning-d38251b1-cache-preparation-20261006-v1",
+  "scope_unit": "holonics-prune-admission-hnn-pair-learning-d38251b1-cache-preparation-20261006-v1",
+  "scientific_job": false,
+  "stage_kind": "preparation",
+  "cwd": "/home/b/Workspaces/holonics",
+  "scope": "Exact d382 pair-output consumer source and selected accepted-518e cache preparation; no compiler",
+  "projection_ns": 17000000000,
+  "aggregate_cpu_limit_us": 17000000,
+  "aggregate_cpu_stop_margin_us": 1000000,
+  "group_memory_max_bytes": 4294967296,
+  "address_space_max_bytes": -1,
+  "minimum_MemAvailable_KiB": 8388608,
+  "system_floor_MemAvailable_KiB": 4194304,
+  "thread_budget": 1,
+  "inputs": [
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-d38251b1-20261006/PREPARATION_REQUEST.v1.json",
+    "/home/b/Workspaces/holonics/.local/wt/material-learning/.local/material-learning-followup-01a1030c-20261006/COHERENT_FOLLOWUP_CANDIDATE.v9.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-d38251b1-20261006/SOURCE_SNAPSHOT.v1.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-d38251b1-20261006/QUEUE_SOURCE_REVIEW.v1.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-d38251b1-20261006/RUNTIME_GROUPS.v1.json",
+    "/home/b/Workspaces/holonics/.local/wt/material-learning/.local/material-learning-followup-01a1030c-20261006/SOURCE_INPUT_MANIFEST.v9.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/prepare_combined_test_cache_v2.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/final_stage.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/leased_stage_v2.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/bounded_stage_v1.py",
+    "/usr/bin/python3.14",
+    "/usr/bin/cp"
+  ],
+  "input_directories": [],
+  "expected_inputs": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-d38251b1-20261006/PREPARATION_REQUEST.v1.json": {
+      "bytes": 1043,
+      "sha256": "147baeae3d41d54129ad83740a407c3b0be4f2f527ddb9d549a62dea360b5dbc"
+    },
+    "/home/b/Workspaces/holonics/.local/wt/material-learning/.local/material-learning-followup-01a1030c-20261006/COHERENT_FOLLOWUP_CANDIDATE.v9.json": {
+      "bytes": 31451,
+      "sha256": "a54dea08a11a8e576dfb6f5ad374d8eb8d52d47d725070b6c3f00835b0682a52"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-d38251b1-20261006/SOURCE_SNAPSHOT.v1.json": {
+      "bytes": 47694,
+      "sha256": "b71497ea0c49e7024a08cc050745dcdcffab4ae320f6e5d0a6a6d11b27466899"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-d38251b1-20261006/QUEUE_SOURCE_REVIEW.v1.json": {
+      "bytes": 1618,
+      "sha256": "acd8fd8ec2a497126feb4a4d7524bc0161b7b80d07c3e44f4bb423bb6d98e492"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-d38251b1-20261006/RUNTIME_GROUPS.v1.json": {
+      "bytes": 21673,
+      "sha256": "c6785a7357d74734fb47bec90fce8fee7ef637878af4697eba2212f5c7f426d8"
+    },
+    "/home/b/Workspaces/holonics/.local/wt/material-learning/.local/material-learning-followup-01a1030c-20261006/SOURCE_INPUT_MANIFEST.v9.json": {
+      "bytes": 46976,
+      "sha256": "2ee091ed1d240325ebda15437774f66e9f1a8db72d4d5958e60ec0770384ce51"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/prepare_combined_test_cache_v2.py": {
+      "bytes": 2795,
+      "sha256": "7c241e2402df26821c82268ff3d38d4bf26c726acdd5a83b597edc64552f4435"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/final_stage.py": {
+      "bytes": 10968,
+      "sha256": "a0a5a94f157acf9a5127b756a036c6e86449dc2012af0f1e71d34aafa13bc79e"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/leased_stage_v2.py": {
+      "bytes": 5520,
+      "sha256": "bcf91456534e763a025613f39e82853d7a58529b399bb183d544d09a7a42f949"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/bounded_stage_v1.py": {
+      "bytes": 12645,
+      "sha256": "84b7d003089fa19881690e368200b2168b9d179c8e6573bdafab54369235cec2"
+    },
+    "/usr/bin/python3.14": {
+      "bytes": 14424,
+      "sha256": "ac12d99c156d3c0ec708a2baf664d35b74f455572fe35fd57faa420ade5c3845"
+    },
+    "/usr/bin/cp": {
+      "bytes": 149816,
+      "sha256": "c330dda7811d7dea399a6b9fe655cfeba4cc5115234015f9d6fd21d05ca55fc5"
+    }
+  },
+  "outputs": [
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-d38251b1-20261006/CACHE_SNAPSHOT.v2.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-d38251b1-20261006/PREPARATION.v2.json"
+  ],
+  "argv": [
+    "/usr/bin/python3.14",
+    "-B",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/prepare_combined_test_cache_v2.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-d38251b1-20261006/PREPARATION_REQUEST.v1.json"
+  ],
+  "allocation_basis": {
+    "largest_selected_debug_preparation_wall_ns": 7606732134,
+    "existing_fixed_development_ceiling_ns": 17000000000,
+    "no_cap_raise": true,
+    "separate_cache_preparation": true
+  },
+  "confirmed_resource_handoff": "Parent explicitly requested HNNv9 in fair queue after active Hodge checks; current full Hodge owner4 passed and lease released; original resource caps retained",
+  "read_partition_change": "Full cache preparation incomplete at unchanged17s. New declared read omits unused incremental/example output; fresh selected cache snapshot required. No source/cap raise or unchanged retry."
+}
