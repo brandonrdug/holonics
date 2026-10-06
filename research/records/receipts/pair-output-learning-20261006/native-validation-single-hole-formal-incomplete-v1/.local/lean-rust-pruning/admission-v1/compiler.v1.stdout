@@ -1,0 +1,6 @@
+{"phase": "precompile sealed JSON read", "wall_ns": 235206972}
+{"phase": "precompile metadata", "wall_ns": 325742027}
+{"phase": "Lean compiler", "wall_ns": 17147946185, "exit": 124}
+{"phase": "postcompile sealed JSON read", "wall_ns": 246177224}
+{"phase": "postcompile metadata", "wall_ns": 328824270}
+{"kernel_accepted": false, "compiler_exit": 124, "compiler_wall_ns": 17147946185, "axioms": {}, "selector_count_matches": false, "standard_axioms_only": true, "metadata_unchanged": true, "broad_library_checked": false}

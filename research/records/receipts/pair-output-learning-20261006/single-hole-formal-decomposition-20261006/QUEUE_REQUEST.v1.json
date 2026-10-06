@@ -1,0 +1,261 @@
+{
+  "base_commit": "0e4f107849c8c3799bf597db1ca0ba0941133b67",
+  "branch": "codex/single-hole-formal-decomposed",
+  "constraints": {
+    "axioms_or_sorry_added": false,
+    "compile_or_kernel_launch": false,
+    "deadline_raise": false,
+    "experiments": false,
+    "native_tests": false,
+    "obligations_removed": false,
+    "projection_ns": null,
+    "projection_owner": "sole queue; derive fresh per-owner measured projection before any launch under unchanged ceilings",
+    "queue_owns_projection_and_resource_lease": true,
+    "source_statement_weakened": false
+  },
+  "dependent_importer_job": {
+    "acceptance": "After the sealed integration overlay, compile the exact existing importer against the decomposed facade; require all nine selector outputs, then compile its original independent audit source/object/lookup matched and require its nine selector outputs.",
+    "audit_selector_names": [
+      "blockTick_apply",
+      "wordMapAt_apply",
+      "sourceReturnAt_pairing",
+      "sourceReturnAt_is_dual_of_sourceRead",
+      "sourceReturnAt_unique",
+      "sourceReturnAt_halfTurn",
+      "sourceContrast_return",
+      "partitionReturn_pairing",
+      "normalizedAbsoluteLoaded_sourceReturn"
+    ],
+    "audit_source_path": "research/records/receipts/pair-output-learning-20261006/single-hole-formal-decomposition-20261006/SourceReceiverReturnAudit.lean",
+    "audit_source_sha256": "8a7d0ff4a5e110091a6993cbec1d2c82ee3c4d8171070a74f0357942170b6d5f",
+    "axiom_selectors": [
+      "blockTick_apply",
+      "wordMapAt_apply",
+      "sourceReturnAt_pairing",
+      "sourceReturnAt_is_dual_of_sourceRead",
+      "sourceReturnAt_unique",
+      "sourceReturnAt_halfTurn",
+      "sourceContrast_return",
+      "partitionReturn_pairing",
+      "normalizedAbsoluteLoaded_sourceReturn"
+    ],
+    "note": "External dependent owner is not copied into this base. Queue must use the coordinator-sealed integration overlay after this facade is integrated; preserve its source bytes.",
+    "source_base_commit": "8ab22667618271eca057fb460f1d062647e5b331",
+    "source_path": "/home/b/Workspaces/holonics/.local/wt/directionality-consumer-01a1030c/lean/Holonics/HNN/SourceReceiverReturn.lean",
+    "source_sha256": "294df662d9a7dff20e4540f0fc643e0a00081fbae49d471c4f146dc1c5d9bc53",
+    "source_snapshot_copy": "research/records/receipts/pair-output-learning-20261006/single-hole-formal-decomposition-20261006/SourceReceiverReturn.lean",
+    "target": "Holonics.HNN.SourceReceiverReturn"
+  },
+  "facade_job": {
+    "acceptance": "After all owner units, compile the stable facade and retain all thirteen exact axiom outputs.",
+    "axiom_selectors": [
+      "Holonics.HNN.SingleHoleResponse.firstComplete_eq_fixed_add_response",
+      "Holonics.HNN.SingleHoleResponse.pairComplete_eq_fixed_add_response",
+      "Holonics.HNN.SingleHoleResponse.oneHoleSourceExpansion",
+      "Holonics.HNN.SingleHoleResponse.populationNormalizedOneHoleSourceExpansion",
+      "Holonics.HNN.SingleHoleResponse.absoluteLoaded_response_add",
+      "Holonics.HNN.SingleHoleResponse.openedState_from_normalized_source",
+      "Holonics.HNN.SingleHoleResponse.loadedReceiving_response",
+      "Holonics.HNN.SingleHoleResponse.exactLeaderUnion_mem_iff",
+      "Holonics.HNN.SingleHoleResponse.exactLeaderUnion_sound",
+      "Holonics.HNN.SingleHoleResponse.constant_face_released_at_zero",
+      "Holonics.HNN.SingleHoleResponse.holdingLaw_releases_constant_face_at_zero",
+      "Holonics.HNN.SingleHoleResponse.singletonLeader_holdingLaw_release",
+      "Holonics.HNN.SingleHoleResponse.normalizedSource_loadedWord_grain_singleton_release"
+    ],
+    "imports": [
+      "Holonics.HNN.SingleHoleResponse.SourceExpansion",
+      "Holonics.HNN.SingleHoleResponse.LoadedWord",
+      "Holonics.HNN.SingleHoleResponse.NormalizedOpening",
+      "Holonics.HNN.SingleHoleResponse.ReceivingResponse",
+      "Holonics.HNN.SingleHoleResponse.GrainRelease",
+      "Holonics.HNN.SingleHoleResponse.ComposedConsumer"
+    ],
+    "independent_audit_after_facade": {
+      "acceptance": "Compile the original independently sealed consumer/audit bytes after the full facade; require source/object/lookup match and all thirteen original selectors.",
+      "imports": [
+        "Holonics.HNN.SingleHoleResponse"
+      ],
+      "selector_count": 13,
+      "source_path": "research/records/receipts/pair-output-learning-20261006/single-hole-formal-decomposition-20261006/SingleHoleResponseAudit.lean",
+      "source_sha256": "c4e65d31b586e869a5b924afa149c0587631741adf5bac17102fc7368956f0b7"
+    },
+    "path": "lean/Holonics/HNN/SingleHoleResponse.lean",
+    "sha256": "cf04ec3f21d685dcfafd1f8f3ae0559b18e31ca375aabca8b6cf4144f97d8efb",
+    "target": "Holonics.HNN.SingleHoleResponse"
+  },
+  "failure_evidence": {
+    "aggregate_cpu_ns": 9369328000,
+    "axiom_outputs": 0,
+    "compiler_exit": 124,
+    "compiler_wall_ns": 17147946185,
+    "copied_evidence": true,
+    "cost_diagnosis": "The complete single-file owner exhausted its terminal-v21 child budget before any axiom output. These are measurements for the combined owner only; no per-declaration hotspot or new per-owner compile cost is measured. Decomposition is a testable hypothesis that separate declaration owners reduce each bounded compile unit; no success or speedup is claimed.",
+    "development_stderr": "research/records/receipts/pair-output-learning-20261006/native-validation-single-hole-formal-incomplete-v1/.local/lean-rust-pruning/admission-v1/compiler.v1.stderr",
+    "development_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "development_stdout": "research/records/receipts/pair-output-learning-20261006/native-validation-single-hole-formal-incomplete-v1/.local/lean-rust-pruning/admission-v1/compiler.v1.stdout",
+    "development_stdout_sha256": "a22b2c86ad99f3c9995509cf03777c7b9f24dbc68a216d3c33bd50a99a94c960",
+    "factorizations": {
+      "aggregate_cpu_ns": "2\u2077 \u00d7 5\u00b3 \u00d7 251 \u00d7 2333",
+      "compiler_wall_ns": "5 \u00d7 37 \u00d7 92691601",
+      "group_peak_bytes": "2\u00b3\u00b2",
+      "memory_max_event_delta": "2 \u00d7 7 \u00d7 367",
+      "outer_wall_ns": "11\u00b2 \u00d7 41 \u00d7 137 \u00d7 27997"
+    },
+    "failure_receipt": "research/records/receipts/pair-output-learning-20261006/native-validation-single-hole-formal-incomplete-v1/.local/lean-rust-pruning/admission-v1/failure.json",
+    "group_peak_bytes": 4294967296,
+    "import_preparation_receipt": "research/records/receipts/pair-output-learning-20261006/native-validation-single-hole-formal-incomplete-v1/import-preparation.v1.json",
+    "memory_max_event_delta": 5138,
+    "oom": 0,
+    "oom_kill": 0,
+    "outer_wall_ns": 19028357029,
+    "provider_provenance_receipt": "research/records/receipts/pair-output-learning-20261006/native-validation-single-hole-formal-incomplete-v1/NATIVE_PROVIDER_PROVENANCE.v1.json",
+    "selectors_emitted": 0,
+    "validation_receipt": "research/records/receipts/pair-output-learning-20261006/native-validation-single-hole-formal-incomplete-v1/VALIDATION.json",
+    "validation_sha256": "8051e44fdba7267eaf14df8d3cf21ce5b5e6986cd8bd86d3af94743b13ceff5a"
+  },
+  "fixed_acceptance_order": [
+    "six owner jobs in listed dependency order",
+    "full SingleHoleResponse facade with all thirteen selectors",
+    "original independent SingleHoleResponseAudit with all thirteen selectors and source/object/lookup match",
+    "SourceReceiverReturn nine dependent selectors after the coordinator-sealed integration overlay",
+    "original independent SourceReceiverReturnAudit with all nine selectors and source/object/lookup match"
+  ],
+  "input_source_sha256_before_decomposition": "6206a8aca280331d6aaba9726af98e2d644074ddb7d4950f50a086b9940ba83d",
+  "new_source_sha256": {
+    "docs/atlas/objects.tsv": "0adc0e5599eaa6f9503c1c8d38be9527510665e60903c37d1365d3378075befc",
+    "lean/Holonics/HNN/SingleHoleResponse.lean": "cf04ec3f21d685dcfafd1f8f3ae0559b18e31ca375aabca8b6cf4144f97d8efb",
+    "lean/Holonics/HNN/SingleHoleResponse/ComposedConsumer.lean": "a0808bf5130db462023f5357df850780561daf7f4a12e35ead0b1b5c03ac0362",
+    "lean/Holonics/HNN/SingleHoleResponse/GrainRelease.lean": "16785b532ef69e74130a148e6d9ab2e933f00beacf580bab5a02d97867fc14e5",
+    "lean/Holonics/HNN/SingleHoleResponse/LoadedWord.lean": "2d72454c1c62667109f471c23c2223f003629a2b4f4e5fcda82cbbb80da043d0",
+    "lean/Holonics/HNN/SingleHoleResponse/NormalizedOpening.lean": "0957ab4482a935b5b80b3f4bf1993f9ab6c14823f1cc90c1a9df4add1d48d199",
+    "lean/Holonics/HNN/SingleHoleResponse/ReceivingResponse.lean": "716da284776cf2a7b21f6ae38547015bb69c1d6bac83093e7186eb5c4a9822e9",
+    "lean/Holonics/HNN/SingleHoleResponse/SourceExpansion.lean": "2661a9d5c3fc3c6c7fd14372756e74d4aa9a88135107164edf9ed20de971bd95"
+  },
+  "owner_jobs": [
+    {
+      "acceptance": "Compile exactly this owner once in dependency order; require all listed #print axioms outputs, standard axioms only, and no sorryAx. Queue owns measured projection, lease, resources and cleanup.",
+      "axiom_selectors": [
+        "Holonics.HNN.SingleHoleResponse.firstComplete_eq_fixed_add_response",
+        "Holonics.HNN.SingleHoleResponse.pairComplete_eq_fixed_add_response",
+        "Holonics.HNN.SingleHoleResponse.oneHoleSourceExpansion",
+        "Holonics.HNN.SingleHoleResponse.populationNormalizedOneHoleSourceExpansion"
+      ],
+      "imports": [
+        "Mathlib.Algebra.BigOperators.Group.Finset.Basic",
+        "Mathlib.Data.Fintype.BigOperators",
+        "Mathlib.Algebra.Module.LinearMap.Basic",
+        "Mathlib.Tactic.Abel"
+      ],
+      "order": 1,
+      "path": "lean/Holonics/HNN/SingleHoleResponse/SourceExpansion.lean",
+      "sha256": "2661a9d5c3fc3c6c7fd14372756e74d4aa9a88135107164edf9ed20de971bd95",
+      "target": "Holonics.HNN.SingleHoleResponse.SourceExpansion"
+    },
+    {
+      "acceptance": "Compile exactly this owner once in dependency order; require all listed #print axioms outputs, standard axioms only, and no sorryAx. Queue owns measured projection, lease, resources and cleanup.",
+      "axiom_selectors": [
+        "Holonics.HNN.SingleHoleResponse.absoluteLoaded_response_add"
+      ],
+      "imports": [
+        "Holonics.HNN.LoadedMedium",
+        "Holonics.HNN.TickFamily"
+      ],
+      "order": 2,
+      "path": "lean/Holonics/HNN/SingleHoleResponse/LoadedWord.lean",
+      "sha256": "2d72454c1c62667109f471c23c2223f003629a2b4f4e5fcda82cbbb80da043d0",
+      "target": "Holonics.HNN.SingleHoleResponse.LoadedWord"
+    },
+    {
+      "acceptance": "Compile exactly this owner once in dependency order; require all listed #print axioms outputs, standard axioms only, and no sorryAx. Queue owns measured projection, lease, resources and cleanup.",
+      "axiom_selectors": [
+        "Holonics.HNN.SingleHoleResponse.openedState_from_normalized_source"
+      ],
+      "imports": [
+        "Holonics.HNN.SingleHoleResponse.SourceExpansion",
+        "Holonics.HNN.SingleHoleResponse.LoadedWord"
+      ],
+      "order": 3,
+      "path": "lean/Holonics/HNN/SingleHoleResponse/NormalizedOpening.lean",
+      "sha256": "0957ab4482a935b5b80b3f4bf1993f9ab6c14823f1cc90c1a9df4add1d48d199",
+      "target": "Holonics.HNN.SingleHoleResponse.NormalizedOpening"
+    },
+    {
+      "acceptance": "Compile exactly this owner once in dependency order; require all listed #print axioms outputs, standard axioms only, and no sorryAx. Queue owns measured projection, lease, resources and cleanup.",
+      "axiom_selectors": [
+        "Holonics.HNN.SingleHoleResponse.loadedReceiving_response"
+      ],
+      "imports": [
+        "Holonics.HNN.SingleHoleResponse.LoadedWord"
+      ],
+      "order": 4,
+      "path": "lean/Holonics/HNN/SingleHoleResponse/ReceivingResponse.lean",
+      "sha256": "716da284776cf2a7b21f6ae38547015bb69c1d6bac83093e7186eb5c4a9822e9",
+      "target": "Holonics.HNN.SingleHoleResponse.ReceivingResponse"
+    },
+    {
+      "acceptance": "Compile exactly this owner once in dependency order; require all listed #print axioms outputs, standard axioms only, and no sorryAx. Queue owns measured projection, lease, resources and cleanup.",
+      "axiom_selectors": [
+        "Holonics.HNN.SingleHoleResponse.exactLeaderUnion_mem_iff",
+        "Holonics.HNN.SingleHoleResponse.exactLeaderUnion_sound",
+        "Holonics.HNN.SingleHoleResponse.constant_face_released_at_zero",
+        "Holonics.HNN.SingleHoleResponse.holdingLaw_releases_constant_face_at_zero",
+        "Holonics.HNN.SingleHoleResponse.singletonLeader_holdingLaw_release"
+      ],
+      "imports": [
+        "Holonics.Foundation.ReceiverRelease"
+      ],
+      "order": 5,
+      "path": "lean/Holonics/HNN/SingleHoleResponse/GrainRelease.lean",
+      "sha256": "16785b532ef69e74130a148e6d9ab2e933f00beacf580bab5a02d97867fc14e5",
+      "target": "Holonics.HNN.SingleHoleResponse.GrainRelease"
+    },
+    {
+      "acceptance": "Compile exactly this owner once in dependency order; require all listed #print axioms outputs, standard axioms only, and no sorryAx. Queue owns measured projection, lease, resources and cleanup.",
+      "axiom_selectors": [
+        "Holonics.HNN.SingleHoleResponse.normalizedSource_loadedWord_grain_singleton_release"
+      ],
+      "imports": [
+        "Holonics.HNN.SingleHoleResponse.SourceExpansion",
+        "Holonics.HNN.SingleHoleResponse.LoadedWord",
+        "Holonics.HNN.SingleHoleResponse.NormalizedOpening",
+        "Holonics.HNN.SingleHoleResponse.ReceivingResponse",
+        "Holonics.HNN.SingleHoleResponse.GrainRelease"
+      ],
+      "order": 6,
+      "path": "lean/Holonics/HNN/SingleHoleResponse/ComposedConsumer.lean",
+      "sha256": "a0808bf5130db462023f5357df850780561daf7f4a12e35ead0b1b5c03ac0362",
+      "target": "Holonics.HNN.SingleHoleResponse.ComposedConsumer"
+    }
+  ],
+  "provider_provenance": {
+    "import_preparation_receipt": "research/records/receipts/pair-output-learning-20261006/native-validation-single-hole-formal-incomplete-v1/import-preparation.v1.json",
+    "import_preparation_sha256": "c100996f87828fc0a969367ccf6b9b9623b94f1833334fd8a82721d2d291df81",
+    "owned_current_imports_verified": 141,
+    "receipt": "research/records/receipts/pair-output-learning-20261006/native-validation-single-hole-formal-incomplete-v1/NATIVE_PROVIDER_PROVENANCE.v1.json",
+    "reuse": "Retain accepted provider/input seals and dependency order; no existing provider rebuilds requested.",
+    "sha256": "820797b6f7dd45f1fdba1bcf44df3c2a43235a937fa60bc43565a8aeed94bb1f"
+  },
+  "purpose": "Per-owner and aggregate/importer acceptance for the dependency-preserving full-owner decomposition of SingleHoleResponse after the measured terminal-v21 timeout.",
+  "source_audit_artifacts": {
+    "SingleHoleResponseAudit": {
+      "path": "research/records/receipts/pair-output-learning-20261006/single-hole-formal-decomposition-20261006/SingleHoleResponseAudit.lean",
+      "selector_count": 13,
+      "sha256": "c4e65d31b586e869a5b924afa149c0587631741adf5bac17102fc7368956f0b7"
+    },
+    "SourceReceiverReturn": {
+      "base_commit": "8ab22667618271eca057fb460f1d062647e5b331",
+      "path": "research/records/receipts/pair-output-learning-20261006/single-hole-formal-decomposition-20261006/SourceReceiverReturn.lean",
+      "selector_count": 9,
+      "sha256": "294df662d9a7dff20e4540f0fc643e0a00081fbae49d471c4f146dc1c5d9bc53"
+    },
+    "SourceReceiverReturnAudit": {
+      "path": "research/records/receipts/pair-output-learning-20261006/single-hole-formal-decomposition-20261006/SourceReceiverReturnAudit.lean",
+      "selector_count": 9,
+      "sha256": "8a7d0ff4a5e110091a6993cbec1d2c82ee3c4d8171070a74f0357942170b6d5f"
+    }
+  },
+  "status": "prepared; launch not authorized; no compiler/kernel acceptance claimed",
+  "version": 1,
+  "worktree": "/home/b/Workspaces/holonics/.local/wt/single-hole-formal-decomposed"
+}

@@ -1,0 +1,9 @@
+{
+  "provisional_passed": false,
+  "final_acceptance_requires_external_CPU_read": true,
+  "label": "hnn-single-hole-formal-5d811c94-development-20261006-v1",
+  "error_type": "SystemExit",
+  "error": "124",
+  "child_launched": true,
+  "child_reaped": true
+}

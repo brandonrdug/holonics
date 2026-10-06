@@ -1,0 +1,15 @@
+import Holonics.HNN.SingleHoleResponse
+
+#print axioms Holonics.HNN.SingleHoleResponse.firstComplete_eq_fixed_add_response
+#print axioms Holonics.HNN.SingleHoleResponse.pairComplete_eq_fixed_add_response
+#print axioms Holonics.HNN.SingleHoleResponse.oneHoleSourceExpansion
+#print axioms Holonics.HNN.SingleHoleResponse.populationNormalizedOneHoleSourceExpansion
+#print axioms Holonics.HNN.SingleHoleResponse.absoluteLoaded_response_add
+#print axioms Holonics.HNN.SingleHoleResponse.openedState_from_normalized_source
+#print axioms Holonics.HNN.SingleHoleResponse.loadedReceiving_response
+#print axioms Holonics.HNN.SingleHoleResponse.exactLeaderUnion_mem_iff
+#print axioms Holonics.HNN.SingleHoleResponse.exactLeaderUnion_sound
+#print axioms Holonics.HNN.SingleHoleResponse.constant_face_released_at_zero
+#print axioms Holonics.HNN.SingleHoleResponse.holdingLaw_releases_constant_face_at_zero
+#print axioms Holonics.HNN.SingleHoleResponse.singletonLeader_holdingLaw_release
+#print axioms Holonics.HNN.SingleHoleResponse.normalizedSource_loadedWord_grain_singleton_release
