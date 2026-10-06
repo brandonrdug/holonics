@@ -1,0 +1,152 @@
+{
+  "status": "FOUR_FIXED_LAW_FIXTURES_PASS",
+  "accepted_source_commit": "0da1652c59fb27eb7fde3ba63e7a705aa251d207",
+  "validation_commit": "fb7859a2e1c2e173d766fec61d39b10eb408dfc4",
+  "original_complete_validation_sha256": "c265c52bd4391f4130fd95342068a3cabd2a489ededb2e2c2237708d63fb8234",
+  "integrated_native_sources": {
+    "crates/holonics/src/hnn/prediction.rs": {
+      "sha256": "208ecc6e113fb2489010d4f7965d148bc557b4f9aee52c6352a4b3010058f3c1",
+      "bytes": 178985
+    },
+    "crates/holonics/src/hnn/prediction/charted.rs": {
+      "sha256": "b0a8a32dbbb83bc9b21a050cf7048a2a0c59bab5bcef9df9fe1962ace584de87",
+      "bytes": 32325
+    },
+    "crates/holonics/src/hnn/tests/mod.rs": {
+      "sha256": "57ca9cac419266b422dca377b8437aebd742028c8b19394aff871589be204edf",
+      "bytes": 618
+    },
+    "crates/holonics/src/hnn/tests/physical_charted.rs": {
+      "sha256": "a9400062391416f1db06e051d15c9b8aa4d9c2634ea216bd6b312cf8abe038f3",
+      "bytes": 14366
+    },
+    "crates/holonics/src/hnn/word.rs": {
+      "sha256": "4fe3b64ed1a2ed5114ee075ee45d03bb8cc215ee5e8824906517165da452363a",
+      "bytes": 146002
+    }
+  },
+  "accepted_stages": {
+    "hnn-charted-v4-exact-control1-20261006-v1": {
+      "CPU_ns": 318122000,
+      "CPU_reading_grain_ns": 1000,
+      "accepted_after_cleanup": true,
+      "aggregate_cpu_limit_us": 17000000,
+      "executions": 1,
+      "group_memory_max_bytes": 4294967296,
+      "measured_to_projected": [
+        372167412,
+        16000000000
+      ],
+      "peak_group_bytes": 16969728,
+      "projection_ns": 16000000000,
+      "quiescent_released": true,
+      "selector": "hnn::tests::physical_charted::charted_source_and_carry_error_enclose_the_same_exact_physical_passage",
+      "stdout_whole": "hnn-charted-v4-exact-control1-20261006-v1.stdout",
+      "test_count": 1,
+      "thread_budget": 1,
+      "wall_ns": 372167412
+    },
+    "hnn-charted-v4-exact-control2-20261006-v1": {
+      "CPU_ns": 571873000,
+      "CPU_reading_grain_ns": 1000,
+      "accepted_after_cleanup": true,
+      "aggregate_cpu_limit_us": 17000000,
+      "executions": 1,
+      "group_memory_max_bytes": 4294967296,
+      "measured_to_projected": [
+        617575542,
+        16000000000
+      ],
+      "peak_group_bytes": 17625088,
+      "projection_ns": 16000000000,
+      "quiescent_released": true,
+      "selector": "hnn::tests::physical_charted::charted_receiving_learning_charges_both_covectors_and_keeps_its_physical_carry",
+      "stdout_whole": "hnn-charted-v4-exact-control2-20261006-v1.stdout",
+      "test_count": 1,
+      "thread_budget": 1,
+      "wall_ns": 617575542
+    },
+    "hnn-charted-v4-exact-control3-20261006-v1": {
+      "CPU_ns": 286576000,
+      "CPU_reading_grain_ns": 1000,
+      "accepted_after_cleanup": true,
+      "aggregate_cpu_limit_us": 17000000,
+      "executions": 1,
+      "group_memory_max_bytes": 4294967296,
+      "measured_to_projected": [
+        326253816,
+        16000000000
+      ],
+      "peak_group_bytes": 16912384,
+      "projection_ns": 16000000000,
+      "quiescent_released": true,
+      "selector": "hnn::tests::physical_charted::charted_zero_tolerance_refuses_the_actual_opening_error_and_retains_the_blind_end",
+      "stdout_whole": "hnn-charted-v4-exact-control3-20261006-v1.stdout",
+      "test_count": 1,
+      "thread_budget": 1,
+      "wall_ns": 326253816
+    },
+    "hnn-charted-v4-exact-control4-20261006-v1": {
+      "CPU_ns": 376149000,
+      "CPU_reading_grain_ns": 1000,
+      "accepted_after_cleanup": true,
+      "aggregate_cpu_limit_us": 17000000,
+      "executions": 1,
+      "group_memory_max_bytes": 4294967296,
+      "measured_to_projected": [
+        412687446,
+        16000000000
+      ],
+      "peak_group_bytes": 17309696,
+      "projection_ns": 16000000000,
+      "quiescent_released": true,
+      "selector": "hnn::tests::physical_charted::charted_loaded_pump_error_keeps_the_absolute_clock_across_the_carry",
+      "stdout_whole": "hnn-charted-v4-exact-control4-20261006-v1.stdout",
+      "test_count": 1,
+      "thread_budget": 1,
+      "wall_ns": 412687446
+    },
+    "hnn-charted-v4-host-cuda-link-20261006-v1": {
+      "CPU_ns": 54469384000,
+      "CPU_reading_grain_ns": 1000,
+      "accepted_after_cleanup": true,
+      "aggregate_cpu_limit_us": 128000000,
+      "group_memory_max_bytes": 4294967296,
+      "measured_to_projected": [
+        21649270954,
+        65000000000
+      ],
+      "peak_group_bytes": 3692335104,
+      "projection_ns": 65000000000,
+      "quiescent_released": true,
+      "thread_budget": 8,
+      "wall_ns": 21649270954
+    },
+    "hnn-charted-v4-workspace-check-20261006-v2": {
+      "CPU_ns": 21002038000,
+      "CPU_reading_grain_ns": 1000,
+      "accepted_after_cleanup": true,
+      "aggregate_cpu_limit_us": 128000000,
+      "group_memory_max_bytes": 4294967296,
+      "measured_to_projected": [
+        12505290120,
+        65000000000
+      ],
+      "peak_group_bytes": 2249461760,
+      "projection_ns": 65000000000,
+      "quiescent_released": true,
+      "thread_budget": 8,
+      "wall_ns": 12505290120
+    }
+  },
+  "law_fixture_acceptance_only": true,
+  "erasure_completion_or_product_acceptance": false,
+  "supported_publication": "Receiving only",
+  "unsupported": [
+    "nonlinear Word-Hessian join",
+    "rounded E/pair publication",
+    "charted completion/meaningful repair",
+    "general boundary decoder"
+  ],
+  "full_original_packages": "Retained in released source-owner worktree, not removed. This file is a derived scoped integration receipt; original validation pin stays distinct."
+}

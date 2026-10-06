@@ -886,6 +886,24 @@ impl SourceOpeningReceipt {
     }
 }
 
+/// The same source imposition on the Word's declared charts. `split` is the signed work
+/// released by its actual opening split; `error` is the coordinate difference from the
+/// unsplit imposition, including crossed arriving waves and held interior states. The work
+/// residual is not used as a state or receiving error bound (Refs #73, #62).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ChartedSourceOpeningReceipt {
+    pub source: SourceOpeningReceipt,
+    pub split: Rat,
+    pub error: EndChange,
+}
+
+impl ChartedSourceOpeningReceipt {
+    pub fn closes(&self) -> bool {
+        &self.source.after - &self.source.before + &self.split
+            == &self.source.imposed - &self.source.absorbed
+    }
+}
+
 /// [definition; agent-inferred, October 3; the reception carry §2.1] **What a reception's word
 /// opens on**: at rest at tick zero (today's reception, [`Word::open_charted`]), or on the previous
 /// reception's carried end under a declared absorption ([`Word::open_received`]).
@@ -1850,6 +1868,110 @@ impl<'c> Word<'c> {
         if !receipt.closes() {
             return Err(HnnError::ContinuingState {
                 what: "the exact source imposition does not close its work balance",
+            });
+        }
+        Ok((word, receipt))
+    }
+
+    /// [agent-inferred] Impose the actual source once, on warm certified charts, while
+    /// retaining the declared carry's crossed interior and absolute pump clock. The source
+    /// work and the coordinate opening split have separate producing receipts. Existing
+    /// exact and charted entries keep their contracts; this entry adds their physical join.
+    pub fn open_charted_received(
+        field: &'c Field,
+        material: &dyn crate::hnn::field::FieldMaterial,
+        current: &Current,
+        source: &SourceMoment,
+        charts: &mut Charts,
+        opening: &WordOpening,
+    ) -> Result<(Self, ChartedSourceOpeningReceipt), HnnError> {
+        let injection = source.open_storage(field, material, current)?;
+        let operands = Operands::at_cut_charted(field, material, current, charts)?;
+        let (mut entered, opened_at) = match opening {
+            WordOpening::Rest => (EndChange::rest(field, &operands), 0),
+            WordOpening::Received { carry, absorption: Absorption::Complete } =>
+                (EndChange::rest(field, &operands), carry.ticks),
+            WordOpening::Received { carry, absorption: Absorption::Nothing } => {
+                let conductances: Vec<_> = operands.contacts().iter()
+                    .map(|c| c.conductance().clone()).collect();
+                let storage: Vec<_> = operands.contacts().iter().map(|c| c.forms().0).collect();
+                let resonators: Vec<_> = operands.resonators().iter()
+                    .map(|r| r.as_ref().map(|r| r.material().forms().0)).collect();
+                (carry.crossed(&conductances, &storage, &resonators)?, carry.ticks)
+            }
+        };
+        let shaped = entered.storage.len() == field.rings().len()
+            && entered.storage.iter().zip(field.rings()).all(|(s,r)|s.len()==r.width())
+            && entered.arrivals.len()==field.contacts().len()
+            && entered.states.len()==field.contacts().len()
+            && entered.resonators.len()==field.rings().len()
+            && entered.resonator_phases.len()==field.rings().len()
+            && entered.arrivals.iter().zip(&entered.states).zip(operands.contacts()).all(|((a,s),c)| {
+                let (g,h)=c.ends(); a[0].len()==field.ring(g).width() && a[1].len()==field.ring(h).width()
+                    && s.iter().all(|s|s.len()==c.width())
+            })
+            && entered.resonators.iter().zip(operands.resonators()).all(|(s,r)|match(s,r) {
+                (Some(s),Some(r))=>s.iter().all(|s|s.len()==r.width()), (None,_)=>true, _=>false,
+            });
+        if !shaped {
+            return Err(HnnError::ContinuingState { what: "the charted source opening has a foreign carried field shape" });
+        }
+        for (ring, resonator) in operands.resonators().iter().enumerate() {
+            if let Some(resonator) = resonator {
+                let phase = resonator.phase_at(opened_at.saturating_sub(1));
+                if matches!(opening, WordOpening::Received { absorption: Absorption::Nothing, .. })
+                    && entered.resonator_phases[ring].is_some_and(|p| p != phase)
+                {
+                    return Err(HnnError::Resonator {
+                        ring, what: "the charted opening keeps the carry's actual pump clock",
+                    });
+                }
+                entered.resonator_phases[ring] = Some(phase);
+            }
+        }
+        let form = PowerForm::read(field, material, current)?;
+        let before = form.power(&entered)? + form.resonator_power(&entered)?;
+        let absorbed = field.sources().iter()
+            .map(|&g| form.ring_power(g, &entered.storage[g])).sum();
+        let interior = interior_of(field, entered);
+        let mut raw = interior.clone();
+        for (storage, injection) in raw.storage.iter_mut().zip(&injection) {
+            *storage = add(storage, injection);
+        }
+        let word = Self::continuing(field, operands, &interior, &injection, opened_at)?;
+        let actual = word.change()?;
+        let after = form.power(&actual)? + form.resonator_power(&actual)?;
+        let raw_power = form.power(&raw)? + form.resonator_power(&raw)?;
+        let imposed = field.sources().iter()
+            .map(|&g| form.ring_power(g, &injection[g])).sum();
+        let difference = |a: &[Rat], b: &[Rat]| a.iter().zip(b)
+            .map(|(a, b)| (a-b).abs()).collect::<Vec<_>>();
+        let mut error = actual.clone();
+        for ((e, a), b) in error.storage.iter_mut().zip(&actual.storage).zip(&raw.storage) {
+            *e = difference(a, b);
+        }
+        for (errors, (actual, raw)) in error.arrivals.iter_mut().zip(actual.arrivals.iter().zip(&raw.arrivals)) {
+            for k in 0..2 { errors[k] = difference(&actual[k], &raw[k]); }
+        }
+        for (errors, (actual, raw)) in error.states.iter_mut().zip(actual.states.iter().zip(&raw.states)) {
+            for k in 0..2 { errors[k] = difference(&actual[k], &raw[k]); }
+        }
+        for (errors, (actual, raw)) in error.resonators.iter_mut().zip(actual.resonators.iter().zip(&raw.resonators)) {
+            if let (Some(errors), Some(actual)) = (errors, actual) {
+                for k in 0..2 {
+                    errors[k] = match raw { Some(raw) => difference(&actual[k], &raw[k]),
+                        None => actual[k].iter().map(|a| a.abs()).collect() };
+                }
+            }
+        }
+        let receipt = ChartedSourceOpeningReceipt {
+            source: SourceOpeningReceipt { before, after: after.clone(), absorbed, imposed },
+            split: raw_power - after,
+            error,
+        };
+        if !receipt.closes() {
+            return Err(HnnError::ContinuingState {
+                what: "the charted source imposition does not close with its opening split",
             });
         }
         Ok((word, receipt))

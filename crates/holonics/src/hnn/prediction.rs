@@ -254,6 +254,9 @@
 //! | the closed pair contacts, the pair storage and the gain on equal material | owed in #62 (lane C's record §8; the joint gain's record §8); the full work form's chart transport `Geometry/Motion.finite_work_form_rechart` | [`closed_pairs`], [`BankPlacement::pair_storage`], [`gain`] |
 //! | the physical repair: the sparse source imposed once, the one word through the declared crossings, the decoder's read, release only over a certified domain | `HNN/ChainedBalance.{power_split, opening_one_baseline}`, `Foundation/ReceiverRelease.{width_eq_zero_iff, ReleaseLaw.sound}`; the coupled drive's domain and the decoder's coverage owed in #62 | [`repair_by_field`], [`DamagedSection`] |
 
+/// Physical chart compression with a consumed state and covector error contract.
+pub mod charted;
+
 use num_bigint::BigInt;
 use num_traits::{One, Signed, ToPrimitive, Zero};
 
