@@ -117,6 +117,98 @@ fn material(field: &Field, ring: usize) -> ResonatorMaterial {
     .unwrap()
 }
 
+/// A source-placement counterexample, not a training family. At unit transport, the continued
+/// section keeps phase counts and omits its offset pairs. Swapping two unlike intact classes a
+/// source period apart therefore leaves the entire moment equal. No later choice of element,
+/// contact or receiving coefficients can distinguish those identical native inputs.
+fn source_alias_field() -> Field {
+    Field::declare(
+        FieldDeclaration {
+            rings: vec![ring(8, (0..8).collect()), ring(3, Vec::new())],
+            contacts: vec![ContactDeclaration {
+                from: 0,
+                to: 1,
+                channel: vec![(0, 0), (1, 1), (2, 2)],
+                admittance: integer(2),
+                exponent: integer(0),
+            }],
+            loops: Vec::new(),
+            sources: vec![0],
+            offsets: Vec::new(),
+            alphabet: 4,
+            step: integer(1),
+            exponent_grain: 1,
+            receivers: vec![receiver(0, 1)],
+            crib: CribDeclaration {
+                window: 16,
+                offset: 1,
+            },
+            population: 1 << 16,
+            lattice: Default::default(),
+        }
+        .by_lattice_rule(),
+    )
+    .unwrap()
+}
+
+#[test]
+fn same_phase_intact_swap_has_one_native_source_moment_and_one_physical_motion() {
+    let field = source_alias_field();
+    let current = Current::at_rest(&field);
+    let period = usize::try_from(field.ring(0).period()).unwrap();
+    let mut left = vec![None; period + 1];
+    left[0] = Some(0);
+    left[period] = Some(1);
+    let mut right = left.clone();
+    right.swap(0, period);
+    assert_ne!(left, right);
+    assert_ne!(left[0], right[0]);
+    let open = SourceMoment::open(&field, &current);
+    let left_moment = open.continued(&field, &current, 0, &left).unwrap();
+    let right_moment = open.continued(&field, &current, 0, &right).unwrap();
+    assert_eq!(left_moment, right_moment);
+
+    // Execute the existing nonlinear loaded port as well: it cannot recover a placement that
+    // the source moment merged. The only supplied arrays are intact inputs, never a target.
+    let theta = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET)
+        .unwrap()
+        .with_ring_resonator(
+            &field,
+            0,
+            material(&field, 0)
+                .with_symmetric_saturation(rat(1, 16))
+                .unwrap(),
+        )
+        .unwrap();
+    assert_eq!(
+        holonics::hnn::field::FieldMaterial::transport(&theta, 0),
+        integer(1)
+    );
+    assert_eq!(
+        left_moment.open_storage(&field, &theta, &current).unwrap(),
+        right_moment.open_storage(&field, &theta, &current).unwrap()
+    );
+    let (mut left_word, left_receipt) =
+        Word::open_exact_received(&field, &theta, &current, &left_moment, &WordOpening::Rest)
+            .unwrap();
+    let (mut right_word, right_receipt) =
+        Word::open_exact_received(&field, &theta, &current, &right_moment, &WordOpening::Rest)
+            .unwrap();
+    assert!(left_receipt.closes() && right_receipt.closes());
+    assert_eq!(left_word.change().unwrap(), right_word.change().unwrap());
+    for _ in 0..3 {
+        left_word.tick().unwrap();
+        right_word.tick().unwrap();
+        assert_eq!(left_word.change().unwrap(), right_word.change().unwrap());
+        assert!(left_word.field_balances().last().unwrap().closes());
+        assert!(right_word.field_balances().last().unwrap().closes());
+    }
+    assert_eq!(
+        left_word.reception_end().unwrap(),
+        right_word.reception_end().unwrap()
+    );
+}
+
 // These unit tests exercise the entrance and its actual physical consumer.
 // The synthetic passage supplies lawful unit-test truth; it is not a
 // scientific validation set, training curriculum or evidence of text repair.

@@ -1584,13 +1584,6 @@ impl ReceivingPhases {
         receiving_windows(cells, self.aperture)
     }
 
-    /// [definition; agent-inferred, October 4; the reception carry §10] **The phases with the rank
-    /// read at their declaring medium**: a restored resident's admitted family keeps the rank its
-    /// declaration read, not one read at the restored medium.
-    pub(crate) fn with_rank(self, rank: usize) -> Self {
-        Self { rank, ..self }
-    }
-
     /// `L_R = ⌈1/ε_bits⌉`.
     pub fn grain(&self) -> u64 {
         self.grain
