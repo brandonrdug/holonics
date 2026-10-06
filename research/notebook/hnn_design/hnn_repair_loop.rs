@@ -37,15 +37,15 @@ use num_bigint::BigUint;
 use executed_loop::{terrain_encoded, terrain_pairs};
 
 /// The declared opening `o` and the stations after it (the record's §0).
-const OPENING: usize = 8;
-const STATIONS: usize = 40;
+pub(super) const OPENING: usize = 8;
+pub(super) const STATIONS: usize = 40;
 /// `|A|`: the terrain's residues `ℤ/4`.
-const CLASSES: usize = 4;
+pub(super) const CLASSES: usize = 4;
 /// THE_TWO_COUNTS' reference lags `[1, 40]`.
 const LAGS: usize = 40;
 
 /// **The declared damage** (the record's §0): A, the spans; B, the odd cells from 7.
-fn damage(name: &str) -> Vec<usize> {
+pub(super) fn damage(name: &str) -> Vec<usize> {
     match name {
         "A" => std::iter::once(3)
             .chain(6..10)

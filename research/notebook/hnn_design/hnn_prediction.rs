@@ -16,6 +16,7 @@
 //! cargo run --release -p holonics --example hnn_prediction -- executed text-repair <cut> <private out dir> <pin> <dev|run>
 //! cargo run --release -p holonics --example hnn_prediction -- executed repair <terrain> <A|B> <seed> <count> <out>
 //! cargo run --release -p holonics --example hnn_prediction -- executed physical-repair <A|B> <count> <aperture> <out> <pin> <terrain>=<seed>…
+//! cargo run --release -p holonics --example hnn_prediction -- executed physical-receive <A|B|one> <count> <aperture> <out> <pin> <terrain>=<seed>…
 //! ```
 //!
 //! [definition; agent-inferred, the order pin and the bank pin] **The declaration**
@@ -63,6 +64,8 @@ mod executed_loop;
 mod keys_loop;
 #[path = "hnn_repair_loop.rs"]
 mod repair_loop;
+#[path = "hnn_physical_receive.rs"]
+mod physical_receive;
 #[path = "hnn_text_repair.rs"]
 mod text_repair;
 #[path = "hnn_transport_loop.rs"]
@@ -355,6 +358,18 @@ fn main() {
                 arguments[5].parse().expect("an aperture"),
                 &arguments[6],
                 &arguments[8..],
+            )
+        }
+        // Continuing native reception; its own pin and whole-section observed partition.
+        (Some("executed"), Some("physical-receive")) => {
+            let pin = pinned(&arguments[7], "executed physical-receive", clock, true);
+            physical_receive::run(
+                &arguments[3],
+                arguments[4].parse().expect("a count"),
+                arguments[5].parse().expect("an aperture"),
+                &arguments[6],
+                &arguments[8..],
+                &pin,
             )
         }
         // Text repair by local keys glued on overlaps
