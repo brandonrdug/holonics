@@ -563,20 +563,23 @@ and scoped card controls pass separately. The joined source `d1e1e0bf` now links
 example and passes four exact native controls: receiving change, stale/chart refusal, retained
 carry and sibling Leaky aging. Its [combined receipt](../../research/records/receipts/hnn-combined-integration-20261006/native-validation-d1e1e0bf/VALIDATION.json)
 preserves the initial missing-PTX snapshot failure and all fixed limits. The new Lean finite-box
-acceptance remains unverified. The observation API is exercised by native teaching controls;
+check failed on definition-rewrite and finite-index binder errors; the narrow source correction
+still requires kernel acceptance. The observation API is exercised by native teaching controls;
 the physical notebook's independent Rest fixtures still pair-learn E rather than invoking it.
 
-Lane C's next release obligation (#62, #73, #148) is the image of the complete compatible sparse
-source/carry family through the **actual coupled Word**, followed by its actual R/phase/grain face
-and producing decoder. Release requires a constant decoded class image; otherwise retain the
-residual fibre. `DomainStep`'s existing fixed-drive component certificate lacks the joined drive
-term `partial_b Phi * D drive_joint` at this exact consumer; a charted route must additionally
-include its numerical fibre. A point
-leader or a singleton chosen from one execution cannot supply that certificate. The supported
-producing identity chart/unit source clock remains explicit. Located sparse conduct has its own
-source-time/decoder square and continues to refuse before the Word until consumed. This bounded
-consumer is the physical worker's scope; shared-clock/rekey, CUDA, formal finite-box acceptance,
-adaptive whole-material retention and resident card restore retain their respective owners/gates.
+Lane C's [finite coupled tube](../../research/records/2026-10-06_THE_COUPLED_PHYSICAL_TUBE_BOUNDS_MISSING_SOURCE_CLASSES_BEFORE_READING_THE_DECODER.md)
+now consumes the complete compatible source family through the actual Word, R/phase/grain face
+and admitted identity decoder. Thirteen native controls pass on `272f6194`; combined capacity
+source acceptance is a separate pending gate. Signed junction coefficients preserve cancellation
+before bounding. The released class two is wrong for the fixture's erased zero, despite all
+four completed native sources sharing that leader. Class constancy therefore supplies no
+reconstruction milestone. The [next learning subject](../../research/records/2026-10-06_THE_RECEIVING_OBJECTIVE_LEARNS_ONE_REACHED_DIRECTION_WHILE_THE_MEDIUM_MUST_CARRY_EXPRESSION.md)
+is the source-response/receiving relation: one receiving-only observation learns one feature
+direction, while expression needs an actual emitted-medium consumer with matched source, clock,
+phase, units and carry. Fix that relation and acceptance before another scientific curriculum.
+Plural or unsupported images remain Held. The formal finite-tube lift, located sparse conduct,
+general decoder/numerical fibre, shared-clock/rekey, CUDA, adaptive whole-material retention and
+resident card restore retain their respective owners/gates.
 
 #### U6. The text chart
 

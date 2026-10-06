@@ -1,0 +1,24 @@
+{
+  "version": 3,
+  "claim": "fixed failed family: signed junction inclusion and actual native family image diagnosis; original singleton gate unchanged",
+  "base": "280fa010e6c12edd71276520470cfc29e527c6c8",
+  "preserved_failed_validation": "native-validation-v2/VALIDATION.json",
+  "original_API_adapted_prediction_sha256": "8c401ef82445232752d3a7910e4ac9d61b828d5ca1279677143a4053a2ee1853",
+  "source": [
+    {
+      "path": "crates/holonics/src/hnn/prediction.rs",
+      "bytes": 126599,
+      "sha256": "c24d3434e7f1c39c039e3cab743b306b7ee5854fb85f48450c2451e267f3af44"
+    },
+    {
+      "path": "crates/holonics/src/hnn/tests/prediction.rs",
+      "bytes": 102946,
+      "sha256": "b4c88b60e4393b4bad1b6eed15e9f0ca9160347ab944ee825d08b112008030f7"
+    },
+    {
+      "path": "research/notebook/hnn_design/hnn_repair_loop.rs",
+      "bytes": 31204,
+      "sha256": "76d7123a14ec3d01957a125f299a2195569ce39f04c470c05ccde3b120148d69"
+    }
+  ]
+}

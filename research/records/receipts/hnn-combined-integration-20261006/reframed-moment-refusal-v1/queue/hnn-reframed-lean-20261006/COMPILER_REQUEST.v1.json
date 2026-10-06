@@ -1,0 +1,39 @@
+{
+  "target": "Holonics.HNN.ReframedMoment",
+  "source": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-integration-d1e1e0bf-20261006/source-v2/lean/Holonics/HNN/ReframedMoment.lean",
+  "sealer": "/home/b/Workspaces/holonics/.local/hodge-cut-cartier-20261003/runner-recovery-02/import_sealer.py",
+  "metadata_verifier": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/verify_lean_metadata_v1.py",
+  "import_seal": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-20261006/current-imports.v4.json",
+  "expected_selectors": [
+    "rekey_mem_windingWindow",
+    "card_reframedBox_le",
+    "card_reframedBox_withCoordinates_le",
+    "winding_step_range"
+  ],
+  "compiler_stdout": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-20261006/compiler.v1.stdout",
+  "compiler_stderr": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-20261006/compiler.v1.stderr",
+  "kernel_receipt": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-20261006/KERNEL_VALIDATION.v1.json",
+  "compiler_argv": [
+    "/usr/bin/timeout",
+    "--signal=TERM",
+    "--kill-after=1s",
+    "17s",
+    "/usr/bin/env",
+    "-i",
+    "PATH=/usr/bin",
+    "HOME=/home/b",
+    "LANG=C",
+    "LC_ALL=C",
+    "LEAN_PATH=/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-20261006/objects-v2:/home/b/Workspaces/holonics/.local/wt/capacity/lean/.lake/build/lib/lean:/home/b/Workspaces/holonics/lean/.lake/build/lib/lean:/home/b/Workspaces/holonics/lean/.lake/packages/physlib/.lake/build/lib/lean:/home/b/Workspaces/holonics/lean/.lake/packages/cslib/.lake/build/lib/lean:/home/b/Workspaces/holonics/lean/.lake/packages/mathlib/.lake/build/lib/lean:/home/b/Workspaces/holonics/lean/.lake/packages/plausible/.lake/build/lib/lean:/home/b/Workspaces/holonics/lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/home/b/Workspaces/holonics/lean/.lake/packages/importGraph/.lake/build/lib/lean:/home/b/Workspaces/holonics/lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/home/b/Workspaces/holonics/lean/.lake/packages/aesop/.lake/build/lib/lean:/home/b/Workspaces/holonics/lean/.lake/packages/Qq/.lake/build/lib/lean:/home/b/Workspaces/holonics/lean/.lake/packages/batteries/.lake/build/lib/lean:/home/b/.local/lib/lean-4.33.0/lib/lean",
+    "/home/b/.local/lib/lean-4.33.0/bin/lean",
+    "-j1",
+    "-M4096",
+    "-R",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-integration-d1e1e0bf-20261006/source-v2/lean",
+    "-o",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-20261006/objects-v2/Holonics/HNN/ReframedMoment.olean",
+    "-i",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-20261006/objects-v2/Holonics/HNN/ReframedMoment.ilean",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-integration-d1e1e0bf-20261006/source-v2/lean/Holonics/HNN/ReframedMoment.lean"
+  ]
+}

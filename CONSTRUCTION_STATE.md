@@ -20,15 +20,23 @@ The retained independent briefs are paused with Claude; the product acceptance b
 now consumes its actual continuing Word's pullback and the existing normal deposition at R.
 The committed physical lane passes two teaching controls and retained carry: a reached deposit
 changes R and a later physical read; the prior prediction remains blind. Nine earlier chart/clock
-controls pass. These fixtures establish the supported identity chart and unit source clock,
-not erasure fidelity: erased cells remain Held without an executed coupled-domain/decoder
-certificate. Located sparse clocks, useful output and adaptive retention remain open.
+controls pass. The subsequent [coupled finite tube](research/records/2026-10-06_THE_COUPLED_PHYSICAL_TUBE_BOUNDS_MISSING_SOURCE_CLASSES_BEFORE_READING_THE_DECODER.md)
+passes thirteen physical native controls on `272f6194`, including exact receiving-image
+enclosure and the corrected signed junction law. Its sixty-four-station blind fixture releases
+class two where the removed truth is zero; all four complete-source controls also lead to two.
+This is a stable physical prediction, not successful reconstruction. A separate teaching/carry
+fixture still holds three erased stations with all four classes. The
+[receiving-objective diagnosis](research/records/2026-10-06_THE_RECEIVING_OBJECTIVE_LEARNS_ONE_REACHED_DIRECTION_WHILE_THE_MEDIUM_MUST_CARRY_EXPRESSION.md)
+traces that one-class observation through receiving-only deposition and recovers the existing
+responsive medium owners. Located sparse clocks, useful output and adaptive retention remain open.
 The shared-clock lane separately passes 26 capacity, entrance, restore and scoped card controls;
 sibling Leaky coordinates pay actual ring ticks and rekey pays zero time. Its conditional bound
 counts the shared lift and independent source endpoints; it is not an adaptive whole-material bound.
 The integrated source `d1e1e0bf` links with its notebook example and passes four exact native
 controls: receiving change, stale/chart refusal, retained carry and sibling Leaky aging.
-The new Lean finite-box leaf remains unverified. The observation consumer is a native library
+The combined source with the finite-tube repair remains pending its distinct queue gate.
+The new Lean finite-box leaf failed on rewrite/binder errors; its minimal source correction
+remains pending kernel acceptance, with the failed diagnostics preserved. The observation consumer is a native library
 interface exercised by its teaching controls; the physical notebook's independent Rest fixtures
 still pair-learn E and do not invoke that R-teaching interface.
 The linked records preserve failed builds, recovery, fixed limits and each receipt's exact scope.

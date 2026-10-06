@@ -1,0 +1,87 @@
+{
+  "native_link_accepted_for_isolated_API_adapted_source": true,
+  "source_base": "280fa010e6c12edd71276520470cfc29e527c6c8",
+  "source_v1_failure": "two E0277 endpoint iterators collect Result but GrainCell::of is infallible",
+  "source_v2_adaptation": "two collect::<Vec<_>>() calls only; original owner source and v1 preserved",
+  "source_v2_prediction_sha256": "8c401ef82445232752d3a7910e4ac9d61b828d5ca1279677143a4053a2ee1853",
+  "enclosure_exact_test_passed": true,
+  "blind_constant_image_exact_test_passed": false,
+  "blind_failure": "tests/prediction.rs2010 assertion left4 right1; actual image fibre [0,1,2,3]",
+  "successful_release_proved": false,
+  "new_exact_tests_run": 2,
+  "new_exact_tests_passed": 1,
+  "expected_physical_module_tests": 13,
+  "remaining11_module_regressions_run": false,
+  "caps_and_failed_deadlines_raised": false,
+  "matching_runtime_tests_repeated": false,
+  "original_repair_field_source_changed_by_queue": false,
+  "source_read_lease_released": true,
+  "all_owned_children_reaped": true,
+  "stages": [
+    {
+      "label": "physical-coupled-domain-host-link-20261006-v1",
+      "driver_passed": false,
+      "wall_ns": 11419162655,
+      "projection_ns": 65000000000,
+      "measured_to_projected_ratio": [
+        11419162655,
+        65000000000
+      ],
+      "aggregate_CPU_ns": 11387024000,
+      "group_peak_bytes": 1581936640,
+      "child_RSS_peak_KiB": 1246668,
+      "inputs_unchanged": true,
+      "matching_quiescent_release": true,
+      "actual_test_count": 0
+    },
+    {
+      "label": "physical-coupled-domain-host-link-20261006-v2",
+      "driver_passed": true,
+      "wall_ns": 19524088059,
+      "projection_ns": 65000000000,
+      "measured_to_projected_ratio": [
+        19524088059,
+        65000000000
+      ],
+      "aggregate_CPU_ns": 29558320000,
+      "group_peak_bytes": 2611576832,
+      "child_RSS_peak_KiB": 2203968,
+      "inputs_unchanged": true,
+      "matching_quiescent_release": true,
+      "actual_test_count": 0
+    },
+    {
+      "label": "physical-coupled-domain-enclosure-development-20261006-v1",
+      "driver_passed": true,
+      "wall_ns": 2757228880,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        2757228880,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 2698075000,
+      "group_peak_bytes": 25202688,
+      "child_RSS_peak_KiB": 32424,
+      "inputs_unchanged": true,
+      "matching_quiescent_release": true,
+      "actual_test_count": 1
+    },
+    {
+      "label": "physical-coupled-domain-blind-development-20261006-v1",
+      "driver_passed": false,
+      "wall_ns": 713266934,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        713266934,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 671003000,
+      "group_peak_bytes": 23941120,
+      "child_RSS_peak_KiB": 32248,
+      "inputs_unchanged": true,
+      "matching_quiescent_release": true,
+      "actual_test_count": 1
+    }
+  ],
+  "combined_d1e1e0bf_integration_not_covered": true
+}

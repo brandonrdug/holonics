@@ -1,0 +1,15 @@
+{
+  "parent_thread": "01a0fe67-e7cb-7202-bcfb-0b2da1acb0fd",
+  "authority": "latest direct parent delegation: Next HNN physicaldomain draft queue647eab4872e44930b0cbef108fb2a1ce ready; schedule after current RH/geometry slots; no need parent permission each ordinary check",
+  "new_selection": "647eab4872e44930b0cbef108fb2a1ce",
+  "source_review": "30408d9161d4429fb1eef2efd94a9ba9",
+  "preceding_slots_complete": true,
+  "released_reservation_not_reused": "6c766d6a76be4c58b9d9eb9ff49d47ae",
+  "fresh_observed_shared_and_GPU_lock_holders": [],
+  "fresh_MemAvailable_KiB": 11575876,
+  "physical_only": true,
+  "combined_capacity_integration_not_admitted": true,
+  "actual_admission_requires_existing_driver_nonblocking_shared_lease_acquisition": true,
+  "source_and_cache_private": true,
+  "caps_unchanged": true
+}

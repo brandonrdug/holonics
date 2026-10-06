@@ -1,0 +1,137 @@
+{
+  "status": "PASS_focused_physical_v3_only",
+  "base": "280fa010e6c12edd71276520470cfc29e527c6c8",
+  "acceptance": "same blind64-cell/one-erasure/two-crossing singleton fixture, signed same-port junction dependence; enclosure completion oracle and remaining11 regressions",
+  "native_blind_cell1": "Released(2)",
+  "sparse_grain_leaders": [
+    2
+  ],
+  "exact_enclosure_classes": [
+    2
+  ],
+  "native_complete_family_leaders": [
+    [
+      2
+    ],
+    [
+      2
+    ],
+    [
+      2
+    ],
+    [
+      2
+    ]
+  ],
+  "all_four_images_inside_enclosure": true,
+  "actual_namespace_tests_passed_once": 13,
+  "rows": [
+    {
+      "label": "physical-coupled-domain-snapshot-preparation-20261006-v3",
+      "passed": true,
+      "wall_ns": 10224588789,
+      "projection_ns": 17000000000,
+      "measured_to_projected": {
+        "numerator": 10224588789,
+        "denominator": 17000000000
+      },
+      "aggregate_CPU_ns": 8943811000,
+      "group_peak_bytes": 4294967296,
+      "peak_child_RSS_KiB": 29064,
+      "actual_passed_tests": null,
+      "released_quiescent": true
+    },
+    {
+      "label": "physical-coupled-domain-host-link-20261006-v3",
+      "passed": true,
+      "wall_ns": 18804203740,
+      "projection_ns": 65000000000,
+      "measured_to_projected": {
+        "numerator": 18804203740,
+        "denominator": 65000000000
+      },
+      "aggregate_CPU_ns": 28815908000,
+      "group_peak_bytes": 2517024768,
+      "peak_child_RSS_KiB": 2223272,
+      "actual_passed_tests": null,
+      "released_quiescent": true
+    },
+    {
+      "label": "physical-coupled-domain-blind-development-20261006-v3",
+      "passed": true,
+      "wall_ns": 1406118749,
+      "projection_ns": 16000000000,
+      "measured_to_projected": {
+        "numerator": 1406118749,
+        "denominator": 16000000000
+      },
+      "aggregate_CPU_ns": 1341278000,
+      "group_peak_bytes": 26210304,
+      "peak_child_RSS_KiB": 32172,
+      "actual_passed_tests": 1,
+      "released_quiescent": true
+    },
+    {
+      "label": "physical-coupled-domain-enclosure-development-20261006-v3",
+      "passed": true,
+      "wall_ns": 2650409676,
+      "projection_ns": 16000000000,
+      "measured_to_projected": {
+        "numerator": 2650409676,
+        "denominator": 16000000000
+      },
+      "aggregate_CPU_ns": 2588707000,
+      "group_peak_bytes": 23695360,
+      "peak_child_RSS_KiB": 32284,
+      "actual_passed_tests": 1,
+      "released_quiescent": true
+    },
+    {
+      "label": "physical-coupled-domain-regressions-development-20261006-v3",
+      "passed": true,
+      "wall_ns": 7877815102,
+      "projection_ns": 16000000000,
+      "measured_to_projected": {
+        "numerator": 7877815102,
+        "denominator": 16000000000
+      },
+      "aggregate_CPU_ns": 7806008000,
+      "group_peak_bytes": 17428480,
+      "peak_child_RSS_KiB": 26528,
+      "actual_passed_tests": 11,
+      "released_quiescent": true
+    }
+  ],
+  "owner_source_unchanged_by_queue": true,
+  "source_seal": {
+    "version": 3,
+    "claim": "fixed failed family: signed junction inclusion and actual native family image diagnosis; original singleton gate unchanged",
+    "base": "280fa010e6c12edd71276520470cfc29e527c6c8",
+    "preserved_failed_validation": "native-validation-v2/VALIDATION.json",
+    "original_API_adapted_prediction_sha256": "8c401ef82445232752d3a7910e4ac9d61b828d5ca1279677143a4053a2ee1853",
+    "source": [
+      {
+        "path": "crates/holonics/src/hnn/prediction.rs",
+        "bytes": 126599,
+        "sha256": "c24d3434e7f1c39c039e3cab743b306b7ee5854fb85f48450c2451e267f3af44"
+      },
+      {
+        "path": "crates/holonics/src/hnn/tests/prediction.rs",
+        "bytes": 102946,
+        "sha256": "b4c88b60e4393b4bad1b6eed15e9f0ca9160347ab944ee825d08b112008030f7"
+      },
+      {
+        "path": "research/notebook/hnn_design/hnn_repair_loop.rs",
+        "bytes": 31204,
+        "sha256": "76d7123a14ec3d01957a125f299a2195569ce39f04c470c05ccde3b120148d69"
+      }
+    ]
+  },
+  "prior_failure_bundle_preserved": "/home/b/Workspaces/holonics/.local/wt/repair-field/research/records/receipts/physical-coupled-domain-20261006/native-validation-v2/VALIDATION.json",
+  "scientific_job": false,
+  "broad_workspace_library_GPU_validation": false,
+  "other_teaching_fixture_erased_stations_remain_plural": true,
+  "unchanged_notebook_source_previously_checked_independently": true,
+  "cache_root_retained": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-20261006/cache-v3",
+  "no_git_commit_push_merge_deletion": true
+}

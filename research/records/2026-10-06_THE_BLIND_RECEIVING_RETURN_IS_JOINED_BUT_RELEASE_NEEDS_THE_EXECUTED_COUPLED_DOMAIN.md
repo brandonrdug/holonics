@@ -2,7 +2,11 @@
 
 **Date:** October 6. **Issues:** #73, #76, #148, #62, #63.
 **Grade:** four exact combined-source native controls pass on `d1e1e0bf`, with its
-notebook example linked. The new formal finite-box leaf remains unverified.
+notebook example linked. The subsequent [finite tube](2026-10-06_THE_COUPLED_PHYSICAL_TUBE_BOUNDS_MISSING_SOURCE_CLASSES_BEFORE_READING_THE_DECODER.md)
+passes its thirteen scoped physical controls on `272f6194`; its integration with capacity
+still requires a new combined gate. The released class two is wrong for the erased zero.
+The new formal finite-box leaf failed its compiler check; a narrow source correction remains
+pending kernel acceptance, with [raw diagnostics retained](receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/queue/hnn-reframed-lean-20261006/compiler.v1.stdout).
 No repair fidelity, full-suite or product acceptance.
 
 ## The consuming joins and their source
@@ -90,6 +94,11 @@ is needed to change that bookkeeping. Full-library/full-GPU runtime, scientific
 repair and the new Lean leaf are outside this acceptance.
 
 ## The next physical obligation, with its existing owners
+
+This section records the missing join at the original `d1e1e0bf` acceptance. The
+subsequent finite-tube record above owns its supported exact identity-chart solution.
+The [receiving-objective diagnosis](2026-10-06_THE_RECEIVING_OBJECTIVE_LEARNS_ONE_REACHED_DIRECTION_WHILE_THE_MEDIUM_MUST_CARRY_EXPRESSION.md)
+owns the current failed reconstruction and the missing emitted-medium consumer.
 
 The release owner is `receiver::face::ReceiverWidth` and `receiver::release`.
 Lean `Foundation/ReceiverRelease.width_le_of_bounds` and `width_eq_zero_iff`

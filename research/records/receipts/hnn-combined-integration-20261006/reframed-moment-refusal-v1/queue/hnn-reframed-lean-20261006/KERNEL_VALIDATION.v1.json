@@ -1,0 +1,33 @@
+{
+  "kernel_accepted": false,
+  "compiler_exit": 1,
+  "compiler_wall_ns": 2251535296,
+  "axioms": {
+    "Holonics.HNN.Moment.SourceDecl.rekey_mem_windingWindow": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.Moment.SourceDecl.card_reframedBox_le": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.Moment.SourceDecl.card_reframedBox_withCoordinates_le": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.Moment.SourceDecl.winding_step_range": [
+      "propext",
+      "Quot.sound"
+    ]
+  },
+  "selector_count_matches": true,
+  "standard_axioms_only": false,
+  "metadata_unchanged": true,
+  "broad_library_checked": false
+}

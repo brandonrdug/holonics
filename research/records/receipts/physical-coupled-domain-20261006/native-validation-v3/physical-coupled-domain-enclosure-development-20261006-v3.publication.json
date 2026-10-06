@@ -1,0 +1,54 @@
+{
+  "lease_still_held": true,
+  "own_group_other_PIDs": [],
+  "outcome": {
+    "provisional_passed": true,
+    "final_acceptance_requires_external_CPU_read": true,
+    "label": "physical-coupled-domain-enclosure-development-20261006-v3",
+    "wall_ns": 2445136782,
+    "peak_child_RSS_KiB": 32284,
+    "group_memory_peak_bytes": 23695360,
+    "original_coordinates_modified": false,
+    "aggregate_cpu_final_us": 2580282,
+    "aggregate_cpu_limit_us": 17000000,
+    "CPU_kernel_hard_total_limit": false
+  },
+  "outputs": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-enclosure-development-20261006-v3.lease-identity.json": {
+      "sha256": "205c966487ef24b7e8b61919f243951d7043409afe4dad66db5997017474560d",
+      "bytes": 565
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-enclosure-development-20261006-v3.memory-gate.json": {
+      "sha256": "7df97274290808437d089ff0e0b4f743b0b879d19945a886d5daa992fe195017",
+      "bytes": 120
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-enclosure-development-20261006-v3.child-identity.json": {
+      "sha256": "d2b73a52e5c5f02f8c16eeed06cc15a08532ec49a276453b5aa97bb3a29f188d",
+      "bytes": 78
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-enclosure-development-20261006-v3.system-floor.json": {
+      "sha256": "0c9fe7c8ce4c571972b2d7cc1c0345fdcd33a10f6fe98feac1b89d623c7806b3",
+      "bytes": 19081
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-enclosure-development-20261006-v3.quiescence.json": {
+      "sha256": "4e76664a1033fec0bc1e4e779aa4c2b7b6cea5f4c8953a056d802d02d0b041fc",
+      "bytes": 130
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-enclosure-development-20261006-v3.input_seal.json": {
+      "sha256": "b016942f06656950a96e568e44f2c358b66fd3697c5c51c7d877cf27c41ba2d6",
+      "bytes": 61750
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-enclosure-development-20261006-v3.output_seal.json": {
+      "sha256": "b29e66ff4616eef010085d365e39efdc98be29795ee95b3436b27c78dc119884",
+      "bytes": 167784
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-enclosure-development-20261006-v3.stdout": {
+      "sha256": "1f90e3fe0b8b516cf9a483d29b5a381167fddd90428b4c9628706d3dba9520ff",
+      "bytes": 231
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-enclosure-development-20261006-v3.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  }
+}

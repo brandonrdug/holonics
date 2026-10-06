@@ -136,8 +136,13 @@ compression crossover for an interleaved/rekeyed input. `SourceCapacity::Reframe
 therefore returns an upper bit bound and shared-clock population, with no `n*`.
 
 `HNN/ReframedMoment.lean` drafts the corresponding joint finite box, single-rekey
-membership, one-period winding step and coordinate extension. These new formal terms
-are **unverified** pending their focused queue check. The native synchronization/save
+membership, one-period winding step and coordinate extension. The focused compiler check
+**failed**: two `rw [D.windingWindow]` applications treated a Finset value as a rewrite
+argument, and an untyped ambient-current binder was inferred as `Nat` rather than `Fin G`.
+Its [unfiltered compiler diagnostics](receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/queue/hnn-reframed-lean-20261006/compiler.v1.stdout)
+and all failed source/import/release seals remain preserved. Explicit `change` goals and a
+`Fin G` binder now correct those source errors without changing the finite-box law; actual
+kernel acceptance and the absence of `sorryAx` remain pending. The native synchronization/save
 regressions pass as described below. The previous compiled no-rekey and Leaky leaves remain
 evidence for their original scope. The incomplete lib suite at its 219-second
 deadline supplies no test-specific slowdown measurement; the unfinished pumped

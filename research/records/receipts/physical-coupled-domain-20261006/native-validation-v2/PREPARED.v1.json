@@ -1,0 +1,24 @@
+{
+  "status": "PREPARED_NOT_LAUNCHED; waiting new parent resource handoff",
+  "build_config": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-host-link-20261006-v1.config.json",
+  "config_pin": {
+    "sha256": "aec4e8c1dbfc2f90328e54e69a2e9308b4fb5b285a279bbc25d4c24ec48dd620",
+    "bytes": 254112
+  },
+  "input_pin_count": 1033,
+  "source_snapshot": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-20261006/SNAPSHOT.v1.json",
+  "cache_snapshot": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-20261006/CACHE_SNAPSHOT.v1.json",
+  "source_review": "30408d9161d4429fb1eef2efd94a9ba9",
+  "build_ceiling_ns": 65000000000,
+  "aggregate_CPU_limit_us": 128000000,
+  "threads": 8,
+  "memory_bytes": 4294967296,
+  "private_cache_writable_by_queue_only": true,
+  "initial_development_selector": "hnn::tests::prediction::physical_repair::the_coupled_quartic_tube_encloses_every_admitted_missing_class",
+  "development_fixed_wall_ns": 16000000000,
+  "runtime_aggregate_CPU_limit_us": 17000000,
+  "runtime_threads": 1,
+  "runtime_limit_bytes": 4294967296,
+  "runtime_acceptance_projection": "fix from largest actual measured development units; successful matching development test is counted once, never repeated",
+  "expected_physical_module_count": 13
+}

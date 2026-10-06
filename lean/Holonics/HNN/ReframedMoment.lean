@@ -36,7 +36,8 @@ def windingWindow (D : SourceDecl A) (d W M : ℕ) : Finset ℕ :=
 theorem mem_windingWindow_of_div_mod {d W M t : ℕ} (hd : 0 < d)
     (hwind : W ≤ t / d ∧ t / d ≤ W + M) (hphase : t % d < d) :
     t ∈ D.windingWindow d W M := by
-  rw [D.windingWindow, Finset.mem_Icc]
+  change t ∈ Finset.Icc (d * W) (d * (W + M) + (d - 1))
+  rw [Finset.mem_Icc]
   have hdecomp : t = d * (t / d) + t % d := by
     calc
       t = t % d + d * (t / d) := (Nat.mod_add_div t d).symm
@@ -61,7 +62,8 @@ theorem rekey_mem_windingWindow [hne : ∀ g, NeZero (D.period g)]
 
 theorem card_windingWindow {d : ℕ} (hd : 0 < d) (W M : ℕ) :
     (D.windingWindow d W M).card = d * (M + 1) := by
-  rw [D.windingWindow, Nat.card_Icc]
+  change (Finset.Icc (d * W) (d * (W + M) + (d - 1))).card = d * (M + 1)
+  rw [Nat.card_Icc]
   have hsum : d * (W + M) + (d - 1) + 1 = d * W + d * (M + 1) := by
     have hd' : d ≠ 0 := by omega
     cases d with
@@ -102,7 +104,7 @@ theorem reframed_mem_box [Fintype A] [DecidableEq A]
     (G : ℕ) (W : Fin G → ℕ) (M n : ℕ) (rate : ℕ → ℕ)
     (current : Fin G → ℕ) (profile : (g : D.sources) → Fin (D.period g.1) × ℕ)
     (source : D.Persist 0)
-    (hcurrent : ∀ g, current g ∈ D.windingWindow (D.period g) (W g) M)
+    (hcurrent : ∀ g : Fin G, current g ∈ D.windingWindow (D.period g) (W g) M)
     (hprofile : profile ∈ D.sourceProfileBox rate n)
     (hsource : source ∈ D.boxWith D.period (fun _ => 0) 0 n) :
     ((current, profile), source) ∈ D.reframedBox G W M n rate := by

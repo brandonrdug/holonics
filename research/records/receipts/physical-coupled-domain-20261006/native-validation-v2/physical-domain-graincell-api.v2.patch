@@ -1,0 +1,15 @@
+--- a/crates/holonics/src/hnn/prediction.rs
++++ b/crates/holonics/src/hnn/prediction.rs
+@@ -2297,10 +2297,10 @@
+         .collect();
+     let lower = (0..field.alphabet())
+         .map(|class| crate::receiver::face::GrainCell::of(&logits[2 * class].lower, phases.grain()))
+-        .collect::<Result<Vec<_>, _>>()?;
++        .collect::<Vec<_>>();
+     let upper = (0..field.alphabet())
+         .map(|class| crate::receiver::face::GrainCell::of(&logits[2 * class].upper, phases.grain()))
+-        .collect::<Result<Vec<_>, _>>()?;
++        .collect::<Vec<_>>();
+     let greatest_lower = lower
+         .iter()
+         .map(|cell| (&cell.carry, cell.phase))

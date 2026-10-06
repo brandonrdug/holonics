@@ -1,0 +1,76 @@
+{
+  "label": "physical-coupled-domain-snapshot-preparation-20261006-v3",
+  "scope_unit": "holonics-prune-admission-physical-coupled-domain-snapshot-preparation-20261006-v3",
+  "stage_kind": "preparation",
+  "scientific_job": false,
+  "cwd": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-20261006",
+  "scope": "fresh physical v3 source plus full private cache reflink and byte identity preparation, separate from compiler projection",
+  "projection_ns": 17000000000,
+  "aggregate_cpu_limit_us": 17000000,
+  "aggregate_cpu_stop_margin_us": 1000000,
+  "group_memory_max_bytes": 4294967296,
+  "address_space_max_bytes": 4294967296,
+  "minimum_MemAvailable_KiB": 8388608,
+  "system_floor_MemAvailable_KiB": 4194304,
+  "thread_budget": 1,
+  "inputs": [
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/final_stage.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/leased_stage_v2.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/bounded_stage_v1.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/prepare_physical_v3.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-20261006/SOURCE_DELTA.v2.json",
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/.local/physical-coupled-domain-20261006/source.seal.v3.json",
+    "/usr/bin/cp",
+    "/usr/bin/python3"
+  ],
+  "input_directories": [],
+  "expected_inputs": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/final_stage.py": {
+      "sha256": "a0a5a94f157acf9a5127b756a036c6e86449dc2012af0f1e71d34aafa13bc79e",
+      "bytes": 10968
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/leased_stage_v2.py": {
+      "sha256": "bcf91456534e763a025613f39e82853d7a58529b399bb183d544d09a7a42f949",
+      "bytes": 5520
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/bounded_stage_v1.py": {
+      "sha256": "84b7d003089fa19881690e368200b2168b9d179c8e6573bdafab54369235cec2",
+      "bytes": 12645
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/prepare_physical_v3.py": {
+      "sha256": "b85cc6ca78e66c6466cd6e81a788667a97f053c722535a49ed11b7063e159cda",
+      "bytes": 2692
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-20261006/SOURCE_DELTA.v2.json": {
+      "sha256": "71ae379eadb6208561639518e4ab7c8fb21d1c46b455a19524be6821ddcd30b1",
+      "bytes": 41967
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/.local/physical-coupled-domain-20261006/source.seal.v3.json": {
+      "sha256": "729566a93abb96dbd89932fd840b8a40aecd6bb60ff1d35655d196da3b60f994",
+      "bytes": 950
+    },
+    "/usr/bin/cp": {
+      "sha256": "c330dda7811d7dea399a6b9fe655cfeba4cc5115234015f9d6fd21d05ca55fc5",
+      "bytes": 149816
+    },
+    "/usr/bin/python3.14": {
+      "sha256": "ac12d99c156d3c0ec708a2baf664d35b74f455572fe35fd57faa420ade5c3845",
+      "bytes": 14424
+    }
+  },
+  "outputs": [
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-20261006/SNAPSHOT.v3.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-20261006/CACHE_SNAPSHOT.v3.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-20261006/PREPARATION.v3.json"
+  ],
+  "argv": [
+    "/usr/bin/python3",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/prepare_physical_v3.py"
+  ],
+  "allocation_basis": {
+    "prior_full_cache_preparation_wall_ns": 4491067699,
+    "fixed_existing_preparation_deadline_ns": 17000000000,
+    "unchanged_resource_caps": true,
+    "cache_prep_is_separate_unit": true
+  }
+}

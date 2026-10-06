@@ -1,0 +1,10 @@
+{
+  "kernel_accepted": false,
+  "terminal_queue_summary": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/helpers/QUEUE_RESULT.20261006.v4.json",
+  "actual_diagnostics": "stages and queue contain unfiltered compiler outputs; source versions copied",
+  "all_native_or_Lean_children_reaped": true,
+  "common_lease_held": false,
+  "remaining_queue_frozen_for_Protein": true,
+  "caps_or_deadlines_raised": false,
+  "manifest": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/MANIFEST.v1.json"
+}

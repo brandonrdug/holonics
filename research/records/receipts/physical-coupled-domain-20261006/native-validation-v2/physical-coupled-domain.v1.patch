@@ -1,0 +1,828 @@
+diff --git a/crates/holonics/src/hnn/prediction.rs b/crates/holonics/src/hnn/prediction.rs
+index 596ca970..541f7245 100644
+--- a/crates/holonics/src/hnn/prediction.rs
++++ b/crates/holonics/src/hnn/prediction.rs
+@@ -219,7 +219,7 @@
+ //!   erasures unplaced ([`SourceMoment::continued`]), never the intact cells ingested alone, which
+ //!   would compress the clock over the erasures; imposed once at the opening,
+ //!   `E_after − E_before = imposed − absorbed` ([`Word::open_exact_received`]);
+-//! - **the motion**: the one continuing word through the declared crossings ([`Word::forward`]);
++//! - **the motion**: the one continuing word through the declared crossings ([`Word::tick`]);
+ //!   station `j` is bound to the receiver's phase `j`, the local crossing `e_0 + j` at the
+ //!   refinement's tick `opened_at + e_0 + j`, certified by the carried end's tick
+ //!   ([`Word::reception_end`]);
+@@ -227,11 +227,16 @@
+ //!   decoder `R` being the field's material (guard 18 excludes the tree and the population);
+ //! - **the release**: a station is released only where the domain of the word's coupled drive,
+ //!   projected through the same executed anchor map and decoder, admits one class; otherwise held
+-//!   with that projection as its fibre. No owner certifies that domain yet (#62): a point reading
+-//!   ([`StationRead::leaders`]), a local tangent rank or a frozen-drive component domain is not it,
+-//!   so every erased station is held, unresolved, with the encoding's classes;
++//!   with that projection as its fibre. The supported exact finite tube derives its opening box
++//!   from every completion of the missing classes through the producing E, source clock and
++//!   population chart, united with the actual sparse opening; it propagates all coupled waves,
++//!   contacts and resonator coordinates, including state-dependent drive and quartic force.
++//!   Its complex R image is read through the admitted identity D at the receiving grain.
++//!   A point leader, local tangent or fixed-drive component domain supplies no such certificate.
++//!   Nonunit source transport and rounded operands keep the full uncertified fibre; the finite
++//!   tube's Lean lift, general decoder, and cyclic whole-field lock remain owed in #62;
+ //! - **the receipts**: the opening's work, every executed tick's field balance, the word's balance
+-//!   and its carried end; the word is dropped once read.
++//!   and its carried end, with exact receiving image enclosures; the word is dropped once read.
+ //!
+ //! It never reads `compression::keys::repair`'s answers or [`generate_by_bank`]; the reference
+ //! repair is the grader's, read after the release.
+@@ -1745,6 +1750,17 @@ pub enum Unresolved {
+     /// A crossing reads it, but no owner certifies the domain of the word's coupled drive that the
+     /// decoder would project (#62), so the domain is the whole state space.
+     UncertifiedDomain,
++    /// The coupled source-completion enclosure reaches more than one decoded class.
++    PluralDomain,
++}
++
++/// A receiving image of the admitted sparse opening and every completion of its missing cells.
++/// Bounds include both parts of the complex receiving relation; the identity decoder's class
++/// reading at the declared grain has width zero only when `classes` contains one member.
++#[derive(Clone, Debug, PartialEq, Eq)]
++pub struct PhysicalDomainRead {
++    pub logits: Vec<crate::ratio::algebraic::ExactInterval>,
++    pub classes: Vec<usize>,
+ }
+ 
+ /// [definition] **One station after the physical repair**: intact as admitted, released at width
+@@ -1777,6 +1793,9 @@ impl RepairedCell {
+ pub struct PhysicalRepair {
+     pub cells: Vec<RepairedCell>,
+     pub reads: Vec<StationRead>,
++    /// None when the admitted source transport or executed operands have no enclosure here.
++    /// These receiving receipts are not a retained trajectory or a reusable material certificate.
++    pub domains: Vec<Option<PhysicalDomainRead>>,
+     pub opening: SourceOpeningReceipt,
+     pub balances: Vec<FieldBalance>,
+     pub word: WordBalance,
+@@ -1825,7 +1844,7 @@ fn physical_forward<'f>(
+     // One accounted imposition, then the one continuing word through the declared crossings.
+     let (mut word, opening_receipt) =
+         Word::open_exact_received(field, material, current, &source, opening)?;
+-    let anchors = word.forward(phases)?;
++    let (anchors, domains) = physical_domain_forward(field, material, current, section, phases, &mut word)?;
+     let balances = word.field_balances().to_vec();
+     let carry = word.reception_end()?;
+     let balance = WordBalance::of(&word.released()?);
+@@ -1864,12 +1883,10 @@ fn physical_forward<'f>(
+             Some(class) => Ok(RepairedCell::Intact(*class)),
+             None => decide_station(
+                 t,
+-                &admitted,
+-                if t < reads.len() {
+-                    Unresolved::UncertifiedDomain
+-                } else {
+-                    Unresolved::Unread
+-                },
++                domains.get(t).and_then(Option::as_ref).map_or(admitted.as_slice(), |domain| domain.classes.as_slice()),
++                if t >= reads.len() { Unresolved::Unread }
++                else if domains[t].is_some() { Unresolved::PluralDomain }
++                else { Unresolved::UncertifiedDomain },
+             ),
+         })
+         .collect::<Result<Vec<_>, HnnError>>()?;
+@@ -1877,6 +1894,7 @@ fn physical_forward<'f>(
+         PhysicalRepair {
+             cells,
+             reads,
++            domains,
+             opening: opening_receipt,
+             balances,
+             word: balance,
+@@ -1887,6 +1905,418 @@ fn physical_forward<'f>(
+     ))
+ }
+ 
++/// [agent-inferred] A finite tube, rather than a cyclic lock: for every compatible completion
++/// `x`, `|x_t - x_t^sparse| <= r_t` implies `|Phi_t(x_t) - Phi_t(x_t^sparse)| <= r_(t+1)`.
++/// The centre is the actual Word, never a proposed answer. The radius starts from the producing
++/// E and the missing cells' entire alphabet. Interior coordinates start at the contemporary
++/// entered carry, and each full tick includes junction, element, loaded return and contact.
++fn physical_domain_forward(
++    field: &Field,
++    material: &dyn FieldMaterial,
++    current: &Current,
++    section: &DamagedSection,
++    phases: &ReceivingPhases,
++    word: &mut Word<'_>,
++) -> Result<(Vec<Vec<Rat>>, Vec<Option<PhysicalDomainRead>>), HnnError> {
++    let mut radius = physical_opening_radius(field, material, current, section, word)?;
++    let mut domains = Vec::with_capacity(phases.aperture());
++    for crossing in 0..phases.junction_steps() {
++        let point = word.change()?;
++        let junctions = radius
++            .as_ref()
++            .map(|radius| physical_junction_radius(word.operands(), radius))
++            .transpose()?;
++        if phases.epochs().contains(&crossing) {
++            domains.push(match &junctions {
++                Some(junctions) => {
++                    let ring = phases.ring();
++                    let operands = word.operands();
++                    let incoming: Vec<_> = operands
++                        .incident(ring)
++                        .iter()
++                        .map(|&a| point.arrivals[a][operands.end_slot(a, ring)].as_slice())
++                        .collect();
++                    let anchor = crate::hnn::propagation::participation(
++                        operands.weights(ring),
++                        &point.storage[ring],
++                        &incoming,
++                    )?;
++                    Some(physical_domain_read(
++                        field,
++                        material,
++                        current,
++                        phases,
++                        &anchor,
++                        &junctions[ring].anchor,
++                    )?)
++                }
++                None => None,
++            });
++        }
++        if crossing + 1 == phases.junction_steps() {
++            word.last_junction()?;
++        } else {
++            radius = match (&radius, &junctions) {
++                (Some(radius), Some(junctions)) => Some(physical_tick_radius(
++                    word,
++                    &point,
++                    radius,
++                    junctions,
++                    word.opened_at() + crossing,
++                )?),
++                _ => None,
++            };
++            word.tick()?;
++        }
++    }
++    let anchors = phases
++        .epochs()
++        .map(|crossing| {
++            word.anchor(crossing, phases.ring())
++                .map(<[Rat]>::to_vec)
++                .ok_or(HnnError::WordEnded {
++                    ticks: word.ticks(),
++                })
++        })
++        .collect::<Result<Vec<_>, _>>()?;
++    Ok((anchors, domains))
++}
++
++/// The box is derived, never chosen: complete every missing station with any admitted class,
++/// at the same source clock and population chart; unite that image with the actual sparse open.
++/// Unit transport is the supported normalization law. A leaky source keeps its typed refusal.
++fn physical_opening_radius(
++    field: &Field,
++    material: &dyn FieldMaterial,
++    _current: &Current,
++    section: &DamagedSection,
++    word: &Word<'_>,
++) -> Result<Option<crate::hnn::word::EndChange>, HnnError> {
++    let operands = word.operands();
++    if operands.lattice().is_some()
++        || field
++            .sources()
++            .iter()
++            .any(|&ring| !material.transport(ring).is_one())
++        || operands.rings().iter().any(|ring| ring.chart().is_some())
++        || operands
++            .contacts()
++            .iter()
++            .any(|contact| contact.chart().is_some())
++        || operands.resonators().iter().flatten().any(|ring| {
++            (0..ring.phases()).any(|phase| {
++                ring.chart_words(phase).is_some() || !ring.certificate(phase).is_zero()
++            })
++        })
++    {
++        return Ok(None);
++    }
++    let point = word.change()?;
++    let mut radius = crate::hnn::word::EndChange::rest(field, operands);
++    let population = u64::try_from(section.length).map_err(|_| HnnError::Unadmitted {
++        reason: "the completion population must fit its declared source chart",
++    })?;
++    let weight = PopulationChart::of(field).value(population);
++    let placed = section.placed();
++    for &ring in field.sources() {
++        let geometry = field.ring(ring);
++        let map = material
++            .source_port(ring)
++            .ok_or(HnnError::MissingSourcePort { ring })?;
++        let mut lower = vec![Rat::zero(); geometry.width()];
++        let mut upper = lower.clone();
++        for (station, class) in placed.iter().enumerate() {
++            // P^tau P^(-(tau+1+j)) E_c: the already admitted station-clock square.
++            let columns = match class {
++                Some(class) => vec![*class],
++                None => (0..section.classes()).collect(),
++            };
++            let values = columns
++                .iter()
++                .map(|&class| {
++                    let column = (0..map.rows())
++                        .map(|row| map.get(row, class).cloned())
++                        .collect::<Result<Vec<_>, _>>()?;
++                    Ok(geometry.rotate(&column, &-(BigInt::from(station) + BigInt::one())))
++                })
++                .collect::<Result<Vec<_>, HnnError>>()?;
++            for coordinate in 0..geometry.width() {
++                lower[coordinate] += values.iter().map(|value| &value[coordinate]).min().unwrap();
++                upper[coordinate] += values.iter().map(|value| &value[coordinate]).max().unwrap();
++            }
++        }
++        for coordinate in 0..geometry.width() {
++            radius.storage[ring][coordinate] = (&weight * &lower[coordinate]
++                - &point.storage[ring][coordinate])
++                .abs()
++                .max((&weight * &upper[coordinate] - &point.storage[ring][coordinate]).abs());
++        }
++    }
++    Ok(Some(radius))
++}
++
++fn physical_add_radius(left: &[Rat], right: &[Rat]) -> Vec<Rat> {
++    left.iter()
++        .zip(right)
++        .map(|(left, right)| left + right)
++        .collect()
++}
++
++fn physical_scale_radius(scale: &Rat, vector: &[Rat]) -> Vec<Rat> {
++    vector.iter().map(|value| scale.abs() * value).collect()
++}
++
++fn physical_matrix_radius(
++    map: &crate::ratio::linear::ExactRatMatrix,
++    radius: &[Rat],
++) -> Result<Vec<Rat>, HnnError> {
++    (0..map.rows())
++        .map(|row| {
++            (0..map.columns())
++                .map(|column| Ok(map.get(row, column)?.abs() * &radius[column]))
++                .sum::<Result<Rat, HnnError>>()
++        })
++        .collect()
++}
++
++fn physical_junction_radius(
++    operands: &crate::hnn::propagation::Operands,
++    radius: &crate::hnn::word::EndChange,
++) -> Result<Vec<crate::hnn::propagation::Junction>, HnnError> {
++    (0..operands.rings().len())
++        .map(|ring| {
++            let incoming: Vec<_> = operands
++                .incident(ring)
++                .iter()
++                .map(|&a| radius.arrivals[a][operands.end_slot(a, ring)].as_slice())
++                .collect();
++            let anchor = crate::hnn::propagation::participation(
++                operands.weights(ring),
++                &radius.storage[ring],
++                &incoming,
++            )?;
++            let twice = physical_scale_radius(&crate::ratio::integer(2), &anchor);
++            Ok(crate::hnn::propagation::Junction {
++                storage_wave: physical_add_radius(&twice, &radius.storage[ring]),
++                contrast: physical_add_radius(&anchor, &radius.storage[ring]),
++                outgoing: incoming
++                    .iter()
++                    .map(|wave| physical_add_radius(&twice, wave))
++                    .collect(),
++                anchor,
++            })
++        })
++        .collect()
++}
++
++/// Image of a linear element relation under a coordinate box. The relation itself supplies the
++/// columns, so the enclosure shares its native operands instead of authoring another transit.
++fn physical_linear_radius(
++    inputs: &[&[Rat]],
++    output: usize,
++    apply: impl Fn(&[Vec<Rat>]) -> Result<Vec<Rat>, HnnError>,
++) -> Result<Vec<Rat>, HnnError> {
++    let mut basis: Vec<_> = inputs
++        .iter()
++        .map(|input| vec![Rat::zero(); input.len()])
++        .collect();
++    let mut image = vec![Rat::zero(); output];
++    for (part, radius) in inputs.iter().enumerate() {
++        for (coordinate, value) in radius
++            .iter()
++            .enumerate()
++            .filter(|(_, value)| !value.is_zero())
++        {
++            basis[part][coordinate] = Rat::one();
++            let column = apply(&basis)?;
++            basis[part][coordinate] = Rat::zero();
++            for (image, coefficient) in image.iter_mut().zip(column) {
++                *image += value * coefficient.abs();
++            }
++        }
++    }
++    Ok(image)
++}
++
++fn physical_tick_radius(
++    word: &Word<'_>,
++    point: &crate::hnn::word::EndChange,
++    radius: &crate::hnn::word::EndChange,
++    junctions: &[crate::hnn::propagation::Junction],
++    tick: usize,
++) -> Result<crate::hnn::word::EndChange, HnnError> {
++    let operands = word.operands();
++    let mut next = radius.clone();
++    let h = operands.step();
++    for (ring, junction) in junctions.iter().enumerate() {
++        let drive = physical_linear_radius(
++            &[&junction.storage_wave, &junction.contrast],
++            operands.rings()[ring].width(),
++            |basis| {
++                Ok(crate::hnn::propagation::element_step(
++                    &operands.rings()[ring],
++                    &basis[0],
++                    &basis[1],
++                )?
++                .next)
++            },
++        )?;
++        let Some(resonator) = &operands.resonators()[ring] else {
++            next.storage[ring] = drive;
++            continue;
++        };
++        let state = point.resonators[ring]
++            .as_ref()
++            .ok_or(HnnError::ContinuingState {
++                what: "the coupled enclosure needs the producing resonator state",
++            })?;
++        let state_radius = radius.resonators[ring]
++            .as_ref()
++            .ok_or(HnnError::ContinuingState {
++                what: "the coupled enclosure needs both resonator coordinate radii",
++            })?;
++        let phase = resonator.phase_at(tick);
++        let (capacity, _, _) = resonator.material().forms();
++        let nonlinear = resonator.material().saturation();
++        let factor = if nonlinear.is_some() {
++            crate::ratio::integer(1)
++        } else {
++            crate::ratio::integer(2)
++        };
++        let mut right = physical_add_radius(
++            &physical_scale_radius(
++                &factor,
++                &physical_matrix_radius(capacity, &state_radius[1])?,
++            ),
++            &physical_scale_radius(h, &drive),
++        );
++        let mut force = physical_matrix_radius(resonator.stiffness(phase), &state_radius[0])?;
++        if let Some(law) = nonlinear {
++            // On each complex node, |H_Q(u)| <= H_Q(U), U_i=|u_i^sparse|+r_i.
++            // This bounds the actual quartic effort difference over the entire box, including
++            // its cross-coordinate terms, and joins the state-dependent drive to that force.
++            let largest: Vec<_> = state[0]
++                .iter()
++                .zip(&state_radius[0])
++                .map(|(value, radius)| value.abs() + radius)
++                .collect();
++            force = physical_add_radius(
++                &force,
++                &physical_matrix_radius(&law.hessian(&largest)?, &state_radius[0])?,
++            );
++        }
++        right = physical_add_radius(&right, &physical_scale_radius(h, &force));
++        let rate = physical_matrix_radius(&resonator.operator(phase).inverse()?, &right)?;
++        let displacement = physical_add_radius(&state_radius[0], &physical_scale_radius(h, &rate));
++        let velocity = if nonlinear.is_some() {
++            rate.clone()
++        } else {
++            physical_add_radius(
++                &physical_scale_radius(&crate::ratio::integer(2), &rate),
++                &state_radius[1],
++            )
++        };
++        next.resonators[ring] = Some([displacement, velocity]);
++        next.storage[ring] = physical_add_radius(
++            &drive,
++            &physical_scale_radius(&(crate::ratio::integer(2) / resonator.admittance()), &rate),
++        );
++    }
++    for (a, contact) in operands.contacts().iter().enumerate() {
++        let (from, to) = contact.ends();
++        let outgoing = |ring: usize| {
++            &junctions[ring].outgoing[operands
++                .incident(ring)
++                .iter()
++                .position(|&index| index == a)
++                .unwrap()]
++        };
++        let inputs = [
++            outgoing(from).as_slice(),
++            outgoing(to).as_slice(),
++            radius.states[a][0].as_slice(),
++            radius.states[a][1].as_slice(),
++        ];
++        let n_from = inputs[0].len();
++        let n_to = inputs[1].len();
++        let n_state = contact.width();
++        let image = physical_linear_radius(&inputs, n_from + n_to + 2 * n_state, |basis| {
++            let passed = crate::hnn::propagation::transit(
++                contact, h, &basis[0], &basis[1], &basis[2], &basis[3],
++            )?;
++            Ok([
++                passed.arrive_from,
++                passed.arrive_to,
++                passed.displacement,
++                passed.rate,
++            ]
++            .concat())
++        })?;
++        next.arrivals[a] = [
++            image[..n_from].to_vec(),
++            image[n_from..n_from + n_to].to_vec(),
++        ];
++        next.states[a] = [
++            image[n_from + n_to..n_from + n_to + n_state].to_vec(),
++            image[n_from + n_to + n_state..].to_vec(),
++        ];
++    }
++    Ok(next)
++}
++
++fn physical_domain_read(
++    field: &Field,
++    material: &dyn FieldMaterial,
++    current: &Current,
++    phases: &ReceivingPhases,
++    anchor: &[Rat],
++    radius: &[Rat],
++) -> Result<PhysicalDomainRead, HnnError> {
++    let point = phases.read(field, material, current, anchor)?;
++    let ring = phases.ring();
++    let transported: Vec<_> = field
++        .ring(ring)
++        .rotate(radius, &current.lift()[ring])
++        .into_iter()
++        .map(|value| value.abs())
++        .collect();
++    let radius = physical_matrix_radius(
++        material
++            .receiving_map(ring)
++            .ok_or(HnnError::MissingReceivingMap { ring })?,
++        &transported,
++    )?;
++    let logits: Vec<_> = point
++        .logits
++        .iter()
++        .zip(&radius)
++        .map(|(point, radius)| crate::ratio::algebraic::ExactInterval {
++            lower: point - radius,
++            upper: point + radius,
++        })
++        .collect();
++    let lower = (0..field.alphabet())
++        .map(|class| crate::receiver::face::GrainCell::of(&logits[2 * class].lower, phases.grain()))
++        .collect::<Result<Vec<_>, _>>()?;
++    let upper = (0..field.alphabet())
++        .map(|class| crate::receiver::face::GrainCell::of(&logits[2 * class].upper, phases.grain()))
++        .collect::<Result<Vec<_>, _>>()?;
++    let greatest_lower = lower
++        .iter()
++        .map(|cell| (&cell.carry, cell.phase))
++        .max()
++        .unwrap();
++    // Every native grain leader belongs to this fibre. One member therefore certifies the
++    // producing identity decoder's class reading throughout the compatible family.
++    let classes = upper
++        .iter()
++        .enumerate()
++        .filter(|(_, cell)| (&cell.carry, cell.phase) >= greatest_lower)
++        .map(|(class, _)| class)
++        .collect();
++    Ok(PhysicalDomainRead { logits, classes })
++}
++
+ /// [definition] A participating reception awaiting one observed comparison: its blind receipt,
+ /// current frame, producing chart and transient native Word/source moment. It is consumed by
+ /// `observe` or `finish`, never cloned or retained as an occurrence archive. An observed target
+@@ -2117,12 +2547,9 @@ impl PhysicalPrediction<'_, '_> {
+ }
+ 
+ /// [definition; agent-inferred, October 5] **The classes an erased station's domain projects
+-/// to**: a release needs the domain of the word's coupled drive, certified, projected through the
+-/// executed anchor map and the decoder. No owner certifies that domain: a component domain under a
+-/// frozen drive (`holon::parametron::DomainProposal`) is not the word's state-dependent drive, a
+-/// local tangent rank is not a domain, and a point reading is one state. Uncertified, the domain is
+-/// the whole state space, whose projection lies within every class of the encoding, so the fibre is
+-/// the encoding's classes. (`PeriodicLock::phase_class` is a pump phase index, not a class.)
++/// to** when the finite tube cannot be admitted: the full encoding fibre. A component domain under
++/// a frozen drive, a local tangent and a point leader do not certify the coupled Word.
++/// (`PeriodicLock::phase_class` is a pump phase index, not a class.)
+ fn domain_classes(section: &DamagedSection) -> Vec<usize> {
+     (0..section.classes()).collect()
+ }
+diff --git a/crates/holonics/src/hnn/tests/prediction.rs b/crates/holonics/src/hnn/tests/prediction.rs
+index 83553993..0be3810f 100644
+--- a/crates/holonics/src/hnn/tests/prediction.rs
++++ b/crates/holonics/src/hnn/tests/prediction.rs
+@@ -1449,7 +1449,7 @@ mod physical_repair {
+                     *cell,
+                     RepairedCell::Held {
+                         fibre: vec![0, 1, 2, 3],
+-                        unresolved: Unresolved::UncertifiedDomain,
++                        unresolved: Unresolved::PluralDomain,
+                     }
+                 );
+             } else {
+@@ -1488,7 +1488,7 @@ mod physical_repair {
+     }
+ 
+     #[test]
+-    fn a_point_reading_with_one_leader_releases_nothing() {
++    fn a_point_leader_does_not_replace_a_plural_coupled_domain() {
+         let field = field();
+         let (_, learned) = materials(&field);
+         let current = Current::at_rest(&field);
+@@ -1513,7 +1513,7 @@ mod physical_repair {
+             assert!(matches!(
+                 repair.cells[t],
+                 RepairedCell::Held {
+-                    unresolved: Unresolved::UncertifiedDomain,
++                    unresolved: Unresolved::PluralDomain,
+                     ..
+                 }
+             ));
+@@ -1536,7 +1536,7 @@ mod physical_repair {
+             RepairedCell::Held { unresolved, .. } => Some(*unresolved),
+             _ => None,
+         };
+-        assert_eq!(unresolved(2), Some(Unresolved::UncertifiedDomain));
++        assert_eq!(unresolved(2), Some(Unresolved::PluralDomain));
+         assert_eq!(unresolved(5), Some(Unresolved::Unread));
+         assert_eq!(unresolved(7), Some(Unresolved::Unread));
+     }
+@@ -1668,7 +1668,7 @@ mod physical_repair {
+             assert_eq!(read.tick, first.carry.ticks + j);
+         }
+         assert_ne!(continued.carry.change, first.carry.change);
+-        assert_eq!(continued.cells, first.cells); // No domain certificate is invented by continuation.
++        assert_eq!(continued.cells, first.cells); // R=0 remains plural across either admitted tube.
+     }
+ 
+     #[test]
+@@ -1736,7 +1736,8 @@ mod physical_repair {
+                 .iter()
+                 .any(|station| station.read.logits.iter().any(|x| !x.is_zero()))
+         );
+-        assert_eq!(after.cells, before.cells); // The coupled-drive domain is still uncertified.
++        assert!(after.cells.iter().enumerate().filter(|(j, _)| [2, 5, 7].contains(j))
++            .all(|(_, cell)| matches!(cell, RepairedCell::Held { .. })));
+         assert!(after.opening.closes() && after.word.closes());
+         assert!(after.balances.iter().all(|balance| balance.closes()));
+         // An exterior test perturbation changes one intact source, under the same learned R,
+@@ -1848,4 +1849,237 @@ mod physical_repair {
+         );
+     }
+ 
++    fn quartic_material(field: &Field) -> Constitution {
++        use crate::hnn::ring::{PumpDeclaration, PumpStep, ResonatorMaterial};
++        use crate::holon::parametron::Carrier;
++        (0..field.rings().len()).fold(
++            Constitution::initial(field, CAMPAIGN_ONE_BUDGET).unwrap(),
++            |material, ring| {
++                let pump =
++                    PumpDeclaration::new(rat(1, 16), Carrier::at(&rat(1, 2)), PumpStep::Half)
++                        .unwrap();
++                let resonator = ResonatorMaterial::of_parametron(
++                    &super::cycle(field.ring(ring).period() as usize),
++                    &rat(1, 8),
++                    Some(pump),
++                )
++                .unwrap()
++                .with_symmetric_saturation(rat(1, 16))
++                .unwrap();
++                material
++                    .with_ring_resonator(field, ring, resonator)
++                    .unwrap()
++            },
++        )
++    }
++
++    fn quartic_teaching(field: &Field) -> (Constitution, crate::hnn::prediction::PhysicalTeaching) {
++        let initial = quartic_material(field);
++        let current = Current::at_rest(field);
++        let phases = ReceivingPhases::declare(field, &initial, &current, &section(2)).unwrap();
++        let observed = crate::hnn::tests::support::encoded(field, &[0, 2]);
++        let damaged = DamagedSection::damage(&observed, &[1]).unwrap();
++        let blind = crate::hnn::prediction::predict_by_field(
++            field,
++            &initial,
++            &current,
++            &damaged,
++            &WordOpening::Rest,
++            &phases,
++        )
++        .unwrap();
++        assert!(matches!(
++            blind.prediction().cells[1],
++            RepairedCell::Held { .. }
++        ));
++        let teaching = blind.observe(&initial, &observed, &[false, true]).unwrap();
++        assert_ne!(
++            initial.receiving_map(0),
++            teaching.constitution.receiving_map(0)
++        );
++        assert_eq!(initial.source_port(0), teaching.constitution.source_port(0));
++        (initial, teaching)
++    }
++
++    #[test]
++    fn the_coupled_quartic_tube_encloses_every_admitted_missing_class() {
++        let field = field();
++        let (_, teaching) = quartic_teaching(&field);
++        let current = Current::at_rest(&field);
++        let phases =
++            ReceivingPhases::declare(&field, &teaching.constitution, &current, &section(4))
++                .unwrap();
++        let opening = WordOpening::Received {
++            carry: teaching.prediction.carry.clone(),
++            absorption: Absorption::Nothing,
++        };
++        let source = crate::hnn::tests::support::encoded(&field, &[1, 0, 3, 2]);
++        let damaged = DamagedSection::damage(&source, &[1]).unwrap();
++        let sparse = repair_by_field(
++            &field,
++            &teaching.constitution,
++            &current,
++            &damaged,
++            &opening,
++            &phases,
++        )
++        .unwrap();
++        assert!(sparse.domains.iter().all(Option::is_some));
++        assert!(
++            sparse
++                .domains
++                .iter()
++                .flatten()
++                .any(|domain| domain.logits.iter().any(|interval| !interval.is_point()))
++        );
++        // Only the test oracle enumerates this tiny complete family. The production owner
++        // derives its enclosure from E columns and never runs candidate completions.
++        for missing in 0..field.alphabet() {
++            let source = crate::hnn::tests::support::encoded(&field, &[1, missing, 3, 2]);
++            let complete = DamagedSection::damage(&source, &[]).unwrap();
++            let complete = repair_by_field(
++                &field,
++                &teaching.constitution,
++                &current,
++                &complete,
++                &opening,
++                &phases,
++            )
++            .unwrap();
++            for (station, (domain, read)) in sparse.domains.iter().zip(&complete.reads).enumerate()
++            {
++                let domain = domain.as_ref().unwrap();
++                for (interval, logit) in domain.logits.iter().zip(&read.read.logits) {
++                    assert!(
++                        &interval.lower <= logit && logit <= &interval.upper,
++                        "completion {missing}, crossing {station} escaped its coupled tube"
++                    );
++                }
++                assert!(
++                    read.leaders()
++                        .iter()
++                        .all(|class| domain.classes.contains(class))
++                );
++            }
++            assert!(complete.opening.closes() && complete.word.closes());
++            assert!(complete.balances.iter().all(|balance| balance.closes()));
++        }
++        assert!(sparse.opening.closes() && sparse.word.closes());
++        assert!(sparse.balances.iter().all(|balance| balance.closes()));
++    }
++
++    #[test]
++    fn a_blind_later_quartic_passage_releases_only_a_constant_learned_domain_image() {
++        let field = field();
++        let (initial, teaching) = quartic_teaching(&field);
++        let current = Current::at_rest(&field);
++        let phases =
++            ReceivingPhases::declare(&field, &teaching.constitution, &current, &section(2))
++                .unwrap();
++        // A distinct actual intact source, independent of the former observation. The later
++        // erased value is absent from its constructor, and only two crossings are requested.
++        let mut later = vec![0; 64];
++        later[0] = 1;
++        let later = crate::hnn::tests::support::encoded(&field, &later);
++        let later = DamagedSection::damage(&later, &[1]).unwrap();
++        let opening = WordOpening::Received {
++            carry: teaching.prediction.carry.clone(),
++            absorption: Absorption::Nothing,
++        };
++        let after = repair_by_field(
++            &field,
++            &teaching.constitution,
++            &current,
++            &later,
++            &opening,
++            &phases,
++        )
++        .unwrap();
++        let before =
++            repair_by_field(&field, &initial, &current, &later, &opening, &phases).unwrap();
++        assert!(matches!(
++            before.cells[1],
++            RepairedCell::Held {
++                unresolved: Unresolved::PluralDomain,
++                ..
++            }
++        ));
++        assert_ne!(after.reads, before.reads);
++        assert_eq!(after.carry.change, before.carry.change);
++        let domain = after.domains[1].as_ref().unwrap();
++        assert_eq!(
++            domain.classes.len(),
++            1,
++            "the declared later passage has no constant decoded image: {:?}",
++            domain.classes
++        );
++        assert_eq!(after.cells[1], RepairedCell::Released(domain.classes[0]));
++        // The same learned relation reads another actual intact source and a rest interior.
++        let changed = crate::hnn::tests::support::encoded(&field, &vec![3; 64]);
++        let changed = DamagedSection::damage(&changed, &[1]).unwrap();
++        let changed = repair_by_field(
++            &field,
++            &teaching.constitution,
++            &current,
++            &changed,
++            &opening,
++            &phases,
++        )
++        .unwrap();
++        assert_ne!(changed.reads, after.reads);
++        assert_ne!(changed.carry.change, after.carry.change);
++        let absorbed = repair_by_field(
++            &field,
++            &teaching.constitution,
++            &current,
++            &later,
++            &WordOpening::Received {
++                carry: teaching.prediction.carry.clone(),
++                absorption: Absorption::Complete,
++            },
++            &phases,
++        )
++        .unwrap();
++        assert_ne!(absorbed.reads, after.reads);
++        assert_ne!(absorbed.carry.change, after.carry.change);
++        // Total erasure retains the whole source-completion uncertainty, with no smaller ball
++        // selected to make the formerly taught class win.
++        let empty = DamagedSection::damage(
++            &crate::hnn::tests::support::encoded(&field, &vec![0; 64]),
++            &(0..64).collect::<Vec<_>>(),
++        )
++        .unwrap();
++        let empty = repair_by_field(
++            &field,
++            &teaching.constitution,
++            &current,
++            &empty,
++            &opening,
++            &phases,
++        )
++        .unwrap();
++        assert!(matches!(empty.cells[1], RepairedCell::Held { .. }));
++        let leaky = teaching
++            .constitution
++            .clone()
++            .with_transport(0, rat(1, 2))
++            .unwrap();
++        let unsupported =
++            repair_by_field(&field, &leaky, &current, &later, &opening, &phases).unwrap();
++        assert!(unsupported.domains.iter().all(Option::is_none));
++        assert_eq!(
++            unsupported.cells[1],
++            RepairedCell::Held {
++                fibre: vec![0, 1, 2, 3],
++                unresolved: Unresolved::UncertifiedDomain,
++            }
++        );
++        assert!(after.opening.closes() && after.word.closes());
++        assert!(after.balances.iter().all(|balance| balance.closes()));
++        println!(
++            "blind coupled quartic output: {:?}; image fibre {:?}; exact receiving bounds {:?}",
++            after.cells, domain.classes, domain.logits
++        );
++    }
++
+ }

@@ -1,0 +1,201 @@
+{
+  "status": "terminal_cleanup_complete_remaining_queue_frozen_for_protein",
+  "queue_owner_thread": "01a10352-66ea-73c8-b716-a835a9a04033",
+  "parent_thread": "01a0fe67-e7cb-7202-bcfb-0b2da1acb0fd",
+  "priority_owner": "Protein coherent116-move continuation",
+  "active_owned_native_or_Lean_children": 0,
+  "shared_execution_lease_held": false,
+  "scheduling_priority_retained": false,
+  "stages": [
+    {
+      "label": "ns-conductive-development-20261006-v1",
+      "passed": false,
+      "wall_ns": 3289011744,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 2667848000,
+      "group_peak_bytes": "631615488",
+      "quiescence_confirmed": true
+    },
+    {
+      "label": "ns-conductive-development-20261006-v2",
+      "passed": false,
+      "wall_ns": 17192258436,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 8665298000,
+      "group_peak_bytes": "4294967296",
+      "quiescence_confirmed": true
+    },
+    {
+      "label": "ns-conductive-development-20261006-v3",
+      "passed": false,
+      "wall_ns": 17188733970,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 16102188000,
+      "group_peak_bytes": "1090134016",
+      "quiescence_confirmed": true
+    },
+    {
+      "label": "ns-conductive-import-preparation-20261006-v1",
+      "passed": false,
+      "wall_ns": 5346792231,
+      "projection_ns": 12779337307,
+      "aggregate_CPU_ns": 4695208000,
+      "group_peak_bytes": "617017344",
+      "quiescence_confirmed": true
+    },
+    {
+      "label": "ns-conductive-import-preparation-20261006-v2",
+      "passed": true,
+      "wall_ns": 12649804730,
+      "projection_ns": 12779337307,
+      "aggregate_CPU_ns": 11172826000,
+      "group_peak_bytes": "1450807296",
+      "quiescence_confirmed": true
+    },
+    {
+      "label": "ns-conductive-import-preparation-20261006-v3",
+      "passed": true,
+      "wall_ns": 12141051525,
+      "projection_ns": 12779337307,
+      "aggregate_CPU_ns": 11657124000,
+      "group_peak_bytes": "622542848",
+      "quiescence_confirmed": true
+    },
+    {
+      "label": "hodge-temporal-development-20261006-v1",
+      "passed": false,
+      "wall_ns": 7401958499,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 6257166000,
+      "group_peak_bytes": "1381748736",
+      "quiescence_confirmed": true
+    },
+    {
+      "label": "hodge-temporal-development-20261006-v2",
+      "passed": false,
+      "wall_ns": 5740955638,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 5544786000,
+      "group_peak_bytes": "419438592",
+      "quiescence_confirmed": true
+    },
+    {
+      "label": "hodge-temporal-import-preparation-20261006-v4",
+      "passed": true,
+      "wall_ns": 11493711139,
+      "projection_ns": 12779337307,
+      "aggregate_CPU_ns": 10901808000,
+      "group_peak_bytes": "702169088",
+      "quiescence_confirmed": true
+    },
+    {
+      "label": "hodge-temporal-target-binding-20261006-v2",
+      "passed": true,
+      "wall_ns": 3511452768,
+      "projection_ns": 12779337307,
+      "aggregate_CPU_ns": 3446998000,
+      "group_peak_bytes": "329039872",
+      "quiescence_confirmed": true
+    },
+    {
+      "label": "hodge-partition-development-20261006-v1",
+      "passed": false,
+      "wall_ns": 6182917460,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 5876287000,
+      "group_peak_bytes": "649621504",
+      "quiescence_confirmed": true
+    },
+    {
+      "label": "hodge-partition-development-20261006-v2",
+      "passed": false,
+      "wall_ns": 5895010541,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 5781212000,
+      "group_peak_bytes": "456359936",
+      "quiescence_confirmed": true
+    },
+    {
+      "label": "hodge-partition-import-preparation-20261006-v4",
+      "passed": true,
+      "wall_ns": 11384099171,
+      "projection_ns": 12779337307,
+      "aggregate_CPU_ns": 10924969000,
+      "group_peak_bytes": "687538176",
+      "quiescence_confirmed": true
+    },
+    {
+      "label": "hodge-partition-target-binding-20261006-v2",
+      "passed": true,
+      "wall_ns": 3437774159,
+      "projection_ns": 12779337307,
+      "aggregate_CPU_ns": 3367094000,
+      "group_peak_bytes": "322297856",
+      "quiescence_confirmed": true
+    },
+    {
+      "label": "hnn-reframed-lean-development-20261006-v1",
+      "passed": false,
+      "wall_ns": 5214489872,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 4692777000,
+      "group_peak_bytes": "676524032",
+      "quiescence_confirmed": true
+    },
+    {
+      "label": "hnn-reframed-lean-import-preparation-20261006-v4",
+      "passed": true,
+      "wall_ns": 12112424073,
+      "projection_ns": 12779337307,
+      "aggregate_CPU_ns": 11548546000,
+      "group_peak_bytes": "801005568",
+      "quiescence_confirmed": true
+    }
+  ],
+  "NS": "incomplete17s; no source object or compiler diagnostics after sequential read repair; no further unchanged retry",
+  "Hodge_temporal_v2": "failed final simp made no progress; sorryAx rejected",
+  "Hodge_partition_v2": {
+    "kernel_accepted": false,
+    "compiler_exit": 1,
+    "compiler_wall_ns": 2983337546,
+    "axioms": {
+      "Holonics.Physics.PartitionedHodgeEnergy.cycleBoundary_is_adjoint": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "Holonics.Physics.PartitionedHodgeEnergy.cycleHeatStep_cut_return": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "Holonics.Physics.PartitionedHodgeEnergy.cut_harmonic_laplacian_defect": [
+        "propext",
+        "sorryAx",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "Holonics.Physics.PartitionedHodgeEnergy.cut_heat_commutation_fails": [
+        "propext",
+        "sorryAx",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    "selector_count_matches": true,
+    "standard_axioms_only": false,
+    "metadata_unchanged": true,
+    "broad_library_checked": false
+  },
+  "ReframedMoment": "failed windingWindow rewrite and Nat/Fin index mismatch; sorryAx rejected",
+  "remaining_queue_frozen": [
+    "Hodge temporal repair",
+    "Hodge recursive cut consumer",
+    "Hodge shuffle/source four-current",
+    "CM finite-cut pushforward leaf",
+    "physical coupled-domain v3",
+    "NS coupled analytical reduction"
+  ],
+  "caps_or_deadlines_raised": false,
+  "failed_sources_and_receipts_preserved": true
+}

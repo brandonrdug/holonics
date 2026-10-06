@@ -1,0 +1,417 @@
+{
+  "version": 3,
+  "scope": "native finite-tube fixture robustness and physical library controls; no reconstruction fidelity or learned language claim",
+  "owner_source_equals_native_snapshot": true,
+  "source_seal": {
+    "version": 3,
+    "claim": "fixed failed family: signed junction inclusion and actual native family image diagnosis; original singleton gate unchanged",
+    "base": "280fa010e6c12edd71276520470cfc29e527c6c8",
+    "preserved_failed_validation": "native-validation-v2/VALIDATION.json",
+    "original_API_adapted_prediction_sha256": "8c401ef82445232752d3a7910e4ac9d61b828d5ca1279677143a4053a2ee1853",
+    "source": [
+      {
+        "path": "crates/holonics/src/hnn/prediction.rs",
+        "bytes": 126599,
+        "sha256": "c24d3434e7f1c39c039e3cab743b306b7ee5854fb85f48450c2451e267f3af44"
+      },
+      {
+        "path": "crates/holonics/src/hnn/tests/prediction.rs",
+        "bytes": 102946,
+        "sha256": "b4c88b60e4393b4bad1b6eed15e9f0ca9160347ab944ee825d08b112008030f7"
+      },
+      {
+        "path": "research/notebook/hnn_design/hnn_repair_loop.rs",
+        "bytes": 31204,
+        "sha256": "76d7123a14ec3d01957a125f299a2195569ce39f04c470c05ccde3b120148d69"
+      }
+    ]
+  },
+  "executable": {
+    "executable": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-20261006/cache-v3/debug/deps/holonics-70b68d2f7e1f6408",
+    "pin": {
+      "sha256": "ff38db9cfac0627b3edd371642a0f31c4c29aeaab8c5c23c549bd781f012c864",
+      "bytes": 64123216
+    },
+    "fresh_Cargo_local_artifact": true,
+    "build_acceptance": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-host-link-20261006-v3.acceptance.json"
+  },
+  "verified_manifest_file_counts": {
+    "native-v2": 95,
+    "native-v3": 347
+  },
+  "unique_passed_native_tests": [
+    "hnn::tests::prediction::physical_repair::a_blind_later_quartic_passage_releases_only_a_constant_learned_domain_image",
+    "hnn::tests::prediction::physical_repair::the_coupled_quartic_tube_encloses_every_admitted_missing_class",
+    "hnn::tests::prediction::physical_repair::a_point_leader_does_not_replace_a_plural_coupled_domain",
+    "hnn::tests::prediction::physical_repair::a_station_no_declared_crossing_reads_is_held_unread",
+    "hnn::tests::prediction::physical_repair::equal_class_counts_do_not_join_different_producing_charts",
+    "hnn::tests::prediction::physical_repair::identity_conduct_must_certify_the_station_clock_even_at_erased_stations",
+    "hnn::tests::prediction::physical_repair::physical_teaching_changes_r_and_the_later_carried_receiving_read",
+    "hnn::tests::prediction::physical_repair::physical_teaching_refuses_a_stale_material_or_foreign_chart_and_preserves_the_carry",
+    "hnn::tests::prediction::physical_repair::the_damaged_section_runs_through_the_field_and_every_erasure_is_held_unresolved",
+    "hnn::tests::prediction::physical_repair::the_producing_decoder_and_both_physical_maps_are_joined_before_opening",
+    "hnn::tests::prediction::physical_repair::the_section_carries_no_erased_class_so_the_repair_cannot_read_one",
+    "hnn::tests::prediction::physical_repair::the_supported_physical_passage_continues_on_its_retained_interior_and_clock",
+    "hnn::tests::prediction::physical_repair::total_erasure_preserves_the_producing_chart_and_refuses_located_conduct_before_opening"
+  ],
+  "raw_blind_output_pin": {
+    "path": "physical-coupled-domain-blind-development-20261006-v3.stdout",
+    "bytes": 6277,
+    "sha256": "fb3542fa1f679b775822cf1c4daf984c951e9278905a93f7a07f0401a10e001b"
+  },
+  "identity_boundary_chart": {
+    "classes": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "decoder": [
+      [
+        1,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        1,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        1
+      ]
+    ],
+    "labels": {
+      "0": 0,
+      "1": 1,
+      "2": 2,
+      "3": 3
+    },
+    "learned_text_mapping": false
+  },
+  "observed_passage_after_blind_prediction": [
+    0,
+    2
+  ],
+  "observed_partition": [
+    false,
+    true
+  ],
+  "later_blind_input": [
+    1,
+    null,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "actual_later_output": [
+    1,
+    2,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "released_station": 1,
+  "released_class": 2,
+  "sparse_grain_leaders": [
+    2
+  ],
+  "certified_enclosure_classes": [
+    2
+  ],
+  "four_native_completion_images": {
+    "0": [
+      2
+    ],
+    "1": [
+      2
+    ],
+    "2": [
+      2
+    ],
+    "3": [
+      2
+    ]
+  },
+  "source_constructed_erased_class": 0,
+  "reconstruction_correctness": false,
+  "receiving_grain": 16,
+  "exact_sparse_complex_logits_real_imag": [
+    {
+      "numerator": "-245434790974338715",
+      "denominator": "33215767322371817472"
+    },
+    {
+      "numerator": "0",
+      "denominator": "1"
+    },
+    {
+      "numerator": "-245434790974338715",
+      "denominator": "33215767322371817472"
+    },
+    {
+      "numerator": "0",
+      "denominator": "1"
+    },
+    {
+      "numerator": "126783197672247029",
+      "denominator": "5838709099635671040"
+    },
+    {
+      "numerator": "3318452616961312157",
+      "denominator": "3487655568849040834560"
+    },
+    {
+      "numerator": "-245434790974338715",
+      "denominator": "33215767322371817472"
+    },
+    {
+      "numerator": "0",
+      "denominator": "1"
+    }
+  ],
+  "exact_complex_enclosure_real_imag": [
+    {
+      "lower": {
+        "numerator": "-49910709660005879",
+        "denominator": "4151970915296477184"
+      },
+      "upper": {
+        "numerator": "-45791952334315199",
+        "denominator": "16607883661185908736"
+      }
+    },
+    {
+      "lower": {
+        "numerator": "0",
+        "denominator": "1"
+      },
+      "upper": {
+        "numerator": "0",
+        "denominator": "1"
+      }
+    },
+    {
+      "lower": {
+        "numerator": "-49910709660005879",
+        "denominator": "4151970915296477184"
+      },
+      "upper": {
+        "numerator": "-45791952334315199",
+        "denominator": "16607883661185908736"
+      }
+    },
+    {
+      "lower": {
+        "numerator": "0",
+        "denominator": "1"
+      },
+      "upper": {
+        "numerator": "0",
+        "denominator": "1"
+      }
+    },
+    {
+      "lower": {
+        "numerator": "2968667122781976401",
+        "denominator": "373677382376682946560"
+      },
+      "upper": {
+        "numerator": "13259582179265643311",
+        "denominator": "373677382376682946560"
+      }
+    },
+    {
+      "lower": {
+        "numerator": "686587147395212881",
+        "denominator": "1743827784424520417280"
+      },
+      "upper": {
+        "numerator": "657966367391524819",
+        "denominator": "435956946106130104320"
+      }
+    },
+    {
+      "lower": {
+        "numerator": "-49910709660005879",
+        "denominator": "4151970915296477184"
+      },
+      "upper": {
+        "numerator": "-45791952334315199",
+        "denominator": "16607883661185908736"
+      }
+    },
+    {
+      "lower": {
+        "numerator": "0",
+        "denominator": "1"
+      },
+      "upper": {
+        "numerator": "0",
+        "denominator": "1"
+      }
+    }
+  ],
+  "separate_teaching_carry_output": [
+    0,
+    3,
+    {
+      "Held": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    0,
+    2,
+    {
+      "Held": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    3,
+    {
+      "Held": [
+        0,
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "native_validation": "native-validation-v3/VALIDATION.json",
+  "source_v2_failure_preserved": "native-validation-v2/VALIDATION.json"
+}

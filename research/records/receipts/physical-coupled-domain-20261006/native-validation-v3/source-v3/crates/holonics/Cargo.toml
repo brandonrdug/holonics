@@ -1,0 +1,37 @@
+[package]
+name = "holonics"
+version = "0.1.0"
+edition = "2024"
+publish = false
+license.workspace = true
+
+[dependencies]
+num-rational = { workspace = true }
+num-bigint = { workspace = true }
+num-traits = { workspace = true }
+thiserror = { workspace = true }
+# The host realization of the HNN's co-present regions (hardware law; `hnn::realization`): the
+# regions whose effects commute run on the host's cores, collected in index order.
+rayon = "1.12"
+
+# The notebook's exposure of campaign 1 on the pinned cut (`Reference::expose` and its complete
+# readout; research/notebook/hnn_design/README.md): a measurement run once in release, never a test.
+[[example]]
+name = "hnn_exposure"
+path = "../../research/notebook/hnn_design/hnn_exposure.rs"
+
+# The notebook's chase terrain in its reception phase (`holarchy::terrain::chase`, the population of
+# candidate runners `receiver::population::ChaseFamily`; THE_REBUILD F6;
+# research/notebook/hnn_design/README.md): count-only development receipts run once in release,
+# never a test.
+[[example]]
+name = "hnn_chase"
+path = "../../research/notebook/hnn_design/hnn_chase.rs"
+
+# The notebook's step-1 harness (THE_REBUILD U6): key location and the located pair's deposit
+# (`hnn::keys`, `hnn::executed`), the release (`hnn::prediction`) and repair on known-truth terrains,
+# order-2, the alternation and the line, and on text (research/notebook/hnn_design/README.md): run
+# once in release, never a test.
+[[example]]
+name = "hnn_prediction"
+path = "../../research/notebook/hnn_design/hnn_prediction.rs"

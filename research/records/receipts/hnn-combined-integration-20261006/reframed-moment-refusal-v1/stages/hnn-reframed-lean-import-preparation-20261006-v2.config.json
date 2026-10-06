@@ -1,0 +1,101 @@
+{
+  "label": "hnn-reframed-lean-import-preparation-20261006-v2",
+  "scope_unit": "holonics-prune-admission-hnn-reframed-lean-import-preparation-20261006-v2",
+  "scientific_job": false,
+  "stage_kind": "preparation",
+  "cwd": "/home/b/Workspaces/holonics",
+  "scope": "complete ordered import sealing with accepted unchanged foreign header graph reuse; preparation only, no compiler",
+  "projection_ns": 12779337307,
+  "aggregate_cpu_limit_us": 17000000,
+  "aggregate_cpu_stop_margin_us": 1000000,
+  "group_memory_max_bytes": 4294967296,
+  "address_space_max_bytes": -1,
+  "minimum_MemAvailable_KiB": 8388608,
+  "system_floor_MemAvailable_KiB": 4194304,
+  "thread_budget": 1,
+  "inputs": [
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-20261006/PREPARATION_REQUEST.v2.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/prepare_lean_imports_v1.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-integration-d1e1e0bf-20261006/LEAN_OWN_CACHE_PREFLIGHT.v2.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-integration-d1e1e0bf-20261006/LEAN_REFRAMED_REQUEST.v1.json",
+    "/home/b/Workspaces/holonics/.local/hodge-cut-cartier-20261003/runner-recovery-02/import_sealer.py",
+    "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/sweep-20261006/current-imports.v4.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-integration-d1e1e0bf-20261006/source-v2/lean/Holonics/HNN/ReframedMoment.lean",
+    "/usr/bin/python3.14",
+    "/usr/bin/timeout",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/final_stage.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/leased_stage_v2.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/bounded_stage_v1.py"
+  ],
+  "input_directories": [],
+  "expected_inputs": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/prepare_lean_imports_v1.py": {
+      "sha256": "58a0e3b5d957c497934593af283c7c8de1fddf40da81f39f4d77e3b46025f6b9",
+      "bytes": 3104
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-integration-d1e1e0bf-20261006/LEAN_OWN_CACHE_PREFLIGHT.v2.json": {
+      "sha256": "8ad801131c531966b7ba7255eea014d9069b371456f742d32d88fcaeb04cc2ad",
+      "bytes": 924423
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-integration-d1e1e0bf-20261006/LEAN_REFRAMED_REQUEST.v1.json": {
+      "sha256": "3d77d2065256517fe7467e8d0312ff381229fe04826558e7a409133373d1be3d",
+      "bytes": 581
+    },
+    "/home/b/Workspaces/holonics/.local/hodge-cut-cartier-20261003/runner-recovery-02/import_sealer.py": {
+      "sha256": "b323b6177c66c48d27a6a39ae580220e0c908430d0bbfbc2c33aa6b5b48b36da",
+      "bytes": 13162
+    },
+    "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/sweep-20261006/current-imports.v4.json": {
+      "sha256": "1b365a91d1b8cb05ada94564ea28ed62103c304e841580b56697847a882aed0e",
+      "bytes": 81181496
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-integration-d1e1e0bf-20261006/source-v2/lean/Holonics/HNN/ReframedMoment.lean": {
+      "sha256": "c12d20d76b44ee512cbc80e2edad1a864f4c921bf638a6e2126b16ae832e3fd2",
+      "bytes": 8599
+    },
+    "/usr/bin/python3.14": {
+      "sha256": "ac12d99c156d3c0ec708a2baf664d35b74f455572fe35fd57faa420ade5c3845",
+      "bytes": 14424
+    },
+    "/usr/bin/timeout": {
+      "sha256": "1425639cf3339b1117536df91cd4ba3229f8fa84e87322dee24e87121ed3feb3",
+      "bytes": 68320
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/final_stage.py": {
+      "sha256": "a0a5a94f157acf9a5127b756a036c6e86449dc2012af0f1e71d34aafa13bc79e",
+      "bytes": 10968
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/leased_stage_v2.py": {
+      "sha256": "bcf91456534e763a025613f39e82853d7a58529b399bb183d544d09a7a42f949",
+      "bytes": 5520
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/bounded_stage_v1.py": {
+      "sha256": "84b7d003089fa19881690e368200b2168b9d179c8e6573bdafab54369235cec2",
+      "bytes": 12645
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-20261006/PREPARATION_REQUEST.v2.json": {
+      "sha256": "a20ba0c0bef3c4a40c44abc309027ef2dd8452dbdbadca6bd89df3541744e953",
+      "bytes": 4141
+    }
+  },
+  "outputs": [
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-20261006/current-imports.v2.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-20261006/import-preparation.v2.json"
+  ],
+  "argv": [
+    "/usr/bin/python3.14",
+    "-B",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/prepare_lean_imports_v1.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-20261006/PREPARATION_REQUEST.v2.json"
+  ],
+  "allocation_basis": {
+    "largest_same_complete_import_preparation_ns": 12779337307,
+    "count": 1,
+    "compiler_projection_is_separate": true,
+    "cached_metadata_assumptions_preserved": true,
+    "no_new_resource_runner": true
+  },
+  "read_partition_change": "Refresh only current source and actual changed leading roots against accepted cached graph; old proof/source failures preserved; same preparation ceiling and caps.",
+  "awaiting_new_resource_handoff": true,
+  "confirmed_resource_handoff": "Protein execution_unit_0141 terminal release; parent next-slot delegation"
+}

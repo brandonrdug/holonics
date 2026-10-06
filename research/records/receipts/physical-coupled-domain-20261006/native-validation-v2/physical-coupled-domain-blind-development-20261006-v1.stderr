@@ -1,0 +1,6 @@
+
+thread 'hnn::tests::prediction::physical_repair::a_blind_later_quartic_passage_releases_only_a_constant_learned_domain_image' (1370657) panicked at crates/holonics/src/hnn/tests/prediction.rs:2010:9:
+assertion `left == right` failed: the declared later passage has no constant decoded image: [0, 1, 2, 3]
+  left: 4
+ right: 1
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

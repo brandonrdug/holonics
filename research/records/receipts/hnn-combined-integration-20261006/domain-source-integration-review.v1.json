@@ -1,0 +1,32 @@
+{
+  "base": "d8bfcb0560c9be5b0030f9134689b307e0c3221d",
+  "physical_owner_commit": "272f61945aed1b1d2aaac2aac56bb57c446187d6",
+  "source": {
+    "crates/holonics/src/hnn/prediction.rs": {
+      "bytes": 126599,
+      "sha256": "c24d3434e7f1c39c039e3cab743b306b7ee5854fb85f48450c2451e267f3af44"
+    },
+    "crates/holonics/src/hnn/tests/prediction.rs": {
+      "bytes": 102946,
+      "sha256": "b4c88b60e4393b4bad1b6eed15e9f0ca9160347ab944ee825d08b112008030f7"
+    },
+    "lean/Holonics/HNN/ReframedMoment.lean": {
+      "bytes": 8704,
+      "sha256": "4ffc65a60f4e72c8bc63c637d7e6480ada2e8721a002e53c487635e64cd93f2e"
+    }
+  },
+  "physical_manifests_rehashed": {
+    "native-validation-v2": 95,
+    "native-validation-v3": 347
+  },
+  "lean_refusal_manifest_rehashed": 61,
+  "physical_source_bytes_equal_accepted_v3": true,
+  "physical_receipts_unchanged": true,
+  "wrong_removed_zero_released_two_preserved": true,
+  "no_native_or_scientific_execution_by_integrator": true,
+  "signed_junction_equation": "v=sum_q w_q*x_q; reflected_p=2*v-x_p; radius=sum_q abs(2*w_q-delta_qp)*r_q",
+  "independent_source_review": "bounded Luna review confirms actual junction coefficients, quartet completion oracle and loaded force/pump/contact terms; no independent execution",
+  "new_Lean_patch": "two explicit change goals and one Fin G binder only; same finite-box law; failed original raw compiler/axiom outputs preserved; corrected-source kernel acceptance pending",
+  "combined_native_acceptance": "pending on this source, old four controls remain scoped to d1e1e0bf",
+  "scientific_acceptance": "not correct reconstruction; no unseen family, acoustic, language or adaptive whole-material acceptance"
+}

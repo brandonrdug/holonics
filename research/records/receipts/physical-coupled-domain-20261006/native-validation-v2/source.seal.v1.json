@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "claim": "exact finite coupled tube and identity decoder constancy; no blind truth fidelity claim",
+  "base": "280fa010e6c12edd71276520470cfc29e527c6c8",
+  "source": [
+    {
+      "path": "crates/holonics/src/hnn/prediction.rs",
+      "bytes": 125825,
+      "sha256": "03e8a6ae9dfe94e57914dbab023df2ef28c3bd5cac9f48d9610be5a9f0ef23fb"
+    },
+    {
+      "path": "crates/holonics/src/hnn/tests/prediction.rs",
+      "bytes": 101218,
+      "sha256": "ae0757fdc8bd60d086f3583bd8eec57adc0cf514dcd3db52e24f3276d9638623"
+    },
+    {
+      "path": "research/notebook/hnn_design/hnn_repair_loop.rs",
+      "bytes": 31204,
+      "sha256": "76d7123a14ec3d01957a125f299a2195569ce39f04c470c05ccde3b120148d69"
+    }
+  ]
+}

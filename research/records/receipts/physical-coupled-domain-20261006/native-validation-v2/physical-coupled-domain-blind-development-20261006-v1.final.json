@@ -1,0 +1,103 @@
+{
+  "passed": false,
+  "label": "physical-coupled-domain-blind-development-20261006-v1",
+  "scientific_job": false,
+  "deferred_lock_busy": false,
+  "final_CPU_ns": 671003000,
+  "CPU_reading_grain_ns": 1000,
+  "aggregate_CPU_limit_us": 17000000,
+  "final_CPU_source": "systemd retained oneshot CPUUsageNSec after all group processes exit",
+  "CPU_kernel_hard_total_limit": false,
+  "sampled_stop_margin_us": 1000000,
+  "aggregate_CPU_within_limit": true,
+  "no_overshoot_accepted": true,
+  "wall_ns": 713266934,
+  "projection_ns": 16000000000,
+  "wall_source": "external monotonic_ns through final property read",
+  "quiescent": true,
+  "completion_event": "oneshot start job completed; no polling",
+  "unit_properties": {
+    "Description": "Owned holonics admission physical-coupled-domain-blind-development-20261006-v1 238101236e4379bfb8edbef2675e7303",
+    "LoadState": "loaded",
+    "ActiveState": "failed",
+    "SubState": "failed",
+    "InvocationID": "68a440413a5742d7944182e705a955e1",
+    "Result": "exit-code",
+    "ExecMainStatus": "125",
+    "ControlGroup": "",
+    "MemoryPeak": "23941120",
+    "CPUUsageNSec": "671003000",
+    "TasksCurrent": "[not set]"
+  },
+  "outer_error": null,
+  "unit_start_exit": 1,
+  "unit_start_stdout": "",
+  "unit_start_stderr": "",
+  "config": {
+    "sha256": "1ae4fedf3353993234ce90b502b5549e1cbfab21513ad05bd1c45c7784852edf",
+    "bytes": 62664
+  },
+  "receipt_pins": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-blind-development-20261006-v1.config.json": {
+      "sha256": "1ae4fedf3353993234ce90b502b5549e1cbfab21513ad05bd1c45c7784852edf",
+      "bytes": 62664
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-blind-development-20261006-v1.external-lease.json": {
+      "sha256": "4884d09f0f24d79b8878e62961bab5833cd6d8603cca9c98c723525303a58d35",
+      "bytes": 487
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-blind-development-20261006-v1.lease-identity.json": {
+      "sha256": "a832d45ca6a5a88cbfef16bff389d3b15ca14aa76f34b64ef5567aa211e73316",
+      "bytes": 565
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-blind-development-20261006-v1.input_seal.json": {
+      "sha256": "fedf9e2185e1525e2dbb7dd35092ba48410776109562600020521876568eefa2",
+      "bytes": 61307
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-blind-development-20261006-v1.stdout": {
+      "sha256": "70eab584759533f414a64f6c588bfe9351b35655cf6579b65484986879302215",
+      "bytes": 395
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-blind-development-20261006-v1.stderr": {
+      "sha256": "7be8b38f4cc0c88132f6f423894664fc2a5b062c44aad0d69c0f2855c0363753",
+      "bytes": 404
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-blind-development-20261006-v1.memory-gate.json": {
+      "sha256": "82d8ceedf946bfe34280513bcac7a6f5446fb8c28f66bc4e301028c8dd8b1ed3",
+      "bytes": 120
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-blind-development-20261006-v1.child-identity.json": {
+      "sha256": "928628366461d5ed72503e8384818b97c819b8bf919fec436d40988d7847ab04",
+      "bytes": 78
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-blind-development-20261006-v1.system-floor.json": {
+      "sha256": "ad1b1778c3900ed88293bba098056e720b76820e1771fbba2d0e054140832605",
+      "bytes": 4172
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-blind-development-20261006-v1.quiescence.json": {
+      "sha256": "f8e41d750c93b229592fed91c5d79585d308d0069e8935c60dfb0473fbda964f",
+      "bytes": 132
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-blind-development-20261006-v1.output_seal.json": {
+      "sha256": "79ca2a00dfcf979165ffdcdf4d8145a0b99bd694c33f4462cb7818cd988f3085",
+      "bytes": 36850
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-blind-development-20261006-v1.failure.json": {
+      "sha256": "c80a1d9c8d72d4ee88dff00956eecf6288bd985381816cdecfaa1b3dc7ccc343",
+      "bytes": 255
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-blind-development-20261006-v1.publication.json": {
+      "sha256": "d90a0dfbc385cf1aad2ef6bf3de225e05587348fbbac692908afd4fa45d96615",
+      "bytes": 3030
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-blind-development-20261006-v1.stage-quiescence.json": {
+      "sha256": "55418966cfa34053e253e4c099af095f9f56519de4a88de958578e498f73dd55",
+      "bytes": 136
+    }
+  },
+  "launcher_outside_native_group": true,
+  "lease_owner_outside_capped_group": true,
+  "lease_held_through_final_CPU_read_and_publication": true,
+  "stage_passed_before_cleanup": false,
+  "requires_cleanup_acceptance": true
+}

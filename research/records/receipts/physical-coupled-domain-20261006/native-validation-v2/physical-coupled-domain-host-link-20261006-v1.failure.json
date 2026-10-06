@@ -1,0 +1,9 @@
+{
+  "provisional_passed": false,
+  "final_acceptance_requires_external_CPU_read": true,
+  "label": "physical-coupled-domain-host-link-20261006-v1",
+  "error_type": "SystemExit",
+  "error": "101",
+  "child_launched": true,
+  "child_reaped": true
+}

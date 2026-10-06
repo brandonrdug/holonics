@@ -1,0 +1,58 @@
+{
+  "lease_still_held": true,
+  "own_group_other_PIDs": [],
+  "outcome": {
+    "provisional_passed": false,
+    "final_acceptance_requires_external_CPU_read": true,
+    "label": "physical-coupled-domain-host-link-20261006-v1",
+    "error_type": "SystemExit",
+    "error": "101",
+    "child_launched": true,
+    "child_reaped": true,
+    "aggregate_cpu_final_us": 11374249,
+    "aggregate_cpu_limit_us": 128000000,
+    "CPU_kernel_hard_total_limit": false
+  },
+  "outputs": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-host-link-20261006-v1.lease-identity.json": {
+      "sha256": "1a1f58774c23cb64cee2888dfb8e9e8273dde4471d2f066fc4c3572e07b370a2",
+      "bytes": 565
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-host-link-20261006-v1.memory-gate.json": {
+      "sha256": "8e0f7f9ad5310d9e653d96c915e58582c5f94f79ea4545ee2af547a03c735f2f",
+      "bytes": 120
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-host-link-20261006-v1.child-identity.json": {
+      "sha256": "99567c82e203db873c5b4bf7f670cef6c8249e0d6c626d0926551930383ddd8f",
+      "bytes": 78
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-host-link-20261006-v1.system-floor.json": {
+      "sha256": "ddbb61f49492d8316a592d0765ccb47fa7b847d9c39f90ab29bb9c849aee9a00",
+      "bytes": 79929
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-host-link-20261006-v1.quiescence.json": {
+      "sha256": "fadeecbb354a4bcc4c90213420a5a3dcdc2c87762614a8f9c479d4f6ee33eb56",
+      "bytes": 132
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-host-link-20261006-v1.input_seal.json": {
+      "sha256": "61193f6b3a17cab987a77d901a5ab9ac81c4f16793da888d6b91f058d130cbf1",
+      "bytes": 242405
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-host-link-20261006-v1.output_seal.json": {
+      "sha256": "1091b354606937e2e2e04185c27466c658a45246e54d5a7e0c3586b955a0f380",
+      "bytes": 724450
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-host-link-20261006-v1.failure.json": {
+      "sha256": "e318eefa178b0dc483b1234e3520fb119f47d9988799e1775a4a8b60eb4ff71f",
+      "bytes": 247
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-host-link-20261006-v1.stdout": {
+      "sha256": "dfb93730fac2160322d2c2cd23ab30b54cc93cb4aa8fb0526445fa7b14baebdc",
+      "bytes": 25295
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-host-link-20261006-v1.stderr": {
+      "sha256": "1b618a038c24d71664f0d00113bcedd80ede84cd95c8f7681954ffcdb04d22d7",
+      "bytes": 3516
+    }
+  }
+}

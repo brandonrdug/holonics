@@ -1,0 +1,62 @@
+{
+  "lease_still_held": true,
+  "own_group_other_PIDs": [],
+  "outcome": {
+    "provisional_passed": true,
+    "final_acceptance_requires_external_CPU_read": true,
+    "label": "hnn-reframed-lean-import-preparation-20261006-v4",
+    "wall_ns": 11791374423,
+    "peak_child_RSS_KiB": 420724,
+    "group_memory_peak_bytes": 801005568,
+    "original_coordinates_modified": false,
+    "aggregate_cpu_final_us": 11495289,
+    "aggregate_cpu_limit_us": 17000000,
+    "CPU_kernel_hard_total_limit": false
+  },
+  "outputs": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-import-preparation-20261006-v4.lease-identity.json": {
+      "sha256": "af9549fbf7491f0a041f6dfe17efaadc0fa9f6df0abb44051754afade6b9b3fd",
+      "bytes": 565
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-import-preparation-20261006-v4.memory-gate.json": {
+      "sha256": "5f2802844f59dad0fd739a75f9409f1f4ab48899fcad18bd5a9536a6326ce57d",
+      "bytes": 120
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-import-preparation-20261006-v4.child-identity.json": {
+      "sha256": "5f41d9597277b968530fd57acb811c956248cb195fc878644fb5b659ef96223f",
+      "bytes": 78
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-import-preparation-20261006-v4.system-floor.json": {
+      "sha256": "9a488d83244b21f574e17b3d07b80e7723ba7842a5b7806c6983a26fd44d9032",
+      "bytes": 92242
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-import-preparation-20261006-v4.quiescence.json": {
+      "sha256": "c5683e77c07815b1e4d6c2937047edfe7045a6f5e81ee9e1e39c026f9f91dcfa",
+      "bytes": 130
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-import-preparation-20261006-v4.input_seal.json": {
+      "sha256": "074c4cf53dc4edf443d7795421f9d5a2d1ccbd36ee666cf1df8cf2ef74931e8b",
+      "bytes": 4744
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-import-preparation-20261006-v4.output_seal.json": {
+      "sha256": "7edaaff089c645f8d1fbca8a4245fe0386f0af3f019eee624eaf69a08e2696f1",
+      "bytes": 807461
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-import-preparation-20261006-v4.stdout": {
+      "sha256": "57166ed5ba6a6c4654217913821f228332dd2d1d4ff7c6ade5fbc900113fd958",
+      "bytes": 540
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-import-preparation-20261006-v4.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-20261006/current-imports.v4.json": {
+      "sha256": "fa2fa5d4af12f17823c3da69a1f9516df42c6c3fcd5a8c599b33692eeafe8f35",
+      "bytes": 97638828
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-20261006/import-preparation.v4.json": {
+      "sha256": "34e186a639e18e76fa715b2791f9531dade98517b474e0409e64f1838d8a072d",
+      "bytes": 592
+    }
+  }
+}

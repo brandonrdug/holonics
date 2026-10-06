@@ -1,0 +1,77 @@
+{
+  "argv": [
+    "/usr/bin/python3",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/prepare_physical_v3.py"
+  ],
+  "cwd": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-20261006",
+  "inputs": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/bounded_stage_v1.py": {
+      "sha256": "84b7d003089fa19881690e368200b2168b9d179c8e6573bdafab54369235cec2",
+      "bytes": 12645
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/final_stage.py": {
+      "sha256": "a0a5a94f157acf9a5127b756a036c6e86449dc2012af0f1e71d34aafa13bc79e",
+      "bytes": 10968
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/leased_stage_v2.py": {
+      "sha256": "bcf91456534e763a025613f39e82853d7a58529b399bb183d544d09a7a42f949",
+      "bytes": 5520
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-20261006/SOURCE_DELTA.v2.json": {
+      "sha256": "71ae379eadb6208561639518e4ab7c8fb21d1c46b455a19524be6821ddcd30b1",
+      "bytes": 41967
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-snapshot-preparation-20261006-v3.config.json": {
+      "sha256": "b67c89eebe68957727d65b29ff86abdce5e1f39519652e48b2a883f6e826545b",
+      "bytes": 3831
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/prepare_physical_v3.py": {
+      "sha256": "b85cc6ca78e66c6466cd6e81a788667a97f053c722535a49ed11b7063e159cda",
+      "bytes": 2692
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/.local/physical-coupled-domain-20261006/source.seal.v3.json": {
+      "sha256": "729566a93abb96dbd89932fd840b8a40aecd6bb60ff1d35655d196da3b60f994",
+      "bytes": 950
+    },
+    "/usr/bin/cp": {
+      "sha256": "c330dda7811d7dea399a6b9fe655cfeba4cc5115234015f9d6fd21d05ca55fc5",
+      "bytes": 149816
+    },
+    "/usr/bin/python3.14": {
+      "sha256": "ac12d99c156d3c0ec708a2baf664d35b74f455572fe35fd57faa420ade5c3845",
+      "bytes": 14424
+    }
+  },
+  "source_scope": "fresh physical v3 source plus full private cache reflink and byte identity preparation, separate from compiler projection",
+  "CPU_count": 1,
+  "per_process_RLIMIT_CPU_seconds": 17,
+  "CPU_affinity": [
+    0
+  ],
+  "cap_ns": 17000000000,
+  "projection_ns": 17000000000,
+  "system_floor_MemAvailable_KiB": 4194304,
+  "system_floor_sampling_period_ns": 10000000,
+  "host_MemTotal_bytes": 32746156032,
+  "host_MemAvailable_bytes": 10633244672,
+  "minimum_MemAvailable_bytes": 8589934592,
+  "group_memory_max_bytes": 4294967296,
+  "group_swap_max_bytes": 0,
+  "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/holonics-prune-admission-physical-coupled-domain-snapshot-preparation-20261006-v3.service",
+  "memory_events_before": {
+    "low": 0,
+    "high": 0,
+    "max": 0,
+    "oom": 0,
+    "oom_kill": 0,
+    "oom_group_kill": 0,
+    "sock_throttled": 0
+  },
+  "group_cap_includes_page_cache_and_is_stricter_than_RSS": true,
+  "sealed_before_execution": true,
+  "aggregate_cpu_limit_us": 17000000,
+  "aggregate_cpu_source": "dedicated cgroup cpu.stat usage_usec, including exited children and controller",
+  "aggregate_cpu_at_seal_us": 33840,
+  "aggregate_cpu_stop_margin_us": 1000000,
+  "aggregate_cpu_stop_us": 16000000
+}

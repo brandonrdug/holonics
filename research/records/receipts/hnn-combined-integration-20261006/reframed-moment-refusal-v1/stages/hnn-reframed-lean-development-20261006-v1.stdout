@@ -1,0 +1,57 @@
+{"phase": "precompile sealed JSON read", "wall_ns": 409328753}
+{"phase": "precompile metadata", "wall_ns": 705457114}
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-integration-d1e1e0bf-20261006/source-v2/lean/Holonics/HNN/ReframedMoment.lean:33:19: warning: Variable name `D` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _D
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-integration-d1e1e0bf-20261006/source-v2/lean/Holonics/HNN/ReframedMoment.lean:39:6: error: Invalid rewrite argument: Expected an equality or iff proof or definition name, but `D.windingWindow ?d ?W
+  ?M` is a value of type
+  Finset ℕ
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-integration-d1e1e0bf-20261006/source-v2/lean/Holonics/HNN/ReframedMoment.lean:64:6: error: Invalid rewrite argument: Expected an equality or iff proof or definition name, but `D.windingWindow ?d ?W
+  ?M` is a value of type
+  Finset ℕ
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-integration-d1e1e0bf-20261006/source-v2/lean/Holonics/HNN/ReframedMoment.lean:105:65: error: Application type mismatch: The argument
+  g
+has type
+  ℕ
+but is expected to have type
+  Fin G
+in the application
+  W g
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-integration-d1e1e0bf-20261006/source-v2/lean/Holonics/HNN/ReframedMoment.lean:105:29: error: Application type mismatch: The argument
+  g
+has type
+  ℕ
+but is expected to have type
+  Fin G
+in the application
+  current g
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-integration-d1e1e0bf-20261006/source-v2/lean/Holonics/HNN/ReframedMoment.lean:118:36: warning: This simp argument is unused:
+  Finset.card_univ
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [Fintype.card_piFinset]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-integration-d1e1e0bf-20261006/source-v2/lean/Holonics/HNN/ReframedMoment.lean:123:5: warning: Variable name `hne` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _hne
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+'Holonics.HNN.Moment.SourceDecl.rekey_mem_windingWindow' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'Holonics.HNN.Moment.SourceDecl.card_reframedBox_le' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'Holonics.HNN.Moment.SourceDecl.card_reframedBox_withCoordinates_le' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'Holonics.HNN.Moment.SourceDecl.winding_step_range' depends on axioms: [propext, Quot.sound]
+{"phase": "Lean compiler", "wall_ns": 2251535296, "exit": 1}
+{"phase": "postcompile sealed JSON read", "wall_ns": 381539283}
+{"phase": "postcompile metadata", "wall_ns": 717147337}
+{"kernel_accepted": false, "compiler_exit": 1, "compiler_wall_ns": 2251535296, "axioms": {"Holonics.HNN.Moment.SourceDecl.rekey_mem_windingWindow": ["propext", "sorryAx", "Classical.choice", "Quot.sound"], "Holonics.HNN.Moment.SourceDecl.card_reframedBox_le": ["propext", "sorryAx", "Classical.choice", "Quot.sound"], "Holonics.HNN.Moment.SourceDecl.card_reframedBox_withCoordinates_le": ["propext", "sorryAx", "Classical.choice", "Quot.sound"], "Holonics.HNN.Moment.SourceDecl.winding_step_range": ["propext", "Quot.sound"]}, "selector_count_matches": true, "standard_axioms_only": false, "metadata_unchanged": true, "broad_library_checked": false}

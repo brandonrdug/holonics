@@ -1,0 +1,9 @@
+{
+  "provisional_passed": false,
+  "final_acceptance_requires_external_CPU_read": true,
+  "label": "hnn-reframed-lean-development-20261006-v1",
+  "error_type": "SystemExit",
+  "error": "1",
+  "child_launched": true,
+  "child_reaped": true
+}

@@ -1,0 +1,41 @@
+# Holonics.
+#
+# `crates/holonics` is the main library: the Holon law and its operators (ratio, geometry, holon,
+# navigator, receiver), exact over the rationals, with no float in a law. `crates/holonics-cuda`
+# is the CUDA realization, currently the device driver.
+[workspace]
+resolver = "2"
+members = [
+  "crates/holonics",
+  "crates/holonics-cuda",
+]
+# The nvptx smoke kernel pins its own nightly. Its committed PTX is included by `mount-smoke`,
+# so the host workspace carries that boundary artifact without carrying the toolchain.
+exclude = [
+  "accelerators/cuda-smoke",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+
+[workspace.dependencies]
+num-bigint = "0.4"
+num-rational = "0.4"
+num-traits = "0.2"
+thiserror = "2"
+
+[profile.release]
+opt-level = 3
+lto = true
+
+# Exact arithmetic dominates the tests' time, and the big-integer kernels are the dependencies'
+# non-generic code: optimize them in debug and test builds (the workspace's own code stays at the
+# debug level). The HNN tests run about four times faster.
+[profile.dev.package.num-bigint]
+opt-level = 3
+
+[profile.dev.package.num-integer]
+opt-level = 3
+

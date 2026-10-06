@@ -1,0 +1,9 @@
+{
+  "executable": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-20261006/cache-v1/debug/deps/holonics-70b68d2f7e1f6408",
+  "pin": {
+    "sha256": "d71565fe4c2bdc29f4292c6de38a0bcdcfe4762a9bf7fdc59748967aecc25d1c",
+    "bytes": 64091456
+  },
+  "fresh_Cargo_local_artifact": true,
+  "build_acceptance": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-host-link-20261006-v2.acceptance.json"
+}

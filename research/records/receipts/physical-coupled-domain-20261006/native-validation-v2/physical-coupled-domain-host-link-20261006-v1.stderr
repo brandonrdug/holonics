@@ -1,0 +1,51 @@
+   Compiling holonics v0.1.0 (/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-20261006/source-v1/crates/holonics)
+error[E0277]: a value of type `Result<Vec<_>, _>` cannot be built from an iterator over elements of type `face::GrainCell`
+    --> crates/holonics/src/hnn/prediction.rs:2300:20
+     |
+2300 |         .collect::<Result<Vec<_>, _>>()?;
+     |          -------   ^^^^^^^^^^^^^^^^^ value of type `Result<Vec<_>, _>` cannot be built from `std::iter::Iterator<Item=face::GrainCell>`
+     |          |
+     |          required by a bound introduced by this call
+     |
+     = help: the trait `FromIterator<face::GrainCell>` is not implemented for `Result<Vec<_>, _>`
+             but trait `FromIterator<Result<_, _>>` is implemented for it
+     = help: for that trait implementation, expected `Result<_, _>`, found `face::GrainCell`
+note: the method call chain might not have had the expected associated types
+    --> crates/holonics/src/hnn/prediction.rs:2299:10
+     |
+2298 |     let lower = (0..field.alphabet())
+     |                 --------------------- this expression has type `Range<usize>`
+2299 |         .map(|class| crate::receiver::face::GrainCell::of(&logits[2 * class].lower, phases.grain()))
+     |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `Iterator::Item` is `GrainCell` here
+note: required by a bound in `std::iter::Iterator::collect`
+    --> /home/b/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/iter/traits/iterator.rs:2015:19
+     |
+2015 |     fn collect<B: FromIterator<Self::Item>>(self) -> B
+     |                   ^^^^^^^^^^^^^^^^^^^^^^^^ required by this bound in `Iterator::collect`
+
+error[E0277]: a value of type `Result<Vec<_>, _>` cannot be built from an iterator over elements of type `face::GrainCell`
+    --> crates/holonics/src/hnn/prediction.rs:2303:20
+     |
+2303 |         .collect::<Result<Vec<_>, _>>()?;
+     |          -------   ^^^^^^^^^^^^^^^^^ value of type `Result<Vec<_>, _>` cannot be built from `std::iter::Iterator<Item=face::GrainCell>`
+     |          |
+     |          required by a bound introduced by this call
+     |
+     = help: the trait `FromIterator<face::GrainCell>` is not implemented for `Result<Vec<_>, _>`
+             but trait `FromIterator<Result<_, _>>` is implemented for it
+     = help: for that trait implementation, expected `Result<_, _>`, found `face::GrainCell`
+note: the method call chain might not have had the expected associated types
+    --> crates/holonics/src/hnn/prediction.rs:2302:10
+     |
+2301 |     let upper = (0..field.alphabet())
+     |                 --------------------- this expression has type `Range<usize>`
+2302 |         .map(|class| crate::receiver::face::GrainCell::of(&logits[2 * class].upper, phases.grain()))
+     |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `Iterator::Item` is `GrainCell` here
+note: required by a bound in `std::iter::Iterator::collect`
+    --> /home/b/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/iter/traits/iterator.rs:2015:19
+     |
+2015 |     fn collect<B: FromIterator<Self::Item>>(self) -> B
+     |                   ^^^^^^^^^^^^^^^^^^^^^^^^ required by this bound in `Iterator::collect`
+
+For more information about this error, try `rustc --explain E0277`.
+error: could not compile `holonics` (lib test) due to 2 previous errors

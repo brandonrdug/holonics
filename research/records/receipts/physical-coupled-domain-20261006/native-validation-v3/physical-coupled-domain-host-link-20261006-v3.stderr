@@ -1,0 +1,14 @@
+   Compiling holonics v0.1.0 (/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-20261006/source-v3/crates/holonics)
+warning: method `with_rank` is never used
+    --> crates/holonics/src/hnn/receiving.rs:1590:19
+     |
+1287 | impl ReceivingPhases {
+     | -------------------- method in this implementation
+...
+1590 |     pub(crate) fn with_rank(self, rank: usize) -> Self {
+     |                   ^^^^^^^^^
+     |
+     = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `holonics` (lib test) generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 17.84s

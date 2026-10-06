@@ -1,0 +1,99 @@
+{
+  "passed": false,
+  "label": "physical-coupled-domain-enclosure-development-20261006-v3",
+  "scientific_job": false,
+  "deferred_lock_busy": false,
+  "final_CPU_ns": 2588707000,
+  "CPU_reading_grain_ns": 1000,
+  "aggregate_CPU_limit_us": 17000000,
+  "final_CPU_source": "systemd retained oneshot CPUUsageNSec after all group processes exit",
+  "CPU_kernel_hard_total_limit": false,
+  "sampled_stop_margin_us": 1000000,
+  "aggregate_CPU_within_limit": true,
+  "no_overshoot_accepted": true,
+  "wall_ns": 2650409676,
+  "projection_ns": 16000000000,
+  "wall_source": "external monotonic_ns through final property read",
+  "quiescent": true,
+  "completion_event": "oneshot start job completed; no polling",
+  "unit_properties": {
+    "Description": "Owned holonics admission physical-coupled-domain-enclosure-development-20261006-v3 e660dcebe2016c567be35baefb04812c",
+    "LoadState": "loaded",
+    "ActiveState": "active",
+    "SubState": "exited",
+    "InvocationID": "9e9ea9737ed74ff1950666279d57afd4",
+    "Result": "success",
+    "ExecMainStatus": "0",
+    "ControlGroup": "",
+    "MemoryPeak": "23695360",
+    "CPUUsageNSec": "2588707000",
+    "TasksCurrent": "[not set]"
+  },
+  "outer_error": null,
+  "unit_start_exit": 0,
+  "unit_start_stdout": "",
+  "unit_start_stderr": "",
+  "config": {
+    "sha256": "10decfa90768cfc432d20de8cf1f851c81998768c460f4a36f5261d9dbdceb95",
+    "bytes": 63037
+  },
+  "receipt_pins": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-enclosure-development-20261006-v3.config.json": {
+      "sha256": "10decfa90768cfc432d20de8cf1f851c81998768c460f4a36f5261d9dbdceb95",
+      "bytes": 63037
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-enclosure-development-20261006-v3.external-lease.json": {
+      "sha256": "99f02b1e54d33e95e052daa1057e087ea9474b2d9409680db39c3c493244defc",
+      "bytes": 487
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-enclosure-development-20261006-v3.lease-identity.json": {
+      "sha256": "205c966487ef24b7e8b61919f243951d7043409afe4dad66db5997017474560d",
+      "bytes": 565
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-enclosure-development-20261006-v3.input_seal.json": {
+      "sha256": "b016942f06656950a96e568e44f2c358b66fd3697c5c51c7d877cf27c41ba2d6",
+      "bytes": 61750
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-enclosure-development-20261006-v3.stdout": {
+      "sha256": "1f90e3fe0b8b516cf9a483d29b5a381167fddd90428b4c9628706d3dba9520ff",
+      "bytes": 231
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-enclosure-development-20261006-v3.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-enclosure-development-20261006-v3.memory-gate.json": {
+      "sha256": "7df97274290808437d089ff0e0b4f743b0b879d19945a886d5daa992fe195017",
+      "bytes": 120
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-enclosure-development-20261006-v3.child-identity.json": {
+      "sha256": "d2b73a52e5c5f02f8c16eeed06cc15a08532ec49a276453b5aa97bb3a29f188d",
+      "bytes": 78
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-enclosure-development-20261006-v3.system-floor.json": {
+      "sha256": "0c9fe7c8ce4c571972b2d7cc1c0345fdcd33a10f6fe98feac1b89d623c7806b3",
+      "bytes": 19081
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-enclosure-development-20261006-v3.quiescence.json": {
+      "sha256": "4e76664a1033fec0bc1e4e779aa4c2b7b6cea5f4c8953a056d802d02d0b041fc",
+      "bytes": 130
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-enclosure-development-20261006-v3.output_seal.json": {
+      "sha256": "b29e66ff4616eef010085d365e39efdc98be29795ee95b3436b27c78dc119884",
+      "bytes": 167784
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-enclosure-development-20261006-v3.publication.json": {
+      "sha256": "e466fa337a08ea49e0b2b7ad6a8f8c71a82cd653026554edba2238a25b4aeccf",
+      "bytes": 2857
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-enclosure-development-20261006-v3.stage-quiescence.json": {
+      "sha256": "64685e499a7ab73851156ebd79b6b88b516d6a90f4be3452866c95539cb56308",
+      "bytes": 136
+    }
+  },
+  "launcher_outside_native_group": true,
+  "lease_owner_outside_capped_group": true,
+  "lease_held_through_final_CPU_read_and_publication": true,
+  "stage_passed_before_cleanup": true,
+  "requires_cleanup_acceptance": true
+}

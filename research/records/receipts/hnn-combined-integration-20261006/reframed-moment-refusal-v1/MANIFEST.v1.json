@@ -1,0 +1,313 @@
+{
+  "scope": "ReframedMoment",
+  "copied_files": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-development-20261006-v1.acceptance.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/stages/hnn-reframed-lean-development-20261006-v1.acceptance.json",
+      "bytes": 379,
+      "sha256": "add6aa5245c201f59b781dfcc7c5b485e0658b0da3aface9da85099d54a3cfda"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-development-20261006-v1.child-identity.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/stages/hnn-reframed-lean-development-20261006-v1.child-identity.json",
+      "bytes": 78,
+      "sha256": "156fd72bc9ae24fcb8ad837a8a34f0a56d6b35026b9ca26b11cc3ec9dd3c16ff"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-development-20261006-v1.config.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/stages/hnn-reframed-lean-development-20261006-v1.config.json",
+      "bytes": 8739,
+      "sha256": "c472bbc7f5e194010a7b3058024f67efe7d65202e48047d76cfc3bca0fe0df21"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-development-20261006-v1.external-lease.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/stages/hnn-reframed-lean-development-20261006-v1.external-lease.json",
+      "bytes": 487,
+      "sha256": "1623646cd470fab0cdd9a27f6401f9fca6fb1fed72915869b608e94759f0fa0e"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-development-20261006-v1.failure.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/stages/hnn-reframed-lean-development-20261006-v1.failure.json",
+      "bytes": 241,
+      "sha256": "db9451b11822d1b894faf4dbd36eebc5e5e932d2af46684f71dce7e2bd5bc725"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-development-20261006-v1.final.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/stages/hnn-reframed-lean-development-20261006-v1.final.json",
+      "bytes": 5031,
+      "sha256": "8a83a175c318e67d2234a3d6f00e8da072dbca849611920fbf35a560f9f5c85e"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-development-20261006-v1.input_seal.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/stages/hnn-reframed-lean-development-20261006-v1.input_seal.json",
+      "bytes": 6043,
+      "sha256": "48e10f95b9a704ac7c331b18940c0440c10266733608f0c2f1d94abcbe22585f"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-development-20261006-v1.lease-identity.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/stages/hnn-reframed-lean-development-20261006-v1.lease-identity.json",
+      "bytes": 565,
+      "sha256": "2437b2a19894dce7ea8bcab830e7f09120c4e2d2f539738e0805c9e335fd96b9"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-development-20261006-v1.memory-gate.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/stages/hnn-reframed-lean-development-20261006-v1.memory-gate.json",
+      "bytes": 120,
+      "sha256": "d97c931bc0f782f0fa25762747673f992638b3804d23f14ab3bde4f275c12452"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-development-20261006-v1.output_seal.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/stages/hnn-reframed-lean-development-20261006-v1.output_seal.json",
+      "bytes": 329839,
+      "sha256": "d099d1258617943fcab532dbeda23481f896faf859bb753094af835817b08639"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-development-20261006-v1.publication.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/stages/hnn-reframed-lean-development-20261006-v1.publication.json",
+      "bytes": 3596,
+      "sha256": "f39e73f4437ca9da849b1e95eb9ab73dd87420e4c78c9f81d0810cc6469627f3"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-development-20261006-v1.quiescence.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/stages/hnn-reframed-lean-development-20261006-v1.quiescence.json",
+      "bytes": 130,
+      "sha256": "a78453036f74a02f770207e802a75a5a4a41b3831b4f23278315e8c86e45a852"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-development-20261006-v1.release.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/stages/hnn-reframed-lean-development-20261006-v1.release.json",
+      "bytes": 175,
+      "sha256": "8c37827b596933784cb5f3eff3cf2b612c03aa5975232de422890b85188a35f1"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-development-20261006-v1.stage-quiescence.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/stages/hnn-reframed-lean-development-20261006-v1.stage-quiescence.json",
+      "bytes": 136,
+      "sha256": "6a0cfe864186cefdd3b6888f6ca6900fda47b7923d1a5a102f6cf6f4eb95687e"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-development-20261006-v1.stderr": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/stages/hnn-reframed-lean-development-20261006-v1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-development-20261006-v1.stdout": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/stages/hnn-reframed-lean-development-20261006-v1.stdout",
+      "bytes": 3910,
+      "sha256": "4db7493c9b87c863c88173a045501965faa2a53ae24c7ef16009639de73997c1"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-development-20261006-v1.system-floor.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/stages/hnn-reframed-lean-development-20261006-v1.system-floor.json",
+      "bytes": 37477,
+      "sha256": "f61ac3e49ed170970edd90635711083588d5c8105d1d0fdc70e95279a365e09c"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-development-20261006-v1.unit-cleanup.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/stages/hnn-reframed-lean-development-20261006-v1.unit-cleanup.json",
+      "bytes": 768,
+      "sha256": "ffc95b3c410c6cd7a04a8e3e78ceb2ab22311e920701744dd70c46271abaced3"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-import-preparation-20261006-v1.config.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/stages/hnn-reframed-lean-import-preparation-20261006-v1.config.json",
+      "bytes": 5641,
+      "sha256": "081cb4871a9367c78d51752a6edaa8b5b33ba502da2909a0f348dc45f1d6ccf4"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-import-preparation-20261006-v2.config.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/stages/hnn-reframed-lean-import-preparation-20261006-v2.config.json",
+      "bytes": 5641,
+      "sha256": "fcd4b831e89bcdd1d0205e0a59b24410f87ccb6d63733c9e1ee8d2734dc3a999"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-import-preparation-20261006-v3.config.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/stages/hnn-reframed-lean-import-preparation-20261006-v3.config.json",
+      "bytes": 5668,
+      "sha256": "8f4316763f70d350a1c3c8d933773f62501574722d593eaf1c3e04a59ff230b0"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-import-preparation-20261006-v4.acceptance.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/stages/hnn-reframed-lean-import-preparation-20261006-v4.acceptance.json",
+      "bytes": 378,
+      "sha256": "eed3c68469d0c8e6ba896b3a20c99e68a728bdc5e59ba782c6aeffc1373885b7"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-import-preparation-20261006-v4.child-identity.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/stages/hnn-reframed-lean-import-preparation-20261006-v4.child-identity.json",
+      "bytes": 78,
+      "sha256": "5f41d9597277b968530fd57acb811c956248cb195fc878644fb5b659ef96223f"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-import-preparation-20261006-v4.config.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/stages/hnn-reframed-lean-import-preparation-20261006-v4.config.json",
+      "bytes": 6204,
+      "sha256": "848be7e1154e6d0805f7b9d5aabee364430a809346270b686c15da9d0547c3ea"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-import-preparation-20261006-v4.external-lease.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/stages/hnn-reframed-lean-import-preparation-20261006-v4.external-lease.json",
+      "bytes": 487,
+      "sha256": "6225478f40c262deec17bc51987543bc62afc2ad1c125d7a60b4083b5cee7efa"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-import-preparation-20261006-v4.final.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/stages/hnn-reframed-lean-import-preparation-20261006-v4.final.json",
+      "bytes": 4893,
+      "sha256": "f512b14f489a2014ad63e62f60e5b730f21303a1b6ccc99627a2038ab9d9789d"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-import-preparation-20261006-v4.input_seal.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/stages/hnn-reframed-lean-import-preparation-20261006-v4.input_seal.json",
+      "bytes": 4744,
+      "sha256": "074c4cf53dc4edf443d7795421f9d5a2d1ccbd36ee666cf1df8cf2ef74931e8b"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-import-preparation-20261006-v4.lease-identity.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/stages/hnn-reframed-lean-import-preparation-20261006-v4.lease-identity.json",
+      "bytes": 565,
+      "sha256": "af9549fbf7491f0a041f6dfe17efaadc0fa9f6df0abb44051754afade6b9b3fd"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-import-preparation-20261006-v4.memory-gate.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/stages/hnn-reframed-lean-import-preparation-20261006-v4.memory-gate.json",
+      "bytes": 120,
+      "sha256": "5f2802844f59dad0fd739a75f9409f1f4ab48899fcad18bd5a9536a6326ce57d"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-import-preparation-20261006-v4.output_seal.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/stages/hnn-reframed-lean-import-preparation-20261006-v4.output_seal.json",
+      "bytes": 807461,
+      "sha256": "7edaaff089c645f8d1fbca8a4245fe0386f0af3f019eee624eaf69a08e2696f1"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-import-preparation-20261006-v4.publication.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/stages/hnn-reframed-lean-import-preparation-20261006-v4.publication.json",
+      "bytes": 3250,
+      "sha256": "a8b36440aa64fb0f11c59c150ad03e6c4d9d784c69f20a18aac3e3db4d87ef1e"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-import-preparation-20261006-v4.quiescence.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/stages/hnn-reframed-lean-import-preparation-20261006-v4.quiescence.json",
+      "bytes": 130,
+      "sha256": "c5683e77c07815b1e4d6c2937047edfe7045a6f5e81ee9e1e39c026f9f91dcfa"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-import-preparation-20261006-v4.release.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/stages/hnn-reframed-lean-import-preparation-20261006-v4.release.json",
+      "bytes": 175,
+      "sha256": "ffc9950b96e6683da52736bfe552d99fe7088f44b2f8c93797eac69ab8a07a81"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-import-preparation-20261006-v4.stage-quiescence.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/stages/hnn-reframed-lean-import-preparation-20261006-v4.stage-quiescence.json",
+      "bytes": 136,
+      "sha256": "1b7208bafdc3de862186ce06bb00302b8e90077d6ba266ad62d2adf586ec56a3"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-import-preparation-20261006-v4.stderr": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/stages/hnn-reframed-lean-import-preparation-20261006-v4.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-import-preparation-20261006-v4.stdout": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/stages/hnn-reframed-lean-import-preparation-20261006-v4.stdout",
+      "bytes": 540,
+      "sha256": "57166ed5ba6a6c4654217913821f228332dd2d1d4ff7c6ade5fbc900113fd958"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-import-preparation-20261006-v4.system-floor.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/stages/hnn-reframed-lean-import-preparation-20261006-v4.system-floor.json",
+      "bytes": 92242,
+      "sha256": "9a488d83244b21f574e17b3d07b80e7723ba7842a5b7806c6983a26fd44d9032"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-import-preparation-20261006-v4.unit-cleanup.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/stages/hnn-reframed-lean-import-preparation-20261006-v4.unit-cleanup.json",
+      "bytes": 723,
+      "sha256": "65dc2bc138ef27023e989298dcdad5f80c1e27ee7f8b1475728595b6b31fd31f"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-20261006/PREPARATION_REQUEST.v1.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/queue/hnn-reframed-lean-20261006/PREPARATION_REQUEST.v1.json",
+      "bytes": 3959,
+      "sha256": "96f6f4d6dc9826c1f8f09480aba297bf47b9d356a78e3d4cc6258c6c29cdde72"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-20261006/PREPARATION_REQUEST.v2.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/queue/hnn-reframed-lean-20261006/PREPARATION_REQUEST.v2.json",
+      "bytes": 4141,
+      "sha256": "a20ba0c0bef3c4a40c44abc309027ef2dd8452dbdbadca6bd89df3541744e953"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-20261006/PREPARATION_REQUEST.v3.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/queue/hnn-reframed-lean-20261006/PREPARATION_REQUEST.v3.json",
+      "bytes": 4154,
+      "sha256": "9adcf50bf7c9509763439a3584720eced5f7518dca3cb003761907814df41803"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-20261006/PRIVATE_NAMESPACE_IMPORTS.v2.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/queue/hnn-reframed-lean-20261006/PRIVATE_NAMESPACE_IMPORTS.v2.json",
+      "bytes": 31573,
+      "sha256": "9ca61a8ce9558a9fa18e739725021d32ee4196e9764ed1720375aed2bc0b8f73"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-20261006/PREPARATION_REQUEST.v4.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/queue/hnn-reframed-lean-20261006/PREPARATION_REQUEST.v4.json",
+      "bytes": 4512,
+      "sha256": "fa0b84ae3b7f8ba65eb5d2472cff00b6a71df6fc2b7b7930d26941ee77406b4e"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-20261006/import-preparation.v4.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/queue/hnn-reframed-lean-20261006/import-preparation.v4.json",
+      "bytes": 592,
+      "sha256": "34e186a639e18e76fa715b2791f9531dade98517b474e0409e64f1838d8a072d"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-20261006/COMPILER_REQUEST.v1.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/queue/hnn-reframed-lean-20261006/COMPILER_REQUEST.v1.json",
+      "bytes": 3094,
+      "sha256": "3128057ae0f0cf9105ab0ee5ba9257dafe03a2301807bb198292b37027d46ef2"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-20261006/compiler.v1.stdout": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/queue/hnn-reframed-lean-20261006/compiler.v1.stdout",
+      "bytes": 2961,
+      "sha256": "71520cc707218192f3bad9b3213a5b7b5094a90bba2ed2d68c371ae7a2be5ee0"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-20261006/compiler.v1.stderr": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/queue/hnn-reframed-lean-20261006/compiler.v1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-20261006/KERNEL_VALIDATION.v1.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/queue/hnn-reframed-lean-20261006/KERNEL_VALIDATION.v1.json",
+      "bytes": 796,
+      "sha256": "b772a4d689c8da4e2a83db251b715740cc7df52b591492843118e85ebfac8f7c"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-integration-d1e1e0bf-20261006/source-v2/lean/Holonics/HNN/ReframedMoment.lean": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/sources/0/ReframedMoment.lean",
+      "bytes": 8599,
+      "sha256": "c12d20d76b44ee512cbc80e2edad1a864f4c921bf638a6e2126b16ae832e3fd2"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/final_stage.py": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/helpers/final_stage.py",
+      "bytes": 10968,
+      "sha256": "a0a5a94f157acf9a5127b756a036c6e86449dc2012af0f1e71d34aafa13bc79e"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/leased_stage_v2.py": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/helpers/leased_stage_v2.py",
+      "bytes": 5520,
+      "sha256": "bcf91456534e763a025613f39e82853d7a58529b399bb183d544d09a7a42f949"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/bounded_stage_v1.py": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/helpers/bounded_stage_v1.py",
+      "bytes": 12645,
+      "sha256": "84b7d003089fa19881690e368200b2168b9d179c8e6573bdafab54369235cec2"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/check_lean_owner_v1.py": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/helpers/check_lean_owner_v1.py",
+      "bytes": 2721,
+      "sha256": "15691e10fcc4bc59be9cec40c40b9eec1fd6a28f72ad547f07b8ce664df036fa"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/check_lean_owner_v2.py": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/helpers/check_lean_owner_v2.py",
+      "bytes": 2535,
+      "sha256": "0afbe0ffab431a8fedaad36892f75846a9ee4e3c8f25ada1e89f57b5f8dd6e81"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/check_lean_owner_v3.py": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/helpers/check_lean_owner_v3.py",
+      "bytes": 2076,
+      "sha256": "3641003e780bc46c56ad88af15a38cf8164f895eecdf3f7301ed9c064cd8d843"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/verify_lean_metadata_v1.py": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/helpers/verify_lean_metadata_v1.py",
+      "bytes": 772,
+      "sha256": "cff6b3ce7c52698766dd59eb249c822960c36667c87d7e8e6cc6bae10c5d41ad"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/prepare_lean_imports_v1.py": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/helpers/prepare_lean_imports_v1.py",
+      "bytes": 3104,
+      "sha256": "58a0e3b5d957c497934593af283c7c8de1fddf40da81f39f4d77e3b46025f6b9"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/prepare_lean_imports_v2.py": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/helpers/prepare_lean_imports_v2.py",
+      "bytes": 3468,
+      "sha256": "ed407d9fd88df3ef2d6e8305c58500d5b08045a525896d552272e6acd743b46c"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/check_namespace_lookup_v1.py": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/helpers/check_namespace_lookup_v1.py",
+      "bytes": 886,
+      "sha256": "9210e5aa18f9daeb7ac8ced18e253f08805577119a5f2b5e211017d9a873679c"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/bind_lean_target_v1.py": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/helpers/bind_lean_target_v1.py",
+      "bytes": 2074,
+      "sha256": "b206c749adbc38ccb8c4bd3fa87d9c23ceb2c6f7dcc172989b19ba84e4238400"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/QUEUE_RESULT.20261006.v4.json": {
+      "copied_path": "/home/b/Workspaces/holonics/.local/wt/capacity/research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/helpers/QUEUE_RESULT.20261006.v4.json",
+      "bytes": 6364,
+      "sha256": "bc1e474d4a8679350a58a841e9686802925e62179b5a8274bffe70c87aae6d79"
+    }
+  },
+  "no_source_edit_or_validation_launch_by_packaging": true,
+  "all_failed_sources_raw_diagnostics_and_release_receipts_preserved": true,
+  "full_import_seals_retained_without_worktree_deletion": true
+}
