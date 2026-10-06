@@ -2061,6 +2061,11 @@ mod physical_repair {
             at_receiver, at_source,
             "same executed physical Word/source adjoint"
         );
+        let paired = taught.source_pairing.as_ref().unwrap();
+        assert_eq!(paired.receiving, at_receiver);
+        assert_eq!(paired.opening, at_source);
+        assert_eq!(paired.deposition, at_source);
+        assert!(paired.defect.is_zero() && paired.composition_defect.is_zero());
         let source_step = taught
             .publication
             .steps
@@ -2075,6 +2080,10 @@ mod physical_repair {
             .filter(|(_, crossed)| **crossed)
             .map(|(delta, _)| dot(delta, delta))
             .sum();
+        assert_eq!(paired.crossings.len(), 1);
+        assert_eq!(paired.response_ticks, 1);
+        assert_eq!(paired.crossings[0].station, 1);
+        assert_eq!(paired.crossings[0].logit_move_squared, logit_move);
         let actual_source_moves: Rat = (0..field.ring(0).placements().len())
             .map(|phase| {
                 let feature = source
@@ -2784,6 +2793,73 @@ mod physical_repair {
         (material, carry.unwrap())
     }
 
+    /// A contract failure control, not training or target fidelity: corrupt one reached return
+    /// component, or substitute the source phase, receiving map, clock or numerical remainder.
+    /// Its independent native Word has the same actual source, entering carry and comparison.
+    #[test]
+    fn same_word_source_return_refuses_foreign_phase_clock_map_and_opening_covectors() {
+        use crate::hnn::prediction::{physical_source_pairing, predict_by_field};
+        let field = field_with_lock_and_offsets((0..8).collect(), vec![1]);
+        let (before, entering) = pair_teaching_opening(&field);
+        let mut current = Current::at_rest(&field);
+        current.rekey(&field, 0, 3).unwrap();
+        let observed = crate::hnn::tests::support::encoded(&field, &[0, 1, 2]);
+        let damaged = DamagedSection::damage(&observed, &[2]).unwrap();
+        let phases = ReceivingPhases::declare(&field, &before, &current, &section(3)).unwrap();
+        let opening = WordOpening::Received { carry: entering, absorption: Absorption::Nothing };
+        let compared = [false, false, true];
+        let taught = predict_by_field(&field, &before, &current, &damaged, &opening, &phases)
+            .unwrap().observe_pair_outputs(&before, &observed, &compared).unwrap();
+        let source = SourceMoment::open_with(&field, &current, &before).unwrap()
+            .station_section(&field, &current, 0, &damaged.placed()).unwrap();
+        let (mut word, receipt) = crate::hnn::word::Word::open_exact_received(
+            &field, &before, &current, &source, &opening,
+        ).unwrap();
+        assert!(receipt.closes());
+        let anchors = word.forward(&phases).unwrap();
+        for (anchor, actual) in anchors.iter().zip(&taught.prediction.reads) {
+            assert_eq!(phases.read(&field, &before, &current, anchor).unwrap(), actual.read);
+        }
+        let operands = word.operands().clone();
+        let opened_at = word.opened_at();
+        let covector = taught.ratio.covector().unwrap();
+        let back = word.pull_back(&covector, before.receiving_map(0).unwrap(),
+            &current.lift()[0], &phases).unwrap();
+        let applied = taught.source_certificate.as_ref().unwrap();
+        let check = |material: &Constitution, frame: &Current, at: usize,
+                     returned: &crate::hnn::port::WordReturn| {
+            physical_source_pairing(&field, material, &taught.constitution, frame, &phases,
+                &source, &operands, at, &taught.prediction, &covector, returned, &compared, applied)
+        };
+        let certified = check(&before, &current, opened_at, &back).unwrap();
+        assert_eq!(&certified, taught.source_pairing.as_ref().unwrap());
+        assert!(!certified.receiving.is_zero());
+        let old_open = source.open_storage(&field, &before, &current).unwrap();
+        let new_open = source.open_storage(&field, &taught.constitution, &current).unwrap();
+        let coordinate = old_open[0].iter().zip(&new_open[0])
+            .position(|(old, new)| old != new).expect("actual nonzero source perturbation");
+        let mut corrupt = back.clone();
+        corrupt.opening[0][coordinate] += integer(1);
+        assert!(matches!(check(&before, &current, opened_at, &corrupt),
+            Err(crate::hnn::HnnError::Unadmitted { reason }) if reason.contains("same-Word")));
+        assert!(matches!(check(&before, &current, opened_at + 1, &back),
+            Err(crate::hnn::HnnError::Unadmitted { reason }) if reason.contains("comparison crossings")));
+        let mut foreign_phase = current.clone();
+        foreign_phase.rekey(&field, 0, 4).unwrap();
+        assert!(matches!(check(&before, &foreign_phase, opened_at, &back),
+            Err(crate::hnn::HnnError::Unadmitted { reason }) if reason.contains("source opening frame")));
+        let wrong_map = before.clone().with_ports(0, None, None,
+            Some(before.receiving_map(0).unwrap().scaled(&integer(-1)))).unwrap();
+        assert!(matches!(check(&wrong_map, &current, opened_at, &back),
+            Err(crate::hnn::HnnError::Unadmitted { reason }) if reason.contains("same-Word")));
+        corrupt = back.clone();
+        corrupt.released.entries = 1;
+        corrupt.released.total = integer(1);
+        assert!(matches!(check(&before, &current, opened_at, &corrupt),
+            Err(crate::hnn::HnnError::Unadmitted { reason }) if reason.contains("zero-defect")));
+        assert_eq!(before.commit(), certified.producing_commit);
+    }
+
     #[test]
     fn the_observed_pair_outputs_change_the_next_target_free_source_conditioned_word() {
         use crate::hnn::prediction::predict_by_field;
@@ -2828,6 +2904,13 @@ mod physical_repair {
             .map(|(g,d)| g.iter().zip(d).map(|(g,d)| g*d).sum::<Rat>()).sum();
         assert_eq!(-paired, applied.sources[0].alignment);
         let logit_move: Rat = deltas[2].iter().map(|v| v*v).sum();
+        let returned = plus.source_pairing.as_ref().unwrap();
+        assert_eq!(returned.receiving, paired);
+        assert_eq!(returned.opening, paired);
+        assert_eq!(returned.deposition, paired);
+        assert_eq!(returned.crossings.len(), 1);
+        assert_eq!(returned.crossings[0].logit_move_squared, logit_move);
+        assert!(returned.defect.is_zero() && returned.composition_defect.is_zero());
         assert!(logit_move <= &applied.sources[0].gain * &applied.sources[0].moves);
         println!("actual learned pair outputs: before {:?}; after {:?}; opposite {:?}; applied joint {:?}; matched logit moves {}",
             old.outputs(), learned.outputs(), minus.constitution.pair_port(0,1).unwrap().outputs(), applied.joint, logit_move);

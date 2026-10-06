@@ -17,7 +17,7 @@ use crate::hnn::encoding::Encoded;
 use crate::hnn::field::{Current, Field, ReceiverDeclaration};
 use crate::hnn::port::Pullback;
 use crate::hnn::prediction::{
-    DamagedSection, PhysicalRepair, PhysicalSourceCertificate, PhysicalTeaching,
+    DamagedSection, PhysicalRepair, PhysicalSourceCertificate, PhysicalSourcePairing, PhysicalTeaching,
     PhysicalTeachingRefusal, predict_by_field,
 };
 use crate::hnn::ratio::HolonRatio;
@@ -47,6 +47,7 @@ pub struct PhysicalPublication {
     pub pullback: Pullback,
     pub publication: DepositReading,
     pub source_certificate: Option<PhysicalSourceCertificate>,
+    pub source_pairing: Option<PhysicalSourcePairing>,
 }
 
 /// The whole blind receipt and optional comparison result. A refused observation changes no
@@ -160,6 +161,7 @@ impl<'f> PhysicalResident<'f> {
                         constitution,
                         publication,
                         source_certificate,
+                        source_pairing,
                     }) => (
                         prediction,
                         Ok(Some(PhysicalPublication {
@@ -167,6 +169,7 @@ impl<'f> PhysicalResident<'f> {
                             pullback,
                             publication,
                             source_certificate,
+                            source_pairing,
                         })),
                         Some(constitution),
                     ),

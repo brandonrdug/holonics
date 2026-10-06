@@ -2363,6 +2363,121 @@ fn physical_completion_read(
     })
 }
 
+/// Consume the applied source perturbation through the same producing Word as the adjoint. Only
+/// one signed full-state response is propagated; no candidate Word, replay or target enters it.
+/// The selected source-only successor has already passed `physical_source_only_change`.
+pub(super) fn physical_source_pairing(
+    field: &Field,
+    before: &crate::hnn::constitution::Constitution,
+    after: &crate::hnn::constitution::Constitution,
+    current: &Current,
+    phases: &ReceivingPhases,
+    source: &SourceMoment,
+    operands: &crate::hnn::propagation::Operands,
+    opened_at: usize,
+    prediction: &PhysicalRepair,
+    covector: &crate::hnn::ratio::RatioCovector,
+    back: &crate::hnn::port::WordReturn,
+    compared: &[bool],
+    applied: &PhysicalSourceCertificate,
+) -> Result<PhysicalSourcePairing, HnnError> {
+    use crate::ratio::linear::vector::{dot, sub};
+    if !physical_word_is_exact(operands)
+        || !prediction.word.bound.is_zero()
+        || back.released.entries != 0
+    {
+        return Err(HnnError::Unadmitted {
+            reason: "the source-return pairing has no zero-defect numerical contract",
+        });
+    }
+    if source.opening() != current.lift() {
+        return Err(HnnError::Unadmitted {
+            reason: "the source-return pairing has a foreign source opening frame",
+        });
+    }
+    if back.opening.len() != field.rings().len()
+        || back.opening.iter().zip(field.rings()).any(|(row, ring)| row.len() != ring.width())
+        || covector.logits().len() != phases.aperture()
+        || prediction.reads.len() != phases.aperture()
+        || compared.len() != phases.aperture()
+    {
+        return Err(HnnError::Unadmitted {
+            reason: "the source-return pairing does not share the producing section's shape",
+        });
+    }
+    let last_station = compared.iter().rposition(|&crossed| crossed).ok_or(HnnError::Unadmitted {
+        reason: "the source-return pairing has no compared receiving crossing",
+    })?;
+    for (station, crossing) in phases.epochs().enumerate() {
+        let actual = &prediction.reads[station];
+        let tick = opened_at.checked_add(crossing).ok_or(HnnError::Unadmitted {
+            reason: "the source-return pairing's producing clock exceeds its carrier",
+        })?;
+        if actual.station != station || actual.crossing != crossing || actual.tick != tick
+            || covector.logits()[station].len() != 2 * field.alphabet()
+            || (!compared[station] && covector.logits()[station].iter().any(|g| !g.is_zero()))
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "the source-return pairing is not bound to the executed comparison crossings",
+            });
+        }
+    }
+    let last_crossing = phases.first_epoch() + last_station;
+    let old_open = source.open_storage(field, before, current)?;
+    let new_open = source.open_storage(field, after, current)?;
+    let delta: Vec<Vec<Rat>> = new_open.iter().zip(&old_open)
+        .map(|(new, old)| sub(new, old)).collect();
+    let opening: Rat = back.opening.iter().zip(&delta).map(|(g, d)| dot(g, d)).sum();
+    let source_move_squared: Rat = delta.iter().map(|row| dot(row, row)).sum();
+    // This is a perturbation of the source storage only. Its zero interior is the difference of
+    // two identical entered physical states, not a reset of the production reception.
+    let mut response = crate::hnn::word::EndChange::rest(field, operands);
+    response.storage = delta;
+    let mut crossings = Vec::new();
+    let mut receiving = Rat::zero();
+    // The declared partition needs no response after its last compared crossing.
+    for crossing in 0..=last_crossing {
+        if crossing >= phases.first_epoch() {
+            let station = crossing - phases.first_epoch();
+            if compared[station] {
+                let ring = phases.ring();
+                let incoming: Vec<_> = operands.incident(ring).iter()
+                    .map(|&a| response.arrivals[a][operands.end_slot(a, ring)].as_slice())
+                    .collect();
+                let anchor = crate::hnn::propagation::participation(
+                    operands.weights(ring), &response.storage[ring], &incoming,
+                )?;
+                // Use the actual read owner: its same R, current lift and complex row chart.
+                let logits = phases.read(field, before, current, &anchor)?.logits;
+                let pairing = dot(&covector.logits()[station], &logits);
+                receiving += &pairing;
+                crossings.push(PhysicalSourceCrossing {
+                    station, crossing, tick: prediction.reads[station].tick, pairing,
+                    logit_move_squared: dot(&logits, &logits),
+                });
+            }
+        }
+        if crossing < last_crossing {
+            response = physical_signed_tick(operands, &response, opened_at + crossing)?;
+        }
+    }
+    let deposition = -&applied.joint.decrease;
+    let defect = &receiving - &opening;
+    let composition_defect = &opening - &deposition;
+    if !defect.is_zero() || !composition_defect.is_zero() {
+        return Err(HnnError::Unadmitted {
+            reason: "the applied source move fails its same-Word receiving/opening/deposition pairing",
+        });
+    }
+    Ok(PhysicalSourcePairing {
+        producing_commit: before.commit(), source_lift: current.lift().to_vec(),
+        receiver: phases.ring(), opened_at, junction_steps: phases.junction_steps(),
+        response_ticks: last_crossing,
+        source_move_squared, crossings, receiving, opening, deposition, defect,
+        composition_defect, return_remainders: back.released.clone(),
+    })
+}
+
 /// All physical forward relations except the selected source relations stay fixed. The field/current and
 /// imposition are the same borrowed operands. FieldMaterial exposes E's map, never its normal-law
 /// carried remainder; SourceMoment::open_storage consumes precisely that view.
@@ -3017,6 +3132,48 @@ pub struct PhysicalTeaching {
     /// The source consumer's certificate of its applied relation, including carried corrections.
     /// The normal publication's step readings describe its proposed ray separately.
     pub source_certificate: Option<PhysicalSourceCertificate>,
+    /// The applied source move's forward/return pairing on the declared compared crossings.
+    /// Present for exact-linear E/pair learning; R-only learning changes no source relation.
+    pub source_pairing: Option<PhysicalSourcePairing>,
+}
+
+/// One compared receiving crossing of the actual applied source perturbation, with R and the
+/// producing Word fixed. These are exterior readings, never retained response states.
+#[derive(Debug, PartialEq, Eq)]
+pub struct PhysicalSourceCrossing {
+    pub station: usize,
+    pub crossing: usize,
+    pub tick: usize,
+    pub pairing: Rat,
+    pub logit_move_squared: Rat,
+}
+
+/// [definition; agent-inferred] A consumed source/receiver contract for the applied E or pair
+/// output move: delta_s = SourceMoment.open_storage(Theta') - open_storage(Theta), with the same
+/// retained source counts, normalization, lift and entered interior. On compared crossings,
+/// <g, R P^tau Pi F delta_s> = <Word.pull_back(g).opening, delta_s>
+/// = -the applied deposition alignment. F uses the producing operands at opened_at + crossing.
+/// This checks one applied direction and comparison, not the whole operator or unseen accuracy.
+/// `defect` is the signed observable pairing defect; no energy defect is used as its bound.
+/// The supported exact-linear law admits zero numerical defect and no adjoint remainder only.
+#[derive(Debug, PartialEq, Eq)]
+pub struct PhysicalSourcePairing {
+    pub producing_commit: u64,
+    pub source_lift: Vec<BigInt>,
+    pub receiver: usize,
+    pub opened_at: usize,
+    pub junction_steps: usize,
+    /// One signed full-field response step per crossing before the last compared read.
+    pub response_ticks: usize,
+    pub source_move_squared: Rat,
+    pub crossings: Vec<PhysicalSourceCrossing>,
+    pub receiving: Rat,
+    pub opening: Rat,
+    /// Negative first-order applied deposition alignment, not a finite score decrement.
+    pub deposition: Rat,
+    pub defect: Rat,
+    pub composition_defect: Rat,
+    pub return_remainders: crate::hnn::chart::Remainders,
 }
 
 /// One source law's actual applied feature moves and their physical source-to-receiver bound.
@@ -3244,8 +3401,13 @@ impl PhysicalPrediction<'_, '_> {
                     .ok_or(HnnError::MissingReceivingMap {
                         ring: phases.ring(),
                     })?;
+            // Preserve only the producing operands/absolute opening until the immediate source
+            // publication check. The Word itself is consumed once by its existing paired return.
+            let source_return = (learning != PhysicalLearning::Receiving)
+                .then(|| (word.operands().clone(), word.opened_at()));
+            let covector = ratio.covector()?;
             let back = word.pull_back(
-                &ratio.covector()?,
+                &covector,
                 map,
                 &current.lift()[phases.ring()],
                 &phases,
@@ -3436,16 +3598,27 @@ impl PhysicalPrediction<'_, '_> {
             } else {
                 None
             };
+            let source_pairing = match (source_return, &source_certificate) {
+                (Some((operands, opened_at)), Some(applied)) => Some(physical_source_pairing(
+                    field, material, &constitution, &current, &phases, &source, &operands,
+                    opened_at, &prediction, &covector, &back, compared, applied,
+                )?),
+                (None, None) => None,
+                _ => return Err(HnnError::Unadmitted {
+                    reason: "the source publication has no producing Word for its applied pairing",
+                }),
+            };
             Ok((
                 ratio,
                 composed.pullback,
                 constitution,
                 publication,
                 source_certificate,
+                source_pairing,
             ))
         })();
         match joined {
-            Ok((ratio, pullback, constitution, publication, source_certificate)) => {
+            Ok((ratio, pullback, constitution, publication, source_certificate, source_pairing)) => {
                 Ok(PhysicalTeaching {
                     prediction,
                     ratio,
@@ -3453,6 +3626,7 @@ impl PhysicalPrediction<'_, '_> {
                     constitution,
                     publication,
                     source_certificate,
+                    source_pairing,
                 })
             }
             Err(error) => Err(PhysicalTeachingRefusal { prediction, error }),

@@ -1,0 +1,81 @@
+{
+  "status": "source/static review only; compiler and native acceptance pending sole queue",
+  "base": "8ab22667618271eca057fb460f1d062647e5b331",
+  "observed_at_utc": "2026-10-06T18:13:36.281834+00:00",
+  "files": {
+    "crates/holonics/src/hnn/prediction.rs": {
+      "bytes": 178122,
+      "sha256": "3ead7e509973c72ebe800db1243e3fc8b6132e2e2d66aec3991667e4e58e73f1",
+      "syntax_parse_exit": 0,
+      "formatted_source_written": false
+    },
+    "crates/holonics/src/hnn/physical.rs": {
+      "bytes": 7821,
+      "sha256": "479a579dc90df9ea95206594b86b841f0ba7f3869973153912d3708c3b2cc77b",
+      "syntax_parse_exit": 0,
+      "formatted_source_written": false
+    },
+    "crates/holonics/src/hnn/tests/prediction.rs": {
+      "bytes": 173087,
+      "sha256": "67225eabefe47406accd9f88b695ad8a746571bbdecb479db40d23af7262f815",
+      "syntax_parse_exit": 0,
+      "formatted_source_written": false
+    },
+    "crates/holonics/src/hnn/tests/physical.rs": {
+      "bytes": 13493,
+      "sha256": "c2eef06d3dd6637fb635cfb975b4aaea7b3e6f0b7677a2c77ada54a47a311e8e",
+      "syntax_parse_exit": 0,
+      "formatted_source_written": false
+    }
+  },
+  "syntax_command": [
+    "rustfmt",
+    "--edition",
+    "2024",
+    "--config",
+    "skip_children=true",
+    "--emit",
+    "stdout",
+    "<source>"
+  ],
+  "stdout": "discarded; no source mutation",
+  "whitespace_command": [
+    "git",
+    "diff",
+    "--check"
+  ],
+  "whitespace_exit": 0,
+  "independent_source_review": {
+    "scope": [
+      "producing SourceMoment and Current lift",
+      "forward R plus phase versus Word pullback R transpose and reverse rotation",
+      "absolute opened_at plus crossing through loaded ticks",
+      "actual E and pair-output applied alignment sign",
+      "zero-interior source contrast versus retained production carry",
+      "zero signed pairing and composition defects separate from work bounds",
+      "last compared crossing cutoff",
+      "new positive and corrupt-context control sources"
+    ],
+    "concrete_blockers_found": [],
+    "limitations": [
+      "read-only source review",
+      "no Rust type check",
+      "no native tests",
+      "finite controls do not certify all pump/phase cases",
+      "one directional pairing is not whole-operator equality"
+    ]
+  },
+  "new_controls": {
+    "count": 2,
+    "declared_native_Words": 16,
+    "scientific_validation": false,
+    "training_job": false
+  },
+  "run_claims": {
+    "compiler": false,
+    "native_tests": false,
+    "benchmarks": false,
+    "scientific_generation": false,
+    "training": false
+  }
+}

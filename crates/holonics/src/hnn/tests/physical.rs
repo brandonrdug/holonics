@@ -205,3 +205,104 @@ fn a_refused_resident_observation_keeps_material_and_carries_into_the_next_nativ
     );
     assert_eq!(resident.constitution(), &initial);
 }
+
+/// A bounded native law control: two post-blind R observations, one selected source observation,
+/// a matched independent forward and a different unobserved continuation. The targets are not a
+/// validation dataset; neither the contract nor the next query asks for a desired output class.
+#[test]
+fn the_resident_certifies_the_applied_source_return_at_its_carried_clock_and_nonzero_phase() {
+    use crate::ratio::linear::vector::{dot, sub};
+    use crate::ratio::Rat;
+    for learning in [PhysicalLearning::SourcePorts, PhysicalLearning::PairOutputs] {
+        let field = field();
+        let initial = super::prediction::pumped_at(
+            &field, Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap(), 0,
+        );
+        let mut current = Current::at_rest(&field);
+        current.rekey(&field, 0, 3).unwrap();
+        let mut resident = PhysicalResident::new(
+            &field, initial, current.clone(), WordOpening::Rest,
+        );
+        for cells in [[0, 2], [1, 1]] {
+            let observed = encoded(&field, &cells);
+            let damaged = DamagedSection::damage(&observed, &[1]).unwrap();
+            let received = resident.receive(&damaged, &receiver(2), |_| Some(PhysicalObservation {
+                observed, compared: vec![false, true], learning: PhysicalLearning::Receiving,
+            })).unwrap();
+            let publication = received.comparison.unwrap().unwrap();
+            assert!(publication.source_pairing.is_none());
+        }
+        let producing = resident.constitution().clone();
+        let entered = resident.opening().clone();
+        let WordOpening::Received { carry, .. } = &entered else { panic!("physical carry") };
+        let entered_tick = carry.ticks;
+        assert!(entered_tick > 0);
+        let observed = encoded(&field, &[0, 1, 2]);
+        let damaged = DamagedSection::damage(&observed, &[2]).unwrap();
+        let mut captured = None;
+        let received = resident.receive(&damaged, &receiver(3), |blind| {
+            captured = Some(blind.clone());
+            Some(PhysicalObservation {
+                observed, compared: vec![false, false, true], learning,
+            })
+        }).unwrap();
+        assert_eq!(received.prediction, captured.unwrap());
+        let publication = received.comparison.unwrap().unwrap();
+        let paired = publication.source_pairing.as_ref().unwrap();
+        assert_eq!(paired.producing_commit, producing.commit());
+        assert_eq!(paired.source_lift.as_slice(), current.lift());
+        assert_eq!(paired.receiver, 0);
+        assert_eq!(paired.opened_at, entered_tick);
+        assert_eq!(paired.junction_steps, 3);
+        assert_eq!(paired.response_ticks, 2);
+        assert!(paired.source_move_squared > Rat::zero());
+        assert!(!paired.receiving.is_zero(), "a nonzero observable pairing is required");
+        assert_eq!(paired.receiving, paired.opening);
+        assert_eq!(paired.opening, paired.deposition);
+        assert!(paired.defect.is_zero() && paired.composition_defect.is_zero());
+        assert_eq!(paired.return_remainders.entries, 0);
+        assert_eq!(paired.crossings.len(), 1);
+        assert_eq!(paired.crossings[0].station, 2);
+        assert_eq!(paired.crossings[0].crossing, 2);
+        assert_eq!(paired.crossings[0].tick, entered_tick + 2);
+        assert_eq!(paired.receiving, -&publication.source_certificate.as_ref().unwrap().joint.decrease);
+        assert_eq!(producing.receiving_map(0), resident.constitution().receiving_map(0));
+        assert_eq!(producing.ring_resonator(0), resident.constitution().ring_resonator(0));
+        let phases = ReceivingPhases::declare(
+            &field, &producing, &current, &receiver(3),
+        ).unwrap();
+        // This extra Word is an exterior unit control, not how production obtains its certificate.
+        let matched = repair_by_field(
+            &field, resident.constitution(), &current, &damaged, &entered, &phases,
+        ).unwrap();
+        let delta = sub(&matched.reads[2].read.logits, &received.prediction.reads[2].read.logits);
+        let covector = publication.ratio.covector().unwrap();
+        assert_eq!(paired.receiving, dot(&covector.logits()[2], &delta));
+        assert_eq!(paired.crossings[0].logit_move_squared, dot(&delta, &delta));
+        assert!(matched.opening.closes() && matched.word.closes());
+        assert!(matched.balances.iter().all(|balance| balance.closes()));
+        // The publication did not install the hypothetical source-perturbed state: the next
+        // section enters on the original blind physical end and contemporary learned material.
+        let next_entered = resident.opening().clone();
+        let WordOpening::Received { carry: next_carry, .. } = &next_entered else { panic!("carry") };
+        assert_eq!(next_carry, &received.prediction.carry);
+        let chart = encoded(&field, &[]);
+        let later = DamagedSection::of_runs(4, &chart, vec![
+            (0, encoded(&field, &[1, 0])), (3, encoded(&field, &[3])),
+        ]).unwrap();
+        let expected_phases = ReceivingPhases::declare(
+            &field, resident.constitution(), &current, &receiver(3),
+        ).unwrap();
+        let actual_same_law = repair_by_field(
+            &field, resident.constitution(), &current, &later, &next_entered, &expected_phases,
+        ).unwrap();
+        let commit = resident.constitution().commit();
+        let next = resident.read(&later, &receiver(3)).unwrap();
+        assert_eq!(next, actual_same_law);
+        assert_eq!(next.carry.ticks, received.prediction.carry.ticks + 2);
+        assert_eq!(resident.constitution().commit(), commit);
+        assert_eq!(resident.current(), &current);
+        println!("resident source-return contract {learning:?}: {paired:?}; blind {:?}; next {:?}",
+            received.prediction, next);
+    }
+}
