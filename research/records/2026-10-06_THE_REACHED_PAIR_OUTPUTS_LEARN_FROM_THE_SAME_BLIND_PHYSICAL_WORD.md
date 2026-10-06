@@ -284,3 +284,7 @@ guarantee both erased truths. This is missing truth-identifying evidence at
 the admitted boundary, not failed execution of physical motion. A learned
 conditional prediction can be measured, but neither an output singleton nor
 these mechanical controls establishes its accuracy.
+
+## Accepted completion diagnostic and sharper consumer
+
+[native-checked on `2700572c`] The [exact diagnostic reconciliation](receipts/pair-output-learning-20261006/accepted-2700572c-completions/ACCEPTANCE_JOIN.v1.json) accepts the thirteen-Word exterior control once: all eight actual complete sources lead with 2; all twelve pairwise full source/read comparisons are unequal. The old `[0,2,3]` fibre is a loose coordinate enclosure. The [shared signed response record](2026-10-06_A_SHARED_SOURCE_LABEL_REACHES_THE_RECEIVER_WITHOUT_LOSING_ITS_SIGNED_RESPONSE.md) preserves these whole outputs and derives a narrower single-hole linear consumer. That changed source is prepared with stricter native controls and has no acceptance transfer from this diagnostic. Model completion constancy remains distinct from erased-truth recovery.

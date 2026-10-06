@@ -1,0 +1,140 @@
+{
+  "accepted": true,
+  "source_commit": "2700572cb7120eac5b1395886447b9ce3fdf9ff1",
+  "source_base": "4432a4b9c7de9330e6701c1c2f860660682e39b6",
+  "original_validation_pin": {
+    "bytes": 640605,
+    "sha256": "64fff7182d05472b1aab172a62eed45cf4d8b2b52f4286aa883fe49d94009199"
+  },
+  "all_original_artifacts_rehashed": 1523,
+  "original_artifact_bytes": 1071007562,
+  "git_and_snapshot_inputs_verified": 286,
+  "native_build_runtime_inputs_verified": 285,
+  "original_source_snapshot_pin": {
+    "bytes": 47261,
+    "sha256": "e3655e916d7f5afc181ad0de3ab7d42125d721d41eb9c05793efeb497c32de1c"
+  },
+  "original_build_seal_pin": {
+    "bytes": 348904,
+    "sha256": "71a74dbf872b42c7a15f3699ee23fa071655976e26abee0f1ce8848a23135b6e"
+  },
+  "original_runtime_seal_pin": {
+    "bytes": 85955,
+    "sha256": "b40a3e41cac94989d4005651cf958e7e3a469d7323410462a06b01a0dc3d63a0"
+  },
+  "all_local_artifacts_fresh_false": true,
+  "fresh_local_targets": 11,
+  "host_executable": {
+    "bytes": 65048872,
+    "sha256": "7d877420402bfcfa4f2c38bc9d4d9a639bcb6b3b4488c92c0fa70231d2a5a675"
+  },
+  "actual_unique_tests": [
+    "hnn::tests::prediction::physical_repair::the_learned_pair_gap_is_read_on_its_actual_four_completion_witnesses"
+  ],
+  "native_Words": 13,
+  "complete_witnesses": 8,
+  "whole_unfiltered_output_pin": {
+    "bytes": 24850,
+    "sha256": "3c788b220bab21ddce4202a4ad6f101cc7a8312d3b073c1fcfa01c6fd9214bf1"
+  },
+  "complete_leader_unions": {
+    "left": [
+      2
+    ],
+    "right": [
+      2
+    ]
+  },
+  "enclosing_fibres": {
+    "left": [
+      0,
+      2,
+      3
+    ],
+    "right": [
+      0,
+      2,
+      3
+    ]
+  },
+  "source_and_read_equalities_all_false_within_each_family": true,
+  "all_caps_cleanup_pass": true,
+  "stages": {
+    "hnn-completion-2700572c-cache-preparation-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 6719539457,
+      "projection_ns": 17000000000,
+      "measured_to_projected_ratio": [
+        6719539457,
+        17000000000
+      ],
+      "aggregate_CPU_ns": 5636802000,
+      "group_peak_bytes": 3584753664,
+      "peak_child_RSS_KiB": 30272,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-completion-2700572c-host-cuda-link-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 20564482918,
+      "projection_ns": 65000000000,
+      "measured_to_projected_ratio": [
+        20564482918,
+        65000000000
+      ],
+      "aggregate_CPU_ns": 55218757000,
+      "group_peak_bytes": 3063009280,
+      "peak_child_RSS_KiB": 2249676,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-completion-2700572c-control-group1-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 805836106,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        805836106,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 743418000,
+      "group_peak_bytes": 19554304,
+      "peak_child_RSS_KiB": 26996,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    }
+  },
+  "accepted_twenty_six_controls_repeated": false,
+  "unchanged_Lean_not_recompiled": true,
+  "mechanical_controls_only": true,
+  "reconstruction_or_holdout_claim": false,
+  "scientific_job": false,
+  "GPU_runtime": false,
+  "scope": "diagnostic270 only; new correlated production certificate has no native acceptance here"
+}

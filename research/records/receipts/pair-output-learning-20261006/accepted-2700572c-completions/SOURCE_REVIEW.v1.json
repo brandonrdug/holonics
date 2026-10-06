@@ -1,0 +1,26 @@
+{
+  "grade": "prepared; read-only source review and syntax/whitespace pass; native type/runtime pending",
+  "source_inputs": {
+    "crates/holonics/src/hnn/prediction.rs": {
+      "bytes": 169351,
+      "sha256": "f0d92e3608096ddfa533052e2ed2413dab266b0e525718eb164c8ac3307fcb49"
+    },
+    "crates/holonics/src/hnn/tests/prediction.rs": {
+      "bytes": 167690,
+      "sha256": "1973932537d362b8d88601e05dc0cbda28fb26c0aa0a2e0d851d04bcff55283f"
+    }
+  },
+  "review": [
+    "Complete N and N-delta population chart factors; fixed known terms and same one-hot class on every incident pair",
+    "Current-endpoint pair phase and source lift match station_section/open_storage",
+    "Fixed entered carry and zero response interior; all full EndChange components advanced by existing native maps at actual pump ticks",
+    "Exactness admission excludes lattice/chart residuals and saturation; nonunit/multiple-hole/quartic fallbacks retained",
+    "Same R and GrainCells after signed fixed+response addition; exact finite one-hot support, ties retained; sparse point only included in intervals",
+    "Production creates and advances one Word; no candidate SourceMoments/Words or task target; A columns are the finite label-face response matrix"
+  ],
+  "independent_read_only_review": true,
+  "new_native_acceptance": false,
+  "previous_diagnostic_source": "2700572cb7120eac5b1395886447b9ce3fdf9ff1",
+  "previous_diagnostic_does_not_accept_new_source": true,
+  "formal_obligation": "Refs #62: full affine source-to-Word-to-GrainCell induction/leader-union soundness; nonlinear/multi-hole extensions separate"
+}

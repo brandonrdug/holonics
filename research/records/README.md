@@ -494,3 +494,5 @@ starting paths, search its ordinary, formal and native spellings, then read the 
 This page grows by useful connections rather than by reproducing the entire file inventory.
 
 - [Actual section derivative and exact dimensional faces](2026-10-04_THE_SECTION_DERIVATIVE_AND_EXACT_DIMENSIONAL_FACES_JOIN_THE_PRODUCING_OPERANDS.md): fixed-section FDeriv → oriented area/current; exact normalization, clock/family discriminators and remaining native decoder.
+
+- [Shared source label and signed physical response](2026-10-06_A_SHARED_SOURCE_LABEL_REACHES_THE_RECEIVER_WITHOUT_LOSING_ITS_SIGNED_RESPONSE.md): accepted eight completed model readings expose a loose coordinate enclosure; prepared one-hole affine carrier keeps full source normalization, carry, native ticks and grain correlation; truth fidelity remains open.

@@ -2357,6 +2357,7 @@ mod physical_repair {
         )
         .unwrap();
         assert!(sparse.domains.iter().all(Option::is_some));
+        assert!(sparse.domains.iter().flatten().all(|domain| domain.completion.is_none()));
         assert!(
             sparse
                 .domains
@@ -2895,6 +2896,9 @@ mod physical_repair {
             let sparse = DamagedSection::of_runs(9, &chart, vec![(0, head), (2, tail)]).unwrap();
             let blind = repair_by_field(&field, &material, &current, &sparse, &carried, &phases).unwrap();
             let domain = blind.domains[1].as_ref().unwrap();
+            let response = domain.completion.as_ref().unwrap();
+            assert_eq!(response.station, 1);
+            assert_eq!(response.label_logits.len(), field.alphabet());
             println!("pair completion witness {label} blind: actual intact source {:?}; whole cells {:?}; point leaders {:?}; actual gap logits {:?}; enclosing domain {:?}; carry tick {}",
                 sparse.placed(), blind.cells, blind.reads[1].leaders(), blind.reads[1].read.logits,
                 domain, blind.carry.ticks);
@@ -2912,6 +2916,12 @@ mod physical_repair {
                 assert!(reached.opening.closes() && reached.word.closes());
                 assert!(reached.balances.iter().all(|b| b.closes()));
                 let read = &reached.reads[1];
+                for (crossing, read) in reached.reads.iter().enumerate() {
+                    let response = blind.domains[crossing].as_ref().unwrap().completion.as_ref().unwrap();
+                    assert_eq!(crate::ratio::linear::vector::add(&response.fixed_logits,
+                        &response.label_logits[missing]), read.read.logits,
+                        "the shared-label response must equal the actual completed Word at every crossing");
+                }
                 assert!(domain.logits.iter().zip(&read.read.logits)
                     .all(|(interval, value)| &interval.lower <= value && value <= &interval.upper));
                 let leaders = read.leaders();
@@ -2929,9 +2939,74 @@ mod physical_repair {
                 .collect::<Vec<_>>();
             println!("pair completion witness {label} exact family: actual complete leader union {:?}; enclosing fibre {:?}; source/read equality witnesses {:?}",
                 leader_union, domain.classes, aliases);
+            assert_eq!(domain.classes, leader_union.into_iter().collect::<Vec<_>>());
+            assert_eq!(domain.classes, vec![2], "the fixed accepted model-completion family leads with 2");
+            assert_eq!(blind.cells[1], RepairedCell::Released(2));
             assert!(blind.opening.closes() && blind.word.closes());
             assert!(blind.balances.iter().all(|b| b.closes()));
         }
+    }
+
+    /// Exterior completion Words check the new response certificate, including both directions
+    /// of each incident pair, complete-population normalization, a nonzero source lift and
+    /// actual carried ticks. Their labels enter only these controls after the blind receipt.
+    #[test]
+    fn single_hole_response_columns_match_shifted_offset_words_and_grain_ties() {
+        let field = field_with_lock_and_offsets((0..8).collect(), vec![1, 2, 7]);
+        let rest = Current::at_rest(&field);
+        let (before, entering) = pair_teaching_opening(&field);
+        let observed = crate::hnn::tests::support::encoded(&field, &[0, 1, 2]);
+        let damaged = DamagedSection::damage(&observed, &[2]).unwrap();
+        let phases = ReceivingPhases::declare(&field, &before, &rest, &section(3)).unwrap();
+        let opening = WordOpening::Received { carry: entering, absorption: Absorption::Nothing };
+        let taught = crate::hnn::prediction::predict_by_field(&field, &before, &rest,
+            &damaged, &opening, &phases).unwrap()
+            .observe_pair_outputs(&before, &observed, &[false, false, true]).unwrap();
+        let material = taught.constitution;
+        let entering_tick = taught.prediction.carry.ticks;
+        let carried = WordOpening::Received { carry: taught.prediction.carry, absorption: Absorption::Nothing };
+        let mut current = rest.clone();
+        current.rekey(&field, 0, 3).unwrap();
+        let phases = ReceivingPhases::declare(&field, &material, &current, &section(3)).unwrap();
+        let original = [0, 1, 2, 3, 1];
+        for hole in [0, 2, 4] {
+            let source = crate::hnn::tests::support::encoded(&field, &original);
+            let damaged = DamagedSection::damage(&source, &[hole]).unwrap();
+            let blind = repair_by_field(&field, &material, &current, &damaged, &carried, &phases).unwrap();
+            let mut union = vec![std::collections::BTreeSet::new(); phases.aperture()];
+            for missing in 0..field.alphabet() {
+                let mut completed = original; completed[hole] = missing;
+                let source = crate::hnn::tests::support::encoded(&field, &completed);
+                let complete = DamagedSection::damage(&source, &[]).unwrap();
+                let actual = repair_by_field(&field, &material, &current, &complete, &carried, &phases).unwrap();
+                for (crossing, read) in actual.reads.iter().enumerate() {
+                    let domain = blind.domains[crossing].as_ref().unwrap();
+                    let response = domain.completion.as_ref().unwrap();
+                    assert_eq!(response.station, hole);
+                    assert_eq!(crate::ratio::linear::vector::add(&response.fixed_logits,
+                        &response.label_logits[missing]), read.read.logits);
+                    union[crossing].extend(read.leaders());
+                }
+                assert!(actual.opening.closes() && actual.word.closes());
+                assert!(actual.balances.iter().all(|balance| balance.closes()));
+                assert_eq!(actual.carry.ticks, entering_tick + phases.last_epoch());
+            }
+            for (crossing, leaders) in union.into_iter().enumerate() {
+                assert_eq!(blind.domains[crossing].as_ref().unwrap().classes,
+                    leaders.into_iter().collect::<Vec<_>>());
+            }
+            assert!(blind.opening.closes() && blind.word.closes());
+            assert!(blind.balances.iter().all(|balance| balance.closes()));
+            println!("signed completion boundary hole {hole}, actual clock {}: whole cells {:?}; complete response receipts {:?}",
+                blind.carry.ticks, blind.cells, blind.domains);
+        }
+        let initial = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap();
+        let phases = ReceivingPhases::declare(&field, &initial, &current, &section(3)).unwrap();
+        let source = crate::hnn::tests::support::encoded(&field, &original);
+        let damaged = DamagedSection::damage(&source, &[2]).unwrap();
+        let tied = repair_by_field(&field, &initial, &current, &damaged, &carried, &phases).unwrap();
+        assert!(tied.domains.iter().flatten().all(|domain| domain.classes == vec![0, 1, 2, 3]));
+        assert!(matches!(tied.cells[2], RepairedCell::Held { .. }));
     }
 
     #[test]
@@ -3089,6 +3164,7 @@ mod physical_repair {
             let phases = ReceivingPhases::declare(&field, &theta, &current, &section(2)).unwrap();
             let blind = repair_by_field(&field, &theta, &current, &damaged, &WordOpening::Rest, &phases).unwrap();
             assert!(blind.domains.iter().all(Option::is_some));
+            assert!(blind.domains.iter().flatten().all(|domain| domain.completion.is_none()));
             assert!(blind.opening.closes() && blind.word.closes());
             for x in 0..4 { for y in 0..4 {
                 let full = crate::hnn::tests::support::encoded(&field, &[0,x,y,3]);

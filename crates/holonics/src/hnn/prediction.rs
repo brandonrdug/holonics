@@ -1767,13 +1767,26 @@ pub enum Unresolved {
     PluralDomain,
 }
 
-/// A receiving image of the admitted sparse opening and every completion of its missing cells.
-/// Bounds include both parts of the complex receiving relation; the identity decoder's class
-/// reading at the declared grain has width zero only when `classes` contains one member.
+/// The receiving image of every compatible completion. The coordinate bounds also include the
+/// actual sparse reading; that point is an executed observation, not a possible completed source.
+/// `classes` encloses the completed sources' grain leaders. A shared one-hot response can certify
+/// their exact union without losing correlations to a coordinate box.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PhysicalDomainRead {
     pub logits: Vec<crate::ratio::algebraic::ExactInterval>,
     pub classes: Vec<usize>,
+    pub completion: Option<PhysicalCompletionRead>,
+}
+
+/// A transient receiving certificate for one erased station: its label is the same one-hot
+/// coordinate in every first/pair source port, full field state and receiving row. For label c,
+/// the complete reading is `fixed_logits + label_logits[c]`. These are signed linear response
+/// columns, not completed Words, candidate answers or retained occurrence states.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PhysicalCompletionRead {
+    pub station: usize,
+    pub fixed_logits: Vec<Rat>,
+    pub label_logits: Vec<Vec<Rat>>,
 }
 
 /// [definition] **One station after the physical repair**: intact as admitted, released at width
@@ -1918,11 +1931,11 @@ fn physical_forward<'f>(
     ))
 }
 
-/// [agent-inferred] A finite tube, rather than a cyclic lock: for every compatible completion
-/// `x`, `|x_t - x_t^sparse| <= r_t` implies `|Phi_t(x_t) - Phi_t(x_t^sparse)| <= r_(t+1)`.
-/// The centre is the actual Word, never a proposed answer. The radius starts from the producing
-/// E and the missing cells' entire alphabet. Interior coordinates start at the contemporary
-/// entered carry, and each full tick includes junction, element, loaded return and contact.
+/// [agent-inferred] One executed Word and its compatible source family. An exact linear,
+/// one-hole source carries a fixed state and shared signed response columns through each native
+/// tick. Otherwise the finite tube uses `|x_t-x_t^sparse|<=r_t` and the actual producing maps.
+/// Both routes include the contemporary entered interior, junction, element, loaded return,
+/// contact and actual pump tick; neither is a cyclic lock or an authored task answer.
 fn physical_domain_forward(
     field: &Field,
     material: &dyn FieldMaterial,
@@ -1931,7 +1944,12 @@ fn physical_domain_forward(
     phases: &ReceivingPhases,
     word: &mut Word<'_>,
 ) -> Result<(Vec<Vec<Rat>>, Vec<Option<PhysicalDomainRead>>), HnnError> {
-    let mut radius = physical_opening_radius(field, material, current, section, word)?;
+    let mut completion = physical_completion_opening(field, material, current, section, word)?;
+    let mut radius = if completion.is_none() {
+        physical_opening_radius(field, material, current, section, word)?
+    } else {
+        None
+    };
     let mut domains = Vec::with_capacity(phases.aperture());
     for crossing in 0..phases.junction_steps() {
         let point = word.change()?;
@@ -1940,35 +1958,58 @@ fn physical_domain_forward(
             .map(|radius| physical_junction_radius(word.operands(), radius))
             .transpose()?;
         if phases.epochs().contains(&crossing) {
-            domains.push(match &junctions {
-                Some(junctions) => {
-                    let ring = phases.ring();
-                    let operands = word.operands();
-                    let incoming: Vec<_> = operands
-                        .incident(ring)
-                        .iter()
-                        .map(|&a| point.arrivals[a][operands.end_slot(a, ring)].as_slice())
-                        .collect();
-                    let anchor = crate::hnn::propagation::participation(
-                        operands.weights(ring),
-                        &point.storage[ring],
-                        &incoming,
-                    )?;
-                    Some(physical_domain_read(
-                        field,
-                        material,
-                        current,
-                        phases,
-                        &anchor,
-                        &junctions[ring].anchor,
-                    )?)
+            domains.push(if let Some(completion) = &completion {
+                Some(physical_completion_read(
+                    field,
+                    material,
+                    current,
+                    phases,
+                    word.operands(),
+                    &point,
+                    completion,
+                )?)
+            } else {
+                match &junctions {
+                    Some(junctions) => {
+                        let ring = phases.ring();
+                        let operands = word.operands();
+                        let incoming: Vec<_> = operands
+                            .incident(ring)
+                            .iter()
+                            .map(|&a| point.arrivals[a][operands.end_slot(a, ring)].as_slice())
+                            .collect();
+                        let anchor = crate::hnn::propagation::participation(
+                            operands.weights(ring),
+                            &point.storage[ring],
+                            &incoming,
+                        )?;
+                        Some(physical_domain_read(
+                            field,
+                            material,
+                            current,
+                            phases,
+                            &anchor,
+                            &junctions[ring].anchor,
+                        )?)
+                    }
+                    None => None,
                 }
-                None => None,
             });
         }
         if crossing + 1 == phases.junction_steps() {
             word.last_junction()?;
         } else {
+            if let Some(completion) = &mut completion {
+                completion.fixed = physical_signed_tick(
+                    word.operands(),
+                    &completion.fixed,
+                    word.opened_at() + crossing,
+                )?;
+                for column in &mut completion.labels {
+                    *column =
+                        physical_signed_tick(word.operands(), column, word.opened_at() + crossing)?;
+                }
+            }
             radius = match (&radius, &junctions) {
                 (Some(radius), Some(junctions)) => Some(physical_tick_radius(
                     word,
@@ -2006,6 +2047,320 @@ fn physical_word_is_exact(operands: &crate::hnn::propagation::Operands) -> bool 
                 ring.chart_words(phase).is_none() && ring.certificate(phase).is_zero()
             })
         })
+}
+
+/// An affine source family transported in lockstep with the one executed Word. The fixed state
+/// includes its actual entered interior; all response columns start with zero interior. No
+/// completed source is constructed, and no response opens or advances a candidate Word.
+struct PhysicalCompletionColumns {
+    station: usize,
+    fixed: crate::hnn::word::EndChange,
+    labels: Vec<crate::hnn::word::EndChange>,
+}
+
+/// [agent-inferred] At one missing station h, the full first population N and every offset's
+/// population max(N-delta,0) are class independent. Known terms form s_bar; E e_c and the pair
+/// edges incident on h form column z_c, so s(c)=s_bar+z_c. The same one-hot e_c is shared by
+/// every source, offset and phase. This is the existing station_section/PairPort law expanded
+/// before an absolute bound; two missing endpoints require bilinear cross terms and use the
+/// conservative tube. Rounded/leaky ports and nonlinear Words also use that existing tube.
+fn physical_completion_opening(
+    field: &Field,
+    material: &dyn FieldMaterial,
+    current: &Current,
+    section: &DamagedSection,
+    word: &Word<'_>,
+) -> Result<Option<PhysicalCompletionColumns>, HnnError> {
+    let operands = word.operands();
+    let placed = section.placed();
+    let holes: Vec<_> = placed
+        .iter()
+        .enumerate()
+        .filter(|(_, cell)| cell.is_none())
+        .map(|(station, _)| station)
+        .collect();
+    if holes.len() != 1
+        || !physical_word_is_exact(operands)
+        || operands
+            .resonators()
+            .iter()
+            .flatten()
+            .any(|ring| ring.material().saturation().is_some())
+        || field
+            .sources()
+            .iter()
+            .any(|&ring| !material.transport(ring).is_one())
+    {
+        return Ok(None);
+    }
+    let chart = PopulationChart::of(field);
+    let population = u64::try_from(section.length).map_err(|_| HnnError::CountOverflow)?;
+    let weight = chart.value(population);
+    let mut fixed = word.change()?;
+    let mut labels: Vec<_> = (0..section.classes())
+        .map(|_| crate::hnn::word::EndChange::rest(field, operands))
+        .collect();
+    for &ring in field.sources() {
+        let geometry = field.ring(ring);
+        let map = material
+            .source_port(ring)
+            .ok_or(HnnError::MissingSourcePort { ring })?;
+        let phase = current.phase(field, ring)? as usize;
+        let period = geometry.placements().len();
+        let carried = |station: usize, values: &[Rat]| {
+            let at = (phase + 1 + station % period) % period;
+            geometry.rotate(values, &(&current.lift()[ring] - BigInt::from(at)))
+        };
+        fixed.storage[ring].fill(Rat::zero());
+        for (station, class) in placed.iter().enumerate() {
+            let column = |class: usize| -> Result<Vec<Rat>, HnnError> {
+                let values = (0..geometry.width())
+                    .map(|row| Ok(&weight * map.get(row, class)?))
+                    .collect::<Result<Vec<_>, HnnError>>()?;
+                Ok(carried(station, &values))
+            };
+            match class {
+                Some(class) => {
+                    fixed.storage[ring] =
+                        crate::ratio::linear::vector::add(&fixed.storage[ring], &column(*class)?)
+                }
+                None => {
+                    for (class, label) in labels.iter_mut().enumerate() {
+                        label.storage[ring] = crate::ratio::linear::vector::add(
+                            &label.storage[ring],
+                            &column(class)?,
+                        );
+                    }
+                }
+            }
+        }
+        for &offset in field.offsets() {
+            let pair = material
+                .pair_port(ring, offset)
+                .ok_or(HnnError::MissingSourcePort { ring })?;
+            if pair
+                .outputs()
+                .iter()
+                .any(|row| row.len() != geometry.width())
+                || pair
+                    .current_reads()
+                    .iter()
+                    .chain(pair.earlier_reads())
+                    .any(|row| row.len() != section.classes())
+            {
+                return Err(HnnError::Unadmitted {
+                    reason: "the affine completion's pair relation must match its producing class and ring chart",
+                });
+            }
+            let pair_weight = chart.value(
+                u64::try_from(section.length.saturating_sub(offset))
+                    .map_err(|_| HnnError::CountOverflow)?,
+            );
+            for station in offset..section.length {
+                let earlier = station - offset;
+                let column = |x: usize, y: usize| {
+                    let mut values = vec![Rat::zero(); geometry.width()];
+                    for ((output, a), b) in pair
+                        .outputs()
+                        .iter()
+                        .zip(pair.current_reads())
+                        .zip(pair.earlier_reads())
+                    {
+                        let factor = &pair_weight * &a[x] * &b[y];
+                        for (value, entry) in values.iter_mut().zip(output) {
+                            *value += &factor * entry;
+                        }
+                    }
+                    carried(station, &values)
+                };
+                match (placed[station], placed[earlier]) {
+                    (Some(x), Some(y)) => {
+                        fixed.storage[ring] =
+                            crate::ratio::linear::vector::add(&fixed.storage[ring], &column(x, y))
+                    }
+                    (x, y) => {
+                        for (class, label) in labels.iter_mut().enumerate() {
+                            label.storage[ring] = crate::ratio::linear::vector::add(
+                                &label.storage[ring],
+                                &column(x.unwrap_or(class), y.unwrap_or(class)),
+                            );
+                        }
+                    }
+                }
+            }
+        }
+    }
+    Ok(Some(PhysicalCompletionColumns {
+        station: holes[0],
+        fixed,
+        labels,
+    }))
+}
+
+/// Signed junction and full tick of the admitted linear relation. The native element,
+/// resonator and contact owners supply the images at the actual pump tick. In particular, the
+/// rate, displacement, velocity and arriving waves remain correlated with their source label.
+fn physical_signed_junctions(
+    operands: &crate::hnn::propagation::Operands,
+    state: &crate::hnn::word::EndChange,
+) -> Result<Vec<crate::hnn::propagation::Junction>, HnnError> {
+    (0..operands.rings().len())
+        .map(|ring| {
+            let incoming: Vec<_> = operands
+                .incident(ring)
+                .iter()
+                .map(|&a| state.arrivals[a][operands.end_slot(a, ring)].as_slice())
+                .collect();
+            let anchor = crate::hnn::propagation::participation(
+                operands.weights(ring),
+                &state.storage[ring],
+                &incoming,
+            )?;
+            Ok(crate::hnn::propagation::scattering_about(
+                anchor,
+                &state.storage[ring],
+                &incoming,
+            ))
+        })
+        .collect()
+}
+
+fn physical_signed_tick(
+    operands: &crate::hnn::propagation::Operands,
+    state: &crate::hnn::word::EndChange,
+    tick: usize,
+) -> Result<crate::hnn::word::EndChange, HnnError> {
+    let junctions = physical_signed_junctions(operands, state)?;
+    let mut next = state.clone();
+    for (ring, junction) in junctions.iter().enumerate() {
+        let drive = crate::hnn::propagation::element_step(
+            &operands.rings()[ring],
+            &junction.storage_wave,
+            &junction.contrast,
+        )?
+        .next;
+        if let Some(resonator) = &operands.resonators()[ring] {
+            let local = state.resonators[ring]
+                .as_ref()
+                .ok_or(HnnError::ContinuingState {
+                    what: "the affine completion needs the full producing resonator state",
+                })?;
+            let driven = resonator.step(
+                tick,
+                &drive,
+                [&local[0], &local[1]],
+                &crate::hnn::ring::ResonatorRemainders::default(),
+                None,
+            )?;
+            next.storage[ring] = driven.output;
+            next.resonators[ring] = Some(driven.state);
+            next.resonator_phases[ring] = Some(resonator.phase_at(tick));
+        } else {
+            next.storage[ring] = drive;
+        }
+    }
+    for (a, contact) in operands.contacts().iter().enumerate() {
+        let (from, to) = contact.ends();
+        let outgoing = |ring: usize| {
+            &junctions[ring].outgoing[operands
+                .incident(ring)
+                .iter()
+                .position(|&index| index == a)
+                .unwrap()]
+        };
+        let passed = crate::hnn::propagation::transit(
+            contact,
+            operands.step(),
+            outgoing(from),
+            outgoing(to),
+            &state.states[a][0],
+            &state.states[a][1],
+        )?;
+        next.arrivals[a] = [passed.arrive_from, passed.arrive_to];
+        next.states[a] = [passed.displacement, passed.rate];
+    }
+    Ok(next)
+}
+
+fn physical_completion_read(
+    field: &Field,
+    material: &dyn FieldMaterial,
+    current: &Current,
+    phases: &ReceivingPhases,
+    operands: &crate::hnn::propagation::Operands,
+    point: &crate::hnn::word::EndChange,
+    completion: &PhysicalCompletionColumns,
+) -> Result<PhysicalDomainRead, HnnError> {
+    let anchor = |state: &crate::hnn::word::EndChange| -> Result<Vec<Rat>, HnnError> {
+        let ring = phases.ring();
+        let incoming: Vec<_> = operands
+            .incident(ring)
+            .iter()
+            .map(|&a| state.arrivals[a][operands.end_slot(a, ring)].as_slice())
+            .collect();
+        crate::hnn::propagation::participation(
+            operands.weights(ring),
+            &state.storage[ring],
+            &incoming,
+        )
+    };
+    let fixed_logits = phases
+        .read(field, material, current, &anchor(&completion.fixed)?)?
+        .logits;
+    let label_logits = completion
+        .labels
+        .iter()
+        .map(|column| {
+            Ok(phases
+                .read(field, material, current, &anchor(column)?)?
+                .logits)
+        })
+        .collect::<Result<Vec<_>, HnnError>>()?;
+    let sparse = phases
+        .read(field, material, current, &anchor(point)?)?
+        .logits;
+    let mut logits: Vec<_> = sparse
+        .into_iter()
+        .map(|value| crate::ratio::algebraic::ExactInterval {
+            lower: value.clone(),
+            upper: value,
+        })
+        .collect();
+    let mut classes = std::collections::BTreeSet::new();
+    // The support of an affine map on a one-hot face is a row reduction over its columns, not
+    // A^holes candidate executions. Read the shared coefficient at the actual grain first;
+    // independent coordinate extrema would invent leaders no compatible source produces.
+    for column in &label_logits {
+        let image = crate::ratio::linear::vector::add(&fixed_logits, column);
+        for (interval, value) in logits.iter_mut().zip(&image) {
+            interval.lower = interval.lower.clone().min(value.clone());
+            interval.upper = interval.upper.clone().max(value.clone());
+        }
+        let cells: Vec<_> = (0..field.alphabet())
+            .map(|class| crate::receiver::face::GrainCell::of(&image[2 * class], phases.grain()))
+            .collect();
+        let top = cells
+            .iter()
+            .map(|cell| (&cell.carry, cell.phase))
+            .max()
+            .unwrap();
+        classes.extend(
+            cells
+                .iter()
+                .enumerate()
+                .filter(|(_, cell)| (&cell.carry, cell.phase) == top)
+                .map(|(class, _)| class),
+        );
+    }
+    Ok(PhysicalDomainRead {
+        logits,
+        classes: classes.into_iter().collect(),
+        completion: Some(PhysicalCompletionRead {
+            station: completion.station,
+            fixed_logits,
+            label_logits,
+        }),
+    })
 }
 
 /// All physical forward relations except the selected source relations stay fixed. The field/current and
@@ -2605,7 +2960,7 @@ fn physical_domain_read(
         .filter(|(_, cell)| (&cell.carry, cell.phase) >= greatest_lower)
         .map(|(class, _)| class)
         .collect();
-    Ok(PhysicalDomainRead { logits, classes })
+    Ok(PhysicalDomainRead { logits, classes, completion: None })
 }
 
 /// [definition] A participating reception awaiting one observed comparison: its blind receipt,

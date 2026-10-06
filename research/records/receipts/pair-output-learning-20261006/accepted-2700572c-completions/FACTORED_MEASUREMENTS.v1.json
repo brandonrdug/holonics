@@ -1,0 +1,311 @@
+{
+  "validation": {
+    "bytes": 640605,
+    "sha256": "64fff7182d05472b1aab172a62eed45cf4d8b2b52f4286aa883fe49d94009199"
+  },
+  "exact_factored_readings": {
+    "hnn-completion-2700572c-cache-preparation-20261006-v1": {
+      "wall_ns": {
+        "integer": 6719539457,
+        "prime_powers": [
+          [
+            6719539457,
+            1
+          ]
+        ]
+      },
+      "projection_ns": {
+        "integer": 17000000000,
+        "prime_powers": [
+          [
+            2,
+            9
+          ],
+          [
+            5,
+            9
+          ],
+          [
+            17,
+            1
+          ]
+        ]
+      },
+      "aggregate_CPU_ns": {
+        "integer": 5636802000,
+        "prime_powers": [
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            37,
+            1
+          ],
+          [
+            25391,
+            1
+          ]
+        ]
+      },
+      "group_peak_bytes": {
+        "integer": 3584753664,
+        "prime_powers": [
+          [
+            2,
+            16
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            18233,
+            1
+          ]
+        ]
+      },
+      "peak_child_RSS_KiB": {
+        "integer": 30272,
+        "prime_powers": [
+          [
+            2,
+            6
+          ],
+          [
+            11,
+            1
+          ],
+          [
+            43,
+            1
+          ]
+        ]
+      },
+      "measured_to_projected": {
+        "numerator": 6719539457,
+        "denominator": 17000000000
+      }
+    },
+    "hnn-completion-2700572c-host-cuda-link-20261006-v1": {
+      "wall_ns": {
+        "integer": 20564482918,
+        "prime_powers": [
+          [
+            2,
+            1
+          ],
+          [
+            7,
+            1
+          ],
+          [
+            3677,
+            1
+          ],
+          [
+            399481,
+            1
+          ]
+        ]
+      },
+      "projection_ns": {
+        "integer": 65000000000,
+        "prime_powers": [
+          [
+            2,
+            9
+          ],
+          [
+            5,
+            10
+          ],
+          [
+            13,
+            1
+          ]
+        ]
+      },
+      "aggregate_CPU_ns": {
+        "integer": 55218757000,
+        "prime_powers": [
+          [
+            2,
+            3
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            11,
+            1
+          ],
+          [
+            1277,
+            1
+          ],
+          [
+            3931,
+            1
+          ]
+        ]
+      },
+      "group_peak_bytes": {
+        "integer": 3063009280,
+        "prime_powers": [
+          [
+            2,
+            12
+          ],
+          [
+            5,
+            1
+          ],
+          [
+            149561,
+            1
+          ]
+        ]
+      },
+      "peak_child_RSS_KiB": {
+        "integer": 2249676,
+        "prime_powers": [
+          [
+            2,
+            2
+          ],
+          [
+            3,
+            2
+          ],
+          [
+            11,
+            1
+          ],
+          [
+            13,
+            1
+          ],
+          [
+            19,
+            1
+          ],
+          [
+            23,
+            1
+          ]
+        ]
+      },
+      "measured_to_projected": {
+        "numerator": 10282241459,
+        "denominator": 32500000000
+      }
+    },
+    "hnn-completion-2700572c-control-group1-20261006-v1": {
+      "wall_ns": {
+        "integer": 805836106,
+        "prime_powers": [
+          [
+            2,
+            1
+          ],
+          [
+            402918053,
+            1
+          ]
+        ]
+      },
+      "projection_ns": {
+        "integer": 16000000000,
+        "prime_powers": [
+          [
+            2,
+            13
+          ],
+          [
+            5,
+            9
+          ]
+        ]
+      },
+      "aggregate_CPU_ns": {
+        "integer": 743418000,
+        "prime_powers": [
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            4
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            13,
+            1
+          ],
+          [
+            353,
+            1
+          ]
+        ]
+      },
+      "group_peak_bytes": {
+        "integer": 19554304,
+        "prime_powers": [
+          [
+            2,
+            13
+          ],
+          [
+            7,
+            1
+          ],
+          [
+            11,
+            1
+          ],
+          [
+            31,
+            1
+          ]
+        ]
+      },
+      "peak_child_RSS_KiB": {
+        "integer": 26996,
+        "prime_powers": [
+          [
+            2,
+            2
+          ],
+          [
+            17,
+            1
+          ],
+          [
+            397,
+            1
+          ]
+        ]
+      },
+      "measured_to_projected": {
+        "numerator": 402918053,
+        "denominator": 8000000000
+      }
+    }
+  },
+  "measurements_are_integers_at_declared_ns_or_bytes_grain": true,
+  "scope": "scoped accepted diagnostic270, no current candidate runtime claim"
+}
