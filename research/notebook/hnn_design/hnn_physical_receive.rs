@@ -179,16 +179,24 @@ pub(super) fn learn(
             let before_material = resident.constitution().clone();
             let learning = if index % 2 == 0 { PhysicalLearning::Receiving } else { PhysicalLearning::PairOutputs };
             let phases = ReceivingPhases::declare(&field, &before_material, &current, &receiver).expect("the receiving clock");
+            // Exterior timing separates existing physical work from receipt costs. It does
+            // not profile arithmetic inside a law or grant a new scientific acceptance.
+            let mut blind_forward_done_ns = 0;
+            let mut blind_publication_done_ns = 0;
             let received = resident.receive(&damaged, &receiver, |blind| {
+                blind_forward_done_ns = started.elapsed().as_nanos();
                 publish(&mut output, format!("{terrain}/{teaching_seed} teaching {index}; input={:?}; blind cells={:?}; read={:?}; grain={}\n", damaged.placed(), blind.cells, blind.reads[target], phases.grain()));
+                blind_publication_done_ns = started.elapsed().as_nanos();
                 let mut compared = vec![false; length];
                 compared[target] = true;
                 Some(PhysicalObservation { observed: observed.clone(), compared, learning })
             }).expect("admitted blind physical reception");
+            let receiving_done_ns = started.elapsed().as_nanos();
             // Exterior matched-material control, never retained by the machine: both Words have
             // this section, producing source frame, receiver and identical *entered* carry.
             let next_phases = ReceivingPhases::declare(&field, resident.constitution(), &current, &receiver).expect("contemporary receiving clock");
             let applied = repair_by_field(&field, resident.constitution(), &current, &damaged, &entered, &next_phases).expect("matched applied read");
+            let matched_forward_done_ns = started.elapsed().as_nanos();
             let old = &received.prediction.reads[target].read.logits;
             let new = &applied.reads[target].read.logits;
             let movement: Vec<_> = new.iter().zip(old).map(|(new, old)| new-old).collect();
@@ -203,6 +211,13 @@ pub(super) fn learn(
                 holonics::hnn::ConstitutionRead::source_port(&before_material, 0) != holonics::hnn::ConstitutionRead::source_port(resident.constitution(), 0),
                 field.offsets().iter().any(|&offset| holonics::hnn::ConstitutionRead::pair_port(&before_material, 0,offset) != holonics::hnn::ConstitutionRead::pair_port(resident.constitution(), 0,offset)),
                 closed(&received.prediction) && closed(&applied), started.elapsed().as_millis(),
+            ));
+            let receipt_done_ns = started.elapsed().as_nanos();
+            publish(&mut output, format!("{terrain} teaching {index} timings; setup_and_blind_forward_ns={blind_forward_done_ns}; blind_publication_ns={}; same_word_comparison_and_deposition_ns={}; matched_applied_control_ns={}; movement_and_receipt_ns={}; whole_unit_ns={receipt_done_ns}; wall_categories_are_exterior_not_an_arithmetic_or_certification_profile\n",
+                blind_publication_done_ns-blind_forward_done_ns,
+                receiving_done_ns-blind_publication_done_ns,
+                matched_forward_done_ns-receiving_done_ns,
+                receipt_done_ns-matched_forward_done_ns,
             ));
             assert!(closed(&received.prediction) && closed(&applied), "the measured physical balances must close");
             if started.elapsed().as_millis() > bound {
@@ -227,10 +242,13 @@ pub(super) fn learn(
             let entered = resident.opening().clone();
             let pre_phases = ReceivingPhases::declare(&field, &initial, &current, &receiver).expect("initial receiving clock");
             let before = repair_by_field(&field, &initial, &current, &damaged, &controlled_opening, &pre_phases).expect("initial-material matched control");
+            let initial_control_done_ns = started.elapsed().as_nanos();
             let post_phases = ReceivingPhases::declare(&field, &frozen_material, &current, &receiver).expect("learned receiving clock");
             let controlled_after = repair_by_field(&field, &frozen_material, &current, &damaged, &controlled_opening, &post_phases).expect("same-carry learned-material control");
+            let learned_control_done_ns = started.elapsed().as_nanos();
             // This is the actual continuing resident; the held truth cannot reach its read API.
             let after = resident.read(&damaged, &receiver).expect("the blind contemporary probe");
+            let continuing_done_ns = started.elapsed().as_nanos();
             publish(&mut output, format!("{terrain}/{probe_seed} {role} probe {index}; input={:?}; before cells={:?}; matched learned cells={:?}; continuing cells={:?}; before read={:?}; matched learned read={:?}; continuing read={:?}; matched_entered={:?}; continuing_entered={:?}; carried_tick={}; balances_close={}\n", damaged.placed(), before.cells, controlled_after.cells, after.cells, before.reads[target], controlled_after.reads[target], after.reads[target], controlled_opening, entered, after.carry.ticks, closed(&before) && closed(&controlled_after) && closed(&after)));
             assert_eq!(resident.constitution(), &frozen_material, "no probe deposition");
             assert!(closed(&before) && closed(&controlled_after) && closed(&after), "the measured physical balances must close");
@@ -262,12 +280,19 @@ pub(super) fn learn(
             let post_cells: Vec<_> = controlled_after.reads[target].read.cells.iter().map(|cell| cell.representative(grain)).collect();
             publish(&mut output, format!("scoring only; truth={truth}; majority={majority}; copy_left={left:?}; copy_right={right:?}; target_margin_before={}; target_margin_after={}; grain={grain}\n", margin(&pre,truth), margin(&post,truth)));
             rows.push((pre,post,pre_cells,post_cells));
+            let scoring_done_ns = started.elapsed().as_nanos();
+            publish(&mut output, format!("{terrain} probe {index} timings; initial_control_ns={initial_control_done_ns}; learned_control_ns={}; actual_continuing_forward_ns={}; publication_and_exterior_scoring_ns={}; whole_unit_ns={scoring_done_ns}; no_observation_or_deposition\n",
+                learned_control_done_ns-initial_control_done_ns,
+                continuing_done_ns-learned_control_done_ns,
+                scoring_done_ns-continuing_done_ns,
+            ));
             if started.elapsed().as_millis() > bound {
                 publish(&mut output, format!("INCOMPLETE: probe whole-unit exceeded measured bound {bound} ms; no subsequent unit\n"));
                 return;
             }
         }
         publish(&mut output, format!("{terrain} counts; whole_passages={probe_count}; released_right={released_right}; released_wrong={released_wrong}; held={held}; point_singleton_right={point_right}; majority_right={majority_right}; copy_left_right={left_right}; copy_right_right={right_right}; no_probe_deposition_commit={frozen_commit}\n"));
+        let context_started = Instant::now();
         // Remove each context's common real class shift before centering across contexts. Raw
         // imaginary coordinates retain their declared phase chart. The grain part uses the
         // actual representative, so a subcell raw change cannot masquerade as an amplitude face.
@@ -292,6 +317,7 @@ pub(super) fn learn(
             publish(&mut output, format!("{terrain} probe {index}; pre_existing_relative_context={pre_existing:?}; acquired_relative_context={acquired:?}; acquired_phase_turns={acquired_phase_turns:?}; acquired_real_grain_context={grain_acquired:?}\n"));
         }
         publish(&mut output, format!("{terrain} distinct_source_contexts={}; acquired_context_changes_real_amplitude_face={heard}; all_context_controls_share_one_exact_entered_carry; scope=short_section_physical_acquisition; U6_bank_counts_are_a_different_consumer\n", contexts.len()));
+        publish(&mut output, format!("{terrain} final_context_summary_ns={}; this_cost_is_outside_the_individual_teaching_and_probe_units\n", context_started.elapsed().as_nanos()));
     }
 }
 
