@@ -203,6 +203,35 @@
 //! `t − δ`, `ρ(F^K(I_h)) = T(request)`. A material with no closed contact (every opening) is read
 //! by the span's law above, unchanged.
 //!
+//! [definition; agent-inferred, October 5; lane C of U6, "The task is repair, not continuation", the
+//! [record](../../../../research/records/2026-10-05_THE_PHYSICAL_REPAIR_RUNS_THE_DAMAGED_SECTION_THROUGH_THE_FIELD_AND_HOLDS_WHAT_NO_CERTIFIED_DOMAIN_DECIDES.md)]
+//! **The physical repair** ([`repair_by_field`]). A damaged section is repaired by the field's own
+//! motion, not by a routine that knows the key:
+//!
+//! - **inputs**: the admitted encoded intact runs at their declared stations ([`DamagedSection`]),
+//!   the contemporary material (`&dyn FieldMaterial`) and lift, the word's opening and the declared
+//!   receiving section ([`ReceivingPhases`]). No erased class, reference family or truth enters;
+//! - **the source**: one sparse moment on the declared chart, station `j` at `τ_g + 1 + j`, the
+//!   erasures unplaced ([`SourceMoment::continued`]), never the intact cells ingested alone, which
+//!   would compress the clock over the erasures; imposed once at the opening,
+//!   `E_after − E_before = imposed − absorbed` ([`Word::open_exact_received`]);
+//! - **the motion**: the one continuing word through the declared crossings ([`Word::forward`]);
+//!   station `j` is bound to the receiver's phase `j`, the local crossing `e_0 + j` at the
+//!   refinement's tick `opened_at + e_0 + j`, certified by the carried end's tick
+//!   ([`Word::reception_end`]);
+//! - **the read**: `R · P_R^(τ_R) v_R(e)` at the receiver's grain ([`ReceivingPhases::read`]), the
+//!   decoder `R` being the field's material (guard 18 excludes the tree and the population);
+//! - **the release**: a station is released only where the domain of the word's coupled drive,
+//!   projected through the same executed anchor map and decoder, admits one class; otherwise held
+//!   with that projection as its fibre. No owner certifies that domain yet (#62): a point reading
+//!   ([`StationRead::leaders`]), a local tangent rank or a frozen-drive component domain is not it,
+//!   so every erased station is held, unresolved, with the encoding's classes;
+//! - **the receipts**: the opening's work, every executed tick's field balance, the word's balance
+//!   and its carried end; the word is dropped once read.
+//!
+//! It never reads `compression::keys::repair`'s answers or [`generate_by_bank`]; the reference
+//! repair is the grader's, read after the release.
+//!
 //! | Law | Lean | Rust |
 //! |---|---|---|
 //! | the joint section is not the product of its marginals | `HNN/Prediction.joint_not_marginals` (and `Computation/JointReceiverWitness`) | [`bank_release`] reads every station from one placement |
@@ -214,13 +243,19 @@
 //! | the release's order read as a diagnostic factor (the law is [`LockOrder::Gap`]) | abstracted in `HNN/ExecutedComparison.decisions_release_the_section` | [`LockOrder`], [`bank_release_ordered`] |
 //! | the lock set: every station the readings do not certify below the largest gap | `HNN/ExecutedComparison.{certifiedLock_largest, leader_locks, lone_lock_is_largest, certified_order_needs_crossing, certifiedLock_exact}` | [`uncertified_largest`] |
 //! | the closed pair contacts, the pair storage and the gain on equal material | owed in #62 (lane C's record §8; the joint gain's record §8); the full work form's chart transport `Geometry/Motion.finite_work_form_rechart` | [`closed_pairs`], [`BankPlacement::pair_storage`], [`gain`] |
+//! | the physical repair: the sparse source imposed once, the one word through the declared crossings, the decoder's read, release only over a certified domain | `HNN/ChainedBalance.{power_split, opening_one_baseline}`, `Foundation/ReceiverRelease.{width_eq_zero_iff, ReleaseLaw.sound}`; the coupled drive's domain and the decoder's coverage owed in #62 | [`repair_by_field`], [`DamagedSection`] |
 
 use num_bigint::BigInt;
 use num_traits::{One, Signed, ToPrimitive, Zero};
 
 use crate::hnn::HnnError;
+use crate::hnn::encoding::Encoded;
 use crate::hnn::field::{Current, Field, FieldMaterial};
 use crate::hnn::moment::{PopulationChart, SourceMoment};
+use crate::hnn::receiving::{ReceivingPhases, ReceivingRead};
+use crate::hnn::word::{
+    FieldBalance, ReceptionCarry, SourceOpeningReceipt, Word, WordBalance, WordOpening,
+};
 use crate::hnn::ring::{Growth, ReceivingBank, TurnCovector, TurnReading, turn};
 use crate::holarchy::terrain::Draw;
 use crate::ratio::Rat;
@@ -1485,4 +1520,336 @@ pub fn closed_pairs(
         }
     }
     Ok(closed)
+}
+
+// -------------------------------------------------------------------------------------------
+// the physical repair
+
+/// [definition; agent-inferred, October 5; lane C's physical repair, module header "The physical
+/// repair"] **A damaged section as the field reads it**: the admitted encoded intact runs, each at
+/// its declared station (its first cell's placement on the section's clock), over a declared
+/// section of `length` stations and the encoding's `classes`. An erased station holds nothing: no
+/// class, no clock step and no count. The section holds no erased class, so no truth of an erased
+/// cell can reach the forward consumer ([`repair_by_field`]), and the reference repair's families
+/// stay outside it (the grader's).
+#[derive(Clone, Debug, PartialEq)]
+pub struct DamagedSection {
+    length: usize,
+    classes: usize,
+    runs: Vec<(usize, Encoded)>,
+}
+
+impl DamagedSection {
+    /// **The damage**: an encoded passage with its erased cells dropped, cut into its intact runs
+    /// (`Encoded::part`, each keeping the encoding that produced it). It is the transition that
+    /// drops the erased cells, so their classes leave with it. Refused with an erasure past the
+    /// passage.
+    pub fn damage(encoded: &Encoded, erased: &[usize]) -> Result<Self, HnnError> {
+        let length = encoded.len();
+        if let Some(&t) = erased.iter().find(|&&t| t >= length) {
+            return Err(HnnError::Shape {
+                what: "an erasure within the passage",
+                expected: length,
+                found: t,
+            });
+        }
+        let mut runs = Vec::new();
+        let mut t = 0;
+        while t < length {
+            if erased.contains(&t) {
+                t += 1;
+                continue;
+            }
+            let start = t;
+            while t < length && !erased.contains(&t) {
+                t += 1;
+            }
+            runs.push((start, encoded.part(start..t)?));
+        }
+        Self::of_runs(length, encoded.classes(), runs)
+    }
+
+    /// **Intact runs at declared stations** over a section of `length` stations on `classes`
+    /// classes: refused when a run is empty, overlaps another, lies past the section, or was encoded
+    /// on another class count.
+    pub fn of_runs(
+        length: usize,
+        classes: usize,
+        mut runs: Vec<(usize, Encoded)>,
+    ) -> Result<Self, HnnError> {
+        runs.sort_by_key(|(start, _)| *start);
+        let mut end = 0;
+        for (start, run) in &runs {
+            if run.is_empty() || *start < end || start + run.len() > length {
+                return Err(HnnError::Shape {
+                    what: "intact runs, nonempty and disjoint, within the section",
+                    expected: length,
+                    found: start + run.len(),
+                });
+            }
+            if run.classes() != classes {
+                return Err(HnnError::Shape {
+                    what: "an intact run on the section's classes",
+                    expected: classes,
+                    found: run.classes(),
+                });
+            }
+            end = start + run.len();
+        }
+        Ok(Self {
+            length,
+            classes,
+            runs,
+        })
+    }
+
+    /// The declared stations `L`.
+    pub fn length(&self) -> usize {
+        self.length
+    }
+
+    /// The encoding's classes.
+    pub fn classes(&self) -> usize {
+        self.classes
+    }
+
+    /// The intact runs, each at its first station.
+    pub fn runs(&self) -> &[(usize, Encoded)] {
+        &self.runs
+    }
+
+    /// **The declared chart**: each intact station's class, `None` at each erasure.
+    pub fn placed(&self) -> Vec<Option<usize>> {
+        let mut cells = vec![None; self.length];
+        for (start, run) in &self.runs {
+            for (k, class) in run.classes_read().enumerate() {
+                cells[start + k] = Some(class);
+            }
+        }
+        cells
+    }
+
+    /// The erased stations, in order.
+    pub fn erased(&self) -> Vec<usize> {
+        self.placed()
+            .iter()
+            .enumerate()
+            .filter_map(|(t, cell)| cell.is_none().then_some(t))
+            .collect()
+    }
+}
+
+/// [definition; agent-inferred, October 5] **One station's read at its bound crossing**: the
+/// station `j`, the local crossing that reads it (`e = e_0 + j`, the receiver's phase `j`:
+/// `hnn::receiving`, "The receiver reads the passage by epochs"), the refinement clock's tick there
+/// (`opened_at + e`), and the read `R · P_R^(τ_R) v_R(e)` at the receiver's grain
+/// ([`ReceivingPhases::read`]).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct StationRead {
+    pub station: usize,
+    pub crossing: usize,
+    pub tick: usize,
+    pub read: ReceivingRead,
+}
+
+impl StationRead {
+    /// **The point reading's leading classes at the grain**: the classes whose grain cell
+    /// `(carry, phase class)` is the largest. A reading of one executed state, never a fibre: a
+    /// point reading does not certify the domain of the coupled drive, so no release reads it.
+    pub fn leaders(&self) -> Vec<usize> {
+        let cells = &self.read.cells;
+        let Some(top) = cells.iter().map(|cell| (&cell.carry, cell.phase)).max() else {
+            return Vec::new();
+        };
+        cells
+            .iter()
+            .enumerate()
+            .filter(|(_, cell)| (&cell.carry, cell.phase) == top)
+            .map(|(class, _)| class)
+            .collect()
+    }
+}
+
+/// [definition] **Why an erased station is held.**
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Unresolved {
+    /// No crossing of the declared receiving section reads the station.
+    Unread,
+    /// A crossing reads it, but no owner certifies the domain of the word's coupled drive that the
+    /// decoder would project (#62), so the domain is the whole state space.
+    UncertifiedDomain,
+}
+
+/// [definition] **One station after the physical repair**: intact as admitted, released at width
+/// zero, or held with its fibre and the reason it is unresolved.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum RepairedCell {
+    Intact(usize),
+    Released(usize),
+    Held {
+        fibre: Vec<usize>,
+        unresolved: Unresolved,
+    },
+}
+
+impl RepairedCell {
+    /// The station's class, when it has one.
+    pub fn class(&self) -> Option<usize> {
+        match self {
+            Self::Intact(class) | Self::Released(class) => Some(*class),
+            Self::Held { .. } => None,
+        }
+    }
+}
+
+/// [definition] **The physical repair's return**: each station's cell, each bound station's read,
+/// the source opening's work receipt, every executed full tick's field balance, the word's balance
+/// and the carried end at its last crossing ([`Word::reception_end`]). The word itself, its
+/// per-tick passage and its waves, is dropped inside [`repair_by_field`] once read.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PhysicalRepair {
+    pub cells: Vec<RepairedCell>,
+    pub reads: Vec<StationRead>,
+    pub opening: SourceOpeningReceipt,
+    pub balances: Vec<FieldBalance>,
+    pub word: WordBalance,
+    pub carry: ReceptionCarry,
+}
+
+/// **Repair a damaged section by the field's own motion** (module header, "The physical repair"):
+/// the admitted intact runs placed on the declared chart as one sparse source moment, imposed once
+/// at the word's opening ([`Word::open_exact_received`]), the one continuing word run through the
+/// declared receiver's crossings ([`Word::forward`]), each bound station read through the field's
+/// decoder at its grain ([`ReceivingPhases::read`], material alone), and each erased station
+/// decided by `receiver::release` at tolerance zero over the classes its domain's projection
+/// admits. Refused when a run is not admitted (`Field::admit`), when the opening's work does not
+/// close, or when the executed crossings are not the declared section's clock.
+pub fn repair_by_field(
+    field: &Field,
+    material: &dyn FieldMaterial,
+    current: &Current,
+    section: &DamagedSection,
+    opening: &WordOpening,
+    phases: &ReceivingPhases,
+) -> Result<PhysicalRepair, HnnError> {
+    for (_, run) in &section.runs {
+        field.admit(run)?;
+    }
+    // The declared chart: station j at τ_g + 1 + j on every source ring, the erasures unplaced.
+    let placed = section.placed();
+    let mut source = SourceMoment::open_with(field, current, material)?;
+    for &ring in field.sources() {
+        source = source.continued(field, current, ring, &placed)?;
+    }
+    // One accounted imposition, then the one continuing word through the declared crossings.
+    let (mut word, opening_receipt) =
+        Word::open_exact_received(field, material, current, &source, opening)?;
+    let anchors = word.forward(phases)?;
+    let balances = word.field_balances().to_vec();
+    let carry = word.reception_end()?;
+    let balance = WordBalance::of(&word.released()?);
+    let opened_at = word.opened_at();
+    // The clock certificate: the carried end stands at the last declared crossing's tick and the
+    // word's own hop clock, which counts the crossings scattered, one past it, so crossing e is
+    // the refinement's tick opened_at + e (the placement alone certifies no clock).
+    let last = opened_at + phases.last_epoch();
+    if carry.ticks != last
+        || word.clock().ticks() != num_bigint::BigUint::from(last + 1)
+        || anchors.len() != phases.aperture()
+    {
+        return Err(HnnError::ContinuingState {
+            what: "the executed crossings are not the declared receiving section's clock",
+        });
+    }
+    drop(word);
+    let first = phases.first_epoch();
+    let reads = anchors
+        .iter()
+        .take(section.length)
+        .enumerate()
+        .map(|(station, anchor)| {
+            Ok(StationRead {
+                station,
+                crossing: first + station,
+                tick: opened_at + first + station,
+                read: phases.read(field, material, current, anchor)?,
+            })
+        })
+        .collect::<Result<Vec<_>, HnnError>>()?;
+    let admitted = domain_classes(section);
+    let cells = placed
+        .iter()
+        .enumerate()
+        .map(|(t, cell)| match cell {
+            Some(class) => Ok(RepairedCell::Intact(*class)),
+            None => decide_station(
+                t,
+                &admitted,
+                if t < reads.len() {
+                    Unresolved::UncertifiedDomain
+                } else {
+                    Unresolved::Unread
+                },
+            ),
+        })
+        .collect::<Result<Vec<_>, HnnError>>()?;
+    Ok(PhysicalRepair {
+        cells,
+        reads,
+        opening: opening_receipt,
+        balances,
+        word: balance,
+        carry,
+    })
+}
+
+/// [definition; agent-inferred, October 5] **The classes an erased station's domain projects
+/// to**: a release needs the domain of the word's coupled drive, certified, projected through the
+/// executed anchor map and the decoder. No owner certifies that domain: a component domain under a
+/// frozen drive (`holon::parametron::DomainProposal`) is not the word's state-dependent drive, a
+/// local tangent rank is not a domain, and a point reading is one state. Uncertified, the domain is
+/// the whole state space, whose projection lies within every class of the encoding, so the fibre is
+/// the encoding's classes. (`PeriodicLock::phase_class` is a pump phase index, not a class.)
+fn domain_classes(section: &DamagedSection) -> Vec<usize> {
+    (0..section.classes).collect()
+}
+
+/// **The one decision on an erased station**: its class reading over the domain has width zero
+/// exactly when the domain projects to one class, decided by `receiver::release` at tolerance
+/// zero: released, or held with the projected classes as its fibre.
+fn decide_station(
+    station: usize,
+    admitted: &[usize],
+    unresolved: Unresolved,
+) -> Result<RepairedCell, HnnError> {
+    let rule = DecisionRule::new(
+        "the physical repair's commit at tolerance zero",
+        WithinTolerance::Release,
+        BeyondTolerance::Hold,
+    );
+    let (diameter, attaining, read) = if admitted.len() == 1 {
+        (Rat::zero(), WidthWitness::Point, 1)
+    } else {
+        (
+            Rat::one(),
+            WidthWitness::Pair { left: 0, right: 1 },
+            admitted.len().max(2),
+        )
+    };
+    let width = ReceiverWidth::declared(
+        format!("the physically repaired station {station}"),
+        "the station's class over the projection of its word's domain through the decoder",
+        DiameterNorm::Supremum,
+        diameter,
+        attaining,
+        read,
+    )?;
+    let options = LawfulOptions::assemble(&width, Rat::zero(), None, true)?;
+    Ok(match release(&rule, &options)? {
+        ReleaseReturn::Released { .. } => RepairedCell::Released(admitted[0]),
+        _ => RepairedCell::Held {
+            fibre: admitted.to_vec(),
+            unresolved,
+        },
+    })
 }

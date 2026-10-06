@@ -721,12 +721,16 @@ tests can comb through anything valuable").
     rule.
 18. **A release reads the field, never the receiving storage** (October 5,
     [contamination history](../research/records/2026-10-05_THE_CONTAMINATION_CYCLES_EVERY_COPY_PIPELINE_FOLLOWED_A_DEMAND_FOR_OUTPUT_BEFORE_THE_FIELD_COULD_RELEASE.md)).
-    `FieldMaterial` is the field's own material: rings, contacts, ports, resonators and transport.
-    It is `ConstitutionRead` without the receiving map, the landmark tree and the receiver's
-    population, which are read at compare, and every `ConstitutionRead` is one through a blanket
-    view. `generate_by_bank`, `BankPlacement::of` and the moment's `open_parts` take
-    `&impl FieldMaterial`, so the release cannot read the tree's counts or a seen context. This
-    is structural: a `compile_fail` doctest (E0599) on `FieldMaterial` shows it. A release is a joint refinement of its open stations. No
+    `FieldMaterial` is the field's own material: rings, contacts, ports, resonators, transport
+    and the receiving map `R`, the field's decoder (moved in October 5 for the physical repair,
+    `hnn::prediction::repair_by_field`: `R · P_R^(τ_R) v_R` is a linear face of the ring's own
+    motion and holds no count, address or seen context). It is `ConstitutionRead` without the
+    landmark tree and the receiver's population, which are read at compare, and every
+    `ConstitutionRead` is one through a blanket view. `generate_by_bank`, `BankPlacement::of`, the
+    moment's `open_parts`, `repair_by_field` and `ReceivingPhases::read` take the material alone,
+    so the release cannot read the tree's counts or a seen context. This is structural: two
+    `compile_fail` doctests (E0599) on `FieldMaterial` show it, the tree and the population, and a
+    third doctest shows the decoder's read compiles. A release is a joint refinement of its open stations. No
     class is drawn and fed back as the next source cell: an emitter of one cell at a time over the
     combined face is the recitation form.
 19. **One release per request, shown whole.** There is no search, rerank, retry or selection

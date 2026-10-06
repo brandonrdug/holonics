@@ -1,0 +1,91 @@
+//! SCRATCH probe (not committed): the exact Word's cost on the order field.
+use holonics::compression::landmark::context::{BaseMeasure, StopPrior};
+use holonics::geometry::{RatVec3, screw::ScrewGenerator};
+use holonics::hnn::constitution::CAMPAIGN_ONE_BUDGET;
+use holonics::hnn::field::{ContactDeclaration, CribDeclaration, ReceiverDeclaration};
+use holonics::hnn::receiving::ReceivingPhases;
+use holonics::hnn::{
+    Constitution, Current, Encoded, Field, FieldDeclaration, RingDeclaration, SourceMoment, Word,
+    WordOpening,
+};
+use holonics::holarchy::terrain::{CyclicLaw, KnownTruth};
+use holonics::ratio::{Rat, rat};
+use std::time::Instant;
+
+fn receiver(aperture: usize) -> ReceiverDeclaration {
+    ReceiverDeclaration { ring: 0, aperture, tolerance: rat(1, 16), depth: 1, prior: StopPrior::half(), mass: 1, base: BaseMeasure::Even, receiving_prior: 0 }
+}
+
+fn declare() -> Field {
+    let d: u64 = 60;
+    let axis = ScrewGenerator::new(RatVec3::from_i64(0, 0, 1), RatVec3::zero());
+    let ring = |lock: Vec<u64>| RingDeclaration {
+        period: d, screw: axis.clone(),
+        placements: (0..d).map(|node| FieldDeclaration::quarter_turn(node, d)).collect(),
+        lock, reflector: (0..d).map(|port| ((d - port) % d) as usize).collect(),
+        admittance: Rat::from_integer(2.into()), initial: 0,
+    };
+    let contact = |from: usize, to: usize| ContactDeclaration {
+        from, to, channel: (0..d as usize).map(|node| (node, node)).collect(),
+        admittance: Rat::from_integer(2.into()), exponent: Rat::from_integer(0.into()),
+    };
+    Field::declare(FieldDeclaration {
+        rings: vec![ring((0..d).collect()), ring(Vec::new()), ring(Vec::new())],
+        contacts: vec![contact(0, 1), contact(1, 2)], loops: Vec::new(), sources: vec![0], offsets: Vec::new(),
+        alphabet: 5, step: Rat::from_integer(1.into()), exponent_grain: 1, receivers: vec![receiver(3)],
+        crib: CribDeclaration { window: 16, offset: 1 }, population: 1 << 16, lattice: Default::default(),
+    }.by_lattice_rule()).unwrap()
+}
+
+#[test]
+fn probe() {
+    let field = declare();
+    let theta = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap();
+    let truth = KnownTruth::cyclic(CyclicLaw::OrderTwo { opening: 8 }, 4, 2_026_100_701, 1, 48).unwrap();
+    let encoded = Encoded::identity(&truth, &field).unwrap().remove(0);
+    let erased: Vec<usize> = std::iter::once(3).chain(6..10).chain(20..25).chain(33..37).chain(44..48).collect();
+    let cells: Vec<Option<usize>> = encoded.classes_read().enumerate().map(|(t, c)| (!erased.contains(&t)).then_some(c)).collect();
+    let current = Current::at_rest(&field);
+    let source = SourceMoment::open(&field, &current).continued(&field, &current, 0, &cells).unwrap();
+    let start = Instant::now();
+    let (mut word, receipt) = Word::open_exact_received(&field, &theta, &current, &source, &WordOpening::Rest).unwrap();
+    println!("open {} ms; receipt before {} after {} absorbed {} imposed {}", start.elapsed().as_millis(), receipt.before, receipt.after, receipt.absorbed, receipt.imposed);
+    let ticks: usize = std::env::var("PROBE_TICKS").ok().and_then(|s| s.parse().ok()).unwrap_or(8);
+    for k in 0..ticks {
+        let t = Instant::now();
+        word.tick().unwrap();
+        println!("tick {k}: {} ms, peak bits {}, balance closes {}", t.elapsed().as_millis(), word.peak_bits(), word.field_balances().last().unwrap().closes());
+    }
+    if std::env::var("PROBE_PHASES").is_ok() {
+        let aperture: usize = std::env::var("PROBE_PHASES").unwrap().parse().unwrap();
+        let t = Instant::now();
+        let phases = ReceivingPhases::declare(&field, &theta, &current, &receiver(aperture));
+        println!("phases aperture {aperture}: {:?} in {} ms", phases.as_ref().map(|p| p.rank()), t.elapsed().as_millis());
+    }
+}
+
+
+#[test]
+fn probe_parallel() {
+    use rayon::prelude::*;
+    if std::env::var("PROBE_PARALLEL").is_err() { return; }
+    let field = declare();
+    let theta = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap();
+    let truth = KnownTruth::cyclic(CyclicLaw::OrderTwo { opening: 8 }, 4, 2_026_100_701, 8, 48).unwrap();
+    let erased: Vec<usize> = std::iter::once(3).chain(6..10).chain(20..25).chain(33..37).chain(44..48).collect();
+    let current = Current::at_rest(&field);
+    let all = Instant::now();
+    let times: Vec<u128> = Encoded::identity(&truth, &field).unwrap().par_iter().map(|encoded| {
+        let t = Instant::now();
+        let cells: Vec<Option<usize>> = encoded.classes_read().enumerate().map(|(t, c)| (!erased.contains(&t)).then_some(c)).collect();
+        let source = SourceMoment::open(&field, &current).continued(&field, &current, 0, &cells).unwrap();
+        let (mut word, _) = Word::open_exact_received(&field, &theta, &current, &source, &WordOpening::Rest).unwrap();
+        word.run(47).unwrap();
+        word.last_junction().unwrap();
+        let ms = t.elapsed().as_millis();
+        println!("word {ms} ms");
+        ms
+    }).collect();
+    let status = std::fs::read_to_string("/proc/self/status").unwrap();
+    println!("all {} ms; max {:?}; {}", all.elapsed().as_millis(), times.iter().max(), status.lines().find(|l| l.starts_with("VmHWM")).unwrap());
+}

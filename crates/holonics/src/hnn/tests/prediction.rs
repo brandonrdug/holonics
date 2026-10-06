@@ -1298,3 +1298,241 @@ fn the_release_reads_a_located_map_that_fixes_its_antecedent() {
         assert_eq!(generated.ticks_closed, generated.ticks);
     }
 }
+
+// -------------------------------------------------------------------------------------------
+// the physical repair (lane C, October 5): the damaged section through the field's own motion
+
+mod physical_repair {
+    use super::super::support::{contact, ring};
+    use crate::compression::landmark::context::{BaseMeasure, StopPrior};
+    use crate::hnn::constitution::{CAMPAIGN_ONE_BUDGET, Constitution};
+    use crate::hnn::encoding::Encoded;
+    use crate::hnn::field::{
+        ConstitutionRead, CribDeclaration, Current, Field, FieldDeclaration, ReceiverDeclaration,
+    };
+    use crate::hnn::keys::{PairLocation, station_pairs};
+    use crate::hnn::prediction::{
+        DamagedSection, PhysicalRepair, RepairedCell, Unresolved, repair_by_field,
+    };
+    use crate::hnn::receiving::ReceivingPhases;
+    use crate::hnn::word::WordOpening;
+    use crate::holarchy::terrain::{CyclicLaw, KnownTruth};
+    use crate::ratio::linear::ExactRatMatrix;
+    use crate::ratio::{Rat, integer, rat};
+    use num_traits::Zero;
+
+    /// The section's declared receiver: ring 0 read at `aperture` crossings from its first.
+    fn section(aperture: usize) -> ReceiverDeclaration {
+        ReceiverDeclaration {
+            ring: 0,
+            aperture,
+            tolerance: rat(1, 16),
+            depth: 1,
+            prior: StopPrior::half(),
+            mass: 1,
+            base: BaseMeasure::Even,
+            receiving_prior: 0,
+        }
+    }
+
+    /// The source and receiving ring of period 8 (its lock every port, so it steps once a cell),
+    /// joined at three nodes to a ring of period 3; four classes, no pair offset.
+    fn field() -> Field {
+        Field::declare(
+            FieldDeclaration {
+                rings: vec![ring(8, (0..8).collect()), ring(3, Vec::new())],
+                contacts: vec![contact(0, 1, 3, 0)],
+                loops: Vec::new(),
+                sources: vec![0],
+                offsets: Vec::new(),
+                alphabet: 4,
+                step: integer(1),
+                exponent_grain: 1,
+                receivers: vec![section(1)],
+                crib: CribDeclaration {
+                    window: 16,
+                    offset: 1,
+                },
+                population: 1 << 16,
+                lattice: Default::default(),
+            }
+            .by_lattice_rule(),
+        )
+        .unwrap()
+    }
+
+    /// The order-2 terrain's passages of 8 cells (an opening of 2), through its declared identity.
+    fn passages(field: &Field, seed: u64, count: usize) -> Vec<Encoded> {
+        let truth =
+            KnownTruth::cyclic(CyclicLaw::OrderTwo { opening: 2 }, 4, seed, count, 8).unwrap();
+        Encoded::identity(&truth, field).unwrap()
+    }
+
+    /// The opening and the material with the pair located on seen passages deposited (lanes B/C).
+    fn materials(field: &Field) -> (Constitution, Constitution) {
+        let opening = Constitution::initial(field, CAMPAIGN_ONE_BUDGET).unwrap();
+        let mut location = PairLocation::open(field, 0);
+        for passage in passages(field, 2_026_100_971, 32) {
+            for observation in station_pairs(field, 0, &passage, 2).unwrap() {
+                location.observe(&observation);
+            }
+        }
+        let located = location.survivors().located().expect("the seen pair is located");
+        assert_eq!(located.offset, 2);
+        let prior = opening.source_port(0).unwrap().clone();
+        let (learned, deposit) =
+            crate::hnn::executed::pair_deposit(field, &opening, &prior, 0, &located).unwrap();
+        assert!(deposit.certificate.holds());
+        (opening, learned)
+    }
+
+    fn repaired(
+        field: &Field,
+        theta: &Constitution,
+        section: &DamagedSection,
+        phases: &ReceivingPhases,
+    ) -> PhysicalRepair {
+        repair_by_field(
+            field,
+            theta,
+            &Current::at_rest(field),
+            section,
+            &WordOpening::Rest,
+            phases,
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn the_damaged_section_runs_through_the_field_and_every_erasure_is_held_unresolved() {
+        let field = field();
+        let (opening, learned) = materials(&field);
+        let current = Current::at_rest(&field);
+        let phases = ReceivingPhases::declare(&field, &learned, &current, &section(8)).unwrap();
+        // The receiver's declaration reads no source port: the deposit leaves it unchanged.
+        assert_eq!(
+            phases,
+            ReceivingPhases::declare(&field, &opening, &current, &section(8)).unwrap()
+        );
+        let truth = passages(&field, 2_026_100_972, 1).remove(0);
+        let erased = [2, 5, 7];
+        let damaged = DamagedSection::damage(&truth, &erased).unwrap();
+        assert_eq!(damaged.erased(), erased);
+        let repair = repaired(&field, &learned, &damaged, &phases);
+        // One imposition from rest, its work closed; every executed tick and the word close.
+        assert!(repair.opening.closes());
+        assert_eq!(repair.opening.before, Rat::zero());
+        assert!(repair.opening.imposed > Rat::zero());
+        assert_eq!(repair.balances.len(), 7);
+        assert!(repair.balances.iter().all(|balance| balance.closes()));
+        assert!(repair.word.closes());
+        // The clock: station j is read at crossing j, the refinement's tick j; the carried end
+        // stands at the last.
+        assert_eq!(repair.carry.ticks, 7);
+        assert_eq!(repair.reads.len(), 8);
+        for (j, read) in repair.reads.iter().enumerate() {
+            assert_eq!((read.station, read.crossing, read.tick), (j, j, j));
+        }
+        // The decoder is the opening's zero map: every class leads every read, a reading only.
+        for read in &repair.reads {
+            assert!(read.read.logits.iter().all(Zero::is_zero));
+            assert_eq!(read.leaders(), vec![0, 1, 2, 3]);
+        }
+        let classes: Vec<usize> = truth.classes_read().collect();
+        for (t, cell) in repair.cells.iter().enumerate() {
+            if erased.contains(&t) {
+                assert_eq!(
+                    *cell,
+                    RepairedCell::Held {
+                        fibre: vec![0, 1, 2, 3],
+                        unresolved: Unresolved::UncertifiedDomain,
+                    }
+                );
+            } else {
+                assert_eq!(*cell, RepairedCell::Intact(classes[t]));
+            }
+        }
+    }
+
+    #[test]
+    fn the_section_carries_no_erased_class_so_the_repair_cannot_read_one() {
+        let field = field();
+        let (_, learned) = materials(&field);
+        let current = Current::at_rest(&field);
+        let phases = ReceivingPhases::declare(&field, &learned, &current, &section(8)).unwrap();
+        let erased = [2, 5, 7];
+        // Two passages equal on the intact cells and different at every erasure.
+        let first = [0, 1, 1, 2, 2, 3, 3, 0];
+        let second = [0, 1, 3, 2, 2, 0, 3, 2];
+        let sections: Vec<DamagedSection> = [first, second]
+            .iter()
+            .map(|word| {
+                DamagedSection::damage(&crate::hnn::tests::support::encoded(&field, word), &erased)
+                    .unwrap()
+            })
+            .collect();
+        assert_eq!(sections[0], sections[1]);
+        assert_eq!(
+            repaired(&field, &learned, &sections[0], &phases),
+            repaired(&field, &learned, &sections[1], &phases)
+        );
+        // Runs that overlap or leave the section are refused.
+        let run = crate::hnn::tests::support::encoded(&field, &[0, 1]);
+        assert!(DamagedSection::of_runs(8, 4, vec![(0, run.clone()), (1, run.clone())]).is_err());
+        assert!(DamagedSection::of_runs(8, 4, vec![(7, run)]).is_err());
+    }
+
+    #[test]
+    fn a_point_reading_with_one_leader_releases_nothing() {
+        let field = field();
+        let (_, learned) = materials(&field);
+        let current = Current::at_rest(&field);
+        let phases = ReceivingPhases::declare(&field, &learned, &current, &section(8)).unwrap();
+        // A declared decoder that reads class 0 from the ring's first node and class 1 against it.
+        let width = field.ring(0).width();
+        let mut rows = vec![vec![Rat::zero(); width]; 8];
+        rows[0][0] = integer(1 << 20);
+        rows[2][0] = -integer(1 << 20);
+        let decoder = ExactRatMatrix::shaped(8, width, rows).unwrap();
+        let theta = learned.with_ports(0, None, None, Some(decoder)).unwrap();
+        let truth = passages(&field, 2_026_100_972, 1).remove(0);
+        let damaged = DamagedSection::damage(&truth, &[2, 5, 7]).unwrap();
+        let repair = repaired(&field, &theta, &damaged, &phases);
+        let single = repair
+            .reads
+            .iter()
+            .filter(|read| read.leaders().len() == 1)
+            .count();
+        assert!(single > 0, "the declared decoder leads one class at some station");
+        for t in [2, 5, 7] {
+            assert!(matches!(
+                repair.cells[t],
+                RepairedCell::Held {
+                    unresolved: Unresolved::UncertifiedDomain,
+                    ..
+                }
+            ));
+        }
+        assert!(repair.cells.iter().all(|cell| !matches!(cell, RepairedCell::Released(_))));
+    }
+
+    #[test]
+    fn a_station_no_declared_crossing_reads_is_held_unread() {
+        let field = field();
+        let (_, learned) = materials(&field);
+        let current = Current::at_rest(&field);
+        let phases = ReceivingPhases::declare(&field, &learned, &current, &section(4)).unwrap();
+        let truth = passages(&field, 2_026_100_972, 1).remove(0);
+        let damaged = DamagedSection::damage(&truth, &[2, 5, 7]).unwrap();
+        let repair = repaired(&field, &learned, &damaged, &phases);
+        assert_eq!(repair.reads.len(), 4);
+        assert_eq!(repair.carry.ticks, 3);
+        let unresolved = |t: usize| match &repair.cells[t] {
+            RepairedCell::Held { unresolved, .. } => Some(*unresolved),
+            _ => None,
+        };
+        assert_eq!(unresolved(2), Some(Unresolved::UncertifiedDomain));
+        assert_eq!(unresolved(5), Some(Unresolved::Unread));
+        assert_eq!(unresolved(7), Some(Unresolved::Unread));
+    }
+}

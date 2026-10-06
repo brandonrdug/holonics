@@ -475,3 +475,205 @@ pub(super) fn repair(terrain: &str, damage_name: &str, seed: u64, count: usize, 
     );
     println!("executed repair: {} ms; resident {}", clock.elapsed().as_millis(), resident());
 }
+
+/// [definition; agent-inferred, October 5; the
+/// [physical repair's record](../../records/2026-10-05_THE_PHYSICAL_REPAIR_RUNS_THE_DAMAGED_SECTION_THROUGH_THE_FIELD_AND_HOLDS_WHAT_NO_CERTIFIED_DOMAIN_DECIDES.md)
+/// §0] **`executed physical-repair <A|B> <count> <aperture> <out> <pin> <terrain>=<seed>…`**: the
+/// same terrains and damage as `executed repair`, repaired by the field's own motion
+/// (`hnn::prediction::repair_by_field`). Per terrain, in order:
+/// 1. **Differentiate and deposit** (lanes B and C, unchanged): the pair located over the damaged
+///    passages' intact stations at the read set's end, deposited on the declared opening by the
+///    certified step (`hnn::executed::pair_deposit`).
+/// 2. **The physical repair**: each damaged section (`DamagedSection::damage`) placed as one sparse
+///    source moment, imposed once from rest, run through the declared receiving section (ring 0
+///    read at `aperture` crossings, declared once at the opening: the declaration reads no source
+///    port) and read through the field's decoder; each erased station released only over a
+///    certified domain, held otherwise. The passages run together under the pin's threads.
+/// 3. **The grader, after every release**: the reference repair (`compression::keys::repair`) on the
+///    same damaged passage and located relation, and the truth. A physically released cell must
+///    equal the reference's released class and its truth; a held fibre must contain the reference's
+///    family. Nothing of the reference or the truth reaches step 2.
+pub(super) fn physical(
+    damage_name: &str,
+    count: usize,
+    aperture: usize,
+    out: &str,
+    terrains: &[String],
+) {
+    use holonics::hnn::executed::pair_deposit;
+    use holonics::hnn::prediction::{
+        DamagedSection, PhysicalRepair, RepairedCell, Unresolved, repair_by_field,
+    };
+    use holonics::hnn::receiving::ReceivingPhases;
+    use holonics::hnn::word::WordOpening;
+    use rayon::prelude::*;
+
+    let clock = Instant::now();
+    let declared = order_declared();
+    let field = declare(&declared);
+    let ring = 0;
+    let shape = Declared {
+        request: OPENING,
+        stations: STATIONS,
+        ..declared
+    };
+    let length = OPENING + STATIONS;
+    let erased = damage(damage_name);
+    let opening = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).expect("the declared opening");
+    let prior = opening.source_port(ring).expect("the opening's source port").clone();
+    let current = Current::at_rest(&field);
+    let receiver = ReceiverDeclaration {
+        ring,
+        aperture,
+        ..field.receivers()[0].clone()
+    };
+    let declaring = Instant::now();
+    let phases = ReceivingPhases::declare(&field, &opening, &current, &receiver)
+        .expect("the declared receiving section");
+    println!(
+        "executed physical-repair: damage {damage_name} {erased:?}, {count} passages of {length} cells a terrain; the receiving section: ring {ring}, epochs {:?}, grain {}, rank {} ({:?}), declared in {} ms",
+        phases.epochs(),
+        phases.grain(),
+        phases.rank(),
+        phases.rank_scope(),
+        declaring.elapsed().as_millis()
+    );
+    let mut sections = String::new();
+    for spec in terrains {
+        let (terrain, seed) = spec.split_once('=').expect("<terrain>=<seed>");
+        let seed: u64 = seed.parse().expect("a seed");
+        let started = Instant::now();
+        let encoded = terrain_encoded(terrain, &shape, &field, seed, count);
+        // 1. Differentiate on the damaged passages' intact stations, then deposit.
+        let damaged: Vec<DamagedPassage> = encoded
+            .iter()
+            .map(|truth| DamagedPassage::encoded(truth, &erased, OPENING).expect("a passage"))
+            .collect();
+        let mut location = PairLocation::open(&field, ring);
+        for passage in &damaged {
+            for (_, readings) in damaged_station_pairs(&field, ring, passage).expect("the damaged menu") {
+                location.observe(&readings);
+            }
+        }
+        let Some(located) = location.survivors().located() else {
+            println!("  {terrain} (seed {seed}): no pair located at the read set's end; nothing deposited, nothing repaired");
+            continue;
+        };
+        let (theta, deposit) =
+            pair_deposit(&field, &opening, &prior, ring, &located).expect("the located pair's deposit");
+        println!(
+            "  {terrain} (seed {seed}): located δ {} map {:?}; deposited, slip {} → {}, certificate {}",
+            located.offset,
+            located.map,
+            deposit.slip_before,
+            deposit.slip_after,
+            deposit.certificate.holds()
+        );
+        // 2. The physical repair: the damaged sections only.
+        let repairs: Vec<(PhysicalRepair, u128)> = encoded
+            .par_iter()
+            .enumerate()
+            .map(|(index, truth)| {
+                let unit = Instant::now();
+                let section = DamagedSection::damage(truth, &erased).expect("the damage");
+                let repair = repair_by_field(&field, &theta, &current, &section, &WordOpening::Rest, &phases)
+                    .expect("the physical repair");
+                let ms = unit.elapsed().as_millis();
+                println!(
+                    "    {terrain} passage {index}: {ms} ms, opening closes {}, ticks closing {} of {}, word closes {}, carry at {}",
+                    repair.opening.closes(),
+                    repair.balances.iter().filter(|b| b.closes()).count(),
+                    repair.balances.len(),
+                    repair.word.closes(),
+                    repair.carry.ticks
+                );
+                (repair, ms)
+            })
+            .collect();
+        // 3. The grader: the reference repair and the truth, read only now.
+        let relation = located
+            .relation(&field, ring, CLASSES)
+            .expect("the located pair as a relation on the classes");
+        let truths: Vec<Vec<usize>> = encoded.iter().map(|e| e.classes_read().collect()).collect();
+        let (mut released, mut unread, mut uncertified) = (0usize, 0usize, 0usize);
+        let (mut agree, mut beside_reference, mut wrong, mut contains, mut held_cells) =
+            (0usize, 0usize, 0usize, 0usize, 0usize);
+        let (mut opening_closes, mut ticks_closing, mut ticks, mut words_close) = (0usize, 0usize, 0usize, 0usize);
+        let mut zero_faces = 0usize;
+        let mut leaders: BTreeMap<usize, usize> = BTreeMap::new();
+        let mut carries: BTreeMap<usize, usize> = BTreeMap::new();
+        let mut unit_max = 0u128;
+        for (index, ((repair, ms), truth)) in repairs.iter().zip(&truths).enumerate() {
+            unit_max = unit_max.max(*ms);
+            let reference = restrict(&damaged[index], &relation)
+                .and_then(|restriction| {
+                    let families = restriction.families().to_vec();
+                    restriction.release().map(|release| (families, release))
+                })
+                .expect("the reference repair");
+            let (families, reference_release) = reference;
+            opening_closes += usize::from(repair.opening.closes());
+            ticks_closing += repair.balances.iter().filter(|b| b.closes()).count();
+            ticks += repair.balances.len();
+            words_close += usize::from(repair.word.closes());
+            *carries.entry(repair.carry.ticks).or_default() += 1;
+            for read in &repair.reads {
+                zero_faces += usize::from(read.read.logits.iter().all(|x| x.is_zero()));
+                *leaders.entry(read.leaders().len()).or_default() += 1;
+            }
+            for &t in &erased {
+                match &repair.cells[t] {
+                    RepairedCell::Released(class) => {
+                        released += 1;
+                        match &reference_release[t] {
+                            CellRelease::Released(r) if r == class => agree += 1,
+                            CellRelease::Released(_) => {}
+                            _ => beside_reference += 1,
+                        }
+                        wrong += usize::from(*class != truth[t]);
+                    }
+                    RepairedCell::Held { fibre, unresolved } => {
+                        held_cells += 1;
+                        match unresolved {
+                            Unresolved::Unread => unread += 1,
+                            Unresolved::UncertifiedDomain => uncertified += 1,
+                        }
+                        contains += usize::from(families[t].iter().all(|c| fibre.contains(c)));
+                    }
+                    RepairedCell::Intact(_) => panic!("an erased station is not intact"),
+                }
+            }
+            let physical: String = repair
+                .cells
+                .iter()
+                .map(|cell| cell.class().map_or_else(|| "?".to_string(), |c| c.to_string()))
+                .collect();
+            sections.push_str(&format!(
+                "{terrain} passage {index}\n  damaged   {}\n  physical  {physical}\n  reference {}\n  truth     {}\n  opening: before {} after {} absorbed {} imposed {}; word: open {} end {} dissipation {} residual {}; carry at {}\n",
+                show(damaged[index].cells()),
+                shown_release(&reference_release),
+                truth.iter().map(usize::to_string).collect::<String>(),
+                repair.opening.before,
+                repair.opening.after,
+                repair.opening.absorbed,
+                repair.opening.imposed,
+                repair.word.open,
+                repair.word.end,
+                repair.word.dissipation,
+                repair.word.residual(),
+                repair.carry.ticks
+            ));
+        }
+        let erased_total = erased.len() * count;
+        println!(
+            "  {terrain}: released {released} of {erased_total} erased (equal to the reference's release {agree}, released where the reference holds {beside_reference}, unequal to the truth {wrong}); held {held_cells} (uncertified domain {uncertified}, unread {unread}), held fibres containing the reference's family {contains} of {held_cells}"
+        );
+        println!(
+            "  {terrain}: openings closing {opening_closes} of {count}; executed ticks closing {ticks_closing} of {ticks}; words closing {words_close} of {count}; carried ends by tick {carries:?}; reads with every logit zero {zero_faces}; reads by leading classes {leaders:?}; unit at most {unit_max} ms; {} ms",
+            started.elapsed().as_millis()
+        );
+    }
+    #[allow(clippy::disallowed_methods)]
+    std::fs::write(format!("{out}.sections"), &sections).expect("write the sections");
+    println!("executed physical-repair: {} ms; resident {}", clock.elapsed().as_millis(), resident());
+}

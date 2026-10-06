@@ -1,0 +1,22 @@
+1287 | impl ReceivingPhases {
+1590 |     pub(crate) fn with_rank(self, rank: usize) -> Self {
+
+    Finished `release` profile [optimized] target(s) in 14.29s
+     Running tests/zz_probe_physical_repair.rs (target/release/deps/zz_probe_physical_repair-1db307eec27d1fb8)
+
+running 1 test
+test probe_parallel has been running for over 60 seconds
+word 101179 ms
+word 101500 ms
+word 101523 ms
+word 101563 ms
+word 101746 ms
+word 101816 ms
+word 101905 ms
+word 101980 ms
+all 101987 ms; max Some(101980); VmHWM:	 1403088 kB
+test probe_parallel ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 102.02s
+
+exit 0

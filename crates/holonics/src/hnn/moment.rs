@@ -34,7 +34,7 @@
 //! locked data are counted into the request's phase counts at their residues: one span, one tube.
 //! Each crossing's datum is carried to the reading frame by the source navigator's transport, a
 //! rotation–dilation of modulus `ρ_g ∈ (0, 1]` a tick (the constitution's
-//! [`ConstitutionRead::transport`], one at the founding), and the span is read over its
+//! [`ConstitutionRead::transport`](crate::hnn::field::ConstitutionRead::transport), one at the founding), and the span is read over its
 //! transported mass: a datum `a` ticks old at the span's end weighs `ρ^a / Σ_k ρ^(a_k)`, the same in
 //! every frame, whichever side of the request's last tick it lies on. At `ρ = 1` (a closing rotor
 //! ring, nothing lost) every datum weighs `ν̂(n + v)`, the one population. Below one the span's
@@ -171,7 +171,7 @@ use num_traits::{One, Signed, ToPrimitive, Zero};
 
 use crate::hnn::HnnError;
 use crate::hnn::encoding::Encoded;
-use crate::hnn::field::{ConstitutionRead, Current, Field, FieldMaterial};
+use crate::hnn::field::{Current, Field, FieldMaterial};
 use crate::ratio::Rat;
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::vector::integral;
@@ -771,7 +771,7 @@ impl SourceMoment {
     pub fn open_with(
         field: &Field,
         current: &Current,
-        constitution: &impl ConstitutionRead,
+        constitution: &(impl FieldMaterial + ?Sized),
     ) -> Result<Self, HnnError> {
         let mut moment = Self::open(field, current);
         let chart = PopulationChart::of(field).exponent();
