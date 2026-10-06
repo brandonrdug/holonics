@@ -73,6 +73,12 @@ A released cell anywhere is a certificate failure (no certified domain exists to
 reported as the blocker. A balance that does not close, or a carried end off tick 47, falsifies the
 physics claim.
 
+**Amendment, after the development read and before the read** [agent-inferred; receipts
+`development/`]. The development read (seed `2_026_100_701`, 8 passages a terrain, aperture 12)
+met every count of the claim's form at its aperture, and changed nothing in the path or the claim.
+Its stations past 11 are unread (13 of the 18 erasures), which the read's aperture 48 removes. The
+read's pin (`research/runs/physical-repair/read.pin`) is projected from it (§4).
+
 **What the read does not claim.** No repair fidelity: the physical path releases nothing until a
 domain is certified and the decoder covers it. The read's value is the executed motion of every
 damaged section through every station, its work, balances and carry, and the honest count.
@@ -186,3 +192,34 @@ class at some station, and every erased station is still held.
   grader), dispatched from `hnn_prediction.rs` under its pin.
 - Guard 18's text (THE_MACHINE), the operator contract's HNN row (ELEMENTARY_OBJECTS) and the atlas
   row `hnn.physical-repair`.
+
+## 4. Development, and the read's pin
+
+[measured; development seed and synthetic probes only] Before any read:
+- **One 48-crossing word, alone** (`development/probe_48_ticks.txt`, the order-2 development
+  passage under damage A on the opening's material): the opening `764` ms (`before = 0`,
+  `absorbed = 0`, `after = imposed = 6083952736125/2⁴³`), then ticks growing by about `21`
+  to `66` ms each, `36,095` ms over the 48 ticks; every tick's field balance closes; the exact
+  carriers grow by about `413` bits a tick (peak `19,438` bits at tick 47).
+- **Eight 48-crossing words together** at 8 threads (`development/probe_8_words_in_parallel.txt`):
+  `101,987` ms wall, each word `101,179` to `101,980` ms; peak resident `1,403,088` kB.
+- **The receiving section's declaration**: at aperture 4, `5,904` ms and rank `120`, the source
+  ring's full width (against `120 · 74 = 8,880` ms for the passage word's first four ticks).
+- **The development read** (`development/dev_log.txt`, `development/dev.sections`; seed
+  `2_026_100_701` on each terrain, 8 passages, aperture 12, 8 threads, under
+  `research/runs/physical-repair/dev.pin` at `407cfafe`): the declaration `133,565` ms, rank
+  `120`; each terrain's pair located and deposited (order-2 `(2, y ↦ y + 1)`, the line `(4, id)`,
+  the alternation `(2, id)`; slip `120 = 2³·3·5` to `0`, certificate held); released `0` of `144`
+  erased a terrain, held `144` (`40` with an uncertified domain, `104` unread past station 11), every
+  held fibre containing the reference's family; openings `8` of `8`, executed ticks `88` of `88`,
+  words `8` of `8` closing; every carried end at tick `11`; all `96` reads a terrain with every
+  logit zero and all five classes leading; units at most `5,213` ms together; `149,118` ms wall
+  against the projection `160,000` (ratio `149118/160000`), peak resident `672,116,736` bytes.
+
+**The read's pin** (`research/runs/physical-repair/read.pin`). The declaration at aperture 48:
+120 unit words, each at most the 48-tick passage word with its opening (`36,859` ms; the unit words
+measured below the passage word at both apertures read), at most `4,423,080` ms. The words: 192 at
+8 threads in 24 rounds, each at most `101,987` ms, at most `2,447,688` ms. The location, deposit
+and grader at most `10,000` ms. In all at most `6,880,768` ms; the deadline `6,881,000` ms under an
+outer `timeout 6881`; the per-unit bound `101,987` ms, past which the run stops early. Peak
+resident at most `3,000,000,000` bytes.

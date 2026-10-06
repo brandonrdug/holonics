@@ -16,7 +16,7 @@ case "${1:-}" in
     ;;
   read)
     # The read, once: the repair record's seeds, 64 passages a terrain, aperture 48.
-    timeout 6931 "$bin" executed physical-repair A 64 48 "$here/read" \
+    timeout 6881 "$bin" executed physical-repair A 64 48 "$here/read" \
       research/runs/physical-repair/read.pin \
       order2=2026100711 line=2026100712 alternation=2026100713 \
       | tee "$here/read_log.txt"
