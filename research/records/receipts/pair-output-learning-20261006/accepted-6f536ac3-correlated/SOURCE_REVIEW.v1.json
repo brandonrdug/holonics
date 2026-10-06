@@ -1,0 +1,30 @@
+{
+  "source_commit": "6f536ac3c9df6a5b9864ea6f9c11b0af7f201b01",
+  "source_unchanged_since_native": true,
+  "controls_first": [
+    "13Word fixed complete families",
+    "19Word shifted holes/offsets/carry/grain ties"
+  ],
+  "verified_claims": [
+    "All archived artifacts rehashed; git and immutable snapshot source joined to every build/runtime input seal",
+    "All11 local targets fresh:false, exact host executable rehashed",
+    "All28 selector names/counts verified from whole unfiltered outputs once in18groups",
+    "Queue namespace group explicitly skips two first selectors; no repeated credit",
+    "Fixed-plus-shared-label columns equal independent completed native Words at each complex coordinate/crossing; exact grain leader union",
+    "Both fixed fibres [2], Released(2); complete-source/read inequalities and scoped equalR rows remain distinct"
+  ],
+  "scope": [
+    "one hole",
+    "unit source transport",
+    "admitted exact linear Word without chart/lattice/saturation",
+    "matched chart, source/receiver clocks, actual carried interior and pump tick",
+    "fallback controls retain leaky/multiple-hole/quartic refusal/enclosure"
+  ],
+  "limitations": [
+    "No missing-truth fidelity, untouched-request accuracy or useful communication claim",
+    "No scientific training campaign",
+    "Broad workspace/guard/doctest and idle-card GPU gates separately unclaimed",
+    "Full source-to-Word-to-grain formal induction and leader-union lift owed #62",
+    "Physical balances and model consistency do not establish contextual action sufficiency"
+  ]
+}

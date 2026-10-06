@@ -2,7 +2,7 @@
 
 October 6, 2026. Refs #73, #63, #62, #148.
 
-[native-checked diagnostic on `2700572c`; new certificate source-only] The
+[native-checked diagnostic on `2700572c`; correlated certificate accepted on `6f536ac3`] The
 [whole completion output](receipts/pair-output-learning-20261006/accepted-2700572c-completions/WHOLE_NATIVE_OUTPUT.v1.txt)
 reads all four compatible complete sources in each of the unchanged left/right families from the
 [learned pair consumer](2026-10-06_THE_REACHED_PAIR_OUTPUTS_LEARN_FROM_THE_SAME_BLIND_PHYSICAL_WORD.md).
@@ -99,7 +99,7 @@ the one Word advances and dropped at return; they are not retention or a replay 
 
 ## Fixed acceptance and remaining scope
 
-[prepared; native pending] The existing thirteen-Word completion selector now also requires that
+[native-checked on `6f536ac3`] The existing thirteen-Word completion selector also requires that
 every published fixed-plus-label read equals each independent complete native Word at every
 declared crossing, that the exact leader union equals the certificate, and that the previously
 accepted two fixture families certify model leader 2. This class is a fixed regression outcome
@@ -122,12 +122,31 @@ outputs or caps stay failures. Required workspace/guard and idle-card gates rema
 until executed, and no unchanged Lean recompilation is requested. Static syntax and whitespace
 reads do not provide type, runtime or GPU acceptance.
 
+The [exact acceptance join](receipts/pair-output-learning-20261006/accepted-6f536ac3-correlated/ACCEPTANCE_JOIN.v1.json)
+independently rehashes all 1829 archived artifacts, all 286 git and immutable snapshot inputs,
+the build and eighteen runtime input seals, and the fresh host executable. All eleven local
+host/CUDA/example targets report `fresh:false`. Twenty-eight unique controls passed once in
+eighteen groups, with the thirteen-Word and nineteen-Word controls first. Each complete native
+Word matches its shared fixed-plus-response image at every complex coordinate and crossing.
+Both fixed families now have fibre `[2]` and `Released(2)`; shifted source clocks, offset pairs,
+retained carry, ties and fallback routes pass their declared controls. The broad namespace group
+explicitly skips the two first controls, preserving its declared eleven and avoiding repeat credit.
+The [whole native output](receipts/pair-output-learning-20261006/accepted-6f536ac3-correlated/WHOLE_NATIVE_OUTPUT.v1.txt)
+is preserved without filtering; the [factored measurements](receipts/pair-output-learning-20261006/accepted-6f536ac3-correlated/FACTORED_MEASUREMENTS.v1.json)
+keep every fixed deadline, measured wall/aggregate CPU/group memory and measured-to-projected
+ratio. Every cap and quiescent release passed. This is focused native acceptance, with broad
+workspace/guard/doctest and idle-card GPU gates independently unclaimed. No scientific job ran.
+
 The Lean components already own the bilinear section, linear native transitions and receiver
 release. The complete single-hole source-to-Word-to-GrainCell induction and exact leader-union
 lift are explicit outstanding obligations in #62. This source change does not claim that formal
 consumer theorem or its multi-hole/nonlinear extension is complete.
 
 Finally, a constant model reading over a completion family does not identify the missing truth.
+Its observable is receiver-relative model constancy, with the declared chart, clock, grain and
+tolerance zero. Physical balances separately account for the passage. Useful communication must
+also name the contextual relation, admitted actions and future receiving consequence; an answer
+key or a count of matching labels does not supply those relations.
 The [equal blind-input witness](receipts/pair-output-learning-20261006/accepted-4432a4b9/BLIND_TRUTH_EQUIVALENCE.v1.json)
 admits different removed labels at identical intact source/chart/current/material/carry. A real
 terrain relation, learned from declared comparisons and tested on an untouched request partition,
