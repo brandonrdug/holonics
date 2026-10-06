@@ -53,9 +53,11 @@ Navigator,Restriction,Law,Conformance}`); the Rust core `holonics` mirrors it fa
 later owner implements or charts it.
 
 <a id="operator-contract"></a>
-[definition] **Operator contract** (September 24, [the rebuild](plans/THE_REBUILD.md)).
+[definition] **Operator contract** (source/consumer status reconciled October 6;
+[the rebuild](plans/THE_REBUILD.md)).
 Each object's operations and their owners are listed below. The *current* column is the
-checked code today. The *target* column is its home in the main `holonics` library and the
+source owner; a receipt establishes only its declared consuming checks. The *target* column is
+its home in the main `holonics` library and the
 Lean `Holonics` library in the rebuild. A target name is not importable until its owner is
 built. Each rebuild step updates this table in the same commit.
 
@@ -80,6 +82,28 @@ built. Each rebuild step updates this table in the same commit.
 
 The restructure's detailed contracts are in history at
 [`13f8c734`](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/plans/THE_REPOSITORY_RESTRUCTURE.md).
+
+[established-bounded; source-checked] **Current HNN consumers and their remaining joins.**
+These qualify the table's HNN, receiver, navigator, parametron and compression rows; they add no
+new owner or general theorem. The checked source is
+[`3c67beee`](https://github.com/brandonrdug/holonics/commit/3c67beee7f656798f912c974f12c482ea12c5e42).
+
+| Operation and existing owner | Consuming relation and evidence | Remaining acceptance |
+|---|---|---|
+| Source admission and transport: `hnn::encoding::Encoded`, `Field::selective_step`, `SourceMoment::ingest`; CUDA `hnn::moment` and `hnn::port` | The producing chart carries classes, decoder `D`, labels, fibre and conduct. The located step reads `a_g(c)` plus carry and checks its chart squares at the consumer; identity input reads its declared lock fits. [Encoding and device-ingest receipt](../research/records/2026-10-05_THE_FIELDS_ENTRIES_TAKE_ONLY_THE_ENCODED_SOURCE.md), atlas `hnn.encoded-source-type`, `hnn.card-located-source-ingest`. | Equal class counts do not identify producing charts or clocks. Erased cells do not determine their located advances. Repair must consume the supported chart and source-time relation, or return the typed obstruction before opening the word. |
+| Received source and physical word: `hnn::word::SourceOpeningReceipt`, `WordOpening::Received`, reception carry and paired pullback | [Source-entrance tests](../crates/holonics/tests/source_entrance.rs) exercise actual source material, offsets and continuing physical words. The [carry receipt](../research/records/2026-10-03_THE_RECEPTION_CARRIES_THE_INTERIOR_CHANGE_THE_SOURCE_PORT_IMPOSES_THE_MOMENT_AND_REST_IS_COMPLETE_ABSORPTION.md) states the chained balance and its boundaries. | Useful learned physical repair must join the source entrance to the reached comparison, learned receiving material and decoded boundary. A closed component balance or next-cell score is narrower evidence. |
+| Retain and cold-mount: host `Resident::continuing_state`, `Reference::mount_continued`, `reference::passage` | Retain the contemporary constitution, carry, lift, optional moment, aeon, balance, kept charts, address-reader kinds, declaring phases, handles and arrived comparison. [Cold-restore tests](../crates/holonics/tests/resident_cold_restore.rs) and [PR #384](https://github.com/brandonrdug/holonics/pull/384) check the subsequent host receipt/state relation without borrowing live predecessors; atlas `hnn.resident-passage`. | Carry alone omits charts the word reads. Card passage restore, shared-clock rekey/capacity and the general action-sufficient adaptive quotient keep their own consumers and obligations in #73, #76 and #62. |
+| Nonlinear pump/lock: `holon::parametron::{PeriodicDomain,PeriodicLock,MountedParametron}`, `ResonatorOperands::mount_periodic` | The existing [executed-domain and carried-cycle receipt](../research/records/2026-10-05_THE_LOADED_COMPONENT_CARRIES_ITS_ADMITTED_PUMP_CYCLE.md) is the component's claim. | The ordinary rounded word, whole nonlinear interconnection and generic asymmetric/adaptive material are separate consuming joins. |
+| Release and decoding: `hnn::prediction`, physical receiving material, producing `Encoded::decoder`, `receiver::release` | `D E = ρ` is the producing reconstruction square (or its retained defect); the learned receiving map needs its own joined comparison and reconstruction relation. A reading keeps its receiver's grain, carry, phase class and remainder. [Foundation supplement](plans/HNN_ATHENA_FOUNDATION.md). | No meaningful autonomous physical-repair output or Athena product acceptance is inferred here. #148 requires the actual output, compatible fibre/keys, health, atomic transition and cold continuation. |
+
+Implementation, builds, tests, Lean integration and source integration are Codex's responsibility;
+Claude contributes architecture, derivation and review. #73 routes the host coordinator and physical
+repair consumer; #76 routes the CUDA consumer and common build queue; #62 retains formal scope;
+#63 and [THE_REBUILD](plans/THE_REBUILD.md) own program order. The
+[comma/ghost record](../research/records/2026-10-05_THE_GHOST_LIVES_IN_THE_GAP_THE_JOINTS_OF_THE_LENS.md)
+joins ratio nonclosure, turn/boost normality and six owed statements. Recursive coarse-graining and
+the RH source-law join remain target work alongside Hodge and complex Euler/Navier–Stokes;
+they are not a proved RH consequence of the component receipts.
 
 [definition] **Use of a Holon's material across an event boundary.** These are admissibility
 conditions on a Holon's existing ports, element relations and admitted futures, not a separate
