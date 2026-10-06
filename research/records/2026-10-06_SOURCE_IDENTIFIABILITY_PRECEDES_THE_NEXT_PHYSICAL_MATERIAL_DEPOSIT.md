@@ -5,7 +5,8 @@ October 6, 2026. Refs #73, #148, #63, #62.
 [established-bounded; source-inspected] This record fixes the next claim before a training run. Its baseline is
 `36a660cd8914a6f55bb049e85d53a9116371e068`, the immutable combined native/formal snapshot.
 The thirteen physical controls accepted on the separately pinned physical source remain unit
-controls. The combined fourteen-control gate and corrected Lean leaf are pending. This follow-up
+controls. The combined fourteen-control gate and four selected Lean declarations were subsequently
+accepted on that exact snapshot plus the isolated notebook match patch. This follow-up
 does not change their input snapshot, start a compiler or produce a training curriculum.
 
 The computational object is the helical pair interaction. This record touches the **helix**
@@ -76,8 +77,12 @@ in `crates/holonics/tests/source_entrance.rs` supplies two unlike intact classes
 and one period. Its field is the supported period-eight source joined to a period-three ring by
 one actual three-node pair contact. It checks complete moment equality, actual opening equality,
 and the same nonlinear native motion and returned carry over three ticks with closed physical balances. It supplies no target,
-expected repaired class, training update or authored decoder. **Type and native acceptance are
-pending**; the source equality above follows directly from the owner's counting law.
+expected repaired class, training update or authored decoder. **Type and native acceptance passed**
+as one exact singleton in the seventeen-control gate at `894c5d9889fe4a38da68945665f0460980ff6814`;
+its source is unchanged at `18968dc9`. The
+[acceptance join](receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/ACCEPTANCE_JOIN.v1.json)
+keeps its unfiltered output, source/binary pins and bounded resource receipts. The source equality
+also follows directly from the owner's counting law.
 
 ## The existing material-learning consumer and its limits
 
@@ -131,12 +136,13 @@ both the declared rank and `RankScope`, validates their shape and reads no conte
 Removing the unused setter therefore does not replace the restore contract. Historical receipt
 bytes are preserved.
 
-The removal and new counterexample live on the isolated next-source branch
-`codex/native-material-learning`; the frozen fourteen-control snapshot is unchanged. They require
-one coherent next validation after source seal, cache preflight and fixed projection, through the
-single admission queue. No separate compile ladder is requested. Prediction/test ownership for
-an E consumer remains with the physical lane until an explicit disjoint handoff arrives. No
-training is justified by the current unrestricted-erasure or same-phase-placement fibres.
+The removal and new counterexample live on the isolated successor branch
+`codex/native-material-learning`; the frozen fourteen-control snapshot is unchanged. Their
+coherent seventeen-control gate passed through the single admission queue. The explicit physical
+handoff was consumed by the [actual E-only observer](2026-10-06_THE_ACTUAL_SOURCE_RETURN_CHANGES_E_AT_THE_NEXT_CONTEMPORARY_OPENING.md),
+whose final executable guard has a separate two-control fresh-source acceptance. No training is
+justified by the current unrestricted-erasure or same-phase-placement fibres. Rounded leaky
+age distinguishes the tested intact swap, but it does not establish general source injectivity.
 
 Sources: `hnn/prediction.rs::{DamagedSection,physical_forward,PhysicalPrediction::observe}`;
 `hnn/encoding.rs::Encoded::part`; `hnn/moment.rs::{SourceMoment::continued,open_storage,encoder_covector}`;

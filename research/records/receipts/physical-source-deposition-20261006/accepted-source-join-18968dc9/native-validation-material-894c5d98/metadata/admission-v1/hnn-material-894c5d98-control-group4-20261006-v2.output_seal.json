@@ -1,0 +1,86 @@
+{
+  "exit": 0,
+  "wall_ns": 9477434,
+  "CPU_count": 1,
+  "CPU_affinity": [
+    0
+  ],
+  "CPU_user_us": 5603,
+  "CPU_system_us": 1865,
+  "CPU_reading_grain_ns": 1000,
+  "timing_source": "monotonic_ns wall; glibc wait4 integer timeval CPU",
+  "peak_child_RSS_KiB": 14720,
+  "cap_ns": 16000000000,
+  "projection_ns": 16000000000,
+  "projection_kill_triggered": false,
+  "system_floor_breached": false,
+  "system_floor_sampling_period_ns": 10000000,
+  "group_memory_max_bytes": 4294967296,
+  "group_memory_peak_bytes": 36761600,
+  "group_memory_current_bytes": 35782656,
+  "memory_events_after": {
+    "low": 0,
+    "high": 0,
+    "max": 0,
+    "oom": 0,
+    "oom_kill": 0,
+    "oom_group_kill": 0,
+    "sock_throttled": 0
+  },
+  "memory_events_delta": {
+    "low": 0,
+    "high": 0,
+    "max": 0,
+    "oom": 0,
+    "oom_kill": 0,
+    "oom_group_kill": 0,
+    "sock_throttled": 0
+  },
+  "stdout": {
+    "sha256": "123f5ea60832ed0e3fc310901b36ab081bf15a4db0b0c146dd28f795f93f2400",
+    "bytes": 213
+  },
+  "stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "outputs": {},
+  "all_outputs_present": true,
+  "inputs_unchanged": true,
+  "within_projection": true,
+  "sealed_before_audit": true,
+  "aggregate_cpu_limit_us": 17000000,
+  "aggregate_cpu_used_us": 102812,
+  "aggregate_cpu_guard_triggered": false,
+  "aggregate_cpu_samples": [
+    {
+      "since_start_ns": 2211951,
+      "usage_usec": 78547
+    },
+    {
+      "since_start_ns": 3957509,
+      "usage_usec": 80534
+    },
+    {
+      "since_start_ns": 5060013,
+      "usage_usec": 81639
+    },
+    {
+      "since_start_ns": 6151467,
+      "usage_usec": 82721
+    },
+    {
+      "since_start_ns": 7255534,
+      "usage_usec": 83817
+    },
+    {
+      "since_start_ns": 8358799,
+      "usage_usec": 84915
+    }
+  ],
+  "aggregate_cpu_scope": "whole dedicated cgroup, including controller and already-reaped descendants",
+  "CPU_kernel_hard_total_limit": false,
+  "aggregate_cpu_stop_margin_us": 1000000,
+  "aggregate_cpu_stop_us": 16000000,
+  "acceptance_provisional_until_external_final_CPU_read": true
+}

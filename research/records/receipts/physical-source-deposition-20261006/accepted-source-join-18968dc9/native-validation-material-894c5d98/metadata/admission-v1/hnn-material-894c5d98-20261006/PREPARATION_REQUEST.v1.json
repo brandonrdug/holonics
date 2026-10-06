@@ -1,0 +1,20 @@
+{
+  "output_root": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-894c5d98-20261006",
+  "cache_origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-combined-domain-36a660cd-20261006/cache-v2",
+  "cache_paths": [
+    "debug/deps",
+    "debug/build",
+    "debug/.fingerprint",
+    ".rustc_info.json"
+  ],
+  "source_manifest_pin": {
+    "bytes": 47688,
+    "sha256": "d3996a559abb7c49f17919ff9b16d75cd8b64d7223602494d0d76f4b1d9d09ac"
+  },
+  "owner_request": "/home/b/Workspaces/holonics/.local/wt/material-learning/.local/material-learning-followup-01a1030c-20261006/COHERENT_FOLLOWUP_CANDIDATE.v3.json",
+  "owner_request_pin": {
+    "bytes": 15444,
+    "sha256": "3b8a7d8fc115ad5eb1b681ad314486b0c51cf4910489c94c72929f6f913ea1e3"
+  },
+  "preserved_failure": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-combined-domain-source-cache-preparation-20261006-v2.final.json"
+}

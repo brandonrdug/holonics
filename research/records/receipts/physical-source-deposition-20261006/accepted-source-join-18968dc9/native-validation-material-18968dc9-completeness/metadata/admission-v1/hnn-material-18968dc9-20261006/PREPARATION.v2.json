@@ -1,0 +1,12 @@
+{
+  "wall_ns": 7129910315,
+  "peak_RSS_KiB": 31088,
+  "source_manifest": {
+    "sha256": "7d69be48f5848687c4b6ef9d8933be20a15e767555594a9e62f1e583be0d2d15",
+    "bytes": 47701
+  },
+  "current_source_verified": true,
+  "cache_count": 2844,
+  "compiler_launched": false,
+  "preserved_full_preparation_failure": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-combined-domain-source-cache-preparation-20261006-v2.final.json"
+}

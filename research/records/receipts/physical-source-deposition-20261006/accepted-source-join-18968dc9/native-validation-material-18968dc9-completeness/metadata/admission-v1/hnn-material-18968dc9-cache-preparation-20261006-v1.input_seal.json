@@ -1,0 +1,79 @@
+{
+  "argv": [
+    "/usr/bin/python3.14",
+    "-B",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/prepare_combined_test_cache_v2.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-18968dc9-20261006/PREPARATION_REQUEST.v1.json"
+  ],
+  "cwd": "/home/b/Workspaces/holonics",
+  "inputs": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/bounded_stage_v1.py": {
+      "sha256": "84b7d003089fa19881690e368200b2168b9d179c8e6573bdafab54369235cec2",
+      "bytes": 12645
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/final_stage.py": {
+      "sha256": "a0a5a94f157acf9a5127b756a036c6e86449dc2012af0f1e71d34aafa13bc79e",
+      "bytes": 10968
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-18968dc9-20261006/PREPARATION_REQUEST.v1.json": {
+      "sha256": "ec9d826b185c914828b909382a8485186244ae55cf876e6969952267a18953c2",
+      "bytes": 947
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-18968dc9-20261006/SOURCE_SNAPSHOT.v1.json": {
+      "sha256": "7d69be48f5848687c4b6ef9d8933be20a15e767555594a9e62f1e583be0d2d15",
+      "bytes": 47701
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-18968dc9-cache-preparation-20261006-v1.config.json": {
+      "sha256": "f40a5a1a432ba835c5e7140ad8403f7880713db22e412e60e91d6bb5e2f575b2",
+      "bytes": 4421
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/leased_stage_v2.py": {
+      "sha256": "bcf91456534e763a025613f39e82853d7a58529b399bb183d544d09a7a42f949",
+      "bytes": 5520
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/prepare_combined_test_cache_v2.py": {
+      "sha256": "7c241e2402df26821c82268ff3d38d4bf26c726acdd5a83b597edc64552f4435",
+      "bytes": 2795
+    },
+    "/home/b/Workspaces/holonics/.local/wt/material-learning/.local/material-learning-followup-01a1030c-20261006/COHERENT_FOLLOWUP_CANDIDATE.v4.json": {
+      "sha256": "370bff0f79965ccf6913f35d9a4a58dbabfb2d80f5489356716773393720c9b1",
+      "bytes": 18898
+    },
+    "/usr/bin/python3.14": {
+      "sha256": "ac12d99c156d3c0ec708a2baf664d35b74f455572fe35fd57faa420ade5c3845",
+      "bytes": 14424
+    }
+  },
+  "source_scope": "Prepare exact18968dc9 source and selected private debug cache; meaningful added E-only completeness refusal; no compiler.",
+  "CPU_count": 1,
+  "per_process_RLIMIT_CPU_seconds": 17,
+  "CPU_affinity": [
+    0
+  ],
+  "cap_ns": 17000000000,
+  "projection_ns": 17000000000,
+  "system_floor_MemAvailable_KiB": 4194304,
+  "system_floor_sampling_period_ns": 10000000,
+  "host_MemTotal_bytes": 32746156032,
+  "host_MemAvailable_bytes": 11782221824,
+  "minimum_MemAvailable_bytes": 8589934592,
+  "group_memory_max_bytes": 4294967296,
+  "group_swap_max_bytes": 0,
+  "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/holonics-prune-admission-hnn-material-18968dc9-cache-preparation-20261006-v1.service",
+  "memory_events_before": {
+    "low": 0,
+    "high": 0,
+    "max": 0,
+    "oom": 0,
+    "oom_kill": 0,
+    "oom_group_kill": 0,
+    "sock_throttled": 0
+  },
+  "group_cap_includes_page_cache_and_is_stricter_than_RSS": true,
+  "sealed_before_execution": true,
+  "aggregate_cpu_limit_us": 17000000,
+  "aggregate_cpu_source": "dedicated cgroup cpu.stat usage_usec, including exited children and controller",
+  "aggregate_cpu_at_seal_us": 34417,
+  "aggregate_cpu_stop_margin_us": 1000000,
+  "aggregate_cpu_stop_us": 16000000
+}

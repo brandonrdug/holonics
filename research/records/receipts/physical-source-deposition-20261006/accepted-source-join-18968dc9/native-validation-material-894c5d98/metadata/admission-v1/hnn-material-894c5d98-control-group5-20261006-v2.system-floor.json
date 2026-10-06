@@ -1,0 +1,75 @@
+{
+  "minimum_MemAvailable_KiB": 4194304,
+  "sampling_period_ns": 10000000,
+  "breached": false,
+  "samples": [
+    {
+      "since_start_ns": 4296454,
+      "MemAvailable_KiB": 12083068
+    },
+    {
+      "since_start_ns": 15349395,
+      "MemAvailable_KiB": 12088036
+    },
+    {
+      "since_start_ns": 26231137,
+      "MemAvailable_KiB": 12086696
+    },
+    {
+      "since_start_ns": 37102148,
+      "MemAvailable_KiB": 12086696
+    },
+    {
+      "since_start_ns": 47944616,
+      "MemAvailable_KiB": 12086332
+    },
+    {
+      "since_start_ns": 58109425,
+      "MemAvailable_KiB": 12082716
+    },
+    {
+      "since_start_ns": 69011244,
+      "MemAvailable_KiB": 12082716
+    },
+    {
+      "since_start_ns": 79829807,
+      "MemAvailable_KiB": 12082716
+    },
+    {
+      "since_start_ns": 90685249,
+      "MemAvailable_KiB": 12082716
+    },
+    {
+      "since_start_ns": 102274685,
+      "MemAvailable_KiB": 12078712
+    },
+    {
+      "since_start_ns": 113169641,
+      "MemAvailable_KiB": 12078712
+    },
+    {
+      "since_start_ns": 124014844,
+      "MemAvailable_KiB": 12078712
+    },
+    {
+      "since_start_ns": 134880856,
+      "MemAvailable_KiB": 12078712
+    },
+    {
+      "since_start_ns": 145727842,
+      "MemAvailable_KiB": 12078712
+    },
+    {
+      "since_start_ns": 156607370,
+      "MemAvailable_KiB": 12078712
+    },
+    {
+      "since_start_ns": 167393753,
+      "MemAvailable_KiB": 12078712
+    },
+    {
+      "since_start_ns": 178162092,
+      "MemAvailable_KiB": 12078712
+    }
+  ]
+}

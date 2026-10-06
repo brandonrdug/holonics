@@ -1,0 +1,35 @@
+{
+  "version": 3,
+  "base_commit": "1ba64477cebb07296a755e531a8affac38083613",
+  "paths": {
+    "crates/holonics/src/hnn/prediction.rs": {
+      "bytes": 135749,
+      "sha256": "f8c60da4195ca5889cef8698c1f22ccac2b13c2448b3e2a71f3d340be0e8fd93"
+    },
+    "crates/holonics/src/hnn/tests/prediction.rs": {
+      "bytes": 120582,
+      "sha256": "d9f3e30ffbcbc227f362ea957f9582bb27cfc1e30ed84a2201fd2ad20e526a3c"
+    },
+    "research/notebook/hnn_design/hnn_repair_loop.rs": {
+      "bytes": 31329,
+      "sha256": "2939d7c6adf418e51ee9556a63ca2e9f815d9d8986f30b527a94312e31e22d94"
+    },
+    "docs/atlas/objects.tsv": {
+      "bytes": 880951,
+      "sha256": "2d7a569f243d109aa7b3792c77585ab1edda67317af888904d5d0637392ab85d"
+    },
+    "research/records/README.md": {
+      "bytes": 160060,
+      "sha256": "25569096e05e97f07784f99c84d9c4c13c8f81b9e390453d80963c150ca1fe75"
+    },
+    "research/records/2026-10-06_THE_ACTUAL_SOURCE_RETURN_CHANGES_E_AT_THE_NEXT_CONTEMPORARY_OPENING.md": {
+      "bytes": 11984,
+      "sha256": "3ff4c24aeee701818441ab568c6892cd3f792b195552e73b323b846a47285c19"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/source-review.v2.json": {
+      "bytes": 2687,
+      "sha256": "f997945aa49b48f3d811e77630e1333bd8419d315331a80b05ac99bb0adfead8"
+    }
+  },
+  "source_commit": "894c5d9889fe4a38da68945665f0460980ff6814"
+}

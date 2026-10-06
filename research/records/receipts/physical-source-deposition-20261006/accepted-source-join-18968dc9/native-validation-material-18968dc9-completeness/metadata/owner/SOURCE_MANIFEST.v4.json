@@ -1,0 +1,103 @@
+{
+  "version": 4,
+  "base_commit": "894c5d9889fe4a38da68945665f0460980ff6814",
+  "paths": {
+    "crates/holonics/src/hnn/prediction.rs": {
+      "bytes": 138686,
+      "sha256": "2caa054629c6c48e61dd5dbccccf487ae917fb48367c5d636bf91c9e79a6add7"
+    },
+    "docs/atlas/objects.tsv": {
+      "bytes": 881375,
+      "sha256": "c1728643545b5aeba58bc8bc39a18b5b69192e438462d0055bbb8ebfbf340bf2"
+    },
+    "research/records/2026-10-06_THE_ACTUAL_SOURCE_RETURN_CHANGES_E_AT_THE_NEXT_CONTEMPORARY_OPENING.md": {
+      "bytes": 14376,
+      "sha256": "7a576f5a44423721a7c66c65d8f9e0aced5e55590f9fc9d7fe7042ea2ee02f16"
+    },
+    "research/records/README.md": {
+      "bytes": 160205,
+      "sha256": "ae04d280d30a893e65618a7ba33a8d286d70f91db26e793570ae06b491ec3a51"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/predecessor-integrated-14/ACCEPTANCE_JOIN.v1.json": {
+      "bytes": 10957,
+      "sha256": "735302a4e5c0133e805074e83460742b32c5bfc513fbe0bd8a2f48c19238c3d2"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/predecessor-integrated-14/evidence/.local/lean-rust-pruning/admission-v1/hnn-combined-domain-36a660cd-20261006/COMPILED_ARTIFACTS.v2.json": {
+      "bytes": 11923,
+      "sha256": "97be5d94f24084e993d4eac473b76f8e7162782ef609f5091e9ab3dd5e9fa896"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/predecessor-integrated-14/evidence/.local/lean-rust-pruning/admission-v1/hnn-combined-domain-36a660cd-20261006/SOURCE_SNAPSHOT.v2.json": {
+      "bytes": 47786,
+      "sha256": "118d7e416ece395cc3db55fa38b39c16350bee5061cb7658362c52aeda5cef0e"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/predecessor-integrated-14/evidence/.local/lean-rust-pruning/admission-v1/hnn-combined-domain-control-group1-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/predecessor-integrated-14/evidence/.local/lean-rust-pruning/admission-v1/hnn-combined-domain-control-group1-20261006-v1.stdout": {
+      "bytes": 6277,
+      "sha256": "7ee4c9ba7f9dae71382fef3d3aa2aa474fafe0101aeb6103cc8d48f08b7f591e"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/predecessor-integrated-14/evidence/.local/lean-rust-pruning/admission-v1/hnn-combined-domain-control-group2-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/predecessor-integrated-14/evidence/.local/lean-rust-pruning/admission-v1/hnn-combined-domain-control-group2-20261006-v1.stdout": {
+      "bytes": 231,
+      "sha256": "40a205d7af25a9603d7467b5f4f39068ae954ba5b2451d2a5cb65c4d903e57a0"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/predecessor-integrated-14/evidence/.local/lean-rust-pruning/admission-v1/hnn-combined-domain-control-group3-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/predecessor-integrated-14/evidence/.local/lean-rust-pruning/admission-v1/hnn-combined-domain-control-group3-20261006-v1.stdout": {
+      "bytes": 2020,
+      "sha256": "5d53154291229d76b577fb81d712bb8f1174c9209678a3d3ac6b1c89be45b6d3"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/predecessor-integrated-14/evidence/.local/lean-rust-pruning/admission-v1/hnn-combined-domain-control-group4-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/predecessor-integrated-14/evidence/.local/lean-rust-pruning/admission-v1/hnn-combined-domain-control-group4-20261006-v1.stdout": {
+      "bytes": 213,
+      "sha256": "123f5ea60832ed0e3fc310901b36ab081bf15a4db0b0c146dd28f795f93f2400"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/predecessor-integrated-14/evidence/.local/lean-rust-pruning/admission-v1/hnn-combined-domain-host-cuda-link-20261006-v2.stderr": {
+      "bytes": 893,
+      "sha256": "30f7386a59d405b343b09650ababaef78b2a2897ce11ff6ad7db331668759b15"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/predecessor-integrated-14/evidence/.local/lean-rust-pruning/admission-v1/hnn-combined-domain-host-cuda-link-20261006-v2.stdout": {
+      "bytes": 38359,
+      "sha256": "5273e2e7b368d9f81a6240040a596ef40ece730475a8b1e7e958072d6ea81b3c"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/predecessor-integrated-14/evidence/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-20261006/compiler.v2.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/predecessor-integrated-14/evidence/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-20261006/compiler.v2.stdout": {
+      "bytes": 1756,
+      "sha256": "c332abc219305683bf3071a16678743fc78573a75179bd1b15a73d9403ffdb4f"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/predecessor-integrated-14/evidence/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-development-20261006-v2.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/predecessor-integrated-14/evidence/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-development-20261006-v2.stdout": {
+      "bytes": 2670,
+      "sha256": "d0e7684dd7ff89445c648393c2e601cb108b7c82b5c7cada0ef7e97ee0b25449"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/predecessor-integrated-14/evidence/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-target-binding-20261006-v2.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/predecessor-integrated-14/evidence/.local/lean-rust-pruning/admission-v1/hnn-reframed-lean-target-binding-20261006-v2.stdout": {
+      "bytes": 299,
+      "sha256": "896646242d858eeb9a36da5bb2dfe089d365011e7064e3536949d8264ada5e37"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/source-review.v3.json": {
+      "bytes": 1829,
+      "sha256": "c3dc61becc16e9c013042fd999775a0ec49b987e0b638be26f8e5af62e5107bc"
+    }
+  },
+  "source_commit": "18968dc9795e6d05c62aa7bfb17c5d48fd0b2130"
+}

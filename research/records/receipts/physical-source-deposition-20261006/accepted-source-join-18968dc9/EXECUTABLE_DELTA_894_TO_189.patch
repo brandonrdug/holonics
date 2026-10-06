@@ -1,0 +1,73 @@
+diff --git a/crates/holonics/src/hnn/prediction.rs b/crates/holonics/src/hnn/prediction.rs
+index e161983e5..c447cc4d7 100644
+--- a/crates/holonics/src/hnn/prediction.rs
++++ b/crates/holonics/src/hnn/prediction.rs
+@@ -1995,6 +1995,39 @@ fn physical_word_is_exact(operands: &crate::hnn::propagation::Operands) -> bool
+         })
+ }
+ 
++/// All physical forward relations except the selected E maps stay fixed. The field/current and
++/// imposition are the same borrowed operands. FieldMaterial exposes E's map, never its normal-law
++/// carried remainder; SourceMoment::open_storage consumes precisely that view.
++fn physical_source_only_change(
++    field: &Field,
++    before: &dyn FieldMaterial,
++    after: &dyn FieldMaterial,
++    selected: &[crate::hnn::constitution::Locus],
++) -> bool {
++    use crate::hnn::constitution::Locus;
++    field.rings().iter().enumerate().all(|(ring, _)| {
++        before.standing(ring) == after.standing(ring)
++            && before.passive_factor(ring) == after.passive_factor(ring)
++            && before.contrast_port(ring) == after.contrast_port(ring)
++            && before.slices(ring) == after.slices(ring)
++            && before.receiving_map(ring) == after.receiving_map(ring)
++            && before.ring_resonator(ring) == after.ring_resonator(ring)
++            && before.transport(ring) == after.transport(ring)
++            && (selected.contains(&Locus::SourcePort(ring))
++                || before.source_port(ring) == after.source_port(ring))
++            && field.offsets().iter().all(|&offset| {
++                before.pair_port(ring, offset) == after.pair_port(ring, offset)
++            })
++    }) && field.contacts().iter().enumerate().all(|(contact, _)| {
++        before.contact_storage(contact) == after.contact_storage(contact)
++            && before.contact_stiffness(contact) == after.contact_stiffness(contact)
++            && before.contact_dissipation(contact) == after.contact_dissipation(contact)
++            && before.contact_stiffness_signature(contact)
++                == after.contact_stiffness_signature(contact)
++            && before.contact_surface_storage(contact) == after.contact_surface_storage(contact)
++    })
++}
++
+ /// The box is derived, never chosen: complete every missing station with any admitted class,
+ /// at the same source clock and population chart; unite that image with the actual sparse open.
+ /// Unit transport is the supported normalization law. A leaky source keeps its typed refusal.
+@@ -2475,6 +2508,13 @@ impl PhysicalPrediction<'_, '_> {
+     /// occupied source features' squared moves. The native fixture checks both on the physical
+     /// Word. Map-carry remainders need not vanish: the existing joint-step law is evaluated on the
+     /// actual applied E difference before a successor is returned, alongside the proposed ray.
++    /// The source gain assumes participation-mean junctions, passive tick power with contrast
++    /// growth and any certified Floquet reach (Lean HNN/Propagation.anchor_is_participation,
++    /// HNN/Word.word_tick_balance, Holon/Deposition.active_energy_growth and entry_span_gain).
++    /// The complete native-Word lift of that bound remains a #62 obligation; a finite fixture
++    /// checks its own physical span rather than proving all spans. Every other FieldMaterial
++    /// relation is compared before a successor is returned; E's carry remainder is never an
++    /// operand of open_storage and enters only a later deposition.
+     pub fn observe_source_ports(
+         self,
+         contemporary: &crate::hnn::constitution::Constitution,
+@@ -2670,6 +2710,14 @@ impl PhysicalPrediction<'_, '_> {
+                 Deposit::new(material.commit(), linear, Vec::new(), reached).with_reach(reach);
+             let (constitution, publication) = contemporary.deposited(&deposit)?;
+             let source_certificate = if learning == PhysicalLearning::SourcePorts {
++                if !physical_source_only_change(field, material, &constitution, &publication.loci)
++                    || material.released() != constitution.released()
++                    || material.storage_product() != constitution.storage_product()
++                {
++                    return Err(HnnError::Unadmitted {
++                        reason: "the proposed physical E successor changes another forward relation",
++                    });
++                }
+                 // The budgeted map carry need not equal eta*D: old/new remainders and releases
+                 // complete that accounting. Certify the *applied* E move with the existing joint
+                 // law, using its actual alignment and feature moves, before returning a successor.

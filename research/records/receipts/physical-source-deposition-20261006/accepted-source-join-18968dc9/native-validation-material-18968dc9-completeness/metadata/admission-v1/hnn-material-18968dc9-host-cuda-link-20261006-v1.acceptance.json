@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "final_CPU_receipt": {
+    "sha256": "0f1c938051db1a59fb53ea48d23ce0636315c6fe95a591b2fb62bd11ac93fa74",
+    "bytes": 4902
+  },
+  "cleanup_receipt": {
+    "sha256": "9b3123451e28b57069639abf4afa8cabce680802a44a1f6e1d5b97220a6330e3",
+    "bytes": 723
+  },
+  "lease_still_held": true,
+  "scientific_job": false,
+  "requires_matching_release_receipt": true
+}

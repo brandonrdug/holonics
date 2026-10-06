@@ -1,0 +1,94 @@
+{
+  "exit": 0,
+  "wall_ns": 11651381,
+  "CPU_count": 1,
+  "CPU_affinity": [
+    0
+  ],
+  "CPU_user_us": 0,
+  "CPU_system_us": 6813,
+  "CPU_reading_grain_ns": 1000,
+  "timing_source": "monotonic_ns wall; glibc wait4 integer timeval CPU",
+  "peak_child_RSS_KiB": 14680,
+  "cap_ns": 16000000000,
+  "projection_ns": 16000000000,
+  "projection_kill_triggered": false,
+  "system_floor_breached": false,
+  "system_floor_sampling_period_ns": 10000000,
+  "group_memory_max_bytes": 4294967296,
+  "group_memory_peak_bytes": 35094528,
+  "group_memory_current_bytes": 33845248,
+  "memory_events_after": {
+    "low": 0,
+    "high": 0,
+    "max": 0,
+    "oom": 0,
+    "oom_kill": 0,
+    "oom_group_kill": 0,
+    "sock_throttled": 0
+  },
+  "memory_events_delta": {
+    "low": 0,
+    "high": 0,
+    "max": 0,
+    "oom": 0,
+    "oom_kill": 0,
+    "oom_group_kill": 0,
+    "sock_throttled": 0
+  },
+  "stdout": {
+    "sha256": "7751942fcb043d4e2f5c0df701cc451276fde106047d1bd94a97b73e20e7d767",
+    "bytes": 116
+  },
+  "stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "outputs": {},
+  "all_outputs_present": true,
+  "inputs_unchanged": true,
+  "within_projection": true,
+  "sealed_before_audit": true,
+  "aggregate_cpu_limit_us": 17000000,
+  "aggregate_cpu_used_us": 99321,
+  "aggregate_cpu_guard_triggered": false,
+  "aggregate_cpu_samples": [
+    {
+      "since_start_ns": 2502535,
+      "usage_usec": 75303
+    },
+    {
+      "since_start_ns": 3744400,
+      "usage_usec": 76117
+    },
+    {
+      "since_start_ns": 4974573,
+      "usage_usec": 76472
+    },
+    {
+      "since_start_ns": 6081585,
+      "usage_usec": 77085
+    },
+    {
+      "since_start_ns": 7200349,
+      "usage_usec": 77969
+    },
+    {
+      "since_start_ns": 8317981,
+      "usage_usec": 79069
+    },
+    {
+      "since_start_ns": 9417670,
+      "usage_usec": 80034
+    },
+    {
+      "since_start_ns": 10518901,
+      "usage_usec": 80792
+    }
+  ],
+  "aggregate_cpu_scope": "whole dedicated cgroup, including controller and already-reaped descendants",
+  "CPU_kernel_hard_total_limit": false,
+  "aggregate_cpu_stop_margin_us": 1000000,
+  "aggregate_cpu_stop_us": 16000000,
+  "acceptance_provisional_until_external_final_CPU_read": true
+}

@@ -2,14 +2,20 @@
 
 October 6, 2026. Refs #73, #148, #63, #62.
 
-[implemented; source-inspected; native acceptance pending] The successor to
+[accepted-bounded; exact native source joined] The successor to
 `d00a6bcac79270759908ec730458fe33e7bdeaf9` adds one physical consumer,
 `PhysicalPrediction::observe_source_ports`. The source-period counterexample and the previously
-frozen combined integration remain unchanged. No compiler, training passage or scientific
-experiment was launched in preparing this change. Static Rust parsing and whitespace checks
-pass; the selected native assertions and their actual output await the shared validation queue.
+frozen combined integration remain unchanged. The sole queue accepted seventeen unique native
+controls on `894c5d9889fe4a38da68945665f0460980ff6814`, then freshly compiled
+`18968dc9795e6d05c62aa7bfb17c5d48fd0b2130` and accepted its two affected source-teaching controls.
+The executable difference is the complete other-`FieldMaterial` admission check. Tests and the
+notebook are unchanged between these pins. This is a composed acceptance, not seventeen tests
+rerun on the final source. No scientific training passage was launched.
+The [native acceptance join](receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/ACCEPTANCE_JOIN.v1.json)
+preserves whole raw outputs, commands, input/executable bindings, cleanup and resource receipts;
+all 489 plus 381 original evidence entries and six git source pins per run were rehashed.
 The [static source receipt](receipts/physical-source-deposition-20261006/source-review.v3.json)
-pins both implementation hashes and the unchanged alias, cleanup, formal leaf and PTX inputs.
+remains the source-only preparation receipt, distinct from native acceptance.
 
 The computational object is the helical pair interaction. The **helix** carries the source clock,
 the **pair** carries the actual forward and adjoint return, **faces and placement** carry the
@@ -136,7 +142,7 @@ its changed imposed work; every Word retains its opening, tick and whole-word ba
 
 ## Fixed native controls and limits of their evidence
 
-[unit controls; source only; native/type acceptance pending]
+[accepted-bounded; native unit controls]
 `the_actual_leaky_source_return_changes_e_before_the_next_target_free_carried_word` uses the
 existing period-eight source, period-three ring and one three-node pair contact. Its fixed
 nine-station section has two intact classes one source period apart. The test first preserves
@@ -180,15 +186,55 @@ predicate remains precisely the earlier coupled-domain predicate.
 The original physical chart, stale-material, ignored-observation and carry controls remain
 selected alongside these two and the unchanged source alias regression.
 
-The next decisive check is one coherently linked, source-pinned bounded native gate through
-the sole queue: the prior thirteen physical controls, these two, sibling-clock leaky aging,
-and the source-period alias control. It requires cache/input preflight, a measured fixed
-projection, exact test counts and raw whole output. Existing limits are retained; a timeout,
-compile error or changed assertion is an incomplete/failed gate, never an E-learning result.
+The coherent native gate passed through the sole queue: thirteen prior physical controls,
+these two, sibling-clock leaky aging and the source-period alias control. Counts are
+`1 + 1 + 11 + 1 + 1 + 1 + 1 = 17`, with exact selectors and unfiltered outputs. The two
+source-teaching selectors were rechecked after the final executable guard. Two earlier wrapper
+stages selected zero tests and are preserved as rejected evidence. The first final-source Cargo
+link reused the previous byte-identical binary with `fresh:true`; it was explicitly rejected as
+a source binding. Preserved local host fingerprints were moved outside the consumed cache,
+then the same bounded command produced `fresh:false` and a distinct binary. No cap was raised.
 The notebook's physical receipt caller also consumes the actual `PluralDomain` enum variant,
 with a separate held-plural count. This is the minimal repair of its exhaustive-match compile
 refusal; no truth, task generator or physical algorithm is changed, and notebook linkage is
-still part of the pending coherent compile.
+part of both accepted coherent links and was not executed as a scientific experiment.
+
+The final fresh link measured `20,295,955,738/1,000,000,000` wall seconds and
+`53,569,556,000/1,000,000,000` aggregate CPU seconds against its fixed `65` wall and `128`
+aggregate CPU seconds. Group peak was `3,111,591,936` bytes; peak child RSS was `2,330,156` KiB.
+The final affected controls measured `2,268,710,970/1,000,000,000` and
+`396,496,809/1,000,000,000` wall seconds against `16` each; aggregate CPU readings were
+`2,208,360,000/1,000,000,000` and `361,503,000/1,000,000,000` seconds against `17` each.
+Their group peaks were `19,447,808` and `21,323,776` bytes. Resource admission, quiescence,
+cleanup and lease release passed. The full seventeen-control source's separate metrics and
+measured-to-projected ratios remain in the same acceptance join.
+
+The whole output at `rho = 169979/1048576` is, before and after teaching:
+
+```text
+[Intact(0), Held, Held, Held, Held, Held, Held, Held, Intact(1)]
+each Held: fibre [0,1,2,3], UncertifiedDomain
+```
+
+The source clock advances from `0` to `1`; actual E changes, R and other forward relations stay
+fixed, and a later same-source Word under the same returned carry changes native motion and
+reads. The intact-source swap changes native reads before teaching, so that distinction is not
+attributed to E learning. The matched observed station's code-length intervals are exactly:
+
+```text
+before [53865328081485772810341910167/39614081257132168796771975168,
+        107730656162971545624431739167/79228162514264337593543950336]
+after  [96054306622615490513327516545/79228162514264337593543950336,
+        24013576655653872629243158919/19807040628566084398385987584]
+after.upper < before.lower
+```
+
+This strict ordering belongs to that one matched training-side comparison. The accepted control
+asserts the physical adjoint, gain, carried-map accounting and actual joint certificate; it does
+not assert generic strict quantized descent or useful erased-class accuracy. The next measured
+limitation is that this actual nonunit source has no completion-domain enclosure at the physical
+consumer. A sound enclosure would qualify the output's robustness; it would still need an
+independently declared source-to-target relation before any useful repair claim.
 
 [accepted-bounded; separately pinned predecessor] During source preparation, the shared queue
 accepted the preceding **fourteen** integrated native controls and **four** selected Lean

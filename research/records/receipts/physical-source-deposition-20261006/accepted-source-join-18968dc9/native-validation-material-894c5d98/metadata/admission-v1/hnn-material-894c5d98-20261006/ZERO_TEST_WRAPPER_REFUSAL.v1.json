@@ -1,0 +1,12 @@
+{
+  "hnn-material-894c5d98-control-group5-20261006-v1": {
+    "accepted": false,
+    "reason": "Raw exact expected test count1, actual0; argv mistakenly invoked predecessor binary with candidate binary pathname as filter. No candidate test ran. Existing generic exit0 receipt is insufficient for control acceptance.",
+    "raw_stdout": ".local/lean-rust-pruning/admission-v1/hnn-material-894c5d98-control-group5-20261006-v1.stdout"
+  },
+  "hnn-material-894c5d98-control-group6-20261006-v1": {
+    "accepted": false,
+    "reason": "Raw exact expected test count1, actual0; argv mistakenly invoked predecessor binary with candidate binary pathname as filter. No candidate test ran. Existing generic exit0 receipt is insufficient for control acceptance.",
+    "raw_stdout": ".local/lean-rust-pruning/admission-v1/hnn-material-894c5d98-control-group6-20261006-v1.stdout"
+  }
+}
