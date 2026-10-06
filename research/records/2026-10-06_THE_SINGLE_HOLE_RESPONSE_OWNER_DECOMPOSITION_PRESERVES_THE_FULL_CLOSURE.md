@@ -93,3 +93,20 @@ receiver faces and placement, and tube; cell holonomy and tower thread stay atta
 keeps the recorded failure modes in view: it preserves shared-label cross terms and distinct pair
 edges, absolute pump time and full state, explicit grain mapping, and the actual receiver release
 law. It adds no axiom, `sorry`, `native_decide`, candidate generator, or native source change.
+
+The coordinator integrated this prepared split on the isolated HNN branch as
+`29f0ba2b075508e0e03ebd1dcc72a1e962bb44c4`, following the source-return borrow repair. The only
+atlas conflict was resolved by replacing this existing owner row and preserving every other row,
+including both source-return consumers. The [integration receipt](receipts/pair-output-learning-20261006/single-hole-formal-integration-20261006/INTEGRATION.v1.json)
+compares all 39 declarations and all thirteen facade selectors against the unsplit source. The
+combined [local source manifest](receipts/pair-output-learning-20261006/single-hole-formal-integration-20261006/LOCAL_SOURCE_CLOSURE.v1.json)
+contains 148 modules for the facade and 150 for the downstream source-return consumer: 143 old
+provider/consumer files remain byte-identical, only the old facade changed, and six owners were
+added. SourceReceiverReturn and both independent audits retain their original bytes.
+
+The authoritative [combined queue request](receipts/pair-output-learning-20261006/single-hole-formal-integration-20261006/QUEUE_REQUEST.v2.json)
+seals those inputs and exact candidate commands at the integrated pin. The prepared worker packet
+above remains its historical source contract; its whole atlas-file hash does not replace the
+integration branch's other owned rows. The sole queue still owns actual toolchain, ordered lookup,
+provider/object, cache, fixed measured projection and lease admission. No compiler or native job
+was started by either source owner, and no limit was raised.

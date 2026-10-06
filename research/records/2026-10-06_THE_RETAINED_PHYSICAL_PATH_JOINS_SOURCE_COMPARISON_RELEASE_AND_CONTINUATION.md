@@ -259,3 +259,21 @@ The remaining concrete joins are:
 The sole queue owns source/executable seals, cache/provider preflight, the measured fixed
 projection, explicit outer lease and unchanged resource caps. This documentation branch leaves
 all queued native/formal source worktrees and their immutable snapshots untouched.
+
+The concise [accepted behavior reading](receipts/retained-physical-architecture-20261006/accepted-retained-a2309576/DEMONSTRATION_BEHAVIOR.v1.json)
+keeps the existing input, retained state and emitted result explicit. Its unobserved sparse input is
+`[0, ?, 2, 2, 2, 2, 2, 2, 1]`, with station 1 erased in the existing four-class producing chart.
+The actual class cells emitted by that retained receiver are:
+
+```text
+[Intact(0), Released(2), Intact(2), Intact(2), Intact(2), Intact(2), Intact(2), Intact(2), Intact(1)]
+```
+
+Earlier declared observations changed the receiving and pair material after their blind receipts.
+This read reused the actual physical end, advanced carry `4 = 2²` to `5`, retained its declared
+source frame, and deposited nothing. Its complete receipt and unfiltered log remain linked above.
+This fixture has no resonators. The second accepted control emits only its test-pass line; it
+checks comparison refusal with unchanged material, continuation by one tick, closed next Word,
+and refusal of a foreign chart before another reception. It prints no physical class receipt.
+These are deterministic law controls with the existing decoder; their singleton release states
+model constancy and does not establish an erased original's truth.

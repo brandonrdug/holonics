@@ -1,0 +1,2165 @@
+{
+  "status": "local source snapshot only; actual ordered import parts, full foreign/core/toolchain and source-matched objects remain sole-queue preflight",
+  "source_commit": "29f0ba2b075508e0e03ebd1dcc72a1e962bb44c4",
+  "facade_local_module_count": 148,
+  "source_return_local_module_count": 150,
+  "facade_modules": [
+    "Holonics.Aeon.Clock.Epoch",
+    "Holonics.Aeon.Clock.Groupoid",
+    "Holonics.Aeon.Clock.Reading",
+    "Holonics.Aeon.Clock.Winding",
+    "Holonics.Compression.Core.FaceMap",
+    "Holonics.Computation.DependentMachineLearningCarrier",
+    "Holonics.Computation.ExactForeignWeight",
+    "Holonics.Computation.HolonicAdjointNormalization",
+    "Holonics.Computation.HolonicArchitectureCharts",
+    "Holonics.Computation.HolonicConstitutiveCirculation",
+    "Holonics.Computation.HolonicConstitutiveFibre",
+    "Holonics.Computation.HolonicCultivationCharts",
+    "Holonics.Computation.HolonicDiffusionCharts",
+    "Holonics.Computation.HolonicInformationTheory",
+    "Holonics.Computation.HolonicIntelligenceLifecycle",
+    "Holonics.Computation.HolonicNeuralEcology",
+    "Holonics.Computation.HolonicOrientedSiteTransport",
+    "Holonics.Computation.HolonicRecurrentEcology",
+    "Holonics.Computation.HolonicWorldReturnDeposit",
+    "Holonics.Computation.IntrinsicHolonProfile",
+    "Holonics.Computation.MachineLearningChart",
+    "Holonics.Computation.MachineLearningStrictLift",
+    "Holonics.Computation.NativeMorphologyVariant",
+    "Holonics.Computation.NativeTransportScaffold",
+    "Holonics.Computation.SituatedMachineLearning",
+    "Holonics.Coupling.Paying",
+    "Holonics.Foundation.AddressedBoundary",
+    "Holonics.Foundation.CausalNaturalHolon",
+    "Holonics.Foundation.CausalRelevance",
+    "Holonics.Foundation.Chronology",
+    "Holonics.Foundation.ComparisonCell",
+    "Holonics.Foundation.CompleteReceiverHistory",
+    "Holonics.Foundation.ConnectionLineage",
+    "Holonics.Foundation.FiniteCrossEntropyReceiver",
+    "Holonics.Foundation.Gluing",
+    "Holonics.Foundation.GluingPassage",
+    "Holonics.Foundation.HigherDifferenceTransport",
+    "Holonics.Foundation.HodgeReceiver",
+    "Holonics.Foundation.Holon",
+    "Holonics.Foundation.HolonicDifferenceCalculus",
+    "Holonics.Foundation.HolonicDirectedPassage",
+    "Holonics.Foundation.InformationReceiver",
+    "Holonics.Foundation.JointReceiverDescent",
+    "Holonics.Foundation.Lineage",
+    "Holonics.Foundation.MeasuredDifferenceReceiver",
+    "Holonics.Foundation.NavigatorModeQuotient",
+    "Holonics.Foundation.Receiver",
+    "Holonics.Foundation.ReceiverFamily",
+    "Holonics.Foundation.ReceiverHistoryCompression",
+    "Holonics.Foundation.ReceiverQuotient",
+    "Holonics.Foundation.ReceiverRelease",
+    "Holonics.Foundation.RelationLadder.Comparison",
+    "Holonics.Foundation.RigidityReceiver",
+    "Holonics.Foundation.Standing",
+    "Holonics.Foundation.Standing.Law",
+    "Holonics.Foundation.TransportLift",
+    "Holonics.Foundation.TransportWord",
+    "Holonics.Geometry.AffineSwing",
+    "Holonics.Geometry.ConnectionCalculus",
+    "Holonics.Geometry.CrossRatio",
+    "Holonics.Geometry.ExteriorBoundary",
+    "Holonics.Geometry.HolonicClockedPantographicSwing",
+    "Holonics.Geometry.HolonicPantographicSwingJets",
+    "Holonics.Geometry.Horizon",
+    "Holonics.Geometry.LocalFactor",
+    "Holonics.Geometry.PartitionFunction",
+    "Holonics.Geometry.PhaseCarry",
+    "Holonics.Geometry.Polarisation",
+    "Holonics.Geometry.ScrewGeometry",
+    "Holonics.Geometry.Swing",
+    "Holonics.Geometry.SwingBridges",
+    "Holonics.Geometry.Telescoping",
+    "Holonics.Geometry.TraceSequence",
+    "Holonics.Geometry.WindingLedger",
+    "Holonics.HNN.CarriedMotion",
+    "Holonics.HNN.CarriedStanding",
+    "Holonics.HNN.DepositHold",
+    "Holonics.HNN.FactoredMedium",
+    "Holonics.HNN.HeldCommits",
+    "Holonics.HNN.LatticeDeposit",
+    "Holonics.HNN.LatticeWord",
+    "Holonics.HNN.LoadedMedium",
+    "Holonics.HNN.LoadedRing",
+    "Holonics.HNN.LocusMap",
+    "Holonics.HNN.MediumStanding",
+    "Holonics.HNN.Normal",
+    "Holonics.HNN.Propagation",
+    "Holonics.HNN.Retention",
+    "Holonics.HNN.Ring",
+    "Holonics.HNN.RingLoci",
+    "Holonics.HNN.SingleHoleResponse",
+    "Holonics.HNN.SingleHoleResponse.ComposedConsumer",
+    "Holonics.HNN.SingleHoleResponse.GrainRelease",
+    "Holonics.HNN.SingleHoleResponse.LoadedWord",
+    "Holonics.HNN.SingleHoleResponse.NormalizedOpening",
+    "Holonics.HNN.SingleHoleResponse.ReceivingResponse",
+    "Holonics.HNN.SingleHoleResponse.SourceExpansion",
+    "Holonics.HNN.TickBlocks",
+    "Holonics.HNN.TickFamily",
+    "Holonics.HNN.TickStanding",
+    "Holonics.HNN.Word",
+    "Holonics.Holarchy.Hearing",
+    "Holonics.Holarchy.Receipt",
+    "Holonics.Holarchy.Reception",
+    "Holonics.Holon.Cayley",
+    "Holonics.Holon.Complex",
+    "Holonics.Holon.Conformance",
+    "Holonics.Holon.Deposition",
+    "Holonics.Holon.Dirac",
+    "Holonics.Holon.Element",
+    "Holonics.Holon.Law",
+    "Holonics.Holon.MomentStorage",
+    "Holonics.Holon.Navigator",
+    "Holonics.Holon.Port",
+    "Holonics.Holon.QuadraticMoment",
+    "Holonics.Holon.Reaction",
+    "Holonics.Holon.Restriction.Morphism",
+    "Holonics.Mathematics.PolynomialReading",
+    "Holonics.Objects.Deposition",
+    "Holonics.Objects.Pairing",
+    "Holonics.Objects.Parametron",
+    "Holonics.Objects.Ratio",
+    "Holonics.Objects.Ratio.CarriedPower",
+    "Holonics.Objects.Ratio.ExponentialKernel",
+    "Holonics.Objects.Ratio.GaugeCalculus",
+    "Holonics.Objects.Ratio.SelectedQuadratic",
+    "Holonics.Objects.Ratio.SelectedQuadratic.PositiveRoot",
+    "Holonics.Objects.Ratio.SelectedQuadratic.SourceRoot",
+    "Holonics.Physics.AccumulatedNormalResponse",
+    "Holonics.Physics.CoupledIncidence",
+    "Holonics.Physics.HolonicMeasuredParametron",
+    "Holonics.Physics.HolonicSnellInteraction",
+    "Holonics.Physics.InformationDifference",
+    "Holonics.Physics.PhaseCarrier",
+    "Holonics.Physics.PhysicalRealization",
+    "Holonics.Transport.AffineJointBall",
+    "Holonics.Transport.CellHolonomy",
+    "Holonics.Transport.ChangingReceiver.Defect",
+    "Holonics.Transport.EditRigidity",
+    "Holonics.Transport.HelicalPairInteraction",
+    "Holonics.Transport.HolonicComposition",
+    "Holonics.Transport.HolonicInteraction",
+    "Holonics.Transport.JetStaircase",
+    "Holonics.Transport.JunctionLaw",
+    "Holonics.Transport.NavigatorTraceFaces",
+    "Holonics.Transport.SituatedReturnedDifference",
+    "Holonics.Transport.SourceMoment",
+    "Holonics.Transport.WorldTube"
+  ],
+  "source_return_modules": [
+    "Holonics.Aeon.Clock.Epoch",
+    "Holonics.Aeon.Clock.Groupoid",
+    "Holonics.Aeon.Clock.Reading",
+    "Holonics.Aeon.Clock.Winding",
+    "Holonics.Compression.Core.FaceMap",
+    "Holonics.Computation.DependentMachineLearningCarrier",
+    "Holonics.Computation.ExactForeignWeight",
+    "Holonics.Computation.HolonicAdjointNormalization",
+    "Holonics.Computation.HolonicArchitectureCharts",
+    "Holonics.Computation.HolonicConstitutiveCirculation",
+    "Holonics.Computation.HolonicConstitutiveFibre",
+    "Holonics.Computation.HolonicCultivationCharts",
+    "Holonics.Computation.HolonicDiffusionCharts",
+    "Holonics.Computation.HolonicInformationTheory",
+    "Holonics.Computation.HolonicIntelligenceLifecycle",
+    "Holonics.Computation.HolonicNeuralEcology",
+    "Holonics.Computation.HolonicOrientedSiteTransport",
+    "Holonics.Computation.HolonicRecurrentEcology",
+    "Holonics.Computation.HolonicWorldReturnDeposit",
+    "Holonics.Computation.IntrinsicHolonProfile",
+    "Holonics.Computation.MachineLearningChart",
+    "Holonics.Computation.MachineLearningStrictLift",
+    "Holonics.Computation.NativeMorphologyVariant",
+    "Holonics.Computation.NativeTransportScaffold",
+    "Holonics.Computation.SituatedMachineLearning",
+    "Holonics.Coupling.Paying",
+    "Holonics.Foundation.AddressedBoundary",
+    "Holonics.Foundation.CausalNaturalHolon",
+    "Holonics.Foundation.CausalRelevance",
+    "Holonics.Foundation.Chronology",
+    "Holonics.Foundation.ComparisonCell",
+    "Holonics.Foundation.CompleteReceiverHistory",
+    "Holonics.Foundation.ConnectionLineage",
+    "Holonics.Foundation.FiniteCrossEntropyReceiver",
+    "Holonics.Foundation.Gluing",
+    "Holonics.Foundation.GluingPassage",
+    "Holonics.Foundation.HigherDifferenceTransport",
+    "Holonics.Foundation.HodgeReceiver",
+    "Holonics.Foundation.Holon",
+    "Holonics.Foundation.HolonicDifferenceCalculus",
+    "Holonics.Foundation.HolonicDirectedPassage",
+    "Holonics.Foundation.InformationReceiver",
+    "Holonics.Foundation.JointReceiverDescent",
+    "Holonics.Foundation.Lineage",
+    "Holonics.Foundation.MeasuredDifferenceReceiver",
+    "Holonics.Foundation.NavigatorModeQuotient",
+    "Holonics.Foundation.Receiver",
+    "Holonics.Foundation.ReceiverFamily",
+    "Holonics.Foundation.ReceiverHistoryCompression",
+    "Holonics.Foundation.ReceiverQuotient",
+    "Holonics.Foundation.ReceiverRelease",
+    "Holonics.Foundation.RelationLadder.Comparison",
+    "Holonics.Foundation.RigidityReceiver",
+    "Holonics.Foundation.Standing",
+    "Holonics.Foundation.Standing.Law",
+    "Holonics.Foundation.TransportLift",
+    "Holonics.Foundation.TransportWord",
+    "Holonics.Geometry.AffineSwing",
+    "Holonics.Geometry.ConnectionCalculus",
+    "Holonics.Geometry.CrossRatio",
+    "Holonics.Geometry.ExteriorBoundary",
+    "Holonics.Geometry.HolonicClockedPantographicSwing",
+    "Holonics.Geometry.HolonicPantographicSwingJets",
+    "Holonics.Geometry.Horizon",
+    "Holonics.Geometry.LocalFactor",
+    "Holonics.Geometry.PartitionFunction",
+    "Holonics.Geometry.PhaseCarry",
+    "Holonics.Geometry.Polarisation",
+    "Holonics.Geometry.ScrewGeometry",
+    "Holonics.Geometry.Swing",
+    "Holonics.Geometry.SwingBridges",
+    "Holonics.Geometry.Telescoping",
+    "Holonics.Geometry.TraceSequence",
+    "Holonics.Geometry.WindingLedger",
+    "Holonics.HNN.CarriedMotion",
+    "Holonics.HNN.CarriedStanding",
+    "Holonics.HNN.DepositHold",
+    "Holonics.HNN.FactoredMedium",
+    "Holonics.HNN.HeldCommits",
+    "Holonics.HNN.LatticeDeposit",
+    "Holonics.HNN.LatticeWord",
+    "Holonics.HNN.LoadedMedium",
+    "Holonics.HNN.LoadedRing",
+    "Holonics.HNN.LocusMap",
+    "Holonics.HNN.MediumStanding",
+    "Holonics.HNN.ModeQuotient",
+    "Holonics.HNN.Normal",
+    "Holonics.HNN.Propagation",
+    "Holonics.HNN.Retention",
+    "Holonics.HNN.Ring",
+    "Holonics.HNN.RingLoci",
+    "Holonics.HNN.SingleHoleResponse",
+    "Holonics.HNN.SingleHoleResponse.ComposedConsumer",
+    "Holonics.HNN.SingleHoleResponse.GrainRelease",
+    "Holonics.HNN.SingleHoleResponse.LoadedWord",
+    "Holonics.HNN.SingleHoleResponse.NormalizedOpening",
+    "Holonics.HNN.SingleHoleResponse.ReceivingResponse",
+    "Holonics.HNN.SingleHoleResponse.SourceExpansion",
+    "Holonics.HNN.SourceReceiverReturn",
+    "Holonics.HNN.TickBlocks",
+    "Holonics.HNN.TickFamily",
+    "Holonics.HNN.TickStanding",
+    "Holonics.HNN.Word",
+    "Holonics.Holarchy.Hearing",
+    "Holonics.Holarchy.Receipt",
+    "Holonics.Holarchy.Reception",
+    "Holonics.Holon.Cayley",
+    "Holonics.Holon.Complex",
+    "Holonics.Holon.Conformance",
+    "Holonics.Holon.Deposition",
+    "Holonics.Holon.Dirac",
+    "Holonics.Holon.Element",
+    "Holonics.Holon.Law",
+    "Holonics.Holon.MomentStorage",
+    "Holonics.Holon.Navigator",
+    "Holonics.Holon.Port",
+    "Holonics.Holon.QuadraticMoment",
+    "Holonics.Holon.Reaction",
+    "Holonics.Holon.Restriction.Morphism",
+    "Holonics.Mathematics.PolynomialReading",
+    "Holonics.Objects.Deposition",
+    "Holonics.Objects.Pairing",
+    "Holonics.Objects.Parametron",
+    "Holonics.Objects.Ratio",
+    "Holonics.Objects.Ratio.CarriedPower",
+    "Holonics.Objects.Ratio.ExponentialKernel",
+    "Holonics.Objects.Ratio.GaugeCalculus",
+    "Holonics.Objects.Ratio.SelectedQuadratic",
+    "Holonics.Objects.Ratio.SelectedQuadratic.PositiveRoot",
+    "Holonics.Objects.Ratio.SelectedQuadratic.SourceRoot",
+    "Holonics.Physics.AccumulatedNormalResponse",
+    "Holonics.Physics.CoupledIncidence",
+    "Holonics.Physics.HolonicMeasuredParametron",
+    "Holonics.Physics.HolonicSnellInteraction",
+    "Holonics.Physics.InformationDifference",
+    "Holonics.Physics.PhaseCarrier",
+    "Holonics.Physics.PhysicalRealization",
+    "Holonics.Transport.AffineJointBall",
+    "Holonics.Transport.CellHolonomy",
+    "Holonics.Transport.ChangingReceiver.Defect",
+    "Holonics.Transport.EditRigidity",
+    "Holonics.Transport.HelicalPairInteraction",
+    "Holonics.Transport.HolonicComposition",
+    "Holonics.Transport.HolonicInteraction",
+    "Holonics.Transport.JetStaircase",
+    "Holonics.Transport.JunctionLaw",
+    "Holonics.Transport.NavigatorTraceFaces",
+    "Holonics.Transport.SituatedReturnedDifference",
+    "Holonics.Transport.SourceMoment",
+    "Holonics.Transport.WorldTube"
+  ],
+  "local_modules": [
+    {
+      "module": "Holonics.Aeon.Clock.Epoch",
+      "relative_path": "Holonics/Aeon/Clock/Epoch.lean",
+      "bytes": 42058,
+      "sha256": "545312fec76d6fd0412ffeb226a27d51e073a796fbdd0f0107de506c0cdcc56c",
+      "imports": [
+        "Holonics.Aeon.Clock.Winding",
+        "Mathlib.Data.Nat.Factorization.Basic"
+      ]
+    },
+    {
+      "module": "Holonics.Aeon.Clock.Groupoid",
+      "relative_path": "Holonics/Aeon/Clock/Groupoid.lean",
+      "bytes": 16528,
+      "sha256": "dc50b513b53786108f84e9420c3193f8a05b25e840d4418f133c0a655d214f61",
+      "imports": [
+        "Mathlib.CategoryTheory.Groupoid",
+        "Mathlib.Tactic"
+      ]
+    },
+    {
+      "module": "Holonics.Aeon.Clock.Reading",
+      "relative_path": "Holonics/Aeon/Clock/Reading.lean",
+      "bytes": 28878,
+      "sha256": "65dc08a6a49e1ccd4163f01f24a7867d67500ecc3e1abd4f77877e521bef07d3",
+      "imports": [
+        "Holonics.Aeon.Clock.Groupoid",
+        "Holonics.Objects.Pairing",
+        "Holonics.Geometry.CrossRatio",
+        "Holonics.Transport.CellHolonomy"
+      ]
+    },
+    {
+      "module": "Holonics.Aeon.Clock.Winding",
+      "relative_path": "Holonics/Aeon/Clock/Winding.lean",
+      "bytes": 19413,
+      "sha256": "14cdcbae7729c67dd194832dc1db3ff7a513d8fd63449649e87b3b31c88804fc",
+      "imports": [
+        "Holonics.Aeon.Clock.Reading",
+        "Holonics.Geometry.PhaseCarry",
+        "Holonics.Objects.Parametron",
+        "Holonics.Holon.Navigator"
+      ]
+    },
+    {
+      "module": "Holonics.Compression.Core.FaceMap",
+      "relative_path": "Holonics/Compression/Core/FaceMap.lean",
+      "bytes": 36209,
+      "sha256": "205f8063c27a32e426fcb4db07babbd3bca28c4511e7b7c93ec95fb90609e197",
+      "imports": [
+        "Holonics.Foundation.Standing",
+        "Holonics.Foundation.ReceiverQuotient",
+        "Holonics.Foundation.NavigatorModeQuotient",
+        "Holonics.Objects.Pairing",
+        "Mathlib.LinearAlgebra.FiniteDimensional.Lemmas",
+        "Mathlib.LinearAlgebra.Dual.Lemmas",
+        "Mathlib.Algebra.Exact.Basic"
+      ]
+    },
+    {
+      "module": "Holonics.Computation.DependentMachineLearningCarrier",
+      "relative_path": "Holonics/Computation/DependentMachineLearningCarrier.lean",
+      "bytes": 4182,
+      "sha256": "fa26a387f5dd84e9ea013b9f5bfb859b79b8c259fdca5b195c6a2694f1061010",
+      "imports": [
+        "Holonics.Computation.SituatedMachineLearning"
+      ]
+    },
+    {
+      "module": "Holonics.Computation.ExactForeignWeight",
+      "relative_path": "Holonics/Computation/ExactForeignWeight.lean",
+      "bytes": 3649,
+      "sha256": "420e224f29a897e347ed09582d49ba7d77def39b9279eb7dc5dc50a0989056ba",
+      "imports": [
+        "Holonics.Computation.IntrinsicHolonProfile",
+        "Mathlib.Tactic"
+      ]
+    },
+    {
+      "module": "Holonics.Computation.HolonicAdjointNormalization",
+      "relative_path": "Holonics/Computation/HolonicAdjointNormalization.lean",
+      "bytes": 31510,
+      "sha256": "3c73d7d43bfbc1b666eb4c41793208878af11ea09014ba35deefbe0f1cf64610",
+      "imports": [
+        "Holonics.Computation.HolonicInformationTheory",
+        "Holonics.Geometry.AffineSwing",
+        "Mathlib.Analysis.InnerProductSpace.Adjoint",
+        "Mathlib.Analysis.Calculus.Deriv.Mul",
+        "Mathlib.Analysis.Calculus.Deriv.Inv",
+        "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+        "Mathlib.Analysis.SpecialFunctions.Pow.Real"
+      ]
+    },
+    {
+      "module": "Holonics.Computation.HolonicArchitectureCharts",
+      "relative_path": "Holonics/Computation/HolonicArchitectureCharts.lean",
+      "bytes": 17664,
+      "sha256": "3891b383a6e48856d06c9bdce2b5e6d130a3cc3686b0bb8893e002a00d5d5444",
+      "imports": [
+        "Holonics.Computation.HolonicAdjointNormalization",
+        "Holonics.Computation.HolonicNeuralEcology"
+      ]
+    },
+    {
+      "module": "Holonics.Computation.HolonicConstitutiveCirculation",
+      "relative_path": "Holonics/Computation/HolonicConstitutiveCirculation.lean",
+      "bytes": 22830,
+      "sha256": "b50ecc1406a5bac001cf8b1119d7196e22f771affa94275cfc4aa97919971f32",
+      "imports": [
+        "Holonics.Geometry.AffineSwing",
+        "Holonics.Computation.HolonicConstitutiveFibre",
+        "Holonics.Geometry.Swing",
+        "Mathlib.Tactic"
+      ]
+    },
+    {
+      "module": "Holonics.Computation.HolonicConstitutiveFibre",
+      "relative_path": "Holonics/Computation/HolonicConstitutiveFibre.lean",
+      "bytes": 16153,
+      "sha256": "60abd0aa03894ce56d5d7e6691bc205347664062dd08e7e6f6102f7a9602c540",
+      "imports": [
+        "Holonics.Foundation.Receiver",
+        "Mathlib.LinearAlgebra.Prod",
+        "Mathlib.LinearAlgebra.Span.Basic",
+        "Mathlib.Tactic"
+      ]
+    },
+    {
+      "module": "Holonics.Computation.HolonicCultivationCharts",
+      "relative_path": "Holonics/Computation/HolonicCultivationCharts.lean",
+      "bytes": 13395,
+      "sha256": "5b004735e9ca6e19ad3396cc5feb5a1f4d535c0a0c12b3c1b0f7ca8c26fbb26c",
+      "imports": [
+        "Holonics.Computation.HolonicAdjointNormalization"
+      ]
+    },
+    {
+      "module": "Holonics.Computation.HolonicDiffusionCharts",
+      "relative_path": "Holonics/Computation/HolonicDiffusionCharts.lean",
+      "bytes": 10196,
+      "sha256": "039f3d004874068a9d6c37725b6e1757d2ac284bf0df10454ad2cd5ee6bead39",
+      "imports": [
+        "Holonics.Computation.HolonicArchitectureCharts"
+      ]
+    },
+    {
+      "module": "Holonics.Computation.HolonicInformationTheory",
+      "relative_path": "Holonics/Computation/HolonicInformationTheory.lean",
+      "bytes": 194,
+      "sha256": "c7f1b4e242dcb9f6fba084f6c2c381ee0b0b86436f08f33abd41c83406b14bdb",
+      "imports": [
+        "Holonics.Foundation.InformationReceiver"
+      ]
+    },
+    {
+      "module": "Holonics.Computation.HolonicIntelligenceLifecycle",
+      "relative_path": "Holonics/Computation/HolonicIntelligenceLifecycle.lean",
+      "bytes": 11253,
+      "sha256": "7ff59cf05cecfb890f8dad1b93302b763b9e6524d5b73a0ec89312c3c7c19c57",
+      "imports": [
+        "Holonics.Computation.IntrinsicHolonProfile",
+        "Holonics.Computation.HolonicNeuralEcology",
+        "Mathlib.Tactic"
+      ]
+    },
+    {
+      "module": "Holonics.Computation.HolonicNeuralEcology",
+      "relative_path": "Holonics/Computation/HolonicNeuralEcology.lean",
+      "bytes": 9751,
+      "sha256": "bd426dc9ba1ce4bd01b6bf2e00617e8f85dd73f59d638e16f260d864c9d54897",
+      "imports": [
+        "Holonics.Computation.DependentMachineLearningCarrier",
+        "Holonics.Foundation.CompleteReceiverHistory",
+        "Mathlib.Algebra.BigOperators.Group.Finset.Basic"
+      ]
+    },
+    {
+      "module": "Holonics.Computation.HolonicOrientedSiteTransport",
+      "relative_path": "Holonics/Computation/HolonicOrientedSiteTransport.lean",
+      "bytes": 62570,
+      "sha256": "9e91357edf3fe368fd9264da8f35483cf656ab636ac044346d3e0942ca2f8a57",
+      "imports": [
+        "Holonics.Computation.HolonicDiffusionCharts",
+        "Holonics.Computation.HolonicRecurrentEcology",
+        "Holonics.Computation.HolonicInformationTheory",
+        "Mathlib.LinearAlgebra.Matrix.ToLin"
+      ]
+    },
+    {
+      "module": "Holonics.Computation.HolonicRecurrentEcology",
+      "relative_path": "Holonics/Computation/HolonicRecurrentEcology.lean",
+      "bytes": 21959,
+      "sha256": "e57c04da469ca2101a0722b8bda4f3604707c3f2e28568e453fd317527538e02",
+      "imports": [
+        "Holonics.Computation.HolonicNeuralEcology",
+        "Holonics.Foundation.CausalNaturalHolon",
+        "Mathlib.Tactic"
+      ]
+    },
+    {
+      "module": "Holonics.Computation.HolonicWorldReturnDeposit",
+      "relative_path": "Holonics/Computation/HolonicWorldReturnDeposit.lean",
+      "bytes": 14650,
+      "sha256": "70a83d605fdb9dad221ccd4df16c106e82648aff088f94f8b5bda0d5732d6f1a",
+      "imports": [
+        "Holonics.Computation.NativeMorphologyVariant",
+        "Holonics.Computation.HolonicOrientedSiteTransport",
+        "Mathlib.Tactic"
+      ]
+    },
+    {
+      "module": "Holonics.Computation.IntrinsicHolonProfile",
+      "relative_path": "Holonics/Computation/IntrinsicHolonProfile.lean",
+      "bytes": 5140,
+      "sha256": "ac56d27ac5635963a9c4fef32f7dbe77d45153ad7e578fa5e5566428a59b0963",
+      "imports": [
+        "Holonics.Foundation.Holon",
+        "Mathlib.Tactic"
+      ]
+    },
+    {
+      "module": "Holonics.Computation.MachineLearningChart",
+      "relative_path": "Holonics/Computation/MachineLearningChart.lean",
+      "bytes": 8774,
+      "sha256": "0869fdf66c77c3ba56ae88e47cd2004cb031decce17cac639c5cc430012241c9",
+      "imports": [
+        "Holonics.Foundation.ReceiverHistoryCompression"
+      ]
+    },
+    {
+      "module": "Holonics.Computation.MachineLearningStrictLift",
+      "relative_path": "Holonics/Computation/MachineLearningStrictLift.lean",
+      "bytes": 5673,
+      "sha256": "cffb5863def3387ec7c185dcfc9a82a7350d626ff5da2971ac44ba2abe1dca89",
+      "imports": [
+        "Holonics.Computation.MachineLearningChart",
+        "Mathlib.LinearAlgebra.Quotient.Basic",
+        "Mathlib.Tactic"
+      ]
+    },
+    {
+      "module": "Holonics.Computation.NativeMorphologyVariant",
+      "relative_path": "Holonics/Computation/NativeMorphologyVariant.lean",
+      "bytes": 23800,
+      "sha256": "82d48273a1c34b5a4e65d378cb42b10349ae67b82034dbd9616436bcd4e0c27e",
+      "imports": [
+        "Holonics.Computation.ExactForeignWeight",
+        "Holonics.Computation.HolonicCultivationCharts",
+        "Holonics.Computation.HolonicNeuralEcology",
+        "Holonics.Computation.NativeTransportScaffold",
+        "Holonics.Foundation.ReceiverHistoryCompression",
+        "Mathlib.Tactic"
+      ]
+    },
+    {
+      "module": "Holonics.Computation.NativeTransportScaffold",
+      "relative_path": "Holonics/Computation/NativeTransportScaffold.lean",
+      "bytes": 13794,
+      "sha256": "5ccd75293da0676b5865e15336d91cc7b5350477b379fc892da23284cd4fd996",
+      "imports": [
+        "Holonics.Computation.HolonicIntelligenceLifecycle",
+        "Mathlib.Tactic"
+      ]
+    },
+    {
+      "module": "Holonics.Computation.SituatedMachineLearning",
+      "relative_path": "Holonics/Computation/SituatedMachineLearning.lean",
+      "bytes": 10744,
+      "sha256": "edd34f0af8a1f7b95114a9734806e102efff15e5260af0fd42ccb0331be368cc",
+      "imports": [
+        "Holonics.Computation.MachineLearningStrictLift",
+        "Holonics.Foundation.Receiver",
+        "Holonics.Physics.CoupledIncidence",
+        "Holonics.Transport.SituatedReturnedDifference",
+        "Mathlib.Tactic"
+      ]
+    },
+    {
+      "module": "Holonics.Coupling.Paying",
+      "relative_path": "Holonics/Coupling/Paying.lean",
+      "bytes": 20663,
+      "sha256": "f26f25213437284cbe5510183133f1fc09d03cd52e3dab010eda00587964c071",
+      "imports": [
+        "Mathlib.Algebra.Group.Subgroup.Basic",
+        "Mathlib.Data.Finset.Lattice.Fold",
+        "Mathlib.Data.Set.Finite.Basic",
+        "Holonics.Foundation.Gluing",
+        "Holonics.Geometry.Swing"
+      ]
+    },
+    {
+      "module": "Holonics.Foundation.AddressedBoundary",
+      "relative_path": "Holonics/Foundation/AddressedBoundary.lean",
+      "bytes": 3973,
+      "sha256": "e1970e501c02440c44cbdd9944df292e669140475844179dc524f23d3900d1d7",
+      "imports": [
+        "Holonics.Foundation.Lineage",
+        "Mathlib.Data.Finsupp.Basic"
+      ]
+    },
+    {
+      "module": "Holonics.Foundation.CausalNaturalHolon",
+      "relative_path": "Holonics/Foundation/CausalNaturalHolon.lean",
+      "bytes": 12448,
+      "sha256": "080b885929e3df6e9ecc85035305a78e14169c477dc96b01da1dfc17e1dff837",
+      "imports": [
+        "Holonics.Foundation.Holon",
+        "Holonics.Foundation.Receiver",
+        "Mathlib.CategoryTheory.Category.Basic"
+      ]
+    },
+    {
+      "module": "Holonics.Foundation.CausalRelevance",
+      "relative_path": "Holonics/Foundation/CausalRelevance.lean",
+      "bytes": 13235,
+      "sha256": "1b0abc414881d1dbe5b1032cfde9ed2b2993f4c36910146ed4d8d8fcb4316d75",
+      "imports": [
+        "Mathlib.Algebra.Order.Field.Rat",
+        "Holonics.Foundation.JointReceiverDescent",
+        "Holonics.Foundation.CompleteReceiverHistory",
+        "Holonics.Foundation.ReceiverFamily"
+      ]
+    },
+    {
+      "module": "Holonics.Foundation.Chronology",
+      "relative_path": "Holonics/Foundation/Chronology.lean",
+      "bytes": 9049,
+      "sha256": "04b9d61c7ad9ed64d1cff5cb6c6d8ed9532db9cadc58ab90efb52181bc149be7",
+      "imports": [
+        "Holonics.Geometry.AffineSwing",
+        "Mathlib.Analysis.Calculus.MeanValue",
+        "Mathlib.GroupTheory.Perm.Basic",
+        "Holonics.Geometry.Swing",
+        "Holonics.Foundation.TransportWord"
+      ]
+    },
+    {
+      "module": "Holonics.Foundation.ComparisonCell",
+      "relative_path": "Holonics/Foundation/ComparisonCell.lean",
+      "bytes": 2735,
+      "sha256": "dd07b6282073c562917fbe7fe66fafb1c4c509f6b8df6148ba59a471144b6020",
+      "imports": [
+        "Holonics.Foundation.AddressedBoundary"
+      ]
+    },
+    {
+      "module": "Holonics.Foundation.CompleteReceiverHistory",
+      "relative_path": "Holonics/Foundation/CompleteReceiverHistory.lean",
+      "bytes": 3876,
+      "sha256": "1029450d1932590577401454b092296ac2ed17467c4c4ac7dfc83c36ddd9dbb7",
+      "imports": [
+        "Holonics.Foundation.ReceiverHistoryCompression"
+      ]
+    },
+    {
+      "module": "Holonics.Foundation.ConnectionLineage",
+      "relative_path": "Holonics/Foundation/ConnectionLineage.lean",
+      "bytes": 11342,
+      "sha256": "c9327dc5d51be4fde0dd81462888edf760227d1566a606a947145b48157203d9",
+      "imports": [
+        "Holonics.Foundation.Lineage",
+        "Holonics.Foundation.ComparisonCell",
+        "Mathlib.GroupTheory.Perm.Basic"
+      ]
+    },
+    {
+      "module": "Holonics.Foundation.FiniteCrossEntropyReceiver",
+      "relative_path": "Holonics/Foundation/FiniteCrossEntropyReceiver.lean",
+      "bytes": 3856,
+      "sha256": "edd4e55fa67b78aefe9864218ab43e2f4adb4c1e61055c21a7e07f70ae9e56fb",
+      "imports": [
+        "Mathlib.Analysis.SpecialFunctions.Log.Basic",
+        "Mathlib.Data.Fintype.BigOperators",
+        "Mathlib.Data.Set.Defs"
+      ]
+    },
+    {
+      "module": "Holonics.Foundation.Gluing",
+      "relative_path": "Holonics/Foundation/Gluing.lean",
+      "bytes": 6717,
+      "sha256": "5f90c401cae7aa7f40fe42b8dc0a1f181a62e5f44e9bf6dd760bcdb8ccd06828",
+      "imports": [
+        "Mathlib.Algebra.Order.Field.Rat",
+        "Mathlib.GroupTheory.QuotientGroup.Basic",
+        "Holonics.Foundation.GluingPassage"
+      ]
+    },
+    {
+      "module": "Holonics.Foundation.GluingPassage",
+      "relative_path": "Holonics/Foundation/GluingPassage.lean",
+      "bytes": 2831,
+      "sha256": "966612dd5ba3888bd8e57f2ea8c405f8ad188c877430b0c12b42ab301ef09719",
+      "imports": [
+        "Mathlib.Logic.IsEmpty.Basic"
+      ]
+    },
+    {
+      "module": "Holonics.Foundation.HigherDifferenceTransport",
+      "relative_path": "Holonics/Foundation/HigherDifferenceTransport.lean",
+      "bytes": 28781,
+      "sha256": "b809f5f80dfb0595df16740a70563e8932caa2e011f2d28bee6bd4afea2a4a05",
+      "imports": [
+        "Holonics.Foundation.Receiver",
+        "Holonics.Foundation.TransportWord",
+        "Mathlib.Algebra.Group.ForwardDiff",
+        "Mathlib.Tactic"
+      ]
+    },
+    {
+      "module": "Holonics.Foundation.HodgeReceiver",
+      "relative_path": "Holonics/Foundation/HodgeReceiver.lean",
+      "bytes": 32039,
+      "sha256": "a6dd9c4f9a6a5f076609f6270d0d145858a2aff6bb29c057961e5910c0a77748",
+      "imports": [
+        "Mathlib.LinearAlgebra.Matrix.ToLin",
+        "Mathlib.LinearAlgebra.BilinearForm.Orthogonal",
+        "Mathlib.LinearAlgebra.FiniteDimensional.Lemmas",
+        "Mathlib.LinearAlgebra.Projection",
+        "Mathlib.Tactic.Ring",
+        "Mathlib.Tactic.Linarith"
+      ]
+    },
+    {
+      "module": "Holonics.Foundation.Holon",
+      "relative_path": "Holonics/Foundation/Holon.lean",
+      "bytes": 16898,
+      "sha256": "2be19f90c9ed0bfff5e67e270b940f314b308c44564460508732ea7b40d1cf53",
+      "imports": [
+        "Holonics.Foundation.AddressedBoundary",
+        "Mathlib.Tactic"
+      ]
+    },
+    {
+      "module": "Holonics.Foundation.HolonicDifferenceCalculus",
+      "relative_path": "Holonics/Foundation/HolonicDifferenceCalculus.lean",
+      "bytes": 17435,
+      "sha256": "addc8fef4d287cc4ce5df708e99dccd278a4a94e2e3f15a5bb44326ad97b0977",
+      "imports": [
+        "Holonics.Geometry.AffineSwing",
+        "Holonics.Geometry.Telescoping",
+        "Holonics.Geometry.Horizon",
+        "Holonics.Geometry.Polarisation",
+        "Holonics.Geometry.Swing",
+        "Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic",
+        "Mathlib.Data.Int.ModEq",
+        "Mathlib.Data.ZMod.Basic",
+        "Mathlib.Tactic"
+      ]
+    },
+    {
+      "module": "Holonics.Foundation.HolonicDirectedPassage",
+      "relative_path": "Holonics/Foundation/HolonicDirectedPassage.lean",
+      "bytes": 15691,
+      "sha256": "21062227a09719bb6bb27a825eac9b16ccf515bd01d08b9644af076a0bf014ec",
+      "imports": [
+        "Holonics.Foundation.HolonicDifferenceCalculus",
+        "Mathlib.Topology.UniformSpace.CompleteSeparated"
+      ]
+    },
+    {
+      "module": "Holonics.Foundation.InformationReceiver",
+      "relative_path": "Holonics/Foundation/InformationReceiver.lean",
+      "bytes": 10979,
+      "sha256": "e52a7a5d3326872ec91709aba0d86c879a906145c4f6587032b0a60216e5b6d2",
+      "imports": [
+        "Mathlib.Tactic",
+        "Mathlib.Analysis.SpecialFunctions.Log.Basic",
+        "Mathlib.Data.Fin.VecNotation"
+      ]
+    },
+    {
+      "module": "Holonics.Foundation.JointReceiverDescent",
+      "relative_path": "Holonics/Foundation/JointReceiverDescent.lean",
+      "bytes": 8689,
+      "sha256": "b334f39fa7d9eeefec4a373cf532119dccf9911c89577e0bdce272f7f3fdfc99",
+      "imports": [
+        "Mathlib.GroupTheory.QuotientGroup.Basic",
+        "Holonics.Foundation.ReceiverHistoryCompression",
+        "Holonics.Foundation.Receiver"
+      ]
+    },
+    {
+      "module": "Holonics.Foundation.Lineage",
+      "relative_path": "Holonics/Foundation/Lineage.lean",
+      "bytes": 9458,
+      "sha256": "d0120d764009f01c3d718fbbbafd1861b07b3710743a85daf8335982f6509577",
+      "imports": [
+        "Holonics.Foundation.Receiver",
+        "Mathlib.Logic.Equiv.Defs"
+      ]
+    },
+    {
+      "module": "Holonics.Foundation.MeasuredDifferenceReceiver",
+      "relative_path": "Holonics/Foundation/MeasuredDifferenceReceiver.lean",
+      "bytes": 10298,
+      "sha256": "deff0e22262afb15828cfc8cd27c9965462a44ede68090df5e1e1deacc9e9bd6",
+      "imports": [
+        "Mathlib.Analysis.Normed.Group.Basic",
+        "Mathlib.Analysis.SpecialFunctions.Exp",
+        "Mathlib.Tactic"
+      ]
+    },
+    {
+      "module": "Holonics.Foundation.NavigatorModeQuotient",
+      "relative_path": "Holonics/Foundation/NavigatorModeQuotient.lean",
+      "bytes": 4187,
+      "sha256": "564544ce2433834b31d850c4fe89abe0ac89960ce4cfb596c40d0309bf201838",
+      "imports": [
+        "Holonics.Foundation.ReceiverHistoryCompression",
+        "Mathlib.Analysis.InnerProductSpace.GramMatrix",
+        "Mathlib.LinearAlgebra.ExteriorAlgebra.Basic"
+      ]
+    },
+    {
+      "module": "Holonics.Foundation.Receiver",
+      "relative_path": "Holonics/Foundation/Receiver.lean",
+      "bytes": 10544,
+      "sha256": "32695757b94827663d9ad6547a125b2a8b0700ab99b890a64c9bf662da7c69c0",
+      "imports": [
+        "Mathlib.Algebra.Group.Subgroup.Ker",
+        "Mathlib.LinearAlgebra.Prod",
+        "Mathlib.Logic.Relation",
+        "Mathlib.Data.Set.Operations"
+      ]
+    },
+    {
+      "module": "Holonics.Foundation.ReceiverFamily",
+      "relative_path": "Holonics/Foundation/ReceiverFamily.lean",
+      "bytes": 696,
+      "sha256": "8ae595a4b215170a882c8cfd461410ec5a9cb8643017d7ad55f0ba9fb1fd63d4",
+      "imports": [
+        "Mathlib.Data.Set.Defs"
+      ]
+    },
+    {
+      "module": "Holonics.Foundation.ReceiverHistoryCompression",
+      "relative_path": "Holonics/Foundation/ReceiverHistoryCompression.lean",
+      "bytes": 7347,
+      "sha256": "404e28dfd7526c51d9711ccc975228b3cfab493a4d112def762469fe5b441ee0",
+      "imports": [
+        "Holonics.Foundation.Lineage",
+        "Holonics.Foundation.TransportWord"
+      ]
+    },
+    {
+      "module": "Holonics.Foundation.ReceiverQuotient",
+      "relative_path": "Holonics/Foundation/ReceiverQuotient.lean",
+      "bytes": 4766,
+      "sha256": "809fbecf8473cb11b4d1b3ba81f23c81520cd34044b2d50ed89f4cd835c53a74",
+      "imports": [
+        "Holonics.Foundation.MeasuredDifferenceReceiver",
+        "Holonics.Foundation.TransportLift"
+      ]
+    },
+    {
+      "module": "Holonics.Foundation.ReceiverRelease",
+      "relative_path": "Holonics/Foundation/ReceiverRelease.lean",
+      "bytes": 47832,
+      "sha256": "15b940da5e3df804f051c6414912e3a7e6334d4f466c16d7d249a1d34558dab1",
+      "imports": [
+        "Mathlib.Data.Finset.Lattice.Fold",
+        "Mathlib.Data.Rat.Lemmas",
+        "Mathlib.Tactic.NormNum",
+        "Mathlib.Tactic.Linarith",
+        "Mathlib.Tactic.IntervalCases",
+        "Mathlib.Tactic.FinCases",
+        "Holonics.Foundation.Receiver"
+      ]
+    },
+    {
+      "module": "Holonics.Foundation.RelationLadder.Comparison",
+      "relative_path": "Holonics/Foundation/RelationLadder/Comparison.lean",
+      "bytes": 5055,
+      "sha256": "97e90c7f7d571d2ea65f2bcea968fb11799aa46a01fc4a219a8447f182aeaa26",
+      "imports": [
+        "Holonics.Foundation.CausalRelevance"
+      ]
+    },
+    {
+      "module": "Holonics.Foundation.RigidityReceiver",
+      "relative_path": "Holonics/Foundation/RigidityReceiver.lean",
+      "bytes": 19833,
+      "sha256": "f038e56bda92cf35c0fbd3df6eef73bb01abe4e860483609973b43f9a63efab4",
+      "imports": [
+        "Mathlib.LinearAlgebra.Matrix.Rank",
+        "Mathlib.LinearAlgebra.FiniteDimensional.Lemmas",
+        "Mathlib.Tactic.Ring",
+        "Mathlib.Tactic.Linarith"
+      ]
+    },
+    {
+      "module": "Holonics.Foundation.Standing",
+      "relative_path": "Holonics/Foundation/Standing.lean",
+      "bytes": 53644,
+      "sha256": "bf8d951fa952394482357996ff358c1675af4775751e75bd407dcb0f605a0629",
+      "imports": [
+        "Holonics.Foundation.Standing.Law",
+        "Holonics.Foundation.ReceiverRelease",
+        "Holonics.Foundation.CausalRelevance",
+        "Holonics.Transport.ChangingReceiver.Defect",
+        "Holonics.Foundation.RelationLadder.Comparison",
+        "Mathlib.Tactic"
+      ]
+    },
+    {
+      "module": "Holonics.Foundation.Standing.Law",
+      "relative_path": "Holonics/Foundation/Standing/Law.lean",
+      "bytes": 9836,
+      "sha256": "d29d9293eeac54ed0f13d282731e85d1609a4961e6e3d1ddce4db4e1190d9d9d",
+      "imports": [
+        "Holonics.Foundation.CausalRelevance"
+      ]
+    },
+    {
+      "module": "Holonics.Foundation.TransportLift",
+      "relative_path": "Holonics/Foundation/TransportLift.lean",
+      "bytes": 5724,
+      "sha256": "1de68847c8ec65e16088eaa89d09fc6b60546e9c32e5d2c865d26191ea54b113",
+      "imports": [
+        "Holonics.Foundation.Receiver",
+        "Mathlib.Algebra.Group.Subgroup.Ker"
+      ]
+    },
+    {
+      "module": "Holonics.Foundation.TransportWord",
+      "relative_path": "Holonics/Foundation/TransportWord.lean",
+      "bytes": 10118,
+      "sha256": "345ece634e00c2b38d0eebf903074e1cd24715a6f3d4b22cb4aaeb09f906c72a",
+      "imports": [
+        "Mathlib.Data.List.Perm.Basic",
+        "Mathlib.GroupTheory.Perm.Basic",
+        "Lean.Elab.Tactic.Omega"
+      ]
+    },
+    {
+      "module": "Holonics.Geometry.AffineSwing",
+      "relative_path": "Holonics/Geometry/AffineSwing.lean",
+      "bytes": 2184,
+      "sha256": "09ce73d5bc9766c152c3ccfc3b16a5f9627e5a4b3cda828ef9f1cf9e91b5805f",
+      "imports": [
+        "Mathlib.Algebra.Group.Basic",
+        "Mathlib.Tactic.Abel"
+      ]
+    },
+    {
+      "module": "Holonics.Geometry.ConnectionCalculus",
+      "relative_path": "Holonics/Geometry/ConnectionCalculus.lean",
+      "bytes": 3368,
+      "sha256": "b5efd916a987bbb1e7fb5cfb283393e1b9184fa78587a1ce528c4150fa15aa45",
+      "imports": [
+        "Mathlib.Analysis.Calculus.FDeriv.Mul",
+        "Mathlib.Analysis.Calculus.FDeriv.Symmetric",
+        "Mathlib.Analysis.Calculus.ContDiff.Basic"
+      ]
+    },
+    {
+      "module": "Holonics.Geometry.CrossRatio",
+      "relative_path": "Holonics/Geometry/CrossRatio.lean",
+      "bytes": 6014,
+      "sha256": "2fe42c8b97bfe226a82605777d1febc53843747c711dccda276e56938b3f1512",
+      "imports": [
+        "Mathlib.Algebra.Field.Basic",
+        "Mathlib.Tactic.FieldSimp",
+        "Mathlib.Tactic.NoncommRing",
+        "Mathlib.Tactic.Ring"
+      ]
+    },
+    {
+      "module": "Holonics.Geometry.ExteriorBoundary",
+      "relative_path": "Holonics/Geometry/ExteriorBoundary.lean",
+      "bytes": 3030,
+      "sha256": "f319cd555d6d3224d8b8b36b59f0340002c4af7e2644377b1f6a9529443e41f8",
+      "imports": [
+        "Mathlib.LinearAlgebra.Dual.Defs",
+        "Mathlib.Analysis.Calculus.DifferentialForm.Basic"
+      ]
+    },
+    {
+      "module": "Holonics.Geometry.HolonicClockedPantographicSwing",
+      "relative_path": "Holonics/Geometry/HolonicClockedPantographicSwing.lean",
+      "bytes": 32441,
+      "sha256": "5bb312b48c16e8a83829b8dd42081ac36254d329639b88b487afc7046f8c28bf",
+      "imports": [
+        "Holonics.Transport.WorldTube",
+        "Holonics.Geometry.HolonicPantographicSwingJets",
+        "Holonics.Transport.HolonicComposition",
+        "Holonics.Foundation.ConnectionLineage",
+        "Mathlib.Tactic"
+      ]
+    },
+    {
+      "module": "Holonics.Geometry.HolonicPantographicSwingJets",
+      "relative_path": "Holonics/Geometry/HolonicPantographicSwingJets.lean",
+      "bytes": 12278,
+      "sha256": "51c34caac9bd16deed9e31c4c1e3ed4c5c5680c5bc62d4438c8d9a6715b55939",
+      "imports": [
+        "Holonics.Geometry.AffineSwing",
+        "Holonics.Geometry.Swing",
+        "Mathlib.Data.Nat.Choose.Basic",
+        "Mathlib.Tactic"
+      ]
+    },
+    {
+      "module": "Holonics.Geometry.Horizon",
+      "relative_path": "Holonics/Geometry/Horizon.lean",
+      "bytes": 15792,
+      "sha256": "1ed9894a917aba66e69e4552297c3fb1f193e618ab4b089643e16d9e85f8c215",
+      "imports": [
+        "Mathlib.Analysis.SpecialFunctions.Complex.Circle",
+        "Mathlib.Combinatorics.SimpleGraph.Acyclic",
+        "Holonics.Geometry.CrossRatio",
+        "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+        "Mathlib.Tactic"
+      ]
+    },
+    {
+      "module": "Holonics.Geometry.LocalFactor",
+      "relative_path": "Holonics/Geometry/LocalFactor.lean",
+      "bytes": 6222,
+      "sha256": "4058a7947dd1d86932e7ced7d92a7b3c3a2dec322fec8ca51e3d62f7f6c04c9d",
+      "imports": [
+        "Holonics.Geometry.TraceSequence",
+        "Holonics.Geometry.PartitionFunction"
+      ]
+    },
+    {
+      "module": "Holonics.Geometry.PartitionFunction",
+      "relative_path": "Holonics/Geometry/PartitionFunction.lean",
+      "bytes": 2963,
+      "sha256": "6a2650e0ed3996ad18d58b0c5c23ff51bd5924900d5bc7aabdaebfcd0a1b3155",
+      "imports": [
+        "Mathlib.LinearAlgebra.Matrix.Trace",
+        "Mathlib.LinearAlgebra.Matrix.Determinant.Basic",
+        "Mathlib.Tactic"
+      ]
+    },
+    {
+      "module": "Holonics.Geometry.PhaseCarry",
+      "relative_path": "Holonics/Geometry/PhaseCarry.lean",
+      "bytes": 8281,
+      "sha256": "878de52e93d8f1244f15238ed24a3e270820a74a77af819d2968dd90b69a9209",
+      "imports": [
+        "Mathlib.Data.ZMod.Basic",
+        "Mathlib.Tactic"
+      ]
+    },
+    {
+      "module": "Holonics.Geometry.Polarisation",
+      "relative_path": "Holonics/Geometry/Polarisation.lean",
+      "bytes": 5472,
+      "sha256": "15141a0dd8489645a133e10f3c537b624bc01479295d25df73cdf363b25f74d2",
+      "imports": [
+        "Mathlib.Tactic"
+      ]
+    },
+    {
+      "module": "Holonics.Geometry.ScrewGeometry",
+      "relative_path": "Holonics/Geometry/ScrewGeometry.lean",
+      "bytes": 7626,
+      "sha256": "91020b35bc1cf591f7eae4e0537a70b8c218986d284852181c6689cec102719e",
+      "imports": [
+        "Mathlib.LinearAlgebra.CrossProduct",
+        "Mathlib.Tactic",
+        "Holonics.Holon.QuadraticMoment"
+      ]
+    },
+    {
+      "module": "Holonics.Geometry.Swing",
+      "relative_path": "Holonics/Geometry/Swing.lean",
+      "bytes": 11469,
+      "sha256": "945876159a3560dbb8417aaccff4f9e79917004f06cd1369a80a3e94957444c3",
+      "imports": [
+        "Mathlib.Tactic",
+        "Mathlib.Data.ZMod.Basic",
+        "Mathlib.Algebra.Order.Field.Basic",
+        "Mathlib.LinearAlgebra.Matrix.Determinant.Basic",
+        "Holonics.Foundation.Gluing",
+        "Holonics.Geometry.AffineSwing"
+      ]
+    },
+    {
+      "module": "Holonics.Geometry.SwingBridges",
+      "relative_path": "Holonics/Geometry/SwingBridges.lean",
+      "bytes": 6278,
+      "sha256": "876cf7a4ffa0e3640ec123caa288364f448889050e9e99889c96c449e8b38219",
+      "imports": [
+        "Holonics.Geometry.AffineSwing",
+        "Holonics.Geometry.CrossRatio",
+        "Holonics.Foundation.Chronology",
+        "Holonics.Coupling.Paying",
+        "Holonics.Geometry.WindingLedger"
+      ]
+    },
+    {
+      "module": "Holonics.Geometry.Telescoping",
+      "relative_path": "Holonics/Geometry/Telescoping.lean",
+      "bytes": 929,
+      "sha256": "ff8783996008207d980f6d64cc144544825304bd23cd09428ec1cae43bc8e5cc",
+      "imports": [
+        "Mathlib.Algebra.BigOperators.Group.Finset.Basic",
+        "Mathlib.Algebra.Ring.GeomSum",
+        "Mathlib.Tactic.Abel"
+      ]
+    },
+    {
+      "module": "Holonics.Geometry.TraceSequence",
+      "relative_path": "Holonics/Geometry/TraceSequence.lean",
+      "bytes": 8487,
+      "sha256": "1ec3d0a525cfa9ca7d2b2444557379ac65697f9d55b19c961d469f01c49e9494",
+      "imports": [
+        "Mathlib.Analysis.SpecialFunctions.Complex.Circle",
+        "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+        "Mathlib.Tactic"
+      ]
+    },
+    {
+      "module": "Holonics.Geometry.WindingLedger",
+      "relative_path": "Holonics/Geometry/WindingLedger.lean",
+      "bytes": 29361,
+      "sha256": "4401d26a1ea939a23d5d2e8cb91c4783bd91c558b60f1e9a0562950275a72f87",
+      "imports": [
+        "Mathlib.Tactic"
+      ]
+    },
+    {
+      "module": "Holonics.HNN.CarriedMotion",
+      "relative_path": "Holonics/HNN/CarriedMotion.lean",
+      "bytes": 21675,
+      "sha256": "04f4ff04006575f4359578971b7c367de85b4b9b915f2d6f28dc8ed552950e30",
+      "imports": [
+        "Holonics.HNN.LocusMap"
+      ]
+    },
+    {
+      "module": "Holonics.HNN.CarriedStanding",
+      "relative_path": "Holonics/HNN/CarriedStanding.lean",
+      "bytes": 40691,
+      "sha256": "83e5e4d05d4f74090e047a079c269bf306827dea9d801db0a8f89b853cbb5b78",
+      "imports": [
+        "Holonics.HNN.Retention"
+      ]
+    },
+    {
+      "module": "Holonics.HNN.DepositHold",
+      "relative_path": "Holonics/HNN/DepositHold.lean",
+      "bytes": 23516,
+      "sha256": "050f28b447f82f141583a5b147a42b2e232d1ad60bddf764c54734d7f35dd089",
+      "imports": [
+        "Holonics.HNN.Ring"
+      ]
+    },
+    {
+      "module": "Holonics.HNN.FactoredMedium",
+      "relative_path": "Holonics/HNN/FactoredMedium.lean",
+      "bytes": 35567,
+      "sha256": "df7015a5e3276a1a2f00dc2c05f0bbdb60b587e41c24a31767a14e7f643ebef7",
+      "imports": [
+        "Holonics.HNN.MediumStanding"
+      ]
+    },
+    {
+      "module": "Holonics.HNN.HeldCommits",
+      "relative_path": "Holonics/HNN/HeldCommits.lean",
+      "bytes": 10679,
+      "sha256": "92eff5a81ca3f4e425b24f9235db3f5235520c2c1322b57f84e647034f9a56b5",
+      "imports": [
+        "Holonics.HNN.DepositHold"
+      ]
+    },
+    {
+      "module": "Holonics.HNN.LatticeDeposit",
+      "relative_path": "Holonics/HNN/LatticeDeposit.lean",
+      "bytes": 49663,
+      "sha256": "812ba9f414af8a5283c0a8482fbf1174a6630e1a71f5ab3d96239021c5449b39",
+      "imports": [
+        "Holonics.HNN.Retention",
+        "Holonics.Holarchy.Hearing",
+        "Mathlib.Algebra.Order.Round",
+        "Mathlib.Data.Nat.Log",
+        "Mathlib.Data.Nat.Size",
+        "Mathlib.Data.Rat.Lemmas",
+        "Mathlib.Algebra.BigOperators.Intervals",
+        "Mathlib.Order.Interval.Finset.SuccPred"
+      ]
+    },
+    {
+      "module": "Holonics.HNN.LatticeWord",
+      "relative_path": "Holonics/HNN/LatticeWord.lean",
+      "bytes": 92762,
+      "sha256": "449af711c1e3e4dba053a4f35bbdd679a02936ab65b0e6e33d1d19c7ff65ca9e",
+      "imports": [
+        "Holonics.HNN.LatticeDeposit",
+        "Holonics.HNN.Normal",
+        "Holonics.Holon.Cayley"
+      ]
+    },
+    {
+      "module": "Holonics.HNN.LoadedMedium",
+      "relative_path": "Holonics/HNN/LoadedMedium.lean",
+      "bytes": 41770,
+      "sha256": "eb1809d8741f44634bf02f4f9a6402b14c3b4ae20e3c191ccf8c3ef3b43ee250",
+      "imports": [
+        "Holonics.HNN.RingLoci",
+        "Holonics.HNN.LoadedRing",
+        "Holonics.HNN.HeldCommits"
+      ]
+    },
+    {
+      "module": "Holonics.HNN.LoadedRing",
+      "relative_path": "Holonics/HNN/LoadedRing.lean",
+      "bytes": 27104,
+      "sha256": "e47634b3ceeb4518bc340a4e643fad8e5502d5f5422c9287f71a77f1fae113f2",
+      "imports": [
+        "Holonics.HNN.Ring",
+        "Holonics.HNN.TickFamily",
+        "Holonics.HNN.CarriedMotion"
+      ]
+    },
+    {
+      "module": "Holonics.HNN.LocusMap",
+      "relative_path": "Holonics/HNN/LocusMap.lean",
+      "bytes": 48814,
+      "sha256": "3cf36ea70f28b03af5f44e62530242bfbb04a01d22e202bb959a4b9f87a8aed4",
+      "imports": [
+        "Holonics.HNN.TickBlocks",
+        "Holonics.HNN.Retention"
+      ]
+    },
+    {
+      "module": "Holonics.HNN.MediumStanding",
+      "relative_path": "Holonics/HNN/MediumStanding.lean",
+      "bytes": 30559,
+      "sha256": "0f102cc42bd4f90a86491e8d359d0913048ca97b0bac64e16edc1afc1cebbe1b",
+      "imports": [
+        "Holonics.HNN.TickStanding",
+        "Holonics.HNN.LocusMap"
+      ]
+    },
+    {
+      "module": "Holonics.HNN.ModeQuotient",
+      "relative_path": "Holonics/HNN/ModeQuotient.lean",
+      "bytes": 33187,
+      "sha256": "573493a7fd07cd3ae8dce6b7f406158f889c14b851b9b36e829fe0e87feb474a",
+      "imports": [
+        "Holonics.Compression.Core.FaceMap"
+      ]
+    },
+    {
+      "module": "Holonics.HNN.Normal",
+      "relative_path": "Holonics/HNN/Normal.lean",
+      "bytes": 53642,
+      "sha256": "cd7049a5ff283d64fb74b2a8e07a1fcb77c6723d62fda5404ea07abdd73fbef7",
+      "imports": [
+        "Holonics.Physics.AccumulatedNormalResponse",
+        "Holonics.Objects.Deposition",
+        "Holonics.Holon.Deposition",
+        "Holonics.Holon.MomentStorage",
+        "Holonics.Transport.SourceMoment"
+      ]
+    },
+    {
+      "module": "Holonics.HNN.Propagation",
+      "relative_path": "Holonics/HNN/Propagation.lean",
+      "bytes": 53379,
+      "sha256": "fb0664f563c9d1a794980763a42e103448e806cf0b8e1a13f6b6a4714bd4be7c",
+      "imports": [
+        "Holonics.Holon.Cayley",
+        "Holonics.Geometry.AffineSwing",
+        "Holonics.Computation.HolonicAdjointNormalization",
+        "Holonics.Computation.HolonicConstitutiveCirculation",
+        "Holonics.Computation.HolonicWorldReturnDeposit",
+        "Mathlib.Analysis.InnerProductSpace.Adjoint",
+        "Mathlib.LinearAlgebra.Dual.Lemmas"
+      ]
+    },
+    {
+      "module": "Holonics.HNN.Retention",
+      "relative_path": "Holonics/HNN/Retention.lean",
+      "bytes": 87007,
+      "sha256": "6183ead6580fdc8edca5ae0e98538a7178842b0d6e09e673442e8ac76842ab5a",
+      "imports": [
+        "Holonics.HNN.Propagation",
+        "Holonics.Compression.Core.FaceMap",
+        "Holonics.Aeon.Clock.Winding",
+        "Mathlib.Data.ENat.Lattice"
+      ]
+    },
+    {
+      "module": "Holonics.HNN.Ring",
+      "relative_path": "Holonics/HNN/Ring.lean",
+      "bytes": 56948,
+      "sha256": "bc9d0a99a48b349db265474bb764f127e17caeefb3c949804cce8ed87bd0c09a",
+      "imports": [
+        "Holonics.HNN.Word",
+        "Holonics.HNN.LatticeWord",
+        "Holonics.Aeon.Clock.Epoch"
+      ]
+    },
+    {
+      "module": "Holonics.HNN.RingLoci",
+      "relative_path": "Holonics/HNN/RingLoci.lean",
+      "bytes": 42468,
+      "sha256": "f8866ee1452111b6f1f039be0ce6d9f692129ad5bb25d28699774251e6d7caf1",
+      "imports": [
+        "Holonics.HNN.FactoredMedium"
+      ]
+    },
+    {
+      "module": "Holonics.HNN.SingleHoleResponse",
+      "relative_path": "Holonics/HNN/SingleHoleResponse.lean",
+      "bytes": 4048,
+      "sha256": "cf04ec3f21d685dcfafd1f8f3ae0559b18e31ca375aabca8b6cf4144f97d8efb",
+      "imports": [
+        "Holonics.HNN.SingleHoleResponse.SourceExpansion",
+        "Holonics.HNN.SingleHoleResponse.LoadedWord",
+        "Holonics.HNN.SingleHoleResponse.NormalizedOpening",
+        "Holonics.HNN.SingleHoleResponse.ReceivingResponse",
+        "Holonics.HNN.SingleHoleResponse.GrainRelease",
+        "Holonics.HNN.SingleHoleResponse.ComposedConsumer"
+      ]
+    },
+    {
+      "module": "Holonics.HNN.SingleHoleResponse.ComposedConsumer",
+      "relative_path": "Holonics/HNN/SingleHoleResponse/ComposedConsumer.lean",
+      "bytes": 12320,
+      "sha256": "a0808bf5130db462023f5357df850780561daf7f4a12e35ead0b1b5c03ac0362",
+      "imports": [
+        "Holonics.HNN.SingleHoleResponse.SourceExpansion",
+        "Holonics.HNN.SingleHoleResponse.LoadedWord",
+        "Holonics.HNN.SingleHoleResponse.NormalizedOpening",
+        "Holonics.HNN.SingleHoleResponse.ReceivingResponse",
+        "Holonics.HNN.SingleHoleResponse.GrainRelease"
+      ]
+    },
+    {
+      "module": "Holonics.HNN.SingleHoleResponse.GrainRelease",
+      "relative_path": "Holonics/HNN/SingleHoleResponse/GrainRelease.lean",
+      "bytes": 5772,
+      "sha256": "16785b532ef69e74130a148e6d9ab2e933f00beacf580bab5a02d97867fc14e5",
+      "imports": [
+        "Holonics.Foundation.ReceiverRelease"
+      ]
+    },
+    {
+      "module": "Holonics.HNN.SingleHoleResponse.LoadedWord",
+      "relative_path": "Holonics/HNN/SingleHoleResponse/LoadedWord.lean",
+      "bytes": 3110,
+      "sha256": "2d72454c1c62667109f471c23c2223f003629a2b4f4e5fcda82cbbb80da043d0",
+      "imports": [
+        "Holonics.HNN.LoadedMedium",
+        "Holonics.HNN.TickFamily"
+      ]
+    },
+    {
+      "module": "Holonics.HNN.SingleHoleResponse.NormalizedOpening",
+      "relative_path": "Holonics/HNN/SingleHoleResponse/NormalizedOpening.lean",
+      "bytes": 3394,
+      "sha256": "0957ab4482a935b5b80b3f4bf1993f9ab6c14823f1cc90c1a9df4add1d48d199",
+      "imports": [
+        "Holonics.HNN.SingleHoleResponse.SourceExpansion",
+        "Holonics.HNN.SingleHoleResponse.LoadedWord"
+      ]
+    },
+    {
+      "module": "Holonics.HNN.SingleHoleResponse.ReceivingResponse",
+      "relative_path": "Holonics/HNN/SingleHoleResponse/ReceivingResponse.lean",
+      "bytes": 1996,
+      "sha256": "716da284776cf2a7b21f6ae38547015bb69c1d6bac83093e7186eb5c4a9822e9",
+      "imports": [
+        "Holonics.HNN.SingleHoleResponse.LoadedWord"
+      ]
+    },
+    {
+      "module": "Holonics.HNN.SingleHoleResponse.SourceExpansion",
+      "relative_path": "Holonics/HNN/SingleHoleResponse/SourceExpansion.lean",
+      "bytes": 12324,
+      "sha256": "2661a9d5c3fc3c6c7fd14372756e74d4aa9a88135107164edf9ed20de971bd95",
+      "imports": [
+        "Mathlib.Algebra.BigOperators.Group.Finset.Basic",
+        "Mathlib.Data.Fintype.BigOperators",
+        "Mathlib.Algebra.Module.LinearMap.Basic",
+        "Mathlib.Tactic.Abel"
+      ]
+    },
+    {
+      "module": "Holonics.HNN.SourceReceiverReturn",
+      "relative_path": "Holonics/HNN/SourceReceiverReturn.lean",
+      "bytes": 13104,
+      "sha256": "294df662d9a7dff20e4540f0fc643e0a00081fbae49d471c4f146dc1c5d9bc53",
+      "imports": [
+        "Holonics.HNN.SingleHoleResponse",
+        "Holonics.HNN.ModeQuotient",
+        "Mathlib.LinearAlgebra.Pi",
+        "Mathlib.LinearAlgebra.Dual.Defs"
+      ]
+    },
+    {
+      "module": "Holonics.HNN.TickBlocks",
+      "relative_path": "Holonics/HNN/TickBlocks.lean",
+      "bytes": 25311,
+      "sha256": "75545870f5a7bff6e080365749e9f18a9bbc98b973467c470e95960dee1a1b0b",
+      "imports": [
+        "Holonics.HNN.Word"
+      ]
+    },
+    {
+      "module": "Holonics.HNN.TickFamily",
+      "relative_path": "Holonics/HNN/TickFamily.lean",
+      "bytes": 20767,
+      "sha256": "965cbe84bec6a8684ccb0423452583db5a79bceecc952469353ba43362a9b0ee",
+      "imports": [
+        "Holonics.HNN.CarriedStanding"
+      ]
+    },
+    {
+      "module": "Holonics.HNN.TickStanding",
+      "relative_path": "Holonics/HNN/TickStanding.lean",
+      "bytes": 53310,
+      "sha256": "73b233201d4b6ea2cffee857bc0449907760073f6d203da58ade377c6eba324b",
+      "imports": [
+        "Holonics.HNN.TickFamily"
+      ]
+    },
+    {
+      "module": "Holonics.HNN.Word",
+      "relative_path": "Holonics/HNN/Word.lean",
+      "bytes": 71277,
+      "sha256": "a941ab2a9906598040c3b2c4b582200105082bf84f7882fb86a58b8f5dff06cc",
+      "imports": [
+        "Holonics.HNN.Propagation"
+      ]
+    },
+    {
+      "module": "Holonics.Holarchy.Hearing",
+      "relative_path": "Holonics/Holarchy/Hearing.lean",
+      "bytes": 17339,
+      "sha256": "c21a3a4bd58325926943295b20487e5e06c4062e54c4fabd8bc5cb8a8b5bdc67",
+      "imports": [
+        "Holonics.Foundation.CausalRelevance",
+        "Holonics.Foundation.Standing.Law",
+        "Holonics.Holarchy.Reception",
+        "Mathlib.LinearAlgebra.Dual.Lemmas"
+      ]
+    },
+    {
+      "module": "Holonics.Holarchy.Receipt",
+      "relative_path": "Holonics/Holarchy/Receipt.lean",
+      "bytes": 17292,
+      "sha256": "061002b72cf9ca994db3bef75c36a4a92a4697cf7421ab805b3334cd44753538",
+      "imports": [
+        "Holonics.Objects.Ratio",
+        "Holonics.Aeon.Clock.Reading"
+      ]
+    },
+    {
+      "module": "Holonics.Holarchy.Reception",
+      "relative_path": "Holonics/Holarchy/Reception.lean",
+      "bytes": 29732,
+      "sha256": "4d1ea17631cfa3d81c28491ff4423686007c6989071920336a2470ac51a4ce09",
+      "imports": [
+        "Holonics.Holarchy.Receipt",
+        "Holonics.Holon.Law",
+        "Mathlib.Analysis.Calculus.Deriv.Prod",
+        "Mathlib.Analysis.Calculus.Deriv.Comp"
+      ]
+    },
+    {
+      "module": "Holonics.Holon.Cayley",
+      "relative_path": "Holonics/Holon/Cayley.lean",
+      "bytes": 28884,
+      "sha256": "ed0adbe6fe5ff4cb38fa8f2a25ce279f3dbce3d98e0a174dfee6b2ca2d29111e",
+      "imports": [
+        "Holonics.Holon.Reaction",
+        "Holonics.Holon.Deposition",
+        "Mathlib.LinearAlgebra.Matrix.ToLinearEquiv"
+      ]
+    },
+    {
+      "module": "Holonics.Holon.Complex",
+      "relative_path": "Holonics/Holon/Complex.lean",
+      "bytes": 12684,
+      "sha256": "b570ff8e0fe2d4621020aed0395ac8d834e830f9057d2270ab03b7df784cac1e",
+      "imports": [
+        "Holonics.Holon.Dirac",
+        "Holonics.Transport.CellHolonomy"
+      ]
+    },
+    {
+      "module": "Holonics.Holon.Conformance",
+      "relative_path": "Holonics/Holon/Conformance.lean",
+      "bytes": 19743,
+      "sha256": "f7193ce68235f38a70502e20635376d9e749ee089de773f57d36a5e8e685d05c",
+      "imports": [
+        "Holonics.Holon.Law",
+        "Holonics.Holon.Complex",
+        "Holonics.Holon.Navigator",
+        "Holonics.Transport.HolonicInteraction",
+        "Holonics.Objects.Pairing"
+      ]
+    },
+    {
+      "module": "Holonics.Holon.Deposition",
+      "relative_path": "Holonics/Holon/Deposition.lean",
+      "bytes": 63679,
+      "sha256": "5c2b58ebdd6aef52531f70f7d93b5395169f7157292ac03e38e4cb6226f8b4ff",
+      "imports": [
+        "Holonics.Holon.Element",
+        "Mathlib.Algebra.Order.Chebyshev",
+        "Mathlib.Analysis.Calculus.MeanValue",
+        "Mathlib.Analysis.Matrix.Spectrum",
+        "Mathlib.Analysis.SpecialFunctions.Exp"
+      ]
+    },
+    {
+      "module": "Holonics.Holon.Dirac",
+      "relative_path": "Holonics/Holon/Dirac.lean",
+      "bytes": 37777,
+      "sha256": "f5f877a5f18d53cb8e0dfa93a6102f9018b238dea72b4fe8046172ba7b0cb2e0",
+      "imports": [
+        "Holonics.Holon.Port",
+        "Mathlib.Data.Matrix.ColumnRowPartitioned"
+      ]
+    },
+    {
+      "module": "Holonics.Holon.Element",
+      "relative_path": "Holonics/Holon/Element.lean",
+      "bytes": 26059,
+      "sha256": "48197e7453f674319f04635043dfe6e9a2649c8440023c88dcbd49636239dd70",
+      "imports": [
+        "Holonics.Holon.Dirac",
+        "Holonics.Transport.AffineJointBall",
+        "Mathlib.Analysis.Calculus.Deriv.Mul",
+        "Mathlib.Analysis.Calculus.Deriv.Pi",
+        "Mathlib.LinearAlgebra.Matrix.PosDef",
+        "Mathlib.LinearAlgebra.Dual.Defs"
+      ]
+    },
+    {
+      "module": "Holonics.Holon.Law",
+      "relative_path": "Holonics/Holon/Law.lean",
+      "bytes": 15094,
+      "sha256": "bfc19b103cf262737fd1f091d3086babcf732c5c04acdc949211abcde72c9047",
+      "imports": [
+        "Holonics.Holon.Element",
+        "Holonics.Holon.Restriction.Morphism"
+      ]
+    },
+    {
+      "module": "Holonics.Holon.MomentStorage",
+      "relative_path": "Holonics/Holon/MomentStorage.lean",
+      "bytes": 3628,
+      "sha256": "1fe04843fcc23cf189b0948f6b84102d0951f0db4bd1a5294d535f036e7c7c4c",
+      "imports": [
+        "Holonics.Holon.Element",
+        "Holonics.Holon.QuadraticMoment"
+      ]
+    },
+    {
+      "module": "Holonics.Holon.Navigator",
+      "relative_path": "Holonics/Holon/Navigator.lean",
+      "bytes": 8686,
+      "sha256": "f0248e450f6c5491032f1cdbfc0b8f98809d2a2898192ae8064eb11850d76edc",
+      "imports": [
+        "Holonics.Physics.PhaseCarrier",
+        "Holonics.Geometry.PhaseCarry",
+        "Holonics.Geometry.HolonicClockedPantographicSwing",
+        "Mathlib.GroupTheory.OrderOfElement",
+        "Mathlib.GroupTheory.Perm.Basic",
+        "Mathlib.Data.ZMod.Basic"
+      ]
+    },
+    {
+      "module": "Holonics.Holon.Port",
+      "relative_path": "Holonics/Holon/Port.lean",
+      "bytes": 5444,
+      "sha256": "3e3cef2364fb0e1da9858576db9bbb204209866774e6c8c1a6a5f2f8090fd727",
+      "imports": [
+        "Holonics.Geometry.ExteriorBoundary",
+        "Mathlib.LinearAlgebra.BilinearForm.Orthogonal",
+        "Mathlib.LinearAlgebra.Dual.Lemmas",
+        "Mathlib.LinearAlgebra.Matrix.ToLin",
+        "Mathlib.Data.Matrix.Mul"
+      ]
+    },
+    {
+      "module": "Holonics.Holon.QuadraticMoment",
+      "relative_path": "Holonics/Holon/QuadraticMoment.lean",
+      "bytes": 2811,
+      "sha256": "f222d34a7bb68ccfc52f6b86b760302e8cc8de6b4ed8ed517f1cf5149585bc9c",
+      "imports": [
+        "Mathlib.Data.Matrix.Basic"
+      ]
+    },
+    {
+      "module": "Holonics.Holon.Reaction",
+      "relative_path": "Holonics/Holon/Reaction.lean",
+      "bytes": 13470,
+      "sha256": "f456982d3f0ea794e13bb6200caacc99ba749b4eafe5c828e4a65e12ed70cdda",
+      "imports": [
+        "Holonics.Holon.Conformance"
+      ]
+    },
+    {
+      "module": "Holonics.Holon.Restriction.Morphism",
+      "relative_path": "Holonics/Holon/Restriction/Morphism.lean",
+      "bytes": 7138,
+      "sha256": "b87e64e19420f45e422bdd9e4a142367888a1441b175c52c149d9f227fdabd34",
+      "imports": [
+        "Holonics.Holon.Dirac",
+        "Mathlib.Tactic"
+      ]
+    },
+    {
+      "module": "Holonics.Mathematics.PolynomialReading",
+      "relative_path": "Holonics/Mathematics/PolynomialReading.lean",
+      "bytes": 1077,
+      "sha256": "e73edd58a9ed15b27e5a6dc4d735f1d444ee05f8d19706e12a871466a330c172",
+      "imports": [
+        "Mathlib.Data.Real.Basic",
+        "Mathlib.Data.Rat.Cast.CharZero"
+      ]
+    },
+    {
+      "module": "Holonics.Objects.Deposition",
+      "relative_path": "Holonics/Objects/Deposition.lean",
+      "bytes": 38945,
+      "sha256": "c191c34a07c2ab50268d14972052612fbaa248923be051bccba5de9546e7d4ee",
+      "imports": [
+        "Holonics.Transport.JunctionLaw",
+        "Holonics.Foundation.Standing",
+        "Holonics.Physics.AccumulatedNormalResponse",
+        "Holonics.Computation.HolonicWorldReturnDeposit",
+        "Mathlib.LinearAlgebra.Matrix.PosDef"
+      ]
+    },
+    {
+      "module": "Holonics.Objects.Pairing",
+      "relative_path": "Holonics/Objects/Pairing.lean",
+      "bytes": 34781,
+      "sha256": "1b2c5a0ad63d2ab62d07753f239124ac6ceddea83fb49f14f4af92483baca768",
+      "imports": [
+        "Holonics.Geometry.ExteriorBoundary",
+        "Holonics.Foundation.Holon",
+        "Holonics.Transport.CellHolonomy",
+        "Holonics.Transport.JunctionLaw",
+        "Holonics.Transport.EditRigidity"
+      ]
+    },
+    {
+      "module": "Holonics.Objects.Parametron",
+      "relative_path": "Holonics/Objects/Parametron.lean",
+      "bytes": 39959,
+      "sha256": "cde36eb8b70b2712d3d37aaa1af6077d241776c161beda12e3af9f3a06fca7dd",
+      "imports": [
+        "Holonics.Physics.PhaseCarrier",
+        "Holonics.Physics.CoupledIncidence",
+        "Holonics.Physics.HolonicMeasuredParametron",
+        "Holonics.Geometry.HolonicClockedPantographicSwing",
+        "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv"
+      ]
+    },
+    {
+      "module": "Holonics.Objects.Ratio",
+      "relative_path": "Holonics/Objects/Ratio.lean",
+      "bytes": 51769,
+      "sha256": "4489aeb3acffda2df6329e64d5955e434d5a7f6d10ba9a9cc9db4d8f3a07b71a",
+      "imports": [
+        "Holonics.Physics.InformationDifference",
+        "Holonics.Computation.HolonicAdjointNormalization",
+        "Holonics.Geometry.CrossRatio",
+        "Holonics.Objects.Ratio.ExponentialKernel",
+        "Holonics.Objects.Ratio.CarriedPower",
+        "Holonics.Objects.Ratio.SelectedQuadratic.SourceRoot",
+        "Holonics.Objects.Ratio.GaugeCalculus",
+        "Holonics.Transport.JetStaircase",
+        "Mathlib.Analysis.Quaternion",
+        "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+        "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+        "Mathlib.Analysis.SpecialFunctions.Sqrt"
+      ]
+    },
+    {
+      "module": "Holonics.Objects.Ratio.CarriedPower",
+      "relative_path": "Holonics/Objects/Ratio/CarriedPower.lean",
+      "bytes": 7523,
+      "sha256": "f82d9ffe939f8c9b94d4964510f7a6684d4c3dca4f6d92a352b0c011318021a3",
+      "imports": [
+        "Mathlib.RingTheory.Polynomial.Eisenstein.Basic",
+        "Mathlib.RingTheory.Polynomial.GaussLemma",
+        "Mathlib.RingTheory.AdjoinRoot",
+        "Mathlib.Data.Nat.Prime.Int",
+        "Mathlib.Analysis.SpecialFunctions.Pow.Real"
+      ]
+    },
+    {
+      "module": "Holonics.Objects.Ratio.ExponentialKernel",
+      "relative_path": "Holonics/Objects/Ratio/ExponentialKernel.lean",
+      "bytes": 748,
+      "sha256": "5f1a959c1a1918e678d069fbf28cbc83b5b41becd2a2039479594e16900e3d0f",
+      "imports": [
+        "Mathlib.Analysis.SpecialFunctions.Complex.Log"
+      ]
+    },
+    {
+      "module": "Holonics.Objects.Ratio.GaugeCalculus",
+      "relative_path": "Holonics/Objects/Ratio/GaugeCalculus.lean",
+      "bytes": 4488,
+      "sha256": "b3b4fc331f9d44f07cc654078e9943f9e485ba4fbbd942306dda7b3dec2f29fa",
+      "imports": [
+        "Holonics.Geometry.ConnectionCalculus",
+        "Mathlib.Tactic.NoncommRing"
+      ]
+    },
+    {
+      "module": "Holonics.Objects.Ratio.SelectedQuadratic",
+      "relative_path": "Holonics/Objects/Ratio/SelectedQuadratic.lean",
+      "bytes": 5887,
+      "sha256": "89e50989eaa8ba1dbd30e6320e635830740afe23c51516e632ee58416ed0098d",
+      "imports": [
+        "Holonics.Mathematics.PolynomialReading",
+        "Mathlib.Tactic.Ring",
+        "Mathlib.Tactic.FieldSimp",
+        "Mathlib.Tactic.Linarith"
+      ]
+    },
+    {
+      "module": "Holonics.Objects.Ratio.SelectedQuadratic.PositiveRoot",
+      "relative_path": "Holonics/Objects/Ratio/SelectedQuadratic/PositiveRoot.lean",
+      "bytes": 4907,
+      "sha256": "ada5e76b6bacfa9bef98485a455a66b06853467110b9153c3d33274de60dabe3",
+      "imports": [
+        "Holonics.Objects.Ratio.SelectedQuadratic",
+        "Mathlib.Analysis.Real.Sqrt",
+        "Mathlib.Data.Rat.Cast.Order"
+      ]
+    },
+    {
+      "module": "Holonics.Objects.Ratio.SelectedQuadratic.SourceRoot",
+      "relative_path": "Holonics/Objects/Ratio/SelectedQuadratic/SourceRoot.lean",
+      "bytes": 3661,
+      "sha256": "d8b622db621d7e4e727b621f5043debcdd9ba6fe4f12bd24971bea0896e5e1ab",
+      "imports": [
+        "Holonics.Objects.Ratio.SelectedQuadratic.PositiveRoot"
+      ]
+    },
+    {
+      "module": "Holonics.Physics.AccumulatedNormalResponse",
+      "relative_path": "Holonics/Physics/AccumulatedNormalResponse.lean",
+      "bytes": 36037,
+      "sha256": "da615923c681be0609f251c9ebdf9b38e1462e959964f8e6f722844aea48a3eb",
+      "imports": [
+        "Mathlib.LinearAlgebra.Matrix.ConjTranspose",
+        "Mathlib.Analysis.InnerProductSpace.EuclideanDist",
+        "Mathlib.Analysis.CStarAlgebra.Matrix",
+        "Mathlib.Algebra.Order.BigOperators.Ring.Finset",
+        "Mathlib.Tactic"
+      ]
+    },
+    {
+      "module": "Holonics.Physics.CoupledIncidence",
+      "relative_path": "Holonics/Physics/CoupledIncidence.lean",
+      "bytes": 35909,
+      "sha256": "44f9edd2e7d3819499d5732987035ebddda1183d12df2ad724d3aefd6c99f196",
+      "imports": [
+        "Holonics.Foundation.Holon",
+        "Holonics.Physics.PhaseCarrier"
+      ]
+    },
+    {
+      "module": "Holonics.Physics.HolonicMeasuredParametron",
+      "relative_path": "Holonics/Physics/HolonicMeasuredParametron.lean",
+      "bytes": 10331,
+      "sha256": "f28a25be59fd617e6231ee9577ca6228f89fe81dfb7e292e315b2046411fcd45",
+      "imports": [
+        "Holonics.Foundation.MeasuredDifferenceReceiver",
+        "Holonics.Physics.CoupledIncidence"
+      ]
+    },
+    {
+      "module": "Holonics.Physics.HolonicSnellInteraction",
+      "relative_path": "Holonics/Physics/HolonicSnellInteraction.lean",
+      "bytes": 9464,
+      "sha256": "175b95e411fe980d2fb22ac54a8b92e2dd8f760d6b2998373cecb6904c88f96f",
+      "imports": [
+        "Holonics.Foundation.HolonicDirectedPassage",
+        "Mathlib.Analysis.Complex.Trigonometric",
+        "Mathlib.Tactic"
+      ]
+    },
+    {
+      "module": "Holonics.Physics.InformationDifference",
+      "relative_path": "Holonics/Physics/InformationDifference.lean",
+      "bytes": 9377,
+      "sha256": "912b63bbbca110452bc2172f9c1407e49a254504712cbf2894f8b68de8b68524",
+      "imports": [
+        "Holonics.Foundation.InformationReceiver",
+        "Holonics.Foundation.FiniteCrossEntropyReceiver",
+        "Mathlib.Data.Complex.Basic"
+      ]
+    },
+    {
+      "module": "Holonics.Physics.PhaseCarrier",
+      "relative_path": "Holonics/Physics/PhaseCarrier.lean",
+      "bytes": 13695,
+      "sha256": "79de87e1d03d40602d45fc5959493dcc86b4ca47c02398a64f0281312babdc1b",
+      "imports": [
+        "Holonics.Foundation.Holon"
+      ]
+    },
+    {
+      "module": "Holonics.Physics.PhysicalRealization",
+      "relative_path": "Holonics/Physics/PhysicalRealization.lean",
+      "bytes": 14756,
+      "sha256": "dd127e8b32c942fb416e80bd8bf9af1612ab65ff7af8125a8d139fbf6139bed7",
+      "imports": [
+        "Holonics.Foundation.Lineage",
+        "Holonics.Foundation.Receiver",
+        "Holonics.Foundation.ReceiverHistoryCompression"
+      ]
+    },
+    {
+      "module": "Holonics.Transport.AffineJointBall",
+      "relative_path": "Holonics/Transport/AffineJointBall.lean",
+      "bytes": 5072,
+      "sha256": "633eb05f622874f2559fc45105c9c9ad822475e33e0a7b53eb3e2fb4c01577f0",
+      "imports": [
+        "Mathlib.Analysis.Normed.Operator.BoundedLinearMaps",
+        "Mathlib.Analysis.InnerProductSpace.Basic",
+        "Mathlib.Tactic"
+      ]
+    },
+    {
+      "module": "Holonics.Transport.CellHolonomy",
+      "relative_path": "Holonics/Transport/CellHolonomy.lean",
+      "bytes": 6346,
+      "sha256": "14da070a4bf02580cb67c3c4bfa06c52b5ea3b4593b8e7032f82edbcf307343c",
+      "imports": [
+        "Holonics.Foundation.HodgeReceiver",
+        "Holonics.Transport.NavigatorTraceFaces",
+        "Mathlib.Tactic"
+      ]
+    },
+    {
+      "module": "Holonics.Transport.ChangingReceiver.Defect",
+      "relative_path": "Holonics/Transport/ChangingReceiver/Defect.lean",
+      "bytes": 7493,
+      "sha256": "0fd69509667e6e3b3cee7c9ef853e29236c67c4f6c205dd1571b9bce4945c950",
+      "imports": [
+        "Holonics.Foundation.Lineage",
+        "Holonics.Foundation.ReceiverHistoryCompression",
+        "Mathlib.Analysis.Calculus.Deriv.Mul",
+        "Mathlib.Tactic"
+      ]
+    },
+    {
+      "module": "Holonics.Transport.EditRigidity",
+      "relative_path": "Holonics/Transport/EditRigidity.lean",
+      "bytes": 45283,
+      "sha256": "e44abd1ca8fddb1e6bee9c04b646dbe0b13ca5b2d1d7e825b38223d46acdfd96",
+      "imports": [
+        "Holonics.Foundation.RigidityReceiver",
+        "Mathlib.LinearAlgebra.Dual.Lemmas"
+      ]
+    },
+    {
+      "module": "Holonics.Transport.HelicalPairInteraction",
+      "relative_path": "Holonics/Transport/HelicalPairInteraction.lean",
+      "bytes": 22961,
+      "sha256": "5408e033f4d0d3adf22e75d01811d172752222a54ea0d762d2facf102f8cdd58",
+      "imports": [
+        "Holonics.Geometry.ScrewGeometry",
+        "Holonics.Transport.HolonicInteraction",
+        "Mathlib.GroupTheory.Perm.Basic",
+        "Mathlib.Tactic"
+      ]
+    },
+    {
+      "module": "Holonics.Transport.HolonicComposition",
+      "relative_path": "Holonics/Transport/HolonicComposition.lean",
+      "bytes": 18005,
+      "sha256": "b2c95f51ec8c6d23e03df8e489d9233edc29073fa2bc314ec824eef88eb1912e",
+      "imports": [
+        "Holonics.Geometry.AffineSwing",
+        "Holonics.Foundation.ComparisonCell",
+        "Holonics.Foundation.TransportWord",
+        "Holonics.Physics.PhysicalRealization",
+        "Holonics.Geometry.SwingBridges",
+        "Holonics.Foundation.ConnectionLineage"
+      ]
+    },
+    {
+      "module": "Holonics.Transport.HolonicInteraction",
+      "relative_path": "Holonics/Transport/HolonicInteraction.lean",
+      "bytes": 31518,
+      "sha256": "ed7aeaa89a12c73b32983536eaffd3b6369951fd55f8143afd5ef16bd455f1b5",
+      "imports": [
+        "Holonics.Physics.HolonicSnellInteraction",
+        "Mathlib.Data.Matrix.Basic",
+        "Mathlib.Data.Matrix.Mul",
+        "Mathlib.LinearAlgebra.Matrix.Notation",
+        "Mathlib.Tactic"
+      ]
+    },
+    {
+      "module": "Holonics.Transport.JetStaircase",
+      "relative_path": "Holonics/Transport/JetStaircase.lean",
+      "bytes": 12810,
+      "sha256": "f1ed86d4743f8bb81af3abfd5d281066119677d09e6e7008e0f93ae5b4c0257f",
+      "imports": [
+        "Holonics.Foundation.HigherDifferenceTransport",
+        "Mathlib.Data.Nat.Choose.Basic",
+        "Mathlib.Tactic"
+      ]
+    },
+    {
+      "module": "Holonics.Transport.JunctionLaw",
+      "relative_path": "Holonics/Transport/JunctionLaw.lean",
+      "bytes": 38245,
+      "sha256": "13873cd62573aa758e75691cfc17c2dc30365db7954914fff282d66143f4fcb4",
+      "imports": [
+        "Holonics.Foundation.HodgeReceiver",
+        "Holonics.Foundation.Lineage"
+      ]
+    },
+    {
+      "module": "Holonics.Transport.NavigatorTraceFaces",
+      "relative_path": "Holonics/Transport/NavigatorTraceFaces.lean",
+      "bytes": 8743,
+      "sha256": "49e223eb8c3d5b8bc950ae13d4a80a3e0d2c4d2e0c487ff08abe699a2972b849",
+      "imports": [
+        "Holonics.Transport.HelicalPairInteraction",
+        "Holonics.Geometry.LocalFactor",
+        "Mathlib.LinearAlgebra.Matrix.Block",
+        "Mathlib.LinearAlgebra.Matrix.Trace",
+        "Mathlib.Tactic"
+      ]
+    },
+    {
+      "module": "Holonics.Transport.SituatedReturnedDifference",
+      "relative_path": "Holonics/Transport/SituatedReturnedDifference.lean",
+      "bytes": 3087,
+      "sha256": "a8d1d4a933eae5f2ea504fac1cb8712eea4c8746da20309f3589205ac7d4f2e4",
+      "imports": [
+        "Holonics.Foundation.Lineage"
+      ]
+    },
+    {
+      "module": "Holonics.Transport.SourceMoment",
+      "relative_path": "Holonics/Transport/SourceMoment.lean",
+      "bytes": 17733,
+      "sha256": "095b84a43b14e2768eb32d72d0bdabd63d7a931cfde8ab2dc92a3591ff6fd15e",
+      "imports": [
+        "Holonics.Foundation.ReceiverHistoryCompression",
+        "Mathlib.LinearAlgebra.TensorProduct.Basic",
+        "Mathlib.Algebra.BigOperators.Group.Finset.Basic",
+        "Mathlib.Tactic"
+      ]
+    },
+    {
+      "module": "Holonics.Transport.WorldTube",
+      "relative_path": "Holonics/Transport/WorldTube.lean",
+      "bytes": 14968,
+      "sha256": "228513f830b91a54a47caee583f7c744b2a22a7bcedec65787927bc0c08a4549",
+      "imports": [
+        "Holonics.Foundation.Holon",
+        "Holonics.Foundation.HolonicDirectedPassage",
+        "Holonics.Foundation.ReceiverHistoryCompression",
+        "Holonics.Transport.SituatedReturnedDifference"
+      ]
+    }
+  ],
+  "direct_foreign_imports": [
+    "Lean.Elab.Tactic.Omega",
+    "Mathlib.Algebra.BigOperators.Group.Finset.Basic",
+    "Mathlib.Algebra.BigOperators.Intervals",
+    "Mathlib.Algebra.Exact.Basic",
+    "Mathlib.Algebra.Field.Basic",
+    "Mathlib.Algebra.Group.Basic",
+    "Mathlib.Algebra.Group.ForwardDiff",
+    "Mathlib.Algebra.Group.Subgroup.Basic",
+    "Mathlib.Algebra.Group.Subgroup.Ker",
+    "Mathlib.Algebra.Module.LinearMap.Basic",
+    "Mathlib.Algebra.Order.BigOperators.Ring.Finset",
+    "Mathlib.Algebra.Order.Chebyshev",
+    "Mathlib.Algebra.Order.Field.Basic",
+    "Mathlib.Algebra.Order.Field.Rat",
+    "Mathlib.Algebra.Order.Round",
+    "Mathlib.Algebra.Ring.GeomSum",
+    "Mathlib.Analysis.CStarAlgebra.Matrix",
+    "Mathlib.Analysis.Calculus.ContDiff.Basic",
+    "Mathlib.Analysis.Calculus.Deriv.Comp",
+    "Mathlib.Analysis.Calculus.Deriv.Inv",
+    "Mathlib.Analysis.Calculus.Deriv.Mul",
+    "Mathlib.Analysis.Calculus.Deriv.Pi",
+    "Mathlib.Analysis.Calculus.Deriv.Prod",
+    "Mathlib.Analysis.Calculus.DifferentialForm.Basic",
+    "Mathlib.Analysis.Calculus.FDeriv.Mul",
+    "Mathlib.Analysis.Calculus.FDeriv.Symmetric",
+    "Mathlib.Analysis.Calculus.MeanValue",
+    "Mathlib.Analysis.Complex.Trigonometric",
+    "Mathlib.Analysis.InnerProductSpace.Adjoint",
+    "Mathlib.Analysis.InnerProductSpace.Basic",
+    "Mathlib.Analysis.InnerProductSpace.EuclideanDist",
+    "Mathlib.Analysis.InnerProductSpace.GramMatrix",
+    "Mathlib.Analysis.Matrix.Spectrum",
+    "Mathlib.Analysis.Normed.Group.Basic",
+    "Mathlib.Analysis.Normed.Operator.BoundedLinearMaps",
+    "Mathlib.Analysis.Quaternion",
+    "Mathlib.Analysis.Real.Sqrt",
+    "Mathlib.Analysis.SpecialFunctions.Complex.Circle",
+    "Mathlib.Analysis.SpecialFunctions.Complex.Log",
+    "Mathlib.Analysis.SpecialFunctions.Exp",
+    "Mathlib.Analysis.SpecialFunctions.ExpDeriv",
+    "Mathlib.Analysis.SpecialFunctions.Log.Basic",
+    "Mathlib.Analysis.SpecialFunctions.Log.Deriv",
+    "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+    "Mathlib.Analysis.SpecialFunctions.Sqrt",
+    "Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic",
+    "Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv",
+    "Mathlib.CategoryTheory.Category.Basic",
+    "Mathlib.CategoryTheory.Groupoid",
+    "Mathlib.Combinatorics.SimpleGraph.Acyclic",
+    "Mathlib.Data.Complex.Basic",
+    "Mathlib.Data.ENat.Lattice",
+    "Mathlib.Data.Fin.VecNotation",
+    "Mathlib.Data.Finset.Lattice.Fold",
+    "Mathlib.Data.Finsupp.Basic",
+    "Mathlib.Data.Fintype.BigOperators",
+    "Mathlib.Data.Int.ModEq",
+    "Mathlib.Data.List.Perm.Basic",
+    "Mathlib.Data.Matrix.Basic",
+    "Mathlib.Data.Matrix.ColumnRowPartitioned",
+    "Mathlib.Data.Matrix.Mul",
+    "Mathlib.Data.Nat.Choose.Basic",
+    "Mathlib.Data.Nat.Factorization.Basic",
+    "Mathlib.Data.Nat.Log",
+    "Mathlib.Data.Nat.Prime.Int",
+    "Mathlib.Data.Nat.Size",
+    "Mathlib.Data.Rat.Cast.CharZero",
+    "Mathlib.Data.Rat.Cast.Order",
+    "Mathlib.Data.Rat.Lemmas",
+    "Mathlib.Data.Real.Basic",
+    "Mathlib.Data.Set.Defs",
+    "Mathlib.Data.Set.Finite.Basic",
+    "Mathlib.Data.Set.Operations",
+    "Mathlib.Data.ZMod.Basic",
+    "Mathlib.GroupTheory.OrderOfElement",
+    "Mathlib.GroupTheory.Perm.Basic",
+    "Mathlib.GroupTheory.QuotientGroup.Basic",
+    "Mathlib.LinearAlgebra.BilinearForm.Orthogonal",
+    "Mathlib.LinearAlgebra.CrossProduct",
+    "Mathlib.LinearAlgebra.Dual.Defs",
+    "Mathlib.LinearAlgebra.Dual.Lemmas",
+    "Mathlib.LinearAlgebra.ExteriorAlgebra.Basic",
+    "Mathlib.LinearAlgebra.FiniteDimensional.Lemmas",
+    "Mathlib.LinearAlgebra.Matrix.Block",
+    "Mathlib.LinearAlgebra.Matrix.ConjTranspose",
+    "Mathlib.LinearAlgebra.Matrix.Determinant.Basic",
+    "Mathlib.LinearAlgebra.Matrix.Notation",
+    "Mathlib.LinearAlgebra.Matrix.PosDef",
+    "Mathlib.LinearAlgebra.Matrix.Rank",
+    "Mathlib.LinearAlgebra.Matrix.ToLin",
+    "Mathlib.LinearAlgebra.Matrix.ToLinearEquiv",
+    "Mathlib.LinearAlgebra.Matrix.Trace",
+    "Mathlib.LinearAlgebra.Pi",
+    "Mathlib.LinearAlgebra.Prod",
+    "Mathlib.LinearAlgebra.Projection",
+    "Mathlib.LinearAlgebra.Quotient.Basic",
+    "Mathlib.LinearAlgebra.Span.Basic",
+    "Mathlib.LinearAlgebra.TensorProduct.Basic",
+    "Mathlib.Logic.Equiv.Defs",
+    "Mathlib.Logic.IsEmpty.Basic",
+    "Mathlib.Logic.Relation",
+    "Mathlib.Order.Interval.Finset.SuccPred",
+    "Mathlib.RingTheory.AdjoinRoot",
+    "Mathlib.RingTheory.Polynomial.Eisenstein.Basic",
+    "Mathlib.RingTheory.Polynomial.GaussLemma",
+    "Mathlib.Tactic",
+    "Mathlib.Tactic.Abel",
+    "Mathlib.Tactic.FieldSimp",
+    "Mathlib.Tactic.FinCases",
+    "Mathlib.Tactic.IntervalCases",
+    "Mathlib.Tactic.Linarith",
+    "Mathlib.Tactic.NoncommRing",
+    "Mathlib.Tactic.NormNum",
+    "Mathlib.Tactic.Ring",
+    "Mathlib.Topology.UniformSpace.CompleteSeparated"
+  ],
+  "audit_sources": {
+    "SingleHoleResponseAudit": {
+      "relative_path": "SingleHoleResponseAudit.lean",
+      "bytes": 1071,
+      "sha256": "c4e65d31b586e869a5b924afa149c0587631741adf5bac17102fc7368956f0b7",
+      "axiom_selectors": [
+        "Holonics.HNN.SingleHoleResponse.firstComplete_eq_fixed_add_response",
+        "Holonics.HNN.SingleHoleResponse.pairComplete_eq_fixed_add_response",
+        "Holonics.HNN.SingleHoleResponse.oneHoleSourceExpansion",
+        "Holonics.HNN.SingleHoleResponse.populationNormalizedOneHoleSourceExpansion",
+        "Holonics.HNN.SingleHoleResponse.absoluteLoaded_response_add",
+        "Holonics.HNN.SingleHoleResponse.openedState_from_normalized_source",
+        "Holonics.HNN.SingleHoleResponse.loadedReceiving_response",
+        "Holonics.HNN.SingleHoleResponse.exactLeaderUnion_mem_iff",
+        "Holonics.HNN.SingleHoleResponse.exactLeaderUnion_sound",
+        "Holonics.HNN.SingleHoleResponse.constant_face_released_at_zero",
+        "Holonics.HNN.SingleHoleResponse.holdingLaw_releases_constant_face_at_zero",
+        "Holonics.HNN.SingleHoleResponse.singletonLeader_holdingLaw_release",
+        "Holonics.HNN.SingleHoleResponse.normalizedSource_loadedWord_grain_singleton_release"
+      ]
+    },
+    "SourceReceiverReturnAudit": {
+      "relative_path": "SourceReceiverReturnAudit.lean",
+      "bytes": 696,
+      "sha256": "8a7d0ff4a5e110091a6993cbec1d2c82ee3c4d8171070a74f0357942170b6d5f",
+      "axiom_selectors": [
+        "Holonics.HNN.SourceReceiverReturn.blockTick_apply",
+        "Holonics.HNN.SourceReceiverReturn.wordMapAt_apply",
+        "Holonics.HNN.SourceReceiverReturn.sourceReturnAt_pairing",
+        "Holonics.HNN.SourceReceiverReturn.sourceReturnAt_is_dual_of_sourceRead",
+        "Holonics.HNN.SourceReceiverReturn.sourceReturnAt_unique",
+        "Holonics.HNN.SourceReceiverReturn.sourceReturnAt_halfTurn",
+        "Holonics.HNN.SourceReceiverReturn.sourceContrast_return",
+        "Holonics.HNN.SourceReceiverReturn.partitionReturn_pairing",
+        "Holonics.HNN.SourceReceiverReturn.normalizedAbsoluteLoaded_sourceReturn"
+      ]
+    }
+  },
+  "metadata": {
+    "lean-toolchain": {
+      "bytes": 25,
+      "sha256": "302cd63c54178885b89e669f33b38f12f4dd7ae7e5cac537b3203e3768d8fb2b"
+    },
+    "lakefile.toml": {
+      "bytes": 629,
+      "sha256": "0b07ad6bd663cf65a8bfbf11fa4998663d5b87d0d3747a4c84442402163f517d"
+    },
+    "lake-manifest.json": {
+      "bytes": 5310,
+      "sha256": "5e2b9522bf6b080d77946a055ed90b88513a1aa52d9fa0ceb01c6b01283783cd"
+    }
+  },
+  "prior_source_return_comparison": {
+    "prior_modules": 144,
+    "missing": [],
+    "changed": [
+      "Holonics.HNN.SingleHoleResponse"
+    ],
+    "added": [
+      "Holonics.HNN.SingleHoleResponse.ComposedConsumer",
+      "Holonics.HNN.SingleHoleResponse.GrainRelease",
+      "Holonics.HNN.SingleHoleResponse.LoadedWord",
+      "Holonics.HNN.SingleHoleResponse.NormalizedOpening",
+      "Holonics.HNN.SingleHoleResponse.ReceivingResponse",
+      "Holonics.HNN.SingleHoleResponse.SourceExpansion"
+    ],
+    "all_other_prior_provider_bytes_preserved": true
+  }
+}

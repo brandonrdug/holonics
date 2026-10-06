@@ -1,0 +1,90 @@
+{
+  "status": "presentation of two already accepted deterministic native controls; no new run, input, decoder or target",
+  "accepted_source_commit": "a23095761e68032f6cbddaa03e6fa6ede778d57d",
+  "producing_test_source_sha256": "94a66b6aa087a2b8e52b8a8d5dacd2c4be6a7faa0a8b7417a374fd650c9f3b88",
+  "acceptance_join": "DEMONSTRATION_ACCEPTANCE.v1.json",
+  "controls": [
+    {
+      "selector": "hnn::tests::physical::the_resident_retains_the_learned_pair_and_reads_the_correlated_family_on_its_carried_state",
+      "input": {
+        "station_classes": [
+          0,
+          null,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          1
+        ],
+        "null_means": "erased station1; its original value is not supplied to resident.read",
+        "class_chart": "existing four-class identity producing chart and decoder",
+        "receiver": "existing receiver(2)",
+        "observation": "none for this query"
+      },
+      "retained_state": {
+        "material": "receiving map and pair-output relation changed by earlier declared observations after their blind receipts",
+        "physical_state": "same actual carry: storage, arriving waves, contact state, conductance and momentum",
+        "clock": {
+          "entered_tick": 4,
+          "returned_tick": 5,
+          "entered_tick_factorization": [
+            [
+              2,
+              2
+            ]
+          ],
+          "returned_tick_factorization": [
+            [
+              5,
+              1
+            ]
+          ]
+        },
+        "material_during_query": "unchanged constitution commit, asserted by accepted control",
+        "source_frame": "initial Current retained separately, asserted by accepted control",
+        "resonators": "None in this fixture; no pumped-resonator claim"
+      },
+      "emitted_cells_verbatim": "[Intact(0), Released(2), Intact(2), Intact(2), Intact(2), Intact(2), Intact(2), Intact(2), Intact(1)]",
+      "emitted_cells_origin": "exact contiguous cells field of the preserved whole emitted PhysicalRepair",
+      "whole_output": "WHOLE_BLIND_PHYSICAL_REPAIR.a230.txt",
+      "whole_output_sha256": "563d4fcf4a1c6eeddb2a5f01c0595896ea31e45bfb84673a449486353a02a03a",
+      "checked_invariants": [
+        "opening and Word work balances close",
+        "all per-crossing balances close",
+        "same-label signed response matches complete-source readings across all four class choices",
+        "query deposits nothing and advances actual carry"
+      ],
+      "claim": "model-domain constancy at the declared receiver; no withheld-truth recovery"
+    },
+    {
+      "selector": "hnn::tests::physical::a_refused_resident_observation_keeps_material_and_carries_into_the_next_native_read",
+      "input": {
+        "station_classes": [
+          0,
+          null
+        ],
+        "class_chart": "same existing four-class chart",
+        "receiver": "existing receiver(2)",
+        "declared_comparison_partition": [
+          false,
+          false
+        ]
+      },
+      "retained_state": "initial material stays unchanged after the refused comparison and after the next unobserved native read",
+      "actual_emission_verbatim": "test hnn::tests::physical::a_refused_resident_observation_keeps_material_and_carries_into_the_next_native_read ... ok",
+      "emission_limit": "control emits only its test-pass line; it prints no PhysicalRepair, so no class output is fabricated",
+      "producing_stdout": "hnn-retained-a2309576-control-group2-20261006-v1.stdout",
+      "producing_stdout_sha256": "bfbae611f9e77735bd1961748b7aa43de631c05c1a5afd0abf6a1fd4d7ffed2b",
+      "checked_invariants": [
+        "comparison is refused",
+        "actual carry advances by one tick on next native read",
+        "next opening and Word close",
+        "foreign three-class chart is refused before reception; material and prior opening stay unchanged"
+      ]
+    }
+  ],
+  "scope": "two fixed physical-law fixtures at their own accepted source/executable pin; no Athena output, unknown-truth reconstruction, untouched scientific population, performance, device, cold-restore or adaptive-retention claim",
+  "new_execution": false
+}

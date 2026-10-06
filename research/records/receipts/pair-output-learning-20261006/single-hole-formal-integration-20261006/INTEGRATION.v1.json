@@ -1,0 +1,53 @@
+{
+  "status": "static local integration only; native/compiler/kernel/resource acceptance remains pending sole queue",
+  "integrated_commit": "29f0ba2b075508e0e03ebd1dcc72a1e962bb44c4",
+  "worker_commit": "6e7651c9b8407fa6dcd7062bd6499d183aec6806",
+  "integration_base": "e756e581c121f13a60319ca6cdfcf47a5abdfc9c",
+  "declaration_preservation": {
+    "count": 39,
+    "all_names_statements_and_proof_bodies_equal_after_comment_and_whitespace_normalization": true,
+    "duplicates": [],
+    "changed_or_missing": [],
+    "facade_original_selectors_identical_in_order": true,
+    "facade_selector_count": 13,
+    "BigOperators_scope_and_required_imports_restored": true,
+    "typechecking": false
+  },
+  "provider_preservation": {
+    "prior_modules": 144,
+    "missing": [],
+    "changed": [
+      "Holonics.HNN.SingleHoleResponse"
+    ],
+    "added": [
+      "Holonics.HNN.SingleHoleResponse.ComposedConsumer",
+      "Holonics.HNN.SingleHoleResponse.GrainRelease",
+      "Holonics.HNN.SingleHoleResponse.LoadedWord",
+      "Holonics.HNN.SingleHoleResponse.NormalizedOpening",
+      "Holonics.HNN.SingleHoleResponse.ReceivingResponse",
+      "Holonics.HNN.SingleHoleResponse.SourceExpansion"
+    ],
+    "all_other_prior_provider_bytes_preserved": true
+  },
+  "atlas_resolution": "replaced only hnn.single-hole-loaded-grain-consumer row from worker; every other integration-base row, including source-receiver-return and source-return-runtime-pairing, preserved byte-for-byte",
+  "local_source_counts": {
+    "facade": 148,
+    "source_return_consumer": 150
+  },
+  "queue_packet": {
+    "path": "QUEUE_REQUEST.v2.json",
+    "sha256": "9887acda3c91ed82173db0debda4eae1a2a3cc4e75c333e3841c0044baf11265",
+    "private_input_snapshot": "/home/b/Workspaces/holonics/.local/wt/hnn-architecture-01a1030c/.local/formal-decomposition-integration-01a1030c-20261006/source/lean",
+    "actual_current_unit_projection": null,
+    "launch_owner": "sole queue01a10352 under existing authorized caps and lease; owner launched nothing"
+  },
+  "source_return_owner_sha256": "294df662d9a7dff20e4540f0fc643e0a00081fbae49d471c4f146dc1c5d9bc53",
+  "source_return_audit_sha256": "8a7d0ff4a5e110091a6993cbec1d2c82ee3c4d8171070a74f0357942170b6d5f",
+  "single_hole_audit_sha256": "c4e65d31b586e869a5b924afa149c0587631741adf5bac17102fc7368956f0b7",
+  "runtime_223_request_unmodified": {
+    "source_commit": "223a4498f5ccb96ca2556c794be434eba1aec688",
+    "packet_path": "/home/b/Workspaces/holonics/.local/wt/source-return-runtime-01a1030c/.local/source-return-borrow-repair-01a1030c-20261006/QUEUE_REQUEST.v3.json",
+    "sha256": "5292b354ec003454b82145ae47b36d5f53914aa920c7ee2449c9da9b8a5c6966",
+    "all_eight_original_selectors_preserved": true
+  }
+}

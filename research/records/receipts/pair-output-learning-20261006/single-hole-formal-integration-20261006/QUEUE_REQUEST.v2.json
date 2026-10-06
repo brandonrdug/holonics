@@ -1,0 +1,498 @@
+{
+  "version": 2,
+  "status": "source/config sealed; no compiler, measurement, lease or launch claimed; sole queue acts under existing authorized resource policy",
+  "source_commit": "29f0ba2b075508e0e03ebd1dcc72a1e962bb44c4",
+  "source_base": "e756e581c121f13a60319ca6cdfcf47a5abdfc9c",
+  "branch": "codex/hnn-architecture-01a1030c",
+  "worktree": "/home/b/Workspaces/holonics/.local/wt/hnn-architecture-01a1030c",
+  "source_input_directory": "/home/b/Workspaces/holonics/.local/wt/hnn-architecture-01a1030c/.local/formal-decomposition-integration-01a1030c-20261006/source/lean",
+  "atomic_native_change": false,
+  "atomic_formal_patch": {
+    "path": "/home/b/Workspaces/holonics/.local/wt/hnn-architecture-01a1030c/.local/formal-decomposition-integration-01a1030c-20261006/ATOMIC_FORMAL.v1.patch",
+    "bytes": 79107,
+    "sha256": "991200c8143c391b00e6973781da957d338ef54b67fe4b4879dcafefc419c71a",
+    "owned_paths": [
+      "lean/Holonics/HNN/SingleHoleResponse.lean",
+      "lean/Holonics/HNN/SingleHoleResponse/ComposedConsumer.lean",
+      "lean/Holonics/HNN/SingleHoleResponse/GrainRelease.lean",
+      "lean/Holonics/HNN/SingleHoleResponse/LoadedWord.lean",
+      "lean/Holonics/HNN/SingleHoleResponse/NormalizedOpening.lean",
+      "lean/Holonics/HNN/SingleHoleResponse/ReceivingResponse.lean",
+      "lean/Holonics/HNN/SingleHoleResponse/SourceExpansion.lean"
+    ]
+  },
+  "source_manifest": {
+    "path": "/home/b/Workspaces/holonics/.local/wt/hnn-architecture-01a1030c/.local/formal-decomposition-integration-01a1030c-20261006/LOCAL_SOURCE_CLOSURE.v1.json",
+    "bytes": 80937,
+    "sha256": "7bba58f1c77d7026d19594ce330e5fc07511e084e6c59d96e0d7522e992904d2"
+  },
+  "prepared_owner_packet": {
+    "path": "/home/b/Workspaces/holonics/.local/wt/hnn-architecture-01a1030c/research/records/receipts/pair-output-learning-20261006/single-hole-formal-decomposition-20261006/QUEUE_REQUEST.v1.json",
+    "sha256": "05cf500138bbf5bcd42d86f034468f1f0e72dcd52b9e285c4a39e8ef95c84eea"
+  },
+  "owner_jobs": [
+    {
+      "acceptance": "Compile exactly this owner once in dependency order; require all listed #print axioms outputs, standard axioms only, and no sorryAx. Queue owns measured projection, lease, resources and cleanup.",
+      "axiom_selectors": [
+        "Holonics.HNN.SingleHoleResponse.firstComplete_eq_fixed_add_response",
+        "Holonics.HNN.SingleHoleResponse.pairComplete_eq_fixed_add_response",
+        "Holonics.HNN.SingleHoleResponse.oneHoleSourceExpansion",
+        "Holonics.HNN.SingleHoleResponse.populationNormalizedOneHoleSourceExpansion"
+      ],
+      "imports": [
+        "Mathlib.Algebra.BigOperators.Group.Finset.Basic",
+        "Mathlib.Data.Fintype.BigOperators",
+        "Mathlib.Algebra.Module.LinearMap.Basic",
+        "Mathlib.Tactic.Abel"
+      ],
+      "order": 1,
+      "path": "lean/Holonics/HNN/SingleHoleResponse/SourceExpansion.lean",
+      "sha256": "2661a9d5c3fc3c6c7fd14372756e74d4aa9a88135107164edf9ed20de971bd95",
+      "target": "Holonics.HNN.SingleHoleResponse.SourceExpansion",
+      "input_path": "/home/b/Workspaces/holonics/.local/wt/hnn-architecture-01a1030c/.local/formal-decomposition-integration-01a1030c-20261006/source/lean/Holonics/HNN/SingleHoleResponse/SourceExpansion.lean"
+    },
+    {
+      "acceptance": "Compile exactly this owner once in dependency order; require all listed #print axioms outputs, standard axioms only, and no sorryAx. Queue owns measured projection, lease, resources and cleanup.",
+      "axiom_selectors": [
+        "Holonics.HNN.SingleHoleResponse.absoluteLoaded_response_add"
+      ],
+      "imports": [
+        "Holonics.HNN.LoadedMedium",
+        "Holonics.HNN.TickFamily"
+      ],
+      "order": 2,
+      "path": "lean/Holonics/HNN/SingleHoleResponse/LoadedWord.lean",
+      "sha256": "2d72454c1c62667109f471c23c2223f003629a2b4f4e5fcda82cbbb80da043d0",
+      "target": "Holonics.HNN.SingleHoleResponse.LoadedWord",
+      "input_path": "/home/b/Workspaces/holonics/.local/wt/hnn-architecture-01a1030c/.local/formal-decomposition-integration-01a1030c-20261006/source/lean/Holonics/HNN/SingleHoleResponse/LoadedWord.lean"
+    },
+    {
+      "acceptance": "Compile exactly this owner once in dependency order; require all listed #print axioms outputs, standard axioms only, and no sorryAx. Queue owns measured projection, lease, resources and cleanup.",
+      "axiom_selectors": [
+        "Holonics.HNN.SingleHoleResponse.openedState_from_normalized_source"
+      ],
+      "imports": [
+        "Holonics.HNN.SingleHoleResponse.SourceExpansion",
+        "Holonics.HNN.SingleHoleResponse.LoadedWord"
+      ],
+      "order": 3,
+      "path": "lean/Holonics/HNN/SingleHoleResponse/NormalizedOpening.lean",
+      "sha256": "0957ab4482a935b5b80b3f4bf1993f9ab6c14823f1cc90c1a9df4add1d48d199",
+      "target": "Holonics.HNN.SingleHoleResponse.NormalizedOpening",
+      "input_path": "/home/b/Workspaces/holonics/.local/wt/hnn-architecture-01a1030c/.local/formal-decomposition-integration-01a1030c-20261006/source/lean/Holonics/HNN/SingleHoleResponse/NormalizedOpening.lean"
+    },
+    {
+      "acceptance": "Compile exactly this owner once in dependency order; require all listed #print axioms outputs, standard axioms only, and no sorryAx. Queue owns measured projection, lease, resources and cleanup.",
+      "axiom_selectors": [
+        "Holonics.HNN.SingleHoleResponse.loadedReceiving_response"
+      ],
+      "imports": [
+        "Holonics.HNN.SingleHoleResponse.LoadedWord"
+      ],
+      "order": 4,
+      "path": "lean/Holonics/HNN/SingleHoleResponse/ReceivingResponse.lean",
+      "sha256": "716da284776cf2a7b21f6ae38547015bb69c1d6bac83093e7186eb5c4a9822e9",
+      "target": "Holonics.HNN.SingleHoleResponse.ReceivingResponse",
+      "input_path": "/home/b/Workspaces/holonics/.local/wt/hnn-architecture-01a1030c/.local/formal-decomposition-integration-01a1030c-20261006/source/lean/Holonics/HNN/SingleHoleResponse/ReceivingResponse.lean"
+    },
+    {
+      "acceptance": "Compile exactly this owner once in dependency order; require all listed #print axioms outputs, standard axioms only, and no sorryAx. Queue owns measured projection, lease, resources and cleanup.",
+      "axiom_selectors": [
+        "Holonics.HNN.SingleHoleResponse.exactLeaderUnion_mem_iff",
+        "Holonics.HNN.SingleHoleResponse.exactLeaderUnion_sound",
+        "Holonics.HNN.SingleHoleResponse.constant_face_released_at_zero",
+        "Holonics.HNN.SingleHoleResponse.holdingLaw_releases_constant_face_at_zero",
+        "Holonics.HNN.SingleHoleResponse.singletonLeader_holdingLaw_release"
+      ],
+      "imports": [
+        "Holonics.Foundation.ReceiverRelease"
+      ],
+      "order": 5,
+      "path": "lean/Holonics/HNN/SingleHoleResponse/GrainRelease.lean",
+      "sha256": "16785b532ef69e74130a148e6d9ab2e933f00beacf580bab5a02d97867fc14e5",
+      "target": "Holonics.HNN.SingleHoleResponse.GrainRelease",
+      "input_path": "/home/b/Workspaces/holonics/.local/wt/hnn-architecture-01a1030c/.local/formal-decomposition-integration-01a1030c-20261006/source/lean/Holonics/HNN/SingleHoleResponse/GrainRelease.lean"
+    },
+    {
+      "acceptance": "Compile exactly this owner once in dependency order; require all listed #print axioms outputs, standard axioms only, and no sorryAx. Queue owns measured projection, lease, resources and cleanup.",
+      "axiom_selectors": [
+        "Holonics.HNN.SingleHoleResponse.normalizedSource_loadedWord_grain_singleton_release"
+      ],
+      "imports": [
+        "Holonics.HNN.SingleHoleResponse.SourceExpansion",
+        "Holonics.HNN.SingleHoleResponse.LoadedWord",
+        "Holonics.HNN.SingleHoleResponse.NormalizedOpening",
+        "Holonics.HNN.SingleHoleResponse.ReceivingResponse",
+        "Holonics.HNN.SingleHoleResponse.GrainRelease"
+      ],
+      "order": 6,
+      "path": "lean/Holonics/HNN/SingleHoleResponse/ComposedConsumer.lean",
+      "sha256": "a0808bf5130db462023f5357df850780561daf7f4a12e35ead0b1b5c03ac0362",
+      "target": "Holonics.HNN.SingleHoleResponse.ComposedConsumer",
+      "input_path": "/home/b/Workspaces/holonics/.local/wt/hnn-architecture-01a1030c/.local/formal-decomposition-integration-01a1030c-20261006/source/lean/Holonics/HNN/SingleHoleResponse/ComposedConsumer.lean"
+    }
+  ],
+  "facade_job": {
+    "acceptance": "After all owner units, compile the stable facade and retain all thirteen exact axiom outputs.",
+    "axiom_selectors": [
+      "Holonics.HNN.SingleHoleResponse.firstComplete_eq_fixed_add_response",
+      "Holonics.HNN.SingleHoleResponse.pairComplete_eq_fixed_add_response",
+      "Holonics.HNN.SingleHoleResponse.oneHoleSourceExpansion",
+      "Holonics.HNN.SingleHoleResponse.populationNormalizedOneHoleSourceExpansion",
+      "Holonics.HNN.SingleHoleResponse.absoluteLoaded_response_add",
+      "Holonics.HNN.SingleHoleResponse.openedState_from_normalized_source",
+      "Holonics.HNN.SingleHoleResponse.loadedReceiving_response",
+      "Holonics.HNN.SingleHoleResponse.exactLeaderUnion_mem_iff",
+      "Holonics.HNN.SingleHoleResponse.exactLeaderUnion_sound",
+      "Holonics.HNN.SingleHoleResponse.constant_face_released_at_zero",
+      "Holonics.HNN.SingleHoleResponse.holdingLaw_releases_constant_face_at_zero",
+      "Holonics.HNN.SingleHoleResponse.singletonLeader_holdingLaw_release",
+      "Holonics.HNN.SingleHoleResponse.normalizedSource_loadedWord_grain_singleton_release"
+    ],
+    "imports": [
+      "Holonics.HNN.SingleHoleResponse.SourceExpansion",
+      "Holonics.HNN.SingleHoleResponse.LoadedWord",
+      "Holonics.HNN.SingleHoleResponse.NormalizedOpening",
+      "Holonics.HNN.SingleHoleResponse.ReceivingResponse",
+      "Holonics.HNN.SingleHoleResponse.GrainRelease",
+      "Holonics.HNN.SingleHoleResponse.ComposedConsumer"
+    ],
+    "independent_audit_after_facade": {
+      "acceptance": "Compile the original independently sealed consumer/audit bytes after the full facade; require source/object/lookup match and all thirteen original selectors.",
+      "imports": [
+        "Holonics.HNN.SingleHoleResponse"
+      ],
+      "selector_count": 13,
+      "source_path": "/home/b/Workspaces/holonics/.local/wt/hnn-architecture-01a1030c/.local/formal-decomposition-integration-01a1030c-20261006/source/lean/SingleHoleResponseAudit.lean",
+      "source_sha256": "c4e65d31b586e869a5b924afa149c0587631741adf5bac17102fc7368956f0b7"
+    },
+    "path": "lean/Holonics/HNN/SingleHoleResponse.lean",
+    "sha256": "cf04ec3f21d685dcfafd1f8f3ae0559b18e31ca375aabca8b6cf4144f97d8efb",
+    "target": "Holonics.HNN.SingleHoleResponse",
+    "input_path": "/home/b/Workspaces/holonics/.local/wt/hnn-architecture-01a1030c/.local/formal-decomposition-integration-01a1030c-20261006/source/lean/Holonics/HNN/SingleHoleResponse.lean"
+  },
+  "dependent_importer_job": {
+    "acceptance": "After the sealed integration overlay, compile the exact existing importer against the decomposed facade; require all nine selector outputs, then compile its original independent audit source/object/lookup matched and require its nine selector outputs.",
+    "audit_selector_names": [
+      "blockTick_apply",
+      "wordMapAt_apply",
+      "sourceReturnAt_pairing",
+      "sourceReturnAt_is_dual_of_sourceRead",
+      "sourceReturnAt_unique",
+      "sourceReturnAt_halfTurn",
+      "sourceContrast_return",
+      "partitionReturn_pairing",
+      "normalizedAbsoluteLoaded_sourceReturn"
+    ],
+    "audit_source_path": "/home/b/Workspaces/holonics/.local/wt/hnn-architecture-01a1030c/.local/formal-decomposition-integration-01a1030c-20261006/source/lean/SourceReceiverReturnAudit.lean",
+    "audit_source_sha256": "8a7d0ff4a5e110091a6993cbec1d2c82ee3c4d8171070a74f0357942170b6d5f",
+    "axiom_selectors": [
+      "blockTick_apply",
+      "wordMapAt_apply",
+      "sourceReturnAt_pairing",
+      "sourceReturnAt_is_dual_of_sourceRead",
+      "sourceReturnAt_unique",
+      "sourceReturnAt_halfTurn",
+      "sourceContrast_return",
+      "partitionReturn_pairing",
+      "normalizedAbsoluteLoaded_sourceReturn"
+    ],
+    "note": "External dependent owner is not copied into this base. Queue must use the coordinator-sealed integration overlay after this facade is integrated; preserve its source bytes.",
+    "source_base_commit": "8ab22667618271eca057fb460f1d062647e5b331",
+    "source_path": "/home/b/Workspaces/holonics/.local/wt/hnn-architecture-01a1030c/.local/formal-decomposition-integration-01a1030c-20261006/source/lean/Holonics/HNN/SourceReceiverReturn.lean",
+    "source_sha256": "294df662d9a7dff20e4540f0fc643e0a00081fbae49d471c4f146dc1c5d9bc53",
+    "source_snapshot_copy": "research/records/receipts/pair-output-learning-20261006/single-hole-formal-decomposition-20261006/SourceReceiverReturn.lean",
+    "target": "Holonics.HNN.SourceReceiverReturn"
+  },
+  "audit_sources": {
+    "SingleHoleResponseAudit": {
+      "relative_path": "SingleHoleResponseAudit.lean",
+      "bytes": 1071,
+      "sha256": "c4e65d31b586e869a5b924afa149c0587631741adf5bac17102fc7368956f0b7",
+      "axiom_selectors": [
+        "Holonics.HNN.SingleHoleResponse.firstComplete_eq_fixed_add_response",
+        "Holonics.HNN.SingleHoleResponse.pairComplete_eq_fixed_add_response",
+        "Holonics.HNN.SingleHoleResponse.oneHoleSourceExpansion",
+        "Holonics.HNN.SingleHoleResponse.populationNormalizedOneHoleSourceExpansion",
+        "Holonics.HNN.SingleHoleResponse.absoluteLoaded_response_add",
+        "Holonics.HNN.SingleHoleResponse.openedState_from_normalized_source",
+        "Holonics.HNN.SingleHoleResponse.loadedReceiving_response",
+        "Holonics.HNN.SingleHoleResponse.exactLeaderUnion_mem_iff",
+        "Holonics.HNN.SingleHoleResponse.exactLeaderUnion_sound",
+        "Holonics.HNN.SingleHoleResponse.constant_face_released_at_zero",
+        "Holonics.HNN.SingleHoleResponse.holdingLaw_releases_constant_face_at_zero",
+        "Holonics.HNN.SingleHoleResponse.singletonLeader_holdingLaw_release",
+        "Holonics.HNN.SingleHoleResponse.normalizedSource_loadedWord_grain_singleton_release"
+      ]
+    },
+    "SourceReceiverReturnAudit": {
+      "relative_path": "SourceReceiverReturnAudit.lean",
+      "bytes": 696,
+      "sha256": "8a7d0ff4a5e110091a6993cbec1d2c82ee3c4d8171070a74f0357942170b6d5f",
+      "axiom_selectors": [
+        "Holonics.HNN.SourceReceiverReturn.blockTick_apply",
+        "Holonics.HNN.SourceReceiverReturn.wordMapAt_apply",
+        "Holonics.HNN.SourceReceiverReturn.sourceReturnAt_pairing",
+        "Holonics.HNN.SourceReceiverReturn.sourceReturnAt_is_dual_of_sourceRead",
+        "Holonics.HNN.SourceReceiverReturn.sourceReturnAt_unique",
+        "Holonics.HNN.SourceReceiverReturn.sourceReturnAt_halfTurn",
+        "Holonics.HNN.SourceReceiverReturn.sourceContrast_return",
+        "Holonics.HNN.SourceReceiverReturn.partitionReturn_pairing",
+        "Holonics.HNN.SourceReceiverReturn.normalizedAbsoluteLoaded_sourceReturn"
+      ]
+    }
+  },
+  "fixed_acceptance_order": [
+    "six owner jobs in listed dependency order",
+    "full SingleHoleResponse facade with all thirteen selectors",
+    "original independent SingleHoleResponseAudit with all thirteen selectors and source/object/lookup match",
+    "SourceReceiverReturn nine dependent selectors after the coordinator-sealed integration overlay",
+    "original independent SourceReceiverReturnAudit with all nine selectors and source/object/lookup match"
+  ],
+  "existing_provider_reuse": {
+    "preserve_verified_141_inputs": true,
+    "existing_changed_local_provider": [
+      "Holonics.HNN.SingleHoleResponse"
+    ],
+    "new_local_owners": [
+      "Holonics.HNN.SingleHoleResponse.ComposedConsumer",
+      "Holonics.HNN.SingleHoleResponse.GrainRelease",
+      "Holonics.HNN.SingleHoleResponse.LoadedWord",
+      "Holonics.HNN.SingleHoleResponse.NormalizedOpening",
+      "Holonics.HNN.SingleHoleResponse.ReceivingResponse",
+      "Holonics.HNN.SingleHoleResponse.SourceExpansion"
+    ],
+    "downstream_existing_extra_provider": "Holonics.HNN.ModeQuotient; exact source retained, source/object/lookup preflight still required",
+    "rebuild_existing_providers_requested": false
+  },
+  "admission_policy": {
+    "threads": 1,
+    "group_memory_bytes": 4294967296,
+    "prelaunch_available_bytes": 8589934592,
+    "running_floor_bytes": 4294967296,
+    "aggregate_cpu_seconds_ceiling": 17,
+    "wall_seconds_ceiling": 60,
+    "measured_projection": null,
+    "projection_owner": "sole queue: measure current source/cache per actual unit, fix its deadline once; no inherited hotspot/projection claim, no raised ceiling, no blind repeat of failed full owner",
+    "lease_and_cleanup_owner": "existing sole queue01a10352; no priority change or uncertain-job retry requested"
+  },
+  "runtime_request_separate": {
+    "source_commit": "223a4498f5ccb96ca2556c794be434eba1aec688",
+    "packet_path": "/home/b/Workspaces/holonics/.local/wt/source-return-runtime-01a1030c/.local/source-return-borrow-repair-01a1030c-20261006/QUEUE_REQUEST.v3.json",
+    "sha256": "5292b354ec003454b82145ae47b36d5f53914aa920c7ee2449c9da9b8a5c6966",
+    "all_eight_original_selectors_preserved": true
+  },
+  "not_requested": [
+    "training",
+    "scientific generation",
+    "benchmarks",
+    "capacity/pruning experiment",
+    "provider substitution",
+    "GPU run",
+    "timeout increase",
+    "duplicate launch"
+  ],
+  "supersedes_packet_metadata": {
+    "path": "/home/b/Workspaces/holonics/.local/wt/hnn-architecture-01a1030c/.local/formal-decomposition-integration-01a1030c-20261006/QUEUE_REQUEST.v1.json",
+    "sha256": "fd4d7ff45ef4f5b0b0d00dfc94790df3ef4e68653834f7f54cbb296ef3bf652a",
+    "change": "adds explicit candidate compiler/audit argv and input paths; source, selectors, providers and ceilings unchanged"
+  },
+  "candidate_commands": [
+    {
+      "target": "Holonics.HNN.SingleHoleResponse.SourceExpansion",
+      "cwd": "/home/b/Workspaces/holonics/.local/wt/hnn-architecture-01a1030c/.local/formal-decomposition-integration-01a1030c-20261006/source/lean",
+      "argv": [
+        "lean",
+        "--threads=1",
+        "-o",
+        "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-formal-split-29f0ba2b-20261006/objects/Holonics/HNN/SingleHoleResponse/SourceExpansion.olean",
+        "Holonics/HNN/SingleHoleResponse/SourceExpansion.lean"
+      ],
+      "acceptance_selectors": [
+        "Holonics.HNN.SingleHoleResponse.firstComplete_eq_fixed_add_response",
+        "Holonics.HNN.SingleHoleResponse.pairComplete_eq_fixed_add_response",
+        "Holonics.HNN.SingleHoleResponse.oneHoleSourceExpansion",
+        "Holonics.HNN.SingleHoleResponse.populationNormalizedOneHoleSourceExpansion"
+      ],
+      "condition": "sole queue only; actual toolchain/import/object/lookup/cache preflight, measured fixed current-unit projection and explicit lease first; output path is proposed queue-owned allocation"
+    },
+    {
+      "target": "Holonics.HNN.SingleHoleResponse.LoadedWord",
+      "cwd": "/home/b/Workspaces/holonics/.local/wt/hnn-architecture-01a1030c/.local/formal-decomposition-integration-01a1030c-20261006/source/lean",
+      "argv": [
+        "lean",
+        "--threads=1",
+        "-o",
+        "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-formal-split-29f0ba2b-20261006/objects/Holonics/HNN/SingleHoleResponse/LoadedWord.olean",
+        "Holonics/HNN/SingleHoleResponse/LoadedWord.lean"
+      ],
+      "acceptance_selectors": [
+        "Holonics.HNN.SingleHoleResponse.absoluteLoaded_response_add"
+      ],
+      "condition": "sole queue only; actual toolchain/import/object/lookup/cache preflight, measured fixed current-unit projection and explicit lease first; output path is proposed queue-owned allocation"
+    },
+    {
+      "target": "Holonics.HNN.SingleHoleResponse.NormalizedOpening",
+      "cwd": "/home/b/Workspaces/holonics/.local/wt/hnn-architecture-01a1030c/.local/formal-decomposition-integration-01a1030c-20261006/source/lean",
+      "argv": [
+        "lean",
+        "--threads=1",
+        "-o",
+        "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-formal-split-29f0ba2b-20261006/objects/Holonics/HNN/SingleHoleResponse/NormalizedOpening.olean",
+        "Holonics/HNN/SingleHoleResponse/NormalizedOpening.lean"
+      ],
+      "acceptance_selectors": [
+        "Holonics.HNN.SingleHoleResponse.openedState_from_normalized_source"
+      ],
+      "condition": "sole queue only; actual toolchain/import/object/lookup/cache preflight, measured fixed current-unit projection and explicit lease first; output path is proposed queue-owned allocation"
+    },
+    {
+      "target": "Holonics.HNN.SingleHoleResponse.ReceivingResponse",
+      "cwd": "/home/b/Workspaces/holonics/.local/wt/hnn-architecture-01a1030c/.local/formal-decomposition-integration-01a1030c-20261006/source/lean",
+      "argv": [
+        "lean",
+        "--threads=1",
+        "-o",
+        "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-formal-split-29f0ba2b-20261006/objects/Holonics/HNN/SingleHoleResponse/ReceivingResponse.olean",
+        "Holonics/HNN/SingleHoleResponse/ReceivingResponse.lean"
+      ],
+      "acceptance_selectors": [
+        "Holonics.HNN.SingleHoleResponse.loadedReceiving_response"
+      ],
+      "condition": "sole queue only; actual toolchain/import/object/lookup/cache preflight, measured fixed current-unit projection and explicit lease first; output path is proposed queue-owned allocation"
+    },
+    {
+      "target": "Holonics.HNN.SingleHoleResponse.GrainRelease",
+      "cwd": "/home/b/Workspaces/holonics/.local/wt/hnn-architecture-01a1030c/.local/formal-decomposition-integration-01a1030c-20261006/source/lean",
+      "argv": [
+        "lean",
+        "--threads=1",
+        "-o",
+        "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-formal-split-29f0ba2b-20261006/objects/Holonics/HNN/SingleHoleResponse/GrainRelease.olean",
+        "Holonics/HNN/SingleHoleResponse/GrainRelease.lean"
+      ],
+      "acceptance_selectors": [
+        "Holonics.HNN.SingleHoleResponse.exactLeaderUnion_mem_iff",
+        "Holonics.HNN.SingleHoleResponse.exactLeaderUnion_sound",
+        "Holonics.HNN.SingleHoleResponse.constant_face_released_at_zero",
+        "Holonics.HNN.SingleHoleResponse.holdingLaw_releases_constant_face_at_zero",
+        "Holonics.HNN.SingleHoleResponse.singletonLeader_holdingLaw_release"
+      ],
+      "condition": "sole queue only; actual toolchain/import/object/lookup/cache preflight, measured fixed current-unit projection and explicit lease first; output path is proposed queue-owned allocation"
+    },
+    {
+      "target": "Holonics.HNN.SingleHoleResponse.ComposedConsumer",
+      "cwd": "/home/b/Workspaces/holonics/.local/wt/hnn-architecture-01a1030c/.local/formal-decomposition-integration-01a1030c-20261006/source/lean",
+      "argv": [
+        "lean",
+        "--threads=1",
+        "-o",
+        "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-formal-split-29f0ba2b-20261006/objects/Holonics/HNN/SingleHoleResponse/ComposedConsumer.olean",
+        "Holonics/HNN/SingleHoleResponse/ComposedConsumer.lean"
+      ],
+      "acceptance_selectors": [
+        "Holonics.HNN.SingleHoleResponse.normalizedSource_loadedWord_grain_singleton_release"
+      ],
+      "condition": "sole queue only; actual toolchain/import/object/lookup/cache preflight, measured fixed current-unit projection and explicit lease first; output path is proposed queue-owned allocation"
+    },
+    {
+      "target": "Holonics.HNN.SingleHoleResponse",
+      "cwd": "/home/b/Workspaces/holonics/.local/wt/hnn-architecture-01a1030c/.local/formal-decomposition-integration-01a1030c-20261006/source/lean",
+      "argv": [
+        "lean",
+        "--threads=1",
+        "-o",
+        "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-formal-split-29f0ba2b-20261006/objects/Holonics/HNN/SingleHoleResponse.olean",
+        "Holonics/HNN/SingleHoleResponse.lean"
+      ],
+      "acceptance_selectors": [
+        "Holonics.HNN.SingleHoleResponse.firstComplete_eq_fixed_add_response",
+        "Holonics.HNN.SingleHoleResponse.pairComplete_eq_fixed_add_response",
+        "Holonics.HNN.SingleHoleResponse.oneHoleSourceExpansion",
+        "Holonics.HNN.SingleHoleResponse.populationNormalizedOneHoleSourceExpansion",
+        "Holonics.HNN.SingleHoleResponse.absoluteLoaded_response_add",
+        "Holonics.HNN.SingleHoleResponse.openedState_from_normalized_source",
+        "Holonics.HNN.SingleHoleResponse.loadedReceiving_response",
+        "Holonics.HNN.SingleHoleResponse.exactLeaderUnion_mem_iff",
+        "Holonics.HNN.SingleHoleResponse.exactLeaderUnion_sound",
+        "Holonics.HNN.SingleHoleResponse.constant_face_released_at_zero",
+        "Holonics.HNN.SingleHoleResponse.holdingLaw_releases_constant_face_at_zero",
+        "Holonics.HNN.SingleHoleResponse.singletonLeader_holdingLaw_release",
+        "Holonics.HNN.SingleHoleResponse.normalizedSource_loadedWord_grain_singleton_release"
+      ],
+      "condition": "sole queue only; actual toolchain/import/object/lookup/cache preflight, measured fixed current-unit projection and explicit lease first; output path is proposed queue-owned allocation"
+    },
+    {
+      "target": "SingleHoleResponseAudit",
+      "cwd": "/home/b/Workspaces/holonics/.local/wt/hnn-architecture-01a1030c/.local/formal-decomposition-integration-01a1030c-20261006/source/lean",
+      "argv": [
+        "lean",
+        "--threads=1",
+        "SingleHoleResponseAudit.lean"
+      ],
+      "input_sha256": "c4e65d31b586e869a5b924afa149c0587631741adf5bac17102fc7368956f0b7",
+      "acceptance_selectors": [
+        "Holonics.HNN.SingleHoleResponse.firstComplete_eq_fixed_add_response",
+        "Holonics.HNN.SingleHoleResponse.pairComplete_eq_fixed_add_response",
+        "Holonics.HNN.SingleHoleResponse.oneHoleSourceExpansion",
+        "Holonics.HNN.SingleHoleResponse.populationNormalizedOneHoleSourceExpansion",
+        "Holonics.HNN.SingleHoleResponse.absoluteLoaded_response_add",
+        "Holonics.HNN.SingleHoleResponse.openedState_from_normalized_source",
+        "Holonics.HNN.SingleHoleResponse.loadedReceiving_response",
+        "Holonics.HNN.SingleHoleResponse.exactLeaderUnion_mem_iff",
+        "Holonics.HNN.SingleHoleResponse.exactLeaderUnion_sound",
+        "Holonics.HNN.SingleHoleResponse.constant_face_released_at_zero",
+        "Holonics.HNN.SingleHoleResponse.holdingLaw_releases_constant_face_at_zero",
+        "Holonics.HNN.SingleHoleResponse.singletonLeader_holdingLaw_release",
+        "Holonics.HNN.SingleHoleResponse.normalizedSource_loadedWord_grain_singleton_release"
+      ],
+      "condition": "after exact full facade acceptance, fresh source-matched selected object and lookup seals"
+    },
+    {
+      "target": "Holonics.HNN.SourceReceiverReturn",
+      "cwd": "/home/b/Workspaces/holonics/.local/wt/hnn-architecture-01a1030c/.local/formal-decomposition-integration-01a1030c-20261006/source/lean",
+      "argv": [
+        "lean",
+        "--threads=1",
+        "-o",
+        "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-formal-split-29f0ba2b-20261006/objects/Holonics/HNN/SourceReceiverReturn.olean",
+        "Holonics/HNN/SourceReceiverReturn.lean"
+      ],
+      "input_sha256": "294df662d9a7dff20e4540f0fc643e0a00081fbae49d471c4f146dc1c5d9bc53",
+      "acceptance_selectors": [
+        "Holonics.HNN.SourceReceiverReturn.blockTick_apply",
+        "Holonics.HNN.SourceReceiverReturn.wordMapAt_apply",
+        "Holonics.HNN.SourceReceiverReturn.sourceReturnAt_pairing",
+        "Holonics.HNN.SourceReceiverReturn.sourceReturnAt_is_dual_of_sourceRead",
+        "Holonics.HNN.SourceReceiverReturn.sourceReturnAt_unique",
+        "Holonics.HNN.SourceReceiverReturn.sourceReturnAt_halfTurn",
+        "Holonics.HNN.SourceReceiverReturn.sourceContrast_return",
+        "Holonics.HNN.SourceReceiverReturn.partitionReturn_pairing",
+        "Holonics.HNN.SourceReceiverReturn.normalizedAbsoluteLoaded_sourceReturn"
+      ],
+      "condition": "after full upstream acceptance and exact existing ModeQuotient provider preflight; same fixed resource policy and separate measured projection"
+    },
+    {
+      "target": "SourceReceiverReturnAudit",
+      "cwd": "/home/b/Workspaces/holonics/.local/wt/hnn-architecture-01a1030c/.local/formal-decomposition-integration-01a1030c-20261006/source/lean",
+      "argv": [
+        "lean",
+        "--threads=1",
+        "SourceReceiverReturnAudit.lean"
+      ],
+      "input_sha256": "8a7d0ff4a5e110091a6993cbec1d2c82ee3c4d8171070a74f0357942170b6d5f",
+      "acceptance_selectors": [
+        "Holonics.HNN.SourceReceiverReturn.blockTick_apply",
+        "Holonics.HNN.SourceReceiverReturn.wordMapAt_apply",
+        "Holonics.HNN.SourceReceiverReturn.sourceReturnAt_pairing",
+        "Holonics.HNN.SourceReceiverReturn.sourceReturnAt_is_dual_of_sourceRead",
+        "Holonics.HNN.SourceReceiverReturn.sourceReturnAt_unique",
+        "Holonics.HNN.SourceReceiverReturn.sourceReturnAt_halfTurn",
+        "Holonics.HNN.SourceReceiverReturn.sourceContrast_return",
+        "Holonics.HNN.SourceReceiverReturn.partitionReturn_pairing",
+        "Holonics.HNN.SourceReceiverReturn.normalizedAbsoluteLoaded_sourceReturn"
+      ],
+      "condition": "after exact source-return owner acceptance and fresh source/object/lookup matching"
+    }
+  ]
+}
