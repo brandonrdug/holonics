@@ -1463,6 +1463,38 @@
         "copy": "executables/holonics",
         "bytes": 64381760,
         "sha256": "d413f7528bdfacd7c131fe17d9d044f0179b3f2da83d2de01653c90be2274adc"
+      },
+      "actual_compilation_snapshot_pins": {
+        "crates/holonics/src/hnn/prediction.rs": {
+          "copy": "source/crates/holonics/src/hnn/prediction.rs",
+          "bytes": 135749,
+          "sha256": "f8c60da4195ca5889cef8698c1f22ccac2b13c2448b3e2a71f3d340be0e8fd93"
+        },
+        "crates/holonics/src/hnn/tests/prediction.rs": {
+          "copy": "source/crates/holonics/src/hnn/tests/prediction.rs",
+          "bytes": 120582,
+          "sha256": "d9f3e30ffbcbc227f362ea957f9582bb27cfc1e30ed84a2201fd2ad20e526a3c"
+        },
+        "lean/Holonics/HNN/ReframedMoment.lean": {
+          "copy": "source/lean/Holonics/HNN/ReframedMoment.lean",
+          "bytes": 8704,
+          "sha256": "4ffc65a60f4e72c8bc63c637d7e6480ada2e8721a002e53c487635e64cd93f2e"
+        },
+        "crates/holonics/src/hnn/receiving.rs": {
+          "copy": "source/crates/holonics/src/hnn/receiving.rs",
+          "bytes": 79239,
+          "sha256": "10cea7efc861f33530ec65bf3a901726850ae2677dfc2d622e494de9359abac4"
+        },
+        "crates/holonics/tests/source_entrance.rs": {
+          "copy": "source/crates/holonics/tests/source_entrance.rs",
+          "bytes": 19074,
+          "sha256": "5308ebf2d6cba10019952e1e9023d3b085349d12b3c6df61833cba8b863d9baf"
+        },
+        "research/notebook/hnn_design/hnn_repair_loop.rs": {
+          "copy": "source/research/notebook/hnn_design/hnn_repair_loop.rs",
+          "bytes": 31329,
+          "sha256": "2939d7c6adf418e51ee9556a63ca2e9f815d9d8986f30b527a94312e31e22d94"
+        }
       }
     },
     "native-validation-material-18968dc9-completeness": {
@@ -1474,6 +1506,38 @@
         "copy": "executables/holonics",
         "bytes": 64388208,
         "sha256": "5e0a3f71771ac5cb41e2829a66d354b679d276c1526bae36ad7b37b03ef351cd"
+      },
+      "actual_compilation_snapshot_pins": {
+        "crates/holonics/src/hnn/prediction.rs": {
+          "copy": "source/crates/holonics/src/hnn/prediction.rs",
+          "bytes": 138686,
+          "sha256": "2caa054629c6c48e61dd5dbccccf487ae917fb48367c5d636bf91c9e79a6add7"
+        },
+        "crates/holonics/src/hnn/tests/prediction.rs": {
+          "copy": "source/crates/holonics/src/hnn/tests/prediction.rs",
+          "bytes": 120582,
+          "sha256": "d9f3e30ffbcbc227f362ea957f9582bb27cfc1e30ed84a2201fd2ad20e526a3c"
+        },
+        "lean/Holonics/HNN/ReframedMoment.lean": {
+          "copy": "source/lean/Holonics/HNN/ReframedMoment.lean",
+          "bytes": 8704,
+          "sha256": "4ffc65a60f4e72c8bc63c637d7e6480ada2e8721a002e53c487635e64cd93f2e"
+        },
+        "crates/holonics/src/hnn/receiving.rs": {
+          "copy": "source/crates/holonics/src/hnn/receiving.rs",
+          "bytes": 79239,
+          "sha256": "10cea7efc861f33530ec65bf3a901726850ae2677dfc2d622e494de9359abac4"
+        },
+        "crates/holonics/tests/source_entrance.rs": {
+          "copy": "source/crates/holonics/tests/source_entrance.rs",
+          "bytes": 19074,
+          "sha256": "5308ebf2d6cba10019952e1e9023d3b085349d12b3c6df61833cba8b863d9baf"
+        },
+        "research/notebook/hnn_design/hnn_repair_loop.rs": {
+          "copy": "source/research/notebook/hnn_design/hnn_repair_loop.rs",
+          "bytes": 31329,
+          "sha256": "2939d7c6adf418e51ee9556a63ca2e9f815d9d8986f30b527a94312e31e22d94"
+        }
       }
     }
   },
@@ -1941,5 +2005,6 @@
     "sha256": "0cf515de3e125eb30de545596e29597b7c3c30794e2cbe1ebc5f19224e422a3d",
     "affected_native_controls_rechecked": 2,
     "tests_and_notebook_unchanged": true
-  }
+  },
+  "source_snapshot_and_runtime_bindings_checked": true
 }

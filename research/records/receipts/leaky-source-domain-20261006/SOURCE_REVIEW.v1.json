@@ -1,0 +1,48 @@
+{
+  "grade": "source-inspected; Rust syntax only; native/type pending",
+  "base_commit": "bb6aedad81256f3aedff320983e0b0a5c1fe70ac",
+  "owned_paths": {
+    "crates/holonics/src/hnn/prediction.rs": {
+      "bytes": 143339,
+      "sha256": "b7f8f0c11089304641a794d334258fa4145b014aafd2791e38580d881405240d"
+    },
+    "crates/holonics/src/hnn/tests/prediction.rs": {
+      "bytes": 126588,
+      "sha256": "5285cd8bf5ad83b0d2adb2c1095d8b9e655ca50f3ed6c0112f114109c8dc8583"
+    },
+    "docs/atlas/objects.tsv": {
+      "bytes": 883110,
+      "sha256": "3e6f66b67968ca1b45843098a0fbc78a6dd5c38295a150ef25aa02a3e94e075e"
+    },
+    "research/records/README.md": {
+      "bytes": 160870,
+      "sha256": "a42cece9073b4535462ba9f08161732b21e77e596a8f490337de9f38b992d999"
+    },
+    "research/records/2026-10-06_THE_LEAKY_SOURCE_COMPLETION_DOMAIN_READS_ITS_ACTUAL_ROUNDED_FEATURES.md": {
+      "bytes": 8576,
+      "sha256": "8679d51446ccdfe24a0c651894e248ee6ea3d804df8ef6e871304e32f0f22248"
+    }
+  },
+  "native_runs_launched_by_this_lane": 0,
+  "scientific_runs": 0,
+  "acceptance_controls_total": 18,
+  "new_selector": "hnn::tests::prediction::physical_repair::the_actual_leaky_completion_chart_encloses_mixed_classes_and_an_erased_age_endpoint",
+  "new_selector_native_Words": 19,
+  "new_selector_completed_source_controls": 16,
+  "source_coordinate_supports_per_source": 4,
+  "source_only_independent_review": "common full extent, rounded mass independent of class; monotone actual chart extrema; signed producing E/lift; sparse point union; fresh open and no offset mass",
+  "guards": "prior chart/identity-clock admission and exact native operands unchanged; unit branch kept; located sparse conduct refused",
+  "no_fidelity_or_singleton_acceptance": true,
+  "static_checks": {
+    "owner_rustfmt_edition2024_emit_stdout_exit": 0,
+    "tests_rustfmt_edition2024_emit_stdout_exit": 0,
+    "whitespace_exit": 0
+  },
+  "runtime_projection": "unmeasured new unit; queue must measure and seal before acceptance under unchanged caps",
+  "fixed_claim_owner": "research/records/2026-10-06_THE_LEAKY_SOURCE_COMPLETION_DOMAIN_READS_ITS_ACTUAL_ROUNDED_FEATURES.md",
+  "queue_status": "not submitted; narrow SourceMoment exact transported-mass owner reservation pending",
+  "actual_guards": "prior chart/identity clock and exact operands; zero actual offset populations and equal phase populations; exact rounded mass follows current owner and needs requested read accessor",
+  "feature_extrema_oracle": "exact normalized coordinate hull of sixteen mixed completions equals hull of four monochrome supports",
+  "total_erasure_oracle": "sixteen-source subset only, not exhaustive4^9",
+  "independent_source_code_review": "no concrete under-enclosure/API gap found; fresh supports, signed lift, sparse source injection centre and unchanged entered interior traced"
+}

@@ -2196,13 +2196,19 @@ mod physical_repair {
         for reading in [&before, &after, &other] {
             assert!(reading.opening.closes() && reading.word.closes());
             assert!(reading.balances.iter().all(|balance| balance.closes()));
-            assert!(erased.iter().all(|&station| matches!(
-                reading.cells[station],
-                RepairedCell::Held {
-                    unresolved: Unresolved::UncertifiedDomain,
-                    ..
+            for &station in &erased {
+                let domain = reading.domains[station].as_ref().unwrap();
+                assert!(domain.logits.iter().zip(&reading.reads[station].read.logits)
+                    .all(|(interval, value)| &interval.lower <= value && value <= &interval.upper));
+                match &reading.cells[station] {
+                    RepairedCell::Held { fibre, unresolved: Unresolved::PluralDomain } => {
+                        assert!(domain.classes.len() > 1);
+                        assert_eq!(*fibre, domain.classes);
+                    }
+                    RepairedCell::Released(class) => assert_eq!(domain.classes, vec![*class]),
+                    other => panic!("a supported leaky completion family has no domain decision: {other:?}"),
                 }
-            )));
+            }
         }
         println!(
             "actual source teaching: rho {}; source clock {} -> {}; R unchanged; blind output {:?}; later target-free output {:?}; pre-teaching encoding swap logits {:?} / {:?}; post-teaching source-swap logits {:?} / {:?}",
@@ -2390,6 +2396,91 @@ mod physical_repair {
     }
 
     #[test]
+    fn the_actual_leaky_completion_chart_encloses_mixed_classes_and_an_erased_age_endpoint() {
+        let field = field();
+        let (_, teaching) = quartic_teaching(&field);
+        let theta = teaching.constitution.founded_transport(&field, 0).unwrap();
+        let mut current = Current::at_rest(&field);
+        current.rekey(&field, 0, 3).unwrap();
+        let phases = ReceivingPhases::declare(&field, &theta, &current, &section(2)).unwrap();
+        let opening = WordOpening::Received {
+            carry: teaching.prediction.carry.clone(),
+            absorption: Absorption::Nothing,
+        };
+        // The holes share a source phase, and the erased final station changes the full family's
+        // age endpoint relative to the sparse point. The producing chart and nonzero lift stay
+        // fixed. The envelope must consume actual per-slot chart rounding and normalization.
+        let source = crate::hnn::tests::support::encoded(&field, &[1, 0, 3, 2, 1, 3, 0, 2, 2]);
+        let damaged = DamagedSection::damage(&source, &[0, 8]).unwrap();
+        let sparse = repair_by_field(&field, &theta, &current, &damaged, &opening, &phases).unwrap();
+        assert!(sparse.domains.iter().all(Option::is_some));
+        let empty = DamagedSection::damage(&source, &(0..9).collect::<Vec<_>>()).unwrap();
+        let empty = repair_by_field(&field, &theta, &current, &empty, &opening, &phases).unwrap();
+        assert!(empty.domains.iter().all(Option::is_some));
+        let features = |cells: &[Option<usize>]| {
+            let moment = crate::hnn::moment::SourceMoment::open_with(&field, &current, &theta)
+                .unwrap().continued(&field, &current, 0, cells).unwrap();
+            (0..field.ring(0).placements().len())
+                .flat_map(|phase| moment.normalized_counts(&field, 0, phase, &theta.transport(0)).unwrap())
+                .collect::<Vec<_>>()
+        };
+        let monochrome: Vec<_> = (0..field.alphabet()).map(|class|
+            features(&damaged.placed().iter().map(|cell| Some(cell.unwrap_or(class))).collect::<Vec<_>>())
+        ).collect();
+        let extrema = |rows: &[Vec<Rat>]| {
+            (0..rows[0].len()).map(|coordinate| (
+                rows.iter().map(|row| row[coordinate].clone()).min().unwrap(),
+                rows.iter().map(|row| row[coordinate].clone()).max().unwrap(),
+            )).collect::<Vec<_>>()
+        };
+        let mut all_features = Vec::new();
+        let mut distinct = None;
+        let mut changed = false;
+        // This bounded test oracle runs the complete 4*4 family after the blind reception.
+        // Production evaluates A source-coordinate supports and advances one actual Word.
+        for first in 0..field.alphabet() {
+            for last in 0..field.alphabet() {
+                let actual = crate::hnn::tests::support::encoded(
+                    &field, &[first, 0, 3, 2, 1, 3, 0, 2, last],
+                );
+                let complete = DamagedSection::damage(&actual, &[]).unwrap();
+                all_features.push(features(&complete.placed()));
+                let complete = repair_by_field(
+                    &field, &theta, &current, &complete, &opening, &phases,
+                ).unwrap();
+                for envelope in [&sparse, &empty] {
+                    for (domain, read) in envelope.domains.iter().zip(&complete.reads) {
+                        let domain = domain.as_ref().unwrap();
+                        assert!(domain.logits.iter().zip(&read.read.logits)
+                            .all(|(interval, value)| &interval.lower <= value && value <= &interval.upper),
+                            "native mixed completion ({first},{last}) escaped its actual leaky source tube");
+                        assert!(read.leaders().iter().all(|class| domain.classes.contains(class)));
+                    }
+                }
+                if let Some(previous) = &distinct {
+                    changed |= *previous != complete.reads;
+                } else {
+                    distinct = Some(complete.reads.clone());
+                }
+                assert!(complete.opening.closes() && complete.word.closes());
+                assert!(complete.balances.iter().all(|balance| balance.closes()));
+                println!("actual leaky completion ({first},{last}): leaders {:?}; actual complex logits {:?}",
+                    complete.reads.iter().map(|read| read.leaders()).collect::<Vec<_>>(),
+                    complete.reads.iter().map(|read| &read.read.logits).collect::<Vec<_>>());
+            }
+        }
+        assert_eq!(extrema(&monochrome), extrema(&all_features),
+            "the actual rounded normalized coordinate hull must equal the full two-hole hull");
+        assert!(changed, "the actual completion field must be source-sensitive");
+        for receipt in [&sparse, &empty] {
+            assert!(receipt.opening.closes() && receipt.word.closes());
+            assert!(receipt.balances.iter().all(|balance| balance.closes()));
+        }
+        println!("leaky source domain: rho {}; whole blind cells {:?}; actual complex bounds {:?}; total-erasure cells {:?}; no erased truth accuracy asserted",
+            theta.transport(0), sparse.cells, sparse.domains, empty.cells);
+    }
+
+    #[test]
     fn a_blind_later_quartic_passage_releases_only_a_constant_learned_domain_image() {
         let field = field();
         let (initial, teaching) = quartic_teaching(&field);
@@ -2529,16 +2620,14 @@ mod physical_repair {
             .clone()
             .with_transport(0, rat(1, 2))
             .unwrap();
-        let unsupported =
+        let supported =
             repair_by_field(&field, &leaky, &current, &later, &opening, &phases).unwrap();
-        assert!(unsupported.domains.iter().all(Option::is_none));
-        assert_eq!(
-            unsupported.cells[1],
-            RepairedCell::Held {
-                fibre: vec![0, 1, 2, 3],
-                unresolved: Unresolved::UncertifiedDomain,
-            }
-        );
+        assert!(supported.domains.iter().all(Option::is_some));
+        assert!(supported.domains.iter().zip(&supported.reads).all(|(domain, read)|
+            domain.as_ref().unwrap().logits.iter().zip(&read.read.logits)
+                .all(|(interval, value)| &interval.lower <= value && value <= &interval.upper)));
+        assert!(supported.opening.closes() && supported.word.closes());
+        assert!(supported.balances.iter().all(|balance| balance.closes()));
         assert!(after.opening.closes() && after.word.closes());
         assert!(after.balances.iter().all(|balance| balance.closes()));
         println!(

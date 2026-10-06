@@ -2030,21 +2030,17 @@ fn physical_source_only_change(
 
 /// The box is derived, never chosen: complete every missing station with any admitted class,
 /// at the same source clock and population chart; unite that image with the actual sparse open.
-/// Unit transport is the supported normalization law. A leaky source keeps its typed refusal.
+/// The unit source has its sharper station-column bound. A leaky source uses the actual rounded
+/// phase features' coordinate extrema, with its complete extent and class-independent mass.
 fn physical_opening_radius(
     field: &Field,
     material: &dyn FieldMaterial,
-    _current: &Current,
+    current: &Current,
     section: &DamagedSection,
     word: &Word<'_>,
 ) -> Result<Option<crate::hnn::word::EndChange>, HnnError> {
     let operands = word.operands();
-    if !physical_word_is_exact(operands)
-        || field
-            .sources()
-            .iter()
-            .any(|&ring| !material.transport(ring).is_one())
-    {
+    if !physical_word_is_exact(operands) {
         return Ok(None);
     }
     let point = word.change()?;
@@ -2055,6 +2051,18 @@ fn physical_opening_radius(
     let weight = PopulationChart::of(field).value(population);
     let placed = section.placed();
     for &ring in field.sources() {
+        if !material.transport(ring).is_one() {
+            let Some((lower, upper)) =
+                physical_leaky_source_bounds(field, material, current, section, ring)?
+            else { return Ok(None) };
+            for coordinate in 0..field.ring(ring).width() {
+                radius.storage[ring][coordinate] = (&lower[coordinate]
+                    - &point.storage[ring][coordinate])
+                    .abs()
+                    .max((&upper[coordinate] - &point.storage[ring][coordinate]).abs());
+            }
+            continue;
+        }
         let geometry = field.ring(ring);
         let map = material
             .source_port(ring)
@@ -2089,6 +2097,84 @@ fn physical_opening_radius(
         }
     }
     Ok(Some(radius))
+}
+
+/// [agent-inferred] The admitted identity clock fixes every complete source's extent `N`.
+/// Its entering integer weight `nearest(U*rho^(N-1-j))` and total mass are independent of class.
+/// For one phase/class coordinate, assigning every hole to that class maximizes its count;
+/// assigning every hole to another class minimizes it. The actual population chart is monotone,
+/// so the `A` monochrome supports attain every coordinate endpoint, including chart rounding.
+/// The normalizer reads that common mass, not a class-specific or learned total. This claim is
+/// tied to the actual fresh continued-source law, not an arbitrary future normalizer.
+/// They are transient source-coordinate supports, not executed candidate Words or task answers.
+/// Signed E and the producing phase lift map their box to an opening enclosure. Discarding joint
+/// coordinate correlations can widen that enclosure, never shrink the admitted source family.
+fn physical_leaky_source_bounds(
+    field: &Field,
+    material: &dyn FieldMaterial,
+    current: &Current,
+    section: &DamagedSection,
+    ring: usize,
+) -> Result<Option<(Vec<Rat>, Vec<Rat>)>, HnnError> {
+    let geometry = field.ring(ring);
+    let modulus = material.transport(ring);
+    let open = SourceMoment::open_with(field, current, material)?;
+    let placed = section.placed();
+    let mut bounds: Option<(Vec<Vec<Rat>>, Vec<Vec<Rat>>)> = None;
+    let mut phase_population = None;
+    for class in 0..section.classes() {
+        let support: Vec<_> = placed.iter().map(|cell| Some(cell.unwrap_or(class))).collect();
+        let moment = open.continued(field, current, ring, &support)?;
+        // A fresh continued section adds no offset pair, even if the field declares offsets.
+        // A future nonzero pair source has mixed-class extrema and cannot use these supports.
+        for &offset in field.offsets() {
+            if moment.pair_population(ring, offset)? != 0 {
+                return Ok(None);
+            }
+        }
+        let population = (0..geometry.placements().len())
+            .map(|phase| Ok(moment.phase_counts(ring, phase)?.iter().sum::<u64>()))
+            .collect::<Result<Vec<_>, HnnError>>()?;
+        if phase_population.as_ref().is_some_and(|before| before != &population) {
+            return Ok(None);
+        }
+        phase_population = Some(population);
+        let features = (0..geometry.placements().len())
+            .map(|phase| moment.normalized_counts(field, ring, phase, &modulus))
+            .collect::<Result<Vec<_>, _>>()?;
+        if let Some((lower, upper)) = &mut bounds {
+            for ((lower, upper), row) in lower.iter_mut().zip(upper).zip(features) {
+                for ((lower, upper), value) in lower.iter_mut().zip(upper).zip(row) {
+                    *lower = lower.clone().min(value.clone());
+                    *upper = upper.clone().max(value);
+                }
+            }
+        } else {
+            bounds = Some((features.clone(), features));
+        }
+    }
+    let (features_lower, features_upper) = bounds.ok_or(HnnError::Unadmitted {
+        reason: "the physical source completion chart has no class",
+    })?;
+    let map = material.source_port(ring).ok_or(HnnError::MissingSourcePort { ring })?;
+    let mut lower = vec![Rat::zero(); geometry.width()];
+    let mut upper = lower.clone();
+    for phase in 0..geometry.placements().len() {
+        let lift = &current.lift()[ring] - BigInt::from(phase);
+        for class in 0..section.classes() {
+            let column = (0..map.rows())
+                .map(|row| map.get(row, class).cloned())
+                .collect::<Result<Vec<_>, _>>()?;
+            let column = geometry.rotate(&column, &lift);
+            for coordinate in 0..geometry.width() {
+                let at_lower = &column[coordinate] * &features_lower[phase][class];
+                let at_upper = &column[coordinate] * &features_upper[phase][class];
+                lower[coordinate] += at_lower.clone().min(at_upper.clone());
+                upper[coordinate] += at_lower.max(at_upper);
+            }
+        }
+    }
+    Ok(Some((lower, upper)))
 }
 
 fn physical_add_radius(left: &[Rat], right: &[Rat]) -> Vec<Rat> {
