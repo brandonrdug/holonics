@@ -1,0 +1,25 @@
+{
+  "source_base": "074a6267ecb515b10aa199790efed83c833baeeb",
+  "change": "Borrow paired in the preexisting unary-negation assertion; preserve its value for new same-Word pairing assertions.",
+  "changed_native_path": "crates/holonics/src/hnn/tests/prediction.rs",
+  "new_native_sha256": "fb189607931f7bedef779a50095eae83dc9bce7f96de11dc826c55e6f0193c3c",
+  "production_law_changed": false,
+  "test_selector_or_assertion_meaning_changed": false,
+  "failed_compiler": {
+    "exit": 101,
+    "error": "E0382 at tests/prediction.rs:2908; paired moved at2905",
+    "native_controls_run": 0,
+    "validation_path": "/home/b/Workspaces/holonics/.local/wt/source-return-runtime-01a1030c/research/records/receipts/source-return-runtime-20261006/native-validation-074-compiler-refusal-v1/VALIDATION.json",
+    "validation_sha256": "cc5046b2dfa5d415cd77cdeeb7d9b2820779a2ec986dae4014521bbd9134d662",
+    "full_archive_preserved_unchanged": true,
+    "stderr_copy": "FAILED_COMPILER.stderr",
+    "stderr_sha256": "6c8bd29cd00950e4bcc676ebf3f484aeaca87420eb80695c37ae13fc1dd979bf"
+  },
+  "static_checks": {
+    "syntax_parse_exit": 0,
+    "source_formatted": false,
+    "whitespace_exit": 0
+  },
+  "successor_compile_or_runtime_acceptance": "pending sole queue",
+  "limits_or_tests_raised": false
+}

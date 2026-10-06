@@ -1,0 +1,28 @@
+   Compiling holonics-cuda v0.1.0 (/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-source-return-runtime-074a6267-20261006/source-v1/crates/holonics-cuda)
+   Compiling holonics v0.1.0 (/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-source-return-runtime-074a6267-20261006/source-v1/crates/holonics)
+error[E0382]: borrow of moved value: `paired`
+    --> crates/holonics/src/hnn/tests/prediction.rs:2908:9
+     |
+2903 |         let paired: Rat = gradient.logits().iter().zip(&deltas)
+     |             ------ move occurs because `paired` has type `Ratio<num_bigint::BigInt>`, which does not implement the `Copy` trait
+2904 |             .map(|(g,d)| g.iter().zip(d).map(|(g,d)| g*d).sum::<Rat>()).sum();
+2905 |         assert_eq!(-paired, applied.sources[0].alignment);
+     |                    ------- `paired` moved due to usage in operator
+...
+2908 |         assert_eq!(returned.receiving, paired);
+     |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ value borrowed here after move
+     |
+note: calling this operator moves the value
+    --> /home/b/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/ops/arith.rs:708:12
+     |
+ 708 |     fn neg(self) -> Self::Output;
+     |            ^^^^
+     = note: this error originates in the macro `assert_eq` (in Nightly builds, run with -Z macro-backtrace for more info)
+help: consider cloning the value if the performance cost is acceptable
+     |
+2905 |         assert_eq!(-paired.clone(), applied.sources[0].alignment);
+     |                           ++++++++
+
+For more information about this error, try `rustc --explain E0382`.
+error: could not compile `holonics` (lib test) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

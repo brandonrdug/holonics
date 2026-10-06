@@ -1,0 +1,211 @@
+{
+  "validation": {
+    "path": "/home/b/Workspaces/holonics/.local/wt/source-return-runtime-01a1030c/research/records/receipts/source-return-runtime-20261006/native-validation-074-compiler-refusal-v1/VALIDATION.json",
+    "bytes": 1439624,
+    "sha256": "cc5046b2dfa5d415cd77cdeeb7d9b2820779a2ec986dae4014521bbd9134d662"
+  },
+  "exact_factored_readings": {
+    "hnn-source-return-074a6267-cache-preparation-20261006-v1": {
+      "wall_ns": {
+        "integer": 6922467669,
+        "prime_powers": [
+          [
+            3,
+            1
+          ],
+          [
+            13,
+            1
+          ],
+          [
+            3119,
+            1
+          ],
+          [
+            56909,
+            1
+          ]
+        ]
+      },
+      "projection_ns": {
+        "integer": 17000000000,
+        "prime_powers": [
+          [
+            2,
+            9
+          ],
+          [
+            5,
+            9
+          ],
+          [
+            17,
+            1
+          ]
+        ]
+      },
+      "aggregate_CPU_ns": {
+        "integer": 5932835000,
+        "prime_powers": [
+          [
+            2,
+            3
+          ],
+          [
+            5,
+            4
+          ],
+          [
+            769,
+            1
+          ],
+          [
+            1543,
+            1
+          ]
+        ]
+      },
+      "group_peak_bytes": {
+        "integer": 4074266624,
+        "prime_powers": [
+          [
+            2,
+            13
+          ],
+          [
+            673,
+            1
+          ],
+          [
+            739,
+            1
+          ]
+        ]
+      },
+      "peak_child_RSS_KiB": {
+        "integer": 30428,
+        "prime_powers": [
+          [
+            2,
+            2
+          ],
+          [
+            7607,
+            1
+          ]
+        ]
+      },
+      "measured_to_projected": [
+        6922467669,
+        17000000000
+      ]
+    },
+    "hnn-source-return-074a6267-host-cuda-link-20261006-v1": {
+      "wall_ns": {
+        "integer": 14597839034,
+        "prime_powers": [
+          [
+            2,
+            1
+          ],
+          [
+            7298919517,
+            1
+          ]
+        ]
+      },
+      "projection_ns": {
+        "integer": 65000000000,
+        "prime_powers": [
+          [
+            2,
+            9
+          ],
+          [
+            5,
+            10
+          ],
+          [
+            13,
+            1
+          ]
+        ]
+      },
+      "aggregate_CPU_ns": {
+        "integer": 33675495000,
+        "prime_powers": [
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            5,
+            4
+          ],
+          [
+            7,
+            2
+          ],
+          [
+            45817,
+            1
+          ]
+        ]
+      },
+      "group_peak_bytes": {
+        "integer": 3135442944,
+        "prime_powers": [
+          [
+            2,
+            12
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            47,
+            1
+          ],
+          [
+            61,
+            1
+          ],
+          [
+            89,
+            1
+          ]
+        ]
+      },
+      "peak_child_RSS_KiB": {
+        "integer": 1483824,
+        "prime_powers": [
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            19,
+            1
+          ],
+          [
+            1627,
+            1
+          ]
+        ]
+      },
+      "measured_to_projected": [
+        7298919517,
+        32500000000
+      ]
+    }
+  }
+}

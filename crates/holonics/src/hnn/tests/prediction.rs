@@ -2902,7 +2902,7 @@ mod physical_repair {
             .map(|(new, old)| new.read.logits.iter().zip(&old.read.logits).map(|(n,o)| n-o).collect()).collect();
         let paired: Rat = gradient.logits().iter().zip(&deltas)
             .map(|(g,d)| g.iter().zip(d).map(|(g,d)| g*d).sum::<Rat>()).sum();
-        assert_eq!(-paired, applied.sources[0].alignment);
+        assert_eq!(-&paired, applied.sources[0].alignment);
         let logit_move: Rat = deltas[2].iter().map(|v| v*v).sum();
         let returned = plus.source_pairing.as_ref().unwrap();
         assert_eq!(returned.receiving, paired);
