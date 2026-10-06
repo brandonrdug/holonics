@@ -2106,6 +2106,9 @@ fn physical_opening_radius(
 /// so the `A` monochrome supports attain every coordinate endpoint, including chart rounding.
 /// The normalizer reads that common mass, not a class-specific or learned total. This claim is
 /// tied to the actual fresh continued-source law, not an arbitrary future normalizer.
+/// Each support opens empty, continues this source once, and immediately reads its mass and
+/// normalized features with immutable current: no intervening ingest, clock synchronization
+/// or aging. The actual forward uses the same fresh source shape before the Word copies it.
 /// They are transient source-coordinate supports, not executed candidate Words or task answers.
 /// Signed E and the producing phase lift map their box to an opening enclosure. Discarding joint
 /// coordinate correlations can widen that enclosure, never shrink the admitted source family.

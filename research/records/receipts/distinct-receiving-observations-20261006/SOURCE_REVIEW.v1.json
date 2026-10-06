@@ -1,0 +1,48 @@
+{
+  "base_commit": "373ee48ababdc831331d72099ad8caf72d688376",
+  "native_source_predecessor": "f9caaabae3ad1d722eece0e01f0f438104447ae2",
+  "grade": "fixed consumer source inspected; Rust2024 syntax parsed; native/type pending",
+  "source_seal": {
+    "crates/holonics/src/hnn/moment.rs": {
+      "bytes": 107540,
+      "sha256": "bec5525b06483fb743b8451a28c87614995c436c2e0f3a056fae4ae9d336ab16"
+    },
+    "crates/holonics/src/hnn/prediction.rs": {
+      "bytes": 143979,
+      "sha256": "74895d9bcf114ddfbb122a5f5722eec8463d4f5da4fac3c4519eb33247976f52"
+    },
+    "crates/holonics/src/hnn/tests/prediction.rs": {
+      "bytes": 133039,
+      "sha256": "64878cbe73a7a666d5ad825a374a669661e7f6ee4915b928360e1189f44e132d"
+    }
+  },
+  "new_exact_selector": "hnn::tests::prediction::physical_repair::the_retained_physical_reader_reports_distinct_observations_and_matched_source_controls",
+  "new_test_count": 1,
+  "prior_physical_test_definitions_unchanged": true,
+  "production_edits": "comment-only immediate normalization premise; executable text unchanged after deleting full-line comments",
+  "phase_covector_target_only": "hnn/ratio.rs::HolonRatio::covector uses covector[2*target+1] only",
+  "bounded_operands": {
+    "native_Words": 9,
+    "receiving_crossings_per_Word": 2,
+    "R_only_observations": 3,
+    "target_free_probe_sections": 3,
+    "matched_material_receptions_per_probe": 2,
+    "source_lift": 3,
+    "same_entered_carry_for_all_probes": true
+  },
+  "probes_have_no_omitted_value_at_construction": true,
+  "new_source_or_answer_encoding": false,
+  "output_class_rank_singleton_or_fidelity_acceptance": false,
+  "synthetic_mechanical_fixture": true,
+  "untouched_scientific_evaluation_claim": false,
+  "static_parse_status": {
+    "moment": 0,
+    "prediction": 0,
+    "prediction_tests": 0,
+    "whitespace": 0
+  },
+  "new_native_compiler_or_scientific_jobs_started_by_source_lane": 0,
+  "runtime_projection": "new shape unmeasured; sole queue bounded first read and fixed measured projection under unchanged caps",
+  "independent_source_review": "no structural/API mismatch; each comparison consumes its fresh contemporary Word, actual carry retained; matched phase rank contract unchanged with R-only training; probe omits the target and asserts no desired output",
+  "probe_phase_contract": "final theta phases reused for initial R control; admitted physical source/element/contact/resonator laws unchanged, so same source-to-anchor tangent/rank scope"
+}

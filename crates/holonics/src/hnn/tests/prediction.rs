@@ -2644,4 +2644,84 @@ mod physical_repair {
         );
     }
 
+    /// A fixed behavioral read, not a task-accuracy gate: diverse observations may distinguish
+    /// receiving rows that one class-2 observation leaves equal. Every observation follows its
+    /// own contemporary blind Word. Probes contain no omitted class or expected output; the
+    /// initial and learned materials read the same entered carry, clock, chart and intact runs.
+    #[test]
+    fn the_retained_physical_reader_reports_distinct_observations_and_matched_source_controls() {
+        use crate::hnn::constitution::Locus;
+        use crate::hnn::prediction::predict_by_field;
+        let field = field();
+        let initial = quartic_material(&field).founded_transport(&field, 0).unwrap();
+        let mut current = Current::at_rest(&field);
+        current.rekey(&field, 0, 3).unwrap();
+        let mut theta = initial.clone();
+        let mut opening = WordOpening::Rest;
+        let closes = |receipt: &PhysicalRepair| {
+            assert!(receipt.opening.closes() && receipt.word.closes());
+            assert!(receipt.balances.iter().all(|balance| balance.closes()));
+        };
+        // Fixed before the behavioral read. These are exterior observed comparisons, not a
+        // solution family installed in a source/receiver. A blind input retains only its cue.
+        for (comparison, cells) in [[0, 2], [1, 1], [3, 3]].iter().enumerate() {
+            let observed = crate::hnn::tests::support::encoded(&field, cells);
+            let damaged = DamagedSection::damage(&observed, &[1]).unwrap();
+            let phases = ReceivingPhases::declare(&field, &theta, &current, &section(2)).unwrap();
+            let pending = predict_by_field(
+                &field, &theta, &current, &damaged, &opening, &phases,
+            ).unwrap();
+            let blind = pending.prediction().clone();
+            closes(&blind);
+            println!("native comparison {comparison} blind whole cells {:?}; actual logits {:?}; entered word end tick {}",
+                blind.cells, blind.reads.iter().map(|read| &read.read.logits).collect::<Vec<_>>(), blind.carry.ticks);
+            // Only here does the teacher cross the declared station-1 comparison section.
+            let taught = pending.observe(&theta, &observed, &[false, true]).unwrap();
+            assert_eq!(taught.prediction, blind);
+            assert_ne!(theta.receiving_map(0), taught.constitution.receiving_map(0));
+            assert_eq!(theta.source_port(0), taught.constitution.source_port(0));
+            assert_eq!(theta.transport(0), taught.constitution.transport(0));
+            for ring in 0..field.rings().len() {
+                assert_eq!(theta.contrast_law(ring), taught.constitution.contrast_law(ring));
+                assert_eq!(theta.passive_factor(ring), taught.constitution.passive_factor(ring));
+                assert_eq!(theta.ring_resonator(ring), taught.constitution.ring_resonator(ring));
+            }
+            println!("native comparison {comparison} observed receiving publication: commit {} -> {}; R clock {} -> {}; actual ratio {:?}; actual normal steps {:?}",
+                theta.commit(), taught.constitution.commit(),
+                theta.clock(Locus::ReceivingMap(0)), taught.constitution.clock(Locus::ReceivingMap(0)),
+                taught.ratio, taught.publication.steps);
+            theta = taught.constitution;
+            opening = WordOpening::Received { carry: blind.carry, absorption: Absorption::Nothing };
+        }
+        let map = theta.receiving_map(0).unwrap();
+        println!("retained receiving material: full actual R {:?}; equal real rows 0/1 {}; 0/3 {}; 1/3 {}; full source E unchanged {}; transport {}",
+            map, map.row(0).unwrap() == map.row(2).unwrap(),
+            map.row(0).unwrap() == map.row(6).unwrap(), map.row(2).unwrap() == map.row(6).unwrap(),
+            theta.source_port(0) == initial.source_port(0), theta.transport(0));
+        let phases = ReceivingPhases::declare(&field, &theta, &current, &section(2)).unwrap();
+        for cue in [0, 1, 3] {
+            // A different four-station passage. No value for its omitted station is ever made;
+            // both controls receive this same cell-free chart plus exactly the intact runs.
+            let left = crate::hnn::tests::support::encoded(&field, &[cue]);
+            let chart = left.part(0..0).unwrap();
+            let right = crate::hnn::tests::support::encoded(&field, &[3, 0]);
+            let probe = DamagedSection::of_runs(4, &chart, vec![(0, left), (2, right)]).unwrap();
+            assert_eq!(probe.placed(), vec![Some(cue), None, Some(3), Some(0)]);
+            let before = repair_by_field(&field, &initial, &current, &probe, &opening, &phases).unwrap();
+            let after = repair_by_field(&field, &theta, &current, &probe, &opening, &phases).unwrap();
+            closes(&before);
+            closes(&after);
+            assert_eq!(before.carry, after.carry, "R-only teaching must leave matched native motion fixed");
+            println!("target-free native probe: actual intact source {:?}; initial-R whole output {:?}; learned-R whole output {:?}; initial-R leaders {:?}; learned-R leaders {:?}; initial-R complex logits {:?}; learned-R complex logits {:?}; learned domain {:?}; returned tick {}",
+                probe.placed(), before.cells, after.cells,
+                before.reads.iter().map(|read| read.leaders()).collect::<Vec<_>>(),
+                after.reads.iter().map(|read| read.leaders()).collect::<Vec<_>>(),
+                before.reads.iter().map(|read| &read.read.logits).collect::<Vec<_>>(),
+                after.reads.iter().map(|read| &read.read.logits).collect::<Vec<_>>(),
+                after.domains, after.carry.ticks);
+        }
+        // No output class, singleton, rank increase, fidelity or description-length decrease
+        // is an acceptance requirement. The whole actual behavior is the diagnostic result.
+    }
+
 }

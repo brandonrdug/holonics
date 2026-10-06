@@ -1,0 +1,53 @@
+{
+  "source_commit": "f9caaabae3ad1d722eece0e01f0f438104447ae2",
+  "source_pins": {
+    "crates/holonics/src/hnn/prediction.rs": {
+      "bytes": 143700,
+      "sha256": "3ecd6ca421ee24d1ae377392427f4e45722dcaf4d848845686b370a649285b7a"
+    },
+    "crates/holonics/src/hnn/moment.rs": {
+      "bytes": 107450,
+      "sha256": "ad2697a9c46d26423dee001b067568e77bc12cb7378d80036320b4bfccf98a3f"
+    },
+    "crates/holonics/src/hnn/word.rs": {
+      "bytes": 139446,
+      "sha256": "0200f5a2920d26b0b6258823ffeb20ae5b23bf4546299ec058e7c60d159b7bb4"
+    }
+  },
+  "review_message": "77d86e57a896497a84b69045aabe3fd9",
+  "freshness_structurally_satisfied": true,
+  "evidence": [
+    {
+      "owner": "moment.rs:1299,1345",
+      "read": "open_with calls open; every first/offset count is zero and every extent/tick is zero; leaky carriers begin empty."
+    },
+    {
+      "owner": "prediction.rs:1839-1846",
+      "read": "physical_forward opens a fresh moment, continues each distinct source ring once with immutable current, then immediately borrows the source into Word::open_exact_received. Continuing a later ring mutates only that ring counts; it does not age previous rings."
+    },
+    {
+      "owner": "moment.rs:1518-1563",
+      "read": "continued clones the moment and selects only the named source ring; the old counts decay before any entering section weight. Each new cell enters once with class-independent closed-form age extent-1-station. Complete supports share the section extent."
+    },
+    {
+      "owner": "word.rs:1786; moment.rs:2181",
+      "read": "open_exact_received first calls source.open_storage through an immutable source borrow; open_storage/encode/normalized feature reads do not call ingest, synchronize_clock, continued, or decay."
+    },
+    {
+      "owner": "prediction.rs:2112-2155",
+      "read": "Each bound support independently begins from fresh open_with and one continued, then transported_mass and normalized_counts read it immutably. No mutation/aging/rekey occurs between continued and normalization."
+    },
+    {
+      "owner": "prediction.rs:1928-1939",
+      "read": "Opening radius is calculated before the first Word tick; subsequent Word ticks act on copied physical operands and do not mutate the source moment."
+    }
+  ],
+  "excluded_extension": "The denominator/hull claim does not extend to aged, incrementally ingested or repeatedly continued nonempty leaky moments; per-bin post-entry rounding can depend on mixed class split. A future such consumer needs its actual mass/feature admission or refusal.",
+  "native_fixture_oracle_scope": "All sixteen mixed two-hole completions; total-erasure check only that sixteen-source subset.",
+  "new_build_or_control": false,
+  "source_changed": false,
+  "accepted_validation_pin": {
+    "bytes": 151259,
+    "sha256": "fa6f50f1852c51cb88ea7713f35358dfb1bea64bb8c1ffe058b20ff1c93ee6a0"
+  }
+}

@@ -1831,8 +1831,9 @@ impl SourceMoment {
     }
 
     /// The actual carried integer mass of a leaky first marginal, in its own lattice units.
-    /// The normalized source reads this common denominator; None is the unit-count route.
-    /// A physical completion family compares it before mapping its coordinate box through E.
+    /// This reads the stored map, without projecting any later pending decay. None is the
+    /// unit-count route. The fresh physical completion consumer normalizes immediately after
+    /// its one continued section and compares this denominator before mapping through E.
     pub fn transported_mass(&self, ring: usize) -> Result<Option<BigInt>, HnnError> {
         Ok(self.counts(ring)?.leaky.as_ref().map(|leaky| leaky.first.values().sum()))
     }
