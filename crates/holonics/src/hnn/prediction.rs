@@ -1848,7 +1848,7 @@ pub fn repair_by_field(
     opening: &WordOpening,
     phases: &ReceivingPhases,
 ) -> Result<PhysicalRepair, HnnError> {
-    physical_forward(field, material, current, section, opening, phases)
+    physical_forward(field, material, current, section, opening, phases, true)
         .map(|(prediction, _word, _source)| prediction)
 }
 
@@ -1862,6 +1862,7 @@ fn physical_forward<'f>(
     section: &DamagedSection,
     opening: &WordOpening,
     phases: &ReceivingPhases,
+    completion_domain: bool,
 ) -> Result<(PhysicalRepair, Word<'f>, SourceMoment), HnnError> {
     section.admit(field, material, phases)?;
     // The admitted identity's conduct certifies station j at τ_g + 1 + j on each source ring.
@@ -1873,7 +1874,13 @@ fn physical_forward<'f>(
     // One accounted imposition, then the one continuing word through the declared crossings.
     let (mut word, opening_receipt) =
         Word::open_exact_received(field, material, current, &source, opening)?;
-    let (anchors, domains) = physical_domain_forward(field, material, current, section, phases, &mut word)?;
+    let (anchors, domains) = if completion_domain {
+        physical_domain_forward(field, material, current, section, phases, &mut word)?
+    } else {
+        // Exact sparse comparison control: the same admitted source and native Word, without
+        // the additional source-completion certificate. Missing stations remain Uncertified.
+        (word.forward(phases)?, vec![None; phases.aperture()])
+    };
     let balances = word.field_balances().to_vec();
     let carry = word.reception_end()?;
     let balance = WordBalance::of(&word.released()?);
@@ -1910,6 +1917,10 @@ fn physical_forward<'f>(
         .enumerate()
         .map(|(t, cell)| match cell {
             Some(class) => Ok(RepairedCell::Intact(*class)),
+            None if !completion_domain => Ok(RepairedCell::Held {
+                fibre: admitted.clone(),
+                unresolved: Unresolved::UncertifiedDomain,
+            }),
             None => decide_station(
                 t,
                 domains.get(t).and_then(Option::as_ref).map_or(admitted.as_slice(), |domain| domain.classes.as_slice()),
@@ -3108,8 +3119,34 @@ pub fn predict_by_field<'f, 'm>(
     opening: &WordOpening,
     phases: &ReceivingPhases,
 ) -> Result<PhysicalPrediction<'f, 'm>, HnnError> {
+    physical_prediction(field, material, current, section, opening, phases, true)
+}
+
+/// Exact sparse forward and immediate same-Word comparison, matching the charted sparse law.
+/// No source-completion certificate is computed: every erased station is Held. This explicit
+/// control does not stand in for the complete-domain repair or certify a point leader as output.
+pub fn predict_sparse_by_field<'f, 'm>(
+    field: &'f Field,
+    material: &'m crate::hnn::constitution::Constitution,
+    current: &Current,
+    section: &DamagedSection,
+    opening: &WordOpening,
+    phases: &ReceivingPhases,
+) -> Result<PhysicalPrediction<'f, 'm>, HnnError> {
+    physical_prediction(field, material, current, section, opening, phases, false)
+}
+
+fn physical_prediction<'f, 'm>(
+    field: &'f Field,
+    material: &'m crate::hnn::constitution::Constitution,
+    current: &Current,
+    section: &DamagedSection,
+    opening: &WordOpening,
+    phases: &ReceivingPhases,
+    completion_domain: bool,
+) -> Result<PhysicalPrediction<'f, 'm>, HnnError> {
     let (prediction, word, source) =
-        physical_forward(field, material, current, section, opening, phases)?;
+        physical_forward(field, material, current, section, opening, phases, completion_domain)?;
     Ok(PhysicalPrediction {
         field,
         material,

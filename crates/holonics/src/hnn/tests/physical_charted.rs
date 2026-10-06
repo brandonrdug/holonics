@@ -220,3 +220,24 @@ fn charted_loaded_pump_error_keeps_the_absolute_clock_across_the_carry() {
     assert!(positive(&charted.prediction.error.end));
     println!("unit charted loaded clock elapsed_ms={}",started.elapsed().as_millis());
 }
+
+#[test]
+fn exact_sparse_comparison_keeps_the_complete_forward_and_receiving_return() {
+    use crate::hnn::prediction::{Unresolved, predict_by_field, predict_sparse_by_field};
+    let field=field();let theta=material(&field,false);let current=Current::at_rest(&field);
+    let observed=encoded(&field,&[0,1,2]);let damaged=DamagedSection::damage(&observed,&[2]).unwrap();
+    let phases=ReceivingPhases::declare(&field,&theta,&current,&receiver()).unwrap();
+    let complete=predict_by_field(&field,&theta,&current,&damaged,&WordOpening::Rest,&phases).unwrap();
+    let sparse=predict_sparse_by_field(&field,&theta,&current,&damaged,&WordOpening::Rest,&phases).unwrap();
+    assert_eq!(sparse.prediction().reads,complete.prediction().reads);
+    assert_eq!(sparse.prediction().carry,complete.prediction().carry);
+    assert_eq!(sparse.prediction().opening,complete.prediction().opening);
+    assert!(sparse.prediction().domains.iter().all(Option::is_none));
+    assert!(complete.prediction().domains[2].is_some());
+    assert!(matches!(&sparse.prediction().cells[2],RepairedCell::Held {unresolved:Unresolved::UncertifiedDomain,..}));
+    let complete=complete.observe(&theta,&observed,&[false,false,true]).unwrap();
+    let sparse=sparse.observe(&theta,&observed,&[false,false,true]).unwrap();
+    assert_eq!(sparse.ratio,complete.ratio);
+    assert_eq!(sparse.pullback.receiving,complete.pullback.receiving);
+    assert_eq!(sparse.constitution,complete.constitution);
+}
