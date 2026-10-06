@@ -122,7 +122,7 @@ theorem normalizedSource_loadedWord_grain_singleton_release
         receiver (trajectoryAt (absoluteLoadedFamily T res h openedAt)
           (sourceInjection (responseSource edges hole known basis c
             (ν (Fintype.card Station)) P F Q
-            (fun e => ν (Fintype.card Station - offset e)))) ticks)) ∧
+            (fun e => ν (Fintype.card Station - offset e)))) ticks))) ∧
     (Holonics.Foundation.ReceiverRelease.holdingLaw Label Unit Unit 0).decide
       compatible hcompatible (fun c => classReading (emit c)) =
         Holonics.Foundation.ReceiverRelease.ReleaseReturn.released := by
