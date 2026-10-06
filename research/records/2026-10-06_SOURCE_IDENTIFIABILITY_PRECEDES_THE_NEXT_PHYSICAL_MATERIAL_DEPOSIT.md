@@ -86,6 +86,31 @@ also follows directly from the owner's counting law.
 
 ## The existing material-learning consumer and its limits
 
+[derived; source-inspected] The fresh sparse physical section also has **zero offset-pair mass**.
+`SourceMoment::open_with` starts empty and `continued` counts no section pair, even when the
+field declares offsets. `offset_table` therefore returns `None`; `moment_parts` contributes
+no `PairPort` signal, and `compose_return` has empty pair slots and zero pair gradient/energy.
+Declaring an offset or stepping its coefficients cannot add an absent source operand. The
+native physical contacts still execute: these missing source-pair features are a separate
+question from the port/contact dynamics.
+
+On the fixed unit source chart, with fixed mask/population, material, clock and carry, and an
+exact **linear** executed Word, the complex receiving logits are affine sums of the intact
+cell contributions. Their mixed two-cell difference is consequently zero:
+
+```text
+f(a,b) + f(a',b') - f(a,b') - f(a',b) = 0.
+```
+
+E and R learning on that same source form can change its coefficients but not this identity.
+This identifies a restriction on the learned receiving relations, not an assertion that every
+relation involving two cells is impossible. It is not asserted for a loaded nonlinear Word or
+the leaky source's per-slot chart rounding. A coupled nonlinear physical reader can provide
+interaction, but the present E observer refuses its uncertified Word-Hessian. An actual
+source-pair/product moment needs its producing clock and omission family before entering
+this sparse consumer. The nonunit-domain extension supplies an enclosure, not either of these
+learning/encoding joins; its completion constancy alone is not progress on a useful task.
+
 [established-bounded; source-inspected] `PhysicalPrediction::observe` already keeps the blind receipt, original Word,
 source moment, opening support and immutable producing material until one explicit comparison.
 It forms `Faces -> HolonRatio::compare_partition -> same Word::pull_back -> compose_return`,
