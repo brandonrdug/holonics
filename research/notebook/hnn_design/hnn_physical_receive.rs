@@ -17,6 +17,7 @@ use super::*;
 use holonics::hnn::physical::{PhysicalLearning, PhysicalObservation, PhysicalResident};
 use holonics::hnn::prediction::DamagedSection;
 use holonics::hnn::word::WordOpening;
+use holonics::holarchy::terrain::{CyclicLaw, KnownTruth};
 use std::io::Write;
 
 pub(super) fn run(
@@ -119,9 +120,11 @@ pub(super) fn run(
 /// the terrain. This is a short-section law read, not a reproduction of U6's 40+8 bank consumer.
 ///
 /// `measure` probes development material; `held` probes seeds/counts sealed before execution and
-/// never deposits a probe. The statistical unit is a whole independently drawn passage. Fresh
+/// never deposits a probe. `coverage` is development only: one seeded KnownTruth class orbit,
+/// Receiving at all four sections, fixed before probing. Its training passages share one source
+/// representative, and the continuing probe readings are not independent observations. Fresh
 /// seeds do not make the finite Line/Alternation pattern family new. No U6 count is presumed.
-/// One continuing exact resident alternates Receiving and PairOutputs observations. A target is
+/// In `measure` and `held`, the resident alternates Receiving and PairOutputs observations. A target is
 /// absent from its source and is observed only after the blind cells have been flushed. Each
 /// step's eta and the *applied* logit movement are read separately. No charted substitution occurs.
 pub(super) fn learn(
@@ -137,12 +140,16 @@ pub(super) fn learn(
     use holonics::hnn::receiving::ReceivingPhases;
     use num_bigint::BigInt;
     use num_traits::{Signed, Zero};
-    assert!(matches!(role, "measure" | "held"), "a declared probe role");
+    assert!(matches!(role, "measure" | "held" | "coverage"), "a declared probe role");
     assert!(teaching_count > 0 && probe_count >= 2);
     let bound = pin.unit_bound_ms().expect("a measured whole-unit bound");
     let target = 2;
     let length = 4;
     let classes = repair_loop::CLASSES;
+    if role == "coverage" {
+        assert_eq!(teaching_count, classes, "one Receiving observation per class-translation, no repetition");
+        assert_eq!(probe_count, classes, "one blind probe per class-translation, fixed coverage read");
+    }
     let physical_shape = Declared {
         period: length as u64,
         alphabet: classes,
@@ -171,13 +178,28 @@ pub(super) fn learn(
         assert!(seeds.insert(teaching_seed) && seeds.insert(probe_seed), "seed reuse across roles");
         let initial = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).expect("declared material");
         let mut resident = PhysicalResident::new(&field, initial.clone(), current.clone(), WordOpening::Rest);
-        let teaching = executed_loop::terrain_encoded(terrain, &truth_shape, &field, teaching_seed, teaching_count);
+        let teaching = if role == "coverage" {
+            let law = match terrain {
+                "order2" => CyclicLaw::OrderTwo { opening: physical_shape.request },
+                "alternation" => CyclicLaw::Alternation,
+                "line" => CyclicLaw::Line,
+                _ => panic!("a terrain: order2 | alternation | line"),
+            };
+            let source = KnownTruth::cyclic_class_orbit(law, classes, teaching_seed, length)
+                .expect("the producer's complete class orbit");
+            publish(&mut output, format!("{terrain} coverage_rule=complete_source_class_translation_orbit; shifts=0..{classes}; one_seeded_source_representative; all_teaching_Receiving; fixed_before_probes; no_independence_or_held_claim\n"));
+            Encoded::identity(&source, &field).expect("the same complete four-class producing chart")
+        } else {
+            executed_loop::terrain_encoded(terrain, &truth_shape, &field, teaching_seed, teaching_count)
+        };
+        let mut intended_targets = std::collections::BTreeSet::new();
+        let mut published_targets = std::collections::BTreeSet::new();
         for (index, observed) in teaching.into_iter().enumerate() {
             let started = Instant::now();
             let damaged = DamagedSection::damage(&observed, &[target]).expect("declared withheld cell");
             let entered = resident.opening().clone();
             let before_material = resident.constitution().clone();
-            let learning = if index % 2 == 0 { PhysicalLearning::Receiving } else { PhysicalLearning::PairOutputs };
+            let learning = if role == "coverage" || index % 2 == 0 { PhysicalLearning::Receiving } else { PhysicalLearning::PairOutputs };
             let phases = ReceivingPhases::declare(&field, &before_material, &current, &receiver).expect("the receiving clock");
             // Exterior timing separates existing physical work from receipt costs. It does
             // not profile arithmetic inside a law or grant a new scientific acceptance.
@@ -203,6 +225,12 @@ pub(super) fn learn(
             let real_move = movement.iter().step_by(2).map(|value| value.abs()).max().unwrap();
             let phase_move = movement.iter().skip(1).step_by(2).map(|value| value.abs() / Rat::from_integer(2.into())).max().unwrap();
             let truth = observed.classes_read().nth(target).expect("the post-blind observation");
+            if role == "coverage" {
+                intended_targets.insert(truth);
+                if matches!(&received.comparison, Ok(Some(_))) {
+                    published_targets.insert(truth);
+                }
+            }
             publish(&mut output, format!(
                 "teaching result; learning={learning:?}; observed={truth}; publication={:?}; applied_logit_movement={movement:?}; largest_real_move={real_move}; largest_real_move_in_grain_cells={}; largest_phase_move_turns={phase_move}; target_margin_before={}; target_margin_after={}; applied_cells={:?}; entered={:?}; retained_tick={}; material_commit={}; receiving_changed={}; source_changed={}; pair_changed={}; balances_close={}; elapsed_ms={}\n",
                 received.comparison, &real_move * Rat::from_integer(BigInt::from(phases.grain())), margin(old, truth), margin(new, truth), applied.reads[target].read.cells,
@@ -225,7 +253,29 @@ pub(super) fn learn(
                 return;
             }
         }
-        let probes = executed_loop::terrain_encoded(terrain, &truth_shape, &field, probe_seed, probe_count);
+        if role == "coverage" {
+            let expected: std::collections::BTreeSet<_> = (0..classes).collect();
+            assert_eq!(intended_targets, expected, "the source orbit covers the declared target classes");
+            let equal = receiving_rows_equal(resident.constitution(), receiver.ring, 0, 1);
+            publish(&mut output, format!("{terrain} coverage_result; intended_targets={intended_targets:?}; published_targets={published_targets:?}; complete_complex_rows_0_1_equal={equal}; source_coverage_is_not_a_relation_fidelity_certificate\n"));
+            if published_targets != expected || equal {
+                publish(&mut output, "INCOMPLETE: declared coverage did not publish all Receiving observations or break the actual 0/1 row symmetry; no probes\n".into());
+                return;
+            }
+        }
+        let probes = if role == "coverage" {
+            let law = match terrain {
+                "order2" => CyclicLaw::OrderTwo { opening: physical_shape.request },
+                "alternation" => CyclicLaw::Alternation,
+                "line" => CyclicLaw::Line,
+                _ => panic!("a terrain: order2 | alternation | line"),
+            };
+            let source = KnownTruth::cyclic_class_orbit(law, classes, probe_seed, length)
+                .expect("the independently seeded probe representative's complete class orbit");
+            Encoded::identity(&source, &field).expect("the same complete four-class producing chart")
+        } else {
+            executed_loop::terrain_encoded(terrain, &truth_shape, &field, probe_seed, probe_count)
+        };
         let frozen_commit = resident.constitution().commit();
         let frozen_material = resident.constitution().clone();
         // Exterior material/source controls all enter the same actual post-teaching carry. The
@@ -244,11 +294,22 @@ pub(super) fn learn(
             let before = repair_by_field(&field, &initial, &current, &damaged, &controlled_opening, &pre_phases).expect("initial-material matched control");
             let initial_control_done_ns = started.elapsed().as_nanos();
             let post_phases = ReceivingPhases::declare(&field, &frozen_material, &current, &receiver).expect("learned receiving clock");
-            let controlled_after = repair_by_field(&field, &frozen_material, &current, &damaged, &controlled_opening, &post_phases).expect("same-carry learned-material control");
+            // The first continuing read has exactly this learned control's operands. Execute
+            // that Word once and use its result for both exterior observations. Subsequent
+            // resident carries differ, so their common-carry controls still execute separately.
+            let controlled_after = if index == 0 {
+                assert_eq!(entered, controlled_opening);
+                assert_eq!(resident.current(), &current);
+                assert_eq!(resident.constitution(), &frozen_material);
+                None
+            } else {
+                Some(repair_by_field(&field, &frozen_material, &current, &damaged, &controlled_opening, &post_phases).expect("same-carry learned-material control"))
+            };
             let learned_control_done_ns = started.elapsed().as_nanos();
             // This is the actual continuing resident; the held truth cannot reach its read API.
             let after = resident.read(&damaged, &receiver).expect("the blind contemporary probe");
             let continuing_done_ns = started.elapsed().as_nanos();
+            let controlled_after = controlled_after.as_ref().unwrap_or(&after);
             publish(&mut output, format!("{terrain}/{probe_seed} {role} probe {index}; input={:?}; before cells={:?}; matched learned cells={:?}; continuing cells={:?}; before read={:?}; matched learned read={:?}; continuing read={:?}; matched_entered={:?}; continuing_entered={:?}; carried_tick={}; balances_close={}\n", damaged.placed(), before.cells, controlled_after.cells, after.cells, before.reads[target], controlled_after.reads[target], after.reads[target], controlled_opening, entered, after.carry.ticks, closed(&before) && closed(&controlled_after) && closed(&after)));
             assert_eq!(resident.constitution(), &frozen_material, "no probe deposition");
             assert!(closed(&before) && closed(&controlled_after) && closed(&after), "the measured physical balances must close");
@@ -281,10 +342,11 @@ pub(super) fn learn(
             publish(&mut output, format!("scoring only; truth={truth}; majority={majority}; copy_left={left:?}; copy_right={right:?}; target_margin_before={}; target_margin_after={}; grain={grain}\n", margin(&pre,truth), margin(&post,truth)));
             rows.push((pre,post,pre_cells,post_cells));
             let scoring_done_ns = started.elapsed().as_nanos();
-            publish(&mut output, format!("{terrain} probe {index} timings; initial_control_ns={initial_control_done_ns}; learned_control_ns={}; actual_continuing_forward_ns={}; publication_and_exterior_scoring_ns={}; whole_unit_ns={scoring_done_ns}; no_observation_or_deposition\n",
+            publish(&mut output, format!("{terrain} probe {index} timings; initial_control_ns={initial_control_done_ns}; learned_control_ns={}; actual_continuing_forward_ns={}; publication_and_exterior_scoring_ns={}; whole_unit_ns={scoring_done_ns}; learned_control_reuses_identical_continuing_word={}; no_observation_or_deposition\n",
                 learned_control_done_ns-initial_control_done_ns,
                 continuing_done_ns-learned_control_done_ns,
                 scoring_done_ns-continuing_done_ns,
+                index == 0,
             ));
             if started.elapsed().as_millis() > bound {
                 publish(&mut output, format!("INCOMPLETE: probe whole-unit exceeded measured bound {bound} ms; no subsequent unit\n"));
@@ -319,6 +381,14 @@ pub(super) fn learn(
         publish(&mut output, format!("{terrain} distinct_source_contexts={}; acquired_context_changes_real_amplitude_face={heard}; all_context_controls_share_one_exact_entered_carry; scope=short_section_physical_acquisition; U6_bank_counts_are_a_different_consumer\n", contexts.len()));
         publish(&mut output, format!("{terrain} final_context_summary_ns={}; this_cost_is_outside_the_individual_teaching_and_probe_units\n", context_started.elapsed().as_nanos()));
     }
+}
+
+fn receiving_rows_equal(material: &Constitution, ring: usize, left: usize, right: usize) -> bool {
+    let map = holonics::hnn::ConstitutionRead::receiving_map(material, ring)
+        .expect("the admitted receiving map");
+    let width = map.columns();
+    let entries = map.entries();
+    entries[2*left*width..2*(left+1)*width] == entries[2*right*width..2*(right+1)*width]
 }
 
 fn margin(logits: &[Rat], target: usize) -> Rat {

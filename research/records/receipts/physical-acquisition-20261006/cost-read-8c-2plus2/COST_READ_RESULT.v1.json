@@ -1,0 +1,32 @@
+{
+  "source": "8c437917314f8825e3212eb3cba4a776702b5c7f",
+  "native_complete": true,
+  "native_wall_ns": 1819068098,
+  "whole_wall_ns": 2109226229,
+  "whole_projection_ns": 4693093857,
+  "aggregate_CPU_ns": 1959835000,
+  "group_peak_bytes": 286953472,
+  "child_peak_RSS_KiB": 98624,
+  "actual_controller_ns": 290158131,
+  "declared_controller_projection_ns": 222093857,
+  "controller_projection_excess_ns": 68064274,
+  "whole_runner_passed": true,
+  "enclosing_validation": "INCOMPLETE: individual controller projection exceeded",
+  "unchanged_rerun_or_cap_increase_allowed": false,
+  "native_exterior_phase_output_is_actual_preserved_evidence": true,
+  "full_output": {
+    "path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-measured-units-8c437917-20261006/runtime-order2-2plus2-v2/physical-learn.txt",
+    "bytes": 350944,
+    "sha256": "24f8868fa591f5d8b5e6c3e8a8ee8ea6f211e0bc0cea40279b063415fa49c458"
+  },
+  "timing_and_informational_counts_lines": [
+    "order2 teaching 0 timings; setup_and_blind_forward_ns=116545896; blind_publication_ns=55474; same_word_comparison_and_deposition_ns=11564755; matched_applied_control_ns=77063173; movement_and_receipt_ns=1179209; whole_unit_ns=206408507; wall_categories_are_exterior_not_an_arithmetic_or_certification_profile",
+    "order2 teaching 1 timings; setup_and_blind_forward_ns=152789785; blind_publication_ns=43932; same_word_comparison_and_deposition_ns=100068411; matched_applied_control_ns=129895975; movement_and_receipt_ns=2547100; whole_unit_ns=385345203; wall_categories_are_exterior_not_an_arithmetic_or_certification_profile",
+    "order2 probe 0 timings; initial_control_ns=143715292; learned_control_ns=166663814; actual_continuing_forward_ns=162595345; publication_and_exterior_scoring_ns=6459005; whole_unit_ns=479433456; no_observation_or_deposition",
+    "order2 probe 1 timings; initial_control_ns=143058923; learned_control_ns=164838296; actual_continuing_forward_ns=203888789; publication_and_exterior_scoring_ns=7118379; whole_unit_ns=518904387; no_observation_or_deposition",
+    "order2 counts; whole_passages=2; released_right=0; released_wrong=2; held=0; point_singleton_right=0; majority_right=0; copy_left_right=1; copy_right_right=0; no_probe_deposition_commit=2",
+    "order2 distinct_source_contexts=2; acquired_context_changes_real_amplitude_face=false; all_context_controls_share_one_exact_entered_carry; scope=short_section_physical_acquisition; U6_bank_counts_are_a_different_consumer",
+    "order2 final_context_summary_ns=336350; this_cost_is_outside_the_individual_teaching_and_probe_units"
+  ],
+  "no_scientific_usefulness_generalization_held_acceptance": true
+}

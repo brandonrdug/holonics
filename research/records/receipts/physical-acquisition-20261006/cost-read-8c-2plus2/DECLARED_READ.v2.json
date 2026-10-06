@@ -1,0 +1,57 @@
+{
+  "source_commit": "8c437917314f8825e3212eb3cba4a776702b5c7f",
+  "argv": [
+    "/usr/bin/env",
+    "-i",
+    "PATH=/usr/bin",
+    "HOME=/home/b",
+    "LANG=C",
+    "LC_ALL=C",
+    "RAYON_NUM_THREADS=1",
+    "/usr/bin/timeout",
+    "--signal=TERM",
+    "--kill-after=2s",
+    "4471e-3s",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-measured-units-8c437917-20261006/cache-v2/debug/examples/hnn_prediction",
+    "executed",
+    "physical-learn",
+    "measure",
+    "2",
+    "2",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-measured-units-8c437917-20261006/runtime-order2-2plus2-v2/physical-learn.txt",
+    "/home/b/Workspaces/holonics/.local/wt/hnn-measured-units-01a1030c/research/records/receipts/measured-units-20261006/queue-pins/order2-2plus2-8c437917.pin",
+    "order2=20261006001:20261006011"
+  ],
+  "executable_pin": {
+    "sha256": "c56e87b4afbff135882df1613beca4df8d4dad15fc3c9ce2927986c57f5628c5",
+    "bytes": 32494952
+  },
+  "pin": "/home/b/Workspaces/holonics/.local/wt/hnn-measured-units-01a1030c/research/records/receipts/measured-units-20261006/queue-pins/order2-2plus2-8c437917.pin",
+  "pin_commit": "2ee1374c15c959b1e1a4fdc9ab4dca3091dda602",
+  "pin_pin": {
+    "sha256": "429e59522f59d9956a4c3c16f33ae1f4e99457ea76202bccc0df9f425efcf389",
+    "bytes": 935
+  },
+  "native_source_not_changed_by_metadata_commit": true,
+  "fixed_native_projection_ns": 4471000000,
+  "fixed_controller_projection_ns": 222093857,
+  "whole_fixed_projection_ns": 4693093857,
+  "measured_native_upper_ns": 4470815162,
+  "measurement_basis": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/HNN_PHASE_TIMINGS.67cd42fc3.v1.json",
+  "measurement_basis_pin": {
+    "sha256": "cf4058ace976277645c049190be5d998c4832678c8af48c7c608ea38574af6f6",
+    "bytes": 4466
+  },
+  "scope": "changed exterior timing source,2teaching+2no-depositprobes, existing spentOrder2 operands",
+  "new_phase_per_probe_rates_unmeasured": true,
+  "whole_prior4plus4_native_cost_is_conservative_entrance_basis_not_a_new2plus2_measurement": true,
+  "stop_on_each_unit_or_controller_rate_error": true,
+  "prior_failed_Line_Alternation_are_not_rehabilitated": true,
+  "existing_CPU_memory_threads_caps_unchanged": true,
+  "science_or_held_acceptance": false,
+  "preserved_prior_preflight_failure": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-measured-8c437917-order2-2plus2-20261006-v1.failure.json",
+  "preflight_only_no_native_child": true,
+  "changed_driver_argv": "GNU timeout equivalent exact4471e-3s replaces unsupported4471ms; same numeric bound",
+  "fresh_resource_diagnostic": "2026-10-06 current host MemAvailable10089800KiB >=existing8388608KiB gate; no worker resource cap change",
+  "same_committed_Pin_same_source_same_counts": true
+}

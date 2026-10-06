@@ -18,6 +18,45 @@ use crate::ratio::algebraic::ExactInterval;
 use crate::ratio::surprisal::SymbolicSurprisal;
 use crate::ratio::{Rat, rat};
 
+/// A complete class orbit covers the receiving labels while preserving the producer's actual
+/// antecedent relation. No model output selects the representative or its order.
+#[test]
+fn a_cyclic_source_orbit_covers_each_station_without_changing_its_law() {
+    let classes = 4;
+    let length = 4;
+    for law in [CyclicLaw::OrderTwo { opening: 2 }, CyclicLaw::Alternation, CyclicLaw::Line] {
+        let truth = KnownTruth::cyclic_class_orbit(law, classes, 20261006001, length).unwrap();
+        assert_eq!(truth.classes(), classes);
+        assert_eq!(truth.passages().len(), classes);
+        for station in 0..length {
+            let mut observed: Vec<_> = truth.passages().iter().map(|p| p[station]).collect();
+            observed.sort_unstable();
+            assert_eq!(observed, (0..classes).collect::<Vec<_>>());
+        }
+        for passage in truth.passages() {
+            match law {
+                CyclicLaw::OrderTwo { opening } => {
+                    for t in opening..length {
+                        assert_eq!(passage[t], (passage[t-2]+1)%classes);
+                    }
+                }
+                CyclicLaw::Alternation => {
+                    assert_eq!(passage[2], passage[0]);
+                    assert_eq!(passage[3], passage[1]);
+                }
+                CyclicLaw::Line => {
+                    let step = (passage[1]+classes-passage[0])%classes;
+                    for t in 0..length {
+                        assert_eq!(passage[t], (passage[0]+step*t)%classes);
+                    }
+                }
+            }
+        }
+    }
+    assert!(KnownTruth::cyclic_class_orbit(CyclicLaw::Alternation, 0, 1, length).is_err());
+    assert!(KnownTruth::cyclic_class_orbit(CyclicLaw::OrderTwo { opening: 1 }, classes, 1, length).is_err());
+}
+
 /// The step is `⌊2^64/φ⌋`: `γ² + γ·2^64 ≤ 2^128 < (γ + 1)² + (γ + 1)·2^64` (`φ⁻¹` is the root of
 /// `x² + x − 1`), and odd, so the rotation's orbit is all of `ℤ/2^64`. A draw below a power of two
 /// rejects nothing, so it is the word's residue; every draw lies below its bound, and the accepted

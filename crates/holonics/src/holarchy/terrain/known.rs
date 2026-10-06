@@ -111,6 +111,38 @@ impl KnownTruth {
         Ok(Self::emitted(classes, passages))
     }
 
+    /// **One cyclic source passage and its complete class-translation orbit.** The existing
+    /// seeded producer supplies the representative; shifts `0..classes` act on *every* cell.
+    /// Translation preserves each [`CyclicLaw`], and at every station the orbit observes each
+    /// class once. Selection uses no machine output or probe passage. These passages share one
+    /// source representative: they are a coverage fixture, not independent random draws.
+    pub fn cyclic_class_orbit(
+        law: CyclicLaw,
+        classes: usize,
+        seed: u64,
+        length: usize,
+    ) -> Result<Self, TerrainError> {
+        let source = Self::cyclic(law, classes, seed, 1, length)?;
+        let representative = &source.passages[0];
+        let passages = (0..classes)
+            .map(|shift| {
+                representative
+                    .iter()
+                    .map(|&class| {
+                        // Addition in Z/classes without overflowing the exterior index carrier.
+                        let remaining = classes - shift;
+                        if class >= remaining {
+                            class - remaining
+                        } else {
+                            class + shift
+                        }
+                    })
+                    .collect()
+            })
+            .collect();
+        Ok(Self::emitted(classes, passages))
+    }
+
     /// **The uniform terrain** (the synthetic fields' drawn cells, no source structure): `count`
     /// passages of `length` cells, each drawn uniformly on `ℤ/classes` from `Draw::new(seed)` in
     /// order. Refused when the classes are empty.

@@ -1,0 +1,48 @@
+{
+  "status": "saved-output arithmetic only; no native execution",
+  "source": "8c437917314f8825e3212eb3cba4a776702b5c7f",
+  "rows": [
+    {
+      "unit": "order2 teaching 0",
+      "setup_and_blind_forward_ns": 116545896,
+      "blind_publication_ns": 55474,
+      "same_word_comparison_and_deposition_ns": 11564755,
+      "matched_applied_control_ns": 77063173,
+      "movement_and_receipt_ns": 1179209,
+      "whole_unit_ns": 206408507
+    },
+    {
+      "unit": "order2 teaching 1",
+      "setup_and_blind_forward_ns": 152789785,
+      "blind_publication_ns": 43932,
+      "same_word_comparison_and_deposition_ns": 100068411,
+      "matched_applied_control_ns": 129895975,
+      "movement_and_receipt_ns": 2547100,
+      "whole_unit_ns": 385345203
+    },
+    {
+      "unit": "order2 probe 0",
+      "initial_control_ns": 143715292,
+      "learned_control_ns": 166663814,
+      "actual_continuing_forward_ns": 162595345,
+      "publication_and_exterior_scoring_ns": 6459005,
+      "whole_unit_ns": 479433456
+    },
+    {
+      "unit": "order2 probe 1",
+      "initial_control_ns": 143058923,
+      "learned_control_ns": 164838296,
+      "actual_continuing_forward_ns": 203888789,
+      "publication_and_exterior_scoring_ns": 7118379,
+      "whole_unit_ns": 518904387
+    }
+  ],
+  "sum_whole_units_ns": 1590091553,
+  "sum_forward_categories_ns": 1461055288,
+  "sum_same_word_comparison_and_deposition_ns": 111633166,
+  "sum_publication_and_exterior_receipts_ns": 17403099,
+  "unclassified_unit_gaps_ns": 0,
+  "first_duplicate_learned_control_measured_ns": 166663814,
+  "cost_decision": "Reuse first actual continuing read as its identical learned-material exterior control, checking complete entered opening/current/material equality. Execute subsequent fixed-opening controls separately. No arithmetic-law optimization is inferred from these exterior categories.",
+  "enclosing_validation": "INCOMPLETE: fixed individual controller projection exceeded; raw native cost observations retained; no unchanged retry or cap raise"
+}

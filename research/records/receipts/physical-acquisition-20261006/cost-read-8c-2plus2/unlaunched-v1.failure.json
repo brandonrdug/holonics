@@ -1,0 +1,9 @@
+{
+  "provisional_passed": false,
+  "final_acceptance_requires_external_CPU_read": true,
+  "label": "hnn-measured-8c437917-order2-2plus2-20261006-v1",
+  "error_type": "AssertionError",
+  "error": "('fresh host memory gate refused', 2257756160, 8589934592)",
+  "child_launched": false,
+  "child_reaped": false
+}
