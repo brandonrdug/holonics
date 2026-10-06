@@ -1,0 +1,1874 @@
+{
+  "source_commit": "4432a4b9c7de9330e6701c1c2f860660682e39b6",
+  "source_base": "25b41f07e9c122c40c0c5886a087bf5aa384bc46",
+  "all_original_artifacts_rehashed": 1765,
+  "original_artifact_bytes": 1078290588,
+  "git_and_snapshot_inputs_verified": 286,
+  "native_build_runtime_inputs_verified": 285,
+  "all_local_artifacts_fresh_false": true,
+  "fresh_local_targets": 11,
+  "host_executable": {
+    "bytes": 65004024,
+    "sha256": "ba7384b7e0df6760980761b188e793139d775c4040140e57cc3b33d4079ff9c1"
+  },
+  "actual_unique_tests": [
+    "hnn::tests::prediction::physical_repair::a_blind_later_quartic_passage_releases_only_a_constant_learned_domain_image",
+    "hnn::tests::prediction::physical_repair::the_coupled_quartic_tube_encloses_every_admitted_missing_class",
+    "hnn::tests::prediction::physical_repair::a_point_leader_does_not_replace_a_plural_coupled_domain",
+    "hnn::tests::prediction::physical_repair::a_station_no_declared_crossing_reads_is_held_unread",
+    "hnn::tests::prediction::physical_repair::equal_class_counts_do_not_join_different_producing_charts",
+    "hnn::tests::prediction::physical_repair::identity_conduct_must_certify_the_station_clock_even_at_erased_stations",
+    "hnn::tests::prediction::physical_repair::physical_teaching_changes_r_and_the_later_carried_receiving_read",
+    "hnn::tests::prediction::physical_repair::physical_teaching_refuses_a_stale_material_or_foreign_chart_and_preserves_the_carry",
+    "hnn::tests::prediction::physical_repair::the_damaged_section_runs_through_the_field_and_every_erasure_is_held_unresolved",
+    "hnn::tests::prediction::physical_repair::the_producing_decoder_and_both_physical_maps_are_joined_before_opening",
+    "hnn::tests::prediction::physical_repair::the_section_carries_no_erased_class_so_the_repair_cannot_read_one",
+    "hnn::tests::prediction::physical_repair::the_supported_physical_passage_continues_on_its_retained_interior_and_clock",
+    "hnn::tests::prediction::physical_repair::total_erasure_preserves_the_producing_chart_and_refuses_located_conduct_before_opening",
+    "sibling_ring_ticks_age_leaky_first_and_offset_coordinates_before_the_next_owning_append",
+    "same_phase_intact_swap_has_one_native_source_moment_and_one_physical_motion",
+    "hnn::tests::prediction::physical_repair::the_actual_leaky_source_return_changes_e_before_the_next_target_free_carried_word",
+    "hnn::tests::prediction::physical_repair::source_teaching_refuses_a_zero_return_and_a_reached_uncertified_quartic",
+    "hnn::tests::prediction::physical_repair::the_actual_leaky_completion_chart_encloses_mixed_classes_and_an_erased_age_endpoint",
+    "hnn::tests::prediction::physical_repair::the_retained_physical_reader_reports_distinct_observations_and_matched_source_controls",
+    "hnn::tests::prediction::physical_repair::the_station_pair_source_preserves_actual_offsets_and_refuses_a_reused_opening",
+    "hnn::tests::prediction::physical_repair::the_station_pair_box_contains_all_mixed_unit_and_rounded_leaky_features",
+    "hnn::tests::prediction::physical_repair::a_declared_station_pair_reaches_the_native_word_and_separates_a_marginal_alias",
+    "hnn::tests::prediction::physical_repair::the_joint_pair_physical_tube_contains_every_mixed_completed_word_read",
+    "hnn::tests::prediction::physical_repair::the_retained_reader_reports_matched_material_carry_and_absent_source_controls",
+    "hnn::tests::prediction::physical_repair::the_observed_pair_outputs_change_the_next_target_free_source_conditioned_word",
+    "hnn::tests::prediction::physical_repair::pair_output_teaching_refuses_absent_comparisons_zero_returns_and_uncertified_quartics"
+  ],
+  "runtime_groups": 16,
+  "all_caps_cleanup_pass": true,
+  "stages": {
+    "hnn-pair-learning-4432a4b9-cache-preparation-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 6855973628,
+      "projection_ns": 17000000000,
+      "measured_to_projected_ratio": [
+        6855973628,
+        17000000000
+      ],
+      "aggregate_CPU_ns": 5683637000,
+      "group_peak_bytes": 3211087872,
+      "peak_child_RSS_KiB": 29964,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-pair-learning-4432a4b9-host-cuda-link-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 19964375814,
+      "projection_ns": 65000000000,
+      "measured_to_projected_ratio": [
+        19964375814,
+        65000000000
+      ],
+      "aggregate_CPU_ns": 54601684000,
+      "group_peak_bytes": 3062050816,
+      "peak_child_RSS_KiB": 2247168,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-pair-learning-4432a4b9-control-group1-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 1385898425,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        1385898425,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 1318279000,
+      "group_peak_bytes": 25497600,
+      "peak_child_RSS_KiB": 33200,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-pair-learning-4432a4b9-control-group2-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 2593674515,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        2593674515,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 2524213000,
+      "group_peak_bytes": 25296896,
+      "peak_child_RSS_KiB": 32356,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-pair-learning-4432a4b9-control-group3-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 7656680657,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        7656680657,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 7588568000,
+      "group_peak_bytes": 19013632,
+      "peak_child_RSS_KiB": 27044,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-pair-learning-4432a4b9-control-group4-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 182375270,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        182375270,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 125414000,
+      "group_peak_bytes": 15466496,
+      "peak_child_RSS_KiB": 15988,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-pair-learning-4432a4b9-control-group5-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 350391226,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        350391226,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 301222000,
+      "group_peak_bytes": 22646784,
+      "peak_child_RSS_KiB": 15988,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-pair-learning-4432a4b9-control-group6-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 4586016061,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        4586016061,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 4510346000,
+      "group_peak_bytes": 20234240,
+      "peak_child_RSS_KiB": 28252,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-pair-learning-4432a4b9-control-group7-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 411536098,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        411536098,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 369113000,
+      "group_peak_bytes": 22724608,
+      "peak_child_RSS_KiB": 32368,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-pair-learning-4432a4b9-control-group8-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 2179910723,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        2179910723,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 2128418000,
+      "group_peak_bytes": 24854528,
+      "peak_child_RSS_KiB": 32340,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-pair-learning-4432a4b9-control-group9-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 2690575306,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        2690575306,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 2619978000,
+      "group_peak_bytes": 25747456,
+      "peak_child_RSS_KiB": 32828,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-pair-learning-4432a4b9-control-group10-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 208100449,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        208100449,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 174651000,
+      "group_peak_bytes": 15831040,
+      "peak_child_RSS_KiB": 21544,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-pair-learning-4432a4b9-control-group11-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 217446038,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        217446038,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 176036000,
+      "group_peak_bytes": 16424960,
+      "peak_child_RSS_KiB": 21540,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-pair-learning-4432a4b9-control-group12-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 470865324,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        470865324,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 434154000,
+      "group_peak_bytes": 22552576,
+      "peak_child_RSS_KiB": 32016,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-pair-learning-4432a4b9-control-group13-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 2930511060,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        2930511060,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 2879164000,
+      "group_peak_bytes": 25300992,
+      "peak_child_RSS_KiB": 32200,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-pair-learning-4432a4b9-control-group14-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 2806780041,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        2806780041,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 2758128000,
+      "group_peak_bytes": 26091520,
+      "peak_child_RSS_KiB": 33276,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-pair-learning-4432a4b9-control-group15-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 971429196,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        971429196,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 910261000,
+      "group_peak_bytes": 20398080,
+      "peak_child_RSS_KiB": 27728,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-pair-learning-4432a4b9-control-group16-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 911649999,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        911649999,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 856453000,
+      "group_peak_bytes": 21327872,
+      "peak_child_RSS_KiB": 30716,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    }
+  },
+  "whole_matched_outputs_preserved": true,
+  "source_arrangement_sensitivity_changed_in_logits": true,
+  "all_six_gap_fibre": [
+    0,
+    2,
+    3
+  ],
+  "mechanical_controls_only": true,
+  "useful_reconstruction_or_heldout_claim": false,
+  "scientific_job": false,
+  "GPU_runtime": false,
+  "unchanged_Lean_not_recompiled": true,
+  "selected_preserved_artifacts": {
+    "queue/hnn-pair-learning-4432a4b9-cache-preparation-20261006-v1.config.json": {
+      "bytes": 5889,
+      "sha256": "3b30f60d71027cde80369e1733ee4ae55ab52df28651bdbb0d0dfaaa75048a5e"
+    },
+    "queue/hnn-pair-learning-4432a4b9-cache-preparation-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "e6d1c4ef9d440b1519e2fe0853d4123b8d6b37f75208b85bf1284d30dcd9a61d"
+    },
+    "queue/hnn-pair-learning-4432a4b9-cache-preparation-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "8081de73705decfef796c7a454c565f893e7bedcf3cb0faee417885527cb32f5"
+    },
+    "queue/hnn-pair-learning-4432a4b9-cache-preparation-20261006-v1.input_seal.json": {
+      "bytes": 4487,
+      "sha256": "4348f42514d61bec1323f0640e226f2bce976bb3bc6ac85b9b2dddd8cee4a1f4"
+    },
+    "queue/hnn-pair-learning-4432a4b9-cache-preparation-20261006-v1.stdout": {
+      "bytes": 487,
+      "sha256": "dfdd08009142b63698617e95c3c2598204cec779147556df75e76c1a05479d62"
+    },
+    "queue/hnn-pair-learning-4432a4b9-cache-preparation-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "queue/hnn-pair-learning-4432a4b9-cache-preparation-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "424693b0f323bc1c099b99a2a6b56c5e766a4eeb318b03bc4565be79f7b5366c"
+    },
+    "queue/hnn-pair-learning-4432a4b9-cache-preparation-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "3dbb61af11ab64ada508df338de81477d85e3af089ea103582202abd9f8e397f"
+    },
+    "queue/hnn-pair-learning-4432a4b9-cache-preparation-20261006-v1.system-floor.json": {
+      "bytes": 52512,
+      "sha256": "5e1c367ec21384c64239591571c733ef1860fe2ec15904b40210a5d69ec64700"
+    },
+    "queue/hnn-pair-learning-4432a4b9-cache-preparation-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "fb2959b63e51eb5ec6e7285e83d1aae70426647fb7a03b3c7c6de2ea18c5e5ac"
+    },
+    "queue/hnn-pair-learning-4432a4b9-cache-preparation-20261006-v1.output_seal.json": {
+      "bytes": 446066,
+      "sha256": "d77088df30c5bc7a6d3f179866085f7f7c59c7fee293520a14fdcbbbb721fa84"
+    },
+    "queue/hnn-pair-learning-4432a4b9-cache-preparation-20261006-v1.publication.json": {
+      "bytes": 3336,
+      "sha256": "934fba8761539e735aa676d3d07cd1245a9ac58b9f7e90d81ad4d79f2bad4d21"
+    },
+    "queue/hnn-pair-learning-4432a4b9-cache-preparation-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "a09283b840d6c8b22ae2ae985511ac8e095b58d0948bc3108d8cdb0bb5bf2c26"
+    },
+    "queue/hnn-pair-learning-4432a4b9-cache-preparation-20261006-v1.final.json": {
+      "bytes": 5011,
+      "sha256": "8e09cd3399af6f4623c60cda692ea91e19469ecbfe089214d11a4a358e240df1"
+    },
+    "queue/hnn-pair-learning-4432a4b9-cache-preparation-20261006-v1.unit-cleanup.json": {
+      "bytes": 739,
+      "sha256": "8191fb4b194bdc13e3136f807958e5482856afc233bfb552c3e9f1a0d5ad51e9"
+    },
+    "queue/hnn-pair-learning-4432a4b9-cache-preparation-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "c9fd3aa34dfff385751b4f62e4580297040f25cdee125af8d0319e55f382fdcf"
+    },
+    "queue/hnn-pair-learning-4432a4b9-cache-preparation-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "a91acd53373a1b43ea36d93176071f6108f56415b7be051aa20e32384410e3ea"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/PREPARATION_REQUEST.v1.json": {
+      "bytes": 1026,
+      "sha256": "65bc85448887f670824b56ca7385fd0abad847074f7bff5bd4257b83163d42bd"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/SOURCE_SNAPSHOT.v1.json": {
+      "bytes": 47744,
+      "sha256": "c6ca7f06b4d515aaa534b2950b1f01afd68f1bdac4487cbe53ef4ef4057dd62d"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/QUEUE_SOURCE_REVIEW.v1.json": {
+      "bytes": 1052,
+      "sha256": "5cc882fe16ef5a1cfca74c53cee70659a3dfbfc5565ca65fea32d8a476c98a9b"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/RUNTIME_GROUPS.v1.json": {
+      "bytes": 21545,
+      "sha256": "033072566560c9ac60db643a4e3de54f17975fd812264ab6ab06a08e4c2579cf"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/CACHE_SNAPSHOT.v2.json": {
+      "bytes": 420997,
+      "sha256": "c063a987c3eea454db9bc9f09b05ac402a14d91493a64e725ba07c5830293b87"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/PREPARATION.v2.json": {
+      "bytes": 515,
+      "sha256": "aee3f7a1c1fb8e44560ca57bf77f54efa7b80ad1e825f214bab37e887cdd2cf7"
+    },
+    "queue/hnn-pair-learning-4432a4b9-host-cuda-link-20261006-v1.config.json": {
+      "bytes": 531857,
+      "sha256": "cb1f777d1753bbec72931a00f1794f085bd98fc1aaf26a367dfa9d3ee2004ffa"
+    },
+    "queue/hnn-pair-learning-4432a4b9-host-cuda-link-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "d6cf20b4ce827984f0afef630fc7fde4c2d03a235fc339303f6e17565c85c981"
+    },
+    "queue/hnn-pair-learning-4432a4b9-host-cuda-link-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "97be03edec28c4594930381df67ffb6a2d7da42359c50594346dcfa7a8ce413e"
+    },
+    "queue/hnn-pair-learning-4432a4b9-host-cuda-link-20261006-v1.input_seal.json": {
+      "bytes": 345300,
+      "sha256": "f4d0b9b410235989601d28e0bcb99c6c84314fc1bb9428d7eddcc48a17aaf4d5"
+    },
+    "queue/hnn-pair-learning-4432a4b9-host-cuda-link-20261006-v1.stdout": {
+      "bytes": 38155,
+      "sha256": "7a9c8e6bddcc0ed915207348a74ccf577949de53d5f5ec54e15a777b79bdbea5"
+    },
+    "queue/hnn-pair-learning-4432a4b9-host-cuda-link-20261006-v1.stderr": {
+      "bytes": 402,
+      "sha256": "3bb7b14274664b34bb0ea050620f61a192c3da711408432507774be4c2b7bebb"
+    },
+    "queue/hnn-pair-learning-4432a4b9-host-cuda-link-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "25ef4ef2ffacafd95e5f9c2e9a72bb1eaef3f71e9141e03613f1f10434683e38"
+    },
+    "queue/hnn-pair-learning-4432a4b9-host-cuda-link-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "60484c8b12dfe13fdfce363d2fcfc30f53925b671959aa84109252224f35484e"
+    },
+    "queue/hnn-pair-learning-4432a4b9-host-cuda-link-20261006-v1.system-floor.json": {
+      "bytes": 143736,
+      "sha256": "ad69f39de7701e6f8ea031f4704e50cb41d034e01a20700105aceb3ba08092a7"
+    },
+    "queue/hnn-pair-learning-4432a4b9-host-cuda-link-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "28ca157980f2db07999adb111b7db105387a651315d6dac86c381d54d2ac088f"
+    },
+    "queue/hnn-pair-learning-4432a4b9-host-cuda-link-20261006-v1.output_seal.json": {
+      "bytes": 1301350,
+      "sha256": "1a7582827ff09ddc6736e96fc97b1b379e71d633f528efa9625a315ba0d635b9"
+    },
+    "queue/hnn-pair-learning-4432a4b9-host-cuda-link-20261006-v1.publication.json": {
+      "bytes": 2831,
+      "sha256": "d537f4ff1aad9f84565de910df21b14958ac95fa49da26a0db999944caf6d64b"
+    },
+    "queue/hnn-pair-learning-4432a4b9-host-cuda-link-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "f0fb144a50cc68236c7420145bcc762093817161e62c23aa4602727f2734a749"
+    },
+    "queue/hnn-pair-learning-4432a4b9-host-cuda-link-20261006-v1.final.json": {
+      "bytes": 4982,
+      "sha256": "5ecd00c39a35f83c86fb092ad4f85badc1614b2d09b9a727db49173109b5f0aa"
+    },
+    "queue/hnn-pair-learning-4432a4b9-host-cuda-link-20261006-v1.unit-cleanup.json": {
+      "bytes": 733,
+      "sha256": "acb1301211c3ecdddb5d2785223474e0eba286f26593dd75ad20afff6b09aa43"
+    },
+    "queue/hnn-pair-learning-4432a4b9-host-cuda-link-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "b5c583000693cd5ae9c84cc000e63f6da233cb1f9299b7f0978d40487f212b18"
+    },
+    "queue/hnn-pair-learning-4432a4b9-host-cuda-link-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "5ac717fb5126e30c48039542a6cee8e06ad6545f15aac12a366a2e6c61014f3e"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/LOCAL_SOURCE_BINDING_PREFLIGHT.v1.json": {
+      "bytes": 750,
+      "sha256": "f9cf7cf8438d0cb9241e401fc247f268e6845b17b0dad4e33a24132bf4e1f979"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group1-20261006-v1.config.json": {
+      "bytes": 132490,
+      "sha256": "3a82be6e44f2ef3a1fa384913f2a9828abc0c40a1bc1bc79ea548279a3d063f8"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group1-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "8a1c3eb2e42d190a359f2d8810bf3e99df7ffcf67aace7a4eee15b26f053efff"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group1-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "2f36874888c1ce10bec79b8906f182b11054b9b8e2240d0ba6f93633693ffd63"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group1-20261006-v1.input_seal.json": {
+      "bytes": 84510,
+      "sha256": "6b673fcdae7756c7d8bd5d93684c619316f337bb0cc74e0e5992ec9be2b51183"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group1-20261006-v1.stdout": {
+      "bytes": 6277,
+      "sha256": "bb72a4de917c77de780ee505f9a3f74d4820a4a7ff8d7ef4bdc2e5eca3fef337"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group1-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group1-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "f02f05edef40672401b56f2ed3827c23687b3228d1e4d925e756fca48d0393ae"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group1-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "7346ae773079820970afad93bc033a12090c1c65c39cd1daba8a82e4951320f9"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group1-20261006-v1.system-floor.json": {
+      "bytes": 9088,
+      "sha256": "241f8c6e18edad15b28c135d6a57bbd4c5030ffa7f4a3d579642d5b8de8b7280"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group1-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "cfa664413738eef5756675e4d7075901d822766f85b3fa477dc1046235177871"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group1-20261006-v1.output_seal.json": {
+      "bytes": 79784,
+      "sha256": "9b6eb29e04d9034b263db6bb2fdbdfd4eb2f0d27a45184149a7a63d1e625b114"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group1-20261006-v1.publication.json": {
+      "bytes": 2816,
+      "sha256": "cf11e0bf54f388818dd99a9b9b965bca658d57b43f8b7b048ecd1728ac1e1143"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group1-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "3a0710f1d7e322cebaa1701458f91581e58e54a3a1e070e41dcfb152658fd90a"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group1-20261006-v1.final.json": {
+      "bytes": 4968,
+      "sha256": "d81f76efb9d1e7cf1916db581fe427dbc309524e4dee0228d01decba766323da"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group1-20261006-v1.unit-cleanup.json": {
+      "bytes": 733,
+      "sha256": "9abb1cde685818e4304bb9a667258b7cf5b00b45b914aae47288dd29f456c745"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group1-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "24b551fd874b796f9614cfa08dd30240c95aa4a1d0a6b95f0036d8e21919cfbc"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group1-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "eadd64bfdf9549eafa1285c5da54d78a3a4d1c75a646c26d08c027703f843923"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/COMPILED_ARTIFACTS.v1.json": {
+      "bytes": 16635,
+      "sha256": "a0951105572844ebc4ec188674b77cc86d0c8837a9b13b13d0f9f35ef312c518"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/COMPILE_SOURCE_BINDING.v1.json": {
+      "bytes": 785,
+      "sha256": "103db6349d08bd04557b471e235ddf07059f8430ccd199e9632fbe4a1ed6248d"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group2-20261006-v1.config.json": {
+      "bytes": 132478,
+      "sha256": "db595db7f8c88008a02044e16695fd2f5dc4d7a880945f27cf9a3a3a01f1ad85"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group2-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "273beac9b2369b4f568af7adde0a1becd4e31591d717f8b0f05b0ace526067a0"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group2-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "c900d04945f8b094f6bb7aa06ac080e5293eab677cc7a3ecb62ea983c3c43757"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group2-20261006-v1.input_seal.json": {
+      "bytes": 84497,
+      "sha256": "bb48ddd46c206235919147071c5317370750f89a890faa250d1c56b90545791e"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group2-20261006-v1.stdout": {
+      "bytes": 231,
+      "sha256": "b406ebee90c2fdf8069175406069c2a4bace63d9136306cde14ea5a6a7547f60"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group2-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group2-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "da56ea899445c5f8c1f7285318be61aed69598ba426941779c819c6cd87ba000"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group2-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "26a097fed77d81694c857af89642a1d771e2a42bb42cf1d95cc98273949836b6"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group2-20261006-v1.system-floor.json": {
+      "bytes": 18659,
+      "sha256": "08fad48524816a11f745496a2863bb921cb82baacf7e019b2e0bf2a0d2af7e58"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group2-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "b37034e8e7e78b45e788f03b091a4b0204a30cedae4de5bf832f719c0a063946"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group2-20261006-v1.output_seal.json": {
+      "bytes": 163169,
+      "sha256": "a7043285ac7f62abb9abdb20c707ff70d2451ff4d15cb85c637d25e32046aedf"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group2-20261006-v1.publication.json": {
+      "bytes": 2817,
+      "sha256": "444a6d950b936ce4d00c462be72519b138b3bfcbabf561df4074d23f26df9ef0"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group2-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "fc4e21883a04b6dea7b7708a0afe2b00db60b63628beaa6dc5c445910fadf3a2"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group2-20261006-v1.final.json": {
+      "bytes": 4969,
+      "sha256": "bfe44db00b90dc2c6a34e4d38c484c42b59cad43c9aa75366b0b3756dcaa16f5"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group2-20261006-v1.unit-cleanup.json": {
+      "bytes": 733,
+      "sha256": "8d4a220f5cc9191363f5d61b49eb03a4b0088c00c64634dc5daa99c8635af3b9"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group2-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "93dff71cfc7a4917d0d7064dfd2cb53931bcc0949afe07de91b38159d8d288c8"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group2-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "28762763fb45df8c1ec96617a19ab6e4c4df9264846e673942bbbb2695ffdab5"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group3-20261006-v1.config.json": {
+      "bytes": 134213,
+      "sha256": "bdaa4e16a7b6a0e009a6c71bacd71be09ea67847707f774805c29270d49ae1e8"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group3-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "796d35c37b1c4870e548f8e927fc0ed9ff5bfcdcf67b2cb99eead943d7b51b03"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group3-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "301d14dea1939d95f7ea9b8ad61ad4854c060ec8efb952385f57048beb62717a"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group3-20261006-v1.input_seal.json": {
+      "bytes": 86231,
+      "sha256": "7bbb72d48be3bc2d9f3753ba16055ecdf26c959efde1989b459077dfd238e4b2"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group3-20261006-v1.stdout": {
+      "bytes": 2020,
+      "sha256": "da07eaf1145426b4ca7a5f39095eaa7972aef53d3364fea6fe4d7b95fa06c7c8"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group3-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group3-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "aaa7a264d571e62621ac51ea952ff5bb60b7b7a2b1562bd70d52be625822ac0a"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group3-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "7114b7edf8a67ecfece1ac57759acda4c16e506347f38b68d5bdf93a0f0e553d"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group3-20261006-v1.system-floor.json": {
+      "bytes": 58811,
+      "sha256": "10a0af02ec1e62f8e83da30459bcfe6eebd1ea51f2d1e5bdf9b6eb3cebac04b7"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group3-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "da6a10339cbf07286ef3e6ddb5fc19075cd1079cd293747ab4b7b63b24346abc"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group3-20261006-v1.output_seal.json": {
+      "bytes": 505971,
+      "sha256": "655a369ff0a80c9ba4e760aa48c8f8cbd20c74a339db4355cbc66fc0d3d1531f"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group3-20261006-v1.publication.json": {
+      "bytes": 2818,
+      "sha256": "3bb0132afc6bfb40b656429896e39e691e63cb7609fef26913d781fbd50b8f47"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group3-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "40a2ae5e34255eff6fdc48da81185a32bfe34eedaf67c3f0911b12ded3085034"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group3-20261006-v1.final.json": {
+      "bytes": 4970,
+      "sha256": "c315671c1610f1d5b13c58ff5446676c796e2dc59a19c9b61424af9b7c84b3fc"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group3-20261006-v1.unit-cleanup.json": {
+      "bytes": 733,
+      "sha256": "5dc24bddb0c2a6c0d7b843ce81246a7fdae8720d58c8b054801a20246fa872d2"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group3-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "dd18db587a4e09903788f03819380563321e72ce4e0cf97105fd4e081e76d194"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group3-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "51c1b64e7f2acdea73ff20448285eb3d2e74764dc0634a991d3e096eb5c48b62"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group4-20261006-v1.config.json": {
+      "bytes": 132482,
+      "sha256": "a1c352a08cbc164182e194a563137389a98f775e892d0ad1ba0c98fb0ba8a79d"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group4-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "ca4652faeaf22bb0b1bbaa05cf6a926d1f55b4b274a2cc22353037a585e0b58e"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group4-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "c68665339f288d15b0fb3d5d3adae3625429cc27878908722fa558ef6e8afe21"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group4-20261006-v1.input_seal.json": {
+      "bytes": 84495,
+      "sha256": "6c8b32dbd6091ebee3d53f515fe520d9f663d3f81231c0e644f1451f3804210f"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group4-20261006-v1.stdout": {
+      "bytes": 213,
+      "sha256": "123f5ea60832ed0e3fc310901b36ab081bf15a4db0b0c146dd28f795f93f2400"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group4-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group4-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "bd8a41e4300b678e8f86cd75c2f626cc6a95ac291a514447e0328aa5e233bc37"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group4-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "4a0a1fc21a962818b0c5be62f810e29b9c0b7731e5ce5b4e039972217ddf1adc"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group4-20261006-v1.system-floor.json": {
+      "bytes": 197,
+      "sha256": "3615852f5297a4f7b8a89df8557eb0a5f1620bbbfef1c0697a278b9be414fdd4"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group4-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "e4b35a9d9def32b7d27dacb2a3e26269fc41303b6995b3193af449212ef347f1"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group4-20261006-v1.output_seal.json": {
+      "bytes": 2192,
+      "sha256": "898ebe5c769012335110f628bfa544e9e784f934588153c36ba70398c99dcbe3"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group4-20261006-v1.publication.json": {
+      "bytes": 2810,
+      "sha256": "e5ad03ebfc39081dcd77885c0c8e3270f065276e1b7dafab9f0f35a1fca19623"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group4-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "1233ee0c9b0cd47a4a2f060666799c35f8b98123c73b9c2a2a8826697687cffb"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group4-20261006-v1.final.json": {
+      "bytes": 4962,
+      "sha256": "bc30577940c512009f8d16d34d2ee94b9cd4b5736f5eff00910d64bcbe7fdfa7"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group4-20261006-v1.unit-cleanup.json": {
+      "bytes": 733,
+      "sha256": "02d82d8e8a7ffc131a26fb29acc52f63cbc98b985f8b439a02dfa87ffe4fdb4f"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group4-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "7f3cfaafe13c83f1d4f481971e80d67d6921d63fcf651880fdf4771bf33765ce"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group4-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "07687534bfe1cf7d73a68a653a8d9aa53a7a8493006bb69cc6e61a24aa401384"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group5-20261006-v1.config.json": {
+      "bytes": 132634,
+      "sha256": "bd006ed20da495979dcd62400a6eaeb5356e3fd89ccbd3402fd00d58a670e18c"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group5-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "22f2e7eeefdeb2aca6a48901b8d2ef02ee5804a1c55c9260addf3b71ea3fdb1c"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group5-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "f4d9ffd15004000f8a384279a6658b3161ccb94d53e51f7cbb5a24ef45549038"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group5-20261006-v1.input_seal.json": {
+      "bytes": 84483,
+      "sha256": "162ac4aefc1d9315f8328d470709f040cc4260396ad354f7270ebfcf2e1c82f1"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group5-20261006-v1.stdout": {
+      "bytes": 200,
+      "sha256": "5d349f8b95afc534d730b66986d360a204d7b7b9c068c8c7eb223e808bd92af5"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group5-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group5-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "eac0182b5dfa81e757bf376b864acce2cb1dbf7c145dfb67d7c7506ca4a98a4f"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group5-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "c1fffcc8c0faed28ef4bae8f6f722aeb57a346b6eb937c4bff8a13eb0a9a096b"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group5-20261006-v1.system-floor.json": {
+      "bytes": 1600,
+      "sha256": "8fba0cd92ec6aa86f19516065ddc44a15e65b8eda039d54fc299c23079f18acd"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group5-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "a4419bcce64a06c662a163944c7a4e5e6668a09c00d389697dab724bf60a9552"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group5-20261006-v1.output_seal.json": {
+      "bytes": 14039,
+      "sha256": "98ad7073fc5bc8b7df4132964486d095e7354392db1603efbf8fb0ed9e609a77"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group5-20261006-v1.publication.json": {
+      "bytes": 2813,
+      "sha256": "846bd8eae591396d0e4d8789930bcc71809e47169ffc65cb061a32b1e43a6313"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group5-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "daa81f739f2acefe680e6182c162ace7ba9f6323418341891a1d676280d5b143"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group5-20261006-v1.final.json": {
+      "bytes": 4964,
+      "sha256": "998fd2e2ac2506aba94ae4289cf87df77b73c66ecef236dbfb94bcd6d573ac7f"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group5-20261006-v1.unit-cleanup.json": {
+      "bytes": 733,
+      "sha256": "77903e35e29a5d19bf1dfc9d8e705ec6268e2b8cc905d90f312f77bb2b66abb1"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group5-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "fbf49a87e4d80cfdb9f0df4cb0e623408338c63f52c04845c7e854bad914279b"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group5-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "e238a67b0f8b08db74413ec64c59a268ba36cdffaf68679efca90d942f6a01b0"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group6-20261006-v1.config.json": {
+      "bytes": 132780,
+      "sha256": "aa63597d78a54838fd77e1e324248f1d6f4dc9494a2c50ddd9752d29064da1cb"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group6-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "aafdf1e16eee6cfa9da76b1bad187da60db41593a77ad70aa1b4c8dceebf2d7a"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group6-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "81e55927d58b5caca51a59f0a84805efb61f1143095927c18aa75e79cab71b97"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group6-20261006-v1.input_seal.json": {
+      "bytes": 84516,
+      "sha256": "27f7bccf8ca5c35ff03ec1a9ef2882b94b7cab6e1c1c3919a0756ada09ebae2d"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group6-20261006-v1.stdout": {
+      "bytes": 17000,
+      "sha256": "df2e98f76c037b01a5058a34d094f795c66ce369a2fa3c3fce57e50f9476817b"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group6-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group6-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "1ef785c81d20e2407a48d30c5eed9144bd7f3915219bc4dec94ad7aae233c8d9"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group6-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "72451af533b6481bb5dadf36e12ab7efadb0f5fa992602437f058fabc6a39a41"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group6-20261006-v1.system-floor.json": {
+      "bytes": 34368,
+      "sha256": "2a9da130b8425ada85603302ef6d2acd40da0eb20459920eb01cf3505708252d"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group6-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "7661d1ee2789cc33ab0d31cef5184c83344d794542655d020f7c9102582f2e96"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group6-20261006-v1.output_seal.json": {
+      "bytes": 294292,
+      "sha256": "20fcc85c2d4f7838140889a22a03c010a9b210f9a63de6db65046d09fb7f6fcb"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group6-20261006-v1.publication.json": {
+      "bytes": 2819,
+      "sha256": "ca4aabaf1669eb78fb0daa790c2663ff46636ac64006b6bc342ef51518dd1b65"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group6-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "dff2e26c0ddeadc4343467fa923db50332eda1703077ff2c82cfddd020c68468"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group6-20261006-v1.final.json": {
+      "bytes": 4971,
+      "sha256": "ba0212788fdff80e5e42a7dc526dea65bb3febd85fa5c8cc160a3d08ce5b67d5"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group6-20261006-v1.unit-cleanup.json": {
+      "bytes": 733,
+      "sha256": "ff3c4575a3d78c38167bf78761812ac0f5355ed8bd069c36f5765eebaf5498bb"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group6-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "4ee31b1e7d03efd7b30f11dc897457b4fd2bef32ea54a311857aeaa9d914fe76"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group6-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "513ce2e5437aa97e8753d1460051355c71ba2d344e3311477acc9a6b15a1b027"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group7-20261006-v1.config.json": {
+      "bytes": 132566,
+      "sha256": "71fe9e57068558d14ac2948052b4abd891224efb0e16050caa6448f7a24362b1"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group7-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "fd49a435dba2567330a2aa86630672a42183bf0453c39e8a8450c8f46436a335"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group7-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "29953c945592c3554a9d5da89a1b1639ab169aee37752838fd479e21a88fda0f"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group7-20261006-v1.input_seal.json": {
+      "bytes": 84506,
+      "sha256": "a77aaf2db15cb05b4fcf4d687d42684291ba8fc6463a238d32dd2051a610fd34"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group7-20261006-v1.stdout": {
+      "bytes": 240,
+      "sha256": "71b06310d1a7e4d80fdaabf3e39dc9f18e847503e81810bcdb7922af7f544d43"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group7-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group7-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "8b9af01b8acd0f7103fd83aa0b49b57c3a014e40614c7696ab93caee645eb2be"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group7-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "3cf10977ae76a87148f0c9638fe3d9691948b202322f9f58a34b90ca64ef00cf"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group7-20261006-v1.system-floor.json": {
+      "bytes": 1766,
+      "sha256": "a45cb277498a202dd14d574a7b7e192126dc4b76d5f910347c464348548a6345"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group7-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "a80a862bd82d0e577063b3ac6066d2b3a8ed7d400ea83e3173bd8afc52139ff8"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group7-20261006-v1.output_seal.json": {
+      "bytes": 15699,
+      "sha256": "6074e8214764f5c78dfcdf4008d9cfab4621b29eacb53bdf684909697f64d67d"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group7-20261006-v1.publication.json": {
+      "bytes": 2813,
+      "sha256": "00929e22918aca088f7894b04baf800d218131ee07a1248743526f1383cbc2d4"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group7-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "b88c2f2f5e65e817f002d65ce7b7dfc02ed587b755e504d6ed4a3cfee4ec1fde"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group7-20261006-v1.final.json": {
+      "bytes": 4964,
+      "sha256": "50d27ed547db83d40396978211b32d63e580efb22f79557ce026f5475f1cb43d"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group7-20261006-v1.unit-cleanup.json": {
+      "bytes": 733,
+      "sha256": "d6cb7b29e5e691b80ed209e629fca0df4c1ca011a3e9a9c20dd5169b3a44e228"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group7-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "60e76523727c4ac32534780e14fbc87020c82a993e0dadbf66cc22aebf60ba29"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group7-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "3ca03de790429636f1d1bdbe0bb0a9a8b84df9c87cc625e457dcaf64637b5eb2"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group8-20261006-v1.config.json": {
+      "bytes": 132670,
+      "sha256": "ce40b3f358c11eec613d84970d214600da428fd5a2de3322b1924bb1f2259351"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group8-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "cc228a6d70bea3975c0d3b6ad692c0d56aaae14d800047e9a46b04ec0721be34"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group8-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "a04b46e72c8a4c9e56ac6c3865c02fdd3538481a1cdbf842ad34c15b20c011a0"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group8-20261006-v1.input_seal.json": {
+      "bytes": 84518,
+      "sha256": "0ef282ad18f00cbe42efe2898b9eb39d4a192fcafa29665b319e771eb9279a9c"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group8-20261006-v1.stdout": {
+      "bytes": 16908,
+      "sha256": "ea04f0c945a4e4dd7785907adf88d00ad426a175e078447af345677abd13eb38"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group8-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group8-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "5d5aeb622d89bbde89a7d15aa5f3ee3df3a7e3ba6b6c11b7f096ae3838298991"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group8-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "550750b66219ba2b1283773de0d774332b0a16024bb46ff1784a68c1c85422d3"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group8-20261006-v1.system-floor.json": {
+      "bytes": 15386,
+      "sha256": "608033b5bdd5fc90e4ee3770dbad7fbdc84c8da83396e219c14233d4d79b8fb0"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group8-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "2a21857201057d8be857065911103b195973a32829211a05a28727aeaeaa7e00"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group8-20261006-v1.output_seal.json": {
+      "bytes": 135201,
+      "sha256": "d410b4bf5cac43b024bac653c56c4690d16ea56d622dc40017a9dcb5da242214"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group8-20261006-v1.publication.json": {
+      "bytes": 2819,
+      "sha256": "1525b3d0c5316ec13f60e120aa88242fad738ce69500a78dd035304cd35bedd4"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group8-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "de6246e6f0fb478ffbeaf990c0f873c5f0cb5152c2fe087837f3fff9ad9a9485"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group8-20261006-v1.final.json": {
+      "bytes": 4971,
+      "sha256": "68cd9731cd56a33229d43559d1b044ac871aa1ddf63221705c13532296245948"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group8-20261006-v1.unit-cleanup.json": {
+      "bytes": 733,
+      "sha256": "dfc1899b2bb12b9f7a86cbba8dec7eacf1a353793da7d10c55e19a3dc164718d"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group8-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "e9e9a73708c429ac441d77af45c123e62564a028b836b47e57c9a28e5a3813d2"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group8-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "78c6bf59506c51f7f96bb741462d1bdaedaf855cda36579de792badb354b6637"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group9-20261006-v1.config.json": {
+      "bytes": 132777,
+      "sha256": "b0c46fd01024274b3a09bf59f0b3f850c9a0b30e351e4ed7a3c724d6e7f82d32"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group9-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "11f3493ac6a0d8916dbc15b4bd789ab1ab8b1691b2d2d4b3a2e1225ee79497db"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group9-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "07e664564afe35059477bd4b0199813dfb872a10b81e87600df4f5a507e04d44"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group9-20261006-v1.input_seal.json": {
+      "bytes": 84521,
+      "sha256": "f23519cca589acdc68e4c98ade5ed24238cf5a2dd9bda4ea60cc3252d673874d"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group9-20261006-v1.stdout": {
+      "bytes": 50918,
+      "sha256": "2226f36b553ec5822491462c6294b077496e2f6794058f5057df19fbe69c9ba5"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group9-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group9-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "b6362a5fa9e411f528fb3cf6d212dad6f2c3a9f780681f540d61e98c6ed382fe"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group9-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "8d8739fbfc1eedb5e8eb29cf1aece4f2d653c3bc237e8146b4d230cd27c7f64b"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group9-20261006-v1.system-floor.json": {
+      "bytes": 19249,
+      "sha256": "50e3579e8148a7d04f55c90c29052f5b75e42d277b7809750fcd5495bfeffc0d"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group9-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "242289daccd2bbf5bcfd81649b4ec91565c7c1d296bf8e999a7107d83eacf88b"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group9-20261006-v1.output_seal.json": {
+      "bytes": 169249,
+      "sha256": "1fdee6fa94cc462f2767b767634bff4e4603bc91d700d572130794abbfdd751d"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group9-20261006-v1.publication.json": {
+      "bytes": 2819,
+      "sha256": "7d14e0a250cc7f238168fc221b0647fd6c09f9d72eb22f59877c757e2dcc51e2"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group9-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "1f15a0c0197cc054b350ad559e6c713017ced9d06678b025ac854acfb7cd34a0"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group9-20261006-v1.final.json": {
+      "bytes": 4971,
+      "sha256": "593782b2b053cd753034e9ada506066aaa1231de35827a38e7d75df79a872d7c"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group9-20261006-v1.unit-cleanup.json": {
+      "bytes": 733,
+      "sha256": "ceedc22765bf45885cc409944934dbe69c5276aaee981e439c7d1c886fd6f398"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group9-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "a282491b8d28abc8afb5b39b797420f3f268d9e41828f6878602ec1f67f781be"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group9-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "e83bfe1545d0cf38f64edd19a086a68abe1a2e02cbe7b6984ef1ce83fde35591"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group10-20261006-v1.config.json": {
+      "bytes": 132581,
+      "sha256": "b37ad8fa1e831116b5a53e4a40d3f8283de7fbb39bc3bd1131decbcfba11a355"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group10-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "bc870b890c79f9e99d70970cb18844d950ac0e1ccb3acaa66f27a2cb30c8c79c"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group10-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "63e900932b45648e87861466a04d4e9b7b8cc2322561cf47a98bcda3fa15ae50"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group10-20261006-v1.input_seal.json": {
+      "bytes": 84515,
+      "sha256": "aaa695226f4704139e88fd60e55d328e38c1c79b9ebc8a22ffc60bf754be1117"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group10-20261006-v1.stdout": {
+      "bytes": 246,
+      "sha256": "537a0440aec9d90da44d47aa3ca352e7400ec91484d65ff5133b979990dbc182"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group10-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group10-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "02608ef339d9413e2be7031224e32eee7c5248f641792fc238c998285909f9d9"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group10-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "0c48b0562fdca0d407fccc85930299b3a4aa95eeb51af4ba1a92609cae74d393"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group10-20261006-v1.system-floor.json": {
+      "bytes": 279,
+      "sha256": "6c056f505e5e88c4ef00338e06bb4b0b7916e669442b8ee2e441a31ef2d38ea7"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group10-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "e54187f6b18caae5d3bce8da1b17372b005f627c1ffa5eaa37a6976aa691465b"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group10-20261006-v1.output_seal.json": {
+      "bytes": 2423,
+      "sha256": "e3b75127b400a09d472c5e925bdeb30341ad9cc9a50b6c3c589132e0d24e610c"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group10-20261006-v1.publication.json": {
+      "bytes": 2820,
+      "sha256": "d34cf71d286f173dfb32aa71109eef07189c2ffcff7571e926bbbc3fdf266a19"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group10-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "f27e5923ed86e7b00c3c65a65f4f1b0ce75986500101a03a43511b436636a086"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group10-20261006-v1.final.json": {
+      "bytes": 4977,
+      "sha256": "f918241dbbc7df9180a70e747bb5af5993bbdfffb6903b8b4e5bb6045b888cee"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group10-20261006-v1.unit-cleanup.json": {
+      "bytes": 735,
+      "sha256": "d4a63d38b783941aede0d5ce0702a6211bb69071c6b024cff7869e9b14758341"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group10-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "ac2cd005af2125432aefcb36f63c37f4c249ea60a748915208a7fea0affe08e8"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group10-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "c668c82a9fca97c10cbbd8f3816bcb0a184bc13ff2b73a7e0ac141acebf39d10"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group11-20261006-v1.config.json": {
+      "bytes": 132575,
+      "sha256": "b55ee2b2be6935b9a16fe5a32684008f1f110812a5c669e3f98a7d18f1c1c348"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group11-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "d616b42ed22db3e1f4c7dd929d06c5c8fe68ad8b2e2d58a28cfc1393e67925d0"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group11-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "eaa1a1d96da67ee8cfc23c78da9a4ddf623b080065bc70e1a64d146140fc15bd"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group11-20261006-v1.input_seal.json": {
+      "bytes": 84509,
+      "sha256": "4dc509798519c09655e9ee54d6d0bfb92da659b56a6bed8e48f9ddc3dcd27eb0"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group11-20261006-v1.stdout": {
+      "bytes": 240,
+      "sha256": "fa58979cec373e8cbbdc1d0be1ceee90c597a2c324bcd206e1dff69fb762ce74"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group11-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group11-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "2a48138e165232c32ae79435c79851c64e50caa174b1edb00bde647a55c7625b"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group11-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "ba8c8e40a73cb5d3546db64e572feed027f609907b1afedd30da8aa8937c19e8"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group11-20261006-v1.system-floor.json": {
+      "bytes": 279,
+      "sha256": "51385b5c54ea1f174c998e74c2597a7759cf1509bd866c5b1f5799b07cfdb073"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group11-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "0586af2bd52358ad68ead9da2952ab8159832307786135a37d9993bb5f0c1845"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group11-20261006-v1.output_seal.json": {
+      "bytes": 2646,
+      "sha256": "65bbcf9c95fa101319b6840bc8435e4abe3a46f31dd55c84420346b3f56fd2c0"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group11-20261006-v1.publication.json": {
+      "bytes": 2820,
+      "sha256": "b86877570959c4b5d64979bd980d9feb2d53c7503b528209e0c0802f7034291b"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group11-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "9f6a1d818f47527683c9f4fceaf1ded620f2f3c583c84726398bdee010062b22"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group11-20261006-v1.final.json": {
+      "bytes": 4977,
+      "sha256": "9712a57f05d666b04f2fb584ad3f449a812c94671443e7278e8c19005e7bbbc8"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group11-20261006-v1.unit-cleanup.json": {
+      "bytes": 735,
+      "sha256": "7ff0c4464fd2a8121d37d86584403390c1fb565e5dead1978688c4f880984a11"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group11-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "bf9aa83ae8520acb0d53fd051e58ed330419d44094c35e0f08ab9a08e681fd77"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group11-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "7e052a9cd5d1cc21049541c031d2b113ed3b5ff6275a4d484b320b21515c8f24"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group12-20261006-v1.config.json": {
+      "bytes": 132582,
+      "sha256": "c384c887710f5478d59810ee76560f60883fa57963d281722d288599326eff53"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group12-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "694d261c86f4e7949bcf38f0c9e508b0ca51a26ab921fa4e47b834300f5aea68"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group12-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "e757df3ab509fff103286978076507325c735291040b0999472fd5d847dd653a"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group12-20261006-v1.input_seal.json": {
+      "bytes": 84516,
+      "sha256": "500987790c154cd905eafef4049bb80202588a1d631f3f301387a0f5976f0526"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group12-20261006-v1.stdout": {
+      "bytes": 4061,
+      "sha256": "e5877202cb86d093ebbf206255bb1c24d99f629c623e593f87094e9e2280b9f1"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group12-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group12-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "52850f9e40363c22dc88aed4402880e56bce62e066ee6a7bebe744562043949b"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group12-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "a2c83e05079ae5e98793b06dae9277b18059149c5f3dbee39e925703cc3e55d2"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group12-20261006-v1.system-floor.json": {
+      "bytes": 2263,
+      "sha256": "46785aac29acdb34909a62348a614cefbd272f71f4465bf0a9cc08bec3fb8fab"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group12-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "e1f5834192d24b5851205e220824ed23f39b3c5b40a817d05dd26760b5c0c17f"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group12-20261006-v1.output_seal.json": {
+      "bytes": 19825,
+      "sha256": "cf185734b714285d17bdab035b9acb79e43e571c423f0fd5118be4ef3d7f58a9"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group12-20261006-v1.publication.json": {
+      "bytes": 2824,
+      "sha256": "ff5eacb24c14b60dd0dd9030eacf9d602dd8f6c858db82f6890630e20fd28051"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group12-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "e24e8aaac0f9512cdd048632933c3ff5c6416c6f3db43b9066f8d687bf858fac"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group12-20261006-v1.final.json": {
+      "bytes": 4980,
+      "sha256": "12397e7025e1bd2e61670bbbc6e557d6f57d42d8483a06819ff0905c08f69bee"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group12-20261006-v1.unit-cleanup.json": {
+      "bytes": 735,
+      "sha256": "416668e214d42dc94fc55c758acf6e8519bf91660cfe290770223f53af16aeeb"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group12-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "3a9ffd37202145c47e17cda4ec51e743abae679db17e5d353f3f6211cb26a1ce"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group12-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "338202529893c5edcfe96019c3629c8c3e84484fccfcf56b411b3a487157d64f"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group13-20261006-v1.config.json": {
+      "bytes": 132574,
+      "sha256": "e0b2d3b9c5ce314994a00d843f3c91d6bb8f2d1def0f6bcd1a26892c88833249"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group13-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "0d36659c0e2e3c9b309d6ad05348dcd89bfbdc063d05d9b09be866ca755228e2"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group13-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "1e77374a7e751a564c74828a7b34688260b08caae15ea3d7ec4f05baf6adc4a2"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group13-20261006-v1.input_seal.json": {
+      "bytes": 84507,
+      "sha256": "e3322fe7bbd674655c420c5fb1284746767701d83cf5a09e8836a3190d19febc"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group13-20261006-v1.stdout": {
+      "bytes": 4598,
+      "sha256": "2e86251b0b3fdcffabbd2e61282140daaf59e19be893f6d3ac25114dd31d6738"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group13-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group13-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "9a453d19d453423f87173fa4d402de02216b8416bfb53b0faa3d9358196d8802"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group13-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "158b6126061beb1facda4a5563fcb445476d2dc3e7dbbbb4bff13a316e02e080"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group13-20261006-v1.system-floor.json": {
+      "bytes": 21348,
+      "sha256": "ca156985493bc42d17d538fe5dd04e7c71837d83bdf2145f28c972dbc2432d06"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group13-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "d8006206a31217a4bc32cb722f2dd853b50b7ab6c558c099379c09c36b9b625d"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group13-20261006-v1.output_seal.json": {
+      "bytes": 187404,
+      "sha256": "4373e108a7589dddbce01528ed51548b49c6062a8ce59a478647b5aba2d33998"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group13-20261006-v1.publication.json": {
+      "bytes": 2828,
+      "sha256": "4a2f34c5340eb52e055d27dd34a93832aaf338e34ce97aabc143e9da85c28b7e"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group13-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "c4463127416ad6b8d21a2ae4c8fbb8171943cfc93b1c05f2b64883c3f1389fa9"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group13-20261006-v1.final.json": {
+      "bytes": 4985,
+      "sha256": "46e39bdfc89f268d1c9b8c2f85ab55c7f6a7222f7f66fa7b20b0bb983f5f0411"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group13-20261006-v1.unit-cleanup.json": {
+      "bytes": 735,
+      "sha256": "631254f799b81fd6640950a5bc4d9dcaca8e7a27c5329f5d20e43c2780250e17"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group13-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "a1d2317787c4517a57496f33433c8bb8f9c347bda053152b00f2ef39e867cd5e"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group13-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "b4aa5e2eeb6c9e3a3ba7ed7897eeeadbf6d4a2691e6c9f16bd4487d90939fe3a"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group14-20261006-v1.config.json": {
+      "bytes": 132582,
+      "sha256": "5522d6f15396aa2a60875bd0f66bf850d3d9fd157a5ba61d6252e17734c8abfe"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group14-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "1ae0b97f54ed7dd448428297883855e84d5a35b103d0294381d7cd9f0e5f3edf"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group14-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "e3df1d262e3d4d07c3205f078a5b0df9ad29eaf2b369f93152c39b9ad8084444"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group14-20261006-v1.input_seal.json": {
+      "bytes": 84515,
+      "sha256": "338e322bc279502fa6117707051096dcf1f5ef22d34b8f5ef6f7cb4ea3c48b95"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group14-20261006-v1.stdout": {
+      "bytes": 17242,
+      "sha256": "e4985dcca7bc63caa362c2e1265fc4fc5ce826af7c16451292a0ae0165216723"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group14-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group14-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "d1bc574efa4e70590c3983df98be95de2a7954c571b93915523e9cfa4ce485c6"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group14-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "1ee3b71a113145d19860eb5c87910a5d300a58babfebec9afd504cbd47ab64db"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group14-20261006-v1.system-floor.json": {
+      "bytes": 20258,
+      "sha256": "f5ab2f2e96fe2ff7e04d593d7ec721cbbf7c84634c11d9459ddec85a6a91664e"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group14-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "db6ef7a5ea210f562591ce27e07a3422759e10e6e4f8fec62751d1ed81bf3ec8"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group14-20261006-v1.output_seal.json": {
+      "bytes": 178947,
+      "sha256": "f779559b3f7aafd2313d9705567c619d0248462c4346ace863651945ed3912d7"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group14-20261006-v1.publication.json": {
+      "bytes": 2829,
+      "sha256": "5e9a15838151b259c6de01fb7edcd1adbfe4a8bd079e0d8daf82ec77fdc4fc3d"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group14-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "658f72e591643b82055c9f83833dcd7a6596a60059621d308ac61ae7107723db"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group14-20261006-v1.final.json": {
+      "bytes": 4986,
+      "sha256": "50da14bd6800201ba22de5bbaa8859d1e62c4f965cb8e5a7d2cf8d90a1de8e22"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group14-20261006-v1.unit-cleanup.json": {
+      "bytes": 735,
+      "sha256": "991695e928562e0bdd66536f97ef04bf4d27a0b621211832b0af5694cf95eded"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group14-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "0faaf082a4b0f95b5c4bf38710e04049314b21b3e4515396c26bc884177a7b92"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group14-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "6a604434049bd785fd1c08967b1588edb8842a35b7fb925446da62298e9074b3"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group15-20261006-v1.config.json": {
+      "bytes": 132690,
+      "sha256": "fe4e2afb32a5b6451bb591f293a11423f720ad8c057fcc1b0c06f190713ad1fe"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group15-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "558217d44e5ea48416112b965376c5a157dd1d1a5f9fce860a11bbe81ae6aec5"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group15-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "72e03b7911dad120559a3c500d025f69b2edf1286e5d8cbd92740d4d23fa8de5"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group15-20261006-v1.input_seal.json": {
+      "bytes": 84515,
+      "sha256": "6ecd817bacc4f5701447cc719425523a2c14d8ec786d9ff2271e5e5f0c81dcde"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group15-20261006-v1.stdout": {
+      "bytes": 37950,
+      "sha256": "6380fa7026d475fb62a4df0cffa6a51be7a25589f5c6f99091bf0dd0a738da25"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group15-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group15-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "6b418c178f27833b0b053215df6af50f7fb2d69c4bf62caedd6dc145653a94a7"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group15-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "0ef0530629b6f3f62de2a4add8b59db74fc4552e5b1689969160ba8c052ad9cd"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group15-20261006-v1.system-floor.json": {
+      "bytes": 5916,
+      "sha256": "83e88d40931203f58f84882a065db1e6c132abe535405570cb3bee9db5a78bd2"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group15-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "db1aa29511f5540628aecf2c90db702e4d893f59d3e8b3cef3ecbc4c318763fd"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group15-20261006-v1.output_seal.json": {
+      "bytes": 50135,
+      "sha256": "7b01656d23f94d1ec5df2f14655a0730110b1808b0988a326be63b6ffa3810ce"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group15-20261006-v1.publication.json": {
+      "bytes": 2825,
+      "sha256": "d6eda5316ed4bc59af0aecd1579f05174aaf2823f9de92a43a6471364e2b400d"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group15-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "5a7ed7d2aeed39acd46b4135e5d1067cc18bb9c7a071c76b3498a020a6c49155"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group15-20261006-v1.final.json": {
+      "bytes": 4981,
+      "sha256": "fb513558b22d253d56981b2a07d2641210169904f512c3543eaa772c91df6c28"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group15-20261006-v1.unit-cleanup.json": {
+      "bytes": 735,
+      "sha256": "bae5113a98a0ddc5fc86edef6a20f453d6a64f35e8d964fa4388d3bec8ea6cc1"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group15-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "855040c9f128003c461fde19bbd1bb6e50c2e5de788c72b89a0b76f75b669e70"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group15-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "e1a38fd101d1a6e1e0f78df2089d27a3cd0ec5708ef1711165c553e9657062aa"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group16-20261006-v1.config.json": {
+      "bytes": 132697,
+      "sha256": "cdd2504c5e1796b5501e02e3b8be2e1f9cb30b248ab202982b2ece4f49386909"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group16-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "dcf92f9ca68bb0d4608edad3a70925695c922cc13a8363f407e67f4899f24674"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group16-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "c7f6c1bbfd5129cd1403f4fc14eaec35a54e5f48a21e5bff7986b7d00ecc0a2a"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group16-20261006-v1.input_seal.json": {
+      "bytes": 84523,
+      "sha256": "12bac0824289bd2e697d5825eee4e106c2b4bcc99d918fb0c8101535eed69536"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group16-20261006-v1.stdout": {
+      "bytes": 1617,
+      "sha256": "76510b79c898e10acfe937712e42274a02c8662904b6d02b2f6da7469b6e539e"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group16-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group16-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "01043ebe7b7cad4eda4dd7c39dbe4fea13ea163c89a0de4c4a56024f18a9e458"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group16-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "382a2d8cde30dbe2e67d3f35f674b8631b64869d52987547e8ea719284674ae3"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group16-20261006-v1.system-floor.json": {
+      "bytes": 5583,
+      "sha256": "fc14e9bc7aeed382e889413a91553f97e93224e0bde4fa124994fbc47ce880fc"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group16-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "cfb9586451a8b2127dbba155cbb8dd3e0cc53f676461c36f56fae24d1d5d643f"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group16-20261006-v1.output_seal.json": {
+      "bytes": 47800,
+      "sha256": "bd62b6fa364e9eced4ba65863cdaa5fef955bf9e00b18d1ff1b8076746bc9938"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group16-20261006-v1.publication.json": {
+      "bytes": 2824,
+      "sha256": "4bbd226a543f165319ee71f704eb9f96192cd1ce7ebaeda07dfbdfbcbf484db5"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group16-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "a968e3ef06a65b60bcdaeb3a1b95f5449059a0419549c56dc32efd77d76f665c"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group16-20261006-v1.final.json": {
+      "bytes": 4980,
+      "sha256": "65ef570af1a66795ee67d464bb03748615730f67f93156f2e4da0671a0e10c64"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group16-20261006-v1.unit-cleanup.json": {
+      "bytes": 735,
+      "sha256": "c86f173033f3d5f6cd608d3100000616eed361a14b00362cabbdcb73eec2f59b"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group16-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "a93d87481f1d7904712817a6d01c7e915291f07bdefed24e433ba688d12c8738"
+    },
+    "queue/hnn-pair-learning-4432a4b9-control-group16-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "2b569bdd3e95c94d81a3c7fb74d9983d7d5fec51e4bfca7a95cf416e120faa7d"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/CONTROL_RESULT.group15.v1.json": {
+      "bytes": 1285,
+      "sha256": "270aafcb04f11bdc3c35f5e1f33cea6b7531698e8ee3cdbadb73083222ef9bce"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/CONTROL_RESULT.group16.v1.json": {
+      "bytes": 1293,
+      "sha256": "fc0acec8e71569f8a38f9ee2381d93c43f8dc42a6688683573f4790558fa66db"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/CONTROL_RESULT.group1.v1.json": {
+      "bytes": 1284,
+      "sha256": "0c86675fc215fccc7717767f5a1f19a973a42f2a4cc34d15a25a28d8a5a9a9c4"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/CONTROL_RESULT.group2.v1.json": {
+      "bytes": 1271,
+      "sha256": "d7defe1e4ecaad57369ddf05da7c9fc51fcec0c9063117692c411e426a2b1a7e"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/CONTROL_RESULT.group3.v1.json": {
+      "bytes": 2456,
+      "sha256": "628edeb15951fbcc34cd8189bebb0a1bc2d5fbed4cd1283727041d0dce5bd085"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/CONTROL_RESULT.group4.v1.json": {
+      "bytes": 1251,
+      "sha256": "a406ecf987da8dd90189e9cb6aee1719f55ff978ca21a484f4e3379174d0e06e"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/CONTROL_RESULT.group5.v1.json": {
+      "bytes": 1239,
+      "sha256": "b7ae0828c0808673d28781e011facd8b4def6692503b111d63dcf247feb8110a"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/MATCHED_PAIR_OUTPUT_EFFECTS.v1.json": {
+      "bytes": 26032,
+      "sha256": "ccb9076526c6687dc0b8d56f26227622534f897385227b437909b1aa607a102a"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/CONTROL_RESULT.group6.v1.json": {
+      "bytes": 1290,
+      "sha256": "b563726498d6d03d9adc8ff57f2d2e07af1fe85404ac38c8901debc9143ed502"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/CONTROL_RESULT.group7.v1.json": {
+      "bytes": 1276,
+      "sha256": "59e85ec7d6fc471a8a67fd7563da21e3125600058f98c84a4b7175567ba68f45"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/CONTROL_RESULT.group8.v1.json": {
+      "bytes": 1292,
+      "sha256": "568d2cebc54c0b4ce8688aeed4bbe2b372235b1cc7638c0f8c037b2cbc7e3bf4"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/CONTROL_RESULT.group9.v1.json": {
+      "bytes": 1295,
+      "sha256": "7df2d15368885d69c444b64cf8ec033afdfafd519633bb16af7e34e57d9207ca"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/CONTROL_RESULT.group10.v1.json": {
+      "bytes": 1285,
+      "sha256": "126f25c9f4900e1d404c09a2c1ece181aad97ab7c465c77095eaf63473a3b5bf"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/CONTROL_RESULT.group11.v1.json": {
+      "bytes": 1279,
+      "sha256": "6c88487d7411bf9f78912425a690ea8962a318df5d1c8d8a8f1da6fd5b7d2162"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/CONTROL_RESULT.group12.v1.json": {
+      "bytes": 1286,
+      "sha256": "fe398a73283689bae76d407faa7d7ec0eef9c5b91d68f1635a726fbe7a8ece9d"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/CONTROL_RESULT.group13.v1.json": {
+      "bytes": 1281,
+      "sha256": "82261be38d836fcef11de645af76fda782950910aac288a7425c803c5b4f18a6"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/CONTROL_RESULT.group14.v1.json": {
+      "bytes": 1289,
+      "sha256": "d11aa78092bd242d9ae7339df607bc0919aa3655f87374fabb1f492e8c346dc6"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/preserved-local-fingerprints-v1/holonics-02407331bdf682dc/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/preserved-local-fingerprints-v1/holonics-02407331bdf682dc/dep-lib-holonics": {
+      "bytes": 4592,
+      "sha256": "4dbc80594dc1bffe7e3aacf5c3c0bfd9db41cb12c7bc3a62c54542b320d29c3f"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/preserved-local-fingerprints-v1/holonics-02407331bdf682dc/lib-holonics": {
+      "bytes": 16,
+      "sha256": "6304d59d6385115a7b9449c78746ac11059ce0dc229f67b249e21d2086347c61"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/preserved-local-fingerprints-v1/holonics-02407331bdf682dc/lib-holonics.json": {
+      "bytes": 655,
+      "sha256": "fca0bdf54a0e37dac6d614e5a11fd8cd6b56846d3ab3eed7085cc23f87d2bc2d"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/preserved-local-fingerprints-v1/holonics-70b68d2f7e1f6408/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/preserved-local-fingerprints-v1/holonics-70b68d2f7e1f6408/output-test-lib-holonics": {
+      "bytes": 2646,
+      "sha256": "317714724fd1340c47c1e08056a9dbe56e183efa9703c02557af772308a9d48b"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/preserved-local-fingerprints-v1/holonics-cuda-c82bf91515d93d4b/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/preserved-local-fingerprints-v1/holonics-cuda-c82bf91515d93d4b/dep-build-script-build-script-build": {
+      "bytes": 28,
+      "sha256": "a71f952e7f3252ef5608298951fd55b25f3590c98bc0765ae4145e623604ee7d"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/preserved-local-fingerprints-v1/holonics-cuda-c82bf91515d93d4b/build-script-build-script-build": {
+      "bytes": 16,
+      "sha256": "dcab605d8b024cdf6df0091b2363713976c61f814202b7e0320074392e027b00"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/preserved-local-fingerprints-v1/holonics-cuda-c82bf91515d93d4b/build-script-build-script-build.json": {
+      "bytes": 373,
+      "sha256": "42af5ee2dbddb0ccadd1d7819991de66100a21f8a5cd26be8bdfa7e7919ab9ea"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/preserved-local-fingerprints-v1/holonics-cuda-d9ad51fae469d445/run-build-script-build-script-build": {
+      "bytes": 16,
+      "sha256": "37b5cbf0a73ad9a7a876508d27665194dde47e537e194aa3b2a24aa3e9f5b192"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/preserved-local-fingerprints-v1/holonics-cuda-d9ad51fae469d445/run-build-script-build-script-build.json": {
+      "bytes": 774,
+      "sha256": "6ee7b9132b6ef6f235b70113cd28fbbd8dac3e4863006c4b9d57b7567e621dc9"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/preserved-local-fingerprints-v1/holonics-cuda-fe78e545d18196b4/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/preserved-local-fingerprints-v1/holonics-cuda-fe78e545d18196b4/dep-lib-holonics_cuda": {
+      "bytes": 478,
+      "sha256": "8eca382aaeefe60d612918af630348f81168d03d1509df42b250bbb92c0a54d2"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/preserved-local-fingerprints-v1/holonics-cuda-fe78e545d18196b4/lib-holonics_cuda": {
+      "bytes": 16,
+      "sha256": "343ec81ebde965c0d6d112456ed3db0dcc3f13d6f6ffd89a809e4d244eeba533"
+    },
+    "queue/hnn-pair-learning-4432a4b9-20261006/preserved-local-fingerprints-v1/holonics-cuda-fe78e545d18196b4/lib-holonics_cuda.json": {
+      "bytes": 676,
+      "sha256": "59a022c0ba527803909cd6c28d5badbf98b334b37bfca813978184d3649a97b1"
+    },
+    "VALIDATION.json": {
+      "bytes": 848298,
+      "sha256": "051deefafcfd09614fc3e3f8f7910f73dc104a56e9322561445e9145b23eeef5"
+    },
+    "FACTORED_MEASUREMENTS.v1.json": {
+      "bytes": 23059,
+      "sha256": "733dea17731209a55b328fb22e241772e7b328b85892debe55a18324796ef672"
+    }
+  }
+}

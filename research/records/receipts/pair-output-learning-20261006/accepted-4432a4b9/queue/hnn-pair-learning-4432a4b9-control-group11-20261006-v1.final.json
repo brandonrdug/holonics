@@ -1,0 +1,99 @@
+{
+  "passed": false,
+  "label": "hnn-pair-learning-4432a4b9-control-group11-20261006-v1",
+  "scientific_job": false,
+  "deferred_lock_busy": false,
+  "final_CPU_ns": 176036000,
+  "CPU_reading_grain_ns": 1000,
+  "aggregate_CPU_limit_us": 17000000,
+  "final_CPU_source": "systemd retained oneshot CPUUsageNSec after all group processes exit",
+  "CPU_kernel_hard_total_limit": false,
+  "sampled_stop_margin_us": 1000000,
+  "aggregate_CPU_within_limit": true,
+  "no_overshoot_accepted": true,
+  "wall_ns": 217446038,
+  "projection_ns": 16000000000,
+  "wall_source": "external monotonic_ns through final property read",
+  "quiescent": true,
+  "completion_event": "oneshot start job completed; no polling",
+  "unit_properties": {
+    "Description": "Owned holonics admission hnn-pair-learning-4432a4b9-control-group11-20261006-v1 bf61890ec23b0813fd11d0d5436a8ffd",
+    "LoadState": "loaded",
+    "ActiveState": "active",
+    "SubState": "exited",
+    "InvocationID": "c7141f37fa1c49d3b1aa746d047fdb87",
+    "Result": "success",
+    "ExecMainStatus": "0",
+    "ControlGroup": "",
+    "MemoryPeak": "16424960",
+    "CPUUsageNSec": "176036000",
+    "TasksCurrent": "[not set]"
+  },
+  "outer_error": null,
+  "unit_start_exit": 0,
+  "unit_start_stdout": "",
+  "unit_start_stderr": "",
+  "config": {
+    "sha256": "b55ee2b2be6935b9a16fe5a32684008f1f110812a5c669e3f98a7d18f1c1c348",
+    "bytes": 132575
+  },
+  "receipt_pins": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-4432a4b9-control-group11-20261006-v1.config.json": {
+      "sha256": "b55ee2b2be6935b9a16fe5a32684008f1f110812a5c669e3f98a7d18f1c1c348",
+      "bytes": 132575
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-4432a4b9-control-group11-20261006-v1.external-lease.json": {
+      "sha256": "d616b42ed22db3e1f4c7dd929d06c5c8fe68ad8b2e2d58a28cfc1393e67925d0",
+      "bytes": 487
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-4432a4b9-control-group11-20261006-v1.lease-identity.json": {
+      "sha256": "eaa1a1d96da67ee8cfc23c78da9a4ddf623b080065bc70e1a64d146140fc15bd",
+      "bytes": 565
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-4432a4b9-control-group11-20261006-v1.input_seal.json": {
+      "sha256": "4dc509798519c09655e9ee54d6d0bfb92da659b56a6bed8e48f9ddc3dcd27eb0",
+      "bytes": 84509
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-4432a4b9-control-group11-20261006-v1.stdout": {
+      "sha256": "fa58979cec373e8cbbdc1d0be1ceee90c597a2c324bcd206e1dff69fb762ce74",
+      "bytes": 240
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-4432a4b9-control-group11-20261006-v1.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-4432a4b9-control-group11-20261006-v1.memory-gate.json": {
+      "sha256": "2a48138e165232c32ae79435c79851c64e50caa174b1edb00bde647a55c7625b",
+      "bytes": 120
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-4432a4b9-control-group11-20261006-v1.child-identity.json": {
+      "sha256": "ba8c8e40a73cb5d3546db64e572feed027f609907b1afedd30da8aa8937c19e8",
+      "bytes": 78
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-4432a4b9-control-group11-20261006-v1.system-floor.json": {
+      "sha256": "51385b5c54ea1f174c998e74c2597a7759cf1509bd866c5b1f5799b07cfdb073",
+      "bytes": 279
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-4432a4b9-control-group11-20261006-v1.quiescence.json": {
+      "sha256": "0586af2bd52358ad68ead9da2952ab8159832307786135a37d9993bb5f0c1845",
+      "bytes": 130
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-4432a4b9-control-group11-20261006-v1.output_seal.json": {
+      "sha256": "65bbcf9c95fa101319b6840bc8435e4abe3a46f31dd55c84420346b3f56fd2c0",
+      "bytes": 2646
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-4432a4b9-control-group11-20261006-v1.publication.json": {
+      "sha256": "b86877570959c4b5d64979bd980d9feb2d53c7503b528209e0c0802f7034291b",
+      "bytes": 2820
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-4432a4b9-control-group11-20261006-v1.stage-quiescence.json": {
+      "sha256": "9f6a1d818f47527683c9f4fceaf1ded620f2f3c583c84726398bdee010062b22",
+      "bytes": 136
+    }
+  },
+  "launcher_outside_native_group": true,
+  "lease_owner_outside_capped_group": true,
+  "lease_held_through_final_CPU_read_and_publication": true,
+  "stage_passed_before_cleanup": true,
+  "requires_cleanup_acceptance": true
+}

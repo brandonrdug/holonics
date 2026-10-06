@@ -1,0 +1,814 @@
+{
+  "exit": 0,
+  "wall_ns": 215380406,
+  "CPU_count": 1,
+  "CPU_affinity": [
+    0
+  ],
+  "CPU_user_us": 189877,
+  "CPU_system_us": 14209,
+  "CPU_reading_grain_ns": 1000,
+  "timing_source": "monotonic_ns wall; glibc wait4 integer timeval CPU",
+  "peak_child_RSS_KiB": 32368,
+  "cap_ns": 16000000000,
+  "projection_ns": 16000000000,
+  "projection_kill_triggered": false,
+  "system_floor_breached": false,
+  "system_floor_sampling_period_ns": 10000000,
+  "group_memory_max_bytes": 4294967296,
+  "group_memory_peak_bytes": 22724608,
+  "group_memory_current_bytes": 14123008,
+  "memory_events_after": {
+    "low": 0,
+    "high": 0,
+    "max": 0,
+    "oom": 0,
+    "oom_kill": 0,
+    "oom_group_kill": 0,
+    "sock_throttled": 0
+  },
+  "memory_events_delta": {
+    "low": 0,
+    "high": 0,
+    "max": 0,
+    "oom": 0,
+    "oom_kill": 0,
+    "oom_group_kill": 0,
+    "sock_throttled": 0
+  },
+  "stdout": {
+    "sha256": "71b06310d1a7e4d80fdaabf3e39dc9f18e847503e81810bcdb7922af7f544d43",
+    "bytes": 240
+  },
+  "stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "outputs": {},
+  "all_outputs_present": true,
+  "inputs_unchanged": true,
+  "within_projection": true,
+  "sealed_before_audit": true,
+  "aggregate_cpu_limit_us": 17000000,
+  "aggregate_cpu_used_us": 359983,
+  "aggregate_cpu_guard_triggered": false,
+  "aggregate_cpu_samples": [
+    {
+      "since_start_ns": 2354700,
+      "usage_usec": 106611
+    },
+    {
+      "since_start_ns": 4118994,
+      "usage_usec": 108608
+    },
+    {
+      "since_start_ns": 5232138,
+      "usage_usec": 109711
+    },
+    {
+      "since_start_ns": 6338851,
+      "usage_usec": 110809
+    },
+    {
+      "since_start_ns": 7436377,
+      "usage_usec": 111906
+    },
+    {
+      "since_start_ns": 8523883,
+      "usage_usec": 112988
+    },
+    {
+      "since_start_ns": 9616439,
+      "usage_usec": 114074
+    },
+    {
+      "since_start_ns": 10731147,
+      "usage_usec": 115182
+    },
+    {
+      "since_start_ns": 11831608,
+      "usage_usec": 116280
+    },
+    {
+      "since_start_ns": 12929755,
+      "usage_usec": 117374
+    },
+    {
+      "since_start_ns": 14055623,
+      "usage_usec": 118494
+    },
+    {
+      "since_start_ns": 15175330,
+      "usage_usec": 119590
+    },
+    {
+      "since_start_ns": 16277675,
+      "usage_usec": 120687
+    },
+    {
+      "since_start_ns": 17381011,
+      "usage_usec": 121786
+    },
+    {
+      "since_start_ns": 18478787,
+      "usage_usec": 122878
+    },
+    {
+      "since_start_ns": 19578076,
+      "usage_usec": 123969
+    },
+    {
+      "since_start_ns": 20675771,
+      "usage_usec": 125062
+    },
+    {
+      "since_start_ns": 21770251,
+      "usage_usec": 126154
+    },
+    {
+      "since_start_ns": 22855674,
+      "usage_usec": 127233
+    },
+    {
+      "since_start_ns": 24068004,
+      "usage_usec": 128467
+    },
+    {
+      "since_start_ns": 25204593,
+      "usage_usec": 129567
+    },
+    {
+      "since_start_ns": 26320192,
+      "usage_usec": 130679
+    },
+    {
+      "since_start_ns": 27423979,
+      "usage_usec": 131780
+    },
+    {
+      "since_start_ns": 28514502,
+      "usage_usec": 132865
+    },
+    {
+      "since_start_ns": 29614352,
+      "usage_usec": 133960
+    },
+    {
+      "since_start_ns": 30714883,
+      "usage_usec": 135055
+    },
+    {
+      "since_start_ns": 33106993,
+      "usage_usec": 137435
+    },
+    {
+      "since_start_ns": 35105956,
+      "usage_usec": 139427
+    },
+    {
+      "since_start_ns": 36237576,
+      "usage_usec": 140553
+    },
+    {
+      "since_start_ns": 37337816,
+      "usage_usec": 141648
+    },
+    {
+      "since_start_ns": 38430062,
+      "usage_usec": 142738
+    },
+    {
+      "since_start_ns": 39516246,
+      "usage_usec": 143817
+    },
+    {
+      "since_start_ns": 40610786,
+      "usage_usec": 144907
+    },
+    {
+      "since_start_ns": 41703302,
+      "usage_usec": 145994
+    },
+    {
+      "since_start_ns": 42789316,
+      "usage_usec": 147077
+    },
+    {
+      "since_start_ns": 43873807,
+      "usage_usec": 148152
+    },
+    {
+      "since_start_ns": 44959861,
+      "usage_usec": 149234
+    },
+    {
+      "since_start_ns": 46045865,
+      "usage_usec": 150315
+    },
+    {
+      "since_start_ns": 47161835,
+      "usage_usec": 151420
+    },
+    {
+      "since_start_ns": 48248530,
+      "usage_usec": 152504
+    },
+    {
+      "since_start_ns": 49326719,
+      "usage_usec": 153578
+    },
+    {
+      "since_start_ns": 50402374,
+      "usage_usec": 154650
+    },
+    {
+      "since_start_ns": 51477066,
+      "usage_usec": 155721
+    },
+    {
+      "since_start_ns": 52554705,
+      "usage_usec": 156794
+    },
+    {
+      "since_start_ns": 53632623,
+      "usage_usec": 157869
+    },
+    {
+      "since_start_ns": 54709901,
+      "usage_usec": 158940
+    },
+    {
+      "since_start_ns": 55794802,
+      "usage_usec": 160021
+    },
+    {
+      "since_start_ns": 56879344,
+      "usage_usec": 161100
+    },
+    {
+      "since_start_ns": 57991206,
+      "usage_usec": 162205
+    },
+    {
+      "since_start_ns": 59078643,
+      "usage_usec": 163303
+    },
+    {
+      "since_start_ns": 60165508,
+      "usage_usec": 164367
+    },
+    {
+      "since_start_ns": 61256672,
+      "usage_usec": 165456
+    },
+    {
+      "since_start_ns": 62342044,
+      "usage_usec": 166534
+    },
+    {
+      "since_start_ns": 63430383,
+      "usage_usec": 167621
+    },
+    {
+      "since_start_ns": 64513451,
+      "usage_usec": 168699
+    },
+    {
+      "since_start_ns": 65600617,
+      "usage_usec": 169781
+    },
+    {
+      "since_start_ns": 66687953,
+      "usage_usec": 170864
+    },
+    {
+      "since_start_ns": 67770972,
+      "usage_usec": 171944
+    },
+    {
+      "since_start_ns": 68880650,
+      "usage_usec": 173041
+    },
+    {
+      "since_start_ns": 69965021,
+      "usage_usec": 174122
+    },
+    {
+      "since_start_ns": 71046696,
+      "usage_usec": 175199
+    },
+    {
+      "since_start_ns": 72105229,
+      "usage_usec": 176253
+    },
+    {
+      "since_start_ns": 73187676,
+      "usage_usec": 177329
+    },
+    {
+      "since_start_ns": 74266346,
+      "usage_usec": 178405
+    },
+    {
+      "since_start_ns": 75341179,
+      "usage_usec": 179476
+    },
+    {
+      "since_start_ns": 76416092,
+      "usage_usec": 180548
+    },
+    {
+      "since_start_ns": 77494051,
+      "usage_usec": 181622
+    },
+    {
+      "since_start_ns": 78569645,
+      "usage_usec": 182693
+    },
+    {
+      "since_start_ns": 79668253,
+      "usage_usec": 183786
+    },
+    {
+      "since_start_ns": 80748867,
+      "usage_usec": 184861
+    },
+    {
+      "since_start_ns": 81831164,
+      "usage_usec": 185938
+    },
+    {
+      "since_start_ns": 82912889,
+      "usage_usec": 187017
+    },
+    {
+      "since_start_ns": 83996288,
+      "usage_usec": 188092
+    },
+    {
+      "since_start_ns": 85084126,
+      "usage_usec": 189188
+    },
+    {
+      "since_start_ns": 86168577,
+      "usage_usec": 190253
+    },
+    {
+      "since_start_ns": 87257095,
+      "usage_usec": 191333
+    },
+    {
+      "since_start_ns": 88350182,
+      "usage_usec": 192424
+    },
+    {
+      "since_start_ns": 89434313,
+      "usage_usec": 193505
+    },
+    {
+      "since_start_ns": 90538371,
+      "usage_usec": 194603
+    },
+    {
+      "since_start_ns": 91622301,
+      "usage_usec": 195679
+    },
+    {
+      "since_start_ns": 92722220,
+      "usage_usec": 196774
+    },
+    {
+      "since_start_ns": 93813344,
+      "usage_usec": 197863
+    },
+    {
+      "since_start_ns": 94896042,
+      "usage_usec": 198942
+    },
+    {
+      "since_start_ns": 95976455,
+      "usage_usec": 200017
+    },
+    {
+      "since_start_ns": 97059754,
+      "usage_usec": 201129
+    },
+    {
+      "since_start_ns": 98164383,
+      "usage_usec": 202189
+    },
+    {
+      "since_start_ns": 99263952,
+      "usage_usec": 203284
+    },
+    {
+      "since_start_ns": 100363471,
+      "usage_usec": 204378
+    },
+    {
+      "since_start_ns": 101492666,
+      "usage_usec": 205502
+    },
+    {
+      "since_start_ns": 102590903,
+      "usage_usec": 206596
+    },
+    {
+      "since_start_ns": 103689210,
+      "usage_usec": 207690
+    },
+    {
+      "since_start_ns": 104786905,
+      "usage_usec": 208782
+    },
+    {
+      "since_start_ns": 105884651,
+      "usage_usec": 209875
+    },
+    {
+      "since_start_ns": 106984762,
+      "usage_usec": 210966
+    },
+    {
+      "since_start_ns": 108081786,
+      "usage_usec": 212073
+    },
+    {
+      "since_start_ns": 109182638,
+      "usage_usec": 213152
+    },
+    {
+      "since_start_ns": 110280163,
+      "usage_usec": 214245
+    },
+    {
+      "since_start_ns": 111379001,
+      "usage_usec": 215339
+    },
+    {
+      "since_start_ns": 112500361,
+      "usage_usec": 216456
+    },
+    {
+      "since_start_ns": 113601383,
+      "usage_usec": 217550
+    },
+    {
+      "since_start_ns": 114701584,
+      "usage_usec": 218647
+    },
+    {
+      "since_start_ns": 115798808,
+      "usage_usec": 219739
+    },
+    {
+      "since_start_ns": 116896284,
+      "usage_usec": 220832
+    },
+    {
+      "since_start_ns": 117994320,
+      "usage_usec": 221925
+    },
+    {
+      "since_start_ns": 119094170,
+      "usage_usec": 223032
+    },
+    {
+      "since_start_ns": 120194501,
+      "usage_usec": 224112
+    },
+    {
+      "since_start_ns": 121291315,
+      "usage_usec": 225204
+    },
+    {
+      "since_start_ns": 122391856,
+      "usage_usec": 226299
+    },
+    {
+      "since_start_ns": 123513256,
+      "usage_usec": 227416
+    },
+    {
+      "since_start_ns": 124613286,
+      "usage_usec": 228510
+    },
+    {
+      "since_start_ns": 125711072,
+      "usage_usec": 229603
+    },
+    {
+      "since_start_ns": 126811223,
+      "usage_usec": 230697
+    },
+    {
+      "since_start_ns": 127917975,
+      "usage_usec": 231798
+    },
+    {
+      "since_start_ns": 129018707,
+      "usage_usec": 232892
+    },
+    {
+      "since_start_ns": 130099351,
+      "usage_usec": 233970
+    },
+    {
+      "since_start_ns": 131195784,
+      "usage_usec": 235059
+    },
+    {
+      "since_start_ns": 132293580,
+      "usage_usec": 236147
+    },
+    {
+      "since_start_ns": 133390795,
+      "usage_usec": 237240
+    },
+    {
+      "since_start_ns": 134512716,
+      "usage_usec": 238357
+    },
+    {
+      "since_start_ns": 135806589,
+      "usage_usec": 239644
+    },
+    {
+      "since_start_ns": 136904465,
+      "usage_usec": 240738
+    },
+    {
+      "since_start_ns": 139100157,
+      "usage_usec": 242921
+    },
+    {
+      "since_start_ns": 140196631,
+      "usage_usec": 244016
+    },
+    {
+      "since_start_ns": 141280831,
+      "usage_usec": 245094
+    },
+    {
+      "since_start_ns": 142369460,
+      "usage_usec": 246175
+    },
+    {
+      "since_start_ns": 143468088,
+      "usage_usec": 247269
+    },
+    {
+      "since_start_ns": 144586602,
+      "usage_usec": 248386
+    },
+    {
+      "since_start_ns": 145670713,
+      "usage_usec": 249463
+    },
+    {
+      "since_start_ns": 146760494,
+      "usage_usec": 250549
+    },
+    {
+      "since_start_ns": 147845175,
+      "usage_usec": 251630
+    },
+    {
+      "since_start_ns": 148928003,
+      "usage_usec": 252709
+    },
+    {
+      "since_start_ns": 150009188,
+      "usage_usec": 253783
+    },
+    {
+      "since_start_ns": 151108086,
+      "usage_usec": 254876
+    },
+    {
+      "since_start_ns": 152192276,
+      "usage_usec": 255954
+    },
+    {
+      "since_start_ns": 153273151,
+      "usage_usec": 257029
+    },
+    {
+      "since_start_ns": 154353965,
+      "usage_usec": 258107
+    },
+    {
+      "since_start_ns": 155453294,
+      "usage_usec": 259199
+    },
+    {
+      "since_start_ns": 156532304,
+      "usage_usec": 260273
+    },
+    {
+      "since_start_ns": 157610293,
+      "usage_usec": 261347
+    },
+    {
+      "since_start_ns": 158690546,
+      "usage_usec": 262421
+    },
+    {
+      "since_start_ns": 159767543,
+      "usage_usec": 263491
+    },
+    {
+      "since_start_ns": 160847255,
+      "usage_usec": 264567
+    },
+    {
+      "since_start_ns": 161927138,
+      "usage_usec": 265642
+    },
+    {
+      "since_start_ns": 163006870,
+      "usage_usec": 266717
+    },
+    {
+      "since_start_ns": 164087003,
+      "usage_usec": 267807
+    },
+    {
+      "since_start_ns": 165175241,
+      "usage_usec": 268872
+    },
+    {
+      "since_start_ns": 166290950,
+      "usage_usec": 269984
+    },
+    {
+      "since_start_ns": 167376433,
+      "usage_usec": 271064
+    },
+    {
+      "since_start_ns": 168462778,
+      "usage_usec": 272147
+    },
+    {
+      "since_start_ns": 169544494,
+      "usage_usec": 273217
+    },
+    {
+      "since_start_ns": 170631820,
+      "usage_usec": 274299
+    },
+    {
+      "since_start_ns": 171719277,
+      "usage_usec": 275383
+    },
+    {
+      "since_start_ns": 172799840,
+      "usage_usec": 276461
+    },
+    {
+      "since_start_ns": 173878070,
+      "usage_usec": 277533
+    },
+    {
+      "since_start_ns": 174965546,
+      "usage_usec": 278616
+    },
+    {
+      "since_start_ns": 176049216,
+      "usage_usec": 279695
+    },
+    {
+      "since_start_ns": 177158684,
+      "usage_usec": 280797
+    },
+    {
+      "since_start_ns": 178238857,
+      "usage_usec": 281875
+    },
+    {
+      "since_start_ns": 179315022,
+      "usage_usec": 282947
+    },
+    {
+      "since_start_ns": 180390286,
+      "usage_usec": 284019
+    },
+    {
+      "since_start_ns": 182102322,
+      "usage_usec": 285726
+    },
+    {
+      "since_start_ns": 183178117,
+      "usage_usec": 286795
+    },
+    {
+      "since_start_ns": 184257178,
+      "usage_usec": 287871
+    },
+    {
+      "since_start_ns": 185334505,
+      "usage_usec": 288940
+    },
+    {
+      "since_start_ns": 186417664,
+      "usage_usec": 290018
+    },
+    {
+      "since_start_ns": 187522643,
+      "usage_usec": 291120
+    },
+    {
+      "since_start_ns": 188603778,
+      "usage_usec": 292193
+    },
+    {
+      "since_start_ns": 189692156,
+      "usage_usec": 293279
+    },
+    {
+      "since_start_ns": 190773712,
+      "usage_usec": 294355
+    },
+    {
+      "since_start_ns": 191863693,
+      "usage_usec": 295437
+    },
+    {
+      "since_start_ns": 192957652,
+      "usage_usec": 296530
+    },
+    {
+      "since_start_ns": 194038116,
+      "usage_usec": 297607
+    },
+    {
+      "since_start_ns": 195103200,
+      "usage_usec": 298667
+    },
+    {
+      "since_start_ns": 196186108,
+      "usage_usec": 299739
+    },
+    {
+      "since_start_ns": 197282131,
+      "usage_usec": 300831
+    },
+    {
+      "since_start_ns": 198396458,
+      "usage_usec": 301943
+    },
+    {
+      "since_start_ns": 199475909,
+      "usage_usec": 303019
+    },
+    {
+      "since_start_ns": 200553818,
+      "usage_usec": 304093
+    },
+    {
+      "since_start_ns": 202869685,
+      "usage_usec": 306394
+    },
+    {
+      "since_start_ns": 203973182,
+      "usage_usec": 307491
+    },
+    {
+      "since_start_ns": 205072731,
+      "usage_usec": 308610
+    },
+    {
+      "since_start_ns": 206172200,
+      "usage_usec": 309679
+    },
+    {
+      "since_start_ns": 208105441,
+      "usage_usec": 311606
+    },
+    {
+      "since_start_ns": 209226651,
+      "usage_usec": 312720
+    },
+    {
+      "since_start_ns": 210320910,
+      "usage_usec": 313808
+    },
+    {
+      "since_start_ns": 211419177,
+      "usage_usec": 314901
+    },
+    {
+      "since_start_ns": 212517905,
+      "usage_usec": 315994
+    },
+    {
+      "since_start_ns": 213616051,
+      "usage_usec": 317083
+    }
+  ],
+  "aggregate_cpu_scope": "whole dedicated cgroup, including controller and already-reaped descendants",
+  "CPU_kernel_hard_total_limit": false,
+  "aggregate_cpu_stop_margin_us": 1000000,
+  "aggregate_cpu_stop_us": 16000000,
+  "acceptance_provisional_until_external_final_CPU_read": true
+}

@@ -1,0 +1,111 @@
+{
+  "minimum_MemAvailable_KiB": 4194304,
+  "sampling_period_ns": 10000000,
+  "breached": false,
+  "samples": [
+    {
+      "since_start_ns": 2306870,
+      "MemAvailable_KiB": 11664552
+    },
+    {
+      "since_start_ns": 12725802,
+      "MemAvailable_KiB": 11663824
+    },
+    {
+      "since_start_ns": 23648418,
+      "MemAvailable_KiB": 11662004
+    },
+    {
+      "since_start_ns": 34484812,
+      "MemAvailable_KiB": 11662492
+    },
+    {
+      "since_start_ns": 45366030,
+      "MemAvailable_KiB": 11662212
+    },
+    {
+      "since_start_ns": 56264631,
+      "MemAvailable_KiB": 11662212
+    },
+    {
+      "since_start_ns": 66343536,
+      "MemAvailable_KiB": 11661536
+    },
+    {
+      "since_start_ns": 77267905,
+      "MemAvailable_KiB": 11661536
+    },
+    {
+      "since_start_ns": 88324982,
+      "MemAvailable_KiB": 11661536
+    },
+    {
+      "since_start_ns": 98589105,
+      "MemAvailable_KiB": 11661536
+    },
+    {
+      "since_start_ns": 109081956,
+      "MemAvailable_KiB": 11661536
+    },
+    {
+      "since_start_ns": 119427480,
+      "MemAvailable_KiB": 11661536
+    },
+    {
+      "since_start_ns": 130117029,
+      "MemAvailable_KiB": 11661536
+    },
+    {
+      "since_start_ns": 141011082,
+      "MemAvailable_KiB": 11661536
+    },
+    {
+      "since_start_ns": 151832998,
+      "MemAvailable_KiB": 11661536
+    },
+    {
+      "since_start_ns": 162700170,
+      "MemAvailable_KiB": 11661536
+    },
+    {
+      "since_start_ns": 173535352,
+      "MemAvailable_KiB": 11661536
+    },
+    {
+      "since_start_ns": 184366486,
+      "MemAvailable_KiB": 11661536
+    },
+    {
+      "since_start_ns": 194426657,
+      "MemAvailable_KiB": 11657896
+    },
+    {
+      "since_start_ns": 205402362,
+      "MemAvailable_KiB": 11657896
+    },
+    {
+      "since_start_ns": 216246941,
+      "MemAvailable_KiB": 11654052
+    },
+    {
+      "since_start_ns": 227060342,
+      "MemAvailable_KiB": 11656388
+    },
+    {
+      "since_start_ns": 237926302,
+      "MemAvailable_KiB": 11656388
+    },
+    {
+      "since_start_ns": 248000428,
+      "MemAvailable_KiB": 11656136
+    },
+    {
+      "since_start_ns": 258858553,
+      "MemAvailable_KiB": 11656136
+    },
+    {
+      "since_start_ns": 269006247,
+      "MemAvailable_KiB": 11656136
+    }
+  ]
+}

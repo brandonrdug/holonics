@@ -1,0 +1,8 @@
+
+running 1 test
+test hnn::tests::prediction::physical_repair::pair_output_teaching_refuses_absent_comparisons_zero_returns_and_uncertified_quartics ... pair consumer R opening: blind whole cells [Intact(0), Held { fibre: [0, 1, 2, 3], unresolved: PluralDomain }]; actual logits [[Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }], [Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }]]
+pair consumer R opening: blind whole cells [Intact(1), Held { fibre: [0, 1, 2, 3], unresolved: PluralDomain }]; actual logits [[Ratio { numer: -191, denom: 1152 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -191, denom: 1152 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 13679, denom: 27648 }, Ratio { numer: 1, denom: 48 }, Ratio { numer: -191, denom: 1152 }, Ratio { numer: 0, denom: 1 }], [Ratio { numer: 89778210197, denom: 9994633141248 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 89778210197, denom: 9994633141248 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -144346352197, denom: 5552573967360 }, Ratio { numer: -29661799351, denom: 49973165706240 }, Ratio { numer: 89778210197, denom: 9994633141248 }, Ratio { numer: 0, denom: 1 }]]
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1034 filtered out; finished in 0.70s
+

@@ -1,0 +1,20 @@
+{
+  "output_root": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-4432a4b9-20261006",
+  "cache_origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-d38251b1-20261006/cache-v2",
+  "cache_paths": [
+    "debug/deps",
+    "debug/build",
+    "debug/.fingerprint",
+    ".rustc_info.json"
+  ],
+  "source_manifest_pin": {
+    "bytes": 47744,
+    "sha256": "c6ca7f06b4d515aaa534b2950b1f01afd68f1bdac4487cbe53ef4ef4057dd62d"
+  },
+  "owner_request": "/home/b/Workspaces/holonics/.local/wt/material-learning/.local/material-learning-followup-01a1030c-20261006/COHERENT_FOLLOWUP_CANDIDATE.v10.json",
+  "owner_request_pin": {
+    "bytes": 36417,
+    "sha256": "68b5871635c447b96c406e16c86dc699c1e2880a89973330ddda7a2b2a79b9eb"
+  },
+  "preserved_failure": "Failed d382 native E0609 and all source/runtime receipts retained; changed4432 diagnostic source, new immutable request and26unique controls; private selected partial-cache copy supplies no acceptance."
+}

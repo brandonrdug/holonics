@@ -2,7 +2,7 @@
 
 October 6, 2026. Refs #73, #148, #63, #62.
 
-[implemented consumer; type/native pending] The
+[native-checked bounded consumer on `4432a4b9`; no reconstruction claim] The
 [station source acceptance](2026-10-06_THE_PHYSICAL_STATION_SOURCE_CONSUMES_DECLARED_INTACT_PAIRS_WITH_A_JOINT_COMPLETION_BOX.md)
 checks an actual pair passage, mixed-completion enclosure and continued physical motion on
 `518e1e3f`. Its nonzero tensor unit chart is a calibration, and the default pair outputs remain
@@ -181,3 +181,49 @@ The successor request carries the existing queue's two namespace exclusions for
 the separately scheduled new controls: 26 unique controls in 16 groups, each
 once. Compile/runtime validation and any resulting behavioral diagnosis are
 pending on `4432a4b9`; no output has been substituted for an actual native read.
+
+## Accepted actual behavior and the remaining completion ambiguity
+
+[native-checked; mechanical controls only] The [accepted `4432a4b9` receipt](receipts/pair-output-learning-20261006/accepted-4432a4b9/ACCEPTANCE_JOIN.v1.json)
+independently verifies all 1,765 original archived artifacts, 286 git/snapshot
+inputs, 285 build/runtime bindings and fresh host/CUDA linkage. All 26 fixed
+controls in 16 groups passed their unchanged bounds and cleanup. The
+[whole matched output](receipts/pair-output-learning-20261006/accepted-4432a4b9/queue/hnn-pair-learning-4432a4b9-20261006/MATCHED_PAIR_OUTPUT_EFFECTS.v1.json)
+shows that learned pair outputs distinguish the two actual source arrangements
+in later complex logits. All six sparse probes nonetheless hold the same gap
+fibre `[0,2,3]`; their two point leader sets are `[1]` then `[2]`. This is
+source/material sensitivity, not successful repair or untouched validation.
+
+[source-derived distinction] `physical_pair_source_bounds` first drops shared-hole
+correlations in ordered-pair coordinate boxes, `physical_opening_radius` combines
+them with first-source coordinate bounds, and `physical_tick_radius` propagates
+absolute radii through the actual coupled Word. `physical_domain_read` returns
+each class whose upper grain endpoint reaches the greatest lower endpoint. This
+is a sufficient enclosure, not the exact union of leaders realized by complete
+sources. Its containing 0 or 3 does not prove that any actual completion has that
+leader. The sparse point itself is also enclosed and is not a complete source.
+
+The current receiving material was founded by only the two declared comparisons
+targeting classes 2 and 1. Equal initially zero receiving rows for untargeted
+classes 0 and 3 receive equal descent covectors and the same normal operator;
+pair-output deposition changes neither row. Thus `R_(0,re)=R_(3,re)` and
+`R_(0,im)=R_(3,im)` imply identical complex readings for those classes on every
+admitted anchor. This is a limitation of this learned receiving material, not an
+unavoidable equivalence of intact source passages or of different classes in
+the producing identity chart. It also does not force 0 or 3 to lead: another
+class can exceed both. The fixed pair read rank 14 alone does not show that a
+particular completed-source difference belongs to its kernel.
+
+[bounded diagnostic; native pending] The new exterior selector
+`the_learned_pair_gap_is_read_on_its_actual_four_completion_witnesses` preserves
+exactly the former two receiving comparisons and one pair-output comparison.
+Its sparse sources contain no erased value; after the blind output, the four
+class assignments at the single hole exhaust that declared completion set. The
+selector prints each exact source moment and actual native gap logits/leaders,
+checks their inclusion in the former bound, and prints all six pairwise
+source/read equality witnesses. It requires no selected leader, singleton or
+release. Its 13 Words and at most three crossings per Word match the accepted
+consumer's declared ceiling. No additional teaching, fitted threshold or
+handcrafted decoder is admitted. Actual witness results are still required to
+separate completion ambiguity from conservative enclosure; no candidate result
+is inferred from its source.

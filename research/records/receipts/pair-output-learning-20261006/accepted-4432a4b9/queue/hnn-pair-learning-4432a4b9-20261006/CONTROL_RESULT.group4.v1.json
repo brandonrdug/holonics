@@ -1,0 +1,31 @@
+{
+  "passed": true,
+  "label": "hnn-pair-learning-4432a4b9-control-group4-20261006-v1",
+  "source_commit": "4432a4b9c7de9330e6701c1c2f860660682e39b6",
+  "expected_tests": 1,
+  "actual_test_names": [
+    "sibling_ring_ticks_age_leaky_first_and_offset_coordinates_before_the_next_owning_append"
+  ],
+  "test_count_and_source_binding_verified": true,
+  "quiescent": true,
+  "issues": [],
+  "measurement": {
+    "wall_ns": 182375270,
+    "fixed_deadline_ns": 16000000000,
+    "measured_to_fixed_deadline": {
+      "numerator": 182375270,
+      "denominator": 16000000000
+    },
+    "aggregate_CPU_ns": 125414000,
+    "aggregate_CPU_limit_us": 17000000,
+    "group_peak_bytes": 15466496,
+    "peak_child_RSS_KiB": 15988,
+    "first_matching_development_read_counted_once": true,
+    "subsequent_same_shape_projection_unit_upper_ns": 182375270
+  },
+  "raw_stdout": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-4432a4b9-control-group4-20261006-v1.stdout",
+  "raw_stderr": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-4432a4b9-control-group4-20261006-v1.stderr",
+  "unchanged_predecessor_acceptances_remain_independent": true,
+  "scientific_job": false,
+  "GPU_runtime": false
+}

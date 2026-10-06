@@ -1,0 +1,54 @@
+{
+  "lease_still_held": true,
+  "own_group_other_PIDs": [],
+  "outcome": {
+    "provisional_passed": true,
+    "final_acceptance_requires_external_CPU_read": true,
+    "label": "hnn-pair-learning-4432a4b9-control-group6-20261006-v1",
+    "wall_ns": 4363948470,
+    "peak_child_RSS_KiB": 28252,
+    "group_memory_peak_bytes": 20234240,
+    "original_coordinates_modified": false,
+    "aggregate_cpu_final_us": 4500896,
+    "aggregate_cpu_limit_us": 17000000,
+    "CPU_kernel_hard_total_limit": false
+  },
+  "outputs": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-4432a4b9-control-group6-20261006-v1.lease-identity.json": {
+      "sha256": "81e55927d58b5caca51a59f0a84805efb61f1143095927c18aa75e79cab71b97",
+      "bytes": 565
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-4432a4b9-control-group6-20261006-v1.memory-gate.json": {
+      "sha256": "1ef785c81d20e2407a48d30c5eed9144bd7f3915219bc4dec94ad7aae233c8d9",
+      "bytes": 120
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-4432a4b9-control-group6-20261006-v1.child-identity.json": {
+      "sha256": "72451af533b6481bb5dadf36e12ab7efadb0f5fa992602437f058fabc6a39a41",
+      "bytes": 78
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-4432a4b9-control-group6-20261006-v1.system-floor.json": {
+      "sha256": "2a9da130b8425ada85603302ef6d2acd40da0eb20459920eb01cf3505708252d",
+      "bytes": 34368
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-4432a4b9-control-group6-20261006-v1.quiescence.json": {
+      "sha256": "7661d1ee2789cc33ab0d31cef5184c83344d794542655d020f7c9102582f2e96",
+      "bytes": 130
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-4432a4b9-control-group6-20261006-v1.input_seal.json": {
+      "sha256": "27f7bccf8ca5c35ff03ec1a9ef2882b94b7cab6e1c1c3919a0756ada09ebae2d",
+      "bytes": 84516
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-4432a4b9-control-group6-20261006-v1.output_seal.json": {
+      "sha256": "20fcc85c2d4f7838140889a22a03c010a9b210f9a63de6db65046d09fb7f6fcb",
+      "bytes": 294292
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-4432a4b9-control-group6-20261006-v1.stdout": {
+      "sha256": "df2e98f76c037b01a5058a34d094f795c66ce369a2fa3c3fce57e50f9476817b",
+      "bytes": 17000
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-4432a4b9-control-group6-20261006-v1.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  }
+}

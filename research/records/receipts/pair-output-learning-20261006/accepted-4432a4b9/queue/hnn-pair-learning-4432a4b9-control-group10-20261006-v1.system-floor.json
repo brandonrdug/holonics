@@ -1,0 +1,15 @@
+{
+  "minimum_MemAvailable_KiB": 4194304,
+  "sampling_period_ns": 10000000,
+  "breached": false,
+  "samples": [
+    {
+      "since_start_ns": 2842413,
+      "MemAvailable_KiB": 11656872
+    },
+    {
+      "since_start_ns": 13411767,
+      "MemAvailable_KiB": 11656508
+    }
+  ]
+}

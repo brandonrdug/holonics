@@ -1,0 +1,417 @@
+{
+  "groups": [
+    {
+      "artifact": "holonics libtest freshly linked from this source",
+      "arguments": [
+        "hnn::tests::prediction::physical_repair::a_blind_later_quartic_passage_releases_only_a_constant_learned_domain_image",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "expected_tests": 1,
+      "prior_wall_ns": 1357973261,
+      "prior_exact_source": "894c5d9889fe4a38da68945665f0460980ff6814",
+      "new_control_measured_projection_required_before_acceptance": true,
+      "expected_test_names_from_source": [
+        "hnn::tests::prediction::physical_repair::a_blind_later_quartic_passage_releases_only_a_constant_learned_domain_image"
+      ]
+    },
+    {
+      "artifact": "holonics libtest freshly linked from this source",
+      "arguments": [
+        "hnn::tests::prediction::physical_repair::the_coupled_quartic_tube_encloses_every_admitted_missing_class",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "expected_tests": 1,
+      "prior_wall_ns": 2576711845,
+      "prior_exact_source": "894c5d9889fe4a38da68945665f0460980ff6814",
+      "new_control_measured_projection_required_before_acceptance": false,
+      "expected_test_names_from_source": [
+        "hnn::tests::prediction::physical_repair::the_coupled_quartic_tube_encloses_every_admitted_missing_class"
+      ]
+    },
+    {
+      "artifact": "holonics libtest freshly linked from this source",
+      "arguments": [
+        "hnn::tests::prediction::physical_repair::",
+        "--test-threads=1",
+        "--nocapture",
+        "--skip",
+        "hnn::tests::prediction::physical_repair::a_blind_later_quartic_passage_releases_only_a_constant_learned_domain_image",
+        "--skip",
+        "hnn::tests::prediction::physical_repair::the_coupled_quartic_tube_encloses_every_admitted_missing_class",
+        "--skip",
+        "hnn::tests::prediction::physical_repair::the_actual_leaky_source_return_changes_e_before_the_next_target_free_carried_word",
+        "--skip",
+        "hnn::tests::prediction::physical_repair::source_teaching_refuses_a_zero_return_and_a_reached_uncertified_quartic",
+        "--skip",
+        "hnn::tests::prediction::physical_repair::the_actual_leaky_completion_chart_encloses_mixed_classes_and_an_erased_age_endpoint",
+        "--skip",
+        "hnn::tests::prediction::physical_repair::the_retained_physical_reader_reports_distinct_observations_and_matched_source_controls",
+        "--skip",
+        "hnn::tests::prediction::physical_repair::the_station_pair_source_preserves_actual_offsets_and_refuses_a_reused_opening",
+        "--skip",
+        "hnn::tests::prediction::physical_repair::the_station_pair_box_contains_all_mixed_unit_and_rounded_leaky_features",
+        "--skip",
+        "hnn::tests::prediction::physical_repair::a_declared_station_pair_reaches_the_native_word_and_separates_a_marginal_alias",
+        "--skip",
+        "hnn::tests::prediction::physical_repair::the_joint_pair_physical_tube_contains_every_mixed_completed_word_read",
+        "--skip",
+        "hnn::tests::prediction::physical_repair::the_retained_reader_reports_matched_material_carry_and_absent_source_controls",
+        "--skip",
+        "hnn::tests::prediction::physical_repair::the_observed_pair_outputs_change_the_next_target_free_source_conditioned_word",
+        "--skip",
+        "hnn::tests::prediction::physical_repair::pair_output_teaching_refuses_absent_comparisons_zero_returns_and_uncertified_quartics"
+      ],
+      "expected_tests": 11,
+      "prior_wall_ns": 7779952937,
+      "prior_exact_source": "894c5d9889fe4a38da68945665f0460980ff6814",
+      "new_control_measured_projection_required_before_acceptance": false,
+      "expected_test_names_from_source": [
+        "hnn::tests::prediction::physical_repair::the_damaged_section_runs_through_the_field_and_every_erasure_is_held_unresolved",
+        "hnn::tests::prediction::physical_repair::the_section_carries_no_erased_class_so_the_repair_cannot_read_one",
+        "hnn::tests::prediction::physical_repair::a_point_leader_does_not_replace_a_plural_coupled_domain",
+        "hnn::tests::prediction::physical_repair::a_station_no_declared_crossing_reads_is_held_unread",
+        "hnn::tests::prediction::physical_repair::equal_class_counts_do_not_join_different_producing_charts",
+        "hnn::tests::prediction::physical_repair::total_erasure_preserves_the_producing_chart_and_refuses_located_conduct_before_opening",
+        "hnn::tests::prediction::physical_repair::identity_conduct_must_certify_the_station_clock_even_at_erased_stations",
+        "hnn::tests::prediction::physical_repair::the_producing_decoder_and_both_physical_maps_are_joined_before_opening",
+        "hnn::tests::prediction::physical_repair::the_supported_physical_passage_continues_on_its_retained_interior_and_clock",
+        "hnn::tests::prediction::physical_repair::physical_teaching_changes_r_and_the_later_carried_receiving_read",
+        "hnn::tests::prediction::physical_repair::physical_teaching_refuses_a_stale_material_or_foreign_chart_and_preserves_the_carry"
+      ]
+    },
+    {
+      "artifact": "ranged_capacity freshly linked from this source",
+      "arguments": [
+        "sibling_ring_ticks_age_leaky_first_and_offset_coordinates_before_the_next_owning_append",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "expected_tests": 1,
+      "prior_wall_ns": 168569152,
+      "prior_exact_source": "894c5d9889fe4a38da68945665f0460980ff6814",
+      "new_control_measured_projection_required_before_acceptance": false,
+      "expected_test_names_from_source": [
+        "sibling_ring_ticks_age_leaky_first_and_offset_coordinates_before_the_next_owning_append"
+      ]
+    },
+    {
+      "artifact": "source_entrance freshly linked from this candidate source",
+      "arguments": [
+        "same_phase_intact_swap_has_one_native_source_moment_and_one_physical_motion",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "expected_tests": 1,
+      "prior_wall_ns": 337650153,
+      "claim": "different intact placement, identical complete phase-count moment, source opening, three nonlinear pair-contact ticks, returned carry, closed balances",
+      "bounded_operands": {
+        "source_period": 8,
+        "other_period": 3,
+        "contact_nodes": 3,
+        "source_words": 2,
+        "ticks_per_word": 3,
+        "teaching_comparisons": 0
+      },
+      "new_control_measured_projection_required_before_acceptance": false,
+      "prior_exact_source": "894c5d9889fe4a38da68945665f0460980ff6814",
+      "expected_test_names_from_source": [
+        "same_phase_intact_swap_has_one_native_source_moment_and_one_physical_motion"
+      ]
+    },
+    {
+      "artifact": "holonics libtest freshly linked from this source",
+      "arguments": [
+        "hnn::tests::prediction::physical_repair::the_actual_leaky_source_return_changes_e_before_the_next_target_free_carried_word",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "expected_tests": 1,
+      "prior_wall_ns": 2246635345,
+      "new_control_measured_projection_required_before_acceptance": true,
+      "bounded_operands": {
+        "source_period": 8,
+        "other_period": 3,
+        "contact_nodes": 3,
+        "stations": 9,
+        "native_words": 8,
+        "ticks_per_word": 8,
+        "observed_station": 1,
+        "R_comparisons": 1,
+        "E_comparisons": 2,
+        "new_model_publications_on_primary_path": 2
+      },
+      "claim": "fixed rounded leaky source distinction before teaching; actual E-only change with R/internal laws fixed; same physical forward/adjoint/gain/carry equations; actual carried joint certificate; matched observed re-read and later target-free native motion/read sensitivity; no reconstruction claim",
+      "prior_exact_source": "894c5d9889fe4a38da68945665f0460980ff6814",
+      "expected_test_names_from_source": [
+        "hnn::tests::prediction::physical_repair::the_actual_leaky_source_return_changes_e_before_the_next_target_free_carried_word"
+      ]
+    },
+    {
+      "artifact": "holonics libtest freshly linked from this source",
+      "arguments": [
+        "hnn::tests::prediction::physical_repair::source_teaching_refuses_a_zero_return_and_a_reached_uncertified_quartic",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "expected_tests": 1,
+      "prior_wall_ns": 401183993,
+      "new_control_measured_projection_required_before_acceptance": false,
+      "bounded_operands": {
+        "stations": 2,
+        "native_words": 2,
+        "comparisons_refused": 2
+      },
+      "claim": "zero R return and reached quartic refuse without input-only deposition or changed blind receipt/carry",
+      "prior_exact_source": "894c5d9889fe4a38da68945665f0460980ff6814",
+      "expected_test_names_from_source": [
+        "hnn::tests::prediction::physical_repair::source_teaching_refuses_a_zero_return_and_a_reached_uncertified_quartic"
+      ]
+    },
+    {
+      "artifact": "holonics libtest freshly linked from this source",
+      "arguments": [
+        "hnn::tests::prediction::physical_repair::the_actual_leaky_completion_chart_encloses_mixed_classes_and_an_erased_age_endpoint",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "claim": "Actual denominator equality and normalized feature hull equality across all sixteen mixed two-hole completions; same native receiving tube containment with retained carry, loaded quartic, erased age endpoint and closed balances. Total-erasure checks use this subset only; no desired-class or singleton criterion.",
+      "development_read_unmeasured": true,
+      "expected_tests": 1,
+      "new_control_measured_projection_required_before_acceptance": true,
+      "bounded_operands": {
+        "native_Words": 19,
+        "native_completed_sources": 16,
+        "receiving_crossings_per_Word": 2,
+        "total_erasure_controls": "16-source subset, not exhaustive4^9"
+      },
+      "expected_test_names_from_source": [
+        "hnn::tests::prediction::physical_repair::the_actual_leaky_completion_chart_encloses_mixed_classes_and_an_erased_age_endpoint"
+      ]
+    },
+    {
+      "artifact": "holonics libtest freshly linked from this source",
+      "arguments": [
+        "hnn::tests::prediction::physical_repair::the_retained_physical_reader_reports_distinct_observations_and_matched_source_controls",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "expected_tests": 1,
+      "development_read_unmeasured": true,
+      "new_control_measured_projection_required_before_acceptance": true,
+      "bounded_operands": {
+        "native_Words": 9,
+        "receiving_crossings_per_Word": 2,
+        "R_only_comparisons": 3,
+        "distinct_target_free_probes": 3,
+        "matched_material_receptions_per_probe": 2,
+        "source_lift": 3,
+        "probe_source_lengths": 4,
+        "teaching_source_lengths": 2
+      },
+      "claim": "Whole actual retained-material native behavior under matched source/clock/chart/carry; physical closures, actual R change and fixed source/internal relations; output/rank/symmetry change not prescribed",
+      "expected_test_names_from_source": [
+        "hnn::tests::prediction::physical_repair::the_retained_physical_reader_reports_distinct_observations_and_matched_source_controls"
+      ]
+    },
+    {
+      "artifact": "holonics libtest freshly linked from this exact source",
+      "arguments": [
+        "hnn::tests::prediction::physical_repair::the_station_pair_source_preserves_actual_offsets_and_refuses_a_reused_opening",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "expected_tests": 1,
+      "development_read_unmeasured": true,
+      "new_control_measured_projection_required_before_acceptance": true,
+      "bounded_operands": {
+        "native_Words": 0,
+        "receiving_crossings_per_Word": 2,
+        "source_lift": 3
+      },
+      "claim": "Exact declared pair-source/clock and mixed-completion consumer, or whole matched causal diagnostic; no desired repaired class or task accuracy",
+      "expected_test_names_from_source": [
+        "hnn::tests::prediction::physical_repair::the_station_pair_source_preserves_actual_offsets_and_refuses_a_reused_opening"
+      ]
+    },
+    {
+      "artifact": "holonics libtest freshly linked from this exact source",
+      "arguments": [
+        "hnn::tests::prediction::physical_repair::the_station_pair_box_contains_all_mixed_unit_and_rounded_leaky_features",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "expected_tests": 1,
+      "development_read_unmeasured": true,
+      "new_control_measured_projection_required_before_acceptance": true,
+      "bounded_operands": {
+        "native_Words": 0,
+        "receiving_crossings_per_Word": 2,
+        "source_lift": 3
+      },
+      "claim": "Exact declared pair-source/clock and mixed-completion consumer, or whole matched causal diagnostic; no desired repaired class or task accuracy",
+      "expected_test_names_from_source": [
+        "hnn::tests::prediction::physical_repair::the_station_pair_box_contains_all_mixed_unit_and_rounded_leaky_features"
+      ]
+    },
+    {
+      "artifact": "holonics libtest freshly linked from this exact source",
+      "arguments": [
+        "hnn::tests::prediction::physical_repair::a_declared_station_pair_reaches_the_native_word_and_separates_a_marginal_alias",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "expected_tests": 1,
+      "development_read_unmeasured": true,
+      "new_control_measured_projection_required_before_acceptance": true,
+      "bounded_operands": {
+        "native_Words": 2,
+        "receiving_crossings_per_Word": 2,
+        "source_lift": 3
+      },
+      "claim": "Exact declared pair-source/clock and mixed-completion consumer, or whole matched causal diagnostic; no desired repaired class or task accuracy",
+      "expected_test_names_from_source": [
+        "hnn::tests::prediction::physical_repair::a_declared_station_pair_reaches_the_native_word_and_separates_a_marginal_alias"
+      ]
+    },
+    {
+      "artifact": "holonics libtest freshly linked from this exact source",
+      "arguments": [
+        "hnn::tests::prediction::physical_repair::the_joint_pair_physical_tube_contains_every_mixed_completed_word_read",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "expected_tests": 1,
+      "development_read_unmeasured": true,
+      "new_control_measured_projection_required_before_acceptance": true,
+      "bounded_operands": {
+        "native_Words": 34,
+        "receiving_crossings_per_Word": 2,
+        "source_lift": 3
+      },
+      "claim": "Exact declared pair-source/clock and mixed-completion consumer, or whole matched causal diagnostic; no desired repaired class or task accuracy",
+      "expected_test_names_from_source": [
+        "hnn::tests::prediction::physical_repair::the_joint_pair_physical_tube_contains_every_mixed_completed_word_read"
+      ]
+    },
+    {
+      "artifact": "holonics libtest freshly linked from this exact source",
+      "arguments": [
+        "hnn::tests::prediction::physical_repair::the_retained_reader_reports_matched_material_carry_and_absent_source_controls",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "expected_tests": 1,
+      "development_read_unmeasured": true,
+      "new_control_measured_projection_required_before_acceptance": true,
+      "bounded_operands": {
+        "native_Words": 12,
+        "receiving_crossings_per_Word": 2,
+        "source_lift": 3
+      },
+      "claim": "Exact declared pair-source/clock and mixed-completion consumer, or whole matched causal diagnostic; no desired repaired class or task accuracy",
+      "expected_test_names_from_source": [
+        "hnn::tests::prediction::physical_repair::the_retained_reader_reports_matched_material_carry_and_absent_source_controls"
+      ]
+    },
+    {
+      "artifact": "holonics libtest freshly linked from this exact source",
+      "arguments": [
+        "hnn::tests::prediction::physical_repair::the_observed_pair_outputs_change_the_next_target_free_source_conditioned_word",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "expected_tests": 1,
+      "development_read_unmeasured": true,
+      "new_control_measured_projection_required_before_acceptance": true,
+      "bounded_operands": {
+        "native_Words": 13,
+        "receiving_crossings_per_Word_upper": 3,
+        "source_stations_upper": 9,
+        "source_lift": 0,
+        "pair_offsets": [
+          1
+        ],
+        "output_rank": 16
+      },
+      "claim": "Actual learned physical pair-output consumer and matching refusal/causal controls; no prescribed class, rank, symmetry or reconstruction outcome",
+      "expected_test_names_from_source": [
+        "hnn::tests::prediction::physical_repair::the_observed_pair_outputs_change_the_next_target_free_source_conditioned_word"
+      ]
+    },
+    {
+      "artifact": "holonics libtest freshly linked from this exact source",
+      "arguments": [
+        "hnn::tests::prediction::physical_repair::pair_output_teaching_refuses_absent_comparisons_zero_returns_and_uncertified_quartics",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "expected_tests": 1,
+      "development_read_unmeasured": true,
+      "new_control_measured_projection_required_before_acceptance": true,
+      "bounded_operands": {
+        "native_Words": 6,
+        "receiving_crossings_per_Word_upper": 3,
+        "source_stations_upper": 9,
+        "source_lift": 0,
+        "pair_offsets": [
+          1
+        ],
+        "output_rank": 16
+      },
+      "claim": "Actual learned physical pair-output consumer and matching refusal/causal controls; no prescribed class, rank, symmetry or reconstruction outcome",
+      "expected_test_names_from_source": [
+        "hnn::tests::prediction::physical_repair::pair_output_teaching_refuses_absent_comparisons_zero_returns_and_uncertified_quartics"
+      ]
+    }
+  ],
+  "unique_tests": 26,
+  "actual_physical_tests": [
+    "hnn::tests::prediction::physical_repair::the_damaged_section_runs_through_the_field_and_every_erasure_is_held_unresolved",
+    "hnn::tests::prediction::physical_repair::the_section_carries_no_erased_class_so_the_repair_cannot_read_one",
+    "hnn::tests::prediction::physical_repair::a_point_leader_does_not_replace_a_plural_coupled_domain",
+    "hnn::tests::prediction::physical_repair::a_station_no_declared_crossing_reads_is_held_unread",
+    "hnn::tests::prediction::physical_repair::equal_class_counts_do_not_join_different_producing_charts",
+    "hnn::tests::prediction::physical_repair::total_erasure_preserves_the_producing_chart_and_refuses_located_conduct_before_opening",
+    "hnn::tests::prediction::physical_repair::identity_conduct_must_certify_the_station_clock_even_at_erased_stations",
+    "hnn::tests::prediction::physical_repair::the_producing_decoder_and_both_physical_maps_are_joined_before_opening",
+    "hnn::tests::prediction::physical_repair::the_supported_physical_passage_continues_on_its_retained_interior_and_clock",
+    "hnn::tests::prediction::physical_repair::physical_teaching_changes_r_and_the_later_carried_receiving_read",
+    "hnn::tests::prediction::physical_repair::physical_teaching_refuses_a_stale_material_or_foreign_chart_and_preserves_the_carry",
+    "hnn::tests::prediction::physical_repair::the_actual_leaky_source_return_changes_e_before_the_next_target_free_carried_word",
+    "hnn::tests::prediction::physical_repair::source_teaching_refuses_a_zero_return_and_a_reached_uncertified_quartic",
+    "hnn::tests::prediction::physical_repair::the_coupled_quartic_tube_encloses_every_admitted_missing_class",
+    "hnn::tests::prediction::physical_repair::the_actual_leaky_completion_chart_encloses_mixed_classes_and_an_erased_age_endpoint",
+    "hnn::tests::prediction::physical_repair::a_blind_later_quartic_passage_releases_only_a_constant_learned_domain_image",
+    "hnn::tests::prediction::physical_repair::the_retained_physical_reader_reports_distinct_observations_and_matched_source_controls",
+    "hnn::tests::prediction::physical_repair::the_observed_pair_outputs_change_the_next_target_free_source_conditioned_word",
+    "hnn::tests::prediction::physical_repair::pair_output_teaching_refuses_absent_comparisons_zero_returns_and_uncertified_quartics",
+    "hnn::tests::prediction::physical_repair::the_station_pair_source_preserves_actual_offsets_and_refuses_a_reused_opening",
+    "hnn::tests::prediction::physical_repair::the_station_pair_box_contains_all_mixed_unit_and_rounded_leaky_features",
+    "hnn::tests::prediction::physical_repair::a_declared_station_pair_reaches_the_native_word_and_separates_a_marginal_alias",
+    "hnn::tests::prediction::physical_repair::the_joint_pair_physical_tube_contains_every_mixed_completed_word_read",
+    "hnn::tests::prediction::physical_repair::the_retained_reader_reports_matched_material_carry_and_absent_source_controls"
+  ],
+  "owner_request_groups_unchanged": true,
+  "owner_request": "/home/b/Workspaces/holonics/.local/wt/material-learning/.local/material-learning-followup-01a1030c-20261006/COHERENT_FOLLOWUP_CANDIDATE.v10.json",
+  "owner_request_pin": {
+    "bytes": 36417,
+    "sha256": "68b5871635c447b96c406e16c86dc699c1e2880a89973330ddda7a2b2a79b9eb"
+  }
+}

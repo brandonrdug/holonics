@@ -1,0 +1,31 @@
+{
+  "passed": true,
+  "label": "hnn-pair-learning-4432a4b9-control-group11-20261006-v1",
+  "source_commit": "4432a4b9c7de9330e6701c1c2f860660682e39b6",
+  "expected_tests": 1,
+  "actual_test_names": [
+    "hnn::tests::prediction::physical_repair::the_station_pair_box_contains_all_mixed_unit_and_rounded_leaky_features"
+  ],
+  "test_count_and_source_binding_verified": true,
+  "quiescent": true,
+  "issues": [],
+  "measurement": {
+    "wall_ns": 217446038,
+    "fixed_deadline_ns": 16000000000,
+    "measured_to_fixed_deadline": {
+      "numerator": 217446038,
+      "denominator": 16000000000
+    },
+    "aggregate_CPU_ns": 176036000,
+    "aggregate_CPU_limit_us": 17000000,
+    "group_peak_bytes": 16424960,
+    "peak_child_RSS_KiB": 21540,
+    "first_matching_development_read_counted_once": true,
+    "subsequent_same_shape_projection_unit_upper_ns": 217446038
+  },
+  "raw_stdout": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-4432a4b9-control-group11-20261006-v1.stdout",
+  "raw_stderr": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-learning-4432a4b9-control-group11-20261006-v1.stderr",
+  "unchanged_predecessor_acceptances_remain_independent": true,
+  "scientific_job": false,
+  "GPU_runtime": false
+}

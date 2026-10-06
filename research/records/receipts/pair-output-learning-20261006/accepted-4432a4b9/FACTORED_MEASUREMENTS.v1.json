@@ -1,0 +1,1396 @@
+{
+  "validation": {
+    "path": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-4432a4b9/VALIDATION.json",
+    "bytes": 848298,
+    "sha256": "051deefafcfd09614fc3e3f8f7910f73dc104a56e9322561445e9145b23eeef5"
+  },
+  "wall_and_CPU_grain": "integer nanoseconds; CPU kernel grain1000ns",
+  "group_peak_grain": "integer bytes",
+  "child_RSS_grain": "integer KiB",
+  "measurements": {
+    "hnn-pair-learning-4432a4b9-cache-preparation-20261006-v1": {
+      "wall_ns": {
+        "value": 6855973628,
+        "prime_factors": [
+          [
+            2,
+            2
+          ],
+          [
+            7,
+            1
+          ],
+          [
+            439,
+            1
+          ],
+          [
+            557759,
+            1
+          ]
+        ]
+      },
+      "projection_ns": {
+        "value": 17000000000,
+        "prime_factors": [
+          [
+            2,
+            9
+          ],
+          [
+            5,
+            9
+          ],
+          [
+            17,
+            1
+          ]
+        ]
+      },
+      "aggregate_CPU_ns": {
+        "value": 5683637000,
+        "prime_factors": [
+          [
+            2,
+            3
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            5683637,
+            1
+          ]
+        ]
+      },
+      "group_peak_bytes": {
+        "value": 3211087872,
+        "prime_factors": [
+          [
+            2,
+            12
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            29,
+            1
+          ],
+          [
+            9011,
+            1
+          ]
+        ]
+      },
+      "measured_to_projected_ratio": [
+        6855973628,
+        17000000000
+      ]
+    },
+    "hnn-pair-learning-4432a4b9-host-cuda-link-20261006-v1": {
+      "wall_ns": {
+        "value": 19964375814,
+        "prime_factors": [
+          [
+            2,
+            1
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            3327395969,
+            1
+          ]
+        ]
+      },
+      "projection_ns": {
+        "value": 65000000000,
+        "prime_factors": [
+          [
+            2,
+            9
+          ],
+          [
+            5,
+            10
+          ],
+          [
+            13,
+            1
+          ]
+        ]
+      },
+      "aggregate_CPU_ns": {
+        "value": 54601684000,
+        "prime_factors": [
+          [
+            2,
+            5
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            13650421,
+            1
+          ]
+        ]
+      },
+      "group_peak_bytes": {
+        "value": 3062050816,
+        "prime_factors": [
+          [
+            2,
+            12
+          ],
+          [
+            11,
+            1
+          ],
+          [
+            67961,
+            1
+          ]
+        ]
+      },
+      "measured_to_projected_ratio": [
+        19964375814,
+        65000000000
+      ]
+    },
+    "hnn-pair-learning-4432a4b9-control-group1-20261006-v1": {
+      "wall_ns": {
+        "value": 1385898425,
+        "prime_factors": [
+          [
+            5,
+            2
+          ],
+          [
+            55435937,
+            1
+          ]
+        ]
+      },
+      "projection_ns": {
+        "value": 16000000000,
+        "prime_factors": [
+          [
+            2,
+            13
+          ],
+          [
+            5,
+            9
+          ]
+        ]
+      },
+      "aggregate_CPU_ns": {
+        "value": 1318279000,
+        "prime_factors": [
+          [
+            2,
+            3
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            1318279,
+            1
+          ]
+        ]
+      },
+      "group_peak_bytes": {
+        "value": 25497600,
+        "prime_factors": [
+          [
+            2,
+            12
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            5,
+            2
+          ],
+          [
+            83,
+            1
+          ]
+        ]
+      },
+      "measured_to_projected_ratio": [
+        1385898425,
+        16000000000
+      ]
+    },
+    "hnn-pair-learning-4432a4b9-control-group2-20261006-v1": {
+      "wall_ns": {
+        "value": 2593674515,
+        "prime_factors": [
+          [
+            5,
+            1
+          ],
+          [
+            19,
+            1
+          ],
+          [
+            53,
+            1
+          ],
+          [
+            59,
+            1
+          ],
+          [
+            8731,
+            1
+          ]
+        ]
+      },
+      "projection_ns": {
+        "value": 16000000000,
+        "prime_factors": [
+          [
+            2,
+            13
+          ],
+          [
+            5,
+            9
+          ]
+        ]
+      },
+      "aggregate_CPU_ns": {
+        "value": 2524213000,
+        "prime_factors": [
+          [
+            2,
+            3
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            2524213,
+            1
+          ]
+        ]
+      },
+      "group_peak_bytes": {
+        "value": 25296896,
+        "prime_factors": [
+          [
+            2,
+            17
+          ],
+          [
+            193,
+            1
+          ]
+        ]
+      },
+      "measured_to_projected_ratio": [
+        2593674515,
+        16000000000
+      ]
+    },
+    "hnn-pair-learning-4432a4b9-control-group3-20261006-v1": {
+      "wall_ns": {
+        "value": 7656680657,
+        "prime_factors": [
+          [
+            23,
+            1
+          ],
+          [
+            332899159,
+            1
+          ]
+        ]
+      },
+      "projection_ns": {
+        "value": 16000000000,
+        "prime_factors": [
+          [
+            2,
+            13
+          ],
+          [
+            5,
+            9
+          ]
+        ]
+      },
+      "aggregate_CPU_ns": {
+        "value": 7588568000,
+        "prime_factors": [
+          [
+            2,
+            6
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            13,
+            1
+          ],
+          [
+            131,
+            1
+          ],
+          [
+            557,
+            1
+          ]
+        ]
+      },
+      "group_peak_bytes": {
+        "value": 19013632,
+        "prime_factors": [
+          [
+            2,
+            13
+          ],
+          [
+            11,
+            1
+          ],
+          [
+            211,
+            1
+          ]
+        ]
+      },
+      "measured_to_projected_ratio": [
+        7656680657,
+        16000000000
+      ]
+    },
+    "hnn-pair-learning-4432a4b9-control-group4-20261006-v1": {
+      "wall_ns": {
+        "value": 182375270,
+        "prime_factors": [
+          [
+            2,
+            1
+          ],
+          [
+            5,
+            1
+          ],
+          [
+            7,
+            1
+          ],
+          [
+            11,
+            1
+          ],
+          [
+            433,
+            1
+          ],
+          [
+            547,
+            1
+          ]
+        ]
+      },
+      "projection_ns": {
+        "value": 16000000000,
+        "prime_factors": [
+          [
+            2,
+            13
+          ],
+          [
+            5,
+            9
+          ]
+        ]
+      },
+      "aggregate_CPU_ns": {
+        "value": 125414000,
+        "prime_factors": [
+          [
+            2,
+            4
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            73,
+            1
+          ],
+          [
+            859,
+            1
+          ]
+        ]
+      },
+      "group_peak_bytes": {
+        "value": 15466496,
+        "prime_factors": [
+          [
+            2,
+            18
+          ],
+          [
+            59,
+            1
+          ]
+        ]
+      },
+      "measured_to_projected_ratio": [
+        182375270,
+        16000000000
+      ]
+    },
+    "hnn-pair-learning-4432a4b9-control-group5-20261006-v1": {
+      "wall_ns": {
+        "value": 350391226,
+        "prime_factors": [
+          [
+            2,
+            1
+          ],
+          [
+            175195613,
+            1
+          ]
+        ]
+      },
+      "projection_ns": {
+        "value": 16000000000,
+        "prime_factors": [
+          [
+            2,
+            13
+          ],
+          [
+            5,
+            9
+          ]
+        ]
+      },
+      "aggregate_CPU_ns": {
+        "value": 301222000,
+        "prime_factors": [
+          [
+            2,
+            4
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            150611,
+            1
+          ]
+        ]
+      },
+      "group_peak_bytes": {
+        "value": 22646784,
+        "prime_factors": [
+          [
+            2,
+            12
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            19,
+            1
+          ],
+          [
+            97,
+            1
+          ]
+        ]
+      },
+      "measured_to_projected_ratio": [
+        350391226,
+        16000000000
+      ]
+    },
+    "hnn-pair-learning-4432a4b9-control-group6-20261006-v1": {
+      "wall_ns": {
+        "value": 4586016061,
+        "prime_factors": [
+          [
+            11,
+            1
+          ],
+          [
+            416910551,
+            1
+          ]
+        ]
+      },
+      "projection_ns": {
+        "value": 16000000000,
+        "prime_factors": [
+          [
+            2,
+            13
+          ],
+          [
+            5,
+            9
+          ]
+        ]
+      },
+      "aggregate_CPU_ns": {
+        "value": 4510346000,
+        "prime_factors": [
+          [
+            2,
+            4
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            23,
+            1
+          ],
+          [
+            71,
+            1
+          ],
+          [
+            1381,
+            1
+          ]
+        ]
+      },
+      "group_peak_bytes": {
+        "value": 20234240,
+        "prime_factors": [
+          [
+            2,
+            14
+          ],
+          [
+            5,
+            1
+          ],
+          [
+            13,
+            1
+          ],
+          [
+            19,
+            1
+          ]
+        ]
+      },
+      "measured_to_projected_ratio": [
+        4586016061,
+        16000000000
+      ]
+    },
+    "hnn-pair-learning-4432a4b9-control-group7-20261006-v1": {
+      "wall_ns": {
+        "value": 411536098,
+        "prime_factors": [
+          [
+            2,
+            1
+          ],
+          [
+            31,
+            1
+          ],
+          [
+            6637679,
+            1
+          ]
+        ]
+      },
+      "projection_ns": {
+        "value": 16000000000,
+        "prime_factors": [
+          [
+            2,
+            13
+          ],
+          [
+            5,
+            9
+          ]
+        ]
+      },
+      "aggregate_CPU_ns": {
+        "value": 369113000,
+        "prime_factors": [
+          [
+            2,
+            3
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            19,
+            1
+          ],
+          [
+            19427,
+            1
+          ]
+        ]
+      },
+      "group_peak_bytes": {
+        "value": 22724608,
+        "prime_factors": [
+          [
+            2,
+            14
+          ],
+          [
+            19,
+            1
+          ],
+          [
+            73,
+            1
+          ]
+        ]
+      },
+      "measured_to_projected_ratio": [
+        411536098,
+        16000000000
+      ]
+    },
+    "hnn-pair-learning-4432a4b9-control-group8-20261006-v1": {
+      "wall_ns": {
+        "value": 2179910723,
+        "prime_factors": [
+          [
+            53,
+            1
+          ],
+          [
+            313,
+            1
+          ],
+          [
+            331,
+            1
+          ],
+          [
+            397,
+            1
+          ]
+        ]
+      },
+      "projection_ns": {
+        "value": 16000000000,
+        "prime_factors": [
+          [
+            2,
+            13
+          ],
+          [
+            5,
+            9
+          ]
+        ]
+      },
+      "aggregate_CPU_ns": {
+        "value": 2128418000,
+        "prime_factors": [
+          [
+            2,
+            4
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            19,
+            1
+          ],
+          [
+            79,
+            1
+          ],
+          [
+            709,
+            1
+          ]
+        ]
+      },
+      "group_peak_bytes": {
+        "value": 24854528,
+        "prime_factors": [
+          [
+            2,
+            14
+          ],
+          [
+            37,
+            1
+          ],
+          [
+            41,
+            1
+          ]
+        ]
+      },
+      "measured_to_projected_ratio": [
+        2179910723,
+        16000000000
+      ]
+    },
+    "hnn-pair-learning-4432a4b9-control-group9-20261006-v1": {
+      "wall_ns": {
+        "value": 2690575306,
+        "prime_factors": [
+          [
+            2,
+            1
+          ],
+          [
+            1345287653,
+            1
+          ]
+        ]
+      },
+      "projection_ns": {
+        "value": 16000000000,
+        "prime_factors": [
+          [
+            2,
+            13
+          ],
+          [
+            5,
+            9
+          ]
+        ]
+      },
+      "aggregate_CPU_ns": {
+        "value": 2619978000,
+        "prime_factors": [
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            83,
+            1
+          ],
+          [
+            5261,
+            1
+          ]
+        ]
+      },
+      "group_peak_bytes": {
+        "value": 25747456,
+        "prime_factors": [
+          [
+            2,
+            13
+          ],
+          [
+            7,
+            1
+          ],
+          [
+            449,
+            1
+          ]
+        ]
+      },
+      "measured_to_projected_ratio": [
+        2690575306,
+        16000000000
+      ]
+    },
+    "hnn-pair-learning-4432a4b9-control-group10-20261006-v1": {
+      "wall_ns": {
+        "value": 208100449,
+        "prime_factors": [
+          [
+            208100449,
+            1
+          ]
+        ]
+      },
+      "projection_ns": {
+        "value": 16000000000,
+        "prime_factors": [
+          [
+            2,
+            13
+          ],
+          [
+            5,
+            9
+          ]
+        ]
+      },
+      "aggregate_CPU_ns": {
+        "value": 174651000,
+        "prime_factors": [
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            58217,
+            1
+          ]
+        ]
+      },
+      "group_peak_bytes": {
+        "value": 15831040,
+        "prime_factors": [
+          [
+            2,
+            12
+          ],
+          [
+            5,
+            1
+          ],
+          [
+            773,
+            1
+          ]
+        ]
+      },
+      "measured_to_projected_ratio": [
+        208100449,
+        16000000000
+      ]
+    },
+    "hnn-pair-learning-4432a4b9-control-group11-20261006-v1": {
+      "wall_ns": {
+        "value": 217446038,
+        "prime_factors": [
+          [
+            2,
+            1
+          ],
+          [
+            108723019,
+            1
+          ]
+        ]
+      },
+      "projection_ns": {
+        "value": 16000000000,
+        "prime_factors": [
+          [
+            2,
+            13
+          ],
+          [
+            5,
+            9
+          ]
+        ]
+      },
+      "aggregate_CPU_ns": {
+        "value": 176036000,
+        "prime_factors": [
+          [
+            2,
+            5
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            7,
+            1
+          ],
+          [
+            6287,
+            1
+          ]
+        ]
+      },
+      "group_peak_bytes": {
+        "value": 16424960,
+        "prime_factors": [
+          [
+            2,
+            13
+          ],
+          [
+            5,
+            1
+          ],
+          [
+            401,
+            1
+          ]
+        ]
+      },
+      "measured_to_projected_ratio": [
+        217446038,
+        16000000000
+      ]
+    },
+    "hnn-pair-learning-4432a4b9-control-group12-20261006-v1": {
+      "wall_ns": {
+        "value": 470865324,
+        "prime_factors": [
+          [
+            2,
+            2
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            31,
+            1
+          ],
+          [
+            103,
+            1
+          ],
+          [
+            12289,
+            1
+          ]
+        ]
+      },
+      "projection_ns": {
+        "value": 16000000000,
+        "prime_factors": [
+          [
+            2,
+            13
+          ],
+          [
+            5,
+            9
+          ]
+        ]
+      },
+      "aggregate_CPU_ns": {
+        "value": 434154000,
+        "prime_factors": [
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            7,
+            1
+          ],
+          [
+            10337,
+            1
+          ]
+        ]
+      },
+      "group_peak_bytes": {
+        "value": 22552576,
+        "prime_factors": [
+          [
+            2,
+            13
+          ],
+          [
+            2753,
+            1
+          ]
+        ]
+      },
+      "measured_to_projected_ratio": [
+        470865324,
+        16000000000
+      ]
+    },
+    "hnn-pair-learning-4432a4b9-control-group13-20261006-v1": {
+      "wall_ns": {
+        "value": 2930511060,
+        "prime_factors": [
+          [
+            2,
+            2
+          ],
+          [
+            3,
+            2
+          ],
+          [
+            5,
+            1
+          ],
+          [
+            43,
+            1
+          ],
+          [
+            378619,
+            1
+          ]
+        ]
+      },
+      "projection_ns": {
+        "value": 16000000000,
+        "prime_factors": [
+          [
+            2,
+            13
+          ],
+          [
+            5,
+            9
+          ]
+        ]
+      },
+      "aggregate_CPU_ns": {
+        "value": 2879164000,
+        "prime_factors": [
+          [
+            2,
+            5
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            719791,
+            1
+          ]
+        ]
+      },
+      "group_peak_bytes": {
+        "value": 25300992,
+        "prime_factors": [
+          [
+            2,
+            12
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            29,
+            1
+          ],
+          [
+            71,
+            1
+          ]
+        ]
+      },
+      "measured_to_projected_ratio": [
+        2930511060,
+        16000000000
+      ]
+    },
+    "hnn-pair-learning-4432a4b9-control-group14-20261006-v1": {
+      "wall_ns": {
+        "value": 2806780041,
+        "prime_factors": [
+          [
+            3,
+            2
+          ],
+          [
+            13,
+            1
+          ],
+          [
+            83,
+            1
+          ],
+          [
+            289031,
+            1
+          ]
+        ]
+      },
+      "projection_ns": {
+        "value": 16000000000,
+        "prime_factors": [
+          [
+            2,
+            13
+          ],
+          [
+            5,
+            9
+          ]
+        ]
+      },
+      "aggregate_CPU_ns": {
+        "value": 2758128000,
+        "prime_factors": [
+          [
+            2,
+            7
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            37,
+            1
+          ],
+          [
+            1553,
+            1
+          ]
+        ]
+      },
+      "group_peak_bytes": {
+        "value": 26091520,
+        "prime_factors": [
+          [
+            2,
+            13
+          ],
+          [
+            5,
+            1
+          ],
+          [
+            7,
+            2
+          ],
+          [
+            13,
+            1
+          ]
+        ]
+      },
+      "measured_to_projected_ratio": [
+        2806780041,
+        16000000000
+      ]
+    },
+    "hnn-pair-learning-4432a4b9-control-group15-20261006-v1": {
+      "wall_ns": {
+        "value": 971429196,
+        "prime_factors": [
+          [
+            2,
+            2
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            23,
+            1
+          ],
+          [
+            283,
+            1
+          ],
+          [
+            12437,
+            1
+          ]
+        ]
+      },
+      "projection_ns": {
+        "value": 16000000000,
+        "prime_factors": [
+          [
+            2,
+            13
+          ],
+          [
+            5,
+            9
+          ]
+        ]
+      },
+      "aggregate_CPU_ns": {
+        "value": 910261000,
+        "prime_factors": [
+          [
+            2,
+            3
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            11,
+            1
+          ],
+          [
+            83,
+            1
+          ],
+          [
+            997,
+            1
+          ]
+        ]
+      },
+      "group_peak_bytes": {
+        "value": 20398080,
+        "prime_factors": [
+          [
+            2,
+            14
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            5,
+            1
+          ],
+          [
+            83,
+            1
+          ]
+        ]
+      },
+      "measured_to_projected_ratio": [
+        971429196,
+        16000000000
+      ]
+    },
+    "hnn-pair-learning-4432a4b9-control-group16-20261006-v1": {
+      "wall_ns": {
+        "value": 911649999,
+        "prime_factors": [
+          [
+            3,
+            1
+          ],
+          [
+            13,
+            1
+          ],
+          [
+            23375641,
+            1
+          ]
+        ]
+      },
+      "projection_ns": {
+        "value": 16000000000,
+        "prime_factors": [
+          [
+            2,
+            13
+          ],
+          [
+            5,
+            9
+          ]
+        ]
+      },
+      "aggregate_CPU_ns": {
+        "value": 856453000,
+        "prime_factors": [
+          [
+            2,
+            3
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            13,
+            1
+          ],
+          [
+            65881,
+            1
+          ]
+        ]
+      },
+      "group_peak_bytes": {
+        "value": 21327872,
+        "prime_factors": [
+          [
+            2,
+            12
+          ],
+          [
+            41,
+            1
+          ],
+          [
+            127,
+            1
+          ]
+        ]
+      },
+      "measured_to_projected_ratio": [
+        911649999,
+        16000000000
+      ]
+    }
+  }
+}

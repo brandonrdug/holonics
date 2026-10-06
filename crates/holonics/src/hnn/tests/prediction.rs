@@ -2861,6 +2861,79 @@ mod physical_repair {
         assert_ne!(images[1],images[2]);
     }
 
+    /// The four complete sources are exterior witnesses for the already fixed one-hole family.
+    /// They enter neither the blind prediction nor deposition, and prescribe no repaired class.
+    #[test]
+    fn the_learned_pair_gap_is_read_on_its_actual_four_completion_witnesses() {
+        let field = field_with_lock_and_offsets((0..8).collect(), vec![1]);
+        let current = Current::at_rest(&field);
+        let (before, entering) = pair_teaching_opening(&field);
+        let observed = crate::hnn::tests::support::encoded(&field, &[0, 1, 2]);
+        let damaged = DamagedSection::damage(&observed, &[2]).unwrap();
+        let phases = ReceivingPhases::declare(&field, &before, &current, &section(3)).unwrap();
+        let opening = WordOpening::Received { carry: entering, absorption: Absorption::Nothing };
+        let taught = crate::hnn::prediction::predict_by_field(
+            &field, &before, &current, &damaged, &opening, &phases,
+        ).unwrap().observe_pair_outputs(&before, &observed, &[false, false, true]).unwrap();
+        let material = taught.constitution;
+        let carried = WordOpening::Received {
+            carry: taught.prediction.carry, absorption: Absorption::Nothing,
+        };
+        let map = material.receiving_map(0).unwrap();
+        // Neither receiving comparison targeted 0 or 3. Their equal initial rows received
+        // equal covectors and the same normal operator; pair-only deposition leaves R fixed.
+        assert_eq!(map.row(0).unwrap(), map.row(6).unwrap());
+        assert_eq!(map.row(1).unwrap(), map.row(7).unwrap());
+        println!("pair completion witness actual receiving R {:?}; equal complex class rows 0/3", map);
+        let phases = ReceivingPhases::declare(&field, &material, &current, &section(2)).unwrap();
+        let mut left = vec![2; 9]; left[0] = 0; left[8] = 1;
+        let mut right = left.clone(); right.swap(0, 8);
+        for (label, cells) in [("left", left), ("right", right)] {
+            let chart = crate::hnn::tests::support::encoded(&field, &[]);
+            let head = crate::hnn::tests::support::encoded(&field, &cells[..1]);
+            let tail = crate::hnn::tests::support::encoded(&field, &cells[2..]);
+            let sparse = DamagedSection::of_runs(9, &chart, vec![(0, head), (2, tail)]).unwrap();
+            let blind = repair_by_field(&field, &material, &current, &sparse, &carried, &phases).unwrap();
+            let domain = blind.domains[1].as_ref().unwrap();
+            println!("pair completion witness {label} blind: actual intact source {:?}; whole cells {:?}; point leaders {:?}; actual gap logits {:?}; enclosing domain {:?}; carry tick {}",
+                sparse.placed(), blind.cells, blind.reads[1].leaders(), blind.reads[1].read.logits,
+                domain, blind.carry.ticks);
+            let mut leader_union = std::collections::BTreeSet::new();
+            let mut exact_sources = Vec::new();
+            let mut exact_reads = Vec::new();
+            for missing in 0..field.alphabet() {
+                let mut completed = cells.clone(); completed[1] = missing;
+                let encoded = crate::hnn::tests::support::encoded(&field, &completed);
+                let complete = DamagedSection::damage(&encoded, &[]).unwrap();
+                let source = SourceMoment::open_with(&field, &current, &material).unwrap()
+                    .station_section(&field, &current, 0, &complete.placed()).unwrap();
+                let actual_source = source.encode(&field, &material, 0).unwrap();
+                let reached = repair_by_field(&field, &material, &current, &complete, &carried, &phases).unwrap();
+                assert!(reached.opening.closes() && reached.word.closes());
+                assert!(reached.balances.iter().all(|b| b.closes()));
+                let read = &reached.reads[1];
+                assert!(domain.logits.iter().zip(&read.read.logits)
+                    .all(|(interval, value)| &interval.lower <= value && value <= &interval.upper));
+                let leaders = read.leaders();
+                assert!(leaders.iter().all(|class| domain.classes.contains(class)));
+                assert_eq!(read.read.logits[0], read.read.logits[6]);
+                assert_eq!(read.read.logits[1], read.read.logits[7]);
+                leader_union.extend(leaders.iter().copied());
+                println!("pair completion witness {label}/{missing}: actual complete source {:?}; exact source moment {:?}; whole cells {:?}; gap leaders {:?}; actual gap complex logits {:?}; carry tick {}",
+                    completed, actual_source, reached.cells, leaders, read.read.logits, reached.carry.ticks);
+                exact_sources.push(actual_source);
+                exact_reads.push(read.read.logits.clone());
+            }
+            let aliases = (0..field.alphabet()).flat_map(|a| ((a+1)..field.alphabet()).map(move |b| (a,b)))
+                .map(|(a,b)| (a,b,exact_sources[a] == exact_sources[b],exact_reads[a] == exact_reads[b]))
+                .collect::<Vec<_>>();
+            println!("pair completion witness {label} exact family: actual complete leader union {:?}; enclosing fibre {:?}; source/read equality witnesses {:?}",
+                leader_union, domain.classes, aliases);
+            assert!(blind.opening.closes() && blind.word.closes());
+            assert!(blind.balances.iter().all(|b| b.closes()));
+        }
+    }
+
     #[test]
     fn pair_output_teaching_refuses_absent_comparisons_zero_returns_and_uncertified_quartics() {
         use crate::hnn::prediction::predict_by_field;
