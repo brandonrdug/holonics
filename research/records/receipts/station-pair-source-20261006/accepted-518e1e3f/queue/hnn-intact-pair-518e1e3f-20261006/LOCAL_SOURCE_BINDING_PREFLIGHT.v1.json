@@ -1,0 +1,21 @@
+{
+  "source_commit": "518e1e3f4f5d6ad6dab57a7dc08b3098eab354f4",
+  "moved_outside_consumed_cache": [
+    "holonics-02407331bdf682dc",
+    "holonics-3dfaf698dddeb1a6",
+    "holonics-70b68d2f7e1f6408",
+    "holonics-8cd4a578e626a457",
+    "holonics-bd29e6ac6f6167da",
+    "holonics-cuda-2b2d6cef9fd78c5f",
+    "holonics-cuda-3a3d38defac6a12c",
+    "holonics-cuda-5cc32226864d0eaa",
+    "holonics-cuda-c82bf91515d93d4b",
+    "holonics-cuda-d9ad51fae469d445",
+    "holonics-cuda-fe78e545d18196b4",
+    "holonics-d85475b8f5abeb14"
+  ],
+  "original_cache_unchanged": true,
+  "no_fingerprint_deleted": true,
+  "actual_local_compilation_fresh_false_required": true,
+  "all_source_inputs_current": true
+}

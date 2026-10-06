@@ -1,0 +1,31 @@
+{
+  "passed": true,
+  "label": "hnn-intact-pair-518e1e3f-control-group13-20261006-v1",
+  "source_commit": "518e1e3f4f5d6ad6dab57a7dc08b3098eab354f4",
+  "expected_tests": 1,
+  "actual_test_names": [
+    "hnn::tests::prediction::physical_repair::the_joint_pair_physical_tube_contains_every_mixed_completed_word_read"
+  ],
+  "test_count_and_source_binding_verified": true,
+  "quiescent": true,
+  "issues": [],
+  "measurement": {
+    "wall_ns": 2999613147,
+    "fixed_deadline_ns": 16000000000,
+    "measured_to_fixed_deadline": {
+      "numerator": 2999613147,
+      "denominator": 16000000000
+    },
+    "aggregate_CPU_ns": 2950643000,
+    "aggregate_CPU_limit_us": 17000000,
+    "group_peak_bytes": 24948736,
+    "peak_child_RSS_KiB": 32496,
+    "first_matching_development_read_counted_once": true,
+    "subsequent_same_shape_projection_unit_upper_ns": 2999613147
+  },
+  "raw_stdout": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-control-group13-20261006-v1.stdout",
+  "raw_stderr": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-control-group13-20261006-v1.stderr",
+  "unchanged_predecessor_acceptances_remain_independent": true,
+  "scientific_job": false,
+  "GPU_runtime": false
+}

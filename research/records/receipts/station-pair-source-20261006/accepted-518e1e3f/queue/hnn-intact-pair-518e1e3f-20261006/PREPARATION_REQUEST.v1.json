@@ -1,0 +1,20 @@
+{
+  "output_root": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006",
+  "cache_origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2",
+  "cache_paths": [
+    "debug/deps",
+    "debug/build",
+    "debug/.fingerprint",
+    ".rustc_info.json"
+  ],
+  "source_manifest_pin": {
+    "sha256": "89059256cc22664809a590912736b17f710f7de35c17f56e741597af3f046acf",
+    "bytes": 47687
+  },
+  "owner_request": "/home/b/Workspaces/holonics/.local/wt/material-learning/.local/material-learning-followup-01a1030c-20261006/COHERENT_FOLLOWUP_CANDIDATE.v8.json",
+  "owner_request_pin": {
+    "sha256": "6d63ea589b31a3d17e86a49ca88984c3ccf697d0ba544d037c91b9b1fcad452f",
+    "bytes": 29407
+  },
+  "preserved_failure": "All prior cache/compiler/runtime/source-binding failures preserved; new immutable518e source and declared24controls; exact selected cache reflink, no old runtime/source acceptance inherited."
+}

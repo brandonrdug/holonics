@@ -1,0 +1,1789 @@
+{
+  "source_commit": "518e1e3f4f5d6ad6dab57a7dc08b3098eab354f4",
+  "source_base": "494688777d153847b18dd14149f131763f5b2978",
+  "all_original_artifacts_rehashed": 1753,
+  "original_artifact_bytes": 1076309403,
+  "git_and_immutable_snapshot_source_inputs_verified": 286,
+  "native_build_runtime_source_inputs_verified": 285,
+  "all_local_artifacts_fresh_false": true,
+  "fresh_local_targets": 11,
+  "host_executable": {
+    "bytes": 64806768,
+    "sha256": "4dabd4f50f2f49c83691dbeb1b024745cdf5b8c2fe86fb8cda1fd51880c3b439"
+  },
+  "actual_unique_selectors": [
+    "hnn::tests::prediction::physical_repair::a_blind_later_quartic_passage_releases_only_a_constant_learned_domain_image",
+    "hnn::tests::prediction::physical_repair::the_coupled_quartic_tube_encloses_every_admitted_missing_class",
+    "hnn::tests::prediction::physical_repair::a_point_leader_does_not_replace_a_plural_coupled_domain",
+    "hnn::tests::prediction::physical_repair::a_station_no_declared_crossing_reads_is_held_unread",
+    "hnn::tests::prediction::physical_repair::equal_class_counts_do_not_join_different_producing_charts",
+    "hnn::tests::prediction::physical_repair::identity_conduct_must_certify_the_station_clock_even_at_erased_stations",
+    "hnn::tests::prediction::physical_repair::physical_teaching_changes_r_and_the_later_carried_receiving_read",
+    "hnn::tests::prediction::physical_repair::physical_teaching_refuses_a_stale_material_or_foreign_chart_and_preserves_the_carry",
+    "hnn::tests::prediction::physical_repair::the_damaged_section_runs_through_the_field_and_every_erasure_is_held_unresolved",
+    "hnn::tests::prediction::physical_repair::the_producing_decoder_and_both_physical_maps_are_joined_before_opening",
+    "hnn::tests::prediction::physical_repair::the_section_carries_no_erased_class_so_the_repair_cannot_read_one",
+    "hnn::tests::prediction::physical_repair::the_supported_physical_passage_continues_on_its_retained_interior_and_clock",
+    "hnn::tests::prediction::physical_repair::total_erasure_preserves_the_producing_chart_and_refuses_located_conduct_before_opening",
+    "sibling_ring_ticks_age_leaky_first_and_offset_coordinates_before_the_next_owning_append",
+    "same_phase_intact_swap_has_one_native_source_moment_and_one_physical_motion",
+    "hnn::tests::prediction::physical_repair::the_actual_leaky_source_return_changes_e_before_the_next_target_free_carried_word",
+    "hnn::tests::prediction::physical_repair::source_teaching_refuses_a_zero_return_and_a_reached_uncertified_quartic",
+    "hnn::tests::prediction::physical_repair::the_actual_leaky_completion_chart_encloses_mixed_classes_and_an_erased_age_endpoint",
+    "hnn::tests::prediction::physical_repair::the_retained_physical_reader_reports_distinct_observations_and_matched_source_controls",
+    "hnn::tests::prediction::physical_repair::the_station_pair_source_preserves_actual_offsets_and_refuses_a_reused_opening",
+    "hnn::tests::prediction::physical_repair::the_station_pair_box_contains_all_mixed_unit_and_rounded_leaky_features",
+    "hnn::tests::prediction::physical_repair::a_declared_station_pair_reaches_the_native_word_and_separates_a_marginal_alias",
+    "hnn::tests::prediction::physical_repair::the_joint_pair_physical_tube_contains_every_mixed_completed_word_read",
+    "hnn::tests::prediction::physical_repair::the_retained_reader_reports_matched_material_carry_and_absent_source_controls"
+  ],
+  "runtime_groups": 14,
+  "new_control_Words": 48,
+  "scientific_job": false,
+  "GPU_runtime": false,
+  "unchanged_Lean_not_recompiled": true,
+  "stages": {
+    "hnn-intact-pair-518e1e3f-cache-preparation-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 6655865762,
+      "projection_ns": 17000000000,
+      "measured_to_projected_ratio": [
+        6655865762,
+        17000000000
+      ],
+      "aggregate_CPU_ns": 5588033000,
+      "group_peak_bytes": 3053318144,
+      "peak_child_RSS_KiB": 29604,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-intact-pair-518e1e3f-host-cuda-link-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 20482106926,
+      "projection_ns": 65000000000,
+      "measured_to_projected_ratio": [
+        20482106926,
+        65000000000
+      ],
+      "aggregate_CPU_ns": 56301527000,
+      "group_peak_bytes": 3245129728,
+      "peak_child_RSS_KiB": 2205076,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-intact-pair-518e1e3f-control-group1-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 1431861031,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        1431861031,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 1346201000,
+      "group_peak_bytes": 26218496,
+      "peak_child_RSS_KiB": 32792,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-intact-pair-518e1e3f-control-group2-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 2609615727,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        2609615727,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 2553152000,
+      "group_peak_bytes": 23597056,
+      "peak_child_RSS_KiB": 32136,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-intact-pair-518e1e3f-control-group3-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 7813678783,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        7813678783,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 7714897000,
+      "group_peak_bytes": 18436096,
+      "peak_child_RSS_KiB": 27588,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-intact-pair-518e1e3f-control-group4-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 170613710,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        170613710,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 119714000,
+      "group_peak_bytes": 15331328,
+      "peak_child_RSS_KiB": 15376,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-intact-pair-518e1e3f-control-group5-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 326457969,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        326457969,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 286416000,
+      "group_peak_bytes": 21987328,
+      "peak_child_RSS_KiB": 15388,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-intact-pair-518e1e3f-control-group6-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 4652048751,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        4652048751,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 4595629000,
+      "group_peak_bytes": 18792448,
+      "peak_child_RSS_KiB": 28672,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-intact-pair-518e1e3f-control-group7-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 410165299,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        410165299,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 373735000,
+      "group_peak_bytes": 22274048,
+      "peak_child_RSS_KiB": 32416,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-intact-pair-518e1e3f-control-group8-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 2200501697,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        2200501697,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 2150459000,
+      "group_peak_bytes": 24879104,
+      "peak_child_RSS_KiB": 32856,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-intact-pair-518e1e3f-control-group9-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 2733424121,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        2733424121,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 2661741000,
+      "group_peak_bytes": 29405184,
+      "peak_child_RSS_KiB": 32604,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-intact-pair-518e1e3f-control-group10-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 207668367,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        207668367,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 165658000,
+      "group_peak_bytes": 15958016,
+      "peak_child_RSS_KiB": 21480,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-intact-pair-518e1e3f-control-group11-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 224470739,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        224470739,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 174347000,
+      "group_peak_bytes": 16531456,
+      "peak_child_RSS_KiB": 22412,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-intact-pair-518e1e3f-control-group12-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 472249517,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        472249517,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 425082000,
+      "group_peak_bytes": 22368256,
+      "peak_child_RSS_KiB": 32028,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-intact-pair-518e1e3f-control-group13-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 2999613147,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        2999613147,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 2950643000,
+      "group_peak_bytes": 24948736,
+      "peak_child_RSS_KiB": 32496,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-intact-pair-518e1e3f-control-group14-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 2829956910,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        2829956910,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 2783170000,
+      "group_peak_bytes": 25755648,
+      "peak_child_RSS_KiB": 33776,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    }
+  },
+  "all_caps_and_cleanup_pass": true,
+  "selected_preserved_artifacts": {
+    "queue/hnn-intact-pair-518e1e3f-cache-preparation-20261006-v1.config.json": {
+      "bytes": 5452,
+      "sha256": "b658ffa13d65934ff313187ed7e9612dfe1ff928777aac5a58566ea525d6165c"
+    },
+    "queue/hnn-intact-pair-518e1e3f-cache-preparation-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "fe21256b39c81e1cd5acc6ee190ab6ca73fea9c3a95a9644cbc93197b685b5c1"
+    },
+    "queue/hnn-intact-pair-518e1e3f-cache-preparation-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "fee86b6c6d285dbf6d5327d1a85b83c002c18071ba02cc762025dbef0952d729"
+    },
+    "queue/hnn-intact-pair-518e1e3f-cache-preparation-20261006-v1.input_seal.json": {
+      "bytes": 4240,
+      "sha256": "cd0a3a969a55d77443b8d09662d07f7a90bdf27b0434aff10b033b54e040b05c"
+    },
+    "queue/hnn-intact-pair-518e1e3f-cache-preparation-20261006-v1.stdout": {
+      "bytes": 476,
+      "sha256": "84a9da65ab9ce4c72471ae2d661eb087df80cbbdb702dff64c3db8791c7ff4d8"
+    },
+    "queue/hnn-intact-pair-518e1e3f-cache-preparation-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "queue/hnn-intact-pair-518e1e3f-cache-preparation-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "f0b63b473d81c4bc28c0df69cdd0e2c5146e11679c441ce1b77abb3c42099412"
+    },
+    "queue/hnn-intact-pair-518e1e3f-cache-preparation-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "9da12dcafac80ea71eb155ccf23bcaf781f0fdae58e9348fa5cb91de063c4d6e"
+    },
+    "queue/hnn-intact-pair-518e1e3f-cache-preparation-20261006-v1.system-floor.json": {
+      "bytes": 51168,
+      "sha256": "6e3e1e30ddb320e7de6d5e23178b7fd2b58d716a03f37cea70134df272e2b25b"
+    },
+    "queue/hnn-intact-pair-518e1e3f-cache-preparation-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "3306ce8625c98a1a55cad13966b9a267c0fc6a9092eea0b12f7cb118e60b2778"
+    },
+    "queue/hnn-intact-pair-518e1e3f-cache-preparation-20261006-v1.output_seal.json": {
+      "bytes": 436240,
+      "sha256": "9d7011512aa0054c8d6c95a3d5936052df916cecae2f1d0c09c70dcf072fc3fc"
+    },
+    "queue/hnn-intact-pair-518e1e3f-cache-preparation-20261006-v1.publication.json": {
+      "bytes": 3312,
+      "sha256": "59072447d83b900cbcbaa2297f7b35a0acbc00c94cbf730e636695e599b4c376"
+    },
+    "queue/hnn-intact-pair-518e1e3f-cache-preparation-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "193b3566607d35ff08943c7e4a37cca477422118e13171081f5ae775d7fa7f62"
+    },
+    "queue/hnn-intact-pair-518e1e3f-cache-preparation-20261006-v1.final.json": {
+      "bytes": 4981,
+      "sha256": "b9147bb21fc2521e9243a9063d80c4652554b5edc5a5a82f8191b616e632c164"
+    },
+    "queue/hnn-intact-pair-518e1e3f-cache-preparation-20261006-v1.unit-cleanup.json": {
+      "bytes": 735,
+      "sha256": "322a3f22358816eebacf05d46a485f61ba9ef2014354b0194575da752187d9c6"
+    },
+    "queue/hnn-intact-pair-518e1e3f-cache-preparation-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "2ca968272e74565a9ae499cae54c09db5f8de67eb2356a7bec8800d01029c4ed"
+    },
+    "queue/hnn-intact-pair-518e1e3f-cache-preparation-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "34503b3f6161bd8966b5325fc9a75f69f9c060da602f572a2c4330693b3f20cc"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/PREPARATION_REQUEST.v1.json": {
+      "bytes": 1007,
+      "sha256": "91d4a0b55d2f6c8b4c0755f24d90384cd94967fe3a3c30d81aa446400f9774ff"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/SOURCE_SNAPSHOT.v1.json": {
+      "bytes": 47687,
+      "sha256": "89059256cc22664809a590912736b17f710f7de35c17f56e741597af3f046acf"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/QUEUE_SOURCE_REVIEW.v1.json": {
+      "bytes": 1457,
+      "sha256": "f415997d6cffcce097f4a578a571ceed1e5e97b53936f57307fb8f20ce3c733b"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/CACHE_SNAPSHOT.v2.json": {
+      "bytes": 426851,
+      "sha256": "2a4ec2b3164dbd9fe90f52c1fd40d11f541742b6b975090de572272e2dde15da"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/PREPARATION.v2.json": {
+      "bytes": 504,
+      "sha256": "136a972ea1adce3f34d45e56bdef27f54f51caa85f0a3102bc93c1db606e01dc"
+    },
+    "queue/hnn-intact-pair-518e1e3f-host-cuda-link-20261006-v1.config.json": {
+      "bytes": 528561,
+      "sha256": "9db00b297f122b8d3e9e67dc10bafc69087cda26d8bc58457f6ee05a888b6571"
+    },
+    "queue/hnn-intact-pair-518e1e3f-host-cuda-link-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "2282fedd3b17794184a5ca2dc7262c766a9022c0ddaab75a98277da9b55d8b94"
+    },
+    "queue/hnn-intact-pair-518e1e3f-host-cuda-link-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "74963d2ea5811bf08b50349497fb1d7ad0d9159d0d5fab0dcf400c626fec97ed"
+    },
+    "queue/hnn-intact-pair-518e1e3f-host-cuda-link-20261006-v1.input_seal.json": {
+      "bytes": 343530,
+      "sha256": "d8708bffa90dc239d14e9b69146e730bd0a833cb372c6b7a4707e09fc04e7e35"
+    },
+    "queue/hnn-intact-pair-518e1e3f-host-cuda-link-20261006-v1.stdout": {
+      "bytes": 37945,
+      "sha256": "b1f37296db0f2f123a7679b78e8c57e40d28746d0f23b5725f0f5096cea15709"
+    },
+    "queue/hnn-intact-pair-518e1e3f-host-cuda-link-20261006-v1.stderr": {
+      "bytes": 398,
+      "sha256": "8134135978c40ac34005aeffb147e4bab5b46c285d3231484732c833a0fb5e28"
+    },
+    "queue/hnn-intact-pair-518e1e3f-host-cuda-link-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "8343ab184abb982a326b62a636f07ab3ab1d8a8eeb0450912c91591031471fd4"
+    },
+    "queue/hnn-intact-pair-518e1e3f-host-cuda-link-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "d74bf76c73189246fa01195866e87e078d071b182b1eeaaa1dff8ccc8fcb85c4"
+    },
+    "queue/hnn-intact-pair-518e1e3f-host-cuda-link-20261006-v1.system-floor.json": {
+      "bytes": 148381,
+      "sha256": "bd923f0b5ce61cb7a5f4b5c9580d7939fa2ace84a24f268568f341abde82cf88"
+    },
+    "queue/hnn-intact-pair-518e1e3f-host-cuda-link-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "385ee10e68070178a2b1177f46965817207e3b8d237d59afeeaf37015b9fbb66"
+    },
+    "queue/hnn-intact-pair-518e1e3f-host-cuda-link-20261006-v1.output_seal.json": {
+      "bytes": 1327050,
+      "sha256": "ce28400aafbee1c20da1784029b26702a73d960c660e86a1341bdd1476439b62"
+    },
+    "queue/hnn-intact-pair-518e1e3f-host-cuda-link-20261006-v1.publication.json": {
+      "bytes": 2811,
+      "sha256": "052f3c7cecc512aec4e29d93b5b445228fa9f60d61650199063236a2b2fe059e"
+    },
+    "queue/hnn-intact-pair-518e1e3f-host-cuda-link-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "830b6c14006be1acfb38e88938da0be326cace65e3b402113a79dab88243f3ae"
+    },
+    "queue/hnn-intact-pair-518e1e3f-host-cuda-link-20261006-v1.final.json": {
+      "bytes": 4952,
+      "sha256": "128513eeff937b3878f7ed1061e97ff082397d453b877c406a50fa7a9b6b37b3"
+    },
+    "queue/hnn-intact-pair-518e1e3f-host-cuda-link-20261006-v1.unit-cleanup.json": {
+      "bytes": 729,
+      "sha256": "f34c3190951a2b28e4f173f3194a2498ee0f4d6e850706fd685a7a46847913c6"
+    },
+    "queue/hnn-intact-pair-518e1e3f-host-cuda-link-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "306da217cb85d984fab547be219eefb5e449987a132f66f59308ffa2c9240cbb"
+    },
+    "queue/hnn-intact-pair-518e1e3f-host-cuda-link-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "a5c25199a54b9309814fb1047be0c1cb2342f5414ac21adf838dbc69d7170975"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/LOCAL_SOURCE_BINDING_PREFLIGHT.v1.json": {
+      "bytes": 696,
+      "sha256": "fce74cfbcb5377c0d619ba3e3f33c2328851231c52ef1c68be6fb12511c17823"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group1-20261006-v1.config.json": {
+      "bytes": 130926,
+      "sha256": "06adda30fdc921215945bcf90a5e14ac29feaa68abf2fcab7c32bc7c8de4672d"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group1-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "f5279e6472512bfcea7825344d8dfac3b78e4dec33bcbde20e6c1ea58ff8c42e"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group1-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "e512f3b859c360a553476993adf82ac9e9125db2960620ae795e149d5142fd3d"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group1-20261006-v1.input_seal.json": {
+      "bytes": 83667,
+      "sha256": "e3f7055e29de5ad9f9e0ebc59b09ab10ad72a2dfbbdf1afc36920211065a548a"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group1-20261006-v1.stdout": {
+      "bytes": 6277,
+      "sha256": "0d4312dfb0008a3bce81f96d5802822ca6442c8128263cb1d0b009c86ec5f9d7"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group1-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group1-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "d71b6826fe3b5d1d34f77892e07d9a1ef2f218eac9c79d8c88dc33f3e51d214d"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group1-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "c1120f2453e652f5ce592a1919fe6496b40d3f477d3d8dda81f209ddb7b790d6"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group1-20261006-v1.system-floor.json": {
+      "bytes": 9336,
+      "sha256": "869ccdc02af0ba359becae8a9f3bae43f29b81237904c6e835015822d400f9db"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group1-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "becc66581487611e5c97bdc9d50284582ecb47d3f99052e269d0afc0ab4658a2"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group1-20261006-v1.output_seal.json": {
+      "bytes": 81918,
+      "sha256": "e9fcebdb2710742b5423e42d38dcad0f191729169b0b713f1bd557b90b8ba3ac"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group1-20261006-v1.publication.json": {
+      "bytes": 2796,
+      "sha256": "152613cfbe8c696b38de0af68e9fb9f1d203c039e8f67b54c92f76077f9d4992"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group1-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "fd88e01b7223d8d110de15315d4c39209bb3c173cd121973adb5dd55c287bb3c"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group1-20261006-v1.final.json": {
+      "bytes": 4938,
+      "sha256": "e57bfd31b87857a682a5f0fd149a206124ea52f9045afdad8dba035e56587f26"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group1-20261006-v1.unit-cleanup.json": {
+      "bytes": 729,
+      "sha256": "4df66b07af9df066cda864eee272335b259a6e8e3524287bd5afb12c88267574"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group1-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "43316ce79fe4151f1c9547ff383780f7482d6f133a78e9cfb0e58fedf91d7989"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group1-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "9bfdb5cf27249aa9058fe1cd717d08825262a2160f3b5970487d60823ddeaf51"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/COMPILED_ARTIFACTS.v1.json": {
+      "bytes": 16525,
+      "sha256": "d3ddbf2adab575fadd3d851babb85aaba7148b5900f51aa886a6b5fe7da3b05d"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/COMPILE_SOURCE_BINDING.v1.json": {
+      "bytes": 785,
+      "sha256": "c56de38fd535488687477bfb4fff12bcaa770fbd9f0c89f54b5500458626eeb5"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group2-20261006-v1.config.json": {
+      "bytes": 130914,
+      "sha256": "b682758ffdc900b3b8a13b22381d83ec2883f7d483503caf48df97e1ad92e0d3"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group2-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "dadb55d704ca88b38a78bdf5da9e55bdfe21215c86d9792d1428825d90e8f88b"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group2-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "40326f73652c2948adace416da37f378bb0a4170c2f6a48cf2da965ea370e88d"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group2-20261006-v1.input_seal.json": {
+      "bytes": 83654,
+      "sha256": "f6cbdf6ab4234e57b65ae69dd745b08355e4421d02706145ee133bffa52a1e8b"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group2-20261006-v1.stdout": {
+      "bytes": 231,
+      "sha256": "dfbf68f060a1a7e684bd57d6869331f145b1d16ae06d119cd6499213bec7d92e"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group2-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group2-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "64323ac64e7e5319113175e6f38e5ebad5872d7bd7865ea21b62cf90abc0d3bf"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group2-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "99d19379f355528a375ee0a1a5106f3c41c245b9144ae5b28731d4a1674f7ffa"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group2-20261006-v1.system-floor.json": {
+      "bytes": 18744,
+      "sha256": "110fb6ef9606d2343bdbcfb2938bf99c15f33d0c5b887c6d0452c60ed4207fdf"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group2-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "3f7a707997939944b2f50abeff2d0685e7dc68136bcee6539b808c90d4da74fd"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group2-20261006-v1.output_seal.json": {
+      "bytes": 165609,
+      "sha256": "0fbfa3d6d1381b7cd8cca55de5b1802036400dc2f45018fd2ea5649cf4a261f6"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group2-20261006-v1.publication.json": {
+      "bytes": 2797,
+      "sha256": "16c29c4d2a0c46b69abbb634a73ef19b05bdfd04209a8ab9f6a1fef3349449e3"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group2-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "2ccdcfbb729620c15c15d899a465b9bdedc90ffe9888d3b99aa7e03d7972c2b1"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group2-20261006-v1.final.json": {
+      "bytes": 4939,
+      "sha256": "2d9fd1b253dfbf3d18a6493eb12534802a88b7c54eb0cb90bf9eed6b4c9ab0f5"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group2-20261006-v1.unit-cleanup.json": {
+      "bytes": 729,
+      "sha256": "45595cfcfa721da904400daafea2bf91c41a8a8a3349cb25482ae73beb0f4562"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group2-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "3b469ae6ebe7f2050d2dd3ae948e5e00800c7300559eb1690a377fe61881302c"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group2-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "ee9fd2d3f6fe85c2023cedd14f02170d9dc685ee8ec80a59686d35b5fc4829f1"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group3-20261006-v1.config.json": {
+      "bytes": 132361,
+      "sha256": "d2a857026de8d54760b14eafecc7786edda8c3e15fbf0cf2bf0a53d5380d7c1b"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group3-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "39faa9f745d79225aa7447ce56dbdda1ccc2bf68c705adf9f1a7d5141d298849"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group3-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "06c9aafb7dcabad28f7291bbb5b308df263f131313f725d3d6eca09c851528bf"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group3-20261006-v1.input_seal.json": {
+      "bytes": 85100,
+      "sha256": "4c678a9e1f3ea0142f1177027e8b58223fe8190b7ac11cc8fe0bcfbe2b63b218"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group3-20261006-v1.stdout": {
+      "bytes": 2020,
+      "sha256": "6d69e4791ff666eb726d876c42a09034a7e9aafd1f4c6cb1b3badf214e743712"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group3-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group3-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "f17662050ac7d9b0b8c0ed9f49f74abfd56bed07ed0a9092a5ff2fdbccc72352"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group3-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "f78705e60826d2408a5a03d1409424af8d7dd4c40a0d09a3dcb79f8acf79fd9f"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group3-20261006-v1.system-floor.json": {
+      "bytes": 59906,
+      "sha256": "4ca22bbde3776eea9c04900f9c0e214b716fef0ac93a81c3ef65d609f821e219"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group3-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "938e3dae3ace950068c1c731bcfc14e2f1431f8bb5e77402799320d09a2d8813"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group3-20261006-v1.output_seal.json": {
+      "bytes": 513626,
+      "sha256": "39c352bcec1c01e5a8d17713d7c25de60651ffd465b05994a32f0ad9f1058186"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group3-20261006-v1.publication.json": {
+      "bytes": 2798,
+      "sha256": "ac396308edca73f70da4f04c4f3cbe1e9121b56426a1cd59d646694487a2f922"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group3-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "7633dcc0868044535d535cf9407de465372a824b2ff7a5ffcdcdca8361a92b90"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group3-20261006-v1.final.json": {
+      "bytes": 4940,
+      "sha256": "0ca2cb5c13fd1efbc7bd5dd9af7bd18462a290ec64f94182f5d2f395717c183c"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group3-20261006-v1.unit-cleanup.json": {
+      "bytes": 729,
+      "sha256": "462e0a50073dbd060619b13a259cf7c094e1793b7d220d25b0b3ed1ad90c8dc1"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group3-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "6355da7497dbbb149e97216df993ce3b743a8aca22e1ee54b7f8aed5734569d1"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group3-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "f898948549ae612c335392e6c00945d5f61bb54867a56901796176c8569865dc"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group4-20261006-v1.config.json": {
+      "bytes": 130918,
+      "sha256": "3da3f7b1b7b57ded4f58a1138a92e5c103c143f117c2d2b1323f888e86953527"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group4-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "d660e6e8ed774633220e298422d827ca2dae22a7581fa53769de5e2f1d43c3c2"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group4-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "a74fa5a264dde297071a134dc2fccc6704809b89bc659509b185a2846a68f812"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group4-20261006-v1.input_seal.json": {
+      "bytes": 83652,
+      "sha256": "f397e84d7546692e4dcd7e0247198e1b3a603b123977a5c0a0e24c85500a2642"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group4-20261006-v1.stdout": {
+      "bytes": 213,
+      "sha256": "123f5ea60832ed0e3fc310901b36ab081bf15a4db0b0c146dd28f795f93f2400"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group4-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group4-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "a6b2a16d457845682de9bd638b6f691cc41ac00bce1662248de99a84dab4bf49"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group4-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "69e04093cdbae20f4fc48841955c3a79116982beabbfb5a777f5a225a414ae0f"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group4-20261006-v1.system-floor.json": {
+      "bytes": 198,
+      "sha256": "91abd2690d3997c6d450419a2964baa1125f4f593d01940d4102f5e3b647e5bb"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group4-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "cbc6fb7719b45e8a4d1b284c62d0dd77bd8c37c35c089539820699feca5f2454"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group4-20261006-v1.output_seal.json": {
+      "bytes": 2054,
+      "sha256": "7ec046735ab69b6e1ab67c08edc4098917afd71781baf7df03530bb3b8d66a44"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group4-20261006-v1.publication.json": {
+      "bytes": 2790,
+      "sha256": "0c47f5265e60a001f45fc6b83ac9af6ff30dbcd94dee9c4cb9210aff5511916b"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group4-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "b91dc03ae0323184c608b3606c988b5636ecb91a146552708df8163a8cbead07"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group4-20261006-v1.final.json": {
+      "bytes": 4932,
+      "sha256": "732e342f240ddad7807d9a3f7c9b6c56f66989a02ada54afed7bed6501e1fce0"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group4-20261006-v1.unit-cleanup.json": {
+      "bytes": 729,
+      "sha256": "46fad2de104c010427931da6b1d33f21f61b773672a0ecd957d72147079040e4"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group4-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "b8bce581535a153efd213d319a6008687178221abb633124df97b131af6cb70f"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group4-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "0ce7e953dff27ac4cf582f9dc88c1e9b0abc1df094d9d9a3781afcbefcecf8a8"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group5-20261006-v1.config.json": {
+      "bytes": 131070,
+      "sha256": "bf851a8cafe47ad92a24b7e63401c5ff837dc2b657ced8e22dfa88298bcd83eb"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group5-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "25e295574a5343cdd21be7e04bf1a86a831d75e7bd013b7a336417b51f387cb0"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group5-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "835d3ff3fb0a123a1bdb71e94356af86be33a163ce0991ab9605df085b8210cf"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group5-20261006-v1.input_seal.json": {
+      "bytes": 83640,
+      "sha256": "152bde9b6682c64dcac8f323cd6944bf29c4ee1930aeb0ef0386df14028a646c"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group5-20261006-v1.stdout": {
+      "bytes": 200,
+      "sha256": "d5a607617c4ebfec517d20ea6851ee05054a03dde60aae092f13fdc89d3819dc"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group5-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group5-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "9c7b7bc1d3beeccf6d18d8a999ac9e0ac4513221effd393cd5727009ab2429a7"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group5-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "53236d5f15f91a50510c5f48f30a769dd193baefd2ee30d00900f64875dc4fe7"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group5-20261006-v1.system-floor.json": {
+      "bytes": 1516,
+      "sha256": "c4629437cdc1d2aab35b1de041e9c7f3452f2f7ac679a487067fb42536c94fa2"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group5-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "87e948a637ca0fed517b4c617961b6140ca3e4d8bafd42af78836833fd17cb8b"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group5-20261006-v1.output_seal.json": {
+      "bytes": 13580,
+      "sha256": "87b7312220bebdbef4921de6c6b71e9b420a08f8e0d783b4a42fb021196c460e"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group5-20261006-v1.publication.json": {
+      "bytes": 2793,
+      "sha256": "076172f0635e549cd31eae65015b99435e2af0dee4c42d2a8e5b7e3540d4150b"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group5-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "dfea56545436b37188b4d778425666eb046ece6fa86a20f24e393e92d566df2c"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group5-20261006-v1.final.json": {
+      "bytes": 4934,
+      "sha256": "c40e8344f02e552c921a0ac1f58f60d95825fbdb45450cf96bc097c787da584f"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group5-20261006-v1.unit-cleanup.json": {
+      "bytes": 729,
+      "sha256": "eb56d24fd6b4743f3f37ef201e3c85952a87cb36e20c47b3ea5150658a186bf2"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group5-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "ad3339a53714c5f5e6f9103d5c9f30582de977fc5edc1335a8c2fe8960483be9"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group5-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "5253209a8ce8173d5f4e12a596656d1e6e43840ff74ad50b2d1a9e8a2733a986"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group6-20261006-v1.config.json": {
+      "bytes": 131216,
+      "sha256": "983950b487686d8caaa0201ea4003d263a14549d8e7be3ac21d441f6d0e26b3d"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group6-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "2838e4dd77d42696b473cd0aa43772d74fd1d2f8e6237ab00d8d087184d85f79"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group6-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "ba9b11aeffa6c2e76a116fc80d5ee54898e81720891e4bd8019280c52ffc590c"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group6-20261006-v1.input_seal.json": {
+      "bytes": 83673,
+      "sha256": "05a1083a119b4a8fbe3160312d2e5d7ca350a95ad9f2cd65b7152b70cb61b6b0"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group6-20261006-v1.stdout": {
+      "bytes": 17000,
+      "sha256": "9b23ace11659e80fd3b3890dc67c50dcd4796f672a39bfd96d14579d0b6ea7d1"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group6-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group6-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "620273c4f359ccf72d8fc191abdafa901dcc3160441d1f147a30e60211633ef9"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group6-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "18c46fc95be9b3598e62adb734e7bd26609a5075f32224b2f4b4465c7a489bac"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group6-20261006-v1.system-floor.json": {
+      "bytes": 35124,
+      "sha256": "db7a5e236dc0595cd526f4a480215a4cc27f2a86389ac90ae03209252ec16002"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group6-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "77d3e777fcb1ad48e206b92c1b177cfc8e85fe6edbdbbef34f94d8b5e28eac6e"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group6-20261006-v1.output_seal.json": {
+      "bytes": 299837,
+      "sha256": "9c011b6aada97a4117fb249e1fea566f34e8bccfb732c2902c0b59cf75957101"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group6-20261006-v1.publication.json": {
+      "bytes": 2799,
+      "sha256": "5177319d35161edcd713ddb5615fc0cb2d28e3892cdabf4e1a91a434260216db"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group6-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "26136070f21b9175bcdce700cbf8874402a90054bb38ff883d80b9adb3532c55"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group6-20261006-v1.final.json": {
+      "bytes": 4941,
+      "sha256": "ddc9efcc34fa51da015a5606d5e2f9b10468e7abf568cfacc3b6c8abb4f8bee6"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group6-20261006-v1.unit-cleanup.json": {
+      "bytes": 729,
+      "sha256": "8694ff6949e6a1148310529f35a53439fabeb73dcb6dce3f43fcc1b91f74ca21"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group6-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "564af2d387f13e144ab41f63e183c19067beeefef994ded03f7641fa9f39d827"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group6-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "826ff55d7199a13e3e8e38f37a1a9b9aac261fe83103f3dfffdb19b92e9dd75f"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group7-20261006-v1.config.json": {
+      "bytes": 131002,
+      "sha256": "3861b5d72aac031bb29748b015acaafe1fba44a5c93e386b89da4bdf6ee2836a"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group7-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "33c6bb974951ca6137609a53994d93de2dfd39f3407674470d07816c975d2c71"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group7-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "f0607e7c93f61fd78ac88e68c7f79d1f76f63dd5b529e35b01884ac4ce79bd22"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group7-20261006-v1.input_seal.json": {
+      "bytes": 83663,
+      "sha256": "54a48c073dcf6fb77d9e49a4ef6e4193a9a7549a626df95b48d35c650c31fe38"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group7-20261006-v1.stdout": {
+      "bytes": 240,
+      "sha256": "cd83237a5ba89ff0a11793f4f6f2994a44e2e7ea00fe955e935e0068622aa94f"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group7-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group7-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "5c76d5e46b8cad4522e4867098bf76b86bfcc331bcff6b0110be0b2032bb4306"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group7-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "fff7c4594c5eb4a9e7d7805f5b43ea7c864a7ff46658b4e88ea5f3d9fae0f9dc"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group7-20261006-v1.system-floor.json": {
+      "bytes": 1766,
+      "sha256": "355cbe0ad39e510be1f1d562479f1682fe8f8ab38059bb28e9468f1122e8754c"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group7-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "2cab0bc6a0c569eb2fd5e3b2db03f19b9245cc466ebc9ec2914787293a3d676b"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group7-20261006-v1.output_seal.json": {
+      "bytes": 16075,
+      "sha256": "87334f2b77e32d1e6d034769ac5ea695f96cb3c9b7aee0b107ffc36d2969fcfc"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group7-20261006-v1.publication.json": {
+      "bytes": 2793,
+      "sha256": "1e0e12474cfe9ed165cb9364d10dec14750b49851d406224b2be8e30f4f108d6"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group7-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "69cb47dcd2e099955a8fe62fc693b7f5f014851d162ee06c1f4c0b8c1832d5b4"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group7-20261006-v1.final.json": {
+      "bytes": 4934,
+      "sha256": "a3973e74d46cf3d9c0abd3dd21ac085fb46cd18547b11681df094a835fc4872e"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group7-20261006-v1.unit-cleanup.json": {
+      "bytes": 729,
+      "sha256": "869d756987c48e0d30929ad526b3b058fb866c95d94b76f7c94d78e2eec0167a"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group7-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "ce0ab63c2c53d4455f11b66e151baabc0be60c5ef288209d4971c135554d6edd"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group7-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "995fc2df5230bb9e9b87b4c85c55567256581d7cfdd6c7d6cb94979573c63fcf"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group8-20261006-v1.config.json": {
+      "bytes": 131106,
+      "sha256": "5bb0f3726076e676ea33523a13cbdb959e8b8fee8d9651233a3a50eaca0b2af1"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group8-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "c0023a666bc50de6ce9b0860902a8a2525f025b441f5a59ccbfd8db96f2c3cfc"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group8-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "f694e58ba17946af8445dd0aecfafd6b40e648d5efd35d72d4e6a8578b981019"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group8-20261006-v1.input_seal.json": {
+      "bytes": 83675,
+      "sha256": "5d9d33662004520163402274160965bf05f042419e639b65cf19277d9646a3a6"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group8-20261006-v1.stdout": {
+      "bytes": 16908,
+      "sha256": "8bf73a1cbb6c4c1de869a13524cf58f5af8336defb61df5a559e378fbbb2d6fc"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group8-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group8-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "b6e97bf0925f139a2fc72267751efee9366e24193a434ef6c3cbe5f65e9c9f9a"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group8-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "e0abd6222a3701c50fe2b50e70ed753265bb9bba81edcc2d630a4f6ba93ca0f4"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group8-20261006-v1.system-floor.json": {
+      "bytes": 15554,
+      "sha256": "c5ee70c689769a14e82f2bf3ffa58be20dcc24b4436de4c34b83b3d21b56c75d"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group8-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "3023af2fdbb9c422b876e2559c8faed1b396350aa92c6f98e58cdee2d9c4a7d2"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group8-20261006-v1.output_seal.json": {
+      "bytes": 136973,
+      "sha256": "376448851179ef0036130dcab055edc7ee399b9a38e5e6d72a0beeb86b74d7ef"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group8-20261006-v1.publication.json": {
+      "bytes": 2799,
+      "sha256": "4a9e69b2097cfcaf8b1fa82d1b24b5245fe63646621b2682ab6c769e46954887"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group8-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "bf03ea4d34174568715f6f3ca7c0f7a90903fe2f846e7cf62572facaf7fbed14"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group8-20261006-v1.final.json": {
+      "bytes": 4941,
+      "sha256": "c0b575a445af17ec5c8f513ba39af630578740bae74e5310db1de17a39153dde"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group8-20261006-v1.unit-cleanup.json": {
+      "bytes": 729,
+      "sha256": "17069da7e9d768ce6059b83201e84696543bfaea7129bad4ce874ec1d23330a5"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group8-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "5937dcd8bb13aabdf73e17c05d0d1072541709909d6fc330643a67c5633169b7"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group8-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "12a1dff75c547b4d762eac0a2e7ab730868a2afb3584346c73c067ec1f0e67b5"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group9-20261006-v1.config.json": {
+      "bytes": 131213,
+      "sha256": "2db3250484aa881f5d19c242988a7a9cdc7aef576c347f3fce3d8a8fccb15708"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group9-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "1e4d33e2f303edef28c4143a09b696e46c0e67b8f3168e3a084119544b351ae8"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group9-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "526c1e5850798e4932cd9d55e0ebe7537b5a461cce36e9aa508a8fe8670a0757"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group9-20261006-v1.input_seal.json": {
+      "bytes": 83678,
+      "sha256": "996c87dca260ca05e7a6a896137120c92e2a2db143366bcbd6189e89376622d6"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group9-20261006-v1.stdout": {
+      "bytes": 50918,
+      "sha256": "e0070d6d4eeb82a9ececfa04ed1c44bf897a1e1e79d1bee9b55fd194703d2085"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group9-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group9-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "6543f25f588caa81ad026703a0377cb7640944ba0107353bd3008b4d352456cb"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group9-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "550e401e6a105164b2ec82bc11ff942758b7a2f432551205f41596254989f0b1"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group9-20261006-v1.system-floor.json": {
+      "bytes": 19585,
+      "sha256": "737809aaf604f235e04e99693677fb87a28bfcb8b8fe18cb96e5404347e2e47d"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group9-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "6593ac43ecb9711a7359ef2b84bf10c3066ae4d074aa2cf827e2ed6fe6dedbff"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group9-20261006-v1.output_seal.json": {
+      "bytes": 171723,
+      "sha256": "333ca8529062d15fc96b2a8790e91b0549cbe953f1f18bb6b032d14925e4b530"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group9-20261006-v1.publication.json": {
+      "bytes": 2799,
+      "sha256": "205c312c875f372d8529e6444901c14000d4b242de6b6f00e57c59f6dd6af34e"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group9-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "c64ee88e90831ba53fad60e736544dadf43e39402bb7ad43f621d0eb871dd9c8"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group9-20261006-v1.final.json": {
+      "bytes": 4941,
+      "sha256": "7e833f94138816f110038c449d9931ce1c66928e99bf582513c9c4a82624e413"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group9-20261006-v1.unit-cleanup.json": {
+      "bytes": 729,
+      "sha256": "b64be78ea6b45b29419b8fe24174a5da468ad572c102cb4f16e9c8cafd8b2a05"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group9-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "aade5313a20c9feec943761e23abf9c4a933230516dccc63c5d2ebed5b4a81db"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group9-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "cfbbd09ca73d0a7fc909dbb6476ceefd8ffdc8264d84a87627ad501be0c28ed8"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group10-20261006-v1.config.json": {
+      "bytes": 131017,
+      "sha256": "0f3eb19dee958ff3c227d4b4e5d5dfadc4aa0f26284b9d174cf1c6754aaf0569"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group10-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "278fdebb93afb281556017155f122dbb5b1331541b08f85edeee1f614ba71d56"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group10-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "7a95e20ffd3c2db091e9a9324c9378eecc0916a58185788311aacbc07a30640b"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group10-20261006-v1.input_seal.json": {
+      "bytes": 83672,
+      "sha256": "cfc847d7c4e73e2e315c9b8966b8f74d8700182d569c57098434bac7978c3bda"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group10-20261006-v1.stdout": {
+      "bytes": 246,
+      "sha256": "49f8bee2979cd795efabaacdcb4dc5704fb28faa155f627eac4d5c1f28cf2fae"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group10-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group10-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "a94593240127aac59b8941fa6f6b198f77bd3e0a80b3e520308bfdeb93c421f3"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group10-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "5497b7112d60ad06ea04e95a2821574672359492081b5039d79b0187c48dd302"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group10-20261006-v1.system-floor.json": {
+      "bytes": 197,
+      "sha256": "586664ad54dfff4778f37e1b88dcddeb0e557b4cdea7f82c12761ca5198a184b"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group10-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "145f2cfba0d390bbc54aa5abcb6a4c4639addff73e4a5ff22785517b9615cae0"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group10-20261006-v1.output_seal.json": {
+      "bytes": 2348,
+      "sha256": "bf7caf99bfca165cf03973987ecc2afa942e63078e2dd332f755f819c86d108f"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group10-20261006-v1.publication.json": {
+      "bytes": 2800,
+      "sha256": "a103437640c8955903aff4558d7dfb830f64c2b1788c51f9456bb061d91ced69"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group10-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "6c1b0b1a8f4f6fabd2d212577c76f3aea70d8d46772b42012160bb691ae8f627"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group10-20261006-v1.final.json": {
+      "bytes": 4947,
+      "sha256": "81a7d7c71d87c3f0f1ea610405f82b7089999fdcb2bf7cb91d148893bb2c8b97"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group10-20261006-v1.unit-cleanup.json": {
+      "bytes": 731,
+      "sha256": "39f4c89a44cc7f152e77ec739145cefde61ce8c168b10fa3572b48dea3a07cd9"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group10-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "05631a61e8b43dc2261e0c0f3916c2c881facd960a0153d3fdf074fc968e39f2"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group10-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "70286139c6b07bea3e8a3e6b500cfa225cec7d382db723823c08b0ea0d4d04d6"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group11-20261006-v1.config.json": {
+      "bytes": 131011,
+      "sha256": "7c3f66d2e768ad510aabffcaf7de58dce8e3a5815b3c9c2934408037fb753de9"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group11-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "b8573cbe670243a2ce5dea0edb687eaf643decd8ed1fde9062ba6b323a50f286"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group11-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "6b77f2c17516eba2b9647b2401190be9f248757844e6a13719fda73d5f358141"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group11-20261006-v1.input_seal.json": {
+      "bytes": 83666,
+      "sha256": "790908220ae9c64aa385e2c531f2c508561a8e4d19605787aa77e806cbde3a76"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group11-20261006-v1.stdout": {
+      "bytes": 240,
+      "sha256": "c85bd5d5e30b68b22782d47d8594e5d112cad2ff4abbdfc5ddcf881b4c7e8af6"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group11-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group11-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "64a1413c03b73e14e09fdafeb3128bd307d83643d042467e2155287b2504e086"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group11-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "eef0ee0627082a01575bd161ba39b930a45533d055fcabcc2ee8d58a46a0cb4d"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group11-20261006-v1.system-floor.json": {
+      "bytes": 279,
+      "sha256": "c85e04f04f96f5cd5a0f865216d6d2a5fe92fe34cb8c57909fab206a365adc7f"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group11-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "c52ddfa4e8b0d7703820b3fa512a370568909c7e07f373eda1a42b933f236a56"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group11-20261006-v1.output_seal.json": {
+      "bytes": 2647,
+      "sha256": "c1243b22a0c48baa6de9ae476a63416b9f2c160f87e574ef4fb93bfca237ef77"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group11-20261006-v1.publication.json": {
+      "bytes": 2800,
+      "sha256": "381b1cf4089676cf9f6b3b2141a121fc4407dd19e1f1129317c90169bb868cd8"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group11-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "2599ff2b81dcc05d790a165616da35aa57cea9a3efa55378b28d019e83652f9f"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group11-20261006-v1.final.json": {
+      "bytes": 4947,
+      "sha256": "44123e2bed5d814add01a345bb7b2e094399b038b9dcc56649d0a85fb3bb6333"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group11-20261006-v1.unit-cleanup.json": {
+      "bytes": 731,
+      "sha256": "781cd19e38c740c8ecdded78b0af701df1e9d578e301fc24af773dece0c700db"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group11-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "0a021538864b982db543c9c57a27a071005d4b40575e7570dcd9c7a1d78cefd5"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group11-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "14e3a54978da185515a4c34d7de93497065e087de2b23e7c792df21a4c90a393"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group12-20261006-v1.config.json": {
+      "bytes": 131018,
+      "sha256": "48406933e56c0904d1388b579662512e1be38596deba21a349f8aad93c0f7134"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group12-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "ef1b358f22f49e4b5b2d46b74f5e64c6a3df22179e58e9ce3f8ddc395bfa162f"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group12-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "5767c6aef5a8ef8b26c63c37d61d222a4dc2bdac5cbd6f648e1c52ef61d9b06e"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group12-20261006-v1.input_seal.json": {
+      "bytes": 83673,
+      "sha256": "79691e0c6e225f0e91d6cbb234f2af455c58c9f3c61409c8a52f5d8a0fcb152a"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group12-20261006-v1.stdout": {
+      "bytes": 4061,
+      "sha256": "1e82c80ea994f5a2ab310ec7d0f6a535976e9bad61a2c648fb31ffa6d0f6b713"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group12-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group12-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "137449ae44c8b0c5f9d31686d680935c03796ff4e82558e28bf20e62ca8fce7c"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group12-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "a108ebc1cc0cbead345edaea843b963ce6b090c4f596f9e72ee42407e6f2a317"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group12-20261006-v1.system-floor.json": {
+      "bytes": 2181,
+      "sha256": "e115ae3e42f031853236d7b5a4fdde22713266f1d2238efcc376d6c418e14bd7"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group12-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "8290036079d86eb80c6dba90283ddc4edf7024f5ad7e182b49d984164704fe78"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group12-20261006-v1.output_seal.json": {
+      "bytes": 19451,
+      "sha256": "764c19bb32f44e3685dab770bca214ea9b330edc4aebd4b0d7f8fac042ddf141"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group12-20261006-v1.publication.json": {
+      "bytes": 2804,
+      "sha256": "76894803e6d4ac04607c5a2c890d6d7db800f50af847e3a72446ee7b4edb6eb4"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group12-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "8d4ebb031cb5472dbb51a8ba6dc8a7f4cfdbbc3ce1e0364d6e2dfa9e21658d99"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group12-20261006-v1.final.json": {
+      "bytes": 4950,
+      "sha256": "3abc823d9ae352239cbdb4db68008ca7e6a25b8b417c9d8b046d8c974d2c93ff"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group12-20261006-v1.unit-cleanup.json": {
+      "bytes": 731,
+      "sha256": "869af705fffeb45ebd2287a2df6c54b6f29594b71db53c9c0c8c1e2d16b82848"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group12-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "1c982e3dd031ad4dd2defb4853ef1325e778d315e2208d19f38ff51f648e4986"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group12-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "a19a93b0ee689ff9b0b8e833600a7df6168927668f56f5e8b3fad8a556f668c7"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group13-20261006-v1.config.json": {
+      "bytes": 131010,
+      "sha256": "47b58eeef88eda8141bd03e20be6a9f7756c757a4ab4270ddb18b5e04601ca2c"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group13-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "da6a1d7a02d8207abed3debcaa5ebcb63e80e87d4533abdfbd9519afca96feba"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group13-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "5e0a08512f4476aaad771d0a793715ea6bccff35fa6facbba57d64377820a440"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group13-20261006-v1.input_seal.json": {
+      "bytes": 83664,
+      "sha256": "736103d420ffaf4ea53b2e8df12895ce22adfd122da39bf81d1c675437791780"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group13-20261006-v1.stdout": {
+      "bytes": 4598,
+      "sha256": "cc5e2be390e9d3b78f72d5b11151504a297b353d7e652edde65a185c35b2b176"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group13-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group13-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "bdceb6e7193e93c7ec7991434b42035e1a984d07de4afeffc9c9ece22cb0c352"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group13-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "ded000142d86e4b11ba605695833c95b561df8f038705d129a863f26cf86d6e3"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group13-20261006-v1.system-floor.json": {
+      "bytes": 21853,
+      "sha256": "077948762ef82fea5d0be3059cda0b65c8d9b447b87263c8bda4d1bac334561d"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group13-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "f25fbc358370dec97abc7e9706814be4d1699c739af27ef59600d368dcff61e9"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group13-20261006-v1.output_seal.json": {
+      "bytes": 192480,
+      "sha256": "734f10cab705072353528f19ad0b9ffe536bbf24fe542828224c302535e55d7a"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group13-20261006-v1.publication.json": {
+      "bytes": 2808,
+      "sha256": "c13d30e2467567f09dd6589cac1afb26c051566c0d4f2a3f9f3f78e2ab723382"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group13-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "b0b7983387d81af2639fb3972fce68b4ffb544a510c031640b21af7264919f41"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group13-20261006-v1.final.json": {
+      "bytes": 4955,
+      "sha256": "68733aed58519e95d8ba48da0f76388cb7876f96bf466038cfae0e5ce0f976d4"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group13-20261006-v1.unit-cleanup.json": {
+      "bytes": 731,
+      "sha256": "63ae1035f6195ed8de0380495591849850f549e6fce05edb7c4da96dd846cbdd"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group13-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "f45b304c10de332da9b81cc9ace9e53ab5719317e8844104e8e0cb50e531d4ed"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group13-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "17affe0510ac4f8494a4bd1e97c531db8065e1eff1ef7b636d53e6856a10e0ab"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group14-20261006-v1.config.json": {
+      "bytes": 131018,
+      "sha256": "768ec88d7684f34cbe95d48aeffb5f6a6dcffe3618c4a4c3e7cee949ba824f86"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group14-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "127d7f9f149b138a373c7a70e2754bde0c349707fc017f30af7a6145806aff51"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group14-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "69170237131a9cbf6e8c127c4141aadc551bf7a89066f5afd5a39a25f7731a51"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group14-20261006-v1.input_seal.json": {
+      "bytes": 83672,
+      "sha256": "273c82b243cee7731e137f889f7327b7e49ed7e01fe8679b37b9e253b31c8356"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group14-20261006-v1.stdout": {
+      "bytes": 17242,
+      "sha256": "30df96a848a92647265a29b166978c33a008f4e86bc06f377de56aed1f1b49f6"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group14-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group14-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "e292a444f6a44c3eb8faf4ee568eef9f9177d3f70986b4f621ffff118b98a31e"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group14-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "947400414dfb8c02e2ef12e9a9f4c49dd69aa1913db9a95e35fc2f2afae26b4c"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group14-20261006-v1.system-floor.json": {
+      "bytes": 20509,
+      "sha256": "e1a4fe12db3ad8761f159c3e53a3d671f8b95788a3fa3c20c1c1ad186f3232d1"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group14-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "b13b6717542b64faf8c46ec1299b2bb6d2bf19c253f03b7f2be4a3a93a19c3c8"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group14-20261006-v1.output_seal.json": {
+      "bytes": 180412,
+      "sha256": "b5e1097f4d2d08c3556445055ba0bd6d4e0c23bdb24001400e1586f35787791c"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group14-20261006-v1.publication.json": {
+      "bytes": 2809,
+      "sha256": "de007b2403f6654c112b898d6c07199cc86e83649d968443a7e3fa75511ff2fe"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group14-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "7764a20f4fb12d9c318d6cbb77b9dcd8dafca746469f89d448a1564c6420c5d3"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group14-20261006-v1.final.json": {
+      "bytes": 4956,
+      "sha256": "80cfaaef18b352f72091cda61af56f4c73d7e54e9ff58ef5d6b4d08511741803"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group14-20261006-v1.unit-cleanup.json": {
+      "bytes": 731,
+      "sha256": "0a4353ca41dc78ea34ff4de9303f4e4b2f65417a4431574148f81f7225417a80"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group14-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "b0c0ed51cac80633a7f2120d99790a8f54a0cbb6db24d3175e70a25a7216e31b"
+    },
+    "queue/hnn-intact-pair-518e1e3f-control-group14-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "36d69a951e7af31855f135bc4fd89574c55781474da640cf50ddd991f12848bc"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/QUEUE_ENTRY.v1.json": {
+      "bytes": 2157,
+      "sha256": "d4bd5b4c3cca750d50001f3b68439037aa6900ef6b96b2970c6ae8257190f74d"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/CONTROL_RESULT.group1.v1.json": {
+      "bytes": 1278,
+      "sha256": "510fdf5b5c9b0ff489f5b9711d6553f3e88f5acca0cfa4cd4983f311f73545f9"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/CONTROL_RESULT.group2.v1.json": {
+      "bytes": 1265,
+      "sha256": "05b6417a976ef74020dac397e6aa219b6299b12fe7c43b5ec925733cc88cbf6c"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/CONTROL_RESULT.group3.v1.json": {
+      "bytes": 2450,
+      "sha256": "3724e4caac166acb0c7cd7b090543f19f3a5cc425bdc1d3d6c46a8c3a307f421"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/CONTROL_RESULT.group4.v1.json": {
+      "bytes": 1245,
+      "sha256": "cdb5f9cca8e468a745e07b58069129fc4046c5e0e97765bca5cf4645813df919"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/CONTROL_RESULT.group5.v1.json": {
+      "bytes": 1233,
+      "sha256": "cb9fcc1a53cba75a86bd4be70e00fc0b2726240ae46934ce73ec02d31a3cab69"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/CONTROL_RESULT.group6.v1.json": {
+      "bytes": 1284,
+      "sha256": "a2d5bfcd622f26382cb28ac06d2c6bd7849d31d9b7b71a498e592155df84fd62"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/CONTROL_RESULT.group7.v1.json": {
+      "bytes": 1270,
+      "sha256": "28bcdf2d501c2787d26d2f3673532fe64e00a38239763b03c8ca731687ed8481"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/CONTROL_RESULT.group8.v1.json": {
+      "bytes": 1286,
+      "sha256": "cadd8266db912948884cc5fff006f689a822611067de5715aa518ee79426de2c"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/CONTROL_RESULT.group9.v1.json": {
+      "bytes": 1289,
+      "sha256": "724fb6ae960c68fd0085be9e56a75d1a5f0a1dc000281b27414f7d6fece0bf4c"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/CONTROL_RESULT.group10.v1.json": {
+      "bytes": 1279,
+      "sha256": "e8f32eb3852c6dfd6401f72329c1464021fbfd3b4fe589f50454ac6638761c74"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/CONTROL_RESULT.group11.v1.json": {
+      "bytes": 1273,
+      "sha256": "2aafab80cd193a8450ac4b3a8a66cb5f612519a56362d65d4ae102329d5b9800"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/CONTROL_RESULT.group12.v1.json": {
+      "bytes": 1280,
+      "sha256": "4cdffa61b582c4fb58039a17ecc88d9b9ea412bd68e920e4175b7cb49854013c"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/CONTROL_RESULT.group13.v1.json": {
+      "bytes": 1275,
+      "sha256": "e52d887ae86644fc4eee5f0da63618e0c94a54fe3ea257e25c7b57daf60dc0b7"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/CONTROL_RESULT.group14.v1.json": {
+      "bytes": 1283,
+      "sha256": "2ca4a1f9b166cbef7e3e456a6ed36f3946f61b5e3d64a5281e2a8f2cf79a7c0a"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-02407331bdf682dc/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-02407331bdf682dc/dep-lib-holonics": {
+      "bytes": 4592,
+      "sha256": "0e3765a223585d20ab03ac87717ae463b42089f9956d273209009d155cbfbf52"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-02407331bdf682dc/lib-holonics": {
+      "bytes": 16,
+      "sha256": "6304d59d6385115a7b9449c78746ac11059ce0dc229f67b249e21d2086347c61"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-02407331bdf682dc/lib-holonics.json": {
+      "bytes": 655,
+      "sha256": "fca0bdf54a0e37dac6d614e5a11fd8cd6b56846d3ab3eed7085cc23f87d2bc2d"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-3dfaf698dddeb1a6/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-3dfaf698dddeb1a6/dep-test-integration-test-source_entrance": {
+      "bytes": 44,
+      "sha256": "3cbeb95fb8a3e7af62122c9ddca89765b8b5d2af7668bbb7c4aaaa1b582d4a9f"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-3dfaf698dddeb1a6/test-integration-test-source_entrance": {
+      "bytes": 16,
+      "sha256": "cc1575537914c534c5975b4b5be220db5b396b5d762737ef336255c520be4e4a"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-3dfaf698dddeb1a6/test-integration-test-source_entrance.json": {
+      "bytes": 741,
+      "sha256": "1ae7c323d91753d33f7406a036b13f8346a9368e5ee61358474ea747ff16f3ef"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-70b68d2f7e1f6408/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-70b68d2f7e1f6408/dep-test-lib-holonics": {
+      "bytes": 6734,
+      "sha256": "afa1082d9670a358b665b6c4577c43cc37ecb03b4d5375f24c2dfe39b379f145"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-70b68d2f7e1f6408/test-lib-holonics": {
+      "bytes": 16,
+      "sha256": "22a78e88c7a82cb1b9f6c908a7365ea7e6ee2ded05671cd3303c8dcd279d2f09"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-70b68d2f7e1f6408/test-lib-holonics.json": {
+      "bytes": 660,
+      "sha256": "c8233c12907db3e23a65e5814adf3def58a6f86bc60a43b9f390b02c9eb021f2"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-8cd4a578e626a457/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-8cd4a578e626a457/dep-test-example-hnn_prediction": {
+      "bytes": 1283,
+      "sha256": "067dcf9586389210feaa209bf5029592c236144f4e21cc1177093b8c1cb1811e"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-8cd4a578e626a457/test-example-hnn_prediction": {
+      "bytes": 16,
+      "sha256": "5420dea12371857d845a91f729f3e9ec6b27bb41facf7a0c8ad5d8f385d5d6a3"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-8cd4a578e626a457/test-example-hnn_prediction.json": {
+      "bytes": 731,
+      "sha256": "6b8795a6673f9ae61e247ea99343e3e43b4da8c321b5ab7fd3cb93d6d105dbf9"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-bd29e6ac6f6167da/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-bd29e6ac6f6167da/dep-test-integration-test-ranged_capacity": {
+      "bytes": 44,
+      "sha256": "992a84355f8fe8356ea38bba60f35a3f813f7590e77a1951c3798579201e5aa0"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-bd29e6ac6f6167da/test-integration-test-ranged_capacity": {
+      "bytes": 16,
+      "sha256": "5addb1095112c0a1ab93fbd7e887513eceebe929f05c507f61ca962846868be0"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-bd29e6ac6f6167da/test-integration-test-ranged_capacity.json": {
+      "bytes": 741,
+      "sha256": "ded6e673675625369d3dbc2758ac5954c84c1dd17849b3b9c6e470be5cf8336e"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-cuda-2b2d6cef9fd78c5f/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-cuda-2b2d6cef9fd78c5f/dep-test-integration-test-located_ingest": {
+      "bytes": 43,
+      "sha256": "7e0b95fbabf30a14579f290ae1ab78d17c2a51b7e3cccd20873fe279e52ac527"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-cuda-2b2d6cef9fd78c5f/test-integration-test-located_ingest": {
+      "bytes": 16,
+      "sha256": "d8aba44a2f986650dee2c7b3112914712311fd03f07293b8178cd55e2a4a238e"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-cuda-2b2d6cef9fd78c5f/test-integration-test-located_ingest.json": {
+      "bytes": 758,
+      "sha256": "70a1fa2678dbfe18c26cf6267cc9aa61aa79a8f1c4c5405fdad276974474df50"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-cuda-3a3d38defac6a12c/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-cuda-3a3d38defac6a12c/dep-test-lib-holonics_cuda": {
+      "bytes": 584,
+      "sha256": "88e846732b949289b96a21c7d827891423da93afd7b3e15da87f076966b6af61"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-cuda-3a3d38defac6a12c/test-lib-holonics_cuda": {
+      "bytes": 16,
+      "sha256": "24cb574a42a7b4f718c53c72fed29551dad94046ad52765d0c84760fe8f44549"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-cuda-3a3d38defac6a12c/test-lib-holonics_cuda.json": {
+      "bytes": 681,
+      "sha256": "de7c12e8e16e8d7a8617709829146a8fb0e5c8161fb472121e80acc9aed2dafa"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-cuda-5cc32226864d0eaa/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-cuda-5cc32226864d0eaa/dep-bin-mount-smoke": {
+      "bytes": 242,
+      "sha256": "e705d2f9e74ee11572e71b7bdaeb08ca1aa255dcc72942d05143e2a824212c0b"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-cuda-5cc32226864d0eaa/bin-mount-smoke": {
+      "bytes": 16,
+      "sha256": "2b6392919ce4ea6b4423ff8de1687995ad4c8ef43053e40b8a5398379cedea54"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-cuda-5cc32226864d0eaa/bin-mount-smoke.json": {
+      "bytes": 737,
+      "sha256": "66897d72c0bd4064231bdf8063be53850a021e028a5bed041aca643925e96f81"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-cuda-c82bf91515d93d4b/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-cuda-c82bf91515d93d4b/dep-build-script-build-script-build": {
+      "bytes": 28,
+      "sha256": "a71f952e7f3252ef5608298951fd55b25f3590c98bc0765ae4145e623604ee7d"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-cuda-c82bf91515d93d4b/build-script-build-script-build": {
+      "bytes": 16,
+      "sha256": "dcab605d8b024cdf6df0091b2363713976c61f814202b7e0320074392e027b00"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-cuda-c82bf91515d93d4b/build-script-build-script-build.json": {
+      "bytes": 373,
+      "sha256": "42af5ee2dbddb0ccadd1d7819991de66100a21f8a5cd26be8bdfa7e7919ab9ea"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-cuda-d9ad51fae469d445/run-build-script-build-script-build": {
+      "bytes": 16,
+      "sha256": "b460f8e39bf97a13eff7c2c6cb8149dd96c5af9a3a767f4b17a559816e410949"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-cuda-d9ad51fae469d445/run-build-script-build-script-build.json": {
+      "bytes": 769,
+      "sha256": "1461ecb83f320a63d6e08c1387462f0c5fdbc271ab6ab4cd753b61b6b1311237"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-cuda-fe78e545d18196b4/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-cuda-fe78e545d18196b4/dep-lib-holonics_cuda": {
+      "bytes": 478,
+      "sha256": "ba4326d0c015d5719188845fbf7a7424409a59027bf645d5491989fb42bbc251"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-cuda-fe78e545d18196b4/lib-holonics_cuda": {
+      "bytes": 16,
+      "sha256": "5a1e01025e1f65ce44a56abf7d16a0c1b813bde74f6d6347d2dc1651be8ba254"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-cuda-fe78e545d18196b4/lib-holonics_cuda.json": {
+      "bytes": 676,
+      "sha256": "c1cb91f250caf0af05d89644807057513142b56d376955b098b2faa2dfd81229"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-d85475b8f5abeb14/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-d85475b8f5abeb14/dep-test-integration-test-resident_cold_restore": {
+      "bytes": 50,
+      "sha256": "26bc6934c48949cb289aa74274df47f2717e5366f8bec1d7e88bc82df668b3e1"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-d85475b8f5abeb14/test-integration-test-resident_cold_restore": {
+      "bytes": 16,
+      "sha256": "072d33738cbc66bb884abab6b7cccc751b47f7aa9bfae702dd569c446d006a33"
+    },
+    "queue/hnn-intact-pair-518e1e3f-20261006/preserved-local-fingerprints-v1/holonics-d85475b8f5abeb14/test-integration-test-resident_cold_restore.json": {
+      "bytes": 746,
+      "sha256": "b00b7a64164b4779eff4bf6e369c2da7710914a20ab4b62126155c85bbf3e54c"
+    },
+    "VALIDATION.json": {
+      "bytes": 798313,
+      "sha256": "bed0a0fba2ff5b6b3d4b1e9223afbe7171cd3388568d256c06db3064faca9644"
+    }
+  },
+  "large_binaries_toolchain_cache_not_committed": true,
+  "mechanical_controls_only": true,
+  "useful_reconstruction_established": false
+}

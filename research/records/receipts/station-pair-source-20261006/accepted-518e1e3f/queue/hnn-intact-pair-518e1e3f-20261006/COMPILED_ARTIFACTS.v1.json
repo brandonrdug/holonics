@@ -1,0 +1,393 @@
+{
+  "source_commit": "518e1e3f4f5d6ad6dab57a7dc08b3098eab354f4",
+  "build_label": "hnn-intact-pair-518e1e3f-host-cuda-link-20261006-v1",
+  "all_local_artifacts_fresh_false": true,
+  "artifacts": [
+    {
+      "reason": "compiler-artifact",
+      "package_id": "path+file:///home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda#0.1.0",
+      "manifest_path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/Cargo.toml",
+      "target": {
+        "kind": [
+          "custom-build"
+        ],
+        "crate_types": [
+          "bin"
+        ],
+        "name": "build-script-build",
+        "src_path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/build.rs",
+        "edition": "2024",
+        "doc": false,
+        "doctest": false,
+        "test": false
+      },
+      "profile": {
+        "opt_level": "0",
+        "debuginfo": 0,
+        "debug_assertions": true,
+        "overflow_checks": true,
+        "test": false
+      },
+      "features": [],
+      "filenames": [
+        "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/cache-v2/debug/build/holonics-cuda-c82bf91515d93d4b/build-script-build"
+      ],
+      "executable": null,
+      "fresh": false
+    },
+    {
+      "reason": "compiler-artifact",
+      "package_id": "path+file:///home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda#0.1.0",
+      "manifest_path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/Cargo.toml",
+      "target": {
+        "kind": [
+          "lib"
+        ],
+        "crate_types": [
+          "lib"
+        ],
+        "name": "holonics_cuda",
+        "src_path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/lib.rs",
+        "edition": "2024",
+        "doc": true,
+        "doctest": true,
+        "test": true
+      },
+      "profile": {
+        "opt_level": "0",
+        "debuginfo": 0,
+        "debug_assertions": true,
+        "overflow_checks": true,
+        "test": false
+      },
+      "features": [],
+      "filenames": [
+        "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/cache-v2/debug/deps/libholonics_cuda-fe78e545d18196b4.rlib",
+        "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/cache-v2/debug/deps/libholonics_cuda-fe78e545d18196b4.rmeta"
+      ],
+      "executable": null,
+      "fresh": false
+    },
+    {
+      "reason": "compiler-artifact",
+      "package_id": "path+file:///home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics#0.1.0",
+      "manifest_path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/Cargo.toml",
+      "target": {
+        "kind": [
+          "lib"
+        ],
+        "crate_types": [
+          "lib"
+        ],
+        "name": "holonics",
+        "src_path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/lib.rs",
+        "edition": "2024",
+        "doc": true,
+        "doctest": true,
+        "test": true
+      },
+      "profile": {
+        "opt_level": "0",
+        "debuginfo": 0,
+        "debug_assertions": true,
+        "overflow_checks": true,
+        "test": false
+      },
+      "features": [],
+      "filenames": [
+        "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/cache-v2/debug/deps/libholonics-02407331bdf682dc.rlib",
+        "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/cache-v2/debug/deps/libholonics-02407331bdf682dc.rmeta"
+      ],
+      "executable": null,
+      "fresh": false
+    },
+    {
+      "reason": "compiler-artifact",
+      "package_id": "path+file:///home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda#0.1.0",
+      "manifest_path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/Cargo.toml",
+      "target": {
+        "kind": [
+          "bin"
+        ],
+        "crate_types": [
+          "bin"
+        ],
+        "name": "mount-smoke",
+        "src_path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/bin/mount-smoke.rs",
+        "edition": "2024",
+        "doc": true,
+        "doctest": false,
+        "test": true
+      },
+      "profile": {
+        "opt_level": "0",
+        "debuginfo": 0,
+        "debug_assertions": true,
+        "overflow_checks": true,
+        "test": false
+      },
+      "features": [],
+      "filenames": [
+        "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/cache-v2/debug/mount-smoke"
+      ],
+      "executable": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/cache-v2/debug/mount-smoke",
+      "fresh": false,
+      "executable_pin": {
+        "bytes": 10074008,
+        "sha256": "20e591eaa331212fa56936e923dd74df844e0cc2a6da7f714e49eb1361c8131a"
+      }
+    },
+    {
+      "reason": "compiler-artifact",
+      "package_id": "path+file:///home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda#0.1.0",
+      "manifest_path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/Cargo.toml",
+      "target": {
+        "kind": [
+          "test"
+        ],
+        "crate_types": [
+          "bin"
+        ],
+        "name": "located_ingest",
+        "src_path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/tests/located_ingest.rs",
+        "edition": "2024",
+        "doc": false,
+        "doctest": false,
+        "test": true
+      },
+      "profile": {
+        "opt_level": "0",
+        "debuginfo": 0,
+        "debug_assertions": true,
+        "overflow_checks": true,
+        "test": true
+      },
+      "features": [],
+      "filenames": [
+        "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/cache-v2/debug/deps/located_ingest-2b2d6cef9fd78c5f"
+      ],
+      "executable": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/cache-v2/debug/deps/located_ingest-2b2d6cef9fd78c5f",
+      "fresh": false,
+      "executable_pin": {
+        "bytes": 16015912,
+        "sha256": "4ac47d79e326ee76f26deddcbbf962a47b4bf5d48bdabaa2e989bc9a8dfc74de"
+      }
+    },
+    {
+      "reason": "compiler-artifact",
+      "package_id": "path+file:///home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics#0.1.0",
+      "manifest_path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/Cargo.toml",
+      "target": {
+        "kind": [
+          "test"
+        ],
+        "crate_types": [
+          "bin"
+        ],
+        "name": "resident_cold_restore",
+        "src_path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/tests/resident_cold_restore.rs",
+        "edition": "2024",
+        "doc": false,
+        "doctest": false,
+        "test": true
+      },
+      "profile": {
+        "opt_level": "0",
+        "debuginfo": 0,
+        "debug_assertions": true,
+        "overflow_checks": true,
+        "test": true
+      },
+      "features": [],
+      "filenames": [
+        "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/cache-v2/debug/deps/resident_cold_restore-d85475b8f5abeb14"
+      ],
+      "executable": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/cache-v2/debug/deps/resident_cold_restore-d85475b8f5abeb14",
+      "fresh": false,
+      "executable_pin": {
+        "bytes": 28445752,
+        "sha256": "a08f6a518cd2fea87a09ae11e71566bc0ae3d372189b573261fdf7e5fc58c05d"
+      }
+    },
+    {
+      "reason": "compiler-artifact",
+      "package_id": "path+file:///home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics#0.1.0",
+      "manifest_path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/Cargo.toml",
+      "target": {
+        "kind": [
+          "test"
+        ],
+        "crate_types": [
+          "bin"
+        ],
+        "name": "source_entrance",
+        "src_path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/tests/source_entrance.rs",
+        "edition": "2024",
+        "doc": false,
+        "doctest": false,
+        "test": true
+      },
+      "profile": {
+        "opt_level": "0",
+        "debuginfo": 0,
+        "debug_assertions": true,
+        "overflow_checks": true,
+        "test": true
+      },
+      "features": [],
+      "filenames": [
+        "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/cache-v2/debug/deps/source_entrance-3dfaf698dddeb1a6"
+      ],
+      "executable": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/cache-v2/debug/deps/source_entrance-3dfaf698dddeb1a6",
+      "fresh": false,
+      "executable_pin": {
+        "bytes": 21110984,
+        "sha256": "dc2f8140b9e23cf39bccfd2da6d3bb5f027d6666df1ae617a423cd071303b9a7"
+      }
+    },
+    {
+      "reason": "compiler-artifact",
+      "package_id": "path+file:///home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics#0.1.0",
+      "manifest_path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/Cargo.toml",
+      "target": {
+        "kind": [
+          "example"
+        ],
+        "crate_types": [
+          "bin"
+        ],
+        "name": "hnn_prediction",
+        "src_path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/../../research/notebook/hnn_design/hnn_prediction.rs",
+        "edition": "2024",
+        "doc": false,
+        "doctest": false,
+        "test": false
+      },
+      "profile": {
+        "opt_level": "0",
+        "debuginfo": 0,
+        "debug_assertions": true,
+        "overflow_checks": true,
+        "test": true
+      },
+      "features": [],
+      "filenames": [
+        "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/cache-v2/debug/examples/hnn_prediction-8cd4a578e626a457"
+      ],
+      "executable": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/cache-v2/debug/examples/hnn_prediction-8cd4a578e626a457",
+      "fresh": false,
+      "executable_pin": {
+        "bytes": 6130728,
+        "sha256": "fb3cf30b07f27619ef2b8a481a3361010a7c5581531549a07595d9977e201a3e"
+      }
+    },
+    {
+      "reason": "compiler-artifact",
+      "package_id": "path+file:///home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics#0.1.0",
+      "manifest_path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/Cargo.toml",
+      "target": {
+        "kind": [
+          "test"
+        ],
+        "crate_types": [
+          "bin"
+        ],
+        "name": "ranged_capacity",
+        "src_path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/tests/ranged_capacity.rs",
+        "edition": "2024",
+        "doc": false,
+        "doctest": false,
+        "test": true
+      },
+      "profile": {
+        "opt_level": "0",
+        "debuginfo": 0,
+        "debug_assertions": true,
+        "overflow_checks": true,
+        "test": true
+      },
+      "features": [],
+      "filenames": [
+        "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/cache-v2/debug/deps/ranged_capacity-bd29e6ac6f6167da"
+      ],
+      "executable": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/cache-v2/debug/deps/ranged_capacity-bd29e6ac6f6167da",
+      "fresh": false,
+      "executable_pin": {
+        "bytes": 23210392,
+        "sha256": "875f958ece66a3988b2cf307084e14f2f7488725e8a143cca51f1246b618ad11"
+      }
+    },
+    {
+      "reason": "compiler-artifact",
+      "package_id": "path+file:///home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda#0.1.0",
+      "manifest_path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/Cargo.toml",
+      "target": {
+        "kind": [
+          "lib"
+        ],
+        "crate_types": [
+          "lib"
+        ],
+        "name": "holonics_cuda",
+        "src_path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/lib.rs",
+        "edition": "2024",
+        "doc": true,
+        "doctest": true,
+        "test": true
+      },
+      "profile": {
+        "opt_level": "0",
+        "debuginfo": 0,
+        "debug_assertions": true,
+        "overflow_checks": true,
+        "test": true
+      },
+      "features": [],
+      "filenames": [
+        "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/cache-v2/debug/deps/holonics_cuda-3a3d38defac6a12c"
+      ],
+      "executable": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/cache-v2/debug/deps/holonics_cuda-3a3d38defac6a12c",
+      "fresh": false,
+      "executable_pin": {
+        "bytes": 41213872,
+        "sha256": "c8ece4621999af16267951bfb69226bbf407728ec4a715f905db19f5a220aff1"
+      }
+    },
+    {
+      "reason": "compiler-artifact",
+      "package_id": "path+file:///home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics#0.1.0",
+      "manifest_path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/Cargo.toml",
+      "target": {
+        "kind": [
+          "lib"
+        ],
+        "crate_types": [
+          "lib"
+        ],
+        "name": "holonics",
+        "src_path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/lib.rs",
+        "edition": "2024",
+        "doc": true,
+        "doctest": true,
+        "test": true
+      },
+      "profile": {
+        "opt_level": "0",
+        "debuginfo": 0,
+        "debug_assertions": true,
+        "overflow_checks": true,
+        "test": true
+      },
+      "features": [],
+      "filenames": [
+        "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/cache-v2/debug/deps/holonics-70b68d2f7e1f6408"
+      ],
+      "executable": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/cache-v2/debug/deps/holonics-70b68d2f7e1f6408",
+      "fresh": false,
+      "executable_pin": {
+        "bytes": 64806768,
+        "sha256": "4dabd4f50f2f49c83691dbeb1b024745cdf5b8c2fe86fb8cda1fd51880c3b439"
+      }
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+
+running 11 tests
+test hnn::tests::prediction::physical_repair::a_point_leader_does_not_replace_a_plural_coupled_domain ... ok
+test hnn::tests::prediction::physical_repair::a_station_no_declared_crossing_reads_is_held_unread ... ok
+test hnn::tests::prediction::physical_repair::equal_class_counts_do_not_join_different_producing_charts ... ok
+test hnn::tests::prediction::physical_repair::identity_conduct_must_certify_the_station_clock_even_at_erased_stations ... ok
+test hnn::tests::prediction::physical_repair::physical_teaching_changes_r_and_the_later_carried_receiving_read ... physical teaching: certified receiving publication at commit 2; blind output [Intact(0), Intact(3), Held { fibre: [0, 1, 2, 3], unresolved: PluralDomain }, Intact(0), Intact(2), Held { fibre: [0, 1, 2, 3], unresolved: PluralDomain }, Intact(3), Held { fibre: [0, 1, 2, 3], unresolved: PluralDomain }]; subsequent carried output [Intact(0), Intact(3), Held { fibre: [0, 1, 2, 3], unresolved: PluralDomain }, Intact(0), Intact(2), Held { fibre: [0, 1, 2, 3], unresolved: PluralDomain }, Intact(3), Held { fibre: [0, 1, 2, 3], unresolved: PluralDomain }]
+ok
+test hnn::tests::prediction::physical_repair::physical_teaching_refuses_a_stale_material_or_foreign_chart_and_preserves_the_carry ... ok
+test hnn::tests::prediction::physical_repair::the_damaged_section_runs_through_the_field_and_every_erasure_is_held_unresolved ... ok
+test hnn::tests::prediction::physical_repair::the_producing_decoder_and_both_physical_maps_are_joined_before_opening ... ok
+test hnn::tests::prediction::physical_repair::the_section_carries_no_erased_class_so_the_repair_cannot_read_one ... ok
+test hnn::tests::prediction::physical_repair::the_supported_physical_passage_continues_on_its_retained_interior_and_clock ... ok
+test hnn::tests::prediction::physical_repair::total_erasure_preserves_the_producing_chart_and_refuses_located_conduct_before_opening ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 1022 filtered out; finished in 7.57s
+

@@ -1,0 +1,46 @@
+{
+  "status": "received immutable v8 request into fair queue; native admission review and archive/cache preparation pending",
+  "request": {
+    "path": "/home/b/Workspaces/holonics/.local/wt/material-learning/.local/material-learning-followup-01a1030c-20261006/COHERENT_FOLLOWUP_CANDIDATE.v8.json",
+    "bytes": 29407,
+    "sha256": "6d63ea589b31a3d17e86a49ca88984c3ccf697d0ba544d037c91b9b1fcad452f"
+  },
+  "source_commit": "518e1e3f4f5d6ad6dab57a7dc08b3098eab354f4",
+  "normalization_record_commit": "67939004",
+  "native_input_file_count": 285,
+  "live_native_inputs_match_manifest": true,
+  "source_input_manifest": {
+    "path": "/home/b/Workspaces/holonics/.local/wt/material-learning/.local/material-learning-followup-01a1030c-20261006/SOURCE_INPUT_MANIFEST.v8.json",
+    "bytes": 46976,
+    "sha256": "5eb854a11abec190bed48ceef217e95b3c352cfccc19a3defb72058b12769464"
+  },
+  "scope": "Fresh combined link and24 exact declared mechanical controls; no new Lean/GPU/scientific run",
+  "prior_a730_acceptance_independent": true,
+  "prior_logits_cue_varied_despite_shared_leader": true,
+  "source_insensitivity_or_last_label_dominance_established": false,
+  "existing_limits": {
+    "compile": {
+      "projection_ns": 65000000000,
+      "aggregate_cpu_limit_us": 128000000,
+      "aggregate_cpu_stop_margin_us": 4000000,
+      "group_memory_max_bytes": 4294967296,
+      "address_space_max_bytes": 4294967296,
+      "minimum_MemAvailable_KiB": 8388608,
+      "system_floor_MemAvailable_KiB": 4194304,
+      "thread_budget": 8
+    },
+    "runtime": {
+      "same_previous_scope_caps": true,
+      "projection_ns": 16000000000,
+      "aggregate_cpu_limit_us": 17000000,
+      "group_memory_max_bytes": 4294967296,
+      "threads": 1,
+      "minimum_MemAvailable_KiB": 8388608,
+      "system_floor_MemAvailable_KiB": 4194304,
+      "projection_and_cache_preflight_must_be_sealed_by_queue_before_any_launch": true,
+      "no_limit_raise_on_failure": true,
+      "no_new_limits": true
+    }
+  },
+  "fair_routing": "Received between six-owner completion and downstream Hodge checks; separate queue entry, no source substitution or duplicate native launch."
+}

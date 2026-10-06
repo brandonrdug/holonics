@@ -1,0 +1,114 @@
+{
+  "exit": 0,
+  "wall_ns": 18960186,
+  "CPU_count": 1,
+  "CPU_affinity": [
+    0
+  ],
+  "CPU_user_us": 10457,
+  "CPU_system_us": 5708,
+  "CPU_reading_grain_ns": 1000,
+  "timing_source": "monotonic_ns wall; glibc wait4 integer timeval CPU",
+  "peak_child_RSS_KiB": 22412,
+  "cap_ns": 16000000000,
+  "projection_ns": 16000000000,
+  "projection_kill_triggered": false,
+  "system_floor_breached": false,
+  "system_floor_sampling_period_ns": 10000000,
+  "group_memory_max_bytes": 4294967296,
+  "group_memory_peak_bytes": 16531456,
+  "group_memory_current_bytes": 14565376,
+  "memory_events_after": {
+    "low": 0,
+    "high": 0,
+    "max": 0,
+    "oom": 0,
+    "oom_kill": 0,
+    "oom_group_kill": 0,
+    "sock_throttled": 0
+  },
+  "memory_events_delta": {
+    "low": 0,
+    "high": 0,
+    "max": 0,
+    "oom": 0,
+    "oom_kill": 0,
+    "oom_group_kill": 0,
+    "sock_throttled": 0
+  },
+  "stdout": {
+    "sha256": "c85bd5d5e30b68b22782d47d8594e5d112cad2ff4abbdfc5ddcf881b4c7e8af6",
+    "bytes": 240
+  },
+  "stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "outputs": {},
+  "all_outputs_present": true,
+  "inputs_unchanged": true,
+  "within_projection": true,
+  "sealed_before_audit": true,
+  "aggregate_cpu_limit_us": 17000000,
+  "aggregate_cpu_used_us": 164844,
+  "aggregate_cpu_guard_triggered": false,
+  "aggregate_cpu_samples": [
+    {
+      "since_start_ns": 4634646,
+      "usage_usec": 107045
+    },
+    {
+      "since_start_ns": 5789190,
+      "usage_usec": 108468
+    },
+    {
+      "since_start_ns": 6885175,
+      "usage_usec": 109566
+    },
+    {
+      "since_start_ns": 7974677,
+      "usage_usec": 110645
+    },
+    {
+      "since_start_ns": 9080128,
+      "usage_usec": 111746
+    },
+    {
+      "since_start_ns": 10177776,
+      "usage_usec": 112841
+    },
+    {
+      "since_start_ns": 11269933,
+      "usage_usec": 113925
+    },
+    {
+      "since_start_ns": 12353634,
+      "usage_usec": 115003
+    },
+    {
+      "since_start_ns": 13446082,
+      "usage_usec": 116075
+    },
+    {
+      "since_start_ns": 14537357,
+      "usage_usec": 117155
+    },
+    {
+      "since_start_ns": 15627981,
+      "usage_usec": 118241
+    },
+    {
+      "since_start_ns": 16745636,
+      "usage_usec": 119351
+    },
+    {
+      "since_start_ns": 17840398,
+      "usage_usec": 120439
+    }
+  ],
+  "aggregate_cpu_scope": "whole dedicated cgroup, including controller and already-reaped descendants",
+  "CPU_kernel_hard_total_limit": false,
+  "aggregate_cpu_stop_margin_us": 1000000,
+  "aggregate_cpu_stop_us": 16000000,
+  "acceptance_provisional_until_external_final_CPU_read": true
+}

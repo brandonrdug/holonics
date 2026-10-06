@@ -1,0 +1,23 @@
+{
+  "passed": true,
+  "source_commit": "518e1e3f4f5d6ad6dab57a7dc08b3098eab354f4",
+  "all_native_source_inputs_match_build_seal": true,
+  "all_local_artifacts_fresh_false": true,
+  "new_holonics_executable_pin": {
+    "bytes": 64806768,
+    "sha256": "4dabd4f50f2f49c83691dbeb1b024745cdf5b8c2fe86fb8cda1fd51880c3b439"
+  },
+  "prior_a730d824_holonics_executable_pin": {
+    "bytes": 64604696,
+    "sha256": "d69aba0fbab9411f2b02aef65636a278a2e189afe916a79c9adadd599f95ef97"
+  },
+  "new_holonics_executable_differs": true,
+  "compiled_artifacts": {
+    "bytes": 16525,
+    "sha256": "d3ddbf2adab575fadd3d851babb85aaba7148b5900f51aa886a6b5fe7da3b05d"
+  },
+  "build_input_seal": {
+    "bytes": 343530,
+    "sha256": "d8708bffa90dc239d14e9b69146e730bd0a833cb372c6b7a4707e09fc04e7e35"
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "lease_still_held": true,
+  "own_group_other_PIDs": [],
+  "outcome": {
+    "provisional_passed": true,
+    "final_acceptance_requires_external_CPU_read": true,
+    "label": "hnn-intact-pair-518e1e3f-control-group12-20261006-v1",
+    "wall_ns": 271669428,
+    "peak_child_RSS_KiB": 32028,
+    "group_memory_peak_bytes": 22368256,
+    "original_coordinates_modified": false,
+    "aggregate_cpu_final_us": 415905,
+    "aggregate_cpu_limit_us": 17000000,
+    "CPU_kernel_hard_total_limit": false
+  },
+  "outputs": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-control-group12-20261006-v1.lease-identity.json": {
+      "sha256": "5767c6aef5a8ef8b26c63c37d61d222a4dc2bdac5cbd6f648e1c52ef61d9b06e",
+      "bytes": 565
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-control-group12-20261006-v1.memory-gate.json": {
+      "sha256": "137449ae44c8b0c5f9d31686d680935c03796ff4e82558e28bf20e62ca8fce7c",
+      "bytes": 120
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-control-group12-20261006-v1.child-identity.json": {
+      "sha256": "a108ebc1cc0cbead345edaea843b963ce6b090c4f596f9e72ee42407e6f2a317",
+      "bytes": 78
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-control-group12-20261006-v1.system-floor.json": {
+      "sha256": "e115ae3e42f031853236d7b5a4fdde22713266f1d2238efcc376d6c418e14bd7",
+      "bytes": 2181
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-control-group12-20261006-v1.quiescence.json": {
+      "sha256": "8290036079d86eb80c6dba90283ddc4edf7024f5ad7e182b49d984164704fe78",
+      "bytes": 130
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-control-group12-20261006-v1.input_seal.json": {
+      "sha256": "79691e0c6e225f0e91d6cbb234f2af455c58c9f3c61409c8a52f5d8a0fcb152a",
+      "bytes": 83673
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-control-group12-20261006-v1.output_seal.json": {
+      "sha256": "764c19bb32f44e3685dab770bca214ea9b330edc4aebd4b0d7f8fac042ddf141",
+      "bytes": 19451
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-control-group12-20261006-v1.stdout": {
+      "sha256": "1e82c80ea994f5a2ab310ec7d0f6a535976e9bad61a2c648fb31ffa6d0f6b713",
+      "bytes": 4061
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-control-group12-20261006-v1.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  }
+}

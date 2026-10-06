@@ -2,7 +2,7 @@
 
 October 6, 2026. Refs #73, #148, #63, #62.
 
-[definition; implemented consumer; type/native pending] The accepted a730d824 result is
+[definition; implemented consumer; native-checked on 518e1e3f] The accepted a730d824 result is
 [source-sensitive but constant-class on its three probes](2026-10-06_DISTINCT_OBSERVATIONS_TEST_THE_RETAINED_RECEIVING_MATERIAL_WITHOUT_A_TARGET_IN_THE_PROBE.md).
 Its R rows are distinct and exact logits vary with the cue; the latest label, entered interior
 and shared probe tail remain confounded. That result does not justify a cue-specific feature,
@@ -97,7 +97,7 @@ source contraction does not justify declaring every downstream readout degree tw
 
 ## Joint completion enclosure
 
-[source-derived interval law; native pending] The sparse point and the full completion family
+[source-derived interval law; native-checked on 518e1e3f] The sparse point and the full completion family
 are distinct operands, as in the accepted first-marginal domain. For N stations and delta<N,
 every full completion has pair population N-delta. Its leaky denominator in integer lattice
 units is
@@ -186,3 +186,32 @@ factor covectors, but physical observation still drops factor updates. Pair-fact
 owes actual factor Reach, joint gain/carry certification and the reached Word Hessian where
 quartic curvature is present. This change does not claim that obligation, useful repair,
 unseen-family accuracy, a complete capacity theorem or any product gate is closed.
+
+## Independent native acceptance on the fixed source
+
+[native-checked; bounded mechanical evidence] The shared queue accepted source `518e1e3f`
+without changing its source, fixtures, selectors or resource caps. The
+[acceptance join](receipts/station-pair-source-20261006/accepted-518e1e3f/ACCEPTANCE_JOIN.v1.json)
+rehashes all 1,753 original artifacts (1,076,309,403 bytes), binds 285 native inputs through
+fresh compilation and all fourteen runtime groups, and independently confirms all twenty-four
+unique controls passed once. Eleven local Cargo targets were fresh. The host executable is
+64,806,768 bytes, SHA256 `4dabd4f50f2f49c83691dbeb1b024745cdf5b8c2fe86fb8cda1fd51880c3b439`.
+Compilation used 20,482,106,926 wall ns, 56,301,527,000 aggregate CPU ns and a peak group
+3,245,129,728 bytes against its fixed 65 wall s /128 CPU s /4GiB admission. Every runtime group
+met its unchanged sixteen-wall-second/seventeen-CPU-second/4GiB bounds; cleanup and lease
+release passed. No GPU runtime, Lean recompilation or scientific job is part of this acceptance.
+
+The [whole readout](receipts/station-pair-source-20261006/accepted-518e1e3f/BEHAVIOR_READOUT.v1.json)
+preserves the exact source/material/carry controls. On the same `[Some(0), None, Some(3), Some(0)]`
+source and C3 opening, material checkpoints R0/R1/R2/R3 respectively hold all four gap classes,
+release class 2, hold classes 1 and 2, then release class 3. Final R on rest and C2 releases class
+3; C1 holds classes 1 and 3. Absent source at rest holds every class; absent source under C3
+also holds every class despite point leaders 3 then 2. The earlier three target-free probes
+still all release class 3. These results locate effects of material and entering motion, and
+preserve the causal limitations above. They do not demonstrate useful reconstruction.
+
+The admitted identity source family/clock now has an executed pair passage and a certified
+mixed-completion box for the declared bounded section. Pair outputs opened at zero remain
+zero until a declared observed comparison is consumed by their deposition law. Learning those
+outputs, their full read factors, and a source step through a reached quartic are separate
+consumer/certificate obligations; this acceptance does not transfer to changed source.

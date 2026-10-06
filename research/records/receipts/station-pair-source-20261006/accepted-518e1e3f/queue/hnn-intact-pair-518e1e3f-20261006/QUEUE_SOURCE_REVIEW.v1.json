@@ -1,0 +1,34 @@
+{
+  "source_commit": "518e1e3f4f5d6ad6dab57a7dc08b3098eab354f4",
+  "request_pin": {
+    "sha256": "6d63ea589b31a3d17e86a49ca88984c3ccf697d0ba544d037c91b9b1fcad452f",
+    "bytes": 29407
+  },
+  "source_snapshot_pin": {
+    "sha256": "89059256cc22664809a590912736b17f710f7de35c17f56e741597af3f046acf",
+    "bytes": 47687
+  },
+  "owned_native_delta_paths": [
+    "crates/holonics/src/hnn/moment.rs",
+    "crates/holonics/src/hnn/prediction.rs",
+    "crates/holonics/src/hnn/tests/prediction.rs"
+  ],
+  "physical_tests": 22,
+  "unique_declared_selectors": 24,
+  "runtime_groups": 14,
+  "fresh_station_source_consumer": "physical_forward -> SourceMoment.station_section -> declared offset counts -> existing PairPort/open_storage -> same native Word",
+  "completion_consumer": "station_pair_bounds -> signed rank-summed transported interval -> physical opening radius -> existing joint tube",
+  "observed_admission_guards": [
+    "class-independent unit station clock",
+    "same fresh immutable opening",
+    "declared offsets/classes",
+    "both physical pair-port operand/output chart dimensions before Word"
+  ],
+  "declared_holes_never_read_as_classes": true,
+  "task_answer_routine_added": false,
+  "pair_coefficient_learning_claim": false,
+  "fixed_causal_controls_do_not_grade_desired_class_or_accuracy": true,
+  "scientific_run_or_training_sweep": false,
+  "source_review_only_native_pending": true,
+  "parent_explicitly_authorized_continuation": true
+}

@@ -1,0 +1,41 @@
+{
+  "passed": true,
+  "label": "hnn-intact-pair-518e1e3f-control-group3-20261006-v1",
+  "source_commit": "518e1e3f4f5d6ad6dab57a7dc08b3098eab354f4",
+  "expected_tests": 11,
+  "actual_test_names": [
+    "hnn::tests::prediction::physical_repair::a_point_leader_does_not_replace_a_plural_coupled_domain",
+    "hnn::tests::prediction::physical_repair::a_station_no_declared_crossing_reads_is_held_unread",
+    "hnn::tests::prediction::physical_repair::equal_class_counts_do_not_join_different_producing_charts",
+    "hnn::tests::prediction::physical_repair::identity_conduct_must_certify_the_station_clock_even_at_erased_stations",
+    "hnn::tests::prediction::physical_repair::physical_teaching_changes_r_and_the_later_carried_receiving_read",
+    "hnn::tests::prediction::physical_repair::physical_teaching_refuses_a_stale_material_or_foreign_chart_and_preserves_the_carry",
+    "hnn::tests::prediction::physical_repair::the_damaged_section_runs_through_the_field_and_every_erasure_is_held_unresolved",
+    "hnn::tests::prediction::physical_repair::the_producing_decoder_and_both_physical_maps_are_joined_before_opening",
+    "hnn::tests::prediction::physical_repair::the_section_carries_no_erased_class_so_the_repair_cannot_read_one",
+    "hnn::tests::prediction::physical_repair::the_supported_physical_passage_continues_on_its_retained_interior_and_clock",
+    "hnn::tests::prediction::physical_repair::total_erasure_preserves_the_producing_chart_and_refuses_located_conduct_before_opening"
+  ],
+  "test_count_and_source_binding_verified": true,
+  "quiescent": true,
+  "issues": [],
+  "measurement": {
+    "wall_ns": 7813678783,
+    "fixed_deadline_ns": 16000000000,
+    "measured_to_fixed_deadline": {
+      "numerator": 7813678783,
+      "denominator": 16000000000
+    },
+    "aggregate_CPU_ns": 7714897000,
+    "aggregate_CPU_limit_us": 17000000,
+    "group_peak_bytes": 18436096,
+    "peak_child_RSS_KiB": 27588,
+    "first_matching_development_read_counted_once": true,
+    "subsequent_same_shape_projection_unit_upper_ns": 7813678783
+  },
+  "raw_stdout": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-control-group3-20261006-v1.stdout",
+  "raw_stderr": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-control-group3-20261006-v1.stderr",
+  "unchanged_predecessor_acceptances_remain_independent": true,
+  "scientific_job": false,
+  "GPU_runtime": false
+}

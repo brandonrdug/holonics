@@ -1,0 +1,1554 @@
+{
+  "label": "hnn-intact-pair-518e1e3f-control-group9-20261006-v1",
+  "scope_unit": "holonics-prune-admission-hnn-intact-pair-518e1e3f-control-group9-20261006-v1",
+  "stage_kind": "runtime",
+  "scientific_job": false,
+  "cwd": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1",
+  "scope": "Exact 518e1e3f source-bound control group 9; bounded development read counted once; no scientific run.",
+  "projection_ns": 16000000000,
+  "aggregate_cpu_limit_us": 17000000,
+  "aggregate_cpu_stop_margin_us": 1000000,
+  "group_memory_max_bytes": 4294967296,
+  "address_space_max_bytes": 4294967296,
+  "minimum_MemAvailable_KiB": 8388608,
+  "system_floor_MemAvailable_KiB": 4194304,
+  "thread_budget": 1,
+  "inputs": [
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/cache-v2/debug/deps/holonics-70b68d2f7e1f6408",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/SOURCE_SNAPSHOT.v1.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/COMPILED_ARTIFACTS.v1.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/COMPILE_SOURCE_BINDING.v1.json",
+    "/home/b/Workspaces/holonics/.local/wt/material-learning/.local/material-learning-followup-01a1030c-20261006/COHERENT_FOLLOWUP_CANDIDATE.v8.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-host-cuda-link-20261006-v1.config.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-host-cuda-link-20261006-v1.acceptance.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-host-cuda-link-20261006-v1.release.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-host-cuda-link-20261006-v1.input_seal.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/final_stage.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/leased_stage_v2.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/bounded_stage_v1.py",
+    "/usr/bin/env",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/Cargo.lock",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/Cargo.toml",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/accelerators/cuda-smoke/mount_smoke_kernel.ptx",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/Cargo.toml",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/build.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/kernels/exact_integer.cuh",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/kernels/hnn.cu",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/kernels/hnn_word.cuh",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/kernels/tree.cu",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/bin/mount-smoke.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/cuda.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/ffi.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/hnn/card.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/hnn/carry.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/hnn/dyadic.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/hnn/execute.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/hnn/lattice.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/hnn/mod.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/hnn/moment.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/hnn/physics_tests.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/hnn/port.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/hnn/port_tests.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/hnn/publication.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/hnn/readout.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/hnn/store.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/hnn/tests.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/hnn/tree.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/hnn/word.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/hnn/word_tests.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/lib.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/tests/located_ingest.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/Cargo.toml",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/aeon/epoch.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/aeon/first_law.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/aeon/groupoid.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/aeon/hodge.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/aeon/join.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/aeon/lock.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/aeon/mod.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/aeon/production.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/aeon/reading.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/cost.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/cost/tests.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/keys.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/keys/edges.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/keys/local.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/keys/local/tests.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/keys/repair.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/keys/repair/tests.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/keys/tests.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/keys/transport.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/keys/transport/tests.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/keys/turns.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/landmark.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/landmark/context.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/landmark/context/baseline.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/landmark/context/sections.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/landmark/context/tests.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/landmark/context/tests/full.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/landmark/mobius.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/landmark/quadratic.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/landmark/site.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/mod.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/resonance.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/exterior_guards.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/geometry/complex.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/geometry/exact.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/geometry/mod.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/geometry/motion.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/geometry/screw.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/geometry/swing.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/geometry/winding.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/geometry/winding/tests.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/chart.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/constitution.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/contact.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/encoding.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/executed.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/field.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/keys.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/mod.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/moment.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/pending.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/port.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/prediction.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/propagation.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/ratio.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/realization.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/receiving.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/reference.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/reference/continuation.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/reference/passage.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/retention.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/ring.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/state_text.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/chart.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/constitution.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/contact_residual.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/encoding.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/executed.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/field.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/floquet.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/guards.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/keys.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/learning.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/loaded_scalar.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/mod.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/moment.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/pending.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/physics.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/port.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/prediction.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/prior_carry.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/propagation.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/ratio.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/rebase_boundary.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/receiving.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/reference.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/resonator_deposit.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/retention.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/support.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/word.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/word.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/word/continuation.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holarchy/gluing.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holarchy/mod.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holarchy/terrain/chase.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holarchy/terrain/chase_tests.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holarchy/terrain/crib.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holarchy/terrain/known.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holarchy/terrain/mod.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holarchy/terrain/moire.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holarchy/terrain/pursuit.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holarchy/terrain/sensing.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holarchy/terrain/sensing_tests.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holarchy/terrain/source.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holarchy/terrain/switching.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holarchy/terrain/tests.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holarchy/tests.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holarchy/view.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holon/conformance.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holon/contact.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holon/contact/menu.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holon/deposition.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holon/dirac.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holon/element.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holon/law.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holon/mod.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holon/parametron.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holon/parametron/loaded.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holon/parametron/mounted.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holon/port.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holon/restriction.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holon/restriction/descent.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holon/restriction/fibre.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holon/restriction/linear.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holon/restriction/tower.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holon/restriction/tower/tests.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holon/restriction/tube.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/lib.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/navigator/address.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/navigator/mod.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/navigator/trace.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/fluid.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/fluid/body.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/fluid/cells.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/fluid/complex.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/fluid/control_volume.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/fluid/singularity.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/information.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/information/apply.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/information/rate.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/information/tests.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/mod.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/spacetime.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/spacetime/clocks.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/spacetime/einstein.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/spacetime/lorentz.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/spacetime/source.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/spacetime/tests.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/thermal.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/thermal/axes.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/thermal/exchange.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/thermal/neck.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/thermal/port.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/thermal/tests.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/wave.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/wave/chain.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/wave/continuation.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/wave/interference.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/wave/tests.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/algebraic.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/disk.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/exponentiated.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/exponentiated/carried.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/gaussian.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/linear.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/linear/inertia.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/linear/prime_image.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/linear/prime_image/tests.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/linear/vector.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/log_ratio.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/mod.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/polynomial.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/polynomial/root_separation.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/polynomial/tests.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/presentation.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/primality.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/ring.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/ring/section.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/ring/section/tests.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/surprisal.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/work.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/face.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/mod.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/population.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/population/birth.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/population/birth_tests.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/population/chase.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/population/chaser.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/population/chaser_tests.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/population/composition.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/population/composition_tests.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/population/dormancy.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/population/dormancy_tests.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/population/evolution.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/population/evolution_tests.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/population/families.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/population/merge.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/population/merge_tests.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/population/port.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/population/port_tests.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/population/species.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/population/tests.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/receipt.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/reception.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/reception/continuation.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/reception/continuation/tests.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/release.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/release/tests.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/tests/ranged_capacity.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/tests/resident_cold_restore.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/tests/source_entrance.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/README.md",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/anchor_memory.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/athena_file_checkpoint.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/athena_file_checkpoint_tests.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/athena_file_protocol.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/athena_file_protocol_tests.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/athena_protocol.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/athena_protocol_tests.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/bank_causes_probe/eF_confirmation_counts.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/bank_causes_probe/eM_section_shapes.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/base_measure.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/context_orders.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/curated_incidence.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/curated_source.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/development_families.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/exterior.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/f5_context.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/f5_context_tests.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/family_passage.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/field_ceiling.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/hnn_chase.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/hnn_executed_loop.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/hnn_exposure.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/hnn_keys_loop.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/hnn_prediction.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/hnn_repair_loop.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/hnn_text_repair.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/hnn_transport_loop.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/latch_letters.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/leaf_counts.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/receiver_combined.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/receiver_fisher_exact.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/receiver_nonlinear.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/receiver_online_sim.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/receiver_oracle.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/receiver_prior_scale.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/regime_letters.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/segment_terms.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/sheet_letters.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/standing_cut.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/tree_base.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/tree_estimator.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/lean/Holonics/HNN/ReframedMoment.lean"
+  ],
+  "input_directories": [],
+  "expected_inputs": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/cache-v2/debug/deps/holonics-70b68d2f7e1f6408": {
+      "bytes": 64806768,
+      "sha256": "4dabd4f50f2f49c83691dbeb1b024745cdf5b8c2fe86fb8cda1fd51880c3b439"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/SOURCE_SNAPSHOT.v1.json": {
+      "bytes": 47687,
+      "sha256": "89059256cc22664809a590912736b17f710f7de35c17f56e741597af3f046acf"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/COMPILED_ARTIFACTS.v1.json": {
+      "bytes": 16525,
+      "sha256": "d3ddbf2adab575fadd3d851babb85aaba7148b5900f51aa886a6b5fe7da3b05d"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/COMPILE_SOURCE_BINDING.v1.json": {
+      "bytes": 785,
+      "sha256": "c56de38fd535488687477bfb4fff12bcaa770fbd9f0c89f54b5500458626eeb5"
+    },
+    "/home/b/Workspaces/holonics/.local/wt/material-learning/.local/material-learning-followup-01a1030c-20261006/COHERENT_FOLLOWUP_CANDIDATE.v8.json": {
+      "bytes": 29407,
+      "sha256": "6d63ea589b31a3d17e86a49ca88984c3ccf697d0ba544d037c91b9b1fcad452f"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-host-cuda-link-20261006-v1.config.json": {
+      "bytes": 528561,
+      "sha256": "9db00b297f122b8d3e9e67dc10bafc69087cda26d8bc58457f6ee05a888b6571"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-host-cuda-link-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "306da217cb85d984fab547be219eefb5e449987a132f66f59308ffa2c9240cbb"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-host-cuda-link-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "a5c25199a54b9309814fb1047be0c1cb2342f5414ac21adf838dbc69d7170975"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-host-cuda-link-20261006-v1.input_seal.json": {
+      "bytes": 343530,
+      "sha256": "d8708bffa90dc239d14e9b69146e730bd0a833cb372c6b7a4707e09fc04e7e35"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/final_stage.py": {
+      "bytes": 10968,
+      "sha256": "a0a5a94f157acf9a5127b756a036c6e86449dc2012af0f1e71d34aafa13bc79e"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/leased_stage_v2.py": {
+      "bytes": 5520,
+      "sha256": "bcf91456534e763a025613f39e82853d7a58529b399bb183d544d09a7a42f949"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/bounded_stage_v1.py": {
+      "bytes": 12645,
+      "sha256": "84b7d003089fa19881690e368200b2168b9d179c8e6573bdafab54369235cec2"
+    },
+    "/usr/bin/env": {
+      "bytes": 72408,
+      "sha256": "795586b56f6da560c3cf4e25c1a6e4f274a8576906e88d94c207db7255b07163"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/Cargo.lock": {
+      "bytes": 4292,
+      "sha256": "4380186a0b5ed33a0c6ef3b15822c215072016af539446727800dcd501bde00a"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/Cargo.toml": {
+      "bytes": 1160,
+      "sha256": "a9ff455bcb89885c74f5758dd782ec4d3c89bbd31018e89333c4d476ea2dc40f"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/accelerators/cuda-smoke/mount_smoke_kernel.ptx": {
+      "bytes": 1437,
+      "sha256": "0310be86a54b08c4234f6a39b69805b72d8610bb55cee5aef7caf387a0c8a2cd"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/Cargo.toml": {
+      "bytes": 649,
+      "sha256": "18b25e1b99b09033da5950c3bb6b722085ab60c39adb322dd01dc0b8aec12f33"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/build.rs": {
+      "bytes": 11927,
+      "sha256": "15cf455bd04009bcf138b687df512e7952f147302c29b3f6af3c27b4ffd59194"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/kernels/exact_integer.cuh": {
+      "bytes": 8317,
+      "sha256": "debeaa8b1fea4d99a979ecc412f3b109d39c2fc63170bffc9269aead56ee9bf4"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/kernels/hnn.cu": {
+      "bytes": 25210,
+      "sha256": "af7dade8dae88f4b925d8b9770bda1db4700cfd3df5f26d1bd7fded211861870"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/kernels/hnn_word.cuh": {
+      "bytes": 80078,
+      "sha256": "9fd654bff83267b28efde51d38524303371488ef5d0a8a366289a0800bbd716e"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/kernels/tree.cu": {
+      "bytes": 46251,
+      "sha256": "78b292ce81aec3855e4cee7f40d764c8e3a8a0ccc7fcbb4a41e381e96ca7e17b"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/bin/mount-smoke.rs": {
+      "bytes": 6400,
+      "sha256": "dcae1004d9697edffb8ae1261f36a9b6c9403d61c7941be74d778c9d3c8be644"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/cuda.rs": {
+      "bytes": 75709,
+      "sha256": "a5ad8f2db28a7e65489d6fd040bd511c4ef897f0623b64b61eab1f9ebd42011c"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/ffi.rs": {
+      "bytes": 8156,
+      "sha256": "f90304f263b2c8d3e261e32973e7c21e3ed1f8eda57246d35a48b6f07e534615"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/hnn/card.rs": {
+      "bytes": 30425,
+      "sha256": "637ae88ad06811a3c6260de8caa28f0479950ab3a2cfdf4b69288e2b1ab00f58"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/hnn/carry.rs": {
+      "bytes": 16404,
+      "sha256": "cb799a71544a9c987ac23c7a53584fa68539540cda8dffe536797c711d4b300f"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/hnn/dyadic.rs": {
+      "bytes": 7971,
+      "sha256": "24d0c05989d2bdae5a76ec264e6aa823bdf033066db0ae4a61e15aae313d7ae1"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/hnn/execute.rs": {
+      "bytes": 67898,
+      "sha256": "97eca583cc8f505b9d4fe603ff0ec6127001834737100e78364f7700c7cc2b7c"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/hnn/lattice.rs": {
+      "bytes": 36762,
+      "sha256": "d8d9fad2d32b74cb8335ad6bae88a5ce0cab4e1a932e50f8c24d4ee2be41395d"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/hnn/mod.rs": {
+      "bytes": 21064,
+      "sha256": "bbbecfb7dbcd2854ec4bf5e5b4a59d3d55d4bd48c584f391f78d6c51da5dc43c"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/hnn/moment.rs": {
+      "bytes": 23045,
+      "sha256": "8ccc9389f54ea33705db2d182991de746e319b866194772f2d7d74a14e413422"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/hnn/physics_tests.rs": {
+      "bytes": 11060,
+      "sha256": "a7f52a5f5b81186a362e74cc5eee332d13293de438a806c59479af3b1e9b64af"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/hnn/port.rs": {
+      "bytes": 89741,
+      "sha256": "9f9cfa4305b99d361f8903f5fb2f3833512cd3c921a8ccb9dc7b84fdb8851cad"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/hnn/port_tests.rs": {
+      "bytes": 92815,
+      "sha256": "f341db9b3fb0d8094b70d7f4ebd8db0f8ebb41e7c6b41122d6da5bedec8a233c"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/hnn/publication.rs": {
+      "bytes": 20735,
+      "sha256": "a258a577e35c3d59e819247879b6f809d71a56e3fb7fc0e52d26b4911e667139"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/hnn/readout.rs": {
+      "bytes": 55410,
+      "sha256": "8fe7ee5b1294c34b5c4fa31c07609cd44efeb3081b8ec60caa123312cbf3b20c"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/hnn/store.rs": {
+      "bytes": 32537,
+      "sha256": "bfc2523616104723332095dfd94fc7514bf0ab10be501c8aa7324f4aebde67d3"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/hnn/tests.rs": {
+      "bytes": 57001,
+      "sha256": "77a82888499b6e33c0b11c0ad0ff916031c62b653f7321771d05793c77230946"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/hnn/tree.rs": {
+      "bytes": 47146,
+      "sha256": "c9c50d9005ccf3b0aa07b72adb595adde7fe47c3473c957c904a75ae72f1971f"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/hnn/word.rs": {
+      "bytes": 13728,
+      "sha256": "92a737acd4ea99d44fda14c25da49e5b3a01aea290dae1e23874e12b589cc22b"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/hnn/word_tests.rs": {
+      "bytes": 2651,
+      "sha256": "1b26f752ecb87c8bff089f03202902b5bfc0cd66450acfdbf517d3bc9aec34f8"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/src/lib.rs": {
+      "bytes": 1250,
+      "sha256": "2c21bb7b3c9bd5512e20f3a59f4f4e7207ddef24b114c2040edb7dca04b4468a"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics-cuda/tests/located_ingest.rs": {
+      "bytes": 7123,
+      "sha256": "86db238adba454ebe96dc80f85ee21b129810ccb9dd9dc943deef702bcd67a8a"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/Cargo.toml": {
+      "bytes": 1544,
+      "sha256": "64170e4fac0e1f1b08bfd076b39289dae249ec50e115c720ac252c2cae09c916"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/aeon/epoch.rs": {
+      "bytes": 22842,
+      "sha256": "19e68ecc1c8fabc5203f4007f0e7f43335f045f5203b95199442ba28482e98e3"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/aeon/first_law.rs": {
+      "bytes": 26370,
+      "sha256": "02e05fd816f29ba72976da44b74df34a9dc023d7ddcacce4c9cae3b73fca1fb2"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/aeon/groupoid.rs": {
+      "bytes": 26932,
+      "sha256": "a2e48359a9a0ea7019c2a2435b053cca10b14830ff0c615094ac6a8223d73181"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/aeon/hodge.rs": {
+      "bytes": 12999,
+      "sha256": "bdd8475b2a8dbad2523d0520afa1892fed8ea092c20fe5c8fc8e1de258ae8efb"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/aeon/join.rs": {
+      "bytes": 17693,
+      "sha256": "891e9fa752cf1224bdd6cecf7491dffaa92caccf171fb82312026744ae994863"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/aeon/lock.rs": {
+      "bytes": 10949,
+      "sha256": "ec5905e52e3fcb215841db21dfdbb399bbf7dab8843f9f3ba5f1d7de283497bd"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/aeon/mod.rs": {
+      "bytes": 10607,
+      "sha256": "e2ac911afee55ba27759fe52c144af9381fad5825f938bc5407cb9751d8c1def"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/aeon/production.rs": {
+      "bytes": 34497,
+      "sha256": "72ccdb2373e93a3c9cc1d2c686a9f54d535f77a07da23ff0585afd5a89c69d93"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/aeon/reading.rs": {
+      "bytes": 28656,
+      "sha256": "0761e5d5d3247d41847859459b5b7ac481d4a3abac47cdb57d9e30edd262d7cd"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/cost.rs": {
+      "bytes": 19593,
+      "sha256": "47c71bae4dee52f1dd8ded129afff6d9ec7efb87c1ffedcf4fb7abb38848a1b2"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/cost/tests.rs": {
+      "bytes": 12697,
+      "sha256": "00873dd825b70353e8d281b648dbe6266259c5f8f1b0d6cc33ed97b3266168a1"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/keys.rs": {
+      "bytes": 21934,
+      "sha256": "576d6b20b27ee68235ff8934ea0063640ed0e0a2c01597c3b0768707bf31860a"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/keys/edges.rs": {
+      "bytes": 18132,
+      "sha256": "031c6b3ba5bee51091b0067d47db8177202adb7e05ebc297258332859c6a3fcd"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/keys/local.rs": {
+      "bytes": 20107,
+      "sha256": "143d411df79d321648b5f00d74d185aa5622cd52385d8ed1ebfb2b16ecd16279"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/keys/local/tests.rs": {
+      "bytes": 8031,
+      "sha256": "6542837c44d16bbfaf383fd6838aebcb0a870772ec8b133ff756202b52d88698"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/keys/repair.rs": {
+      "bytes": 24181,
+      "sha256": "be69d14b09c7ec6578e46f83d5f6802321f99ddbca5c708ca224276da0f74156"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/keys/repair/tests.rs": {
+      "bytes": 10632,
+      "sha256": "02490fffb036d03dd407fb171c1fd4cd4f1890533543eb46fa652f898d148895"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/keys/tests.rs": {
+      "bytes": 12675,
+      "sha256": "98e119b40d456017941f586726561cd969ffd168986e8ae85635354db9303d3f"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/keys/transport.rs": {
+      "bytes": 56281,
+      "sha256": "e5838556ab8f65a0f3015f517460479c2fe32ec4babc6a4bc4db78eeaa3ae212"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/keys/transport/tests.rs": {
+      "bytes": 25500,
+      "sha256": "d276e5fea67d2701496343700c4b41a15527d22ee94c197e5cb73d5b3eecf362"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/keys/turns.rs": {
+      "bytes": 17206,
+      "sha256": "7dfcc2a199da6b3ac30fc32d18d82cb7541c1a0a671763e7f91df7df0b1fdd18"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/landmark.rs": {
+      "bytes": 4925,
+      "sha256": "b2020bb401cf404e3fdbdd4aaf8eb4e806d2556f7e2750e2ff54fde4ee05a573"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/landmark/context.rs": {
+      "bytes": 263781,
+      "sha256": "5f5e718eee55408f0b6827210acbd99fb7b9414c76af090cbd4cb9c7de8f0efc"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/landmark/context/baseline.rs": {
+      "bytes": 10550,
+      "sha256": "413f6c3f0d94127b94aec763bca73fde869d8d64aaa883550e20ef2cdb53cf51"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/landmark/context/sections.rs": {
+      "bytes": 5059,
+      "sha256": "f0843ade9a2a7340b268edd80c8b430f395fb3b3afaa68ba1c7e541dda24deed"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/landmark/context/tests.rs": {
+      "bytes": 111230,
+      "sha256": "bab40109ec3c9375094725afef6522b929791b3f731e5c2dd5de5a2787d708df"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/landmark/context/tests/full.rs": {
+      "bytes": 9232,
+      "sha256": "a26897aa77ff642f55e185564efaedb77b94a1e5d4bd5a0da0aadf1c2cd685f5"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/landmark/mobius.rs": {
+      "bytes": 27570,
+      "sha256": "385b851ddc4462c8cdd118bde46697caf731d338b764a0f4a05b250386a4092b"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/landmark/quadratic.rs": {
+      "bytes": 10655,
+      "sha256": "b75c5fdfd2db5d747123ba5540a25c36e2a7d74dc7530bc4c4e28f76ecf5ffaf"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/landmark/site.rs": {
+      "bytes": 27824,
+      "sha256": "da336b8bbb3a7ddac4751da10f9e41d8cb52094f746c24e3a517cddc9129c621"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/mod.rs": {
+      "bytes": 9169,
+      "sha256": "2870e07f0d35dcd9c8c21bff8d480bb362a164402fa87cc8fdb1a4cd1202f2ea"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/compression/resonance.rs": {
+      "bytes": 18058,
+      "sha256": "faabd9076873c12ad297b71ca25b7afd6ce7e035ce4cf20d89635f6683914011"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/exterior_guards.rs": {
+      "bytes": 11595,
+      "sha256": "ac1a5008df895cd34bb05570bdf630d67fe7edc4bf8de261b46b1ff11bbace3d"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/geometry/complex.rs": {
+      "bytes": 36085,
+      "sha256": "6f13385b17eb5a0bc9f3609539fe7f92b4c1915a3394107f32b7b3f8a76b9396"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/geometry/exact.rs": {
+      "bytes": 9605,
+      "sha256": "8ff996a5878c7f97d6debb3d7a7f4f11733644cbc4c917b7154c9545ea6d68fe"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/geometry/mod.rs": {
+      "bytes": 1292,
+      "sha256": "e9686f8ed6626939a09c16e08dbf1afa6a8995d2929e8ccebed8cd00e8dcda35"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/geometry/motion.rs": {
+      "bytes": 20023,
+      "sha256": "1ce22c85fc4c230f5dc642d393d77c0111779d890f56e171ba597ece7980e345"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/geometry/screw.rs": {
+      "bytes": 21308,
+      "sha256": "0f5ac4bfb3c651f6e1bff125d8c78fae87e7b08fd67ca13f92cf478b66deceeb"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/geometry/swing.rs": {
+      "bytes": 11216,
+      "sha256": "a98e3cbb084058fd8a3b552b501fbff273ed21c4f34387f65b959209d51e369b"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/geometry/winding.rs": {
+      "bytes": 10566,
+      "sha256": "ca5a8f4417b638edc922cd6ef12d1b8e6ac0ad04b4e446d4ab2cd271a8fb72c0"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/geometry/winding/tests.rs": {
+      "bytes": 9386,
+      "sha256": "11d3b79af579138cf28de806e4d33fc96fc6955ca1c860226e1f07d0368034fa"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/chart.rs": {
+      "bytes": 38033,
+      "sha256": "71b69f3298d57e8c3312874764919bf3110e7a6b598018eba61551bc33c7f277"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/constitution.rs": {
+      "bytes": 433201,
+      "sha256": "951580ec936cb5948c239a9f3006130809df2111be412beb85831c8fcda5caaa"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/contact.rs": {
+      "bytes": 37018,
+      "sha256": "c03e82181b7d6063b922edfebbb3ac0ef1ebb516b0791b75e5943e74d32ce4d5"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/encoding.rs": {
+      "bytes": 59224,
+      "sha256": "50152ce0f52a501ec08e9cd0b7981950f8173ec4dcfe5a66286ad48d94bf9739"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/executed.rs": {
+      "bytes": 14059,
+      "sha256": "e9000546fd4b202c887336b020dc063286309fe01c217124e887f798baee518b"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/field.rs": {
+      "bytes": 117656,
+      "sha256": "c7a556a2eec3007d0885292123aedda383f61fa48914cb334b8c8c8cb3991c00"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/keys.rs": {
+      "bytes": 30498,
+      "sha256": "6b3d12bc909fe7c4e0e24f443a0313df16cee0460bef0b7db14da76652a44d8f"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/mod.rs": {
+      "bytes": 31487,
+      "sha256": "ded2350455fe3c2e9b5db159efcc8f75724078f3f30d2e3763bf1a02de8eb717"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/moment.rs": {
+      "bytes": 114255,
+      "sha256": "2585d881e1b3e7584a5982bc54107f8d79233de9a65dd423e6b515e2a48a548a"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/pending.rs": {
+      "bytes": 13935,
+      "sha256": "092d05ce266079a07bec53f067adc586eb83b94926530149c93ad44ad6f20332"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/port.rs": {
+      "bytes": 68725,
+      "sha256": "882929e7c463b6a65b0f437de8d7000ea8044dd25504720c8ff85a253c8d660c"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/prediction.rs": {
+      "bytes": 147665,
+      "sha256": "7830ff1a0aeb024c0e7465cd47c8b99a8105c880c490c35382071c4e7b5e0384"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/propagation.rs": {
+      "bytes": 65733,
+      "sha256": "ebae450035e9a86b53f454d437e51ad9ceebb020f54a0e0dfc5278a741356856"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/ratio.rs": {
+      "bytes": 22152,
+      "sha256": "4b223f2a9bae7b70291ed62ce026a5f6ca521df0b4d87be3769c26a32f91030c"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/realization.rs": {
+      "bytes": 6393,
+      "sha256": "d6daddbf8cc69ee9d546862a1bfc22e05cc27a70ee835455c9016d1062400c5a"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/receiving.rs": {
+      "bytes": 79239,
+      "sha256": "10cea7efc861f33530ec65bf3a901726850ae2677dfc2d622e494de9359abac4"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/reference.rs": {
+      "bytes": 220442,
+      "sha256": "9800117d77ca85642e607264897a9974aee3b2e9659392a4512ce4aba8cd13d8"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/reference/continuation.rs": {
+      "bytes": 21252,
+      "sha256": "7ca75a55b49a1dd1c2341f8db22751829e7891ab0f1459376816f57271369eea"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/reference/passage.rs": {
+      "bytes": 12839,
+      "sha256": "2665e5235bff5beadac9904eee5011151873899cf19fc96f5d65886c9df905ee"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/retention.rs": {
+      "bytes": 30391,
+      "sha256": "287e881f98cf9d05969b2f0f3969bb7084320b873761c9d790dd04855b69a118"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/ring.rs": {
+      "bytes": 175230,
+      "sha256": "ebf6814531626b4a50da5e9e3e0edd32fbb43e80ef28ce20426b2f412bc72836"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/state_text.rs": {
+      "bytes": 1964,
+      "sha256": "2bb767b8dabc3eaf564873d0ab843f35d154a8551542a409045e821b0155997d"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/chart.rs": {
+      "bytes": 16139,
+      "sha256": "8e68c257478b70719a5f6e3519db66fd92ff514513b393e5b0adee7516e05c05"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/constitution.rs": {
+      "bytes": 101052,
+      "sha256": "891869da775924e02808b5794e026a8bca583bd34cddf7d75bbb6fb05a0331da"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/contact_residual.rs": {
+      "bytes": 28458,
+      "sha256": "c2e6bf8644804f9bbca1022776b01523dee0e89ea391643f67cebbf1ddece490"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/encoding.rs": {
+      "bytes": 21151,
+      "sha256": "f8cd5512219a3f4dba60aa202b9f649af3d7df2b5dc3f6e91df10b77d3344fd0"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/executed.rs": {
+      "bytes": 29817,
+      "sha256": "2743e09de9071e89e230d61560a8291c53f89be308c4b351f31f370b27325e34"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/field.rs": {
+      "bytes": 25126,
+      "sha256": "89424a0a8997e800ce5ec0e189902301581aee2fd2ecf848aae86ed580f02f47"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/floquet.rs": {
+      "bytes": 49983,
+      "sha256": "17732721e670ab57d45431328f7862203d8404cf68e4cb2ce15be75c80c26f8b"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/guards.rs": {
+      "bytes": 13871,
+      "sha256": "6738cbbd49ed07daa75085f173fe9ca91f3aeddf1dcf5583b99a16cec736f2b5"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/keys.rs": {
+      "bytes": 26822,
+      "sha256": "c03889988225553330e737e26d0e1108fb51fc9628644c7ea5c934eeeb10da11"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/learning.rs": {
+      "bytes": 11310,
+      "sha256": "d9aa781454b3390fe58b4cdbcd1dae4cdd2ee17bd8da138681d708a96c968466"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/loaded_scalar.rs": {
+      "bytes": 3962,
+      "sha256": "a53e89e341c0e5b0f09fdca82cd6937a896ce3ffa4b1f833f4ff743563899df5"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/mod.rs": {
+      "bytes": 582,
+      "sha256": "2ca9b07a6ef766724a4998a179a0b2c5f973b4af7aba8b28b3c33c88ee065e9e"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/moment.rs": {
+      "bytes": 37039,
+      "sha256": "a002bc2a07194a74b3eb201edc89166f13b3577ec6aeba0e5a5e88219090643b"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/pending.rs": {
+      "bytes": 7479,
+      "sha256": "eef9d986b1e328ebaaae5a8776d4a31493a3e43bd47fda3af4e3d7c042ba0274"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/physics.rs": {
+      "bytes": 64394,
+      "sha256": "5119cbdd834cf239194aa0781ee9092d35ef8c2e05836eed8f3c7ede4569c12e"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/port.rs": {
+      "bytes": 64526,
+      "sha256": "bd5a97953ebea6b4fdca1ff987c7dae76f8dc714ce62f9530b27609d7ab6a2be"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/prediction.rs": {
+      "bytes": 147036,
+      "sha256": "e878ca97d8cd76d3a277d4cea85d0954fb2a651775a8eb4ce13b968b67f613b3"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/prior_carry.rs": {
+      "bytes": 25191,
+      "sha256": "5af5954548ed7afbb54aa08722694652a0831f3abcf37d40877ef0e87a9ca6d7"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/propagation.rs": {
+      "bytes": 49477,
+      "sha256": "6c21e6729e2b1d44d1fbc319000e96130d85741ab9a5936c3395dd8d3744fdb1"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/ratio.rs": {
+      "bytes": 16437,
+      "sha256": "c5e4018f9848ffc1ec32f50357e57608a15b429fab9cd8610045742abffa74f5"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/rebase_boundary.rs": {
+      "bytes": 15550,
+      "sha256": "c72a0fe982520cc9cd6568a4184dada11c82669134098db6fc7788154c6c569b"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/receiving.rs": {
+      "bytes": 70737,
+      "sha256": "6efac0e41141252cc9e42ca72da902019cb950f0e3b917d4f9665ad91fb8d0d0"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/reference.rs": {
+      "bytes": 59191,
+      "sha256": "94808746e57632e11acac4142d17fa107db77cb4528d568ac757c3df469efb65"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/resonator_deposit.rs": {
+      "bytes": 21882,
+      "sha256": "18fe10dc13a0598b5c68d7e275c7c4e2be39c896979a4ecbe6cc9bce5994726f"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/retention.rs": {
+      "bytes": 55058,
+      "sha256": "5e818dd6786e7c680e35ffcf26af3747ec54c20aedba1326be6ac0f2cc94734e"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/support.rs": {
+      "bytes": 19532,
+      "sha256": "7d4bfa4a66210a0b4482dc777a2af12c9a322e5195d5d44a03a7c5233e8ea929"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/tests/word.rs": {
+      "bytes": 12411,
+      "sha256": "f32470c088dee3f6fa01907891a2238d14a783faa811f8d3ff72db681c432edd"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/word.rs": {
+      "bytes": 139446,
+      "sha256": "0200f5a2920d26b0b6258823ffeb20ae5b23bf4546299ec058e7c60d159b7bb4"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/hnn/word/continuation.rs": {
+      "bytes": 18198,
+      "sha256": "cb96ea4f09a24ca57e26cfd95436c69752670dacf9afb1450546e9b7d09d8092"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holarchy/gluing.rs": {
+      "bytes": 38035,
+      "sha256": "7076f731eb028c169ffae7ffd307103e886a04063300ae21e03d1cc34a73d8b0"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holarchy/mod.rs": {
+      "bytes": 27077,
+      "sha256": "4c3c3e786eaa085fbe482e7dfcbda4366d3846bb5f8c99e63627ab3c5c1ffc8b"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holarchy/terrain/chase.rs": {
+      "bytes": 56847,
+      "sha256": "6c3894adc1e792f29d1f76b9520814c4b72e739bb403aedb8fc2f3f0c1fc001a"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holarchy/terrain/chase_tests.rs": {
+      "bytes": 46303,
+      "sha256": "d149a0fe0a01cd57dab3682d8c7d7748f88101e68885f1743bbb7854df564572"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holarchy/terrain/crib.rs": {
+      "bytes": 4271,
+      "sha256": "45d8c5b7f68d4cfd38900bb1808169c2801faa23a2ca6bd0ed4d88b78153c5d6"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holarchy/terrain/known.rs": {
+      "bytes": 11494,
+      "sha256": "9d037d70b4d8ee73d3cbb8e8829d86a0fc69056c7cbca113b68241a3651843f3"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holarchy/terrain/mod.rs": {
+      "bytes": 12526,
+      "sha256": "bcd7f37f7bcef44fc2e926a1472cbf9fde4a62f9826fd1225caaaf38de59621e"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holarchy/terrain/moire.rs": {
+      "bytes": 17282,
+      "sha256": "bcf9a1499a3ad561d766dc598ed596b7c31461dda545392d19285024ef7649bc"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holarchy/terrain/pursuit.rs": {
+      "bytes": 62351,
+      "sha256": "af43f56795774266758b0ca0fc74e72e1d48f345d6c41085ba44619cfad8d3d8"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holarchy/terrain/sensing.rs": {
+      "bytes": 21820,
+      "sha256": "f4bfb5bb32402039d7fdba193e84e3baf22667559d9db2648d8c81b1ca3445fc"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holarchy/terrain/sensing_tests.rs": {
+      "bytes": 16730,
+      "sha256": "9a9db8e6ac026539a7e1e102008536448afeec90b20b5ca0eb2e6c4adb4e1933"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holarchy/terrain/source.rs": {
+      "bytes": 31318,
+      "sha256": "59a1c7362e9ca7690d06cafede0725517526cd883067002a72f3bd50b7c471ce"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holarchy/terrain/switching.rs": {
+      "bytes": 7650,
+      "sha256": "51590fd7ff814dbdd4a91350d3b9acf7816d129a0c0db048585536c50c81474b"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holarchy/terrain/tests.rs": {
+      "bytes": 15010,
+      "sha256": "f6bbbf7e2d461b5c9ab0ca999c593ec18b0f293dc950f4ba5a310a7cf9067110"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holarchy/tests.rs": {
+      "bytes": 35541,
+      "sha256": "78f915d2489e1e826e9cc1cb1e355b0ddaf5dfb811367208f5ccb9def1dbac42"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holarchy/view.rs": {
+      "bytes": 15932,
+      "sha256": "394e31eb24dee652c690d738fcf96b18f59f9b795adb0e5eb4ab7cb6c1a526a7"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holon/conformance.rs": {
+      "bytes": 35585,
+      "sha256": "b84e602a91a9bf24f773ba1a45227acbabf9d3ef276eda7e168c00d5cf3e39da"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holon/contact.rs": {
+      "bytes": 52333,
+      "sha256": "20d0316d1424c0f1930921d53a9051706044b7aad980c25a07481454d5a39479"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holon/contact/menu.rs": {
+      "bytes": 12179,
+      "sha256": "c455941738139e4d08a7bdf0aaa45f5aab79747956e874e6dfbf13114025e160"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holon/deposition.rs": {
+      "bytes": 49598,
+      "sha256": "164ee9a8371e1d89d842c6cff4ac0dd3f9f1a9a017e57f05d1ffc9eda844b6b3"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holon/dirac.rs": {
+      "bytes": 33263,
+      "sha256": "738810b57ae629e9354c354678aee4ea140f0d215b8cb870ead6660e07bf6940"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holon/element.rs": {
+      "bytes": 9918,
+      "sha256": "32683220d74dc3ecf836cb2d10a133dd6bd9debd324f61cebe1db7a7f79825af"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holon/law.rs": {
+      "bytes": 24095,
+      "sha256": "80366830ad5f9bc949b093f5a574273a99c0bb53ccb67d86f9d7ad795f5779ef"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holon/mod.rs": {
+      "bytes": 34249,
+      "sha256": "cae7f90c30da6ce2cb42b9ba916a3db7012e8efab2629daa58e6d524d3f3de26"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holon/parametron.rs": {
+      "bytes": 29429,
+      "sha256": "25b6df1023761fbbb0442c314d97c65a9a2473e067f9359e96db847205aafd31"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holon/parametron/loaded.rs": {
+      "bytes": 22304,
+      "sha256": "e54a1126bb99761af613c6d6272343aadab69cadcb3817cfca769a7e89a422b8"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holon/parametron/mounted.rs": {
+      "bytes": 6423,
+      "sha256": "3009606b8f21dcf98b99df3fdf66b6b3651c91a710af20798b4c5706cbb0b965"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holon/port.rs": {
+      "bytes": 10322,
+      "sha256": "080016ede397f88f32a9277245b10563048c4189e1bc2b3e25d14e20c9d3e7d1"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holon/restriction.rs": {
+      "bytes": 22136,
+      "sha256": "e4793320d666786e4ea0f3eb75f80d33767d25d034fb3f3f70c8d6273805bd2e"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holon/restriction/descent.rs": {
+      "bytes": 15455,
+      "sha256": "8043e19886bc5efd55bb68e76d30efab3c7db777b22ba6ecd49ff949497d5a9e"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holon/restriction/fibre.rs": {
+      "bytes": 14091,
+      "sha256": "6657ca1aaeae87bf6f2e86fa1d4c7c560b5d7f7bef0e22d84fa0af337970b89e"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holon/restriction/linear.rs": {
+      "bytes": 11182,
+      "sha256": "26cae1e60ca8fe9dcf8ebfb8353b5f4591a88f9590c6f6c9d18134a4afc78b09"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holon/restriction/tower.rs": {
+      "bytes": 107102,
+      "sha256": "1995980fcd8e61d8c92fb71fdf1ffd1951924092fec5563c1d92ba72c7755c90"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holon/restriction/tower/tests.rs": {
+      "bytes": 41983,
+      "sha256": "35cac77cf4a24dce92ccdb556d808f9c63c8e70153bf341b99698f46fe6a08f6"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/holon/restriction/tube.rs": {
+      "bytes": 42581,
+      "sha256": "48a989a80585f28c8964148fa9c9d486037990aecf2b1bf428733988c8162c42"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/lib.rs": {
+      "bytes": 3161,
+      "sha256": "61f950806d8151d92301d56330927b86dcac3ac54c6f9a7db838086ce0fd938f"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/navigator/address.rs": {
+      "bytes": 20610,
+      "sha256": "fe2de33951e99bcd8f03231ab54d730d55ad7543c4830de88b71848b753cb2da"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/navigator/mod.rs": {
+      "bytes": 29138,
+      "sha256": "97b2a701c10dc66730008718fb824077df845449ff8b1597fa7d41918af1281b"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/navigator/trace.rs": {
+      "bytes": 14606,
+      "sha256": "807642025dc9fa87a41cfb8b8067820ac559ee8acb44dae98bc8afc6ca872e6d"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/fluid.rs": {
+      "bytes": 4965,
+      "sha256": "527849ab40cc00051713213c8efa24f6acafa8797d56bcea4ecc236d608f2baa"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/fluid/body.rs": {
+      "bytes": 22085,
+      "sha256": "74f13f642abb1a5c44ed3bcb3c7682ed31f452424bfa7f7bd51be2499b6dbd3d"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/fluid/cells.rs": {
+      "bytes": 23191,
+      "sha256": "b4a011146d7d1b0ccbfca20e92df085312d2215fc1bcddce666c096662b65f3a"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/fluid/complex.rs": {
+      "bytes": 15382,
+      "sha256": "e744d4f344efafbb6e98c251dc4c55bf93f47d8dabf3378756a69b8c5846183c"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/fluid/control_volume.rs": {
+      "bytes": 30395,
+      "sha256": "210711e88c19b94311d50240c334750d6c216211327babe65597a7bf3ff9c59b"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/fluid/singularity.rs": {
+      "bytes": 20201,
+      "sha256": "942ae7098ab29b0fce79e061034444dcc10429b2abfbe4b78d0ed0053b00d0d8"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/information.rs": {
+      "bytes": 7170,
+      "sha256": "c50285be4d0891d9063e2b7eed07f8f80481c2c0b81cea75a8d771ca4b12197c"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/information/apply.rs": {
+      "bytes": 16364,
+      "sha256": "2983abbdc8d9059c4e0a3c2529957cce3cf011ade0c9d0576f76bad4ee654792"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/information/rate.rs": {
+      "bytes": 9691,
+      "sha256": "4922b5c427e276986e7310e4908793dd13d2f2f037fb572cb75e6ce7eabb5dc3"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/information/tests.rs": {
+      "bytes": 18987,
+      "sha256": "c809005516720ce75ddb47f3fc33401684adde0dcc475f4cffcf36a160e8e9aa"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/mod.rs": {
+      "bytes": 490,
+      "sha256": "dce482909e8c86254b21739dd8762c5d74bca7136b5884c7257aa2400e560147"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/spacetime.rs": {
+      "bytes": 9282,
+      "sha256": "dc06b19dcb428091a858c136b0dbb2ffb3d780d50810554669e595f10eb33a77"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/spacetime/clocks.rs": {
+      "bytes": 5670,
+      "sha256": "676e05f56bb49ea93b203ba610a7b494d4757f310d2692bebfced2596d0b1ccc"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/spacetime/einstein.rs": {
+      "bytes": 4716,
+      "sha256": "21c95c284cd847e14720cc59210894b72c0ecbd7340472c491c9c028b4d25bf6"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/spacetime/lorentz.rs": {
+      "bytes": 16360,
+      "sha256": "a3a2ba6380c5edbbc69b7e5fafa1feaaa5dd06d592b12721aa28a84977a51283"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/spacetime/source.rs": {
+      "bytes": 14166,
+      "sha256": "30166438e3fa8e4817a2476fb36d9499cfd95bb66ab6de7e90e4eefc1f7247d4"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/spacetime/tests.rs": {
+      "bytes": 28398,
+      "sha256": "46def048d2076fc3c3ba2a5a8c37d652de8ed8823718307fa755f71df2733416"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/thermal.rs": {
+      "bytes": 11192,
+      "sha256": "8b7d1502fb6295db8d5748716e3a3c434cca5bba23d1209686864f76b7fb8a00"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/thermal/axes.rs": {
+      "bytes": 11494,
+      "sha256": "d0e1b594f729039b25384e6d43dfd3e6a3a07ad0ea75fbd086be7516255e7e87"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/thermal/exchange.rs": {
+      "bytes": 8560,
+      "sha256": "caa0936f50629ca9da048a73aa780c9e4ae7bea6b4375636208cd4f33d9251ec"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/thermal/neck.rs": {
+      "bytes": 5512,
+      "sha256": "59bdc3038d59cf02a3ce8d560b0c74bb7c73a1c958ac93e6f1d9f68f325df6b0"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/thermal/port.rs": {
+      "bytes": 3655,
+      "sha256": "0caf15ea9905e54f556e6b211c8f89e832137ee4a12f3af019299a4ecae4d85c"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/thermal/tests.rs": {
+      "bytes": 25333,
+      "sha256": "bc37321efefbc7eae0849f3a04eaece7145d3a5623d83187447d8d2ac6ceacd9"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/wave.rs": {
+      "bytes": 6790,
+      "sha256": "9255780b05fb94ce29a0f1f4c4d8c6ece752250947cff62315c70eab41cc668f"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/wave/chain.rs": {
+      "bytes": 28939,
+      "sha256": "3130272d662e592f72601253ad7aac21a2ebd1a2670fb6bd7f9d70f17532265a"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/wave/continuation.rs": {
+      "bytes": 14963,
+      "sha256": "fef87716fa785bb372693885adacb91b4cf07164b0d5c421f1a45b0dc0e18674"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/wave/interference.rs": {
+      "bytes": 1942,
+      "sha256": "58dc30d9a92bb783c3ebe78420eafb288d3b6c0babcaefb57798392eba4e19d3"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/physics/wave/tests.rs": {
+      "bytes": 18594,
+      "sha256": "58350fe1a6a52472e80cac2312bf7f75e85a63f32eb59442718517219a3d3c06"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/algebraic.rs": {
+      "bytes": 58349,
+      "sha256": "aff50b8ff77ffd718784440ce067433e2594c41924fada44c2003d352aa0c5d0"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/disk.rs": {
+      "bytes": 31062,
+      "sha256": "2d696d43b641b4e0cfc55a90179aae1aeeae3e3277e082a7c1fd5d1780a082d7"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/exponentiated.rs": {
+      "bytes": 25253,
+      "sha256": "a22226720ae5f423b0f39975caff0f3f28e1fcb11aa95da1eff4e3f973e4a9d5"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/exponentiated/carried.rs": {
+      "bytes": 13651,
+      "sha256": "3e5d49524168c8360078477e38d93f97ebb93a1cca8ba65a387f7db30ef43332"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/gaussian.rs": {
+      "bytes": 5107,
+      "sha256": "66899eac32c9cb6a8af20ae7fc941a83b268db9f602aa2317ae29cb80a217ed4"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/linear.rs": {
+      "bytes": 60326,
+      "sha256": "a1bb3e17c9e7d0c0fd0da9369700970b9a7a3895a922780c04e6242b1379d5f9"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/linear/inertia.rs": {
+      "bytes": 29196,
+      "sha256": "5e97d0b7677929816bb9795c56191f9aa4ff828ce18256e17be57e6c8d92daeb"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/linear/prime_image.rs": {
+      "bytes": 63195,
+      "sha256": "bc8f9eb928d357eca67af08c7457fa8d7e00206ed1c59a03d190afe3ec2e447e"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/linear/prime_image/tests.rs": {
+      "bytes": 14857,
+      "sha256": "5a05657b15f92c8ce2a3e00e1570bc2fd959766e9d199b17b31b2ab3b844f434"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/linear/vector.rs": {
+      "bytes": 17748,
+      "sha256": "0a3e739bf292f53b6a877f31a4f74f63a159fc587d3f6f371f35e029fc5fd36e"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/log_ratio.rs": {
+      "bytes": 9297,
+      "sha256": "7e561a27844629c0106c95ae2dc2415dabfa38060208551672a12364305caace"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/mod.rs": {
+      "bytes": 7370,
+      "sha256": "9944f3167bf7006904a30cacb471e4ad42b4c30ca23b726ad8e9f4e538f8d682"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/polynomial.rs": {
+      "bytes": 96688,
+      "sha256": "f9ca719594bf5e0e09e5e766ddb0ff78d0e77a2244ffdb8659f8e9ee19855f1e"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/polynomial/root_separation.rs": {
+      "bytes": 3117,
+      "sha256": "7d7eb6cf83a121f20a57fd5260addf2e2a7ba827d489159cf71f469a8eaeacf9"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/polynomial/tests.rs": {
+      "bytes": 19925,
+      "sha256": "3e08cbec3c91a9ce37762c087d9fab25cbabff1a7e1a3cf27d502150e15fd58e"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/presentation.rs": {
+      "bytes": 4788,
+      "sha256": "d32df704d1bbdf400750c324c28d10d8d491869ae11d64d49a09964932183d3d"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/primality.rs": {
+      "bytes": 3481,
+      "sha256": "bd21e383e842a6bdd5b5a4a839b999d629f9e124f8b8117b9ff0e828c5a03cc8"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/ring.rs": {
+      "bytes": 7878,
+      "sha256": "63b10a3686ecc8e71945be3b933ed5a9d6a5cfff67ef2f3878d9189776cba9a1"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/ring/section.rs": {
+      "bytes": 3429,
+      "sha256": "104e07b80568558a634ff6ebfc00fdb869ef0edfbf45dc1966ff54b06f62ec57"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/ring/section/tests.rs": {
+      "bytes": 4930,
+      "sha256": "0479ff0dba89f210441d9cdd71213d745bc52c439796aec42a070b1dd199e7c0"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/surprisal.rs": {
+      "bytes": 45369,
+      "sha256": "e40c543235a531c80ed868c1449361888499c7b8abb63deb69970d21d03b8fb8"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/ratio/work.rs": {
+      "bytes": 11411,
+      "sha256": "fe8a71d64d7b2723c15ce1060fe73b6b3cd4286c6ca53a294be32b5f3e461fbd"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/face.rs": {
+      "bytes": 56378,
+      "sha256": "07dd1919c0bec668fb0d69cd29c1223933257549eab94bacfa648cb42b28799b"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/mod.rs": {
+      "bytes": 2000,
+      "sha256": "da2741278f0e6f913fbe0cb03fb26c09b3551fa31eba9477b12f2dc8e21f3b51"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/population.rs": {
+      "bytes": 105215,
+      "sha256": "cfd9aded5802bd82fbf9956c2c9392a3b067cae405594cdef02ee548a4a0ec35"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/population/birth.rs": {
+      "bytes": 49128,
+      "sha256": "5f22d8caf0689cf1bce5b83c8926413fef1ca5acd6bb2a3fd0ba8d51aef4c185"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/population/birth_tests.rs": {
+      "bytes": 11291,
+      "sha256": "347c7e7fc68e5952d5b6c05fbb44ea6d5e2739784e5efb8034fb4179e79f1428"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/population/chase.rs": {
+      "bytes": 11627,
+      "sha256": "e7d36c043e55b0ce63069a29086865ae049aa14f3417dfdc3f320e96e24465eb"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/population/chaser.rs": {
+      "bytes": 48030,
+      "sha256": "7fd980990c9498cfcd11b15f069aeb798caa62c7619b5d9b26d442bb8de1bea1"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/population/chaser_tests.rs": {
+      "bytes": 10514,
+      "sha256": "58108bead607677a61e19cd3d25733ef3a62bc87d95e69b238d597a4192474da"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/population/composition.rs": {
+      "bytes": 35014,
+      "sha256": "cb052720c0ee191918de873ed352f7f766de503fa0218a9eb98e432bc784b471"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/population/composition_tests.rs": {
+      "bytes": 28417,
+      "sha256": "17e669f052f96e882516c76dbb756ef9b812f49ce1455f435ec66864004fee57"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/population/dormancy.rs": {
+      "bytes": 30830,
+      "sha256": "010e4ae88bcbd28d4e050baf3078301e0c38a54a6d0be077028a1cf4fb1d5115"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/population/dormancy_tests.rs": {
+      "bytes": 7965,
+      "sha256": "a48f30d0c267d1f37b89ac235fd92207e6e7b961637732fce9bcd5810026acff"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/population/evolution.rs": {
+      "bytes": 12935,
+      "sha256": "d659c6aae69615ab7ce6326716584d893475a13eb6decfbbbe1cccb6b013cab5"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/population/evolution_tests.rs": {
+      "bytes": 30044,
+      "sha256": "6ef1ec61168dd3212078bb51dfaad754ab7256e654b7f6516733c0a54e54c437"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/population/families.rs": {
+      "bytes": 25284,
+      "sha256": "a2eef57533998b8463d74a849f4b64589f38bf851f076f1cfab0fd6df8225f65"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/population/merge.rs": {
+      "bytes": 21448,
+      "sha256": "666de82c1e357dda1e881ce2426f1492e6f7942ea4068866ddd401d4d5ca4fbe"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/population/merge_tests.rs": {
+      "bytes": 7344,
+      "sha256": "acc4ab73ea75e2905d497afa0b8a886afd37ec0628f5cfa72d122fcd9f237340"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/population/port.rs": {
+      "bytes": 22579,
+      "sha256": "2b2c8cbb72ab72938210d6f8dbd5635f78392b8d5186337149893045db9ef2cf"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/population/port_tests.rs": {
+      "bytes": 8803,
+      "sha256": "9344b8739fc62d304a29b6ce07e8f37aa400a436b9027625aad0ff9e940267e3"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/population/species.rs": {
+      "bytes": 14349,
+      "sha256": "99a9e59c3508e5d58a4b019f330ae28ad542f7d493c62c287f4aa891e076d390"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/population/tests.rs": {
+      "bytes": 45993,
+      "sha256": "6d8897b0092e70b364c8bdc2985b951f0627f130ecc9ea26e0f657e77bb4d888"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/receipt.rs": {
+      "bytes": 18545,
+      "sha256": "d4391ea8f8c7fb6d9a5bc53b081107095b00ac52f1eb30055ae79f05d9397ab4"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/reception.rs": {
+      "bytes": 36764,
+      "sha256": "f33ac0ad50631f94db67c4dedaee08914f652fb5967c6351386b868ee5a89d70"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/reception/continuation.rs": {
+      "bytes": 10991,
+      "sha256": "0805e35e5b8c19763b50472835545588dd4ab0918ee72a0e9361a1847bbfc8e1"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/reception/continuation/tests.rs": {
+      "bytes": 14261,
+      "sha256": "9527ef643ac8f48406e2fe7c60367041fd3a5d7c8925860eaec97e1bcbaca3dd"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/release.rs": {
+      "bytes": 32160,
+      "sha256": "6d89ab726bc289a2cfbf5cdfef902e532b431026162fe2d106e24b6da5e74e6a"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/src/receiver/release/tests.rs": {
+      "bytes": 32491,
+      "sha256": "316f7e043cff97fec5c14916922e0a8c4fea56d0e906876f8c1ea9fa16e30e89"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/tests/ranged_capacity.rs": {
+      "bytes": 24618,
+      "sha256": "86ae43a11634abbe645bf2bbab25e7a62e5e3fad302e31e105b62afb1abebb38"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/tests/resident_cold_restore.rs": {
+      "bytes": 8133,
+      "sha256": "c883536ad0672f210d013ef9bc3adc5b1735b62f3dc88498565d2cbce9e5c2ea"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/crates/holonics/tests/source_entrance.rs": {
+      "bytes": 19074,
+      "sha256": "5308ebf2d6cba10019952e1e9023d3b085349d12b3c6df61833cba8b863d9baf"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/README.md": {
+      "bytes": 125210,
+      "sha256": "5b2e984e5f904f0c189f437835a995c1bd0a26672f7b817f0885aa2f10110e56"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/anchor_memory.py": {
+      "bytes": 5770,
+      "sha256": "b115fb1f1a4eaefaa05badad29839896d11f3639bf2ea12b2607fcf1fb6bfd57"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/athena_file_checkpoint.py": {
+      "bytes": 11337,
+      "sha256": "5f3c43b222981725aaa3ebfecd38748fc2274fbc9999a6621b2b00612463179b"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/athena_file_checkpoint_tests.py": {
+      "bytes": 7095,
+      "sha256": "e1aa5920de74b6da907484c4734c02261cf5404ec007892a1cf781ed533c790d"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/athena_file_protocol.py": {
+      "bytes": 10799,
+      "sha256": "b0d5e780d7639c478562cb63aeaf7615fa27e6a54ef7c5f38e0c28a334ddea53"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/athena_file_protocol_tests.py": {
+      "bytes": 8786,
+      "sha256": "c5cc1ef2d832eb71a0c18efb7c04c00668db6e5484252a7885320b618ad9c1c9"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/athena_protocol.py": {
+      "bytes": 15724,
+      "sha256": "30d770274159e4f5f9212706334e54af3f3a7e9ad1f9a76f3829f919ae02e0ca"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/athena_protocol_tests.py": {
+      "bytes": 12415,
+      "sha256": "df681db0efef495f5972d37b3f4af1140fa5aa8b78216369c6051c7abe694dab"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/bank_causes_probe/eF_confirmation_counts.py": {
+      "bytes": 2047,
+      "sha256": "5d9f8c13d7e96dc4f45d5f7c9a61bbf211771ada328857f013a4c71b474fd1bd"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/bank_causes_probe/eM_section_shapes.py": {
+      "bytes": 2107,
+      "sha256": "a8123a4bf66a7e076049ccd9c47a0d1d4af7719bbf969b17bf61a232452fa2a3"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/base_measure.py": {
+      "bytes": 4231,
+      "sha256": "74fe985360826e4599408574e193bda8b58d71e85b9801900eccd07c9ef8ebcd"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/context_orders.py": {
+      "bytes": 2647,
+      "sha256": "a66092338e124c4c2b0a9d0db0b5d180492d698a6afede4e6e72c61c5fe331f6"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/curated_incidence.py": {
+      "bytes": 7541,
+      "sha256": "6bdd3addc8a50f1ec30c92e5788ad6a36a4c6f00208b04313ac666c7db85dce8"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/curated_source.py": {
+      "bytes": 25995,
+      "sha256": "64a8a4d6660539499f3fb91e422b4c8f42072f70c68f85b2a4c6923142242792"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/development_families.py": {
+      "bytes": 23297,
+      "sha256": "4c1e75ed8bafc3ebc699809f6951522d1cd84777382b19193b9c10ec3ee084fc"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/exterior.rs": {
+      "bytes": 35307,
+      "sha256": "91714b1c01dd9101c7ed47e66fc980c0461282d6f84329c1f2b1d0a94bcc54fb"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/f5_context.py": {
+      "bytes": 12663,
+      "sha256": "7272fcba15d62e9a34a88373d1dcccaddf7dc954a1ca7e731c51e4fdc1bd5c82"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/f5_context_tests.py": {
+      "bytes": 5813,
+      "sha256": "2fe71cf1ba49002fe25321ca382e4ecc281faf411af9ffea4ef5d215453dae0f"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/family_passage.py": {
+      "bytes": 7168,
+      "sha256": "eda731b6ba30e7e323f590ca2220bab490f06a6eee66f6c3739c499d4211111f"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/field_ceiling.py": {
+      "bytes": 5070,
+      "sha256": "7a4a9129b2378ab676d967f717e28e5b5ba58996cabf44213429d165d3dbc307"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/hnn_chase.rs": {
+      "bytes": 85402,
+      "sha256": "956863c53d52a35a8083d1f984b3d55ff778249cdf4ac02cd8ca6318e68c0c2d"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/hnn_executed_loop.rs": {
+      "bytes": 38885,
+      "sha256": "301810d848cd641452a796b49908cb8a2ba4104fb1f08643a2408a460d5e458f"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/hnn_exposure.rs": {
+      "bytes": 90883,
+      "sha256": "d47a90aa95aea5cdb079f9c0b87bd343c5a528b20f6365b547336c12bb9a0dc1"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/hnn_keys_loop.rs": {
+      "bytes": 18016,
+      "sha256": "6f59edaaf1f65b70bd9f95d52b0bddcbd4490c5ffb7189da2b3482c2990b84ca"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/hnn_prediction.rs": {
+      "bytes": 18298,
+      "sha256": "ad5d4d634c5de368fa54b09e97bfc0a65a0913354351d4a697e4079c80229a53"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/hnn_repair_loop.rs": {
+      "bytes": 31329,
+      "sha256": "2939d7c6adf418e51ee9556a63ca2e9f815d9d8986f30b527a94312e31e22d94"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/hnn_text_repair.rs": {
+      "bytes": 1559,
+      "sha256": "87504e1f1acbca3c14c324cb22f1c6e4a5d1d168f9001b5268c2ce3b1bc58251"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/hnn_transport_loop.rs": {
+      "bytes": 16839,
+      "sha256": "f35724e4b9d1a6035eb0db7ae5acbfa02407e018fdbca7c78f0796642fac17d7"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/latch_letters.py": {
+      "bytes": 4276,
+      "sha256": "c790ac37e56794617d9bcf3f4ddd1c1341c43a0026872db4a3d3dcdf4273900c"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/leaf_counts.py": {
+      "bytes": 3243,
+      "sha256": "5f863feef27a76a14b98498652a01436fd7a1d457bd3da6636a4526ab1c33f1b"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/receiver_combined.py": {
+      "bytes": 4511,
+      "sha256": "56be653425a4b16ad5bdfd3a07c6098b41b04022bb87a88852e76d3358fbc764"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/receiver_fisher_exact.py": {
+      "bytes": 2057,
+      "sha256": "a3da39d040105ae949816d3971c218ee23b682d5de53089f57c20f1344a34afc"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/receiver_nonlinear.py": {
+      "bytes": 7648,
+      "sha256": "f2c119e9431ed694f9bf271fdbac12a1de579928afe1fe642e1406525d2b6b11"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/receiver_online_sim.py": {
+      "bytes": 2307,
+      "sha256": "84e4b4f00b585dd91430ff2a2bf971a9d3d50db3e8895ae891e8c0fc6150962c"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/receiver_oracle.py": {
+      "bytes": 4817,
+      "sha256": "576fcb6083c58f7e0926b7891351ab79153e69ea86bf39a64cdff62e87e45e84"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/receiver_prior_scale.py": {
+      "bytes": 7989,
+      "sha256": "b5a80bdf214cbd8e36947e51722cbfb5754c1baaa4f0fa71259a06681cb3e903"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/regime_letters.py": {
+      "bytes": 4606,
+      "sha256": "7b71ac59e904671b7a9a7b9e378f5fe65f1a56db0cc97dbdcd698d9f5ba3d69b"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/segment_terms.py": {
+      "bytes": 1384,
+      "sha256": "9ae3d868e866847b7276442d4ba74b253892cbeb124264559f896c975aa70da3"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/sheet_letters.py": {
+      "bytes": 4988,
+      "sha256": "ef59265188e7c51593fef2f1b0dfe5f4075fdc69bdf640e6a1be892feff77bb4"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/standing_cut.py": {
+      "bytes": 6965,
+      "sha256": "b228736c1acf3e6c99be2fd02ab4340d35c1f4a913cd8631a6a294b8ba2b356d"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/tree_base.py": {
+      "bytes": 4017,
+      "sha256": "9f433e00200390dc84e5a169e4bfb2c73fce83856f0b18a3026fd94d8463dcf6"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/research/notebook/hnn_design/tree_estimator.py": {
+      "bytes": 5694,
+      "sha256": "378a7d5c301659b3ddd07ad903866e95d6df7fc689117acef8143bd2b8488f9f"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/source-v1/lean/Holonics/HNN/ReframedMoment.lean": {
+      "bytes": 8704,
+      "sha256": "4ffc65a60f4e72c8bc63c637d7e6480ada2e8721a002e53c487635e64cd93f2e"
+    }
+  },
+  "outputs": [],
+  "argv": [
+    "/usr/bin/env",
+    "-i",
+    "PATH=/home/b/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin:/usr/bin",
+    "HOME=/home/b",
+    "LANG=C",
+    "LC_ALL=C",
+    "RAYON_NUM_THREADS=1",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-intact-pair-518e1e3f-20261006/cache-v2/debug/deps/holonics-70b68d2f7e1f6408",
+    "hnn::tests::prediction::physical_repair::the_retained_physical_reader_reports_distinct_observations_and_matched_source_controls",
+    "--exact",
+    "--test-threads=1",
+    "--nocapture"
+  ],
+  "allocation_basis": {
+    "existing_fixed_development_wall_ns": 16000000000,
+    "same_caps_no_raise": true,
+    "bounded_operands": {
+      "native_Words": 9,
+      "receiving_crossings_per_Word": 2,
+      "R_only_comparisons": 3,
+      "distinct_target_free_probes": 3,
+      "matched_material_receptions_per_probe": 2,
+      "source_lift": 3,
+      "probe_source_lengths": 4,
+      "teaching_source_lengths": 2
+    },
+    "largest_matching_prior_wall_ns": null,
+    "new_first_development_read": true,
+    "count_this_matching_development_read_once": true,
+    "total_unique_candidate_controls": 24,
+    "prior_a730_acceptance_independent": true
+  },
+  "source_base": "494688777d153847b18dd14149f131763f5b2978",
+  "launch_pending_resource_owner_handoff": false,
+  "expected_test_count": 1,
+  "source_commit": "518e1e3f4f5d6ad6dab57a7dc08b3098eab354f4"
+}
