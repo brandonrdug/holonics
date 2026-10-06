@@ -1,0 +1,69 @@
+lean/Holonics/HNN/SingleHoleResponse/LoadedWord.lean:23:66: error: Application type mismatch: The argument
+  b
+has type
+  Sum.{u_1, u_2} Ring Contact
+of sort `Type (max u_1 u_2)` but is expected to have type
+  Sum.{u_2, u_2} (?m.19 b) (?m.20 b)
+of sort `Type u_2` in the application
+  LoadedM ?m.13 ?m.15 ?m.17 b
+lean/Holonics/HNN/SingleHoleResponse/LoadedWord.lean:27:41: error: Invalid argument name `endRing` for function `LoadedState`
+lean/Holonics/HNN/SingleHoleResponse/LoadedWord.lean:33:41: error: Function expected at
+  BlockM
+but this term has type
+  ?m.9
+
+Note: Expected a function because this term is being applied to the argument
+  endRing
+
+Hint: The identifier `BlockM` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+lean/Holonics/HNN/SingleHoleResponse/LoadedWord.lean:35:37: error: Application type mismatch: The argument
+  Ch
+has type
+  Contact → Type u_4
+but is expected to have type
+  ?m.20 → Type ?u.66
+in the application
+  LoadedM ?m.22 ?m.24 Ch
+lean/Holonics/HNN/SingleHoleResponse/LoadedWord.lean:39:23: error: Invalid argument name `endRing` for function `LoadedState`
+lean/Holonics/HNN/SingleHoleResponse/LoadedWord.lean:39:23: error: Invalid argument name `endRing` for function `LoadedState`
+lean/Holonics/HNN/SingleHoleResponse/LoadedWord.lean:46:23: error: Invalid argument name `endRing` for function `LoadedState`
+lean/Holonics/HNN/SingleHoleResponse/LoadedWord.lean:46:23: error: Invalid argument name `endRing` for function `LoadedState`
+lean/Holonics/HNN/SingleHoleResponse/LoadedWord.lean:58:35: error: Invalid argument name `endRing` for function `LoadedState`
+lean/Holonics/HNN/SingleHoleResponse/LoadedWord.lean:58:35: error: Invalid argument name `endRing` for function `LoadedState`
+lean/Holonics/HNN/SingleHoleResponse/LoadedWord.lean:56:52: error: Function expected at
+  BlockM
+but this term has type
+  ?m.9
+
+Note: Expected a function because this term is being applied to the argument
+  endRing
+
+Hint: The identifier `BlockM` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+lean/Holonics/HNN/SingleHoleResponse/LoadedWord.lean:59:18: error: Function expected at
+  absoluteLoadedFamily
+but this term has type
+  ?m.10
+
+Note: Expected a function because this term is being applied to the argument
+  T
+
+Hint: The identifier `absoluteLoadedFamily` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+lean/Holonics/HNN/SingleHoleResponse/LoadedWord.lean:60:20: error: Function expected at
+  absoluteLoadedFamily
+but this term has type
+  ?m.10
+
+Note: Expected a function because this term is being applied to the argument
+  T
+
+Hint: The identifier `absoluteLoadedFamily` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+lean/Holonics/HNN/SingleHoleResponse/LoadedWord.lean:61:22: error: Function expected at
+  absoluteLoadedFamily
+but this term has type
+  ?m.10
+
+Note: Expected a function because this term is being applied to the argument
+  T
+
+Hint: The identifier `absoluteLoadedFamily` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+lean/Holonics/HNN/SingleHoleResponse/LoadedWord.lean:68:14: error(lean.unknownIdentifier): Unknown constant `Holonics.HNN.SingleHoleResponse.absoluteLoaded_response_add`

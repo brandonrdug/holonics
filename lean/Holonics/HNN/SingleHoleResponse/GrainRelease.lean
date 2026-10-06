@@ -56,7 +56,6 @@ theorem constant_face_released_at_zero
   have hz : Holonics.Foundation.ReceiverRelease.width compatible hcompat reading = 0 :=
     (Holonics.Foundation.ReceiverRelease.width_eq_zero_iff compatible hcompat reading).2 hconstant
   rw [hz]
-  exact le_rfl
 
 /-- The declared holding law actually releases this constant receiver face at tolerance zero. -/
 theorem holdingLaw_releases_constant_face_at_zero

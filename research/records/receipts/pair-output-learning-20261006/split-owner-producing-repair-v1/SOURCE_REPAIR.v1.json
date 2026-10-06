@@ -1,0 +1,105 @@
+{
+  "grade": "source repaired; fresh whole-owner kernel/type acceptance pending sole queue",
+  "source_base": "6f789d5990fc20209c193a5985a3019b882202c1",
+  "failures": {
+    "LoadedWord": {
+      "original_raw_bytes": 6119,
+      "original_raw_sha256": "e6f7be52a11d205391868be1ab5d1543e97453d970d3e4d73b8b978cf0345957",
+      "published_diagnostic": "same complete compiler stdout, sealed-source absolute prefix replaced by repository-relative path",
+      "outcome": "whole-owner compiler FAILED1; no object acceptance"
+    },
+    "GrainRelease": {
+      "original_raw_bytes": 2711,
+      "original_raw_sha256": "0f65371783b2389390ff18f9fa14b57b67048f99c515da65a19843f327e07c74",
+      "published_diagnostic": "same complete compiler stdout, sealed-source absolute prefix replaced by repository-relative path",
+      "outcome": "whole-owner compiler FAILED1; no object acceptance"
+    }
+  },
+  "declaration_names_unchanged": {
+    "ComposedConsumer": [
+      "EndToEndLoadedState",
+      "normalizedSourceAnchor",
+      "normalizedSourceResponse",
+      "normalizedSource_loadedWord_grain_singleton_release"
+    ],
+    "GrainRelease": [
+      "exactLeaders",
+      "exactLeaderUnion",
+      "exactLeaderUnion_mem_iff",
+      "exactLeaderUnion_sound",
+      "constant_face_released_at_zero",
+      "holdingLaw_releases_constant_face_at_zero",
+      "singletonLeader_holdingLaw_release"
+    ],
+    "LoadedWord": [
+      "LoadedState",
+      "SourceResponseShape",
+      "absoluteLoadedFamily",
+      "tick_add_loaded",
+      "trajectoryAt_add_loaded",
+      "absoluteLoaded_response_add"
+    ],
+    "NormalizedOpening": [
+      "openedState_from_normalized_source"
+    ],
+    "ReceivingResponse": [
+      "loadedReceiving_response"
+    ],
+    "SourceExpansion": [
+      "completedCell",
+      "firstCompleteTerm",
+      "firstFixedTerm",
+      "firstResponseTerm",
+      "firstComplete",
+      "firstFixed",
+      "firstResponse",
+      "pairCompleteTerm",
+      "pairFixedTerm",
+      "pairResponseTerm",
+      "pairComplete",
+      "pairFixed",
+      "pairResponse",
+      "completeSource",
+      "fixedSource",
+      "responseSource",
+      "firstComplete_eq_fixed_add_response",
+      "pairComplete_eq_fixed_add_response",
+      "oneHoleSourceExpansion",
+      "populationNormalizedOneHoleSourceExpansion"
+    ]
+  },
+  "all_owner_selector_lines_unchanged": {
+    "ComposedConsumer": [
+      "#print axioms Holonics.HNN.SingleHoleResponse.normalizedSource_loadedWord_grain_singleton_release"
+    ],
+    "GrainRelease": [
+      "#print axioms Holonics.HNN.SingleHoleResponse.exactLeaderUnion_mem_iff",
+      "#print axioms Holonics.HNN.SingleHoleResponse.exactLeaderUnion_sound",
+      "#print axioms Holonics.HNN.SingleHoleResponse.constant_face_released_at_zero",
+      "#print axioms Holonics.HNN.SingleHoleResponse.holdingLaw_releases_constant_face_at_zero",
+      "#print axioms Holonics.HNN.SingleHoleResponse.singletonLeader_holdingLaw_release"
+    ],
+    "LoadedWord": [
+      "#print axioms Holonics.HNN.SingleHoleResponse.absoluteLoaded_response_add"
+    ],
+    "NormalizedOpening": [
+      "#print axioms Holonics.HNN.SingleHoleResponse.openedState_from_normalized_source"
+    ],
+    "ReceivingResponse": [
+      "#print axioms Holonics.HNN.SingleHoleResponse.loadedReceiving_response"
+    ],
+    "SourceExpansion": [
+      "#print axioms Holonics.HNN.SingleHoleResponse.firstComplete_eq_fixed_add_response",
+      "#print axioms Holonics.HNN.SingleHoleResponse.pairComplete_eq_fixed_add_response",
+      "#print axioms Holonics.HNN.SingleHoleResponse.oneHoleSourceExpansion",
+      "#print axioms Holonics.HNN.SingleHoleResponse.populationNormalizedOneHoleSourceExpansion"
+    ]
+  },
+  "facade_selector_count": 13,
+  "independent_return_audit_selector_count": 9,
+  "SourceExpansion_unchanged_and_accepted": true,
+  "LoadedMedium_actual_context": "Ring, Contact, V, Ch share universe u; BlockM owned by TickBlocks",
+  "changes": "Restore TickBlocks namespace resolution and actual common loaded-block universe in LoadedWord and three consumers. Drop only redundant GrainRelease final exact le_rfl after rw [hz].",
+  "native_inputs_unchanged_from_useful_learning6f": true,
+  "no_owner_compiler_or_job": true
+}

@@ -9,13 +9,16 @@ section ReceivingResponse
 open Holonics.HNN.LoadedMedium
 open Holonics.HNN.TickFamily
 open Holonics.HNN.Propagation
+open Holonics.HNN.TickBlocks
 
-variable {Ring Contact : Type*} [Fintype Ring] [Fintype Contact]
+universe u
+
+variable {Ring Contact : Type u} [Fintype Ring] [Fintype Contact]
   [DecidableEq Ring] [DecidableEq Contact]
 variable {endRing : Contact × Bool → Ring}
-variable {V : Ring → Type*} [∀ r, NormedAddCommGroup (V r)]
+variable {V : Ring → Type u} [∀ r, NormedAddCommGroup (V r)]
   [∀ r, InnerProductSpace ℝ (V r)]
-variable {Ch : Contact → Type*} [∀ a, NormedAddCommGroup (Ch a)]
+variable {Ch : Contact → Type u} [∀ a, NormedAddCommGroup (Ch a)]
   [∀ a, InnerProductSpace ℝ (Ch a)]
 variable {adj : Ring ⊕ Contact → Ring ⊕ Contact → Prop}
 
