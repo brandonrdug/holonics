@@ -1,0 +1,1780 @@
+{
+  "integration_worktree": "/home/b/Workspaces/holonics/.local/wt/capacity",
+  "branch": "codex/ranged-leaky-capacity",
+  "base": "128235e82943276a1eaa1ca9a7bc21fab0826f8e",
+  "physical_commit": "280fa010e6c12edd71276520470cfc29e527c6c8",
+  "index_unchanged": true,
+  "local_commit": null,
+  "publish": false,
+  "patch": {
+    "path": "/tmp/holonics-hnn-integration-20261006.patch",
+    "bytes": 12497308,
+    "sha256": "29bd8a944fe4082f0cc13698f4d5fdc63aedf7c66fc4e4ec02b4490412800115"
+  },
+  "tracked_changes": 20,
+  "added_files": 400,
+  "files": {
+    "CONSTRUCTION_STATE.md": {
+      "bytes": 23076,
+      "sha256": "82d06d8b5b3a6e22b8236747e590ddd3db89e7252c5b22295ae50affd80524e2"
+    },
+    "crates/holonics-cuda/src/hnn/port.rs": {
+      "bytes": 89741,
+      "sha256": "9f9cfa4305b99d361f8903f5fb2f3833512cd3c921a8ccb9dc7b84fdb8851cad"
+    },
+    "crates/holonics-cuda/src/hnn/port_tests.rs": {
+      "bytes": 92815,
+      "sha256": "f341db9b3fb0d8094b70d7f4ebd8db0f8ebb41e7c6b41122d6da5bedec8a233c"
+    },
+    "crates/holonics/src/hnn/field.rs": {
+      "bytes": 117656,
+      "sha256": "c7a556a2eec3007d0885292123aedda383f61fa48914cb334b8c8c8cb3991c00"
+    },
+    "crates/holonics/src/hnn/moment.rs": {
+      "bytes": 106993,
+      "sha256": "d92ffd6017ba63cd3e7ec3b8b22cc0bcb9d0c95f9887eade40c7b42831a63bb1"
+    },
+    "crates/holonics/src/hnn/prediction.rs": {
+      "bytes": 108879,
+      "sha256": "f0eb33270990aa14e72c5b668cb0433c8b9424533986be5934c87efc74283e74"
+    },
+    "crates/holonics/src/hnn/receiving.rs": {
+      "bytes": 79596,
+      "sha256": "1a5b23d4a045ba83f5960e3e35c0bb6425d2017e3516f8700ea25cf0f063c8fc"
+    },
+    "crates/holonics/src/hnn/reference.rs": {
+      "bytes": 220442,
+      "sha256": "9800117d77ca85642e607264897a9974aee3b2e9659392a4512ce4aba8cd13d8"
+    },
+    "crates/holonics/src/hnn/tests/prediction.rs": {
+      "bytes": 91960,
+      "sha256": "b8fec478451253985d936799e8dbcb456643d42543d98e2e678de8a9516bc24b"
+    },
+    "crates/holonics/tests/ranged_capacity.rs": {
+      "bytes": 24618,
+      "sha256": "86ae43a11634abbe645bf2bbab25e7a62e5e3fad302e31e105b62afb1abebb38"
+    },
+    "docs/ELEMENTARY_OBJECTS.md": {
+      "bytes": 114115,
+      "sha256": "d4f0ba0944402c2ed31c20fe65ab30459e11dbd144bd1561e8c64518fa2eb28a"
+    },
+    "docs/THE_MACHINE.md": {
+      "bytes": 71312,
+      "sha256": "7958756024073d9679dd03d34d75c8449f3646e64c6252d2346d90f2c9118a02"
+    },
+    "docs/atlas/objects.tsv": {
+      "bytes": 876010,
+      "sha256": "cfb7668c49df1ec0c71775ef91de70512921f8ca4cb64ac49d2b3567ad70c64f"
+    },
+    "docs/plans/THE_REBUILD.md": {
+      "bytes": 225216,
+      "sha256": "8eaf2637ac4699711d164719e897c49c06616cefb189452e46b6c5168b9da9e6"
+    },
+    "lean/Holonics/HNN.lean": {
+      "bytes": 45760,
+      "sha256": "d33d3bee1aa8bf49bdff77a623d7a8aa1a06be40b8615181db8b10df7db861ec"
+    },
+    "research/notebook/hnn_design/hnn_exposure.rs": {
+      "bytes": 90883,
+      "sha256": "d47a90aa95aea5cdb079f9c0b87bd343c5a528b20f6365b547336c12bb9a0dc1"
+    },
+    "research/notebook/hnn_design/hnn_prediction.rs": {
+      "bytes": 18298,
+      "sha256": "ad5d4d634c5de368fa54b09e97bfc0a65a0913354351d4a697e4079c80229a53"
+    },
+    "research/notebook/hnn_design/hnn_repair_loop.rs": {
+      "bytes": 31204,
+      "sha256": "76d7123a14ec3d01957a125f299a2195569ce39f04c470c05ccde3b120148d69"
+    },
+    "research/records/2026-10-06_THE_SOURCE_CAPACITY_BOUNDS_THE_ADMITTED_CLOCK_NOT_THE_OBSERVED_BATCH.md": {
+      "bytes": 13811,
+      "sha256": "6ec7683924e698b5e96d42abac446ee83e7e45b2afa554a3b9cd6e55a7534b53"
+    },
+    "research/records/README.md": {
+      "bytes": 157457,
+      "sha256": "7c21fe5be6796a6355c6a028ca317ee9a4fde538a9777b739c3f05e7f920ab2d"
+    },
+    "lean/Holonics/HNN/ReframedMoment.lean": {
+      "bytes": 8599,
+      "sha256": "c12d20d76b44ee512cbc80e2edad1a864f4c921bf638a6e2126b16ae832e3fd2"
+    },
+    "research/records/2026-10-05_THE_PHYSICAL_REPAIR_RUNS_THE_DAMAGED_SECTION_THROUGH_THE_FIELD_AND_HOLDS_WHAT_NO_CERTIFIED_DOMAIN_DECIDES.md": {
+      "bytes": 16883,
+      "sha256": "13382396fcdb90b5a584deac007272e09f0526b871c1a4ec27b4e217196b651c"
+    },
+    "research/records/2026-10-05_THE_PHYSICAL_REPAIR_receipts/compact.py": {
+      "bytes": 1943,
+      "sha256": "c4c96657b8c38a84c42ef1044f99f0f87c06cf7110fc26ece0b651b1e97e354d"
+    },
+    "research/records/2026-10-05_THE_PHYSICAL_REPAIR_receipts/development/dev.sections": {
+      "bytes": 69973,
+      "sha256": "8758ec5a19ec74ae36aa8ace1ac6e5de5f21a2bf36e617e4dc0c0401857a919c"
+    },
+    "research/records/2026-10-05_THE_PHYSICAL_REPAIR_receipts/development/dev_log.txt": {
+      "bytes": 5160,
+      "sha256": "4ad09612f0b51d5e529b3d011b31d47890fc427b23a1392b532fdb387af53efa"
+    },
+    "research/records/2026-10-05_THE_PHYSICAL_REPAIR_receipts/development/probe.rs.txt": {
+      "bytes": 5208,
+      "sha256": "e805b0999f01a6a5b7b65740501bf86814793fdf79005b292e8ff958f4a69ade"
+    },
+    "research/records/2026-10-05_THE_PHYSICAL_REPAIR_receipts/development/probe_48_ticks.txt": {
+      "bytes": 3117,
+      "sha256": "4de898a7b81711f9fcdfa07f0db18516d06f52a3273bd8754993e5499df2d150"
+    },
+    "research/records/2026-10-05_THE_PHYSICAL_REPAIR_receipts/development/probe_8_words_in_parallel.txt": {
+      "bytes": 646,
+      "sha256": "aa85386debf0ddde3c200f694ba3195c11c1e250aefbc1ae006b9efa9ad92ff4"
+    },
+    "research/records/2026-10-05_THE_PHYSICAL_REPAIR_receipts/read_log_stopped.txt": {
+      "bytes": 1010,
+      "sha256": "d9e4df955ea5049a75b0ed78cbe1168e57b88fcea87a7f618637b9b2607cd616"
+    },
+    "research/records/2026-10-05_THE_PHYSICAL_REPAIR_receipts/runs.sh": {
+      "bytes": 1211,
+      "sha256": "39a6720237949d1fda8050990de07331744c6a9a8c89bc82452333c0b059c7f8"
+    },
+    "research/records/2026-10-06_THE_BLIND_RECEIVING_RETURN_IS_JOINED_BUT_RELEASE_NEEDS_THE_EXECUTED_COUPLED_DOMAIN.md": {
+      "bytes": 7389,
+      "sha256": "5218a65985741e145b335aa5cdd00301a461f20cdbf5a99ae933c4f69c0418e7"
+    },
+    "research/records/2026-10-06_THE_PHYSICAL_REPAIR_ADMITS_ONE_PRODUCING_CHART_AND_ITS_STATION_CLOCK_BEFORE_OPENING_THE_WORD.md": {
+      "bytes": 11924,
+      "sha256": "7c0fabc123c504fa07eea3d385a808fa09dcc99aa4a079695a8860ab22fd3fa7"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/MANIFEST.json": {
+      "bytes": 14028,
+      "sha256": "1a425489ccbb10fd2bf1335b3a7e7f809a59c19498abee37d4897579aa5c7900"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/VALIDATION.json": {
+      "bytes": 7163,
+      "sha256": "8aa99628551a4b5dd01a9d6c87cb66e30297d4b6f98ceab108e8d3996c88e42f"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/before-bounded_stage_v1.py": {
+      "bytes": 12218,
+      "sha256": "8ef953d3a2dc37f5a0407983183f2ec25720a1abf155f120117c5744bdb10ead"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/before-final_stage.py": {
+      "bytes": 10554,
+      "sha256": "83df6f84512e1a1c807dbddf3396d997c68329f61d39ea22e408883d8506890d"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/before-leased_stage_v2.py": {
+      "bytes": 5345,
+      "sha256": "7c668bad52c3a32e87bf2d4a45dd7c90ea354896f7c5da1cb5c82c6a38cf9cf7"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/bounded_stage_v1.py": {
+      "bytes": 12645,
+      "sha256": "84b7d003089fa19881690e368200b2168b9d179c8e6573bdafab54369235cec2"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/final_stage.py": {
+      "bytes": 10968,
+      "sha256": "a0a5a94f157acf9a5127b756a036c6e86449dc2012af0f1e71d34aafa13bc79e"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/leased_stage_v2.py": {
+      "bytes": 5520,
+      "sha256": "bcf91456534e763a025613f39e82853d7a58529b399bb183d544d09a7a42f949"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/native-build-policy-adapter.patch": {
+      "bytes": 5477,
+      "sha256": "372486719e79d8ba2cc2dc8e220e9b052f9bc75f9172cddb4073039691fb2105"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-first-read-20261006-v1.acceptance.json": {
+      "bytes": 379,
+      "sha256": "405463318050ec2108d742026608fb6a1aa5d2ca732dcc3051cb0e1468f66f56"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-first-read-20261006-v1.config.json": {
+      "bytes": 51521,
+      "sha256": "5f4b337b5cbc6194456588d18b5819d547d090e81b3b0326f51a541077ce2c8f"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-first-read-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "849ec47e5be6a4c35f6030a8383d260af32c7b2963a93814143e3acdbd829e73"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-first-read-20261006-v1.failure.json": {
+      "bytes": 382,
+      "sha256": "b5892fc8f6cc141ff676d8797725260027bd263520d67d6d227e2a24bf1361e2"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-first-read-20261006-v1.final.json": {
+      "bytes": 3056,
+      "sha256": "d88071aa37dd1ae9858c372090d1723cd24cacc0f365b4f6bf3ca821f183e07b"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-first-read-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "b3ab4396d03b10c5b37911f977d852ead44194f4eb23fcf62c2910ee10c41cb9"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-first-read-20261006-v1.publication.json": {
+      "bytes": 1090,
+      "sha256": "9347ebf89db2a5e3791a18817959c52ae990a09e16dfaa63e2c3846456a7b3db"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-first-read-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "9703b73f2246065398b28a9a1e1b4d1776c94467d7bec2f606a40f2fc7b83ef4"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-first-read-20261006-v1.stage-quiescence.json": {
+      "bytes": 137,
+      "sha256": "0afbe8665604d64585c06cd34f2492d8ab04661ad602cef9b3709d29093ced8c"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-first-read-20261006-v1.unit-cleanup.json": {
+      "bytes": 757,
+      "sha256": "96629f179267a948b5557b8d54f9e488c51638072259b50ce63be0490724f14b"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-first-read-20261006-v2.acceptance.json": {
+      "bytes": 378,
+      "sha256": "12b996f5db51adf8cf780ec74e42c8377f96f6495b26354566aff6ac80cc0f3e"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-first-read-20261006-v2.child-identity.json": {
+      "bytes": 78,
+      "sha256": "9155dff9456b5a95cdece6b40bbc6a4c8d6d5bf751368f0273d56d477065f31b"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-first-read-20261006-v2.config.json": {
+      "bytes": 51769,
+      "sha256": "4f30708ef08481c8c9cdfa392ed2dd811b3cd14f3596c6d06021a12439af9fd3"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-first-read-20261006-v2.external-lease.json": {
+      "bytes": 487,
+      "sha256": "3eeeabca30f7fd9ac1de21e5c5b01acdc6651886b7d053a9634bd64db993df7d"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-first-read-20261006-v2.final.json": {
+      "bytes": 4725,
+      "sha256": "c61f176e2f66356be881a604ff25101ca82031437c3e5ed1e5b0ec0cf9686925"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-first-read-20261006-v2.input_seal.json": {
+      "bytes": 50340,
+      "sha256": "2e11ed05e4fb959751ca07e7c3830cd615e976b61a1228c68191dc81f338d8b1"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-first-read-20261006-v2.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "4f056b6d8dc10760a9739ee924cef4e15b88079da7a94aca4847208bd43f3ac9"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-first-read-20261006-v2.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "cc47ece112e34fa19cb8b861bf9c533ede0b81f28b07868c04a38449d2d48f4b"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-first-read-20261006-v2.output_seal.json": {
+      "bytes": 76775,
+      "sha256": "d65fc2ef3109a879df2e6c8112c5aded13ed7b1bb90d5ad56d3d9f0d1521c50a"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-first-read-20261006-v2.publication.json": {
+      "bytes": 2655,
+      "sha256": "f108914702716c7c4415bea51c7b227eae39a95a17dfff28ba42914bd190362b"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-first-read-20261006-v2.quiescence.json": {
+      "bytes": 130,
+      "sha256": "6b21dbb774b0d46c06761f30eb470f63745e1d7687bbff161a68c91c07912b72"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-first-read-20261006-v2.release.json": {
+      "bytes": 175,
+      "sha256": "449be84aa6f5ba98cdd294f6f5ad921f3f16320d3c7f6f85d09d4cab68d5205c"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-first-read-20261006-v2.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "8d73c373193ca2afbcbf2acf4eb6c94c84a2c0662aa9d26a3988e20260f9cbce"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-first-read-20261006-v2.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-first-read-20261006-v2.stdout": {
+      "bytes": 248,
+      "sha256": "e9e759694584608b0f29982cfc7dcfbeca8d6a43b884e211ea5f83b1396c4a96"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-first-read-20261006-v2.system-floor.json": {
+      "bytes": 8831,
+      "sha256": "d013a095c7885bc4519a79b4e6f24e563a973b509c0f5787d3c5c0d5d4b9757e"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-first-read-20261006-v2.unit-cleanup.json": {
+      "bytes": 701,
+      "sha256": "a4d7db7a6db24b1c522265b7d0de199efb5e6b52ee1cd08b30b77d334d7ca0c1"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-host-link-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "4811335037e3349c1f70720fcf96f46e9af5ab921d488de56adf65ca1c1b6f61"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-host-link-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "f18702b351b09adbe0bee544fc52bdab53b262b22da207ce8e429ce1e1e8e045"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-host-link-20261006-v1.config.json": {
+      "bytes": 50715,
+      "sha256": "7fd3184da7a23c71df36fb39be6e10d40a2c20974bffb0007210e8694a7db4f7"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-host-link-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "0d025c371506bed5c0e0ad575a6e4486b155b7c416cf6d99bc8571fe0384cc6f"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-host-link-20261006-v1.final.json": {
+      "bytes": 4722,
+      "sha256": "089de613caa1bf290909fe03567f6f23361a85a5bca39848d1919c83b34e3563"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-host-link-20261006-v1.input_seal.json": {
+      "bytes": 49864,
+      "sha256": "dd79ef37c264c8a27f1264145eb27c6b56dae0526c546f61f608db1c9e79e072"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-host-link-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "e97f06aadcc85f76ab007ec8f466351f13a2ac885b74ac60fac42cb95b86e8a7"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-host-link-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "b28cfb477d443adf4ac9b618f3731cbc03531b51df8b06fb952fb1a6135996cc"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-host-link-20261006-v1.output_seal.json": {
+      "bytes": 886551,
+      "sha256": "7f852ba076f9479e4da634593c54752dab0e85a16b498299ed94231e21ea206d"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-host-link-20261006-v1.publication.json": {
+      "bytes": 2658,
+      "sha256": "cf840a72c9bd29bd70fe37186c37463d9c1b6b91f5815fbe3287546c0274c945"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-host-link-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "36d51c58fccf8de8e7be3e291372e84b76da37fb3fc6cb2b7505ed0553016f10"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-host-link-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "3a1a1fe3ce4f8024f73a60d1a2b2a85ef7ebf8ed8b41f4205c39e8692d332e28"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-host-link-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "6d45be2fecf62bb0cab89bab98a50efee5535dcc658e413a40ebee1c6458b48f"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-host-link-20261006-v1.stderr": {
+      "bytes": 752,
+      "sha256": "fa0225514e40e3df412b7f913e09d47641d64938c4990281cbf2a7d6a8100823"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-host-link-20261006-v1.stdout": {
+      "bytes": 23638,
+      "sha256": "5dfcd892cb6e33c0befa1ca456f2035061bc7391608aee66bca5367767e20cae"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-host-link-20261006-v1.system-floor.json": {
+      "bytes": 97780,
+      "sha256": "68d4f7ec5d9244e830a86cfcced5fd8d84a0cf139e8e8cf52ba6163c35fdf207"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-host-link-20261006-v1.unit-cleanup.json": {
+      "bytes": 699,
+      "sha256": "7443ecb3b055f2248b3a374b29cb6efffc549cb5eaf442356b88486a7262d484"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-nine-tests-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "40ad0aab75813a22874f671c2e3ec8ba74a61c2692c848936b6aac63a6e53aec"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-nine-tests-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "20e2a79352a51945ddc7da7dda82f73e154c4c943922599bf353327c6d959001"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-nine-tests-20261006-v1.config.json": {
+      "bytes": 51525,
+      "sha256": "c07fa5b2b75d2e2828d4dc62b08519bedfc6cd94738b01aaf867c8c4de6d6d49"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-nine-tests-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "9941a80472b3f726e43b0e7e4430f6c95932b6bffa70ee281d9ae9cef6a2819d"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-nine-tests-20261006-v1.final.json": {
+      "bytes": 4728,
+      "sha256": "cec4df18ed41616710a547e1290e097c4cc7f27683399d1a93e7e092e0a7b424"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-nine-tests-20261006-v1.input_seal.json": {
+      "bytes": 50234,
+      "sha256": "66670c10e06e2d4006e082c7a45812b3c58ed6d9b17b6de7521cb9c78b66b222"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-nine-tests-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "5b6d5166bd32320557714128a8454690b8669f9d0337bfaa4d8a20019d497da5"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-nine-tests-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "53739da397a7b26669a58f9b581c7c53167ea607755d46a19dcc20b535ab3280"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-nine-tests-20261006-v1.output_seal.json": {
+      "bytes": 216078,
+      "sha256": "4a73674f226c3e92b4c18f1a51374fef42b340265999a57e546e13210d4c7e3d"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-nine-tests-20261006-v1.publication.json": {
+      "bytes": 2658,
+      "sha256": "7d2d98e759a3e592d72c1731f80be5693f468493aedfaa5ad0ffa4633a854028"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-nine-tests-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "3b5a4c2ead794873c6e24c119e023bbc39b8a708a2887c3b52cca7054085ec7d"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-nine-tests-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "5c6a37bd53ef2bf7bae3bf988f0af85080987928935db27014c905533dbd3de5"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-nine-tests-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "70059414537a923af123b95174bc1b74cfe474ef736bafe96694f8ff1ec8d486"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-nine-tests-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-nine-tests-20261006-v1.stdout": {
+      "bytes": 1204,
+      "sha256": "e22f96a57b3079a5459b8eabdcf61004adb97b420744c8ef2129002ed8397105"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-nine-tests-20261006-v1.system-floor.json": {
+      "bytes": 24875,
+      "sha256": "01945473d106cc5c2d13f3125866eea728c49001268d258c44b95265e477b2ea"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-nine-tests-20261006-v1.unit-cleanup.json": {
+      "bytes": 701,
+      "sha256": "5cc726903f35ebc891ac954c2597f34c9b5b44254170349afaa6d7b98cf07e25"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-notebook-check-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "cbc1cc31470e3819e63cf9858070ec8efe549d63ad082336b55f7e032655431c"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-notebook-check-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "17fa5ca1c82641f8465a56f503800794c5a098bb43974f2c84c4c444d8a5a40a"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-notebook-check-20261006-v1.config.json": {
+      "bytes": 53269,
+      "sha256": "b8b623bd9183d19dfb963b6e85f51b8adcf0342eb64eaef7a7aa8cbabfafb318"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-notebook-check-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "385dd452bc9c2a40ff6ef29fd6eb923cf483d1737dd29f990e043a2e3eadd32a"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-notebook-check-20261006-v1.final.json": {
+      "bytes": 4793,
+      "sha256": "5a281c5da0251a6a003b5edbaddb0b85c31a1f89ddfbd37e047705e51badbd8a"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-notebook-check-20261006-v1.input_seal.json": {
+      "bytes": 51547,
+      "sha256": "22577821b1b0deba1f87ff3691351b145c96103b81695ffbc5ecb0d5fa3a02f1"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-notebook-check-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "b76febb637709160b1def33aaa3042d033afd4595c62e9169e634fa65e9b5266"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-notebook-check-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "333f950112bf849d9556d6697492bf02934d4d2652c9d151042b2147a92f8d69"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-notebook-check-20261006-v1.output_seal.json": {
+      "bytes": 129892,
+      "sha256": "520286dca70ef537b56f701790fad1b523d6708445428d4a36acf6db1cc73c99"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-notebook-check-20261006-v1.publication.json": {
+      "bytes": 2704,
+      "sha256": "285bc804d2a6b7e83171c255fd58c428e10cb813dce0a11bc61b9d2526f73119"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-notebook-check-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "32733f512e4455973c964fe11da3d62d17b2076af0d60461dc727361b94417a1"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-notebook-check-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "6a5a42989711995eadc1fd759a193d8be68ebd0d7eb5162878d570734c86cb4c"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-notebook-check-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "b11096a727169b831cd92d095ad7abaa43fde9c606d9e5164502e51a8b1fe632"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-notebook-check-20261006-v1.stderr": {
+      "bytes": 624,
+      "sha256": "56b7f2d7cfd5e5d5f01abf8663fe40c9a3d203ebf02c69c26bcad3d57cdec290"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-notebook-check-20261006-v1.stdout": {
+      "bytes": 23139,
+      "sha256": "55f8003e1c470a5e106b706aac7a928571a06083860bb4664b705a632b8a01d7"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-notebook-check-20261006-v1.system-floor.json": {
+      "bytes": 14293,
+      "sha256": "6cfda034e4635e79ab3bfac397a76f8d449dc4e68c5fc5782c1b1c5a6c24d43e"
+    },
+    "research/records/receipts/physical-chart-join-20261006/native-validation-v1/physical-chart-notebook-check-20261006-v1.unit-cleanup.json": {
+      "bytes": 709,
+      "sha256": "28721f26a1d44a62067fd2793f2304de3069a3cccecfe5980612b5b8df741872"
+    },
+    "research/records/receipts/physical-chart-join-20261006/prior-physical-failure.txt": {
+      "bytes": 1376,
+      "sha256": "af74117111745c9defe3ae3ae775ce20cce284153b5282045b2a9b4fd2503380"
+    },
+    "research/records/receipts/physical-chart-join-20261006/prior-provenance.json": {
+      "bytes": 310,
+      "sha256": "17dec9e6d27f9a7a656122a1b76332566a8fb67a62f39c4afd78b7ab43c81dc1"
+    },
+    "research/records/receipts/physical-chart-join-20261006/source.seal.json": {
+      "bytes": 1497,
+      "sha256": "3a7cc37544485b9daabba33c4f86ae35643a18147055610f53009e7d79f2ebc2"
+    },
+    "research/records/receipts/physical-chart-join-20261006/syntax.receipt.json": {
+      "bytes": 496,
+      "sha256": "f5278d44da93c9606b6310c9580ab943d2909802460d7bb477be8eb361166edd"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/MANIFEST.json": {
+      "bytes": 15726,
+      "sha256": "b82a48ee7fb4e28c75852f6348b826f2873e12976d1d09c290736f1946ee6591"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/VALIDATION.json": {
+      "bytes": 2607,
+      "sha256": "1fde1577942a983ff7fe219de01456705bdc74f972f68293bd4a6d9c59aef38e"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/bounded_stage_v1.py": {
+      "bytes": 12645,
+      "sha256": "84b7d003089fa19881690e368200b2168b9d179c8e6573bdafab54369235cec2"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/final_stage.py": {
+      "bytes": 10968,
+      "sha256": "a0a5a94f157acf9a5127b756a036c6e86449dc2012af0f1e71d34aafa13bc79e"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/leased_stage_v2.py": {
+      "bytes": 5520,
+      "sha256": "bcf91456534e763a025613f39e82853d7a58529b399bb183d544d09a7a42f949"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/native-binary.seal.v2.json": {
+      "bytes": 722,
+      "sha256": "536410fc51689068c311c8542c2cd60b7e01744d24a95678d5a06a711a227640"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/native-runtime-plans.v2.json": {
+      "bytes": 2648,
+      "sha256": "ead82bc4e50676739e93acbd3f20a34e98a78b6c97ec032066d8c613103b6bfe"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-carry-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "a63c391fcc81cedc3004fafff20003fe80d920e722b08f260b0a89d20da10d71"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-carry-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "e5908b6fa70aa6f0d36055bd744d981bb86a05c563c2c9036395161c1864909b"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-carry-20261006-v1.config.json": {
+      "bytes": 53589,
+      "sha256": "ac1387983141b4057da548796591d73c5fcece88af8aef16b20fd33faf7be7a8"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-carry-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "19f884a1e424cf87a13ceb8014dabdf47bceaaf63a74e6b3f473e0ef3348a9cb"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-carry-20261006-v1.final.json": {
+      "bytes": 4736,
+      "sha256": "da60f113abf2130a7ada18cb484ba5d4eab6540cfc44d9f0ced2b31067949446"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-carry-20261006-v1.input_seal.json": {
+      "bytes": 51302,
+      "sha256": "d45f2af41e7d640e56155940f999294b1ede5182f798b8ef34f600b109668be9"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-carry-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "358cb729dc877cb1b0d3861991352a87f95caf34af3bb701e0be6d65778684aa"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-carry-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "6eb23733ceab45151cb836851804239c7cc2b86c464a60deceb6ca807e62f6f8"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-carry-20261006-v1.output_seal.json": {
+      "bytes": 45773,
+      "sha256": "c73d79f8c69357af71d74d8b9f1e09cfb22309659c5beef85b34eded4acfa982"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-carry-20261006-v1.publication.json": {
+      "bytes": 2663,
+      "sha256": "8da75eadd721198171c445c59d73bc778bcf88d007c5ee1956fe53c00683cd0a"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-carry-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "d283eb0fc75949966b658a19161346e2df51522387dd27aec4d14dfedaf9abc4"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-carry-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "2e549a68561306e7af68212fa63acb2a4ece42476ba0f00abf018dfddc5d1f00"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-carry-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "eb6a56a95c3b8f6b61e326582ef2625ace169b88f722303a86189903b65f97d3"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-carry-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-carry-20261006-v1.stdout": {
+      "bytes": 244,
+      "sha256": "bcf12666d123d74337c17a2dc91bbfdd865ae16d27032f944fca8ed4820252dc"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-carry-20261006-v1.system-floor.json": {
+      "bytes": 5251,
+      "sha256": "e77a1ae789b6af1958a7e286fb3d1035c46525bb9e9b67d94a287f6d2ffe76cf"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-carry-20261006-v1.unit-cleanup.json": {
+      "bytes": 703,
+      "sha256": "399a3d25d2b1eab881e52e810de54a6e93b94d9b2aada82d4794a35f35f0263b"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-host-link-20261006-v1.acceptance.json": {
+      "bytes": 379,
+      "sha256": "797c2cfa1ea8e19f561b218f4b23dc399222a5a56675933552fbebf6d8a5b567"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-host-link-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "aff4606d596d245b1fdb15897d2a88873dbe2c6a8016492e2f5633004657e405"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-host-link-20261006-v1.config.json": {
+      "bytes": 51712,
+      "sha256": "65b93afcf9655bac6f8c44378ee1a4e398ea2f0164ca41d2080c3510ab04ebcc"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-host-link-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "6c19588289c8ad6cd60487e425a5674312e29882c2dfd7e25b4786e7e5a4ae1e"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-host-link-20261006-v1.failure.json": {
+      "bytes": 244,
+      "sha256": "c87f3029585dd73e4da1d6e47e7f90e55a940b08cea577ae98066a5a8296037e"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-host-link-20261006-v1.final.json": {
+      "bytes": 5061,
+      "sha256": "08d1bff6d1084688dabfa4b9b7fcf558cef36c0b3d5225b8a1f34502d7686d29"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-host-link-20261006-v1.input_seal.json": {
+      "bytes": 50404,
+      "sha256": "549553537742bb77be2ba4ff18174c674b33607f092c5a80088d14787309bc0b"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-host-link-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "d8f6fbb0ec9242c31e6ab7c736ccf1234b0bca5c9d3fbbbe54753e0f6b1edb65"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-host-link-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "ba36b1d18b29799f4f9886080dddf62a18638adff71def9b5407300687779265"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-host-link-20261006-v1.output_seal.json": {
+      "bytes": 1773944,
+      "sha256": "6d7e72cfb54edf827e94be8c608d94b87aa8507bc678bc7fb554d9e3b727e7f1"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-host-link-20261006-v1.publication.json": {
+      "bytes": 2919,
+      "sha256": "7f5ce0dcadef4230df1ab788df4b7fa9e50319490ed08c46d076d9898525e34d"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-host-link-20261006-v1.quiescence.json": {
+      "bytes": 132,
+      "sha256": "1b203a74ce8ff86f6fbe493b9a7111300a0ace4316068965c35abb8eab455721"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-host-link-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "a9a1c8c0ecbb23f039de6a62f8359a13a36e10f57453c21c6cf35074ce968943"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-host-link-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "a4192a9e1c21c539078f12fc57b074e1b9d7a1f9d827c87dc2fe7f793febd71e"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-host-link-20261006-v1.stderr": {
+      "bytes": 1949,
+      "sha256": "9d9d4d45b6bf2981537530347d6978ff109c927d96bb436fa70a8621a1b96a07"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-host-link-20261006-v1.stdout": {
+      "bytes": 22845,
+      "sha256": "d721a63ddf8ddd0e493f65cf4f73a2bac118c458a9df294577e494eb791cbf1d"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-host-link-20261006-v1.system-floor.json": {
+      "bytes": 195189,
+      "sha256": "3340daf944ec7e45f4fd8cc25a69f1f7a1bc253ff250dd0397c600c17d3a243a"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-host-link-20261006-v1.unit-cleanup.json": {
+      "bytes": 772,
+      "sha256": "33091a31bb1f08c4657263b272a53191c04f38f2f623e1e07b00efb4f4d5b1c2"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-host-link-20261006-v2.acceptance.json": {
+      "bytes": 378,
+      "sha256": "9ca7a29328358fdae9cd0b88385d5994d534f58149fa2bc31164ff796c9ea65d"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-host-link-20261006-v2.child-identity.json": {
+      "bytes": 78,
+      "sha256": "e6aae54530f78c35650768ecf5644cff266e6262f5e1e99f35ef2c019ed534c6"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-host-link-20261006-v2.config.json": {
+      "bytes": 52280,
+      "sha256": "f0eaaa728df95398e491bd863a4a82283053045b532dda98fdc40bc223ff02b6"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-host-link-20261006-v2.external-lease.json": {
+      "bytes": 487,
+      "sha256": "a848c2a028bbae46370c970406618019915a2488df2ce2e9182fa5a13123fd77"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-host-link-20261006-v2.final.json": {
+      "bytes": 4814,
+      "sha256": "ec810747a5e31f32e08d7a77135376d4e989c7a1751c9d7d1e59f7e8af44dc38"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-host-link-20261006-v2.input_seal.json": {
+      "bytes": 50535,
+      "sha256": "116dd739f74de84b03e391c8b1f49123f198b6bd1a49730824e110173b58adf1"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-host-link-20261006-v2.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "3d4c0ec304e4e0b2aba52cb7cd6a4477f204675d6bf3615c11a805e1b462dbba"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-host-link-20261006-v2.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "c73d72c7dff64e417e1f143d319f77915bee5f69a984b7fb305f3c80ae40bac3"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-host-link-20261006-v2.output_seal.json": {
+      "bytes": 1291679,
+      "sha256": "1407a078f58826492fb7504607da164f7a1820bfe573294df913e71824874076"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-host-link-20261006-v2.publication.json": {
+      "bytes": 2720,
+      "sha256": "8950b2abf7bd74ad5d2772fc92171e999f0bd4fca775a225e241cd58eea87d18"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-host-link-20261006-v2.quiescence.json": {
+      "bytes": 130,
+      "sha256": "4d71a055af421d0e09d96744c66e32eb3398330b33768358c11f4de460895ec8"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-host-link-20261006-v2.release.json": {
+      "bytes": 175,
+      "sha256": "ecfab0cfe4b198bd77587433190a1056c3d81ac21c7853f8b387234d98bc4d6d"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-host-link-20261006-v2.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "24303715f4f8d4c06f4631e4aa1491ace25800140ec8f24f595dd7046fdd7943"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-host-link-20261006-v2.stderr": {
+      "bytes": 600,
+      "sha256": "68ea8ea29525009043e68fe36519adc3f3ebc68b0bbf4fc0d9220f7b19971fad"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-host-link-20261006-v2.stdout": {
+      "bytes": 23633,
+      "sha256": "768af4f3e385659f6c2250b42915d8183b729dd72a6f5043c03a78caf90f1add"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-host-link-20261006-v2.system-floor.json": {
+      "bytes": 142147,
+      "sha256": "adb2f03251be1dad7994044f506c4ed2a90e721be403b6b382fd972bac52ddca"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-host-link-20261006-v2.unit-cleanup.json": {
+      "bytes": 711,
+      "sha256": "220f2fe94648f059ec1bd3ce6a3d36671344446bfb4db295a1d87961a097bdca"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-teaching-change-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "13f0c2b85ad5b84a1fcde1d0e970fe630ae02ab941928cc1dbd57a3be215e47d"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-teaching-change-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "5a1b349fe8dab9748b16f83c2f50d131e59b24c74193e4882894a3ade62b89fa"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-teaching-change-20261006-v1.config.json": {
+      "bytes": 53609,
+      "sha256": "ba1e3b5dbbd39f4a59b0982c5fc528a81895b7d9a1336b73ebb8705c708b9ae3"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-teaching-change-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "013226fc002bebb904989aac958967a42835e75a94ad6ff9b63ded863dc94047"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-teaching-change-20261006-v1.final.json": {
+      "bytes": 4889,
+      "sha256": "8b74fefe89f8f831d6c80609f55aa7fb629d0ffbc253e3ea2aea8229d59d0eae"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-teaching-change-20261006-v1.input_seal.json": {
+      "bytes": 51300,
+      "sha256": "fa12b3f991f2fb64ffdc2132104780182a25219a591a7accb6f4c8c2a04ed493"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-teaching-change-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "216fcc6aefdee479c6a1df71c8e1f4876fbe666dd7283f7eba05704e58a1ec71"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-teaching-change-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "1b8221816d64334ab6c819e987b15e180ea3d027c02cba2928982a37277f5486"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-teaching-change-20261006-v1.output_seal.json": {
+      "bytes": 61157,
+      "sha256": "57909f357cc76316984eb828896179d26ba4d4ac9da8896796d0d90f174cda62"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-teaching-change-20261006-v1.publication.json": {
+      "bytes": 2764,
+      "sha256": "c6f728260feb64ad74219b83d52b2dd98b9d9b60034e9d5d19b71f210d688c2f"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-teaching-change-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "2ebe8630f0744340c8d028597297bf9a38ae6270772a9fd0893455d82eb3eb55"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-teaching-change-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "fced0a20e0ef56e0baeb59643760e95629d58bb8a663af817065db880c5fb66d"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-teaching-change-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "87cbc5799da2c7f38e743bedad17ffe9e1874da54455c3e84c339c29ead3ae22"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-teaching-change-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-teaching-change-20261006-v1.stdout": {
+      "bytes": 815,
+      "sha256": "488108bf91cd5fe4fb537d4e81e182749a92d311e1fbf27d00b111540e730419"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-teaching-change-20261006-v1.system-floor.json": {
+      "bytes": 7077,
+      "sha256": "4cafbb0a703e087df5430a9733a2712c049f8cd51378a78952df46c520879911"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-teaching-change-20261006-v1.unit-cleanup.json": {
+      "bytes": 723,
+      "sha256": "22064a195e125ef738c32a092d4b208b79c6a7c668df54687c4b115fac8b344c"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-teaching-refusal-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "6761410ce63ede108b20ad5ccbe0ad2fb8dcb461bc930f7175ae9b3e1cc8c54a"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-teaching-refusal-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "a33fc9d886a9439ea7f9af02c3d063576e2b35c4792ab919e9428881f8aeb0f7"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-teaching-refusal-20261006-v1.config.json": {
+      "bytes": 53666,
+      "sha256": "565e177255a947b31deac10dbb7a679fd2d7654e455846938f35adf395409f8e"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-teaching-refusal-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "5017f448ec36b7680fb9938a2f841455ca82d213962df4a07993b97ab09ffb15"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-teaching-refusal-20261006-v1.final.json": {
+      "bytes": 4902,
+      "sha256": "532010c13f72d714003f866cd0053b5b210ff5f83126ea65bb5925d11da94151"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-teaching-refusal-20261006-v1.input_seal.json": {
+      "bytes": 51341,
+      "sha256": "3c173446ac8814929a12de7e8b94c4d558adc18a87410967acf3deaa6418aedb"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-teaching-refusal-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "8ecf15a41dfb75d6ade462022ada487b7bf85dd091971a18592385f0f3365b96"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-teaching-refusal-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "bd3e5dd45edd7ac551cf4d0014038cb1cbab07e16a5ed8b4631de770df1cf9b1"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-teaching-refusal-20261006-v1.output_seal.json": {
+      "bytes": 53125,
+      "sha256": "685ef32a813c6211603edf61a42ec7c1935ebdb9641044060f3e3a290e51ccf9"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-teaching-refusal-20261006-v1.publication.json": {
+      "bytes": 2773,
+      "sha256": "5fc4c3095148b444e82bc179e90e4fe5679df3a4845965b914e2c638a39c7478"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-teaching-refusal-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "3b53aba56887933a144b91d48cd61b015aac7ff23f0c1ccb88cb2bc2102d4a26"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-teaching-refusal-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "2092cb30559952a1607e4fea159d4dd9bfd4162cb242189ea1fb03d4828041f0"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-teaching-refusal-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "3d8c0d63bbbea5c7f00183fac5a9f69026a083e6c2bba8cd510f51c52bf9ceb7"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-teaching-refusal-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-teaching-refusal-20261006-v1.stdout": {
+      "bytes": 252,
+      "sha256": "ac55afec4f932696a052603fe6f469f1f529ba9eed34adb35363961215efbb32"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-teaching-refusal-20261006-v1.system-floor.json": {
+      "bytes": 6164,
+      "sha256": "0e72acc07f7d2fe562d9e030f8e35afab7eb0079294e336a979d1d882543445e"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/physical-observation-teaching-refusal-20261006-v1.unit-cleanup.json": {
+      "bytes": 725,
+      "sha256": "3b6514020ce61dda1fa349e38ada13f36d7aad607a25e71d7ff8bab222c22b13"
+    },
+    "research/records/receipts/physical-observation-join-20261006/native-validation-v2/source.seal.v2.json": {
+      "bytes": 1600,
+      "sha256": "4e01d6b778fdba2c5a22a96e329f92c19e4d55118d3484eae5bfacb92fa56707"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/CUDA_HOST_CLOCK_INTERFACE.v2.md": {
+      "bytes": 3003,
+      "sha256": "69337e9cb013187f36486e588e3334c8138217e0bad766d769cc8e89540f4bd6"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/CUDA_ORDERING_REVIEW.v3.txt": {
+      "bytes": 1452,
+      "sha256": "a2ac7b3c52515aac25b6a12c59bd81aed56914b64d5dc20aae758521156211ac"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/HOST_REFRAME_SOURCE_SEAL.v4.json": {
+      "bytes": 2673,
+      "sha256": "4b866e17ed4ba7095835efa71656eacc1fb4a8a04f2f96ea4f19a5c664e4d2f9"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/MANIFEST.json": {
+      "bytes": 33544,
+      "sha256": "4be33e9e4012992bba26f4f259e559da8038484ba900a861097464b86ea4e177"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/VALIDATION.json": {
+      "bytes": 5568,
+      "sha256": "c69d1041b9034d1597644248937433a3f5183427bfbd45e242badaee819e89f1"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/bounded_stage_v1.py": {
+      "bytes": 12645,
+      "sha256": "84b7d003089fa19881690e368200b2168b9d179c8e6573bdafab54369235cec2"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/cuda-clock-mirror.v4.patch": {
+      "bytes": 18935,
+      "sha256": "2a778664aba6737e9eb70a660ce0516de3c2490c6b9f781028e6c9353f0cc2ff"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/cuda-clock-mirror.v5.patch": {
+      "bytes": 18951,
+      "sha256": "5efcaf8531e81e2650914654ebadbd2bdb635c980f23c09fcb091465f8844a57"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/cuda-clock-mirror.v5.receipt.json": {
+      "bytes": 622,
+      "sha256": "df9ecfa1a4cd45b313c7f1153c72562f6f5d9b87e7b43b2e5e40778fdd4365a2"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/final_stage.py": {
+      "bytes": 10968,
+      "sha256": "a0a5a94f157acf9a5127b756a036c6e86449dc2012af0f1e71d34aafa13bc79e"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cold-restore-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "0f4a868813c69bf8b12d1f418e544d726152f2ae4c816e6f224ece616ec6870a"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cold-restore-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "6728a742ba838bb2aa8557d751e8495d22cb68dede92bb58f9ab40ca14d969b0"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cold-restore-20261006-v1.config.json": {
+      "bytes": 61714,
+      "sha256": "f993ea7a5f2f0bf2d6df6e76165bfb992667149cd54c020edad7aca504f5de51"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cold-restore-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "9dde1e4bfdf0771ef2565423050c3b5c81ae0ccb9d8749d22ee0d9fcfcbd7953"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cold-restore-20261006-v1.final.json": {
+      "bytes": 4723,
+      "sha256": "f776cead52b4c0b890fffe31ce044c2e12bb7af5f792546c9f0a88d1d501e7b0"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cold-restore-20261006-v1.input_seal.json": {
+      "bytes": 57727,
+      "sha256": "ff3dc3bb7a2cf96b7d6fa0f7f89ce6941a87fe70184151d07697acd4c39145d6"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cold-restore-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "6eacc134e3daa54d878287fd872060af7f678a9b719ffe82b1d49c74591cd664"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cold-restore-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "6c9781e56522004520e01ce9fd6282b6e12fa352d8986ba33f1cfd4e4c1bbe56"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cold-restore-20261006-v1.output_seal.json": {
+      "bytes": 48249,
+      "sha256": "5e46a0675c1f22872b35472c64753e1ed0246aeb145cfd1c5a920de8329f056f"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cold-restore-20261006-v1.publication.json": {
+      "bytes": 2653,
+      "sha256": "aac56940eb70bfcc3b6c79d1184801f390661193034bd82caa03605663f240ab"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cold-restore-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "6f16d3a41b00cecad8ca4a47aa0f6d0ab6a532a34ed465f33c9f11cab0312f11"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cold-restore-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "b88aaa5ad3d982ccb2e212f36e771de5ae8754a50e3b1e02e28bc16d8bac3a4d"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cold-restore-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "819fbcaa63ae2a9e31524351106947f239a2d9c6023456d20df45427143f305b"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cold-restore-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cold-restore-20261006-v1.stdout": {
+      "bytes": 347,
+      "sha256": "91942278fe4e24f045dc2897b07bf08749fc86686ae8fb747370262d8daffe56"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cold-restore-20261006-v1.system-floor.json": {
+      "bytes": 5500,
+      "sha256": "5d77a225dfab939ebe5ed48e9493b8936f1d90d987ccc056686df4ed3a61fec0"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cold-restore-20261006-v1.unit-cleanup.json": {
+      "bytes": 701,
+      "sha256": "4394c2781b22ac9d0f4883537f75b7299129ed16341f5cf3e078da93507a5c48"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-capacity-refusal-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "d359898905cbd97ee4612875d3ab7de73f295ffea026d77453c85af51ce1c60a"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-capacity-refusal-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "2a8552637c519a950f2c776f202a81d6a36197024377a58f9f61ba35321a4a42"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-capacity-refusal-20261006-v1.config.json": {
+      "bytes": 62077,
+      "sha256": "4344c8acf67398c32f34d4961a613b01fcc9ff94b6fe82485779f005fa1c7157"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-capacity-refusal-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "f7063760143256a1d1f7419508e77678f2eb203a6a8a2745e4afcf20bd16196e"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-capacity-refusal-20261006-v1.final.json": {
+      "bytes": 4863,
+      "sha256": "739354eabd604dc27439b6c34a8833bffc037637cc3c3629dc8e7cdeb7f20bf4"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-capacity-refusal-20261006-v1.input_seal.json": {
+      "bytes": 58076,
+      "sha256": "92e02b4b3607b3cd4cc100e2d680565cb0e238344febdab7f51fdb38f335b2cb"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-capacity-refusal-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "569981c4a773b6dac06f5b2cf25983c1e05293f7e2c776ffb5373b6b20a7fb37"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-capacity-refusal-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "d8acd08301024f1789b32a7e8ddd03af3715b6a3f75a7ca2071b7a530453a6c3"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-capacity-refusal-20261006-v1.output_seal.json": {
+      "bytes": 249344,
+      "sha256": "46fd8aca311714ae44ef95f29a518c99261e791a3e74c2b06f6b4daa4cd26899"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-capacity-refusal-20261006-v1.publication.json": {
+      "bytes": 2749,
+      "sha256": "b96c0bd96f8580b5326eba0158d474633ddf4ecaecc34b1c2cb87bed06e11e4b"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-capacity-refusal-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "d5f6dda4f38647318b044b55641672e7c7317019223737aab3d9e4291f1b6ab3"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-capacity-refusal-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "badb334f92ab9aa3854f7aca127a2d3e9ae7aab8779287999d4aa52f11cad420"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-capacity-refusal-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "d8ff81cc407866165d0886fb1d1a38249fe250f2582a9d8f27654a283ac5d6f1"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-capacity-refusal-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-capacity-refusal-20261006-v1.stdout": {
+      "bytes": 197,
+      "sha256": "c57675f6d52bce998a2878ba05e0a2d567ad39e54ec168bcaf37446166f1f1fe"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-capacity-refusal-20261006-v1.system-floor.json": {
+      "bytes": 28407,
+      "sha256": "e24d35c36e97864443c60109210841bff0bef61c5539e60428dcba679767ccfe"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-capacity-refusal-20261006-v1.unit-cleanup.json": {
+      "bytes": 719,
+      "sha256": "a9bc61115aa4f2cda4f38d7619b2d38921a1dbd2a439bbe917b854bb2c2788a6"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-failed-ingest-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "f4a4796b3c1705f857b09fb7b0bfb604ae530d739b529298d16ae8d3dd6aa40d"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-failed-ingest-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "1a326dc8ff2d443f1a988d02f1103644949235e3fb748804b1d0e9884f978fe7"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-failed-ingest-20261006-v1.config.json": {
+      "bytes": 62053,
+      "sha256": "5477472530e07c291719f0b4a5b8de46ded04449e69526713c95b5777bfb27e6"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-failed-ingest-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "7ba645043fae68c69e4e842ec7750ad03052e4469be118f6912c63d49381d30f"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-failed-ingest-20261006-v1.final.json": {
+      "bytes": 4818,
+      "sha256": "0789dd9af9fa15dee512de291114ad045d844c82d3f1714ca83be9322eb3014f"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-failed-ingest-20261006-v1.input_seal.json": {
+      "bytes": 58052,
+      "sha256": "d7d1e5bc0d7bc1ff37451f1bae47d61078804384048ec5cfe1e66ce6fe6f6cfc"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-failed-ingest-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "af3ce025bfbeb584ff95c244ad4af5bcc77a51ac96180dfd6f3448fcb1e1d2c9"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-failed-ingest-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "b5049c740a1e046b65f6f9c192745b17e662abc365260279993b629545ada4f6"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-failed-ingest-20261006-v1.output_seal.json": {
+      "bytes": 409875,
+      "sha256": "ad494242cecfb10a7609cb8d0b186c1524224ab45f19d53ff4a4c6ef48ecd281"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-failed-ingest-20261006-v1.publication.json": {
+      "bytes": 2719,
+      "sha256": "7b438698c0bd5b3da800bcd8710aa94360223e446372298fcf24cccdb8d81626"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-failed-ingest-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "0f79715629b27d267f2966269b1f69191bc9244b21b28c7195f0dedf312b023e"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-failed-ingest-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "d8bce2cb54d24a4a37c450fe0c9fef0f037da20795b9486ea51b28e89844f501"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-failed-ingest-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "e290ef1357729f9cf293fda256aef849d4c0e4692414a170fa34a6106716293a"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-failed-ingest-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-failed-ingest-20261006-v1.stdout": {
+      "bytes": 182,
+      "sha256": "e69c25b114c17b006220b8ca0efe8b778dd4e58610c61bf71be93040894f770d"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-failed-ingest-20261006-v1.system-floor.json": {
+      "bytes": 46464,
+      "sha256": "c855b4c8e7c246d0f915d8ee20f3c81c2b1730ac56bc620e3c7915c97813a9ae"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-failed-ingest-20261006-v1.unit-cleanup.json": {
+      "bytes": 713,
+      "sha256": "5b8833ace4b997c2d225f7421d476c19308c982f752222531fdc5d70f114c4b4"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-host-moment-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "5219d37fa58f66d529c19d9f5a3faded97ad354ab05df22a568a183b57e56024"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-host-moment-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "e5307e5ce5a39a2bb38c275238e4899abada6e9ccfdda71a2267e922d443f707"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-host-moment-20261006-v1.config.json": {
+      "bytes": 62040,
+      "sha256": "13ecb81d1124e372158feefdddd8f709fb8ec20c0ba82be25088cf36108874da"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-host-moment-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "d8a6398102f135765621474aef17890caa3770a58204454f4fc072cd0fc3369a"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-host-moment-20261006-v1.final.json": {
+      "bytes": 4787,
+      "sha256": "dd6381d22b96056f0db8ea375572c693d1655045fb5ed2bc204ea9b050e1b23a"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-host-moment-20261006-v1.input_seal.json": {
+      "bytes": 58039,
+      "sha256": "c412dfab45cb5311291c06da1f396c5e9427d0bd7682fe9fb783858efde232bc"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-host-moment-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "83a47eebd6f73563083fff4079ca9497c0236f30e8b9761cfb65cd87c3055178"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-host-moment-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "55de55af02b91ad1672794b9c93d0b2d4f3b010b0c45ca3ba3481d091272bf55"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-host-moment-20261006-v1.output_seal.json": {
+      "bytes": 96017,
+      "sha256": "a02c78a2d439c517e93fc27b6276b91ca7204acea3774f3c3a0e0a0cbb4990f7"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-host-moment-20261006-v1.publication.json": {
+      "bytes": 2698,
+      "sha256": "06653df1641507be91272be77d466ddfdf60871672bbe1106426e0493ae7c50f"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-host-moment-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "122ed5b844bdb468328832cf36a217957dd61ecd89132fcc7bfb780c4e09037c"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-host-moment-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "823943dfd79f818867129b4e86b605b4611162e17d80e8c50a9bb0aea525213d"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-host-moment-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "478944de9404a40bde651c41af738f85555b92d5fe37e6131114a8160e14d348"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-host-moment-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-host-moment-20261006-v1.stdout": {
+      "bytes": 175,
+      "sha256": "4fae8384b441b5e90e3d650beaa5ebec8f6ecaaa2507853914b299f8a2df6ed6"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-host-moment-20261006-v1.system-floor.json": {
+      "bytes": 10933,
+      "sha256": "c3eae15d27ae45f2fc3b0d53ba33f0d2b0f3f87f33380df5a327dd48e8912658"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-host-moment-20261006-v1.unit-cleanup.json": {
+      "bytes": 709,
+      "sha256": "66e4abdae712424d82ff98f17491062423aaf2a33d3565a19ec6ce7a2bfcabaa"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-key-relocation-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "e970f6054f60aa28132f6585c468c26a4e545be96d25ca1385d29aa5318d1870"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-key-relocation-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "fca11fb9d90fc549e37bb4e7818609f8806d97c2d9c8e38d20e3fc66d918c676"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-key-relocation-20261006-v1.config.json": {
+      "bytes": 62064,
+      "sha256": "508474db6243024e25429948f1c07121b454b26057773290c9c20f225a8b161f"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-key-relocation-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "4da366560962603c9f32d1dba4c7004516b9efa8758c246fd33fa6ce2451d24c"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-key-relocation-20261006-v1.final.json": {
+      "bytes": 4833,
+      "sha256": "79de6fb074fa69ddc1b26591a73a3ecb8c5d8c4015fe6da3c53229036d2cd8e2"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-key-relocation-20261006-v1.input_seal.json": {
+      "bytes": 58063,
+      "sha256": "064e98e1f366f68b30ba4cab254814b5907dccc536edf00545eff4627e04b29c"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-key-relocation-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "b4903dee8aa68cc6ff034b8c10bda1868c4229874c3b171356584a7c97fcd91e"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-key-relocation-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "3cbf463f6a6ff7ae447f5a65a7d1a13f1d6a6c3b24385a2266279e073f240ae6"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-key-relocation-20261006-v1.output_seal.json": {
+      "bytes": 255580,
+      "sha256": "b57f2f89cd36d2b14fb152937a77f73f77b6b25b2c7316595d645561e7e0f41f"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-key-relocation-20261006-v1.publication.json": {
+      "bytes": 2729,
+      "sha256": "54c7f8a007f5295bb7e39e79b55535cc3ce62840a787542e465e43792700700d"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-key-relocation-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "411509fde43e9bb2cdeea191d68fd88d1c00f1bca146b39458578580e924c031"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-key-relocation-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "f9a3bc7c9e6fc19766981281300c4c312c28636bbb9ca9c420bf7d993b4f5fee"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-key-relocation-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "43577a6efd30cfb21db7c05c76f65bf82c5f523342c863ea16de2cef0f251a3d"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-key-relocation-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-key-relocation-20261006-v1.stdout": {
+      "bytes": 190,
+      "sha256": "2cb22423a385b14d570f50a5ac5559cbc54397d5bd27795c70e549177ac8b7b0"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-key-relocation-20261006-v1.system-floor.json": {
+      "bytes": 28992,
+      "sha256": "1ad9bf9f7772e2eb80a2cd5aecfe8fe5117f1b36a588648b1f827c9467cf19f7"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-key-relocation-20261006-v1.unit-cleanup.json": {
+      "bytes": 715,
+      "sha256": "07a706a8da023341b98200f48a9aa4afe0eef08fe750e61c0524b005e00cae3f"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-located-ingest-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "0385baa8e1dc107907c5dd636d643a66920bca8b0ae5ff760d5bc7650bf27874"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-located-ingest-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "2b2f828592df2ae9f9b7440ac41f08a228effd51fa448e10f8daedef5729a95e"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-located-ingest-20261006-v1.config.json": {
+      "bytes": 62079,
+      "sha256": "56cb200b0b6bac2565c05d3881747a989e459df67a5bd4bfe20dca3e1f6ff09c"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-located-ingest-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "0dd3471f2c6c37a5de87f049bcb1635dfedbd0fef15f3f3e8cc3d0b718e955de"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-located-ingest-20261006-v1.final.json": {
+      "bytes": 4833,
+      "sha256": "f3204cc30499a563325075a17000765d230177b84e30683fc81a7c92b4307af6"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-located-ingest-20261006-v1.input_seal.json": {
+      "bytes": 58076,
+      "sha256": "7e406ee32b6deaf9d7b3e175e20372fc328d0ec7bd2678f611c28dd08cd0403d"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-located-ingest-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "de669e9c070cbb2ee4fae5a64ab505a5b0287cef126a1962b116476531c7d433"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-located-ingest-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "0eaafbe7b9bfb4b309075f6554fccacfe2dc84d68a7df0bcf988c88671449912"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-located-ingest-20261006-v1.output_seal.json": {
+      "bytes": 142582,
+      "sha256": "b006210976a7716d75f30d00441bf8bf788a591600dfbeb3970249273c287991"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-located-ingest-20261006-v1.publication.json": {
+      "bytes": 2729,
+      "sha256": "02f92b367ad32b65f66807066ad36ace8090581f779fe255dcb4ee43985f964b"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-located-ingest-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "d5d142ef7b5fc9a121beee504b0759dbdfd12537fd2f66c2bf0e36bda981e19c"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-located-ingest-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "ca93c77f86a209ea466570e77b78357e4d318924659610befdf0d3eda3eb2833"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-located-ingest-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "e2a064d4454ad7943dc8e47a2b7d666a3dcd4e3092f028602480a21f45040bfa"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-located-ingest-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-located-ingest-20261006-v1.stdout": {
+      "bytes": 201,
+      "sha256": "876e672a461c95cb619c1075d41af929f4dd74593c5def5b9f7c74b64b863b25"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-located-ingest-20261006-v1.system-floor.json": {
+      "bytes": 16476,
+      "sha256": "9da33d3c9f246ca20a273f15f0be26ab6029605798b1e9f38738b5c825c88fe6"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-located-ingest-20261006-v1.unit-cleanup.json": {
+      "bytes": 715,
+      "sha256": "123a35f83abe6ffd8253394e0e7f98ef510e4c9221cfc52a39546a088d034cf4"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-sibling-clock-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "b3c0ded5982db4aefec63d8d358a213877962054cdfa9eb4d36d3acdbff69431"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-sibling-clock-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "d2889132a276e13734f5003162766cc75e4d1d1d0e6cc00ee75a0c9fdad50150"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-sibling-clock-20261006-v1.config.json": {
+      "bytes": 62080,
+      "sha256": "b23973363181545f189b41ff104599df72e873b94fbdf650da5953cbdd1ff1c4"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-sibling-clock-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "5ac4ddbfc4487f141711d45c6ff95468d39bf7be758f82615f9aa242441eb2c1"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-sibling-clock-20261006-v1.final.json": {
+      "bytes": 4818,
+      "sha256": "d84d49354589aa1d466a014f9798ff3169f97ae3dd990b286f0a14e39b11e22b"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-sibling-clock-20261006-v1.input_seal.json": {
+      "bytes": 58079,
+      "sha256": "c79b4847484cbe876854c650c713a3d95d63950de4e859d21b9a096171faf2e1"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-sibling-clock-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "97b2b81d8ac551bf04b9d99d15789f4bc116bc9b47f3b4e1012f5bebea69b5c5"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-sibling-clock-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "ed33ba2ff1540d12bb1f91e159fc2be33160afa02130a863ce2149b89dc0b214"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-sibling-clock-20261006-v1.output_seal.json": {
+      "bytes": 255810,
+      "sha256": "86e2d5274ffdc793418891f66a3c5da47c943ec182901b8f4d2ffe6cb52744b3"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-sibling-clock-20261006-v1.publication.json": {
+      "bytes": 2719,
+      "sha256": "9fd45e451885f43f9509204e890617e8f54b58a293f320621e421d69b36b1f6e"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-sibling-clock-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "048dd030979cdd404f6b2b03654ab385a5615aed1965fa2ff9155fb872401ef5"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-sibling-clock-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "0d0c4dadb7e1808033fa7a97c6b6fde5e360bdd556caf6531629b6915145262d"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-sibling-clock-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "4bfd3934769cef23ecfac3493fbfba438992392c6e3bc21aaf7a173a15c3cf30"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-sibling-clock-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-sibling-clock-20261006-v1.stdout": {
+      "bytes": 209,
+      "sha256": "290cfbf462b125d71391b8d49eb8b8c0594d9734ec00387d75c14261874cc552"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-sibling-clock-20261006-v1.system-floor.json": {
+      "bytes": 28993,
+      "sha256": "d44f88cc13f218a68bcabdc50d969c5c3e720f7ec40a1bec8fe8d4ce8f7af877"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-cuda-sibling-clock-20261006-v1.unit-cleanup.json": {
+      "bytes": 713,
+      "sha256": "b16752695ef5e528d9ef490f926a53d2fd30412b2b1e4f9e1e9a77ff5fe70418"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-host-cuda-link-20261006-v4.acceptance.json": {
+      "bytes": 379,
+      "sha256": "09aa3fcfd0f6a23ffc1bc29c515a5264dd86ba7c0848f5edf8c23c50de0ab4de"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-host-cuda-link-20261006-v4.child-identity.json": {
+      "bytes": 78,
+      "sha256": "e8cca9189050c2b494d095b1ddc65bb58da84c4920aa85cef88d901379407446"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-host-cuda-link-20261006-v4.config.json": {
+      "bytes": 60610,
+      "sha256": "a4db753f2b915f427056454368892329f388f2f583690ca0f734c5b5f7e636ed"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-host-cuda-link-20261006-v4.external-lease.json": {
+      "bytes": 487,
+      "sha256": "91539ecf5b2723ecff9c522a749c66d3336e9de54f57ceacd12132fe8ed6ed2d"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-host-cuda-link-20261006-v4.failure.json": {
+      "bytes": 241,
+      "sha256": "d58de42c3597338b5521a46b1d6c6d1c3661201fe0b69aebc936784facb23d1a"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-host-cuda-link-20261006-v4.final.json": {
+      "bytes": 5013,
+      "sha256": "ffbfcad126813cb72f66fa77edcced187e53926eac2ad4c188bf675cc137659f"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-host-cuda-link-20261006-v4.input_seal.json": {
+      "bytes": 57637,
+      "sha256": "debcb3c860858ffd56ac9c264a206d3e78e9da6ff4caf138c4e2f82fe06659ea"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-host-cuda-link-20261006-v4.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "0737ef3f1f2fabb59eb558df9a6e68530e41aeb302d84fa36f04073ef7638b26"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-host-cuda-link-20261006-v4.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "17b499caf4155cb2d8a93b278d342891b420d4a4fcf75807b3c44f09e85aa954"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-host-cuda-link-20261006-v4.output_seal.json": {
+      "bytes": 1387135,
+      "sha256": "4bbed774ed1182d425b540f14a6acb0b869ece72b552c62abb6c8b1d55d7083f"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-host-cuda-link-20261006-v4.publication.json": {
+      "bytes": 2886,
+      "sha256": "60dacb210c61da9374fb7cc337fc95de42af0b9f346713d357eebb101477b79d"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-host-cuda-link-20261006-v4.quiescence.json": {
+      "bytes": 132,
+      "sha256": "3b782770b1b58a17354fe22c1cdef8cb26b29382ecb9c9f1d086cd59a2060a58"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-host-cuda-link-20261006-v4.release.json": {
+      "bytes": 175,
+      "sha256": "fc8963ec0f7dc47eb9f7ca8042e21383d4a1d6e246b58be5b68382179df063d4"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-host-cuda-link-20261006-v4.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "86f7b1ba14337c0d3df1ae61e758fedc123e9e14be6f208265b2f5b2bfcda743"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-host-cuda-link-20261006-v4.stderr": {
+      "bytes": 1898,
+      "sha256": "30253a8c9d4a82110c25dfee8e1bdbf878e981c3524a97868dcb71555012bd54"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-host-cuda-link-20261006-v4.stdout": {
+      "bytes": 30256,
+      "sha256": "72db0e4ea845732cc365f8310617f7b635aff4f115bc72c770823133ddffb46b"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-host-cuda-link-20261006-v4.system-floor.json": {
+      "bytes": 156159,
+      "sha256": "aa4457892cf6516bd75967d1bb3eb423e24592f0e31b43c8ac2c9deaf2e3126c"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-host-cuda-link-20261006-v4.unit-cleanup.json": {
+      "bytes": 766,
+      "sha256": "e5d3cbbd294ee6180b573b5fd6ae5f79371ca6b25fba5f0de7df7775c8f7d2da"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-host-cuda-link-20261006-v5.acceptance.json": {
+      "bytes": 378,
+      "sha256": "fd232138bec7a39060d2ec3e4d0151b12df3c716f90dc081c1b6c253aba52ebc"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-host-cuda-link-20261006-v5.child-identity.json": {
+      "bytes": 78,
+      "sha256": "a40927bfde310e1f62edd8e4c5951bb4d79b2fc1001752fde729e4053efa1f12"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-host-cuda-link-20261006-v5.config.json": {
+      "bytes": 60822,
+      "sha256": "67aa93347e491ffe39f60be5b4845c2b0d420409d81e3f1c048ec9838b0ccf78"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-host-cuda-link-20261006-v5.external-lease.json": {
+      "bytes": 487,
+      "sha256": "06b2075b42e3db2214e23520a124451a7ec33f442653b1dbaa04d7b4d12c4b94"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-host-cuda-link-20261006-v5.final.json": {
+      "bytes": 4763,
+      "sha256": "e814838bdedc3bd95296328b00fe40b6d44f38fce19c2fa6a161ea5f648e45d0"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-host-cuda-link-20261006-v5.input_seal.json": {
+      "bytes": 57637,
+      "sha256": "bf2111655cfa1f550aeed47d6c86ad496f6f1b066bc56584e688e50833f111fd"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-host-cuda-link-20261006-v5.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "8430c57d8c2bcffe109d60b509fb003eedcec832d529a18ad18101d774a82798"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-host-cuda-link-20261006-v5.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "56560f0f3975626a53fb87bcc07f93fa90ff141827012322e38c27a23c7978b8"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-host-cuda-link-20261006-v5.output_seal.json": {
+      "bytes": 135963,
+      "sha256": "ad46310fb6dc74acd03587c5f1831daf591efd5998cc6cd8afbf5c633c7ddfc5"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-host-cuda-link-20261006-v5.publication.json": {
+      "bytes": 2684,
+      "sha256": "ff099f752cc5ab7796e96c77897f73828c059a0121fb0ae8ff9300817a7ae082"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-host-cuda-link-20261006-v5.quiescence.json": {
+      "bytes": 130,
+      "sha256": "68599999d74366086708c7368b1f3ccc1d2a6dee46c4f32978e1e24674e9ec32"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-host-cuda-link-20261006-v5.release.json": {
+      "bytes": 175,
+      "sha256": "5213fa97536d5bf6ad2406aa87f350acd512d9eb3ed2d29041411611a2e6ac97"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-host-cuda-link-20261006-v5.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "8562351eaae5f343c6669efe1344c7411a7257f4bc3589d8bbbac556b22340dd"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-host-cuda-link-20261006-v5.stderr": {
+      "bytes": 665,
+      "sha256": "193d55565a5f332c251117a46b46eed2d1d8e1252e66cfc9544e828a65150700"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-host-cuda-link-20261006-v5.stdout": {
+      "bytes": 31048,
+      "sha256": "de3e9045047f388ab365b8127e8066a2f4df63cb98231a5a25e26a099234cda2"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-host-cuda-link-20261006-v5.system-floor.json": {
+      "bytes": 15301,
+      "sha256": "b5650c9ab0c8d05935bd1a150ddc4c2c23a359b2fc45f8b74bb6f64250a23a70"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-host-cuda-link-20261006-v5.unit-cleanup.json": {
+      "bytes": 705,
+      "sha256": "559eaed922470d80d78ef6039fa4f49b6db11cbd8ca81242236618e17ba925f8"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-ranged-capacity-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "db1db7db2055850f90f66ed74d716a564d30096bad96929389ce3690db62f7a9"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-ranged-capacity-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "b37e51f30f9cdf7909ba4410bfded0492ad953e1c8737a017bdcfee5e38a26c0"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-ranged-capacity-20261006-v1.config.json": {
+      "bytes": 61705,
+      "sha256": "051b42ad282a9e446717e868006ade9d3ee43f681761c9cc71e25ddbaef9d178"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-ranged-capacity-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "2fb493732bffa1c1747b7a7291230765d4aeb87a98594afb07b309fb398c9377"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-ranged-capacity-20261006-v1.final.json": {
+      "bytes": 4768,
+      "sha256": "2e8f30cdf11b0c309915b75d493ac953d8fb1614458cbb4a556dddd3e5dd485e"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-ranged-capacity-20261006-v1.input_seal.json": {
+      "bytes": 57724,
+      "sha256": "4b5d12fa41e4e1948c094cc88058074131380db72fb6cc914da0a30cbdd70a7f"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-ranged-capacity-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "51cecd584816bdb213301593febc376ba8e86c46d2755be49eb8d5650056a0fb"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-ranged-capacity-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "c9ff5b41d5134d440aea4044bf558451815322ec0f0c2a0f567ec795e60bb385"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-ranged-capacity-20261006-v1.output_seal.json": {
+      "bytes": 34372,
+      "sha256": "3ccaf014e9b8b35c50e007a68f684a148de53b48e77e9e1721e9b30d8ec400cc"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-ranged-capacity-20261006-v1.publication.json": {
+      "bytes": 2684,
+      "sha256": "478a94e39e52d59b059560ab01ffb5ae302588c73e36c9d97ccc05cf44af8d60"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-ranged-capacity-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "263aac66c8a09cb0f34d9bff89607f083843ac024e643e8f8fd2e085696728f4"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-ranged-capacity-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "6ec7149b7a2fe870f85795f97a3d66073ffca5fcfd27d973050238e1ce1508f8"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-ranged-capacity-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "aa7191fca44901d8f65f7cb1f97648cd5129b1b5984eca163d94b05b91fa26f9"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-ranged-capacity-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-ranged-capacity-20261006-v1.stdout": {
+      "bytes": 1186,
+      "sha256": "921a1c5a177aa85b2353c10229dc9bac121fca11ba376278d7212d29a6f187eb"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-ranged-capacity-20261006-v1.system-floor.json": {
+      "bytes": 3923,
+      "sha256": "65b157f2ad73a99d2f6db851d510039e306dfa8e5c7b613379bbe3bd12680b01"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-ranged-capacity-20261006-v1.unit-cleanup.json": {
+      "bytes": 707,
+      "sha256": "9326ed7d1b9289c1d00ed634fb3793bec0b10bb47497992695d89f6ff6500ee2"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-source-entrance-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "5e3787c411ab10f20c1dc46a7c62756a17e3d1e71baed652d7579ac05ffb37a3"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-source-entrance-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "0f515135d2bc7ee1f92d8498767331a6a9a6730746ca3a4afefb9596d6f0ebe9"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-source-entrance-20261006-v1.config.json": {
+      "bytes": 61705,
+      "sha256": "e7b1d3a22c79fa41d99a8ce350376f5f49b077a35a077f96c5e40c8920f6542a"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-source-entrance-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "4203d62c083a3e26f617a40188a21226c623f1388f8db592524ea1dc7949e887"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-source-entrance-20261006-v1.final.json": {
+      "bytes": 4773,
+      "sha256": "1ccaf394e57e1ba08555f0ab25cd58d093a50f6675fc6874ea6491dd13c93c92"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-source-entrance-20261006-v1.input_seal.json": {
+      "bytes": 57724,
+      "sha256": "38574928fbb54755bcfffba61768dce9877f8f2ab8136a4d3fb543e89a0e15de"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-source-entrance-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "6d6568f209b8294fce0d995e23983a1652f7e5261589ff7654c5fa8620eef81e"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-source-entrance-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "c975acd16bde5138273e5a52c12c8cbb23e252769fb0124d9b11707759563fc3"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-source-entrance-20261006-v1.output_seal.json": {
+      "bytes": 124750,
+      "sha256": "c5973894f106de0cb20a5066b776a1e39bd979dea90bd77bb3a5881d90a87bdb"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-source-entrance-20261006-v1.publication.json": {
+      "bytes": 2688,
+      "sha256": "7bade3b82f54508555290b6b33bcdff7c4cfb03538458e2df3ee04c42e1a0d28"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-source-entrance-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "ff33fbebd14f047f20dd9f8b5d6f97db093d9f02ab1760f9a69f6c6e2882d93a"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-source-entrance-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "821dadbacc217eafd6e6c3bccc6b1e96e586217189b35c575e4ea8967f734b2d"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-source-entrance-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "a0964be468660f4b8ce0bea49dc6ff7001efe44ee04cf73780204d5712a79e85"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-source-entrance-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-source-entrance-20261006-v1.stdout": {
+      "bytes": 955,
+      "sha256": "d7ffe681392107618ce1bf6403f1c11c3567205b957ffee8b298d2470003260f"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-source-entrance-20261006-v1.system-floor.json": {
+      "bytes": 14208,
+      "sha256": "0b096bc3d9f71b84de062ae1d508cebc3aab1d95e16b33818d0f31bf94b763b4"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/hnn-reframed-source-entrance-20261006-v1.unit-cleanup.json": {
+      "bytes": 707,
+      "sha256": "663e1293f20fc15b22b1018716d9c0cc1d8073541d2b524b8159754950e461d8"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/leased_stage_v2.py": {
+      "bytes": 5520,
+      "sha256": "bcf91456534e763a025613f39e82853d7a58529b399bb183d544d09a7a42f949"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/native-binaries.seal.v1.json": {
+      "bytes": 2059,
+      "sha256": "cb16cf07bcf071c3c88058f7a68df12872130b0395add43f485395e64a5cbd3b"
+    },
+    "research/records/receipts/source-clock-join-20261006/native-validation-v1/runtime-plans.v1.json": {
+      "bytes": 2125,
+      "sha256": "1b86745bfc45fedcbeb5b46ac032af5c1564d8dc860ce7e99346f56367eea2f5"
+    },
+    "research/runs/physical-repair/dev.pin": {
+      "bytes": 918,
+      "sha256": "f6838f7b83bf24b7decc507d7c383d754fd5b4b9ff4901e3c5a724d5ca8fc4b2"
+    },
+    "research/runs/physical-repair/read.pin": {
+      "bytes": 1439,
+      "sha256": "ee75377c1eb09c38ecfba7a2ad9d33780d336fbd7f6b7b12de23ee38c90dfca4"
+    }
+  },
+  "prior_cache": {
+    "holonics": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/capacity/target/debug/deps/holonics-70b68d2f7e1f6408",
+      "sha256": "06d6d5ae3ceb53078eb54b5ab4c245aee19137b60d72d47dfcf9771533db3aa3",
+      "bytes": 63546480,
+      "current_seal": {
+        "bytes": 63546480,
+        "sha256": "06d6d5ae3ceb53078eb54b5ab4c245aee19137b60d72d47dfcf9771533db3aa3"
+      },
+      "matches_prior_acceptance": true
+    },
+    "ranged_capacity": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/capacity/target/debug/deps/ranged_capacity-bd29e6ac6f6167da",
+      "sha256": "d173a8f570118c1e5a68e9859480cefe4a6069b038c03eda6bfb98c3d41a6ef2",
+      "bytes": 23177848,
+      "current_seal": {
+        "bytes": 23177848,
+        "sha256": "d173a8f570118c1e5a68e9859480cefe4a6069b038c03eda6bfb98c3d41a6ef2"
+      },
+      "matches_prior_acceptance": true
+    },
+    "source_entrance": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/capacity/target/debug/deps/source_entrance-3dfaf698dddeb1a6",
+      "sha256": "f5a483772718566e28e25945bb95c0308f454f5692762d9936a025505575f89f",
+      "bytes": 21022424,
+      "current_seal": {
+        "bytes": 21022424,
+        "sha256": "f5a483772718566e28e25945bb95c0308f454f5692762d9936a025505575f89f"
+      },
+      "matches_prior_acceptance": true
+    },
+    "resident_cold_restore": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/capacity/target/debug/deps/resident_cold_restore-d85475b8f5abeb14",
+      "sha256": "385d6fe09f9618aab0443baf17646d635c8653a3b027dbdc050a3c30f478133e",
+      "bytes": 28410784,
+      "current_seal": {
+        "bytes": 28410784,
+        "sha256": "385d6fe09f9618aab0443baf17646d635c8653a3b027dbdc050a3c30f478133e"
+      },
+      "matches_prior_acceptance": true
+    },
+    "mount-smoke": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/capacity/target/debug/mount-smoke",
+      "sha256": "5c19bb910fa5f91994ccb2d100858bd0af4596cd4ed02462e65722ddcb9f3f5d",
+      "bytes": 10042504,
+      "current_seal": {
+        "bytes": 10042504,
+        "sha256": "5c19bb910fa5f91994ccb2d100858bd0af4596cd4ed02462e65722ddcb9f3f5d"
+      },
+      "matches_prior_acceptance": true
+    },
+    "located_ingest": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/capacity/target/debug/deps/located_ingest-2b2d6cef9fd78c5f",
+      "sha256": "21f40afb42a87a8bab46ff9b19a951316ac8516de8d6a73962e6e49a66c52d2a",
+      "bytes": 15984328,
+      "current_seal": {
+        "bytes": 15984328,
+        "sha256": "21f40afb42a87a8bab46ff9b19a951316ac8516de8d6a73962e6e49a66c52d2a"
+      },
+      "matches_prior_acceptance": true
+    },
+    "holonics_cuda": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/capacity/target/debug/deps/holonics_cuda-3a3d38defac6a12c",
+      "sha256": "108923440dd2148229be48a27389ec697eb6353853199d58d5487824cddf43a9",
+      "bytes": 41176880,
+      "current_seal": {
+        "bytes": 41176880,
+        "sha256": "108923440dd2148229be48a27389ec697eb6353853199d58d5487824cddf43a9"
+      },
+      "matches_prior_acceptance": true
+    }
+  },
+  "stage_blocker": "Automatic approval review rejected git add because original task expressly prohibited source/worktree mutation; explicit authorization handoff required before staging. No workaround attempted.",
+  "accepted_scopes": {
+    "physical_v1_chart_clock_carry": 9,
+    "physical_v2_selected": 3,
+    "host_cuda_selected": 26,
+    "combined_source": false,
+    "ReframedMoment_Lean": false,
+    "full_library_full_GPU": false,
+    "scientific_job_started": false
+  }
+}

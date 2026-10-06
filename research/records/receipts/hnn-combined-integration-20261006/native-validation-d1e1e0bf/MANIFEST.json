@@ -1,0 +1,466 @@
+{
+  "hnn-combined-d1e1e0bf-host-cuda-link-20261006-v1.config.json": {
+    "sha256": "e9810e48f6d7d6e5e683047ee62f851efa9a1b2f9dd43ca22e4421b5b06177aa",
+    "bytes": 403204
+  },
+  "hnn-combined-d1e1e0bf-host-cuda-link-20261006-v1.external-lease.json": {
+    "sha256": "d862679d54afcd34682739e60c820dbb84882caccd8b62f83e6dcce7d5b4cfb2",
+    "bytes": 487
+  },
+  "hnn-combined-d1e1e0bf-host-cuda-link-20261006-v1.lease-identity.json": {
+    "sha256": "166db65b9fd89ff9f9cba211fbefda304dbcb91b3e6f876561eae8352a827f9d",
+    "bytes": 565
+  },
+  "hnn-combined-d1e1e0bf-host-cuda-link-20261006-v1.input_seal.json": {
+    "sha256": "f6e354c3cee8bdc78340414d200b1ebe3185262075968200db9e4be7f2875be6",
+    "bytes": 342766
+  },
+  "hnn-combined-d1e1e0bf-host-cuda-link-20261006-v1.stdout": {
+    "sha256": "adb4a3d412a55e1abdb0c1f40ae27d569b5894ba49df0421050a8dc50c4cf6c6",
+    "bytes": 36883
+  },
+  "hnn-combined-d1e1e0bf-host-cuda-link-20261006-v1.stderr": {
+    "sha256": "3024910ad0faae284a0a675529c3d76c150e59b779c7da32055436637d486497",
+    "bytes": 1372
+  },
+  "hnn-combined-d1e1e0bf-host-cuda-link-20261006-v1.memory-gate.json": {
+    "sha256": "2338ee72373175def46e6af0c32671aa10116b3ec13f55ecee2c530ee23a592c",
+    "bytes": 120
+  },
+  "hnn-combined-d1e1e0bf-host-cuda-link-20261006-v1.child-identity.json": {
+    "sha256": "40d77256747835bd03837532acc8c02e962446a4ca1630d2552bf6bf4d59555b",
+    "bytes": 78
+  },
+  "hnn-combined-d1e1e0bf-host-cuda-link-20261006-v1.system-floor.json": {
+    "sha256": "4b1cb93bec9b51618dce9b3c30392ee88c03aa143a248c27d1f47dce0fdbb0ae",
+    "bytes": 146990
+  },
+  "hnn-combined-d1e1e0bf-host-cuda-link-20261006-v1.quiescence.json": {
+    "sha256": "22458cba49a2cd3e1afc5030d6242bc8d6fc2d7b4738288304ef9828cc33b0aa",
+    "bytes": 132
+  },
+  "hnn-combined-d1e1e0bf-host-cuda-link-20261006-v1.output_seal.json": {
+    "sha256": "b040dfa7cacbd7340041ea3503830aa8acb8873c157ecce497338aa0259a5d23",
+    "bytes": 1317856
+  },
+  "hnn-combined-d1e1e0bf-host-cuda-link-20261006-v1.failure.json": {
+    "sha256": "80e9031fc7a5465934f8d073787693b44d69329747ec4c85419f09dc7b2cc69e",
+    "bytes": 250
+  },
+  "hnn-combined-d1e1e0bf-host-cuda-link-20261006-v1.publication.json": {
+    "sha256": "87950a752681c0a1a6eb3da12af22f19868421a1485f4438d7579023f4affb45",
+    "bytes": 2986
+  },
+  "hnn-combined-d1e1e0bf-host-cuda-link-20261006-v1.stage-quiescence.json": {
+    "sha256": "04b04b1252456c045e057d78136f8fde939ae63798f87e7dc4fe94cb55c7f7da",
+    "bytes": 136
+  },
+  "hnn-combined-d1e1e0bf-host-cuda-link-20261006-v1.final.json": {
+    "sha256": "c27247e6226ddf28ad9be738f1adb0ad16715c9eec37ad2edbd37fe82baa1cd8",
+    "bytes": 5160
+  },
+  "hnn-combined-d1e1e0bf-host-cuda-link-20261006-v1.unit-cleanup.json": {
+    "sha256": "27568fd4d63b617553bf981abf8b1d2f2cd28daed919ee5b7f52a2d9d338bd4b",
+    "bytes": 784
+  },
+  "hnn-combined-d1e1e0bf-host-cuda-link-20261006-v1.acceptance.json": {
+    "sha256": "e76b0cb70746c3ee2b4d575fdb519ad6d7d3789ea1d99d167d902c98bf1bf893",
+    "bytes": 379
+  },
+  "hnn-combined-d1e1e0bf-host-cuda-link-20261006-v1.release.json": {
+    "sha256": "73c4904b839f84c854c4571c84948a9d8fff18ccd37abf72787f79cb301f6335",
+    "bytes": 175
+  },
+  "hnn-combined-d1e1e0bf-host-cuda-link-20261006-v2.config.json": {
+    "sha256": "5ae34c95cbd09b7264c37f8ea54948df02031d0653e1db99f4455c45ff3dd065",
+    "bytes": 404440
+  },
+  "hnn-combined-d1e1e0bf-host-cuda-link-20261006-v2.external-lease.json": {
+    "sha256": "1dd9046cb33fc48ff21796e134e10ef60a8d982e2c7a12a2f18bcf65659b8469",
+    "bytes": 487
+  },
+  "hnn-combined-d1e1e0bf-host-cuda-link-20261006-v2.lease-identity.json": {
+    "sha256": "ccacaecea1691bff1ca8d1be8d9e0e36f7d06502a03736ab2e1cdfe84ed86f15",
+    "bytes": 565
+  },
+  "hnn-combined-d1e1e0bf-host-cuda-link-20261006-v2.input_seal.json": {
+    "sha256": "74a141de5df03ba055e10b66383424b4eb2c8e256aa66919572f48a07a545dc5",
+    "bytes": 343292
+  },
+  "hnn-combined-d1e1e0bf-host-cuda-link-20261006-v2.stdout": {
+    "sha256": "b3a85207cf9eb15d7858e0684ac1840489b9a24551eb63a7b22af54a4360ade1",
+    "bytes": 37938
+  },
+  "hnn-combined-d1e1e0bf-host-cuda-link-20261006-v2.stderr": {
+    "sha256": "fb2d52cffbb25b5924551471c7f8c2ef4abed94aad4371148cacc5c1837cd471",
+    "bytes": 728
+  },
+  "hnn-combined-d1e1e0bf-host-cuda-link-20261006-v2.memory-gate.json": {
+    "sha256": "c2c87a2b444a4f8a9a8727217481a7d240bf194693ed7bdffa226caca7990f12",
+    "bytes": 120
+  },
+  "hnn-combined-d1e1e0bf-host-cuda-link-20261006-v2.child-identity.json": {
+    "sha256": "313cc2a8644cb9fc5300fbe4da1ae05d489b1b4e9167e3cb7b57019247543d56",
+    "bytes": 78
+  },
+  "hnn-combined-d1e1e0bf-host-cuda-link-20261006-v2.system-floor.json": {
+    "sha256": "72ae64d1243091490e25ff95c43e86de2cdbb30b7e505eb6c7e9e54302b79583",
+    "bytes": 16561
+  },
+  "hnn-combined-d1e1e0bf-host-cuda-link-20261006-v2.quiescence.json": {
+    "sha256": "2ef6ed767c596fd805a40cb9afabba1382faedea180271f5de91546cb91de0ea",
+    "bytes": 130
+  },
+  "hnn-combined-d1e1e0bf-host-cuda-link-20261006-v2.output_seal.json": {
+    "sha256": "92f7dd3d33ba83c8568625d1ef2dcb2662462b4722f63d06e4ebd280f066c1ee",
+    "bytes": 145079
+  },
+  "hnn-combined-d1e1e0bf-host-cuda-link-20261006-v2.publication.json": {
+    "sha256": "6b72311f0d14ade689436bef1083f045058b45b29fac79c45357600bb0a79bc6",
+    "bytes": 2775
+  },
+  "hnn-combined-d1e1e0bf-host-cuda-link-20261006-v2.stage-quiescence.json": {
+    "sha256": "ccf3babd6aec1d872ab17d021d1c1f709e008c27d61ab0982325792b68f977c1",
+    "bytes": 136
+  },
+  "hnn-combined-d1e1e0bf-host-cuda-link-20261006-v2.final.json": {
+    "sha256": "688a09a4d6ce10ef1e174833232554f1bb3f97f3c9eab2ea02293519ec05d8c4",
+    "bytes": 4902
+  },
+  "hnn-combined-d1e1e0bf-host-cuda-link-20261006-v2.unit-cleanup.json": {
+    "sha256": "a5be35cc31ec4772f698aad9bf2faeba838dd429846894513d306c08a9d8b6df",
+    "bytes": 723
+  },
+  "hnn-combined-d1e1e0bf-host-cuda-link-20261006-v2.acceptance.json": {
+    "sha256": "79a791ae20171ce739d4f58714bce7490ad23c1a389af1923c6c0a148dfe77c3",
+    "bytes": 378
+  },
+  "hnn-combined-d1e1e0bf-host-cuda-link-20261006-v2.release.json": {
+    "sha256": "d8c2b2b79661580709b9dc0b01f34046317c2eb17a095d39c42a17c3daacf3d8",
+    "bytes": 175
+  },
+  "hnn-combined-d1e1e0bf-teaching-change-20261006-v1.config.json": {
+    "sha256": "a0e290c198a4da56ecc676de745d211f499bfec78fdf628838e2c3c359718043",
+    "bytes": 63282
+  },
+  "hnn-combined-d1e1e0bf-teaching-change-20261006-v1.external-lease.json": {
+    "sha256": "c1af0c89e94ed606a1643cc1acdea9f2b15f841012b92672d5dd4601ce1c5a9c",
+    "bytes": 487
+  },
+  "hnn-combined-d1e1e0bf-teaching-change-20261006-v1.lease-identity.json": {
+    "sha256": "1a8edffe026b82fd84f3a15f87a6627fb6d0cde824f8ee2e71bd67a28eda6783",
+    "bytes": 565
+  },
+  "hnn-combined-d1e1e0bf-teaching-change-20261006-v1.input_seal.json": {
+    "sha256": "96e642e5133b6c67137132d097f0d9beacda9606ecce096856fe393f7aca01a4",
+    "bytes": 62107
+  },
+  "hnn-combined-d1e1e0bf-teaching-change-20261006-v1.stdout": {
+    "sha256": "f05fc01ad789cdba03bdd1eac26397a7c3bb42970c95223de7349d62269599f2",
+    "bytes": 815
+  },
+  "hnn-combined-d1e1e0bf-teaching-change-20261006-v1.stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "hnn-combined-d1e1e0bf-teaching-change-20261006-v1.memory-gate.json": {
+    "sha256": "a122b0d73c3bbb64831a5cc5bba1a9e4929d927b98387a6417f74fd6b17e30e6",
+    "bytes": 120
+  },
+  "hnn-combined-d1e1e0bf-teaching-change-20261006-v1.child-identity.json": {
+    "sha256": "5b911f42bdcf04af7e4628bfbe6f4b563bebb6522fbd5bba57a64a2ec740bc44",
+    "bytes": 78
+  },
+  "hnn-combined-d1e1e0bf-teaching-change-20261006-v1.system-floor.json": {
+    "sha256": "473864332412664aaabde3c35b6cf713525802d71ff7de74f9a1c46e7822482b",
+    "bytes": 7243
+  },
+  "hnn-combined-d1e1e0bf-teaching-change-20261006-v1.quiescence.json": {
+    "sha256": "77d844b7fd194294ae5b5c0b9c4074d226fc84f52c02b21f0247e66f027ffbb3",
+    "bytes": 130
+  },
+  "hnn-combined-d1e1e0bf-teaching-change-20261006-v1.output_seal.json": {
+    "sha256": "2c0ff0b22921d01b419068dd44e59ed9e31bdc638703cade6956d036c15871dc",
+    "bytes": 61900
+  },
+  "hnn-combined-d1e1e0bf-teaching-change-20261006-v1.publication.json": {
+    "sha256": "f4462c3313c301ff4427a9882fcfb9db13ae46e4d48e03c6c7d36bb6969739dc",
+    "bytes": 2774
+  },
+  "hnn-combined-d1e1e0bf-teaching-change-20261006-v1.stage-quiescence.json": {
+    "sha256": "5b64c8588ccf53b049cfa50a6a6ac2f65faf19537d8918243266bb6fda72e521",
+    "bytes": 136
+  },
+  "hnn-combined-d1e1e0bf-teaching-change-20261006-v1.final.json": {
+    "sha256": "4a9a62eb3ab2e314eeeaa376f6e0c32b78f97c70ae95c12ec1af7486c14239ea",
+    "bytes": 4904
+  },
+  "hnn-combined-d1e1e0bf-teaching-change-20261006-v1.unit-cleanup.json": {
+    "sha256": "4ea6f34402d462613f9c4b4c0d6ed0015d2fdebe50e4ef68d370dd6e1a96a1d8",
+    "bytes": 725
+  },
+  "hnn-combined-d1e1e0bf-teaching-change-20261006-v1.acceptance.json": {
+    "sha256": "a1a427d516cb5a4ae7bccf96e028f64f77e2c72e4c2d4f6c7f53a8c1176d5687",
+    "bytes": 378
+  },
+  "hnn-combined-d1e1e0bf-teaching-change-20261006-v1.release.json": {
+    "sha256": "5ccba5ecaf05ed9be0018e4deb296ea86546c3848a3672715bc3db9348b9a799",
+    "bytes": 175
+  },
+  "hnn-combined-d1e1e0bf-teaching-refusal-20261006-v1.config.json": {
+    "sha256": "5a8d0d2d380f92ac03634adb916e2f6c72c58148309e945654430d2ceb90dcb4",
+    "bytes": 63322
+  },
+  "hnn-combined-d1e1e0bf-teaching-refusal-20261006-v1.external-lease.json": {
+    "sha256": "f399e6506fb42086b425f6536ae4643791d99b8833ff6591a8c0e19587c54ed4",
+    "bytes": 487
+  },
+  "hnn-combined-d1e1e0bf-teaching-refusal-20261006-v1.lease-identity.json": {
+    "sha256": "180e7ae7c82a724dc49b151cf40890846e148962ecdbcab0ec4c8ec55cbe79f8",
+    "bytes": 565
+  },
+  "hnn-combined-d1e1e0bf-teaching-refusal-20261006-v1.input_seal.json": {
+    "sha256": "e6c7461796c15d71eaf3893b7d6d6f550e268974193106b6e7f38e33b7a1275e",
+    "bytes": 62148
+  },
+  "hnn-combined-d1e1e0bf-teaching-refusal-20261006-v1.stdout": {
+    "sha256": "35fe831dbc64aaaf1131ca82bd09af8eca3f75970957d8868991c9626915a4e6",
+    "bytes": 252
+  },
+  "hnn-combined-d1e1e0bf-teaching-refusal-20261006-v1.stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "hnn-combined-d1e1e0bf-teaching-refusal-20261006-v1.memory-gate.json": {
+    "sha256": "3d410e891034cd25435024c9361181891bec9fabe24a335173927cb4833b48c9",
+    "bytes": 120
+  },
+  "hnn-combined-d1e1e0bf-teaching-refusal-20261006-v1.child-identity.json": {
+    "sha256": "66deb5fee5cb9e8e2d052251995a6da0eabe262ba190dad32b8368e462ede650",
+    "bytes": 78
+  },
+  "hnn-combined-d1e1e0bf-teaching-refusal-20261006-v1.system-floor.json": {
+    "sha256": "c34244d1938bbeedd94c3af636c55bd0d2816982dcab1b29d6f854b8da305ef4",
+    "bytes": 6247
+  },
+  "hnn-combined-d1e1e0bf-teaching-refusal-20261006-v1.quiescence.json": {
+    "sha256": "924297bc9f7d5aeeb67dd5f64f323157a0c2662a414d4ca35027dd447e3ff658",
+    "bytes": 130
+  },
+  "hnn-combined-d1e1e0bf-teaching-refusal-20261006-v1.output_seal.json": {
+    "sha256": "0e4f363572ed9896ed82a2f9494fb9a4ce7cc1a2d4db6fb999ec176d45860293",
+    "bytes": 53272
+  },
+  "hnn-combined-d1e1e0bf-teaching-refusal-20261006-v1.publication.json": {
+    "sha256": "a9699623491457ab1574e6e0b3047b7779d529a3e2c48d6a11a386125ba04fd6",
+    "bytes": 2783
+  },
+  "hnn-combined-d1e1e0bf-teaching-refusal-20261006-v1.stage-quiescence.json": {
+    "sha256": "80e72714ca262608847e038e86bee8f31b7f82b29cb904c075136ff1a2d29ea7",
+    "bytes": 136
+  },
+  "hnn-combined-d1e1e0bf-teaching-refusal-20261006-v1.final.json": {
+    "sha256": "50d5619c1cdc69d1c474e440e8164a856ce642f04662c0ea2c1c6ddebefa4c51",
+    "bytes": 4916
+  },
+  "hnn-combined-d1e1e0bf-teaching-refusal-20261006-v1.unit-cleanup.json": {
+    "sha256": "d482810429128b943735a956ce4bc33e9e8ccf1c65b06f1bb85c854ad50383dd",
+    "bytes": 727
+  },
+  "hnn-combined-d1e1e0bf-teaching-refusal-20261006-v1.acceptance.json": {
+    "sha256": "44f417310a370c4034b95f0ad8c29150f7e26669a59940159a28f1f5b16092b7",
+    "bytes": 378
+  },
+  "hnn-combined-d1e1e0bf-teaching-refusal-20261006-v1.release.json": {
+    "sha256": "d2e8036166d0cc9631460b4806d5940c05c0326b0cfbb36a85ae7507a81c9a4d",
+    "bytes": 175
+  },
+  "hnn-combined-d1e1e0bf-carry-20261006-v1.config.json": {
+    "sha256": "59c6db49c1553c5a0ad0913e72c4fc770761ef6f0a2af9df498125da2ee7a9c1",
+    "bytes": 63284
+  },
+  "hnn-combined-d1e1e0bf-carry-20261006-v1.external-lease.json": {
+    "sha256": "bf4cfc1e4dc6e21917bbe1100b72fa2fa502e934f27eab045de547ddd31fbb33",
+    "bytes": 487
+  },
+  "hnn-combined-d1e1e0bf-carry-20261006-v1.lease-identity.json": {
+    "sha256": "faa3215a4c438a74ccd46b03c2f4beb4ad0482956f2a2d490f51eb3356004e0d",
+    "bytes": 565
+  },
+  "hnn-combined-d1e1e0bf-carry-20261006-v1.input_seal.json": {
+    "sha256": "725b6acf1ba0ab789f69c7931c5d79fba58b1f5094be7c6e182f3abfc81ca3a7",
+    "bytes": 62109
+  },
+  "hnn-combined-d1e1e0bf-carry-20261006-v1.stdout": {
+    "sha256": "275295ac0e08894bfeee556d5fe14440e4a602bdba767810b983b92917062e24",
+    "bytes": 244
+  },
+  "hnn-combined-d1e1e0bf-carry-20261006-v1.stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "hnn-combined-d1e1e0bf-carry-20261006-v1.memory-gate.json": {
+    "sha256": "e4d152d38e8d98e3f11411b6b81dc233f8d4637ec54d92d7d165f911e1823b48",
+    "bytes": 120
+  },
+  "hnn-combined-d1e1e0bf-carry-20261006-v1.child-identity.json": {
+    "sha256": "eae619710a3c1f25eacd7b252a8238cbd2cb3fccfd02e79f77fed4ea928de89c",
+    "bytes": 78
+  },
+  "hnn-combined-d1e1e0bf-carry-20261006-v1.system-floor.json": {
+    "sha256": "af4a486308783e9dc70869484321423eaa7165eb8db16cffbd193d31e3a73f58",
+    "bytes": 5334
+  },
+  "hnn-combined-d1e1e0bf-carry-20261006-v1.quiescence.json": {
+    "sha256": "ad907e6372bfb52268ebf5c15dd6b86d56202ad0b5a278ed0e604e5d92e710d2",
+    "bytes": 130
+  },
+  "hnn-combined-d1e1e0bf-carry-20261006-v1.output_seal.json": {
+    "sha256": "81c7f848eb349f7f6db3162af370ce366e8dee648817c5afb425893a607f4e26",
+    "bytes": 46445
+  },
+  "hnn-combined-d1e1e0bf-carry-20261006-v1.publication.json": {
+    "sha256": "3aa03a6a6defbe8b3fd7221330dafdbab003b32c5b0d4e98370682348f43a61a",
+    "bytes": 2673
+  },
+  "hnn-combined-d1e1e0bf-carry-20261006-v1.stage-quiescence.json": {
+    "sha256": "8f07c4c6c7044d095c6e3e0cfcebe4211ffb66aa7dca35d52abe1f8127a29c02",
+    "bytes": 136
+  },
+  "hnn-combined-d1e1e0bf-carry-20261006-v1.final.json": {
+    "sha256": "d81289d10a8647a68099289935f553d8a54fe0eb7239f43e5d263afcecf0418d",
+    "bytes": 4751
+  },
+  "hnn-combined-d1e1e0bf-carry-20261006-v1.unit-cleanup.json": {
+    "sha256": "8d7bd6dc3e4ea8e24fc7bdf375db48cd7319c4ac6307bf595c9dcefe102bdf83",
+    "bytes": 705
+  },
+  "hnn-combined-d1e1e0bf-carry-20261006-v1.acceptance.json": {
+    "sha256": "8531c13ab93681f3bab0fc9a2af29ae591341bc664fae7d39be04df37c46a419",
+    "bytes": 378
+  },
+  "hnn-combined-d1e1e0bf-carry-20261006-v1.release.json": {
+    "sha256": "f3c0837680ae1e3f4948e01cd8054c83b9e73b7cfedd8aa42116cf1d1c79d685",
+    "bytes": 175
+  },
+  "hnn-combined-d1e1e0bf-sibling-aging-20261006-v1.config.json": {
+    "sha256": "9043e67bc3552fa2e87043d6c0734ec8760a9cf3ebcf5585d91e6d0c7b4a27ee",
+    "bytes": 63265
+  },
+  "hnn-combined-d1e1e0bf-sibling-aging-20261006-v1.external-lease.json": {
+    "sha256": "80cab389490e5151cbfd0ba5e3f2c1ef14aa77c8ada2e9b9d62b887d290dcddc",
+    "bytes": 487
+  },
+  "hnn-combined-d1e1e0bf-sibling-aging-20261006-v1.lease-identity.json": {
+    "sha256": "adc83a6147d69df23df81323bb070a34ee6325401caf714621c59b3acef7986e",
+    "bytes": 565
+  },
+  "hnn-combined-d1e1e0bf-sibling-aging-20261006-v1.input_seal.json": {
+    "sha256": "7b83d51898d193d6da680f4bbb971a5b1cf53882e3000cba4ac4d0441b149be5",
+    "bytes": 62084
+  },
+  "hnn-combined-d1e1e0bf-sibling-aging-20261006-v1.stdout": {
+    "sha256": "123f5ea60832ed0e3fc310901b36ab081bf15a4db0b0c146dd28f795f93f2400",
+    "bytes": 213
+  },
+  "hnn-combined-d1e1e0bf-sibling-aging-20261006-v1.stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "hnn-combined-d1e1e0bf-sibling-aging-20261006-v1.memory-gate.json": {
+    "sha256": "8b98b5d213181b29ccd5de8f6224eb851eb082f5ac7af93ff1298094ba81aa39",
+    "bytes": 120
+  },
+  "hnn-combined-d1e1e0bf-sibling-aging-20261006-v1.child-identity.json": {
+    "sha256": "3b574d3c26668120c1f3e8645a5b0af4452cf1934172bf18cf0bd63c65013eab",
+    "bytes": 78
+  },
+  "hnn-combined-d1e1e0bf-sibling-aging-20261006-v1.system-floor.json": {
+    "sha256": "16892b469d27bafb461f315d798ae2c3aff99ab93d55ca22259ee4967fe9fe02",
+    "bytes": 197
+  },
+  "hnn-combined-d1e1e0bf-sibling-aging-20261006-v1.quiescence.json": {
+    "sha256": "5fbf71f420b506d5eefd6abf846973f2ca207870857eed5038b507f00f713502",
+    "bytes": 130
+  },
+  "hnn-combined-d1e1e0bf-sibling-aging-20261006-v1.output_seal.json": {
+    "sha256": "e0b1650114706e2adf135ee74f37d983371989a157286a36708065493053fe32",
+    "bytes": 2047
+  },
+  "hnn-combined-d1e1e0bf-sibling-aging-20261006-v1.publication.json": {
+    "sha256": "1a785dbd1930176e223e3ade83d66e2bf3f3217224ea74b8c5b517c5a9bbd4f7",
+    "bytes": 2748
+  },
+  "hnn-combined-d1e1e0bf-sibling-aging-20261006-v1.stage-quiescence.json": {
+    "sha256": "06863b48b395ea0528f072f37b6d784d6b9a6a94daea2fb308ea5c15d6108497",
+    "bytes": 136
+  },
+  "hnn-combined-d1e1e0bf-sibling-aging-20261006-v1.final.json": {
+    "sha256": "04d2e276a8e416e3e2a8fbd95e3101d7ab24ad6f7576568e7e9e7a82beb60bdb",
+    "bytes": 4870
+  },
+  "hnn-combined-d1e1e0bf-sibling-aging-20261006-v1.unit-cleanup.json": {
+    "sha256": "5a8b7b44ad83ad8e526ddf153d0485bac05af2230c7176c5ef82def15e699fff",
+    "bytes": 721
+  },
+  "hnn-combined-d1e1e0bf-sibling-aging-20261006-v1.acceptance.json": {
+    "sha256": "775cb060462761d6138cbd17bff25da1b28615b41894a25acef65ef965965bbd",
+    "bytes": 378
+  },
+  "hnn-combined-d1e1e0bf-sibling-aging-20261006-v1.release.json": {
+    "sha256": "b8f7e23fb0b0d18340a26cc53ed76ce4848e79bc2fc7dae93c8941b2616675a5",
+    "bytes": 175
+  },
+  "holonics-hnn-integration-20261006.manifest.json": {
+    "sha256": "552a977ca3859f7c96b8300f6f8fd241307d4910b0cc3eb822f88a7ee72bd32a",
+    "bytes": 106801
+  },
+  "holonics-hnn-integration-20261006.queue-request.json": {
+    "sha256": "582f5badfec81e286b274f4087db45a86404193643bdbb22591d17c50d73771b",
+    "bytes": 5134
+  },
+  "holonics-hnn-integration-20261006.patch.gz": {
+    "sha256": "aa20e85025ddc91c0274a16c164844a7e92e4c070f487c2279d3f0de23dffa6f",
+    "bytes": 2104049
+  },
+  "SOURCE_SNAPSHOT.v1.json": {
+    "sha256": "b4eabe21bf495ce94af89e4b5a159fb1396b766c1355f07c64d3b9b6dd2a9097",
+    "bytes": 118601
+  },
+  "CACHE_SNAPSHOT.v1.json": {
+    "sha256": "706f298f89755043f464a0b333505d7f2c5e6e48bccad355fdc5c36f7fc047b0",
+    "bytes": 3147695
+  },
+  "NATIVE_ADMISSION.v1.json": {
+    "sha256": "50eb8d8694d272bbf9b11fadeb19be20e386defb8a2168d3cb95864bc89d0e24",
+    "bytes": 1862
+  },
+  "SOURCE_CLOSURE_REPAIR.v2.json": {
+    "sha256": "97f6c02fe98b71a5438eec93245d07b1440cadcc6e9505003b1bae559d9f2a06",
+    "bytes": 817
+  },
+  "NATIVE_EXECUTABLES.v2.json": {
+    "sha256": "f657b1f3ad3357842b5a1de136e3801f4506916bcf987ce70429089456dad826",
+    "bytes": 5974
+  },
+  "RUNTIME_QUEUE.v1.json": {
+    "sha256": "aa0962ae6daf1a7db820fa144e511a8046a3a428fbcd6c77bb5f226fddd95946",
+    "bytes": 330
+  },
+  "final_stage.py": {
+    "sha256": "a0a5a94f157acf9a5127b756a036c6e86449dc2012af0f1e71d34aafa13bc79e",
+    "bytes": 10968
+  },
+  "leased_stage_v2.py": {
+    "sha256": "bcf91456534e763a025613f39e82853d7a58529b399bb183d544d09a7a42f949",
+    "bytes": 5520
+  },
+  "bounded_stage_v1.py": {
+    "sha256": "84b7d003089fa19881690e368200b2168b9d179c8e6573bdafab54369235cec2",
+    "bytes": 12645
+  },
+  "VALIDATION.json": {
+    "sha256": "b7ce153377cfc913612741acbe4e22f2b9e50d96867d90c2f352f19d89e26578",
+    "bytes": 4667
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "owned_unit": "holonics-prune-admission-hnn-combined-d1e1e0bf-host-cuda-link-20261006-v1.service",
+  "stop_exit": 0,
+  "final_state": {
+    "Description": "Owned holonics admission hnn-combined-d1e1e0bf-host-cuda-link-20261006-v1 2c7d61d40d28a50279bd8b277d259457",
+    "LoadState": "loaded",
+    "ActiveState": "failed",
+    "SubState": "failed",
+    "InvocationID": "a2bad398c7014a4b97c2ce1c6cb039b8",
+    "Result": "exit-code",
+    "ExecMainStatus": "125",
+    "ControlGroup": "",
+    "MemoryPeak": "3147444224",
+    "CPUUsageNSec": "55938372000",
+    "TasksCurrent": "[not set]"
+  },
+  "no_unrelated_units_stopped": true,
+  "accounting_captured_before_stop": true,
+  "catchable_cleanup_signals_blocked": true,
+  "lease_retention_events": 0,
+  "pending_catchable_signals": []
+}

@@ -1,0 +1,107 @@
+{
+  "recorded_at_utc": "2026-10-06T04:55:39.310441+00:00",
+  "commit": "d1e1e0bfc30a9b9b22c8f44ad65a8f6c5dc75135",
+  "rows": [
+    {
+      "label": "hnn-combined-d1e1e0bf-host-cuda-link-20261006-v1",
+      "accepted": false,
+      "wall_ns": 20572214780,
+      "projection_ns": 65000000000,
+      "aggregate_CPU_ns": 55938372000,
+      "group_MemoryPeak_bytes": 3147444224,
+      "native_exit": 101,
+      "actual_tests": null,
+      "notebook_example_arg_present": true,
+      "config_sha256": "e9810e48f6d7d6e5e683047ee62f851efa9a1b2f9dd43ca22e4421b5b06177aa",
+      "acceptance_sha256": "e76b0cb70746c3ee2b4d575fdb519ad6d7d3789ea1d99d167d902c98bf1bf893"
+    },
+    {
+      "label": "hnn-combined-d1e1e0bf-host-cuda-link-20261006-v2",
+      "accepted": true,
+      "wall_ns": 3847595065,
+      "projection_ns": 65000000000,
+      "aggregate_CPU_ns": 7004155000,
+      "group_MemoryPeak_bytes": 1051963392,
+      "native_exit": 0,
+      "actual_tests": null,
+      "notebook_example_arg_present": true,
+      "config_sha256": "5ae34c95cbd09b7264c37f8ea54948df02031d0653e1db99f4455c45ff3dd065",
+      "acceptance_sha256": "79a791ae20171ce739d4f58714bce7490ad23c1a389af1923c6c0a148dfe77c3"
+    },
+    {
+      "label": "hnn-combined-d1e1e0bf-teaching-change-20261006-v1",
+      "accepted": true,
+      "wall_ns": 1106474484,
+      "projection_ns": 7628488095,
+      "aggregate_CPU_ns": 1052748000,
+      "group_MemoryPeak_bytes": 16093184,
+      "native_exit": 0,
+      "actual_tests": {
+        "passed": 1,
+        "failed": 0
+      },
+      "notebook_example_arg_present": false,
+      "config_sha256": "a0e290c198a4da56ecc676de745d211f499bfec78fdf628838e2c3c359718043",
+      "acceptance_sha256": "a1a427d516cb5a4ae7bccf96e028f64f77e2c72e4c2d4f6c7f53a8c1176d5687"
+    },
+    {
+      "label": "hnn-combined-d1e1e0bf-teaching-refusal-20261006-v1",
+      "accepted": true,
+      "wall_ns": 962615212,
+      "projection_ns": 9154185714,
+      "aggregate_CPU_ns": 921417000,
+      "group_MemoryPeak_bytes": 16072704,
+      "native_exit": 0,
+      "actual_tests": {
+        "passed": 1,
+        "failed": 0
+      },
+      "notebook_example_arg_present": false,
+      "config_sha256": "5a8d0d2d380f92ac03634adb916e2f6c72c58148309e945654430d2ceb90dcb4",
+      "acceptance_sha256": "44f417310a370c4034b95f0ad8c29150f7e26669a59940159a28f1f5b16092b7"
+    },
+    {
+      "label": "hnn-combined-d1e1e0bf-carry-20261006-v1",
+      "accepted": true,
+      "wall_ns": 853675627,
+      "projection_ns": 3051395238,
+      "aggregate_CPU_ns": 815109000,
+      "group_MemoryPeak_bytes": 15519744,
+      "native_exit": 0,
+      "actual_tests": {
+        "passed": 1,
+        "failed": 0
+      },
+      "notebook_example_arg_present": false,
+      "config_sha256": "59c6db49c1553c5a0ad0913e72c4fc770761ef6f0a2af9df498125da2ee7a9c1",
+      "acceptance_sha256": "8531c13ab93681f3bab0fc9a2af29ae591341bc664fae7d39be04df37c46a419"
+    },
+    {
+      "label": "hnn-combined-d1e1e0bf-sibling-aging-20261006-v1",
+      "accepted": true,
+      "wall_ns": 150971298,
+      "projection_ns": 16000000000,
+      "aggregate_CPU_ns": 105793000,
+      "group_MemoryPeak_bytes": 13668352,
+      "native_exit": 0,
+      "actual_tests": {
+        "passed": 1,
+        "failed": 0
+      },
+      "notebook_example_arg_present": false,
+      "config_sha256": "9043e67bc3552fa2e87043d6c0734ec8760a9cf3ebcf5585d91e6d0c7b4a27ee",
+      "acceptance_sha256": "775cb060462761d6138cbd17bff25da1b28615b41894a25acef65ef965965bbd"
+    }
+  ],
+  "final_and_cleanup_receipts_rehashed": 12,
+  "deduplicated_inputs_rehashed": 1691,
+  "input_bytes_read": 940997139,
+  "input_differences": [],
+  "selected_native_runtime_tests_passed": 4,
+  "actual_notebook_example_linked": true,
+  "separate_cargo_check_executed": false,
+  "planned_build_scope_drift": "actual native no-run argv retained extra --example hnn_prediction; preserve transparently, do not rerun accepted build to alter bookkeeping",
+  "full_suite_GPU_science_accepted": false,
+  "ReframedMoment_Lean_accepted": false,
+  "new_domain_draft_accepted": false
+}

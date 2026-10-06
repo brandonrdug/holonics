@@ -1,0 +1,10 @@
+{
+  "labels": [
+    "hnn-combined-d1e1e0bf-teaching-change-20261006-v1",
+    "hnn-combined-d1e1e0bf-teaching-refusal-20261006-v1",
+    "hnn-combined-d1e1e0bf-carry-20261006-v1",
+    "hnn-combined-d1e1e0bf-sibling-aging-20261006-v1"
+  ],
+  "source_commit": "d1e1e0bfc30a9b9b22c8f44ad65a8f6c5dc75135",
+  "expected_total_tests": 4
+}

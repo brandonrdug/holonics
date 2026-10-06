@@ -1,0 +1,118 @@
+{
+  "status": "PREPARED_FOR_PARENT_REVIEW_ONLY_NOT_ADMITTED",
+  "source_worktree": "/home/b/Workspaces/holonics/.local/wt/capacity",
+  "base": "128235e82943276a1eaa1ca9a7bc21fab0826f8e",
+  "local_commit": null,
+  "source_patch_sha256": "29bd8a944fe4082f0cc13698f4d5fdc63aedf7c66fc4e4ec02b4490412800115",
+  "source_manifest": "/tmp/holonics-hnn-integration-20261006.manifest.json",
+  "compressed_patch": {
+    "path": "/tmp/holonics-hnn-integration-20261006.patch.gz",
+    "bytes": 2104049,
+    "sha256": "aa20e85025ddc91c0274a16c164844a7e92e4c070f487c2279d3f0de23dffa6f"
+  },
+  "source_frozen": true,
+  "source_scope": "physical predecessor interfaces + blind return/normal-R consumer joined to accepted host/CUDA shared-clock stack; exact physical source/test/caller pin 280fa010; no new domain consumer",
+  "proposed_cached_build_argv": [
+    "cargo",
+    "test",
+    "--offline",
+    "--locked",
+    "--workspace",
+    "--lib",
+    "--test",
+    "ranged_capacity",
+    "--test",
+    "source_entrance",
+    "--test",
+    "resident_cold_restore",
+    "--test",
+    "located_ingest",
+    "--example",
+    "hnn_prediction",
+    "--no-run",
+    "-j8",
+    "--message-format=json-render-diagnostics",
+    "--config",
+    "profile.test.package.holonics.debug=0",
+    "--config",
+    "profile.test.package.holonics.codegen-units=16",
+    "--config",
+    "profile.test.package.holonics-cuda.debug=0",
+    "--config",
+    "profile.test.package.holonics-cuda.codegen-units=16"
+  ],
+  "cache_target_directory": "/home/b/Workspaces/holonics/.local/wt/capacity/target",
+  "offline_locked": true,
+  "input_files": [
+    "Cargo.toml",
+    "Cargo.lock",
+    "crates/holonics/Cargo.toml",
+    "crates/holonics-cuda/Cargo.toml",
+    "crates/holonics-cuda/build.rs",
+    "/tmp/holonics-hnn-integration-20261006.manifest.json"
+  ],
+  "input_directories": [
+    "crates/holonics/src",
+    "crates/holonics/tests",
+    "crates/holonics-cuda/src",
+    "crates/holonics-cuda/tests",
+    "crates/holonics-cuda/kernels",
+    "research/notebook/hnn_design"
+  ],
+  "selectors": [
+    {
+      "binary": "holonics",
+      "selector": "hnn::tests::prediction::physical_repair::physical_teaching_changes_r_and_the_later_carried_receiving_read",
+      "expected_tests": 1,
+      "prior_fixed_projection_ns": 7628488095
+    },
+    {
+      "binary": "holonics",
+      "selector": "hnn::tests::prediction::physical_repair::physical_teaching_refuses_a_stale_material_or_foreign_chart_and_preserves_the_carry",
+      "expected_tests": 1,
+      "prior_fixed_projection_ns": 9154185714
+    },
+    {
+      "binary": "holonics",
+      "selector": "hnn::tests::prediction::physical_repair::the_supported_physical_passage_continues_on_its_retained_interior_and_clock",
+      "expected_tests": 1,
+      "prior_fixed_projection_ns": 3051395238
+    },
+    {
+      "binary": "ranged_capacity",
+      "selector": "sibling_ring_ticks_age_leaky_first_and_offset_coordinates_before_the_next_owning_append",
+      "expected_tests": 1,
+      "prior_fixed_projection_ns": 16000000000
+    }
+  ],
+  "proposed_test_argv_suffix": [
+    "--exact",
+    "--test-threads=1",
+    "--nocapture"
+  ],
+  "runtime_threads": 1,
+  "scientific_job": false,
+  "full_suite": false,
+  "full_suite_not_admitted_reason": "No whole-library or full-GPU projection/selection is sealed here; historical full-library failure remains incomplete and cannot be relabelled by focused tests.",
+  "build_limits_unchanged": {
+    "wall_ns": 65000000000,
+    "aggregate_CPU_us": 128000000,
+    "threads": 8,
+    "group_memory_bytes": 4294967296,
+    "address_space_bytes": 4294967296,
+    "prelaunch_MemAvailable_KiB": 8388608,
+    "running_floor_MemAvailable_KiB": 4194304
+  },
+  "runtime_limits_unchanged": {
+    "aggregate_CPU_us": 17000000,
+    "wall_ceiling_ns": 60000000000,
+    "threads": 1,
+    "group_memory_bytes": 4294967296,
+    "prelaunch_MemAvailable_KiB": 8388608,
+    "running_floor_MemAvailable_KiB": 4194304
+  },
+  "projection_requirement": "Queue must independently seal exact current source/input closure, tools, private cache and largest measured per-unit values from every prelaunch measurement; preserve existing failure ceilings. The example target is additional to last host/CUDA link selector, so its old physical-v1 compile receipt must join the actual cache/projection preflight. No launch authorization is conveyed by this request.",
+  "Lean": "Separate focused ReframedMoment source/complete import-closure cache/axiom gate pending; candidate direct-import provenance already prepared under .local/codex-physical-source-proposal-20261005/LEAN_REFRAME_DIRECT_IMPORT_PREFLIGHT.v1.json; not complete admission",
+  "resource_handoff": "Previous queue batch terminated and returned outer workflow lease (message 4e876bbb822b4e85b2e42d394ea43fc8); new explicit resource handoff and independent queue review needed. Do not reuse released reservation as authorization.",
+  "source_permission_blocker": "Automatic approval review rejected git add because original task expressly prohibited source/worktree mutation; explicit authorization handoff required before staging. No workaround attempted."
+}

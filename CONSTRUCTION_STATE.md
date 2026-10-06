@@ -26,7 +26,11 @@ certificate. Located sparse clocks, useful output and adaptive retention remain 
 The shared-clock lane separately passes 26 capacity, entrance, restore and scoped card controls;
 sibling Leaky coordinates pay actual ring ticks and rekey pays zero time. Its conditional bound
 counts the shared lift and independent source endpoints; it is not an adaptive whole-material bound.
-The new Lean finite-box leaf and this combined source's focused acceptance are still pending.
+The integrated source `d1e1e0bf` links with its notebook example and passes four exact native
+controls: receiving change, stale/chart refusal, retained carry and sibling Leaky aging.
+The new Lean finite-box leaf remains unverified. The observation consumer is a native library
+interface exercised by its teaching controls; the physical notebook's independent Rest fixtures
+still pair-learn E and do not invoke that R-teaching interface.
 The linked records preserve failed builds, recovery, fixed limits and each receipt's exact scope.
 
 | Part | State | Plan |

@@ -1,0 +1,15 @@
+{
+  "exact_commit": "d1e1e0bfc30a9b9b22c8f44ad65a8f6c5dc75135",
+  "source_root": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-integration-d1e1e0bf-20261006/source-v2",
+  "missing_snapshot_dependency_added": "accelerators/cuda-smoke/mount_smoke_kernel.ptx",
+  "artifact_pin": {
+    "bytes": 1437,
+    "sha256": "0310be86a54b08c4234f6a39b69805b72d8610bb55cee5aef7caf387a0c8a2cd"
+  },
+  "origin_bytes_match_git_commit": true,
+  "mathematical_and_Rust_source_bytes_unchanged": true,
+  "no_artifact_or_owner_source_removed": true,
+  "previous_native_failure_preserved": "hnn-combined-d1e1e0bf-host-cuda-link-20261006-v1",
+  "previous_failure": "Cargo links mount-smoke binary for selected integrations; include_bytes PTX closure omitted by queue snapshot",
+  "caps_and_deadlines_raised": false
+}

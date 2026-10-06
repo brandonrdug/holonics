@@ -1,0 +1,99 @@
+{
+  "passed": false,
+  "label": "hnn-combined-d1e1e0bf-teaching-refusal-20261006-v1",
+  "scientific_job": false,
+  "deferred_lock_busy": false,
+  "final_CPU_ns": 921417000,
+  "CPU_reading_grain_ns": 1000,
+  "aggregate_CPU_limit_us": 17000000,
+  "final_CPU_source": "systemd retained oneshot CPUUsageNSec after all group processes exit",
+  "CPU_kernel_hard_total_limit": false,
+  "sampled_stop_margin_us": 1000000,
+  "aggregate_CPU_within_limit": true,
+  "no_overshoot_accepted": true,
+  "wall_ns": 962615212,
+  "projection_ns": 9154185714,
+  "wall_source": "external monotonic_ns through final property read",
+  "quiescent": true,
+  "completion_event": "oneshot start job completed; no polling",
+  "unit_properties": {
+    "Description": "Owned holonics admission hnn-combined-d1e1e0bf-teaching-refusal-20261006-v1 77740799cc856677f8d9fb5586bca39f",
+    "LoadState": "loaded",
+    "ActiveState": "active",
+    "SubState": "exited",
+    "InvocationID": "74ad4eea5a8044199e66e440371dffbb",
+    "Result": "success",
+    "ExecMainStatus": "0",
+    "ControlGroup": "",
+    "MemoryPeak": "16072704",
+    "CPUUsageNSec": "921417000",
+    "TasksCurrent": "[not set]"
+  },
+  "outer_error": null,
+  "unit_start_exit": 0,
+  "unit_start_stdout": "",
+  "unit_start_stderr": "",
+  "config": {
+    "sha256": "5a8d0d2d380f92ac03634adb916e2f6c72c58148309e945654430d2ceb90dcb4",
+    "bytes": 63322
+  },
+  "receipt_pins": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-combined-d1e1e0bf-teaching-refusal-20261006-v1.config.json": {
+      "sha256": "5a8d0d2d380f92ac03634adb916e2f6c72c58148309e945654430d2ceb90dcb4",
+      "bytes": 63322
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-combined-d1e1e0bf-teaching-refusal-20261006-v1.external-lease.json": {
+      "sha256": "f399e6506fb42086b425f6536ae4643791d99b8833ff6591a8c0e19587c54ed4",
+      "bytes": 487
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-combined-d1e1e0bf-teaching-refusal-20261006-v1.lease-identity.json": {
+      "sha256": "180e7ae7c82a724dc49b151cf40890846e148962ecdbcab0ec4c8ec55cbe79f8",
+      "bytes": 565
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-combined-d1e1e0bf-teaching-refusal-20261006-v1.input_seal.json": {
+      "sha256": "e6c7461796c15d71eaf3893b7d6d6f550e268974193106b6e7f38e33b7a1275e",
+      "bytes": 62148
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-combined-d1e1e0bf-teaching-refusal-20261006-v1.stdout": {
+      "sha256": "35fe831dbc64aaaf1131ca82bd09af8eca3f75970957d8868991c9626915a4e6",
+      "bytes": 252
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-combined-d1e1e0bf-teaching-refusal-20261006-v1.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-combined-d1e1e0bf-teaching-refusal-20261006-v1.memory-gate.json": {
+      "sha256": "3d410e891034cd25435024c9361181891bec9fabe24a335173927cb4833b48c9",
+      "bytes": 120
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-combined-d1e1e0bf-teaching-refusal-20261006-v1.child-identity.json": {
+      "sha256": "66deb5fee5cb9e8e2d052251995a6da0eabe262ba190dad32b8368e462ede650",
+      "bytes": 78
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-combined-d1e1e0bf-teaching-refusal-20261006-v1.system-floor.json": {
+      "sha256": "c34244d1938bbeedd94c3af636c55bd0d2816982dcab1b29d6f854b8da305ef4",
+      "bytes": 6247
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-combined-d1e1e0bf-teaching-refusal-20261006-v1.quiescence.json": {
+      "sha256": "924297bc9f7d5aeeb67dd5f64f323157a0c2662a414d4ca35027dd447e3ff658",
+      "bytes": 130
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-combined-d1e1e0bf-teaching-refusal-20261006-v1.output_seal.json": {
+      "sha256": "0e4f363572ed9896ed82a2f9494fb9a4ce7cc1a2d4db6fb999ec176d45860293",
+      "bytes": 53272
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-combined-d1e1e0bf-teaching-refusal-20261006-v1.publication.json": {
+      "sha256": "a9699623491457ab1574e6e0b3047b7779d529a3e2c48d6a11a386125ba04fd6",
+      "bytes": 2783
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-combined-d1e1e0bf-teaching-refusal-20261006-v1.stage-quiescence.json": {
+      "sha256": "80e72714ca262608847e038e86bee8f31b7f82b29cb904c075136ff1a2d29ea7",
+      "bytes": 136
+    }
+  },
+  "launcher_outside_native_group": true,
+  "lease_owner_outside_capped_group": true,
+  "lease_held_through_final_CPU_read_and_publication": true,
+  "stage_passed_before_cleanup": true,
+  "requires_cleanup_acceptance": true
+}

@@ -1,8 +1,9 @@
 # The blind receiving return is joined, but release needs the executed coupled domain
 
 **Date:** October 6. **Issues:** #73, #76, #148, #62, #63.
-**Grade:** scoped native source receipts; combined-source acceptance and the new
-formal finite-box leaf remain pending. No repair fidelity or product acceptance.
+**Grade:** four exact combined-source native controls pass on `d1e1e0bf`, with its
+notebook example linked. The new formal finite-box leaf remains unverified.
+No repair fidelity, full-suite or product acceptance.
 
 ## The consuming joins and their source
 
@@ -31,7 +32,10 @@ Uncompared stations contribute neither covectors nor normal statistics. Refusal
 returns the already-produced blind receipt and carry and drops the transient word.
 The producing identity decoder and unit station-clock admission remain explicit;
 located sparse conduct refuses before the word. No expected answer enters the
-forward law, and no receiving map is authored in the consumer.
+forward law, and no receiving map is authored in the consumer. This observation
+interface is exercised by the native teaching controls. The physical notebook's
+independent Rest fixtures still pair-learn E and call the blind repair; they do
+not invoke the new R-teaching interface or retain carry between those fixtures.
 
 The shared source-clock join preserves source bins and own injection/endpoint
 coordinates while accounting the actual shared cell population. Sibling motion
@@ -62,9 +66,28 @@ remains outside its admission. The new `ReframedMoment` proof-source fixes and
 printed-axiom selectors still require actual Lean acceptance.
 
 Both source-read leases were released before this integration. Separate lane
-passes establish their exact source scopes, not this combined source's acceptance.
-The combined source must receive its own focused linkage and affected physical,
-carry and sibling-aging check through the common bounded queue.
+passes establish their exact source scopes. The [combined receipt](receipts/hnn-combined-integration-20261006/native-validation-d1e1e0bf/VALIDATION.json)
+then checks commit `d1e1e0bfc30a9b9b22c8f44ad65a8f6c5dc75135`: the actual
+offline/locked workspace no-run build includes the `hnn_prediction` example
+executable, and four selected runtime controls each run one test and pass:
+receiving change, stale/chart refusal, retained carry and sibling Leaky aging.
+The example is linked, not executed; a separate `cargo check` was not run.
+
+The initial isolated snapshot omitted the committed mount-smoke PTX include;
+that build failed before tests. Adding its unchanged bytes closes the source
+snapshot without a Rust/equation edit or any raised limit. The successful link's
+wall/projected ratio is `(5*43*79*359*631)/(2^9*5^10*13)`, aggregate CPU is
+`7004155000 = 2^3*5^4*251*5581` nanoseconds, and the final retained-unit memory
+peak is `1051963392 = 2^12*3*59*1451` bytes.
+The [independent final-accounting review](receipts/hnn-combined-integration-20261006/independent-final-accounting-review.v1.json)
+rehashes every final/cleanup receipt and `1691 = 19*89` deduplicated input pins. Its
+final memory readings distinguish the later retained-unit boundary from the
+queue summary's earlier stage peaks. All children are reaped and matching leases
+released. The actual build retained an extra example executable target relative
+to the latest notebook-metadata proposal; its command is preserved, and the older
+notebook metadata measurement is not evidence for executable linkage. No rerun
+is needed to change that bookkeeping. Full-library/full-GPU runtime, scientific
+repair and the new Lean leaf are outside this acceptance.
 
 ## The next physical obligation, with its existing owners
 

@@ -559,8 +559,12 @@ The physical lane's two teaching controls and retained-carry regression pass on 
 source; its earlier nine chart/clock controls also pass. Explicit observation follows prediction
 and spends that teaching passage. A later native read changes under learned R and returned carry;
 there is no erasure or product acceptance. The shared-clock lane's 26 capacity, entrance, restore
-and scoped card controls pass separately. This integration still needs its focused joined-source
-gate and the new Lean finite-box acceptance; separate source receipts do not establish either.
+and scoped card controls pass separately. The joined source `d1e1e0bf` now links with its notebook
+example and passes four exact native controls: receiving change, stale/chart refusal, retained
+carry and sibling Leaky aging. Its [combined receipt](../../research/records/receipts/hnn-combined-integration-20261006/native-validation-d1e1e0bf/VALIDATION.json)
+preserves the initial missing-PTX snapshot failure and all fixed limits. The new Lean finite-box
+acceptance remains unverified. The observation API is exercised by native teaching controls;
+the physical notebook's independent Rest fixtures still pair-learn E rather than invoking it.
 
 Lane C's next release obligation (#62, #73, #148) is the image of the complete compatible sparse
 source/carry family through the **actual coupled Word**, followed by its actual R/phase/grain face

@@ -170,7 +170,7 @@ offsets `{1,3}` give identity crossover `436 = 2^2*109` and ranged crossover
 last ring five ticks where the old box allowed two. At `n = d = 2^64-1` the widened
 lift factor is `2^64*(2^64-1)`. The baseline's eight native ranged fixtures cover
 these exact arithmetic controls. They establish no learning or scientific claim;
-the new reframe and sibling-aging fixtures still need current-source acceptance.
+the later reframe and sibling-aging fixtures have their separate acceptance below.
 
 The baseline native acceptance covers independent crossover comparisons,
 exact wide arithmetic, malformed declaration/lift refusals, the existing located
@@ -209,7 +209,10 @@ After that release, the tested physical chart/observation consumer at `280fa010`
 was joined to this integration tree with its immutable source and receipt bytes.
 Its source moment uses the supported continued station carrier and does not borrow
 this ingest-only capacity bound. The two lanes' separate passes do not establish
-joined-source acceptance: the exact combined source is submitted to the same queue
-for focused linkage and affected physical/carry/Leaky controls. The source comments
-and record status above now distinguish those completed unit gates from the pending
-formal leaf and combined integration.
+joined-source acceptance. The [combined receipt](receipts/hnn-combined-integration-20261006/native-validation-d1e1e0bf/VALIDATION.json)
+then records `d1e1e0bf` linking with its notebook example and four exact native
+controls passing: receiving change, stale/chart refusal, retained carry and sibling
+Leaky aging. The snapshot's first missing-PTX failure is preserved; only its exact
+committed include was added, with no source-law edit or raised limit. The source
+comments and this record distinguish both completed native scopes from the pending
+new formal leaf, adaptive capacity and scientific acceptance.

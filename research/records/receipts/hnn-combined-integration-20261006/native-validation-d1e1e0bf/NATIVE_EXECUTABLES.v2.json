@@ -1,0 +1,178 @@
+{
+  "holonics": {
+    "executable": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-integration-d1e1e0bf-20261006/cache-v1/debug/deps/holonics-70b68d2f7e1f6408",
+    "fresh": true,
+    "target": {
+      "kind": [
+        "lib"
+      ],
+      "crate_types": [
+        "lib"
+      ],
+      "name": "holonics",
+      "src_path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-integration-d1e1e0bf-20261006/source-v2/crates/holonics/src/lib.rs",
+      "edition": "2024",
+      "doc": true,
+      "doctest": true,
+      "test": true
+    },
+    "pin": {
+      "bytes": 63936520,
+      "sha256": "017775823f1c867edc3164216922073c077dafbf84e1f963d8380c52e45d36ad"
+    }
+  },
+  "resident_cold_restore": {
+    "executable": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-integration-d1e1e0bf-20261006/cache-v1/debug/deps/resident_cold_restore-d85475b8f5abeb14",
+    "fresh": true,
+    "target": {
+      "kind": [
+        "test"
+      ],
+      "crate_types": [
+        "bin"
+      ],
+      "name": "resident_cold_restore",
+      "src_path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-integration-d1e1e0bf-20261006/source-v2/crates/holonics/tests/resident_cold_restore.rs",
+      "edition": "2024",
+      "doc": false,
+      "doctest": false,
+      "test": true
+    },
+    "pin": {
+      "bytes": 28422968,
+      "sha256": "2e5f27e3ee5d332c7f2f91701e814f827d06fd00efbb68e62a7f50dcc6e61b12"
+    }
+  },
+  "source_entrance": {
+    "executable": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-integration-d1e1e0bf-20261006/cache-v1/debug/deps/source_entrance-3dfaf698dddeb1a6",
+    "fresh": true,
+    "target": {
+      "kind": [
+        "test"
+      ],
+      "crate_types": [
+        "bin"
+      ],
+      "name": "source_entrance",
+      "src_path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-integration-d1e1e0bf-20261006/source-v2/crates/holonics/tests/source_entrance.rs",
+      "edition": "2024",
+      "doc": false,
+      "doctest": false,
+      "test": true
+    },
+    "pin": {
+      "bytes": 21032200,
+      "sha256": "cb6aa2579f955644983674ec8c4c7a12c8cb9ee6a2c0fd297ae97851d8a59a23"
+    }
+  },
+  "hnn_prediction": {
+    "executable": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-integration-d1e1e0bf-20261006/cache-v1/debug/examples/hnn_prediction-8cd4a578e626a457",
+    "fresh": true,
+    "target": {
+      "kind": [
+        "example"
+      ],
+      "crate_types": [
+        "bin"
+      ],
+      "name": "hnn_prediction",
+      "src_path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-integration-d1e1e0bf-20261006/source-v2/crates/holonics/../../research/notebook/hnn_design/hnn_prediction.rs",
+      "edition": "2024",
+      "doc": false,
+      "doctest": false,
+      "test": false
+    },
+    "pin": {
+      "bytes": 6130728,
+      "sha256": "fb3cf30b07f27619ef2b8a481a3361010a7c5581531549a07595d9977e201a3e"
+    }
+  },
+  "ranged_capacity": {
+    "executable": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-integration-d1e1e0bf-20261006/cache-v1/debug/deps/ranged_capacity-bd29e6ac6f6167da",
+    "fresh": true,
+    "target": {
+      "kind": [
+        "test"
+      ],
+      "crate_types": [
+        "bin"
+      ],
+      "name": "ranged_capacity",
+      "src_path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-integration-d1e1e0bf-20261006/source-v2/crates/holonics/tests/ranged_capacity.rs",
+      "edition": "2024",
+      "doc": false,
+      "doctest": false,
+      "test": true
+    },
+    "pin": {
+      "bytes": 23187568,
+      "sha256": "ed2864b401cd656180ec2bda0b5767d64179c7e34181ad70bafe3e2acbe09114"
+    }
+  },
+  "mount-smoke": {
+    "executable": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-integration-d1e1e0bf-20261006/cache-v1/debug/mount-smoke",
+    "fresh": false,
+    "target": {
+      "kind": [
+        "bin"
+      ],
+      "crate_types": [
+        "bin"
+      ],
+      "name": "mount-smoke",
+      "src_path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-integration-d1e1e0bf-20261006/source-v2/crates/holonics-cuda/src/bin/mount-smoke.rs",
+      "edition": "2024",
+      "doc": true,
+      "doctest": false,
+      "test": true
+    },
+    "pin": {
+      "bytes": 10052064,
+      "sha256": "ab0ad9b83d07270b8d37b429006f59981023d8605ca40bfa814206a6d228f9c2"
+    }
+  },
+  "located_ingest": {
+    "executable": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-integration-d1e1e0bf-20261006/cache-v1/debug/deps/located_ingest-2b2d6cef9fd78c5f",
+    "fresh": false,
+    "target": {
+      "kind": [
+        "test"
+      ],
+      "crate_types": [
+        "bin"
+      ],
+      "name": "located_ingest",
+      "src_path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-integration-d1e1e0bf-20261006/source-v2/crates/holonics-cuda/tests/located_ingest.rs",
+      "edition": "2024",
+      "doc": false,
+      "doctest": false,
+      "test": true
+    },
+    "pin": {
+      "bytes": 15993544,
+      "sha256": "26661ce82dae800a8d4a7986beade776891881b807e73e79d2f3f7aba9321920"
+    }
+  },
+  "holonics_cuda": {
+    "executable": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-integration-d1e1e0bf-20261006/cache-v1/debug/deps/holonics_cuda-3a3d38defac6a12c",
+    "fresh": false,
+    "target": {
+      "kind": [
+        "lib"
+      ],
+      "crate_types": [
+        "lib"
+      ],
+      "name": "holonics_cuda",
+      "src_path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-integration-d1e1e0bf-20261006/source-v2/crates/holonics-cuda/src/lib.rs",
+      "edition": "2024",
+      "doc": true,
+      "doctest": true,
+      "test": true
+    },
+    "pin": {
+      "bytes": 41190080,
+      "sha256": "d8cf4782ee3efc8c70f602c20e47de3d4d36446f810070f77ca1e01c925f8de1"
+    }
+  }
+}

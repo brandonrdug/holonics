@@ -1,0 +1,141 @@
+{
+  "exact_tested_commit": "d1e1e0bfc30a9b9b22c8f44ad65a8f6c5dc75135",
+  "native_link_plus_notebook_accepted": true,
+  "selected_integrations_passed": true,
+  "expected_and_actual_total_tests": 4,
+  "selectors": [
+    {
+      "binary": "holonics",
+      "selector": "hnn::tests::prediction::physical_repair::physical_teaching_changes_r_and_the_later_carried_receiving_read",
+      "expected_tests": 1,
+      "prior_fixed_projection_ns": 7628488095
+    },
+    {
+      "binary": "holonics",
+      "selector": "hnn::tests::prediction::physical_repair::physical_teaching_refuses_a_stale_material_or_foreign_chart_and_preserves_the_carry",
+      "expected_tests": 1,
+      "prior_fixed_projection_ns": 9154185714
+    },
+    {
+      "binary": "holonics",
+      "selector": "hnn::tests::prediction::physical_repair::the_supported_physical_passage_continues_on_its_retained_interior_and_clock",
+      "expected_tests": 1,
+      "prior_fixed_projection_ns": 3051395238
+    },
+    {
+      "binary": "ranged_capacity",
+      "selector": "sibling_ring_ticks_age_leaky_first_and_offset_coordinates_before_the_next_owning_append",
+      "expected_tests": 1,
+      "prior_fixed_projection_ns": 16000000000
+    }
+  ],
+  "all_source_and_executable_pins_preserved": true,
+  "private_original_snapshot_closure_error": "mount-smoke PTX include_bytes omitted; original failed snapshot/source/control receipts preserved, next source snapshot includes exact commit-owned1437-byte file",
+  "Rust_or_mathematical_commit_source_modified": false,
+  "source_owner_worktree_or_cache_mutated": false,
+  "stages": [
+    {
+      "label": "hnn-combined-d1e1e0bf-host-cuda-link-20261006-v1",
+      "passed": false,
+      "wall_ns": 20572214780,
+      "projection_ns": 65000000000,
+      "measured_to_projected_ratio": [
+        20572214780,
+        65000000000
+      ],
+      "aggregate_CPU_ns": 55938372000,
+      "group_peak_bytes": 3147444224,
+      "child_RSS_peak_KiB": 2221176,
+      "inputs_unchanged": true,
+      "quiescent_release": true,
+      "actual_test_count": 0
+    },
+    {
+      "label": "hnn-combined-d1e1e0bf-host-cuda-link-20261006-v2",
+      "passed": true,
+      "wall_ns": 3847595065,
+      "projection_ns": 65000000000,
+      "measured_to_projected_ratio": [
+        3847595065,
+        65000000000
+      ],
+      "aggregate_CPU_ns": 7004155000,
+      "group_peak_bytes": 945876992,
+      "child_RSS_peak_KiB": 472188,
+      "inputs_unchanged": true,
+      "quiescent_release": true,
+      "actual_test_count": 0
+    },
+    {
+      "label": "hnn-combined-d1e1e0bf-teaching-change-20261006-v1",
+      "passed": true,
+      "wall_ns": 1106474484,
+      "projection_ns": 7628488095,
+      "measured_to_projected_ratio": [
+        1106474484,
+        7628488095
+      ],
+      "aggregate_CPU_ns": 1052748000,
+      "group_peak_bytes": 16093184,
+      "child_RSS_peak_KiB": 26020,
+      "inputs_unchanged": true,
+      "quiescent_release": true,
+      "actual_test_count": 1
+    },
+    {
+      "label": "hnn-combined-d1e1e0bf-teaching-refusal-20261006-v1",
+      "passed": true,
+      "wall_ns": 962615212,
+      "projection_ns": 9154185714,
+      "measured_to_projected_ratio": [
+        962615212,
+        9154185714
+      ],
+      "aggregate_CPU_ns": 921417000,
+      "group_peak_bytes": 16072704,
+      "child_RSS_peak_KiB": 27004,
+      "inputs_unchanged": true,
+      "quiescent_release": true,
+      "actual_test_count": 1
+    },
+    {
+      "label": "hnn-combined-d1e1e0bf-carry-20261006-v1",
+      "passed": true,
+      "wall_ns": 853675627,
+      "projection_ns": 3051395238,
+      "measured_to_projected_ratio": [
+        853675627,
+        3051395238
+      ],
+      "aggregate_CPU_ns": 815109000,
+      "group_peak_bytes": 15519744,
+      "child_RSS_peak_KiB": 25236,
+      "inputs_unchanged": true,
+      "quiescent_release": true,
+      "actual_test_count": 1
+    },
+    {
+      "label": "hnn-combined-d1e1e0bf-sibling-aging-20261006-v1",
+      "passed": true,
+      "wall_ns": 150971298,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        150971298,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 105793000,
+      "group_peak_bytes": 13459456,
+      "child_RSS_peak_KiB": 14500,
+      "inputs_unchanged": true,
+      "quiescent_release": true,
+      "actual_test_count": 1
+    }
+  ],
+  "resource_caps_or_failed_deadlines_raised": false,
+  "all_owned_children_reaped_and_leases_released": true,
+  "full_library_or_GPU_checked": false,
+  "new_coupled_domain_draft_included": false,
+  "scientific_run": false,
+  "ReframedMoment_kernel_checked": false,
+  "prior_separate3physical_26hostCUDA_passes_retained_independently": true
+}

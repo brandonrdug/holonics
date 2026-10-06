@@ -1,0 +1,2866 @@
+{
+  "exact_commit": "d1e1e0bfc30a9b9b22c8f44ad65a8f6c5dc75135",
+  "origin": "/home/b/Workspaces/holonics/.local/wt/capacity",
+  "source_root": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-integration-d1e1e0bf-20261006/source-v1",
+  "420_frozen_manifest_files_match_commit_worktree": true,
+  "dirty_source_claim": false,
+  "source_inputs": {
+    "Cargo.lock": {
+      "bytes": 4292,
+      "sha256": "4380186a0b5ed33a0c6ef3b15822c215072016af539446727800dcd501bde00a"
+    },
+    "Cargo.toml": {
+      "bytes": 1160,
+      "sha256": "a9ff455bcb89885c74f5758dd782ec4d3c89bbd31018e89333c4d476ea2dc40f"
+    },
+    "crates/README.md": {
+      "bytes": 1662,
+      "sha256": "71bb810675f5a7cca8f1b27bf12f8b4664b10c0f7e7ab9a9c827fc1893e53858"
+    },
+    "crates/holonics/Cargo.toml": {
+      "bytes": 1544,
+      "sha256": "64170e4fac0e1f1b08bfd076b39289dae249ec50e115c720ac252c2cae09c916"
+    },
+    "crates/holonics/clippy.toml": {
+      "bytes": 1957,
+      "sha256": "9e24d4bbefb44e67cf54a27844a4136ab421ef21a7abfae475f76acf2a07adc7"
+    },
+    "crates/holonics/src/aeon/epoch.rs": {
+      "bytes": 22842,
+      "sha256": "19e68ecc1c8fabc5203f4007f0e7f43335f045f5203b95199442ba28482e98e3"
+    },
+    "crates/holonics/src/aeon/first_law.rs": {
+      "bytes": 26370,
+      "sha256": "02e05fd816f29ba72976da44b74df34a9dc023d7ddcacce4c9cae3b73fca1fb2"
+    },
+    "crates/holonics/src/aeon/groupoid.rs": {
+      "bytes": 26932,
+      "sha256": "a2e48359a9a0ea7019c2a2435b053cca10b14830ff0c615094ac6a8223d73181"
+    },
+    "crates/holonics/src/aeon/hodge.rs": {
+      "bytes": 12999,
+      "sha256": "bdd8475b2a8dbad2523d0520afa1892fed8ea092c20fe5c8fc8e1de258ae8efb"
+    },
+    "crates/holonics/src/aeon/join.rs": {
+      "bytes": 17693,
+      "sha256": "891e9fa752cf1224bdd6cecf7491dffaa92caccf171fb82312026744ae994863"
+    },
+    "crates/holonics/src/aeon/lock.rs": {
+      "bytes": 10949,
+      "sha256": "ec5905e52e3fcb215841db21dfdbb399bbf7dab8843f9f3ba5f1d7de283497bd"
+    },
+    "crates/holonics/src/aeon/mod.rs": {
+      "bytes": 10607,
+      "sha256": "e2ac911afee55ba27759fe52c144af9381fad5825f938bc5407cb9751d8c1def"
+    },
+    "crates/holonics/src/aeon/production.rs": {
+      "bytes": 34497,
+      "sha256": "72ccdb2373e93a3c9cc1d2c686a9f54d535f77a07da23ff0585afd5a89c69d93"
+    },
+    "crates/holonics/src/aeon/reading.rs": {
+      "bytes": 28656,
+      "sha256": "0761e5d5d3247d41847859459b5b7ac481d4a3abac47cdb57d9e30edd262d7cd"
+    },
+    "crates/holonics/src/compression/cost/tests.rs": {
+      "bytes": 12697,
+      "sha256": "00873dd825b70353e8d281b648dbe6266259c5f8f1b0d6cc33ed97b3266168a1"
+    },
+    "crates/holonics/src/compression/cost.rs": {
+      "bytes": 19593,
+      "sha256": "47c71bae4dee52f1dd8ded129afff6d9ec7efb87c1ffedcf4fb7abb38848a1b2"
+    },
+    "crates/holonics/src/compression/keys/edges.rs": {
+      "bytes": 18132,
+      "sha256": "031c6b3ba5bee51091b0067d47db8177202adb7e05ebc297258332859c6a3fcd"
+    },
+    "crates/holonics/src/compression/keys/local/tests.rs": {
+      "bytes": 8031,
+      "sha256": "6542837c44d16bbfaf383fd6838aebcb0a870772ec8b133ff756202b52d88698"
+    },
+    "crates/holonics/src/compression/keys/local.rs": {
+      "bytes": 20107,
+      "sha256": "143d411df79d321648b5f00d74d185aa5622cd52385d8ed1ebfb2b16ecd16279"
+    },
+    "crates/holonics/src/compression/keys/repair/tests.rs": {
+      "bytes": 10632,
+      "sha256": "02490fffb036d03dd407fb171c1fd4cd4f1890533543eb46fa652f898d148895"
+    },
+    "crates/holonics/src/compression/keys/repair.rs": {
+      "bytes": 24181,
+      "sha256": "be69d14b09c7ec6578e46f83d5f6802321f99ddbca5c708ca224276da0f74156"
+    },
+    "crates/holonics/src/compression/keys/tests.rs": {
+      "bytes": 12675,
+      "sha256": "98e119b40d456017941f586726561cd969ffd168986e8ae85635354db9303d3f"
+    },
+    "crates/holonics/src/compression/keys/transport/tests.rs": {
+      "bytes": 25500,
+      "sha256": "d276e5fea67d2701496343700c4b41a15527d22ee94c197e5cb73d5b3eecf362"
+    },
+    "crates/holonics/src/compression/keys/transport.rs": {
+      "bytes": 56281,
+      "sha256": "e5838556ab8f65a0f3015f517460479c2fe32ec4babc6a4bc4db78eeaa3ae212"
+    },
+    "crates/holonics/src/compression/keys/turns.rs": {
+      "bytes": 17206,
+      "sha256": "7dfcc2a199da6b3ac30fc32d18d82cb7541c1a0a671763e7f91df7df0b1fdd18"
+    },
+    "crates/holonics/src/compression/keys.rs": {
+      "bytes": 21934,
+      "sha256": "576d6b20b27ee68235ff8934ea0063640ed0e0a2c01597c3b0768707bf31860a"
+    },
+    "crates/holonics/src/compression/landmark/context/baseline.rs": {
+      "bytes": 10550,
+      "sha256": "413f6c3f0d94127b94aec763bca73fde869d8d64aaa883550e20ef2cdb53cf51"
+    },
+    "crates/holonics/src/compression/landmark/context/sections.rs": {
+      "bytes": 5059,
+      "sha256": "f0843ade9a2a7340b268edd80c8b430f395fb3b3afaa68ba1c7e541dda24deed"
+    },
+    "crates/holonics/src/compression/landmark/context/tests/full.rs": {
+      "bytes": 9232,
+      "sha256": "a26897aa77ff642f55e185564efaedb77b94a1e5d4bd5a0da0aadf1c2cd685f5"
+    },
+    "crates/holonics/src/compression/landmark/context/tests.rs": {
+      "bytes": 111230,
+      "sha256": "bab40109ec3c9375094725afef6522b929791b3f731e5c2dd5de5a2787d708df"
+    },
+    "crates/holonics/src/compression/landmark/context.rs": {
+      "bytes": 263781,
+      "sha256": "5f5e718eee55408f0b6827210acbd99fb7b9414c76af090cbd4cb9c7de8f0efc"
+    },
+    "crates/holonics/src/compression/landmark/mobius.rs": {
+      "bytes": 27570,
+      "sha256": "385b851ddc4462c8cdd118bde46697caf731d338b764a0f4a05b250386a4092b"
+    },
+    "crates/holonics/src/compression/landmark/quadratic.rs": {
+      "bytes": 10655,
+      "sha256": "b75c5fdfd2db5d747123ba5540a25c36e2a7d74dc7530bc4c4e28f76ecf5ffaf"
+    },
+    "crates/holonics/src/compression/landmark/site.rs": {
+      "bytes": 27824,
+      "sha256": "da336b8bbb3a7ddac4751da10f9e41d8cb52094f746c24e3a517cddc9129c621"
+    },
+    "crates/holonics/src/compression/landmark.rs": {
+      "bytes": 4925,
+      "sha256": "b2020bb401cf404e3fdbdd4aaf8eb4e806d2556f7e2750e2ff54fde4ee05a573"
+    },
+    "crates/holonics/src/compression/mod.rs": {
+      "bytes": 9169,
+      "sha256": "2870e07f0d35dcd9c8c21bff8d480bb362a164402fa87cc8fdb1a4cd1202f2ea"
+    },
+    "crates/holonics/src/compression/resonance.rs": {
+      "bytes": 18058,
+      "sha256": "faabd9076873c12ad297b71ca25b7afd6ce7e035ce4cf20d89635f6683914011"
+    },
+    "crates/holonics/src/exterior_guards.rs": {
+      "bytes": 11595,
+      "sha256": "ac1a5008df895cd34bb05570bdf630d67fe7edc4bf8de261b46b1ff11bbace3d"
+    },
+    "crates/holonics/src/geometry/complex.rs": {
+      "bytes": 36085,
+      "sha256": "6f13385b17eb5a0bc9f3609539fe7f92b4c1915a3394107f32b7b3f8a76b9396"
+    },
+    "crates/holonics/src/geometry/exact.rs": {
+      "bytes": 9605,
+      "sha256": "8ff996a5878c7f97d6debb3d7a7f4f11733644cbc4c917b7154c9545ea6d68fe"
+    },
+    "crates/holonics/src/geometry/mod.rs": {
+      "bytes": 1292,
+      "sha256": "e9686f8ed6626939a09c16e08dbf1afa6a8995d2929e8ccebed8cd00e8dcda35"
+    },
+    "crates/holonics/src/geometry/motion.rs": {
+      "bytes": 20023,
+      "sha256": "1ce22c85fc4c230f5dc642d393d77c0111779d890f56e171ba597ece7980e345"
+    },
+    "crates/holonics/src/geometry/screw.rs": {
+      "bytes": 21308,
+      "sha256": "0f5ac4bfb3c651f6e1bff125d8c78fae87e7b08fd67ca13f92cf478b66deceeb"
+    },
+    "crates/holonics/src/geometry/swing.rs": {
+      "bytes": 11216,
+      "sha256": "a98e3cbb084058fd8a3b552b501fbff273ed21c4f34387f65b959209d51e369b"
+    },
+    "crates/holonics/src/geometry/winding/tests.rs": {
+      "bytes": 9386,
+      "sha256": "11d3b79af579138cf28de806e4d33fc96fc6955ca1c860226e1f07d0368034fa"
+    },
+    "crates/holonics/src/geometry/winding.rs": {
+      "bytes": 10566,
+      "sha256": "ca5a8f4417b638edc922cd6ef12d1b8e6ac0ad04b4e446d4ab2cd271a8fb72c0"
+    },
+    "crates/holonics/src/hnn/chart.rs": {
+      "bytes": 38033,
+      "sha256": "71b69f3298d57e8c3312874764919bf3110e7a6b598018eba61551bc33c7f277"
+    },
+    "crates/holonics/src/hnn/constitution.rs": {
+      "bytes": 433201,
+      "sha256": "951580ec936cb5948c239a9f3006130809df2111be412beb85831c8fcda5caaa"
+    },
+    "crates/holonics/src/hnn/contact.rs": {
+      "bytes": 37018,
+      "sha256": "c03e82181b7d6063b922edfebbb3ac0ef1ebb516b0791b75e5943e74d32ce4d5"
+    },
+    "crates/holonics/src/hnn/encoding.rs": {
+      "bytes": 59224,
+      "sha256": "50152ce0f52a501ec08e9cd0b7981950f8173ec4dcfe5a66286ad48d94bf9739"
+    },
+    "crates/holonics/src/hnn/executed.rs": {
+      "bytes": 14059,
+      "sha256": "e9000546fd4b202c887336b020dc063286309fe01c217124e887f798baee518b"
+    },
+    "crates/holonics/src/hnn/field.rs": {
+      "bytes": 117656,
+      "sha256": "c7a556a2eec3007d0885292123aedda383f61fa48914cb334b8c8c8cb3991c00"
+    },
+    "crates/holonics/src/hnn/keys.rs": {
+      "bytes": 30498,
+      "sha256": "6b3d12bc909fe7c4e0e24f443a0313df16cee0460bef0b7db14da76652a44d8f"
+    },
+    "crates/holonics/src/hnn/mod.rs": {
+      "bytes": 31487,
+      "sha256": "ded2350455fe3c2e9b5db159efcc8f75724078f3f30d2e3763bf1a02de8eb717"
+    },
+    "crates/holonics/src/hnn/moment.rs": {
+      "bytes": 106993,
+      "sha256": "d92ffd6017ba63cd3e7ec3b8b22cc0bcb9d0c95f9887eade40c7b42831a63bb1"
+    },
+    "crates/holonics/src/hnn/pending.rs": {
+      "bytes": 13935,
+      "sha256": "092d05ce266079a07bec53f067adc586eb83b94926530149c93ad44ad6f20332"
+    },
+    "crates/holonics/src/hnn/port.rs": {
+      "bytes": 68725,
+      "sha256": "882929e7c463b6a65b0f437de8d7000ea8044dd25504720c8ff85a253c8d660c"
+    },
+    "crates/holonics/src/hnn/prediction.rs": {
+      "bytes": 108879,
+      "sha256": "f0eb33270990aa14e72c5b668cb0433c8b9424533986be5934c87efc74283e74"
+    },
+    "crates/holonics/src/hnn/propagation.rs": {
+      "bytes": 65733,
+      "sha256": "ebae450035e9a86b53f454d437e51ad9ceebb020f54a0e0dfc5278a741356856"
+    },
+    "crates/holonics/src/hnn/ratio.rs": {
+      "bytes": 22152,
+      "sha256": "4b223f2a9bae7b70291ed62ce026a5f6ca521df0b4d87be3769c26a32f91030c"
+    },
+    "crates/holonics/src/hnn/realization.rs": {
+      "bytes": 6393,
+      "sha256": "d6daddbf8cc69ee9d546862a1bfc22e05cc27a70ee835455c9016d1062400c5a"
+    },
+    "crates/holonics/src/hnn/receiving.rs": {
+      "bytes": 79596,
+      "sha256": "1a5b23d4a045ba83f5960e3e35c0bb6425d2017e3516f8700ea25cf0f063c8fc"
+    },
+    "crates/holonics/src/hnn/reference/continuation.rs": {
+      "bytes": 21252,
+      "sha256": "7ca75a55b49a1dd1c2341f8db22751829e7891ab0f1459376816f57271369eea"
+    },
+    "crates/holonics/src/hnn/reference/passage.rs": {
+      "bytes": 12839,
+      "sha256": "2665e5235bff5beadac9904eee5011151873899cf19fc96f5d65886c9df905ee"
+    },
+    "crates/holonics/src/hnn/reference.rs": {
+      "bytes": 220442,
+      "sha256": "9800117d77ca85642e607264897a9974aee3b2e9659392a4512ce4aba8cd13d8"
+    },
+    "crates/holonics/src/hnn/retention.rs": {
+      "bytes": 30391,
+      "sha256": "287e881f98cf9d05969b2f0f3969bb7084320b873761c9d790dd04855b69a118"
+    },
+    "crates/holonics/src/hnn/ring.rs": {
+      "bytes": 175230,
+      "sha256": "ebf6814531626b4a50da5e9e3e0edd32fbb43e80ef28ce20426b2f412bc72836"
+    },
+    "crates/holonics/src/hnn/state_text.rs": {
+      "bytes": 1964,
+      "sha256": "2bb767b8dabc3eaf564873d0ab843f35d154a8551542a409045e821b0155997d"
+    },
+    "crates/holonics/src/hnn/tests/chart.rs": {
+      "bytes": 16139,
+      "sha256": "8e68c257478b70719a5f6e3519db66fd92ff514513b393e5b0adee7516e05c05"
+    },
+    "crates/holonics/src/hnn/tests/constitution.rs": {
+      "bytes": 101052,
+      "sha256": "891869da775924e02808b5794e026a8bca583bd34cddf7d75bbb6fb05a0331da"
+    },
+    "crates/holonics/src/hnn/tests/contact_residual.rs": {
+      "bytes": 28458,
+      "sha256": "c2e6bf8644804f9bbca1022776b01523dee0e89ea391643f67cebbf1ddece490"
+    },
+    "crates/holonics/src/hnn/tests/encoding.rs": {
+      "bytes": 21151,
+      "sha256": "f8cd5512219a3f4dba60aa202b9f649af3d7df2b5dc3f6e91df10b77d3344fd0"
+    },
+    "crates/holonics/src/hnn/tests/executed.rs": {
+      "bytes": 29817,
+      "sha256": "2743e09de9071e89e230d61560a8291c53f89be308c4b351f31f370b27325e34"
+    },
+    "crates/holonics/src/hnn/tests/field.rs": {
+      "bytes": 25126,
+      "sha256": "89424a0a8997e800ce5ec0e189902301581aee2fd2ecf848aae86ed580f02f47"
+    },
+    "crates/holonics/src/hnn/tests/floquet.rs": {
+      "bytes": 49983,
+      "sha256": "17732721e670ab57d45431328f7862203d8404cf68e4cb2ce15be75c80c26f8b"
+    },
+    "crates/holonics/src/hnn/tests/guards.rs": {
+      "bytes": 13871,
+      "sha256": "6738cbbd49ed07daa75085f173fe9ca91f3aeddf1dcf5583b99a16cec736f2b5"
+    },
+    "crates/holonics/src/hnn/tests/keys.rs": {
+      "bytes": 26822,
+      "sha256": "c03889988225553330e737e26d0e1108fb51fc9628644c7ea5c934eeeb10da11"
+    },
+    "crates/holonics/src/hnn/tests/learning.rs": {
+      "bytes": 11310,
+      "sha256": "d9aa781454b3390fe58b4cdbcd1dae4cdd2ee17bd8da138681d708a96c968466"
+    },
+    "crates/holonics/src/hnn/tests/loaded_scalar.rs": {
+      "bytes": 3962,
+      "sha256": "a53e89e341c0e5b0f09fdca82cd6937a896ce3ffa4b1f833f4ff743563899df5"
+    },
+    "crates/holonics/src/hnn/tests/mod.rs": {
+      "bytes": 582,
+      "sha256": "2ca9b07a6ef766724a4998a179a0b2c5f973b4af7aba8b28b3c33c88ee065e9e"
+    },
+    "crates/holonics/src/hnn/tests/moment.rs": {
+      "bytes": 37039,
+      "sha256": "a002bc2a07194a74b3eb201edc89166f13b3577ec6aeba0e5a5e88219090643b"
+    },
+    "crates/holonics/src/hnn/tests/pending.rs": {
+      "bytes": 7479,
+      "sha256": "eef9d986b1e328ebaaae5a8776d4a31493a3e43bd47fda3af4e3d7c042ba0274"
+    },
+    "crates/holonics/src/hnn/tests/physics.rs": {
+      "bytes": 64394,
+      "sha256": "5119cbdd834cf239194aa0781ee9092d35ef8c2e05836eed8f3c7ede4569c12e"
+    },
+    "crates/holonics/src/hnn/tests/port.rs": {
+      "bytes": 64526,
+      "sha256": "bd5a97953ebea6b4fdca1ff987c7dae76f8dc714ce62f9530b27609d7ab6a2be"
+    },
+    "crates/holonics/src/hnn/tests/prediction.rs": {
+      "bytes": 91960,
+      "sha256": "b8fec478451253985d936799e8dbcb456643d42543d98e2e678de8a9516bc24b"
+    },
+    "crates/holonics/src/hnn/tests/prior_carry.rs": {
+      "bytes": 25191,
+      "sha256": "5af5954548ed7afbb54aa08722694652a0831f3abcf37d40877ef0e87a9ca6d7"
+    },
+    "crates/holonics/src/hnn/tests/propagation.rs": {
+      "bytes": 49477,
+      "sha256": "6c21e6729e2b1d44d1fbc319000e96130d85741ab9a5936c3395dd8d3744fdb1"
+    },
+    "crates/holonics/src/hnn/tests/ratio.rs": {
+      "bytes": 16437,
+      "sha256": "c5e4018f9848ffc1ec32f50357e57608a15b429fab9cd8610045742abffa74f5"
+    },
+    "crates/holonics/src/hnn/tests/rebase_boundary.rs": {
+      "bytes": 15550,
+      "sha256": "c72a0fe982520cc9cd6568a4184dada11c82669134098db6fc7788154c6c569b"
+    },
+    "crates/holonics/src/hnn/tests/receiving.rs": {
+      "bytes": 70737,
+      "sha256": "6efac0e41141252cc9e42ca72da902019cb950f0e3b917d4f9665ad91fb8d0d0"
+    },
+    "crates/holonics/src/hnn/tests/reference.rs": {
+      "bytes": 59191,
+      "sha256": "94808746e57632e11acac4142d17fa107db77cb4528d568ac757c3df469efb65"
+    },
+    "crates/holonics/src/hnn/tests/resonator_deposit.rs": {
+      "bytes": 21882,
+      "sha256": "18fe10dc13a0598b5c68d7e275c7c4e2be39c896979a4ecbe6cc9bce5994726f"
+    },
+    "crates/holonics/src/hnn/tests/retention.rs": {
+      "bytes": 55058,
+      "sha256": "5e818dd6786e7c680e35ffcf26af3747ec54c20aedba1326be6ac0f2cc94734e"
+    },
+    "crates/holonics/src/hnn/tests/support.rs": {
+      "bytes": 19532,
+      "sha256": "7d4bfa4a66210a0b4482dc777a2af12c9a322e5195d5d44a03a7c5233e8ea929"
+    },
+    "crates/holonics/src/hnn/tests/word.rs": {
+      "bytes": 12411,
+      "sha256": "f32470c088dee3f6fa01907891a2238d14a783faa811f8d3ff72db681c432edd"
+    },
+    "crates/holonics/src/hnn/word/continuation.rs": {
+      "bytes": 18198,
+      "sha256": "cb96ea4f09a24ca57e26cfd95436c69752670dacf9afb1450546e9b7d09d8092"
+    },
+    "crates/holonics/src/hnn/word.rs": {
+      "bytes": 139446,
+      "sha256": "0200f5a2920d26b0b6258823ffeb20ae5b23bf4546299ec058e7c60d159b7bb4"
+    },
+    "crates/holonics/src/holarchy/gluing.rs": {
+      "bytes": 38035,
+      "sha256": "7076f731eb028c169ffae7ffd307103e886a04063300ae21e03d1cc34a73d8b0"
+    },
+    "crates/holonics/src/holarchy/mod.rs": {
+      "bytes": 27077,
+      "sha256": "4c3c3e786eaa085fbe482e7dfcbda4366d3846bb5f8c99e63627ab3c5c1ffc8b"
+    },
+    "crates/holonics/src/holarchy/terrain/chase.rs": {
+      "bytes": 56847,
+      "sha256": "6c3894adc1e792f29d1f76b9520814c4b72e739bb403aedb8fc2f3f0c1fc001a"
+    },
+    "crates/holonics/src/holarchy/terrain/chase_tests.rs": {
+      "bytes": 46303,
+      "sha256": "d149a0fe0a01cd57dab3682d8c7d7748f88101e68885f1743bbb7854df564572"
+    },
+    "crates/holonics/src/holarchy/terrain/crib.rs": {
+      "bytes": 4271,
+      "sha256": "45d8c5b7f68d4cfd38900bb1808169c2801faa23a2ca6bd0ed4d88b78153c5d6"
+    },
+    "crates/holonics/src/holarchy/terrain/known.rs": {
+      "bytes": 11494,
+      "sha256": "9d037d70b4d8ee73d3cbb8e8829d86a0fc69056c7cbca113b68241a3651843f3"
+    },
+    "crates/holonics/src/holarchy/terrain/mod.rs": {
+      "bytes": 12526,
+      "sha256": "bcd7f37f7bcef44fc2e926a1472cbf9fde4a62f9826fd1225caaaf38de59621e"
+    },
+    "crates/holonics/src/holarchy/terrain/moire.rs": {
+      "bytes": 17282,
+      "sha256": "bcf9a1499a3ad561d766dc598ed596b7c31461dda545392d19285024ef7649bc"
+    },
+    "crates/holonics/src/holarchy/terrain/pursuit.rs": {
+      "bytes": 62351,
+      "sha256": "af43f56795774266758b0ca0fc74e72e1d48f345d6c41085ba44619cfad8d3d8"
+    },
+    "crates/holonics/src/holarchy/terrain/sensing.rs": {
+      "bytes": 21820,
+      "sha256": "f4bfb5bb32402039d7fdba193e84e3baf22667559d9db2648d8c81b1ca3445fc"
+    },
+    "crates/holonics/src/holarchy/terrain/sensing_tests.rs": {
+      "bytes": 16730,
+      "sha256": "9a9db8e6ac026539a7e1e102008536448afeec90b20b5ca0eb2e6c4adb4e1933"
+    },
+    "crates/holonics/src/holarchy/terrain/source.rs": {
+      "bytes": 31318,
+      "sha256": "59a1c7362e9ca7690d06cafede0725517526cd883067002a72f3bd50b7c471ce"
+    },
+    "crates/holonics/src/holarchy/terrain/switching.rs": {
+      "bytes": 7650,
+      "sha256": "51590fd7ff814dbdd4a91350d3b9acf7816d129a0c0db048585536c50c81474b"
+    },
+    "crates/holonics/src/holarchy/terrain/tests.rs": {
+      "bytes": 15010,
+      "sha256": "f6bbbf7e2d461b5c9ab0ca999c593ec18b0f293dc950f4ba5a310a7cf9067110"
+    },
+    "crates/holonics/src/holarchy/tests.rs": {
+      "bytes": 35541,
+      "sha256": "78f915d2489e1e826e9cc1cb1e355b0ddaf5dfb811367208f5ccb9def1dbac42"
+    },
+    "crates/holonics/src/holarchy/view.rs": {
+      "bytes": 15932,
+      "sha256": "394e31eb24dee652c690d738fcf96b18f59f9b795adb0e5eb4ab7cb6c1a526a7"
+    },
+    "crates/holonics/src/holon/conformance.rs": {
+      "bytes": 35585,
+      "sha256": "b84e602a91a9bf24f773ba1a45227acbabf9d3ef276eda7e168c00d5cf3e39da"
+    },
+    "crates/holonics/src/holon/contact/menu.rs": {
+      "bytes": 12179,
+      "sha256": "c455941738139e4d08a7bdf0aaa45f5aab79747956e874e6dfbf13114025e160"
+    },
+    "crates/holonics/src/holon/contact.rs": {
+      "bytes": 52333,
+      "sha256": "20d0316d1424c0f1930921d53a9051706044b7aad980c25a07481454d5a39479"
+    },
+    "crates/holonics/src/holon/deposition.rs": {
+      "bytes": 49598,
+      "sha256": "164ee9a8371e1d89d842c6cff4ac0dd3f9f1a9a017e57f05d1ffc9eda844b6b3"
+    },
+    "crates/holonics/src/holon/dirac.rs": {
+      "bytes": 33263,
+      "sha256": "738810b57ae629e9354c354678aee4ea140f0d215b8cb870ead6660e07bf6940"
+    },
+    "crates/holonics/src/holon/element.rs": {
+      "bytes": 9918,
+      "sha256": "32683220d74dc3ecf836cb2d10a133dd6bd9debd324f61cebe1db7a7f79825af"
+    },
+    "crates/holonics/src/holon/law.rs": {
+      "bytes": 24095,
+      "sha256": "80366830ad5f9bc949b093f5a574273a99c0bb53ccb67d86f9d7ad795f5779ef"
+    },
+    "crates/holonics/src/holon/mod.rs": {
+      "bytes": 34249,
+      "sha256": "cae7f90c30da6ce2cb42b9ba916a3db7012e8efab2629daa58e6d524d3f3de26"
+    },
+    "crates/holonics/src/holon/parametron/loaded.rs": {
+      "bytes": 22304,
+      "sha256": "e54a1126bb99761af613c6d6272343aadab69cadcb3817cfca769a7e89a422b8"
+    },
+    "crates/holonics/src/holon/parametron/mounted.rs": {
+      "bytes": 6423,
+      "sha256": "3009606b8f21dcf98b99df3fdf66b6b3651c91a710af20798b4c5706cbb0b965"
+    },
+    "crates/holonics/src/holon/parametron.rs": {
+      "bytes": 29429,
+      "sha256": "25b6df1023761fbbb0442c314d97c65a9a2473e067f9359e96db847205aafd31"
+    },
+    "crates/holonics/src/holon/port.rs": {
+      "bytes": 10322,
+      "sha256": "080016ede397f88f32a9277245b10563048c4189e1bc2b3e25d14e20c9d3e7d1"
+    },
+    "crates/holonics/src/holon/restriction/descent.rs": {
+      "bytes": 15455,
+      "sha256": "8043e19886bc5efd55bb68e76d30efab3c7db777b22ba6ecd49ff949497d5a9e"
+    },
+    "crates/holonics/src/holon/restriction/fibre.rs": {
+      "bytes": 14091,
+      "sha256": "6657ca1aaeae87bf6f2e86fa1d4c7c560b5d7f7bef0e22d84fa0af337970b89e"
+    },
+    "crates/holonics/src/holon/restriction/linear.rs": {
+      "bytes": 11182,
+      "sha256": "26cae1e60ca8fe9dcf8ebfb8353b5f4591a88f9590c6f6c9d18134a4afc78b09"
+    },
+    "crates/holonics/src/holon/restriction/tower/tests.rs": {
+      "bytes": 41983,
+      "sha256": "35cac77cf4a24dce92ccdb556d808f9c63c8e70153bf341b99698f46fe6a08f6"
+    },
+    "crates/holonics/src/holon/restriction/tower.rs": {
+      "bytes": 107102,
+      "sha256": "1995980fcd8e61d8c92fb71fdf1ffd1951924092fec5563c1d92ba72c7755c90"
+    },
+    "crates/holonics/src/holon/restriction/tube.rs": {
+      "bytes": 42581,
+      "sha256": "48a989a80585f28c8964148fa9c9d486037990aecf2b1bf428733988c8162c42"
+    },
+    "crates/holonics/src/holon/restriction.rs": {
+      "bytes": 22136,
+      "sha256": "e4793320d666786e4ea0f3eb75f80d33767d25d034fb3f3f70c8d6273805bd2e"
+    },
+    "crates/holonics/src/lib.rs": {
+      "bytes": 3161,
+      "sha256": "61f950806d8151d92301d56330927b86dcac3ac54c6f9a7db838086ce0fd938f"
+    },
+    "crates/holonics/src/navigator/address.rs": {
+      "bytes": 20610,
+      "sha256": "fe2de33951e99bcd8f03231ab54d730d55ad7543c4830de88b71848b753cb2da"
+    },
+    "crates/holonics/src/navigator/mod.rs": {
+      "bytes": 29138,
+      "sha256": "97b2a701c10dc66730008718fb824077df845449ff8b1597fa7d41918af1281b"
+    },
+    "crates/holonics/src/navigator/trace.rs": {
+      "bytes": 14606,
+      "sha256": "807642025dc9fa87a41cfb8b8067820ac559ee8acb44dae98bc8afc6ca872e6d"
+    },
+    "crates/holonics/src/physics/fluid/body.rs": {
+      "bytes": 22085,
+      "sha256": "74f13f642abb1a5c44ed3bcb3c7682ed31f452424bfa7f7bd51be2499b6dbd3d"
+    },
+    "crates/holonics/src/physics/fluid/cells.rs": {
+      "bytes": 23191,
+      "sha256": "b4a011146d7d1b0ccbfca20e92df085312d2215fc1bcddce666c096662b65f3a"
+    },
+    "crates/holonics/src/physics/fluid/complex.rs": {
+      "bytes": 15382,
+      "sha256": "e744d4f344efafbb6e98c251dc4c55bf93f47d8dabf3378756a69b8c5846183c"
+    },
+    "crates/holonics/src/physics/fluid/control_volume.rs": {
+      "bytes": 30395,
+      "sha256": "210711e88c19b94311d50240c334750d6c216211327babe65597a7bf3ff9c59b"
+    },
+    "crates/holonics/src/physics/fluid/singularity.rs": {
+      "bytes": 20201,
+      "sha256": "942ae7098ab29b0fce79e061034444dcc10429b2abfbe4b78d0ed0053b00d0d8"
+    },
+    "crates/holonics/src/physics/fluid.rs": {
+      "bytes": 4965,
+      "sha256": "527849ab40cc00051713213c8efa24f6acafa8797d56bcea4ecc236d608f2baa"
+    },
+    "crates/holonics/src/physics/information/apply.rs": {
+      "bytes": 16364,
+      "sha256": "2983abbdc8d9059c4e0a3c2529957cce3cf011ade0c9d0576f76bad4ee654792"
+    },
+    "crates/holonics/src/physics/information/rate.rs": {
+      "bytes": 9691,
+      "sha256": "4922b5c427e276986e7310e4908793dd13d2f2f037fb572cb75e6ce7eabb5dc3"
+    },
+    "crates/holonics/src/physics/information/tests.rs": {
+      "bytes": 18987,
+      "sha256": "c809005516720ce75ddb47f3fc33401684adde0dcc475f4cffcf36a160e8e9aa"
+    },
+    "crates/holonics/src/physics/information.rs": {
+      "bytes": 7170,
+      "sha256": "c50285be4d0891d9063e2b7eed07f8f80481c2c0b81cea75a8d771ca4b12197c"
+    },
+    "crates/holonics/src/physics/mod.rs": {
+      "bytes": 490,
+      "sha256": "dce482909e8c86254b21739dd8762c5d74bca7136b5884c7257aa2400e560147"
+    },
+    "crates/holonics/src/physics/spacetime/clocks.rs": {
+      "bytes": 5670,
+      "sha256": "676e05f56bb49ea93b203ba610a7b494d4757f310d2692bebfced2596d0b1ccc"
+    },
+    "crates/holonics/src/physics/spacetime/einstein.rs": {
+      "bytes": 4716,
+      "sha256": "21c95c284cd847e14720cc59210894b72c0ecbd7340472c491c9c028b4d25bf6"
+    },
+    "crates/holonics/src/physics/spacetime/lorentz.rs": {
+      "bytes": 16360,
+      "sha256": "a3a2ba6380c5edbbc69b7e5fafa1feaaa5dd06d592b12721aa28a84977a51283"
+    },
+    "crates/holonics/src/physics/spacetime/source.rs": {
+      "bytes": 14166,
+      "sha256": "30166438e3fa8e4817a2476fb36d9499cfd95bb66ab6de7e90e4eefc1f7247d4"
+    },
+    "crates/holonics/src/physics/spacetime/tests.rs": {
+      "bytes": 28398,
+      "sha256": "46def048d2076fc3c3ba2a5a8c37d652de8ed8823718307fa755f71df2733416"
+    },
+    "crates/holonics/src/physics/spacetime.rs": {
+      "bytes": 9282,
+      "sha256": "dc06b19dcb428091a858c136b0dbb2ffb3d780d50810554669e595f10eb33a77"
+    },
+    "crates/holonics/src/physics/thermal/axes.rs": {
+      "bytes": 11494,
+      "sha256": "d0e1b594f729039b25384e6d43dfd3e6a3a07ad0ea75fbd086be7516255e7e87"
+    },
+    "crates/holonics/src/physics/thermal/exchange.rs": {
+      "bytes": 8560,
+      "sha256": "caa0936f50629ca9da048a73aa780c9e4ae7bea6b4375636208cd4f33d9251ec"
+    },
+    "crates/holonics/src/physics/thermal/neck.rs": {
+      "bytes": 5512,
+      "sha256": "59bdc3038d59cf02a3ce8d560b0c74bb7c73a1c958ac93e6f1d9f68f325df6b0"
+    },
+    "crates/holonics/src/physics/thermal/port.rs": {
+      "bytes": 3655,
+      "sha256": "0caf15ea9905e54f556e6b211c8f89e832137ee4a12f3af019299a4ecae4d85c"
+    },
+    "crates/holonics/src/physics/thermal/tests.rs": {
+      "bytes": 25333,
+      "sha256": "bc37321efefbc7eae0849f3a04eaece7145d3a5623d83187447d8d2ac6ceacd9"
+    },
+    "crates/holonics/src/physics/thermal.rs": {
+      "bytes": 11192,
+      "sha256": "8b7d1502fb6295db8d5748716e3a3c434cca5bba23d1209686864f76b7fb8a00"
+    },
+    "crates/holonics/src/physics/wave/chain.rs": {
+      "bytes": 28939,
+      "sha256": "3130272d662e592f72601253ad7aac21a2ebd1a2670fb6bd7f9d70f17532265a"
+    },
+    "crates/holonics/src/physics/wave/continuation.rs": {
+      "bytes": 14963,
+      "sha256": "fef87716fa785bb372693885adacb91b4cf07164b0d5c421f1a45b0dc0e18674"
+    },
+    "crates/holonics/src/physics/wave/interference.rs": {
+      "bytes": 1942,
+      "sha256": "58dc30d9a92bb783c3ebe78420eafb288d3b6c0babcaefb57798392eba4e19d3"
+    },
+    "crates/holonics/src/physics/wave/tests.rs": {
+      "bytes": 18594,
+      "sha256": "58350fe1a6a52472e80cac2312bf7f75e85a63f32eb59442718517219a3d3c06"
+    },
+    "crates/holonics/src/physics/wave.rs": {
+      "bytes": 6790,
+      "sha256": "9255780b05fb94ce29a0f1f4c4d8c6ece752250947cff62315c70eab41cc668f"
+    },
+    "crates/holonics/src/ratio/algebraic.rs": {
+      "bytes": 58349,
+      "sha256": "aff50b8ff77ffd718784440ce067433e2594c41924fada44c2003d352aa0c5d0"
+    },
+    "crates/holonics/src/ratio/disk.rs": {
+      "bytes": 31062,
+      "sha256": "2d696d43b641b4e0cfc55a90179aae1aeeae3e3277e082a7c1fd5d1780a082d7"
+    },
+    "crates/holonics/src/ratio/exponentiated/carried.rs": {
+      "bytes": 13651,
+      "sha256": "3e5d49524168c8360078477e38d93f97ebb93a1cca8ba65a387f7db30ef43332"
+    },
+    "crates/holonics/src/ratio/exponentiated.rs": {
+      "bytes": 25253,
+      "sha256": "a22226720ae5f423b0f39975caff0f3f28e1fcb11aa95da1eff4e3f973e4a9d5"
+    },
+    "crates/holonics/src/ratio/gaussian.rs": {
+      "bytes": 5107,
+      "sha256": "66899eac32c9cb6a8af20ae7fc941a83b268db9f602aa2317ae29cb80a217ed4"
+    },
+    "crates/holonics/src/ratio/linear/inertia.rs": {
+      "bytes": 29196,
+      "sha256": "5e97d0b7677929816bb9795c56191f9aa4ff828ce18256e17be57e6c8d92daeb"
+    },
+    "crates/holonics/src/ratio/linear/prime_image/tests.rs": {
+      "bytes": 14857,
+      "sha256": "5a05657b15f92c8ce2a3e00e1570bc2fd959766e9d199b17b31b2ab3b844f434"
+    },
+    "crates/holonics/src/ratio/linear/prime_image.rs": {
+      "bytes": 63195,
+      "sha256": "bc8f9eb928d357eca67af08c7457fa8d7e00206ed1c59a03d190afe3ec2e447e"
+    },
+    "crates/holonics/src/ratio/linear/vector.rs": {
+      "bytes": 17748,
+      "sha256": "0a3e739bf292f53b6a877f31a4f74f63a159fc587d3f6f371f35e029fc5fd36e"
+    },
+    "crates/holonics/src/ratio/linear.rs": {
+      "bytes": 60326,
+      "sha256": "a1bb3e17c9e7d0c0fd0da9369700970b9a7a3895a922780c04e6242b1379d5f9"
+    },
+    "crates/holonics/src/ratio/log_ratio.rs": {
+      "bytes": 9297,
+      "sha256": "7e561a27844629c0106c95ae2dc2415dabfa38060208551672a12364305caace"
+    },
+    "crates/holonics/src/ratio/mod.rs": {
+      "bytes": 7370,
+      "sha256": "9944f3167bf7006904a30cacb471e4ad42b4c30ca23b726ad8e9f4e538f8d682"
+    },
+    "crates/holonics/src/ratio/polynomial/root_separation.rs": {
+      "bytes": 3117,
+      "sha256": "7d7eb6cf83a121f20a57fd5260addf2e2a7ba827d489159cf71f469a8eaeacf9"
+    },
+    "crates/holonics/src/ratio/polynomial/tests.rs": {
+      "bytes": 19925,
+      "sha256": "3e08cbec3c91a9ce37762c087d9fab25cbabff1a7e1a3cf27d502150e15fd58e"
+    },
+    "crates/holonics/src/ratio/polynomial.rs": {
+      "bytes": 96688,
+      "sha256": "f9ca719594bf5e0e09e5e766ddb0ff78d0e77a2244ffdb8659f8e9ee19855f1e"
+    },
+    "crates/holonics/src/ratio/presentation.rs": {
+      "bytes": 4788,
+      "sha256": "d32df704d1bbdf400750c324c28d10d8d491869ae11d64d49a09964932183d3d"
+    },
+    "crates/holonics/src/ratio/primality.rs": {
+      "bytes": 3481,
+      "sha256": "bd21e383e842a6bdd5b5a4a839b999d629f9e124f8b8117b9ff0e828c5a03cc8"
+    },
+    "crates/holonics/src/ratio/ring/section/tests.rs": {
+      "bytes": 4930,
+      "sha256": "0479ff0dba89f210441d9cdd71213d745bc52c439796aec42a070b1dd199e7c0"
+    },
+    "crates/holonics/src/ratio/ring/section.rs": {
+      "bytes": 3429,
+      "sha256": "104e07b80568558a634ff6ebfc00fdb869ef0edfbf45dc1966ff54b06f62ec57"
+    },
+    "crates/holonics/src/ratio/ring.rs": {
+      "bytes": 7878,
+      "sha256": "63b10a3686ecc8e71945be3b933ed5a9d6a5cfff67ef2f3878d9189776cba9a1"
+    },
+    "crates/holonics/src/ratio/surprisal.rs": {
+      "bytes": 45369,
+      "sha256": "e40c543235a531c80ed868c1449361888499c7b8abb63deb69970d21d03b8fb8"
+    },
+    "crates/holonics/src/ratio/work.rs": {
+      "bytes": 11411,
+      "sha256": "fe8a71d64d7b2723c15ce1060fe73b6b3cd4286c6ca53a294be32b5f3e461fbd"
+    },
+    "crates/holonics/src/receiver/face.rs": {
+      "bytes": 56378,
+      "sha256": "07dd1919c0bec668fb0d69cd29c1223933257549eab94bacfa648cb42b28799b"
+    },
+    "crates/holonics/src/receiver/mod.rs": {
+      "bytes": 2000,
+      "sha256": "da2741278f0e6f913fbe0cb03fb26c09b3551fa31eba9477b12f2dc8e21f3b51"
+    },
+    "crates/holonics/src/receiver/population/birth.rs": {
+      "bytes": 49128,
+      "sha256": "5f22d8caf0689cf1bce5b83c8926413fef1ca5acd6bb2a3fd0ba8d51aef4c185"
+    },
+    "crates/holonics/src/receiver/population/birth_tests.rs": {
+      "bytes": 11291,
+      "sha256": "347c7e7fc68e5952d5b6c05fbb44ea6d5e2739784e5efb8034fb4179e79f1428"
+    },
+    "crates/holonics/src/receiver/population/chase.rs": {
+      "bytes": 11627,
+      "sha256": "e7d36c043e55b0ce63069a29086865ae049aa14f3417dfdc3f320e96e24465eb"
+    },
+    "crates/holonics/src/receiver/population/chaser.rs": {
+      "bytes": 48030,
+      "sha256": "7fd980990c9498cfcd11b15f069aeb798caa62c7619b5d9b26d442bb8de1bea1"
+    },
+    "crates/holonics/src/receiver/population/chaser_tests.rs": {
+      "bytes": 10514,
+      "sha256": "58108bead607677a61e19cd3d25733ef3a62bc87d95e69b238d597a4192474da"
+    },
+    "crates/holonics/src/receiver/population/composition.rs": {
+      "bytes": 35014,
+      "sha256": "cb052720c0ee191918de873ed352f7f766de503fa0218a9eb98e432bc784b471"
+    },
+    "crates/holonics/src/receiver/population/composition_tests.rs": {
+      "bytes": 28417,
+      "sha256": "17e669f052f96e882516c76dbb756ef9b812f49ce1455f435ec66864004fee57"
+    },
+    "crates/holonics/src/receiver/population/dormancy.rs": {
+      "bytes": 30830,
+      "sha256": "010e4ae88bcbd28d4e050baf3078301e0c38a54a6d0be077028a1cf4fb1d5115"
+    },
+    "crates/holonics/src/receiver/population/dormancy_tests.rs": {
+      "bytes": 7965,
+      "sha256": "a48f30d0c267d1f37b89ac235fd92207e6e7b961637732fce9bcd5810026acff"
+    },
+    "crates/holonics/src/receiver/population/evolution.rs": {
+      "bytes": 12935,
+      "sha256": "d659c6aae69615ab7ce6326716584d893475a13eb6decfbbbe1cccb6b013cab5"
+    },
+    "crates/holonics/src/receiver/population/evolution_tests.rs": {
+      "bytes": 30044,
+      "sha256": "6ef1ec61168dd3212078bb51dfaad754ab7256e654b7f6516733c0a54e54c437"
+    },
+    "crates/holonics/src/receiver/population/families.rs": {
+      "bytes": 25284,
+      "sha256": "a2eef57533998b8463d74a849f4b64589f38bf851f076f1cfab0fd6df8225f65"
+    },
+    "crates/holonics/src/receiver/population/merge.rs": {
+      "bytes": 21448,
+      "sha256": "666de82c1e357dda1e881ce2426f1492e6f7942ea4068866ddd401d4d5ca4fbe"
+    },
+    "crates/holonics/src/receiver/population/merge_tests.rs": {
+      "bytes": 7344,
+      "sha256": "acc4ab73ea75e2905d497afa0b8a886afd37ec0628f5cfa72d122fcd9f237340"
+    },
+    "crates/holonics/src/receiver/population/port.rs": {
+      "bytes": 22579,
+      "sha256": "2b2c8cbb72ab72938210d6f8dbd5635f78392b8d5186337149893045db9ef2cf"
+    },
+    "crates/holonics/src/receiver/population/port_tests.rs": {
+      "bytes": 8803,
+      "sha256": "9344b8739fc62d304a29b6ce07e8f37aa400a436b9027625aad0ff9e940267e3"
+    },
+    "crates/holonics/src/receiver/population/species.rs": {
+      "bytes": 14349,
+      "sha256": "99a9e59c3508e5d58a4b019f330ae28ad542f7d493c62c287f4aa891e076d390"
+    },
+    "crates/holonics/src/receiver/population/tests.rs": {
+      "bytes": 45993,
+      "sha256": "6d8897b0092e70b364c8bdc2985b951f0627f130ecc9ea26e0f657e77bb4d888"
+    },
+    "crates/holonics/src/receiver/population.rs": {
+      "bytes": 105215,
+      "sha256": "cfd9aded5802bd82fbf9956c2c9392a3b067cae405594cdef02ee548a4a0ec35"
+    },
+    "crates/holonics/src/receiver/receipt.rs": {
+      "bytes": 18545,
+      "sha256": "d4391ea8f8c7fb6d9a5bc53b081107095b00ac52f1eb30055ae79f05d9397ab4"
+    },
+    "crates/holonics/src/receiver/reception/continuation/tests.rs": {
+      "bytes": 14261,
+      "sha256": "9527ef643ac8f48406e2fe7c60367041fd3a5d7c8925860eaec97e1bcbaca3dd"
+    },
+    "crates/holonics/src/receiver/reception/continuation.rs": {
+      "bytes": 10991,
+      "sha256": "0805e35e5b8c19763b50472835545588dd4ab0918ee72a0e9361a1847bbfc8e1"
+    },
+    "crates/holonics/src/receiver/reception.rs": {
+      "bytes": 36764,
+      "sha256": "f33ac0ad50631f94db67c4dedaee08914f652fb5967c6351386b868ee5a89d70"
+    },
+    "crates/holonics/src/receiver/release/tests.rs": {
+      "bytes": 32491,
+      "sha256": "316f7e043cff97fec5c14916922e0a8c4fea56d0e906876f8c1ea9fa16e30e89"
+    },
+    "crates/holonics/src/receiver/release.rs": {
+      "bytes": 32160,
+      "sha256": "6d89ab726bc289a2cfbf5cdfef902e532b431026162fe2d106e24b6da5e74e6a"
+    },
+    "crates/holonics/tests/ranged_capacity.rs": {
+      "bytes": 24618,
+      "sha256": "86ae43a11634abbe645bf2bbab25e7a62e5e3fad302e31e105b62afb1abebb38"
+    },
+    "crates/holonics/tests/resident_cold_restore.rs": {
+      "bytes": 8133,
+      "sha256": "c883536ad0672f210d013ef9bc3adc5b1735b62f3dc88498565d2cbce9e5c2ea"
+    },
+    "crates/holonics/tests/source_entrance.rs": {
+      "bytes": 15495,
+      "sha256": "fde84d7f8b01873d7d3c39cc07e5b3061d4a3607bd61ae1faf6bdc89a9648221"
+    },
+    "crates/holonics-cuda/Cargo.toml": {
+      "bytes": 649,
+      "sha256": "18b25e1b99b09033da5950c3bb6b722085ab60c39adb322dd01dc0b8aec12f33"
+    },
+    "crates/holonics-cuda/build.rs": {
+      "bytes": 11927,
+      "sha256": "15cf455bd04009bcf138b687df512e7952f147302c29b3f6af3c27b4ffd59194"
+    },
+    "crates/holonics-cuda/kernels/exact_integer.cuh": {
+      "bytes": 8317,
+      "sha256": "debeaa8b1fea4d99a979ecc412f3b109d39c2fc63170bffc9269aead56ee9bf4"
+    },
+    "crates/holonics-cuda/kernels/hnn.cu": {
+      "bytes": 25210,
+      "sha256": "af7dade8dae88f4b925d8b9770bda1db4700cfd3df5f26d1bd7fded211861870"
+    },
+    "crates/holonics-cuda/kernels/hnn_word.cuh": {
+      "bytes": 80078,
+      "sha256": "9fd654bff83267b28efde51d38524303371488ef5d0a8a366289a0800bbd716e"
+    },
+    "crates/holonics-cuda/kernels/tree.cu": {
+      "bytes": 46251,
+      "sha256": "78b292ce81aec3855e4cee7f40d764c8e3a8a0ccc7fcbb4a41e381e96ca7e17b"
+    },
+    "crates/holonics-cuda/src/bin/mount-smoke.rs": {
+      "bytes": 6400,
+      "sha256": "dcae1004d9697edffb8ae1261f36a9b6c9403d61c7941be74d778c9d3c8be644"
+    },
+    "crates/holonics-cuda/src/cuda.rs": {
+      "bytes": 75709,
+      "sha256": "a5ad8f2db28a7e65489d6fd040bd511c4ef897f0623b64b61eab1f9ebd42011c"
+    },
+    "crates/holonics-cuda/src/ffi.rs": {
+      "bytes": 8156,
+      "sha256": "f90304f263b2c8d3e261e32973e7c21e3ed1f8eda57246d35a48b6f07e534615"
+    },
+    "crates/holonics-cuda/src/hnn/card.rs": {
+      "bytes": 30425,
+      "sha256": "637ae88ad06811a3c6260de8caa28f0479950ab3a2cfdf4b69288e2b1ab00f58"
+    },
+    "crates/holonics-cuda/src/hnn/carry.rs": {
+      "bytes": 16404,
+      "sha256": "cb799a71544a9c987ac23c7a53584fa68539540cda8dffe536797c711d4b300f"
+    },
+    "crates/holonics-cuda/src/hnn/dyadic.rs": {
+      "bytes": 7971,
+      "sha256": "24d0c05989d2bdae5a76ec264e6aa823bdf033066db0ae4a61e15aae313d7ae1"
+    },
+    "crates/holonics-cuda/src/hnn/execute.rs": {
+      "bytes": 67898,
+      "sha256": "97eca583cc8f505b9d4fe603ff0ec6127001834737100e78364f7700c7cc2b7c"
+    },
+    "crates/holonics-cuda/src/hnn/lattice.rs": {
+      "bytes": 36762,
+      "sha256": "d8d9fad2d32b74cb8335ad6bae88a5ce0cab4e1a932e50f8c24d4ee2be41395d"
+    },
+    "crates/holonics-cuda/src/hnn/mod.rs": {
+      "bytes": 21064,
+      "sha256": "bbbecfb7dbcd2854ec4bf5e5b4a59d3d55d4bd48c584f391f78d6c51da5dc43c"
+    },
+    "crates/holonics-cuda/src/hnn/moment.rs": {
+      "bytes": 23045,
+      "sha256": "8ccc9389f54ea33705db2d182991de746e319b866194772f2d7d74a14e413422"
+    },
+    "crates/holonics-cuda/src/hnn/physics_tests.rs": {
+      "bytes": 11060,
+      "sha256": "a7f52a5f5b81186a362e74cc5eee332d13293de438a806c59479af3b1e9b64af"
+    },
+    "crates/holonics-cuda/src/hnn/port.rs": {
+      "bytes": 89741,
+      "sha256": "9f9cfa4305b99d361f8903f5fb2f3833512cd3c921a8ccb9dc7b84fdb8851cad"
+    },
+    "crates/holonics-cuda/src/hnn/port_tests.rs": {
+      "bytes": 92815,
+      "sha256": "f341db9b3fb0d8094b70d7f4ebd8db0f8ebb41e7c6b41122d6da5bedec8a233c"
+    },
+    "crates/holonics-cuda/src/hnn/publication.rs": {
+      "bytes": 20735,
+      "sha256": "a258a577e35c3d59e819247879b6f809d71a56e3fb7fc0e52d26b4911e667139"
+    },
+    "crates/holonics-cuda/src/hnn/readout.rs": {
+      "bytes": 55410,
+      "sha256": "8fe7ee5b1294c34b5c4fa31c07609cd44efeb3081b8ec60caa123312cbf3b20c"
+    },
+    "crates/holonics-cuda/src/hnn/store.rs": {
+      "bytes": 32537,
+      "sha256": "bfc2523616104723332095dfd94fc7514bf0ab10be501c8aa7324f4aebde67d3"
+    },
+    "crates/holonics-cuda/src/hnn/tests.rs": {
+      "bytes": 57001,
+      "sha256": "77a82888499b6e33c0b11c0ad0ff916031c62b653f7321771d05793c77230946"
+    },
+    "crates/holonics-cuda/src/hnn/tree.rs": {
+      "bytes": 47146,
+      "sha256": "c9c50d9005ccf3b0aa07b72adb595adde7fe47c3473c957c904a75ae72f1971f"
+    },
+    "crates/holonics-cuda/src/hnn/word.rs": {
+      "bytes": 13728,
+      "sha256": "92a737acd4ea99d44fda14c25da49e5b3a01aea290dae1e23874e12b589cc22b"
+    },
+    "crates/holonics-cuda/src/hnn/word_tests.rs": {
+      "bytes": 2651,
+      "sha256": "1b26f752ecb87c8bff089f03202902b5bfc0cd66450acfdbf517d3bc9aec34f8"
+    },
+    "crates/holonics-cuda/src/lib.rs": {
+      "bytes": 1250,
+      "sha256": "2c21bb7b3c9bd5512e20f3a59f4f4e7207ddef24b114c2040edb7dca04b4468a"
+    },
+    "crates/holonics-cuda/tests/located_ingest.rs": {
+      "bytes": 7123,
+      "sha256": "86db238adba454ebe96dc80f85ee21b129810ccb9dd9dc943deef702bcd67a8a"
+    },
+    "lean/Holonics/Aeon/Clock/CarryWord.lean": {
+      "bytes": 46940,
+      "sha256": "3200ef74482bca7e6b956fb5cee26cf8afbe5d93b832c2e090dffaaf6bfd2bac"
+    },
+    "lean/Holonics/Aeon/Clock/Epoch.lean": {
+      "bytes": 42058,
+      "sha256": "545312fec76d6fd0412ffeb226a27d51e073a796fbdd0f0107de506c0cdcc56c"
+    },
+    "lean/Holonics/Aeon/Clock/Groupoid.lean": {
+      "bytes": 16528,
+      "sha256": "dc50b513b53786108f84e9420c3193f8a05b25e840d4418f133c0a655d214f61"
+    },
+    "lean/Holonics/Aeon/Clock/Lock.lean": {
+      "bytes": 25467,
+      "sha256": "95297aa6b35c9efb0bfe487091a8b8e3c60f61437c9ffa8cfc3056f19935b828"
+    },
+    "lean/Holonics/Aeon/Clock/Reading.lean": {
+      "bytes": 28878,
+      "sha256": "65dc08a6a49e1ccd4163f01f24a7867d67500ecc3e1abd4f77877e521bef07d3"
+    },
+    "lean/Holonics/Aeon/Clock/Winding.lean": {
+      "bytes": 19413,
+      "sha256": "14cdcbae7729c67dd194832dc1db3ff7a513d8fd63449649e87b3b31c88804fc"
+    },
+    "lean/Holonics/Aeon/Clock.lean": {
+      "bytes": 5931,
+      "sha256": "9feec37a150cffbf2d97924e38a6b6ee9512ff6f8e18c017bc924e884eb9a810"
+    },
+    "lean/Holonics/Aeon/Production/FirstLaw/Continuous.lean": {
+      "bytes": 2557,
+      "sha256": "96cd731020900e67a333ae5d50a124a5f3598e49e041e2be7341d10b478ce3e0"
+    },
+    "lean/Holonics/Aeon/Production/FirstLaw.lean": {
+      "bytes": 21671,
+      "sha256": "b5487a1810a96f8ea4f34a3aecc49bbf888b05ced6ee85fdced87c7ab29decb5"
+    },
+    "lean/Holonics/Aeon/Production/HodgeTime.lean": {
+      "bytes": 23573,
+      "sha256": "d3af8607f058e6e7f648490c0b0296d27ba5686ba9dc16f3a2c87e095dfeae6f"
+    },
+    "lean/Holonics/Aeon/Production/Kac.lean": {
+      "bytes": 39999,
+      "sha256": "998e43b2cc6dbea7c0cefe5a3d1d31a0c547959b65772372ad79f53f6d285ff0"
+    },
+    "lean/Holonics/Aeon/Production/PathReversal.lean": {
+      "bytes": 48150,
+      "sha256": "3fbdb3790ddd2bde210433103edde85bf694a38aa780ef2e0173986ccf68a72b"
+    },
+    "lean/Holonics/Aeon/Production/Zeta.lean": {
+      "bytes": 29329,
+      "sha256": "f776c4608bd8e93456cb47e7ae810c7551fec046ae87a63f0add320b384da103"
+    },
+    "lean/Holonics/Aeon/Production.lean": {
+      "bytes": 3652,
+      "sha256": "a75738789588fa83408fc80dc29a2f54dbfd1d838aa7a8f0e5ba262faaea22fc"
+    },
+    "lean/Holonics/Aeon.lean": {
+      "bytes": 830,
+      "sha256": "b5cd5583c306ce80898d6f079c2809903c4b79f592473b820a1aa12b92ee9025"
+    },
+    "lean/Holonics/Compression/Core/Cost.lean": {
+      "bytes": 39795,
+      "sha256": "2f7da91635d4d5de3bdc02abf69f309c0a9248a92a00509812991bb0c9b833a1"
+    },
+    "lean/Holonics/Compression/Core/FaceMap.lean": {
+      "bytes": 36209,
+      "sha256": "205f8063c27a32e426fcb4db07babbd3bca28c4511e7b7c93ec95fb90609e197"
+    },
+    "lean/Holonics/Compression/Core/Keys.lean": {
+      "bytes": 21525,
+      "sha256": "728173bfeddbe0b954c9cc67b1174d7824b150c55230b7a7bc9b90b9dc6cc6d4"
+    },
+    "lean/Holonics/Compression/Core/Resonance.lean": {
+      "bytes": 39144,
+      "sha256": "1699440e9a3315bc17414da1c94f151eb113904dfd9440e88ebe1fffab2f20ff"
+    },
+    "lean/Holonics/Compression/Core.lean": {
+      "bytes": 4044,
+      "sha256": "bb51ced4b5c79d9382d55e0d9ff64ce0a2d9cea645f5c3d68c2b94a48e383f45"
+    },
+    "lean/Holonics/Compression/Landmark/ConstraintIdentity.lean": {
+      "bytes": 27560,
+      "sha256": "01c821befb88c4ce4614b8c56d2a386876d68cfe24cc5f161109b021fc00f178"
+    },
+    "lean/Holonics/Compression/Landmark/Context/Address.lean": {
+      "bytes": 36564,
+      "sha256": "19a0651e396e7d10a65e1a659f5e98fb1d2da8f04f326a99feebd77930f7ab12"
+    },
+    "lean/Holonics/Compression/Landmark/Context/BaseMeasure.lean": {
+      "bytes": 52383,
+      "sha256": "f5c3af8b8010cc97342b6b1edd4b5803ad8b7bfacd8f2d46d74f55bcf080c827"
+    },
+    "lean/Holonics/Compression/Landmark/Context/BinaryLog.lean": {
+      "bytes": 29429,
+      "sha256": "38d3132ed5336806fc6b2d7b766884649669fc94dd0753c8a61dd9eac8fbd952"
+    },
+    "lean/Holonics/Compression/Landmark/Context/Birth.lean": {
+      "bytes": 14456,
+      "sha256": "728614b689e1b4ab094d7e6bea6a3de073db9274210745fdb3251bc0843ac1cb"
+    },
+    "lean/Holonics/Compression/Landmark/Context/Capacity.lean": {
+      "bytes": 16737,
+      "sha256": "6c54fb34007605cfc4e855b4cd3183507334261cad43ecb4d27da17dd0b673d7"
+    },
+    "lean/Holonics/Compression/Landmark/Context/Carrier.lean": {
+      "bytes": 17920,
+      "sha256": "69bd58771ca974be82e2d14e659e8274355d54b0492c95ae72e55627c44a8861"
+    },
+    "lean/Holonics/Compression/Landmark/Context/Compaction.lean": {
+      "bytes": 84348,
+      "sha256": "9c5c27de4645d13f09746c179e4d969a6cc9fc50d2a0aac17f774a32be944df2"
+    },
+    "lean/Holonics/Compression/Landmark/Context/Composition.lean": {
+      "bytes": 17301,
+      "sha256": "be61c56c6a2afd1c89020d7cd78c3521ef3e5a973510e271541b2b62d0b02d08"
+    },
+    "lean/Holonics/Compression/Landmark/Context/ConvergenceFounding.lean": {
+      "bytes": 51083,
+      "sha256": "9a6cac29d16c0a034bb964ea975f8ad364dcc6124f2299e1304e6acd6b9f28a9"
+    },
+    "lean/Holonics/Compression/Landmark/Context/Dormancy.lean": {
+      "bytes": 42360,
+      "sha256": "bf92bb9bec83dbbb8b225453a3153de9cd1dbc9324eeb16376ad42d3fde3a0bb"
+    },
+    "lean/Holonics/Compression/Landmark/Context/Drift.lean": {
+      "bytes": 48743,
+      "sha256": "b49bb992d79cb9cc69914f4814bb2154ce66da0ac7b562509f8ea5fc5e9656d0"
+    },
+    "lean/Holonics/Compression/Landmark/Context/Epoch.lean": {
+      "bytes": 11426,
+      "sha256": "a18adffb3b62bfeb981e44fed82cb165fe3699071123627075adfa2491d8d542"
+    },
+    "lean/Holonics/Compression/Landmark/Context/Evolution.lean": {
+      "bytes": 63508,
+      "sha256": "63fa8351919b93b9d3bc707164a14ec43c1583f7047a9757982499b9e8b93a85"
+    },
+    "lean/Holonics/Compression/Landmark/Context/JoinDrift.lean": {
+      "bytes": 30063,
+      "sha256": "b9f71ca7abafff8e38b9462dc309b40433c4aa910264c9c3412a31283309470c"
+    },
+    "lean/Holonics/Compression/Landmark/Context/LocalWeighing.lean": {
+      "bytes": 55798,
+      "sha256": "ed0bfc76cf7a6b4c2842fb9af6bdfa975946afcd39edf73094369a354e5b0c70"
+    },
+    "lean/Holonics/Compression/Landmark/Context/Merge.lean": {
+      "bytes": 31915,
+      "sha256": "bfdac84c28e4ce869b5dd525114018e6ad73dccd2c307546fe31481c989ca79c"
+    },
+    "lean/Holonics/Compression/Landmark/Context/Population.lean": {
+      "bytes": 56048,
+      "sha256": "09bc174e48e9799d38eb3657a0cdec2501070860e09eac525bb4f3dbdf75d665"
+    },
+    "lean/Holonics/Compression/Landmark/Context/PriorMass.lean": {
+      "bytes": 73478,
+      "sha256": "8f2317849f1c1f378ecca09b56da8a5cf6c36435bff43abc23fc113c8e35981c"
+    },
+    "lean/Holonics/Compression/Landmark/Context/SplitOperands.lean": {
+      "bytes": 20723,
+      "sha256": "b390406d0ea6cbacdab7caa56f3be63639f3f5c77ba5822cd41fe3834fd53b8a"
+    },
+    "lean/Holonics/Compression/Landmark/Context/Standing.lean": {
+      "bytes": 18413,
+      "sha256": "0a64dbed8e140d2c4224b1f0da61039a37d48437fe9b94fdecc492a3a5be69ec"
+    },
+    "lean/Holonics/Compression/Landmark/Context/StoredDrift.lean": {
+      "bytes": 50063,
+      "sha256": "b3bb9c79b18a8e02379fa043d43d8421a1d6ed08d686a29b3b44a1d16ba83c82"
+    },
+    "lean/Holonics/Compression/Landmark/Context/StoredInstance.lean": {
+      "bytes": 32623,
+      "sha256": "b3012a5b600c29654fc31aee6ad872fa59bbd8b98014be612788683df1113113"
+    },
+    "lean/Holonics/Compression/Landmark/Context/Tree.lean": {
+      "bytes": 211827,
+      "sha256": "37d9dd274156bbe34d5834b33d78bd3f2abcc3c6dc6823abb62cfca7a49fcb88"
+    },
+    "lean/Holonics/Compression/Landmark/Context.lean": {
+      "bytes": 16047,
+      "sha256": "f29751f82a78446a89b9ba6dbf331fff29ca041007bfa3387ab3659dd4beeab2"
+    },
+    "lean/Holonics/Compression/Landmark/FixedPoint.lean": {
+      "bytes": 29401,
+      "sha256": "6d43de55250e67bc780d6b7a78435ffc169c2774387d9a6ce06d7e853db77f40"
+    },
+    "lean/Holonics/Compression/Landmark/Identity.lean": {
+      "bytes": 20997,
+      "sha256": "95a7c06a63c0e9a98675009d905c23906e3140de8077de7a45b213cd7dce417b"
+    },
+    "lean/Holonics/Compression/Landmark/PrimitiveCycle.lean": {
+      "bytes": 17577,
+      "sha256": "1818419ccc7d5c2dc8cb2139c1ae602b89e8d608fa0d96d4782ac1b747200248"
+    },
+    "lean/Holonics/Compression/Landmark/SiteKind.lean": {
+      "bytes": 39079,
+      "sha256": "299768dd7adb6a9a3c5deedaee08dffe4118d3b95f878a7594f495e735218ebc"
+    },
+    "lean/Holonics/Compression/Landmark.lean": {
+      "bytes": 3163,
+      "sha256": "c94b2ec599c732d73a90b7f1cf30e4edfa0f067e22955dcb8a9c10f6daae96f1"
+    },
+    "lean/Holonics/Compression.lean": {
+      "bytes": 902,
+      "sha256": "7c616810422079efa66346ccdc8c0594e62016dd1022a1f945314a77cb27c5f7"
+    },
+    "lean/Holonics/Computation/AttentionModeCompression.lean": {
+      "bytes": 4695,
+      "sha256": "34c848cb4b3e12b10879acd01459c8e8265098d0899c2ed30c3a2ecb6f731f17"
+    },
+    "lean/Holonics/Computation/CertifiedWindingRoute.lean": {
+      "bytes": 8387,
+      "sha256": "6735ddbb9cb54d15b2a606d9c1d7e822ac2b5a1b8163c8dfefa13e94a58e9fce"
+    },
+    "lean/Holonics/Computation/CslibExecutionReceiver.lean": {
+      "bytes": 5077,
+      "sha256": "a5d4fd428626f6b234da5d64fd7e53c8acf01f6d823a161f2f5d440df57f5714"
+    },
+    "lean/Holonics/Computation/DependentMachineLearningCarrier.lean": {
+      "bytes": 4182,
+      "sha256": "fa26a387f5dd84e9ea013b9f5bfb859b79b8c259fdca5b195c6a2694f1061010"
+    },
+    "lean/Holonics/Computation/ExactForeignWeight.lean": {
+      "bytes": 3649,
+      "sha256": "420e224f29a897e347ed09582d49ba7d77def39b9279eb7dc5dc50a0989056ba"
+    },
+    "lean/Holonics/Computation/HolonicAdjointNormalization.lean": {
+      "bytes": 31510,
+      "sha256": "3c73d7d43bfbc1b666eb4c41793208878af11ea09014ba35deefbe0f1cf64610"
+    },
+    "lean/Holonics/Computation/HolonicArchitectureCharts.lean": {
+      "bytes": 17664,
+      "sha256": "3891b383a6e48856d06c9bdce2b5e6d130a3cc3686b0bb8893e002a00d5d5444"
+    },
+    "lean/Holonics/Computation/HolonicCirculationPassage.lean": {
+      "bytes": 12776,
+      "sha256": "07e1b17d19bbea295a0d6d9b926607cc301d39ccb3a13703dc235c630821fdd1"
+    },
+    "lean/Holonics/Computation/HolonicConstitutiveCirculation.lean": {
+      "bytes": 22830,
+      "sha256": "b50ecc1406a5bac001cf8b1119d7196e22f771affa94275cfc4aa97919971f32"
+    },
+    "lean/Holonics/Computation/HolonicConstitutiveFibre.lean": {
+      "bytes": 16153,
+      "sha256": "60abd0aa03894ce56d5d7e6691bc205347664062dd08e7e6f6102f7a9602c540"
+    },
+    "lean/Holonics/Computation/HolonicConstructiveDifferentialBoundary.lean": {
+      "bytes": 10706,
+      "sha256": "3ffae0af87b5a107a200dd4833680f872c6226c456e6c1a9906317894e9aadf8"
+    },
+    "lean/Holonics/Computation/HolonicCultivationCharts.lean": {
+      "bytes": 13395,
+      "sha256": "5b004735e9ca6e19ad3396cc5feb5a1f4d535c0a0c12b3c1b0f7ca8c26fbb26c"
+    },
+    "lean/Holonics/Computation/HolonicDiffusionCharts.lean": {
+      "bytes": 10196,
+      "sha256": "039f3d004874068a9d6c37725b6e1757d2ac284bf0df10454ad2cd5ee6bead39"
+    },
+    "lean/Holonics/Computation/HolonicEvolutionKinds.lean": {
+      "bytes": 6941,
+      "sha256": "d6698be895a4f8017a0e564729ef0ae1cee5f25c9a62b4ca8d9ca8fd16543973"
+    },
+    "lean/Holonics/Computation/HolonicExcitationFoundedQuotient.lean": {
+      "bytes": 50765,
+      "sha256": "3ab87fd1db1a0bcda899f3bfa9c7855c8b0a7594cc37c898b10cbff96665709f"
+    },
+    "lean/Holonics/Computation/HolonicFermiHubbard.lean": {
+      "bytes": 26697,
+      "sha256": "0f76e11f680bcaa9a8516d9d289c9a1c35b6e2fe56a6270dd572bfd07fe1d7d2"
+    },
+    "lean/Holonics/Computation/HolonicFermionicOccupation.lean": {
+      "bytes": 28651,
+      "sha256": "2ebc7027b8edf3ce19250865169a2f12f1bd3f049cea064fbfcd469cbf35776a"
+    },
+    "lean/Holonics/Computation/HolonicInformationTheory.lean": {
+      "bytes": 194,
+      "sha256": "c7f1b4e242dcb9f6fba084f6c2c381ee0b0b86436f08f33abd41c83406b14bdb"
+    },
+    "lean/Holonics/Computation/HolonicIntelligenceFramework.lean": {
+      "bytes": 596,
+      "sha256": "763d06327c45c92b534fcb32a073ca8aba8e5b8d2efb2cde537db86975011b2a"
+    },
+    "lean/Holonics/Computation/HolonicIntelligenceLifecycle.lean": {
+      "bytes": 11253,
+      "sha256": "7ff59cf05cecfb890f8dad1b93302b763b9e6524d5b73a0ec89312c3c7c19c57"
+    },
+    "lean/Holonics/Computation/HolonicMachineLearning.lean": {
+      "bytes": 1328,
+      "sha256": "8b8ab21722038b57488d71d4f956e3ea3cae2bdbf1bb47b566ca51971d259810"
+    },
+    "lean/Holonics/Computation/HolonicNeuralEcology.lean": {
+      "bytes": 9751,
+      "sha256": "bd426dc9ba1ce4bd01b6bf2e00617e8f85dd73f59d638e16f260d864c9d54897"
+    },
+    "lean/Holonics/Computation/HolonicNeuralMorphologyContinuation.lean": {
+      "bytes": 13497,
+      "sha256": "65afb71baece614073d39eccad07817b21cbaef8b920f723b08871305e6c25fe"
+    },
+    "lean/Holonics/Computation/HolonicOrientedSiteTransport.lean": {
+      "bytes": 62570,
+      "sha256": "9e91357edf3fe368fd9264da8f35483cf656ab636ac044346d3e0942ca2f8a57"
+    },
+    "lean/Holonics/Computation/HolonicPolarizedCrystalTransport.lean": {
+      "bytes": 10446,
+      "sha256": "9ca29d86c07ac0b411bdfaed72f725a19b6822e8157a1f787a0cd2ca75c2d4e3"
+    },
+    "lean/Holonics/Computation/HolonicQuantumTransport.lean": {
+      "bytes": 952,
+      "sha256": "407367316627475039e138f093a5eb680d805bfa049afcce29e5f4bb47c4670b"
+    },
+    "lean/Holonics/Computation/HolonicRecurrentEcology.lean": {
+      "bytes": 21959,
+      "sha256": "e57c04da469ca2101a0722b8bda4f3604707c3f2e28568e453fd317527538e02"
+    },
+    "lean/Holonics/Computation/HolonicSimulationCertificate.lean": {
+      "bytes": 7869,
+      "sha256": "089731a3d40cfc992a99c72d1eb38b7796f36de36deaee2cea5a7901541f52ab"
+    },
+    "lean/Holonics/Computation/HolonicWorldReturnDeposit.lean": {
+      "bytes": 14650,
+      "sha256": "70a83d605fdb9dad221ccd4df16c106e82648aff088f94f8b5bda0d5732d6f1a"
+    },
+    "lean/Holonics/Computation/IntersectionNavigation.lean": {
+      "bytes": 7237,
+      "sha256": "233d4d3c583b7d2613d525808b3dd01ecafd7fa57f92280f41ccde4d4ac3e6ca"
+    },
+    "lean/Holonics/Computation/IntrinsicHolonProfile.lean": {
+      "bytes": 5140,
+      "sha256": "ac56d27ac5635963a9c4fef32f7dbe77d45153ad7e578fa5e5566428a59b0963"
+    },
+    "lean/Holonics/Computation/JointReceiverWitness.lean": {
+      "bytes": 6575,
+      "sha256": "2576d2d51b72c85c4a978a04bdfb70862f2296aa147448d5dc74b8c234fcd5bf"
+    },
+    "lean/Holonics/Computation/MachineLearningChart.lean": {
+      "bytes": 8774,
+      "sha256": "0869fdf66c77c3ba56ae88e47cd2004cb031decce17cac639c5cc430012241c9"
+    },
+    "lean/Holonics/Computation/MachineLearningStrictLift.lean": {
+      "bytes": 5673,
+      "sha256": "cffb5863def3387ec7c185dcfc9a82a7350d626ff5da2971ac44ba2abe1dca89"
+    },
+    "lean/Holonics/Computation/NativeMorphologyVariant.lean": {
+      "bytes": 23800,
+      "sha256": "82d48273a1c34b5a4e65d378cb42b10349ae67b82034dbd9616436bcd4e0c27e"
+    },
+    "lean/Holonics/Computation/NativeTransportScaffold.lean": {
+      "bytes": 13794,
+      "sha256": "5ccd75293da0676b5865e15336d91cc7b5350477b379fc892da23284cd4fd996"
+    },
+    "lean/Holonics/Computation/NormalizationProjectionScope.lean": {
+      "bytes": 1786,
+      "sha256": "6d0b1ca8b258a9dbbc0aebb5aaf98637a8a1784e6126726a8c2eab2e6255af17"
+    },
+    "lean/Holonics/Computation/SituatedMachineLearning.lean": {
+      "bytes": 10744,
+      "sha256": "edd34f0af8a1f7b95114a9734806e102efff15e5260af0fd42ccb0331be368cc"
+    },
+    "lean/Holonics/Computation/ZeroNavigation.lean": {
+      "bytes": 3862,
+      "sha256": "f06490760591203e1a8b753200a0b59f5d0db4b1c564171c5136277d360cc5f5"
+    },
+    "lean/Holonics/Coupling/Coupling.lean": {
+      "bytes": 8921,
+      "sha256": "df674bbb6ce13a1664ca7af2342f7fe722f072c5354cba9a3a311026166cfba8"
+    },
+    "lean/Holonics/Coupling/Paying.lean": {
+      "bytes": 20663,
+      "sha256": "f26f25213437284cbe5510183133f1fc09d03cd52e3dab010eda00587964c071"
+    },
+    "lean/Holonics/Fluid/NavierStokes.lean": {
+      "bytes": 7565,
+      "sha256": "e7455a3002c215a8c25d11031ae2f862ee3d113a42674ebdb24f2a4db4c80991"
+    },
+    "lean/Holonics/Fluid/NavierStokesCurlCommutation.lean": {
+      "bytes": 25231,
+      "sha256": "3205063281dc6415b9d9bf0c11d807825bf4665053f9d5973cb09e27a41f7f22"
+    },
+    "lean/Holonics/Fluid/NavierStokesCurvedTransport.lean": {
+      "bytes": 19349,
+      "sha256": "e0fbdf6f8c8336a830c59245c33fbe97a4c2c2e73f09500932feec9598487760"
+    },
+    "lean/Holonics/Fluid/NavierStokesFiniteFourierHeat.lean": {
+      "bytes": 8783,
+      "sha256": "b075ac9c56802b7b0fdee57500f09b453c86cc0464a0e2a0bd06da62e57ab6ab"
+    },
+    "lean/Holonics/Fluid/NavierStokesFiniteGalerkin.lean": {
+      "bytes": 32738,
+      "sha256": "3ae39a12ce1b4fb6f1dd5e6a5b31e28c5cfa483f7256d7161f3336a2398e2cbd"
+    },
+    "lean/Holonics/Fluid/NavierStokesFiniteTime.lean": {
+      "bytes": 9286,
+      "sha256": "dfb737b6fd8510405528f14ebc8ee7ae28d2f8f96d22b422e2cf1beb85b6f105"
+    },
+    "lean/Holonics/Fluid/NavierStokesFiniteTimeVorticity.lean": {
+      "bytes": 24917,
+      "sha256": "1714eb2aabadde8839cba54e0d84b555a86c92f04ded274489f9a3c564fe6f1f"
+    },
+    "lean/Holonics/Fluid/NavierStokesFourierTriads.lean": {
+      "bytes": 12440,
+      "sha256": "5a305d09f00fb20eb189097aeea0590aa77a0ce0b7079bb977588b8ce83b1349"
+    },
+    "lean/Holonics/Fluid/NavierStokesInfiniteFourierHeat.lean": {
+      "bytes": 17071,
+      "sha256": "00f189e645852d5da3be9eca2349918fce65f90a24f8cfbeea34ef2f2a19e648"
+    },
+    "lean/Holonics/Fluid/NavierStokesInfiniteFourierHeatH3.lean": {
+      "bytes": 11330,
+      "sha256": "91d1f61552ca06d97c45a7f561db1aa54cede794a792e1fd987df8b05d499f54"
+    },
+    "lean/Holonics/Fluid/NavierStokesInfiniteFourierHeatRestart.lean": {
+      "bytes": 15130,
+      "sha256": "77df5c2b1981438928a556144abea4fe2ea566fd365340e78b879b733ec55596"
+    },
+    "lean/Holonics/Fluid/NavierStokesMaterialPolygon.lean": {
+      "bytes": 21379,
+      "sha256": "22fef6996049fbfaf7d39be42da91a596aa1e9e57af80a10496950eb8def7f87"
+    },
+    "lean/Holonics/Fluid/NavierStokesMildFourierNonlinearity.lean": {
+      "bytes": 19908,
+      "sha256": "2fc32aee69ac975b9146d3af3355364ef44c527c5ca722e4bd2a740661cf7079"
+    },
+    "lean/Holonics/Fluid/NavierStokesOpenLifespan.lean": {
+      "bytes": 18298,
+      "sha256": "78cf424f4ef30bf1bf7ad5ce0f82654b8e271d3578fe225b582fddc0cb182433"
+    },
+    "lean/Holonics/Fluid/NavierStokesPeriodicEnergy.lean": {
+      "bytes": 47189,
+      "sha256": "acfd2887307e79e4362b8de107ae437fe588eac938d7079a67aed110869014c8"
+    },
+    "lean/Holonics/Fluid/NavierStokesPeriodicEnstrophy.lean": {
+      "bytes": 45810,
+      "sha256": "fca84f9099464039de7a36b54ea7a519df7697096582a1df92ccfeff5019b4f4"
+    },
+    "lean/Holonics/Fluid/NavierStokesPeriodicFlux.lean": {
+      "bytes": 8327,
+      "sha256": "76cd3d8015b37490425947e41a5109f6a01ce18ffdf53d845c95c71642716865"
+    },
+    "lean/Holonics/Fluid/NavierStokesTorusFourier.lean": {
+      "bytes": 64890,
+      "sha256": "7d01d52c1cc452854e7d0c96adfcf709d43bbc6fa80ed3184c332f32df83a87f"
+    },
+    "lean/Holonics/Fluid/NavierStokesTorusVorticity.lean": {
+      "bytes": 13430,
+      "sha256": "7b3be9cd7e909fef3aee9438a249727bf750588e48fda4357235fd502a766373"
+    },
+    "lean/Holonics/Fluid/NavierStokesVorticity.lean": {
+      "bytes": 42082,
+      "sha256": "3d37c34ec414920162625a40e063b21b7d2d63f15d4f727146181021d7825072"
+    },
+    "lean/Holonics/Foundation/AddressedBoundary.lean": {
+      "bytes": 3973,
+      "sha256": "e1970e501c02440c44cbdd9944df292e669140475844179dc524f23d3900d1d7"
+    },
+    "lean/Holonics/Foundation/AperturedGradedComplex.lean": {
+      "bytes": 37614,
+      "sha256": "cfd5db4d1c5c9bc60871ceae6c5f24ac9f8fa1d99796fc7c9d0931dcc47de71b"
+    },
+    "lean/Holonics/Foundation/BoundaryReceiver.lean": {
+      "bytes": 2138,
+      "sha256": "89a378888ba68da287dfc83df15fdebf9b4b72b143dec3953d8625fcfc8146d1"
+    },
+    "lean/Holonics/Foundation/BoundaryScalePassage.lean": {
+      "bytes": 5078,
+      "sha256": "c2f90c9e906c4712378615eda814dc2e0e786ba50beca7bfdaa33cf6d59a16b5"
+    },
+    "lean/Holonics/Foundation/CausalChord.lean": {
+      "bytes": 43769,
+      "sha256": "bf9e8165102f911bf68d23edcf9a0136a70682539948db71f86d2cf789f74a0d"
+    },
+    "lean/Holonics/Foundation/CausalNaturalHolon.lean": {
+      "bytes": 12448,
+      "sha256": "080b885929e3df6e9ecc85035305a78e14169c477dc96b01da1dfc17e1dff837"
+    },
+    "lean/Holonics/Foundation/CausalRelevance.lean": {
+      "bytes": 13235,
+      "sha256": "1b0abc414881d1dbe5b1032cfde9ed2b2993f4c36910146ed4d8d8fcb4316d75"
+    },
+    "lean/Holonics/Foundation/Chronology.lean": {
+      "bytes": 9049,
+      "sha256": "04b9d61c7ad9ed64d1cff5cb6c6d8ed9532db9cadc58ab90efb52181bc149be7"
+    },
+    "lean/Holonics/Foundation/ComparisonCell.lean": {
+      "bytes": 2735,
+      "sha256": "dd07b6282073c562917fbe7fe66fafb1c4c509f6b8df6148ba59a471144b6020"
+    },
+    "lean/Holonics/Foundation/ComparisonLoss.lean": {
+      "bytes": 2996,
+      "sha256": "120b06f7b137e53f9bb7f11402f73dd9c3d2d678c6435db0b1580dec96a7a177"
+    },
+    "lean/Holonics/Foundation/CompleteReceiverHistory.lean": {
+      "bytes": 3876,
+      "sha256": "1029450d1932590577401454b092296ac2ed17467c4c4ac7dfc83c36ddd9dbb7"
+    },
+    "lean/Holonics/Foundation/ConnectionLineage.lean": {
+      "bytes": 11342,
+      "sha256": "c9327dc5d51be4fde0dd81462888edf760227d1566a606a947145b48157203d9"
+    },
+    "lean/Holonics/Foundation/ContinuingTower.lean": {
+      "bytes": 111591,
+      "sha256": "252188a3852476c9506eba1864662bd7965ae0b8bd107babcc8130d77ae70806"
+    },
+    "lean/Holonics/Foundation/FiniteCrossEntropyReceiver.lean": {
+      "bytes": 3856,
+      "sha256": "edd4e55fa67b78aefe9864218ab43e2f4adb4c1e61055c21a7e07f70ae9e56fb"
+    },
+    "lean/Holonics/Foundation/FractalPacking.lean": {
+      "bytes": 39784,
+      "sha256": "cc478f469e8ae0e2340ef3c479a0fa7c3e99b8f75ea5d09cb2172336364df30d"
+    },
+    "lean/Holonics/Foundation/FractalString.lean": {
+      "bytes": 39435,
+      "sha256": "c5b509dee5fcc3d064b3004449489684369f756f3c253758cee628037a21cc0a"
+    },
+    "lean/Holonics/Foundation/Gluing.lean": {
+      "bytes": 6717,
+      "sha256": "5f90c401cae7aa7f40fe42b8dc0a1f181a62e5f44e9bf6dd760bcdb8ccd06828"
+    },
+    "lean/Holonics/Foundation/GluingPassage.lean": {
+      "bytes": 2831,
+      "sha256": "966612dd5ba3888bd8e57f2ea8c405f8ad188c877430b0c12b42ab301ef09719"
+    },
+    "lean/Holonics/Foundation/GrainRestriction.lean": {
+      "bytes": 33658,
+      "sha256": "75b3803a876863ec8e781251287dca8063a52a1a294e161f7e4a43e5816f014a"
+    },
+    "lean/Holonics/Foundation/HigherDifferenceTransport.lean": {
+      "bytes": 28781,
+      "sha256": "b809f5f80dfb0595df16740a70563e8932caa2e011f2d28bee6bd4afea2a4a05"
+    },
+    "lean/Holonics/Foundation/HodgeReceiver.lean": {
+      "bytes": 32039,
+      "sha256": "a6dd9c4f9a6a5f076609f6270d0d145858a2aff6bb29c057961e5910c0a77748"
+    },
+    "lean/Holonics/Foundation/Holon.lean": {
+      "bytes": 16898,
+      "sha256": "2be19f90c9ed0bfff5e67e270b940f314b308c44564460508732ea7b40d1cf53"
+    },
+    "lean/Holonics/Foundation/HolonTensorLens.lean": {
+      "bytes": 7220,
+      "sha256": "7d41892cab3996eaf5a2bebdba64b3016a14897b2c00047965bbe585b2b1c29f"
+    },
+    "lean/Holonics/Foundation/HolonicDifferenceCalculus.lean": {
+      "bytes": 17435,
+      "sha256": "addc8fef4d287cc4ce5df708e99dccd278a4a94e2e3f15a5bb44326ad97b0977"
+    },
+    "lean/Holonics/Foundation/HolonicDirectedPassage.lean": {
+      "bytes": 15691,
+      "sha256": "21062227a09719bb6bb27a825eac9b16ccf515bd01d08b9644af076a0bf014ec"
+    },
+    "lean/Holonics/Foundation/InformationReceiver.lean": {
+      "bytes": 10979,
+      "sha256": "e52a7a5d3326872ec91709aba0d86c879a906145c4f6587032b0a60216e5b6d2"
+    },
+    "lean/Holonics/Foundation/JointReceiverDescent.lean": {
+      "bytes": 8689,
+      "sha256": "b334f39fa7d9eeefec4a373cf532119dccf9911c89577e0bdce272f7f3fdfc99"
+    },
+    "lean/Holonics/Foundation/LatticeTransport.lean": {
+      "bytes": 7263,
+      "sha256": "823443aed448bc13aab37251ad98c4d72a3d0e1ccb321477556200d3fead2b77"
+    },
+    "lean/Holonics/Foundation/Lineage.lean": {
+      "bytes": 9458,
+      "sha256": "d0120d764009f01c3d718fbbbafd1861b07b3710743a85daf8335982f6509577"
+    },
+    "lean/Holonics/Foundation/MeasuredDifferenceReceiver.lean": {
+      "bytes": 10298,
+      "sha256": "deff0e22262afb15828cfc8cd27c9965462a44ede68090df5e1e1deacc9e9bd6"
+    },
+    "lean/Holonics/Foundation/NavigatorInference.lean": {
+      "bytes": 18455,
+      "sha256": "8d72fa02817e3cafd03c74d5930d773abebfe720129880f874ab5e2d01de886b"
+    },
+    "lean/Holonics/Foundation/NavigatorModeQuotient.lean": {
+      "bytes": 4187,
+      "sha256": "564544ce2433834b31d850c4fe89abe0ac89960ce4cfb596c40d0309bf201838"
+    },
+    "lean/Holonics/Foundation/PadicTower.lean": {
+      "bytes": 829,
+      "sha256": "dc9ba6270712b3b34af1c24b85714eb0d332babe82e99d751b423b5fc02b71fe"
+    },
+    "lean/Holonics/Foundation/Receiver.lean": {
+      "bytes": 10544,
+      "sha256": "32695757b94827663d9ad6547a125b2a8b0700ab99b890a64c9bf662da7c69c0"
+    },
+    "lean/Holonics/Foundation/ReceiverAtlas.lean": {
+      "bytes": 62736,
+      "sha256": "ea04009a9c65cc52f36b5379458568f3548f45d6e7b71c460a16fa84c5c168f2"
+    },
+    "lean/Holonics/Foundation/ReceiverCodeCost.lean": {
+      "bytes": 8785,
+      "sha256": "c34e8145936900c28e3f13af7c90d80c827544afaac4eee4f2845ec309769665"
+    },
+    "lean/Holonics/Foundation/ReceiverFamily.lean": {
+      "bytes": 696,
+      "sha256": "8ae595a4b215170a882c8cfd461410ec5a9cb8643017d7ad55f0ba9fb1fd63d4"
+    },
+    "lean/Holonics/Foundation/ReceiverHistoryCompression.lean": {
+      "bytes": 7347,
+      "sha256": "404e28dfd7526c51d9711ccc975228b3cfab493a4d112def762469fe5b441ee0"
+    },
+    "lean/Holonics/Foundation/ReceiverQuotient.lean": {
+      "bytes": 4766,
+      "sha256": "809fbecf8473cb11b4d1b3ba81f23c81520cd34044b2d50ed89f4cd835c53a74"
+    },
+    "lean/Holonics/Foundation/ReceiverRelease.lean": {
+      "bytes": 47832,
+      "sha256": "15b940da5e3df804f051c6414912e3a7e6334d4f466c16d7d249a1d34558dab1"
+    },
+    "lean/Holonics/Foundation/RelationLadder/Comparison.lean": {
+      "bytes": 5055,
+      "sha256": "97e90c7f7d571d2ea65f2bcea968fb11799aa46a01fc4a219a8447f182aeaa26"
+    },
+    "lean/Holonics/Foundation/RelationLadder.lean": {
+      "bytes": 60404,
+      "sha256": "e4059e17c4d75644a804c86784b8dba8d0d3c317cec88c1b5674f884f2924e14"
+    },
+    "lean/Holonics/Foundation/RigidityReceiver.lean": {
+      "bytes": 19833,
+      "sha256": "f038e56bda92cf35c0fbd3df6eef73bb01abe4e860483609973b43f9a63efab4"
+    },
+    "lean/Holonics/Foundation/SectionResidual.lean": {
+      "bytes": 2371,
+      "sha256": "cdf0ae63bc4a726fc36e06dc39c0825c3d1fcf3e5bf731fa8a8fe61bdca690fc"
+    },
+    "lean/Holonics/Foundation/SituatedInformationRate.lean": {
+      "bytes": 8707,
+      "sha256": "c7fe0082e01ebc7d67f2723a9857030f7f05684c35ecc5e4b7404da567355655"
+    },
+    "lean/Holonics/Foundation/Standing/Law.lean": {
+      "bytes": 9836,
+      "sha256": "d29d9293eeac54ed0f13d282731e85d1609a4961e6e3d1ddce4db4e1190d9d9d"
+    },
+    "lean/Holonics/Foundation/Standing.lean": {
+      "bytes": 53644,
+      "sha256": "bf8d951fa952394482357996ff358c1675af4775751e75bd407dcb0f605a0629"
+    },
+    "lean/Holonics/Foundation/SuccessorWitnessSystem.lean": {
+      "bytes": 4187,
+      "sha256": "e24f44b3168fb7a736ec914096f724d7d3ae4b106aa541156f9c8861a6d20806"
+    },
+    "lean/Holonics/Foundation/TowerCarrier.lean": {
+      "bytes": 1430,
+      "sha256": "0bb1256d1685c4e599ad8546d62cb63e14b68f2ccac1d720388c7f3ea180cbe4"
+    },
+    "lean/Holonics/Foundation/TransportLift.lean": {
+      "bytes": 5724,
+      "sha256": "1de68847c8ec65e16088eaa89d09fc6b60546e9c32e5d2c865d26191ea54b113"
+    },
+    "lean/Holonics/Foundation/TransportWord.lean": {
+      "bytes": 10118,
+      "sha256": "345ece634e00c2b38d0eebf903074e1cd24715a6f3d4b22cb4aaeb09f906c72a"
+    },
+    "lean/Holonics/Foundation/Unicity.lean": {
+      "bytes": 16890,
+      "sha256": "c28ab793086adc3e8f5ec2612fbd6a9988af9fa2a2156611625504f3d3eaf327"
+    },
+    "lean/Holonics/Framework/Computation.lean": {
+      "bytes": 1305,
+      "sha256": "a6b9b221bdf52212b737c59bf3e2b94cc64d1033a60f904036a3d4c665f1651e"
+    },
+    "lean/Holonics/Framework/Core.lean": {
+      "bytes": 914,
+      "sha256": "b2fc5748f06f68354f2b3204f59475af20170c037e1cfa5852d39d32466a5936"
+    },
+    "lean/Holonics/Framework/Dynamics.lean": {
+      "bytes": 1716,
+      "sha256": "dce4a3e93a2cad45b9b1894a66536e4f4ff4cf9647fc6f042ee123cc727493fd"
+    },
+    "lean/Holonics/Framework/Geometry.lean": {
+      "bytes": 1129,
+      "sha256": "57b2b248c740f11a7d5cd6fa6098eb618806dfbda6fa026f315341625d59a00e"
+    },
+    "lean/Holonics/Framework/HolonObject.lean": {
+      "bytes": 7461,
+      "sha256": "48a851474ec103c42a60d84c0890e5fc93b077a13909788dc00c4e849b8351c5"
+    },
+    "lean/Holonics/Framework/Information.lean": {
+      "bytes": 1109,
+      "sha256": "6b9a13f7780b7c4c0ada582d9ad1b3408d862d8f92b29588c6f359194933ebc6"
+    },
+    "lean/Holonics/Framework/Objects.lean": {
+      "bytes": 4028,
+      "sha256": "ed70446e7ffb32388c3f8013cb868324dbe8d7d135644e13eb4fbd7a31551123"
+    },
+    "lean/Holonics/Framework/Physics.lean": {
+      "bytes": 2104,
+      "sha256": "0d5c2a934047c54634a840e9394027e88cd69b4b83cbd5a39a434354e2594b47"
+    },
+    "lean/Holonics/Framework.lean": {
+      "bytes": 870,
+      "sha256": "3b4e5a3ac233e8f19c4d0234d167cc418c22ef915a399b32cab719ed87a3b96a"
+    },
+    "lean/Holonics/Geometry/AffineSwing.lean": {
+      "bytes": 2184,
+      "sha256": "09ce73d5bc9766c152c3ccfc3b16a5f9627e5a4b3cda828ef9f1cf9e91b5805f"
+    },
+    "lean/Holonics/Geometry/ConnectionCalculus.lean": {
+      "bytes": 3368,
+      "sha256": "b5efd916a987bbb1e7fb5cfb283393e1b9184fa78587a1ce528c4150fa15aa45"
+    },
+    "lean/Holonics/Geometry/CrossRatio.lean": {
+      "bytes": 6014,
+      "sha256": "2fe42c8b97bfe226a82605777d1febc53843747c711dccda276e56938b3f1512"
+    },
+    "lean/Holonics/Geometry/ExteriorBoundary.lean": {
+      "bytes": 3030,
+      "sha256": "f319cd555d6d3224d8b8b36b59f0340002c4af7e2644377b1f6a9529443e41f8"
+    },
+    "lean/Holonics/Geometry/FrameTransport.lean": {
+      "bytes": 25975,
+      "sha256": "8e2dab7ef9ac4a4e0564e23621531742def4edf234e47947cec39422e13c1c7b"
+    },
+    "lean/Holonics/Geometry/Gyrogroup.lean": {
+      "bytes": 3726,
+      "sha256": "552ac01619be9590d274ef3dc4e3b37405e65f6131c55dcbbfdb4a0cff902741"
+    },
+    "lean/Holonics/Geometry/HolonicClockedPantographicSwing.lean": {
+      "bytes": 32441,
+      "sha256": "5bb312b48c16e8a83829b8dd42081ac36254d329639b88b487afc7046f8c28bf"
+    },
+    "lean/Holonics/Geometry/HolonicCurvedArcEinstein.lean": {
+      "bytes": 9806,
+      "sha256": "6b62d2d688add8f3d7f9b710169790fa762de56dd8725212012d2839d7072aa7"
+    },
+    "lean/Holonics/Geometry/HolonicInteractionExterior.lean": {
+      "bytes": 11009,
+      "sha256": "a817e26b27b2398169e7f1d153e88beb9b4efd81ef758fdeb4c1edfb4725012e"
+    },
+    "lean/Holonics/Geometry/HolonicPantographicSwingJets.lean": {
+      "bytes": 12278,
+      "sha256": "51c34caac9bd16deed9e31c4c1e3ed4c5c5680c5bc62d4438c8d9a6715b55939"
+    },
+    "lean/Holonics/Geometry/HolonicPolygonalTorusCarrier.lean": {
+      "bytes": 14317,
+      "sha256": "54cccbfc264ea0d35515011bd48bae574eb09a3327c5c2bce176ec37dd6fad10"
+    },
+    "lean/Holonics/Geometry/HolonicTorusKnots.lean": {
+      "bytes": 23104,
+      "sha256": "f309c9bb7a2dee96e0ef382336771814c308e1c3fa11b5e26cc02ab16f06ab0f"
+    },
+    "lean/Holonics/Geometry/HolonicTorusMonodromyReceiver.lean": {
+      "bytes": 8119,
+      "sha256": "c7a2cd3db8647f61b94e5f470d24537c6d8d511380f2c2702d93c32fbbd68a15"
+    },
+    "lean/Holonics/Geometry/Horizon.lean": {
+      "bytes": 15792,
+      "sha256": "1ed9894a917aba66e69e4552297c3fb1f193e618ab4b089643e16d9e85f8c215"
+    },
+    "lean/Holonics/Geometry/LocalFactor.lean": {
+      "bytes": 6222,
+      "sha256": "4058a7947dd1d86932e7ced7d92a7b3c3a2dec322fec8ca51e3d62f7f6c04c9d"
+    },
+    "lean/Holonics/Geometry/Motion.lean": {
+      "bytes": 55845,
+      "sha256": "32df98dece1d3d0cbff9505bd9f4e15f0b2ee6244c490a3058c26a479b962fad"
+    },
+    "lean/Holonics/Geometry/PairResonance.lean": {
+      "bytes": 4677,
+      "sha256": "0d52440149b018e28f16725d924edc3579aa328b759ccd0124a95bf4c18b314e"
+    },
+    "lean/Holonics/Geometry/PartitionFunction.lean": {
+      "bytes": 2963,
+      "sha256": "6a2650e0ed3996ad18d58b0c5c23ff51bd5924900d5bc7aabdaebfcd0a1b3155"
+    },
+    "lean/Holonics/Geometry/PhaseCarry.lean": {
+      "bytes": 8281,
+      "sha256": "878de52e93d8f1244f15238ed24a3e270820a74a77af819d2968dd90b69a9209"
+    },
+    "lean/Holonics/Geometry/Polarisation.lean": {
+      "bytes": 5472,
+      "sha256": "15141a0dd8489645a133e10f3c537b624bc01479295d25df73cdf363b25f74d2"
+    },
+    "lean/Holonics/Geometry/Reflection.lean": {
+      "bytes": 11407,
+      "sha256": "a4fd2a46f8b03f3cbb1b7dd7bb71f40dd64e5a1d9c3121d3ed27364ee9d00588"
+    },
+    "lean/Holonics/Geometry/Ricci.lean": {
+      "bytes": 14550,
+      "sha256": "8cefb48234da736c0d43e2e13f907286fc2f36b12128b2c78fb954e453cde4df"
+    },
+    "lean/Holonics/Geometry/ScrewGeometry.lean": {
+      "bytes": 7626,
+      "sha256": "91020b35bc1cf591f7eae4e0537a70b8c218986d284852181c6689cec102719e"
+    },
+    "lean/Holonics/Geometry/SixSphereMonodromy.lean": {
+      "bytes": 7219,
+      "sha256": "2c2140e52b667588bc9894188ff2a96af6ccfe7642c573f9677f831b52acabfa"
+    },
+    "lean/Holonics/Geometry/SixSpherePeriods.lean": {
+      "bytes": 13521,
+      "sha256": "d4ec61be74e0ef5bec1186805d48129b55e6c53d10e238db642d5fbf5a61c979"
+    },
+    "lean/Holonics/Geometry/SixSphereTorusFibre.lean": {
+      "bytes": 18130,
+      "sha256": "fda4db44e374eb5b9312a64678c41d9c6ad5a07b97ec69878062437d40e1eede"
+    },
+    "lean/Holonics/Geometry/Swing.lean": {
+      "bytes": 11469,
+      "sha256": "945876159a3560dbb8417aaccff4f9e79917004f06cd1369a80a3e94957444c3"
+    },
+    "lean/Holonics/Geometry/SwingBridges.lean": {
+      "bytes": 6278,
+      "sha256": "876cf7a4ffa0e3640ec123caa288364f448889050e9e99889c96c449e8b38219"
+    },
+    "lean/Holonics/Geometry/SwingPotential.lean": {
+      "bytes": 5281,
+      "sha256": "aa34165284f830171787cd209f3c2370d5f6d41345351f02b71cc86d75f5a444"
+    },
+    "lean/Holonics/Geometry/Telescoping.lean": {
+      "bytes": 929,
+      "sha256": "ff8783996008207d980f6d64cc144544825304bd23cd09428ec1cae43bc8e5cc"
+    },
+    "lean/Holonics/Geometry/TraceSequence.lean": {
+      "bytes": 8487,
+      "sha256": "1ec3d0a525cfa9ca7d2b2444557379ac65697f9d55b19c961d469f01c49e9494"
+    },
+    "lean/Holonics/Geometry/Turn.lean": {
+      "bytes": 14637,
+      "sha256": "a5999d48f034d1c1acc91871fbdb4008b5958d3f09963db706b04bdc6beb42e0"
+    },
+    "lean/Holonics/Geometry/TwoSidedIdentityAtlas.lean": {
+      "bytes": 11556,
+      "sha256": "8aa274417ec7c04ec70d55b2b8b6c95720c68f8afa8297a089f4649dc12394f4"
+    },
+    "lean/Holonics/Geometry/WindingLedger.lean": {
+      "bytes": 29361,
+      "sha256": "4401d26a1ea939a23d5d2e8cb91c4783bd91c558b60f1e9a0562950275a72f87"
+    },
+    "lean/Holonics/HNN/BankFace.lean": {
+      "bytes": 20146,
+      "sha256": "b991ba6b7c937b5142c966cf0b5950512ef484ed8b87c9f129e714293c07126e"
+    },
+    "lean/Holonics/HNN/BornFace.lean": {
+      "bytes": 31029,
+      "sha256": "5d3da18fdc789bfcc269d7d43f480719be5d5822a4aa122c301e52df07375b1e"
+    },
+    "lean/Holonics/HNN/CarriedCuts.lean": {
+      "bytes": 11728,
+      "sha256": "32502fa90e0ac9d4cd1571b0b69959462aa40e21188cba7aa97385bb44e48703"
+    },
+    "lean/Holonics/HNN/CarriedMotion.lean": {
+      "bytes": 21675,
+      "sha256": "04f4ff04006575f4359578971b7c367de85b4b9b915f2d6f28dc8ed552950e30"
+    },
+    "lean/Holonics/HNN/CarriedStanding.lean": {
+      "bytes": 40691,
+      "sha256": "83e5e4d05d4f74090e047a079c269bf306827dea9d801db0a8f89b853cbb5b78"
+    },
+    "lean/Holonics/HNN/ChainedBalance.lean": {
+      "bytes": 28663,
+      "sha256": "8c4c0991b64a156471134cd05aefbf3b6edd0d9b1d50edeeb1cee8e2588049d3"
+    },
+    "lean/Holonics/HNN/ChartResidual.lean": {
+      "bytes": 15172,
+      "sha256": "118e749d60bb58ffc457ecaf664c8456d13af1500b0a6be39d314d3de6ac6740"
+    },
+    "lean/Holonics/HNN/Contact.lean": {
+      "bytes": 29136,
+      "sha256": "a722cae9d733ff2ccf11db8037a0b2e44a6cc22e005e4c37eb3bdf90b78ae9a5"
+    },
+    "lean/Holonics/HNN/ContactBreak.lean": {
+      "bytes": 7930,
+      "sha256": "7b533c756ec9e24a3a94375aa49a796bc7ced03ff7a2e330e77e9bab14b4bdb2"
+    },
+    "lean/Holonics/HNN/DepositHold.lean": {
+      "bytes": 23516,
+      "sha256": "050f28b447f82f141583a5b147a42b2e232d1ad60bddf764c54734d7f35dd089"
+    },
+    "lean/Holonics/HNN/Encoding.lean": {
+      "bytes": 18118,
+      "sha256": "d46bf078f47a3dd8201b2c719af0aafa5ba77bd229108788dc3c0299c667d608"
+    },
+    "lean/Holonics/HNN/ExecutedComparison.lean": {
+      "bytes": 132596,
+      "sha256": "4d00dd425b879806a495ffe579c82376702f11e936e75c59243eb2e65cdca569"
+    },
+    "lean/Holonics/HNN/FactoredMedium.lean": {
+      "bytes": 35567,
+      "sha256": "df7015a5e3276a1a2f00dc2c05f0bbdb60b587e41c24a31767a14e7f643ebef7"
+    },
+    "lean/Holonics/HNN/Floquet.lean": {
+      "bytes": 28133,
+      "sha256": "1e220ff9905585083f77569f744a20603c4fa32d307806b674f7f829bb9a18a4"
+    },
+    "lean/Holonics/HNN/FloquetPassage.lean": {
+      "bytes": 13178,
+      "sha256": "4e9c56c47a815746aa2baaf5ba1a71b49c4aca7007897bbe6a40db8c573783d8"
+    },
+    "lean/Holonics/HNN/HeldCommits.lean": {
+      "bytes": 10679,
+      "sha256": "92eff5a81ca3f4e425b24f9235db3f5235520c2c1322b57f84e647034f9a56b5"
+    },
+    "lean/Holonics/HNN/IndexedOpen.lean": {
+      "bytes": 66356,
+      "sha256": "55b8c98742d2739bffee95d158006924aea65aaafb4fb67ad30f5d43cf5c6c2e"
+    },
+    "lean/Holonics/HNN/JointStep.lean": {
+      "bytes": 42306,
+      "sha256": "586198ca4e996480812462a2158e3c8fcadafc58d8cec7e1036e9e9db0de9cd9"
+    },
+    "lean/Holonics/HNN/Keys.lean": {
+      "bytes": 32288,
+      "sha256": "066c59f7342758fb09aa615c60ae76378e36b873b4eac5de360c7211455e8a8f"
+    },
+    "lean/Holonics/HNN/LatticeDeposit/Freeze.lean": {
+      "bytes": 38426,
+      "sha256": "5679b0d821d5d875e25be66c1faaf58590812420538ec770e8ea442c2677661a"
+    },
+    "lean/Holonics/HNN/LatticeDeposit/Rebase.lean": {
+      "bytes": 13677,
+      "sha256": "87ae9638f69e01c99febfc40b90431f64fdd42b2f06b071bdf8ee8f9a915aeb6"
+    },
+    "lean/Holonics/HNN/LatticeDeposit.lean": {
+      "bytes": 49663,
+      "sha256": "812ba9f414af8a5283c0a8482fbf1174a6630e1a71f5ab3d96239021c5449b39"
+    },
+    "lean/Holonics/HNN/LatticeWord.lean": {
+      "bytes": 92762,
+      "sha256": "449af711c1e3e4dba053a4f35bbdd679a02936ab65b0e6e33d1d19c7ff65ca9e"
+    },
+    "lean/Holonics/HNN/LeakyCapacity.lean": {
+      "bytes": 9292,
+      "sha256": "08dce928ceed7ebb3a1b7b4121fb7dba7ab8b7edef0c42475b7ff8f76812e766"
+    },
+    "lean/Holonics/HNN/LoadedMedium.lean": {
+      "bytes": 41770,
+      "sha256": "eb1809d8741f44634bf02f4f9a6402b14c3b4ae20e3c191ccf8c3ef3b43ee250"
+    },
+    "lean/Holonics/HNN/LoadedMotion.lean": {
+      "bytes": 17353,
+      "sha256": "3df82815aba7b15aacb7a0e3d1d2249abc58028d8402c52daebbf08c0ab0233b"
+    },
+    "lean/Holonics/HNN/LoadedRing.lean": {
+      "bytes": 27104,
+      "sha256": "e47634b3ceeb4518bc340a4e643fad8e5502d5f5422c9287f71a77f1fae113f2"
+    },
+    "lean/Holonics/HNN/LocusMap.lean": {
+      "bytes": 48814,
+      "sha256": "3cf36ea70f28b03af5f44e62530242bfbb04a01d22e202bb959a4b9f87a8aed4"
+    },
+    "lean/Holonics/HNN/LocusStatistics.lean": {
+      "bytes": 34099,
+      "sha256": "fe41de4c47b97fc01df19d7a31f9e5fecfa4a0fd95f2bf1e6e648d87f4b94c37"
+    },
+    "lean/Holonics/HNN/MediumStanding.lean": {
+      "bytes": 30559,
+      "sha256": "0f102cc42bd4f90a86491e8d359d0913048ca97b0bac64e16edc1afc1cebbe1b"
+    },
+    "lean/Holonics/HNN/ModeQuotient.lean": {
+      "bytes": 33187,
+      "sha256": "573493a7fd07cd3ae8dce6b7f406158f889c14b851b9b36e829fe0e87feb474a"
+    },
+    "lean/Holonics/HNN/Moment.lean": {
+      "bytes": 65140,
+      "sha256": "979638e8c8854652fecbf2f978247e2bfbc76599033ea252c80b81e5d7b42444"
+    },
+    "lean/Holonics/HNN/MovedChart.lean": {
+      "bytes": 10377,
+      "sha256": "47a36ab63d531e1b3c09052606e5bf01cc19f87694782a870013a0dbd78c9f08"
+    },
+    "lean/Holonics/HNN/Normal.lean": {
+      "bytes": 53642,
+      "sha256": "cd7049a5ff283d64fb74b2a8e07a1fcb77c6723d62fda5404ea07abdd73fbef7"
+    },
+    "lean/Holonics/HNN/Prediction.lean": {
+      "bytes": 14706,
+      "sha256": "f3b2f130615a6ed4152f8ef4d1e3e25d4235a1e4204e44c9ab1ae3fea9a9f2a9"
+    },
+    "lean/Holonics/HNN/PriorCarry.lean": {
+      "bytes": 19061,
+      "sha256": "11b671bffdd7858e3bc973ddc01749476e4b799e9c101c2c17d0bf6a9b0267d7"
+    },
+    "lean/Holonics/HNN/PriorMove.lean": {
+      "bytes": 16067,
+      "sha256": "cb858c5908cf568b1f0d708a2760a9a0d917d46452ba17f14e2f0f72182f5eef"
+    },
+    "lean/Holonics/HNN/Propagation.lean": {
+      "bytes": 53379,
+      "sha256": "fb0664f563c9d1a794980763a42e103448e806cf0b8e1a13f6b6a4714bd4be7c"
+    },
+    "lean/Holonics/HNN/PumpCarry.lean": {
+      "bytes": 23180,
+      "sha256": "6eeb5b345b16b007275e184c55f962a1e1914a339b01451f75c7f4a5ffcb4f2c"
+    },
+    "lean/Holonics/HNN/RangedMoment.lean": {
+      "bytes": 20093,
+      "sha256": "85ae00d0f3579c79e57456bf69c38286ff2c6b2d4be16acea3173079d18ea330"
+    },
+    "lean/Holonics/HNN/Ratio/Certificate.lean": {
+      "bytes": 70519,
+      "sha256": "50cd93ec9e80878d05826e22f33a92f0ca467af48725bc0a6168e8847067d046"
+    },
+    "lean/Holonics/HNN/Ratio/Resolution.lean": {
+      "bytes": 86344,
+      "sha256": "9f78696daaabfe6947c142df9abe068ff89f99b21de117a33668c8b4556987f8"
+    },
+    "lean/Holonics/HNN/Ratio.lean": {
+      "bytes": 32240,
+      "sha256": "093404cf3f093449d5a6208e90952f18901bdbd7f23cd380c71bb565442ba611"
+    },
+    "lean/Holonics/HNN/ReceivingPrior.lean": {
+      "bytes": 42646,
+      "sha256": "385a79ceb5970de973be04c5a9f1d2fb578a381fafdb3b8e40dc314934ccb29f"
+    },
+    "lean/Holonics/HNN/ReceivingReach.lean": {
+      "bytes": 6947,
+      "sha256": "a32363a3e7733818a0e605973b511822c72e0ebd9d6264c03e5b0296ce53b651"
+    },
+    "lean/Holonics/HNN/ReframedMoment.lean": {
+      "bytes": 8599,
+      "sha256": "c12d20d76b44ee512cbc80e2edad1a864f4c921bf638a6e2126b16ae832e3fd2"
+    },
+    "lean/Holonics/HNN/RegionCounts.lean": {
+      "bytes": 66245,
+      "sha256": "1816774140e90235635feab2e6dc6c43f8b26140a4bb8bd55c7613af11c82415"
+    },
+    "lean/Holonics/HNN/ReleaseRun.lean": {
+      "bytes": 10449,
+      "sha256": "c362fadfce7bd87725b81116de78e58b221b9d529919a25e67b1417421c98712"
+    },
+    "lean/Holonics/HNN/Retention.lean": {
+      "bytes": 87007,
+      "sha256": "6183ead6580fdc8edca5ae0e98538a7178842b0d6e09e673442e8ac76842ab5a"
+    },
+    "lean/Holonics/HNN/Ring.lean": {
+      "bytes": 56948,
+      "sha256": "bc9d0a99a48b349db265474bb764f127e17caeefb3c949804cce8ed87bd0c09a"
+    },
+    "lean/Holonics/HNN/RingLoci.lean": {
+      "bytes": 42468,
+      "sha256": "f8866ee1452111b6f1f039be0ce6d9f692129ad5bb25d28699774251e6d7caf1"
+    },
+    "lean/Holonics/HNN/StandingRead.lean": {
+      "bytes": 13011,
+      "sha256": "142c8c7e2206b8730e2d9f2f12a78151d4a12a16801285a148658c55fb8806f2"
+    },
+    "lean/Holonics/HNN/StorageResolution.lean": {
+      "bytes": 14159,
+      "sha256": "ede5c4747267ce780c59779f160c79b48f532bbdfb6110683ee2d8d332c0626b"
+    },
+    "lean/Holonics/HNN/TargetFace.lean": {
+      "bytes": 31503,
+      "sha256": "342eed337eea4350cf7df952cb1f2b75ebba7ef447f2603d08d27a4da4d0484f"
+    },
+    "lean/Holonics/HNN/TickBlocks.lean": {
+      "bytes": 25311,
+      "sha256": "75545870f5a7bff6e080365749e9f18a9bbc98b973467c470e95960dee1a1b0b"
+    },
+    "lean/Holonics/HNN/TickFamily.lean": {
+      "bytes": 20767,
+      "sha256": "965cbe84bec6a8684ccb0423452583db5a79bceecc952469353ba43362a9b0ee"
+    },
+    "lean/Holonics/HNN/TickStanding.lean": {
+      "bytes": 53310,
+      "sha256": "73b233201d4b6ea2cffee857bc0449907760073f6d203da58ade377c6eba324b"
+    },
+    "lean/Holonics/HNN/Word.lean": {
+      "bytes": 71277,
+      "sha256": "a941ab2a9906598040c3b2c4b582200105082bf84f7882fb86a58b8f5dff06cc"
+    },
+    "lean/Holonics/HNN/WordDiamond.lean": {
+      "bytes": 13414,
+      "sha256": "4f0c0548a2be137d7e8780036f6ecac434f241f0ee8ecb64c1166fb6eb5940da"
+    },
+    "lean/Holonics/HNN.lean": {
+      "bytes": 45760,
+      "sha256": "d33d3bee1aa8bf49bdff77a623d7a8aa1a06be40b8615181db8b10df7db861ec"
+    },
+    "lean/Holonics/Hodge/HodgeFiniteDecomposition.lean": {
+      "bytes": 7583,
+      "sha256": "344d0c2b932a8802122da8d12a10f19a86d4e4c7b230d1dc0634fa2f731f05a0"
+    },
+    "lean/Holonics/Hodge/HodgeGreenOperator.lean": {
+      "bytes": 3321,
+      "sha256": "043d238010ef0d1a00bf0ca9ddf981f342f4faae9e5e38535ee4ce98d8ed42b7"
+    },
+    "lean/Holonics/Hodge/HodgeHarmonicRepresentative.lean": {
+      "bytes": 4864,
+      "sha256": "22777a0d67fa7e44d222f5dbfa4587494223a4350b4b7d1bb3d259012b8fb75f"
+    },
+    "lean/Holonics/Hodge/HodgeLeastNorm.lean": {
+      "bytes": 1713,
+      "sha256": "8a63f0a542bd97c6445b3197b5d1c254faeb82c1f06932a35ceb25834b03212b"
+    },
+    "lean/Holonics/Holarchy/Globe.lean": {
+      "bytes": 31311,
+      "sha256": "3cf48cc5fb2555c4a49e78a6427ce6327138678d8a7cdb8102ad54630aad6917"
+    },
+    "lean/Holonics/Holarchy/Hearing.lean": {
+      "bytes": 17339,
+      "sha256": "c21a3a4bd58325926943295b20487e5e06c4062e54c4fabd8bc5cb8a8b5bdc67"
+    },
+    "lean/Holonics/Holarchy/Join.lean": {
+      "bytes": 83016,
+      "sha256": "5994fe8dc04687961454ab6e8567d174274f7bfa23094edb48d4fbc0fabb6de1"
+    },
+    "lean/Holonics/Holarchy/Receipt.lean": {
+      "bytes": 17292,
+      "sha256": "061002b72cf9ca994db3bef75c36a4a92a4697cf7421ab805b3334cd44753538"
+    },
+    "lean/Holonics/Holarchy/Reception.lean": {
+      "bytes": 29732,
+      "sha256": "4d1ea17631cfa3d81c28491ff4423686007c6989071920336a2470ac51a4ce09"
+    },
+    "lean/Holonics/Holarchy/View.lean": {
+      "bytes": 33254,
+      "sha256": "a3cc32f1a36c1a367178a11e0f955d75b81367a6df5b0db6e6430b8c71aec71e"
+    },
+    "lean/Holonics/Holarchy.lean": {
+      "bytes": 7315,
+      "sha256": "20e0fc1d8e4862a2fb6d5442711621023b26ccd3299d41d22aaa2d2b1ec1d507"
+    },
+    "lean/Holonics/Holon/AffineContact.lean": {
+      "bytes": 6122,
+      "sha256": "ed8645c3e1997936c26d9e0a7364178191ad5728b2351745c56f7ebf7856a333"
+    },
+    "lean/Holonics/Holon/Cayley.lean": {
+      "bytes": 28884,
+      "sha256": "ed0adbe6fe5ff4cb38fa8f2a25ce279f3dbce3d98e0a174dfee6b2ca2d29111e"
+    },
+    "lean/Holonics/Holon/Complex.lean": {
+      "bytes": 12684,
+      "sha256": "b570ff8e0fe2d4621020aed0395ac8d834e830f9057d2270ab03b7df784cac1e"
+    },
+    "lean/Holonics/Holon/Conformance.lean": {
+      "bytes": 19743,
+      "sha256": "f7193ce68235f38a70502e20635376d9e749ee089de773f57d36a5e8e685d05c"
+    },
+    "lean/Holonics/Holon/Deposition.lean": {
+      "bytes": 63679,
+      "sha256": "5c2b58ebdd6aef52531f70f7d93b5395169f7157292ac03e38e4cb6226f8b4ff"
+    },
+    "lean/Holonics/Holon/Dirac.lean": {
+      "bytes": 37777,
+      "sha256": "f5f877a5f18d53cb8e0dfa93a6102f9018b238dea72b4fe8046172ba7b0cb2e0"
+    },
+    "lean/Holonics/Holon/Element.lean": {
+      "bytes": 26059,
+      "sha256": "48197e7453f674319f04635043dfe6e9a2649c8440023c88dcbd49636239dd70"
+    },
+    "lean/Holonics/Holon/Law/Fisher.lean": {
+      "bytes": 15823,
+      "sha256": "a9701a666122dea8226b7916bfca7ae49f6c6d437dfe71bc4a68110ea34ca4aa"
+    },
+    "lean/Holonics/Holon/Law.lean": {
+      "bytes": 15094,
+      "sha256": "bfc19b103cf262737fd1f091d3086babcf732c5c04acdc949211abcde72c9047"
+    },
+    "lean/Holonics/Holon/MomentStorage.lean": {
+      "bytes": 3628,
+      "sha256": "1fe04843fcc23cf189b0948f6b84102d0951f0db4bd1a5294d535f036e7c7c4c"
+    },
+    "lean/Holonics/Holon/Navigator.lean": {
+      "bytes": 8686,
+      "sha256": "f0248e450f6c5491032f1cdbfc0b8f98809d2a2898192ae8064eb11850d76edc"
+    },
+    "lean/Holonics/Holon/Port.lean": {
+      "bytes": 5444,
+      "sha256": "3e3cef2364fb0e1da9858576db9bbb204209866774e6c8c1a6a5f2f8090fd727"
+    },
+    "lean/Holonics/Holon/QuadraticMoment.lean": {
+      "bytes": 2811,
+      "sha256": "f222d34a7bb68ccfc52f6b86b760302e8cc8de6b4ed8ed517f1cf5149585bc9c"
+    },
+    "lean/Holonics/Holon/Reaction.lean": {
+      "bytes": 13470,
+      "sha256": "f456982d3f0ea794e13bb6200caacc99ba749b4eafe5c828e4a65e12ed70cdda"
+    },
+    "lean/Holonics/Holon/Restriction/Morphism.lean": {
+      "bytes": 7138,
+      "sha256": "b87e64e19420f45e422bdd9e4a142367888a1441b175c52c149d9f227fdabd34"
+    },
+    "lean/Holonics/Holon/Restriction.lean": {
+      "bytes": 8818,
+      "sha256": "28704ed11bf354f783b6bfac18ab1e2a4b2e19754e5fb787dec96c00561aed5e"
+    },
+    "lean/Holonics/Mathematics/AffineOrbitDivisor.lean": {
+      "bytes": 4453,
+      "sha256": "da0d1f80ac883c434af3b3cbed1168595ee11dd190f9481a43445b27a7b391d6"
+    },
+    "lean/Holonics/Mathematics/AnalyticNavigation.lean": {
+      "bytes": 5177,
+      "sha256": "f7b934a00d7eba8fe1dcf79c063db3e5ea60245753d54391a1ec34ce1a182ac8"
+    },
+    "lean/Holonics/Mathematics/AnalyticReceiving.lean": {
+      "bytes": 5230,
+      "sha256": "b08c95bc6d757dfa5ff69f88eb2dd9ae01d2208c719117119f2b2d0d6130140a"
+    },
+    "lean/Holonics/Mathematics/DependentConstitutiveReturn.lean": {
+      "bytes": 15916,
+      "sha256": "8ece94159ce104ad5179d6115bae4f240b007938584cd3a4bdfc8a9763769840"
+    },
+    "lean/Holonics/Mathematics/NavigatorFactorization.lean": {
+      "bytes": 8112,
+      "sha256": "6b39e1787e9197c666dbb41de3099e381003580643b169026351801aed33580f"
+    },
+    "lean/Holonics/Mathematics/PolynomialReading.lean": {
+      "bytes": 1077,
+      "sha256": "e73edd58a9ed15b27e5a6dc4d735f1d444ee05f8d19706e12a871466a330c172"
+    },
+    "lean/Holonics/Mathematics/RadixWindowReceiver.lean": {
+      "bytes": 11867,
+      "sha256": "2c70bf8c0fc0887600533330e7e13eb620036bab0c1ee827707375063d97a112"
+    },
+    "lean/Holonics/Mathematics/RatioSeriesTransport.lean": {
+      "bytes": 5772,
+      "sha256": "4d8fb1d2a59d446a62c540b364d91ce84ea722428c5db6f8268af681ab70ee4f"
+    },
+    "lean/Holonics/Objects/CommitRebase.lean": {
+      "bytes": 5137,
+      "sha256": "aa193de886dba6fe574e5c00419aff4d4f9191672ebc63fb4324e33c08dc42d8"
+    },
+    "lean/Holonics/Objects/Deposition.lean": {
+      "bytes": 38945,
+      "sha256": "c191c34a07c2ab50268d14972052612fbaa248923be051bccba5de9546e7d4ee"
+    },
+    "lean/Holonics/Objects/Membrane.lean": {
+      "bytes": 16136,
+      "sha256": "94ab9c537eeccfc109b77d318db3c3fd1c1e912e7d29adca8ddd4dd4783e0056"
+    },
+    "lean/Holonics/Objects/Orientation.lean": {
+      "bytes": 6098,
+      "sha256": "4de6756e312cb88d56ffd5f424f56605cb65602633c15e3f70e4cb1b1af09372"
+    },
+    "lean/Holonics/Objects/Pairing.lean": {
+      "bytes": 34781,
+      "sha256": "1b2c5a0ad63d2ab62d07753f239124ac6ceddea83fb49f14f4af92483baca768"
+    },
+    "lean/Holonics/Objects/Parametron.lean": {
+      "bytes": 39959,
+      "sha256": "cde36eb8b70b2712d3d37aaa1af6077d241776c161beda12e3af9f3a06fca7dd"
+    },
+    "lean/Holonics/Objects/ParametronLock.lean": {
+      "bytes": 20971,
+      "sha256": "b826df6d3184409d61d8ab392bd72614d746ac070935dbf245e3f68c0236afef"
+    },
+    "lean/Holonics/Objects/Ratio/CarriedPower.lean": {
+      "bytes": 7523,
+      "sha256": "f82d9ffe939f8c9b94d4964510f7a6684d4c3dca4f6d92a352b0c011318021a3"
+    },
+    "lean/Holonics/Objects/Ratio/ExponentialKernel.lean": {
+      "bytes": 748,
+      "sha256": "5f1a959c1a1918e678d069fbf28cbc83b5b41becd2a2039479594e16900e3d0f"
+    },
+    "lean/Holonics/Objects/Ratio/GaugeCalculus.lean": {
+      "bytes": 4488,
+      "sha256": "b3b4fc331f9d44f07cc654078e9943f9e485ba4fbbd942306dda7b3dec2f29fa"
+    },
+    "lean/Holonics/Objects/Ratio/SelectedQuadratic/PositiveRoot.lean": {
+      "bytes": 4907,
+      "sha256": "ada5e76b6bacfa9bef98485a455a66b06853467110b9153c3d33274de60dabe3"
+    },
+    "lean/Holonics/Objects/Ratio/SelectedQuadratic/SourceRoot.lean": {
+      "bytes": 3661,
+      "sha256": "d8b622db621d7e4e727b621f5043debcdd9ba6fe4f12bd24971bea0896e5e1ab"
+    },
+    "lean/Holonics/Objects/Ratio/SelectedQuadratic.lean": {
+      "bytes": 5887,
+      "sha256": "89e50989eaa8ba1dbd30e6320e635830740afe23c51516e632ee58416ed0098d"
+    },
+    "lean/Holonics/Objects/Ratio.lean": {
+      "bytes": 51769,
+      "sha256": "4489aeb3acffda2df6329e64d5955e434d5a7f6d10ba9a9cc9db4d8f3a07b71a"
+    },
+    "lean/Holonics/Objects/RatioBlock.lean": {
+      "bytes": 23800,
+      "sha256": "8e41b8d330b166cfcf0cacbb385c1f4792587bcc23cfa765ec3497f7b701d800"
+    },
+    "lean/Holonics/Objects/RatioPhase.lean": {
+      "bytes": 30882,
+      "sha256": "717bf39751d3abc1e541efd00f3783ff20ba205fa59813a66193a2010b7aa9c6"
+    },
+    "lean/Holonics/Objects/RelativeCompleteness.lean": {
+      "bytes": 55163,
+      "sha256": "57ab28e2561c7a4903cc1a8fa2b87b5e9f0afc8f106dbcba68d61703ca1fbdb5"
+    },
+    "lean/Holonics/Objects/Retention.lean": {
+      "bytes": 17226,
+      "sha256": "95d599cb9885b0bd5188cb50da817d19eb003dcb23e411489b2d4b2321257b42"
+    },
+    "lean/Holonics/Objects/SourceHolon.lean": {
+      "bytes": 34281,
+      "sha256": "762578e715f1a2dcb7c1873dd063ac9758bd7ce5ccc1e3aef192528a7bc7998e"
+    },
+    "lean/Holonics/Objects/SourcePorts.lean": {
+      "bytes": 18719,
+      "sha256": "0fc7830b2ff6a5a7f82b4e9e8f06ce1911d91f6598b3d5555218c2ec10b4b6c9"
+    },
+    "lean/Holonics/Physics/AccumulatedNormalResponse.lean": {
+      "bytes": 36037,
+      "sha256": "da615923c681be0609f251c9ebdf9b38e1462e959964f8e6f722844aea48a3eb"
+    },
+    "lean/Holonics/Physics/CompactifiedModeTransport.lean": {
+      "bytes": 6596,
+      "sha256": "89e75bdfcf6a971379b2143e9230ae63037249e35a50a43d8f1d19d932a636a8"
+    },
+    "lean/Holonics/Physics/CompositeMassEnergy.lean": {
+      "bytes": 5807,
+      "sha256": "cdbe477bb3423e4e5f869e863d1fc014df25aae48e94a9f108804df803283c33"
+    },
+    "lean/Holonics/Physics/ConductiveFluidReflection.lean": {
+      "bytes": 4513,
+      "sha256": "3ee726cdff937582def1201c290b068db506ee7477be0a0f61c6c9ebcec2d926"
+    },
+    "lean/Holonics/Physics/ConformationResponse.lean": {
+      "bytes": 6885,
+      "sha256": "88fba326441b0cca2251db2eab9d236c44f8bfef459962a781189c9f4b458269"
+    },
+    "lean/Holonics/Physics/ConstitutiveCurrentReduction.lean": {
+      "bytes": 16233,
+      "sha256": "91fb367c6f825991c33eb4da50912c108465896fee4f47b22d9d9e2c758fdcdd"
+    },
+    "lean/Holonics/Physics/ConstitutiveModulation.lean": {
+      "bytes": 13206,
+      "sha256": "3d8f0273c7cf322b7c340ade89e2b0afc6dab6c847d8a6ef466e10d74fbe2c4f"
+    },
+    "lean/Holonics/Physics/ConstitutiveScale.lean": {
+      "bytes": 7814,
+      "sha256": "f407f45e52a273e3106fff70c2ec3384b850b947b6947ca688a4c346d9021301"
+    },
+    "lean/Holonics/Physics/ConstitutiveWorldTube.lean": {
+      "bytes": 11896,
+      "sha256": "b5c3b7dcd2cf9287ffd869ab822b746dd331b1f9daeb5656fc224717b5e49ff5"
+    },
+    "lean/Holonics/Physics/CoupledIncidence.lean": {
+      "bytes": 35909,
+      "sha256": "44f9edd2e7d3819499d5732987035ebddda1183d12df2ad724d3aefd6c99f196"
+    },
+    "lean/Holonics/Physics/DirectionalPolarization.lean": {
+      "bytes": 7450,
+      "sha256": "170d0edc06fd131e383d86377113f5254e06dda1a8df0b89463a6fd60fd40f64"
+    },
+    "lean/Holonics/Physics/Ellipse.lean": {
+      "bytes": 4016,
+      "sha256": "a37043c31fd0f9142500db8c1ea279d25bfc5dd9636a420c2948b867fb7b84cb"
+    },
+    "lean/Holonics/Physics/FermionicModeReceiver.lean": {
+      "bytes": 2861,
+      "sha256": "0d7625a17be1102775c042d0bf4410478386c37023ee5acea5bd1a8c99dc75d7"
+    },
+    "lean/Holonics/Physics/Fluid/Body.lean": {
+      "bytes": 19915,
+      "sha256": "3ae56e5367d1e818f4ca41978958cb29b96c15aa3895a2c7180c7b7441f2c0b9"
+    },
+    "lean/Holonics/Physics/Fluid/Cells.lean": {
+      "bytes": 26148,
+      "sha256": "a440460ffc62c81f0e280f92e5ccabc5179b318b18055744369328de317325da"
+    },
+    "lean/Holonics/Physics/Fluid/ComplexFluid.lean": {
+      "bytes": 12933,
+      "sha256": "3b4e1d23d44851e66a0f6b4836f181e2405819333c6ae016735994170f16bc5b"
+    },
+    "lean/Holonics/Physics/Fluid/ControlVolume.lean": {
+      "bytes": 32162,
+      "sha256": "90b3f9eae07d7590ebbf3ff6a1ccfff8f164ceb25884e9c187d7e047d6931446"
+    },
+    "lean/Holonics/Physics/Fluid/Singularity.lean": {
+      "bytes": 29652,
+      "sha256": "2a04fcf31744615cd9acd2e2b966af416bdbe5d407b5b9c1a1027337ae2025c1"
+    },
+    "lean/Holonics/Physics/Fluid.lean": {
+      "bytes": 1924,
+      "sha256": "4b3a1bebd6a5d9744ce9aee3350fa320b8b7ee712860dd76ba5cb8a7d7652c05"
+    },
+    "lean/Holonics/Physics/FluidReceiverClosure.lean": {
+      "bytes": 15012,
+      "sha256": "3d879a586306f75f0924731dda463229ea530862baf424badd07306ceacd0114"
+    },
+    "lean/Holonics/Physics/FourTorusCurrentChart.lean": {
+      "bytes": 14177,
+      "sha256": "1626d532570a15b4063b677962f7f917714dc98108b17c3f653413acbce061df"
+    },
+    "lean/Holonics/Physics/FourTorusParametronCurrent.lean": {
+      "bytes": 4883,
+      "sha256": "994c9a5efabd43e3402daf8458b4df35281111f687f3710e822e14708c913d26"
+    },
+    "lean/Holonics/Physics/FourTorusTwoFace.lean": {
+      "bytes": 8657,
+      "sha256": "00548090565897e35f18e144e3c6fcd06b5482437489d3891bdec63d636b1e7c"
+    },
+    "lean/Holonics/Physics/HolonicCosmologicalInference.lean": {
+      "bytes": 11967,
+      "sha256": "2e04f26792dbcf0302f1decbec6b58e505685928342450412b61ec3ccec0e8e9"
+    },
+    "lean/Holonics/Physics/HolonicDiscreteInduction.lean": {
+      "bytes": 20296,
+      "sha256": "73646097750ecb03cd35ee6a5460a85965f1f113f65be6a6cbbfc33314cfde04"
+    },
+    "lean/Holonics/Physics/HolonicEntropyActionInduction.lean": {
+      "bytes": 38377,
+      "sha256": "ebe884a1283c15eb2feb32d54ccd7536a65fc94c17946d019b0a6aa34550cf0a"
+    },
+    "lean/Holonics/Physics/HolonicFieldTheoryPassage.lean": {
+      "bytes": 13296,
+      "sha256": "ca51924c3e355e4e926cb25a06d4287cf166525d2ff11663f143c1e92dfcc384"
+    },
+    "lean/Holonics/Physics/HolonicFourForceSectorCarrier.lean": {
+      "bytes": 12553,
+      "sha256": "b1aac7ed4020088f6ce774767d9750623a33948a47a7e7934e16824279032ddf"
+    },
+    "lean/Holonics/Physics/HolonicFourTorusCarrier.lean": {
+      "bytes": 14143,
+      "sha256": "7ff24b9eba4b31536f590a6af62eda5fa83082317cc686d15fffc494e4283af0"
+    },
+    "lean/Holonics/Physics/HolonicFourTorusParametronRealization.lean": {
+      "bytes": 9320,
+      "sha256": "c61ad8e1f992d7271e138bb224605f9999af54ef6ee4442b796408c446f5d31c"
+    },
+    "lean/Holonics/Physics/HolonicMassShellFace.lean": {
+      "bytes": 6593,
+      "sha256": "acdf233fa50037c9f0c4af2a6aaf1b324cbf9445db9cd4cdf8fe30adb4be58df"
+    },
+    "lean/Holonics/Physics/HolonicMeasuredParametron.lean": {
+      "bytes": 10331,
+      "sha256": "f28a25be59fd617e6231ee9577ca6228f89fe81dfb7e292e315b2046411fcd45"
+    },
+    "lean/Holonics/Physics/HolonicRankFourInteractionPlanes.lean": {
+      "bytes": 8140,
+      "sha256": "a583fe17a95bcbdf1db4f24553b7a99c54fefc80aa05efe700919f4228c630c4"
+    },
+    "lean/Holonics/Physics/HolonicRankFourWindingRealization.lean": {
+      "bytes": 13659,
+      "sha256": "fca71f09ef6bbbce955a79250297390cd572c4bd27d4e77ac58a06f945c021e4"
+    },
+    "lean/Holonics/Physics/HolonicSnellInteraction.lean": {
+      "bytes": 9464,
+      "sha256": "175b95e411fe980d2fb22ac54a8b92e2dd8f760d6b2998373cecb6904c88f96f"
+    },
+    "lean/Holonics/Physics/HolonicTorusParametronRealization.lean": {
+      "bytes": 22286,
+      "sha256": "322d4977f0d3bfbe85b22fb9808cd88314301139b9666b6960ca08a4753f3213"
+    },
+    "lean/Holonics/Physics/HolonicTypedOriginDimensions.lean": {
+      "bytes": 12752,
+      "sha256": "6eb37acc603c381a11512d90dd659785c547181455646c1345369feeb06d4c86"
+    },
+    "lean/Holonics/Physics/Information/ClockJoin.lean": {
+      "bytes": 8840,
+      "sha256": "fea38d6af929be440c61cd86cdc2698b48c60858c1b4983183719bf3da49262f"
+    },
+    "lean/Holonics/Physics/Information/CrossEntropyRate.lean": {
+      "bytes": 15926,
+      "sha256": "9cb8219a5abddfa9b65c21adbd3bd96acbe377b8d9677c524d0effc318b4c486"
+    },
+    "lean/Holonics/Physics/Information/PortWork.lean": {
+      "bytes": 25101,
+      "sha256": "351a6c15f65c004f6e055ad3811563390eb75a01a46d666f880b7bea816d184e"
+    },
+    "lean/Holonics/Physics/Information.lean": {
+      "bytes": 2382,
+      "sha256": "715d423277513eafce8fa58d4b34a96c58171206c89535fe23d6f4a8517a1dec"
+    },
+    "lean/Holonics/Physics/InformationDifference.lean": {
+      "bytes": 9377,
+      "sha256": "912b63bbbca110452bc2172f9c1407e49a254504712cbf2894f8b68de8b68524"
+    },
+    "lean/Holonics/Physics/MaxwellEnergyCone.lean": {
+      "bytes": 2351,
+      "sha256": "453a6b5ba5b676aa7790ea73668b9ad2c60078dd192361444e0c9d0a109daa81"
+    },
+    "lean/Holonics/Physics/MechanicalReceiver.lean": {
+      "bytes": 6408,
+      "sha256": "66d62d0514163277c50d1d8dd76fdee8f12ac8b3d1e68709f39cab699443eb51"
+    },
+    "lean/Holonics/Physics/ObserverBoundaryCurrent/Field.lean": {
+      "bytes": 2028,
+      "sha256": "e6bcdc225a800a8591bbe261744768653204b120e2539ab33d691bf2c15279b1"
+    },
+    "lean/Holonics/Physics/ObserverBoundaryCurrent/Slab.lean": {
+      "bytes": 6192,
+      "sha256": "9c23cb37c12798242d441a084cffc6222f108ae75b2ceddf09eb76881bfc6c6c"
+    },
+    "lean/Holonics/Physics/ObserverBoundaryCurrent/TiltedCut/Integral.lean": {
+      "bytes": 5389,
+      "sha256": "21b12adca3fa5559a1d6c44539980af9d14e2cecc3daa6c2a13fbe0448ab6639"
+    },
+    "lean/Holonics/Physics/ObserverBoundaryCurrent/TiltedCut.lean": {
+      "bytes": 8129,
+      "sha256": "3cbed38ff4da19fb87157ba1f9cb07c13482a09743c5b9a9adfd1fe98848f20b"
+    },
+    "lean/Holonics/Physics/ObserverBoundaryCurrent.lean": {
+      "bytes": 3377,
+      "sha256": "b791b524ee3565fdb34232665b305a91780e5f7cc8a295841a0a16b14197ae79"
+    },
+    "lean/Holonics/Physics/PartitionedHodgeEnergy.lean": {
+      "bytes": 8426,
+      "sha256": "80a85c3569b00deeb9c31d9cd3784f13c47f19331a1c8d197728f275a8557a1a"
+    },
+    "lean/Holonics/Physics/PhaseCarrier.lean": {
+      "bytes": 13695,
+      "sha256": "79de87e1d03d40602d45fc5959493dcc86b4ca47c02398a64f0281312babdc1b"
+    },
+    "lean/Holonics/Physics/PhaseContactPassage.lean": {
+      "bytes": 7502,
+      "sha256": "9ac32ca41d8a8d3c1f713d069141e11edfd633e365b592e4aa94e61093edccad"
+    },
+    "lean/Holonics/Physics/PhysicalRealization.lean": {
+      "bytes": 14756,
+      "sha256": "dd127e8b32c942fb416e80bd8bf9af1612ab65ff7af8125a8d139fbf6139bed7"
+    },
+    "lean/Holonics/Physics/PortEnergyHeat.lean": {
+      "bytes": 8299,
+      "sha256": "61f60fc310a7d15d5da53a5ef6a34e5e8fcd0c4635ed71ef05b1a30a9016767d"
+    },
+    "lean/Holonics/Physics/ReactionCurrent.lean": {
+      "bytes": 7354,
+      "sha256": "71ae5336e6183466d90441108654db5b5ebb31d4b58470ca196c3d74c6b1936b"
+    },
+    "lean/Holonics/Physics/ReceiverStressEnergy.lean": {
+      "bytes": 7918,
+      "sha256": "b6dc438501bc1119d8b77fb4d9935c3e3817601d366cf7c1ed986ac1699f3d86"
+    },
+    "lean/Holonics/Physics/ReflectedBoundaryMemory.lean": {
+      "bytes": 6828,
+      "sha256": "c6178b8e9b1420079de15eed2036dadbb590021663d7e6cd3dd74b29451d15d4"
+    },
+    "lean/Holonics/Physics/ReleasedMotion.lean": {
+      "bytes": 3947,
+      "sha256": "a23e92ec289120356d1609568add39ba587e8e347611da8ff9df80389e18dade"
+    },
+    "lean/Holonics/Physics/ScatteringWaveHeat.lean": {
+      "bytes": 2221,
+      "sha256": "a81a3f1c8580e05432cb2843206861260faa26c9d3f8048ebb38f6cbfcb3524c"
+    },
+    "lean/Holonics/Physics/Spacetime/Boost.lean": {
+      "bytes": 18683,
+      "sha256": "ac41aac18b2d2a8102de00001ceaa833ac4381d5718453e367666c768c591966"
+    },
+    "lean/Holonics/Physics/Spacetime/Einstein.lean": {
+      "bytes": 9993,
+      "sha256": "697a43c3e8a945a13f17b0768b1f36bc37f77154511f1febd1bc576e34dc31a3"
+    },
+    "lean/Holonics/Physics/Spacetime/NonClosedClock.lean": {
+      "bytes": 11535,
+      "sha256": "824016ba735783559a598b086521ab45453127686c8fcb9050cc652b659917fd"
+    },
+    "lean/Holonics/Physics/Spacetime/StressEnergy.lean": {
+      "bytes": 26282,
+      "sha256": "016e64e4d1121a1c5fc9c1aa82eb8f8f6ab1903aa607708604cab644e32a7b77"
+    },
+    "lean/Holonics/Physics/Spacetime/Wigner.lean": {
+      "bytes": 21762,
+      "sha256": "8889b2d8a5927a6118dfdd88c031a4d2dc1bce7bdcdd53d4ec76a6396d6ae07f"
+    },
+    "lean/Holonics/Physics/Spacetime.lean": {
+      "bytes": 3109,
+      "sha256": "fa9a9f8ce44a581e2506daf3b320c9152b49db839d3fe0a08cfca83e87e730e3"
+    },
+    "lean/Holonics/Physics/TemporalHodgeResidue.lean": {
+      "bytes": 3737,
+      "sha256": "e7f929899644599152c945a10303f668573a4a35b564f471c3780a12e7f74ffc"
+    },
+    "lean/Holonics/Physics/Thermal/ChainAxes.lean": {
+      "bytes": 29234,
+      "sha256": "28c21e709ff7ea8ccb643f7bd0bfbe8bb91da3093600c9847fd5261dd5a2d19f"
+    },
+    "lean/Holonics/Physics/Thermal/Exchange.lean": {
+      "bytes": 16626,
+      "sha256": "21ab35f17f0f83493cfddfbfbc3c5898b2ae472a59dea747a2011bde6cb1a0b5"
+    },
+    "lean/Holonics/Physics/Thermal/Schnakenberg.lean": {
+      "bytes": 13874,
+      "sha256": "5bb0ca25b0a118903d9f93d9f15ba55a13dd033ce2936f88b36b7a8dd948d1b0"
+    },
+    "lean/Holonics/Physics/Thermal/ViscousPort.lean": {
+      "bytes": 8226,
+      "sha256": "7b55724fce2bd05e62922f806e1e1229a84792b35102413875b46f9f6e09803a"
+    },
+    "lean/Holonics/Physics/Thermal.lean": {
+      "bytes": 1824,
+      "sha256": "ab980e28975c588afab8718d16cc06e65b7def4f35b207c572bdb7087414d57d"
+    },
+    "lean/Holonics/Physics/TwoCellEntropyTransport.lean": {
+      "bytes": 2876,
+      "sha256": "981c2a1b0699ede513d30fe696fa1fceef762b54d0ef74b19b27bc66014dc1f5"
+    },
+    "lean/Holonics/Physics/TwoFaceConstitutive.lean": {
+      "bytes": 12863,
+      "sha256": "c13a374e541b4fe1863d4402cc14b1e496776e7b3efd074026e0a0758455cd7a"
+    },
+    "lean/Holonics/Physics/Wave/Energy.lean": {
+      "bytes": 18467,
+      "sha256": "0a85c5443ff62ef5f8d85377efa0a1b69f402ecdeb0c5a597672dbbfa32b995b"
+    },
+    "lean/Holonics/Physics/Wave/Interference.lean": {
+      "bytes": 11304,
+      "sha256": "24d255e4db171142f84893b6d4bccfa4466f21b652a2b49aa189a456c82aa33e"
+    },
+    "lean/Holonics/Physics/Wave/Radiation.lean": {
+      "bytes": 7928,
+      "sha256": "447d720aa2faac29b9571cdb5bd6dc12f3255b9036c009f9d840640778cdf1f5"
+    },
+    "lean/Holonics/Physics/Wave/Telegrapher.lean": {
+      "bytes": 19528,
+      "sha256": "c6e5388d5d7ccbaa9c4d94eed4d896fff2c831d91b79fce3c8f1343a4102cb3a"
+    },
+    "lean/Holonics/Physics/Wave.lean": {
+      "bytes": 1109,
+      "sha256": "9f3211fc49419edc5e0600d040f1e5a50b00fd71fd4500314bab7440b5d14363"
+    },
+    "lean/Holonics/Transport/AccumulatedReceiverDefect.lean": {
+      "bytes": 3260,
+      "sha256": "57be57b472109a1b718545fe4d8a8de62ba27277ae9785c28d56584419a00c2e"
+    },
+    "lean/Holonics/Transport/AddressedLinearizedPassage.lean": {
+      "bytes": 4926,
+      "sha256": "5d86a65e6de31b066919ae898e40e4fc203dcc78981d69f0cab269b3cd22fe60"
+    },
+    "lean/Holonics/Transport/AffineJointBall.lean": {
+      "bytes": 5072,
+      "sha256": "633eb05f622874f2559fc45105c9c9ad822475e33e0a7b53eb3e2fb4c01577f0"
+    },
+    "lean/Holonics/Transport/CellHolonomy.lean": {
+      "bytes": 6346,
+      "sha256": "14da070a4bf02580cb67c3c4bfa06c52b5ea3b4593b8e7032f82edbcf307343c"
+    },
+    "lean/Holonics/Transport/ChangingReceiver/Defect.lean": {
+      "bytes": 7493,
+      "sha256": "0fd69509667e6e3b3cee7c9ef853e29236c67c4f6c205dd1571b9bce4945c950"
+    },
+    "lean/Holonics/Transport/ChangingReceiver.lean": {
+      "bytes": 12889,
+      "sha256": "076349edd4c133d8b48aab35398a8ff74fc183afa5c8c18997eeec217f5b0483"
+    },
+    "lean/Holonics/Transport/ContactFactorScale.lean": {
+      "bytes": 6657,
+      "sha256": "6ef119fcc6dd014d17b9de8b466adaf35fc7ecd41d6f8917c491b39db3b4d69f"
+    },
+    "lean/Holonics/Transport/ContinuingTube.lean": {
+      "bytes": 83715,
+      "sha256": "f57f3e421b0c44cabb6bb03f310947313fcebda35b9eb2d40b31c73a602d9410"
+    },
+    "lean/Holonics/Transport/EditRigidity.lean": {
+      "bytes": 45283,
+      "sha256": "e44abd1ca8fddb1e6bee9c04b646dbe0b13ca5b2d1d7e825b38223d46acdfd96"
+    },
+    "lean/Holonics/Transport/GaussianRebase.lean": {
+      "bytes": 2143,
+      "sha256": "e982f5a959a7a3cc61a45037eb2411fb0fcae4786643fe7a2ed099c978b53c31"
+    },
+    "lean/Holonics/Transport/HelicalPairInteraction.lean": {
+      "bytes": 22961,
+      "sha256": "5408e033f4d0d3adf22e75d01811d172752222a54ea0d762d2facf102f8cdd58"
+    },
+    "lean/Holonics/Transport/HolonicChain.lean": {
+      "bytes": 37800,
+      "sha256": "4a15b8fb9743c3a3aee1c497804d418f18eaa4d83072b9dcd9abb5ad3352b4a1"
+    },
+    "lean/Holonics/Transport/HolonicComposition.lean": {
+      "bytes": 18005,
+      "sha256": "b2c95f51ec8c6d23e03df8e489d9233edc29073fa2bc314ec824eef88eb1912e"
+    },
+    "lean/Holonics/Transport/HolonicInteraction.lean": {
+      "bytes": 31518,
+      "sha256": "ed7aeaa89a12c73b32983536eaffd3b6369951fd55f8143afd5ef16bd455f1b5"
+    },
+    "lean/Holonics/Transport/HolonicPortResolvedBoundaryTransport.lean": {
+      "bytes": 9597,
+      "sha256": "cfe66b032df3beb3c005de1bacf8bbc45028ce3f7fd3376c22c4ab58b5e4691b"
+    },
+    "lean/Holonics/Transport/JetStaircase.lean": {
+      "bytes": 12810,
+      "sha256": "f1ed86d4743f8bb81af3abfd5d281066119677d09e6e7008e0f93ae5b4c0257f"
+    },
+    "lean/Holonics/Transport/JunctionLaw.lean": {
+      "bytes": 38245,
+      "sha256": "13873cd62573aa758e75691cfc17c2dc30365db7954914fff282d66143f4fcb4"
+    },
+    "lean/Holonics/Transport/NavigatorMachineCharts.lean": {
+      "bytes": 17013,
+      "sha256": "ea4cdaac09e6d3d5acb4321a51a53a9cdbbfdfdc730072b07fc87d23c1bf0589"
+    },
+    "lean/Holonics/Transport/NavigatorTraceFaces.lean": {
+      "bytes": 8743,
+      "sha256": "49e223eb8c3d5b8bc950ae13d4a80a3e0d2c4d2e0c487ff08abe699a2972b849"
+    },
+    "lean/Holonics/Transport/PairJointBall.lean": {
+      "bytes": 4203,
+      "sha256": "f7cd65b1a8960a5c46b47c13a3e1b4b7ec45e076fadc4e3d45093805284ea667"
+    },
+    "lean/Holonics/Transport/ReceiverPotential.lean": {
+      "bytes": 12836,
+      "sha256": "2c5834af87a5ce8f40818198e63e1ffd56914e6ec11488ac17d58aedc8355e99"
+    },
+    "lean/Holonics/Transport/ReflectiveContinuation.lean": {
+      "bytes": 9491,
+      "sha256": "dc0c78305c61655355cd5a2286de710f4337a6fcb0fc1965db1452a5a0344345"
+    },
+    "lean/Holonics/Transport/SerialScrewChain.lean": {
+      "bytes": 9571,
+      "sha256": "df6c97094a357b30226d4617e7d9d86f832cc81fe320a0a5e186dd8d6eea6051"
+    },
+    "lean/Holonics/Transport/SituatedReturnedDifference.lean": {
+      "bytes": 3087,
+      "sha256": "a8d1d4a933eae5f2ea504fac1cb8712eea4c8746da20309f3589205ac7d4f2e4"
+    },
+    "lean/Holonics/Transport/SourceMoment.lean": {
+      "bytes": 17733,
+      "sha256": "095b84a43b14e2768eb32d72d0bdabd63d7a931cfde8ab2dc92a3591ff6fd15e"
+    },
+    "lean/Holonics/Transport/WorldTube.lean": {
+      "bytes": 14968,
+      "sha256": "228513f830b91a54a47caee583f7c744b2a22a7bcedec65787927bc0c08a4549"
+    },
+    "lean/Holonics/Transport/WorldTubePotential.lean": {
+      "bytes": 17338,
+      "sha256": "b92403d345aadf42c58e0e39b73edbd07da93a28f25d889d6eab8914c3cd0056"
+    },
+    "research/notebook/hnn_design/README.md": {
+      "bytes": 125210,
+      "sha256": "5b2e984e5f904f0c189f437835a995c1bd0a26672f7b817f0885aa2f10110e56"
+    },
+    "research/notebook/hnn_design/anchor_memory.py": {
+      "bytes": 5770,
+      "sha256": "b115fb1f1a4eaefaa05badad29839896d11f3639bf2ea12b2607fcf1fb6bfd57"
+    },
+    "research/notebook/hnn_design/athena_file_checkpoint.py": {
+      "bytes": 11337,
+      "sha256": "5f3c43b222981725aaa3ebfecd38748fc2274fbc9999a6621b2b00612463179b"
+    },
+    "research/notebook/hnn_design/athena_file_checkpoint_tests.py": {
+      "bytes": 7095,
+      "sha256": "e1aa5920de74b6da907484c4734c02261cf5404ec007892a1cf781ed533c790d"
+    },
+    "research/notebook/hnn_design/athena_file_protocol.py": {
+      "bytes": 10799,
+      "sha256": "b0d5e780d7639c478562cb63aeaf7615fa27e6a54ef7c5f38e0c28a334ddea53"
+    },
+    "research/notebook/hnn_design/athena_file_protocol_tests.py": {
+      "bytes": 8786,
+      "sha256": "c5cc1ef2d832eb71a0c18efb7c04c00668db6e5484252a7885320b618ad9c1c9"
+    },
+    "research/notebook/hnn_design/athena_protocol.py": {
+      "bytes": 15724,
+      "sha256": "30d770274159e4f5f9212706334e54af3f3a7e9ad1f9a76f3829f919ae02e0ca"
+    },
+    "research/notebook/hnn_design/athena_protocol_tests.py": {
+      "bytes": 12415,
+      "sha256": "df681db0efef495f5972d37b3f4af1140fa5aa8b78216369c6051c7abe694dab"
+    },
+    "research/notebook/hnn_design/bank_causes_probe/eF_confirmation_counts.py": {
+      "bytes": 2047,
+      "sha256": "5d9f8c13d7e96dc4f45d5f7c9a61bbf211771ada328857f013a4c71b474fd1bd"
+    },
+    "research/notebook/hnn_design/bank_causes_probe/eM_section_shapes.py": {
+      "bytes": 2107,
+      "sha256": "a8123a4bf66a7e076049ccd9c47a0d1d4af7719bbf969b17bf61a232452fa2a3"
+    },
+    "research/notebook/hnn_design/base_measure.py": {
+      "bytes": 4231,
+      "sha256": "74fe985360826e4599408574e193bda8b58d71e85b9801900eccd07c9ef8ebcd"
+    },
+    "research/notebook/hnn_design/context_orders.py": {
+      "bytes": 2647,
+      "sha256": "a66092338e124c4c2b0a9d0db0b5d180492d698a6afede4e6e72c61c5fe331f6"
+    },
+    "research/notebook/hnn_design/curated_incidence.py": {
+      "bytes": 7541,
+      "sha256": "6bdd3addc8a50f1ec30c92e5788ad6a36a4c6f00208b04313ac666c7db85dce8"
+    },
+    "research/notebook/hnn_design/curated_source.py": {
+      "bytes": 25995,
+      "sha256": "64a8a4d6660539499f3fb91e422b4c8f42072f70c68f85b2a4c6923142242792"
+    },
+    "research/notebook/hnn_design/development_families.py": {
+      "bytes": 23297,
+      "sha256": "4c1e75ed8bafc3ebc699809f6951522d1cd84777382b19193b9c10ec3ee084fc"
+    },
+    "research/notebook/hnn_design/exterior.rs": {
+      "bytes": 35307,
+      "sha256": "91714b1c01dd9101c7ed47e66fc980c0461282d6f84329c1f2b1d0a94bcc54fb"
+    },
+    "research/notebook/hnn_design/f5_context.py": {
+      "bytes": 12663,
+      "sha256": "7272fcba15d62e9a34a88373d1dcccaddf7dc954a1ca7e731c51e4fdc1bd5c82"
+    },
+    "research/notebook/hnn_design/f5_context_tests.py": {
+      "bytes": 5813,
+      "sha256": "2fe71cf1ba49002fe25321ca382e4ecc281faf411af9ffea4ef5d215453dae0f"
+    },
+    "research/notebook/hnn_design/family_passage.py": {
+      "bytes": 7168,
+      "sha256": "eda731b6ba30e7e323f590ca2220bab490f06a6eee66f6c3739c499d4211111f"
+    },
+    "research/notebook/hnn_design/field_ceiling.py": {
+      "bytes": 5070,
+      "sha256": "7a4a9129b2378ab676d967f717e28e5b5ba58996cabf44213429d165d3dbc307"
+    },
+    "research/notebook/hnn_design/hnn_chase.rs": {
+      "bytes": 85402,
+      "sha256": "956863c53d52a35a8083d1f984b3d55ff778249cdf4ac02cd8ca6318e68c0c2d"
+    },
+    "research/notebook/hnn_design/hnn_executed_loop.rs": {
+      "bytes": 38885,
+      "sha256": "301810d848cd641452a796b49908cb8a2ba4104fb1f08643a2408a460d5e458f"
+    },
+    "research/notebook/hnn_design/hnn_exposure.rs": {
+      "bytes": 90883,
+      "sha256": "d47a90aa95aea5cdb079f9c0b87bd343c5a528b20f6365b547336c12bb9a0dc1"
+    },
+    "research/notebook/hnn_design/hnn_keys_loop.rs": {
+      "bytes": 18016,
+      "sha256": "6f59edaaf1f65b70bd9f95d52b0bddcbd4490c5ffb7189da2b3482c2990b84ca"
+    },
+    "research/notebook/hnn_design/hnn_prediction.rs": {
+      "bytes": 18298,
+      "sha256": "ad5d4d634c5de368fa54b09e97bfc0a65a0913354351d4a697e4079c80229a53"
+    },
+    "research/notebook/hnn_design/hnn_repair_loop.rs": {
+      "bytes": 31204,
+      "sha256": "76d7123a14ec3d01957a125f299a2195569ce39f04c470c05ccde3b120148d69"
+    },
+    "research/notebook/hnn_design/hnn_text_repair.rs": {
+      "bytes": 1559,
+      "sha256": "87504e1f1acbca3c14c324cb22f1c6e4a5d1d168f9001b5268c2ce3b1bc58251"
+    },
+    "research/notebook/hnn_design/hnn_transport_loop.rs": {
+      "bytes": 16839,
+      "sha256": "f35724e4b9d1a6035eb0db7ae5acbfa02407e018fdbca7c78f0796642fac17d7"
+    },
+    "research/notebook/hnn_design/latch_letters.py": {
+      "bytes": 4276,
+      "sha256": "c790ac37e56794617d9bcf3f4ddd1c1341c43a0026872db4a3d3dcdf4273900c"
+    },
+    "research/notebook/hnn_design/leaf_counts.py": {
+      "bytes": 3243,
+      "sha256": "5f863feef27a76a14b98498652a01436fd7a1d457bd3da6636a4526ab1c33f1b"
+    },
+    "research/notebook/hnn_design/receiver_combined.py": {
+      "bytes": 4511,
+      "sha256": "56be653425a4b16ad5bdfd3a07c6098b41b04022bb87a88852e76d3358fbc764"
+    },
+    "research/notebook/hnn_design/receiver_fisher_exact.py": {
+      "bytes": 2057,
+      "sha256": "a3da39d040105ae949816d3971c218ee23b682d5de53089f57c20f1344a34afc"
+    },
+    "research/notebook/hnn_design/receiver_nonlinear.py": {
+      "bytes": 7648,
+      "sha256": "f2c119e9431ed694f9bf271fdbac12a1de579928afe1fe642e1406525d2b6b11"
+    },
+    "research/notebook/hnn_design/receiver_online_sim.py": {
+      "bytes": 2307,
+      "sha256": "84e4b4f00b585dd91430ff2a2bf971a9d3d50db3e8895ae891e8c0fc6150962c"
+    },
+    "research/notebook/hnn_design/receiver_oracle.py": {
+      "bytes": 4817,
+      "sha256": "576fcb6083c58f7e0926b7891351ab79153e69ea86bf39a64cdff62e87e45e84"
+    },
+    "research/notebook/hnn_design/receiver_prior_scale.py": {
+      "bytes": 7989,
+      "sha256": "b5a80bdf214cbd8e36947e51722cbfb5754c1baaa4f0fa71259a06681cb3e903"
+    },
+    "research/notebook/hnn_design/regime_letters.py": {
+      "bytes": 4606,
+      "sha256": "7b71ac59e904671b7a9a7b9e378f5fe65f1a56db0cc97dbdcd698d9f5ba3d69b"
+    },
+    "research/notebook/hnn_design/segment_terms.py": {
+      "bytes": 1384,
+      "sha256": "9ae3d868e866847b7276442d4ba74b253892cbeb124264559f896c975aa70da3"
+    },
+    "research/notebook/hnn_design/sheet_letters.py": {
+      "bytes": 4988,
+      "sha256": "ef59265188e7c51593fef2f1b0dfe5f4075fdc69bdf640e6a1be892feff77bb4"
+    },
+    "research/notebook/hnn_design/standing_cut.py": {
+      "bytes": 6965,
+      "sha256": "b228736c1acf3e6c99be2fd02ab4340d35c1f4a913cd8631a6a294b8ba2b356d"
+    },
+    "research/notebook/hnn_design/tree_base.py": {
+      "bytes": 4017,
+      "sha256": "9f433e00200390dc84e5a169e4bfb2c73fce83856f0b18a3026fd94d8463dcf6"
+    },
+    "research/notebook/hnn_design/tree_estimator.py": {
+      "bytes": 5694,
+      "sha256": "378a7d5c301659b3ddd07ad903866e95d6df7fc689117acef8143bd2b8488f9f"
+    }
+  },
+  "physical_consumer_predecessor_commit": "280fa010e6c12edd71276520470cfc29e527c6c8",
+  "new_coupled_domain_source_included": false,
+  "wall_ns": 235512139,
+  "peak_RSS_KiB": 23332,
+  "original_owner_changed_by_queue": false
+}

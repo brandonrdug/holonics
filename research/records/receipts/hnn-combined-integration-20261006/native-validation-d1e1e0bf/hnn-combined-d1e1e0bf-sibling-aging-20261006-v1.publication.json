@@ -1,0 +1,54 @@
+{
+  "lease_still_held": true,
+  "own_group_other_PIDs": [],
+  "outcome": {
+    "provisional_passed": true,
+    "final_acceptance_requires_external_CPU_read": true,
+    "label": "hnn-combined-d1e1e0bf-sibling-aging-20261006-v1",
+    "wall_ns": 9102214,
+    "peak_child_RSS_KiB": 14500,
+    "group_memory_peak_bytes": 13459456,
+    "original_coordinates_modified": false,
+    "aggregate_cpu_final_us": 98034,
+    "aggregate_cpu_limit_us": 17000000,
+    "CPU_kernel_hard_total_limit": false
+  },
+  "outputs": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-combined-d1e1e0bf-sibling-aging-20261006-v1.lease-identity.json": {
+      "sha256": "adc83a6147d69df23df81323bb070a34ee6325401caf714621c59b3acef7986e",
+      "bytes": 565
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-combined-d1e1e0bf-sibling-aging-20261006-v1.memory-gate.json": {
+      "sha256": "8b98b5d213181b29ccd5de8f6224eb851eb082f5ac7af93ff1298094ba81aa39",
+      "bytes": 120
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-combined-d1e1e0bf-sibling-aging-20261006-v1.child-identity.json": {
+      "sha256": "3b574d3c26668120c1f3e8645a5b0af4452cf1934172bf18cf0bd63c65013eab",
+      "bytes": 78
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-combined-d1e1e0bf-sibling-aging-20261006-v1.system-floor.json": {
+      "sha256": "16892b469d27bafb461f315d798ae2c3aff99ab93d55ca22259ee4967fe9fe02",
+      "bytes": 197
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-combined-d1e1e0bf-sibling-aging-20261006-v1.quiescence.json": {
+      "sha256": "5fbf71f420b506d5eefd6abf846973f2ca207870857eed5038b507f00f713502",
+      "bytes": 130
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-combined-d1e1e0bf-sibling-aging-20261006-v1.input_seal.json": {
+      "sha256": "7b83d51898d193d6da680f4bbb971a5b1cf53882e3000cba4ac4d0441b149be5",
+      "bytes": 62084
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-combined-d1e1e0bf-sibling-aging-20261006-v1.output_seal.json": {
+      "sha256": "e0b1650114706e2adf135ee74f37d983371989a157286a36708065493053fe32",
+      "bytes": 2047
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-combined-d1e1e0bf-sibling-aging-20261006-v1.stdout": {
+      "sha256": "123f5ea60832ed0e3fc310901b36ab081bf15a4db0b0c146dd28f795f93f2400",
+      "bytes": 213
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-combined-d1e1e0bf-sibling-aging-20261006-v1.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  }
+}
