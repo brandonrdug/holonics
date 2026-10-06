@@ -105,6 +105,21 @@ joins ratio nonclosure, turn/boost normality and six owed statements. Recursive 
 the RH source-law join remain target work alongside Hodge and complex Euler/Navier–Stokes;
 they are not a proved RH consequence of the component receipts.
 
+[definition; agent-inferred from the consuming relations above] **Next physical-learning receipt.**
+The Codex HNN coordinator owns its source/acceptance integration; the physical source/receiver
+consumer joins the charted source-opening and receiving-error pullbacks to the reached deposit;
+the CUDA consumer owns matching parity through the common build queue. The opening receipt
+`E_after − E_before = imposed − absorbed` is an energy reading, not that complete adjoint join.
+The next receipt keeps the producing chart, clock, clamps, damaged-cell partition, cohort, seed
+and mechanism fixed across its declared comparison and names each contemporary constitution and
+its producing covector. It reports which distinguishing
+relations changed after deposition and which persist through cold continuation. A common-class
+majority or a total assembled from different cohorts cannot establish acquisition. The
+[pair-gain regressions](../research/records/2026-10-05_THE_PAIR_GAIN_IS_THE_JOINED_BANKS_LOG_DETERMINANT.md)
+and [reflection repair](../research/records/2026-10-05_REPAIR_BY_REFLECTION_THE_LOCATED_PAIR_RESTRICTS_THE_ERASED_CELLS_FROM_BOTH_SIDES.md)
+keep their separate claims. #62 retains formal source/receiver squares; #73 consumes the native
+learning relation; #76 consumes its device equivalent; #148 requires the actual useful boundary.
+
 [definition] **Use of a Holon's material across an event boundary.** These are admissibility
 conditions on a Holon's existing ports, element relations and admitted futures, not a separate
 parameter object. An occurrence may be copied only when the relation at that interface supplies a

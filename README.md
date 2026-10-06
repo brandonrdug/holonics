@@ -131,6 +131,20 @@ scores, component tests and restore fixtures each establish their own narrower c
 output, whole, decides usefulness; the spent diagnostic split stays spent, and the separate
 evaluation partition stays closed.
 
+**The next learning receipt must distinguish the relations learned.** Keep each source head,
+producing chart, cohort, seed, damage and mechanism with its own result. The
+[pair-gain receipt](research/records/2026-10-05_THE_PAIR_GAIN_IS_THE_JOINED_BANKS_LOG_DETERMINANT.md)
+explicitly measures regressions on repeated request spaces; the
+[reflection-repair receipt](research/records/2026-10-05_REPAIR_BY_REFLECTION_THE_LOCATED_PAIR_RESTRICTS_THE_ERASED_CELLS_FROM_BOTH_SIDES.md)
+uses separate damage/read cohorts. Their totals do not form one U6 acceptance bar. A result
+dominated by the common class does not establish acquired relations: report the distinguishing
+damaged cells and intact clamps, compare the same declared source/receiver task before and after
+reached deposition on the respective contemporary material, and check the retained result through
+cold continuation. The physical consumer still
+needs the charted source-opening and receiving-error pullbacks joined at their producing operands;
+the published opening balance alone does not establish that learning path. This public status
+credits completion only at published source and consuming receipts.
+
 The [foundation supplement](docs/plans/HNN_ATHENA_FOUNDATION.md) joins dynamic geometry, asymmetric
 potentials and receiver-relative tolerance to the existing owners. An asymmetric potential is a
 constitutive proposal; its generic adaptive HNN consumer is not established by the symmetric
