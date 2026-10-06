@@ -1,0 +1,94 @@
+{
+  "base": "494688777d153847b18dd14149f131763f5b2978",
+  "status": "source/static only, native/type pending",
+  "source_pins": {
+    "crates/holonics/src/hnn/moment.rs": {
+      "bytes": 114255,
+      "sha256": "2585d881e1b3e7584a5982bc54107f8d79233de9a65dd423e6b515e2a48a548a"
+    },
+    "crates/holonics/src/hnn/prediction.rs": {
+      "bytes": 147665,
+      "sha256": "7830ff1a0aeb024c0e7465cd47c8b99a8105c880c490c35382071c4e7b5e0384"
+    },
+    "crates/holonics/src/hnn/tests/prediction.rs": {
+      "bytes": 147036,
+      "sha256": "e878ca97d8cd76d3a277d4cea85d0954fb2a651775a8eb4ce13b968b67f613b3"
+    }
+  },
+  "generic_owners_body_unchanged": {
+    "continued": true,
+    "ingest": true
+  },
+  "protected_owners_exact_bytes_unchanged": {
+    "crates/holonics/src/hnn/reference.rs": {
+      "bytes": 220442,
+      "sha256": "9800117d77ca85642e607264897a9974aee3b2e9659392a4512ce4aba8cd13d8"
+    },
+    "crates/holonics/src/hnn/constitution.rs": {
+      "bytes": 433201,
+      "sha256": "951580ec936cb5948c239a9f3006130809df2111be412beb85831c8fcda5caaa"
+    },
+    "crates/holonics/src/hnn/encoding.rs": {
+      "bytes": 59224,
+      "sha256": "50152ce0f52a501ec08e9cd0b7981950f8173ec4dcfe5a66286ad48d94bf9739"
+    },
+    "crates/holonics/src/hnn/receiving.rs": {
+      "bytes": 79239,
+      "sha256": "10cea7efc861f33530ec65bf3a901726850ae2677dfc2d622e494de9359abac4"
+    },
+    "crates/holonics/src/hnn/field.rs": {
+      "bytes": 117656,
+      "sha256": "c7a556a2eec3007d0885292123aedda383f61fa48914cb334b8c8c8cb3991c00"
+    },
+    "crates/holonics/tests/source_entrance.rs": {
+      "bytes": 19074,
+      "sha256": "5308ebf2d6cba10019952e1e9023d3b085349d12b3c6df61833cba8b863d9baf"
+    },
+    "lean/Holonics/HNN/ReframedMoment.lean": {
+      "bytes": 8704,
+      "sha256": "4ffc65a60f4e72c8bc63c637d7e6480ada2e8721a002e53c487635e64cd93f2e"
+    },
+    "research/notebook/hnn_design/hnn_repair_loop.rs": {
+      "bytes": 31329,
+      "sha256": "2939d7c6adf418e51ee9556a63ca2e9f815d9d8986f30b527a94312e31e22d94"
+    }
+  },
+  "physical_module_exact_names": [
+    "hnn::tests::prediction::physical_repair::the_damaged_section_runs_through_the_field_and_every_erasure_is_held_unresolved",
+    "hnn::tests::prediction::physical_repair::the_section_carries_no_erased_class_so_the_repair_cannot_read_one",
+    "hnn::tests::prediction::physical_repair::a_point_leader_does_not_replace_a_plural_coupled_domain",
+    "hnn::tests::prediction::physical_repair::a_station_no_declared_crossing_reads_is_held_unread",
+    "hnn::tests::prediction::physical_repair::equal_class_counts_do_not_join_different_producing_charts",
+    "hnn::tests::prediction::physical_repair::total_erasure_preserves_the_producing_chart_and_refuses_located_conduct_before_opening",
+    "hnn::tests::prediction::physical_repair::identity_conduct_must_certify_the_station_clock_even_at_erased_stations",
+    "hnn::tests::prediction::physical_repair::the_producing_decoder_and_both_physical_maps_are_joined_before_opening",
+    "hnn::tests::prediction::physical_repair::the_supported_physical_passage_continues_on_its_retained_interior_and_clock",
+    "hnn::tests::prediction::physical_repair::physical_teaching_changes_r_and_the_later_carried_receiving_read",
+    "hnn::tests::prediction::physical_repair::physical_teaching_refuses_a_stale_material_or_foreign_chart_and_preserves_the_carry",
+    "hnn::tests::prediction::physical_repair::the_actual_leaky_source_return_changes_e_before_the_next_target_free_carried_word",
+    "hnn::tests::prediction::physical_repair::source_teaching_refuses_a_zero_return_and_a_reached_uncertified_quartic",
+    "hnn::tests::prediction::physical_repair::the_coupled_quartic_tube_encloses_every_admitted_missing_class",
+    "hnn::tests::prediction::physical_repair::the_actual_leaky_completion_chart_encloses_mixed_classes_and_an_erased_age_endpoint",
+    "hnn::tests::prediction::physical_repair::a_blind_later_quartic_passage_releases_only_a_constant_learned_domain_image",
+    "hnn::tests::prediction::physical_repair::the_retained_physical_reader_reports_distinct_observations_and_matched_source_controls",
+    "hnn::tests::prediction::physical_repair::the_station_pair_source_preserves_actual_offsets_and_refuses_a_reused_opening",
+    "hnn::tests::prediction::physical_repair::the_station_pair_box_contains_all_mixed_unit_and_rounded_leaky_features",
+    "hnn::tests::prediction::physical_repair::a_declared_station_pair_reaches_the_native_word_and_separates_a_marginal_alias",
+    "hnn::tests::prediction::physical_repair::the_joint_pair_physical_tube_contains_every_mixed_completed_word_read",
+    "hnn::tests::prediction::physical_repair::the_retained_reader_reports_matched_material_carry_and_absent_source_controls"
+  ],
+  "physical_module_count": 22,
+  "new_controls": [
+    "the_station_pair_source_preserves_actual_offsets_and_refuses_a_reused_opening",
+    "the_station_pair_box_contains_all_mixed_unit_and_rounded_leaky_features",
+    "a_declared_station_pair_reaches_the_native_word_and_separates_a_marginal_alias",
+    "the_joint_pair_physical_tube_contains_every_mixed_completed_word_read",
+    "the_retained_reader_reports_matched_material_carry_and_absent_source_controls"
+  ],
+  "new_native_Words": 48,
+  "new_source_only_feature_oracle_completions": 64,
+  "unmodified_existing_fixture_operands": true,
+  "pair_coefficients_not_learned": true,
+  "old_projection_or_results_not_reassigned_to_new_source": true,
+  "native_runtime_or_compiler_started_here": false
+}

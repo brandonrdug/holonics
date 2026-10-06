@@ -1564,6 +1564,128 @@ impl SourceMoment {
         Ok(passage)
     }
 
+    /// [definition; agent-inferred, October 6] A fresh physical station section, on the
+    /// source clock certified by `DamagedSection::admit`: first marginals are exactly
+    /// [`Self::continued`], with each declared offset's actual intact pair additionally counted.
+    /// At station j the current endpoint is x, the earlier endpoint at j-delta is y, and its
+    /// slot is ((tau+1+j) mod d, x, y). A hole is never compressed out or guessed. The pair
+    /// enters at the current endpoint's existing end-framed age, over its own pair population.
+    /// Only this fresh section is admitted: request/section cross pairs belong to `ingest`.
+    /// The consumer is `prediction::physical_forward -> open_storage -> PairPort -> same Word`.
+    /// This adds no pair-coefficient learning; its reached factor-step certificate is separate.
+    pub(crate) fn station_section(
+        &self,
+        field: &Field,
+        current: &Current,
+        ring: usize,
+        cells: &[Option<usize>],
+    ) -> Result<Self, HnnError> {
+        self.admit_fresh_station_section(field, current, ring, cells)?;
+        let mut passage = self.continued(field, current, ring, cells)?;
+        let phase = current.phase(field, ring)? as usize;
+        let a = passage.alphabet;
+        let counts = passage.rings.iter_mut().find(|counts| counts.ring == ring)
+            .ok_or(HnnError::MissingSourcePort { ring })?;
+        for (index, &offset) in passage.offsets.iter().enumerate() {
+            for station in offset..cells.len() {
+                let (Some(x), Some(y)) = (cells[station], cells[station-offset]) else { continue };
+                let slot = (((phase + 1) + station % counts.period) % counts.period) * a * a + x * a + y;
+                bump(&mut counts.offset[index][slot])?;
+                if let Some(leaky) = &mut counts.leaky {
+                    Leaky::enter(&mut leaky.offset[index], slot, leaky.unit, &leaky.modulus,
+                        counts.extent - 1 - station as u64);
+                }
+            }
+        }
+        Ok(passage)
+    }
+
+    fn admit_fresh_station_section(
+        &self, field: &Field, current: &Current, ring: usize, cells: &[Option<usize>],
+    ) -> Result<(), HnnError> {
+        self.admit_partition(field)?;
+        let counts = self.counts(ring)?;
+        if (0..self.alphabet).any(|class| !field.ring(ring).fits(field.ring(ring).port(class)))
+            || (0..ring).any(|g| (0..self.alphabet)
+                .any(|class| field.ring(g).fits(field.ring(g).port(class))))
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "the physical station source has no class-independent unit clock",
+            });
+        }
+        if self.opening.as_slice() != current.lift() || self.clock_cells != 0 || self.reframed || self.located
+            || counts.start != current.phase(field, ring)? || counts.end != counts.start
+            || counts.ticks != 0 || counts.extent != 0
+            || counts.first.iter().any(|&n| n != 0)
+            || counts.offset.iter().flatten().any(|&n| n != 0)
+            || counts.leaky.as_ref().is_some_and(|leaky|
+                !leaky.first.is_empty() || leaky.offset.iter().any(|map| !map.is_empty()))
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "the physical station source requires its fresh immutable opening",
+            });
+        }
+        u64::try_from(cells.len()).map_err(|_| HnnError::CountOverflow)?;
+        if let Some(code) = cells.iter().flatten().copied().find(|&code| code >= self.alphabet) {
+            return Err(HnnError::CellOutside { code, alphabet: self.alphabet });
+        }
+        Ok(())
+    }
+
+    /// Coordinate enclosure of every complete station source's one offset table. Forced
+    /// intact-intact edges give a lower count; every compatible ordered pair gives an upper
+    /// count. Shared hole constraints may widen this box, never shrink it. Unit denominator
+    /// is N-delta; leaky denominator is sum_j nearest(U*rho^(N-1-j)), independent of classes.
+    /// The same Leaky entry and monotone population chart as the forward are consumed; no
+    /// monochrome completion is substituted for mixed pair slots. No candidate Word is run.
+    #[allow(clippy::type_complexity)]
+    pub(crate) fn station_pair_bounds(
+        &self, field: &Field, current: &Current, ring: usize,
+        cells: &[Option<usize>], offset: usize,
+    ) -> Result<Option<(Vec<Vec<Rat>>, Vec<Vec<Rat>>)>, HnnError> {
+        self.admit_fresh_station_section(field, current, ring, cells)?;
+        if !self.offsets.contains(&offset) { return Err(HnnError::Offset { offset }) }
+        let counts = self.counts(ring)?;
+        let a = self.alphabet;
+        let phase = current.phase(field, ring)? as usize;
+        let mut lower = vec![vec![BigInt::zero(); a*a]; counts.period];
+        let mut upper = lower.clone();
+        if cells.len() <= offset {
+            let zero = vec![vec![Rat::zero(); a*a]; counts.period];
+            return Ok(Some((zero.clone(), zero)));
+        }
+        let mut mass = BigInt::zero();
+        for station in offset..cells.len() {
+            let weight = if let Some(leaky) = &counts.leaky {
+                let mut entry = BTreeMap::new();
+                Leaky::enter(&mut entry, 0, leaky.unit, &leaky.modulus,
+                    (cells.len()-1-station) as u64);
+                entry.remove(&0).unwrap_or_else(BigInt::zero)
+            } else { BigInt::one() };
+            mass += &weight;
+            let phase = ((phase+1) + station % counts.period) % counts.period;
+            let (x, y) = (cells[station], cells[station-offset]);
+            for current_class in 0..a {
+                if x.is_some_and(|x| x != current_class) { continue }
+                for earlier_class in 0..a {
+                    if y.is_some_and(|y| y != earlier_class) { continue }
+                    let slot = current_class*a + earlier_class;
+                    upper[phase][slot] += &weight;
+                    if x.is_some() && y.is_some() { lower[phase][slot] += &weight }
+                }
+            }
+        }
+        if cells.len() > offset && mass <= BigInt::zero() { return Ok(None) }
+        let chart = PopulationChart::of(field);
+        let normalize = |rows: Vec<Vec<BigInt>>| -> Vec<Vec<Rat>> { rows.into_iter().map(|row|
+            row.into_iter().map(|count| {
+                if mass.is_zero() { Rat::zero() }
+                else if counts.leaky.is_some() { chart.chart(&Rat::new(count, mass.clone())) }
+                else { Rat::from_integer(count) * chart.value((cells.len()-offset) as u64) }
+            }).collect()).collect() };
+        Ok(Some((normalize(lower), normalize(upper))))
+    }
+
     /// [definition; agent-inferred, October 4; the reception carry §10] **The moment's text**, a
     /// part of a continuing state: `moment n cursor rings profile` (the cells ingested, the held
     /// cells' cursor, the source rings counted, and the route profile, `identity` or `located` once

@@ -1666,7 +1666,7 @@ impl DamagedSection {
     /// no predecessor can deliver a carry. Erased classes then leave time declared but inject
     /// nothing. Located advances, even on an intact section, cannot be replaced by this square.
     /// A sparse located-clock fibre and its projection through the producing `D` remain owed.
-    /// All admission runs before `SourceMoment::continued` and the physical word's opening.
+    /// All admission runs before the fresh source section and the physical word's opening.
     fn admit(&self, field: &Field, material: &dyn FieldMaterial, phases: &ReceivingPhases) -> Result<(), HnnError> {
         field.admit(&self.chart)?;
         if self.chart.located().is_some() {
@@ -1698,6 +1698,19 @@ impl DamagedSection {
                 return Err(HnnError::Unadmitted {
                     reason: "the physical source map does not consume the producing chart's classes",
                 });
+            }
+            for &offset in field.offsets() {
+                let pair = material.pair_port(source, offset).ok_or(HnnError::Unadmitted {
+                    reason: "the station chart has no declared physical pair port",
+                })?;
+                if pair.outputs().iter().any(|row| row.len() != field.ring(source).width())
+                    || pair.current_reads().iter().chain(pair.earlier_reads())
+                        .any(|row| row.len() != self.classes())
+                {
+                    return Err(HnnError::Unadmitted {
+                        reason: "the physical pair port does not consume the producing chart's classes",
+                    });
+                }
             }
         }
         let ring = phases.ring();
@@ -1839,7 +1852,7 @@ fn physical_forward<'f>(
     let placed = section.placed();
     let mut source = SourceMoment::open_with(field, current, material)?;
     for &ring in field.sources() {
-        source = source.continued(field, current, ring, &placed)?;
+        source = source.station_section(field, current, ring, &placed)?;
     }
     // One accounted imposition, then the one continuing word through the declared crossings.
     let (mut word, opening_receipt) =
@@ -2089,11 +2102,15 @@ fn physical_opening_radius(
                 upper[coordinate] += values.iter().map(|value| &value[coordinate]).max().unwrap();
             }
         }
+        let Some((pair_lower, pair_upper)) =
+            physical_pair_source_bounds(field, material, current, section, ring)?
+        else { return Ok(None) };
         for coordinate in 0..geometry.width() {
-            radius.storage[ring][coordinate] = (&weight * &lower[coordinate]
+            radius.storage[ring][coordinate] = (&weight * &lower[coordinate] + &pair_lower[coordinate]
                 - &point.storage[ring][coordinate])
                 .abs()
-                .max((&weight * &upper[coordinate] - &point.storage[ring][coordinate]).abs());
+                .max((&weight * &upper[coordinate] + &pair_upper[coordinate]
+                    - &point.storage[ring][coordinate]).abs());
         }
     }
     Ok(Some(radius))
@@ -2136,8 +2153,8 @@ fn physical_leaky_source_bounds(
             return Ok(None);
         }
         transported_mass = Some(mass);
-        // A fresh continued section adds no offset pair, even if the field declares offsets.
-        // A future nonzero pair source has mixed-class extrema and cannot use these supports.
+        // These supports measure first marginals only. The separate ordered-pair box below
+        // consumes the joint family; monochrome supports cannot bound mixed pair slots.
         for &offset in field.offsets() {
             if moment.pair_population(ring, offset)? != 0 {
                 return Ok(None);
@@ -2182,6 +2199,59 @@ fn physical_leaky_source_bounds(
                 let at_upper = &column[coordinate] * &features_upper[phase][class];
                 lower[coordinate] += at_lower.clone().min(at_upper.clone());
                 upper[coordinate] += at_lower.max(at_upper);
+            }
+        }
+    }
+    let Some((pair_lower, pair_upper)) =
+        physical_pair_source_bounds(field, material, current, section, ring)?
+    else { return Ok(None) };
+    for coordinate in 0..geometry.width() {
+        lower[coordinate] += &pair_lower[coordinate];
+        upper[coordinate] += &pair_upper[coordinate];
+    }
+    Ok(Some((lower, upper)))
+}
+
+/// The declared pair ports on the complete source family's ordered-coordinate box. Their
+/// signed coefficients are combined before interval mapping, including cancellations between
+/// rank members. Phase/lift is the producing source's same transport square. This bounds
+/// every complete pair table, independently of first marginals; shared-hole correlations only
+/// widen the box. The opening radius also contains the separate actual sparse source point.
+#[allow(clippy::type_complexity)]
+fn physical_pair_source_bounds(
+    field: &Field, material: &dyn FieldMaterial, current: &Current,
+    section: &DamagedSection, ring: usize,
+) -> Result<Option<(Vec<Rat>, Vec<Rat>)>, HnnError> {
+    let geometry = field.ring(ring);
+    let a = section.classes();
+    let placed = section.placed();
+    let open = SourceMoment::open_with(field, current, material)?;
+    let mut lower = vec![Rat::zero(); geometry.width()];
+    let mut upper = lower.clone();
+    for &offset in field.offsets() {
+        let Some((feature_lower, feature_upper)) =
+            open.station_pair_bounds(field, current, ring, &placed, offset)?
+        else { return Ok(None) };
+        let pair = material.pair_port(ring, offset).ok_or(HnnError::MissingSourcePort { ring })?;
+        for phase in 0..geometry.placements().len() {
+            let lift = &current.lift()[ring] - BigInt::from(phase);
+            for slot in 0..a*a {
+                if feature_upper[phase][slot].is_zero() { continue }
+                let (x, y) = (slot/a, slot%a);
+                let mut column = vec![Rat::zero(); geometry.width()];
+                for rho in 0..pair.rank() {
+                    let coefficient = &pair.current_reads()[rho][x] * &pair.earlier_reads()[rho][y];
+                    for (entry, output) in column.iter_mut().zip(&pair.outputs()[rho]) {
+                        *entry += &coefficient * output;
+                    }
+                }
+                let column = geometry.rotate(&column, &lift);
+                for coordinate in 0..geometry.width() {
+                    let at_lower = &column[coordinate] * &feature_lower[phase][slot];
+                    let at_upper = &column[coordinate] * &feature_upper[phase][slot];
+                    lower[coordinate] += at_lower.clone().min(at_upper.clone());
+                    upper[coordinate] += at_lower.max(at_upper);
+                }
             }
         }
     }

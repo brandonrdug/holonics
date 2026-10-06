@@ -1311,6 +1311,7 @@ mod physical_repair {
         ConstitutionRead, CribDeclaration, Current, Field, FieldDeclaration, ReceiverDeclaration,
     };
     use crate::hnn::keys::{PairLocation, station_pairs};
+    use crate::hnn::moment::SourceMoment;
     use crate::hnn::prediction::{
         DamagedSection, PhysicalRepair, RepairedCell, Unresolved, repair_by_field,
     };
@@ -1342,13 +1343,17 @@ mod physical_repair {
     }
 
     fn field_with_lock(lock: Vec<u64>) -> Field {
+        field_with_lock_and_offsets(lock, Vec::new())
+    }
+
+    fn field_with_lock_and_offsets(lock: Vec<u64>, offsets: Vec<usize>) -> Field {
         Field::declare(
             FieldDeclaration {
                 rings: vec![ring(8, lock), ring(3, Vec::new())],
                 contacts: vec![contact(0, 1, 3, 0)],
                 loops: Vec::new(),
                 sources: vec![0],
-                offsets: Vec::new(),
+                offsets,
                 alphabet: 4,
                 step: integer(1),
                 exponent_grain: 1,
@@ -2722,6 +2727,235 @@ mod physical_repair {
         }
         // No output class, singleton, rank increase, fidelity or description-length decrease
         // is an acceptance requirement. The whole actual behavior is the diagnostic result.
+    }
+
+    /// A tensor-basis unit chart for a declared pair port, independent of any target/answer.
+    /// Its sixteen coordinates expose the four-by-four ordered pair table at a period-eight
+    /// source. The receiving chart exposes its first eight physical coordinates; no class
+    /// output is prescribed. This fixture tests the source-to-Word join, not learned pair material.
+    fn paired_chart(field: &Field) -> Constitution {
+        use crate::hnn::moment::PairPort;
+        let theta = quartic_material(field);
+        let a = field.alphabet();
+        let n = field.ring(0).width();
+        let rank = theta.pair_port(0, 1).unwrap().rank();
+        assert_eq!(rank, a*a);
+        assert_eq!(n, rank);
+        let basis = |length: usize, coordinate: usize| {
+            let mut row = vec![Rat::zero(); length];
+            row[coordinate] = integer(1);
+            row
+        };
+        let pair = PairPort::new(
+            (0..rank).map(|rho| basis(n, rho)).collect(),
+            (0..rank).map(|rho| basis(a, rho/a)).collect(),
+            (0..rank).map(|rho| basis(a, rho%a)).collect(),
+        ).unwrap();
+        let receiving = ExactRatMatrix::shaped(2*a, n,
+            (0..2*a).map(|coordinate| basis(n, coordinate)).collect()).unwrap();
+        theta.with_pair(0, 1, pair).unwrap()
+            .with_ports(0, None, None, Some(receiving)).unwrap()
+    }
+
+    #[test]
+    fn the_station_pair_source_preserves_actual_offsets_and_refuses_a_reused_opening() {
+        let field = field_with_lock_and_offsets((0..8).collect(), vec![1, 2]);
+        let theta = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap();
+        let mut current = Current::at_rest(&field);
+        current.rekey(&field, 0, 3).unwrap();
+        let open = SourceMoment::open_with(&field, &current, &theta).unwrap();
+        let cells = [Some(0), None, Some(1), Some(3), None];
+        let source = open.station_section(&field, &current, 0, &cells).unwrap();
+        let marginal = open.continued(&field, &current, 0, &cells).unwrap();
+        assert_eq!(source.population(0).unwrap(), 3);
+        for phase in 0..8 {
+            assert_eq!(source.phase_counts(0, phase).unwrap(), marginal.phase_counts(0, phase).unwrap());
+        }
+        assert_eq!(source.pair_population(0, 1).unwrap(), 1);
+        assert_eq!(source.pair_population(0, 2).unwrap(), 1);
+        assert_eq!(source.offset_counts(0, 1, 7).unwrap()[3*4+1], 1);
+        assert_eq!(source.offset_counts(0, 2, 6).unwrap()[4], 1);
+        assert!(source.station_section(&field, &current, 0, &cells).is_err());
+        let mut moved = current.clone();
+        moved.rekey(&field, 0, 4).unwrap();
+        assert!(open.station_section(&field, &moved, 0, &cells).is_err());
+        // Independently executed unit identity clock: no erasure, no carry-out in these four cells.
+        let full = crate::hnn::tests::support::encoded(&field, &[0, 1, 2, 3]);
+        let section = open.station_section(&field, &current, 0,
+            &full.cells().iter().map(|cell| Some(cell.class())).collect::<Vec<_>>()).unwrap();
+        let mut ingested = open.clone();
+        let mut walked = current.clone();
+        assert_eq!(ingested.ingest(&field, &mut walked, &full).unwrap().cells, 4);
+        for phase in 0..8 {
+            assert_eq!(section.phase_counts(0, phase).unwrap(), ingested.phase_counts(0, phase).unwrap());
+            for offset in [1, 2] {
+                assert_eq!(section.offset_counts(0, offset, phase).unwrap(), ingested.offset_counts(0, offset, phase).unwrap());
+            }
+        }
+        assert_eq!(section.encode(&field, &theta, 0).unwrap(), ingested.encode(&field, &theta, 0).unwrap());
+        // A declared delta longer than this span has an exact empty pair feature box.
+        let (lower, upper) = open.station_pair_bounds(&field, &current, 0, &[Some(0)], 2).unwrap().unwrap();
+        assert!(lower.iter().chain(&upper).flatten().all(Zero::is_zero));
+    }
+
+    #[test]
+    fn the_station_pair_box_contains_all_mixed_unit_and_rounded_leaky_features() {
+        let field = field_with_lock_and_offsets((0..8).collect(), vec![1, 2]);
+        let initial = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap();
+        let mut current = Current::at_rest(&field);
+        current.rekey(&field, 0, 3).unwrap();
+        let placed = [Some(0), None, None, Some(3)];
+        for theta in [initial.clone(), initial.founded_transport(&field, 0).unwrap()] {
+            let open = SourceMoment::open_with(&field, &current, &theta).unwrap();
+            for offset in [1, 2] {
+                let (lower, upper) = open.station_pair_bounds(&field, &current, 0, &placed, offset).unwrap().unwrap();
+                for x in 0..4 { for y in 0..4 {
+                    let full = [Some(0), Some(x), Some(y), Some(3)];
+                    let source = open.station_section(&field, &current, 0, &full).unwrap();
+                    let table = source.offset_table(&field, 0, offset).unwrap().unwrap();
+                    assert_eq!(table.population, (4-offset) as u64);
+                    for phase in 0..8 {
+                        let mut row = vec![Rat::zero(); 16];
+                        for (slot, value) in table.normalized(phase, 4) { row[slot] = value }
+                        for slot in 0..16 {
+                            assert!(lower[phase][slot] <= row[slot] && row[slot] <= upper[phase][slot]);
+                        }
+                    }
+                }}
+            }
+            // Monochrome hole completions miss this heterotypic edge at station2, phase6.
+            let (_, upper) = open.station_pair_bounds(&field, &current, 0, &placed, 1).unwrap().unwrap();
+            assert!(upper[6][4] > Rat::zero());
+            for class in 0..4 {
+                let mono = open.station_section(&field, &current, 0,
+                    &[Some(0), Some(class), Some(class), Some(3)]).unwrap();
+                assert_eq!(mono.offset_counts(0, 1, 6).unwrap()[4], 0);
+            }
+        }
+    }
+
+    #[test]
+    fn a_declared_station_pair_reaches_the_native_word_and_separates_a_marginal_alias() {
+        let field = field_with_lock_and_offsets((0..8).collect(), vec![1]);
+        let theta = paired_chart(&field);
+        let mut current = Current::at_rest(&field);
+        current.rekey(&field, 0, 3).unwrap();
+        let mut left = vec![2; 9];
+        left[0] = 0; left[8] = 1;
+        let mut right = left.clone(); right.swap(0, 8);
+        let open = SourceMoment::open_with(&field, &current, &theta).unwrap();
+        let left_cells: Vec<_> = left.iter().copied().map(Some).collect();
+        let right_cells: Vec<_> = right.iter().copied().map(Some).collect();
+        assert_eq!(open.continued(&field, &current, 0, &left_cells).unwrap(),
+            open.continued(&field, &current, 0, &right_cells).unwrap());
+        let l = open.station_section(&field, &current, 0, &left_cells).unwrap();
+        let r = open.station_section(&field, &current, 0, &right_cells).unwrap();
+        assert_ne!(l.encode(&field, &theta, 0).unwrap(), r.encode(&field, &theta, 0).unwrap());
+        let phases = ReceivingPhases::declare(&field, &theta, &current, &section(2)).unwrap();
+        let mut receipts = Vec::new();
+        for cells in [left, right] {
+            let encoded = crate::hnn::tests::support::encoded(&field, &cells);
+            let section = DamagedSection::damage(&encoded, &[]).unwrap();
+            let repair = repair_by_field(&field, &theta, &current, &section, &WordOpening::Rest, &phases).unwrap();
+            assert!(repair.opening.closes() && repair.word.closes());
+            assert!(repair.balances.iter().all(|b| b.closes()));
+            receipts.push(repair);
+        }
+        assert_ne!(receipts[0].carry.change, receipts[1].carry.change);
+        assert_ne!(receipts[0].reads, receipts[1].reads);
+        println!("declared tensor-pair chart separates the source alias: actual native reads {:?} / {:?}",
+            receipts[0].reads, receipts[1].reads);
+    }
+
+    #[test]
+    fn the_joint_pair_physical_tube_contains_every_mixed_completed_word_read() {
+        let field = field_with_lock_and_offsets((0..8).collect(), vec![1]);
+        let initial = paired_chart(&field);
+        let mut current = Current::at_rest(&field);
+        current.rekey(&field, 0, 3).unwrap();
+        let chart = crate::hnn::tests::support::encoded(&field, &[]);
+        let left = crate::hnn::tests::support::encoded(&field, &[0]);
+        let right = crate::hnn::tests::support::encoded(&field, &[3]);
+        let damaged = DamagedSection::of_runs(4, &chart, vec![(0,left),(3,right)]).unwrap();
+        for theta in [initial.clone(), initial.founded_transport(&field, 0).unwrap()] {
+            let phases = ReceivingPhases::declare(&field, &theta, &current, &section(2)).unwrap();
+            let blind = repair_by_field(&field, &theta, &current, &damaged, &WordOpening::Rest, &phases).unwrap();
+            assert!(blind.domains.iter().all(Option::is_some));
+            assert!(blind.opening.closes() && blind.word.closes());
+            for x in 0..4 { for y in 0..4 {
+                let full = crate::hnn::tests::support::encoded(&field, &[0,x,y,3]);
+                let full = DamagedSection::damage(&full, &[]).unwrap();
+                let read = repair_by_field(&field, &theta, &current, &full, &WordOpening::Rest, &phases).unwrap();
+                assert!(read.opening.closes() && read.word.closes());
+                assert!(read.balances.iter().all(|b| b.closes()));
+                for (domain, read) in blind.domains.iter().zip(&read.reads) {
+                    for (bound, value) in domain.as_ref().unwrap().logits.iter().zip(&read.read.logits) {
+                        assert!(&bound.lower <= value && value <= &bound.upper);
+                    }
+                }
+            }}
+            println!("joint station-pair physical tube: rho {}; blind whole cells {:?}; actual complex bounds {:?}",
+                theta.transport(0), blind.cells, blind.domains);
+        }
+    }
+
+    /// Twelve fixed Words separate material checkpoint, entered interior and absent-source
+    /// controls. Checkpoints are exterior counterfactual operands, never a retained event tape.
+    /// No label, diversity, singleton or accuracy is required of the readouts.
+    #[test]
+    fn the_retained_reader_reports_matched_material_carry_and_absent_source_controls() {
+        use crate::hnn::prediction::predict_by_field;
+        let field = field();
+        let mut theta = quartic_material(&field).founded_transport(&field, 0).unwrap();
+        let mut current = Current::at_rest(&field);
+        current.rekey(&field, 0, 3).unwrap();
+        let mut opening = WordOpening::Rest;
+        let mut materials = vec![theta.clone()];
+        let mut carries = Vec::new();
+        for cells in [[0,2], [1,1], [3,3]] {
+            let observed = crate::hnn::tests::support::encoded(&field, &cells);
+            let damaged = DamagedSection::damage(&observed, &[1]).unwrap();
+            let phases = ReceivingPhases::declare(&field, &theta, &current, &section(2)).unwrap();
+            let pending = predict_by_field(&field, &theta, &current, &damaged, &opening, &phases).unwrap();
+            let blind = pending.prediction().clone();
+            let taught = pending.observe(&theta, &observed, &[false,true]).unwrap();
+            assert_eq!(blind, taught.prediction);
+            assert!(blind.opening.closes() && blind.word.closes());
+            assert!(blind.balances.iter().all(|b| b.closes()));
+            theta = taught.constitution;
+            materials.push(theta.clone());
+            carries.push(blind.carry.clone());
+            opening = WordOpening::Received { carry: blind.carry, absorption: Absorption::Nothing };
+        }
+        let left = crate::hnn::tests::support::encoded(&field, &[0]);
+        let chart = left.part(0..0).unwrap();
+        let right = crate::hnn::tests::support::encoded(&field, &[3,0]);
+        let probe = DamagedSection::of_runs(4, &chart, vec![(0,left),(2,right)]).unwrap();
+        let absent = DamagedSection::of_runs(4, &chart, Vec::new()).unwrap();
+        let phases = ReceivingPhases::declare(&field, &theta, &current, &section(2)).unwrap();
+        let read = |label: &str, material: &Constitution, opening: &WordOpening, probe: &DamagedSection| {
+            let receipt = repair_by_field(&field, material, &current, probe, opening, &phases).unwrap();
+            assert!(receipt.opening.closes() && receipt.word.closes());
+            assert!(receipt.balances.iter().all(|b| b.closes()));
+            println!("matched retained-reader control {label}: R commit {}; actual intact source {:?}; whole cells {:?}; leaders {:?}; complex logits {:?}; carry tick {}",
+                material.commit(), probe.placed(), receipt.cells,
+                receipt.reads.iter().map(|r| r.leaders()).collect::<Vec<_>>(),
+                receipt.reads.iter().map(|r| &r.read.logits).collect::<Vec<_>>(), receipt.carry.ticks);
+            receipt
+        };
+        let mut common_motion = None;
+        for (index, material) in materials.iter().enumerate() {
+            let receipt = read(&format!("material{index}/enteredC3"), material, &opening, &probe);
+            if let Some(carry) = &common_motion { assert_eq!(carry, &receipt.carry) }
+            else { common_motion = Some(receipt.carry) }
+        }
+        read("R3/rest", &theta, &WordOpening::Rest, &probe);
+        for (index, carry) in carries.iter().take(2).enumerate() {
+            read(&format!("R3/enteredC{}",index+1), &theta,
+                &WordOpening::Received { carry: carry.clone(), absorption: Absorption::Nothing }, &probe);
+        }
+        read("R3/absent-source/rest", &theta, &WordOpening::Rest, &absent);
+        read("R3/absent-source/enteredC3", &theta, &opening, &absent);
     }
 
 }
