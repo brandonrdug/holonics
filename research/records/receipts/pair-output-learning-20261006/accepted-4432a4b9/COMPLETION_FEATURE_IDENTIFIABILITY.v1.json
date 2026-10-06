@@ -1,0 +1,854 @@
+{
+  "source_commit": "4432a4b9c7de9330e6701c1c2f860660682e39b6",
+  "method": "Source algebra on the pinned fixed bilinear read matrix and declared E; no native completion execution",
+  "fixed_read_receipt": {
+    "path": "research/records/receipts/pair-output-deposition-20261006/FEATURE_SPAN_SOURCE_READ.v1.json",
+    "bytes": 8363,
+    "sha256": "42dbe914427670cb944fa76cda5bb32d5ed48e101d16ac77a01fafc7f190fef7"
+  },
+  "source_clock": "tau0=0; hole1 atphase2; edges1/2 atphases2/3; offset1; fullpopulation8",
+  "default_first_source_column_rank": 4,
+  "pair_projection_rank": 14,
+  "exact_completed_source_pair_feature_contrasts": [
+    {
+      "source": "left",
+      "missing_pair": [
+        0,
+        1
+      ],
+      "phase2_ordered_pair_contrast": [
+        [
+          0,
+          0,
+          1
+        ],
+        [
+          1,
+          0,
+          -1
+        ]
+      ],
+      "phase3_ordered_pair_contrast": [
+        [
+          2,
+          0,
+          1
+        ],
+        [
+          2,
+          1,
+          -1
+        ]
+      ],
+      "phase2_raw_projection": [
+        -2,
+        2,
+        -2,
+        2,
+        0,
+        0,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        2,
+        0,
+        -2,
+        2
+      ],
+      "phase3_raw_projection": [
+        2,
+        -2,
+        0,
+        2,
+        -2,
+        0,
+        2,
+        2,
+        -2,
+        0,
+        2,
+        0,
+        -2,
+        0,
+        -2,
+        0
+      ],
+      "phase2_nonzero": true,
+      "phase3_nonzero": true
+    },
+    {
+      "source": "left",
+      "missing_pair": [
+        0,
+        2
+      ],
+      "phase2_ordered_pair_contrast": [
+        [
+          0,
+          0,
+          1
+        ],
+        [
+          2,
+          0,
+          -1
+        ]
+      ],
+      "phase3_ordered_pair_contrast": [
+        [
+          2,
+          0,
+          1
+        ],
+        [
+          2,
+          2,
+          -1
+        ]
+      ],
+      "phase2_raw_projection": [
+        -2,
+        2,
+        -2,
+        0,
+        2,
+        2,
+        0,
+        0,
+        2,
+        0,
+        0,
+        0,
+        2,
+        0,
+        0,
+        2
+      ],
+      "phase3_raw_projection": [
+        2,
+        0,
+        0,
+        2,
+        -2,
+        0,
+        2,
+        2,
+        -2,
+        0,
+        0,
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      "phase2_nonzero": true,
+      "phase3_nonzero": true
+    },
+    {
+      "source": "left",
+      "missing_pair": [
+        0,
+        3
+      ],
+      "phase2_ordered_pair_contrast": [
+        [
+          0,
+          0,
+          1
+        ],
+        [
+          3,
+          0,
+          -1
+        ]
+      ],
+      "phase3_ordered_pair_contrast": [
+        [
+          2,
+          0,
+          1
+        ],
+        [
+          2,
+          3,
+          -1
+        ]
+      ],
+      "phase2_raw_projection": [
+        0,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        2,
+        0,
+        0,
+        0,
+        2,
+        -2,
+        2
+      ],
+      "phase3_raw_projection": [
+        0,
+        0,
+        0,
+        2,
+        -2,
+        -2,
+        2,
+        0,
+        0,
+        2,
+        2,
+        0,
+        -2,
+        2,
+        -2,
+        0
+      ],
+      "phase2_nonzero": true,
+      "phase3_nonzero": true
+    },
+    {
+      "source": "left",
+      "missing_pair": [
+        1,
+        2
+      ],
+      "phase2_ordered_pair_contrast": [
+        [
+          1,
+          0,
+          1
+        ],
+        [
+          2,
+          0,
+          -1
+        ]
+      ],
+      "phase3_ordered_pair_contrast": [
+        [
+          2,
+          1,
+          1
+        ],
+        [
+          2,
+          2,
+          -1
+        ]
+      ],
+      "phase2_raw_projection": [
+        0,
+        0,
+        0,
+        -2,
+        2,
+        2,
+        -2,
+        0,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        2,
+        0
+      ],
+      "phase3_raw_projection": [
+        0,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        -2,
+        2,
+        2,
+        0,
+        2,
+        0
+      ],
+      "phase2_nonzero": true,
+      "phase3_nonzero": true
+    },
+    {
+      "source": "left",
+      "missing_pair": [
+        1,
+        3
+      ],
+      "phase2_ordered_pair_contrast": [
+        [
+          1,
+          0,
+          1
+        ],
+        [
+          3,
+          0,
+          -1
+        ]
+      ],
+      "phase3_ordered_pair_contrast": [
+        [
+          2,
+          1,
+          1
+        ],
+        [
+          2,
+          3,
+          -1
+        ]
+      ],
+      "phase2_raw_projection": [
+        2,
+        0,
+        2,
+        -2,
+        0,
+        0,
+        -2,
+        0,
+        0,
+        2,
+        0,
+        0,
+        -2,
+        2,
+        0,
+        0
+      ],
+      "phase3_raw_projection": [
+        -2,
+        2,
+        0,
+        0,
+        0,
+        -2,
+        0,
+        -2,
+        2,
+        2,
+        0,
+        0,
+        0,
+        2,
+        0,
+        0
+      ],
+      "phase2_nonzero": true,
+      "phase3_nonzero": true
+    },
+    {
+      "source": "left",
+      "missing_pair": [
+        2,
+        3
+      ],
+      "phase2_ordered_pair_contrast": [
+        [
+          2,
+          0,
+          1
+        ],
+        [
+          3,
+          0,
+          -1
+        ]
+      ],
+      "phase3_ordered_pair_contrast": [
+        [
+          2,
+          2,
+          1
+        ],
+        [
+          2,
+          3,
+          -1
+        ]
+      ],
+      "phase2_raw_projection": [
+        2,
+        0,
+        2,
+        0,
+        -2,
+        -2,
+        0,
+        0,
+        -2,
+        2,
+        0,
+        0,
+        -2,
+        2,
+        -2,
+        0
+      ],
+      "phase3_raw_projection": [
+        -2,
+        0,
+        0,
+        0,
+        0,
+        -2,
+        0,
+        -2,
+        2,
+        2,
+        2,
+        -2,
+        -2,
+        2,
+        -2,
+        0
+      ],
+      "phase2_nonzero": true,
+      "phase3_nonzero": true
+    },
+    {
+      "source": "right",
+      "missing_pair": [
+        0,
+        1
+      ],
+      "phase2_ordered_pair_contrast": [
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          -1
+        ]
+      ],
+      "phase3_ordered_pair_contrast": [
+        [
+          2,
+          0,
+          1
+        ],
+        [
+          2,
+          1,
+          -1
+        ]
+      ],
+      "phase2_raw_projection": [
+        2,
+        -2,
+        -2,
+        -2,
+        0,
+        0,
+        -2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        -2,
+        0,
+        2,
+        2
+      ],
+      "phase3_raw_projection": [
+        2,
+        -2,
+        0,
+        2,
+        -2,
+        0,
+        2,
+        2,
+        -2,
+        0,
+        2,
+        0,
+        -2,
+        0,
+        -2,
+        0
+      ],
+      "phase2_nonzero": true,
+      "phase3_nonzero": true
+    },
+    {
+      "source": "right",
+      "missing_pair": [
+        0,
+        2
+      ],
+      "phase2_ordered_pair_contrast": [
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          2,
+          1,
+          -1
+        ]
+      ],
+      "phase3_ordered_pair_contrast": [
+        [
+          2,
+          0,
+          1
+        ],
+        [
+          2,
+          2,
+          -1
+        ]
+      ],
+      "phase2_raw_projection": [
+        2,
+        -2,
+        -2,
+        0,
+        -2,
+        2,
+        0,
+        0,
+        -2,
+        0,
+        0,
+        0,
+        -2,
+        0,
+        0,
+        2
+      ],
+      "phase3_raw_projection": [
+        2,
+        0,
+        0,
+        2,
+        -2,
+        0,
+        2,
+        2,
+        -2,
+        0,
+        0,
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      "phase2_nonzero": true,
+      "phase3_nonzero": true
+    },
+    {
+      "source": "right",
+      "missing_pair": [
+        0,
+        3
+      ],
+      "phase2_ordered_pair_contrast": [
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          3,
+          1,
+          -1
+        ]
+      ],
+      "phase3_ordered_pair_contrast": [
+        [
+          2,
+          0,
+          1
+        ],
+        [
+          2,
+          3,
+          -1
+        ]
+      ],
+      "phase2_raw_projection": [
+        0,
+        -2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        2,
+        0,
+        0,
+        0,
+        2,
+        2,
+        2
+      ],
+      "phase3_raw_projection": [
+        0,
+        0,
+        0,
+        2,
+        -2,
+        -2,
+        2,
+        0,
+        0,
+        2,
+        2,
+        0,
+        -2,
+        2,
+        -2,
+        0
+      ],
+      "phase2_nonzero": true,
+      "phase3_nonzero": true
+    },
+    {
+      "source": "right",
+      "missing_pair": [
+        1,
+        2
+      ],
+      "phase2_ordered_pair_contrast": [
+        [
+          1,
+          1,
+          1
+        ],
+        [
+          2,
+          1,
+          -1
+        ]
+      ],
+      "phase3_ordered_pair_contrast": [
+        [
+          2,
+          1,
+          1
+        ],
+        [
+          2,
+          2,
+          -1
+        ]
+      ],
+      "phase2_raw_projection": [
+        0,
+        0,
+        0,
+        2,
+        -2,
+        2,
+        2,
+        0,
+        -2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        -2,
+        0
+      ],
+      "phase3_raw_projection": [
+        0,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        -2,
+        2,
+        2,
+        0,
+        2,
+        0
+      ],
+      "phase2_nonzero": true,
+      "phase3_nonzero": true
+    },
+    {
+      "source": "right",
+      "missing_pair": [
+        1,
+        3
+      ],
+      "phase2_ordered_pair_contrast": [
+        [
+          1,
+          1,
+          1
+        ],
+        [
+          3,
+          1,
+          -1
+        ]
+      ],
+      "phase3_ordered_pair_contrast": [
+        [
+          2,
+          1,
+          1
+        ],
+        [
+          2,
+          3,
+          -1
+        ]
+      ],
+      "phase2_raw_projection": [
+        -2,
+        0,
+        2,
+        2,
+        0,
+        0,
+        2,
+        0,
+        0,
+        2,
+        0,
+        0,
+        2,
+        2,
+        0,
+        0
+      ],
+      "phase3_raw_projection": [
+        -2,
+        2,
+        0,
+        0,
+        0,
+        -2,
+        0,
+        -2,
+        2,
+        2,
+        0,
+        0,
+        0,
+        2,
+        0,
+        0
+      ],
+      "phase2_nonzero": true,
+      "phase3_nonzero": true
+    },
+    {
+      "source": "right",
+      "missing_pair": [
+        2,
+        3
+      ],
+      "phase2_ordered_pair_contrast": [
+        [
+          2,
+          1,
+          1
+        ],
+        [
+          3,
+          1,
+          -1
+        ]
+      ],
+      "phase3_ordered_pair_contrast": [
+        [
+          2,
+          2,
+          1
+        ],
+        [
+          2,
+          3,
+          -1
+        ]
+      ],
+      "phase2_raw_projection": [
+        -2,
+        0,
+        2,
+        0,
+        2,
+        -2,
+        0,
+        0,
+        2,
+        2,
+        0,
+        0,
+        2,
+        2,
+        2,
+        0
+      ],
+      "phase3_raw_projection": [
+        -2,
+        0,
+        0,
+        0,
+        0,
+        -2,
+        0,
+        -2,
+        2,
+        2,
+        2,
+        -2,
+        -2,
+        2,
+        -2,
+        0
+      ],
+      "phase2_nonzero": true,
+      "phase3_nonzero": true
+    }
+  ],
+  "conclusion": "All six missing-class pairs in each left/right family have nonzero fixed bilinear projections at both affected phases. Thus rank14 does not merge these normalized pair-feature completions; the common class-independent normalization scales each nonzero contrast. Default E separately has rank4. Current learned output plus E superposition, native physical motion/read and grain leader union still require actual witnesses.",
+  "cannot_claim": [
+    "No proof yet that learned encoded source vectors differ after output superposition",
+    "No proof yet that all completed native reads differ",
+    "No actual completion leader union inferred",
+    "No useful reconstruction claim"
+  ],
+  "declared_E_owner_pin": {
+    "bytes": 433201,
+    "sha256": "951580ec936cb5948c239a9f3006130809df2111be412beb85831c8fcda5caaa"
+  },
+  "declared_E_recipe": "E[i,j] = declared_sign(locus_code(0,0,0),i,j)/2, i=0..15, j=0..3; exact Fraction row reduction"
+}

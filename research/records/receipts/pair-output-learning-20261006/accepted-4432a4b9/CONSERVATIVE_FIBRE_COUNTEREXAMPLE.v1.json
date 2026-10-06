@@ -1,0 +1,178 @@
+{
+  "method": "Exact algebraic counterexample to inference from the implemented independent endpoint fibre; no native execution or imitation of the actual saved logits",
+  "native_owner": "physical_domain_read, prediction.rs:2558-2608",
+  "family": [
+    [
+      [
+        -1,
+        1
+      ],
+      [
+        -4,
+        1
+      ],
+      [
+        0,
+        1
+      ],
+      [
+        -1,
+        1
+      ]
+    ],
+    [
+      [
+        0,
+        1
+      ],
+      [
+        -3,
+        1
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        0,
+        1
+      ]
+    ],
+    [
+      [
+        0,
+        1
+      ],
+      [
+        -3,
+        1
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        0,
+        1
+      ]
+    ],
+    [
+      [
+        1,
+        1
+      ],
+      [
+        -2,
+        1
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        1,
+        1
+      ]
+    ]
+  ],
+  "grain": 16,
+  "point_leaders": [
+    [
+      2
+    ],
+    [
+      2
+    ],
+    [
+      2
+    ],
+    [
+      2
+    ]
+  ],
+  "independent_coordinate_bounds": [
+    [
+      [
+        -1,
+        1
+      ],
+      [
+        1,
+        1
+      ]
+    ],
+    [
+      [
+        -4,
+        1
+      ],
+      [
+        -2,
+        1
+      ]
+    ],
+    [
+      [
+        0,
+        1
+      ],
+      [
+        2,
+        1
+      ]
+    ],
+    [
+      [
+        -1,
+        1
+      ],
+      [
+        1,
+        1
+      ]
+    ]
+  ],
+  "domain_fibre": [
+    0,
+    2,
+    3
+  ],
+  "actual_complete_leader_union": [
+    2
+  ],
+  "class2_pairwise_gaps": {
+    "0": [
+      [
+        1,
+        1
+      ],
+      [
+        1,
+        1
+      ]
+    ],
+    "1": [
+      [
+        4,
+        1
+      ],
+      [
+        4,
+        1
+      ]
+    ],
+    "3": [
+      [
+        1,
+        1
+      ],
+      [
+        1,
+        1
+      ]
+    ]
+  },
+  "conclusion": "The actual endpoint algorithm can return[0,2,3] while every source-family member has sole grain leader2. A plural endpoint fibre alone cannot establish an actual competing completion or unavoidable source equivalence.",
+  "source_derived_correction": "Preserve joint signed response covectors/differences over the same admitted source completion relation and executed clock/Word before projecting grain leaders; common motion cancels from the comparison. Native receiving grain still governs the margin; thresholds unchanged.",
+  "current_case_status": "Actual4432a4b9 completion leader union remains unmeasured; queued exact witness selector2700572c will decide it."
+}

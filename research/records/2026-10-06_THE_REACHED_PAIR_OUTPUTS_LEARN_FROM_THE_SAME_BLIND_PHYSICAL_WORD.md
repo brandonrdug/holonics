@@ -227,3 +227,44 @@ consumer's declared ceiling. No additional teaching, fitted threshold or
 handcrafted decoder is admitted. Actual witness results are still required to
 separate completion ambiguity from conservative enclosure; no candidate result
 is inferred from its source.
+
+[source-derived completion feature witnesses] The
+[exact contrast receipt](receipts/pair-output-learning-20261006/accepted-4432a4b9/COMPLETION_FEATURE_IDENTIFIABILITY.v1.json)
+uses the same fixed bilinear read matrix. For missing classes a and b, the
+left/right family changes ordered cells `(a,head)-(b,head)` at source phase 2
+and `(2,a)-(2,b)` at phase 3. Every one of the twelve contrasts has a nonzero
+projection at both phases. Complete pair population 8 supplies one common
+positive normalization, so it cannot erase those contrasts. The declared
+first-source E separately has column rank 4; its phase-2 class difference is
+nonzero under the invertible source transport. A claim that these completion
+features are lost solely because the fixed pair read has rank 14 is therefore
+false. Superposed learned output, executed Word, receiving map and grain can
+still lose distinctions; their actual witness reads remain unmeasured.
+
+[exact counterexample to a diagnostic inference] The
+[independent-bound counterexample](receipts/pair-output-learning-20261006/accepted-4432a4b9/CONSERVATIVE_FIBRE_COUNTEREXAMPLE.v1.json)
+sets real class readings to `(x,x-3,x+1,x)` with x in `{-1,0,1}` at grain 16.
+Every member's sole grain leader is class 2. Independent coordinate endpoint
+bounds nevertheless return exactly `[0,2,3]` under `physical_domain_read`.
+This is an algebraic counterexample to inferring actual ambiguity from that
+fibre, not a simulation of the saved native readings. It shows the architectural
+term lost by the current bound: joint signed receiving comparisons through the
+same source-completion relation. Common motion cancels before class comparison;
+independent absolute endpoint propagation discards that cancellation. A tighter
+consumer must retain the corresponding joint source/clock/Word relation and the
+actual grain, rather than change a threshold or pick a source answer. Its need
+in these actual probes is decided by the queued complete-source readings.
+
+[receiver-relative limitation] Equality of the fixed complex R rows for 0 and 3
+is sufficient for equality of their wave readings on every anchor, including
+any changed source or returned carry. `ReceivingPhases::read` performs exactly
+that matrix read, and physical `StationRead` carries it without a tree face.
+The same-row covector/common-normal-operator and per-entry carry law preserves
+this equality during the two receiving deposits; the pair-only deposit leaves
+R fixed. Thus this particular material cannot distinguish those two class
+channels. This does not merge the producing classes or all retained source
+states, and does not force either class to lead. A differing comparison at the
+receiving locus is required to change the equality; repeating pair-only
+teaching cannot do so. Finally, no declared terrain relation excludes any of
+the four hole assignments. Even a constant native leader across them would
+certify the material's output, not identify the erased truth.
