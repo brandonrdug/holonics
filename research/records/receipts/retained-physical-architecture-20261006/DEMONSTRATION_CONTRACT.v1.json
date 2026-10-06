@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "status": "prepared; no fresh native output or acceptance claimed",
+  "purpose": "Show actual whole native blind receipts, retained continuation and the applied source-return certificate from already queued controls after fresh acceptance.",
+  "source_commit": "074a6267ecb515b10aa199790efed83c833baeeb",
+  "queue_owner": "01a10352-66ea-73c8-b716-a835a9a04033",
+  "existing_queue_packet": {
+    "path": "/home/b/Workspaces/holonics/.local/wt/source-return-runtime-01a1030c/.local/source-return-runtime-01a1030c-20261006/QUEUE_REQUEST.v1.json",
+    "sha256": "fcca6ca81ccbe95e5d8f4edaf0cbdc6c7d55d1a2aa356aa57d24aa0e7d2cdcb9"
+  },
+  "creates_job": false,
+  "new_test_selector": false,
+  "new_input_or_truth_generator": false,
+  "changes_native_source": false,
+  "launch_authorization": false,
+  "projection_or_limits_changed": false,
+  "fixed_native_acceptance_selectors": [
+    "hnn::tests::physical::the_resident_certifies_the_applied_source_return_at_its_carried_clock_and_nonzero_phase",
+    "hnn::tests::prediction::physical_repair::same_word_source_return_refuses_foreign_phase_clock_map_and_opening_covectors",
+    "hnn::tests::prediction::physical_repair::the_actual_leaky_source_return_changes_e_before_the_next_target_free_carried_word",
+    "hnn::tests::prediction::physical_repair::the_observed_pair_outputs_change_the_next_target_free_source_conditioned_word",
+    "hnn::tests::prediction::physical_repair::source_teaching_refuses_a_zero_return_and_a_reached_uncertified_quartic",
+    "hnn::tests::prediction::physical_repair::pair_output_teaching_refuses_absent_comparisons_zero_returns_and_uncertified_quartics",
+    "hnn::tests::physical::the_resident_retains_the_learned_pair_and_reads_the_correlated_family_on_its_carried_state",
+    "hnn::tests::physical::a_refused_resident_observation_keeps_material_and_carries_into_the_next_native_read"
+  ],
+  "required_receipts": [
+    "Fresh source/input-matched compile and executable identity at this pin.",
+    "All eight exact selectors pass once in their sealed units, with full unfiltered stdout/stderr, exact test count, exits and no omitted failure.",
+    "Sole queue accepts fixed measured projection, aggregate resources, floors, quiescent release and outer lease."
+  ],
+  "presentation_records": [
+    {
+      "selector": "hnn::tests::physical::the_resident_retains_the_learned_pair_and_reads_the_correlated_family_on_its_carried_state",
+      "source_path": "crates/holonics/src/hnn/tests/physical.rs",
+      "source_sha256": "c2eef06d3dd6637fb635cfb975b4aaea7b3e6f0b7677a2c77ada54a47a311e8e",
+      "whole_output_prefix": "retained resident target-free whole output: ",
+      "expected_whole_records": 1,
+      "declared_input": "Existing four-class retained-pair fixture: two R observations, one pair-output observation, then the already declared nine-station sparse unobserved section. Input and observed partitions are fixed in the source.",
+      "observable": "Actual whole PhysicalRepair from resident.read, source-domain leader fibre, balances and advancing physical carry.",
+      "claim_limit": "Model-domain constancy; no unknown erased truth fidelity or scientific population inference."
+    },
+    {
+      "selector": "hnn::tests::physical::the_resident_certifies_the_applied_source_return_at_its_carried_clock_and_nonzero_phase",
+      "source_path": "crates/holonics/src/hnn/tests/physical.rs",
+      "source_sha256": "c2eef06d3dd6637fb635cfb975b4aaea7b3e6f0b7677a2c77ada54a47a311e8e",
+      "whole_output_prefix": "resident source-return contract ",
+      "expected_whole_records": 2,
+      "declared_input": "Existing four-class pumped source fixture at Current rekey 3; two R warmups, one SourcePorts or PairOutputs observation and the fixed later four-station sparse unobserved section.",
+      "observable": "Exact applied receiving/opening/deposition pairings and defects, actual blind PhysicalRepair, whole subsequent unobserved PhysicalRepair; separate records for SourcePorts and PairOutputs.",
+      "claim_limit": "One applied source direction under the supported exact clock/chart; not an operator realization proof, inverse, finite score decrement or broad useful repair."
+    }
+  ],
+  "presentation_policy": [
+    "Use existing accepted stdout; launch no replay or additional task.",
+    "Copy each selected whole output record verbatim; leave its body and class outcomes intact.",
+    "Link the complete unfiltered producing logs, source and executable seals, test/resource receipts. An excerpt is not a replacement for them.",
+    "Do not show expected-target, reference repair or invented control text beside the output.",
+    "State deterministic fixture scope. Show Held/refusal unchanged; preserve any failed gate and do not present it as accepted.",
+    "Native demonstration does not grant independent Lean, broad workspace, device, cold-restore or product acceptance."
+  ],
+  "output_before_acceptance": null,
+  "statistical_unit": "Deterministic law control, exact specified inputs and compared partition. No independent-station binomial, accuracy interval or untouched-test claim.",
+  "future_scientific_acceptance": "Requires a fixed terrain relation, genuinely untouched request partition and explicit source-to-observable contracts; not created here."
+}

@@ -1,0 +1,351 @@
+{
+  "version": 1,
+  "status": "read-only source-to-consumer trace and documentation preparation; no compiler/runtime result",
+  "observed_at_utc": "2026-10-06T18:33:49Z",
+  "source_commit": "074a6267ecb515b10aa199790efed83c833baeeb",
+  "files": {
+    "crates/holonics/src/hnn/physical.rs": {
+      "bytes": 7821,
+      "sha256": "479a579dc90df9ea95206594b86b841f0ba7f3869973153912d3708c3b2cc77b",
+      "anchors": [
+        {
+          "source_operand": "pub struct PhysicalResident",
+          "lines": [
+            65
+          ]
+        },
+        {
+          "source_operand": "    pub fn receive(",
+          "lines": [
+            114
+          ]
+        },
+        {
+          "source_operand": "    pub fn read(",
+          "lines": [
+            102
+          ]
+        },
+        {
+          "source_operand": "    pub fn into_parts(",
+          "lines": [
+            197
+          ]
+        }
+      ]
+    },
+    "crates/holonics/src/hnn/prediction.rs": {
+      "bytes": 178122,
+      "sha256": "3ead7e509973c72ebe800db1243e3fc8b6132e2e2d66aec3991667e4e58e73f1",
+      "anchors": [
+        {
+          "source_operand": "    pub fn of_runs(",
+          "lines": [
+            1588
+          ]
+        },
+        {
+          "source_operand": "    fn admit(&self, field:",
+          "lines": [
+            1670
+          ]
+        },
+        {
+          "source_operand": "fn physical_forward",
+          "lines": [
+            1855
+          ]
+        },
+        {
+          "source_operand": "fn physical_domain_forward",
+          "lines": [
+            1939
+          ]
+        },
+        {
+          "source_operand": "fn physical_completion_opening",
+          "lines": [
+            2067
+          ]
+        },
+        {
+          "source_operand": "fn physical_signed_tick",
+          "lines": [
+            2228
+          ]
+        },
+        {
+          "source_operand": "fn physical_completion_read",
+          "lines": [
+            2285
+          ]
+        },
+        {
+          "source_operand": "pub(super) fn physical_source_pairing",
+          "lines": [
+            2369
+          ]
+        },
+        {
+          "source_operand": "pub struct PhysicalPrediction",
+          "lines": [
+            3085
+          ]
+        },
+        {
+          "source_operand": "    fn observe_at(",
+          "lines": [
+            3302
+          ]
+        },
+        {
+          "source_operand": "Some(physical_source_pairing(",
+          "lines": [
+            3602
+          ]
+        },
+        {
+          "source_operand": "fn decide_station",
+          "lines": [
+            3648
+          ]
+        }
+      ]
+    },
+    "crates/holonics/src/hnn/word.rs": {
+      "bytes": 139446,
+      "sha256": "0200f5a2920d26b0b6258823ffeb20ae5b23bf4546299ec058e7c60d159b7bb4",
+      "anchors": [
+        {
+          "source_operand": "fn interior_of(",
+          "lines": [
+            1643
+          ]
+        },
+        {
+          "source_operand": "    pub fn open_exact_received(",
+          "lines": [
+            1779
+          ]
+        }
+      ]
+    },
+    "crates/holonics/src/hnn/moment.rs": {
+      "bytes": 114255,
+      "sha256": "2585d881e1b3e7584a5982bc54107f8d79233de9a65dd423e6b515e2a48a548a",
+      "anchors": [
+        {
+          "source_operand": "pub struct Capacity",
+          "lines": [
+            250
+          ]
+        },
+        {
+          "source_operand": "    pub fn state_bits(",
+          "lines": [
+            306
+          ]
+        },
+        {
+          "source_operand": "    pub(crate) fn station_section(",
+          "lines": [
+            1576
+          ]
+        },
+        {
+          "source_operand": "    pub fn open_storage(",
+          "lines": [
+            2304
+          ]
+        },
+        {
+          "source_operand": "    pub fn dense_bits(",
+          "lines": [
+            2427
+          ]
+        }
+      ]
+    },
+    "crates/holonics/src/hnn/receiving.rs": {
+      "bytes": 79239,
+      "sha256": "10cea7efc861f33530ec65bf3a901726850ae2677dfc2d622e494de9359abac4",
+      "anchors": [
+        {
+          "source_operand": "    pub fn read(",
+          "lines": [
+            1620
+          ]
+        }
+      ]
+    },
+    "crates/holonics/src/hnn/port.rs": {
+      "bytes": 68725,
+      "sha256": "882929e7c463b6a65b0f437de8d7000ea8044dd25504720c8ff85a253c8d660c",
+      "anchors": [
+        {
+          "source_operand": "    pub fn pull_back(",
+          "lines": [
+            878
+          ]
+        }
+      ]
+    },
+    "crates/holonics/src/hnn/reference.rs": {
+      "bytes": 220442,
+      "sha256": "9800117d77ca85642e607264897a9974aee3b2e9659392a4512ce4aba8cd13d8",
+      "anchors": [
+        {
+          "source_operand": "pub fn compose_return(",
+          "lines": [
+            2224
+          ]
+        }
+      ]
+    },
+    "crates/holonics/src/hnn/constitution.rs": {
+      "bytes": 433201,
+      "sha256": "951580ec936cb5948c239a9f3006130809df2111be412beb85831c8fcda5caaa",
+      "anchors": [
+        {
+          "source_operand": "    pub fn exact_bits(",
+          "lines": [
+            4682
+          ]
+        },
+        {
+          "source_operand": "    pub fn deposited(&self, deposit:",
+          "lines": [
+            5891
+          ]
+        }
+      ]
+    },
+    "crates/holonics/src/hnn/ratio.rs": {
+      "bytes": 22152,
+      "sha256": "4b223f2a9bae7b70291ed62ce026a5f6ca521df0b4d87be3769c26a32f91030c",
+      "anchors": [
+        {
+          "source_operand": "    pub fn covector(",
+          "lines": [
+            467
+          ]
+        },
+        {
+          "source_operand": "pub struct RatioCovector",
+          "lines": [
+            501
+          ]
+        }
+      ]
+    },
+    "crates/holonics/src/hnn/realization.rs": {
+      "bytes": 6393,
+      "sha256": "d6daddbf8cc69ee9d546862a1bfc22e05cc27a70ee835455c9016d1062400c5a",
+      "anchors": [
+        {
+          "source_operand": "fn row_block(",
+          "lines": [
+            35
+          ]
+        },
+        {
+          "source_operand": "pub(crate) fn indexed",
+          "lines": [
+            40
+          ]
+        },
+        {
+          "source_operand": "pub(crate) fn outer_rows",
+          "lines": [
+            67
+          ]
+        }
+      ]
+    },
+    "crates/holonics/src/compression/cost.rs": {
+      "bytes": 19593,
+      "sha256": "47c71bae4dee52f1dd8ded129afff6d9ec7efb87c1ffedcf4fb7abb38848a1b2",
+      "anchors": [
+        {
+          "source_operand": "pub struct CodecPivot",
+          "lines": [
+            431
+          ]
+        }
+      ]
+    },
+    "crates/holonics/src/hnn/tests/physical.rs": {
+      "bytes": 13493,
+      "sha256": "c2eef06d3dd6637fb635cfb975b4aaea7b3e6f0b7677a2c77ada54a47a311e8e",
+      "anchors": [
+        {
+          "source_operand": "fn the_resident_retains_the_learned_pair_and_reads_the_correlated_family_on_its_carried_state",
+          "lines": [
+            54
+          ]
+        },
+        {
+          "source_operand": "fn the_resident_certifies_the_applied_source_return_at_its_carried_clock_and_nonzero_phase",
+          "lines": [
+            213
+          ]
+        },
+        {
+          "source_operand": "retained resident target-free whole output",
+          "lines": [
+            170
+          ]
+        },
+        {
+          "source_operand": "resident source-return contract",
+          "lines": [
+            305
+          ]
+        }
+      ]
+    },
+    "crates/holonics/src/hnn/tests/prediction.rs": {
+      "bytes": 173087,
+      "sha256": "67225eabefe47406accd9f88b695ad8a746571bbdecb479db40d23af7262f815",
+      "anchors": [
+        {
+          "source_operand": "fn same_word_source_return_refuses_foreign_phase_clock_map_and_opening_covectors",
+          "lines": [
+            2800
+          ]
+        }
+      ]
+    },
+    "lean/Holonics/HNN/SingleHoleResponse.lean": {
+      "bytes": 39387,
+      "sha256": "6206a8aca280331d6aaba9726af98e2d644074ddb7d4950f50a086b9940ba83d",
+      "anchors": []
+    },
+    "lean/Holonics/HNN/SourceReceiverReturn.lean": {
+      "bytes": 13104,
+      "sha256": "294df662d9a7dff20e4540f0fc643e0a00081fbae49d471c4f146dc1c5d9bc53",
+      "anchors": []
+    }
+  },
+  "native_source_seals_match_existing_queue": true,
+  "queued_runtime_worktree_tracked_clean": true,
+  "new_native_operations": [],
+  "new_owned_paths": [
+    "research/records/2026-10-06_THE_RETAINED_PHYSICAL_PATH_JOINS_SOURCE_COMPARISON_RELEASE_AND_CONTINUATION.md",
+    "research/records/receipts/retained-physical-architecture-20261006/DEMONSTRATION_CONTRACT.v1.json",
+    "research/records/receipts/retained-physical-architecture-20261006/SOURCE_TRACE.v1.json"
+  ],
+  "evidence_boundary": [
+    "Pinned source bytes and consuming calls inspected.",
+    "Source equality/hash and marker existence are static checks.",
+    "No type check, native execution, Lean kernel check, measured resource reduction, untouched scientific outcome or product claim."
+  ],
+  "related_source_static_receipt": "research/records/receipts/source-return-runtime-20261006/SOURCE_STATIC_RECEIPT.v1.json",
+  "documentation_static_checks": {
+    "relative_links_checked": 3,
+    "all_link_targets_present": true,
+    "json_files_parsed": 2,
+    "new_paths_checked_for_whitespace": 3,
+    "compiler_or_native_command": false
+  }
+}
