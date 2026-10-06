@@ -1,0 +1,99 @@
+{
+  "passed": false,
+  "label": "hnn-physical-acquisition-67cd42fc3-alternation-partitioned-20261006-v2",
+  "scientific_job": true,
+  "deferred_lock_busy": false,
+  "final_CPU_ns": 4540050000,
+  "CPU_reading_grain_ns": 1000,
+  "aggregate_CPU_limit_us": 17000000,
+  "final_CPU_source": "systemd retained oneshot CPUUsageNSec after all group processes exit",
+  "CPU_kernel_hard_total_limit": false,
+  "sampled_stop_margin_us": 1000000,
+  "aggregate_CPU_within_limit": true,
+  "no_overshoot_accepted": true,
+  "wall_ns": 4625571449,
+  "projection_ns": 4686572208,
+  "wall_source": "external monotonic_ns through final property read",
+  "quiescent": true,
+  "completion_event": "oneshot start job completed; no polling",
+  "unit_properties": {
+    "Description": "Owned holonics admission hnn-physical-acquisition-67cd42fc3-alternation-partitioned-20261006-v2 6e8e952760605b2ca74176459f90cbe7",
+    "LoadState": "loaded",
+    "ActiveState": "active",
+    "SubState": "exited",
+    "InvocationID": "0ef4d67a573a43e4b5f94deac5f8e8a6",
+    "Result": "success",
+    "ExecMainStatus": "0",
+    "ControlGroup": "",
+    "MemoryPeak": "85295104",
+    "CPUUsageNSec": "4540050000",
+    "TasksCurrent": "[not set]"
+  },
+  "outer_error": null,
+  "unit_start_exit": 0,
+  "unit_start_stdout": "",
+  "unit_start_stderr": "",
+  "config": {
+    "sha256": "ffde95becbeee5fc6bf36cd5bc1c1a0cceef6abb80d0b9bdf51b34d21e4dc300",
+    "bytes": 151550
+  },
+  "receipt_pins": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-physical-acquisition-67cd42fc3-alternation-partitioned-20261006-v2.config.json": {
+      "sha256": "ffde95becbeee5fc6bf36cd5bc1c1a0cceef6abb80d0b9bdf51b34d21e4dc300",
+      "bytes": 151550
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-physical-acquisition-67cd42fc3-alternation-partitioned-20261006-v2.external-lease.json": {
+      "sha256": "6725e12327d211c25f240971d64c25a300d770bfb7ca0b2afb65cceac4d6b38c",
+      "bytes": 487
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-physical-acquisition-67cd42fc3-alternation-partitioned-20261006-v2.lease-identity.json": {
+      "sha256": "21ac260c0dbc411e922c6cb3f80de710ced2e0c20ed445dae0c5e794feb14bc2",
+      "bytes": 565
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-physical-acquisition-67cd42fc3-alternation-partitioned-20261006-v2.input_seal.json": {
+      "sha256": "da1b0e2a604ba9fc781a8125237e939f37a7a7ad3e5c377d5fb2d561921b5f2a",
+      "bytes": 95932
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-physical-acquisition-67cd42fc3-alternation-partitioned-20261006-v2.stdout": {
+      "sha256": "52db73bc346cf9b7622fb4c129c22dbe052a7adfaa1aaa8521946cee35138745",
+      "bytes": 843527
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-physical-acquisition-67cd42fc3-alternation-partitioned-20261006-v2.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-physical-acquisition-67cd42fc3-alternation-partitioned-20261006-v2.memory-gate.json": {
+      "sha256": "0b52e135f8972b3c0d790ef5bc06de85f3464416d956bbd682a39f8536c9c8c7",
+      "bytes": 120
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-physical-acquisition-67cd42fc3-alternation-partitioned-20261006-v2.child-identity.json": {
+      "sha256": "b8e4c101c2fe1a2e75c4f9a29e90b054c9b0dd991271604f266b600ec5357b67",
+      "bytes": 78
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-physical-acquisition-67cd42fc3-alternation-partitioned-20261006-v2.system-floor.json": {
+      "sha256": "d2c0c61a8aaef14e83c0496a2a189330b965887cb4544f8c12db81c6e3a1ff9a",
+      "bytes": 33959
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-physical-acquisition-67cd42fc3-alternation-partitioned-20261006-v2.quiescence.json": {
+      "sha256": "ae8175d6ddb070f8a76141bd8de09c3bc12b43f6a36701911c4f9b1e5f92b236",
+      "bytes": 130
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-physical-acquisition-67cd42fc3-alternation-partitioned-20261006-v2.output_seal.json": {
+      "sha256": "abac0f83c716eced8b54d6df6f4a2fe1e5c38680fc3a6b7e662cbf2ca5966d77",
+      "bytes": 295686
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-physical-acquisition-67cd42fc3-alternation-partitioned-20261006-v2.publication.json": {
+      "sha256": "5b015ab4a64169428c83be145525b6344024bf69bd0f70b6bbc9c4891520babb",
+      "bytes": 3279
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-physical-acquisition-67cd42fc3-alternation-partitioned-20261006-v2.stage-quiescence.json": {
+      "sha256": "0b96a93ff1a11a0b88dcc2ca94e7507112062db8d2f31fe31aad56f03f6d107f",
+      "bytes": 136
+    }
+  },
+  "launcher_outside_native_group": true,
+  "lease_owner_outside_capped_group": true,
+  "lease_held_through_final_CPU_read_and_publication": true,
+  "stage_passed_before_cleanup": true,
+  "requires_cleanup_acceptance": true
+}

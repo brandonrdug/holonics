@@ -1,0 +1,212 @@
+{
+  "source_commit": "67cd42fc3d5298c38843d1e8e03f1da116eb02c7",
+  "source_scope": "288 native inputs fixed through all three development bodies; later queue metadata pins do not change native source",
+  "artifact_scope": "actual outputs/time/controller/release cores and immutable native/timing source identities. No private conversation, replayed Word, provider/cache binary archive or claimed new run.",
+  "files": {
+    "order2.stdout": {
+      "bytes": 1086793,
+      "sha256": "6d8767eab958e483c8d8c9df72bbf0ccc128741799e8fcdf65575897fb880084"
+    },
+    "order2.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "order2.final.json": {
+      "bytes": 5122,
+      "sha256": "101c5d174af7b44b5ac08f62eca6a1255a605c52bde8299a75f2ba433abe7371"
+    },
+    "order2.acceptance.json": {
+      "bytes": 377,
+      "sha256": "ddf50f9e2b0e1c3da1c8fa25c1bcff28f34ed0faea5b0332ac4391494e87f297"
+    },
+    "order2.release.json": {
+      "bytes": 175,
+      "sha256": "b0e48abfff33ae59628b2a03dd637e90b3244f77c7929d71950d994a760256ea"
+    },
+    "order2.config.json": {
+      "bytes": 146799,
+      "sha256": "9b88be0082f03b1928baf089a00d821ecf2b8a6fb21c414f14547776a964d8b0"
+    },
+    "line.stdout": {
+      "bytes": 857076,
+      "sha256": "beda525f1ba8cb468fa91e7284a41f2aa9b32dd3cf6372433f76881535bdc4c3"
+    },
+    "line.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "line.final.json": {
+      "bytes": 5114,
+      "sha256": "89cdd6211c06e70a15b762871403197417f3a2ac27103287a29f9260c1a9465d"
+    },
+    "line.acceptance.json": {
+      "bytes": 378,
+      "sha256": "9aecf15ce521ad6bc964bf47492eded99910419ffc2d6e774ea15911177e43b4"
+    },
+    "line.release.json": {
+      "bytes": 175,
+      "sha256": "82f6603e98e49f03b85c125cf9944cf365679ca24f0d3081d9dd87b474e16227"
+    },
+    "line.config.json": {
+      "bytes": 148757,
+      "sha256": "ec75fe24fa9a0b68dc7eac011ec52df49cc7e714f62a6d907ec52fa779ff424f"
+    },
+    "alternation.stdout": {
+      "bytes": 843527,
+      "sha256": "52db73bc346cf9b7622fb4c129c22dbe052a7adfaa1aaa8521946cee35138745"
+    },
+    "alternation.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "alternation.final.json": {
+      "bytes": 5225,
+      "sha256": "277429433dc3042ed6d71d47edeec92418ede7ad6d55cc0a3e4badad0ab6755d"
+    },
+    "alternation.acceptance.json": {
+      "bytes": 377,
+      "sha256": "978a8ec30f06655441f4f4d11cff1572929cf02d724ddfe819455f9d7d45f8db"
+    },
+    "alternation.release.json": {
+      "bytes": 175,
+      "sha256": "8c548bff16458c9f368468b49c09091ecf3333aeadc14f394e46efa1d772f169"
+    },
+    "alternation.config.json": {
+      "bytes": 151550,
+      "sha256": "ffde95becbeee5fc6bf36cd5bc1c1a0cceef6abb80d0b9bdf51b34d21e4dc300"
+    },
+    "FROZEN_CARRY_SIZE_READ.v1.json": {
+      "bytes": 10501,
+      "sha256": "964b924d0a1ee116388792deb9a0ca546f8ecf34545bf0a1bb2eaa11e28afc54"
+    }
+  },
+  "results": [
+    {
+      "family": "order2",
+      "protocol_status": "accepted development",
+      "whole_outputs": [
+        {
+          "probe": 0,
+          "input_debug": "[Some(0), Some(3), None, Some(0)]",
+          "before_cells_debug": "[Intact(0), Intact(3), Held { fibre: [0, 1, 2, 3], unresolved: PluralDomain }, Intact(0)]",
+          "matched_cells_debug": "[Intact(0), Intact(3), Held { fibre: [2, 3], unresolved: PluralDomain }, Intact(0)]",
+          "continuing_cells_debug": "[Intact(0), Intact(3), Held { fibre: [2, 3], unresolved: PluralDomain }, Intact(0)]",
+          "complex_logit_0_equals_1": true,
+          "truth": 1
+        },
+        {
+          "probe": 1,
+          "input_debug": "[Some(1), Some(2), None, Some(3)]",
+          "before_cells_debug": "[Intact(1), Intact(2), Held { fibre: [0, 1, 2, 3], unresolved: PluralDomain }, Intact(3)]",
+          "matched_cells_debug": "[Intact(1), Intact(2), Released(2), Intact(3)]",
+          "continuing_cells_debug": "[Intact(1), Intact(2), Held { fibre: [2, 3], unresolved: PluralDomain }, Intact(3)]",
+          "complex_logit_0_equals_1": true,
+          "truth": 2
+        },
+        {
+          "probe": 2,
+          "input_debug": "[Some(1), Some(0), None, Some(1)]",
+          "before_cells_debug": "[Intact(1), Intact(0), Held { fibre: [0, 1, 2, 3], unresolved: PluralDomain }, Intact(1)]",
+          "matched_cells_debug": "[Intact(1), Intact(0), Released(2), Intact(1)]",
+          "continuing_cells_debug": "[Intact(1), Intact(0), Released(2), Intact(1)]",
+          "complex_logit_0_equals_1": true,
+          "truth": 2
+        },
+        {
+          "probe": 3,
+          "input_debug": "[Some(1), Some(2), None, Some(3)]",
+          "before_cells_debug": "[Intact(1), Intact(2), Held { fibre: [0, 1, 2, 3], unresolved: PluralDomain }, Intact(3)]",
+          "matched_cells_debug": "[Intact(1), Intact(2), Released(2), Intact(3)]",
+          "continuing_cells_debug": "[Intact(1), Intact(2), Released(2), Intact(3)]",
+          "complex_logit_0_equals_1": true,
+          "truth": 2
+        }
+      ]
+    },
+    {
+      "family": "line",
+      "protocol_status": "INCOMPLETE whole-wall projection",
+      "whole_outputs": [
+        {
+          "probe": 0,
+          "input_debug": "[Some(2), Some(3), None, Some(1)]",
+          "before_cells_debug": "[Intact(2), Intact(3), Held { fibre: [0, 1, 2, 3], unresolved: PluralDomain }, Intact(1)]",
+          "matched_cells_debug": "[Intact(2), Intact(3), Released(2), Intact(1)]",
+          "continuing_cells_debug": "[Intact(2), Intact(3), Released(2), Intact(1)]",
+          "complex_logit_0_equals_1": true,
+          "truth": 0
+        },
+        {
+          "probe": 1,
+          "input_debug": "[Some(2), Some(2), None, Some(2)]",
+          "before_cells_debug": "[Intact(2), Intact(2), Held { fibre: [0, 1, 2, 3], unresolved: PluralDomain }, Intact(2)]",
+          "matched_cells_debug": "[Intact(2), Intact(2), Held { fibre: [2, 3], unresolved: PluralDomain }, Intact(2)]",
+          "continuing_cells_debug": "[Intact(2), Intact(2), Held { fibre: [2, 3], unresolved: PluralDomain }, Intact(2)]",
+          "complex_logit_0_equals_1": true,
+          "truth": 2
+        },
+        {
+          "probe": 2,
+          "input_debug": "[Some(2), Some(3), None, Some(1)]",
+          "before_cells_debug": "[Intact(2), Intact(3), Held { fibre: [0, 1, 2, 3], unresolved: PluralDomain }, Intact(1)]",
+          "matched_cells_debug": "[Intact(2), Intact(3), Released(2), Intact(1)]",
+          "continuing_cells_debug": "[Intact(2), Intact(3), Released(2), Intact(1)]",
+          "complex_logit_0_equals_1": true,
+          "truth": 0
+        },
+        {
+          "probe": 3,
+          "input_debug": "[Some(3), Some(2), None, Some(0)]",
+          "before_cells_debug": "[Intact(3), Intact(2), Held { fibre: [0, 1, 2, 3], unresolved: PluralDomain }, Intact(0)]",
+          "matched_cells_debug": "[Intact(3), Intact(2), Held { fibre: [2, 3], unresolved: PluralDomain }, Intact(0)]",
+          "continuing_cells_debug": "[Intact(3), Intact(2), Held { fibre: [0, 1, 2], unresolved: PluralDomain }, Intact(0)]",
+          "complex_logit_0_equals_1": true,
+          "truth": 1
+        }
+      ]
+    },
+    {
+      "family": "alternation",
+      "protocol_status": "INCOMPLETE controller projection",
+      "whole_outputs": [
+        {
+          "probe": 0,
+          "input_debug": "[Some(3), Some(1), None, Some(1)]",
+          "before_cells_debug": "[Intact(3), Intact(1), Held { fibre: [0, 1, 2, 3], unresolved: PluralDomain }, Intact(1)]",
+          "matched_cells_debug": "[Intact(3), Intact(1), Held { fibre: [2, 3], unresolved: PluralDomain }, Intact(1)]",
+          "continuing_cells_debug": "[Intact(3), Intact(1), Held { fibre: [2, 3], unresolved: PluralDomain }, Intact(1)]",
+          "complex_logit_0_equals_1": true,
+          "truth": 3
+        },
+        {
+          "probe": 1,
+          "input_debug": "[Some(1), Some(0), None, Some(0)]",
+          "before_cells_debug": "[Intact(1), Intact(0), Held { fibre: [0, 1, 2, 3], unresolved: PluralDomain }, Intact(0)]",
+          "matched_cells_debug": "[Intact(1), Intact(0), Released(2), Intact(0)]",
+          "continuing_cells_debug": "[Intact(1), Intact(0), Held { fibre: [0, 1, 2], unresolved: PluralDomain }, Intact(0)]",
+          "complex_logit_0_equals_1": true,
+          "truth": 1
+        },
+        {
+          "probe": 2,
+          "input_debug": "[Some(1), Some(3), None, Some(3)]",
+          "before_cells_debug": "[Intact(1), Intact(3), Held { fibre: [0, 1, 2, 3], unresolved: PluralDomain }, Intact(3)]",
+          "matched_cells_debug": "[Intact(1), Intact(3), Released(2), Intact(3)]",
+          "continuing_cells_debug": "[Intact(1), Intact(3), Released(2), Intact(3)]",
+          "complex_logit_0_equals_1": true,
+          "truth": 1
+        },
+        {
+          "probe": 3,
+          "input_debug": "[Some(3), Some(0), None, Some(0)]",
+          "before_cells_debug": "[Intact(3), Intact(0), Held { fibre: [0, 1, 2, 3], unresolved: PluralDomain }, Intact(0)]",
+          "matched_cells_debug": "[Intact(3), Intact(0), Released(2), Intact(0)]",
+          "continuing_cells_debug": "[Intact(3), Intact(0), Released(2), Intact(0)]",
+          "complex_logit_0_equals_1": true,
+          "truth": 3
+        }
+      ]
+    }
+  ],
+  "material_read_limitation": "No serialized R material dump; full row equality is source-inductive, observed exact0/1 complex logits are12 finite projections."
+}

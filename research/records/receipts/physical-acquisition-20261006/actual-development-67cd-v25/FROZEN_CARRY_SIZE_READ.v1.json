@@ -1,0 +1,292 @@
+{
+  "scope": "read-only extraction from frozen67cd native stdout, not a new run",
+  "basis": "All explicit Ratio numerator/denominator entries in the actual entering WordOpening debug value, including change/conductance/momenta; abs(numerator).bit_length and denominator.bit_length, zero numerator0bits. Counts are serialized logical entries, not physical memory allocation. Teaching elapsed includes publication and all controls, not arithmetic-only. No current R material dump was saved, so R-vs-carry dominance is unresolved.",
+  "results": [
+    {
+      "family": "order2",
+      "raw_stdout": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-physical-acquisition-67cd42fc3-order2-bootstrap-20261006-v1.stdout",
+      "sha256": "6d8767eab958e483c8d8c9df72bbf0ccc128741799e8fcdf65575897fb880084",
+      "rows": [
+        {
+          "kind": "teaching",
+          "index": 0,
+          "entering_opening": "Rest",
+          "serialized_entering_carry_bytes": 4,
+          "rational_entries": 0,
+          "max_numerator_bits": 0,
+          "max_denominator_bits": 0,
+          "sum_numerator_denominator_bits": 0,
+          "teaching_whole_elapsed_ms": 195
+        },
+        {
+          "kind": "teaching",
+          "index": 1,
+          "entering_opening": "Received",
+          "serialized_entering_carry_bytes": 5965,
+          "rational_entries": 106,
+          "max_numerator_bits": 54,
+          "max_denominator_bits": 58,
+          "sum_numerator_denominator_bits": 8684,
+          "teaching_whole_elapsed_ms": 372
+        },
+        {
+          "kind": "teaching",
+          "index": 2,
+          "entering_opening": "Received",
+          "serialized_entering_carry_bytes": 9568,
+          "rational_entries": 106,
+          "max_numerator_bits": 117,
+          "max_denominator_bits": 122,
+          "sum_numerator_denominator_bits": 20646,
+          "teaching_whole_elapsed_ms": 436
+        },
+        {
+          "kind": "teaching",
+          "index": 3,
+          "entering_opening": "Received",
+          "serialized_entering_carry_bytes": 13168,
+          "rational_entries": 106,
+          "max_numerator_bits": 179,
+          "max_denominator_bits": 183,
+          "sum_numerator_denominator_bits": 32496,
+          "teaching_whole_elapsed_ms": 562
+        },
+        {
+          "kind": "probe",
+          "index": 0,
+          "entering_opening": "Received",
+          "serialized_entering_carry_bytes": 17009,
+          "rational_entries": 106,
+          "max_numerator_bits": 239,
+          "max_denominator_bits": 243,
+          "sum_numerator_denominator_bits": 45331,
+          "teaching_whole_elapsed_ms": null
+        },
+        {
+          "kind": "probe",
+          "index": 1,
+          "entering_opening": "Received",
+          "serialized_entering_carry_bytes": 20797,
+          "rational_entries": 106,
+          "max_numerator_bits": 300,
+          "max_denominator_bits": 304,
+          "sum_numerator_denominator_bits": 57909,
+          "teaching_whole_elapsed_ms": null
+        },
+        {
+          "kind": "probe",
+          "index": 2,
+          "entering_opening": "Received",
+          "serialized_entering_carry_bytes": 24710,
+          "rational_entries": 106,
+          "max_numerator_bits": 363,
+          "max_denominator_bits": 366,
+          "sum_numerator_denominator_bits": 70817,
+          "teaching_whole_elapsed_ms": null
+        },
+        {
+          "kind": "probe",
+          "index": 3,
+          "entering_opening": "Received",
+          "serialized_entering_carry_bytes": 28451,
+          "rational_entries": 106,
+          "max_numerator_bits": 423,
+          "max_denominator_bits": 427,
+          "sum_numerator_denominator_bits": 83287,
+          "teaching_whole_elapsed_ms": null
+        }
+      ]
+    },
+    {
+      "family": "line",
+      "raw_stdout": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-physical-acquisition-67cd42fc3-line-measured-20261006-v1.stdout",
+      "sha256": "beda525f1ba8cb468fa91e7284a41f2aa9b32dd3cf6372433f76881535bdc4c3",
+      "rows": [
+        {
+          "kind": "teaching",
+          "index": 0,
+          "entering_opening": "Rest",
+          "serialized_entering_carry_bytes": 4,
+          "rational_entries": 0,
+          "max_numerator_bits": 0,
+          "max_denominator_bits": 0,
+          "sum_numerator_denominator_bits": 0,
+          "teaching_whole_elapsed_ms": 202
+        },
+        {
+          "kind": "teaching",
+          "index": 1,
+          "entering_opening": "Received",
+          "serialized_entering_carry_bytes": 6091,
+          "rational_entries": 106,
+          "max_numerator_bits": 55,
+          "max_denominator_bits": 58,
+          "sum_numerator_denominator_bits": 8981,
+          "teaching_whole_elapsed_ms": 351
+        },
+        {
+          "kind": "teaching",
+          "index": 2,
+          "entering_opening": "Received",
+          "serialized_entering_carry_bytes": 10034,
+          "rational_entries": 106,
+          "max_numerator_bits": 119,
+          "max_denominator_bits": 122,
+          "sum_numerator_denominator_bits": 22098,
+          "teaching_whole_elapsed_ms": 445
+        },
+        {
+          "kind": "teaching",
+          "index": 3,
+          "entering_opening": "Received",
+          "serialized_entering_carry_bytes": 13798,
+          "rational_entries": 106,
+          "max_numerator_bits": 180,
+          "max_denominator_bits": 183,
+          "sum_numerator_denominator_bits": 34623,
+          "teaching_whole_elapsed_ms": 515
+        },
+        {
+          "kind": "probe",
+          "index": 0,
+          "entering_opening": "Received",
+          "serialized_entering_carry_bytes": 17681,
+          "rational_entries": 106,
+          "max_numerator_bits": 241,
+          "max_denominator_bits": 243,
+          "sum_numerator_denominator_bits": 47496,
+          "teaching_whole_elapsed_ms": null
+        },
+        {
+          "kind": "probe",
+          "index": 1,
+          "entering_opening": "Received",
+          "serialized_entering_carry_bytes": 21462,
+          "rational_entries": 106,
+          "max_numerator_bits": 301,
+          "max_denominator_bits": 304,
+          "sum_numerator_denominator_bits": 60028,
+          "teaching_whole_elapsed_ms": null
+        },
+        {
+          "kind": "probe",
+          "index": 2,
+          "entering_opening": "Received",
+          "serialized_entering_carry_bytes": 25363,
+          "rational_entries": 106,
+          "max_numerator_bits": 363,
+          "max_denominator_bits": 366,
+          "sum_numerator_denominator_bits": 72944,
+          "teaching_whole_elapsed_ms": null
+        },
+        {
+          "kind": "probe",
+          "index": 3,
+          "entering_opening": "Received",
+          "serialized_entering_carry_bytes": 29113,
+          "rational_entries": 106,
+          "max_numerator_bits": 423,
+          "max_denominator_bits": 427,
+          "sum_numerator_denominator_bits": 85458,
+          "teaching_whole_elapsed_ms": null
+        }
+      ]
+    },
+    {
+      "family": "alternation",
+      "raw_stdout": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-physical-acquisition-67cd42fc3-alternation-partitioned-20261006-v2.stdout",
+      "sha256": "52db73bc346cf9b7622fb4c129c22dbe052a7adfaa1aaa8521946cee35138745",
+      "rows": [
+        {
+          "kind": "teaching",
+          "index": 0,
+          "entering_opening": "Rest",
+          "serialized_entering_carry_bytes": 4,
+          "rational_entries": 0,
+          "max_numerator_bits": 0,
+          "max_denominator_bits": 0,
+          "sum_numerator_denominator_bits": 0,
+          "teaching_whole_elapsed_ms": 198
+        },
+        {
+          "kind": "teaching",
+          "index": 1,
+          "entering_opening": "Received",
+          "serialized_entering_carry_bytes": 5972,
+          "rational_entries": 106,
+          "max_numerator_bits": 55,
+          "max_denominator_bits": 58,
+          "sum_numerator_denominator_bits": 8639,
+          "teaching_whole_elapsed_ms": 348
+        },
+        {
+          "kind": "teaching",
+          "index": 2,
+          "entering_opening": "Received",
+          "serialized_entering_carry_bytes": 9761,
+          "rational_entries": 106,
+          "max_numerator_bits": 118,
+          "max_denominator_bits": 122,
+          "sum_numerator_denominator_bits": 21192,
+          "teaching_whole_elapsed_ms": 439
+        },
+        {
+          "kind": "teaching",
+          "index": 3,
+          "entering_opening": "Received",
+          "serialized_entering_carry_bytes": 13492,
+          "rational_entries": 106,
+          "max_numerator_bits": 181,
+          "max_denominator_bits": 183,
+          "sum_numerator_denominator_bits": 33627,
+          "teaching_whole_elapsed_ms": 505
+        },
+        {
+          "kind": "probe",
+          "index": 0,
+          "entering_opening": "Received",
+          "serialized_entering_carry_bytes": 17392,
+          "rational_entries": 106,
+          "max_numerator_bits": 240,
+          "max_denominator_bits": 243,
+          "sum_numerator_denominator_bits": 46534,
+          "teaching_whole_elapsed_ms": null
+        },
+        {
+          "kind": "probe",
+          "index": 1,
+          "entering_opening": "Received",
+          "serialized_entering_carry_bytes": 21144,
+          "rational_entries": 106,
+          "max_numerator_bits": 300,
+          "max_denominator_bits": 304,
+          "sum_numerator_denominator_bits": 59000,
+          "teaching_whole_elapsed_ms": null
+        },
+        {
+          "kind": "probe",
+          "index": 2,
+          "entering_opening": "Received",
+          "serialized_entering_carry_bytes": 25048,
+          "rational_entries": 106,
+          "max_numerator_bits": 364,
+          "max_denominator_bits": 366,
+          "sum_numerator_denominator_bits": 71949,
+          "teaching_whole_elapsed_ms": null
+        },
+        {
+          "kind": "probe",
+          "index": 3,
+          "entering_opening": "Received",
+          "serialized_entering_carry_bytes": 28796,
+          "rational_entries": 106,
+          "max_numerator_bits": 424,
+          "max_denominator_bits": 427,
+          "sum_numerator_denominator_bits": 84443,
+          "teaching_whole_elapsed_ms": null
+        }
+      ]
+    }
+  ],
+  "inference": "Increasing carry bit sizes and longer whole teaching cost are associated; causality and arithmetic versus serialization/deposition/certification work are not established."
+}
