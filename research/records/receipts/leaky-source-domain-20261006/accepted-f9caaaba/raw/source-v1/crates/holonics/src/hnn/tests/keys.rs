@@ -1,0 +1,569 @@
+//! Keys lead learning: a declared rotor configuration is recovered from a crib the terrain owner's
+//! true machine produces (`holarchy::terrain::rotor_crib`) as its full gauge orbit, a drawn key and
+//! plugboard lie in the located fibre, propagation equals brute force, gauge fixing picks one member
+//! per orbit, adding an edge only shrinks the fibre, an empty fibre falls back, a ring is located
+//! under the earlier rings' configurations, and re-keying leaves the open moment untouched.
+
+use num_bigint::BigUint;
+
+use crate::hnn::tests::support::encoded;
+use super::support::{Draw, contact, ring};
+use crate::compression::{Candidate, Menu, PortImages};
+use crate::hnn::HnnError;
+use crate::hnn::field::{CribDeclaration, Current, Field, FieldDeclaration, ReceiverDeclaration};
+use crate::hnn::keys::{
+    candidate_keys, crib_menu, crib_opening, crib_ticks, locate_closing, locate_keys, locate_ring,
+    ring_steps,
+};
+use crate::hnn::moment::SourceMoment;
+use crate::holarchy::terrain::{RotorCrib, rotor_crib};
+use crate::holon::contact::menu::PortPermutation;
+use crate::navigator::Clock;
+use crate::ratio::{integer, rat};
+
+/// A field of rings with the declared periods and locks (in carry order), joined in a path, whose
+/// source is its widest ring and whose classes are that ring's ports, so a class is its own port on
+/// every ring at least as wide (THE_MACHINE guard 9: no residue; it read 16 classes through
+/// `code mod d_g` before October 5).
+fn rotor_field(rings: &[(u64, Vec<u64>)]) -> Field {
+    let widest = (0..rings.len()).max_by_key(|&g| (rings[g].0, std::cmp::Reverse(g))).unwrap();
+    Field::declare(
+        FieldDeclaration {
+            rings: rings
+                .iter()
+                .map(|(period, lock)| ring(*period, lock.clone()))
+                .collect(),
+            contacts: (1..rings.len()).map(|g| contact(g - 1, g, 1, 0)).collect(),
+            loops: Vec::new(),
+            sources: vec![widest],
+            offsets: vec![1],
+            alphabet: rings[widest].0 as usize,
+            step: integer(1),
+            exponent_grain: 1,
+            receivers: vec![ReceiverDeclaration {
+                ring: rings.len() - 1,
+                aperture: 1,
+                tolerance: rat(1, 16),
+                depth: 2,
+                prior: crate::compression::landmark::context::StopPrior::half(),
+                mass: 1,
+                base: crate::compression::landmark::context::BaseMeasure::Even,
+                receiving_prior: 0,
+            }],
+            crib: CribDeclaration {
+                window: 64,
+                offset: 1,
+            },
+            population: 1 << 24,
+            lattice: Default::default(),
+        }
+        .by_lattice_rule(),
+    )
+    .unwrap()
+}
+
+fn key_class(candidate: &Candidate<Clock>, period: u64) -> u64 {
+    u64::try_from(candidate.key.ticks() % BigUint::from(period)).unwrap()
+}
+
+/// Lean `HNN/Keys.{field_loop_fibre, gauge_fix_unique}`, `Keys.fibre_eq_orbit`: a declared rotor
+/// configuration is recovered from a synthetic crib as its full consistent family, the truth's
+/// rotor-gauge orbit (seven members, never a point), and the gauge fixing `S(p_0) = 0` publishes the
+/// known key when the true plugboard fixes `p_0`.
+#[test]
+fn a_known_key_is_recovered_as_its_gauge_orbit_and_published_by_the_convention() {
+    let field = rotor_field(&[(7, (0..7).collect()), (2, vec![])]);
+    let board = PortPermutation::new(vec![0, 4, 6, 2, 1, 5, 3]).unwrap();
+    let key = 3;
+    let crib = rotor_crib(&field, 0, key, &board, &[0, 0], 64, 0).unwrap();
+    let located = locate_ring(&field, 0, &encoded(&field, &crib), 1, &[0, 0], 0).unwrap();
+    assert_eq!(
+        located.fibre.len(),
+        7,
+        "the fibre is the orbit, not a point"
+    );
+    assert_eq!(located.orbits, 1);
+    let mut keys: Vec<u64> = located.fibre.iter().map(|c| key_class(c, 7)).collect();
+    keys.sort_unstable();
+    assert_eq!(keys, (0..7).collect::<Vec<_>>());
+    let truth = located
+        .fibre
+        .iter()
+        .find(|c| key_class(c, 7) == key)
+        .expect("the truth lies in the fibre");
+    for port in &located.menu_ports {
+        assert_eq!(truth.images.image(*port), Some(board.apply(*port).unwrap()));
+    }
+    assert_eq!(located.menu_ports[0], 0);
+    assert_eq!(located.published, Some(key));
+    assert_eq!(located.configuration, key);
+    assert!(!located.fell_back);
+    // A plugboard that does not fix the least port publishes the gauge-fixed member instead.
+    let turned = PortPermutation::new(vec![2, 4, 6, 0, 1, 5, 3]).unwrap();
+    let crib = rotor_crib(&field, 0, key, &turned, &[0, 0], 64, 0).unwrap();
+    let located = locate_ring(&field, 0, &encoded(&field, &crib), 1, &[0, 0], 0).unwrap();
+    // The gauge-fixed member is `(key + t, S − t)` with `S(0) − t = 0`, so `t = S(0) = 2`.
+    assert_eq!(located.published, Some((key + 2) % 7));
+}
+
+/// A drawn crib (`holarchy::terrain::RotorCrib::draw`): its truth's key and plugboard lie in the
+/// located fibre, which is one rotor-gauge orbit of seven members, and a drawn key and plugboard of a
+/// period-7 ring are named by `⌈log₂(7 · 7!)⌉ = ⌈log₂ 35280⌉ = 16` bits.
+#[test]
+fn a_drawn_crib_keeps_its_key_and_plugboard_in_the_located_fibre() {
+    let field = rotor_field(&[(7, (0..7).collect()), (2, vec![])]);
+    let crib = RotorCrib::draw(&field, 0, &[0, 0], 64, &mut Draw::new(41)).unwrap();
+    assert_eq!(crib.truth.key_bits, 16);
+    assert_eq!(crib.cells[0], crib.truth.start);
+    let located = locate_ring(&field, 0, &encoded(&field, &crib.cells), 1, &[0, 0], 0).unwrap();
+    assert_eq!(located.fibre.len(), 7);
+    let truth = located
+        .fibre
+        .iter()
+        .find(|c| key_class(c, 7) == crib.truth.key)
+        .expect("the drawn key lies in the fibre");
+    for port in &located.menu_ports {
+        assert_eq!(
+            truth.images.image(*port),
+            Some(crib.truth.board.apply(*port).unwrap())
+        );
+    }
+}
+
+/// Brute force over a ring's menu: every key with every injective image of the menu ports, kept
+/// when every edge holds, with each edge's stage computed once per key.
+fn brute_force(menu: &Menu<Clock>, keys: &[Clock]) -> Vec<(u64, Vec<Option<usize>>)> {
+    let ports = menu.menu_ports();
+    let images = PortImages::injections(menu.ports(), &ports).unwrap();
+    let mut kept = Vec::new();
+    for key in keys {
+        let stages: Vec<_> = menu.edges().iter().map(|e| e.stage(key).unwrap()).collect();
+        for image in &images {
+            let holds = menu.edges().iter().zip(&stages).all(|(edge, stage)| {
+                stage.apply(image.image(edge.from()).unwrap()).unwrap()
+                    == image.image(edge.to()).unwrap()
+            });
+            if holds {
+                kept.push((
+                    u64::try_from(key.ticks() % BigUint::from(menu.ports() as u64)).unwrap(),
+                    (0..menu.ports()).map(|p| image.image(p)).collect(),
+                ));
+            }
+        }
+    }
+    kept.sort();
+    kept
+}
+
+fn classes(fibre: &[Candidate<Clock>], period: u64) -> Vec<(u64, Vec<Option<usize>>)> {
+    let mut classes: Vec<_> = fibre
+        .iter()
+        .map(|c| {
+            (
+                key_class(c, period),
+                (0..period as usize).map(|p| c.images.image(p)).collect(),
+            )
+        })
+        .collect();
+    classes.sort();
+    classes
+}
+
+/// Lean `HNN/Keys.propagation_eq_edge_fibre`: on ring menus below the image ceiling, the
+/// propagated survivors are exactly the brute-force candidates satisfying every edge, on
+/// machine-produced cribs and on random cribs.
+#[test]
+fn propagation_equals_brute_force_on_ring_menus() {
+    let field = rotor_field(&[(7, vec![1, 4]), (2, vec![])]);
+    let board = PortPermutation::new(vec![4, 0, 6, 2, 1, 5, 3]).unwrap();
+    let mut draw = Draw::new(51);
+    for length in [4usize, 6, 9] {
+        let crib = rotor_crib(&field, 0, 2, &board, &[0, 0], length, draw.below(7)).unwrap();
+        let random: Vec<usize> = (0..length).map(|_| draw.below(7)).collect();
+        for cells in [crib, random] {
+            let menu = crib_menu(&field, 0, &encoded(&field, &cells), 1, &[0, 0]).unwrap();
+            let keys = candidate_keys(&field, 0).unwrap();
+            let propagated = menu.propagate(&keys).unwrap();
+            assert_eq!(
+                classes(&propagated.candidates, 7),
+                brute_force(&menu, &keys)
+            );
+            assert!(propagated.work <= 7 * 7 * 2 * menu.edges().len() as u64);
+        }
+    }
+}
+
+/// Lean `HNN/Keys.gauge_fix_unique`: on a plural fibre, every rotor-gauge orbit has exactly one
+/// member with `S(p_0) = 0` at the least menu port.
+#[test]
+fn gauge_fixing_picks_one_member_per_orbit() {
+    let field = rotor_field(&[(7, vec![1, 4]), (2, vec![])]);
+    let board = PortPermutation::new(vec![4, 0, 6, 2, 1, 5, 3]).unwrap();
+    let crib = rotor_crib(&field, 0, 5, &board, &[0, 0], 12, 1).unwrap();
+    let located = locate_ring(&field, 0, &encoded(&field, &crib), 1, &[0, 0], 0).unwrap();
+    assert!(
+        located.orbits > 1,
+        "the δ = 1 chain leaves the fibre plural"
+    );
+    assert_eq!(located.published, None);
+    assert!(located.fell_back);
+    let least = located.menu_ports[0];
+    let fixed = located
+        .fibre
+        .iter()
+        .filter(|c| c.images.image(least) == Some(0))
+        .count();
+    assert_eq!(fixed, located.orbits);
+    assert_eq!(located.fibre.len(), 7 * located.orbits);
+}
+
+/// Lean `Keys.fibre_cons`: adding an edge only shrinks the fibre (each survivor, restricted to the
+/// earlier menu's ports, survived there), and the truth is never lost.
+#[test]
+fn adding_an_edge_only_shrinks_the_fibre() {
+    let field = rotor_field(&[(7, vec![1, 4]), (2, vec![])]);
+    let board = PortPermutation::new(vec![4, 0, 6, 2, 1, 5, 3]).unwrap();
+    let crib = rotor_crib(&field, 0, 1, &board, &[0, 0], 24, 2).unwrap();
+    let keys = candidate_keys(&field, 0).unwrap();
+    let restrict = |class: &(u64, Vec<Option<usize>>), ports: &[usize]| {
+        (
+            class.0,
+            ports.iter().map(|p| class.1[*p]).collect::<Vec<_>>(),
+        )
+    };
+    let mut previous: Option<(Vec<usize>, Vec<(u64, Vec<Option<usize>>)>)> = None;
+    for length in 2..=crib.len() {
+        let menu = crib_menu(&field, 0, &encoded(&field, &crib[..length]), 1, &[0, 0]).unwrap();
+        let ports = menu.menu_ports();
+        let fibre = classes(&menu.propagate(&keys).unwrap().candidates, 7);
+        assert!(fibre.iter().any(|(key, images)| {
+            *key == 1
+                && ports
+                    .iter()
+                    .all(|p| images[*p] == Some(board.apply(*p).unwrap()))
+        }));
+        if let Some((earlier_ports, earlier)) = &previous {
+            for class in &fibre {
+                let restricted = restrict(class, earlier_ports);
+                assert!(
+                    earlier
+                        .iter()
+                        .any(|e| restrict(e, earlier_ports) == restricted)
+                );
+            }
+        }
+        previous = Some((ports, fibre));
+    }
+}
+
+/// An empty fibre, reported with its shortest failing loop, falls back to the current
+/// configuration.
+#[test]
+fn an_empty_fibre_falls_back_to_the_current_configuration() {
+    let field = rotor_field(&[(7, (0..7).collect()), (2, vec![])]);
+    // Two self-edges at port 0 at consecutive positions each force `S(0)` to their stage's one
+    // fixed point, `−(key + m)`, which differ: no key closes both.
+    let crib: Vec<usize> = vec![0, 0, 0, 3, 5];
+    let located = locate_ring(&field, 0, &encoded(&field, &crib), 1, &[4, 0], 4).unwrap();
+    assert!(located.fibre.is_empty());
+    assert_eq!(located.orbits, 0);
+    assert_eq!(located.published, None);
+    assert_eq!(located.configuration, 4);
+    assert!(located.fell_back);
+    let failing = located.failing_loop.expect("a failing loop is reported");
+    assert!(!failing.is_empty());
+    let mut current = Current::at(&field, vec![4.into(), 0.into()]).unwrap();
+    let location = locate_keys(&field, &current, &encoded(&field, &crib), 1).unwrap();
+    assert_eq!(location.configurations()[0], 4);
+    let before = current.clone();
+    location.rekey(&field, &mut current).unwrap();
+    assert_eq!(current, before);
+}
+
+/// Ring `g` is located under the earlier rings' published or fallen-back configurations: its step
+/// positions come from their carries. A crib a true machine produced on ring 1 with ring 0 at
+/// configuration 1 keeps the truth in ring 1's fibre under that configuration, which ring 0's own
+/// (empty) fibre falls back to.
+#[test]
+fn a_ring_is_located_under_the_earlier_rings_configurations() {
+    let field = rotor_field(&[(3, vec![0, 1, 2]), (5, vec![])]);
+    let board = PortPermutation::new(vec![3, 0, 4, 1, 2]).unwrap();
+    let crib = rotor_crib(&field, 1, 2, &board, &[1, 0], 40, 0).unwrap();
+    let under_truth = locate_ring(&field, 1, &encoded(&field, &crib), 1, &[1, 0], 0).unwrap();
+    let truth = |fibre: &[Candidate<Clock>]| {
+        fibre
+            .iter()
+            .any(|c| key_class(c, 5) == 2 && c.images.image(0) == Some(board.apply(0).unwrap()))
+    };
+    assert!(truth(&under_truth.fibre));
+    let under_other = locate_ring(&field, 1, &encoded(&field, &crib), 1, &[0, 0], 0).unwrap();
+    assert!(!truth(&under_other.fibre));
+    assert_ne!(
+        ring_steps(&field, 1, &encoded(&field, &crib), &[1, 0]).unwrap(),
+        ring_steps(&field, 1, &encoded(&field, &crib), &[0, 0]).unwrap()
+    );
+    let current = Current::at(&field, vec![1.into(), 0.into()]).unwrap();
+    let location = locate_keys(&field, &current, &encoded(&field, &crib), 1).unwrap();
+    assert!(location.rings[0].fell_back);
+    assert_eq!(location.rings[0].configuration, 1);
+    assert!(truth(&location.rings[1].fibre));
+}
+
+/// R3 K1: re-keying at a boundary moves only the lift point's phase classes, keeping windings, and
+/// leaves the open moment's bins, offset counts and window unchanged.
+#[test]
+fn rekeying_leaves_the_open_moment_untouched() {
+    let field = rotor_field(&[(7, (0..7).collect()), (2, vec![])]);
+    let board = PortPermutation::new(vec![0, 4, 6, 2, 1, 5, 3]).unwrap();
+    let mut current = Current::at_rest(&field);
+    let mut moment = SourceMoment::open(&field, &current);
+    let mut draw = Draw::new(61);
+    let cells: Vec<usize> = (0..30).map(|_| draw.below(7)).collect();
+    let mut fed = 0;
+    while fed < cells.len() {
+        fed += moment
+            .ingest(&field, &mut current, &encoded(&field, &cells[fed..]))
+            .unwrap()
+            .cells;
+    }
+    let kept = moment.clone();
+    let windings: Vec<_> = (0..2)
+        .map(|g| current.winding(&field, g).unwrap())
+        .collect();
+    let crib = rotor_crib(&field, 0, 3, &board, &[0, 0], 64, 0).unwrap();
+    let location = locate_keys(&field, &current, &encoded(&field, &crib), 1).unwrap();
+    assert_eq!(location.rings[0].published, Some(3));
+    let jumps = location.rekey(&field, &mut current).unwrap();
+    assert_eq!(current.phase(&field, 0).unwrap(), 3);
+    // Ring 0 ticks once a cell from rest, so it stood at 30 mod 7 = 2 before the jump.
+    assert_eq!(jumps[0], 1);
+    assert_eq!(
+        (0..2)
+            .map(|g| current.winding(&field, g).unwrap())
+            .collect::<Vec<_>>(),
+        windings
+    );
+    assert_eq!(moment, kept);
+}
+
+/// Review D1: keys are located on the crib that closed an aeon, cells already ingested. The lift at
+/// the crib's opening is recovered exactly by stepping back over it; the truth's gauge-fixed key is
+/// located there and carried over the crib's ticks to the boundary, where re-keying applies it; a
+/// crib that did not reach the lift is refused.
+#[test]
+fn a_closing_crib_is_stepped_back_and_its_key_carried_to_the_boundary() {
+    let field = rotor_field(&[(7, (0..7).collect()), (2, vec![])]);
+    let board = PortPermutation::new(vec![0, 4, 6, 2, 1, 5, 3]).unwrap();
+    let crib = rotor_crib(&field, 0, 3, &board, &[0, 0], 64, 0).unwrap();
+    let opening = Current::at(&field, vec![5.into(), 1.into()]).unwrap();
+    let mut current = opening.clone();
+    for &code in &crib {
+        current.step(&field, &encoded(&field, &[code]), 0).unwrap();
+    }
+    assert_eq!(
+        crib_opening(&field, current.lift(), &encoded(&field, &crib)).unwrap(),
+        opening.lift()
+    );
+    let location = locate_closing(&field, &current, &encoded(&field, &crib), 1).unwrap();
+    assert_eq!(location.rings[0].published, Some(3));
+    let ticks = crib_ticks(&field, 0, &encoded(&field, &crib), &location.configurations()).unwrap();
+    assert_eq!(ticks, 64);
+    assert_eq!(location.rings[0].carried, Some((3 + 64) % 7));
+    location.rekey(&field, &mut current).unwrap();
+    assert_eq!(current.phase(&field, 0).unwrap(), (3 + 64) % 7);
+    assert_eq!(
+        crib_opening(&field, Current::at_rest(&field).lift(), &encoded(&field, &crib)).unwrap_err(),
+        HnnError::NegativeLift { ring: 0 }
+    );
+}
+
+// -------------------------------------------------------------------------------------------
+// the pair menu over the span's distances, and the turn machine (lane B, October 5)
+
+use crate::hnn::keys::{PairLocation, PairReading, PairSurvivors, station_pairs};
+
+/// Seen passages of the order-2 law over four symbols: `n` drawn cells, then `m` stations each the
+/// cell two before it plus one (mod 4).
+fn order_two(seed: u64, count: usize, n: usize, m: usize) -> Vec<Vec<usize>> {
+    let mut draw = Draw::new(seed);
+    (0..count)
+        .map(|_| {
+            let mut passage: Vec<usize> = (0..n).map(|_| draw.below(4) as usize).collect();
+            for _ in 0..m {
+                let next = (passage[passage.len() - 2] + 1) % 4;
+                passage.push(next);
+            }
+            passage
+        })
+        .collect()
+}
+
+/// [implemented-exact] **The pair menu locates order-2 from its seen stations, and the alternation
+/// as the least of its windings.** On a ring of period 16, passages of 10 drawn cells continued by
+/// 4 order-2 stations locate the one distance 2 with the map `y ↦ y + 1` on the four symbols, its
+/// 4-cycle and the turns of order 4 (`4` and `12`); no other distance survives. Passages that
+/// alternate two drawn symbols keep every even distance alive with the identity map: the windings
+/// of distance 2, located as its pair `(2, id)` (module section "A class of windings is one key").
+#[test]
+fn the_pair_menu_locates_order_two_and_the_alternation_as_its_least_winding() {
+    let field = rotor_field(&[(16, (0..16).collect())]);
+    let mut location = PairLocation::open(&field, 0);
+    for passage in order_two(2_026_100_502, 12, 10, 4) {
+        for observation in station_pairs(&field, 0, &encoded(&field, &passage), 10).unwrap() {
+            location.observe(&observation);
+        }
+    }
+    let survivors = location.survivors();
+    assert_eq!(survivors.observations, 48);
+    let located = survivors.located().expect("order-2 located");
+    assert_eq!(located.offset, 2);
+    assert_eq!(located.map, vec![(0, 1), (1, 2), (2, 3), (3, 0)]);
+    assert_eq!(located.cycle, 4);
+    assert_eq!(located.turns, vec![4, 12]);
+
+    let mut draw = Draw::new(2_026_100_503);
+    let mut alternation = PairLocation::open(&field, 0);
+    for _ in 0..6 {
+        let (a, b) = (draw.below(4) as usize, draw.below(4) as usize);
+        let passage: Vec<usize> = (0..14).map(|t| if t % 2 == 0 { a } else { b }).collect();
+        for observation in station_pairs(&field, 0, &encoded(&field, &passage), 10).unwrap() {
+            alternation.observe(&observation);
+        }
+    }
+    let survivors = alternation.survivors();
+    let distances = survivors.distances();
+    assert!(distances.contains(&2) && distances.contains(&4));
+    assert!(distances.iter().all(|offset| offset % 2 == 0));
+    for (_, reading) in &survivors.alive {
+        let map = reading.map.as_ref().expect("every winding publishes its map");
+        assert!(map.iter().all(|(y, x)| y == x));
+    }
+    let located = survivors.located().expect("the windings of distance 2 locate it");
+    assert_eq!(located.offset, 2);
+    assert!(located.map.iter().all(|(y, x)| y == x));
+    assert_eq!((located.cycle, located.turns.clone()), (1, vec![0]));
+}
+
+/// A turn menu's reading with a published map (its cycle and turns as given).
+fn published(map: &[(usize, usize)], cycle: u64, turns: &[u64]) -> crate::compression::TurnReading {
+    crate::compression::TurnReading {
+        turns: turns.to_vec(),
+        cycle: Some(cycle),
+        map: Some(map.to_vec()),
+        edges: map.len() as u64,
+    }
+}
+
+/// [implemented-exact] **A class of windings is one key, any other plural class stays plural**
+/// (module section "A class of windings is one key"). Survivors `2` with `y ↦ y + 1` and `4` with
+/// `y ↦ y + 2` are one family, located as `(2, +1)`; `4` with `y ↦ y + 1` is not `f₀²`, and `3` is
+/// not a multiple of `2`: both leave the class plural. One survivor is located alone, and an
+/// unpublished generator locates nothing.
+#[test]
+fn a_class_of_windings_locates_its_least_distance_and_any_other_class_stays_plural() {
+    let plus = |k: usize| -> Vec<(usize, usize)> { (0..4).map(|y| (y, (y + k) % 4)).collect() };
+    let survivors = |alive: Vec<(usize, crate::compression::TurnReading)>| PairSurvivors {
+        observations: 1,
+        read: alive.len(),
+        alive,
+    };
+    let generator = published(&plus(1), 4, &[4, 12]);
+    let family = survivors(vec![
+        (2, generator.clone()),
+        (4, published(&plus(2), 2, &[8])),
+        (6, published(&plus(3), 4, &[4, 12])),
+    ]);
+    let located = family.located().expect("the windings of (2, +1)");
+    assert_eq!((located.offset, located.map.clone()), (2, plus(1)));
+    assert_eq!((located.cycle, located.turns), (4, vec![4, 12]));
+    let wrong_power = survivors(vec![(2, generator.clone()), (4, published(&plus(1), 4, &[4, 12]))]);
+    assert!(wrong_power.located().is_none());
+    let coprime = survivors(vec![(2, generator.clone()), (3, published(&plus(1), 4, &[4, 12]))]);
+    assert!(coprime.located().is_none());
+    let partial = survivors(vec![(2, generator.clone()), (4, published(&plus(2)[..2], 2, &[8]))]);
+    assert_eq!(partial.located().map(|pair| pair.offset), Some(2));
+    let alone = survivors(vec![(5, generator.clone())]);
+    assert_eq!(alone.located().map(|pair| pair.offset), Some(5));
+    let mut unpublished = generator;
+    unpublished.map = None;
+    assert!(survivors(vec![(2, unpublished)]).located().is_none());
+}
+
+/// [implemented-exact] **The pair menu reads only the passage it is given**: one observation per
+/// station after the opening, each at every distance below the period that its passage reaches;
+/// a passage with no station is refused, and a class outside the chart has no encoding.
+#[test]
+fn the_pair_menu_reads_each_station_at_every_distance_its_passage_reaches() {
+    let field = rotor_field(&[(16, (0..16).collect())]);
+    let passage: Vec<usize> = (0..20).map(|t| t % 4).collect();
+    let readings = station_pairs(&field, 0, &encoded(&field, &passage), 18).unwrap();
+    assert_eq!(readings.len(), 2);
+    assert_eq!(readings[0].len(), 15);
+    assert_eq!(readings[0][1], PairReading { offset: 2, from: 0, to: 2 });
+    assert!(matches!(
+        station_pairs(&field, 0, &encoded(&field, &passage), 0),
+        Err(HnnError::Crib { .. })
+    ));
+    // A class past the ring's ports has no encoding for it (THE_MACHINE guard 9).
+    assert!(matches!(
+        crate::hnn::encoding::Encoded::identity(
+            &crate::holarchy::terrain::KnownTruth::declared(100, vec![vec![0, 1, 99]]),
+            &field
+        ),
+        Err(crate::hnn::encoding::EncodingError::Fold { classes: 100, .. })
+    ));
+}
+
+/// [implemented-exact] **A damaged passage's menu reads only its intact cells, and the located
+/// pair repairs it from both sides** (`hnn::keys`, "A damaged passage's menu"; the consumer
+/// `compression::keys::repair`). On a ring of period 16, order-2 passages of 4 drawn cells and 12
+/// stations with the cells `1`, `5`, `6`, `9` and the tail `14, 15` erased: an erased station is no
+/// observation and an erased cell no antecedent, so the stations read are `4, 7, 8, 10 … 13` and the
+/// station 7 reads only the distances `3, 4, 5, 7` (its antecedents `6, 5, 1` are erased). The
+/// menus still locate `(2, y ↦ y + 1)`, its relation on the four classes is `y ↦ y + 1`, and the
+/// restriction releases every erased cell a station joins to an intact cell, equal to its truth,
+/// holding cell 1 (the opening's, joined by no station) with the four classes.
+#[test]
+fn a_damaged_passage_locates_its_pair_from_intact_cells_and_is_repaired_through_it() {
+    use crate::compression::keys::repair::{CellRelease, DamagedPassage, restrict};
+    use crate::hnn::keys::damaged_station_pairs;
+    let field = rotor_field(&[(16, (0..16).collect())]);
+    let erased = [1usize, 5, 6, 9, 14, 15];
+    let damage = |passage: &[usize]| -> Vec<Option<usize>> {
+        (0..passage.len())
+            .map(|t| (!erased.contains(&t)).then_some(passage[t]))
+            .collect()
+    };
+    let passages = order_two(2_026_100_742, 12, 4, 12);
+    let mut location = PairLocation::open(&field, 0);
+    for passage in &passages {
+        let cells = damage(passage);
+        let observations = damaged_station_pairs(&field, 0, &DamagedPassage::new(cells.clone(), field.alphabet(), 4).unwrap()).unwrap();
+        let stations: Vec<usize> = observations.iter().map(|(t, _)| *t).collect();
+        assert_eq!(stations, vec![4, 7, 8, 10, 11, 12, 13]);
+        let (_, at_seven) = &observations[1];
+        let distances: Vec<usize> = at_seven.iter().map(|reading| reading.offset).collect();
+        assert_eq!(distances, vec![3, 4, 5, 7]);
+        for (_, observation) in &observations {
+            location.observe(observation);
+        }
+    }
+    let located = location.survivors().located().expect("order-2 located from intact cells");
+    assert_eq!((located.offset, located.map.clone()), (2, vec![(0, 1), (1, 2), (2, 3), (3, 0)]));
+    let relation = located.relation(&field, 0, 4).unwrap();
+    assert_eq!(relation.map(), &[Some(1), Some(2), Some(3), Some(0)]);
+    for passage in &passages {
+        let damaged = DamagedPassage::new(damage(passage), 4, 4).unwrap();
+        let releases = restrict(&damaged, &relation).unwrap().release().unwrap();
+        for &t in &erased {
+            match &releases[t] {
+                CellRelease::Released(class) => assert_eq!(*class, passage[t], "cell {t}"),
+                CellRelease::Held(family) => {
+                    assert_eq!(t, 1);
+                    assert_eq!(family, &vec![0, 1, 2, 3]);
+                }
+                CellRelease::Intact(_) => panic!("cell {t} was erased"),
+            }
+        }
+    }
+}

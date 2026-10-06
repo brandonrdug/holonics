@@ -1,0 +1,3213 @@
+{
+  "passed": true,
+  "source_commit": "f9caaabae3ad1d722eece0e01f0f438104447ae2",
+  "source_base": "468553d5d971951d75e97c17f32a26e5b2ed0dc6",
+  "native_controls": 18,
+  "actual_unique_test_names": [
+    "hnn::tests::prediction::physical_repair::a_blind_later_quartic_passage_releases_only_a_constant_learned_domain_image",
+    "hnn::tests::prediction::physical_repair::the_coupled_quartic_tube_encloses_every_admitted_missing_class",
+    "hnn::tests::prediction::physical_repair::a_point_leader_does_not_replace_a_plural_coupled_domain",
+    "hnn::tests::prediction::physical_repair::a_station_no_declared_crossing_reads_is_held_unread",
+    "hnn::tests::prediction::physical_repair::equal_class_counts_do_not_join_different_producing_charts",
+    "hnn::tests::prediction::physical_repair::identity_conduct_must_certify_the_station_clock_even_at_erased_stations",
+    "hnn::tests::prediction::physical_repair::physical_teaching_changes_r_and_the_later_carried_receiving_read",
+    "hnn::tests::prediction::physical_repair::physical_teaching_refuses_a_stale_material_or_foreign_chart_and_preserves_the_carry",
+    "hnn::tests::prediction::physical_repair::the_damaged_section_runs_through_the_field_and_every_erasure_is_held_unresolved",
+    "hnn::tests::prediction::physical_repair::the_producing_decoder_and_both_physical_maps_are_joined_before_opening",
+    "hnn::tests::prediction::physical_repair::the_section_carries_no_erased_class_so_the_repair_cannot_read_one",
+    "hnn::tests::prediction::physical_repair::the_supported_physical_passage_continues_on_its_retained_interior_and_clock",
+    "hnn::tests::prediction::physical_repair::total_erasure_preserves_the_producing_chart_and_refuses_located_conduct_before_opening",
+    "sibling_ring_ticks_age_leaky_first_and_offset_coordinates_before_the_next_owning_append",
+    "same_phase_intact_swap_has_one_native_source_moment_and_one_physical_motion",
+    "hnn::tests::prediction::physical_repair::the_actual_leaky_source_return_changes_e_before_the_next_target_free_carried_word",
+    "hnn::tests::prediction::physical_repair::source_teaching_refuses_a_zero_return_and_a_reached_uncertified_quartic",
+    "hnn::tests::prediction::physical_repair::the_actual_leaky_completion_chart_encloses_mixed_classes_and_an_erased_age_endpoint"
+  ],
+  "runtime_groups": [
+    {
+      "passed": true,
+      "label": "hnn-material-f9caaaba-control-group1-20261006-v1",
+      "source_commit": "f9caaabae3ad1d722eece0e01f0f438104447ae2",
+      "expected_tests": 1,
+      "actual_test_names": [
+        "hnn::tests::prediction::physical_repair::a_blind_later_quartic_passage_releases_only_a_constant_learned_domain_image"
+      ],
+      "test_count_and_source_binding_verified": true,
+      "quiescent": true,
+      "issues": [],
+      "measurement": {
+        "wall_ns": 1401204275,
+        "fixed_deadline_ns": 16000000000,
+        "measured_to_fixed_deadline": {
+          "numerator": 1401204275,
+          "denominator": 16000000000
+        },
+        "aggregate_CPU_ns": 1330777000,
+        "aggregate_CPU_limit_us": 17000000,
+        "group_peak_bytes": 25690112,
+        "peak_child_RSS_KiB": 32360,
+        "first_matching_development_read_counted_once": true,
+        "subsequent_same_shape_projection_unit_upper_ns": 1401204275
+      },
+      "raw_stdout": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-control-group1-20261006-v1.stdout",
+      "raw_stderr": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-control-group1-20261006-v1.stderr",
+      "unchanged_predecessor_acceptances_remain_independent": true,
+      "scientific_job": false,
+      "GPU_runtime": false
+    },
+    {
+      "passed": true,
+      "label": "hnn-material-f9caaaba-control-group2-20261006-v1",
+      "source_commit": "f9caaabae3ad1d722eece0e01f0f438104447ae2",
+      "expected_tests": 1,
+      "actual_test_names": [
+        "hnn::tests::prediction::physical_repair::the_coupled_quartic_tube_encloses_every_admitted_missing_class"
+      ],
+      "test_count_and_source_binding_verified": true,
+      "quiescent": true,
+      "issues": [],
+      "measurement": {
+        "wall_ns": 2595293072,
+        "fixed_deadline_ns": 16000000000,
+        "measured_to_fixed_deadline": {
+          "numerator": 2595293072,
+          "denominator": 16000000000
+        },
+        "aggregate_CPU_ns": 2537673000,
+        "aggregate_CPU_limit_us": 17000000,
+        "group_peak_bytes": 24338432,
+        "peak_child_RSS_KiB": 32272,
+        "first_matching_development_read_counted_once": true,
+        "subsequent_same_shape_projection_unit_upper_ns": 2595293072
+      },
+      "raw_stdout": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-control-group2-20261006-v1.stdout",
+      "raw_stderr": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-control-group2-20261006-v1.stderr",
+      "unchanged_predecessor_acceptances_remain_independent": true,
+      "scientific_job": false,
+      "GPU_runtime": false
+    },
+    {
+      "passed": true,
+      "label": "hnn-material-f9caaaba-control-group3-20261006-v1",
+      "source_commit": "f9caaabae3ad1d722eece0e01f0f438104447ae2",
+      "expected_tests": 11,
+      "actual_test_names": [
+        "hnn::tests::prediction::physical_repair::a_point_leader_does_not_replace_a_plural_coupled_domain",
+        "hnn::tests::prediction::physical_repair::a_station_no_declared_crossing_reads_is_held_unread",
+        "hnn::tests::prediction::physical_repair::equal_class_counts_do_not_join_different_producing_charts",
+        "hnn::tests::prediction::physical_repair::identity_conduct_must_certify_the_station_clock_even_at_erased_stations",
+        "hnn::tests::prediction::physical_repair::physical_teaching_changes_r_and_the_later_carried_receiving_read",
+        "hnn::tests::prediction::physical_repair::physical_teaching_refuses_a_stale_material_or_foreign_chart_and_preserves_the_carry",
+        "hnn::tests::prediction::physical_repair::the_damaged_section_runs_through_the_field_and_every_erasure_is_held_unresolved",
+        "hnn::tests::prediction::physical_repair::the_producing_decoder_and_both_physical_maps_are_joined_before_opening",
+        "hnn::tests::prediction::physical_repair::the_section_carries_no_erased_class_so_the_repair_cannot_read_one",
+        "hnn::tests::prediction::physical_repair::the_supported_physical_passage_continues_on_its_retained_interior_and_clock",
+        "hnn::tests::prediction::physical_repair::total_erasure_preserves_the_producing_chart_and_refuses_located_conduct_before_opening"
+      ],
+      "test_count_and_source_binding_verified": true,
+      "quiescent": true,
+      "issues": [],
+      "measurement": {
+        "wall_ns": 7702555302,
+        "fixed_deadline_ns": 16000000000,
+        "measured_to_fixed_deadline": {
+          "numerator": 7702555302,
+          "denominator": 16000000000
+        },
+        "aggregate_CPU_ns": 7633445000,
+        "aggregate_CPU_limit_us": 17000000,
+        "group_peak_bytes": 18386944,
+        "peak_child_RSS_KiB": 27600,
+        "first_matching_development_read_counted_once": true,
+        "subsequent_same_shape_projection_unit_upper_ns": 7702555302
+      },
+      "raw_stdout": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-control-group3-20261006-v1.stdout",
+      "raw_stderr": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-control-group3-20261006-v1.stderr",
+      "unchanged_predecessor_acceptances_remain_independent": true,
+      "scientific_job": false,
+      "GPU_runtime": false
+    },
+    {
+      "passed": true,
+      "label": "hnn-material-f9caaaba-control-group4-20261006-v1",
+      "source_commit": "f9caaabae3ad1d722eece0e01f0f438104447ae2",
+      "expected_tests": 1,
+      "actual_test_names": [
+        "sibling_ring_ticks_age_leaky_first_and_offset_coordinates_before_the_next_owning_append"
+      ],
+      "test_count_and_source_binding_verified": true,
+      "quiescent": true,
+      "issues": [],
+      "measurement": {
+        "wall_ns": 156769422,
+        "fixed_deadline_ns": 16000000000,
+        "measured_to_fixed_deadline": {
+          "numerator": 156769422,
+          "denominator": 16000000000
+        },
+        "aggregate_CPU_ns": 119314000,
+        "aggregate_CPU_limit_us": 17000000,
+        "group_peak_bytes": 14999552,
+        "peak_child_RSS_KiB": 15200,
+        "first_matching_development_read_counted_once": true,
+        "subsequent_same_shape_projection_unit_upper_ns": 156769422
+      },
+      "raw_stdout": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-control-group4-20261006-v1.stdout",
+      "raw_stderr": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-control-group4-20261006-v1.stderr",
+      "unchanged_predecessor_acceptances_remain_independent": true,
+      "scientific_job": false,
+      "GPU_runtime": false
+    },
+    {
+      "passed": true,
+      "label": "hnn-material-f9caaaba-control-group5-20261006-v1",
+      "source_commit": "f9caaabae3ad1d722eece0e01f0f438104447ae2",
+      "expected_tests": 1,
+      "actual_test_names": [
+        "same_phase_intact_swap_has_one_native_source_moment_and_one_physical_motion"
+      ],
+      "test_count_and_source_binding_verified": true,
+      "quiescent": true,
+      "issues": [],
+      "measurement": {
+        "wall_ns": 347304622,
+        "fixed_deadline_ns": 16000000000,
+        "measured_to_fixed_deadline": {
+          "numerator": 347304622,
+          "denominator": 16000000000
+        },
+        "aggregate_CPU_ns": 302558000,
+        "aggregate_CPU_limit_us": 17000000,
+        "group_peak_bytes": 21954560,
+        "peak_child_RSS_KiB": 15416,
+        "first_matching_development_read_counted_once": true,
+        "subsequent_same_shape_projection_unit_upper_ns": 347304622
+      },
+      "raw_stdout": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-control-group5-20261006-v1.stdout",
+      "raw_stderr": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-control-group5-20261006-v1.stderr",
+      "unchanged_predecessor_acceptances_remain_independent": true,
+      "scientific_job": false,
+      "GPU_runtime": false
+    },
+    {
+      "passed": true,
+      "label": "hnn-material-f9caaaba-control-group6-20261006-v1",
+      "source_commit": "f9caaabae3ad1d722eece0e01f0f438104447ae2",
+      "expected_tests": 1,
+      "actual_test_names": [
+        "hnn::tests::prediction::physical_repair::the_actual_leaky_source_return_changes_e_before_the_next_target_free_carried_word"
+      ],
+      "test_count_and_source_binding_verified": true,
+      "quiescent": true,
+      "issues": [],
+      "measurement": {
+        "wall_ns": 4617181411,
+        "fixed_deadline_ns": 16000000000,
+        "measured_to_fixed_deadline": {
+          "numerator": 4617181411,
+          "denominator": 16000000000
+        },
+        "aggregate_CPU_ns": 4551401000,
+        "aggregate_CPU_limit_us": 17000000,
+        "group_peak_bytes": 18759680,
+        "peak_child_RSS_KiB": 28356,
+        "first_matching_development_read_counted_once": true,
+        "subsequent_same_shape_projection_unit_upper_ns": 4617181411
+      },
+      "raw_stdout": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-control-group6-20261006-v1.stdout",
+      "raw_stderr": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-control-group6-20261006-v1.stderr",
+      "unchanged_predecessor_acceptances_remain_independent": true,
+      "scientific_job": false,
+      "GPU_runtime": false
+    },
+    {
+      "passed": true,
+      "label": "hnn-material-f9caaaba-control-group7-20261006-v1",
+      "source_commit": "f9caaabae3ad1d722eece0e01f0f438104447ae2",
+      "expected_tests": 1,
+      "actual_test_names": [
+        "hnn::tests::prediction::physical_repair::source_teaching_refuses_a_zero_return_and_a_reached_uncertified_quartic"
+      ],
+      "test_count_and_source_binding_verified": true,
+      "quiescent": true,
+      "issues": [],
+      "measurement": {
+        "wall_ns": 409027358,
+        "fixed_deadline_ns": 16000000000,
+        "measured_to_fixed_deadline": {
+          "numerator": 409027358,
+          "denominator": 16000000000
+        },
+        "aggregate_CPU_ns": 369674000,
+        "aggregate_CPU_limit_us": 17000000,
+        "group_peak_bytes": 21913600,
+        "peak_child_RSS_KiB": 32244,
+        "first_matching_development_read_counted_once": true,
+        "subsequent_same_shape_projection_unit_upper_ns": 409027358
+      },
+      "raw_stdout": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-control-group7-20261006-v1.stdout",
+      "raw_stderr": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-control-group7-20261006-v1.stderr",
+      "unchanged_predecessor_acceptances_remain_independent": true,
+      "scientific_job": false,
+      "GPU_runtime": false
+    },
+    {
+      "passed": true,
+      "label": "hnn-material-f9caaaba-control-group8-20261006-v1",
+      "source_commit": "f9caaabae3ad1d722eece0e01f0f438104447ae2",
+      "expected_tests": 1,
+      "actual_test_names": [
+        "hnn::tests::prediction::physical_repair::the_actual_leaky_completion_chart_encloses_mixed_classes_and_an_erased_age_endpoint"
+      ],
+      "test_count_and_source_binding_verified": true,
+      "quiescent": true,
+      "issues": [],
+      "measurement": {
+        "wall_ns": 2182399262,
+        "fixed_deadline_ns": 16000000000,
+        "measured_to_fixed_deadline": {
+          "numerator": 2182399262,
+          "denominator": 16000000000
+        },
+        "aggregate_CPU_ns": 2134024000,
+        "aggregate_CPU_limit_us": 17000000,
+        "group_peak_bytes": 22945792,
+        "peak_child_RSS_KiB": 32536,
+        "first_matching_development_read_counted_once": true,
+        "subsequent_same_shape_projection_unit_upper_ns": 2182399262
+      },
+      "raw_stdout": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-control-group8-20261006-v1.stdout",
+      "raw_stderr": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-control-group8-20261006-v1.stderr",
+      "unchanged_predecessor_acceptances_remain_independent": true,
+      "scientific_job": false,
+      "GPU_runtime": false
+    }
+  ],
+  "measurements": [
+    {
+      "label": "hnn-material-f9caaaba-cache-preparation-20261006-v1",
+      "wall_ns": 7092599660,
+      "fixed_deadline_ns": 17000000000,
+      "measured_to_fixed_deadline": {
+        "numerator": 7092599660,
+        "denominator": 17000000000
+      },
+      "aggregate_CPU_ns": 6031971000,
+      "aggregate_CPU_limit_us": 17000000,
+      "group_peak_bytes": 4294967296,
+      "group_memory_max_bytes": 4294967296,
+      "thread_budget": 1,
+      "peak_child_RSS_KiB": 30004,
+      "quiescent_release": true
+    },
+    {
+      "label": "hnn-material-f9caaaba-host-cuda-link-20261006-v1",
+      "wall_ns": 21293409144,
+      "fixed_deadline_ns": 65000000000,
+      "measured_to_fixed_deadline": {
+        "numerator": 21293409144,
+        "denominator": 65000000000
+      },
+      "aggregate_CPU_ns": 57551184000,
+      "aggregate_CPU_limit_us": 128000000,
+      "group_peak_bytes": 3192647680,
+      "group_memory_max_bytes": 4294967296,
+      "thread_budget": 8,
+      "peak_child_RSS_KiB": 2269824,
+      "quiescent_release": true
+    },
+    {
+      "label": "hnn-material-f9caaaba-control-group1-20261006-v1",
+      "wall_ns": 1401204275,
+      "fixed_deadline_ns": 16000000000,
+      "measured_to_fixed_deadline": {
+        "numerator": 1401204275,
+        "denominator": 16000000000
+      },
+      "aggregate_CPU_ns": 1330777000,
+      "aggregate_CPU_limit_us": 17000000,
+      "group_peak_bytes": 25690112,
+      "group_memory_max_bytes": 4294967296,
+      "thread_budget": 1,
+      "peak_child_RSS_KiB": 32360,
+      "quiescent_release": true
+    },
+    {
+      "label": "hnn-material-f9caaaba-control-group2-20261006-v1",
+      "wall_ns": 2595293072,
+      "fixed_deadline_ns": 16000000000,
+      "measured_to_fixed_deadline": {
+        "numerator": 2595293072,
+        "denominator": 16000000000
+      },
+      "aggregate_CPU_ns": 2537673000,
+      "aggregate_CPU_limit_us": 17000000,
+      "group_peak_bytes": 24338432,
+      "group_memory_max_bytes": 4294967296,
+      "thread_budget": 1,
+      "peak_child_RSS_KiB": 32272,
+      "quiescent_release": true
+    },
+    {
+      "label": "hnn-material-f9caaaba-control-group3-20261006-v1",
+      "wall_ns": 7702555302,
+      "fixed_deadline_ns": 16000000000,
+      "measured_to_fixed_deadline": {
+        "numerator": 7702555302,
+        "denominator": 16000000000
+      },
+      "aggregate_CPU_ns": 7633445000,
+      "aggregate_CPU_limit_us": 17000000,
+      "group_peak_bytes": 18386944,
+      "group_memory_max_bytes": 4294967296,
+      "thread_budget": 1,
+      "peak_child_RSS_KiB": 27600,
+      "quiescent_release": true
+    },
+    {
+      "label": "hnn-material-f9caaaba-control-group4-20261006-v1",
+      "wall_ns": 156769422,
+      "fixed_deadline_ns": 16000000000,
+      "measured_to_fixed_deadline": {
+        "numerator": 156769422,
+        "denominator": 16000000000
+      },
+      "aggregate_CPU_ns": 119314000,
+      "aggregate_CPU_limit_us": 17000000,
+      "group_peak_bytes": 14999552,
+      "group_memory_max_bytes": 4294967296,
+      "thread_budget": 1,
+      "peak_child_RSS_KiB": 15200,
+      "quiescent_release": true
+    },
+    {
+      "label": "hnn-material-f9caaaba-control-group5-20261006-v1",
+      "wall_ns": 347304622,
+      "fixed_deadline_ns": 16000000000,
+      "measured_to_fixed_deadline": {
+        "numerator": 347304622,
+        "denominator": 16000000000
+      },
+      "aggregate_CPU_ns": 302558000,
+      "aggregate_CPU_limit_us": 17000000,
+      "group_peak_bytes": 21954560,
+      "group_memory_max_bytes": 4294967296,
+      "thread_budget": 1,
+      "peak_child_RSS_KiB": 15416,
+      "quiescent_release": true
+    },
+    {
+      "label": "hnn-material-f9caaaba-control-group6-20261006-v1",
+      "wall_ns": 4617181411,
+      "fixed_deadline_ns": 16000000000,
+      "measured_to_fixed_deadline": {
+        "numerator": 4617181411,
+        "denominator": 16000000000
+      },
+      "aggregate_CPU_ns": 4551401000,
+      "aggregate_CPU_limit_us": 17000000,
+      "group_peak_bytes": 18759680,
+      "group_memory_max_bytes": 4294967296,
+      "thread_budget": 1,
+      "peak_child_RSS_KiB": 28356,
+      "quiescent_release": true
+    },
+    {
+      "label": "hnn-material-f9caaaba-control-group7-20261006-v1",
+      "wall_ns": 409027358,
+      "fixed_deadline_ns": 16000000000,
+      "measured_to_fixed_deadline": {
+        "numerator": 409027358,
+        "denominator": 16000000000
+      },
+      "aggregate_CPU_ns": 369674000,
+      "aggregate_CPU_limit_us": 17000000,
+      "group_peak_bytes": 21913600,
+      "group_memory_max_bytes": 4294967296,
+      "thread_budget": 1,
+      "peak_child_RSS_KiB": 32244,
+      "quiescent_release": true
+    },
+    {
+      "label": "hnn-material-f9caaaba-control-group8-20261006-v1",
+      "wall_ns": 2182399262,
+      "fixed_deadline_ns": 16000000000,
+      "measured_to_fixed_deadline": {
+        "numerator": 2182399262,
+        "denominator": 16000000000
+      },
+      "aggregate_CPU_ns": 2134024000,
+      "aggregate_CPU_limit_us": 17000000,
+      "group_peak_bytes": 22945792,
+      "group_memory_max_bytes": 4294967296,
+      "thread_budget": 1,
+      "peak_child_RSS_KiB": 32536,
+      "quiescent_release": true
+    }
+  ],
+  "selected_host_CUDA_linkage_and_hnn_prediction_example": true,
+  "all_local_compiler_artifacts_fresh_false": true,
+  "actual_runtime_executable_differs_from_predecessor": true,
+  "all_pinned_native_source_inputs_match_build_and_runtime": true,
+  "unchanged_Lean_owner": "lean/Holonics/HNN/ReframedMoment.lean",
+  "unchanged_Lean_source_sha256": "4ffc65a60f4e72c8bc63c637d7e6480ada2e8721a002e53c487635e64cd93f2e",
+  "unchanged_Lean_rebuilt": false,
+  "prior_full17_and_final_guard2_acceptances_retained_independently": true,
+  "fidelity_or_general_reconstruction_claim": false,
+  "total_erasure_completion_check_is_16_source_subset_only": true,
+  "native_source_sensitivity_and_exact_feature_enclosure_fixture": true,
+  "full_unfiltered_runtime_output": [
+    "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/leaky-source-domain-20261006/native-validation-f9caaaba/stages/hnn-material-f9caaaba-control-group1-20261006-v1.stdout",
+    "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/leaky-source-domain-20261006/native-validation-f9caaaba/stages/hnn-material-f9caaaba-control-group2-20261006-v1.stdout",
+    "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/leaky-source-domain-20261006/native-validation-f9caaaba/stages/hnn-material-f9caaaba-control-group3-20261006-v1.stdout",
+    "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/leaky-source-domain-20261006/native-validation-f9caaaba/stages/hnn-material-f9caaaba-control-group4-20261006-v1.stdout",
+    "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/leaky-source-domain-20261006/native-validation-f9caaaba/stages/hnn-material-f9caaaba-control-group5-20261006-v1.stdout",
+    "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/leaky-source-domain-20261006/native-validation-f9caaaba/stages/hnn-material-f9caaaba-control-group6-20261006-v1.stdout",
+    "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/leaky-source-domain-20261006/native-validation-f9caaaba/stages/hnn-material-f9caaaba-control-group7-20261006-v1.stdout",
+    "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/leaky-source-domain-20261006/native-validation-f9caaaba/stages/hnn-material-f9caaaba-control-group8-20261006-v1.stdout"
+  ],
+  "scientific_job": false,
+  "GPU_runtime": false,
+  "original_bounds_unchanged": true,
+  "all_stages_quiescent_and_leases_released": true,
+  "receipt_metadata_correction_preserved": true,
+  "preserved_files": {
+    "NEW_CONTROL_MEASURED_PROJECTION.v1.json": {
+      "bytes": 740,
+      "sha256": "7b2270250cf018cd5ce5a8b37a5fce2606ee6b3a606283ae4e72c5ac787ea805"
+    },
+    "PRESERVATION_METADATA_CORRECTION.v1.json": {
+      "bytes": 400,
+      "sha256": "a98a5764ab9e26fa6f23bf77c6d37dea9ce4c803f7162498f937c7d3a5eacae8"
+    },
+    "candidate/CACHE_SNAPSHOT.v2.json": {
+      "bytes": 453200,
+      "sha256": "d623783bdae367ace88c38dd2c8fc47590e6ab4eef95e1c259f153ce40b59282"
+    },
+    "candidate/COMPILED_ARTIFACTS.v1.json": {
+      "bytes": 16360,
+      "sha256": "321b5b1556d0dbd7458c53f7adc81793fb69965a3f88e77071c87ea600e37a76"
+    },
+    "candidate/COMPILE_SOURCE_BINDING.v1.json": {
+      "bytes": 785,
+      "sha256": "b407ba25c06c9c038b5cffda05be15b14c7e4b78ab22820aa72d9274b88875d4"
+    },
+    "candidate/CONTROL_RESULT.group1.v1.json": {
+      "bytes": 1269,
+      "sha256": "78378af6eef62fb6c8bdf6b8fb62a3c2b694cc90f7037d2c4dea747636bfe60d"
+    },
+    "candidate/CONTROL_RESULT.group2.v1.json": {
+      "bytes": 1256,
+      "sha256": "e727ff3823b058c1e053bcbe5983fdd2fbd28828919f8aa01f3feb71a0e921f7"
+    },
+    "candidate/CONTROL_RESULT.group3.v1.json": {
+      "bytes": 2441,
+      "sha256": "da51ce490a84ae131327814a10039957d9ecac6e8280a29ae04ea4e21d2bed9b"
+    },
+    "candidate/CONTROL_RESULT.group4.v1.json": {
+      "bytes": 1236,
+      "sha256": "94aaf62ec5ed6dc64f97a8b270378cd6241d466a918a2cec6450deda0aacec69"
+    },
+    "candidate/CONTROL_RESULT.group5.v1.json": {
+      "bytes": 1224,
+      "sha256": "4533b43c2bda431ea4ae3913640f309992eb50517ee016cf80c7f28c53434277"
+    },
+    "candidate/CONTROL_RESULT.group6.v1.json": {
+      "bytes": 1275,
+      "sha256": "6eef14f99f4761b71cc277641e5da084009a9ca426ab113e7c0c89ae963803b4"
+    },
+    "candidate/CONTROL_RESULT.group7.v1.json": {
+      "bytes": 1261,
+      "sha256": "e94ce1d23460ddeabd1d19643b00e0a2eba134675d1df817affabda095a131a6"
+    },
+    "candidate/CONTROL_RESULT.group8.v1.json": {
+      "bytes": 1277,
+      "sha256": "a665903ce6f6f910ce528ae316a7e68320331e4185e184506d8af61dd07446ca"
+    },
+    "candidate/LOCAL_SOURCE_BINDING_PREFLIGHT.v1.json": {
+      "bytes": 2144,
+      "sha256": "62e7b5ddcf219a638a37da8f0a511c7bff1105002ab0b9a24c1a53c5cc8d3516"
+    },
+    "candidate/PREPARATION.v2.json": {
+      "bytes": 458,
+      "sha256": "5dba1ee787cb963da991c1fc8d9b5e2f1892158ef92ff9c501e20716f4338f22"
+    },
+    "candidate/PREPARATION_REQUEST.v1.json": {
+      "bytes": 958,
+      "sha256": "a5773ccd69b40527568e9f99ad51248febb815ea3edca1fd989d272ee5606e27"
+    },
+    "candidate/SOURCE_SNAPSHOT.v1.json": {
+      "bytes": 47684,
+      "sha256": "9bf63c67c917a430312eda36195f432d70dd6455e70165fc8dcdb55c77edb0f7"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-02407331bdf682dc/dep-lib-holonics": {
+      "bytes": 4592,
+      "sha256": "393316a90fa012816936759ce430aab1078088ab6facac39fb42735b42812344"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-02407331bdf682dc/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-02407331bdf682dc/lib-holonics": {
+      "bytes": 16,
+      "sha256": "6304d59d6385115a7b9449c78746ac11059ce0dc229f67b249e21d2086347c61"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-02407331bdf682dc/lib-holonics.json": {
+      "bytes": 655,
+      "sha256": "fca0bdf54a0e37dac6d614e5a11fd8cd6b56846d3ab3eed7085cc23f87d2bc2d"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-3dfaf698dddeb1a6/dep-test-integration-test-source_entrance": {
+      "bytes": 44,
+      "sha256": "3cbeb95fb8a3e7af62122c9ddca89765b8b5d2af7668bbb7c4aaaa1b582d4a9f"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-3dfaf698dddeb1a6/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-3dfaf698dddeb1a6/test-integration-test-source_entrance": {
+      "bytes": 16,
+      "sha256": "cc1575537914c534c5975b4b5be220db5b396b5d762737ef336255c520be4e4a"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-3dfaf698dddeb1a6/test-integration-test-source_entrance.json": {
+      "bytes": 741,
+      "sha256": "1ae7c323d91753d33f7406a036b13f8346a9368e5ee61358474ea747ff16f3ef"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-70b68d2f7e1f6408/dep-test-lib-holonics": {
+      "bytes": 6734,
+      "sha256": "874d491e583870505bcccb680f94524c19a5e3f5a11196ee63e28b55a52bf632"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-70b68d2f7e1f6408/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-70b68d2f7e1f6408/test-lib-holonics": {
+      "bytes": 16,
+      "sha256": "22a78e88c7a82cb1b9f6c908a7365ea7e6ee2ded05671cd3303c8dcd279d2f09"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-70b68d2f7e1f6408/test-lib-holonics.json": {
+      "bytes": 660,
+      "sha256": "c8233c12907db3e23a65e5814adf3def58a6f86bc60a43b9f390b02c9eb021f2"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-8cd4a578e626a457/dep-test-example-hnn_prediction": {
+      "bytes": 1283,
+      "sha256": "efa6a0f41f6e965b0112e0001a405370d3f761300794325705260d2eaed15fa3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-8cd4a578e626a457/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-8cd4a578e626a457/test-example-hnn_prediction": {
+      "bytes": 16,
+      "sha256": "5420dea12371857d845a91f729f3e9ec6b27bb41facf7a0c8ad5d8f385d5d6a3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-8cd4a578e626a457/test-example-hnn_prediction.json": {
+      "bytes": 731,
+      "sha256": "6b8795a6673f9ae61e247ea99343e3e43b4da8c321b5ab7fd3cb93d6d105dbf9"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-bd29e6ac6f6167da/dep-test-integration-test-ranged_capacity": {
+      "bytes": 44,
+      "sha256": "992a84355f8fe8356ea38bba60f35a3f813f7590e77a1951c3798579201e5aa0"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-bd29e6ac6f6167da/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-bd29e6ac6f6167da/test-integration-test-ranged_capacity": {
+      "bytes": 16,
+      "sha256": "5addb1095112c0a1ab93fbd7e887513eceebe929f05c507f61ca962846868be0"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-bd29e6ac6f6167da/test-integration-test-ranged_capacity.json": {
+      "bytes": 741,
+      "sha256": "ded6e673675625369d3dbc2758ac5954c84c1dd17849b3b9c6e470be5cf8336e"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-01b79b415e4da2ec/dep-test-lib-holonics_cuda": {
+      "bytes": 63,
+      "sha256": "62fae1137a090f1ac0f06fa602427cfaa1216fe47248ba16cd6795ebf9c38eb8"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-01b79b415e4da2ec/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-01b79b415e4da2ec/test-lib-holonics_cuda": {
+      "bytes": 16,
+      "sha256": "70eb2ac6f2dea3aeec2541046abb2072d4f3566908382604731f9f19d6f57342"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-01b79b415e4da2ec/test-lib-holonics_cuda.json": {
+      "bytes": 423,
+      "sha256": "498d3de62563d3ae68b42a2e94902bf19878f591b1aa944ce85393cdafc46b06"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-02f71fcb51a4a5ba/bin-mount-smoke": {
+      "bytes": 16,
+      "sha256": "3b64cdda94b822b61a13f853f5aef292b1616924d6e847f73de167cff405914c"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-02f71fcb51a4a5ba/bin-mount-smoke.json": {
+      "bytes": 734,
+      "sha256": "023f0481d37e6833dd8d027674b8dff394c08951617cf9d3521f655923cfc87d"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-02f71fcb51a4a5ba/dep-bin-mount-smoke": {
+      "bytes": 182,
+      "sha256": "020309a3fb52548d34c161c324a9cd7bc4a110fbc143c4c9ea7fa9253ac70311"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-02f71fcb51a4a5ba/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-0a0b5429f4231006/run-build-script-build-script-build": {
+      "bytes": 16,
+      "sha256": "8c050ec8e9278ea492ebe0b8854a9a546547af637d288f9018643db40607a60f"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-0a0b5429f4231006/run-build-script-build-script-build.json": {
+      "bytes": 700,
+      "sha256": "8a712032cd6922c360a362ce1d7315de8a2fca19e666475ed3aef19432b74fa5"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-162b84abbaed056d/dep-test-lib-holonics_cuda": {
+      "bytes": 562,
+      "sha256": "4bada0bffaae21a6fdb3fe4fb495d111aaf3864eb91c877458404abe682e72fc"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-162b84abbaed056d/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-162b84abbaed056d/test-lib-holonics_cuda": {
+      "bytes": 16,
+      "sha256": "4a913ca5f10c25b0dd4f55e259917ca1361a5da99afc8b28f20946b82a14f51f"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-162b84abbaed056d/test-lib-holonics_cuda.json": {
+      "bytes": 678,
+      "sha256": "c5293e787a51edca49e6d95e34f48b04833be97713e905088d13ff5893e91626"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-18e66f602edd7812/bin-mount-smoke": {
+      "bytes": 16,
+      "sha256": "f31ba49b5ea9cbdcd62137c63f1b2f848abba341813f1b8e4c56045ce5d20915"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-18e66f602edd7812/bin-mount-smoke.json": {
+      "bytes": 482,
+      "sha256": "19952e779a37e35dca806b26e3c32c62b5e922364b5806faf6911299ca55c4f4"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-18e66f602edd7812/dep-bin-mount-smoke": {
+      "bytes": 163,
+      "sha256": "f7ef4747b5da9f0b385beb6c732a36162867ed8bd1e483e6a0ac24aaba3b6924"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-18e66f602edd7812/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-1bb0d5c9275dd70a/dep-lib-holonics_cuda": {
+      "bytes": 63,
+      "sha256": "e1558138f7de068684509e554e0449d2f0f20e8ae84d568c70ed38ad788899c1"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-1bb0d5c9275dd70a/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-1bb0d5c9275dd70a/lib-holonics_cuda": {
+      "bytes": 16,
+      "sha256": "81b108ed187c48d7662359a267c69dc244cc8eb464f0d7278c75c787716d0ed6"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-1bb0d5c9275dd70a/lib-holonics_cuda.json": {
+      "bytes": 968,
+      "sha256": "3cce2bca96ae0f36cd96e7881365431df5ba9b1bd65046d4add5a779a0e15e67"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-230710d444d23ddc/dep-test-bin-mount-smoke": {
+      "bytes": 163,
+      "sha256": "72bb7e66e7050702a462560074de7814a8bf57998d8f7163bdcc0dec1ae1c7d0"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-230710d444d23ddc/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-230710d444d23ddc/test-bin-mount-smoke": {
+      "bytes": 16,
+      "sha256": "daeb544ea19745ec436282db16d062508201c082019630e77d7b95a0727e2a96"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-230710d444d23ddc/test-bin-mount-smoke.json": {
+      "bytes": 1320,
+      "sha256": "6ee26fbf358ae720ab5d80469d8ae7f0333c3e5464bbdccfdd47e399ea90f32a"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-2b1bcd05cb038948/dep-test-bin-mount-smoke": {
+      "bytes": 163,
+      "sha256": "f7ef4747b5da9f0b385beb6c732a36162867ed8bd1e483e6a0ac24aaba3b6924"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-2b1bcd05cb038948/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-2b1bcd05cb038948/test-bin-mount-smoke": {
+      "bytes": 16,
+      "sha256": "18edb1c4ad5eb7cf9a128d437e69dbcd2927dd0acd44ac3a64eb2fe547217584"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-2b1bcd05cb038948/test-bin-mount-smoke.json": {
+      "bytes": 486,
+      "sha256": "4aba22a1e1d4c9c9f803cd604eb6d85917b2c70586efc7634ac8d45672cc2afa"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-2b2d6cef9fd78c5f/dep-test-integration-test-located_ingest": {
+      "bytes": 43,
+      "sha256": "7e0b95fbabf30a14579f290ae1ab78d17c2a51b7e3cccd20873fe279e52ac527"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-2b2d6cef9fd78c5f/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-2b2d6cef9fd78c5f/test-integration-test-located_ingest": {
+      "bytes": 16,
+      "sha256": "5296f3304532adea7efd54fda49d58e3a837bc65190eb803390d4108662836ae"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-2b2d6cef9fd78c5f/test-integration-test-located_ingest.json": {
+      "bytes": 757,
+      "sha256": "a406069d235ea4945b78fd55d017c45108a241efeff6d2018af67f14273b623a"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-2dbee56c835149b4/dep-example-hnn_exposure": {
+      "bytes": 220,
+      "sha256": "229602595898474fceb9ac97225e7c280bd52becbdfe3fcd03a80b5c1cac3032"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-2dbee56c835149b4/example-hnn_exposure": {
+      "bytes": 16,
+      "sha256": "616d5e96f3de1bc04547cdc2531f992c07c3ba008bbd59f60106b038699bd64e"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-2dbee56c835149b4/example-hnn_exposure.json": {
+      "bytes": 740,
+      "sha256": "ced4aa3be16850c17cd5dc8b50494cb8cb40b84c13e250834f48307c342e4b90"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-2dbee56c835149b4/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-3a3d38defac6a12c/dep-test-lib-holonics_cuda": {
+      "bytes": 584,
+      "sha256": "edb6891859677fda487a27a2ed383234ce631257af7e819e4cc406f9cae69a8d"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-3a3d38defac6a12c/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-3a3d38defac6a12c/test-lib-holonics_cuda": {
+      "bytes": 16,
+      "sha256": "e742bf6cf7d4e5fc15e491a0682fb8bd421c0a2a387f27bf2423caaf7d5eb30e"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-3a3d38defac6a12c/test-lib-holonics_cuda.json": {
+      "bytes": 680,
+      "sha256": "1a9ac68ef0f603df8bf8fa9e3bd62c0e6c424bfbee6f8c528040923d22d4526e"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-3ad89bd5d4a10caf/dep-lib-holonics_cuda": {
+      "bytes": 456,
+      "sha256": "e82f3295a220506b9da940231d661bab9a5399efceeded7eb14d1abf3d86b6b1"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-3ad89bd5d4a10caf/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-3ad89bd5d4a10caf/lib-holonics_cuda": {
+      "bytes": 16,
+      "sha256": "23b32e9a80ce927fcb074395464cbb86d14a47bcfc4692e76cb5e538c4b892a5"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-3ad89bd5d4a10caf/lib-holonics_cuda.json": {
+      "bytes": 673,
+      "sha256": "409f69ba928967f46edb8c05851bc48beb41f4ab857d3a51cf01ad00b7bf651b"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-3b006e2a766083d4/bin-mount-smoke": {
+      "bytes": 16,
+      "sha256": "9ff2a4aee2f3bfa5c7343f55def2a3227c7bb40175ba1f70a09574f5f0289c43"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-3b006e2a766083d4/bin-mount-smoke.json": {
+      "bytes": 1029,
+      "sha256": "e4f574e145caee8471946e7d4a3e0dfb53ab70f449244666ec184bac0a0334c5"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-3b006e2a766083d4/dep-bin-mount-smoke": {
+      "bytes": 163,
+      "sha256": "72bb7e66e7050702a462560074de7814a8bf57998d8f7163bdcc0dec1ae1c7d0"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-3b006e2a766083d4/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-3ff4f42172a26d9d/dep-test-bin-mount-smoke": {
+      "bytes": 183,
+      "sha256": "94d7fbe2154bc612fb01a3865e27949fe06847b2fd843138d3cebc3d7ca9e9f6"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-3ff4f42172a26d9d/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-3ff4f42172a26d9d/test-bin-mount-smoke": {
+      "bytes": 16,
+      "sha256": "b030e4cad8ea57dddaae274bd5bc8ce55fce89b87b1c7206a58ccccff9b9dc0b"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-3ff4f42172a26d9d/test-bin-mount-smoke.json": {
+      "bytes": 485,
+      "sha256": "1db292fe08e8d063f7a62849175fd90e01e62853d2581ea22fc2ee9bac060c21"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-569bf16e165ff310/dep-test-bin-mount-smoke": {
+      "bytes": 163,
+      "sha256": "f7ef4747b5da9f0b385beb6c732a36162867ed8bd1e483e6a0ac24aaba3b6924"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-569bf16e165ff310/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-569bf16e165ff310/test-bin-mount-smoke": {
+      "bytes": 16,
+      "sha256": "3b8fa5b22d3a56856ec8578af8f9de72122d07ae98cb47250eb6963e32f7cb49"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-569bf16e165ff310/test-bin-mount-smoke.json": {
+      "bytes": 740,
+      "sha256": "fbf7849dec3a5d7d02d5f98e494246a9a3607487b097a9ce6fb389a6841c8a27"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-5cc32226864d0eaa/bin-mount-smoke": {
+      "bytes": 16,
+      "sha256": "bed887abe762ff557bc6b5a84550ab5a1e7d7a3e48ca3c6945614a5ee8768be3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-5cc32226864d0eaa/bin-mount-smoke.json": {
+      "bytes": 736,
+      "sha256": "4759cefe9d6867e134be200857a72b84a234b27d5148320f908675f9581aeb49"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-5cc32226864d0eaa/dep-bin-mount-smoke": {
+      "bytes": 242,
+      "sha256": "e56cbf34cd1900f4ae2015d122ceda64ecc5cfd9fdf586648bbf7480211bbc1d"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-5cc32226864d0eaa/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-7156409d71e6ef82/dep-test-bin-mount-smoke": {
+      "bytes": 163,
+      "sha256": "f7ef4747b5da9f0b385beb6c732a36162867ed8bd1e483e6a0ac24aaba3b6924"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-7156409d71e6ef82/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-7156409d71e6ef82/test-bin-mount-smoke": {
+      "bytes": 16,
+      "sha256": "e02d976bc0524e4b88f4c8c877c4fe9a8c779bde73ac374aeffcad2afef9ecbc"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-7156409d71e6ef82/test-bin-mount-smoke.json": {
+      "bytes": 484,
+      "sha256": "3af3475e26f49211f223bfc233fa928f730465d5a79a3c9514ccb9fb8d118756"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-7236e4e36860d36f/dep-lib-holonics_cuda": {
+      "bytes": 63,
+      "sha256": "f84b472c87de105b269f6ae8c65f9a965e21d3ce89c1e4a7d643390c5ffe1324"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-7236e4e36860d36f/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-7236e4e36860d36f/lib-holonics_cuda": {
+      "bytes": 16,
+      "sha256": "1baadab596c5626ad85187632c34fced9d7d5d5009b94b8ee6bdd8469d842ef2"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-7236e4e36860d36f/lib-holonics_cuda.json": {
+      "bytes": 421,
+      "sha256": "9eb7c61b6bd6a836ab5ae68e2ac4e1a34a60294e0cb3aab7704620dc3850073b"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-73851af1fce5d0ac/dep-test-integration-test-located_ingest": {
+      "bytes": 43,
+      "sha256": "7e0b95fbabf30a14579f290ae1ab78d17c2a51b7e3cccd20873fe279e52ac527"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-73851af1fce5d0ac/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-73851af1fce5d0ac/test-integration-test-located_ingest": {
+      "bytes": 16,
+      "sha256": "8c888ae4a2c9737367151c8d9f85dc42c10fa47551c5f566049dad99c400ef49"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-73851af1fce5d0ac/test-integration-test-located_ingest.json": {
+      "bytes": 754,
+      "sha256": "b27ffb9d22374fd22c30a7052ef534baf7f3f0bf4d589e154b5edbc5804d514e"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-76daffa6a574b2cf/bin-mount-smoke": {
+      "bytes": 16,
+      "sha256": "0a5e141d9a80256891b7990c3286148787bff3f8beeef1c0ab8dc553d876ced8"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-76daffa6a574b2cf/bin-mount-smoke.json": {
+      "bytes": 1029,
+      "sha256": "007759915a4c8fd5a4eb2cd1f97a8904eec9634d32ba88429e8ea62418ee39d5"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-76daffa6a574b2cf/dep-bin-mount-smoke": {
+      "bytes": 163,
+      "sha256": "f7ef4747b5da9f0b385beb6c732a36162867ed8bd1e483e6a0ac24aaba3b6924"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-76daffa6a574b2cf/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-79a5ac3e7c479714/build-script-build-script-build": {
+      "bytes": 16,
+      "sha256": "d2e9fb142f28cdb88e474fa425a6d20347a036b0cb3c309fd0026851bfeb8371"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-79a5ac3e7c479714/build-script-build-script-build.json": {
+      "bytes": 373,
+      "sha256": "06c3ee196a710d8a3efdb945020188c8235408cf434d28295595c95000f8096a"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-79a5ac3e7c479714/dep-build-script-build-script-build": {
+      "bytes": 28,
+      "sha256": "a71f952e7f3252ef5608298951fd55b25f3590c98bc0765ae4145e623604ee7d"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-79a5ac3e7c479714/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-a0a1094f0549622c/dep-lib-holonics_cuda": {
+      "bytes": 63,
+      "sha256": "f84b472c87de105b269f6ae8c65f9a965e21d3ce89c1e4a7d643390c5ffe1324"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-a0a1094f0549622c/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-a0a1094f0549622c/lib-holonics_cuda": {
+      "bytes": 16,
+      "sha256": "8273488230c7c38fb1bec801a06feb5a462e7d56ed60c783b472058e86234987"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-a0a1094f0549622c/lib-holonics_cuda.json": {
+      "bytes": 967,
+      "sha256": "65cc6578a6887ad8851a9d736dc0f1b7abe9a707ec569d845dfad9bcfecaf1d6"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-a6cd09943eb661fd/dep-lib-holonics_cuda": {
+      "bytes": 63,
+      "sha256": "e1558138f7de068684509e554e0449d2f0f20e8ae84d568c70ed38ad788899c1"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-a6cd09943eb661fd/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-a6cd09943eb661fd/lib-holonics_cuda": {
+      "bytes": 16,
+      "sha256": "3aa16e63f05a23544a22a9b79207661d365a80f2dbf02d053ae1730589201126"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-a6cd09943eb661fd/lib-holonics_cuda.json": {
+      "bytes": 418,
+      "sha256": "18f39434c04194b3b3d3332d8a61af20233319cefa71bdb5f963986bd13ba9d6"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-a772729fa8b0f243/dep-test-bin-mount-smoke": {
+      "bytes": 163,
+      "sha256": "f7ef4747b5da9f0b385beb6c732a36162867ed8bd1e483e6a0ac24aaba3b6924"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-a772729fa8b0f243/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-a772729fa8b0f243/test-bin-mount-smoke": {
+      "bytes": 16,
+      "sha256": "9af649bb7e29bc834db7b9c4872602a803a037003f58d627e65feade2e8c239a"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-a772729fa8b0f243/test-bin-mount-smoke.json": {
+      "bytes": 1319,
+      "sha256": "740d27fd904fea303c0781651dc59a65a4e79ced84ce715019b776b8113d8725"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-ab9180243ea625b6/dep-example-hnn_exposure": {
+      "bytes": 258,
+      "sha256": "f2d599a7b5b06f29a9e638dc7b986a5f30f1839cf8594d6678f6a6f5d25af9d2"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-ab9180243ea625b6/example-hnn_exposure": {
+      "bytes": 16,
+      "sha256": "44b7b404249003704140e339db5e3198f5a4bf909e110869c51edd1ba92199aa"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-ab9180243ea625b6/example-hnn_exposure.json": {
+      "bytes": 739,
+      "sha256": "93b330623edb41b0e0ea8b6d19508de01d03719bba27ffb085bf400d646f64fb"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-ab9180243ea625b6/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-aff11910290495d0/bin-mount-smoke": {
+      "bytes": 16,
+      "sha256": "fc9e2cbb65394b0e28e03bab4ec1a243fd6a0f9397b12aec6ac8d92d1ff0057e"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-aff11910290495d0/bin-mount-smoke.json": {
+      "bytes": 481,
+      "sha256": "cc353a14b3a3e35a1184d726bbca2167184ac1a0527a8a9d2deb64d0105e7b00"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-aff11910290495d0/dep-bin-mount-smoke": {
+      "bytes": 183,
+      "sha256": "94d7fbe2154bc612fb01a3865e27949fe06847b2fd843138d3cebc3d7ca9e9f6"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-aff11910290495d0/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-b121e76922aa7536/dep-lib-holonics_cuda": {
+      "bytes": 63,
+      "sha256": "e1558138f7de068684509e554e0449d2f0f20e8ae84d568c70ed38ad788899c1"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-b121e76922aa7536/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-b121e76922aa7536/lib-holonics_cuda": {
+      "bytes": 16,
+      "sha256": "50d748f2f349e38acb3933258cecd5ceb5fb0e001fd8f4d4ddc2ad08b4206bb3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-b121e76922aa7536/lib-holonics_cuda.json": {
+      "bytes": 967,
+      "sha256": "c3687f361b93e74621c3c24cc30ff8128674a9a268d7fae7faaba67ad31dd856"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-b91bec0f7e05edda/dep-test-lib-holonics_cuda": {
+      "bytes": 63,
+      "sha256": "aad3d9d322671892f8344ae4d0aa71fe741b9a5c2fa0490f25f108bcd492f44b"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-b91bec0f7e05edda/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-b91bec0f7e05edda/test-lib-holonics_cuda": {
+      "bytes": 16,
+      "sha256": "b57d14015491436640ebe377794c6301028fe396e115573cea5af2625cbde570"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-b91bec0f7e05edda/test-lib-holonics_cuda.json": {
+      "bytes": 425,
+      "sha256": "c1c9f4acc532c7e3a3d18c38fddf50d890161a01f569f57a8d142eaff38f5f0b"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-ba4aed34b9382c85/dep-test-lib-holonics_cuda": {
+      "bytes": 584,
+      "sha256": "cb4d1d1baaad746b7b0878b65481c1b2ae7d7febc642ee1b8ae5fe0436255eb4"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-ba4aed34b9382c85/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-ba4aed34b9382c85/test-lib-holonics_cuda": {
+      "bytes": 16,
+      "sha256": "d6cd6d970a3daa5fed80c1b4d951dc475eece2e59f6391ca5a555452d126e81d"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-ba4aed34b9382c85/test-lib-holonics_cuda.json": {
+      "bytes": 677,
+      "sha256": "d8f285b9a024b07427ec99b90227db83af474b41f110c9eba035da0cd6f5dd24"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-c599bdb869b0e76e/dep-lib-holonics_cuda": {
+      "bytes": 478,
+      "sha256": "e424e651cefa4a087c0b19c638f0bb27a6ac65a8367d9fe9837af00627b6b1c7"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-c599bdb869b0e76e/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-c599bdb869b0e76e/lib-holonics_cuda": {
+      "bytes": 16,
+      "sha256": "03b550a492937ea3745d3e574881ee7ba92261bbc3303eae9f829d18aef47835"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-c599bdb869b0e76e/lib-holonics_cuda.json": {
+      "bytes": 673,
+      "sha256": "e71c0e1328753c709ad0dd607484d13ffbafa9a9f336f5ef49b1e189c811f855"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-c82bf91515d93d4b/build-script-build-script-build": {
+      "bytes": 16,
+      "sha256": "dcab605d8b024cdf6df0091b2363713976c61f814202b7e0320074392e027b00"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-c82bf91515d93d4b/build-script-build-script-build.json": {
+      "bytes": 373,
+      "sha256": "42af5ee2dbddb0ccadd1d7819991de66100a21f8a5cd26be8bdfa7e7919ab9ea"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-c82bf91515d93d4b/dep-build-script-build-script-build": {
+      "bytes": 28,
+      "sha256": "a71f952e7f3252ef5608298951fd55b25f3590c98bc0765ae4145e623604ee7d"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-c82bf91515d93d4b/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-cbbe507f341cf76e/dep-test-lib-holonics_cuda": {
+      "bytes": 63,
+      "sha256": "b0400e1630e4705d345b65d5549e3fb4ccfd273e011b3da97d9672426f32f0eb"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-cbbe507f341cf76e/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-cbbe507f341cf76e/test-lib-holonics_cuda": {
+      "bytes": 16,
+      "sha256": "71dc5ec75b1e6eebeaccd64645f7d12c1072e965850d7b57bced8057b338566e"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-cbbe507f341cf76e/test-lib-holonics_cuda.json": {
+      "bytes": 425,
+      "sha256": "3030ea205c07afd8e8b95156a36782fbb63db1ec36e3bdd8ed3fd536896225ff"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-cca9cc0e4e095146/dep-test-lib-holonics_cuda": {
+      "bytes": 63,
+      "sha256": "b0400e1630e4705d345b65d5549e3fb4ccfd273e011b3da97d9672426f32f0eb"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-cca9cc0e4e095146/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-cca9cc0e4e095146/test-lib-holonics_cuda": {
+      "bytes": 16,
+      "sha256": "5ff00ea70831159306557789b80e198433c28f76a241c9457dbb575ef10b1375"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-cca9cc0e4e095146/test-lib-holonics_cuda.json": {
+      "bytes": 1258,
+      "sha256": "91b35f8ba12cbc878b326c8146f286ccb99cedf5a44e904c47e45a18e0510afe"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-cf912041cb139d6e/dep-test-lib-holonics_cuda": {
+      "bytes": 63,
+      "sha256": "37111c010933df380500d596ef9760d9be6ef52b8aa68469b2d3b6b57d5f52bb"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-cf912041cb139d6e/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-cf912041cb139d6e/test-lib-holonics_cuda": {
+      "bytes": 16,
+      "sha256": "ae1a420146d18648d69a86ad03645529d9cec82cb8726ad7468235bc4a291946"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-cf912041cb139d6e/test-lib-holonics_cuda.json": {
+      "bytes": 1258,
+      "sha256": "c4e44cf2f87bc18618c7e8ef0abc838f5a3b673f06c61d32373e67f97c2ae858"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-d6dca0008b0cf712/dep-test-lib-holonics_cuda": {
+      "bytes": 63,
+      "sha256": "b0400e1630e4705d345b65d5549e3fb4ccfd273e011b3da97d9672426f32f0eb"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-d6dca0008b0cf712/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-d6dca0008b0cf712/test-lib-holonics_cuda": {
+      "bytes": 16,
+      "sha256": "c5d257ba615176f6ef72e17d50395b7d501d7cffce91368e5ca91238f6d387e1"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-d6dca0008b0cf712/test-lib-holonics_cuda.json": {
+      "bytes": 1259,
+      "sha256": "10d646593879619584025be18587e865322a04ba141e25d8c846158c9d254487"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-d8a2b2a26ba8c5dc/dep-test-bin-mount-smoke": {
+      "bytes": 182,
+      "sha256": "020309a3fb52548d34c161c324a9cd7bc4a110fbc143c4c9ea7fa9253ac70311"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-d8a2b2a26ba8c5dc/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-d8a2b2a26ba8c5dc/test-bin-mount-smoke": {
+      "bytes": 16,
+      "sha256": "61b0e90ace0d04a536058836020b0f90644708a37b58ea56727f6fffe508c026"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-d8a2b2a26ba8c5dc/test-bin-mount-smoke.json": {
+      "bytes": 738,
+      "sha256": "c6cce74712117f147c6df9025b9e75153c2f5eeb25e7f4dd6d52caa79c595a60"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-d9ad51fae469d445/run-build-script-build-script-build": {
+      "bytes": 16,
+      "sha256": "68eee927195677c529e7d0df1fb77f8619965674522fb152779d96f304c7231e"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-d9ad51fae469d445/run-build-script-build-script-build.json": {
+      "bytes": 769,
+      "sha256": "4b78be1bdfd02a2b7fa2a434cef698f86cae34027239772dcd5802d99f7caf48"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-e2e5cb6452e52789/dep-lib-holonics_cuda": {
+      "bytes": 63,
+      "sha256": "f84b472c87de105b269f6ae8c65f9a965e21d3ce89c1e4a7d643390c5ffe1324"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-e2e5cb6452e52789/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-e2e5cb6452e52789/lib-holonics_cuda": {
+      "bytes": 16,
+      "sha256": "609e4105f68d7d3dcd5bd3bc250f4bd703095a97dccad856c620821c19ea59ac"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-e2e5cb6452e52789/lib-holonics_cuda.json": {
+      "bytes": 421,
+      "sha256": "a7089dd6baabeaeac83e6f613573c1c0d9e490ae830ee1af2851ee39fbe1db25"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-ea9c35fe0376efcc/bin-mount-smoke": {
+      "bytes": 16,
+      "sha256": "cf367c023518491d65dc1b9b86fb03519eb695a8febb5f2fda28266e186fe7e0"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-ea9c35fe0376efcc/bin-mount-smoke.json": {
+      "bytes": 1028,
+      "sha256": "67ce56f27172fd18b0e0508101580c7c00ed7d2d5b5fb37e165a653aa060df01"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-ea9c35fe0376efcc/dep-bin-mount-smoke": {
+      "bytes": 163,
+      "sha256": "f7ef4747b5da9f0b385beb6c732a36162867ed8bd1e483e6a0ac24aaba3b6924"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-ea9c35fe0376efcc/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-ef631b89ef48f51d/dep-test-bin-mount-smoke": {
+      "bytes": 163,
+      "sha256": "72bb7e66e7050702a462560074de7814a8bf57998d8f7163bdcc0dec1ae1c7d0"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-ef631b89ef48f51d/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-ef631b89ef48f51d/test-bin-mount-smoke": {
+      "bytes": 16,
+      "sha256": "7c60b21aceb96c01f61043713fd095e8c9e087d099d949fde22d1febe8963df3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-ef631b89ef48f51d/test-bin-mount-smoke.json": {
+      "bytes": 1320,
+      "sha256": "12ba53bb99ec6481a04f73f85ad6825d690e8ab69e58ffe529cb10bb07b04824"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-fe78e545d18196b4/dep-lib-holonics_cuda": {
+      "bytes": 478,
+      "sha256": "674de2d2911d8b3f0da1283563980315d604fa5c17a6310ac4a74bc17d042c2a"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-fe78e545d18196b4/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-fe78e545d18196b4/lib-holonics_cuda": {
+      "bytes": 16,
+      "sha256": "7110d607d836b4dfd7ebff11b91b74509ee8f212e34707af03b45261ae96233e"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-cuda-fe78e545d18196b4/lib-holonics_cuda.json": {
+      "bytes": 675,
+      "sha256": "e800705a177a495fd944beae7c58e0bb12d3ee6ca0814af59cba91ac8c38dacd"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-d85475b8f5abeb14/dep-test-integration-test-resident_cold_restore": {
+      "bytes": 50,
+      "sha256": "26bc6934c48949cb289aa74274df47f2717e5366f8bec1d7e88bc82df668b3e1"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-d85475b8f5abeb14/invoked.timestamp": {
+      "bytes": 48,
+      "sha256": "5a109e6643e8d3e88642e3f35e85d2a83e639d07523aa6e99166c48178e965c3"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-d85475b8f5abeb14/test-integration-test-resident_cold_restore": {
+      "bytes": 16,
+      "sha256": "072d33738cbc66bb884abab6b7cccc751b47f7aa9bfae702dd569c446d006a33"
+    },
+    "candidate/preserved-local-fingerprints-v1/holonics-d85475b8f5abeb14/test-integration-test-resident_cold_restore.json": {
+      "bytes": 746,
+      "sha256": "b00b7a64164b4779eff4bf6e369c2da7710914a20ab4b62126155c85bbf3e54c"
+    },
+    "controls/group1.json": {
+      "bytes": 1269,
+      "sha256": "78378af6eef62fb6c8bdf6b8fb62a3c2b694cc90f7037d2c4dea747636bfe60d"
+    },
+    "controls/group2.json": {
+      "bytes": 1256,
+      "sha256": "e727ff3823b058c1e053bcbe5983fdd2fbd28828919f8aa01f3feb71a0e921f7"
+    },
+    "controls/group3.json": {
+      "bytes": 2441,
+      "sha256": "da51ce490a84ae131327814a10039957d9ecac6e8280a29ae04ea4e21d2bed9b"
+    },
+    "controls/group4.json": {
+      "bytes": 1236,
+      "sha256": "94aaf62ec5ed6dc64f97a8b270378cd6241d466a918a2cec6450deda0aacec69"
+    },
+    "controls/group5.json": {
+      "bytes": 1224,
+      "sha256": "4533b43c2bda431ea4ae3913640f309992eb50517ee016cf80c7f28c53434277"
+    },
+    "controls/group6.json": {
+      "bytes": 1275,
+      "sha256": "6eef14f99f4761b71cc277641e5da084009a9ca426ab113e7c0c89ae963803b4"
+    },
+    "controls/group7.json": {
+      "bytes": 1261,
+      "sha256": "e94ce1d23460ddeabd1d19643b00e0a2eba134675d1df817affabda095a131a6"
+    },
+    "controls/group8.json": {
+      "bytes": 1277,
+      "sha256": "a665903ce6f6f910ce528ae316a7e68320331e4185e184506d8af61dd07446ca"
+    },
+    "executables/hnn_prediction-8cd4a578e626a457": {
+      "bytes": 6130728,
+      "sha256": "fb3cf30b07f27619ef2b8a481a3361010a7c5581531549a07595d9977e201a3e"
+    },
+    "executables/holonics-70b68d2f7e1f6408": {
+      "bytes": 64547120,
+      "sha256": "8b7380ad017334d4a509e189471111fce61cf7fc6600d8b8f98ea773f3825eeb"
+    },
+    "executables/holonics_cuda-3a3d38defac6a12c": {
+      "bytes": 41210152,
+      "sha256": "234227d13fe487aa63b2d51ab03faa389afc106a71c5c731786fd37b6848e405"
+    },
+    "executables/located_ingest-2b2d6cef9fd78c5f": {
+      "bytes": 16012320,
+      "sha256": "1476fdeaf4cf3bb10a18c440ebf06130d878866f4c56f4b67edd6b4b0edda2f1"
+    },
+    "executables/mount-smoke": {
+      "bytes": 10070776,
+      "sha256": "d1366b2dfc7a96fc8941d47bf9eb277eec6a4feda4406e42ba75ee930c8047d7"
+    },
+    "executables/ranged_capacity-bd29e6ac6f6167da": {
+      "bytes": 23206512,
+      "sha256": "7c0c1f00b0a1c89295603a9d16621ac2f9868b2328c012dae695bcce2e7ec327"
+    },
+    "executables/resident_cold_restore-d85475b8f5abeb14": {
+      "bytes": 28441976,
+      "sha256": "d35a5b12ada6028b755ddc90f714cb8369a4df68fbc3508335e777376e279a58"
+    },
+    "executables/source_entrance-3dfaf698dddeb1a6": {
+      "bytes": 21106744,
+      "sha256": "f21f754bfc946be1b1f3c14bf6f4d75ede56c09658c3b4940ad8549a545c066a"
+    },
+    "request/COHERENT_FOLLOWUP_CANDIDATE.v6.json": {
+      "bytes": 26033,
+      "sha256": "99e9925da183acadac18a0bef5d07f1e46effc870372fc31092b36b2bd527f74"
+    },
+    "request/SOURCE_INPUT_MANIFEST.v6.json": {
+      "bytes": 47480,
+      "sha256": "69c70d984f0f6a3f6642e55f8e97781772006f3b8aa7a471ee9a15d7043dcba3"
+    },
+    "request/SOURCE_MANIFEST.v6.json": {
+      "bytes": 166918,
+      "sha256": "7e0d88c60f359baf1394c3b0b24fc561daa99233c6afbed43b9e708ce8fb1c61"
+    },
+    "source-v1/Cargo.lock": {
+      "bytes": 4292,
+      "sha256": "4380186a0b5ed33a0c6ef3b15822c215072016af539446727800dcd501bde00a"
+    },
+    "source-v1/Cargo.toml": {
+      "bytes": 1160,
+      "sha256": "a9ff455bcb89885c74f5758dd782ec4d3c89bbd31018e89333c4d476ea2dc40f"
+    },
+    "source-v1/accelerators/cuda-smoke/mount_smoke_kernel.ptx": {
+      "bytes": 1437,
+      "sha256": "0310be86a54b08c4234f6a39b69805b72d8610bb55cee5aef7caf387a0c8a2cd"
+    },
+    "source-v1/crates/holonics/Cargo.toml": {
+      "bytes": 1544,
+      "sha256": "64170e4fac0e1f1b08bfd076b39289dae249ec50e115c720ac252c2cae09c916"
+    },
+    "source-v1/crates/holonics/src/aeon/epoch.rs": {
+      "bytes": 22842,
+      "sha256": "19e68ecc1c8fabc5203f4007f0e7f43335f045f5203b95199442ba28482e98e3"
+    },
+    "source-v1/crates/holonics/src/aeon/first_law.rs": {
+      "bytes": 26370,
+      "sha256": "02e05fd816f29ba72976da44b74df34a9dc023d7ddcacce4c9cae3b73fca1fb2"
+    },
+    "source-v1/crates/holonics/src/aeon/groupoid.rs": {
+      "bytes": 26932,
+      "sha256": "a2e48359a9a0ea7019c2a2435b053cca10b14830ff0c615094ac6a8223d73181"
+    },
+    "source-v1/crates/holonics/src/aeon/hodge.rs": {
+      "bytes": 12999,
+      "sha256": "bdd8475b2a8dbad2523d0520afa1892fed8ea092c20fe5c8fc8e1de258ae8efb"
+    },
+    "source-v1/crates/holonics/src/aeon/join.rs": {
+      "bytes": 17693,
+      "sha256": "891e9fa752cf1224bdd6cecf7491dffaa92caccf171fb82312026744ae994863"
+    },
+    "source-v1/crates/holonics/src/aeon/lock.rs": {
+      "bytes": 10949,
+      "sha256": "ec5905e52e3fcb215841db21dfdbb399bbf7dab8843f9f3ba5f1d7de283497bd"
+    },
+    "source-v1/crates/holonics/src/aeon/mod.rs": {
+      "bytes": 10607,
+      "sha256": "e2ac911afee55ba27759fe52c144af9381fad5825f938bc5407cb9751d8c1def"
+    },
+    "source-v1/crates/holonics/src/aeon/production.rs": {
+      "bytes": 34497,
+      "sha256": "72ccdb2373e93a3c9cc1d2c686a9f54d535f77a07da23ff0585afd5a89c69d93"
+    },
+    "source-v1/crates/holonics/src/aeon/reading.rs": {
+      "bytes": 28656,
+      "sha256": "0761e5d5d3247d41847859459b5b7ac481d4a3abac47cdb57d9e30edd262d7cd"
+    },
+    "source-v1/crates/holonics/src/compression/cost/tests.rs": {
+      "bytes": 12697,
+      "sha256": "00873dd825b70353e8d281b648dbe6266259c5f8f1b0d6cc33ed97b3266168a1"
+    },
+    "source-v1/crates/holonics/src/compression/cost.rs": {
+      "bytes": 19593,
+      "sha256": "47c71bae4dee52f1dd8ded129afff6d9ec7efb87c1ffedcf4fb7abb38848a1b2"
+    },
+    "source-v1/crates/holonics/src/compression/keys/edges.rs": {
+      "bytes": 18132,
+      "sha256": "031c6b3ba5bee51091b0067d47db8177202adb7e05ebc297258332859c6a3fcd"
+    },
+    "source-v1/crates/holonics/src/compression/keys/local/tests.rs": {
+      "bytes": 8031,
+      "sha256": "6542837c44d16bbfaf383fd6838aebcb0a870772ec8b133ff756202b52d88698"
+    },
+    "source-v1/crates/holonics/src/compression/keys/local.rs": {
+      "bytes": 20107,
+      "sha256": "143d411df79d321648b5f00d74d185aa5622cd52385d8ed1ebfb2b16ecd16279"
+    },
+    "source-v1/crates/holonics/src/compression/keys/repair/tests.rs": {
+      "bytes": 10632,
+      "sha256": "02490fffb036d03dd407fb171c1fd4cd4f1890533543eb46fa652f898d148895"
+    },
+    "source-v1/crates/holonics/src/compression/keys/repair.rs": {
+      "bytes": 24181,
+      "sha256": "be69d14b09c7ec6578e46f83d5f6802321f99ddbca5c708ca224276da0f74156"
+    },
+    "source-v1/crates/holonics/src/compression/keys/tests.rs": {
+      "bytes": 12675,
+      "sha256": "98e119b40d456017941f586726561cd969ffd168986e8ae85635354db9303d3f"
+    },
+    "source-v1/crates/holonics/src/compression/keys/transport/tests.rs": {
+      "bytes": 25500,
+      "sha256": "d276e5fea67d2701496343700c4b41a15527d22ee94c197e5cb73d5b3eecf362"
+    },
+    "source-v1/crates/holonics/src/compression/keys/transport.rs": {
+      "bytes": 56281,
+      "sha256": "e5838556ab8f65a0f3015f517460479c2fe32ec4babc6a4bc4db78eeaa3ae212"
+    },
+    "source-v1/crates/holonics/src/compression/keys/turns.rs": {
+      "bytes": 17206,
+      "sha256": "7dfcc2a199da6b3ac30fc32d18d82cb7541c1a0a671763e7f91df7df0b1fdd18"
+    },
+    "source-v1/crates/holonics/src/compression/keys.rs": {
+      "bytes": 21934,
+      "sha256": "576d6b20b27ee68235ff8934ea0063640ed0e0a2c01597c3b0768707bf31860a"
+    },
+    "source-v1/crates/holonics/src/compression/landmark/context/baseline.rs": {
+      "bytes": 10550,
+      "sha256": "413f6c3f0d94127b94aec763bca73fde869d8d64aaa883550e20ef2cdb53cf51"
+    },
+    "source-v1/crates/holonics/src/compression/landmark/context/sections.rs": {
+      "bytes": 5059,
+      "sha256": "f0843ade9a2a7340b268edd80c8b430f395fb3b3afaa68ba1c7e541dda24deed"
+    },
+    "source-v1/crates/holonics/src/compression/landmark/context/tests/full.rs": {
+      "bytes": 9232,
+      "sha256": "a26897aa77ff642f55e185564efaedb77b94a1e5d4bd5a0da0aadf1c2cd685f5"
+    },
+    "source-v1/crates/holonics/src/compression/landmark/context/tests.rs": {
+      "bytes": 111230,
+      "sha256": "bab40109ec3c9375094725afef6522b929791b3f731e5c2dd5de5a2787d708df"
+    },
+    "source-v1/crates/holonics/src/compression/landmark/context.rs": {
+      "bytes": 263781,
+      "sha256": "5f5e718eee55408f0b6827210acbd99fb7b9414c76af090cbd4cb9c7de8f0efc"
+    },
+    "source-v1/crates/holonics/src/compression/landmark/mobius.rs": {
+      "bytes": 27570,
+      "sha256": "385b851ddc4462c8cdd118bde46697caf731d338b764a0f4a05b250386a4092b"
+    },
+    "source-v1/crates/holonics/src/compression/landmark/quadratic.rs": {
+      "bytes": 10655,
+      "sha256": "b75c5fdfd2db5d747123ba5540a25c36e2a7d74dc7530bc4c4e28f76ecf5ffaf"
+    },
+    "source-v1/crates/holonics/src/compression/landmark/site.rs": {
+      "bytes": 27824,
+      "sha256": "da336b8bbb3a7ddac4751da10f9e41d8cb52094f746c24e3a517cddc9129c621"
+    },
+    "source-v1/crates/holonics/src/compression/landmark.rs": {
+      "bytes": 4925,
+      "sha256": "b2020bb401cf404e3fdbdd4aaf8eb4e806d2556f7e2750e2ff54fde4ee05a573"
+    },
+    "source-v1/crates/holonics/src/compression/mod.rs": {
+      "bytes": 9169,
+      "sha256": "2870e07f0d35dcd9c8c21bff8d480bb362a164402fa87cc8fdb1a4cd1202f2ea"
+    },
+    "source-v1/crates/holonics/src/compression/resonance.rs": {
+      "bytes": 18058,
+      "sha256": "faabd9076873c12ad297b71ca25b7afd6ce7e035ce4cf20d89635f6683914011"
+    },
+    "source-v1/crates/holonics/src/exterior_guards.rs": {
+      "bytes": 11595,
+      "sha256": "ac1a5008df895cd34bb05570bdf630d67fe7edc4bf8de261b46b1ff11bbace3d"
+    },
+    "source-v1/crates/holonics/src/geometry/complex.rs": {
+      "bytes": 36085,
+      "sha256": "6f13385b17eb5a0bc9f3609539fe7f92b4c1915a3394107f32b7b3f8a76b9396"
+    },
+    "source-v1/crates/holonics/src/geometry/exact.rs": {
+      "bytes": 9605,
+      "sha256": "8ff996a5878c7f97d6debb3d7a7f4f11733644cbc4c917b7154c9545ea6d68fe"
+    },
+    "source-v1/crates/holonics/src/geometry/mod.rs": {
+      "bytes": 1292,
+      "sha256": "e9686f8ed6626939a09c16e08dbf1afa6a8995d2929e8ccebed8cd00e8dcda35"
+    },
+    "source-v1/crates/holonics/src/geometry/motion.rs": {
+      "bytes": 20023,
+      "sha256": "1ce22c85fc4c230f5dc642d393d77c0111779d890f56e171ba597ece7980e345"
+    },
+    "source-v1/crates/holonics/src/geometry/screw.rs": {
+      "bytes": 21308,
+      "sha256": "0f5ac4bfb3c651f6e1bff125d8c78fae87e7b08fd67ca13f92cf478b66deceeb"
+    },
+    "source-v1/crates/holonics/src/geometry/swing.rs": {
+      "bytes": 11216,
+      "sha256": "a98e3cbb084058fd8a3b552b501fbff273ed21c4f34387f65b959209d51e369b"
+    },
+    "source-v1/crates/holonics/src/geometry/winding/tests.rs": {
+      "bytes": 9386,
+      "sha256": "11d3b79af579138cf28de806e4d33fc96fc6955ca1c860226e1f07d0368034fa"
+    },
+    "source-v1/crates/holonics/src/geometry/winding.rs": {
+      "bytes": 10566,
+      "sha256": "ca5a8f4417b638edc922cd6ef12d1b8e6ac0ad04b4e446d4ab2cd271a8fb72c0"
+    },
+    "source-v1/crates/holonics/src/hnn/chart.rs": {
+      "bytes": 38033,
+      "sha256": "71b69f3298d57e8c3312874764919bf3110e7a6b598018eba61551bc33c7f277"
+    },
+    "source-v1/crates/holonics/src/hnn/constitution.rs": {
+      "bytes": 433201,
+      "sha256": "951580ec936cb5948c239a9f3006130809df2111be412beb85831c8fcda5caaa"
+    },
+    "source-v1/crates/holonics/src/hnn/contact.rs": {
+      "bytes": 37018,
+      "sha256": "c03e82181b7d6063b922edfebbb3ac0ef1ebb516b0791b75e5943e74d32ce4d5"
+    },
+    "source-v1/crates/holonics/src/hnn/encoding.rs": {
+      "bytes": 59224,
+      "sha256": "50152ce0f52a501ec08e9cd0b7981950f8173ec4dcfe5a66286ad48d94bf9739"
+    },
+    "source-v1/crates/holonics/src/hnn/executed.rs": {
+      "bytes": 14059,
+      "sha256": "e9000546fd4b202c887336b020dc063286309fe01c217124e887f798baee518b"
+    },
+    "source-v1/crates/holonics/src/hnn/field.rs": {
+      "bytes": 117656,
+      "sha256": "c7a556a2eec3007d0885292123aedda383f61fa48914cb334b8c8c8cb3991c00"
+    },
+    "source-v1/crates/holonics/src/hnn/keys.rs": {
+      "bytes": 30498,
+      "sha256": "6b3d12bc909fe7c4e0e24f443a0313df16cee0460bef0b7db14da76652a44d8f"
+    },
+    "source-v1/crates/holonics/src/hnn/mod.rs": {
+      "bytes": 31487,
+      "sha256": "ded2350455fe3c2e9b5db159efcc8f75724078f3f30d2e3763bf1a02de8eb717"
+    },
+    "source-v1/crates/holonics/src/hnn/moment.rs": {
+      "bytes": 107450,
+      "sha256": "ad2697a9c46d26423dee001b067568e77bc12cb7378d80036320b4bfccf98a3f"
+    },
+    "source-v1/crates/holonics/src/hnn/pending.rs": {
+      "bytes": 13935,
+      "sha256": "092d05ce266079a07bec53f067adc586eb83b94926530149c93ad44ad6f20332"
+    },
+    "source-v1/crates/holonics/src/hnn/port.rs": {
+      "bytes": 68725,
+      "sha256": "882929e7c463b6a65b0f437de8d7000ea8044dd25504720c8ff85a253c8d660c"
+    },
+    "source-v1/crates/holonics/src/hnn/prediction.rs": {
+      "bytes": 143700,
+      "sha256": "3ecd6ca421ee24d1ae377392427f4e45722dcaf4d848845686b370a649285b7a"
+    },
+    "source-v1/crates/holonics/src/hnn/propagation.rs": {
+      "bytes": 65733,
+      "sha256": "ebae450035e9a86b53f454d437e51ad9ceebb020f54a0e0dfc5278a741356856"
+    },
+    "source-v1/crates/holonics/src/hnn/ratio.rs": {
+      "bytes": 22152,
+      "sha256": "4b223f2a9bae7b70291ed62ce026a5f6ca521df0b4d87be3769c26a32f91030c"
+    },
+    "source-v1/crates/holonics/src/hnn/realization.rs": {
+      "bytes": 6393,
+      "sha256": "d6daddbf8cc69ee9d546862a1bfc22e05cc27a70ee835455c9016d1062400c5a"
+    },
+    "source-v1/crates/holonics/src/hnn/receiving.rs": {
+      "bytes": 79239,
+      "sha256": "10cea7efc861f33530ec65bf3a901726850ae2677dfc2d622e494de9359abac4"
+    },
+    "source-v1/crates/holonics/src/hnn/reference/continuation.rs": {
+      "bytes": 21252,
+      "sha256": "7ca75a55b49a1dd1c2341f8db22751829e7891ab0f1459376816f57271369eea"
+    },
+    "source-v1/crates/holonics/src/hnn/reference/passage.rs": {
+      "bytes": 12839,
+      "sha256": "2665e5235bff5beadac9904eee5011151873899cf19fc96f5d65886c9df905ee"
+    },
+    "source-v1/crates/holonics/src/hnn/reference.rs": {
+      "bytes": 220442,
+      "sha256": "9800117d77ca85642e607264897a9974aee3b2e9659392a4512ce4aba8cd13d8"
+    },
+    "source-v1/crates/holonics/src/hnn/retention.rs": {
+      "bytes": 30391,
+      "sha256": "287e881f98cf9d05969b2f0f3969bb7084320b873761c9d790dd04855b69a118"
+    },
+    "source-v1/crates/holonics/src/hnn/ring.rs": {
+      "bytes": 175230,
+      "sha256": "ebf6814531626b4a50da5e9e3e0edd32fbb43e80ef28ce20426b2f412bc72836"
+    },
+    "source-v1/crates/holonics/src/hnn/state_text.rs": {
+      "bytes": 1964,
+      "sha256": "2bb767b8dabc3eaf564873d0ab843f35d154a8551542a409045e821b0155997d"
+    },
+    "source-v1/crates/holonics/src/hnn/tests/chart.rs": {
+      "bytes": 16139,
+      "sha256": "8e68c257478b70719a5f6e3519db66fd92ff514513b393e5b0adee7516e05c05"
+    },
+    "source-v1/crates/holonics/src/hnn/tests/constitution.rs": {
+      "bytes": 101052,
+      "sha256": "891869da775924e02808b5794e026a8bca583bd34cddf7d75bbb6fb05a0331da"
+    },
+    "source-v1/crates/holonics/src/hnn/tests/contact_residual.rs": {
+      "bytes": 28458,
+      "sha256": "c2e6bf8644804f9bbca1022776b01523dee0e89ea391643f67cebbf1ddece490"
+    },
+    "source-v1/crates/holonics/src/hnn/tests/encoding.rs": {
+      "bytes": 21151,
+      "sha256": "f8cd5512219a3f4dba60aa202b9f649af3d7df2b5dc3f6e91df10b77d3344fd0"
+    },
+    "source-v1/crates/holonics/src/hnn/tests/executed.rs": {
+      "bytes": 29817,
+      "sha256": "2743e09de9071e89e230d61560a8291c53f89be308c4b351f31f370b27325e34"
+    },
+    "source-v1/crates/holonics/src/hnn/tests/field.rs": {
+      "bytes": 25126,
+      "sha256": "89424a0a8997e800ce5ec0e189902301581aee2fd2ecf848aae86ed580f02f47"
+    },
+    "source-v1/crates/holonics/src/hnn/tests/floquet.rs": {
+      "bytes": 49983,
+      "sha256": "17732721e670ab57d45431328f7862203d8404cf68e4cb2ce15be75c80c26f8b"
+    },
+    "source-v1/crates/holonics/src/hnn/tests/guards.rs": {
+      "bytes": 13871,
+      "sha256": "6738cbbd49ed07daa75085f173fe9ca91f3aeddf1dcf5583b99a16cec736f2b5"
+    },
+    "source-v1/crates/holonics/src/hnn/tests/keys.rs": {
+      "bytes": 26822,
+      "sha256": "c03889988225553330e737e26d0e1108fb51fc9628644c7ea5c934eeeb10da11"
+    },
+    "source-v1/crates/holonics/src/hnn/tests/learning.rs": {
+      "bytes": 11310,
+      "sha256": "d9aa781454b3390fe58b4cdbcd1dae4cdd2ee17bd8da138681d708a96c968466"
+    },
+    "source-v1/crates/holonics/src/hnn/tests/loaded_scalar.rs": {
+      "bytes": 3962,
+      "sha256": "a53e89e341c0e5b0f09fdca82cd6937a896ce3ffa4b1f833f4ff743563899df5"
+    },
+    "source-v1/crates/holonics/src/hnn/tests/mod.rs": {
+      "bytes": 582,
+      "sha256": "2ca9b07a6ef766724a4998a179a0b2c5f973b4af7aba8b28b3c33c88ee065e9e"
+    },
+    "source-v1/crates/holonics/src/hnn/tests/moment.rs": {
+      "bytes": 37039,
+      "sha256": "a002bc2a07194a74b3eb201edc89166f13b3577ec6aeba0e5a5e88219090643b"
+    },
+    "source-v1/crates/holonics/src/hnn/tests/pending.rs": {
+      "bytes": 7479,
+      "sha256": "eef9d986b1e328ebaaae5a8776d4a31493a3e43bd47fda3af4e3d7c042ba0274"
+    },
+    "source-v1/crates/holonics/src/hnn/tests/physics.rs": {
+      "bytes": 64394,
+      "sha256": "5119cbdd834cf239194aa0781ee9092d35ef8c2e05836eed8f3c7ede4569c12e"
+    },
+    "source-v1/crates/holonics/src/hnn/tests/port.rs": {
+      "bytes": 64526,
+      "sha256": "bd5a97953ebea6b4fdca1ff987c7dae76f8dc714ce62f9530b27609d7ab6a2be"
+    },
+    "source-v1/crates/holonics/src/hnn/tests/prediction.rs": {
+      "bytes": 127132,
+      "sha256": "8b75015e5e2e3ca95907ef8b94db15bd943b13985d851ac22426e2d894d0fcaa"
+    },
+    "source-v1/crates/holonics/src/hnn/tests/prior_carry.rs": {
+      "bytes": 25191,
+      "sha256": "5af5954548ed7afbb54aa08722694652a0831f3abcf37d40877ef0e87a9ca6d7"
+    },
+    "source-v1/crates/holonics/src/hnn/tests/propagation.rs": {
+      "bytes": 49477,
+      "sha256": "6c21e6729e2b1d44d1fbc319000e96130d85741ab9a5936c3395dd8d3744fdb1"
+    },
+    "source-v1/crates/holonics/src/hnn/tests/ratio.rs": {
+      "bytes": 16437,
+      "sha256": "c5e4018f9848ffc1ec32f50357e57608a15b429fab9cd8610045742abffa74f5"
+    },
+    "source-v1/crates/holonics/src/hnn/tests/rebase_boundary.rs": {
+      "bytes": 15550,
+      "sha256": "c72a0fe982520cc9cd6568a4184dada11c82669134098db6fc7788154c6c569b"
+    },
+    "source-v1/crates/holonics/src/hnn/tests/receiving.rs": {
+      "bytes": 70737,
+      "sha256": "6efac0e41141252cc9e42ca72da902019cb950f0e3b917d4f9665ad91fb8d0d0"
+    },
+    "source-v1/crates/holonics/src/hnn/tests/reference.rs": {
+      "bytes": 59191,
+      "sha256": "94808746e57632e11acac4142d17fa107db77cb4528d568ac757c3df469efb65"
+    },
+    "source-v1/crates/holonics/src/hnn/tests/resonator_deposit.rs": {
+      "bytes": 21882,
+      "sha256": "18fe10dc13a0598b5c68d7e275c7c4e2be39c896979a4ecbe6cc9bce5994726f"
+    },
+    "source-v1/crates/holonics/src/hnn/tests/retention.rs": {
+      "bytes": 55058,
+      "sha256": "5e818dd6786e7c680e35ffcf26af3747ec54c20aedba1326be6ac0f2cc94734e"
+    },
+    "source-v1/crates/holonics/src/hnn/tests/support.rs": {
+      "bytes": 19532,
+      "sha256": "7d4bfa4a66210a0b4482dc777a2af12c9a322e5195d5d44a03a7c5233e8ea929"
+    },
+    "source-v1/crates/holonics/src/hnn/tests/word.rs": {
+      "bytes": 12411,
+      "sha256": "f32470c088dee3f6fa01907891a2238d14a783faa811f8d3ff72db681c432edd"
+    },
+    "source-v1/crates/holonics/src/hnn/word/continuation.rs": {
+      "bytes": 18198,
+      "sha256": "cb96ea4f09a24ca57e26cfd95436c69752670dacf9afb1450546e9b7d09d8092"
+    },
+    "source-v1/crates/holonics/src/hnn/word.rs": {
+      "bytes": 139446,
+      "sha256": "0200f5a2920d26b0b6258823ffeb20ae5b23bf4546299ec058e7c60d159b7bb4"
+    },
+    "source-v1/crates/holonics/src/holarchy/gluing.rs": {
+      "bytes": 38035,
+      "sha256": "7076f731eb028c169ffae7ffd307103e886a04063300ae21e03d1cc34a73d8b0"
+    },
+    "source-v1/crates/holonics/src/holarchy/mod.rs": {
+      "bytes": 27077,
+      "sha256": "4c3c3e786eaa085fbe482e7dfcbda4366d3846bb5f8c99e63627ab3c5c1ffc8b"
+    },
+    "source-v1/crates/holonics/src/holarchy/terrain/chase.rs": {
+      "bytes": 56847,
+      "sha256": "6c3894adc1e792f29d1f76b9520814c4b72e739bb403aedb8fc2f3f0c1fc001a"
+    },
+    "source-v1/crates/holonics/src/holarchy/terrain/chase_tests.rs": {
+      "bytes": 46303,
+      "sha256": "d149a0fe0a01cd57dab3682d8c7d7748f88101e68885f1743bbb7854df564572"
+    },
+    "source-v1/crates/holonics/src/holarchy/terrain/crib.rs": {
+      "bytes": 4271,
+      "sha256": "45d8c5b7f68d4cfd38900bb1808169c2801faa23a2ca6bd0ed4d88b78153c5d6"
+    },
+    "source-v1/crates/holonics/src/holarchy/terrain/known.rs": {
+      "bytes": 11494,
+      "sha256": "9d037d70b4d8ee73d3cbb8e8829d86a0fc69056c7cbca113b68241a3651843f3"
+    },
+    "source-v1/crates/holonics/src/holarchy/terrain/mod.rs": {
+      "bytes": 12526,
+      "sha256": "bcd7f37f7bcef44fc2e926a1472cbf9fde4a62f9826fd1225caaaf38de59621e"
+    },
+    "source-v1/crates/holonics/src/holarchy/terrain/moire.rs": {
+      "bytes": 17282,
+      "sha256": "bcf9a1499a3ad561d766dc598ed596b7c31461dda545392d19285024ef7649bc"
+    },
+    "source-v1/crates/holonics/src/holarchy/terrain/pursuit.rs": {
+      "bytes": 62351,
+      "sha256": "af43f56795774266758b0ca0fc74e72e1d48f345d6c41085ba44619cfad8d3d8"
+    },
+    "source-v1/crates/holonics/src/holarchy/terrain/sensing.rs": {
+      "bytes": 21820,
+      "sha256": "f4bfb5bb32402039d7fdba193e84e3baf22667559d9db2648d8c81b1ca3445fc"
+    },
+    "source-v1/crates/holonics/src/holarchy/terrain/sensing_tests.rs": {
+      "bytes": 16730,
+      "sha256": "9a9db8e6ac026539a7e1e102008536448afeec90b20b5ca0eb2e6c4adb4e1933"
+    },
+    "source-v1/crates/holonics/src/holarchy/terrain/source.rs": {
+      "bytes": 31318,
+      "sha256": "59a1c7362e9ca7690d06cafede0725517526cd883067002a72f3bd50b7c471ce"
+    },
+    "source-v1/crates/holonics/src/holarchy/terrain/switching.rs": {
+      "bytes": 7650,
+      "sha256": "51590fd7ff814dbdd4a91350d3b9acf7816d129a0c0db048585536c50c81474b"
+    },
+    "source-v1/crates/holonics/src/holarchy/terrain/tests.rs": {
+      "bytes": 15010,
+      "sha256": "f6bbbf7e2d461b5c9ab0ca999c593ec18b0f293dc950f4ba5a310a7cf9067110"
+    },
+    "source-v1/crates/holonics/src/holarchy/tests.rs": {
+      "bytes": 35541,
+      "sha256": "78f915d2489e1e826e9cc1cb1e355b0ddaf5dfb811367208f5ccb9def1dbac42"
+    },
+    "source-v1/crates/holonics/src/holarchy/view.rs": {
+      "bytes": 15932,
+      "sha256": "394e31eb24dee652c690d738fcf96b18f59f9b795adb0e5eb4ab7cb6c1a526a7"
+    },
+    "source-v1/crates/holonics/src/holon/conformance.rs": {
+      "bytes": 35585,
+      "sha256": "b84e602a91a9bf24f773ba1a45227acbabf9d3ef276eda7e168c00d5cf3e39da"
+    },
+    "source-v1/crates/holonics/src/holon/contact/menu.rs": {
+      "bytes": 12179,
+      "sha256": "c455941738139e4d08a7bdf0aaa45f5aab79747956e874e6dfbf13114025e160"
+    },
+    "source-v1/crates/holonics/src/holon/contact.rs": {
+      "bytes": 52333,
+      "sha256": "20d0316d1424c0f1930921d53a9051706044b7aad980c25a07481454d5a39479"
+    },
+    "source-v1/crates/holonics/src/holon/deposition.rs": {
+      "bytes": 49598,
+      "sha256": "164ee9a8371e1d89d842c6cff4ac0dd3f9f1a9a017e57f05d1ffc9eda844b6b3"
+    },
+    "source-v1/crates/holonics/src/holon/dirac.rs": {
+      "bytes": 33263,
+      "sha256": "738810b57ae629e9354c354678aee4ea140f0d215b8cb870ead6660e07bf6940"
+    },
+    "source-v1/crates/holonics/src/holon/element.rs": {
+      "bytes": 9918,
+      "sha256": "32683220d74dc3ecf836cb2d10a133dd6bd9debd324f61cebe1db7a7f79825af"
+    },
+    "source-v1/crates/holonics/src/holon/law.rs": {
+      "bytes": 24095,
+      "sha256": "80366830ad5f9bc949b093f5a574273a99c0bb53ccb67d86f9d7ad795f5779ef"
+    },
+    "source-v1/crates/holonics/src/holon/mod.rs": {
+      "bytes": 34249,
+      "sha256": "cae7f90c30da6ce2cb42b9ba916a3db7012e8efab2629daa58e6d524d3f3de26"
+    },
+    "source-v1/crates/holonics/src/holon/parametron/loaded.rs": {
+      "bytes": 22304,
+      "sha256": "e54a1126bb99761af613c6d6272343aadab69cadcb3817cfca769a7e89a422b8"
+    },
+    "source-v1/crates/holonics/src/holon/parametron/mounted.rs": {
+      "bytes": 6423,
+      "sha256": "3009606b8f21dcf98b99df3fdf66b6b3651c91a710af20798b4c5706cbb0b965"
+    },
+    "source-v1/crates/holonics/src/holon/parametron.rs": {
+      "bytes": 29429,
+      "sha256": "25b6df1023761fbbb0442c314d97c65a9a2473e067f9359e96db847205aafd31"
+    },
+    "source-v1/crates/holonics/src/holon/port.rs": {
+      "bytes": 10322,
+      "sha256": "080016ede397f88f32a9277245b10563048c4189e1bc2b3e25d14e20c9d3e7d1"
+    },
+    "source-v1/crates/holonics/src/holon/restriction/descent.rs": {
+      "bytes": 15455,
+      "sha256": "8043e19886bc5efd55bb68e76d30efab3c7db777b22ba6ecd49ff949497d5a9e"
+    },
+    "source-v1/crates/holonics/src/holon/restriction/fibre.rs": {
+      "bytes": 14091,
+      "sha256": "6657ca1aaeae87bf6f2e86fa1d4c7c560b5d7f7bef0e22d84fa0af337970b89e"
+    },
+    "source-v1/crates/holonics/src/holon/restriction/linear.rs": {
+      "bytes": 11182,
+      "sha256": "26cae1e60ca8fe9dcf8ebfb8353b5f4591a88f9590c6f6c9d18134a4afc78b09"
+    },
+    "source-v1/crates/holonics/src/holon/restriction/tower/tests.rs": {
+      "bytes": 41983,
+      "sha256": "35cac77cf4a24dce92ccdb556d808f9c63c8e70153bf341b99698f46fe6a08f6"
+    },
+    "source-v1/crates/holonics/src/holon/restriction/tower.rs": {
+      "bytes": 107102,
+      "sha256": "1995980fcd8e61d8c92fb71fdf1ffd1951924092fec5563c1d92ba72c7755c90"
+    },
+    "source-v1/crates/holonics/src/holon/restriction/tube.rs": {
+      "bytes": 42581,
+      "sha256": "48a989a80585f28c8964148fa9c9d486037990aecf2b1bf428733988c8162c42"
+    },
+    "source-v1/crates/holonics/src/holon/restriction.rs": {
+      "bytes": 22136,
+      "sha256": "e4793320d666786e4ea0f3eb75f80d33767d25d034fb3f3f70c8d6273805bd2e"
+    },
+    "source-v1/crates/holonics/src/lib.rs": {
+      "bytes": 3161,
+      "sha256": "61f950806d8151d92301d56330927b86dcac3ac54c6f9a7db838086ce0fd938f"
+    },
+    "source-v1/crates/holonics/src/navigator/address.rs": {
+      "bytes": 20610,
+      "sha256": "fe2de33951e99bcd8f03231ab54d730d55ad7543c4830de88b71848b753cb2da"
+    },
+    "source-v1/crates/holonics/src/navigator/mod.rs": {
+      "bytes": 29138,
+      "sha256": "97b2a701c10dc66730008718fb824077df845449ff8b1597fa7d41918af1281b"
+    },
+    "source-v1/crates/holonics/src/navigator/trace.rs": {
+      "bytes": 14606,
+      "sha256": "807642025dc9fa87a41cfb8b8067820ac559ee8acb44dae98bc8afc6ca872e6d"
+    },
+    "source-v1/crates/holonics/src/physics/fluid/body.rs": {
+      "bytes": 22085,
+      "sha256": "74f13f642abb1a5c44ed3bcb3c7682ed31f452424bfa7f7bd51be2499b6dbd3d"
+    },
+    "source-v1/crates/holonics/src/physics/fluid/cells.rs": {
+      "bytes": 23191,
+      "sha256": "b4a011146d7d1b0ccbfca20e92df085312d2215fc1bcddce666c096662b65f3a"
+    },
+    "source-v1/crates/holonics/src/physics/fluid/complex.rs": {
+      "bytes": 15382,
+      "sha256": "e744d4f344efafbb6e98c251dc4c55bf93f47d8dabf3378756a69b8c5846183c"
+    },
+    "source-v1/crates/holonics/src/physics/fluid/control_volume.rs": {
+      "bytes": 30395,
+      "sha256": "210711e88c19b94311d50240c334750d6c216211327babe65597a7bf3ff9c59b"
+    },
+    "source-v1/crates/holonics/src/physics/fluid/singularity.rs": {
+      "bytes": 20201,
+      "sha256": "942ae7098ab29b0fce79e061034444dcc10429b2abfbe4b78d0ed0053b00d0d8"
+    },
+    "source-v1/crates/holonics/src/physics/fluid.rs": {
+      "bytes": 4965,
+      "sha256": "527849ab40cc00051713213c8efa24f6acafa8797d56bcea4ecc236d608f2baa"
+    },
+    "source-v1/crates/holonics/src/physics/information/apply.rs": {
+      "bytes": 16364,
+      "sha256": "2983abbdc8d9059c4e0a3c2529957cce3cf011ade0c9d0576f76bad4ee654792"
+    },
+    "source-v1/crates/holonics/src/physics/information/rate.rs": {
+      "bytes": 9691,
+      "sha256": "4922b5c427e276986e7310e4908793dd13d2f2f037fb572cb75e6ce7eabb5dc3"
+    },
+    "source-v1/crates/holonics/src/physics/information/tests.rs": {
+      "bytes": 18987,
+      "sha256": "c809005516720ce75ddb47f3fc33401684adde0dcc475f4cffcf36a160e8e9aa"
+    },
+    "source-v1/crates/holonics/src/physics/information.rs": {
+      "bytes": 7170,
+      "sha256": "c50285be4d0891d9063e2b7eed07f8f80481c2c0b81cea75a8d771ca4b12197c"
+    },
+    "source-v1/crates/holonics/src/physics/mod.rs": {
+      "bytes": 490,
+      "sha256": "dce482909e8c86254b21739dd8762c5d74bca7136b5884c7257aa2400e560147"
+    },
+    "source-v1/crates/holonics/src/physics/spacetime/clocks.rs": {
+      "bytes": 5670,
+      "sha256": "676e05f56bb49ea93b203ba610a7b494d4757f310d2692bebfced2596d0b1ccc"
+    },
+    "source-v1/crates/holonics/src/physics/spacetime/einstein.rs": {
+      "bytes": 4716,
+      "sha256": "21c95c284cd847e14720cc59210894b72c0ecbd7340472c491c9c028b4d25bf6"
+    },
+    "source-v1/crates/holonics/src/physics/spacetime/lorentz.rs": {
+      "bytes": 16360,
+      "sha256": "a3a2ba6380c5edbbc69b7e5fafa1feaaa5dd06d592b12721aa28a84977a51283"
+    },
+    "source-v1/crates/holonics/src/physics/spacetime/source.rs": {
+      "bytes": 14166,
+      "sha256": "30166438e3fa8e4817a2476fb36d9499cfd95bb66ab6de7e90e4eefc1f7247d4"
+    },
+    "source-v1/crates/holonics/src/physics/spacetime/tests.rs": {
+      "bytes": 28398,
+      "sha256": "46def048d2076fc3c3ba2a5a8c37d652de8ed8823718307fa755f71df2733416"
+    },
+    "source-v1/crates/holonics/src/physics/spacetime.rs": {
+      "bytes": 9282,
+      "sha256": "dc06b19dcb428091a858c136b0dbb2ffb3d780d50810554669e595f10eb33a77"
+    },
+    "source-v1/crates/holonics/src/physics/thermal/axes.rs": {
+      "bytes": 11494,
+      "sha256": "d0e1b594f729039b25384e6d43dfd3e6a3a07ad0ea75fbd086be7516255e7e87"
+    },
+    "source-v1/crates/holonics/src/physics/thermal/exchange.rs": {
+      "bytes": 8560,
+      "sha256": "caa0936f50629ca9da048a73aa780c9e4ae7bea6b4375636208cd4f33d9251ec"
+    },
+    "source-v1/crates/holonics/src/physics/thermal/neck.rs": {
+      "bytes": 5512,
+      "sha256": "59bdc3038d59cf02a3ce8d560b0c74bb7c73a1c958ac93e6f1d9f68f325df6b0"
+    },
+    "source-v1/crates/holonics/src/physics/thermal/port.rs": {
+      "bytes": 3655,
+      "sha256": "0caf15ea9905e54f556e6b211c8f89e832137ee4a12f3af019299a4ecae4d85c"
+    },
+    "source-v1/crates/holonics/src/physics/thermal/tests.rs": {
+      "bytes": 25333,
+      "sha256": "bc37321efefbc7eae0849f3a04eaece7145d3a5623d83187447d8d2ac6ceacd9"
+    },
+    "source-v1/crates/holonics/src/physics/thermal.rs": {
+      "bytes": 11192,
+      "sha256": "8b7d1502fb6295db8d5748716e3a3c434cca5bba23d1209686864f76b7fb8a00"
+    },
+    "source-v1/crates/holonics/src/physics/wave/chain.rs": {
+      "bytes": 28939,
+      "sha256": "3130272d662e592f72601253ad7aac21a2ebd1a2670fb6bd7f9d70f17532265a"
+    },
+    "source-v1/crates/holonics/src/physics/wave/continuation.rs": {
+      "bytes": 14963,
+      "sha256": "fef87716fa785bb372693885adacb91b4cf07164b0d5c421f1a45b0dc0e18674"
+    },
+    "source-v1/crates/holonics/src/physics/wave/interference.rs": {
+      "bytes": 1942,
+      "sha256": "58dc30d9a92bb783c3ebe78420eafb288d3b6c0babcaefb57798392eba4e19d3"
+    },
+    "source-v1/crates/holonics/src/physics/wave/tests.rs": {
+      "bytes": 18594,
+      "sha256": "58350fe1a6a52472e80cac2312bf7f75e85a63f32eb59442718517219a3d3c06"
+    },
+    "source-v1/crates/holonics/src/physics/wave.rs": {
+      "bytes": 6790,
+      "sha256": "9255780b05fb94ce29a0f1f4c4d8c6ece752250947cff62315c70eab41cc668f"
+    },
+    "source-v1/crates/holonics/src/ratio/algebraic.rs": {
+      "bytes": 58349,
+      "sha256": "aff50b8ff77ffd718784440ce067433e2594c41924fada44c2003d352aa0c5d0"
+    },
+    "source-v1/crates/holonics/src/ratio/disk.rs": {
+      "bytes": 31062,
+      "sha256": "2d696d43b641b4e0cfc55a90179aae1aeeae3e3277e082a7c1fd5d1780a082d7"
+    },
+    "source-v1/crates/holonics/src/ratio/exponentiated/carried.rs": {
+      "bytes": 13651,
+      "sha256": "3e5d49524168c8360078477e38d93f97ebb93a1cca8ba65a387f7db30ef43332"
+    },
+    "source-v1/crates/holonics/src/ratio/exponentiated.rs": {
+      "bytes": 25253,
+      "sha256": "a22226720ae5f423b0f39975caff0f3f28e1fcb11aa95da1eff4e3f973e4a9d5"
+    },
+    "source-v1/crates/holonics/src/ratio/gaussian.rs": {
+      "bytes": 5107,
+      "sha256": "66899eac32c9cb6a8af20ae7fc941a83b268db9f602aa2317ae29cb80a217ed4"
+    },
+    "source-v1/crates/holonics/src/ratio/linear/inertia.rs": {
+      "bytes": 29196,
+      "sha256": "5e97d0b7677929816bb9795c56191f9aa4ff828ce18256e17be57e6c8d92daeb"
+    },
+    "source-v1/crates/holonics/src/ratio/linear/prime_image/tests.rs": {
+      "bytes": 14857,
+      "sha256": "5a05657b15f92c8ce2a3e00e1570bc2fd959766e9d199b17b31b2ab3b844f434"
+    },
+    "source-v1/crates/holonics/src/ratio/linear/prime_image.rs": {
+      "bytes": 63195,
+      "sha256": "bc8f9eb928d357eca67af08c7457fa8d7e00206ed1c59a03d190afe3ec2e447e"
+    },
+    "source-v1/crates/holonics/src/ratio/linear/vector.rs": {
+      "bytes": 17748,
+      "sha256": "0a3e739bf292f53b6a877f31a4f74f63a159fc587d3f6f371f35e029fc5fd36e"
+    },
+    "source-v1/crates/holonics/src/ratio/linear.rs": {
+      "bytes": 60326,
+      "sha256": "a1bb3e17c9e7d0c0fd0da9369700970b9a7a3895a922780c04e6242b1379d5f9"
+    },
+    "source-v1/crates/holonics/src/ratio/log_ratio.rs": {
+      "bytes": 9297,
+      "sha256": "7e561a27844629c0106c95ae2dc2415dabfa38060208551672a12364305caace"
+    },
+    "source-v1/crates/holonics/src/ratio/mod.rs": {
+      "bytes": 7370,
+      "sha256": "9944f3167bf7006904a30cacb471e4ad42b4c30ca23b726ad8e9f4e538f8d682"
+    },
+    "source-v1/crates/holonics/src/ratio/polynomial/root_separation.rs": {
+      "bytes": 3117,
+      "sha256": "7d7eb6cf83a121f20a57fd5260addf2e2a7ba827d489159cf71f469a8eaeacf9"
+    },
+    "source-v1/crates/holonics/src/ratio/polynomial/tests.rs": {
+      "bytes": 19925,
+      "sha256": "3e08cbec3c91a9ce37762c087d9fab25cbabff1a7e1a3cf27d502150e15fd58e"
+    },
+    "source-v1/crates/holonics/src/ratio/polynomial.rs": {
+      "bytes": 96688,
+      "sha256": "f9ca719594bf5e0e09e5e766ddb0ff78d0e77a2244ffdb8659f8e9ee19855f1e"
+    },
+    "source-v1/crates/holonics/src/ratio/presentation.rs": {
+      "bytes": 4788,
+      "sha256": "d32df704d1bbdf400750c324c28d10d8d491869ae11d64d49a09964932183d3d"
+    },
+    "source-v1/crates/holonics/src/ratio/primality.rs": {
+      "bytes": 3481,
+      "sha256": "bd21e383e842a6bdd5b5a4a839b999d629f9e124f8b8117b9ff0e828c5a03cc8"
+    },
+    "source-v1/crates/holonics/src/ratio/ring/section/tests.rs": {
+      "bytes": 4930,
+      "sha256": "0479ff0dba89f210441d9cdd71213d745bc52c439796aec42a070b1dd199e7c0"
+    },
+    "source-v1/crates/holonics/src/ratio/ring/section.rs": {
+      "bytes": 3429,
+      "sha256": "104e07b80568558a634ff6ebfc00fdb869ef0edfbf45dc1966ff54b06f62ec57"
+    },
+    "source-v1/crates/holonics/src/ratio/ring.rs": {
+      "bytes": 7878,
+      "sha256": "63b10a3686ecc8e71945be3b933ed5a9d6a5cfff67ef2f3878d9189776cba9a1"
+    },
+    "source-v1/crates/holonics/src/ratio/surprisal.rs": {
+      "bytes": 45369,
+      "sha256": "e40c543235a531c80ed868c1449361888499c7b8abb63deb69970d21d03b8fb8"
+    },
+    "source-v1/crates/holonics/src/ratio/work.rs": {
+      "bytes": 11411,
+      "sha256": "fe8a71d64d7b2723c15ce1060fe73b6b3cd4286c6ca53a294be32b5f3e461fbd"
+    },
+    "source-v1/crates/holonics/src/receiver/face.rs": {
+      "bytes": 56378,
+      "sha256": "07dd1919c0bec668fb0d69cd29c1223933257549eab94bacfa648cb42b28799b"
+    },
+    "source-v1/crates/holonics/src/receiver/mod.rs": {
+      "bytes": 2000,
+      "sha256": "da2741278f0e6f913fbe0cb03fb26c09b3551fa31eba9477b12f2dc8e21f3b51"
+    },
+    "source-v1/crates/holonics/src/receiver/population/birth.rs": {
+      "bytes": 49128,
+      "sha256": "5f22d8caf0689cf1bce5b83c8926413fef1ca5acd6bb2a3fd0ba8d51aef4c185"
+    },
+    "source-v1/crates/holonics/src/receiver/population/birth_tests.rs": {
+      "bytes": 11291,
+      "sha256": "347c7e7fc68e5952d5b6c05fbb44ea6d5e2739784e5efb8034fb4179e79f1428"
+    },
+    "source-v1/crates/holonics/src/receiver/population/chase.rs": {
+      "bytes": 11627,
+      "sha256": "e7d36c043e55b0ce63069a29086865ae049aa14f3417dfdc3f320e96e24465eb"
+    },
+    "source-v1/crates/holonics/src/receiver/population/chaser.rs": {
+      "bytes": 48030,
+      "sha256": "7fd980990c9498cfcd11b15f069aeb798caa62c7619b5d9b26d442bb8de1bea1"
+    },
+    "source-v1/crates/holonics/src/receiver/population/chaser_tests.rs": {
+      "bytes": 10514,
+      "sha256": "58108bead607677a61e19cd3d25733ef3a62bc87d95e69b238d597a4192474da"
+    },
+    "source-v1/crates/holonics/src/receiver/population/composition.rs": {
+      "bytes": 35014,
+      "sha256": "cb052720c0ee191918de873ed352f7f766de503fa0218a9eb98e432bc784b471"
+    },
+    "source-v1/crates/holonics/src/receiver/population/composition_tests.rs": {
+      "bytes": 28417,
+      "sha256": "17e669f052f96e882516c76dbb756ef9b812f49ce1455f435ec66864004fee57"
+    },
+    "source-v1/crates/holonics/src/receiver/population/dormancy.rs": {
+      "bytes": 30830,
+      "sha256": "010e4ae88bcbd28d4e050baf3078301e0c38a54a6d0be077028a1cf4fb1d5115"
+    },
+    "source-v1/crates/holonics/src/receiver/population/dormancy_tests.rs": {
+      "bytes": 7965,
+      "sha256": "a48f30d0c267d1f37b89ac235fd92207e6e7b961637732fce9bcd5810026acff"
+    },
+    "source-v1/crates/holonics/src/receiver/population/evolution.rs": {
+      "bytes": 12935,
+      "sha256": "d659c6aae69615ab7ce6326716584d893475a13eb6decfbbbe1cccb6b013cab5"
+    },
+    "source-v1/crates/holonics/src/receiver/population/evolution_tests.rs": {
+      "bytes": 30044,
+      "sha256": "6ef1ec61168dd3212078bb51dfaad754ab7256e654b7f6516733c0a54e54c437"
+    },
+    "source-v1/crates/holonics/src/receiver/population/families.rs": {
+      "bytes": 25284,
+      "sha256": "a2eef57533998b8463d74a849f4b64589f38bf851f076f1cfab0fd6df8225f65"
+    },
+    "source-v1/crates/holonics/src/receiver/population/merge.rs": {
+      "bytes": 21448,
+      "sha256": "666de82c1e357dda1e881ce2426f1492e6f7942ea4068866ddd401d4d5ca4fbe"
+    },
+    "source-v1/crates/holonics/src/receiver/population/merge_tests.rs": {
+      "bytes": 7344,
+      "sha256": "acc4ab73ea75e2905d497afa0b8a886afd37ec0628f5cfa72d122fcd9f237340"
+    },
+    "source-v1/crates/holonics/src/receiver/population/port.rs": {
+      "bytes": 22579,
+      "sha256": "2b2c8cbb72ab72938210d6f8dbd5635f78392b8d5186337149893045db9ef2cf"
+    },
+    "source-v1/crates/holonics/src/receiver/population/port_tests.rs": {
+      "bytes": 8803,
+      "sha256": "9344b8739fc62d304a29b6ce07e8f37aa400a436b9027625aad0ff9e940267e3"
+    },
+    "source-v1/crates/holonics/src/receiver/population/species.rs": {
+      "bytes": 14349,
+      "sha256": "99a9e59c3508e5d58a4b019f330ae28ad542f7d493c62c287f4aa891e076d390"
+    },
+    "source-v1/crates/holonics/src/receiver/population/tests.rs": {
+      "bytes": 45993,
+      "sha256": "6d8897b0092e70b364c8bdc2985b951f0627f130ecc9ea26e0f657e77bb4d888"
+    },
+    "source-v1/crates/holonics/src/receiver/population.rs": {
+      "bytes": 105215,
+      "sha256": "cfd9aded5802bd82fbf9956c2c9392a3b067cae405594cdef02ee548a4a0ec35"
+    },
+    "source-v1/crates/holonics/src/receiver/receipt.rs": {
+      "bytes": 18545,
+      "sha256": "d4391ea8f8c7fb6d9a5bc53b081107095b00ac52f1eb30055ae79f05d9397ab4"
+    },
+    "source-v1/crates/holonics/src/receiver/reception/continuation/tests.rs": {
+      "bytes": 14261,
+      "sha256": "9527ef643ac8f48406e2fe7c60367041fd3a5d7c8925860eaec97e1bcbaca3dd"
+    },
+    "source-v1/crates/holonics/src/receiver/reception/continuation.rs": {
+      "bytes": 10991,
+      "sha256": "0805e35e5b8c19763b50472835545588dd4ab0918ee72a0e9361a1847bbfc8e1"
+    },
+    "source-v1/crates/holonics/src/receiver/reception.rs": {
+      "bytes": 36764,
+      "sha256": "f33ac0ad50631f94db67c4dedaee08914f652fb5967c6351386b868ee5a89d70"
+    },
+    "source-v1/crates/holonics/src/receiver/release/tests.rs": {
+      "bytes": 32491,
+      "sha256": "316f7e043cff97fec5c14916922e0a8c4fea56d0e906876f8c1ea9fa16e30e89"
+    },
+    "source-v1/crates/holonics/src/receiver/release.rs": {
+      "bytes": 32160,
+      "sha256": "6d89ab726bc289a2cfbf5cdfef902e532b431026162fe2d106e24b6da5e74e6a"
+    },
+    "source-v1/crates/holonics/tests/ranged_capacity.rs": {
+      "bytes": 24618,
+      "sha256": "86ae43a11634abbe645bf2bbab25e7a62e5e3fad302e31e105b62afb1abebb38"
+    },
+    "source-v1/crates/holonics/tests/resident_cold_restore.rs": {
+      "bytes": 8133,
+      "sha256": "c883536ad0672f210d013ef9bc3adc5b1735b62f3dc88498565d2cbce9e5c2ea"
+    },
+    "source-v1/crates/holonics/tests/source_entrance.rs": {
+      "bytes": 19074,
+      "sha256": "5308ebf2d6cba10019952e1e9023d3b085349d12b3c6df61833cba8b863d9baf"
+    },
+    "source-v1/crates/holonics-cuda/Cargo.toml": {
+      "bytes": 649,
+      "sha256": "18b25e1b99b09033da5950c3bb6b722085ab60c39adb322dd01dc0b8aec12f33"
+    },
+    "source-v1/crates/holonics-cuda/build.rs": {
+      "bytes": 11927,
+      "sha256": "15cf455bd04009bcf138b687df512e7952f147302c29b3f6af3c27b4ffd59194"
+    },
+    "source-v1/crates/holonics-cuda/kernels/exact_integer.cuh": {
+      "bytes": 8317,
+      "sha256": "debeaa8b1fea4d99a979ecc412f3b109d39c2fc63170bffc9269aead56ee9bf4"
+    },
+    "source-v1/crates/holonics-cuda/kernels/hnn.cu": {
+      "bytes": 25210,
+      "sha256": "af7dade8dae88f4b925d8b9770bda1db4700cfd3df5f26d1bd7fded211861870"
+    },
+    "source-v1/crates/holonics-cuda/kernels/hnn_word.cuh": {
+      "bytes": 80078,
+      "sha256": "9fd654bff83267b28efde51d38524303371488ef5d0a8a366289a0800bbd716e"
+    },
+    "source-v1/crates/holonics-cuda/kernels/tree.cu": {
+      "bytes": 46251,
+      "sha256": "78b292ce81aec3855e4cee7f40d764c8e3a8a0ccc7fcbb4a41e381e96ca7e17b"
+    },
+    "source-v1/crates/holonics-cuda/src/bin/mount-smoke.rs": {
+      "bytes": 6400,
+      "sha256": "dcae1004d9697edffb8ae1261f36a9b6c9403d61c7941be74d778c9d3c8be644"
+    },
+    "source-v1/crates/holonics-cuda/src/cuda.rs": {
+      "bytes": 75709,
+      "sha256": "a5ad8f2db28a7e65489d6fd040bd511c4ef897f0623b64b61eab1f9ebd42011c"
+    },
+    "source-v1/crates/holonics-cuda/src/ffi.rs": {
+      "bytes": 8156,
+      "sha256": "f90304f263b2c8d3e261e32973e7c21e3ed1f8eda57246d35a48b6f07e534615"
+    },
+    "source-v1/crates/holonics-cuda/src/hnn/card.rs": {
+      "bytes": 30425,
+      "sha256": "637ae88ad06811a3c6260de8caa28f0479950ab3a2cfdf4b69288e2b1ab00f58"
+    },
+    "source-v1/crates/holonics-cuda/src/hnn/carry.rs": {
+      "bytes": 16404,
+      "sha256": "cb799a71544a9c987ac23c7a53584fa68539540cda8dffe536797c711d4b300f"
+    },
+    "source-v1/crates/holonics-cuda/src/hnn/dyadic.rs": {
+      "bytes": 7971,
+      "sha256": "24d0c05989d2bdae5a76ec264e6aa823bdf033066db0ae4a61e15aae313d7ae1"
+    },
+    "source-v1/crates/holonics-cuda/src/hnn/execute.rs": {
+      "bytes": 67898,
+      "sha256": "97eca583cc8f505b9d4fe603ff0ec6127001834737100e78364f7700c7cc2b7c"
+    },
+    "source-v1/crates/holonics-cuda/src/hnn/lattice.rs": {
+      "bytes": 36762,
+      "sha256": "d8d9fad2d32b74cb8335ad6bae88a5ce0cab4e1a932e50f8c24d4ee2be41395d"
+    },
+    "source-v1/crates/holonics-cuda/src/hnn/mod.rs": {
+      "bytes": 21064,
+      "sha256": "bbbecfb7dbcd2854ec4bf5e5b4a59d3d55d4bd48c584f391f78d6c51da5dc43c"
+    },
+    "source-v1/crates/holonics-cuda/src/hnn/moment.rs": {
+      "bytes": 23045,
+      "sha256": "8ccc9389f54ea33705db2d182991de746e319b866194772f2d7d74a14e413422"
+    },
+    "source-v1/crates/holonics-cuda/src/hnn/physics_tests.rs": {
+      "bytes": 11060,
+      "sha256": "a7f52a5f5b81186a362e74cc5eee332d13293de438a806c59479af3b1e9b64af"
+    },
+    "source-v1/crates/holonics-cuda/src/hnn/port.rs": {
+      "bytes": 89741,
+      "sha256": "9f9cfa4305b99d361f8903f5fb2f3833512cd3c921a8ccb9dc7b84fdb8851cad"
+    },
+    "source-v1/crates/holonics-cuda/src/hnn/port_tests.rs": {
+      "bytes": 92815,
+      "sha256": "f341db9b3fb0d8094b70d7f4ebd8db0f8ebb41e7c6b41122d6da5bedec8a233c"
+    },
+    "source-v1/crates/holonics-cuda/src/hnn/publication.rs": {
+      "bytes": 20735,
+      "sha256": "a258a577e35c3d59e819247879b6f809d71a56e3fb7fc0e52d26b4911e667139"
+    },
+    "source-v1/crates/holonics-cuda/src/hnn/readout.rs": {
+      "bytes": 55410,
+      "sha256": "8fe7ee5b1294c34b5c4fa31c07609cd44efeb3081b8ec60caa123312cbf3b20c"
+    },
+    "source-v1/crates/holonics-cuda/src/hnn/store.rs": {
+      "bytes": 32537,
+      "sha256": "bfc2523616104723332095dfd94fc7514bf0ab10be501c8aa7324f4aebde67d3"
+    },
+    "source-v1/crates/holonics-cuda/src/hnn/tests.rs": {
+      "bytes": 57001,
+      "sha256": "77a82888499b6e33c0b11c0ad0ff916031c62b653f7321771d05793c77230946"
+    },
+    "source-v1/crates/holonics-cuda/src/hnn/tree.rs": {
+      "bytes": 47146,
+      "sha256": "c9c50d9005ccf3b0aa07b72adb595adde7fe47c3473c957c904a75ae72f1971f"
+    },
+    "source-v1/crates/holonics-cuda/src/hnn/word.rs": {
+      "bytes": 13728,
+      "sha256": "92a737acd4ea99d44fda14c25da49e5b3a01aea290dae1e23874e12b589cc22b"
+    },
+    "source-v1/crates/holonics-cuda/src/hnn/word_tests.rs": {
+      "bytes": 2651,
+      "sha256": "1b26f752ecb87c8bff089f03202902b5bfc0cd66450acfdbf517d3bc9aec34f8"
+    },
+    "source-v1/crates/holonics-cuda/src/lib.rs": {
+      "bytes": 1250,
+      "sha256": "2c21bb7b3c9bd5512e20f3a59f4f4e7207ddef24b114c2040edb7dca04b4468a"
+    },
+    "source-v1/crates/holonics-cuda/tests/located_ingest.rs": {
+      "bytes": 7123,
+      "sha256": "86db238adba454ebe96dc80f85ee21b129810ccb9dd9dc943deef702bcd67a8a"
+    },
+    "source-v1/lean/Holonics/HNN/ReframedMoment.lean": {
+      "bytes": 8704,
+      "sha256": "4ffc65a60f4e72c8bc63c637d7e6480ada2e8721a002e53c487635e64cd93f2e"
+    },
+    "source-v1/research/notebook/hnn_design/README.md": {
+      "bytes": 125210,
+      "sha256": "5b2e984e5f904f0c189f437835a995c1bd0a26672f7b817f0885aa2f10110e56"
+    },
+    "source-v1/research/notebook/hnn_design/anchor_memory.py": {
+      "bytes": 5770,
+      "sha256": "b115fb1f1a4eaefaa05badad29839896d11f3639bf2ea12b2607fcf1fb6bfd57"
+    },
+    "source-v1/research/notebook/hnn_design/athena_file_checkpoint.py": {
+      "bytes": 11337,
+      "sha256": "5f3c43b222981725aaa3ebfecd38748fc2274fbc9999a6621b2b00612463179b"
+    },
+    "source-v1/research/notebook/hnn_design/athena_file_checkpoint_tests.py": {
+      "bytes": 7095,
+      "sha256": "e1aa5920de74b6da907484c4734c02261cf5404ec007892a1cf781ed533c790d"
+    },
+    "source-v1/research/notebook/hnn_design/athena_file_protocol.py": {
+      "bytes": 10799,
+      "sha256": "b0d5e780d7639c478562cb63aeaf7615fa27e6a54ef7c5f38e0c28a334ddea53"
+    },
+    "source-v1/research/notebook/hnn_design/athena_file_protocol_tests.py": {
+      "bytes": 8786,
+      "sha256": "c5cc1ef2d832eb71a0c18efb7c04c00668db6e5484252a7885320b618ad9c1c9"
+    },
+    "source-v1/research/notebook/hnn_design/athena_protocol.py": {
+      "bytes": 15724,
+      "sha256": "30d770274159e4f5f9212706334e54af3f3a7e9ad1f9a76f3829f919ae02e0ca"
+    },
+    "source-v1/research/notebook/hnn_design/athena_protocol_tests.py": {
+      "bytes": 12415,
+      "sha256": "df681db0efef495f5972d37b3f4af1140fa5aa8b78216369c6051c7abe694dab"
+    },
+    "source-v1/research/notebook/hnn_design/bank_causes_probe/eF_confirmation_counts.py": {
+      "bytes": 2047,
+      "sha256": "5d9f8c13d7e96dc4f45d5f7c9a61bbf211771ada328857f013a4c71b474fd1bd"
+    },
+    "source-v1/research/notebook/hnn_design/bank_causes_probe/eM_section_shapes.py": {
+      "bytes": 2107,
+      "sha256": "a8123a4bf66a7e076049ccd9c47a0d1d4af7719bbf969b17bf61a232452fa2a3"
+    },
+    "source-v1/research/notebook/hnn_design/base_measure.py": {
+      "bytes": 4231,
+      "sha256": "74fe985360826e4599408574e193bda8b58d71e85b9801900eccd07c9ef8ebcd"
+    },
+    "source-v1/research/notebook/hnn_design/context_orders.py": {
+      "bytes": 2647,
+      "sha256": "a66092338e124c4c2b0a9d0db0b5d180492d698a6afede4e6e72c61c5fe331f6"
+    },
+    "source-v1/research/notebook/hnn_design/curated_incidence.py": {
+      "bytes": 7541,
+      "sha256": "6bdd3addc8a50f1ec30c92e5788ad6a36a4c6f00208b04313ac666c7db85dce8"
+    },
+    "source-v1/research/notebook/hnn_design/curated_source.py": {
+      "bytes": 25995,
+      "sha256": "64a8a4d6660539499f3fb91e422b4c8f42072f70c68f85b2a4c6923142242792"
+    },
+    "source-v1/research/notebook/hnn_design/development_families.py": {
+      "bytes": 23297,
+      "sha256": "4c1e75ed8bafc3ebc699809f6951522d1cd84777382b19193b9c10ec3ee084fc"
+    },
+    "source-v1/research/notebook/hnn_design/exterior.rs": {
+      "bytes": 35307,
+      "sha256": "91714b1c01dd9101c7ed47e66fc980c0461282d6f84329c1f2b1d0a94bcc54fb"
+    },
+    "source-v1/research/notebook/hnn_design/f5_context.py": {
+      "bytes": 12663,
+      "sha256": "7272fcba15d62e9a34a88373d1dcccaddf7dc954a1ca7e731c51e4fdc1bd5c82"
+    },
+    "source-v1/research/notebook/hnn_design/f5_context_tests.py": {
+      "bytes": 5813,
+      "sha256": "2fe71cf1ba49002fe25321ca382e4ecc281faf411af9ffea4ef5d215453dae0f"
+    },
+    "source-v1/research/notebook/hnn_design/family_passage.py": {
+      "bytes": 7168,
+      "sha256": "eda731b6ba30e7e323f590ca2220bab490f06a6eee66f6c3739c499d4211111f"
+    },
+    "source-v1/research/notebook/hnn_design/field_ceiling.py": {
+      "bytes": 5070,
+      "sha256": "7a4a9129b2378ab676d967f717e28e5b5ba58996cabf44213429d165d3dbc307"
+    },
+    "source-v1/research/notebook/hnn_design/hnn_chase.rs": {
+      "bytes": 85402,
+      "sha256": "956863c53d52a35a8083d1f984b3d55ff778249cdf4ac02cd8ca6318e68c0c2d"
+    },
+    "source-v1/research/notebook/hnn_design/hnn_executed_loop.rs": {
+      "bytes": 38885,
+      "sha256": "301810d848cd641452a796b49908cb8a2ba4104fb1f08643a2408a460d5e458f"
+    },
+    "source-v1/research/notebook/hnn_design/hnn_exposure.rs": {
+      "bytes": 90883,
+      "sha256": "d47a90aa95aea5cdb079f9c0b87bd343c5a528b20f6365b547336c12bb9a0dc1"
+    },
+    "source-v1/research/notebook/hnn_design/hnn_keys_loop.rs": {
+      "bytes": 18016,
+      "sha256": "6f59edaaf1f65b70bd9f95d52b0bddcbd4490c5ffb7189da2b3482c2990b84ca"
+    },
+    "source-v1/research/notebook/hnn_design/hnn_prediction.rs": {
+      "bytes": 18298,
+      "sha256": "ad5d4d634c5de368fa54b09e97bfc0a65a0913354351d4a697e4079c80229a53"
+    },
+    "source-v1/research/notebook/hnn_design/hnn_repair_loop.rs": {
+      "bytes": 31329,
+      "sha256": "2939d7c6adf418e51ee9556a63ca2e9f815d9d8986f30b527a94312e31e22d94"
+    },
+    "source-v1/research/notebook/hnn_design/hnn_text_repair.rs": {
+      "bytes": 1559,
+      "sha256": "87504e1f1acbca3c14c324cb22f1c6e4a5d1d168f9001b5268c2ce3b1bc58251"
+    },
+    "source-v1/research/notebook/hnn_design/hnn_transport_loop.rs": {
+      "bytes": 16839,
+      "sha256": "f35724e4b9d1a6035eb0db7ae5acbfa02407e018fdbca7c78f0796642fac17d7"
+    },
+    "source-v1/research/notebook/hnn_design/latch_letters.py": {
+      "bytes": 4276,
+      "sha256": "c790ac37e56794617d9bcf3f4ddd1c1341c43a0026872db4a3d3dcdf4273900c"
+    },
+    "source-v1/research/notebook/hnn_design/leaf_counts.py": {
+      "bytes": 3243,
+      "sha256": "5f863feef27a76a14b98498652a01436fd7a1d457bd3da6636a4526ab1c33f1b"
+    },
+    "source-v1/research/notebook/hnn_design/receiver_combined.py": {
+      "bytes": 4511,
+      "sha256": "56be653425a4b16ad5bdfd3a07c6098b41b04022bb87a88852e76d3358fbc764"
+    },
+    "source-v1/research/notebook/hnn_design/receiver_fisher_exact.py": {
+      "bytes": 2057,
+      "sha256": "a3da39d040105ae949816d3971c218ee23b682d5de53089f57c20f1344a34afc"
+    },
+    "source-v1/research/notebook/hnn_design/receiver_nonlinear.py": {
+      "bytes": 7648,
+      "sha256": "f2c119e9431ed694f9bf271fdbac12a1de579928afe1fe642e1406525d2b6b11"
+    },
+    "source-v1/research/notebook/hnn_design/receiver_online_sim.py": {
+      "bytes": 2307,
+      "sha256": "84e4b4f00b585dd91430ff2a2bf971a9d3d50db3e8895ae891e8c0fc6150962c"
+    },
+    "source-v1/research/notebook/hnn_design/receiver_oracle.py": {
+      "bytes": 4817,
+      "sha256": "576fcb6083c58f7e0926b7891351ab79153e69ea86bf39a64cdff62e87e45e84"
+    },
+    "source-v1/research/notebook/hnn_design/receiver_prior_scale.py": {
+      "bytes": 7989,
+      "sha256": "b5a80bdf214cbd8e36947e51722cbfb5754c1baaa4f0fa71259a06681cb3e903"
+    },
+    "source-v1/research/notebook/hnn_design/regime_letters.py": {
+      "bytes": 4606,
+      "sha256": "7b71ac59e904671b7a9a7b9e378f5fe65f1a56db0cc97dbdcd698d9f5ba3d69b"
+    },
+    "source-v1/research/notebook/hnn_design/segment_terms.py": {
+      "bytes": 1384,
+      "sha256": "9ae3d868e866847b7276442d4ba74b253892cbeb124264559f896c975aa70da3"
+    },
+    "source-v1/research/notebook/hnn_design/sheet_letters.py": {
+      "bytes": 4988,
+      "sha256": "ef59265188e7c51593fef2f1b0dfe5f4075fdc69bdf640e6a1be892feff77bb4"
+    },
+    "source-v1/research/notebook/hnn_design/standing_cut.py": {
+      "bytes": 6965,
+      "sha256": "b228736c1acf3e6c99be2fd02ab4340d35c1f4a913cd8631a6a294b8ba2b356d"
+    },
+    "source-v1/research/notebook/hnn_design/tree_base.py": {
+      "bytes": 4017,
+      "sha256": "9f433e00200390dc84e5a169e4bfb2c73fce83856f0b18a3026fd94d8463dcf6"
+    },
+    "source-v1/research/notebook/hnn_design/tree_estimator.py": {
+      "bytes": 5694,
+      "sha256": "378a7d5c301659b3ddd07ad903866e95d6df7fc689117acef8143bd2b8488f9f"
+    },
+    "stages/hnn-material-f9caaaba-cache-preparation-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "25f59401596f3e8598b02122fd96b386645dca48be0494911261d5cbecf732d8"
+    },
+    "stages/hnn-material-f9caaaba-cache-preparation-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "779a00f9afe37e9c52b996235ee8bcd7742dead511898ecb22cac14c2f15aad7"
+    },
+    "stages/hnn-material-f9caaaba-cache-preparation-20261006-v1.config.json": {
+      "bytes": 4836,
+      "sha256": "5a20c9b47f50c9057e526d7629c9dd1211cfa8a30e4f969653eb93e658975791"
+    },
+    "stages/hnn-material-f9caaaba-cache-preparation-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "dcfe0da271a3049dd89af831f08c6e626fb77183795a7e1b37b13f0b02e157e4"
+    },
+    "stages/hnn-material-f9caaaba-cache-preparation-20261006-v1.final.json": {
+      "bytes": 4936,
+      "sha256": "f0cc756a5c6bbee8375fcb34c9650e78c29ec6943d66edd2855b43f247e2e9c1"
+    },
+    "stages/hnn-material-f9caaaba-cache-preparation-20261006-v1.input_seal.json": {
+      "bytes": 3849,
+      "sha256": "ab32442e16b425172f58ec4c7a1e2d6c8a81a0d9269e214d3d5fb43b2358e986"
+    },
+    "stages/hnn-material-f9caaaba-cache-preparation-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "6c076877cf40169c709dc7f401ebd8a4b9e41020a23721890fd38a3a176333e9"
+    },
+    "stages/hnn-material-f9caaaba-cache-preparation-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "592a7546948e8733eab4e3665cadae3319bd0dcff50212ab01d6a6ff1408ab8f"
+    },
+    "stages/hnn-material-f9caaaba-cache-preparation-20261006-v1.output_seal.json": {
+      "bytes": 464038,
+      "sha256": "8fb1ec7b994916d6009096d916525ec627197c35acbddb9528d7a8c676433ec8"
+    },
+    "stages/hnn-material-f9caaaba-cache-preparation-20261006-v1.publication.json": {
+      "bytes": 3276,
+      "sha256": "4810874284223757d2c51082f20f01cc3ff4cbc16c27cad5c8aa636b4229e8b2"
+    },
+    "stages/hnn-material-f9caaaba-cache-preparation-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "902c1cee80f719773096dacce3cf29985dedeaf22117ff56629b1faa636a5190"
+    },
+    "stages/hnn-material-f9caaaba-cache-preparation-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "efad17c3694a625171203744671ef25d08a8e775bab302fcc767eb78587b1589"
+    },
+    "stages/hnn-material-f9caaaba-cache-preparation-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "609b374d548c03b916fef47a9a38249d0825154ed2e9de1bcef67f40193c097f"
+    },
+    "stages/hnn-material-f9caaaba-cache-preparation-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stages/hnn-material-f9caaaba-cache-preparation-20261006-v1.stdout": {
+      "bytes": 430,
+      "sha256": "cea601ae059021c9aeae0cfde1ccdbbf216fb7860ae5cb73f3f113d6dbc25be3"
+    },
+    "stages/hnn-material-f9caaaba-cache-preparation-20261006-v1.system-floor.json": {
+      "bytes": 54445,
+      "sha256": "8f4f09c8e5a9f416c89b44462f5990addfe9122385a4fb05de5fd98964675c86"
+    },
+    "stages/hnn-material-f9caaaba-cache-preparation-20261006-v1.unit-cleanup.json": {
+      "bytes": 729,
+      "sha256": "05f421c449e11ef8ad0511e2e3bea3a870b58a1beb829bc6bff6508da3d73fd0"
+    },
+    "stages/hnn-material-f9caaaba-control-group1-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "234679875310407b61f8994347772ffd7082f0c1d25b4f3877e235333ffbf621"
+    },
+    "stages/hnn-material-f9caaaba-control-group1-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "7227ac9eec9cf45d40ad4b352d1d30e2ba5c9e2eb34e2aa51b5d7683cb6678fc"
+    },
+    "stages/hnn-material-f9caaaba-control-group1-20261006-v1.config.json": {
+      "bytes": 129152,
+      "sha256": "b58b28876f0235a317b0d598937cce37b7c7c5c1284eb5644563da6ee3936afe"
+    },
+    "stages/hnn-material-f9caaaba-control-group1-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "5b8d5244c45a5085c4c65b621cc9660ce2568282b3617e1b0ffb6560dc8612bf"
+    },
+    "stages/hnn-material-f9caaaba-control-group1-20261006-v1.final.json": {
+      "bytes": 4893,
+      "sha256": "084c50d26395296520fd39b33b298b4b1c57b6763ec231d35c49bf5288ade03a"
+    },
+    "stages/hnn-material-f9caaaba-control-group1-20261006-v1.input_seal.json": {
+      "bytes": 82773,
+      "sha256": "6989c106bf30247f80f027b3e77e26bbe3333c7814bf8601d7113b2077ddf5e6"
+    },
+    "stages/hnn-material-f9caaaba-control-group1-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "76fdc244ac733022dde036376a4bbeed3975ede7fdc5e6055f431514c0e83ba8"
+    },
+    "stages/hnn-material-f9caaaba-control-group1-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "0fcccb1c341775a20ae3386246a38a8f2c788e250634e3cb68c43d837335f39e"
+    },
+    "stages/hnn-material-f9caaaba-control-group1-20261006-v1.output_seal.json": {
+      "bytes": 80685,
+      "sha256": "19547c8a45d40bc5b34a42bef9981bda41113454f230f2977495a49f52ebbda7"
+    },
+    "stages/hnn-material-f9caaaba-control-group1-20261006-v1.publication.json": {
+      "bytes": 2766,
+      "sha256": "08884fbf97858d97c5c2c23e2773d004ee5275c868dd20c6cf8ace8a3763a191"
+    },
+    "stages/hnn-material-f9caaaba-control-group1-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "022df8357cf4ab6b64cf90d838351a15f926fe228f94c7fe80b3a57c0d734810"
+    },
+    "stages/hnn-material-f9caaaba-control-group1-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "1d44bbe2718818cd3d926bfda38023ad33c8c145342851e406c4befc11817911"
+    },
+    "stages/hnn-material-f9caaaba-control-group1-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "b57e08efd135805a12e0acad5c7fc68dfc8ef5da320cb356fc69cbb2529ac4a0"
+    },
+    "stages/hnn-material-f9caaaba-control-group1-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stages/hnn-material-f9caaaba-control-group1-20261006-v1.stdout": {
+      "bytes": 6277,
+      "sha256": "c140eb2dc3b396a435eb5f7adaf59d16052872b7fcd573aba0d35ea7ab390e76"
+    },
+    "stages/hnn-material-f9caaaba-control-group1-20261006-v1.system-floor.json": {
+      "bytes": 9253,
+      "sha256": "972321c279315f4f4eb84fdd752acdc3d1fcc1877cdfb38bc842b8dfb5a8b2e2"
+    },
+    "stages/hnn-material-f9caaaba-control-group1-20261006-v1.unit-cleanup.json": {
+      "bytes": 723,
+      "sha256": "bed48e40935e11319669471c06b04ef27044e2ac1dbe8f86d3a5d30aca084fd5"
+    },
+    "stages/hnn-material-f9caaaba-control-group2-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "ca6a08605a123f49668c8eb8d9ac54d7b538aa5d01c0b9d3b5f16fb90a4f4f9c"
+    },
+    "stages/hnn-material-f9caaaba-control-group2-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "b6370d307d6e5ee30dcc5b39d8b16a6f1268c23b50f8d1624779046a485610c6"
+    },
+    "stages/hnn-material-f9caaaba-control-group2-20261006-v1.config.json": {
+      "bytes": 129140,
+      "sha256": "6990d786c4b94dbb126eddb22f8f5abec867afc5d96db1bdba9125529bed43f2"
+    },
+    "stages/hnn-material-f9caaaba-control-group2-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "bb38494cf12db83fc21ffe111a622e96826d90a3e4df1599fb1c1fc55330d1d6"
+    },
+    "stages/hnn-material-f9caaaba-control-group2-20261006-v1.final.json": {
+      "bytes": 4894,
+      "sha256": "a064194b60bb7a6b99a4f9fad20a9d1cafe469d8bec13ac92ff2975e3d257eca"
+    },
+    "stages/hnn-material-f9caaaba-control-group2-20261006-v1.input_seal.json": {
+      "bytes": 82760,
+      "sha256": "9c556373f5401036be7111a5c201d919ef4ca23d6d464d8f29e8e9c8fb869891"
+    },
+    "stages/hnn-material-f9caaaba-control-group2-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "32a2916bcb884418dde5d9394baa0c7590fa149ff698a31d0261744a04f7a4d1"
+    },
+    "stages/hnn-material-f9caaaba-control-group2-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "dc3485fccafb888a11d3658e6dc2fb695edbfc50a720061cd86ad7c6c2e5e7c4"
+    },
+    "stages/hnn-material-f9caaaba-control-group2-20261006-v1.output_seal.json": {
+      "bytes": 164013,
+      "sha256": "5321440680ff44052c47fe8f3ff88215d1466267358511a14502445fcf651707"
+    },
+    "stages/hnn-material-f9caaaba-control-group2-20261006-v1.publication.json": {
+      "bytes": 2767,
+      "sha256": "817ebd6e3d8d2c9a608d991d0fe47b1732f910ddbf4f7194e89a49f6670cac59"
+    },
+    "stages/hnn-material-f9caaaba-control-group2-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "4b3caef4be242e6900ca2064c899ae71f6cf07de3da32604fb342fbad081bb05"
+    },
+    "stages/hnn-material-f9caaaba-control-group2-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "6d4c502e83d1592c28728148fa841782fd0e308024369d5340c11c49cd99547f"
+    },
+    "stages/hnn-material-f9caaaba-control-group2-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "216f4db8863e7b22a38df0413197bb1425f97bd9686fefc097538bf55873e145"
+    },
+    "stages/hnn-material-f9caaaba-control-group2-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stages/hnn-material-f9caaaba-control-group2-20261006-v1.stdout": {
+      "bytes": 231,
+      "sha256": "771bcada8492dec5f4e205717a006c86d60b1e5aebe802c26dd09609ab9ffd34"
+    },
+    "stages/hnn-material-f9caaaba-control-group2-20261006-v1.system-floor.json": {
+      "bytes": 18660,
+      "sha256": "a1e20785305b70abf8fbadcf119e107a5b34821d75f9850ce8405d47938637ba"
+    },
+    "stages/hnn-material-f9caaaba-control-group2-20261006-v1.unit-cleanup.json": {
+      "bytes": 723,
+      "sha256": "7bf87356e56e1dc2d25a447f89c89594cf4157e3b3c9dd8bfa42f8620ac44f8b"
+    },
+    "stages/hnn-material-f9caaaba-control-group3-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "9283fabe285997064b6e6f22eeca3c616b95980ad4b59da1ed82a11b414a55a8"
+    },
+    "stages/hnn-material-f9caaaba-control-group3-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "a0d2ec944f0dc52f67e403eff6b08fae4d4d3fb373d5b69df7c50c7e9189566c"
+    },
+    "stages/hnn-material-f9caaaba-control-group3-20261006-v1.config.json": {
+      "bytes": 129751,
+      "sha256": "5020490708fff00ea073fd24a9afad96965aaa77ce0f5f04b70e6333bc76ae46"
+    },
+    "stages/hnn-material-f9caaaba-control-group3-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "6e41f46a1041c81fb1f56b98c160df9a742a04e103a34cad04dcb2c48b8a0ae1"
+    },
+    "stages/hnn-material-f9caaaba-control-group3-20261006-v1.final.json": {
+      "bytes": 4895,
+      "sha256": "5602a3747ff6d17bfd9a2e54d12b22ee01a98cdd915b4ee9ae75f7d3c2a3b062"
+    },
+    "stages/hnn-material-f9caaaba-control-group3-20261006-v1.input_seal.json": {
+      "bytes": 83370,
+      "sha256": "fad5b22d803c630560e5bcd058d2b7dda916cceb53e183b3a70324bce13b22b9"
+    },
+    "stages/hnn-material-f9caaaba-control-group3-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "97581d8dd4da92b1c4289d64958ea55618cd003493cccbd53e058044f75969c6"
+    },
+    "stages/hnn-material-f9caaaba-control-group3-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "b95c116a16196edb40a87a43d5bfcdba7a4e33061f9d0e2c1a13269d22144859"
+    },
+    "stages/hnn-material-f9caaaba-control-group3-20261006-v1.output_seal.json": {
+      "bytes": 509284,
+      "sha256": "fa0e0752b8dc2bb9f93e5a4cb0f1892b24c99607f050ca6ed698e2c634bdaff4"
+    },
+    "stages/hnn-material-f9caaaba-control-group3-20261006-v1.publication.json": {
+      "bytes": 2768,
+      "sha256": "667690242c960b4f37f96d07ecc98aa7dda3c30202b596db179fe95a3ede0130"
+    },
+    "stages/hnn-material-f9caaaba-control-group3-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "85bd56f0dcbfeb06b444d6637a9ccd61dbd0e4e1ce363921deaccddadc741714"
+    },
+    "stages/hnn-material-f9caaaba-control-group3-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "c29c1d289fff621a69386c51c21cd0293672cd6e8878abfaea590fae5e16f885"
+    },
+    "stages/hnn-material-f9caaaba-control-group3-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "de95b86b689dce9ab405030db45dd912b54c62ede6c38a88f3fcede775b7b58b"
+    },
+    "stages/hnn-material-f9caaaba-control-group3-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stages/hnn-material-f9caaaba-control-group3-20261006-v1.stdout": {
+      "bytes": 2020,
+      "sha256": "a66c939599908957faff18b35529c77be4d371c7ca1eaa1fac3c637bd9ca12f0"
+    },
+    "stages/hnn-material-f9caaaba-control-group3-20261006-v1.system-floor.json": {
+      "bytes": 59231,
+      "sha256": "5ddefb0b67a016753136d1e2202af14fbee9edd1978ea884ea21ce69abbc71cf"
+    },
+    "stages/hnn-material-f9caaaba-control-group3-20261006-v1.unit-cleanup.json": {
+      "bytes": 723,
+      "sha256": "b1507ba357f659c384dda22db7a22b5cc9d7ff1020e930725f73a33f1252e3f0"
+    },
+    "stages/hnn-material-f9caaaba-control-group4-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "4dbb86430cd00ee222e5c950739c5bfc01f4c10d94baec188b932987e6eaea50"
+    },
+    "stages/hnn-material-f9caaaba-control-group4-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "423338773e69b0c165a408cb7367bd6f3331e26a0b2e701d5fe9e4faae691273"
+    },
+    "stages/hnn-material-f9caaaba-control-group4-20261006-v1.config.json": {
+      "bytes": 129144,
+      "sha256": "71757ec698fe5fbdf5e31ce977a40bf9205c57568635daffe40bed8d8818d779"
+    },
+    "stages/hnn-material-f9caaaba-control-group4-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "9b864e824481e0bdd31fcfc8f2e55f0e5a2eb053e0d41a7aa26e14cebb63199a"
+    },
+    "stages/hnn-material-f9caaaba-control-group4-20261006-v1.final.json": {
+      "bytes": 4887,
+      "sha256": "13f373ba9f06808f29789326ab38b9ca6318c6a388d9cb3ee63039eb0600b96c"
+    },
+    "stages/hnn-material-f9caaaba-control-group4-20261006-v1.input_seal.json": {
+      "bytes": 82758,
+      "sha256": "6998f2a6557007dee858dda0da1b0033c9b45c49cacf8ce2fb1b9cc56b031199"
+    },
+    "stages/hnn-material-f9caaaba-control-group4-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "a9f995c502b48dd2767cb134fac1e72e4732111757318d01b0fb111ee1fcbf2d"
+    },
+    "stages/hnn-material-f9caaaba-control-group4-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "aa542967d3fcfe277dfb929ee6e39e2c1257e9e5e3adb45b07fa19c04113803d"
+    },
+    "stages/hnn-material-f9caaaba-control-group4-20261006-v1.output_seal.json": {
+      "bytes": 2048,
+      "sha256": "39b0d1e39d231affb64064f7ab485d35aa4503ab3cb7529277e7d1fbefbb2341"
+    },
+    "stages/hnn-material-f9caaaba-control-group4-20261006-v1.publication.json": {
+      "bytes": 2760,
+      "sha256": "8847666c49a0ca2e2043369429b4a61c821cc78f474f24dfb317e406253e019f"
+    },
+    "stages/hnn-material-f9caaaba-control-group4-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "7cceca886f2809e013e43329e36b7c5222a537cff9c8cae30bd387263f423fc5"
+    },
+    "stages/hnn-material-f9caaaba-control-group4-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "1e51b67615beb79a6bbf167a678e9f6976052ec59e2685edb4dd690d8341e6e4"
+    },
+    "stages/hnn-material-f9caaaba-control-group4-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "002dfcf8de8c39979029a4ed9c37ad0a3aa95a667bef355c0619ce6ba89512a3"
+    },
+    "stages/hnn-material-f9caaaba-control-group4-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stages/hnn-material-f9caaaba-control-group4-20261006-v1.stdout": {
+      "bytes": 213,
+      "sha256": "123f5ea60832ed0e3fc310901b36ab081bf15a4db0b0c146dd28f795f93f2400"
+    },
+    "stages/hnn-material-f9caaaba-control-group4-20261006-v1.system-floor.json": {
+      "bytes": 197,
+      "sha256": "b5ca4941854bc37bfa49959acbab63f5b0f70e7231a52c3ab0a17f363a15a410"
+    },
+    "stages/hnn-material-f9caaaba-control-group4-20261006-v1.unit-cleanup.json": {
+      "bytes": 723,
+      "sha256": "f336bbdf9efcc838a4d793cff3a6774027899482240bd0a3c09123273db342c1"
+    },
+    "stages/hnn-material-f9caaaba-control-group5-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "77c8d0c78ffed56f4b098330a579593505f8c54ecc4be5cabfa50f44d26aa184"
+    },
+    "stages/hnn-material-f9caaaba-control-group5-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "eef0a3c0c020900f257fb06ff025e6ea9bb465128771a2046d5a0858b2e361d1"
+    },
+    "stages/hnn-material-f9caaaba-control-group5-20261006-v1.config.json": {
+      "bytes": 129296,
+      "sha256": "e143c8471aaa23b150b144a0a90a7428174148867659ca698caaa381db48d396"
+    },
+    "stages/hnn-material-f9caaaba-control-group5-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "745e03fbb081d5f1162c588c5408f74b4179e9edde1ad4909823f9eef5864134"
+    },
+    "stages/hnn-material-f9caaaba-control-group5-20261006-v1.final.json": {
+      "bytes": 4889,
+      "sha256": "518da4f1c2b841204bff83e579f6b9ec47f9f63f584928e22d18551b916ce6ce"
+    },
+    "stages/hnn-material-f9caaaba-control-group5-20261006-v1.input_seal.json": {
+      "bytes": 82746,
+      "sha256": "f8fa9183631fd8e792b82a69642664d77e510a6c7c9d6d97f1d1eaf24191a48e"
+    },
+    "stages/hnn-material-f9caaaba-control-group5-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "662ea8afae4ab235e162f352e1ab4ca305b0dfed249fc405d9aca51512e3ee97"
+    },
+    "stages/hnn-material-f9caaaba-control-group5-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "71c8238ab3dd47c4e0e57150855faaa26e8f9c7f7e139cb2883c172b1588436e"
+    },
+    "stages/hnn-material-f9caaaba-control-group5-20261006-v1.output_seal.json": {
+      "bytes": 13965,
+      "sha256": "5d0aa47a3bdb5a0b3f171fd42529336de7d6af390c9dc8c20dbf8863fbca1dfe"
+    },
+    "stages/hnn-material-f9caaaba-control-group5-20261006-v1.publication.json": {
+      "bytes": 2763,
+      "sha256": "3a7feb3ff2cb0b24bd6eba4ef46dc4f373bc607f057f20eae8d207677ead256f"
+    },
+    "stages/hnn-material-f9caaaba-control-group5-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "27edfdbac6ef496fc433a8187284ad7fb072ac1222582b2ba48e8eac6f90e650"
+    },
+    "stages/hnn-material-f9caaaba-control-group5-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "1ae3c90c2e5c9a9aa22045c03754744b1e83e3c44f41f100bde2490b67c0cb22"
+    },
+    "stages/hnn-material-f9caaaba-control-group5-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "beadeb805f8ee96f110ed4ef40dc5e93066c148d6649201d9ffb5a3218537fd3"
+    },
+    "stages/hnn-material-f9caaaba-control-group5-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stages/hnn-material-f9caaaba-control-group5-20261006-v1.stdout": {
+      "bytes": 200,
+      "sha256": "5d349f8b95afc534d730b66986d360a204d7b7b9c068c8c7eb223e808bd92af5"
+    },
+    "stages/hnn-material-f9caaaba-control-group5-20261006-v1.system-floor.json": {
+      "bytes": 1600,
+      "sha256": "bf7f99e7e2f96f5341d83f9f0a5d43de34d36b6b9589a7e9081af6835d314449"
+    },
+    "stages/hnn-material-f9caaaba-control-group5-20261006-v1.unit-cleanup.json": {
+      "bytes": 723,
+      "sha256": "b821f6e53860bbf9ffe0b64806e25643bc3608d14ac891739ce2d7be36ecf208"
+    },
+    "stages/hnn-material-f9caaaba-control-group6-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "79daaba6ea073678b96ecb5fc89e5d2159742b72bda31e180f9ecbefbb27c5d3"
+    },
+    "stages/hnn-material-f9caaaba-control-group6-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "1b4249e703a9c86b97082fcdf1a6a7499e30fd184c019c8fcab378f7c6c1269c"
+    },
+    "stages/hnn-material-f9caaaba-control-group6-20261006-v1.config.json": {
+      "bytes": 129442,
+      "sha256": "4d45433ae821cd9b21e81c46ea8a31308f70692df6edf3e0bf99ec55ce7f7cfb"
+    },
+    "stages/hnn-material-f9caaaba-control-group6-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "06aa78bc525a4808704f39da42fa9beaf97c2d41e43a79fd4016b5265fcb98f4"
+    },
+    "stages/hnn-material-f9caaaba-control-group6-20261006-v1.final.json": {
+      "bytes": 4896,
+      "sha256": "f347123dd9b220d185e69a8f2e7a8f3ce61b057f383044a82509e5aa31bdedc6"
+    },
+    "stages/hnn-material-f9caaaba-control-group6-20261006-v1.input_seal.json": {
+      "bytes": 82779,
+      "sha256": "46910a32809198379509b219b3ac77554f5b6384b979cd0cef16520af8eb0550"
+    },
+    "stages/hnn-material-f9caaaba-control-group6-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "8a20b1cd9d12a1a4a9fe07bf3d260a521d03e069f70b1e5819dcfee36c4fa080"
+    },
+    "stages/hnn-material-f9caaaba-control-group6-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "ffd1bfdcb5ca82eff605498d021b289de746de57c0decebd729ae8b73561714c"
+    },
+    "stages/hnn-material-f9caaaba-control-group6-20261006-v1.output_seal.json": {
+      "bytes": 296842,
+      "sha256": "c0be4bc2b23f35d462b460bf54ffef3379619da5afbb7f9da1e30ea360121b50"
+    },
+    "stages/hnn-material-f9caaaba-control-group6-20261006-v1.publication.json": {
+      "bytes": 2769,
+      "sha256": "eedea37bdac9b4fec4626ded4019748fde8c1385a63498cbffa79c03222e5feb"
+    },
+    "stages/hnn-material-f9caaaba-control-group6-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "a78908164e0914be15a3db6d2639197769f4d6e62b75c6e456be6e8d0ed2a5b9"
+    },
+    "stages/hnn-material-f9caaaba-control-group6-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "6da14cf3b828fda447595b049cd1c37c2ea5557759e407ccc98a86e2d9b2be68"
+    },
+    "stages/hnn-material-f9caaaba-control-group6-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "f9366d40fa3ff777846c903741447b5e60c63789ba03c991027064d57c683476"
+    },
+    "stages/hnn-material-f9caaaba-control-group6-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stages/hnn-material-f9caaaba-control-group6-20261006-v1.stdout": {
+      "bytes": 17000,
+      "sha256": "4e8417440a3854f48c1837c8fb9783d7de3ab9a491d312fdd4429fb8a9cd0cf2"
+    },
+    "stages/hnn-material-f9caaaba-control-group6-20261006-v1.system-floor.json": {
+      "bytes": 34787,
+      "sha256": "cd6e298fdba91f414badcd043ade398b64c243bb7d85f76821d6a01b4de4a53c"
+    },
+    "stages/hnn-material-f9caaaba-control-group6-20261006-v1.unit-cleanup.json": {
+      "bytes": 723,
+      "sha256": "950f1bcb91800402d3c2dc4a8e6c36016204bb19d2c5755a158f8e4b26e7caac"
+    },
+    "stages/hnn-material-f9caaaba-control-group7-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "0e050070b7e1d194e36c423926ea163c192988d3ccd9cefb801627b058f9488d"
+    },
+    "stages/hnn-material-f9caaaba-control-group7-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "52d4c16f38a15e007db25f0c17807fdbdd0b52d43d33531ab699ae0ed9a3bc49"
+    },
+    "stages/hnn-material-f9caaaba-control-group7-20261006-v1.config.json": {
+      "bytes": 129228,
+      "sha256": "302446c7a7215e0efdca208039c77c8c04a5e8661189ce1fcbb510c698088003"
+    },
+    "stages/hnn-material-f9caaaba-control-group7-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "de7054fd3a3fe349e60fe3dd5d0bebfe283913280c5734654c92690e34e7186b"
+    },
+    "stages/hnn-material-f9caaaba-control-group7-20261006-v1.final.json": {
+      "bytes": 4889,
+      "sha256": "7a7a6ed0d2bcea1a3e379a1ce58d769bb02f21ccf5a527973925d227fe49b7bf"
+    },
+    "stages/hnn-material-f9caaaba-control-group7-20261006-v1.input_seal.json": {
+      "bytes": 82769,
+      "sha256": "b4271efd8d5e4b7328e7239693cb7baf663402447228983e3b76116ed31efa2a"
+    },
+    "stages/hnn-material-f9caaaba-control-group7-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "50b490280b272648c99b042a64724a42b26b489446dbde99b6a8a12c707c2677"
+    },
+    "stages/hnn-material-f9caaaba-control-group7-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "503ce73e6e5a9d475a6ccf12b8130fe1e30fb098ff2b9ed04c0302b532629ecc"
+    },
+    "stages/hnn-material-f9caaaba-control-group7-20261006-v1.output_seal.json": {
+      "bytes": 16074,
+      "sha256": "4e3319ca42f3750a72ec62360cd6d58f0f16dd41a44dbbc33642228e574268c1"
+    },
+    "stages/hnn-material-f9caaaba-control-group7-20261006-v1.publication.json": {
+      "bytes": 2763,
+      "sha256": "81905c328380213f4d0d6775c6935e2a70cd18616166fec00b9381b763e25f74"
+    },
+    "stages/hnn-material-f9caaaba-control-group7-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "4b1fa1fab1df7056d9f87cd422f7f64d720a08801f85b80bd1c824f2af7376ed"
+    },
+    "stages/hnn-material-f9caaaba-control-group7-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "1fee24c5a3741a08216b5b53f5381487476ce0d305db8d9c76d31881eab4248b"
+    },
+    "stages/hnn-material-f9caaaba-control-group7-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "6b2ae7d7c544968361ad3f55eb9222ab1eb608efea8f84384f718663e574f0f3"
+    },
+    "stages/hnn-material-f9caaaba-control-group7-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stages/hnn-material-f9caaaba-control-group7-20261006-v1.stdout": {
+      "bytes": 240,
+      "sha256": "5c3cc45049d9748d107524241af799eeab3b9e336a45b8e9fc4f673334ad35f6"
+    },
+    "stages/hnn-material-f9caaaba-control-group7-20261006-v1.system-floor.json": {
+      "bytes": 1848,
+      "sha256": "055630a7d0415600b0e229c3e685543020200f8be0706c09c564d2995e30f88a"
+    },
+    "stages/hnn-material-f9caaaba-control-group7-20261006-v1.unit-cleanup.json": {
+      "bytes": 723,
+      "sha256": "bc7e1c276fc6ba1e6d85ea99dec16319f66fdf7d3321c00939446f6cf7c11ca7"
+    },
+    "stages/hnn-material-f9caaaba-control-group8-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "debf29f7a807b9bbba0d762e78635a3569b3edf8e991e8b76424f7891a921337"
+    },
+    "stages/hnn-material-f9caaaba-control-group8-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "09aa7772a8d0db775f3636f7a0cb1e3522d6194a9681358ef9fc16eaf916a8d0"
+    },
+    "stages/hnn-material-f9caaaba-control-group8-20261006-v1.config.json": {
+      "bytes": 129332,
+      "sha256": "9e1cb32f615d3ef631c8bea32c64ae6b4ac508461a8e9380c4a5adb2b502bda3"
+    },
+    "stages/hnn-material-f9caaaba-control-group8-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "451356dec329c455cdb3d9aacdc2ddeed4cf2a7da52c5bb3382b55077dbc2238"
+    },
+    "stages/hnn-material-f9caaaba-control-group8-20261006-v1.final.json": {
+      "bytes": 4896,
+      "sha256": "2e5d3015d2a9251ed76713a6db012dea6819e7855ef78862974658faa75003e2"
+    },
+    "stages/hnn-material-f9caaaba-control-group8-20261006-v1.input_seal.json": {
+      "bytes": 82781,
+      "sha256": "2dcc72b29c14038fccc8adec74143b9dbea514d4ae8cb7a579834a6d7cd91098"
+    },
+    "stages/hnn-material-f9caaaba-control-group8-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "fd2b19250de56125b2980590ca1f011b5526d506548430fe4b33877e7b6faf2f"
+    },
+    "stages/hnn-material-f9caaaba-control-group8-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "99ef3877116586adb9ce94e5f878cb18c3b96dd8329a8ca05ff84cb919c99ebd"
+    },
+    "stages/hnn-material-f9caaaba-control-group8-20261006-v1.output_seal.json": {
+      "bytes": 136045,
+      "sha256": "e0f246e164fb503d83a41d154e8cd26d5aa52a54b2f503ff857035065c1be347"
+    },
+    "stages/hnn-material-f9caaaba-control-group8-20261006-v1.publication.json": {
+      "bytes": 2769,
+      "sha256": "799a11cbdb115044743760f3ff787a0e5630c4947a57e9056dbb74b4e2e0cad5"
+    },
+    "stages/hnn-material-f9caaaba-control-group8-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "baa4cf0cecef5bb1c74261acd0f588d38e465a56434baa38d5123bf07a073318"
+    },
+    "stages/hnn-material-f9caaaba-control-group8-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "83de297f35b93bcd601e3e78d8bac8b855149929ef34651ef2445ca9512891d7"
+    },
+    "stages/hnn-material-f9caaaba-control-group8-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "f53ec280a0d06e5d4febc148f4ac65777b6a63eb940016e9bbfabb2c61e2ccb4"
+    },
+    "stages/hnn-material-f9caaaba-control-group8-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stages/hnn-material-f9caaaba-control-group8-20261006-v1.stdout": {
+      "bytes": 16908,
+      "sha256": "91eaaae2ff712543e078b59464bf577a8a53b3b28a5991e3a83f8b2e4e192063"
+    },
+    "stages/hnn-material-f9caaaba-control-group8-20261006-v1.system-floor.json": {
+      "bytes": 15553,
+      "sha256": "a24108856b8c5abbb66aeb2259d96ed0daaf1763841bded554c8b885c3f75188"
+    },
+    "stages/hnn-material-f9caaaba-control-group8-20261006-v1.unit-cleanup.json": {
+      "bytes": 723,
+      "sha256": "aa937612cab8143599b47d8f6275c74fefab1cfcb638e43e005076a8a9cd4b81"
+    },
+    "stages/hnn-material-f9caaaba-host-cuda-link-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "78aeb819bd833eb6c07cb7bab56888c72272427a4506c4a4757a221a9cd07b41"
+    },
+    "stages/hnn-material-f9caaaba-host-cuda-link-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "d88b8717b21e26d96dc73ee8a9f15ffe6d10beb6bd8b8f9fcf30e5281fed6450"
+    },
+    "stages/hnn-material-f9caaaba-host-cuda-link-20261006-v1.config.json": {
+      "bytes": 397058,
+      "sha256": "b11ab23eccf7885fb67d581e59e20f24e02fe83eba84e18c8e17b6daf9ab4665"
+    },
+    "stages/hnn-material-f9caaaba-host-cuda-link-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "059e5826fb38b6d7bcad8e651878869d9d39a72c1a0b0f150d9c5eab6763903a"
+    },
+    "stages/hnn-material-f9caaaba-host-cuda-link-20261006-v1.final.json": {
+      "bytes": 4907,
+      "sha256": "f49a18594b1d8ba11cf1cafcfab34a9512468947cc36fe3b63e21dfe1b3dd13b"
+    },
+    "stages/hnn-material-f9caaaba-host-cuda-link-20261006-v1.input_seal.json": {
+      "bytes": 339505,
+      "sha256": "42ce5a2aa4ddeb0fd14c787feb7c824e9c03f9f9cf2e1fe276ce92bafa6241ee"
+    },
+    "stages/hnn-material-f9caaaba-host-cuda-link-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "634ba9c89996ad695b632d9f1ed3f26264eaf2249e36104af079f03463f11a41"
+    },
+    "stages/hnn-material-f9caaaba-host-cuda-link-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "c4645b5d9ee59dd910ad5ef7b66ae73f630488e5719aec5884d20c54c276e458"
+    },
+    "stages/hnn-material-f9caaaba-host-cuda-link-20261006-v1.output_seal.json": {
+      "bytes": 1356762,
+      "sha256": "957f3bdeac2ff33d751f1ff0bd297ec512786c7290e5b4de81a5e2ad9a0709df"
+    },
+    "stages/hnn-material-f9caaaba-host-cuda-link-20261006-v1.publication.json": {
+      "bytes": 2781,
+      "sha256": "f5298f5742ab7e753e97141a6c460365b67d51a0c15c898ba70459d94bf54c26"
+    },
+    "stages/hnn-material-f9caaaba-host-cuda-link-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "b8bdc96e8ba1cc51cb90c9f3e91683ffe694541690d69a96c3318c3a87c52c9a"
+    },
+    "stages/hnn-material-f9caaaba-host-cuda-link-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "d6d8bd9e43ccd4ecd2962d43bef9bbd83a4003ebfb1955e561d510c6571c454a"
+    },
+    "stages/hnn-material-f9caaaba-host-cuda-link-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "30a279c37c65204b8a4f29a257e33766f93cb2afb800185cb1816d01d36696c8"
+    },
+    "stages/hnn-material-f9caaaba-host-cuda-link-20261006-v1.stderr": {
+      "bytes": 392,
+      "sha256": "785c1b104c56e853c7879e2985dd4bd7550446506195059bce250afcc83707ff"
+    },
+    "stages/hnn-material-f9caaaba-host-cuda-link-20261006-v1.stdout": {
+      "bytes": 37630,
+      "sha256": "71926d37c35707e1f44d34355830cbd21ebc4228c052baab9aeb0051271a432a"
+    },
+    "stages/hnn-material-f9caaaba-host-cuda-link-20261006-v1.system-floor.json": {
+      "bytes": 152043,
+      "sha256": "351aa97938ca5fb1c7855acd8e7b94d4b0f2e79a42dfb7ea165f7350dcf6ea78"
+    },
+    "stages/hnn-material-f9caaaba-host-cuda-link-20261006-v1.unit-cleanup.json": {
+      "bytes": 723,
+      "sha256": "def413caaec5078f6150c44017519d97d80db11345e78abb337d79809cedf994"
+    },
+    "tools/bounded_stage_v1.py": {
+      "bytes": 12645,
+      "sha256": "84b7d003089fa19881690e368200b2168b9d179c8e6573bdafab54369235cec2"
+    },
+    "tools/final_stage.py": {
+      "bytes": 10968,
+      "sha256": "a0a5a94f157acf9a5127b756a036c6e86449dc2012af0f1e71d34aafa13bc79e"
+    },
+    "tools/finish_hnn_f9caaaba_preservation_v1.py": {
+      "bytes": 5030,
+      "sha256": "ab01cd795d49e29f4e7c1ed35485d1052343daeaaac273675eb583c3ed29f888"
+    },
+    "tools/grade_hnn_f9caaaba_control_v1.py": {
+      "bytes": 3443,
+      "sha256": "91095965e3209d07cc4ab36e3159b3b3766f357b599d346d6eac221a2e97ae31"
+    },
+    "tools/leased_stage_v2.py": {
+      "bytes": 5520,
+      "sha256": "bcf91456534e763a025613f39e82853d7a58529b399bb183d544d09a7a42f949"
+    },
+    "tools/materialize_hnn_f9caaaba_controls_v1.py": {
+      "bytes": 5231,
+      "sha256": "391bf476fcc6a2b0178eecb05f2445f59b7485c75c56340c9f429124921d3f06"
+    },
+    "tools/prepare_combined_test_cache_v2.py": {
+      "bytes": 2795,
+      "sha256": "7c241e2402df26821c82268ff3d38d4bf26c726acdd5a83b597edc64552f4435"
+    },
+    "tools/preserve_hnn_f9caaaba_validation_v1.py": {
+      "bytes": 6350,
+      "sha256": "f4bbc57467359e20f3b6fec8319f7b551c159e3cdbfe0c599ee9a2a9b8328bfe"
+    }
+  },
+  "no_Git_mutation": true
+}

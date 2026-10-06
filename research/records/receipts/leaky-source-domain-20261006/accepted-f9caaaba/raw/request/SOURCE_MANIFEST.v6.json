@@ -1,0 +1,1526 @@
+{
+  "source_commit": "f9caaabae3ad1d722eece0e01f0f438104447ae2",
+  "source_base": "468553d5d971951d75e97c17f32a26e5b2ed0dc6",
+  "atomic_patch_base": "18968dc9795e6d05c62aa7bfb17c5d48fd0b2130",
+  "git_tree": "80edfc8772eef60c986415483dfc795a02ea6132",
+  "owned_native_paths": [
+    "crates/holonics/src/hnn/moment.rs",
+    "crates/holonics/src/hnn/prediction.rs",
+    "crates/holonics/src/hnn/tests/prediction.rs"
+  ],
+  "files": {
+    "crates/holonics/src/hnn/moment.rs": {
+      "bytes": 107450,
+      "sha256": "ad2697a9c46d26423dee001b067568e77bc12cb7378d80036320b4bfccf98a3f"
+    },
+    "crates/holonics/src/hnn/prediction.rs": {
+      "bytes": 143700,
+      "sha256": "3ecd6ca421ee24d1ae377392427f4e45722dcaf4d848845686b370a649285b7a"
+    },
+    "crates/holonics/src/hnn/tests/prediction.rs": {
+      "bytes": 127132,
+      "sha256": "8b75015e5e2e3ca95907ef8b94db15bd943b13985d851ac22426e2d894d0fcaa"
+    },
+    "docs/atlas/objects.tsv": {
+      "bytes": 883551,
+      "sha256": "7406bd972d8a4ae0a434a534e583fe0d5415f0d54fb0657a9c1646739b2dad65"
+    },
+    "research/records/2026-10-06_SOURCE_IDENTIFIABILITY_PRECEDES_THE_NEXT_PHYSICAL_MATERIAL_DEPOSIT.md": {
+      "bytes": 12750,
+      "sha256": "82d6e05d354b625b5e3b211498be81bc4ed580211812dc63d38372dc4fd7bf24"
+    },
+    "research/records/2026-10-06_THE_ACTUAL_SOURCE_RETURN_CHANGES_E_AT_THE_NEXT_CONTEMPORARY_OPENING.md": {
+      "bytes": 17429,
+      "sha256": "ed6647e8ebd5c7d6d249b0ed1b9104ea80f93d37986494b8e71deb42bf46d2c0"
+    },
+    "research/records/2026-10-06_THE_LEAKY_SOURCE_COMPLETION_DOMAIN_READS_ITS_ACTUAL_ROUNDED_FEATURES.md": {
+      "bytes": 8956,
+      "sha256": "7e59fdfaba546c360593f6bf129bb5353c26cd38c2b6e31c805458851d0537bc"
+    },
+    "research/records/README.md": {
+      "bytes": 160870,
+      "sha256": "a42cece9073b4535462ba9f08161732b21e77e596a8f490337de9f38b992d999"
+    },
+    "research/records/receipts/leaky-source-domain-20261006/SOURCE_REVIEW.v1.json": {
+      "bytes": 2853,
+      "sha256": "b27047aab05003e029ac660a61471bce6d2e2ef0febd4cf3cfb57d3fee4592a1"
+    },
+    "research/records/receipts/leaky-source-domain-20261006/SOURCE_REVIEW.v2.json": {
+      "bytes": 2367,
+      "sha256": "a20b563d53fac424869c8a1b9663eb77e688c9e8d60aaf264d26634c3d08b694"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/ACCEPTANCE_JOIN.v1.json": {
+      "bytes": 132197,
+      "sha256": "a530537004e977cdfd703cd893ce23a59d02da036349b350c5f86a3660bc603e"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/EXECUTABLE_DELTA_894_TO_189.patch": {
+      "bytes": 4690,
+      "sha256": "0cf515de3e125eb30de545596e29597b7c3c30794e2cbe1ebc5f19224e422a3d"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/QUEUE_VALIDATION.original.json": {
+      "bytes": 135567,
+      "sha256": "585788dd02b1d95f2f6bf985dd197609876cf447ef0287ffbff8ff269019ffb8"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-20261006/CACHE_SNAPSHOT.v2.json": {
+      "bytes": 512553,
+      "sha256": "524d49620f136db65cd272c8110e46908222271b64552d0f36e9c77eb39a8cc1"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-20261006/COMPILED_ARTIFACTS.v1.json": {
+      "bytes": 12576,
+      "sha256": "1d0cbb64c086a2267478e8064280aa0b4a31397321fc0e22d9d7a600fb6748b9"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-20261006/LOCAL_CACHE_SOURCE_BINDING_REFUSAL.v1.json": {
+      "bytes": 88190,
+      "sha256": "32ac8d130718aa0630ddc0d1df68f78ad7041e8e6a4fd9e49bbf9e11ee2759bd"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-20261006/PREPARATION.v2.json": {
+      "bytes": 447,
+      "sha256": "fcc21f5ff5fc85762f4c34bbf23079d8c31c6d32c8bc66d8a481cec96459e3b3"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-20261006/PREPARATION_REQUEST.v1.json": {
+      "bytes": 947,
+      "sha256": "ec9d826b185c914828b909382a8485186244ae55cf876e6969952267a18953c2"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-20261006/SOURCE_SNAPSHOT.v1.json": {
+      "bytes": 47701,
+      "sha256": "7d69be48f5848687c4b6ef9d8933be20a15e767555594a9e62f1e583be0d2d15"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-cache-preparation-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "623f26f5951b0e8e1e28f2ef48714584a079f7d0420da67131fd4341ae9f7768"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-cache-preparation-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "a3765f4d1220a21a0737081f81922fdcf3d5e42b7dda6476991277f0f514352d"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-cache-preparation-20261006-v1.config.json": {
+      "bytes": 4421,
+      "sha256": "f40a5a1a432ba835c5e7140ad8403f7880713db22e412e60e91d6bb5e2f575b2"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-cache-preparation-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "eacceb40040ea2781a4ae4816aa535d9034fd61a8a78875998a4b4dcc35f295c"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-cache-preparation-20261006-v1.final.json": {
+      "bytes": 4936,
+      "sha256": "617a6f1e2a83e88c6f2fead20751b085aef1083bef4ca90ee716032cda57f852"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-cache-preparation-20261006-v1.input_seal.json": {
+      "bytes": 3594,
+      "sha256": "28cd14ec5da7b27e0ca4a811fbecf8e5f00bb5c8be80127cab0ff539f5bef838"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-cache-preparation-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "75ffa90d0680a4c3c7eb5da1d48c1ad8c7810a9b5be78bf20b313855ef54055f"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-cache-preparation-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "9d88d4905ec1bfd7c7b7b09a772bb97cdc912fbc3bf99b7c596142245cbcd92f"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-cache-preparation-20261006-v1.output_seal.json": {
+      "bytes": 476052,
+      "sha256": "81b2c59d2ba7c97fbf82cc80b950a84e2d8ce24a9e0dfc8e7c02d173fab5f7e9"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-cache-preparation-20261006-v1.publication.json": {
+      "bytes": 3276,
+      "sha256": "ed19e58ca50c0682b588152d3ac7e13ae8b3a4668bf2de82f7095f904fe639dc"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-cache-preparation-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "66ba38b1a809e4f10e816f51cbe4b388cb8dda2e6e351ccacbc51dd829bd0bd6"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-cache-preparation-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "747aeb9db4e571a34130f456019183e1fb54bd50d0b6268ed50255174da3eba8"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-cache-preparation-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "13938d673e7b8406a86ae051784805a8a2ce7f1bfca87e8fb73ef3895476f1bb"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-cache-preparation-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-cache-preparation-20261006-v1.stdout": {
+      "bytes": 419,
+      "sha256": "72d84a6ef116eece9f356d8bc807e825851680b3e9c9f91cb91cf39f5337cd16"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-cache-preparation-20261006-v1.system-floor.json": {
+      "bytes": 55872,
+      "sha256": "2be5f526aaae4ce9a8015072825b5d7b0f056fb253a8042966712c33a7a134c5"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-cache-preparation-20261006-v1.unit-cleanup.json": {
+      "bytes": 729,
+      "sha256": "d952e5cc0d9fd72c546a3f17d2093c9f57c646e3f97d91dc260c38bcf64c5169"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group6-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "be77fccc525aa277989ed672d14872222306c3deef7da32a1a2a3173be430f32"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group6-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "9de304d7a6efcb657fac90e0e2b1dead36ad07f6feebd6733c3e95d4347ccfa8"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group6-20261006-v1.config.json": {
+      "bytes": 62616,
+      "sha256": "d6a03b529f6f8f61f01c2fec01c6abf69a9ae61cf576296219de4b18405fd701"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group6-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "be56d83f30720771f399df6673047d40fa2c795de5a9181bfb7483fe13721258"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group6-20261006-v1.final.json": {
+      "bytes": 4894,
+      "sha256": "546cb3b9936bf2ee9bff4bc1d0c47da14a3d4d75f451811297330928781520d2"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group6-20261006-v1.input_seal.json": {
+      "bytes": 61429,
+      "sha256": "b9e46bcc33a7e645514ec4763a9117c5c5a0f53421896c38e415a1a8d23c631e"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group6-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "eecccbbdd14d1f3d59e7b9e0faa248f78094199dfebf95b6c8abcaf3e19cd31a"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group6-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "32684da3a8276dcc047ffb2bc1a0691c1e96fb9e796a16951c100a48a69d13f5"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group6-20261006-v1.output_seal.json": {
+      "bytes": 141125,
+      "sha256": "3aa0d6eeacacc62e2b0cbdae5917b30a6278df51543ba81e639ffa6dbd3d5610"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group6-20261006-v1.publication.json": {
+      "bytes": 2769,
+      "sha256": "13674ae1c8c263c28a820a658c3cba8fab85aa1b2f17ce69e1ce69911cc123b3"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group6-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "d7f805e5e5211f59a01ed3ec2b59a88c7cadc49de40fd2f12341d9a356b37cb2"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group6-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "68b6029ea0aee6961a8234df942ac825b84be1e9a2820d9af6d07eddbacc3572"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group6-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "29e8e1cb1a0b9d8fabb7faf54aaeb2ba85782283714bafd42f168fcfea04ce4d"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group6-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group6-20261006-v1.stdout": {
+      "bytes": 17156,
+      "sha256": "9d5b2cdacbd6e1050c3d7fbd04d16e404bda6c9b75df9311d5b49975c1c7152e"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group6-20261006-v1.system-floor.json": {
+      "bytes": 16140,
+      "sha256": "e8a4d978deddccc783ec046f05b1d1cb6c89efbf55aff9e8bd9c30be3a3a210f"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group6-20261006-v1.unit-cleanup.json": {
+      "bytes": 723,
+      "sha256": "8692339e8f337445a19e73211615c307035dd17e456cf52818feb001b68f7946"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group7-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "0bfb5f231656867bdbc24da63919839626c7574b426a629f727be52afd3d57b4"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group7-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "9a07c2974593ce9ad254388037001a8c71fd375a4307e6cf5e36e5bbbebdbde3"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group7-20261006-v1.config.json": {
+      "bytes": 62605,
+      "sha256": "6f07593b438a38a7ca1cc147471c90aaa5f0a776c1ec936ed1e8e9f356c4fc41"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group7-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "c13863d0e8f3aceb95e000e19d2705f9ac7c2ed17b0bfbaef9949e43cdb03f99"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group7-20261006-v1.final.json": {
+      "bytes": 4887,
+      "sha256": "b7bbdacab9a6e090826a6c0dd9f8d7927803c9eeb2cee0a8b53967a0e1765bd7"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group7-20261006-v1.input_seal.json": {
+      "bytes": 61419,
+      "sha256": "cac4010ac69a4f793a17859f17cac3f4b37cd6b098a8301abb727aa8cb39518d"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group7-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "c05733726beac92d287e06a9437ec028c15bd296b4a396b21034d9e7e3b1affb"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group7-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "6d51e0333ef080b8d5717437e25a8a54d024d025be51ec9087faa3efd9a27e18"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group7-20261006-v1.output_seal.json": {
+      "bytes": 16219,
+      "sha256": "d2f6a30fad48bb8bb40679eb5eae2ae8b73f79e5a8cbfa47d90a664fdab4ab8a"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group7-20261006-v1.publication.json": {
+      "bytes": 2763,
+      "sha256": "d6c2a81a4317777283ba219cf123ae1662040fa4cf04182d331d2cb72180a3ed"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group7-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "11a486715551d5d9cd1c4ae95252d74f3d99854bdcf8c0ad31b37588a156ac9e"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group7-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "98c29818afaf6531f631bcefedd082e65419b6132131afbbb05fc39809a49e7e"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group7-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "8a4e78fad6f4433468eb812c4517eef388390414bfd0302af256b419d02d7e73"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group7-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group7-20261006-v1.stdout": {
+      "bytes": 240,
+      "sha256": "0837874de868e121d0bdca83e52de89639ca408a7925989d2effb1e615b3719f"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group7-20261006-v1.system-floor.json": {
+      "bytes": 1848,
+      "sha256": "33569d5239d013d0c45e055fd773aa25c1d43dd8b079f4d23dd1723627202fa7"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group7-20261006-v1.unit-cleanup.json": {
+      "bytes": 723,
+      "sha256": "01c650f78fcfc27d2ab8fe4a4d88a9d86d42fc1c79ef9f68aa4f3d02f8a7efe1"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "5b5fd4d22b98fdb39ce07c98687dc5076a13c317cf787c303282030626cba186"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "1be4df637d9e801cf85f901ca4c4626abdd3bcc79e98496b9c5747909921b873"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v1.config.json": {
+      "bytes": 395804,
+      "sha256": "6a50bdc715cafa546aeeb04d2d6f8574944b465dcbe050859539564cece41ad8"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "9b48048efff0fda67ac3d15d182902627dd5de7985562e5636bbbaa805b8904b"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v1.final.json": {
+      "bytes": 4902,
+      "sha256": "0f1c938051db1a59fb53ea48d23ce0636315c6fe95a591b2fb62bd11ac93fa74"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v1.input_seal.json": {
+      "bytes": 338980,
+      "sha256": "b5cde0df0b1ab2fcb3c106380f24055c7ec0a0c54c243ae6120bacc4f680d067"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "8b3927f0c57b6de4ec0b5ceb3714571b3322e1fa1dd68ca9db6da94fec9c10e8"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "c5708a241f61517020d4fdb25890744e3f2cfe8c51d09490850ae6638961dd77"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v1.output_seal.json": {
+      "bytes": 141237,
+      "sha256": "877a09125751840bd506e98406c1c78975f7c19defb0b269150b66283860a667"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v1.publication.json": {
+      "bytes": 2776,
+      "sha256": "32ec741157524b8a65ae7fd2d2b05ce9c2e9ceb0e783883824e3f04d7d2f0f60"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "55a28f1994a149d9306f79721bf8359f1f21144ca72b66935bdb4a44af47cb13"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "a7b1aa3ec074946b30eff848dad7f401c63ffceb9fa589de5a89663161e32329"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "7fe1bdb0f64135699d5a52a0042bc0d90512c42546401b3041b5c45abd921efc"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v1.stderr": {
+      "bytes": 391,
+      "sha256": "111befec46aab3df4989a0bf9ebd0ce2c3a8b0f3b294e8674d21413f73221279"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v1.stdout": {
+      "bytes": 37624,
+      "sha256": "eb250be9036ec9f3105c05135a12ab02091497702e2f4864f48b8796f6601a3d"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v1.system-floor.json": {
+      "bytes": 16057,
+      "sha256": "5549675534b871e0ffee07cc41d945055d50410ef1a106fef8c4bd7fb40ab760"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v1.unit-cleanup.json": {
+      "bytes": 723,
+      "sha256": "9b3123451e28b57069639abf4afa8cabce680802a44a1f6e1d5b97220a6330e3"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v2.acceptance.json": {
+      "bytes": 378,
+      "sha256": "15800644ad4eaf7081583da88d6d96d752a935936585d34185367ec22aa71e31"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v2.child-identity.json": {
+      "bytes": 78,
+      "sha256": "801522c96630090cece1e1d20c6e217b139bd86a19e04a5acdb8ae98010e6973"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v2.config.json": {
+      "bytes": 396637,
+      "sha256": "893e9edc9997aede02f0879772307aa35cd1494bf4a9380282a0fc5193ee1624"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v2.external-lease.json": {
+      "bytes": 487,
+      "sha256": "0ed04ed2ddd37da4cd2109934876593276e396f9d5d14fe0a8386bd10319d8f7"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v2.final.json": {
+      "bytes": 4907,
+      "sha256": "dba15d3cba627fb7fb9b60b4bea5c7e4698265260c9095752f43316363f7324d"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v2.input_seal.json": {
+      "bytes": 339241,
+      "sha256": "f2301d00eb662c6e96a9f11b1a7f74f3fcec68e14689875c109ce3a98792d8b9"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v2.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "3fb48e6599a5ff7902510c79483918cd72ccdaa510ada338fe99312e7a7044c5"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v2.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "a0260817822911e2ed3d75ff640e28af13c09599cbea420d9db1588783d49680"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v2.output_seal.json": {
+      "bytes": 1301167,
+      "sha256": "e226db0a4756fb38b2309cab0822b322be652543104f3580c4b939fe3848ceb8"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v2.publication.json": {
+      "bytes": 2781,
+      "sha256": "cec7366af08578990c0a2082e5d0caf770a4987cf43e6477aed3b06708a2a410"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v2.quiescence.json": {
+      "bytes": 130,
+      "sha256": "3c2729236ab7f82cb3f382ed12a90c3fe1dd130c0ab6281b47368342b0ca2c22"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v2.release.json": {
+      "bytes": 175,
+      "sha256": "c29b4c8d9ee44147c42a18d3e91c3bd8a55a45641dccbbd2067423fde498a061"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v2.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "b86759359b1d44217d61e657810f34118837a4f5fae400ff847ccac3aa7ea112"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v2.stderr": {
+      "bytes": 392,
+      "sha256": "569b755c1b919d7f248fc767407356e58731aaa9fd09e866c95b865821261a10"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v2.stdout": {
+      "bytes": 37629,
+      "sha256": "fa1bdc1f507a46001425f855465dec425e007cbfe5591324e87e1293a136f15d"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v2.system-floor.json": {
+      "bytes": 144870,
+      "sha256": "1e39050112de2dbbe6628d524a105cd1399502f222721ba6baed9431803cbb4d"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v2.unit-cleanup.json": {
+      "bytes": 723,
+      "sha256": "d0989725e4024fa7f0d68021f88d641e6459ea34fbfa9e5f8e036266364812f8"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/owner/COHERENT_FOLLOWUP_CANDIDATE.v4.json": {
+      "bytes": 18898,
+      "sha256": "370bff0f79965ccf6913f35d9a4a58dbabfb2d80f5489356716773393720c9b1"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/owner/SOURCE_MANIFEST.v4.json": {
+      "bytes": 6800,
+      "sha256": "54bf4a9f15920b3a51cc9ee252f67b42f7d5c95ca695941d2ce328c7893f9b53"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/QUEUE_VALIDATION.original.json": {
+      "bytes": 178591,
+      "sha256": "ddd82d0befce2072487aba16a8e69f97fd5c6cf266b7786e4171edb743ca4385"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-20261006/CACHE_SNAPSHOT.v2.json": {
+      "bytes": 512935,
+      "sha256": "c6c645226d41df3610a4594537e5d31f7b0e905c37a7cccaeddfdad8a09308eb"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-20261006/COMPILED_ARTIFACTS.v1.json": {
+      "bytes": 12694,
+      "sha256": "f5ae02deca26712885cd268e506868136897bfe38ae8a3c232c2b7a054276d41"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-20261006/PREPARATION.v2.json": {
+      "bytes": 447,
+      "sha256": "89bc1798416a4d1319d07bf9cbf7bc4c8a034f19b5a19f96d909d66f55d5249d"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-20261006/PREPARATION_REQUEST.v1.json": {
+      "bytes": 954,
+      "sha256": "94b09ec28c8e5c031db9b85f818444fbcd365f268ba8a803accad57a0bb57ee1"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-20261006/SOURCE_SNAPSHOT.v1.json": {
+      "bytes": 47688,
+      "sha256": "d3996a559abb7c49f17919ff9b16d75cd8b64d7223602494d0d76f4b1d9d09ac"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-20261006/ZERO_TEST_WRAPPER_REFUSAL.v1.json": {
+      "bytes": 873,
+      "sha256": "95a8610e19ff89827ce182922f19540ca558dcd939ef3c3812e46fd6018b7ca8"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-cache-preparation-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "4174ef2efc40a00b988096eca0659d474e8ab05688e512b1037d43d5bf89275e"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-cache-preparation-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "080306c0c8dfccf4e23a4154be2aa5528c20c94e88ebe3dea5bdde087477920c"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-cache-preparation-20261006-v1.config.json": {
+      "bytes": 4461,
+      "sha256": "14ea77b02e0bfcca06f679248a74684c3808563d2a1ae2e428c2799f3e5016c0"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-cache-preparation-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "587365a2638baa6a151d8695a3f5934ac4f355f1ee548106b952980dc665f3fc"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-cache-preparation-20261006-v1.final.json": {
+      "bytes": 4936,
+      "sha256": "e409f8ad6608fe154c3453dd3bd6627fc1ed4831ce77e1b772ea9d3a93dfeb21"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-cache-preparation-20261006-v1.input_seal.json": {
+      "bytes": 3575,
+      "sha256": "a7f440125d33422351b6f8243dcf610ad1f168491a691e0b15d4d6dbae812338"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-cache-preparation-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "793e26ec83fdca806ac6c2d46768427db0f0dae9fe96ce66041adc81fda3cf81"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-cache-preparation-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "d490dd625ba11ad5a603425069e67e179740f08cffa3f6c0447f25583c4d0eeb"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-cache-preparation-20261006-v1.output_seal.json": {
+      "bytes": 495791,
+      "sha256": "76b79bb33ec933f95d503dd55d9f2de575fc12077765a958ddcf325b41db2919"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-cache-preparation-20261006-v1.publication.json": {
+      "bytes": 3276,
+      "sha256": "81c375b933808ef3ac13c80ed41aa0ac1613d3e91f707c4584393faa55561077"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-cache-preparation-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "3f04b838f63b85bb27f309263e713bbc7a0dccc5ea92cdbed98428a7b724b949"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-cache-preparation-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "fd8d530beb4189578b81182eadabac0028f29b3b4046eea9b83e7601ccff164b"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-cache-preparation-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "9f8d5cb913b299f9f3043caa75b5c1b25fe460fbd03e1413bcd7bd262ca9b550"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-cache-preparation-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-cache-preparation-20261006-v1.stdout": {
+      "bytes": 419,
+      "sha256": "011ad4cfa0d5e78624797f0d1b5c80ed1159299d0541c0b6c5d820595424c39c"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-cache-preparation-20261006-v1.system-floor.json": {
+      "bytes": 58392,
+      "sha256": "f5d85debabe04482d064c0bbf06a494a707e774d6c5215662c2be0b800c2e156"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-cache-preparation-20261006-v1.unit-cleanup.json": {
+      "bytes": 729,
+      "sha256": "0666472659060b48f76f46f6236cb423bbd8eca31f5f8320e408c7eb36cac0bc"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group1-20261006-v2.acceptance.json": {
+      "bytes": 378,
+      "sha256": "a3e2e00e123c41647286fb9b1cc00b1b9ebeceb6a62bce7ace0876b4a95a7aee"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group1-20261006-v2.child-identity.json": {
+      "bytes": 78,
+      "sha256": "2ba5af0dac3bee35e9b8ecc1d4b8af2d592e788ba5c1ff0a4328d00366b00967"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group1-20261006-v2.config.json": {
+      "bytes": 62910,
+      "sha256": "45a5db7fbc70d2589fecfee67ccb72296235773d2a25d0ddc7f38614b1ba9aa5"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group1-20261006-v2.external-lease.json": {
+      "bytes": 487,
+      "sha256": "6daa5f628e8d2f8d680fa3a554ed6f3e9b380331780093595872f5b909b4d58d"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group1-20261006-v2.final.json": {
+      "bytes": 4891,
+      "sha256": "0f2730b0560ceba13c8828b064c0a8d6efecd2f9a5ccea3c80cbfefe5da9745d"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group1-20261006-v2.input_seal.json": {
+      "bytes": 61377,
+      "sha256": "4f4fe01e7f1d95c7700a0d3c8305acfc64d6421612795b2ff313c407d01dcdc8"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group1-20261006-v2.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "c3156df9b3bd4a4cdd243dc2c79af01e3be9563d9111aad5346445199f48c2f1"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group1-20261006-v2.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "3458e6fd85afb9c691fd0b605366895fc9c0a1c727f695b9deebe2d33037091a"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group1-20261006-v2.output_seal.json": {
+      "bytes": 80367,
+      "sha256": "32510d4e3060ae22b40a73ff8b719061d7709f4b98e22731209a87106798a100"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group1-20261006-v2.publication.json": {
+      "bytes": 2766,
+      "sha256": "450c22f3b8677597c5435c30f55a21301f376392904296f732f40f4c9488f549"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group1-20261006-v2.quiescence.json": {
+      "bytes": 130,
+      "sha256": "e14090801da1cc726225918260a0f177ab958d0a21f9601bd47a64ab09366638"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group1-20261006-v2.release.json": {
+      "bytes": 175,
+      "sha256": "3cab7708be26cfa38e85a8f823a4fd4dc0cb37f39cd844f2a671d797c78724bb"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group1-20261006-v2.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "9ba8be60d045b2e9e94d93920058e8c351cf91aafb759c6105ad3b9a8139d506"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group1-20261006-v2.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group1-20261006-v2.stdout": {
+      "bytes": 6277,
+      "sha256": "012f7e3bba56aa1b76cb20b0228a9c765c283430e63ee04b17cbd510dff6bf20"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group1-20261006-v2.system-floor.json": {
+      "bytes": 9168,
+      "sha256": "77e224823ac80c2ad6f1d3fe5936f46cdd3bb04c4bda14deba93e049e3848d5a"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group1-20261006-v2.unit-cleanup.json": {
+      "bytes": 723,
+      "sha256": "2369e3bb5a98fb5f506dd3ef320bbaea80661bde8f43210453d68b8a744bba87"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group2-20261006-v2.acceptance.json": {
+      "bytes": 378,
+      "sha256": "87861bb33f8c5a949ce4fc737d7ccc2dd6a949b90665c83e1dd7c89d0f14e130"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group2-20261006-v2.child-identity.json": {
+      "bytes": 78,
+      "sha256": "8dd02229bf12a1526903f00858ba395db13a709f469a75f9447edd3cdf8a230f"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group2-20261006-v2.config.json": {
+      "bytes": 62897,
+      "sha256": "b8417226147e71c98217d36746a1e74f382d3aa4a6c7c43eeb7e7d782aa3bebe"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group2-20261006-v2.external-lease.json": {
+      "bytes": 487,
+      "sha256": "02a21571cfc5fdd1757fce69a5024da403aaf97a7d6758af5f3c7ad0f8f8e99e"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group2-20261006-v2.final.json": {
+      "bytes": 4892,
+      "sha256": "3751c6edd4629b9960c97f0c0b1003040ce2257927cd5a6cab19d49e86508ea7"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group2-20261006-v2.input_seal.json": {
+      "bytes": 61364,
+      "sha256": "7fce671f30cdd6cb0796101aa7b73a32f9f23c3b264e701aff71e2ae02770098"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group2-20261006-v2.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "30f3ddb35249b722abd62378daaf6ed9b089be64ad97886d48ceeba4349e5906"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group2-20261006-v2.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "3c05672343eae2c6ec1233f17fabb7e6813720340b8e739a8e9453857a589eff"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group2-20261006-v2.output_seal.json": {
+      "bytes": 164227,
+      "sha256": "af431cb86960fd1f1c19194e9d82f254f9c4961d1d47779b2b04be3ea20ee012"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group2-20261006-v2.publication.json": {
+      "bytes": 2767,
+      "sha256": "d0f16961d177002e5910c1c7798fb86c9d5d74c48cc14d9650c41ba235a7136c"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group2-20261006-v2.quiescence.json": {
+      "bytes": 130,
+      "sha256": "c285422057b5e7c1887fd00fcacbe178731dda74802f2aa14b4492211ac2c999"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group2-20261006-v2.release.json": {
+      "bytes": 175,
+      "sha256": "b5a725e4c270ea69fa4029a0fc9bdb696d1ea40e17c7efe21acdcad595737bcb"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group2-20261006-v2.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "b3f0fa1a4d5cc9b37fbcfb9421782deb2b2e63143a824aa56dae3b4515ee21e7"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group2-20261006-v2.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group2-20261006-v2.stdout": {
+      "bytes": 231,
+      "sha256": "62e2680341c323de1f1e89d0ac0e82d6c2b17e1b1faac3de189fa55a4a38bc10"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group2-20261006-v2.system-floor.json": {
+      "bytes": 18660,
+      "sha256": "999d02f6e23a5d43b874dc74971e62fcccaef5f50bf744b226dfb236ff828344"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group2-20261006-v2.unit-cleanup.json": {
+      "bytes": 723,
+      "sha256": "cca0bddfd70709ae3025ea560738cb3f070da2e6de598b30c30b12b91b46fe80"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group3-20261006-v2.acceptance.json": {
+      "bytes": 378,
+      "sha256": "3327dd7bd283497e23d5ca9be48b242850cbf405d31a1dc8ef3d67fc97586093"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group3-20261006-v2.child-identity.json": {
+      "bytes": 78,
+      "sha256": "afcc1e6795b4648027d1cd94edd7166c04c4d3e3932ca081e74176fc276a3b81"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group3-20261006-v2.config.json": {
+      "bytes": 63362,
+      "sha256": "cd35e4117cfc35f11e0acdfeab5d81e9a44aca537807a719666bcbe7b68f56ba"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group3-20261006-v2.external-lease.json": {
+      "bytes": 487,
+      "sha256": "6a35bfa912da7ccaac061dcb99b39b35cec3653094e237b9f4eda240a22662e9"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group3-20261006-v2.final.json": {
+      "bytes": 4893,
+      "sha256": "ea0d6fe14ff4d230b15fcd44935de7dd4d47e82a6b6c17f2b00c7bff864d9af1"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group3-20261006-v2.input_seal.json": {
+      "bytes": 61828,
+      "sha256": "6f7f85ad72f149bd1b93fcf583ff85fdc2bf5ffb0578f9f0cfe9676425190640"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group3-20261006-v2.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "10190356bc7baac74d0e6275a9429aeb576b2559630151cd285e5bce8fa4f5b2"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group3-20261006-v2.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "168c1b0dc985d51cd4f4e180e10c724fd963689607397989e3d7c68235a24351"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group3-20261006-v2.output_seal.json": {
+      "bytes": 514053,
+      "sha256": "f539403dee3eb92c110cb9881a4b4268f8cca1c57f14925115f69b956830f9df"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group3-20261006-v2.publication.json": {
+      "bytes": 2768,
+      "sha256": "32a5cdccdd8bb8ab07f32a498212a421c0f2c95e823c8ec00d7e0ec7c4d7e99e"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group3-20261006-v2.quiescence.json": {
+      "bytes": 130,
+      "sha256": "5f34eb9a44ba3b11011baa77756bbc6b47b9a22ee05d3718c654f5fa9bdc74b3"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group3-20261006-v2.release.json": {
+      "bytes": 175,
+      "sha256": "5075b287f77c28c9bebe3628eef085dca347142ae8f0d10c5ab5b239b1d66818"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group3-20261006-v2.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "3b1fe4d17f53948764892469b666a94de1ce392e37ba8deb5644c116551bba84"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group3-20261006-v2.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group3-20261006-v2.stdout": {
+      "bytes": 2020,
+      "sha256": "081a27fbf29e9cd82da03f658536a7cd2621d782f7d24070332ca0a77fa5e0b2"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group3-20261006-v2.system-floor.json": {
+      "bytes": 59987,
+      "sha256": "d73df19fb790e5ac9e1be431123c307939ffbca02fa465f52328f42a15ac270e"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group3-20261006-v2.unit-cleanup.json": {
+      "bytes": 723,
+      "sha256": "c5b5fcb2265591ffcf2c3bbb8792fdc41bc645304c5ebaca1c673a2bd4501997"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group4-20261006-v2.acceptance.json": {
+      "bytes": 378,
+      "sha256": "19674af84b0f2d60819766aad55a84cdae4c0f127e57ea10b6eb42ebbf3d30a2"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group4-20261006-v2.child-identity.json": {
+      "bytes": 78,
+      "sha256": "ff90fb7295df35d007454c65e5155e1eb099e35bfa444c40f470d608387148d6"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group4-20261006-v2.config.json": {
+      "bytes": 63849,
+      "sha256": "9c9696180e1781ccc4063d27f2bb8c8779e9ab4a1e8215ed83824342f0b87b8d"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group4-20261006-v2.external-lease.json": {
+      "bytes": 487,
+      "sha256": "d2226a4578f47966b2ce7fe347a021f90d4de55f04d473eb5f5153a485db226c"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group4-20261006-v2.final.json": {
+      "bytes": 4885,
+      "sha256": "b43a6efe344e464b89cfb55cd8f6a0332ebdb2c23dcfd936e298712a796b60e7"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group4-20261006-v2.input_seal.json": {
+      "bytes": 62174,
+      "sha256": "b0a47afe8f8b9bd90bad6268ba702e679d5240f0002d86b3dfe77e15664d38ce"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group4-20261006-v2.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "d8d7c196b9d7ab59074d034f7f4f291f0eccb48a2d05ff89581587af09ec447a"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group4-20261006-v2.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "0af64a45edad4c9dbf10e690a2307d1882efe2190d662dd783493f9dec963b45"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group4-20261006-v2.output_seal.json": {
+      "bytes": 2120,
+      "sha256": "36315d87b0697102b5fd7d8841a70c608d294f0f494d38cfeb567f8d6c3418ee"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group4-20261006-v2.publication.json": {
+      "bytes": 2759,
+      "sha256": "6690e2777d968a290e88839a0a80144f61d07cc140bdbf74f8fa9861995ae4b7"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group4-20261006-v2.quiescence.json": {
+      "bytes": 130,
+      "sha256": "3b3004ba68b8b6d7a3ed91032f02782bb66819cb6585f4cd02a1b0360f331b18"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group4-20261006-v2.release.json": {
+      "bytes": 175,
+      "sha256": "8bef33f91a6751a66637d0b54322be5177823677c06515b14728d934940756c6"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group4-20261006-v2.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "5ad2e9507d852c00840b57869ebf5ef08f3fe3e351d50cfbf4a09fe0abb41e10"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group4-20261006-v2.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group4-20261006-v2.stdout": {
+      "bytes": 213,
+      "sha256": "123f5ea60832ed0e3fc310901b36ab081bf15a4db0b0c146dd28f795f93f2400"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group4-20261006-v2.system-floor.json": {
+      "bytes": 197,
+      "sha256": "1de298015dd52ed3cb23ccb9df26bed107ff06c2f467744dec95aba6e1693c15"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group4-20261006-v2.unit-cleanup.json": {
+      "bytes": 723,
+      "sha256": "e2319de035bf3f4d17d34e1bcd0b3098e5cdf8e892c7a9ec5e0b9f0ab624e40a"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "3a2c620a8d85ca068e00ef85d00d0ec9a7eae31cb0819bba5988a6d540b2546f"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "c3db4c21eeaf0e943de2daafd2bc536463de355ced987d9932981c770c186535"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v1.config.json": {
+      "bytes": 63946,
+      "sha256": "58403647ff188d4647fc7050e226e9734fcb6b3fd84a319f76c8d7f190105958"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "4517b759a16f7a2ae99eda19b31f6e069c987e42c27c46eb5546448f84264b8d"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v1.final.json": {
+      "bytes": 4885,
+      "sha256": "974469d69e6edb5e886a5d90b8b8084026e7b3f4e55ef9e9a42a7aef2c651fbd"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v1.input_seal.json": {
+      "bytes": 62321,
+      "sha256": "c4112099efa9f8efcc8d2ceaf1ab81d8cd406e384ff8189b160349862e5c73e3"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "613756dfce43f42b9e82b43ccb1453c03f2dbf109036c8d454c7b9fead5bbea5"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "59d1f1ccaf2e5fd8208194584863dfb5acaa31611cda78c5ab102fcdaf64a07c"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v1.output_seal.json": {
+      "bytes": 2262,
+      "sha256": "a3e2646ae74ffd647966e786f01462778153328daf29db8615186fd7c0fb37b3"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v1.publication.json": {
+      "bytes": 2759,
+      "sha256": "8f38d034eb46f9255e84526486704fa097fd735508fd2087f50ad195e9ffd9c2"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "cf939162f8c9f23d036f727bb2bf0d1391a5c04effef795d08836ded351a2ade"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "e3d136386faa9bec1809a25c88a333455b696fe64a216b05491c21ad86cc837f"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "7436bd54e025f7700d20922333c5135912ebf2fd80cd42d14ddf1412e616d3cd"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v1.stdout": {
+      "bytes": 116,
+      "sha256": "7751942fcb043d4e2f5c0df701cc451276fde106047d1bd94a97b73e20e7d767"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v1.system-floor.json": {
+      "bytes": 197,
+      "sha256": "551773bca79bbe6d3b2096211eec71a5cbb43d87630bb8797f78526793bf71b1"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v1.unit-cleanup.json": {
+      "bytes": 723,
+      "sha256": "e953ab983a807aadb76db5da4b17d2f67e909424c5e2c030c2395a515f0f2502"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v2.acceptance.json": {
+      "bytes": 378,
+      "sha256": "9025975fd59c6aa85120ca6bec0fc869eb9108a0cdbffb40533385598cd080f3"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v2.child-identity.json": {
+      "bytes": 78,
+      "sha256": "ef7083a0636b5e0ccb2daee333825fb8a436521a9e41d8732a68afa28af80547"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v2.config.json": {
+      "bytes": 63997,
+      "sha256": "8c51a9bea31db6e278e45c5210c5c0b8ede8610795eb8a06f21cc4da8db0cde4"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v2.external-lease.json": {
+      "bytes": 487,
+      "sha256": "993625ad354efa22a3c0fe482da0c6b793ddc24e86ecae9304c4d8558cf763ca"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v2.final.json": {
+      "bytes": 4887,
+      "sha256": "272432e44dbb031af9ca41df550266583001dbb33a7f841d54371c6277ee8e2b"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v2.input_seal.json": {
+      "bytes": 62164,
+      "sha256": "99a12794ddfa868d0259b6d5031930d4659e00043deb34cb6386526c3cac84fc"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v2.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "d73b8c609468bfde1ac05f11b2551b2b693f9b826ba1713355835dede1efb50e"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v2.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "8734b28af0beec6653a2832a0989c3f40f379cc1cdc24c93c7131c7318776519"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v2.output_seal.json": {
+      "bytes": 13655,
+      "sha256": "9978c2d4dd2007c48d1ecb97a447272832513d406fd7a30dd9b71dce172d9500"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v2.publication.json": {
+      "bytes": 2763,
+      "sha256": "74c4979117130fffa389dea26f98a7c629e26b69dc8edc7186464b8f11e797d0"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v2.quiescence.json": {
+      "bytes": 130,
+      "sha256": "9c4f1ba8337c710e4e098264e743ceefbf702c8a8433ee35d07c4fafebd1c705"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v2.release.json": {
+      "bytes": 175,
+      "sha256": "610b0dac46f7e8580ffcc0532a45488fa22bb76f4f357693cfeac2dbaef843b9"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v2.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "1e3008b92f9ee456f2da84b231c518b48d45ea9c438ba48aa6bdec9b54c945b2"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v2.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v2.stdout": {
+      "bytes": 200,
+      "sha256": "d5a607617c4ebfec517d20ea6851ee05054a03dde60aae092f13fdc89d3819dc"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v2.system-floor.json": {
+      "bytes": 1517,
+      "sha256": "e2090f9e362a064e57c45759f4eb08da471b65d2e2c54cfb0c7f256b6b265da8"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v2.unit-cleanup.json": {
+      "bytes": 723,
+      "sha256": "4f2b0a94c6ce5a12707b038a9edb20ec76edaa64006cd7d4fb7f7fc14377d392"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "02d39af3ce2aa59c8ae05a8b2d07103372797ff636642bc7d0034b6448fc7c99"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "1b5dfaadaa034f6448e62b115c0b6b6a88370f6693442673f507a93f40a55ac5"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v1.config.json": {
+      "bytes": 63144,
+      "sha256": "01e1f392683b96d4713c54f4f5fb9448606f440b9bcb58795485ea03dad4d550"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "3c850b658e1ada1f084585d59e063331f31a30057b572b2d89de48e1bda9c585"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v1.final.json": {
+      "bytes": 4885,
+      "sha256": "430d2dace84a4bdab271f74f3373530c9d2e7521a3fc462b0e926b94699af055"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v1.input_seal.json": {
+      "bytes": 61542,
+      "sha256": "7c466f9f8b63f199e81e3c5ec0c8126a814163bd53aa93244e2fff14f853fb31"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "21dc66a2f2c2b4f3fe524e7d636640c2226450ecf0859b02a4acaed72e23e4f0"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "6ea1b2aac6d116274bf8de508c2bc379ceb7defb1568e4d27d580efd1787a4bf"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v1.output_seal.json": {
+      "bytes": 1761,
+      "sha256": "5f9523d56bb43a750a3843df7469cf133021c56af0461b83688b3b450fff1446"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v1.publication.json": {
+      "bytes": 2760,
+      "sha256": "d420c1d0c637268df55a7dc300e921695bc5e1670598871b27c3e34ccafd7ed2"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "fe88718d57a3a71f4da6621a451d1fb07dc6252f93cdb8ef956d7534b24e7c32"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "cfb884e67317b308b3f5f4b6f335f0e16c1a0b3f2ebb7822423955832fea61db"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "ea9e97073b806e79435db234aa884e1877fce8fe024f4e25b68c186b2431b009"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v1.stdout": {
+      "bytes": 116,
+      "sha256": "7751942fcb043d4e2f5c0df701cc451276fde106047d1bd94a97b73e20e7d767"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v1.system-floor.json": {
+      "bytes": 198,
+      "sha256": "22a60e7b37b501672589e246da5845fdf048aec982cae9bc8f1d4409c0a5f1d7"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v1.unit-cleanup.json": {
+      "bytes": 723,
+      "sha256": "47d49819a5f183775f790f6024605b099065b867c0f13c4fcbea70e5b96e14f6"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v2.acceptance.json": {
+      "bytes": 378,
+      "sha256": "62454cf4e7c99b9fc02387249c6de2dd3fef48184bd9f10a102d9b37093beb2e"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v2.child-identity.json": {
+      "bytes": 78,
+      "sha256": "02d6633c0ceae228c9e80b63a356624c8c0aa5c675dfa04226eff4f0f55408de"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v2.config.json": {
+      "bytes": 63195,
+      "sha256": "4e418f1369d61b5431ac46565240f9eb542b3a553e6d2900a7a0d858eb44b65f"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v2.external-lease.json": {
+      "bytes": 487,
+      "sha256": "427968c11748987a09e588e666aa3605dd692aa8f4ab8d92dd93eff6677d93b8"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v2.final.json": {
+      "bytes": 4894,
+      "sha256": "07b0431d73ada087209e4027762b0b769de8fab3dfd1f65baf8ea97b74c6324f"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v2.input_seal.json": {
+      "bytes": 61385,
+      "sha256": "b09c63f7795a756e85b7a43e7f836913e97485077db9270b229d3e25c26c4e86"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v2.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "767af4b9aa64e411838bfe9ab2e662a5d517f580bda797ab34c48e140e9d839c"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v2.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "76645bdc586e4b083e8581966ef150ed23de3e7e6a917343a4c9652d2ef69b68"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v2.output_seal.json": {
+      "bytes": 140583,
+      "sha256": "3c7158e00c336986cf97bdb81e9bebaa3452bc4137e96583a9991c42e02de53e"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v2.publication.json": {
+      "bytes": 2769,
+      "sha256": "0d044f4c79e3b8a4baa1d13a2b540057f2d6dba9d9c57b4ea3ca23a0638dc335"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v2.quiescence.json": {
+      "bytes": 130,
+      "sha256": "86c8be15fa6fff22b7ca28ff8e3995bb2c43bba14994c656b4cda31d76f67a78"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v2.release.json": {
+      "bytes": 175,
+      "sha256": "35090df5bfeef37fc24b9677775ed13d9c83060f13656432561517fb47a145e0"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v2.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "aad0fd333388211ef53231338f0d5322063f2e56eef60094c69d3363332ea7a3"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v2.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v2.stdout": {
+      "bytes": 17156,
+      "sha256": "9d5b2cdacbd6e1050c3d7fbd04d16e404bda6c9b75df9311d5b49975c1c7152e"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v2.system-floor.json": {
+      "bytes": 16139,
+      "sha256": "99ae11332b85db05e2cba6e905f77a534ac624c6607ae9edd18d11daac39b3bc"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v2.unit-cleanup.json": {
+      "bytes": 723,
+      "sha256": "2d9f14125a8cd717f18c5f4eeea04e5d2d9be3d2cd321c71b13a66b5cdcb3aec"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group7-20261006-v2.acceptance.json": {
+      "bytes": 378,
+      "sha256": "f4f6df5c6e18b1c454ef0f7f516cadd2a5d69ed744e7c03140417c827b96c30c"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group7-20261006-v2.child-identity.json": {
+      "bytes": 78,
+      "sha256": "e743ddd0277e45f65a4049afda55e184a49d3a5d1a90b53df4a7a54c90c3a3de"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group7-20261006-v2.config.json": {
+      "bytes": 62981,
+      "sha256": "c4d33c66a3c0aa2dce03191098edd42b73137e934d1e10a83517c06ebdfaea48"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group7-20261006-v2.external-lease.json": {
+      "bytes": 487,
+      "sha256": "95dbca9113d1627220cea6d3389d0259473844c2f606e688e08665d8d74bff2b"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group7-20261006-v2.final.json": {
+      "bytes": 4887,
+      "sha256": "c551d6c5877aee08cccf21c30cf249fb4c1a72861ce98e21c10f3e4501a7657a"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group7-20261006-v2.input_seal.json": {
+      "bytes": 61375,
+      "sha256": "9c26c076799b544fd722fa5df96f8c0674811eee4acc7a7d10caa190afb2f5c3"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group7-20261006-v2.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "1bf432b9b26a01605670bc028aa0a70e71b25785639b9723430e411be65bfcdb"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group7-20261006-v2.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "1e37b26df12d607ec1f92b09a8bf4e96b945e46c58cb8e59703caeb3b4f8cdfc"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group7-20261006-v2.output_seal.json": {
+      "bytes": 15920,
+      "sha256": "d5e0b4fddb88e1a6e4b8ba7da9df6466e765c5265351fd655774aa82222bb5aa"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group7-20261006-v2.publication.json": {
+      "bytes": 2763,
+      "sha256": "4c278aab191543f3d1d7f13962a6d903c679f4b02bee66d7ed84a23b5874edf1"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group7-20261006-v2.quiescence.json": {
+      "bytes": 130,
+      "sha256": "dc877f734747c41e6a7a6b127b2153199b8172e7565a242f54d4f921f36e1ee3"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group7-20261006-v2.release.json": {
+      "bytes": 175,
+      "sha256": "ccff17f230df705502be51502e54fd4733a2b877180f1e5e0c0dddd8712cffa7"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group7-20261006-v2.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "a08281fb0f48a7aa0b88cc516dbc15adf04fd69428376b10fe70b8344ed1a00a"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group7-20261006-v2.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group7-20261006-v2.stdout": {
+      "bytes": 240,
+      "sha256": "0837874de868e121d0bdca83e52de89639ca408a7925989d2effb1e615b3719f"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group7-20261006-v2.system-floor.json": {
+      "bytes": 1766,
+      "sha256": "9c11b2627b4eb7e55fae1ffb74d80f41feecc80501cf1e3d6d7c05a709998fe3"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group7-20261006-v2.unit-cleanup.json": {
+      "bytes": 723,
+      "sha256": "c0a181f29fb1845c294c56f384a9d05ade7ead0146f34b30e13eafc74e65c39e"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-host-cuda-link-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "d401725cccffb754ef6a6eaea81628fd0a770be2a33b762d9d59e44ed60ac127"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-host-cuda-link-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "96c0a76f4b672990e4eaa993aa7a52c0d9e57d6404f05b677c80e7e8c20bc0eb"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-host-cuda-link-20261006-v1.config.json": {
+      "bytes": 395824,
+      "sha256": "413cc5e01d25ea24bce1fff7761bda7b75c14aa66d0630f2bee4cda3498b293f"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-host-cuda-link-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "78ac0c5ba034b532b6c396fec5877b13f30d332ce03108a3ed6e99487a7b28c8"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-host-cuda-link-20261006-v1.final.json": {
+      "bytes": 4907,
+      "sha256": "d9f9a3aea22e5476d6737c8c853f117b391fe929191f7609583ecebe05befddf"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-host-cuda-link-20261006-v1.input_seal.json": {
+      "bytes": 338969,
+      "sha256": "e63af19a7aa510b764065095c24093f742826a9a28a5634aefc2e74a10df0590"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-host-cuda-link-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "bef474315898b48852c2ea25bbc24cec9c45046c259c10b33cb8f19384f9542e"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-host-cuda-link-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "fc05770e56ee63407e541f4d36c7119c432f7c3483a5b329ad7257999ee26b95"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-host-cuda-link-20261006-v1.output_seal.json": {
+      "bytes": 1340124,
+      "sha256": "60fb7f9996f98d5eb8d4fbfc52ac723365cb4af9973300ead40a25f3c42c872c"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-host-cuda-link-20261006-v1.publication.json": {
+      "bytes": 2781,
+      "sha256": "d1b8c4d3a44541ea847536f7712ac27ce735d56f94e7667055d866b905067eba"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-host-cuda-link-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "c62c4bcd636c7da972210fa809abf6e8e7a5b32aa38b996eb0ab50bb2c4e1e4a"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-host-cuda-link-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "f97cb7a41889b13e939db246b2fe162fb6d6ada45b30cb72db07eb59d70b22d3"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-host-cuda-link-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "0999cbfdb732d2adc1dbea4d7d1fa2dda4d9747bf2fe53fa8acc4775a9210635"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-host-cuda-link-20261006-v1.stderr": {
+      "bytes": 392,
+      "sha256": "d1ecdfca5e158642445195dca57d6b6517fb36dce14e53627d2480baf4fb2215"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-host-cuda-link-20261006-v1.stdout": {
+      "bytes": 37630,
+      "sha256": "9a412720529c5b586f91c9a269a325ef065165f5c60ec13678d99393e1ab77de"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-host-cuda-link-20261006-v1.system-floor.json": {
+      "bytes": 150800,
+      "sha256": "fede4342e3f5244a432e3d1eec6c7601c254fdd381b1dc1b5c923473926849a6"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-host-cuda-link-20261006-v1.unit-cleanup.json": {
+      "bytes": 723,
+      "sha256": "b384ffcee7de816084a2a025379a9e753159a90f3f3437f1408523da8ec5e3ea"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/owner/COHERENT_FOLLOWUP_CANDIDATE.v3.json": {
+      "bytes": 15444,
+      "sha256": "3b8a7d8fc115ad5eb1b681ad314486b0c51cf4910489c94c72929f6f913ea1e3"
+    },
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/owner/SOURCE_MANIFEST.v3.json": {
+      "bytes": 1373,
+      "sha256": "ebe94a13ae6d8733c41d70c4e617e1e76fb5a40f6d193f1f93e36d9765731f74"
+    }
+  },
+  "tracked_delta_paths": [
+    "crates/holonics/src/hnn/moment.rs",
+    "crates/holonics/src/hnn/prediction.rs",
+    "crates/holonics/src/hnn/tests/prediction.rs",
+    "docs/atlas/objects.tsv",
+    "research/records/2026-10-06_SOURCE_IDENTIFIABILITY_PRECEDES_THE_NEXT_PHYSICAL_MATERIAL_DEPOSIT.md",
+    "research/records/2026-10-06_THE_ACTUAL_SOURCE_RETURN_CHANGES_E_AT_THE_NEXT_CONTEMPORARY_OPENING.md",
+    "research/records/2026-10-06_THE_LEAKY_SOURCE_COMPLETION_DOMAIN_READS_ITS_ACTUAL_ROUNDED_FEATURES.md",
+    "research/records/README.md",
+    "research/records/receipts/leaky-source-domain-20261006/SOURCE_REVIEW.v1.json",
+    "research/records/receipts/leaky-source-domain-20261006/SOURCE_REVIEW.v2.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/ACCEPTANCE_JOIN.v1.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/EXECUTABLE_DELTA_894_TO_189.patch",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/QUEUE_VALIDATION.original.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-20261006/CACHE_SNAPSHOT.v2.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-20261006/COMPILED_ARTIFACTS.v1.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-20261006/LOCAL_CACHE_SOURCE_BINDING_REFUSAL.v1.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-20261006/PREPARATION.v2.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-20261006/PREPARATION_REQUEST.v1.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-20261006/SOURCE_SNAPSHOT.v1.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-cache-preparation-20261006-v1.acceptance.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-cache-preparation-20261006-v1.child-identity.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-cache-preparation-20261006-v1.config.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-cache-preparation-20261006-v1.external-lease.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-cache-preparation-20261006-v1.final.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-cache-preparation-20261006-v1.input_seal.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-cache-preparation-20261006-v1.lease-identity.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-cache-preparation-20261006-v1.memory-gate.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-cache-preparation-20261006-v1.output_seal.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-cache-preparation-20261006-v1.publication.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-cache-preparation-20261006-v1.quiescence.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-cache-preparation-20261006-v1.release.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-cache-preparation-20261006-v1.stage-quiescence.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-cache-preparation-20261006-v1.stderr",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-cache-preparation-20261006-v1.stdout",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-cache-preparation-20261006-v1.system-floor.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-cache-preparation-20261006-v1.unit-cleanup.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group6-20261006-v1.acceptance.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group6-20261006-v1.child-identity.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group6-20261006-v1.config.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group6-20261006-v1.external-lease.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group6-20261006-v1.final.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group6-20261006-v1.input_seal.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group6-20261006-v1.lease-identity.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group6-20261006-v1.memory-gate.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group6-20261006-v1.output_seal.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group6-20261006-v1.publication.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group6-20261006-v1.quiescence.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group6-20261006-v1.release.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group6-20261006-v1.stage-quiescence.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group6-20261006-v1.stderr",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group6-20261006-v1.stdout",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group6-20261006-v1.system-floor.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group6-20261006-v1.unit-cleanup.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group7-20261006-v1.acceptance.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group7-20261006-v1.child-identity.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group7-20261006-v1.config.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group7-20261006-v1.external-lease.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group7-20261006-v1.final.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group7-20261006-v1.input_seal.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group7-20261006-v1.lease-identity.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group7-20261006-v1.memory-gate.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group7-20261006-v1.output_seal.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group7-20261006-v1.publication.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group7-20261006-v1.quiescence.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group7-20261006-v1.release.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group7-20261006-v1.stage-quiescence.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group7-20261006-v1.stderr",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group7-20261006-v1.stdout",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group7-20261006-v1.system-floor.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-control-group7-20261006-v1.unit-cleanup.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v1.acceptance.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v1.child-identity.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v1.config.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v1.external-lease.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v1.final.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v1.input_seal.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v1.lease-identity.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v1.memory-gate.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v1.output_seal.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v1.publication.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v1.quiescence.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v1.release.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v1.stage-quiescence.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v1.stderr",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v1.stdout",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v1.system-floor.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v1.unit-cleanup.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v2.acceptance.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v2.child-identity.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v2.config.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v2.external-lease.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v2.final.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v2.input_seal.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v2.lease-identity.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v2.memory-gate.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v2.output_seal.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v2.publication.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v2.quiescence.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v2.release.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v2.stage-quiescence.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v2.stderr",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v2.stdout",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v2.system-floor.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v2.unit-cleanup.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/owner/COHERENT_FOLLOWUP_CANDIDATE.v4.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-18968dc9-completeness/metadata/owner/SOURCE_MANIFEST.v4.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/QUEUE_VALIDATION.original.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-20261006/CACHE_SNAPSHOT.v2.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-20261006/COMPILED_ARTIFACTS.v1.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-20261006/PREPARATION.v2.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-20261006/PREPARATION_REQUEST.v1.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-20261006/SOURCE_SNAPSHOT.v1.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-20261006/ZERO_TEST_WRAPPER_REFUSAL.v1.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-cache-preparation-20261006-v1.acceptance.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-cache-preparation-20261006-v1.child-identity.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-cache-preparation-20261006-v1.config.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-cache-preparation-20261006-v1.external-lease.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-cache-preparation-20261006-v1.final.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-cache-preparation-20261006-v1.input_seal.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-cache-preparation-20261006-v1.lease-identity.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-cache-preparation-20261006-v1.memory-gate.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-cache-preparation-20261006-v1.output_seal.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-cache-preparation-20261006-v1.publication.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-cache-preparation-20261006-v1.quiescence.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-cache-preparation-20261006-v1.release.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-cache-preparation-20261006-v1.stage-quiescence.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-cache-preparation-20261006-v1.stderr",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-cache-preparation-20261006-v1.stdout",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-cache-preparation-20261006-v1.system-floor.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-cache-preparation-20261006-v1.unit-cleanup.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group1-20261006-v2.acceptance.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group1-20261006-v2.child-identity.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group1-20261006-v2.config.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group1-20261006-v2.external-lease.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group1-20261006-v2.final.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group1-20261006-v2.input_seal.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group1-20261006-v2.lease-identity.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group1-20261006-v2.memory-gate.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group1-20261006-v2.output_seal.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group1-20261006-v2.publication.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group1-20261006-v2.quiescence.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group1-20261006-v2.release.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group1-20261006-v2.stage-quiescence.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group1-20261006-v2.stderr",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group1-20261006-v2.stdout",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group1-20261006-v2.system-floor.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group1-20261006-v2.unit-cleanup.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group2-20261006-v2.acceptance.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group2-20261006-v2.child-identity.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group2-20261006-v2.config.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group2-20261006-v2.external-lease.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group2-20261006-v2.final.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group2-20261006-v2.input_seal.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group2-20261006-v2.lease-identity.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group2-20261006-v2.memory-gate.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group2-20261006-v2.output_seal.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group2-20261006-v2.publication.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group2-20261006-v2.quiescence.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group2-20261006-v2.release.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group2-20261006-v2.stage-quiescence.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group2-20261006-v2.stderr",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group2-20261006-v2.stdout",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group2-20261006-v2.system-floor.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group2-20261006-v2.unit-cleanup.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group3-20261006-v2.acceptance.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group3-20261006-v2.child-identity.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group3-20261006-v2.config.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group3-20261006-v2.external-lease.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group3-20261006-v2.final.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group3-20261006-v2.input_seal.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group3-20261006-v2.lease-identity.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group3-20261006-v2.memory-gate.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group3-20261006-v2.output_seal.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group3-20261006-v2.publication.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group3-20261006-v2.quiescence.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group3-20261006-v2.release.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group3-20261006-v2.stage-quiescence.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group3-20261006-v2.stderr",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group3-20261006-v2.stdout",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group3-20261006-v2.system-floor.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group3-20261006-v2.unit-cleanup.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group4-20261006-v2.acceptance.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group4-20261006-v2.child-identity.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group4-20261006-v2.config.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group4-20261006-v2.external-lease.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group4-20261006-v2.final.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group4-20261006-v2.input_seal.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group4-20261006-v2.lease-identity.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group4-20261006-v2.memory-gate.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group4-20261006-v2.output_seal.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group4-20261006-v2.publication.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group4-20261006-v2.quiescence.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group4-20261006-v2.release.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group4-20261006-v2.stage-quiescence.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group4-20261006-v2.stderr",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group4-20261006-v2.stdout",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group4-20261006-v2.system-floor.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group4-20261006-v2.unit-cleanup.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v1.acceptance.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v1.child-identity.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v1.config.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v1.external-lease.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v1.final.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v1.input_seal.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v1.lease-identity.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v1.memory-gate.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v1.output_seal.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v1.publication.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v1.quiescence.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v1.release.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v1.stage-quiescence.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v1.stderr",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v1.stdout",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v1.system-floor.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v1.unit-cleanup.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v2.acceptance.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v2.child-identity.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v2.config.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v2.external-lease.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v2.final.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v2.input_seal.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v2.lease-identity.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v2.memory-gate.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v2.output_seal.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v2.publication.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v2.quiescence.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v2.release.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v2.stage-quiescence.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v2.stderr",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v2.stdout",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v2.system-floor.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group5-20261006-v2.unit-cleanup.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v1.acceptance.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v1.child-identity.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v1.config.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v1.external-lease.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v1.final.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v1.input_seal.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v1.lease-identity.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v1.memory-gate.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v1.output_seal.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v1.publication.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v1.quiescence.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v1.release.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v1.stage-quiescence.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v1.stderr",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v1.stdout",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v1.system-floor.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v1.unit-cleanup.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v2.acceptance.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v2.child-identity.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v2.config.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v2.external-lease.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v2.final.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v2.input_seal.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v2.lease-identity.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v2.memory-gate.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v2.output_seal.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v2.publication.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v2.quiescence.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v2.release.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v2.stage-quiescence.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v2.stderr",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v2.stdout",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v2.system-floor.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group6-20261006-v2.unit-cleanup.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group7-20261006-v2.acceptance.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group7-20261006-v2.child-identity.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group7-20261006-v2.config.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group7-20261006-v2.external-lease.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group7-20261006-v2.final.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group7-20261006-v2.input_seal.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group7-20261006-v2.lease-identity.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group7-20261006-v2.memory-gate.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group7-20261006-v2.output_seal.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group7-20261006-v2.publication.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group7-20261006-v2.quiescence.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group7-20261006-v2.release.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group7-20261006-v2.stage-quiescence.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group7-20261006-v2.stderr",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group7-20261006-v2.stdout",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group7-20261006-v2.system-floor.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-control-group7-20261006-v2.unit-cleanup.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-host-cuda-link-20261006-v1.acceptance.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-host-cuda-link-20261006-v1.child-identity.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-host-cuda-link-20261006-v1.config.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-host-cuda-link-20261006-v1.external-lease.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-host-cuda-link-20261006-v1.final.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-host-cuda-link-20261006-v1.input_seal.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-host-cuda-link-20261006-v1.lease-identity.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-host-cuda-link-20261006-v1.memory-gate.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-host-cuda-link-20261006-v1.output_seal.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-host-cuda-link-20261006-v1.publication.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-host-cuda-link-20261006-v1.quiescence.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-host-cuda-link-20261006-v1.release.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-host-cuda-link-20261006-v1.stage-quiescence.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-host-cuda-link-20261006-v1.stderr",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-host-cuda-link-20261006-v1.stdout",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-host-cuda-link-20261006-v1.system-floor.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/admission-v1/hnn-material-894c5d98-host-cuda-link-20261006-v1.unit-cleanup.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/owner/COHERENT_FOLLOWUP_CANDIDATE.v3.json",
+    "research/records/receipts/physical-source-deposition-20261006/accepted-source-join-18968dc9/native-validation-material-894c5d98/metadata/owner/SOURCE_MANIFEST.v3.json"
+  ],
+  "tracked_source_matches_commit": true
+}

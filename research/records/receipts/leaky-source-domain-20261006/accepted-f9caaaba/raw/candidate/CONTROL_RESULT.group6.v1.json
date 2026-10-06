@@ -1,0 +1,31 @@
+{
+  "passed": true,
+  "label": "hnn-material-f9caaaba-control-group6-20261006-v1",
+  "source_commit": "f9caaabae3ad1d722eece0e01f0f438104447ae2",
+  "expected_tests": 1,
+  "actual_test_names": [
+    "hnn::tests::prediction::physical_repair::the_actual_leaky_source_return_changes_e_before_the_next_target_free_carried_word"
+  ],
+  "test_count_and_source_binding_verified": true,
+  "quiescent": true,
+  "issues": [],
+  "measurement": {
+    "wall_ns": 4617181411,
+    "fixed_deadline_ns": 16000000000,
+    "measured_to_fixed_deadline": {
+      "numerator": 4617181411,
+      "denominator": 16000000000
+    },
+    "aggregate_CPU_ns": 4551401000,
+    "aggregate_CPU_limit_us": 17000000,
+    "group_peak_bytes": 18759680,
+    "peak_child_RSS_KiB": 28356,
+    "first_matching_development_read_counted_once": true,
+    "subsequent_same_shape_projection_unit_upper_ns": 4617181411
+  },
+  "raw_stdout": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-control-group6-20261006-v1.stdout",
+  "raw_stderr": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-control-group6-20261006-v1.stderr",
+  "unchanged_predecessor_acceptances_remain_independent": true,
+  "scientific_job": false,
+  "GPU_runtime": false
+}

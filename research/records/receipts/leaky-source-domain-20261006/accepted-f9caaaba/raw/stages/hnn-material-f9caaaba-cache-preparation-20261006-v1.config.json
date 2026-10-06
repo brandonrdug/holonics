@@ -1,0 +1,84 @@
+{
+  "label": "hnn-material-f9caaaba-cache-preparation-20261006-v1",
+  "scope_unit": "holonics-prune-admission-hnn-material-f9caaaba-cache-preparation-20261006-v1",
+  "scientific_job": false,
+  "stage_kind": "preparation",
+  "cwd": "/home/b/Workspaces/holonics",
+  "scope": "Exact committed f9caaaba source and selected private test cache only; native18controls newly authorized; no compiler.",
+  "projection_ns": 17000000000,
+  "aggregate_cpu_limit_us": 17000000,
+  "aggregate_cpu_stop_margin_us": 1000000,
+  "group_memory_max_bytes": 4294967296,
+  "address_space_max_bytes": -1,
+  "minimum_MemAvailable_KiB": 8388608,
+  "system_floor_MemAvailable_KiB": 4194304,
+  "thread_budget": 1,
+  "inputs": [
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-20261006/PREPARATION_REQUEST.v1.json",
+    "/home/b/Workspaces/holonics/.local/wt/material-learning/.local/material-learning-followup-01a1030c-20261006/COHERENT_FOLLOWUP_CANDIDATE.v6.json",
+    "/home/b/Workspaces/holonics/.local/wt/material-learning/.local/material-learning-followup-01a1030c-20261006/SOURCE_INPUT_MANIFEST.v6.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-20261006/SOURCE_SNAPSHOT.v1.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/prepare_combined_test_cache_v2.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/final_stage.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/leased_stage_v2.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/bounded_stage_v1.py",
+    "/usr/bin/python3.14"
+  ],
+  "input_directories": [],
+  "expected_inputs": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-20261006/PREPARATION_REQUEST.v1.json": {
+      "sha256": "a5773ccd69b40527568e9f99ad51248febb815ea3edca1fd989d272ee5606e27",
+      "bytes": 958
+    },
+    "/home/b/Workspaces/holonics/.local/wt/material-learning/.local/material-learning-followup-01a1030c-20261006/COHERENT_FOLLOWUP_CANDIDATE.v6.json": {
+      "sha256": "99e9925da183acadac18a0bef5d07f1e46effc870372fc31092b36b2bd527f74",
+      "bytes": 26033
+    },
+    "/home/b/Workspaces/holonics/.local/wt/material-learning/.local/material-learning-followup-01a1030c-20261006/SOURCE_INPUT_MANIFEST.v6.json": {
+      "sha256": "69c70d984f0f6a3f6642e55f8e97781772006f3b8aa7a471ee9a15d7043dcba3",
+      "bytes": 47480
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-20261006/SOURCE_SNAPSHOT.v1.json": {
+      "sha256": "9bf63c67c917a430312eda36195f432d70dd6455e70165fc8dcdb55c77edb0f7",
+      "bytes": 47684
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/prepare_combined_test_cache_v2.py": {
+      "sha256": "7c241e2402df26821c82268ff3d38d4bf26c726acdd5a83b597edc64552f4435",
+      "bytes": 2795
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/final_stage.py": {
+      "sha256": "a0a5a94f157acf9a5127b756a036c6e86449dc2012af0f1e71d34aafa13bc79e",
+      "bytes": 10968
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/leased_stage_v2.py": {
+      "sha256": "bcf91456534e763a025613f39e82853d7a58529b399bb183d544d09a7a42f949",
+      "bytes": 5520
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/bounded_stage_v1.py": {
+      "sha256": "84b7d003089fa19881690e368200b2168b9d179c8e6573bdafab54369235cec2",
+      "bytes": 12645
+    },
+    "/usr/bin/python3.14": {
+      "sha256": "ac12d99c156d3c0ec708a2baf664d35b74f455572fe35fd57faa420ade5c3845",
+      "bytes": 14424
+    }
+  },
+  "outputs": [
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-20261006/CACHE_SNAPSHOT.v2.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-20261006/PREPARATION.v2.json"
+  ],
+  "argv": [
+    "/usr/bin/python3.14",
+    "-B",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/prepare_combined_test_cache_v2.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-20261006/PREPARATION_REQUEST.v1.json"
+  ],
+  "allocation_basis": {
+    "largest_selected_debug_preparation_wall_ns": 7606732134,
+    "existing_fixed_development_ceiling_ns": 17000000000,
+    "no_cap_raise": true,
+    "separate_cache_preparation": true
+  },
+  "confirmed_resource_handoff": "Parent finalized f9caaaba18control request; RHreleased, NSprepterminated/released; no active lease",
+  "read_partition_change": "Full cache preparation incomplete at unchanged17s. New declared read omits unused incremental/example output; fresh selected cache snapshot required. No source/cap raise or unchanged retry."
+}

@@ -1,0 +1,17 @@
+{
+  "source_commit": "f9caaabae3ad1d722eece0e01f0f438104447ae2",
+  "new_control_selector": "hnn::tests::prediction::physical_repair::the_actual_leaky_completion_chart_encloses_mixed_classes_and_an_erased_age_endpoint",
+  "declared_units": 1,
+  "largest_completed_matching_unit_wall_ns": 2182399262,
+  "fixed_measured_followup_projection_ns": 2182399262,
+  "actual_first_development_deadline_ns": 16000000000,
+  "first_conforming_development_read_counted_once": true,
+  "followup_run_launched": false,
+  "no_retroactive_deadline_change": true,
+  "bounded_operands": {
+    "native_Words": 19,
+    "native_completed_sources": 16,
+    "receiving_crossings_per_Word": 2,
+    "total_erasure_controls": "16-source subset, not exhaustive4^9"
+  }
+}

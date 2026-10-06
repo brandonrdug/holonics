@@ -1,0 +1,9 @@
+{
+  "kind": "receipt_metadata_only",
+  "native_and_Lean_job_rerun": false,
+  "prior_writer": "tools/preserve_hnn_f9caaaba_validation_v1.py",
+  "error": "KeyError: 'lean/Holonics/Foundation/ReframedRetainedMaps.lean'",
+  "actual_pinned_unchanged_Lean_owner": "lean/Holonics/HNN/ReframedMoment.lean",
+  "all_copied_evidence_retained": true,
+  "effect_on_completed_build_or_control_acceptance": false
+}

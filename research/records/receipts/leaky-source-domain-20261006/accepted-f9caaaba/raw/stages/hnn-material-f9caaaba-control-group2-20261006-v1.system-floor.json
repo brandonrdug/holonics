@@ -1,0 +1,895 @@
+{
+  "minimum_MemAvailable_KiB": 4194304,
+  "sampling_period_ns": 10000000,
+  "breached": false,
+  "samples": [
+    {
+      "since_start_ns": 2335825,
+      "MemAvailable_KiB": 11972056
+    },
+    {
+      "since_start_ns": 12785198,
+      "MemAvailable_KiB": 11972056
+    },
+    {
+      "since_start_ns": 23678301,
+      "MemAvailable_KiB": 11970348
+    },
+    {
+      "since_start_ns": 34507976,
+      "MemAvailable_KiB": 11969984
+    },
+    {
+      "since_start_ns": 45403704,
+      "MemAvailable_KiB": 11969984
+    },
+    {
+      "since_start_ns": 56070534,
+      "MemAvailable_KiB": 11969256
+    },
+    {
+      "since_start_ns": 66952817,
+      "MemAvailable_KiB": 11969256
+    },
+    {
+      "since_start_ns": 77940137,
+      "MemAvailable_KiB": 11968164
+    },
+    {
+      "since_start_ns": 88074109,
+      "MemAvailable_KiB": 11968164
+    },
+    {
+      "since_start_ns": 98450374,
+      "MemAvailable_KiB": 11968284
+    },
+    {
+      "since_start_ns": 109508557,
+      "MemAvailable_KiB": 11968156
+    },
+    {
+      "since_start_ns": 120532425,
+      "MemAvailable_KiB": 11968156
+    },
+    {
+      "since_start_ns": 131400472,
+      "MemAvailable_KiB": 11968156
+    },
+    {
+      "since_start_ns": 142222823,
+      "MemAvailable_KiB": 11968156
+    },
+    {
+      "since_start_ns": 153071132,
+      "MemAvailable_KiB": 11968156
+    },
+    {
+      "since_start_ns": 163878485,
+      "MemAvailable_KiB": 11968156
+    },
+    {
+      "since_start_ns": 174082017,
+      "MemAvailable_KiB": 11967904
+    },
+    {
+      "since_start_ns": 184084783,
+      "MemAvailable_KiB": 11966084
+    },
+    {
+      "since_start_ns": 194158943,
+      "MemAvailable_KiB": 11966084
+    },
+    {
+      "since_start_ns": 205162663,
+      "MemAvailable_KiB": 11966084
+    },
+    {
+      "since_start_ns": 215988511,
+      "MemAvailable_KiB": 11961988
+    },
+    {
+      "since_start_ns": 226819077,
+      "MemAvailable_KiB": 11961988
+    },
+    {
+      "since_start_ns": 237639003,
+      "MemAvailable_KiB": 11961988
+    },
+    {
+      "since_start_ns": 248470321,
+      "MemAvailable_KiB": 11961988
+    },
+    {
+      "since_start_ns": 260020816,
+      "MemAvailable_KiB": 11961988
+    },
+    {
+      "since_start_ns": 271047540,
+      "MemAvailable_KiB": 11961988
+    },
+    {
+      "since_start_ns": 281173707,
+      "MemAvailable_KiB": 11959940
+    },
+    {
+      "since_start_ns": 291553018,
+      "MemAvailable_KiB": 11959692
+    },
+    {
+      "since_start_ns": 301934162,
+      "MemAvailable_KiB": 11959692
+    },
+    {
+      "since_start_ns": 312011237,
+      "MemAvailable_KiB": 11959692
+    },
+    {
+      "since_start_ns": 322470058,
+      "MemAvailable_KiB": 11959692
+    },
+    {
+      "since_start_ns": 332854448,
+      "MemAvailable_KiB": 11959692
+    },
+    {
+      "since_start_ns": 343350428,
+      "MemAvailable_KiB": 11959692
+    },
+    {
+      "since_start_ns": 354365800,
+      "MemAvailable_KiB": 11959692
+    },
+    {
+      "since_start_ns": 365355645,
+      "MemAvailable_KiB": 11959692
+    },
+    {
+      "since_start_ns": 375735537,
+      "MemAvailable_KiB": 11959944
+    },
+    {
+      "since_start_ns": 386370277,
+      "MemAvailable_KiB": 11959944
+    },
+    {
+      "since_start_ns": 397425784,
+      "MemAvailable_KiB": 11959944
+    },
+    {
+      "since_start_ns": 407611743,
+      "MemAvailable_KiB": 11959944
+    },
+    {
+      "since_start_ns": 418377869,
+      "MemAvailable_KiB": 11959944
+    },
+    {
+      "since_start_ns": 429358617,
+      "MemAvailable_KiB": 11959944
+    },
+    {
+      "since_start_ns": 439556007,
+      "MemAvailable_KiB": 11959944
+    },
+    {
+      "since_start_ns": 450634418,
+      "MemAvailable_KiB": 11959944
+    },
+    {
+      "since_start_ns": 461630073,
+      "MemAvailable_KiB": 11959944
+    },
+    {
+      "since_start_ns": 472616982,
+      "MemAvailable_KiB": 11959944
+    },
+    {
+      "since_start_ns": 483539821,
+      "MemAvailable_KiB": 11960196
+    },
+    {
+      "since_start_ns": 494066919,
+      "MemAvailable_KiB": 11960196
+    },
+    {
+      "since_start_ns": 504510491,
+      "MemAvailable_KiB": 11960196
+    },
+    {
+      "since_start_ns": 515239658,
+      "MemAvailable_KiB": 11962244
+    },
+    {
+      "since_start_ns": 526081665,
+      "MemAvailable_KiB": 11962244
+    },
+    {
+      "since_start_ns": 537088572,
+      "MemAvailable_KiB": 11962244
+    },
+    {
+      "since_start_ns": 548061906,
+      "MemAvailable_KiB": 11962244
+    },
+    {
+      "since_start_ns": 559054666,
+      "MemAvailable_KiB": 11962244
+    },
+    {
+      "since_start_ns": 570040884,
+      "MemAvailable_KiB": 11967108
+    },
+    {
+      "since_start_ns": 581132349,
+      "MemAvailable_KiB": 11966868
+    },
+    {
+      "since_start_ns": 592074143,
+      "MemAvailable_KiB": 11966868
+    },
+    {
+      "since_start_ns": 603150179,
+      "MemAvailable_KiB": 11966868
+    },
+    {
+      "since_start_ns": 614085983,
+      "MemAvailable_KiB": 11966868
+    },
+    {
+      "since_start_ns": 624538912,
+      "MemAvailable_KiB": 11966868
+    },
+    {
+      "since_start_ns": 635305038,
+      "MemAvailable_KiB": 11966868
+    },
+    {
+      "since_start_ns": 646078697,
+      "MemAvailable_KiB": 11966868
+    },
+    {
+      "since_start_ns": 656968765,
+      "MemAvailable_KiB": 11966868
+    },
+    {
+      "since_start_ns": 667980861,
+      "MemAvailable_KiB": 11966868
+    },
+    {
+      "since_start_ns": 678980975,
+      "MemAvailable_KiB": 11966868
+    },
+    {
+      "since_start_ns": 690038988,
+      "MemAvailable_KiB": 11965888
+    },
+    {
+      "since_start_ns": 701017331,
+      "MemAvailable_KiB": 11965860
+    },
+    {
+      "since_start_ns": 711843239,
+      "MemAvailable_KiB": 11978348
+    },
+    {
+      "since_start_ns": 722073090,
+      "MemAvailable_KiB": 11978404
+    },
+    {
+      "since_start_ns": 733072573,
+      "MemAvailable_KiB": 11978152
+    },
+    {
+      "since_start_ns": 743977178,
+      "MemAvailable_KiB": 11978152
+    },
+    {
+      "since_start_ns": 754898905,
+      "MemAvailable_KiB": 11978152
+    },
+    {
+      "since_start_ns": 765752664,
+      "MemAvailable_KiB": 11978152
+    },
+    {
+      "since_start_ns": 776669382,
+      "MemAvailable_KiB": 11978156
+    },
+    {
+      "since_start_ns": 787463069,
+      "MemAvailable_KiB": 11978156
+    },
+    {
+      "since_start_ns": 798232160,
+      "MemAvailable_KiB": 11978032
+    },
+    {
+      "since_start_ns": 809025146,
+      "MemAvailable_KiB": 11978032
+    },
+    {
+      "since_start_ns": 819870400,
+      "MemAvailable_KiB": 11978032
+    },
+    {
+      "since_start_ns": 830360068,
+      "MemAvailable_KiB": 11973924
+    },
+    {
+      "since_start_ns": 842068258,
+      "MemAvailable_KiB": 11973904
+    },
+    {
+      "since_start_ns": 852878847,
+      "MemAvailable_KiB": 11973904
+    },
+    {
+      "since_start_ns": 863160115,
+      "MemAvailable_KiB": 11973904
+    },
+    {
+      "since_start_ns": 873954373,
+      "MemAvailable_KiB": 11973904
+    },
+    {
+      "since_start_ns": 884757448,
+      "MemAvailable_KiB": 11973904
+    },
+    {
+      "since_start_ns": 895679756,
+      "MemAvailable_KiB": 11973904
+    },
+    {
+      "since_start_ns": 906580203,
+      "MemAvailable_KiB": 11973900
+    },
+    {
+      "since_start_ns": 917386935,
+      "MemAvailable_KiB": 11973648
+    },
+    {
+      "since_start_ns": 928153642,
+      "MemAvailable_KiB": 11973396
+    },
+    {
+      "since_start_ns": 938943973,
+      "MemAvailable_KiB": 11967800
+    },
+    {
+      "since_start_ns": 949741247,
+      "MemAvailable_KiB": 11959224
+    },
+    {
+      "since_start_ns": 960547518,
+      "MemAvailable_KiB": 11959224
+    },
+    {
+      "since_start_ns": 971303504,
+      "MemAvailable_KiB": 11947120
+    },
+    {
+      "since_start_ns": 981393604,
+      "MemAvailable_KiB": 11947120
+    },
+    {
+      "since_start_ns": 992196959,
+      "MemAvailable_KiB": 11942660
+    },
+    {
+      "since_start_ns": 1002983944,
+      "MemAvailable_KiB": 11939436
+    },
+    {
+      "since_start_ns": 1013775527,
+      "MemAvailable_KiB": 11952496
+    },
+    {
+      "since_start_ns": 1024530562,
+      "MemAvailable_KiB": 11962924
+    },
+    {
+      "since_start_ns": 1035326874,
+      "MemAvailable_KiB": 11962644
+    },
+    {
+      "since_start_ns": 1046138666,
+      "MemAvailable_KiB": 11962848
+    },
+    {
+      "since_start_ns": 1057697967,
+      "MemAvailable_KiB": 11962792
+    },
+    {
+      "since_start_ns": 1068327597,
+      "MemAvailable_KiB": 11967520
+    },
+    {
+      "since_start_ns": 1079161229,
+      "MemAvailable_KiB": 11967520
+    },
+    {
+      "since_start_ns": 1089997786,
+      "MemAvailable_KiB": 11967520
+    },
+    {
+      "since_start_ns": 1100264988,
+      "MemAvailable_KiB": 11967520
+    },
+    {
+      "since_start_ns": 1111080195,
+      "MemAvailable_KiB": 11967520
+    },
+    {
+      "since_start_ns": 1121900693,
+      "MemAvailable_KiB": 11966764
+    },
+    {
+      "since_start_ns": 1132754813,
+      "MemAvailable_KiB": 11966264
+    },
+    {
+      "since_start_ns": 1143558990,
+      "MemAvailable_KiB": 11966264
+    },
+    {
+      "since_start_ns": 1154426936,
+      "MemAvailable_KiB": 11966264
+    },
+    {
+      "since_start_ns": 1165370835,
+      "MemAvailable_KiB": 11965036
+    },
+    {
+      "since_start_ns": 1176387831,
+      "MemAvailable_KiB": 11964784
+    },
+    {
+      "since_start_ns": 1187299930,
+      "MemAvailable_KiB": 11964784
+    },
+    {
+      "since_start_ns": 1198128933,
+      "MemAvailable_KiB": 11964852
+    },
+    {
+      "since_start_ns": 1208959990,
+      "MemAvailable_KiB": 11964884
+    },
+    {
+      "since_start_ns": 1219756473,
+      "MemAvailable_KiB": 11964884
+    },
+    {
+      "since_start_ns": 1230583312,
+      "MemAvailable_KiB": 11964884
+    },
+    {
+      "since_start_ns": 1241470505,
+      "MemAvailable_KiB": 11964884
+    },
+    {
+      "since_start_ns": 1252327260,
+      "MemAvailable_KiB": 11964884
+    },
+    {
+      "since_start_ns": 1263151555,
+      "MemAvailable_KiB": 11964884
+    },
+    {
+      "since_start_ns": 1273958697,
+      "MemAvailable_KiB": 11964884
+    },
+    {
+      "since_start_ns": 1284745832,
+      "MemAvailable_KiB": 11964884
+    },
+    {
+      "since_start_ns": 1295535652,
+      "MemAvailable_KiB": 11964884
+    },
+    {
+      "since_start_ns": 1306300435,
+      "MemAvailable_KiB": 11964884
+    },
+    {
+      "since_start_ns": 1317078333,
+      "MemAvailable_KiB": 11964884
+    },
+    {
+      "since_start_ns": 1327882360,
+      "MemAvailable_KiB": 11964884
+    },
+    {
+      "since_start_ns": 1338664415,
+      "MemAvailable_KiB": 11964884
+    },
+    {
+      "since_start_ns": 1348679534,
+      "MemAvailable_KiB": 11964884
+    },
+    {
+      "since_start_ns": 1359303674,
+      "MemAvailable_KiB": 11965008
+    },
+    {
+      "since_start_ns": 1370079397,
+      "MemAvailable_KiB": 11965008
+    },
+    {
+      "since_start_ns": 1380887391,
+      "MemAvailable_KiB": 11965008
+    },
+    {
+      "since_start_ns": 1392090756,
+      "MemAvailable_KiB": 11965008
+    },
+    {
+      "since_start_ns": 1402991945,
+      "MemAvailable_KiB": 11965008
+    },
+    {
+      "since_start_ns": 1413275116,
+      "MemAvailable_KiB": 11965008
+    },
+    {
+      "since_start_ns": 1424163280,
+      "MemAvailable_KiB": 11965008
+    },
+    {
+      "since_start_ns": 1435008935,
+      "MemAvailable_KiB": 11965008
+    },
+    {
+      "since_start_ns": 1445802311,
+      "MemAvailable_KiB": 11965008
+    },
+    {
+      "since_start_ns": 1456668424,
+      "MemAvailable_KiB": 11965008
+    },
+    {
+      "since_start_ns": 1467485756,
+      "MemAvailable_KiB": 11965008
+    },
+    {
+      "since_start_ns": 1478352961,
+      "MemAvailable_KiB": 11964760
+    },
+    {
+      "since_start_ns": 1489338537,
+      "MemAvailable_KiB": 11964760
+    },
+    {
+      "since_start_ns": 1501074169,
+      "MemAvailable_KiB": 11964764
+    },
+    {
+      "since_start_ns": 1511471634,
+      "MemAvailable_KiB": 11964764
+    },
+    {
+      "since_start_ns": 1522284277,
+      "MemAvailable_KiB": 11964764
+    },
+    {
+      "since_start_ns": 1533077874,
+      "MemAvailable_KiB": 11962716
+    },
+    {
+      "since_start_ns": 1543863216,
+      "MemAvailable_KiB": 11962716
+    },
+    {
+      "since_start_ns": 1554758784,
+      "MemAvailable_KiB": 11962968
+    },
+    {
+      "since_start_ns": 1567080814,
+      "MemAvailable_KiB": 11962968
+    },
+    {
+      "since_start_ns": 1577946486,
+      "MemAvailable_KiB": 11962968
+    },
+    {
+      "since_start_ns": 1588765661,
+      "MemAvailable_KiB": 11964404
+    },
+    {
+      "since_start_ns": 1599547266,
+      "MemAvailable_KiB": 11964404
+    },
+    {
+      "since_start_ns": 1610293755,
+      "MemAvailable_KiB": 11964404
+    },
+    {
+      "since_start_ns": 1621078806,
+      "MemAvailable_KiB": 11964404
+    },
+    {
+      "since_start_ns": 1631853367,
+      "MemAvailable_KiB": 11964404
+    },
+    {
+      "since_start_ns": 1642621506,
+      "MemAvailable_KiB": 11964404
+    },
+    {
+      "since_start_ns": 1653229235,
+      "MemAvailable_KiB": 11964404
+    },
+    {
+      "since_start_ns": 1664010970,
+      "MemAvailable_KiB": 11964404
+    },
+    {
+      "since_start_ns": 1674756608,
+      "MemAvailable_KiB": 11964404
+    },
+    {
+      "since_start_ns": 1685527242,
+      "MemAvailable_KiB": 11964404
+    },
+    {
+      "since_start_ns": 1695568530,
+      "MemAvailable_KiB": 11964404
+    },
+    {
+      "since_start_ns": 1706381283,
+      "MemAvailable_KiB": 11964404
+    },
+    {
+      "since_start_ns": 1717360938,
+      "MemAvailable_KiB": 11964404
+    },
+    {
+      "since_start_ns": 1728223645,
+      "MemAvailable_KiB": 11964404
+    },
+    {
+      "since_start_ns": 1739074389,
+      "MemAvailable_KiB": 11964404
+    },
+    {
+      "since_start_ns": 1750079212,
+      "MemAvailable_KiB": 11964404
+    },
+    {
+      "since_start_ns": 1760882938,
+      "MemAvailable_KiB": 11964404
+    },
+    {
+      "since_start_ns": 1771737870,
+      "MemAvailable_KiB": 11964156
+    },
+    {
+      "since_start_ns": 1782560752,
+      "MemAvailable_KiB": 11964156
+    },
+    {
+      "since_start_ns": 1793409733,
+      "MemAvailable_KiB": 11964156
+    },
+    {
+      "since_start_ns": 1803626570,
+      "MemAvailable_KiB": 11964156
+    },
+    {
+      "since_start_ns": 1814709128,
+      "MemAvailable_KiB": 11964156
+    },
+    {
+      "since_start_ns": 1825265801,
+      "MemAvailable_KiB": 11964156
+    },
+    {
+      "since_start_ns": 1836135461,
+      "MemAvailable_KiB": 11964156
+    },
+    {
+      "since_start_ns": 1846945348,
+      "MemAvailable_KiB": 11964156
+    },
+    {
+      "since_start_ns": 1857716553,
+      "MemAvailable_KiB": 11964156
+    },
+    {
+      "since_start_ns": 1868485384,
+      "MemAvailable_KiB": 11964156
+    },
+    {
+      "since_start_ns": 1879085609,
+      "MemAvailable_KiB": 11964156
+    },
+    {
+      "since_start_ns": 1889938918,
+      "MemAvailable_KiB": 11964156
+    },
+    {
+      "since_start_ns": 1900787107,
+      "MemAvailable_KiB": 11964156
+    },
+    {
+      "since_start_ns": 1911595823,
+      "MemAvailable_KiB": 11964156
+    },
+    {
+      "since_start_ns": 1922387857,
+      "MemAvailable_KiB": 11964156
+    },
+    {
+      "since_start_ns": 1933153432,
+      "MemAvailable_KiB": 11964156
+    },
+    {
+      "since_start_ns": 1943934445,
+      "MemAvailable_KiB": 11964156
+    },
+    {
+      "since_start_ns": 1954677588,
+      "MemAvailable_KiB": 11963932
+    },
+    {
+      "since_start_ns": 1965467989,
+      "MemAvailable_KiB": 11963932
+    },
+    {
+      "since_start_ns": 1976228524,
+      "MemAvailable_KiB": 11963932
+    },
+    {
+      "since_start_ns": 1987010900,
+      "MemAvailable_KiB": 11964028
+    },
+    {
+      "since_start_ns": 1997757209,
+      "MemAvailable_KiB": 11963904
+    },
+    {
+      "since_start_ns": 2008153381,
+      "MemAvailable_KiB": 11963904
+    },
+    {
+      "since_start_ns": 2018981764,
+      "MemAvailable_KiB": 11963904
+    },
+    {
+      "since_start_ns": 2029793114,
+      "MemAvailable_KiB": 11963904
+    },
+    {
+      "since_start_ns": 2039960969,
+      "MemAvailable_KiB": 11963904
+    },
+    {
+      "since_start_ns": 2050825599,
+      "MemAvailable_KiB": 11963904
+    },
+    {
+      "since_start_ns": 2060868921,
+      "MemAvailable_KiB": 11963904
+    },
+    {
+      "since_start_ns": 2071821857,
+      "MemAvailable_KiB": 11963904
+    },
+    {
+      "since_start_ns": 2082612358,
+      "MemAvailable_KiB": 11963904
+    },
+    {
+      "since_start_ns": 2093415613,
+      "MemAvailable_KiB": 11963904
+    },
+    {
+      "since_start_ns": 2104229578,
+      "MemAvailable_KiB": 11963904
+    },
+    {
+      "since_start_ns": 2115053272,
+      "MemAvailable_KiB": 11963932
+    },
+    {
+      "since_start_ns": 2126239364,
+      "MemAvailable_KiB": 11963932
+    },
+    {
+      "since_start_ns": 2136618224,
+      "MemAvailable_KiB": 11963932
+    },
+    {
+      "since_start_ns": 2147676327,
+      "MemAvailable_KiB": 11964688
+    },
+    {
+      "since_start_ns": 2158032595,
+      "MemAvailable_KiB": 11964688
+    },
+    {
+      "since_start_ns": 2168850678,
+      "MemAvailable_KiB": 11964184
+    },
+    {
+      "since_start_ns": 2179642402,
+      "MemAvailable_KiB": 11964184
+    },
+    {
+      "since_start_ns": 2190403979,
+      "MemAvailable_KiB": 11964184
+    },
+    {
+      "since_start_ns": 2201084674,
+      "MemAvailable_KiB": 11964184
+    },
+    {
+      "since_start_ns": 2211255605,
+      "MemAvailable_KiB": 11964184
+    },
+    {
+      "since_start_ns": 2222078978,
+      "MemAvailable_KiB": 11964184
+    },
+    {
+      "since_start_ns": 2232892232,
+      "MemAvailable_KiB": 11964184
+    },
+    {
+      "since_start_ns": 2243689606,
+      "MemAvailable_KiB": 11964184
+    },
+    {
+      "since_start_ns": 2254453828,
+      "MemAvailable_KiB": 11964184
+    },
+    {
+      "since_start_ns": 2265231005,
+      "MemAvailable_KiB": 11964184
+    },
+    {
+      "since_start_ns": 2276005977,
+      "MemAvailable_KiB": 11964184
+    },
+    {
+      "since_start_ns": 2286775689,
+      "MemAvailable_KiB": 11964184
+    },
+    {
+      "since_start_ns": 2297530634,
+      "MemAvailable_KiB": 11964184
+    },
+    {
+      "since_start_ns": 2308301769,
+      "MemAvailable_KiB": 11964184
+    },
+    {
+      "since_start_ns": 2319077212,
+      "MemAvailable_KiB": 11964184
+    },
+    {
+      "since_start_ns": 2329844149,
+      "MemAvailable_KiB": 11968532
+    },
+    {
+      "since_start_ns": 2340159941,
+      "MemAvailable_KiB": 11968532
+    },
+    {
+      "since_start_ns": 2350976461,
+      "MemAvailable_KiB": 11968532
+    },
+    {
+      "since_start_ns": 2361967749,
+      "MemAvailable_KiB": 11968532
+    },
+    {
+      "since_start_ns": 2372759523,
+      "MemAvailable_KiB": 11968532
+    },
+    {
+      "since_start_ns": 2383659268,
+      "MemAvailable_KiB": 11968532
+    }
+  ]
+}

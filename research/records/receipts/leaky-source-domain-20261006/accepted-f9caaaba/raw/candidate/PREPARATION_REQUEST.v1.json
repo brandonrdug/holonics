@@ -1,0 +1,20 @@
+{
+  "output_root": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-20261006",
+  "cache_origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-18968dc9-20261006/cache-v2",
+  "cache_paths": [
+    "debug/deps",
+    "debug/build",
+    "debug/.fingerprint",
+    ".rustc_info.json"
+  ],
+  "source_manifest_pin": {
+    "sha256": "9bf63c67c917a430312eda36195f432d70dd6455e70165fc8dcdb55c77edb0f7",
+    "bytes": 47684
+  },
+  "owner_request": "/home/b/Workspaces/holonics/.local/wt/material-learning/.local/material-learning-followup-01a1030c-20261006/COHERENT_FOLLOWUP_CANDIDATE.v6.json",
+  "owner_request_pin": {
+    "sha256": "99e9925da183acadac18a0bef5d07f1e46effc870372fc31092b36b2bd527f74",
+    "bytes": 26033
+  },
+  "preserved_failure": "Existing prior-source whole-cache timeout preserved; this candidate uses previously accepted selected cache read, not an unchanged failed retry."
+}

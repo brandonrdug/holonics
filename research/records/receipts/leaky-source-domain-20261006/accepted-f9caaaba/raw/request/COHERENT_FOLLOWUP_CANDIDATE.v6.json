@@ -1,0 +1,466 @@
+{
+  "version": 6,
+  "status": "ready_source_frozen_committed; queue admission and native/type acceptance pending",
+  "source_commit": "f9caaabae3ad1d722eece0e01f0f438104447ae2",
+  "source_base": "468553d5d971951d75e97c17f32a26e5b2ed0dc6",
+  "source_worktree": "/home/b/Workspaces/holonics/.local/wt/material-learning",
+  "owned_patch_paths": [
+    "crates/holonics/src/hnn/moment.rs",
+    "crates/holonics/src/hnn/prediction.rs",
+    "crates/holonics/src/hnn/tests/prediction.rs"
+  ],
+  "source_seal": {
+    "crates/holonics/src/hnn/prediction.rs": {
+      "bytes": 143700,
+      "sha256": "3ecd6ca421ee24d1ae377392427f4e45722dcaf4d848845686b370a649285b7a"
+    },
+    "crates/holonics/src/hnn/tests/prediction.rs": {
+      "bytes": 127132,
+      "sha256": "8b75015e5e2e3ca95907ef8b94db15bd943b13985d851ac22426e2d894d0fcaa"
+    },
+    "lean/Holonics/HNN/ReframedMoment.lean": {
+      "bytes": 8704,
+      "sha256": "4ffc65a60f4e72c8bc63c637d7e6480ada2e8721a002e53c487635e64cd93f2e"
+    },
+    "crates/holonics/src/hnn/receiving.rs": {
+      "bytes": 79239,
+      "sha256": "10cea7efc861f33530ec65bf3a901726850ae2677dfc2d622e494de9359abac4"
+    },
+    "crates/holonics/tests/source_entrance.rs": {
+      "bytes": 19074,
+      "sha256": "5308ebf2d6cba10019952e1e9023d3b085349d12b3c6df61833cba8b863d9baf"
+    },
+    "research/notebook/hnn_design/hnn_repair_loop.rs": {
+      "bytes": 31329,
+      "sha256": "2939d7c6adf418e51ee9556a63ca2e9f815d9d8986f30b527a94312e31e22d94"
+    },
+    "crates/holonics/src/hnn/moment.rs": {
+      "bytes": 107450,
+      "sha256": "ad2697a9c46d26423dee001b067568e77bc12cb7378d80036320b4bfccf98a3f"
+    }
+  },
+  "full_commit_manifest": "/home/b/Workspaces/holonics/.local/wt/material-learning/.local/material-learning-followup-01a1030c-20261006/SOURCE_MANIFEST.v6.json",
+  "scientific_job": false,
+  "no_new_training_sweep": true,
+  "native_claim": "At the supported identity/unit source-clock chart, read the actual rounded leaky first-marginal mass at SourceMoment, admit a positive/common full-completion denominator and zero actual offset features, map the actual normalized feature hull through producing E/phase lift into the same coupled physical tube; prove bounded mixed completion/native containment and balances. No task fidelity, singleton, or broad learned-repair claim; retain prior E-mediated adjoint/gain/carry controls.",
+  "native_compile": {
+    "cargo_arguments": [
+      "test",
+      "--offline",
+      "--locked",
+      "--workspace",
+      "--lib",
+      "--test",
+      "ranged_capacity",
+      "--test",
+      "source_entrance",
+      "--test",
+      "resident_cold_restore",
+      "--test",
+      "located_ingest",
+      "--example",
+      "hnn_prediction",
+      "--no-run",
+      "-j8",
+      "--message-format=json-render-diagnostics",
+      "--config",
+      "profile.test.package.holonics.debug=0",
+      "--config",
+      "profile.test.package.holonics.codegen-units=16",
+      "--config",
+      "profile.test.package.holonics-cuda.debug=0",
+      "--config",
+      "profile.test.package.holonics-cuda.codegen-units=16"
+    ],
+    "exact_command_matches_previous_successful_combined_link": true,
+    "candidate_cache_root": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-18968dc9-20261006/cache-v2",
+    "candidate_secondary_cache_root": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-coupled-domain-20261006/cache-v3",
+    "cache_preflight_required": true,
+    "isolated_cache_copy_or_existing_owner_handoff_required": true,
+    "prior_link_config": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/physical-source-deposition-20261006/native-validation-material-18968dc9-completeness/.local/lean-rust-pruning/admission-v1/hnn-material-18968dc9-host-cuda-link-20261006-v2.config.json",
+    "source_directories": [
+      "crates/holonics/src",
+      "crates/holonics/tests",
+      "crates/holonics-cuda/src",
+      "crates/holonics-cuda/tests",
+      "crates/holonics-cuda/kernels",
+      "research/notebook/hnn_design"
+    ],
+    "required_individual_inputs": [
+      "Cargo.toml",
+      "Cargo.lock",
+      "crates/holonics/Cargo.toml",
+      "crates/holonics-cuda/Cargo.toml",
+      "crates/holonics-cuda/build.rs",
+      "accelerators/cuda-smoke/mount_smoke_kernel.ptx"
+    ],
+    "external_input_directory_basis": [
+      "/home/b/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib",
+      "/home/b/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/autocfg-1.5.1",
+      "/home/b/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/crossbeam-deque-0.8.8",
+      "/home/b/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/crossbeam-epoch-0.9.21",
+      "/home/b/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/crossbeam-utils-0.8.23",
+      "/home/b/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/either-1.18.0",
+      "/home/b/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/num-bigint-0.4.8",
+      "/home/b/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/num-integer-0.1.46",
+      "/home/b/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/num-rational-0.4.2",
+      "/home/b/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/num-traits-0.2.19",
+      "/home/b/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proc-macro2-1.0.107",
+      "/home/b/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-1.0.47",
+      "/home/b/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rayon-1.12.0",
+      "/home/b/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rayon-core-1.13.0",
+      "/home/b/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/syn-3.0.3",
+      "/home/b/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.19",
+      "/home/b/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-impl-2.0.19",
+      "/home/b/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/unicode-ident-1.0.24"
+    ],
+    "unchanged_caps": {
+      "projection_ns": 65000000000,
+      "aggregate_cpu_limit_us": 128000000,
+      "aggregate_cpu_stop_margin_us": 4000000,
+      "group_memory_max_bytes": 4294967296,
+      "address_space_max_bytes": 4294967296,
+      "minimum_MemAvailable_KiB": 8388608,
+      "system_floor_MemAvailable_KiB": 4194304,
+      "thread_budget": 8
+    },
+    "measurement_basis": {
+      "physical_v3_link_wall_ns": 18804203740,
+      "physical_v3_link_CPU_ns": 28815908000,
+      "combined_prior_success_wall_ns": 3847595065,
+      "full_previous_failure_retained": true,
+      "latest_adapted_predecessor_link_wall_ns": 3257323926,
+      "latest_adapted_predecessor_link_CPU_ns": 7140817000,
+      "latest_exact_predecessor_link_wall_ns": 20295955738,
+      "latest_exact_predecessor_link_CPU_ns": 53569556000,
+      "latest_exact_predecessor_source": "18968dc9795e6d05c62aa7bfb17c5d48fd0b2130"
+    },
+    "bind_fresh_Cargo_artifacts_to_new_source": true,
+    "example_is_linked_only_not_executed": true,
+    "source_owned_by": "01a1030c coordinator lane; parent explicitly granted narrow SourceMoment transported_mass accessor and exact denominator admission; no live reservation conflict found",
+    "previous_candidate_cache_root": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-integration-d1e1e0bf-20261006/cache-v1",
+    "latest_exact_predecessor_cache_snapshot": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-18968dc9-20261006/CACHE_SNAPSHOT.v2.json",
+    "producer_acceptance": "Fresh local Cargo compilation with fresh:false for changed source targets, exact immutable source/input/profile binding, and direct runtime binary hashes; generic exit0 or stale artifact reuse does not establish acceptance."
+  },
+  "runtime_groups": [
+    {
+      "artifact": "holonics libtest freshly linked from this source",
+      "arguments": [
+        "hnn::tests::prediction::physical_repair::a_blind_later_quartic_passage_releases_only_a_constant_learned_domain_image",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "expected_tests": 1,
+      "prior_wall_ns": 1357973261,
+      "prior_exact_source": "894c5d9889fe4a38da68945665f0460980ff6814",
+      "new_control_measured_projection_required_before_acceptance": true
+    },
+    {
+      "artifact": "holonics libtest freshly linked from this source",
+      "arguments": [
+        "hnn::tests::prediction::physical_repair::the_coupled_quartic_tube_encloses_every_admitted_missing_class",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "expected_tests": 1,
+      "prior_wall_ns": 2576711845,
+      "prior_exact_source": "894c5d9889fe4a38da68945665f0460980ff6814",
+      "new_control_measured_projection_required_before_acceptance": false
+    },
+    {
+      "artifact": "holonics libtest freshly linked from this source",
+      "arguments": [
+        "hnn::tests::prediction::physical_repair::",
+        "--test-threads=1",
+        "--nocapture",
+        "--skip",
+        "hnn::tests::prediction::physical_repair::a_blind_later_quartic_passage_releases_only_a_constant_learned_domain_image",
+        "--skip",
+        "hnn::tests::prediction::physical_repair::the_coupled_quartic_tube_encloses_every_admitted_missing_class",
+        "--skip",
+        "hnn::tests::prediction::physical_repair::the_actual_leaky_source_return_changes_e_before_the_next_target_free_carried_word",
+        "--skip",
+        "hnn::tests::prediction::physical_repair::source_teaching_refuses_a_zero_return_and_a_reached_uncertified_quartic",
+        "--skip",
+        "hnn::tests::prediction::physical_repair::the_actual_leaky_completion_chart_encloses_mixed_classes_and_an_erased_age_endpoint"
+      ],
+      "expected_tests": 11,
+      "prior_wall_ns": 7779952937,
+      "prior_exact_source": "894c5d9889fe4a38da68945665f0460980ff6814",
+      "new_control_measured_projection_required_before_acceptance": false
+    },
+    {
+      "artifact": "ranged_capacity freshly linked from this source",
+      "arguments": [
+        "sibling_ring_ticks_age_leaky_first_and_offset_coordinates_before_the_next_owning_append",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "expected_tests": 1,
+      "prior_wall_ns": 168569152,
+      "prior_exact_source": "894c5d9889fe4a38da68945665f0460980ff6814",
+      "new_control_measured_projection_required_before_acceptance": false
+    },
+    {
+      "artifact": "source_entrance freshly linked from this candidate source",
+      "arguments": [
+        "same_phase_intact_swap_has_one_native_source_moment_and_one_physical_motion",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "expected_tests": 1,
+      "prior_wall_ns": 337650153,
+      "claim": "different intact placement, identical complete phase-count moment, source opening, three nonlinear pair-contact ticks, returned carry, closed balances",
+      "bounded_operands": {
+        "source_period": 8,
+        "other_period": 3,
+        "contact_nodes": 3,
+        "source_words": 2,
+        "ticks_per_word": 3,
+        "teaching_comparisons": 0
+      },
+      "new_control_measured_projection_required_before_acceptance": false,
+      "prior_exact_source": "894c5d9889fe4a38da68945665f0460980ff6814"
+    },
+    {
+      "artifact": "holonics libtest freshly linked from this source",
+      "arguments": [
+        "hnn::tests::prediction::physical_repair::the_actual_leaky_source_return_changes_e_before_the_next_target_free_carried_word",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "expected_tests": 1,
+      "prior_wall_ns": 2246635345,
+      "new_control_measured_projection_required_before_acceptance": true,
+      "bounded_operands": {
+        "source_period": 8,
+        "other_period": 3,
+        "contact_nodes": 3,
+        "stations": 9,
+        "native_words": 8,
+        "ticks_per_word": 8,
+        "observed_station": 1,
+        "R_comparisons": 1,
+        "E_comparisons": 2,
+        "new_model_publications_on_primary_path": 2
+      },
+      "claim": "fixed rounded leaky source distinction before teaching; actual E-only change with R/internal laws fixed; same physical forward/adjoint/gain/carry equations; actual carried joint certificate; matched observed re-read and later target-free native motion/read sensitivity; no reconstruction claim",
+      "prior_exact_source": "894c5d9889fe4a38da68945665f0460980ff6814"
+    },
+    {
+      "artifact": "holonics libtest freshly linked from this source",
+      "arguments": [
+        "hnn::tests::prediction::physical_repair::source_teaching_refuses_a_zero_return_and_a_reached_uncertified_quartic",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "expected_tests": 1,
+      "prior_wall_ns": 401183993,
+      "new_control_measured_projection_required_before_acceptance": false,
+      "bounded_operands": {
+        "stations": 2,
+        "native_words": 2,
+        "comparisons_refused": 2
+      },
+      "claim": "zero R return and reached quartic refuse without input-only deposition or changed blind receipt/carry",
+      "prior_exact_source": "894c5d9889fe4a38da68945665f0460980ff6814"
+    },
+    {
+      "artifact": "holonics libtest freshly linked from this source",
+      "arguments": [
+        "hnn::tests::prediction::physical_repair::the_actual_leaky_completion_chart_encloses_mixed_classes_and_an_erased_age_endpoint",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "claim": "Actual denominator equality and normalized feature hull equality across all sixteen mixed two-hole completions; same native receiving tube containment with retained carry, loaded quartic, erased age endpoint and closed balances. Total-erasure checks use this subset only; no desired-class or singleton criterion.",
+      "development_read_unmeasured": true,
+      "expected_tests": 1,
+      "new_control_measured_projection_required_before_acceptance": true,
+      "bounded_operands": {
+        "native_Words": 19,
+        "native_completed_sources": 16,
+        "receiving_crossings_per_Word": 2,
+        "total_erasure_controls": "16-source subset, not exhaustive4^9"
+      }
+    }
+  ],
+  "runtime_policy": {
+    "same_previous_scope_caps": true,
+    "projection_ns": 16000000000,
+    "aggregate_cpu_limit_us": 17000000,
+    "group_memory_max_bytes": 4294967296,
+    "threads": 1,
+    "minimum_MemAvailable_KiB": 8388608,
+    "system_floor_MemAvailable_KiB": 4194304,
+    "projection_and_cache_preflight_must_be_sealed_by_queue_before_any_launch": true,
+    "no_limit_raise_on_failure": true,
+    "no_new_limits": true
+  },
+  "lean": {
+    "target": "Holonics.HNN.ReframedMoment",
+    "source": {
+      "bytes": 8704,
+      "sha256": "4ffc65a60f4e72c8bc63c637d7e6480ada2e8721a002e53c487635e64cd93f2e"
+    },
+    "previous_failed_source_sha256": "c12d20d76b44ee512cbc80e2edad1a864f4c921bf638a6e2126b16ae832e3fd2",
+    "patch": "two change goals and explicit Fin G binder; same statements",
+    "previous_diagnostic_receipt": "research/records/receipts/hnn-combined-integration-20261006/reframed-moment-refusal-v1/queue/hnn-reframed-lean-20261006/compiler.v1.stdout",
+    "axioms": [
+      "Holonics.HNN.Moment.SourceDecl.rekey_mem_windingWindow",
+      "Holonics.HNN.Moment.SourceDecl.card_reframedBox_le",
+      "Holonics.HNN.Moment.SourceDecl.card_reframedBox_withCoordinates_le",
+      "Holonics.HNN.Moment.SourceDecl.winding_step_range"
+    ],
+    "acceptance": "exit0, no errors or sorryAx in any selected declaration; exact source/import/toolchain seals and raw outputs",
+    "prior_fixed_cap_ns": 17000000000,
+    "same_resource_caps_as_failed_development": true,
+    "complete_import_preparation_and_source_to_olean_bindings_required": true,
+    "status": "accepted on unchanged exact leaf/source+toolchain/import bindings from adapted predecessor",
+    "run_requested": false,
+    "reason_no_repeat": "source SHA4ffc65a60f4e72c8bc63c637d7e6480ada2e8721a002e53c487635e64cd93f2e unchanged; four exact selectors accepted in predecessor receipt; no new formal source or statement here",
+    "acceptance_receipt": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/physical-source-deposition-20261006/predecessor-integrated-14/ACCEPTANCE_JOIN.v1.json"
+  },
+  "launch_conditions": [
+    "Parent source ownership/admission grant is already satisfied; no additional parent permission required absent an actual new conflict",
+    "Sole shared queue seals current common workflow lease, isolated immutable source/input/cache preflight and bounded development read",
+    "Queue fixes measured acceptance projections within unchanged wall/aggregate CPU/memory/thread caps; new nineteen-Word singleton is unmeasured here",
+    "Fresh Cargo producer and direct executable/source binding; retain failed/rejected stages including zero-test wrappers and stale cached artifacts",
+    "Whole actual output/count/resources and cleanup release receipts; do not change target, clock, grain, source law or limits after a failed gate"
+  ],
+  "does_not_replace_or_mutate_existing_request": true,
+  "native_test_count": 18,
+  "new_control_projection_status": "Unmeasured new nineteen-Word/16-completion/two-crossing test: sole queue may perform one bounded development read within existing caps, count a first conforming matching read once, then seal the fixed measured acceptance projection; source lane launches nothing.",
+  "integration_base": "1ab18bfe233254b085ed38ed68356bab4e69d05c",
+  "acceptance_receipts_required": [
+    "exit status/test counts for exact groups; no filtered failed tests",
+    "whole raw fixed fixture stdout, matched ratio/work and target-free native output",
+    "aggregate CPU/wall/RSS/cleanup and measured-to-projected ratio",
+    "complete source/input/cache/Cargo artifact executable binding",
+    "old failed compile/gate receipts remain preserved",
+    "whole actual-map certificate, ideal-ray bound, applied deltaE carry/release and matched physical identities printed intact",
+    "failure of actual carried joint certificate or source gain is a blocker, never altered target/grain/transport/seed to obtain success"
+  ],
+  "preserved_obsolete_source_candidate": "/home/b/Workspaces/holonics/.local/wt/material-learning/.local/material-learning-followup-01a1030c-20261006/COHERENT_FOLLOWUP_CANDIDATE.v5.prepared.json",
+  "changes_after_v2": [
+    "actual applied-map alignment/motion joint certificate before successor return; existing proposed-ray receipt retained separately",
+    "physical logit/adjoint/gain/carrier equations added to existing singleton control; no new selector or task terrain",
+    "source-swap sensitivity attributed before teaching; extra fixed native Word included in unmeasured projection scope",
+    "retained Resonator locus tested for saturation admission",
+    "exact notebook PluralDomain match/count/display consumer repair; prior exhaustive-match failure not hidden"
+  ],
+  "previous_integrated_acceptance": {
+    "source_version": "36a660cd plus isolated notebook-plural-domain-consumer.v1.patch",
+    "receipt": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/physical-source-deposition-20261006/predecessor-integrated-14/ACCEPTANCE_JOIN.v1.json",
+    "native_controls": 14,
+    "lean_selected": 4,
+    "all434_evidence_entries_rehashed": true,
+    "new17_acceptance_transferred": false,
+    "fidelity": false
+  },
+  "required_new_Lean_runs": 0,
+  "changes_after_v3": [
+    "mandatory equality of every physical forward relation outside selected E maps, released loci and storage product; source carry stays outside forward",
+    "source-gain participation/passive/contrast/Floquet premises and remaining complete native lift #62 stated at consumer",
+    "predecessor fourteen native/four Lean acceptance rehashed and joined only to its exact source; no successor transfer",
+    "unchanged exact Lean leaf already accepted; no redundant compiler run requested"
+  ],
+  "accepted_before_this_request": {
+    "full17_source": "894c5d9889fe4a38da68945665f0460980ff6814",
+    "affected2_final_source": "18968dc9795e6d05c62aa7bfb17c5d48fd0b2130",
+    "source_period_alias": true,
+    "new_E_controls": true,
+    "new_nonunit_domain": false
+  },
+  "actual_map_certificate": "existing JointReading on applied E feature motion/alignment with normal proposed-ray receipt separate, no co-moved FieldMaterial relation, failed certificate preserves blind receipt and refuses successor",
+  "atomic_patch_base": "18968dc9795e6d05c62aa7bfb17c5d48fd0b2130",
+  "atomic_native_patch": {
+    "path": "/home/b/Workspaces/holonics/.local/wt/material-learning/.local/material-learning-followup-01a1030c-20261006/NATIVE_ATOMIC_DELTA.v6.patch",
+    "bytes": 17096,
+    "sha256": "63f58c74858cd98bc7e3d3809f9b2bf9ca9e253301d4884753545392488f229a",
+    "exact_owned_paths": [
+      "crates/holonics/src/hnn/moment.rs",
+      "crates/holonics/src/hnn/prediction.rs",
+      "crates/holonics/src/hnn/tests/prediction.rs"
+    ]
+  },
+  "complete_successor_commits": [
+    "d00a6bcac79270759908ec730458fe33e7bdeaf9",
+    "1ba64477cebb07296a755e531a8affac38083613",
+    "894c5d9889fe4a38da68945665f0460980ff6814",
+    "18968dc9795e6d05c62aa7bfb17c5d48fd0b2130",
+    "bb6aedad81256f3aedff320983e0b0a5c1fe70ac",
+    "6c40fa67b58ac5db840fda030824f4c160634e9b",
+    "468553d5d971951d75e97c17f32a26e5b2ed0dc6",
+    "f9caaabae3ad1d722eece0e01f0f438104447ae2"
+  ],
+  "changes_after_v4": [
+    "fresh actual leaky feature extrema; sharper unit branch retained",
+    "Actual zero offset populations and equal phase populations checked; exact owner transported_mass accessor now consumed before feature bounds.",
+    "direct actual sixteen-feature hull equality plus native receiving containment/closure, actual sparse age endpoint and total-erasure subset",
+    "historical UncertifiedDomain predicates superseded by actual supported-domain decision criteria before any new native output"
+  ],
+  "source_only_selector_closure": {
+    "physical_module": 16,
+    "unique_selected": 18,
+    "exact_selected_names": [
+      "hnn::tests::prediction::physical_repair::a_blind_later_quartic_passage_releases_only_a_constant_learned_domain_image",
+      "hnn::tests::prediction::physical_repair::the_coupled_quartic_tube_encloses_every_admitted_missing_class",
+      "hnn::tests::prediction::physical_repair::the_damaged_section_runs_through_the_field_and_every_erasure_is_held_unresolved",
+      "hnn::tests::prediction::physical_repair::the_section_carries_no_erased_class_so_the_repair_cannot_read_one",
+      "hnn::tests::prediction::physical_repair::a_point_leader_does_not_replace_a_plural_coupled_domain",
+      "hnn::tests::prediction::physical_repair::a_station_no_declared_crossing_reads_is_held_unread",
+      "hnn::tests::prediction::physical_repair::equal_class_counts_do_not_join_different_producing_charts",
+      "hnn::tests::prediction::physical_repair::total_erasure_preserves_the_producing_chart_and_refuses_located_conduct_before_opening",
+      "hnn::tests::prediction::physical_repair::identity_conduct_must_certify_the_station_clock_even_at_erased_stations",
+      "hnn::tests::prediction::physical_repair::the_producing_decoder_and_both_physical_maps_are_joined_before_opening",
+      "hnn::tests::prediction::physical_repair::the_supported_physical_passage_continues_on_its_retained_interior_and_clock",
+      "hnn::tests::prediction::physical_repair::physical_teaching_changes_r_and_the_later_carried_receiving_read",
+      "hnn::tests::prediction::physical_repair::physical_teaching_refuses_a_stale_material_or_foreign_chart_and_preserves_the_carry",
+      "sibling_ring_ticks_age_leaky_first_and_offset_coordinates_before_the_next_owning_append",
+      "same_phase_intact_swap_has_one_native_source_moment_and_one_physical_motion",
+      "hnn::tests::prediction::physical_repair::the_actual_leaky_source_return_changes_e_before_the_next_target_free_carried_word",
+      "hnn::tests::prediction::physical_repair::source_teaching_refuses_a_zero_return_and_a_reached_uncertified_quartic",
+      "hnn::tests::prediction::physical_repair::the_actual_leaky_completion_chart_encloses_mixed_classes_and_an_erased_age_endpoint"
+    ],
+    "counts": [
+      1,
+      1,
+      11,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "source_commit": "f9caaabae3ad1d722eece0e01f0f438104447ae2",
+    "method": "static test declaration/name closure; no native --list or runtime invoked",
+    "native_acceptance": false
+  },
+  "ownership_admission": {
+    "parent_grant": true,
+    "accessor_and_guard_committed": true,
+    "new_live_reservation_conflict": false,
+    "reference_rs_changed": false,
+    "source_clock_or_encoding_changed": false,
+    "SourceMoment_state_or_update_changed": false
+  },
+  "changes_after_v5": [
+    "Parent ownership handoff recovered; narrow read-only SourceMoment mass accessor and consumer positive/common full-completion denominator guard committed",
+    "All sixteen mixed-source oracle completions now also require exact denominator equality; actual feature-hull equality and native tube containment remain fixed",
+    "No reference.rs, encoding, source clock, target law, receiving map or scientific dataset change; independent source review and Rust2024 parse pass, native/type gate pending"
+  ],
+  "source_review_receipt": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/leaky-source-domain-20261006/SOURCE_REVIEW.v2.json",
+  "preserved_predecessor_fourteen_control_request": "/home/b/Workspaces/holonics/.local/wt/capacity/.local/integration-publication-01a1030c-20261006/COMBINED_DOMAIN_QUEUE_REQUEST.v1.json",
+  "source_input_manifest": {
+    "path": "/home/b/Workspaces/holonics/.local/wt/material-learning/.local/material-learning-followup-01a1030c-20261006/SOURCE_INPUT_MANIFEST.v6.json",
+    "bytes": 47480,
+    "sha256": "69c70d984f0f6a3f6642e55f8e97781772006f3b8aa7a471ee9a15d7043dcba3"
+  }
+}

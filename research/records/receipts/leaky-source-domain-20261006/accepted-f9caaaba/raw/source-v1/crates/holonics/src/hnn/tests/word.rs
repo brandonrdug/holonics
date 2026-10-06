@@ -1,0 +1,249 @@
+//! The word: it opens at zero change whatever preceded it, runs through the epoch the receiver
+//! reads, and releases the change at its end.
+
+use num_bigint::BigInt;
+use num_traits::Zero;
+
+use super::learning::chain;
+use crate::hnn::tests::support::encoded;
+use super::support::Medium;
+use crate::hnn::HnnError;
+use crate::hnn::field::{Current, Field};
+use crate::hnn::moment::SourceMoment;
+use crate::hnn::receiving::{ActiveAddress, ReceivingPhases, ReceivingRead, grain_logits};
+use crate::hnn::word::Word;
+use crate::ratio::{Rat, integer};
+
+/// A cut of the chain control (rings of periods 4, 3, 2, source ring 0, receiving ring 2 with
+/// aperture 2): a constitution with a nonzero encoder, and a moment of 40 cells that fit no lock
+/// (code 1: odd and not divisible by 3), so every ring stays dormant at rest and every contact's
+/// exponent is zero: the word's laws, not the exponent's bits.
+fn cut(field: &Field) -> (Medium, Current, SourceMoment) {
+    let medium = Medium::encoding(field, 41);
+    let cells = vec![1usize; 40];
+    let mut current = Current::at_rest(field);
+    let mut moment = SourceMoment::open(field, &current);
+    moment.ingest(field, &mut current, &encoded(field, &cells)).unwrap();
+    (medium, current, moment)
+}
+
+/// Lean `HNN/Retention.word_opens_at_zero`: a word opens with every wave and contact state zero
+/// and storage only on the source rings, and a word opened after another word's full epoch reads
+/// exactly what the first read: nothing of the earlier change persists. This is today's reception,
+/// the rest limit (complete absorption, `A = I`) of the reception carry; under a declared carry the
+/// interior change persists (`tests/reference.rs`, "the reception carry").
+#[test]
+fn a_word_opens_at_zero_change_whatever_preceded_it() {
+    let field = &chain();
+    let (medium, current, moment) = cut(field);
+    assert_eq!(
+        current,
+        Current::at_rest(field),
+        "the cut's rings stay dormant"
+    );
+    let phases = ReceivingPhases::declare(field, &medium, &current, &field.receivers()[0]).unwrap();
+    let mut first = Word::open(field, &medium, &current, &moment).unwrap();
+    assert_eq!(first.support(), vec![true, false, false]);
+    assert!(first.contact_support().iter().all(|carried| !carried));
+    let opening = first.power().unwrap();
+    let reads = first.forward(&phases).unwrap();
+    first.release().unwrap();
+    let mut second = Word::open(field, &medium, &current, &moment).unwrap();
+    assert_eq!(second.power().unwrap(), opening);
+    assert_eq!(second.forward(&phases).unwrap(), reads);
+}
+
+/// The forward word runs `e_max = e_0 + A` junction steps on its own hop clock, reads the receiving
+/// ring at `e_0 … e_last` (the front reaches it no earlier than `e_0`), every full tick's balance
+/// closes up to its residual within its certified bound, and its end releases the change with the
+/// power it carried after the last junction: the last junction is a `W`-isometry about the
+/// participation mean, so its power moves only by the executed anchor's residual, zero under the
+/// exact law. On the word's lattices every carried remainder it releases lies in its half-open
+/// cell (Lean `HNN/LatticeWord.feedback_rem_bounds`); under the exact law it releases none.
+#[test]
+fn the_forward_word_reads_its_epochs_and_releases_its_change() {
+    for field in [chain(), chain().with_exact_word()] {
+        let field = &field;
+        let (medium, current, moment) = cut(field);
+        let phases =
+            ReceivingPhases::declare(field, &medium, &current, &field.receivers()[0]).unwrap();
+        assert_eq!(
+            (
+                phases.first_epoch(),
+                phases.last_epoch(),
+                phases.junction_steps()
+            ),
+            (2, 3, 4)
+        );
+        let mut word = Word::open(field, &medium, &current, &moment).unwrap();
+        let reads = word.forward(&phases).unwrap();
+        assert_eq!(reads.len(), 2);
+        assert!(reads.iter().all(|read| read.iter().any(|x| !x.is_zero())));
+        for early in 0..2 {
+            assert!(word.anchor(early, 2).unwrap().iter().all(Zero::is_zero));
+        }
+        assert_eq!(word.ticks(), 4);
+        assert_eq!(word.clock().ticks(), 4u32.into());
+        assert_eq!(word.balances().len(), 3);
+        assert!(word.balances().iter().all(|balance| balance.closes()));
+        let before_last = word.balances()[2].after.clone();
+        assert!(matches!(word.tick(), Err(HnnError::WordEnded { ticks: 4 })));
+        let released = word.release().unwrap();
+        assert_eq!(
+            released.power,
+            &before_last + &released.last,
+            "the last junction moves the power only by its executed anchor's residual"
+        );
+        assert_eq!(released.ticks, 4);
+        assert!(released.peak_bits > 0);
+        match field.word_lattice() {
+            Some(lattice) => {
+                assert!(released.remainders.entries > 0);
+                assert!(released.remainders.largest <= lattice.transient().unit() / integer(2));
+                assert_eq!(released.charts.len(), 5, "three rings and two contacts");
+                assert!(
+                    released
+                        .charts
+                        .iter()
+                        .all(|chart| chart.certificate <= lattice.target())
+                );
+            }
+            None => {
+                assert!(released.last.is_zero());
+                assert_eq!(released.remainders.entries, 0);
+                assert!(released.charts.is_empty());
+            }
+        }
+    }
+}
+
+/// A medium with `E = 0` opens an empty word: its first word carries no change and every wave
+/// logit is zero; the receiving parametron's tree is empty, so its face is uniform at every
+/// address (the landmark tree): every real logit of the combined read is `log₂(1/|A|) = −2` on the
+/// chain's `|A| = 4`, carry `−2` and phase class `0`, every imaginary logit zero. The first faces
+/// are uniform (read with no target known, so no phase reads an earlier phase's deposit).
+#[test]
+fn the_initial_constitution_opens_an_empty_word() {
+    let field = &chain();
+    let medium = Medium::initial(field, 3);
+    let (_, current, moment) = cut(field);
+    let phases = ReceivingPhases::declare(field, &medium, &current, &field.receivers()[0]);
+    // With `E = 0` the observability over the source storage is still the medium's own; the wave
+    // of this moment is zero.
+    let phases = phases.unwrap();
+    let tree = phases
+        .tree_faces(&medium, &ActiveAddress::boundary(phases.depth()), &[])
+        .unwrap();
+    let mut word = Word::open(field, &medium, &current, &moment).unwrap();
+    assert_eq!(word.power().unwrap(), Rat::zero());
+    for (anchor, tree) in word.forward(&phases).unwrap().into_iter().zip(&tree) {
+        let wave = phases.read(field, &medium, &current, &anchor).unwrap();
+        assert!(wave.logits.iter().all(Zero::is_zero));
+        let read = ReceivingRead::combined(wave.logits, tree, phases.grain()).unwrap();
+        assert_eq!(read.logits, grain_logits(tree));
+        assert!(read.logits.iter().skip(1).step_by(2).all(Zero::is_zero));
+        assert!(
+            read.cells
+                .iter()
+                .all(|cell| cell.carry == BigInt::from(-2) && cell.phase == 0)
+        );
+    }
+}
+
+/// Record B §2.3a and the deposit record (October 3) §4: a carried change crosses the next
+/// opening's references exactly. Each contact's arriving waves are transmitted, `a′ = (1 + Γ) a`,
+/// with `G′|a′|² + Γ²G|a|² = G|a|²` (Lean `HNN/Ring.two_port_reference_balance`), so the lift
+/// emits `Σ (h/4)Γ²G|a|²` and never raises the carried waves' power. Each contact's rate is held
+/// at momentum, `C′ w′ = π`: at an unchanged storage `w′ = w` exactly, under an accretion
+/// `C′ = C + F`, `F ⪰ 0`, the kinetic reading falls by `½⟨w′, F w′⟩ + ½⟨w − w′, C(w − w′)⟩`
+/// (`held_momentum_loss`, `held_momentum_dissipates`), and a momentum outside `range C′` is refused.
+/// A carried resonator's rate is held at its momentum the same way (record B §2.4), and a carried
+/// resonator state crosses only onto a declared resonator.
+#[test]
+fn a_carried_change_crosses_the_next_openings_references() {
+    use crate::hnn::word::{EndChange, ReceptionCarry};
+    use crate::ratio::linear::ExactRatMatrix;
+    use crate::ratio::linear::vector::{dot, sub};
+    let r = |n: i64, d: i64| Rat::new(BigInt::from(n), BigInt::from(d));
+    let matrix = |rows: Vec<Vec<Rat>>| ExactRatMatrix::new(rows).unwrap();
+    // Two contacts of width 2 between rings of widths 2 and 3.
+    let storage = matrix(vec![vec![r(2, 1), r(1, 2)], vec![r(1, 2), r(1, 1)]]);
+    let rate = vec![r(3, 5), r(-7, 4)];
+    let momentum = storage.apply(&rate).unwrap();
+    let arrivals = vec![
+        [vec![r(1, 3), r(-2, 7)], vec![r(5, 6), r(0, 1), r(-1, 9)]],
+        [vec![r(-4, 5), r(3, 8)], vec![r(1, 2), r(2, 3), r(-3, 4)]],
+    ];
+    let states = vec![[vec![r(1, 7), r(-1, 3)], rate.clone()], [vec![r(2, 5), r(1, 11)], rate.clone()]];
+    let carry = ReceptionCarry {
+        change: EndChange {
+            storage: vec![vec![r(1, 1), r(2, 1)], vec![r(0, 1); 3]],
+            arrivals: arrivals.clone(),
+            states,
+            resonators: vec![Some([vec![r(1, 5), r(-1, 4)], rate.clone()]), None],
+            resonator_phases: vec![Some(1), None],
+        },
+        ticks: 5,
+        conductances: vec![r(2, 1), r(1, 4)],
+        momenta: vec![momentum.clone(), momentum.clone()],
+        resonator_momenta: vec![Some(momentum.clone()), None],
+    };
+    // Contact 0 keeps its storage; contact 1 accretes F ⪰ 0.
+    let accreted = matrix(vec![vec![r(1, 1), r(1, 3)], vec![r(1, 3), r(1, 9)]]);
+    let grown = storage.add(&accreted).unwrap();
+    let after = [r(1, 8), r(1, 4)];
+    let step = r(1, 2);
+    let crossed = carry.crossed(&after, &[&storage, &grown], &[Some(&grown), None]).unwrap();
+    // Storage and displacements carry unchanged; the resonator's rate is held at its momentum.
+    assert_eq!(crossed.storage, carry.change.storage);
+    for (a, b) in crossed.states.iter().zip(&carry.change.states) {
+        assert_eq!(a[0], b[0]);
+    }
+    let [u, w] = crossed.resonators[0].clone().unwrap();
+    assert_eq!(u, vec![r(1, 5), r(-1, 4)]);
+    assert_eq!(grown.apply(&w).unwrap(), momentum);
+    assert_eq!(
+        carry.crossed(&after, &[&storage, &grown], &[Some(&storage), None]).unwrap().resonators,
+        carry.change.resonators,
+        "an unchanged capacity holds the resonator's rate exactly"
+    );
+    assert!(matches!(
+        carry.crossed(&after, &[&storage, &grown], &[None, None]),
+        Err(HnnError::Resonator { ring: 0, .. })
+    ));
+    // The waves: transmitted, the reflection's power the only difference.
+    let mut reflected = Rat::zero();
+    for (a, ((before, now), (from, to))) in arrivals
+        .iter()
+        .zip(&crossed.arrivals)
+        .zip(carry.conductances.iter().zip(&after))
+        .enumerate()
+    {
+        let gamma = (from - to) / (from + to);
+        for (wave, crossed) in before.iter().zip(now) {
+            let power = dot(wave, wave);
+            assert_eq!(to * dot(crossed, crossed) + &gamma * &gamma * from * &power, from * &power);
+            reflected += &step / integer(4) * &gamma * &gamma * from * power;
+        }
+        if from == to {
+            assert_eq!(before, now, "contact {a}: no reference change, no crossing");
+        }
+    }
+    assert!(reflected > Rat::zero());
+    assert_eq!(carry.reflected(&step, &after), reflected);
+    // The rates: held at momentum.
+    assert_eq!(crossed.states[0][1], rate, "an unchanged storage holds the rate exactly");
+    let held = &crossed.states[1][1];
+    assert_eq!(grown.apply(held).unwrap(), momentum);
+    let jump = sub(&rate, held);
+    let kinetic = |c: &ExactRatMatrix, w: &[Rat]| dot(w, &c.apply(w).unwrap()) / integer(2);
+    let fall = kinetic(&storage, &rate) - kinetic(&grown, held);
+    assert_eq!(fall, kinetic(&accreted, held) + kinetic(&storage, &jump));
+    assert!(fall > Rat::zero());
+    // A singular storage cannot hold a momentum outside its range.
+    let singular = matrix(vec![vec![r(1, 1), r(0, 1)], vec![r(0, 1), r(0, 1)]]);
+    assert!(matches!(
+        carry.crossed(&after, &[&storage, &singular], &[Some(&storage), None]),
+        Err(HnnError::HeldMomentum { contact: 1 })
+    ));
+}

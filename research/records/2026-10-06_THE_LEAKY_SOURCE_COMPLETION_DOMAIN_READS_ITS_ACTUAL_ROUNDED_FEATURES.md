@@ -2,7 +2,7 @@
 
 October 6, 2026. Refs #73, #148, #63, #62.
 
-[derived; implemented candidate; native/type acceptance pending] The accepted
+[established-bounded; derived and implemented; native/type accepted on f9caaaba] The accepted
 [E-only consumer](2026-10-06_THE_ACTUAL_SOURCE_RETURN_CHANGES_E_AT_THE_NEXT_CONTEMPORARY_OPENING.md)
 changes actual subsequent source motion and reads, but its seven erased stations remain held
 at `18968dc9`: the physical opening enclosure rejects nonunit source transport. This follow-up
@@ -119,12 +119,17 @@ the declared source family has a new owner, before any new output was observed. 
 accepted old assertions and unfiltered outputs remain in the predecessor receipt.
 
 The coherent affected gate is eighteen unique controls: the prior seventeen plus this one.
-Static Rust parsing and whitespace checks pass. No native/type pass is claimed; sole-queue
-cache and source preflight, a measured fixed projection, whole output and exact selector counts
-are required. Existing link/runtime CPU, wall, memory and thread caps remain fixed. A failed
+Static Rust parsing and whitespace checks pass. The exact eighteen-control native/type gate
+subsequently passed on `f9caaabae3ad1d722eece0e01f0f438104447ae2`, including fresh host/CUDA
+linkage and prediction example compilation. The [acceptance join](receipts/leaky-source-domain-20261006/accepted-f9caaaba/ACCEPTANCE_JOIN.v1.json)
+binds raw output, exact counts, immutable source and executable, resources and cleanup. Existing link/runtime CPU, wall, memory and thread caps remain fixed. A failed
 projection or assertion remains failure with its receipt, without a larger cap or altered truth.
 
 The independent source-law and source-code reviews agree with the common-mass and monotone-chart argument.
 Its review is mathematical/source evidence, not a native run. The generic formal tube lift
 remains owed in #62. Useful source-to-target repair and an untouched evaluation family remain
 open after any domain-soundness pass alone.
+
+The [source-conditioned behavior read](2026-10-06_THE_LEARNED_RECEIVING_FACE_IS_SOURCE_SENSITIVE_AND_SINGLE_OBSERVATION_SYMMETRIC.md)
+shows a source-dependent receiving face and the whole still-held damaged boundary; one observed
+class leaves the other three receiving rows equal. No useful-repair claim follows from acceptance.

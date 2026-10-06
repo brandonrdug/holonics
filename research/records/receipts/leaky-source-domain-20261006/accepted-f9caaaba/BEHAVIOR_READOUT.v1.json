@@ -1,0 +1,585 @@
+{
+  "source_commit": "f9caaabae3ad1d722eece0e01f0f438104447ae2",
+  "raw_source": "research/records/receipts/leaky-source-domain-20261006/native-validation-f9caaaba/stages/hnn-material-f9caaaba-control-group8-20261006-v1.stdout",
+  "raw_source_pin": {
+    "bytes": 16908,
+    "sha256": "91eaaae2ff712543e078b59464bf577a8a53b3b28a5991e3a83f8b2e4e192063"
+  },
+  "readout_method": "parse sealed native stdout only; no model calls, generated source, rerun, target or rounding changes",
+  "retained_model_operands": {
+    "R_teaching": "one native post-blind comparison at station1 of [0,2] from zeroR, existing quartic material",
+    "transport": "169979/1048576",
+    "source_lift": 3,
+    "opening": "same returned teaching carry; Absorption::Nothing",
+    "source_sections": "[a,0,3,2,1,3,0,2,b] for a,b in {0,1,2,3}",
+    "receiving_crossings": 2,
+    "learned_material_or_controls_changed_between_completions": false
+  },
+  "whole_blind_native_cells": "[Held { fibre: [0, 1, 2, 3], unresolved: PluralDomain }, Intact(0), Intact(3), Intact(2), Intact(1), Intact(3), Intact(0), Intact(2), Held { fibre: [0, 1, 2, 3], unresolved: Unread }]",
+  "whole_blind_boundary_display": "? 0 3 2 1 3 0 2 ?",
+  "held_reasons": [
+    "station0 PluralDomain",
+    "station8 Unread because two requested crossings"
+  ],
+  "intact_boundary_cells_are_copied_input_not_generated_output": true,
+  "native_cases": [
+    {
+      "completion": [
+        0,
+        0
+      ],
+      "native_receiving_leaders": [
+        [
+          2
+        ],
+        [
+          2
+        ]
+      ],
+      "complex_logits": [
+        "-18976909/6442450944",
+        "0",
+        "-18976909/6442450944",
+        "0",
+        "275455637/28991029248",
+        "74494471/57982058496",
+        "-18976909/6442450944",
+        "0",
+        "-66879744793704798979/2790124455079232667648",
+        "0",
+        "-66879744793704798979/2790124455079232667648",
+        "0",
+        "1501613926386229871749/20925933413094245007360",
+        "137728224994179747311/41851866826188490014720",
+        "-66879744793704798979/2790124455079232667648",
+        "0"
+      ],
+      "class2_minus_class0_real_first": "721703455/57982058496",
+      "whole_raw_line": "test hnn::tests::prediction::physical_repair::the_actual_leaky_completion_chart_encloses_mixed_classes_and_an_erased_age_endpoint ... actual leaky completion (0,0): leaders [[2], [2]]; actual complex logits [[Ratio { numer: -18976909, denom: 6442450944 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -18976909, denom: 6442450944 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 275455637, denom: 28991029248 }, Ratio { numer: 74494471, denom: 57982058496 }, Ratio { numer: -18976909, denom: 6442450944 }, Ratio { numer: 0, denom: 1 }], [Ratio { numer: -66879744793704798979, denom: 2790124455079232667648 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -66879744793704798979, denom: 2790124455079232667648 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 1501613926386229871749, denom: 20925933413094245007360 }, Ratio { numer: 137728224994179747311, denom: 41851866826188490014720 }, Ratio { numer: -66879744793704798979, denom: 2790124455079232667648 }, Ratio { numer: 0, denom: 1 }]]"
+    },
+    {
+      "completion": [
+        0,
+        1
+      ],
+      "native_receiving_leaders": [
+        [
+          0,
+          1,
+          3
+        ],
+        [
+          2
+        ]
+      ],
+      "complex_logits": [
+        "28467329/6442450944",
+        "0",
+        "28467329/6442450944",
+        "0",
+        "-206242907/14495514624",
+        "-67838243/57982058496",
+        "28467329/6442450944",
+        "0",
+        "-45655933328538586657/2790124455079232667648",
+        "0",
+        "-45655933328538586657/2790124455079232667648",
+        "0",
+        "502526419708675529777/10462966706547122503680",
+        "45138290514669777221/41851866826188490014720",
+        "-45655933328538586657/2790124455079232667648",
+        "0"
+      ],
+      "class2_minus_class0_real_first": "-1081177589/57982058496",
+      "whole_raw_line": "actual leaky completion (0,1): leaders [[0, 1, 3], [2]]; actual complex logits [[Ratio { numer: 28467329, denom: 6442450944 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 28467329, denom: 6442450944 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -206242907, denom: 14495514624 }, Ratio { numer: -67838243, denom: 57982058496 }, Ratio { numer: 28467329, denom: 6442450944 }, Ratio { numer: 0, denom: 1 }], [Ratio { numer: -45655933328538586657, denom: 2790124455079232667648 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -45655933328538586657, denom: 2790124455079232667648 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 502526419708675529777, denom: 10462966706547122503680 }, Ratio { numer: 45138290514669777221, denom: 41851866826188490014720 }, Ratio { numer: -45655933328538586657, denom: 2790124455079232667648 }, Ratio { numer: 0, denom: 1 }]]"
+    },
+    {
+      "completion": [
+        0,
+        2
+      ],
+      "native_receiving_leaders": [
+        [
+          2
+        ],
+        [
+          2
+        ]
+      ],
+      "complex_logits": [
+        "-472332961/6442450944",
+        "0",
+        "-472332961/6442450944",
+        "0",
+        "1593010055/7247757312",
+        "548936851/57982058496",
+        "-472332961/6442450944",
+        "0",
+        "-190840332873121800031/2790124455079232667648",
+        "0",
+        "-190840332873121800031/2790124455079232667648",
+        "0",
+        "1072206156318212122981/5231483353273561251840",
+        "348275199290051734091/41851866826188490014720",
+        "-190840332873121800031/2790124455079232667648",
+        "0"
+      ],
+      "class2_minus_class0_real_first": "16995077089/57982058496",
+      "whole_raw_line": "actual leaky completion (0,2): leaders [[2], [2]]; actual complex logits [[Ratio { numer: -472332961, denom: 6442450944 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -472332961, denom: 6442450944 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 1593010055, denom: 7247757312 }, Ratio { numer: 548936851, denom: 57982058496 }, Ratio { numer: -472332961, denom: 6442450944 }, Ratio { numer: 0, denom: 1 }], [Ratio { numer: -190840332873121800031, denom: 2790124455079232667648 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -190840332873121800031, denom: 2790124455079232667648 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 1072206156318212122981, denom: 5231483353273561251840 }, Ratio { numer: 348275199290051734091, denom: 41851866826188490014720 }, Ratio { numer: -190840332873121800031, denom: 2790124455079232667648 }, Ratio { numer: 0, denom: 1 }]]"
+    },
+    {
+      "completion": [
+        0,
+        3
+      ],
+      "native_receiving_leaders": [
+        [
+          2
+        ],
+        [
+          2
+        ]
+      ],
+      "complex_logits": [
+        "-150766459/6442450944",
+        "0",
+        "-150766459/6442450944",
+        "0",
+        "2078336681/28991029248",
+        "216827185/57982058496",
+        "-150766459/6442450944",
+        "0",
+        "-100279766820559993669/2790124455079232667648",
+        "0",
+        "-100279766820559993669/2790124455079232667648",
+        "0",
+        "2265163797025476474409/20925933413094245007360",
+        "189730790934726442841/41851866826188490014720",
+        "-100279766820559993669/2790124455079232667648",
+        "0"
+      ],
+      "class2_minus_class0_real_first": "5513571493/57982058496",
+      "whole_raw_line": "actual leaky completion (0,3): leaders [[2], [2]]; actual complex logits [[Ratio { numer: -150766459, denom: 6442450944 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -150766459, denom: 6442450944 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 2078336681, denom: 28991029248 }, Ratio { numer: 216827185, denom: 57982058496 }, Ratio { numer: -150766459, denom: 6442450944 }, Ratio { numer: 0, denom: 1 }], [Ratio { numer: -100279766820559993669, denom: 2790124455079232667648 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -100279766820559993669, denom: 2790124455079232667648 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 2265163797025476474409, denom: 20925933413094245007360 }, Ratio { numer: 189730790934726442841, denom: 41851866826188490014720 }, Ratio { numer: -100279766820559993669, denom: 2790124455079232667648 }, Ratio { numer: 0, denom: 1 }]]"
+    },
+    {
+      "completion": [
+        1,
+        0
+      ],
+      "native_receiving_leaders": [
+        [
+          2
+        ],
+        [
+          2
+        ]
+      ],
+      "complex_logits": [
+        "-9488441/3221225472",
+        "0",
+        "-9488441/3221225472",
+        "0",
+        "550910491/57982058496",
+        "37247195/28991029248",
+        "-9488441/3221225472",
+        "0",
+        "-33439866357732226883/1395062227539616333824",
+        "0",
+        "-33439866357732226883/1395062227539616333824",
+        "0",
+        "3003227287597428450563/41851866826188490014720",
+        "68864086151127367663/20925933413094245007360",
+        "-33439866357732226883/1395062227539616333824",
+        "0"
+      ],
+      "class2_minus_class0_real_first": "721702429/57982058496",
+      "whole_raw_line": "actual leaky completion (1,0): leaders [[2], [2]]; actual complex logits [[Ratio { numer: -9488441, denom: 3221225472 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -9488441, denom: 3221225472 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 550910491, denom: 57982058496 }, Ratio { numer: 37247195, denom: 28991029248 }, Ratio { numer: -9488441, denom: 3221225472 }, Ratio { numer: 0, denom: 1 }], [Ratio { numer: -33439866357732226883, denom: 1395062227539616333824 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -33439866357732226883, denom: 1395062227539616333824 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 3003227287597428450563, denom: 41851866826188490014720 }, Ratio { numer: 68864086151127367663, denom: 20925933413094245007360 }, Ratio { numer: -33439866357732226883, denom: 1395062227539616333824 }, Ratio { numer: 0, denom: 1 }]]"
+    },
+    {
+      "completion": [
+        1,
+        1
+      ],
+      "native_receiving_leaders": [
+        [
+          0,
+          1,
+          3
+        ],
+        [
+          2
+        ]
+      ],
+      "complex_logits": [
+        "7116839/1610612736",
+        "0",
+        "7116839/1610612736",
+        "0",
+        "-824972411/57982058496",
+        "-16959581/14495514624",
+        "7116839/1610612736",
+        "0",
+        "-11413980312574560361/697531113769808166912",
+        "0",
+        "-11413980312574560361/697531113769808166912",
+        "0",
+        "2010105113659670826173/41851866826188490014720",
+        "11284559455686191309/10462966706547122503680",
+        "-11413980312574560361/697531113769808166912",
+        "0"
+      ],
+      "class2_minus_class0_real_first": "-1081178615/57982058496",
+      "whole_raw_line": "actual leaky completion (1,1): leaders [[0, 1, 3], [2]]; actual complex logits [[Ratio { numer: 7116839, denom: 1610612736 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 7116839, denom: 1610612736 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -824972411, denom: 57982058496 }, Ratio { numer: -16959581, denom: 14495514624 }, Ratio { numer: 7116839, denom: 1610612736 }, Ratio { numer: 0, denom: 1 }], [Ratio { numer: -11413980312574560361, denom: 697531113769808166912 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -11413980312574560361, denom: 697531113769808166912 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 2010105113659670826173, denom: 41851866826188490014720 }, Ratio { numer: 11284559455686191309, denom: 10462966706547122503680 }, Ratio { numer: -11413980312574560361, denom: 697531113769808166912 }, Ratio { numer: 0, denom: 1 }]]"
+    },
+    {
+      "completion": [
+        1,
+        2
+      ],
+      "native_receiving_leaders": [
+        [
+          2
+        ],
+        [
+          2
+        ]
+      ],
+      "complex_logits": [
+        "-236166467/3221225472",
+        "0",
+        "-236166467/3221225472",
+        "0",
+        "12744079657/57982058496",
+        "274468385/28991029248",
+        "-236166467/3221225472",
+        "0",
+        "-95420160397440727409/1395062227539616333824",
+        "0",
+        "-95420160397440727409/1395062227539616333824",
+        "0",
+        "8577648685370665690913/41851866826188490014720",
+        "174137573299063361053/20925933413094245007360",
+        "-95420160397440727409/1395062227539616333824",
+        "0"
+      ],
+      "class2_minus_class0_real_first": "16995076063/57982058496",
+      "whole_raw_line": "actual leaky completion (1,2): leaders [[2], [2]]; actual complex logits [[Ratio { numer: -236166467, denom: 3221225472 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -236166467, denom: 3221225472 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 12744079657, denom: 57982058496 }, Ratio { numer: 274468385, denom: 28991029248 }, Ratio { numer: -236166467, denom: 3221225472 }, Ratio { numer: 0, denom: 1 }], [Ratio { numer: -95420160397440727409, denom: 1395062227539616333824 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -95420160397440727409, denom: 1395062227539616333824 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 8577648685370665690913, denom: 41851866826188490014720 }, Ratio { numer: 174137573299063361053, denom: 20925933413094245007360 }, Ratio { numer: -95420160397440727409, denom: 1395062227539616333824 }, Ratio { numer: 0, denom: 1 }]]"
+    },
+    {
+      "completion": [
+        1,
+        3
+      ],
+      "native_receiving_leaders": [
+        [
+          2
+        ],
+        [
+          2
+        ]
+      ],
+      "complex_logits": [
+        "-4711451/201326592",
+        "0",
+        "-4711451/201326592",
+        "0",
+        "4156672579/57982058496",
+        "6775847/1811939328",
+        "-4711451/201326592",
+        "0",
+        "-12534969342789956057/348765556884904083456",
+        "0",
+        "-12534969342789956057/348765556884904083456",
+        "0",
+        "4530327028875921655883/41851866826188490014720",
+        "23716342280350178857/5231483353273561251840",
+        "-12534969342789956057/348765556884904083456",
+        "0"
+      ],
+      "class2_minus_class0_real_first": "5513570467/57982058496",
+      "whole_raw_line": "actual leaky completion (1,3): leaders [[2], [2]]; actual complex logits [[Ratio { numer: -4711451, denom: 201326592 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -4711451, denom: 201326592 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 4156672579, denom: 57982058496 }, Ratio { numer: 6775847, denom: 1811939328 }, Ratio { numer: -4711451, denom: 201326592 }, Ratio { numer: 0, denom: 1 }], [Ratio { numer: -12534969342789956057, denom: 348765556884904083456 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -12534969342789956057, denom: 348765556884904083456 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 4530327028875921655883, denom: 41851866826188490014720 }, Ratio { numer: 23716342280350178857, denom: 5231483353273561251840 }, Ratio { numer: -12534969342789956057, denom: 348765556884904083456 }, Ratio { numer: 0, denom: 1 }]]"
+    },
+    {
+      "completion": [
+        2,
+        0
+      ],
+      "native_receiving_leaders": [
+        [
+          2
+        ],
+        [
+          2
+        ]
+      ],
+      "complex_logits": [
+        "-18977167/6442450944",
+        "0",
+        "-18977167/6442450944",
+        "0",
+        "550918213/57982058496",
+        "74494741/57982058496",
+        "-18977167/6442450944",
+        "0",
+        "-66879815338327691737/2790124455079232667648",
+        "0",
+        "-66879815338327691737/2790124455079232667648",
+        "0",
+        "3003231025115068341773/41851866826188490014720",
+        "137728344814173610181/41851866826188490014720",
+        "-66879815338327691737/2790124455079232667648",
+        "0"
+      ],
+      "class2_minus_class0_real_first": "180428179/14495514624",
+      "whole_raw_line": "actual leaky completion (2,0): leaders [[2], [2]]; actual complex logits [[Ratio { numer: -18977167, denom: 6442450944 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -18977167, denom: 6442450944 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 550918213, denom: 57982058496 }, Ratio { numer: 74494741, denom: 57982058496 }, Ratio { numer: -18977167, denom: 6442450944 }, Ratio { numer: 0, denom: 1 }], [Ratio { numer: -66879815338327691737, denom: 2790124455079232667648 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -66879815338327691737, denom: 2790124455079232667648 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 3003231025115068341773, denom: 41851866826188490014720 }, Ratio { numer: 137728344814173610181, denom: 41851866826188490014720 }, Ratio { numer: -66879815338327691737, denom: 2790124455079232667648 }, Ratio { numer: 0, denom: 1 }]]"
+    },
+    {
+      "completion": [
+        2,
+        1
+      ],
+      "native_receiving_leaders": [
+        [
+          0,
+          1,
+          3
+        ],
+        [
+          2
+        ]
+      ],
+      "complex_logits": [
+        "28467071/6442450944",
+        "0",
+        "28467071/6442450944",
+        "0",
+        "-824964689/57982058496",
+        "-67837973/57982058496",
+        "28467071/6442450944",
+        "0",
+        "-45656003873161479415/2790124455079232667648",
+        "0",
+        "-45656003873161479415/2790124455079232667648",
+        "0",
+        "2010108851177310717383/41851866826188490014720",
+        "45138410334663640091/41851866826188490014720",
+        "-45656003873161479415/2790124455079232667648",
+        "0"
+      ],
+      "class2_minus_class0_real_first": "-135146041/7247757312",
+      "whole_raw_line": "actual leaky completion (2,1): leaders [[0, 1, 3], [2]]; actual complex logits [[Ratio { numer: 28467071, denom: 6442450944 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 28467071, denom: 6442450944 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -824964689, denom: 57982058496 }, Ratio { numer: -67837973, denom: 57982058496 }, Ratio { numer: 28467071, denom: 6442450944 }, Ratio { numer: 0, denom: 1 }], [Ratio { numer: -45656003873161479415, denom: 2790124455079232667648 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -45656003873161479415, denom: 2790124455079232667648 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 2010108851177310717383, denom: 41851866826188490014720 }, Ratio { numer: 45138410334663640091, denom: 41851866826188490014720 }, Ratio { numer: -45656003873161479415, denom: 2790124455079232667648 }, Ratio { numer: 0, denom: 1 }]]"
+    },
+    {
+      "completion": [
+        2,
+        2
+      ],
+      "native_receiving_leaders": [
+        [
+          2
+        ],
+        [
+          2
+        ]
+      ],
+      "complex_logits": [
+        "-472333219/6442450944",
+        "0",
+        "-472333219/6442450944",
+        "0",
+        "12744087379/57982058496",
+        "548937121/57982058496",
+        "-472333219/6442450944",
+        "0",
+        "-190840403417744692789/2790124455079232667648",
+        "0",
+        "-190840403417744692789/2790124455079232667648",
+        "0",
+        "8577652422888305582123/41851866826188490014720",
+        "348275319110045596961/41851866826188490014720",
+        "-190840403417744692789/2790124455079232667648",
+        "0"
+      ],
+      "class2_minus_class0_real_first": "8497543175/28991029248",
+      "whole_raw_line": "actual leaky completion (2,2): leaders [[2], [2]]; actual complex logits [[Ratio { numer: -472333219, denom: 6442450944 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -472333219, denom: 6442450944 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 12744087379, denom: 57982058496 }, Ratio { numer: 548937121, denom: 57982058496 }, Ratio { numer: -472333219, denom: 6442450944 }, Ratio { numer: 0, denom: 1 }], [Ratio { numer: -190840403417744692789, denom: 2790124455079232667648 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -190840403417744692789, denom: 2790124455079232667648 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 8577652422888305582123, denom: 41851866826188490014720 }, Ratio { numer: 348275319110045596961, denom: 41851866826188490014720 }, Ratio { numer: -190840403417744692789, denom: 2790124455079232667648 }, Ratio { numer: 0, denom: 1 }]]"
+    },
+    {
+      "completion": [
+        2,
+        3
+      ],
+      "native_receiving_leaders": [
+        [
+          2
+        ],
+        [
+          2
+        ]
+      ],
+      "complex_logits": [
+        "-150766717/6442450944",
+        "0",
+        "-150766717/6442450944",
+        "0",
+        "4156680301/57982058496",
+        "216827455/57982058496",
+        "-150766717/6442450944",
+        "0",
+        "-100279837365182886427/2790124455079232667648",
+        "0",
+        "-100279837365182886427/2790124455079232667648",
+        "0",
+        "4530330766393561547093/41851866826188490014720",
+        "189730910754720305711/41851866826188490014720",
+        "-100279837365182886427/2790124455079232667648",
+        "0"
+      ],
+      "class2_minus_class0_real_first": "2756790377/28991029248",
+      "whole_raw_line": "actual leaky completion (2,3): leaders [[2], [2]]; actual complex logits [[Ratio { numer: -150766717, denom: 6442450944 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -150766717, denom: 6442450944 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 4156680301, denom: 57982058496 }, Ratio { numer: 216827455, denom: 57982058496 }, Ratio { numer: -150766717, denom: 6442450944 }, Ratio { numer: 0, denom: 1 }], [Ratio { numer: -100279837365182886427, denom: 2790124455079232667648 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -100279837365182886427, denom: 2790124455079232667648 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 4530330766393561547093, denom: 41851866826188490014720 }, Ratio { numer: 189730910754720305711, denom: 41851866826188490014720 }, Ratio { numer: -100279837365182886427, denom: 2790124455079232667648 }, Ratio { numer: 0, denom: 1 }]]"
+    },
+    {
+      "completion": [
+        3,
+        0
+      ],
+      "native_receiving_leaders": [
+        [
+          2
+        ],
+        [
+          2
+        ]
+      ],
+      "complex_logits": [
+        "-2372123/805306368",
+        "0",
+        "-2372123/805306368",
+        "0",
+        "275456663/28991029248",
+        "9311819/7247757312",
+        "-2372123/805306368",
+        "0",
+        "-4179985237580886679/174382778442452041728",
+        "0",
+        "-4179985237580886679/174382778442452041728",
+        "0",
+        "1501614360914159422639/20925933413094245007360",
+        "4304007955883581783/1307870838318390312960",
+        "-4179985237580886679/174382778442452041728",
+        "0"
+      ],
+      "class2_minus_class0_real_first": "360853091/28991029248",
+      "whole_raw_line": "actual leaky completion (3,0): leaders [[2], [2]]; actual complex logits [[Ratio { numer: -2372123, denom: 805306368 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -2372123, denom: 805306368 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 275456663, denom: 28991029248 }, Ratio { numer: 9311819, denom: 7247757312 }, Ratio { numer: -2372123, denom: 805306368 }, Ratio { numer: 0, denom: 1 }], [Ratio { numer: -4179985237580886679, denom: 174382778442452041728 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -4179985237580886679, denom: 174382778442452041728 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 1501614360914159422639, denom: 20925933413094245007360 }, Ratio { numer: 4304007955883581783, denom: 1307870838318390312960 }, Ratio { numer: -4179985237580886679, denom: 174382778442452041728 }, Ratio { numer: 0, denom: 1 }]]"
+    },
+    {
+      "completion": [
+        3,
+        1
+      ],
+      "native_receiving_leaders": [
+        [
+          0,
+          1,
+          3
+        ],
+        [
+          2
+        ]
+      ],
+      "complex_logits": [
+        "14233627/3221225472",
+        "0",
+        "14233627/3221225472",
+        "0",
+        "-103121197/7247757312",
+        "-33919081/28991029248",
+        "14233627/3221225472",
+        "0",
+        "-22827976168063987271/1395062227539616333824",
+        "0",
+        "-22827976168063987271/1395062227539616333824",
+        "0",
+        "251263318486320152611/5231483353273561251840",
+        "22569160054382323483/20925933413094245007360",
+        "-22827976168063987271/1395062227539616333824",
+        "0"
+      ],
+      "class2_minus_class0_real_first": "-540587431/28991029248",
+      "whole_raw_line": "actual leaky completion (3,1): leaders [[0, 1, 3], [2]]; actual complex logits [[Ratio { numer: 14233627, denom: 3221225472 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 14233627, denom: 3221225472 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -103121197, denom: 7247757312 }, Ratio { numer: -33919081, denom: 28991029248 }, Ratio { numer: 14233627, denom: 3221225472 }, Ratio { numer: 0, denom: 1 }], [Ratio { numer: -22827976168063987271, denom: 1395062227539616333824 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -22827976168063987271, denom: 1395062227539616333824 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 251263318486320152611, denom: 5231483353273561251840 }, Ratio { numer: 22569160054382323483, denom: 20925933413094245007360 }, Ratio { numer: -22827976168063987271, denom: 1395062227539616333824 }, Ratio { numer: 0, denom: 1 }]]"
+    },
+    {
+      "completion": [
+        3,
+        2
+      ],
+      "native_receiving_leaders": [
+        [
+          2
+        ],
+        [
+          2
+        ]
+      ],
+      "complex_logits": [
+        "-118083259/1610612736",
+        "0",
+        "-118083259/1610612736",
+        "0",
+        "3186020623/14495514624",
+        "137234233/14495514624",
+        "-118083259/1610612736",
+        "0",
+        "-47710087970177796979/697531113769808166912",
+        "0",
+        "-47710087970177796979/697531113769808166912",
+        "0",
+        "2144412529900389021407/10462966706547122503680",
+        "87068807221036650959/10462966706547122503680",
+        "-47710087970177796979/697531113769808166912",
+        "0"
+      ],
+      "class2_minus_class0_real_first": "2124384977/7247757312",
+      "whole_raw_line": "actual leaky completion (3,2): leaders [[2], [2]]; actual complex logits [[Ratio { numer: -118083259, denom: 1610612736 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -118083259, denom: 1610612736 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 3186020623, denom: 14495514624 }, Ratio { numer: 137234233, denom: 14495514624 }, Ratio { numer: -118083259, denom: 1610612736 }, Ratio { numer: 0, denom: 1 }], [Ratio { numer: -47710087970177796979, denom: 697531113769808166912 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -47710087970177796979, denom: 697531113769808166912 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 2144412529900389021407, denom: 10462966706547122503680 }, Ratio { numer: 87068807221036650959, denom: 10462966706547122503680 }, Ratio { numer: -47710087970177796979, denom: 697531113769808166912 }, Ratio { numer: 0, denom: 1 }]]"
+    },
+    {
+      "completion": [
+        3,
+        3
+      ],
+      "native_receiving_leaders": [
+        [
+          2
+        ],
+        [
+          2
+        ]
+      ],
+      "complex_logits": [
+        "-75383267/3221225472",
+        "0",
+        "-75383267/3221225472",
+        "0",
+        "2078337707/28991029248",
+        "108413633/28991029248",
+        "-75383267/3221225472",
+        "0",
+        "-50139892914074690777/1395062227539616333824",
+        "0",
+        "-50139892914074690777/1395062227539616333824",
+        "0",
+        "2265164231553406025299/20925933413094245007360",
+        "94865410264410656293/20925933413094245007360",
+        "-50139892914074690777/1395062227539616333824",
+        "0"
+      ],
+      "class2_minus_class0_real_first": "1378393555/14495514624",
+      "whole_raw_line": "actual leaky completion (3,3): leaders [[2], [2]]; actual complex logits [[Ratio { numer: -75383267, denom: 3221225472 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -75383267, denom: 3221225472 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 2078337707, denom: 28991029248 }, Ratio { numer: 108413633, denom: 28991029248 }, Ratio { numer: -75383267, denom: 3221225472 }, Ratio { numer: 0, denom: 1 }], [Ratio { numer: -50139892914074690777, denom: 1395062227539616333824 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -50139892914074690777, denom: 1395062227539616333824 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 2265164231553406025299, denom: 20925933413094245007360 }, Ratio { numer: 94865410264410656293, denom: 20925933413094245007360 }, Ratio { numer: -50139892914074690777, denom: 1395062227539616333824 }, Ratio { numer: 0, denom: 1 }]]"
+    }
+  ],
+  "actual_source_conditioning": "last source class1 yields first receiving tie {0,1,3}; last classes0,2,3 yield first leader {2}; second crossing {2} in every listed case",
+  "exact_real_read_equality_classes_0_1_3_in_all16_cases": true,
+  "reconstruction_or_task_fidelity": false,
+  "teacher_oracle_used_in_forward": false,
+  "source_or_receiving_law_changed_for_readout": false,
+  "statistical_unit": "one fixed learned constitution and returned carry, sixteen dependent deterministic source completions, not sixteen independent training results"
+}

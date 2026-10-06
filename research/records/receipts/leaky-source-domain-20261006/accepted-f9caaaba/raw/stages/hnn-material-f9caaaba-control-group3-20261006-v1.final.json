@@ -1,0 +1,99 @@
+{
+  "passed": false,
+  "label": "hnn-material-f9caaaba-control-group3-20261006-v1",
+  "scientific_job": false,
+  "deferred_lock_busy": false,
+  "final_CPU_ns": 7633445000,
+  "CPU_reading_grain_ns": 1000,
+  "aggregate_CPU_limit_us": 17000000,
+  "final_CPU_source": "systemd retained oneshot CPUUsageNSec after all group processes exit",
+  "CPU_kernel_hard_total_limit": false,
+  "sampled_stop_margin_us": 1000000,
+  "aggregate_CPU_within_limit": true,
+  "no_overshoot_accepted": true,
+  "wall_ns": 7702555302,
+  "projection_ns": 16000000000,
+  "wall_source": "external monotonic_ns through final property read",
+  "quiescent": true,
+  "completion_event": "oneshot start job completed; no polling",
+  "unit_properties": {
+    "Description": "Owned holonics admission hnn-material-f9caaaba-control-group3-20261006-v1 1f0b7820ddc578bb2edfdbe13eb583bb",
+    "LoadState": "loaded",
+    "ActiveState": "active",
+    "SubState": "exited",
+    "InvocationID": "f17a614811dd4834a0b2cc7fae92d0e3",
+    "Result": "success",
+    "ExecMainStatus": "0",
+    "ControlGroup": "",
+    "MemoryPeak": "18386944",
+    "CPUUsageNSec": "7633445000",
+    "TasksCurrent": "[not set]"
+  },
+  "outer_error": null,
+  "unit_start_exit": 0,
+  "unit_start_stdout": "",
+  "unit_start_stderr": "",
+  "config": {
+    "sha256": "5020490708fff00ea073fd24a9afad96965aaa77ce0f5f04b70e6333bc76ae46",
+    "bytes": 129751
+  },
+  "receipt_pins": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-control-group3-20261006-v1.config.json": {
+      "sha256": "5020490708fff00ea073fd24a9afad96965aaa77ce0f5f04b70e6333bc76ae46",
+      "bytes": 129751
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-control-group3-20261006-v1.external-lease.json": {
+      "sha256": "6e41f46a1041c81fb1f56b98c160df9a742a04e103a34cad04dcb2c48b8a0ae1",
+      "bytes": 487
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-control-group3-20261006-v1.lease-identity.json": {
+      "sha256": "97581d8dd4da92b1c4289d64958ea55618cd003493cccbd53e058044f75969c6",
+      "bytes": 565
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-control-group3-20261006-v1.input_seal.json": {
+      "sha256": "fad5b22d803c630560e5bcd058d2b7dda916cceb53e183b3a70324bce13b22b9",
+      "bytes": 83370
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-control-group3-20261006-v1.stdout": {
+      "sha256": "a66c939599908957faff18b35529c77be4d371c7ca1eaa1fac3c637bd9ca12f0",
+      "bytes": 2020
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-control-group3-20261006-v1.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-control-group3-20261006-v1.memory-gate.json": {
+      "sha256": "b95c116a16196edb40a87a43d5bfcdba7a4e33061f9d0e2c1a13269d22144859",
+      "bytes": 120
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-control-group3-20261006-v1.child-identity.json": {
+      "sha256": "a0d2ec944f0dc52f67e403eff6b08fae4d4d3fb373d5b69df7c50c7e9189566c",
+      "bytes": 78
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-control-group3-20261006-v1.system-floor.json": {
+      "sha256": "5ddefb0b67a016753136d1e2202af14fbee9edd1978ea884ea21ce69abbc71cf",
+      "bytes": 59231
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-control-group3-20261006-v1.quiescence.json": {
+      "sha256": "85bd56f0dcbfeb06b444d6637a9ccd61dbd0e4e1ce363921deaccddadc741714",
+      "bytes": 130
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-control-group3-20261006-v1.output_seal.json": {
+      "sha256": "fa0e0752b8dc2bb9f93e5a4cb0f1892b24c99607f050ca6ed698e2c634bdaff4",
+      "bytes": 509284
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-control-group3-20261006-v1.publication.json": {
+      "sha256": "667690242c960b4f37f96d07ecc98aa7dda3c30202b596db179fe95a3ede0130",
+      "bytes": 2768
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-control-group3-20261006-v1.stage-quiescence.json": {
+      "sha256": "de95b86b689dce9ab405030db45dd912b54c62ede6c38a88f3fcede775b7b58b",
+      "bytes": 136
+    }
+  },
+  "launcher_outside_native_group": true,
+  "lease_owner_outside_capped_group": true,
+  "lease_held_through_final_CPU_read_and_publication": true,
+  "stage_passed_before_cleanup": true,
+  "requires_cleanup_acceptance": true
+}

@@ -1,0 +1,12 @@
+{
+  "wall_ns": 6954968514,
+  "peak_RSS_KiB": 30004,
+  "source_manifest": {
+    "sha256": "9bf63c67c917a430312eda36195f432d70dd6455e70165fc8dcdb55c77edb0f7",
+    "bytes": 47684
+  },
+  "current_source_verified": true,
+  "cache_count": 2526,
+  "compiler_launched": false,
+  "preserved_full_preparation_failure": "Existing prior-source whole-cache timeout preserved; this candidate uses previously accepted selected cache read, not an unchanged failed retry."
+}

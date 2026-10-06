@@ -1,0 +1,62 @@
+{
+  "lease_still_held": true,
+  "own_group_other_PIDs": [],
+  "outcome": {
+    "provisional_passed": true,
+    "final_acceptance_requires_external_CPU_read": true,
+    "label": "hnn-material-f9caaaba-cache-preparation-20261006-v1",
+    "wall_ns": 6984161896,
+    "peak_child_RSS_KiB": 30004,
+    "group_memory_peak_bytes": 4294967296,
+    "original_coordinates_modified": false,
+    "aggregate_cpu_final_us": 6023791,
+    "aggregate_cpu_limit_us": 17000000,
+    "CPU_kernel_hard_total_limit": false
+  },
+  "outputs": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-cache-preparation-20261006-v1.lease-identity.json": {
+      "sha256": "6c076877cf40169c709dc7f401ebd8a4b9e41020a23721890fd38a3a176333e9",
+      "bytes": 565
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-cache-preparation-20261006-v1.memory-gate.json": {
+      "sha256": "592a7546948e8733eab4e3665cadae3319bd0dcff50212ab01d6a6ff1408ab8f",
+      "bytes": 120
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-cache-preparation-20261006-v1.child-identity.json": {
+      "sha256": "779a00f9afe37e9c52b996235ee8bcd7742dead511898ecb22cac14c2f15aad7",
+      "bytes": 78
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-cache-preparation-20261006-v1.system-floor.json": {
+      "sha256": "8f4f09c8e5a9f416c89b44462f5990addfe9122385a4fb05de5fd98964675c86",
+      "bytes": 54445
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-cache-preparation-20261006-v1.quiescence.json": {
+      "sha256": "902c1cee80f719773096dacce3cf29985dedeaf22117ff56629b1faa636a5190",
+      "bytes": 130
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-cache-preparation-20261006-v1.input_seal.json": {
+      "sha256": "ab32442e16b425172f58ec4c7a1e2d6c8a81a0d9269e214d3d5fb43b2358e986",
+      "bytes": 3849
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-cache-preparation-20261006-v1.output_seal.json": {
+      "sha256": "8fb1ec7b994916d6009096d916525ec627197c35acbddb9528d7a8c676433ec8",
+      "bytes": 464038
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-cache-preparation-20261006-v1.stdout": {
+      "sha256": "cea601ae059021c9aeae0cfde1ccdbbf216fb7860ae5cb73f3f113d6dbc25be3",
+      "bytes": 430
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-cache-preparation-20261006-v1.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-20261006/CACHE_SNAPSHOT.v2.json": {
+      "sha256": "d623783bdae367ace88c38dd2c8fc47590e6ab4eef95e1c259f153ce40b59282",
+      "bytes": 453200
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-20261006/PREPARATION.v2.json": {
+      "sha256": "5dba1ee787cb963da991c1fc8d9b5e2f1892158ef92ff9c501e20716f4338f22",
+      "bytes": 458
+    }
+  }
+}

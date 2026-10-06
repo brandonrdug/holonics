@@ -1,0 +1,1339 @@
+//! **The host's readings of a word executed on the card** (the port plan's host side): the faces,
+//! each tick's balance, the word's release, and the word's return, each read exactly from the
+//! card's integer record.
+//!
+//! [definition] The card executes the word's change; the host keeps the readings whose values are
+//! exact rationals past the carrier or in `ℚ(θ)` (the port plan: "the faces in `ℚ(θ)`, every
+//! enclosure, the Holon ratio"). Each is the host owner's formula read on the record's coordinates:
+//!
+//! - **the faces** (`holonics::hnn::receiving::ReceivingPhases::read`, `ratio::Faces::of_reads`):
+//!   the wave's logits are the card's (`R · P_R^(τ_R) v_R(e_j)`, exact); their grain cells and
+//!   faces in `ℚ(θ)` are the host's. The landmark tree's grain logits at each phase's causal address
+//!   (the landmark tree) are read on the host from its constitution's tree at compare and added there
+//!   (`PendingRatio::against`, the host reference's own formula);
+//! - **each tick's balance** (`holonics::hnn::word::Word::tick`, `propagation::TickBalance`): the
+//!   power before and after, the dissipation, the passive and contrast terms, and the executed
+//!   word's residual with its certified bound, term by term as the host forms them. [agent-inferred]
+//!   They are read on the host, from the record the return reads anyway, because their terms pass
+//!   the card's 128-bit carrier (`⟨x̄, K x̄⟩` lies on `2^(−148)ℤ` at campaign 1's scales) and they are
+//!   receipts, read once per tick;
+//! - **the release** (`Word::released`): the unread change's power, the peak bits of the change,
+//!   the last junction's residual, and every carried remainder, released and read;
+//! - **the return** (`port::Word::pull_back`): the reads' covectors formed on the host (the
+//!   covector `p̃ − q` lives on `(1/W)ℤ`, not on a lattice, so its pull through `Rᵀ` and its first
+//!   split are the host's, and its remainder is released with the return's), the elements', loaded
+//!   resonators' and transits' ticks, the conductance covector (its junction parts divide by the
+//!   admittance sum, which is not dyadic) and the return's remainders. A loaded `ResonatorTick`
+//!   reads its drive, state, rate, returned wave and post-split reverse solve from the resident word
+//!   record; the host contracts it with the declared material gain family.
+
+use holonics::hnn::chart::carry;
+use holonics::hnn::port::{ElementTick, ResonatorTick, TransitTick, WordReturn};
+use holonics::hnn::propagation::TickBalance;
+use holonics::hnn::ratio::Faces;
+use holonics::hnn::receiving::ReceivingRead;
+use holonics::hnn::word::EndChange;
+use holonics::hnn::{ChartReading, Field, HnnError, RatioCovector, Released, Remainders};
+use holonics::ratio::Rat;
+
+use num_bigint::BigInt;
+use num_traits::{Signed, Zero};
+
+use crate::hnn::dyadic::{DyadicMatrix, dot, integral, l1, lift, sup, value, wide, wider};
+use crate::hnn::execute::{ForwardRecord, ReverseRecord, WordPlan};
+use crate::hnn::publication::Loci;
+
+fn rat(numerator: BigInt, exponent: u32) -> Rat {
+    value(numerator, exponent)
+}
+
+fn integer(value: i64) -> Rat {
+    Rat::from_integer(BigInt::from(value))
+}
+
+/// A remainder carried over a denominator (a crossed wave's, the reception carry;
+/// `1` at rest): its coordinate's value divided by it.
+fn over(value: Rat, denominator: i64) -> Rat {
+    if denominator == 1 {
+        value
+    } else {
+        value / Rat::from_integer(BigInt::from(denominator))
+    }
+}
+
+/// A held rate's remainder (the reception carry, `crate::hnn::execute::HeldRow`): the integer part
+/// the card carried at `2^(−σ)` and the fixed fraction the host split off at the open, at the same
+/// scale.
+fn fractional(value: Rat, fraction: Option<&Rat>, exponent: u32) -> Rat {
+    match fraction {
+        Some(fraction) if !fraction.is_zero() => {
+            value + fraction / Rat::from_integer(BigInt::from(1) << exponent as usize)
+        }
+        _ => value,
+    }
+}
+
+/// A word's slice of `len` entries at `at`.
+fn slice<T: Clone>(values: &[T], at: usize, len: usize) -> &[T] {
+    &values[at..at + len]
+}
+
+/// The exact bits of a dyadic entry `X · 2^(−σ)` as a reduced ratio: its numerator's and its
+/// denominator's bits (`ExactWork`'s and `Word::state_bits`'s reading).
+fn entry_bits(coordinate: i64, exponent: u32) -> u64 {
+    let value = rat(BigInt::from(coordinate), exponent);
+    value.numer().bits() + value.denom().bits()
+}
+
+/// [definition] **One step's change as the host reads it**: per ring its storage and anchor, per
+/// contact its arrivals at both ends and its state `(u, w)`, all on `2^(−L_w)ℤ`.
+struct Change<'a> {
+    storage: &'a [i64],
+    arrivals: &'a [i64],
+    u: &'a [i64],
+    w: &'a [i64],
+    resonator_u: &'a [i64],
+    resonator_w: &'a [i64],
+    resonator_phases: Vec<Option<usize>>,
+}
+
+impl<'a> Change<'a> {
+    fn at(plan: &WordPlan, record: &'a ForwardRecord, step: usize) -> Self {
+        let full = plan.steps.saturating_sub(1);
+        let (resonator_u, resonator_w) = if step >= full {
+            (&record.resonator_final_u[..], &record.resonator_final_w[..])
+        } else {
+            (
+                &record.resonator_u[step * plan.n..(step + 1) * plan.n],
+                &record.resonator_w[step * plan.n..(step + 1) * plan.n],
+            )
+        };
+        let resonator_phases = measured_phases(plan, step.min(full));
+        Self {
+            storage: slice(&record.storage, step * plan.n, plan.n),
+            arrivals: slice(&record.arrivals, step * plan.na, plan.na),
+            u: slice(&record.u, step * plan.k, plan.k),
+            w: slice(&record.w, step * plan.k, plan.k),
+            resonator_u,
+            resonator_w,
+            resonator_phases,
+        }
+    }
+
+    fn after(plan: &WordPlan, record: &'a ForwardRecord) -> Self {
+        Self {
+            storage: &record.final_storage,
+            arrivals: &record.final_arrivals,
+            u: &record.final_u,
+            w: &record.final_w,
+            resonator_u: &record.resonator_final_u,
+            resonator_w: &record.resonator_final_w,
+            resonator_phases: measured_phases(plan, plan.steps.saturating_sub(1)),
+        }
+    }
+
+    /// **The change as the host's `EndChange`** (`holonics::hnn::word::EndChange`): the storage
+    /// waves per ring, the arriving waves per contact `[at from, at to]` and the states `[u, w]`,
+    /// each coordinate on `2^(−L_w)ℤ`.
+    fn end(&self, plan: &WordPlan) -> EndChange {
+        let values = |words: &[i64]| -> Vec<Rat> {
+            words
+                .iter()
+                .map(|&x| rat(BigInt::from(x), plan.lw))
+                .collect()
+        };
+        let resonators = plan
+            .rings
+            .iter()
+            .enumerate()
+            .map(|(ring_index, ring)| {
+                if !plan.resonators.iter().any(|r| r.ring == ring_index) {
+                    return (None, None);
+                }
+                let values = |words: &[i64]| {
+                    slice(words, ring.rows, ring.width)
+                        .iter()
+                        .map(|&x| rat(BigInt::from(x), plan.lw))
+                        .collect::<Vec<_>>()
+                };
+                (
+                    Some([values(self.resonator_u), values(self.resonator_w)]),
+                    self.resonator_phases[ring_index],
+                )
+            })
+            .map(|(state, _phase)| state)
+            .collect::<Vec<_>>();
+        let resonator_phases = self.resonator_phases.clone();
+        EndChange {
+            storage: plan
+                .rings
+                .iter()
+                .map(|ring| values(slice(self.storage, ring.rows, ring.width)))
+                .collect(),
+            arrivals: plan
+                .contacts
+                .iter()
+                .map(|contact| {
+                    let widths = [
+                        plan.rings[contact.ends.0].width,
+                        plan.rings[contact.ends.1].width,
+                    ];
+                    [
+                        values(slice(self.arrivals, contact.arrival[0], widths[0])),
+                        values(slice(self.arrivals, contact.arrival[1], widths[1])),
+                    ]
+                })
+                .collect(),
+            states: plan
+                .contacts
+                .iter()
+                .map(|contact| {
+                    [
+                        values(slice(self.u, contact.rows, contact.width)),
+                        values(slice(self.w, contact.rows, contact.width)),
+                    ]
+                })
+                .collect(),
+            resonators,
+            resonator_phases,
+        }
+    }
+}
+
+/// The pump phase whose form measures each loaded ring's state after `ticks` full ticks
+/// (`holonics::hnn::word::EndChange::resonator_phases`): the last executed tick's, and phase `0`,
+/// where the open state is read, before any; `None` off the loaded rings.
+fn measured_phases(plan: &WordPlan, ticks: usize) -> Vec<Option<usize>> {
+    (0..plan.rings.len())
+        .map(|ring| {
+            let resonator = plan.resonators.iter().find(|res| res.ring == ring)?;
+            Some(phase_before(plan, resonator.phases, ticks))
+        })
+        .collect()
+}
+
+/// [definition; record B §2.4] **The pump phase at word tick `t`**: the field's tick
+/// `opened_at + t` on the pump's circle (`ResonatorOperands::phase_at`).
+fn phase_at(plan: &WordPlan, phases: usize, tick: usize) -> usize {
+    (plan.opened_at + tick) % phases
+}
+
+/// The pump phase that measures a state before word tick `t` (the previous hop's, phase `0` at the
+/// field's first tick): `phase_at(opened_at + t − 1)`.
+fn phase_before(plan: &WordPlan, phases: usize, tick: usize) -> usize {
+    (plan.opened_at + tick)
+        .checked_sub(1)
+        .map_or(0, |previous| previous % phases)
+}
+
+/// `⟨x, F x⟩` for a form at its scale and a coordinate vector at `σ_x`: the value, or zero for a
+/// zero form (the host reads it as no term).
+fn quadratic(form: &DyadicMatrix, vector: &[BigInt], exponent: u32) -> Rat {
+    if form.is_zero() {
+        return Rat::zero();
+    }
+    let image = form.apply(vector);
+    rat(dot(vector, &image), 2 * exponent + form.exponent)
+}
+
+/// **The global power of a change** (`holonics::hnn::propagation::global_power`):
+/// `(h/4)[Σ_r Y_r |s_r|² + Σ_a G_a (|a_from|² + |a_to|²)] + Σ_a ½(⟨w, C w⟩ + ⟨u, K u⟩)`.
+fn power(plan: &WordPlan, loci: &Loci, change: &Change<'_>) -> Rat {
+    let lw = plan.lw;
+    let mut waves = Rat::zero();
+    for ring in &plan.rings {
+        let s = wide(slice(change.storage, ring.rows, ring.width));
+        waves += &ring.admittance * rat(dot(&s, &s), 2 * lw);
+    }
+    let mut stored = Rat::zero();
+    for (a, contact) in plan.contacts.iter().enumerate() {
+        let widths = [
+            plan.rings[contact.ends.0].width,
+            plan.rings[contact.ends.1].width,
+        ];
+        let mut squares = BigInt::zero();
+        for (base, width) in contact.arrival.iter().zip(widths) {
+            let x = wide(slice(change.arrivals, *base, width));
+            squares += dot(&x, &x);
+        }
+        waves += &contact.conductance * rat(squares, 2 * lw);
+        let u = wide(slice(change.u, contact.rows, contact.width));
+        let w = wide(slice(change.w, contact.rows, contact.width));
+        let contactloci = &loci.contacts[a];
+        stored += (quadratic(&contactloci.storage.matrix, &w, lw)
+            + quadratic(&contactloci.stiffness.matrix, &u, lw))
+            / integer(2);
+    }
+    &plan.step / integer(4) * waves + stored
+}
+
+fn resonator_matrix(plan: &WordPlan, offset: usize, width: usize, exponent: u32) -> DyadicMatrix {
+    DyadicMatrix {
+        rows: width,
+        columns: width,
+        exponent,
+        words: plan.operands[offset..offset + width * width].to_vec(),
+    }
+}
+
+fn loaded_output(
+    plan: &WordPlan,
+    record: &ForwardRecord,
+    resonator: &crate::hnn::execute::LoadedResonatorPlan,
+    tick: usize,
+) -> Vec<Rat> {
+    let ring = &plan.rings[resonator.ring];
+    (0..resonator.width)
+        .map(|i| {
+            let at = tick * plan.n + ring.rows + i;
+            let drive = rat(BigInt::from(record.resonator_drive[at]), plan.lw);
+            let rate = rat(BigInt::from(record.resonator_rate[at]), plan.lw);
+            drive
+                - Rat::new(
+                    BigInt::from(resonator.return_gain) * rate.numer(),
+                    rate.denom() * (BigInt::from(1u8) << resonator.return_exp as usize),
+                )
+        })
+        .collect()
+}
+
+/// The host's `ResonatorBalance` read from the loaded tick record. The returned wave's split
+/// remains in the field balance; it is separate from the resonator's state split. Its bound is the
+/// host's (`holonics::hnn::ring::ResonatorStep::bound`) on the record's coordinates:
+/// `‖ω‖₁(δ_j‖r‖∞ + ‖M_j‖∞u)` for the executed solve, with the host's chart certificate and the
+/// operator words' row norm, and `(u/2)(‖C(ŵ′ + w′)‖₁ + ‖K_j(û′ + u′)‖₁)` for the state's split. The
+/// card carries the state exactly (`u + hω`, `2ω − w` lie on `2^(−L_w)ℤ` for `h = 2^(e_h)`), so the
+/// carried state is its image and the split term is zero, while its bound is not.
+fn resonator_balance(
+    plan: &WordPlan,
+    record: &ForwardRecord,
+    resonator: &crate::hnn::execute::LoadedResonatorPlan,
+) -> Result<holonics::hnn::word::ResonatorBalance, HnnError> {
+    let n = resonator.width;
+    let capacity = resonator_matrix(plan, resonator.capacity_offset, n, resonator.material_exp);
+    let dissipation = resonator_matrix(
+        plan,
+        resonator.dissipation_offset,
+        n,
+        resonator.material_exp,
+    );
+    let saturation = resonator.saturation.map(|(beta, exponent)| {
+        holonics::holon::parametron::SymmetricQuartic::new(rat(BigInt::from(beta), exponent))
+            .expect("the plan carries a declared positive quartic coefficient")
+    });
+    let quartic = |coordinates: &[BigInt]| -> Rat {
+        saturation.as_ref().map_or_else(Rat::zero, |law| {
+            let state: Vec<Rat> = coordinates
+                .iter()
+                .map(|x| rat(x.clone(), plan.lw))
+                .collect();
+            law.energy(&state)
+                .expect("the declared realified resonator width")
+        })
+    };
+    let h = &plan.step;
+    let full = plan.steps.saturating_sub(1);
+    let mut end = Rat::zero();
+    let mut pump = Rat::zero();
+    let mut port = Rat::zero();
+    let mut dissipation_work = Rat::zero();
+    let mut integration = Rat::zero();
+    let mut chart_work = Rat::zero();
+    let mut split_work = Rat::zero();
+    let mut bound = Rat::zero();
+    let unit = rat(BigInt::from(1), plan.lw);
+    let ring = &plan.rings[resonator.ring];
+    for tick in 0..full {
+        let at = tick * plan.n + ring.rows;
+        let phase = phase_at(plan, resonator.phases, tick);
+        let previous_phase = if plan.opened_at + tick == 0 {
+            phase
+        } else {
+            phase_before(plan, resonator.phases, tick)
+        };
+        let displacement: Vec<BigInt> = slice(&record.resonator_u, at, n)
+            .iter()
+            .map(|x| BigInt::from(*x))
+            .collect();
+        let velocity: Vec<BigInt> = slice(&record.resonator_w, at, n)
+            .iter()
+            .map(|x| BigInt::from(*x))
+            .collect();
+        let rate: Vec<BigInt> = slice(&record.resonator_rate, at, n)
+            .iter()
+            .map(|x| BigInt::from(*x))
+            .collect();
+        let drive: Vec<BigInt> = slice(&record.resonator_drive, at, n)
+            .iter()
+            .map(|x| BigInt::from(*x))
+            .collect();
+        let stiffness_at = resonator.stiffness_offset + phase * n * n;
+        let stiffness = resonator_matrix(plan, stiffness_at, n, resonator.material_exp);
+        let previous_at = resonator.stiffness_offset + previous_phase * n * n;
+        let previous_stiffness = resonator_matrix(plan, previous_at, n, resonator.material_exp);
+        if previous_phase != phase {
+            let delta = DyadicMatrix {
+                rows: n,
+                columns: n,
+                exponent: resonator.material_exp,
+                words: stiffness
+                    .words
+                    .iter()
+                    .zip(&previous_stiffness.words)
+                    .map(|(a, b)| a - b)
+                    .collect(),
+            };
+            pump += quadratic(&delta, &displacement, plan.lw) / integer(2);
+        }
+
+        let displacement_image: Vec<BigInt> = displacement
+            .iter()
+            .zip(&rate)
+            .map(|(u, w)| u + (w << resonator.hop_exp as usize))
+            .collect();
+        // Read both carried states from the resident word. Their images use this law's
+        // recurrence, and the split term includes a held rate's continuing error feedback.
+        let displacement_at = if tick + 1 < full {
+            slice(&record.resonator_u, at + plan.n, n)
+        } else {
+            slice(&record.resonator_final_u, ring.rows, n)
+        };
+        let displacement_after = wide(displacement_at);
+        let velocity_image: Vec<BigInt> = rate
+            .iter()
+            .zip(&velocity)
+            .map(|(w, previous)| {
+                if saturation.is_some() {
+                    w.clone()
+                } else {
+                    (w << 1usize) - previous
+                }
+            })
+            .collect();
+        let carried_at = if tick + 1 < full {
+            slice(&record.resonator_w, at + plan.n, n)
+        } else {
+            slice(&record.resonator_final_w, ring.rows, n)
+        };
+        let velocity_after: Vec<BigInt> = carried_at.iter().map(|x| BigInt::from(*x)).collect();
+        end = (quadratic(&capacity, &velocity_after, plan.lw)
+            + quadratic(&stiffness, &displacement_after, plan.lw))
+            / integer(2)
+            + quartic(&displacement_after);
+        let quartic_split = quartic(&displacement_after) - quartic(&displacement_image);
+        let split_before = split_work.clone();
+        split_work += (quadratic(&capacity, &velocity_after, plan.lw)
+            - quadratic(&capacity, &velocity_image, plan.lw)
+            + quadratic(&stiffness, &displacement_after, plan.lw)
+            - quadratic(&stiffness, &displacement_image, plan.lw))
+            / integer(2)
+            + &quartic_split;
+        if let Some(law) = &saturation {
+            let drift: Vec<BigInt> = rate
+                .iter()
+                .map(|w| w << resonator.hop_exp as usize)
+                .collect();
+            let rate_change: Vec<BigInt> = rate.iter().zip(&velocity).map(|(a, b)| a - b).collect();
+            let state: Vec<Rat> = displacement
+                .iter()
+                .map(|x| rat(x.clone(), plan.lw))
+                .collect();
+            let drift_rat: Vec<Rat> = drift.iter().map(|x| rat(x.clone(), plan.lw)).collect();
+            integration += (quadratic(&stiffness, &drift, plan.lw)
+                - quadratic(&capacity, &rate_change, plan.lw))
+                / integer(2)
+                + law
+                    .drift_defect(&state, &drift_rat)
+                    .expect("the declared realified resonator width");
+        }
+
+        let drive_rat: Vec<Rat> = drive.iter().map(|x| rat(x.clone(), plan.lw)).collect();
+        let output = loaded_output(plan, record, resonator, tick);
+        let input_norm: Rat = drive_rat.iter().map(|x| x * x).sum();
+        let output_norm: Rat = output.iter().map(|x| x * x).sum();
+        port += h * &ring.admittance / integer(4) * (input_norm - output_norm);
+        dissipation_work += h * quadratic(&dissipation, &rate, plan.lw);
+
+        let operator_at = resonator.operator_offset + phase * n * n;
+        let operator = resonator_matrix(plan, operator_at, n, resonator.operator_exp);
+        let mut rhs: Vec<BigInt> = capacity
+            .apply(&velocity)
+            .into_iter()
+            .map(|x| if saturation.is_some() { x } else { x << 1usize })
+            .map(|x| x << (resonator.force_exp - resonator.material_exp) as usize)
+            .collect();
+        let h_exp = resonator.hop_exp as usize;
+        let ku = stiffness.apply(&displacement);
+        for i in 0..n {
+            rhs[i] += &drive[i] << (resonator.force_exp as usize + h_exp);
+            rhs[i] -= &ku[i] << (h_exp + (resonator.force_exp - resonator.material_exp) as usize);
+        }
+        if let Some((beta, exponent)) = resonator.saturation {
+            let shift = h_exp + (resonator.force_exp - exponent - 2 * plan.lw) as usize;
+            for node in (0..n).step_by(2) {
+                let radius = &displacement[node] * &displacement[node]
+                    + &displacement[node + 1] * &displacement[node + 1];
+                for coordinate in node..node + 2 {
+                    rhs[coordinate] -=
+                        (BigInt::from(beta) * &radius * &displacement[coordinate]) << shift;
+                }
+            }
+        }
+        let image = operator.apply(&rate);
+        let common = resonator.operator_exp.max(resonator.force_exp) + plan.lw;
+        let op_shift = common - (resonator.operator_exp + plan.lw);
+        let rhs_shift = common - (resonator.force_exp + plan.lw);
+        let rhs_at_scale = rhs.clone();
+        let residual: Vec<BigInt> = image
+            .iter()
+            .zip(rhs)
+            .map(|(left, right)| (left << op_shift as usize) - (right << rhs_shift as usize))
+            .collect();
+        let tick_chart = rat(dot(&rate, &residual), plan.lw + common);
+        chart_work += &tick_chart;
+        // The solve and state split retain their separate numerical bounds. The signed
+        // constitutive integration defect never enters either bound.
+        let tick_chart_bound = rat(l1(&rate), plan.lw)
+            * (&resonator.certificates[phase]
+                * rat(sup(&rhs_at_scale), resonator.force_exp + plan.lw)
+                + operator.row_norm() * &unit);
+        let displacement_sum: Vec<BigInt> = displacement_after
+            .iter()
+            .zip(&displacement_image)
+            .map(|(carried, image)| carried + image)
+            .collect();
+        let velocity_sum: Vec<BigInt> = velocity_after
+            .iter()
+            .zip(&velocity_image)
+            .map(|(carried, image)| carried + image)
+            .collect();
+        let stored = capacity.apply(&velocity_sum);
+        let stiffened = stiffness.apply(&displacement_sum);
+        let tick_split_bound = &unit
+            * (rat(l1(&stored), capacity.exponent + plan.lw)
+                + rat(l1(&stiffened), stiffness.exponent + plan.lw))
+            / integer(2)
+            + quartic_split.abs();
+        // Check each producing tick, before summing signed defects: neither the integration
+        // term nor a residual of opposite sign at another tick may hide a wrong solve.
+        if tick_chart.abs() > tick_chart_bound
+            || (&split_work - split_before).abs() > tick_split_bound
+        {
+            return Err(HnnError::Resonator {
+                ring: resonator.ring,
+                what: "a device tick exceeds its chart or split certificate",
+            });
+        }
+        bound += tick_chart_bound + tick_split_bound;
+    }
+    let mut released = Vec::new();
+    for i in 0..n {
+        let row = resonator.rows + i;
+        released.push(rat(
+            BigInt::from(record.resonator_remainders[0][row]),
+            plan.lw + resonator.force_exp + resonator.chart_exp,
+        ));
+        released.push(rat(
+            BigInt::from(record.resonator_remainders[1][row]),
+            plan.lw,
+        ));
+        released.push(fractional(
+            rat(BigInt::from(record.resonator_remainders[2][row]), plan.lw),
+            plan.velocity_fraction(row),
+            plan.lw,
+        ));
+    }
+    // The state the word opened on, measured at the phase before its first hop.
+    let (open_u, open_w) = if full > 0 {
+        (
+            slice(&record.resonator_u, ring.rows, n),
+            slice(&record.resonator_w, ring.rows, n),
+        )
+    } else {
+        (
+            slice(&record.resonator_final_u, ring.rows, n),
+            slice(&record.resonator_final_w, ring.rows, n),
+        )
+    };
+    let open_phase = phase_before(plan, resonator.phases, 0);
+    let open_stiffness = resonator_matrix(
+        plan,
+        resonator.stiffness_offset + open_phase * n * n,
+        n,
+        resonator.material_exp,
+    );
+    let open = (quadratic(&capacity, &wide(open_w), plan.lw)
+        + quadratic(&open_stiffness, &wide(open_u), plan.lw))
+        / integer(2)
+        + quartic(&wide(open_u));
+    Ok(holonics::hnn::word::ResonatorBalance {
+        ring: resonator.ring,
+        ticks: full,
+        open,
+        end,
+        pump,
+        port,
+        dissipation: dissipation_work,
+        integration,
+        chart: chart_work,
+        split: split_work,
+        bound,
+        released: Remainders::of(&released),
+    })
+}
+
+/// The signed field-port work and its separate returned-wave lattice split for one tick.
+fn loaded_field_terms(plan: &WordPlan, record: &ForwardRecord, tick: usize) -> (Rat, Rat, Rat) {
+    let h = &plan.step;
+    let mut loaded_port = Rat::zero();
+    let mut loaded_split = Rat::zero();
+    let mut loaded_split_bound = Rat::zero();
+    for resonator in &plan.resonators {
+        let ring = &plan.rings[resonator.ring];
+        let at = tick * plan.n + resonator.rows;
+        let drive: Vec<Rat> = slice(&record.resonator_drive, at, resonator.width)
+            .iter()
+            .map(|x| rat(BigInt::from(*x), plan.lw))
+            .collect();
+        let carried: Vec<Rat> = slice(&record.resonator_output, at, resonator.width)
+            .iter()
+            .map(|x| rat(BigInt::from(*x), plan.lw))
+            .collect();
+        let output = loaded_output(plan, record, resonator, tick);
+        let input_norm: Rat = drive.iter().map(|x| x * x).sum();
+        let output_norm: Rat = output.iter().map(|x| x * x).sum();
+        let carried_norm: Rat = carried.iter().map(|x| x * x).sum();
+        let port = h * &ring.admittance / integer(4) * (input_norm - output_norm.clone());
+        loaded_port -= port;
+        let split = (&carried_norm - output_norm) * h * &ring.admittance / integer(4);
+        loaded_split += split;
+        let sum: Vec<Rat> = carried.iter().zip(&output).map(|(a, b)| a + b).collect();
+        let sum_l1: Rat = sum.iter().map(|x| x.abs()).sum();
+        loaded_split_bound +=
+            h * &ring.admittance / integer(4) * rat(BigInt::from(1), plan.lw) * sum_l1;
+    }
+    (loaded_port, loaded_split, loaded_split_bound)
+}
+
+/// **One ring's junction terms at a step**: the executed anchor's residual against the
+/// participation mean, `h·total·⟨v, v − v*⟩`, and its bound `h·total·‖v‖₁(‖ŵ − w‖₁·largest + u)`
+/// (`holonics::hnn::word::Word::junctions`).
+fn junction(plan: &WordPlan, record: &ForwardRecord, step: usize, g: usize) -> (Rat, Rat) {
+    let (n, lw) = (plan.n, plan.lw);
+    let ring = &plan.rings[g];
+    let v = wide(slice(&record.anchors, step * n + ring.rows, ring.width));
+    let s = wide(slice(&record.storage, step * n + ring.rows, ring.width));
+    let mut largest = sup(&s);
+    // total·v* = Y s + Σ G a.
+    let mut pulled = rat(dot(&v, &s), 2 * lw) * &ring.admittance;
+    for &(a, _, base) in &ring.incident {
+        let x = wide(slice(&record.arrivals, step * plan.na + base, ring.width));
+        largest = largest.max(sup(&x));
+        pulled += rat(dot(&v, &x), 2 * lw) * &plan.contacts[a].conductance;
+    }
+    let h = &plan.step;
+    let residual = h * (&ring.total * rat(dot(&v, &v), 2 * lw) - pulled);
+    let unit = rat(BigInt::from(1), lw);
+    let bound = h * &ring.total * rat(l1(&v), lw) * (&ring.certificate * rat(largest, lw) + unit);
+    (residual, bound)
+}
+
+/// The terms of one full tick's balance that a ring's element contributes: `(resist, drive,
+/// residual, bound)`, each already scaled by `(h/2)Y` or `(h/4)Y` as the word adds them.
+fn element(
+    plan: &WordPlan,
+    loci: &Loci,
+    record: &ForwardRecord,
+    step: usize,
+    g: usize,
+    certificate: &Rat,
+) -> (Rat, Rat, Rat, Rat) {
+    let (n, lc, lw) = (plan.n, plan.lc, plan.lw);
+    let ring = &plan.rings[g];
+    let ringloci = &loci.rings[g];
+    let swc = ring.contrast.unwrap_or(0);
+    let sx = lc + swc + lw + 1;
+    let v = wide(slice(&record.anchors, step * n + ring.rows, ring.width));
+    let s = wide(slice(&record.storage, step * n + ring.rows, ring.width));
+    let next = if plan.resonators.iter().any(|resonator| resonator.ring == g) {
+        wide(slice(
+            &record.resonator_drive,
+            step * n + ring.rows,
+            ring.width,
+        ))
+    } else {
+        wide(slice(
+            &record.storage,
+            (step + 1) * n + ring.rows,
+            ring.width,
+        ))
+    };
+    let x = wider(slice(&record.mid, step * n + ring.rows, ring.width));
+    let b: Vec<BigInt> = v.iter().zip(&s).map(|(v, s)| 2 * v - s).collect();
+    let c: Vec<BigInt> = v.iter().zip(&s).map(|(v, s)| v - s).collect();
+    // next_image = 2x̄ − b on σ_x.
+    let b_at_x = lift(&b, sx - lw);
+    let image: Vec<BigInt> = x.iter().zip(&b_at_x).map(|(x, b)| 2 * x - b).collect();
+    // The contrast port's drive W_c c on σ_Wc + L_w, and the operand 2b + W_c c.
+    let (drive, operand, operand_exp) = match ring.contrast {
+        Some(exponent) => {
+            let wcc = ringloci.contrast.matrix.apply(&c);
+            let operand: Vec<BigInt> = lift(&b, exponent + 1)
+                .iter()
+                .zip(&wcc)
+                .map(|(b, d)| b + d)
+                .collect();
+            (Some(wcc), operand, exponent + lw)
+        }
+        None => (None, lift(&b, 1), lw),
+    };
+    let resist = quadratic(&ringloci.passive, &x, sx);
+    let drive_term = match &drive {
+        Some(wcc) => rat(dot(&x, wcc), sx + swc + lw),
+        None => Rat::zero(),
+    };
+    // e = next_image − b − K x̄ − W_c c on σ_e = σ_x + σ_K.
+    let sk = ringloci.element.exponent;
+    let se = sx + sk;
+    let kx = ringloci.element.apply(&x);
+    let mut e: Vec<BigInt> = lift(&image, sk)
+        .iter()
+        .zip(lift(&b, se - lw))
+        .zip(&kx)
+        .map(|((image, b), kx)| image - b - kx)
+        .collect();
+    if let Some(wcc) = &drive {
+        for (entry, d) in e.iter_mut().zip(lift(wcc, se - swc - lw)) {
+            *entry -= d;
+        }
+    }
+    let defect = rat(dot(&x, &e), sx + se);
+    let chart_bound = rat(l1(&x), sx) * certificate * rat(sup(&operand), operand_exp);
+    // The storage's split: |s′|² − |ŝ′|² = ⟨s′ − ŝ′, s′ + ŝ′⟩ on σ_x.
+    let next_at_x = lift(&next, sx - lw);
+    let difference: Vec<BigInt> = next_at_x.iter().zip(&image).map(|(a, b)| a - b).collect();
+    let sum: Vec<BigInt> = next_at_x.iter().zip(&image).map(|(a, b)| a + b).collect();
+    let split_power = rat(dot(&difference, &sum), 2 * sx);
+    let split_bound = rat(l1(&sum), sx + lw);
+    let half = &plan.step / integer(2) * &ring.admittance;
+    let quarter = &plan.step / integer(4) * &ring.admittance;
+    (
+        &half * resist,
+        &half * drive_term,
+        &half * defect + &quarter * split_power,
+        &half * chart_bound + &quarter * split_bound,
+    )
+}
+
+/// The terms of one full tick's balance that a contact's transit contributes: `(dissipation,
+/// residual, bound)` (`holonics::hnn::propagation::transit_defect` and the word's split terms).
+fn transit(
+    plan: &WordPlan,
+    loci: &Loci,
+    record: &ForwardRecord,
+    step: usize,
+    a: usize,
+    executed: &Executed<'_>,
+) -> (Rat, Rat, Rat) {
+    let (operator, norm) = executed.contacts[a];
+    let certificate = &executed.readings[plan.rings.len() + a].certificate;
+    let (k, na, lw) = (plan.k, plan.na, plan.lw);
+    let contact = &plan.contacts[a];
+    let contactloci = &loci.contacts[a];
+    let (h_mul, h_shift, x_mul, x_shift) = plan.hop();
+    let eg = contact.gain_exp;
+    let so = lw + eg;
+    let at = step * k + contact.rows;
+    let zeta = wide(slice(&record.zeta, at, contact.width));
+    let omega = wider(slice(&record.omega, at, contact.width));
+    let right = wider(slice(&record.right, at, contact.width));
+    // ⟨ω, m ζ − right⟩ on a common scale.
+    let mz = operator.apply(&zeta);
+    let smz = operator.exponent + lw;
+    let common = smz.max(contact.right_exp);
+    let residual: Vec<BigInt> = lift(&mz, common - smz)
+        .iter()
+        .zip(lift(&right, common - contact.right_exp))
+        .map(|(m, r)| m - r)
+        .collect();
+    let chart_term = rat(dot(&omega, &residual), common + so);
+    let unit = rat(BigInt::from(1), lw);
+    let chart_bound =
+        rat(l1(&omega), so) * (certificate * rat(sup(&right), contact.right_exp) + norm * &unit);
+    let h = &plan.step;
+    let dissipation = h * quadratic(&contactloci.dissipation, &omega, so);
+    // The state's split: E(u′, w′) − E(û′, ŵ′), and its bound.
+    let u = wide(slice(&record.u, at, contact.width));
+    let w = wide(slice(&record.w, at, contact.width));
+    let next_u = wide(slice(
+        &record.u,
+        (step + 1) * k + contact.rows,
+        contact.width,
+    ));
+    let next_w = wide(slice(
+        &record.w,
+        (step + 1) * k + contact.rows,
+        contact.width,
+    ));
+    // ŵ′ = 2ω − w on L_w + e_g; û′ = u + hω on L_w + e_g + H.
+    let image_w: Vec<BigInt> = omega
+        .iter()
+        .zip(lift(&w, eg))
+        .map(|(o, w)| 2 * o - w)
+        .collect();
+    let image_u: Vec<BigInt> = lift(&u, eg + h_shift)
+        .iter()
+        .zip(&omega)
+        .map(|(u, o)| u + BigInt::from(h_mul) * o)
+        .collect();
+    let (sw, su) = (lw + eg, lw + eg + h_shift);
+    let energy = |disp: &[BigInt], sd: u32, rate: &[BigInt], sr: u32| -> Rat {
+        (quadratic(&contactloci.storage.matrix, rate, sr)
+            + quadratic(&contactloci.stiffness.matrix, disp, sd))
+            / integer(2)
+    };
+    let mut split_power = energy(&next_u, lw, &next_w, lw) - energy(&image_u, su, &image_w, sw);
+    let w_sum: Vec<BigInt> = lift(&next_w, eg)
+        .iter()
+        .zip(&image_w)
+        .map(|(a, b)| a + b)
+        .collect();
+    let u_sum: Vec<BigInt> = lift(&next_u, eg + h_shift)
+        .iter()
+        .zip(&image_u)
+        .map(|(a, b)| a + b)
+        .collect();
+    let stored = contactloci.storage.matrix.apply(&w_sum);
+    let stiffened = contactloci.stiffness.matrix.apply(&u_sum);
+    let mut split_bound = &unit
+        * (rat(l1(&stored), contactloci.storage.matrix.exponent + sw)
+            + rat(l1(&stiffened), contactloci.stiffness.matrix.exponent + su))
+        / integer(2);
+    // The arrivals' split at both ends, each weighted (hG/4).
+    let quarter = h / integer(4) * &contact.conductance;
+    let (from, to) = contact.ends;
+    for (end, ring) in [from, to].into_iter().enumerate() {
+        let width = plan.rings[ring].width;
+        let base = contact.arrival[end];
+        let v = wide(slice(
+            &record.anchors,
+            step * plan.n + plan.rings[ring].rows,
+            width,
+        ));
+        let a_in = wide(slice(&record.arrivals, step * na + base, width));
+        let carried = wide(slice(&record.arrivals, (step + 1) * na + base, width));
+        // image = o·2^X ∓ X_mul·ζ on the channel, o = 2v − a.
+        let mut image: Vec<BigInt> = v
+            .iter()
+            .zip(&a_in)
+            .map(|(v, a)| (2 * v - a) << x_shift as usize)
+            .collect();
+        for (kk, &coordinate) in contact.selection[end].iter().enumerate() {
+            let exchange = BigInt::from(x_mul) * &zeta[kk];
+            if end == 0 {
+                image[coordinate] -= exchange;
+            } else {
+                image[coordinate] += exchange;
+            }
+        }
+        let carried_at = lift(&carried, x_shift);
+        let difference: Vec<BigInt> = carried_at.iter().zip(&image).map(|(a, b)| a - b).collect();
+        let sum: Vec<BigInt> = carried_at.iter().zip(&image).map(|(a, b)| a + b).collect();
+        let sa = lw + x_shift;
+        split_power += &quarter * rat(dot(&difference, &sum), 2 * sa);
+        split_bound += &quarter * (&unit * rat(l1(&sum), sa));
+    }
+    (
+        dissipation,
+        chart_term + split_power,
+        chart_bound + split_bound,
+    )
+}
+
+/// [definition] **The operators a word's balance reads beside the publication's loci**: each
+/// contact's operator words and row norm at its carry, and every chart's certificate (rings then
+/// contacts, the refinement's readings).
+pub(crate) struct Executed<'a> {
+    pub(crate) contacts: Vec<(&'a DyadicMatrix, &'a Rat)>,
+    pub(crate) readings: &'a [ChartReading],
+}
+
+/// **The wave's faces a word read** (module header).
+pub(crate) fn faces(plan: &WordPlan, record: &ForwardRecord) -> Result<Faces, HnnError> {
+    let reads: Vec<ReceivingRead> = (0..plan.aperture)
+        .map(|j| {
+            let wave: Vec<Rat> = slice(&record.logits, j * plan.map_rows, plan.map_rows)
+                .iter()
+                .map(|l| rat(BigInt::from(*l), plan.logit_exp))
+                .collect();
+            ReceivingRead::of_logits(wave, plan.grain)
+        })
+        .collect();
+    Faces::of_reads(&reads, plan.grain)
+}
+
+/// **The receiving ring's carried anchors** `v_R(e_j)` at the window's epochs.
+pub(crate) fn anchors(plan: &WordPlan, record: &ForwardRecord) -> Vec<Vec<Rat>> {
+    let ring = &plan.rings[plan.receiver];
+    (0..plan.aperture)
+        .map(|j| {
+            slice(
+                &record.anchors,
+                (plan.first_epoch + j) * plan.n + ring.rows,
+                ring.width,
+            )
+            .iter()
+            .map(|v| rat(BigInt::from(*v), plan.lw))
+            .collect()
+        })
+        .collect()
+}
+
+/// **The word's release read at its end** (`Word::released`): its unread change's power, its
+/// steps, the peak bits of its change, every full tick's balance, the last junction's residual and
+/// bound, the end change, its carried remainders and its charts' readings.
+pub(crate) fn released(
+    plan: &WordPlan,
+    loci: &Loci,
+    record: &ForwardRecord,
+    executed: &Executed<'_>,
+) -> Result<Released, HnnError> {
+    let (steps, lw) = (plan.steps, plan.lw);
+    let rings = plan.rings.len();
+    let certificate = |pair: usize| &executed.readings[pair].certificate;
+    let mut balances = Vec::with_capacity(steps.saturating_sub(1));
+    let mut before = power(plan, loci, &Change::at(plan, record, 0));
+    for step in 0..steps.saturating_sub(1) {
+        let (mut residual, mut bound) = (Rat::zero(), Rat::zero());
+        for g in 0..rings {
+            let (r, b) = junction(plan, record, step, g);
+            residual += r;
+            bound += b;
+        }
+        let (mut resist, mut contrast) = (Rat::zero(), Rat::zero());
+        for g in 0..rings {
+            let (r, d, res, b) = element(plan, loci, record, step, g, certificate(g));
+            resist += r;
+            contrast += d;
+            residual += res;
+            bound += b;
+        }
+        let mut dissipation = Rat::zero();
+        for a in 0..plan.contacts.len() {
+            let (d, res, b) = transit(plan, loci, record, step, a, executed);
+            dissipation += d;
+            residual += res;
+            bound += b;
+        }
+        let after = power(plan, loci, &Change::at(plan, record, step + 1));
+        let (loaded_port, loaded_split, loaded_split_bound) =
+            loaded_field_terms(plan, record, step);
+        balances.push(TickBalance {
+            before: before.clone(),
+            after: after.clone(),
+            dissipation,
+            resist,
+            contrast,
+            loaded_port,
+            loaded_split,
+            residual,
+            bound: bound + loaded_split_bound,
+        });
+        before = after;
+    }
+    let (mut last, mut last_bound) = (Rat::zero(), Rat::zero());
+    for g in 0..rings {
+        let (residual, bound) = junction(plan, record, steps - 1, g);
+        last += residual;
+        last_bound += bound;
+    }
+    // The peak bits of the change at the open and after each full tick.
+    let mut peak = 0u64;
+    for step in 0..steps {
+        let change = Change::at(plan, record, step);
+        for coordinate in change
+            .storage
+            .iter()
+            .chain(change.arrivals)
+            .chain(change.u)
+            .chain(change.w)
+            .chain(change.resonator_u)
+            .chain(change.resonator_w)
+        {
+            peak = peak.max(entry_bits(*coordinate, lw));
+        }
+    }
+    // Every carried remainder, released at the word's end.
+    let mut remainders: Vec<Rat> = Vec::new();
+    for ring in &plan.rings {
+        for i in 0..ring.width {
+            remainders.push(rat(
+                BigInt::from(record.rem_anchor[ring.rows + i]),
+                plan.lc + lw,
+            ));
+            remainders.push(rat(
+                BigInt::from(record.rem_storage[ring.rows + i]),
+                ring.storage_exp,
+            ));
+        }
+    }
+    for (a, contact) in plan.contacts.iter().enumerate() {
+        let (solve, arrival, disp, rate, _) = plan.contact_scales(a);
+        for i in 0..contact.width {
+            let q = contact.rows + i;
+            remainders.push(rat(BigInt::from(record.rem_solve[q]), solve));
+            remainders.push(rat(BigInt::from(record.rem_disp[q]), disp));
+            remainders.push(fractional(
+                rat(BigInt::from(record.rem_rate[q]), rate),
+                plan.rate_fraction(q),
+                rate,
+            ));
+        }
+        let widths = [
+            plan.rings[contact.ends.0].width,
+            plan.rings[contact.ends.1].width,
+        ];
+        for (base, width) in contact.arrival.iter().zip(widths) {
+            for i in 0..width {
+                remainders.push(over(
+                    rat(BigInt::from(record.rem_arrival[base + i]), arrival),
+                    plan.arrival_over(a),
+                ));
+            }
+        }
+    }
+    for resonator in &plan.resonators {
+        for i in 0..resonator.width {
+            let row = resonator.rows + i;
+            remainders.push(rat(
+                BigInt::from(record.resonator_remainders[3][row]),
+                lw + resonator.return_exp,
+            ));
+        }
+    }
+    let resonator_balances = plan
+        .resonators
+        .iter()
+        .map(|resonator| resonator_balance(plan, record, resonator))
+        .collect::<Result<Vec<_>, _>>()?;
+    Ok(Released {
+        power: power(plan, loci, &Change::after(plan, record)),
+        ticks: steps,
+        peak_bits: peak,
+        balances,
+        last,
+        last_bound,
+        end: Change::after(plan, record).end(plan),
+        remainders: Remainders::of(&remainders),
+        charts: executed.readings.to_vec(),
+        resonators: resonator_balances,
+    })
+}
+
+/// [definition; record B §2.4] **The word's last crossing** (`Word::reception_end`), read from its
+/// record: the change at the start of its last junction step, every resonator state as its last
+/// hop left it, measured at that hop's phase; the reception carry's change (`crate::hnn::carry`).
+pub(crate) fn crossing(plan: &WordPlan, record: &ForwardRecord) -> EndChange {
+    Change::at(plan, record, plan.steps - 1).end(plan)
+}
+
+/// [definition] **The return's source on the host** (module header): per receiving epoch the
+/// receiving anchor's covector `P_R^(−τ_R) Rᵀ g_j`, split onto `2^(−L_w)ℤ` in reverse epoch order
+/// with its carried remainder; the carried reads (one row per epoch) for the card, the released
+/// remainder, and the reads the return reports.
+pub(crate) struct Source {
+    pub(crate) carried: Vec<i64>,
+    pub(crate) remainder: Vec<Rat>,
+    pub(crate) reads: Vec<(Vec<Rat>, Vec<Rat>)>,
+}
+
+/// **Form the return's source** from the ratio's covector, the receiving map's words and the
+/// receiving ring's lift at the cut.
+pub(crate) fn source(
+    field: &Field,
+    plan: &WordPlan,
+    record: &ForwardRecord,
+    covector: &RatioCovector,
+    map: &DyadicMatrix,
+    lift: &BigInt,
+) -> Result<Source, HnnError> {
+    if covector.logits().len() != plan.aperture {
+        return Err(HnnError::Shape {
+            what: "covector phases against the aperture",
+            expected: plan.aperture,
+            found: covector.logits().len(),
+        });
+    }
+    let ring = field.ring(plan.receiver);
+    let width = ring.width();
+    let lattice =
+        field
+            .word_lattice()
+            .map(|word| word.transient())
+            .ok_or(HnnError::Realization {
+                what: "a field whose word runs on no declared lattice",
+            })?;
+    let anchors = anchors(plan, record);
+    let mut images = Vec::with_capacity(plan.aperture);
+    let mut reads = Vec::with_capacity(plan.aperture);
+    for (j, gradient) in covector.logits().iter().enumerate() {
+        // Rᵀ g: the gradient in its integral chart against the map's words.
+        let (numerators, denominator) = integral(gradient);
+        let scale: BigInt = &denominator * (BigInt::from(1) << map.exponent as usize);
+        let pulled: Vec<Rat> = (0..width)
+            .map(|column| {
+                let sum: BigInt = (0..map.rows)
+                    .filter(|&row| !numerators[row].is_zero())
+                    .map(|row| {
+                        BigInt::from(map.words[row * map.columns + column]) * &numerators[row]
+                    })
+                    .sum();
+                Rat::new(sum, scale.clone())
+            })
+            .collect();
+        images.push(ring.rotate(&pulled, &-lift));
+        reads.push((ring.rotate(&anchors[j], lift), gradient.clone()));
+    }
+    let mut remainder = vec![Rat::zero(); width];
+    let mut carried = vec![0i64; plan.aperture * width];
+    for j in (0..plan.aperture).rev() {
+        let split = carry(&lattice, &images[j], &mut remainder);
+        for (i, value) in split.iter().enumerate() {
+            let coordinate = value * Rat::from_integer(BigInt::from(1) << plan.lw as usize);
+            carried[j * width + i] = num_traits::ToPrimitive::to_i64(&coordinate.to_integer())
+                .ok_or(HnnError::Carrier {
+                    what: "a receiving covector past the signed 64-bit word",
+                })?;
+        }
+    }
+    Ok(Source {
+        carried,
+        remainder,
+        reads,
+    })
+}
+
+/// **The word's return** (`port::WordReturn`) from the card's reverse record, the forward record
+/// and the host's source.
+pub(crate) fn word_return(
+    plan: &WordPlan,
+    loci: &Loci,
+    record: &ForwardRecord,
+    reverse: &ReverseRecord,
+    source: Source,
+) -> WordReturn {
+    let _ = loci;
+    let (n, k, lc, lw, steps) = (plan.n, plan.k, plan.lc, plan.lw, plan.steps);
+    let full = steps.saturating_sub(1);
+    let opening = plan
+        .rings
+        .iter()
+        .map(|ring| {
+            slice(&reverse.opening, ring.rows, ring.width)
+                .iter()
+                .map(|v| rat(BigInt::from(*v), lw))
+                .collect()
+        })
+        .collect();
+    let elements = plan
+        .rings
+        .iter()
+        .map(|ring| {
+            let sx = lc + ring.contrast.unwrap_or(0) + lw + 1;
+            (0..full)
+                .map(|t| {
+                    let at = t * n + ring.rows;
+                    ElementTick {
+                        tick: t,
+                        midpoint: slice(&record.mid, at, ring.width)
+                            .iter()
+                            .map(|x| rat(BigInt::from(*x), sx))
+                            .collect(),
+                        adjoint: slice(&reverse.adjoint, at, ring.width)
+                            .iter()
+                            .map(|u| rat(BigInt::from(*u), lw))
+                            .collect(),
+                        contrast: slice(&record.anchors, at, ring.width)
+                            .iter()
+                            .zip(slice(&record.storage, at, ring.width))
+                            .map(|(v, s)| rat(BigInt::from(*v) - BigInt::from(*s), lw))
+                            .collect(),
+                    }
+                })
+                .collect()
+        })
+        .collect();
+    let transits = plan
+        .contacts
+        .iter()
+        .map(|contact| {
+            let so = lw + contact.gain_exp;
+            (0..full)
+                .map(|t| {
+                    let at = t * k + contact.rows;
+                    let at_lw = |values: &[i64]| -> Vec<Rat> {
+                        slice(values, at, contact.width)
+                            .iter()
+                            .map(|v| rat(BigInt::from(*v), lw))
+                            .collect()
+                    };
+                    TransitTick {
+                        tick: t,
+                        solved: at_lw(&reverse.solved),
+                        displacement: at_lw(&record.u),
+                        rate: at_lw(&record.w),
+                        midpoint: slice(&record.omega, at, contact.width)
+                            .iter()
+                            .map(|o| rat(BigInt::from(*o), so))
+                            .collect(),
+                    }
+                })
+                .collect()
+        })
+        .collect();
+    // The loaded rings' own receiving stage shares the field row layout. Keep the public return
+    // chronological even though the kernel computes its adjoint in reverse tick order.
+    let resonators = plan
+        .rings
+        .iter()
+        .enumerate()
+        .map(|(ring_index, _ring)| {
+            let Some(resonator) = plan.resonators.iter().find(|r| r.ring == ring_index) else {
+                return Vec::new();
+            };
+            (0..full)
+                .map(|t| {
+                    let at = t * n + resonator.rows;
+                    let values = |words: &[i64]| {
+                        slice(words, at, resonator.width)
+                            .iter()
+                            .map(|v| rat(BigInt::from(*v), lw))
+                            .collect()
+                    };
+                    let drive: Vec<Rat> = values(&record.resonator_drive);
+                    let rate: Vec<Rat> = values(&record.resonator_rate);
+                    let output = drive
+                        .iter()
+                        .zip(&rate)
+                        .map(|(drive, rate)| {
+                            drive
+                                - Rat::new(
+                                    BigInt::from(resonator.return_gain) * rate.numer(),
+                                    rate.denom()
+                                        * (BigInt::from(1u8) << resonator.return_exp as usize),
+                                )
+                        })
+                        .collect();
+                    ResonatorTick {
+                        ring: ring_index,
+                        tick: t,
+                        phase: phase_at(plan, resonator.phases, t),
+                        drive,
+                        displacement: values(&record.resonator_u),
+                        velocity: values(&record.resonator_w),
+                        rate,
+                        solved: slice(&reverse.resonator_solved, at, resonator.width)
+                            .iter()
+                            .map(|v| rat(BigInt::from(*v), lw))
+                            .collect(),
+                        output,
+                    }
+                })
+                .collect()
+        })
+        .collect();
+    // The conductance covector: the transits' parts, then the junctions' (each divided by its
+    // ring's admittance sum).
+    let contacts = plan.contacts.len();
+    let mut conductance = vec![Rat::zero(); contacts];
+    let h = &plan.step;
+    for (a, contact) in plan.contacts.iter().enumerate() {
+        let square = &contact.conductance * &contact.conductance;
+        let sd = 2 * lw + contact.gain_exp;
+        for t in 0..full {
+            let d1 = rat(BigInt::from(reverse.dots1[t * contacts + a]), sd);
+            let d2 = rat(BigInt::from(reverse.dots2[t * contacts + a]), sd);
+            conductance[a] += integer(2) * h / &square * d1 - integer(2) / &square * d2;
+        }
+    }
+    let mut x = 0usize;
+    for ring in &plan.rings {
+        for &(a, _, _) in &ring.incident {
+            for t in 0..steps {
+                let d3 = rat(
+                    BigInt::from(reverse.dots3[t * plan.incidences + x]),
+                    ring.anchor_exp + lw,
+                );
+                conductance[a] += d3 / &ring.total;
+            }
+            x += 1;
+        }
+    }
+    // The return's remainders, released at the open.
+    let mut remainders: Vec<Rat> = source.remainder.clone();
+    for ring in &plan.rings {
+        for i in 0..ring.width {
+            let e = ring.rows + i;
+            remainders.push(rat(BigInt::from(reverse.rem_el[e]), lc + lw));
+            remainders.push(rat(
+                BigInt::from(reverse.rem_storage[e]),
+                lc + ring.anchor_exp,
+            ));
+        }
+    }
+    let (_, h_shift, _, _) = plan.hop();
+    for contact in &plan.contacts {
+        let sc = contact.storage_exp.unwrap_or(0);
+        let sk = contact.stiffness_exp.unwrap_or(0);
+        for i in 0..contact.width {
+            let q = contact.rows + i;
+            remainders.push(rat(BigInt::from(reverse.rem_zeta[q]), contact.zeta_exp));
+            remainders.push(rat(BigInt::from(reverse.rem_solved[q]), lc + lw));
+            remainders.push(rat(BigInt::from(reverse.rem_rate[q]), sc + lw));
+            remainders.push(rat(BigInt::from(reverse.rem_disp[q]), sk + lw + h_shift));
+        }
+        for (end, ring) in [contact.ends.0, contact.ends.1].into_iter().enumerate() {
+            let target = &plan.rings[ring];
+            for i in 0..target.width {
+                remainders.push(rat(
+                    BigInt::from(reverse.rem_arrival[contact.arrival[end] + i]),
+                    lc + target.anchor_exp,
+                ));
+            }
+        }
+    }
+    // The forward returned-wave residual belongs to Released. This return reports only
+    // adjoint carries; counting the forward residual here would count it a second time.
+    for resonator in &plan.resonators {
+        for i in 0..resonator.width {
+            let row = resonator.rows + i;
+            remainders.push(rat(
+                BigInt::from(reverse.resonator_remainders[0][row]),
+                lw + resonator.return_exp,
+            ));
+            remainders.push(rat(
+                BigInt::from(reverse.resonator_remainders[1][row]),
+                lw + resonator.chart_exp,
+            ));
+            // ē = s̄ + h r̄ is an exact dyadic sum on Lw.
+            remainders.push(Rat::zero());
+            remainders.push(rat(
+                BigInt::from(reverse.resonator_remainders[2][row]),
+                lw + resonator.force_exp,
+            ));
+            remainders.push(rat(
+                BigInt::from(reverse.resonator_remainders[3][row]),
+                lw + resonator.material_exp,
+            ));
+        }
+    }
+    WordReturn {
+        opening,
+        elements,
+        transits,
+        resonators,
+        conductance,
+        reads: source.reads,
+        released: Remainders::of(&remainders),
+    }
+}
