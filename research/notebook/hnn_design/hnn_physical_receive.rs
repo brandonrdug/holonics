@@ -199,9 +199,9 @@ pub(super) fn learn(
                 "teaching result; learning={learning:?}; observed={truth}; publication={:?}; applied_logit_movement={movement:?}; largest_real_move={real_move}; largest_real_move_in_grain_cells={}; largest_phase_move_turns={phase_move}; target_margin_before={}; target_margin_after={}; applied_cells={:?}; entered={:?}; retained_tick={}; material_commit={}; receiving_changed={}; source_changed={}; pair_changed={}; balances_close={}; elapsed_ms={}\n",
                 received.comparison, &real_move * Rat::from_integer(BigInt::from(phases.grain())), margin(old, truth), margin(new, truth), applied.reads[target].read.cells,
                 entered, received.prediction.carry.ticks, resident.constitution().commit(),
-                before_material.receiving_map(0) != resident.constitution().receiving_map(0),
-                before_material.source_port(0) != resident.constitution().source_port(0),
-                field.offsets().iter().any(|&offset| before_material.pair_port(0,offset) != resident.constitution().pair_port(0,offset)),
+                holonics::hnn::ConstitutionRead::receiving_map(&before_material, 0) != holonics::hnn::ConstitutionRead::receiving_map(resident.constitution(), 0),
+                holonics::hnn::ConstitutionRead::source_port(&before_material, 0) != holonics::hnn::ConstitutionRead::source_port(resident.constitution(), 0),
+                field.offsets().iter().any(|&offset| holonics::hnn::ConstitutionRead::pair_port(&before_material, 0,offset) != holonics::hnn::ConstitutionRead::pair_port(resident.constitution(), 0,offset)),
                 closed(&received.prediction) && closed(&applied), started.elapsed().as_millis(),
             ));
             assert!(closed(&received.prediction) && closed(&applied), "the measured physical balances must close");
