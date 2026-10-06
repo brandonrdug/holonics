@@ -47,7 +47,8 @@ predict_by_field -> actual sparse pair source -> same continuing Word -> blind w
 ```
 
 `compose_return` reads the actual normalized pair table and turns the actual opening covector
-in its producing phases. Its original output descent covectors reach the existing pair factor
+in its producing phases. `compose_return` stores the negated output gradients as the descent
+`q-p` covectors; the applied alignment uses that same sign. Its original output descent covectors reach the existing pair factor
 statistic, certified ray, budgeted carry and source-gain law. Zero directions constrain the two
 read factors; no observed comparison means no retained pair statistic. The executable successor
 guard checks every other physical forward relation and both selected read factors, including
@@ -68,7 +69,10 @@ JointReading(1/2, {alignment_g, bound_g}) holds before successor return.
 
 This is the applied coefficient difference, including output carry/release, rather than an
 assumption that the proposed ray equals the carried successor. The source gain is common
-across offsets at one ring and Reach. It includes the phase-count Cauchy--Schwarz factor,
+across offsets at one ring and Reach. The publication's `gain` is the source transport gain alone;
+`constitution::certify_steps` keeps `source_gain(...)` separate from
+`moves.own(prepared.energy, ...)`. Feature energy is therefore not multiplied into the applied
+table motion twice. It includes the phase-count Cauchy--Schwarz factor,
 readout norm, admittance and executed source-to-station span law. The native control separately
 pairs actual changed logits with the same comparison covector and checks the applied gain.
 
@@ -126,3 +130,28 @@ then reads zero R from rest without consuming a post-blind receiving/pair observ
 missing production term is that caller's declared source family and actual observed-deposition
 consumer, followed by continued receiving motion. This bounded native consumer does not
 transfer its evidence to that unchanged notebook, nor close useful repair or any product gate.
+
+### Exact fixed-read coefficient span
+
+[source-derived exact read; no native run] The
+[coefficient receipt](receipts/pair-output-deposition-20261006/FEATURE_SPAN_SOURCE_READ.v1.json)
+reads the unchanged default `declared_sign` law at the candidate's field dimensions using exact
+integer arithmetic and rational row reduction. The sixteen-by-sixteen matrix whose rank row
+rho is `vec(a_rho b_rho^T)` has exact rank fourteen, hence a two-dimensional algebraic kernel
+on unconstrained pair tables. The left-minus-right nine-station probe contrast is at phase one:
+`PopulationChart::value(6) * (cell(1,2)-cell(0,2))`. Its raw bilinear projection is
+
+```
+[-2, -2, 2, 2, 0, 0, 2, 0, 0, 0, 0, 0, -2, 0, 2, -2].
+```
+
+That contrast has both a represented component and a nonzero kernel residual. It is not wholly
+aliased: a contrast need not lie entirely in the row span to have a nonzero represented
+projection. A nonzero projection makes output-row separation representable; it does not prove
+this observed update or the subsequent receiving Word distinguishes it. Those are the fixed
+native behavioral read. The full tensor calibration's complete basis is not the default learned
+consumer's coefficient span. Read-factor learning may enlarge the span; the corresponding
+cubic source ray and its reached certificates remain owed. This algebraic kernel is not itself
+a proof that every such contrast is realizable by admitted finite source cells with the same
+first marginals and clocks. Source-family injectivity and task fidelity remain receiver-relative
+obligations, rather than a full-rank inference.

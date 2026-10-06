@@ -1,0 +1,596 @@
+{
+  "source_commit": "d38251b1280e7e2e4f73f4480e067ff5f2d992a9",
+  "source_owner": "crates/holonics/src/hnn/constitution.rs",
+  "source_owner_pin": {
+    "bytes": 433201,
+    "sha256": "951580ec936cb5948c239a9f3006130809df2111be412beb85831c8fcda5caaa"
+  },
+  "method": "Exact source evaluation of declared_sign and Fraction row reduction; no native executable, learning, data generation or scientific job",
+  "field": {
+    "alphabet": 4,
+    "source_period": 8,
+    "width_and_rank": 16,
+    "source_ring": 0,
+    "offset": 1,
+    "offset_index": 0
+  },
+  "fixed_bilinear_read_matrix": [
+    [
+      -1,
+      1,
+      1,
+      -1,
+      1,
+      -1,
+      -1,
+      1,
+      1,
+      -1,
+      -1,
+      1,
+      -1,
+      1,
+      1,
+      -1
+    ],
+    [
+      1,
+      -1,
+      1,
+      1,
+      -1,
+      1,
+      -1,
+      -1,
+      -1,
+      1,
+      -1,
+      -1,
+      -1,
+      1,
+      -1,
+      -1
+    ],
+    [
+      -1,
+      -1,
+      -1,
+      -1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      -1,
+      -1,
+      -1,
+      -1
+    ],
+    [
+      1,
+      -1,
+      -1,
+      -1,
+      -1,
+      1,
+      1,
+      1,
+      1,
+      -1,
+      -1,
+      -1,
+      1,
+      -1,
+      -1,
+      -1
+    ],
+    [
+      1,
+      -1,
+      -1,
+      -1,
+      1,
+      -1,
+      -1,
+      -1,
+      -1,
+      1,
+      1,
+      1,
+      1,
+      -1,
+      -1,
+      -1
+    ],
+    [
+      1,
+      1,
+      1,
+      -1,
+      1,
+      1,
+      1,
+      -1,
+      -1,
+      -1,
+      -1,
+      1,
+      1,
+      1,
+      1,
+      -1
+    ],
+    [
+      1,
+      -1,
+      -1,
+      -1,
+      -1,
+      1,
+      1,
+      1,
+      1,
+      -1,
+      -1,
+      -1,
+      1,
+      -1,
+      -1,
+      -1
+    ],
+    [
+      1,
+      -1,
+      -1,
+      1,
+      1,
+      -1,
+      -1,
+      1,
+      1,
+      -1,
+      -1,
+      1,
+      1,
+      -1,
+      -1,
+      1
+    ],
+    [
+      1,
+      -1,
+      -1,
+      1,
+      1,
+      -1,
+      -1,
+      1,
+      -1,
+      1,
+      1,
+      -1,
+      1,
+      -1,
+      -1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      -1,
+      1,
+      1,
+      1,
+      -1,
+      1,
+      1,
+      1,
+      -1,
+      -1,
+      -1,
+      -1,
+      1
+    ],
+    [
+      1,
+      -1,
+      1,
+      -1,
+      1,
+      -1,
+      1,
+      -1,
+      1,
+      -1,
+      1,
+      -1,
+      1,
+      -1,
+      1,
+      -1
+    ],
+    [
+      1,
+      1,
+      -1,
+      1,
+      1,
+      1,
+      -1,
+      1,
+      1,
+      1,
+      -1,
+      1,
+      1,
+      1,
+      -1,
+      1
+    ],
+    [
+      1,
+      -1,
+      1,
+      -1,
+      -1,
+      1,
+      -1,
+      1,
+      -1,
+      1,
+      -1,
+      1,
+      1,
+      -1,
+      1,
+      -1
+    ],
+    [
+      1,
+      1,
+      1,
+      -1,
+      1,
+      1,
+      1,
+      -1,
+      1,
+      1,
+      1,
+      -1,
+      -1,
+      -1,
+      -1,
+      1
+    ],
+    [
+      -1,
+      1,
+      -1,
+      1,
+      1,
+      -1,
+      1,
+      -1,
+      -1,
+      1,
+      -1,
+      1,
+      1,
+      -1,
+      1,
+      -1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      -1,
+      -1,
+      -1,
+      -1,
+      -1,
+      -1,
+      -1,
+      -1,
+      -1,
+      -1,
+      -1,
+      -1
+    ]
+  ],
+  "exact_rank": 14,
+  "pivots": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    15
+  ],
+  "probe_contrast": {
+    "source_phase": 1,
+    "pair_population": 6,
+    "raw_left_minus_right_count": [
+      {
+        "numerator": 0,
+        "denominator": 1
+      },
+      {
+        "numerator": 0,
+        "denominator": 1
+      },
+      {
+        "numerator": -1,
+        "denominator": 1
+      },
+      {
+        "numerator": 0,
+        "denominator": 1
+      },
+      {
+        "numerator": 0,
+        "denominator": 1
+      },
+      {
+        "numerator": 0,
+        "denominator": 1
+      },
+      {
+        "numerator": 1,
+        "denominator": 1
+      },
+      {
+        "numerator": 0,
+        "denominator": 1
+      },
+      {
+        "numerator": 0,
+        "denominator": 1
+      },
+      {
+        "numerator": 0,
+        "denominator": 1
+      },
+      {
+        "numerator": 0,
+        "denominator": 1
+      },
+      {
+        "numerator": 0,
+        "denominator": 1
+      },
+      {
+        "numerator": 0,
+        "denominator": 1
+      },
+      {
+        "numerator": 0,
+        "denominator": 1
+      },
+      {
+        "numerator": 0,
+        "denominator": 1
+      },
+      {
+        "numerator": 0,
+        "denominator": 1
+      }
+    ],
+    "normalized_contrast": "PopulationChart::value(6) times raw count contrast",
+    "bilinear_projection_raw": [
+      {
+        "numerator": -2,
+        "denominator": 1
+      },
+      {
+        "numerator": -2,
+        "denominator": 1
+      },
+      {
+        "numerator": 2,
+        "denominator": 1
+      },
+      {
+        "numerator": 2,
+        "denominator": 1
+      },
+      {
+        "numerator": 0,
+        "denominator": 1
+      },
+      {
+        "numerator": 0,
+        "denominator": 1
+      },
+      {
+        "numerator": 2,
+        "denominator": 1
+      },
+      {
+        "numerator": 0,
+        "denominator": 1
+      },
+      {
+        "numerator": 0,
+        "denominator": 1
+      },
+      {
+        "numerator": 0,
+        "denominator": 1
+      },
+      {
+        "numerator": 0,
+        "denominator": 1
+      },
+      {
+        "numerator": 0,
+        "denominator": 1
+      },
+      {
+        "numerator": -2,
+        "denominator": 1
+      },
+      {
+        "numerator": 0,
+        "denominator": 1
+      },
+      {
+        "numerator": 2,
+        "denominator": 1
+      },
+      {
+        "numerator": -2,
+        "denominator": 1
+      }
+    ],
+    "orthogonal_projection_onto_read_span": [
+      {
+        "numerator": -22,
+        "denominator": 63
+      },
+      {
+        "numerator": 0,
+        "denominator": 1
+      },
+      {
+        "numerator": -17,
+        "denominator": 21
+      },
+      {
+        "numerator": 0,
+        "denominator": 1
+      },
+      {
+        "numerator": 5,
+        "denominator": 63
+      },
+      {
+        "numerator": 10,
+        "denominator": 63
+      },
+      {
+        "numerator": 53,
+        "denominator": 63
+      },
+      {
+        "numerator": -5,
+        "denominator": 63
+      },
+      {
+        "numerator": 0,
+        "denominator": 1
+      },
+      {
+        "numerator": -5,
+        "denominator": 63
+      },
+      {
+        "numerator": 0,
+        "denominator": 1
+      },
+      {
+        "numerator": -5,
+        "denominator": 63
+      },
+      {
+        "numerator": 17,
+        "denominator": 63
+      },
+      {
+        "numerator": -5,
+        "denominator": 63
+      },
+      {
+        "numerator": -4,
+        "denominator": 21
+      },
+      {
+        "numerator": 0,
+        "denominator": 1
+      }
+    ],
+    "null_residual": [
+      {
+        "numerator": 22,
+        "denominator": 63
+      },
+      {
+        "numerator": 0,
+        "denominator": 1
+      },
+      {
+        "numerator": -4,
+        "denominator": 21
+      },
+      {
+        "numerator": 0,
+        "denominator": 1
+      },
+      {
+        "numerator": -5,
+        "denominator": 63
+      },
+      {
+        "numerator": -10,
+        "denominator": 63
+      },
+      {
+        "numerator": 10,
+        "denominator": 63
+      },
+      {
+        "numerator": 5,
+        "denominator": 63
+      },
+      {
+        "numerator": 0,
+        "denominator": 1
+      },
+      {
+        "numerator": 5,
+        "denominator": 63
+      },
+      {
+        "numerator": 0,
+        "denominator": 1
+      },
+      {
+        "numerator": 5,
+        "denominator": 63
+      },
+      {
+        "numerator": -17,
+        "denominator": 63
+      },
+      {
+        "numerator": 5,
+        "denominator": 63
+      },
+      {
+        "numerator": 4,
+        "denominator": 21
+      },
+      {
+        "numerator": 0,
+        "denominator": 1
+      }
+    ],
+    "contrast_is_in_kernel": false,
+    "contrast_is_entirely_in_span": false
+  },
+  "interpretation": "A source contrast is represented iff its bilinear projection is nonzero. A nonzero unresolved kernel component does not imply the entire contrast is aliased. Full rank/in-span is sufficient, not necessary; actual learned output and receiving material can introduce further kernels. No learned/read/repair claim."
+}
