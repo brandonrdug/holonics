@@ -46,6 +46,7 @@ pub struct PhysicalPublication {
     pub ratio: HolonRatio,
     pub pullback: Pullback,
     pub publication: DepositReading,
+    pub feature_energy: Vec<(crate::hnn::constitution::Locus, crate::ratio::Rat)>,
     pub source_certificate: Option<PhysicalSourceCertificate>,
     pub source_pairing: Option<PhysicalSourcePairing>,
 }
@@ -160,6 +161,7 @@ impl<'f> PhysicalResident<'f> {
                         pullback,
                         constitution,
                         publication,
+                        feature_energy,
                         source_certificate,
                         source_pairing,
                     }) => (
@@ -168,6 +170,7 @@ impl<'f> PhysicalResident<'f> {
                             ratio,
                             pullback,
                             publication,
+                            feature_energy,
                             source_certificate,
                             source_pairing,
                         })),

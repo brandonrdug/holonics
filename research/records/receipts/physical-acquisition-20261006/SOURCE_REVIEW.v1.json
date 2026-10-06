@@ -1,0 +1,30 @@
+{
+  "base": "05b0420d1c032b0f7cd3ff6add28c0aeb7151c2f",
+  "changed_native_inputs": {
+    "crates/holonics/src/hnn/physical.rs": {
+      "bytes": 7988,
+      "sha256": "7ba0f1961f3e73d85cf86629bfbff5b3282111d17c370f35162837ee438daa3f"
+    },
+    "crates/holonics/src/hnn/prediction.rs": {
+      "bytes": 178885,
+      "sha256": "e90991f08b13aa157d1eb9fb1d37557198f20b93d0ec811bcae3a5591b3ad2b7"
+    },
+    "research/notebook/hnn_design/hnn_physical_receive.rs": {
+      "bytes": 21771,
+      "sha256": "d37c91e3433464ea27781f02277721a05e1ec34c9728a10c693920922234d12d"
+    },
+    "research/notebook/hnn_design/hnn_prediction.rs": {
+      "bytes": 20053,
+      "sha256": "847152c1ae458ef5c323a8a1f2da933ae35e27dd2e786d04daa8199090fe9a63"
+    }
+  },
+  "syntax_only_rustfmt_stdout": "passed for four changed Rust files; no file formatting or compiler",
+  "git_diff_check": "passed",
+  "independent_source_review": "no apparent source typing/borrow issue or blind target injection; current held role requires exterior queue source/argv/seed/count seal and once-only receipt, not the role label",
+  "charted_contract": "carry/split accounting exists; inverse-solve residual and energy balance are not the joined receiver-logit discrepancy; exact path retained",
+  "native_runtime": "not run on this source",
+  "current_step_eta_movement_cost": "unknown pending queue development read",
+  "scientific_training_job_launched": false,
+  "new_held_read_launched": false,
+  "old_223_runtime_first_selector": "accepted fresh link, but first exact nonzero-phase selector INCOMPLETE at original16s wall; remaining seven independent controls and full formal closures not credited"
+}

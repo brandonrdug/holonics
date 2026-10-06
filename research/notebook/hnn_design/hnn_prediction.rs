@@ -17,10 +17,12 @@
 //! cargo run --release -p holonics --example hnn_prediction -- executed repair <terrain> <A|B> <seed> <count> <out>
 //! cargo run --release -p holonics --example hnn_prediction -- executed physical-repair <A|B> <count> <aperture> <out> <pin> <terrain>=<seed>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed physical-receive <A|B|one> <count> <aperture> <out> <pin> <terrain>=<seed>…
+//! cargo run --release -p holonics --example hnn_prediction -- executed physical-learn <measure|held> <teaching count> <probe count> <out> <pin> <terrain>=<teaching seed>:<probe seed>…
 //! ```
 //!
 //! [definition; agent-inferred, the order pin and the bank pin] **The declaration**
-//! ([`order_declared`]), fixed by the September 29 pins and read by every mode:
+//! ([`order_declared`]), fixed by the September 29 pins for the reference modes. The physical
+//! acquisition consumer declares its shorter section in `hnn_physical_receive::learn`:
 //! - **The field** ([`declare`]): three rings of one period `d = 60 = 2²·3·5` in a chain
 //!   `0 — 1 — 2`, joined node to node on every node at admittance 2 and exponent 0 (`G_a = Y_a`).
 //!   The period is the joint residue ring of the pairwise coprime factors `3, 4, 5`, so a datum's
@@ -118,6 +120,12 @@ struct Declared {
 
 /// **The field** (module header).
 fn declare(declared: &Declared) -> Field {
+    declare_with_offsets(declared, Vec::new())
+}
+
+/// The same physical chain with an explicitly declared finite family of source pair contacts.
+/// Offsets are geometry, never a located task map or an expected class.
+fn declare_with_offsets(declared: &Declared, offsets: Vec<usize>) -> Field {
     let d = declared.period;
     let axis = ScrewGenerator::new(RatVec3::from_i64(0, 0, 1), RatVec3::zero());
     let ring = |lock: Vec<u64>| RingDeclaration {
@@ -144,7 +152,7 @@ fn declare(declared: &Declared) -> Field {
             contacts: vec![contact(0, 1), contact(1, 2)],
             loops: Vec::new(),
             sources: vec![0],
-            offsets: Vec::new(),
+            offsets,
             alphabet: declared.alphabet,
             step: Rat::from_integer(1.into()),
             exponent_grain: 1,
@@ -367,6 +375,17 @@ fn main() {
                 &arguments[3],
                 arguments[4].parse().expect("a count"),
                 arguments[5].parse().expect("an aperture"),
+                &arguments[6],
+                &arguments[8..],
+                &pin,
+            )
+        }
+        (Some("executed"), Some("physical-learn")) => {
+            let pin = pinned(&arguments[7], "executed physical-learn", clock, true);
+            physical_receive::learn(
+                &arguments[3],
+                arguments[4].parse().expect("a teaching count"),
+                arguments[5].parse().expect("a probe count"),
                 &arguments[6],
                 &arguments[8..],
                 &pin,

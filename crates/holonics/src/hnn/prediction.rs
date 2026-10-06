@@ -3129,6 +3129,9 @@ pub struct PhysicalTeaching {
     pub pullback: crate::hnn::port::Pullback,
     pub constitution: crate::hnn::constitution::Constitution,
     pub publication: crate::hnn::constitution::DepositReading,
+    /// Exterior feature-energy readings of exactly the admitted normal samples/factor family.
+    /// A scalar diagnostic beside eta and the applied move, never a retained source or target.
+    pub feature_energy: Vec<(crate::hnn::constitution::Locus, Rat)>,
     /// The source consumer's certificate of its applied relation, including carried corrections.
     /// The normal publication's step readings describe its proposed ray separately.
     pub source_certificate: Option<PhysicalSourceCertificate>,
@@ -3511,6 +3514,13 @@ impl PhysicalPrediction<'_, '_> {
             };
             let deposit =
                 Deposit::new(material.commit(), linear, factors, reached).with_reach(reach);
+            let feature_energy = deposit.linear().iter().map(|step| {
+                (step.locus.locus(), step.samples.iter().map(|sample| {
+                    &sample.weight * sample.feature.iter().map(|value| value*value).sum::<Rat>()
+                }).sum::<Rat>())
+            }).chain(deposit.factors().iter().map(|step| {
+                (step.gradient.locus(), step.energy.clone())
+            })).collect();
             let (constitution, publication) = contemporary.deposited(&deposit)?;
             let source_certificate = if learning == PhysicalLearning::SourcePorts {
                 if !physical_source_only_change(field, material, &constitution, &publication.loci, &[])
@@ -3615,10 +3625,11 @@ impl PhysicalPrediction<'_, '_> {
                 publication,
                 source_certificate,
                 source_pairing,
+                feature_energy,
             ))
         })();
         match joined {
-            Ok((ratio, pullback, constitution, publication, source_certificate, source_pairing)) => {
+            Ok((ratio, pullback, constitution, publication, source_certificate, source_pairing, feature_energy)) => {
                 Ok(PhysicalTeaching {
                     prediction,
                     ratio,
@@ -3627,6 +3638,7 @@ impl PhysicalPrediction<'_, '_> {
                     publication,
                     source_certificate,
                     source_pairing,
+                    feature_energy,
                 })
             }
             Err(error) => Err(PhysicalTeachingRefusal { prediction, error }),

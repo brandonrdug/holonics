@@ -41,6 +41,9 @@ pub(super) fn run(
     };
     let field = declare(&declared);
     let shape = Declared {
+        // terrain_truth's exterior declaration reserves its last class for termination.
+        // The physical chart has four actual classes and no termination row.
+        alphabet: repair_loop::CLASSES + 1,
         request: repair_loop::OPENING,
         stations: repair_loop::STATIONS,
         ..declared
@@ -107,4 +110,204 @@ pub(super) fn run(
             }
         }
     }
+}
+
+/// [agent-inferred] A bounded acquisition read on the existing cyclic producers. Four stations
+/// are the shortest passage containing both order-two continuations and neighbours on both sides
+/// of the predeclared missing station 2. The physical period is the least quarter-turn period
+/// containing this section; the pair family includes *every* separation in it, independent of
+/// the terrain. This is a short-section law read, not a reproduction of U6's 40+8 bank consumer.
+///
+/// `measure` probes development material; `held` probes seeds/counts sealed before execution and
+/// never deposits a probe. The statistical unit is a whole independently drawn passage. Fresh
+/// seeds do not make the finite Line/Alternation pattern family new. No U6 count is presumed.
+/// One continuing exact resident alternates Receiving and PairOutputs observations. A target is
+/// absent from its source and is observed only after the blind cells have been flushed. Each
+/// step's eta and the *applied* logit movement are read separately. No charted substitution occurs.
+pub(super) fn learn(
+    role: &str,
+    teaching_count: usize,
+    probe_count: usize,
+    out: &str,
+    terrains: &[String],
+    pin: &exterior::Pin,
+) {
+    use holonics::hnn::field::FieldMaterial;
+    use holonics::hnn::prediction::{RepairedCell, repair_by_field};
+    use holonics::hnn::receiving::ReceivingPhases;
+    use num_bigint::BigInt;
+    use num_traits::{Signed, Zero};
+    assert!(matches!(role, "measure" | "held"), "a declared probe role");
+    assert!(teaching_count > 0 && probe_count >= 2);
+    let bound = pin.unit_bound_ms().expect("a measured whole-unit bound");
+    let target = 2;
+    let length = 4;
+    let classes = repair_loop::CLASSES;
+    let physical_shape = Declared {
+        period: length as u64,
+        alphabet: classes,
+        request: 2,
+        stations: 2,
+        ..order_declared()
+    };
+    // The old notebook's producer declaration includes a termination class. Encoded::identity
+    // nevertheless carries only the producer's actual four residues, matching the physical D=I.
+    let truth_shape = Declared { alphabet: classes + 1, ..physical_shape };
+    let field = declare_with_offsets(&physical_shape, (1..length).collect());
+    let current = Current::at_rest(&field);
+    let receiver = ReceiverDeclaration { ring: 0, aperture: length, ..field.receivers()[0].clone() };
+    #[allow(clippy::disallowed_methods)]
+    let mut output = std::fs::File::create(out).expect("the requested output file");
+    publish(&mut output, format!(
+        "role={role}; exact physical section length={length}; classes={classes}; target={target}; period={}; all source offsets={:?}; teaching_count={teaching_count}; probe_count={probe_count}; probe truth is never deposited\n",
+        field.ring(0).period(), field.offsets(),
+    ));
+    let mut seeds = std::collections::BTreeSet::new();
+    for spec in terrains {
+        let (terrain, split) = spec.split_once('=').expect("terrain=teaching-seed:probe-seed");
+        let (teaching_seed, probe_seed) = split.split_once(':').expect("disjoint seed roles");
+        let teaching_seed: u64 = teaching_seed.parse().expect("a teaching seed");
+        let probe_seed: u64 = probe_seed.parse().expect("a probe seed");
+        assert!(seeds.insert(teaching_seed) && seeds.insert(probe_seed), "seed reuse across roles");
+        let initial = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).expect("declared material");
+        let mut resident = PhysicalResident::new(&field, initial.clone(), current.clone(), WordOpening::Rest);
+        let teaching = executed_loop::terrain_encoded(terrain, &truth_shape, &field, teaching_seed, teaching_count);
+        for (index, observed) in teaching.into_iter().enumerate() {
+            let started = Instant::now();
+            let damaged = DamagedSection::damage(&observed, &[target]).expect("declared withheld cell");
+            let entered = resident.opening().clone();
+            let before_material = resident.constitution().clone();
+            let learning = if index % 2 == 0 { PhysicalLearning::Receiving } else { PhysicalLearning::PairOutputs };
+            let phases = ReceivingPhases::declare(&field, &before_material, &current, &receiver).expect("the receiving clock");
+            let received = resident.receive(&damaged, &receiver, |blind| {
+                publish(&mut output, format!("{terrain}/{teaching_seed} teaching {index}; input={:?}; blind cells={:?}; read={:?}; grain={}\n", damaged.placed(), blind.cells, blind.reads[target], phases.grain()));
+                let mut compared = vec![false; length];
+                compared[target] = true;
+                Some(PhysicalObservation { observed: observed.clone(), compared, learning })
+            }).expect("admitted blind physical reception");
+            // Exterior matched-material control, never retained by the machine: both Words have
+            // this section, producing source frame, receiver and identical *entered* carry.
+            let next_phases = ReceivingPhases::declare(&field, resident.constitution(), &current, &receiver).expect("contemporary receiving clock");
+            let applied = repair_by_field(&field, resident.constitution(), &current, &damaged, &entered, &next_phases).expect("matched applied read");
+            let old = &received.prediction.reads[target].read.logits;
+            let new = &applied.reads[target].read.logits;
+            let movement: Vec<_> = new.iter().zip(old).map(|(new, old)| new-old).collect();
+            let real_move = movement.iter().step_by(2).map(|value| value.abs()).max().unwrap();
+            let phase_move = movement.iter().skip(1).step_by(2).map(|value| value.abs() / Rat::from_integer(2.into())).max().unwrap();
+            let truth = observed.classes_read().nth(target).expect("the post-blind observation");
+            publish(&mut output, format!(
+                "teaching result; learning={learning:?}; observed={truth}; publication={:?}; applied_logit_movement={movement:?}; largest_real_move={real_move}; largest_real_move_in_grain_cells={}; largest_phase_move_turns={phase_move}; target_margin_before={}; target_margin_after={}; applied_cells={:?}; entered={:?}; retained_tick={}; material_commit={}; receiving_changed={}; source_changed={}; pair_changed={}; balances_close={}; elapsed_ms={}\n",
+                received.comparison, &real_move * Rat::from_integer(BigInt::from(phases.grain())), margin(old, truth), margin(new, truth), applied.reads[target].read.cells,
+                entered, received.prediction.carry.ticks, resident.constitution().commit(),
+                before_material.receiving_map(0) != resident.constitution().receiving_map(0),
+                before_material.source_port(0) != resident.constitution().source_port(0),
+                field.offsets().iter().any(|&offset| before_material.pair_port(0,offset) != resident.constitution().pair_port(0,offset)),
+                closed(&received.prediction) && closed(&applied), started.elapsed().as_millis(),
+            ));
+            assert!(closed(&received.prediction) && closed(&applied), "the measured physical balances must close");
+            if started.elapsed().as_millis() > bound {
+                publish(&mut output, format!("INCOMPLETE: teaching whole-unit exceeded measured bound {bound} ms; no subsequent unit\n"));
+                return;
+            }
+        }
+        let probes = executed_loop::terrain_encoded(terrain, &truth_shape, &field, probe_seed, probe_count);
+        let frozen_commit = resident.constitution().commit();
+        let frozen_material = resident.constitution().clone();
+        // Exterior material/source controls all enter the same actual post-teaching carry. The
+        // resident itself continues between probes; its evolving interior must not be mistaken
+        // for acquired source-context sensitivity in the centered comparison below.
+        let controlled_opening = resident.opening().clone();
+        let mut contexts = std::collections::BTreeSet::new();
+        let mut rows = Vec::new();
+        let (mut released_right, mut released_wrong, mut held, mut point_right) = (0,0,0,0);
+        let (mut majority_right, mut left_right, mut right_right) = (0,0,0);
+        for (index, observed) in probes.into_iter().enumerate() {
+            let started = Instant::now();
+            let damaged = DamagedSection::damage(&observed, &[target]).expect("declared withheld cell");
+            let entered = resident.opening().clone();
+            let pre_phases = ReceivingPhases::declare(&field, &initial, &current, &receiver).expect("initial receiving clock");
+            let before = repair_by_field(&field, &initial, &current, &damaged, &controlled_opening, &pre_phases).expect("initial-material matched control");
+            let post_phases = ReceivingPhases::declare(&field, &frozen_material, &current, &receiver).expect("learned receiving clock");
+            let controlled_after = repair_by_field(&field, &frozen_material, &current, &damaged, &controlled_opening, &post_phases).expect("same-carry learned-material control");
+            // This is the actual continuing resident; the held truth cannot reach its read API.
+            let after = resident.read(&damaged, &receiver).expect("the blind contemporary probe");
+            publish(&mut output, format!("{terrain}/{probe_seed} {role} probe {index}; input={:?}; before cells={:?}; matched learned cells={:?}; continuing cells={:?}; before read={:?}; matched learned read={:?}; continuing read={:?}; matched_entered={:?}; continuing_entered={:?}; carried_tick={}; balances_close={}\n", damaged.placed(), before.cells, controlled_after.cells, after.cells, before.reads[target], controlled_after.reads[target], after.reads[target], controlled_opening, entered, after.carry.ticks, closed(&before) && closed(&controlled_after) && closed(&after)));
+            assert_eq!(resident.constitution(), &frozen_material, "no probe deposition");
+            assert!(closed(&before) && closed(&controlled_after) && closed(&after), "the measured physical balances must close");
+            assert_eq!(resident.constitution().commit(), frozen_commit);
+            // Only after publishing blind output is the exterior truth used to score.
+            let truth = observed.classes_read().nth(target).expect("exterior scoring truth");
+            match &after.cells[target] {
+                RepairedCell::Released(class) if *class == truth => released_right += 1,
+                RepairedCell::Released(_) => released_wrong += 1,
+                RepairedCell::Held { .. } => held += 1,
+                RepairedCell::Intact(_) => panic!("the target was withheld"),
+            }
+            point_right += usize::from(after.reads[target].leaders() == vec![truth]);
+            let placed = damaged.placed();
+            contexts.insert(placed.clone());
+            let mut counts = vec![0usize; classes];
+            for class in placed.iter().flatten() { counts[*class] += 1; }
+            // Deterministic baseline tie rule: least class at maximum intact count.
+            let majority = (0..classes).max_by_key(|&class| (counts[class], std::cmp::Reverse(class))).unwrap();
+            let left = placed[..target].iter().rev().flatten().next().copied();
+            let right = placed[target+1..].iter().flatten().next().copied();
+            majority_right += usize::from(majority == truth);
+            left_right += usize::from(left == Some(truth));
+            right_right += usize::from(right == Some(truth));
+            let grain = pre_phases.grain();
+            let pre = before.reads[target].read.logits.clone();
+            let post = controlled_after.reads[target].read.logits.clone();
+            let pre_cells: Vec<_> = before.reads[target].read.cells.iter().map(|cell| cell.representative(grain)).collect();
+            let post_cells: Vec<_> = controlled_after.reads[target].read.cells.iter().map(|cell| cell.representative(grain)).collect();
+            publish(&mut output, format!("scoring only; truth={truth}; majority={majority}; copy_left={left:?}; copy_right={right:?}; target_margin_before={}; target_margin_after={}; grain={grain}\n", margin(&pre,truth), margin(&post,truth)));
+            rows.push((pre,post,pre_cells,post_cells));
+            if started.elapsed().as_millis() > bound {
+                publish(&mut output, format!("INCOMPLETE: probe whole-unit exceeded measured bound {bound} ms; no subsequent unit\n"));
+                return;
+            }
+        }
+        publish(&mut output, format!("{terrain} counts; whole_passages={probe_count}; released_right={released_right}; released_wrong={released_wrong}; held={held}; point_singleton_right={point_right}; majority_right={majority_right}; copy_left_right={left_right}; copy_right_right={right_right}; no_probe_deposition_commit={frozen_commit}\n"));
+        // Remove each context's common real class shift before centering across contexts. Raw
+        // imaginary coordinates retain their declared phase chart. The grain part uses the
+        // actual representative, so a subcell raw change cannot masquerade as an amplitude face.
+        let relative = |values: &[Rat]| -> Vec<Rat> { values.iter().enumerate().map(|(i,value)| if i%2==0 { value-&values[0] } else { value.clone() }).collect() };
+        let pairs: Vec<_> = rows.iter().map(|(pre,post,_,_)| (relative(pre),relative(post))).collect();
+        let mean = |which: bool| -> Vec<Rat> {
+            (0..2*classes).map(|i| pairs.iter().map(|(pre,post)| if which { post[i].clone() } else { pre[i].clone() }).sum::<Rat>() / Rat::from_integer(BigInt::from(probe_count))).collect()
+        };
+        let pre_mean = mean(false);
+        let post_mean = mean(true);
+        let shared_change: Vec<_> = post_mean.iter().zip(&pre_mean).map(|(post,pre)| post-pre).collect();
+        publish(&mut output, format!("{terrain} relative_shared_bias_before={pre_mean:?}; relative_shared_bias_after={post_mean:?}; relative_shared_bias_change={shared_change:?}\n"));
+        let mut heard = false;
+        let grain_differences: Vec<Vec<Rat>> = rows.iter().map(|(_,_,pre,post)| pre.iter().zip(post).map(|(a,b)| (b-&post[0])-(a-&pre[0])).collect()).collect();
+        let grain_mean: Vec<Rat> = (0..classes).map(|k| grain_differences.iter().map(|row| row[k].clone()).sum::<Rat>() / Rat::from_integer(BigInt::from(probe_count))).collect();
+        for (index,((pre,post),grain_delta)) in pairs.iter().zip(&grain_differences).enumerate() {
+            let pre_existing: Vec<_> = pre.iter().zip(&pre_mean).map(|(value,mean)| value-mean).collect();
+            let acquired: Vec<_> = post.iter().zip(pre).zip(&shared_change).map(|((post,pre),shared)| post-pre-shared).collect();
+            let grain_acquired: Vec<_> = grain_delta.iter().zip(&grain_mean).map(|(value,mean)| value-mean).collect();
+            let acquired_phase_turns: Vec<_> = acquired.iter().skip(1).step_by(2).map(|value| value / Rat::from_integer(2.into())).collect();
+            heard |= grain_acquired.iter().any(|value| !value.is_zero());
+            publish(&mut output, format!("{terrain} probe {index}; pre_existing_relative_context={pre_existing:?}; acquired_relative_context={acquired:?}; acquired_phase_turns={acquired_phase_turns:?}; acquired_real_grain_context={grain_acquired:?}\n"));
+        }
+        publish(&mut output, format!("{terrain} distinct_source_contexts={}; acquired_context_changes_real_amplitude_face={heard}; all_context_controls_share_one_exact_entered_carry; scope=short_section_physical_acquisition; U6_bank_counts_are_a_different_consumer\n", contexts.len()));
+    }
+}
+
+fn margin(logits: &[Rat], target: usize) -> Rat {
+    let rival = logits.chunks_exact(2).enumerate().filter(|(class,_)| *class != target).map(|(_,pair)| &pair[0]).max().expect("another class");
+    &logits[2*target]-rival
+}
+
+fn closed(prediction: &holonics::hnn::prediction::PhysicalRepair) -> bool {
+    prediction.opening.closes() && prediction.word.closes() && prediction.balances.iter().all(|balance| balance.closes())
+}
+
+#[allow(clippy::disallowed_types, clippy::disallowed_methods)] // exterior output, no native state
+fn publish(output: &mut std::fs::File, text: String) {
+    print!("{text}");
+    std::io::stdout().flush().expect("publish whole output");
+    output.write_all(text.as_bytes()).expect("write whole output");
+    output.flush().expect("flush before observing/scoring");
 }
