@@ -41,6 +41,21 @@ opening lift and empty per-source counts/age maps. It refuses reuse, rekey or an
 Separate source rings can be filled from their same fresh opening; no request-to-section cross
 pair is invented. Those belong to the existing `ingest` operation.
 
+[source-derived sufficient admission] The unit station clock follows the existing selective
+law, not the observed intact classes. On an identity chart,
+[`Encoded::advance`](../../crates/holonics/src/hnn/encoding.rs) returns no located digits;
+[`Field::advance_of` and `step_class`](../../crates/holonics/src/hnn/field.rs) apply
+`advance_h = [class fits h] + carry_h` and propagate the actual wraps. If no possible class
+fits any predecessor h<g, induction from ring zero gives zero advance and outgoing carry at
+every predecessor. If every possible class fits source g, its advance is exactly one. Thus
+every completion reaches source lift `tau_g+1+j` after station j, independently of the erased
+classes. The dormant-prefix induction is already owned by
+[`Keys.dormant_step` and `selective_step_dormant`](../../lean/Holonics/HNN/Keys.lean), using
+[`SelectiveDecl.step`, `carryIn` and `advance`](../../lean/Holonics/HNN/Moment.lean).
+`fitting_cell_moves` is the ring-zero instance of the final one-tick step. This structural
+condition is sufficient for the admitted route, not a necessary characterization of all valid
+finite clocks. Other clocks require their own certificate; no new Lean check is claimed here.
+
 For intact station set S, offset delta in the field's declared offsets, source phase tau and
 period d, the additional table is exactly
 
@@ -71,6 +86,10 @@ physical_forward -> fresh station_section
 No new planner, source family or expected target reaches that path. An empty declared offset
 set has the same first source law as before. A zero pair output material still has zero pair
 contribution; counting an offset is not a claim that its coefficients have been learned.
+The default constitution's pair outputs are zero, so this join alone leaves them inert. The
+nonzero generic tensor fixture below tests represented source motion and read separation under
+that declared calibration; it does not demonstrate pair learning or learned repair. Every
+configured offset and compatible ordered class pair is consumed without a cue-selected branch.
 This port consumes pair statistics, not a per-passage key solver. Complete source operands
 that agree in every represented marginal/pair/age still reach the same native motion. No
 general source injectivity is claimed. Conversely the loaded Word is nonlinear: the degree-two
@@ -141,6 +160,17 @@ rank increase, singleton or diversity requirement. The mixed-completion cases ar
 source/physical enclosure oracles, not a scientific corpus or a training curriculum. Existing
 nineteen independent source/native controls are also selected on the new source; prior eighteen
 and a730d824 acceptance remain attached to their own immutable sources.
+
+[causal scope fixed before the read] The four material checkpoints use the same source,
+entered carry and clocks: a changed read attributes an effect to the material stage under
+those matched operands. It does not by itself distinguish learned cue discrimination from a
+shared class bias. Final R under rest and the earlier returned carries changes the whole
+carry, including its tick and pump phase; it is not a state-only intervention. Removing the
+source also changes its population chart. Teaching order/label, pure recency, carry apart from
+clock, cue versus shared-tail nonlinear attribution and task fidelity remain unidentified by
+these controls. The pair alias fixture establishes a representational distinction under its
+nonzero calibration, while the matched controls diagnose the actual learned receiving material;
+neither is an unseen-family accuracy claim.
 
 All new native Words have two receiving crossings. The shared queue owns one offline locked
 host/CUDA/example no-run build, cache preflight, fixed projection and runtime admission. Compile
