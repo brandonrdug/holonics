@@ -10,8 +10,17 @@ use num_traits::{Signed, Zero};
 use super::learning::chain;
 use crate::hnn::tests::support::encoded;
 use super::support::{Draw, Medium, Parts, contact, small_field};
-use crate::hnn::field::{ConstitutionRead, Current, Field};
-use crate::hnn::moment::{SourceMoment, capacity};
+use crate::compression::keys::transport::{CarryHelix, SteppedTerrain, TransportLocation};
+use crate::geometry::RatVec3;
+use crate::geometry::screw::ScrewGenerator;
+use crate::hnn::HnnError;
+use crate::hnn::encoding::{Encoded, Encoding, EncodingError, PassageChart};
+use crate::hnn::field::{
+    ConstitutionRead, CribDeclaration, Current, Field, FieldDeclaration, ReceiverDeclaration,
+    RingDeclaration,
+};
+use crate::hnn::moment::{SourceCapacity, SourceMoment, capacity};
+use crate::ratio::{integer, rat};
 use crate::ratio::Rat;
 use crate::ratio::linear::vector::{add, dot};
 
@@ -569,4 +578,214 @@ fn the_leaky_read_is_not_within_one_chart_unit_in_general() {
     let weight =
         one.clone() / (one + &modulus + Rat::from_integer(205.into()) * &modulus * &modulus);
     assert!(weight - &newest > Rat::from_integer(8.into()) * dyadic(1, 18));
+}
+
+// -------------------------------------------------------------------------------------------
+// a refused occurrence, and the located route's capacity
+
+/// The helix `(2, 3, 5)` as a field: the rings in carry order on the quarter turns, chained on
+/// their common nodes, source ring 2 holding the five classes, `Δ = {1, 3}`.
+fn helix_field() -> Field {
+    let rings = [2u64, 3, 5]
+        .into_iter()
+        .map(|period| RingDeclaration {
+            period,
+            screw: ScrewGenerator::new(RatVec3::from_i64(0, 0, 1), RatVec3::zero()),
+            placements: (0..period)
+                .map(|node| FieldDeclaration::quarter_turn(node, period))
+                .collect(),
+            lock: vec![0],
+            reflector: (0..period)
+                .map(|p| ((period - p) % period) as usize)
+                .collect(),
+            admittance: integer(2),
+            initial: 0,
+        })
+        .collect();
+    Field::declare(
+        FieldDeclaration {
+            rings,
+            contacts: vec![contact(0, 1, 2, 0), contact(1, 2, 3, 0)],
+            loops: Vec::new(),
+            sources: vec![2],
+            offsets: vec![1, 3],
+            alphabet: 5,
+            step: integer(1),
+            exponent_grain: 1,
+            receivers: vec![ReceiverDeclaration {
+                ring: 2,
+                aperture: 5,
+                tolerance: rat(1, 16),
+                depth: 2,
+                prior: crate::compression::landmark::context::StopPrior::half(),
+                mass: 1,
+                base: crate::compression::landmark::context::BaseMeasure::Even,
+                receiving_prior: 0,
+            }],
+            crib: CribDeclaration {
+                window: 16,
+                offset: 1,
+            },
+            population: 1 << 16,
+            lattice: Default::default(),
+        }
+        .by_lattice_rule(),
+    )
+    .unwrap()
+}
+
+/// [agent-inferred, October 5] **A founded partial-span passage**: a stepped terrain on the helix
+/// `(2, 3, 5)` whose five advances are nonzero multiples of 5, so they generate `5ℤ/30`, of index 5,
+/// which does not divide the receiving grain `D_low = 6` (an index dividing it reads every coset
+/// alike, and its read set stays plural). Located from a passage at every key, the read set is one
+/// gauge class; the chart founded on the first passage's key alone reaches that key's coset, six of
+/// the thirty lifts. Returns the encoded passage and its opening key. The draw: the first of
+/// `2_026_100_990 … 2_026_101_189` (a range no ref, tree or receipt held) whose read set locates
+/// one gauge class.
+fn partial_span(field: &Field) -> (Encoded, u64) {
+    let helix = CarryHelix::new(vec![2, 3, 5]).unwrap();
+    let mut draw = Draw::new(2_026_100_995);
+    let advances: Vec<u64> = (0..5).map(|_| 5 * (1 + draw.below(5)) as u64).collect();
+    let mut left: Vec<usize> = (0..5).collect();
+    let labels: Vec<usize> = (0..5).map(|_| left.remove(draw.below(left.len()))).collect();
+    let terrain = SteppedTerrain::new(helix.clone(), advances, labels).unwrap();
+    let passages: Vec<Vec<usize>> = (0..helix.period()).map(|key| terrain.passage(key, 60)).collect();
+    let location = TransportLocation::locate(helix, 5, &passages).unwrap();
+    let chart = PassageChart::located(&location, &passages[..1]).unwrap();
+    let encoding = Encoding::found(&chart).unwrap();
+    assert_eq!(encoding.reached(), 6, "the chart reaches one coset of 5ℤ/30");
+    let key = chart.openings()[0]
+        .iter()
+        .position(|entry| !entry.is_zero())
+        .expect("an opening is a lift") as u64;
+    let encoded = Encoded::through(&encoding, &chart, field, &passages[..1])
+        .unwrap()
+        .remove(0);
+    (encoded, key)
+}
+
+/// The lift point whose helix lift is `ℓ = τ_0 + 2τ_1 + 6τ_2`.
+fn at_helix(field: &Field, lift: u64) -> Current {
+    let lift = lift % 30;
+    Current::at(
+        field,
+        vec![BigInt::from(lift % 2), BigInt::from(lift / 2 % 3), BigInt::from(lift / 6)],
+    )
+    .unwrap()
+}
+
+/// [implemented-exact] **A refused occurrence leaves the Current and the moment as they were**
+/// (`Field::step_occurrence`, atomic; `SourceMoment::ingest` counts an occurrence only after its
+/// step returns). A founded partial-span passage ([`partial_span`]) steps from a lift on its reached
+/// coset; from a lift off it, its first occurrence's located step is refused
+/// (`EncodingError::Unreached`, the square `D E = ρ` read where the encoding is not founded), and the
+/// lift point, the moment and its text are unchanged. A part of the passage is refused alike.
+#[test]
+fn a_refused_located_step_leaves_the_current_and_the_moment_unchanged() {
+    let field = helix_field();
+    let (encoded, key) = partial_span(&field);
+    for part in [encoded.part(0..encoded.len()).unwrap(), encoded.part(7..31).unwrap()] {
+        // On the reached coset the passage steps.
+        let mut current = at_helix(&field, key);
+        let mut moment = SourceMoment::open(&field, &current);
+        assert!(moment.ingest(&field, &mut current, &part).unwrap().cells > 0);
+        // Off it, the first occurrence is refused and nothing moves.
+        let mut current = at_helix(&field, key + 1);
+        let mut moment = SourceMoment::open(&field, &current);
+        let (opened, held) = (current.clone(), moment.clone());
+        assert_eq!(
+            moment.ingest(&field, &mut current, &part),
+            Err(HnnError::from(EncodingError::Unreached))
+        );
+        assert_eq!(current, opened);
+        assert_eq!(moment, held);
+        let mut lift = current.lift().to_vec();
+        assert_eq!(
+            field.selective_step(&mut lift, &part, 0),
+            Err(HnnError::from(EncodingError::Unreached))
+        );
+        assert_eq!(lift, opened.lift());
+    }
+}
+
+/// [definition; agent-inferred, October 5] **The counted capacity is the identity route's**
+/// (`hnn::moment`, "The located route's capacity is owed"): a moment that has counted a located
+/// occurrence refuses its capacity, typed, and its receipt reads it as owed; its text keeps the
+/// route and reads back equal. A moment of identity-route cells reads the field's certificate.
+#[test]
+fn a_located_moment_refuses_the_identity_capacity() {
+    let field = helix_field();
+    let (passage, key) = partial_span(&field);
+    let mut current = at_helix(&field, key);
+    let mut moment = SourceMoment::open(&field, &current);
+    assert_eq!(moment.capacity(&field), Ok(field.capacity()));
+    let empty = passage.part(0..0).unwrap();
+    moment.ingest(&field, &mut current, &empty).unwrap();
+    assert_eq!(moment.capacity(&field), Ok(field.capacity()), "no located cell is counted");
+    moment.ingest(&field, &mut current, &passage).unwrap();
+    assert_eq!(moment.capacity(&field), Err(HnnError::CapacityOwed));
+    assert_eq!(SourceCapacity::of(&moment, &field), SourceCapacity::Owed);
+    // A later identity-route or empty ingest does not downgrade the moment.
+    moment.ingest(&field, &mut current, &empty).unwrap();
+    assert_eq!(moment.capacity(&field), Err(HnnError::CapacityOwed));
+    // The identity route reads the certificate at the moment's cells.
+    let chain = chain();
+    let mut current = Current::at_rest(&chain);
+    let mut identity = SourceMoment::open(&chain, &current);
+    identity
+        .ingest(&chain, &mut current, &encoded(&chain, &[0, 1, 1, 0, 1]))
+        .unwrap();
+    assert_eq!(
+        SourceCapacity::of(&identity, &chain),
+        SourceCapacity::Identity {
+            state_bits: chain.capacity().state_bits(identity.cells()),
+            n_star: chain.capacity().n_star(),
+        }
+    );
+}
+
+/// [definition; agent-inferred, October 5] **The moment's text carries its route profile**
+/// (`SourceMoment::write`): each marked line, `identity` or `located`, reads back equal; an unmarked
+/// line is refused, typed, never read as identity (it cannot be told from a located moment saved
+/// before the profile, and an old save is a superseded prototype).
+#[test]
+fn the_moment_text_carries_its_route_profile() {
+    let read = |field: &Field, text: &str| {
+        let mut lines = text.lines();
+        let head = lines.next().unwrap();
+        SourceMoment::read(field, head, &mut |what| {
+            lines.next().ok_or(HnnError::ContinuingState { what })
+        })
+    };
+    let unmarked = |text: &str| {
+        let (head, rest) = text.split_once('\n').unwrap();
+        let (head, _) = head.rsplit_once(' ').unwrap();
+        format!("{head}\n{rest}")
+    };
+    let located_field = helix_field();
+    let (passage, key) = partial_span(&located_field);
+    let mut current = at_helix(&located_field, key);
+    let mut located = SourceMoment::open(&located_field, &current);
+    located.ingest(&located_field, &mut current, &passage).unwrap();
+    let chain = chain();
+    let mut current = Current::at_rest(&chain);
+    let mut identity = SourceMoment::open(&chain, &current);
+    identity
+        .ingest(&chain, &mut current, &encoded(&chain, &[1, 0, 1, 1]))
+        .unwrap();
+    for (field, moment, profile) in [
+        (&located_field, &located, "located"),
+        (&chain, &identity, "identity"),
+    ] {
+        let mut text = String::new();
+        moment.write(&mut text);
+        assert!(text.lines().next().unwrap().ends_with(&format!(" {profile}")));
+        assert_eq!(read(field, &text).as_ref(), Ok(moment));
+        assert_eq!(
+            read(field, &unmarked(&text)),
+            Err(HnnError::ContinuingState {
+                what: "the moment's route profile (identity | located)",
+            })
+        );
+    }
 }

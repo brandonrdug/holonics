@@ -22,8 +22,10 @@
 //!   admitted receivers with their landmark trees' address depths (the landmark tree), the crib, and the
 //!   carrier lattice `2^(−L_ℓ)ℤ` of
 //!   every learned locus
-//!   ([`FieldDeclaration::lattice_by_rule`]). [`Field::declare`] computes the capacity `n*` by
-//!   counting and refuses a declared population shorter than it (guard 1), and declares the word's
+//!   ([`FieldDeclaration::lattice_by_rule`]). [`Field::declare`] computes the identity route's
+//!   capacity `n*` by counting and refuses a declared population shorter than it (guard 1; the
+//!   located route's certificate is owed, refs #62: `hnn::moment`, "The located route's capacity
+//!   is owed"), and declares the word's
 //!   precisions by rule ([`Field::word_lattice`], [`crate::hnn::WordLattice::by_rule`], the lattice word):
 //!   the certificate's target `2^(−D_c)`, the charts' lattice `L_c = 2D_c` and the transients'
 //!   lattice `L_w`, from the finest receiver grain, the receiving fan-in, the widest local solve
@@ -384,7 +386,8 @@ pub struct FieldDeclaration {
     pub exponent_grain: u64,
     pub receivers: Vec<ReceiverDeclaration>,
     pub crib: CribDeclaration,
-    /// The declared population (the cut's length in cells), refused below `n*`.
+    /// The declared population (the cut's length in cells), refused below the identity route's
+    /// `n*` (the located route's certificate is owed, refs #62).
     pub population: u64,
     /// The declared carrier lattice exponent `L_ℓ` of every learned locus (its entries live on
     /// `2^(−L_ℓ)ℤ`; `hnn::constitution`): exactly the field's learned loci, each once, and each at
@@ -1048,7 +1051,10 @@ pub struct Field {
 impl Field {
     /// **Declare a field**: every ring and contact checked, the complex built with `∂∘∂ = 0`, one
     /// exponent per contact on its lattice `(2q_Q/L)ℤ`, every ring reached from a source ring, and
-    /// the capacity `n*` counted, refusing a population shorter than it.
+    /// the identity route's capacity `n*` counted, refusing a population shorter than it. The
+    /// refusal certifies a lossy moment for identity-route cells only; a located source's
+    /// certificate is owed (refs #62), and its moment refuses the reading
+    /// (`SourceMoment::capacity`).
     ///
     /// The ring count and widths are fixed without any exterior alphabet: `|A|` bounds the class
     /// count of the encodings the field reads, and it enters only `n*` and the moment's slots. A
@@ -1334,7 +1340,8 @@ impl Field {
         self.population
     }
 
-    /// The capacity crossover `n*` and its certificate.
+    /// The identity route's capacity crossover `n*` and its certificate; a moment reads it through
+    /// `SourceMoment::capacity`, which refuses it once a located occurrence is counted.
     pub fn capacity(&self) -> &Capacity {
         &self.capacity
     }
@@ -1462,7 +1469,11 @@ impl Field {
         self.step_occurrence(lift, encoded, at)
     }
 
-    /// One occurrence's step of an admitted passage (the moment's ingest admits once).
+    /// **One occurrence's step of an admitted passage** (the moment's ingest admits once),
+    /// atomic: the step is taken on a staged copy of the lift and committed only once it and, on
+    /// the located route, its squares at the consumer hold. A refused occurrence leaves the lift as
+    /// it was, so its consumer (`SourceMoment::ingest`, which counts an occurrence only after its
+    /// step returns) is left unchanged by it.
     pub(crate) fn step_occurrence(
         &self,
         lift: &mut [BigInt],
@@ -1474,16 +1485,19 @@ impl Field {
             expected: encoded.len(),
             found: at,
         })?;
-        match encoded.advance(at) {
-            None => self.step_class(lift, cell.class(), None),
+        let mut staged = lift.to_vec();
+        let step = match encoded.advance(at) {
+            None => self.step_class(&mut staged, cell.class(), None)?,
             Some(digits) => {
                 let before = self.helix_lift(lift)?;
-                let step = self.step_class(lift, cell.class(), Some(digits))?;
-                let after = self.helix_lift(lift)?;
+                let step = self.step_class(&mut staged, cell.class(), Some(digits))?;
+                let after = self.helix_lift(&staged)?;
                 encoded.check_step(at, before, after)?;
-                Ok(step)
+                step
             }
-        }
+        };
+        lift.clone_from_slice(&staged);
+        Ok(step)
     }
 
     /// **Ring `g`'s advance on a class before its carry**: the class's located digit `a_g(c)` on

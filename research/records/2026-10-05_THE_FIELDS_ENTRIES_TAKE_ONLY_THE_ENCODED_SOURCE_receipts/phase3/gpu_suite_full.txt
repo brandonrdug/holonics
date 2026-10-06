@@ -1,0 +1,82 @@
+   Compiling holonics-cuda v0.1.0 (./crates/holonics-cuda)
+warning: method `with_rank` is never used
+    --> crates/holonics/src/hnn/receiving.rs:1588:19
+     |
+1285 | impl ReceivingPhases {
+     | -------------------- method in this implementation
+...
+1588 |     pub(crate) fn with_rank(self, rank: usize) -> Self {
+     |                   ^^^^^^^^^
+     |
+     = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `holonics` (lib) generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.93s
+     Running unittests src/lib.rs (target/debug/deps/holonics_cuda-162b84abbaed056d)
+
+running 41 tests
+test cuda::tests::allocation_calibration_keeps_persistent_and_driver_failures ... ok
+test cuda::tests::allocation_calibration_retries_an_unstable_sample_without_guessing ... ok
+test cuda::tests::launch_census_attribute_numbers_match_the_cuda_driver_abi ... ok
+test cuda::tests::virtual_memory_structures_match_the_cuda_driver_abi ... ok
+test cuda::tests::zero_fill_count_is_measured_in_cuda_dwords ... ok
+test hnn::physics_tests::the_prox_deposit_on_the_card_equals_the_host_and_is_measured ... ok
+test hnn::port_tests::a_failed_ingest_leaves_no_further_reads ... ok
+test hnn::port_tests::a_refused_deposit_restores_host_and_card_predecessors ... ok
+test hnn::port_tests::the_card_absorbs_each_reception_as_the_reference ... ok
+test hnn::port_tests::the_card_carries_each_reception_as_the_reference ... ok
+test hnn::port_tests::the_card_carries_the_pump_as_the_reference ... ok
+test hnn::port_tests::the_card_carries_the_reference_on_a_generic_constitution ... ok
+test hnn::port_tests::the_card_holds_a_rate_past_a_words_width_as_the_reference ... ok
+test hnn::port_tests::the_card_holds_a_resonators_momentum_as_the_reference ... ok
+test hnn::port_tests::the_card_port_refuses_as_the_reference ... ok
+test hnn::port_tests::the_card_port_returns_the_reference_across_a_moved_receiving_prior ... ok
+test hnn::port_tests::the_card_port_returns_the_reference_on_a_generic_constitution ... ok
+test hnn::port_tests::the_card_port_returns_the_reference_on_campaign_one ... ok
+test hnn::port_tests::the_card_port_returns_the_reference_on_deferred_compares ... ok
+test hnn::port_tests::the_card_port_returns_the_reference_on_the_chain ... ok
+test hnn::port_tests::the_card_port_returns_the_reference_through_a_releasing_collapse ... ok
+test hnn::port_tests::the_card_port_returns_the_reference_with_resonators ... ok
+test hnn::port_tests::the_card_saturating_ring_matches_the_reference_with_carry ... ok
+test hnn::port_tests::the_dyadic_readings_are_exact ... ok
+test hnn::port_tests::the_loaded_source_matches_with_y4_and_hop_two ... ok
+test hnn::port_tests::the_tree_is_read_at_each_phases_address_in_cell_order ... ok
+test hnn::tests::a_foreign_buffer_is_refused ... ok
+test hnn::tests::campaign_one_reads_and_ingest_match_the_host ... ok
+test hnn::tests::ingest_layout_is_derived_from_the_census ... ok
+test hnn::tests::lattice_coordinates_are_the_lattice_points ... ok
+test hnn::tests::lattice_read_matches_the_host_on_small_fixtures ... ok
+test hnn::tests::moment_ingest_matches_the_host_moment ... ok
+test hnn::tests::read_layout_is_derived_from_the_census ... ok
+test hnn::tests::the_card_beta_step_is_the_hosts ... ok
+test hnn::tests::the_card_opens_with_its_census ... ok
+test hnn::tests::the_card_register_carries_at_its_ceiling_as_the_host ... ok
+test hnn::tests::the_card_split_is_the_hosts ... ok
+test hnn::tests::the_card_tree_mixes_past_the_single_division_as_the_host_tree ... ok
+test hnn::tests::the_card_tree_reads_and_deposits_as_the_host_tree ... ok
+test hnn::word_tests::the_inverse_ceiling_is_the_carriers ... ok
+test hnn::word_tests::the_inverse_layouts_are_derived_from_the_census ... ok
+
+test result: ok. 41 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 359.02s
+
+     Running unittests src/bin/mount-smoke.rs (target/debug/deps/mount_smoke-569bf16e165ff310)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/located_ingest.rs (target/debug/deps/located_ingest-937856e9fe1c7741)
+
+running 1 test
+test located_ingest_keeps_the_actual_phase_winding_and_offset_counts_across_tiles ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.90s
+
+   Doc-tests holonics_cuda
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+STEP gpu-full exit 0 wall 361011 ms peak_rss 1013698560 bytes
+exit 0

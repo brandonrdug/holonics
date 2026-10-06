@@ -129,8 +129,10 @@
 //! counts on the exterior chart are independent of the learned `E` and `E^(δ)`, so the moment stays
 //! tape-free when either changes (Lean `HNN/Moment.exteriorOffset_independent_of_E`).
 //!
-//! [established-bounded; implemented-exact] **The capacity** ([`capacity`], design (a), R3 H1):
-//! the persisting source state after `n` cells takes at most
+//! [established-bounded; implemented-exact] **The capacity, on the identity route** ([`capacity`],
+//! design (a), R3 H1): on the identity route (THE_MACHINE guard 9; a ring advances by its lock's
+//! Boolean fit `[c ∈ N_g]` plus the carry, so at most two ticks a cell), the persisting source
+//! state after `n` cells takes at most
 //!
 //! ```text
 //! N(n) = |A|^(max Δ) · ∏_g (2n + d_g) · ∏_(g∈𝒮) [ C(n + d_g|A| − 1, d_g|A| − 1) · ∏_(δ∈Δ) C(n − δ + d_g|A|² − 1, d_g|A|² − 1) ]
@@ -141,6 +143,14 @@
 //! `n ≥ n*`. It is found by bisection on exact integers and certified at `n* − 1` and `n*`
 //! (Lean `HNN/Moment.moment_capacity`). The binomials are exact products formed by binary
 //! splitting. For `n < δ` there are no offset counts, and the factor is 1.
+//!
+//! [definition; agent-inferred, October 5] **The located route's capacity is owed** (refs #62). On
+//! the located route a ring advances by its class's located digit `a_g(c) < d_g` plus the carry,
+//! so its lift factor is not `2n + d_g` and the counted `N(n)` certifies nothing there. The
+//! formula is the identity route's and is not widened: a moment that has counted a located
+//! occurrence refuses its capacity, typed ([`SourceMoment::capacity`], `HnnError::CapacityOwed`),
+//! and a receipt reads it as owed ([`SourceCapacity::Owed`]). The located certificate, with its
+//! Lean ranged-clock join, is Codex's follow-up.
 //!
 //! | Lean `HNN/Moment` | Rust |
 //! |---|---|
@@ -169,8 +179,10 @@ use crate::ratio::linear::vector::integral;
 // -------------------------------------------------------------------------------------------
 // the capacity
 
-/// [established-bounded; implemented-exact] **The capacity crossover** of a declared source state:
-/// `n*` with its exact certificate. [definition; agent-inferred] **Its scope: the re-keys.** The
+/// [established-bounded; implemented-exact] **The capacity crossover** of a declared source state on
+/// the identity route (module header, "The capacity, on the identity route"; the located route's is
+/// owed, refs #62): `n*` with its exact certificate. [definition; agent-inferred] **Its scope: the
+/// re-keys.** The
 /// lift factor `2n + d_g` counts ring `g`'s own steps and carries over `n` cells from one opening.
 /// Each aeon boundary within the `n` cells re-keys the ring, a jump of its phase class by less than
 /// `d_g` that keeps its winding, so after `b` boundaries the lift takes at most `2n + (b + 1)d_g`
@@ -189,12 +201,13 @@ pub struct Capacity {
 }
 
 impl Capacity {
-    /// `n*`: the least `n` with `N(n) < |A|^n`.
+    /// `n*`: the least `n` with `N(n) < |A|^n`, on the identity route.
     pub fn n_star(&self) -> u64 {
         self.n_star
     }
 
-    /// **`N(n)`**, the count of distinct persisting source states after `n` cells, exactly.
+    /// **`N(n)`**, the count of distinct persisting source states after `n` identity-route cells,
+    /// exactly.
     pub fn states(&self, n: u64) -> BigUint {
         state_count(
             n,
@@ -217,9 +230,33 @@ impl Capacity {
         )
     }
 
-    /// The source-state bits `⌈log₂ N(n)⌉` as a reading, against the source's `n log₂|A|`.
+    /// The source-state bits `⌈log₂ N(n)⌉` as a reading, against the source's `n log₂|A|`, on the
+    /// identity route ([`SourceCapacity`] reads a moment's route).
     pub fn state_bits(&self, n: u64) -> u64 {
         self.states(n).bits()
+    }
+}
+
+/// [definition] **The source-state capacity a receipt reads** at a moment's `n` cells: the identity
+/// route's certificate (`⌈log₂N(n)⌉` and `n*`), or owed once the moment has counted a located
+/// occurrence ([`SourceMoment::capacity`]; the located route's certificate is owed, refs #62). No
+/// identity count is asserted for a located source.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum SourceCapacity {
+    Identity { state_bits: u64, n_star: u64 },
+    Owed,
+}
+
+impl SourceCapacity {
+    /// The reading of `moment` on `field`.
+    pub fn of(moment: &SourceMoment, field: &Field) -> Self {
+        match moment.capacity(field) {
+            Ok(capacity) => Self::Identity {
+                state_bits: capacity.state_bits(moment.cells()),
+                n_star: capacity.n_star(),
+            },
+            Err(_) => Self::Owed,
+        }
     }
 }
 
@@ -681,6 +718,9 @@ pub struct SourceMoment {
     cursor: usize,
     cells: u64,
     opening: Vec<BigInt>,
+    /// Whether a located occurrence has been counted: the capacity the moment reads
+    /// ([`SourceMoment::capacity`]) is then owed.
+    located: bool,
 }
 
 impl SourceMoment {
@@ -721,6 +761,7 @@ impl SourceMoment {
             cursor: 0,
             cells: 0,
             opening: current.lift().to_vec(),
+            located: false,
         }
     }
 
@@ -775,6 +816,7 @@ impl SourceMoment {
         field.admit(cells)?;
         for (consumed, code) in cells.classes_read().enumerate() {
             let step = current.step(field, cells, consumed)?;
+            self.located |= cells.located().is_some();
             for counts in &mut self.rings {
                 let phase = current.phase(field, counts.ring)? as usize;
                 counts.end = phase as u64;
@@ -882,15 +924,23 @@ impl SourceMoment {
     }
 
     /// [definition; agent-inferred, October 4; the reception carry §10] **The moment's text**, a
-    /// part of a continuing state: `moment n cursor rings` (the cells ingested, the held cells'
-    /// cursor, the source rings counted), `window` (each held cell's code or `-`), `opening` (the
+    /// part of a continuing state: `moment n cursor rings profile` (the cells ingested, the held
+    /// cells' cursor, the source rings counted, and the route profile, `identity` or `located` once
+    /// a located occurrence is counted, whose capacity is owed: [`SourceMoment::capacity`]; an
+    /// unmarked line is refused), `window` (each held cell's code or `-`), `opening` (the
     /// lift point at the open), then per source ring `counts g d start end ticks extent leaky`, its
     /// phase counts `first`, one `offset` line per declared offset, and, where it counts leakily,
     /// `leaky ρ k s unit` with its maps (`map` lines of `slot value` pairs, the phase map first).
     /// The alphabet and offsets are the field's and are not written.
     pub fn write(&self, s: &mut String) {
         use crate::hnn::state_text::line;
-        *s += &format!("moment {} {} {}\n", self.cells, self.cursor, self.rings.len());
+        *s += &format!(
+            "moment {} {} {} {}\n",
+            self.cells,
+            self.cursor,
+            self.rings.len(),
+            if self.located { "located" } else { "identity" }
+        );
         line(
             s,
             "window",
@@ -945,8 +995,14 @@ impl SourceMoment {
         use crate::hnn::state_text::{counted, keyed, refused, value, values};
         let what = "the moment";
         let words = keyed(head, "moment", what)?;
-        let [cells, cursor, count] = words[..] else {
-            return refused(what);
+        // The route profile is explicit: an unmarked line cannot be told from a located moment
+        // saved before the profile, so it is refused, never read as identity (an old save is a
+        // superseded prototype, with no legacy decoder).
+        let (cells, cursor, count, located) = match words[..] {
+            [cells, cursor, count, "identity"] => (cells, cursor, count, false),
+            [cells, cursor, count, "located"] => (cells, cursor, count, true),
+            [_, _, _] => return refused("the moment's route profile (identity | located)"),
+            _ => return refused(what),
         };
         let (cells, cursor, count): (u64, usize, usize) = (
             value(Some(&cells), what)?,
@@ -1048,6 +1104,7 @@ impl SourceMoment {
             cursor,
             cells,
             opening,
+            located,
         })
     }
 
@@ -1064,6 +1121,18 @@ impl SourceMoment {
     /// The lift point at the open.
     pub fn opening(&self) -> &[BigInt] {
         &self.opening
+    }
+
+    /// **The capacity this moment's cells are certified by** (module header, "The capacity"):
+    /// the field's, on the identity route only. Refused, typed ([`HnnError::CapacityOwed`]), once
+    /// a located occurrence is counted: `N(n)`'s lift factor `2n + d_g` bounds a ring's steps by
+    /// the Boolean fit plus the carry, and a located digit steps a ring by up to `d_g − 1` plus the
+    /// carry; the located route's certificate is owed (refs #62).
+    pub fn capacity<'f>(&self, field: &'f Field) -> Result<&'f Capacity, HnnError> {
+        if self.located {
+            return Err(HnnError::CapacityOwed);
+        }
+        Ok(field.capacity())
     }
 
     fn counts(&self, ring: usize) -> Result<&RingCounts, HnnError> {

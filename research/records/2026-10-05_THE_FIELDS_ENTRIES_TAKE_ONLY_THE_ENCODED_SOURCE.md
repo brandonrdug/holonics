@@ -1,6 +1,6 @@
 # The field's entries take only the encoded source, and the folded fixtures are re-derived
 
-**Date.** October 5. **Issues.** #73, #148, #76, #63. **Lane.** E of U6, phase 2 (the boundary's
+**Date.** October 5. **Issues.** #73, #148, #76, #63, #62. **Lane.** E of U6, phases 2 and 3 (the boundary's
 join, after the type of the [located transport record](2026-10-05_THE_LOCATED_TRANSPORT_EACH_OCCURRENCE_STEPS_THE_RINGS_BY_ITS_LOCATED_ADVANCE.md)
 §10 and Codex's source entrance, #377). **Grade.** [definition; agent-inferred] for the entries and
 the fixtures' choices; [measured] for the counts, quadrances and receipts below.
@@ -39,9 +39,9 @@ bytes on the helix of its rings, `5·7·11·13 = 5,005` past the location's ceil
 refusal as its result, and `executed text` and `executed text-repair` report guard 9's refusal. The
 card's standing-cut lockstep (bytes) is retired; its source is at `f91666c0`.
 
-**The card.** Its port accepts `Encoded` and refuses a located route's passage (`Unadmitted`): the
-`hnn_moment_ingest` kernel steps by the lock's fit alone. The kernel taking `digits(A) + carry` is
-device debt for #76 (Codex, branched off `c2cecc48`).
+**The card.** Its port passes the admitted `Encoded` to the card's ingest, which steps by
+`digits(A) + carry` on the located route (Codex's `hnn_moment_ingest` and `ResidentMoment::ingest`,
+adopted in phase 3, §4). The located refusal is gone.
 
 ## 1. The reproduction acceptance
 
@@ -147,3 +147,142 @@ byte modes report the refusal; no byte enters); seen graded as unseen (no read t
 confirmation seed); a refusal answered with a larger limit (each deadline from measurements, no
 rerun with a raised one); bits read as progress (the reproduction is a byte comparison of listings,
 not a score).
+
+## 4. Phase 3: the card takes the located digits, a refused step moves nothing, and the capacity is the identity route's
+
+**Adoption.** [measured] Codex's two patches were verified before they were applied. The first is the
+device ingest: SHA-256 `1c1197f7…`, 24,369 bytes, on `c2cecc48`, and the four code files' hashes
+match its manifest. The second is its invalidation follow-up: SHA-256 `25718f0d…`, 6,593 bytes, with
+the CUDA `moment.rs` at `9cdddbab…` before and `8ccc9389…` after, as its manifest states. Both passed
+`git apply --check`. Their files are adopted as written, with one fixture change in
+`tests/located_ingest.rs`. `Field::declare` refused the fixture's field with `Unreached { ring: 0 }`:
+it had no contacts, and its source ring is 2. Two contacts now join the helix's rings on their
+common nodes, marked `[agent-inferred, adoption]` in the file. The moment's ingest reads no contact.
+
+The joins:
+- the port passes the `Encoded`, or its part, to `open.card.ingest`, and the located refusal is
+  removed;
+- the `ResidentMoment` fixtures pass the `Encoded` part;
+- the layout expectations are rederived from `shared = 12·rings + 8·rings·threads`: 4 rings at
+  1,024 threads take `48 + 32·1,024 = 32,816` octets, and 12 rings at 256 threads take
+  `144 + 96·256 = 24,720`, under the ceiling 49,144;
+- a nonempty located ingest counts its located chart's upload, `8·rings·|A|` octets, beside the
+  cells' `4n` and the lift's and phases' `8·(2 + rings)`. The octets are counted once the card has
+  launched: on its checked receipt, or on a failure past the launch. A refusal before the launch
+  moves nothing across the bus.
+
+**A failed open is discarded.** [definition; agent-inferred] On a refusal the card and the host do
+not hold one checked state:
+- the card's ingest walks the prefix through the host owner before its launch, so a refused
+  occurrence is refused before anything reaches the card;
+- after any failure past the launch, the card's moment is invalid until a checked receipt
+  (`ResidentMoment::is_valid`, Codex's);
+- the host mirror commits the occurrences before the refused one.
+
+So the device port drops the open on every error of its ingest (`port::ingest_open`), and drops any
+moment whose re-key fails (`rekey_moments`). The reference port drops a failed open too, so both
+ports read the same handles after the same refusal (the parity law). A dropped handle reads
+`HnnError::UnknownHandle` (`port_tests::a_failed_ingest_leaves_no_further_reads`). The test's
+refusal comes before the card launches, so it tests the port's discard. No test exercises a
+failure after the launch, which would invalidate the card's moment: that path needs a driver or
+receipt fault, and the tree has no way to inject one.
+
+**A refused occurrence moves nothing.** [definition; agent-inferred] `Field::step_occurrence` takes
+the step on a staged copy of the lift and commits it only once the step and, on the located route,
+the squares at the consumer hold. `SourceMoment::ingest` counts an occurrence only after its step
+returns. The checked squares are the source consumer's, reached through `Field::selective_step`,
+`Current::step` and `SourceMoment::ingest`. The keys' candidate-class helpers call the in-crate
+`step_class` deliberately, unchecked, as the machine's own crib charts.
+
+[proved-derived] A founded chart rarely refuses. Its transports are shifts of `ℤ/D`, so its reached
+span is the union of its openings' orbits under the group its advances generate. That span is all of
+`ℤ/D` when the advances generate it, and then no admitted lift leaves it. A step from inside the
+span stays inside it, so only a passage's first occurrence can be refused. A refusal therefore needs
+two things: advances that do not generate, and a location that is still one gauge class.
+
+[proved-derived] When the index `m` divides the receiving grain `D_low`, the cosets of `mℤ/D` cannot
+be told apart. The map `φ(ℓ) = m⌊ℓ/m⌋ + (ℓ + 1 mod m)` keeps every lift in its cell, because a block
+of `m` lifts lies within one cell. It commutes with every step by a multiple of `m`, and it carries
+each coset to the next. On the helix `(2, 3, 5)` with `m = 3`, one coset's lifts
+`r + 3k` read the cells `⌊k/2⌋`: a ten-lift helix `(2, 5)` stepped by `A/3`.
+
+[agent-inferred] That smaller helix sits inside `(2, 3, 5)` in more than one way, which would explain
+why index 3 never located in the scans below. Index 5 does not divide `D_low = 6`, and it located.
+
+[measured] The scratch scans behind the fixture (the 200-seed listing is in
+`…_receipts/phase3/atomicity_fixture_scan.txt`):
+
+| Advances | Read set | Seeds | One gauge class | Fewest gauge classes |
+|---|---|---|---|---|
+| multiples of 3 | keys `3j + 1`, `j < 10`, 60 cells | 20 | none | 65 |
+| multiples of 3 | keys `k ≢ 0 (mod 3)`, 120 cells | 40 | none | (not kept) |
+| multiples of 3 | every key, 60 cells | first 2 | none | 3,186 |
+| `5·k`, `k < 6` | every key, 60 cells | 20 | none | 2 |
+| `5·(1 + k)`, `k < 5` | every key, 60 cells | 200 (`2_026_100_990 … 2_026_101_189`) | 31 | 2 |
+
+The fixture is the first seed that locates, `2_026_100_995`, with advances `[25, 20, 5, 25, 20]`.
+Founded on the first passage's key alone, its chart reaches 6 of the 30 lifts, one coset of
+`5ℤ/30`. The test is `hnn::tests::moment::a_refused_located_step_leaves_the_current_and_the_moment_unchanged`:
+- from a lift on that coset, the whole passage and a part of it step;
+- from the next lift, the first occurrence is refused (`EncodingError::Unreached`, the reading
+  square at a lift where the encoding is not founded), and the lift point, the moment and the raw
+  lift are unchanged.
+
+Committing the staged lift before the square fails the test, moving the lift from `[0, 0, 1]` to
+`[1, 2, 1]`. The same fixture drives the card port's test above.
+
+**The capacity is the identity route's.** [definition; agent-inferred] `N(n)`'s lift factor
+`2n + d_g` bounds a ring's ticks by the Boolean fit plus the carry. A located digit steps a ring by
+up to `d_g − 1` plus the carry, so the counted `N(n)` certifies nothing on the located route. The
+formula is not changed. Its claims (the `hnn::moment` header, `Capacity`, `Field::declare`,
+`FieldDeclaration::population`, THE_MACHINE guard 1, the atlas row `hnn.moment-capacity`) are scoped
+to the identity route.
+- A moment that has counted a located occurrence refuses its capacity, typed
+  (`SourceMoment::capacity`, `HnnError::CapacityOwed`), and a later identity-route or empty ingest
+  does not downgrade it.
+- The ingest receipts and the exposure's state report carry `SourceCapacity`, either `Identity` with
+  `⌈log₂N(n)⌉` and `n*`, or `Owed`. Before this change both receipts asserted the identity count for
+  every passage. The notebook's identity listing is unchanged.
+- The moment's saved line carries an explicit profile, `moment n cursor rings identity|located`. An
+  unmarked line is refused (`ContinuingState`, "the moment's route profile"), never read as
+  identity. It cannot be told from a located moment saved before the profile, and an old save is a
+  superseded prototype (`hnn::tests::moment::the_moment_text_carries_its_route_profile`).
+
+The located route's certificate, with its Lean ranged-clock join, is owed (#62). It is Codex's
+follow-up, which takes over `SourceMoment::capacity` and `SourceCapacity`.
+
+**Gates and receipts.** [measured] Every run below read one code tree. The SHA-256 of the tracked code diff plus the
+untracked `tests/located_ingest.rs` is `593068e7…` at each run (`…_receipts/phase3/tree.txt`). The
+worktree's own target, thread budget 12:
+- Gate 1, `bash tools/gate.sh`: check, guard lints and guard doctests ok, 2,238, 6,555 and 17,863 ms (26,660 ms wall), the entries' `compile_fail` doctests among them.
+- `cargo test -p holonics --lib`: 1,009 passed, 0 failed, 1 ignored (the defect), 213.51 s of tests (219,304 ms wall). The three new tests are among them: the refused located step, the located moment's capacity, and the route profile.
+- `cargo test -p holonics --test source_entrance --test resident_cold_restore`: 4 and 4 passed (17,484 ms wall).
+- The card, alone under `.local/gpu.lock`, `--include-ignored --test-threads=1`:
+  - the short partition, the four tests measured before at 32,362 ms plus the new port test:
+    5 passed, 32,221 ms wall against a deadline of 120 s, so the new test adds nothing measurable;
+  - `--test located_ingest`: 1 passed, 1,704 ms wall against a deadline of 60 s, projected from the
+    1,785 ms measured before;
+  - the full suite: **41 passed, 0 failed**, and `located_ingest` 1 passed; 359.02 s of tests,
+    361,011 ms wall, peak resident set 1,013,698,560 bytes. The projection was the last full run's
+    378,441 ms, about 380 s, with the deadline fixed at 460 s. Measured over projected:
+    `361,011/380,000`.
+
+Receipts: `…_receipts/phase3/`. No limit was raised. Two gate launches of this loop failed before
+these runs, and the gates were rerun after each:
+- the first did not start, because the host has no `/usr/bin/time`;
+- the second hit a compile error in a new test, a local binding that shadowed the support helper
+  `encoded`, which was repaired.
+
+The computational object is the helical pair interaction. This loop touches two of the winding
+guide's six objects: the **helix** (the card's located step, digit plus carry at `u64`; the coset
+structure of a partial span) and **faces and placement** (the squares at the consumer, now
+atomic). The **pair** stays attached through the contacts that `located_ingest`'s field needed to
+be declared.
+
+The recorded failures this loop could repeat, and how each was held:
+- An uncertified deposition step: none. A refused step now commits nothing.
+- A located cause carried unrepaired into a new consumer: the capacity formula's identity scope is
+  refused, typed, at its consumers, not carried into the located route.
+- An authored routine standing in for learning: the fixture's terrain is generated as known truth,
+  and the machine meets only its emitted classes.
+- A refusal answered with a larger limit: none.

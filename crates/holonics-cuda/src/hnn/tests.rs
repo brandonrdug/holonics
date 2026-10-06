@@ -355,10 +355,13 @@ fn read_layout_is_derived_from_the_census() {
 fn ingest_layout_is_derived_from_the_census() {
     let census = census();
     let ingest = entry("hnn_moment_ingest", 1024, 8);
-    // Campaign 1: four rings, 1,190 cells (a mean aeon on uniform bytes).
+    // The shared octets are `12·rings + 8·rings·threads` (the located scan's 8-octet words); the
+    // ceiling is the census's `49,152` less the entry's static `8`, `49,144`.
+    // Campaign 1: four rings, 1,190 cells: `(49,144 − 48) / 32 = 1,534`, so the entry's 1,024.
     let layout = ingest_layout(&census, &ingest, 4, 1190, None).unwrap();
     assert_eq!((layout.grid, layout.block), (Dim3::x(1), Dim3::x(1024)));
     assert_eq!(layout.shared, ingest_shared(4, 1024).unwrap());
+    assert_eq!(layout.shared, 48 + 32 * 1024);
     assert_eq!(
         layout.realization,
         Realization::OneBlockScan {
@@ -366,11 +369,10 @@ fn ingest_layout_is_derived_from_the_census() {
             tiles: 2
         }
     );
-    // Twelve rings' scans need 48 octets a thread: (49,152 − 8 − 144) / 48 = 1,020, so 512.
-    assert_eq!(
-        ingest_layout(&census, &ingest, 12, 1, None).unwrap().block,
-        Dim3::x(512)
-    );
+    // Twelve rings' scans need 96 octets a thread: (49,144 − 144) / 96 = 510, so 256.
+    let twelve = ingest_layout(&census, &ingest, 12, 1, None).unwrap();
+    assert_eq!(twelve.block, Dim3::x(256));
+    assert_eq!(twelve.shared, 144 + 96 * 256);
     // Narrowed on request, to a power of two.
     assert_eq!(
         ingest_layout(&census, &ingest, 3, 400, Some(48))
@@ -599,7 +601,9 @@ fn moment_ingest_matches_the_host_moment() {
             let expected = host
                 .ingest(&field, &mut current, &encoded.part(fed..end).unwrap())
                 .unwrap();
-            let (found, layout) = device.ingest_in(&cells[fed..end], lanes).unwrap();
+            let (found, layout) = device
+                .ingest_in(&encoded.part(fed..end).unwrap(), lanes)
+                .unwrap();
             assert_eq!(found, expected, "batch at {fed}, {layout:?}");
             assert_eq!(
                 device.lift(),
@@ -633,14 +637,17 @@ fn moment_ingest_matches_the_host_moment() {
             }
         }
     }
+    // A passage encoded against another field's source rings is refused before the card reads it
+    // (THE_MACHINE guard 9): campaign 1's classes on its period-5 source ring.
+    let campaign = Field::declare(FieldDeclaration::campaign_one(1 << 16)).unwrap();
+    let foreign = Encoded::identity(&KnownTruth::uniform(2, 1, 1, 2).unwrap(), &campaign)
+        .unwrap()
+        .remove(0);
     assert!(matches!(
         ResidentMoment::open(&card, &field, &Current::at_rest(&field))
             .unwrap()
-            .ingest(&[1, 2]),
-        Err(DeviceError::Hnn(holonics::hnn::HnnError::CellOutside {
-            code: 2,
-            alphabet: 2
-        }))
+            .ingest(&foreign),
+        Err(DeviceError::Hnn(holonics::hnn::HnnError::Unadmitted { .. }))
     ));
 }
 
@@ -681,7 +688,9 @@ fn campaign_one_reads_and_ingest_match_the_host() {
             .ingest(&field, &mut current, &encoded.part(fed..cells.len()).unwrap())
             .unwrap();
         let clock = Instant::now();
-        let (found, layout) = device.ingest_in(&cells[fed..], None).unwrap();
+        let (found, layout) = device
+            .ingest_in(&encoded.part(fed..cells.len()).unwrap(), None)
+            .unwrap();
         device_us += clock.elapsed().as_micros();
         if fed == 0 {
             eprintln!("ingest: {layout:?}");

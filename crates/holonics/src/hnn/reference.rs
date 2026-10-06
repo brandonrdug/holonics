@@ -166,7 +166,7 @@ use crate::hnn::contact::{SiteReading, site_readings};
 use crate::hnn::field::{ConstitutionRead, Current, Field};
 use crate::hnn::encoding::Encoded;
 use crate::hnn::keys::{self, KeyLocation};
-use crate::hnn::moment::{Ingested, PopulationChart, SourceMoment};
+use crate::hnn::moment::{Ingested, PopulationChart, SourceCapacity, SourceMoment};
 use crate::hnn::pending::{Against, PendingRatio};
 use crate::hnn::port::{
     Census, ContactPullback, Deposit, ExecutionPort, Handle, MomentId, PendingId, PortReceipt,
@@ -1197,7 +1197,18 @@ impl ExecutionPort for Reference {
             .get_mut(&id)
             .expect("the moment was checked or opened");
         let start = Instant::now();
-        let ingested = open.ingest(&field, &mut resident.current, cells)?;
+        // [definition; agent-inferred, October 5] A failed ingest discards its open, on both ports
+        // (the device port's `ingest_open`: a failed card open holds no checked state, and the
+        // parity law reads the same handles after the same refusal). The refused occurrence left
+        // the lift as it was (`Field::step_occurrence`); on a founded chart only a passage's first
+        // occurrence can leave the reached span, a union of transport orbits.
+        let ingested = match open.ingest(&field, &mut resident.current, cells) {
+            Ok(ingested) => ingested,
+            Err(error) => {
+                resident.moments.remove(&id);
+                return Err(error);
+            }
+        };
         // The receiving parametron's active suffix address receives the cells the moment took, each
         // tick's letter read by its register's clock, which stays the lift point's (its windings
         // since the aeon's opening, which the carry-out moves to its own lift point), and its
@@ -1241,13 +1252,11 @@ impl ExecutionPort for Reference {
             })
             .collect();
         let n = open.cells();
-        let capacity = field.capacity();
         let detail = ReceiptDetail::Ingest {
             cells: ingested.cells as u64,
             moment_bits: open.dense_bits(),
-            state_bits: capacity.state_bits(n),
+            capacity: SourceCapacity::of(open, &field),
             source_bits: n * ceil_log2(&BigUint::from(field.alphabet())),
-            n_star: capacity.n_star(),
             carry_out: ingested.carry_out,
         };
         let mut work = ExactWork::nothing();
@@ -2930,17 +2939,17 @@ pub struct KeyReport {
 /// [definition] **The state against the source, in bits**: the lift point, the open moment, the
 /// constitution, and the whole resident with and without the collapse
 /// ([`Resident::state_bits_without_collapse`]: equal on a field inside one diamond, review D6); the
-/// moment's `⌈log₂N(n)⌉` and dense bits against the source's `n ⌈log₂|A|⌉`, with `n*`.
+/// moment's dense bits and its source-state capacity (`⌈log₂N(n)⌉` with `n*` on the identity
+/// route, owed on the located route: [`SourceCapacity`]) against the source's `n ⌈log₂|A|⌉`.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct StateReport {
     pub lift_bits: u64,
     pub moment_bits: u64,
-    pub moment_state_bits: u64,
+    pub moment_capacity: SourceCapacity,
     pub constitution_bits: u64,
     pub resident_bits: u64,
     pub resident_bits_without_collapse: u64,
     pub source_bits: u64,
-    pub n_star: u64,
 }
 
 /// [definition] **One point of the constitution's curve** (design (f) item 4): the commit reached,
@@ -4628,12 +4637,11 @@ where
     let state = StateReport {
         lift_bits: resident.current().lift().iter().map(|x| x.bits() + 1).sum(),
         moment_bits: open.dense_bits(),
-        moment_state_bits: field.capacity().state_bits(n),
+        moment_capacity: SourceCapacity::of(open, field),
         constitution_bits: resident.constitution().exact_bits(),
         resident_bits: resident.state_bits(),
         resident_bits_without_collapse: resident.state_bits_without_collapse(),
         source_bits: n * symbol,
-        n_star: field.capacity().n_star(),
     };
     let exposure = Exposure {
         training,

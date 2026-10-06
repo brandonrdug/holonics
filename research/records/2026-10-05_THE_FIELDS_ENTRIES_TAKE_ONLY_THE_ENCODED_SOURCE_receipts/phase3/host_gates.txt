@@ -1,0 +1,11 @@
+gate check: ok (2238 ms)
+gate guard-lints: ok (6555 ms)
+test result: ok. 54 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.55s
+gate guard-doctests: ok (17863 ms)
+STEP gate exit 0 wall 26660 ms peak_rss 1888894976 bytes
+test result: ok. 1009 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 213.51s
+STEP lib exit 0 wall 219304 ms peak_rss 1222381568 bytes
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.83s
+STEP entrance exit 0 wall 17484 ms peak_rss 2013413376 bytes
+exit 0

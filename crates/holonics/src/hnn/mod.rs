@@ -303,6 +303,10 @@ pub enum HnnError {
         "the declared population of {population} cells is shorter than the capacity n* = {n_star}: the moment would be lossless"
     )]
     BelowCapacity { population: u64, n_star: u64 },
+    #[error(
+        "the moment has counted a located occurrence: its capacity N(n) is the identity route's, and the located route's certificate is owed (#62)"
+    )]
+    CapacityOwed,
     #[error("class {code} lies outside the field's {alphabet} classes")]
     CellOutside { code: usize, alphabet: usize },
     /// THE_MACHINE guard 9: an encoded passage this field does not read.

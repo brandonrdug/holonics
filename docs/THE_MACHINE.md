@@ -530,7 +530,10 @@ tests can comb through anything valuable").
    - `SourceMoment` is sized once, from the `Field`, and accepts closing source rings only. A
      rotation transport has no ingest port (`compile_fail`).
    - `Field::declare` computes `n*` by the counting formula, on exact integers, and refuses a
-     declared population shorter than it.
+     declared population shorter than it. The formula is the identity route's (a ring steps by
+     its lock's Boolean fit plus the carry); a moment that has counted a located occurrence refuses
+     the reading (`SourceMoment::capacity`, `HnnError::CapacityOwed`), and the located route's
+     certificate is owed (#62).
    - A capacity test checks the count, not one slot's bits: `log₂N(n)` per source bit is at least 1
      below `n*` and below 1 past it, at `n` = 2 … 4,096 on the three-ring control (R3 H1).
 2. **No word outlives its return.** `Word<'c>` borrows `&'c Field` and owns its tick operands.
@@ -605,9 +608,12 @@ tests can comb through anything valuable").
    - **The located step.** An occurrence of the located route steps ring `g` by its class's located
      digit plus the carry, `a_g(c) + carry_g ≤ d_g`, its ticks held at `u64` (`SelectiveStep.ticks`),
      and the squares `D E = ρ` and `E T_a = U_a E` are checked on the lift the step reads and the
-     lift it reaches (`Encoded::check_step`); an identity steps by the lock's fit as before. The card
-     steps by the lock's fit alone and refuses a located route's passage (`HnnError::Unadmitted`):
-     the kernel taking the digits is device debt (#76).
+     lift it reaches (`Encoded::check_step`); an identity steps by the lock's fit as before. The
+     step is atomic: it is staged and committed only once its squares hold, so a refused occurrence
+     (a lift off a partial-span chart's reached coset, `EncodingError::Unreached`) leaves the lift
+     point and the moment as they were. The card takes the same digits (`hnn_moment_ingest`, its
+     located chart one `u64` digit per ring and class, `ResidentMoment::ingest`, Codex's), and both
+     ports discard an open whose ingest failed: its handle reads no further.
    - **No residue chart.** No constructor exists for `code mod d_g`, for `code` itself on a ring
      of period `|A|`, or for a chart founded from a passage's counts or placed at first arrival.
      `PortChart` and its residue constructor are deleted (October 5, with `one_hot` and the ports'

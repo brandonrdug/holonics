@@ -1832,3 +1832,116 @@ fn the_card_port_returns_the_reference_through_a_releasing_collapse() {
     );
     same("read", both.host.read(&both.h), both.device.read(&both.d));
 }
+
+// -------------------------------------------------------------------------------------------
+// a failed ingest
+
+/// The helix `(2, 3, 5)` as a field (the host's `hnn::tests::moment` fixture): the rings in carry
+/// order on the quarter turns, chained on their common nodes, source ring 2 holding the five
+/// classes, `Δ = {1, 3}`, receiver ring 2 with aperture 5.
+fn helix_field() -> Field {
+    let mut declaration = chain_declaration(1 << 16);
+    declaration.rings = [2u64, 3, 5].into_iter().map(|d| ring(d, vec![0])).collect();
+    declaration.contacts = vec![contact(0, 1, 2, 0), contact(1, 2, 3, 0)];
+    declaration.sources = vec![2];
+    declaration.offsets = vec![1, 3];
+    declaration.alphabet = 5;
+    declaration.receivers[0].aperture = 5;
+    Field::declare(declaration.by_lattice_rule()).unwrap()
+}
+
+/// [agent-inferred, October 5] **A founded partial-span passage** (the host's
+/// `hnn::tests::moment::partial_span`, the same draw `2_026_100_995`): advances that are nonzero
+/// multiples of 5 on the helix `(2, 3, 5)`, located from a passage at every key to one gauge class;
+/// the chart founded on the first passage's key reaches that key's coset only. Returns the encoded
+/// passage and its opening key.
+fn partial_span(field: &Field) -> (Encoded, u64) {
+    use holonics::compression::keys::transport::{CarryHelix, SteppedTerrain, TransportLocation};
+    use holonics::hnn::encoding::{Encoding, PassageChart};
+    let helix = CarryHelix::new(vec![2, 3, 5]).unwrap();
+    let mut draw = holonics::holarchy::terrain::Draw::new(2_026_100_995);
+    let advances: Vec<u64> = (0..5).map(|_| 5 * (1 + draw.below(5)) as u64).collect();
+    let mut left: Vec<usize> = (0..5).collect();
+    let labels: Vec<usize> = (0..5).map(|_| left.remove(draw.below(left.len()))).collect();
+    let terrain = SteppedTerrain::new(helix.clone(), advances, labels).unwrap();
+    let passages: Vec<Vec<usize>> = (0..helix.period()).map(|key| terrain.passage(key, 60)).collect();
+    let location = TransportLocation::locate(helix, 5, &passages).unwrap();
+    let chart = PassageChart::located(&location, &passages[..1]).unwrap();
+    let encoding = Encoding::found(&chart).unwrap();
+    assert_eq!(encoding.reached(), 6, "the chart reaches one coset of 5ℤ/30");
+    let key = chart.openings()[0]
+        .iter()
+        .position(|entry| !entry.is_zero())
+        .expect("an opening is a lift") as u64;
+    let encoded = Encoded::through(&encoding, &chart, field, &passages[..1])
+        .unwrap()
+        .remove(0);
+    (encoded, key)
+}
+
+/// [implemented-exact] **A failed ingest leaves no further reads** (`port::ingest_open`, Codex's
+/// invalidation law `ResidentMoment::is_valid`): on both ports, a moment opened off the passage's
+/// reached coset refuses the passage's first located step alike (`EncodingError::Unreached`), and
+/// the failed open is discarded, never consumed: the read lists no moment, and a later ingest or
+/// refine of its handle is refused (`HnnError::UnknownHandle`). The lift point is the mount's, and a
+/// fresh open on the reached coset ingests the passage on both ports alike.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn a_failed_ingest_leaves_no_further_reads() {
+    let field = helix_field();
+    let (encoded, key) = partial_span(&field);
+    let card = card();
+    let host = Reference::campaign_one();
+    let device = Resident::campaign_one(&card);
+    let lift = |ell: u64| {
+        let ell = ell % 30;
+        Current::at(
+            &field,
+            vec![BigInt::from(ell % 2), BigInt::from(ell / 2 % 3), BigInt::from(ell / 6)],
+        )
+        .unwrap()
+    };
+    let off = lift(key + 1);
+    let mut h = host.mount(&field, &off).unwrap();
+    let mut d = device.mount(&field, &off).unwrap();
+    let phases = h.admitted()[0].clone();
+    let empty = encoded.part(0..0).unwrap();
+    let (moment, _) = same(
+        "the open",
+        host.ingest(&mut h, None, &empty),
+        device.ingest(&mut d, None, &empty),
+    )
+    .unwrap();
+    let refused = (
+        host.ingest(&mut h, Some(&moment), &encoded),
+        device.ingest(&mut d, Some(&moment), &encoded),
+    );
+    let unreached = HnnError::from(holonics::hnn::encoding::EncodingError::Unreached);
+    assert_eq!(refused.0.as_ref().err(), Some(&unreached));
+    assert_eq!(refused.1.as_ref().err(), Some(&unreached));
+    assert!(ExposedResident::moment(&h, &moment).is_none());
+    assert!(ExposedResident::moment(&d, &moment).is_none());
+    assert_eq!(ExposedResident::current(&h), &off);
+    assert_eq!(ExposedResident::current(&d), &off);
+    let (_, _, handles) = same("read", host.read(&h), device.read(&d)).unwrap();
+    assert!(handles.iter().all(|(handle, _)| !matches!(handle, Handle::Moment(_))));
+    let unknown = || HnnError::UnknownHandle {
+        handle: Handle::Moment(moment),
+    };
+    assert_eq!(host.ingest(&mut h, Some(&moment), &empty).err(), Some(unknown()));
+    assert_eq!(device.ingest(&mut d, Some(&moment), &empty).err(), Some(unknown()));
+    assert_eq!(host.refine(&mut h, &moment, &phases).err(), Some(unknown()));
+    assert_eq!(device.refine(&mut d, &moment, &phases).err(), Some(unknown()));
+    // On the reached coset a fresh open ingests the passage through the card's located route alike.
+    let on = lift(key);
+    let mut h = host.mount(&field, &on).unwrap();
+    let mut d = device.mount(&field, &on).unwrap();
+    let (_, ingested) = same(
+        "the located ingest",
+        host.ingest(&mut h, None, &encoded),
+        device.ingest(&mut d, None, &encoded),
+    )
+    .unwrap();
+    assert!(ingested.forward.present().unwrap().cells > 0);
+    assert_eq!(ExposedResident::current(&h), ExposedResident::current(&d));
+}

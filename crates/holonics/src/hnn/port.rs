@@ -77,7 +77,7 @@ use crate::hnn::constitution::{
 };
 use crate::hnn::field::{Current, Field, Ring};
 use crate::hnn::keys::KeyLocation;
-use crate::hnn::moment::Ingested;
+use crate::hnn::moment::{Ingested, SourceCapacity};
 use crate::hnn::propagation::{
     PathAttenuation, TickBalance, conductance_covector, scattering_about,
 };
@@ -149,14 +149,14 @@ pub fn source_order(field: &Field, lift: &[BigInt], cells: u64) -> SourceOrder {
 /// [definition] **What a method's receipt reads beyond the common fields**, one arm per method.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ReceiptDetail {
-    /// `ingest`: cells accessed, the moment's dense bits and its source-state bits `⌈log₂N(n)⌉`
-    /// against the source's `n ⌈log₂|A|⌉`, `n*`, and whether the joint clock carried out.
+    /// `ingest`: cells accessed, the moment's dense bits, its source-state capacity (`⌈log₂N(n)⌉`
+    /// and `n*` on the identity route, owed on the located route: `hnn::moment::SourceCapacity`)
+    /// against the source's `n ⌈log₂|A|⌉`, and whether the joint clock carried out.
     Ingest {
         cells: u64,
         moment_bits: u64,
-        state_bits: u64,
+        capacity: SourceCapacity,
         source_bits: u64,
-        n_star: u64,
         carry_out: bool,
     },
     /// `locate_keys`: per ring the fibre's size, its orbits, whether it fell back, its minimal

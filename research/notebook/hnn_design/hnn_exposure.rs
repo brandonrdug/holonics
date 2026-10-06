@@ -154,6 +154,7 @@ use holonics::compression::keys::transport::{CarryHelix, TransportLocation};
 use holonics::hnn::encoding::{Encoded, Encoding, EncodingError, PassageChart};
 use holonics::hnn::constitution::CAMPAIGN_ONE_BUDGET;
 use holonics::hnn::port::{ExecutionPort, ReceiptDetail};
+use holonics::hnn::moment::SourceCapacity;
 use holonics::hnn::receiving::landmark_declaration;
 use holonics::hnn::reference::{Bits, KeyReport};
 use holonics::hnn::{
@@ -909,19 +910,26 @@ fn report(field: &Field, exposure: &Exposure) {
             ))
         }
     };
+    // The counted capacity is the identity route's; a located source's is owed (refs #62).
+    let (n_star, counted) = match state.moment_capacity {
+        SourceCapacity::Identity { state_bits, n_star } => (
+            n_star.to_string(),
+            format!("{} bits, per source bit {}", state_bits, over_source(state_bits)),
+        ),
+        SourceCapacity::Owed => ("owed".to_string(), "owed on the located route".to_string()),
+    };
     println!(
         "source: {} bits ({} cells ingested, n* = {})",
         state.source_bits,
         state.source_bits / ceil_log2(&BigUint::from(field.alphabet())).max(1),
-        state.n_star
+        n_star
     );
     println!("lift point: {} bits", state.lift_bits);
     println!(
-        "moment: dense {} bits, per source bit {}; counted state ceil(log2 N(n)) {} bits, per source bit {}",
+        "moment: dense {} bits, per source bit {}; counted state ceil(log2 N(n)) {}",
         state.moment_bits,
         over_source(state.moment_bits),
-        state.moment_state_bits,
-        over_source(state.moment_state_bits)
+        counted
     );
     println!(
         "constitution: {} bits, per source bit {}",

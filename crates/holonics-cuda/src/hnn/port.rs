@@ -54,7 +54,7 @@ use holonics::hnn::constitution::{
 };
 use holonics::hnn::keys::{self, KeyLocation};
 use holonics::hnn::encoding::Encoded;
-use holonics::hnn::moment::Ingested;
+use holonics::hnn::moment::{Ingested, SourceCapacity};
 use holonics::hnn::pending::Against;
 use holonics::hnn::port::{
     Census, Deposit, ExecutionPort, Handle, MomentId, PendingId, PortReceipt, Pullback,
@@ -96,6 +96,61 @@ use crate::hnn::tree::{CardTree, TreeTimes};
 
 fn device(error: DeviceError) -> HnnError {
     error.into_hnn()
+}
+
+/// [definition; agent-inferred, October 5] **A failed open is discarded, never consumed.** One
+/// open's ingest: the card's, then the host mirror's, checked equal. On a refusal the two do not
+/// hold one checked state: the card's ingest commits nothing past a refused occurrence and is
+/// invalid after any failure past its launch (`ResidentMoment::is_valid`), while the host's commits
+/// the occurrences admitted before the refused one (`Field::step_occurrence` is atomic per
+/// occurrence). So the port's caller drops the open on every error returned here, and its handle
+/// then reads `HnnError::UnknownHandle`.
+fn ingest_open(
+    open: &mut MomentSlot<'_>,
+    field: &Field,
+    current: &mut Current,
+    cells: &Encoded,
+) -> Result<Ingested, HnnError> {
+    let carded = if cells.is_empty() {
+        Ingested {
+            cells: 0,
+            carry_out: false,
+        }
+    } else {
+        open.card.ingest(cells).map_err(device)?
+    };
+    let ingested = open.host.ingest(field, current, cells)?;
+    if carded != ingested || open.card.lift() != current.lift() {
+        return Err(HnnError::Realization {
+            what: "the card's ingest against the host's moment",
+        });
+    }
+    Ok(ingested)
+}
+
+/// **Every open moment but `except` re-keyed to the lift point's phases.** A moment whose re-key
+/// fails holds an unchecked device write (`ResidentMoment::rekey`), so it is dropped with the
+/// failed opens and the first failure is returned.
+fn rekey_moments(
+    moments: &mut BTreeMap<MomentId, MomentSlot<'_>>,
+    field: &Field,
+    current: &Current,
+    except: Option<MomentId>,
+) -> Result<(), HnnError> {
+    let mut failed = Vec::new();
+    for (id, moment) in moments.iter_mut() {
+        if Some(*id) != except
+            && let Err(error) = moment.card.rekey(field, current)
+        {
+            failed.push((*id, device(error)));
+        }
+    }
+    let mut first = None;
+    for (id, error) in failed {
+        moments.remove(&id);
+        first.get_or_insert(error);
+    }
+    first.map_or(Ok(()), Err)
 }
 
 // -------------------------------------------------------------------------------------------
@@ -974,13 +1029,9 @@ impl<'c> ExecutionPort for Resident<'c> {
         }
         let field = resident.field.clone();
         field.admit(cells)?;
-        // The card's kernel steps a ring by its lock's fit plus the carry (two ticks at most); a
-        // located route's digits are the host's alone until the kernel takes them (#76).
-        if cells.located().is_some() {
-            return Err(HnnError::Unadmitted {
-                reason: "the card steps by the lock's fit; a located route's digits are host-only",
-            });
-        }
+        // The card steps a ring by the admitted encoding's advance plus the carry: an identity by
+        // the lock's fit, a located passage by its classes' digits at their exact width, mounted by
+        // the native owner (`ResidentMoment::ingest`; #76).
         let codes: Vec<usize> = cells.classes_read().collect();
         let id = match moment {
             Some(id) if resident.moments.contains_key(id) => *id,
@@ -1005,29 +1056,38 @@ impl<'c> ExecutionPort for Resident<'c> {
         };
         let before = resident.current.lift().to_vec();
         let start = Instant::now();
-        if !codes.is_empty() {
-            let octets = (4 * codes.len() + 8 * (2 + field.rings().len())) as u64;
-            resident.count(|traffic| traffic.ingest += octets);
-        }
+        // The cells' 32-bit classes and the lift's and phases' words, and on the located route the
+        // located chart, one `u64` digit per ring and class (`8·rings·|A|` octets), counted once the
+        // card launched: on its checked receipt, or on a failure past its launch.
+        let octets = if codes.is_empty() {
+            0
+        } else {
+            let rings = field.rings().len();
+            let located = if cells.located().is_some() {
+                8 * rings * field.alphabet()
+            } else {
+                0
+            };
+            (4 * codes.len() + 8 * (2 + rings) + located) as u64
+        };
         let open = resident
             .moments
             .get_mut(&id)
             .expect("the moment was checked or opened");
-        // The card's ingest, resident, and the host's mirror, checked equal.
-        let carded = if codes.is_empty() {
-            Ingested {
-                cells: 0,
-                carry_out: false,
+        // The card's ingest, resident, and the host's mirror, checked equal. A failed ingest
+        // discards its open (`ResidentMoment::is_valid`): it is never read or ingested again.
+        let ingested = match ingest_open(open, &field, &mut resident.current, cells) {
+            Ok(ingested) => ingested,
+            Err(error) => {
+                let launched = !open.card.is_valid();
+                resident.moments.remove(&id);
+                if launched {
+                    resident.count(|traffic| traffic.ingest += octets);
+                }
+                return Err(error);
             }
-        } else {
-            open.card.ingest(&codes).map_err(device)?
         };
-        let ingested = open.host.ingest(&field, &mut resident.current, cells)?;
-        if carded != ingested || open.card.lift() != resident.current.lift() {
-            return Err(HnnError::Realization {
-                what: "the card's ingest against the host's moment",
-            });
-        }
+        resident.count(|traffic| traffic.ingest += octets);
         // The receiving parametron's active suffix address receives the cells the moment took,
         // and its contact letters' site kinds refresh after the ingest, as the reference's.
         for &code in &codes[..ingested.cells] {
@@ -1052,14 +1112,7 @@ impl<'c> ExecutionPort for Resident<'c> {
         resident.address.refresh(&field, &resident.constitution)?;
         // Every other open moment steps from the one lift point: its card's phases follow it.
         if ingested.cells > 0 && resident.moments.len() > 1 {
-            for (other, moment) in resident.moments.iter_mut() {
-                if *other != id {
-                    moment
-                        .card
-                        .rekey(&field, &resident.current)
-                        .map_err(device)?;
-                }
-            }
+            rekey_moments(&mut resident.moments, &field, &resident.current, Some(id))?;
         }
         let open = &resident.moments[&id];
         resident.wall.ingest += start.elapsed();
@@ -1080,13 +1133,11 @@ impl<'c> ExecutionPort for Resident<'c> {
             })
             .collect();
         let n = open.host.cells();
-        let capacity = field.capacity();
         let detail = ReceiptDetail::Ingest {
             cells: ingested.cells as u64,
             moment_bits: open.host.dense_bits(),
-            state_bits: capacity.state_bits(n),
+            capacity: SourceCapacity::of(&open.host, &field),
             source_bits: n * ceil_log2(&BigUint::from(field.alphabet())),
-            n_star: capacity.n_star(),
             carry_out: ingested.carry_out,
         };
         let mut work = ExactWork::nothing();
@@ -1131,12 +1182,7 @@ impl<'c> ExecutionPort for Resident<'c> {
         let jumps = location.rekey(&field, &mut resident.current)?;
         resident.address.synchronize(&field, &resident.current)?;
         // Re-keying moves only the lift's phase classes: every resident moment steps from them.
-        for moment in resident.moments.values_mut() {
-            moment
-                .card
-                .rekey(&field, &resident.current)
-                .map_err(device)?;
-        }
+        rekey_moments(&mut resident.moments, &field, &resident.current, None)?;
         resident.aeon.opening = resident.current.lift().to_vec();
         let published = location
             .rings

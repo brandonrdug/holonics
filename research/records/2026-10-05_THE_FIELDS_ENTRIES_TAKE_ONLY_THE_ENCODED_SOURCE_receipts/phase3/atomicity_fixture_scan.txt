@@ -1,0 +1,34 @@
+# The partial-span fixture scan (scratch test, not kept): helix (2, 3, 5), advances 5*(1 + below(5)), labels by shuffle,
+# a passage of 60 cells at every key, located to 5 classes; for a one-class seed, the chart founded on the first passage's key.
+[2, 3, 5] seed 2026100995 advances [25, 20, 5, 25, 20] ONE reached 6
+[2, 3, 5] seed 2026101004 advances [25, 10, 25, 10, 5] ONE reached 6
+[2, 3, 5] seed 2026101008 advances [20, 5, 25, 20, 5] ONE reached 6
+[2, 3, 5] seed 2026101016 advances [20, 5, 5, 25, 20] ONE reached 6
+[2, 3, 5] seed 2026101022 advances [10, 25, 15, 25, 20] ONE reached 6
+[2, 3, 5] seed 2026101033 advances [5, 15, 20, 20, 5] ONE reached 6
+[2, 3, 5] seed 2026101037 advances [10, 15, 5, 20, 5] ONE reached 6
+[2, 3, 5] seed 2026101040 advances [25, 10, 5, 5, 15] ONE reached 6
+[2, 3, 5] seed 2026101041 advances [15, 20, 5, 10, 5] ONE reached 6
+[2, 3, 5] seed 2026101061 advances [10, 5, 5, 25, 5] ONE reached 6
+[2, 3, 5] seed 2026101068 advances [10, 15, 5, 10, 25] ONE reached 6
+[2, 3, 5] seed 2026101080 advances [5, 10, 10, 10, 15] ONE reached 6
+[2, 3, 5] seed 2026101086 advances [10, 15, 25, 10, 25] ONE reached 6
+[2, 3, 5] seed 2026101087 advances [25, 5, 10, 25, 20] ONE reached 6
+[2, 3, 5] seed 2026101093 advances [25, 5, 25, 25, 20] ONE reached 6
+[2, 3, 5] seed 2026101103 advances [25, 10, 10, 25, 20] ONE reached 6
+[2, 3, 5] seed 2026101105 advances [5, 15, 25, 5, 15] ONE reached 6
+[2, 3, 5] seed 2026101106 advances [25, 5, 10, 20, 10] ONE reached 6
+[2, 3, 5] seed 2026101115 advances [20, 15, 5, 20, 5] ONE reached 6
+[2, 3, 5] seed 2026101118 advances [15, 5, 20, 5, 25] ONE reached 6
+[2, 3, 5] seed 2026101119 advances [20, 5, 5, 15, 10] ONE reached 6
+[2, 3, 5] seed 2026101122 advances [25, 10, 25, 20, 10] ONE reached 6
+[2, 3, 5] seed 2026101124 advances [25, 25, 25, 10, 20] ONE reached 6
+[2, 3, 5] seed 2026101139 advances [15, 20, 5, 5, 15] ONE reached 6
+[2, 3, 5] seed 2026101141 advances [20, 25, 25, 15, 25] ONE reached 6
+[2, 3, 5] seed 2026101142 advances [5, 5, 15, 20, 15] ONE reached 6
+[2, 3, 5] seed 2026101149 advances [25, 10, 5, 10, 10] ONE reached 6
+[2, 3, 5] seed 2026101150 advances [20, 20, 15, 15, 20] ONE reached 6
+[2, 3, 5] seed 2026101173 advances [20, 20, 5, 10, 25] ONE reached 6
+[2, 3, 5] seed 2026101174 advances [10, 15, 5, 5, 20] ONE reached 6
+[2, 3, 5] seed 2026101187 advances [15, 20, 20, 5, 10] ONE reached 6
+[2, 3, 5] ones 31 least plural 2

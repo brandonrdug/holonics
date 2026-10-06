@@ -1500,7 +1500,7 @@ fn cold_restore_refuses_a_checksummed_cursor_at_nonempty_window_end() {
         .find(|line| line.starts_with("moment "))
         .unwrap();
     let mut words: Vec<String> = head.split_whitespace().map(str::to_string).collect();
-    assert_eq!(words.len(), 4);
+    assert_eq!(words.len(), 5);
     words[2] = reach.to_string();
     let invalid = cold_v3_changed_line(&state, "moment ", &words.join(" "));
     assert!(matches!(
