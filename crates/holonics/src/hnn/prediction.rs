@@ -1982,6 +1982,19 @@ fn physical_domain_forward(
     Ok((anchors, domains))
 }
 
+/// The executed operand law has no approximate inverse, transient split or loaded chart residual.
+/// Shared by the coupled-domain bound and the affine source-port comparison certificate.
+fn physical_word_is_exact(operands: &crate::hnn::propagation::Operands) -> bool {
+    operands.lattice().is_none()
+        && operands.rings().iter().all(|ring| ring.chart().is_none())
+        && operands.contacts().iter().all(|contact| contact.chart().is_none())
+        && operands.resonators().iter().flatten().all(|ring| {
+            (0..ring.phases()).all(|phase| {
+                ring.chart_words(phase).is_none() && ring.certificate(phase).is_zero()
+            })
+        })
+}
+
 /// The box is derived, never chosen: complete every missing station with any admitted class,
 /// at the same source clock and population chart; unite that image with the actual sparse open.
 /// Unit transport is the supported normalization law. A leaky source keeps its typed refusal.
@@ -1993,21 +2006,11 @@ fn physical_opening_radius(
     word: &Word<'_>,
 ) -> Result<Option<crate::hnn::word::EndChange>, HnnError> {
     let operands = word.operands();
-    if operands.lattice().is_some()
+    if !physical_word_is_exact(operands)
         || field
             .sources()
             .iter()
             .any(|&ring| !material.transport(ring).is_one())
-        || operands.rings().iter().any(|ring| ring.chart().is_some())
-        || operands
-            .contacts()
-            .iter()
-            .any(|contact| contact.chart().is_some())
-        || operands.resonators().iter().flatten().any(|ring| {
-            (0..ring.phases()).any(|phase| {
-                ring.chart_words(phase).is_some() || !ring.certificate(phase).is_zero()
-            })
-        })
     {
         return Ok(None);
     }
@@ -2393,6 +2396,13 @@ pub struct PhysicalTeachingRefusal {
     pub error: HnnError,
 }
 
+/// One affine relation per observed comparison. The coupled R/E ray is not certified.
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum PhysicalLearning {
+    Receiving,
+    SourcePorts,
+}
+
 impl PhysicalPrediction<'_, '_> {
     /// Read the whole blind output before any teaching observation is admitted.
     pub fn prediction(&self) -> &PhysicalRepair {
@@ -2420,6 +2430,34 @@ impl PhysicalPrediction<'_, '_> {
         contemporary: &crate::hnn::constitution::Constitution,
         observed: &Encoded,
         compared: &[bool],
+    ) -> Result<PhysicalTeaching, PhysicalTeachingRefusal> {
+        self.observe_at(contemporary, observed, compared, PhysicalLearning::Receiving)
+    }
+
+    /// An observed source-port comparison through the same blind Word, with R and every internal
+    /// propagation relation fixed. E enters only at the next contemporary source opening. The
+    /// existing source moment supplies its actual phase/population and, at leaky transport, its
+    /// carried age weights; neither stations nor target values are installed as learned features.
+    ///
+    /// The supported ray is an exact linear Word. A reached quartic needs its Word-Hessian term
+    /// before E can be stepped. Only nonzero reached source samples enter their existing normal
+    /// laws. Their certificate reads the whole executed source-to-comparison diamond, including
+    /// its element/contact growth, rather than just the stepped source locus.
+    pub fn observe_source_ports(
+        self,
+        contemporary: &crate::hnn::constitution::Constitution,
+        observed: &Encoded,
+        compared: &[bool],
+    ) -> Result<PhysicalTeaching, PhysicalTeachingRefusal> {
+        self.observe_at(contemporary, observed, compared, PhysicalLearning::SourcePorts)
+    }
+
+    fn observe_at(
+        self,
+        contemporary: &crate::hnn::constitution::Constitution,
+        observed: &Encoded,
+        compared: &[bool],
+        learning: PhysicalLearning,
     ) -> Result<PhysicalTeaching, PhysicalTeachingRefusal> {
         use crate::hnn::constitution::{LinearLocus, Locus, Reach};
         use crate::hnn::port::Deposit;
@@ -2471,6 +2509,24 @@ impl PhysicalPrediction<'_, '_> {
                     reason: "no observation crosses the declared comparison partition",
                 });
             }
+            let diamond = Diamond::opened(field, &phases, &opening_support);
+            let full_reach = diamond.retained(field);
+            if learning == PhysicalLearning::SourcePorts {
+                if !physical_word_is_exact(word.operands()) {
+                    return Err(HnnError::Unadmitted {
+                        reason: "source-port learning has no certificate through a rounded Word",
+                    });
+                }
+                if field.rings().iter().enumerate().any(|(ring, _)| {
+                    full_reach.contains(&Locus::Element(ring))
+                        && material.ring_resonator(ring)
+                            .is_some_and(|law| law.saturation().is_some())
+                }) {
+                    return Err(HnnError::Unadmitted {
+                        reason: "source-port learning through a reached quartic needs the Word-Hessian certificate",
+                    });
+                }
+            }
             let reads: Vec<_> = prediction
                 .reads
                 .iter()
@@ -2495,7 +2551,6 @@ impl PhysicalPrediction<'_, '_> {
                 &current.lift()[phases.ring()],
                 &phases,
             )?;
-            let diamond = Diamond::opened(field, &phases, &opening_support);
             let composed = crate::hnn::reference::compose_return(
                 field,
                 material,
@@ -2505,32 +2560,57 @@ impl PhysicalPrediction<'_, '_> {
                 &source,
                 &back,
             )?;
-            let receiving = Locus::ReceivingMap(phases.ring());
-            if !composed.reached.contains(&receiving) {
-                return Err(HnnError::Unadmitted {
-                    reason: "the physical observation reaches no retained receiving relation",
-                });
-            }
-            // Unobserved phases have zero pullback; they must also leave no comparison statistic
-            // in R's normal law. Its samples are the existing compose consumer's actual anchors.
             let mut linear: Vec<_> = composed
                 .linear
                 .into_iter()
-                .filter(|step| step.locus == LinearLocus::Receiving(phases.ring()))
+                .filter(|step| match learning {
+                    PhysicalLearning::Receiving => {
+                        step.locus == LinearLocus::Receiving(phases.ring())
+                    }
+                    PhysicalLearning::SourcePorts => {
+                        matches!(step.locus, LinearLocus::SourcePort(_))
+                    }
+                })
                 .collect();
-            for step in &mut linear {
-                if step.samples.len() != compared.len() {
-                    return Err(HnnError::Shape {
-                        what: "the reached receiving samples against the observation partition",
-                        expected: compared.len(),
-                        found: step.samples.len(),
-                    });
+            match learning {
+                PhysicalLearning::Receiving => {
+                    // R's samples are one per station. An unobserved station leaves no normal
+                    // statistic; the feature is its existing rotated receiving anchor.
+                    for step in &mut linear {
+                        if step.samples.len() != compared.len() {
+                            return Err(HnnError::Shape {
+                                what: "the reached receiving samples against the observation partition",
+                                expected: compared.len(),
+                                found: step.samples.len(),
+                            });
+                        }
+                        step.samples = std::mem::take(&mut step.samples)
+                            .into_iter()
+                            .zip(compared)
+                            .filter_map(|(sample, &crossed)| crossed.then_some(sample))
+                            .collect();
+                    }
                 }
-                step.samples = std::mem::take(&mut step.samples)
-                    .into_iter()
-                    .zip(compared)
-                    .filter_map(|(sample, &crossed)| crossed.then_some(sample))
-                    .collect();
+                PhysicalLearning::SourcePorts => {
+                    // E's samples are occupied source phases, already pulled back from the
+                    // masked comparison. Input alone must not retain a Gram/chart statistic.
+                    for step in &mut linear {
+                        step.samples.retain(|sample| {
+                            !sample.weight.is_zero()
+                                && sample.feature.iter().any(|value| !value.is_zero())
+                                && sample.covector.iter().any(|value| !value.is_zero())
+                        });
+                    }
+                    linear.retain(|step| !step.samples.is_empty());
+                }
+            }
+            let reached: Vec<_> = linear.iter().map(|step| step.locus.locus()).collect();
+            if reached.is_empty()
+                || reached.iter().any(|locus| !composed.reached.contains(locus))
+            {
+                return Err(HnnError::Unadmitted {
+                    reason: "the physical comparison reaches no nonzero sample at the selected relation",
+                });
             }
             let reach = Reach {
                 receiver: phases.ring(),
@@ -2541,9 +2621,12 @@ impl PhysicalPrediction<'_, '_> {
                     .collect(),
                 entries: vec![0],
                 phases: composed.phases,
-                loci: std::collections::BTreeSet::from([receiving]),
+                loci: match learning {
+                    PhysicalLearning::Receiving => reached.iter().copied().collect(),
+                    PhysicalLearning::SourcePorts => full_reach,
+                },
             };
-            let deposit = Deposit::new(material.commit(), linear, Vec::new(), vec![receiving])
+            let deposit = Deposit::new(material.commit(), linear, Vec::new(), reached)
                 .with_reach(reach);
             let (constitution, publication) = contemporary.deposited(&deposit)?;
             Ok((ratio, composed.pullback, constitution, publication))

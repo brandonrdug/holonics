@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "grade": "static source review; native and type acceptance pending",
+  "base_commit": "d00a6bcac79270759908ec730458fe33e7bdeaf9",
+  "rustfmt_edition": 2024,
+  "parse_only_no_full_file_format_applied": true,
+  "parser_exit_codes": [
+    0,
+    0
+  ],
+  "diff_check_exit": 0,
+  "implementation_sources": {
+    "crates/holonics/src/hnn/prediction.rs": {
+      "bytes": 130805,
+      "sha256": "fb313733ef79a63976de939b11f849d4bd11928549c523f405a5bad0a4765014"
+    },
+    "crates/holonics/src/hnn/tests/prediction.rs": {
+      "bytes": 114442,
+      "sha256": "204bfcff4253bcf9c803c0724d71d6468e6fbea77724ec838615cbf55c7f6eb4"
+    }
+  },
+  "preserved_inputs": [
+    {
+      "path": "crates/holonics/src/hnn/receiving.rs",
+      "unchanged_since_d00": true,
+      "sha256": "10cea7efc861f33530ec65bf3a901726850ae2677dfc2d622e494de9359abac4"
+    },
+    {
+      "path": "crates/holonics/tests/source_entrance.rs",
+      "unchanged_since_d00": true,
+      "sha256": "5308ebf2d6cba10019952e1e9023d3b085349d12b3c6df61833cba8b863d9baf"
+    },
+    {
+      "path": "lean/Holonics/HNN/ReframedMoment.lean",
+      "unchanged_since_d00": true,
+      "sha256": "4ffc65a60f4e72c8bc63c637d7e6480ada2e8721a002e53c487635e64cd93f2e"
+    },
+    {
+      "path": "accelerators/cuda-smoke/mount_smoke_kernel.ptx",
+      "unchanged_since_d00": true,
+      "sha256": "0310be86a54b08c4234f6a39b69805b72d8610bb55cee5aef7caf387a0c8a2cd"
+    }
+  ],
+  "atlas_eight_field_checks": [
+    "hnn.physical-repair",
+    "hnn.physical-source-deposition"
+  ],
+  "record_relative_links_exist": true,
+  "compiler_runs": 0,
+  "native_runs": 0,
+  "training_runs": 0,
+  "claimed_runtime_outputs": [],
+  "native_acceptance_pending": [
+    "the_actual_leaky_source_return_changes_e_before_the_next_target_free_carried_word",
+    "source_teaching_refuses_a_zero_return_and_a_reached_uncertified_quartic"
+  ],
+  "claim_limit": "fixed native fixture and matched observed comparison; no strict quantized score descent, erasure fidelity, general source injectivity or scientific replication"
+}

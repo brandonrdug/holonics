@@ -1849,6 +1849,283 @@ mod physical_repair {
         );
     }
 
+    #[test]
+    fn the_actual_leaky_source_return_changes_e_before_the_next_target_free_carried_word() {
+        use crate::hnn::constitution::Locus;
+        use crate::hnn::moment::SourceMoment;
+        use crate::hnn::prediction::predict_by_field;
+        let field = field();
+        let current = Current::at_rest(&field);
+        // The existing constitutive law chooses rho from the source period and declared grains.
+        // It is not selected from a teacher, task score or the later source.
+        let initial = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET)
+            .unwrap()
+            .founded_transport(&field, 0)
+            .unwrap();
+        let modulus = initial.transport(0);
+        assert!(modulus > Rat::zero() && modulus < integer(1));
+        let period = usize::try_from(field.ring(0).period()).unwrap();
+        let length = period + 1;
+        let mut truth = vec![0; length];
+        truth[1] = 2;
+        truth[period] = 1;
+        let observed = crate::hnn::tests::support::encoded(&field, &truth);
+        let erased: Vec<_> = (1..period).collect();
+        let damaged = DamagedSection::damage(&observed, &erased).unwrap();
+        let mut swapped_truth = truth.clone();
+        swapped_truth.swap(0, period);
+        let swapped = crate::hnn::tests::support::encoded(&field, &swapped_truth);
+        let swapped = DamagedSection::damage(&swapped, &erased).unwrap();
+        // Preserve the original counterexample: the unit clock/transport loses this placement.
+        let unit = SourceMoment::open(&field, &current);
+        assert_eq!(
+            unit.continued(&field, &current, 0, &damaged.placed())
+                .unwrap(),
+            unit.continued(&field, &current, 0, &swapped.placed())
+                .unwrap()
+        );
+        // The existing Leaky owner carries their different ages, at its actual rounded grain.
+        let leaky = SourceMoment::open_with(&field, &current, &initial).unwrap();
+        let source = leaky
+            .continued(&field, &current, 0, &damaged.placed())
+            .unwrap();
+        let other_source = leaky
+            .continued(&field, &current, 0, &swapped.placed())
+            .unwrap();
+        assert_ne!(source, other_source);
+        assert_ne!(
+            source.open_storage(&field, &initial, &current).unwrap(),
+            other_source
+                .open_storage(&field, &initial, &current)
+                .unwrap()
+        );
+        let phases =
+            ReceivingPhases::declare(&field, &initial, &current, &section(length)).unwrap();
+        let mut compared = vec![false; length];
+        compared[1] = true;
+        // R is learned by the existing post-blind observed comparison, never authored.
+        let receiving = predict_by_field(
+            &field,
+            &initial,
+            &current,
+            &damaged,
+            &WordOpening::Rest,
+            &phases,
+        )
+        .unwrap()
+        .observe(&initial, &observed, &compared)
+        .unwrap();
+        assert_eq!(receiving.constitution.source_law(0), initial.source_law(0));
+        let producing = &receiving.constitution;
+        let opening = WordOpening::Received {
+            carry: receiving.prediction.carry.clone(),
+            absorption: Absorption::Nothing,
+        };
+        let pending =
+            predict_by_field(&field, producing, &current, &damaged, &opening, &phases).unwrap();
+        let blind = pending.prediction().clone();
+        let taught = pending
+            .observe_source_ports(producing, &observed, &compared)
+            .unwrap();
+        assert_eq!(taught.prediction, blind);
+        assert_eq!(taught.constitution.commit(), producing.commit() + 1);
+        assert_ne!(taught.constitution.source_port(0), producing.source_port(0));
+        assert_eq!(
+            taught.constitution.receiving_law(0),
+            producing.receiving_law(0)
+        );
+        assert_eq!(taught.constitution.transport(0), modulus);
+        assert_eq!(
+            taught.constitution.clock(Locus::SourcePort(0)),
+            producing.clock(Locus::SourcePort(0)) + 1
+        );
+        for ring in 0..field.rings().len() {
+            assert_eq!(
+                taught.constitution.contrast_law(ring),
+                producing.contrast_law(ring)
+            );
+            assert_eq!(
+                taught.constitution.passive_factor(ring),
+                producing.passive_factor(ring)
+            );
+            assert_eq!(
+                taught.constitution.clock(Locus::Element(ring)),
+                producing.clock(Locus::Element(ring))
+            );
+        }
+        for contact in 0..field.contacts().len() {
+            assert_eq!(
+                taught.constitution.contact_storage(contact),
+                producing.contact_storage(contact)
+            );
+            assert_eq!(
+                taught.constitution.contact_stiffness(contact),
+                producing.contact_stiffness(contact)
+            );
+            assert_eq!(
+                taught.constitution.contact_dissipation(contact),
+                producing.contact_dissipation(contact)
+            );
+            assert_eq!(
+                taught.constitution.clock(Locus::Channel(contact)),
+                producing.clock(Locus::Channel(contact))
+            );
+        }
+        // An ignored teacher label changes neither the clock nor the actual E normal statistic.
+        let mut ignored = truth.clone();
+        ignored[0] = 3;
+        let ignored = crate::hnn::tests::support::encoded(&field, &ignored);
+        let equivalent = predict_by_field(&field, producing, &current, &damaged, &opening, &phases)
+            .unwrap()
+            .observe_source_ports(producing, &ignored, &compared)
+            .unwrap();
+        assert_eq!(equivalent.constitution, taught.constitution);
+        // Re-read the declared comparison on a new contemporary Word with the same source,
+        // clock and original opening. This is a training-side measurement, not an untouched test.
+        let matched = repair_by_field(
+            &field,
+            &taught.constitution,
+            &current,
+            &damaged,
+            &opening,
+            &phases,
+        )
+        .unwrap();
+        let matched_reads: Vec<_> = matched
+            .reads
+            .iter()
+            .map(|station| station.read.clone())
+            .collect();
+        let matched_ratio = crate::hnn::ratio::HolonRatio::compare_partition(
+            crate::hnn::ratio::Faces::of_reads(&matched_reads, phases.grain()).unwrap(),
+            &observed.classes_read().collect::<Vec<_>>(),
+            &crate::hnn::ratio::target_phases(&field, current.lift(), phases.ring(), &observed)
+                .unwrap(),
+            &compared,
+        )
+        .unwrap();
+        assert_eq!(taught.ratio.stations(), matched_ratio.stations());
+        assert!(matched.opening.closes() && matched.word.closes());
+        assert!(matched.balances.iter().all(|balance| balance.closes()));
+        println!(
+            "matched observed station comparison: before {:?}; after {:?}; imposed source work {} -> {}; quantized strict descent is not asserted",
+            taught.ratio.phases(),
+            matched_ratio.phases(),
+            taught.prediction.opening.imposed,
+            matched.opening.imposed,
+        );
+        // No observation enters any of these later forwards. E changes actual motion at the next
+        // imposition under the returned carry, while the fixed R reads the changed native signal.
+        let later_opening = WordOpening::Received {
+            carry: taught.prediction.carry.clone(),
+            absorption: Absorption::Nothing,
+        };
+        let before = repair_by_field(
+            &field,
+            producing,
+            &current,
+            &damaged,
+            &later_opening,
+            &phases,
+        )
+        .unwrap();
+        let after = repair_by_field(
+            &field,
+            &taught.constitution,
+            &current,
+            &damaged,
+            &later_opening,
+            &phases,
+        )
+        .unwrap();
+        let other = repair_by_field(
+            &field,
+            &taught.constitution,
+            &current,
+            &swapped,
+            &later_opening,
+            &phases,
+        )
+        .unwrap();
+        assert_ne!(before.carry.change, after.carry.change);
+        assert_ne!(before.reads, after.reads);
+        assert_ne!(after.carry.change, other.carry.change);
+        assert_ne!(after.reads, other.reads);
+        for reading in [&before, &after, &other] {
+            assert!(reading.opening.closes() && reading.word.closes());
+            assert!(reading.balances.iter().all(|balance| balance.closes()));
+            assert!(erased.iter().all(|&station| matches!(
+                reading.cells[station],
+                RepairedCell::Held {
+                    unresolved: Unresolved::UncertifiedDomain,
+                    ..
+                }
+            )));
+        }
+        println!(
+            "actual source teaching: rho {}; source clock {} -> {}; R unchanged; blind output {:?}; later target-free output {:?}; source-swap logits {:?} / {:?}",
+            modulus,
+            producing.clock(Locus::SourcePort(0)),
+            taught.constitution.clock(Locus::SourcePort(0)),
+            taught.prediction.cells,
+            after.cells,
+            after.reads[1].read.logits,
+            other.reads[1].read.logits,
+        );
+    }
+
+    #[test]
+    fn source_teaching_refuses_a_zero_return_and_a_reached_uncertified_quartic() {
+        use crate::hnn::prediction::predict_by_field;
+        let field = field();
+        let current = Current::at_rest(&field);
+        let observed = crate::hnn::tests::support::encoded(&field, &[0, 2]);
+        let damaged = DamagedSection::damage(&observed, &[1]).unwrap();
+        let initial = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap();
+        let phases = ReceivingPhases::declare(&field, &initial, &current, &section(2)).unwrap();
+        let pending = predict_by_field(
+            &field,
+            &initial,
+            &current,
+            &damaged,
+            &WordOpening::Rest,
+            &phases,
+        )
+        .unwrap();
+        let blind = pending.prediction().clone();
+        let refusal = pending
+            .observe_source_ports(&initial, &observed, &[false, true])
+            .unwrap_err();
+        assert_eq!(refusal.prediction, blind);
+        assert!(matches!(
+            refusal.error,
+            crate::hnn::HnnError::Unadmitted {
+                reason: "the physical comparison reaches no nonzero sample at the selected relation",
+            }
+        ));
+        let nonlinear = quartic_material(&field);
+        let phases = ReceivingPhases::declare(&field, &nonlinear, &current, &section(2)).unwrap();
+        let pending = predict_by_field(
+            &field,
+            &nonlinear,
+            &current,
+            &damaged,
+            &WordOpening::Rest,
+            &phases,
+        )
+        .unwrap();
+        let blind = pending.prediction().clone();
+        let refusal = pending
+            .observe_source_ports(&nonlinear, &observed, &[false, true])
+            .unwrap_err();
+        assert_eq!(refusal.prediction, blind);
+        assert!(matches!(
+            refusal.error,
+            crate::hnn::HnnError::Unadmitted {
+                reason: "source-port learning through a reached quartic needs the Word-Hessian certificate",
+            }
+        ));
+    }
     fn quartic_material(field: &Field) -> Constitution {
         use crate::hnn::ring::{PumpDeclaration, PumpStep, ResonatorMaterial};
         use crate::holon::parametron::Carrier;
