@@ -1,0 +1,62 @@
+1285 | impl ReceivingPhases {
+1588 |     pub(crate) fn with_rank(self, rank: usize) -> Self {
+
+    Finished `release` profile [optimized] target(s) in 14.03s
+     Running tests/zz_probe_physical_repair.rs (target/release/deps/zz_probe_physical_repair-1db307eec27d1fb8)
+
+running 1 test
+open 764 ms; receipt before 0 after 6083952736125/8796093022208 absorbed 0 imposed 6083952736125/8796093022208
+tick 0: 2 ms, peak bits 50, balance closes true
+tick 1: 5 ms, peak bits 446, balance closes true
+tick 2: 23 ms, peak bits 853, balance closes true
+tick 3: 44 ms, peak bits 1268, balance closes true
+tick 4: 64 ms, peak bits 1673, balance closes true
+tick 5: 84 ms, peak bits 2099, balance closes true
+tick 6: 106 ms, peak bits 2501, balance closes true
+tick 7: 131 ms, peak bits 2917, balance closes true
+tick 8: 152 ms, peak bits 3330, balance closes true
+tick 9: 179 ms, peak bits 3750, balance closes true
+tick 10: 201 ms, peak bits 4157, balance closes true
+tick 11: 225 ms, peak bits 4571, balance closes true
+tick 12: 252 ms, peak bits 4982, balance closes true
+tick 13: 283 ms, peak bits 5401, balance closes true
+tick 14: 309 ms, peak bits 5802, balance closes true
+tick 15: 340 ms, peak bits 6219, balance closes true
+tick 16: 371 ms, peak bits 6632, balance closes true
+tick 17: 405 ms, peak bits 7053, balance closes true
+tick 18: 440 ms, peak bits 7462, balance closes true
+tick 19: 476 ms, peak bits 7875, balance closes true
+tick 20: 510 ms, peak bits 8283, balance closes true
+tick 21: 550 ms, peak bits 8707, balance closes true
+tick 22: 588 ms, peak bits 9109, balance closes true
+tick 23: 625 ms, peak bits 9526, balance closes true
+tick 24: 674 ms, peak bits 9936, balance closes true
+tick 25: 704 ms, peak bits 10358, balance closes true
+tick 26: 746 ms, peak bits 10765, balance closes true
+tick 27: 787 ms, peak bits 11180, balance closes true
+tick 28: 844 ms, peak bits 11590, balance closes true
+tick 29: 877 ms, peak bits 12010, balance closes true
+tick 30: 924 ms, peak bits 12406, balance closes true
+tick 31: 977 ms, peak bits 12826, balance closes true
+tick 32: 1028 ms, peak bits 13238, balance closes true
+tick 33: 1071 ms, peak bits 13662, balance closes true
+tick 34: 1122 ms, peak bits 14070, balance closes true
+tick 35: 1196 ms, peak bits 14485, balance closes true
+tick 36: 1260 ms, peak bits 14890, balance closes true
+tick 37: 1292 ms, peak bits 15315, balance closes true
+tick 38: 1338 ms, peak bits 15718, balance closes true
+tick 39: 1395 ms, peak bits 16136, balance closes true
+tick 40: 1459 ms, peak bits 16546, balance closes true
+tick 41: 1519 ms, peak bits 16968, balance closes true
+tick 42: 1590 ms, peak bits 17374, balance closes true
+tick 43: 1652 ms, peak bits 17790, balance closes true
+tick 44: 1729 ms, peak bits 18199, balance closes true
+tick 45: 1774 ms, peak bits 18620, balance closes true
+tick 46: 1853 ms, peak bits 19020, balance closes true
+tick 47: 1919 ms, peak bits 19438, balance closes true
+phases aperture 4: Ok(120) in 5904 ms
+test probe ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 42.94s
+
+exit 0

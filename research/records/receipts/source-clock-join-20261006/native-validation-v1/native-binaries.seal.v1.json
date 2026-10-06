@@ -1,0 +1,41 @@
+{
+  "accepted_build": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-host-cuda-link-20261006-v5.acceptance.json",
+  "matching_release": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-host-cuda-link-20261006-v5.release.json",
+  "binaries": {
+    "holonics": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/capacity/target/debug/deps/holonics-70b68d2f7e1f6408",
+      "sha256": "06d6d5ae3ceb53078eb54b5ab4c245aee19137b60d72d47dfcf9771533db3aa3",
+      "bytes": 63546480
+    },
+    "ranged_capacity": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/capacity/target/debug/deps/ranged_capacity-bd29e6ac6f6167da",
+      "sha256": "d173a8f570118c1e5a68e9859480cefe4a6069b038c03eda6bfb98c3d41a6ef2",
+      "bytes": 23177848
+    },
+    "source_entrance": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/capacity/target/debug/deps/source_entrance-3dfaf698dddeb1a6",
+      "sha256": "f5a483772718566e28e25945bb95c0308f454f5692762d9936a025505575f89f",
+      "bytes": 21022424
+    },
+    "resident_cold_restore": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/capacity/target/debug/deps/resident_cold_restore-d85475b8f5abeb14",
+      "sha256": "385d6fe09f9618aab0443baf17646d635c8653a3b027dbdc050a3c30f478133e",
+      "bytes": 28410784
+    },
+    "mount-smoke": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/capacity/target/debug/mount-smoke",
+      "sha256": "5c19bb910fa5f91994ccb2d100858bd0af4596cd4ed02462e65722ddcb9f3f5d",
+      "bytes": 10042504
+    },
+    "located_ingest": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/capacity/target/debug/deps/located_ingest-2b2d6cef9fd78c5f",
+      "sha256": "21f40afb42a87a8bab46ff9b19a951316ac8516de8d6a73962e6e49a66c52d2a",
+      "bytes": 15984328
+    },
+    "holonics_cuda": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/capacity/target/debug/deps/holonics_cuda-3a3d38defac6a12c",
+      "sha256": "108923440dd2148229be48a27389ec697eb6353853199d58d5487824cddf43a9",
+      "bytes": 41176880
+    }
+  }
+}

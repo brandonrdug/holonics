@@ -1,0 +1,92 @@
+{
+  "policy": {
+    "development_read": true,
+    "existing_fixed_bounded_development_wall_ns": 16000000000,
+    "projection_qualification": "new host-clock/CUDA parity partitions unmeasured; bounded existing development allocation, not a scientific or whole-library projection; failure/overrun remains incomplete with no cap raise",
+    "thread_budget": 1,
+    "aggregate_CPU_limit_us": 17000000,
+    "group_bytes": 4294967296,
+    "GPU_lock": "/home/b/Workspaces/holonics/.local/gpu.lock",
+    "serial_reason": "common lease and single resident card are mutable shared resources"
+  },
+  "stages": [
+    [
+      "ranged-capacity",
+      "ranged_capacity",
+      [],
+      false
+    ],
+    [
+      "source-entrance",
+      "source_entrance",
+      [],
+      false
+    ],
+    [
+      "cold-restore",
+      "resident_cold_restore",
+      [],
+      false
+    ],
+    [
+      "cuda-capacity-refusal",
+      "holonics_cuda",
+      [
+        "hnn::port_tests::a_located_capacity_refusal_leaves_both_ports_unchanged",
+        "--exact",
+        "--ignored"
+      ],
+      true
+    ],
+    [
+      "cuda-sibling-clock",
+      "holonics_cuda",
+      [
+        "hnn::port_tests::sibling_moments_keep_their_counts_and_capacity_on_the_shared_clock",
+        "--exact",
+        "--ignored"
+      ],
+      true
+    ],
+    [
+      "cuda-key-relocation",
+      "holonics_cuda",
+      [
+        "hnn::port_tests::key_relocation_keeps_the_open_capacity_readable",
+        "--exact",
+        "--ignored"
+      ],
+      true
+    ],
+    [
+      "cuda-failed-ingest",
+      "holonics_cuda",
+      [
+        "hnn::port_tests::a_failed_ingest_leaves_no_further_reads",
+        "--exact",
+        "--ignored"
+      ],
+      true
+    ],
+    [
+      "cuda-host-moment",
+      "holonics_cuda",
+      [
+        "hnn::tests::moment_ingest_matches_the_host_moment",
+        "--exact",
+        "--ignored"
+      ],
+      true
+    ],
+    [
+      "cuda-located-ingest",
+      "located_ingest",
+      [
+        "located_ingest_keeps_the_actual_phase_winding_and_offset_counts_across_tiles",
+        "--exact",
+        "--ignored"
+      ],
+      true
+    ]
+  ]
+}

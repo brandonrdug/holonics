@@ -1,0 +1,19 @@
+   Compiling holonics v0.1.0 (/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics)
+warning: method `with_rank` is never used
+    --> crates/holonics/src/hnn/receiving.rs:1590:19
+     |
+1287 | impl ReceivingPhases {
+     | -------------------- method in this implementation
+...
+1590 |     pub(crate) fn with_rank(self, rank: usize) -> Self {
+     |                   ^^^^^^^^^
+     |
+     = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+rustc-LLVM ERROR: out of memory
+Allocation failed
+warning: `holonics` (lib test) generated 1 warning
+error: could not compile `holonics` (lib test); 1 warning emitted
+
+Caused by:
+  process didn't exit successfully: `rustc --crate-name holonics --edition=2024 crates/holonics/src/lib.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --emit=dep-info,link -C embed-bitcode=no -C debuginfo=2 --test --check-cfg 'cfg(docsrs,test)' --check-cfg 'cfg(feature, values())' -C metadata=437db91bd8863782 -C extra-filename=-4ca36bb3d7db439e --out-dir /home/b/Workspaces/holonics/.local/wt/repair-field/target/debug/deps -C incremental=/home/b/Workspaces/holonics/.local/wt/repair-field/target/debug/incremental -L dependency=/home/b/Workspaces/holonics/.local/wt/repair-field/target/debug/deps --extern num_bigint=/home/b/Workspaces/holonics/.local/wt/repair-field/target/debug/deps/libnum_bigint-623b2a2ece9f0903.rlib --extern num_rational=/home/b/Workspaces/holonics/.local/wt/repair-field/target/debug/deps/libnum_rational-161e9b6af3b7caad.rlib --extern num_traits=/home/b/Workspaces/holonics/.local/wt/repair-field/target/debug/deps/libnum_traits-1af290354603b57b.rlib --extern rayon=/home/b/Workspaces/holonics/.local/wt/repair-field/target/debug/deps/librayon-1dba5f3412560c1c.rlib --extern thiserror=/home/b/Workspaces/holonics/.local/wt/repair-field/target/debug/deps/libthiserror-f2ffdb0e1d99793f.rlib` (signal: 6, SIGABRT: process abort signal)

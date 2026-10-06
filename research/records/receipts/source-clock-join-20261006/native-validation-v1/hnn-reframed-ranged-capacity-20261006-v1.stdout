@@ -1,0 +1,17 @@
+
+running 12 tests
+test a_capacity_read_checks_its_actual_producing_partition_including_hidden_rings ... ok
+test a_clock_synchronization_refuses_an_unaccounted_winding_without_changing_the_source ... ok
+test a_continued_station_carrier_is_never_given_the_ingest_box ... ok
+test a_located_passage_below_its_crossover_is_refused_before_the_resident_moves ... ok
+test a_sibling_source_advances_only_the_shared_clock_count_and_continues_after_restore ... ok
+test malformed_capacity_declarations_and_lifts_are_typed_refusals ... ok
+test rekey_keeps_the_source_age_and_receipt_bound_counts_its_independent_endpoint ... ok
+test sibling_ring_ticks_age_leaky_first_and_offset_coordinates_before_the_next_owning_append ... ok
+test the_complete_leaky_read_counts_the_retained_coordinates_and_keeps_the_histogram_crossover_separate ... ok
+test the_consuming_capacity_keeps_winding_prefix_and_offset_invariants_across_charts ... ok
+test the_lift_factor_widens_before_the_word_sized_rate_and_count_are_multiplied ... ok
+test the_located_bound_has_its_own_exact_crossover_and_identity_is_unchanged ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.49s
+

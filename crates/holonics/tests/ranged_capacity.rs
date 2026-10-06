@@ -237,6 +237,152 @@ fn the_complete_leaky_read_counts_the_retained_coordinates_and_keeps_the_histogr
 }
 
 #[test]
+fn rekey_keeps_the_source_age_and_receipt_bound_counts_its_independent_endpoint() {
+    use holonics::hnn::Constitution;
+    let field = field();
+    let mut current = Current::at_rest(&field);
+    let material = Constitution::initial(&field, 1 << 33)
+        .unwrap()
+        .with_transport(2, rat(1, 2))
+        .unwrap();
+    let mut moment = SourceMoment::open_with(&field, &current, &material).unwrap();
+    let encoded = Encoded::identity(&KnownTruth::uniform(5, 21, 1, 2).unwrap(), &field)
+        .unwrap().remove(0);
+    let at = encoded.classes_read().position(|code| code != 0).unwrap();
+    moment.ingest(&field, &mut current, &encoded.part(at..at + 1).unwrap()).unwrap();
+    let source = moment.encode(&field, &material, 2).unwrap();
+    let mut before = String::new();
+    moment.write(&mut before);
+    current.rekey(&field, 2, 4).unwrap();
+    assert!(SourceCapacity::checked_of(&moment, &field, &current).is_err());
+    moment.synchronize_clock(&field, &current, 0, &[0; 3]).unwrap();
+    // Rekey is zero time: no source injection, own tick, bin or Leaky coordinate moves.
+    assert_eq!(moment.encode(&field, &material, 2).unwrap(), source);
+    let mut after = String::new();
+    moment.write(&mut after);
+    let source_rows = |text: &str| text.lines()
+        .filter(|line| line.starts_with("counts ") || line.starts_with("first ")
+            || line.starts_with("offset ") || line.starts_with("map "))
+        .map(str::to_owned).collect::<Vec<_>>();
+    assert_eq!(source_rows(&before), source_rows(&after));
+    assert!(after.contains("source-clock 1 reframed\n"));
+    assert!(matches!(SourceCapacity::checked_of(&moment, &field, &current).unwrap(),
+        SourceCapacity::Reframed { clock: CapacityClock::Identity, clock_cells: 1, .. }));
+    let mut rows = after.lines();
+    let head = rows.next().unwrap();
+    let restored = SourceMoment::read(&field, head, &mut |what| rows.next()
+        .ok_or(HnnError::ContinuingState { what })).unwrap();
+    assert_eq!(restored, moment);
+    assert_eq!(restored.capacity(&field, &current).unwrap(), moment.capacity(&field, &current).unwrap());
+}
+
+#[test]
+fn a_sibling_source_advances_only_the_shared_clock_count_and_continues_after_restore() {
+    let field = field();
+    let mut current = Current::at_rest(&field);
+    let encoded = Encoded::identity(&KnownTruth::uniform(5, 39, 1, 128).unwrap(), &field)
+        .unwrap().remove(0);
+    let at = encoded.classes_read().position(|code| code == 0).unwrap();
+    let encoded = encoded.part(0..at + 1).unwrap();
+    let mut first = SourceMoment::open(&field, &current);
+    let mut sibling = SourceMoment::open(&field, &current);
+    let before = current.clone();
+    let consumed = sibling.ingest(&field, &mut current, &encoded).unwrap().cells as u64;
+    let ticks: Vec<u64> = current.lift().iter().zip(before.lift())
+        .map(|(after, before)| u64::try_from(after - before).unwrap()).collect();
+    first.synchronize_clock(&field, &current, consumed, &ticks).unwrap();
+    assert_eq!(first.cells(), 0);
+    assert!(matches!(first.capacity(&field, &current).unwrap(),
+        SourceCapacity::Reframed { clock_cells, .. } if clock_cells == consumed));
+    let mut text = String::new();
+    first.write(&mut text);
+    let mut rows = text.lines();
+    let head = rows.next().unwrap();
+    let mut restored = SourceMoment::read(&field, head, &mut |what| rows.next()
+        .ok_or(HnnError::ContinuingState { what })).unwrap();
+    let next = encoded.part(0..1).unwrap();
+    let own = restored.ingest(&field, &mut current, &next).unwrap().cells as u64;
+    assert_eq!(restored.cells(), own);
+    assert!(matches!(restored.capacity(&field, &current).unwrap(),
+        SourceCapacity::Reframed { clock_cells, .. } if clock_cells == consumed + own));
+    // A saved counter outside the declared relation cannot borrow the original reader's bound.
+    let bad = text.replace(&format!("source-clock {consumed} reframed"), "source-clock 0 plain");
+    let mut rows = bad.lines();
+    let head = rows.next().unwrap();
+    let bad = SourceMoment::read(&field, head, &mut |what| rows.next()
+        .ok_or(HnnError::ContinuingState { what })).unwrap();
+    assert!(bad.capacity(&field, &current).is_err());
+}
+
+#[test]
+fn a_clock_synchronization_refuses_an_unaccounted_winding_without_changing_the_source() {
+    let field = field();
+    let mut moment = SourceMoment::open(&field, &Current::at_rest(&field));
+    let found = moment.clone();
+    let current = Current::at(&field, vec![BigInt::from(2), BigInt::from(0), BigInt::from(0)]).unwrap();
+    assert!(moment.synchronize_clock(&field, &current, 0, &[0; 3]).is_err());
+    assert_eq!(moment, found);
+    let rest = Current::at_rest(&field);
+    assert!(moment.synchronize_clock(&field, &rest, 0, &[0; 2]).is_err());
+    assert!(moment.synchronize_clock(&field, &rest, 0, &[0, 0, 1]).is_err());
+    assert_eq!(moment, found);
+}
+
+#[test]
+fn sibling_ring_ticks_age_leaky_first_and_offset_coordinates_before_the_next_owning_append() {
+    use holonics::hnn::Constitution;
+    use holonics::hnn::moment::PopulationChart;
+    let field = field();
+    let material = Constitution::initial(&field, 1 << 33).unwrap()
+        .with_transport(2, rat(1, 2)).unwrap();
+    let encoded = Encoded::identity(&KnownTruth::uniform(5, 39, 1, 128).unwrap(), &field)
+        .unwrap().remove(0);
+    let cell = |class| {
+        let at = encoded.classes_read().position(|code| code == class).unwrap();
+        encoded.part(at..at + 1).unwrap()
+    };
+    let chart = PopulationChart::of(&field);
+    for own_cells in [1u64, 2] {
+        let mut current = Current::at_rest(&field);
+        let mut first = SourceMoment::open_with(&field, &current, &material).unwrap();
+        let mut sibling = SourceMoment::open_with(&field, &current, &material).unwrap();
+        for _ in 0..own_cells {
+            first.ingest(&field, &mut current, &cell(1)).unwrap();
+        }
+        assert_eq!(current.phase(&field, 2).unwrap(), 0);
+        let before = current.clone();
+        let actual = sibling.ingest(&field, &mut current, &cell(0)).unwrap();
+        let ticks: Vec<u64> = current.lift().iter().zip(before.lift())
+            .map(|(after, before)| u64::try_from(after - before).unwrap()).collect();
+        assert_eq!(ticks[2], 1);
+        first.synchronize_clock(&field, &current, actual.cells as u64, &ticks).unwrap();
+        // The next owning class does not tick source2. Its old coordinates nevertheless paid
+        // the sibling's actual ring tick before this fresh unit entered at phase1.
+        let before = current.clone();
+        first.ingest(&field, &mut current, &cell(3)).unwrap();
+        assert_eq!(current.lift()[2], before.lift()[2]);
+        let old = first.normalized_counts(&field, 2, 0, &rat(1, 2)).unwrap();
+        let fresh = first.normalized_counts(&field, 2, 1, &rat(1, 2)).unwrap();
+        assert_eq!(old[1], chart.chart(&rat(own_cells as i64, own_cells as i64 + 2)));
+        assert_eq!(fresh[3], chart.chart(&rat(2, own_cells as i64 + 2)));
+        if own_cells == 2 {
+            let pairs = first.offset_table(&field, 2, 1).unwrap().unwrap();
+            assert_eq!(pairs.normalized(0, 5), vec![(6, chart.chart(&rat(1, 3)))]);
+            assert_eq!(pairs.normalized(1, 5), vec![(16, chart.chart(&rat(2, 3)))]);
+        }
+        let mut text = String::new();
+        first.write(&mut text);
+        let mut rows = text.lines();
+        let head = rows.next().unwrap();
+        let restored = SourceMoment::read(&field, head, &mut |what| rows.next()
+            .ok_or(HnnError::ContinuingState { what })).unwrap();
+        assert_eq!(restored, first);
+        assert_eq!(restored.capacity(&field, &current).unwrap(), first.capacity(&field, &current).unwrap());
+        assert_eq!(restored.encode(&field, &material, 2).unwrap(), first.encode(&field, &material, 2).unwrap());
+    }
+}
+
+#[test]
 fn a_continued_station_carrier_is_never_given_the_ingest_box() {
     let field = field();
     let current = Current::at_rest(&field);

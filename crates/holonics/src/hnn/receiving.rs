@@ -144,7 +144,9 @@ use crate::compression::landmark::context::{
 use crate::hnn::HnnError;
 use crate::hnn::encoding::Encoded;
 use crate::hnn::contact::{ContactReading, LockDeclaration, lock_address, site_kinds};
-use crate::hnn::field::{ConstitutionRead, Current, Field, ReceiverDeclaration, ring_digit};
+use crate::hnn::field::{
+    ConstitutionRead, Current, Field, FieldMaterial, ReceiverDeclaration, ring_digit,
+};
 use crate::hnn::keys;
 use crate::hnn::propagation::Operands;
 use crate::hnn::ratio::{Face, Faces};
@@ -1619,11 +1621,13 @@ impl ReceivingPhases {
 
     /// **The wave's read at one receiving epoch**: `R · P_R^(τ_R) v_R`, each class's real logit read
     /// at the grain with its fibre, and its imaginary logit halved into turns. The tree part is
-    /// added at compare ([`ReceivingPhases::combine`]).
+    /// added at compare ([`ReceivingPhases::combine`]). [agent-inferred, October 5] It reads the
+    /// field's material alone (`R` is the field's decoder, `hnn::field::FieldMaterial`), so a
+    /// release reads it without the tree or the population (guard 18).
     pub fn read(
         &self,
         field: &Field,
-        constitution: &impl ConstitutionRead,
+        constitution: &(impl FieldMaterial + ?Sized),
         current: &Current,
         anchor: &[Rat],
     ) -> Result<ReceivingRead, HnnError> {

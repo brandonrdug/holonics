@@ -933,6 +933,18 @@ fn report(field: &Field, exposure: &Exposure) {
                 over_source(state_bits_upper)
             ),
         ),
+        SourceCapacity::Reframed {
+            clock,
+            state_bits_upper,
+            clock_cells,
+        } => (
+            format!("not certified after reframe ({clock:?}, {clock_cells} shared-clock cells)"),
+            format!(
+                "at most {} bits at the declared source/shared-clock populations, per source bit {}",
+                state_bits_upper,
+                over_source(state_bits_upper)
+            ),
+        ),
     };
     println!(
         "source: {} bits ({} cells ingested, n* = {})",

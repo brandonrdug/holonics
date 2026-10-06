@@ -198,15 +198,40 @@ pub trait ConstitutionRead: Sync {
 
 /// [definition; agent-inferred, October 5] **The field's own material: what a release reads of
 /// the constitution.** It is [`ConstitutionRead`] without the receiving storage read at compare,
-/// so no receiving map, landmark tree or population. Every `ConstitutionRead` is one, through the
-/// view below. A release bounded on it cannot read the tree's counts or a seen context (THE_MACHINE,
-/// guard 18): the release is the field's motion, never a lookup of stored passages.
+/// so no landmark tree and no population. Every `ConstitutionRead` is one, through the view below.
+/// A release bounded on it cannot read the tree's counts or a seen context (THE_MACHINE, guard 18):
+/// the release is the field's motion, never a lookup of stored passages.
+///
+/// [definition; agent-inferred, October 5, lane C's physical repair] **The receiving map `R` is
+/// the field's decoder, not storage**, so it is material: a receiver's read `R · P_R^(τ_R) v_R`
+/// at its grain (`hnn::receiving::ReceivingPhases::read`) is a linear face of the ring's own
+/// motion, read through the same executed anchor map at every crossing, and holds no count, no
+/// address and no seen context. Guard 18 excludes the landmark tree (the receiving storage of
+/// counts) and the receiver's population (the families scored at compare), not the decoder.
 ///
 /// ```compile_fail,E0599
 /// use holonics::hnn::FieldMaterial;
 /// // A release generic over the field's material cannot read the landmark tree (guard 18).
 /// fn release_reads_the_tree(material: &impl FieldMaterial) {
 ///     let _ = material.landmarks(0);
+/// }
+/// ```
+///
+/// ```compile_fail,E0599
+/// use holonics::hnn::FieldMaterial;
+/// // Nor the receiver's population, which scores an epoch at compare (guard 18).
+/// fn release_reads_the_population(material: &impl FieldMaterial) {
+///     let _ = material.population(0);
+/// }
+/// ```
+///
+/// The decoder is the field's, and a release reads it:
+///
+/// ```
+/// use holonics::hnn::FieldMaterial;
+/// use holonics::ratio::linear::ExactRatMatrix;
+/// fn release_reads_the_decoder(material: &impl FieldMaterial) -> Option<&ExactRatMatrix> {
+///     material.receiving_map(0)
 /// }
 /// ```
 pub trait FieldMaterial: Sync {
@@ -236,6 +261,9 @@ pub trait FieldMaterial: Sync {
     fn ring_resonator(&self, ring: usize) -> Option<&crate::hnn::ring::ResonatorMaterial>;
     /// A source navigator's transport modulus. ([`ConstitutionRead::transport`])
     fn transport(&self, ring: usize) -> Rat;
+    /// The receiving map `R` of a receiving ring, the field's decoder (above).
+    /// ([`ConstitutionRead::receiving_map`])
+    fn receiving_map(&self, ring: usize) -> Option<&ExactRatMatrix>;
 }
 
 impl<T: ConstitutionRead + ?Sized> FieldMaterial for T {
@@ -277,6 +305,9 @@ impl<T: ConstitutionRead + ?Sized> FieldMaterial for T {
     }
     fn transport(&self, ring: usize) -> Rat {
         ConstitutionRead::transport(self, ring)
+    }
+    fn receiving_map(&self, ring: usize) -> Option<&ExactRatMatrix> {
+        ConstitutionRead::receiving_map(self, ring)
     }
 }
 

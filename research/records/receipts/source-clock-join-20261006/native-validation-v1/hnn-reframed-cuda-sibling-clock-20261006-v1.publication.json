@@ -1,0 +1,54 @@
+{
+  "lease_still_held": true,
+  "own_group_other_PIDs": [],
+  "outcome": {
+    "provisional_passed": true,
+    "final_acceptance_requires_external_CPU_read": true,
+    "label": "hnn-reframed-cuda-sibling-clock-20261006-v1",
+    "wall_ns": 3725570047,
+    "peak_child_RSS_KiB": 254576,
+    "group_memory_peak_bytes": 249892864,
+    "original_coordinates_modified": false,
+    "aggregate_cpu_final_us": 3914043,
+    "aggregate_cpu_limit_us": 17000000,
+    "CPU_kernel_hard_total_limit": false
+  },
+  "outputs": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-cuda-sibling-clock-20261006-v1.lease-identity.json": {
+      "sha256": "97b2b81d8ac551bf04b9d99d15789f4bc116bc9b47f3b4e1012f5bebea69b5c5",
+      "bytes": 565
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-cuda-sibling-clock-20261006-v1.memory-gate.json": {
+      "sha256": "ed33ba2ff1540d12bb1f91e159fc2be33160afa02130a863ce2149b89dc0b214",
+      "bytes": 120
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-cuda-sibling-clock-20261006-v1.child-identity.json": {
+      "sha256": "d2889132a276e13734f5003162766cc75e4d1d1d0e6cc00ee75a0c9fdad50150",
+      "bytes": 78
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-cuda-sibling-clock-20261006-v1.system-floor.json": {
+      "sha256": "d44f88cc13f218a68bcabdc50d969c5c3e720f7ec40a1bec8fe8d4ce8f7af877",
+      "bytes": 28993
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-cuda-sibling-clock-20261006-v1.quiescence.json": {
+      "sha256": "048dd030979cdd404f6b2b03654ab385a5615aed1965fa2ff9155fb872401ef5",
+      "bytes": 130
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-cuda-sibling-clock-20261006-v1.input_seal.json": {
+      "sha256": "c79b4847484cbe876854c650c713a3d95d63950de4e859d21b9a096171faf2e1",
+      "bytes": 58079
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-cuda-sibling-clock-20261006-v1.output_seal.json": {
+      "sha256": "86e2d5274ffdc793418891f66a3c5da47c943ec182901b8f4d2ffe6cb52744b3",
+      "bytes": 255810
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-cuda-sibling-clock-20261006-v1.stdout": {
+      "sha256": "290cfbf462b125d71391b8d49eb8b8c0594d9734ec00387d75c14261874cc552",
+      "bytes": 209
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-cuda-sibling-clock-20261006-v1.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  }
+}

@@ -1,0 +1,346 @@
+{
+  "VALIDATION.json": {
+    "sha256": "8aa99628551a4b5dd01a9d6c87cb66e30297d4b6f98ceab108e8d3996c88e42f",
+    "bytes": 7163
+  },
+  "before-bounded_stage_v1.py": {
+    "sha256": "8ef953d3a2dc37f5a0407983183f2ec25720a1abf155f120117c5744bdb10ead",
+    "bytes": 12218
+  },
+  "before-final_stage.py": {
+    "sha256": "83df6f84512e1a1c807dbddf3396d997c68329f61d39ea22e408883d8506890d",
+    "bytes": 10554
+  },
+  "before-leased_stage_v2.py": {
+    "sha256": "7c668bad52c3a32e87bf2d4a45dd7c90ea354896f7c5da1cb5c82c6a38cf9cf7",
+    "bytes": 5345
+  },
+  "bounded_stage_v1.py": {
+    "sha256": "84b7d003089fa19881690e368200b2168b9d179c8e6573bdafab54369235cec2",
+    "bytes": 12645
+  },
+  "final_stage.py": {
+    "sha256": "a0a5a94f157acf9a5127b756a036c6e86449dc2012af0f1e71d34aafa13bc79e",
+    "bytes": 10968
+  },
+  "leased_stage_v2.py": {
+    "sha256": "bcf91456534e763a025613f39e82853d7a58529b399bb183d544d09a7a42f949",
+    "bytes": 5520
+  },
+  "native-build-policy-adapter.patch": {
+    "sha256": "372486719e79d8ba2cc2dc8e220e9b052f9bc75f9172cddb4073039691fb2105",
+    "bytes": 5477
+  },
+  "physical-chart-first-read-20261006-v1.acceptance.json": {
+    "sha256": "405463318050ec2108d742026608fb6a1aa5d2ca732dcc3051cb0e1468f66f56",
+    "bytes": 379
+  },
+  "physical-chart-first-read-20261006-v1.config.json": {
+    "sha256": "5f4b337b5cbc6194456588d18b5819d547d090e81b3b0326f51a541077ce2c8f",
+    "bytes": 51521
+  },
+  "physical-chart-first-read-20261006-v1.external-lease.json": {
+    "sha256": "849ec47e5be6a4c35f6030a8383d260af32c7b2963a93814143e3acdbd829e73",
+    "bytes": 487
+  },
+  "physical-chart-first-read-20261006-v1.failure.json": {
+    "sha256": "b5892fc8f6cc141ff676d8797725260027bd263520d67d6d227e2a24bf1361e2",
+    "bytes": 382
+  },
+  "physical-chart-first-read-20261006-v1.final.json": {
+    "sha256": "d88071aa37dd1ae9858c372090d1723cd24cacc0f365b4f6bf3ca821f183e07b",
+    "bytes": 3056
+  },
+  "physical-chart-first-read-20261006-v1.lease-identity.json": {
+    "sha256": "b3ab4396d03b10c5b37911f977d852ead44194f4eb23fcf62c2910ee10c41cb9",
+    "bytes": 565
+  },
+  "physical-chart-first-read-20261006-v1.publication.json": {
+    "sha256": "9347ebf89db2a5e3791a18817959c52ae990a09e16dfaa63e2c3846456a7b3db",
+    "bytes": 1090
+  },
+  "physical-chart-first-read-20261006-v1.release.json": {
+    "sha256": "9703b73f2246065398b28a9a1e1b4d1776c94467d7bec2f606a40f2fc7b83ef4",
+    "bytes": 175
+  },
+  "physical-chart-first-read-20261006-v1.stage-quiescence.json": {
+    "sha256": "0afbe8665604d64585c06cd34f2492d8ab04661ad602cef9b3709d29093ced8c",
+    "bytes": 137
+  },
+  "physical-chart-first-read-20261006-v1.unit-cleanup.json": {
+    "sha256": "96629f179267a948b5557b8d54f9e488c51638072259b50ce63be0490724f14b",
+    "bytes": 757
+  },
+  "physical-chart-first-read-20261006-v2.acceptance.json": {
+    "sha256": "12b996f5db51adf8cf780ec74e42c8377f96f6495b26354566aff6ac80cc0f3e",
+    "bytes": 378
+  },
+  "physical-chart-first-read-20261006-v2.child-identity.json": {
+    "sha256": "9155dff9456b5a95cdece6b40bbc6a4c8d6d5bf751368f0273d56d477065f31b",
+    "bytes": 78
+  },
+  "physical-chart-first-read-20261006-v2.config.json": {
+    "sha256": "4f30708ef08481c8c9cdfa392ed2dd811b3cd14f3596c6d06021a12439af9fd3",
+    "bytes": 51769
+  },
+  "physical-chart-first-read-20261006-v2.external-lease.json": {
+    "sha256": "3eeeabca30f7fd9ac1de21e5c5b01acdc6651886b7d053a9634bd64db993df7d",
+    "bytes": 487
+  },
+  "physical-chart-first-read-20261006-v2.final.json": {
+    "sha256": "c61f176e2f66356be881a604ff25101ca82031437c3e5ed1e5b0ec0cf9686925",
+    "bytes": 4725
+  },
+  "physical-chart-first-read-20261006-v2.input_seal.json": {
+    "sha256": "2e11ed05e4fb959751ca07e7c3830cd615e976b61a1228c68191dc81f338d8b1",
+    "bytes": 50340
+  },
+  "physical-chart-first-read-20261006-v2.lease-identity.json": {
+    "sha256": "4f056b6d8dc10760a9739ee924cef4e15b88079da7a94aca4847208bd43f3ac9",
+    "bytes": 565
+  },
+  "physical-chart-first-read-20261006-v2.memory-gate.json": {
+    "sha256": "cc47ece112e34fa19cb8b861bf9c533ede0b81f28b07868c04a38449d2d48f4b",
+    "bytes": 120
+  },
+  "physical-chart-first-read-20261006-v2.output_seal.json": {
+    "sha256": "d65fc2ef3109a879df2e6c8112c5aded13ed7b1bb90d5ad56d3d9f0d1521c50a",
+    "bytes": 76775
+  },
+  "physical-chart-first-read-20261006-v2.publication.json": {
+    "sha256": "f108914702716c7c4415bea51c7b227eae39a95a17dfff28ba42914bd190362b",
+    "bytes": 2655
+  },
+  "physical-chart-first-read-20261006-v2.quiescence.json": {
+    "sha256": "6b21dbb774b0d46c06761f30eb470f63745e1d7687bbff161a68c91c07912b72",
+    "bytes": 130
+  },
+  "physical-chart-first-read-20261006-v2.release.json": {
+    "sha256": "449be84aa6f5ba98cdd294f6f5ad921f3f16320d3c7f6f85d09d4cab68d5205c",
+    "bytes": 175
+  },
+  "physical-chart-first-read-20261006-v2.stage-quiescence.json": {
+    "sha256": "8d73c373193ca2afbcbf2acf4eb6c94c84a2c0662aa9d26a3988e20260f9cbce",
+    "bytes": 136
+  },
+  "physical-chart-first-read-20261006-v2.stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "physical-chart-first-read-20261006-v2.stdout": {
+    "sha256": "e9e759694584608b0f29982cfc7dcfbeca8d6a43b884e211ea5f83b1396c4a96",
+    "bytes": 248
+  },
+  "physical-chart-first-read-20261006-v2.system-floor.json": {
+    "sha256": "d013a095c7885bc4519a79b4e6f24e563a973b509c0f5787d3c5c0d5d4b9757e",
+    "bytes": 8831
+  },
+  "physical-chart-first-read-20261006-v2.unit-cleanup.json": {
+    "sha256": "a4d7db7a6db24b1c522265b7d0de199efb5e6b52ee1cd08b30b77d334d7ca0c1",
+    "bytes": 701
+  },
+  "physical-chart-host-link-20261006-v1.acceptance.json": {
+    "sha256": "4811335037e3349c1f70720fcf96f46e9af5ab921d488de56adf65ca1c1b6f61",
+    "bytes": 378
+  },
+  "physical-chart-host-link-20261006-v1.child-identity.json": {
+    "sha256": "f18702b351b09adbe0bee544fc52bdab53b262b22da207ce8e429ce1e1e8e045",
+    "bytes": 78
+  },
+  "physical-chart-host-link-20261006-v1.config.json": {
+    "sha256": "7fd3184da7a23c71df36fb39be6e10d40a2c20974bffb0007210e8694a7db4f7",
+    "bytes": 50715
+  },
+  "physical-chart-host-link-20261006-v1.external-lease.json": {
+    "sha256": "0d025c371506bed5c0e0ad575a6e4486b155b7c416cf6d99bc8571fe0384cc6f",
+    "bytes": 487
+  },
+  "physical-chart-host-link-20261006-v1.final.json": {
+    "sha256": "089de613caa1bf290909fe03567f6f23361a85a5bca39848d1919c83b34e3563",
+    "bytes": 4722
+  },
+  "physical-chart-host-link-20261006-v1.input_seal.json": {
+    "sha256": "dd79ef37c264c8a27f1264145eb27c6b56dae0526c546f61f608db1c9e79e072",
+    "bytes": 49864
+  },
+  "physical-chart-host-link-20261006-v1.lease-identity.json": {
+    "sha256": "e97f06aadcc85f76ab007ec8f466351f13a2ac885b74ac60fac42cb95b86e8a7",
+    "bytes": 565
+  },
+  "physical-chart-host-link-20261006-v1.memory-gate.json": {
+    "sha256": "b28cfb477d443adf4ac9b618f3731cbc03531b51df8b06fb952fb1a6135996cc",
+    "bytes": 120
+  },
+  "physical-chart-host-link-20261006-v1.output_seal.json": {
+    "sha256": "7f852ba076f9479e4da634593c54752dab0e85a16b498299ed94231e21ea206d",
+    "bytes": 886551
+  },
+  "physical-chart-host-link-20261006-v1.publication.json": {
+    "sha256": "cf840a72c9bd29bd70fe37186c37463d9c1b6b91f5815fbe3287546c0274c945",
+    "bytes": 2658
+  },
+  "physical-chart-host-link-20261006-v1.quiescence.json": {
+    "sha256": "36d51c58fccf8de8e7be3e291372e84b76da37fb3fc6cb2b7505ed0553016f10",
+    "bytes": 130
+  },
+  "physical-chart-host-link-20261006-v1.release.json": {
+    "sha256": "3a1a1fe3ce4f8024f73a60d1a2b2a85ef7ebf8ed8b41f4205c39e8692d332e28",
+    "bytes": 175
+  },
+  "physical-chart-host-link-20261006-v1.stage-quiescence.json": {
+    "sha256": "6d45be2fecf62bb0cab89bab98a50efee5535dcc658e413a40ebee1c6458b48f",
+    "bytes": 136
+  },
+  "physical-chart-host-link-20261006-v1.stderr": {
+    "sha256": "fa0225514e40e3df412b7f913e09d47641d64938c4990281cbf2a7d6a8100823",
+    "bytes": 752
+  },
+  "physical-chart-host-link-20261006-v1.stdout": {
+    "sha256": "5dfcd892cb6e33c0befa1ca456f2035061bc7391608aee66bca5367767e20cae",
+    "bytes": 23638
+  },
+  "physical-chart-host-link-20261006-v1.system-floor.json": {
+    "sha256": "68d4f7ec5d9244e830a86cfcced5fd8d84a0cf139e8e8cf52ba6163c35fdf207",
+    "bytes": 97780
+  },
+  "physical-chart-host-link-20261006-v1.unit-cleanup.json": {
+    "sha256": "7443ecb3b055f2248b3a374b29cb6efffc549cb5eaf442356b88486a7262d484",
+    "bytes": 699
+  },
+  "physical-chart-nine-tests-20261006-v1.acceptance.json": {
+    "sha256": "40ad0aab75813a22874f671c2e3ec8ba74a61c2692c848936b6aac63a6e53aec",
+    "bytes": 378
+  },
+  "physical-chart-nine-tests-20261006-v1.child-identity.json": {
+    "sha256": "20e2a79352a51945ddc7da7dda82f73e154c4c943922599bf353327c6d959001",
+    "bytes": 78
+  },
+  "physical-chart-nine-tests-20261006-v1.config.json": {
+    "sha256": "c07fa5b2b75d2e2828d4dc62b08519bedfc6cd94738b01aaf867c8c4de6d6d49",
+    "bytes": 51525
+  },
+  "physical-chart-nine-tests-20261006-v1.external-lease.json": {
+    "sha256": "9941a80472b3f726e43b0e7e4430f6c95932b6bffa70ee281d9ae9cef6a2819d",
+    "bytes": 487
+  },
+  "physical-chart-nine-tests-20261006-v1.final.json": {
+    "sha256": "cec4df18ed41616710a547e1290e097c4cc7f27683399d1a93e7e092e0a7b424",
+    "bytes": 4728
+  },
+  "physical-chart-nine-tests-20261006-v1.input_seal.json": {
+    "sha256": "66670c10e06e2d4006e082c7a45812b3c58ed6d9b17b6de7521cb9c78b66b222",
+    "bytes": 50234
+  },
+  "physical-chart-nine-tests-20261006-v1.lease-identity.json": {
+    "sha256": "5b6d5166bd32320557714128a8454690b8669f9d0337bfaa4d8a20019d497da5",
+    "bytes": 565
+  },
+  "physical-chart-nine-tests-20261006-v1.memory-gate.json": {
+    "sha256": "53739da397a7b26669a58f9b581c7c53167ea607755d46a19dcc20b535ab3280",
+    "bytes": 120
+  },
+  "physical-chart-nine-tests-20261006-v1.output_seal.json": {
+    "sha256": "4a73674f226c3e92b4c18f1a51374fef42b340265999a57e546e13210d4c7e3d",
+    "bytes": 216078
+  },
+  "physical-chart-nine-tests-20261006-v1.publication.json": {
+    "sha256": "7d2d98e759a3e592d72c1731f80be5693f468493aedfaa5ad0ffa4633a854028",
+    "bytes": 2658
+  },
+  "physical-chart-nine-tests-20261006-v1.quiescence.json": {
+    "sha256": "3b5a4c2ead794873c6e24c119e023bbc39b8a708a2887c3b52cca7054085ec7d",
+    "bytes": 130
+  },
+  "physical-chart-nine-tests-20261006-v1.release.json": {
+    "sha256": "5c6a37bd53ef2bf7bae3bf988f0af85080987928935db27014c905533dbd3de5",
+    "bytes": 175
+  },
+  "physical-chart-nine-tests-20261006-v1.stage-quiescence.json": {
+    "sha256": "70059414537a923af123b95174bc1b74cfe474ef736bafe96694f8ff1ec8d486",
+    "bytes": 136
+  },
+  "physical-chart-nine-tests-20261006-v1.stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "physical-chart-nine-tests-20261006-v1.stdout": {
+    "sha256": "e22f96a57b3079a5459b8eabdcf61004adb97b420744c8ef2129002ed8397105",
+    "bytes": 1204
+  },
+  "physical-chart-nine-tests-20261006-v1.system-floor.json": {
+    "sha256": "01945473d106cc5c2d13f3125866eea728c49001268d258c44b95265e477b2ea",
+    "bytes": 24875
+  },
+  "physical-chart-nine-tests-20261006-v1.unit-cleanup.json": {
+    "sha256": "5cc726903f35ebc891ac954c2597f34c9b5b44254170349afaa6d7b98cf07e25",
+    "bytes": 701
+  },
+  "physical-chart-notebook-check-20261006-v1.acceptance.json": {
+    "sha256": "cbc1cc31470e3819e63cf9858070ec8efe549d63ad082336b55f7e032655431c",
+    "bytes": 378
+  },
+  "physical-chart-notebook-check-20261006-v1.child-identity.json": {
+    "sha256": "17fa5ca1c82641f8465a56f503800794c5a098bb43974f2c84c4c444d8a5a40a",
+    "bytes": 78
+  },
+  "physical-chart-notebook-check-20261006-v1.config.json": {
+    "sha256": "b8b623bd9183d19dfb963b6e85f51b8adcf0342eb64eaef7a7aa8cbabfafb318",
+    "bytes": 53269
+  },
+  "physical-chart-notebook-check-20261006-v1.external-lease.json": {
+    "sha256": "385dd452bc9c2a40ff6ef29fd6eb923cf483d1737dd29f990e043a2e3eadd32a",
+    "bytes": 487
+  },
+  "physical-chart-notebook-check-20261006-v1.final.json": {
+    "sha256": "5a281c5da0251a6a003b5edbaddb0b85c31a1f89ddfbd37e047705e51badbd8a",
+    "bytes": 4793
+  },
+  "physical-chart-notebook-check-20261006-v1.input_seal.json": {
+    "sha256": "22577821b1b0deba1f87ff3691351b145c96103b81695ffbc5ecb0d5fa3a02f1",
+    "bytes": 51547
+  },
+  "physical-chart-notebook-check-20261006-v1.lease-identity.json": {
+    "sha256": "b76febb637709160b1def33aaa3042d033afd4595c62e9169e634fa65e9b5266",
+    "bytes": 565
+  },
+  "physical-chart-notebook-check-20261006-v1.memory-gate.json": {
+    "sha256": "333f950112bf849d9556d6697492bf02934d4d2652c9d151042b2147a92f8d69",
+    "bytes": 120
+  },
+  "physical-chart-notebook-check-20261006-v1.output_seal.json": {
+    "sha256": "520286dca70ef537b56f701790fad1b523d6708445428d4a36acf6db1cc73c99",
+    "bytes": 129892
+  },
+  "physical-chart-notebook-check-20261006-v1.publication.json": {
+    "sha256": "285bc804d2a6b7e83171c255fd58c428e10cb813dce0a11bc61b9d2526f73119",
+    "bytes": 2704
+  },
+  "physical-chart-notebook-check-20261006-v1.quiescence.json": {
+    "sha256": "32733f512e4455973c964fe11da3d62d17b2076af0d60461dc727361b94417a1",
+    "bytes": 130
+  },
+  "physical-chart-notebook-check-20261006-v1.release.json": {
+    "sha256": "6a5a42989711995eadc1fd759a193d8be68ebd0d7eb5162878d570734c86cb4c",
+    "bytes": 175
+  },
+  "physical-chart-notebook-check-20261006-v1.stage-quiescence.json": {
+    "sha256": "b11096a727169b831cd92d095ad7abaa43fde9c606d9e5164502e51a8b1fe632",
+    "bytes": 136
+  },
+  "physical-chart-notebook-check-20261006-v1.stderr": {
+    "sha256": "56b7f2d7cfd5e5d5f01abf8663fe40c9a3d203ebf02c69c26bcad3d57cdec290",
+    "bytes": 624
+  },
+  "physical-chart-notebook-check-20261006-v1.stdout": {
+    "sha256": "55f8003e1c470a5e106b706aac7a928571a06083860bb4664b705a632b8a01d7",
+    "bytes": 23139
+  },
+  "physical-chart-notebook-check-20261006-v1.system-floor.json": {
+    "sha256": "6cfda034e4635e79ab3bfac397a76f8d449dc4e68c5fc5782c1b1c5a6c24d43e",
+    "bytes": 14293
+  },
+  "physical-chart-notebook-check-20261006-v1.unit-cleanup.json": {
+    "sha256": "28721f26a1d44a62067fd2793f2304de3069a3cccecfe5980612b5b8df741872",
+    "bytes": 709
+  }
+}

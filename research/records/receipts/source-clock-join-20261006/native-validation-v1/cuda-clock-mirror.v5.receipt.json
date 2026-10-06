@@ -1,0 +1,12 @@
+{
+  "patch": "/home/b/Workspaces/holonics/.local/wt/capacity/.local/cuda-capacity-admission-20261006/cuda-clock-mirror.v5.patch",
+  "pin": {
+    "sha256": "5efcaf8531e81e2650914654ebadbd2bdb635c980f23c09fcb091465f8844a57",
+    "bytes": 18951
+  },
+  "changed_since_v4": [
+    "/home/b/Workspaces/holonics/.local/wt/capacity/crates/holonics-cuda/src/hnn/port_tests.rs"
+  ],
+  "source_repair": "Own parity test borrows HnnError in four refusal assertions; three invalid clone calls removed. Public error and runtime law unchanged; preserve failed v4 receipt, no deadline/cap increase.",
+  "native_validation_pending": true
+}

@@ -1,0 +1,15 @@
+    Checking thiserror v2.0.19
+    Checking holonics v0.1.0 (/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics)
+warning: method `with_rank` is never used
+    --> crates/holonics/src/hnn/receiving.rs:1590:19
+     |
+1287 | impl ReceivingPhases {
+     | -------------------- method in this implementation
+...
+1590 |     pub(crate) fn with_rank(self, rank: usize) -> Self {
+     |                   ^^^^^^^^^
+     |
+     = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `holonics` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.84s

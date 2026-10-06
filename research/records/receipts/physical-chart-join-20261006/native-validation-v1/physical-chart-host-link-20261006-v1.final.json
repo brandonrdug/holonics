@@ -1,0 +1,99 @@
+{
+  "passed": false,
+  "label": "physical-chart-host-link-20261006-v1",
+  "scientific_job": false,
+  "deferred_lock_busy": false,
+  "final_CPU_ns": 24567563000,
+  "CPU_reading_grain_ns": 1000,
+  "aggregate_CPU_limit_us": 128000000,
+  "final_CPU_source": "systemd retained oneshot CPUUsageNSec after all group processes exit",
+  "CPU_kernel_hard_total_limit": false,
+  "sampled_stop_margin_us": 4000000,
+  "aggregate_CPU_within_limit": true,
+  "no_overshoot_accepted": true,
+  "wall_ns": 12890577123,
+  "projection_ns": 65000000000,
+  "wall_source": "external monotonic_ns through final property read",
+  "quiescent": true,
+  "completion_event": "oneshot start job completed; no polling",
+  "unit_properties": {
+    "Description": "Owned holonics admission physical-chart-host-link-20261006-v1 2cf6ce6d73985a232dd4375ae39f6506",
+    "LoadState": "loaded",
+    "ActiveState": "active",
+    "SubState": "exited",
+    "InvocationID": "13c97c6d48ee4a66ae8321ebec257648",
+    "Result": "success",
+    "ExecMainStatus": "0",
+    "ControlGroup": "",
+    "MemoryPeak": "2601517056",
+    "CPUUsageNSec": "24567563000",
+    "TasksCurrent": "[not set]"
+  },
+  "outer_error": null,
+  "unit_start_exit": 0,
+  "unit_start_stdout": "",
+  "unit_start_stderr": "",
+  "config": {
+    "sha256": "7fd3184da7a23c71df36fb39be6e10d40a2c20974bffb0007210e8694a7db4f7",
+    "bytes": 50715
+  },
+  "receipt_pins": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-host-link-20261006-v1.config.json": {
+      "sha256": "7fd3184da7a23c71df36fb39be6e10d40a2c20974bffb0007210e8694a7db4f7",
+      "bytes": 50715
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-host-link-20261006-v1.external-lease.json": {
+      "sha256": "0d025c371506bed5c0e0ad575a6e4486b155b7c416cf6d99bc8571fe0384cc6f",
+      "bytes": 487
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-host-link-20261006-v1.lease-identity.json": {
+      "sha256": "e97f06aadcc85f76ab007ec8f466351f13a2ac885b74ac60fac42cb95b86e8a7",
+      "bytes": 565
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-host-link-20261006-v1.input_seal.json": {
+      "sha256": "dd79ef37c264c8a27f1264145eb27c6b56dae0526c546f61f608db1c9e79e072",
+      "bytes": 49864
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-host-link-20261006-v1.stdout": {
+      "sha256": "5dfcd892cb6e33c0befa1ca456f2035061bc7391608aee66bca5367767e20cae",
+      "bytes": 23638
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-host-link-20261006-v1.stderr": {
+      "sha256": "fa0225514e40e3df412b7f913e09d47641d64938c4990281cbf2a7d6a8100823",
+      "bytes": 752
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-host-link-20261006-v1.memory-gate.json": {
+      "sha256": "b28cfb477d443adf4ac9b618f3731cbc03531b51df8b06fb952fb1a6135996cc",
+      "bytes": 120
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-host-link-20261006-v1.child-identity.json": {
+      "sha256": "f18702b351b09adbe0bee544fc52bdab53b262b22da207ce8e429ce1e1e8e045",
+      "bytes": 78
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-host-link-20261006-v1.system-floor.json": {
+      "sha256": "68d4f7ec5d9244e830a86cfcced5fd8d84a0cf139e8e8cf52ba6163c35fdf207",
+      "bytes": 97780
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-host-link-20261006-v1.quiescence.json": {
+      "sha256": "36d51c58fccf8de8e7be3e291372e84b76da37fb3fc6cb2b7505ed0553016f10",
+      "bytes": 130
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-host-link-20261006-v1.output_seal.json": {
+      "sha256": "7f852ba076f9479e4da634593c54752dab0e85a16b498299ed94231e21ea206d",
+      "bytes": 886551
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-host-link-20261006-v1.publication.json": {
+      "sha256": "cf840a72c9bd29bd70fe37186c37463d9c1b6b91f5815fbe3287546c0274c945",
+      "bytes": 2658
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-host-link-20261006-v1.stage-quiescence.json": {
+      "sha256": "6d45be2fecf62bb0cab89bab98a50efee5535dcc658e413a40ebee1c6458b48f",
+      "bytes": 136
+    }
+  },
+  "launcher_outside_native_group": true,
+  "lease_owner_outside_capped_group": true,
+  "lease_held_through_final_CPU_read_and_publication": true,
+  "stage_passed_before_cleanup": true,
+  "requires_cleanup_acceptance": true
+}

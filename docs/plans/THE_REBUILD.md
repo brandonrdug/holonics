@@ -552,6 +552,28 @@ replaces.
 moves its statements to the object's Lean owner, or joins them to it by a proved bridge, in the same
 commit; what it cannot join is named in #62.
 
+**October 6 consuming join and next gate.** The
+[blind receiving return](../../research/records/2026-10-06_THE_BLIND_RECEIVING_RETURN_IS_JOINED_BUT_RELEASE_NEEDS_THE_EXECUTED_COUPLED_DOMAIN.md)
+joins `predict_by_field -> actual Word::pull_back -> compose_return -> reached R deposition`.
+The physical lane's two teaching controls and retained-carry regression pass on its committed
+source; its earlier nine chart/clock controls also pass. Explicit observation follows prediction
+and spends that teaching passage. A later native read changes under learned R and returned carry;
+there is no erasure or product acceptance. The shared-clock lane's 26 capacity, entrance, restore
+and scoped card controls pass separately. This integration still needs its focused joined-source
+gate and the new Lean finite-box acceptance; separate source receipts do not establish either.
+
+Lane C's next release obligation (#62, #73, #148) is the image of the complete compatible sparse
+source/carry family through the **actual coupled Word**, followed by its actual R/phase/grain face
+and producing decoder. Release requires a constant decoded class image; otherwise retain the
+residual fibre. `DomainStep`'s existing fixed-drive component certificate lacks the joined drive
+term `partial_b Phi * D drive_joint` at this exact consumer; a charted route must additionally
+include its numerical fibre. A point
+leader or a singleton chosen from one execution cannot supply that certificate. The supported
+producing identity chart/unit source clock remains explicit. Located sparse conduct has its own
+source-time/decoder square and continues to refuse before the Word until consumed. This bounded
+consumer is the physical worker's scope; shared-clock/rekey, CUDA, formal finite-box acceptance,
+adaptive whole-material retention and resident card restore retain their respective owners/gates.
+
 #### U6. The text chart
 
 **U6's order from October 5** (Brandon, October 5: review the design for conservatism and

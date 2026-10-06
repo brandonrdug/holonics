@@ -1,0 +1,8 @@
+{
+  "path": ".local/gates.log",
+  "sha256": "2b2a96f6de97ae7daf9cb179579f6c768c4f11cebe0020614e4c875ba856ee7c",
+  "first_line": 5700,
+  "last_line": 5711,
+  "base_commit": "a954a0d8f10121445a058f0deb132e586863352a",
+  "limitation": "inherited pipeline omitted panic refusal; not a current execution receipt"
+}

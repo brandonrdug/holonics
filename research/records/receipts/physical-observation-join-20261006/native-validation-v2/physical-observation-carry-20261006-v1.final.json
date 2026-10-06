@@ -1,0 +1,99 @@
+{
+  "passed": false,
+  "label": "physical-observation-carry-20261006-v1",
+  "scientific_job": false,
+  "deferred_lock_busy": false,
+  "final_CPU_ns": 845799000,
+  "CPU_reading_grain_ns": 1000,
+  "aggregate_CPU_limit_us": 17000000,
+  "final_CPU_source": "systemd retained oneshot CPUUsageNSec after all group processes exit",
+  "CPU_kernel_hard_total_limit": false,
+  "sampled_stop_margin_us": 1000000,
+  "aggregate_CPU_within_limit": true,
+  "no_overshoot_accepted": true,
+  "wall_ns": 886790186,
+  "projection_ns": 3051395238,
+  "wall_source": "external monotonic_ns through final property read",
+  "quiescent": true,
+  "completion_event": "oneshot start job completed; no polling",
+  "unit_properties": {
+    "Description": "Owned holonics admission physical-observation-carry-20261006-v1 a7923e5f97636eb145f5be97b6c2b116",
+    "LoadState": "loaded",
+    "ActiveState": "active",
+    "SubState": "exited",
+    "InvocationID": "beca73cedc3a4875aa89d9ac5a502801",
+    "Result": "success",
+    "ExecMainStatus": "0",
+    "ControlGroup": "",
+    "MemoryPeak": "14921728",
+    "CPUUsageNSec": "845799000",
+    "TasksCurrent": "[not set]"
+  },
+  "outer_error": null,
+  "unit_start_exit": 0,
+  "unit_start_stdout": "",
+  "unit_start_stderr": "",
+  "config": {
+    "sha256": "ac1387983141b4057da548796591d73c5fcece88af8aef16b20fd33faf7be7a8",
+    "bytes": 53589
+  },
+  "receipt_pins": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-observation-carry-20261006-v1.config.json": {
+      "sha256": "ac1387983141b4057da548796591d73c5fcece88af8aef16b20fd33faf7be7a8",
+      "bytes": 53589
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-observation-carry-20261006-v1.external-lease.json": {
+      "sha256": "19f884a1e424cf87a13ceb8014dabdf47bceaaf63a74e6b3f473e0ef3348a9cb",
+      "bytes": 487
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-observation-carry-20261006-v1.lease-identity.json": {
+      "sha256": "358cb729dc877cb1b0d3861991352a87f95caf34af3bb701e0be6d65778684aa",
+      "bytes": 565
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-observation-carry-20261006-v1.input_seal.json": {
+      "sha256": "d45f2af41e7d640e56155940f999294b1ede5182f798b8ef34f600b109668be9",
+      "bytes": 51302
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-observation-carry-20261006-v1.stdout": {
+      "sha256": "bcf12666d123d74337c17a2dc91bbfdd865ae16d27032f944fca8ed4820252dc",
+      "bytes": 244
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-observation-carry-20261006-v1.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-observation-carry-20261006-v1.memory-gate.json": {
+      "sha256": "6eb23733ceab45151cb836851804239c7cc2b86c464a60deceb6ca807e62f6f8",
+      "bytes": 120
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-observation-carry-20261006-v1.child-identity.json": {
+      "sha256": "e5908b6fa70aa6f0d36055bd744d981bb86a05c563c2c9036395161c1864909b",
+      "bytes": 78
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-observation-carry-20261006-v1.system-floor.json": {
+      "sha256": "e77a1ae789b6af1958a7e286fb3d1035c46525bb9e9b67d94a287f6d2ffe76cf",
+      "bytes": 5251
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-observation-carry-20261006-v1.quiescence.json": {
+      "sha256": "d283eb0fc75949966b658a19161346e2df51522387dd27aec4d14dfedaf9abc4",
+      "bytes": 130
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-observation-carry-20261006-v1.output_seal.json": {
+      "sha256": "c73d79f8c69357af71d74d8b9f1e09cfb22309659c5beef85b34eded4acfa982",
+      "bytes": 45773
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-observation-carry-20261006-v1.publication.json": {
+      "sha256": "8da75eadd721198171c445c59d73bc778bcf88d007c5ee1956fe53c00683cd0a",
+      "bytes": 2663
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-observation-carry-20261006-v1.stage-quiescence.json": {
+      "sha256": "eb6a56a95c3b8f6b61e326582ef2625ace169b88f722303a86189903b65f97d3",
+      "bytes": 136
+    }
+  },
+  "launcher_outside_native_group": true,
+  "lease_owner_outside_capped_group": true,
+  "lease_held_through_final_CPU_read_and_publication": true,
+  "stage_passed_before_cleanup": true,
+  "requires_cleanup_acceptance": true
+}

@@ -1,0 +1,802 @@
+{
+  "CUDA_HOST_CLOCK_INTERFACE.v2.md": {
+    "sha256": "69337e9cb013187f36486e588e3334c8138217e0bad766d769cc8e89540f4bd6",
+    "bytes": 3003
+  },
+  "CUDA_ORDERING_REVIEW.v3.txt": {
+    "sha256": "a2ac7b3c52515aac25b6a12c59bd81aed56914b64d5dc20aae758521156211ac",
+    "bytes": 1452
+  },
+  "HOST_REFRAME_SOURCE_SEAL.v4.json": {
+    "sha256": "4b866e17ed4ba7095835efa71656eacc1fb4a8a04f2f96ea4f19a5c664e4d2f9",
+    "bytes": 2673
+  },
+  "VALIDATION.json": {
+    "sha256": "c69d1041b9034d1597644248937433a3f5183427bfbd45e242badaee819e89f1",
+    "bytes": 5568
+  },
+  "bounded_stage_v1.py": {
+    "sha256": "84b7d003089fa19881690e368200b2168b9d179c8e6573bdafab54369235cec2",
+    "bytes": 12645
+  },
+  "cuda-clock-mirror.v4.patch": {
+    "sha256": "2a778664aba6737e9eb70a660ce0516de3c2490c6b9f781028e6c9353f0cc2ff",
+    "bytes": 18935
+  },
+  "cuda-clock-mirror.v5.patch": {
+    "sha256": "5efcaf8531e81e2650914654ebadbd2bdb635c980f23c09fcb091465f8844a57",
+    "bytes": 18951
+  },
+  "cuda-clock-mirror.v5.receipt.json": {
+    "sha256": "df9ecfa1a4cd45b313c7f1153c72562f6f5d9b87e7b43b2e5e40778fdd4365a2",
+    "bytes": 622
+  },
+  "final_stage.py": {
+    "sha256": "a0a5a94f157acf9a5127b756a036c6e86449dc2012af0f1e71d34aafa13bc79e",
+    "bytes": 10968
+  },
+  "hnn-reframed-cold-restore-20261006-v1.acceptance.json": {
+    "sha256": "0f4a868813c69bf8b12d1f418e544d726152f2ae4c816e6f224ece616ec6870a",
+    "bytes": 378
+  },
+  "hnn-reframed-cold-restore-20261006-v1.child-identity.json": {
+    "sha256": "6728a742ba838bb2aa8557d751e8495d22cb68dede92bb58f9ab40ca14d969b0",
+    "bytes": 78
+  },
+  "hnn-reframed-cold-restore-20261006-v1.config.json": {
+    "sha256": "f993ea7a5f2f0bf2d6df6e76165bfb992667149cd54c020edad7aca504f5de51",
+    "bytes": 61714
+  },
+  "hnn-reframed-cold-restore-20261006-v1.external-lease.json": {
+    "sha256": "9dde1e4bfdf0771ef2565423050c3b5c81ae0ccb9d8749d22ee0d9fcfcbd7953",
+    "bytes": 487
+  },
+  "hnn-reframed-cold-restore-20261006-v1.final.json": {
+    "sha256": "f776cead52b4c0b890fffe31ce044c2e12bb7af5f792546c9f0a88d1d501e7b0",
+    "bytes": 4723
+  },
+  "hnn-reframed-cold-restore-20261006-v1.input_seal.json": {
+    "sha256": "ff3dc3bb7a2cf96b7d6fa0f7f89ce6941a87fe70184151d07697acd4c39145d6",
+    "bytes": 57727
+  },
+  "hnn-reframed-cold-restore-20261006-v1.lease-identity.json": {
+    "sha256": "6eacc134e3daa54d878287fd872060af7f678a9b719ffe82b1d49c74591cd664",
+    "bytes": 565
+  },
+  "hnn-reframed-cold-restore-20261006-v1.memory-gate.json": {
+    "sha256": "6c9781e56522004520e01ce9fd6282b6e12fa352d8986ba33f1cfd4e4c1bbe56",
+    "bytes": 120
+  },
+  "hnn-reframed-cold-restore-20261006-v1.output_seal.json": {
+    "sha256": "5e46a0675c1f22872b35472c64753e1ed0246aeb145cfd1c5a920de8329f056f",
+    "bytes": 48249
+  },
+  "hnn-reframed-cold-restore-20261006-v1.publication.json": {
+    "sha256": "aac56940eb70bfcc3b6c79d1184801f390661193034bd82caa03605663f240ab",
+    "bytes": 2653
+  },
+  "hnn-reframed-cold-restore-20261006-v1.quiescence.json": {
+    "sha256": "6f16d3a41b00cecad8ca4a47aa0f6d0ab6a532a34ed465f33c9f11cab0312f11",
+    "bytes": 130
+  },
+  "hnn-reframed-cold-restore-20261006-v1.release.json": {
+    "sha256": "b88aaa5ad3d982ccb2e212f36e771de5ae8754a50e3b1e02e28bc16d8bac3a4d",
+    "bytes": 175
+  },
+  "hnn-reframed-cold-restore-20261006-v1.stage-quiescence.json": {
+    "sha256": "819fbcaa63ae2a9e31524351106947f239a2d9c6023456d20df45427143f305b",
+    "bytes": 136
+  },
+  "hnn-reframed-cold-restore-20261006-v1.stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "hnn-reframed-cold-restore-20261006-v1.stdout": {
+    "sha256": "91942278fe4e24f045dc2897b07bf08749fc86686ae8fb747370262d8daffe56",
+    "bytes": 347
+  },
+  "hnn-reframed-cold-restore-20261006-v1.system-floor.json": {
+    "sha256": "5d77a225dfab939ebe5ed48e9493b8936f1d90d987ccc056686df4ed3a61fec0",
+    "bytes": 5500
+  },
+  "hnn-reframed-cold-restore-20261006-v1.unit-cleanup.json": {
+    "sha256": "4394c2781b22ac9d0f4883537f75b7299129ed16341f5cf3e078da93507a5c48",
+    "bytes": 701
+  },
+  "hnn-reframed-cuda-capacity-refusal-20261006-v1.acceptance.json": {
+    "sha256": "d359898905cbd97ee4612875d3ab7de73f295ffea026d77453c85af51ce1c60a",
+    "bytes": 378
+  },
+  "hnn-reframed-cuda-capacity-refusal-20261006-v1.child-identity.json": {
+    "sha256": "2a8552637c519a950f2c776f202a81d6a36197024377a58f9f61ba35321a4a42",
+    "bytes": 78
+  },
+  "hnn-reframed-cuda-capacity-refusal-20261006-v1.config.json": {
+    "sha256": "4344c8acf67398c32f34d4961a613b01fcc9ff94b6fe82485779f005fa1c7157",
+    "bytes": 62077
+  },
+  "hnn-reframed-cuda-capacity-refusal-20261006-v1.external-lease.json": {
+    "sha256": "f7063760143256a1d1f7419508e77678f2eb203a6a8a2745e4afcf20bd16196e",
+    "bytes": 487
+  },
+  "hnn-reframed-cuda-capacity-refusal-20261006-v1.final.json": {
+    "sha256": "739354eabd604dc27439b6c34a8833bffc037637cc3c3629dc8e7cdeb7f20bf4",
+    "bytes": 4863
+  },
+  "hnn-reframed-cuda-capacity-refusal-20261006-v1.input_seal.json": {
+    "sha256": "92e02b4b3607b3cd4cc100e2d680565cb0e238344febdab7f51fdb38f335b2cb",
+    "bytes": 58076
+  },
+  "hnn-reframed-cuda-capacity-refusal-20261006-v1.lease-identity.json": {
+    "sha256": "569981c4a773b6dac06f5b2cf25983c1e05293f7e2c776ffb5373b6b20a7fb37",
+    "bytes": 565
+  },
+  "hnn-reframed-cuda-capacity-refusal-20261006-v1.memory-gate.json": {
+    "sha256": "d8acd08301024f1789b32a7e8ddd03af3715b6a3f75a7ca2071b7a530453a6c3",
+    "bytes": 120
+  },
+  "hnn-reframed-cuda-capacity-refusal-20261006-v1.output_seal.json": {
+    "sha256": "46fd8aca311714ae44ef95f29a518c99261e791a3e74c2b06f6b4daa4cd26899",
+    "bytes": 249344
+  },
+  "hnn-reframed-cuda-capacity-refusal-20261006-v1.publication.json": {
+    "sha256": "b96c0bd96f8580b5326eba0158d474633ddf4ecaecc34b1c2cb87bed06e11e4b",
+    "bytes": 2749
+  },
+  "hnn-reframed-cuda-capacity-refusal-20261006-v1.quiescence.json": {
+    "sha256": "d5f6dda4f38647318b044b55641672e7c7317019223737aab3d9e4291f1b6ab3",
+    "bytes": 130
+  },
+  "hnn-reframed-cuda-capacity-refusal-20261006-v1.release.json": {
+    "sha256": "badb334f92ab9aa3854f7aca127a2d3e9ae7aab8779287999d4aa52f11cad420",
+    "bytes": 175
+  },
+  "hnn-reframed-cuda-capacity-refusal-20261006-v1.stage-quiescence.json": {
+    "sha256": "d8ff81cc407866165d0886fb1d1a38249fe250f2582a9d8f27654a283ac5d6f1",
+    "bytes": 136
+  },
+  "hnn-reframed-cuda-capacity-refusal-20261006-v1.stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "hnn-reframed-cuda-capacity-refusal-20261006-v1.stdout": {
+    "sha256": "c57675f6d52bce998a2878ba05e0a2d567ad39e54ec168bcaf37446166f1f1fe",
+    "bytes": 197
+  },
+  "hnn-reframed-cuda-capacity-refusal-20261006-v1.system-floor.json": {
+    "sha256": "e24d35c36e97864443c60109210841bff0bef61c5539e60428dcba679767ccfe",
+    "bytes": 28407
+  },
+  "hnn-reframed-cuda-capacity-refusal-20261006-v1.unit-cleanup.json": {
+    "sha256": "a9bc61115aa4f2cda4f38d7619b2d38921a1dbd2a439bbe917b854bb2c2788a6",
+    "bytes": 719
+  },
+  "hnn-reframed-cuda-failed-ingest-20261006-v1.acceptance.json": {
+    "sha256": "f4a4796b3c1705f857b09fb7b0bfb604ae530d739b529298d16ae8d3dd6aa40d",
+    "bytes": 378
+  },
+  "hnn-reframed-cuda-failed-ingest-20261006-v1.child-identity.json": {
+    "sha256": "1a326dc8ff2d443f1a988d02f1103644949235e3fb748804b1d0e9884f978fe7",
+    "bytes": 78
+  },
+  "hnn-reframed-cuda-failed-ingest-20261006-v1.config.json": {
+    "sha256": "5477472530e07c291719f0b4a5b8de46ded04449e69526713c95b5777bfb27e6",
+    "bytes": 62053
+  },
+  "hnn-reframed-cuda-failed-ingest-20261006-v1.external-lease.json": {
+    "sha256": "7ba645043fae68c69e4e842ec7750ad03052e4469be118f6912c63d49381d30f",
+    "bytes": 487
+  },
+  "hnn-reframed-cuda-failed-ingest-20261006-v1.final.json": {
+    "sha256": "0789dd9af9fa15dee512de291114ad045d844c82d3f1714ca83be9322eb3014f",
+    "bytes": 4818
+  },
+  "hnn-reframed-cuda-failed-ingest-20261006-v1.input_seal.json": {
+    "sha256": "d7d1e5bc0d7bc1ff37451f1bae47d61078804384048ec5cfe1e66ce6fe6f6cfc",
+    "bytes": 58052
+  },
+  "hnn-reframed-cuda-failed-ingest-20261006-v1.lease-identity.json": {
+    "sha256": "af3ce025bfbeb584ff95c244ad4af5bcc77a51ac96180dfd6f3448fcb1e1d2c9",
+    "bytes": 565
+  },
+  "hnn-reframed-cuda-failed-ingest-20261006-v1.memory-gate.json": {
+    "sha256": "b5049c740a1e046b65f6f9c192745b17e662abc365260279993b629545ada4f6",
+    "bytes": 120
+  },
+  "hnn-reframed-cuda-failed-ingest-20261006-v1.output_seal.json": {
+    "sha256": "ad494242cecfb10a7609cb8d0b186c1524224ab45f19d53ff4a4c6ef48ecd281",
+    "bytes": 409875
+  },
+  "hnn-reframed-cuda-failed-ingest-20261006-v1.publication.json": {
+    "sha256": "7b438698c0bd5b3da800bcd8710aa94360223e446372298fcf24cccdb8d81626",
+    "bytes": 2719
+  },
+  "hnn-reframed-cuda-failed-ingest-20261006-v1.quiescence.json": {
+    "sha256": "0f79715629b27d267f2966269b1f69191bc9244b21b28c7195f0dedf312b023e",
+    "bytes": 130
+  },
+  "hnn-reframed-cuda-failed-ingest-20261006-v1.release.json": {
+    "sha256": "d8bce2cb54d24a4a37c450fe0c9fef0f037da20795b9486ea51b28e89844f501",
+    "bytes": 175
+  },
+  "hnn-reframed-cuda-failed-ingest-20261006-v1.stage-quiescence.json": {
+    "sha256": "e290ef1357729f9cf293fda256aef849d4c0e4692414a170fa34a6106716293a",
+    "bytes": 136
+  },
+  "hnn-reframed-cuda-failed-ingest-20261006-v1.stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "hnn-reframed-cuda-failed-ingest-20261006-v1.stdout": {
+    "sha256": "e69c25b114c17b006220b8ca0efe8b778dd4e58610c61bf71be93040894f770d",
+    "bytes": 182
+  },
+  "hnn-reframed-cuda-failed-ingest-20261006-v1.system-floor.json": {
+    "sha256": "c855b4c8e7c246d0f915d8ee20f3c81c2b1730ac56bc620e3c7915c97813a9ae",
+    "bytes": 46464
+  },
+  "hnn-reframed-cuda-failed-ingest-20261006-v1.unit-cleanup.json": {
+    "sha256": "5b8833ace4b997c2d225f7421d476c19308c982f752222531fdc5d70f114c4b4",
+    "bytes": 713
+  },
+  "hnn-reframed-cuda-host-moment-20261006-v1.acceptance.json": {
+    "sha256": "5219d37fa58f66d529c19d9f5a3faded97ad354ab05df22a568a183b57e56024",
+    "bytes": 378
+  },
+  "hnn-reframed-cuda-host-moment-20261006-v1.child-identity.json": {
+    "sha256": "e5307e5ce5a39a2bb38c275238e4899abada6e9ccfdda71a2267e922d443f707",
+    "bytes": 78
+  },
+  "hnn-reframed-cuda-host-moment-20261006-v1.config.json": {
+    "sha256": "13ecb81d1124e372158feefdddd8f709fb8ec20c0ba82be25088cf36108874da",
+    "bytes": 62040
+  },
+  "hnn-reframed-cuda-host-moment-20261006-v1.external-lease.json": {
+    "sha256": "d8a6398102f135765621474aef17890caa3770a58204454f4fc072cd0fc3369a",
+    "bytes": 487
+  },
+  "hnn-reframed-cuda-host-moment-20261006-v1.final.json": {
+    "sha256": "dd6381d22b96056f0db8ea375572c693d1655045fb5ed2bc204ea9b050e1b23a",
+    "bytes": 4787
+  },
+  "hnn-reframed-cuda-host-moment-20261006-v1.input_seal.json": {
+    "sha256": "c412dfab45cb5311291c06da1f396c5e9427d0bd7682fe9fb783858efde232bc",
+    "bytes": 58039
+  },
+  "hnn-reframed-cuda-host-moment-20261006-v1.lease-identity.json": {
+    "sha256": "83a47eebd6f73563083fff4079ca9497c0236f30e8b9761cfb65cd87c3055178",
+    "bytes": 565
+  },
+  "hnn-reframed-cuda-host-moment-20261006-v1.memory-gate.json": {
+    "sha256": "55de55af02b91ad1672794b9c93d0b2d4f3b010b0c45ca3ba3481d091272bf55",
+    "bytes": 120
+  },
+  "hnn-reframed-cuda-host-moment-20261006-v1.output_seal.json": {
+    "sha256": "a02c78a2d439c517e93fc27b6276b91ca7204acea3774f3c3a0e0a0cbb4990f7",
+    "bytes": 96017
+  },
+  "hnn-reframed-cuda-host-moment-20261006-v1.publication.json": {
+    "sha256": "06653df1641507be91272be77d466ddfdf60871672bbe1106426e0493ae7c50f",
+    "bytes": 2698
+  },
+  "hnn-reframed-cuda-host-moment-20261006-v1.quiescence.json": {
+    "sha256": "122ed5b844bdb468328832cf36a217957dd61ecd89132fcc7bfb780c4e09037c",
+    "bytes": 130
+  },
+  "hnn-reframed-cuda-host-moment-20261006-v1.release.json": {
+    "sha256": "823943dfd79f818867129b4e86b605b4611162e17d80e8c50a9bb0aea525213d",
+    "bytes": 175
+  },
+  "hnn-reframed-cuda-host-moment-20261006-v1.stage-quiescence.json": {
+    "sha256": "478944de9404a40bde651c41af738f85555b92d5fe37e6131114a8160e14d348",
+    "bytes": 136
+  },
+  "hnn-reframed-cuda-host-moment-20261006-v1.stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "hnn-reframed-cuda-host-moment-20261006-v1.stdout": {
+    "sha256": "4fae8384b441b5e90e3d650beaa5ebec8f6ecaaa2507853914b299f8a2df6ed6",
+    "bytes": 175
+  },
+  "hnn-reframed-cuda-host-moment-20261006-v1.system-floor.json": {
+    "sha256": "c3eae15d27ae45f2fc3b0d53ba33f0d2b0f3f87f33380df5a327dd48e8912658",
+    "bytes": 10933
+  },
+  "hnn-reframed-cuda-host-moment-20261006-v1.unit-cleanup.json": {
+    "sha256": "66e4abdae712424d82ff98f17491062423aaf2a33d3565a19ec6ce7a2bfcabaa",
+    "bytes": 709
+  },
+  "hnn-reframed-cuda-key-relocation-20261006-v1.acceptance.json": {
+    "sha256": "e970f6054f60aa28132f6585c468c26a4e545be96d25ca1385d29aa5318d1870",
+    "bytes": 378
+  },
+  "hnn-reframed-cuda-key-relocation-20261006-v1.child-identity.json": {
+    "sha256": "fca11fb9d90fc549e37bb4e7818609f8806d97c2d9c8e38d20e3fc66d918c676",
+    "bytes": 78
+  },
+  "hnn-reframed-cuda-key-relocation-20261006-v1.config.json": {
+    "sha256": "508474db6243024e25429948f1c07121b454b26057773290c9c20f225a8b161f",
+    "bytes": 62064
+  },
+  "hnn-reframed-cuda-key-relocation-20261006-v1.external-lease.json": {
+    "sha256": "4da366560962603c9f32d1dba4c7004516b9efa8758c246fd33fa6ce2451d24c",
+    "bytes": 487
+  },
+  "hnn-reframed-cuda-key-relocation-20261006-v1.final.json": {
+    "sha256": "79de6fb074fa69ddc1b26591a73a3ecb8c5d8c4015fe6da3c53229036d2cd8e2",
+    "bytes": 4833
+  },
+  "hnn-reframed-cuda-key-relocation-20261006-v1.input_seal.json": {
+    "sha256": "064e98e1f366f68b30ba4cab254814b5907dccc536edf00545eff4627e04b29c",
+    "bytes": 58063
+  },
+  "hnn-reframed-cuda-key-relocation-20261006-v1.lease-identity.json": {
+    "sha256": "b4903dee8aa68cc6ff034b8c10bda1868c4229874c3b171356584a7c97fcd91e",
+    "bytes": 565
+  },
+  "hnn-reframed-cuda-key-relocation-20261006-v1.memory-gate.json": {
+    "sha256": "3cbf463f6a6ff7ae447f5a65a7d1a13f1d6a6c3b24385a2266279e073f240ae6",
+    "bytes": 120
+  },
+  "hnn-reframed-cuda-key-relocation-20261006-v1.output_seal.json": {
+    "sha256": "b57f2f89cd36d2b14fb152937a77f73f77b6b25b2c7316595d645561e7e0f41f",
+    "bytes": 255580
+  },
+  "hnn-reframed-cuda-key-relocation-20261006-v1.publication.json": {
+    "sha256": "54c7f8a007f5295bb7e39e79b55535cc3ce62840a787542e465e43792700700d",
+    "bytes": 2729
+  },
+  "hnn-reframed-cuda-key-relocation-20261006-v1.quiescence.json": {
+    "sha256": "411509fde43e9bb2cdeea191d68fd88d1c00f1bca146b39458578580e924c031",
+    "bytes": 130
+  },
+  "hnn-reframed-cuda-key-relocation-20261006-v1.release.json": {
+    "sha256": "f9a3bc7c9e6fc19766981281300c4c312c28636bbb9ca9c420bf7d993b4f5fee",
+    "bytes": 175
+  },
+  "hnn-reframed-cuda-key-relocation-20261006-v1.stage-quiescence.json": {
+    "sha256": "43577a6efd30cfb21db7c05c76f65bf82c5f523342c863ea16de2cef0f251a3d",
+    "bytes": 136
+  },
+  "hnn-reframed-cuda-key-relocation-20261006-v1.stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "hnn-reframed-cuda-key-relocation-20261006-v1.stdout": {
+    "sha256": "2cb22423a385b14d570f50a5ac5559cbc54397d5bd27795c70e549177ac8b7b0",
+    "bytes": 190
+  },
+  "hnn-reframed-cuda-key-relocation-20261006-v1.system-floor.json": {
+    "sha256": "1ad9bf9f7772e2eb80a2cd5aecfe8fe5117f1b36a588648b1f827c9467cf19f7",
+    "bytes": 28992
+  },
+  "hnn-reframed-cuda-key-relocation-20261006-v1.unit-cleanup.json": {
+    "sha256": "07a706a8da023341b98200f48a9aa4afe0eef08fe750e61c0524b005e00cae3f",
+    "bytes": 715
+  },
+  "hnn-reframed-cuda-located-ingest-20261006-v1.acceptance.json": {
+    "sha256": "0385baa8e1dc107907c5dd636d643a66920bca8b0ae5ff760d5bc7650bf27874",
+    "bytes": 378
+  },
+  "hnn-reframed-cuda-located-ingest-20261006-v1.child-identity.json": {
+    "sha256": "2b2f828592df2ae9f9b7440ac41f08a228effd51fa448e10f8daedef5729a95e",
+    "bytes": 78
+  },
+  "hnn-reframed-cuda-located-ingest-20261006-v1.config.json": {
+    "sha256": "56cb200b0b6bac2565c05d3881747a989e459df67a5bd4bfe20dca3e1f6ff09c",
+    "bytes": 62079
+  },
+  "hnn-reframed-cuda-located-ingest-20261006-v1.external-lease.json": {
+    "sha256": "0dd3471f2c6c37a5de87f049bcb1635dfedbd0fef15f3f3e8cc3d0b718e955de",
+    "bytes": 487
+  },
+  "hnn-reframed-cuda-located-ingest-20261006-v1.final.json": {
+    "sha256": "f3204cc30499a563325075a17000765d230177b84e30683fc81a7c92b4307af6",
+    "bytes": 4833
+  },
+  "hnn-reframed-cuda-located-ingest-20261006-v1.input_seal.json": {
+    "sha256": "7e406ee32b6deaf9d7b3e175e20372fc328d0ec7bd2678f611c28dd08cd0403d",
+    "bytes": 58076
+  },
+  "hnn-reframed-cuda-located-ingest-20261006-v1.lease-identity.json": {
+    "sha256": "de669e9c070cbb2ee4fae5a64ab505a5b0287cef126a1962b116476531c7d433",
+    "bytes": 565
+  },
+  "hnn-reframed-cuda-located-ingest-20261006-v1.memory-gate.json": {
+    "sha256": "0eaafbe7b9bfb4b309075f6554fccacfe2dc84d68a7df0bcf988c88671449912",
+    "bytes": 120
+  },
+  "hnn-reframed-cuda-located-ingest-20261006-v1.output_seal.json": {
+    "sha256": "b006210976a7716d75f30d00441bf8bf788a591600dfbeb3970249273c287991",
+    "bytes": 142582
+  },
+  "hnn-reframed-cuda-located-ingest-20261006-v1.publication.json": {
+    "sha256": "02f92b367ad32b65f66807066ad36ace8090581f779fe255dcb4ee43985f964b",
+    "bytes": 2729
+  },
+  "hnn-reframed-cuda-located-ingest-20261006-v1.quiescence.json": {
+    "sha256": "d5d142ef7b5fc9a121beee504b0759dbdfd12537fd2f66c2bf0e36bda981e19c",
+    "bytes": 130
+  },
+  "hnn-reframed-cuda-located-ingest-20261006-v1.release.json": {
+    "sha256": "ca93c77f86a209ea466570e77b78357e4d318924659610befdf0d3eda3eb2833",
+    "bytes": 175
+  },
+  "hnn-reframed-cuda-located-ingest-20261006-v1.stage-quiescence.json": {
+    "sha256": "e2a064d4454ad7943dc8e47a2b7d666a3dcd4e3092f028602480a21f45040bfa",
+    "bytes": 136
+  },
+  "hnn-reframed-cuda-located-ingest-20261006-v1.stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "hnn-reframed-cuda-located-ingest-20261006-v1.stdout": {
+    "sha256": "876e672a461c95cb619c1075d41af929f4dd74593c5def5b9f7c74b64b863b25",
+    "bytes": 201
+  },
+  "hnn-reframed-cuda-located-ingest-20261006-v1.system-floor.json": {
+    "sha256": "9da33d3c9f246ca20a273f15f0be26ab6029605798b1e9f38738b5c825c88fe6",
+    "bytes": 16476
+  },
+  "hnn-reframed-cuda-located-ingest-20261006-v1.unit-cleanup.json": {
+    "sha256": "123a35f83abe6ffd8253394e0e7f98ef510e4c9221cfc52a39546a088d034cf4",
+    "bytes": 715
+  },
+  "hnn-reframed-cuda-sibling-clock-20261006-v1.acceptance.json": {
+    "sha256": "b3c0ded5982db4aefec63d8d358a213877962054cdfa9eb4d36d3acdbff69431",
+    "bytes": 378
+  },
+  "hnn-reframed-cuda-sibling-clock-20261006-v1.child-identity.json": {
+    "sha256": "d2889132a276e13734f5003162766cc75e4d1d1d0e6cc00ee75a0c9fdad50150",
+    "bytes": 78
+  },
+  "hnn-reframed-cuda-sibling-clock-20261006-v1.config.json": {
+    "sha256": "b23973363181545f189b41ff104599df72e873b94fbdf650da5953cbdd1ff1c4",
+    "bytes": 62080
+  },
+  "hnn-reframed-cuda-sibling-clock-20261006-v1.external-lease.json": {
+    "sha256": "5ac4ddbfc4487f141711d45c6ff95468d39bf7be758f82615f9aa242441eb2c1",
+    "bytes": 487
+  },
+  "hnn-reframed-cuda-sibling-clock-20261006-v1.final.json": {
+    "sha256": "d84d49354589aa1d466a014f9798ff3169f97ae3dd990b286f0a14e39b11e22b",
+    "bytes": 4818
+  },
+  "hnn-reframed-cuda-sibling-clock-20261006-v1.input_seal.json": {
+    "sha256": "c79b4847484cbe876854c650c713a3d95d63950de4e859d21b9a096171faf2e1",
+    "bytes": 58079
+  },
+  "hnn-reframed-cuda-sibling-clock-20261006-v1.lease-identity.json": {
+    "sha256": "97b2b81d8ac551bf04b9d99d15789f4bc116bc9b47f3b4e1012f5bebea69b5c5",
+    "bytes": 565
+  },
+  "hnn-reframed-cuda-sibling-clock-20261006-v1.memory-gate.json": {
+    "sha256": "ed33ba2ff1540d12bb1f91e159fc2be33160afa02130a863ce2149b89dc0b214",
+    "bytes": 120
+  },
+  "hnn-reframed-cuda-sibling-clock-20261006-v1.output_seal.json": {
+    "sha256": "86e2d5274ffdc793418891f66a3c5da47c943ec182901b8f4d2ffe6cb52744b3",
+    "bytes": 255810
+  },
+  "hnn-reframed-cuda-sibling-clock-20261006-v1.publication.json": {
+    "sha256": "9fd45e451885f43f9509204e890617e8f54b58a293f320621e421d69b36b1f6e",
+    "bytes": 2719
+  },
+  "hnn-reframed-cuda-sibling-clock-20261006-v1.quiescence.json": {
+    "sha256": "048dd030979cdd404f6b2b03654ab385a5615aed1965fa2ff9155fb872401ef5",
+    "bytes": 130
+  },
+  "hnn-reframed-cuda-sibling-clock-20261006-v1.release.json": {
+    "sha256": "0d0c4dadb7e1808033fa7a97c6b6fde5e360bdd556caf6531629b6915145262d",
+    "bytes": 175
+  },
+  "hnn-reframed-cuda-sibling-clock-20261006-v1.stage-quiescence.json": {
+    "sha256": "4bfd3934769cef23ecfac3493fbfba438992392c6e3bc21aaf7a173a15c3cf30",
+    "bytes": 136
+  },
+  "hnn-reframed-cuda-sibling-clock-20261006-v1.stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "hnn-reframed-cuda-sibling-clock-20261006-v1.stdout": {
+    "sha256": "290cfbf462b125d71391b8d49eb8b8c0594d9734ec00387d75c14261874cc552",
+    "bytes": 209
+  },
+  "hnn-reframed-cuda-sibling-clock-20261006-v1.system-floor.json": {
+    "sha256": "d44f88cc13f218a68bcabdc50d969c5c3e720f7ec40a1bec8fe8d4ce8f7af877",
+    "bytes": 28993
+  },
+  "hnn-reframed-cuda-sibling-clock-20261006-v1.unit-cleanup.json": {
+    "sha256": "b16752695ef5e528d9ef490f926a53d2fd30412b2b1e4f9e1e9a77ff5fe70418",
+    "bytes": 713
+  },
+  "hnn-reframed-host-cuda-link-20261006-v4.acceptance.json": {
+    "sha256": "09aa3fcfd0f6a23ffc1bc29c515a5264dd86ba7c0848f5edf8c23c50de0ab4de",
+    "bytes": 379
+  },
+  "hnn-reframed-host-cuda-link-20261006-v4.child-identity.json": {
+    "sha256": "e8cca9189050c2b494d095b1ddc65bb58da84c4920aa85cef88d901379407446",
+    "bytes": 78
+  },
+  "hnn-reframed-host-cuda-link-20261006-v4.config.json": {
+    "sha256": "a4db753f2b915f427056454368892329f388f2f583690ca0f734c5b5f7e636ed",
+    "bytes": 60610
+  },
+  "hnn-reframed-host-cuda-link-20261006-v4.external-lease.json": {
+    "sha256": "91539ecf5b2723ecff9c522a749c66d3336e9de54f57ceacd12132fe8ed6ed2d",
+    "bytes": 487
+  },
+  "hnn-reframed-host-cuda-link-20261006-v4.failure.json": {
+    "sha256": "d58de42c3597338b5521a46b1d6c6d1c3661201fe0b69aebc936784facb23d1a",
+    "bytes": 241
+  },
+  "hnn-reframed-host-cuda-link-20261006-v4.final.json": {
+    "sha256": "ffbfcad126813cb72f66fa77edcced187e53926eac2ad4c188bf675cc137659f",
+    "bytes": 5013
+  },
+  "hnn-reframed-host-cuda-link-20261006-v4.input_seal.json": {
+    "sha256": "debcb3c860858ffd56ac9c264a206d3e78e9da6ff4caf138c4e2f82fe06659ea",
+    "bytes": 57637
+  },
+  "hnn-reframed-host-cuda-link-20261006-v4.lease-identity.json": {
+    "sha256": "0737ef3f1f2fabb59eb558df9a6e68530e41aeb302d84fa36f04073ef7638b26",
+    "bytes": 565
+  },
+  "hnn-reframed-host-cuda-link-20261006-v4.memory-gate.json": {
+    "sha256": "17b499caf4155cb2d8a93b278d342891b420d4a4fcf75807b3c44f09e85aa954",
+    "bytes": 120
+  },
+  "hnn-reframed-host-cuda-link-20261006-v4.output_seal.json": {
+    "sha256": "4bbed774ed1182d425b540f14a6acb0b869ece72b552c62abb6c8b1d55d7083f",
+    "bytes": 1387135
+  },
+  "hnn-reframed-host-cuda-link-20261006-v4.publication.json": {
+    "sha256": "60dacb210c61da9374fb7cc337fc95de42af0b9f346713d357eebb101477b79d",
+    "bytes": 2886
+  },
+  "hnn-reframed-host-cuda-link-20261006-v4.quiescence.json": {
+    "sha256": "3b782770b1b58a17354fe22c1cdef8cb26b29382ecb9c9f1d086cd59a2060a58",
+    "bytes": 132
+  },
+  "hnn-reframed-host-cuda-link-20261006-v4.release.json": {
+    "sha256": "fc8963ec0f7dc47eb9f7ca8042e21383d4a1d6e246b58be5b68382179df063d4",
+    "bytes": 175
+  },
+  "hnn-reframed-host-cuda-link-20261006-v4.stage-quiescence.json": {
+    "sha256": "86f7b1ba14337c0d3df1ae61e758fedc123e9e14be6f208265b2f5b2bfcda743",
+    "bytes": 136
+  },
+  "hnn-reframed-host-cuda-link-20261006-v4.stderr": {
+    "sha256": "30253a8c9d4a82110c25dfee8e1bdbf878e981c3524a97868dcb71555012bd54",
+    "bytes": 1898
+  },
+  "hnn-reframed-host-cuda-link-20261006-v4.stdout": {
+    "sha256": "72db0e4ea845732cc365f8310617f7b635aff4f115bc72c770823133ddffb46b",
+    "bytes": 30256
+  },
+  "hnn-reframed-host-cuda-link-20261006-v4.system-floor.json": {
+    "sha256": "aa4457892cf6516bd75967d1bb3eb423e24592f0e31b43c8ac2c9deaf2e3126c",
+    "bytes": 156159
+  },
+  "hnn-reframed-host-cuda-link-20261006-v4.unit-cleanup.json": {
+    "sha256": "e5d3cbbd294ee6180b573b5fd6ae5f79371ca6b25fba5f0de7df7775c8f7d2da",
+    "bytes": 766
+  },
+  "hnn-reframed-host-cuda-link-20261006-v5.acceptance.json": {
+    "sha256": "fd232138bec7a39060d2ec3e4d0151b12df3c716f90dc081c1b6c253aba52ebc",
+    "bytes": 378
+  },
+  "hnn-reframed-host-cuda-link-20261006-v5.child-identity.json": {
+    "sha256": "a40927bfde310e1f62edd8e4c5951bb4d79b2fc1001752fde729e4053efa1f12",
+    "bytes": 78
+  },
+  "hnn-reframed-host-cuda-link-20261006-v5.config.json": {
+    "sha256": "67aa93347e491ffe39f60be5b4845c2b0d420409d81e3f1c048ec9838b0ccf78",
+    "bytes": 60822
+  },
+  "hnn-reframed-host-cuda-link-20261006-v5.external-lease.json": {
+    "sha256": "06b2075b42e3db2214e23520a124451a7ec33f442653b1dbaa04d7b4d12c4b94",
+    "bytes": 487
+  },
+  "hnn-reframed-host-cuda-link-20261006-v5.final.json": {
+    "sha256": "e814838bdedc3bd95296328b00fe40b6d44f38fce19c2fa6a161ea5f648e45d0",
+    "bytes": 4763
+  },
+  "hnn-reframed-host-cuda-link-20261006-v5.input_seal.json": {
+    "sha256": "bf2111655cfa1f550aeed47d6c86ad496f6f1b066bc56584e688e50833f111fd",
+    "bytes": 57637
+  },
+  "hnn-reframed-host-cuda-link-20261006-v5.lease-identity.json": {
+    "sha256": "8430c57d8c2bcffe109d60b509fb003eedcec832d529a18ad18101d774a82798",
+    "bytes": 565
+  },
+  "hnn-reframed-host-cuda-link-20261006-v5.memory-gate.json": {
+    "sha256": "56560f0f3975626a53fb87bcc07f93fa90ff141827012322e38c27a23c7978b8",
+    "bytes": 120
+  },
+  "hnn-reframed-host-cuda-link-20261006-v5.output_seal.json": {
+    "sha256": "ad46310fb6dc74acd03587c5f1831daf591efd5998cc6cd8afbf5c633c7ddfc5",
+    "bytes": 135963
+  },
+  "hnn-reframed-host-cuda-link-20261006-v5.publication.json": {
+    "sha256": "ff099f752cc5ab7796e96c77897f73828c059a0121fb0ae8ff9300817a7ae082",
+    "bytes": 2684
+  },
+  "hnn-reframed-host-cuda-link-20261006-v5.quiescence.json": {
+    "sha256": "68599999d74366086708c7368b1f3ccc1d2a6dee46c4f32978e1e24674e9ec32",
+    "bytes": 130
+  },
+  "hnn-reframed-host-cuda-link-20261006-v5.release.json": {
+    "sha256": "5213fa97536d5bf6ad2406aa87f350acd512d9eb3ed2d29041411611a2e6ac97",
+    "bytes": 175
+  },
+  "hnn-reframed-host-cuda-link-20261006-v5.stage-quiescence.json": {
+    "sha256": "8562351eaae5f343c6669efe1344c7411a7257f4bc3589d8bbbac556b22340dd",
+    "bytes": 136
+  },
+  "hnn-reframed-host-cuda-link-20261006-v5.stderr": {
+    "sha256": "193d55565a5f332c251117a46b46eed2d1d8e1252e66cfc9544e828a65150700",
+    "bytes": 665
+  },
+  "hnn-reframed-host-cuda-link-20261006-v5.stdout": {
+    "sha256": "de3e9045047f388ab365b8127e8066a2f4df63cb98231a5a25e26a099234cda2",
+    "bytes": 31048
+  },
+  "hnn-reframed-host-cuda-link-20261006-v5.system-floor.json": {
+    "sha256": "b5650c9ab0c8d05935bd1a150ddc4c2c23a359b2fc45f8b74bb6f64250a23a70",
+    "bytes": 15301
+  },
+  "hnn-reframed-host-cuda-link-20261006-v5.unit-cleanup.json": {
+    "sha256": "559eaed922470d80d78ef6039fa4f49b6db11cbd8ca81242236618e17ba925f8",
+    "bytes": 705
+  },
+  "hnn-reframed-ranged-capacity-20261006-v1.acceptance.json": {
+    "sha256": "db1db7db2055850f90f66ed74d716a564d30096bad96929389ce3690db62f7a9",
+    "bytes": 378
+  },
+  "hnn-reframed-ranged-capacity-20261006-v1.child-identity.json": {
+    "sha256": "b37e51f30f9cdf7909ba4410bfded0492ad953e1c8737a017bdcfee5e38a26c0",
+    "bytes": 78
+  },
+  "hnn-reframed-ranged-capacity-20261006-v1.config.json": {
+    "sha256": "051b42ad282a9e446717e868006ade9d3ee43f681761c9cc71e25ddbaef9d178",
+    "bytes": 61705
+  },
+  "hnn-reframed-ranged-capacity-20261006-v1.external-lease.json": {
+    "sha256": "2fb493732bffa1c1747b7a7291230765d4aeb87a98594afb07b309fb398c9377",
+    "bytes": 487
+  },
+  "hnn-reframed-ranged-capacity-20261006-v1.final.json": {
+    "sha256": "2e8f30cdf11b0c309915b75d493ac953d8fb1614458cbb4a556dddd3e5dd485e",
+    "bytes": 4768
+  },
+  "hnn-reframed-ranged-capacity-20261006-v1.input_seal.json": {
+    "sha256": "4b5d12fa41e4e1948c094cc88058074131380db72fb6cc914da0a30cbdd70a7f",
+    "bytes": 57724
+  },
+  "hnn-reframed-ranged-capacity-20261006-v1.lease-identity.json": {
+    "sha256": "51cecd584816bdb213301593febc376ba8e86c46d2755be49eb8d5650056a0fb",
+    "bytes": 565
+  },
+  "hnn-reframed-ranged-capacity-20261006-v1.memory-gate.json": {
+    "sha256": "c9ff5b41d5134d440aea4044bf558451815322ec0f0c2a0f567ec795e60bb385",
+    "bytes": 120
+  },
+  "hnn-reframed-ranged-capacity-20261006-v1.output_seal.json": {
+    "sha256": "3ccaf014e9b8b35c50e007a68f684a148de53b48e77e9e1721e9b30d8ec400cc",
+    "bytes": 34372
+  },
+  "hnn-reframed-ranged-capacity-20261006-v1.publication.json": {
+    "sha256": "478a94e39e52d59b059560ab01ffb5ae302588c73e36c9d97ccc05cf44af8d60",
+    "bytes": 2684
+  },
+  "hnn-reframed-ranged-capacity-20261006-v1.quiescence.json": {
+    "sha256": "263aac66c8a09cb0f34d9bff89607f083843ac024e643e8f8fd2e085696728f4",
+    "bytes": 130
+  },
+  "hnn-reframed-ranged-capacity-20261006-v1.release.json": {
+    "sha256": "6ec7149b7a2fe870f85795f97a3d66073ffca5fcfd27d973050238e1ce1508f8",
+    "bytes": 175
+  },
+  "hnn-reframed-ranged-capacity-20261006-v1.stage-quiescence.json": {
+    "sha256": "aa7191fca44901d8f65f7cb1f97648cd5129b1b5984eca163d94b05b91fa26f9",
+    "bytes": 136
+  },
+  "hnn-reframed-ranged-capacity-20261006-v1.stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "hnn-reframed-ranged-capacity-20261006-v1.stdout": {
+    "sha256": "921a1c5a177aa85b2353c10229dc9bac121fca11ba376278d7212d29a6f187eb",
+    "bytes": 1186
+  },
+  "hnn-reframed-ranged-capacity-20261006-v1.system-floor.json": {
+    "sha256": "65b157f2ad73a99d2f6db851d510039e306dfa8e5c7b613379bbe3bd12680b01",
+    "bytes": 3923
+  },
+  "hnn-reframed-ranged-capacity-20261006-v1.unit-cleanup.json": {
+    "sha256": "9326ed7d1b9289c1d00ed634fb3793bec0b10bb47497992695d89f6ff6500ee2",
+    "bytes": 707
+  },
+  "hnn-reframed-source-entrance-20261006-v1.acceptance.json": {
+    "sha256": "5e3787c411ab10f20c1dc46a7c62756a17e3d1e71baed652d7579ac05ffb37a3",
+    "bytes": 378
+  },
+  "hnn-reframed-source-entrance-20261006-v1.child-identity.json": {
+    "sha256": "0f515135d2bc7ee1f92d8498767331a6a9a6730746ca3a4afefb9596d6f0ebe9",
+    "bytes": 78
+  },
+  "hnn-reframed-source-entrance-20261006-v1.config.json": {
+    "sha256": "e7b1d3a22c79fa41d99a8ce350376f5f49b077a35a077f96c5e40c8920f6542a",
+    "bytes": 61705
+  },
+  "hnn-reframed-source-entrance-20261006-v1.external-lease.json": {
+    "sha256": "4203d62c083a3e26f617a40188a21226c623f1388f8db592524ea1dc7949e887",
+    "bytes": 487
+  },
+  "hnn-reframed-source-entrance-20261006-v1.final.json": {
+    "sha256": "1ccaf394e57e1ba08555f0ab25cd58d093a50f6675fc6874ea6491dd13c93c92",
+    "bytes": 4773
+  },
+  "hnn-reframed-source-entrance-20261006-v1.input_seal.json": {
+    "sha256": "38574928fbb54755bcfffba61768dce9877f8f2ab8136a4d3fb543e89a0e15de",
+    "bytes": 57724
+  },
+  "hnn-reframed-source-entrance-20261006-v1.lease-identity.json": {
+    "sha256": "6d6568f209b8294fce0d995e23983a1652f7e5261589ff7654c5fa8620eef81e",
+    "bytes": 565
+  },
+  "hnn-reframed-source-entrance-20261006-v1.memory-gate.json": {
+    "sha256": "c975acd16bde5138273e5a52c12c8cbb23e252769fb0124d9b11707759563fc3",
+    "bytes": 120
+  },
+  "hnn-reframed-source-entrance-20261006-v1.output_seal.json": {
+    "sha256": "c5973894f106de0cb20a5066b776a1e39bd979dea90bd77bb3a5881d90a87bdb",
+    "bytes": 124750
+  },
+  "hnn-reframed-source-entrance-20261006-v1.publication.json": {
+    "sha256": "7bade3b82f54508555290b6b33bcdff7c4cfb03538458e2df3ee04c42e1a0d28",
+    "bytes": 2688
+  },
+  "hnn-reframed-source-entrance-20261006-v1.quiescence.json": {
+    "sha256": "ff33fbebd14f047f20dd9f8b5d6f97db093d9f02ab1760f9a69f6c6e2882d93a",
+    "bytes": 130
+  },
+  "hnn-reframed-source-entrance-20261006-v1.release.json": {
+    "sha256": "821dadbacc217eafd6e6c3bccc6b1e96e586217189b35c575e4ea8967f734b2d",
+    "bytes": 175
+  },
+  "hnn-reframed-source-entrance-20261006-v1.stage-quiescence.json": {
+    "sha256": "a0964be468660f4b8ce0bea49dc6ff7001efe44ee04cf73780204d5712a79e85",
+    "bytes": 136
+  },
+  "hnn-reframed-source-entrance-20261006-v1.stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "hnn-reframed-source-entrance-20261006-v1.stdout": {
+    "sha256": "d7ffe681392107618ce1bf6403f1c11c3567205b957ffee8b298d2470003260f",
+    "bytes": 955
+  },
+  "hnn-reframed-source-entrance-20261006-v1.system-floor.json": {
+    "sha256": "0b096bc3d9f71b84de062ae1d508cebc3aab1d95e16b33818d0f31bf94b763b4",
+    "bytes": 14208
+  },
+  "hnn-reframed-source-entrance-20261006-v1.unit-cleanup.json": {
+    "sha256": "663e1293f20fc15b22b1018716d9c0cc1d8073541d2b524b8159754950e461d8",
+    "bytes": 707
+  },
+  "leased_stage_v2.py": {
+    "sha256": "bcf91456534e763a025613f39e82853d7a58529b399bb183d544d09a7a42f949",
+    "bytes": 5520
+  },
+  "native-binaries.seal.v1.json": {
+    "sha256": "cb16cf07bcf071c3c88058f7a68df12872130b0395add43f485395e64a5cbd3b",
+    "bytes": 2059
+  },
+  "runtime-plans.v1.json": {
+    "sha256": "1b86745bfc45fedcbeb5b46ac032af5c1564d8dc860ce7e99346f56367eea2f5",
+    "bytes": 2125
+  }
+}

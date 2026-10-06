@@ -1,0 +1,54 @@
+{
+  "lease_still_held": true,
+  "own_group_other_PIDs": [],
+  "outcome": {
+    "provisional_passed": true,
+    "final_acceptance_requires_external_CPU_read": true,
+    "label": "hnn-reframed-cuda-capacity-refusal-20261006-v1",
+    "wall_ns": 3657703123,
+    "peak_child_RSS_KiB": 252908,
+    "group_memory_peak_bytes": 216109056,
+    "original_coordinates_modified": false,
+    "aggregate_cpu_final_us": 3815157,
+    "aggregate_cpu_limit_us": 17000000,
+    "CPU_kernel_hard_total_limit": false
+  },
+  "outputs": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-cuda-capacity-refusal-20261006-v1.lease-identity.json": {
+      "sha256": "569981c4a773b6dac06f5b2cf25983c1e05293f7e2c776ffb5373b6b20a7fb37",
+      "bytes": 565
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-cuda-capacity-refusal-20261006-v1.memory-gate.json": {
+      "sha256": "d8acd08301024f1789b32a7e8ddd03af3715b6a3f75a7ca2071b7a530453a6c3",
+      "bytes": 120
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-cuda-capacity-refusal-20261006-v1.child-identity.json": {
+      "sha256": "2a8552637c519a950f2c776f202a81d6a36197024377a58f9f61ba35321a4a42",
+      "bytes": 78
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-cuda-capacity-refusal-20261006-v1.system-floor.json": {
+      "sha256": "e24d35c36e97864443c60109210841bff0bef61c5539e60428dcba679767ccfe",
+      "bytes": 28407
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-cuda-capacity-refusal-20261006-v1.quiescence.json": {
+      "sha256": "d5f6dda4f38647318b044b55641672e7c7317019223737aab3d9e4291f1b6ab3",
+      "bytes": 130
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-cuda-capacity-refusal-20261006-v1.input_seal.json": {
+      "sha256": "92e02b4b3607b3cd4cc100e2d680565cb0e238344febdab7f51fdb38f335b2cb",
+      "bytes": 58076
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-cuda-capacity-refusal-20261006-v1.output_seal.json": {
+      "sha256": "46fd8aca311714ae44ef95f29a518c99261e791a3e74c2b06f6b4daa4cd26899",
+      "bytes": 249344
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-cuda-capacity-refusal-20261006-v1.stdout": {
+      "sha256": "c57675f6d52bce998a2878ba05e0a2d567ad39e54ec168bcaf37446166f1f1fe",
+      "bytes": 197
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-cuda-capacity-refusal-20261006-v1.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  }
+}

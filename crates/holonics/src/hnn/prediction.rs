@@ -203,6 +203,39 @@
 //! `t − δ`, `ρ(F^K(I_h)) = T(request)`. A material with no closed contact (every opening) is read
 //! by the span's law above, unchanged.
 //!
+//! [definition; agent-inferred, October 5; lane C of U6, "The task is repair, not continuation", the
+//! [record](../../../../research/records/2026-10-05_THE_PHYSICAL_REPAIR_RUNS_THE_DAMAGED_SECTION_THROUGH_THE_FIELD_AND_HOLDS_WHAT_NO_CERTIFIED_DOMAIN_DECIDES.md)]
+//! **The physical repair** ([`repair_by_field`]). A damaged section is repaired by the field's own
+//! motion, not by a routine that knows the key:
+//!
+//! - **inputs**: the admitted encoded intact runs at their declared stations ([`DamagedSection`]),
+//!   the contemporary material (`&dyn FieldMaterial`) and lift, the word's opening and the declared
+//!   receiving section ([`ReceivingPhases`]). No erased class, reference family or truth enters;
+//! - **admission**: every intact run has one complete producing chart, retained without cells even
+//!   when every station is erased. The supported chart is the identity `D = I_A`, with exactly the
+//!   field's classes. Each source advances once at every station, with no incoming selective carry;
+//!   a located conduct without a certified sparse clock is refused before the word opens;
+//! - **the source**: one sparse moment on that certified station chart, station `j` at `τ_g + 1 + j`, the
+//!   erasures unplaced ([`SourceMoment::continued`]), never the intact cells ingested alone, which
+//!   would compress the clock over the erasures; imposed once at the opening,
+//!   `E_after − E_before = imposed − absorbed` ([`Word::open_exact_received`]);
+//! - **the motion**: the one continuing word through the declared crossings ([`Word::forward`]);
+//!   station `j` is bound to the receiver's phase `j`, the local crossing `e_0 + j` at the
+//!   refinement's tick `opened_at + e_0 + j`, certified by the carried end's tick
+//!   ([`Word::reception_end`]);
+//! - **the read**: `R · P_R^(τ_R) v_R(e)` at the receiver's grain ([`ReceivingPhases::read`]), the
+//!   decoder `R` being the field's material (guard 18 excludes the tree and the population);
+//! - **the release**: a station is released only where the domain of the word's coupled drive,
+//!   projected through the same executed anchor map and decoder, admits one class; otherwise held
+//!   with that projection as its fibre. No owner certifies that domain yet (#62): a point reading
+//!   ([`StationRead::leaders`]), a local tangent rank or a frozen-drive component domain is not it,
+//!   so every erased station is held, unresolved, with the encoding's classes;
+//! - **the receipts**: the opening's work, every executed tick's field balance, the word's balance
+//!   and its carried end; the word is dropped once read.
+//!
+//! It never reads `compression::keys::repair`'s answers or [`generate_by_bank`]; the reference
+//! repair is the grader's, read after the release.
+//!
 //! | Law | Lean | Rust |
 //! |---|---|---|
 //! | the joint section is not the product of its marginals | `HNN/Prediction.joint_not_marginals` (and `Computation/JointReceiverWitness`) | [`bank_release`] reads every station from one placement |
@@ -214,13 +247,19 @@
 //! | the release's order read as a diagnostic factor (the law is [`LockOrder::Gap`]) | abstracted in `HNN/ExecutedComparison.decisions_release_the_section` | [`LockOrder`], [`bank_release_ordered`] |
 //! | the lock set: every station the readings do not certify below the largest gap | `HNN/ExecutedComparison.{certifiedLock_largest, leader_locks, lone_lock_is_largest, certified_order_needs_crossing, certifiedLock_exact}` | [`uncertified_largest`] |
 //! | the closed pair contacts, the pair storage and the gain on equal material | owed in #62 (lane C's record §8; the joint gain's record §8); the full work form's chart transport `Geometry/Motion.finite_work_form_rechart` | [`closed_pairs`], [`BankPlacement::pair_storage`], [`gain`] |
+//! | the physical repair: the sparse source imposed once, the one word through the declared crossings, the decoder's read, release only over a certified domain | `HNN/ChainedBalance.{power_split, opening_one_baseline}`, `Foundation/ReceiverRelease.{width_eq_zero_iff, ReleaseLaw.sound}`; the coupled drive's domain and the decoder's coverage owed in #62 | [`repair_by_field`], [`DamagedSection`] |
 
 use num_bigint::BigInt;
 use num_traits::{One, Signed, ToPrimitive, Zero};
 
 use crate::hnn::HnnError;
+use crate::hnn::encoding::Encoded;
 use crate::hnn::field::{Current, Field, FieldMaterial};
 use crate::hnn::moment::{PopulationChart, SourceMoment};
+use crate::hnn::receiving::{ReceivingPhases, ReceivingRead};
+use crate::hnn::word::{
+    FieldBalance, ReceptionCarry, SourceOpeningReceipt, Word, WordBalance, WordOpening,
+};
 use crate::hnn::ring::{Growth, ReceivingBank, TurnCovector, TurnReading, turn};
 use crate::holarchy::terrain::Draw;
 use crate::ratio::Rat;
@@ -1485,4 +1524,645 @@ pub fn closed_pairs(
         }
     }
     Ok(closed)
+}
+
+// -------------------------------------------------------------------------------------------
+// the physical repair
+
+/// [definition; agent-inferred, October 5; lane C's physical repair, module header "The physical
+/// repair"] **A damaged section as the field reads it**: the admitted encoded intact runs, each at
+/// its declared station (its first cell's placement on the section's clock), over a declared
+/// section of `length` stations and one complete producing chart. An erased station holds nothing: no
+/// class, no clock step and no count. The section holds no erased class, so no truth of an erased
+/// cell can reach the forward consumer ([`repair_by_field`]), and the reference repair's families
+/// stay outside it (the grader's).
+#[derive(Clone, Debug, PartialEq)]
+pub struct DamagedSection {
+    length: usize,
+    /// The producing chart only: an empty part retains its decoder, labels, fibre and conduct,
+    /// and no occurrence, including when the damage erased every station.
+    chart: Encoded,
+    runs: Vec<(usize, Encoded)>,
+}
+
+impl DamagedSection {
+    /// **The damage**: an encoded passage with its erased cells dropped, cut into its intact runs
+    /// (`Encoded::part`, each keeping the encoding that produced it). It is the transition that
+    /// drops the erased cells, so their classes leave with it. Refused with an erasure past the
+    /// passage.
+    pub fn damage(encoded: &Encoded, erased: &[usize]) -> Result<Self, HnnError> {
+        let length = encoded.len();
+        if let Some(&t) = erased.iter().find(|&&t| t >= length) {
+            return Err(HnnError::Shape {
+                what: "an erasure within the passage",
+                expected: length,
+                found: t,
+            });
+        }
+        let mut runs = Vec::new();
+        let mut t = 0;
+        while t < length {
+            if erased.contains(&t) {
+                t += 1;
+                continue;
+            }
+            let start = t;
+            while t < length && !erased.contains(&t) {
+                t += 1;
+            }
+            runs.push((start, encoded.part(start..t)?));
+        }
+        Self::of_runs(length, encoded, runs)
+    }
+
+    /// **Intact runs at declared stations** over a section of `length` stations in the producing
+    /// `chart`: refused when a run is empty, overlaps another, lies past the section, or has another
+    /// producing chart. [agent-inferred] Comparing empty parts compares all chart operands, including
+    /// `D`, labels and conduct, without comparing or retaining occurrences. Equal class counts alone
+    /// do not supply the join. The `chart` operand's cells are dropped, never read.
+    pub fn of_runs(
+        length: usize,
+        chart: &Encoded,
+        mut runs: Vec<(usize, Encoded)>,
+    ) -> Result<Self, HnnError> {
+        let chart = chart.part(0..0)?;
+        runs.sort_by_key(|(start, _)| *start);
+        let mut end = 0;
+        for (start, run) in &runs {
+            let next = start.checked_add(run.len()).ok_or(HnnError::Unadmitted {
+                reason: "an intact run's end is outside the station carrier",
+            })?;
+            if run.is_empty() || *start < end || next > length {
+                return Err(HnnError::Shape {
+                    what: "intact runs, nonempty and disjoint, within the section",
+                    expected: length,
+                    found: next,
+                });
+            }
+            if run.part(0..0)? != chart {
+                return Err(HnnError::Unadmitted {
+                    reason: "intact runs do not share the section's complete producing chart",
+                });
+            }
+            end = next;
+        }
+        Ok(Self {
+            length,
+            chart,
+            runs,
+        })
+    }
+
+    /// The declared stations `L`.
+    pub fn length(&self) -> usize {
+        self.length
+    }
+
+    /// The encoding's classes.
+    pub fn classes(&self) -> usize {
+        self.chart.classes()
+    }
+
+    /// **The complete producing chart**, with no occurrences. It survives total erasure, so
+    /// neither the class domain nor the source/decoder/clock contract is guessed from intact data.
+    pub fn chart(&self) -> &Encoded {
+        &self.chart
+    }
+
+    /// The intact runs, each at its first station.
+    pub fn runs(&self) -> &[(usize, Encoded)] {
+        &self.runs
+    }
+
+    /// **The declared chart**: each intact station's class, `None` at each erasure.
+    pub fn placed(&self) -> Vec<Option<usize>> {
+        let mut cells = vec![None; self.length];
+        for (start, run) in &self.runs {
+            for (k, class) in run.classes_read().enumerate() {
+                cells[start + k] = Some(class);
+            }
+        }
+        cells
+    }
+
+    /// The erased stations, in order.
+    pub fn erased(&self) -> Vec<usize> {
+        self.placed()
+            .iter()
+            .enumerate()
+            .filter_map(|(t, cell)| cell.is_none().then_some(t))
+            .collect()
+    }
+
+    /// [definition; agent-inferred] **The supported source/decoder square at the consumer.**
+    /// `D = I_A`, `lambda(c) = c`; the physical source map consumes these same classes and `R`
+    /// returns their complex readings. The identity's selective source clock agrees with
+    /// `tau_g + 1 + j` only when every class fits its source and no predecessor can advance, hence
+    /// no predecessor can deliver a carry. Erased classes then leave time declared but inject
+    /// nothing. Located advances, even on an intact section, cannot be replaced by this square.
+    /// A sparse located-clock fibre and its projection through the producing `D` remain owed.
+    /// All admission runs before `SourceMoment::continued` and the physical word's opening.
+    fn admit(&self, field: &Field, material: &dyn FieldMaterial, phases: &ReceivingPhases) -> Result<(), HnnError> {
+        field.admit(&self.chart)?;
+        if self.chart.located().is_some() {
+            return Err(HnnError::Unadmitted {
+                reason: "the located conduct has no certified sparse station-clock chart",
+            });
+        }
+        if self.classes() != field.alphabet()
+            || !self.chart.fibre().is_empty()
+            || self.chart.decoder() != &crate::ratio::linear::ExactRatMatrix::identity(self.classes())?
+            || self.runs.iter().any(|(_, run)| run.cells().iter().any(|&cell| run.label(cell) != Some(cell.class())))
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "the physical source and receiver do not share the producing identity decoder's classes",
+            });
+        }
+        for &source in field.sources() {
+            if (0..self.classes()).any(|class| !field.ring(source).fits(field.ring(source).port(class)))
+                || (0..source).any(|ring| (0..self.classes()).any(|class| field.ring(ring).fits(field.ring(ring).port(class))))
+            {
+                return Err(HnnError::Unadmitted {
+                    reason: "the identity conduct does not certify one source tick per declared station",
+                });
+            }
+            let map = material.source_port(source).ok_or(HnnError::Unadmitted {
+                reason: "the station chart has no physical source map",
+            })?;
+            if map.columns() != self.classes() || map.rows() != field.ring(source).width() {
+                return Err(HnnError::Unadmitted {
+                    reason: "the physical source map does not consume the producing chart's classes",
+                });
+            }
+        }
+        let ring = phases.ring();
+        let map = material.receiving_map(ring).ok_or(HnnError::MissingReceivingMap { ring })?;
+        if map.rows() != 2 * self.classes() || map.columns() != field.ring(ring).width() {
+            return Err(HnnError::Unadmitted {
+                reason: "the physical receiving map does not return the producing chart's complex classes",
+            });
+        }
+        Ok(())
+    }
+}
+
+/// [definition; agent-inferred, October 5] **One station's read at its bound crossing**: the
+/// station `j`, the local crossing that reads it (`e = e_0 + j`, the receiver's phase `j`:
+/// `hnn::receiving`, "The receiver reads the passage by epochs"), the refinement clock's tick there
+/// (`opened_at + e`), and the read `R · P_R^(τ_R) v_R(e)` at the receiver's grain
+/// ([`ReceivingPhases::read`]).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct StationRead {
+    pub station: usize,
+    pub crossing: usize,
+    pub tick: usize,
+    pub read: ReceivingRead,
+}
+
+impl StationRead {
+    /// **The point reading's leading classes at the grain**: the classes whose grain cell
+    /// `(carry, phase class)` is the largest. A reading of one executed state, never a fibre: a
+    /// point reading does not certify the domain of the coupled drive, so no release reads it.
+    pub fn leaders(&self) -> Vec<usize> {
+        let cells = &self.read.cells;
+        let Some(top) = cells.iter().map(|cell| (&cell.carry, cell.phase)).max() else {
+            return Vec::new();
+        };
+        cells
+            .iter()
+            .enumerate()
+            .filter(|(_, cell)| (&cell.carry, cell.phase) == top)
+            .map(|(class, _)| class)
+            .collect()
+    }
+}
+
+/// [definition] **Why an erased station is held.**
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Unresolved {
+    /// No crossing of the declared receiving section reads the station.
+    Unread,
+    /// A crossing reads it, but no owner certifies the domain of the word's coupled drive that the
+    /// decoder would project (#62), so the domain is the whole state space.
+    UncertifiedDomain,
+}
+
+/// [definition] **One station after the physical repair**: intact as admitted, released at width
+/// zero, or held with its fibre and the reason it is unresolved.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum RepairedCell {
+    Intact(usize),
+    Released(usize),
+    Held {
+        fibre: Vec<usize>,
+        unresolved: Unresolved,
+    },
+}
+
+impl RepairedCell {
+    /// The station's class, when it has one.
+    pub fn class(&self) -> Option<usize> {
+        match self {
+            Self::Intact(class) | Self::Released(class) => Some(*class),
+            Self::Held { .. } => None,
+        }
+    }
+}
+
+/// [definition] **The physical repair's return**: each station's cell, each bound station's read,
+/// the source opening's work receipt, every executed full tick's field balance, the word's balance
+/// and the carried end at its last crossing ([`Word::reception_end`]). The word itself, its
+/// per-tick passage and its waves, is dropped inside [`repair_by_field`] once read.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PhysicalRepair {
+    pub cells: Vec<RepairedCell>,
+    pub reads: Vec<StationRead>,
+    pub opening: SourceOpeningReceipt,
+    pub balances: Vec<FieldBalance>,
+    pub word: WordBalance,
+    pub carry: ReceptionCarry,
+}
+
+/// **Repair a damaged section by the field's own motion** (module header, "The physical repair"):
+/// the admitted intact runs placed on the declared chart as one sparse source moment, imposed once
+/// at the word's opening ([`Word::open_exact_received`]), the one continuing word run through the
+/// declared receiver's crossings ([`Word::forward`]), each bound station read through the field's
+/// decoder at its grain ([`ReceivingPhases::read`], material alone), and each erased station
+/// decided by `receiver::release` at tolerance zero over the classes its domain's projection
+/// admits. Refused when a run is not admitted (`Field::admit`), when the opening's work does not
+/// close, or when the executed crossings are not the declared section's clock. Producing charts,
+/// the identity station clock and both physical maps are admitted before the word opens.
+pub fn repair_by_field(
+    field: &Field,
+    material: &dyn FieldMaterial,
+    current: &Current,
+    section: &DamagedSection,
+    opening: &WordOpening,
+    phases: &ReceivingPhases,
+) -> Result<PhysicalRepair, HnnError> {
+    physical_forward(field, material, current, section, opening, phases)
+        .map(|(prediction, _word, _source)| prediction)
+}
+
+/// The one physical forward law, shared by a blind repair and a blind reception awaiting its
+/// observed comparison. Only the latter retains the transient Word and source moment until the
+/// paired return consumes them; neither path receives a target.
+fn physical_forward<'f>(
+    field: &'f Field,
+    material: &dyn FieldMaterial,
+    current: &Current,
+    section: &DamagedSection,
+    opening: &WordOpening,
+    phases: &ReceivingPhases,
+) -> Result<(PhysicalRepair, Word<'f>, SourceMoment), HnnError> {
+    section.admit(field, material, phases)?;
+    // The admitted identity's conduct certifies station j at τ_g + 1 + j on each source ring.
+    let placed = section.placed();
+    let mut source = SourceMoment::open_with(field, current, material)?;
+    for &ring in field.sources() {
+        source = source.continued(field, current, ring, &placed)?;
+    }
+    // One accounted imposition, then the one continuing word through the declared crossings.
+    let (mut word, opening_receipt) =
+        Word::open_exact_received(field, material, current, &source, opening)?;
+    let anchors = word.forward(phases)?;
+    let balances = word.field_balances().to_vec();
+    let carry = word.reception_end()?;
+    let balance = WordBalance::of(&word.released()?);
+    let opened_at = word.opened_at();
+    // The clock certificate: the carried end stands at the last declared crossing's tick and the
+    // word's own hop clock, which counts the crossings scattered, one past it, so crossing e is
+    // the refinement's tick opened_at + e (the placement alone certifies no clock).
+    let last = opened_at + phases.last_epoch();
+    if carry.ticks != last
+        || word.clock().ticks() != num_bigint::BigUint::from(last + 1)
+        || anchors.len() != phases.aperture()
+    {
+        return Err(HnnError::ContinuingState {
+            what: "the executed crossings are not the declared receiving section's clock",
+        });
+    }
+    let first = phases.first_epoch();
+    let reads = anchors
+        .iter()
+        .take(section.length)
+        .enumerate()
+        .map(|(station, anchor)| {
+            Ok(StationRead {
+                station,
+                crossing: first + station,
+                tick: opened_at + first + station,
+                read: phases.read(field, material, current, anchor)?,
+            })
+        })
+        .collect::<Result<Vec<_>, HnnError>>()?;
+    let admitted = domain_classes(section);
+    let cells = placed
+        .iter()
+        .enumerate()
+        .map(|(t, cell)| match cell {
+            Some(class) => Ok(RepairedCell::Intact(*class)),
+            None => decide_station(
+                t,
+                &admitted,
+                if t < reads.len() {
+                    Unresolved::UncertifiedDomain
+                } else {
+                    Unresolved::Unread
+                },
+            ),
+        })
+        .collect::<Result<Vec<_>, HnnError>>()?;
+    Ok((
+        PhysicalRepair {
+            cells,
+            reads,
+            opening: opening_receipt,
+            balances,
+            word: balance,
+            carry,
+        },
+        word,
+        source,
+    ))
+}
+
+/// [definition] A participating reception awaiting one observed comparison: its blind receipt,
+/// current frame, producing chart and transient native Word/source moment. It is consumed by
+/// `observe` or `finish`, never cloned or retained as an occurrence archive. An observed target
+/// cannot enter its forward constructor.
+pub struct PhysicalPrediction<'f, 'm> {
+    field: &'f Field,
+    material: &'m crate::hnn::constitution::Constitution,
+    current: Current,
+    phases: ReceivingPhases,
+    chart: Encoded,
+    opening_support: Vec<usize>,
+    source: SourceMoment,
+    word: Word<'f>,
+    prediction: PhysicalRepair,
+}
+
+/// Blind physical reception with the paired return still available. `repair_by_field` executes
+/// the same law and drops that return; this constructor keeps it only until the immediate
+/// comparison or `finish`. No reference family, observation or expected output is an input.
+pub fn predict_by_field<'f, 'm>(
+    field: &'f Field,
+    material: &'m crate::hnn::constitution::Constitution,
+    current: &Current,
+    section: &DamagedSection,
+    opening: &WordOpening,
+    phases: &ReceivingPhases,
+) -> Result<PhysicalPrediction<'f, 'm>, HnnError> {
+    let (prediction, word, source) =
+        physical_forward(field, material, current, section, opening, phases)?;
+    Ok(PhysicalPrediction {
+        field,
+        material,
+        current: current.clone(),
+        phases: phases.clone(),
+        chart: section.chart.clone(),
+        opening_support: opening.support(field),
+        source,
+        word,
+        prediction,
+    })
+}
+
+/// The observed comparison and its actual publication: the blind receipt remains the produced
+/// reading. The successor is the normal law's certified deposit, not a replacement decoder.
+#[derive(Debug)]
+pub struct PhysicalTeaching {
+    pub prediction: PhysicalRepair,
+    pub ratio: crate::hnn::ratio::HolonRatio,
+    pub pullback: crate::hnn::port::Pullback,
+    pub constitution: crate::hnn::constitution::Constitution,
+    pub publication: crate::hnn::constitution::DepositReading,
+}
+
+/// A comparison refusal preserves the physical motion already reached, including the carry.
+/// The unconsumed transient Word is dropped; no stale operands are held for replay.
+#[derive(Debug)]
+pub struct PhysicalTeachingRefusal {
+    pub prediction: PhysicalRepair,
+    pub error: HnnError,
+}
+
+impl PhysicalPrediction<'_, '_> {
+    /// Read the whole blind output before any teaching observation is admitted.
+    pub fn prediction(&self) -> &PhysicalRepair {
+        &self.prediction
+    }
+
+    /// Finish without an observation, dropping the transient paired return.
+    pub fn finish(self) -> PhysicalRepair {
+        self.prediction
+    }
+
+    /// [definition; agent-inferred] An explicit observation after blind prediction, on a declared
+    /// station partition. The supported comparison reads the whole section at its source/receiving
+    /// ring; its identity conduct was certified by forward admission, so `target_phases` reads
+    /// the same station clock. The target's producing chart must equal the source's.
+    ///
+    /// The ratio's covector passes through this Word's original operands and phase frame.
+    /// `reference::compose_return` forms the reached normal samples (including R's actual rotated
+    /// anchors and q-p). Only its reached receiving samples at compared stations are deposited;
+    /// `Constitution::deposited` publishes their certified successor. Trees,
+    /// a codec grader and a handcrafted decoder never enter it. A changed material refuses and
+    /// requires a new contemporary forward reading; the old Word is never replayed.
+    pub fn observe(
+        self,
+        contemporary: &crate::hnn::constitution::Constitution,
+        observed: &Encoded,
+        compared: &[bool],
+    ) -> Result<PhysicalTeaching, PhysicalTeachingRefusal> {
+        use crate::hnn::constitution::{LinearLocus, Locus, Reach};
+        use crate::hnn::port::Deposit;
+        use crate::hnn::ratio::{Faces, HolonRatio, target_phases};
+        use crate::hnn::retention::Diamond;
+        let Self {
+            field,
+            material,
+            current,
+            phases,
+            chart,
+            opening_support,
+            source,
+            word,
+            prediction,
+        } = self;
+        let joined = (|| -> Result<_, HnnError> {
+            if contemporary.commit() != material.commit() {
+                return Err(HnnError::StaleDeposit {
+                    staged: material.commit(),
+                    published: contemporary.commit(),
+                });
+            }
+            if contemporary != material {
+                return Err(HnnError::Unadmitted {
+                    reason: "the physical comparison's producing material changed without its commit",
+                });
+            }
+            if observed.part(0..0)? != chart {
+                return Err(HnnError::Unadmitted {
+                    reason: "the observation does not share the physical source's complete producing chart",
+                });
+            }
+            if prediction.cells.len() != phases.aperture()
+                || observed.len() != phases.aperture()
+                || compared.len() != phases.aperture()
+            {
+                return Err(HnnError::Unadmitted {
+                    reason: "the observation partition is not the whole declared physical section",
+                });
+            }
+            if !field.is_source(phases.ring()) || phases.first_epoch() != 0 {
+                return Err(HnnError::Unadmitted {
+                    reason: "the observation's receiving clock has no certified source station square",
+                });
+            }
+            if !compared.iter().any(|&crossed| crossed) {
+                return Err(HnnError::Unadmitted {
+                    reason: "no observation crosses the declared comparison partition",
+                });
+            }
+            let reads: Vec<_> = prediction
+                .reads
+                .iter()
+                .map(|station| station.read.clone())
+                .collect();
+            let targets: Vec<_> = observed.classes_read().collect();
+            let ratio = HolonRatio::compare_partition(
+                Faces::of_reads(&reads, phases.grain())?,
+                &targets,
+                &target_phases(field, current.lift(), phases.ring(), observed)?,
+                compared,
+            )?;
+            let map =
+                material
+                    .receiving_map(phases.ring())
+                    .ok_or(HnnError::MissingReceivingMap {
+                        ring: phases.ring(),
+                    })?;
+            let back = word.pull_back(
+                &ratio.covector()?,
+                map,
+                &current.lift()[phases.ring()],
+                &phases,
+            )?;
+            let diamond = Diamond::opened(field, &phases, &opening_support);
+            let composed = crate::hnn::reference::compose_return(
+                field,
+                material,
+                &diamond,
+                current.lift(),
+                &current,
+                &source,
+                &back,
+            )?;
+            let receiving = Locus::ReceivingMap(phases.ring());
+            if !composed.reached.contains(&receiving) {
+                return Err(HnnError::Unadmitted {
+                    reason: "the physical observation reaches no retained receiving relation",
+                });
+            }
+            // Unobserved phases have zero pullback; they must also leave no comparison statistic
+            // in R's normal law. Its samples are the existing compose consumer's actual anchors.
+            let mut linear: Vec<_> = composed
+                .linear
+                .into_iter()
+                .filter(|step| step.locus == LinearLocus::Receiving(phases.ring()))
+                .collect();
+            for step in &mut linear {
+                if step.samples.len() != compared.len() {
+                    return Err(HnnError::Shape {
+                        what: "the reached receiving samples against the observation partition",
+                        expected: compared.len(),
+                        found: step.samples.len(),
+                    });
+                }
+                step.samples = std::mem::take(&mut step.samples)
+                    .into_iter()
+                    .zip(compared)
+                    .filter_map(|(sample, &crossed)| crossed.then_some(sample))
+                    .collect();
+            }
+            let reach = Reach {
+                receiver: phases.ring(),
+                stations: phases
+                    .epochs()
+                    .zip(compared)
+                    .filter_map(|(tick, &crossed)| crossed.then_some(tick as u64))
+                    .collect(),
+                entries: vec![0],
+                phases: composed.phases,
+                loci: std::collections::BTreeSet::from([receiving]),
+            };
+            let deposit = Deposit::new(material.commit(), linear, Vec::new(), vec![receiving])
+                .with_reach(reach);
+            let (constitution, publication) = contemporary.deposited(&deposit)?;
+            Ok((ratio, composed.pullback, constitution, publication))
+        })();
+        match joined {
+            Ok((ratio, pullback, constitution, publication)) => Ok(PhysicalTeaching {
+                prediction,
+                ratio,
+                pullback,
+                constitution,
+                publication,
+            }),
+            Err(error) => Err(PhysicalTeachingRefusal { prediction, error }),
+        }
+    }
+}
+
+/// [definition; agent-inferred, October 5] **The classes an erased station's domain projects
+/// to**: a release needs the domain of the word's coupled drive, certified, projected through the
+/// executed anchor map and the decoder. No owner certifies that domain: a component domain under a
+/// frozen drive (`holon::parametron::DomainProposal`) is not the word's state-dependent drive, a
+/// local tangent rank is not a domain, and a point reading is one state. Uncertified, the domain is
+/// the whole state space, whose projection lies within every class of the encoding, so the fibre is
+/// the encoding's classes. (`PeriodicLock::phase_class` is a pump phase index, not a class.)
+fn domain_classes(section: &DamagedSection) -> Vec<usize> {
+    (0..section.classes()).collect()
+}
+
+/// **The one decision on an erased station**: its class reading over the domain has width zero
+/// exactly when the domain projects to one class, decided by `receiver::release` at tolerance
+/// zero: released, or held with the projected classes as its fibre.
+fn decide_station(
+    station: usize,
+    admitted: &[usize],
+    unresolved: Unresolved,
+) -> Result<RepairedCell, HnnError> {
+    let rule = DecisionRule::new(
+        "the physical repair's commit at tolerance zero",
+        WithinTolerance::Release,
+        BeyondTolerance::Hold,
+    );
+    let (diameter, attaining, read) = if admitted.len() == 1 {
+        (Rat::zero(), WidthWitness::Point, 1)
+    } else {
+        (
+            Rat::one(),
+            WidthWitness::Pair { left: 0, right: 1 },
+            admitted.len().max(2),
+        )
+    };
+    let width = ReceiverWidth::declared(
+        format!("the physically repaired station {station}"),
+        "the station's class over the projection of its word's domain through the decoder",
+        DiameterNorm::Supremum,
+        diameter,
+        attaining,
+        read,
+    )?;
+    let options = LawfulOptions::assemble(&width, Rat::zero(), None, true)?;
+    Ok(match release(&rule, &options)? {
+        ReleaseReturn::Released { .. } => RepairedCell::Released(admitted[0]),
+        _ => RepairedCell::Held {
+            fibre: admitted.to_vec(),
+            unresolved,
+        },
+    })
 }

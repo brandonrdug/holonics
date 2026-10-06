@@ -1840,7 +1840,11 @@ fn the_card_port_returns_the_reference_through_a_releasing_collapse() {
 /// order on the quarter turns, chained on their common nodes, source ring 2 holding the five
 /// classes, `Δ = {1, 3}`, receiver ring 2 with aperture 5.
 fn helix_field() -> Field {
-    let mut declaration = chain_declaration(1 << 16);
+    helix_field_at(1 << 16)
+}
+
+fn helix_field_at(population: u64) -> Field {
+    let mut declaration = chain_declaration(population);
     declaration.rings = [2u64, 3, 5].into_iter().map(|d| ring(d, vec![0])).collect();
     declaration.contacts = vec![contact(0, 1, 2, 0), contact(1, 2, 3, 0)];
     declaration.sources = vec![2];
@@ -1848,6 +1852,267 @@ fn helix_field() -> Field {
     declaration.alphabet = 5;
     declaration.receivers[0].aperture = 5;
     Field::declare(declaration.by_lattice_rule()).unwrap()
+}
+
+/// The population 436 admits the identity carrier, but lies below the located carrier's 438.
+/// Both ports refuse before opening a handle or touching an existing moment; the card's traffic
+/// remains unchanged, and the same existing handle still accepts an identity passage.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn a_located_capacity_refusal_leaves_both_ports_unchanged() {
+    let field = helix_field_at(436);
+    assert_eq!(field.capacity().n_star(), 436);
+    let (located, _) = partial_span(&field);
+    let card = card();
+    let host = Reference::campaign_one();
+    let device = Resident::campaign_one(&card);
+    let opening = Current::at_rest(&field);
+    let mut h = host.mount(&field, &opening).unwrap();
+    let mut d = device.mount(&field, &opening).unwrap();
+    let before = same("read before refusal", host.read(&h), device.read(&d)).unwrap();
+    let address = h.address().clone();
+    let traffic = d.traffic();
+    let below = HnnError::BelowCapacity {
+        population: 436,
+        n_star: 438,
+    };
+    assert_eq!(
+        host.ingest(&mut h, None, &located).err().as_ref(),
+        Some(&below)
+    );
+    assert_eq!(
+        device.ingest(&mut d, None, &located).err().as_ref(),
+        Some(&below)
+    );
+    assert_eq!(
+        same("read after refusal", host.read(&h), device.read(&d)).unwrap(),
+        before
+    );
+    assert_eq!(h.address(), &address);
+    assert_eq!(d.address(), &address);
+    assert_eq!(d.traffic(), traffic);
+
+    let empty = located.part(0..0).unwrap();
+    let (moment, _) = same(
+        "the existing open",
+        host.ingest(&mut h, None, &empty),
+        device.ingest(&mut d, None, &empty),
+    )
+    .unwrap();
+    let before = same("read the existing open", host.read(&h), device.read(&d)).unwrap();
+    assert_eq!(
+        host.ingest(&mut h, Some(&moment), &located).err().as_ref(),
+        Some(&below)
+    );
+    assert_eq!(
+        device.ingest(&mut d, Some(&moment), &located).err().as_ref(),
+        Some(&below)
+    );
+    assert_eq!(
+        same("read the refused open", host.read(&h), device.read(&d)).unwrap(),
+        before
+    );
+    assert_eq!(ExposedResident::moment(&h, &moment).unwrap().cells(), 0);
+    assert_eq!(ExposedResident::moment(&d, &moment).unwrap().cells(), 0);
+    assert_eq!(h.address(), &address);
+    assert_eq!(d.address(), &address);
+    assert_eq!(d.traffic(), traffic);
+    let identity = word(&field, 1, 2);
+    let (_, entered) = same(
+        "identity after the capacity refusal",
+        host.ingest(&mut h, Some(&moment), &identity),
+        device.ingest(&mut d, Some(&moment), &identity),
+    )
+    .unwrap();
+    assert_eq!(entered.forward.present().unwrap().cells, 1);
+    assert_eq!(ExposedResident::moment(&h, &moment).unwrap().cells(), 1);
+    assert_eq!(ExposedResident::moment(&d, &moment).unwrap().cells(), 1);
+}
+
+/// Two source moments share the current's clock while retaining their own injected cells. A
+/// sibling's advance must leave the other moment's capacity readable and its counts untouched;
+/// alternating the producing moment then exercises the card's next ingest at that joined clock.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn sibling_moments_keep_their_counts_and_capacity_on_the_shared_clock() {
+    use holonics::hnn::moment::SourceCapacity;
+    let field = chain();
+    let turn = BigInt::one() << 80usize;
+    let opening = Current::at(
+        &field,
+        field
+            .rings()
+            .iter()
+            .map(|ring| &turn * ring.period())
+            .collect(),
+    )
+    .unwrap();
+    let card = card();
+    let host = Reference::campaign_one();
+    let device = Resident::campaign_one(&card);
+    let mut h = host.mount(&field, &opening).unwrap();
+    let mut d = device.mount(&field, &opening).unwrap();
+    let passage = word(&field, 32, 21);
+    let empty = passage.part(0..0).unwrap();
+    let first = same(
+        "the first open",
+        host.ingest(&mut h, None, &empty),
+        device.ingest(&mut d, None, &empty),
+    )
+    .unwrap()
+    .0;
+    let second = same(
+        "the sibling open",
+        host.ingest(&mut h, None, &empty),
+        device.ingest(&mut d, None, &empty),
+    )
+    .unwrap()
+    .0;
+    let at = passage.classes_read().position(|class| class == 0).unwrap();
+    let ticking = passage.part(at..at + 1).unwrap();
+    let counts = |moment: &SourceMoment| {
+        field
+            .sources()
+            .iter()
+            .map(|&ring| {
+                (0..field.ring(ring).period() as usize)
+                    .map(|phase| {
+                        (
+                            moment.phase_counts(ring, phase).unwrap().to_vec(),
+                            field
+                                .offsets()
+                                .iter()
+                                .map(|&offset| {
+                                    moment.offset_counts(ring, offset, phase).unwrap().to_vec()
+                                })
+                                .collect::<Vec<_>>(),
+                        )
+                    })
+                    .collect::<Vec<_>>()
+            })
+            .collect::<Vec<_>>()
+    };
+    for (active, sibling) in [
+        (first, second),
+        (second, first),
+        (first, second),
+        (second, first),
+    ] {
+        let before = ExposedResident::moment(&h, &sibling).unwrap();
+        let kept = (before.cells(), before.window(), counts(before));
+        let (_, ingested) = same(
+            "ingest beside an open sibling",
+            host.ingest(&mut h, Some(&active), &ticking),
+            device.ingest(&mut d, Some(&active), &ticking),
+        )
+        .unwrap();
+        assert_eq!(ingested.forward.present().unwrap().cells, 1);
+        let after = ExposedResident::moment(&h, &sibling).unwrap();
+        assert_eq!((after.cells(), after.window(), counts(after)), kept);
+        for id in [first, second] {
+            let hm = ExposedResident::moment(&h, &id).unwrap();
+            let dm = ExposedResident::moment(&d, &id).unwrap();
+            assert_eq!(
+                SourceCapacity::checked_of(hm, &field, ExposedResident::current(&h)).unwrap(),
+                SourceCapacity::checked_of(dm, &field, ExposedResident::current(&d)).unwrap(),
+            );
+            let (mut hs, mut ds) = (String::new(), String::new());
+            hm.write(&mut hs);
+            dm.write(&mut ds);
+            assert_eq!(hs, ds, "the host and card source-clock bindings must agree");
+        }
+        same("read the sibling clocks", host.read(&h), device.read(&d)).unwrap();
+        if ingested.forward.present().unwrap().carry_out {
+            let family = h.admitted().to_vec();
+            same(
+                "close the shared aeon",
+                host.close_aeon(&mut h, &family),
+                device.close_aeon(&mut d, &family),
+            )
+            .unwrap();
+        }
+    }
+    assert_ne!(
+        ExposedResident::current(&h),
+        &opening,
+        "the fixture must advance the clock"
+    );
+    assert_eq!(ExposedResident::moment(&h, &first).unwrap().cells(), 2);
+    assert_eq!(ExposedResident::moment(&h, &second).unwrap().cells(), 2);
+}
+
+/// Closing and locating keys reframes the open source without adding cells. Its shared-clock
+/// capacity stays readable, the injection counts stay fixed, and the next ingest uses that frame.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn key_relocation_keeps_the_open_capacity_readable() {
+    use holonics::hnn::moment::SourceCapacity;
+    let field = chain();
+    let card = card();
+    let mut both = pair(&card, &field, None);
+    let cells = source(&field, field.population() as usize, 3);
+    let (_, entered) = same(
+        "ingest to the boundary",
+        both.host.ingest(&mut both.h, Some(&both.moment), &cells),
+        both.device.ingest(&mut both.d, Some(&both.moment), &cells),
+    )
+    .unwrap();
+    let entered = entered.forward.present().unwrap();
+    assert!(entered.carry_out);
+    let count = ExposedResident::moment(&both.h, &both.moment)
+        .unwrap()
+        .cells();
+    let family = both.h.admitted().to_vec();
+    same(
+        "close before location",
+        both.host.close_aeon(&mut both.h, &family),
+        both.device.close_aeon(&mut both.d, &family),
+    )
+    .unwrap();
+    let crib = cells
+        .part(entered.cells.saturating_sub(8)..entered.cells)
+        .unwrap();
+    same(
+        "locate the closing keys",
+        both.host.locate_keys(&mut both.h, &crib, 1),
+        both.device.locate_keys(&mut both.d, &crib, 1),
+    )
+    .unwrap();
+    let hm = ExposedResident::moment(&both.h, &both.moment).unwrap();
+    let dm = ExposedResident::moment(&both.d, &both.moment).unwrap();
+    assert_eq!(hm.cells(), count);
+    assert_eq!(dm.cells(), count);
+    let capacity =
+        SourceCapacity::checked_of(hm, &field, ExposedResident::current(&both.h)).unwrap();
+    assert!(matches!(capacity, SourceCapacity::Reframed { .. }));
+    assert_eq!(
+        SourceCapacity::checked_of(dm, &field, ExposedResident::current(&both.d)).unwrap(),
+        capacity,
+    );
+    let (mut hs, mut ds) = (String::new(), String::new());
+    hm.write(&mut hs);
+    dm.write(&mut ds);
+    assert_eq!(hs, ds);
+    let tail = cells.part(entered.cells..entered.cells + 1).unwrap();
+    let (_, continued) = same(
+        "ingest after location",
+        both.host.ingest(&mut both.h, Some(&both.moment), &tail),
+        both.device.ingest(&mut both.d, Some(&both.moment), &tail),
+    )
+    .unwrap();
+    assert_eq!(continued.forward.present().unwrap().cells, 1);
+    assert_eq!(
+        ExposedResident::moment(&both.h, &both.moment)
+            .unwrap()
+            .cells(),
+        count + 1
+    );
+    assert_eq!(
+        ExposedResident::moment(&both.d, &both.moment)
+            .unwrap()
+            .cells(),
+        count + 1
+    );
 }
 
 /// [agent-inferred, October 5] **A founded partial-span passage** (the host's

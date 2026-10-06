@@ -15,6 +15,7 @@
 //! cargo run --release -p holonics --example hnn_prediction -- executed text <cut> <private out dir> <pin> <dev|run> [<state> [<from> <to>]]
 //! cargo run --release -p holonics --example hnn_prediction -- executed text-repair <cut> <private out dir> <pin> <dev|run>
 //! cargo run --release -p holonics --example hnn_prediction -- executed repair <terrain> <A|B> <seed> <count> <out>
+//! cargo run --release -p holonics --example hnn_prediction -- executed physical-repair <A|B> <count> <aperture> <out> <pin> <terrain>=<seed>…
 //! ```
 //!
 //! [definition; agent-inferred, the order pin and the bank pin] **The declaration**
@@ -344,6 +345,18 @@ fn main() {
             arguments[6].parse().expect("a count"),
             &arguments[7],
         ),
+        // The physical repair: the damaged section through the field's own motion
+        // (research/records/2026-10-05_THE_PHYSICAL_REPAIR_RUNS_THE_DAMAGED_SECTION_THROUGH_THE_FIELD_AND_HOLDS_WHAT_NO_CERTIFIED_DOMAIN_DECIDES.md).
+        (Some("executed"), Some("physical-repair")) => {
+            pinned(&arguments[7], "executed physical-repair", clock, true);
+            repair_loop::physical(
+                &arguments[3],
+                arguments[4].parse().expect("a count"),
+                arguments[5].parse().expect("an aperture"),
+                &arguments[6],
+                &arguments[8..],
+            )
+        }
         // Text repair by local keys glued on overlaps
         // (research/records/2026-10-05_TEXT_REPAIR_BY_LOCAL_KEYS_GLUED_ON_OVERLAPS.md).
         (Some("executed"), Some("text-repair")) => {
@@ -367,7 +380,7 @@ fn main() {
             &arguments[7],
         ),
         _ => panic!(
-            "executed evaluate <terrain> <seed> <count> <out> <label[=state]>… | counts <terrain> <training seed> <count> <validation seed> <count> <out> | keys <terrain> <training seed> <count> <out> | keys-probe <terrain> <training seed> <count> <scale> <out> | pair-members <terrain> <seed> <count> <state> | text <cut> <out dir> <pin> <dev|run> [<state> [<from> <to>]] | text-repair <cut> <out dir> <pin> <dev|run> | repair <terrain> <A|B> <seed> <count> <out>"
+            "executed evaluate <terrain> <seed> <count> <out> <label[=state]>… | counts <terrain> <training seed> <count> <validation seed> <count> <out> | keys <terrain> <training seed> <count> <out> | keys-probe <terrain> <training seed> <count> <scale> <out> | pair-members <terrain> <seed> <count> <state> | text <cut> <out dir> <pin> <dev|run> [<state> [<from> <to>]] | text-repair <cut> <out dir> <pin> <dev|run> | repair <terrain> <A|B> <seed> <count> <out> | physical-repair <A|B> <count> <aperture> <out> <pin> <terrain>=<seed>…"
         ),
     }
 }

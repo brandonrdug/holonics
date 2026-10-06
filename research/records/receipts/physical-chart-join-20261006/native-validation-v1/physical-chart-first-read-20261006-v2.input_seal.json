@@ -1,0 +1,956 @@
+{
+  "argv": [
+    "/usr/bin/env",
+    "-i",
+    "PATH=/home/b/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin:/usr/bin",
+    "HOME=/home/b",
+    "CARGO_HOME=/home/b/.cargo",
+    "LANG=C",
+    "LC_ALL=C",
+    "RAYON_NUM_THREADS=1",
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/target/debug/deps/holonics-4ca36bb3d7db439e",
+    "hnn::tests::prediction::physical_repair::the_damaged_section_runs_through_the_field_and_every_erasure_is_held_unresolved",
+    "--exact",
+    "--test-threads=1",
+    "--nocapture"
+  ],
+  "cwd": "/home/b/Workspaces/holonics/.local/wt/repair-field",
+  "inputs": {
+    "/home/b/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo": {
+      "sha256": "310fa46c7903259368c0df3dbb3f4f52759563f3c9ce53b500404b7741fb6860",
+      "bytes": 41181888
+    },
+    "/home/b/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc": {
+      "sha256": "028fd60b0e0add5505c661cd3ccde91393d615c8729bd95d94ab1e91409b36a1",
+      "bytes": 654904
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/bounded_stage_v1.py": {
+      "sha256": "84b7d003089fa19881690e368200b2168b9d179c8e6573bdafab54369235cec2",
+      "bytes": 12645
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/final_stage.py": {
+      "sha256": "a0a5a94f157acf9a5127b756a036c6e86449dc2012af0f1e71d34aafa13bc79e",
+      "bytes": 10968
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/leased_stage_v2.py": {
+      "sha256": "bcf91456534e763a025613f39e82853d7a58529b399bb183d544d09a7a42f949",
+      "bytes": 5520
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-first-read-20261006-v2.config.json": {
+      "sha256": "4f30708ef08481c8c9cdfa392ed2dd811b3cd14f3596c6d06021a12439af9fd3",
+      "bytes": 51769
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-host-link-20261006-v1.acceptance.json": {
+      "sha256": "4811335037e3349c1f70720fcf96f46e9af5ab921d488de56adf65ca1c1b6f61",
+      "bytes": 378
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-host-link-20261006-v1.release.json": {
+      "sha256": "3a1a1fe3ce4f8024f73a60d1a2b2a85ef7ebf8ed8b41f4205c39e8692d332e28",
+      "bytes": 175
+    },
+    "/home/b/Workspaces/holonics/.local/wt/codex-saturating-ring/.local/lane-a-source-handoff/combined-native-build.projection.json": {
+      "sha256": "ed3e0f38a2b454d5dce43a1008a8505e211f5177fc80a42046d89c52844147a1",
+      "bytes": 27612
+    },
+    "/home/b/Workspaces/holonics/.local/wt/codex-saturating-ring/.local/lane-a-source-handoff/combined-native-build.receipt.json": {
+      "sha256": "2ab6c235a7481d77c2485552a8b26ca8be8cae275e63ba63e88314a53e7573c6",
+      "bytes": 533
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/.local/physical-chart-join-20261006/source.seal.json": {
+      "sha256": "3a7cc37544485b9daabba33c4f86ae35643a18147055610f53009e7d79f2ebc2",
+      "bytes": 1497
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/Cargo.lock": {
+      "sha256": "4380186a0b5ed33a0c6ef3b15822c215072016af539446727800dcd501bde00a",
+      "bytes": 4292
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/Cargo.toml": {
+      "sha256": "a9ff455bcb89885c74f5758dd782ec4d3c89bbd31018e89333c4d476ea2dc40f",
+      "bytes": 1160
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/Cargo.toml": {
+      "sha256": "64170e4fac0e1f1b08bfd076b39289dae249ec50e115c720ac252c2cae09c916",
+      "bytes": 1544
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/aeon/epoch.rs": {
+      "sha256": "19e68ecc1c8fabc5203f4007f0e7f43335f045f5203b95199442ba28482e98e3",
+      "bytes": 22842
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/aeon/first_law.rs": {
+      "sha256": "02e05fd816f29ba72976da44b74df34a9dc023d7ddcacce4c9cae3b73fca1fb2",
+      "bytes": 26370
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/aeon/groupoid.rs": {
+      "sha256": "a2e48359a9a0ea7019c2a2435b053cca10b14830ff0c615094ac6a8223d73181",
+      "bytes": 26932
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/aeon/hodge.rs": {
+      "sha256": "bdd8475b2a8dbad2523d0520afa1892fed8ea092c20fe5c8fc8e1de258ae8efb",
+      "bytes": 12999
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/aeon/join.rs": {
+      "sha256": "891e9fa752cf1224bdd6cecf7491dffaa92caccf171fb82312026744ae994863",
+      "bytes": 17693
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/aeon/lock.rs": {
+      "sha256": "ec5905e52e3fcb215841db21dfdbb399bbf7dab8843f9f3ba5f1d7de283497bd",
+      "bytes": 10949
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/aeon/mod.rs": {
+      "sha256": "e2ac911afee55ba27759fe52c144af9381fad5825f938bc5407cb9751d8c1def",
+      "bytes": 10607
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/aeon/production.rs": {
+      "sha256": "72ccdb2373e93a3c9cc1d2c686a9f54d535f77a07da23ff0585afd5a89c69d93",
+      "bytes": 34497
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/aeon/reading.rs": {
+      "sha256": "0761e5d5d3247d41847859459b5b7ac481d4a3abac47cdb57d9e30edd262d7cd",
+      "bytes": 28656
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/compression/cost/tests.rs": {
+      "sha256": "00873dd825b70353e8d281b648dbe6266259c5f8f1b0d6cc33ed97b3266168a1",
+      "bytes": 12697
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/compression/cost.rs": {
+      "sha256": "47c71bae4dee52f1dd8ded129afff6d9ec7efb87c1ffedcf4fb7abb38848a1b2",
+      "bytes": 19593
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/compression/keys/edges.rs": {
+      "sha256": "031c6b3ba5bee51091b0067d47db8177202adb7e05ebc297258332859c6a3fcd",
+      "bytes": 18132
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/compression/keys/local/tests.rs": {
+      "sha256": "6542837c44d16bbfaf383fd6838aebcb0a870772ec8b133ff756202b52d88698",
+      "bytes": 8031
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/compression/keys/local.rs": {
+      "sha256": "143d411df79d321648b5f00d74d185aa5622cd52385d8ed1ebfb2b16ecd16279",
+      "bytes": 20107
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/compression/keys/repair/tests.rs": {
+      "sha256": "02490fffb036d03dd407fb171c1fd4cd4f1890533543eb46fa652f898d148895",
+      "bytes": 10632
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/compression/keys/repair.rs": {
+      "sha256": "be69d14b09c7ec6578e46f83d5f6802321f99ddbca5c708ca224276da0f74156",
+      "bytes": 24181
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/compression/keys/tests.rs": {
+      "sha256": "98e119b40d456017941f586726561cd969ffd168986e8ae85635354db9303d3f",
+      "bytes": 12675
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/compression/keys/transport/tests.rs": {
+      "sha256": "d276e5fea67d2701496343700c4b41a15527d22ee94c197e5cb73d5b3eecf362",
+      "bytes": 25500
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/compression/keys/transport.rs": {
+      "sha256": "e5838556ab8f65a0f3015f517460479c2fe32ec4babc6a4bc4db78eeaa3ae212",
+      "bytes": 56281
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/compression/keys/turns.rs": {
+      "sha256": "7dfcc2a199da6b3ac30fc32d18d82cb7541c1a0a671763e7f91df7df0b1fdd18",
+      "bytes": 17206
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/compression/keys.rs": {
+      "sha256": "576d6b20b27ee68235ff8934ea0063640ed0e0a2c01597c3b0768707bf31860a",
+      "bytes": 21934
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/compression/landmark/context/baseline.rs": {
+      "sha256": "413f6c3f0d94127b94aec763bca73fde869d8d64aaa883550e20ef2cdb53cf51",
+      "bytes": 10550
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/compression/landmark/context/sections.rs": {
+      "sha256": "f0843ade9a2a7340b268edd80c8b430f395fb3b3afaa68ba1c7e541dda24deed",
+      "bytes": 5059
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/compression/landmark/context/tests/full.rs": {
+      "sha256": "a26897aa77ff642f55e185564efaedb77b94a1e5d4bd5a0da0aadf1c2cd685f5",
+      "bytes": 9232
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/compression/landmark/context/tests.rs": {
+      "sha256": "bab40109ec3c9375094725afef6522b929791b3f731e5c2dd5de5a2787d708df",
+      "bytes": 111230
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/compression/landmark/context.rs": {
+      "sha256": "5f5e718eee55408f0b6827210acbd99fb7b9414c76af090cbd4cb9c7de8f0efc",
+      "bytes": 263781
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/compression/landmark/mobius.rs": {
+      "sha256": "385b851ddc4462c8cdd118bde46697caf731d338b764a0f4a05b250386a4092b",
+      "bytes": 27570
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/compression/landmark/quadratic.rs": {
+      "sha256": "b75c5fdfd2db5d747123ba5540a25c36e2a7d74dc7530bc4c4e28f76ecf5ffaf",
+      "bytes": 10655
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/compression/landmark/site.rs": {
+      "sha256": "da336b8bbb3a7ddac4751da10f9e41d8cb52094f746c24e3a517cddc9129c621",
+      "bytes": 27824
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/compression/landmark.rs": {
+      "sha256": "b2020bb401cf404e3fdbdd4aaf8eb4e806d2556f7e2750e2ff54fde4ee05a573",
+      "bytes": 4925
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/compression/mod.rs": {
+      "sha256": "2870e07f0d35dcd9c8c21bff8d480bb362a164402fa87cc8fdb1a4cd1202f2ea",
+      "bytes": 9169
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/compression/resonance.rs": {
+      "sha256": "faabd9076873c12ad297b71ca25b7afd6ce7e035ce4cf20d89635f6683914011",
+      "bytes": 18058
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/exterior_guards.rs": {
+      "sha256": "ac1a5008df895cd34bb05570bdf630d67fe7edc4bf8de261b46b1ff11bbace3d",
+      "bytes": 11595
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/geometry/complex.rs": {
+      "sha256": "6f13385b17eb5a0bc9f3609539fe7f92b4c1915a3394107f32b7b3f8a76b9396",
+      "bytes": 36085
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/geometry/exact.rs": {
+      "sha256": "8ff996a5878c7f97d6debb3d7a7f4f11733644cbc4c917b7154c9545ea6d68fe",
+      "bytes": 9605
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/geometry/mod.rs": {
+      "sha256": "e9686f8ed6626939a09c16e08dbf1afa6a8995d2929e8ccebed8cd00e8dcda35",
+      "bytes": 1292
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/geometry/motion.rs": {
+      "sha256": "1ce22c85fc4c230f5dc642d393d77c0111779d890f56e171ba597ece7980e345",
+      "bytes": 20023
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/geometry/screw.rs": {
+      "sha256": "0f5ac4bfb3c651f6e1bff125d8c78fae87e7b08fd67ca13f92cf478b66deceeb",
+      "bytes": 21308
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/geometry/swing.rs": {
+      "sha256": "a98e3cbb084058fd8a3b552b501fbff273ed21c4f34387f65b959209d51e369b",
+      "bytes": 11216
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/geometry/winding/tests.rs": {
+      "sha256": "11d3b79af579138cf28de806e4d33fc96fc6955ca1c860226e1f07d0368034fa",
+      "bytes": 9386
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/geometry/winding.rs": {
+      "sha256": "ca5a8f4417b638edc922cd6ef12d1b8e6ac0ad04b4e446d4ab2cd271a8fb72c0",
+      "bytes": 10566
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/chart.rs": {
+      "sha256": "71b69f3298d57e8c3312874764919bf3110e7a6b598018eba61551bc33c7f277",
+      "bytes": 38033
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/constitution.rs": {
+      "sha256": "951580ec936cb5948c239a9f3006130809df2111be412beb85831c8fcda5caaa",
+      "bytes": 433201
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/contact.rs": {
+      "sha256": "c03e82181b7d6063b922edfebbb3ac0ef1ebb516b0791b75e5943e74d32ce4d5",
+      "bytes": 37018
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/encoding.rs": {
+      "sha256": "50152ce0f52a501ec08e9cd0b7981950f8173ec4dcfe5a66286ad48d94bf9739",
+      "bytes": 59224
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/executed.rs": {
+      "sha256": "e9000546fd4b202c887336b020dc063286309fe01c217124e887f798baee518b",
+      "bytes": 14059
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/field.rs": {
+      "sha256": "2227f7e1f43bfd65eb126b50c3b30bdfb4a54fe8d03546000fba9b9d0c58bfd6",
+      "bytes": 116020
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/keys.rs": {
+      "sha256": "6b3d12bc909fe7c4e0e24f443a0313df16cee0460bef0b7db14da76652a44d8f",
+      "bytes": 30498
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/mod.rs": {
+      "sha256": "2e0bd03426a64e2332ab25e19e0ced6176bcc8bf204c2e863f0570c90dece433",
+      "bytes": 31441
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/moment.rs": {
+      "sha256": "d5c966b1d30fd222d59b5838eeeb8cfc5bfa2efdf1ea6527a07b6a081c66cd22",
+      "bytes": 76979
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/pending.rs": {
+      "sha256": "092d05ce266079a07bec53f067adc586eb83b94926530149c93ad44ad6f20332",
+      "bytes": 13935
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/port.rs": {
+      "sha256": "2d8639bbb4f0475735014d19e3fea9c35b13f5cad1f81a3047063b969c3368c1",
+      "bytes": 68689
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/prediction.rs": {
+      "sha256": "9f8caaaeafc7114d4bdb9d92a5e43dafcc3a7b9ebc7f53640e6bfd049572c2ed",
+      "bytes": 98536
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/propagation.rs": {
+      "sha256": "ebae450035e9a86b53f454d437e51ad9ceebb020f54a0e0dfc5278a741356856",
+      "bytes": 65733
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/ratio.rs": {
+      "sha256": "4b223f2a9bae7b70291ed62ce026a5f6ca521df0b4d87be3769c26a32f91030c",
+      "bytes": 22152
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/realization.rs": {
+      "sha256": "d6daddbf8cc69ee9d546862a1bfc22e05cc27a70ee835455c9016d1062400c5a",
+      "bytes": 6393
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/receiving.rs": {
+      "sha256": "1a5b23d4a045ba83f5960e3e35c0bb6425d2017e3516f8700ea25cf0f063c8fc",
+      "bytes": 79596
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/reference/continuation.rs": {
+      "sha256": "7ca75a55b49a1dd1c2341f8db22751829e7891ab0f1459376816f57271369eea",
+      "bytes": 21252
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/reference/passage.rs": {
+      "sha256": "2665e5235bff5beadac9904eee5011151873899cf19fc96f5d65886c9df905ee",
+      "bytes": 12839
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/reference.rs": {
+      "sha256": "53a80300f6eeeea0e15db442fd6a9c0f2653c3232ce5bb50b612df3170f26c76",
+      "bytes": 216486
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/retention.rs": {
+      "sha256": "287e881f98cf9d05969b2f0f3969bb7084320b873761c9d790dd04855b69a118",
+      "bytes": 30391
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/ring.rs": {
+      "sha256": "ebf6814531626b4a50da5e9e3e0edd32fbb43e80ef28ce20426b2f412bc72836",
+      "bytes": 175230
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/state_text.rs": {
+      "sha256": "2bb767b8dabc3eaf564873d0ab843f35d154a8551542a409045e821b0155997d",
+      "bytes": 1964
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/tests/chart.rs": {
+      "sha256": "8e68c257478b70719a5f6e3519db66fd92ff514513b393e5b0adee7516e05c05",
+      "bytes": 16139
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/tests/constitution.rs": {
+      "sha256": "891869da775924e02808b5794e026a8bca583bd34cddf7d75bbb6fb05a0331da",
+      "bytes": 101052
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/tests/contact_residual.rs": {
+      "sha256": "c2e6bf8644804f9bbca1022776b01523dee0e89ea391643f67cebbf1ddece490",
+      "bytes": 28458
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/tests/encoding.rs": {
+      "sha256": "f8cd5512219a3f4dba60aa202b9f649af3d7df2b5dc3f6e91df10b77d3344fd0",
+      "bytes": 21151
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/tests/executed.rs": {
+      "sha256": "2743e09de9071e89e230d61560a8291c53f89be308c4b351f31f370b27325e34",
+      "bytes": 29817
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/tests/field.rs": {
+      "sha256": "89424a0a8997e800ce5ec0e189902301581aee2fd2ecf848aae86ed580f02f47",
+      "bytes": 25126
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/tests/floquet.rs": {
+      "sha256": "17732721e670ab57d45431328f7862203d8404cf68e4cb2ce15be75c80c26f8b",
+      "bytes": 49983
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/tests/guards.rs": {
+      "sha256": "6738cbbd49ed07daa75085f173fe9ca91f3aeddf1dcf5583b99a16cec736f2b5",
+      "bytes": 13871
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/tests/keys.rs": {
+      "sha256": "c03889988225553330e737e26d0e1108fb51fc9628644c7ea5c934eeeb10da11",
+      "bytes": 26822
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/tests/learning.rs": {
+      "sha256": "d9aa781454b3390fe58b4cdbcd1dae4cdd2ee17bd8da138681d708a96c968466",
+      "bytes": 11310
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/tests/loaded_scalar.rs": {
+      "sha256": "a53e89e341c0e5b0f09fdca82cd6937a896ce3ffa4b1f833f4ff743563899df5",
+      "bytes": 3962
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/tests/mod.rs": {
+      "sha256": "2ca9b07a6ef766724a4998a179a0b2c5f973b4af7aba8b28b3c33c88ee065e9e",
+      "bytes": 582
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/tests/moment.rs": {
+      "sha256": "4033c92f83ee44ca56d556847a0a36962dd2d5fc4983d4bbe292e1ea8d0699c4",
+      "bytes": 36363
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/tests/pending.rs": {
+      "sha256": "eef9d986b1e328ebaaae5a8776d4a31493a3e43bd47fda3af4e3d7c042ba0274",
+      "bytes": 7479
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/tests/physics.rs": {
+      "sha256": "5119cbdd834cf239194aa0781ee9092d35ef8c2e05836eed8f3c7ede4569c12e",
+      "bytes": 64394
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/tests/port.rs": {
+      "sha256": "bd5a97953ebea6b4fdca1ff987c7dae76f8dc714ce62f9530b27609d7ab6a2be",
+      "bytes": 64526
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/tests/prediction.rs": {
+      "sha256": "adc7a472e2e94f82535de94bb9b72a63de896d74dab457b92d13f04bfb41e48f",
+      "bytes": 84777
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/tests/prior_carry.rs": {
+      "sha256": "5af5954548ed7afbb54aa08722694652a0831f3abcf37d40877ef0e87a9ca6d7",
+      "bytes": 25191
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/tests/propagation.rs": {
+      "sha256": "6c21e6729e2b1d44d1fbc319000e96130d85741ab9a5936c3395dd8d3744fdb1",
+      "bytes": 49477
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/tests/ratio.rs": {
+      "sha256": "c5e4018f9848ffc1ec32f50357e57608a15b429fab9cd8610045742abffa74f5",
+      "bytes": 16437
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/tests/rebase_boundary.rs": {
+      "sha256": "c72a0fe982520cc9cd6568a4184dada11c82669134098db6fc7788154c6c569b",
+      "bytes": 15550
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/tests/receiving.rs": {
+      "sha256": "6efac0e41141252cc9e42ca72da902019cb950f0e3b917d4f9665ad91fb8d0d0",
+      "bytes": 70737
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/tests/reference.rs": {
+      "sha256": "94808746e57632e11acac4142d17fa107db77cb4528d568ac757c3df469efb65",
+      "bytes": 59191
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/tests/resonator_deposit.rs": {
+      "sha256": "18fe10dc13a0598b5c68d7e275c7c4e2be39c896979a4ecbe6cc9bce5994726f",
+      "bytes": 21882
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/tests/retention.rs": {
+      "sha256": "5e818dd6786e7c680e35ffcf26af3747ec54c20aedba1326be6ac0f2cc94734e",
+      "bytes": 55058
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/tests/support.rs": {
+      "sha256": "7d4bfa4a66210a0b4482dc777a2af12c9a322e5195d5d44a03a7c5233e8ea929",
+      "bytes": 19532
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/tests/word.rs": {
+      "sha256": "f32470c088dee3f6fa01907891a2238d14a783faa811f8d3ff72db681c432edd",
+      "bytes": 12411
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/word/continuation.rs": {
+      "sha256": "cb96ea4f09a24ca57e26cfd95436c69752670dacf9afb1450546e9b7d09d8092",
+      "bytes": 18198
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/hnn/word.rs": {
+      "sha256": "0200f5a2920d26b0b6258823ffeb20ae5b23bf4546299ec058e7c60d159b7bb4",
+      "bytes": 139446
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/holarchy/gluing.rs": {
+      "sha256": "7076f731eb028c169ffae7ffd307103e886a04063300ae21e03d1cc34a73d8b0",
+      "bytes": 38035
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/holarchy/mod.rs": {
+      "sha256": "4c3c3e786eaa085fbe482e7dfcbda4366d3846bb5f8c99e63627ab3c5c1ffc8b",
+      "bytes": 27077
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/holarchy/terrain/chase.rs": {
+      "sha256": "6c3894adc1e792f29d1f76b9520814c4b72e739bb403aedb8fc2f3f0c1fc001a",
+      "bytes": 56847
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/holarchy/terrain/chase_tests.rs": {
+      "sha256": "d149a0fe0a01cd57dab3682d8c7d7748f88101e68885f1743bbb7854df564572",
+      "bytes": 46303
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/holarchy/terrain/crib.rs": {
+      "sha256": "45d8c5b7f68d4cfd38900bb1808169c2801faa23a2ca6bd0ed4d88b78153c5d6",
+      "bytes": 4271
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/holarchy/terrain/known.rs": {
+      "sha256": "9d037d70b4d8ee73d3cbb8e8829d86a0fc69056c7cbca113b68241a3651843f3",
+      "bytes": 11494
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/holarchy/terrain/mod.rs": {
+      "sha256": "bcd7f37f7bcef44fc2e926a1472cbf9fde4a62f9826fd1225caaaf38de59621e",
+      "bytes": 12526
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/holarchy/terrain/moire.rs": {
+      "sha256": "bcf9a1499a3ad561d766dc598ed596b7c31461dda545392d19285024ef7649bc",
+      "bytes": 17282
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/holarchy/terrain/pursuit.rs": {
+      "sha256": "af43f56795774266758b0ca0fc74e72e1d48f345d6c41085ba44619cfad8d3d8",
+      "bytes": 62351
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/holarchy/terrain/sensing.rs": {
+      "sha256": "f4bfb5bb32402039d7fdba193e84e3baf22667559d9db2648d8c81b1ca3445fc",
+      "bytes": 21820
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/holarchy/terrain/sensing_tests.rs": {
+      "sha256": "9a9db8e6ac026539a7e1e102008536448afeec90b20b5ca0eb2e6c4adb4e1933",
+      "bytes": 16730
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/holarchy/terrain/source.rs": {
+      "sha256": "59a1c7362e9ca7690d06cafede0725517526cd883067002a72f3bd50b7c471ce",
+      "bytes": 31318
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/holarchy/terrain/switching.rs": {
+      "sha256": "51590fd7ff814dbdd4a91350d3b9acf7816d129a0c0db048585536c50c81474b",
+      "bytes": 7650
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/holarchy/terrain/tests.rs": {
+      "sha256": "f6bbbf7e2d461b5c9ab0ca999c593ec18b0f293dc950f4ba5a310a7cf9067110",
+      "bytes": 15010
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/holarchy/tests.rs": {
+      "sha256": "78f915d2489e1e826e9cc1cb1e355b0ddaf5dfb811367208f5ccb9def1dbac42",
+      "bytes": 35541
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/holarchy/view.rs": {
+      "sha256": "394e31eb24dee652c690d738fcf96b18f59f9b795adb0e5eb4ab7cb6c1a526a7",
+      "bytes": 15932
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/holon/conformance.rs": {
+      "sha256": "b84e602a91a9bf24f773ba1a45227acbabf9d3ef276eda7e168c00d5cf3e39da",
+      "bytes": 35585
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/holon/contact/menu.rs": {
+      "sha256": "c455941738139e4d08a7bdf0aaa45f5aab79747956e874e6dfbf13114025e160",
+      "bytes": 12179
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/holon/contact.rs": {
+      "sha256": "20d0316d1424c0f1930921d53a9051706044b7aad980c25a07481454d5a39479",
+      "bytes": 52333
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/holon/deposition.rs": {
+      "sha256": "164ee9a8371e1d89d842c6cff4ac0dd3f9f1a9a017e57f05d1ffc9eda844b6b3",
+      "bytes": 49598
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/holon/dirac.rs": {
+      "sha256": "738810b57ae629e9354c354678aee4ea140f0d215b8cb870ead6660e07bf6940",
+      "bytes": 33263
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/holon/element.rs": {
+      "sha256": "32683220d74dc3ecf836cb2d10a133dd6bd9debd324f61cebe1db7a7f79825af",
+      "bytes": 9918
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/holon/law.rs": {
+      "sha256": "80366830ad5f9bc949b093f5a574273a99c0bb53ccb67d86f9d7ad795f5779ef",
+      "bytes": 24095
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/holon/mod.rs": {
+      "sha256": "cae7f90c30da6ce2cb42b9ba916a3db7012e8efab2629daa58e6d524d3f3de26",
+      "bytes": 34249
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/holon/parametron/loaded.rs": {
+      "sha256": "e54a1126bb99761af613c6d6272343aadab69cadcb3817cfca769a7e89a422b8",
+      "bytes": 22304
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/holon/parametron/mounted.rs": {
+      "sha256": "3009606b8f21dcf98b99df3fdf66b6b3651c91a710af20798b4c5706cbb0b965",
+      "bytes": 6423
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/holon/parametron.rs": {
+      "sha256": "25b6df1023761fbbb0442c314d97c65a9a2473e067f9359e96db847205aafd31",
+      "bytes": 29429
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/holon/port.rs": {
+      "sha256": "080016ede397f88f32a9277245b10563048c4189e1bc2b3e25d14e20c9d3e7d1",
+      "bytes": 10322
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/holon/restriction/descent.rs": {
+      "sha256": "8043e19886bc5efd55bb68e76d30efab3c7db777b22ba6ecd49ff949497d5a9e",
+      "bytes": 15455
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/holon/restriction/fibre.rs": {
+      "sha256": "6657ca1aaeae87bf6f2e86fa1d4c7c560b5d7f7bef0e22d84fa0af337970b89e",
+      "bytes": 14091
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/holon/restriction/linear.rs": {
+      "sha256": "26cae1e60ca8fe9dcf8ebfb8353b5f4591a88f9590c6f6c9d18134a4afc78b09",
+      "bytes": 11182
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/holon/restriction/tower/tests.rs": {
+      "sha256": "35cac77cf4a24dce92ccdb556d808f9c63c8e70153bf341b99698f46fe6a08f6",
+      "bytes": 41983
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/holon/restriction/tower.rs": {
+      "sha256": "1995980fcd8e61d8c92fb71fdf1ffd1951924092fec5563c1d92ba72c7755c90",
+      "bytes": 107102
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/holon/restriction/tube.rs": {
+      "sha256": "48a989a80585f28c8964148fa9c9d486037990aecf2b1bf428733988c8162c42",
+      "bytes": 42581
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/holon/restriction.rs": {
+      "sha256": "e4793320d666786e4ea0f3eb75f80d33767d25d034fb3f3f70c8d6273805bd2e",
+      "bytes": 22136
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/lib.rs": {
+      "sha256": "61f950806d8151d92301d56330927b86dcac3ac54c6f9a7db838086ce0fd938f",
+      "bytes": 3161
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/navigator/address.rs": {
+      "sha256": "fe2de33951e99bcd8f03231ab54d730d55ad7543c4830de88b71848b753cb2da",
+      "bytes": 20610
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/navigator/mod.rs": {
+      "sha256": "97b2a701c10dc66730008718fb824077df845449ff8b1597fa7d41918af1281b",
+      "bytes": 29138
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/navigator/trace.rs": {
+      "sha256": "807642025dc9fa87a41cfb8b8067820ac559ee8acb44dae98bc8afc6ca872e6d",
+      "bytes": 14606
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/physics/fluid/body.rs": {
+      "sha256": "74f13f642abb1a5c44ed3bcb3c7682ed31f452424bfa7f7bd51be2499b6dbd3d",
+      "bytes": 22085
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/physics/fluid/cells.rs": {
+      "sha256": "b4a011146d7d1b0ccbfca20e92df085312d2215fc1bcddce666c096662b65f3a",
+      "bytes": 23191
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/physics/fluid/complex.rs": {
+      "sha256": "e744d4f344efafbb6e98c251dc4c55bf93f47d8dabf3378756a69b8c5846183c",
+      "bytes": 15382
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/physics/fluid/control_volume.rs": {
+      "sha256": "210711e88c19b94311d50240c334750d6c216211327babe65597a7bf3ff9c59b",
+      "bytes": 30395
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/physics/fluid/singularity.rs": {
+      "sha256": "942ae7098ab29b0fce79e061034444dcc10429b2abfbe4b78d0ed0053b00d0d8",
+      "bytes": 20201
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/physics/fluid.rs": {
+      "sha256": "527849ab40cc00051713213c8efa24f6acafa8797d56bcea4ecc236d608f2baa",
+      "bytes": 4965
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/physics/information/apply.rs": {
+      "sha256": "2983abbdc8d9059c4e0a3c2529957cce3cf011ade0c9d0576f76bad4ee654792",
+      "bytes": 16364
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/physics/information/rate.rs": {
+      "sha256": "4922b5c427e276986e7310e4908793dd13d2f2f037fb572cb75e6ce7eabb5dc3",
+      "bytes": 9691
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/physics/information/tests.rs": {
+      "sha256": "c809005516720ce75ddb47f3fc33401684adde0dcc475f4cffcf36a160e8e9aa",
+      "bytes": 18987
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/physics/information.rs": {
+      "sha256": "c50285be4d0891d9063e2b7eed07f8f80481c2c0b81cea75a8d771ca4b12197c",
+      "bytes": 7170
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/physics/mod.rs": {
+      "sha256": "dce482909e8c86254b21739dd8762c5d74bca7136b5884c7257aa2400e560147",
+      "bytes": 490
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/physics/spacetime/clocks.rs": {
+      "sha256": "676e05f56bb49ea93b203ba610a7b494d4757f310d2692bebfced2596d0b1ccc",
+      "bytes": 5670
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/physics/spacetime/einstein.rs": {
+      "sha256": "21c95c284cd847e14720cc59210894b72c0ecbd7340472c491c9c028b4d25bf6",
+      "bytes": 4716
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/physics/spacetime/lorentz.rs": {
+      "sha256": "a3a2ba6380c5edbbc69b7e5fafa1feaaa5dd06d592b12721aa28a84977a51283",
+      "bytes": 16360
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/physics/spacetime/source.rs": {
+      "sha256": "30166438e3fa8e4817a2476fb36d9499cfd95bb66ab6de7e90e4eefc1f7247d4",
+      "bytes": 14166
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/physics/spacetime/tests.rs": {
+      "sha256": "46def048d2076fc3c3ba2a5a8c37d652de8ed8823718307fa755f71df2733416",
+      "bytes": 28398
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/physics/spacetime.rs": {
+      "sha256": "dc06b19dcb428091a858c136b0dbb2ffb3d780d50810554669e595f10eb33a77",
+      "bytes": 9282
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/physics/thermal/axes.rs": {
+      "sha256": "d0e1b594f729039b25384e6d43dfd3e6a3a07ad0ea75fbd086be7516255e7e87",
+      "bytes": 11494
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/physics/thermal/exchange.rs": {
+      "sha256": "caa0936f50629ca9da048a73aa780c9e4ae7bea6b4375636208cd4f33d9251ec",
+      "bytes": 8560
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/physics/thermal/neck.rs": {
+      "sha256": "59bdc3038d59cf02a3ce8d560b0c74bb7c73a1c958ac93e6f1d9f68f325df6b0",
+      "bytes": 5512
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/physics/thermal/port.rs": {
+      "sha256": "0caf15ea9905e54f556e6b211c8f89e832137ee4a12f3af019299a4ecae4d85c",
+      "bytes": 3655
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/physics/thermal/tests.rs": {
+      "sha256": "bc37321efefbc7eae0849f3a04eaece7145d3a5623d83187447d8d2ac6ceacd9",
+      "bytes": 25333
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/physics/thermal.rs": {
+      "sha256": "8b7d1502fb6295db8d5748716e3a3c434cca5bba23d1209686864f76b7fb8a00",
+      "bytes": 11192
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/physics/wave/chain.rs": {
+      "sha256": "3130272d662e592f72601253ad7aac21a2ebd1a2670fb6bd7f9d70f17532265a",
+      "bytes": 28939
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/physics/wave/continuation.rs": {
+      "sha256": "fef87716fa785bb372693885adacb91b4cf07164b0d5c421f1a45b0dc0e18674",
+      "bytes": 14963
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/physics/wave/interference.rs": {
+      "sha256": "58dc30d9a92bb783c3ebe78420eafb288d3b6c0babcaefb57798392eba4e19d3",
+      "bytes": 1942
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/physics/wave/tests.rs": {
+      "sha256": "58350fe1a6a52472e80cac2312bf7f75e85a63f32eb59442718517219a3d3c06",
+      "bytes": 18594
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/physics/wave.rs": {
+      "sha256": "9255780b05fb94ce29a0f1f4c4d8c6ece752250947cff62315c70eab41cc668f",
+      "bytes": 6790
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/ratio/algebraic.rs": {
+      "sha256": "aff50b8ff77ffd718784440ce067433e2594c41924fada44c2003d352aa0c5d0",
+      "bytes": 58349
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/ratio/disk.rs": {
+      "sha256": "2d696d43b641b4e0cfc55a90179aae1aeeae3e3277e082a7c1fd5d1780a082d7",
+      "bytes": 31062
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/ratio/exponentiated/carried.rs": {
+      "sha256": "3e5d49524168c8360078477e38d93f97ebb93a1cca8ba65a387f7db30ef43332",
+      "bytes": 13651
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/ratio/exponentiated.rs": {
+      "sha256": "a22226720ae5f423b0f39975caff0f3f28e1fcb11aa95da1eff4e3f973e4a9d5",
+      "bytes": 25253
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/ratio/gaussian.rs": {
+      "sha256": "66899eac32c9cb6a8af20ae7fc941a83b268db9f602aa2317ae29cb80a217ed4",
+      "bytes": 5107
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/ratio/linear/inertia.rs": {
+      "sha256": "5e97d0b7677929816bb9795c56191f9aa4ff828ce18256e17be57e6c8d92daeb",
+      "bytes": 29196
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/ratio/linear/prime_image/tests.rs": {
+      "sha256": "5a05657b15f92c8ce2a3e00e1570bc2fd959766e9d199b17b31b2ab3b844f434",
+      "bytes": 14857
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/ratio/linear/prime_image.rs": {
+      "sha256": "bc8f9eb928d357eca67af08c7457fa8d7e00206ed1c59a03d190afe3ec2e447e",
+      "bytes": 63195
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/ratio/linear/vector.rs": {
+      "sha256": "0a3e739bf292f53b6a877f31a4f74f63a159fc587d3f6f371f35e029fc5fd36e",
+      "bytes": 17748
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/ratio/linear.rs": {
+      "sha256": "a1bb3e17c9e7d0c0fd0da9369700970b9a7a3895a922780c04e6242b1379d5f9",
+      "bytes": 60326
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/ratio/log_ratio.rs": {
+      "sha256": "7e561a27844629c0106c95ae2dc2415dabfa38060208551672a12364305caace",
+      "bytes": 9297
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/ratio/mod.rs": {
+      "sha256": "9944f3167bf7006904a30cacb471e4ad42b4c30ca23b726ad8e9f4e538f8d682",
+      "bytes": 7370
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/ratio/polynomial/root_separation.rs": {
+      "sha256": "7d7eb6cf83a121f20a57fd5260addf2e2a7ba827d489159cf71f469a8eaeacf9",
+      "bytes": 3117
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/ratio/polynomial/tests.rs": {
+      "sha256": "3e08cbec3c91a9ce37762c087d9fab25cbabff1a7e1a3cf27d502150e15fd58e",
+      "bytes": 19925
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/ratio/polynomial.rs": {
+      "sha256": "f9ca719594bf5e0e09e5e766ddb0ff78d0e77a2244ffdb8659f8e9ee19855f1e",
+      "bytes": 96688
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/ratio/presentation.rs": {
+      "sha256": "d32df704d1bbdf400750c324c28d10d8d491869ae11d64d49a09964932183d3d",
+      "bytes": 4788
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/ratio/primality.rs": {
+      "sha256": "bd21e383e842a6bdd5b5a4a839b999d629f9e124f8b8117b9ff0e828c5a03cc8",
+      "bytes": 3481
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/ratio/ring/section/tests.rs": {
+      "sha256": "0479ff0dba89f210441d9cdd71213d745bc52c439796aec42a070b1dd199e7c0",
+      "bytes": 4930
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/ratio/ring/section.rs": {
+      "sha256": "104e07b80568558a634ff6ebfc00fdb869ef0edfbf45dc1966ff54b06f62ec57",
+      "bytes": 3429
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/ratio/ring.rs": {
+      "sha256": "63b10a3686ecc8e71945be3b933ed5a9d6a5cfff67ef2f3878d9189776cba9a1",
+      "bytes": 7878
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/ratio/surprisal.rs": {
+      "sha256": "e40c543235a531c80ed868c1449361888499c7b8abb63deb69970d21d03b8fb8",
+      "bytes": 45369
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/ratio/work.rs": {
+      "sha256": "fe8a71d64d7b2723c15ce1060fe73b6b3cd4286c6ca53a294be32b5f3e461fbd",
+      "bytes": 11411
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/receiver/face.rs": {
+      "sha256": "07dd1919c0bec668fb0d69cd29c1223933257549eab94bacfa648cb42b28799b",
+      "bytes": 56378
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/receiver/mod.rs": {
+      "sha256": "da2741278f0e6f913fbe0cb03fb26c09b3551fa31eba9477b12f2dc8e21f3b51",
+      "bytes": 2000
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/receiver/population/birth.rs": {
+      "sha256": "5f22d8caf0689cf1bce5b83c8926413fef1ca5acd6bb2a3fd0ba8d51aef4c185",
+      "bytes": 49128
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/receiver/population/birth_tests.rs": {
+      "sha256": "347c7e7fc68e5952d5b6c05fbb44ea6d5e2739784e5efb8034fb4179e79f1428",
+      "bytes": 11291
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/receiver/population/chase.rs": {
+      "sha256": "e7d36c043e55b0ce63069a29086865ae049aa14f3417dfdc3f320e96e24465eb",
+      "bytes": 11627
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/receiver/population/chaser.rs": {
+      "sha256": "7fd980990c9498cfcd11b15f069aeb798caa62c7619b5d9b26d442bb8de1bea1",
+      "bytes": 48030
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/receiver/population/chaser_tests.rs": {
+      "sha256": "58108bead607677a61e19cd3d25733ef3a62bc87d95e69b238d597a4192474da",
+      "bytes": 10514
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/receiver/population/composition.rs": {
+      "sha256": "cb052720c0ee191918de873ed352f7f766de503fa0218a9eb98e432bc784b471",
+      "bytes": 35014
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/receiver/population/composition_tests.rs": {
+      "sha256": "17e669f052f96e882516c76dbb756ef9b812f49ce1455f435ec66864004fee57",
+      "bytes": 28417
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/receiver/population/dormancy.rs": {
+      "sha256": "010e4ae88bcbd28d4e050baf3078301e0c38a54a6d0be077028a1cf4fb1d5115",
+      "bytes": 30830
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/receiver/population/dormancy_tests.rs": {
+      "sha256": "a48f30d0c267d1f37b89ac235fd92207e6e7b961637732fce9bcd5810026acff",
+      "bytes": 7965
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/receiver/population/evolution.rs": {
+      "sha256": "d659c6aae69615ab7ce6326716584d893475a13eb6decfbbbe1cccb6b013cab5",
+      "bytes": 12935
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/receiver/population/evolution_tests.rs": {
+      "sha256": "6ef1ec61168dd3212078bb51dfaad754ab7256e654b7f6516733c0a54e54c437",
+      "bytes": 30044
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/receiver/population/families.rs": {
+      "sha256": "a2eef57533998b8463d74a849f4b64589f38bf851f076f1cfab0fd6df8225f65",
+      "bytes": 25284
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/receiver/population/merge.rs": {
+      "sha256": "666de82c1e357dda1e881ce2426f1492e6f7942ea4068866ddd401d4d5ca4fbe",
+      "bytes": 21448
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/receiver/population/merge_tests.rs": {
+      "sha256": "acc4ab73ea75e2905d497afa0b8a886afd37ec0628f5cfa72d122fcd9f237340",
+      "bytes": 7344
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/receiver/population/port.rs": {
+      "sha256": "2b2c8cbb72ab72938210d6f8dbd5635f78392b8d5186337149893045db9ef2cf",
+      "bytes": 22579
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/receiver/population/port_tests.rs": {
+      "sha256": "9344b8739fc62d304a29b6ce07e8f37aa400a436b9027625aad0ff9e940267e3",
+      "bytes": 8803
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/receiver/population/species.rs": {
+      "sha256": "99a9e59c3508e5d58a4b019f330ae28ad542f7d493c62c287f4aa891e076d390",
+      "bytes": 14349
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/receiver/population/tests.rs": {
+      "sha256": "6d8897b0092e70b364c8bdc2985b951f0627f130ecc9ea26e0f657e77bb4d888",
+      "bytes": 45993
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/receiver/population.rs": {
+      "sha256": "cfd9aded5802bd82fbf9956c2c9392a3b067cae405594cdef02ee548a4a0ec35",
+      "bytes": 105215
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/receiver/receipt.rs": {
+      "sha256": "d4391ea8f8c7fb6d9a5bc53b081107095b00ac52f1eb30055ae79f05d9397ab4",
+      "bytes": 18545
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/receiver/reception/continuation/tests.rs": {
+      "sha256": "9527ef643ac8f48406e2fe7c60367041fd3a5d7c8925860eaec97e1bcbaca3dd",
+      "bytes": 14261
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/receiver/reception/continuation.rs": {
+      "sha256": "0805e35e5b8c19763b50472835545588dd4ab0918ee72a0e9361a1847bbfc8e1",
+      "bytes": 10991
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/receiver/reception.rs": {
+      "sha256": "f33ac0ad50631f94db67c4dedaee08914f652fb5967c6351386b868ee5a89d70",
+      "bytes": 36764
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/receiver/release/tests.rs": {
+      "sha256": "316f7e043cff97fec5c14916922e0a8c4fea56d0e906876f8c1ea9fa16e30e89",
+      "bytes": 32491
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/crates/holonics/src/receiver/release.rs": {
+      "sha256": "6d89ab726bc289a2cfbf5cdfef902e532b431026162fe2d106e24b6da5e74e6a",
+      "bytes": 32160
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/research/notebook/hnn_design/hnn_repair_loop.rs": {
+      "sha256": "76d7123a14ec3d01957a125f299a2195569ce39f04c470c05ccde3b120148d69",
+      "bytes": 31204
+    },
+    "/home/b/Workspaces/holonics/.local/wt/repair-field/target/debug/deps/holonics-4ca36bb3d7db439e": {
+      "sha256": "e5253b93325ede2e88bbcc7f359b91a525219a4df80722158e8e6fe4f51ff666",
+      "bytes": 246177664
+    },
+    "/usr/bin/env": {
+      "sha256": "795586b56f6da560c3cf4e25c1a6e4f274a8576906e88d94c207db7255b07163",
+      "bytes": 72408
+    },
+    "/usr/bin/timeout": {
+      "sha256": "1425639cf3339b1117536df91cd4ba3229f8fa84e87322dee24e87121ed3feb3",
+      "bytes": 68320
+    }
+  },
+  "source_scope": "bounded development read of the original physical field test; expose exact refusal/pass, no scientific or whole-suite claim",
+  "CPU_count": 1,
+  "per_process_RLIMIT_CPU_seconds": 16,
+  "CPU_affinity": [
+    0
+  ],
+  "cap_ns": 16000000000,
+  "projection_ns": 16000000000,
+  "system_floor_MemAvailable_KiB": 4194304,
+  "system_floor_sampling_period_ns": 10000000,
+  "host_MemTotal_bytes": 32746156032,
+  "host_MemAvailable_bytes": 12507594752,
+  "minimum_MemAvailable_bytes": 8589934592,
+  "group_memory_max_bytes": 4294967296,
+  "group_swap_max_bytes": 0,
+  "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/holonics-prune-admission-physical-chart-first-read-20261006-v2.service",
+  "memory_events_before": {
+    "low": 0,
+    "high": 0,
+    "max": 0,
+    "oom": 0,
+    "oom_kill": 0,
+    "oom_group_kill": 0,
+    "sock_throttled": 0
+  },
+  "group_cap_includes_page_cache_and_is_stricter_than_RSS": true,
+  "sealed_before_execution": true,
+  "aggregate_cpu_limit_us": 17000000,
+  "aggregate_cpu_source": "dedicated cgroup cpu.stat usage_usec, including exited children and controller",
+  "aggregate_cpu_at_seal_us": 193938,
+  "aggregate_cpu_stop_margin_us": 1000000,
+  "aggregate_cpu_stop_us": 16000000
+}

@@ -1,0 +1,48 @@
+{
+  "source_seal": "/home/b/Workspaces/holonics/.local/wt/repair-field/.local/physical-observation-join-20261006/source.seal.v2.json",
+  "basis": {
+    "receipt": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-first-read-20261006-v2.final.json",
+    "largest_measured_same_forward_unit_wall_ns": 1525697619,
+    "same_measured_unit_CPU_ns": 1485110000
+  },
+  "stages": [
+    {
+      "selector": "hnn::tests::prediction::physical_repair::physical_teaching_changes_r_and_the_later_carried_receiving_read",
+      "exact": true,
+      "thread_budget": 1,
+      "charged_units": 5,
+      "unit_reason": "four actual forward words plus one matched pullback/deposition charged one whole word upper",
+      "projection_ns": 7628488095,
+      "projected_CPU_ns": 7425550000,
+      "per_stage_aggregate_CPU_limit_ns": 17000000000,
+      "no_combined_CPU_allowance_increase": true,
+      "projection_qualification": "new observed-return cost has not been measured; conservative charged matching native-forward estimate fixed before launch; any overrun stays incomplete, no retry/raise"
+    },
+    {
+      "selector": "hnn::tests::prediction::physical_repair::physical_teaching_refuses_a_stale_material_or_foreign_chart_and_preserves_the_carry",
+      "exact": true,
+      "thread_budget": 1,
+      "charged_units": 6,
+      "unit_reason": "four actual forward words plus two matched observed returns charged two whole word uppers",
+      "projection_ns": 9154185714,
+      "projected_CPU_ns": 8910660000,
+      "per_stage_aggregate_CPU_limit_ns": 17000000000,
+      "no_combined_CPU_allowance_increase": true,
+      "projection_qualification": "new observed-return cost has not been measured; conservative charged matching native-forward estimate fixed before launch; any overrun stays incomplete, no retry/raise"
+    },
+    {
+      "selector": "hnn::tests::prediction::physical_repair::the_supported_physical_passage_continues_on_its_retained_interior_and_clock",
+      "exact": true,
+      "thread_budget": 1,
+      "charged_units": 2,
+      "unit_reason": "two actual forward words at the validated carried boundary",
+      "projection_ns": 3051395238,
+      "projected_CPU_ns": 2970220000,
+      "per_stage_aggregate_CPU_limit_ns": 17000000000,
+      "no_combined_CPU_allowance_increase": true,
+      "projection_qualification": "new observed-return cost has not been measured; conservative charged matching native-forward estimate fixed before launch; any overrun stays incomplete, no retry/raise"
+    }
+  ],
+  "unchanged_namespace_rerun": false,
+  "launch_pending_confirmed_resource_handoff_and_linked_binary": true
+}

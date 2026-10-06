@@ -1,0 +1,49 @@
+{
+  "base": "a954a0d8f10121445a058f0deb132e586863352a",
+  "paths": [
+    {
+      "path": "crates/holonics/src/hnn/prediction.rs",
+      "bytes": 98536,
+      "sha256": "9f8caaaeafc7114d4bdb9d92a5e43dafcc3a7b9ebc7f53640e6bfd049572c2ed"
+    },
+    {
+      "path": "crates/holonics/src/hnn/tests/prediction.rs",
+      "bytes": 84777,
+      "sha256": "adc7a472e2e94f82535de94bb9b72a63de896d74dab457b92d13f04bfb41e48f"
+    },
+    {
+      "path": "research/notebook/hnn_design/hnn_repair_loop.rs",
+      "bytes": 31204,
+      "sha256": "76d7123a14ec3d01957a125f299a2195569ce39f04c470c05ccde3b120148d69"
+    },
+    {
+      "path": "Cargo.toml",
+      "bytes": 1160,
+      "sha256": "a9ff455bcb89885c74f5758dd782ec4d3c89bbd31018e89333c4d476ea2dc40f"
+    },
+    {
+      "path": "Cargo.lock",
+      "bytes": 4292,
+      "sha256": "4380186a0b5ed33a0c6ef3b15822c215072016af539446727800dcd501bde00a"
+    },
+    {
+      "path": "crates/holonics/Cargo.toml",
+      "bytes": 1544,
+      "sha256": "64170e4fac0e1f1b08bfd076b39289dae249ec50e115c720ac252c2cae09c916"
+    }
+  ],
+  "selector": [
+    "cargo",
+    "test",
+    "-p",
+    "holonics",
+    "--lib",
+    "hnn::tests::prediction::physical_repair",
+    "--",
+    "--test-threads=1"
+  ],
+  "claims": "source/syntax only; prior physical failure preserved; current typecheck and runtime pending",
+  "jobs_launched": [],
+  "thread_budget_requested": 1,
+  "scope": "targeted physical chart/clock/map admission and carried native continuation; no scientific read"
+}

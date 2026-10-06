@@ -15,6 +15,7 @@ import Holonics.HNN.TargetFace
 import Holonics.HNN.StandingRead
 import Holonics.HNN.IndexedOpen
 import Holonics.HNN.LeakyCapacity
+import Holonics.HNN.ReframedMoment
 import Holonics.HNN.Encoding
 import Holonics.HNN.RegionCounts
 import Holonics.HNN.Retention

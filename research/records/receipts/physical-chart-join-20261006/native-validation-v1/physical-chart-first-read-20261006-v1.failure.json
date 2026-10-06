@@ -1,0 +1,9 @@
+{
+  "provisional_passed": false,
+  "final_acceptance_requires_external_CPU_read": true,
+  "label": "physical-chart-first-read-20261006-v1",
+  "error_type": "FileNotFoundError",
+  "error": "[Errno 2] No such file or directory: '/home/b/.local/lean-rust-pruning/admission-v1/physical-chart-host-link-20261006-v1.acceptance.json'",
+  "child_launched": false,
+  "child_reaped": false
+}

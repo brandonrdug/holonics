@@ -1,0 +1,54 @@
+{
+  "lease_still_held": true,
+  "own_group_other_PIDs": [],
+  "outcome": {
+    "provisional_passed": true,
+    "final_acceptance_requires_external_CPU_read": true,
+    "label": "physical-chart-notebook-check-20261006-v1",
+    "wall_ns": 1853818254,
+    "peak_child_RSS_KiB": 628596,
+    "group_memory_peak_bytes": 766058496,
+    "original_coordinates_modified": false,
+    "aggregate_cpu_final_us": 1968136,
+    "aggregate_cpu_limit_us": 128000000,
+    "CPU_kernel_hard_total_limit": false
+  },
+  "outputs": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-notebook-check-20261006-v1.lease-identity.json": {
+      "sha256": "b76febb637709160b1def33aaa3042d033afd4595c62e9169e634fa65e9b5266",
+      "bytes": 565
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-notebook-check-20261006-v1.memory-gate.json": {
+      "sha256": "333f950112bf849d9556d6697492bf02934d4d2652c9d151042b2147a92f8d69",
+      "bytes": 120
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-notebook-check-20261006-v1.child-identity.json": {
+      "sha256": "17fa5ca1c82641f8465a56f503800794c5a098bb43974f2c84c4c444d8a5a40a",
+      "bytes": 78
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-notebook-check-20261006-v1.system-floor.json": {
+      "sha256": "6cfda034e4635e79ab3bfac397a76f8d449dc4e68c5fc5782c1b1c5a6c24d43e",
+      "bytes": 14293
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-notebook-check-20261006-v1.quiescence.json": {
+      "sha256": "32733f512e4455973c964fe11da3d62d17b2076af0d60461dc727361b94417a1",
+      "bytes": 130
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-notebook-check-20261006-v1.input_seal.json": {
+      "sha256": "22577821b1b0deba1f87ff3691351b145c96103b81695ffbc5ecb0d5fa3a02f1",
+      "bytes": 51547
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-notebook-check-20261006-v1.output_seal.json": {
+      "sha256": "520286dca70ef537b56f701790fad1b523d6708445428d4a36acf6db1cc73c99",
+      "bytes": 129892
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-notebook-check-20261006-v1.stdout": {
+      "sha256": "55f8003e1c470a5e106b706aac7a928571a06083860bb4664b705a632b8a01d7",
+      "bytes": 23139
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-notebook-check-20261006-v1.stderr": {
+      "sha256": "56b7f2d7cfd5e5d5f01abf8663fe40c9a3d203ebf02c69c26bcad3d57cdec290",
+      "bytes": 624
+    }
+  }
+}

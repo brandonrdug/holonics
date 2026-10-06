@@ -1,0 +1,191 @@
+{
+  "minimum_MemAvailable_KiB": 4194304,
+  "sampling_period_ns": 10000000,
+  "breached": false,
+  "samples": [
+    {
+      "since_start_ns": 2139678,
+      "MemAvailable_KiB": 12974800
+    },
+    {
+      "since_start_ns": 12639272,
+      "MemAvailable_KiB": 12974696
+    },
+    {
+      "since_start_ns": 23080798,
+      "MemAvailable_KiB": 12974696
+    },
+    {
+      "since_start_ns": 33960645,
+      "MemAvailable_KiB": 12978700
+    },
+    {
+      "since_start_ns": 44764990,
+      "MemAvailable_KiB": 12975540
+    },
+    {
+      "since_start_ns": 55655376,
+      "MemAvailable_KiB": 12974476
+    },
+    {
+      "since_start_ns": 65983199,
+      "MemAvailable_KiB": 12974476
+    },
+    {
+      "since_start_ns": 76866532,
+      "MemAvailable_KiB": 12973508
+    },
+    {
+      "since_start_ns": 87721873,
+      "MemAvailable_KiB": 12972472
+    },
+    {
+      "since_start_ns": 98555123,
+      "MemAvailable_KiB": 12975132
+    },
+    {
+      "since_start_ns": 109040591,
+      "MemAvailable_KiB": 12975860
+    },
+    {
+      "since_start_ns": 119877767,
+      "MemAvailable_KiB": 12976540
+    },
+    {
+      "since_start_ns": 130725764,
+      "MemAvailable_KiB": 12976540
+    },
+    {
+      "since_start_ns": 141548544,
+      "MemAvailable_KiB": 12978864
+    },
+    {
+      "since_start_ns": 152379159,
+      "MemAvailable_KiB": 12972816
+    },
+    {
+      "since_start_ns": 162885556,
+      "MemAvailable_KiB": 12965004
+    },
+    {
+      "since_start_ns": 173891479,
+      "MemAvailable_KiB": 12965004
+    },
+    {
+      "since_start_ns": 184269926,
+      "MemAvailable_KiB": 12964640
+    },
+    {
+      "since_start_ns": 195290487,
+      "MemAvailable_KiB": 12963884
+    },
+    {
+      "since_start_ns": 206369877,
+      "MemAvailable_KiB": 12959600
+    },
+    {
+      "since_start_ns": 217383314,
+      "MemAvailable_KiB": 12957836
+    },
+    {
+      "since_start_ns": 227495302,
+      "MemAvailable_KiB": 12955652
+    },
+    {
+      "since_start_ns": 237528584,
+      "MemAvailable_KiB": 12961748
+    },
+    {
+      "since_start_ns": 248178560,
+      "MemAvailable_KiB": 12961840
+    },
+    {
+      "since_start_ns": 259231541,
+      "MemAvailable_KiB": 12961840
+    },
+    {
+      "since_start_ns": 270876701,
+      "MemAvailable_KiB": 12963296
+    },
+    {
+      "since_start_ns": 281884006,
+      "MemAvailable_KiB": 12963296
+    },
+    {
+      "since_start_ns": 292039897,
+      "MemAvailable_KiB": 12963836
+    },
+    {
+      "since_start_ns": 302886582,
+      "MemAvailable_KiB": 12963960
+    },
+    {
+      "since_start_ns": 313752572,
+      "MemAvailable_KiB": 12962196
+    },
+    {
+      "since_start_ns": 324596462,
+      "MemAvailable_KiB": 12964380
+    },
+    {
+      "since_start_ns": 335421506,
+      "MemAvailable_KiB": 12964152
+    },
+    {
+      "since_start_ns": 346215191,
+      "MemAvailable_KiB": 12966252
+    },
+    {
+      "since_start_ns": 357037540,
+      "MemAvailable_KiB": 12966252
+    },
+    {
+      "since_start_ns": 367887751,
+      "MemAvailable_KiB": 12968144
+    },
+    {
+      "since_start_ns": 378728545,
+      "MemAvailable_KiB": 12968144
+    },
+    {
+      "since_start_ns": 389214604,
+      "MemAvailable_KiB": 12968164
+    },
+    {
+      "since_start_ns": 400037243,
+      "MemAvailable_KiB": 12964580
+    },
+    {
+      "since_start_ns": 410876624,
+      "MemAvailable_KiB": 12960576
+    },
+    {
+      "since_start_ns": 421778352,
+      "MemAvailable_KiB": 12960576
+    },
+    {
+      "since_start_ns": 432747856,
+      "MemAvailable_KiB": 12959120
+    },
+    {
+      "since_start_ns": 443469918,
+      "MemAvailable_KiB": 12956712
+    },
+    {
+      "since_start_ns": 454433481,
+      "MemAvailable_KiB": 12956572
+    },
+    {
+      "since_start_ns": 464526494,
+      "MemAvailable_KiB": 12956572
+    },
+    {
+      "since_start_ns": 475492352,
+      "MemAvailable_KiB": 12956572
+    },
+    {
+      "since_start_ns": 485970566,
+      "MemAvailable_KiB": 12956572
+    }
+  ]
+}

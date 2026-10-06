@@ -1,0 +1,99 @@
+{
+  "passed": false,
+  "label": "hnn-reframed-ranged-capacity-20261006-v1",
+  "scientific_job": false,
+  "deferred_lock_busy": false,
+  "final_CPU_ns": 697468000,
+  "CPU_reading_grain_ns": 1000,
+  "aggregate_CPU_limit_us": 17000000,
+  "final_CPU_source": "systemd retained oneshot CPUUsageNSec after all group processes exit",
+  "CPU_kernel_hard_total_limit": false,
+  "sampled_stop_margin_us": 1000000,
+  "aggregate_CPU_within_limit": true,
+  "no_overshoot_accepted": true,
+  "wall_ns": 805277531,
+  "projection_ns": 16000000000,
+  "wall_source": "external monotonic_ns through final property read",
+  "quiescent": true,
+  "completion_event": "oneshot start job completed; no polling",
+  "unit_properties": {
+    "Description": "Owned holonics admission hnn-reframed-ranged-capacity-20261006-v1 d897aaea1c2707da3b17ca589514badc",
+    "LoadState": "loaded",
+    "ActiveState": "active",
+    "SubState": "exited",
+    "InvocationID": "f8af11d0f8724691b39599a5cca37643",
+    "Result": "success",
+    "ExecMainStatus": "0",
+    "ControlGroup": "",
+    "MemoryPeak": "75886592",
+    "CPUUsageNSec": "697468000",
+    "TasksCurrent": "[not set]"
+  },
+  "outer_error": null,
+  "unit_start_exit": 0,
+  "unit_start_stdout": "",
+  "unit_start_stderr": "",
+  "config": {
+    "sha256": "051b42ad282a9e446717e868006ade9d3ee43f681761c9cc71e25ddbaef9d178",
+    "bytes": 61705
+  },
+  "receipt_pins": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-ranged-capacity-20261006-v1.config.json": {
+      "sha256": "051b42ad282a9e446717e868006ade9d3ee43f681761c9cc71e25ddbaef9d178",
+      "bytes": 61705
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-ranged-capacity-20261006-v1.external-lease.json": {
+      "sha256": "2fb493732bffa1c1747b7a7291230765d4aeb87a98594afb07b309fb398c9377",
+      "bytes": 487
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-ranged-capacity-20261006-v1.lease-identity.json": {
+      "sha256": "51cecd584816bdb213301593febc376ba8e86c46d2755be49eb8d5650056a0fb",
+      "bytes": 565
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-ranged-capacity-20261006-v1.input_seal.json": {
+      "sha256": "4b5d12fa41e4e1948c094cc88058074131380db72fb6cc914da0a30cbdd70a7f",
+      "bytes": 57724
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-ranged-capacity-20261006-v1.stdout": {
+      "sha256": "921a1c5a177aa85b2353c10229dc9bac121fca11ba376278d7212d29a6f187eb",
+      "bytes": 1186
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-ranged-capacity-20261006-v1.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-ranged-capacity-20261006-v1.memory-gate.json": {
+      "sha256": "c9ff5b41d5134d440aea4044bf558451815322ec0f0c2a0f567ec795e60bb385",
+      "bytes": 120
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-ranged-capacity-20261006-v1.child-identity.json": {
+      "sha256": "b37e51f30f9cdf7909ba4410bfded0492ad953e1c8737a017bdcfee5e38a26c0",
+      "bytes": 78
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-ranged-capacity-20261006-v1.system-floor.json": {
+      "sha256": "65b157f2ad73a99d2f6db851d510039e306dfa8e5c7b613379bbe3bd12680b01",
+      "bytes": 3923
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-ranged-capacity-20261006-v1.quiescence.json": {
+      "sha256": "263aac66c8a09cb0f34d9bff89607f083843ac024e643e8f8fd2e085696728f4",
+      "bytes": 130
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-ranged-capacity-20261006-v1.output_seal.json": {
+      "sha256": "3ccaf014e9b8b35c50e007a68f684a148de53b48e77e9e1721e9b30d8ec400cc",
+      "bytes": 34372
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-ranged-capacity-20261006-v1.publication.json": {
+      "sha256": "478a94e39e52d59b059560ab01ffb5ae302588c73e36c9d97ccc05cf44af8d60",
+      "bytes": 2684
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-ranged-capacity-20261006-v1.stage-quiescence.json": {
+      "sha256": "aa7191fca44901d8f65f7cb1f97648cd5129b1b5984eca163d94b05b91fa26f9",
+      "bytes": 136
+    }
+  },
+  "launcher_outside_native_group": true,
+  "lease_owner_outside_capped_group": true,
+  "lease_held_through_final_CPU_read_and_publication": true,
+  "stage_passed_before_cleanup": true,
+  "requires_cleanup_acceptance": true
+}

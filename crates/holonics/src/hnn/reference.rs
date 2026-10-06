@@ -1191,11 +1191,13 @@ impl ExecutionPort for Reference {
         if !cells.is_empty() {
             field.capacity_for(cells)?;
         }
+        // Every open shares Current: admit each source before moving it through this passage.
+        // Sibling sources keep their own bins/ticks; only their shared-clock population moves.
+        for open in resident.moments.values() {
+            SourceCapacity::checked_of(open, &field, &resident.current)?;
+        }
         let id = match moment {
-            Some(id) if resident.moments.contains_key(id) => {
-                SourceCapacity::checked_of(&resident.moments[id], &field, &resident.current)?;
-                *id
-            }
+            Some(id) if resident.moments.contains_key(id) => *id,
             Some(id) => {
                 return Err(HnnError::UnknownHandle {
                     handle: Handle::Moment(*id),
@@ -1226,6 +1228,7 @@ impl ExecutionPort for Reference {
             Ok(ingested) => ingested,
             Err(error) => {
                 resident.moments.remove(&id);
+                resident.current = found;
                 return Err(error);
             }
         };
@@ -1243,6 +1246,33 @@ impl ExecutionPort for Reference {
                 return Err(error);
             }
         };
+        let n = open.cells();
+        let moment_bits = open.dense_bits();
+        // The physical aging operand is each ring's actual elapsed ticks, not the number of
+        // cells consumed. Every sibling carrying a Leaky source pays these same ring ticks.
+        let ticks: Vec<u64> = resident
+            .current
+            .lift()
+            .iter()
+            .zip(&before)
+            .map(|(after, before)| {
+                u64::try_from(after - before).expect("a lift only advances at ingest")
+            })
+            .collect();
+        // The actual prefix must also fit every sibling clock before address/aeon publication.
+        // On a refused synchronization discard this open and restore the call's shared Current.
+        let synchronization = resident.moments.iter().try_for_each(|(other_id, other)| {
+            if *other_id != id && ingested.cells != 0 {
+                other.check_clock_synchronization(&field, &resident.current, ingested.cells as u64, &ticks)
+            } else {
+                Ok(())
+            }
+        });
+        if let Err(error) = synchronization {
+            resident.moments.remove(&id);
+            resident.current = found;
+            return Err(error);
+        }
         // The receiving parametron's active suffix address receives the cells the moment took, each
         // tick's letter read by its register's clock, which stays the lift point's (its windings
         // since the aeon's opening, which the carry-out moves to its own lift point), and its
@@ -1276,29 +1306,28 @@ impl ExecutionPort for Reference {
         if ingested.carry_out {
             resident.aeon.awaiting = true;
         }
-        let ticks: Vec<u64> = resident
-            .current
-            .lift()
-            .iter()
-            .zip(&before)
-            .map(|(after, before)| {
-                u64::try_from(after - before).expect("a lift only advances at ingest")
-            })
-            .collect();
-        let n = open.cells();
         let detail = ReceiptDetail::Ingest {
             cells: ingested.cells as u64,
-            moment_bits: open.dense_bits(),
+            moment_bits,
             capacity,
             source_bits: n * ceil_log2(&BigUint::from(field.alphabet())),
             carry_out: ingested.carry_out,
         };
         let mut work = ExactWork::nothing();
-        work.resident(open.dense_bits());
+        work.resident(moment_bits);
         for _ in 0..ingested.cells {
             work.stepped();
         }
         let order = source_order(&field, resident.current.lift(), n);
+        // Sibling advancement is declared by the actual consumed prefix, never requested cells.
+        // Validate every synchronization before publishing any of the sibling metadata.
+        if ingested.cells != 0 {
+            for (other_id, other) in &mut resident.moments {
+                if *other_id != id {
+                    other.synchronize_clock(&field, &resident.current, ingested.cells as u64, &ticks)?;
+                }
+            }
+        }
         Ok((
             id,
             InteractionReturn {
@@ -1334,7 +1363,19 @@ impl ExecutionPort for Reference {
             });
         }
         let location = keys::locate_closing(&field, &resident.current, crib, offset)?;
-        let jumps = location.rekey(&field, &mut resident.current)?;
+        // Rekey changes phase without elapsed source time. Stage the shared Current, validate
+        // all ingest sources, then publish the new frame and clock certificates together.
+        let mut rekeyed = resident.current.clone();
+        let jumps = location.rekey(&field, &mut rekeyed)?;
+        let external_ticks = vec![0; field.rings().len()];
+        for open in resident.moments.values() {
+            SourceCapacity::checked_of(open, &field, &resident.current)?;
+            open.check_clock_synchronization(&field, &rekeyed, 0, &external_ticks)?;
+        }
+        for open in resident.moments.values_mut() {
+            open.synchronize_clock(&field, &rekeyed, 0, &external_ticks)?;
+        }
+        resident.current = rekeyed;
         resident.address.synchronize(&field, &resident.current)?;
         resident.aeon.opening = resident.current.lift().to_vec();
         // The published ring clocks: each published ring's clock at the boundary, its phase class

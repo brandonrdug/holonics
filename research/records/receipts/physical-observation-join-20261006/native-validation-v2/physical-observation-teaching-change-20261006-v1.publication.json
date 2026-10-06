@@ -1,0 +1,54 @@
+{
+  "lease_still_held": true,
+  "own_group_other_PIDs": [],
+  "outcome": {
+    "provisional_passed": true,
+    "final_acceptance_requires_external_CPU_read": true,
+    "label": "physical-observation-teaching-change-20261006-v1",
+    "wall_ns": 899247511,
+    "peak_child_RSS_KiB": 26060,
+    "group_memory_peak_bytes": 16539648,
+    "original_coordinates_modified": false,
+    "aggregate_cpu_final_us": 1077064,
+    "aggregate_cpu_limit_us": 17000000,
+    "CPU_kernel_hard_total_limit": false
+  },
+  "outputs": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-observation-teaching-change-20261006-v1.lease-identity.json": {
+      "sha256": "216fcc6aefdee479c6a1df71c8e1f4876fbe666dd7283f7eba05704e58a1ec71",
+      "bytes": 565
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-observation-teaching-change-20261006-v1.memory-gate.json": {
+      "sha256": "1b8221816d64334ab6c819e987b15e180ea3d027c02cba2928982a37277f5486",
+      "bytes": 120
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-observation-teaching-change-20261006-v1.child-identity.json": {
+      "sha256": "5a1b349fe8dab9748b16f83c2f50d131e59b24c74193e4882894a3ade62b89fa",
+      "bytes": 78
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-observation-teaching-change-20261006-v1.system-floor.json": {
+      "sha256": "4cafbb0a703e087df5430a9733a2712c049f8cd51378a78952df46c520879911",
+      "bytes": 7077
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-observation-teaching-change-20261006-v1.quiescence.json": {
+      "sha256": "2ebe8630f0744340c8d028597297bf9a38ae6270772a9fd0893455d82eb3eb55",
+      "bytes": 130
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-observation-teaching-change-20261006-v1.input_seal.json": {
+      "sha256": "fa12b3f991f2fb64ffdc2132104780182a25219a591a7accb6f4c8c2a04ed493",
+      "bytes": 51300
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-observation-teaching-change-20261006-v1.output_seal.json": {
+      "sha256": "57909f357cc76316984eb828896179d26ba4d4ac9da8896796d0d90f174cda62",
+      "bytes": 61157
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-observation-teaching-change-20261006-v1.stdout": {
+      "sha256": "488108bf91cd5fe4fb537d4e81e182749a92d311e1fbf27d00b111540e730419",
+      "bytes": 815
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-observation-teaching-change-20261006-v1.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  }
+}

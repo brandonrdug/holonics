@@ -1,0 +1,26 @@
+{
+  "lease_still_held": true,
+  "own_group_other_PIDs": [],
+  "outcome": {
+    "provisional_passed": false,
+    "final_acceptance_requires_external_CPU_read": true,
+    "label": "physical-chart-first-read-20261006-v1",
+    "error_type": "FileNotFoundError",
+    "error": "[Errno 2] No such file or directory: '/home/b/.local/lean-rust-pruning/admission-v1/physical-chart-host-link-20261006-v1.acceptance.json'",
+    "child_launched": false,
+    "child_reaped": false,
+    "aggregate_cpu_final_us": 38613,
+    "aggregate_cpu_limit_us": 17000000,
+    "CPU_kernel_hard_total_limit": false
+  },
+  "outputs": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-first-read-20261006-v1.lease-identity.json": {
+      "sha256": "b3ab4396d03b10c5b37911f977d852ead44194f4eb23fcf62c2910ee10c41cb9",
+      "bytes": 565
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-first-read-20261006-v1.failure.json": {
+      "sha256": "b5892fc8f6cc141ff676d8797725260027bd263520d67d6d227e2a24bf1361e2",
+      "bytes": 382
+    }
+  }
+}

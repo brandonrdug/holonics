@@ -1,0 +1,54 @@
+{
+  "lease_still_held": true,
+  "own_group_other_PIDs": [],
+  "outcome": {
+    "provisional_passed": true,
+    "final_acceptance_requires_external_CPU_read": true,
+    "label": "hnn-reframed-cuda-key-relocation-20261006-v1",
+    "wall_ns": 3720986686,
+    "peak_child_RSS_KiB": 252592,
+    "group_memory_peak_bytes": 228388864,
+    "original_coordinates_modified": false,
+    "aggregate_cpu_final_us": 3907622,
+    "aggregate_cpu_limit_us": 17000000,
+    "CPU_kernel_hard_total_limit": false
+  },
+  "outputs": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-cuda-key-relocation-20261006-v1.lease-identity.json": {
+      "sha256": "b4903dee8aa68cc6ff034b8c10bda1868c4229874c3b171356584a7c97fcd91e",
+      "bytes": 565
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-cuda-key-relocation-20261006-v1.memory-gate.json": {
+      "sha256": "3cbf463f6a6ff7ae447f5a65a7d1a13f1d6a6c3b24385a2266279e073f240ae6",
+      "bytes": 120
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-cuda-key-relocation-20261006-v1.child-identity.json": {
+      "sha256": "fca11fb9d90fc549e37bb4e7818609f8806d97c2d9c8e38d20e3fc66d918c676",
+      "bytes": 78
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-cuda-key-relocation-20261006-v1.system-floor.json": {
+      "sha256": "1ad9bf9f7772e2eb80a2cd5aecfe8fe5117f1b36a588648b1f827c9467cf19f7",
+      "bytes": 28992
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-cuda-key-relocation-20261006-v1.quiescence.json": {
+      "sha256": "411509fde43e9bb2cdeea191d68fd88d1c00f1bca146b39458578580e924c031",
+      "bytes": 130
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-cuda-key-relocation-20261006-v1.input_seal.json": {
+      "sha256": "064e98e1f366f68b30ba4cab254814b5907dccc536edf00545eff4627e04b29c",
+      "bytes": 58063
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-cuda-key-relocation-20261006-v1.output_seal.json": {
+      "sha256": "b57f2f89cd36d2b14fb152937a77f73f77b6b25b2c7316595d645561e7e0f41f",
+      "bytes": 255580
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-cuda-key-relocation-20261006-v1.stdout": {
+      "sha256": "2cb22423a385b14d570f50a5ac5559cbc54397d5bd27795c70e549177ac8b7b0",
+      "bytes": 190
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-cuda-key-relocation-20261006-v1.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  }
+}

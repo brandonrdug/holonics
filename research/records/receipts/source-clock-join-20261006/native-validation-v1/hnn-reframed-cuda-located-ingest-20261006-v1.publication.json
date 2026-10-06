@@ -1,0 +1,54 @@
+{
+  "lease_still_held": true,
+  "own_group_other_PIDs": [],
+  "outcome": {
+    "provisional_passed": true,
+    "final_acceptance_requires_external_CPU_read": true,
+    "label": "hnn-reframed-cuda-located-ingest-20261006-v1",
+    "wall_ns": 2111452225,
+    "peak_child_RSS_KiB": 206440,
+    "group_memory_peak_bytes": 132968448,
+    "original_coordinates_modified": false,
+    "aggregate_cpu_final_us": 2221690,
+    "aggregate_cpu_limit_us": 17000000,
+    "CPU_kernel_hard_total_limit": false
+  },
+  "outputs": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-cuda-located-ingest-20261006-v1.lease-identity.json": {
+      "sha256": "de669e9c070cbb2ee4fae5a64ab505a5b0287cef126a1962b116476531c7d433",
+      "bytes": 565
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-cuda-located-ingest-20261006-v1.memory-gate.json": {
+      "sha256": "0eaafbe7b9bfb4b309075f6554fccacfe2dc84d68a7df0bcf988c88671449912",
+      "bytes": 120
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-cuda-located-ingest-20261006-v1.child-identity.json": {
+      "sha256": "2b2f828592df2ae9f9b7440ac41f08a228effd51fa448e10f8daedef5729a95e",
+      "bytes": 78
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-cuda-located-ingest-20261006-v1.system-floor.json": {
+      "sha256": "9da33d3c9f246ca20a273f15f0be26ab6029605798b1e9f38738b5c825c88fe6",
+      "bytes": 16476
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-cuda-located-ingest-20261006-v1.quiescence.json": {
+      "sha256": "d5d142ef7b5fc9a121beee504b0759dbdfd12537fd2f66c2bf0e36bda981e19c",
+      "bytes": 130
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-cuda-located-ingest-20261006-v1.input_seal.json": {
+      "sha256": "7e406ee32b6deaf9d7b3e175e20372fc328d0ec7bd2678f611c28dd08cd0403d",
+      "bytes": 58076
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-cuda-located-ingest-20261006-v1.output_seal.json": {
+      "sha256": "b006210976a7716d75f30d00441bf8bf788a591600dfbeb3970249273c287991",
+      "bytes": 142582
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-cuda-located-ingest-20261006-v1.stdout": {
+      "sha256": "876e672a461c95cb619c1075d41af929f4dd74593c5def5b9f7c74b64b863b25",
+      "bytes": 201
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-reframed-cuda-located-ingest-20261006-v1.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  }
+}

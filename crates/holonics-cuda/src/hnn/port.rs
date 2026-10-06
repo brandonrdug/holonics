@@ -128,21 +128,34 @@ fn ingest_open(
     Ok(ingested)
 }
 
-/// **Every open moment but `except` re-keyed to the lift point's phases.** A moment whose re-key
-/// fails holds an unchecked device write (`ResidentMoment::rekey`), so it is dropped with the
-/// failed opens and the first failure is returned.
+/// **Every open moment but `except` joined to the shared clock.** The host source owner admits
+/// the actual external prefix (zero at a phase rekey) before any card write. Source counts stay
+/// at their own injection clock; the card's next ingest starts at the shared lift's phases.
+/// A failed host synchronization or unchecked card write discards that whole open.
 fn rekey_moments(
     moments: &mut BTreeMap<MomentId, MomentSlot<'_>>,
     field: &Field,
     current: &Current,
     except: Option<MomentId>,
+    external_cells: u64,
+    external_ticks: &[u64],
 ) -> Result<(), HnnError> {
+    for (id, moment) in moments.iter() {
+        if Some(*id) != except {
+            moment
+                .host
+                .check_clock_synchronization(field, current, external_cells, external_ticks)?;
+        }
+    }
     let mut failed = Vec::new();
     for (id, moment) in moments.iter_mut() {
         if Some(*id) != except
-            && let Err(error) = moment.card.rekey(field, current)
+            && let Err(error) = moment
+                .host
+                .synchronize_clock(field, current, external_cells, external_ticks)
+                .and_then(|()| moment.card.rekey(field, current).map_err(device))
         {
-            failed.push((*id, device(error)));
+            failed.push((*id, error));
         }
     }
     let mut first = None;
@@ -1044,11 +1057,12 @@ impl<'c> ExecutionPort for Resident<'c> {
         if !cells.is_empty() {
             field.capacity_for(cells)?;
         }
+        // Every source shares Current, so its consuming capacity is admitted before any ingest.
+        for open in resident.moments.values() {
+            SourceCapacity::checked_of(&open.host, &field, &resident.current)?;
+        }
         let id = match moment {
-            Some(id) if resident.moments.contains_key(id) => {
-                SourceCapacity::checked_of(&resident.moments[id].host, &field, &resident.current)?;
-                *id
-            }
+            Some(id) if resident.moments.contains_key(id) => *id,
             Some(id) => {
                 return Err(HnnError::UnknownHandle {
                     handle: Handle::Moment(*id),
@@ -1096,6 +1110,7 @@ impl<'c> ExecutionPort for Resident<'c> {
             Err(error) => {
                 let launched = !open.card.is_valid();
                 resident.moments.remove(&id);
+                resident.current = found;
                 if launched {
                     resident.count(|traffic| traffic.ingest += octets);
                 }
@@ -1119,6 +1134,37 @@ impl<'c> ExecutionPort for Resident<'c> {
                 return Err(error);
             }
         };
+        // The physical aging operand is each ring's actual elapsed ticks, separate from the
+        // consumed prefix population. The source owner pays these ticks on a Leaky mirror.
+        let ticks: Vec<u64> = resident
+            .current
+            .lift()
+            .iter()
+            .zip(&before)
+            .map(|(after, before)| {
+                u64::try_from(after - before).expect("a lift only advances at ingest")
+            })
+            .collect();
+        // Check the actual prefix against every sibling before address/aeon publication. A
+        // prospective refusal discards only this attempted open and restores the shared Current;
+        // untouched sibling host mirrors and cards still carry their valid prior frame.
+        let synchronization = resident.moments.iter().try_for_each(|(other_id, other)| {
+            if *other_id != id && ingested.cells != 0 {
+                other.host.check_clock_synchronization(
+                    &field,
+                    &resident.current,
+                    ingested.cells as u64,
+                    &ticks,
+                )
+            } else {
+                Ok(())
+            }
+        });
+        if let Err(error) = synchronization {
+            resident.moments.remove(&id);
+            resident.current = found;
+            return Err(error);
+        }
         // The receiving parametron's active suffix address receives the cells the moment took,
         // and its contact letters' site kinds refresh after the ingest, as the reference's.
         for &code in &codes[..ingested.cells] {
@@ -1143,7 +1189,14 @@ impl<'c> ExecutionPort for Resident<'c> {
         resident.address.refresh(&field, &resident.constitution)?;
         // Every other open moment steps from the one lift point: its card's phases follow it.
         if ingested.cells > 0 && resident.moments.len() > 1 {
-            rekey_moments(&mut resident.moments, &field, &resident.current, Some(id))?;
+            rekey_moments(
+                &mut resident.moments,
+                &field,
+                &resident.current,
+                Some(id),
+                ingested.cells as u64,
+                &ticks,
+            )?;
         }
         let open = &resident.moments[&id];
         resident.wall.ingest += start.elapsed();
@@ -1154,15 +1207,6 @@ impl<'c> ExecutionPort for Resident<'c> {
         if ingested.carry_out {
             resident.aeon.awaiting = true;
         }
-        let ticks: Vec<u64> = resident
-            .current
-            .lift()
-            .iter()
-            .zip(&before)
-            .map(|(after, before)| {
-                u64::try_from(after - before).expect("a lift only advances at ingest")
-            })
-            .collect();
         let n = open.host.cells();
         let detail = ReceiptDetail::Ingest {
             cells: ingested.cells as u64,
@@ -1210,10 +1254,25 @@ impl<'c> ExecutionPort for Resident<'c> {
             });
         }
         let location = keys::locate_closing(&field, &resident.current, crib, offset)?;
-        let jumps = location.rekey(&field, &mut resident.current)?;
+        let mut rekeyed = resident.current.clone();
+        let jumps = location.rekey(&field, &mut rekeyed)?;
+        let external_ticks = vec![0; field.rings().len()];
+        for open in resident.moments.values() {
+            SourceCapacity::checked_of(&open.host, &field, &resident.current)?;
+            open.host
+                .check_clock_synchronization(&field, &rekeyed, 0, &external_ticks)?;
+        }
+        resident.current = rekeyed;
         resident.address.synchronize(&field, &resident.current)?;
         // Re-keying moves only the lift's phase classes: every resident moment steps from them.
-        rekey_moments(&mut resident.moments, &field, &resident.current, None)?;
+        rekey_moments(
+            &mut resident.moments,
+            &field,
+            &resident.current,
+            None,
+            0,
+            &external_ticks,
+        )?;
         resident.aeon.opening = resident.current.lift().to_vec();
         let published = location
             .rings

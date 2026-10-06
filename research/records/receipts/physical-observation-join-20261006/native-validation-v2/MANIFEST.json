@@ -1,0 +1,374 @@
+{
+  "VALIDATION.json": {
+    "sha256": "1fde1577942a983ff7fe219de01456705bdc74f972f68293bd4a6d9c59aef38e",
+    "bytes": 2607
+  },
+  "bounded_stage_v1.py": {
+    "sha256": "84b7d003089fa19881690e368200b2168b9d179c8e6573bdafab54369235cec2",
+    "bytes": 12645
+  },
+  "final_stage.py": {
+    "sha256": "a0a5a94f157acf9a5127b756a036c6e86449dc2012af0f1e71d34aafa13bc79e",
+    "bytes": 10968
+  },
+  "leased_stage_v2.py": {
+    "sha256": "bcf91456534e763a025613f39e82853d7a58529b399bb183d544d09a7a42f949",
+    "bytes": 5520
+  },
+  "native-binary.seal.v2.json": {
+    "sha256": "536410fc51689068c311c8542c2cd60b7e01744d24a95678d5a06a711a227640",
+    "bytes": 722
+  },
+  "native-runtime-plans.v2.json": {
+    "sha256": "ead82bc4e50676739e93acbd3f20a34e98a78b6c97ec032066d8c613103b6bfe",
+    "bytes": 2648
+  },
+  "physical-observation-carry-20261006-v1.acceptance.json": {
+    "sha256": "a63c391fcc81cedc3004fafff20003fe80d920e722b08f260b0a89d20da10d71",
+    "bytes": 378
+  },
+  "physical-observation-carry-20261006-v1.child-identity.json": {
+    "sha256": "e5908b6fa70aa6f0d36055bd744d981bb86a05c563c2c9036395161c1864909b",
+    "bytes": 78
+  },
+  "physical-observation-carry-20261006-v1.config.json": {
+    "sha256": "ac1387983141b4057da548796591d73c5fcece88af8aef16b20fd33faf7be7a8",
+    "bytes": 53589
+  },
+  "physical-observation-carry-20261006-v1.external-lease.json": {
+    "sha256": "19f884a1e424cf87a13ceb8014dabdf47bceaaf63a74e6b3f473e0ef3348a9cb",
+    "bytes": 487
+  },
+  "physical-observation-carry-20261006-v1.final.json": {
+    "sha256": "da60f113abf2130a7ada18cb484ba5d4eab6540cfc44d9f0ced2b31067949446",
+    "bytes": 4736
+  },
+  "physical-observation-carry-20261006-v1.input_seal.json": {
+    "sha256": "d45f2af41e7d640e56155940f999294b1ede5182f798b8ef34f600b109668be9",
+    "bytes": 51302
+  },
+  "physical-observation-carry-20261006-v1.lease-identity.json": {
+    "sha256": "358cb729dc877cb1b0d3861991352a87f95caf34af3bb701e0be6d65778684aa",
+    "bytes": 565
+  },
+  "physical-observation-carry-20261006-v1.memory-gate.json": {
+    "sha256": "6eb23733ceab45151cb836851804239c7cc2b86c464a60deceb6ca807e62f6f8",
+    "bytes": 120
+  },
+  "physical-observation-carry-20261006-v1.output_seal.json": {
+    "sha256": "c73d79f8c69357af71d74d8b9f1e09cfb22309659c5beef85b34eded4acfa982",
+    "bytes": 45773
+  },
+  "physical-observation-carry-20261006-v1.publication.json": {
+    "sha256": "8da75eadd721198171c445c59d73bc778bcf88d007c5ee1956fe53c00683cd0a",
+    "bytes": 2663
+  },
+  "physical-observation-carry-20261006-v1.quiescence.json": {
+    "sha256": "d283eb0fc75949966b658a19161346e2df51522387dd27aec4d14dfedaf9abc4",
+    "bytes": 130
+  },
+  "physical-observation-carry-20261006-v1.release.json": {
+    "sha256": "2e549a68561306e7af68212fa63acb2a4ece42476ba0f00abf018dfddc5d1f00",
+    "bytes": 175
+  },
+  "physical-observation-carry-20261006-v1.stage-quiescence.json": {
+    "sha256": "eb6a56a95c3b8f6b61e326582ef2625ace169b88f722303a86189903b65f97d3",
+    "bytes": 136
+  },
+  "physical-observation-carry-20261006-v1.stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "physical-observation-carry-20261006-v1.stdout": {
+    "sha256": "bcf12666d123d74337c17a2dc91bbfdd865ae16d27032f944fca8ed4820252dc",
+    "bytes": 244
+  },
+  "physical-observation-carry-20261006-v1.system-floor.json": {
+    "sha256": "e77a1ae789b6af1958a7e286fb3d1035c46525bb9e9b67d94a287f6d2ffe76cf",
+    "bytes": 5251
+  },
+  "physical-observation-carry-20261006-v1.unit-cleanup.json": {
+    "sha256": "399a3d25d2b1eab881e52e810de54a6e93b94d9b2aada82d4794a35f35f0263b",
+    "bytes": 703
+  },
+  "physical-observation-host-link-20261006-v1.acceptance.json": {
+    "sha256": "797c2cfa1ea8e19f561b218f4b23dc399222a5a56675933552fbebf6d8a5b567",
+    "bytes": 379
+  },
+  "physical-observation-host-link-20261006-v1.child-identity.json": {
+    "sha256": "aff4606d596d245b1fdb15897d2a88873dbe2c6a8016492e2f5633004657e405",
+    "bytes": 78
+  },
+  "physical-observation-host-link-20261006-v1.config.json": {
+    "sha256": "65b93afcf9655bac6f8c44378ee1a4e398ea2f0164ca41d2080c3510ab04ebcc",
+    "bytes": 51712
+  },
+  "physical-observation-host-link-20261006-v1.external-lease.json": {
+    "sha256": "6c19588289c8ad6cd60487e425a5674312e29882c2dfd7e25b4786e7e5a4ae1e",
+    "bytes": 487
+  },
+  "physical-observation-host-link-20261006-v1.failure.json": {
+    "sha256": "c87f3029585dd73e4da1d6e47e7f90e55a940b08cea577ae98066a5a8296037e",
+    "bytes": 244
+  },
+  "physical-observation-host-link-20261006-v1.final.json": {
+    "sha256": "08d1bff6d1084688dabfa4b9b7fcf558cef36c0b3d5225b8a1f34502d7686d29",
+    "bytes": 5061
+  },
+  "physical-observation-host-link-20261006-v1.input_seal.json": {
+    "sha256": "549553537742bb77be2ba4ff18174c674b33607f092c5a80088d14787309bc0b",
+    "bytes": 50404
+  },
+  "physical-observation-host-link-20261006-v1.lease-identity.json": {
+    "sha256": "d8f6fbb0ec9242c31e6ab7c736ccf1234b0bca5c9d3fbbbe54753e0f6b1edb65",
+    "bytes": 565
+  },
+  "physical-observation-host-link-20261006-v1.memory-gate.json": {
+    "sha256": "ba36b1d18b29799f4f9886080dddf62a18638adff71def9b5407300687779265",
+    "bytes": 120
+  },
+  "physical-observation-host-link-20261006-v1.output_seal.json": {
+    "sha256": "6d7e72cfb54edf827e94be8c608d94b87aa8507bc678bc7fb554d9e3b727e7f1",
+    "bytes": 1773944
+  },
+  "physical-observation-host-link-20261006-v1.publication.json": {
+    "sha256": "7f5ce0dcadef4230df1ab788df4b7fa9e50319490ed08c46d076d9898525e34d",
+    "bytes": 2919
+  },
+  "physical-observation-host-link-20261006-v1.quiescence.json": {
+    "sha256": "1b203a74ce8ff86f6fbe493b9a7111300a0ace4316068965c35abb8eab455721",
+    "bytes": 132
+  },
+  "physical-observation-host-link-20261006-v1.release.json": {
+    "sha256": "a9a1c8c0ecbb23f039de6a62f8359a13a36e10f57453c21c6cf35074ce968943",
+    "bytes": 175
+  },
+  "physical-observation-host-link-20261006-v1.stage-quiescence.json": {
+    "sha256": "a4192a9e1c21c539078f12fc57b074e1b9d7a1f9d827c87dc2fe7f793febd71e",
+    "bytes": 136
+  },
+  "physical-observation-host-link-20261006-v1.stderr": {
+    "sha256": "9d9d4d45b6bf2981537530347d6978ff109c927d96bb436fa70a8621a1b96a07",
+    "bytes": 1949
+  },
+  "physical-observation-host-link-20261006-v1.stdout": {
+    "sha256": "d721a63ddf8ddd0e493f65cf4f73a2bac118c458a9df294577e494eb791cbf1d",
+    "bytes": 22845
+  },
+  "physical-observation-host-link-20261006-v1.system-floor.json": {
+    "sha256": "3340daf944ec7e45f4fd8cc25a69f1f7a1bc253ff250dd0397c600c17d3a243a",
+    "bytes": 195189
+  },
+  "physical-observation-host-link-20261006-v1.unit-cleanup.json": {
+    "sha256": "33091a31bb1f08c4657263b272a53191c04f38f2f623e1e07b00efb4f4d5b1c2",
+    "bytes": 772
+  },
+  "physical-observation-host-link-20261006-v2.acceptance.json": {
+    "sha256": "9ca7a29328358fdae9cd0b88385d5994d534f58149fa2bc31164ff796c9ea65d",
+    "bytes": 378
+  },
+  "physical-observation-host-link-20261006-v2.child-identity.json": {
+    "sha256": "e6aae54530f78c35650768ecf5644cff266e6262f5e1e99f35ef2c019ed534c6",
+    "bytes": 78
+  },
+  "physical-observation-host-link-20261006-v2.config.json": {
+    "sha256": "f0eaaa728df95398e491bd863a4a82283053045b532dda98fdc40bc223ff02b6",
+    "bytes": 52280
+  },
+  "physical-observation-host-link-20261006-v2.external-lease.json": {
+    "sha256": "a848c2a028bbae46370c970406618019915a2488df2ce2e9182fa5a13123fd77",
+    "bytes": 487
+  },
+  "physical-observation-host-link-20261006-v2.final.json": {
+    "sha256": "ec810747a5e31f32e08d7a77135376d4e989c7a1751c9d7d1e59f7e8af44dc38",
+    "bytes": 4814
+  },
+  "physical-observation-host-link-20261006-v2.input_seal.json": {
+    "sha256": "116dd739f74de84b03e391c8b1f49123f198b6bd1a49730824e110173b58adf1",
+    "bytes": 50535
+  },
+  "physical-observation-host-link-20261006-v2.lease-identity.json": {
+    "sha256": "3d4c0ec304e4e0b2aba52cb7cd6a4477f204675d6bf3615c11a805e1b462dbba",
+    "bytes": 565
+  },
+  "physical-observation-host-link-20261006-v2.memory-gate.json": {
+    "sha256": "c73d72c7dff64e417e1f143d319f77915bee5f69a984b7fb305f3c80ae40bac3",
+    "bytes": 120
+  },
+  "physical-observation-host-link-20261006-v2.output_seal.json": {
+    "sha256": "1407a078f58826492fb7504607da164f7a1820bfe573294df913e71824874076",
+    "bytes": 1291679
+  },
+  "physical-observation-host-link-20261006-v2.publication.json": {
+    "sha256": "8950b2abf7bd74ad5d2772fc92171e999f0bd4fca775a225e241cd58eea87d18",
+    "bytes": 2720
+  },
+  "physical-observation-host-link-20261006-v2.quiescence.json": {
+    "sha256": "4d71a055af421d0e09d96744c66e32eb3398330b33768358c11f4de460895ec8",
+    "bytes": 130
+  },
+  "physical-observation-host-link-20261006-v2.release.json": {
+    "sha256": "ecfab0cfe4b198bd77587433190a1056c3d81ac21c7853f8b387234d98bc4d6d",
+    "bytes": 175
+  },
+  "physical-observation-host-link-20261006-v2.stage-quiescence.json": {
+    "sha256": "24303715f4f8d4c06f4631e4aa1491ace25800140ec8f24f595dd7046fdd7943",
+    "bytes": 136
+  },
+  "physical-observation-host-link-20261006-v2.stderr": {
+    "sha256": "68ea8ea29525009043e68fe36519adc3f3ebc68b0bbf4fc0d9220f7b19971fad",
+    "bytes": 600
+  },
+  "physical-observation-host-link-20261006-v2.stdout": {
+    "sha256": "768af4f3e385659f6c2250b42915d8183b729dd72a6f5043c03a78caf90f1add",
+    "bytes": 23633
+  },
+  "physical-observation-host-link-20261006-v2.system-floor.json": {
+    "sha256": "adb2f03251be1dad7994044f506c4ed2a90e721be403b6b382fd972bac52ddca",
+    "bytes": 142147
+  },
+  "physical-observation-host-link-20261006-v2.unit-cleanup.json": {
+    "sha256": "220f2fe94648f059ec1bd3ce6a3d36671344446bfb4db295a1d87961a097bdca",
+    "bytes": 711
+  },
+  "physical-observation-teaching-change-20261006-v1.acceptance.json": {
+    "sha256": "13f0c2b85ad5b84a1fcde1d0e970fe630ae02ab941928cc1dbd57a3be215e47d",
+    "bytes": 378
+  },
+  "physical-observation-teaching-change-20261006-v1.child-identity.json": {
+    "sha256": "5a1b349fe8dab9748b16f83c2f50d131e59b24c74193e4882894a3ade62b89fa",
+    "bytes": 78
+  },
+  "physical-observation-teaching-change-20261006-v1.config.json": {
+    "sha256": "ba1e3b5dbbd39f4a59b0982c5fc528a81895b7d9a1336b73ebb8705c708b9ae3",
+    "bytes": 53609
+  },
+  "physical-observation-teaching-change-20261006-v1.external-lease.json": {
+    "sha256": "013226fc002bebb904989aac958967a42835e75a94ad6ff9b63ded863dc94047",
+    "bytes": 487
+  },
+  "physical-observation-teaching-change-20261006-v1.final.json": {
+    "sha256": "8b74fefe89f8f831d6c80609f55aa7fb629d0ffbc253e3ea2aea8229d59d0eae",
+    "bytes": 4889
+  },
+  "physical-observation-teaching-change-20261006-v1.input_seal.json": {
+    "sha256": "fa12b3f991f2fb64ffdc2132104780182a25219a591a7accb6f4c8c2a04ed493",
+    "bytes": 51300
+  },
+  "physical-observation-teaching-change-20261006-v1.lease-identity.json": {
+    "sha256": "216fcc6aefdee479c6a1df71c8e1f4876fbe666dd7283f7eba05704e58a1ec71",
+    "bytes": 565
+  },
+  "physical-observation-teaching-change-20261006-v1.memory-gate.json": {
+    "sha256": "1b8221816d64334ab6c819e987b15e180ea3d027c02cba2928982a37277f5486",
+    "bytes": 120
+  },
+  "physical-observation-teaching-change-20261006-v1.output_seal.json": {
+    "sha256": "57909f357cc76316984eb828896179d26ba4d4ac9da8896796d0d90f174cda62",
+    "bytes": 61157
+  },
+  "physical-observation-teaching-change-20261006-v1.publication.json": {
+    "sha256": "c6f728260feb64ad74219b83d52b2dd98b9d9b60034e9d5d19b71f210d688c2f",
+    "bytes": 2764
+  },
+  "physical-observation-teaching-change-20261006-v1.quiescence.json": {
+    "sha256": "2ebe8630f0744340c8d028597297bf9a38ae6270772a9fd0893455d82eb3eb55",
+    "bytes": 130
+  },
+  "physical-observation-teaching-change-20261006-v1.release.json": {
+    "sha256": "fced0a20e0ef56e0baeb59643760e95629d58bb8a663af817065db880c5fb66d",
+    "bytes": 175
+  },
+  "physical-observation-teaching-change-20261006-v1.stage-quiescence.json": {
+    "sha256": "87cbc5799da2c7f38e743bedad17ffe9e1874da54455c3e84c339c29ead3ae22",
+    "bytes": 136
+  },
+  "physical-observation-teaching-change-20261006-v1.stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "physical-observation-teaching-change-20261006-v1.stdout": {
+    "sha256": "488108bf91cd5fe4fb537d4e81e182749a92d311e1fbf27d00b111540e730419",
+    "bytes": 815
+  },
+  "physical-observation-teaching-change-20261006-v1.system-floor.json": {
+    "sha256": "4cafbb0a703e087df5430a9733a2712c049f8cd51378a78952df46c520879911",
+    "bytes": 7077
+  },
+  "physical-observation-teaching-change-20261006-v1.unit-cleanup.json": {
+    "sha256": "22064a195e125ef738c32a092d4b208b79c6a7c668df54687c4b115fac8b344c",
+    "bytes": 723
+  },
+  "physical-observation-teaching-refusal-20261006-v1.acceptance.json": {
+    "sha256": "6761410ce63ede108b20ad5ccbe0ad2fb8dcb461bc930f7175ae9b3e1cc8c54a",
+    "bytes": 378
+  },
+  "physical-observation-teaching-refusal-20261006-v1.child-identity.json": {
+    "sha256": "a33fc9d886a9439ea7f9af02c3d063576e2b35c4792ab919e9428881f8aeb0f7",
+    "bytes": 78
+  },
+  "physical-observation-teaching-refusal-20261006-v1.config.json": {
+    "sha256": "565e177255a947b31deac10dbb7a679fd2d7654e455846938f35adf395409f8e",
+    "bytes": 53666
+  },
+  "physical-observation-teaching-refusal-20261006-v1.external-lease.json": {
+    "sha256": "5017f448ec36b7680fb9938a2f841455ca82d213962df4a07993b97ab09ffb15",
+    "bytes": 487
+  },
+  "physical-observation-teaching-refusal-20261006-v1.final.json": {
+    "sha256": "532010c13f72d714003f866cd0053b5b210ff5f83126ea65bb5925d11da94151",
+    "bytes": 4902
+  },
+  "physical-observation-teaching-refusal-20261006-v1.input_seal.json": {
+    "sha256": "3c173446ac8814929a12de7e8b94c4d558adc18a87410967acf3deaa6418aedb",
+    "bytes": 51341
+  },
+  "physical-observation-teaching-refusal-20261006-v1.lease-identity.json": {
+    "sha256": "8ecf15a41dfb75d6ade462022ada487b7bf85dd091971a18592385f0f3365b96",
+    "bytes": 565
+  },
+  "physical-observation-teaching-refusal-20261006-v1.memory-gate.json": {
+    "sha256": "bd3e5dd45edd7ac551cf4d0014038cb1cbab07e16a5ed8b4631de770df1cf9b1",
+    "bytes": 120
+  },
+  "physical-observation-teaching-refusal-20261006-v1.output_seal.json": {
+    "sha256": "685ef32a813c6211603edf61a42ec7c1935ebdb9641044060f3e3a290e51ccf9",
+    "bytes": 53125
+  },
+  "physical-observation-teaching-refusal-20261006-v1.publication.json": {
+    "sha256": "5fc4c3095148b444e82bc179e90e4fe5679df3a4845965b914e2c638a39c7478",
+    "bytes": 2773
+  },
+  "physical-observation-teaching-refusal-20261006-v1.quiescence.json": {
+    "sha256": "3b53aba56887933a144b91d48cd61b015aac7ff23f0c1ccb88cb2bc2102d4a26",
+    "bytes": 130
+  },
+  "physical-observation-teaching-refusal-20261006-v1.release.json": {
+    "sha256": "2092cb30559952a1607e4fea159d4dd9bfd4162cb242189ea1fb03d4828041f0",
+    "bytes": 175
+  },
+  "physical-observation-teaching-refusal-20261006-v1.stage-quiescence.json": {
+    "sha256": "3d8c0d63bbbea5c7f00183fac5a9f69026a083e6c2bba8cd510f51c52bf9ceb7",
+    "bytes": 136
+  },
+  "physical-observation-teaching-refusal-20261006-v1.stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "physical-observation-teaching-refusal-20261006-v1.stdout": {
+    "sha256": "ac55afec4f932696a052603fe6f469f1f529ba9eed34adb35363961215efbb32",
+    "bytes": 252
+  },
+  "physical-observation-teaching-refusal-20261006-v1.system-floor.json": {
+    "sha256": "0e72acc07f7d2fe562d9e030f8e35afab7eb0079294e336a979d1d882543445e",
+    "bytes": 6164
+  },
+  "physical-observation-teaching-refusal-20261006-v1.unit-cleanup.json": {
+    "sha256": "3b6514020ce61dda1fa349e38ada13f36d7aad607a25e71d7ff8bab222c22b13",
+    "bytes": 725
+  },
+  "source.seal.v2.json": {
+    "sha256": "4e01d6b778fdba2c5a22a96e329f92c19e4d55118d3484eae5bfacb92fa56707",
+    "bytes": 1600
+  }
+}

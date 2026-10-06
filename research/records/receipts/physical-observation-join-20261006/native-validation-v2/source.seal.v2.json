@@ -1,0 +1,49 @@
+{
+  "base": "93f40a8bcda4ea8276f4a2cf9a42f1afe5ecec0d",
+  "paths": [
+    {
+      "path": "crates/holonics/src/hnn/prediction.rs",
+      "sha256": "f0eb33270990aa14e72c5b668cb0433c8b9424533986be5934c87efc74283e74",
+      "bytes": 108879
+    },
+    {
+      "path": "crates/holonics/src/hnn/tests/prediction.rs",
+      "sha256": "b8fec478451253985d936799e8dbcb456643d42543d98e2e678de8a9516bc24b",
+      "bytes": 91960
+    },
+    {
+      "path": "Cargo.toml",
+      "sha256": "a9ff455bcb89885c74f5758dd782ec4d3c89bbd31018e89333c4d476ea2dc40f",
+      "bytes": 1160
+    },
+    {
+      "path": "Cargo.lock",
+      "sha256": "4380186a0b5ed33a0c6ef3b15822c215072016af539446727800dcd501bde00a",
+      "bytes": 4292
+    },
+    {
+      "path": "crates/holonics/Cargo.toml",
+      "sha256": "64170e4fac0e1f1b08bfd076b39289dae249ec50e115c720ac252c2cae09c916",
+      "bytes": 1544
+    }
+  ],
+  "syntax": [
+    {
+      "path": "crates/holonics/src/hnn/prediction.rs",
+      "exit_code": 0,
+      "wall_ns": 49684991
+    },
+    {
+      "path": "crates/holonics/src/hnn/tests/prediction.rs",
+      "exit_code": 0,
+      "wall_ns": 53817716
+    }
+  ],
+  "syntax_child_peak_rss_bytes": 44285952,
+  "selectors": [
+    "hnn::tests::prediction::physical_repair::physical_teaching_",
+    "hnn::tests::prediction::physical_repair::the_supported_physical_passage_continues_on_its_retained_interior_and_clock"
+  ],
+  "claim": "explicit observations after blind physical prediction; same Word pullback and existing receiving-only normal deposition; current native verification pending",
+  "jobs_launched_by_physical_lane": []
+}

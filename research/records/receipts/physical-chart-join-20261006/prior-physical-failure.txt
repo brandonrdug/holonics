@@ -1,0 +1,12 @@
+test hnn::tests::prediction::physical_repair::a_station_no_declared_crossing_reads_is_held_unread ... FAILED
+test hnn::tests::prediction::physical_repair::a_point_reading_with_one_leader_releases_nothing ... FAILED
+test hnn::tests::prediction::physical_repair::the_section_carries_no_erased_class_so_the_repair_cannot_read_one ... FAILED
+test hnn::tests::prediction::physical_repair::the_damaged_section_runs_through_the_field_and_every_erasure_is_held_unresolved ... FAILED
+failures:
+thread 'hnn::tests::prediction::physical_repair::a_station_no_declared_crossing_reads_is_held_unread' (1137955) panicked at crates/holonics/src/hnn/tests/prediction.rs:1403:10:
+thread 'hnn::tests::prediction::physical_repair::a_point_reading_with_one_leader_releases_nothing' (1137954) panicked at crates/holonics/src/hnn/tests/prediction.rs:1403:10:
+thread 'hnn::tests::prediction::physical_repair::the_section_carries_no_erased_class_so_the_repair_cannot_read_one' (1137957) panicked at crates/holonics/src/hnn/tests/prediction.rs:1403:10:
+thread 'hnn::tests::prediction::physical_repair::the_damaged_section_runs_through_the_field_and_every_erasure_is_held_unresolved' (1137956) panicked at crates/holonics/src/hnn/tests/prediction.rs:1403:10:
+failures:
+test result: FAILED. 1011 passed; 4 failed; 0 ignored; 0 measured; 0 filtered out; finished in 247.21s
+lib tests exit 101 (253583 ms)

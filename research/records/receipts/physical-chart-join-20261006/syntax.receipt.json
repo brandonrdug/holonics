@@ -1,0 +1,21 @@
+{
+  "claim": "Rust syntax parsing only; no typecheck or runtime execution",
+  "results": [
+    {
+      "path": "crates/holonics/src/hnn/prediction.rs",
+      "exit_code": 0,
+      "wall_ns": 58819483
+    },
+    {
+      "path": "crates/holonics/src/hnn/tests/prediction.rs",
+      "exit_code": 0,
+      "wall_ns": 53565505
+    },
+    {
+      "path": "research/notebook/hnn_design/hnn_repair_loop.rs",
+      "exit_code": 0,
+      "wall_ns": 43927721
+    }
+  ],
+  "child_peak_rss_bytes": 43618304
+}

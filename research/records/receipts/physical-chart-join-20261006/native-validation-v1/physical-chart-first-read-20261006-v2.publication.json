@@ -1,0 +1,54 @@
+{
+  "lease_still_held": true,
+  "own_group_other_PIDs": [],
+  "outcome": {
+    "provisional_passed": true,
+    "final_acceptance_requires_external_CPU_read": true,
+    "label": "physical-chart-first-read-20261006-v2",
+    "wall_ns": 1121912832,
+    "peak_child_RSS_KiB": 29376,
+    "group_memory_peak_bytes": 14753792,
+    "original_coordinates_modified": false,
+    "aggregate_cpu_final_us": 1476927,
+    "aggregate_cpu_limit_us": 17000000,
+    "CPU_kernel_hard_total_limit": false
+  },
+  "outputs": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-first-read-20261006-v2.lease-identity.json": {
+      "sha256": "4f056b6d8dc10760a9739ee924cef4e15b88079da7a94aca4847208bd43f3ac9",
+      "bytes": 565
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-first-read-20261006-v2.memory-gate.json": {
+      "sha256": "cc47ece112e34fa19cb8b861bf9c533ede0b81f28b07868c04a38449d2d48f4b",
+      "bytes": 120
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-first-read-20261006-v2.child-identity.json": {
+      "sha256": "9155dff9456b5a95cdece6b40bbc6a4c8d6d5bf751368f0273d56d477065f31b",
+      "bytes": 78
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-first-read-20261006-v2.system-floor.json": {
+      "sha256": "d013a095c7885bc4519a79b4e6f24e563a973b509c0f5787d3c5c0d5d4b9757e",
+      "bytes": 8831
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-first-read-20261006-v2.quiescence.json": {
+      "sha256": "6b21dbb774b0d46c06761f30eb470f63745e1d7687bbff161a68c91c07912b72",
+      "bytes": 130
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-first-read-20261006-v2.input_seal.json": {
+      "sha256": "2e11ed05e4fb959751ca07e7c3830cd615e976b61a1228c68191dc81f338d8b1",
+      "bytes": 50340
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-first-read-20261006-v2.output_seal.json": {
+      "sha256": "d65fc2ef3109a879df2e6c8112c5aded13ed7b1bb90d5ad56d3d9f0d1521c50a",
+      "bytes": 76775
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-first-read-20261006-v2.stdout": {
+      "sha256": "e9e759694584608b0f29982cfc7dcfbeca8d6a43b884e211ea5f83b1396c4a96",
+      "bytes": 248
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-first-read-20261006-v2.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  }
+}

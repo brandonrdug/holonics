@@ -1,0 +1,9 @@
+
+running 4 tests
+test cold_restore_preserves_an_immediate_arrived_release ... ok
+test cold_restore_preserves_arrived_through_ingest_to_close ... ok
+test cold_restore_preserves_arrived_without_an_open_moment ... ok
+test post_close_save_remounts ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.70s
+

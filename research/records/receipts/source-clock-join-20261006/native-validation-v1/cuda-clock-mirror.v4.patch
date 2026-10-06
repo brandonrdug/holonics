@@ -1,0 +1,452 @@
+diff --git a/crates/holonics-cuda/src/hnn/port.rs b/crates/holonics-cuda/src/hnn/port.rs
+index 2cbee0b0..03a6ec87 100644
+--- a/crates/holonics-cuda/src/hnn/port.rs
++++ b/crates/holonics-cuda/src/hnn/port.rs
+@@ -128,21 +128,34 @@ fn ingest_open(
+     Ok(ingested)
+ }
+ 
+-/// **Every open moment but `except` re-keyed to the lift point's phases.** A moment whose re-key
+-/// fails holds an unchecked device write (`ResidentMoment::rekey`), so it is dropped with the
+-/// failed opens and the first failure is returned.
++/// **Every open moment but `except` joined to the shared clock.** The host source owner admits
++/// the actual external prefix (zero at a phase rekey) before any card write. Source counts stay
++/// at their own injection clock; the card's next ingest starts at the shared lift's phases.
++/// A failed host synchronization or unchecked card write discards that whole open.
+ fn rekey_moments(
+     moments: &mut BTreeMap<MomentId, MomentSlot<'_>>,
+     field: &Field,
+     current: &Current,
+     except: Option<MomentId>,
++    external_cells: u64,
++    external_ticks: &[u64],
+ ) -> Result<(), HnnError> {
++    for (id, moment) in moments.iter() {
++        if Some(*id) != except {
++            moment
++                .host
++                .check_clock_synchronization(field, current, external_cells, external_ticks)?;
++        }
++    }
+     let mut failed = Vec::new();
+     for (id, moment) in moments.iter_mut() {
+         if Some(*id) != except
+-            && let Err(error) = moment.card.rekey(field, current)
++            && let Err(error) = moment
++                .host
++                .synchronize_clock(field, current, external_cells, external_ticks)
++                .and_then(|()| moment.card.rekey(field, current).map_err(device))
+         {
+-            failed.push((*id, device(error)));
++            failed.push((*id, error));
+         }
+     }
+     let mut first = None;
+@@ -1044,11 +1057,12 @@ impl<'c> ExecutionPort for Resident<'c> {
+         if !cells.is_empty() {
+             field.capacity_for(cells)?;
+         }
++        // Every source shares Current, so its consuming capacity is admitted before any ingest.
++        for open in resident.moments.values() {
++            SourceCapacity::checked_of(&open.host, &field, &resident.current)?;
++        }
+         let id = match moment {
+-            Some(id) if resident.moments.contains_key(id) => {
+-                SourceCapacity::checked_of(&resident.moments[id].host, &field, &resident.current)?;
+-                *id
+-            }
++            Some(id) if resident.moments.contains_key(id) => *id,
+             Some(id) => {
+                 return Err(HnnError::UnknownHandle {
+                     handle: Handle::Moment(*id),
+@@ -1096,6 +1110,7 @@ impl<'c> ExecutionPort for Resident<'c> {
+             Err(error) => {
+                 let launched = !open.card.is_valid();
+                 resident.moments.remove(&id);
++                resident.current = found;
+                 if launched {
+                     resident.count(|traffic| traffic.ingest += octets);
+                 }
+@@ -1119,6 +1134,37 @@ impl<'c> ExecutionPort for Resident<'c> {
+                 return Err(error);
+             }
+         };
++        // The physical aging operand is each ring's actual elapsed ticks, separate from the
++        // consumed prefix population. The source owner pays these ticks on a Leaky mirror.
++        let ticks: Vec<u64> = resident
++            .current
++            .lift()
++            .iter()
++            .zip(&before)
++            .map(|(after, before)| {
++                u64::try_from(after - before).expect("a lift only advances at ingest")
++            })
++            .collect();
++        // Check the actual prefix against every sibling before address/aeon publication. A
++        // prospective refusal discards only this attempted open and restores the shared Current;
++        // untouched sibling host mirrors and cards still carry their valid prior frame.
++        let synchronization = resident.moments.iter().try_for_each(|(other_id, other)| {
++            if *other_id != id && ingested.cells != 0 {
++                other.host.check_clock_synchronization(
++                    &field,
++                    &resident.current,
++                    ingested.cells as u64,
++                    &ticks,
++                )
++            } else {
++                Ok(())
++            }
++        });
++        if let Err(error) = synchronization {
++            resident.moments.remove(&id);
++            resident.current = found;
++            return Err(error);
++        }
+         // The receiving parametron's active suffix address receives the cells the moment took,
+         // and its contact letters' site kinds refresh after the ingest, as the reference's.
+         for &code in &codes[..ingested.cells] {
+@@ -1143,7 +1189,14 @@ impl<'c> ExecutionPort for Resident<'c> {
+         resident.address.refresh(&field, &resident.constitution)?;
+         // Every other open moment steps from the one lift point: its card's phases follow it.
+         if ingested.cells > 0 && resident.moments.len() > 1 {
+-            rekey_moments(&mut resident.moments, &field, &resident.current, Some(id))?;
++            rekey_moments(
++                &mut resident.moments,
++                &field,
++                &resident.current,
++                Some(id),
++                ingested.cells as u64,
++                &ticks,
++            )?;
+         }
+         let open = &resident.moments[&id];
+         resident.wall.ingest += start.elapsed();
+@@ -1154,15 +1207,6 @@ impl<'c> ExecutionPort for Resident<'c> {
+         if ingested.carry_out {
+             resident.aeon.awaiting = true;
+         }
+-        let ticks: Vec<u64> = resident
+-            .current
+-            .lift()
+-            .iter()
+-            .zip(&before)
+-            .map(|(after, before)| {
+-                u64::try_from(after - before).expect("a lift only advances at ingest")
+-            })
+-            .collect();
+         let n = open.host.cells();
+         let detail = ReceiptDetail::Ingest {
+             cells: ingested.cells as u64,
+@@ -1210,10 +1254,25 @@ impl<'c> ExecutionPort for Resident<'c> {
+             });
+         }
+         let location = keys::locate_closing(&field, &resident.current, crib, offset)?;
+-        let jumps = location.rekey(&field, &mut resident.current)?;
++        let mut rekeyed = resident.current.clone();
++        let jumps = location.rekey(&field, &mut rekeyed)?;
++        let external_ticks = vec![0; field.rings().len()];
++        for open in resident.moments.values() {
++            SourceCapacity::checked_of(&open.host, &field, &resident.current)?;
++            open.host
++                .check_clock_synchronization(&field, &rekeyed, 0, &external_ticks)?;
++        }
++        resident.current = rekeyed;
+         resident.address.synchronize(&field, &resident.current)?;
+         // Re-keying moves only the lift's phase classes: every resident moment steps from them.
+-        rekey_moments(&mut resident.moments, &field, &resident.current, None)?;
++        rekey_moments(
++            &mut resident.moments,
++            &field,
++            &resident.current,
++            None,
++            0,
++            &external_ticks,
++        )?;
+         resident.aeon.opening = resident.current.lift().to_vec();
+         let published = location
+             .rings
+diff --git a/crates/holonics-cuda/src/hnn/port_tests.rs b/crates/holonics-cuda/src/hnn/port_tests.rs
+index 210ef57b..9bf110c9 100644
+--- a/crates/holonics-cuda/src/hnn/port_tests.rs
++++ b/crates/holonics-cuda/src/hnn/port_tests.rs
+@@ -1840,7 +1840,11 @@ fn the_card_port_returns_the_reference_through_a_releasing_collapse() {
+ /// order on the quarter turns, chained on their common nodes, source ring 2 holding the five
+ /// classes, `Δ = {1, 3}`, receiver ring 2 with aperture 5.
+ fn helix_field() -> Field {
+-    let mut declaration = chain_declaration(1 << 16);
++    helix_field_at(1 << 16)
++}
++
++fn helix_field_at(population: u64) -> Field {
++    let mut declaration = chain_declaration(population);
+     declaration.rings = [2u64, 3, 5].into_iter().map(|d| ring(d, vec![0])).collect();
+     declaration.contacts = vec![contact(0, 1, 2, 0), contact(1, 2, 3, 0)];
+     declaration.sources = vec![2];
+@@ -1850,6 +1854,267 @@ fn helix_field() -> Field {
+     Field::declare(declaration.by_lattice_rule()).unwrap()
+ }
+ 
++/// The population 436 admits the identity carrier, but lies below the located carrier's 438.
++/// Both ports refuse before opening a handle or touching an existing moment; the card's traffic
++/// remains unchanged, and the same existing handle still accepts an identity passage.
++#[test]
++#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
++fn a_located_capacity_refusal_leaves_both_ports_unchanged() {
++    let field = helix_field_at(436);
++    assert_eq!(field.capacity().n_star(), 436);
++    let (located, _) = partial_span(&field);
++    let card = card();
++    let host = Reference::campaign_one();
++    let device = Resident::campaign_one(&card);
++    let opening = Current::at_rest(&field);
++    let mut h = host.mount(&field, &opening).unwrap();
++    let mut d = device.mount(&field, &opening).unwrap();
++    let before = same("read before refusal", host.read(&h), device.read(&d)).unwrap();
++    let address = h.address().clone();
++    let traffic = d.traffic();
++    let below = HnnError::BelowCapacity {
++        population: 436,
++        n_star: 438,
++    };
++    assert_eq!(
++        host.ingest(&mut h, None, &located).err(),
++        Some(below.clone())
++    );
++    assert_eq!(
++        device.ingest(&mut d, None, &located).err(),
++        Some(below.clone())
++    );
++    assert_eq!(
++        same("read after refusal", host.read(&h), device.read(&d)).unwrap(),
++        before
++    );
++    assert_eq!(h.address(), &address);
++    assert_eq!(d.address(), &address);
++    assert_eq!(d.traffic(), traffic);
++
++    let empty = located.part(0..0).unwrap();
++    let (moment, _) = same(
++        "the existing open",
++        host.ingest(&mut h, None, &empty),
++        device.ingest(&mut d, None, &empty),
++    )
++    .unwrap();
++    let before = same("read the existing open", host.read(&h), device.read(&d)).unwrap();
++    assert_eq!(
++        host.ingest(&mut h, Some(&moment), &located).err(),
++        Some(below.clone())
++    );
++    assert_eq!(
++        device.ingest(&mut d, Some(&moment), &located).err(),
++        Some(below)
++    );
++    assert_eq!(
++        same("read the refused open", host.read(&h), device.read(&d)).unwrap(),
++        before
++    );
++    assert_eq!(ExposedResident::moment(&h, &moment).unwrap().cells(), 0);
++    assert_eq!(ExposedResident::moment(&d, &moment).unwrap().cells(), 0);
++    assert_eq!(h.address(), &address);
++    assert_eq!(d.address(), &address);
++    assert_eq!(d.traffic(), traffic);
++    let identity = word(&field, 1, 2);
++    let (_, entered) = same(
++        "identity after the capacity refusal",
++        host.ingest(&mut h, Some(&moment), &identity),
++        device.ingest(&mut d, Some(&moment), &identity),
++    )
++    .unwrap();
++    assert_eq!(entered.forward.present().unwrap().cells, 1);
++    assert_eq!(ExposedResident::moment(&h, &moment).unwrap().cells(), 1);
++    assert_eq!(ExposedResident::moment(&d, &moment).unwrap().cells(), 1);
++}
++
++/// Two source moments share the current's clock while retaining their own injected cells. A
++/// sibling's advance must leave the other moment's capacity readable and its counts untouched;
++/// alternating the producing moment then exercises the card's next ingest at that joined clock.
++#[test]
++#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
++fn sibling_moments_keep_their_counts_and_capacity_on_the_shared_clock() {
++    use holonics::hnn::moment::SourceCapacity;
++    let field = chain();
++    let turn = BigInt::one() << 80usize;
++    let opening = Current::at(
++        &field,
++        field
++            .rings()
++            .iter()
++            .map(|ring| &turn * ring.period())
++            .collect(),
++    )
++    .unwrap();
++    let card = card();
++    let host = Reference::campaign_one();
++    let device = Resident::campaign_one(&card);
++    let mut h = host.mount(&field, &opening).unwrap();
++    let mut d = device.mount(&field, &opening).unwrap();
++    let passage = word(&field, 32, 21);
++    let empty = passage.part(0..0).unwrap();
++    let first = same(
++        "the first open",
++        host.ingest(&mut h, None, &empty),
++        device.ingest(&mut d, None, &empty),
++    )
++    .unwrap()
++    .0;
++    let second = same(
++        "the sibling open",
++        host.ingest(&mut h, None, &empty),
++        device.ingest(&mut d, None, &empty),
++    )
++    .unwrap()
++    .0;
++    let at = passage.classes_read().position(|class| class == 0).unwrap();
++    let ticking = passage.part(at..at + 1).unwrap();
++    let counts = |moment: &SourceMoment| {
++        field
++            .sources()
++            .iter()
++            .map(|&ring| {
++                (0..field.ring(ring).period() as usize)
++                    .map(|phase| {
++                        (
++                            moment.phase_counts(ring, phase).unwrap().to_vec(),
++                            field
++                                .offsets()
++                                .iter()
++                                .map(|&offset| {
++                                    moment.offset_counts(ring, offset, phase).unwrap().to_vec()
++                                })
++                                .collect::<Vec<_>>(),
++                        )
++                    })
++                    .collect::<Vec<_>>()
++            })
++            .collect::<Vec<_>>()
++    };
++    for (active, sibling) in [
++        (first, second),
++        (second, first),
++        (first, second),
++        (second, first),
++    ] {
++        let before = ExposedResident::moment(&h, &sibling).unwrap();
++        let kept = (before.cells(), before.window(), counts(before));
++        let (_, ingested) = same(
++            "ingest beside an open sibling",
++            host.ingest(&mut h, Some(&active), &ticking),
++            device.ingest(&mut d, Some(&active), &ticking),
++        )
++        .unwrap();
++        assert_eq!(ingested.forward.present().unwrap().cells, 1);
++        let after = ExposedResident::moment(&h, &sibling).unwrap();
++        assert_eq!((after.cells(), after.window(), counts(after)), kept);
++        for id in [first, second] {
++            let hm = ExposedResident::moment(&h, &id).unwrap();
++            let dm = ExposedResident::moment(&d, &id).unwrap();
++            assert_eq!(
++                SourceCapacity::checked_of(hm, &field, ExposedResident::current(&h)).unwrap(),
++                SourceCapacity::checked_of(dm, &field, ExposedResident::current(&d)).unwrap(),
++            );
++            let (mut hs, mut ds) = (String::new(), String::new());
++            hm.write(&mut hs);
++            dm.write(&mut ds);
++            assert_eq!(hs, ds, "the host and card source-clock bindings must agree");
++        }
++        same("read the sibling clocks", host.read(&h), device.read(&d)).unwrap();
++        if ingested.forward.present().unwrap().carry_out {
++            let family = h.admitted().to_vec();
++            same(
++                "close the shared aeon",
++                host.close_aeon(&mut h, &family),
++                device.close_aeon(&mut d, &family),
++            )
++            .unwrap();
++        }
++    }
++    assert_ne!(
++        ExposedResident::current(&h),
++        &opening,
++        "the fixture must advance the clock"
++    );
++    assert_eq!(ExposedResident::moment(&h, &first).unwrap().cells(), 2);
++    assert_eq!(ExposedResident::moment(&h, &second).unwrap().cells(), 2);
++}
++
++/// Closing and locating keys reframes the open source without adding cells. Its shared-clock
++/// capacity stays readable, the injection counts stay fixed, and the next ingest uses that frame.
++#[test]
++#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
++fn key_relocation_keeps_the_open_capacity_readable() {
++    use holonics::hnn::moment::SourceCapacity;
++    let field = chain();
++    let card = card();
++    let mut both = pair(&card, &field, None);
++    let cells = source(&field, field.population() as usize, 3);
++    let (_, entered) = same(
++        "ingest to the boundary",
++        both.host.ingest(&mut both.h, Some(&both.moment), &cells),
++        both.device.ingest(&mut both.d, Some(&both.moment), &cells),
++    )
++    .unwrap();
++    let entered = entered.forward.present().unwrap();
++    assert!(entered.carry_out);
++    let count = ExposedResident::moment(&both.h, &both.moment)
++        .unwrap()
++        .cells();
++    let family = both.h.admitted().to_vec();
++    same(
++        "close before location",
++        both.host.close_aeon(&mut both.h, &family),
++        both.device.close_aeon(&mut both.d, &family),
++    )
++    .unwrap();
++    let crib = cells
++        .part(entered.cells.saturating_sub(8)..entered.cells)
++        .unwrap();
++    same(
++        "locate the closing keys",
++        both.host.locate_keys(&mut both.h, &crib, 1),
++        both.device.locate_keys(&mut both.d, &crib, 1),
++    )
++    .unwrap();
++    let hm = ExposedResident::moment(&both.h, &both.moment).unwrap();
++    let dm = ExposedResident::moment(&both.d, &both.moment).unwrap();
++    assert_eq!(hm.cells(), count);
++    assert_eq!(dm.cells(), count);
++    let capacity =
++        SourceCapacity::checked_of(hm, &field, ExposedResident::current(&both.h)).unwrap();
++    assert!(matches!(capacity, SourceCapacity::Reframed { .. }));
++    assert_eq!(
++        SourceCapacity::checked_of(dm, &field, ExposedResident::current(&both.d)).unwrap(),
++        capacity,
++    );
++    let (mut hs, mut ds) = (String::new(), String::new());
++    hm.write(&mut hs);
++    dm.write(&mut ds);
++    assert_eq!(hs, ds);
++    let tail = cells.part(entered.cells..entered.cells + 1).unwrap();
++    let (_, continued) = same(
++        "ingest after location",
++        both.host.ingest(&mut both.h, Some(&both.moment), &tail),
++        both.device.ingest(&mut both.d, Some(&both.moment), &tail),
++    )
++    .unwrap();
++    assert_eq!(continued.forward.present().unwrap().cells, 1);
++    assert_eq!(
++        ExposedResident::moment(&both.h, &both.moment)
++            .unwrap()
++            .cells(),
++        count + 1
++    );
++    assert_eq!(
++        ExposedResident::moment(&both.d, &both.moment)
++            .unwrap()
++            .cells(),
++        count + 1
++    );
++}
++
+ /// [agent-inferred, October 5] **A founded partial-span passage** (the host's
+ /// `hnn::tests::moment::partial_span`, the same draw `2_026_100_995`): advances that are nonzero
+ /// multiples of 5 on the helix `(2, 3, 5)`, located from a passage at every key to one gauge class;

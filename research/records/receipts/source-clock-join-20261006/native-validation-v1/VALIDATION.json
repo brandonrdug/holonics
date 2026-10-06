@@ -1,0 +1,193 @@
+{
+  "host_seal_version": 4,
+  "owned_cuda_patch_version": 5,
+  "source_base": "128235e82943276a1eaa1ca9a7bc21fab0826f8e",
+  "native_selected_acceptance": true,
+  "tests_passed": 26,
+  "failed_test_compile_v4_preserved": true,
+  "test_source_repair": "borrow expected HnnError in four assertions; no Clone API or runtime law change",
+  "caps_raised": false,
+  "runtime_is_fixed_bounded_development_read": true,
+  "scientific_job": false,
+  "whole_library_or_full_GPU_suite_run": false,
+  "Lean_ReframedMoment_acceptance": "pending separate focused Lean closure/proof check",
+  "stages": [
+    {
+      "label": "hnn-reframed-host-cuda-link-20261006-v4",
+      "passed": false,
+      "tests_passed": null,
+      "wall_ns": 20196230265,
+      "projection_ns": 65000000000,
+      "measured_to_projected_ratio": [
+        20196230265,
+        65000000000
+      ],
+      "aggregate_CPU_ns": 57885056000,
+      "group_peak_bytes": 3419713536,
+      "peak_child_RSS_KiB": 2143880,
+      "inputs_unchanged": true,
+      "quiescent_release": true
+    },
+    {
+      "label": "hnn-reframed-host-cuda-link-20261006-v5",
+      "passed": true,
+      "tests_passed": null,
+      "wall_ns": 2188906986,
+      "projection_ns": 65000000000,
+      "measured_to_projected_ratio": [
+        2188906986,
+        65000000000
+      ],
+      "aggregate_CPU_ns": 3747139000,
+      "group_peak_bytes": 843120640,
+      "peak_child_RSS_KiB": 483820,
+      "inputs_unchanged": true,
+      "quiescent_release": true
+    },
+    {
+      "label": "hnn-reframed-cold-restore-20261006-v1",
+      "passed": true,
+      "tests_passed": 4,
+      "wall_ns": 1011849257,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        1011849257,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 904498000,
+      "group_peak_bytes": 74891264,
+      "peak_child_RSS_KiB": 14076,
+      "inputs_unchanged": true,
+      "quiescent_release": true
+    },
+    {
+      "label": "hnn-reframed-cuda-capacity-refusal-20261006-v1",
+      "passed": true,
+      "tests_passed": 1,
+      "wall_ns": 3968680614,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        3968680614,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 3823441000,
+      "group_peak_bytes": 216109056,
+      "peak_child_RSS_KiB": 252908,
+      "inputs_unchanged": true,
+      "quiescent_release": true
+    },
+    {
+      "label": "hnn-reframed-cuda-failed-ingest-20261006-v1",
+      "passed": true,
+      "tests_passed": 1,
+      "wall_ns": 6239064457,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        6239064457,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 6150936000,
+      "group_peak_bytes": 171634688,
+      "peak_child_RSS_KiB": 255932,
+      "inputs_unchanged": true,
+      "quiescent_release": true
+    },
+    {
+      "label": "hnn-reframed-cuda-host-moment-20261006-v1",
+      "passed": true,
+      "tests_passed": 1,
+      "wall_ns": 1638961056,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        1638961056,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 1580713000,
+      "group_peak_bytes": 133378048,
+      "peak_child_RSS_KiB": 215116,
+      "inputs_unchanged": true,
+      "quiescent_release": true
+    },
+    {
+      "label": "hnn-reframed-cuda-key-relocation-20261006-v1",
+      "passed": true,
+      "tests_passed": 1,
+      "wall_ns": 4035586486,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        4035586486,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 3916921000,
+      "group_peak_bytes": 228388864,
+      "peak_child_RSS_KiB": 252592,
+      "inputs_unchanged": true,
+      "quiescent_release": true
+    },
+    {
+      "label": "hnn-reframed-cuda-located-ingest-20261006-v1",
+      "passed": true,
+      "tests_passed": 1,
+      "wall_ns": 2324830241,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        2324830241,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 2230708000,
+      "group_peak_bytes": 132968448,
+      "peak_child_RSS_KiB": 206440,
+      "inputs_unchanged": true,
+      "quiescent_release": true
+    },
+    {
+      "label": "hnn-reframed-cuda-sibling-clock-20261006-v1",
+      "passed": true,
+      "tests_passed": 1,
+      "wall_ns": 4038764831,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        4038764831,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 3923032000,
+      "group_peak_bytes": 249892864,
+      "peak_child_RSS_KiB": 254576,
+      "inputs_unchanged": true,
+      "quiescent_release": true
+    },
+    {
+      "label": "hnn-reframed-ranged-capacity-20261006-v1",
+      "passed": true,
+      "tests_passed": 12,
+      "wall_ns": 805277531,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        805277531,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 697468000,
+      "group_peak_bytes": 75886592,
+      "peak_child_RSS_KiB": 14056,
+      "inputs_unchanged": true,
+      "quiescent_release": true
+    },
+    {
+      "label": "hnn-reframed-source-entrance-20261006-v1",
+      "passed": true,
+      "tests_passed": 4,
+      "wall_ns": 2108523873,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        2108523873,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 2002777000,
+      "group_peak_bytes": 104484864,
+      "peak_child_RSS_KiB": 38332,
+      "inputs_unchanged": true,
+      "quiescent_release": true
+    }
+  ],
+  "source_read_lease_released": true
+}

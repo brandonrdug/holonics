@@ -1,0 +1,54 @@
+{
+  "lease_still_held": true,
+  "own_group_other_PIDs": [],
+  "outcome": {
+    "provisional_passed": true,
+    "final_acceptance_requires_external_CPU_read": true,
+    "label": "physical-observation-teaching-refusal-20261006-v1",
+    "wall_ns": 778890266,
+    "peak_child_RSS_KiB": 26852,
+    "group_memory_peak_bytes": 15544320,
+    "original_coordinates_modified": false,
+    "aggregate_cpu_final_us": 953558,
+    "aggregate_cpu_limit_us": 17000000,
+    "CPU_kernel_hard_total_limit": false
+  },
+  "outputs": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-observation-teaching-refusal-20261006-v1.lease-identity.json": {
+      "sha256": "8ecf15a41dfb75d6ade462022ada487b7bf85dd091971a18592385f0f3365b96",
+      "bytes": 565
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-observation-teaching-refusal-20261006-v1.memory-gate.json": {
+      "sha256": "bd3e5dd45edd7ac551cf4d0014038cb1cbab07e16a5ed8b4631de770df1cf9b1",
+      "bytes": 120
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-observation-teaching-refusal-20261006-v1.child-identity.json": {
+      "sha256": "a33fc9d886a9439ea7f9af02c3d063576e2b35c4792ab919e9428881f8aeb0f7",
+      "bytes": 78
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-observation-teaching-refusal-20261006-v1.system-floor.json": {
+      "sha256": "0e72acc07f7d2fe562d9e030f8e35afab7eb0079294e336a979d1d882543445e",
+      "bytes": 6164
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-observation-teaching-refusal-20261006-v1.quiescence.json": {
+      "sha256": "3b53aba56887933a144b91d48cd61b015aac7ff23f0c1ccb88cb2bc2102d4a26",
+      "bytes": 130
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-observation-teaching-refusal-20261006-v1.input_seal.json": {
+      "sha256": "3c173446ac8814929a12de7e8b94c4d558adc18a87410967acf3deaa6418aedb",
+      "bytes": 51341
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-observation-teaching-refusal-20261006-v1.output_seal.json": {
+      "sha256": "685ef32a813c6211603edf61a42ec7c1935ebdb9641044060f3e3a290e51ccf9",
+      "bytes": 53125
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-observation-teaching-refusal-20261006-v1.stdout": {
+      "sha256": "ac55afec4f932696a052603fe6f469f1f529ba9eed34adb35363961215efbb32",
+      "bytes": 252
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-observation-teaching-refusal-20261006-v1.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  }
+}

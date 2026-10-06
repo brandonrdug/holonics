@@ -1,0 +1,52 @@
+{
+  "base": "128235e82943276a1eaa1ca9a7bc21fab0826f8e",
+  "worktree": "/home/b/Workspaces/holonics/.local/wt/capacity",
+  "owned_paths": {
+    "crates/holonics/src/hnn/moment.rs": {
+      "sha256": "6f1b5a14831276dec378a3acae1be45e25e4b80fe14efb6cc808cbd55b1e39d0",
+      "bytes": 106846
+    },
+    "crates/holonics/src/hnn/reference.rs": {
+      "sha256": "9800117d77ca85642e607264897a9974aee3b2e9659392a4512ce4aba8cd13d8",
+      "bytes": 220442
+    },
+    "crates/holonics/tests/ranged_capacity.rs": {
+      "sha256": "86ae43a11634abbe645bf2bbab25e7a62e5e3fad302e31e105b62afb1abebb38",
+      "bytes": 24618
+    },
+    "research/notebook/hnn_design/hnn_exposure.rs": {
+      "sha256": "d47a90aa95aea5cdb079f9c0b87bd343c5a528b20f6365b547336c12bb9a0dc1",
+      "bytes": 90883
+    },
+    "lean/Holonics/HNN/ReframedMoment.lean": {
+      "sha256": "c12d20d76b44ee512cbc80e2edad1a864f4c921bf638a6e2126b16ae832e3fd2",
+      "bytes": 8599
+    },
+    "lean/Holonics/HNN.lean": {
+      "sha256": "d33d3bee1aa8bf49bdff77a623d7a8aa1a06be40b8615181db8b10df7db861ec",
+      "bytes": 45760
+    },
+    "docs/atlas/objects.tsv": {
+      "sha256": "c98276f6a163fa8be3890e13a2b644234b3824a0f883ade49266b209f9f925df",
+      "bytes": 872870
+    },
+    "research/records/2026-10-06_THE_SOURCE_CAPACITY_BOUNDS_THE_ADMITTED_CLOCK_NOT_THE_OBSERVED_BATCH.md": {
+      "sha256": "035d05600d40f68f4a4868e4b88e2da305c0d07aea1cd3f950c8693bd66b19eb",
+      "bytes": 10867
+    }
+  },
+  "status": "v4 source sealed before host native launch; v3 superseded only for source-reviewed explicit phase premise; native Rust/CUDA unchanged; new types/runtime and Lean pending",
+  "host_interface": "SourceMoment::{check_clock_synchronization,synchronize_clock}(field,current,external_cells,external_ticks)",
+  "bound": "H(n)*prod_all_g[d_g*(M+1)]*prod_sources[d_g*(b_g*n+1)]*(Leaky box where present), fixed opening/partition/profile/n/M; no old n_star",
+  "next_selectors": [
+    "cargo check --workspace --all-targets",
+    "cargo test -p holonics --test ranged_capacity -- --test-threads=1",
+    "cargo test -p holonics --test source_entrance --test resident_cold_restore -- --test-threads=1",
+    "lake build Holonics.HNN.ReframedMoment"
+  ],
+  "no_tests_or_compilers_launched": true,
+  "physical_aging": "Actual reached-minus-found ring ticks decay Leaky first/offset coordinates; zero vector on rekey; no pending/save field",
+  "new_regression": "sibling_ring_ticks_age_leaky_first_and_offset_coordinates_before_the_next_owning_append",
+  "supersedes": "HOST_REFRAME_SOURCE_SEAL.v3.json",
+  "lean_correction": "Explicit D theorem call; phase rewrite followed by exact hkey; four printed-axiom selectors"
+}

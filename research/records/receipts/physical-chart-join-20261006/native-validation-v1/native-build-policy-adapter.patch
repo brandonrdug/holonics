@@ -1,0 +1,83 @@
+--- before/final_stage.py
++++ after/final_stage.py
+@@ -6,8 +6,14 @@
+ unit=cfg['scope_unit']+'.service';label=cfg['label']
+ assert re.fullmatch(r'holonics-prune-admission-[a-z0-9-]+',cfg['scope_unit'])
+ assert re.fullmatch(r'[a-z0-9-]+',label)
+-cap_ns=int(cfg['projection_ns']);assert 0<cap_ns<=60_000_000_000
+-cpu_limit=int(cfg['aggregate_cpu_limit_us']);assert 0<cpu_limit<=17_000_000
++# The recovered native-build allocation is separate from the one-CPU runtime policy.
++# Native builds keep the same aggregate accounting and final acceptance; no child-only reading.
++native_build=cfg.get('stage_kind')=='native_build'
++wall_policy=65_000_000_000 if native_build else 60_000_000_000
++cpu_policy=128_000_000 if native_build else 17_000_000
++assert int(cfg.get('thread_budget',1))==(8 if native_build else 1)
++cap_ns=int(cfg['projection_ns']);assert 0<cap_ns<=wall_policy
++cpu_limit=int(cfg['aggregate_cpu_limit_us']);assert 0<cpu_limit<=cpu_policy
+ group_bytes=int(cfg['group_memory_max_bytes']);assert 2**28<=group_bytes<=2**32
+ fault=cfg.get('synthetic_cleanup_fault')
+ assert not fault or (not cfg.get('scientific_job') and fault in ('show','stop','interrupt'))
+--- before/leased_stage_v2.py
++++ after/leased_stage_v2.py
+@@ -25,7 +25,10 @@
+  p.wait();ex['child_reaped']=True
+ def interrupt(s,f):raise KeyboardInterrupt(str(s))
+ for s in [signal.SIGINT,signal.SIGTERM,signal.SIGHUP]:signal.signal(s,interrupt)
+-os.sched_setaffinity(0,{min(os.sched_getaffinity(0))})
++threads=int(config.get('thread_budget',1))
++assert threads==(8 if config.get('stage_kind')=='native_build' else 1)
++allowed=sorted(os.sched_getaffinity(0));assert len(allowed)>=threads
++os.sched_setaffinity(0,set(allowed[:threads]))
+ owner=json.loads(sys.argv[2]);ex={};outcome={};owner_verified=False
+ try:
+  mask=signal.pthread_sigmask(signal.SIG_BLOCK,{signal.SIGINT,signal.SIGTERM,signal.SIGHUP})
+--- before/bounded_stage_v1.py
++++ after/bounded_stage_v1.py
+@@ -1,4 +1,4 @@
+-"""One-CPU projected units; sampled stop plus external final aggregate acceptance."""
++"""Projected runtime/build units; sampled stop plus external final aggregate acceptance."""
+ from pathlib import Path
+ import ctypes, hashlib, json, os, resource, signal, shutil, subprocess, sys, time
+ ROOT=Path(__file__).resolve().parent
+@@ -28,13 +28,19 @@
+ WORKSPACE=Path(config.get('cwd',str(WORKSPACE))).resolve()
+ assert WORKSPACE.is_dir() and WORKSPACE.is_relative_to(ROOT.parents[2]), 'cwd outside the owned workspace'
+ GROUP_BYTES=int(config.get('group_memory_max_bytes',2**32)); assert 2**28<=GROUP_BYTES<=2**32
+-CPU_CAP_US=int(config['aggregate_cpu_limit_us']); assert 0<CPU_CAP_US<=17_000_000
++native_build=config.get('stage_kind')=='native_build'
++CPU_POLICY_US=128_000_000 if native_build else 17_000_000
++WALL_POLICY_NS=65_000_000_000 if native_build else 60_000_000_000
++THREADS=int(config.get('thread_budget',1));assert THREADS==(8 if native_build else 1)
++CPU_CAP_US=int(config['aggregate_cpu_limit_us']); assert 0<CPU_CAP_US<=CPU_POLICY_US
+ CPU_MARGIN_US=int(config['aggregate_cpu_stop_margin_us']); assert 0<CPU_MARGIN_US<CPU_CAP_US
+ CPU_STOP_US=CPU_CAP_US-CPU_MARGIN_US
+ FLOOR_KIB=int(config['system_floor_MemAvailable_KiB']); FLOOR_PERIOD_NS=10_000_000
+ assert FLOOR_KIB==4_194_304
+-CAP_NS=int(config['projection_ns']); assert 0<CAP_NS<=60_000_000_000
+-os.sched_setaffinity(0,{min(os.sched_getaffinity(0))})
++CAP_NS=int(config['projection_ns']); assert 0<CAP_NS<=WALL_POLICY_NS
++allowed=sorted(os.sched_getaffinity(0));assert len(allowed)>=THREADS
++os.sched_setaffinity(0,set(allowed[:THREADS]))
++CHILD_CPU_SECONDS=min(CPU_POLICY_US//1_000_000,(CAP_NS+999_999_999)//1_000_000_000)
+ mem={k:int(v.split()[0])*1024 for k,v in (line.split(':',1) for line in Path('/proc/meminfo').read_text().splitlines()) if v.strip().endswith('kB')}
+ HOST_GATE=int(config['minimum_MemAvailable_KiB'])*1024
+ assert HOST_GATE==8_589_934_592
+@@ -84,7 +90,7 @@
+ for directory in config.get('input_directories',[]):
+     paths.update(p.resolve() for p in Path(directory).rglob('*') if p.is_file())
+ pin={'argv':config['argv'],'cwd':str(WORKSPACE),'inputs':{str(p):ident(p) for p in sorted(paths)},
+-     'source_scope':config['scope'],'CPU_count':1,'CPU_affinity':sorted(os.sched_getaffinity(0)),
++     'source_scope':config['scope'],'CPU_count':THREADS,'per_process_RLIMIT_CPU_seconds':CHILD_CPU_SECONDS,'CPU_affinity':sorted(os.sched_getaffinity(0)),
+      'cap_ns':CAP_NS,'projection_ns':CAP_NS,'system_floor_MemAvailable_KiB':FLOOR_KIB,'system_floor_sampling_period_ns':FLOOR_PERIOD_NS,'host_MemTotal_bytes':mem['MemTotal'],
+      'host_MemAvailable_bytes':mem['MemAvailable'],'minimum_MemAvailable_bytes':HOST_GATE,'group_memory_max_bytes':GROUP_BYTES,
+      'group_swap_max_bytes':0,'cgroup':str(cgpath),'memory_events_before':before_events,
+@@ -99,8 +105,7 @@
+     signal.pthread_sigmask(signal.SIG_SETMASK, child_signal_mask)
+     address_cap=int(config.get('address_space_max_bytes',GROUP_BYTES))
+     resource.setrlimit(resource.RLIMIT_AS,(address_cap,address_cap))
+-    cpu_seconds=min(17,(CAP_NS+999_999_999)//1_000_000_000)
+-    resource.setrlimit(resource.RLIMIT_CPU,(cpu_seconds,cpu_seconds))
++    resource.setrlimit(resource.RLIMIT_CPU,(CHILD_CPU_SECONDS,CHILD_CPU_SECONDS))
+ outpath=ROOT/(label+'.stdout');errpath=ROOT/(label+'.stderr')
+ start=time.monotonic_ns();timed_out=False;floor_breached=False;cpu_exceeded=False;floor_samples=[];next_floor=start;cpu_samples=[]
+ with outpath.open('x') as out,errpath.open('x') as err:

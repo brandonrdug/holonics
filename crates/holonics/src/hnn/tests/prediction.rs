@@ -1298,3 +1298,554 @@ fn the_release_reads_a_located_map_that_fixes_its_antecedent() {
         assert_eq!(generated.ticks_closed, generated.ticks);
     }
 }
+
+// -------------------------------------------------------------------------------------------
+// the physical repair (lane C, October 5): the damaged section through the field's own motion
+
+mod physical_repair {
+    use super::super::support::{contact, ring};
+    use crate::compression::landmark::context::{BaseMeasure, StopPrior};
+    use crate::hnn::constitution::{CAMPAIGN_ONE_BUDGET, Constitution};
+    use crate::hnn::encoding::Encoded;
+    use crate::hnn::field::{
+        ConstitutionRead, CribDeclaration, Current, Field, FieldDeclaration, ReceiverDeclaration,
+    };
+    use crate::hnn::keys::{PairLocation, station_pairs};
+    use crate::hnn::prediction::{
+        DamagedSection, PhysicalRepair, RepairedCell, Unresolved, repair_by_field,
+    };
+    use crate::hnn::receiving::ReceivingPhases;
+    use crate::hnn::word::{Absorption, WordOpening};
+    use crate::holarchy::terrain::{CyclicLaw, KnownTruth};
+    use crate::ratio::linear::ExactRatMatrix;
+    use crate::ratio::{Rat, integer, rat};
+    use num_traits::Zero;
+
+    /// The section's declared receiver: ring 0 read at `aperture` crossings from its first.
+    fn section(aperture: usize) -> ReceiverDeclaration {
+        ReceiverDeclaration {
+            ring: 0,
+            aperture,
+            tolerance: rat(1, 16),
+            depth: 1,
+            prior: StopPrior::half(),
+            mass: 1,
+            base: BaseMeasure::Even,
+            receiving_prior: 0,
+        }
+    }
+
+    /// The source and receiving ring of period 8 (its lock every port, so it steps once a cell),
+    /// joined at three nodes to a ring of period 3; four classes, no pair offset.
+    fn field() -> Field {
+        field_with_lock((0..8).collect())
+    }
+
+    fn field_with_lock(lock: Vec<u64>) -> Field {
+        Field::declare(
+            FieldDeclaration {
+                rings: vec![ring(8, lock), ring(3, Vec::new())],
+                contacts: vec![contact(0, 1, 3, 0)],
+                loops: Vec::new(),
+                sources: vec![0],
+                offsets: Vec::new(),
+                alphabet: 4,
+                step: integer(1),
+                exponent_grain: 1,
+                receivers: vec![section(1)],
+                crib: CribDeclaration {
+                    window: 16,
+                    offset: 1,
+                },
+                population: 1 << 16,
+                lattice: Default::default(),
+            }
+            .by_lattice_rule(),
+        )
+        .unwrap()
+    }
+
+    /// The order-2 terrain's passages of 8 cells (an opening of 2), through its declared identity.
+    fn passages(field: &Field, seed: u64, count: usize) -> Vec<Encoded> {
+        let truth =
+            KnownTruth::cyclic(CyclicLaw::OrderTwo { opening: 2 }, 4, seed, count, 8).unwrap();
+        Encoded::identity(&truth, field).unwrap()
+    }
+
+    /// The opening and the material with the pair located on seen passages deposited (lanes B/C).
+    fn materials(field: &Field) -> (Constitution, Constitution) {
+        let opening = Constitution::initial(field, CAMPAIGN_ONE_BUDGET).unwrap();
+        let mut location = PairLocation::open(field, 0);
+        for passage in passages(field, 2_026_100_971, 32) {
+            for observation in station_pairs(field, 0, &passage, 2).unwrap() {
+                location.observe(&observation);
+            }
+        }
+        let located = location.survivors().located().expect("the seen pair is located");
+        assert_eq!(located.offset, 2);
+        let prior = opening.source_port(0).unwrap().clone();
+        let (learned, deposit) =
+            crate::hnn::executed::pair_deposit(field, &opening, &prior, 0, &located).unwrap();
+        assert!(deposit.certificate.holds());
+        (opening, learned)
+    }
+
+    fn repaired(
+        field: &Field,
+        theta: &Constitution,
+        section: &DamagedSection,
+        phases: &ReceivingPhases,
+    ) -> PhysicalRepair {
+        repair_by_field(
+            field,
+            theta,
+            &Current::at_rest(field),
+            section,
+            &WordOpening::Rest,
+            phases,
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn the_damaged_section_runs_through_the_field_and_every_erasure_is_held_unresolved() {
+        let field = field();
+        let (opening, learned) = materials(&field);
+        let current = Current::at_rest(&field);
+        let phases = ReceivingPhases::declare(&field, &learned, &current, &section(8)).unwrap();
+        // The receiver's declaration reads no source port: the deposit leaves it unchanged.
+        assert_eq!(
+            phases,
+            ReceivingPhases::declare(&field, &opening, &current, &section(8)).unwrap()
+        );
+        let truth = passages(&field, 2_026_100_972, 1).remove(0);
+        let erased = [2, 5, 7];
+        let damaged = DamagedSection::damage(&truth, &erased).unwrap();
+        assert_eq!(damaged.erased(), erased);
+        let repair = repaired(&field, &learned, &damaged, &phases);
+        // One imposition from rest, its work closed; every executed tick and the word close.
+        assert!(repair.opening.closes());
+        assert_eq!(repair.opening.before, Rat::zero());
+        assert!(repair.opening.imposed > Rat::zero());
+        assert_eq!(repair.balances.len(), 7);
+        assert!(repair.balances.iter().all(|balance| balance.closes()));
+        assert!(repair.word.closes());
+        // The clock: station j is read at crossing j, the refinement's tick j; the carried end
+        // stands at the last.
+        assert_eq!(repair.carry.ticks, 7);
+        assert_eq!(repair.reads.len(), 8);
+        for (j, read) in repair.reads.iter().enumerate() {
+            assert_eq!((read.station, read.crossing, read.tick), (j, j, j));
+        }
+        // The decoder is the opening's zero map: every class leads every read, a reading only.
+        for read in &repair.reads {
+            assert!(read.read.logits.iter().all(Zero::is_zero));
+            assert_eq!(read.leaders(), vec![0, 1, 2, 3]);
+        }
+        let classes: Vec<usize> = truth.classes_read().collect();
+        for (t, cell) in repair.cells.iter().enumerate() {
+            if erased.contains(&t) {
+                assert_eq!(
+                    *cell,
+                    RepairedCell::Held {
+                        fibre: vec![0, 1, 2, 3],
+                        unresolved: Unresolved::UncertifiedDomain,
+                    }
+                );
+            } else {
+                assert_eq!(*cell, RepairedCell::Intact(classes[t]));
+            }
+        }
+    }
+
+    #[test]
+    fn the_section_carries_no_erased_class_so_the_repair_cannot_read_one() {
+        let field = field();
+        let (_, learned) = materials(&field);
+        let current = Current::at_rest(&field);
+        let phases = ReceivingPhases::declare(&field, &learned, &current, &section(8)).unwrap();
+        let erased = [2, 5, 7];
+        // Two passages equal on the intact cells and different at every erasure.
+        let first = [0, 1, 1, 2, 2, 3, 3, 0];
+        let second = [0, 1, 3, 2, 2, 0, 3, 2];
+        let sections: Vec<DamagedSection> = [first, second]
+            .iter()
+            .map(|word| {
+                DamagedSection::damage(&crate::hnn::tests::support::encoded(&field, word), &erased)
+                    .unwrap()
+            })
+            .collect();
+        assert_eq!(sections[0], sections[1]);
+        assert_eq!(
+            repaired(&field, &learned, &sections[0], &phases),
+            repaired(&field, &learned, &sections[1], &phases)
+        );
+        // Runs that overlap or leave the section are refused.
+        let run = crate::hnn::tests::support::encoded(&field, &[0, 1]);
+        assert!(DamagedSection::of_runs(8, &run, vec![(0, run.clone()), (1, run.clone())]).is_err());
+        assert!(DamagedSection::of_runs(8, &run, vec![(7, run.clone())]).is_err());
+        assert!(DamagedSection::of_runs(usize::MAX, &run, vec![(usize::MAX, run.clone())]).is_err());
+    }
+
+    #[test]
+    fn a_point_reading_with_one_leader_releases_nothing() {
+        let field = field();
+        let (_, learned) = materials(&field);
+        let current = Current::at_rest(&field);
+        let phases = ReceivingPhases::declare(&field, &learned, &current, &section(8)).unwrap();
+        // A declared decoder that reads class 0 from the ring's first node and class 1 against it.
+        let width = field.ring(0).width();
+        let mut rows = vec![vec![Rat::zero(); width]; 8];
+        rows[0][0] = integer(1 << 20);
+        rows[2][0] = -integer(1 << 20);
+        let decoder = ExactRatMatrix::shaped(8, width, rows).unwrap();
+        let theta = learned.with_ports(0, None, None, Some(decoder)).unwrap();
+        let truth = passages(&field, 2_026_100_972, 1).remove(0);
+        let damaged = DamagedSection::damage(&truth, &[2, 5, 7]).unwrap();
+        let repair = repaired(&field, &theta, &damaged, &phases);
+        let single = repair
+            .reads
+            .iter()
+            .filter(|read| read.leaders().len() == 1)
+            .count();
+        assert!(single > 0, "the declared decoder leads one class at some station");
+        for t in [2, 5, 7] {
+            assert!(matches!(
+                repair.cells[t],
+                RepairedCell::Held {
+                    unresolved: Unresolved::UncertifiedDomain,
+                    ..
+                }
+            ));
+        }
+        assert!(repair.cells.iter().all(|cell| !matches!(cell, RepairedCell::Released(_))));
+    }
+
+    #[test]
+    fn a_station_no_declared_crossing_reads_is_held_unread() {
+        let field = field();
+        let (_, learned) = materials(&field);
+        let current = Current::at_rest(&field);
+        let phases = ReceivingPhases::declare(&field, &learned, &current, &section(4)).unwrap();
+        let truth = passages(&field, 2_026_100_972, 1).remove(0);
+        let damaged = DamagedSection::damage(&truth, &[2, 5, 7]).unwrap();
+        let repair = repaired(&field, &learned, &damaged, &phases);
+        assert_eq!(repair.reads.len(), 4);
+        assert_eq!(repair.carry.ticks, 3);
+        let unresolved = |t: usize| match &repair.cells[t] {
+            RepairedCell::Held { unresolved, .. } => Some(*unresolved),
+            _ => None,
+        };
+        assert_eq!(unresolved(2), Some(Unresolved::UncertifiedDomain));
+        assert_eq!(unresolved(5), Some(Unresolved::Unread));
+        assert_eq!(unresolved(7), Some(Unresolved::Unread));
+    }
+
+    /// The existing located partial-span control (moment.rs): its actual nonunit conduct and
+    /// producing decoder are founded on the observed stepped terrain, not forged chart metadata.
+    fn located_passage() -> (Field, Encoded) {
+        use crate::compression::keys::transport::{CarryHelix, SteppedTerrain, TransportLocation};
+        use crate::hnn::encoding::{Encoding, PassageChart};
+        use crate::hnn::tests::support::Draw;
+        let mut receiver = section(1);
+        receiver.ring = 2;
+        let field = Field::declare(FieldDeclaration {
+            rings: [2, 3, 5].into_iter().map(|period| ring(period, vec![0])).collect(),
+            contacts: vec![contact(0, 1, 2, 0), contact(1, 2, 3, 0)],
+            loops: Vec::new(),
+            sources: vec![2],
+            offsets: vec![1, 3],
+            alphabet: 5,
+            step: integer(1),
+            exponent_grain: 1,
+            receivers: vec![receiver],
+            crib: CribDeclaration { window: 16, offset: 1 },
+            population: 1 << 16,
+            lattice: Default::default(),
+        }.by_lattice_rule()).unwrap();
+        let helix = CarryHelix::new(vec![2, 3, 5]).unwrap();
+        let mut draw = Draw::new(2_026_100_995);
+        let advances = (0..5).map(|_| 5 * (1 + draw.below(5)) as u64).collect();
+        let mut left: Vec<usize> = (0..5).collect();
+        let labels = (0..5).map(|_| left.remove(draw.below(left.len()))).collect();
+        let terrain = SteppedTerrain::new(helix.clone(), advances, labels).unwrap();
+        let passages: Vec<_> = (0..helix.period()).map(|key| terrain.passage(key, 60)).collect();
+        let location = TransportLocation::locate(helix, 5, &passages).unwrap();
+        let chart = PassageChart::located(&location, &passages[..1]).unwrap();
+        let encoding = Encoding::found(&chart).unwrap();
+        let encoded = Encoded::through(&encoding, &chart, &field, &passages[..1]).unwrap().remove(0);
+        (field, encoded)
+    }
+
+    #[test]
+    fn equal_class_counts_do_not_join_different_producing_charts() {
+        let (field, located) = located_passage();
+        let identity = crate::hnn::tests::support::encoded(&field, &[0, 1]);
+        assert_eq!(identity.classes(), located.classes());
+        let refusal = DamagedSection::of_runs(8, &identity, vec![(0, identity.clone()), (3, located.part(0..2).unwrap())]);
+        assert!(matches!(refusal, Err(crate::hnn::HnnError::Unadmitted {
+            reason: "intact runs do not share the section's complete producing chart",
+        })));
+    }
+
+    #[test]
+    fn total_erasure_preserves_the_producing_chart_and_refuses_located_conduct_before_opening() {
+        let (field, located) = located_passage();
+        let theta = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap();
+        let current = Current::at_rest(&field);
+        let phases = ReceivingPhases::declare(&field, &theta, &current, &field.receivers()[0]).unwrap();
+        for erased in [vec![2, 5], (0..located.len()).collect()] {
+            let damaged = DamagedSection::damage(&located, &erased).unwrap();
+            assert!(damaged.chart().is_empty());
+            assert_eq!(damaged.chart(), &located.part(0..0).unwrap());
+            let before = theta.clone();
+            let refusal = repair_by_field(&field, &theta, &current, &damaged, &WordOpening::Rest, &phases);
+            assert!(matches!(refusal, Err(crate::hnn::HnnError::Unadmitted {
+                reason: "the located conduct has no certified sparse station-clock chart",
+            })));
+            assert_eq!(theta, before);
+        }
+    }
+
+    #[test]
+    fn identity_conduct_must_certify_the_station_clock_even_at_erased_stations() {
+        let field = field_with_lock(vec![0, 1, 2]); // Class 3 does not fit.
+        let theta = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap();
+        let current = Current::at_rest(&field);
+        let phases = ReceivingPhases::declare(&field, &theta, &current, &section(1)).unwrap();
+        let encoded = crate::hnn::tests::support::encoded(&field, &[0, 1]);
+        let damaged = DamagedSection::damage(&encoded, &[1]).unwrap();
+        assert!(matches!(repair_by_field(&field, &theta, &current, &damaged, &WordOpening::Rest, &phases),
+            Err(crate::hnn::HnnError::Unadmitted {
+                reason: "the identity conduct does not certify one source tick per declared station",
+            })));
+    }
+
+    #[test]
+    fn the_producing_decoder_and_both_physical_maps_are_joined_before_opening() {
+        let field = field();
+        let theta = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap();
+        let current = Current::at_rest(&field);
+        let phases = ReceivingPhases::declare(&field, &theta, &current, &section(1)).unwrap();
+        let smaller = Encoded::identity(&KnownTruth::declared(3, vec![vec![0, 1]]), &field).unwrap().remove(0);
+        let damaged = DamagedSection::damage(&smaller, &[1]).unwrap();
+        assert!(matches!(repair_by_field(&field, &theta, &current, &damaged, &WordOpening::Rest, &phases),
+            Err(crate::hnn::HnnError::Unadmitted {
+                reason: "the physical source and receiver do not share the producing identity decoder's classes",
+            })));
+        let encoded = crate::hnn::tests::support::encoded(&field, &[0, 1]);
+        let damaged = DamagedSection::damage(&encoded, &[1]).unwrap();
+        let width = field.ring(0).width();
+        for (source, receiving, reason) in [
+            (Some(ExactRatMatrix::zero(width, 3).unwrap()), None,
+                "the physical source map does not consume the producing chart's classes"),
+            (None, Some(ExactRatMatrix::zero(6, width).unwrap()),
+                "the physical receiving map does not return the producing chart's complex classes"),
+        ] {
+            let incompatible = theta.clone().with_ports(0, None, source, receiving).unwrap();
+            assert!(matches!(repair_by_field(&field, &incompatible, &current, &damaged, &WordOpening::Rest, &phases),
+                Err(crate::hnn::HnnError::Unadmitted { reason: found }) if found == reason));
+        }
+    }
+
+    #[test]
+    fn the_supported_physical_passage_continues_on_its_retained_interior_and_clock() {
+        let field = field();
+        let (_, learned) = materials(&field);
+        let current = Current::at_rest(&field);
+        let phases = ReceivingPhases::declare(&field, &learned, &current, &section(8)).unwrap();
+        let truth = passages(&field, 2_026_100_972, 1).remove(0);
+        let damaged = DamagedSection::damage(&truth, &[2, 5, 7]).unwrap();
+        let first = repaired(&field, &learned, &damaged, &phases);
+        let continued = repair_by_field(&field, &learned, &current, &damaged,
+            &WordOpening::Received { carry: first.carry.clone(), absorption: Absorption::Nothing }, &phases).unwrap();
+        assert!(continued.opening.before > Rat::zero(), "the carried interior is physical motion");
+        assert!(continued.opening.closes());
+        assert!(continued.balances.iter().all(|balance| balance.closes()));
+        assert!(continued.word.closes());
+        assert_eq!(continued.carry.ticks, first.carry.ticks + 7);
+        for (j, read) in continued.reads.iter().enumerate() {
+            assert_eq!(read.tick, first.carry.ticks + j);
+        }
+        assert_ne!(continued.carry.change, first.carry.change);
+        assert_eq!(continued.cells, first.cells); // No domain certificate is invented by continuation.
+    }
+
+    #[test]
+    fn physical_teaching_changes_r_and_the_later_carried_receiving_read() {
+        use crate::hnn::prediction::predict_by_field;
+        let field = field();
+        let (_, learned) = materials(&field);
+        let current = Current::at_rest(&field);
+        let phases = ReceivingPhases::declare(&field, &learned, &current, &section(8)).unwrap();
+        let observed = passages(&field, 2_026_100_972, 1).remove(0);
+        let damaged = DamagedSection::damage(&observed, &[2, 5, 7]).unwrap();
+        // No observation is an input to the blind physical prediction.
+        let prediction = predict_by_field(
+            &field,
+            &learned,
+            &current,
+            &damaged,
+            &WordOpening::Rest,
+            &phases,
+        )
+        .unwrap();
+        let blind = prediction.prediction().clone();
+        assert!(
+            blind
+                .reads
+                .iter()
+                .all(|station| station.read.logits.iter().all(Zero::is_zero))
+        );
+        let compared = [false, false, true, false, false, true, false, true];
+        // Teaching arrives only now, at the declared previously erased stations.
+        let teaching = prediction.observe(&learned, &observed, &compared).unwrap();
+        assert_eq!(teaching.prediction, blind);
+        assert_eq!(teaching.constitution.commit(), learned.commit() + 1);
+        assert!(teaching.publication.stepped > 0);
+        assert_ne!(
+            teaching.constitution.receiving_map(0),
+            learned.receiving_map(0)
+        );
+        // R=0 had no native pullback before teaching: only the actual receiving relation changes.
+        assert_eq!(teaching.constitution.source_port(0), learned.source_port(0));
+        let later_word = passages(&field, 2_026_100_973, 1).remove(0);
+        let later = DamagedSection::damage(&later_word, &[2, 5, 7]).unwrap();
+        let opening = WordOpening::Received {
+            carry: teaching.prediction.carry.clone(),
+            absorption: Absorption::Nothing,
+        };
+        let before = repair_by_field(&field, &learned, &current, &later, &opening, &phases).unwrap();
+        let after = repair_by_field(
+            &field,
+            &teaching.constitution,
+            &current,
+            &later,
+            &opening,
+            &phases,
+        )
+        .unwrap();
+        assert_eq!(after.carry.change, before.carry.change);
+        assert_ne!(
+            after.reads, before.reads,
+            "the reached R deposit changes the actual native read"
+        );
+        assert!(
+            after
+                .reads
+                .iter()
+                .any(|station| station.read.logits.iter().any(|x| !x.is_zero()))
+        );
+        assert_eq!(after.cells, before.cells); // The coupled-drive domain is still uncertified.
+        assert!(after.opening.closes() && after.word.closes());
+        assert!(after.balances.iter().all(|balance| balance.closes()));
+        // An exterior test perturbation changes one intact source, under the same learned R,
+        // carry and clocks. It supplies no desired output and changes nothing in the learner.
+        let mut changed: Vec<_> = later_word.classes_read().collect();
+        changed[0] = (changed[0] + 1) % 4;
+        let changed = crate::hnn::tests::support::encoded(&field, &changed);
+        let changed = DamagedSection::damage(&changed, &[2, 5, 7]).unwrap();
+        let changed = repair_by_field(
+            &field,
+            &teaching.constitution,
+            &current,
+            &changed,
+            &opening,
+            &phases,
+        )
+        .unwrap();
+        assert_ne!(changed.carry.change, after.carry.change);
+        assert_ne!(
+            changed.reads, after.reads,
+            "the learned physical read depends on the actual intact source"
+        );
+        println!(
+            "physical teaching: certified receiving publication at commit {}; blind output {:?}; subsequent carried output {:?}",
+            teaching.constitution.commit(),
+            teaching.prediction.cells,
+            after.cells
+        );
+    }
+
+    #[test]
+    fn physical_teaching_refuses_a_stale_material_or_foreign_chart_and_preserves_the_carry() {
+        use crate::hnn::prediction::predict_by_field;
+        let field = field();
+        let (_, learned) = materials(&field);
+        let current = Current::at_rest(&field);
+        let phases = ReceivingPhases::declare(&field, &learned, &current, &section(8)).unwrap();
+        let observed = passages(&field, 2_026_100_972, 1).remove(0);
+        let damaged = DamagedSection::damage(&observed, &[2, 5, 7]).unwrap();
+        let compared = [false, false, true, false, false, true, false, true];
+        let foreign = Encoded::identity(&KnownTruth::declared(3, vec![vec![0; 8]]), &field)
+            .unwrap()
+            .remove(0);
+        let prediction = predict_by_field(
+            &field,
+            &learned,
+            &current,
+            &damaged,
+            &WordOpening::Rest,
+            &phases,
+        )
+        .unwrap();
+        let blind = prediction.prediction().clone();
+        let refusal = prediction
+            .observe(&learned, &foreign, &compared)
+            .unwrap_err();
+        assert_eq!(refusal.prediction, blind);
+        assert!(matches!(
+            refusal.error,
+            crate::hnn::HnnError::Unadmitted {
+                reason: "the observation does not share the physical source's complete producing chart",
+            }
+        ));
+        let pending = predict_by_field(
+            &field,
+            &learned,
+            &current,
+            &damaged,
+            &WordOpening::Rest,
+            &phases,
+        )
+        .unwrap();
+        let blind = pending.prediction().clone();
+        let teaching = predict_by_field(
+            &field,
+            &learned,
+            &current,
+            &damaged,
+            &WordOpening::Rest,
+            &phases,
+        )
+        .unwrap()
+        .observe(&learned, &observed, &compared)
+        .unwrap();
+        // False comparison regions carry no teaching covector or normal statistic. Their exterior
+        // labels cannot alter the selected regions' target clock or the deposited constitution.
+        let mut alternative: Vec<_> = observed.classes_read().collect();
+        alternative[0] = (alternative[0] + 1) % 4;
+        let alternative = crate::hnn::tests::support::encoded(&field, &alternative);
+        let equivalent = predict_by_field(
+            &field,
+            &learned,
+            &current,
+            &damaged,
+            &WordOpening::Rest,
+            &phases,
+        )
+        .unwrap()
+        .observe(&learned, &alternative, &compared)
+        .unwrap();
+        assert_eq!(equivalent.constitution, teaching.constitution);
+        let refusal = pending
+            .observe(&teaching.constitution, &observed, &compared)
+            .unwrap_err();
+        assert_eq!(refusal.prediction, blind);
+        assert!(
+            matches!(refusal.error, crate::hnn::HnnError::StaleDeposit { staged, published }
+                if staged == learned.commit() && published == teaching.constitution.commit())
+        );
+    }
+
+}

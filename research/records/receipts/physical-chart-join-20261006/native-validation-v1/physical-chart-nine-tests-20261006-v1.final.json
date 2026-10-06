@@ -1,0 +1,99 @@
+{
+  "passed": false,
+  "label": "physical-chart-nine-tests-20261006-v1",
+  "scientific_job": false,
+  "deferred_lock_busy": false,
+  "final_CPU_ns": 3519877000,
+  "CPU_reading_grain_ns": 1000,
+  "aggregate_CPU_limit_us": 17000000,
+  "final_CPU_source": "systemd retained oneshot CPUUsageNSec after all group processes exit",
+  "CPU_kernel_hard_total_limit": false,
+  "sampled_stop_margin_us": 1000000,
+  "aggregate_CPU_within_limit": true,
+  "no_overshoot_accepted": true,
+  "wall_ns": 3569951773,
+  "projection_ns": 16782673809,
+  "wall_source": "external monotonic_ns through final property read",
+  "quiescent": true,
+  "completion_event": "oneshot start job completed; no polling",
+  "unit_properties": {
+    "Description": "Owned holonics admission physical-chart-nine-tests-20261006-v1 7c3ea52accb8fa5d47886a2e2d9de053",
+    "LoadState": "loaded",
+    "ActiveState": "active",
+    "SubState": "exited",
+    "InvocationID": "60b87577753f4ae1b4b6e701a9f09ce5",
+    "Result": "success",
+    "ExecMainStatus": "0",
+    "ControlGroup": "",
+    "MemoryPeak": "15273984",
+    "CPUUsageNSec": "3519877000",
+    "TasksCurrent": "[not set]"
+  },
+  "outer_error": null,
+  "unit_start_exit": 0,
+  "unit_start_stdout": "",
+  "unit_start_stderr": "",
+  "config": {
+    "sha256": "c07fa5b2b75d2e2828d4dc62b08519bedfc6cd94738b01aaf867c8c4de6d6d49",
+    "bytes": 51525
+  },
+  "receipt_pins": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-nine-tests-20261006-v1.config.json": {
+      "sha256": "c07fa5b2b75d2e2828d4dc62b08519bedfc6cd94738b01aaf867c8c4de6d6d49",
+      "bytes": 51525
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-nine-tests-20261006-v1.external-lease.json": {
+      "sha256": "9941a80472b3f726e43b0e7e4430f6c95932b6bffa70ee281d9ae9cef6a2819d",
+      "bytes": 487
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-nine-tests-20261006-v1.lease-identity.json": {
+      "sha256": "5b6d5166bd32320557714128a8454690b8669f9d0337bfaa4d8a20019d497da5",
+      "bytes": 565
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-nine-tests-20261006-v1.input_seal.json": {
+      "sha256": "66670c10e06e2d4006e082c7a45812b3c58ed6d9b17b6de7521cb9c78b66b222",
+      "bytes": 50234
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-nine-tests-20261006-v1.stdout": {
+      "sha256": "e22f96a57b3079a5459b8eabdcf61004adb97b420744c8ef2129002ed8397105",
+      "bytes": 1204
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-nine-tests-20261006-v1.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-nine-tests-20261006-v1.memory-gate.json": {
+      "sha256": "53739da397a7b26669a58f9b581c7c53167ea607755d46a19dcc20b535ab3280",
+      "bytes": 120
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-nine-tests-20261006-v1.child-identity.json": {
+      "sha256": "20e2a79352a51945ddc7da7dda82f73e154c4c943922599bf353327c6d959001",
+      "bytes": 78
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-nine-tests-20261006-v1.system-floor.json": {
+      "sha256": "01945473d106cc5c2d13f3125866eea728c49001268d258c44b95265e477b2ea",
+      "bytes": 24875
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-nine-tests-20261006-v1.quiescence.json": {
+      "sha256": "3b5a4c2ead794873c6e24c119e023bbc39b8a708a2887c3b52cca7054085ec7d",
+      "bytes": 130
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-nine-tests-20261006-v1.output_seal.json": {
+      "sha256": "4a73674f226c3e92b4c18f1a51374fef42b340265999a57e546e13210d4c7e3d",
+      "bytes": 216078
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-nine-tests-20261006-v1.publication.json": {
+      "sha256": "7d2d98e759a3e592d72c1731f80be5693f468493aedfaa5ad0ffa4633a854028",
+      "bytes": 2658
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-chart-nine-tests-20261006-v1.stage-quiescence.json": {
+      "sha256": "70059414537a923af123b95174bc1b74cfe474ef736bafe96694f8ff1ec8d486",
+      "bytes": 136
+    }
+  },
+  "launcher_outside_native_group": true,
+  "lease_owner_outside_capped_group": true,
+  "lease_held_through_final_CPU_read_and_publication": true,
+  "stage_passed_before_cleanup": true,
+  "requires_cleanup_acceptance": true
+}

@@ -1,0 +1,9 @@
+# The development read of `executed physical-repair` (the physical repair's record §0): damage A,
+# 8 passages a terrain on the repair record's development seed 2_026_100_701, the receiving section
+# at aperture 12 (stations 0 to 11 read), 8 threads. It measures the declaration's rank at aperture
+# 12, the 12-crossing words run together and the grader's path end to end; the read's pin is
+# projected from it and from the probes' 48-crossing words.
+command = executed physical-repair
+projection = the declaration at aperture 12: 120 unit words of 12 junction steps, at most 120 x 1,216 ms = 145,920 ms (the probe's 48-tick passage word, ticks 0 to 11; the 4-step declaration measured 5,904 ms against 120 x 74 ms = 8,880 ms); 24 words of 12 crossings at 8 threads, each at most 764 + 1,216 ms; the location and deposit of three terrains, at most 3,000 ms; at most 160,000 ms in all
+deadline_ms = 300000
+threads = 8

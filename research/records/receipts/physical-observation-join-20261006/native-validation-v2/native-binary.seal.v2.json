@@ -1,0 +1,11 @@
+{
+  "binary": "/home/b/Workspaces/holonics/.local/wt/repair-field/target/debug/deps/holonics-70b68d2f7e1f6408",
+  "pin": {
+    "sha256": "2e5f4a3d357913fcf18084f4edc3bb6240382127bd120f1f527c07d9f121e3f9",
+    "bytes": 63828896
+  },
+  "source_seal": "/home/b/Workspaces/holonics/.local/wt/repair-field/.local/physical-observation-join-20261006/source.seal.v2.json",
+  "accepted_build": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-observation-host-link-20261006-v2.acceptance.json",
+  "matching_release": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/physical-observation-host-link-20261006-v2.release.json",
+  "compiler_partition": "holonics debug=0;codegen-units=16"
+}

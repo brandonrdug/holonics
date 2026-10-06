@@ -1,0 +1,87 @@
+{
+  "source_base": "93f40a8bcda4ea8276f4a2cf9a42f1afe5ecec0d",
+  "physical_v2_passed": true,
+  "failed_default_debug_build_preserved": true,
+  "compiler_partition_changed_only": "holonics debug=0;codegen-units=16",
+  "caps_unchanged": true,
+  "independent_physical_v1_acceptance_not_rerun": true,
+  "stages": [
+    {
+      "label": "physical-observation-host-link-20261006-v1",
+      "passed": false,
+      "wall_ns": 25362143231,
+      "projection_ns": 65000000000,
+      "measured_to_projected_ratio": [
+        25362143231,
+        65000000000
+      ],
+      "aggregate_CPU_ns": 21000157000,
+      "group_MemoryPeak_bytes": 3290042368,
+      "source_inputs_unchanged": true,
+      "quiescent_release": true,
+      "stage_passed_before_cleanup": false
+    },
+    {
+      "label": "physical-observation-host-link-20261006-v2",
+      "passed": true,
+      "wall_ns": 18523141339,
+      "projection_ns": 65000000000,
+      "measured_to_projected_ratio": [
+        18523141339,
+        65000000000
+      ],
+      "aggregate_CPU_ns": 28096208000,
+      "group_MemoryPeak_bytes": 2480889856,
+      "source_inputs_unchanged": true,
+      "quiescent_release": true,
+      "stage_passed_before_cleanup": true
+    },
+    {
+      "label": "physical-observation-teaching-change-20261006-v1",
+      "passed": true,
+      "wall_ns": 1140457606,
+      "projection_ns": 7628488095,
+      "measured_to_projected_ratio": [
+        1140457606,
+        7628488095
+      ],
+      "aggregate_CPU_ns": 1085266000,
+      "group_MemoryPeak_bytes": 16539648,
+      "source_inputs_unchanged": true,
+      "quiescent_release": true,
+      "stage_passed_before_cleanup": true
+    },
+    {
+      "label": "physical-observation-teaching-refusal-20261006-v1",
+      "passed": true,
+      "wall_ns": 1002166502,
+      "projection_ns": 9154185714,
+      "measured_to_projected_ratio": [
+        1002166502,
+        9154185714
+      ],
+      "aggregate_CPU_ns": 961786000,
+      "group_MemoryPeak_bytes": 15544320,
+      "source_inputs_unchanged": true,
+      "quiescent_release": true,
+      "stage_passed_before_cleanup": true
+    },
+    {
+      "label": "physical-observation-carry-20261006-v1",
+      "passed": true,
+      "wall_ns": 886790186,
+      "projection_ns": 3051395238,
+      "measured_to_projected_ratio": [
+        886790186,
+        3051395238
+      ],
+      "aggregate_CPU_ns": 845799000,
+      "group_MemoryPeak_bytes": 14921728,
+      "source_inputs_unchanged": true,
+      "quiescent_release": true,
+      "stage_passed_before_cleanup": true
+    }
+  ],
+  "source_read_lease_released": true,
+  "scientific_job": false
+}

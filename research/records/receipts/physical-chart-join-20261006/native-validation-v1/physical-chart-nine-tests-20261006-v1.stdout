@@ -1,0 +1,14 @@
+
+running 9 tests
+test hnn::tests::prediction::physical_repair::a_point_reading_with_one_leader_releases_nothing ... ok
+test hnn::tests::prediction::physical_repair::a_station_no_declared_crossing_reads_is_held_unread ... ok
+test hnn::tests::prediction::physical_repair::equal_class_counts_do_not_join_different_producing_charts ... ok
+test hnn::tests::prediction::physical_repair::identity_conduct_must_certify_the_station_clock_even_at_erased_stations ... ok
+test hnn::tests::prediction::physical_repair::the_damaged_section_runs_through_the_field_and_every_erasure_is_held_unresolved ... ok
+test hnn::tests::prediction::physical_repair::the_producing_decoder_and_both_physical_maps_are_joined_before_opening ... ok
+test hnn::tests::prediction::physical_repair::the_section_carries_no_erased_class_so_the_repair_cannot_read_one ... ok
+test hnn::tests::prediction::physical_repair::the_supported_physical_passage_continues_on_its_retained_interior_and_clock ... ok
+test hnn::tests::prediction::physical_repair::total_erasure_preserves_the_producing_chart_and_refuses_located_conduct_before_opening ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 1011 filtered out; finished in 3.15s
+

@@ -34,7 +34,7 @@
 //! locked data are counted into the request's phase counts at their residues: one span, one tube.
 //! Each crossing's datum is carried to the reading frame by the source navigator's transport, a
 //! rotation–dilation of modulus `ρ_g ∈ (0, 1]` a tick (the constitution's
-//! [`ConstitutionRead::transport`], one at the founding), and the span is read over its
+//! [`ConstitutionRead::transport`](crate::hnn::field::ConstitutionRead::transport), one at the founding), and the span is read over its
 //! transported mass: a datum `a` ticks old at the span's end weighs `ρ^a / Σ_k ρ^(a_k)`, the same in
 //! every frame, whichever side of the request's last tick it lies on. At `ρ = 1` (a closing rotor
 //! ring, nothing lost) every datum weighs `ν̂(n + v)`, the one population. Below one the span's
@@ -160,9 +160,24 @@
 //! its text, never borrowed from the reader's field) and the reached lift point. The moment must lie
 //! on its ingest-only carrier: no continued station extent, its window and cursor those of `n`
 //! ingested cells, its phase and offset masses `n` and `max(n − δ, 0)`, its opening, end and ticks
-//! those of the reached lift's advance; and the full lift's advance must lie within `b_g n`. A moment
-//! outside it (a continued section, a re-keyed lift, another partition) is refused, typed, and no
-//! reading bypasses the check.
+//! those of the reached lift's advance on the plain route; and the full lift's advance must lie
+//! within `b_g n`. A continued section or another partition is refused, typed.
+//!
+//! **After reframe** a sibling ingest or a phase rekey separates own source time from the shared
+//! Current. `clock_cells = M` counts all actual ingested occurrences on that Current since the
+//! fixed source opening, with `M >= n`. Rekey preserves winding and is zero elapsed source time;
+//! synchronization preserves bins, own ticks, own age endpoint and held suffix. Each Leaky
+//! coordinate pays the actual external ticks of its ring by the existing carried decay law;
+//! a zero-time rekey pays none. Every
+//! native occurrence advances at most one winding, so the current lift has `d_g(M+1)` values per
+//! ring. The source's endpoint phase and own ticks independently have `d_g(b_g n+1)` values.
+//! At fixed opening/partition/profile and declared `(n,M)`, with `H(n)` the histogram/suffix
+//! factor above, the reframed count is bounded by
+//! `H(n) · ∏_g d_g(M+1) · ∏_(g∈𝒮) d_g(b_g n+1)`, times the Leaky factor where present.
+//! [`SourceCapacity::Reframed`] reports that upper bound and never lends it the old `n*`.
+//! The new `HNN/ReframedMoment` finite-box terms are pending compilation. The sealed native
+//! consumer passes its twelve capacity, four source-entrance, four cold-restore and six scoped
+//! host/card parity controls; these unit receipts establish no adaptive or scientific claim.
 //!
 //! [definition; agent-inferred, October 6; the
 //! [record](../../../../research/records/2026-10-06_THE_LEAKY_COORDINATES_ARE_BOUNDED_BY_THE_ADMITTED_DRIVE_COUNT.md)]
@@ -196,7 +211,7 @@ use num_traits::{One, Signed, ToPrimitive, Zero};
 
 use crate::hnn::HnnError;
 use crate::hnn::encoding::Encoded;
-use crate::hnn::field::{ConstitutionRead, Current, Field, FieldMaterial};
+use crate::hnn::field::{Current, Field, FieldMaterial};
 use crate::ratio::Rat;
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::vector::integral;
@@ -354,6 +369,57 @@ impl Capacity {
         }
         Ok(())
     }
+
+    /// The shared clock after arbitrary in-range phase rekeys and `clock_cells` ingested
+    /// occurrences since a fixed opening. A native occurrence advances at most one winding;
+    /// rekey changes only phase. This admits a box, not an event history or a learned key law.
+    fn check_windings(
+        &self,
+        opening: &[BigInt],
+        reached: &[BigInt],
+        clock_cells: u64,
+    ) -> Result<(), HnnError> {
+        for found in [opening.len(), reached.len()] {
+            if found != self.periods.len() {
+                return Err(HnnError::Shape {
+                    what: "a reframed capacity reading's full lift",
+                    expected: self.periods.len(),
+                    found,
+                });
+            }
+        }
+        for ((before, after), &period) in opening.iter().zip(reached).zip(&self.periods) {
+            if before.is_negative() || after.is_negative() {
+                return Err(HnnError::Unadmitted {
+                    reason: "a reframed source clock has a negative lift",
+                });
+            }
+            let advance = after / BigInt::from(period) - before / BigInt::from(period);
+            if advance.is_negative() || advance > BigInt::from(clock_cells) {
+                return Err(HnnError::Unadmitted {
+                    reason: "the shared clock's winding lies outside its consumed-cell bound",
+                });
+            }
+        }
+        Ok(())
+    }
+
+    /// At fixed source population `n` and shared-clock population `clock_cells`, count the
+    /// histogram/held suffix, the whole shared lift, and each source's independent own ticks.
+    /// The original no-rekey `n*` does not certify this count.
+    fn reframed_state_bits(&self, n: u64, clock_cells: u64) -> u64 {
+        let mut count = histogram_count(n, &self.periods, &self.sources, self.alphabet, &self.offsets);
+        for &period in &self.periods {
+            count *= BigUint::from(period) * (BigUint::from(clock_cells) + 1u32);
+        }
+        for &source in &self.sources {
+            // The passage's own last-injection phase and cumulative ticks are independent of
+            // the shared Current after reframe; the age endpoint is not overwritten by rekey.
+            count *= BigUint::from(self.periods[source])
+                * (BigUint::from(self.rates[source]) * BigUint::from(n) + 1u32);
+        }
+        (count - 1u32).bits()
+    }
 }
 
 /// The established Boolean-fit identity count, `rate_g = 2`.
@@ -448,12 +514,23 @@ fn state_count(
     alphabet: usize,
     offsets: &[usize],
 ) -> BigUint {
-    let a = BigUint::from(alphabet);
-    let window = offsets.iter().copied().max().unwrap_or(0);
-    let mut count = a.pow(u32::try_from(window).expect("the capacity offset was admitted"));
+    let mut count = histogram_count(n, periods, sources, alphabet, offsets);
     for (&period, &rate) in periods.iter().zip(rates) {
         count *= BigUint::from(rate) * BigUint::from(n) + BigUint::from(period);
     }
+    count
+}
+
+fn histogram_count(
+    n: u64,
+    periods: &[u64],
+    sources: &[usize],
+    alphabet: usize,
+    offsets: &[usize],
+) -> BigUint {
+    let a = BigUint::from(alphabet);
+    let window = offsets.iter().copied().max().unwrap_or(0);
+    let mut count = a.pow(u32::try_from(window).expect("the capacity offset was admitted"));
     for &source in sources {
         let d = BigUint::from(periods[source]);
         let first = &d * &a;
@@ -581,6 +658,14 @@ pub enum SourceCapacity {
         state_bits_upper: u64,
         histogram_n_star: u64,
     },
+    /// Source state and shared Current at fixed opening/profile and declared `(n, clock_cells)`
+    /// after rekey or a sibling ingest. Includes independent source endpoint/ticks and Leaky where
+    /// present. Adaptive constitution/key state is outside this bound; there is no old `n*` claim.
+    Reframed {
+        clock: CapacityClock,
+        state_bits_upper: u64,
+        clock_cells: u64,
+    },
 }
 
 impl SourceCapacity {
@@ -592,6 +677,16 @@ impl SourceCapacity {
         // These checks precede every numerical or nonnumerical disposition.
         moment.admit_ingest_carrier(field, current)?;
         let capacity = moment.histogram_capacity(field)?;
+        if moment.reframed {
+            return Ok(Self::Reframed {
+                clock: capacity.clock(),
+                state_bits_upper: capacity
+                    .reframed_state_bits(moment.cells, moment.clock_cells)
+                    .checked_add(moment.leaky_coordinate_bits(field)?)
+                    .ok_or(HnnError::CountOverflow)?,
+                clock_cells: moment.clock_cells,
+            });
+        }
         capacity.check_lift(moment.opening(), current.lift(), moment.cells())?;
         let state_bits = capacity.state_bits(moment.cells());
         let n_star = capacity.n_star();
@@ -651,8 +746,14 @@ impl SourceMoment {
         };
         if current.lift().len() != self.opening.len()
             || self.opening.iter().any(BigInt::is_negative)
+            || self.clock_cells < self.cells
+            || (!self.reframed && self.clock_cells != self.cells)
         {
             return Err(refused());
+        }
+        let capacity = self.histogram_capacity(field)?;
+        if self.reframed {
+            capacity.check_windings(&self.opening, current.lift(), self.clock_cells)?;
         }
         let reach = self.offsets.iter().copied().max().unwrap_or(0);
         let reach_word = u64::try_from(reach).map_err(|_| HnnError::CountOverflow)?;
@@ -699,8 +800,14 @@ impl SourceMoment {
             let opened_phase = u64::try_from(&self.opening[g] % BigInt::from(counts.period))
                 .map_err(|_| refused())?;
             if counts.start != opened_phase
-                || counts.end != current.phase(field, g)?
-                || BigInt::from(counts.ticks) != &current.lift()[g] - &self.opening[g]
+                || counts.end >= counts.period as u64
+                || (!self.reframed && counts.end != current.phase(field, g)?)
+                || if self.reframed {
+                    BigUint::from(counts.ticks)
+                        > BigUint::from(capacity.rates[g]) * BigUint::from(self.cells)
+                } else {
+                    BigInt::from(counts.ticks) != &current.lift()[g] - &self.opening[g]
+                }
             {
                 return Err(refused());
             }
@@ -1175,6 +1282,11 @@ pub struct SourceMoment {
     cursor: usize,
     cells: u64,
     opening: Vec<BigInt>,
+    /// All ingested occurrences on the shared Current since this moment opened, including
+    /// sibling moments. Fixed declared population of the reframed reading, not a history.
+    clock_cells: u64,
+    /// A rekey or sibling advance separated own ticks from the contemporary shared lift.
+    reframed: bool,
     /// Whether a located occurrence has been counted: the moment's capacity is then the located
     /// clock's, persistently ([`SourceMoment::capacity`]; no later identity or empty passage clears it).
     located: bool,
@@ -1220,6 +1332,8 @@ impl SourceMoment {
             cursor: 0,
             cells: 0,
             opening: current.lift().to_vec(),
+            clock_cells: 0,
+            reframed: false,
             located: false,
             partition: SourcePartition::of(field),
         }
@@ -1231,7 +1345,7 @@ impl SourceMoment {
     pub fn open_with(
         field: &Field,
         current: &Current,
-        constitution: &impl ConstitutionRead,
+        constitution: &(impl FieldMaterial + ?Sized),
     ) -> Result<Self, HnnError> {
         let mut moment = Self::open(field, current);
         let chart = PopulationChart::of(field).exponent();
@@ -1275,6 +1389,8 @@ impl SourceMoment {
         let a = self.alphabet;
         field.admit(cells)?;
         for (consumed, code) in cells.classes_read().enumerate() {
+            let clock_cells = self.clock_cells.checked_add(1).ok_or(HnnError::CountOverflow)?;
+            let counted = self.cells.checked_add(1).ok_or(HnnError::CountOverflow)?;
             let step = current.step(field, cells, consumed)?;
             self.located |= cells.located().is_some();
             for counts in &mut self.rings {
@@ -1302,7 +1418,8 @@ impl SourceMoment {
                 self.window[self.cursor] = Some(code);
                 self.cursor = (self.cursor + 1) % self.window.len();
             }
-            self.cells += 1;
+            self.cells = counted;
+            self.clock_cells = clock_cells;
             if step.carry_out {
                 return Ok(Ingested {
                     cells: consumed + 1,
@@ -1314,6 +1431,70 @@ impl SourceMoment {
             cells: cells.len(),
             carry_out: false,
         })
+    }
+
+    /// Reframe an ingest source at the contemporary shared clock after a true phase rekey
+    /// (`external_cells = 0`) or another moment's actual consumed prefix. The original opening,
+    /// phase bins, own ticks/age endpoint and held cells stay fixed. Leaky coordinates pay the
+    /// actual external ticks of their ring, whoever drove it; a zero-time rekey pays none.
+    /// `external_cells` counts the shared capacity population and is not a tick count. The
+    /// consumer supplies `external_ticks` from its actual reached-minus-found lift, never from
+    /// requested cells. Consumers validate before publishing.
+    pub fn check_clock_synchronization(
+        &self,
+        field: &Field,
+        current: &Current,
+        external_cells: u64,
+        external_ticks: &[u64],
+    ) -> Result<(), HnnError> {
+        self.admit_partition(field)?;
+        if external_ticks.len() != field.rings().len() {
+            return Err(HnnError::Shape {
+                what: "the external ring ticks against the shared field",
+                expected: field.rings().len(),
+                found: external_ticks.len(),
+            });
+        }
+        // A native occurrence advances at most one period per ring. This checks the declared
+        // footprint before any decay or metadata moves, including zero ticks on a phase rekey.
+        if external_ticks.iter().enumerate().any(|(g, &ticks)| {
+            BigUint::from(ticks)
+                > BigUint::from(field.ring(g).period()) * BigUint::from(external_cells)
+        }) {
+            return Err(HnnError::Unadmitted {
+                reason: "the external ring ticks exceed the admitted native prefix",
+            });
+        }
+        if self.rings.iter().any(|counts| counts.extent != 0) {
+            return Err(HnnError::Unadmitted {
+                reason: "a continued section is not an ingest clock synchronization carrier",
+            });
+        }
+        let clock_cells = self.clock_cells.checked_add(external_cells).ok_or(HnnError::CountOverflow)?;
+        if clock_cells < self.cells {
+            return Err(HnnError::Unadmitted {
+                reason: "the shared clock's population is smaller than its source's",
+            });
+        }
+        self.histogram_capacity(field)?.check_windings(&self.opening, current.lift(), clock_cells)
+    }
+
+    pub fn synchronize_clock(
+        &mut self,
+        field: &Field,
+        current: &Current,
+        external_cells: u64,
+        external_ticks: &[u64],
+    ) -> Result<(), HnnError> {
+        self.check_clock_synchronization(field, current, external_cells, external_ticks)?;
+        for counts in &mut self.rings {
+            if let Some(leaky) = &mut counts.leaky {
+                leaky.decay(external_ticks[counts.ring]);
+            }
+        }
+        self.clock_cells += external_cells;
+        self.reframed = true;
+        Ok(())
     }
 
     /// [definition; agent-inferred, September 30] **The passage continued by its section**
@@ -1390,7 +1571,8 @@ impl SourceMoment {
     /// [`SourceMoment::capacity`]; an unmarked line is refused), `window` (each held cell's code or
     /// `-`), `opening` (the lift point at the open), the producing partition's four mandatory rows
     /// (October 6: `source-partition |A| rings sources offsets`, `source-periods`, `source-rings`,
-    /// `source-offsets`; [`SourcePartition`]), then per source ring `counts g d start end ticks extent leaky`, its
+    /// `source-offsets`; [`SourcePartition`]), mandatory `source-clock M plain|reframed`, then
+    /// per source ring `counts g d start end ticks extent leaky`, its
     /// phase counts `first`, one `offset` line per declared offset, and, where it counts leakily,
     /// `leaky ρ k s unit` with its maps (`map` lines of `slot value` pairs, the phase map first).
     /// The alphabet and offsets are the field's and are not written.
@@ -1412,6 +1594,8 @@ impl SourceMoment {
         );
         line(s, "opening", &self.opening);
         self.partition.write(s);
+        *s += &format!("source-clock {} {}\n", self.clock_cells,
+            if self.reframed { "reframed" } else { "plain" });
         let map = |s: &mut String, map: &BTreeMap<usize, BigInt>| {
             line(
                 s,
@@ -1502,6 +1686,15 @@ impl SourceMoment {
         // The producing partition is mandatory and read against the restored field before the
         // ring counts: an absent or different tag is refused, never borrowed from the reader.
         let partition = SourcePartition::read_against(field, next)?;
+        let clock = keyed(next("the moment's shared source clock")?, "source-clock", "the moment's shared source clock")?;
+        let (clock_cells, reframed) = match clock.as_slice() {
+            [population, "plain"] => (value(Some(population), "the moment's shared source clock")?, false),
+            [population, "reframed"] => (value(Some(population), "the moment's shared source clock")?, true),
+            _ => return refused("the moment's shared source clock"),
+        };
+        if clock_cells < cells || (!reframed && clock_cells != cells) {
+            return refused("the moment's shared source clock population");
+        }
         let read_map = |next: &mut dyn FnMut(&'static str) -> Result<&'a str, HnnError>| -> Result<BTreeMap<usize, BigInt>, HnnError> {
             let words = keyed(next("a leaky map")?, "map", "a leaky map")?;
             if words.len() % 2 != 0 {
@@ -1571,6 +1764,8 @@ impl SourceMoment {
             cursor,
             cells,
             opening,
+            clock_cells,
+            reframed,
             located,
             partition,
         })

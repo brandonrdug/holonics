@@ -1,0 +1,10 @@
+# The read of `executed physical-repair`, once (the physical repair's record §0): damage A, 64
+# passages a terrain on the repair record's seeds (order-2 2_026_100_711, the line 712, the
+# alternation 713), the receiving section at aperture 48 (every station read), 8 threads. Projected
+# from the development read (research/records/2026-10-05_THE_PHYSICAL_REPAIR_receipts/development/)
+# and the probes' 48-crossing words, the largest measured value of each unit.
+command = executed physical-repair
+projection = the declaration at aperture 48: 120 unit words of 48 junction steps, each at most the 48-tick passage word with its opening, 36,095 + 764 = 36,859 ms (unit words measured below the passage word: 5,904 ms at aperture 4 against 120 x 74 ms, 133,565 ms at aperture 12 against 120 x 1,216 ms), so at most 4,423,080 ms; 192 words of 48 crossings at 8 threads in 24 rounds of 8, each round at most 101,987 ms (eight 48-crossing words together; the development's 12-crossing words ran at most 5,213 ms together against 1,980 ms alone), so at most 2,447,688 ms; the location, deposit and grader of three terrains at most 10,000 ms (the development's 82 ms a terrain); at most 6,880,768 ms in all. Peak resident at most 3,000,000,000 bytes (eight words together 1,436,762,112 bytes, the retained receipts of one terrain beside them). Early stop: a passage unit past 101,987 ms
+deadline_ms = 6881000
+unit_bound_ms = 101987
+threads = 8
