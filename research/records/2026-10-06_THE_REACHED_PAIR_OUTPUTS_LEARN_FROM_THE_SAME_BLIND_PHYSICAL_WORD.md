@@ -268,3 +268,19 @@ receiving locus is required to change the equality; repeating pair-only
 teaching cannot do so. Finally, no declared terrain relation excludes any of
 the four hole assignments. Even a constant native leader across them would
 certify the material's output, not identify the erased truth.
+
+[source-law truth-identifiability witness] There is also an exact blind-input
+equivalence, independent of pair rank or receiving material:
+`damage([0,0,2,2,2,2,2,2,1],{1}) =
+damage([0,3,2,2,2,2,2,2,1],{1})`. The producing identity chart, sparse
+placed cells, source clock, length and entered carry are the same. The actual
+blind physical forward must therefore have identical source, Word, receipt
+and returned carry on these two inputs. The complete source features need
+not be equal: those are the different witnesses read only after prediction.
+The [exact constructor witness](receipts/pair-output-learning-20261006/accepted-4432a4b9/BLIND_TRUTH_EQUIVALENCE.v1.json)
+also gives the corresponding right-family pair. Since no declared terrain
+relation excludes either omitted label, a blind deterministic output cannot
+guarantee both erased truths. This is missing truth-identifying evidence at
+the admitted boundary, not failed execution of physical motion. A learned
+conditional prediction can be measured, but neither an output singleton nor
+these mechanical controls establishes its accuracy.

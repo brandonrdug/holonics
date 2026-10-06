@@ -1,0 +1,98 @@
+{
+  "method": "Exact constructor/source-law witness, no native completion execution",
+  "source_commit": "4432a4b9c7de9330e6701c1c2f860660682e39b6",
+  "witnesses": [
+    {
+      "family": "left",
+      "complete_class0": [
+        0,
+        0,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        1
+      ],
+      "complete_class3": [
+        0,
+        3,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        1
+      ],
+      "erased_indices": [
+        1
+      ],
+      "same_sparse_placed": [
+        0,
+        null,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        1
+      ],
+      "same_empty_producing_chart": true,
+      "same_length": 9
+    },
+    {
+      "family": "right",
+      "complete_class0": [
+        1,
+        0,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        0
+      ],
+      "complete_class3": [
+        1,
+        3,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        0
+      ],
+      "erased_indices": [
+        1
+      ],
+      "same_sparse_placed": [
+        1,
+        null,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        0
+      ],
+      "same_empty_producing_chart": true,
+      "same_length": 9
+    }
+  ],
+  "equation": "DamagedSection::damage(S0,[1])=DamagedSection::damage(S3,[1]); with identical Theta/current/Encoded chart/opening/receiving section, physical_forward returns the same source moment, actual Word, read and carry.",
+  "scope": "Blind input observational equivalence. This does not assert full completed sources or their features are equal; complete first-source and pair-feature contrasts are distinct in the separate source algebra.",
+  "limitation": "No deterministic blind consumer can guarantee different omitted labels0and3 on both admitted witnesses when its entire input is equal. A further source/terrain relation or evidence restricting the completion family is required for truth identification. Learned prediction remains possible; a constant completed-source output or a point leader alone is not omitted-truth validation.",
+  "existing_native_control": "the_section_carries_no_erased_class_so_the_repair_cannot_read_one, included in accepted4432a4b9 26controls",
+  "forbidden_shortcuts": [
+    "Injecting erased truth into forward",
+    "Declaring a selected desired completion",
+    "Installing an answer decoder",
+    "Treating this mechanical fixture as scientific heldout accuracy"
+  ]
+}
