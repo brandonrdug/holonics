@@ -16,6 +16,7 @@
 use super::*;
 use holonics::hnn::physical::{PhysicalLearning, PhysicalObservation, PhysicalResident};
 use holonics::hnn::prediction::DamagedSection;
+use holonics::receiver::face::GrainCell;
 use holonics::hnn::word::WordOpening;
 use holonics::holarchy::terrain::{CyclicLaw, KnownTruth};
 use std::io::Write;
@@ -124,7 +125,10 @@ pub(super) fn run(
 /// Receiving at all four sections, fixed before probing. Its training passages share one source
 /// representative, and the continuing probe readings are not independent observations. Fresh
 /// seeds do not make the finite Line/Alternation pattern family new. No U6 count is presumed.
-/// In `measure` and `held`, the resident alternates Receiving and PairOutputs observations. A target is
+/// `attribution` preserves the historical four alternating updates and four Alternation probes.
+/// It adds three intermediate material controls at each of the fixed probe positions zero and
+/// three, all at one entered carry. These exterior controls neither observe nor deposit truth.
+/// In `measure`, `held` and `attribution`, the resident alternates Receiving and PairOutputs observations. A target is
 /// absent from its source and is observed only after the blind cells have been flushed. Each
 /// step's eta and the *applied* logit movement are read separately. No charted substitution occurs.
 pub(super) fn learn(
@@ -140,7 +144,7 @@ pub(super) fn learn(
     use holonics::hnn::receiving::ReceivingPhases;
     use num_bigint::BigInt;
     use num_traits::{Signed, Zero};
-    assert!(matches!(role, "measure" | "held" | "coverage"), "a declared probe role");
+    assert!(matches!(role, "measure" | "held" | "coverage" | "attribution"), "a declared probe role");
     assert!(teaching_count > 0 && probe_count >= 2);
     let bound = pin.unit_bound_ms().expect("a measured whole-unit bound");
     let target = 2;
@@ -149,6 +153,10 @@ pub(super) fn learn(
     if role == "coverage" {
         assert_eq!(teaching_count, classes, "one Receiving observation per class-translation, no repetition");
         assert_eq!(probe_count, classes, "one blind probe per class-translation, fixed coverage read");
+    }
+    if role == "attribution" {
+        assert_eq!((teaching_count, probe_count), (4, 4), "historical diagnostic partition");
+        assert_eq!(terrains, ["alternation=20261006003:20261006013".to_owned()], "spent development operands fixed before output");
     }
     let physical_shape = Declared {
         period: length as u64,
@@ -192,6 +200,9 @@ pub(super) fn learn(
         } else {
             executed_loop::terrain_encoded(terrain, &truth_shape, &field, teaching_seed, teaching_count)
         };
+        // Exterior finite measurement controls only. No Word, trajectory, teacher or response
+        // column is retained by the HNN. Each prefix is an actually published constitution.
+        let mut material_controls = if role == "attribution" { vec![initial.clone()] } else { Vec::new() };
         let mut intended_targets = std::collections::BTreeSet::new();
         let mut published_targets = std::collections::BTreeSet::new();
         for (index, observed) in teaching.into_iter().enumerate() {
@@ -231,9 +242,24 @@ pub(super) fn learn(
                     published_targets.insert(truth);
                 }
             }
+            let publication = if role == "attribution" {
+                causal_publication(&received.comparison, phases.grain())
+            } else {
+                format!("{:?}", received.comparison)
+            };
+            if role == "attribution" {
+                let before = receiving_contrast(&before_material, receiver.ring);
+                let after = receiving_contrast(resident.constitution(), receiver.ring);
+                if matches!(learning, PhysicalLearning::PairOutputs) {
+                    assert_eq!(holonics::hnn::ConstitutionRead::receiving_map(&before_material, receiver.ring), holonics::hnn::ConstitutionRead::receiving_map(resident.constitution(), receiver.ring), "PairOutputs leaves the whole R map unchanged");
+                }
+                let delta: Vec<_> = after.iter().zip(&before).map(|(a,b)| [ &a[0]-&b[0], &a[1]-&b[1] ]).collect();
+                publish(&mut output, format!("attribution publication {index}; actual_R2_minus_R3_delta_real_imag={delta:?}; no_proposed_map_or_Gram_dump\n"));
+                material_controls.push(resident.constitution().clone());
+            }
             publish(&mut output, format!(
-                "teaching result; learning={learning:?}; observed={truth}; publication={:?}; applied_logit_movement={movement:?}; largest_real_move={real_move}; largest_real_move_in_grain_cells={}; largest_phase_move_turns={phase_move}; target_margin_before={}; target_margin_after={}; applied_cells={:?}; entered={:?}; retained_tick={}; material_commit={}; receiving_changed={}; source_changed={}; pair_changed={}; balances_close={}; elapsed_ms={}\n",
-                received.comparison, &real_move * Rat::from_integer(BigInt::from(phases.grain())), margin(old, truth), margin(new, truth), applied.reads[target].read.cells,
+                "teaching result; learning={learning:?}; observed={truth}; publication={publication}; applied_logit_movement={movement:?}; largest_real_move={real_move}; largest_real_move_in_grain_cells={}; largest_phase_move_turns={phase_move}; target_margin_before={}; target_margin_after={}; applied_cells={:?}; entered={:?}; retained_tick={}; material_commit={}; receiving_changed={}; source_changed={}; pair_changed={}; balances_close={}; elapsed_ms={}\n",
+                &real_move * Rat::from_integer(BigInt::from(phases.grain())), margin(old, truth), margin(new, truth), applied.reads[target].read.cells,
                 entered, received.prediction.carry.ticks, resident.constitution().commit(),
                 holonics::hnn::ConstitutionRead::receiving_map(&before_material, 0) != holonics::hnn::ConstitutionRead::receiving_map(resident.constitution(), 0),
                 holonics::hnn::ConstitutionRead::source_port(&before_material, 0) != holonics::hnn::ConstitutionRead::source_port(resident.constitution(), 0),
@@ -282,6 +308,7 @@ pub(super) fn learn(
         // resident itself continues between probes; its evolving interior must not be mistaken
         // for acquired source-context sensitivity in the centered comparison below.
         let controlled_opening = resident.opening().clone();
+        let mut causal_controls = Vec::new();
         let mut contexts = std::collections::BTreeSet::new();
         let mut rows = Vec::new();
         let (mut released_right, mut released_wrong, mut held, mut point_right) = (0,0,0,0);
@@ -310,6 +337,16 @@ pub(super) fn learn(
             let after = resident.read(&damaged, &receiver).expect("the blind contemporary probe");
             let continuing_done_ns = started.elapsed().as_nanos();
             let controlled_after = controlled_after.as_ref().unwrap_or(&after);
+            if role == "attribution" && matches!(index, 0 | 3) {
+                let opened_at = match &controlled_opening {
+                    WordOpening::Rest => 0,
+                    WordOpening::Received { carry, .. } => carry.ticks,
+                };
+                let before_read = causal_read(&before, target, pre_phases.grain(), opened_at);
+                let after_read = causal_read(controlled_after, target, post_phases.grain(), opened_at);
+                assert_eq!(before_read.tick, after_read.tick, "same absolute receiving tick");
+                causal_controls.push((index, damaged.clone(), before_read, after_read));
+            }
             publish(&mut output, format!("{terrain}/{probe_seed} {role} probe {index}; input={:?}; before cells={:?}; matched learned cells={:?}; continuing cells={:?}; before read={:?}; matched learned read={:?}; continuing read={:?}; matched_entered={:?}; continuing_entered={:?}; carried_tick={}; balances_close={}\n", damaged.placed(), before.cells, controlled_after.cells, after.cells, before.reads[target], controlled_after.reads[target], after.reads[target], controlled_opening, entered, after.carry.ticks, closed(&before) && closed(&controlled_after) && closed(&after)));
             assert_eq!(resident.constitution(), &frozen_material, "no probe deposition");
             assert!(closed(&before) && closed(&controlled_after) && closed(&after), "the measured physical balances must close");
@@ -353,6 +390,9 @@ pub(super) fn learn(
                 return;
             }
         }
+        if role == "attribution" && !causal_attribution(&mut output, &field, &current, &receiver, &controlled_opening, &material_controls, &causal_controls, target, bound) {
+            return;
+        }
         publish(&mut output, format!("{terrain} counts; whole_passages={probe_count}; released_right={released_right}; released_wrong={released_wrong}; held={held}; point_singleton_right={point_right}; majority_right={majority_right}; copy_left_right={left_right}; copy_right_right={right_right}; no_probe_deposition_commit={frozen_commit}\n"));
         let context_started = Instant::now();
         // Remove each context's common real class shift before centering across contexts. Raw
@@ -381,6 +421,122 @@ pub(super) fn learn(
         publish(&mut output, format!("{terrain} distinct_source_contexts={}; acquired_context_changes_real_amplitude_face={heard}; all_context_controls_share_one_exact_entered_carry; scope=short_section_physical_acquisition; U6_bank_counts_are_a_different_consumer\n", contexts.len()));
         publish(&mut output, format!("{terrain} final_context_summary_ns={}; this_cost_is_outside_the_individual_teaching_and_probe_units\n", context_started.elapsed().as_nanos()));
     }
+}
+
+// The fixed class contrast is the logged wrong release (two against true three), not a
+// task decoder. Full native leader unions still include every class, including zero and one.
+fn contrast(logits: &[Rat]) -> [Rat; 2] {
+    [ &logits[4]-&logits[6], (&logits[5]-&logits[7]) / Rat::from_integer(2.into()) ]
+}
+
+fn receiving_contrast(material: &Constitution, ring: usize) -> Vec<[Rat; 2]> {
+    let map = holonics::hnn::ConstitutionRead::receiving_map(material, ring).expect("actual R");
+    let width = map.columns();
+    (0..width).map(|j| [ &map.entries()[4*width+j]-&map.entries()[6*width+j], &map.entries()[5*width+j]-&map.entries()[7*width+j] ]).collect()
+}
+
+fn causal_publication(comparison: &Result<Option<holonics::hnn::physical::PhysicalPublication>, holonics::hnn::HnnError>, grain: u64) -> String {
+    match comparison {
+        Ok(Some(result)) => {
+            let steps: Vec<_> = result.publication.steps.iter().map(|(locus, read)| (locus, &read.step.step)).collect();
+            let phases: Vec<_> = result.ratio.phases().iter().map(|p| (p.target, GrainCell::of(&p.target_phase, grain), GrainCell::of(&p.produced_phase, grain), p.winding(), GrainCell::of(&p.gap.turns(), grain))).collect();
+            format!("published commit={}; loci={:?}; eta={steps:?}; target_produced_gap_phase_cells_and_winding={phases:?}; reached_feature_energy={:?}; source_certificate={}; source_pairing={}", result.publication.commit, result.publication.loci, result.feature_energy, result.source_certificate.is_some(), result.source_pairing.is_some())
+        }
+        Ok(None) => "no comparison".into(),
+        Err(error) => format!("refused {error:?}"),
+    }
+}
+
+#[derive(Clone, Debug)]
+struct CausalRead {
+    tick: usize,
+    grain: u64,
+    sparse: [Rat; 2],
+    fixed: [Rat; 2],
+    columns: Vec<[Rat; 2]>,
+    real_cells: Vec<[GrainCell; 2]>,
+    phase_cells: Vec<GrainCell>,
+    leaders: Vec<usize>,
+}
+
+fn causal_read(prediction: &holonics::hnn::prediction::PhysicalRepair, target: usize, grain: u64, opened_at: usize) -> CausalRead {
+    let station = &prediction.reads[target];
+    assert_eq!(station.station, target);
+    assert_eq!(station.tick, opened_at + station.crossing, "native source/absolute receiving clock join");
+    let domain = prediction.domains[target].as_ref().expect("admitted completed source domain");
+    let completion = domain.completion.as_ref().expect("existing exact signed completion columns");
+    assert_eq!(completion.station, target);
+    let mut leaders = std::collections::BTreeSet::new();
+    let mut real_cells = Vec::new();
+    let mut phase_cells = Vec::new();
+    for column in &completion.label_logits {
+        let image = completion.fixed_logits.iter().zip(column).map(|(a,b)| a+b).collect();
+        let read = holonics::hnn::receiving::ReceivingRead::of_logits(image, grain);
+        let completed = holonics::hnn::prediction::StationRead { station: target, crossing: station.crossing, tick: station.tick, read };
+        leaders.extend(completed.leaders());
+        let read = &completed.read;
+        real_cells.push([read.cells[2].clone(), read.cells[3].clone()]);
+        phase_cells.push(GrainCell::of(&(&read.phases[2]-&read.phases[3]), grain));
+    }
+    let leaders: Vec<_> = leaders.into_iter().collect();
+    assert_eq!(leaders, domain.classes, "full native completed-source union, not sparse leaders");
+    CausalRead { tick: station.tick, grain, sparse: contrast(&station.read.logits), fixed: contrast(&completion.fixed_logits), columns: completion.label_logits.iter().map(|column| contrast(column)).collect(), real_cells, phase_cells, leaders }
+}
+
+// a_i(x,c)=m_i(x,c)-m_(i-1)(x,c), with every operand at the same actual carry.
+// These controls exclude carry-mediated effects and allocate ordered interactions to the
+// later actual publication. They do not construct reordered or hypothetical deposit materials.
+#[allow(clippy::too_many_arguments)]
+fn causal_attribution(output: &mut std::fs::File, field: &Field, current: &Current, receiver: &ReceiverDeclaration, opening: &WordOpening, materials: &[Constitution], controls: &[(usize, DamagedSection, CausalRead, CausalRead)], target: usize, bound: u128) -> bool {
+    use holonics::hnn::{prediction::repair_by_field, receiving::ReceivingPhases};
+    assert_eq!(materials.len(), 5);
+    assert_eq!(controls.iter().map(|c| c.0).collect::<Vec<_>>(), vec![0,3]);
+    let opened_at = match opening { WordOpening::Rest => 0, WordOpening::Received { carry, .. } => carry.ticks };
+    let mut effects = Vec::new();
+    for (index, damaged, before, after) in controls {
+        let mut readings = vec![before.clone()];
+        for (prefix, material) in materials.iter().enumerate().take(4).skip(1) {
+            let started = Instant::now();
+            let phases = ReceivingPhases::declare(field, material, current, receiver).expect("same producing receiver declaration");
+            let prediction = repair_by_field(field, material, current, damaged, opening, &phases).expect("actual prefix material completion");
+            assert!(closed(&prediction));
+            let read = causal_read(&prediction, target, phases.grain(), opened_at);
+            assert_eq!((read.tick,read.grain), (before.tick,before.grain));
+            readings.push(read);
+            let elapsed = started.elapsed();
+            publish(output, format!("attribution probe {index} prefix {prefix}; elapsed_ns={}; elapsed_ms={}; balances_close=true; no_observation_or_deposition\n", elapsed.as_nanos(), elapsed.as_millis()));
+            if started.elapsed().as_millis() > bound {
+                publish(output, format!("INCOMPLETE: attribution control exceeded measured unit bound {bound} ms; no subsequent control\n"));
+                return false;
+            }
+        }
+        readings.push(after.clone());
+        for (prefix, read) in readings.iter().enumerate() {
+            publish(output, format!("attribution probe {index} prefix {prefix}; tick={}; grain={}; sparse_2_minus_3_real_phase={:?}; fixed_2_minus_3_real_phase={:?}; label_columns_2_minus_3_real_phase={:?}; absolute_real_cells_2_3_per_completion={:?}; phase_contrast_cells_per_completion={:?}; full_native_leader_union={:?}\n", read.tick,read.grain,read.sparse,read.fixed,read.columns,read.real_cells,read.phase_cells,read.leaders));
+        }
+        let mut per_update = Vec::new();
+        for update in 1..readings.len() {
+            let pre = &readings[update-1];
+            let post = &readings[update];
+            assert_eq!(pre.columns.len(), post.columns.len());
+            let delta: Vec<_> = pre.columns.iter().zip(&post.columns).map(|(a,b)| [(&post.fixed[0]+&b[0])-(&pre.fixed[0]+&a[0]), (&post.fixed[1]+&b[1])-(&pre.fixed[1]+&a[1])]).collect();
+            let fixed = [ &post.fixed[0]-&pre.fixed[0], &post.fixed[1]-&pre.fixed[1] ];
+            publish(output, format!("attribution probe {index} update {update}; completed_margin_delta_real_phase={delta:?}; fixed_margin_delta_real_phase={fixed:?}; phase_is_separate_from_real_grain_release\n"));
+            per_update.push(delta);
+        }
+        for c in 0..before.columns.len() {
+            for channel in 0..2 {
+                let sum: Rat = per_update.iter().map(|delta| delta[c][channel].clone()).sum();
+                assert_eq!(sum, (&after.fixed[channel]+&after.columns[c][channel])-(&before.fixed[channel]+&before.columns[c][channel]), "exact chronological telescope");
+            }
+        }
+        effects.push(per_update);
+    }
+    for update in 0..4 {
+        let centered: Vec<_> = effects[0][update].iter().zip(&effects[1][update]).map(|(a,b)| [ &b[0]-&a[0], &b[1]-&a[1] ]).collect();
+        publish(output, format!("attribution update {}; probe3_minus_probe0_completed_margin_effect_real_phase={centered:?}; pair_specific_distractor_contrast_not_population; exact_telescope=true; direct_material_at_fixed_actual_carry_only\n", update+1));
+    }
+    true
 }
 
 fn receiving_rows_equal(material: &Constitution, ring: usize, left: usize, right: usize) -> bool {
