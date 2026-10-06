@@ -141,15 +141,8 @@ theorem normalizedSource_loadedWord_grain_singleton_release
         (openComplete c) ticks) =
       receiver (trajectoryAt (absoluteLoadedFamily T res h openedAt)
         (anchor + response c) ticks) := by
-    calc
-      receiver (trajectoryAt (absoluteLoadedFamily T res h openedAt)
-          (openComplete c) ticks) =
-        receiver (trajectoryAt (absoluteLoadedFamily T res h openedAt) anchor ticks) +
-          receiver (trajectoryAt (absoluteLoadedFamily T res h openedAt) (response c) ticks) :=
-            hread c
-      _ = receiver (trajectoryAt (absoluteLoadedFamily T res h openedAt)
-          (anchor + response c) ticks) := by
-        rw [absoluteLoaded_response_add, map_add]
+    exact congrArg (fun z => receiver (trajectoryAt
+      (absoluteLoadedFamily T res h openedAt) z ticks)) (hopened.1 c)
   have hfaceAdd (c : Label) := congrArg grainCell (hread c)
   -- Share the actual completed receiver/score term once. This proof-only expression sharing
   -- preserves the source/clock/grain operands and consumes their existing accepted owners.
