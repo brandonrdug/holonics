@@ -1,0 +1,44 @@
+{
+  "version": 3,
+  "grade": "static source review; successor17 native/type acceptance pending",
+  "base_commit": "894c5d9889fe4a38da68945665f0460980ff6814",
+  "rustfmt_edition": 2024,
+  "parse_only": true,
+  "syntax": [
+    {
+      "path": "crates/holonics/src/hnn/prediction.rs",
+      "bytes": 138686,
+      "sha256": "2caa054629c6c48e61dd5dbccccf487ae917fb48367c5d636bf91c9e79a6add7",
+      "parser_exit": 0,
+      "stderr_bytes": 0
+    },
+    {
+      "path": "crates/holonics/src/hnn/tests/prediction.rs",
+      "bytes": 120582,
+      "sha256": "d9f3e30ffbcbc227f362ea957f9582bb27cfc1e30ed84a2201fd2ad20e526a3c",
+      "parser_exit": 0,
+      "stderr_bytes": 0
+    },
+    {
+      "path": "research/notebook/hnn_design/hnn_repair_loop.rs",
+      "bytes": 31329,
+      "sha256": "2939d7c6adf418e51ee9556a63ca2e9f815d9d8986f30b527a94312e31e22d94",
+      "parser_exit": 0,
+      "stderr_bytes": 0
+    }
+  ],
+  "diff_check_exit": 0,
+  "other_forward_relations": "mandatory consumer equality of every other FieldMaterial getter, unstepped E, released loci and storage product; same field/current/imposition/chart/source; forward consumes NormalLaw.map and excludes map_remainder",
+  "gain_premises": "participation mean; h/4 source power and 4/h receiving-anchor bound; passive/contrast growth; certified Floquet reach; full native lift owed #62",
+  "old_acceptance_join": "predecessor-integrated-14/ACCEPTANCE_JOIN.v1.json",
+  "old_native_accepted": 14,
+  "old_Lean_selected_accepted": 4,
+  "old_source": "36a660cd8914a6f55bb049e85d53a9116371e068 plus isolated notebook-PluralDomain patch only",
+  "new_native_accepted": 0,
+  "new_native_controls": 17,
+  "compiler_runs_by_successor_owner": 0,
+  "native_runs_by_successor_owner": 0,
+  "training_runs": 0,
+  "source_period_alias_unchanged": true,
+  "type_runtime_pending": true
+}

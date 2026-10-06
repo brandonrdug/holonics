@@ -8,7 +8,7 @@ October 6, 2026. Refs #73, #148, #63, #62.
 frozen combined integration remain unchanged. No compiler, training passage or scientific
 experiment was launched in preparing this change. Static Rust parsing and whitespace checks
 pass; the selected native assertions and their actual output await the shared validation queue.
-The [static source receipt](receipts/physical-source-deposition-20261006/source-review.v2.json)
+The [static source receipt](receipts/physical-source-deposition-20261006/source-review.v3.json)
 pins both implementation hashes and the unchanged alias, cleanup, formal leaf and PTX inputs.
 
 The computational object is the helical pair interaction. The **helix** carries the source clock,
@@ -111,6 +111,25 @@ teacher is pleased. Each source-phase covector is an invertible cyclic rotation 
 covector, so a source ring has either all of those covectors zero or none; omitting the zero
 return cannot omit another occupied nonzero feature within that stepped source.
 
+Before that certificate is admitted, `physical_source_only_change` compares every other
+`FieldMaterial` relation against the producer, including R, the element and resonator laws,
+transport, pair ports, contact factors/signatures/surface density and unstepped source maps.
+The released loci and storage product also agree. The field/current, chart, source moment and
+imposition law are unchanged operands. `ConstitutionRead::source_port` returns
+`NormalLaw::map`, and `SourceMoment::open_storage` consumes the `FieldMaterial` view; a map
+remainder is not read into the forward and can affect only a later deposit. Thus no other
+co-moved physical relation can escape the E certificate.
+
+The gain premise is named rather than inferred from one fixture: the anchor is the
+participation mean with `||v_R||^2 <= (4/h) P/Y_R`, the source injection's power is
+`(h/4)Y_g||delta s_g||^2`, passive ticks have their power balance, contrast ports have their
+`(1+omega)` growth, and any nonpassive resonator span needs its certified Floquet reach.
+The owners are Lean `HNN/Propagation.anchor_is_participation`, `HNN/Word.word_tick_balance`,
+`Holon/Deposition.active_energy_growth`, `entry_span_gain`, `joint_step_descends`, and
+`HNN/Floquet.floquet_span_reach`. The complete lift of that gain to every admitted native Word
+is still an obligation in #62. The exact finite physical gain assertion is evidence for its
+own span, not a proof of all spans; arbitrary nonlinear and residual Words remain refused.
+
 E changes the next contemporary imposition once. It does not change R, contact C/K/D, the
 storage metric, transport or a Word already executing. The next opening separately reports
 its changed imposed work; every Word retains its opening, tick and whole-word balances.
@@ -170,5 +189,15 @@ The notebook's physical receipt caller also consumes the actual `PluralDomain` e
 with a separate held-plural count. This is the minimal repair of its exhaustive-match compile
 refusal; no truth, task generator or physical algorithm is changed, and notebook linkage is
 still part of the pending coherent compile.
+
+[accepted-bounded; separately pinned predecessor] During source preparation, the shared queue
+accepted the preceding **fourteen** integrated native controls and **four** selected Lean
+declarations on `36a660cd8914a6f55bb049e85d53a9116371e068` plus the isolated notebook
+`PluralDomain` patch. The [predecessor acceptance join](receipts/physical-source-deposition-20261006/predecessor-integrated-14/ACCEPTANCE_JOIN.v1.json)
+keeps that exact source, unfiltered outputs, input/executable bindings and resource readings;
+all 434 copied evidence entries were rehashed. The same notebook patch is now consumed by this
+successor. That acceptance is not transferred to the new E consumer or its seventeen controls.
+The predecessor's blind output still releases **2** where the removed source truth was **0**;
+all four completed native sources lead **2**. This remains model-image robustness, not recovery.
 No erasure-fidelity, product output, arbitrary nonlinear step or scientific training claim is
 made before or after this finite structural gate alone.

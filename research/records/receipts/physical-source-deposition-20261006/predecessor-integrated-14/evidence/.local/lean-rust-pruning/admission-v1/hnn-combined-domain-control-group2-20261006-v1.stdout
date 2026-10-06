@@ -1,0 +1,6 @@
+
+running 1 test
+test hnn::tests::prediction::physical_repair::the_coupled_quartic_tube_encloses_every_admitted_missing_class ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1023 filtered out; finished in 2.40s
+

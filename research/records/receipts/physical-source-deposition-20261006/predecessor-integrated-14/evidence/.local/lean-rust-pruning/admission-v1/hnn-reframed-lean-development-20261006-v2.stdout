@@ -1,0 +1,31 @@
+{"phase": "precompile sealed JSON read", "wall_ns": 435698396}
+{"phase": "precompile metadata", "wall_ns": 701317367}
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-combined-domain-36a660cd-20261006/source-v2/lean/Holonics/HNN/ReframedMoment.lean:33:19: warning: Variable name `D` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _D
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-combined-domain-36a660cd-20261006/source-v2/lean/Holonics/HNN/ReframedMoment.lean:120:36: warning: This simp argument is unused:
+  Finset.card_univ
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [Fintype.card_piFinset]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-combined-domain-36a660cd-20261006/source-v2/lean/Holonics/HNN/ReframedMoment.lean:125:5: warning: Variable name `hne` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _hne
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+'Holonics.HNN.Moment.SourceDecl.rekey_mem_windingWindow' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.HNN.Moment.SourceDecl.card_reframedBox_le' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.HNN.Moment.SourceDecl.card_reframedBox_withCoordinates_le' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.HNN.Moment.SourceDecl.winding_step_range' depends on axioms: [propext, Quot.sound]
+{"phase": "Lean compiler", "wall_ns": 5515889677, "exit": 0}
+{"phase": "postcompile sealed JSON read", "wall_ns": 411413669}
+{"phase": "postcompile metadata", "wall_ns": 709305244}
+{"kernel_accepted": true, "compiler_exit": 0, "compiler_wall_ns": 5515889677, "axioms": {"Holonics.HNN.Moment.SourceDecl.rekey_mem_windingWindow": ["propext", "Classical.choice", "Quot.sound"], "Holonics.HNN.Moment.SourceDecl.card_reframedBox_le": ["propext", "Classical.choice", "Quot.sound"], "Holonics.HNN.Moment.SourceDecl.card_reframedBox_withCoordinates_le": ["propext", "Classical.choice", "Quot.sound"], "Holonics.HNN.Moment.SourceDecl.winding_step_range": ["propext", "Quot.sound"]}, "selector_count_matches": true, "standard_axioms_only": true, "metadata_unchanged": true, "broad_library_checked": false}
