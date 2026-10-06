@@ -1,0 +1,38 @@
+{
+  "groups": [
+    {
+      "artifact": "fresh holonics libtest from this exact immutable source",
+      "arguments": [
+        "hnn::tests::physical::the_resident_retains_the_learned_pair_and_reads_the_correlated_family_on_its_carried_state",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "expected_tests": 1,
+      "expected_test_names_from_source": [
+        "hnn::tests::physical::the_resident_retains_the_learned_pair_and_reads_the_correlated_family_on_its_carried_state"
+      ],
+      "native_Words": 8,
+      "receiving_crossings_per_Word_upper": 3,
+      "source_stations_upper": 9
+    },
+    {
+      "artifact": "fresh holonics libtest from this exact immutable source",
+      "arguments": [
+        "hnn::tests::physical::a_refused_resident_observation_keeps_material_and_carries_into_the_next_native_read",
+        "--exact",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "expected_tests": 1,
+      "expected_test_names_from_source": [
+        "hnn::tests::physical::a_refused_resident_observation_keeps_material_and_carries_into_the_next_native_read"
+      ],
+      "native_Words": 2,
+      "receiving_crossings_per_Word_upper": 3,
+      "source_stations_upper": 9
+    }
+  ],
+  "unique_tests": 2,
+  "all_source_selectors_verified": true
+}

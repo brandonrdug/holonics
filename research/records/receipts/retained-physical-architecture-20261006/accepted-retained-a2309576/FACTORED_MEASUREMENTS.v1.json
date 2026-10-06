@@ -1,0 +1,464 @@
+{
+  "validation": {
+    "path": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/VALIDATION.json",
+    "bytes": 1521584,
+    "sha256": "624335e965b684e06e03549e56962c5bef6b4862d8c930a5776d746ff8d23394"
+  },
+  "exact_factored_readings": {
+    "hnn-retained-a2309576-cache-preparation-20261006-v1": {
+      "wall_ns": {
+        "integer": 7537224736,
+        "prime_powers": [
+          [
+            2,
+            5
+          ],
+          [
+            235538273,
+            1
+          ]
+        ]
+      },
+      "projection_ns": {
+        "integer": 17000000000,
+        "prime_powers": [
+          [
+            2,
+            9
+          ],
+          [
+            5,
+            9
+          ],
+          [
+            17,
+            1
+          ]
+        ]
+      },
+      "aggregate_CPU_ns": {
+        "integer": 6375290000,
+        "prime_powers": [
+          [
+            2,
+            4
+          ],
+          [
+            5,
+            4
+          ],
+          [
+            637529,
+            1
+          ]
+        ]
+      },
+      "group_peak_bytes": {
+        "integer": 3870388224,
+        "prime_powers": [
+          [
+            2,
+            12
+          ],
+          [
+            3,
+            3
+          ],
+          [
+            79,
+            1
+          ],
+          [
+            443,
+            1
+          ]
+        ]
+      },
+      "peak_child_RSS_KiB": {
+        "integer": 30104,
+        "prime_powers": [
+          [
+            2,
+            3
+          ],
+          [
+            53,
+            1
+          ],
+          [
+            71,
+            1
+          ]
+        ]
+      },
+      "measured_to_projected": [
+        235538273,
+        531250000
+      ]
+    },
+    "hnn-retained-a2309576-host-cuda-link-20261006-v1": {
+      "wall_ns": {
+        "integer": 23426062063,
+        "prime_powers": [
+          [
+            43,
+            1
+          ],
+          [
+            53,
+            1
+          ],
+          [
+            349,
+            1
+          ],
+          [
+            29453,
+            1
+          ]
+        ]
+      },
+      "projection_ns": {
+        "integer": 65000000000,
+        "prime_powers": [
+          [
+            2,
+            9
+          ],
+          [
+            5,
+            10
+          ],
+          [
+            13,
+            1
+          ]
+        ]
+      },
+      "aggregate_CPU_ns": {
+        "integer": 60527487000,
+        "prime_powers": [
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            1213,
+            1
+          ],
+          [
+            16633,
+            1
+          ]
+        ]
+      },
+      "group_peak_bytes": {
+        "integer": 3085094912,
+        "prime_powers": [
+          [
+            2,
+            12
+          ],
+          [
+            753197,
+            1
+          ]
+        ]
+      },
+      "peak_child_RSS_KiB": {
+        "integer": 2273048,
+        "prime_powers": [
+          [
+            2,
+            3
+          ],
+          [
+            284131,
+            1
+          ]
+        ]
+      },
+      "measured_to_projected": [
+        23426062063,
+        65000000000
+      ]
+    },
+    "hnn-retained-a2309576-completed-artifact-read-20261006-v1": {
+      "wall_ns": {
+        "integer": 3667168155,
+        "prime_powers": [
+          [
+            3,
+            1
+          ],
+          [
+            5,
+            1
+          ],
+          [
+            7,
+            1
+          ],
+          [
+            34925411,
+            1
+          ]
+        ]
+      },
+      "projection_ns": {
+        "integer": 17000000000,
+        "prime_powers": [
+          [
+            2,
+            9
+          ],
+          [
+            5,
+            9
+          ],
+          [
+            17,
+            1
+          ]
+        ]
+      },
+      "aggregate_CPU_ns": {
+        "integer": 3161693000,
+        "prime_powers": [
+          [
+            2,
+            3
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            3161693,
+            1
+          ]
+        ]
+      },
+      "group_peak_bytes": {
+        "integer": 3777593344,
+        "prime_powers": [
+          [
+            2,
+            15
+          ],
+          [
+            7,
+            1
+          ],
+          [
+            43,
+            1
+          ],
+          [
+            383,
+            1
+          ]
+        ]
+      },
+      "peak_child_RSS_KiB": {
+        "integer": 31760,
+        "prime_powers": [
+          [
+            2,
+            4
+          ],
+          [
+            5,
+            1
+          ],
+          [
+            397,
+            1
+          ]
+        ]
+      },
+      "measured_to_projected": [
+        733433631,
+        3400000000
+      ]
+    },
+    "hnn-retained-a2309576-control-group1-20261006-v1": {
+      "wall_ns": {
+        "integer": 642115118,
+        "prime_powers": [
+          [
+            2,
+            1
+          ],
+          [
+            151,
+            1
+          ],
+          [
+            313,
+            1
+          ],
+          [
+            6793,
+            1
+          ]
+        ]
+      },
+      "projection_ns": {
+        "integer": 16000000000,
+        "prime_powers": [
+          [
+            2,
+            13
+          ],
+          [
+            5,
+            9
+          ]
+        ]
+      },
+      "aggregate_CPU_ns": {
+        "integer": 586286000,
+        "prime_powers": [
+          [
+            2,
+            4
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            53,
+            1
+          ],
+          [
+            5531,
+            1
+          ]
+        ]
+      },
+      "group_peak_bytes": {
+        "integer": 18038784,
+        "prime_powers": [
+          [
+            2,
+            14
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            367,
+            1
+          ]
+        ]
+      },
+      "peak_child_RSS_KiB": {
+        "integer": 27224,
+        "prime_powers": [
+          [
+            2,
+            3
+          ],
+          [
+            41,
+            1
+          ],
+          [
+            83,
+            1
+          ]
+        ]
+      },
+      "measured_to_projected": [
+        321057559,
+        8000000000
+      ]
+    },
+    "hnn-retained-a2309576-control-group2-20261006-v1": {
+      "wall_ns": {
+        "integer": 280165553,
+        "prime_powers": [
+          [
+            23,
+            1
+          ],
+          [
+            12181111,
+            1
+          ]
+        ]
+      },
+      "projection_ns": {
+        "integer": 16000000000,
+        "prime_powers": [
+          [
+            2,
+            13
+          ],
+          [
+            5,
+            9
+          ]
+        ]
+      },
+      "aggregate_CPU_ns": {
+        "integer": 226685000,
+        "prime_powers": [
+          [
+            2,
+            3
+          ],
+          [
+            5,
+            4
+          ],
+          [
+            45337,
+            1
+          ]
+        ]
+      },
+      "group_peak_bytes": {
+        "integer": 16900096,
+        "prime_powers": [
+          [
+            2,
+            13
+          ],
+          [
+            2063,
+            1
+          ]
+        ]
+      },
+      "peak_child_RSS_KiB": {
+        "integer": 24832,
+        "prime_powers": [
+          [
+            2,
+            8
+          ],
+          [
+            97,
+            1
+          ]
+        ]
+      },
+      "measured_to_projected": [
+        280165553,
+        16000000000
+      ]
+    }
+  }
+}

@@ -175,14 +175,39 @@ Field storage/work balances use their declared effort/flow metric. Aggregate CPU
 and resident bytes are different exterior readings. No SI joule calibration, receiving-ratio
 thermal-port join or universal conserved sum of bits and operations is established by this path.
 
+The accepted [Motion decoder-work correction](2026-10-06_A_LOSSY_RECEIVER_RETURNS_DECODING_WORK_AND_WINDING.md)
+now supplies an exact condition on any proposed physical reconstruction. Let P encode ending
+motion, V decode it, W chart the initial motion, T be the actual finite transport and G0/G1 its
+physical storage forms. Write `R_dec=VP`, distinguishing reconstruction from the HNN's learned
+receiving map R. The extra work form returned by the ending decoder is
+
+`W^T T^T (R_dec^T G1 R_dec-G1) T W`.
+
+It has no automatic sign and vanishes under `VP=I`. The existing `finite_work_form_rechart`
+consumes the new theorem with exactly that hypothesis. In real symmetric energy coordinates,
+evaluation on z and division by two gives the decoded-minus-physical ending energy correction;
+actual affine source motion still requires its cross and self-energy terms. A class decoder
+`D=I_A`, a singleton class fibre or an equal present receiving face does not prove `VP=I` on
+physical ring/contact/resonator motion. The current resident retains its full physical carry and
+introduces no such coarse reconstructed opening. This theorem therefore prices a proposed
+physical compression only after its actual P/V/T/storage square is supplied; it is not an
+unmeasured work saving or a native pruning certificate. Exact source, object and independent
+importer acceptance cover the Motion correction and consumer (2+58+3 queries); the future-read
+theorem and native physical reconstruction square remain separate.
+
 ## Evidence boundaries and the next observable demonstration
 
 The accepted `6f536ac3` producer archive establishes its twenty-eight focused controls and
 matched complete-Word/response coordinates on that source only. The retained consumer, formal
-modules and new runtime gate have their own pins. The successor `074a6267` still needs a fresh
-matched link and all eight queued exact selectors. Static syntax, source trace and whitespace
-checks do not supply type checking or execution. Broad workspace/source guards, doctests and an
-idle-card device gate are separate. No prior receipt receives successor credit by ancestry.
+modules and new runtime gate have their own pins. Terminal v21 subsequently accepted the two
+retained controls at `a2309576`, with their source-matched executable and separate completed-artifact
+provenance read. The initial compiler wrapper's refusal is preserved; it is not relabelled as
+accepted. The source-return successor `074a6267` failed compilation with test-only E0382: an
+earlier `-paired` consumed the reading reused by new assertions. Its eight selectors ran zero
+tests. The exact borrow repair at `223a4498` uses `-&paired` with unchanged production laws and
+assertions; fresh linkage and all eight selectors remain pending. Static syntax, source trace and
+whitespace checks do not supply that acceptance. Broad workspace/source guards, doctests and an
+idle-card device gate remain separate. No receipt receives successor credit by ancestry.
 
 The demonstration is already expressed by two queued controls. The retained-family selector
 prints the whole unobserved `PhysicalRepair` after real R/pair deposition and continuation. The
@@ -192,18 +217,31 @@ and an advancing pump clock. They are bounded deterministic physical-law fixture
 untouched scientific population, trained product, or new synthetic curriculum. Their matched
 Word witnesses are exterior unit controls, never a production answer routine.
 
-After fresh native acceptance, present those existing output records verbatim with their full
-unfiltered raw log and source/executable/acceptance links. Present no desired or reference answer
-beside the output. Do not invent output while the queue is pending. The concrete observation is
-continued native motion, source-sensitive receiving change, the consumed pairing and the actual
-Released/Held fibre. A refusal or failed gate is preserved whole. A larger timeout or another
-fixture cannot substitute for the failed fixed claim. The demonstration introduces no job.
+The accepted retained-family output is now available as the verbatim
+[whole blind receipt](receipts/retained-physical-architecture-20261006/accepted-retained-a2309576/WHOLE_BLIND_PHYSICAL_REPAIR.a230.txt),
+with [full unfiltered producing stdout](receipts/retained-physical-architecture-20261006/accepted-retained-a2309576/hnn-retained-a2309576-control-group1-20261006-v1.stdout)
+and its [source/executable/acceptance join](receipts/retained-physical-architecture-20261006/accepted-retained-a2309576/DEMONSTRATION_ACCEPTANCE.v1.json).
+The second retained control separately passed comparison-refusal/carry continuation. These
+observations establish that narrow retained consumer on `a2309576`; they do not establish the
+unrun carried source-return control or an unknown truth's recovery. The whole debug receipt is a
+physical-law fixture output, not Athena prose or an autonomous product demonstration.
+
+After fresh source-return acceptance, present its existing output records verbatim with their
+full unfiltered logs and producing seals. Present no desired or reference answer beside output.
+Do not invent its missing output. The concrete observation will be continued native motion,
+source-sensitive receiving change and the consumed pairing, with the actual Released/Held fibre.
+A refusal or failed gate is preserved whole. A larger timeout or another fixture cannot
+substitute for the failed fixed claim. Neither receipt consumption introduces a job.
 
 The remaining concrete joins are:
 
-1. Fresh `074a6267` native acceptance, independently admitted broad/device gates, and kernel/axiom
-   acceptance for prepared `SingleHoleResponse` and `SourceReceiverReturn` under their actual
-   provider closures. A runtime directional check is not an all-directions operator theorem.
+1. Fresh corrected `223a4498` native acceptance, independently admitted broad/device gates, and
+   kernel/axiom acceptance for `SingleHoleResponse` and `SourceReceiverReturn` under their actual
+   provider closures. The original SingleHoleResponse full owner reached its fixed child deadline
+   with no axiom selector output, although provider provenance and ordered import parts passed.
+   Dependency-preserving source decomposition is its next subject; statements and providers
+   remain fixed and its deadline is not raised. A runtime directional check is not an
+   all-directions operator theorem.
 2. Native rational first/pair normalization, source storage injection, actual loaded tick,
    Encoded source clock/decoder and GrainCell instantiation of those formal maps. Their #62
    boundary squares remain explicit; source-present proofs are not borrowed kernel receipts.

@@ -1,0 +1,286 @@
+{
+  "passed": true,
+  "source_commit": "a23095761e68032f6cbddaa03e6fa6ede778d57d",
+  "all_288_source_inputs_unchanged": true,
+  "completed_compiler_exit": 0,
+  "original_wrapper_acceptance": false,
+  "original_wrapper_refusal_preserved": true,
+  "no_compiler_rerun": true,
+  "declared_read_change": "Read completed fresh compiler artifacts and classify drift against precompile seal; local Cargo outputs are output evidence, immutable foreign inputs remain inputs. Original rejected wrapper is not relabelled.",
+  "original_compiler_label": "hnn-retained-a2309576-host-cuda-link-20261006-v1",
+  "original_config_pin": {
+    "bytes": 1496904,
+    "sha256": "e05ede35cbcaf09d8e5ccac1698ae2f0d66b0c58e29bcd639ff190db9c55228a"
+  },
+  "original_stdout_pin": {
+    "bytes": 38575,
+    "sha256": "4fa388abdb7d7ff6c44dbd73830d43d8c4c51bf62f34f9b09684057020c4f985"
+  },
+  "original_release_pin": {
+    "bytes": 175,
+    "sha256": "62e7a8745cd1f7d16bbd09ca077fc22609770db4b965df8ab7360b375734f41b"
+  },
+  "input_count": 3410,
+  "unchanged_count": 3387,
+  "changed_count": 23,
+  "changed_inputs": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-physical-a2309576-20261006/cache-v2/debug/build/holonics-cuda-c82bf91515d93d4b/build_script_build-c82bf91515d93d4b.d": {
+      "before": {
+        "sha256": "b68ce5b3fb7748a3bfd0fbba8acf5849cf706b6d5316e4270ca8170e6efc8e40",
+        "bytes": 493
+      },
+      "after": {
+        "bytes": 485,
+        "sha256": "3c204486d9fafa201e6a06490d643abf7f04b07909b4af540c36cd771a555c0f"
+      },
+      "local_output": true
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-physical-a2309576-20261006/cache-v2/debug/build/holonics-cuda-d9ad51fae469d445/output": {
+      "before": {
+        "sha256": "4a8c218a11279a888b399b8d0577b144c0dcea39c0e93dffada650ef82d49f9b",
+        "bytes": 732
+      },
+      "after": {
+        "bytes": 728,
+        "sha256": "b0e509fa249170b2c559ffc5bc79ef6505d5e7500bde5107b16e5180f5a219b0"
+      },
+      "local_output": true
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-physical-a2309576-20261006/cache-v2/debug/build/holonics-cuda-d9ad51fae469d445/root-output": {
+      "before": {
+        "sha256": "7669225c91c5193585e80682893ef333265c05aca17442943f87538abda30b86",
+        "bytes": 165
+      },
+      "after": {
+        "bytes": 161,
+        "sha256": "de8b4b1f75908291a46e7ba963133fc1d0e7c59a6c9b75dea0fbfd44e1a40811"
+      },
+      "local_output": true
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-physical-a2309576-20261006/cache-v2/debug/deps/holonics-02407331bdf682dc.d": {
+      "before": {
+        "sha256": "4c6518fb74684f123321d422ab9830e6c167871da01d67075992f79b4de7416a",
+        "bytes": 25465
+      },
+      "after": {
+        "bytes": 25598,
+        "sha256": "350b8a5bb13ef071e6f63bc0d61f3c78d4e7c0a9c96442512f1da3264b982cbc"
+      },
+      "local_output": true
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-physical-a2309576-20261006/cache-v2/debug/deps/holonics-70b68d2f7e1f6408": {
+      "before": {
+        "sha256": "ce3ac75139ccead63ef0ac015f0b1da2c91b20c54ef55e479e433a50b563de65",
+        "bytes": 65215928
+      },
+      "after": {
+        "bytes": 65274496,
+        "sha256": "c540497ebe82b65925412c5f842e9ec9fe18c9b60302eed53c1a168311d69c68"
+      },
+      "local_output": true
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-physical-a2309576-20261006/cache-v2/debug/deps/holonics-70b68d2f7e1f6408.d": {
+      "before": {
+        "sha256": "eca938f638e7edcf53c718bf057eee0b5d0e0fb4009a6a8c26c280cc2ee5026c",
+        "bytes": 27516
+      },
+      "after": {
+        "bytes": 27744,
+        "sha256": "eb7b0c72d62f6074342994caeefbc902e3e830565b4da62bafca6efb9e2ada19"
+      },
+      "local_output": true
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-physical-a2309576-20261006/cache-v2/debug/deps/holonics_cuda-3a3d38defac6a12c": {
+      "before": {
+        "sha256": "58fc5d2cffc51fd4adfbd7ac30ca55cd70d2ddeafb14d0284719bd49e0f24455",
+        "bytes": 41226008
+      },
+      "after": {
+        "bytes": 41225144,
+        "sha256": "3de32b23c80384fece1eb5332ab8508cf69dc4ec18fec53fa6afcf023038157b"
+      },
+      "local_output": true
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-physical-a2309576-20261006/cache-v2/debug/deps/holonics_cuda-3a3d38defac6a12c.d": {
+      "before": {
+        "sha256": "18085027d3fdb95ba99975496c499f453fbf3301ac9286126526a2a51a257939",
+        "bytes": 3932
+      },
+      "after": {
+        "bytes": 3896,
+        "sha256": "da65ae75b2d482c34ba2f9e7088a286022338404783ff8d0ba32c9af34fdf767"
+      },
+      "local_output": true
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-physical-a2309576-20261006/cache-v2/debug/deps/holonics_cuda-fe78e545d18196b4.d": {
+      "before": {
+        "sha256": "e5661a7a581bd5e97c3b7435154a96a02371faffa97ff71921c84081efd91315",
+        "bytes": 4546
+      },
+      "after": {
+        "bytes": 4498,
+        "sha256": "b9963ed13919c33cbe68b6fa03584a21de676417ebc3b3a4e4879e909a68bf71"
+      },
+      "local_output": true
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-physical-a2309576-20261006/cache-v2/debug/deps/libholonics-02407331bdf682dc.rlib": {
+      "before": {
+        "sha256": "82b9b86fb86decc5c164e505f6908bf2948824deffda6bcdb826b344b614440b",
+        "bytes": 101629894
+      },
+      "after": {
+        "bytes": 101694360,
+        "sha256": "a8a2bbd0a1cd7d90daf808b57b3aff933cdd3e5990d09038a687057f909a23af"
+      },
+      "local_output": true
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-physical-a2309576-20261006/cache-v2/debug/deps/libholonics-02407331bdf682dc.rmeta": {
+      "before": {
+        "sha256": "5c38b41443add046d1492c5bf6bd1498ef03a1063965f4a4e50065044a43de22",
+        "bytes": 14052374
+      },
+      "after": {
+        "bytes": 14081180,
+        "sha256": "c7a16ddb4d8748ff64498f488f1b6bdfeb873a00c8410ffa54c8bc97e57807f7"
+      },
+      "local_output": true
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-physical-a2309576-20261006/cache-v2/debug/deps/libholonics_cuda-fe78e545d18196b4.rlib": {
+      "before": {
+        "sha256": "b2cef3aa76a9c80543fd48cc5296e8977f8c80da52a7276917ec8870ce1d1b27",
+        "bytes": 16877016
+      },
+      "after": {
+        "bytes": 16876944,
+        "sha256": "a660b95b76b538b79343446951ca091c2d4ddbb9af1b1f2aa367b483da3e6c07"
+      },
+      "local_output": true
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-physical-a2309576-20261006/cache-v2/debug/deps/libholonics_cuda-fe78e545d18196b4.rmeta": {
+      "before": {
+        "sha256": "75322074120bf5e60a3608b2cd72050054ace87aa8ffaff03e72a42e039c0f0e",
+        "bytes": 5758949
+      },
+      "after": {
+        "bytes": 5758885,
+        "sha256": "3dd86824c53ba3510d6c199215bcc047f4859b09d719d1c80b81f1da9799ba79"
+      },
+      "local_output": true
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-physical-a2309576-20261006/cache-v2/debug/deps/located_ingest-2b2d6cef9fd78c5f": {
+      "before": {
+        "sha256": "72d42d96ac2a29690a63106226cfeaafc8562a293509a98d1872e583274a717a",
+        "bytes": 16028248
+      },
+      "after": {
+        "bytes": 16028032,
+        "sha256": "6fd1e2ef94dc850a1ffd646e47303eac90ed29725426749e750a1b11765eb178"
+      },
+      "local_output": true
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-physical-a2309576-20261006/cache-v2/debug/deps/located_ingest-2b2d6cef9fd78c5f.d": {
+      "before": {
+        "sha256": "1d6100d0332c71a2a0f1ee4a3fc0086c67ce86ace13a65bc9014151cf51f5a78",
+        "bytes": 466
+      },
+      "after": {
+        "bytes": 458,
+        "sha256": "a67d81e7dad618a986af146cd76e4d3cd18dbe52bf078384c8ab7465a578d814"
+      },
+      "local_output": true
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-physical-a2309576-20261006/cache-v2/debug/deps/mount_smoke-5cc32226864d0eaa": {
+      "before": {
+        "sha256": "c504ffe60981b11d056aada9a3a56a3a131a639bf35d38a5f7af0775d9ee98aa",
+        "bytes": 10086424
+      },
+      "after": {
+        "bytes": 10087064,
+        "sha256": "04d8606d8ec47311f3b81ddedafba1ac0e0a738f848d010c3cffa46be0ca4428"
+      },
+      "local_output": true
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-physical-a2309576-20261006/cache-v2/debug/deps/mount_smoke-5cc32226864d0eaa.d": {
+      "before": {
+        "sha256": "87d59cc69db5d7ab98edf56245564cd460b99078899d69f86d092fc2ed7537cb",
+        "bytes": 722
+      },
+      "after": {
+        "bytes": 714,
+        "sha256": "51f261372a12e0ec557d371d445bd9a5b6d873857dd7d72796808cb165bd4e75"
+      },
+      "local_output": true
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-physical-a2309576-20261006/cache-v2/debug/deps/ranged_capacity-bd29e6ac6f6167da": {
+      "before": {
+        "sha256": "cc0e37dc7f7486db9819912a43f9ea2a75fabf7f7f7ed9660245bbfb74102b78",
+        "bytes": 23222160
+      },
+      "after": {
+        "bytes": 23222072,
+        "sha256": "2c87214cae751268dc01f6781fa23ee109fd881b04ac69c37a48d06d0bc2fc61"
+      },
+      "local_output": true
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-physical-a2309576-20261006/cache-v2/debug/deps/ranged_capacity-bd29e6ac6f6167da.d": {
+      "before": {
+        "sha256": "bab2f5350a11ffc749170bc94ae7948548b0d45cc88af1efddbc7911c64fc61e",
+        "bytes": 456
+      },
+      "after": {
+        "bytes": 448,
+        "sha256": "391d092a3b36307a8d84cce5f3104fda909d17dabc583e63336d94c57d1efbc8"
+      },
+      "local_output": true
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-physical-a2309576-20261006/cache-v2/debug/deps/resident_cold_restore-d85475b8f5abeb14": {
+      "before": {
+        "sha256": "467a2f8596605ac0dc269d49b6974794c04d518de81f729d4b0649d00d45942d",
+        "bytes": 28457528
+      },
+      "after": {
+        "bytes": 28457232,
+        "sha256": "dc6df0dc7a255e9d434894eb9125f59f92fd21b9004f322c76f767a75bb5aa0f"
+      },
+      "local_output": true
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-physical-a2309576-20261006/cache-v2/debug/deps/resident_cold_restore-d85475b8f5abeb14.d": {
+      "before": {
+        "sha256": "6f57043268b0b214ec322034c4965cc8a69bb9984b39bc0058663aa8ef87eaa2",
+        "bytes": 486
+      },
+      "after": {
+        "bytes": 478,
+        "sha256": "a72fd0a21ff261a3d26471e71f37eb0d02a60711d23a4d950c746c6fa49cb8e2"
+      },
+      "local_output": true
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-physical-a2309576-20261006/cache-v2/debug/deps/source_entrance-3dfaf698dddeb1a6": {
+      "before": {
+        "sha256": "1e03113b70a938ad24d9513dd66b4d38976b942be12e0a0f57824e186aef00e6",
+        "bytes": 21122968
+      },
+      "after": {
+        "bytes": 21122776,
+        "sha256": "93d43bc32d93ebb68e5ee0d0ebf658f3b24da52e1549b0aebe09d8c6894c066c"
+      },
+      "local_output": true
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-physical-a2309576-20261006/cache-v2/debug/deps/source_entrance-3dfaf698dddeb1a6.d": {
+      "before": {
+        "sha256": "3eb21913bfea3df99223e589e59f21e67044e50261ad0cc3abfa0eeb65fb6551",
+        "bytes": 456
+      },
+      "after": {
+        "bytes": 448,
+        "sha256": "03d88148c3b8288331f3930a53fdb8ece91a95e40c329469a0b50f25fd5a37ea"
+      },
+      "local_output": true
+    }
+  },
+  "unclassified_changes": {},
+  "foreign_artifacts_all_fresh": true,
+  "foreign_artifact_count": 25,
+  "all_11_local_artifacts_fresh_false": true,
+  "elapsed_ns": 3485810159
+}

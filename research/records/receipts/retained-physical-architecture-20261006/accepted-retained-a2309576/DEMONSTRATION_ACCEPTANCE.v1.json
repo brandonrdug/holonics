@@ -1,0 +1,336 @@
+{
+  "source_commit": "a23095761e68032f6cbddaa03e6fa6ede778d57d",
+  "scope": "Exact a230 fresh selected Cargo artifacts, separate completed-artifact provenance read, two retained physical controls",
+  "selected_preserved_files": {
+    "SOURCE_SNAPSHOT.v1.json": {
+      "bytes": 48386,
+      "sha256": "489c46c2bbaa73536f7af998816aa94bc4ceca8d4f54fd322e1838dacb2feea2",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-physical-a2309576-20261006/SOURCE_SNAPSHOT.v1.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-physical-a2309576-20261006/SOURCE_SNAPSHOT.v1.json"
+    },
+    "RUNTIME_GROUPS.v1.json": {
+      "bytes": 1309,
+      "sha256": "72cc24446594dd76496fb98649183a58aec1f1a03275d96683839a28b0b90b51",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-physical-a2309576-20261006/RUNTIME_GROUPS.v1.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-physical-a2309576-20261006/RUNTIME_GROUPS.v1.json"
+    },
+    "hnn-retained-a2309576-host-cuda-link-20261006-v1.stdout": {
+      "bytes": 38575,
+      "sha256": "4fa388abdb7d7ff6c44dbd73830d43d8c4c51bf62f34f9b09684057020c4f985",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-host-cuda-link-20261006-v1.stdout",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-host-cuda-link-20261006-v1.stdout"
+    },
+    "hnn-retained-a2309576-host-cuda-link-20261006-v1.stderr": {
+      "bytes": 410,
+      "sha256": "8008695188d16c341ce4d0172f0a4c6e712e4803f38c955d5c840b369a0be54b",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-host-cuda-link-20261006-v1.stderr",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-host-cuda-link-20261006-v1.stderr"
+    },
+    "hnn-retained-a2309576-host-cuda-link-20261006-v1.final.json": {
+      "bytes": 5161,
+      "sha256": "9c255009ddc2f93d5681365eeca6d8e6f42f1992c7447afc7eeda977ea634606",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-host-cuda-link-20261006-v1.final.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-host-cuda-link-20261006-v1.final.json"
+    },
+    "hnn-retained-a2309576-host-cuda-link-20261006-v1.unit-cleanup.json": {
+      "bytes": 784,
+      "sha256": "340fa683310bb19528285067ed0dcf6e3b579e3deb33aaeffd089b6f390631ba",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-host-cuda-link-20261006-v1.unit-cleanup.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-host-cuda-link-20261006-v1.unit-cleanup.json"
+    },
+    "hnn-retained-a2309576-host-cuda-link-20261006-v1.acceptance.json": {
+      "bytes": 379,
+      "sha256": "1d14a474f70de33ab320ac7d9666edeb235e4f9c3341178f7d991dd0e035e0de",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-host-cuda-link-20261006-v1.acceptance.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-host-cuda-link-20261006-v1.acceptance.json"
+    },
+    "hnn-retained-a2309576-host-cuda-link-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "62e7a8745cd1f7d16bbd09ca077fc22609770db4b965df8ab7360b375734f41b",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-host-cuda-link-20261006-v1.release.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-host-cuda-link-20261006-v1.release.json"
+    },
+    "hnn-retained-a2309576-completed-artifact-read-20261006-v1.stdout": {
+      "bytes": 140,
+      "sha256": "2b98b4a16cd41d82039e51a1ffa443327cf58afdc0290ecfc673ebaac0fa238d",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-completed-artifact-read-20261006-v1.stdout",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-completed-artifact-read-20261006-v1.stdout"
+    },
+    "hnn-retained-a2309576-completed-artifact-read-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-completed-artifact-read-20261006-v1.stderr",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-completed-artifact-read-20261006-v1.stderr"
+    },
+    "hnn-retained-a2309576-completed-artifact-read-20261006-v1.final.json": {
+      "bytes": 5031,
+      "sha256": "0db8313a3cad7d71bebde6ef93916a2df67cf5807c9489b4b8bb63d1e93f1c84",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-completed-artifact-read-20261006-v1.final.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-completed-artifact-read-20261006-v1.final.json"
+    },
+    "hnn-retained-a2309576-completed-artifact-read-20261006-v1.unit-cleanup.json": {
+      "bytes": 741,
+      "sha256": "63bc4717a5b4aba749a447d44d83e087ab5cc34f66dba4af2e3320929ffd9709",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-completed-artifact-read-20261006-v1.unit-cleanup.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-completed-artifact-read-20261006-v1.unit-cleanup.json"
+    },
+    "hnn-retained-a2309576-completed-artifact-read-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "f1a867d5d70d6ff5cb293c528c8f810f47adcc9c423b38de387cdf2285c99311",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-completed-artifact-read-20261006-v1.acceptance.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-completed-artifact-read-20261006-v1.acceptance.json"
+    },
+    "hnn-retained-a2309576-completed-artifact-read-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "4eead3d7c4dcf14f1dce94fee335f59830aaa5e4f132d5f7fb202035342b1444",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-completed-artifact-read-20261006-v1.release.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-completed-artifact-read-20261006-v1.release.json"
+    },
+    "COMPLETED_ARTIFACT_READ.v1.json": {
+      "bytes": 12240,
+      "sha256": "ac155a75c2bca97844b9c3e8c38494239a1d5de56e9e0e101e57818022dad279",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-physical-a2309576-20261006/COMPLETED_ARTIFACT_READ.v1.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-physical-a2309576-20261006/COMPLETED_ARTIFACT_READ.v1.json"
+    },
+    "COMPILED_ARTIFACTS.v1.json": {
+      "bytes": 21139,
+      "sha256": "51a39b1460f5b83e8e497d84c5b274c2cb71f412275852e4b558894e4dd8efe9",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-physical-a2309576-20261006/COMPILED_ARTIFACTS.v1.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-physical-a2309576-20261006/COMPILED_ARTIFACTS.v1.json"
+    },
+    "hnn-retained-a2309576-control-group1-20261006-v1.config.json": {
+      "bytes": 140848,
+      "sha256": "e80904deabe4bcf705fea02ce3b5dbd7c7deba0e8e80dc9716af7c0f33839bd1",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group1-20261006-v1.config.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group1-20261006-v1.config.json"
+    },
+    "hnn-retained-a2309576-control-group1-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "b4d346aefcf62e06ccda439418456271398588e7f0ab795e8a3f7c3934787869",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group1-20261006-v1.external-lease.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group1-20261006-v1.external-lease.json"
+    },
+    "hnn-retained-a2309576-control-group1-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "e67039464b46028f485018d5e7cee6f9d7f57169dcc018b8dbf9920c4c4fd588",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group1-20261006-v1.lease-identity.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group1-20261006-v1.lease-identity.json"
+    },
+    "hnn-retained-a2309576-control-group1-20261006-v1.input_seal.json": {
+      "bytes": 89497,
+      "sha256": "03a5f1e86c2a51467f9f224d88e2a46961e46cccfe9017a1dfa36b8922517b74",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group1-20261006-v1.input_seal.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group1-20261006-v1.input_seal.json"
+    },
+    "hnn-retained-a2309576-control-group1-20261006-v1.stdout": {
+      "bytes": 73175,
+      "sha256": "c7386419092ca457e31e1b852038994128a35d051d4a18c374b713d658d29977",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group1-20261006-v1.stdout",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group1-20261006-v1.stdout"
+    },
+    "hnn-retained-a2309576-control-group1-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group1-20261006-v1.stderr",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group1-20261006-v1.stderr"
+    },
+    "hnn-retained-a2309576-control-group1-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "eb89024b4bd15df57e96dffe058baa6c5b7d2eb9c54191234d873afdb3d0dc38",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group1-20261006-v1.memory-gate.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group1-20261006-v1.memory-gate.json"
+    },
+    "hnn-retained-a2309576-control-group1-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "7c7fed4c516b678ebfc93452f516c7aeaaabd408c54421c400c755f3de0b0a96",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group1-20261006-v1.child-identity.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group1-20261006-v1.child-identity.json"
+    },
+    "hnn-retained-a2309576-control-group1-20261006-v1.system-floor.json": {
+      "bytes": 3343,
+      "sha256": "21cd1a94490e4d0bc0e2035f7850c4b21f4f4ccc5ea447ac25572498ebe0a6b4",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group1-20261006-v1.system-floor.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group1-20261006-v1.system-floor.json"
+    },
+    "hnn-retained-a2309576-control-group1-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "36a6dfb5435c778a6929ab37616444d6a6fb35e1025ba3ffa2ce306586ddafa1",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group1-20261006-v1.quiescence.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group1-20261006-v1.quiescence.json"
+    },
+    "hnn-retained-a2309576-control-group1-20261006-v1.output_seal.json": {
+      "bytes": 29130,
+      "sha256": "040f11f27c0ef8983e38433aa40fb15caf0cf55aed735a0a26583803587ecb30",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group1-20261006-v1.output_seal.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group1-20261006-v1.output_seal.json"
+    },
+    "hnn-retained-a2309576-control-group1-20261006-v1.publication.json": {
+      "bytes": 2765,
+      "sha256": "7af45bfd0d41b1db73b5912333fbce2733e43b324c488f93d3d6331b0ddb3c88",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group1-20261006-v1.publication.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group1-20261006-v1.publication.json"
+    },
+    "hnn-retained-a2309576-control-group1-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "1ee4a03a10edecd154e2a1dfbf0d081517527850d277854ef0ee547621ab39db",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group1-20261006-v1.stage-quiescence.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group1-20261006-v1.stage-quiescence.json"
+    },
+    "hnn-retained-a2309576-control-group1-20261006-v1.final.json": {
+      "bytes": 4891,
+      "sha256": "4c8fe90ab7a0dd5dad2e053c257a2e415f3bc9e67fefd0a7bd561e6f31245e75",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group1-20261006-v1.final.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group1-20261006-v1.final.json"
+    },
+    "hnn-retained-a2309576-control-group1-20261006-v1.unit-cleanup.json": {
+      "bytes": 723,
+      "sha256": "3a4e8e993fa88d5386f36575900dc6fd84cd7400c2b35599c6d3a82d4f1d2647",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group1-20261006-v1.unit-cleanup.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group1-20261006-v1.unit-cleanup.json"
+    },
+    "hnn-retained-a2309576-control-group1-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "9f4df60d60e4300fa2beb426c968ae47cb261918517a1b6e0de588c56024a385",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group1-20261006-v1.acceptance.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group1-20261006-v1.acceptance.json"
+    },
+    "hnn-retained-a2309576-control-group1-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "36270df55a598be1c25b621fe0cdb33048634b3a3ead3330a0da004a7ed91b30",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group1-20261006-v1.release.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group1-20261006-v1.release.json"
+    },
+    "hnn-retained-a2309576-control-group2-20261006-v1.config.json": {
+      "bytes": 140834,
+      "sha256": "58f752cb6f478f875ee0b7c0bdfb0b0246636c4356020221bc9d66cd1948ef83",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.config.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.config.json"
+    },
+    "hnn-retained-a2309576-control-group2-20261006-v1.external-lease.json": {
+      "bytes": 487,
+      "sha256": "688bd121f208cf615385a667344bf0347c8150ec0a7dda52a0b2db41234006b8",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.external-lease.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.external-lease.json"
+    },
+    "hnn-retained-a2309576-control-group2-20261006-v1.lease-identity.json": {
+      "bytes": 565,
+      "sha256": "c3dd74d925a1d68f7d9967a2f61bb0e0e18e8decf8eb9d3b208a52f3be78e4ca",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.lease-identity.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.lease-identity.json"
+    },
+    "hnn-retained-a2309576-control-group2-20261006-v1.input_seal.json": {
+      "bytes": 89490,
+      "sha256": "016b7107b6deadb3c00293c90d6bb43f97e22dea6c543ed60c9f8e5283569222",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.input_seal.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.input_seal.json"
+    },
+    "hnn-retained-a2309576-control-group2-20261006-v1.stdout": {
+      "bytes": 233,
+      "sha256": "bfbae611f9e77735bd1961748b7aa43de631c05c1a5afd0abf6a1fd4d7ffed2b",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.stdout",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.stdout"
+    },
+    "hnn-retained-a2309576-control-group2-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.stderr",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.stderr"
+    },
+    "hnn-retained-a2309576-control-group2-20261006-v1.memory-gate.json": {
+      "bytes": 120,
+      "sha256": "7ade785d72a6917d57f9e651576a4ae6b71beddd957bed39a51cbf70fc0721d6",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.memory-gate.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.memory-gate.json"
+    },
+    "hnn-retained-a2309576-control-group2-20261006-v1.child-identity.json": {
+      "bytes": 78,
+      "sha256": "ed87b44429f963a129dc57258a8ac32f0c869b0941779b1e29a20603416aee96",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.child-identity.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.child-identity.json"
+    },
+    "hnn-retained-a2309576-control-group2-20261006-v1.system-floor.json": {
+      "bytes": 520,
+      "sha256": "9fc5778a8812245ee2d4199469c4440aecbffa0d90fa03f4fa52ef7666691da8",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.system-floor.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.system-floor.json"
+    },
+    "hnn-retained-a2309576-control-group2-20261006-v1.quiescence.json": {
+      "bytes": 130,
+      "sha256": "efb4e5f33a3be50db7de60c21ca5edd0232a97b035d95d689f4fb4156ba64b28",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.quiescence.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.quiescence.json"
+    },
+    "hnn-retained-a2309576-control-group2-20261006-v1.output_seal.json": {
+      "bytes": 5089,
+      "sha256": "fef948969201261397c146baf872ab4ff17ad0b4fbe613103d024b9d3548248a",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.output_seal.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.output_seal.json"
+    },
+    "hnn-retained-a2309576-control-group2-20261006-v1.publication.json": {
+      "bytes": 2760,
+      "sha256": "0475f21d65d23476a9dbad483d374b2c1976bc6dfc0d28788ad4d041b65edde0",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.publication.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.publication.json"
+    },
+    "hnn-retained-a2309576-control-group2-20261006-v1.stage-quiescence.json": {
+      "bytes": 136,
+      "sha256": "35d21038260e657bd1a8386f7ef20cfc5306126fea17eeae511fca71ea8274a4",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.stage-quiescence.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.stage-quiescence.json"
+    },
+    "hnn-retained-a2309576-control-group2-20261006-v1.final.json": {
+      "bytes": 4887,
+      "sha256": "799ca446034b4f68e35d634d7594aa08c4f03d709822a26c0dc08e43bd5a60b6",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.final.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.final.json"
+    },
+    "hnn-retained-a2309576-control-group2-20261006-v1.unit-cleanup.json": {
+      "bytes": 723,
+      "sha256": "470813c9c0d983d817cc3b7b1826522d9787ebaaa384fea67814b5c7055347e5",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.unit-cleanup.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.unit-cleanup.json"
+    },
+    "hnn-retained-a2309576-control-group2-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "76eb2297dd51f4f2d33b2bea5b47e8610034326eb8184fe7686c8034395eb80f",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.acceptance.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.acceptance.json"
+    },
+    "hnn-retained-a2309576-control-group2-20261006-v1.release.json": {
+      "bytes": 175,
+      "sha256": "6fd9da33d7883e7565f3b15fd2ac02e1c43ece30d005d4193c395e8feaa416b0",
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.release.json",
+      "preserved_archive": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.release.json"
+    },
+    "VALIDATION.json": {
+      "bytes": 1521584,
+      "sha256": "624335e965b684e06e03549e56962c5bef6b4862d8c930a5776d746ff8d23394",
+      "origin": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/VALIDATION.json"
+    },
+    "FACTORED_MEASUREMENTS.v1.json": {
+      "bytes": 7735,
+      "sha256": "e24452ce6edb3ec53861ce7244f5c5e25f43ad1f7d717c327989f247c6aa3fb8",
+      "origin": "/home/b/Workspaces/holonics/.local/wt/material-learning/research/records/receipts/pair-output-learning-20261006/native-validation-retained-a2309576-v1/FACTORED_MEASUREMENTS.v1.json"
+    }
+  },
+  "raw_outputs_complete_unfiltered": true,
+  "whole_blind_record": {
+    "path": "WHOLE_BLIND_PHYSICAL_REPAIR.a230.txt",
+    "bytes": 23098,
+    "sha256": "563d4fcf4a1c6eeddb2a5f01c0595896ea31e45bfb84673a449486353a02a03a",
+    "byte_offset_in_raw_stdout": 49975,
+    "verbatim": true,
+    "rewrite_or_native_replay": false
+  },
+  "statistical_unit": "Two deterministic law controls; no scientific population or unknown truth accuracy claim.",
+  "compiler_wrapper_refusal_preserved": true,
+  "separate_completed_artifact_provenance_accepted": true,
+  "source_return_074_compile_refusal_not_overwritten": true,
+  "source_return_223_acceptance": null,
+  "executable": {
+    "path": "hnn-retained-physical-a2309576-20261006/cache-v2/debug/deps/holonics-70b68d2f7e1f6408",
+    "bytes": 65274496,
+    "sha256": "c540497ebe82b65925412c5f842e9ec9fe18c9b60302eed53c1a168311d69c68"
+  },
+  "parent_request": "Consume actual retained outputs while the separately repaired source-return gate validates."
+}

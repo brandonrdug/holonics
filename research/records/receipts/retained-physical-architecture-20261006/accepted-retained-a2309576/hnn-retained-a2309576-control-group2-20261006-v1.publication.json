@@ -1,0 +1,54 @@
+{
+  "lease_still_held": true,
+  "own_group_other_PIDs": [],
+  "outcome": {
+    "provisional_passed": true,
+    "final_acceptance_requires_external_CPU_read": true,
+    "label": "hnn-retained-a2309576-control-group2-20261006-v1",
+    "wall_ns": 57621701,
+    "peak_child_RSS_KiB": 24832,
+    "group_memory_peak_bytes": 16900096,
+    "original_coordinates_modified": false,
+    "aggregate_cpu_final_us": 217219,
+    "aggregate_cpu_limit_us": 17000000,
+    "CPU_kernel_hard_total_limit": false
+  },
+  "outputs": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.lease-identity.json": {
+      "sha256": "c3dd74d925a1d68f7d9967a2f61bb0e0e18e8decf8eb9d3b208a52f3be78e4ca",
+      "bytes": 565
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.memory-gate.json": {
+      "sha256": "7ade785d72a6917d57f9e651576a4ae6b71beddd957bed39a51cbf70fc0721d6",
+      "bytes": 120
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.child-identity.json": {
+      "sha256": "ed87b44429f963a129dc57258a8ac32f0c869b0941779b1e29a20603416aee96",
+      "bytes": 78
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.system-floor.json": {
+      "sha256": "9fc5778a8812245ee2d4199469c4440aecbffa0d90fa03f4fa52ef7666691da8",
+      "bytes": 520
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.quiescence.json": {
+      "sha256": "efb4e5f33a3be50db7de60c21ca5edd0232a97b035d95d689f4fb4156ba64b28",
+      "bytes": 130
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.input_seal.json": {
+      "sha256": "016b7107b6deadb3c00293c90d6bb43f97e22dea6c543ed60c9f8e5283569222",
+      "bytes": 89490
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.output_seal.json": {
+      "sha256": "fef948969201261397c146baf872ab4ff17ad0b4fbe613103d024b9d3548248a",
+      "bytes": 5089
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.stdout": {
+      "sha256": "bfbae611f9e77735bd1961748b7aa43de631c05c1a5afd0abf6a1fd4d7ffed2b",
+      "bytes": 233
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-retained-a2309576-control-group2-20261006-v1.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  }
+}

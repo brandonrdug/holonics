@@ -1,0 +1,246 @@
+{
+  "exit": 0,
+  "wall_ns": 57621701,
+  "CPU_count": 1,
+  "CPU_affinity": [
+    0
+  ],
+  "CPU_user_us": 48655,
+  "CPU_system_us": 4966,
+  "CPU_reading_grain_ns": 1000,
+  "timing_source": "monotonic_ns wall; glibc wait4 integer timeval CPU",
+  "peak_child_RSS_KiB": 24832,
+  "cap_ns": 16000000000,
+  "projection_ns": 16000000000,
+  "projection_kill_triggered": false,
+  "system_floor_breached": false,
+  "system_floor_sampling_period_ns": 10000000,
+  "group_memory_max_bytes": 4294967296,
+  "group_memory_peak_bytes": 16900096,
+  "group_memory_current_bytes": 14577664,
+  "memory_events_after": {
+    "low": 0,
+    "high": 0,
+    "max": 0,
+    "oom": 0,
+    "oom_kill": 0,
+    "oom_group_kill": 0,
+    "sock_throttled": 0
+  },
+  "memory_events_delta": {
+    "low": 0,
+    "high": 0,
+    "max": 0,
+    "oom": 0,
+    "oom_kill": 0,
+    "oom_group_kill": 0,
+    "sock_throttled": 0
+  },
+  "stdout": {
+    "sha256": "bfbae611f9e77735bd1961748b7aa43de631c05c1a5afd0abf6a1fd4d7ffed2b",
+    "bytes": 233
+  },
+  "stderr": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  "outputs": {},
+  "all_outputs_present": true,
+  "inputs_unchanged": true,
+  "within_projection": true,
+  "sealed_before_audit": true,
+  "aggregate_cpu_limit_us": 17000000,
+  "aggregate_cpu_used_us": 216232,
+  "aggregate_cpu_guard_triggered": false,
+  "aggregate_cpu_samples": [
+    {
+      "since_start_ns": 5183302,
+      "usage_usec": 118828
+    },
+    {
+      "since_start_ns": 6361099,
+      "usage_usec": 120317
+    },
+    {
+      "since_start_ns": 7476319,
+      "usage_usec": 121433
+    },
+    {
+      "since_start_ns": 8579957,
+      "usage_usec": 122536
+    },
+    {
+      "since_start_ns": 9671693,
+      "usage_usec": 123621
+    },
+    {
+      "since_start_ns": 10763519,
+      "usage_usec": 124698
+    },
+    {
+      "since_start_ns": 12021516,
+      "usage_usec": 125934
+    },
+    {
+      "since_start_ns": 13132438,
+      "usage_usec": 127042
+    },
+    {
+      "since_start_ns": 14235124,
+      "usage_usec": 128141
+    },
+    {
+      "since_start_ns": 15333933,
+      "usage_usec": 129232
+    },
+    {
+      "since_start_ns": 16463058,
+      "usage_usec": 130348
+    },
+    {
+      "since_start_ns": 17563330,
+      "usage_usec": 131443
+    },
+    {
+      "since_start_ns": 18662410,
+      "usage_usec": 132538
+    },
+    {
+      "since_start_ns": 19760647,
+      "usage_usec": 133630
+    },
+    {
+      "since_start_ns": 21390241,
+      "usage_usec": 135249
+    },
+    {
+      "since_start_ns": 22494320,
+      "usage_usec": 136348
+    },
+    {
+      "since_start_ns": 23589512,
+      "usage_usec": 137441
+    },
+    {
+      "since_start_ns": 24674435,
+      "usage_usec": 138521
+    },
+    {
+      "since_start_ns": 25764878,
+      "usage_usec": 139604
+    },
+    {
+      "since_start_ns": 26855632,
+      "usage_usec": 140687
+    },
+    {
+      "since_start_ns": 27955573,
+      "usage_usec": 141779
+    },
+    {
+      "since_start_ns": 29052238,
+      "usage_usec": 142873
+    },
+    {
+      "since_start_ns": 30145456,
+      "usage_usec": 143961
+    },
+    {
+      "since_start_ns": 31248163,
+      "usage_usec": 145057
+    },
+    {
+      "since_start_ns": 32342904,
+      "usage_usec": 146151
+    },
+    {
+      "since_start_ns": 33427957,
+      "usage_usec": 147230
+    },
+    {
+      "since_start_ns": 34518571,
+      "usage_usec": 148313
+    },
+    {
+      "since_start_ns": 35613072,
+      "usage_usec": 149401
+    },
+    {
+      "since_start_ns": 36713955,
+      "usage_usec": 150496
+    },
+    {
+      "since_start_ns": 37845575,
+      "usage_usec": 151622
+    },
+    {
+      "since_start_ns": 38944254,
+      "usage_usec": 152714
+    },
+    {
+      "since_start_ns": 40042131,
+      "usage_usec": 153806
+    },
+    {
+      "since_start_ns": 41150357,
+      "usage_usec": 154908
+    },
+    {
+      "since_start_ns": 42247974,
+      "usage_usec": 156001
+    },
+    {
+      "since_start_ns": 43345050,
+      "usage_usec": 157094
+    },
+    {
+      "since_start_ns": 44443628,
+      "usage_usec": 158187
+    },
+    {
+      "since_start_ns": 45540914,
+      "usage_usec": 159279
+    },
+    {
+      "since_start_ns": 46633923,
+      "usage_usec": 160369
+    },
+    {
+      "since_start_ns": 47718325,
+      "usage_usec": 161448
+    },
+    {
+      "since_start_ns": 48840066,
+      "usage_usec": 162574
+    },
+    {
+      "since_start_ns": 50247995,
+      "usage_usec": 163962
+    },
+    {
+      "since_start_ns": 51355450,
+      "usage_usec": 165065
+    },
+    {
+      "since_start_ns": 52521975,
+      "usage_usec": 166229
+    },
+    {
+      "since_start_ns": 53615354,
+      "usage_usec": 167317
+    },
+    {
+      "since_start_ns": 54711468,
+      "usage_usec": 168389
+    },
+    {
+      "since_start_ns": 56495872,
+      "usage_usec": 170160
+    }
+  ],
+  "aggregate_cpu_scope": "whole dedicated cgroup, including controller and already-reaped descendants",
+  "CPU_kernel_hard_total_limit": false,
+  "aggregate_cpu_stop_margin_us": 1000000,
+  "aggregate_cpu_stop_us": 16000000,
+  "acceptance_provisional_until_external_final_CPU_read": true
+}
