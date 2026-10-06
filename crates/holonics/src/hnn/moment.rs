@@ -1830,6 +1830,13 @@ impl SourceMoment {
         Ok(self.counts(ring)?.first.iter().sum())
     }
 
+    /// The actual carried integer mass of a leaky first marginal, in its own lattice units.
+    /// The normalized source reads this common denominator; None is the unit-count route.
+    /// A physical completion family compares it before mapping its coordinate box through E.
+    pub fn transported_mass(&self, ring: usize) -> Result<Option<BigInt>, HnnError> {
+        Ok(self.counts(ring)?.leaky.as_ref().map(|leaky| leaky.first.values().sum()))
+    }
+
     /// **The pair population `n_(g,δ) = Σ_(c,x,a) C_g(δ)[c, x, a]`** of a source ring's offset
     /// counts at a declared offset.
     pub fn pair_population(&self, ring: usize, offset: usize) -> Result<u64, HnnError> {

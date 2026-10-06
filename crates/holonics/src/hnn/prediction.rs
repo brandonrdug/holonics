@@ -2122,9 +2122,17 @@ fn physical_leaky_source_bounds(
     let placed = section.placed();
     let mut bounds: Option<(Vec<Vec<Rat>>, Vec<Vec<Rat>>)> = None;
     let mut phase_population = None;
+    let mut transported_mass: Option<BigInt> = None;
     for class in 0..section.classes() {
         let support: Vec<_> = placed.iter().map(|cell| Some(cell.unwrap_or(class))).collect();
         let moment = open.continued(field, current, ring, &support)?;
+        let Some(mass) = moment.transported_mass(ring)? else { return Ok(None) };
+        if (section.length != 0 && mass <= BigInt::zero())
+            || transported_mass.as_ref().is_some_and(|before| before != &mass)
+        {
+            return Ok(None);
+        }
+        transported_mass = Some(mass);
         // A fresh continued section adds no offset pair, even if the field declares offsets.
         // A future nonzero pair source has mixed-class extrema and cannot use these supports.
         for &offset in field.offsets() {

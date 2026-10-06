@@ -64,9 +64,12 @@ class's indicators. The present `continued`/`enter`/`normalized` owner establish
 The candidate checks equal phase populations and zero **actual offset populations** across its
 supports. An unused declared offset is allowed: a fresh continued section counts no pair.
 Nonzero pair mass instead holds the domain, since a mixed pair can have an extremum absent
-from all monochrome supports. Exact rounded denominator admission needs a read at the source
-owner; that narrow `SourceMoment` accessor is reserved with the parent before touching its path.
-Until the ownership handoff and that consumer check arrive, this candidate is not queued.
+from all monochrome supports. The narrow source-owner handoff is now granted and consumed:
+`SourceMoment::transported_mass` returns the actual carried integer first-map mass in its own
+lattice units. The domain consumer requires the leaky carrier, positive mass for a nonempty
+complete section, and exact denominator equality across its supports; otherwise it holds the
+domain. The accessor changes no counts, clock, encoding or normalizer. Source and native
+acceptance remain separate; this completed source candidate can now be sealed to the sole queue.
 
 Write these endpoints `f_lo` and `f_hi`, and the actual signed producing map
 `B_(g,c)=P_g^(tau_g-c) E_g`. Then each opening coordinate is enclosed by:
@@ -102,7 +105,8 @@ Every complex receiving logit and grain leader must lie in the sparse and total-
 enclosures, and every opening/tick/Word balance must close. Actual completed-source reads must
 vary, so enclosure is exercised on a source-sensitive field. The actual feature-coordinate hull
 over those sixteen mixed completions must equal the hull of the four monochrome supports,
-testing the extremal claim before its physical image. The total-erasure check covers those
+and every mixed source's exact carried denominator must equal the supports' common denominator,
+testing the admitted source family before its physical image. The total-erasure check covers those
 sixteen sources as a subset, not all `4^9` sources. Production advances one actual
 Word and evaluates only `A` source-coordinate supports. No teacher or erased truth supplies
 its enclosure, and no singleton or task accuracy is required by acceptance.

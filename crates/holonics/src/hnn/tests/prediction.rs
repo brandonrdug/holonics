@@ -2420,13 +2420,19 @@ mod physical_repair {
         let features = |cells: &[Option<usize>]| {
             let moment = crate::hnn::moment::SourceMoment::open_with(&field, &current, &theta)
                 .unwrap().continued(&field, &current, 0, cells).unwrap();
-            (0..field.ring(0).placements().len())
+            let mass = moment.transported_mass(0).unwrap().unwrap();
+            assert!(mass > num_bigint::BigInt::zero());
+            let features = (0..field.ring(0).placements().len())
                 .flat_map(|phase| moment.normalized_counts(&field, 0, phase, &theta.transport(0)).unwrap())
-                .collect::<Vec<_>>()
+                .collect::<Vec<_>>();
+            (features, mass)
         };
         let monochrome: Vec<_> = (0..field.alphabet()).map(|class|
             features(&damaged.placed().iter().map(|cell| Some(cell.unwrap_or(class))).collect::<Vec<_>>())
         ).collect();
+        let common_mass = monochrome[0].1.clone();
+        assert!(monochrome.iter().all(|(_, mass)| *mass == common_mass));
+        let monochrome: Vec<_> = monochrome.into_iter().map(|(features, _)| features).collect();
         let extrema = |rows: &[Vec<Rat>]| {
             (0..rows[0].len()).map(|coordinate| (
                 rows.iter().map(|row| row[coordinate].clone()).min().unwrap(),
@@ -2444,7 +2450,9 @@ mod physical_repair {
                     &field, &[first, 0, 3, 2, 1, 3, 0, 2, last],
                 );
                 let complete = DamagedSection::damage(&actual, &[]).unwrap();
-                all_features.push(features(&complete.placed()));
+                let (feature, mass) = features(&complete.placed());
+                assert_eq!(mass, common_mass, "mixed source classes changed their rounded denominator");
+                all_features.push(feature);
                 let complete = repair_by_field(
                     &field, &theta, &current, &complete, &opening, &phases,
                 ).unwrap();

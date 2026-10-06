@@ -1,0 +1,46 @@
+{
+  "grade": "implemented candidate; source-inspected; Rust syntax only; native/type acceptance pending",
+  "base_commit": "468553d5d971951d75e97c17f32a26e5b2ed0dc6",
+  "ownership": "parent granted narrow SourceMoment transported_mass accessor and exact denominator consumer in isolated successor; no newer live reservation conflict found",
+  "owned_paths": {
+    "crates/holonics/src/hnn/moment.rs": {
+      "bytes": 107450,
+      "sha256": "ad2697a9c46d26423dee001b067568e77bc12cb7378d80036320b4bfccf98a3f"
+    },
+    "crates/holonics/src/hnn/prediction.rs": {
+      "bytes": 143700,
+      "sha256": "3ecd6ca421ee24d1ae377392427f4e45722dcaf4d848845686b370a649285b7a"
+    },
+    "crates/holonics/src/hnn/tests/prediction.rs": {
+      "bytes": 127132,
+      "sha256": "8b75015e5e2e3ca95907ef8b94db15bd943b13985d851ac22426e2d894d0fcaa"
+    },
+    "docs/atlas/objects.tsv": {
+      "bytes": 883551,
+      "sha256": "7406bd972d8a4ae0a434a534e583fe0d5415f0d54fb0657a9c1646739b2dad65"
+    },
+    "research/records/2026-10-06_THE_LEAKY_SOURCE_COMPLETION_DOMAIN_READS_ITS_ACTUAL_ROUNDED_FEATURES.md": {
+      "bytes": 8956,
+      "sha256": "7e59fdfaba546c360593f6bf129bb5353c26cd38c2b6e31c805458851d0537bc"
+    }
+  },
+  "guard": "leaky first-map denominator read at its owner; positive at nonempty full source; equal across A supports; no duplicate weight/chart formula, count/clock/encoding update or serialization parsing",
+  "native_gate_unique_count": 18,
+  "new_control": "actual rounded normalized feature hull and denominator equality across all16 two-hole mixed completions; same coupled native receiving containment, carry and physical balances",
+  "total_erasure_claim": "16 completed source controls as subset, not full4^9",
+  "actual_offset_populations_must_be_zero": true,
+  "population_and_phase_partition_checked": true,
+  "new_task_fidelity_or_singleton_acceptance": false,
+  "new_native_words": 19,
+  "new_unit_crossings_per_word": 2,
+  "new_unit_completed_sources": 16,
+  "static_checks": {
+    "mass_owner_Rust2024_parse": 0,
+    "prediction_Rust2024_parse": 0,
+    "prediction_tests_Rust2024_parse": 0,
+    "git_diff_check": 0
+  },
+  "new_native_or_compiler_jobs_launched_by_source_lane": 0,
+  "scientific_jobs": 0,
+  "admission": "fresh commit then sole queue input/cache/fresh artifact binding and measured fixed projection; unchanged resource caps"
+}
