@@ -8,9 +8,10 @@ use holonics::hnn::field::{ContactDeclaration, CribDeclaration, ReceiverDeclarat
 use holonics::hnn::ring::{PumpDeclaration, PumpStep, ResonatorMaterial};
 use holonics::hnn::word::PowerForm;
 use holonics::hnn::{
-    Absorption, Constitution, Current, Field, FieldDeclaration, RingDeclaration, SourceMoment,
-    Word, WordOpening,
+    Absorption, Constitution, Current, Encoded, Field, FieldDeclaration, RingDeclaration,
+    SourceMoment, Word, WordOpening,
 };
+use holonics::holarchy::terrain::{CyclicLaw, KnownTruth};
 use holonics::holon::parametron::Carrier;
 use holonics::ratio::linear::ExactRatMatrix;
 use holonics::ratio::{Rat, integer, rat};
@@ -256,7 +257,12 @@ fn nonzero_offset_moments_drive_the_actual_loaded_port_without_marginal_source()
     let field = pair_field_with_offsets(4, vec![1]);
     let mut current = Current::at_rest(&field);
     let mut source = SourceMoment::open(&field, &current);
-    let ingested = source.ingest(&field, &mut current, &[0, 1]).unwrap();
+    // The word [0, 1] as a known truth (THE_MACHINE guard 9): the line terrain on ℤ/4 whose drawn
+    // start and step are 0 and 1, through its declared identity.
+    let truth = KnownTruth::cyclic(CyclicLaw::Line, 4, 2_026_100_982, 1, 2).unwrap();
+    assert_eq!(truth.passages(), &[vec![0, 1]]);
+    let cells = Encoded::identity(&truth, &field).unwrap().remove(0);
+    let ingested = source.ingest(&field, &mut current, &cells).unwrap();
     assert_eq!(ingested.cells, 2);
     let theta = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET)
         .unwrap()
@@ -331,23 +337,25 @@ fn an_observed_pair_deposit_changes_the_later_continuing_loaded_response() {
     use holonics::hnn::field::ConstitutionRead;
     use holonics::hnn::keys::{PairLocation, station_pairs};
     let field = pair_field(4);
-    // The locator is given observations, not the desired LocatedPair or its distance.
+    // The locator is given observations, not the desired LocatedPair or its distance: the order-2
+    // terrain's passages (a drawn opening of two cells, then x_t = x_(t−2) + 1 on ℤ/4), entering
+    // through the terrain's declared identity (THE_MACHINE guard 9).
+    let truth =
+        KnownTruth::cyclic(CyclicLaw::OrderTwo { opening: 2 }, 4, 2_026_100_984, 32, 8).unwrap();
     let mut location = PairLocation::open(&field, 0);
-    for a in 0..4 {
-        for b in 0..4 {
-            let mut passage = vec![a, b];
-            for _ in 0..6 {
-                passage.push((passage[passage.len() - 2] + 1) % 4);
-            }
-            for observation in station_pairs(&field, 0, &passage, 2).unwrap() {
-                location.observe(&observation);
-            }
+    for passage in Encoded::identity(&truth, &field).unwrap() {
+        for observation in station_pairs(&field, 0, &passage, 2).unwrap() {
+            location.observe(&observation);
         }
     }
     let located = location
         .survivors()
         .located()
         .expect("the fixture's pair is located");
+    assert_eq!(
+        (located.offset, located.map.clone()),
+        (2, vec![(0, 1), (1, 2), (2, 3), (3, 0)])
+    );
     let theta = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET)
         .unwrap()
         .with_ring_resonator(

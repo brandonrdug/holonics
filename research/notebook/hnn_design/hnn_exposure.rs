@@ -3,6 +3,12 @@
 //! the notebook's receipt of `Reference::campaign_one().expose(&field, &cut)`, a committed command run
 //! once in release, never a test.
 //!
+//! [definition; agent-inferred, October 5; THE_MACHINE guard 9] A cut's bytes enter the field only as
+//! an `Encoded` built from a founded encoding ([`encoded_text`]); campaign 1 read them through the
+//! residue chart `code mod d_g`, which is deleted, and it reads five classes now. No encoding of the
+//! bytes is founded, so every mode below reports the route's refusal as its result; the readouts and
+//! counts this header states (`n* = 6,148` on the bytes) are the byte chart's history.
+//!
 //! ```sh
 //! # campaign 1's exposure: the standing real cut (THE_REBUILD Decision 23), written by standing_cut.py
 //! cargo run --release -p holonics --example hnn_exposure -- cut-file .local/cuts/standing-real-cut-campaign-1.bin cells all
@@ -144,8 +150,11 @@ use holonics::aeon::{EnclosedBalance, LiteralComparison};
 use holonics::compression::cost::ceil_log2;
 use holonics::compression::landmark::context::baseline::PPM_ORDER;
 use holonics::compression::landmark::context::{Landmarks, cell_letters, letter_address};
+use holonics::compression::keys::transport::{CarryHelix, TransportLocation};
+use holonics::hnn::encoding::{Encoded, Encoding, EncodingError, PassageChart};
 use holonics::hnn::constitution::CAMPAIGN_ONE_BUDGET;
 use holonics::hnn::port::{ExecutionPort, ReceiptDetail};
+use holonics::hnn::moment::SourceCapacity;
 use holonics::hnn::receiving::landmark_declaration;
 use holonics::hnn::reference::{Bits, KeyReport};
 use holonics::hnn::{
@@ -218,6 +227,23 @@ fn component<T>(value: &Component<T>, present: impl Fn(&T) -> String) -> String 
 
 // -------------------------------------------------------------------------------------------
 // the run
+
+/// [definition; agent-inferred, October 5; THE_MACHINE guard 9] **The cut's bytes through the one
+/// route a passage has into the field**: a located chart (the field's own key location over the
+/// bytes on the helix of its rings, `compression::keys::transport`), its founded encoding, then
+/// `Encoded::through`. Campaign 1's byte exposure read them through the residue chart `code mod d_g`,
+/// deleted October 5; on its rings `(5, 7, 11, 13)` the helix's joint period `5,005 = 5·7·11·13`
+/// passes the location's ceiling and 256 classes pass its receiving cells, so the route refuses and
+/// the run reports the refusal as its result.
+fn encoded_text(field: &Field, bytes: &[u8]) -> Result<Encoded, EncodingError> {
+    let periods = field.rings().iter().map(|ring| ring.period()).collect();
+    let helix = CarryHelix::new(periods)?;
+    let codes = vec![bytes.iter().map(|&byte| usize::from(byte)).collect::<Vec<usize>>()];
+    let location = TransportLocation::locate(helix, 256, &codes)?;
+    let chart = PassageChart::located(&location, &codes)?;
+    let encoding = Encoding::found(&chart)?;
+    Ok(Encoded::through(&encoding, &chart, field, &codes)?.remove(0))
+}
 
 fn main() {
     let arguments: Vec<String> = std::env::args().skip(1).collect();
@@ -334,11 +360,20 @@ fn main() {
         }
         None => length.saturating_sub(held_out.unwrap_or(HELD_OUT))..length,
     };
+    // THE_MACHINE guard 9: the cut's bytes enter the field only as an `Encoded`, built from a
+    // founded encoding; the run reports the route's refusal as its result.
+    let cells = match encoded_text(&field, &text[..length]) {
+        Ok(cells) => cells,
+        Err(refusal) => {
+            println!(
+                "hnn_exposure: {source}, {length} cells; refused: {refusal} (THE_MACHINE guard 9: a \
+                 byte passage enters the field only through a founded encoding)"
+            );
+            return;
+        }
+    };
     let cut = Cut {
-        cells: text[..length]
-            .iter()
-            .map(|&byte| usize::from(byte))
-            .collect(),
+        cells,
         held_out: vec![tail.clone()],
     };
     let reference = match deadline {
@@ -875,19 +910,26 @@ fn report(field: &Field, exposure: &Exposure) {
             ))
         }
     };
+    // The counted capacity is the identity route's; a located source's is owed (refs #62).
+    let (n_star, counted) = match state.moment_capacity {
+        SourceCapacity::Identity { state_bits, n_star } => (
+            n_star.to_string(),
+            format!("{} bits, per source bit {}", state_bits, over_source(state_bits)),
+        ),
+        SourceCapacity::Owed => ("owed".to_string(), "owed on the located route".to_string()),
+    };
     println!(
         "source: {} bits ({} cells ingested, n* = {})",
         state.source_bits,
         state.source_bits / ceil_log2(&BigUint::from(field.alphabet())).max(1),
-        state.n_star
+        n_star
     );
     println!("lift point: {} bits", state.lift_bits);
     println!(
-        "moment: dense {} bits, per source bit {}; counted state ceil(log2 N(n)) {} bits, per source bit {}",
+        "moment: dense {} bits, per source bit {}; counted state ceil(log2 N(n)) {}",
         state.moment_bits,
         over_source(state.moment_bits),
-        state.moment_state_bits,
-        over_source(state.moment_state_bits)
+        counted
     );
     println!(
         "constitution: {} bits, per source bit {}",
@@ -1595,7 +1637,8 @@ fn tree_alone(field: &Field, cut: &Cut, scored: usize) -> TreeAlone {
     let declaration =
         landmark_declaration(field, &field.receivers()[0]).expect("the receiver's declared tree");
     let depth = declaration.depth;
-    let cells = &cut.cells[..scored];
+    let classes: Vec<usize> = cut.cells.classes_read().take(scored).collect();
+    let cells = &classes[..];
     let letters = cell_letters(cells);
     let mut tree = Landmarks::new(declaration).expect("the receiver's tree");
     let mut population = PortPopulation::new(&[0]).expect("one family at prior one");
@@ -1653,7 +1696,8 @@ fn prior_mass_ladder(
     }
     let grain = base.grain;
     let digits = holonics::compression::landmark::context::odometer_digits(base.alphabet) as u32;
-    let letters = cell_letters(&cut.cells);
+    let classes: Vec<usize> = cut.cells.classes_read().collect();
+    let letters = cell_letters(&classes);
     println!(
         "prior-mass ladder over the cut's {} cells (B = {digits}, depth {}, base {:?})",
         cut.cells.len(),
@@ -1669,7 +1713,7 @@ fn prior_mass_ladder(
         let mut tree = Landmarks::new(declaration).expect("the receiver's tree at the prior mass");
         let zero = ExactInterval::point(Rat::zero());
         let (mut training, mut held_out) = (zero.clone(), zero);
-        for (position, &class) in cut.cells.iter().enumerate() {
+        for (position, &class) in classes.iter().enumerate() {
             let reading = tree
                 .receive(&letter_address(&letters, position, base.depth), class)
                 .expect("the tree receives the cell");

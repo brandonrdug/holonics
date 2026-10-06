@@ -515,7 +515,7 @@ impl PassageChart {
             let mut lift: Vec<BigInt> = (0..rings.len())
                 .map(|h| BigInt::from(if h <= ring { phases[h] } else { 0 }))
                 .collect();
-            field.selective_step(&mut lift, x)?;
+            field.step_class(&mut lift, x, None)?;
             let stepped: Vec<usize> = (0..=ring)
                 .map(|h| {
                     (&lift[h] % BigInt::from(periods[h]))
@@ -1001,7 +1001,7 @@ impl PortCell {
 }
 
 /// [definition] The chart an encoded passage carries, shared by every passage one encoding produced.
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq)]
 struct EncodedChart {
     classes: usize,
     sources: Vec<(usize, u64)>,
@@ -1009,6 +1009,19 @@ struct EncodedChart {
     fibre: Vec<Vec<Rat>>,
     labels: Vec<Option<usize>>,
     advances: Option<LocatedAdvances>,
+    founded: Option<Founded>,
+}
+
+/// [definition; agent-inferred, October 5] **The located route's founded encoding, read at the
+/// consuming calls**: the encoding `E` with its `U_a` and `D`, the located chart's receiving forms
+/// `ρ_c` on `ℚ^D` and, per class, the index `a` of its transport `T_a` (the labelled cells in cell
+/// order, `LocatedTransport::chart`). The field checks `D E = ρ` and `E T_a = U_a E` on the lift it
+/// actually steps ([`Encoded::check_step`]).
+#[derive(Debug, PartialEq)]
+struct Founded {
+    encoding: Encoding,
+    coupling: Vec<Vec<Rat>>,
+    transport: Vec<Option<usize>>,
 }
 
 /// [definition; agent-inferred, October 5] **The one source type** (THE_MACHINE guard 9; module
@@ -1099,7 +1112,7 @@ struct EncodedChart {
 ///     Ok(())
 /// }
 /// ```
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Encoded {
     cells: Vec<PortCell>,
     chart: Arc<EncodedChart>,
@@ -1142,6 +1155,7 @@ impl Encoded {
             fibre: Vec::new(),
             labels: (0..classes).map(Some).collect(),
             advances: None,
+            founded: None,
         });
         Ok(truth
             .passages()
@@ -1184,6 +1198,17 @@ impl Encoded {
             .enumerate()
             .filter_map(|(class, label)| label.map(|code| (code, class)))
             .collect();
+        let mut rank = 0;
+        let transport = located
+            .labels
+            .iter()
+            .map(|label| {
+                label.map(|_| {
+                    rank += 1;
+                    rank - 1
+                })
+            })
+            .collect();
         let shared = Arc::new(EncodedChart {
             classes,
             sources,
@@ -1191,6 +1216,11 @@ impl Encoded {
             fibre: encoding.fibre()?,
             labels: located.labels.clone(),
             advances: Some(located.advances.clone()),
+            founded: Some(Founded {
+                encoding: encoding.clone(),
+                coupling: chart.coupling.clone(),
+                transport,
+            }),
         });
         passages
             .iter()
@@ -1229,9 +1259,90 @@ impl Encoded {
         ))
     }
 
+    /// **A part of the passage** (the cells a moment has not yet taken, a crib, a window): the
+    /// occurrences in `range`, keeping the encoding that produced them; refused past the passage.
+    pub fn part(&self, range: std::ops::Range<usize>) -> Result<Self, EncodingError> {
+        let cells = self
+            .cells
+            .get(range)
+            .ok_or_else(|| chart_refusal("an encoded passage's part lies within it"))?;
+        Ok(Self {
+            cells: cells.to_vec(),
+            chart: Arc::clone(&self.chart),
+        })
+    }
+
     /// The occurrences' classes, in order.
     pub fn cells(&self) -> &[PortCell] {
         &self.cells
+    }
+
+    /// The occurrences' classes as the chart's indices, in order (the field's slots read them).
+    pub fn classes_read(&self) -> impl Iterator<Item = usize> + '_ {
+        self.cells.iter().map(|cell| cell.class)
+    }
+
+    /// **The located advance of occurrence `at`**: its class's digits `a_g(c)`, ring 0 first, on
+    /// the located route; `None` for an identity (the field's lock fit steps it) or past the
+    /// passage.
+    pub fn advance(&self, at: usize) -> Option<&[u64]> {
+        let cell = *self.cells.get(at)?;
+        self.chart.advances.as_ref()?.digits(cell)
+    }
+
+    /// **The squares at the consumer** (module header; the located route only): at the lift `ℓ` the
+    /// field read before occurrence `at` and the lift `ℓ′` its step reached, both on `ℚ^D`,
+    /// `D E e_ℓ = ρ e_ℓ` and `E e_ℓ′ = U_a E e_ℓ` for the occurrence's transport `a`. An identity
+    /// has nothing to check. Refused with [`EncodingError::Square`] (state: the occurrence) when
+    /// either fails, with [`EncodingError::Unreached`] when a lift leaves the reached span, and with
+    /// [`EncodingError::Unencoded`] at an unlabelled class.
+    pub fn check_step(&self, at: usize, before: u64, after: u64) -> Result<(), EncodingError> {
+        let Some(founded) = &self.chart.founded else {
+            return Ok(());
+        };
+        let class = self
+            .cells
+            .get(at)
+            .ok_or_else(|| chart_refusal("the occurrence lies within the passage"))?
+            .class;
+        let n = founded.encoding.chart();
+        let (before, after) = (
+            usize::try_from(before).map_err(|_| EncodingError::Unreached)?,
+            usize::try_from(after).map_err(|_| EncodingError::Unreached)?,
+        );
+        if before >= n || after >= n {
+            return Err(EncodingError::Unreached);
+        }
+        let encoded = founded.encoding.encode(&unit(n, before))?;
+        let read = founded.encoding.readout().apply(&encoded)?;
+        let reading: Vec<Rat> = founded
+            .coupling
+            .iter()
+            .map(|form| form[before].clone())
+            .collect();
+        if read != reading {
+            return Err(EncodingError::Square {
+                square: "reading D E = ρ at the consuming step",
+                state: at,
+            });
+        }
+        let a = founded
+            .transport
+            .get(class)
+            .copied()
+            .flatten()
+            .ok_or(EncodingError::Unencoded)?;
+        let transport = founded
+            .encoding
+            .transport(a)
+            .ok_or_else(|| chart_refusal("a located class's transport is founded"))?;
+        if founded.encoding.encode(&unit(n, after))? != transport.apply(&encoded)? {
+            return Err(EncodingError::Square {
+                square: "conduct E T = U E at the consuming step",
+                state: at,
+            });
+        }
+        Ok(())
     }
 
     /// The occurrence count.

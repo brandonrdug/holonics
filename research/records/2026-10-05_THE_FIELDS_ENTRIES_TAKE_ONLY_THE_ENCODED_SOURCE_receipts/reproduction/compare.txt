@@ -1,0 +1,3 @@
+order2: validation sections byte-identical to #375's receipt
+alternation: validation sections byte-identical to #375's receipt
+line: validation sections byte-identical to #375's receipt

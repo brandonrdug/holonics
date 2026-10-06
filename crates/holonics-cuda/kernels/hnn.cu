@@ -81,15 +81,19 @@ extern "C" __global__ void hnn_lattice_read(
 // -------------------------------------------------------------------------------------------------
 //
 // [definition] `holonics::hnn::SourceMoment::ingest` with `Field::selective_step`: on each cell
-// `x_k`, in carry order, ring `g` advances `c_g(x_k) = [port_g(x_k) ∈ N_g]` plus its
+// `x_k`, in carry order, ring `g` advances its admitted `a_g(x_k)` plus its
 // predecessor's carry, and carries when its phase before the step plus the advance reaches its
 // period; then on every source ring, at its phase `c` after the step, `M_g[c][x_k] += 1` and, for
 // each declared offset `δ` whose earlier cell exists, `C_g(δ)[c][x_k][x_(k−δ)] += 1`; the moment
 // holds the last `max Δ` cells. Ingest stops after the cell whose step carries the last ring out
 // (the joint clock's carry-out) and reports it.
 //
-// The lock chart `fits[g][code] = [port_g(code) ∈ N_g]` is the field's, read off the host owner at
-// the moment's open (`Ring::fits`, `Ring::port`); the kernel reads it and states no port law.
+// The exact advance chart is mounted from the admitted Encoded passage: a located digit on the
+// located route, or `[class ∈ N_g]` from the declared field on the identity route. Every digit
+// is below its period; adding the predecessor's carry advances at most that period. Periods are
+// below 2^31 and cells/threads fit u32, so every tile scan and whole-batch advance is below 2^63.
+// The host checks the encoding squares at the existing Field::selective_step consumer before
+// launch and compares the actual receipt and full lift afterwards; no key is inferred here.
 //
 // Realization: one block carries the cell sequence. Thread `t` is cell `start + t` of each tile of
 // `blockDim.x` cells; the block loops over the tiles in order, carrying each ring's phase from
@@ -101,11 +105,11 @@ extern "C" __global__ void hnn_lattice_read(
 // Held cells: `window[0]` is the number of valid cells, `window[1 …]` the cells, oldest first.
 // Receipt: `[consumed, carried out, advance_0, …, advance_(G−1)]`.
 //
-// Shared: `rings` 8-octet advance totals, `rings` 4-octet phases, `rings · blockDim.x` 4-octet
-// scans.
+// Shared: `rings` 8-octet advance totals, `rings · blockDim.x` 8-octet scans, then `rings`
+// 4-octet phases. The scans precede the phases to keep the 8-octet words aligned for odd rings.
 extern "C" __global__ void hnn_moment_ingest(
     const uint32_t *codes, uint32_t cells,
-    uint32_t rings, const uint32_t *periods, const uint8_t *fits, uint32_t alphabet,
+    uint32_t rings, const uint32_t *periods, const unsigned long long *steps, uint32_t alphabet,
     uint32_t sources, const uint32_t *source_rings,
     uint32_t offsets, const uint32_t *offset_values,
     uint32_t *window, uint32_t window_extent,
@@ -115,8 +119,8 @@ extern "C" __global__ void hnn_moment_ingest(
     unsigned long long *receipt
 ) {
     unsigned long long *advance = (unsigned long long *)hnn_shared;
-    uint32_t *base = (uint32_t *)(advance + rings);
-    uint32_t *inclusive = base + rings;
+    unsigned long long *inclusive = advance + rings;
+    uint32_t *base = (uint32_t *)(inclusive + (size_t)rings * blockDim.x);
     __shared__ uint32_t stop;
     __shared__ uint32_t valid;
     const uint32_t t = threadIdx.x, lanes = blockDim.x;
@@ -130,8 +134,8 @@ extern "C" __global__ void hnn_moment_ingest(
     __syncthreads();
     uint32_t consumed = 0;
     bool carried = false;
-    for (uint32_t start = 0; start < cells && !carried; start += lanes) {
-        const uint32_t k = start + t;
+    for (unsigned long long start = 0; start < cells && !carried; start += lanes) {
+        const unsigned long long k = start + t;
         const bool active = k < cells;
         const uint32_t code = active ? codes[k] : 0;
         if (t == 0) {
@@ -140,30 +144,31 @@ extern "C" __global__ void hnn_moment_ingest(
         uint32_t carry = 0;
         for (uint32_t g = 0; g < rings; ++g) {
             const uint32_t period = periods[g];
-            const uint32_t step =
-                active ? (uint32_t)fits[(size_t)g * alphabet + code] + carry : 0u;
-            uint32_t *scan = inclusive + (size_t)g * lanes;
+            const unsigned long long step =
+                active ? steps[(size_t)g * alphabet + code] + carry : 0ull;
+            unsigned long long *scan = inclusive + (size_t)g * lanes;
             scan[t] = step;
             __syncthreads();
             for (uint32_t reach = 1; reach < lanes; reach <<= 1) {
-                const uint32_t earlier = t >= reach ? scan[t - reach] : 0u;
+                const unsigned long long earlier = t >= reach ? scan[t - reach] : 0ull;
                 __syncthreads();
                 scan[t] += earlier;
                 __syncthreads();
             }
-            const uint32_t before = (base[g] + scan[t] - step) % period;
+            const unsigned long long before = (base[g] + scan[t] - step) % period;
             carry = (active && before + step >= period) ? 1u : 0u;
         }
         if (carry) {
             atomicMin(&stop, t);
         }
         __syncthreads();
-        const uint32_t tile = cells - start < lanes ? cells - start : lanes;
+        const uint32_t tile = cells - start < lanes ? (uint32_t)(cells - start) : lanes;
         const uint32_t last = stop < lanes ? stop : tile - 1;
         if (active && t <= last) {
             for (uint32_t s = 0; s < sources; ++s) {
                 const uint32_t g = source_rings[s];
-                const uint32_t phase = (base[g] + inclusive[(size_t)g * lanes + t]) % periods[g];
+                const uint32_t phase =
+                    (uint32_t)((base[g] + inclusive[(size_t)g * lanes + t]) % periods[g]);
                 const size_t cell = (size_t)phase * alphabet + code;
                 atomicAdd(first + first_base[s] + cell, 1ull);
                 for (uint32_t o = 0; o < offsets; ++o) {
@@ -189,22 +194,22 @@ extern "C" __global__ void hnn_moment_ingest(
         __syncthreads();
         if (t == 0) {
             for (uint32_t g = 0; g < rings; ++g) {
-                const uint32_t moved = inclusive[(size_t)g * lanes + last];
+                const unsigned long long moved = inclusive[(size_t)g * lanes + last];
                 advance[g] += moved;
-                base[g] = (base[g] + moved) % periods[g];
+                base[g] = (uint32_t)((base[g] + moved) % periods[g]);
             }
         }
-        consumed = start + last + 1;
+        consumed = (uint32_t)(start + last + 1);
         carried = stop < lanes;
         __syncthreads();
     }
     if (t == 0) {
         // The held cells' overwrite: the last cells of (held ++ consumed cells), copied forward in
         // place (each read lies at or after the position it fills).
-        const uint32_t total = valid + consumed;
-        const uint32_t keep = total < window_extent ? total : window_extent;
+        const unsigned long long total = (unsigned long long)valid + consumed;
+        const uint32_t keep = total < window_extent ? (uint32_t)total : window_extent;
         for (uint32_t i = 0; i < keep; ++i) {
-            const uint32_t at = total - keep + i;
+            const unsigned long long at = total - keep + i;
             window[1 + i] = at < valid ? window[1 + at] : codes[at - valid];
         }
         window[0] = keep;

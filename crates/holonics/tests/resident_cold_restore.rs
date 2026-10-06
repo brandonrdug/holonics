@@ -6,7 +6,9 @@ use holonics::geometry::{RatVec3, screw::ScrewGenerator};
 use holonics::hnn::constitution::ContinuingState;
 use holonics::hnn::field::{ContactDeclaration, CribDeclaration, ReceiverDeclaration};
 use holonics::hnn::port::{ExecutionPort, Handle};
-use holonics::hnn::reference::{Reference, one_hot};
+use holonics::hnn::reference::Reference;
+use holonics::hnn::Encoded;
+use holonics::holarchy::terrain::{CyclicLaw, KnownTruth};
 use holonics::hnn::{Constitution, Current, Field, FieldDeclaration, RingDeclaration};
 use holonics::ratio::{integer, rat};
 
@@ -40,6 +42,20 @@ fn chain() -> Field {
     Field::declare(declaration).unwrap()
 }
 
+/// A run of `count` zeros: the line terrain on one class (ℤ/1), through its declared identity
+/// (THE_MACHINE guard 9).
+fn zeros(field: &Field, count: usize) -> Encoded {
+    let truth = KnownTruth::cyclic(CyclicLaw::Line, 1, 0, 1, count).unwrap();
+    Encoded::identity(&truth, field).unwrap().remove(0)
+}
+
+/// The target word [1, 0]: the line terrain on ℤ/2 whose drawn start and step are both 1.
+fn target(field: &Field) -> Encoded {
+    let truth = KnownTruth::cyclic(CyclicLaw::Line, 2, 2_026_100_983, 1, 2).unwrap();
+    assert_eq!(truth.passages(), &[vec![1, 0]]);
+    Encoded::identity(&truth, field).unwrap().remove(0)
+}
+
 fn compare_twice(
     reference: &Reference,
     resident: &mut holonics::hnn::reference::Resident,
@@ -48,7 +64,7 @@ fn compare_twice(
     let phases = resident.admitted()[0].clone();
     for _ in 0..2 {
         let (pending, _) = reference.refine(resident, &moment, &phases).unwrap();
-        let (staged, _) = reference.compare(resident, pending, &one_hot(&[1, 0])).unwrap();
+        let (staged, _) = reference.compare(resident, pending, &target(resident.field())).unwrap();
         reference.discard(resident, Handle::Staged(staged)).unwrap();
     }
 }
@@ -58,7 +74,7 @@ fn cold_equivalence(ingest_after_restore: bool, discard_moment: bool, remount_af
     let reference = Reference::new(64, u64::MAX);
     let mut original = reference.mount(&field, &Current::at_rest(&field)).unwrap();
     let count = if ingest_after_restore { 1 } else { usize::try_from(field.population()).unwrap() };
-    let (moment, ingested) = reference.ingest(&mut original, None, &one_hot(&vec![0; count])).unwrap();
+    let (moment, ingested) = reference.ingest(&mut original, None, &zeros(&field, count)).unwrap();
     assert_eq!(ingested.forward.present().unwrap().carry_out, !ingest_after_restore,
         "the fixture must save at its declared side of carry-out");
     compare_twice(&reference, &mut original, moment);
@@ -86,7 +102,7 @@ fn cold_equivalence(ingest_after_restore: bool, discard_moment: bool, remount_af
     assert_eq!(restored.admitted(), original.admitted());
     assert_eq!(restored.ledger().balance(), original.ledger().balance());
     if ingest_after_restore {
-        let cells = one_hot(&vec![0; usize::try_from(field.population()).unwrap()]);
+        let cells = zeros(&field, usize::try_from(field.population()).unwrap());
         let (_, uninterrupted) = reference.ingest(&mut original, Some(&moment), &cells).unwrap();
         let (_, resumed) = reference.ingest(&mut restored, Some(&moment), &cells).unwrap();
         assert!(uninterrupted.forward.present().unwrap().carry_out);

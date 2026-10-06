@@ -61,6 +61,7 @@ use num_traits::{One, Zero};
 
 use crate::compression::CompressionError;
 use crate::compression::cost::{ceil_log2, read_index, write_index};
+use crate::hnn::encoding::Encoded;
 use crate::ratio::Rat;
 use crate::receiver::face::{DiameterNorm, ReceiverWidth, WidthWitness};
 use crate::receiver::release::{
@@ -127,7 +128,16 @@ impl PairRelation {
 }
 
 /// [definition] **A damaged passage**: each cell's class, `None` where erased, over `|A|` classes,
-/// with its declared opening `o` (the first station: the relation is read at `t ≥ o`).
+/// with its declared opening `o` (the first station: the relation is read at `t ≥ o`). Built from
+/// outside the crate only from an encoded passage and its erasures ([`DamagedPassage::encoded`];
+/// THE_MACHINE guard 9), so its classes are an encoding's, never an exterior code's:
+///
+/// ```compile_fail,E0624
+/// use holonics::compression::keys::repair::DamagedPassage;
+/// fn bytes(codes: Vec<Option<usize>>) {
+///     let _ = DamagedPassage::new(codes, 256, 0);
+/// }
+/// ```
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct DamagedPassage {
     cells: Vec<Option<usize>>,
@@ -136,8 +146,28 @@ pub struct DamagedPassage {
 }
 
 impl DamagedPassage {
-    /// A passage; refused with a class outside `A` or an opening past its end.
-    pub fn new(
+    /// **An encoded passage with its erasures** (THE_MACHINE guard 9): the classes of `encoded`,
+    /// `None` at each erased position, over its class count; refused with an erasure past the
+    /// passage or an opening past its end.
+    pub fn encoded(
+        encoded: &Encoded,
+        erased: &[usize],
+        opening: usize,
+    ) -> Result<Self, CompressionError> {
+        let mut cells: Vec<Option<usize>> = encoded.classes_read().map(Some).collect();
+        for &position in erased {
+            let length = cells.len();
+            *cells.get_mut(position).ok_or(CompressionError::IndexOutside {
+                index: position,
+                population: length,
+            })? = None;
+        }
+        Self::new(cells, encoded.classes(), opening)
+    }
+
+    /// A passage of the crate's own classes (its restrictions and local regions); refused with a
+    /// class outside `A` or an opening past its end.
+    pub(crate) fn new(
         cells: Vec<Option<usize>>,
         classes: usize,
         opening: usize,

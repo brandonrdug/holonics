@@ -14,6 +14,7 @@ use std::sync::Arc;
 use super::*;
 use crate::hnn::constitution::{Constitution, DepositReading, FactorGradient, Locus, Reach};
 use crate::hnn::port::{Deposit, WordReturn};
+use crate::hnn::encoding::Encoded;
 use crate::hnn::ratio::{Faces, HolonRatio, RatioCovector, target_phases};
 use crate::hnn::retention::Diamond;
 use crate::receiver::reception::{Component, InteractionReturn};
@@ -83,7 +84,7 @@ impl<'c> Word<'c> {
         self,
         receiver: usize,
         contact: usize,
-        targets: &[usize],
+        targets: &Encoded,
     ) -> Result<
         (HolonRatio, InteractionReturn<ContactCut, WordReturn, Deposit, Vec<Option<usize>>, Remainders>),
         HnnError,
@@ -107,8 +108,9 @@ impl<'c> Word<'c> {
             })?;
             phases.read(field, &theta, &current, anchor)
         }).collect::<Result<_, _>>()?;
+        let classes: Vec<usize> = targets.classes_read().collect();
         let ratio = HolonRatio::compare(
-            Faces::of_reads(&reads, phases.grain())?, targets,
+            Faces::of_reads(&reads, phases.grain())?, &classes,
             &target_phases(field, current.lift(), phases.ring(), targets)?,
         )?;
         let returned = self.return_contact(

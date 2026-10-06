@@ -10,7 +10,7 @@
 use num_bigint::BigInt;
 use num_traits::{One, Zero};
 
-use super::support::{Draw, contact, ring};
+use super::support::{Draw, contact, encoded, ring};
 use crate::compression::landmark::context::StopPrior;
 use crate::geometry::RatVec3;
 use crate::geometry::screw::ScrewGenerator;
@@ -245,15 +245,15 @@ fn the_moment_chart_runs_the_reduced_recurrence_of_the_source_moment() {
     assert_eq!(squares.transports, 3);
     assert_eq!(encoding.dimension(), chart.chart());
     let mut draw = Draw::new(5);
-    let cells: Vec<usize> = (0..200).map(|_| draw.below(field.alphabet())).collect();
+    let cells: Vec<usize> = (0..200).map(|_| draw.below(super::support::classes(&field))).collect();
     let mut current = Current::at_rest(&field);
     let mut moment = SourceMoment::open(&field, &current);
     let mut state = vec![Rat::zero(); chart.chart()];
     let mut driven = Vec::new();
     for &cell in &cells {
         let mut probe = current.clone();
-        let ticks = usize::from(probe.step(&field, cell).unwrap().ticks[0]);
-        moment.ingest(&field, &mut current, &[cell]).unwrap();
+        let ticks = usize::try_from(probe.step(&field, &encoded(&field, &[cell]), 0).unwrap().ticks[0]).unwrap();
+        moment.ingest(&field, &mut current, &encoded(&field, &[cell])).unwrap();
         assert_eq!(current.lift(), probe.lift());
         state = chart.transports()[ticks].apply(&state).unwrap();
         for (entry, injected) in state.iter_mut().zip(&chart.injection()[cell]) {

@@ -5,6 +5,7 @@ use num_bigint::{BigInt, BigUint};
 use num_traits::{One, Signed, Zero};
 
 use super::learning::{OPEN_BUDGET, chain};
+use crate::hnn::tests::support::encoded;
 use super::support::{Draw, Medium};
 use crate::aeon::{Cycle, Reading, TorusClock, TwoClocks, epochs, reading};
 use crate::compression::landmark::context::Landmarks;
@@ -111,7 +112,7 @@ fn cut(field: &Field) -> (Current, SourceMoment) {
     let cells = vec![1usize; 40];
     let mut current = Current::at_rest(field);
     let mut moment = SourceMoment::open(field, &current);
-    moment.ingest(field, &mut current, &cells).unwrap();
+    moment.ingest(field, &mut current, &encoded(field, &cells)).unwrap();
     (current, moment)
 }
 
@@ -423,18 +424,18 @@ fn the_ring_ticks_are_its_section_epochs_and_its_carries_their_flux() {
             .unwrap()
     };
     let mut draw = Draw::new(29);
-    let cells: Vec<usize> = (0..3000).map(|_| draw.below(256)).collect();
+    let cells: Vec<usize> = (0..3000).map(|_| draw.below(super::support::classes(&field))).collect();
     let start = Current::at_rest(&field);
     let mut end = start.clone();
     let mut carried = vec![BigInt::zero(); rings];
     for &cell in &cells {
         let before = end.lift().to_vec();
-        let step = end.step(&field, cell).unwrap();
+        let step = end.step(&field, &encoded(&field, &[cell]), 0).unwrap();
         let aeon = lift.forward(before, end.lift()).unwrap();
         for ring in 0..rings {
             let carry = match field.rings().get(ring + 1) {
-                Some(next) => step.ticks[ring + 1] - u8::from(next.fits(next.port(cell))),
-                None => u8::from(step.carry_out),
+                Some(next) => step.ticks[ring + 1] - u64::from(next.fits(next.port(cell))),
+                None => u64::from(step.carry_out),
             };
             assert_eq!(epochs(&aeon, section(ring)).flux(), BigInt::from(carry));
             carried[ring] += BigInt::from(carry);
@@ -689,7 +690,7 @@ fn a_perturbed_resonator_solve_fails_the_word_balance() {
 #[test]
 fn the_refine_receipt_carries_each_resonators_balance() {
     use crate::hnn::port::{ExecutionPort, ReceiptDetail};
-    use crate::hnn::reference::{Reference, one_hot};
+    use crate::hnn::reference::{Reference};
     let field = chain();
     let theta = Constitution::initial(&field, OPEN_BUDGET).unwrap();
     let mut resonant = theta.clone();
@@ -713,7 +714,7 @@ fn the_refine_receipt_carries_each_resonators_balance() {
             .mount_with(&field, &Current::at_rest(&field), constitution)
             .unwrap();
         let (moment, _) = reference
-            .ingest(&mut resident, None, &one_hot(&cells))
+            .ingest(&mut resident, None, &encoded(&field, &cells))
             .unwrap();
         let phases = resident.admitted()[0].clone();
         let (_, refined) = reference.refine(&mut resident, &moment, &phases).unwrap();
@@ -1298,7 +1299,7 @@ fn the_contact_readings_are_read_from_retained_state() {
     let mut draw = Draw::new(31);
     let mut current = rest.clone();
     for _ in 0..5000 {
-        current.step(&field, draw.below(256)).unwrap();
+        current.step(&field, &encoded(&field, &[draw.below(super::support::classes(&field))]), 0).unwrap();
     }
     let later = contact_readings(&field, &theta, &current, Some(&rest)).unwrap();
     let again = contact_readings(&field, &theta, &current, Some(&rest)).unwrap();

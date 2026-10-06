@@ -1,0 +1,8 @@
+# the code each run read: sha256 of (git diff HEAD -- crates research/notebook tools; the untracked tests/located_ingest.rs)
+gpu runs:   593068e7f361d9814efbfc36e21c27fb2eab1e77406f837a2e0be2c06cf1db49
+host gates: 593068e7f361d9814efbfc36e21c27fb2eab1e77406f837a2e0be2c06cf1db49
+# the adopted files
+af7dade8dae88f4b925d8b9770bda1db4700cfd3df5f26d1bd7fded211861870  crates/holonics-cuda/kernels/hnn.cu
+637ae88ad06811a3c6260de8caa28f0479950ab3a2cfdf4b69288e2b1ab00f58  crates/holonics-cuda/src/hnn/card.rs
+8ccc9389f54ea33705db2d182991de746e319b866194772f2d7d74a14e413422  crates/holonics-cuda/src/hnn/moment.rs
+86db238adba454ebe96dc80f85ee21b129810ccb9dd9dc943deef702bcd67a8a  crates/holonics-cuda/tests/located_ingest.rs

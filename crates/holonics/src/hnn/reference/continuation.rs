@@ -1,5 +1,6 @@
 //! Focused consumer of the native comparison/contact return, reusing the existing tick field
 //! and an uncoupled direct sum of its Floquet node material. No authored factor covector enters.
+use crate::hnn::tests::support::encoded;
 use super::*;
 use crate::ratio::rat;
 use crate::hnn::ring::{PumpDeclaration, PumpStep, ResonatorMaterial};
@@ -47,7 +48,7 @@ fn contact_comparison(
     word.run(phases.last_epoch() + 1).unwrap();
     eprintln!("unit forward elapsed_ms={}", started.elapsed().as_millis());
     let targets: Vec<_> = (0..phases.aperture()).map(|i| (i+1)%field.alphabet()).collect();
-    let (ratio, returned) = word.compare_contact_storage(0, 0, &targets).unwrap();
+    let (ratio, returned) = word.compare_contact_storage(0, 0, &encoded(&field, &targets)).unwrap();
     assert_eq!(ratio.stations().len(), targets.len());
     let back = returned.pullback.present().unwrap();
     assert!(back.transits[0].iter().any(|tick| tick.solved.iter().any(|x| !x.is_zero())));
@@ -371,7 +372,7 @@ fn a_zero_receiving_map_returns_no_covector_to_the_contact() {
     let mut word = Word::open_source(&field, &theta, &current, source, &mut charts).unwrap();
     word.run(phases.last_epoch() + 1).unwrap();
     let targets: Vec<_> = (0..phases.aperture()).map(|i| (i + 1) % field.alphabet()).collect();
-    let (_, returned) = word.compare_contact_storage(0, 0, &targets).unwrap();
+    let (_, returned) = word.compare_contact_storage(0, 0, &encoded(&field, &targets)).unwrap();
     let back = returned.pullback.present().unwrap();
     // The face's covector and the feature it pairs with are present: `R`'s step has its samples.
     assert!(back.reads.iter().any(|(f, _)| f.iter().any(|x| !x.is_zero())));

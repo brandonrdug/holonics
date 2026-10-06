@@ -13,8 +13,12 @@
 //! flock .local/gpu.lock cargo test -p holonics-cuda -- --include-ignored --test-threads=1
 //! ```
 //!
-//! The standing real cut (THE_REBUILD (f)) is private: its lockstep reads it from `HOLONICS_CUT` (the
-//! cut file; its manifest beside it), and reports itself skipped when the file is absent.
+//! [historical; retired October 5 with THE_MACHINE guard 9 at the field's entries] The standing real
+//! cut's lockstep read the private cut's bytes into campaign 1 through the residue chart; a byte
+//! enters only through a founded encoding, so it has no route here (source at
+//! [`f91666c0`](https://github.com/brandonrdug/holonics/blob/f91666c0/crates/holonics-cuda/src/hnn/port_tests.rs)).
+//! Every lockstep reads a known truth's cells through its declared identity (`KnownTruth`,
+//! `Encoded::identity`).
 
 use std::ops::Range;
 
@@ -23,7 +27,9 @@ use holonics::hnn::constitution::CAMPAIGN_ONE_BUDGET;
 use holonics::hnn::field::{ContactDeclaration, CribDeclaration, ReceiverDeclaration};
 use holonics::hnn::port::{ExecutionPort, Handle, ReceiptDetail};
 use holonics::hnn::reference::ExposedResident;
-use holonics::hnn::reference::{Cut, Reception, Reference, one_hot};
+use holonics::hnn::Encoded;
+use holonics::hnn::reference::{Cut, Reception, Reference};
+use holonics::holarchy::terrain::KnownTruth;
 use holonics::hnn::ring::{PumpDeclaration, PumpStep, ResonatorMaterial};
 use holonics::hnn::{
     Absorption, Constitution, ConstitutionRead, Current, Field, FieldDeclaration, HnnError,
@@ -74,11 +80,12 @@ fn contact(from: usize, to: usize, nodes: usize, exponent: i64) -> ContactDeclar
     }
 }
 
-/// The chain control on the quarter turns: rings of periods 2, 3, 2 (locks `{0}`, `{0}`, `∅`),
+/// The chain control on the quarter turns: rings of periods 4, 3, 2 (locks `{0, 2}`, `{0}`, `∅`; the
+/// source ring's period 4 holds the four classes without a fold, THE_MACHINE guard 9),
 /// two contacts, source ring 0, `|A| = 4`, `Δ = {1}`, receiver ring 2 with aperture 2.
 fn chain_declaration(population: u64) -> FieldDeclaration {
     FieldDeclaration {
-        rings: vec![ring(2, vec![0]), ring(3, vec![0]), ring(2, vec![])],
+        rings: vec![ring(4, vec![0, 2]), ring(3, vec![0]), ring(2, vec![])],
         contacts: vec![contact(0, 1, 2, 2), contact(1, 2, 2, 0)],
         loops: Vec::new(),
         sources: vec![0],
@@ -208,17 +215,16 @@ fn generic(field: &Field, seed: u64) -> Constitution {
 }
 
 /// A periodic source with a little noise over `alphabet` classes.
-fn source(length: usize, alphabet: usize, seed: u64) -> Vec<usize> {
-    let mut draw = Draw(seed);
-    (0..length)
-        .map(|k| {
-            if draw.below(8) == 0 {
-                draw.below(alphabet)
-            } else {
-                [0, 1, 2, 1][k % 4] % alphabet
-            }
-        })
-        .collect()
+fn source(field: &Field, length: usize, seed: u64) -> Encoded {
+    let truth = KnownTruth::interrupted(field.alphabet(), seed, 1, length).unwrap();
+    Encoded::identity(&truth, field).unwrap().remove(0)
+}
+
+/// A drawn word of `length` cells on the field's classes (the uniform terrain), encoded for it
+/// (THE_MACHINE guard 9: a test's word enters as every source does).
+fn word(field: &Field, length: usize, seed: u64) -> Encoded {
+    let truth = KnownTruth::uniform(field.alphabet(), seed, 1, length).unwrap();
+    Encoded::identity(&truth, field).unwrap().remove(0)
 }
 
 fn releasing() -> DecisionRule {
@@ -372,8 +378,8 @@ fn lockstep_receiving(
     let cells = &cut.cells;
     let (hm, _) = same(
         "the open",
-        host.ingest(&mut h, None, &[]),
-        device.ingest(&mut d, None, &[]),
+        host.ingest(&mut h, None, &word(&field, 0, 0)),
+        device.ingest(&mut d, None, &word(&field, 0, 0)),
     )
     .expect("the moment opens");
     let rule = releasing();
@@ -382,7 +388,7 @@ fn lockstep_receiving(
     let mut window = 0u64;
     while position < cells.len() && window < windows {
         let end = (position + aperture).min(cells.len());
-        let span = &cells[position..end];
+        let span = &cells.part(position..end).unwrap();
         if span.len() == aperture {
             window += 1;
             if let Some(carry) = h.carried() {
@@ -432,8 +438,8 @@ fn lockstep_receiving(
             }
             let compared_return = same(
                 "compare",
-                host.compare(&mut h, pending, &one_hot(span)),
-                device.compare(&mut d, pending, &one_hot(span)),
+                host.compare(&mut h, pending, span),
+                device.compare(&mut d, pending, span),
             );
             compared.compares += 1;
             let Some((staged, _)) = compared_return else {
@@ -505,8 +511,8 @@ fn lockstep_receiving(
         while fed < span.len() {
             let ingested = same(
                 "ingest",
-                host.ingest(&mut h, Some(&hm), &one_hot(&span[fed..])),
-                device.ingest(&mut d, Some(&hm), &one_hot(&span[fed..])),
+                host.ingest(&mut h, Some(&hm), &span.part(fed..span.len()).unwrap()),
+                device.ingest(&mut d, Some(&hm), &span.part(fed..span.len()).unwrap()),
             )
             .expect("the ingest returns");
             compared.ingests += 1;
@@ -525,8 +531,8 @@ fn lockstep_receiving(
                 if span.len() > crib.offset {
                     same(
                         "locate_keys",
-                        host.locate_keys(&mut h, &one_hot(&cells[span.clone()]), crib.offset),
-                        device.locate_keys(&mut d, &one_hot(&cells[span]), crib.offset),
+                        host.locate_keys(&mut h, &cells.part(span.clone()).unwrap(), crib.offset),
+                        device.locate_keys(&mut d, &cells.part(span).unwrap(), crib.offset),
                     );
                     compared.keys += 1;
                 }
@@ -572,7 +578,7 @@ fn lockstep_receiving(
     compared
 }
 
-fn cut_of(cells: Vec<usize>, held_out: Range<usize>) -> Cut {
+fn cut_of(cells: Encoded, held_out: Range<usize>) -> Cut {
     Cut {
         cells,
         held_out: vec![held_out],
@@ -653,7 +659,7 @@ fn the_tree_is_read_at_each_phases_address_in_cell_order() {
 fn the_card_port_returns_the_reference_on_the_chain() {
     let field = chain();
     let population = field.population() as usize;
-    let cells = source(population, field.alphabet(), 3);
+    let cells = source(&field, population, 3);
     let held = population - 8;
     let compared = lockstep(&field, &cut_of(cells, held..population), u64::MAX, None, 3);
     println!("chain, declared constitution: {compared:?}");
@@ -669,11 +675,12 @@ fn the_card_port_returns_the_reference_on_the_chain() {
 /// constitutions are compared after every deposit); the normal-law mirror skips a deposit whose
 /// prior moved, since its kernel steps a fixed `2^k`, and counts it.
 ///
-/// At rest this cut cannot move the prior, by the law: the receiving map's moves stay below its
-/// lattice's grain at `2^6`, so the map in force reads zero at every window, the code along `φ W`
-/// is the same at every member and every read holds for want of curvature (the host's
-/// `holonics::hnn::tests::prior_carry::at_rest_the_cards_chain_holds_its_prior_and_under_the_carry_it_moves`,
-/// on this fixture: 33 reads at rest, none moved; 33 under the carry, 22 moved).
+/// [historical; restated October 5 with THE_MACHINE guard 9] On the folded chain (four classes on a
+/// period-2 source ring through `c mod 2`) this cut held the prior at rest and moved it only under
+/// the carry (33 reads at rest, none moved; 33 under the carry, 22 moved). The chain is fold-free
+/// now (its source ring of period 4), and the host's conditional law, a map that never leaves zero
+/// holds its prior, is read on the two-class chain
+/// (`holonics::hnn::tests::prior_carry::at_rest_a_map_that_never_leaves_zero_holds_its_prior`).
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_card_port_returns_the_reference_across_a_moved_receiving_prior() {
@@ -684,7 +691,7 @@ fn the_card_port_returns_the_reference_across_a_moved_receiving_prior() {
     };
     let field = declared(declared(1 << 20).capacity().n_star() as u64);
     let population = field.population() as usize;
-    let cells = source(population, field.alphabet(), 3);
+    let cells = source(&field, population, 3);
     let held = population - 8;
     let compared = lockstep_receiving(
         &field,
@@ -713,7 +720,7 @@ fn carry_chain() -> (Field, Cut) {
     let length = n_star + n_star % 2;
     let field = declared(length as u64);
     let cut = Cut {
-        cells: source(length, field.alphabet(), 81),
+        cells: source(&field, length, 81),
         held_out: vec![2..4, length - 4..length],
     };
     (field, cut)
@@ -748,7 +755,8 @@ fn the_card_carries_each_reception_as_the_reference() {
     println!("chain, Carry(Nothing): {compared:?}");
     assert_eq!(compared.compares, windows);
     assert_eq!(
-        compared.received, 8,
+        compared.received,
+        windows - 1,
         "every reception after the first opens on a carry"
     );
     assert!(
@@ -766,7 +774,7 @@ fn the_card_carries_each_reception_as_the_reference() {
     let reference = without_wall(host.expose(&field, &cut).unwrap());
     let carried = without_wall(device.expose(&field, &cut).unwrap());
     let chained = &reference.word.chained;
-    assert_eq!(chained.read, 8);
+    assert_eq!(chained.read, reference.compares - 1);
     assert!(chained.closed && chained.dissipative == chained.read);
     assert!(
         !chained.split.is_zero(),
@@ -780,8 +788,8 @@ fn the_card_carries_each_reception_as_the_reference() {
     let phases = h.admitted()[0].clone();
     let (hm, _) = same(
         "the open",
-        host.ingest(&mut h, None, &[]),
-        device.ingest(&mut d, None, &[]),
+        host.ingest(&mut h, None, &word(&field, 0, 0)),
+        device.ingest(&mut d, None, &word(&field, 0, 0)),
     )
     .unwrap();
     let (pending, _) = same(
@@ -792,8 +800,8 @@ fn the_card_carries_each_reception_as_the_reference() {
     .unwrap();
     same(
         "compare",
-        host.compare(&mut h, pending, &one_hot(&cut.cells[..2])),
-        device.compare(&mut d, pending, &one_hot(&cut.cells[..2])),
+        host.compare(&mut h, pending, &cut.cells.part(0..2).unwrap()),
+        device.compare(&mut d, pending, &cut.cells.part(0..2).unwrap()),
     );
     let saved = carry_text(h.carried()).expect("the refine writes the carry");
     assert_eq!(
@@ -815,8 +823,8 @@ fn the_card_carries_each_reception_as_the_reference() {
         .unwrap();
     let (hm, _) = same(
         "the open",
-        host.ingest(&mut h, None, &[]),
-        device.ingest(&mut d, None, &[]),
+        host.ingest(&mut h, None, &word(&field, 0, 0)),
+        device.ingest(&mut d, None, &word(&field, 0, 0)),
     )
     .unwrap();
     same(
@@ -835,7 +843,7 @@ fn the_card_carries_the_reference_on_a_generic_constitution() {
     let field = chain();
     let population = field.population() as usize;
     for seed in [5u64, 11] {
-        let cells = source(population, field.alphabet(), seed);
+        let cells = source(&field, population, seed);
         let compared = lockstep_receiving(
             &field,
             &cut_of(cells, population - 6..population),
@@ -892,9 +900,10 @@ fn the_card_carries_the_pump_as_the_reference() {
     let compared = lockstep_receiving(&field, &cut, windows, Some(theta.clone()), 3, carry);
     println!("pumped chain, Carry(Nothing): {compared:?}");
     assert_eq!(compared.compares, windows);
-    assert_eq!(compared.received, 8);
+    assert_eq!(compared.received, windows - 1);
     assert_eq!(
-        compared.pumped, 8,
+        compared.pumped,
+        windows - 1,
         "every carry holds the resonators' states"
     );
     let card = card();
@@ -903,7 +912,7 @@ fn the_card_carries_the_pump_as_the_reference() {
     let reference = without_wall(host.expose_with(&field, &cut, theta.clone()).unwrap());
     let carried = without_wall(device.expose_with(&field, &cut, theta).unwrap());
     let chained = &reference.word.chained;
-    assert_eq!(chained.read, 8);
+    assert_eq!(chained.read, reference.compares - 1);
     assert!(chained.closed && chained.dissipative == chained.read);
     assert_eq!(
         carried, reference,
@@ -919,14 +928,14 @@ fn the_card_carries_the_pump_as_the_reference() {
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_card_saturating_ring_matches_the_reference_with_carry() {
-    fn reception(both: &mut Pair<'_>, span: &[usize]) -> bool {
+    fn reception(both: &mut Pair<'_>, span: &Encoded) -> bool {
         let phases = both.h.admitted()[0].clone();
         same(
             "ingest the source",
             both.host
-                .ingest(&mut both.h, Some(&both.moment), &one_hot(span)),
+                .ingest(&mut both.h, Some(&both.moment), span),
             both.device
-                .ingest(&mut both.d, Some(&both.moment), &one_hot(span)),
+                .ingest(&mut both.d, Some(&both.moment), span),
         )
         .unwrap();
         let (pending, refined) = same(
@@ -948,8 +957,8 @@ fn the_card_saturating_ring_matches_the_reference_with_carry() {
             .any(|balance| !balance.integration.is_zero());
         let (staged, _) = same(
             "the quartic Hessian return",
-            both.host.compare(&mut both.h, pending, &one_hot(span)),
-            both.device.compare(&mut both.d, pending, &one_hot(span)),
+            both.host.compare(&mut both.h, pending, span),
+            both.device.compare(&mut both.d, pending, span),
         )
         .unwrap();
         let host_carry = carry_text(both.h.carried()).expect("comparison retains the carry");
@@ -985,7 +994,7 @@ fn the_card_saturating_ring_matches_the_reference_with_carry() {
     }));
     let mut integration_seen = false;
     for window in 0..3 {
-        integration_seen |= reception(&mut both, &cut.cells[2 * window..2 * window + 2]);
+        integration_seen |= reception(&mut both, &cut.cells.part(2 * window..2 * window + 2).unwrap());
     }
 
     let saved = carry_text(both.h.carried()).expect("the comparison writes the carry");
@@ -1032,8 +1041,8 @@ fn the_card_saturating_ring_matches_the_reference_with_carry() {
     assert_eq!(d.constitution(), &moved);
     let (moment, _) = same(
         "the moved publication opens",
-        both.host.ingest(&mut h, None, &[]),
-        both.device.ingest(&mut d, None, &[]),
+        both.host.ingest(&mut h, None, &word(&field, 0, 0)),
+        both.device.ingest(&mut d, None, &word(&field, 0, 0)),
     )
     .unwrap();
     let mut both = Pair {
@@ -1044,7 +1053,7 @@ fn the_card_saturating_ring_matches_the_reference_with_carry() {
         moment,
     };
     for window in 3..5 {
-        integration_seen |= reception(&mut both, &cut.cells[2 * window..2 * window + 2]);
+        integration_seen |= reception(&mut both, &cut.cells.part(2 * window..2 * window + 2).unwrap());
     }
     assert!(
         integration_seen,
@@ -1122,19 +1131,21 @@ fn receive<'c>(
     device: &Resident<'c>,
     h: &mut holonics::hnn::reference::Resident,
     d: &mut super::Mounted<'c>,
-    cells: &[usize],
+    cells: &Encoded,
     from: usize,
     windows: usize,
 ) {
     let phases = h.admitted()[0].clone();
     let (moment, _) = same(
         "the open",
-        host.ingest(h, None, &[]),
-        device.ingest(d, None, &[]),
+        host.ingest(h, None, &cells.part(0..0).unwrap()),
+        device.ingest(d, None, &cells.part(0..0).unwrap()),
     )
     .unwrap();
     for window in 0..windows {
-        let span = &cells[from + 2 * window..from + 2 * window + 2];
+        let span = &cells
+            .part(from + 2 * window..from + 2 * window + 2)
+            .unwrap();
         let (pending, _) = same(
             "refine",
             host.refine(h, &moment, &phases),
@@ -1143,8 +1154,8 @@ fn receive<'c>(
         .unwrap();
         let (staged, _) = same(
             "compare",
-            host.compare(h, pending, &one_hot(span)),
-            device.compare(d, pending, &one_hot(span)),
+            host.compare(h, pending, span),
+            device.compare(d, pending, span),
         )
         .unwrap();
         assert_eq!(
@@ -1159,8 +1170,8 @@ fn receive<'c>(
         );
         same(
             "ingest",
-            host.ingest(h, Some(&moment), &one_hot(span)),
-            device.ingest(d, Some(&moment), &one_hot(span)),
+            host.ingest(h, Some(&moment), span),
+            device.ingest(d, Some(&moment), span),
         );
     }
 }
@@ -1264,7 +1275,7 @@ fn the_card_absorbs_each_reception_as_the_reference() {
     );
     println!("chain, Carry(Complete): {compared:?}");
     assert_eq!(compared.compares, windows);
-    assert_eq!(compared.received, 8);
+    assert_eq!(compared.received, windows - 1);
     // With a pumped resonator on every ring the word opens at rest at the carried tick, its pump
     // phases reading the field's elapsed ticks.
     let compared = lockstep_receiving(
@@ -1277,7 +1288,7 @@ fn the_card_absorbs_each_reception_as_the_reference() {
     );
     println!("pumped chain, Carry(Complete): {compared:?}");
     assert_eq!(compared.compares, windows);
-    assert_eq!(compared.received, 8);
+    assert_eq!(compared.received, windows - 1);
 }
 
 /// The chain from a generic constitution on half-integers (every locus live: the contrast port,
@@ -1288,7 +1299,7 @@ fn the_card_port_returns_the_reference_on_a_generic_constitution() {
     let field = chain();
     let population = field.population() as usize;
     for seed in [5u64, 11] {
-        let cells = source(population, field.alphabet(), seed);
+        let cells = source(&field, population, seed);
         let theta = generic(&field, seed);
         let compared = lockstep(
             &field,
@@ -1303,7 +1314,8 @@ fn the_card_port_returns_the_reference_on_a_generic_constitution() {
     }
 }
 
-/// Campaign 1's declared field on a drawn byte cut of its capacity (`n* = 6,148` cells): the first
+/// Campaign 1's declared field on a drawn cut of its capacity on its five classes (the uniform
+/// terrain; THE_MACHINE guard 9 refuses the byte cut it read through the residue chart): the first
 /// eight windows, every return the reference's.
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
@@ -1311,10 +1323,9 @@ fn the_card_port_returns_the_reference_on_campaign_one() {
     let probe = Field::declare(FieldDeclaration::campaign_one(1 << 17)).unwrap();
     let n_star = probe.capacity().n_star() as usize;
     let field = Field::declare(FieldDeclaration::campaign_one(n_star as u64)).unwrap();
-    let mut draw = Draw(7);
-    let cells: Vec<usize> = (0..n_star).map(|_| draw.below(256)).collect();
-    let compared = lockstep(&field, &cut_of(cells, n_star - 1_190..n_star), 8, None, 4);
-    println!("campaign 1, drawn bytes: {compared:?}");
+    let cells = word(&field, n_star, 7);
+    let compared = lockstep(&field, &cut_of(cells, n_star - n_star / 5..n_star), 8, None, 4);
+    println!("campaign 1, drawn classes: {compared:?}");
     assert_eq!(compared.compares, 8);
     assert_eq!(compared.landmarks, 16);
 }
@@ -1341,16 +1352,15 @@ fn the_card_port_returns_the_reference_with_resonators() {
     // and their deposit's refusal by `the_loaded_source_matches_with_y4_and_hop_two`.
     let theta = super::physics_tests::loaded(&field);
 
-    let mut draw = Draw(13);
-    let cells: Vec<usize> = (0..n_star).map(|_| draw.below(256)).collect();
+    let cells = word(&field, n_star, 13);
     let compared = lockstep(
         &field,
-        &cut_of(cells, n_star - 1_190..n_star),
+        &cut_of(cells, n_star - n_star / 5..n_star),
         8,
         Some(theta),
         4,
     );
-    println!("campaign 1 with resonators, drawn bytes: {compared:?}");
+    println!("campaign 1 with resonators, drawn classes: {compared:?}");
     assert_eq!(compared.compares, 8);
     assert!(compared.mirror.carried > 0);
     // Coarse gains may stay in their lattice cells on these first windows. The returned
@@ -1406,10 +1416,7 @@ fn the_loaded_source_matches_with_y4_and_hop_two() {
         .clone()
         .with_ring_resonator(&field, 0, material)
         .unwrap();
-    let mut draw = Draw(29);
-    let cells: Vec<usize> = (0..field.capacity().n_star() as usize)
-        .map(|_| draw.below(field.alphabet()))
-        .collect();
+    let cells = word(&field, field.capacity().n_star() as usize, 29);
     let mut current = Current::at_rest(&field);
     let mut moment = SourceMoment::open(&field, &current);
     moment.ingest(&field, &mut current, &cells).unwrap();
@@ -1475,8 +1482,8 @@ fn a_refused_deposit_restores_host_and_card_predecessors() {
 
     let (moment, _) = same(
         "open and ingest a tiny source moment",
-        host.ingest(&mut h, None, &one_hot(&[0])),
-        device.ingest(&mut d, None, &one_hot(&[0])),
+        host.ingest(&mut h, None, &word(&field, 1, 101)),
+        device.ingest(&mut d, None, &word(&field, 1, 101)),
     )
     .unwrap();
     let phases = h.admitted()[0].clone();
@@ -1488,8 +1495,8 @@ fn a_refused_deposit_restores_host_and_card_predecessors() {
     .unwrap();
     let (staged, compared) = same(
         "stage a valid comparison",
-        host.compare(&mut h, pending, &one_hot(&[1, 0])),
-        device.compare(&mut d, pending, &one_hot(&[1, 0])),
+        host.compare(&mut h, pending, &word(&field, 2, 103)),
+        device.compare(&mut d, pending, &word(&field, 2, 103)),
     )
     .unwrap();
     let deposit = compared
@@ -1556,62 +1563,12 @@ fn a_refused_deposit_restores_host_and_card_predecessors() {
     assert_eq!(host_pending, device_pending);
     let retried = same(
         "compare again after the refusal",
-        host.compare(&mut h, host_pending, &one_hot(&[1, 0])),
-        device.compare(&mut d, device_pending, &one_hot(&[1, 0])),
+        host.compare(&mut h, host_pending, &word(&field, 2, 105)),
+        device.compare(&mut d, device_pending, &word(&field, 2, 105)),
     );
     assert!(retried.is_some());
 }
 
-/// The standing real cut's manifest numbers (its population and held-out range).
-fn manifest(path: &str) -> Option<(usize, Range<usize>)> {
-    let manifest_path = path
-        .strip_suffix(".bin")
-        .map_or_else(|| format!("{path}.json"), |stem| format!("{stem}.json"));
-    #[allow(clippy::disallowed_methods)]
-    let manifest = std::fs::read_to_string(manifest_path).ok()?;
-    let numbers_after = |key: &str| -> Vec<usize> {
-        let start = manifest.find(key).expect("the manifest names the key") + key.len();
-        let rest = manifest[start..].trim_start();
-        let value = if rest.starts_with('[') {
-            &rest[..rest.find(']').expect("a closed list")]
-        } else {
-            &rest[..rest.find([',', '\n', '}']).unwrap_or(rest.len())]
-        };
-        value
-            .split(|c: char| !c.is_ascii_digit())
-            .filter(|piece| !piece.is_empty())
-            .map(|piece| piece.parse().expect("a count"))
-            .collect()
-    };
-    let population = numbers_after("\"population\":")[0];
-    let range = numbers_after("\"held_out_range\":");
-    Some((population, range[0]..range[1]))
-}
-
-/// **The standing real cut's first 24 windows** (THE_REBUILD (f); the cut file from `HOLONICS_CUT`):
-/// every return the reference's.
-#[test]
-#[ignore = "needs the CUDA card and the private standing cut (HOLONICS_CUT); run alone"]
-fn the_card_port_returns_the_reference_on_the_standing_cut() {
-    let Ok(path) = std::env::var("HOLONICS_CUT") else {
-        println!("skipped: HOLONICS_CUT names no standing cut file");
-        return;
-    };
-    #[allow(clippy::disallowed_methods)]
-    let Ok(bytes) = std::fs::read(&path) else {
-        println!("skipped: the standing cut {path} is not readable");
-        return;
-    };
-    let (population, held_out) = manifest(&path).expect("the cut's manifest");
-    assert_eq!(bytes.len(), population);
-    let field = Field::declare(FieldDeclaration::campaign_one(population as u64)).unwrap();
-    let cells: Vec<usize> = bytes.iter().map(|b| usize::from(*b)).collect();
-    let compared = lockstep(&field, &cut_of(cells, held_out), 24, None, 6);
-    println!("standing real cut, 24 windows: {compared:?}");
-    assert_eq!(compared.compares, 24);
-}
-
-/// A refusal is returned alike: a compare against a target of the wrong length, an unknown handle.
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_card_port_refuses_as_the_reference() {
@@ -1622,12 +1579,12 @@ fn the_card_port_refuses_as_the_reference() {
     let current = Current::at_rest(&field);
     let mut h = host.mount(&field, &current).unwrap();
     let mut d = device.mount(&field, &current).unwrap();
-    let (moment, _) = host.ingest(&mut h, None, &[]).unwrap();
-    device.ingest(&mut d, None, &[]).unwrap();
+    let (moment, _) = host.ingest(&mut h, None, &word(&field, 0, 0)).unwrap();
+    device.ingest(&mut d, None, &word(&field, 0, 0)).unwrap();
     same(
         "ingest",
-        host.ingest(&mut h, Some(&moment), &one_hot(&[0, 1, 2, 3])),
-        device.ingest(&mut d, Some(&moment), &one_hot(&[0, 1, 2, 3])),
+        host.ingest(&mut h, Some(&moment), &word(&field, 4, 107)),
+        device.ingest(&mut d, Some(&moment), &word(&field, 4, 107)),
     );
     let phases = h.admitted()[0].clone();
     let (pending, _) = same(
@@ -1638,8 +1595,8 @@ fn the_card_port_refuses_as_the_reference() {
     .unwrap();
     same(
         "a short target",
-        host.compare(&mut h, pending, &one_hot(&[1])),
-        device.compare(&mut d, pending, &one_hot(&[1])),
+        host.compare(&mut h, pending, &word(&field, 1, 109)),
+        device.compare(&mut d, pending, &word(&field, 1, 109)),
     );
     same(
         "an unknown handle",
@@ -1649,8 +1606,8 @@ fn the_card_port_refuses_as_the_reference() {
     // The refused compare left the pending ratio open on both: it compares now.
     let compared = same(
         "compare",
-        host.compare(&mut h, pending, &one_hot(&[1, 2])),
-        device.compare(&mut d, pending, &one_hot(&[1, 2])),
+        host.compare(&mut h, pending, &word(&field, 2, 111)),
+        device.compare(&mut d, pending, &word(&field, 2, 111)),
     );
     assert!(compared.is_some());
     let _ = ReceiptDetail::Boundary;
@@ -1681,8 +1638,8 @@ fn pair<'c>(card: &'c super::Card, field: &Field, theta: Option<Constitution>) -
     };
     let (moment, _) = same(
         "the open",
-        host.ingest(&mut h, None, &[]),
-        device.ingest(&mut d, None, &[]),
+        host.ingest(&mut h, None, &word(&field, 0, 0)),
+        device.ingest(&mut d, None, &word(&field, 0, 0)),
     )
     .unwrap();
     Pair {
@@ -1696,16 +1653,16 @@ fn pair<'c>(card: &'c super::Card, field: &Field, theta: Option<Constitution>) -
 
 /// Ingest cells on both until they are all taken, closing each aeon at its carry-out on the
 /// declared family (and locating no keys); the boundaries' returns asserted equal.
-fn feed(pair: &mut Pair<'_>, cells: &[usize]) {
+fn feed(pair: &mut Pair<'_>, cells: &Encoded) {
     let family = pair.h.admitted().to_vec();
     let mut fed = 0;
     while fed < cells.len() {
         let (_, ingested) = same(
             "ingest",
             pair.host
-                .ingest(&mut pair.h, Some(&pair.moment), &one_hot(&cells[fed..])),
+                .ingest(&mut pair.h, Some(&pair.moment), &cells.part(fed..cells.len()).unwrap()),
             pair.device
-                .ingest(&mut pair.d, Some(&pair.moment), &one_hot(&cells[fed..])),
+                .ingest(&mut pair.d, Some(&pair.moment), &cells.part(fed..cells.len()).unwrap()),
         )
         .unwrap();
         let ingested = ingested.forward.into_present().unwrap();
@@ -1731,17 +1688,18 @@ fn the_card_port_returns_the_reference_on_deferred_compares() {
     let card = card();
     let mut both = pair(&card, &field, Some(generic(&field, 17)));
     let phases = both.h.admitted()[0].clone();
-    let cells = source(40, field.alphabet(), 17);
+    let cells = source(&field, 40, 17);
     let mut pending = Vec::new();
-    for chunk in cells.chunks(4).take(5) {
+    for k in 0..5 {
+        let chunk = cells.part(4 * k..4 * k + 4).unwrap();
         let (id, _) = same(
             "refine",
             both.host.refine(&mut both.h, &both.moment, &phases),
             both.device.refine(&mut both.d, &both.moment, &phases),
         )
         .unwrap();
-        pending.push((id, [chunk[0], chunk[1]]));
-        feed(&mut both, chunk);
+        pending.push((id, chunk.part(0..2).unwrap()));
+        feed(&mut both, &chunk);
     }
     for (index, (id, targets)) in pending.iter().enumerate() {
         if index == 2 {
@@ -1754,8 +1712,8 @@ fn the_card_port_returns_the_reference_on_deferred_compares() {
         }
         let (staged, _) = same(
             "compare",
-            both.host.compare(&mut both.h, *id, &one_hot(targets)),
-            both.device.compare(&mut both.d, *id, &one_hot(targets)),
+            both.host.compare(&mut both.h, *id, targets),
+            both.device.compare(&mut both.d, *id, targets),
         )
         .unwrap();
         same(
@@ -1786,7 +1744,7 @@ fn the_card_port_returns_the_reference_through_a_releasing_collapse() {
     let card = card();
     let mut both = pair(&card, &field, Some(generic(&field, 23)));
     let phases = both.h.admitted()[0].clone();
-    let cells = source(64, field.alphabet(), 23);
+    let cells = source(&field, 64, 23);
     let mut position = 0;
     // Refine, compare and deposit until the joint clock carries out.
     loop {
@@ -1796,7 +1754,7 @@ fn the_card_port_returns_the_reference_through_a_releasing_collapse() {
             both.device.refine(&mut both.d, &both.moment, &phases),
         )
         .unwrap();
-        let targets = one_hot(&cells[position..position + 2]);
+        let targets = cells.part(position..position + 2).unwrap();
         let (staged, _) = same(
             "compare",
             both.host.compare(&mut both.h, id, &targets),
@@ -1840,8 +1798,8 @@ fn the_card_port_returns_the_reference_through_a_releasing_collapse() {
     .unwrap();
     same(
         "compare",
-        both.host.compare(&mut both.h, other, &one_hot(&[1, 2])),
-        both.device.compare(&mut both.d, other, &one_hot(&[1, 2])),
+        both.host.compare(&mut both.h, other, &word(&field, 2, 113)),
+        both.device.compare(&mut both.d, other, &word(&field, 2, 113)),
     );
     let boundary = same(
         "close_aeon onto no receiver",
@@ -1853,8 +1811,8 @@ fn the_card_port_returns_the_reference_through_a_releasing_collapse() {
     assert!(!released.is_empty(), "the collapse releases loci");
     same(
         "compare a refused pending ratio",
-        both.host.compare(&mut both.h, id, &one_hot(&[0, 1])),
-        both.device.compare(&mut both.d, id, &one_hot(&[0, 1])),
+        both.host.compare(&mut both.h, id, &word(&field, 2, 115)),
+        both.device.compare(&mut both.d, id, &word(&field, 2, 115)),
     );
     let (fresh, _) = same(
         "refine on the collapsed medium",
@@ -1869,8 +1827,121 @@ fn the_card_port_returns_the_reference_through_a_releasing_collapse() {
     );
     same(
         "compare on the collapsed medium",
-        both.host.compare(&mut both.h, fresh, &one_hot(&[2, 3])),
-        both.device.compare(&mut both.d, fresh, &one_hot(&[2, 3])),
+        both.host.compare(&mut both.h, fresh, &word(&field, 2, 117)),
+        both.device.compare(&mut both.d, fresh, &word(&field, 2, 117)),
     );
     same("read", both.host.read(&both.h), both.device.read(&both.d));
+}
+
+// -------------------------------------------------------------------------------------------
+// a failed ingest
+
+/// The helix `(2, 3, 5)` as a field (the host's `hnn::tests::moment` fixture): the rings in carry
+/// order on the quarter turns, chained on their common nodes, source ring 2 holding the five
+/// classes, `Δ = {1, 3}`, receiver ring 2 with aperture 5.
+fn helix_field() -> Field {
+    let mut declaration = chain_declaration(1 << 16);
+    declaration.rings = [2u64, 3, 5].into_iter().map(|d| ring(d, vec![0])).collect();
+    declaration.contacts = vec![contact(0, 1, 2, 0), contact(1, 2, 3, 0)];
+    declaration.sources = vec![2];
+    declaration.offsets = vec![1, 3];
+    declaration.alphabet = 5;
+    declaration.receivers[0].aperture = 5;
+    Field::declare(declaration.by_lattice_rule()).unwrap()
+}
+
+/// [agent-inferred, October 5] **A founded partial-span passage** (the host's
+/// `hnn::tests::moment::partial_span`, the same draw `2_026_100_995`): advances that are nonzero
+/// multiples of 5 on the helix `(2, 3, 5)`, located from a passage at every key to one gauge class;
+/// the chart founded on the first passage's key reaches that key's coset only. Returns the encoded
+/// passage and its opening key.
+fn partial_span(field: &Field) -> (Encoded, u64) {
+    use holonics::compression::keys::transport::{CarryHelix, SteppedTerrain, TransportLocation};
+    use holonics::hnn::encoding::{Encoding, PassageChart};
+    let helix = CarryHelix::new(vec![2, 3, 5]).unwrap();
+    let mut draw = holonics::holarchy::terrain::Draw::new(2_026_100_995);
+    let advances: Vec<u64> = (0..5).map(|_| 5 * (1 + draw.below(5)) as u64).collect();
+    let mut left: Vec<usize> = (0..5).collect();
+    let labels: Vec<usize> = (0..5).map(|_| left.remove(draw.below(left.len()))).collect();
+    let terrain = SteppedTerrain::new(helix.clone(), advances, labels).unwrap();
+    let passages: Vec<Vec<usize>> = (0..helix.period()).map(|key| terrain.passage(key, 60)).collect();
+    let location = TransportLocation::locate(helix, 5, &passages).unwrap();
+    let chart = PassageChart::located(&location, &passages[..1]).unwrap();
+    let encoding = Encoding::found(&chart).unwrap();
+    assert_eq!(encoding.reached(), 6, "the chart reaches one coset of 5ℤ/30");
+    let key = chart.openings()[0]
+        .iter()
+        .position(|entry| !entry.is_zero())
+        .expect("an opening is a lift") as u64;
+    let encoded = Encoded::through(&encoding, &chart, field, &passages[..1])
+        .unwrap()
+        .remove(0);
+    (encoded, key)
+}
+
+/// [implemented-exact] **A failed ingest leaves no further reads** (`port::ingest_open`, Codex's
+/// invalidation law `ResidentMoment::is_valid`): on both ports, a moment opened off the passage's
+/// reached coset refuses the passage's first located step alike (`EncodingError::Unreached`), and
+/// the failed open is discarded, never consumed: the read lists no moment, and a later ingest or
+/// refine of its handle is refused (`HnnError::UnknownHandle`). The lift point is the mount's, and a
+/// fresh open on the reached coset ingests the passage on both ports alike.
+#[test]
+#[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+fn a_failed_ingest_leaves_no_further_reads() {
+    let field = helix_field();
+    let (encoded, key) = partial_span(&field);
+    let card = card();
+    let host = Reference::campaign_one();
+    let device = Resident::campaign_one(&card);
+    let lift = |ell: u64| {
+        let ell = ell % 30;
+        Current::at(
+            &field,
+            vec![BigInt::from(ell % 2), BigInt::from(ell / 2 % 3), BigInt::from(ell / 6)],
+        )
+        .unwrap()
+    };
+    let off = lift(key + 1);
+    let mut h = host.mount(&field, &off).unwrap();
+    let mut d = device.mount(&field, &off).unwrap();
+    let phases = h.admitted()[0].clone();
+    let empty = encoded.part(0..0).unwrap();
+    let (moment, _) = same(
+        "the open",
+        host.ingest(&mut h, None, &empty),
+        device.ingest(&mut d, None, &empty),
+    )
+    .unwrap();
+    let refused = (
+        host.ingest(&mut h, Some(&moment), &encoded),
+        device.ingest(&mut d, Some(&moment), &encoded),
+    );
+    let unreached = HnnError::from(holonics::hnn::encoding::EncodingError::Unreached);
+    assert_eq!(refused.0.as_ref().err(), Some(&unreached));
+    assert_eq!(refused.1.as_ref().err(), Some(&unreached));
+    assert!(ExposedResident::moment(&h, &moment).is_none());
+    assert!(ExposedResident::moment(&d, &moment).is_none());
+    assert_eq!(ExposedResident::current(&h), &off);
+    assert_eq!(ExposedResident::current(&d), &off);
+    let (_, _, handles) = same("read", host.read(&h), device.read(&d)).unwrap();
+    assert!(handles.iter().all(|(handle, _)| !matches!(handle, Handle::Moment(_))));
+    let unknown = || HnnError::UnknownHandle {
+        handle: Handle::Moment(moment),
+    };
+    assert_eq!(host.ingest(&mut h, Some(&moment), &empty).err(), Some(unknown()));
+    assert_eq!(device.ingest(&mut d, Some(&moment), &empty).err(), Some(unknown()));
+    assert_eq!(host.refine(&mut h, &moment, &phases).err(), Some(unknown()));
+    assert_eq!(device.refine(&mut d, &moment, &phases).err(), Some(unknown()));
+    // On the reached coset a fresh open ingests the passage through the card's located route alike.
+    let on = lift(key);
+    let mut h = host.mount(&field, &on).unwrap();
+    let mut d = device.mount(&field, &on).unwrap();
+    let (_, ingested) = same(
+        "the located ingest",
+        host.ingest(&mut h, None, &encoded),
+        device.ingest(&mut d, None, &encoded),
+    )
+    .unwrap();
+    assert!(ingested.forward.present().unwrap().cells > 0);
+    assert_eq!(ExposedResident::current(&h), ExposedResident::current(&d));
 }

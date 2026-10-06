@@ -7,7 +7,7 @@
 //!   finite-order port map `P_g = (· + 1)` of its `d_g` nodes (`navigator::Transport::Map`, order
 //!   exactly `d_g`), its key the declared initial configuration; its reflector `F_g`, an involution
 //!   of `ℤ/d_g` (the keys' [`ReflectorMachine`] is built from the two, [`Ring::machine`]); its lock
-//!   `N_g ⊂ ℤ/d_g` on the field's port chart ([`PortChart`], "The port chart" below);
+//!   `N_g ⊂ ℤ/d_g`, read on the classes of the encoding the field reads ("The port chart" below);
 //!   one screw generator with `d_g` node placements on its circle, node `k` at winding `n` sitting
 //!   at `x_g(k, n) = placement_k + n·v_∥` (helix = circle + carry, `v_∥` the generator's axial
 //!   advance). The period is combinatorial, so several nodes may share a placement; its storage
@@ -22,8 +22,10 @@
 //!   admitted receivers with their landmark trees' address depths (the landmark tree), the crib, and the
 //!   carrier lattice `2^(−L_ℓ)ℤ` of
 //!   every learned locus
-//!   ([`FieldDeclaration::lattice_by_rule`]). [`Field::declare`] computes the capacity `n*` by
-//!   counting and refuses a declared population shorter than it (guard 1), and declares the word's
+//!   ([`FieldDeclaration::lattice_by_rule`]). [`Field::declare`] computes the identity route's
+//!   capacity `n*` by counting and refuses a declared population shorter than it (guard 1; the
+//!   located route's certificate is owed, refs #62: `hnn::moment`, "The located route's capacity
+//!   is owed"), and declares the word's
 //!   precisions by rule ([`Field::word_lattice`], [`crate::hnn::WordLattice::by_rule`], the lattice word):
 //!   the certificate's target `2^(−D_c)`, the charts' lattice `L_c = 2D_c` and the transients'
 //!   lattice `L_w`, from the finest receiver grain, the receiving fan-in, the widest local solve
@@ -41,19 +43,24 @@
 //! carry is the joint clock's carry-out, the aeon boundary. A ring whose lock no input fits and
 //! that receives no carry keeps its configuration (Lean `HNN/Keys.selective_step_dormant`).
 //!
-//! [definition; agent-inferred, U6] **The port chart** ([`PortChart`]). `port_g(x)` is read from
-//! the field's declared chart, one port of `ℤ/d_g` for each exterior code `x` on each ring.
-//! [`Field::declare`] declares the **residue chart** `code mod d_g`, the codec's choice: an exterior
-//! chart that depends on the codec (guard 9's stated exception), exact for the synthetic fields whose
-//! drawn codes carry no source structure (and whose codes are the ring's ports when `|A| ≤ d_g`).
-//! [historical; retired September 29] The charts founded from a passage (each reached cell, then
-//! each class of the charged founding, placed on the rings at its first arrival, with the founded
-//! machine's step codes) were retired by the
-//! [lessons record](../../../../research/records/2026-09-29_LESSONS_THE_FAILURES_THAT_REPEATED_AFTER_THEY_WERE_RECORDED.md)
-//! (code at `96d8940b`). [open] A text field therefore steps its rings on its codec's residues,
-//! the recorded failure "text run on its codec's grain": the stepping classes a text passage needs
-//! are to be located by the field's own keys and deposition, never founded by counts or placed by
-//! first arrival.
+//! [definition; agent-inferred, October 5; THE_MACHINE guard 9] **The port chart is the encoding's
+//! classes.** The field reads a source only as `hnn::encoding::Encoded`: each occurrence a class `c`
+//! of the encoding's chart, and `|A|` ([`FieldDeclaration::alphabet`]) is that chart's class count,
+//! never an exterior alphabet: it bounds the classes of the encodings the field admits
+//! ([`Field::admit`]). An encoding's classes inject into every source ring's ports (`Encoded`
+//! refuses a fold, `EncodingError::Fold`), so every class is its own port there,
+//! `port_g(c) = c`; on any other ring a class at or past `d_g` reads the port `d_g`, which no lock
+//! admits ([`Ring::port`]). The codec's
+//! residue chart `code mod d_g` was deleted with its constructor (October 5); it is at
+//! [`f91666c0`](https://github.com/brandonrdug/holonics/blob/f91666c0/crates/holonics/src/hnn/field.rs).
+//!
+//! [definition; agent-inferred, October 5] **The located step.** An occurrence of the located route
+//! (`Encoded::advance`) steps ring `g` by its class's located digit plus the carry,
+//! `a_g(c) + carry_g ≤ (d_g − 1) + 1 = d_g`, in place of the lock's fit; its carry out is still the
+//! ring clock's jumps, `⌊(τ_g + a_g + carry_g)/d_g⌋ ∈ {0, 1}`. A ring's ticks are held as `u64` (the
+//! width the helix declares its periods in), so each digit, section flux and winding is exact; the
+//! squares `D E = ρ` and `E T_a = U_a E` are checked on the lift the step actually reads and reaches
+//! (`Encoded::check_step`).
 //!
 //! [definition; agent-inferred, U5] **The rings' clocks.** Ring `g`'s clock is its navigator's
 //! `navigator::Clock`, a ring of period `d_g` ([`Ring::clock_at`]); the lift coordinate `λ_g` is
@@ -79,7 +86,7 @@
 //! | Lean | Rust |
 //! |---|---|
 //! | `HNN/Keys.selective_step_dormant`, `HNN/Moment.selective_position` | [`Field::selective_step`] |
-//! | `HNN/Moment.SelectiveDecl` (its declared port chart `port g x`, any chart) | [`PortChart`], [`Ring::port`] |
+//! | `HNN/Moment.SelectiveDecl` (its declared port chart `port g x`, any chart: here the encoding's classes) | [`Ring::port`], [`Field::selective_step`] over `hnn::encoding::Encoded` |
 //! | `HNN/Moment.SelectiveDecl.carryIn_is_section_flux`, `Holon/Navigator.jumps_are_carries` (the carry is the ring clock's jumps and its section's flux) | [`Field::selective_step`] through [`Ring::clock_at`] |
 //! | `Aeon/Clock/Winding.ratio_split`, `split_unique` (a lift coordinate's phase class and windings) | [`Current::phase`], [`Current::winding`], [`Ring::point`], [`Ring::rotate`] |
 //! | `Aeon/Clock/Winding.clockLift` | [`Field::parametric`] |
@@ -107,6 +114,7 @@ use crate::geometry::screw::{ScrewAxis, ScrewGenerator, ScrewPair, SituatedScrew
 use crate::hnn::HnnError;
 use crate::hnn::chart::WordLattice;
 use crate::hnn::constitution::{Lattice, Locus};
+use crate::hnn::encoding::Encoded;
 use crate::hnn::moment::{Capacity, PairPort, capacity};
 #[cfg(test)]
 use crate::holarchy::GluingDefect;
@@ -367,7 +375,10 @@ pub struct FieldDeclaration {
     pub sources: Vec<usize>,
     /// The declared offsets `Δ` of the pair port.
     pub offsets: Vec<usize>,
-    /// `|A|`, the exterior chart's size. It enters only the capacity `n*`, never the widths.
+    /// `|A|`, the class count of the encodings the field reads (`hnn::encoding::Encoded`; never an
+    /// exterior alphabet): an encoding of at most `|A|` classes enters, each class injecting into
+    /// every source ring's ports. It enters only the capacity `n*` and the moment's slots, never
+    /// the widths.
     pub alphabet: usize,
     /// The hop's duration `h > 0`.
     pub step: Rat,
@@ -375,7 +386,8 @@ pub struct FieldDeclaration {
     pub exponent_grain: u64,
     pub receivers: Vec<ReceiverDeclaration>,
     pub crib: CribDeclaration,
-    /// The declared population (the cut's length in cells), refused below `n*`.
+    /// The declared population (the cut's length in cells), refused below the identity route's
+    /// `n*` (the located route's certificate is owed, refs #62).
     pub population: u64,
     /// The declared carrier lattice exponent `L_ℓ` of every learned locus (its entries live on
     /// `2^(−L_ℓ)ℤ`; `hnn::constitution`): exactly the field's learned loci, each once, and each at
@@ -389,7 +401,10 @@ const QUARTER_TURNS: [(i64, i64); 4] = [(1, 0), (0, 1), (-1, 0), (0, -1)];
 
 impl FieldDeclaration {
     /// [definition; agent-inferred] **Campaign 1's declared values** (design (d), "Declared values",
-    /// R2 M14, R3 D2): UTF-8 bytes (`|A| = 256`); four closing rings of periods 5, 7, 11, 13 in that
+    /// R2 M14, R3 D2): `|A| = 5` classes, the widest encoding its source ring of period 5 holds
+    /// without a fold ([agent-inferred, October 5; THE_MACHINE guard 9] campaign 1 declared UTF-8
+    /// bytes, `|A| = 256`, read through the residue chart `code mod 5` that guard 9 deleted: a byte
+    /// enters only through a founded encoding's classes); four closing rings of periods 5, 7, 11, 13 in that
     /// carry order; the 4-cycle `0–1–2–3–0` with its one 2-cell; channels matching node `i` of
     /// both ends for `i < min(d_g, d_h)`; `𝒮 = {0}`, `R = 2`, `A = 2`; locks `{0}` on rings 0–2 and
     /// `∅` on ring 3; reflectors `p ↦ −p mod d_g`; every ring at phase 0; one axis `e_z` through the
@@ -451,7 +466,7 @@ impl FieldDeclaration {
             loops: vec![vec![0, 1, 2, 3]],
             sources: vec![0],
             offsets: vec![1],
-            alphabet: 256,
+            alphabet: 5,
             step: integer(1),
             exponent_grain: 1,
             receivers: vec![ReceiverDeclaration {
@@ -583,40 +598,6 @@ pub fn lattice_exponent(grain: u128, fan_in: u128) -> u32 {
 }
 
 // -------------------------------------------------------------------------------------------
-// the port chart
-
-/// [definition; agent-inferred, U6] **The field's port chart** (module header, "The port chart"):
-/// the port `port_g(x) ∈ ℤ/d_g` of every exterior code `x` on every ring `g`. The selective step
-/// reads the ports through [`Ring::port`]; the card mounts the lock chart `[port_g(x) ∈ N_g]`, read
-/// off the host owner at the moment's open, so both realizations read one chart.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct PortChart {
-    /// `ports[g][x]`.
-    ports: Vec<Vec<usize>>,
-}
-
-impl PortChart {
-    /// **The residue chart** `port_g(x) = x mod d_g` over an exterior chart of `alphabet` codes.
-    pub fn residue(periods: &[u64], alphabet: usize) -> Self {
-        Self {
-            ports: periods
-                .iter()
-                .map(|&period| {
-                    (0..alphabet)
-                        .map(|code| (code as u64 % period.max(1)) as usize)
-                        .collect()
-                })
-                .collect(),
-        }
-    }
-
-    /// `ports[g][x]`.
-    pub fn ports(&self) -> &[Vec<usize>] {
-        &self.ports
-    }
-}
-
-// -------------------------------------------------------------------------------------------
 // the ring
 
 /// [definition] **A closing rotor ring**, checked. See the module header.
@@ -632,8 +613,6 @@ pub struct Ring {
     admittance: Rat,
     parametron: Parametron,
     initial: u64,
-    /// The port of each exterior code on this ring, read from the field's [`PortChart`].
-    ports: Vec<usize>,
 }
 
 impl Ring {
@@ -732,7 +711,6 @@ impl Ring {
             admittance: declared.admittance.clone(),
             parametron,
             initial: declared.initial,
-            ports: Vec::new(),
         })
     }
 
@@ -790,14 +768,15 @@ impl Ring {
         Ok(clock)
     }
 
-    /// **The port class of an exterior code** on this ring, read from the field's [`PortChart`]
-    /// (module header, "The port chart"). A code outside the chart reads the port `d_g`, which no
-    /// lock admits (the selective step refuses one first).
-    pub fn port(&self, code: usize) -> usize {
-        self.ports
-            .get(code)
-            .copied()
-            .unwrap_or(self.placements.len())
+    /// **The port of an encoding's class** on this ring (module header, "The port chart"): the
+    /// class itself, `c < d_g` (every class on a source ring); a class at or past `d_g` reads the
+    /// port `d_g`, which no lock admits. No residue: nothing is folded.
+    pub fn port(&self, class: usize) -> usize {
+        if (class as u64) < self.period {
+            class
+        } else {
+            self.placements.len()
+        }
     }
 
     /// Whether a port class fits the lock `N_g`.
@@ -1035,9 +1014,11 @@ impl Contact {
 // the field
 
 /// What one cell's selective step did: each ring's ticks, and whether the joint clock carried out.
+/// A ring's ticks are at most its period (a located digit plus the carry, module header "The located
+/// step"), held at the periods' width.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SelectiveStep {
-    pub ticks: Vec<u8>,
+    pub ticks: Vec<u64>,
     pub carry_out: bool,
 }
 
@@ -1065,17 +1046,20 @@ pub struct Field {
     /// The word's declared precisions by rule ([`WordLattice::by_rule`]); `None` only for the
     /// exact law's own tests (`Field::with_exact_word`).
     word: Option<WordLattice>,
-    /// The port chart the rings read ([`PortChart`]).
-    port_chart: PortChart,
 }
 
 impl Field {
     /// **Declare a field**: every ring and contact checked, the complex built with `∂∘∂ = 0`, one
     /// exponent per contact on its lattice `(2q_Q/L)ℤ`, every ring reached from a source ring, and
-    /// the capacity `n*` counted, refusing a population shorter than it.
+    /// the identity route's capacity `n*` counted, refusing a population shorter than it. The
+    /// refusal certifies a lossy moment for identity-route cells only; a located source's
+    /// certificate is owed (refs #62), and its moment refuses the reading
+    /// (`SourceMoment::capacity`).
     ///
-    /// The ring count and widths are fixed without the exterior alphabet, which enters only `n*`
-    /// (guard 9).
+    /// The ring count and widths are fixed without any exterior alphabet: `|A|` bounds the class
+    /// count of the encodings the field reads, and it enters only `n*` and the moment's slots. A
+    /// class enters only where it injects into every source ring's ports, which the encoding checks
+    /// (`hnn::encoding::Encoded`, `EncodingError::Fold`; guard 9) and [`Field::admit`] reads.
     pub fn declare(declared: FieldDeclaration) -> Result<Self, HnnError> {
         if declared.rings.is_empty() {
             return Err(HnnError::Shape {
@@ -1087,20 +1071,12 @@ impl Field {
         if !declared.step.is_positive() || declared.exponent_grain == 0 || declared.alphabet == 0 {
             return Err(HnnError::NonpositiveDeclaration);
         }
-        let mut rings = declared
+        let rings = declared
             .rings
             .iter()
             .enumerate()
             .map(|(index, ring)| Ring::declare(index, ring))
             .collect::<Result<Vec<_>, _>>()?;
-        // The declared chart is the codec's residue chart (module header, "The port chart").
-        let port_chart = PortChart::residue(
-            &rings.iter().map(Ring::period).collect::<Vec<_>>(),
-            declared.alphabet,
-        );
-        for (ring, ports) in rings.iter_mut().zip(port_chart.ports()) {
-            ring.ports = ports.clone();
-        }
         let contacts = declared
             .contacts
             .iter()
@@ -1252,14 +1228,10 @@ impl Field {
             distances,
             lattices,
             word,
-            port_chart,
         })
     }
 
     /// The port chart the rings read.
-    pub fn port_chart(&self) -> &PortChart {
-        &self.port_chart
-    }
 
     /// **The word's declared precisions** (the lattice word; [`WordLattice::by_rule`]): the charts'
     /// lattice `L_c`, the certificate's target `2^(−D_c)` and the transients' lattice `L_w`. `None`
@@ -1368,7 +1340,8 @@ impl Field {
         self.population
     }
 
-    /// The capacity crossover `n*` and its certificate.
+    /// The identity route's capacity crossover `n*` and its certificate; a moment reads it through
+    /// `SourceMoment::capacity`, which refuses it once a located occurrence is counted.
     pub fn capacity(&self) -> &Capacity {
         &self.capacity
     }
@@ -1398,9 +1371,84 @@ impl Field {
         .expect("every declared period is at least 2")
     }
 
-    /// **One cell's selective step on a lift point**, in carry order: ring `g` advances
-    /// `[port_g(x) ∈ N_g]` plus its predecessor's carry; the last ring's carry is the carry-out.
-    /// Lean `HNN/Moment.selective_position`, on the field's declared port chart ([`PortChart`]).
+    /// **Whether an encoded passage enters this field** (THE_MACHINE guard 9): its classes are at
+    /// most `|A|`, it was checked against exactly this field's source rings and periods, and a
+    /// located route's helix is this field's rings in carry order. Refused with
+    /// [`HnnError::Unadmitted`].
+    pub fn admit(&self, encoded: &Encoded) -> Result<(), HnnError> {
+        if encoded.classes() > self.alphabet {
+            return Err(HnnError::Unadmitted {
+                reason: "its classes exceed the field's class count",
+            });
+        }
+        let sources: Vec<(usize, u64)> = self
+            .sources
+            .iter()
+            .map(|&ring| (ring, self.rings[ring].period))
+            .collect();
+        if encoded.sources() != sources.as_slice() {
+            return Err(HnnError::Unadmitted {
+                reason: "it was encoded against another field's source rings",
+            });
+        }
+        if let Some(located) = encoded.located()
+            && (located.periods().len() != self.rings.len()
+                || located
+                    .periods()
+                    .iter()
+                    .zip(&self.rings)
+                    .any(|(&period, ring)| period != ring.period))
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "its located helix is not the field's rings in carry order",
+            });
+        }
+        Ok(())
+    }
+
+    /// **The lift read as the helix's lift** `ℓ = Σ_g τ_g ∏_(h<g) d_h` (`τ_g` ring `g`'s phase
+    /// class): the state of the located chart `ℚ^D` the encoding reads.
+    fn helix_lift(&self, lift: &[BigInt]) -> Result<u64, HnnError> {
+        let mut state = 0u64;
+        for (ring, tau) in self.rings.iter().zip(lift).rev() {
+            let digit = ring_digit(&ring.clock_at(tau)?);
+            state = state
+                .checked_mul(ring.period)
+                .and_then(|state| state.checked_add(digit))
+                .ok_or(HnnError::Unadmitted {
+                    reason: "the helix's joint period exceeds the machine word",
+                })?;
+        }
+        Ok(state)
+    }
+
+    /// **One occurrence's selective step on a lift point** (THE_MACHINE guard 9; module header,
+    /// "The port chart" and "The located step"): occurrence `at` of an encoded passage the field
+    /// admits ([`Field::admit`]). On an identity ring `g` advances `[c ∈ N_g]` plus its
+    /// predecessor's carry; on the located route it advances the class's located digit `a_g(c)`
+    /// plus the carry, and the squares `D E = ρ`, `E T_a = U_a E` are checked on the lift the step
+    /// read and the lift it reached (`Encoded::check_step`). The last ring's carry is the carry-out.
+    /// Lean `HNN/Moment.selective_position`, on the encoding's classes.
+    ///
+    /// No exterior code reaches it: a code list or one-hot cells are refused where the encoded
+    /// passage goes (structural, `E0308`):
+    ///
+    /// ```compile_fail,E0308
+    /// use holonics::hnn::field::Field;
+    /// use num_bigint::BigInt;
+    /// fn step(field: &Field, lift: &mut [BigInt], codes: &[usize]) {
+    ///     let _ = field.selective_step(lift, codes, 0);
+    /// }
+    /// ```
+    ///
+    /// ```compile_fail,E0308
+    /// use holonics::hnn::field::Field;
+    /// use holonics::ratio::Rat;
+    /// use num_bigint::BigInt;
+    /// fn step(field: &Field, lift: &mut [BigInt], cells: &[Vec<(usize, Rat)>]) {
+    ///     let _ = field.selective_step(lift, cells, 0);
+    /// }
+    /// ```
     ///
     /// [definition; agent-inferred, U5] **The carry is the ring clock's jumps.** Ring `g`'s carry
     /// into ring `g + 1` is the jump count of its clock ([`Ring::clock_at`]) over its advance,
@@ -1414,15 +1462,72 @@ impl Field {
     pub fn selective_step(
         &self,
         lift: &mut [BigInt],
-        code: usize,
+        encoded: &Encoded,
+        at: usize,
     ) -> Result<SelectiveStep, HnnError> {
-        if code >= self.alphabet {
+        self.admit(encoded)?;
+        self.step_occurrence(lift, encoded, at)
+    }
+
+    /// **One occurrence's step of an admitted passage** (the moment's ingest admits once),
+    /// atomic: the step is taken on a staged copy of the lift and committed only once it and, on
+    /// the located route, its squares at the consumer hold. A refused occurrence leaves the lift as
+    /// it was, so its consumer (`SourceMoment::ingest`, which counts an occurrence only after its
+    /// step returns) is left unchanged by it.
+    pub(crate) fn step_occurrence(
+        &self,
+        lift: &mut [BigInt],
+        encoded: &Encoded,
+        at: usize,
+    ) -> Result<SelectiveStep, HnnError> {
+        let cell = *encoded.cells().get(at).ok_or(HnnError::Shape {
+            what: "an occurrence of the encoded passage",
+            expected: encoded.len(),
+            found: at,
+        })?;
+        let mut staged = lift.to_vec();
+        let step = match encoded.advance(at) {
+            None => self.step_class(&mut staged, cell.class(), None)?,
+            Some(digits) => {
+                let before = self.helix_lift(lift)?;
+                let step = self.step_class(&mut staged, cell.class(), Some(digits))?;
+                let after = self.helix_lift(&staged)?;
+                encoded.check_step(at, before, after)?;
+                step
+            }
+        };
+        lift.clone_from_slice(&staged);
+        Ok(step)
+    }
+
+    /// **Ring `g`'s advance on a class before its carry**: the class's located digit `a_g(c)` on
+    /// the located route, else its lock's fit `[c ∈ N_g]`.
+    pub(crate) fn advance_of(&self, ring: usize, class: usize, digits: Option<&[u64]>) -> u64 {
+        match digits {
+            Some(digits) => digits[ring],
+            None => {
+                let declared = &self.rings[ring];
+                u64::from(declared.fits(declared.port(class)))
+            }
+        }
+    }
+
+    /// **The selective step's law on one class** (the field's own: the machine's crib charts, a
+    /// candidate family's emission and a terrain's generator read it in-crate; every passage from
+    /// outside enters through [`Field::selective_step`]). Refused at a class past `|A|`.
+    pub(crate) fn step_class(
+        &self,
+        lift: &mut [BigInt],
+        class: usize,
+        digits: Option<&[u64]>,
+    ) -> Result<SelectiveStep, HnnError> {
+        if class >= self.alphabet {
             return Err(HnnError::CellOutside {
-                code,
+                code: class,
                 alphabet: self.alphabet,
             });
         }
-        if lift.len() != self.rings.len() {
+        if lift.len() != self.rings.len() || digits.is_some_and(|d| d.len() != self.rings.len()) {
             return Err(HnnError::Shape {
                 what: "lift point",
                 expected: self.rings.len(),
@@ -1430,13 +1535,13 @@ impl Field {
             });
         }
         let mut ticks = Vec::with_capacity(self.rings.len());
-        let mut carry = 0u8;
-        for (ring, tau) in self.rings.iter().zip(lift.iter_mut()) {
-            let advance = u8::from(ring.fits(ring.port(code))) + carry;
+        let mut carry = 0u64;
+        for (g, (ring, tau)) in self.rings.iter().zip(lift.iter_mut()).enumerate() {
+            let advance = self.advance_of(g, class, digits) + carry;
             let jumps = ring.clock_at(tau)?.advance(&BigUint::from(advance));
             *tau += advance;
-            carry = jumps.to_u8().expect(
-                "a ring of period at least 2 advanced at most two ticks jumps at most once",
+            carry = jumps.to_u64().expect(
+                "a ring advanced by at most its period from a phase below it jumps at most once",
             );
             ticks.push(advance);
         }
@@ -2400,9 +2505,15 @@ impl Current {
         Ok(BigInt::from(self.clock(field, ring)?.winding().clone()))
     }
 
-    /// One cell's selective step of the lift point ([`Field::selective_step`]).
-    pub fn step(&mut self, field: &Field, code: usize) -> Result<SelectiveStep, HnnError> {
-        field.selective_step(&mut self.lift, code)
+    /// One occurrence's selective step of the lift point ([`Field::selective_step`]): occurrence
+    /// `at` of an encoded passage, never an exterior code.
+    pub fn step(
+        &mut self,
+        field: &Field,
+        encoded: &Encoded,
+        at: usize,
+    ) -> Result<SelectiveStep, HnnError> {
+        field.selective_step(&mut self.lift, encoded, at)
     }
 
     /// **Re-key one ring**: set its phase class, keeping its winding (design (d), R3 K1; Lean

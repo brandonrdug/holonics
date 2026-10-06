@@ -31,6 +31,7 @@
 
 use super::*;
 use holonics::hnn::constitution::ContinuingState;
+use holonics::hnn::Encoded;
 use holonics::holarchy::terrain::{CyclicLaw, KnownTruth};
 use num_bigint::{BigInt, BigUint};
 use num_traits::One;
@@ -44,18 +45,12 @@ pub(super) fn cell(interval: &ExactInterval, grain: i64) -> String {
     format!("[{low}/{grain}, {high}/{grain})")
 }
 
-/// **A known-truth terrain's pairs** (only the terrain computes truth; the generation law is the
-/// library's, `holarchy::terrain::KnownTruth::cyclic`, moved there on October 5 for THE_MACHINE
-/// guard 9 with its draws in the same order): `order2`, `x_t = x_(t−2) + 1 (mod 4)` after the
-/// request's drawn cells; `alternation`, two drawn classes alternating, `x_t = x_(t−2)`; `line`, a
-/// drawn start and step, `x_t = x_0 + s t (mod 4)`. Each passage is cut into its request and its
-/// stations.
-pub(super) fn terrain_pairs(
-    terrain: &str,
-    declared: &Declared,
-    seed: u64,
-    count: usize,
-) -> Vec<(Vec<usize>, Vec<usize>)> {
+/// **A known-truth terrain** (only the terrain computes truth; the generation law is the library's,
+/// `holarchy::terrain::KnownTruth::cyclic`, moved there on October 5 for THE_MACHINE guard 9 with its
+/// draws in the same order): `order2`, `x_t = x_(t−2) + 1 (mod 4)` after the request's drawn cells;
+/// `alternation`, two drawn classes alternating, `x_t = x_(t−2)`; `line`, a drawn start and step,
+/// `x_t = x_0 + s t (mod 4)`; each passage a request and its stations.
+pub(super) fn terrain_truth(terrain: &str, declared: &Declared, seed: u64, count: usize) -> KnownTruth {
     let symbols = declared.alphabet - 1;
     let (n, m) = (declared.request, declared.stations);
     let law = match terrain {
@@ -64,15 +59,38 @@ pub(super) fn terrain_pairs(
         "line" => CyclicLaw::Line,
         _ => panic!("a terrain: order2 | alternation | line"),
     };
-    KnownTruth::cyclic(law, symbols, seed, count, n + m)
-        .expect("a declared cyclic terrain")
+    KnownTruth::cyclic(law, symbols, seed, count, n + m).expect("a declared cyclic terrain")
+}
+
+/// **A known-truth terrain's pairs**, read to declare a request's length and to score (the truth's
+/// own classes): each passage cut into its request and its stations.
+pub(super) fn terrain_pairs(
+    terrain: &str,
+    declared: &Declared,
+    seed: u64,
+    count: usize,
+) -> Vec<(Vec<usize>, Vec<usize>)> {
+    terrain_truth(terrain, declared, seed, count)
         .passages()
         .iter()
         .map(|passage| {
-            let (request, target) = passage.split_at(n);
+            let (request, target) = passage.split_at(declared.request);
             (request.to_vec(), target.to_vec())
         })
         .collect()
+}
+
+/// **The terrain's passages as the field reads them** (THE_MACHINE guard 9): its declared identity
+/// (`Encoded::identity`), each passage a request and its stations, in the pairs' order.
+pub(super) fn terrain_encoded(
+    terrain: &str,
+    declared: &Declared,
+    field: &Field,
+    seed: u64,
+    count: usize,
+) -> Vec<Encoded> {
+    Encoded::identity(&terrain_truth(terrain, declared, seed, count), field)
+        .expect("the terrain's classes inject into the field's source ports")
 }
 
 /// [definition; agent-inferred, step 1b's pin §13.6] **A checkpoint: the complete continuing state**
@@ -126,6 +144,10 @@ pub(super) fn evaluate(terrain: &str, seed: u64, count: usize, out: &str, arms: 
     let bank = bank_of(declared.period, &bank_strength());
     let ring = engine.refinement.ring();
     let pairs = terrain_pairs(terrain, &declared, seed, count);
+    let requests: Vec<Encoded> = terrain_encoded(terrain, &declared, &engine.field, seed, count)
+        .into_iter()
+        .map(|passage| passage.part(0..declared.request).expect("a request within its passage"))
+        .collect();
     let mut listing = String::new();
     for arm in arms {
         let (label, path) = arm.split_once('=').unwrap_or((arm.as_str(), ""));
@@ -138,9 +160,9 @@ pub(super) fn evaluate(terrain: &str, seed: u64, count: usize, out: &str, arms: 
         // The constitution's own clock: its requests' generation (run in parallel on the host's
         // cores) and their tally, read before the listing is written.
         let started = Instant::now();
-        let generated: Vec<_> = pairs
+        let generated: Vec<_> = requests
             .par_iter()
-            .map(|(request, _)| {
+            .map(|request| {
                 let (current, moment) = ingest(&engine.field, request);
                 generate_by_bank(
                     &engine.field,

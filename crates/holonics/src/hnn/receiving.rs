@@ -142,6 +142,7 @@ use crate::compression::landmark::context::{
     Bundle, LandmarkDeclaration, LandmarkFace, Landmarks, Letter, LetterFamily, Splits, code_length,
 };
 use crate::hnn::HnnError;
+use crate::hnn::encoding::Encoded;
 use crate::hnn::contact::{ContactReading, LockDeclaration, lock_address, site_kinds};
 use crate::hnn::field::{ConstitutionRead, Current, Field, ReceiverDeclaration, ring_digit};
 use crate::hnn::keys;
@@ -996,7 +997,7 @@ pub fn receiving_windows(cells: usize, aperture: usize) -> Result<Vec<Range<usiz
 pub fn clock_letters(
     field: &Field,
     family: &FeatureFamily,
-    cells: &[usize],
+    cells: &Encoded,
     kinds: &[Vec<SiteKind>],
 ) -> Result<Vec<Letter>, HnnError> {
     if family.reads_contacts() && kinds.len() < cells.len() {
@@ -1011,18 +1012,18 @@ pub fn clock_letters(
     let crib = field.crib();
     let mut aeon_start = 0usize;
     let mut letters = Vec::with_capacity(cells.len());
-    for (at, &cell) in cells.iter().enumerate() {
+    for (at, cell) in cells.classes_read().enumerate() {
         if family.reads_contacts() && reader.kinds.as_ref() != Some(&kinds[at]) {
             reader.hold_kinds(kinds[at].clone())?;
         }
-        let step = current.step(field, cell)?;
+        let step = current.step(field, cells, at)?;
         letters.push(reader.tick(cell)?);
         if step.carry_out {
             let end = at + 1;
             let from = end.saturating_sub(crib.window).max(aeon_start);
             if end - from > crib.offset {
                 let location =
-                    keys::locate_closing(field, &current, &cells[from..end], crib.offset)?;
+                    keys::locate_closing(field, &current, &cells.part(from..end)?, crib.offset)?;
                 location.rekey(field, &mut current)?;
                 reader.synchronize(field, &current)?;
             }

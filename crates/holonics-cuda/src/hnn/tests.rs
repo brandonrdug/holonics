@@ -11,6 +11,8 @@ use std::time::Instant;
 
 use holonics::geometry::RatVec3;
 use holonics::geometry::screw::ScrewGenerator;
+use holonics::hnn::Encoded;
+use holonics::holarchy::terrain::KnownTruth;
 use holonics::hnn::constitution::CAMPAIGN_ONE_BUDGET;
 use holonics::hnn::field::{CribDeclaration, ReceiverDeclaration};
 use holonics::hnn::{
@@ -164,7 +166,9 @@ fn chain() -> Field {
             loops: Vec::new(),
             sources: vec![0, 1],
             offsets: vec![1, 3],
-            alphabet: 4,
+            // [agent-inferred, October 5; THE_MACHINE guard 9] two classes, which inject into both
+            // source rings' ports (periods 2 and 3); four were read through the residue chart.
+            alphabet: 2,
             step: integer(1),
             exponent_grain: 1,
             receivers: vec![ReceiverDeclaration {
@@ -351,10 +355,13 @@ fn read_layout_is_derived_from_the_census() {
 fn ingest_layout_is_derived_from_the_census() {
     let census = census();
     let ingest = entry("hnn_moment_ingest", 1024, 8);
-    // Campaign 1: four rings, 1,190 cells (a mean aeon on uniform bytes).
+    // The shared octets are `12·rings + 8·rings·threads` (the located scan's 8-octet words); the
+    // ceiling is the census's `49,152` less the entry's static `8`, `49,144`.
+    // Campaign 1: four rings, 1,190 cells: `(49,144 − 48) / 32 = 1,534`, so the entry's 1,024.
     let layout = ingest_layout(&census, &ingest, 4, 1190, None).unwrap();
     assert_eq!((layout.grid, layout.block), (Dim3::x(1), Dim3::x(1024)));
     assert_eq!(layout.shared, ingest_shared(4, 1024).unwrap());
+    assert_eq!(layout.shared, 48 + 32 * 1024);
     assert_eq!(
         layout.realization,
         Realization::OneBlockScan {
@@ -362,11 +369,10 @@ fn ingest_layout_is_derived_from_the_census() {
             tiles: 2
         }
     );
-    // Twelve rings' scans need 48 octets a thread: (49,152 − 8 − 144) / 48 = 1,020, so 512.
-    assert_eq!(
-        ingest_layout(&census, &ingest, 12, 1, None).unwrap().block,
-        Dim3::x(512)
-    );
+    // Twelve rings' scans need 96 octets a thread: (49,144 − 144) / 96 = 510, so 256.
+    let twelve = ingest_layout(&census, &ingest, 12, 1, None).unwrap();
+    assert_eq!(twelve.block, Dim3::x(256));
+    assert_eq!(twelve.shared, 144 + 96 * 256);
     // Narrowed on request, to a power of two.
     assert_eq!(
         ingest_layout(&census, &ingest, 3, 400, Some(48))
@@ -585,14 +591,19 @@ fn moment_ingest_matches_the_host_moment() {
         let mut current = opening.clone();
         let mut host = SourceMoment::open(&field, &current);
         let mut device = ResidentMoment::open(&card, &field, &opening).unwrap();
-        let mut draw = Draw(21);
-        let cells: Vec<usize> = (0..400).map(|_| draw.below(a)).collect();
+        let encoded = Encoded::identity(&KnownTruth::uniform(a, 21, 1, 400).unwrap(), &field)
+            .unwrap()
+            .remove(0);
+        let cells: Vec<usize> = encoded.classes_read().collect();
         let (mut fed, mut batch, mut carries) = (0usize, 1usize, 0usize);
         while fed < cells.len() {
             let end = (fed + batch).min(cells.len());
-            let chunk = &cells[fed..end];
-            let expected = host.ingest(&field, &mut current, chunk).unwrap();
-            let (found, layout) = device.ingest_in(chunk, lanes).unwrap();
+            let expected = host
+                .ingest(&field, &mut current, &encoded.part(fed..end).unwrap())
+                .unwrap();
+            let (found, layout) = device
+                .ingest_in(&encoded.part(fed..end).unwrap(), lanes)
+                .unwrap();
             assert_eq!(found, expected, "batch at {fed}, {layout:?}");
             assert_eq!(
                 device.lift(),
@@ -626,22 +637,27 @@ fn moment_ingest_matches_the_host_moment() {
             }
         }
     }
+    // A passage encoded against another field's source rings is refused before the card reads it
+    // (THE_MACHINE guard 9): campaign 1's classes on its period-5 source ring.
+    let campaign = Field::declare(FieldDeclaration::campaign_one(1 << 16)).unwrap();
+    let foreign = Encoded::identity(&KnownTruth::uniform(2, 1, 1, 2).unwrap(), &campaign)
+        .unwrap()
+        .remove(0);
     assert!(matches!(
         ResidentMoment::open(&card, &field, &Current::at_rest(&field))
             .unwrap()
-            .ingest(&[1, 4]),
-        Err(DeviceError::Hnn(holonics::hnn::HnnError::CellOutside {
-            code: 4,
-            alphabet: 4
-        }))
+            .ingest(&foreign),
+        Err(DeviceError::Hnn(holonics::hnn::HnnError::Unadmitted { .. }))
     ));
 }
 
-/// Campaign 1's declared shapes (`FieldDeclaration::campaign_one` at `n* = 6,148`): the ingest of
-/// `n*` drawn bytes equals the host moment's; `E_0 M_0[c]` (`10 × 256` on its lattice, against the
+/// Campaign 1's declared shapes (`FieldDeclaration::campaign_one` over a population of 6,148, its
+/// five classes' capacity `n* = 190 = 2·5·19` below it): the ingest of 6,148 drawn cells on its
+/// classes (the uniform terrain; guard 9 refuses the bytes it read through the residue chart)
+/// equals the host moment's; `E_0 M_0[c]` (`10 × 5` on its lattice, against the
 /// resident counts) equals the host's product per phase and, over the population chart (ruling B),
 /// folds to `SourceMoment::encode`; and
-/// `R P_R^(τ_R) v` (`512 × 22` on `2^(−10)ℤ`, the initial and a drawn map, against lattice anchors
+/// `R P_R^(τ_R) v` (`2|A| × 22 = 10 × 22` on `2^(−10)ℤ`, the initial and a drawn map, against lattice anchors
 /// with the rotation as a gather) equals `ReceivingPhases::read`'s logits.
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
@@ -654,18 +670,27 @@ fn campaign_one_reads_and_ingest_match_the_host() {
     let card = card();
     let mut draw = Draw(1_077);
 
-    // The ingest of n* bytes, batch by batch across the carry-outs.
-    let cells: Vec<usize> = (0..population as usize).map(|_| draw.below(256)).collect();
+    // The ingest of the population's cells, batch by batch across the carry-outs.
+    let encoded = Encoded::identity(
+        &KnownTruth::uniform(field.alphabet(), 1_077, 1, population as usize).unwrap(),
+        &field,
+    )
+    .unwrap()
+    .remove(0);
+    let cells: Vec<usize> = encoded.classes_read().collect();
     let opening = Current::at_rest(&field);
     let mut current = opening.clone();
     let mut host = SourceMoment::open(&field, &current);
     let mut device = ResidentMoment::open(&card, &field, &opening).unwrap();
     let (mut fed, mut aeons, mut device_us) = (0usize, 0usize, 0u128);
     while fed < cells.len() {
-        let chunk = &cells[fed..];
-        let expected = host.ingest(&field, &mut current, chunk).unwrap();
+        let expected = host
+            .ingest(&field, &mut current, &encoded.part(fed..cells.len()).unwrap())
+            .unwrap();
         let clock = Instant::now();
-        let (found, layout) = device.ingest_in(chunk, None).unwrap();
+        let (found, layout) = device
+            .ingest_in(&encoded.part(fed..cells.len()).unwrap(), None)
+            .unwrap();
         device_us += clock.elapsed().as_micros();
         if fed == 0 {
             eprintln!("ingest: {layout:?}");
@@ -693,7 +718,7 @@ fn campaign_one_reads_and_ingest_match_the_host() {
 
     // E_0 on its lattice, read against the resident phase rows.
     let lattice = initial.lattice(Locus::SourcePort(0)).unwrap();
-    let e0 = draw.lattice_matrix(10, 256, lattice.exponent(), 40);
+    let e0 = draw.lattice_matrix(10, field.alphabet(), lattice.exponent(), 40);
     let theta = initial
         .clone()
         .with_ports(0, None, Some(e0.clone()), None)
@@ -749,7 +774,7 @@ fn campaign_one_reads_and_ingest_match_the_host() {
         &LatticeCoordinates::of_vectors(&anchors, Lattice::new(20)).unwrap(),
     )
     .unwrap();
-    let drawn = draw.lattice_matrix(512, 22, 10, 50);
+    let drawn = draw.lattice_matrix(2 * field.alphabet(), 22, 10, 50);
     for (name, theta) in [
         ("initial", initial.clone()),
         (

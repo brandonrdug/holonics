@@ -63,7 +63,7 @@ pub fn rotor_crib(
         let stage = machine.stage(&BigUint::from(key + taken))?;
         let image = stage.apply(board.apply(crib[k])?)?;
         crib.push(board.inverse().apply(image)?);
-        taken += u64::from(field.selective_step(&mut lift, crib[k])?.ticks[ring]);
+        taken += field.step_class(&mut lift, crib[k], None)?.ticks[ring];
     }
     Ok(crib)
 }

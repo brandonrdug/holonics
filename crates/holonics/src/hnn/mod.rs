@@ -43,8 +43,8 @@
 //! propagates one contact per tick and is released at the word's end. The forward machine is here:
 //!
 //! - [`field`]: the declaration ([`Ring`], [`Contact`], [`Field`]), the lift point [`Current`] and
-//!   the read face of the constitution ([`ConstitutionRead`]); selective stepping on the declared
-//!   port chart ([`PortChart`], the codec's residue chart);
+//!   the read face of the constitution ([`ConstitutionRead`]); selective stepping on the encoding's
+//!   classes ([`Encoded`], THE_MACHINE guard 9: the codec's residue chart is deleted);
 //! - [`encoding`] (U6): Holonic Encoding, a passage chart's minimal realization founded by
 //!   closing the receiving forms under the chart's declared transports ([`Encoding`],
 //!   [`PassageChart`]), its squares `D E = ρ`, `E T = U E` and the injection square, its Preimage
@@ -172,9 +172,9 @@ pub use contact::{
     contact_readings, site_kinds, site_readings,
 };
 
-pub use encoding::{Encoding, EncodingError, PassageChart};
+pub use encoding::{Encoded, Encoding, EncodingError, PassageChart, PortCell};
 pub use field::{
-    ConstitutionRead, Contact, FieldMaterial, ContactDeclaration, Current, Field, FieldDeclaration, PortChart, Ring,
+    ConstitutionRead, Contact, FieldMaterial, ContactDeclaration, Current, Field, FieldDeclaration, Ring,
     RingDeclaration,
 };
 pub use keys::{KeyLocation, RingKeys, locate_keys};
@@ -303,8 +303,19 @@ pub enum HnnError {
         "the declared population of {population} cells is shorter than the capacity n* = {n_star}: the moment would be lossless"
     )]
     BelowCapacity { population: u64, n_star: u64 },
-    #[error("cell code {code} lies outside the exterior chart of {alphabet}")]
+    #[error(
+        "the moment has counted a located occurrence: its capacity N(n) is the identity route's, and the located route's certificate is owed (#62)"
+    )]
+    CapacityOwed,
+    #[error("class {code} lies outside the field's {alphabet} classes")]
     CellOutside { code: usize, alphabet: usize },
+    /// THE_MACHINE guard 9: an encoded passage this field does not read.
+    #[error("the encoded passage does not enter this field: {reason}")]
+    Unadmitted { reason: &'static str },
+    /// The encoding's refusal at a consuming call (its squares on the stepped lift). Boxed: the
+    /// encoding's refusals are wide.
+    #[error(transparent)]
+    Encoding(Box<encoding::EncodingError>),
     #[error("a count of the moment would pass the machine word; the moment refuses it")]
     CountOverflow,
     #[error("ring {ring} is a source ring but the constitution carries no source port for it")]
@@ -432,8 +443,6 @@ pub enum HnnError {
         "keys are located only between close_aeon and the next ingest, from the crib that closed the aeon"
     )]
     KeysNotAdmitted,
-    #[error("cell {position} is not a one-hot vector of the exterior chart")]
-    CellNotOneHot { position: usize },
     #[error("the release was refused: {0}")]
     ReleaseRefused(#[from] WidthRefusal),
     #[error("the carrier refused {what}: nothing is rounded")]
@@ -477,6 +486,12 @@ pub enum HnnError {
         certificate: Box<Rat>,
         target: Box<Rat>,
     },
+}
+
+impl From<encoding::EncodingError> for HnnError {
+    fn from(error: encoding::EncodingError) -> Self {
+        Self::Encoding(Box::new(error))
+    }
 }
 
 macro_rules! boxed_from {

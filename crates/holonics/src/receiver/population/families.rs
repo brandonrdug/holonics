@@ -441,8 +441,8 @@ impl Emitters for RotorKeys {
 
     fn advance(&mut self, cell: usize) -> Result<(), PopulationError> {
         if let Some(previous) = self.last {
-            let step = self.field.selective_step(&mut self.lift, previous)?;
-            self.taken += u64::from(step.ticks[self.ring]);
+            let step = self.field.step_class(&mut self.lift, previous, None)?;
+            self.taken += step.ticks[self.ring];
         }
         self.last = Some(cell);
         Ok(())

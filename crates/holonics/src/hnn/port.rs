@@ -70,13 +70,14 @@ use num_traits::{One, Zero};
 use crate::aeon::Reading;
 use crate::compression::{CompressionError, ResonanceSplit, resonance_split};
 use crate::hnn::HnnError;
+use crate::hnn::encoding::Encoded;
 use crate::hnn::chart::{ChartReading, Remainders, carry};
 use crate::hnn::constitution::{
     DepositReading, FactorStep, LandmarkStep, Lattice, LinearStep, Locus, Reach,
 };
 use crate::hnn::field::{Current, Field, Ring};
 use crate::hnn::keys::KeyLocation;
-use crate::hnn::moment::Ingested;
+use crate::hnn::moment::{Ingested, SourceCapacity};
 use crate::hnn::propagation::{
     PathAttenuation, TickBalance, conductance_covector, scattering_about,
 };
@@ -148,14 +149,14 @@ pub fn source_order(field: &Field, lift: &[BigInt], cells: u64) -> SourceOrder {
 /// [definition] **What a method's receipt reads beyond the common fields**, one arm per method.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ReceiptDetail {
-    /// `ingest`: cells accessed, the moment's dense bits and its source-state bits `⌈log₂N(n)⌉`
-    /// against the source's `n ⌈log₂|A|⌉`, `n*`, and whether the joint clock carried out.
+    /// `ingest`: cells accessed, the moment's dense bits, its source-state capacity (`⌈log₂N(n)⌉`
+    /// and `n*` on the identity route, owed on the located route: `hnn::moment::SourceCapacity`)
+    /// against the source's `n ⌈log₂|A|⌉`, and whether the joint clock carried out.
     Ingest {
         cells: u64,
         moment_bits: u64,
-        state_bits: u64,
+        capacity: SourceCapacity,
         source_bits: u64,
-        n_star: u64,
         carry_out: bool,
     },
     /// `locate_keys`: per ring the fibre's size, its orbits, whether it fell back, its minimal
@@ -592,6 +593,31 @@ impl Deposit {
 /// ```compile_fail,E0107
 /// fn borrowed(returned: holonics::receiver::reception::InteractionReturn<'static>) {}
 /// ```
+///
+/// A source enters only encoded (THE_MACHINE guard 9): `ingest`, `locate_keys` and `compare` take
+/// an `hnn::encoding::Encoded`, never exterior codes or one-hot cells (structural, `E0308`):
+///
+/// ```compile_fail,E0308
+/// use holonics::hnn::port::ExecutionPort;
+/// fn bytes<P: ExecutionPort>(port: &P, resident: &mut P::Resident, codes: &[usize]) {
+///     let _ = port.ingest(resident, None, codes);
+/// }
+/// ```
+///
+/// ```compile_fail,E0308
+/// use holonics::hnn::port::ExecutionPort;
+/// use holonics::ratio::Rat;
+/// fn one_hot<P: ExecutionPort>(port: &P, resident: &mut P::Resident, cells: &[Vec<(usize, Rat)>]) {
+///     let _ = port.ingest(resident, None, cells);
+/// }
+/// ```
+///
+/// ```compile_fail,E0308
+/// use holonics::hnn::port::{ExecutionPort, PendingId};
+/// fn target<P: ExecutionPort>(port: &P, resident: &mut P::Resident, pending: PendingId, codes: &[usize]) {
+///     let _ = port.compare(resident, pending, codes);
+/// }
+/// ```
 pub trait ExecutionPort {
     /// The field, its lift point, the constitution, the open moments, the open pending ratios and
     /// the staged deposits: on the card for a device.
@@ -609,12 +635,13 @@ pub trait ExecutionPort {
         resident: &Self::Resident,
     ) -> Result<(Field, Current, Vec<(Handle, u64)>), HnnError>;
 
-    /// Opens (`None`) or extends a moment; stops at a carry-out of the joint clock.
+    /// Opens (`None`) or extends a moment with an encoded passage (an empty `Encoded::part` opens
+    /// one with nothing taken); stops at a carry-out of the joint clock.
     fn ingest(
         &self,
         resident: &mut Self::Resident,
         moment: Option<&MomentId>,
-        cells: &[Vec<(usize, Rat)>],
+        cells: &Encoded,
     ) -> Result<
         (
             MomentId,
@@ -630,7 +657,7 @@ pub trait ExecutionPort {
     fn locate_keys(
         &self,
         resident: &mut Self::Resident,
-        crib: &[Vec<(usize, Rat)>],
+        crib: &Encoded,
         offset: usize,
     ) -> Result<
         InteractionReturn<KeyLocation, (), Vec<Option<Clock>>, Vec<ReceivingPhases>, PortReceipt>,
@@ -656,7 +683,7 @@ pub trait ExecutionPort {
         &self,
         resident: &mut Self::Resident,
         pending: PendingId,
-        target: &[Vec<(usize, Rat)>],
+        target: &Encoded,
     ) -> Result<
         (
             StagedId,

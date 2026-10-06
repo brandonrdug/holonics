@@ -378,7 +378,11 @@ fn the_declarations_refuse_and_name_the_bombe() {
 fn crib_field() -> Field {
     let mut declared = FieldDeclaration::campaign_one(1 << 16);
     declared.rings[1].lock = (0..7).collect();
-    Field::declare(declared).unwrap()
+    // [agent-inferred, October 5; THE_MACHINE guard 9] Seven classes, the crib ring's ports: the
+    // crib is the terrain's own emission, read by the family's own stepping, and no source enters
+    // (campaign 1's five classes would hold the crib ring's ports only through a fold).
+    declared.alphabet = 7;
+    Field::declare(declared.by_lattice_rule()).unwrap()
 }
 
 /// A drawn rotor crib on that period-7 ring (`holarchy::terrain::RotorCrib::draw`): the

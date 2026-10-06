@@ -423,12 +423,12 @@ pub fn copy_layout(
     })
 }
 
-/// The ingest's shared octets: `rings` 8-octet advance totals and 4-octet phases, and one 4-octet
+/// The ingest's shared octets: `rings` 8-octet advance totals and 4-octet phases, and one 8-octet
 /// scan word per ring and thread.
 pub fn ingest_shared(rings: u32, threads: u32) -> Option<u32> {
     rings
         .checked_mul(12)?
-        .checked_add(rings.checked_mul(threads)?.checked_mul(4)?)
+        .checked_add(rings.checked_mul(threads)?.checked_mul(8)?)
 }
 
 /// [definition] **The moment ingest's layout** for `rings` rings and `cells` cells: one block, as
@@ -455,8 +455,15 @@ pub fn ingest_layout(
         });
     }
     let available = shared_ceiling(census, entry);
-    let fixed = rings * 12;
-    let shared_threads = available.saturating_sub(fixed) / (4 * rings);
+    let fixed = rings.checked_mul(12).ok_or(DeviceError::Launch {
+        entry: entry.name,
+        clause: "the ingest's fixed shared octets fit a 32-bit extent",
+    })?;
+    let per_thread = rings.checked_mul(8).ok_or(DeviceError::Launch {
+        entry: entry.name,
+        clause: "the ingest's per-thread shared octets fit a 32-bit extent",
+    })?;
+    let shared_threads = available.saturating_sub(fixed) / per_thread;
     let mut ceiling = thread_ceiling(census, entry).min(shared_threads);
     if let Some(lanes) = lanes {
         ceiling = ceiling.min(lanes);

@@ -17,13 +17,25 @@
 //! certifies both the 64-bit atomic additions and the counts' use as the lattice read's operand at
 //! `L_x = 0` ([`ResidentMoment::phase_operand`]).
 //!
-//! [definition] **The lock chart is the field's.** At the open the host reads `[port_g(x) ∈ N_g]`
-//! for every ring and code off the field (`Ring::port`, `Ring::fits`) and mounts it; the kernel
-//! reads that chart and states no port law of its own.
+//! [definition] **The advance chart belongs to the admitted encoding.** An identity uses the
+//! declared field's `[class ∈ N_g]`, mounted at the open; a located passage mounts its actual
+//! digits `a_g(class)` at their exact `u64` width. The kernel adds the predecessor's carry,
+//! scans at `u64` width and counts at the executed resulting phase. The field's native
+//! `selective_step` checks `D E = ρ` and `E T = U E` on the admitted prefix before launch, and
+//! the kernel's actual receipt and full lift must equal that owner afterwards. It computes no
+//! label, key or task answer. This is the helix and its paired moment's device realization;
+//! the boundary labels, material/port evolution and receiving decoder keep their own consumers.
+//!
+//! [definition] **A mutating device failure invalidates the moment.** Launch and transfer errors
+//! can follow a partial device mutation. Before a launch or re-key write the moment is marked
+//! invalid; only a checked successful receipt restores validity. A failure then requires dropping
+//! it and opening a new moment: no consuming entry, device reading or operand accepts it again.
+//! The host lift and cell count remain the last checked receipt, not a rollback of device buffers.
 
 use core::ffi::c_void;
 use core::marker::PhantomData;
 
+use holonics::hnn::encoding::Encoded;
 use holonics::hnn::moment::Ingested;
 use holonics::hnn::{Current, Field, HnnError};
 use num_bigint::BigInt;
@@ -34,14 +46,14 @@ use crate::hnn::card::{Card, CardBuffer, Layout, Operand, ingest_layout};
 /// The entry's name in the image.
 pub const INGEST_ENTRY: &str = "hnn_moment_ingest";
 
-/// The ring periods the kernel's 32-bit phase scans admit: a phase plus a tile's advances
-/// (at most twice the block's threads, themselves within the device's 32-bit thread count) stays
-/// within the word below `2^31`.
+/// The ring periods the resident phase wire admits. With each advance at most its period and
+/// a batch/thread count within `u32`, every `u64` scan and batch advance is below `2^63`.
 const PERIOD_CEILING: u64 = 1 << 31;
 
 /// [definition] **The source moment resident on a card.** See the module header.
 pub struct ResidentMoment<'c> {
     card: &'c Card,
+    field: Field,
     alphabet: usize,
     periods: Vec<u64>,
     sources: Vec<usize>,
@@ -49,9 +61,10 @@ pub struct ResidentMoment<'c> {
     lift: Vec<BigInt>,
     opening: Vec<BigInt>,
     cells: u64,
+    valid: bool,
     first_base: Vec<u64>,
     paired_base: Vec<u64>,
-    chart: CardBuffer<'c, u8>,
+    chart: CardBuffer<'c, u64>,
     period_words: CardBuffer<'c, u32>,
     source_words: CardBuffer<'c, u32>,
     offset_words: CardBuffer<'c, u32>,
@@ -139,7 +152,7 @@ impl<'c> ResidentMoment<'c> {
         let periods: Vec<u64> = field.rings().iter().map(|ring| ring.period()).collect();
         if let Some(ring) = periods.iter().position(|d| *d >= PERIOD_CEILING) {
             return Err(DeviceError::Shape {
-                what: "a ring period within the kernel's 32-bit phase scan",
+                what: "a ring period within the resident phase wire and exact scan bound",
                 expected: PERIOD_CEILING as usize,
                 found: periods[ring] as usize,
             });
@@ -149,7 +162,7 @@ impl<'c> ResidentMoment<'c> {
         let mut chart = Vec::with_capacity(rings * alphabet);
         for ring in field.rings() {
             for code in 0..alphabet {
-                chart.push(u8::from(ring.fits(ring.port(code))));
+                chart.push(u64::from(ring.fits(ring.port(code))));
             }
         }
         let phases = (0..rings)
@@ -178,10 +191,12 @@ impl<'c> ResidentMoment<'c> {
             .collect::<Vec<u32>>();
         Ok(Self {
             card,
+            field: field.clone(),
             alphabet,
             lift: current.lift().to_vec(),
             opening: current.lift().to_vec(),
             cells: 0,
+            valid: true,
             chart: card.upload(&chart)?,
             period_words: card.upload(&period_words)?,
             source_words: card.upload(&words(&sources, "a source ring within 32 bits")?)?,
@@ -204,17 +219,20 @@ impl<'c> ResidentMoment<'c> {
     /// **Ingest cells in order** at the layout derived from the card's census: the lift point's
     /// selective steps, then the phase-binned and offset counts on every source ring, then the
     /// held cells. Stops after the cell whose step carries the joint clock out, and reports it.
-    pub fn ingest(&mut self, codes: &[usize]) -> Result<Ingested, DeviceError> {
-        Ok(self.ingest_in(codes, None)?.0)
+    pub fn ingest(&mut self, encoded: &Encoded) -> Result<Ingested, DeviceError> {
+        Ok(self.ingest_in(encoded, None)?.0)
     }
 
     /// The ingest with the block narrowed to at most `lanes` threads (a realization choice that
     /// changes no value), returning the layout it ran at.
     pub fn ingest_in(
         &mut self,
-        codes: &[usize],
+        encoded: &Encoded,
         lanes: Option<u32>,
     ) -> Result<(Ingested, Layout), DeviceError> {
+        self.ensure_valid()?;
+        self.field.admit(encoded)?;
+        let codes: Vec<usize> = encoded.classes_read().collect();
         if let Some(&code) = codes.iter().find(|code| **code >= self.alphabet) {
             return Err(DeviceError::Hnn(HnnError::CellOutside {
                 code,
@@ -234,16 +252,61 @@ impl<'c> ResidentMoment<'c> {
         {
             return Err(DeviceError::Hnn(HnnError::CountOverflow));
         }
+        // Reuse the existing exact owner for admission: its consumer checks the founded squares
+        // at each actually admitted occurrence. Stop at the same first carry as the kernel, so
+        // an occurrence outside this receipt's prefix is not compared or counted.
+        let mut expected_lift = Current::at(&self.field, self.lift.clone())?;
+        let mut expected = Ingested {
+            cells: 0,
+            carry_out: false,
+        };
+        for at in 0..encoded.len() {
+            let step = expected_lift.step(&self.field, encoded, at)?;
+            expected.cells = at + 1;
+            if step.carry_out {
+                expected.carry_out = true;
+                break;
+            }
+        }
         let card = self.card;
         let rings = self.periods.len();
         let entry = card.entry(INGEST_ENTRY)?;
         let layout = ingest_layout(card.census(), &entry, rings, codes.len(), lanes)?;
-        let staged = card.upload(&words(codes, "a cell code within 32 bits")?)?;
+        if encoded.is_empty() {
+            return Ok((expected, layout));
+        }
+        // Mount the actual digits of every class the tile scans may read, including occurrences
+        // after the first stopping cell. Only the admitted prefix is counted and committed.
+        // A mounted value is an encoding's actual resident transport face, not an inferred or
+        // authored table of answers.
+        let located = if encoded.located().is_some() {
+            let mut advances = vec![0u64; rings * self.alphabet];
+            for at in 0..encoded.len() {
+                let digits = encoded
+                    .advance(at)
+                    .ok_or(DeviceError::Hnn(HnnError::Unadmitted {
+                        reason: "the located occurrence has no transport digits",
+                    }))?;
+                let class = codes[at];
+                for (g, (&digit, &period)) in digits.iter().zip(&self.periods).enumerate() {
+                    if digit >= period {
+                        return Err(DeviceError::Hnn(HnnError::Unadmitted {
+                            reason: "a located digit lies outside its admitted ring period",
+                        }));
+                    }
+                    advances[g * self.alphabet + class] = digit;
+                }
+            }
+            Some(card.upload(&advances)?)
+        } else {
+            None
+        };
+        let staged = card.upload(&words(&codes, "a cell class within 32 bits")?)?;
         let mut codes_ptr = staged.device_ptr();
         let mut cells = cells_wire;
         let mut rings_wire = rings as u32;
         let mut periods = self.period_words.device_ptr();
-        let mut chart = self.chart.device_ptr();
+        let mut chart = located.as_ref().unwrap_or(&self.chart).device_ptr();
         let mut alphabet = self.alphabet as u32;
         let mut sources_wire = self.sources.len() as u32;
         let mut sources = self.source_words.device_ptr();
@@ -277,13 +340,33 @@ impl<'c> ResidentMoment<'c> {
             &mut paired_base as *mut _ as *mut c_void,
             &mut receipt as *mut _ as *mut c_void,
         ];
+        // A refused or failed launch/fetch may already have changed the card. Only a receipt
+        // checked against the exact owner can make this instance usable again.
+        self.valid = false;
         card.launch(INGEST_ENTRY, &layout, &mut params)?;
         let read = card.fetch(&self.receipt)?;
         let consumed = read[0];
-        for (lift, advance) in self.lift.iter_mut().zip(&read[2..]) {
+        if consumed != expected.cells as u64 || read[1] != u64::from(expected.carry_out) {
+            return Err(DeviceError::Hnn(HnnError::Shape {
+                what: "the resident ingest prefix against the exact field owner",
+                expected: expected.cells,
+                found: consumed as usize,
+            }));
+        }
+        let mut actual_lift = self.lift.clone();
+        for (lift, advance) in actual_lift.iter_mut().zip(&read[2..]) {
             *lift += *advance;
         }
+        if actual_lift.as_slice() != expected_lift.lift() {
+            return Err(DeviceError::Hnn(HnnError::Shape {
+                what: "the resident ingest lift against the exact field owner",
+                expected: 0,
+                found: 1,
+            }));
+        }
+        self.lift = actual_lift;
         self.cells += consumed;
+        self.valid = true;
         Ok((
             Ingested {
                 cells: consumed as usize,
@@ -293,7 +376,23 @@ impl<'c> ResidentMoment<'c> {
         ))
     }
 
-    /// `λ`, the lift point the moment's ingests have reached.
+    /// Whether every mutating device operation has a checked successful receipt. A false
+    /// reading is terminal for this instance; drop it and open a new moment.
+    pub fn is_valid(&self) -> bool {
+        self.valid
+    }
+
+    fn ensure_valid(&self) -> Result<(), DeviceError> {
+        if !self.valid {
+            return Err(DeviceError::Hnn(HnnError::Unadmitted {
+                reason: "the resident moment has an unchecked device mutation; discard it",
+            }));
+        }
+        Ok(())
+    }
+
+    /// `λ`, the lift point in the last checked receipt. After invalidation this is diagnostic
+    /// host state, not the device's current lift (see [`Self::is_valid`]).
     pub fn lift(&self) -> &[BigInt] {
         &self.lift
     }
@@ -303,23 +402,27 @@ impl<'c> ResidentMoment<'c> {
         &self.opening
     }
 
-    /// The cells ingested since the open, `n`.
+    /// The cells in the last checked receipt, `n`. After invalidation this is diagnostic host
+    /// state, not a reading of the device buffers (see [`Self::is_valid`]).
     pub fn cells(&self) -> u64 {
         self.cells
     }
 
     /// The lift point as the host's [`Current`].
     pub fn current(&self, field: &Field) -> Result<Current, DeviceError> {
+        self.ensure_valid()?;
         Ok(Current::at(field, self.lift.clone())?)
     }
 
     /// **The rings' phase classes on the card** (a transfer).
     pub fn phases(&self) -> Result<Vec<u32>, DeviceError> {
+        self.ensure_valid()?;
         self.card.fetch(&self.phases)
     }
 
     /// **The counts read back** (a transfer).
     pub fn counts(&self) -> Result<MomentCounts, DeviceError> {
+        self.ensure_valid()?;
         Ok(MomentCounts {
             alphabet: self.alphabet,
             periods: self.periods.clone(),
@@ -335,6 +438,7 @@ impl<'c> ResidentMoment<'c> {
     /// **The held cells, most recent first** (`win[1], win[2], …`), `None` before enough
     /// cells (a transfer).
     pub fn window(&self) -> Result<Vec<Option<usize>>, DeviceError> {
+        self.ensure_valid()?;
         let words = self.card.fetch(&self.window)?;
         let (valid, cells) = (words[0] as usize, &words[1..]);
         Ok((1..cells.len() + 1)
@@ -346,6 +450,7 @@ impl<'c> ResidentMoment<'c> {
     /// host's `PendingRatio` copies the moment's counts at its cut, and its later reads read that
     /// copy, never the moment that later ingests extend). Nothing crosses the bus.
     pub fn snapshot(&self) -> Result<MomentSnapshot<'c>, DeviceError> {
+        self.ensure_valid()?;
         let card = self.card;
         let first = card.alloc::<u64>(self.first.len())?;
         let paired = card.alloc::<u64>(self.paired.len())?;
@@ -365,20 +470,24 @@ impl<'c> ResidentMoment<'c> {
     /// classes; the counts and the held cells are untouched): the phases written (a transfer of one
     /// word per ring) and the lift kept.
     pub fn rekey(&mut self, field: &Field, current: &Current) -> Result<(), DeviceError> {
+        self.ensure_valid()?;
         let phases = (0..field.rings().len())
             .map(|g| {
                 let phase = current.phase(field, g)?;
                 Ok(u32::try_from(phase).expect("a phase lies below its period"))
             })
             .collect::<Result<Vec<u32>, DeviceError>>()?;
+        self.valid = false;
         self.card.write(&self.phases, 0, &phases)?;
         self.lift = current.lift().to_vec();
+        self.valid = true;
         Ok(())
     }
 
     /// **The phase rows `M_g[c]` of a source ring as a resident operand**: `d_g` vectors of `|A|`
     /// counts at `L_x = 0`, read as signed 64-bit words under the moment's word certificate.
     pub fn phase_operand(&self, ring: usize) -> Result<Operand<'_>, DeviceError> {
+        self.ensure_valid()?;
         let s = source_index(&self.sources, ring)?;
         let octets = self.first_base[s] * core::mem::size_of::<u64>() as u64;
         Ok(Operand {

@@ -118,7 +118,9 @@ fn a_key_familys_identity_is_unmoved_by_a_passage() {
     let sheets = hand_moire(MoireClass::Sheets).emit(24);
     let mut declared = FieldDeclaration::campaign_one(1 << 16);
     declared.rings[1].lock = (0..7).collect();
-    let field = Field::declare(declared).unwrap();
+    // Seven classes, the crib ring's ports (the population's crib field, THE_MACHINE guard 9).
+    declared.alphabet = 7;
+    let field = Field::declare(declared.by_lattice_rule()).unwrap();
     let configurations = [0u64, 0, 0, 0];
     let crib = RotorCrib::draw(&field, 1, &configurations, 64, &mut Draw::new(41)).unwrap();
     let tuple = drawn_sheets().emit(60);
@@ -462,7 +464,9 @@ fn a_species_splits_when_the_admitted_future_grows() {
 fn a_rotor_gauge_orbit_is_one_species() {
     let mut declared = FieldDeclaration::campaign_one(1 << 16);
     declared.rings[1].lock = (0..7).collect();
-    let field = Field::declare(declared).unwrap();
+    // Seven classes, the crib ring's ports (the population's crib field, THE_MACHINE guard 9).
+    declared.alphabet = 7;
+    let field = Field::declare(declared.by_lattice_rule()).unwrap();
     let configurations = [0u64, 0, 0, 0];
     let crib = RotorCrib::draw(&field, 1, &configurations, 64, &mut Draw::new(41)).unwrap();
     let mut keys = KeyFamily::rotor(&field, 1, &configurations, 1 << 24, 0).unwrap();

@@ -119,8 +119,8 @@ pub struct PairDeposit {
     pub source: SourceStep,
 }
 
-/// The exterior chart's one class at a ring's port (the residue chart holds one class at each port
-/// when `|A| ≤ d_g`); refused otherwise.
+/// The encoding's one class at a ring's port: each class is its own port (THE_MACHINE guard 9: no
+/// fold), so a port holds at most one; refused at a port that holds none.
 fn class_at(field: &Field, ring: usize, port: usize) -> Result<usize, HnnError> {
     let geometry = field.ring(ring);
     let classes: Vec<usize> = (0..field.alphabet())
@@ -129,7 +129,7 @@ fn class_at(field: &Field, ring: usize, port: usize) -> Result<usize, HnnError> 
     match classes.as_slice() {
         [class] => Ok(*class),
         _ => Err(HnnError::Shape {
-            what: "a located port holding one class of the exterior chart",
+            what: "a located port holding one class of the encoding",
             expected: 1,
             found: classes.len(),
         }),

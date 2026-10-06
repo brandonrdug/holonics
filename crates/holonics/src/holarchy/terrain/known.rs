@@ -15,6 +15,10 @@
 //!   drawn start and step, `x_t = x_0 + s t (mod |A|)`. Moved from the notebook (`terrain_pairs`,
 //!   `order_pairs`) unchanged in law and in the draw's order, so every receipt they wrote reads the
 //!   same passages.
+//! - [`KnownTruth::uniform`]: drawn cells on `ℤ/|A|` with no source structure, the synthetic
+//!   fields' passages (the moment's, the port's and the card's parity reads).
+//! - [`KnownTruth::interrupted`]: the period-four word `0, 1, 2, 1` interrupted by drawn cells,
+//!   the port's and the card's parity source.
 //! - [`KnownTruth::stepped`]: the located transport's terrain
 //!   (`compression::keys::transport::SteppedTerrain`), `u_k = λ(c(ℓ(k)))`, `ℓ(k+1) = ℓ(k) + A(u_k)`,
 //!   one passage per declared key.
@@ -105,6 +109,74 @@ impl KnownTruth {
             })
             .collect();
         Ok(Self::emitted(classes, passages))
+    }
+
+    /// **The uniform terrain** (the synthetic fields' drawn cells, no source structure): `count`
+    /// passages of `length` cells, each drawn uniformly on `ℤ/classes` from `Draw::new(seed)` in
+    /// order. Refused when the classes are empty.
+    pub fn uniform(
+        classes: usize,
+        seed: u64,
+        count: usize,
+        length: usize,
+    ) -> Result<Self, TerrainError> {
+        if classes == 0 {
+            return Err(TerrainError::Declaration {
+                what: "the uniform terrain",
+                reason: "it declares at least one class",
+            });
+        }
+        let mut draw = Draw::new(seed);
+        let passages = (0..count)
+            .map(|_| (0..length).map(|_| draw.below(classes)).collect())
+            .collect();
+        Ok(Self::emitted(classes, passages))
+    }
+
+    /// **The interrupted cycle** (the moment's, the port's and the card's parity source): `count`
+    /// passages of `length` cells from `Draw::new(seed)`, cell `k` a uniform class of `ℤ/classes`
+    /// where a draw below 8 reads 0 (one cell in eight), else the period-four word `0, 1, 2, 1` at
+    /// `k mod 4`, read on `ℤ/classes`. Refused when the classes are empty.
+    pub fn interrupted(
+        classes: usize,
+        seed: u64,
+        count: usize,
+        length: usize,
+    ) -> Result<Self, TerrainError> {
+        if classes == 0 {
+            return Err(TerrainError::Declaration {
+                what: "the interrupted cycle",
+                reason: "it declares at least one class",
+            });
+        }
+        let mut draw = Draw::new(seed);
+        let passages = (0..count)
+            .map(|_| {
+                (0..length)
+                    .map(|k| {
+                        if draw.below(8) == 0 {
+                            draw.below(classes)
+                        } else {
+                            [0, 1, 2, 1][k % 4] % classes
+                        }
+                    })
+                    .collect()
+            })
+            .collect();
+        Ok(Self::emitted(classes, passages))
+    }
+
+    /// [definition; agent-inferred, October 5] **A test's declared words** (in-crate tests only:
+    /// this exists in no build of the library, so no harness or file reaches it). The field's laws
+    /// are tested on declared words (`[1, 3, 2]`, a run of zeros); a word outside `ℤ/classes` is a
+    /// test defect and panics.
+    #[cfg(test)]
+    pub(crate) fn declared(classes: usize, passages: Vec<Vec<usize>>) -> Self {
+        assert!(
+            passages.iter().flatten().all(|&class| class < classes),
+            "a declared word lies on its classes"
+        );
+        Self::emitted(classes, passages)
     }
 
     /// **The stepped terrain's passages** (`SteppedTerrain::passage`), one of `length` cells from

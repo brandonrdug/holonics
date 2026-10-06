@@ -73,6 +73,7 @@ use std::time::Instant;
 use holonics::compression::landmark::context::StopPrior;
 use holonics::geometry::RatVec3;
 use holonics::geometry::screw::ScrewGenerator;
+use holonics::hnn::Encoded;
 use holonics::hnn::constitution::{CAMPAIGN_ONE_BUDGET, Constitution};
 use holonics::hnn::field::{
     ConstitutionRead, ContactDeclaration, CribDeclaration, Current, Field, FieldDeclaration,
@@ -165,14 +166,19 @@ fn declare(declared: &Declared) -> Field {
     .expect("the declared field")
 }
 
-/// **A request's moment**, ingested from rest (past any carry-out: the moment's own law continues).
-fn ingest(field: &Field, request: &[usize]) -> (Current, SourceMoment) {
+/// **A request's moment**, ingested from rest (past any carry-out: the moment's own law continues);
+/// the request enters encoded (THE_MACHINE guard 9).
+fn ingest(field: &Field, request: &Encoded) -> (Current, SourceMoment) {
     let mut current = Current::at_rest(field);
     let mut moment = SourceMoment::open(field, &current);
     let mut fed = 0;
     while fed < request.len() {
         fed += moment
-            .ingest(field, &mut current, &request[fed..])
+            .ingest(
+                field,
+                &mut current,
+                &request.part(fed..request.len()).expect("a part of the request"),
+            )
             .expect("a request in the chart")
             .cells;
     }
@@ -323,20 +329,11 @@ fn main() {
             arguments[5].parse().expect("a count"),
             &arguments[6],
         ),
-        // Lane B's key location and lane C's release, unchanged, on a text cut through the byte
-        // chart (research/records/2026-10-05_THE_SAME_PATH_ON_TEXT_KEY_LOCATION_AND_THE_RELEASE_ON_THE_BYTE_CHART.md).
+        // [historical; retired October 5] Lane B's key location and lane C's release on a text cut
+        // through the byte chart: its result is THE_MACHINE guard 9's refusal (`keys_loop::text`).
         (Some("executed"), Some("text")) => {
-            let pin = pinned(&arguments[5], "executed text", clock, true);
-            let at = |k: usize| arguments.get(k).map(|a| a.parse().expect("a count"));
-            let range = at(8).zip(at(9));
-            keys_loop::text(
-                &arguments[3],
-                &arguments[4],
-                &arguments[6],
-                arguments.get(7).map(String::as_str),
-                range,
-                pin.unit_bound_ms(),
-            )
+            pinned(&arguments[5], "executed text", clock, true);
+            keys_loop::text(&arguments[3])
         }
         // The first repair terrain: the located pair restricts the erased cells from both sides
         // (research/records/2026-10-05_REPAIR_BY_REFLECTION_THE_LOCATED_PAIR_RESTRICTS_THE_ERASED_CELLS_FROM_BOTH_SIDES.md).
@@ -351,7 +348,7 @@ fn main() {
         // (research/records/2026-10-05_TEXT_REPAIR_BY_LOCAL_KEYS_GLUED_ON_OVERLAPS.md).
         (Some("executed"), Some("text-repair")) => {
             pinned(&arguments[5], "executed text-repair", clock, true);
-            text_repair::run(&arguments[3], &arguments[4], &arguments[6])
+            text_repair::run(&arguments[3])
         }
         // The located transport: each occurrence steps the rings by its located advance
         // (research/records/2026-10-05_THE_LOCATED_TRANSPORT_EACH_OCCURRENCE_STEPS_THE_RINGS_BY_ITS_LOCATED_ADVANCE.md).

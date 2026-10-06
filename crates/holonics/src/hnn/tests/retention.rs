@@ -10,6 +10,7 @@ use std::collections::BTreeSet;
 use num_traits::{Signed, Zero};
 
 use super::learning::{generic, moment, path_with, phases, six_path};
+use crate::hnn::tests::support::encoded;
 use super::support::Draw;
 use crate::hnn::HnnError;
 use crate::hnn::constitution::{
@@ -21,7 +22,7 @@ use crate::hnn::port::{Deposit, ExecutionPort, Handle};
 use crate::hnn::propagation::Operands;
 use crate::hnn::ratio::{HolonRatio, target_phases};
 use crate::hnn::receiving::{ActiveAddress, ReceivingPhases};
-use crate::hnn::reference::{Reception, Reference, compose, one_hot};
+use crate::hnn::reference::{Reception, Reference, compose};
 use crate::hnn::retention::{Diamond, Opens, collapse, loci, retained, retained_on_motion};
 use crate::hnn::word::Word;
 use crate::ratio::{Rat, integer, rat};
@@ -292,7 +293,7 @@ fn deposit_try(
 fn compose_deposit(field: &Field, theta: &Constitution, pending: &PendingRatio) -> Deposit {
     let (word, faces) = pending.read(field, theta).unwrap();
     let targets = [1usize, 0];
-    let anchors = target_phases(field, pending.anchor(), 2, &targets).unwrap();
+    let anchors = target_phases(field, pending.anchor(), 2, &encoded(field, &targets)).unwrap();
     let ratio = HolonRatio::compare(faces, &targets, &anchors).unwrap();
     let back = word
         .pull_back(
@@ -511,10 +512,11 @@ fn the_collapse_deletes_whole_loci() {
 
 /// Ingest zeros until the joint clock carries out.
 fn to_the_carry_out(reference: &Reference, resident: &mut crate::hnn::reference::Resident) {
-    let (moment, _) = reference.ingest(resident, None, &[]).unwrap();
+    let field = resident.field().clone();
+    let (moment, _) = reference.ingest(resident, None, &encoded(&field, &[])).unwrap();
     for _ in 0..4096 {
         let (_, ingested) = reference
-            .ingest(resident, Some(&moment), &one_hot(&[0]))
+            .ingest(resident, Some(&moment), &encoded(&field, &[0]))
             .unwrap();
         if ingested.forward.present().unwrap().carry_out {
             return;
@@ -607,7 +609,7 @@ fn the_boundary_reaches_the_pending_ratios_and_refuses_out_of_turn() {
     to_the_carry_out(&reference, &mut resident);
     assert_eq!(
         reference
-            .ingest(&mut resident, None, &one_hot(&[1]))
+            .ingest(&mut resident, None, &encoded(&field, &[1]))
             .unwrap_err(),
         HnnError::AeonAwaitingClose
     );
@@ -616,7 +618,7 @@ fn the_boundary_reaches_the_pending_ratios_and_refuses_out_of_turn() {
     let (lost, _) = reference.refine(&mut resident, &moment, &far).unwrap();
     let (compared, _) = reference.refine(&mut resident, &moment, &far).unwrap();
     let (staged, _) = reference
-        .compare(&mut resident, compared, &one_hot(&[1]))
+        .compare(&mut resident, compared, &encoded(&field, &[1]))
         .unwrap();
     let wider = ReceivingPhases::declare(
         &field,
@@ -740,7 +742,7 @@ fn a_releasing_collapse_releases_the_carried_motion_its_material_held() {
     let mut resident = reference
         .mount_with(&field, &Current::at_rest(&field), generic(&field, 23))
         .unwrap();
-    let (moment, _) = reference.ingest(&mut resident, None, &[]).unwrap();
+    let (moment, _) = reference.ingest(&mut resident, None, &encoded(&field, &[])).unwrap();
     let phases = resident.admitted()[0].clone();
     let mut draw = Draw::new(23);
     let cells: Vec<usize> = (0..64)
@@ -749,7 +751,7 @@ fn a_releasing_collapse_releases_the_carried_motion_its_material_held() {
     let mut position = 0;
     loop {
         let (id, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
-        let targets = one_hot(&cells[position..position + 2]);
+        let targets = encoded(&field, &cells[position..position + 2]);
         let (staged, _) = reference.compare(&mut resident, id, &targets).unwrap();
         reference.deposit(&mut resident, staged).unwrap();
         let (_, ingested) = reference
@@ -765,7 +767,7 @@ fn a_releasing_collapse_releases_the_carried_motion_its_material_held() {
     let (id, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
     let (other, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
     reference
-        .compare(&mut resident, other, &one_hot(&[1, 2]))
+        .compare(&mut resident, other, &encoded(&field, &[1, 2]))
         .unwrap();
     let held = resident.carried().cloned().expect("the refine writes the carry");
     assert!(
@@ -787,10 +789,10 @@ fn a_releasing_collapse_releases_the_carried_motion_its_material_held() {
         }
     }
     // The collapsed medium reads on: a word opens on the released carry, and is compared.
-    let _ = reference.compare(&mut resident, id, &one_hot(&[0, 1]));
+    let _ = reference.compare(&mut resident, id, &encoded(&field, &[0, 1]));
     let (fresh, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
     reference
-        .compare(&mut resident, fresh, &one_hot(&[2, 3]))
+        .compare(&mut resident, fresh, &encoded(&field, &[2, 3]))
         .unwrap();
     reference.read(&resident).unwrap();
 }
@@ -810,10 +812,10 @@ fn a_collapsed_constitution_remounts_and_reads_alike() {
         .mount_with(&field, &Current::at_rest(&field), generic(&field, 23))
         .unwrap();
     let phases = resident.admitted()[0].clone();
-    let (moment, _) = reference.ingest(&mut resident, None, &[]).unwrap();
+    let (moment, _) = reference.ingest(&mut resident, None, &encoded(&field, &[])).unwrap();
     let (pending, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
     let (staged, _) = reference
-        .compare(&mut resident, pending, &one_hot(&[1, 0]))
+        .compare(&mut resident, pending, &encoded(&field, &[1, 0]))
         .unwrap();
     reference.discard(&mut resident, Handle::Staged(staged)).unwrap();
     to_the_carry_out(&reference, &mut resident);
@@ -837,11 +839,11 @@ fn a_collapsed_constitution_remounts_and_reads_alike() {
     assert_eq!(remounted.carried(), resident.carried());
     let next = |resident: &mut crate::hnn::reference::Resident| {
         let (moment, _) = reference
-            .ingest(resident, None, &one_hot(&[1, 2, 3]))
+            .ingest(resident, None, &encoded(&field, &[1, 2, 3]))
             .unwrap();
         let (pending, refined) = reference.refine(resident, &moment, &phases).unwrap();
         let (_, compared) = reference
-            .compare(resident, pending, &one_hot(&[2, 1]))
+            .compare(resident, pending, &encoded(&field, &[2, 1]))
             .unwrap();
         (refined.forward, compared.forward, compared.deposit)
     };

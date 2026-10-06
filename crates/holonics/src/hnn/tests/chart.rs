@@ -358,7 +358,10 @@ fn a_resident_reads_again_its_certified_charts() {
 /// the charts the first left, every certificate at most the target.
 #[test]
 fn a_deposit_moves_the_charts_by_warm_refinement() {
-    let field = super::learning::chain();
+    // [agent-inferred, October 5; THE_MACHINE guard 9] On the two-class chain, the smallest fold-free
+    // fixture of the claim: on the chain with its source ring of period 4 this draw's word reaches an
+    // operator whose integer scale `D·2^L_c = 2^129` passes the 128-bit carrier.
+    let field = super::learning::chain_two();
     let theta = generic(&field, 26);
     let (current, _) = moment(&field, 27, 9);
     let mut charts = Charts::new();

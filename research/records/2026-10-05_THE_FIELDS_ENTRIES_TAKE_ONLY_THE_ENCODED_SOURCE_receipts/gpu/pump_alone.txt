@@ -1,0 +1,52 @@
+   Compiling holonics-cuda v0.1.0 (./crates/holonics-cuda)
+warning: method `with_rank` is never used
+    --> crates/holonics/src/hnn/receiving.rs:1588:19
+     |
+1285 | impl ReceivingPhases {
+     | -------------------- method in this implementation
+...
+1588 |     pub(crate) fn with_rank(self, rank: usize) -> Self {
+     |                   ^^^^^^^^^
+     |
+     = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `holonics` (lib) generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.69s
+     Running unittests src/lib.rs (target/debug/deps/holonics_cuda-162b84abbaed056d)
+
+running 1 test
+test hnn::port_tests::the_card_carries_the_pump_as_the_reference ... the normal-law mirror: 55 carried; 4 declined (empty 1, off the dyadics 3, past a word 0, the kernel 0, the read 0); 11 skipped (a locus stepped again 0, no normal law 0, a moved prior 11)
+pumped chain, Carry(Nothing): Compared { ingests: 15, refines: 14, releases: 4, compares: 14, deposits: 14, refused: 0, stepped_loci: 97, discards: 0, boundaries: 1, keys: 1, reads: 1, landmarks: 28, resonator_material_changes: 0, traffic: Traffic { words: 804512, returns: 161952, publications: 3216, ingest: 716, word_count: 32, return_count: 14 }, mirror: NormalMirror { carried: 55, empty: 1, off_dyadic: 3, past_word: 0, kernel: 0, read: 0, repeated: 0, lawless: 0, moved: 11 }, received: 13, held: 0, crossed: 8, pumped: 13, resonator_held: 0, prior_reads: 12, prior_moves: 11 }
+  window 1, cells 0 to 2; 53 ms
+  window 2, cells 2 to 4; 61 ms
+  window 3, cells 4 to 6; 3194 ms
+  window 4, cells 6 to 8; 3225 ms
+  window 5, cells 8 to 10; 3216 ms
+  window 6, cells 10 to 12; 3215 ms
+  window 7, cells 12 to 14; 3221 ms
+  window 8, cells 14 to 16; 3214 ms
+  window 9, cells 16 to 18; 3197 ms
+  window 10, cells 18 to 20; 3192 ms
+  window 11, cells 20 to 22; 3193 ms
+  window 12, cells 22 to 24; 3187 ms
+  window 13, cells 24 to 26; 3189 ms
+  window 14, cells 26 to 28; 3229 ms
+  window 1, cells 0 to 2; 59 ms
+  window 2, cells 2 to 4; 51 ms
+  window 3, cells 4 to 6; 3173 ms
+  window 4, cells 6 to 8; 3218 ms
+  window 5, cells 8 to 10; 3196 ms
+  window 6, cells 10 to 12; 3209 ms
+  window 7, cells 12 to 14; 3185 ms
+  window 8, cells 14 to 16; 3202 ms
+  window 9, cells 16 to 18; 3170 ms
+  window 10, cells 18 to 20; 3189 ms
+  window 11, cells 20 to 22; 3183 ms
+  window 12, cells 22 to 24; 3174 ms
+  window 13, cells 24 to 26; 3168 ms
+  window 14, cells 26 to 28; 3168 ms
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 39 filtered out; finished in 154.90s
+
+exit 0 wall 155632 ms
