@@ -1,0 +1,12 @@
+{
+  "wall_ns": 6634927976,
+  "peak_RSS_KiB": 29356,
+  "source_manifest": {
+    "sha256": "e088666e6b2c46deedd8bda6b11437d41fbaf97b9ff22d304741c5c5ac0b80d9",
+    "bytes": 47680
+  },
+  "current_source_verified": true,
+  "cache_count": 2388,
+  "compiler_launched": false,
+  "preserved_full_preparation_failure": "All previous cache/link/runtime failures immutable; new committed a730 target diagnostic; selected tested cache shape omits unused incremental/old example outputs; no prior native job for this source."
+}

@@ -1,0 +1,71 @@
+{
+  "passed": false,
+  "label": "hnn-behavior-a730d824-host-cuda-link-20261006-v1",
+  "scientific_job": false,
+  "deferred_lock_busy": false,
+  "final_CPU_ns": 609935000,
+  "CPU_reading_grain_ns": 1000,
+  "aggregate_CPU_limit_us": 128000000,
+  "final_CPU_source": "systemd retained oneshot CPUUsageNSec after all group processes exit",
+  "CPU_kernel_hard_total_limit": false,
+  "sampled_stop_margin_us": 4000000,
+  "aggregate_CPU_within_limit": true,
+  "no_overshoot_accepted": true,
+  "wall_ns": 748141125,
+  "projection_ns": 65000000000,
+  "wall_source": "external monotonic_ns through final property read",
+  "quiescent": true,
+  "completion_event": "oneshot start job completed; no polling",
+  "unit_properties": {
+    "Description": "Owned holonics admission hnn-behavior-a730d824-host-cuda-link-20261006-v1 9688995a2aec075541eeb0422178e25e",
+    "LoadState": "loaded",
+    "ActiveState": "failed",
+    "SubState": "failed",
+    "InvocationID": "0114a9428d634e5f989852d3a9c10df0",
+    "Result": "exit-code",
+    "ExecMainStatus": "125",
+    "ControlGroup": "",
+    "MemoryPeak": "161398784",
+    "CPUUsageNSec": "609935000",
+    "TasksCurrent": "[not set]"
+  },
+  "outer_error": null,
+  "unit_start_exit": 1,
+  "unit_start_stdout": "",
+  "unit_start_stderr": "",
+  "config": {
+    "sha256": "3530b4fd645e80c0cabcfd21d6ed38a163ccab0ba2c9b9137f0f34d85f7952e6",
+    "bytes": 155811
+  },
+  "receipt_pins": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-host-cuda-link-20261006-v1.config.json": {
+      "sha256": "3530b4fd645e80c0cabcfd21d6ed38a163ccab0ba2c9b9137f0f34d85f7952e6",
+      "bytes": 155811
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-host-cuda-link-20261006-v1.external-lease.json": {
+      "sha256": "230f4efdfdb826451320daea38e702dc1efbd003b20289f309708b9dbd784be9",
+      "bytes": 487
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-host-cuda-link-20261006-v1.lease-identity.json": {
+      "sha256": "5fec0f0e623e34c01714a63dc2b66e760dafe71353ce731941fbe7a88f0b3768",
+      "bytes": 565
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-host-cuda-link-20261006-v1.failure.json": {
+      "sha256": "be93db182d1251d815df23c3198e5aadfdd26dbe72d28c2482e69e0a4ec4e6ef",
+      "bytes": 299
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-host-cuda-link-20261006-v1.publication.json": {
+      "sha256": "d7bd3e1ed6a6939d17eab47d051a1ff56f537708367a1d0dde86a8fd5cf02837",
+      "bytes": 1031
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-host-cuda-link-20261006-v1.stage-quiescence.json": {
+      "sha256": "7f973dfa32a60efec03ca7e2e28cb43b433dc7cceb8b084a8589d2bd13b3a437",
+      "bytes": 137
+    }
+  },
+  "launcher_outside_native_group": true,
+  "lease_owner_outside_capped_group": true,
+  "lease_held_through_final_CPU_read_and_publication": true,
+  "stage_passed_before_cleanup": false,
+  "requires_cleanup_acceptance": true
+}

@@ -1,0 +1,1860 @@
+{
+  "label": "hnn-behavior-a730d824-host-cuda-link-20261006-v1",
+  "scope_unit": "holonics-prune-admission-hnn-behavior-a730d824-host-cuda-link-20261006-v1",
+  "stage_kind": "native_build",
+  "scientific_job": false,
+  "cwd": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/source-v1",
+  "scope": "Exact committed a730 single9Word retained-reader synthetic behavior consumer; selected host/CUDA/example no-run compilation, no scientific/GPU runtime.",
+  "source_base": "373ee48ababdc831331d72099ad8caf72d688376",
+  "projection_ns": 65000000000,
+  "aggregate_cpu_limit_us": 128000000,
+  "aggregate_cpu_stop_margin_us": 4000000,
+  "group_memory_max_bytes": 4294967296,
+  "address_space_max_bytes": 4294967296,
+  "minimum_MemAvailable_KiB": 8388608,
+  "system_floor_MemAvailable_KiB": 4194304,
+  "thread_budget": 8,
+  "outputs": [],
+  "inputs": [
+    "/home/b/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo",
+    "/home/b/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc",
+    "/home/b/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/libLLVM-21-rust-1.92.0-stable.so",
+    "/home/b/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/librustc_driver-d31eb41759495bb2.so",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/bounded_stage_v1.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/final_stage.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/build/holonics-cuda-0a0b5429f4231006/out/hnn.ptx",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/build/holonics-cuda-0a0b5429f4231006/out/kernels.sha256",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/build/holonics-cuda-0a0b5429f4231006/out/tree.ptx",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/build/holonics-cuda-d9ad51fae469d445/out/hnn.ptx",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/build/holonics-cuda-d9ad51fae469d445/out/kernels.sha256",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/build/holonics-cuda-d9ad51fae469d445/out/tree.ptx",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libadler2-8ddbfa9477eb984f.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libahash-558768623df4663b.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libaho_corasick-7a59af228b3d9bc5.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libautocfg-49824861d9b9f015.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libautocfg-49824861d9b9f015.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libautocfg-8fad447444a29888.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libautocfg-8fad447444a29888.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libbase64-f7564408245538ae.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libbitflags-6c9ae5c363e32d68.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libbitflags-7af03ff3dd9b0808.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libbitflags-85a04f3d8f6ad245.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libbitflags-85a04f3d8f6ad245.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libbitflags-aa1a47e391994cd7.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libblock_buffer-09e3c28633c14d81.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libblock_buffer-655a92828a7c26af.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libblock_buffer-ae6563f7cc06d68d.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libblock_buffer-b84c600cbbb55d51.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libblock_buffer-b84c600cbbb55d51.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libblock_buffer-f1f09f7064f0d3bf.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libblock_buffer-f1f09f7064f0d3bf.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libbytemuck-814df7a0ff6c9506.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libbyteorder_lite-b23754f5d3aa0269.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcastaway-974afcefc47f76af.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcc-d6f3e42c7038d765.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcc-d6f3e42c7038d765.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcfg_if-16f49e2043628444.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcfg_if-16f49e2043628444.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcfg_if-20192facbdd9f0b0.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcfg_if-2d20780be38939e6.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcfg_if-2d20780be38939e6.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcfg_if-5b0d4be6829fc8fe.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcfg_if-e720413b8edafa0a.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libclaxon-0fe527ec464c154d.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcompact_str-57b2c3e722b734db.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libconsole-34aeec246acb5b17.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libconst_oid-900b990a5634664a.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libconst_oid-bdbd633346f98822.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libconst_oid-bdbd633346f98822.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcpufeatures-716b7d326f337e94.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcpufeatures-8ecad47d6fded137.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcpufeatures-8ecad47d6fded137.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcpufeatures-dfe1b88f7de5011f.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcpufeatures-dfe1b88f7de5011f.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcpufeatures-f853003584d3fc07.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcpufeatures-fdae92bb8edf0078.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcrc32fast-69ea6609f925bfa8.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcrossbeam_deque-69b04a7e40895447.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcrossbeam_deque-69b04a7e40895447.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcrossbeam_deque-99a29020a7bb8a3c.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcrossbeam_deque-b92e4a43aea92bdd.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcrossbeam_epoch-ac40ee45a84b4be9.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcrossbeam_epoch-ac40ee45a84b4be9.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcrossbeam_epoch-b5b5a37215ab3a04.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcrossbeam_epoch-c38d6cbf594d143b.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcrossbeam_utils-57cd949fef0b6d3c.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcrossbeam_utils-70a3aee7cb089a51.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcrossbeam_utils-c9ce9a37b1c8cb8c.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcrossbeam_utils-c9ce9a37b1c8cb8c.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcrypto_common-3cd73791875fa064.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcrypto_common-72bdd94d7640b056.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcrypto_common-72bdd94d7640b056.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcrypto_common-a5332a858943e274.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcrypto_common-ac2cbf842899868b.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcrypto_common-ac2cbf842899868b.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcrypto_common-dc2e10469038786d.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libdarling-fdca939069f05c90.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libdarling-fdca939069f05c90.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libdarling_core-ffff8dba15aef50d.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libdarling_core-ffff8dba15aef50d.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libdarling_macro-b7586423e7dbc01b.so",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libdary_heap-ca1823966ced6047.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libderive_builder-efaf352f8dba5101.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libderive_builder_core-72fbf03a30d9090e.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libderive_builder_core-72fbf03a30d9090e.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libderive_builder_macro-564dba1a2b67166c.so",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libdigest-1a05543a86d9844c.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libdigest-6abf9cf075bf13e9.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libdigest-8286364ca7dfdfd9.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libdigest-8286364ca7dfdfd9.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libdigest-d283f020140dc634.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libdigest-f3ecc3e4c5d6669b.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libdigest-f3ecc3e4c5d6669b.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libeither-1ec8a15c03d402c6.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libeither-62301849af19b001.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libeither-62301849af19b001.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libeither-8f78749e0a1d09d4.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libesaxx_rs-7c6848ee90bca083.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libfastrand-b5805260b4e59e2a.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libfdeflate-45c8e4398e1ba0e6.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libfind_msvc_tools-20b5cef0e0b26060.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libfind_msvc_tools-20b5cef0e0b26060.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libflate2-acf236de1f77475a.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libfnv-4644d4661f025f86.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libfnv-4644d4661f025f86.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libgeneric_array-54c8f50c85979a8f.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libgeneric_array-54c8f50c85979a8f.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libgeneric_array-77c4e637611b42f0.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libgeneric_array-e27b0b4439542c99.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libgetrandom-97601a21df1010b3.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libhound-55627a994d90a6f1.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libhybrid_array-1f108564845291c4.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libhybrid_array-ae297c83c0696f5f.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libhybrid_array-ae297c83c0696f5f.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libident_case-649284103e8b873b.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libident_case-649284103e8b873b.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libimage-fa81552103927ade.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libindicatif-55ae297f6fcfe5c6.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libitertools-417eb96bee6c9dce.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libitoa-1fc6d3404db4e00a.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libitoa-87333a0d8f995d09.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libitoa-fc5c8f1745b88ffe.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libitoa-fc5c8f1745b88ffe.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/liblibc-51cd6541e39e8c4d.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/liblinux_raw_sys-ed34a42c920f706f.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/liblog-dfc22a749e5bd92b.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libmacro_rules_attribute-a4ab44a0455eb942.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libmacro_rules_attribute_proc_macro-bb1480de326d0722.so",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libmemchr-32daeb188d08e657.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libmemchr-64fdf34196895b21.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libmemchr-64fdf34196895b21.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libmemchr-b1ae9ce6e303a27b.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libminimal_lexical-0e86f6740b38f9bd.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libminiz_oxide-323b085015f38a2c.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libmonostate-8eff454d479a0a57.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libmonostate_impl-789d9df1ba47f41d.so",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libmoxcms-fb75d79ee9630312.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnom-9204cd3f6ab5f31b.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_bigint-2fd9247bafb8f23d.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_bigint-36e6095dd1d0f015.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_bigint-36e6095dd1d0f015.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_bigint-566fb31806ab7952.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_bigint-623b2a2ece9f0903.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_bigint-623b2a2ece9f0903.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_bigint-623bca0729b1f11d.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_bigint-623bca0729b1f11d.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_bigint-804781c1bb64cec6.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_bigint-81344f97c27e3e17.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_bigint-81344f97c27e3e17.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_bigint-96f49d4243d685c2.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_bigint-97e307883dcf91bc.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_bigint-97e307883dcf91bc.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_bigint-ae4b5f98659b1a1d.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_bigint-aefd309e4f2b1694.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_bigint-d9167e9e16e6fec4.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_bigint-e173dca09f6683ba.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_integer-03fa9f60eac0a1a7.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_integer-03fa9f60eac0a1a7.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_integer-58f87865cf287a72.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_integer-de01a73b927b0f2f.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_integer-ec23979970fd5af3.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_integer-ec23979970fd5af3.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_integer-f4d330e3e5e0192a.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_integer-f9bb5a08a614f6e2.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_rational-09e1dabfa40d0393.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_rational-12b3e11e87fa6de7.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_rational-144b4fb57ca96567.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_rational-161e9b6af3b7caad.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_rational-161e9b6af3b7caad.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_rational-3181697426248fba.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_rational-3181697426248fba.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_rational-5baa8d894785bbb1.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_rational-64825e91828d47bb.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_rational-64825e91828d47bb.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_rational-765ab549ee813f03.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_rational-7ecbd8cfd4ce6f57.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_rational-7ecbd8cfd4ce6f57.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_rational-96b6f964761ec741.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_rational-bf57fbbb00e3fe06.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_rational-bf57fbbb00e3fe06.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_rational-c6c6919f5733e65c.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_rational-f72a5e887b4592ee.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_traits-1af290354603b57b.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_traits-1af290354603b57b.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_traits-b4fdf05d6ef84062.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_traits-ba0c8130e2c16b7a.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnumber_prefix-6b130bdc63bf643b.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libonce_cell-05a8d2e5a504756a.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libonce_cell-2c1b787530c5e85d.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libonce_cell-2c1b787530c5e85d.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libonce_cell-58499e260ab16242.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libonce_cell-8308ecf2e0f34bb8.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libonig-186f9d7cd95ec0b5.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libonig_sys-c653546dd6259816.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libpaste-577a69ce6fdefcf7.so",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libpastey-f33f8b589fc635a5.so",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libpkg_config-f7b9a01e28014672.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libpkg_config-f7b9a01e28014672.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libpng-60e9842096e377e5.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libportable_atomic-2e55ef30e1d70e6b.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libppv_lite86-22b3cc2e7693530b.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libproc_macro2-579f357a2789d525.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libproc_macro2-579f357a2789d525.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libproc_macro2-620dad5adfc40f74.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libproc_macro2-620dad5adfc40f74.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libproc_macro2-dc715f84d16883f9.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libproc_macro2-dc715f84d16883f9.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libpxfm-c8b1f18d4ac2a1f0.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libquote-558ac7c8875640fb.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libquote-558ac7c8875640fb.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libquote-918d2e4f2fe3cf01.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libquote-918d2e4f2fe3cf01.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libquote-a8e10d36338b4265.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libquote-a8e10d36338b4265.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/librand-91bd22d804adaf9d.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/librand_chacha-d2925045c5064ddc.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/librand_core-35afbf4461b53b4d.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/librayon-1dba5f3412560c1c.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/librayon-1dba5f3412560c1c.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/librayon-91215a3217bb2636.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/librayon-92da40b2a3b588bf.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/librayon_cond-e168f97a42f5d56e.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/librayon_core-8b509118d1a2888d.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/librayon_core-9cb4e2a57c5131af.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/librayon_core-9cb4e2a57c5131af.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/librayon_core-b77b48d4c7c99bb1.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libregex-21b599583ba0941e.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libregex_automata-f0fbd0f296b2694a.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libregex_syntax-29613ee99811d9bf.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libron-28e4eb8d35f9b0e7.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libron-82783d25f5b6f285.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libron-a803beac05a0c202.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libron-a803beac05a0c202.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libron-c7c43a7750559b47.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/librustix-68d0ed66c6aab1ad.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/librustversion-272e36686d896562.so",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libryu-17c84dad17bd72b5.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde-50a26248471bcb8b.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde-50a26248471bcb8b.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde-51d89b1799bed5da.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde-51d89b1799bed5da.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde-84a1d107bc647ad7.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde-969fd928ff1bc152.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde-a77a2ca71586dac9.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde-a77a2ca71586dac9.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde-c6119aa15d577478.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde-e5034c356a434b6a.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde_core-2f9fb2e97fda086a.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde_core-2f9fb2e97fda086a.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde_core-5e4a53ab78a8ae9f.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde_core-89d0dde54340b726.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde_core-b6636475c1160337.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde_core-b6636475c1160337.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde_core-d114acf83aad9801.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde_core-d114acf83aad9801.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde_core-e12a7806b529f3c7.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde_core-f8e6df9e2c8f4cf0.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde_derive-45322e8e378b4523.so",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde_derive-c41848acebf7cfde.so",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde_derive-e8da7e57684f75f1.so",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde_json-330d04e41c16218c.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde_json-330d04e41c16218c.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde_json-4b0a32259b470b86.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde_json-4e98b618f2bc5e37.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libsha2-045def8bf4018d9f.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libsha2-045def8bf4018d9f.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libsha2-06fb652e5e7d0a9c.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libsha2-06fb652e5e7d0a9c.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libsha2-388eff32157e44da.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libsha2-47d326ea81a2bfcf.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libsha2-d8f1a2543c77219a.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libshlex-eb2cd44b463aae93.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libshlex-eb2cd44b463aae93.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libsimd_adler32-cca6d482a46b8144.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libsmallvec-382c9b5be4b932d2.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libspm_precompiled-fb7e16c3f647425e.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libstatic_assertions-fdae80a8dbbd64a1.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libstrsim-cdfa80b3792e870c.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libstrsim-cdfa80b3792e870c.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libsyn-7aa00b9ea9b718b3.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libsyn-7aa00b9ea9b718b3.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libsyn-bb8099108f6ac24c.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libsyn-bb8099108f6ac24c.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libsyn-f1cac1a122027145.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libsyn-f1cac1a122027145.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libsyn-f44cf1b978579699.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libsyn-f44cf1b978579699.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libtempfile-f117750779c253e6.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libthiserror-78d3a88eb52848d2.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libthiserror-ce91eb6ba4dabb1b.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libthiserror-eaa1e8ed4ec3eb0a.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libthiserror-eaa1e8ed4ec3eb0a.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libthiserror-f2ffdb0e1d99793f.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libthiserror-f2ffdb0e1d99793f.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libthiserror_impl-1c7c7abf43f23513.so",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libthiserror_impl-70daf25107d4fa60.so",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libthiserror_impl-bd1591f5016dc55b.so",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libtokenizers-946f3c2728ef8f09.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libtypeid-08c8b3d84cc17b2e.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libtypeid-40b9faa0f19c2dcd.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libtypeid-e61006e1d7d32119.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libtypeid-e61006e1d7d32119.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libtypenum-32ef2a4f83bebb61.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libtypenum-32ef2a4f83bebb61.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libtypenum-8e739126c1e7e8ac.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libtypenum-8e739126c1e7e8ac.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libtypenum-aa73d0077c6a12c0.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libtypenum-ea26e9f5cbc5483f.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libtypenum-eb394cf81edb03ff.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libunicode_categories-35727b5b7cb3d13d.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libunicode_ident-13f0fece03880ff1.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libunicode_ident-13f0fece03880ff1.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libunicode_ident-148a18864ce1990a.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libunicode_ident-5fd884ed9145b54b.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libunicode_ident-5fd884ed9145b54b.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libunicode_ident-61533c72d8f4e5f7.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libunicode_ident-61533c72d8f4e5f7.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libunicode_ident-8eca967e5ae5feb8.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libunicode_normalization_alignments-0c7f3d25560b683b.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libunicode_segmentation-5a2d4812fa722557.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libunicode_width-5dc14b41389dbddc.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libversion_check-9011ebc106141497.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libversion_check-9011ebc106141497.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libversion_check-e67c589c3c1ced77.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libversion_check-e67c589c3c1ced77.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libzerocopy-469f58be8b5915c7.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libzmij-2d47a3cbfef53c27.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libzmij-b6c1bf877ed137a2.rlib",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libzmij-b6c1bf877ed137a2.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libzmij-f05119c09cc4a24b.rmeta",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/leased_stage_v2.py",
+    "/opt/cuda/bin/nvcc",
+    "/usr/bin/env",
+    "/usr/bin/timeout",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/source-v1/Cargo.toml",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/source-v1/Cargo.lock",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/source-v1/crates/holonics/Cargo.toml",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/source-v1/crates/holonics-cuda/Cargo.toml",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/source-v1/crates/holonics-cuda/build.rs",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/source-v1/accelerators/cuda-smoke/mount_smoke_kernel.ptx",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-18968dc9-20261006/LOCAL_CACHE_SOURCE_BINDING_REFUSAL.v1.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/SOURCE_SNAPSHOT.v1.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/CACHE_SNAPSHOT.v2.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/PREPARATION.v2.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/LOCAL_SOURCE_BINDING_PREFLIGHT.v1.json",
+    "/home/b/Workspaces/holonics/.local/wt/material-learning/.local/material-learning-followup-01a1030c-20261006/COHERENT_FOLLOWUP_CANDIDATE.v7.json",
+    "/home/b/Workspaces/holonics/.local/wt/material-learning/.local/material-learning-followup-01a1030c-20261006/SOURCE_INPUT_MANIFEST.v7.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-cache-preparation-20261006-v1.acceptance.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-cache-preparation-20261006-v1.release.json"
+  ],
+  "input_directories": [
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/source-v1/crates/holonics/src",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/source-v1/crates/holonics/tests",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/source-v1/crates/holonics-cuda/src",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/source-v1/crates/holonics-cuda/tests",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/source-v1/crates/holonics-cuda/kernels",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/source-v1/research/notebook/hnn_design",
+    "/home/b/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/lib",
+    "/home/b/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/autocfg-1.5.1",
+    "/home/b/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/crossbeam-deque-0.8.8",
+    "/home/b/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/crossbeam-epoch-0.9.21",
+    "/home/b/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/crossbeam-utils-0.8.23",
+    "/home/b/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/either-1.18.0",
+    "/home/b/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/num-bigint-0.4.8",
+    "/home/b/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/num-integer-0.1.46",
+    "/home/b/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/num-rational-0.4.2",
+    "/home/b/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/num-traits-0.2.19",
+    "/home/b/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proc-macro2-1.0.107",
+    "/home/b/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-1.0.47",
+    "/home/b/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rayon-1.12.0",
+    "/home/b/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rayon-core-1.13.0",
+    "/home/b/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/syn-3.0.3",
+    "/home/b/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.19",
+    "/home/b/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-impl-2.0.19",
+    "/home/b/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/unicode-ident-1.0.24"
+  ],
+  "expected_inputs": {
+    "/home/b/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo": {
+      "sha256": "310fa46c7903259368c0df3dbb3f4f52759563f3c9ce53b500404b7741fb6860",
+      "bytes": 41181888
+    },
+    "/home/b/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc": {
+      "sha256": "028fd60b0e0add5505c661cd3ccde91393d615c8729bd95d94ab1e91409b36a1",
+      "bytes": 654904
+    },
+    "/home/b/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/libLLVM-21-rust-1.92.0-stable.so": {
+      "sha256": "cb147f108d9724cbe89786a83e636bc1c29a63a5e9b9df50910c04ccc6968954",
+      "bytes": 42
+    },
+    "/home/b/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/librustc_driver-d31eb41759495bb2.so": {
+      "sha256": "779fd86c3420b56500d6421abe6511ef939b78ed2fca4103a57ce145507bd1e7",
+      "bytes": 153636080
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/bounded_stage_v1.py": {
+      "sha256": "84b7d003089fa19881690e368200b2168b9d179c8e6573bdafab54369235cec2",
+      "bytes": 12645
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/final_stage.py": {
+      "sha256": "a0a5a94f157acf9a5127b756a036c6e86449dc2012af0f1e71d34aafa13bc79e",
+      "bytes": 10968
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/build/holonics-cuda-0a0b5429f4231006/out/hnn.ptx": {
+      "sha256": "c26ae191f6b6a2f70b2720c0c5cfb09de052b09bf925024b72b7666214b0dac3",
+      "bytes": 697703
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/build/holonics-cuda-0a0b5429f4231006/out/kernels.sha256": {
+      "sha256": "200301614f940f7ab3916c25a17199d766ee875375990b55f5f064b4ef2135e8",
+      "bytes": 64
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/build/holonics-cuda-0a0b5429f4231006/out/tree.ptx": {
+      "sha256": "4448f33a15f364d961064af94f8c113101678cab2491add72b1830c5ca1b3dee",
+      "bytes": 1465962
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/build/holonics-cuda-d9ad51fae469d445/out/hnn.ptx": {
+      "sha256": "c26ae191f6b6a2f70b2720c0c5cfb09de052b09bf925024b72b7666214b0dac3",
+      "bytes": 697703
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/build/holonics-cuda-d9ad51fae469d445/out/kernels.sha256": {
+      "sha256": "200301614f940f7ab3916c25a17199d766ee875375990b55f5f064b4ef2135e8",
+      "bytes": 64
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/build/holonics-cuda-d9ad51fae469d445/out/tree.ptx": {
+      "sha256": "4448f33a15f364d961064af94f8c113101678cab2491add72b1830c5ca1b3dee",
+      "bytes": 1465962
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libadler2-8ddbfa9477eb984f.rmeta": {
+      "sha256": "b91ea32ba17993997201d413f5d6085b9706113c8cdcf8d5c52340aedfaf67a6",
+      "bytes": 15716
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libahash-558768623df4663b.rmeta": {
+      "sha256": "9b141b1789f850acd645a1de2411326381148db7fb7df7ed6c29cc250893e4b0",
+      "bytes": 197329
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libaho_corasick-7a59af228b3d9bc5.rmeta": {
+      "sha256": "73b8f1f6ba13b478f18a3cbadc5689f129258ea9a523cc5eb5d36aa821666a2d",
+      "bytes": 1481988
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libautocfg-49824861d9b9f015.rlib": {
+      "sha256": "c65ad2c70de42b8c93c572758ea18f76999fd23a956247e4cf352f5926613434",
+      "bytes": 671584
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libautocfg-49824861d9b9f015.rmeta": {
+      "sha256": "01aa8280b9de3f5deba16650eef4495401629a1f16d4afee76f83bcf2810c3b9",
+      "bytes": 80937
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libautocfg-8fad447444a29888.rlib": {
+      "sha256": "7baca40e76ece04d87f7b3a60bacddf090edd3dea436457062241e9d00a30961",
+      "bytes": 671584
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libautocfg-8fad447444a29888.rmeta": {
+      "sha256": "df7157fdb0ae18210fac7a3f605f1f27447ab1e99f630f8c13750ac276f400f0",
+      "bytes": 80937
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libbase64-f7564408245538ae.rmeta": {
+      "sha256": "ab937787166597066ffbdb7b0db0d19a7a486097514ff2144b1068bddc5c29d3",
+      "bytes": 175826
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libbitflags-6c9ae5c363e32d68.rmeta": {
+      "sha256": "220c43ede7f21334254b32d104d9cc89cfccf09837b01fd3db9e20d91980554c",
+      "bytes": 192261
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libbitflags-7af03ff3dd9b0808.rmeta": {
+      "sha256": "5f5acb26c1e3395b0093ea323c3a2ab06a081f207949536c440182563759a1ca",
+      "bytes": 191977
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libbitflags-85a04f3d8f6ad245.rlib": {
+      "sha256": "f600b6e568db3a68d57832885f5dfeb1bd65a64558461c8e97dabba2c09aaa11",
+      "bytes": 469886
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libbitflags-85a04f3d8f6ad245.rmeta": {
+      "sha256": "bc1a6bd445a8bb5eda44ac2c737cde24b71ec96b8d1a7029b10f4c9960a2f3a7",
+      "bytes": 243038
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libbitflags-aa1a47e391994cd7.rmeta": {
+      "sha256": "5e27d79a74aa6650e7341f53aff77e506b99a6b9a49b77ce42671cbb41aba61a",
+      "bytes": 191977
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libblock_buffer-09e3c28633c14d81.rmeta": {
+      "sha256": "04cd9020c58bf956ab12f254e8aec03392a402c00d74667706ec6d5baf5397d9",
+      "bytes": 53067
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libblock_buffer-655a92828a7c26af.rmeta": {
+      "sha256": "9b745529291cf9c82279c51a78e6e3434b26378107904ff43ed7f88983960572",
+      "bytes": 27478
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libblock_buffer-ae6563f7cc06d68d.rmeta": {
+      "sha256": "f05e27d96b51f74c47f00efb6fa03a28b960abbf5462ae1217315a8b8952023e",
+      "bytes": 27478
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libblock_buffer-b84c600cbbb55d51.rlib": {
+      "sha256": "04a126820f9027e803a1d10943a1fab19a52e28980c0b4e329e7c8d4e8678ed6",
+      "bytes": 89706
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libblock_buffer-b84c600cbbb55d51.rmeta": {
+      "sha256": "eaf260b7d983a5f4b6b262f8aa7451ed7017d2b72ac37f52d68620a330265b40",
+      "bytes": 83795
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libblock_buffer-f1f09f7064f0d3bf.rlib": {
+      "sha256": "df67065b68df204e4ed8169040cb8eb64c2b3f57fba14f8e4276d3bacc833ccb",
+      "bytes": 54746
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libblock_buffer-f1f09f7064f0d3bf.rmeta": {
+      "sha256": "dd23065f5ecd54793f4085b5226b63db842ecd23cf252c6dddf83f4a257105d6",
+      "bytes": 48835
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libbytemuck-814df7a0ff6c9506.rmeta": {
+      "sha256": "96be18cb7ea3e3b09e32d6a6bb05e292e98be251261699bc5d8ccd9d36f4fb13",
+      "bytes": 463463
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libbyteorder_lite-b23754f5d3aa0269.rmeta": {
+      "sha256": "4d68c20490c9255fbe43f5547149fe7e6bba3cf58cdfacc8721ab7e38a135c7a",
+      "bytes": 168034
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcastaway-974afcefc47f76af.rmeta": {
+      "sha256": "52db07c4b7e33eedb8d563f84e75d261299ef5a256ccfdb6285a9ac52b96367d",
+      "bytes": 57401
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcc-d6f3e42c7038d765.rlib": {
+      "sha256": "daece36f7245298c056cfcb58e077ce83694e1cf3dccb2645e62db2b0f5fe542",
+      "bytes": 2876880
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcc-d6f3e42c7038d765.rmeta": {
+      "sha256": "1ead2d47f48b89ff0a65cfe149f5d6d48f3bc8812daae17ab9e0152c377174be",
+      "bytes": 424690
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcfg_if-16f49e2043628444.rlib": {
+      "sha256": "a1aa90c281a984fdff32302813d9ec608296374c51cee736bf53dd7bfa0fe00d",
+      "bytes": 7158
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcfg_if-16f49e2043628444.rmeta": {
+      "sha256": "d3587cd33fe7896ca9b73c974ebf69ba470f20fa16c264e46a96b4804de17375",
+      "bytes": 5651
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcfg_if-20192facbdd9f0b0.rmeta": {
+      "sha256": "7699813d03b02f74a16e9d368edc005e878e41ab2ee7a0bfae2b282a969e18b0",
+      "bytes": 5293
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcfg_if-2d20780be38939e6.rlib": {
+      "sha256": "5826bad4147227ea74d312a80cb779ebbb4d6c5913e3ec9d1a8051adbba3028a",
+      "bytes": 6798
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcfg_if-2d20780be38939e6.rmeta": {
+      "sha256": "c8dd09876526f3654835c12495e577c38aca1811cbd55edb61577cb1d7dbc7a4",
+      "bytes": 5293
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcfg_if-5b0d4be6829fc8fe.rmeta": {
+      "sha256": "28bfcbc7312b607eb2a396ff09f77ef3c97de6bf39f72ec9f1a9d0facabdfc08",
+      "bytes": 5651
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcfg_if-e720413b8edafa0a.rmeta": {
+      "sha256": "79aa7b14bdb1c080783b525eb67a64d4aa8b39ef32bb622dbfc1f25d607c1f07",
+      "bytes": 5293
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libclaxon-0fe527ec464c154d.rmeta": {
+      "sha256": "51227a6dcb92d521fa657ee9fe5c108f3f2716b256b775560609c72a0e90c18c",
+      "bytes": 151979
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcompact_str-57b2c3e722b734db.rmeta": {
+      "sha256": "48c2ff888a2344dfae5ab5cf66316287732da324b478083aa5fe4d00842bc825",
+      "bytes": 501959
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libconsole-34aeec246acb5b17.rmeta": {
+      "sha256": "ce8399db935fa18156002ee03a1391539f9368e6b66589139c4c8f1de7bf9e11",
+      "bytes": 194893
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libconst_oid-900b990a5634664a.rmeta": {
+      "sha256": "6cccad44bab07c52ebc2be4280fe9153dbe581db13cc7c7e03e5d1d3b9485abe",
+      "bytes": 120242
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libconst_oid-bdbd633346f98822.rlib": {
+      "sha256": "bf8c20884252a23c0456fbb52c19b37005145e39b9a2e969e53873b332e15dc2",
+      "bytes": 361134
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libconst_oid-bdbd633346f98822.rmeta": {
+      "sha256": "b2f90e02a4bba4bec4d3ecb168528a7ca71c59174b1a072afb17d8f4d949dade",
+      "bytes": 159927
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcpufeatures-716b7d326f337e94.rmeta": {
+      "sha256": "ff534cd72fefd55a5e23867ea86894be83cc4316178d98c9edaaefe7542fb9ea",
+      "bytes": 38855
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcpufeatures-8ecad47d6fded137.rlib": {
+      "sha256": "63278ae60a9948422ee515eff8a5a6b0e1fea06b5c5c8ab6a3e4749f4867b042",
+      "bytes": 40376
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcpufeatures-8ecad47d6fded137.rmeta": {
+      "sha256": "da46e813373a73a406048c858fdb9d6ff79332fa1d4153e64fe08a0bbe39a0d0",
+      "bytes": 38855
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcpufeatures-dfe1b88f7de5011f.rlib": {
+      "sha256": "ceaeec53b449f35b0da050c16de9511c4ebc2344196389c08c6eb0854fad3dc9",
+      "bytes": 49712
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcpufeatures-dfe1b88f7de5011f.rmeta": {
+      "sha256": "3ca999deed1e891c7dc392349888afc557a654f89e9dc742669f8a3a8d907a9a",
+      "bytes": 48192
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcpufeatures-f853003584d3fc07.rmeta": {
+      "sha256": "1611a75673a05adaa885d7969376e8dc5a0602de51bbdc658142b9dbc0d09d07",
+      "bytes": 48192
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcpufeatures-fdae92bb8edf0078.rmeta": {
+      "sha256": "d5e178947ac8993285e21821c4f918120eb8cad00b48af55b3ee67400ffa9375",
+      "bytes": 38855
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcrc32fast-69ea6609f925bfa8.rmeta": {
+      "sha256": "4894122e9a7c4353ea9c0201d746961718ee36018107182c5a0a1af1e414235c",
+      "bytes": 43840
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcrossbeam_deque-69b04a7e40895447.rlib": {
+      "sha256": "425e571fc7efa7e5535b7382bf10b41a6bf42630befca5a95566403edd809ad6",
+      "bytes": 184280
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcrossbeam_deque-69b04a7e40895447.rmeta": {
+      "sha256": "40b389555446c84aacc3439a2dcb200b6538a277deab699873c03a182964ef14",
+      "bytes": 182752
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcrossbeam_deque-99a29020a7bb8a3c.rmeta": {
+      "sha256": "a8de1444ffcac56205a4be88d12bb8f5947932bbb6fc8be575e6ae2aac11bd45",
+      "bytes": 67539
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcrossbeam_deque-b92e4a43aea92bdd.rmeta": {
+      "sha256": "18df26288d6dbb99db8a11f4c122259ac161039ae1b27b3fb45321b5a36828a9",
+      "bytes": 68127
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcrossbeam_epoch-ac40ee45a84b4be9.rlib": {
+      "sha256": "dc600422f64a2bc6bb2c5eaaeebd2523e78504794930adabc97de9bd15fb2ee7",
+      "bytes": 874520
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcrossbeam_epoch-ac40ee45a84b4be9.rmeta": {
+      "sha256": "86ffe302a53756dfcfeb8d2c3892bc8b7eb9c9eb8f08df9a5725f18dbd0055da",
+      "bytes": 324745
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcrossbeam_epoch-b5b5a37215ab3a04.rmeta": {
+      "sha256": "97aa222cf3ad20558f41111cde525e664292d22cd1a9bf083753f3ee4434899c",
+      "bytes": 250031
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcrossbeam_epoch-c38d6cbf594d143b.rmeta": {
+      "sha256": "872da29bccca075d73195e0d4244347afe6721399896877a3cd82f83f92a2daa",
+      "bytes": 248367
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcrossbeam_utils-57cd949fef0b6d3c.rmeta": {
+      "sha256": "f7be902ce1da1e1b3af8010f74d1ec42d186624bce2c3f62ac9b41be2d2b34a9",
+      "bytes": 291425
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcrossbeam_utils-70a3aee7cb089a51.rmeta": {
+      "sha256": "a2b57ea548dfe8d8519926511e9c9636bdc08a7810e17de9fb208ec639466edf",
+      "bytes": 291726
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcrossbeam_utils-c9ce9a37b1c8cb8c.rlib": {
+      "sha256": "ddb0b1b2d7b17d26b9119e8b3e1e105c6ffa821c30fb805b5bb343a5511aed5c",
+      "bytes": 1292114
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcrossbeam_utils-c9ce9a37b1c8cb8c.rmeta": {
+      "sha256": "90e821463ae8aa76293f889a74fafdcf7c7276ad0985b7e7ea28c6a75d7c799a",
+      "bytes": 776656
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcrypto_common-3cd73791875fa064.rmeta": {
+      "sha256": "1cad5583ae16d3b86e4bd1fde12389fdf8146dfc143fb413d5936055950c980f",
+      "bytes": 22842
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcrypto_common-72bdd94d7640b056.rlib": {
+      "sha256": "8d016012ea1c394f453e85a315e164bdd1e87256c6796eaf581cead4030e4486",
+      "bytes": 33470
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcrypto_common-72bdd94d7640b056.rmeta": {
+      "sha256": "1c438b9f7807287c8c1666f30c68325691c979aa39c78740ffeb7b0e1c3e2254",
+      "bytes": 27508
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcrypto_common-a5332a858943e274.rmeta": {
+      "sha256": "e2b5b2ff7fa5b924b1f941390e514be9ab766f8fac5c4cf3ec10a103f5314c9b",
+      "bytes": 22842
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcrypto_common-ac2cbf842899868b.rlib": {
+      "sha256": "f1424a27bd03a17bb0170fe3f00792a10db143d3210c6b57a2e69c7f91224a1b",
+      "bytes": 3986494
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcrypto_common-ac2cbf842899868b.rmeta": {
+      "sha256": "cb606cb424bfa8088b89263b317e16f4156912379f5fc27f184923794e01de54",
+      "bytes": 363567
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libcrypto_common-dc2e10469038786d.rmeta": {
+      "sha256": "6a2bf0d6a169a99ea311cebc133f95da5ee4fdb50b1c74dc923b18526257ead6",
+      "bytes": 311633
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libdarling-fdca939069f05c90.rlib": {
+      "sha256": "257c5f1014c29e6e55cc5c84f3e4b0f301acb125624c552e5a178c0b04614882",
+      "bytes": 18952
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libdarling-fdca939069f05c90.rmeta": {
+      "sha256": "d8f9ea18712f024b932fc0858e02e5cf78beac6826e339371ee37df81bce8d89",
+      "bytes": 17446
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libdarling_core-ffff8dba15aef50d.rlib": {
+      "sha256": "f67f82bd3b0162556cb4cbcf973d75388c82c17733fd24953b3dd78e64c032e9",
+      "bytes": 5775026
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libdarling_core-ffff8dba15aef50d.rmeta": {
+      "sha256": "ff2e687598690e2e555ec6ed9ebf8b58b09b610648d95f31b9ced49a7a481653",
+      "bytes": 1363026
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libdarling_macro-b7586423e7dbc01b.so": {
+      "sha256": "74c3d6646b7d0e932399f83037df4a9eb0cab2e2356b63068bec4ef565c0493f",
+      "bytes": 8814304
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libdary_heap-ca1823966ced6047.rmeta": {
+      "sha256": "997c74bac7e662a495b8bcb69321bc7775c187a63c35bfebbea25a5136bbe82f",
+      "bytes": 89991
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libderive_builder-efaf352f8dba5101.rmeta": {
+      "sha256": "c46b1bf2a84e3e66d3f2fe351d3ee967f7d582fadf3594d09f4322a57d0fe34d",
+      "bytes": 37081
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libderive_builder_core-72fbf03a30d9090e.rlib": {
+      "sha256": "b15257525506be0825c072070f59cb136f4f2c3729b857799a5d3dcecb6ac400",
+      "bytes": 1628042
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libderive_builder_core-72fbf03a30d9090e.rmeta": {
+      "sha256": "27fee0f3a60a08582b076700be83757851ab2430eeac076cbcba7cc72d96f4c9",
+      "bytes": 298009
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libderive_builder_macro-564dba1a2b67166c.so": {
+      "sha256": "6ea479708882cd15341e574b3ba74976d80e5f03eca68104a9c61b61b0783e29",
+      "bytes": 8237864
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libdigest-1a05543a86d9844c.rmeta": {
+      "sha256": "5695ab09f79579e17ac5b647e0e4d5e6e29d17fc4b8787fde81101d9070587ae",
+      "bytes": 197027
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libdigest-6abf9cf075bf13e9.rmeta": {
+      "sha256": "2e5833ef22e6225ccdaa921d9bafcd7a0b880ddc500d4c84c8e6c4faa26adfb5",
+      "bytes": 112282
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libdigest-8286364ca7dfdfd9.rlib": {
+      "sha256": "90345ac9ef28c2477b8c638a29e01577b2cbe9e6fa66c3ce685162aea8b9f4ec",
+      "bytes": 176788
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libdigest-8286364ca7dfdfd9.rmeta": {
+      "sha256": "0e9637c9f27e8b8cf5f3d3e0b0e19fe5f5c181deeeff7d2ff1a7417cf109d5ff",
+      "bytes": 167832
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libdigest-d283f020140dc634.rmeta": {
+      "sha256": "c017a7b5648480ab26c768c49954fbd632222c8e0677a626315547ea8c5fbe20",
+      "bytes": 112282
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libdigest-f3ecc3e4c5d6669b.rlib": {
+      "sha256": "543d387d1aa02d2f8c8fb35c77c7a59b306df6fc117c80b73844376299f826b8",
+      "bytes": 231180
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libdigest-f3ecc3e4c5d6669b.rmeta": {
+      "sha256": "6f9fe7725297377a502518561dfab03401306507431f5c6fcfc7bcbf63ee41d0",
+      "bytes": 222223
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libeither-1ec8a15c03d402c6.rmeta": {
+      "sha256": "b5c04b5f6eb97bf63ebeed60df088338481424b3b50b267b62a5b771d2aee573",
+      "bytes": 165784
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libeither-62301849af19b001.rlib": {
+      "sha256": "bfe73b7aaf40421b81040a5625d0dcf9496a83634454f7b6d11eb61ddd6603a9",
+      "bytes": 226574
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libeither-62301849af19b001.rmeta": {
+      "sha256": "14b67e2f52be12d4f853156c39383ccfa3f1fc58920bcdab8e4bcdeb843ab756",
+      "bytes": 225070
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libeither-8f78749e0a1d09d4.rmeta": {
+      "sha256": "f650015c4d8978ef09851b8ef113998be39c96a0212e49c26ba0cb6e5371fb6a",
+      "bytes": 146798
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libesaxx_rs-7c6848ee90bca083.rmeta": {
+      "sha256": "b793db698fc09d1794b3ff9c69f82d4c24aba83e45044c5f02a5d15e7434bec2",
+      "bytes": 23166
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libfastrand-b5805260b4e59e2a.rmeta": {
+      "sha256": "877c0a722f8c4d0d29a66376827ef890db276f7ad4c13745feb431a1461c4449",
+      "bytes": 63674
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libfdeflate-45c8e4398e1ba0e6.rmeta": {
+      "sha256": "8617563059ea586edee5f15020835e50741164a229a66712b69d7a1022b1c6b6",
+      "bytes": 93644
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libfind_msvc_tools-20b5cef0e0b26060.rlib": {
+      "sha256": "ecf7ca0f3b71293b5d7861553b7894b4daecbd7eeec463b7c0d59257f16c1929",
+      "bytes": 320238
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libfind_msvc_tools-20b5cef0e0b26060.rmeta": {
+      "sha256": "d36d530f600c0be226fba5ef8a10bec8b311b9ba76de01dac0f0491637100b43",
+      "bytes": 50655
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libflate2-acf236de1f77475a.rmeta": {
+      "sha256": "c2cab10b0f1a6e5e5c895cb697bb576cdcc03665c2e42b6efb663c869fce6a1f",
+      "bytes": 374735
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libfnv-4644d4661f025f86.rlib": {
+      "sha256": "35e10b3d871c94a3e24aa31211311ecb819e5a9225d6f30189d889a01c54f6aa",
+      "bytes": 12216
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libfnv-4644d4661f025f86.rmeta": {
+      "sha256": "edf4bc966478820684e208517aa103d143eabf056ceec5c3668fe093585f06dc",
+      "bytes": 10714
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libgeneric_array-54c8f50c85979a8f.rlib": {
+      "sha256": "345096201ac65e707b13569d00bc60be48d0784c7f2195506df8f9e4c1c5ab64",
+      "bytes": 886872
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libgeneric_array-54c8f50c85979a8f.rmeta": {
+      "sha256": "4fe078bfb242faacf0271b79d485b350d9c7b5dd71348574fb93176271028cdd",
+      "bytes": 872965
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libgeneric_array-77c4e637611b42f0.rmeta": {
+      "sha256": "abdd76f82544da607fed5a888eec84f805c8b2b5970d28468f7b6bc909f8eba3",
+      "bytes": 716331
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libgeneric_array-e27b0b4439542c99.rmeta": {
+      "sha256": "6a4723564440d0cbe2f155624c2c4c73004d81306d07e37c5bb540a0032eb68a",
+      "bytes": 716331
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libgetrandom-97601a21df1010b3.rmeta": {
+      "sha256": "18173b9f0a9320b3f93d48940356954e77b7af9adc138b2825438da64e76901b",
+      "bytes": 81387
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libhound-55627a994d90a6f1.rmeta": {
+      "sha256": "ac3c0d7189f0a37ceaafdcec0e98e13c9bf39a094c26acb42140d3b426c4fc24",
+      "bytes": 110427
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libhybrid_array-1f108564845291c4.rmeta": {
+      "sha256": "30d8e9a775e79459d21bac042bef13c0acf2a5dfa160f47dad00d5fdac52ba77",
+      "bytes": 1202186
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libhybrid_array-ae297c83c0696f5f.rlib": {
+      "sha256": "127d9c771c52d2c9db155aea137de5e186b84860990670a617fd7aed2dc48ab7",
+      "bytes": 1284744
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libhybrid_array-ae297c83c0696f5f.rmeta": {
+      "sha256": "69dcffa5d229d1e0fdab3ff57eb53c14ab1bb977ccfced4c96cf5a1850a3ef80",
+      "bytes": 1278640
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libident_case-649284103e8b873b.rlib": {
+      "sha256": "ce8763d9fd14e7a64a6a1623cdfc42d0e97653911b5be6113875c8b7435f4de3",
+      "bytes": 21102
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libident_case-649284103e8b873b.rmeta": {
+      "sha256": "cd7bc4ae99ce234c88850c50379b90d6e18c2ae50d330c0c8506fe56fbcd5dc8",
+      "bytes": 16642
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libimage-fa81552103927ade.rmeta": {
+      "sha256": "f8cff9aad2c34b06b55bab7af587b04ae609ee8c61532f4633c02fa91a906d3a",
+      "bytes": 1363900
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libindicatif-55ae297f6fcfe5c6.rmeta": {
+      "sha256": "3b8825509cefec5e7b4477284eb19eed1de886cda603e127ba65611ab3e722f1",
+      "bytes": 298869
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libitertools-417eb96bee6c9dce.rmeta": {
+      "sha256": "d0f0cbb81b71e48545ebb02f4db899e612ca74510dca30fbe468094fabe07929",
+      "bytes": 1578129
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libitoa-1fc6d3404db4e00a.rmeta": {
+      "sha256": "0e69e3db152e78d9acae4b6410619919277441ccd5999b16f179b02f8c236776",
+      "bytes": 51981
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libitoa-87333a0d8f995d09.rmeta": {
+      "sha256": "2ccb6fe4a86683c08b33053202e923524b7483eb21ea57d2a19a935a782ebb60",
+      "bytes": 51981
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libitoa-fc5c8f1745b88ffe.rlib": {
+      "sha256": "6a0e66c156aad617fec1180148c39600b318f5be79b6985fe63873b0ed986749",
+      "bytes": 207376
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libitoa-fc5c8f1745b88ffe.rmeta": {
+      "sha256": "1a78a6c979ca23df0e582cd0776ee826ff0733e4a9cd40bdc3dfc35825b6a7a2",
+      "bytes": 62716
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/liblibc-51cd6541e39e8c4d.rmeta": {
+      "sha256": "bfcd22c6ae102a72c857e2d4dacf733310393bebf090fad559aec836212de649",
+      "bytes": 3867211
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/liblinux_raw_sys-ed34a42c920f706f.rmeta": {
+      "sha256": "2e014fa84266a234fb501dd874a1318bc9e54083ea117a52372a470b77931ae6",
+      "bytes": 1395131
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/liblog-dfc22a749e5bd92b.rmeta": {
+      "sha256": "c7975d9787576ce8f6d3223eea6cb930469d078662b61258d91d281ff9a40fb5",
+      "bytes": 162314
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libmacro_rules_attribute-a4ab44a0455eb942.rmeta": {
+      "sha256": "8cc268c684eb1a790d1720d8b409f07ac771ff393fe6a140307ee595a97ddfc3",
+      "bytes": 13311
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libmacro_rules_attribute_proc_macro-bb1480de326d0722.so": {
+      "sha256": "5178009f056a5e17ec630e77abe93df1d713bf1ec25edec1743067c5f79657e5",
+      "bytes": 4902456
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libmemchr-32daeb188d08e657.rmeta": {
+      "sha256": "334b6823ba6672552a089bb4ea8f188385f9fe6e00927c0fae2914504e634369",
+      "bytes": 959750
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libmemchr-64fdf34196895b21.rlib": {
+      "sha256": "2563dce7c11ab69fed601171a979cedbd41a788d927100e572258e520a79d5e5",
+      "bytes": 2558798
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libmemchr-64fdf34196895b21.rmeta": {
+      "sha256": "edf59ab9a87224038e2a61ee1dd23831003d6f206aa2eb4356146c2b2ce2d88e",
+      "bytes": 1275059
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libmemchr-b1ae9ce6e303a27b.rmeta": {
+      "sha256": "3f6a20fa8bc5d4fff8d5b1a518039b8fb99cd5db85badc69f4f8c5272e3b058a",
+      "bytes": 959750
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libminimal_lexical-0e86f6740b38f9bd.rmeta": {
+      "sha256": "1b8c98954ce33ca6c89bcd0fc23aef0a5494ab562ab20b7e9182e09c05f7171c",
+      "bytes": 148632
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libminiz_oxide-323b085015f38a2c.rmeta": {
+      "sha256": "e97d6f202fbabc01741d2c4d3c21c5d6c0b74ed2b9d0dc1da93f4f033d1c6fe8",
+      "bytes": 347165
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libmonostate-8eff454d479a0a57.rmeta": {
+      "sha256": "e6123571edfd24d644ce028e226bd64fe98cbb0bb20333a4af6f8f8db4c895e0",
+      "bytes": 320784
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libmonostate_impl-789d9df1ba47f41d.so": {
+      "sha256": "2f6aa825679234ac586c34eecf484a81c94c27c6c4c038c566dfb271dcf008fe",
+      "bytes": 5420272
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libmoxcms-fb75d79ee9630312.rmeta": {
+      "sha256": "1ad6d611e3cd8cc32b7462050ff05ec52eb8d1d871ce46100f02674ffb17cc9d",
+      "bytes": 4502119
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnom-9204cd3f6ab5f31b.rmeta": {
+      "sha256": "9b631cd62040cc00e618c18f0af7fd3d6cf1bbb26792aea69365cc0363dbdffe",
+      "bytes": 1478831
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_bigint-2fd9247bafb8f23d.rmeta": {
+      "sha256": "74bf9449da436f07196fbe76f0258875bd99955f51a0161863c5f236fd47c031",
+      "bytes": 1447441
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_bigint-36e6095dd1d0f015.rlib": {
+      "sha256": "4d3d36311586f9130b3289f6279657e4183c516263a55f0f45240d8bb0efac0e",
+      "bytes": 4636814
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_bigint-36e6095dd1d0f015.rmeta": {
+      "sha256": "628c7353e1db76cc796919d2f500aeb74aca2af6d8f9eb2a590b15df67a14174",
+      "bytes": 2019016
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_bigint-566fb31806ab7952.rmeta": {
+      "sha256": "db9c0607b6f24237ef5beec9ce49270d56356ca22f326db113cd82049fb04b95",
+      "bytes": 1447597
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_bigint-623b2a2ece9f0903.rlib": {
+      "sha256": "0f42ff7b250a0f261e7bebc3f23bc58f512de4ffae06cf33ab49457798a88c4d",
+      "bytes": 7426948
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_bigint-623b2a2ece9f0903.rmeta": {
+      "sha256": "639a0deda5e78f2fffc750e991f7ddab272323c744f0fab0aa6e0c9970bfa7c4",
+      "bytes": 2610980
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_bigint-623bca0729b1f11d.rlib": {
+      "sha256": "583f7ccb1f89d4e14789df4cbee333c0ea96e728aff66dc7cec7d65487bfc5e9",
+      "bytes": 4632010
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_bigint-623bca0729b1f11d.rmeta": {
+      "sha256": "544629e0fc412e2f68952519a21a01f6ddbcfed9291f5cb852368f7f3a382465",
+      "bytes": 1992986
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_bigint-804781c1bb64cec6.rmeta": {
+      "sha256": "08164a0e18732f819903fac3a178594d304a2dcaab17eb373f37b6cda7533faf",
+      "bytes": 1434773
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_bigint-81344f97c27e3e17.rlib": {
+      "sha256": "43996ce6af6dd424431925942de7ed0b19ea256ccccb9afa9d567d0d2486b7c5",
+      "bytes": 4656134
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_bigint-81344f97c27e3e17.rmeta": {
+      "sha256": "55a2bc12e2054349ee272c933e020235629f99049985c5210aa63a28dd04d9e8",
+      "bytes": 2019009
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_bigint-96f49d4243d685c2.rmeta": {
+      "sha256": "6296cc7c438ace0499b27bac0c4824abaae60477aed5057aaedce310e773ad37",
+      "bytes": 1447597
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_bigint-97e307883dcf91bc.rlib": {
+      "sha256": "b79422daada79a9a714333c23592567f331f86ece365925b9410e2f4dc531f95",
+      "bytes": 4637286
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_bigint-97e307883dcf91bc.rmeta": {
+      "sha256": "e023be973a909fe22140612dad503375478eb5929757e3b9f33cbdbd88745faf",
+      "bytes": 2019016
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_bigint-ae4b5f98659b1a1d.rmeta": {
+      "sha256": "bb1af277f642be722a9349b2e0efce7c95da3e93208f51cd8f906cdd3f0bed8d",
+      "bytes": 1447597
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_bigint-aefd309e4f2b1694.rmeta": {
+      "sha256": "49c0734467488330b35d4ac9aa4475c568124895d95177cd917bd2cd9f9ea61f",
+      "bytes": 1434773
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_bigint-d9167e9e16e6fec4.rmeta": {
+      "sha256": "487ecf588eedd5ac0bdd206b5d1d79fd58814fa2fcc1ab7d23f3b174f5b46a9b",
+      "bytes": 1434773
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_bigint-e173dca09f6683ba.rmeta": {
+      "sha256": "f5fd12d308033a634c8524b9d417b4bec1aff56a74cabd84ef7cdc797a3d61e5",
+      "bytes": 1447597
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_integer-03fa9f60eac0a1a7.rlib": {
+      "sha256": "7d4e29bb11c376d53998d5f63069152786582454aab8d467eeebde2e2874a527",
+      "bytes": 624128
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_integer-03fa9f60eac0a1a7.rmeta": {
+      "sha256": "dd61c40a4579f212f44504f80cba3d85e4a87ff5bb45b31f40a58056bf960470",
+      "bytes": 311106
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_integer-58f87865cf287a72.rmeta": {
+      "sha256": "1e67e8153edad9d3f4b25528a502b3277e072b0125f0ad9bef35a9e1a403e57e",
+      "bytes": 176442
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_integer-de01a73b927b0f2f.rmeta": {
+      "sha256": "7a659d3fd8602bd187918f5fdc3975d53ca5265120e1b74d4f2b7ba8c3371ccd",
+      "bytes": 176442
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_integer-ec23979970fd5af3.rlib": {
+      "sha256": "e33a829ac47d893b3e5db5ed041f2952fd0431843bacf488ad67793b27f71b57",
+      "bytes": 514144
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_integer-ec23979970fd5af3.rmeta": {
+      "sha256": "9cc297b70896466fb8dff1655a34b70de158e91d74bf2f40d997cd5a6071a134",
+      "bytes": 343843
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_integer-f4d330e3e5e0192a.rmeta": {
+      "sha256": "01c5021b0ec397591b4f1a767bbdc811f3c3095539bf7544719614254437a5cb",
+      "bytes": 176442
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_integer-f9bb5a08a614f6e2.rmeta": {
+      "sha256": "00636b48cbbc7985039f12fe20c4cdd86d461b076d23f4b4dfb83bdf210ca3a6",
+      "bytes": 176442
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_rational-09e1dabfa40d0393.rmeta": {
+      "sha256": "a3861e3ba7e1ea4a7f761cdec290e774e83acd14c365c555d6198d7b99e8c12e",
+      "bytes": 241679
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_rational-12b3e11e87fa6de7.rmeta": {
+      "sha256": "dd2deade08657abfec7bbf55679dc0d009fc5c1e0f537b357cca87cd94b4da49",
+      "bytes": 239292
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_rational-144b4fb57ca96567.rmeta": {
+      "sha256": "47c5bdf19472ebc000bbe25361f0c2952ce5961f34074900cd8d965172484b11",
+      "bytes": 241679
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_rational-161e9b6af3b7caad.rlib": {
+      "sha256": "c9fe3c88f4a325eef1c55ecb5c129d90ac2b721fbb528b20b74dd064c6b39f4e",
+      "bytes": 2398462
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_rational-161e9b6af3b7caad.rmeta": {
+      "sha256": "7be5901fee627c8e7c0d7710387c43e3acf2fc077d5405273a88f05b1eaae4b1",
+      "bytes": 443778
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_rational-3181697426248fba.rlib": {
+      "sha256": "8cdc87cad38dabb255fca986747600c1c04e0fd9e73a5fae1c862250503a4d74",
+      "bytes": 1977854
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_rational-3181697426248fba.rmeta": {
+      "sha256": "7efecae4bee478eb76018ba9352f11154b685d7ffe69db05c2f55b4a2c38f2dd",
+      "bytes": 446731
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_rational-5baa8d894785bbb1.rmeta": {
+      "sha256": "82577d096fcd39a46b987321849b9e1e9c97242e0a3202dc7fbd85cb6a34ae44",
+      "bytes": 241679
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_rational-64825e91828d47bb.rlib": {
+      "sha256": "976eeeb9c70e60531e814c9eead9c155c400c409284c1f1c8b0b04ded285dc06",
+      "bytes": 1972422
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_rational-64825e91828d47bb.rmeta": {
+      "sha256": "f1a884111432b134f99e060b626ced7ec89bc5028dfb1f9ef10d85d7e48372ed",
+      "bytes": 441298
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_rational-765ab549ee813f03.rmeta": {
+      "sha256": "2d2ef64f7177432c53fb5ee776a9e8e88fd9d7a5cab434f0d8122109bbbf1001",
+      "bytes": 239292
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_rational-7ecbd8cfd4ce6f57.rlib": {
+      "sha256": "04e822a52fafede29042f13c8ddc9a9727e6ec5522bf6fe6604cb6c52a368461",
+      "bytes": 1977902
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_rational-7ecbd8cfd4ce6f57.rmeta": {
+      "sha256": "273126e39335a9d67647834c40bcb1fa54d81e93b4f222359fe50fa4cb3d74da",
+      "bytes": 446784
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_rational-96b6f964761ec741.rmeta": {
+      "sha256": "dea12089ba3cc07e82979a2c4cb041d8457800de0863ea699365bec8aa5b263b",
+      "bytes": 241626
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_rational-bf57fbbb00e3fe06.rlib": {
+      "sha256": "1a3de7c1a77817a7844656f54377f61a72bafbd2dda934ca6f912c09c726834b",
+      "bytes": 1977900
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_rational-bf57fbbb00e3fe06.rmeta": {
+      "sha256": "d6e3c1758624b44af45513942ffb6eac710409baf2e6b596918bed2e0c6c1df0",
+      "bytes": 446784
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_rational-c6c6919f5733e65c.rmeta": {
+      "sha256": "cae931af538666433061bcc697909e47b3c877871ed8dea16f040a30ffd09c1a",
+      "bytes": 241679
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_rational-f72a5e887b4592ee.rmeta": {
+      "sha256": "f0385dd63c118e52638b9886d194ff9714a17fb837848c58b066b4c2178c5115",
+      "bytes": 239292
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_traits-1af290354603b57b.rlib": {
+      "sha256": "5cc4ca7a6aa706f36dcc0a572951a1cd1e6805d7f8a9a65b38223117c815b6e1",
+      "bytes": 1963920
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_traits-1af290354603b57b.rmeta": {
+      "sha256": "09ae6e2e4eeb30d026ac4e0bdf6edd80c857fb17e215b14179a09650314003d1",
+      "bytes": 1783213
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_traits-b4fdf05d6ef84062.rmeta": {
+      "sha256": "9c5a1a7735692d6bc1007b0fef0236544a6272eb243495b6169c9582be115fcc",
+      "bytes": 1254240
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnum_traits-ba0c8130e2c16b7a.rmeta": {
+      "sha256": "b8f7c923126e0ed94ce1b9aeda08009456db7195036bfe348adaaa5e623909f2",
+      "bytes": 1254240
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libnumber_prefix-6b130bdc63bf643b.rmeta": {
+      "sha256": "d659667874777287b0860a29c956bba562f33ca222b303aa00f9fd09015dae82",
+      "bytes": 37109
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libonce_cell-05a8d2e5a504756a.rmeta": {
+      "sha256": "38d6a5d5aab0bda73b1bbe5a570b99678e9a409130dbd06354c34857043534ce",
+      "bytes": 78889
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libonce_cell-2c1b787530c5e85d.rlib": {
+      "sha256": "b50e233003c3981d5caa98ec39f54703c5c7cadf5cf8a93b9877843433508577",
+      "bytes": 135714
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libonce_cell-2c1b787530c5e85d.rmeta": {
+      "sha256": "819fb22f644e478a4189cb82f5f5bac9448c37ae10290338d9d089b803c987f5",
+      "bytes": 118736
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libonce_cell-58499e260ab16242.rmeta": {
+      "sha256": "29c9b89fd3ed0795bb77c856bf99a482f622678dda919583c62f577ce9a989c9",
+      "bytes": 136331
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libonce_cell-8308ecf2e0f34bb8.rmeta": {
+      "sha256": "393e24d79248b3d0a03754cd3bd784965c3aadd1436e028fd1dbad77d3d559d3",
+      "bytes": 78889
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libonig-186f9d7cd95ec0b5.rmeta": {
+      "sha256": "0ff96b35e285264f1802dd25a401b0cb0eabb8a6d7d61a41b28f61a7513aa80f",
+      "bytes": 912660
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libonig_sys-c653546dd6259816.rmeta": {
+      "sha256": "b3cfabc54843ef51ffd7212e4437376916e0c1bd8e3a6d48a591df9ec98db3cb",
+      "bytes": 220343
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libpaste-577a69ce6fdefcf7.so": {
+      "sha256": "370ab09e8eb2c0a85df497e1eabeed2f99bc0b0c4ce0d9cb3413ba9755811e41",
+      "bytes": 5018392
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libpastey-f33f8b589fc635a5.so": {
+      "sha256": "38030724107b8be4a201e644e5230dac96746a92d67df53cd06505f23b59acf1",
+      "bytes": 5054832
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libpkg_config-f7b9a01e28014672.rlib": {
+      "sha256": "a3e134642d818d054474474df9ce0ff9ec1f7c4737990bccb3b2eeb833cca01c",
+      "bytes": 960098
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libpkg_config-f7b9a01e28014672.rmeta": {
+      "sha256": "6ce8241f18efb7a3232cccf40792ee5d9223b637c66cfe9c9fa63c421040b713",
+      "bytes": 68973
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libpng-60e9842096e377e5.rmeta": {
+      "sha256": "4a31b2048651c217d93e962833a2b85de2c22ab71fe0c66d9e7a69226f698dc9",
+      "bytes": 718753
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libportable_atomic-2e55ef30e1d70e6b.rmeta": {
+      "sha256": "5e8ec25bbb28ccc70fbb5c68f375ddacdede094226349c7beab87faa93f11d0a",
+      "bytes": 1503359
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libppv_lite86-22b3cc2e7693530b.rmeta": {
+      "sha256": "56afcd07e8557c8d6f90fcdde71253cc869ca031f74831da275839d85dfaf1bd",
+      "bytes": 940753
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libproc_macro2-579f357a2789d525.rlib": {
+      "sha256": "d71bf13fb9f561cc47f07412cacb9d7ebb7a98f60e1e37625c355318362cc506",
+      "bytes": 1202436
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libproc_macro2-579f357a2789d525.rmeta": {
+      "sha256": "da29669b82144a5ea206ab163ad43d960bfe565b3faab87ba1b7ad21c39c2084",
+      "bytes": 339054
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libproc_macro2-620dad5adfc40f74.rlib": {
+      "sha256": "3bfd102158704fb4cdefba208da8c97da59c3010c0ab1706b3a283402e9c87e2",
+      "bytes": 1202004
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libproc_macro2-620dad5adfc40f74.rmeta": {
+      "sha256": "b22f2765ef69bb9dd3fc51eb6d80f9087cd8f8d6600ece412b6b60547b1444f0",
+      "bytes": 339054
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libproc_macro2-dc715f84d16883f9.rlib": {
+      "sha256": "2a11ea96d9b813968c1d8acce9cfad673227724c802cd77096dade9f55109816",
+      "bytes": 1202436
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libproc_macro2-dc715f84d16883f9.rmeta": {
+      "sha256": "1aff29ef4c758c16c1709ff08a5755acddb6a4d5a9fa37ebafa7c80bf232c821",
+      "bytes": 339054
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libpxfm-c8b1f18d4ac2a1f0.rmeta": {
+      "sha256": "1470a8065793578716a742bdd134cfb3819a4bad4a581cbe8c1342e266a45382",
+      "bytes": 2157013
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libquote-558ac7c8875640fb.rlib": {
+      "sha256": "8e0a263f089e727abc32332afa42d4903b85a45b382f883046d036a00ae96a98",
+      "bytes": 496436
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libquote-558ac7c8875640fb.rmeta": {
+      "sha256": "16a8ffdb82e34a2fe66412c66027d7da97c20b6d81b12175cad5641f9ef508fd",
+      "bytes": 272415
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libquote-918d2e4f2fe3cf01.rlib": {
+      "sha256": "f3c6bd56faecc56769055ca864dbe37fe792cbb53ac13b2d10fe5717435448ac",
+      "bytes": 496436
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libquote-918d2e4f2fe3cf01.rmeta": {
+      "sha256": "6a0ea78cecbaa41f76bd7adf015299109c25a3422dee88ac5f9384a39e469bc4",
+      "bytes": 272415
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libquote-a8e10d36338b4265.rlib": {
+      "sha256": "f25c87f7a70362d46321ae5a67ebce3be4e8566d85424daf0d76c96795448610",
+      "bytes": 496436
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libquote-a8e10d36338b4265.rmeta": {
+      "sha256": "9ca7d4bb48f05c82090a28bb7e4cf42a9a50291c233d13f2bc9223de51680d1d",
+      "bytes": 272415
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/librand-91bd22d804adaf9d.rmeta": {
+      "sha256": "b2f1a6f3c8e7f3ff655957c7a9f3fa9b8e8616759b47b80435a491c41fcbb30a",
+      "bytes": 688273
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/librand_chacha-d2925045c5064ddc.rmeta": {
+      "sha256": "70b5c53628b6b6954a1d91a017e0afc65bcc0f145179c44fb7344c5b4435423b",
+      "bytes": 106980
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/librand_core-35afbf4461b53b4d.rmeta": {
+      "sha256": "a1eb030becf7a07ee8c1ea39a6be5ecac8e59df27911401929f783e2d32abd51",
+      "bytes": 96940
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/librayon-1dba5f3412560c1c.rlib": {
+      "sha256": "6641bee9a8a47673bf94d5df6eac7c4b133539d31603781af8b27ade91673897",
+      "bytes": 4787666
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/librayon-1dba5f3412560c1c.rmeta": {
+      "sha256": "d2c1f1c449fe964f3e6d9b0954e02e255b3fb28b2442236dba5814015124661f",
+      "bytes": 4037124
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/librayon-91215a3217bb2636.rmeta": {
+      "sha256": "5e9915ce5a62bedcbc9039e61f511bab9a43de32af773639ae6d1179d59c2ec5",
+      "bytes": 3016627
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/librayon-92da40b2a3b588bf.rmeta": {
+      "sha256": "928f3a7e6d41ffd9c05710718d13848092cfe9bea78a6494666d3d08e78814b3",
+      "bytes": 3016627
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/librayon_cond-e168f97a42f5d56e.rmeta": {
+      "sha256": "1f6fb458b77916a51d060c9a51341b6156f50bd63d5fb404aabdfa55dd7c38ca",
+      "bytes": 56519
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/librayon_core-8b509118d1a2888d.rmeta": {
+      "sha256": "2b3f006e0ed7eb9ae29363cc72788e0fe9fdbef55b09d3e81579d9fe22147cab",
+      "bytes": 334429
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/librayon_core-9cb4e2a57c5131af.rlib": {
+      "sha256": "e1a3b685ab0176974f7c389afa9f7bd23242f4873513ecbfa26bd5db35b88508",
+      "bytes": 3314062
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/librayon_core-9cb4e2a57c5131af.rmeta": {
+      "sha256": "c9ba0be068adbac6d01def242c55361c0219e8643543e749250b0aee5fe14718",
+      "bytes": 481807
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/librayon_core-b77b48d4c7c99bb1.rmeta": {
+      "sha256": "5dfc584a46fdd60720b539d096f44ef28972c143f4d6bdbbca8162590ad6d2fa",
+      "bytes": 334429
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libregex-21b599583ba0941e.rmeta": {
+      "sha256": "e84807f3ad7381de4cf4de13a89aefe627153b1100dc820b50e2b8cdd4eba127",
+      "bytes": 558806
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libregex_automata-f0fbd0f296b2694a.rmeta": {
+      "sha256": "a10fb6a8c09222283d76390f7af1ca530d8fa2d922184409a058dd68a7f22488",
+      "bytes": 2553193
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libregex_syntax-29613ee99811d9bf.rmeta": {
+      "sha256": "6ba8a093ac2b7f504dc578ef383ce38942ca866539b0371b569d2434b4d23643",
+      "bytes": 4165579
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libron-28e4eb8d35f9b0e7.rmeta": {
+      "sha256": "1e5a9c64d4066389942802aabce838e7c2300bca0859439a412ff3f53d9148a0",
+      "bytes": 950117
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libron-82783d25f5b6f285.rmeta": {
+      "sha256": "d31eee958ba71d3f9442871fed4907d3bde01afdff944f5f727e192aaac3fd77",
+      "bytes": 950117
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libron-a803beac05a0c202.rlib": {
+      "sha256": "8c74c853d2389e5fdfb8ef158ace7cce27c7766f8770c7dcd058706223e198b4",
+      "bytes": 7124702
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libron-a803beac05a0c202.rmeta": {
+      "sha256": "898b3905bd9a2fedf3be2439286818651624757d5f2f70b231d4c63a58574a10",
+      "bytes": 1576595
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libron-c7c43a7750559b47.rmeta": {
+      "sha256": "4f74147549166cc393d0f3b16a910c7ab2ad1b41225b876e0d31b3837bcea2aa",
+      "bytes": 950118
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/librustix-68d0ed66c6aab1ad.rmeta": {
+      "sha256": "a22c7eeafa145abb26af30fd840a52b323ca5387160602c7f0487a060729ce76",
+      "bytes": 3110695
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/librustversion-272e36686d896562.so": {
+      "sha256": "f1acd2eee951a293449bf69b4d0a4956342869e37c65c30fb721a27d141981b5",
+      "bytes": 5045840
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libryu-17c84dad17bd72b5.rmeta": {
+      "sha256": "467856892ae455213b60f7bbc6f572474bedeef7ac3e18ea0fec6cbed351b6c8",
+      "bytes": 51019
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde-50a26248471bcb8b.rlib": {
+      "sha256": "f1b356e58adb4dbda6db94ec63e421c2ae8eef8ed93588f0b06203b3c72f0678",
+      "bytes": 1165068
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde-50a26248471bcb8b.rmeta": {
+      "sha256": "1444dcc96f83fd9961027a980472c059b9215d62e188d48e0fa928c366da8176",
+      "bytes": 831230
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde-51d89b1799bed5da.rlib": {
+      "sha256": "3f93fec719c1bda1c7f6d776a344859c255912444b1e87bd5d16a974d56b798c",
+      "bytes": 1165268
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde-51d89b1799bed5da.rmeta": {
+      "sha256": "b86ae6a4350b563bae71077815401a99a7c615bb2630807cc893a66a79c28da0",
+      "bytes": 831430
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde-84a1d107bc647ad7.rmeta": {
+      "sha256": "165fc178609389b4630ee036d1db25629502390cce591ac3398b486ec2c4e0d2",
+      "bytes": 516599
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde-969fd928ff1bc152.rmeta": {
+      "sha256": "85685629f3fcab3b03584f811c0cfdcdde0321a61c12cd4bcadf7c713a157f59",
+      "bytes": 516409
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde-a77a2ca71586dac9.rlib": {
+      "sha256": "1e70df422f34002461ea154cb8bb0114e2ed42a1ba32a9724752d0f5d707c6ac",
+      "bytes": 180874
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde-a77a2ca71586dac9.rmeta": {
+      "sha256": "74f26ad6040213ffb56406bcf2e5784bc84a355fdc70e3768776107d51002ed7",
+      "bytes": 171358
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde-c6119aa15d577478.rmeta": {
+      "sha256": "e91464e7caf75271187178da9ac3195faecdcba92d89ea71fd0d9de6833149e9",
+      "bytes": 516599
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde-e5034c356a434b6a.rmeta": {
+      "sha256": "3c2cb2837b7af0be3bca9bf68ad0c643615a82499a5c6bfd6248930080ef9654",
+      "bytes": 119508
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde_core-2f9fb2e97fda086a.rlib": {
+      "sha256": "0d66736ffa4e6e0658e0a52b51e67656a06b8c517b70108bdc471c7c70b35155",
+      "bytes": 5283434
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde_core-2f9fb2e97fda086a.rmeta": {
+      "sha256": "58e95e8a7a61e64b20d49f89e35c7e359d55fc4f30745133bf808b4063fba116",
+      "bytes": 4757204
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde_core-5e4a53ab78a8ae9f.rmeta": {
+      "sha256": "7269e77e0edac70e31bd5de1ebf5bd3a89146183f672ddea429ea918a54b9f45",
+      "bytes": 2374471
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde_core-89d0dde54340b726.rmeta": {
+      "sha256": "7096a361b6368875152a49b34b4a8529ff6f8bb62fca38d729d5ef8737cb98d3",
+      "bytes": 2648761
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde_core-b6636475c1160337.rlib": {
+      "sha256": "fcc2b75ac5b8a979cbab25c3ae93bf7f1bdbb82c1009da66407eaafecd29c2ea",
+      "bytes": 4868674
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde_core-b6636475c1160337.rmeta": {
+      "sha256": "d315eff9d72ab987b4f4f1f9812e2d96700544ea778ee46871cd8a22865d4cf1",
+      "bytes": 4372133
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde_core-d114acf83aad9801.rlib": {
+      "sha256": "df196ba410a877a49d9b994b0831e40fb935594d803feec7df60c44847e9cdc9",
+      "bytes": 5283714
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde_core-d114acf83aad9801.rmeta": {
+      "sha256": "cb1b3e64ebee025540c987dd7a5d7a7caf3cca8820624f5b93fa61accd6a4ec3",
+      "bytes": 4757473
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde_core-e12a7806b529f3c7.rmeta": {
+      "sha256": "ca10a9e5473089c4d494362bcfd8573ad620943db5e87e62db90db13d948fa76",
+      "bytes": 2648507
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde_core-f8e6df9e2c8f4cf0.rmeta": {
+      "sha256": "b595947fc29c7c4226ecbcab3af9ecd8048ba9405431953ac05a1138e602d3ec",
+      "bytes": 2648761
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde_derive-45322e8e378b4523.so": {
+      "sha256": "65dfc086b69a9becad76e86d9da886de91ee076e11393878d18e49b1f02c81e7",
+      "bytes": 8017744
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde_derive-c41848acebf7cfde.so": {
+      "sha256": "5a147df3f564ce2992d91404cb09852b519bdc63433ae3f10e487aa0ed3c80a2",
+      "bytes": 8025800
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde_derive-e8da7e57684f75f1.so": {
+      "sha256": "6cfc849f981bc9953c6d6ed304f79d2d4e14e730d8f151d553d4d3a90fa2fa17",
+      "bytes": 8017744
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde_json-330d04e41c16218c.rlib": {
+      "sha256": "a5114078f5cb7f6e2904ae691ea7fc716d22d52023f571b20592a663d8a912ac",
+      "bytes": 4422928
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde_json-330d04e41c16218c.rmeta": {
+      "sha256": "cac8788f65f645cab3c2f134a0cfd357c5caa1ec6f6c8fb62e70ceada854f0a1",
+      "bytes": 1415392
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde_json-4b0a32259b470b86.rmeta": {
+      "sha256": "f8d937b84fc567a3cf7e19b81115242e5926a506b82304c3e0cbb19cf8ad4876",
+      "bytes": 936832
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libserde_json-4e98b618f2bc5e37.rmeta": {
+      "sha256": "31f173bb772217d17075b7a9abf1393f7ec70a4c9933e20be0f46cb135490a85",
+      "bytes": 936832
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libsha2-045def8bf4018d9f.rlib": {
+      "sha256": "05d477713b6527a31424d213c5fdf8d93f59756342cb925776a71791cf67ee50",
+      "bytes": 1488504
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libsha2-045def8bf4018d9f.rmeta": {
+      "sha256": "83066ac9025bb9381a1b7b6f2683d41ee68e202a994dac99d831612ee8116a51",
+      "bytes": 666220
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libsha2-06fb652e5e7d0a9c.rlib": {
+      "sha256": "bc9b61e5d9945a845dc551be342c5b860ddc6a0231319b000afb9fcdfaaf962a",
+      "bytes": 1762410
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libsha2-06fb652e5e7d0a9c.rmeta": {
+      "sha256": "4ae6e32e5ead4816913a088ae4a20f8cd9740acba01f7473af0d8aba8da46117",
+      "bytes": 689608
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libsha2-388eff32157e44da.rmeta": {
+      "sha256": "64cf98ca975804536c4bffddaadbe7e07e3fbaca565dc570a143d6034eed4257",
+      "bytes": 642556
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libsha2-47d326ea81a2bfcf.rmeta": {
+      "sha256": "c784284a70b824f47c22c3de83b6b17a614393cf2ddc70aed384871f6341a514",
+      "bytes": 642556
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libsha2-d8f1a2543c77219a.rmeta": {
+      "sha256": "6b1e359396a1b19ffaa66a920d883f0d2bc051c0076352641943f83892758669",
+      "bytes": 641090
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libshlex-eb2cd44b463aae93.rlib": {
+      "sha256": "f668cfc63e0ce651c65d871f3ada092e6d8224394fd88516767461a66d9736f8",
+      "bytes": 125898
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libshlex-eb2cd44b463aae93.rmeta": {
+      "sha256": "4c89dae1dbbfd16f011b81c20a15c333cdc9fdec78f8be4d20dd817a89f4aa4a",
+      "bytes": 48262
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libsimd_adler32-cca6d482a46b8144.rmeta": {
+      "sha256": "cbcef78f6ad2c61781187ecd7452680a18a51da07692b01e48daf356c1d24042",
+      "bytes": 602250
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libsmallvec-382c9b5be4b932d2.rmeta": {
+      "sha256": "b404fa3e7635ba29717e0e8e6eb35657155edf8c253bf81255e08caaf8611d89",
+      "bytes": 157326
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libspm_precompiled-fb7e16c3f647425e.rmeta": {
+      "sha256": "6a900f1e4464f5b830f98e098d57427d337864a36cdff7b63b0fb8107344c3c4",
+      "bytes": 46959
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libstatic_assertions-fdae80a8dbbd64a1.rmeta": {
+      "sha256": "3ef71e371165d6cb1de409fcea742f358fd2059864000982ac6354e1824a0556",
+      "bytes": 49655
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libstrsim-cdfa80b3792e870c.rlib": {
+      "sha256": "523da6b87d449c84d3656fd15114c7913ff9081cbf6ad100a070fbfabbbf749b",
+      "bytes": 455476
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libstrsim-cdfa80b3792e870c.rmeta": {
+      "sha256": "f919317ee76ee7962e71a9da59789cec2b6dec946b0f7d1fe09b4ac056835313",
+      "bytes": 69171
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libsyn-7aa00b9ea9b718b3.rlib": {
+      "sha256": "87bcf9863748ca7148d49f82cef4d58aec5d72c12d0d5bd2537d4b48880464a0",
+      "bytes": 10977086
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libsyn-7aa00b9ea9b718b3.rmeta": {
+      "sha256": "52bd37d310ee6702f213223edf93f8f18acb59500b8f7c59317500060516f695",
+      "bytes": 3719723
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libsyn-bb8099108f6ac24c.rlib": {
+      "sha256": "25a2c5db543f26db003ed5b698bd374c83373a61feb57087a94439904fdd9ba1",
+      "bytes": 6087078
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libsyn-bb8099108f6ac24c.rmeta": {
+      "sha256": "1f3a8c2e3bf63bdb83a8126d0ffaf5eac73574e20d54ee53bb7ec8815e5d8283",
+      "bytes": 2226723
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libsyn-f1cac1a122027145.rlib": {
+      "sha256": "ceceef9338effe071ce200414f315928ad3e6e55c0d745791f11d69881b252d6",
+      "bytes": 6087078
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libsyn-f1cac1a122027145.rmeta": {
+      "sha256": "c9f9debda26e8fb075779fd0f8a2a305ab3aed8eb7ecb9402a843d46c72ca5d4",
+      "bytes": 2226723
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libsyn-f44cf1b978579699.rlib": {
+      "sha256": "f2d5ef718ecd768523fac9ed563dc351444355543a9958a0f12361dc2f2d7ae9",
+      "bytes": 6086046
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libsyn-f44cf1b978579699.rmeta": {
+      "sha256": "954f0ae7f7bef49e17c7db1959d1c7635e94b1dac44a79d22c8bf0fa1897813c",
+      "bytes": 2226723
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libtempfile-f117750779c253e6.rmeta": {
+      "sha256": "a998aba54601cc394423bc622a84161ea238a24bfb3404fea6f6983e0fda5613",
+      "bytes": 184817
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libthiserror-78d3a88eb52848d2.rmeta": {
+      "sha256": "e20f08f0124308d85480286ee502a1a2af90e12366c4afc522d3a185cf8a45aa",
+      "bytes": 27222
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libthiserror-ce91eb6ba4dabb1b.rmeta": {
+      "sha256": "89ec2fb06f65f3ab93957a7a132bef181edb79b94e0baa0e5dd9cd624afa9241",
+      "bytes": 27239
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libthiserror-eaa1e8ed4ec3eb0a.rlib": {
+      "sha256": "730539c139b165e478e801889dd913fc4be8a492fc6288d8316d28a44286ddb6",
+      "bytes": 30524
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libthiserror-eaa1e8ed4ec3eb0a.rmeta": {
+      "sha256": "672637a04128339f6e9dd7dbb4e9d72820113cf73bcf894be7f71be60a2f3123",
+      "bytes": 29003
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libthiserror-f2ffdb0e1d99793f.rlib": {
+      "sha256": "7bb0d590a5fa60b3dca190674a04e7005516b3ac5bc80b226dc766192dba9e6e",
+      "bytes": 30540
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libthiserror-f2ffdb0e1d99793f.rmeta": {
+      "sha256": "f320cf9cd72c7691cc74733ed22662d8dfed4bcc391b864aa60272ad3f996ac8",
+      "bytes": 29022
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libthiserror_impl-1c7c7abf43f23513.so": {
+      "sha256": "ce1ee1857f28fe63b8134673934426e459ed12313e78cd687fd7d8a8dff1120d",
+      "bytes": 7160272
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libthiserror_impl-70daf25107d4fa60.so": {
+      "sha256": "16956604653236cb6a9e57b74517f6a12b1e593314b1dfe72731a53fba6eda7b",
+      "bytes": 7152264
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libthiserror_impl-bd1591f5016dc55b.so": {
+      "sha256": "e46c440a868d73dd00d15a61d9249a0863fc6565a04738c9a3eded829d383b0e",
+      "bytes": 7152264
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libtokenizers-946f3c2728ef8f09.rmeta": {
+      "sha256": "c3cb40c34a0fbc49254f133fb245a57846b9c12e35f59f61b5599ae54e5ef48a",
+      "bytes": 2553547
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libtypeid-08c8b3d84cc17b2e.rmeta": {
+      "sha256": "567e967386454591dfda42a57e140dc3ca85152da71d211bdfc15898a9c24379",
+      "bytes": 15125
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libtypeid-40b9faa0f19c2dcd.rmeta": {
+      "sha256": "46735f4603ac1d14bf610c139e860ac247f9facca848ec52982ef6c03c11b86d",
+      "bytes": 15125
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libtypeid-e61006e1d7d32119.rlib": {
+      "sha256": "6399176c32faa61b44fcc5ab9cdf7e4f84a5f9ebd32b93fd19496fad54b09b79",
+      "bytes": 26746
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libtypeid-e61006e1d7d32119.rmeta": {
+      "sha256": "29db7143a8e6185074a10bfe54ce4c84aba0c5eb76bd7210be2cd46b5aa38d2f",
+      "bytes": 17176
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libtypenum-32ef2a4f83bebb61.rlib": {
+      "sha256": "3ff9793c2140df7a2f9036467a7af9c4ac8e937d71fdb7556d4d66e2a1e2d7db",
+      "bytes": 3667386
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libtypenum-32ef2a4f83bebb61.rmeta": {
+      "sha256": "3521e7d4d609a4d99e44d33ff582b8d787299457c59bf926efdf833560a14026",
+      "bytes": 3646184
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libtypenum-8e739126c1e7e8ac.rlib": {
+      "sha256": "f524b0abd78407224c863e80d4c9218a4a008d3f688e86a0b8c71de2f9d6d2d1",
+      "bytes": 2730858
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libtypenum-8e739126c1e7e8ac.rmeta": {
+      "sha256": "9b5cfb06b16c216223526562f756ea57f93fba0a4fcb5edbc52650f448637d9e",
+      "bytes": 2709645
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libtypenum-aa73d0077c6a12c0.rmeta": {
+      "sha256": "db26478f2968ddab4ef4918a58b6e3344b094b387c71d36af61f3e871f4bbe45",
+      "bytes": 2479335
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libtypenum-ea26e9f5cbc5483f.rmeta": {
+      "sha256": "8a780fa0a2fd7772499dacda0e6e638810c29cccb0d19c868160583b5cc99432",
+      "bytes": 2479335
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libtypenum-eb394cf81edb03ff.rmeta": {
+      "sha256": "55d2ccb943ad57013795ef26f6adbe6f778e1d91c24d9c6bd72390733b518c3b",
+      "bytes": 3391617
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libunicode_categories-35727b5b7cb3d13d.rmeta": {
+      "sha256": "2a40ef451cc358cf51e55894b442b3ab0225ffeda3e3ae3a88a1b9d09bd3d07a",
+      "bytes": 156219
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libunicode_ident-13f0fece03880ff1.rlib": {
+      "sha256": "83b92e3dc9c82ad81ab5b5cd5122bdb2de377f199accbf09120c795edc72410f",
+      "bytes": 71236
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libunicode_ident-13f0fece03880ff1.rmeta": {
+      "sha256": "0e8dcc06c387f4b2c79400a5030a525299d68a87a1222b922570267f1a679f3e",
+      "bytes": 32885
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libunicode_ident-148a18864ce1990a.rmeta": {
+      "sha256": "f5651d5943e97c6f5ff084bcbe858a2afa820bdc009cb30487f100f0aaaa2afa",
+      "bytes": 32545
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libunicode_ident-5fd884ed9145b54b.rlib": {
+      "sha256": "f7d1a5e7ef2b9694bd1d37468a4fe05ce09d85e26192baa98c876133beeb1624",
+      "bytes": 54580
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libunicode_ident-5fd884ed9145b54b.rmeta": {
+      "sha256": "5d989e938512acfaa7754b5a702fd0d33fc8b2bbd7ff7a989ec3db61f2f36dfd",
+      "bytes": 32885
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libunicode_ident-61533c72d8f4e5f7.rlib": {
+      "sha256": "581252e3853cf97b9f23cf215b04e21afe0dbb4f2841618fd8e9b500b4794890",
+      "bytes": 54580
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libunicode_ident-61533c72d8f4e5f7.rmeta": {
+      "sha256": "c5c9d801901f10796cf8b046d53c2dcaa6a0ec0614bfc3775b35cfd421dcb129",
+      "bytes": 32885
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libunicode_ident-8eca967e5ae5feb8.rmeta": {
+      "sha256": "f04036d187226bc164d3e68a8f80032eecefe47d63045269e5c8e595c1aee8c3",
+      "bytes": 32545
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libunicode_normalization_alignments-0c7f3d25560b683b.rmeta": {
+      "sha256": "bf186f5bd37e0a671b58c89ab7644c9214b04c97820e767b97bfc7c037613af9",
+      "bytes": 1723827
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libunicode_segmentation-5a2d4812fa722557.rmeta": {
+      "sha256": "5294a0ad01857b2db16b0af789d59b67e1510591ee6cdcdf61c009c06f903e92",
+      "bytes": 975131
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libunicode_width-5dc14b41389dbddc.rmeta": {
+      "sha256": "282475e999a16a34804f7d7fd25be098a0858a935b8a152f2d00364c8e55daa3",
+      "bytes": 815883
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libversion_check-9011ebc106141497.rlib": {
+      "sha256": "6bbc1296d439fcda860d854a65c7fee37d9caad16e3e36c9d1bdbc70e403ae10",
+      "bytes": 484064
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libversion_check-9011ebc106141497.rmeta": {
+      "sha256": "e14d8884ebbe4f69b3b246ef3b753a02d23619c94b628ae98a106d468e181436",
+      "bytes": 73603
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libversion_check-e67c589c3c1ced77.rlib": {
+      "sha256": "fa91eb9f7c65a17036c270a546065b3cea413a90043c19824d05c245c955d511",
+      "bytes": 484064
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libversion_check-e67c589c3c1ced77.rmeta": {
+      "sha256": "c024e4e371923a143114508296815b0d3cb374eb4e6932a42e91843bfbfa7333",
+      "bytes": 73603
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libzerocopy-469f58be8b5915c7.rmeta": {
+      "sha256": "42ebbfd459d779d1ec5e08402b3ef58a0b6aa298041f8e01fafc636f7b98a350",
+      "bytes": 12498473
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libzmij-2d47a3cbfef53c27.rmeta": {
+      "sha256": "84a6ed8b6589125171f579a3746a5f748e0c9e762ea9457cf8e4143e7d9d8b57",
+      "bytes": 406935
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libzmij-b6c1bf877ed137a2.rlib": {
+      "sha256": "4d5b301c9ae0f55d09ea2c872449d1a50b5a70e147ba45bdcc541c54ce90a251",
+      "bytes": 671932
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libzmij-b6c1bf877ed137a2.rmeta": {
+      "sha256": "381e3143bad9b5470ec560124a44d3b06fb187bce9fb6cf845038e5c0a5e980c",
+      "bytes": 416153
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2/debug/deps/libzmij-f05119c09cc4a24b.rmeta": {
+      "sha256": "1e3e8f4110caea6cd8b7079687957be717666cfe7d3a4bd6b537c6c31ae9c848",
+      "bytes": 406935
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/leased_stage_v2.py": {
+      "sha256": "bcf91456534e763a025613f39e82853d7a58529b399bb183d544d09a7a42f949",
+      "bytes": 5520
+    },
+    "/opt/cuda/bin/nvcc": {
+      "sha256": "02afd6a20bd29fae33bf278fa847a4e9711db25afec4a1bf648be81a3b210af0",
+      "bytes": 33994064
+    },
+    "/usr/bin/env": {
+      "sha256": "795586b56f6da560c3cf4e25c1a6e4f274a8576906e88d94c207db7255b07163",
+      "bytes": 72408
+    },
+    "/usr/bin/timeout": {
+      "sha256": "1425639cf3339b1117536df91cd4ba3229f8fa84e87322dee24e87121ed3feb3",
+      "bytes": 68320
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/source-v1/Cargo.toml": {
+      "sha256": "a9ff455bcb89885c74f5758dd782ec4d3c89bbd31018e89333c4d476ea2dc40f",
+      "bytes": 1160
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/source-v1/Cargo.lock": {
+      "sha256": "4380186a0b5ed33a0c6ef3b15822c215072016af539446727800dcd501bde00a",
+      "bytes": 4292
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/source-v1/crates/holonics/Cargo.toml": {
+      "sha256": "64170e4fac0e1f1b08bfd076b39289dae249ec50e115c720ac252c2cae09c916",
+      "bytes": 1544
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/source-v1/crates/holonics-cuda/Cargo.toml": {
+      "sha256": "18b25e1b99b09033da5950c3bb6b722085ab60c39adb322dd01dc0b8aec12f33",
+      "bytes": 649
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/source-v1/crates/holonics-cuda/build.rs": {
+      "sha256": "15cf455bd04009bcf138b687df512e7952f147302c29b3f6af3c27b4ffd59194",
+      "bytes": 11927
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/source-v1/accelerators/cuda-smoke/mount_smoke_kernel.ptx": {
+      "sha256": "0310be86a54b08c4234f6a39b69805b72d8610bb55cee5aef7caf387a0c8a2cd",
+      "bytes": 1437
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-18968dc9-20261006/LOCAL_CACHE_SOURCE_BINDING_REFUSAL.v1.json": {
+      "sha256": "32ac8d130718aa0630ddc0d1df68f78ad7041e8e6a4fd9e49bbf9e11ee2759bd",
+      "bytes": 88190
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/SOURCE_SNAPSHOT.v1.json": {
+      "sha256": "e088666e6b2c46deedd8bda6b11437d41fbaf97b9ff22d304741c5c5ac0b80d9",
+      "bytes": 47680
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/CACHE_SNAPSHOT.v2.json": {
+      "sha256": "f8495c1de94cd1b63c955d5d4852747f38941f764f0005c7541345b741fc6dec",
+      "bytes": 426848
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/PREPARATION.v2.json": {
+      "sha256": "47fadbe35630bfed338afca93e4ac56aa63033b5533b9c815766cafe89e30664",
+      "bytes": 514
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/LOCAL_SOURCE_BINDING_PREFLIGHT.v1.json": {
+      "sha256": "5a245b94f88748ba8cf07fdebb38153b38f091af781093cb5b3ead5df2bebba6",
+      "bytes": 831
+    },
+    "/home/b/Workspaces/holonics/.local/wt/material-learning/.local/material-learning-followup-01a1030c-20261006/COHERENT_FOLLOWUP_CANDIDATE.v7.json": {
+      "sha256": "f48dca9452cd12ea403641512c08b3669c12b14bf012336215a65588b497bf57",
+      "bytes": 15060
+    },
+    "/home/b/Workspaces/holonics/.local/wt/material-learning/.local/material-learning-followup-01a1030c-20261006/SOURCE_INPUT_MANIFEST.v7.json": {
+      "sha256": "016652f651eec6811e2c52ca38f73d5cf6f0b276b2498e3bb8e22cc4341d3517",
+      "bytes": 46976
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-cache-preparation-20261006-v1.acceptance.json": {
+      "sha256": "ad37b30050afc8b057086a8d392ab96bf7f4526f7bbe53c662a9fd910972e848",
+      "bytes": 378
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-cache-preparation-20261006-v1.release.json": {
+      "sha256": "1165763e5eb8526deab86618dff7da29947519ab0ed6e6209b921b67afc872ac",
+      "bytes": 175
+    }
+  },
+  "argv": [
+    "/usr/bin/env",
+    "-i",
+    "PATH=/home/b/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin:/usr/bin:/opt/cuda/bin",
+    "HOME=/home/b",
+    "CARGO_HOME=/home/b/.cargo",
+    "CARGO_TARGET_DIR=/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/cache-v2",
+    "LANG=C",
+    "LC_ALL=C",
+    "RAYON_NUM_THREADS=8",
+    "CARGO_BUILD_JOBS=8",
+    "RUSTFLAGS=",
+    "RUSTDOCFLAGS=",
+    "CARGO_ENCODED_RUSTFLAGS=",
+    "NVCC=/opt/cuda/bin/nvcc",
+    "/usr/bin/timeout",
+    "--signal=TERM",
+    "--kill-after=2s",
+    "65s",
+    "/home/b/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo",
+    "test",
+    "--offline",
+    "--locked",
+    "--workspace",
+    "--lib",
+    "--test",
+    "ranged_capacity",
+    "--test",
+    "source_entrance",
+    "--test",
+    "resident_cold_restore",
+    "--test",
+    "located_ingest",
+    "--example",
+    "hnn_prediction",
+    "--no-run",
+    "-j8",
+    "--message-format=json-render-diagnostics",
+    "--config",
+    "profile.test.package.holonics.debug=0",
+    "--config",
+    "profile.test.package.holonics.codegen-units=16",
+    "--config",
+    "profile.test.package.holonics-cuda.debug=0",
+    "--config",
+    "profile.test.package.holonics-cuda.codegen-units=16"
+  ],
+  "allocation_basis": {
+    "existing_wall_bound_ns": 65000000000,
+    "largest_prior_selected_link_wall_ns": 64890000000,
+    "latest_exact_predecessor_compile_wall_ns": 21293409144,
+    "latest_exact_predecessor_CPU_ns": 57551184000,
+    "current_compile_unmeasured": true,
+    "no_cap_raise": true
+  },
+  "launch_pending_resource_owner_handoff": false,
+  "queue_order": "NS leaf+audit complete; full Hodge cost frontier returned; exact parenta730 behavior admission next; protein slot remains free between units.",
+  "compiler_partition_choice": "agent-inferred: existing local-package debug=0/codegen-units=16 partition; preserved physical default-debug LLVM allocation failure under same native caps. Fixed source v4 seal; no capacity/carry algorithm or allocation change.",
+  "source_commit": "a730d824209573bed8e56fccd0e2774d4cf88ddc",
+  "source_version": "v7",
+  "changed_cache_read": "Preserved copied local package fingerprints outside consumed private cache before first current-source build; actual local fresh:false required, original accepted cache unchanged.",
+  "previous_stale_cache_source_binding_refusal": "Prior18968dc9 v1 fresh:true link unaccepted/preserved; this private cache source preflight preserves local fingerprints outside lookup before first compiler."
+}

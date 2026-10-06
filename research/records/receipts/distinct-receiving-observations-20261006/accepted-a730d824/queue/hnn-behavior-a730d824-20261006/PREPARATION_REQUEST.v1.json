@@ -1,0 +1,20 @@
+{
+  "output_root": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006",
+  "cache_origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-material-f9caaaba-20261006/cache-v2",
+  "cache_paths": [
+    "debug/deps",
+    "debug/build",
+    "debug/.fingerprint",
+    ".rustc_info.json"
+  ],
+  "source_manifest_pin": {
+    "sha256": "e088666e6b2c46deedd8bda6b11437d41fbaf97b9ff22d304741c5c5ac0b80d9",
+    "bytes": 47680
+  },
+  "owner_request": "/home/b/Workspaces/holonics/.local/wt/material-learning/.local/material-learning-followup-01a1030c-20261006/COHERENT_FOLLOWUP_CANDIDATE.v7.json",
+  "owner_request_pin": {
+    "sha256": "f48dca9452cd12ea403641512c08b3669c12b14bf012336215a65588b497bf57",
+    "bytes": 15060
+  },
+  "preserved_failure": "All previous cache/link/runtime failures immutable; new committed a730 target diagnostic; selected tested cache shape omits unused incremental/old example outputs; no prior native job for this source."
+}

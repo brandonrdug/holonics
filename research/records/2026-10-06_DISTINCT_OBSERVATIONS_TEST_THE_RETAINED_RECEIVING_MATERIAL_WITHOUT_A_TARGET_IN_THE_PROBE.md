@@ -2,7 +2,7 @@
 
 October 6, 2026. Refs #73, #148, #63, #62.
 
-[definition; prepared bounded consumer; native/type pending] The accepted f9caaaba behavior has
+[implemented-exact; bounded native consumer accepted on a730d824] The accepted f9caaaba behavior has
 one observed class-2 comparison and exactly equal class-0/1/3 real receiving readings. The
 [first-deposit owner](2026-10-02_THE_RECEIVING_MAP_OPENS_AT_ZERO_AND_THE_SOURCE_MAP_REACHES_THE_CONTACT_ONLY_AS_MOTION.md)
 and Lean `HNN/ReceivingReach.first_deposit_read` explain that symmetry. Its
@@ -68,9 +68,10 @@ labels, masks, source law, grain, transport, carry, read count or caps after the
 There are nine native Words: three blind teaching Words plus two matched receptions for each
 of three probes, all with two requested crossings and one actual tick. Three R-only comparisons
 are admitted after their blind forward. This is one exact selector, one thread, the existing
-16 wall s /17 aggregate CPU s /4GiB group cap with the existing memory floors. The new shape
-has not been measured here: only the shared queue may perform its bounded development read,
-count a first conforming read once, and seal the fixed measured projection. The usual offline
+16 wall s /17 aggregate CPU s /4GiB group cap with the existing memory floors. The sole queue's
+first matching bounded read passed once and was counted once, without a repeated runtime.
+Its measured upper unit is 2,730,753,827 ns wall and 2,653,169,000 ns aggregate CPU, with a
+26,783,744-byte group peak. The usual offline
 locked host/CUDA/example no-run linkage has unchanged 65 wall s /128 aggregate CPU s /8 threads
 and 4GiB bounds. No Lean owner changed or new Lean run is needed.
 
@@ -80,7 +81,7 @@ immutable current, and no intervening ingest, synchronization or pending decay. 
 [fresh source audit](receipts/leaky-source-domain-20261006/accepted-f9caaaba/FRESH_CONTINUED_SOURCE_AUDIT.v1.json)
 is source evidence on the accepted f9caaaba path; it does not extend the denominator claim to
 an aged or incrementally ingested nonempty moment. The eighteen-control acceptance remains
-attached to f9caaaba. This new selector's native/type status is pending its own fresh binding.
+attached to f9caaaba. This new selector has its own fresh native binding to a730d824.
 
 A behavior change here would establish only this bounded retained-material consumer response.
 Useful repair still owes an independently declared source-conditioned family whose intact
@@ -88,3 +89,52 @@ information survives the source chart and whose erased constraints the native fi
 Fresh sparse first marginals still omit offset-pair features; the unit same-phase source alias
 remains; nonlinear E learning still requires the reached Word-Hessian certificate. Those
 architectural obligations are not changed by giving R another observation.
+
+## Accepted actual output and causal limit
+
+[measured] The [independent acceptance join](receipts/distinct-receiving-observations-20261006/accepted-a730d824/ACCEPTANCE_JOIN.v1.json)
+rehashes all 760 original artifacts (1,018,489,597 bytes), matches 286 source inputs against
+immutable git and the queue snapshot, and matches the 285 native inputs against both build and
+runtime seals. All local Cargo artifacts are freshly built. The host executable is
+`d69aba0fbab9411f2b02aef65636a278a2e189afe916a79c9adadd599f95ef97`.
+The combined host/CUDA/example link passed within unchanged bounds; no GPU execution, Lean
+recompile or scientific job occurred. The prior pre-Cargo input-plan refusal remains in the
+receipt with cleanup. The link used 20,692,976,887 ns wall, 56,277,529,000 ns aggregate CPU and
+3,252,465,664 bytes group peak. The runtime/deadline ratio is exactly
+2,730,753,827/16,000,000,000. The raw full output, material, normal-step and resource receipts
+are preserved in the same directory; large binaries/cache remain in the original local archive.
+
+The three blind teaching receipts hold the full four-class fibre. R clock and commit move
+0→1→2→3; E, transport and internal physical relations stay fixed. Real rows0/1/3 are now
+distinct, so the earlier one-observation exchangeability no longer explains this result.
+The subsequent whole native outputs are:
+
+```
+[Intact(0), Released(3), Intact(3), Intact(0)]
+[Intact(1), Released(3), Intact(3), Intact(0)]
+[Intact(3), Released(3), Intact(3), Intact(0)]
+```
+
+Only the erased station is emitted by the native face; the intact cells are boundary readings.
+Initial R under each same entered carry remains plural. Thus changing R causes these release
+decisions. Changing the cue changes every probe's exact complex reading, while class3 leads
+at both crossings for all three probes. The [exact readout](receipts/distinct-receiving-observations-20261006/accepted-a730d824/BEHAVIOR_READOUT.v1.json)
+keeps all pairwise complex differences and exact class3 margins. This is source-sensitive
+motion with a constant decision on these three probes, not evidence that the source is ignored.
+
+[unresolved causal attribution] Latest observed label3, the entered continuing interior and
+the probes' common tail `[3,0]` have not been varied independently. Training also changes source
+and carry between observations. A pure last-label overwrite is therefore not identified.
+The loaded Word is quartic: shared-tail/carry cancellation through a fixed linear map
+`R K E` is not justified, although the fixed-operand finite differences themselves are exact.
+The strong end-framed transport also attenuates the older cue relative to the shared tail;
+the complete rounded source law, not a lossless or unrounded surrogate, owns that statement.
+No erased truth exists for these probes, so no reconstruction accuracy can be attached to them.
+
+The next bounded diagnosis fixes one probe across material checkpoints and entered carries,
+with absent-source controls. It may identify a receiving-material, source and interior
+interaction; it cannot establish a task family from three chosen observations. Independently,
+the proven first-marginal alias still requires joining the existing declared pair-source law
+to the physical sparse source consumer. A generic joint-source change must enclose mixed-class
+completions and preserve the same Word/adjoint operands; it must not be selected to force a
+particular cue output.

@@ -1,0 +1,99 @@
+{
+  "passed": false,
+  "label": "hnn-behavior-a730d824-exact-reader-control-20261006-v1",
+  "scientific_job": false,
+  "deferred_lock_busy": false,
+  "final_CPU_ns": 2653169000,
+  "CPU_reading_grain_ns": 1000,
+  "aggregate_CPU_limit_us": 17000000,
+  "final_CPU_source": "systemd retained oneshot CPUUsageNSec after all group processes exit",
+  "CPU_kernel_hard_total_limit": false,
+  "sampled_stop_margin_us": 1000000,
+  "aggregate_CPU_within_limit": true,
+  "no_overshoot_accepted": true,
+  "wall_ns": 2730753827,
+  "projection_ns": 16000000000,
+  "wall_source": "external monotonic_ns through final property read",
+  "quiescent": true,
+  "completion_event": "oneshot start job completed; no polling",
+  "unit_properties": {
+    "Description": "Owned holonics admission hnn-behavior-a730d824-exact-reader-control-20261006-v1 b667f8422a36f515f10b3914745dfd93",
+    "LoadState": "loaded",
+    "ActiveState": "active",
+    "SubState": "exited",
+    "InvocationID": "f66096eddbb7410998383873a73e307c",
+    "Result": "success",
+    "ExecMainStatus": "0",
+    "ControlGroup": "",
+    "MemoryPeak": "26783744",
+    "CPUUsageNSec": "2653169000",
+    "TasksCurrent": "[not set]"
+  },
+  "outer_error": null,
+  "unit_start_exit": 0,
+  "unit_start_stdout": "",
+  "unit_start_stderr": "",
+  "config": {
+    "sha256": "dfbbb3ca12e9146a880655b206acb667c27d3e81fbce19375d526617f8433c98",
+    "bytes": 129969
+  },
+  "receipt_pins": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-exact-reader-control-20261006-v1.config.json": {
+      "sha256": "dfbbb3ca12e9146a880655b206acb667c27d3e81fbce19375d526617f8433c98",
+      "bytes": 129969
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-exact-reader-control-20261006-v1.external-lease.json": {
+      "sha256": "db6062879427a81a57dc10bf6896268fc813c7442690a236d2c747bc67a6f4fe",
+      "bytes": 487
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-exact-reader-control-20261006-v1.lease-identity.json": {
+      "sha256": "c12237b32520738272f67d763eef19f57c9da464b6dbb73395fa04d1f16733c9",
+      "bytes": 565
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-exact-reader-control-20261006-v1.input_seal.json": {
+      "sha256": "e9e21f69f6ca7c06421d9d2babfd5864411cbd2c0bb7c29c0733900c3e247cb9",
+      "bytes": 83124
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-exact-reader-control-20261006-v1.stdout": {
+      "sha256": "97773a99dadae439ad8da64e2b3d6c9f58141071f81e60ec2b43f9c3119b0484",
+      "bytes": 50918
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-exact-reader-control-20261006-v1.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-exact-reader-control-20261006-v1.memory-gate.json": {
+      "sha256": "753985c982bf7ea827989cc58f00f81aab85e343af9220f75bba12ee21f9b3ee",
+      "bytes": 120
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-exact-reader-control-20261006-v1.child-identity.json": {
+      "sha256": "c09597377da65e54847f58153f3f167c3756154d3352a751a367f853d9f87815",
+      "bytes": 78
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-exact-reader-control-20261006-v1.system-floor.json": {
+      "sha256": "850c7c1a02e659883c1d7367082ed25c6f8faa91ac8196e8580add86a181681a",
+      "bytes": 19502
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-exact-reader-control-20261006-v1.quiescence.json": {
+      "sha256": "2ef1c2b38995e0b261fd7ef9a6b006863982d5614025052daeb2e892b9fee348",
+      "bytes": 130
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-exact-reader-control-20261006-v1.output_seal.json": {
+      "sha256": "50836090b3f826c020727f988cc746d8a948dec781b659fb4efd7c3872fc8fdf",
+      "bytes": 171185
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-exact-reader-control-20261006-v1.publication.json": {
+      "sha256": "d66f421efe62533fd0c1b57a7ac75602947d23ee5d6a721eecdefa64290a34e8",
+      "bytes": 2829
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-exact-reader-control-20261006-v1.stage-quiescence.json": {
+      "sha256": "f91c4be0fd4ecee21d160b4b84dc793d0b9a15942f07c40bc2b39e000ffecc78",
+      "bytes": 136
+    }
+  },
+  "launcher_outside_native_group": true,
+  "lease_owner_outside_capped_group": true,
+  "lease_held_through_final_CPU_read_and_publication": true,
+  "stage_passed_before_cleanup": true,
+  "requires_cleanup_acceptance": true
+}

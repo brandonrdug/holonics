@@ -1,0 +1,54 @@
+{
+  "lease_still_held": true,
+  "own_group_other_PIDs": [],
+  "outcome": {
+    "provisional_passed": true,
+    "final_acceptance_requires_external_CPU_read": true,
+    "label": "hnn-behavior-a730d824-host-cuda-link-20261006-v2",
+    "wall_ns": 18884777680,
+    "peak_child_RSS_KiB": 2296456,
+    "group_memory_peak_bytes": 3252465664,
+    "original_coordinates_modified": false,
+    "aggregate_cpu_final_us": 56256994,
+    "aggregate_cpu_limit_us": 128000000,
+    "CPU_kernel_hard_total_limit": false
+  },
+  "outputs": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-host-cuda-link-20261006-v2.lease-identity.json": {
+      "sha256": "453e66e2aea6a95ed8222ac14b6253778c451346fa7cbcdfe79bb9ee59b19b6f",
+      "bytes": 565
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-host-cuda-link-20261006-v2.memory-gate.json": {
+      "sha256": "0eb7cb84d3d30f826214f25187219ba841bea53b8b59c61e697ffeaa5ae8bb34",
+      "bytes": 120
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-host-cuda-link-20261006-v2.child-identity.json": {
+      "sha256": "231ea3b1043799b1d8f02d271d5aa31a2dfcb0cb41f55a333ca3ecf75d9d385b",
+      "bytes": 78
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-host-cuda-link-20261006-v2.system-floor.json": {
+      "sha256": "ae00ec3413c1fe611b496a95f318092687f0886f0ea2cea0b8e719e9cf96f5d0",
+      "bytes": 147611
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-host-cuda-link-20261006-v2.quiescence.json": {
+      "sha256": "ab7637501e328903490fb2d0689d77f6b121d9902cb06a8072d609ce5d6bb204",
+      "bytes": 130
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-host-cuda-link-20261006-v2.input_seal.json": {
+      "sha256": "eef0b4470225ba70acc6d149eb3b5f993690e6163e241954866165f731f0c8d8",
+      "bytes": 339988
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-host-cuda-link-20261006-v2.output_seal.json": {
+      "sha256": "b8c091ef62b46715c73e1d0a8360b4feadcf049e01933c955c100eb1f894fa0a",
+      "bytes": 1320896
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-host-cuda-link-20261006-v2.stdout": {
+      "sha256": "8e86c68e66a9b2372bc613e54b381fcc87110924f9d66dd9c765a831865225a0",
+      "bytes": 37630
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-host-cuda-link-20261006-v2.stderr": {
+      "sha256": "00f2fd7ee06eb8dc81175c369b27e5fa3cf395d8f775f79b5f7d6cac9fa0fdce",
+      "bytes": 392
+    }
+  }
+}

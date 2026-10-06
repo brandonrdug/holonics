@@ -1,0 +1,26 @@
+{
+  "lease_still_held": true,
+  "own_group_other_PIDs": [],
+  "outcome": {
+    "provisional_passed": false,
+    "final_acceptance_requires_external_CPU_read": true,
+    "label": "hnn-behavior-a730d824-host-cuda-link-20261006-v1",
+    "error_type": "AssertionError",
+    "error": "input membership differs from the planned seal",
+    "child_launched": false,
+    "child_reaped": false,
+    "aggregate_cpu_final_us": 599749,
+    "aggregate_cpu_limit_us": 128000000,
+    "CPU_kernel_hard_total_limit": false
+  },
+  "outputs": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-host-cuda-link-20261006-v1.lease-identity.json": {
+      "sha256": "5fec0f0e623e34c01714a63dc2b66e760dafe71353ce731941fbe7a88f0b3768",
+      "bytes": 565
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-host-cuda-link-20261006-v1.failure.json": {
+      "sha256": "be93db182d1251d815df23c3198e5aadfdd26dbe72d28c2482e69e0a4ec4e6ef",
+      "bytes": 299
+    }
+  }
+}

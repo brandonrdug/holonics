@@ -1,0 +1,3 @@
+   Compiling holonics-cuda v0.1.0 (/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/source-v1/crates/holonics-cuda)
+   Compiling holonics v0.1.0 (/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-20261006/source-v1/crates/holonics)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 18.87s

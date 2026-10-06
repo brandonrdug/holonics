@@ -1,0 +1,40 @@
+{
+  "source_commit": "a730d824209573bed8e56fccd0e2774d4cf88ddc",
+  "raw_stdout": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-behavior-a730d824-exact-reader-control-20261006-v1.stdout",
+  "raw_stdout_pin": {
+    "bytes": 50918,
+    "sha256": "97773a99dadae439ad8da64e2b3d6c9f58141071f81e60ec2b43f9c3119b0484"
+  },
+  "blind_whole_outputs": [
+    "0 blind whole cells [Intact(0), Held { fibre: [0, 1, 2, 3], unresolved: PluralDomain }]",
+    "1 blind whole cells [Intact(1), Held { fibre: [0, 1, 2, 3], unresolved: PluralDomain }]",
+    "2 blind whole cells [Intact(3), Held { fibre: [0, 1, 2, 3], unresolved: PluralDomain }]"
+  ],
+  "target_free_probe_whole_outputs": [
+    {
+      "actual_intact_source": "[Some(0), None, Some(3), Some(0)]",
+      "initial_material_whole_output": "[Intact(0), Held { fibre: [0, 1, 2, 3], unresolved: PluralDomain }, Intact(3), Intact(0)]",
+      "learned_material_whole_output": "[Intact(0), Released(3), Intact(3), Intact(0)]",
+      "initial_leaders": "[[0, 1, 2, 3], [0, 1, 2, 3]]",
+      "learned_leaders": "[[3], [3]]"
+    },
+    {
+      "actual_intact_source": "[Some(1), None, Some(3), Some(0)]",
+      "initial_material_whole_output": "[Intact(1), Held { fibre: [0, 1, 2, 3], unresolved: PluralDomain }, Intact(3), Intact(0)]",
+      "learned_material_whole_output": "[Intact(1), Released(3), Intact(3), Intact(0)]",
+      "initial_leaders": "[[0, 1, 2, 3], [0, 1, 2, 3]]",
+      "learned_leaders": "[[3], [3]]"
+    },
+    {
+      "actual_intact_source": "[Some(3), None, Some(3), Some(0)]",
+      "initial_material_whole_output": "[Intact(3), Held { fibre: [0, 1, 2, 3], unresolved: PluralDomain }, Intact(3), Intact(0)]",
+      "learned_material_whole_output": "[Intact(3), Released(3), Intact(3), Intact(0)]",
+      "initial_leaders": "[[0, 1, 2, 3], [0, 1, 2, 3]]",
+      "learned_leaders": "[[3], [3]]"
+    }
+  ],
+  "receiving_material_summary_from_raw": [
+    "retained receiving material: full actual R ExactRatMatrix { rows: 8, columns: 16, entries: [Ratio { numer: -3, denom: 512 }, Ratio { numer: 5, denom: 64 }, Ratio { numer: 7, denom: 128 }, Ratio { numer: -37, denom: 256 }, Ratio { numer: 11, denom: 256 }, Ratio { numer: 1, denom: 128 }, Ratio { numer: -29, denom: 512 }, Ratio { numer: -5, denom: 128 }, Ratio { numer: 3, denom: 256 }, Ratio { numer: -3, denom: 32 }, Ratio { numer: 13, denom: 512 }, Ratio { numer: 3, denom: 512 }, Ratio { numer: 37, denom: 512 }, Ratio { numer: -31, denom: 512 }, Ratio { numer: -25, denom: 512 }, Ratio { numer: 87, denom: 512 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 33, denom: 256 }, Ratio { numer: 83, denom: 512 }, Ratio { numer: 31, denom: 128 }, Ratio { numer: -3, denom: 256 }, Ratio { numer: 37, denom: 512 }, Ratio { numer: 83, denom: 512 }, Ratio { numer: -35, denom: 512 }, Ratio { numer: -113, denom: 512 }, Ratio { numer: -13, denom: 512 }, Ratio { numer: -5, denom: 128 }, Ratio { numer: 75, denom: 512 }, Ratio { numer: -7, denom: 64 }, Ratio { numer: -3, denom: 256 }, Ratio { numer: -5, denom: 64 }, Ratio { numer: 1, denom: 16 }, Ratio { numer: -35, denom: 512 }, Ratio { numer: 5, denom: 512 }, Ratio { numer: 3, denom: 512 }, Ratio { numer: 1, denom: 64 }, Ratio { numer: 5, denom: 512 }, Ratio { numer: 1, denom: 512 }, Ratio { numer: 3, denom: 256 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -7, denom: 512 }, Ratio { numer: -1, denom: 512 }, Ratio { numer: 1, denom: 256 }, Ratio { numer: 5, denom: 512 }, Ratio { numer: -5, denom: 512 }, Ratio { numer: -3, denom: 512 }, Ratio { numer: -1, denom: 512 }, Ratio { numer: 1, denom: 128 }, Ratio { numer: -5, denom: 256 }, Ratio { numer: -141, denom: 512 }, Ratio { numer: -25, denom: 128 }, Ratio { numer: -55, denom: 256 }, Ratio { numer: 71, denom: 512 }, Ratio { numer: -119, denom: 512 }, Ratio { numer: -67, denom: 256 }, Ratio { numer: 35, denom: 256 }, Ratio { numer: 19, denom: 128 }, Ratio { numer: -93, denom: 512 }, Ratio { numer: 27, denom: 256 }, Ratio { numer: -83, denom: 512 }, Ratio { numer: 25, denom: 128 }, Ratio { numer: -53, denom: 256 }, Ratio { numer: 55, denom: 256 }, Ratio { numer: 119, denom: 512 }, Ratio { numer: -15, denom: 128 }, Ratio { numer: -11, denom: 512 }, Ratio { numer: -11, denom: 512 }, Ratio { numer: -11, denom: 512 }, Ratio { numer: 11, denom: 512 }, Ratio { numer: -11, denom: 512 }, Ratio { numer: -11, denom: 512 }, Ratio { numer: 1, denom: 64 }, Ratio { numer: 1, denom: 64 }, Ratio { numer: -7, denom: 512 }, Ratio { numer: 1, denom: 64 }, Ratio { numer: -7, denom: 512 }, Ratio { numer: 1, denom: 64 }, Ratio { numer: -11, denom: 512 }, Ratio { numer: 11, denom: 512 }, Ratio { numer: 11, denom: 512 }, Ratio { numer: -11, denom: 512 }, Ratio { numer: 79, denom: 512 }, Ratio { numer: -11, denom: 256 }, Ratio { numer: -41, denom: 512 }, Ratio { numer: 5, denom: 256 }, Ratio { numer: 61, denom: 512 }, Ratio { numer: 47, denom: 512 }, Ratio { numer: -5, denom: 512 }, Ratio { numer: 57, denom: 512 }, Ratio { numer: 25, denom: 128 }, Ratio { numer: 7, denom: 256 }, Ratio { numer: -5, denom: 512 }, Ratio { numer: -23, denom: 256 }, Ratio { numer: 19, denom: 128 }, Ratio { numer: -39, denom: 512 }, Ratio { numer: -127, denom: 512 }, Ratio { numer: 9, denom: 512 }, Ratio { numer: 3, denom: 256 }, Ratio { numer: -5, denom: 512 }, Ratio { numer: -5, denom: 512 }, Ratio { numer: 7, denom: 512 }, Ratio { numer: 3, denom: 512 }, Ratio { numer: 3, denom: 512 }, Ratio { numer: 1, denom: 256 }, Ratio { numer: 3, denom: 256 }, Ratio { numer: 7, denom: 512 }, Ratio { numer: 5, denom: 512 }, Ratio { numer: -1, denom: 512 }, Ratio { numer: -1, denom: 128 }, Ratio { numer: 3, denom: 512 }, Ratio { numer: -1, denom: 512 }, Ratio { numer: -1, denom: 64 }, Ratio { numer: -3, denom: 256 }] }; equal real rows 0/1 false; 0/3 false; 1/3 false; full source E unchanged true; transport 169979/1048576"
+  ],
+  "actual_outputs_extracted_no_desired_output_grade": true
+}

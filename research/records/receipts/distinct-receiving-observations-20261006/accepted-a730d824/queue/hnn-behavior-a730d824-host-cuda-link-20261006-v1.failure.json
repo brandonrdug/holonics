@@ -1,0 +1,9 @@
+{
+  "provisional_passed": false,
+  "final_acceptance_requires_external_CPU_read": true,
+  "label": "hnn-behavior-a730d824-host-cuda-link-20261006-v1",
+  "error_type": "AssertionError",
+  "error": "input membership differs from the planned seal",
+  "child_launched": false,
+  "child_reaped": false
+}
