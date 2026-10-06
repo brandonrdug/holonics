@@ -1,0 +1,619 @@
+{
+  "validation": {
+    "path": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/native-validation-motion-decoder-v1/VALIDATION.json",
+    "bytes": 105058,
+    "sha256": "2943b3c1181bdcdbb47a39a185d44977c8e80ba7542d68db76a74ce8a25f463d"
+  },
+  "exact_factored_readings": {
+    "geometry-decoder-development-preparation-20261006-v1": {
+      "wall_ns": {
+        "integer": 2941657943,
+        "prime_powers": [
+          [
+            7,
+            1
+          ],
+          [
+            193,
+            1
+          ],
+          [
+            617,
+            1
+          ],
+          [
+            3529,
+            1
+          ]
+        ]
+      },
+      "projection_ns": {
+        "integer": 12779337307,
+        "prime_powers": [
+          [
+            11,
+            1
+          ],
+          [
+            1161757937,
+            1
+          ]
+        ]
+      },
+      "aggregate_CPU_ns": {
+        "integer": 2599105000,
+        "prime_powers": [
+          [
+            2,
+            3
+          ],
+          [
+            5,
+            4
+          ],
+          [
+            19,
+            1
+          ],
+          [
+            109,
+            1
+          ],
+          [
+            251,
+            1
+          ]
+        ]
+      },
+      "group_peak_bytes": {
+        "integer": 385007616,
+        "prime_powers": [
+          [
+            2,
+            14
+          ],
+          [
+            3,
+            2
+          ],
+          [
+            7,
+            1
+          ],
+          [
+            373,
+            1
+          ]
+        ]
+      },
+      "peak_child_RSS_KiB": {
+        "integer": 284420,
+        "prime_powers": [
+          [
+            2,
+            2
+          ],
+          [
+            5,
+            1
+          ],
+          [
+            14221,
+            1
+          ]
+        ]
+      },
+      "measured_to_projected": [
+        2941657943,
+        12779337307
+      ]
+    },
+    "geometry-decoder-development-development-20261006-v1": {
+      "wall_ns": {
+        "integer": 4928043974,
+        "prime_powers": [
+          [
+            2,
+            1
+          ],
+          [
+            7,
+            2
+          ],
+          [
+            2917,
+            1
+          ],
+          [
+            17239,
+            1
+          ]
+        ]
+      },
+      "projection_ns": {
+        "integer": 21132554884,
+        "prime_powers": [
+          [
+            2,
+            2
+          ],
+          [
+            7,
+            1
+          ],
+          [
+            37,
+            1
+          ],
+          [
+            20398219,
+            1
+          ]
+        ]
+      },
+      "aggregate_CPU_ns": {
+        "integer": 2589098000,
+        "prime_powers": [
+          [
+            2,
+            4
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            947,
+            1
+          ],
+          [
+            1367,
+            1
+          ]
+        ]
+      },
+      "group_peak_bytes": {
+        "integer": 2278350848,
+        "prime_powers": [
+          [
+            2,
+            13
+          ],
+          [
+            278119,
+            1
+          ]
+        ]
+      },
+      "peak_child_RSS_KiB": {
+        "integer": 1785952,
+        "prime_powers": [
+          [
+            2,
+            5
+          ],
+          [
+            7,
+            2
+          ],
+          [
+            17,
+            1
+          ],
+          [
+            67,
+            1
+          ]
+        ]
+      },
+      "measured_to_projected": [
+        352003141,
+        1509468206
+      ]
+    },
+    "geometry-motion-decoder-owner-preparation-20261006-v1": {
+      "wall_ns": {
+        "integer": 4866447885,
+        "prime_powers": [
+          [
+            3,
+            1
+          ],
+          [
+            5,
+            1
+          ],
+          [
+            13,
+            1
+          ],
+          [
+            24956143,
+            1
+          ]
+        ]
+      },
+      "projection_ns": {
+        "integer": 12779337307,
+        "prime_powers": [
+          [
+            11,
+            1
+          ],
+          [
+            1161757937,
+            1
+          ]
+        ]
+      },
+      "aggregate_CPU_ns": {
+        "integer": 4354179000,
+        "prime_powers": [
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            1451393,
+            1
+          ]
+        ]
+      },
+      "group_peak_bytes": {
+        "integer": 324677632,
+        "prime_powers": [
+          [
+            2,
+            12
+          ],
+          [
+            31,
+            1
+          ],
+          [
+            2557,
+            1
+          ]
+        ]
+      },
+      "peak_child_RSS_KiB": {
+        "integer": 284412,
+        "prime_powers": [
+          [
+            2,
+            2
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            137,
+            1
+          ],
+          [
+            173,
+            1
+          ]
+        ]
+      },
+      "measured_to_projected": [
+        4866447885,
+        12779337307
+      ]
+    },
+    "geometry-motion-decoder-owner-development-20261006-v1": {
+      "wall_ns": {
+        "integer": 18898885914,
+        "prime_powers": [
+          [
+            2,
+            1
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            19,
+            1
+          ],
+          [
+            107,
+            1
+          ],
+          [
+            113,
+            1
+          ],
+          [
+            13711,
+            1
+          ]
+        ]
+      },
+      "projection_ns": {
+        "integer": 21132554884,
+        "prime_powers": [
+          [
+            2,
+            2
+          ],
+          [
+            7,
+            1
+          ],
+          [
+            37,
+            1
+          ],
+          [
+            20398219,
+            1
+          ]
+        ]
+      },
+      "aggregate_CPU_ns": {
+        "integer": 12190530000,
+        "prime_powers": [
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            5,
+            4
+          ],
+          [
+            11,
+            1
+          ],
+          [
+            17,
+            1
+          ],
+          [
+            41,
+            1
+          ],
+          [
+            53,
+            1
+          ]
+        ]
+      },
+      "group_peak_bytes": {
+        "integer": 4294967296,
+        "prime_powers": [
+          [
+            2,
+            32
+          ]
+        ]
+      },
+      "peak_child_RSS_KiB": {
+        "integer": 3405460,
+        "prime_powers": [
+          [
+            2,
+            2
+          ],
+          [
+            5,
+            1
+          ],
+          [
+            41,
+            1
+          ],
+          [
+            4153,
+            1
+          ]
+        ]
+      },
+      "measured_to_projected": [
+        9449442957,
+        10566277442
+      ]
+    },
+    "geometry-decoder-importer-preparation-20261006-v1": {
+      "wall_ns": {
+        "integer": 4798881106,
+        "prime_powers": [
+          [
+            2,
+            1
+          ],
+          [
+            887,
+            1
+          ],
+          [
+            937,
+            1
+          ],
+          [
+            2887,
+            1
+          ]
+        ]
+      },
+      "projection_ns": {
+        "integer": 12779337307,
+        "prime_powers": [
+          [
+            11,
+            1
+          ],
+          [
+            1161757937,
+            1
+          ]
+        ]
+      },
+      "aggregate_CPU_ns": {
+        "integer": 4232233000,
+        "prime_powers": [
+          [
+            2,
+            3
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            4232233,
+            1
+          ]
+        ]
+      },
+      "group_peak_bytes": {
+        "integer": 279875584,
+        "prime_powers": [
+          [
+            2,
+            12
+          ],
+          [
+            68329,
+            1
+          ]
+        ]
+      },
+      "peak_child_RSS_KiB": {
+        "integer": 182376,
+        "prime_powers": [
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            2
+          ],
+          [
+            17,
+            1
+          ],
+          [
+            149,
+            1
+          ]
+        ]
+      },
+      "measured_to_projected": [
+        4798881106,
+        12779337307
+      ]
+    },
+    "geometry-decoder-importer-development-20261006-v1": {
+      "wall_ns": {
+        "integer": 12193085042,
+        "prime_powers": [
+          [
+            2,
+            1
+          ],
+          [
+            19,
+            1
+          ],
+          [
+            443,
+            1
+          ],
+          [
+            724313,
+            1
+          ]
+        ]
+      },
+      "projection_ns": {
+        "integer": 21132554884,
+        "prime_powers": [
+          [
+            2,
+            2
+          ],
+          [
+            7,
+            1
+          ],
+          [
+            37,
+            1
+          ],
+          [
+            20398219,
+            1
+          ]
+        ]
+      },
+      "aggregate_CPU_ns": {
+        "integer": 5761449000,
+        "prime_powers": [
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            4
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            71129,
+            1
+          ]
+        ]
+      },
+      "group_peak_bytes": {
+        "integer": 4294967296,
+        "prime_powers": [
+          [
+            2,
+            32
+          ]
+        ]
+      },
+      "peak_child_RSS_KiB": {
+        "integer": 3397840,
+        "prime_powers": [
+          [
+            2,
+            4
+          ],
+          [
+            5,
+            1
+          ],
+          [
+            42473,
+            1
+          ]
+        ]
+      },
+      "measured_to_projected": [
+        6096542521,
+        10566277442
+      ]
+    }
+  }
+}

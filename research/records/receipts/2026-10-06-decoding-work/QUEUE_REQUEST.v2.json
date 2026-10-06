@@ -1,0 +1,238 @@
+{
+  "status": "exact theorem/source unchanged v1; v2 clarifies immutable lookup source paths; no kernel acceptance",
+  "thread": "01a10f3d-0838-7315-a0f1-93ed832d5019",
+  "queue_thread": "01a10352-66ea-73c8-b716-a835a9a04033",
+  "root": "/home/b/Workspaces/holonics",
+  "source_root": "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/thermo-medium-20261006/source-v1/lean",
+  "owner": "Holonics.Geometry.Motion",
+  "predecessor": {
+    "path": "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/thermo-medium-20261006/Motion.root-predecessor.lean",
+    "sha256": "32df98dece1d3d0cbff9505bd9f4e15f0b2ee6244c490a3058c26a479b962fad"
+  },
+  "source_pins": {
+    "Holonics.Geometry.Motion": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/thermo-medium-20261006/source-v1/lean/Holonics/Geometry/Motion.lean",
+      "sha256": "0be5b5b2b2aa729a73a8530f3a751d0015a6735f34f23e1667faa8fe34e9e85e",
+      "bytes": 56875,
+      "origin_path": "/home/b/Workspaces/holonics/.local/wt/swept-transport/lean/Holonics/Geometry/Motion.lean"
+    },
+    "Holonics.Compression.Landmark.FixedPoint": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/thermo-medium-20261006/source-v1/lean/Holonics/Compression/Landmark/FixedPoint.lean",
+      "sha256": "6d43de55250e67bc780d6b7a78435ffc169c2774387d9a6ce06d7e853db77f40",
+      "bytes": 29401,
+      "origin_path": "/home/b/Workspaces/holonics/lean/Holonics/Compression/Landmark/FixedPoint.lean"
+    },
+    "Holonics.Geometry.CrossRatio": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/thermo-medium-20261006/source-v1/lean/Holonics/Geometry/CrossRatio.lean",
+      "sha256": "2fe42c8b97bfe226a82605777d1febc53843747c711dccda276e56938b3f1512",
+      "bytes": 6014,
+      "origin_path": "/home/b/Workspaces/holonics/lean/Holonics/Geometry/CrossRatio.lean"
+    },
+    "Holonics.Compression.Landmark.SiteKind": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/thermo-medium-20261006/source-v1/lean/Holonics/Compression/Landmark/SiteKind.lean",
+      "sha256": "299768dd7adb6a9a3c5deedaee08dffe4118d3b95f878a7594f495e735218ebc",
+      "bytes": 39079,
+      "origin_path": "/home/b/Workspaces/holonics/lean/Holonics/Compression/Landmark/SiteKind.lean"
+    },
+    "Holonics.Physics.CompositeMassEnergy": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/thermo-medium-20261006/source-v1/lean/Holonics/Physics/CompositeMassEnergy.lean",
+      "sha256": "cdbe477bb3423e4e5f869e863d1fc014df25aae48e94a9f108804df803283c33",
+      "bytes": 5807,
+      "origin_path": "/home/b/Workspaces/holonics/lean/Holonics/Physics/CompositeMassEnergy.lean"
+    },
+    "Holonics.Physics.HolonicMassShellFace": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/thermo-medium-20261006/source-v1/lean/Holonics/Physics/HolonicMassShellFace.lean",
+      "sha256": "acdf233fa50037c9f0c4af2a6aaf1b324cbf9445db9cd4cdf8fe30adb4be58df",
+      "bytes": 6593,
+      "origin_path": "/home/b/Workspaces/holonics/lean/Holonics/Physics/HolonicMassShellFace.lean"
+    },
+    "Holonics.Fluid.NavierStokesMaterialPolygon": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/thermo-medium-20261006/source-v1/lean/Holonics/Fluid/NavierStokesMaterialPolygon.lean",
+      "sha256": "22fef6996049fbfaf7d39be42da91a596aa1e9e57af80a10496950eb8def7f87",
+      "bytes": 21379,
+      "origin_path": "/home/b/Workspaces/holonics/lean/Holonics/Fluid/NavierStokesMaterialPolygon.lean"
+    },
+    "Holonics.Geometry.Swing": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/thermo-medium-20261006/source-v1/lean/Holonics/Geometry/Swing.lean",
+      "sha256": "945876159a3560dbb8417aaccff4f9e79917004f06cd1369a80a3e94957444c3",
+      "bytes": 11469,
+      "origin_path": "/home/b/Workspaces/holonics/lean/Holonics/Geometry/Swing.lean"
+    },
+    "Holonics.Geometry.AffineSwing": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/thermo-medium-20261006/source-v1/lean/Holonics/Geometry/AffineSwing.lean",
+      "sha256": "09ce73d5bc9766c152c3ccfc3b16a5f9627e5a4b3cda828ef9f1cf9e91b5805f",
+      "bytes": 2184,
+      "origin_path": "/home/b/Workspaces/holonics/lean/Holonics/Geometry/AffineSwing.lean"
+    },
+    "Holonics.Foundation.Gluing": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/thermo-medium-20261006/source-v1/lean/Holonics/Foundation/Gluing.lean",
+      "sha256": "5f90c401cae7aa7f40fe42b8dc0a1f181a62e5f44e9bf6dd760bcdb8ccd06828",
+      "bytes": 6717,
+      "origin_path": "/home/b/Workspaces/holonics/lean/Holonics/Foundation/Gluing.lean"
+    },
+    "Holonics.Foundation.GluingPassage": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/thermo-medium-20261006/source-v1/lean/Holonics/Foundation/GluingPassage.lean",
+      "sha256": "966612dd5ba3888bd8e57f2ea8c405f8ad188c877430b0c12b42ab301ef09719",
+      "bytes": 2831,
+      "origin_path": "/home/b/Workspaces/holonics/lean/Holonics/Foundation/GluingPassage.lean"
+    },
+    "Holonics.Fluid.NavierStokes": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/thermo-medium-20261006/source-v1/lean/Holonics/Fluid/NavierStokes.lean",
+      "sha256": "e7455a3002c215a8c25d11031ae2f862ee3d113a42674ebdb24f2a4db4c80991",
+      "bytes": 7565,
+      "origin_path": "/home/b/Workspaces/holonics/lean/Holonics/Fluid/NavierStokes.lean"
+    },
+    "Holonics.Geometry.Gyrogroup": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/thermo-medium-20261006/source-v1/lean/Holonics/Geometry/Gyrogroup.lean",
+      "sha256": "552ac01619be9590d274ef3dc4e3b37405e65f6131c55dcbbfdb4a0cff902741",
+      "bytes": 3726,
+      "origin_path": "/home/b/Workspaces/holonics/lean/Holonics/Geometry/Gyrogroup.lean"
+    },
+    "Holonics.Physics.Ellipse": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/thermo-medium-20261006/source-v1/lean/Holonics/Physics/Ellipse.lean",
+      "sha256": "a37043c31fd0f9142500db8c1ea279d25bfc5dd9636a420c2948b867fb7b84cb",
+      "bytes": 4016,
+      "origin_path": "/home/b/Workspaces/holonics/lean/Holonics/Physics/Ellipse.lean"
+    },
+    "Holonics.Transport.NavigatorTraceFaces": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/thermo-medium-20261006/source-v1/lean/Holonics/Transport/NavigatorTraceFaces.lean",
+      "sha256": "49e223eb8c3d5b8bc950ae13d4a80a3e0d2c4d2e0c487ff08abe699a2972b849",
+      "bytes": 8743,
+      "origin_path": "/home/b/Workspaces/holonics/lean/Holonics/Transport/NavigatorTraceFaces.lean"
+    },
+    "Holonics.Geometry.LocalFactor": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/thermo-medium-20261006/source-v1/lean/Holonics/Geometry/LocalFactor.lean",
+      "sha256": "4058a7947dd1d86932e7ced7d92a7b3c3a2dec322fec8ca51e3d62f7f6c04c9d",
+      "bytes": 6222,
+      "origin_path": "/home/b/Workspaces/holonics/lean/Holonics/Geometry/LocalFactor.lean"
+    },
+    "Holonics.Geometry.PartitionFunction": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/thermo-medium-20261006/source-v1/lean/Holonics/Geometry/PartitionFunction.lean",
+      "sha256": "6a2650e0ed3996ad18d58b0c5c23ff51bd5924900d5bc7aabdaebfcd0a1b3155",
+      "bytes": 2963,
+      "origin_path": "/home/b/Workspaces/holonics/lean/Holonics/Geometry/PartitionFunction.lean"
+    },
+    "Holonics.Geometry.TraceSequence": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/thermo-medium-20261006/source-v1/lean/Holonics/Geometry/TraceSequence.lean",
+      "sha256": "1ec3d0a525cfa9ca7d2b2444557379ac65697f9d55b19c961d469f01c49e9494",
+      "bytes": 8487,
+      "origin_path": "/home/b/Workspaces/holonics/lean/Holonics/Geometry/TraceSequence.lean"
+    },
+    "Holonics.Transport.HelicalPairInteraction": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/thermo-medium-20261006/source-v1/lean/Holonics/Transport/HelicalPairInteraction.lean",
+      "sha256": "5408e033f4d0d3adf22e75d01811d172752222a54ea0d762d2facf102f8cdd58",
+      "bytes": 22961,
+      "origin_path": "/home/b/Workspaces/holonics/lean/Holonics/Transport/HelicalPairInteraction.lean"
+    },
+    "Holonics.Transport.HolonicInteraction": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/thermo-medium-20261006/source-v1/lean/Holonics/Transport/HolonicInteraction.lean",
+      "sha256": "ed7aeaa89a12c73b32983536eaffd3b6369951fd55f8143afd5ef16bd455f1b5",
+      "bytes": 31518,
+      "origin_path": "/home/b/Workspaces/holonics/lean/Holonics/Transport/HolonicInteraction.lean"
+    },
+    "Holonics.Physics.HolonicSnellInteraction": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/thermo-medium-20261006/source-v1/lean/Holonics/Physics/HolonicSnellInteraction.lean",
+      "sha256": "175b95e411fe980d2fb22ac54a8b92e2dd8f760d6b2998373cecb6904c88f96f",
+      "bytes": 9464,
+      "origin_path": "/home/b/Workspaces/holonics/lean/Holonics/Physics/HolonicSnellInteraction.lean"
+    },
+    "Holonics.Foundation.HolonicDirectedPassage": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/thermo-medium-20261006/source-v1/lean/Holonics/Foundation/HolonicDirectedPassage.lean",
+      "sha256": "21062227a09719bb6bb27a825eac9b16ccf515bd01d08b9644af076a0bf014ec",
+      "bytes": 15691,
+      "origin_path": "/home/b/Workspaces/holonics/lean/Holonics/Foundation/HolonicDirectedPassage.lean"
+    },
+    "Holonics.Foundation.HolonicDifferenceCalculus": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/thermo-medium-20261006/source-v1/lean/Holonics/Foundation/HolonicDifferenceCalculus.lean",
+      "sha256": "addc8fef4d287cc4ce5df708e99dccd278a4a94e2e3f15a5bb44326ad97b0977",
+      "bytes": 17435,
+      "origin_path": "/home/b/Workspaces/holonics/lean/Holonics/Foundation/HolonicDifferenceCalculus.lean"
+    },
+    "Holonics.Geometry.Polarisation": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/thermo-medium-20261006/source-v1/lean/Holonics/Geometry/Polarisation.lean",
+      "sha256": "15141a0dd8489645a133e10f3c537b624bc01479295d25df73cdf363b25f74d2",
+      "bytes": 5472,
+      "origin_path": "/home/b/Workspaces/holonics/lean/Holonics/Geometry/Polarisation.lean"
+    },
+    "Holonics.Geometry.Horizon": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/thermo-medium-20261006/source-v1/lean/Holonics/Geometry/Horizon.lean",
+      "sha256": "1ed9894a917aba66e69e4552297c3fb1f193e618ab4b089643e16d9e85f8c215",
+      "bytes": 15792,
+      "origin_path": "/home/b/Workspaces/holonics/lean/Holonics/Geometry/Horizon.lean"
+    },
+    "Holonics.Geometry.Telescoping": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/thermo-medium-20261006/source-v1/lean/Holonics/Geometry/Telescoping.lean",
+      "sha256": "ff8783996008207d980f6d64cc144544825304bd23cd09428ec1cae43bc8e5cc",
+      "bytes": 929,
+      "origin_path": "/home/b/Workspaces/holonics/lean/Holonics/Geometry/Telescoping.lean"
+    },
+    "Holonics.Geometry.ScrewGeometry": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/thermo-medium-20261006/source-v1/lean/Holonics/Geometry/ScrewGeometry.lean",
+      "sha256": "91020b35bc1cf591f7eae4e0537a70b8c218986d284852181c6689cec102719e",
+      "bytes": 7626,
+      "origin_path": "/home/b/Workspaces/holonics/lean/Holonics/Geometry/ScrewGeometry.lean"
+    },
+    "Holonics.Holon.QuadraticMoment": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/thermo-medium-20261006/source-v1/lean/Holonics/Holon/QuadraticMoment.lean",
+      "sha256": "f222d34a7bb68ccfc52f6b86b760302e8cc8de6b4ed8ed517f1cf5149585bc9c",
+      "bytes": 2811,
+      "origin_path": "/home/b/Workspaces/holonics/lean/Holonics/Holon/QuadraticMoment.lean"
+    },
+    "Holonics.Foundation.TransportWord": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/thermo-medium-20261006/source-v1/lean/Holonics/Foundation/TransportWord.lean",
+      "sha256": "345ece634e00c2b38d0eebf903074e1cd24715a6f3d4b22cb4aaeb09f906c72a",
+      "bytes": 10118,
+      "origin_path": "/home/b/Workspaces/holonics/lean/Holonics/Foundation/TransportWord.lean"
+    },
+    "Holonics.Geometry.HolonicPantographicSwingJets": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/thermo-medium-20261006/source-v1/lean/Holonics/Geometry/HolonicPantographicSwingJets.lean",
+      "sha256": "51c34caac9bd16deed9e31c4c1e3ed4c5c5680c5bc62d4438c8d9a6715b55939",
+      "bytes": 12278,
+      "origin_path": "/home/b/Workspaces/holonics/lean/Holonics/Geometry/HolonicPantographicSwingJets.lean"
+    },
+    "FiniteDecoderWorkDevelopment": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/thermo-medium-20261006/source-v1/lean/FiniteDecoderWorkDevelopment.lean",
+      "sha256": "822d47429562e92a546c970a82896b927ebdb3629b39a280fd0da73abb4f80ac",
+      "bytes": 1704,
+      "origin_path": "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/thermo-medium-20261006/source-v1/lean/FiniteDecoderWorkDevelopment.lean"
+    },
+    "FiniteDecoderWorkAudit": {
+      "path": "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/thermo-medium-20261006/source-v1/lean/FiniteDecoderWorkAudit.lean",
+      "sha256": "7f0d757704bec8c2671caf8371129e7c98aba8d1db99d26ab17405721cd64636",
+      "bytes": 228,
+      "origin_path": "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/thermo-medium-20261006/source-v1/lean/FiniteDecoderWorkAudit.lean"
+    }
+  },
+  "source_change": "one new exact finite-work decoding-defect theorem, existing finite-work rechart theorem consumes it, plus axiom query; no direct import change or new canonical owner",
+  "targets": [
+    "FiniteDecoderWorkDevelopment",
+    "Holonics.Geometry.Motion",
+    "FiniteDecoderWorkAudit"
+  ],
+  "acceptance": [
+    "new theorem and existing consuming finite_work_form_rechart standard axioms only",
+    "complete actual owner object fresh and unchanged affine_quadratic_work standard closure",
+    "separate importing audit resolves accepted actual Motion source/object",
+    "whole selected current source/import/object/ordered-part graph sealed",
+    "resource and quiescent release receipts; no cap raise or unchanged failed-source repeat"
+  ],
+  "request": "shared queue chooses measured existing Motion prefix and bounded development slot; do not inherit Frame compiler timings as Motion projection",
+  "measurements": {
+    "prior_finite_endpoint_development_ns": 946103970,
+    "prior_finite_endpoint_receipt": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-04_finite-step-work/finite-work-accepted-05.json",
+    "new_elaboration_unmeasured": true
+  },
+  "policy": {
+    "threads": 1,
+    "group_resident_bytes": 4294967296,
+    "aggregate_CPU_ceiling_ns": 17000000000,
+    "child_ceiling_ns": 17000000000,
+    "no_deadline_raise": true,
+    "one_unchanged_requested_development_slot": true,
+    "shared_queue_only": true,
+    "no_worker_compiler_or_native_run": true
+  },
+  "public_receipt_destination": "/home/b/Workspaces/holonics/.local/wt/swept-transport/research/records/receipts/2026-10-06-decoding-work",
+  "previous_request_immutable": "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/thermo-medium-20261006/QUEUE_REQUEST.v1.json",
+  "source_graph_binding": "32-source private immutable snapshot; source pins below name each actual lookup source as well as recovered origin"
+}

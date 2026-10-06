@@ -953,25 +953,6 @@ section FiniteMetric
 
 variable {n K : Type*} [Fintype n] [CommRing K]
 
-/-- [proved-derived; validation pending] A lossy ending decoder returns an exact work
-defect. `P` encodes the ending motion and `V` decodes it, so `V * P` is the actual
-reconstruction, which need not be the identity. The last term is the transported
-change of storage form caused by that reconstruction. It has no automatic sign,
-even when the physical storage form is positive definite. No symmetry, positivity
-or decoder inverse is needed for this undivided matrix identity.
-
-[agent-inferred] Keep the defect in the existing finite-work owner because a
-present receiver face alone cannot certify physical work or future retention.
-Consumer: `finite_work_form_rechart` removes this term only with its declared
-left-inverse hypothesis. Record: `2026-10-06_A_LOSSY_RECEIVER_RETURNS_DECODING_WORK_AND_WINDING`. -/
-theorem finite_work_form_rechart_defect (P V W T G0 G1 : Matrix n n K) :
-    (P * T * W)ᵀ * (Vᵀ * G1 * V) * (P * T * W) - Wᵀ * G0 * W =
-      Wᵀ * (Tᵀ * G1 * T - G0) * W +
-        Wᵀ * Tᵀ * ((V * P)ᵀ * G1 * (V * P) - G1) * T * W := by
-  simp only [Matrix.transpose_mul, Matrix.mul_sub, Matrix.sub_mul,
-    Matrix.mul_add, Matrix.add_mul, Matrix.mul_assoc]
-  abel
-
 /-- [proved-derived; formal-checked in isolated development] The finite work form transports through the initial
 chart. `P` and `V` are the ending chart and its left inverse; `W` pulls the initial
 chart back. Distinct endpoint charts are allowed. No symmetry or positivity is
@@ -982,9 +963,15 @@ independently computed physical work and `opening_difference`; that square is ow
 theorem finite_work_form_rechart [DecidableEq n] (P V W T G0 G1 : Matrix n n K) (hVP : V * P = 1) :
     (P * T * W)ᵀ * (Vᵀ * G1 * V) * (P * T * W) - Wᵀ * G0 * W =
       Wᵀ * (Tᵀ * G1 * T - G0) * W := by
-  simpa only [hVP, Matrix.transpose_one, Matrix.one_mul, Matrix.mul_one,
-    sub_self, Matrix.mul_zero, Matrix.zero_mul, add_zero] using
-    finite_work_form_rechart_defect P V W T G0 G1
+  have hL : ∀ Y : Matrix n n K, Pᵀ * (Vᵀ * Y) = Y := by
+    intro Y
+    rw [← Matrix.mul_assoc, ← Matrix.transpose_mul, hVP, Matrix.transpose_one,
+      Matrix.one_mul]
+  have hR : ∀ Y : Matrix n n K, V * (P * Y) = Y := by
+    intro Y
+    rw [← Matrix.mul_assoc, hVP, Matrix.one_mul]
+  simp only [Matrix.transpose_mul, Matrix.mul_sub, Matrix.sub_mul,
+    Matrix.mul_assoc, hL, hR]
 
 /-- [proved-derived; formal-checked in isolated development] Twice the energy change of the affine motion
 `x_next = T x + b`. The cross term and the source's self-energy both remain. This
@@ -1079,6 +1066,5 @@ open Holonics.Geometry.Motion
 #print axioms energy_rate_moving_metric
 #print axioms energy_rate_moving_metric_boost
 #print axioms finite_work_form_rechart
-#print axioms finite_work_form_rechart_defect
 #print axioms affine_quadratic_work
 end Audit

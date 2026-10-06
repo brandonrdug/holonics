@@ -1,0 +1,1694 @@
+{
+  "scope": "Actual decoder-work development, complete Motion owner and independent importer",
+  "development_queries": 2,
+  "whole_owner_queries": 58,
+  "importer_queries": 3,
+  "kernel_validations": {
+    "development": {
+      "kernel_accepted": true,
+      "compiler_exit": 0,
+      "compiler_wall_ns": 3829215937,
+      "axioms": {
+        "Holonics.Geometry.Motion.finite_work_form_rechart_defect": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.finite_work_form_rechart": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      "selector_count_matches": true,
+      "standard_axioms_only": true,
+      "metadata_unchanged": true,
+      "broad_library_checked": false
+    },
+    "whole_owner": {
+      "kernel_accepted": true,
+      "compiler_exit": 0,
+      "compiler_wall_ns": 16992423344,
+      "axioms": {
+        "Holonics.Geometry.Motion.turn_add_boost": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.turn_isSkew": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.boost_isSymm": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.turn_boost_unique": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.skew_rate_conserves": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.energy_rate_is_boost": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.complex_rate_split": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.turn_portHamiltonian": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.boost_portHamiltonian": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.move_about_pivot": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.move_fixes_iff_pivot": [
+          "propext"
+        ],
+        "Holonics.Geometry.Motion.pivot_unique": [
+          "propext"
+        ],
+        "Holonics.Geometry.Motion.move_comp": [
+          "propext",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.translation_has_no_pivot": [
+          "propext",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.move_about_axis_then_falls": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.complex_move_about_pivot": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.complex_move_is_pantograph": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.complex_fall_has_no_pivot": [
+          "propext",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.swing_is_half_turn_move": [
+          "propext",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.swing_pivot_is_anchor": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.multiplier_cross_ratio": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.multiplier_trace_det_undivided": [
+          "propext",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.multiplier_trace_det": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.multiplier_half_turn_iff_traceless": [
+          "propext",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.multiplier_ratio_half_turn_iff_traceless": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.swing_word_linear_part": [
+          "propext"
+        ],
+        "Holonics.Geometry.Motion.even_swing_word_is_translation": [
+          "propext"
+        ],
+        "Holonics.Geometry.Motion.odd_swing_word_is_point_reflection": [
+          "propext"
+        ],
+        "Holonics.Geometry.Motion.odd_swing_word_is_swing": [
+          "propext"
+        ],
+        "Holonics.Geometry.Motion.det_half_turn_odd": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.power_is_boost_rate": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.normal_effort_is_turn_rate": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.sling_energy_gain": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.sling_speed_gain": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.traction_disk": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.turn_distance_from_one": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.turn_by_angle_distance_from_one": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.velocity_rate_is_log_derivative": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.acceleration_and_jerk": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.bellJet_two": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.derivation_iterate_of_log_rate": [
+          "propext",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.position_jets": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.rates_from_effort": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.quadraticGenerator_trace_det": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.quadraticGenerator_is_turn_of_energy": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.quadraticGenerator_sq": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.quadratic_turn": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.quadratic_boost": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.quadratic_fall": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.free_particle_step": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.quadratic_turn_energy_pos": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.iwasawa": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.iwasawa_unique": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.energy_rate_moving_metric": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.energy_rate_moving_metric_boost": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.finite_work_form_rechart": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.finite_work_form_rechart_defect": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.affine_quadratic_work": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      "selector_count_matches": true,
+      "standard_axioms_only": true,
+      "metadata_unchanged": true,
+      "broad_library_checked": false
+    },
+    "importer": {
+      "kernel_accepted": true,
+      "compiler_exit": 0,
+      "compiler_wall_ns": 10446737571,
+      "axioms": {
+        "Holonics.Geometry.Motion.finite_work_form_rechart_defect": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.finite_work_form_rechart": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.affine_quadratic_work": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      "selector_count_matches": true,
+      "standard_axioms_only": true,
+      "metadata_unchanged": true,
+      "broad_library_checked": false
+    }
+  },
+  "whole_owner_source_sha256": "0be5b5b2b2aa729a73a8530f3a751d0015a6735f34f23e1667faa8fe34e9e85e",
+  "old_29_custom_providers_unchanged": true,
+  "same_caps_no_raise": true,
+  "maintained_source_changed_by_queue": false,
+  "Git_publication": false,
+  "stages": {
+    "geometry-decoder-development-preparation-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 2941657943,
+      "projection_ns": 12779337307,
+      "measured_to_projected_ratio": [
+        2941657943,
+        12779337307
+      ],
+      "aggregate_CPU_ns": 2599105000,
+      "group_peak_bytes": 385007616,
+      "peak_child_RSS_KiB": 284420,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "geometry-decoder-development-development-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 4928043974,
+      "projection_ns": 21132554884,
+      "measured_to_projected_ratio": [
+        4928043974,
+        21132554884
+      ],
+      "aggregate_CPU_ns": 2589098000,
+      "group_peak_bytes": 2278350848,
+      "peak_child_RSS_KiB": 1785952,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "geometry-motion-decoder-owner-preparation-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 4866447885,
+      "projection_ns": 12779337307,
+      "measured_to_projected_ratio": [
+        4866447885,
+        12779337307
+      ],
+      "aggregate_CPU_ns": 4354179000,
+      "group_peak_bytes": 324677632,
+      "peak_child_RSS_KiB": 284412,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "geometry-motion-decoder-owner-development-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 18898885914,
+      "projection_ns": 21132554884,
+      "measured_to_projected_ratio": [
+        18898885914,
+        21132554884
+      ],
+      "aggregate_CPU_ns": 12190530000,
+      "group_peak_bytes": 4294967296,
+      "peak_child_RSS_KiB": 3405460,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 1957,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "geometry-decoder-importer-preparation-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 4798881106,
+      "projection_ns": 12779337307,
+      "measured_to_projected_ratio": [
+        4798881106,
+        12779337307
+      ],
+      "aggregate_CPU_ns": 4232233000,
+      "group_peak_bytes": 279875584,
+      "peak_child_RSS_KiB": 182376,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "geometry-decoder-importer-development-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 12193085042,
+      "projection_ns": 21132554884,
+      "measured_to_projected_ratio": [
+        12193085042,
+        21132554884
+      ],
+      "aggregate_CPU_ns": 5761449000,
+      "group_peak_bytes": 4294967296,
+      "peak_child_RSS_KiB": 3397840,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 1504,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "quiescent_release": true,
+      "outer_error": null
+    }
+  },
+  "artifacts": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-preparation-20261006-v1.config.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-preparation-20261006-v1.config.json",
+      "bytes": 8162,
+      "sha256": "da3939d3d7ca2a1e1a850d5d66fd1d3e088d56ffac3659b8047cdd2aaf2a5e82"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-preparation-20261006-v1.external-lease.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-preparation-20261006-v1.external-lease.json",
+      "bytes": 487,
+      "sha256": "bdf4efb629b395be0d10a1b0d6c32615d470a53e3cf876fc43de50166fb898c4"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-preparation-20261006-v1.lease-identity.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-preparation-20261006-v1.lease-identity.json",
+      "bytes": 565,
+      "sha256": "d9813287758a0f1548d9817f2573762c6ec32482fdcd0af64c10bb6810a71f3e"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-preparation-20261006-v1.input_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-preparation-20261006-v1.input_seal.json",
+      "bytes": 5919,
+      "sha256": "ce6517b14e863072cf1ddfc4784c41d750a195cfce0b2998fe89cb7d1691225f"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-preparation-20261006-v1.stdout": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-preparation-20261006-v1.stdout",
+      "bytes": 1880,
+      "sha256": "6692a6bac887e8a4bd16e1de5257d2d4b45ead8a563908ec796567cd85fb573e"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-preparation-20261006-v1.stderr": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-preparation-20261006-v1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-preparation-20261006-v1.memory-gate.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-preparation-20261006-v1.memory-gate.json",
+      "bytes": 120,
+      "sha256": "64be1f749391e254819850a2e79f9b6ecb02170606f043168e37ee7da3bfd1fa"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-preparation-20261006-v1.child-identity.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-preparation-20261006-v1.child-identity.json",
+      "bytes": 78,
+      "sha256": "16f360d8e77e52d2b645ff1f9f8dea73497cdcaba483df44ac181a3dd3ae1ac0"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-preparation-20261006-v1.system-floor.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-preparation-20261006-v1.system-floor.json",
+      "bytes": 20609,
+      "sha256": "db576a32614f5f45ee8ed70ebf7853b5ab0e16d082f57e4e0424f79b5d1eb5c0"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-preparation-20261006-v1.quiescence.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-preparation-20261006-v1.quiescence.json",
+      "bytes": 130,
+      "sha256": "86db3faf89ce6350dc2bf1d18f287568ef44ddf7a2f885c3be1c1595333b05ad"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-preparation-20261006-v1.output_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-preparation-20261006-v1.output_seal.json",
+      "bytes": 179925,
+      "sha256": "6657740357cd7349e74d885f778138e43d6711301c9b760e5bcbd1648be9f6a1"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-preparation-20261006-v1.publication.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-preparation-20261006-v1.publication.json",
+      "bytes": 3312,
+      "sha256": "62bf7e926624b9afc05c3694475be73269513de7267130faeb35a656fca9eca5"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-preparation-20261006-v1.stage-quiescence.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-preparation-20261006-v1.stage-quiescence.json",
+      "bytes": 136,
+      "sha256": "337e751a67869bc0237d1c2fd2d02fe08b9bea93fa0c5dbcb704375931c6c592"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-preparation-20261006-v1.final.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-preparation-20261006-v1.final.json",
+      "bytes": 4951,
+      "sha256": "08f961ce00beaebda3cdc90e7b77fdf422c349d9cca785897d48a8e32fe5b864"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-preparation-20261006-v1.unit-cleanup.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-preparation-20261006-v1.unit-cleanup.json",
+      "bytes": 731,
+      "sha256": "2c24543f83eced71e747448a208f04743af0cf046b9abdfb04b166b6a256cf19"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-preparation-20261006-v1.acceptance.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-preparation-20261006-v1.acceptance.json",
+      "bytes": 378,
+      "sha256": "ffb3aa126d465ea238f3b4ff0fe96c89791ac9bc6e69fd773a879f0c88c6ca47"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-preparation-20261006-v1.release.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-preparation-20261006-v1.release.json",
+      "bytes": 175,
+      "sha256": "1d6d06b525ad1394668f46419f7c58f3a24c6be0a42c87c7d404d07cc2d9562d"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-20261006/PREPARATION_REQUEST.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-20261006/PREPARATION_REQUEST.v1.json",
+      "bytes": 6501,
+      "sha256": "1e7b6addf5a120cd8d03996e511079fc51c8708618dcd88ff6ee601b156439c4"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/FiniteDecoderWorkDevelopment.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/FiniteDecoderWorkDevelopment.lean",
+      "bytes": 1704,
+      "sha256": "822d47429562e92a546c970a82896b927ebdb3629b39a280fd0da73abb4f80ac"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/materialize_geometry_decoder_v1.py": {
+      "copy": ".local/lean-rust-pruning/admission-v1/materialize_geometry_decoder_v1.py",
+      "bytes": 9324,
+      "sha256": "d673c47cbb5ce355e9b0be24dd6a80f0f94eb3c5bfae974410833f051f987051"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/SOURCE_READINESS.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/SOURCE_READINESS.v1.json",
+      "bytes": 2074,
+      "sha256": "af529d58df288bf50340fe9775c82a8e4179f90a44c17a32ccd5bd0a9ec45e54"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-20261006/PROVIDER_NAMESPACE.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-20261006/PROVIDER_NAMESPACE.v1.json",
+      "bytes": 19,
+      "sha256": "248264b9e517c0c69c19253914f38cdaea2ff97437405efb9282f4968ead5b8e"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/QUEUE_REQUEST.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/QUEUE_REQUEST.v1.json",
+      "bytes": 10203,
+      "sha256": "7620fa467753449489d79b4b132ce3f23ac4f4b1d2da116184c4a19a2593e327"
+    },
+    "/home/b/Workspaces/holonics/.local/hnn-athena-foundation/lean-geometric-runner/canonical-motion-09.output_seal.json": {
+      "copy": ".local/hnn-athena-foundation/lean-geometric-runner/canonical-motion-09.output_seal.json",
+      "bytes": 1766,
+      "sha256": "45ab2b100ab7b8a14de208059194d9dcb3769282f74dd10af9ad8c1365fa7c33"
+    },
+    "/home/b/Workspaces/holonics/.local/hnn-athena-foundation/lean-geometric-runner/canonical-motion-09.publication.json": {
+      "copy": ".local/hnn-athena-foundation/lean-geometric-runner/canonical-motion-09.publication.json",
+      "bytes": 2907,
+      "sha256": "f02e2e8637f9be233bc0c602546868509d6fbb89082c805a5506d9331da155c8"
+    },
+    "/home/b/Workspaces/holonics/.local/hnn-athena-foundation/lean-geometric-runner/canonical-motion-09.release.json": {
+      "copy": ".local/hnn-athena-foundation/lean-geometric-runner/canonical-motion-09.release.json",
+      "bytes": 130,
+      "sha256": "c088fd027b70089d38b22751984fcca2eeff16f983e17d3358015623af25e709"
+    },
+    "/home/b/Workspaces/holonics/.local/hnn-athena-foundation/canonical-integration-20261004/motion-postcheck-09.json": {
+      "copy": ".local/hnn-athena-foundation/canonical-integration-20261004/motion-postcheck-09.json",
+      "bytes": 422,
+      "sha256": "88144f869f43f7294803df5cf9b17386ab9b635a3e602956a09a2c23a9f51145"
+    },
+    "/home/b/Workspaces/holonics/.local/hnn-athena-foundation/lean-geometric-runner/canonical-motion-import-seal-09.json": {
+      "copy": ".local/hnn-athena-foundation/lean-geometric-runner/canonical-motion-import-seal-09.json",
+      "bytes": 99651251,
+      "sha256": "de2599a7934bb8355e9ff0b7e2346c621ad8e4acb927aebea7312802581731b6"
+    },
+    "/home/b/Workspaces/holonics/.local/hodge-cut-cartier-20261003/runner-recovery-02/import_sealer.py": {
+      "copy": ".local/hodge-cut-cartier-20261003/runner-recovery-02/import_sealer.py",
+      "bytes": 13162,
+      "sha256": "b323b6177c66c48d27a6a39ae580220e0c908430d0bbfbc2c33aa6b5b48b36da"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/prepare_ns_namespace_v1.py": {
+      "copy": ".local/lean-rust-pruning/admission-v1/prepare_ns_namespace_v1.py",
+      "bytes": 10766,
+      "sha256": "85b5a0626525cf14d6dbf8ecf9098ee8804df8facf1cad8c5e2f8eeb36aeea7c"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/check_namespace_lookup_v1.py": {
+      "copy": ".local/lean-rust-pruning/admission-v1/check_namespace_lookup_v1.py",
+      "bytes": 886,
+      "sha256": "9210e5aa18f9daeb7ac8ced18e253f08805577119a5f2b5e211017d9a873679c"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/final_stage.py": {
+      "copy": ".local/lean-rust-pruning/admission-v1/final_stage.py",
+      "bytes": 10968,
+      "sha256": "a0a5a94f157acf9a5127b756a036c6e86449dc2012af0f1e71d34aafa13bc79e"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/leased_stage_v2.py": {
+      "copy": ".local/lean-rust-pruning/admission-v1/leased_stage_v2.py",
+      "bytes": 5520,
+      "sha256": "bcf91456534e763a025613f39e82853d7a58529b399bb183d544d09a7a42f949"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/bounded_stage_v1.py": {
+      "copy": ".local/lean-rust-pruning/admission-v1/bounded_stage_v1.py",
+      "bytes": 12645,
+      "sha256": "84b7d003089fa19881690e368200b2168b9d179c8e6573bdafab54369235cec2"
+    },
+    "/usr/bin/python3.14": {
+      "copy": "external/usr/bin/python3.14",
+      "bytes": 14424,
+      "sha256": "ac12d99c156d3c0ec708a2baf664d35b74f455572fe35fd57faa420ade5c3845"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-20261006/current-imports.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-20261006/current-imports.v1.json",
+      "bytes": 23711108,
+      "sha256": "8ad8a7df93c1d996bb14b172525836e81806bff40233e482fed87b354abd4ecb"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-20261006/import-preparation.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-20261006/import-preparation.v1.json",
+      "bytes": 1239,
+      "sha256": "3d3253d6cab7db2c43d796d82b3d57c7035922cbde1b1fecd4a942b63b93669c"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-development-20261006-v1.config.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-development-20261006-v1.config.json",
+      "bytes": 14096,
+      "sha256": "8b83d7725723ad2440ce1193e761210de31caf7eb2da647fa162bea071571707"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-development-20261006-v1.external-lease.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-development-20261006-v1.external-lease.json",
+      "bytes": 487,
+      "sha256": "7902622f6abe521837786e9016c3ad0d2461c30385e471967ea3fe674387e84b"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-development-20261006-v1.lease-identity.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-development-20261006-v1.lease-identity.json",
+      "bytes": 565,
+      "sha256": "3d9e29e59b9d4172d5d59225ee7cc229e0ee511e16270e1161bcbf13b0d3e885"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-development-20261006-v1.input_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-development-20261006-v1.input_seal.json",
+      "bytes": 9006,
+      "sha256": "42af767e97b9ebf5d31105ddadaeb2eb9c59c56588e635ae40c13ff99c2227d3"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-development-20261006-v1.stdout": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-development-20261006-v1.stdout",
+      "bytes": 1852,
+      "sha256": "079e79dd81955716d9ae35ac5b60dde311077dd5a9b737918754edf0da718d89"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-development-20261006-v1.stderr": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-development-20261006-v1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-development-20261006-v1.memory-gate.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-development-20261006-v1.memory-gate.json",
+      "bytes": 120,
+      "sha256": "d9ba72b1501a9d15b17498bd6240b838905eb1309cc3e07a48bb66e432bc20ce"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-development-20261006-v1.child-identity.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-development-20261006-v1.child-identity.json",
+      "bytes": 78,
+      "sha256": "ee3eb73ebb10ac6cc14fbfc97ea4c22b30b67c03f5c1e2a8d79d9ba7467a1747"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-development-20261006-v1.system-floor.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-development-20261006-v1.system-floor.json",
+      "bytes": 35878,
+      "sha256": "2a17969e2a250fa411f6bec7504268a6c202024beedb1dbf78901ceff19b851e"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-development-20261006-v1.quiescence.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-development-20261006-v1.quiescence.json",
+      "bytes": 130,
+      "sha256": "4ea452921fd6556fd01e16d9ae7bed8a6acd9dd08517545ab7793b15c2ae7f0d"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-development-20261006-v1.output_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-development-20261006-v1.output_seal.json",
+      "bytes": 310767,
+      "sha256": "bf865b7faed8647cda5639c9f4041b2e0a1599798ee5510830cf8610bd6fd20c"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-development-20261006-v1.publication.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-development-20261006-v1.publication.json",
+      "bytes": 4084,
+      "sha256": "81720c7bfcf9396aa4e0d3b3c880ca857346c4106725522dc70b598d67af728b"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-development-20261006-v1.stage-quiescence.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-development-20261006-v1.stage-quiescence.json",
+      "bytes": 136,
+      "sha256": "26d9696dc3f32d76d0776281a8d387493000210dc892917e440a6bc1bc6e5e97"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-development-20261006-v1.final.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-development-20261006-v1.final.json",
+      "bytes": 4954,
+      "sha256": "e7fc12d928a6eeec2092abcc370948da7ca16416c6bf193e595dd60b13dde839"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-development-20261006-v1.unit-cleanup.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-development-20261006-v1.unit-cleanup.json",
+      "bytes": 731,
+      "sha256": "5f06fe9d04fc77479a0f04abe1f8917f6896f88176bf3eb1798a46b26184f103"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-development-20261006-v1.acceptance.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-development-20261006-v1.acceptance.json",
+      "bytes": 378,
+      "sha256": "38266fd23a26f1703abdd50ae44bcf20b9f58a5438fd7fc8e8d96de495817596"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-development-20261006-v1.release.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-development-20261006-v1.release.json",
+      "bytes": 175,
+      "sha256": "236aa563e836581f623c83564603f49e780fa824881e20430c135bb4f5d38ab3"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-20261006/COMPILER_REQUEST.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-20261006/COMPILER_REQUEST.v1.json",
+      "bytes": 3062,
+      "sha256": "d89cdba283f829e590d8ac5dc5becebb76be237b301c631547a24b5e3bae6abc"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/materialize_lean_compiler_v5.py": {
+      "copy": ".local/lean-rust-pruning/admission-v1/materialize_lean_compiler_v5.py",
+      "bytes": 5331,
+      "sha256": "de9a1a486638c317d68a9704af4c95384eae684e99845c4d15f4a5d5c43a25ca"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/lean_budget_v5.py": {
+      "copy": ".local/lean-rust-pruning/admission-v1/lean_budget_v5.py",
+      "bytes": 5550,
+      "sha256": "ad9ee8b7658a53011a020e159847ac9b23d4b491e3b262c2f49d23afa43b974e"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-20261006/COMPLETE_DEVELOPMENT_BUDGET.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-20261006/COMPLETE_DEVELOPMENT_BUDGET.v1.json",
+      "bytes": 167514,
+      "sha256": "dd3793724fe737d638f1a1d1ee4da762003b1126a02eea508b5cdbc1259231d5"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/check_lean_owner_v3.py": {
+      "copy": ".local/lean-rust-pruning/admission-v1/check_lean_owner_v3.py",
+      "bytes": 2076,
+      "sha256": "3641003e780bc46c56ad88af15a38cf8164f895eecdf3f7301ed9c064cd8d843"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/verify_lean_metadata_v1.py": {
+      "copy": ".local/lean-rust-pruning/admission-v1/verify_lean_metadata_v1.py",
+      "bytes": 772,
+      "sha256": "cff6b3ce7c52698766dd59eb249c822960c36667c87d7e8e6cc6bae10c5d41ad"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/PHASE_COST_CATALOG.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/PHASE_COST_CATALOG.v1.json",
+      "bytes": 23045,
+      "sha256": "239f8764229dbfe50a0f1ce9a0f0bd8cc0705788e66ca62c1652eab695cac1d2"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/KERNEL_VALIDATION.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/KERNEL_VALIDATION.v1.json",
+      "bytes": 237,
+      "sha256": "b69b1718a5b38478ca334988fd9c045cea29d3318155c7d0e8b7a6e74a4c0863"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hodge-product-degree-two-development-20261006-v1.final.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/hodge-product-degree-two-development-20261006-v1.final.json",
+      "bytes": 4425,
+      "sha256": "3f4ef60f1086e496da58b2ac8f0ae9b018d56bcdf944ee1760df27f4c7d449eb"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hodge-product-degree-two-development-20261006-v2.final.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/hodge-product-degree-two-development-20261006-v2.final.json",
+      "bytes": 4425,
+      "sha256": "db9b7d7687ff615de0d4a9717ab90d4567ef10b3b2b2fbe3971a30c1afecccf4"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hodge-normalized-continuation-05-20261006/PHASE_COST_CATALOG.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/hodge-normalized-continuation-05-20261006/PHASE_COST_CATALOG.v1.json",
+      "bytes": 11159,
+      "sha256": "efc087f30b894248625861594529916de0aa7de63f60d944ccd64f75f28fd214"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hodge-ruling-decomposed-11-20261006/PHASE_COST_CATALOG.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/hodge-ruling-decomposed-11-20261006/PHASE_COST_CATALOG.v1.json",
+      "bytes": 7248,
+      "sha256": "9efcaef04d621e96dc3ee8b28e335c5fc4265118754094308dd668640cf72ed8"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hodge-pair-carrier-repair-20261006/PHASE_COST_CATALOG.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/hodge-pair-carrier-repair-20261006/PHASE_COST_CATALOG.v1.json",
+      "bytes": 678,
+      "sha256": "17c01868a5be1877100cacc5e24fdb34539b94c3183f0c367bff73968e0cf495"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/import-preparation.v2.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/import-preparation.v2.json",
+      "bytes": 1239,
+      "sha256": "650d712b187afd14ce6709be97620b42c5c10a557462b4fdb15d78d9c8ba5d3a"
+    },
+    "/usr/bin/env": {
+      "copy": "external/usr/bin/env",
+      "bytes": 72408,
+      "sha256": "795586b56f6da560c3cf4e25c1a6e4f274a8576906e88d94c207db7255b07163"
+    },
+    "/usr/bin/timeout": {
+      "copy": "external/usr/bin/timeout",
+      "bytes": 68320,
+      "sha256": "1425639cf3339b1117536df91cd4ba3229f8fa84e87322dee24e87121ed3feb3"
+    },
+    "/home/b/.local/lib/lean-4.33.0/bin/lean": {
+      "copy": "external/home/b/.local/lib/lean-4.33.0/bin/lean",
+      "bytes": 9024,
+      "sha256": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550"
+    },
+    "/home/b/.local/lib/lean-4.33.0/lib/lean/libleanshared_1.so": {
+      "copy": "external/home/b/.local/lib/lean-4.33.0/lib/lean/libleanshared_1.so",
+      "bytes": 6232,
+      "sha256": "2f96493ac9046f64ec7bcb78102a4c1e7cd9a7042487f246af45eda8a96667f5"
+    },
+    "/home/b/.local/lib/lean-4.33.0/lib/lean/libleanshared.so": {
+      "copy": "external/home/b/.local/lib/lean-4.33.0/lib/lean/libleanshared.so",
+      "bytes": 229196736,
+      "sha256": "f2a36d5e56b936afc07bdbea18542de0bce6a9977ebc325915272c300d992d42"
+    },
+    "/home/b/.local/lib/lean-4.33.0/lib/lean/libLake_shared.so": {
+      "copy": "external/home/b/.local/lib/lean-4.33.0/lib/lean/libLake_shared.so",
+      "bytes": 12311904,
+      "sha256": "feb2914d056638438613284b1f98278579ff8d8d99d0567e9823167806d150c0"
+    },
+    "/home/b/.local/lib/lean-4.33.0/lib/lean/libleanshared_2.so": {
+      "copy": "external/home/b/.local/lib/lean-4.33.0/lib/lean/libleanshared_2.so",
+      "bytes": 6232,
+      "sha256": "2f96493ac9046f64ec7bcb78102a4c1e7cd9a7042487f246af45eda8a96667f5"
+    },
+    "/home/b/.local/lib/lean-4.33.0/lib/lean/libInit_shared.so": {
+      "copy": "external/home/b/.local/lib/lean-4.33.0/lib/lean/libInit_shared.so",
+      "bytes": 6232,
+      "sha256": "2f96493ac9046f64ec7bcb78102a4c1e7cd9a7042487f246af45eda8a96667f5"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-20261006/objects-v1/FiniteDecoderWorkDevelopment.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-20261006/objects-v1/FiniteDecoderWorkDevelopment.olean",
+      "bytes": 85840,
+      "sha256": "99e16d30a15e99406d1653257b673f96d7b86e667e0d3c8f7aed1a5c3dfdb45d"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-20261006/objects-v1/FiniteDecoderWorkDevelopment.ilean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-20261006/objects-v1/FiniteDecoderWorkDevelopment.ilean",
+      "bytes": 3590,
+      "sha256": "b938742c2accd951e565cba3b53ab0962a36baca542f58941ba3bf00b9349e8a"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-20261006/compiler.v1.stdout": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-20261006/compiler.v1.stdout",
+      "bytes": 1134,
+      "sha256": "5ef2869d246db86ce555c371ba57febe5e35c4438039da220572e3b3ef2c5dac"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-20261006/compiler.v1.stderr": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-20261006/compiler.v1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-20261006/KERNEL_VALIDATION.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-20261006/KERNEL_VALIDATION.v1.json",
+      "bytes": 497,
+      "sha256": "fcb888dc8b6af970c0f0152efa91d9021c0bb65df7a52c9fad4615e08b2a4179"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-preparation-20261006-v1.config.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-preparation-20261006-v1.config.json",
+      "bytes": 8161,
+      "sha256": "ee928ba6dc9f5c31c588a880ebbf923ab7c172e184f2311a7c5f6ee9f45868a3"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-preparation-20261006-v1.external-lease.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-preparation-20261006-v1.external-lease.json",
+      "bytes": 487,
+      "sha256": "9148ad50caa29ea5072579f47d483855b3f03036b12a659cab9b5f708369747b"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-preparation-20261006-v1.lease-identity.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-preparation-20261006-v1.lease-identity.json",
+      "bytes": 565,
+      "sha256": "67de480d71167fa1a648757eea0f581e3cf38db27c6867d3b947ce76755ecfd7"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-preparation-20261006-v1.input_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-preparation-20261006-v1.input_seal.json",
+      "bytes": 5917,
+      "sha256": "757767c4f9749f39723deea4a8226f19f5f3b766036d3fe1190e28171a8953bc"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-preparation-20261006-v1.stdout": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-preparation-20261006-v1.stdout",
+      "bytes": 2059,
+      "sha256": "4ef242e8759ccb05a226294b1d1b7f8df11b2d99bf7f7dbabf36f8c0f800cc01"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-preparation-20261006-v1.stderr": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-preparation-20261006-v1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-preparation-20261006-v1.memory-gate.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-preparation-20261006-v1.memory-gate.json",
+      "bytes": 120,
+      "sha256": "f90fba9145d170fedf2467f94312eb9ac7c6ad03268d1e020f6d1358a113c1cc"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-preparation-20261006-v1.child-identity.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-preparation-20261006-v1.child-identity.json",
+      "bytes": 78,
+      "sha256": "3f88c37ca3a74cb74bf9a520722e03892296401e3cd0f25e9b5aae8a816e5cdd"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-preparation-20261006-v1.system-floor.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-preparation-20261006-v1.system-floor.json",
+      "bytes": 35788,
+      "sha256": "d8639b9564c86ee3f546ddaca2dc2537439d8cda1a18650d2a11737a6a2a006d"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-preparation-20261006-v1.quiescence.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-preparation-20261006-v1.quiescence.json",
+      "bytes": 130,
+      "sha256": "856996587aa6286c774774b2417a1a23f1a5a768a6c833914d3b6a0f6f9d8dfd"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-preparation-20261006-v1.output_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-preparation-20261006-v1.output_seal.json",
+      "bytes": 310123,
+      "sha256": "6193615899aed258f6d86530ab89a84be96a936cb0ea397516e863c91da5146d"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-preparation-20261006-v1.publication.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-preparation-20261006-v1.publication.json",
+      "bytes": 3324,
+      "sha256": "7b2b7fc5ece55a0ad69c904db0c96ad206a3d28d4618ba58b52dda9fa55e0ab5"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-preparation-20261006-v1.stage-quiescence.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-preparation-20261006-v1.stage-quiescence.json",
+      "bytes": 136,
+      "sha256": "a14ab86d6ad8572ac57732f8515d1f777fa6b78ce3d213e784e0a6b469326367"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-preparation-20261006-v1.final.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-preparation-20261006-v1.final.json",
+      "bytes": 4966,
+      "sha256": "f7718791c0bfd9dcddba9dc8dcc668049cec80f92cf086f8ac4826483d3a5479"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-preparation-20261006-v1.unit-cleanup.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-preparation-20261006-v1.unit-cleanup.json",
+      "bytes": 733,
+      "sha256": "dc32f5ae661bd0b3dbade6f02540eed8c449055e5d01ad51c5326abc98c4015e"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-preparation-20261006-v1.acceptance.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-preparation-20261006-v1.acceptance.json",
+      "bytes": 378,
+      "sha256": "c6efceaf49f0bbebd37b06caec8a314d6f24bbef34159c355c8a9cf05effa790"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-preparation-20261006-v1.release.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-preparation-20261006-v1.release.json",
+      "bytes": 175,
+      "sha256": "551a5cb8e61514a1f959de1d65fcdc3300baae6c96d7a802d8a7d9edc64dfa69"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/PREPARATION_REQUEST.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/PREPARATION_REQUEST.v1.json",
+      "bytes": 6498,
+      "sha256": "affe321786d0b8a20b658ee5f804d8644e2109bd76a34039fb7539802e3f57db"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Geometry/Motion.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Geometry/Motion.lean",
+      "bytes": 56875,
+      "sha256": "0be5b5b2b2aa729a73a8530f3a751d0015a6735f34f23e1667faa8fe34e9e85e"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/PROVIDER_NAMESPACE.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/PROVIDER_NAMESPACE.v1.json",
+      "bytes": 26148,
+      "sha256": "cee43ff91ecf510d80284dc2ddc11ba71ee4280e49cc651850d1931de2e06ea9"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/current-imports.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/current-imports.v1.json",
+      "bytes": 46466747,
+      "sha256": "06c8f6bd15bb7cfb9c076295d3680d0bcc6fc96f2d93211c08c96b9f560ca2cc"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/import-preparation.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/import-preparation.v1.json",
+      "bytes": 1235,
+      "sha256": "4abeb11b0a328c8679caf7031a8bb19e291c805edd5df88a51d4bcf346d8a928"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-development-20261006-v1.config.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-development-20261006-v1.config.json",
+      "bytes": 15683,
+      "sha256": "faf379e597fb860ac28d35d159137e39a663c7d65c9bd40fcedb6290caf86c44"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-development-20261006-v1.external-lease.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-development-20261006-v1.external-lease.json",
+      "bytes": 487,
+      "sha256": "aa61076dd46fb2ed9b8b9a8fc3dde7084c20c365934d75cb981bc35774310f05"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-development-20261006-v1.lease-identity.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-development-20261006-v1.lease-identity.json",
+      "bytes": 565,
+      "sha256": "ffd08b5c5b91687c35ca86006f7f0be45f39ea41f99c95511e345700723410f7"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-development-20261006-v1.input_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-development-20261006-v1.input_seal.json",
+      "bytes": 9013,
+      "sha256": "e0ab882d31e861f3d1466abc86444e65ae6b5026b4041a01e54e4ac7302355c2"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-development-20261006-v1.stdout": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-development-20261006-v1.stdout",
+      "bytes": 13213,
+      "sha256": "44ce92f4a413afcefb50ee70e7d2659ef340da23a3a88653310c9bf8f50f57ed"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-development-20261006-v1.stderr": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-development-20261006-v1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-development-20261006-v1.memory-gate.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-development-20261006-v1.memory-gate.json",
+      "bytes": 120,
+      "sha256": "d22b76484a9e586a1751470d61a13ec82cee51f99cfd2d058d323c31f72fcb6e"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-development-20261006-v1.child-identity.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-development-20261006-v1.child-identity.json",
+      "bytes": 78,
+      "sha256": "6ca76e6da9c174fcb113365a89c11269ff3a77ba6f2425c84ae67a831f6585ca"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-development-20261006-v1.system-floor.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-development-20261006-v1.system-floor.json",
+      "bytes": 144080,
+      "sha256": "06a07d9dc8b6363d837f6680340683c0f900c70fd50b9c0c201a37e865b3254e"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-development-20261006-v1.quiescence.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-development-20261006-v1.quiescence.json",
+      "bytes": 130,
+      "sha256": "64b65d23383b45c08ed79d1dab7e09ba0f2413f409a5ab0155a19d4a465174f5"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-development-20261006-v1.output_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-development-20261006-v1.output_seal.json",
+      "bytes": 1262094,
+      "sha256": "2da944c84f106f93739d66988e581ab7d6cdbfd1531acc49e700f10471e6dbe9"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-development-20261006-v1.publication.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-development-20261006-v1.publication.json",
+      "bytes": 4101,
+      "sha256": "70199859787324b1cd584059f9d8e810fb36bb78af961fd364234fc66cb7b670"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-development-20261006-v1.stage-quiescence.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-development-20261006-v1.stage-quiescence.json",
+      "bytes": 136,
+      "sha256": "9b71debef20435cdc21c1623fda9334b2a2811b717ca486bb9e522a12118ad1f"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-development-20261006-v1.final.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-development-20261006-v1.final.json",
+      "bytes": 4975,
+      "sha256": "bfd9e14300a9dd5f93af5041b8851be2364cf5a389718bb5af821cacbbc27d77"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-development-20261006-v1.unit-cleanup.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-development-20261006-v1.unit-cleanup.json",
+      "bytes": 733,
+      "sha256": "904a024a9bfc5e99660c288df3e497b8a68cd2fe5eafe0be5e733361c84b15d2"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-development-20261006-v1.acceptance.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-development-20261006-v1.acceptance.json",
+      "bytes": 378,
+      "sha256": "fe0d312602b94a9c9c45ca58e94d3a5810d1951b686328a6110074c2a0d283ba"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-development-20261006-v1.release.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-development-20261006-v1.release.json",
+      "bytes": 175,
+      "sha256": "2b22b5cf3077580664cc413d93440c641d0ee0505dc2f505b3bb973135ae0e44"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/COMPILER_REQUEST.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/COMPILER_REQUEST.v1.json",
+      "bytes": 4633,
+      "sha256": "a1ea84208b16a2a46235a64ff1f07be5a7a5c65109e6a30a2cab81c05c80eee9"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/COMPLETE_DEVELOPMENT_BUDGET.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/COMPLETE_DEVELOPMENT_BUDGET.v1.json",
+      "bytes": 167511,
+      "sha256": "305806b934a18fe57fc8b1db5bd00a1555febc21eff7c2a10a9d45e956cba8db"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Geometry/Motion.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Geometry/Motion.olean",
+      "bytes": 4203160,
+      "sha256": "e1229d7bf24796b406b471e3c9a1fd345bee8235b207b704b591400035228d91"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Geometry/Motion.ilean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Geometry/Motion.ilean",
+      "bytes": 102161,
+      "sha256": "cf80cb1d99e4f9897d97ee2815448f61e4d1578627b467744c87501265702922"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/compiler.v1.stdout": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/compiler.v1.stdout",
+      "bytes": 7395,
+      "sha256": "459256df394362491d6c70f5ae11545989079f4ff5df9ee3e551691f493a2851"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/compiler.v1.stderr": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/compiler.v1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/KERNEL_VALIDATION.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/KERNEL_VALIDATION.v1.json",
+      "bytes": 7050,
+      "sha256": "4ef9a4b374203be21d4bed59bd8f223fab612f34c865e58df96bb46221fdd1ff"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-preparation-20261006-v1.config.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-preparation-20261006-v1.config.json",
+      "bytes": 7151,
+      "sha256": "4726c0eb8f2956934c51cf9e848e6c7d7bcaa527be30a64965fa56a2eebb7855"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-preparation-20261006-v1.external-lease.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-preparation-20261006-v1.external-lease.json",
+      "bytes": 487,
+      "sha256": "1ffd01b797c4097b2330717f3a3d23135fd1b2033d4a1384207c403b5ae464f6"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-preparation-20261006-v1.lease-identity.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-preparation-20261006-v1.lease-identity.json",
+      "bytes": 565,
+      "sha256": "ad8432759ee7434ea53a488fbc1688185809258483e9d50ee55ac7d608410e2a"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-preparation-20261006-v1.input_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-preparation-20261006-v1.input_seal.json",
+      "bytes": 5236,
+      "sha256": "6748675604b463630345ece27e5592ee5e6b3dc2a8beb0e5372c61a3a06a2617"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-preparation-20261006-v1.stdout": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-preparation-20261006-v1.stdout",
+      "bytes": 2058,
+      "sha256": "80926cbee31661d3db36462fb23a6868e8d61a8e5c7d080abe3d0d6a56a958a4"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-preparation-20261006-v1.stderr": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-preparation-20261006-v1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-preparation-20261006-v1.memory-gate.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-preparation-20261006-v1.memory-gate.json",
+      "bytes": 119,
+      "sha256": "6b5da6e1716ffaa575a8f35f66f58f48d1471f56d9770b9ea60c1a2f09e21186"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-preparation-20261006-v1.child-identity.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-preparation-20261006-v1.child-identity.json",
+      "bytes": 78,
+      "sha256": "cd9237c2e129e9a830a715295bf0f47be7ad3b857d1dc70b13b71375af430c98"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-preparation-20261006-v1.system-floor.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-preparation-20261006-v1.system-floor.json",
+      "bytes": 35701,
+      "sha256": "d20c55fe6730f5dc48469041af2599fa0aa2b78ec0ea0fece2cde351b834c4be"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-preparation-20261006-v1.quiescence.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-preparation-20261006-v1.quiescence.json",
+      "bytes": 130,
+      "sha256": "d3e6e2b1fe8ea3200ce43a9e25d7d2b12186ae0e3db0b82004b7b93b1ae3fe0a"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-preparation-20261006-v1.output_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-preparation-20261006-v1.output_seal.json",
+      "bytes": 308348,
+      "sha256": "855c1940dce4f260bf5ceb5a856eecc4670a3a3d6e9d7f9b29b5377046316570"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-preparation-20261006-v1.publication.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-preparation-20261006-v1.publication.json",
+      "bytes": 3276,
+      "sha256": "58d07238439132b0ad6cc92c5c16e36195b35b6618b7d77676b1276dfc971e24"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-preparation-20261006-v1.stage-quiescence.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-preparation-20261006-v1.stage-quiescence.json",
+      "bytes": 136,
+      "sha256": "d26a6e2bc51d5684bb788fb721f70735ff15377d6d1e9313b765a37a93e144b0"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-preparation-20261006-v1.final.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-preparation-20261006-v1.final.json",
+      "bytes": 4906,
+      "sha256": "0b8db81e146862e937aee64d899d3d9e343ed7298fe87b8c3c702947e166d289"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-preparation-20261006-v1.unit-cleanup.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-preparation-20261006-v1.unit-cleanup.json",
+      "bytes": 725,
+      "sha256": "1005d22656825385ba170393b00744c61bee8ab10a7c7a7f52664eeb27806706"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-preparation-20261006-v1.acceptance.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-preparation-20261006-v1.acceptance.json",
+      "bytes": 378,
+      "sha256": "ce0716f80559cb06cb3b6802bebb692da41e11ce0219bd80663fb1f5314a8708"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-preparation-20261006-v1.release.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-preparation-20261006-v1.release.json",
+      "bytes": 175,
+      "sha256": "3a62ef2e82cb1d6bc968a411a2b4a51078247b382bb1fe24c6fb6d3e961f85ba"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-20261006/PREPARATION_REQUEST.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-20261006/PREPARATION_REQUEST.v1.json",
+      "bytes": 6400,
+      "sha256": "ae9abee363882d02abaf324886908bb9c87b47dda3c3251a39fcd4d8d9e85b99"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/FiniteDecoderWorkAudit.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/FiniteDecoderWorkAudit.lean",
+      "bytes": 228,
+      "sha256": "7f0d757704bec8c2671caf8371129e7c98aba8d1db99d26ab17405721cd64636"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/materialize_accepted_importer_v1.py": {
+      "copy": ".local/lean-rust-pruning/admission-v1/materialize_accepted_importer_v1.py",
+      "bytes": 4440,
+      "sha256": "b0e15fa6de1f8907c02078bb961e0580e7defd1cf4a4f93673f7355c3a94f7cb"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-20261006/PROVIDER_NAMESPACE.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-20261006/PROVIDER_NAMESPACE.v1.json",
+      "bytes": 27012,
+      "sha256": "c2ef77ce1546e89ae3988130728e53d5706ca26f4b0a97292ba061d00663927e"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-20261006/current-imports.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-20261006/current-imports.v1.json",
+      "bytes": 46486428,
+      "sha256": "94c5b26f4898c267d858ab4ffddd71213b8366fe3d6f1f646e7ccc08636862be"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-20261006/import-preparation.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-20261006/import-preparation.v1.json",
+      "bytes": 1233,
+      "sha256": "03a15dfd219b79772fb3b43463eeb8bb679b98f8da736db19543875af50efeec"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-development-20261006-v1.config.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-development-20261006-v1.config.json",
+      "bytes": 14053,
+      "sha256": "b6a00ebbb0a574534a1b1e640905978df8812cb268d804f6744aab0f89def1a0"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-development-20261006-v1.external-lease.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-development-20261006-v1.external-lease.json",
+      "bytes": 487,
+      "sha256": "fb0895000ffe8e37d176ad902340f8dd8283f1b0d7b6c7ae2c059a0f2f643cb8"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-development-20261006-v1.lease-identity.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-development-20261006-v1.lease-identity.json",
+      "bytes": 565,
+      "sha256": "ff2f2d978aae27e08bf08c155502d5cdee68f7fa6d754204da06779fbb7c8617"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-development-20261006-v1.input_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-development-20261006-v1.input_seal.json",
+      "bytes": 8969,
+      "sha256": "7716e960de75697b9b4338d1377f0dbe14921ebc4e166c502849c50eab9e2f3c"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-development-20261006-v1.stdout": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-development-20261006-v1.stdout",
+      "bytes": 1154,
+      "sha256": "806fa7eed1b88a09eb62f2c7adaa1ff1752585985adc34de2ede7c86504c91eb"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-development-20261006-v1.stderr": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-development-20261006-v1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-development-20261006-v1.memory-gate.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-development-20261006-v1.memory-gate.json",
+      "bytes": 120,
+      "sha256": "421fb7625a2665ec8a22b48c6fd26253b2abf6f62537c5d9cf235f7ff8285380"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-development-20261006-v1.child-identity.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-development-20261006-v1.child-identity.json",
+      "bytes": 78,
+      "sha256": "5f6741e51a21c9ecf58991506efb3d64eb10b77bc6a91d3ac266e98b4c3b6c19"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-development-20261006-v1.system-floor.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-development-20261006-v1.system-floor.json",
+      "bytes": 93732,
+      "sha256": "0683b3564d853c52825f4ba4b8599edbfe95315c1e9b5ab1c3a13223f6054037"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-development-20261006-v1.quiescence.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-development-20261006-v1.quiescence.json",
+      "bytes": 130,
+      "sha256": "284764f0bf8678d33b6756fa8f7096d130f1a30a190df4bc298810af52e7a540"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-development-20261006-v1.output_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-development-20261006-v1.output_seal.json",
+      "bytes": 808132,
+      "sha256": "3f604138fda433df8529bdf4325d2373275a047bdd510b22f4a15fc40adcc9fe"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-development-20261006-v1.publication.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-development-20261006-v1.publication.json",
+      "bytes": 4025,
+      "sha256": "672a6c8e8a71fb15e74e89f8cd0cb8cfec79ce32f61d2180449edde3264a77de"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-development-20261006-v1.stage-quiescence.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-development-20261006-v1.stage-quiescence.json",
+      "bytes": 136,
+      "sha256": "72bba350e7a5c19d151b3a17748b60c141a347b0465813f955214cef51b7f406"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-development-20261006-v1.final.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-development-20261006-v1.final.json",
+      "bytes": 4910,
+      "sha256": "3742bca3768581621277f270f87be910117304ff8d04072e4426d10d2506dc8b"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-development-20261006-v1.unit-cleanup.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-development-20261006-v1.unit-cleanup.json",
+      "bytes": 725,
+      "sha256": "6f7de915198b9aedfb2c24a7070bb288f666567eb8911e54aaa4dd15203d0b13"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-development-20261006-v1.acceptance.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-development-20261006-v1.acceptance.json",
+      "bytes": 378,
+      "sha256": "a2737f073c734afdfa7d1fde0864bee997cbbd48430bd7bf5704904c8c66bd30"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-development-20261006-v1.release.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-development-20261006-v1.release.json",
+      "bytes": 175,
+      "sha256": "2dba13107e391a6c4d09de9387dda3536da6a6d3aa1fed4b04806a3e8e5adb0e"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-20261006/COMPILER_REQUEST.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-20261006/COMPILER_REQUEST.v1.json",
+      "bytes": 3181,
+      "sha256": "7bb6dcf6f3b577ad7321e896f1fe008b1d14cce7c71e576fab8a8135a8f9d9b3"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-20261006/COMPLETE_DEVELOPMENT_BUDGET.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-20261006/COMPLETE_DEVELOPMENT_BUDGET.v1.json",
+      "bytes": 167505,
+      "sha256": "f97ffc15bca9d3eae2253ec66f58b1ccde08c4f6c4f598cb105a43cae97d8fa9"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-20261006/objects-v1/FiniteDecoderWorkAudit.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-20261006/objects-v1/FiniteDecoderWorkAudit.olean",
+      "bytes": 1552,
+      "sha256": "7becaa339609f3895aef82bbb670b0d174a27077cc29d0e4a37221ca9db520cf"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-20261006/objects-v1/FiniteDecoderWorkAudit.ilean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-20261006/objects-v1/FiniteDecoderWorkAudit.ilean",
+      "bytes": 592,
+      "sha256": "72c83d8a48aabd4a763be97bf1bccfb0f53d10d4c6dee08929ec60c8365df630"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-20261006/compiler.v1.stdout": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-20261006/compiler.v1.stdout",
+      "bytes": 337,
+      "sha256": "57a235c7ca2c553dbb68a08635df838e8471520c5f233391fae11f49a3f7ce38"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-20261006/compiler.v1.stderr": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-20261006/compiler.v1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-20261006/KERNEL_VALIDATION.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-20261006/KERNEL_VALIDATION.v1.json",
+      "bytes": 623,
+      "sha256": "793609ca1d7eb192f1a15379823c80cfdd4e6f050aa476bebcd4b345bdc42e39"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/QUEUE_ENTRY.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/QUEUE_ENTRY.v1.json",
+      "bytes": 2178,
+      "sha256": "3c913ea351c902b2f724483379a860e694fc1b7ef02042ec7b18f2b567bf3c3e"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Geometry/CrossRatio.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Geometry/CrossRatio.olean",
+      "bytes": 387032,
+      "sha256": "9bd8920bea8c848791567bb3a3c27321b228716e40914c915e9d177ba269ebf6"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Geometry/Swing.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Geometry/Swing.olean",
+      "bytes": 673128,
+      "sha256": "73e83321888969f228fddca517f31d8ee848332bf4777ebbb75fa328248e3356"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Geometry/AffineSwing.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Geometry/AffineSwing.olean",
+      "bytes": 76576,
+      "sha256": "5bb3f1fc695741756d16e04e35ad714e485f1cb762f43e87fcf46054e7d0cdd9"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Geometry/Gyrogroup.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Geometry/Gyrogroup.olean",
+      "bytes": 141464,
+      "sha256": "84c664c2b5e7f2aeb475d752e535d3fc0705704e58504a8d4c8442ef93fb5a87"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Geometry/LocalFactor.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Geometry/LocalFactor.olean",
+      "bytes": 707080,
+      "sha256": "77f8753ecd5e34a01916d9a38987b677a2e721ed4bd76c625f1a95ef4ed7c830"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Geometry/PartitionFunction.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Geometry/PartitionFunction.olean",
+      "bytes": 419472,
+      "sha256": "67d58d7f21263d0889d7a39e7849fb8ffa3789519807cc7e4a03ef518cfbd44a"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Geometry/TraceSequence.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Geometry/TraceSequence.olean",
+      "bytes": 559440,
+      "sha256": "86aee9e6f5570a30d481fbf4bba3ead2c8119ebeee6434c05f3adcc51529d928"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Geometry/Polarisation.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Geometry/Polarisation.olean",
+      "bytes": 174152,
+      "sha256": "cc7808af8391a0b676bd1668293d41f60b239127d31133712184787c43abd87f"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Geometry/Horizon.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Geometry/Horizon.olean",
+      "bytes": 724016,
+      "sha256": "a6d7973e2396461956ac5773f6d0d799a5479e6d4d9fe2a9ccad2818a72c6f3a"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Geometry/Telescoping.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Geometry/Telescoping.olean",
+      "bytes": 53592,
+      "sha256": "4d3a1f9e210f369ef47aac722254978eea59aca59b63b938deeed088bedd30b2"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Geometry/ScrewGeometry.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Geometry/ScrewGeometry.olean",
+      "bytes": 2049320,
+      "sha256": "3fe77355d6bf3fc5e08e3fd60637b53535fff231eed1b68c69920f9a8b4f9075"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Geometry/HolonicPantographicSwingJets.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Geometry/HolonicPantographicSwingJets.olean",
+      "bytes": 397632,
+      "sha256": "c7729d8d4d59161f39f92908d1603553657d8a233e55c9982ce0918ae67e385c"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Physics/CompositeMassEnergy.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Physics/CompositeMassEnergy.olean",
+      "bytes": 495128,
+      "sha256": "74ed92c780a396a6deed0b2b8a1f929b80c0b4bf7b65abe9b979d91951cdc04c"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Physics/HolonicMassShellFace.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Physics/HolonicMassShellFace.olean",
+      "bytes": 295480,
+      "sha256": "951337fd709501d381846803d3425879d6ceae6262cc57e8a68625e82e9a3620"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Physics/Ellipse.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Physics/Ellipse.olean",
+      "bytes": 231896,
+      "sha256": "ef6c4f1da669a404e5a8b6fb8448b8262c83782b1f6fa9080b5861d0734b8530"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Physics/HolonicSnellInteraction.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Physics/HolonicSnellInteraction.olean",
+      "bytes": 163384,
+      "sha256": "942ff9f49ce42451ee24a19b700e67d2d888725ebd4e86d8e1df79102d257bef"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Fluid/NavierStokesMaterialPolygon.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Fluid/NavierStokesMaterialPolygon.olean",
+      "bytes": 633616,
+      "sha256": "40fe0a0522656329558a9ab6c833a9b032eac25cb5a2188a54d91ca5d1091730"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Fluid/NavierStokes.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Fluid/NavierStokes.olean",
+      "bytes": 177368,
+      "sha256": "bc5b3db92426387ad5622f64bd91a7da63143afc28b3dd7f6493dedaedc02461"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Foundation/Gluing.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Foundation/Gluing.olean",
+      "bytes": 178288,
+      "sha256": "af6f425d9cbbd6fc31c53263f4953bd3a54b56cbd8b0e5301de48096d55f99cf"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Foundation/GluingPassage.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Foundation/GluingPassage.olean",
+      "bytes": 70584,
+      "sha256": "4025653894b0f3195c4912ba0ba3923eb0fc400d6b4943c332a4fdd92d485836"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Foundation/HolonicDirectedPassage.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Foundation/HolonicDirectedPassage.olean",
+      "bytes": 338200,
+      "sha256": "a1ded9144b7c7a8df68804b11787d8298f10752f272d8085c4aa690cda391f77"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Foundation/HolonicDifferenceCalculus.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Foundation/HolonicDifferenceCalculus.olean",
+      "bytes": 457160,
+      "sha256": "ba23d8d2a54829cc10b5147e6348a851aae309585c27272f3620dac7f06ae909"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Foundation/TransportWord.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Foundation/TransportWord.olean",
+      "bytes": 331688,
+      "sha256": "9d516bb503727dab1bf150f8982f6f871f27e23a21ec0612013d495c5faa9f93"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Transport/NavigatorTraceFaces.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Transport/NavigatorTraceFaces.olean",
+      "bytes": 458744,
+      "sha256": "c0f84d8b35e02a1f85338e0cfa24dbd700e7e5628ca73a5c5d03aaf76987e319"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Transport/HelicalPairInteraction.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Transport/HelicalPairInteraction.olean",
+      "bytes": 1069616,
+      "sha256": "8865c32b66f17844824d4a0267c576395f12556756533818b1909566fce29245"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Transport/HolonicInteraction.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Transport/HolonicInteraction.olean",
+      "bytes": 961152,
+      "sha256": "46649f243a94f8b6094b9a1c54a769af23d5e2573406787eab8e5f110a891dad"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Holon/QuadraticMoment.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Holon/QuadraticMoment.olean",
+      "bytes": 120488,
+      "sha256": "db65bcf761ef07d805110c4ad26fa9878f7d015170aff36ea66180a9c0cb6617"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Compression/Landmark/FixedPoint.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Compression/Landmark/FixedPoint.olean",
+      "bytes": 1779384,
+      "sha256": "44efbcbbe8a8a6228f46224642a1fd5f7def3aefe49a014953636e92f46db293"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Compression/Landmark/SiteKind.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Compression/Landmark/SiteKind.olean",
+      "bytes": 3154776,
+      "sha256": "381e20c53e0676ecbce49834d7e90efb491466fb817e02c0040f4bbfa0674098"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-20261006/QUEUE_ENTRY.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-20261006/QUEUE_ENTRY.v1.json",
+      "bytes": 951,
+      "sha256": "b3b0488d0331b47f6fc0af7f66899f93e6a27e3730505c4adf368b33ab76897f"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoder-development-20261006/QUEUE_ENTRY.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-development-20261006/QUEUE_ENTRY.v1.json",
+      "bytes": 607,
+      "sha256": "e41a06eb80787abb60872138ac1527df0fafc40edd34832d02f521d0184bcc3c"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/REQUEST_V2_CONSUMPTION.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/REQUEST_V2_CONSUMPTION.v1.json",
+      "bytes": 494,
+      "sha256": "bcbc2a87c14a019986365a742cd3d717797f33d2dc80ecad9eda5a106c2d2037"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/MOTION_DECODING_WORK.v1.patch": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/MOTION_DECODING_WORK.v1.patch",
+      "bytes": 21450,
+      "sha256": "66cb576e76f631e4ca66691dcef44c7f6d2995b673ffc46e67b0fd10e0f56aaa"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/Motion.root-predecessor.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/Motion.root-predecessor.lean",
+      "bytes": 55845,
+      "sha256": "32df98dece1d3d0cbff9505bd9f4e15f0b2ee6244c490a3058c26a479b962fad"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/SOURCE_AND_SEMANTIC_RECEIPT.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/SOURCE_AND_SEMANTIC_RECEIPT.json",
+      "bytes": 2014,
+      "sha256": "b23ab282fb79a58677e6c5cc8154ceadd56e5e0cdb9c5cf8045b196763865fa6"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/QUEUE_REQUEST.v2.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/QUEUE_REQUEST.v2.json",
+      "bytes": 15714,
+      "sha256": "f01a40492eb511a52c894b7232150170d907c50fa08b2978cabbdac72552d4e4"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Geometry/CrossRatio.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Geometry/CrossRatio.lean",
+      "bytes": 6014,
+      "sha256": "2fe42c8b97bfe226a82605777d1febc53843747c711dccda276e56938b3f1512"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Geometry/Swing.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Geometry/Swing.lean",
+      "bytes": 11469,
+      "sha256": "945876159a3560dbb8417aaccff4f9e79917004f06cd1369a80a3e94957444c3"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Geometry/AffineSwing.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Geometry/AffineSwing.lean",
+      "bytes": 2184,
+      "sha256": "09ce73d5bc9766c152c3ccfc3b16a5f9627e5a4b3cda828ef9f1cf9e91b5805f"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Geometry/Gyrogroup.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Geometry/Gyrogroup.lean",
+      "bytes": 3726,
+      "sha256": "552ac01619be9590d274ef3dc4e3b37405e65f6131c55dcbbfdb4a0cff902741"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Geometry/LocalFactor.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Geometry/LocalFactor.lean",
+      "bytes": 6222,
+      "sha256": "4058a7947dd1d86932e7ced7d92a7b3c3a2dec322fec8ca51e3d62f7f6c04c9d"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Geometry/PartitionFunction.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Geometry/PartitionFunction.lean",
+      "bytes": 2963,
+      "sha256": "6a2650e0ed3996ad18d58b0c5c23ff51bd5924900d5bc7aabdaebfcd0a1b3155"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Geometry/TraceSequence.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Geometry/TraceSequence.lean",
+      "bytes": 8487,
+      "sha256": "1ec3d0a525cfa9ca7d2b2444557379ac65697f9d55b19c961d469f01c49e9494"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Geometry/Polarisation.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Geometry/Polarisation.lean",
+      "bytes": 5472,
+      "sha256": "15141a0dd8489645a133e10f3c537b624bc01479295d25df73cdf363b25f74d2"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Geometry/Horizon.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Geometry/Horizon.lean",
+      "bytes": 15792,
+      "sha256": "1ed9894a917aba66e69e4552297c3fb1f193e618ab4b089643e16d9e85f8c215"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Geometry/Telescoping.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Geometry/Telescoping.lean",
+      "bytes": 929,
+      "sha256": "ff8783996008207d980f6d64cc144544825304bd23cd09428ec1cae43bc8e5cc"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Geometry/ScrewGeometry.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Geometry/ScrewGeometry.lean",
+      "bytes": 7626,
+      "sha256": "91020b35bc1cf591f7eae4e0537a70b8c218986d284852181c6689cec102719e"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Geometry/HolonicPantographicSwingJets.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Geometry/HolonicPantographicSwingJets.lean",
+      "bytes": 12278,
+      "sha256": "51c34caac9bd16deed9e31c4c1e3ed4c5c5680c5bc62d4438c8d9a6715b55939"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Physics/CompositeMassEnergy.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Physics/CompositeMassEnergy.lean",
+      "bytes": 5807,
+      "sha256": "cdbe477bb3423e4e5f869e863d1fc014df25aae48e94a9f108804df803283c33"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Physics/HolonicMassShellFace.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Physics/HolonicMassShellFace.lean",
+      "bytes": 6593,
+      "sha256": "acdf233fa50037c9f0c4af2a6aaf1b324cbf9445db9cd4cdf8fe30adb4be58df"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Physics/Ellipse.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Physics/Ellipse.lean",
+      "bytes": 4016,
+      "sha256": "a37043c31fd0f9142500db8c1ea279d25bfc5dd9636a420c2948b867fb7b84cb"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Physics/HolonicSnellInteraction.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Physics/HolonicSnellInteraction.lean",
+      "bytes": 9464,
+      "sha256": "175b95e411fe980d2fb22ac54a8b92e2dd8f760d6b2998373cecb6904c88f96f"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Fluid/NavierStokesMaterialPolygon.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Fluid/NavierStokesMaterialPolygon.lean",
+      "bytes": 21379,
+      "sha256": "22fef6996049fbfaf7d39be42da91a596aa1e9e57af80a10496950eb8def7f87"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Fluid/NavierStokes.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Fluid/NavierStokes.lean",
+      "bytes": 7565,
+      "sha256": "e7455a3002c215a8c25d11031ae2f862ee3d113a42674ebdb24f2a4db4c80991"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Foundation/Gluing.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Foundation/Gluing.lean",
+      "bytes": 6717,
+      "sha256": "5f90c401cae7aa7f40fe42b8dc0a1f181a62e5f44e9bf6dd760bcdb8ccd06828"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Foundation/GluingPassage.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Foundation/GluingPassage.lean",
+      "bytes": 2831,
+      "sha256": "966612dd5ba3888bd8e57f2ea8c405f8ad188c877430b0c12b42ab301ef09719"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Foundation/HolonicDirectedPassage.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Foundation/HolonicDirectedPassage.lean",
+      "bytes": 15691,
+      "sha256": "21062227a09719bb6bb27a825eac9b16ccf515bd01d08b9644af076a0bf014ec"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Foundation/HolonicDifferenceCalculus.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Foundation/HolonicDifferenceCalculus.lean",
+      "bytes": 17435,
+      "sha256": "addc8fef4d287cc4ce5df708e99dccd278a4a94e2e3f15a5bb44326ad97b0977"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Foundation/TransportWord.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Foundation/TransportWord.lean",
+      "bytes": 10118,
+      "sha256": "345ece634e00c2b38d0eebf903074e1cd24715a6f3d4b22cb4aaeb09f906c72a"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Transport/NavigatorTraceFaces.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Transport/NavigatorTraceFaces.lean",
+      "bytes": 8743,
+      "sha256": "49e223eb8c3d5b8bc950ae13d4a80a3e0d2c4d2e0c487ff08abe699a2972b849"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Transport/HelicalPairInteraction.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Transport/HelicalPairInteraction.lean",
+      "bytes": 22961,
+      "sha256": "5408e033f4d0d3adf22e75d01811d172752222a54ea0d762d2facf102f8cdd58"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Transport/HolonicInteraction.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Transport/HolonicInteraction.lean",
+      "bytes": 31518,
+      "sha256": "ed7aeaa89a12c73b32983536eaffd3b6369951fd55f8143afd5ef16bd455f1b5"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Holon/QuadraticMoment.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Holon/QuadraticMoment.lean",
+      "bytes": 2811,
+      "sha256": "f222d34a7bb68ccfc52f6b86b760302e8cc8de6b4ed8ed517f1cf5149585bc9c"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Compression/Landmark/FixedPoint.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Compression/Landmark/FixedPoint.lean",
+      "bytes": 29401,
+      "sha256": "6d43de55250e67bc780d6b7a78435ffc169c2774387d9a6ce06d7e853db77f40"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Compression/Landmark/SiteKind.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Compression/Landmark/SiteKind.lean",
+      "bytes": 39079,
+      "sha256": "299768dd7adb6a9a3c5deedaee08dffe4118d3b95f878a7594f495e735218ebc"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/preserve_resumed_native_v21.py": {
+      "copy": ".local/lean-rust-pruning/admission-v1/preserve_resumed_native_v21.py",
+      "bytes": 3817,
+      "sha256": "cea2aff5b87921ce46fe5339d53c796ff4abeda6ed5bb198b54073e9b44d4966"
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/preserve_queue_package_v1.py": {
+      "copy": ".local/lean-rust-pruning/admission-v1/preserve_queue_package_v1.py",
+      "bytes": 2476,
+      "sha256": "fbd3fba619e973d910217ede1eff8c62f4d03a964a67c9c38dec7c2f654de125"
+    }
+  }
+}

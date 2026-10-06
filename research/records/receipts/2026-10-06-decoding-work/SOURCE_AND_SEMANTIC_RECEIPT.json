@@ -1,0 +1,52 @@
+{
+  "status": "source/static and five exterior exact semantic checks pass; kernel pending",
+  "source_pins": {
+    "exact_semantic_checks.py": {
+      "sha256": "28c04e8d9a2145d3e24c0c9d59f951e245496fccb89b7f48ce0e684ea7c5a484",
+      "bytes": 5224
+    },
+    "exact-semantic-checks.json": {
+      "sha256": "42c9a75bc6f9c7d4e3eba9ecdf0dbbb43f3f710448a3ad7299322bbeed7e6556",
+      "bytes": 2053
+    },
+    "primary/source-read-receipt.md": {
+      "sha256": "a4ce3d03bf0f9391bb82ef7fb340df8b264fdef694bfa41c18a6a9e808a70cf8",
+      "bytes": 4712
+    },
+    "primary/modulo-owner-recovery.md": {
+      "sha256": "2019924c3d6456b017c6a23ae076af8e8b0da1abb5596720777814f434ec072b",
+      "bytes": 9119
+    },
+    "Motion.root-predecessor.lean": {
+      "sha256": "32df98dece1d3d0cbff9505bd9f4e15f0b2ee6244c490a3058c26a479b962fad",
+      "bytes": 55845
+    },
+    "QUEUE_REQUEST.v1.json": {
+      "sha256": "7620fa467753449489d79b4b132ce3f23ac4f4b1d2da116184c4a19a2593e327",
+      "bytes": 10203
+    },
+    "Motion.candidate.lean": {
+      "sha256": "0be5b5b2b2aa729a73a8530f3a751d0015a6735f34f23e1667faa8fe34e9e85e",
+      "bytes": 56875
+    }
+  },
+  "new_owner_direct_imports_unchanged": true,
+  "existing_affine_theorem_byte_identical": true,
+  "existing_chart_theorem_statement_preserved": true,
+  "canonical_root_Motion_unchanged": true,
+  "root_patch_dry_check": "PASS",
+  "new_atlas_row_columns": 8,
+  "local_links_checked": 3,
+  "compiler_or_native_invocations": 0,
+  "fixture_receipt": {
+    "sha256": "42c9a75bc6f9c7d4e3eba9ecdf0dbbb43f3f710448a3ad7299322bbeed7e6556",
+    "bytes": 2053
+  },
+  "queue_request": {
+    "sha256": "7620fa467753449489d79b4b132ce3f23ac4f4b1d2da116184c4a19a2593e327",
+    "bytes": 10203
+  },
+  "new_theorem_consumed_by": "finite_work_form_rechart",
+  "whole_source_snapshot": "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/thermo-medium-20261006/source-v1/lean",
+  "phase_modulo_primary_claims": "parent actual reader input; no independent primary fetch in lane"
+}

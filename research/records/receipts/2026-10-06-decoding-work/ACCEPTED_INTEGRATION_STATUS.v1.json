@@ -1,0 +1,20 @@
+{
+  "scope": "Narrow exact accepted Motion integration through coordinator; no CausalChord/SourceHolon future-read sources or objects",
+  "source_sha256": "0be5b5b2b2aa729a73a8530f3a751d0015a6735f34f23e1667faa8fe34e9e85e",
+  "source_annotation_preserved_to_keep_exact_accepted_bytes": true,
+  "root_predecessor_sha256": "32df98dece1d3d0cbff9505bd9f4e15f0b2ee6244c490a3058c26a479b962fad",
+  "root_unchanged_before_integration": true,
+  "new_atlas_row": "motion.decoding-work-defect",
+  "queue_validation_sha256": "2943b3c1181bdcdbb47a39a185d44977c8e80ba7542d68db76a74ce8a25f463d",
+  "Motion_object_sha256": "e1229d7bf24796b406b471e3c9a1fd345bee8235b207b704b591400035228d91",
+  "audit_object_sha256": "7becaa339609f3895aef82bbb670b0d174a27077cc29d0e4a37221ca9db520cf",
+  "formal_counts": {
+    "development": 2,
+    "whole_owner": 58,
+    "importer": 3
+  },
+  "whole_library_gate": false,
+  "Git_publication": false,
+  "native_HNN_performance_claim": false,
+  "future_read_request_separate": true
+}

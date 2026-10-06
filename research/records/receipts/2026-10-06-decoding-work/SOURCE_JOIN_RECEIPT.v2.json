@@ -1,0 +1,51 @@
+{
+  "status": "source/static/exterior semantics pass; kernel pending",
+  "candidate_source_sha256": "0be5b5b2b2aa729a73a8530f3a751d0015a6735f34f23e1667faa8fe34e9e85e",
+  "current_owner_sources_read": {
+    "lean/Holonics/Physics/Information/PortWork.lean": {
+      "sha256": "351a6c15f65c004f6e055ad3811563390eb75a01a46d666f880b7bea816d184e",
+      "bytes": 25101
+    },
+    "lean/Holonics/Foundation/CausalChord.lean": {
+      "sha256": "bf9e8165102f911bf68d23edcf9a0136a70682539948db71f86d2cf789f74a0d",
+      "bytes": 43769
+    },
+    "lean/Holonics/Foundation/SectionResidual.lean": {
+      "sha256": "841d5b94895b05d30f949e3c57e8c11c2413914d9923b2713f5536780dbb3acd",
+      "bytes": 4683
+    },
+    "lean/Holonics/Transport/ChangingReceiver/Defect.lean": {
+      "sha256": "0fd69509667e6e3b3cee7c9ef853e29236c67c4f6c205dd1571b9bce4945c950",
+      "bytes": 7493
+    },
+    "docs/RECEIVER_HOLARCHY.md": {
+      "sha256": "b5db04e4ac98fa184df05036420196253193e18f657c85e66d164fa59706f00d",
+      "bytes": 51061
+    },
+    "crates/holonics/src/physics/information/apply.rs": {
+      "sha256": "2983abbdc8d9059c4e0a3c2529957cce3cf011ade0c9d0576f76bad4ee654792",
+      "bytes": 16364
+    },
+    "crates/holonics/src/physics/wave/chain.rs": {
+      "sha256": "3130272d662e592f72601253ad7aac21a2ebd1a2670fb6bd7f9d70f17532265a",
+      "bytes": 28939
+    },
+    "a1bc2bc:research/records/2026-10-05_THE_GHOST_LIVES_IN_THE_GAP_THE_JOINTS_OF_THE_LENS.md": {
+      "sha256": "9e52b4e64166668a683080f931ba04ba597caf877212f58361ac5441beb727d4",
+      "bytes": 24071,
+      "sections_consumed": "J3-J4 exact comma carry; J7 receiver-relative drum ambiguity; no biological material shared"
+    }
+  },
+  "record_sha256": "1146af5d5bc79488dff06f1936e58984a7231dd32176f0d12b85881612027242",
+  "queue_request_path": "/home/b/Workspaces/holonics/.local/wt/swept-transport/.local/thermo-medium-20261006/QUEUE_REQUEST.v2.json",
+  "queue_request_sha256": "f01a40492eb511a52c894b7232150170d907c50fa08b2978cabbdac72552d4e4",
+  "private_snapshot_sources": 32,
+  "root_patch_dry_check": "PASS",
+  "patch_sha256": "5e892763fdd6d1eac1fa9bd95a08a2bcace2e03cc1fb15878d4f61664e39bfcf",
+  "root_Motion_unchanged": true,
+  "accepted_Frame_source_frozen": true,
+  "local_links_checked": 3,
+  "existing_five_exact_checks_not_repeated": true,
+  "fresh_native_or_compiler_invocations": 0,
+  "new_claims": "full decoder work-form defect; other physical/source/retention joins conditional and previously owned"
+}

@@ -1,0 +1,82 @@
+{
+  "status": "PASS: five exact semantic witnesses",
+  "mathematical_arithmetic": "Fraction",
+  "threads": 1,
+  "projection_scope": "fixture computation; Python startup excluded",
+  "prior_read": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-04_finite-step-work/source-validation.json",
+  "largest_prior_unit_upper_ns": 6956621,
+  "declared_count": 5,
+  "projection_ns": 34783105,
+  "deadline_ns": 34783105,
+  "wall_ns": 129272,
+  "measured_to_projected": [
+    129272,
+    34783105
+  ],
+  "peak_RSS_KiB": 17804,
+  "source_sha256": "28c04e8d9a2145d3e24c0c9d59f951e245496fccb89b7f48ce0e684ea7c5a484",
+  "checks": [
+    {
+      "case": "decoder_signs",
+      "wall_ns": 52759,
+      "reading": {
+        "decoded_minus_physical_energy": [
+          "3/2",
+          "-5/2"
+        ],
+        "decoder_idempotent": true
+      }
+    },
+    {
+      "case": "material_area_work",
+      "wall_ns": 26890,
+      "reading": {
+        "kinetic_material_work": "121/10",
+        "potential_material_work": "-49/12",
+        "volume_ratio": "2",
+        "LC_unchanged": true
+      }
+    },
+    {
+      "case": "pressure_face_future_separator",
+      "wall_ns": 8676,
+      "reading": {
+        "same_pressure_face": [
+          "0",
+          "0"
+        ],
+        "different_actual_pressure_rates": [
+          "0",
+          "11/15"
+        ]
+      }
+    },
+    {
+      "case": "modulo_future_separator",
+      "wall_ns": 12403,
+      "reading": {
+        "period": "2",
+        "same_initial_faces": [
+          "0",
+          "0"
+        ],
+        "ending_faces_under_half_transport": [
+          "0",
+          "1"
+        ]
+      }
+    },
+    {
+      "case": "folded_quantized_energy_error",
+      "wall_ns": 16941,
+      "reading": {
+        "actual_reconstruction_error": "13/7",
+        "energy_error": "767/98",
+        "cross_term": "130/49",
+        "self_term": "507/98"
+      }
+    }
+  ],
+  "compiler_or_native_invocations": 0,
+  "scope": "independent algebraic semantic witnesses; not native WaveChain or physical ADC execution"
+}
