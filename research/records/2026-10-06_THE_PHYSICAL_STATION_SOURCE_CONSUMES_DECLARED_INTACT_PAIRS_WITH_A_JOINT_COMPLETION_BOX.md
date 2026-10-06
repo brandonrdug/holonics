@@ -55,6 +55,9 @@ with the existing sparse extent e and age e-1-j. Trailing holes therefore retain
 sparse point convention; this change does not silently advance a blank source clock. Unit
 pair population is the number of actual intact eligible edges; below unit transport the same
 `Leaky::enter` and `Leaky::normalized` read its transported counts on the existing lattice/chart.
+The first feature F[c] is also the actual existing normalized feature: raw counts times the
+population chart at unit transport, the charted normalized leaky row otherwise. It is not a
+raw phase histogram times one approximate age weight when that phase contains distinct ages.
 
 The concrete join is
 
@@ -100,6 +103,17 @@ read from the actual sparse opening to those full-family endpoints, so it also c
 sparse point. The unchanged exact coupled tube consumes this opening box through its loaded
 element/contact/pump maps and reads complex intervals through actual R. Release still requires
 a singleton of the whole certified receiving image; no point leader is substituted for it.
+
+[source-verified opening invariant] `Word::open_exact_received` computes the injection from
+this actual source, calls `interior_of` to zero **only source storage**, and then `continuing`
+adds the injection. Source-ring `word.change().storage` therefore equals the imposed sparse
+source contribution at this exact opening. Arrivals, contact displacement/rate, resonator
+state/phase and non-source storage stay at the entered interior. The opening box measures
+variation of the source while those interior coordinates are fixed; it does not add old source
+storage a second time or absorb the whole interior. `SourceOpeningReceipt` verifies
+`E_after-E_before = imposed-absorbed`. The [opening seam review](receipts/station-pair-source-20261006/SOURCE_OPENING_SEAM_REVIEW.v1.json)
+pins these existing owners. A review concern about total-storage centering was resolved by
+this actual replacement law, with no source, fixture or cap change.
 
 ## Fixed acceptance and its limits
 

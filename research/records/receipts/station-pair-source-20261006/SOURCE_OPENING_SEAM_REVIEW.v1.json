@@ -1,0 +1,19 @@
+{
+  "source_commit": "518e1e3f4f5d6ad6dab57a7dc08b3098eab354f4",
+  "status": "source-verified unchanged opening law; no native run",
+  "word_rs": {
+    "bytes": 139446,
+    "sha256": "0200f5a2920d26b0b6258823ffeb20ae5b23bf4546299ec058e7c60d159b7bb4"
+  },
+  "owners": {
+    "SourceMoment::open_storage": "word.rs1786 injection",
+    "interior_of": "word.rs1643-1649 zeros only source storage",
+    "Word::open_exact_received": "word.rs1825-1855 absorption/replacement/exact balance",
+    "Word::continuing": "word.rs1906-1940 adds injection to projected interior"
+  },
+  "source_to_observable": "For g in sources, opening.storage[g]=source.open_storage[g]; source radius varies this contribution while all entered interior coordinates stay fixed. Subsequent native ticks consume both actual source and retained interior.",
+  "review_concern": "Potential centering defect if old source storage were added; disproved because exact opening replaces it after accounted absorption.",
+  "source_bytes_fixture_caps_changed": false,
+  "native_candidate_still": "518e1e3f with exact v8 request and pins",
+  "new_run_started_here": false
+}
