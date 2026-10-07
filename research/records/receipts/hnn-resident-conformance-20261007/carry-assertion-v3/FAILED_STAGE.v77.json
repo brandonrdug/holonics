@@ -1,0 +1,452 @@
+{
+  "UTC": "2026-10-07T20:55:19.200710+00:00",
+  "grade": "PRODUCTION_GUARDS_PASS_LIBTEST_REFUSED_E0277",
+  "source_commit": "082a399161cccd75e38ac632c26d608262d36534",
+  "predecessor": "173a196b1f1aa9fcfa4dd46655c87cc5eb1a865e",
+  "accepted_production_guards": [
+    "library-check",
+    "three guard lints",
+    "57 doctests"
+  ],
+  "accepted_controls": 0,
+  "requested_controls": 7,
+  "native_controls_unlaunched": 7,
+  "caller_checks_unlaunched": [
+    "hnn_prediction",
+    "holonics-cuda --lib"
+  ],
+  "stages": {
+    "hnn-resident082-cache-preparation-20261006-v1": {
+      "phase": "cache-preparation",
+      "accepted_stage": true,
+      "stage_wall_ns": 7015015673,
+      "native_wall_ns": 6899138594,
+      "CPU_ns": 5813444000,
+      "fixed_guard_ns": 17000000000,
+      "aggregate_CPU_cap_us": 17000000,
+      "thread_budget": 1,
+      "group_peak_bytes": 2648010752,
+      "child_RSS_KiB": 31236,
+      "memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "measured_to_guard": {
+        "numerator": 7015015673,
+        "denominator": 17000000000
+      },
+      "inputs_unchanged": true,
+      "quiescent_released": true,
+      "wall_factored": {
+        "integer": 7015015673,
+        "prime_powers": [
+          [
+            1523,
+            1
+          ],
+          [
+            4606051,
+            1
+          ]
+        ]
+      },
+      "CPU_factored": {
+        "integer": 5813444000,
+        "prime_powers": [
+          [
+            2,
+            5
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            7,
+            1
+          ],
+          [
+            13,
+            1
+          ],
+          [
+            15971,
+            1
+          ]
+        ]
+      },
+      "group_bytes_factored": {
+        "integer": 2648010752,
+        "prime_powers": [
+          [
+            2,
+            12
+          ],
+          [
+            83,
+            1
+          ],
+          [
+            7789,
+            1
+          ]
+        ]
+      }
+    },
+    "hnn-resident082-library-check-20261006-v1": {
+      "phase": "library-check",
+      "accepted_stage": true,
+      "stage_wall_ns": 6866655556,
+      "native_wall_ns": 6077250142,
+      "CPU_ns": 6855351000,
+      "fixed_guard_ns": 65000000000,
+      "aggregate_CPU_cap_us": 128000000,
+      "thread_budget": 8,
+      "group_peak_bytes": 980955136,
+      "child_RSS_KiB": 882836,
+      "memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "measured_to_guard": {
+        "numerator": 6866655556,
+        "denominator": 65000000000
+      },
+      "inputs_unchanged": true,
+      "quiescent_released": true,
+      "wall_factored": {
+        "integer": 6866655556,
+        "prime_powers": [
+          [
+            2,
+            2
+          ],
+          [
+            19,
+            1
+          ],
+          [
+            90350731,
+            1
+          ]
+        ]
+      },
+      "CPU_factored": {
+        "integer": 6855351000,
+        "prime_powers": [
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            199,
+            1
+          ],
+          [
+            11483,
+            1
+          ]
+        ]
+      },
+      "group_bytes_factored": {
+        "integer": 980955136,
+        "prime_powers": [
+          [
+            2,
+            12
+          ],
+          [
+            7,
+            1
+          ],
+          [
+            34213,
+            1
+          ]
+        ]
+      }
+    },
+    "hnn-resident082-library-guard-lints-20261006-v1": {
+      "phase": "library-guard-lints",
+      "accepted_stage": true,
+      "stage_wall_ns": 9236718690,
+      "native_wall_ns": 8549154820,
+      "CPU_ns": 9403607000,
+      "fixed_guard_ns": 65000000000,
+      "aggregate_CPU_cap_us": 128000000,
+      "thread_budget": 8,
+      "group_peak_bytes": 929562624,
+      "child_RSS_KiB": 906256,
+      "memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "measured_to_guard": {
+        "numerator": 9236718690,
+        "denominator": 65000000000
+      },
+      "inputs_unchanged": true,
+      "quiescent_released": true,
+      "wall_factored": {
+        "integer": 9236718690,
+        "prime_powers": [
+          [
+            2,
+            1
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            5,
+            1
+          ],
+          [
+            523,
+            1
+          ],
+          [
+            571,
+            1
+          ],
+          [
+            1031,
+            1
+          ]
+        ]
+      },
+      "CPU_factored": {
+        "integer": 9403607000,
+        "prime_powers": [
+          [
+            2,
+            3
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            79,
+            1
+          ],
+          [
+            119033,
+            1
+          ]
+        ]
+      },
+      "group_bytes_factored": {
+        "integer": 929562624,
+        "prime_powers": [
+          [
+            2,
+            19
+          ],
+          [
+            3,
+            2
+          ],
+          [
+            197,
+            1
+          ]
+        ]
+      }
+    },
+    "hnn-resident082-guard-doctests-20261006-v1": {
+      "phase": "guard-doctests",
+      "accepted_stage": true,
+      "stage_wall_ns": 19456580932,
+      "native_wall_ns": 18582572097,
+      "CPU_ns": 36713458000,
+      "fixed_guard_ns": 65000000000,
+      "aggregate_CPU_cap_us": 128000000,
+      "thread_budget": 8,
+      "group_peak_bytes": 2333831168,
+      "child_RSS_KiB": 2095328,
+      "memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "measured_to_guard": {
+        "numerator": 19456580932,
+        "denominator": 65000000000
+      },
+      "inputs_unchanged": true,
+      "quiescent_released": true,
+      "wall_factored": {
+        "integer": 19456580932,
+        "prime_powers": [
+          [
+            2,
+            2
+          ],
+          [
+            103,
+            1
+          ],
+          [
+            47224711,
+            1
+          ]
+        ]
+      },
+      "CPU_factored": {
+        "integer": 36713458000,
+        "prime_powers": [
+          [
+            2,
+            4
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            59,
+            1
+          ],
+          [
+            241,
+            1
+          ],
+          [
+            1291,
+            1
+          ]
+        ]
+      },
+      "group_bytes_factored": {
+        "integer": 2333831168,
+        "prime_powers": [
+          [
+            2,
+            12
+          ],
+          [
+            137,
+            1
+          ],
+          [
+            4159,
+            1
+          ]
+        ]
+      }
+    },
+    "hnn-resident082-lib-test-build-20261006-v1": {
+      "phase": "lib-test-build",
+      "accepted_stage": false,
+      "stage_wall_ns": 12329011160,
+      "native_wall_ns": 11484130937,
+      "CPU_ns": 12893467000,
+      "fixed_guard_ns": 65000000000,
+      "aggregate_CPU_cap_us": 128000000,
+      "thread_budget": 8,
+      "group_peak_bytes": 1501798400,
+      "child_RSS_KiB": 1345712,
+      "memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "measured_to_guard": {
+        "numerator": 12329011160,
+        "denominator": 65000000000
+      },
+      "inputs_unchanged": true,
+      "quiescent_released": true,
+      "wall_factored": {
+        "integer": 12329011160,
+        "prime_powers": [
+          [
+            2,
+            3
+          ],
+          [
+            5,
+            1
+          ],
+          [
+            308225279,
+            1
+          ]
+        ]
+      },
+      "CPU_factored": {
+        "integer": 12893467000,
+        "prime_powers": [
+          [
+            2,
+            3
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            12893467,
+            1
+          ]
+        ]
+      },
+      "group_bytes_factored": {
+        "integer": 1501798400,
+        "prime_powers": [
+          [
+            2,
+            13
+          ],
+          [
+            5,
+            2
+          ],
+          [
+            7333,
+            1
+          ]
+        ]
+      }
+    }
+  },
+  "all_released": true,
+  "no_resource_stop_or_event": true,
+  "no_cap_raise_or_unchanged_failure_replay": true,
+  "actual_refusal": "E0277 hnn/tests/physical_communication.rs:548 assert_eq!(carry, taught.carry), &ReceptionCarry versus ReceptionCarry",
+  "application_boundary": "communicate_contact is currently consumed by library controls; notebook physical receive/learn is compile-only and no acquired-output grade follows.",
+  "remaining_blockers": "Test source assertion type repair before seven controls/caller checks. No useful acquired transformation, GPU runtime parity, global wave-delay-storage conformance or cold codec acceptance."
+}

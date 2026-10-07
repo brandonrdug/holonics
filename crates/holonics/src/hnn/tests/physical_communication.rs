@@ -545,7 +545,7 @@ fn one_future_source_publication_reaches_the_next_contemporary_communication_ope
     let WordOpening::Received { carry, .. } = &entered else {
         panic!("actual blind end")
     };
-    assert_eq!(carry, taught.carry);
+    assert_eq!(carry, &taught.carry);
     let mut prior = PhysicalReceiver::new(&field, producing, current, entered).expect("admitted common resident");
     // A separately fixed prefix; no later observation is supplied to either native read.
     let later_source = encoded(&field, &[2, 1]);

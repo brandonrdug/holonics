@@ -1,0 +1,22 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling thiserror v2.0.19
+   Compiling quote v1.0.47
+   Compiling syn v3.0.3
+   Compiling thiserror-impl v2.0.19
+   Compiling holonics v0.1.0 (/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-resident082-20261007/source-v1/crates/holonics)
+error[E0277]: can't compare `&hnn::word::ReceptionCarry` with `hnn::word::ReceptionCarry`
+   --> crates/holonics/src/hnn/tests/physical_communication.rs:548:5
+    |
+548 |     assert_eq!(carry, taught.carry);
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ no implementation for `&hnn::word::ReceptionCarry == hnn::word::ReceptionCarry`
+    |
+    = help: the trait `PartialEq<hnn::word::ReceptionCarry>` is not implemented for `&hnn::word::ReceptionCarry`
+    = note: this error originates in the macro `assert_eq` (in Nightly builds, run with -Z macro-backtrace for more info)
+help: consider dereferencing here
+   --> /home/b/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/macros/mod.rs:46:22
+    |
+ 46 |                 if !(**left_val == *right_val) {
+    |                      +
+
+For more information about this error, try `rustc --explain E0277`.
+error: could not compile `holonics` (lib test) due to 1 previous error

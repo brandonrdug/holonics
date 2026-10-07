@@ -141,3 +141,17 @@ The corrected successor requires a fresh queue check; the failed predecessor rem
 fixed contact/Holon controls, fifty-seven doctests and the CUDA caller typecheck. Those are
 predecessor mechanical/type receipts, not this resident lifecycle's runtime acceptance, device
 runtime parity, useful acquired output or a new scientific result.
+
+## Fresh production guards pass; carry assertion corrected
+
+[measured; queue continuation-v77] Corrected source082a3991 passed the library check, the three
+required guards and fifty-seven doctests. Its fresh test build then refused E0277 at
+`physical_communication.rs:548`: `carry` is borrowed from `&entered`, while the migrated assertion
+compared it to an owned `taught.carry`. Seven native controls and notebook/CUDA checks remained
+unlaunched. The exact failure, passed-stage costs and full compiler output are preserved in
+[carry-assertion-v3](receipts/hnn-resident-conformance-20261007/carry-assertion-v3/CORRECTION_PREPARATION.json).
+
+[implementation; native pending] The assertion again compares `carry` to `&taught.carry`,
+preserving equality of the actual complete reception carry. This is a cfg(test)-only correction;
+production forward, material reaction, common owner and enclosure-publication guard are unchanged.
+The same seven fixed controls and caller checks still require fresh source-matched validation.

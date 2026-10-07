@@ -1,0 +1,30 @@
+{
+  "base": "082a399161cccd75e38ac632c26d608262d36534",
+  "grade": "CFG_TEST_ASSERTION_REPAIR; NATIVE_VALIDATION_PENDING",
+  "source": "crates/holonics/src/hnn/tests/physical_communication.rs",
+  "sha256": "0ab226e5dbbfdd0b256ae9443d7a56eaf7411fea30f62d7a350cf7063ae19fd6",
+  "bytes": 27328,
+  "sole_code_delta": "assert_eq!(carry,taught.carry) -> assert_eq!(carry,&taught.carry)",
+  "meaning": "carry is borrowed from &entered; compare equal full ReceptionCarry values through two references; preserve actual blind-end equality",
+  "production_code_and_publication_guard_unchanged": true,
+  "syntax_only": {
+    "exit": 0,
+    "wall_ns": 64402508,
+    "peak_resident_bytes": 40583168,
+    "stderr": "",
+    "source_writes": false
+  },
+  "diff_check": {
+    "exit": 0,
+    "stderr": ""
+  },
+  "prior_v77_production_guards": [
+    "library-check",
+    "three guard lints",
+    "57 doctests"
+  ],
+  "seven_native_controls_unlaunched": true,
+  "notebook_and_CUDA_unlaunched": true,
+  "source_owner_builds_or_runs": false,
+  "selectors_and_limits_unchanged": true
+}
