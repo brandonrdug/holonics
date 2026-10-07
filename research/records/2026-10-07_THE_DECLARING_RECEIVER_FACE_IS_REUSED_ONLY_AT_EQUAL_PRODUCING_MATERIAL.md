@@ -4,7 +4,7 @@ Refs #63, #73; native-to-formal correspondence remains an obligation of #62.
 
 ## Fixed claim and owner
 
-[source-derived; native acceptance pending] The existing `ReceivingPhases::declare` measures
+[native-checked on corrected source `8c04058c`; bounded controls] The existing `ReceivingPhases::declare` measures
 the exact anchor map from unit storage on the source rings, with every other interior motion at
 rest and absolute opening tick zero. It refuses an aperture beyond its rank. For nonlinear
 material it instead measures the differential at rest and carries `RankScope::TangentAtRest`.
@@ -83,7 +83,7 @@ owns fresh provider/cache/toolchain/executable pins and measured admission under
 
 Acceptance requires these six selectors and ordinary workspace/arithmetic/lint/doctest gates at
 the sealed source. No unchanged failed scientific read is requested, and no cap or tolerance is
-raised. Native acceptance is pending. Device parity, useful relation acquisition, independent
+raised. All six controls and fresh guards/link pass on corrected source `8c04058c`. Device parity, useful relation acquisition, independent
 generalization, cold communication and product acceptance remain separate gates.
 
 ## A distinct possible interior reduction
@@ -132,3 +132,22 @@ probe read at radius source493 stopped after two teachings and no probes: the se
 The declaring successor neither repeats that read nor treats a retained unit fixture as an
 untouched holdout. The statistical unit of a future scientific acceptance must account for shared
 material, carry, source family and teaching history. Relation-level useful output remains owed.
+
+## Corrected-source native receipt
+
+The initial source `f09a2bf97` stopped at workspace type checking: two fixture calls to
+`with_ring_resonator` omitted the required producing `&Field`. Its failed input/output remains
+unchanged. No native selector ran on that input. Corrected source `8c04058c` changes only those
+two arguments and records the repair; it receives its own fresh acceptance rather than inheriting
+the predecessor result. The actual-source excluded-getter and invalidation/refusal controls,
+and four affected communication/charted carry/learning controls, each pass once.
+
+Five preparation/guard/link stages and six controls have matching acceptance, quiescence and
+lease-release receipts. The library has 56 accepted doctests; whole-workspace tests were not run.
+The six control walls sum to `2065055661 ns`, aggregate CPU to `1768384000 ns`,
+with maximum native group peak `19042304 bytes`. The original output and grade,
+all six stdout/stderr pairs, source input manifest and derived exact resource acceptance are
+preserved in [accepted-8c04058c](receipts/declaring-receiver-face-20261007/accepted-8c04058c/RECEIPT_MANIFEST.v1.json).
+The executable and compiled-artifact descriptor are independently rehashed. No new scientific
+read, learned useful relation, speedup, cold restore or device acceptance follows from PASS6.
+The continuing work/caller successor `71f2e8508` remains source-only and requires its own gates.

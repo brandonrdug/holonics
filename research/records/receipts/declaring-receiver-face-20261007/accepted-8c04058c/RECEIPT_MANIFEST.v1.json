@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "files": {
+    "HNN_QUEUE_ACCEPTANCE.v1.json": {
+      "bytes": 15051,
+      "sha256": "3b9321d329807a73e6c2c427c2034455154ae449a692159ed2c142c96fa4a3b8"
+    },
+    "NATIVE_GRADE.v1.json": {
+      "bytes": 31756,
+      "sha256": "0803a2c71d898268b740f7b749b9ea8d36bbbe42d3c580faef0980936e1fb6b9"
+    },
+    "RAW_PASS6.v1.txt": {
+      "bytes": 30953,
+      "sha256": "bd59a24b12c7795854f8b1ba0e0a31f1097ea36b4dd9aa5ed3faa37bdd808dc2"
+    },
+    "SOURCE_INPUT_MANIFEST.v1.json": {
+      "bytes": 48785,
+      "sha256": "ec8b492d7fc328188a53d72c923f882d819d38e6932fe4b431398d8f15878f6d"
+    },
+    "control1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "control1.stdout": {
+      "bytes": 237,
+      "sha256": "0591511b670120c503e65f58840d51201a9dcd28bc3c83c881b919c410ceaed9"
+    },
+    "control2.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "control2.stdout": {
+      "bytes": 239,
+      "sha256": "7cb8547a2bbecd843ebc7b021d66bae274738a731a9383c5a026a76362334b58"
+    },
+    "control3.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "control3.stdout": {
+      "bytes": 3876,
+      "sha256": "d97a178d162f51ba4d5dc67cc7904e41fc167e0587a60105cdb0cb877e9d93bb"
+    },
+    "control4.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "control4.stdout": {
+      "bytes": 7621,
+      "sha256": "74d84e076cf7474b072d8046afa21b38c2a0059d630b83e8b9601597bfb6bacf"
+    },
+    "control5.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "control5.stdout": {
+      "bytes": 2845,
+      "sha256": "003de10d9cef9b5c44e78bcaae44de6b4e8c3370881489f8496585d055100e43"
+    },
+    "control6.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "control6.stdout": {
+      "bytes": 14915,
+      "sha256": "d1529cc968d90d896a4f6395dedf3fdc27ba40ff3ebb8b1b3c5d96ad8e0eef1c"
+    }
+  },
+  "original_queue_outputs_copied_exactly": true,
+  "raw_messages_published": false,
+  "source_owner_executions": 0
+}

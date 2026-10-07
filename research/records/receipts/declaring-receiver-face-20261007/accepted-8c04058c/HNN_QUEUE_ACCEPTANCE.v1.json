@@ -1,0 +1,363 @@
+{
+  "version": 1,
+  "source_commit": "8c04058c5b75ef0d26e747e09144ef878ec60e03",
+  "scope": "PASS6 exact bounded native selectors plus cache/preparation/workspace/guards/56doctests/fresh debug0-cgu16 link; no scientific read",
+  "failed_f09_E0061_preserved": true,
+  "source_inputs": 296,
+  "stages": [
+    {
+      "label": "hnn-declaring-fieldarg-8c04058c-cache-preparation-20261006-v1",
+      "accepted_after_owned_cleanup": true,
+      "quiescent": true,
+      "released": true,
+      "wall_ns": 7253893563,
+      "projection_ns": 17000000000,
+      "CPU_ns": 6247664000,
+      "CPU_reading_grain_ns": 1000,
+      "aggregate_CPU_limit_us": 17000000,
+      "group_peak_bytes": 4294967296,
+      "original_receipt_pins": {
+        "hnn-declaring-fieldarg-8c04058c-cache-preparation-20261006-v1.acceptance.json": {
+          "bytes": 378,
+          "sha256": "f6175c583966edcd9aa188624c7bb74dd79fce5d5f6b686afea13d9c76a94e03"
+        },
+        "hnn-declaring-fieldarg-8c04058c-cache-preparation-20261006-v1.final.json": {
+          "bytes": 5086,
+          "sha256": "52d58996c18898d4a2d6bce84cf75d5bc36057dda9f8480a6a92a1f4a55997e3"
+        },
+        "hnn-declaring-fieldarg-8c04058c-cache-preparation-20261006-v1.stage-quiescence.json": {
+          "bytes": 135,
+          "sha256": "0eb41d10b610b9b98449ccfed31d0d493c0da6bdf7bf1afd1219346c55935654"
+        },
+        "hnn-declaring-fieldarg-8c04058c-cache-preparation-20261006-v1.release.json": {
+          "bytes": 173,
+          "sha256": "29509df71407cfbfd80b7e94e0bbe651fa67514645de3dba4c349996d7918e30"
+        }
+      }
+    },
+    {
+      "label": "hnn-declaring-fieldarg-8c04058c-control1-20261006-v1",
+      "accepted_after_owned_cleanup": true,
+      "quiescent": true,
+      "released": true,
+      "wall_ns": 228608306,
+      "projection_ns": 16000000000,
+      "CPU_ns": 185851000,
+      "CPU_reading_grain_ns": 1000,
+      "aggregate_CPU_limit_us": 17000000,
+      "group_peak_bytes": 19042304,
+      "original_receipt_pins": {
+        "hnn-declaring-fieldarg-8c04058c-control1-20261006-v1.acceptance.json": {
+          "bytes": 378,
+          "sha256": "26e6cc6a74645f9907e8a72e81f054ba636e54b2829b17825fb711474683a25f"
+        },
+        "hnn-declaring-fieldarg-8c04058c-control1-20261006-v1.final.json": {
+          "bytes": 4947,
+          "sha256": "ecf72ee4d4ae346a64f421a3abb1e3a34cffca4708de32f0a819f7d78ecfd13a"
+        },
+        "hnn-declaring-fieldarg-8c04058c-control1-20261006-v1.stage-quiescence.json": {
+          "bytes": 135,
+          "sha256": "2847f6b56425c694d1c07f5205f5231063ea697f3150710d517227a56fb2443e"
+        },
+        "hnn-declaring-fieldarg-8c04058c-control1-20261006-v1.release.json": {
+          "bytes": 173,
+          "sha256": "8fce8592855aca25aa54f0d242d318e4cc1f8349fe2bd58c75c12332371165f6"
+        }
+      }
+    },
+    {
+      "label": "hnn-declaring-fieldarg-8c04058c-control2-20261006-v1",
+      "accepted_after_owned_cleanup": true,
+      "quiescent": true,
+      "released": true,
+      "wall_ns": 243205841,
+      "projection_ns": 16000000000,
+      "CPU_ns": 187089000,
+      "CPU_reading_grain_ns": 1000,
+      "aggregate_CPU_limit_us": 17000000,
+      "group_peak_bytes": 17211392,
+      "original_receipt_pins": {
+        "hnn-declaring-fieldarg-8c04058c-control2-20261006-v1.acceptance.json": {
+          "bytes": 378,
+          "sha256": "8372211dafcb43198a507163a8e81cf49a0c69e4cc26054e674e3ae34b78ba42"
+        },
+        "hnn-declaring-fieldarg-8c04058c-control2-20261006-v1.final.json": {
+          "bytes": 4947,
+          "sha256": "76400226ede15bbf497f262a38d0384cafbfa8416006a18212ab5433e237f499"
+        },
+        "hnn-declaring-fieldarg-8c04058c-control2-20261006-v1.stage-quiescence.json": {
+          "bytes": 135,
+          "sha256": "b053b1e65bfa35ffb68f8d352cc9767472f6467dcca9f5dee3b04d0c841050a3"
+        },
+        "hnn-declaring-fieldarg-8c04058c-control2-20261006-v1.release.json": {
+          "bytes": 173,
+          "sha256": "2212783542d3edf74d51f996100fc089cc2e893af48c6c84d4e63fc11bebb1f5"
+        }
+      }
+    },
+    {
+      "label": "hnn-declaring-fieldarg-8c04058c-control3-20261006-v1",
+      "accepted_after_owned_cleanup": true,
+      "quiescent": true,
+      "released": true,
+      "wall_ns": 277658629,
+      "projection_ns": 16000000000,
+      "CPU_ns": 230706000,
+      "CPU_reading_grain_ns": 1000,
+      "aggregate_CPU_limit_us": 17000000,
+      "group_peak_bytes": 17895424,
+      "original_receipt_pins": {
+        "hnn-declaring-fieldarg-8c04058c-control3-20261006-v1.acceptance.json": {
+          "bytes": 378,
+          "sha256": "0ac1d3557e8701af3ff25c4091e2cfbe6785840acad23bd19455c1e5aae872f4"
+        },
+        "hnn-declaring-fieldarg-8c04058c-control3-20261006-v1.final.json": {
+          "bytes": 4948,
+          "sha256": "8c239d89a52fd028a74d09805ada9842f5f2d938fe802f2a45ab5bcafd0122bf"
+        },
+        "hnn-declaring-fieldarg-8c04058c-control3-20261006-v1.stage-quiescence.json": {
+          "bytes": 135,
+          "sha256": "daf98ed32ac3b2ef2ef001aa3c158e64a74b14833083c528afac0d2d43e2c004"
+        },
+        "hnn-declaring-fieldarg-8c04058c-control3-20261006-v1.release.json": {
+          "bytes": 173,
+          "sha256": "9009101d3ec860d894f893fdf1afc73999a7e23d3f778ada1f1584506eff2a2b"
+        }
+      }
+    },
+    {
+      "label": "hnn-declaring-fieldarg-8c04058c-control4-20261006-v1",
+      "accepted_after_owned_cleanup": true,
+      "quiescent": true,
+      "released": true,
+      "wall_ns": 364634822,
+      "projection_ns": 16000000000,
+      "CPU_ns": 312992000,
+      "CPU_reading_grain_ns": 1000,
+      "aggregate_CPU_limit_us": 17000000,
+      "group_peak_bytes": 17465344,
+      "original_receipt_pins": {
+        "hnn-declaring-fieldarg-8c04058c-control4-20261006-v1.acceptance.json": {
+          "bytes": 378,
+          "sha256": "d498c7457bdc264ec1ba0e1fe78a9b9eded1819aa17d82d869612fb31e178516"
+        },
+        "hnn-declaring-fieldarg-8c04058c-control4-20261006-v1.final.json": {
+          "bytes": 4951,
+          "sha256": "373ab54639e7a055eac9b7296e854e1c8d61a4bc4164b69026b5b665abfc2b1a"
+        },
+        "hnn-declaring-fieldarg-8c04058c-control4-20261006-v1.stage-quiescence.json": {
+          "bytes": 135,
+          "sha256": "ef4954303e83c00eada73706372ec8ee75a708bf843274f2683a387f68d729f9"
+        },
+        "hnn-declaring-fieldarg-8c04058c-control4-20261006-v1.release.json": {
+          "bytes": 173,
+          "sha256": "b63e6d21b04516265ec371ed28039752599e8c0ba8fa7f0328b702e132d96986"
+        }
+      }
+    },
+    {
+      "label": "hnn-declaring-fieldarg-8c04058c-control5-20261006-v1",
+      "accepted_after_owned_cleanup": true,
+      "quiescent": true,
+      "released": true,
+      "wall_ns": 353561125,
+      "projection_ns": 16000000000,
+      "CPU_ns": 300195000,
+      "CPU_reading_grain_ns": 1000,
+      "aggregate_CPU_limit_us": 17000000,
+      "group_peak_bytes": 17571840,
+      "original_receipt_pins": {
+        "hnn-declaring-fieldarg-8c04058c-control5-20261006-v1.acceptance.json": {
+          "bytes": 378,
+          "sha256": "4aa0ca7eed62f96fc879f78da46468993386062c359a39635b780378b1b30f45"
+        },
+        "hnn-declaring-fieldarg-8c04058c-control5-20261006-v1.final.json": {
+          "bytes": 4951,
+          "sha256": "440309edc1f0cbb2b9edcf645a18c714e3515bfc699732290cbcf939445bb4c4"
+        },
+        "hnn-declaring-fieldarg-8c04058c-control5-20261006-v1.stage-quiescence.json": {
+          "bytes": 135,
+          "sha256": "41d99d99654b4778f81f7606598294517673fd6e9f9827c0c36b89609e6a24b9"
+        },
+        "hnn-declaring-fieldarg-8c04058c-control5-20261006-v1.release.json": {
+          "bytes": 173,
+          "sha256": "4f0f3ad745c462df670d0a2e14e427ad93c1bbb6e3a377a3d1e7a18c58ce3f87"
+        }
+      }
+    },
+    {
+      "label": "hnn-declaring-fieldarg-8c04058c-control6-20261006-v1",
+      "accepted_after_owned_cleanup": true,
+      "quiescent": true,
+      "released": true,
+      "wall_ns": 597386938,
+      "projection_ns": 16000000000,
+      "CPU_ns": 551551000,
+      "CPU_reading_grain_ns": 1000,
+      "aggregate_CPU_limit_us": 17000000,
+      "group_peak_bytes": 17981440,
+      "original_receipt_pins": {
+        "hnn-declaring-fieldarg-8c04058c-control6-20261006-v1.acceptance.json": {
+          "bytes": 378,
+          "sha256": "c9118f02ab2a8eb77b249bab52f4ed15f9b7a52dd24559308c0f34c82e8d7e3d"
+        },
+        "hnn-declaring-fieldarg-8c04058c-control6-20261006-v1.final.json": {
+          "bytes": 4952,
+          "sha256": "265b52bb8099023c337f95244baf487062b2454b1ea4b315138badfa5254ece1"
+        },
+        "hnn-declaring-fieldarg-8c04058c-control6-20261006-v1.stage-quiescence.json": {
+          "bytes": 135,
+          "sha256": "ded46e855b45cd685e8ca196537e0b0ba3793384f0aa4091303250bd9ab14f45"
+        },
+        "hnn-declaring-fieldarg-8c04058c-control6-20261006-v1.release.json": {
+          "bytes": 173,
+          "sha256": "fb7372763f940fd47fb892a74561cbf15115830708b294b3c15d77118d25a99e"
+        }
+      }
+    },
+    {
+      "label": "hnn-declaring-fieldarg-8c04058c-guard-doctests-20261006-v1",
+      "accepted_after_owned_cleanup": true,
+      "quiescent": true,
+      "released": true,
+      "wall_ns": 22375646763,
+      "projection_ns": 65000000000,
+      "CPU_ns": 35510840000,
+      "CPU_reading_grain_ns": 1000,
+      "aggregate_CPU_limit_us": 128000000,
+      "group_peak_bytes": 2707808256,
+      "original_receipt_pins": {
+        "hnn-declaring-fieldarg-8c04058c-guard-doctests-20261006-v1.acceptance.json": {
+          "bytes": 378,
+          "sha256": "221dcfafb81bf3a54d9fa1be1a421250f6624d8eb687a4e0813440e224454001"
+        },
+        "hnn-declaring-fieldarg-8c04058c-guard-doctests-20261006-v1.final.json": {
+          "bytes": 5056,
+          "sha256": "29f2bc873e754b1d9070ef10fdba5bdeef29957a49f91b9f0efc426b20e07ee1"
+        },
+        "hnn-declaring-fieldarg-8c04058c-guard-doctests-20261006-v1.stage-quiescence.json": {
+          "bytes": 135,
+          "sha256": "da9abe2cb2fd7bf6e99f653ec6ed5a7f0418f817d2a33c53e64d7788161f65ed"
+        },
+        "hnn-declaring-fieldarg-8c04058c-guard-doctests-20261006-v1.release.json": {
+          "bytes": 173,
+          "sha256": "0f45d462800116d544e9894852ef629236d718db65c30473074024dbfd753421"
+        }
+      }
+    },
+    {
+      "label": "hnn-declaring-fieldarg-8c04058c-guard-lints-20261006-v1",
+      "accepted_after_owned_cleanup": true,
+      "quiescent": true,
+      "released": true,
+      "wall_ns": 17327627782,
+      "projection_ns": 65000000000,
+      "CPU_ns": 25290994000,
+      "CPU_reading_grain_ns": 1000,
+      "aggregate_CPU_limit_us": 128000000,
+      "group_peak_bytes": 1846493184,
+      "original_receipt_pins": {
+        "hnn-declaring-fieldarg-8c04058c-guard-lints-20261006-v1.acceptance.json": {
+          "bytes": 378,
+          "sha256": "a79361fd2c4eb898b309c116c1f3f3b3bf2930a74f75306b63f625bfff5c0513"
+        },
+        "hnn-declaring-fieldarg-8c04058c-guard-lints-20261006-v1.final.json": {
+          "bytes": 5015,
+          "sha256": "cdbd59c119e8324051c499c4be187be2c7f34a4dc586c64ddeba754959ba7f1d"
+        },
+        "hnn-declaring-fieldarg-8c04058c-guard-lints-20261006-v1.stage-quiescence.json": {
+          "bytes": 135,
+          "sha256": "cf60070f11c6e681987c862e611d2c593ec499c5364db651c2e88e0e184fce22"
+        },
+        "hnn-declaring-fieldarg-8c04058c-guard-lints-20261006-v1.release.json": {
+          "bytes": 173,
+          "sha256": "ee46a1fbb39f4527eaf6a472c5808bceacfa16688375b764e9dc64705a3eafd5"
+        }
+      }
+    },
+    {
+      "label": "hnn-declaring-fieldarg-8c04058c-lib-test-build-20261006-v1",
+      "accepted_after_owned_cleanup": true,
+      "quiescent": true,
+      "released": true,
+      "wall_ns": 19937283987,
+      "projection_ns": 65000000000,
+      "CPU_ns": 30778441000,
+      "CPU_reading_grain_ns": 1000,
+      "aggregate_CPU_limit_us": 128000000,
+      "group_peak_bytes": 2535161856,
+      "original_receipt_pins": {
+        "hnn-declaring-fieldarg-8c04058c-lib-test-build-20261006-v1.acceptance.json": {
+          "bytes": 378,
+          "sha256": "772f000bf79eb1bec0e89c286c065b38367d084e9e54e853ff1745ee0a0b51ed"
+        },
+        "hnn-declaring-fieldarg-8c04058c-lib-test-build-20261006-v1.final.json": {
+          "bytes": 5057,
+          "sha256": "a305b81299253eb3624e2add6ea0df70c3bc057f96359b50739e605730bec6f8"
+        },
+        "hnn-declaring-fieldarg-8c04058c-lib-test-build-20261006-v1.stage-quiescence.json": {
+          "bytes": 135,
+          "sha256": "d6691e466d8b338ab2124ff7f7764d1d5b1775110482a654da75924005e227e9"
+        },
+        "hnn-declaring-fieldarg-8c04058c-lib-test-build-20261006-v1.release.json": {
+          "bytes": 173,
+          "sha256": "c1ca93ce0bc5fc488ed0ddf4f64a1dcc7a8c2ce45a8cf438daa4b0dfeff98dac"
+        }
+      }
+    },
+    {
+      "label": "hnn-declaring-fieldarg-8c04058c-workspace-check-20261006-v1",
+      "accepted_after_owned_cleanup": true,
+      "quiescent": true,
+      "released": true,
+      "wall_ns": 10466428633,
+      "projection_ns": 65000000000,
+      "CPU_ns": 19757898000,
+      "CPU_reading_grain_ns": 1000,
+      "aggregate_CPU_limit_us": 128000000,
+      "group_peak_bytes": 1878659072,
+      "original_receipt_pins": {
+        "hnn-declaring-fieldarg-8c04058c-workspace-check-20261006-v1.acceptance.json": {
+          "bytes": 378,
+          "sha256": "00f32e000f2ff39234d2060c99ecee26d12dda122a32727380bee6a87482435c"
+        },
+        "hnn-declaring-fieldarg-8c04058c-workspace-check-20261006-v1.final.json": {
+          "bytes": 5070,
+          "sha256": "ca84784e5ffec649b1d2e85952a539e7c459faf9b03ddaf81c9eb6017102a69b"
+        },
+        "hnn-declaring-fieldarg-8c04058c-workspace-check-20261006-v1.stage-quiescence.json": {
+          "bytes": 135,
+          "sha256": "9a20de193fbbe66bd1cf195c4fd69f8205c5e5960f72bcde4bc091628c341345"
+        },
+        "hnn-declaring-fieldarg-8c04058c-workspace-check-20261006-v1.release.json": {
+          "bytes": 173,
+          "sha256": "73faa49a6f15d131945814cabfd6c0bb736556571573ec32e83cefa562e74eb5"
+        }
+      }
+    }
+  ],
+  "controls_wall_ns": 2065055661,
+  "controls_CPU_ns": 1768384000,
+  "controls_max_group_bytes": 19042304,
+  "all_stages_wall_ns": 79425936389,
+  "all_stages_CPU_ns": 119354221000,
+  "libtest_executable_pin": {
+    "sha256": "e87340ae1a91f53cceb5a7af922c052f68791f0daf6a8d221ec5d5fe399a6cdd",
+    "bytes": 67078712
+  },
+  "fresh_compiled_artifact_manifest_pin": {
+    "bytes": 1768,
+    "sha256": "9162a3da40d67370db9d4bc44173539a461ec41dd77076ef3d3a38f6d55b6cf3"
+  },
+  "profile": {
+    "opt_level": "0",
+    "debuginfo": 0,
+    "debug_assertions": true,
+    "overflow_checks": true,
+    "test": true
+  },
+  "whole_workspace_tests_run": false,
+  "precleanup_final_passed_note": "Native final receipts precede cleanup acceptance; accepted=true is checked only at the matching acceptance/release chain, never inferred from the earlier final flag.",
+  "no_useful_relation_speedup_product_cold_or_device_credit": true,
+  "source_owner_native_runs": 0
+}

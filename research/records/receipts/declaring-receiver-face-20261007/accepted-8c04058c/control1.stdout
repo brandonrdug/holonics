@@ -1,0 +1,6 @@
+
+running 1 test
+test hnn::receiving::declaration::tests::declaring_face_excludes_source_and_receiving_ports_by_the_actual_producer ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1060 filtered out; finished in 0.01s
+
