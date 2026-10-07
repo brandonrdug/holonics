@@ -86,7 +86,7 @@ impl Resident {
         }
         let carry = &point.configuration;
         for (a, state) in carry.change.states.iter().enumerate() {
-            let factor = next.contact_storage(a);
+            let factor = FieldMaterial::contact_storage(&next, a);
             let capacity = factor.multiply(&factor.transpose()?)?;
             if capacity.apply(&state[1])? != carry.momenta[a] {
                 return Err(HnnError::HeldMomentum { contact: a });

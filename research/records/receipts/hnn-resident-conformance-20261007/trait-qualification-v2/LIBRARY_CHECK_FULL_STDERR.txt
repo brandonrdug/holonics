@@ -1,0 +1,31 @@
+    Checking thiserror v2.0.19
+    Checking holonics v0.1.0 (/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-resident173-20261007/source-v1/crates/holonics)
+error[E0034]: multiple applicable items in scope
+    --> crates/holonics/src/hnn/reference/interaction.rs:89:31
+     |
+  89 |             let factor = next.contact_storage(a);
+     |                               ^^^^^^^^^^^^^^^ multiple `contact_storage` found
+     |
+note: candidate #1 is defined in an impl of the trait `field::FieldMaterial` for the type `T`
+    --> crates/holonics/src/hnn/field.rs:297:5
+     |
+ 297 |     fn contact_storage(&self, contact: usize) -> &ExactRatMatrix {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+note: candidate #2 is defined in an impl of the trait `field::ConstitutionRead` for the type `constitution::Constitution`
+    --> crates/holonics/src/hnn/constitution.rs:9385:5
+     |
+9385 |     fn contact_storage(&self, contact: usize) -> &ExactRatMatrix {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+help: disambiguate the method for candidate #1
+     |
+  89 -             let factor = next.contact_storage(a);
+  89 +             let factor = field::FieldMaterial::contact_storage(&next, a);
+     |
+help: disambiguate the method for candidate #2
+     |
+  89 -             let factor = next.contact_storage(a);
+  89 +             let factor = field::ConstitutionRead::contact_storage(&next, a);
+     |
+
+For more information about this error, try `rustc --explain E0034`.
+error: could not compile `holonics` (lib) due to 1 previous error

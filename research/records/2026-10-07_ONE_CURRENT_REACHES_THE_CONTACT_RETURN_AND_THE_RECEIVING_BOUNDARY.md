@@ -122,3 +122,22 @@ are candidate selectors for the sole validation queue, not source-owner results.
 whitespace checks. The separate immutable handoff pins source/input hashes, exact selectors and
 existing cache commands. The queue must produce fresh type/runtime evidence under its unchanged
 measured admission policy; no enlarged limit or scientific replay is requested.
+
+## First library refusal and exact trait qualification
+
+[measured; queue continuation-v76] The first shared-resident library check refused source
+173a196b1 at `reference/interaction.rs:89`: `contact_storage` was ambiguous between the existing
+`ConstitutionRead` and its blanket `FieldMaterial` view. It was a source type failure; no resource
+limit triggered. All seven controls, guards, doctests, notebook and device checks stayed unlaunched.
+The failure's full compiler output, exact stage cost and released-lease result are preserved in
+[trait-qualification-v2](receipts/hnn-resident-conformance-20261007/trait-qualification-v2/CORRECTION_PREPARATION.json).
+
+[implementation; native pending] The correction names `FieldMaterial::contact_storage(&next,a)`.
+Its existing blanket implementation delegates `ConstitutionRead::contact_storage` and returns the
+same factor. No contact/carry/clock/material/work equation, publication guard or selector changes.
+The corrected successor requires a fresh queue check; the failed predecessor remains unaccepted.
+
+[measured; independent queue continuation-v73] Separately, ade009f/df7ce66d passed the thirteen
+fixed contact/Holon controls, fifty-seven doctests and the CUDA caller typecheck. Those are
+predecessor mechanical/type receipts, not this resident lifecycle's runtime acceptance, device
+runtime parity, useful acquired output or a new scientific result.

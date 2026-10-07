@@ -1,0 +1,218 @@
+{
+  "UTC": "2026-10-07T20:44:11.030791+00:00",
+  "grade": "SHARED_RESIDENT_SUCCESSOR_REFUSED_E0034_BEFORE_CONTROLS",
+  "source_commit": "173a196b1f1aa9fcfa4dd46655c87cc5eb1a865e",
+  "base": "df7ce66d8372cacb5abfe0d6895305575505d9c4",
+  "native_base": "192d084288ca7953d21531b6a923db9314b5ebbe",
+  "source_inputs": {
+    "count": 302,
+    "changed_native_paths": [
+      "crates/holonics/src/hnn/physical.rs",
+      "crates/holonics/src/hnn/physical/communication.rs",
+      "crates/holonics/src/hnn/physical/contact.rs",
+      "crates/holonics/src/hnn/prediction.rs",
+      "crates/holonics/src/hnn/prediction/charted.rs",
+      "crates/holonics/src/hnn/reference.rs",
+      "crates/holonics/src/hnn/reference/interaction.rs",
+      "crates/holonics/src/hnn/reference/passage.rs",
+      "crates/holonics/src/hnn/tests/physical.rs",
+      "crates/holonics/src/hnn/tests/physical_charted.rs",
+      "crates/holonics/src/hnn/tests/physical_communication.rs",
+      "research/notebook/hnn_design/hnn_physical_receive.rs"
+    ],
+    "unchanged": 290,
+    "exact_committed_bytes_verified": true
+  },
+  "accepted_controls": 0,
+  "requested_controls": 7,
+  "native_controls_unlaunched": 7,
+  "stages": {
+    "hnn-resident173-cache-preparation-20261006-v1": {
+      "phase": "cache-preparation",
+      "accepted_stage": true,
+      "stage_wall_ns": 8214262834,
+      "native_wall_ns": 8100440279,
+      "CPU_ns": 6471164000,
+      "fixed_guard_ns": 17000000000,
+      "aggregate_CPU_cap_us": 17000000,
+      "thread_budget": 1,
+      "group_peak_bytes": 4294967296,
+      "child_RSS_KiB": 31268,
+      "memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 2428,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "measured_to_guard": {
+        "numerator": 8214262834,
+        "denominator": 17000000000
+      },
+      "inputs_unchanged": true,
+      "quiescent_released": true,
+      "wall_factored": {
+        "integer": 8214262834,
+        "prime_powers": [
+          [
+            2,
+            1
+          ],
+          [
+            41,
+            1
+          ],
+          [
+            97,
+            1
+          ],
+          [
+            1032721,
+            1
+          ]
+        ]
+      },
+      "CPU_factored": {
+        "integer": 6471164000,
+        "prime_powers": [
+          [
+            2,
+            5
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            7,
+            1
+          ],
+          [
+            239,
+            1
+          ],
+          [
+            967,
+            1
+          ]
+        ]
+      },
+      "group_bytes_factored": {
+        "integer": 4294967296,
+        "prime_powers": [
+          [
+            2,
+            32
+          ]
+        ]
+      }
+    },
+    "hnn-resident173-library-check-20261006-v1": {
+      "phase": "library-check",
+      "accepted_stage": false,
+      "stage_wall_ns": 6837082355,
+      "native_wall_ns": 6048516959,
+      "CPU_ns": 6794193000,
+      "fixed_guard_ns": 65000000000,
+      "aggregate_CPU_cap_us": 128000000,
+      "thread_budget": 8,
+      "group_peak_bytes": 1030512640,
+      "child_RSS_KiB": 854284,
+      "memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "measured_to_guard": {
+        "numerator": 6837082355,
+        "denominator": 65000000000
+      },
+      "inputs_unchanged": true,
+      "quiescent_released": true,
+      "wall_factored": {
+        "integer": 6837082355,
+        "prime_powers": [
+          [
+            5,
+            1
+          ],
+          [
+            17,
+            1
+          ],
+          [
+            1039,
+            1
+          ],
+          [
+            77417,
+            1
+          ]
+        ]
+      },
+      "CPU_factored": {
+        "integer": 6794193000,
+        "prime_powers": [
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            7,
+            2
+          ],
+          [
+            46219,
+            1
+          ]
+        ]
+      },
+      "group_bytes_factored": {
+        "integer": 1030512640,
+        "prime_powers": [
+          [
+            2,
+            13
+          ],
+          [
+            5,
+            1
+          ],
+          [
+            139,
+            1
+          ],
+          [
+            181,
+            1
+          ]
+        ]
+      }
+    }
+  },
+  "all_released": true,
+  "no_cap_raise_or_unchanged_failure_replay": true,
+  "source_owner_worktree_edits_by_queue": false,
+  "new_HNN_guard_native_cost": {
+    "jobs": 2,
+    "CPU_ns": 13265357000,
+    "wall_ns": 15051345189
+  },
+  "actual_refusal": "E0034 reference/interaction.rs:89 next.contact_storage(a) ambiguous FieldMaterial and ConstitutionRead",
+  "repair_semantics": "Existing blanket FieldMaterial::contact_storage calls ConstitutionRead::contact_storage; qualifier changes no equation or returned value. Owner source not edited; repaired source must be sealed and freshly checked.",
+  "remaining_blockers": "Fresh resident library check failed E0034; guard lint/doctests/libtest/all7 controls/notebook/device caller checks unlaunched. Source repair needed before successor acceptance. Previous v73 helper/Holon13controls/device types PASS independently; no useful acquired generation, global delay-storage conformance or cold codec/enclosure support claimed."
+}

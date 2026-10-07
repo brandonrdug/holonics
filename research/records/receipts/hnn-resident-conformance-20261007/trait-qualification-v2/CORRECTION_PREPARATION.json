@@ -1,0 +1,59 @@
+{
+  "base": "173a196b1f1aa9fcfa4dd46655c87cc5eb1a865e",
+  "grade": "QUALIFIED_EXACT_EXISTING_MATERIAL_TRAIT; FRESH_QUEUE_VALIDATION_PENDING",
+  "sole_source_delta": "next.contact_storage(a) -> FieldMaterial::contact_storage(&next,a)",
+  "delegate": "field.rs blanket impl<T:ConstitutionRead> FieldMaterial::contact_storage delegates ConstitutionRead::contact_storage, returning the same borrowed factor",
+  "mathematical_operand_unchanged": true,
+  "contact_carry_commit_enclosure_guard_unchanged": true,
+  "changed_source": {
+    "crates/holonics/src/hnn/reference/interaction.rs": {
+      "bytes": 8232,
+      "sha256": "1400e4c561145cc9170233f2d96149175201011edbb565819a7bbd71e36cf7ca"
+    }
+  },
+  "syntax_only": {
+    "argv": [
+      "rustfmt",
+      "--edition",
+      "2024",
+      "--emit",
+      "stdout",
+      "--config",
+      "skip_children=true",
+      "crates/holonics/src/hnn/reference/interaction.rs"
+    ],
+    "exit": 0,
+    "wall_ns": 112873196,
+    "peak_resident_bytes": 38674432,
+    "stderr": "",
+    "source_writes": false
+  },
+  "diff_check": {
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "prior_failure_artifacts": {
+    "research/records/receipts/hnn-resident-conformance-20261007/trait-qualification-v2/LIBRARY_CHECK_FULL_STDERR.txt": {
+      "bytes": 1608,
+      "sha256": "343d299409a53ee1e40aa50b49039495360e05c937effeabe751f001c2a289fc"
+    },
+    "research/records/receipts/hnn-resident-conformance-20261007/trait-qualification-v2/LIBRARY_CHECK_FULL_STDOUT.txt": {
+      "bytes": 23257,
+      "sha256": "97bbd6e4af3a08964f05cc31e6edf34bfa1ca932fe88af41ac981ab52feccf08"
+    }
+  },
+  "independent_predecessor_acceptance": {
+    "grade": "HELPER_EIGHT_CONTACT_PASS_AND_HOLON_OWNER_FIVE_CONTROLS_FRESH_GUARDS_DEVICE_TYPES_PASS",
+    "source_commits": {
+      "hnn-contact-ade": "ade009f3ae949ea63f1c590261e7c63809947745",
+      "hnn-holon-df7": "df7ce66d8372cacb5abfe0d6895305575505d9c4"
+    },
+    "accepted_controls": 13,
+    "Holon_doctests": 57,
+    "native_libtests_fresh": true
+  },
+  "source_owner_builds_or_runs": false,
+  "new_scientific_evidence": false,
+  "queue_configuration_selectors_caps_unchanged": true
+}
