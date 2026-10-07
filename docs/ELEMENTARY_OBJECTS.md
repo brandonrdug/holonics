@@ -110,13 +110,62 @@ Navigator,Restriction,Law,Conformance}`); the Rust core `holonics` mirrors it fa
 later owner implements or charts it.
 
 <a id="operator-contract"></a>
-[definition] **Operator contract** (source/consumer status reconciled October 6;
+[definition] **Operator contract** (source/consumer snapshot October 6; representation contract
+updated October 7;
 [the rebuild](plans/THE_REBUILD.md)).
 Each object's operations and their owners are listed below. The *current* column is the
 source owner; a receipt establishes only its declared consuming checks. The *target* column is
 its home in the main `holonics` library and the
 Lean `Holonics` library in the rebuild. A target name is not importable until its owner is
 built. Each rebuild step updates this table in the same commit.
+
+[project-postulate, October 7; wording agent-inferred] **The ontology guides speculative
+engineering; its current data types are revisable hypotheses.** Since the September 24 reset,
+derivation, representation design, formalization and experiment develop together. The objects
+state the mathematical operands and relations; current structs, field layouts and API names
+propose how to realize them. Develop a type, its partition or its consuming relation when that
+proposal is insufficient. Derive improvements independently from the objects, their operators
+and measured failures, including missing relations beyond the latest request.
+
+[definition; agent-inferred] **Distinguish law drift from abstraction insufficiency.** Drift
+breaks a stated relation or its hypotheses: for example, a comparison uses different producing
+operands, a constitution changes without a reached covector, or active power goes unaccounted.
+Insufficiency means the present abstraction cannot express an admitted interaction, changing
+geometry, retained interior or restriction. State the missing relation and revise its carrier
+with its consumer. Names identify roles; semantic policing alone establishes neither fidelity
+nor failure. Consolidation joins actual Holon data and dynamics at shared relations, rather than
+giving parallel implementations the same label or freezing a library abstraction prematurely.
+
+[source-audit] **Current types and roles**, read at public
+[`3c67beee`](https://github.com/brandonrdug/holonics/commit/3c67beee7f656798f912c974f12c482ea12c5e42).
+This is a map of that realization, not a prescribed final type hierarchy:
+
+| Current type and source owner | Actual role and consuming relation | Redesign obligation |
+|---|---|---|
+| [`holon::Holon`](../crates/holonics/src/holon/mod.rs) | The law and ports, including element relations, complex/connection, navigators and restrictions; `HolonState<C>` is a point on its motion. `Holon::interconnect` returns a Holarchy or gluing defect. | A richer law or state carrier must keep its actual port, power, incidence and restriction relations explicit. |
+| [`hnn::Field`](../crates/holonics/src/hnn/field.rs) | Checked ring/contact declaration, incidence, source/receiver placement and exact realization grains. `Field::holarchy(Θ)` builds a read-only Holarchy chart from the contemporary constitution; mount consumes that chart. | Fixed declared placement and a constructed chart do not by themselves implement changing geometry or constituent-native execution. Join those relations at their consumers. |
+| [`hnn::Word`](../crates/holonics/src/hnn/word.rs) | One execution over a borrowed field: producing operands, hop clock, storage/arrival/contact/resonator motion, finite transient return and carried remainders. Opening, ticking, comparison, pullback and release consume it. | Preserve the executed forward/return relation, reached loci, actual clocks and reception carry; a new representation must not turn transient execution into retained occurrence history. |
+| [`hnn::reference::Resident`](../crates/holonics/src/hnn/reference.rs) | Continuing host realization: `Field`, `Current`, `Constitution`, source moments, pending comparisons/deposits, receiver declarations, charts, aeon state and reception carry. Mount certifies the Holarchy and keeps its parametric orientation; `mount_continued` consumes saved continuation. | The resident presently keeps that orientation, not the whole Holarchy. Retaining and executing the joined constituents is a concrete consuming join; save/restore must preserve the admitted future of the redesigned carrier. |
+| [`hnn::moment::SourceMoment`](../crates/holonics/src/hnn/moment.rs) | Closing source-ring phase and offset moments, with bounded entering state; `ingest(Encoded, …)` enters through the producing chart and clock. It holds no per-occurrence list. | A broader source family needs its transport, sufficient quotient and capacity relation. The current closing-ring/count carrier is a scoped realization, not the final definition of a source Holon. |
+
+[definition; agent-inferred] **A redesign carries its evidence through a consuming join.** State
+the changed mathematical hypothesis or representation, source/import version, admitted family,
+receiver, clock, grain and residual. Where the law is preserved, prove or check the consumer's
+relation, such as `decode(T_native(encode x)) = T(x)`, `E_next T = U E`, or its complete residual.
+An earlier theorem keeps its original hypotheses; an experimental receipt keeps its original
+source and cohort. Neither automatically certifies redesigned code. Reuse unchanged evidence
+within its checked scope, then verify the changed forward/adjoint, deposition, restriction,
+continuation or host/device join it actually affects. A changed law receives its own grade and
+acceptance. The unchanged historical receipt remains history.
+
+Codex owns implementation, builds, tests, Lean and integration; Claude contributes architecture,
+derivation and peer review. [#63](https://github.com/brandonrdug/holonics/issues/63) owns the rebuild
+coordination, [#73](https://github.com/brandonrdug/holonics/issues/73) the host HNN joins,
+[#76](https://github.com/brandonrdug/holonics/issues/76) the device joins and common build queue,
+[#62](https://github.com/brandonrdug/holonics/issues/62) the surviving formal obligations, and
+[#148](https://github.com/brandonrdug/holonics/issues/148) the product acceptance. Canonical order
+and position remain in THE_REBUILD and CONSTRUCTION_STATE with the HNN coordinator. A moved,
+added or retired source owner updates this contract and its atlas rows in the same change.
 
 | Object | Operations | Current owners | Target |
 |---|---|---|---|

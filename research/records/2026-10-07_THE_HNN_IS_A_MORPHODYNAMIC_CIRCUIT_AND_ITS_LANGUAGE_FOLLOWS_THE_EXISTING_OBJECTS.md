@@ -53,3 +53,29 @@ operands in the guide. No source owner is added, moved or retired by this docume
 **Verification.** Documentation links and anchors resolve in the draft; referenced source owners
 were checked at the declared public source pin. `git diff --check` passes. No build, training run,
 new theorem claim or product acceptance is introduced.
+
+## Representation refinement, October 7
+
+[project-postulate; wording agent-inferred] Brandon clarified that the ontology-guided
+construction is simultaneous speculative engineering: current structs and names are hypotheses,
+and their abstractions can need development. The terminology choice above introduces no extra
+ontology; it does not prohibit a new or revised implementation type. Derivation from the objects,
+formalization and experiment proceed together, including independent investigation beyond the
+latest phrasing.
+
+[definition; agent-inferred] The
+[operator contract](../../docs/ELEMENTARY_OBJECTS.md#operator-contract) now distinguishes drift
+from an explicit law from insufficiency of a carrier. Its source-pinned map names the actual
+roles of `Holon`, `Field`, `Word`, host `Resident` and `SourceMoment`. At `3c67beee`, the field
+constructs a Holarchy chart at mount, the word executes the passage, and the resident retains the
+parametric orientation rather than the whole. The existing
+[library spine](../../docs/plans/THE_REBUILD.md#the-library-spine-october-5) already names the
+constituent execution/resident-whole join. This is a concrete abstraction and consumer obligation,
+not a reason to relabel every type or discard the working realization wholesale.
+
+Evidence belongs to its exact source and hypotheses. A redesigned representation needs the
+consumer equality or complete residual, with affected forward/return, deposition, continuation,
+restriction and device checks. A changed mathematical relation needs its own grade and
+acceptance; earlier proofs and measurements retain their original scope. This addresses the
+recorded failures of an unrepaired cause reaching a new consumer, parallel owners without a
+shared law, and source/receipt drift. No code owner is moved by this contract update.
