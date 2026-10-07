@@ -1,0 +1,104 @@
+{
+  "UTC": "2026-10-07T21:22:04Z",
+  "base": "2fc219bb81f51e1f73dee8301f9427bfe39678d0",
+  "grade": "prepared exact causal account; native/type pending; original acceptance failed",
+  "source_delta": {
+    "crates/holonics/src/hnn/physical/contact.rs": {
+      "bytes": 9693,
+      "sha256": "5cf08b589db8bf22599c06ea0187caaccfd99db485348ca2dfb82dc0f26c31bd"
+    },
+    "crates/holonics/src/hnn/tests/physical_communication.rs": {
+      "bytes": 33237,
+      "sha256": "d95a1d8d2499809b7900469c19562886940984aaeea2245382b632ceac38f67d"
+    }
+  },
+  "checks": [
+    {
+      "path": "crates/holonics/src/hnn/physical/contact.rs",
+      "command": [
+        "rustfmt",
+        "--edition",
+        "2024",
+        "--emit",
+        "stdout",
+        "--config",
+        "skip_children=true",
+        "crates/holonics/src/hnn/physical/contact.rs"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "source_written": false
+    },
+    {
+      "path": "crates/holonics/src/hnn/tests/physical_communication.rs",
+      "command": [
+        "rustfmt",
+        "--edition",
+        "2024",
+        "--emit",
+        "stdout",
+        "--config",
+        "skip_children=true",
+        "crates/holonics/src/hnn/tests/physical_communication.rs"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "source_written": false
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "atlas_qualified_and_new_rows": 3,
+      "columns_each": 8
+    }
+  ],
+  "no_source_owner_compilation_native_test_or_scientific_run": true,
+  "new_selector": "hnn::tests::physical_communication::the_fixed_v79_contact_observation_accounts_for_its_actual_material_and_remainders",
+  "original_selector_status": "failed at unchanged F despite aggregate stepped>0; all original assertions preserved; not requested for blind replay",
+  "fixture_unchanged": {
+    "seed": 81,
+    "Channel0_rebase_levels": 7,
+    "source": [
+      0,
+      1
+    ],
+    "observed": [
+      0,
+      1,
+      3
+    ],
+    "compared": [
+      false,
+      false,
+      true
+    ],
+    "opening": "Rest",
+    "receiving_aperture": 3
+  },
+  "claim": "same actual Deposit is accounted through certified rate, factor/statistic split and producer->resident publication",
+  "forward_deposition_material_carry_and_publication_equations_changed": false,
+  "retained_state_or_archive_added": false,
+  "actual_cause_below_lattice_vs_no_certified_step": "unmeasured; receipt requested",
+  "source_peer_review": "independent critique agrees counter/publication source interpretation; no runtime evidence or private message copied",
+  "failed_run_wall_ns": 734352527,
+  "failed_run_CPU_ns": 682641000,
+  "failed_run_peak_group_bytes": 20279296,
+  "native_caps_unchanged": {
+    "CPU_ns": 17000000000,
+    "wall_ns": 60000000000,
+    "group_memory_bytes": 4294967296,
+    "prelaunch_available_bytes": 8589934592,
+    "running_floor_bytes": 4294967296
+  },
+  "projection_status": "predecessor fixed fixture measured; additional exact account unmeasured; sole queue retains fixed existing guards/caps and seals stage projection, no limit increase",
+  "remaining_controls_and_callers": "six controls and hnn_prediction/CUDA unlaunched, no new acceptance",
+  "accounting_scope": "one complete Storage step verified; actual final certified rate and carried scale; per-deposit residual only; exact carrier keys with absent=0; gamma_length(clock_before+1); half-open coarse remainder cell checked"
+}

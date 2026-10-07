@@ -1,0 +1,314 @@
+{
+  "UTC": "2026-10-07T21:05:46.486899+00:00",
+  "grade": "FIRST_SHARED_RESIDENT_NATIVE_CONTROL_FAILED_CONTACT_STORAGE_EQUALITY",
+  "source_commit": "2fc219bb81f51e1f73dee8301f9427bfe39678d0",
+  "fresh_libtest_accepted": true,
+  "controls_passed": 0,
+  "controls_failed": 1,
+  "controls_unlaunched": 6,
+  "caller_checks_unlaunched": [
+    "hnn_prediction",
+    "holonics-cuda --lib"
+  ],
+  "actual_failure": {
+    "grade": "FIRST_SHARED_RESIDENT_CONTROL_FAILED_UNCHANGED_CONTACT_STORAGE",
+    "source_commit": "2fc219bb81f51e1f73dee8301f9427bfe39678d0",
+    "fresh_libtest_build_passed": true,
+    "verified_production_guards_reused": [
+      "library-check",
+      "three guard lints",
+      "57 doctests"
+    ],
+    "native_controls_passed": 0,
+    "native_controls_failed": 1,
+    "remaining_native_controls_unlaunched": 6,
+    "callers_unlaunched": [
+      "hnn_prediction",
+      "holonics-cuda --lib"
+    ],
+    "failed_stage": "hnn-resident2fc-control1-20261006-v1",
+    "exact_selector": "hnn::tests::physical_communication::complete_contact_return_publishes_held_point_before_existing_communication",
+    "stage_wall_ns": 734352527,
+    "CPU_ns": 682641000,
+    "peak_group_bytes": 20279296,
+    "child_RSS_KiB": 30404,
+    "resource_stop": false,
+    "memory_events": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0,
+      "sock_throttled": 0
+    },
+    "inputs_unchanged": true,
+    "lease_released": true,
+    "actual_failure": "physical_communication.rs:89 assert_ne!(actual.constitution().contact_storage(0), initial.contact_storage(0)); exact6x6 factors equal despite earlier publication.stepped>0 assertion passing",
+    "downstream_continued_communication_not_reached": true,
+    "scientific_run": false
+  },
+  "stages": {
+    "hnn-resident2fc-cache-preparation-20261006-v1": {
+      "phase": "cache-preparation",
+      "accepted_stage": true,
+      "whole_wall_ns": 7622559508,
+      "CPU_ns": 6170791000,
+      "fixed_guard_ns": 17000000000,
+      "measured_to_guard": {
+        "numerator": 7622559508,
+        "denominator": 17000000000
+      },
+      "group_peak_bytes": 4294967296,
+      "child_RSS_KiB": 31132,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 3823,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "inputs_unchanged": true,
+      "quiescent_released": true,
+      "wall_factored": {
+        "integer": 7622559508,
+        "prime_powers": [
+          [
+            2,
+            2
+          ],
+          [
+            263,
+            1
+          ],
+          [
+            7245779,
+            1
+          ]
+        ]
+      },
+      "CPU_factored": {
+        "integer": 6170791000,
+        "prime_powers": [
+          [
+            2,
+            3
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            11,
+            1
+          ],
+          [
+            199,
+            1
+          ],
+          [
+            2819,
+            1
+          ]
+        ]
+      },
+      "peak_factored": {
+        "integer": 4294967296,
+        "prime_powers": [
+          [
+            2,
+            32
+          ]
+        ]
+      }
+    },
+    "hnn-resident2fc-lib-test-build-20261006-v1": {
+      "phase": "lib-test-build",
+      "accepted_stage": true,
+      "whole_wall_ns": 19798405005,
+      "CPU_ns": 30173610000,
+      "fixed_guard_ns": 65000000000,
+      "measured_to_guard": {
+        "numerator": 19798405005,
+        "denominator": 65000000000
+      },
+      "group_peak_bytes": 2678026240,
+      "child_RSS_KiB": 2328540,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "inputs_unchanged": true,
+      "quiescent_released": true,
+      "wall_factored": {
+        "integer": 19798405005,
+        "prime_powers": [
+          [
+            3,
+            1
+          ],
+          [
+            5,
+            1
+          ],
+          [
+            1319893667,
+            1
+          ]
+        ]
+      },
+      "CPU_factored": {
+        "integer": 30173610000,
+        "prime_powers": [
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            5,
+            4
+          ],
+          [
+            277,
+            1
+          ],
+          [
+            3631,
+            1
+          ]
+        ]
+      },
+      "peak_factored": {
+        "integer": 2678026240,
+        "prime_powers": [
+          [
+            2,
+            12
+          ],
+          [
+            5,
+            1
+          ],
+          [
+            43,
+            1
+          ],
+          [
+            3041,
+            1
+          ]
+        ]
+      }
+    },
+    "hnn-resident2fc-control1-20261006-v1": {
+      "phase": "control1",
+      "accepted_stage": false,
+      "whole_wall_ns": 734352527,
+      "CPU_ns": 682641000,
+      "fixed_guard_ns": 16000000000,
+      "measured_to_guard": {
+        "numerator": 734352527,
+        "denominator": 16000000000
+      },
+      "group_peak_bytes": 20279296,
+      "child_RSS_KiB": 30404,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "inputs_unchanged": true,
+      "quiescent_released": true,
+      "wall_factored": {
+        "integer": 734352527,
+        "prime_powers": [
+          [
+            19,
+            1
+          ],
+          [
+            59,
+            1
+          ],
+          [
+            655087,
+            1
+          ]
+        ]
+      },
+      "CPU_factored": {
+        "integer": 682641000,
+        "prime_powers": [
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            3
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            131,
+            1
+          ],
+          [
+            193,
+            1
+          ]
+        ]
+      },
+      "peak_factored": {
+        "integer": 20279296,
+        "prime_powers": [
+          [
+            2,
+            12
+          ],
+          [
+            4951,
+            1
+          ]
+        ]
+      }
+    }
+  },
+  "all_released": true,
+  "no_resource_stop_or_OOM": true,
+  "cache_preparation_memory_max_events": 3823,
+  "first_control_memory_events_zero": true,
+  "no_cap_raise_or_unchanged_failure_replay": true,
+  "source_owner_worktree_edits_by_queue": false,
+  "new_HNN_guard_native_cost": {
+    "jobs": 3,
+    "CPU_ns": 37027042000,
+    "wall_ns": 28155317040
+  },
+  "cumulative_HNN_native_guard_cost": {
+    "jobs": 101,
+    "CPU_ns": 989764738000,
+    "wall_ns": 762111782950,
+    "formal_and_other_accounts_separate_retained": true
+  },
+  "scientific_or_acquired_output_claim": false,
+  "origin_record": "research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v79",
+  "archive_scope": "exact first-control full stdout/stderr and all stage costs; source-bound queue archive remains at origin; no private messages"
+}

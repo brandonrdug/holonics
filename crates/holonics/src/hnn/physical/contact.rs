@@ -14,7 +14,7 @@ use crate::hnn::constitution::DepositReading;
 use crate::hnn::encoding::Encoded;
 use crate::hnn::field::ReceiverDeclaration;
 use crate::hnn::moment::SourceMoment;
-use crate::hnn::port::WordReturn;
+use crate::hnn::port::{Deposit, WordReturn};
 use crate::hnn::prediction::{DamagedSection, PhysicalRepair, RepairedCell, StationRead, Unresolved};
 use crate::hnn::ratio::HolonRatio;
 use crate::hnn::word::continuation::ContinuationReceipt;
@@ -34,6 +34,12 @@ pub struct ContactObservation {
 pub struct ContactPublication {
     pub ratio: HolonRatio,
     pub pullback: WordReturn,
+    /// The actual reached comparison return consumed by this deposition, exposed transiently
+    /// so its direction/energy can be joined to the scale, certified step and applied factor.
+    /// Neither this return nor its producing Word is installed in the common resident.
+    pub comparison_return: Deposit,
+    /// `stepped` includes normalization-statistic coordinates. Physical factor movement is
+    /// the actual finite difference in `continuation.storage`, not that aggregate count.
     pub publication: DepositReading,
     pub continuation: ContinuationReceipt,
 }
@@ -146,7 +152,7 @@ impl PhysicalReceiver<'_> {
                 let continuation = returned.receipt;
                 self.resident.publish_reception(Some(material.clone()),
                     HolonState::at(carry, material.commit()), Some(charts), None, section.chart())?;
-                Ok(ContactPublication { ratio, pullback, publication, continuation })
+                Ok(ContactPublication { ratio, pullback, comparison_return: deposit, publication, continuation })
             })();
             comparison = joined.map(Some);
         }

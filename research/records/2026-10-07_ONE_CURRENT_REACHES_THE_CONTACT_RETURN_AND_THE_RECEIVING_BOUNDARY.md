@@ -155,3 +155,92 @@ unlaunched. The exact failure, passed-stage costs and full compiler output are p
 preserving equality of the actual complete reception carry. This is a cfg(test)-only correction;
 production forward, material reaction, common owner and enclosure-publication guard are unchanged.
 The same seven fixed controls and caller checks still require fresh source-matched validation.
+
+## First native failure: statistics moved, physical storage did not
+
+[measured; queue continuation-v79] Source2fc219bb built a fresh libtest, with production guards
+reused only after the queue verified their unchanged source scope. The first control reached an
+Ok contact publication and passed `publication.stepped > 0`, then failed the unchanged assertion
+that the contact storage factor differs from its initial value. Both actual factors are exactly
+the same six-by-six matrix. Downstream held-momentum and continued-communication assertions were
+not reached. The other six controls and notebook/CUDA caller checks remained unlaunched. This
+resident/contact-output gate is **failed**, not accepted and not a useful-learning result.
+
+The failed control took 734352527 ns (=19·59·655087 ns) wall and 682641000 ns
+(=2³·3³·5³·131·193 ns) aggregate CPU, with peak group memory 20279296 bytes (=2¹²·4951 bytes).
+Its unchanged fixed stage guard was 16000000000 ns; measured/guard is 734352527/16000000000.
+It recorded no memory events or resource stop, its source inputs stayed unchanged, and the lease
+was released. Cache preparation separately recorded memory.max pressure without OOM. The
+[failure receipt](receipts/hnn-resident-conformance-20261007/contact-causal-v4/FAILED_STAGE.v79.json)
+preserves every stage cost; full first-control stdout/stderr are retained beside it. No fixture,
+deadline or resource policy is enlarged as a response to this failure.
+
+[source-derived] `BudgetedCarry::stepped` counts nonzero applied coordinates on **all** carriers.
+Preparing a reached Storage factor first carries its feature energy into `FactorScale(0)`;
+`DepositReading.stepped` includes this normalization-statistic movement. It does not witness a
+physical `Factor(0)` movement. A new commit likewise does not prove that a factor changed. The
+existing `vanished` list names only positively certified families whose material coordinates
+all rounded to zero; a reached family with no certified step is outside that list. Its current
+documentation's last sentence is broader than the implemented account and supplies no extra
+evidence.
+
+The actual producing successor is returned by `ContactCut::continue_deposited`, then published
+directly into the common Resident. No later reset or overwritten successor was found in that
+source path. The continuation already reports `dF = F_successor - F_producing` and its full
+`dC = dF Fᵀ + F dFᵀ + dF dFᵀ`. The failed equality therefore originates inside deposition;
+the failure output does not distinguish an absent/zero certified step from a positive proposal
+wholly carried or released below the factor lattice. Independent peer source review agrees on
+this distinction; it supplies no runtime observation.
+
+## Exact causal account without changing the failed gate
+
+[implementation; agent-inferred; native pending] `ContactPublication::comparison_return` now
+exposes, transiently, the actual Deposit that its contact cut consumed. No second comparison,
+recomputed Word, source reinjection or retained event archive is introduced. Forward operands,
+deposition, successor, held-state transport and publication are unchanged. The receiving receipt
+joins the operands already present:
+
+`delta = eta G / h_after`,
+
+`delta_i + r_before,i = dF_i + r_after,i + released_i`,
+
+`energy + r_scale,before = h_after - h_before + r_scale,after + released_scale`,
+
+`F_resident = F_producing + dF`,
+
+`C_resident - C_producing = dF F_producingᵀ + F_producing dFᵀ + dF dFᵀ`.
+
+The new fixed selector
+`the_fixed_v79_contact_observation_accounts_for_its_actual_material_and_remainders` executes
+the identical seed81/rebase7/source[0,1]/observation[0,1,3]/partition[false,false,true] once. It
+asserts the exact factor/statistic splits, the producer-to-resident factor identity and the full
+storage identity. It reports the actual comparison gradient energy/covector, certified family
+steps, joint and pumped decisions, lattice/clock/gamma precision, proposals including prior
+remainders, vanished families, releases and held-state work. This diagnostic's claim is the
+causal account, **not nonzero physical learning or later output gain**. The original failed
+control and all its acceptance assertions are preserved; it also prints this receipt before
+those assertions. The sole queue is asked to run the new diagnostic once on sealed source,
+not to replay the original failed gate blindly.
+
+The fixed consumer emits one complete Storage return per contact; the diagnostic checks that
+cardinality before using its rate. Each split is read over the whole deposit, with the final
+joint-certified eta and the actually carried h_after. A missing remainder or released residual
+is zero. The coarse remainder is checked in its half-open cell `[-unit/2, unit/2)`; the largest
+unrounded proposal alone is not used as a rounding verdict. Precision is the opened stroke's
+`gamma_length(clock_before + 1)`, distinct from the published clock. A scale-only move may
+advance that clock while physical F stays unchanged.
+
+[pending] A nonzero proposed update may validly remain entirely in the carried material remainder
+or be released below the fine lattice; it cannot be credited as an immediate physical-output
+change because the forward contact reads F. Conversely, a zero reached gradient or held family
+requires its own producing-covector explanation. Which case this fixed observation actually
+occupies remains unmeasured. No step, grain, target or acceptance is tuned to select a desired
+case. The prepared receipt changes neither the deposition mathematics nor an outstanding Lean
+obligation; the existing budgeted split laws remain in `HNN/LatticeDeposit` and `Rebase`.
+
+[prepared] The source owner ran syntax-only rustfmt parsing and whitespace checks, with no
+compiler, native test, scientific run or device launch. Fresh type/guard/libtest checks and the
+one causal diagnostic belong to the existing sole queue under its unchanged controls. Their
+receipt is still required. The six other controls and notebook/CUDA checks are not promoted by
+this preparation. [Preparation](receipts/hnn-resident-conformance-20261007/contact-causal-v4/DIAGNOSTIC_PREPARATION.json)
+seals this narrow source delta and the unchanged failed acceptance.

@@ -65,6 +65,86 @@ fn contact_material(field: &Field) -> Constitution {
     super::learning::generic(field, 81).rebased(Locus::Channel(0), 7, &reads).unwrap()
 }
 
+/// Trace the fixed v79 observation through its actual return, two carry resolutions and
+/// producer/current publication. It changes no acceptance, fixture, material or future read.
+fn contact_causal_receipt(before: &Constitution, after: &Constitution,
+    publication: &crate::hnn::physical::contact::ContactPublication) {
+    use crate::hnn::constitution::{Carrier, FactorGradient, Family, Locus, gamma_length};
+    use crate::ratio::Rat;
+    use num_traits::Signed;
+    let locus = Locus::Channel(0);
+    assert_eq!(publication.comparison_return.commit(), before.commit());
+    assert_eq!(publication.publication.commit, after.commit());
+    let movement = publication.continuation.storage.iter().find(|m| m.contact == 0).unwrap();
+    assert_eq!(before.contact_storage(0).add(&movement.factor).unwrap(),
+        *after.contact_storage(0), "the producer's actual factor reaches the resident unchanged");
+    let old_capacity = before.contact_storage(0).multiply(&before.contact_storage(0).transpose().unwrap()).unwrap();
+    let new_capacity = after.contact_storage(0).multiply(&after.contact_storage(0).transpose().unwrap()).unwrap();
+    assert_eq!(new_capacity.subtract(&old_capacity).unwrap(), movement.storage);
+    let steps = publication.comparison_return.factors().iter().filter(|s| {
+        matches!(s.gradient, FactorGradient::Storage { contact: 0, .. })
+    }).collect::<Vec<_>>();
+    assert_eq!(steps.len(), 1, "compose_contact emits one complete Storage return per contact");
+    let step = steps[0];
+    let FactorGradient::Storage { gradient, .. } = &step.gradient else { unreachable!() };
+    let eta = publication.publication.family_step(locus, Family::Factor(0));
+    let statistic = &after.contact_scales(0)[0];
+    let proposed = gradient.scaled(&(&eta / statistic));
+    let prior = before.carried_remainders();
+    let next = after.carried_remainders();
+    let carried = |xs: &[(Locus, Carrier, usize, Rat)], carrier, entry| {
+        xs.iter().filter(|(l,c,i,_)| *l==locus && *c==carrier && *i==entry)
+            .map(|(_,_,_,r)| r.clone()).sum::<Rat>()
+    };
+    let scale_release = publication.publication.released.iter()
+        .filter(|(l,c,i,_)| *l==locus && *c==Carrier::FactorScale(0) && *i==0)
+        .map(|(_,_,_,r)| r.clone()).sum::<Rat>();
+    assert_eq!(&step.energy + carried(&prior,Carrier::FactorScale(0),0),
+        statistic - &before.contact_scales(0)[0] + carried(&next,Carrier::FactorScale(0),0) + scale_release,
+        "the reached energy splits into applied statistic, retained and released parts");
+    let half_unit = before.lattice(locus).unwrap().unit() / integer(2);
+    for (i, (delta, applied)) in proposed.entries().iter().zip(movement.factor.entries()).enumerate() {
+        let released = publication.publication.released.iter()
+            .filter(|(l,c,j,_)| *l==locus && *c==Carrier::Factor(0) && *j==i)
+            .map(|(_,_,_,r)| r.clone()).sum::<Rat>();
+        assert_eq!(delta + carried(&prior,Carrier::Factor(0),i), applied + carried(&next,Carrier::Factor(0),i) + released,
+            "the actual proposed factor displacement splits into applied, retained and released parts");
+        let remainder = carried(&next,Carrier::Factor(0),i);
+        assert!(-&half_unit <= remainder && remainder < half_unit,
+            "the coarse remainder uses the half-open cell with ties upward");
+    }
+    let largest = proposed.entries().iter().map(Signed::abs).max().unwrap_or_else(Rat::zero);
+    let largest_with_prior = proposed.entries().iter().enumerate()
+        .map(|(i,d)| (d + carried(&prior,Carrier::Factor(0),i)).abs()).max().unwrap_or_else(Rat::zero);
+    println!("v79 fixed causal receipt: before_commit={} after_commit={} aggregate_stepped={} unit={} clock_before={} clock_after={} precision={} eta={} gradient_squared={} reached_energy={} reached_covector={} scale_before={} scale_after={} largest_proposed={} largest_with_prior={} joint={:?} family_steps={:?} pumped={:?} vanished={:?} released={:?} carried_before={:?} carried_after={:?} actual_storage={:?} work={}",
+        before.commit(), after.commit(), publication.publication.stepped, before.lattice(locus).unwrap().unit(),
+        before.clock(locus), after.clock(locus), gamma_length(before.clock(locus)+1), eta,
+        gradient.entries().iter().map(|x| x*x).sum::<Rat>(), step.energy, step.covector,
+        before.contact_scales(0)[0], statistic, largest, largest_with_prior, publication.publication.joint,
+        publication.publication.steps.iter().filter(|(l,_)| *l==locus).collect::<Vec<_>>(),
+        publication.publication.pumped,
+        publication.publication.vanished,
+        publication.publication.released.iter().filter(|(l,_,_,_)| *l==locus).collect::<Vec<_>>(),
+        prior.iter().filter(|(l,_,_,_)| *l==locus).collect::<Vec<_>>(),
+        next.iter().filter(|(l,_,_,_)| *l==locus).collect::<Vec<_>>(), movement,
+        publication.continuation.deposition_work);
+}
+
+#[test]
+fn the_fixed_v79_contact_observation_accounts_for_its_actual_material_and_remainders() {
+    use crate::hnn::physical::contact::ContactObservation;
+    let field = field();
+    let initial = contact_material(&field);
+    let mut actual = PhysicalReceiver::new(&field, initial.clone(), Current::at_rest(&field), WordOpening::Rest).unwrap();
+    let taught = actual.communicate_contact(&encoded(&field,&[0,1]), &receiver(), |_| {
+        Some(ContactObservation { observed: encoded(&field,&[0,1,3]), compared: vec![false,false,true] })
+    }).unwrap();
+    assert!(taught.closes());
+    contact_causal_receipt(&initial, actual.constitution(), taught.comparison.as_ref().unwrap().as_ref().unwrap());
+    // This diagnostic proves the actual publication/split account, not the failed nonzero-C or
+    // later-output gate. The original seven-selector acceptance remains failed and unchanged.
+}
+
 #[test]
 fn complete_contact_return_publishes_held_point_before_existing_communication() {
     use crate::hnn::physical::contact::ContactObservation;
@@ -85,6 +165,7 @@ fn complete_contact_return_publishes_held_point_before_existing_communication() 
     assert_eq!(taught.blind_carry, blind.carry);
     assert_eq!(taught.carry.ticks, 3, "full ticks keep their actual complete crossing");
     let publication = taught.comparison.as_ref().unwrap().as_ref().unwrap();
+    contact_causal_receipt(&initial, actual.constitution(), publication);
     assert!(publication.publication.stepped > 0, "this fixed native control remains unaccepted until an actual move");
     assert_ne!(actual.constitution().contact_storage(0), initial.contact_storage(0));
     assert_eq!(taught.carry.momenta, taught.blind_carry.momenta);
