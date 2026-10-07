@@ -1,0 +1,174 @@
+{
+  "UTC": "2026-10-07T23:01:36.417299+00:00",
+  "grade": "SOURCE_DIAGNOSIS_AND_EXACT_SAVED_RECEIPT_ANALYSIS_NOT_NEW_NATIVE_VALIDATION",
+  "validated_executable_source": "cacb0d0376bafe1f8893c2cac2da57948eb940bf",
+  "receipt_pins": {
+    "VALIDATION.v82.json": {
+      "bytes": 336890,
+      "sha256": "37625146a97433d2e5a356759d441f155aab55d5f06daec106d702dfe129dd98"
+    },
+    "CONTROL3_FULL_STDOUT.v82.txt": {
+      "bytes": 117933,
+      "sha256": "7fcb92f011d938926a525c4cb83d80e6625a2a3d2d7ea2935722ce656878b781"
+    }
+  },
+  "accepted": "Exact common physical factor and normalization value-plus-remainder conservation and lossless rebase; atomic refusal of an oversized successor; retained unresolved actual material consumed by an ordinary different-source passage and a later different comparison, with existing finite material/current/work account",
+  "excludes": [
+    "independent-review acceptance",
+    "useful physical F/C movement or acquired output",
+    "all-future extinction",
+    "nonlinear descent",
+    "logarithmic exact denominator cost",
+    "cold restore",
+    "CUDA parity",
+    "other carriers sensitivity contract"
+  ],
+  "saved_comparisons": [
+    {
+      "comparison": 1,
+      "unit": "1/32768",
+      "half_cell": "1/65536",
+      "eta": "1/33554432",
+      "scale_before": "1",
+      "scale_after": "35807/32768",
+      "max_proposal_exact": "4594278221811465178711503979416472973172493306150936040384498608386101927491314831747859475987688858397/4953891210380391341082532602675999946067939376004286355222957767672486333384749656311290669585079870607668681728",
+      "max_proposal_power_enclosure": [
+        -31,
+        -30
+      ],
+      "max_delta_plus_prior_exact": "4594278221811465178711503979416472973172493306150936040384498608386101927491314831747859475987688858397/4953891210380391341082532602675999946067939376004286355222957767672486333384749656311290669585079870607668681728",
+      "max_delta_plus_prior_power_enclosure": [
+        -31,
+        -30
+      ],
+      "distance_to_either_cell_edge_strict_lower_bound": "16383/1073741824",
+      "all36_factor_residuals_nonzero": true,
+      "all36_actual_factor_moves_zero": true,
+      "all_finite_linear_quadratic_storage_moves_zero": true,
+      "deposition_work": 0,
+      "factor_residue_payload_bits": 25784,
+      "normalization_residue_payload_bits": 520,
+      "total_residue_payload_bits": 26304,
+      "factor_coordinates": 36,
+      "no_residue_erasure_quotient_coordinate_would_cross_for_same_delta": true
+    },
+    {
+      "comparison": 2,
+      "unit": "1/32768",
+      "half_cell": "1/65536",
+      "eta": "1/134217728",
+      "scale_before": "35807/32768",
+      "scale_after": "28701/16384",
+      "max_proposal_exact": "258855130585669963075084289283407331283071840552117897267553852811177122049392000228660035400439495246883339880777388111263200171205512414871822890630091652592871029498238264621651768219186537508424914715099819895744376833804159959031711067247956063977402200609394672070731654900432057525350533029673674455474646993493377186350809377268540965191475117692126745257240130322769799719815415793017621509/391386683177615803541333510312615986750300956850725848550088384344518422920033971439683399413029730768998959594470503625448099424646012389392674334028948707676610127263325368035464346578443745135799341887484916300776114112362202125338877765452111671795786483913757801121298704025626797485735259600149564032102765261720588353524553345117145853897851626477931819574257247601584099190023921335842781074311151616",
+      "max_proposal_power_enclosure": [
+        -31,
+        -30
+      ],
+      "max_delta_plus_prior_exact": "18827317577945563584127490908047003883666732867295668323219068881707773624779283687089870866646558356540994351143553143127089375637581003906315796152895304797864668643126074325363293393722372572950174199748961254752097576031526932555461781954319578083240701055328593825578585187900681728521785892539379265495888896974156039906400266919640329934222461759110665098137582799379720877301905017309544060857327/14014382964540889077404529003763840637568026361953940459033014778224171169497656415340743482782355569645545746199205323316420096098299765626983489878574566375776378826917891453245871857934335182077567034965172397981890318021353371502009196147543762631991726629499925584750342695045618737571722440502555439297503715726429107174653681628609641590520373189295304663495429264869921839697186551272522461927859405914112",
+      "max_delta_plus_prior_power_enclosure": [
+        -30,
+        -29
+      ],
+      "distance_to_either_cell_edge_strict_lower_bound": "8191/536870912",
+      "all36_factor_residuals_nonzero": true,
+      "all36_actual_factor_moves_zero": true,
+      "all_finite_linear_quadratic_storage_moves_zero": true,
+      "deposition_work": 0,
+      "factor_residue_payload_bits": 97493,
+      "normalization_residue_payload_bits": 2477,
+      "total_residue_payload_bits": 99970,
+      "factor_coordinates": 36,
+      "no_residue_erasure_quotient_coordinate_would_cross_for_same_delta": true
+    }
+  ],
+  "unit_of_evidence": "one fixed three-Word law control, two declared comparisons; 36 coordinates are not independent observations",
+  "ordinary_physical_consumer": {
+    "source": "crates/holonics/src/hnn/constitution.rs:9445 -> propagation.rs:952 -> ContactOperands::build",
+    "reads": "stored coarse F/K/D; never F plus unresolved remainder",
+    "library_medium_consumer": "field.rs:2028 also reads coarse F",
+    "normalization": "factor preparation advances carried h and returns coarse h; gradient proposal uses actual eta/h_after; normalization remainder participates in later advance, not immediate native dynamics"
+  },
+  "residual_action": {
+    "source": "constitution.rs:946 and 7783",
+    "equation": "q=floor((delta+r_old)/u+1/2); F_next=F+q*u; r_next=delta+r_old-q*u",
+    "trigger": "later admitted deposition or lossless rebase; ordinary no-observation communication preserves Theta",
+    "reconstruction_probe": "constitution.rs:4820 with_remainders is cfg(test), never published; sole current consumer tests/resonator_deposit.rs:339",
+    "no_immediate_material_response": "both actual saved directions stay strictly inside half-cell; scalar normalization movement is not C/F work"
+  },
+  "v81_plus_v82_total": {
+    "CPU_ns": 92342405000,
+    "bounded_stage_wall_ns": 68939542947
+  },
+  "control3_cost": {
+    "selector": "hnn::tests::physical_communication::the_actual_unresolved_contact_return_survives_a_different_physical_passage",
+    "status": "PASS",
+    "stage_label": "hnn-unresolved-cacb-control3-20261006-v1",
+    "phase": "control3",
+    "accepted_stage": true,
+    "whole_wall_ns": 980318743,
+    "CPU_ns": 925027000,
+    "fixed_guard_ns": 16000000000,
+    "measured_to_guard": {
+      "numerator": 980318743,
+      "denominator": 16000000000
+    },
+    "group_peak_bytes": 19202048,
+    "child_RSS_KiB": 29428,
+    "memory_events_delta": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0,
+      "sock_throttled": 0
+    },
+    "wall_stop": false,
+    "CPU_stop": false,
+    "floor_stop": false,
+    "inputs_unchanged": true,
+    "quiescent_released": true
+  },
+  "all_leases_released": true,
+  "source_owner_new_builds_or_tests": 0,
+  "source_status_edit_only": true,
+  "original_output_gate_failed_and_unreplayed": true,
+  "threshold_provenance": {
+    "grade": "SOURCE_RECOVERED_REPRESENTATION_RULE_NOT_ESTABLISHED_MATERIAL_QUANTIZATION",
+    "source": "FieldDeclaration::lattice_by_rule field.rs:585; lattice_exponent field.rs:634; constitution.rs:346",
+    "rule": "L=ceil(log2(2*L_R*X)), tolerance-derived receiver grain and unit-scale operand fan-in",
+    "fixture": {
+      "L_R": 16,
+      "channel_X": 6,
+      "product": 192,
+      "initial_exponent": 8,
+      "historical_rebase": 7,
+      "fixed_exponent": 15
+    },
+    "scope": "linear functional bound only; nonlinear factor-product/inverse/continuing-word sensitivity explicitly owed #62",
+    "material_owner": "holon::element::ContactConstitution has no quantization at this carrier unit",
+    "reading": "Representation rule; delayed receiver relevance is intended. Zero coefficient movement does not imply a stationary field or require immediate fine-material response."
+  },
+  "transported_state": {
+    "source": "word.rs:367 EndChange and :395 ReceptionCarry; :2031 continuing; physical/contact.rs:104 exact received opening",
+    "state": "storage b_r; two-directional arrivals a_(a,r); contact displacement/rate u_a,w_a; loaded-ring state and pump phase; absolute crossing t; conductances and canonical momenta",
+    "complex_chart": "ring width2d_g; Ring::rotate carries both coordinates of each node; ReceivingRead pairs2A output rows and keeps imaginary phase",
+    "superposition": "propagation.rs:1139 participation v=weighted storage+sum weighted arrivals; half-turn outgoing then actual contact transit and next arrivals",
+    "actual_exact_route": "open_source_exact_received -> Operands::exact_at_cut, not charted transient rounding",
+    "wave_receiving_join": "SourceMoment.open_storage -> realified source lift -> actual received Word -> junction/contact/pump propagation -> f_R(e_j)=R_map P_R^tau_R v_R(e_j) at absolute opened_at+e_j",
+    "constitutive_residue": "Theta.carries[(Channel(a),Factor(k))][i]; added during later actual reached deposition; no autonomous spatial/pump-phase propagation",
+    "missing_identification": "no decoder/propagator consumer identifies constitutive-update rho with unresolved radiating field at a future receiving epoch",
+    "generic_transient_residue": "Word.carried storage/arrivals/states/solve/resonator feedback differs from Theta coefficient carry; release and ReceptionCarry state contract remain scoped",
+    "future_law": "SourceHolon.native_futureAgreement_iff requires P U^k delta m=0 for every future k; present silence is insufficient",
+    "recovered_other_wave_owners": "Telegrapher distributedV/I; Radiation.receiver_reads_the_change delayed front; AcousticReceiver.run_add complex superposition; no native HNN decoder/clock square credited",
+    "no_immediate_reactivity_or_numerical_redesign_requirement": true
+  },
+  "next_step": {
+    "grade": "SOURCE_TO_TRANSPORT_TO_RECEIVER_CLAIM_REQUIRED_BEFORE_NEW_EXPERIMENT",
+    "scope": "actual entered state -> directional arrivals/contact/ring/pump state -> receiver crossing/phase/complex face with work/budget; name decoder for retained distinction and actual future propagator before claiming delayed relevance",
+    "no_new_teacher_or_step_grain_precision_redesign_or_repeated_threshold_forcing": true,
+    "no_control_source_or_launch_request_prepared": true,
+    "cost": "actual field/material/source/Word/adjoint/certificate/copy costs charged; growing rational residue is not free nor evidence of radiation",
+    "native_caps_unchanged": true
+  }
+}

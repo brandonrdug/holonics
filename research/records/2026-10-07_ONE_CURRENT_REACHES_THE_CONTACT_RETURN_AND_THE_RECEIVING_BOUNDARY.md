@@ -357,7 +357,7 @@ learning, or useful compression; no reference code was executed.
 
 ## Exact unresolved contact material and its existing physical consumer
 
-[implementation; agent-inferred; native pending] Preserve the unresolved C/K/D directions and
+[implementation; native law controls accepted at cacb0d037/v82] Preserve the unresolved C/K/D directions and
 their normalization in the same Constitution. The missing all-future sensitivity is a reason
 to retain them, not an assumption permitting their release. At each physical factor or its
 normalization carrier, replace the fine/coarse pair of splits with the existing exact coarse
@@ -430,3 +430,128 @@ Full nonlinear comparison decrease and future material sensitivity remain open, 
 proof is needed to preserve the actual unresolved coordinates. Source syntax and whitespace
 checks are the only owner execution. The sole queue owns all fresh type/guard/native checks,
 fixed projection, cache matching and unchanged resource limits.
+
+
+
+## v82: conservation accepted and the transported state distinguished
+
+[measured; source cacb0d0376bafe1f8893c2cac2da57948eb940bf] The sole queue accepted the fresh
+library check, three guards, all 57 doctests, source-matched libtest build and three focused
+controls. All 302 native inputs were reverified. The
+[complete validation](receipts/hnn-resident-conformance-20261007/unresolved-contact-v6/VALIDATION.v82.json),
+[whole physical stdout](receipts/hnn-resident-conformance-20261007/unresolved-contact-v6/CONTROL3_FULL_STDOUT.v82.txt)
+and [exact source/observability account](receipts/hnn-resident-conformance-20261007/unresolved-contact-v6/OBSERVABILITY_ACCOUNT.v82.json)
+are preserved. Acceptance is exact factor/normalization conservation and lossless rebase,
+atomic budget refusal, and actual different-passage continuation. The original physical-output
+gate remains failed and unreplayed, with six remaining gates and notebook/CUDA callers unlaunched.
+No credit transfers to nonlinear descent, useful output, cold restore, independent review,
+device parity or other source changes.
+
+Both reached comparisons retained all 36 nonzero C-factor residuals. Their total exact rational
+payload grows from 26304 bits=2^6*3*137 to 99970 bits=2*5*13*769. The latter is factor payload
+97493 bits=11*8863 plus normalization payload 2477 bits (prime). Both applied F moves, complete
+linear/quadratic C moves and deposition work remain exactly zero. These are coefficient
+observations; they do not say the current field or its waves are stationary. The three-Word
+control's physical state continues under a different source and a different comparison.
+
+## Wave propagation, constitutive residue and receiving relevance
+
+[definition; source-recovered] Delayed relevance belongs to the continuing field and the
+participating receiver's clock. It does not require an immediate response or completion of a
+rotation. Distinguish three actual source owners:
+
+1. **The evolving field.** EndChange (word.rs:367) carries storage waves b_r, arriving waves
+   a_(a,r), contact state (u_a,w_a), loaded-ring state and its actual pump phase.
+   ReceptionCarry (word.rs:395) adds absolute crossing t, contact conductances and canonical
+   momenta. These are vectors; each ring has width 2*d_g, a realification retaining both
+   coordinates per complex node. Current is the independent source navigator lift, not this
+   wave field. The common Resident retains both the current/source chart and ReceptionCarry.
+2. **Constitutive update residue.** The retained rho_(a,k,i) lives in Theta.carries at
+   (Locus::Channel(a), Carrier::Factor(k), entry i), with FactorScale holding its normalization
+   counterpart. These are coordinates of complete material matrices/scales, not an autonomous
+   wave or a scalar replacement for the field. A reached matrix covector may encode directions
+   from a whole wave comparison, but this residue has no spatial propagation or pump-phase
+   evolution of its own.
+3. **The receiving crossing.** ReceivingPhases names receiver ring R and epochs e_j=e_0+j.
+   The physical caller records absolute tick opened_at+e_j and reads the actual anchor v_R(e_j)
+   in its source/receiving frame. Its complex face is f_j=R_map*P_R^(tau_R)*v_R(e_j), realified
+   into paired rows with real grain and a retained imaginary phase channel. Present silence
+   at this receiver is not silence at every admitted later receiver/crossing.
+
+[source excerpts; existing consumer] The wave and source-to-receiver join is already executed:
+
+- moment.rs:2317: storage[counts.ring]=field.ring(counts.ring).rotate(&moment,&current.lift()[counts.ring]).
+- field.rs:910: rotated[2*target]=vector[2*node]; rotated[2*target+1]=vector[2*node+1].
+- propagation.rs:1158: anchor=add(&anchor,&scale(weight,wave)).
+- propagation.rs:1185: storage_wave=half_turn(&anchor,storage); outgoing waves use the same anchor.
+- word.rs:2031: storage.push(add(wave,added)), then on_change keeps the other carried fields.
+- word.rs:2755: transit_solve reads both outgoing end waves, displacement and rate; transit_update
+  returns new arrivals and state, installed at word.rs:2867.
+- word.rs:2630: tick=opened_at+passage.len()-1 supplies the actual loaded-ring pump step.
+- receiving.rs:2144: wave=apply_rows(map,&ring.rotate(anchor,&current.lift()[self.ring])).
+
+Thus weighted arrivals superpose at a junction, including direction-dependent cancellation;
+the reflected outgoing field enters contact transport and changes the next arrivals. Stored
+contact/ring motion, source frame and pump phase participate in the actual work/storage balances.
+Relevance is the future crossing at which that propagated state enters the chosen receiver's
+face. It is not the time at which a scalar buffer happens to exceed a threshold.
+
+The v82 physical route uses Word::open_source_exact_received, which calls
+Operands::exact_at_cut (word.rs:1808). Its motion is exact on the current constitutive operands.
+The received opening crosses the actual carried state, conductance and momentum before source
+imposition; complete absorption is an explicit alternative, not the default continuing path.
+Generic charted words additionally have dynamic transient feedback remainders in storage,
+arrivals, states, solves and pump states, updated by each executed tick. Those differ from
+Theta's factor-update residue. ReceptionCarry has no separate transient-remainder archive:
+end_change clones the current wave/state coordinates and phases, while generic Word remainders
+are reported at release. No claim of a full all-future charted wave quotient or cold restore
+follows from the exact v82 continuation.
+
+[precise material join] The actual comparison reads that blind receiving field, returns through
+the same Word's pull_back and compose_contact, then deposits the reached factor covectors.
+carried_entry (constitution.rs:946) adds delta+rho_old, takes its coarse quotient and retains
+rho_new. Contact material getters (constitution.rs:9445) return the stored factor F; Operands
+(propagation.rs:952) builds C=F*F^T from it. A subsequent material change then affects subsequent
+wave transport under the actual held-current/work contract. Ordinary no-comparison communication
+does not move rho between contacts or rotate it by a wave clock. There is no source consumer
+identifying this coefficient residue itself with a radiating wave, or decoding it into the
+propagated state at a later receiver. Accumulation of rho is therefore not evidence of radiation.
+
+The fixed carrier unit comes from FieldDeclaration's tolerance/fan-in representation rule
+(field.rs:585), not an established physical quantization law: L=ceil(log2(2*L_R*X)).
+For this fixture L_R=16 and X=6 give initial L=8; its already-fixed rebase by seven gives L=15.
+The rule's linear functional error bound does not discharge the explicitly owed nonlinear
+factor/product-to-word/future sensitivity. This observation neither demands immediate
+fine-material reactivity nor prescribes a smaller grain, changed step or C(F+rho) redesign.
+Those numerical redesign proposals are not part of this step.
+
+[existing wave laws; actual join still required] Physics/Wave/Telegrapher and
+Physics/Wave/Radiation.receiver_reads_the_change own distributed voltage/current and a delayed
+source front. The latter proves a positive uniform chain's receiver silent through n_0+w,
+then responsive at n_0+1+w. HolonicsResearch/Foundation/AcousticReceiver.run_add proves complex
+mode superposition before its receiving nonlinearity. Objects/SourceHolon.native_futureAgreement_iff
+requires P*U^k*(m-m')=0 for every admitted future k, not merely a zero present face.
+These recovered owners clarify the intended roles; no identity mapping the retained
+contact-factor residue to their propagating state, or native HNN-to-telegrapher decoder/clock
+square, is supplied by v82. A numerical matrix coordinate is not itself a transported wave.
+
+[next bounded claim; no new run] Trace the actual entered/current state, both directional
+arrivals, contact/ring state and phase, absolute crossing and whole complex receiving face
+through one declared continuation, with its interface work and existing budgets. If a retained
+distinction is claimed to become relevant there, name its field-state decoder and actual
+propagator/receiver relation first; compare the matched produced states at that receiver's
+crossing. Keep the post-blind observation and the current source/clock/pump/energy contract.
+Neither immediate constitutive movement, scalar remainder growth, an authored target nor
+repetitions until a threshold crosses establish that wave claim. No precision/step redesign,
+additional experiment or larger campaign is requested by this source account.
+
+[cost] v82's seven stages charge CPU 86096845000 ns=2^3*5^4*967*17807 ns and bounded-stage wall
+60825435980 ns=2^2*5*191*311*51199 ns. Including v81 preflight once gives CPU
+92342405000 ns=2^3*5^4*18468481 ns and bounded-stage wall
+68939542947 ns=3*11*41*50953099 ns. The physical control measured whole wall 980318743 ns,
+CPU 925027000 ns=2^3*5^3*925027 ns and group peak 19202048 bytes=2^16*293 bytes.
+Every lease was released, memory-event deltas were zero and limits were unchanged.
+Rational payload is not an RSS bound: retained field/material state, exact source moments,
+native Word/adjoint operands, chart certificates and receipt copies remain charged.
+This owner ran no compiler, control or scientific job. A future source-to-wave-to-receiver
+control still needs its exact consumer, bounded selector and complete sole-queue projection.
