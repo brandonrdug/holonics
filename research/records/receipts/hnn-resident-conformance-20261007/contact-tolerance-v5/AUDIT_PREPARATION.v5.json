@@ -1,0 +1,97 @@
+{
+  "UTC": "2026-10-07T22:10:35.761292+00:00",
+  "predecessor": "e3ad0f6b4c58d5296a6417e92d3abcac7fcd6588",
+  "grade": "DOCUMENTATION_AND_SAVED_NATIVE_EVIDENCE_ONLY",
+  "owned_paths": [
+    "crates/holonics/src/hnn/constitution.rs",
+    "docs/atlas/objects.tsv",
+    "research/records/2026-10-07_ONE_CURRENT_REACHES_THE_CONTACT_RETURN_AND_THE_RECEIVING_BOUNDARY.md",
+    "research/records/receipts/hnn-resident-conformance-20261007/contact-tolerance-v5/CAUSAL_FULL_STDERR.txt",
+    "research/records/receipts/hnn-resident-conformance-20261007/contact-tolerance-v5/CAUSAL_FULL_STDOUT.txt",
+    "research/records/receipts/hnn-resident-conformance-20261007/contact-tolerance-v5/EXACT_CERTIFICATE_ACCOUNT.v80.json",
+    "research/records/receipts/hnn-resident-conformance-20261007/contact-tolerance-v5/EXACT_RECEIVING_CELL_ACCOUNT.v79-v80.json",
+    "research/records/receipts/hnn-resident-conformance-20261007/contact-tolerance-v5/OUTCOME.md",
+    "research/records/receipts/hnn-resident-conformance-20261007/contact-tolerance-v5/VALIDATION_SUMMARY.v80.json"
+  ],
+  "path_pins": {
+    "crates/holonics/src/hnn/constitution.rs": {
+      "bytes": 436184,
+      "sha256": "257005f04cbbe17bcf2a187ef063623727fb7fae2077f9e559bc0abda229b7c7"
+    },
+    "docs/atlas/objects.tsv": {
+      "bytes": 938847,
+      "sha256": "3b91652f874aa022338f1ec1aaff0067e5ebf1a4533302ff6cf0400adc997d6e"
+    },
+    "research/records/2026-10-07_ONE_CURRENT_REACHES_THE_CONTACT_RETURN_AND_THE_RECEIVING_BOUNDARY.md": {
+      "bytes": 26477,
+      "sha256": "20aaa8dec48729363886de606b5c72536577b49cbc5bedab097e6a4e39e3fd20"
+    },
+    "research/records/receipts/hnn-resident-conformance-20261007/contact-tolerance-v5/CAUSAL_FULL_STDERR.txt": {
+      "bytes": 140,
+      "sha256": "063a505c4b532c38c8a68c0e542034ba22779dec0698b54cb5de5d0b01c3e0e0"
+    },
+    "research/records/receipts/hnn-resident-conformance-20261007/contact-tolerance-v5/CAUSAL_FULL_STDOUT.txt": {
+      "bytes": 17971,
+      "sha256": "c36bd01742bd85e0cbff4b9072092394401e9c8cd1227d43e21b59eb7a446fd9"
+    },
+    "research/records/receipts/hnn-resident-conformance-20261007/contact-tolerance-v5/EXACT_CERTIFICATE_ACCOUNT.v80.json": {
+      "bytes": 3264,
+      "sha256": "218f58c9c3e20590e0bd6e7ede7e4d6b2aaad12ebb30fed5ae411bf63c3ced93"
+    },
+    "research/records/receipts/hnn-resident-conformance-20261007/contact-tolerance-v5/EXACT_RECEIVING_CELL_ACCOUNT.v79-v80.json": {
+      "bytes": 2600,
+      "sha256": "ed3a02b7fc26b06fff47ffb29d9ec2f558f8324776b80550cba0b945a2b0db60"
+    },
+    "research/records/receipts/hnn-resident-conformance-20261007/contact-tolerance-v5/OUTCOME.md": {
+      "bytes": 379,
+      "sha256": "8190e81d1a27f8e4f3232372997ebd614f011d61f173fc042cff099e2b1a48ea"
+    },
+    "research/records/receipts/hnn-resident-conformance-20261007/contact-tolerance-v5/VALIDATION_SUMMARY.v80.json": {
+      "bytes": 29297,
+      "sha256": "9673b65e48f04c86d965020ac6fdb99078715411bdbc5cf1a32d82d360191b91"
+    }
+  },
+  "syntax_and_whitespace": [
+    {
+      "argv": [
+        "rustfmt",
+        "--edition",
+        "2024",
+        "--config",
+        "skip_children=true",
+        "--emit",
+        "stdout",
+        "crates/holonics/src/hnn/constitution.rs"
+      ],
+      "exit_code": 0,
+      "compiler_or_test": false
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "compiler_or_test": false
+    }
+  ],
+  "all_local_record_links_verified": 11,
+  "atlas_column_count": 8,
+  "executable_lines_equal_to_accepted_v80_source": true,
+  "fixed_original_gate_and_fixtures_unchanged": true,
+  "all_original_acceptance_selectors_unchanged": true,
+  "FACE_signal_carry_uncommitted_patch_withheld": true,
+  "no_native_or_formal_request": true,
+  "source_owner_compilers_native_tests_science_device_jobs": 0,
+  "read_only_process_snapshot": {
+    "running_commands_matching_hnn_holonics_rustc_cargo_lean_lake_timeout": [],
+    "active_HNN_queue_services": [],
+    "scope": "one snapshot, not monitoring guarantee"
+  },
+  "remaining_consuming_contracts": [
+    "full nonlinear comparison ray and paired material/current energy trial",
+    "all-future constitution-to-receiver sensitivity and retention certificate",
+    "unchanged actual physical factor/storage/later output gate"
+  ]
+}

@@ -244,3 +244,113 @@ one causal diagnostic belong to the existing sole queue under its unchanged cont
 receipt is still required. The six other controls and notebook/CUDA checks are not promoted by
 this preparation. [Preparation](receipts/hnn-resident-conformance-20261007/contact-causal-v4/DIAGNOSTIC_PREPARATION.json)
 seals this narrow source delta and the unchanged failed acceptance.
+
+## The actual v80 causal result and tolerance boundary
+
+[measured, source e3ad0f6b; native v80] The sole queue passed the fresh library, three guards,
+57 doctests, fresh libtest and one exact causal diagnostic. The first original seven-control
+acceptance remains failed; its other six controls and notebook/CUDA checks were not launched.
+The complete [stdout](receipts/hnn-resident-conformance-20261007/contact-tolerance-v5/CAUSAL_FULL_STDOUT.txt),
+[stderr](receipts/hnn-resident-conformance-20261007/contact-tolerance-v5/CAUSAL_FULL_STDERR.txt),
+[queue account and all stage costs](receipts/hnn-resident-conformance-20261007/contact-tolerance-v5/VALIDATION_SUMMARY.v80.json)
+and [exact certificate extraction](receipts/hnn-resident-conformance-20261007/contact-tolerance-v5/EXACT_CERTIFICATE_ACCOUNT.v80.json)
+are preserved, rather than requiring another run to print operands already present.
+
+The comparison admitted `eta=2^-25`. The channel unit was `2^-15`, and its first clock used
+`k_1=1`, so the fine half-cell was `2^-17`. Its largest proposed factor displacement was in
+`[2^-31,2^-30)`: all 36 nonzero factor displacements were released, none carried, and the factor,
+capacity and finite physical work all moved by exactly zero. The normal statistic changed
+from `1` to `35807/32768`, by `3039/32768`. That statistic's applied coordinate explains
+`aggregate_stepped=1`; it is not a physical-storage witness. Publication did not overwrite a
+nonzero factor successor.
+
+[exact extraction, no new execution] The saved StepReading already supplies the certificate
+operands. Its squared finite-Reach power gain is in `[2^18,2^19)`, its ray output moves in
+`[2^-1,1)`, and its joint move bound is `3892343875/8388608` in `[2^8,2^9)`.
+Thus `eta*bound=3892343875/281474976710656` is in `[2^-17,2^-16)`. Exact arithmetic on that
+saved receipt verifies `eta*C<=a`, `eta*c<=1`, `bound^2>=gain*moves` and
+`C=gain*moves/2`. This is an **upper bound on a finite stacked-logit move**. It is neither
+an observed move nor a lower bound on progress. The observer declaration's `1/16` is
+**code bits per cell**; its source implements that tolerance as the base-two exponent's
+cell width through `grain_of -> ReceivingRead::of_logits -> GrainCell::of`. The saved
+v79 boundary has the same fixed producing forward as v80. Exact reconstruction of all four
+real logits as `carry+phase/16+fibre` verifies that finite unit join, rather than assuming it.
+The [saved-cell account](receipts/hnn-resident-conformance-20261007/contact-tolerance-v5/EXACT_RECEIVING_CELL_ACCOUNT.v79-v80.json)
+gives the minimum distance to a real cell edge in `[2^-7,2^-6)`, with its ratio to the current
+finite logit bound in `[2^9,2^10)`. Conditional on that ray bound, no real cell changes
+(`HNN/Ratio.face_constant_on_fibre`). The imaginary logit's half remains a separate phase
+reading, so this is no full-ratio, physical-output or all-future constancy claim. Nor can
+the bound be held fixed while eta is enlarged: `certify_steps` rereads it at the new ray.
+
+[decision; agent-inferred] Do not treat this release as outward physical work, or as affirmed
+extinction of information. It is the existing arithmetic coefficient residual. To affirm
+extinction, [the elementary object's contraction law](../../docs/ELEMENTARY_OBJECTS.md#affirming-extinction)
+requires a common invariant chart, a contraction bound for every admitted navigator word,
+and receiver support/gain in that chart. `Constitution::certify_steps` instead computes gains
+for one finite `Reach` at the ends of the current joint ray, including the changing receiving
+map, contrast amplitude, source entries, station ticks and Floquet span factors. Factor
+coefficients enter `C=FF^T`, the contact solve and held-current transport. A scalar reading
+gain cannot be substituted for that factor/product/metric contract.
+
+The conditional tolerance law is useful and exact: **if** the same admitted future family has
+a certified coefficient-to-receiver infinity-norm gain `K`, in the receiver's unit, choose
+`k_m>=gamma_length(m)` such that
+
+`K*2^(-L-k_m-1) <= epsilon*2^(-gamma_length(m))`.
+
+Then the total effect of the released coefficients on each receiver is at most
+`epsilon*sum_m 2^(-gamma_length(m)) < epsilon`. For arrays this needs the actual norm and
+dimension/product conversion; for changing constitutions and futures it needs the same
+family certificate or an explicit transported sensitivity at the later read. Neither a
+different local gain at each deposition nor a present score comparison supplies that
+certificate. The actual observer refuses nonpositive tolerance; a mathematical tolerance-zero
+future additionally requires exact retention or a proved zero gain,
+not a positive error budget. The all-future join remains #62.
+
+[prepared proposal withheld] A common dyadic carry resolved at the certificate's 64-bit
+significant arithmetic face was inspected, then withheld before compilation or commitment.
+That face sizes the certificate's arithmetic products; it is not a declared receiver
+quantity. The rule could preserve the lost coefficient direction, but it would not make
+the physical forward read it, establish extinction, or satisfy the unchanged storage/output
+gate. No material unit, eta, target, seed, mask, fixture or acceptance was tuned. An exact
+rational aggregate and a finer dyadic aggregate are both quotient candidates; their
+denominator/bit cost and future sensitivity must be justified rather than assuming a record
+of observations.
+
+[causal repair contract, pending consumer] The existing contact consumer is
+`PhysicalReceiver::communicate_contact -> same Word::compare_contact_storage ->
+Constitution::deposited -> ContactCut::continue_deposited -> Resident::publish_reception`.
+A tolerance-sized trial belongs at this actual comparison/constitution join: its candidate
+must consume the producing source, clock, chart, decoder and held current; use the actual
+finite `dC=dF F^T+F dF^T+dF dF^T`; and report both the declared comparison and the physical
+work/storage balance. Exact evaluation of a station score by itself does not certify this
+energy/state contract, a whole nonlinear ray, or future release. Until that consumer is
+derived, the certified eta is not enlarged and the original failed gate is not replayed.
+The source explicitly limits its score certificate to Gauss–Newton curvature: coupled
+material/receiving maps, factor second derivatives and differentiated resolvents still owe
+the full nonlinear score statement in #62. The bound above does not discharge that debt.
+The existing `vanished` description now explicitly excludes absent/held steps and
+distinguishes physical coordinates from applied normal statistics.
+
+[resource receipt] The causal native unit used wall time
+`575374647 ns = 3*23*8338763 ns`, CPU time
+`509408000 ns = 2^8*5^3*15919 ns`, and group peak
+`22728704 bytes = 2^12*31*179 bytes`, under its unchanged `16000000000 ns` guard.
+All memory-event deltas were zero and its lease was released. The v80 queue account charges
+six preparation/check/native stages with total CPU `91098018000 ns` and wall
+`64497069504 ns`; its cumulative HNN guard/native account names 107 jobs with CPU
+`1080862756000 ns` and wall `826608852454 ns`. Formal and other campaigns are separate.
+These are costs, not a useful-learning result. No new execution is needed to recover the
+already printed gain.
+
+[reference lesson, read-only] The pinned
+[integer-multiplication audit](https://github.com/CrocSwap/integer-mult-bounds/blob/bcd4ebde8692383539f8a48734e5fbf3a18a32c2/docs/audit.md)
+is conditional, rather than an implemented multiplication machine or a learning receipt. Its
+[swap analysis](https://github.com/CrocSwap/integer-mult-bounds/blob/bcd4ebde8692383539f8a48734e5fbf3a18a32c2/upstream/build/sections/04-swap.tex)
+charges actual active volume, parking and restoration rather than counting only intermediate
+roles. Its
+[assembly](https://github.com/CrocSwap/integer-mult-bounds/blob/bcd4ebde8692383539f8a48734e5fbf3a18a32c2/upstream/build/sections/08-assembly.tex)
+has an explicit final integer recovery identity and precision condition. The transferable
+lesson is to charge actual representation, restoration and precision at the consuming
+receiver. That multiplication recovery does not certify an HNN future kernel, physical
+learning, or useful compression; no reference code was executed.

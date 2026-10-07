@@ -399,7 +399,14 @@
 //! value releases at most once per entry. [open] The counterfactual bound (how far the carried
 //! trajectory is from the one whose updates are computed at never-rounded operands) is
 //! `Objects/CommitRebase`'s `commit_chain_residual`, `Σ K^(n−1−i) r_i`, and needs a Lipschitz bound
-//! `K` of the deposit map, which is owed. Brandon may override this choice.
+//! `K` of the deposit map, which is owed. [measured, October 7] The fixed contact observation
+//! certified a positive step but released every factor displacement, while only its normal
+//! statistic moved (record `2026-10-07_ONE_CURRENT_REACHES_THE_CONTACT_RETURN_AND_THE_RECEIVING_BOUNDARY`).
+//! This release is a coefficient representation residual, not physical heat/work and not an
+//! affirmed extinction at receiver tolerance. A finite Reach's squared power gain does not supply
+//! the common invariant chart and all-word contraction required by the extinction law; the
+//! coefficient-to-receiver norm, unit and admitted-future join remains owed in #62.
+//! Brandon may override this choice.
 //!
 //! A [`NormalLaw`] keeps `W` and its Gram `H` of the locus's own width (no global Gram), each
 //! carried, and the **solved chart** `X̂ ≈ H⁻¹` of the carried Gram (the lattice word, Lean
@@ -3290,8 +3297,10 @@ pub struct DepositReading {
     /// **The rounding refusals**: every family certified at a step `η > 0` none of whose entries
     /// took a nonzero lattice coordinate, so its constitution did not change at this deposit. Its
     /// move is released below the fine lattice or carried as a remainder below the coarse one
-    /// ([`Constitution::carried_remainders`] says which); it is not necessarily lost. A reached
-    /// family either moves or is named here.
+    /// ([`Constitution::carried_remainders`] says which); it is not necessarily lost. Only a
+    /// positively certified family either moves material coordinates or is named here: a reached
+    /// family with no admitted step is outside this list. The aggregate `stepped` count includes
+    /// applied normal statistics and does not witness a physical factor or storage move.
     pub vanished: Vec<(Locus, Family)>,
     pub charts: Vec<(Locus, ChartReading)>,
     pub landmarks: u64,

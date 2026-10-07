@@ -1,0 +1,1 @@
+Fresh causal diagnostic passed; its exact reached-return/statistic/factor/remainder and producer/current account is retained in full stdout. Original complete-contact material gate remains failed; no old selector replay, fixture substitution, six remaining controls, notebook/CUDA check, acquired-output or scientific result follows. Every lease released under unchanged limits.

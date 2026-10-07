@@ -1,0 +1,56 @@
+{
+  "grade": "EXACT_SAVED_BOUNDARY_ARITHMETIC; NO REEXECUTION",
+  "boundary_source_commit": "2fc219bb81f51e1f73dee8301f9427bfe39678d0",
+  "certificate_source_commit": "e3ad0f6b4c58d5296a6417e92d3abcac7fcd6588",
+  "same_fixed_producing_forward_equations_and_fixture": true,
+  "station": 2,
+  "grain": 16,
+  "unit_join": [
+    {
+      "class": 0,
+      "real_logit": "-58806685895180447645046747253499720476218927987341431/137717747752232721907668385587869335877848802799576008",
+      "carry": -1,
+      "phase": 9,
+      "fibre": "2889657492842736379116342882386227940679846474946145/275435495504465443815336771175738671755697605599152016",
+      "reconstruction_equals_real_logit": true
+    },
+    {
+      "class": 1,
+      "real_logit": "161834422369983762966866133849550026094174408437942529/275435495504465443815336771175738671755697605599152016",
+      "carry": 0,
+      "phase": 9,
+      "fibre": "431372259295121926296200003949813951974656580526220/17214718469029090238458548198483666984731100349947001",
+      "reconstruction_equals_real_logit": true
+    },
+    {
+      "class": 2,
+      "real_logit": "-27253772230216360673168243142354960529193956754024553/34429436938058180476917096396967333969462200699894002",
+      "carry": -1,
+      "phase": 3,
+      "fibre": "5761162255647287714615181441447986567952650517114589/275435495504465443815336771175738671755697605599152016",
+      "reconstruction_equals_real_logit": true
+    },
+    {
+      "class": 3,
+      "real_logit": "57809645143722905153605495514447195975305687602993895/68858873876116360953834192793934667938924401399788004",
+      "carry": 0,
+      "phase": 13,
+      "fibre": "7447240477513447514460855477501113099718445862664567/275435495504465443815336771175738671755697605599152016",
+      "reconstruction_equals_real_logit": true
+    }
+  ],
+  "minimum_real_cell_edge_distance": "2889657492842736379116342882386227940679846474946145/275435495504465443815336771175738671755697605599152016",
+  "finite_logit_bound": "3892343875/281474976710656",
+  "bound_below_every_real_cell_edge": true,
+  "margin_to_bound": "1452439777678003266642405675472746606711529310055228110119370752/1914445828364993045328183414907433870730223341975044740484825",
+  "margin_enclosure_exponents": [
+    9,
+    10
+  ],
+  "minimum_cell_edge_enclosure_exponents": [
+    -7,
+    -6
+  ],
+  "scope": "conditional on existing finite-Reach ray bound; magnitude grain face constant only; phase comparison, full nonlinear score, physical energy and all-future material sensitivity not certified",
+  "new_trial_or_audible_eta_not_authorized_by_this_bound": true
+}

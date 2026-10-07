@@ -1,0 +1,83 @@
+{
+  "grade": "EXACT_ARITHMETIC_ON_SAVED_RECEIPT; NO NEW EXECUTION",
+  "native_source_commit": "e3ad0f6b4c58d5296a6417e92d3abcac7fcd6588",
+  "saved_stdout": {
+    "bytes": 17971,
+    "sha256": "c36bd01742bd85e0cbff4b9072092394401e9c8cd1227d43e21b59eb7a446fd9"
+  },
+  "family": "Channel(0), Factor(0)",
+  "observed_exact_scalars": {
+    "step": "1/33554432",
+    "alignment": "1614380841378676119/295147905179352825856",
+    "curvature": "14988559530088228568902629166675209796679287882204762917695007799368313986802264142719753097302259747692597344916668164646471763341974264979742074422669402506322552179823596580365994849256355125/139234637988958594318883410818490335842688858253435056475195084164406590796163250320615014993816265862385324388842602762167013693889631286567769205313788274787963704661873320009853338386432",
+    "covector": "10121651328803995987/147573952589676412928",
+    "gain": "352533375297235703879131459562728496357797387783128399712713996507419392286003475/904625697166532776746648320380374280103671755200316906558262375061821325312",
+    "moves": "42516710701364783226430878580580688477348737567793362729976829650928817124205006200157664415925636614722287219095/76957043352332967211482500195592995713046365762627825523336510555167425334955489475418488779072100860950445293568",
+    "bound": "3892343875/8388608",
+    "readout": "22098198002265970209/1152921504606846976",
+    "amplitude": "311/32"
+  },
+  "exact_checks": {
+    "eta_curvature_le_alignment": true,
+    "eta_covector_le_one": true,
+    "bound_squared_ge_gain_times_moves": true,
+    "curvature_equals_half_gain_moves": true
+  },
+  "half_open_power_two_enclosures": {
+    "step": {
+      "lower_exponent": -25,
+      "upper_exponent": -24
+    },
+    "alignment": {
+      "lower_exponent": -8,
+      "upper_exponent": -7
+    },
+    "curvature": {
+      "lower_exponent": 16,
+      "upper_exponent": 17
+    },
+    "covector": {
+      "lower_exponent": -4,
+      "upper_exponent": -3
+    },
+    "gain": {
+      "lower_exponent": 18,
+      "upper_exponent": 19
+    },
+    "moves": {
+      "lower_exponent": -1,
+      "upper_exponent": 0
+    },
+    "bound": {
+      "lower_exponent": 8,
+      "upper_exponent": 9
+    },
+    "readout": {
+      "lower_exponent": 4,
+      "upper_exponent": 5
+    },
+    "amplitude": {
+      "lower_exponent": 3,
+      "upper_exponent": 4
+    }
+  },
+  "finite_joint_logit_move_bound": "3892343875/281474976710656",
+  "finite_joint_logit_move_bound_enclosure": {
+    "lower_exponent": -17,
+    "upper_exponent": -16
+  },
+  "nonzero_factor_displacements_released": 36,
+  "largest_factor_displacement_enclosure": {
+    "lower_exponent": -31,
+    "upper_exponent": -30
+  },
+  "receiver_declared_tolerance": {
+    "value": "1/16",
+    "unit": "code bits per cell"
+  },
+  "gain_scope": "squared l2 power bound for actual finite Reach / whole proposed ray; not an all-word infinity-norm constitution-to-receiver sensitivity",
+  "actual_F_C_finite_work_movement": "0",
+  "no_future_extinction_or_useful_learning_credit": true,
+  "finite_unit_join": "grain_of -> ReceivingRead::of_logits -> GrainCell::of; all four saved real logits reconstructed exactly at grain16 in EXACT_RECEIVING_CELL_ACCOUNT.v79-v80.json",
+  "no_global_or_phase_tolerance_claim": true
+}
