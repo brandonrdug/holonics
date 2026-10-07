@@ -19,7 +19,7 @@
 //! comparison changes the contemporary constitution; the next request consumes it and the
 //! actual carry. Neither the request nor Word is retained by the resident.
 
-use super::{PhysicalObservation, PhysicalPublication, PhysicalResident};
+use super::{PhysicalObservation, PhysicalPublication, PhysicalReceiver};
 use crate::hnn::HnnError;
 use crate::hnn::encoding::Encoded;
 use crate::hnn::field::{FieldMaterial, ReceiverDeclaration};
@@ -47,7 +47,7 @@ pub struct PhysicalBoundary {
 }
 
 impl PhysicalBoundary {
-    fn of_suffix(
+    pub(super) fn of_suffix(
         prediction: &PhysicalRepair,
         chart: Encoded,
         first: usize,
@@ -179,7 +179,7 @@ impl PhysicalCommunication {
     }
 }
 
-impl PhysicalResident<'_> {
+impl PhysicalReceiver<'_> {
     /// An intact request drives the same native field and releases its whole requested complex
     /// boundary. `receiver.aperture` contains the prefix followed by the future section; source
     /// and receiving axes use the existing admitted identity/station clock. No target is an input
@@ -234,7 +234,7 @@ impl PhysicalResident<'_> {
         // finite phase-section admission bars that wrap; it is not source-map injectivity.
         let span = u64::try_from(aperture).map_err(|_| HnnError::CountOverflow)?;
         for &ring in self.field.sources() {
-            if self.constitution.transport(ring).is_one() && span > self.field.ring(ring).period() {
+            if self.resident.constitution().transport(ring).is_one() && span > self.field.ring(ring).period() {
                 return Err(HnnError::Unadmitted {
                     reason: "a unit-source communication aperture exceeds its producing phase period",
                 });

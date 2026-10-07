@@ -6,7 +6,7 @@ use crate::hnn::constitution::{CAMPAIGN_ONE_BUDGET, Constitution};
 use crate::hnn::field::{CribDeclaration, Current, Field, FieldDeclaration, FieldMaterial, ReceiverDeclaration};
 use crate::hnn::moment::SourceMoment;
 use crate::hnn::prediction::{DamagedSection, RepairedCell, repair_by_field};
-use crate::hnn::prediction::charted::{ChartedPhysicalPublication, ChartedPhysicalResident, ChartedTolerance};
+use crate::hnn::prediction::charted::{ChartedPhysicalPublication, ChartedPhysicalReceiver, ChartedTolerance};
 use crate::hnn::ratio::{Faces, HolonRatio, RatioCovector, target_phases};
 use crate::hnn::receiving::ReceivingPhases;
 use crate::hnn::retention::Diamond;
@@ -44,6 +44,50 @@ fn positive(change:&EndChange)->bool {
     change.storage.iter().flatten().chain(change.arrivals.iter().flatten().flatten())
         .chain(change.states.iter().flatten().flatten()).chain(change.resonators.iter().flatten().flatten().flatten())
         .any(|x|!x.is_zero())
+}
+
+#[test]
+fn a_shared_charted_enclosure_survives_view_changes_and_bars_unsupported_futures() {
+    use crate::hnn::physical::PhysicalReceiver;
+    use crate::hnn::port::ExecutionPort;
+    use crate::hnn::reference::Reference;
+    let field = field();
+    let mut view = ChartedPhysicalReceiver::new(&field, material(&field, false),
+        Current::at_rest(&field), WordOpening::Rest, tolerance()).unwrap();
+    let observed = encoded(&field, &[0, 1, 2]);
+    let section = DamagedSection::damage(&observed, &[2]).unwrap();
+    let first = view.receive(&section, &receiver(), |_| None).unwrap();
+    assert!(first.prediction.closes());
+    let mut common = view.into_resident();
+    let theta = common.constitution().clone();
+    let current = common.current().clone();
+    let carry = common.carried().unwrap().clone();
+    let enclosure = common.carry_error().unwrap().clone();
+    let charts = common.charts().clone();
+    let bits = common.state_bits();
+    assert!(positive(&enclosure));
+    assert!(common.publish_reception(None,
+        crate::holon::HolonState::at(carry.clone(), theta.commit()), None, None, section.chart()).is_err(),
+        "the common publication owner itself bars a forgotten enclosure");
+    assert!(Reference::campaign_one().ingest(&mut common, None, &observed).is_err());
+    assert!(common.refine_contact_grain(1).is_err());
+    assert!(common.continuing_state(0).is_err());
+    assert_eq!(common.constitution(), &theta);
+    assert_eq!(common.current(), &current);
+    assert_eq!(common.carried(), Some(&carry));
+    assert_eq!(common.carry_error(), Some(&enclosure));
+    assert_eq!(common.state_bits(), bits);
+    let mut exact = PhysicalReceiver::from_resident(&field, common).unwrap();
+    assert!(exact.receive(&section, &receiver(), |_| panic!("unsupported error transport precedes native execution")).is_err());
+    let common = exact.into_resident();
+    assert_eq!(common.carried(), Some(&carry));
+    assert_eq!(common.carry_error(), Some(&enclosure));
+    assert_eq!(common.charts().bits(), charts.bits());
+    let mut view = ChartedPhysicalReceiver::from_resident(&field, common, tolerance()).unwrap();
+    let next = view.receive(&section, &receiver(), |_| None).unwrap();
+    assert!(next.prediction.closes());
+    assert_eq!(next.prediction.physical.carry.ticks, carry.ticks + 2);
+    assert_eq!(view.carry_error(), Some(&next.prediction.error.end));
 }
 
 fn contains(actual:&EndChange,exact:&EndChange,radius:&EndChange) {
@@ -113,7 +157,7 @@ fn charted_source_and_carry_error_enclose_the_same_exact_physical_passage() {
     let field=field();let theta=material(&field,true);let current=Current::at_rest(&field);
     let observed=encoded(&field,&[0,1,2]);let damaged=DamagedSection::damage(&observed,&[2]).unwrap();
     let phases=ReceivingPhases::declare(&field,&theta,&current,&receiver()).unwrap();
-    let mut resident=ChartedPhysicalResident::new(&field,theta.clone(),current.clone(),WordOpening::Rest,tolerance()).unwrap();
+    let mut resident=ChartedPhysicalReceiver::new(&field,theta.clone(),current.clone(),WordOpening::Rest,tolerance()).unwrap();
     let first=resident.receive(&damaged,&receiver(),|blind| {
         println!("charted blind input [0,1,missing] output {:?} reads {:?}",blind.cells,blind.reads);
         None
@@ -149,7 +193,7 @@ fn charted_receiving_learning_charges_both_covectors_and_keeps_its_physical_carr
     let observed=encoded(&field,&[0,1,2]);let damaged=DamagedSection::damage(&observed,&[2]).unwrap();
     let exact_first=exact_comparison(&field,&theta,&current,&damaged,&WordOpening::Rest,&observed);
     let source=theta.source_port(0).unwrap().clone();
-    let mut resident=ChartedPhysicalResident::new(&field,theta.clone(),current.clone(),WordOpening::Rest,tolerance()).unwrap();
+    let mut resident=ChartedPhysicalReceiver::new(&field,theta.clone(),current.clone(),WordOpening::Rest,tolerance()).unwrap();
     let first=resident.receive(&damaged,&receiver(),|blind| {
         println!("charted before teaching input [0,1,missing] whole output {:?} reads {:?}",blind.cells,blind.reads);
         Some((observed,vec![false,false,true]))
@@ -191,7 +235,7 @@ fn charted_zero_tolerance_refuses_the_actual_opening_error_and_retains_the_blind
     let field=field();let theta=material(&field,false);let current=Current::at_rest(&field);
     let observed=encoded(&field,&[0,1,2]);let damaged=DamagedSection::damage(&observed,&[2]).unwrap();
     let zero=ChartedTolerance {logits:Rat::zero(),receiving_covector:Rat::zero(),source_covector:Rat::zero()};
-    let mut resident=ChartedPhysicalResident::new(&field,theta.clone(),current,WordOpening::Rest,zero).unwrap();
+    let mut resident=ChartedPhysicalReceiver::new(&field,theta.clone(),current,WordOpening::Rest,zero).unwrap();
     let reception=resident.receive(&damaged,&receiver(),|blind| {
         println!("charted zero-tolerance blind whole output {:?}",blind.cells);
         Some((observed,vec![false,false,true]))
@@ -201,7 +245,7 @@ fn charted_zero_tolerance_refuses_the_actual_opening_error_and_retains_the_blind
     assert!(positive(&reception.prediction.error.opening.error));
     assert_eq!(resident.carry_error(),Some(&reception.prediction.error.end));
     let WordOpening::Received {carry,..}=resident.opening() else {panic!("a refusal retains its actual physical end")};
-    assert_eq!(carry,&reception.prediction.physical.carry);
+    assert_eq!(carry,reception.prediction.physical.carry);
     println!("unit zero-tolerance refusal completed elapsed_ms={}",started.elapsed().as_millis());
 }
 
@@ -214,7 +258,7 @@ fn charted_loaded_pump_error_keeps_the_absolute_clock_across_the_carry() {
     let phases=ReceivingPhases::declare(&field,&theta,&current,&receiver()).unwrap();
     let exact=repair_by_field(&field,&theta,&current,&damaged,&WordOpening::Rest,&phases).unwrap();
     let opening=WordOpening::Received {carry:exact.carry.clone(),absorption:Absorption::Nothing};
-    let mut resident=ChartedPhysicalResident::new(&field,theta.clone(),current.clone(),opening.clone(),tolerance()).unwrap();
+    let mut resident=ChartedPhysicalReceiver::new(&field,theta.clone(),current.clone(),opening.clone(),tolerance()).unwrap();
     let charted=resident.receive(&damaged,&receiver(),|_|None).unwrap();
     let continued=repair_by_field(&field,&theta,&current,&damaged,&opening,&phases).unwrap();
     contains(&charted.prediction.physical.carry.change,&continued.carry.change,&charted.prediction.error.end);
@@ -263,7 +307,7 @@ fn charted_physical_balance_consumes_its_actual_opening_split() {
         &WordOpening::Rest, &phases).unwrap().finish();
     assert!(exact.opening.closes() && exact.word.closes());
     assert!(exact.balances.iter().all(|balance| balance.closes()));
-    let mut resident = ChartedPhysicalResident::new(&field, theta, current,
+    let mut resident = ChartedPhysicalReceiver::new(&field, theta, current,
         WordOpening::Rest, tolerance()).unwrap();
     let prediction = resident.receive(&damaged, &receiver(), |_| None).unwrap().prediction;
     let split = prediction.error.opening.split.clone();

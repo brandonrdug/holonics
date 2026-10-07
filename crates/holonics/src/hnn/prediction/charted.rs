@@ -19,6 +19,8 @@ use super::*;
 use crate::hnn::chart::{ChartReading, Charts, Remainders};
 use crate::hnn::constitution::{Constitution, LinearLocus, Locus, Reach};
 use crate::hnn::field::ReceiverDeclaration;
+use crate::hnn::reference::{Reference, Resident};
+use crate::holon::HolonState;
 use crate::hnn::port::{Deposit, WordReturn};
 use crate::hnn::propagation::{Junction, Operands};
 use crate::hnn::ratio::{Faces, HolonRatio, RatioCovector, target_phases};
@@ -235,47 +237,47 @@ impl ChartedPhysicalPrediction<'_, '_> {
 /// A resident of the actual physical field and its present error box. R-only publication keeps
 /// every carry-crossing material/reference fixed, so this box crosses by the identity; imposed
 /// source storage is replaced. A caller-supplied first opening is a declared exact initial state.
-pub struct ChartedPhysicalResident<'f> {
+pub struct ChartedPhysicalReceiver<'f> {
     field: &'f Field,
-    constitution: Constitution,
-    current: Current,
-    opening: WordOpening,
-    bound: Option<EndChange>,
-    charts: Charts,
-    chart: Option<Encoded>,
+    resident: Resident,
     tolerance: ChartedTolerance,
     declaring: DeclaringFace<'f>,
 }
 
-impl<'f> ChartedPhysicalResident<'f> {
+impl<'f> ChartedPhysicalReceiver<'f> {
     pub fn new(field: &'f Field, constitution: Constitution, current: Current,
         opening: WordOpening, tolerance: ChartedTolerance) -> Result<Self, HnnError> {
+        Self::from_resident(field,
+            Reference::mount_receiving(field, &current, constitution, opening)?, tolerance)
+    }
+    pub fn from_resident(field: &'f Field, resident: Resident,
+        tolerance: ChartedTolerance) -> Result<Self, HnnError> {
+        resident.admit_receiving_view(field)?;
         tolerance.admit()?;
         if field.word_lattice().is_none() {
-            return Err(HnnError::Unadmitted { reason: "the charted physical resident has no declared Word lattice" });
+            return Err(HnnError::Unadmitted { reason: "the charted receiving view has no declared Word lattice" });
         }
-        Ok(Self { field, constitution, current, opening, bound: None,
-            charts: Charts::new(), chart: None, tolerance, declaring: DeclaringFace::new(field) })
+        Ok(Self { field, resident, tolerance, declaring: DeclaringFace::new(field) })
     }
-    pub fn constitution(&self) -> &Constitution { &self.constitution }
-    pub fn opening(&self) -> &WordOpening { &self.opening }
-    pub fn carry_error(&self) -> Option<&EndChange> { self.bound.as_ref() }
-    pub fn charts(&self) -> &Charts { &self.charts }
+    pub fn constitution(&self) -> &Constitution { self.resident.constitution() }
+    pub fn opening(&self) -> WordOpening { self.resident.reception_opening() }
+    pub fn carry_error(&self) -> Option<&EndChange> { self.resident.carry_error() }
+    pub fn charts(&self) -> &Charts { self.resident.charts() }
+    pub fn into_resident(self) -> Resident { self.resident }
 
     pub fn receive(&mut self, section: &DamagedSection, receiver: &ReceiverDeclaration,
         observation: impl FnOnce(&PhysicalRepair) -> Option<(Encoded, Vec<bool>)>,
     ) -> Result<ChartedPhysicalReception, HnnError> {
-        if self.chart.as_ref().is_some_and(|chart| chart != section.chart()) {
-            return Err(HnnError::Unadmitted { reason: "the charted resident's producing source chart changed" });
-        }
-        let (phases, declaring_face_reused) = self.declaring.declare(&self.constitution, &self.current, receiver)?;
-        let mut charts = self.charts.clone();
-        let pending = predict(self.field, &self.constitution, &self.current, section,
-            &self.opening, self.bound.as_ref(), &phases, &mut charts)?;
+        self.resident.admit_receiving_chart(section.chart())?;
+        let opening = self.resident.reception_opening();
+        let (phases, declaring_face_reused) = self.declaring.declare(self.resident.constitution(), self.resident.current(), receiver)?;
+        let mut charts = self.resident.reception_charts();
+        let pending = predict(self.field, self.resident.constitution(), self.resident.current(), section,
+            &opening, self.resident.carry_error(), &phases, &mut charts)?;
         let forward_error = pending.error.clone();
-        let (prediction, comparison, successor) = match observation(pending.prediction()) {
+        let (prediction, mut comparison, successor) = match observation(pending.prediction()) {
             None => (pending.finish(), Ok(None), None),
-            Some((observed, compared)) => match pending.observe(&self.constitution, &observed, &compared, &self.tolerance) {
+            Some((observed, compared)) => match pending.observe(self.resident.constitution(), &observed, &compared, &self.tolerance) {
                 Ok(publication) => {
                     let successor = publication.teaching.constitution.clone();
                     let prediction = ChartedPhysicalRepair { physical: publication.teaching.prediction.clone(), error: forward_error };
@@ -284,11 +286,16 @@ impl<'f> ChartedPhysicalResident<'f> {
                 Err((prediction, error)) => (prediction, Err(error), None),
             },
         };
-        if let Some(successor) = successor { self.constitution = successor; }
-        self.opening = WordOpening::Received { carry: prediction.physical.carry.clone(), absorption: Absorption::Nothing };
-        self.bound = Some(prediction.error.end.clone());
-        self.chart = Some(section.chart().clone());
-        self.charts = charts;
+        let commit = successor.as_ref().unwrap_or_else(|| self.resident.constitution()).commit();
+        if let Err(error) = self.resident.publish_reception(successor,
+            HolonState::at(prediction.physical.carry.clone(), commit), Some(charts.clone()),
+            Some(prediction.error.end.clone()), section.chart()) {
+            comparison = Err(error);
+            let commit = self.resident.constitution().commit();
+            self.resident.publish_reception(None,
+                HolonState::at(prediction.physical.carry.clone(), commit), Some(charts),
+                Some(prediction.error.end.clone()), section.chart())?;
+        }
         Ok(ChartedPhysicalReception { prediction, comparison, declaring_face_reused })
     }
 }

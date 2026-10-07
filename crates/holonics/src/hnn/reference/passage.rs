@@ -19,6 +19,10 @@ impl Resident {
     /// Save between windows, refusing open pending/staged handles, stopped deposition and
     /// multiple open moments. A passage is retained even when no moment is open.
     pub fn continuing_state(&self, ring: usize) -> Result<ContinuingState, HnnError> {
+        self.admit_exact_current()?;
+        if self.receiving_chart.is_some() {
+            return refused("a receiving codec chart whose passage serialization is not admitted");
+        }
         if !self.pending.is_empty() || !self.staged.is_empty() {
             return refused("a resident with an open pending ratio or staged deposit");
         }

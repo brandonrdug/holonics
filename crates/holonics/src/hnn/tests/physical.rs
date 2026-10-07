@@ -6,7 +6,7 @@ use crate::hnn::constitution::{CAMPAIGN_ONE_BUDGET, Constitution};
 use crate::hnn::field::{
     ConstitutionRead, CribDeclaration, Current, Field, FieldDeclaration, ReceiverDeclaration,
 };
-use crate::hnn::physical::{PhysicalLearning, PhysicalObservation, PhysicalResident};
+use crate::hnn::physical::{PhysicalLearning, PhysicalObservation, PhysicalReceiver};
 use crate::hnn::prediction::{DamagedSection, RepairedCell, repair_by_field};
 use crate::hnn::receiving::ReceivingPhases;
 use crate::hnn::word::WordOpening;
@@ -577,7 +577,7 @@ fn four_station_pair_coordinate_retains_carry_and_has_a_matched_source_dependent
     let current = Current::at_rest(&field);
     let receiving = receiver(4);
     let material = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap();
-    let mut resident = PhysicalResident::new(&field, material, current.clone(), WordOpening::Rest);
+    let mut resident = PhysicalReceiver::new(&field, material, current.clone(), WordOpening::Rest).expect("admitted common resident");
     let teaching = KnownTruth::cyclic_class_orbit(CyclicLaw::OrderTwo { opening: 2 }, 4, 20261006001, 4).unwrap();
     let mut last = None;
     for observed in Encoded::identity(&teaching, &field).unwrap() {
@@ -654,7 +654,7 @@ fn four_station_sparse_pair_return_at_nonzero_source_phase_matches_its_applied_d
     current.rekey(&field, 0, 2).unwrap();
     let receiving = receiver(4);
     let initial = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap();
-    let mut resident = PhysicalResident::new(&field, initial, current.clone(), WordOpening::Rest);
+    let mut resident = PhysicalReceiver::new(&field, initial, current.clone(), WordOpening::Rest).expect("admitted common resident");
     let teaching = KnownTruth::cyclic_class_orbit(CyclicLaw::OrderTwo { opening: 2 }, 4, 20261006001, 4).unwrap();
     let mut last = None;
     println!("nonzero-phase current consumer setup_ns={}; source_frame={current:?}", whole.elapsed().as_nanos());
@@ -798,7 +798,7 @@ fn the_resident_retains_the_learned_pair_and_reads_the_correlated_family_on_its_
     let initial = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap();
     let current = Current::at_rest(&field);
     let mut resident =
-        PhysicalResident::new(&field, initial.clone(), current.clone(), WordOpening::Rest);
+        PhysicalReceiver::new(&field, initial.clone(), current.clone(), WordOpening::Rest).expect("admitted common resident");
     // These three declared comparisons match the accepted bounded pair consumer. Each callback
     // sees the whole blind receipt before returning its observation; no output is installed.
     for cells in [[0, 2], [1, 1]] {
@@ -917,7 +917,7 @@ fn a_refused_resident_observation_keeps_material_and_carries_into_the_next_nativ
     let field = field();
     let initial = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap();
     let current = Current::at_rest(&field);
-    let mut resident = PhysicalResident::new(&field, initial.clone(), current, WordOpening::Rest);
+    let mut resident = PhysicalReceiver::new(&field, initial.clone(), current, WordOpening::Rest).expect("admitted common resident");
     let observed = encoded(&field, &[0, 2]);
     let damaged = DamagedSection::damage(&observed, &[1]).unwrap();
     let first = resident
@@ -942,7 +942,7 @@ fn a_refused_resident_observation_keeps_material_and_carries_into_the_next_nativ
     assert!(resident.read(&foreign, &receiver(2)).is_err());
     assert_eq!(
         resident.opening(),
-        &opening,
+        opening,
         "forward refusal executes no new reception"
     );
     assert_eq!(resident.constitution(), &initial);
@@ -962,9 +962,9 @@ fn the_resident_certifies_the_applied_source_return_at_its_carried_clock_and_non
         );
         let mut current = Current::at_rest(&field);
         current.rekey(&field, 0, 3).unwrap();
-        let mut resident = PhysicalResident::new(
+        let mut resident = PhysicalReceiver::new(
             &field, initial, current.clone(), WordOpening::Rest,
-        );
+        ).expect("admitted common resident");
         for cells in [[0, 2], [1, 1]] {
             let observed = encoded(&field, &cells);
             let damaged = DamagedSection::damage(&observed, &[1]).unwrap();

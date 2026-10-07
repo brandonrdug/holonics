@@ -1,0 +1,108 @@
+{
+  "grade": "SOURCE_PREPARED; TYPE/NATIVE/SIGNIFICANT-OUTPUT PENDING",
+  "base": "df7ce66d8372cacb5abfe0d6895305575505d9c4",
+  "owned_paths": [
+    "crates/holonics/src/hnn/physical.rs",
+    "crates/holonics/src/hnn/physical/communication.rs",
+    "crates/holonics/src/hnn/physical/contact.rs",
+    "crates/holonics/src/hnn/prediction.rs",
+    "crates/holonics/src/hnn/prediction/charted.rs",
+    "crates/holonics/src/hnn/reference.rs",
+    "crates/holonics/src/hnn/reference/interaction.rs",
+    "crates/holonics/src/hnn/reference/passage.rs",
+    "crates/holonics/src/hnn/tests/physical.rs",
+    "crates/holonics/src/hnn/tests/physical_charted.rs",
+    "crates/holonics/src/hnn/tests/physical_communication.rs",
+    "docs/atlas/objects.tsv",
+    "research/notebook/hnn_design/hnn_physical_receive.rs",
+    "research/records/2026-10-07_ONE_CURRENT_REACHES_THE_CONTACT_RETURN_AND_THE_RECEIVING_BOUNDARY.md"
+  ],
+  "native_source_inputs": {
+    "crates/holonics/src/hnn/physical.rs": {
+      "bytes": 12504,
+      "sha256": "44412aeb0d9597a00a31acb55e71fde493988e57d974288596e51ad3a09dfacc"
+    },
+    "crates/holonics/src/hnn/physical/communication.rs": {
+      "bytes": 17199,
+      "sha256": "5e24a891bf2e7cde6a5f6072ef6a420704da72e0c13ffb68b292f2e47e443b4c"
+    },
+    "crates/holonics/src/hnn/physical/contact.rs": {
+      "bytes": 9159,
+      "sha256": "aa92deb9dba93317c6ed83242884e34f1dbb85f6f926201b27ef70db5fbd2a74"
+    },
+    "crates/holonics/src/hnn/prediction.rs": {
+      "bytes": 198272,
+      "sha256": "5ae16d2519ef4d0ed4558e3d210e0db7245716bcafad4c9d1f13b935d177f0a8"
+    },
+    "crates/holonics/src/hnn/prediction/charted.rs": {
+      "bytes": 50604,
+      "sha256": "3ab52894893cc886733687e466053edf856ac78706982bc68cb5e32d55a07f8d"
+    },
+    "crates/holonics/src/hnn/reference.rs": {
+      "bytes": 221923,
+      "sha256": "445ed9efcb9beb085236f2a5d4565188684918ac42d7ad7ae5e2e68fae3cfb10"
+    },
+    "crates/holonics/src/hnn/reference/interaction.rs": {
+      "bytes": 8215,
+      "sha256": "77ffa0dd50ade006d0f66bae533d487fa10906ced6adc727b6ec6d13202421aa"
+    },
+    "crates/holonics/src/hnn/reference/passage.rs": {
+      "bytes": 13029,
+      "sha256": "ceea35f639d22f1b05587a1b38ff08c3193f209782e22363e1a886a2ec5000d7"
+    },
+    "crates/holonics/src/hnn/tests/physical.rs": {
+      "bytes": 48917,
+      "sha256": "895df8ea4ec14d0a665e0b3b42bc7a4dcaa005b2f9b032a6767305297d2e8128"
+    },
+    "crates/holonics/src/hnn/tests/physical_charted.rs": {
+      "bytes": 21568,
+      "sha256": "c5eb98795e16a1fe15e73e4cedd71f678bbde2c197856c770d6d082bf1a81f8d"
+    },
+    "crates/holonics/src/hnn/tests/physical_communication.rs": {
+      "bytes": 27327,
+      "sha256": "d43e7dd673df7363555e449b1a1c6dd86b42299cf19efa433294fbf30ba973d3"
+    },
+    "research/notebook/hnn_design/hnn_physical_receive.rs": {
+      "bytes": 108089,
+      "sha256": "f7dc212d58c9d91bafe191e5d0da9555ab4f50f26caaa248d9448b8949687bb4"
+    }
+  },
+  "syntax_only": {
+    "argv": [
+      "rustfmt",
+      "--edition",
+      "2024",
+      "--emit",
+      "stdout",
+      "--config",
+      "skip_children=true",
+      "crates/holonics/src/hnn/physical.rs",
+      "crates/holonics/src/hnn/physical/communication.rs",
+      "crates/holonics/src/hnn/physical/contact.rs",
+      "crates/holonics/src/hnn/prediction.rs",
+      "crates/holonics/src/hnn/prediction/charted.rs",
+      "crates/holonics/src/hnn/reference.rs",
+      "crates/holonics/src/hnn/reference/interaction.rs",
+      "crates/holonics/src/hnn/reference/passage.rs",
+      "crates/holonics/src/hnn/tests/physical.rs",
+      "crates/holonics/src/hnn/tests/physical_charted.rs",
+      "crates/holonics/src/hnn/tests/physical_communication.rs",
+      "research/notebook/hnn_design/hnn_physical_receive.rs"
+    ],
+    "exit": 0,
+    "wall_ns": 239135015,
+    "peak_resident_bytes": 46718976,
+    "stderr": "",
+    "source_writes": false
+  },
+  "diff_check": {
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "native_or_type_executed": false,
+  "scientific_job": false,
+  "source_owner_no_builds": true,
+  "scope": "single common circuit owner, actual contact return to existing complex boundary, fixed law controls; no scientific acquisition/cold/current-Holarchy conformance claim",
+  "review": "Independent Claude source review identified owner-level enclosure-loss guard; applied in owner and fixed control. Private correspondence remains in authorized mailbox; source review is not runtime acceptance."
+}

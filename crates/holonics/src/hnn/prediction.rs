@@ -1670,7 +1670,7 @@ impl DamagedSection {
     /// nothing. Located advances, even on an intact section, cannot be replaced by this square.
     /// A sparse located-clock fibre and its projection through the producing `D` remain owed.
     /// All admission runs before the fresh source section and the physical word's opening.
-    fn admit(&self, field: &Field, material: &dyn FieldMaterial, phases: &ReceivingPhases) -> Result<(), HnnError> {
+    pub(crate) fn admit(&self, field: &Field, material: &dyn FieldMaterial, phases: &ReceivingPhases) -> Result<(), HnnError> {
         field.admit(&self.chart)?;
         if self.chart.located().is_some() {
             return Err(HnnError::Unadmitted {

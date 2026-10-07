@@ -9,9 +9,10 @@
 //! comparison through that same Word, then `next(section', Θ', frame, receipt.carry)`. The callback
 //! is called only after the blind forward law completes. It may publish the whole receipt before
 //! obtaining an observation. The observation never enters the forward constructor. This is a
-//! continuing owner of the existing physical laws, not another predictor or release rule.
+//! receiving view of the common circuit; the source section is not retained.
 
 pub mod communication;
+pub mod contact;
 
 use crate::hnn::HnnError;
 use crate::hnn::constitution::{Constitution, DepositReading};
@@ -24,7 +25,9 @@ use crate::hnn::prediction::{
 };
 use crate::hnn::ratio::HolonRatio;
 use crate::hnn::receiving::{DeclaringFace, ReceivingPhases};
-use crate::hnn::word::{Absorption, WordOpening};
+use crate::hnn::word::WordOpening;
+use crate::hnn::reference::{Reference, Resident};
+use crate::holon::HolonState;
 
 /// One supported affine material relation per declared comparison; no coupled R/E ray.
 #[derive(Clone, Copy, Debug)]
@@ -67,47 +70,29 @@ pub struct PhysicalReception {
     pub receiving_features: Option<Vec<Vec<crate::ratio::Rat>>>,
 }
 
-/// A retained physical receiver. Construction accepts an explicit source frame and opening;
-/// the first section and every later receiver are admitted by the existing physical forward law.
-/// The chart, once admitted, cannot change between receptions. This owner makes no cold-restore
-/// or external raw-data encoding claim: callers must supply genuinely constructed `Encoded` data.
-pub struct PhysicalResident<'f> {
+/// An exact receiving view of the common execution resident. Moving this view out returns
+/// the same constitution, source clock, wave carry, chart and bounded port operands.
+/// The receiver owns only its reusable declaring face; no second material/current is copied.
+pub struct PhysicalReceiver<'f> {
     field: &'f Field,
-    constitution: Constitution,
-    current: Current,
-    opening: WordOpening,
-    chart: Option<Encoded>,
+    resident: Resident,
     declaring: DeclaringFace<'f>,
 }
 
-impl<'f> PhysicalResident<'f> {
-    pub fn new(
-        field: &'f Field,
-        constitution: Constitution,
-        current: Current,
-        opening: WordOpening,
-    ) -> Self {
-        Self {
-            field,
-            constitution,
-            current,
-            opening,
-            chart: None,
-            declaring: DeclaringFace::new(field),
-        }
+impl<'f> PhysicalReceiver<'f> {
+    pub fn new(field: &'f Field, constitution: Constitution, current: Current,
+        opening: WordOpening) -> Result<Self, HnnError> {
+        Self::from_resident(field, Reference::mount_receiving(field, &current, constitution, opening)?)
     }
 
-    pub fn constitution(&self) -> &Constitution {
-        &self.constitution
+    pub fn from_resident(field: &'f Field, resident: Resident) -> Result<Self, HnnError> {
+        resident.admit_receiving_view(field)?;
+        Ok(Self { field, resident, declaring: DeclaringFace::new(field) })
     }
 
-    pub fn current(&self) -> &Current {
-        &self.current
-    }
-
-    pub fn opening(&self) -> &WordOpening {
-        &self.opening
-    }
+    pub fn constitution(&self) -> &Constitution { self.resident.constitution() }
+    pub fn current(&self) -> &Current { self.resident.current() }
+    pub fn opening(&self) -> WordOpening { self.resident.reception_opening() }
 
     /// Execute one unobserved query and retain its physical end without a deposition.
     pub fn read(
@@ -176,30 +161,28 @@ impl<'f> PhysicalResident<'f> {
         sparse: bool,
         read_receiving_operands: bool,
     ) -> Result<PhysicalReception, HnnError> {
+        self.resident.admit_exact_current()?;
         let chart = section.chart();
-        if self.chart.as_ref().is_some_and(|bound| bound != chart) {
-            return Err(HnnError::Unadmitted {
-                reason: "the continuing physical receiver's complete producing chart changed",
-            });
-        }
+        self.resident.admit_receiving_chart(chart)?;
+        let opening = self.resident.reception_opening();
         let (phases, declaring_face_reused) =
-            self.declaring.declare(&self.constitution, &self.current, receiver)?;
+            self.declaring.declare(self.resident.constitution(), self.resident.current(), receiver)?;
         let pending = if sparse {
             predict_sparse_by_field(
                 self.field,
-                &self.constitution,
-                &self.current,
+                self.resident.constitution(),
+                self.resident.current(),
                 section,
-                &self.opening,
+                &opening,
                 &phases,
             )?
         } else {
             predict_by_field(
                 self.field,
-                &self.constitution,
-                &self.current,
+                self.resident.constitution(),
+                self.resident.current(),
                 section,
-                &self.opening,
+                &opening,
                 &phases,
             )?
         };
@@ -218,27 +201,27 @@ impl<'f> PhysicalResident<'f> {
             (0..pending.prediction().reads.len()).map(|station| pending.receiving_feature(station))
                 .collect::<Option<Vec<_>>>()
         }).flatten();
-        let (prediction, comparison, successor) = match observation(pending.prediction(), &phases) {
+        let (prediction, mut comparison, successor) = match observation(pending.prediction(), &phases) {
             None => (pending.finish(), Ok(None), None),
             Some(observation) => {
                 let result = match observation.learning {
                     PhysicalLearning::Receiving if read_receiving_operands => pending.observe_receiving_diagnostic(
-                        &self.constitution,
+                        self.resident.constitution(),
                         &observation.observed,
                         &observation.compared,
                     ),
                     PhysicalLearning::Receiving => pending.observe(
-                        &self.constitution,
+                        self.resident.constitution(),
                         &observation.observed,
                         &observation.compared,
                     ),
                     PhysicalLearning::SourcePorts => pending.observe_source_ports(
-                        &self.constitution,
+                        self.resident.constitution(),
                         &observation.observed,
                         &observation.compared,
                     ),
                     PhysicalLearning::PairOutputs => pending.observe_pair_outputs(
-                        &self.constitution,
+                        self.resident.constitution(),
                         &observation.observed,
                         &observation.compared,
                     ),
@@ -273,14 +256,17 @@ impl<'f> PhysicalResident<'f> {
                 }
             }
         };
-        if let Some(constitution) = successor {
-            self.constitution = constitution;
+        // R/E/pair publication keeps C and the loaded storage fixed. Material-coordinate
+        // reactions must use their transported contact return, not this blind end unchanged.
+        let commit = successor.as_ref().unwrap_or_else(|| self.resident.constitution()).commit();
+        if let Err(error) = self.resident.publish_reception(successor,
+            HolonState::at(prediction.carry.clone(), commit), None, None, chart) {
+            // A failed publication keeps the old material but retains the accounted blind end.
+            comparison = Err(error);
+            let commit = self.resident.constitution().commit();
+            self.resident.publish_reception(None,
+                HolonState::at(prediction.carry.clone(), commit), None, None, chart)?;
         }
-        self.chart = Some(chart.clone());
-        self.opening = WordOpening::Received {
-            carry: prediction.carry.clone(),
-            absorption: Absorption::Nothing,
-        };
         Ok(PhysicalReception {
             prediction,
             comparison,
@@ -289,8 +275,6 @@ impl<'f> PhysicalResident<'f> {
         })
     }
 
-    /// Move out the complete in-memory continuation, with no old Word or source passage.
-    pub fn into_parts(self) -> (Constitution, Current, WordOpening, Option<Encoded>) {
-        (self.constitution, self.current, self.opening, self.chart)
-    }
+    /// Return the same complete resident, without retaining an executed Word or source section.
+    pub fn into_resident(self) -> Resident { self.resident }
 }

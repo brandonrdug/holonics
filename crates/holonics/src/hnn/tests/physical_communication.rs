@@ -6,7 +6,7 @@ use crate::hnn::constitution::{CAMPAIGN_ONE_BUDGET, Constitution};
 use crate::hnn::field::{
     CribDeclaration, Current, Field, FieldDeclaration, FieldMaterial, ReceiverDeclaration,
 };
-use crate::hnn::physical::{PhysicalLearning, PhysicalObservation, PhysicalResident};
+use crate::hnn::physical::{PhysicalLearning, PhysicalObservation, PhysicalReceiver};
 use crate::hnn::prediction::{DamagedSection, RepairedCell, Unresolved, repair_by_field};
 use crate::hnn::receiving::ReceivingPhases;
 use crate::hnn::word::WordOpening;
@@ -57,6 +57,92 @@ fn material(field: &Field) -> Constitution {
     theta.with_ports(0, None, Some(source), None).unwrap()
 }
 
+/// One fixed mechanical fixture, with the existing native contact grain. It is not a sampled
+/// curriculum or an output accuracy gate; targets arrive only in the comparison callback.
+fn contact_material(field: &Field) -> Constitution {
+    use crate::hnn::constitution::Locus;
+    let reads = crate::hnn::retention::loci(field).into_iter().collect();
+    super::learning::generic(field, 81).rebased(Locus::Channel(0), 7, &reads).unwrap()
+}
+
+#[test]
+fn complete_contact_return_publishes_held_point_before_existing_communication() {
+    use crate::hnn::physical::contact::ContactObservation;
+    let field = field();
+    let initial = contact_material(&field);
+    let current = Current::at_rest(&field);
+    let source = encoded(&field, &[0, 1]);
+    let mut actual = PhysicalReceiver::new(&field, initial.clone(), current.clone(), WordOpening::Rest).unwrap();
+    let mut untouched = PhysicalReceiver::new(&field, initial.clone(), current.clone(), WordOpening::Rest).unwrap();
+    let blind = untouched.communicate_contact(&source, &receiver(), |_| None).unwrap();
+    let taught = actual.communicate_contact(&source, &receiver(), |boundary| {
+        assert_eq!(boundary, &blind.boundary, "observation cannot enter its earlier forward");
+        println!("whole complete blind contact boundary: {boundary:?}");
+        Some(ContactObservation { observed: encoded(&field, &[0, 1, 3]), compared: vec![false, false, true] })
+    }).unwrap();
+    assert!(blind.closes() && taught.closes());
+    assert_eq!(taught.boundary, blind.boundary);
+    assert_eq!(taught.blind_carry, blind.carry);
+    assert_eq!(taught.carry.ticks, 3, "full ticks keep their actual complete crossing");
+    let publication = taught.comparison.as_ref().unwrap().as_ref().unwrap();
+    assert!(publication.publication.stepped > 0, "this fixed native control remains unaccepted until an actual move");
+    assert_ne!(actual.constitution().contact_storage(0), initial.contact_storage(0));
+    assert_eq!(taught.carry.momenta, taught.blind_carry.momenta);
+    assert_eq!(taught.carry.change.states[0][0], taught.blind_carry.change.states[0][0]);
+    assert_eq!(&publication.continuation.committed - &publication.continuation.before,
+        publication.continuation.deposition_work);
+    let material = actual.constitution().clone();
+    let opening = actual.opening();
+    let common = actual.into_resident();
+    assert_eq!(common.constitution(), &material);
+    assert_eq!(common.current(), &current);
+    assert_eq!(common.carried(), Some(&taught.carry));
+    assert!(common.carry_error().is_none());
+    let mut actual = PhysicalReceiver::from_resident(&field, common).unwrap();
+    // The actual production boundary consumes this current on a different source, without a
+    // new contact comparison, expected target or retained Word. Controls share its entering end.
+    let other_source = encoded(&field, &[2, 1]);
+    let mut prior = PhysicalReceiver::new(&field, initial, current.clone(), opening.clone()).unwrap();
+    let mut other = PhysicalReceiver::new(&field, material, current, opening).unwrap();
+    let next = actual.communicate(&other_source, &receiver(), |_| None).unwrap();
+    let old_material = prior.communicate(&other_source, &receiver(), |_| None).unwrap();
+    let old_source = other.communicate(&source, &receiver(), |_| None).unwrap();
+    assert!(next.closes() && old_material.closes() && old_source.closes());
+    assert_eq!(next.carry.ticks, taught.carry.ticks + 2);
+    assert_ne!(next.boundary.readings(), old_material.boundary.readings());
+    assert_ne!(next.boundary.readings(), old_source.boundary.readings());
+    println!("whole carried existing communication boundary: {:?}", next.boundary);
+}
+
+#[test]
+fn a_shared_execution_clock_reanchors_the_next_section_without_resetting_its_carry() {
+    use crate::hnn::port::ExecutionPort;
+    use crate::hnn::reference::Reference;
+    let field = field();
+    let mut view = PhysicalReceiver::new(&field, material(&field), Current::at_rest(&field), WordOpening::Rest).unwrap();
+    let source = encoded(&field, &[0, 1]);
+    let first = view.communicate(&source, &receiver(), |_| None).unwrap();
+    let mut common = view.into_resident();
+    let previous = common.current().clone();
+    Reference::campaign_one().ingest(&mut common, None, &encoded(&field, &[2])).unwrap();
+    assert_ne!(common.current(), &previous);
+    assert_eq!(common.carried(), Some(&first.carry), "ingest advances source time, not this wave current");
+    let live = common.current().clone();
+    let theta = common.constitution().clone();
+    let entering = common.reception_opening();
+    let chart = source.part(0..0).unwrap();
+    let section = DamagedSection::of_runs(3, &chart, vec![(0, source.clone())]).unwrap();
+    let phases = ReceivingPhases::declare(&field, &theta, &live, &receiver()).unwrap();
+    let matched = crate::hnn::prediction::predict_sparse_by_field(&field, &theta, &live, &section, &entering, &phases).unwrap().finish();
+    let mut view = PhysicalReceiver::from_resident(&field, common).unwrap();
+    let next = view.communicate(&source, &receiver(), |_| None).unwrap();
+    assert!(next.closes());
+    assert_eq!(next.boundary.readings(), &matched.reads[2..]);
+    assert_eq!(next.carry, matched.carry);
+    assert_eq!(view.current(), &live, "section entrance does not secretly advance Current");
+    assert_eq!(next.carry.ticks, first.carry.ticks + 2);
+}
+
 #[test]
 fn communication_deposits_after_the_whole_boundary_and_reuses_material_source_and_carry() {
     let started = std::time::Instant::now();
@@ -65,7 +151,7 @@ fn communication_deposits_after_the_whole_boundary_and_reuses_material_source_an
     let current = Current::at_rest(&field);
     let source = encoded(&field, &[0, 1]);
     let mut resident =
-        PhysicalResident::new(&field, initial.clone(), current.clone(), WordOpening::Rest);
+        PhysicalReceiver::new(&field, initial.clone(), current.clone(), WordOpening::Rest).expect("admitted common resident");
     let taught = resident
         .communicate(&source, &receiver(), |boundary| {
             println!("whole blind communication boundary: {boundary:?}");
@@ -108,7 +194,7 @@ fn communication_deposits_after_the_whole_boundary_and_reuses_material_source_an
     let commit = theta.commit();
 
     // Same actual entering carry and source, with the earlier material: isolate learned R.
-    let mut unlearned = PhysicalResident::new(&field, initial, current.clone(), entered.clone());
+    let mut unlearned = PhysicalReceiver::new(&field, initial, current.clone(), entered.clone()).expect("admitted common resident");
     let prior = unlearned
         .communicate(&source, &receiver(), |_| None)
         .unwrap();
@@ -131,11 +217,11 @@ fn communication_deposits_after_the_whole_boundary_and_reuses_material_source_an
     let WordOpening::Received { carry, .. } = resident.opening() else {
         panic!("actual carried end")
     };
-    assert_eq!(carry, &next.carry);
+    assert_eq!(carry, next.carry);
 
     // Same learned material, clock and entering carry, changing only an admitted source class.
     // This is a source-sensitivity falsifier, not a favourable answer selected by a grader.
-    let mut changed_source = PhysicalResident::new(&field, theta, current, entered);
+    let mut changed_source = PhysicalReceiver::new(&field, theta, current, entered).expect("admitted common resident");
     let changed = changed_source
         .communicate(&encoded(&field, &[2, 1]), &receiver(), |_| None)
         .unwrap();
@@ -163,8 +249,8 @@ fn communication_observations_cannot_change_the_earlier_boundary() {
     let current = Current::at_rest(&field);
     let source = encoded(&field, &[0, 1]);
     let mut left =
-        PhysicalResident::new(&field, initial.clone(), current.clone(), WordOpening::Rest);
-    let mut right = PhysicalResident::new(&field, initial, current, WordOpening::Rest);
+        PhysicalReceiver::new(&field, initial.clone(), current.clone(), WordOpening::Rest).expect("admitted common resident");
+    let mut right = PhysicalReceiver::new(&field, initial, current, WordOpening::Rest).expect("admitted common resident");
     let a = left
         .communicate(&source, &receiver(), |_| {
             Some(PhysicalObservation {
@@ -212,12 +298,12 @@ fn communication_refuses_changed_source_or_partition_without_deposition_and_keep
     let field = field();
     let initial = material(&field);
     let source = encoded(&field, &[0, 1]);
-    let mut resident = PhysicalResident::new(
+    let mut resident = PhysicalReceiver::new(
         &field,
         initial.clone(),
         Current::at_rest(&field),
         WordOpening::Rest,
-    );
+    ).expect("admitted common resident");
     for (cells, compared) in [
         ([1, 1, 3], vec![false, false, true]),
         ([0, 1, 3], vec![true, false, true]),
@@ -242,7 +328,7 @@ fn communication_refuses_changed_source_or_partition_without_deposition_and_keep
         let WordOpening::Received { carry, .. } = resident.opening() else {
             panic!("blind carried end")
         };
-        assert_eq!(carry, &receipt.carry);
+        assert_eq!(carry, receipt.carry);
     }
     let before = resident.opening().clone();
     assert!(
@@ -252,7 +338,7 @@ fn communication_refuses_changed_source_or_partition_without_deposition_and_keep
             })
             .is_err()
     );
-    assert_eq!(resident.opening(), &before);
+    assert_eq!(resident.opening(), before);
     assert_eq!(resident.constitution(), &initial);
     let mut over_period = receiver();
     over_period.aperture = 5; // the producing source phase period is four
@@ -263,7 +349,7 @@ fn communication_refuses_changed_source_or_partition_without_deposition_and_keep
             })
             .is_err()
     );
-    assert_eq!(resident.opening(), &before);
+    assert_eq!(resident.opening(), before);
     assert_eq!(resident.constitution(), &initial);
     println!(
         "unit communication source/partition refusal elapsed_ns={}",
@@ -276,12 +362,12 @@ fn communication_returns_actual_multistation_held_receipts_without_a_joint_certi
     let started = std::time::Instant::now();
     let field = field();
     let initial = material(&field);
-    let mut resident = PhysicalResident::new(
+    let mut resident = PhysicalReceiver::new(
         &field,
         initial.clone(),
         Current::at_rest(&field),
         WordOpening::Rest,
-    );
+    ).expect("admitted common resident");
     let output = resident
         .communicate(&encoded(&field, &[0]), &receiver(), |boundary| {
             assert_eq!(boundary.first_station(), 1);
@@ -327,7 +413,7 @@ fn one_future_communication_carries_one_actual_source_label_through_the_whole_re
     let current = Current::at_rest(&field);
     let source = encoded(&field, &[0, 1]);
     let mut resident =
-        PhysicalResident::new(&field, initial.clone(), current.clone(), WordOpening::Rest);
+        PhysicalReceiver::new(&field, initial.clone(), current.clone(), WordOpening::Rest).expect("admitted common resident");
     let taught = resident
         .communicate_one_future(&source, &receiver(), |boundary| {
             println!("whole one-future boundary before observation: {boundary:?}");
@@ -410,7 +496,7 @@ fn one_future_source_publication_reaches_the_next_contemporary_communication_ope
     let current = Current::at_rest(&field);
     let source = encoded(&field, &[0, 1]);
     let mut resident =
-        PhysicalResident::new(&field, material(&field), current.clone(), WordOpening::Rest);
+        PhysicalReceiver::new(&field, material(&field), current.clone(), WordOpening::Rest).expect("admitted common resident");
     let received = resident
         .communicate_one_future(&source, &receiver(), |_| {
             Some(PhysicalObservation {
@@ -459,8 +545,8 @@ fn one_future_source_publication_reaches_the_next_contemporary_communication_ope
     let WordOpening::Received { carry, .. } = &entered else {
         panic!("actual blind end")
     };
-    assert_eq!(carry, &taught.carry);
-    let mut prior = PhysicalResident::new(&field, producing, current, entered);
+    assert_eq!(carry, taught.carry);
+    let mut prior = PhysicalReceiver::new(&field, producing, current, entered).expect("admitted common resident");
     // A separately fixed prefix; no later observation is supplied to either native read.
     let later_source = encoded(&field, &[2, 1]);
     let before = prior
@@ -501,12 +587,12 @@ fn one_future_communication_keeps_refusal_and_multi_future_admission_honest() {
     let field = field();
     let initial = material(&field);
     let source = encoded(&field, &[0, 1]);
-    let mut resident = PhysicalResident::new(
+    let mut resident = PhysicalReceiver::new(
         &field,
         initial.clone(),
         Current::at_rest(&field),
         WordOpening::Rest,
-    );
+    ).expect("admitted common resident");
     let refused = resident
         .communicate_one_future(&source, &receiver(), |_| {
             Some(PhysicalObservation {
@@ -536,7 +622,7 @@ fn one_future_communication_keeps_refusal_and_multi_future_admission_honest() {
             })
             .is_err()
     );
-    assert_eq!(resident.opening(), &entered);
+    assert_eq!(resident.opening(), entered);
     assert_eq!(resident.constitution(), &initial);
     let WordOpening::Received { carry, .. } = &entered else {
         panic!("blind end retained")

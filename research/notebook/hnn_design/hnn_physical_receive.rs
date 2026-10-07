@@ -14,7 +14,7 @@
 //! no historical physical-repair pin licenses this changed law.
 
 use super::*;
-use holonics::hnn::physical::{PhysicalLearning, PhysicalObservation, PhysicalResident};
+use holonics::hnn::physical::{PhysicalLearning, PhysicalObservation, PhysicalReceiver};
 use holonics::hnn::prediction::DamagedSection;
 use holonics::receiver::face::GrainCell;
 use holonics::hnn::word::WordOpening;
@@ -52,7 +52,7 @@ pub(super) fn run(
     };
     let current = Current::at_rest(&field);
     let material = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).expect("declared material");
-    let mut resident = PhysicalResident::new(&field, material, current, WordOpening::Rest);
+    let mut resident = PhysicalReceiver::new(&field, material, current, WordOpening::Rest).expect("admitted common resident");
     let receiver = ReceiverDeclaration {
         ring: 0,
         aperture,
@@ -209,7 +209,7 @@ pub(super) fn learn(
         let probe_seed: u64 = probe_seed.parse().expect("a probe seed");
         assert!(seeds.insert(teaching_seed) && seeds.insert(probe_seed), "seed reuse across roles");
         let initial = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).expect("declared material");
-        let mut resident = PhysicalResident::new(&field, initial.clone(), current.clone(), WordOpening::Rest);
+        let mut resident = PhysicalReceiver::new(&field, initial.clone(), current.clone(), WordOpening::Rest).expect("admitted common resident");
         let teaching = if role == "coverage" {
             let law = match terrain {
                 "order2" => CyclicLaw::OrderTwo { opening: physical_shape.request },
@@ -468,7 +468,7 @@ fn exact_relation(teaching_count: usize, probe_count: usize, out: &str, terrains
     let initial=Constitution::initial(&field,CAMPAIGN_ONE_BUDGET).expect("same initial material");
     let grain=ReceivingPhases::declare(&field,&initial,&current,&receiver).unwrap().grain();
     let tolerance=Rat::new(1.into(),grain.into());
-    let mut resident=PhysicalResident::new(&field,initial.clone(),current.clone(),WordOpening::Rest);
+    let mut resident=PhysicalReceiver::new(&field,initial.clone(),current.clone(),WordOpening::Rest).expect("admitted common resident");
     let mut declaration=DeclarationWork::default();
     let mut completed=0;
     let mut common=None;
@@ -483,7 +483,7 @@ fn exact_relation(teaching_count: usize, probe_count: usize, out: &str, terrains
         publish(&mut output,format!("pair-relation; fresh native coordinate Words; same four R observations then one PairOutputs observation of the already seen final teaching section; same four blind source translations; unchanged OrderTwo seeds20261006001:20261006011 and withheld station2; grain={grain}; tolerance={tolerance}; blind receipt precedes repeated teacher; actual carry and pair material retained; no probe deposition; whole_job_deadline_ms={}; measured_role_bound_ms={role_bound}\n",pin.deadline_ms()));
         publish(&mut output,format!("fixed pair receiving gate: complete4R+1Pair+4probes; own pair comparison first-order descent<0; all learned common and continuing margins>{tolerance}; no-pair contemporary material fails some; centered real pair effect>{tolerance}; report bias, material effect and useful gate separately; this delayed-one-class relation cannot establish pair necessity or order-two key discovery; finite spent correlated orbits are not untouched holdout; a weak last-context pair step does not refute pair necessity\n"));
     } else {
-    publish(&mut output,format!("exact-relation; actual PhysicalResident sparse R-only reception; four teachings then four blind probes; OrderTwo seeds20261006001:20261006011; x_t=x_(t-2)+1 mod4; station2 withheld; grain={grain}; tolerance={tolerance}; actual carry continues; expected target read only after blind publication; no probe deposition; source/clock/chart/decoder and physical balance contracts unchanged; declaration reuse is a work receipt, not acceptance; every setup/control/Word charged; whole_job_deadline_ms={}; new_exact_role_bound_ms={role_bound}; inherited composite unit latency is not acceptance; no charted speedup/equivalence or source-domain release claim\n",pin.deadline_ms()));
+    publish(&mut output,format!("exact-relation; actual PhysicalReceiver sparse R-only reception; four teachings then four blind probes; OrderTwo seeds20261006001:20261006011; x_t=x_(t-2)+1 mod4; station2 withheld; grain={grain}; tolerance={tolerance}; actual carry continues; expected target read only after blind publication; no probe deposition; source/clock/chart/decoder and physical balance contracts unchanged; declaration reuse is a work receipt, not acceptance; every setup/control/Word charged; whole_job_deadline_ms={}; new_exact_role_bound_ms={role_bound}; inherited composite unit latency is not acceptance; no charted speedup/equivalence or source-domain release claim\n",pin.deadline_ms()));
     publish(&mut output,format!("fixed receiving gate: complete4+4; all learned common-carry and actual continuing expected-target margins>{tolerance}; initial common-carry material fails some expected margin; centered acquired real source response>{tolerance}; comparison refusal means incomplete; no independent/general-language/order-two-key/full-teaching-retention claim; sources are spent correlated orbits; controls use actual exact post-teaching carry and never deposit; initial E is the declared dense sign map/2; pair-output factors are zero and unchanged by R-only deposition, so no learned pair-mechanism claim\n"));
     }
     if !exact_role(&mut output,"setup",all_started,role_bound,None,&initial) {
@@ -848,7 +848,7 @@ fn publish_receiving_operands(output:&mut impl Write,index:usize,
 /// The returned Theta is an exterior no-deposit control, never the resident's retained state.
 /// Same-context first-order descent is a mechanical reading, not a finite score or useful gate.
 fn exact_pair_observation(
-    resident:&mut PhysicalResident<'_>,field:&Field,current:&Current,
+    resident:&mut PhysicalReceiver<'_>,field:&Field,current:&Current,
     receiver:&ReceiverDeclaration,observed:&Encoded,output:&mut impl Write,
     bound:u128,declaration:&mut DeclarationWork,
 ) -> Option<Constitution> {
@@ -955,7 +955,7 @@ fn exact_role(output:&mut impl Write,name:&str,started:Instant,bound_ms:u128,
 /// Matched sparse engineering read, declared before execution. The exact baseline excludes
 /// its otherwise additional completion work. This role never supplies an E/pair publication.
 fn charted_compare(teaching_count: usize, probe_count: usize, out: &str, terrains: &[String], pin: &exterior::Pin) {
-    use holonics::hnn::prediction::{charted::{ChartedPhysicalResident, ChartedTolerance}, predict_sparse_by_field};
+    use holonics::hnn::prediction::{charted::{ChartedPhysicalReceiver, ChartedTolerance}, predict_sparse_by_field};
     use holonics::hnn::receiving::ReceivingPhases;
     use holonics::hnn::word::{Absorption, EndChange};
     use num_traits::Signed;
@@ -981,7 +981,7 @@ fn charted_compare(teaching_count: usize, probe_count: usize, out: &str, terrain
     // These are numerical component tolerances; missing-source release still has no certificate.
     let one_grain=Rat::new(1.into(),grain.into());
     let tolerance=ChartedTolerance {logits:one_grain.clone(),receiving_covector:one_grain.clone(),source_covector:one_grain};
-    let mut resident=ChartedPhysicalResident::new(&field,theta,current.clone(),WordOpening::Rest,tolerance.clone()).expect("declared charted material");
+    let mut resident=ChartedPhysicalReceiver::new(&field,theta,current.clone(),WordOpening::Rest,tolerance.clone()).expect("declared charted material");
     let mut reference_opening=WordOpening::Rest;
     #[allow(clippy::disallowed_types, clippy::disallowed_methods)]
     let mut output=std::fs::File::create(out).expect("requested output");

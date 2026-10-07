@@ -290,6 +290,7 @@ impl Resident {
     /// re-based. The ring loci keep their lattice (their re-base is refused). Each re-base is
     /// admitted against the resident's retention ([`Resident::retention`], record B §8).
     pub fn refine_contact_grain(&mut self, levels: u32) -> Result<usize, HnnError> {
+        self.admit_exact_current()?;
         if levels == 0 {
             return Ok(0);
         }
@@ -358,7 +359,8 @@ impl PendingSlot {
 }
 
 /// The exact bits of a carried change: every nonzero value by its numerator's and denominator's
-/// bits (a zero coordinate is the rest, which holds nothing), and the carried tick's. Public so a
+/// bits (a zero coordinate is the rest, which holds nothing), plus its references, canonical
+/// momenta, pump phases and absolute crossing. Public so a
 /// device realization's resident counts its carried change as the reference does
 /// (`holonics-cuda`'s `hnn::carry`).
 pub fn carry_bits(carry: &ReceptionCarry) -> u64 {
@@ -374,12 +376,17 @@ pub fn carry_bits(carry: &ReceptionCarry) -> u64 {
         .chain(arrivals.iter().flatten())
         .chain(states.iter().flatten())
         .chain(resonators.iter().flatten().flatten())
-        .flatten();
+        .flatten()
+        .chain(carry.conductances.iter())
+        .chain(carry.momenta.iter().flatten())
+        .chain(carry.resonator_momenta.iter().flatten().flatten());
     values
         .filter(|x| !x.is_zero())
         .map(|x| x.numer().bits() + x.denom().bits())
         .sum::<u64>()
         + u64::from(usize::BITS - carry.ticks.leading_zeros())
+        + carry.change.resonator_phases.iter().flatten()
+            .map(|phase| u64::from(usize::BITS - phase.leading_zeros())).sum::<u64>()
 }
 
 /// The exact bits of a reception's opening: none at rest.
@@ -497,6 +504,11 @@ pub struct Resident {
     /// mount, whose first reception opens with zero carry; a saved state brings its carried end
     /// back through [`Reference::mount_continued`].
     carried: Option<ReceptionCarry>,
+    /// The charted current's enclosure at that same carried crossing. A receiver view cannot
+    /// discard it; consumers without its transport refuse before changing the resident.
+    carried_error: Option<EndChange>,
+    /// The complete cell-free codec chart admitted by receiving views.
+    receiving_chart: Option<Encoded>,
     /// [definition; agent-inferred, October 4; record B §8] **What the admitted future's words open
     /// on** (the port's declared reception, [`Reception::opens`]): the retention a re-base of the
     /// contacts' grain is admitted against ([`Resident::refine_contact_grain`]).
@@ -838,8 +850,14 @@ impl Resident {
         let staged: u64 = self.staged.values().map(|slot| slot.deposit.bits()).sum();
         let arrived = self.arrived.as_ref().map_or(0, Arrived::bits);
         let carried = self.carried.as_ref().map_or(0, carry_bits);
+        let receiving_chart = self.receiving_chart.as_ref().map_or(0, |chart| {
+            chart.decoder().entries().iter().filter(|x| !x.is_zero())
+                .map(|x| x.numer().bits() + x.denom().bits()).sum::<u64>()
+        });
         lift + moments
             + carried
+            + self.carry_error_bits()
+            + receiving_chart
             + pending
             + staged
             + arrived
@@ -1036,6 +1054,8 @@ impl Reference {
             tally: ChartTally::new(field),
             wall: WallTimes::default(),
             carried: None,
+            carried_error: None,
+            receiving_chart: None,
             opens: self.reception.opens(),
         })
     }
@@ -1177,6 +1197,7 @@ impl ExecutionPort for Reference {
         ),
         HnnError,
     > {
+        resident.admit_exact_current()?;
         if resident.aeon.awaiting {
             return Err(HnnError::AeonAwaitingClose);
         }
@@ -1350,6 +1371,7 @@ impl ExecutionPort for Reference {
         InteractionReturn<KeyLocation, (), Vec<Option<Clock>>, Vec<ReceivingPhases>, PortReceipt>,
         HnnError,
     > {
+        resident.admit_exact_current()?;
         if !resident.aeon.keys_admitted {
             return Err(HnnError::KeysNotAdmitted);
         }
@@ -1432,6 +1454,7 @@ impl ExecutionPort for Reference {
         ),
         HnnError,
     > {
+        resident.admit_exact_current()?;
         if resident.pending.len() >= self.pending_capacity {
             return Err(HnnError::PendingCapacity {
                 capacity: self.pending_capacity,
@@ -1545,6 +1568,7 @@ impl ExecutionPort for Reference {
         // commit until then acts on (the reception carry §8).
         if ended.is_some() {
             resident.carried = ended;
+            resident.carried_error = None;
         }
         Ok((
             id,
@@ -1573,6 +1597,7 @@ impl ExecutionPort for Reference {
         ),
         HnnError,
     > {
+        resident.admit_exact_current()?;
         // Everything is read from the borrowed pending ratio; it is consumed only once the compare
         // has succeeded, so a refused target or a refused read leaves it open (review S11).
         let field = resident.field.clone();
@@ -1724,6 +1749,7 @@ impl ExecutionPort for Reference {
         InteractionReturn<(), (), DepositReading, Vec<ReceivingPhases>, PortReceipt>,
         HnnError,
     > {
+        resident.admit_exact_current()?;
         if resident.stop.is_some() {
             return Err(HnnError::DepositsStopped {
                 commit: resident.constitution.commit(),
@@ -1809,6 +1835,7 @@ impl ExecutionPort for Reference {
         pending: &PendingId,
         decision: &DecisionRule,
     ) -> Result<InteractionReturn<Faces, (), (), Vec<ReceivingPhases>, PortReceipt>, HnnError> {
+        resident.admit_exact_current()?;
         let slot = resident
             .pending
             .get(pending)
@@ -1904,6 +1931,7 @@ impl ExecutionPort for Reference {
         >,
         HnnError,
     > {
+        resident.admit_exact_current()?;
         if !resident.aeon.awaiting {
             return Err(HnnError::NotAtCarryOut);
         }
@@ -1996,6 +2024,7 @@ impl ExecutionPort for Reference {
         // Published together.
         resident.constitution = constitution;
         resident.carried = carry;
+        resident.carried_error = None;
         resident.forget_kept_reads();
         for (id, _) in &refused {
             resident.pending.remove(id);
@@ -4946,3 +4975,4 @@ pub fn prequential(
 #[cfg(test)]
 mod continuation;
 mod passage;
+mod interaction;
