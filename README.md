@@ -51,12 +51,16 @@ not a blind search over keys.
 [Keys, locks and navigation](docs/ELEMENTARY_OBJECTS.md#keys-locks-and-navigation) ·
 [the line](docs/THE_MACHINE.md#the-line-the-rebuild-serves)
 
-**The machine is geometry.** The HNN (Holonic neural network) is a continuing field of complex
+**The HNN is a morphodynamic circuit.** The Holonic neural network is a continuing field of complex
 parametron rings, annular rings that store, oscillate and lock, joined by helical pair contacts,
-which slip, dissipate and address. Information is phase and winding on the rings. Learning deposits
-into the material of the contacts a comparison actually reached. A weight matrix is one chart of
-this object, never the object.
+which slip, dissipate and address. Its geometry and constitution govern motion; admitted motion
+can change geometry and couplings, with its work accounted for. Information is phase and winding
+on the rings. Learning deposits a comparison actually reached into the constitution. **Dynamic
+Geometry** and **Asymmetric Potential** name aspects of this same construction, with their
+consumers still subject to the gates below. A graph, tree or weight matrix is a declared chart of
+the continuing circuit.
 [The machine](docs/THE_MACHINE.md) · [the HNN formula](docs/HNN_FORMULA.md) ·
+[language and operators](docs/ELEMENTARY_OBJECTS.md#the-morphodynamic-circuit) ·
 [helical geometry](docs/HELICAL_GEOMETRY.md) · [winding and carry](docs/WINDING_CARRY_AND_PLACEMENT.md)
 
 **Memory is a quotient, not a tape.** Retention is a quotient sufficient for every admitted future,

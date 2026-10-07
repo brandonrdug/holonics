@@ -17,6 +17,63 @@ between them. Every other object below is a part, a dual, a comparison or a cont
 picture. Neither half reduces to the other: the ring is the reactive (second-order, storing) cell,
 the contact is the dissipative (first-order, addressing) cell.
 
+<a id="the-morphodynamic-circuit"></a>
+
+## The morphodynamic circuit
+
+[project-postulate, October 7] **Morphodynamic circuit** is the organizing description of the
+continuing physical and parametric circuit formed by these objects
+([terminology record](../research/records/2026-10-07_THE_HNN_IS_A_MORPHODYNAMIC_CIRCUIT_AND_ITS_LANGUAGE_FOLLOWS_THE_EXISTING_OBJECTS.md)). Geometry and constitution
+govern motion; admitted motion can change geometry and couplings, with physical work accounted
+for and changes to the constitution obeying deposition. This names their composition, not another
+elementary object or a second implementation alongside the Holon. **Dynamic Geometry** describes
+its changing geometry and transported frames; **Asymmetric Potential** describes a constitutive
+relation. An asymmetric scalar potential can have a symmetric Hessian. Directed active forces
+require their own relations and power terms; the phrases do not certify nonreciprocity or a
+generic adaptive HNN consumer ([the foundation supplement](plans/HNN_ATHENA_FOUNDATION.md#what-asymmetry-mathematically-requires)).
+
+[definition; agent-inferred] The hierarchy follows the existing composition law: a **Holon** is
+the law and its ports; interconnection returns a **Holarchy**, the whole with its retained
+constituents and restrictions. The HNN's **field** realizes that whole through parametrons, pair
+contacts and navigators, with Holons participating as receivers. A receiver partitions or charts
+the whole at its declared grain and clock. A graph or tree is such a scaled view, carrying its
+restriction and unresolved fibre; it does not replace the continuing motion. Compression and
+navigation belong within the circuit: resonating modes meet terrain, pair contacts locate keys,
+and converging paths present landmarks. They are not a separate context store attached to it.
+
+The following map routes the common language to its existing owners. It does not claim that a
+general law has passed every HNN consumer; the operator contract and receipts below retain that
+scope.
+
+| Language | Meaning and existing operator or owner |
+|---|---|
+| Holon; Holarchy; morphodynamic circuit | Law with ports; interconnected whole with retained constituents. Rust [`Holon`](../crates/holonics/src/holon/mod.rs), [`Holon::interconnect`](../crates/holonics/src/holarchy/mod.rs); HNN [`Field::holarchy`](../crates/holonics/src/hnn/field.rs). |
+| Field; interacting regions | One continuing whole, with actual incidence, current and material. HNN [`Field`](../crates/holonics/src/hnn/field.rs); a region belongs to a receiver's partition, with certified finite counts. |
+| Dynamic Geometry; swing; transport | Physical motion and its work; coordinate changes transport state and metric. [`geometry::motion`](../crates/holonics/src/geometry/motion.rs), Lean [`Geometry/Motion`](../lean/Holonics/Geometry/Motion.lean) and [`FrameTransport`](../lean/Holonics/Geometry/FrameTransport.lean). |
+| Constitution; Asymmetric Potential | Element relations, including storage, contacts, pumps and active power. [`holon::element`](../crates/holonics/src/holon/element.rs), HNN [`Constitution`](../crates/holonics/src/hnn/constitution.rs); the executed quartic component and proposed general asymmetric consumer have separate scope. |
+| Parametron; pair contact | Storage and oscillation joined through slip, dissipation and lock address. [`holon::parametron`](../crates/holonics/src/holon/parametron.rs), [`PairContact` and `ContactMaterial`](../crates/holonics/src/holon/contact.rs). |
+| Navigator; key; phase, winding and carry | Configuration and clock of the producing motion; its address and lifted phase. [`Navigator`, `Clock`, `PhaseLift`](../crates/holonics/src/navigator/mod.rs), [winding and placement](WINDING_CARRY_AND_PLACEMENT.md). A spectral mode belongs to the declared constitution, not to an index of contexts. |
+| Source; entrance; phase-carried moment | A participating source enters through its producing chart and clock. HNN [`Encoded::identity` and `through`](../crates/holonics/src/hnn/encoding.rs), [`SourceMoment::ingest`](../crates/holonics/src/hnn/moment.rs). |
+| Receiver; reception; receipt | A participating Holon changes with the source and returns regional readings, clocks and unresolved fibres. [`JointLaw::interact`](../crates/holonics/src/receiver/reception.rs), [`ReceiptLaw::receive`](../crates/holonics/src/receiver/receipt.rs); HNN [`ReceivingPhases::read`](../crates/holonics/src/hnn/receiving.rs) is a declared receiving chart. |
+| Face; chart; grain; decoder | A receiver's reading and its representation, preserving carry, phase and unresolved remainder. [`GrainCell`](../crates/holonics/src/receiver/face.rs), [the receiver atlas](RECEIVER_HOLARCHY.md#no-object-has-one-intrinsic-face-the-receiver-atlas). A codec is an exterior chart of the same objects. |
+| Comparison; ratio; loss | Relative transport through the producing operands; `log R` with branch and `R⁻¹dR`. HNN [`HolonRatio::compare_partition`, `log_ratio`, `covector`](../crates/holonics/src/hnn/ratio.rs), `RatioCovector::descent`; the phase part completes the comparison. |
+| Deposition | Change to a constitution from a covector that reached that locus. HNN [`Constitution::deposited` and `deposited_within`](../crates/holonics/src/hnn/constitution.rs); producing chart, clock, material and adjoint must agree at the consumer. |
+| Retention; continuing interior | Quotient sufficient for admitted future reception and actions, retaining its decoder and residual. Lean [`Foundation/Standing`](../lean/Holonics/Foundation/Standing.lean); HNN [`Reference::mount_continued`](../crates/holonics/src/hnn/reference.rs) consumes the declared saved constitution, chart and carry. |
+| Causal composition; tube; tower | Joined interactions, longitudinal continuation and transverse restriction with a gluing result or defect. [`holon::restriction`](../crates/holonics/src/holon/restriction.rs), [the causal chord](RECEIVER_HOLARCHY.md#the-causal-chord); the chord's Rust prototype is retired. |
+| Compression; navigation; landmarks | Resonating modes coupled to terrain; kernel quotient, residual cokernel, converging faces and located keys. [`compression::keys::Menu`](../crates/holonics/src/compression/keys.rs), [keys and navigation](#keys-locks-and-navigation); the landmark count tree retains its narrower measuring scope. |
+| Comma | A declared exact nonclosure of transports, such as `(3:2)^12 / 2^7 = 3^12:2^19`. Lean [`Mathematics/Comma`](../lean/HolonicsResearch/Mathematics/Comma.lean). The [comma/ghost interpretation](../research/records/2026-10-05_THE_GHOST_LIVES_IN_THE_GAP_THE_JOINTS_OF_THE_LENS.md) carries its owed statements and proves no RH claim. |
+| Aeon; epoch; cycle | Causal container; division at a receiver's section; closed loop. [`aeon::{Aeon,Epochs,Cycle}`](../crates/holonics/src/aeon/mod.rs). Elapsed time pairs the receiver's clock with a passage. |
+
+Several shared words need their operand stated at the consuming call:
+
+| Word | Distinction to preserve |
+|---|---|
+| Port | A Holon interface carries effort and flow paired as power. HNN [`ExecutionPort`](../crates/holonics/src/hnn/port.rs) is the host/device execution interface implementing admitted operations. An API adapter alone is not a physical port. |
+| Context | Actual continuing causal coupling, current, storage, clocks and interior return. A landmark-tree address or an exterior text aperture is a particular chart. A transformer context window supplies no HNN law ([continuing context](RECEIVER_HOLARCHY.md#a-displayed-body-is-a-cut-its-plates-can-be-continuing-bodies)). |
+| Source | Distinguish the producing Holon and its encoded passage from a source term in an element relation. A source-only receiving face does not establish sufficiency for retained interior context. |
+| Memory | Retention is future sufficiency; storage is an element's energy relation; device memory is a resource of its realization. Their capacities and owners differ. |
+| Boundary | State the oriented-cell boundary, selected Holon interface, receiver's crossing section or exterior codec chart. Their maps and clocks need not coincide. |
+
 <a id="the-holon-as-one-object"></a>
 
 ## The Holon as one object
