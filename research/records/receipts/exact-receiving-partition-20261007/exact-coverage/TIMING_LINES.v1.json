@@ -1,0 +1,32 @@
+{
+  "source_commit": "af365197c30b2701e4b99f2cb99f24b05b3090e6",
+  "source_full_stdout_bytes": 733968,
+  "source_full_stdout_sha256": "ced3766af5deb48c91d1c8d17cd70a6a615516c94aca07328caa509a68c639b3",
+  "selection": "every exterior timings line, in original order; no selection by outcome",
+  "lines": [
+    {
+      "line": 6,
+      "text": "order2 teaching 0 timings; setup_and_blind_forward_ns=113274214; blind_publication_ns=63398; same_word_comparison_and_deposition_ns=10754062; matched_applied_control_ns=74302720; movement_and_receipt_ns=1022322; whole_unit_ns=199416716; wall_categories_are_exterior_not_an_arithmetic_or_certification_profile"
+    },
+    {
+      "line": 9,
+      "text": "order2 teaching 1 timings; setup_and_blind_forward_ns=150487069; blind_publication_ns=35596; same_word_comparison_and_deposition_ns=71450005; matched_applied_control_ns=112442689; movement_and_receipt_ns=2195185; whole_unit_ns=336610544; wall_categories_are_exterior_not_an_arithmetic_or_certification_profile"
+    },
+    {
+      "line": 12,
+      "text": "order2 teaching 2 timings; setup_and_blind_forward_ns=185746921; blind_publication_ns=36508; same_word_comparison_and_deposition_ns=76399882; matched_applied_control_ns=147540979; movement_and_receipt_ns=3108473; whole_unit_ns=412832763; wall_categories_are_exterior_not_an_arithmetic_or_certification_profile"
+    },
+    {
+      "line": 15,
+      "text": "order2 teaching 3 timings; setup_and_blind_forward_ns=216277659; blind_publication_ns=33533; same_word_comparison_and_deposition_ns=91450459; matched_applied_control_ns=177740478; movement_and_receipt_ns=4000332; whole_unit_ns=489502461; wall_categories_are_exterior_not_an_arithmetic_or_certification_profile"
+    },
+    {
+      "line": 19,
+      "text": "order2 probe 0 timings; initial_control_ns=198411136; learned_control_ns=40347267; actual_continuing_forward_ns=208277437; publication_and_exterior_scoring_ns=10982129; whole_unit_ns=458017969; learned_control_reuses_identical_continuing_word=true; no_observation_or_deposition"
+    },
+    {
+      "line": 22,
+      "text": "order2 probe 1 timings; initial_control_ns=197549295; learned_control_ns=207857332; actual_continuing_forward_ns=242510030; publication_and_exterior_scoring_ns=11562434; whole_unit_ns=659479091; learned_control_reuses_identical_continuing_word=false; no_observation_or_deposition"
+    }
+  ]
+}

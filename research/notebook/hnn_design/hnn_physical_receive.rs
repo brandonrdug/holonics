@@ -135,6 +135,9 @@ pub(super) fn run(
 /// the spent OrderTwo class orbit, with one-grain numerical component tolerance fixed first.
 /// Each charted reception is paired with the same exact sparse Word on the contemporary
 /// material and a continuing exact reference carry. Erasures remain Held in both sparse routes.
+/// `exact-relation` separately consumes the native exact sparse owner under a measured role
+/// projection. Its expected margins and centered R response are development point readings;
+/// the zero initial pair-output law is unchanged, so this does not identify a pair mechanism.
 pub(super) fn learn(
     role: &str,
     teaching_count: usize,
@@ -143,6 +146,10 @@ pub(super) fn learn(
     terrains: &[String],
     pin: &exterior::Pin,
 ) {
+    if role == "exact-relation" {
+        exact_relation(teaching_count, probe_count, out, terrains, pin);
+        return;
+    }
     if role == "charted-compare" {
         charted_compare(teaching_count, probe_count, out, terrains, pin);
         return;
@@ -428,6 +435,156 @@ pub(super) fn learn(
         publish(&mut output, format!("{terrain} distinct_source_contexts={}; acquired_context_changes_real_amplitude_face={heard}; all_context_controls_share_one_exact_entered_carry; scope=short_section_physical_acquisition; U6_bank_counts_are_a_different_consumer\n", contexts.len()));
         publish(&mut output, format!("{terrain} final_context_summary_ns={}; this_cost_is_outside_the_individual_teaching_and_probe_units\n", context_started.elapsed().as_nanos()));
     }
+}
+
+/// The exact physical receiving relation is an existing-owner scientific read. At one actual
+/// carried end c, delta_i = f(Theta_4, c, u_i) - f(Theta_0, c, u_i); delta_i minus its orbit mean
+/// removes a source-independent receiving bias. The native consumer is still the same sparse
+/// source -> Word -> receiving face -> observed ratio -> that Word's pullback -> R normal law.
+/// Whole-job admission is separate from the charted comparison's disproved unit projection.
+fn exact_relation(teaching_count: usize, probe_count: usize, out: &str, terrains: &[String], pin: &exterior::Pin) {
+    use holonics::hnn::prediction::predict_sparse_by_field;
+    use holonics::hnn::receiving::ReceivingPhases;
+    use num_traits::Signed;
+    assert_eq!((teaching_count,probe_count),(4,4),"same fixed complete class orbits");
+    assert_eq!(terrains,["order2=20261006001:20261006011".to_owned()]);
+    let role_bound=pin.unit_bound_ms().expect("a separately measured exact-role projection");
+    let all_started=Instant::now();
+    let all_work=holonics::hnn::word::work::read();
+    let shape=Declared {period:4,alphabet:repair_loop::CLASSES,request:2,stations:2,..order_declared()};
+    let field=declare_with_offsets(&shape,(1..4).collect());
+    let current=Current::at_rest(&field);
+    let receiver=ReceiverDeclaration {ring:0,aperture:4,..field.receivers()[0].clone()};
+    let initial=Constitution::initial(&field,CAMPAIGN_ONE_BUDGET).expect("same initial material");
+    let grain=ReceivingPhases::declare(&field,&initial,&current,&receiver).unwrap().grain();
+    let tolerance=Rat::new(1.into(),grain.into());
+    let mut resident=PhysicalResident::new(&field,initial.clone(),current.clone(),WordOpening::Rest);
+    let mut declaration=DeclarationWork::default();
+    let mut completed=0;
+    let mut common=None;
+    let mut pairs=Vec::new();
+    let mut initial_passes=true;
+    let mut learned_passes=true;
+    #[allow(clippy::disallowed_types, clippy::disallowed_methods)]
+    let mut output=std::fs::File::create(out).expect("requested output");
+    publish(&mut output,format!("exact-relation; actual PhysicalResident sparse R-only reception; four teachings then four blind probes; OrderTwo seeds20261006001:20261006011; x_t=x_(t-2)+1 mod4; station2 withheld; grain={grain}; tolerance={tolerance}; actual carry continues; expected target read only after blind publication; no probe deposition; source/clock/chart/decoder and physical balance contracts unchanged; declaration reuse is a work receipt, not acceptance; every setup/control/Word charged; whole_job_deadline_ms={}; new_exact_role_bound_ms={role_bound}; inherited composite unit latency is not acceptance; no charted speedup/equivalence or source-domain release claim\n",pin.deadline_ms()));
+    publish(&mut output,format!("fixed receiving gate: complete4+4; all learned common-carry and actual continuing expected-target margins>{tolerance}; initial common-carry material fails some expected margin; centered acquired real source response>{tolerance}; comparison refusal means incomplete; no independent/general-language/order-two-key/full-teaching-retention claim; sources are spent correlated orbits; controls use actual exact post-teaching carry and never deposit; initial E is the declared dense sign map/2; pair-output factors are zero and unchanged by R-only deposition, so no learned pair-mechanism claim\n"));
+    if !exact_role(&mut output,"setup",all_started,role_bound,None,&initial) {
+        interaction_work(&mut output,all_work,&declaration,completed,false);return;
+    }
+    for (teaching,seed) in [(true,20261006001),(false,20261006011)] {
+        let truth=KnownTruth::cyclic_class_orbit(CyclicLaw::OrderTwo {opening:2},shape.alphabet,seed,4).unwrap();
+        for (index,observed) in Encoded::identity(&truth,&field).unwrap().into_iter().enumerate() {
+            let started=Instant::now();
+            let before_work=holonics::hnn::word::work::read();
+            let entered=resident.opening().clone();
+            if !teaching && index==0 {common=Some(entered.clone());}
+            let material=resident.constitution().clone();
+            let damaged=DamagedSection::damage(&observed,&[2]).unwrap();
+            let mut forward_ns=0;
+            let mut publication_ns=0;
+            let received=match resident.receive_sparse(&damaged,&receiver,|blind,phases| {
+                forward_ns=started.elapsed().as_nanos();
+                assert_eq!(grain,phases.grain());
+                publish(&mut output,format!("exact blind; teaching={teaching}; section={index}; input={:?}; whole_cells={:?}; reads={:?}; carry_tick={}; producing_commit={}\n",damaged.placed(),blind.cells,blind.reads,blind.carry.ticks,material.commit()));
+                publication_ns=started.elapsed().as_nanos();
+                teaching.then(||PhysicalObservation {observed:observed.clone(),compared:vec![false,false,true,false],learning:PhysicalLearning::Receiving})
+            }) {
+                Ok(v)=>v,
+                Err(e)=>{publish(&mut output,format!("INCOMPLETE: exact native forward refused {e:?}\n"));interaction_work(&mut output,all_work,&declaration,completed,false);return;}
+            };
+            let receive_ns=started.elapsed().as_nanos();
+            declaration.selected(received.declaring_face_reused);
+            assert!(closed(&received.prediction),"actual exact source/Word/tick balances close");
+            publish(&mut output,format!("exact native work; teaching={teaching}; section={index}; declaration={declaration:?}; receive_owner_calls={:?}; forward_ns={forward_ns}; blind_publication_ns={}; comparison_deposition_and_return_ns={}; whole_receive_ns={receive_ns}; balances_close=true; retained_tick={}\n",holonics::hnn::word::work::read().since(before_work),publication_ns-forward_ns,receive_ns-publication_ns,received.prediction.carry.ticks));
+            let control_started=Instant::now();
+            if teaching {
+                match received.comparison {
+                    Ok(Some(publication))=>{
+                        let changed=holonics::hnn::ConstitutionRead::receiving_map(&material,0)!=holonics::hnn::ConstitutionRead::receiving_map(resident.constitution(),0);
+                        publish(&mut output,format!("exact observed R publication; section={index}; R_changed={changed}; commit={}; loci={:?}; source_certificate={}; source_pairing={}; comparison follows whole blind output\n",publication.publication.commit,publication.publication.loci,publication.source_certificate.is_some(),publication.source_pairing.is_some()));
+                    }
+                    refusal=>{publish(&mut output,format!("INCOMPLETE: exact comparison refused {refusal:?}; actual blind carry retained\n"));interaction_work(&mut output,all_work,&declaration,completed,false);return;}
+                }
+            } else {
+                assert!(matches!(received.comparison,Ok(None)),"blind probe has no comparison");
+                assert_eq!(resident.constitution(),&material,"no probe changes material");
+            }
+            if !exact_role(&mut output,"primary sparse reception",started,role_bound,Some(&received.prediction.carry),resident.constitution()) {
+                interaction_work(&mut output,all_work,&declaration,completed,false);return;
+            }
+            if !teaching {
+                let fixed=common.as_ref().expect("actual post-teaching carry");
+                let initial_control_started=Instant::now();
+                let before_phases=ReceivingPhases::declare(&field,&initial,&current,&receiver).unwrap();
+                let before=match predict_sparse_by_field(&field,&initial,&current,&damaged,fixed,&before_phases) {
+                    Ok(v)=>v,
+                    Err(e)=>{publish(&mut output,format!("INCOMPLETE: exact initial control refused {e:?}\n"));interaction_work(&mut output,all_work,&declaration,completed,false);return;}
+                };
+                if !exact_role(&mut output,"initial fixed-carry control",initial_control_started,role_bound,Some(&before.prediction().carry),&initial) {
+                    interaction_work(&mut output,all_work,&declaration,completed,false);return;
+                }
+                let matched=if index==0 {
+                    assert_eq!(&entered,fixed);
+                    None
+                } else {
+                    let learned_control_started=Instant::now();
+                    let phases=ReceivingPhases::declare(&field,&material,&current,&receiver).unwrap();
+                    match predict_sparse_by_field(&field,&material,&current,&damaged,fixed,&phases) {
+                        Ok(v)=>{
+                            if !exact_role(&mut output,"learned fixed-carry control",learned_control_started,role_bound,Some(&v.prediction().carry),&material) {
+                                interaction_work(&mut output,all_work,&declaration,completed,false);return;
+                            }
+                            Some(v)
+                        },
+                        Err(e)=>{publish(&mut output,format!("INCOMPLETE: exact learned control refused {e:?}\n"));interaction_work(&mut output,all_work,&declaration,completed,false);return;}
+                    }
+                };
+                let after=matched.as_ref().map(|x|x.prediction()).unwrap_or(&received.prediction);
+                assert!(closed(before.prediction()) && closed(after));
+                publish(&mut output,format!("exact fixed-carry controls; probe={index}; initial={:?}; learned={:?}; actual_continuing={:?}; no observation or deposit\n",before.prediction().reads[2],after.reads[2],received.prediction.reads[2]));
+                let target=observed.classes_read().nth(2).expect("exterior expected relation");
+                let pre=before.prediction().reads[2].read.logits.clone();
+                let post=after.reads[2].read.logits.clone();
+                let actual=&received.prediction.reads[2].read.logits;
+                initial_passes &= margin(&pre,target)>tolerance;
+                learned_passes &= margin(&post,target)>tolerance && margin(actual,target)>tolerance;
+                publish(&mut output,format!("exact relation comparison after publication; probe={index}; truth={target}; initial_margin={}; learned_common_margin={}; continuing_margin={}; required={tolerance}\n",margin(&pre,target),margin(&post,target),margin(actual,target)));
+                pairs.push((pre,post));
+            }
+            completed+=1;
+            publish(&mut output,format!("exact whole unit; teaching={teaching}; section={index}; controls_receipts_and_grading_ns={}; whole_unit_ns={}; all_owner_calls={:?}; unit_cost_is_telemetry; whole_job_admission_unchanged\n",control_started.elapsed().as_nanos(),started.elapsed().as_nanos(),holonics::hnn::word::work::read().since(before_work)));
+        }
+    }
+    let mut acquired=false;
+    if let Some((pre,_))=pairs.first() {
+        let count=Rat::from_integer(pairs.len().into());
+        let mean:Vec<Rat>=(0..pre.len()).map(|j|pairs.iter().map(|(a,b)|&b[j]-&a[j]).sum::<Rat>()/&count).collect();
+        acquired=pairs.iter().any(|(a,b)|a.iter().zip(b).zip(&mean).enumerate().any(|(j,((a,b),m))|j%2==0 && (b-a-m).abs()>tolerance));
+    }
+    let complete=completed==teaching_count+probe_count && pairs.len()==probe_count;
+    publish(&mut output,format!("bounded exact receiving relation; complete_interaction={complete}; initial_relation_already_passes={initial_passes}; centered_acquired_real_source_response_above_tolerance={acquired}; every_expected_common_and_continuing_margin_passes={learned_passes}; bounded_relation_gate={}; whole_interaction_ns={}; no charted/performance/product/generalization/order-two-key/full-teaching-retention claim\n",complete && !initial_passes && acquired && learned_passes,all_started.elapsed().as_nanos()));
+    interaction_work(&mut output,all_work,&declaration,completed,complete);
+}
+
+fn exact_role(output:&mut std::fs::File,name:&str,started:Instant,bound_ms:u128,
+    carry:Option<&holonics::hnn::word::ReceptionCarry>,material:&Constitution,
+) -> bool {
+    let carry_denominator_bits=carry.map(|c|c.change.storage.iter().flatten()
+        .chain(c.change.arrivals.iter().flatten().flatten())
+        .chain(c.change.states.iter().flatten().flatten())
+        .chain(c.change.resonators.iter().flatten().flatten().flatten())
+        .chain(c.conductances.iter()).chain(c.momenta.iter().flatten())
+        .chain(c.resonator_momenta.iter().flatten().flatten())
+        .map(|v|v.denom().bits()).max().unwrap_or(0)).unwrap_or(0);
+    let receiving_denominator_bits=holonics::hnn::ConstitutionRead::receiving_map(material,0)
+        .map(|r|r.entries().iter().map(|v|v.denom().bits()).max().unwrap_or(0)).unwrap_or(0);
+    let elapsed=started.elapsed().as_nanos();
+    publish(output,format!("exact execution role={name}; elapsed_ns={elapsed}; projected_upper_ms={bound_ms}; largest_actual_carry_denominator_bits={carry_denominator_bits}; largest_receiving_map_denominator_bits={receiving_denominator_bits}; timing does not prove a cause from bit length\n"));
+    if elapsed>bound_ms*1_000_000 {
+        publish(output,format!("INCOMPLETE: changed exact role exceeded its fixed measured projection; no further role; whole resource envelope unchanged\n"));
+        false
+    } else {true}
 }
 
 /// Matched sparse engineering read, declared before execution. The exact baseline excludes

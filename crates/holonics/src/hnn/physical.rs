@@ -134,7 +134,7 @@ impl<'f> PhysicalResident<'f> {
 
     /// The same continuing receiver on an explicit sparse source, without a completion-domain
     /// certificate. A communicated complex face does not assert a completed class assignment.
-    pub(crate) fn receive_sparse(
+    pub fn receive_sparse(
         &mut self,
         section: &DamagedSection,
         receiver: &ReceiverDeclaration,

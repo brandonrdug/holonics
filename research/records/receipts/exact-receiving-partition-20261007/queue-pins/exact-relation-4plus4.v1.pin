@@ -1,0 +1,10 @@
+# Changed existing-owner exact sparse partition, not a replay of failed charted comparison.
+# Max completed exact coverage unit659479091 ns, rounded up at this pin's1ms grain.
+# Sixteen roles=one setup+eight primary sparse receptions+seven extra fixed-carry controls.
+# Later-state growth unproved: each actual role above660ms stops; result incomplete.
+# Old whole native deadline and outer projection retained, no cap raise.
+command = executed physical-learn
+projection = 16*660000000ns=10560000000ns prospective exact role sum; whole native ceiling10682000000ns; outer10972158131ns; prior exact max659479091ns; no complete8-unit measurement; all setup/source/output/controls charged to whole job
+deadline_ms = 10682
+unit_bound_ms = 660
+threads = 1

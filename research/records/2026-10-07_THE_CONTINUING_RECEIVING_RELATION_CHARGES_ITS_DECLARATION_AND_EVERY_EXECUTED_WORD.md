@@ -4,7 +4,7 @@ Refs #63, #73, #148. Native/formal and device joins remain obligations of #62 an
 
 ## Fixed claim and existing consumer
 
-[source-derived; native acceptance pending] The existing notebook consumer
+[native-checked at 71f2e850; continuing science incomplete] The existing notebook consumer
 `hnn_physical_receive::charted_compare` now consumes the declaring-face reuse receipt alongside
 the same sparse exact forward, charted forward and paired receiving comparison. No new training
 mode, terrain, response solver, decoder or source law is installed. The native coefficients,
@@ -110,7 +110,11 @@ omitting the expensive declaring producer from a reported Word count.
 ## Failure explanations and acceptance boundary
 
 The preceding matched read stopped after two teachings and no probes because a unit exceeded
-its measured fixed projection. That establishes a cost failure, not feature aliasing, lack of
+its inferred fixed projection. Subsequent source tracing found that projection combined unrelated
+exact and charted fixture timings and was not a measured upper for the current unit. The complete
+v50 receipt and changed exact read are qualified in
+[the execution-partition record](2026-10-07_THE_EXACT_RECEIVING_POINT_RELATION_HAS_ITS_OWN_MEASURED_EXECUTION_PARTITION.md).
+The stop establishes incomplete execution, not aggregate resource exhaustion, feature aliasing, lack of
 separability, inadequate teaching or useful acquisition. The unchanged failed scientific input
 is not replayed. The new controls and instrumentation add work; all of it remains charged to
 the same unit and outer policy. No timing cap or numerical tolerance is raised. A prospective
@@ -127,10 +131,14 @@ map is admitted here. A perceptron upper convergence bound greater than four doe
 four observations insufficient, and the existing certified normal deposition is not assumed to
 be that perceptron update.
 
-The frozen corrected declaration source remains the queue's preceding six-control input. This
-successor is source preparation only: syntax, whitespace, owned-path and atlas checks are static
+At preparation the frozen corrected declaration source was the queue's preceding six-control input. This
+successor's syntax, whitespace, owned-path and atlas checks were static
 receipts. Native type/guard/doctest/link and the new counter control must pass at the exact sealed
-source before the caller is an accepted implementation. No scientific job was requested or run.
+source before the caller is an accepted implementation. At preparation no scientific job was requested or run.
+Continuation-v50 has since accepted five focused native controls, 56 doctests, affected-library
+checks/guards and the actual example, with all 297 source inputs matched. Automatic approval review
+refused the broad workspace/all-targets launch; that grade remains unverified. Its continuing read
+was incomplete after two teachings and zero probes. No useful-response or speedup credit follows.
 
 Recorded failures addressed: omitted declaring/control cost; seen material graded as unseen;
 an authored response mistaken for learning; an observed R change mistaken for acquired source

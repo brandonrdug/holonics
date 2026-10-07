@@ -1,0 +1,109 @@
+{
+  "grade": "SOURCE PREPARATION ONLY; type/runtime/science pending",
+  "checks": [
+    {
+      "check": "Rust parse only; no emitted file/compile",
+      "argv": [
+        "rustfmt",
+        "--emit",
+        "stdout",
+        "--config",
+        "skip_children=true",
+        "--edition",
+        "2024",
+        "crates/holonics/src/hnn/physical.rs"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "check": "Rust parse only; no emitted file/compile",
+      "argv": [
+        "rustfmt",
+        "--emit",
+        "stdout",
+        "--config",
+        "skip_children=true",
+        "--edition",
+        "2024",
+        "research/notebook/hnn_design/hnn_physical_receive.rs"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "check": "Rust parse only; no emitted file/compile",
+      "argv": [
+        "rustfmt",
+        "--emit",
+        "stdout",
+        "--config",
+        "skip_children=true",
+        "--edition",
+        "2024",
+        "research/notebook/hnn_design/hnn_prediction.rs"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "check": "Whitespace",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "source_owner_native_runs": 0,
+  "files": {
+    "crates/holonics/src/hnn/physical.rs": {
+      "bytes": 10138,
+      "sha256": "20c25b6b9e686d60e0b54de7c5b2b609517c54d7403257cb5e8b71a8e5ddb654"
+    },
+    "research/notebook/hnn_design/hnn_physical_receive.rs": {
+      "bytes": 75524,
+      "sha256": "c1ffc722d0ba56708f102e8282914d49caca9aa77c67db5ee4a891640ae9c327"
+    },
+    "research/notebook/hnn_design/hnn_prediction.rs": {
+      "bytes": 20105,
+      "sha256": "00c612acecdce7fc1654f56687372547ac28862b331f4f6aa684dc54557ba563"
+    }
+  },
+  "base_commit": "9d2fae373bbca374998b4f1dffc053204f927917",
+  "atlas_check": {
+    "unique_id": "hnn.exact-receiving-point-relation",
+    "columns": 8,
+    "status": "PASS",
+    "existing_row_updated": "hnn.continuing-owner-work-receipt"
+  },
+  "source_or_scientific_runs": 0,
+  "whole_workspace_acceptance": false,
+  "source_facts": {
+    "initial_source": "dense declared signs/2",
+    "initial_pair_outputs": "all zero",
+    "learned_locus": "ReceivingMap only",
+    "spent_correlated_orbits": true,
+    "sparse_domain": "Held/UncertifiedDomain"
+  },
+  "preserved_evidence": {
+    "research/records/receipts/exact-receiving-partition-20261007/exact-coverage/RESULT.v1.json": {
+      "bytes": 1763,
+      "sha256": "238e18ef17b19763ec99a510172282f6486d93a5c003eb0921769d5234528a91"
+    },
+    "research/records/receipts/exact-receiving-partition-20261007/exact-coverage/TIMING_LINES.v1.json": {
+      "bytes": 2387,
+      "sha256": "8ba5059a67acf51b1388844fbd3e13ac4e7463a2efa8e501a3e056a64b9e02ab"
+    },
+    "research/records/receipts/exact-receiving-partition-20261007/queue-pins/exact-relation-4plus4.v1.pin": {
+      "bytes": 750,
+      "sha256": "74260d7d1646edb64c95ce46b9a59556a059a1402301121161eebda29434f66b"
+    },
+    "research/records/receipts/exact-receiving-partition-20261007/v50/HNN_FULL_ACTUAL_OUTPUT.txt": {
+      "bytes": 12395,
+      "sha256": "7d733898b6301f54a6dbe4e4c7b67c2097f855aaf7a643c805c9080e80bf3c4c"
+    },
+    "research/records/receipts/exact-receiving-partition-20261007/v50/OUTCOME.md": {
+      "bytes": 1511,
+      "sha256": "a0777a9c85c7dccd3835271639f58432af40924cdb36ef4d1cac974b78103879"
+    }
+  }
+}

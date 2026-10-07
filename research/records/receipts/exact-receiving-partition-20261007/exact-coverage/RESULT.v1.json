@@ -1,0 +1,51 @@
+{
+  "source_commit": "af365197c30b2701e4b99f2cb99f24b05b3090e6",
+  "scientific_completed": false,
+  "scientific_grade": "INCOMPLETE",
+  "resource_stage_accepted": true,
+  "four_observed_target_classes": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "complete_complex_rows_0_1_equal": false,
+  "completed_teachings": 4,
+  "completed_probes": 2,
+  "requested_probes": 4,
+  "whole_unit_ns": [
+    199416716,
+    336610544,
+    412832763,
+    489502461,
+    458017969,
+    659479091
+  ],
+  "fixed_whole_unit_strict_upper_ns": 563000000,
+  "first_excess_ns": 96479091,
+  "stop": "After probe1; no probe2/3, no repeated/raised-budget job",
+  "blind_probe_cells": [
+    {
+      "index": 0,
+      "before_cells": "[Intact(0), Intact(3), Held { fibre: [0, 1, 2, 3], unresolved: PluralDomain }, Intact(0)]",
+      "matched_cells": "[Intact(0), Intact(3), Held { fibre: [1, 2], unresolved: PluralDomain }, Intact(0)]",
+      "continuing_cells": "[Intact(0), Intact(3), Held { fibre: [1, 2], unresolved: PluralDomain }, Intact(0)]"
+    },
+    {
+      "index": 1,
+      "before_cells": "[Intact(1), Intact(0), Held { fibre: [0, 1, 2, 3], unresolved: PluralDomain }, Intact(1)]",
+      "matched_cells": "[Intact(1), Intact(0), Held { fibre: [1, 2], unresolved: PluralDomain }, Intact(1)]",
+      "continuing_cells": "[Intact(1), Intact(0), Held { fibre: [0, 1, 2], unresolved: PluralDomain }, Intact(1)]"
+    }
+  ],
+  "wall_ns": 2878925307,
+  "native_wall_ns": 2697155834,
+  "controller_wall_ns": 181769473,
+  "controller_projection_ns": 290158131,
+  "outer_projection_ns": 5252158131,
+  "CPU_ns": 2821718000,
+  "peak_child_RSS_KiB": 98912,
+  "group_peak_bytes": 83976192,
+  "no_held_or_fidelity_or_acquisition_credit": true,
+  "pin_commit": "293f59d1688f467be1fbe3f4fdfee5fd314e6674"
+}
