@@ -1,0 +1,63 @@
+{
+  "grade": "SOURCE PRESENT; no native acceptance/performance credit",
+  "base": "204936dce4c1ae977048375453dab4bf52244740",
+  "owned_native_paths": [
+    "crates/holonics/src/hnn/prediction/charted.rs",
+    "crates/holonics/src/hnn/prediction/charted/linear_radius.rs"
+  ],
+  "source_files": {
+    "crates/holonics/src/hnn/prediction/charted.rs": {
+      "bytes": 49747,
+      "sha256": "61cfe1100562333f25f0118d0996980c017a0ad312df825aa3e9f32da2303315"
+    },
+    "crates/holonics/src/hnn/prediction/charted/linear_radius.rs": {
+      "bytes": 6296,
+      "sha256": "aa54bb088760db2bc3dccac49fa9eab9aa40005496fac725e9804083d4d91337"
+    }
+  },
+  "unchanged_inputs_from_base": 291,
+  "added_native_inputs": 1,
+  "new_native_total": 293,
+  "equation": "e_right=abs(B)e_input; e_next=abs(U)e_update; each coefficient from same borrowed producing contact map on unit input, once lazily per Word; same exact input-order sum",
+  "consumer": [
+    "predict -> same native full tick/error loop",
+    "source_return_error_on -> same source-coordinate tick/error loop",
+    "same contemporary comparison/Word.pull_back/compose_return/actual applied-R step unchanged"
+  ],
+  "reusable_scope": "one borrowed immutable Operands; two contact radius maps; no cross-Word/material/clock reuse",
+  "retained_occurrence_or_actual_state": false,
+  "receiving_covector_error_contract_changed": false,
+  "tolerance_projection_or_physics_shortened": false,
+  "new_controls": 2,
+  "new_direct_Words": 1,
+  "new_direct_full_ticks": 0,
+  "counts_boundary": "Direct native test constructions only; actual receiving declaration includes all exact observability certificate Words; source error includes analytical signed/error ticks. No total execution-count claim or time projection inferred from direct count.",
+  "selectors": [
+    "hnn::prediction::charted::linear_radius::tests::lazy_radius_columns_preserve_exact_images_zero_work_and_typed_shape_refusal",
+    "hnn::prediction::charted::tests::contact_radius_faces_reuse_the_same_native_images_under_one_producing_word",
+    "hnn::prediction::charted::tests::source_response_re_represents_the_producing_chart",
+    "hnn::tests::physical_charted::charted_source_and_carry_error_enclose_the_same_exact_physical_passage",
+    "hnn::tests::physical_charted::charted_receiving_learning_charges_both_covectors_and_keeps_its_physical_carry",
+    "hnn::tests::physical_charted::charted_zero_tolerance_refuses_the_actual_opening_error_and_retains_the_blind_end",
+    "hnn::tests::physical_charted::charted_loaded_pump_error_keeps_the_absolute_clock_across_the_carry",
+    "hnn::tests::physical_charted::charted_physical_balance_consumes_its_actual_opening_split"
+  ],
+  "no_compiler_or_native_run_by_source_owner": true,
+  "static_checks": [
+    "rustfmt new child format check",
+    "rustfmt existing parent syntax parse without wholesale reformatting",
+    "git diff whitespace check",
+    "292 baseline input hashes: only charted.rs changed; one added child",
+    "eight selector definitions found",
+    "JSON and local record links checked"
+  ],
+  "ownership_review": "Narrow charted.rs consuming/new-test hunks plus new child/atlas row/record/preparation; physical owner must reconcile at integration. Original physical owner tree and frozen communication048 unchanged.",
+  "resource_policy": "sole queue fixed measured projection, existing17CPU/60wall/4GiBgroup/8GiBentrance/4GiBfloor/j1 and cached65wall128CPU/j8/group+AS4GiB, existingdebug0/cgu16 partition; no cap raise/replay",
+  "native_validation_or_scientific_replay_launched": false,
+  "full_matched_after_gate": "Only a new declared source-matched admission after eight native controls, unchanged original cadence. No old failed source replay or science claim.",
+  "Refs": [
+    63,
+    73,
+    62
+  ]
+}

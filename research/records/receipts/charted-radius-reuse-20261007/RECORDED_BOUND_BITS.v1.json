@@ -1,0 +1,59 @@
+{
+  "grade": "Derived bit lengths of already printed exact bounds/applied certificates; not new runtime or a constitution/actual-carry dump",
+  "rows": [
+    {
+      "section": 0,
+      "receiving_bound_max_bits": [
+        115,
+        126
+      ],
+      "actual_receiving_covector_error_max_bits": [
+        26,
+        41
+      ],
+      "applied_curvature_bits": [
+        261,
+        272
+      ],
+      "applied_decrease_bits": [
+        130,
+        134
+      ],
+      "carry_error_bound_bits": [
+        118,
+        127
+      ],
+      "source_covector_nonzero_components": 0
+    },
+    {
+      "section": 1,
+      "receiving_bound_max_bits": [
+        305,
+        313
+      ],
+      "actual_receiving_covector_error_max_bits": [
+        71,
+        85
+      ],
+      "applied_curvature_bits": [
+        623,
+        630
+      ],
+      "applied_decrease_bits": [
+        321,
+        325
+      ],
+      "carry_error_bound_bits": [
+        386,
+        390
+      ],
+      "source_covector_nonzero_components": 8
+    }
+  ],
+  "no_constitution_or_actual_current_bit_measurement": true,
+  "producing_source": "204936dce4c1ae977048375453dab4bf52244740",
+  "original_raw_stdout_pin": {
+    "bytes": 10080,
+    "sha256": "6e0639ab60c1c43d5a8f810d23667ba4e9c8e3845fd85d1657801b1b2c3ef6dc"
+  }
+}

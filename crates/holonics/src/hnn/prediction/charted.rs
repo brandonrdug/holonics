@@ -30,6 +30,9 @@ use crate::ratio::exponentiated::CarriedPower;
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::vector::{add, dot, scale, sub};
 
+mod linear_radius;
+use linear_radius::ContactRadiusMaps;
+
 /// Component tolerances in the declared receiving/source charts. None is an iteration budget.
 #[derive(Clone, Debug)]
 pub struct ChartedTolerance {
@@ -297,6 +300,7 @@ fn predict<'f, 'm>(field: &'f Field, material: &'m Constitution, current: &Curre
     for &g in field.sources() { source = source.station_section(field, current, g, &placed)?; }
     let (mut word, receipt) = Word::open_charted_received(field, material, current, &source, charts, opening)?;
     let operands = word.operands().clone();
+    let mut radius_maps = ContactRadiusMaps::new(&operands);
     if operands.resonators().iter().flatten().any(|r| r.material().saturation().is_some()) {
         return Err(HnnError::Unadmitted { reason: "a charted physical comparison needs its nonlinear Word-Hessian error join" });
     }
@@ -324,7 +328,7 @@ fn predict<'f, 'm>(field: &'f Field, material: &'m Constitution, current: &Curre
         }
         else {
             let signed = physical_signed_tick(&operands, &point, opened_at+crossing)?;
-            let mut next = tick_error(&operands, &point, &radius, opened_at+crossing)?;
+            let mut next = tick_error_cached(&mut radius_maps, &point, &radius, opened_at+crossing)?;
             word.tick()?;
             let actual = word.change()?;
             let mut split = actual;
@@ -420,7 +424,13 @@ fn junction_error(o: &Operands, point: &EndChange, error: &EndChange) -> Result<
     }).collect()
 }
 
+#[cfg(test)]
 fn tick_error(o: &Operands, point: &EndChange, error: &EndChange, tick: usize) -> Result<EndChange,HnnError> {
+    tick_error_cached(&mut ContactRadiusMaps::new(o), point, error, tick)
+}
+
+fn tick_error_cached(maps: &mut ContactRadiusMaps<'_>, point: &EndChange, error: &EndChange, tick: usize) -> Result<EndChange,HnnError> {
+    let o = maps.operands;
     let centers = physical_signed_junctions(o,point)?;
     let bounds = junction_error(o,point,error)?;
     let mut next = error.clone();
@@ -455,14 +465,11 @@ fn tick_error(o: &Operands, point: &EndChange, error: &EndChange, tick: usize) -
         let point_inputs=[outgoing(o,&centers,from,a),outgoing(o,&centers,to,a),point.states[a][0].as_slice(),point.states[a][1].as_slice()];
         let inputs=[outgoing(o,&bounds,from,a),outgoing(o,&bounds,to,a),error.states[a][0].as_slice(),error.states[a][1].as_slice()];
         let right=crate::hnn::propagation::transit_solve(c,h,point_inputs[0],point_inputs[1],point_inputs[2],point_inputs[3])?.0;
-        let re=physical_linear_radius(&inputs,c.width(),|b| Ok(crate::hnn::propagation::transit_solve(c,h,&b[0],&b[1],&b[2],&b[3])?.0))?;
+        let re=maps.right(a,&inputs)?;
         let solved=solve_error(&c.solve()?,c.chart().map_or_else(Rat::zero,|c|c.certificate.clone()),&right,&re)?;
         let n0=inputs[0].len();let n1=inputs[1].len();let n=c.width();
         let inputs=[solved.as_slice(),inputs[0],inputs[1],inputs[2],inputs[3]];
-        let image=physical_linear_radius(&inputs,n0+n1+2*n,|b| {
-            let p=crate::hnn::propagation::transit_update(c,h,&b[0],&b[1],&b[2],&b[3],&b[4]);
-            Ok([p.arrive_from,p.arrive_to,p.displacement,p.rate].concat())
-        })?;
+        let image=maps.update(a,&inputs)?;
         next.arrivals[a]=[image[..n0].to_vec(),image[n0..n0+n1].to_vec()];
         next.states[a]=[image[n0+n1..n0+n1+n].to_vec(),image[n0+n1+n..].to_vec()];
     }
@@ -532,6 +539,7 @@ fn source_return_error_on(field:&Field,material:&Constitution,current:&Current,p
     ->Result<(Vec<Vec<Rat>>,Vec<Vec<Rat>>),HnnError> {
     let mut error:Vec<_>=field.rings().iter().map(|r|vec![Rat::zero();r.width()]).collect();
     let mut rounding=error.clone();
+    let mut radius_maps = ContactRadiusMaps::new(operands);
     for &ring in field.sources() {for coordinate in 0..field.ring(ring).width() {
         let mut point=EndChange::rest(field,operands);point.storage[ring][coordinate]=Rat::one();
         let mut radius=EndChange::rest(field,operands);
@@ -549,7 +557,7 @@ fn source_return_error_on(field:&Field,material:&Constitution,current:&Current,p
                     .map(|((l,e),(g,ge))|&e*g.abs()+(l.abs()+e)*ge).sum::<Rat>();
             }
             if crossing+1<phases.junction_steps() {
-                radius=tick_error(operands,&point,&radius,opened_at+crossing)?;
+                radius=tick_error_cached(&mut radius_maps,&point,&radius,opened_at+crossing)?;
                 point=physical_signed_tick(operands,&point,opened_at+crossing)?;
             }
         }
@@ -669,6 +677,51 @@ mod tests {
             }
         }}
         panic!("the actual refused response operand must be reproduced");
+    }
+
+    #[test]
+    fn contact_radius_faces_reuse_the_same_native_images_under_one_producing_word() {
+        let field=matched_field();
+        let theta=Constitution::initial(&field,CAMPAIGN_ONE_BUDGET).unwrap();
+        let current=Current::at_rest(&field);
+        let source=SourceMoment::open_with(&field,&current,&theta).unwrap();
+        let mut charts=Charts::new();
+        let (word,_)=Word::open_charted_received(&field,&theta,&current,&source,&mut charts,&WordOpening::Rest).unwrap();
+        let linear=word.operands().clone().unsplit().unwrap();
+        let mut faces=ContactRadiusMaps::new(&linear);
+        let mut total=0;
+        for (a,c) in linear.contacts().iter().enumerate() {
+            let (from,to)=c.ends();
+            let n0=linear.rings()[from].width();let n1=linear.rings()[to].width();let n=c.width();
+            let shape=[n0,n1,n,n];
+            let values:Vec<_>=shape.iter().map(|&width|vec![Rat::one();width]).collect();
+            let inputs:Vec<_>=values.iter().map(Vec::as_slice).collect();
+            let raw=|b:&[Vec<Rat>]|Ok(crate::hnn::propagation::transit_solve(c,linear.step(),&b[0],&b[1],&b[2],&b[3])?.0);
+            let expected=physical_linear_radius(&inputs,n,&raw).unwrap();
+            assert_eq!(faces.right(a,&inputs).unwrap(),expected);
+            total+=shape.iter().sum::<usize>();
+            assert_eq!(faces.located_columns(),total);
+            let changed:Vec<_>=values.iter().map(|row|scale(&integer(3),row)).collect();
+            let inputs:Vec<_>=changed.iter().map(Vec::as_slice).collect();
+            assert_eq!(faces.right(a,&inputs).unwrap(),physical_linear_radius(&inputs,n,&raw).unwrap());
+            assert_eq!(faces.located_columns(),total,"fresh radius uses already located coefficient columns");
+            let shape=[n,n0,n1,n,n];
+            let values:Vec<_>=shape.iter().map(|&width|vec![Rat::one();width]).collect();
+            let inputs:Vec<_>=values.iter().map(Vec::as_slice).collect();
+            let raw=|b:&[Vec<Rat>]| {
+                let p=crate::hnn::propagation::transit_update(c,linear.step(),&b[0],&b[1],&b[2],&b[3],&b[4]);
+                Ok([p.arrive_from,p.arrive_to,p.displacement,p.rate].concat())
+            };
+            assert_eq!(faces.update(a,&inputs).unwrap(),physical_linear_radius(&inputs,n0+n1+2*n,&raw).unwrap());
+            total+=shape.iter().sum::<usize>();
+            assert_eq!(faces.located_columns(),total);
+            assert_eq!(faces.update(a,&inputs).unwrap(),physical_linear_radius(&inputs,n0+n1+2*n,&raw).unwrap());
+            assert_eq!(faces.located_columns(),total);
+        }
+        let fresh=ContactRadiusMaps::new(&linear);
+        assert_eq!(fresh.located_columns(),0,"a new producing face never inherits a previous word's coefficients");
+        println!("exact contact radius columns located={total}; repeated applications locate no further columns; no forward tick removed");
+        drop(word);
     }
 
     #[test]
