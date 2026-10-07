@@ -267,3 +267,31 @@ recovered owners, not a proof of this new consumed six-anchor instance. Scoped m
 acceptance is now v66; Lean, GPU parity and the save/current-key joins remain separate obligations.
 The prepared acquisition caller itself has no type/runtime or scientific result yet. Fresh
 independently reserved observations would additionally be required for a generalization claim.
+
+## V67 boundary refusal and exact correction
+
+The sole queue's fresh example Clippy/type/three-guard check at `606eceb4f` rejected five
+`std::fs::File` helper parameters in `source_observer_role`, `publish_receiving_operands`,
+`exact_pair_observation`, `exact_role` and `interaction_work`. Example linking and the 4+4
+acquisition were not launched: the scientific point is **unspent**. The v66 seven-control
+acceptance remains separate and unchanged. Full raw Cargo output is preserved in the canonical
+v67 receipts; the [boundary correction receipt](receipts/source-observer-20261007/BOUNDARY_CORRECTION.v1.json)
+pins it and the corrected source.
+
+[agent-inferred] These exterior receipt helpers need only the existing `std::io::Write`
+interface, not filesystem ownership. Their parameters now use `&mut impl Write`, as does the
+existing `publish` sink. File creation stays at the existing explicit exterior bindings. The
+publisher's now-unneeded disallowed-type allowance is removed; no allowance is added and the
+three denied guard flags are unchanged. Every helper body, stdout/file receipt, write/flush
+order, teaching/probe law, strict criterion, physical carry and work counter is unchanged.
+This is a boundary repair, not native acceptance or an acquisition result. Fresh example
+validation remains with the sole queue; the same unchanged failed source is not replayed.
+
+V67's two HNN stages used `16002893000 ns` aggregate CPU and `17165080544 ns` stage wall time.
+The cumulative HNN native/build/guard account is now 52 jobs, `528950026000 ns` aggregate CPU
+and `406881880913 ns` stage wall time; prior formal and earlier accounts remain separate.
+The queue retains its existing **16-second complete/child development guard**, 17-second
+aggregate CPU limit and unchanged memory/thread/lease policy. The committed source pin's
+60-second ceiling is looser; it does not increase the queue's effective deadline. Neither that
+pin nor the fixed acquisition operands/criterion changes in this correction. The separately
+reviewed producing-operand and seed-reuse consolidation does not enter this boundary-only source.

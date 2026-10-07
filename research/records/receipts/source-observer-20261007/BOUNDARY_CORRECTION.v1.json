@@ -1,0 +1,90 @@
+{
+  "base": "606eceb4f59b69934761ca226088089a8f71077d",
+  "grade": "source/parser/whitespace verification only; new example guard/link/science pending",
+  "source": {
+    "path": "/home/b/Workspaces/holonics/.local/wt/hnn-source-observer-01a1030c/research/notebook/hnn_design/hnn_physical_receive.rs",
+    "bytes": 107984,
+    "sha256": "68e512e1c727e69b2d27c80db03e2ba9f99dbf9e4900729fb7b3e368243ce8a9"
+  },
+  "exact_code_delta": "Six helper/publisher parameter substitutions from &mut File to &mut impl Write; remove publisher disallowed_types allowance. Every byte outside these substitutions unchanged. No helper body, receipt string, forward/teacher/criterion/clock/prior/carry/work counter change.",
+  "file_boundaries": "File creation remains at existing exterior-local bindings; generic publication still writes and flushes same actual File and stdout. No new native IO owner or filesystem input.",
+  "guard_flags": [
+    "-D clippy::disallowed_types",
+    "-D clippy::disallowed_methods",
+    "-D clippy::float_arithmetic"
+  ],
+  "guard_flags_and_configuration_unchanged": true,
+  "new_allowances": 0,
+  "removed_allowance": "publish clippy::disallowed_types",
+  "syntax": {
+    "argv": [
+      "timeout",
+      "10",
+      "rustfmt",
+      "--edition",
+      "2024",
+      "--emit",
+      "stdout",
+      "research/notebook/hnn_design/hnn_physical_receive.rs"
+    ],
+    "fixed_guard_seconds": 10,
+    "exit": 0,
+    "mutated_source": false
+  },
+  "exact_code_equivalence_check": true,
+  "git_diff_check_exit": 0,
+  "canonical_v67": {
+    "outcome": {
+      "path": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v67/OUTCOME.md",
+      "bytes": 2523,
+      "sha256": "cb07bd1bb1f06566e3f6d17e94e9bf180a26378275615bbfc6e8ec8fda0ae2ef"
+    },
+    "validation": {
+      "path": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v67/VALIDATION.json",
+      "bytes": 821329,
+      "sha256": "e6f6087c2c0c8a4ef699da0db7ff600f99441ebad1038c1dd339231710a52501"
+    },
+    "full_stdout": {
+      "path": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v67/HNN_FULL_EXAMPLE_GUARD_STDOUT.txt",
+      "bytes": 24660,
+      "sha256": "a5cf5bdbb34bf2d60c63d1184e1b795c2d1ac744be5cc1f5d4ab5c333c960c7b"
+    },
+    "full_stderr": {
+      "path": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v67/HNN_FULL_EXAMPLE_GUARD_STDERR.txt",
+      "bytes": 282886,
+      "sha256": "cf4fc63a56ffaf581db3c4c9feb63071ffd5534050fa27cafce822080cd3ec15"
+    },
+    "errors": [
+      "error: use of a disallowed type `std::fs::File`\n   --> crates/holonics/../../research/notebook/hnn_design/hnn_physical_receive.rs:804:37\n    |\n804 | fn source_observer_role(output:&mut std::fs::File,name:&str,started:Instant,\n    |                                     ^^^^^^^^^^^^^\n    |\n    = note: no file system inside the machinery (guard 7)\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.92.0/index.html#disallowed_types\n    = note: requested on the command line with `-D clippy::disallowed-types`",
+      "error: use of a disallowed type `std::fs::File`\n   --> crates/holonics/../../research/notebook/hnn_design/hnn_physical_receive.rs:822:43\n    |\n822 | fn publish_receiving_operands(output:&mut std::fs::File,index:usize,\n    |                                           ^^^^^^^^^^^^^\n    |\n    = note: no file system inside the machinery (guard 7)\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.92.0/index.html#disallowed_types\n",
+      "error: use of a disallowed type `std::fs::File`\n   --> crates/holonics/../../research/notebook/hnn_design/hnn_physical_receive.rs:852:65\n    |\n852 |     receiver:&ReceiverDeclaration,observed:&Encoded,output:&mut std::fs::File,\n    |                                                                 ^^^^^^^^^^^^^\n    |\n    = note: no file system inside the machinery (guard 7)\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.92.0/index.html#disallowed_types\n",
+      "error: use of a disallowed type `std::fs::File`\n   --> crates/holonics/../../research/notebook/hnn_design/hnn_physical_receive.rs:935:27\n    |\n935 | fn exact_role(output:&mut std::fs::File,name:&str,started:Instant,bound_ms:u128,\n    |                           ^^^^^^^^^^^^^\n    |\n    = note: no file system inside the machinery (guard 7)\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.92.0/index.html#disallowed_types\n",
+      "error: use of a disallowed type `std::fs::File`\n    --> crates/holonics/../../research/notebook/hnn_design/hnn_physical_receive.rs:1158:33\n     |\n1158 | fn interaction_work(output:&mut std::fs::File,before:holonics::hnn::word::work::WorkRead,\n     |                                 ^^^^^^^^^^^^^\n     |\n     = note: no file system inside the machinery (guard 7)\n     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.92.0/index.html#disallowed_types\n"
+    ]
+  },
+  "v67_grade": "FRESH_EXAMPLE_GUARD_REFUSAL_FIVE_FILE_BOUNDARY_TYPES",
+  "scientific_point_spent": false,
+  "v67_example_link_and_runtime": "NOT_LAUNCHED_STOP_FIRST_REFUSAL",
+  "preserved_mechanical_scope": "16a/v66 all7nativePASS; production and tests unchanged by606/boundary",
+  "v67_runtime_admission": "Existing16s child/complete development guard,17s aggregateCPU/j1/4GiBgroup+AS; original60s source pin is only a looser ceiling and does not raise queue deadline",
+  "effective_runtime_guard_seconds": 16,
+  "prepared_pin_unchanged": {
+    "path": "/home/b/Workspaces/holonics/.local/wt/hnn-source-observer-01a1030c/research/runs/source-observer-relation/first-development.pin",
+    "bytes": 916,
+    "sha256": "5d8fbeb7292204bf3fa94919a8f51bbf2a4b603e9bb016b77d2807e185f10e9e"
+  },
+  "new_HNN_workflow_cost": {
+    "jobs": 2,
+    "CPU_ns": 16002893000,
+    "wall_ns": 17165080544
+  },
+  "cumulative_HNN_native_guard_cost": {
+    "jobs": 52,
+    "CPU_ns": 528950026000,
+    "wall_ns": 406881880913,
+    "prior_formal_and_earlier_cost_accounts_separate_retained": true
+  },
+  "source_owner_compiler_native_scientific_jobs": 0,
+  "consolidations_applied": false,
+  "scientific_acceptance": "Same original4R+4blindprobes/spent seeds/source/clock/prior/commoncarry12/actualticks3..24/strict1/16 gate, never spent; no baseline replay/new teacher/tuned gain requested."
+}

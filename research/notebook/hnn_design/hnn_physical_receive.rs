@@ -801,7 +801,7 @@ fn source_observer_relation(teaching_count:usize,probe_count:usize,out:&str,
 /// The first source-matched development read has a fixed admission cap, no invented forecast.
 /// A later measured pin may bound whole units; full-point time is checked only against its
 /// whole deadline. The external common-lease controller independently stops aggregate CPU.
-fn source_observer_role(output:&mut std::fs::File,name:&str,started:Instant,
+fn source_observer_role(output:&mut impl Write,name:&str,started:Instant,
     all_started:Instant,pin:&exterior::Pin,
 ) -> bool {
     let elapsed=started.elapsed().as_nanos();
@@ -819,7 +819,7 @@ fn source_observer_role(output:&mut std::fs::File,name:&str,started:Instant,
 /// The actual reached R operands, read only AFTER the unchanged blind/comparison/publication.
 /// A port's linear read at its already reached feature costs no additional Word. Its arithmetic
 /// and full receipt publication are still charged in the existing whole unit/job measurement.
-fn publish_receiving_operands(output:&mut std::fs::File,index:usize,
+fn publish_receiving_operands(output:&mut impl Write,index:usize,
     publication:&holonics::hnn::physical::PhysicalPublication,
     blind:&holonics::hnn::prediction::PhysicalRepair,
 ) {
@@ -849,7 +849,7 @@ fn publish_receiving_operands(output:&mut std::fs::File,index:usize,
 /// Same-context first-order descent is a mechanical reading, not a finite score or useful gate.
 fn exact_pair_observation(
     resident:&mut PhysicalResident<'_>,field:&Field,current:&Current,
-    receiver:&ReceiverDeclaration,observed:&Encoded,output:&mut std::fs::File,
+    receiver:&ReceiverDeclaration,observed:&Encoded,output:&mut impl Write,
     bound:u128,declaration:&mut DeclarationWork,
 ) -> Option<Constitution> {
     use holonics::hnn::ConstitutionRead;
@@ -932,7 +932,7 @@ fn same_declaring_medium(field:&Field,a:&Constitution,b:&Constitution) -> bool {
         && a.contact_surface_storage(j)==b.contact_surface_storage(j))
 }
 
-fn exact_role(output:&mut std::fs::File,name:&str,started:Instant,bound_ms:u128,
+fn exact_role(output:&mut impl Write,name:&str,started:Instant,bound_ms:u128,
     carry:Option<&holonics::hnn::word::ReceptionCarry>,material:&Constitution,
 ) -> bool {
     let carry_denominator_bits=carry.map(|c|c.change.storage.iter().flatten()
@@ -1155,7 +1155,7 @@ impl DeclarationWork {
         }
     }
 }
-fn interaction_work(output:&mut std::fs::File,before:holonics::hnn::word::work::WorkRead,
+fn interaction_work(output:&mut impl Write,before:holonics::hnn::word::work::WorkRead,
     declaration:&DeclarationWork,completed:usize,complete:bool,
 ) {
     publish(output,format!("interaction work receipt; completed_units={completed}; complete={complete}; declaration={declaration:?}; native_owner_calls={:?}; includes_setup_declarations_all_basis_Words_exact_reference_charted_and_exterior_controls; partial_attempts_retained; thread_scope=one_calling_thread; no FLOP_energy_or_speedup_conversion; whole_resource_time_in_outer_queue_receipt\n",holonics::hnn::word::work::read().since(before)));
@@ -1295,8 +1295,8 @@ fn closed(prediction: &holonics::hnn::prediction::PhysicalRepair) -> bool {
     prediction.opening.closes() && prediction.word.closes() && prediction.balances.iter().all(|balance| balance.closes())
 }
 
-#[allow(clippy::disallowed_types, clippy::disallowed_methods)] // exterior output, no native state
-fn publish(output: &mut std::fs::File, text: String) {
+#[allow(clippy::disallowed_methods)] // exterior output, no native state
+fn publish(output: &mut impl Write, text: String) {
     print!("{text}");
     std::io::stdout().flush().expect("publish whole output");
     output.write_all(text.as_bytes()).expect("write whole output");
