@@ -164,6 +164,11 @@ pub trait ConstitutionRead: Sync {
     fn contact_dissipation(&self, contact: usize) -> &ExactRatMatrix;
     /// The receiving map `R` (`2|A| × 2d_R`) of a receiving ring; `None` elsewhere.
     fn receiving_map(&self, ring: usize) -> Option<&ExactRatMatrix>;
+    /// The carrier whose normal statistics and receiving map are paired. Raw declarations
+    /// use the executed anchor; a source observer binds its own law before any comparison.
+    fn receiving_carrier(&self, _ring: usize) -> crate::hnn::receiving::ReceivingCarrier {
+        crate::hnn::receiving::ReceivingCarrier::Anchor
+    }
     /// **The receiving parametron's landmark tree** (`compression::landmark::context`) of a receiving
     /// ring, whose face at each phase's causal address the receiving read adds to the wave at the
     /// grain (`hnn::receiving`); `None` elsewhere.
@@ -264,6 +269,10 @@ pub trait FieldMaterial: Sync {
     /// The receiving map `R` of a receiving ring, the field's decoder (above).
     /// ([`ConstitutionRead::receiving_map`])
     fn receiving_map(&self, ring: usize) -> Option<&ExactRatMatrix>;
+    /// The receiving map's producing carrier. ([`ConstitutionRead::receiving_carrier`])
+    fn receiving_carrier(&self, _ring: usize) -> crate::hnn::receiving::ReceivingCarrier {
+        crate::hnn::receiving::ReceivingCarrier::Anchor
+    }
 }
 
 impl<T: ConstitutionRead + ?Sized> FieldMaterial for T {
@@ -308,6 +317,9 @@ impl<T: ConstitutionRead + ?Sized> FieldMaterial for T {
     }
     fn receiving_map(&self, ring: usize) -> Option<&ExactRatMatrix> {
         ConstitutionRead::receiving_map(self, ring)
+    }
+    fn receiving_carrier(&self, ring: usize) -> crate::hnn::receiving::ReceivingCarrier {
+        ConstitutionRead::receiving_carrier(self, ring)
     }
 }
 

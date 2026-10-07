@@ -1,0 +1,59 @@
+{
+  "source_base": "9410077e6395b5b0cb376f298a03cae0308eefed",
+  "status": "prepared source; syntax/source review only; type, guard, native and Lean pending",
+  "edition": "2024 declared by Cargo.toml",
+  "source_owner_compiler_test_training_generator_benchmark_runs": 0,
+  "checks": [
+    {
+      "path": "crates/holonics/src/hnn/constitution.rs",
+      "rustfmt_parse_exit": 0,
+      "stderr": "",
+      "sha256": "131a1dc1244a99858902535ad2582e8b874c373b6d3f923876cd6c9fc1810d12"
+    },
+    {
+      "path": "crates/holonics/src/hnn/field.rs",
+      "rustfmt_parse_exit": 0,
+      "stderr": "",
+      "sha256": "d6c8d1a04c29862920617ff95c02b50bae40e4120c171dce19aac5b297ada2f7"
+    },
+    {
+      "path": "crates/holonics/src/hnn/port.rs",
+      "rustfmt_parse_exit": 0,
+      "stderr": "",
+      "sha256": "fb62daa8daafb259b8696353247a017b005fd027264160abf7a61b96206b0df2"
+    },
+    {
+      "path": "crates/holonics/src/hnn/prediction.rs",
+      "rustfmt_parse_exit": 0,
+      "stderr": "",
+      "sha256": "f93e577a516ba491567f78444ccb64605c99a651f3a94342c98a06a911dd9d45"
+    },
+    {
+      "path": "crates/holonics/src/hnn/receiving.rs",
+      "rustfmt_parse_exit": 0,
+      "stderr": "",
+      "sha256": "120919c0d2d2eec235aade0a0c5b8b7c09d53495cfd229a04db7ee83b69ed301"
+    },
+    {
+      "path": "crates/holonics/src/hnn/tests/physical.rs",
+      "rustfmt_parse_exit": 0,
+      "stderr": "",
+      "sha256": "3221851c1150fa58606f20e454ed6c4d3d8e849b84592e8872ec93ffa33ecfa2"
+    }
+  ],
+  "diff_check_exit": 0,
+  "diff_check_output": "",
+  "relative_record_links": 3,
+  "missing_record_links": [],
+  "owned_atlas_rows": 1,
+  "owned_atlas_field_count": 8,
+  "fixed_syntax_guard_seconds": 10,
+  "measured_syntax_wall_ns": 425223811,
+  "native_projection_measured": false,
+  "earlier_syntax_attempt": "initial Rust 2021 parser invocation refused existing let-chain syntax; corrected to declared 2024 without changing deadline; original output retained privately",
+  "public_synthetic_fixture": {
+    "path": "research/records/receipts/source-observer-20261007/affine-witness.tsv",
+    "sha256": "f4e0e4af6303a5d9fdc361fc8309194bc3387afbd20aa8fb434e7f668c4059ea"
+  },
+  "peer_review": "actual source mathematical/carrier review; source-only grade"
+}

@@ -67,6 +67,468 @@ fn four_station_field() -> Field {
     }.by_lattice_rule()).unwrap()
 }
 
+/// Exact operator regression: eight joined returns check all 88 opening coordinates, not
+/// merely the source marginal. The arbitrary interior is a differential fixture, not training.
+#[test]
+fn source_observer_full_state_identity_and_joined_adjoint_at_actual_clocks() {
+    use crate::hnn::propagation::Operands;
+    use crate::hnn::receiving::SourceObserverView;
+    use crate::hnn::word::{EndChange, Word};
+    use crate::ratio::{Rat, linear::ExactRatMatrix};
+    let field = four_station_field();
+    let theta = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap();
+    let mut current = Current::at_rest(&field);
+    current.rekey(&field, 0, 2).unwrap();
+    let phases = ReceivingPhases::declare(&field, &theta, &current, &receiver(4)).unwrap();
+    let view = SourceObserverView::declare(&field, &theta, &current, &phases).unwrap();
+    let operands = Operands::exact_at_cut(&field, &theta, &current).unwrap();
+    let mut opening = EndChange::rest(&field, &operands);
+    let mut k = 0;
+    for x in opening
+        .storage
+        .iter_mut()
+        .flatten()
+        .chain(opening.arrivals.iter_mut().flatten().flatten())
+        .chain(opening.states.iter_mut().flatten().flatten())
+    {
+        *x = rat((k % 7) as i64 - 3, 8);
+        k += 1;
+    }
+    assert_eq!(k, 88);
+    let zero: Vec<_> = field
+        .rings()
+        .iter()
+        .map(|ring| vec![Rat::zero(); ring.width()])
+        .collect();
+    let mut word = Word::continuing(&field, operands.clone(), &opening, &zero, 9).unwrap();
+    word.forward(&phases).unwrap();
+    let receipt = view.read(&word).unwrap();
+    assert_eq!(receipt.source, opening.storage[0]);
+    assert_eq!(receipt.available_at, 12);
+    assert_eq!(
+        receipt.anchors,
+        vec![
+            (0, 0, 9),
+            (1, 0, 10),
+            (2, 0, 11),
+            (3, 0, 12),
+            (1, 1, 10),
+            (2, 1, 11)
+        ]
+    );
+    assert!(word.field_balances().iter().all(|b| b.closes()));
+    for i in 0..8 {
+        let mut covector = vec![Rat::zero(); 8];
+        covector[i] = integer(1);
+        let back = word
+            .anchor_differential_joined(view.source_seeds(&covector).unwrap())
+            .unwrap();
+        assert_eq!(back.storage[0], covector);
+        assert!(
+            back.storage
+                .iter()
+                .skip(1)
+                .flatten()
+                .chain(back.arrivals.iter().flatten().flatten())
+                .chain(back.states.iter().flatten().flatten())
+                .all(Zero::is_zero)
+        );
+    }
+    // Nonzero exterior R and nonzero lift: using R=0 would make this test vacuous.
+    let map = ExactRatMatrix::identity(8).unwrap();
+    let mut gradients = vec![vec![Rat::zero(); 8]; 4];
+    gradients[2][4] = integer(1);
+    let seeds = view.seeds(&gradients, &map, &current.lift()[0]).unwrap();
+    let complete = word.anchor_differential_joined(seeds).unwrap();
+    let source = view
+        .source_covector(&gradients, &map, &current.lift()[0])
+        .unwrap();
+    assert!(source.iter().any(|v| !v.is_zero()));
+    assert_eq!(complete.storage[0], source);
+    assert_eq!(
+        complete.pairing(&opening),
+        crate::ratio::linear::vector::dot(&source, &opening.storage[0])
+    );
+    let mut old_seed = vec![None; 4];
+    old_seed[2] = Some(field.ring(0).rotate(&gradients[2], &-&current.lift()[0]));
+    let old = word.anchor_differential(old_seed, 0).unwrap();
+    assert_eq!(
+        old.storage[0], complete.storage[0],
+        "the old SOURCE marginal alone passes"
+    );
+    assert_ne!(
+        old, complete,
+        "the old full raw-anchor adjoint must fail the observer contract"
+    );
+    assert!(
+        old.arrivals
+            .iter()
+            .flatten()
+            .flatten()
+            .any(|v| !v.is_zero())
+    );
+    // A fresh actual interior-only perturbation has zero observer change but a raw face change.
+    let mut perturbed = opening.clone();
+    perturbed.arrivals[0][0][0] += integer(1);
+    let mut next = Word::continuing(&field, operands.clone(), &perturbed, &zero, 9).unwrap();
+    next.forward(&phases).unwrap();
+    assert_eq!(view.read(&next).unwrap().features, receipt.features);
+    assert_ne!(next.anchor(2, 0), word.anchor(2, 0));
+    let mut short = Word::continuing(&field, operands, &opening, &zero, 9).unwrap();
+    short.run(2).unwrap();
+    short.last_junction().unwrap();
+    assert!(
+        view.read(&short).is_err(),
+        "a later anchor cannot be taken from an unexecuted future"
+    );
+    // P_lift^T=P_-lift is verified on every coordinate, rather than assumed from naming.
+    for i in 0..8 {
+        for j in 0..8 {
+            let mut a = vec![Rat::zero(); 8];
+            a[i] = integer(1);
+            let mut b = vec![Rat::zero(); 8];
+            b[j] = integer(1);
+            assert_eq!(
+                crate::ratio::linear::vector::dot(
+                    &field.ring(0).rotate(&a, &current.lift()[0]),
+                    &b
+                ),
+                crate::ratio::linear::vector::dot(
+                    &a,
+                    &field.ring(0).rotate(&b, &-&current.lift()[0])
+                )
+            );
+        }
+    }
+}
+
+#[test]
+fn source_observer_same_carrier_normal_comparison_preserves_carry_and_withholds_release() {
+    use crate::hnn::prediction::{predict_by_source_observer, predict_sparse_by_field};
+    use crate::hnn::receiving::{ReceivingCarrier, SourceObserverMaterial};
+    use crate::hnn::word::Absorption;
+    let field = four_station_field();
+    let initial = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap();
+    let old_law = initial.receiving_law(0).unwrap().clone();
+    let current = Current::at_rest(&field);
+    let phases = ReceivingPhases::declare(&field, &initial, &current, &receiver(4)).unwrap();
+    let material =
+        SourceObserverMaterial::found(&field, initial.clone(), &current, &phases).unwrap();
+    assert_eq!(
+        initial.receiving_law(0).unwrap(),
+        &old_law,
+        "binding does not replace a raw law"
+    );
+    assert_ne!(
+        material.commit(),
+        initial.commit(),
+        "fresh binding advances this material's commit; the carrier is named separately"
+    );
+    material
+        .view()
+        .admits(&field, material.constitution(), &current)
+        .unwrap();
+    assert_eq!(
+        material.receiving_law().carrier(),
+        ReceivingCarrier::SourceObserver
+    );
+    assert_eq!(old_law.carrier(), ReceivingCarrier::Anchor);
+    assert_eq!(material.receiving_law().map(), old_law.map());
+    assert_eq!(material.receiving_law().gram(), old_law.gram());
+    assert_eq!(material.receiving_law().located(), old_law.located());
+    assert!(
+        material.constitution().continuing_state(0).is_err(),
+        "an unjoined save cannot discard the view binding"
+    );
+    let observed = encoded(&field, &[2, 2, 3, 3]);
+    let damaged = DamagedSection::damage(&observed, &[2]).unwrap();
+    assert!(
+        predict_sparse_by_field(
+            &field,
+            material.constitution(),
+            &current,
+            &damaged,
+            &WordOpening::Rest,
+            &phases
+        )
+        .is_err(),
+        "even internal read access cannot feed observer R to the raw-anchor route"
+    );
+    assert!(
+        phases
+            .read(
+                &field,
+                material.constitution(),
+                &current,
+                &vec![Rat::zero(); 8]
+            )
+            .is_err()
+    );
+    assert!(
+        phases
+            .read_observer(&field, &initial, &current, &vec![Rat::zero(); 8])
+            .is_err()
+    );
+    let blind =
+        predict_by_source_observer(&field, &material, &current, &damaged, &WordOpening::Rest)
+            .unwrap();
+    let receipt = blind.prediction().clone();
+    let features = blind.observation().features.clone();
+    assert_eq!(
+        blind.observation().carrier,
+        ReceivingCarrier::SourceObserver
+    );
+    assert_eq!(
+        blind.observation().producing_commit,
+        Some(material.commit())
+    );
+    assert!(receipt.reads.iter().all(|r| r.tick == 3));
+    assert!(matches!(receipt.cells[2], RepairedCell::Held { .. }));
+    assert!(receipt.domains.iter().all(Option::is_none));
+    let taught = blind
+        .observe(&material, &observed, &[false, false, true, false])
+        .unwrap();
+    taught
+        .material
+        .view()
+        .admits(&field, taught.material.constitution(), &current)
+        .unwrap();
+    assert_eq!(taught.prediction, receipt);
+    assert_eq!(taught.samples[0].feature, features[2]);
+    assert_ne!(
+        taught.material.constitution().receiving_map(0),
+        material.constitution().receiving_map(0)
+    );
+    assert_eq!(initial.receiving_law(0).unwrap(), &old_law);
+    assert_eq!(
+        taught.material.constitution().source_law(0),
+        initial.source_law(0)
+    );
+    assert!(
+        SourceObserverMaterial::found(
+            &field,
+            taught.material.constitution().clone(),
+            &current,
+            &phases
+        )
+        .is_err(),
+        "learned statistics cannot be relabeled or reset by binding another view"
+    );
+    let carry = WordOpening::Received {
+        carry: taught.prediction.carry.clone(),
+        absorption: Absorption::Nothing,
+    };
+    let later = encoded(&field, &[0, 1, 1, 2]);
+    let section = DamagedSection::damage(&later, &[2]).unwrap();
+    let at_rest = predict_by_source_observer(
+        &field,
+        &taught.material,
+        &current,
+        &section,
+        &WordOpening::Rest,
+    )
+    .unwrap();
+    let continued =
+        predict_by_source_observer(&field, &taught.material, &current, &section, &carry).unwrap();
+    assert_eq!(
+        at_rest.observation().features,
+        continued.observation().features
+    );
+    assert_eq!(
+        at_rest
+            .prediction()
+            .reads
+            .iter()
+            .map(|r| &r.read)
+            .collect::<Vec<_>>(),
+        continued
+            .prediction()
+            .reads
+            .iter()
+            .map(|r| &r.read)
+            .collect::<Vec<_>>()
+    );
+    assert_ne!(
+        at_rest.prediction().carry.change,
+        continued.prediction().carry.change
+    );
+    assert_eq!(continued.prediction().carry.ticks, 6);
+    assert!(continued.prediction().reads.iter().all(|r| r.tick == 6));
+    assert!(continued.prediction().balances.iter().all(|b| b.closes()));
+    assert!(continued.prediction().opening.closes() && continued.prediction().word.closes());
+    let a = at_rest
+        .observe(&taught.material, &later, &[false, false, true, false])
+        .unwrap();
+    let b = continued
+        .observe(&taught.material, &later, &[false, false, true, false])
+        .unwrap();
+    a.material
+        .view()
+        .admits(&field, a.material.constitution(), &current)
+        .unwrap();
+    b.material
+        .view()
+        .admits(&field, b.material.constitution(), &current)
+        .unwrap();
+    assert_eq!(a.samples, b.samples);
+    assert_eq!(
+        a.material.constitution().receiving_law(0),
+        b.material.constitution().receiving_law(0),
+        "prior/Gram/deposition must use the same observer carrier, not a history-dependent raw preview"
+    );
+    assert!(
+        b.full_adjoint.storage[0].iter().any(|v| !v.is_zero()),
+        "nonzero-R actual comparison return"
+    );
+    assert!(matches!(b.prediction.cells[2], RepairedCell::Held { .. }));
+    assert_eq!(initial.receiving_law(0).unwrap(), &old_law);
+}
+
+#[test]
+fn source_observer_carry_family_affine_witness_separates_the_omitted_source() {
+    use crate::hnn::prediction::{predict_by_source_observer, predict_sparse_by_field};
+    use crate::hnn::receiving::SourceObserverMaterial;
+    use crate::hnn::word::Absorption;
+    use crate::ratio::{Rat, linear::ExactRatMatrix};
+    let field = four_station_field();
+    let initial = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap();
+    let current = Current::at_rest(&field);
+    let phases = ReceivingPhases::declare(&field, &initial, &current, &receiver(4)).unwrap();
+    let material =
+        SourceObserverMaterial::found(&field, initial.clone(), &current, &phases).unwrap();
+    // Identity R is an exterior differential probe, never a learned decoder or task solution.
+    let probe = initial
+        .with_ports(0, None, None, Some(ExactRatMatrix::identity(8).unwrap()))
+        .unwrap();
+    let mut openings = vec![WordOpening::Rest];
+    for a in [2, 3, 0] {
+        let section =
+            DamagedSection::damage(&encoded(&field, &[a, a, (a + 1) % 4, (a + 1) % 4]), &[2])
+                .unwrap();
+        let next = predict_by_source_observer(
+            &field,
+            &material,
+            &current,
+            &section,
+            openings.last().unwrap(),
+        )
+        .unwrap()
+        .finish();
+        openings.push(WordOpening::Received {
+            carry: next.carry,
+            absorption: Absorption::Nothing,
+        });
+    }
+    let fixture = include_str!(concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../research/records/receipts/source-observer-20261007/affine-witness.tsv"
+    ));
+    let mut total = vec![Rat::zero(); 8];
+    let mut forced = total.clone();
+    let mut target = vec![Rat::zero(); 4];
+    let mut sum = Rat::zero();
+    for row in fixture.lines().filter(|row| !row.starts_with('#')) {
+        let parts: Vec<_> = row.split_whitespace().collect();
+        assert_eq!(parts.len(), 4);
+        let tick: usize = parts[0].parse().unwrap();
+        let a: usize = parts[1].parse().unwrap();
+        let b: usize = parts[2].parse().unwrap();
+        let coefficient: Rat = parts[3].parse().unwrap();
+        sum += &coefficient;
+        let section =
+            DamagedSection::damage(&encoded(&field, &[a, b, (a + 1) % 4, (b + 1) % 4]), &[2])
+                .unwrap();
+        let point =
+            predict_by_source_observer(&field, &material, &current, &section, &openings[tick / 3])
+                .unwrap();
+        let raw = predict_sparse_by_field(
+            &field,
+            &probe,
+            &current,
+            &section,
+            &openings[tick / 3],
+            &phases,
+        )
+        .unwrap()
+        .finish();
+        assert_eq!(point.prediction().carry.change, raw.carry.change);
+        for i in 0..8 {
+            total[i] += &coefficient * &raw.reads[2].read.logits[i];
+            forced[i] += &coefficient * &point.observation().features[2][i];
+        }
+        target[(a + 1) % 4] += &coefficient; // exterior declared target contrast, never passed to prediction
+    }
+    assert!(sum.is_zero() && total.iter().all(Zero::is_zero));
+    assert!(forced.iter().any(|v| !v.is_zero()) && target.iter().any(|v| !v.is_zero()));
+}
+
+#[test]
+fn source_observer_refuses_foreign_stale_future_and_ignored_observations() {
+    use crate::hnn::prediction::predict_by_source_observer;
+    use crate::hnn::receiving::SourceObserverMaterial;
+    let field = four_station_field();
+    let initial = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap();
+    let current = Current::at_rest(&field);
+    let phases = ReceivingPhases::declare(&field, &initial, &current, &receiver(4)).unwrap();
+    let material = SourceObserverMaterial::found(&field, initial, &current, &phases).unwrap();
+    let observed = encoded(&field, &[0, 1, 2, 2]);
+    let section = DamagedSection::damage(&observed, &[2]).unwrap();
+    let make = || {
+        predict_by_source_observer(&field, &material, &current, &section, &WordOpening::Rest)
+            .unwrap()
+    };
+    let blind = make().prediction().clone();
+    let ignored = make()
+        .observe(&material, &observed, &[false; 4])
+        .unwrap_err();
+    assert_eq!(ignored.prediction, blind);
+    let foreign = super::support::encoded_classes(5, &[0, 1, 2, 2]);
+    assert_eq!(
+        make()
+            .observe(&material, &foreign, &[false, false, true, false])
+            .unwrap_err()
+            .prediction,
+        blind
+    );
+    let changed_clamp = encoded(&field, &[1, 1, 2, 2]);
+    assert_eq!(
+        make()
+            .observe(&material, &changed_clamp, &[false, false, true, false])
+            .unwrap_err()
+            .prediction,
+        blind
+    );
+    let taught = make()
+        .observe(&material, &observed, &[false, false, true, false])
+        .unwrap();
+    assert_eq!(
+        make()
+            .observe(&taught.material, &observed, &[false, false, true, false])
+            .unwrap_err()
+            .prediction,
+        blind
+    );
+    let future = DamagedSection::damage(&encoded(&field, &[0, 1, 2, 2, 3]), &[4]).unwrap();
+    assert!(
+        predict_by_source_observer(&field, &material, &current, &future, &WordOpening::Rest)
+            .is_err()
+    );
+    let erased_changed = DamagedSection::damage(&encoded(&field, &[0, 1, 3, 2]), &[2]).unwrap();
+    let changed = predict_by_source_observer(
+        &field,
+        &material,
+        &current,
+        &erased_changed,
+        &WordOpening::Rest,
+    )
+    .unwrap();
+    assert_eq!(
+        changed.prediction(),
+        &blind,
+        "an erased label cannot enter the physical prediction"
+    );
+}
+
 #[test]
 fn four_station_pair_coordinate_retains_carry_and_has_a_matched_source_dependent_consequence() {
     use crate::hnn::encoding::Encoded;

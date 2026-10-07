@@ -1944,6 +1944,9 @@ pub struct Sample {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct NormalLaw {
     map: ExactRatMatrix,
+    /// Receiving carrier identity, preserved by every normal-law successor. Source and
+    /// contrast laws leave this at Anchor; observer binding is a fresh receiving declaration.
+    carrier: crate::hnn::receiving::ReceivingCarrier,
     gram: Vec<Vec<Rat>>,
     chart: SolvedChart,
     map_carry: Carry,
@@ -1969,6 +1972,7 @@ impl NormalLaw {
             gram: identity,
             chart: SolvedChart::identity(),
             map,
+            carrier: crate::hnn::receiving::ReceivingCarrier::Anchor,
             map_carry: Carry::default(),
             gram_carry: Carry::default(),
             located: None,
@@ -2001,6 +2005,7 @@ impl NormalLaw {
             gram,
             chart: SolvedChart::founded(scale),
             map,
+            carrier: crate::hnn::receiving::ReceivingCarrier::Anchor,
             map_carry: Carry::default(),
             gram_carry: Carry::default(),
             located: None,
@@ -2021,6 +2026,11 @@ impl NormalLaw {
     /// keeps the unit prior and carries no pair.
     pub fn receiving_prior(&self) -> Option<u32> {
         self.located.as_ref().map(|pair| pair.from)
+    }
+
+    /// The carrier on which this law's map, Gram, solved chart and prior were founded.
+    pub fn carrier(&self) -> crate::hnn::receiving::ReceivingCarrier {
+        self.carrier
     }
 
     /// The receiving prior's carried pair, `None` on a source or contrast law.
@@ -2514,6 +2524,7 @@ impl NormalLaw {
         let certificate = chart.certificate().clone();
         let moved = Self {
             map: flat_matrix(m, n, map)?,
+            carrier: self.carrier,
             gram,
             chart,
             map_carry,
@@ -3970,6 +3981,20 @@ impl Constitution {
     /// Ring `g`'s receiving-map normal law `R`.
     pub fn receiving_law(&self, ring: usize) -> Option<&NormalLaw> {
         self.rings[ring].receiving.as_ref()
+    }
+
+    /// Bind the observer's own pristine law. The caller verifies freshness and the complete
+    /// observation identity first; no existing statistics are migrated or reset here.
+    pub(crate) fn bind_source_observer_receiving(&mut self, ring: usize) -> Result<(), HnnError> {
+        let commit = self.commit.checked_add(1).ok_or(HnnError::CountOverflow)?;
+        let law = self.rings.get_mut(ring).and_then(|r| r.receiving.as_mut())
+            .ok_or(HnnError::MissingReceivingMap { ring })?;
+        if law.carrier != crate::hnn::receiving::ReceivingCarrier::Anchor {
+            return Err(HnnError::Unadmitted { reason: "a receiving law already bound to another carrier" });
+        }
+        law.carrier = crate::hnn::receiving::ReceivingCarrier::SourceObserver;
+        self.commit = commit;
+        Ok(())
     }
 
     /// The constitution with every receiving law's prior pair dropped, so a deposit on it steps
@@ -7951,6 +7976,7 @@ impl LearnedRing {
                 (Some(saved), Some(declared)) => {
                     !same_law_shape(saved, declared)
                         || saved.receiving_prior() != declared.receiving_prior()
+                        || saved.carrier() != declared.carrier()
                 }
                 _ => true,
             }
@@ -8126,6 +8152,13 @@ impl Constitution {
     /// **The complete continuing state** ([`ContinuingState`]) headed by ring `g`'s source port:
     /// refused off a source ring, and complete wherever the constitution has moved.
     pub fn continuing_state(&self, ring: usize) -> Result<ContinuingState, HnnError> {
+        if self.rings.iter().filter_map(|r| r.receiving.as_ref()).any(|law|
+            law.carrier() == crate::hnn::receiving::ReceivingCarrier::SourceObserver)
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "the source observer's producing view and save/restore square are not admitted",
+            });
+        }
         if self
             .rings
             .get(ring)
@@ -9293,6 +9326,7 @@ fn read_law(lines: &mut std::str::Lines<'_>, map: ExactRatMatrix) -> Result<Norm
     let map_carry = carries.pop().expect("two carries");
     Ok(NormalLaw {
         map,
+        carrier: crate::hnn::receiving::ReceivingCarrier::Anchor,
         gram,
         chart: SolvedChart {
             exponent,
@@ -9308,6 +9342,9 @@ fn read_law(lines: &mut std::str::Lines<'_>, map: ExactRatMatrix) -> Result<Norm
 }
 
 impl ConstitutionRead for Constitution {
+    fn receiving_carrier(&self, ring: usize) -> crate::hnn::receiving::ReceivingCarrier {
+        self.receiving_law(ring).map_or(crate::hnn::receiving::ReceivingCarrier::Anchor, NormalLaw::carrier)
+    }
     fn standing(&self, ring: usize) -> &[Rat] {
         &self.rings[ring].standing
     }

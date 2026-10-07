@@ -911,6 +911,31 @@ impl<'c> Word<'c> {
         }
         reverse_core(&self, anchors, receiving, end)
     }
+
+    /// The same producing reverse sweep with a covector at each reached ring/crossing.
+    /// An observer first transposes its own fixed receiving map onto these anchors. The
+    /// returned change includes storage, arrivals and contact state, not only source storage.
+    /// Material ticks here differentiate the Word at fixed observer coefficients; an observer
+    /// depending on material must supply its coefficient derivative before depositing them.
+    pub(crate) fn pull_back_joined(
+        self,
+        anchors: Vec<Vec<Option<Vec<Rat>>>>,
+    ) -> Result<(WordReturn, ChangeCovector), HnnError> {
+        reverse_core_joined(&self, anchors, None)
+    }
+
+    /// Declaration/control differential of the same joined anchors, with no retained Word.
+    pub(crate) fn anchor_differential_joined(
+        &self,
+        anchors: Vec<Vec<Option<Vec<Rat>>>>,
+    ) -> Result<ChangeCovector, HnnError> {
+        if self.operands().lattice().is_some() {
+            return Err(HnnError::Unadmitted {
+                reason: "an exact Word for a joined receiving differential",
+            });
+        }
+        Ok(reverse_core_joined(self, anchors, None)?.1)
+    }
 }
 
 fn zeros(n: usize) -> Vec<Rat> {
@@ -945,7 +970,7 @@ struct Adjoint {
     solved: Vec<Vec<Rat>>,
     /// The receiving anchor's covector `P^(−τ)Rᵀg_j`, the return's source, carried from epoch to
     /// epoch in reverse.
-    reads: Vec<Rat>,
+    reads: Vec<Vec<Rat>>,
 }
 
 impl Adjoint {
@@ -967,7 +992,7 @@ impl Adjoint {
                 )
                 .chain(&self.zetas)
                 .chain(&self.solved)
-                .chain(std::iter::once(&self.reads))
+                .chain(&self.reads)
                 .flatten()
                 .chain(self.arrivals.iter().flatten().flatten()),
         )
@@ -1052,8 +1077,28 @@ fn reverse(
 /// empty) and the covector on the word's opening change.
 fn reverse_core(
     word: &Word<'_>,
-    mut read_covector: Vec<Option<Vec<Rat>>>,
+    read_covector: Vec<Option<Vec<Rat>>>,
     receiving: usize,
+    end: Option<&ChangeCovector>,
+) -> Result<(WordReturn, ChangeCovector), HnnError> {
+    let rings = word.field().rings().len();
+    if receiving >= rings {
+        return Err(HnnError::RingOutside {
+            ring: receiving,
+            rings,
+        });
+    }
+    let anchors = read_covector.into_iter().map(|seed| {
+        let mut joined = vec![None; rings];
+        joined[receiving] = seed;
+        joined
+    }).collect();
+    reverse_core_joined(word, anchors, end)
+}
+
+fn reverse_core_joined(
+    word: &Word<'_>,
+    mut read_covector: Vec<Vec<Option<Vec<Rat>>>>,
     end: Option<&ChangeCovector>,
 ) -> Result<(WordReturn, ChangeCovector), HnnError> {
     crate::hnn::word::work::reached(crate::hnn::word::work::Event::ReturnAttempt);
@@ -1061,10 +1106,13 @@ fn reverse_core(
     let operands = word.operands();
     let records = word.recorded();
     let steps = records.len();
-    if receiving >= field.rings().len() {
-        return Err(HnnError::RingOutside {
-            ring: receiving,
-            rings: field.rings().len(),
+    if read_covector.len() != steps || read_covector.iter().any(|at| {
+        at.len() != field.rings().len() || at.iter().zip(field.rings()).any(|(seed, ring)| {
+            seed.as_ref().is_some_and(|seed| seed.len() != ring.width())
+        })
+    }) {
+        return Err(HnnError::Unadmitted {
+            reason: "one matched anchor covector slot per executed crossing and ring",
         });
     }
     if end.is_some() && word.is_ended() {
@@ -1137,7 +1185,7 @@ fn reverse_core(
         resonator_state: rest_resonators.clone(),
         zetas: rest_states.clone(),
         solved: rest_states.clone(),
-        reads: zeros(widths[receiving]),
+        reads: rest_storage.clone(),
     };
     let mut conductance = vec![Rat::zero(); contacts.len()];
     let mut elements: Vec<Vec<ElementTick>> = vec![Vec::new(); rings.len()];
@@ -1425,22 +1473,17 @@ fn reverse_core(
         // slots, its remainders and its conductance terms: the rings run together, and the
         // conductance terms are added afterwards in ring, then incidence, order.
         // The return's source enters at the receiving anchor on the transients' lattice.
-        let read_carried = match read_covector[t].take() {
-            Some(image) => {
-                let (read, remainder) = split(lattice.as_ref(), image, &carried.reads);
-                carried.reads = remainder;
-                Some(read)
-            }
-            None => None,
-        };
+        let read_carried: Vec<_> = read_covector[t].iter_mut().enumerate().map(|(r, seed)| {
+            seed.take().map(|image| {
+                let (read, remainder) = split(lattice.as_ref(), image, &carried.reads[r]);
+                carried.reads[r] = remainder;
+                read
+            })
+        }).collect();
         let (arrival_carried, storage_carried) = (&carried.arrivals, &carried.storage);
         let swung = indexed(rings.len(), |r| {
             let junction = &junctions[r];
-            let read = if r == receiving {
-                read_carried.as_ref()
-            } else {
-                None
-            };
+            let read = read_carried[r].as_ref();
             let incident = operands.incident(r);
             let weights = operands.weights(r);
             let total = incident

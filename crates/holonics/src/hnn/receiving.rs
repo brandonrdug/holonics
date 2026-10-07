@@ -1274,6 +1274,468 @@ pub enum RankScope {
     TangentAtRest,
 }
 
+/// A source-relative receiving view of the stationary three-ring chain. The coefficients are
+/// the contact/element elimination, not fitted receiving rows. Its key includes the producing
+/// field, exact operands and section clocks. It reads after all four crossings have executed.
+///
+/// With ring0 anchors v0..v3 and ring1 anchors b1,b2, contact elimination gives
+/// M m + B0 v0 + B1 v1 + B2 v2 + B3 v3 -16 b1 +16 b2 = 0,
+/// M=-27L^3-19L^2+23L+23I. Thus chi O=[I|0] on the complete opening change.
+/// The observer never consumes labels, an observation, source counts or a future contact.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct SourceObserverView {
+    field: Field,
+    operands: Operands,
+    phases: ReceivingPhases,
+    chi: Vec<ExactRatMatrix>,
+    response: Vec<ExactRatMatrix>,
+}
+
+/// The actual clocks of the six measured anchors, and their common publication time. Features
+/// are unrotated source-response carriers; the receiving lift is applied by the matched read.
+/// This is a transient receipt, never a retained passage or a source/target archive.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct SourceObserverReceipt {
+    /// Carrier identity is separate from the material's local commit counter.
+    pub carrier: ReceivingCarrier,
+    /// None for a bare Word differential control; bound before a production receiving read
+    /// is exposed. A commit counter alone does not identify a receiving carrier.
+    pub producing_commit: Option<u64>,
+    pub anchors: Vec<(usize, usize, usize)>, // (step, ring, actual tick)
+    pub available_at: usize,
+    pub source: Vec<Rat>,
+    pub features: Vec<Vec<Rat>>,
+}
+
+impl SourceObserverView {
+    // Positions come from the two-contact chain's elimination, independent of any erasure.
+    const ANCHORS: [(usize, usize); 6] = [(0, 0), (1, 0), (2, 0), (3, 0), (1, 1), (2, 1)];
+
+    pub fn declare(
+        field: &Field,
+        material: &impl ConstitutionRead,
+        current: &Current,
+        phases: &ReceivingPhases,
+    ) -> Result<Self, HnnError> {
+        let refuse = || HnnError::Unadmitted {
+            reason: "the exact stationary three-ring source observer's producing geometry and clocks",
+        };
+        if field.sources() != [0]
+            || field.rings().len() != 3
+            || field.contacts().len() != 2
+            || phases.ring() != 0
+            || phases.first_epoch() != 0
+            || phases.aperture() != 4
+            || field.step() != &integer(1)
+        {
+            return Err(refuse());
+        }
+        let width = field.ring(0).width();
+        if width == 0 || field.rings().iter().any(|ring| ring.width() != width) {
+            return Err(refuse());
+        }
+        for (contact, ends) in field.contacts().iter().zip([(0, 1), (1, 2)]) {
+            if contact.ends() != ends
+                || contact.width() != width
+                || contact
+                    .channel()
+                    .iter()
+                    .enumerate()
+                    .any(|(node, &pair)| pair != (node, node))
+            {
+                return Err(refuse());
+            }
+        }
+        let operands = Operands::exact_at_cut(field, material, current)?;
+        let identity = ExactRatMatrix::identity(width)?;
+        let quarter = identity.scaled(&crate::ratio::rat(1, 4));
+        if operands.lattice().is_some()
+            || operands.resonators().iter().any(Option::is_some)
+            || operands.surfaces().iter().any(Option::is_some)
+            || operands.rings().iter().any(|ring| {
+                ring.admittance() != &integer(2)
+                    || ring.chart().is_some()
+                    || ring.contrast().entries().iter().any(|x| !x.is_zero())
+            })
+            || operands.contacts().iter().any(|contact| {
+                let (c, k, d) = contact.forms();
+                contact.conductance() != &integer(2)
+                    || contact.chart().is_some()
+                    || c != &identity
+                    || k != &quarter
+                    || d != &quarter
+            })
+        {
+            return Err(refuse());
+        }
+        let l = operands.rings()[0]
+            .solve()?
+            .scaled(&integer(2))
+            .subtract(&identity)?;
+        let neighbour_l = operands.rings()[1]
+            .solve()?
+            .scaled(&integer(2))
+            .subtract(&identity)?;
+        let l2 = l.multiply(&l)?;
+        let l3 = l2.multiply(&l)?;
+        let m = l3
+            .scaled(&integer(-27))
+            .add(&l2.scaled(&integer(-19)))?
+            .add(&l.scaled(&integer(23)))?
+            .add(&identity.scaled(&integer(23)))?;
+        // An exact inverse is the admission certificate; a singular material is refused.
+        let inverse = m.inverse().map_err(|_| HnnError::Unadmitted {
+            reason: "the source observer's material-dependent M is singular",
+        })?;
+        let b = vec![
+            l3.scaled(&integer(54))
+                .add(&l2.scaled(&integer(38)))?
+                .subtract(&l.scaled(&integer(46)))?,
+            l2.scaled(&integer(-54))
+                .subtract(&l.scaled(&integer(38)))?
+                .subtract(&identity.scaled(&integer(30)))?,
+            l.scaled(&integer(54)).add(&identity.scaled(&integer(76)))?,
+            identity.scaled(&integer(-54)),
+            identity.scaled(&integer(-16)),
+            identity.scaled(&integer(16)),
+        ];
+        let chi = b
+            .iter()
+            .map(|block| inverse.multiply(block).map(|map| map.scaled(&integer(-1))))
+            .collect::<Result<Vec<_>, _>>()?;
+        // Source-response sections, eliminated from the SAME junction/transit recurrence.
+        // H3 also reads the neighbour's element L1; it is not a task/label rule.
+        let response = vec![
+            identity.scaled(&crate::ratio::rat(1, 2)),
+            identity.scaled(&crate::ratio::rat(19, 54)),
+            l.scaled(&crate::ratio::rat(19, 54))
+                .subtract(&identity.scaled(&crate::ratio::rat(392, 2187)))?,
+            l.scaled(&crate::ratio::rat(299, 4374))
+                .add(&neighbour_l.scaled(&crate::ratio::rat(128, 6561)))?
+                .subtract(&identity.scaled(&crate::ratio::rat(2072, 177147)))?,
+        ];
+        let view = Self {
+            field: field.clone(),
+            operands,
+            phases: phases.clone(),
+            chi,
+            response,
+        };
+        view.check_identity()?;
+        Ok(view)
+    }
+
+    /// Admission on every opening-state coordinate. This composes the declared stationary
+    /// junction/element/transit maps, not basis Words or a source/answer dataset. The order is
+    /// storage rings, arriving ends, contact displacement/rate. No material key is admitted
+    /// solely because its source-only marginal has the right rank.
+    fn check_identity(&self) -> Result<(), HnnError> {
+        let width = self.field.ring(0).width();
+        let parts = self.field.rings().len() + 4 * self.field.contacts().len();
+        let extent = parts * width;
+        let selectors = (0..parts)
+            .map(|part| {
+                Ok::<_, HnnError>(ExactRatMatrix::shaped(
+                    width,
+                    extent,
+                    (0..width)
+                        .map(|i| {
+                            (0..extent)
+                                .map(|j| {
+                                    if j == part * width + i {
+                                        Rat::one()
+                                    } else {
+                                        Rat::zero()
+                                    }
+                                })
+                                .collect()
+                        })
+                        .collect(),
+                )?)
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        let storage = &selectors[..3];
+        let arriving = [&selectors[3..5], &selectors[5..7]];
+        let state = [&selectors[7..9], &selectors[9..11]];
+        let v = [
+            storage[0]
+                .add(&arriving[0][0])?
+                .scaled(&crate::ratio::rat(1, 2)),
+            storage[1]
+                .add(&arriving[0][1])?
+                .add(&arriving[1][0])?
+                .scaled(&crate::ratio::rat(1, 3)),
+            storage[2]
+                .add(&arriving[1][1])?
+                .scaled(&crate::ratio::rat(1, 2)),
+        ];
+        let mut next = Vec::new();
+        for (r, stored) in storage.iter().enumerate() {
+            let identity = ExactRatMatrix::identity(width)?;
+            let l = self.operands.rings()[r]
+                .solve()?
+                .scaled(&integer(2))
+                .subtract(&identity)?;
+            next.push(l.multiply(&v[r].scaled(&integer(2)).subtract(stored)?)?);
+        }
+        let mut next_arriving = Vec::new();
+        let mut next_state = Vec::new();
+        for (a, (g, h)) in [(0, 1), (1, 2)].into_iter().enumerate() {
+            let outgoing_g = v[g].scaled(&integer(2)).subtract(&arriving[a][0])?;
+            let outgoing_h = v[h].scaled(&integer(2)).subtract(&arriving[a][1])?;
+            let zeta = outgoing_g
+                .subtract(&outgoing_h)?
+                .add(&state[a][1].scaled(&integer(2)))?
+                .subtract(&state[a][0].scaled(&crate::ratio::rat(1, 4)))?
+                .scaled(&crate::ratio::rat(8, 27));
+            next_arriving.push(outgoing_g.subtract(&zeta)?);
+            next_arriving.push(outgoing_h.add(&zeta)?);
+            next_state.push(state[a][0].add(&zeta)?);
+            next_state.push(zeta.scaled(&integer(2)).subtract(&state[a][1])?);
+        }
+        next.extend(next_arriving);
+        next.extend(next_state);
+        let tick = ExactRatMatrix::shaped(
+            extent,
+            extent,
+            next.iter()
+                .flat_map(|block| {
+                    (0..width).map(move |row| block.row(row).expect("declared block row").to_vec())
+                })
+                .collect(),
+        )?;
+        let mut anchors: Vec<Vec<ExactRatMatrix>> =
+            v.iter().cloned().map(|map| vec![map]).collect();
+        for _ in 1..4 {
+            for at in &mut anchors {
+                at.push(at.last().expect("initial anchor").multiply(&tick)?);
+            }
+        }
+        let mut reconstructed = ExactRatMatrix::zero(width, extent)?;
+        for ((step, ring), chi) in Self::ANCHORS.iter().zip(&self.chi) {
+            reconstructed = reconstructed.add(&chi.multiply(&anchors[*ring][*step])?)?;
+        }
+        if reconstructed != selectors[0] {
+            return Err(HnnError::Unadmitted {
+                reason: "the observer's complete-state chi O identity fails",
+            });
+        }
+        for (j, response) in self.response.iter().enumerate() {
+            for i in 0..width {
+                for k in 0..width {
+                    if anchors[0][j].get(i, k)? != response.get(i, k)? {
+                        return Err(HnnError::Unadmitted {
+                            reason: "the observer's source-response section differs from its producing field",
+                        });
+                    }
+                }
+            }
+        }
+        Ok(())
+    }
+
+    pub fn phases(&self) -> &ReceivingPhases {
+        &self.phases
+    }
+
+    pub(crate) fn admits(
+        &self,
+        field: &Field,
+        material: &dyn FieldMaterial,
+        current: &Current,
+    ) -> Result<(), HnnError> {
+        if material.receiving_carrier(self.phases.ring()) != ReceivingCarrier::SourceObserver {
+            return Err(HnnError::Unadmitted {
+                reason: "the observer requires its own receiving carrier law",
+            });
+        }
+        if field != &self.field
+            || Operands::exact_at_cut(field, material, current)? != self.operands
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "the observer view's producing field/material key changed",
+            });
+        }
+        Ok(())
+    }
+
+    pub fn read(&self, word: &Word<'_>) -> Result<SourceObserverReceipt, HnnError> {
+        if word.field() != &self.field
+            || word.operands() != &self.operands
+            || !word.is_ended()
+            || word.recorded().len() != 4
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "the source observer requires its matching completed four-crossing Word",
+            });
+        }
+        let mut source = vec![Rat::zero(); self.field.ring(0).width()];
+        let mut clocks = Vec::new();
+        for ((step, ring), map) in Self::ANCHORS.iter().zip(&self.chi) {
+            let anchor = word
+                .anchor(*step, *ring)
+                .ok_or(HnnError::WordEnded { ticks: 4 })?;
+            source = crate::ratio::linear::vector::add(&source, &map.apply(anchor)?);
+            clocks.push((*step, *ring, word.opened_at() + *step));
+        }
+        let features = self
+            .response
+            .iter()
+            .map(|h| h.apply(&source))
+            .collect::<Result<_, _>>()?;
+        Ok(SourceObserverReceipt {
+            carrier: ReceivingCarrier::SourceObserver,
+            producing_commit: None,
+            anchors: clocks,
+            available_at: word.opened_at() + 3,
+            source,
+            features,
+        })
+    }
+
+    /// Complete anchor transpose: sum_j H_j^T P^-lift R^T grad_j, then chi_i^T at
+    /// each of the six actual clocks. The Word performs ONE joined reverse sweep afterward.
+    pub(crate) fn seeds(
+        &self,
+        gradients: &[Vec<Rat>],
+        map: &ExactRatMatrix,
+        lift: &BigInt,
+    ) -> Result<Vec<Vec<Option<Vec<Rat>>>>, HnnError> {
+        self.source_seeds(&self.source_covector(gradients, map, lift)?)
+    }
+
+    pub(crate) fn source_covector(
+        &self,
+        gradients: &[Vec<Rat>],
+        map: &ExactRatMatrix,
+        lift: &BigInt,
+    ) -> Result<Vec<Rat>, HnnError> {
+        if gradients.len() != self.response.len()
+            || map.columns() != self.field.ring(0).width()
+            || map.rows() != 2 * self.field.alphabet()
+            || gradients.iter().any(|g| g.len() != map.rows())
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "the observer return's matched comparison/map shape",
+            });
+        }
+        let mt = map.transpose()?;
+        let mut source = vec![Rat::zero(); map.columns()];
+        for (gradient, h) in gradients.iter().zip(&self.response) {
+            let anchor = self.field.ring(0).rotate(&mt.apply(gradient)?, &-lift);
+            source = crate::ratio::linear::vector::add(&source, &h.transpose()?.apply(&anchor)?);
+        }
+        Ok(source)
+    }
+
+    pub(crate) fn source_seeds(
+        &self,
+        source: &[Rat],
+    ) -> Result<Vec<Vec<Option<Vec<Rat>>>>, HnnError> {
+        let mut seeds = vec![vec![None; self.field.rings().len()]; 4];
+        for ((step, ring), map) in Self::ANCHORS.iter().zip(&self.chi) {
+            seeds[*step][*ring] = Some(map.transpose()?.apply(source)?);
+        }
+        Ok(seeds)
+    }
+}
+
+/// The carrier bound into a receiving normal law's identity. Equal map bytes do not make
+/// anchor statistics and source-relative statistics interchangeable.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ReceivingCarrier {
+    Anchor,
+    SourceObserver,
+}
+
+/// The observer's own receiving material/view binding. Founding accepts a pristine R law,
+/// never relabels the old total-anchor Gram/prior and never resets statistics per passage.
+/// R-only successors keep this key; internal-material and save/restore joins are not admitted.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct SourceObserverMaterial {
+    view: SourceObserverView,
+    constitution: crate::hnn::constitution::Constitution,
+}
+
+impl SourceObserverMaterial {
+    pub fn found(
+        field: &Field,
+        mut constitution: crate::hnn::constitution::Constitution,
+        current: &Current,
+        phases: &ReceivingPhases,
+    ) -> Result<Self, HnnError> {
+        use crate::hnn::constitution::{Locus, NormalLaw};
+        let law =
+            constitution
+                .receiving_law(phases.ring())
+                .ok_or(HnnError::MissingReceivingMap {
+                    ring: phases.ring(),
+                })?;
+        let from = law.receiving_prior().ok_or(HnnError::Unadmitted {
+            reason: "a founded receiving prior for the observer view",
+        })?;
+        let pristine = NormalLaw::with_receiving_prior(
+            ExactRatMatrix::zero(law.map().rows(), law.map().columns())?,
+            from,
+        );
+        if law != &pristine || constitution.clock(Locus::ReceivingMap(phases.ring())) != 0 {
+            return Err(HnnError::Unadmitted {
+                reason: "the new source-relative view requires its own pristine R statistics",
+            });
+        }
+        let view = SourceObserverView::declare(field, &constitution, current, phases)?;
+        constitution.bind_source_observer_receiving(phases.ring())?;
+        Ok(Self { view, constitution })
+    }
+
+    pub fn view(&self) -> &SourceObserverView {
+        &self.view
+    }
+    // Internal access preserves the law's carrier tag; raw reads and saves refuse it.
+    pub(crate) fn constitution(&self) -> &crate::hnn::constitution::Constitution {
+        &self.constitution
+    }
+    pub fn receiving_law(&self) -> &crate::hnn::constitution::NormalLaw {
+        self.constitution
+            .receiving_law(self.view.phases.ring())
+            .expect("admitted receiving law")
+    }
+    pub fn commit(&self) -> u64 {
+        self.constitution.commit()
+    }
+
+    pub(crate) fn successor(
+        &self,
+        field: &Field,
+        current: &Current,
+        constitution: crate::hnn::constitution::Constitution,
+    ) -> Result<Self, HnnError> {
+        // admits checks the receiving carrier separately from the physical operand key.
+        // Binding/normal R successors change commit and R, neither is a Word body operand.
+        self.view.admits(field, &constitution, current)?;
+        if constitution.released() != self.constitution.released()
+            || constitution.storage_product() != self.constitution.storage_product()
+            || field.sources().iter().any(|&ring| {
+                constitution.source_law(ring) != self.constitution.source_law(ring)
+                    || ConstitutionRead::transport(&constitution, ring)
+                        != ConstitutionRead::transport(&self.constitution, ring)
+                    || field.offsets().iter().any(|&offset| {
+                        ConstitutionRead::pair_port(&constitution, ring, offset)
+                            != ConstitutionRead::pair_port(&self.constitution, ring, offset)
+                    })
+            })
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "the observer's R-only successor changed another relation",
+            });
+        }
+        Ok(Self {
+            view: self.view.clone(),
+            constitution,
+        })
+    }
+}
+
 /// [definition] **The receiving phases** of one admitted receiver. See the module header.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ReceivingPhases {
@@ -1627,6 +2089,30 @@ impl ReceivingPhases {
         current: &Current,
         anchor: &[Rat],
     ) -> Result<ReceivingRead, HnnError> {
+        self.read_carrier(field, constitution, current, anchor, ReceivingCarrier::Anchor)
+    }
+
+    pub(crate) fn read_observer(
+        &self,
+        field: &Field,
+        constitution: &(impl FieldMaterial + ?Sized),
+        current: &Current,
+        feature: &[Rat],
+    ) -> Result<ReceivingRead, HnnError> {
+        self.read_carrier(field, constitution, current, feature, ReceivingCarrier::SourceObserver)
+    }
+
+    fn read_carrier(
+        &self,
+        field: &Field,
+        constitution: &(impl FieldMaterial + ?Sized),
+        current: &Current,
+        anchor: &[Rat],
+        carrier: ReceivingCarrier,
+    ) -> Result<ReceivingRead, HnnError> {
+        if constitution.receiving_carrier(self.ring) != carrier {
+            return Err(HnnError::Unadmitted { reason: "the receiving law's carrier differs from the executed read" });
+        }
         let ring = field.ring(self.ring);
         if anchor.len() != ring.width() {
             return Err(HnnError::Shape {

@@ -1848,8 +1848,8 @@ pub fn repair_by_field(
     opening: &WordOpening,
     phases: &ReceivingPhases,
 ) -> Result<PhysicalRepair, HnnError> {
-    physical_forward(field, material, current, section, opening, phases, true)
-        .map(|(prediction, _word, _source)| prediction)
+    physical_forward(field, material, current, section, opening, phases, true, None)
+        .map(|(prediction, _word, _source, _observation)| prediction)
 }
 
 /// The one physical forward law, shared by a blind repair and a blind reception awaiting its
@@ -1863,7 +1863,30 @@ fn physical_forward<'f>(
     opening: &WordOpening,
     phases: &ReceivingPhases,
     completion_domain: bool,
-) -> Result<(PhysicalRepair, Word<'f>, SourceMoment), HnnError> {
+    observer: Option<&crate::hnn::receiving::SourceObserverView>,
+) -> Result<
+    (
+        PhysicalRepair,
+        Word<'f>,
+        SourceMoment,
+        Option<crate::hnn::receiving::SourceObserverReceipt>,
+    ),
+    HnnError,
+> {
+    if let Some(view) = observer {
+        view.admits(field, material, current)?;
+        if completion_domain || phases != view.phases() || section.length != phases.aperture() {
+            return Err(HnnError::Unadmitted {
+                reason: "a complete observer section without a completion-domain release",
+            });
+        }
+    } else if material.receiving_carrier(phases.ring())
+        != crate::hnn::receiving::ReceivingCarrier::Anchor
+    {
+        return Err(HnnError::Unadmitted {
+            reason: "a raw-anchor forward cannot read source-observer material",
+        });
+    }
     section.admit(field, material, phases)?;
     // The admitted identity's conduct certifies station j at τ_g + 1 + j on each source ring.
     let placed = section.placed();
@@ -1897,20 +1920,38 @@ fn physical_forward<'f>(
             what: "the executed crossings are not the declared receiving section's clock",
         });
     }
+    let observation = observer.map(|view| view.read(&word)).transpose()?;
     let first = phases.first_epoch();
-    let reads = anchors
-        .iter()
-        .take(section.length)
-        .enumerate()
-        .map(|(station, anchor)| {
-            Ok(StationRead {
-                station,
-                crossing: first + station,
-                tick: opened_at + first + station,
-                read: phases.read(field, material, current, anchor)?,
+    let reads = if let Some(observation) = &observation {
+        observation
+            .features
+            .iter()
+            .enumerate()
+            .map(|(station, feature)| {
+                Ok(StationRead {
+                    station,
+                    crossing: first + station,
+                    // H_j's section is provenance; all six physical anchors exist only here.
+                    tick: observation.available_at,
+                    read: phases.read_observer(field, material, current, feature)?,
+                })
             })
-        })
-        .collect::<Result<Vec<_>, HnnError>>()?;
+            .collect::<Result<Vec<_>, HnnError>>()?
+    } else {
+        anchors
+            .iter()
+            .take(section.length)
+            .enumerate()
+            .map(|(station, anchor)| {
+                Ok(StationRead {
+                    station,
+                    crossing: first + station,
+                    tick: opened_at + first + station,
+                    read: phases.read(field, material, current, anchor)?,
+                })
+            })
+            .collect::<Result<Vec<_>, HnnError>>()?
+    };
     let admitted = domain_classes(section);
     let cells = placed
         .iter()
@@ -1923,10 +1964,17 @@ fn physical_forward<'f>(
             }),
             None => decide_station(
                 t,
-                domains.get(t).and_then(Option::as_ref).map_or(admitted.as_slice(), |domain| domain.classes.as_slice()),
-                if t >= reads.len() { Unresolved::Unread }
-                else if domains[t].is_some() { Unresolved::PluralDomain }
-                else { Unresolved::UncertifiedDomain },
+                domains
+                    .get(t)
+                    .and_then(Option::as_ref)
+                    .map_or(admitted.as_slice(), |domain| domain.classes.as_slice()),
+                if t >= reads.len() {
+                    Unresolved::Unread
+                } else if domains[t].is_some() {
+                    Unresolved::PluralDomain
+                } else {
+                    Unresolved::UncertifiedDomain
+                },
             ),
         })
         .collect::<Result<Vec<_>, HnnError>>()?;
@@ -1942,6 +1990,7 @@ fn physical_forward<'f>(
         },
         word,
         source,
+        observation,
     ))
 }
 
@@ -3092,6 +3141,247 @@ fn physical_domain_read(
     Ok(PhysicalDomainRead { logits, classes, completion: None })
 }
 
+/// A blind reception through the declared source-relative observer. The same physical forward
+/// owner executes the sparse source and retains the actual carry. Observer availability is the
+/// final crossing, not the earlier source-response section assigned to each feature.
+pub struct SourceObserverPrediction<'f, 'm> {
+    field: &'f Field,
+    material: &'m crate::hnn::receiving::SourceObserverMaterial,
+    current: Current,
+    chart: Encoded,
+    word: Word<'f>,
+    prediction: PhysicalRepair,
+    observation: crate::hnn::receiving::SourceObserverReceipt,
+}
+
+/// No teacher or erased class enters this constructor. It supports completed four-cell sections
+/// only. All six anchors belong to this Word at or before opened_at+3. A future communication
+/// request has no admission here. Completion domains are withheld, so every erasure stays Held.
+pub fn predict_by_source_observer<'f, 'm>(
+    field: &'f Field,
+    material: &'m crate::hnn::receiving::SourceObserverMaterial,
+    current: &Current,
+    section: &DamagedSection,
+    opening: &WordOpening,
+) -> Result<SourceObserverPrediction<'f, 'm>, HnnError> {
+    let view = material.view();
+    view.admits(field, material.constitution(), current)?;
+    if section.length != view.phases().aperture() {
+        return Err(HnnError::Unadmitted {
+            reason: "the observer reads a complete four-cell section, not a future station",
+        });
+    }
+    let (prediction, word, source, observation) = physical_forward(
+        field,
+        material.constitution(),
+        current,
+        section,
+        opening,
+        view.phases(),
+        false,
+        Some(view),
+    )?;
+    let mut observation = observation.ok_or(HnnError::Unadmitted {
+        reason: "the declared observer's actual forward receipt",
+    })?;
+    observation.producing_commit = Some(material.commit());
+    let imposed = source.open_storage(field, material.constitution(), current)?;
+    if observation.source != imposed[0] {
+        return Err(HnnError::Unadmitted {
+            reason: "the executed observer disagrees with the actual blind source imposition",
+        });
+    }
+    Ok(SourceObserverPrediction {
+        field,
+        material,
+        current: current.clone(),
+        chart: section.chart.clone(),
+        word,
+        prediction,
+        observation,
+    })
+}
+
+/// The observer's reached R comparison. The full opening adjoint is an exterior receipt;
+/// no Word, source occurrence or target is installed in the successor material.
+#[derive(Debug)]
+pub struct SourceObserverTeaching {
+    pub prediction: PhysicalRepair,
+    pub observation: crate::hnn::receiving::SourceObserverReceipt,
+    pub full_adjoint: crate::hnn::port::ChangeCovector,
+    pub ratio: crate::hnn::ratio::HolonRatio,
+    pub material: crate::hnn::receiving::SourceObserverMaterial,
+    pub publication: crate::hnn::constitution::DepositReading,
+    pub samples: Vec<crate::hnn::constitution::Sample>,
+}
+
+#[derive(Debug)]
+pub struct SourceObserverRefusal {
+    pub prediction: PhysicalRepair,
+    pub observation: crate::hnn::receiving::SourceObserverReceipt,
+    pub error: HnnError,
+}
+
+impl SourceObserverPrediction<'_, '_> {
+    pub fn prediction(&self) -> &PhysicalRepair {
+        &self.prediction
+    }
+    pub fn observation(&self) -> &crate::hnn::receiving::SourceObserverReceipt {
+        &self.observation
+    }
+    pub fn finish(self) -> PhysicalRepair {
+        self.prediction
+    }
+
+    /// One carrier through blind read, observed ratio, located-prior preparation and normal
+    /// deposition. Only R is stepped. The actual Word receives all six transposed anchor seeds
+    /// in one reverse sweep; replacing it with the old source marginal fails the full identity.
+    pub fn observe(
+        self,
+        contemporary: &crate::hnn::receiving::SourceObserverMaterial,
+        observed: &Encoded,
+        compared: &[bool],
+    ) -> Result<SourceObserverTeaching, SourceObserverRefusal> {
+        use crate::hnn::constitution::{LinearLocus, LinearStep, Locus, Reach, Sample};
+        use crate::hnn::port::Deposit;
+        use crate::hnn::ratio::{Faces, HolonRatio, target_phases};
+        let Self {
+            field,
+            material,
+            current,
+            chart,
+            word,
+            prediction,
+            observation,
+        } = self;
+        let result = (|| -> Result<_, HnnError> {
+            if contemporary != material {
+                return Err(HnnError::Unadmitted {
+                    reason: "the observer comparison's producing view/material changed",
+                });
+            }
+            if observed.part(0..0)? != chart
+                || observed.len() != observation.features.len()
+                || compared.len() != observation.features.len()
+                || !compared.iter().any(|&crossed| crossed)
+            {
+                return Err(HnnError::Unadmitted {
+                    reason: "the observer comparison's producing chart and nonempty section partition",
+                });
+            }
+            let targets: Vec<_> = observed.classes_read().collect();
+            if prediction.cells.iter().zip(&targets).any(
+                |(cell, target)| matches!(cell, RepairedCell::Intact(class) if class != target),
+            ) {
+                return Err(HnnError::Unadmitted {
+                    reason: "the observed comparison changed an intact source clamp",
+                });
+            }
+            let view = material.view();
+            let theta = material.constitution();
+            let phases = view.phases();
+            let reads: Vec<_> = prediction
+                .reads
+                .iter()
+                .map(|station| station.read.clone())
+                .collect();
+            let ratio = HolonRatio::compare_partition(
+                Faces::of_reads(&reads, phases.grain())?,
+                &targets,
+                &target_phases(field, current.lift(), phases.ring(), observed)?,
+                compared,
+            )?;
+            let gradient = ratio.covector()?;
+            let map = theta
+                .receiving_map(phases.ring())
+                .ok_or(HnnError::MissingReceivingMap {
+                    ring: phases.ring(),
+                })?;
+            let lift = &current.lift()[phases.ring()];
+            let expected_source = view.source_covector(gradient.logits(), map, lift)?;
+            let seeds = view.seeds(gradient.logits(), map, lift)?;
+            let (back, full) = word.pull_back_joined(seeds)?;
+            // Differentiate the entire actual opening, including every arriving wave and
+            // contact state. An old raw-anchor return has nonzero interior columns here.
+            if full.storage[0] != expected_source
+                || full.storage.iter().skip(1).flatten().any(|x| !x.is_zero())
+                || full
+                    .arrivals
+                    .iter()
+                    .flatten()
+                    .flatten()
+                    .any(|x| !x.is_zero())
+                || full.states.iter().flatten().flatten().any(|x| !x.is_zero())
+                || full.resonators.iter().any(Option::is_some)
+                || !back.released.total.is_zero()
+            {
+                return Err(HnnError::Unadmitted {
+                    reason: "the observer's full-state matched return identity fails",
+                });
+            }
+            // The generic material ticks are NOT published: chi depends on body material,
+            // whose coefficient derivative is outside this R-only receiving declaration.
+            let samples: Vec<_> = observation
+                .features
+                .iter()
+                .zip(gradient.logits())
+                .zip(compared)
+                .filter_map(|((feature, gradient), &crossed)| {
+                    crossed.then(|| Sample {
+                        weight: Rat::one(),
+                        feature: field.ring(0).rotate(feature, lift),
+                        covector: gradient.iter().map(|x| -x).collect(),
+                    })
+                })
+                .collect();
+            let locus = Locus::ReceivingMap(phases.ring());
+            let reach = Reach {
+                receiver: phases.ring(),
+                stations: vec![observation.available_at as u64],
+                entries: vec![observation.anchors[0].2 as u64],
+                phases: samples.len() as u64,
+                loci: [locus].into_iter().collect(),
+            };
+            let deposit = Deposit::new(
+                theta.commit(),
+                vec![LinearStep {
+                    locus: LinearLocus::Receiving(phases.ring()),
+                    samples: samples.clone(),
+                }],
+                Vec::new(),
+                vec![locus],
+            )
+            .with_reach(reach);
+            let (successor, publication) = theta.deposited(&deposit)?;
+            if publication.loci.iter().any(|at| *at != locus) {
+                return Err(HnnError::Unadmitted {
+                    reason: "the observer's R-only comparison reached another material relation",
+                });
+            }
+            let successor = material.successor(field, &current, successor)?;
+            Ok((ratio, full, successor, publication, samples))
+        })();
+        match result {
+            Ok((ratio, full_adjoint, material, publication, samples)) => {
+                Ok(SourceObserverTeaching {
+                    prediction,
+                    observation,
+                    full_adjoint,
+                    ratio,
+                    material,
+                    publication,
+                    samples,
+                })
+            }
+            Err(error) => Err(SourceObserverRefusal {
+                prediction,
+                observation,
+                error,
+            }),
+        }
+    }
+}
+
 /// [definition] A participating reception awaiting one observed comparison: its blind receipt,
 /// current frame, producing chart and transient native Word/source moment. It is consumed by
 /// `observe` or `finish`, never cloned or retained as an occurrence archive. An observed target
@@ -3145,8 +3435,8 @@ fn physical_prediction<'f, 'm>(
     phases: &ReceivingPhases,
     completion_domain: bool,
 ) -> Result<PhysicalPrediction<'f, 'm>, HnnError> {
-    let (prediction, word, source) =
-        physical_forward(field, material, current, section, opening, phases, completion_domain)?;
+    let (prediction, word, source, _observation) =
+        physical_forward(field, material, current, section, opening, phases, completion_domain, None)?;
     Ok(PhysicalPrediction {
         field,
         material,
