@@ -21,6 +21,9 @@
 //! | `PortHolon.passive` | [`ResistiveRelation::new`] |
 //! | `PortHolon.energy_balance`, `energy_balance_const` | [`crate::holon::law::EnergyBalance`] |
 
+mod contact;
+pub use contact::{ContactConstitution, contact_operator};
+
 use crate::ratio::Rat;
 
 use crate::holon::HolonError;

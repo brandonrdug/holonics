@@ -1,0 +1,69 @@
+{
+  "grade": "SOURCE_PREPARED_NATIVE_PENDING",
+  "base": "ade009f3ae949ea63f1c590261e7c63809947745",
+  "source_inputs_changed": {
+    "crates/holonics/src/holon/element.rs": {
+      "bytes": 9990,
+      "sha256": "3ec07b3d2fb78aaf1b0ef17460e79e611195e1433445a969f40cac797c4526ae"
+    },
+    "crates/holonics/src/holon/element/contact.rs": {
+      "bytes": 4832,
+      "sha256": "41a947bbe3ca180a809d37ef4c8d5d4a1ef93bd897d5c1f8ba8e68bf5439eb40"
+    },
+    "crates/holonics/src/hnn/propagation.rs": {
+      "bytes": 65654,
+      "sha256": "5457d58cf2ec0f3515687134d770bcfe1e3723f391ea3af48d54025ef1be655e"
+    },
+    "crates/holonics/src/hnn/contact.rs": {
+      "bytes": 37045,
+      "sha256": "6e07667b40c038eb1884ed192501bc6042ea20a49aa9d932ed9cfa251827f5d5"
+    },
+    "crates/holonics/src/hnn/tests/physics.rs": {
+      "bytes": 64392,
+      "sha256": "7d58e4fe8cc16ab179750bd97330f2a60cce3f479d234c827b272c3f6f8447ed"
+    },
+    "crates/holonics-cuda/src/hnn/publication.rs": {
+      "bytes": 20763,
+      "sha256": "a3a85008c06e61a8d6ea611f1848600ee367ccc359c8ece710605138dabf0215"
+    }
+  },
+  "syntax_only": {
+    "argv": [
+      "rustfmt",
+      "--edition",
+      "2024",
+      "--emit",
+      "stdout",
+      "--config",
+      "skip_children=true",
+      "crates/holonics/src/holon/element.rs",
+      "crates/holonics/src/holon/element/contact.rs",
+      "crates/holonics/src/hnn/propagation.rs",
+      "crates/holonics/src/hnn/contact.rs",
+      "crates/holonics/src/hnn/tests/physics.rs",
+      "crates/holonics-cuda/src/hnn/publication.rs"
+    ],
+    "exit": 0,
+    "wall_ns": 66424532,
+    "peak_resident_bytes": 44417024,
+    "stderr": "",
+    "source_writes": false
+  },
+  "diff_check": {
+    "exit": 0,
+    "stderr": "",
+    "stdout": ""
+  },
+  "native_jobs": 0,
+  "typecheck": false,
+  "native_tests": false,
+  "scientific_or_training_or_generation_runs": 0,
+  "device_validation": false,
+  "native_queued_control_request": "separate frozen ade009f3a contact packet; no automatic follow-up launched",
+  "old_forwarding_owner_retired": true,
+  "new_resident": false,
+  "whole_artifact_completion": false,
+  "private_messages_or_data_published": false,
+  "comparison_decrease_claim": false,
+  "formal_counterpart": "existing HNN/Propagation descriptor transit and Holon/Element midpoint statements; no new mathematical identity; full descriptor-to-Holarchy/current conformance remains #62"
+}

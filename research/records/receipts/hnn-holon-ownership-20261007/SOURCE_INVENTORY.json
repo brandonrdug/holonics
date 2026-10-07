@@ -1,0 +1,142 @@
+{
+  "source": "ade009f3ae949ea63f1c590261e7c63809947745",
+  "native_rs_files": 30,
+  "declarations": 269,
+  "kind_counts": {
+    "struct": 228,
+    "enum": 35,
+    "trait": 5,
+    "type": 1
+  },
+  "visibility_counts": {
+    "pub": 257,
+    "pub(crate)": 11,
+    "pub(super)": 1
+  },
+  "individually_source_reviewed": 22,
+  "inventory_complete_for": "line-start pub/pub(restricted) structs/enums/traits/type declarations under hnn excluding tests; macros/private declarations not AST-certified",
+  "consumer_review": "prioritized core types only; other mapping is provisional module role, not a deletion verdict",
+  "native_jobs": 0,
+  "source_inputs": {
+    "crates/holonics/src/hnn/chart.rs": {
+      "bytes": 38033,
+      "sha256": "71b69f3298d57e8c3312874764919bf3110e7a6b598018eba61551bc33c7f277"
+    },
+    "crates/holonics/src/hnn/constitution.rs": {
+      "bytes": 435321,
+      "sha256": "3644ed2cb7e7996b9b6e41e5681e765fcc2157f4d017e0994a3e2ebc1537a0eb"
+    },
+    "crates/holonics/src/hnn/contact.rs": {
+      "bytes": 37018,
+      "sha256": "c03e82181b7d6063b922edfebbb3ac0ef1ebb516b0791b75e5943e74d32ce4d5"
+    },
+    "crates/holonics/src/hnn/encoding.rs": {
+      "bytes": 59224,
+      "sha256": "50152ce0f52a501ec08e9cd0b7981950f8173ec4dcfe5a66286ad48d94bf9739"
+    },
+    "crates/holonics/src/hnn/executed.rs": {
+      "bytes": 14059,
+      "sha256": "e9000546fd4b202c887336b020dc063286309fe01c217124e887f798baee518b"
+    },
+    "crates/holonics/src/hnn/field.rs": {
+      "bytes": 118386,
+      "sha256": "d6c8d1a04c29862920617ff95c02b50bae40e4120c171dce19aac5b297ada2f7"
+    },
+    "crates/holonics/src/hnn/keys.rs": {
+      "bytes": 30498,
+      "sha256": "6b3d12bc909fe7c4e0e24f443a0313df16cee0460bef0b7db14da76652a44d8f"
+    },
+    "crates/holonics/src/hnn/mod.rs": {
+      "bytes": 31505,
+      "sha256": "aabf7320ec4362620ffc08c38c2fff635487b08289a480572f82aa1ff2d2511c"
+    },
+    "crates/holonics/src/hnn/moment.rs": {
+      "bytes": 114255,
+      "sha256": "2585d881e1b3e7584a5982bc54107f8d79233de9a65dd423e6b515e2a48a548a"
+    },
+    "crates/holonics/src/hnn/pending.rs": {
+      "bytes": 13935,
+      "sha256": "092d05ce266079a07bec53f067adc586eb83b94926530149c93ad44ad6f20332"
+    },
+    "crates/holonics/src/hnn/physical/communication.rs": {
+      "bytes": 17177,
+      "sha256": "947753e233118765a9973dff42efc366e3feac1109c336ed7253643f46f30ed9"
+    },
+    "crates/holonics/src/hnn/physical.rs": {
+      "bytes": 12102,
+      "sha256": "b2c569239093985c6c86c1005c91d2a3d3ada92d9c535efd305eb25901617ab2"
+    },
+    "crates/holonics/src/hnn/port.rs": {
+      "bytes": 70789,
+      "sha256": "fb62daa8daafb259b8696353247a017b005fd027264160abf7a61b96206b0df2"
+    },
+    "crates/holonics/src/hnn/prediction/charted/linear_radius.rs": {
+      "bytes": 6296,
+      "sha256": "aa54bb088760db2bc3dccac49fa9eab9aa40005496fac725e9804083d4d91337"
+    },
+    "crates/holonics/src/hnn/prediction/charted.rs": {
+      "bytes": 50032,
+      "sha256": "409a1fc3a5fbfae6031ffeb2431b78fe110ab8010d8e790708af0d7b85ed3ad4"
+    },
+    "crates/holonics/src/hnn/prediction.rs": {
+      "bytes": 198261,
+      "sha256": "06f1570e2e7d4d4d6f465fb24e849c6b815c1b9fd9da508aaca4af156b74e1ff"
+    },
+    "crates/holonics/src/hnn/propagation.rs": {
+      "bytes": 66089,
+      "sha256": "5784d92fa12cb7c70db3bda0dc5576cb96bf2e83e919e2d25bf5c59884b99a07"
+    },
+    "crates/holonics/src/hnn/ratio.rs": {
+      "bytes": 22152,
+      "sha256": "4b223f2a9bae7b70291ed62ce026a5f6ca521df0b4d87be3769c26a32f91030c"
+    },
+    "crates/holonics/src/hnn/realization.rs": {
+      "bytes": 6393,
+      "sha256": "d6daddbf8cc69ee9d546862a1bfc22e05cc27a70ee835455c9016d1062400c5a"
+    },
+    "crates/holonics/src/hnn/receiving/declaration.rs": {
+      "bytes": 13691,
+      "sha256": "9be4102908e728c7566428ade4881de65c4b41b244008ac2b82c0bdb4de127ab"
+    },
+    "crates/holonics/src/hnn/receiving.rs": {
+      "bytes": 99700,
+      "sha256": "6b61b28f08e2b56c51b8a3e72c554ef9aadd109f6d1b32e5d58cff1ad11c4b85"
+    },
+    "crates/holonics/src/hnn/reference/continuation.rs": {
+      "bytes": 28990,
+      "sha256": "65a0c9686d4cf8d2855959423db196d8f85c10f1a59fde07ca99d418568f83e3"
+    },
+    "crates/holonics/src/hnn/reference/passage.rs": {
+      "bytes": 12839,
+      "sha256": "2665e5235bff5beadac9904eee5011151873899cf19fc96f5d65886c9df905ee"
+    },
+    "crates/holonics/src/hnn/reference.rs": {
+      "bytes": 220442,
+      "sha256": "9800117d77ca85642e607264897a9974aee3b2e9659392a4512ce4aba8cd13d8"
+    },
+    "crates/holonics/src/hnn/retention.rs": {
+      "bytes": 30391,
+      "sha256": "287e881f98cf9d05969b2f0f3969bb7084320b873761c9d790dd04855b69a118"
+    },
+    "crates/holonics/src/hnn/ring.rs": {
+      "bytes": 175213,
+      "sha256": "5e7263b121ab508923eaba7afbbea532490e357da92abfc4b313c874f157d234"
+    },
+    "crates/holonics/src/hnn/state_text.rs": {
+      "bytes": 1964,
+      "sha256": "2bb767b8dabc3eaf564873d0ab843f35d154a8551542a409045e821b0155997d"
+    },
+    "crates/holonics/src/hnn/word/continuation.rs": {
+      "bytes": 23307,
+      "sha256": "6e928ef4b079844021b1329819d2469bb9a9aa6d5482915e0e463d19feb6a7aa"
+    },
+    "crates/holonics/src/hnn/word/work.rs": {
+      "bytes": 5515,
+      "sha256": "1710ab55822f882c3d0d21fcaa42565c62221632b0061840da3724495f75b459"
+    },
+    "crates/holonics/src/hnn/word.rs": {
+      "bytes": 146371,
+      "sha256": "ae979c581327aa33268f4be2051599f87cb0b75899916103fe90add2356e9909"
+    }
+  }
+}

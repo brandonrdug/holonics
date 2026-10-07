@@ -66,7 +66,9 @@
 //! its advance on `(u, p = C_a w)` with storage `(K_a, C_a⁻¹)`, resistance `D_a + (2/G_a)I` and the
 //! channel waves as sources, whenever `C_a ≻ 0`. Two tests equate them at the same operands under
 //! the exact law (`tests/propagation.rs`, `the_element_step_is_the_reference_holons_midpoint_advance`,
-//! `a_stored_transit_is_the_reference_holons_midpoint_advance`). The tick does not call the owner:
+//! `a_stored_transit_is_the_reference_holons_midpoint_advance`). The descriptor forms and
+//! normalized operator now have the library owner `holon::element::ContactConstitution`.
+//! The tick consumes its cached native realization rather than calling `ReferenceHolon`:
 //! (i) `C_a = c_a c_aᵀ` may be singular (campaign 1 admits `c_a = 0`, pure transmission), where the
 //! transit is a descriptor midpoint step with mass `C_a` that the owner's unit-mass step
 //! `q⁺ − q = h((J − R)Q q̄ + B u)` does not state; (ii) a word's operands are fixed at its cut, so
@@ -100,6 +102,7 @@ use num_bigint::BigInt;
 use num_traits::{One, Signed, ToPrimitive, Zero};
 
 use crate::geometry::swing::half_turn;
+use crate::holon::element::ContactConstitution;
 use crate::hnn::HnnError;
 use crate::hnn::chart::{ChartKey, ChartReading, ChartWords, Charts, WordLattice, refine};
 use crate::hnn::constitution::Lattice;
@@ -385,28 +388,6 @@ pub fn ring_operator(element: &ExactRatMatrix) -> Result<ExactRatMatrix, HnnErro
     Ok(ExactRatMatrix::identity(element.rows())?.subtract(&element.scaled(&rat(1, 2)))?)
 }
 
-/// **The contact's normalized operator** `m_a = 1 + (G_a/2h)(2C_a + hD_a + (h²/2)K_a)` from its
-/// squared forms, conductance and hop (`M_a = (2h/G_a) m_a`), whose inverse is the transit's solve.
-/// Public for a realization that charts it off the host.
-pub fn contact_operator(
-    storage: &ExactRatMatrix,
-    stiffness: &ExactRatMatrix,
-    dissipation: &ExactRatMatrix,
-    conductance: &Rat,
-    step: &Rat,
-) -> Result<ExactRatMatrix, HnnError> {
-    let h = step;
-    // m = 1 + (G/2h)(2C + hD + (h²/2)K) = (G/2h) M.
-    let gain = conductance / (integer(2) * h);
-    Ok(ExactRatMatrix::identity(storage.rows())?.add(
-        &storage
-            .scaled(&integer(2))
-            .add(&dissipation.scaled(h))?
-            .add(&stiffness.scaled(&(h * h / integer(2))))?
-            .scaled(&gain),
-    )?)
-}
-
 impl RingOperands {
     /// **A ring's operands under the exact law**, from its declared admittance and its element
     /// material, at the sheet classes of the standing contrast `Δ_r` (`σ_ρ = sign Δ_r[ρ]`,
@@ -551,9 +532,7 @@ pub struct ContactOperands {
     selection: (Vec<usize>, Vec<usize>),
     exponent: ExponentReading,
     conductance: Rat,
-    storage: ExactRatMatrix,
-    stiffness: ExactRatMatrix,
-    dissipation: ExactRatMatrix,
+    material: ContactConstitution,
     storage_rows: Option<Rows>,
     stiffness_rows: Option<Rows>,
     dissipation_rows: Option<Rows>,
@@ -669,7 +648,11 @@ impl ContactOperands {
                 step,
             )?;
         }
-        let operator = contact_operator(&storage, &stiffness, &dissipation, &conductance, step)?;
+        // One library element relation owns the physical forms. Native rows/charts below realize
+        // m = I + (G/(2h))(2C + hD + (h²/2)K) on that same relation, including singular C.
+        let material = ContactConstitution::new(storage, stiffness, dissipation)?;
+        let (storage, stiffness, dissipation) = material.forms();
+        let operator = material.operator(&conductance, step)?;
         let operator_norm = (0..k)
             .map(|i| {
                 operator
@@ -688,12 +671,10 @@ impl ContactOperands {
             selection,
             exponent,
             conductance,
-            storage_rows: rows(&storage),
-            stiffness_rows: rows(&stiffness),
-            dissipation_rows: rows(&dissipation),
-            storage,
-            stiffness,
-            dissipation,
+            storage_rows: rows(storage),
+            stiffness_rows: rows(stiffness),
+            dissipation_rows: rows(dissipation),
+            material,
             operator_rows: Rows::of(&operator),
             operator,
             operator_norm,
@@ -717,7 +698,7 @@ impl ContactOperands {
 
     /// `C_a`, `K_a`, `D_a`.
     pub fn forms(&self) -> (&ExactRatMatrix, &ExactRatMatrix, &ExactRatMatrix) {
-        (&self.storage, &self.stiffness, &self.dissipation)
+        self.material.forms()
     }
 
     /// `m_a = 1 + (G_a/2h)(2C_a + hD_a + (h²/2)K_a)`.

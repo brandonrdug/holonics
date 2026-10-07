@@ -105,7 +105,8 @@ use num_traits::{One, Signed, ToPrimitive, Zero};
 
 use crate::hnn::HnnError;
 use crate::hnn::field::{ConstitutionRead, Current, Field};
-use crate::hnn::propagation::{ContactOperands, Transit, contact_operator, gram};
+use crate::hnn::propagation::{ContactOperands, Transit, gram};
+use crate::holon::element::contact_operator;
 use crate::navigator::address::simplest_between;
 use crate::navigator::trace::{SiteFactor, SiteKind};
 use crate::ratio::linear::ExactRatMatrix;

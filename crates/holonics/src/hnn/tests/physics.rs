@@ -1059,7 +1059,7 @@ fn a_boost_is_admitted_only_with_a_certified_solve() {
             contact, direction, ..
         }) => {
             assert_eq!(contact, 3);
-            let operator = crate::hnn::propagation::contact_operator(
+            let operator = crate::holon::element::contact_operator(
                 &storage,
                 &stiffness,
                 &dissipation,

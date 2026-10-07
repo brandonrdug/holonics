@@ -32,7 +32,8 @@ use std::rc::Rc;
 use core::ffi::c_void;
 
 use holonics::hnn::contact::signed_stiffness;
-use holonics::hnn::propagation::{contact_operator, element_material, gram, ring_operator};
+use holonics::hnn::propagation::{element_material, gram, ring_operator};
+use holonics::holon::element::contact_operator;
 use holonics::hnn::ring::{ResonatorMaterial, ResonatorOperands};
 use holonics::hnn::{ConstitutionRead, Field, HnnError, Locus};
 use holonics::ratio::Rat;
@@ -322,7 +323,7 @@ impl Loci {
 
     /// **Contact `a`'s operator at a conductance** (its chart key's carry), formed once per
     /// publication and carry: `m_a = 1 + (G/2h)(2C + hD + (h²/2)K)` (the host's
-    /// `holonics::hnn::propagation::contact_operator`).
+    /// `holonics::holon::element::contact_operator`).
     pub(crate) fn contact_operator(
         &self,
         contact: usize,
