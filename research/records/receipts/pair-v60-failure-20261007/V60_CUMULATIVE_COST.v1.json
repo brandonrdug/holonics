@@ -1,0 +1,23 @@
+{
+  "scope": "exact three source-successor native continuations v56+v58+v60; excludes earlier attempts, formal queue and source audit time",
+  "versions": {
+    "v56": {
+      "jobs": 11,
+      "CPU_ns": 108688463000,
+      "wall_ns": 78284950420
+    },
+    "v58": {
+      "jobs": 7,
+      "CPU_ns": 102571316000,
+      "wall_ns": 79283503954
+    },
+    "v60": {
+      "jobs": 7,
+      "CPU_ns": 56686176000,
+      "wall_ns": 41185221389
+    }
+  },
+  "total_jobs": 25,
+  "CPU_ns": 267945955000,
+  "wall_ns": 198753675763
+}

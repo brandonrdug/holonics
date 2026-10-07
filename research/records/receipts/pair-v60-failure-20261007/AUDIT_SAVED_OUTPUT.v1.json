@@ -1,0 +1,210 @@
+{
+  "saved_output_checks": "pass",
+  "native_calls": 0,
+  "R_centered_max_real": "16651161803/2968862588928",
+  "pair_centered_max_real": "111544579975/2565097276833792",
+  "R_to_pair_centered_ratio": "14386603797792/111544579975",
+  "pre_pair_rankings": [
+    [
+      2,
+      0,
+      1,
+      3
+    ],
+    [
+      2,
+      1,
+      0,
+      3
+    ],
+    [
+      2,
+      3,
+      0,
+      1
+    ],
+    [
+      2,
+      1,
+      0,
+      3
+    ]
+  ],
+  "post_pair_rankings": [
+    [
+      2,
+      0,
+      1,
+      3
+    ],
+    [
+      2,
+      1,
+      0,
+      3
+    ],
+    [
+      2,
+      3,
+      0,
+      1
+    ],
+    [
+      2,
+      1,
+      0,
+      3
+    ]
+  ],
+  "continuing_rankings": [
+    [
+      2,
+      0,
+      1,
+      3
+    ],
+    [
+      1,
+      2,
+      3,
+      0
+    ],
+    [
+      2,
+      1,
+      3,
+      0
+    ],
+    [
+      2,
+      1,
+      3,
+      0
+    ]
+  ],
+  "margins_at_grain4096": [
+    {
+      "no_pair": [
+        "-13/1024",
+        "-51/4096"
+      ],
+      "learned_common": [
+        "-13/1024",
+        "-51/4096"
+      ],
+      "continuing": [
+        "-13/1024",
+        "-51/4096"
+      ]
+    },
+    {
+      "no_pair": [
+        "23/4096",
+        "3/512"
+      ],
+      "learned_common": [
+        "23/4096",
+        "3/512"
+      ],
+      "continuing": [
+        "-59/4096",
+        "-29/2048"
+      ]
+    },
+    {
+      "no_pair": [
+        "-51/2048",
+        "-101/4096"
+      ],
+      "learned_common": [
+        "-51/2048",
+        "-101/4096"
+      ],
+      "continuing": [
+        "-3/128",
+        "-95/4096"
+      ]
+    },
+    {
+      "no_pair": [
+        "-51/2048",
+        "-101/4096"
+      ],
+      "learned_common": [
+        "-51/2048",
+        "-101/4096"
+      ],
+      "continuing": [
+        "-5/128",
+        "-159/4096"
+      ]
+    }
+  ],
+  "centered_R_equal_v56_v60": true,
+  "phase2_prior": "8",
+  "phase2_sample_trace_upper": "39/128",
+  "phase2_trace_upper_over_prior": "39/1024",
+  "phase2_retained_V_plus_a": "strictly negative",
+  "cost_by_continuation": {
+    "v56": {
+      "jobs": 11,
+      "CPU_ns": 108688463000,
+      "wall_ns": 78284950420
+    },
+    "v58": {
+      "jobs": 7,
+      "CPU_ns": 102571316000,
+      "wall_ns": 79283503954
+    },
+    "v60": {
+      "jobs": 7,
+      "CPU_ns": 56686176000,
+      "wall_ns": 41185221389
+    }
+  },
+  "cost_total": {
+    "jobs": 25,
+    "CPU_ns": 267945955000,
+    "wall_ns": 198753675763
+  },
+  "cost_CPU_prime_powers": [
+    [
+      2,
+      3
+    ],
+    [
+      5,
+      4
+    ],
+    [
+      149,
+      1
+    ],
+    [
+      457,
+      1
+    ],
+    [
+      787,
+      1
+    ]
+  ],
+  "cost_wall_prime_powers": [
+    [
+      19,
+      1
+    ],
+    [
+      149,
+      1
+    ],
+    [
+      821,
+      1
+    ],
+    [
+      85513,
+      1
+    ]
+  ]
+}

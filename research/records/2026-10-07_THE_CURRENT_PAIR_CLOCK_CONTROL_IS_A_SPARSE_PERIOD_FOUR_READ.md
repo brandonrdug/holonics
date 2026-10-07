@@ -1,5 +1,7 @@
 # The current pair clock control is a sparse period-four read
 
+[Acceptance update, October 7] Continuation-v60 at source826e3033 and Pin3bf58bd3 passed the focused current native controls and fresh example. The complete fixed 4R+1Pair+4probe interaction **failed** the useful1/16 gate. The source-preparation and pending statements below describe the earlier stage; they are superseded by the [complete result and independent audit](2026-10-07_THE_COMPLETE_PAIR_POINT_FAILS_WITH_A_PRIOR_DOMINATED_RECEIVING_MAP.md). Both legacy pumped/domain stops remain incomplete and uncredited.
+
 Refs #63, #73, #148. Pumped/domain source-return and formal/device joins remain owed in #62/#76.
 
 [native-verified on 1f8a81ee; current successor control pending] Continuation-v58 passed the

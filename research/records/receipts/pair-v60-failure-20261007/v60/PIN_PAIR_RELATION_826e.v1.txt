@@ -1,0 +1,10 @@
+# Source826e3033; current exact sparse pair-relation read, spent orbits. Refs #63 #73.
+# Empirical timing projection; no later-state/cold guarantee. First excess stops, no limit raise.
+# Matching measured role upper246041963ns at1ms grain =>247ms;18roles.
+# Full matching fixture unattributed setup/control/certificate/publication charge1316782321ns retained.
+# Complete-wrapper controller upper290158131ns is separately enforced by the admission queue.
+command = executed physical-learn pair-relation
+projection = 18 roles * 247 ms + 1316782321 ns full matching fixture residual; native ceiling 5763 ms; controller 290158131 ns; outer 6053158131 ns
+deadline_ms = 5763
+unit_bound_ms = 247
+threads = 1
