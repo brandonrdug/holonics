@@ -1,0 +1,6 @@
+
+running 1 test
+test hnn::prediction::charted::linear_radius::tests::lazy_radius_columns_preserve_exact_images_zero_work_and_typed_shape_refusal ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1050 filtered out; finished in 0.00s
+

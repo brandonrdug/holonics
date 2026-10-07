@@ -11,14 +11,16 @@
 //! obtaining an observation. The observation never enters the forward constructor. This is a
 //! continuing owner of the existing physical laws, not another predictor or release rule.
 
+pub mod communication;
+
 use crate::hnn::HnnError;
 use crate::hnn::constitution::{Constitution, DepositReading};
 use crate::hnn::encoding::Encoded;
 use crate::hnn::field::{Current, Field, ReceiverDeclaration};
 use crate::hnn::port::Pullback;
 use crate::hnn::prediction::{
-    DamagedSection, PhysicalRepair, PhysicalSourceCertificate, PhysicalSourcePairing, PhysicalTeaching,
-    PhysicalTeachingRefusal, predict_by_field,
+    DamagedSection, PhysicalRepair, PhysicalSourceCertificate, PhysicalSourcePairing,
+    PhysicalTeaching, PhysicalTeachingRefusal, predict_by_field, predict_sparse_by_field,
 };
 use crate::hnn::ratio::HolonRatio;
 use crate::hnn::receiving::ReceivingPhases;
@@ -118,6 +120,32 @@ impl<'f> PhysicalResident<'f> {
         receiver: &ReceiverDeclaration,
         observation: impl FnOnce(&PhysicalRepair) -> Option<PhysicalObservation>,
     ) -> Result<PhysicalReception, HnnError> {
+        self.receive_with(
+            section,
+            receiver,
+            |blind, _phases| observation(blind),
+            false,
+        )
+    }
+
+    /// The same continuing receiver on an explicit sparse source, without a completion-domain
+    /// certificate. A communicated complex face does not assert a completed class assignment.
+    pub(crate) fn receive_sparse(
+        &mut self,
+        section: &DamagedSection,
+        receiver: &ReceiverDeclaration,
+        observation: impl FnOnce(&PhysicalRepair, &ReceivingPhases) -> Option<PhysicalObservation>,
+    ) -> Result<PhysicalReception, HnnError> {
+        self.receive_with(section, receiver, observation, true)
+    }
+
+    fn receive_with(
+        &mut self,
+        section: &DamagedSection,
+        receiver: &ReceiverDeclaration,
+        observation: impl FnOnce(&PhysicalRepair, &ReceivingPhases) -> Option<PhysicalObservation>,
+        sparse: bool,
+    ) -> Result<PhysicalReception, HnnError> {
         let chart = section.chart();
         if self.chart.as_ref().is_some_and(|bound| bound != chart) {
             return Err(HnnError::Unadmitted {
@@ -126,15 +154,37 @@ impl<'f> PhysicalResident<'f> {
         }
         let phases =
             ReceivingPhases::declare(self.field, &self.constitution, &self.current, receiver)?;
-        let pending = predict_by_field(
-            self.field,
-            &self.constitution,
-            &self.current,
-            section,
-            &self.opening,
-            &phases,
-        )?;
-        let (prediction, comparison, successor) = match observation(pending.prediction()) {
+        let pending = if sparse {
+            predict_sparse_by_field(
+                self.field,
+                &self.constitution,
+                &self.current,
+                section,
+                &self.opening,
+                &phases,
+            )?
+        } else {
+            predict_by_field(
+                self.field,
+                &self.constitution,
+                &self.current,
+                section,
+                &self.opening,
+                &phases,
+            )?
+        };
+        // The exact physical owner publishes only an accounted passage. This checks the
+        // original exact receipts; it does not change the charted owner's split accounting.
+        let blind = pending.prediction();
+        if !blind.opening.closes()
+            || !blind.word.closes()
+            || blind.balances.iter().any(|balance| !balance.closes())
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "the exact physical passage does not close its declared work receipts",
+            });
+        }
+        let (prediction, comparison, successor) = match observation(pending.prediction(), &phases) {
             None => (pending.finish(), Ok(None), None),
             Some(observation) => {
                 let result = match observation.learning {

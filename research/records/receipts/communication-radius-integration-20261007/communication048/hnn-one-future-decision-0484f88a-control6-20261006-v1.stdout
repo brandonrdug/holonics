@@ -1,0 +1,7 @@
+
+running 1 test
+test hnn::tests::physical_communication::communication_observations_cannot_change_the_earlier_boundary ... unit communication post-blind independence elapsed_ns=76279998
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1054 filtered out; finished in 0.08s
+

@@ -1,0 +1,132 @@
+{
+  "source_commit": "49395016f8141bcc95b8dc73a9f99b1879c33005",
+  "source_snapshot_pin": {
+    "bytes": 49279,
+    "sha256": "2ec8392b9845c163321f97e58d26922a511350dbf4be17c72a9d4eee0b66ee19"
+  },
+  "status": "PASS8 exact radius and affected physical controls",
+  "controls": [
+    {
+      "selector": "hnn::prediction::charted::linear_radius::tests::lazy_radius_columns_preserve_exact_images_zero_work_and_typed_shape_refusal",
+      "label": "hnn-charted-radius-reuse-49395016-control1-20261006-v1",
+      "native_pass": true,
+      "wall_ns": 228560814,
+      "projection_ns": 16000000000,
+      "aggregate_CPU_ns": 178328000,
+      "group_peak_B": 17616896,
+      "stdout_pin": {
+        "bytes": 251,
+        "sha256": "dc83e60a694bb1b9aae34a8722d8b5e0f45b5d666f5f0e84c71c2103a40fb0fd"
+      },
+      "quiescent": true
+    },
+    {
+      "selector": "hnn::prediction::charted::tests::contact_radius_faces_reuse_the_same_native_images_under_one_producing_word",
+      "label": "hnn-charted-radius-reuse-49395016-control2-20261006-v1",
+      "native_pass": true,
+      "wall_ns": 258757330,
+      "projection_ns": 16000000000,
+      "aggregate_CPU_ns": 219655000,
+      "group_peak_B": 17440768,
+      "stdout_pin": {
+        "bytes": 350,
+        "sha256": "5c4f8305ab63e3f008121b313caf2958c2de5354185992e7581d21fc27534c5c"
+      },
+      "quiescent": true
+    },
+    {
+      "selector": "hnn::prediction::charted::tests::source_response_re_represents_the_producing_chart",
+      "label": "hnn-charted-radius-reuse-49395016-control3-20261006-v1",
+      "native_pass": true,
+      "wall_ns": 2996464395,
+      "projection_ns": 16000000000,
+      "aggregate_CPU_ns": 2936865000,
+      "group_peak_B": 18644992,
+      "stdout_pin": {
+        "bytes": 5659,
+        "sha256": "697ff18b9e5fc5b76d811132e8bcd27ab20291c08156a6de3a48d381a10e497a"
+      },
+      "quiescent": true
+    },
+    {
+      "selector": "hnn::tests::physical_charted::charted_source_and_carry_error_enclose_the_same_exact_physical_passage",
+      "label": "hnn-charted-radius-reuse-49395016-control4-20261006-v1",
+      "native_pass": true,
+      "wall_ns": 373787036,
+      "projection_ns": 16000000000,
+      "aggregate_CPU_ns": 321304000,
+      "group_peak_B": 17965056,
+      "stdout_pin": {
+        "bytes": 2845,
+        "sha256": "cc7804557f65e9ba7a205d94664285d1c694b9e5bcacd2b41f38452a6090c9f2"
+      },
+      "quiescent": true
+    },
+    {
+      "selector": "hnn::tests::physical_charted::charted_receiving_learning_charges_both_covectors_and_keeps_its_physical_carry",
+      "label": "hnn-charted-radius-reuse-49395016-control5-20261006-v1",
+      "native_pass": true,
+      "wall_ns": 639243695,
+      "projection_ns": 16000000000,
+      "aggregate_CPU_ns": 583167000,
+      "group_peak_B": 18132992,
+      "stdout_pin": {
+        "bytes": 14915,
+        "sha256": "5a120539969abd7e0ea18c6b82840f1ad6c531780ca648ddd8bb024c04efb61d"
+      },
+      "quiescent": true
+    },
+    {
+      "selector": "hnn::tests::physical_charted::charted_zero_tolerance_refuses_the_actual_opening_error_and_retains_the_blind_end",
+      "label": "hnn-charted-radius-reuse-49395016-control6-20261006-v1",
+      "native_pass": true,
+      "wall_ns": 349574544,
+      "projection_ns": 16000000000,
+      "aggregate_CPU_ns": 296152000,
+      "group_peak_B": 17620992,
+      "stdout_pin": {
+        "bytes": 418,
+        "sha256": "e820e6eb0a59568d919ce0eadaadd1402ef5fd527d52364fa8cb75125c5ff0b6"
+      },
+      "quiescent": true
+    },
+    {
+      "selector": "hnn::tests::physical_charted::charted_loaded_pump_error_keeps_the_absolute_clock_across_the_carry",
+      "label": "hnn-charted-radius-reuse-49395016-control7-20261006-v1",
+      "native_pass": true,
+      "wall_ns": 443636760,
+      "projection_ns": 16000000000,
+      "aggregate_CPU_ns": 378485000,
+      "group_peak_B": 17944576,
+      "stdout_pin": {
+        "bytes": 266,
+        "sha256": "23b4064b6a7c276e8d14af0d3e731f91b8263fdaeaca1bbce8c212c175f33bb3"
+      },
+      "quiescent": true
+    },
+    {
+      "selector": "hnn::tests::physical_charted::charted_physical_balance_consumes_its_actual_opening_split",
+      "label": "hnn-charted-radius-reuse-49395016-control8-20261006-v1",
+      "native_pass": true,
+      "wall_ns": 263508801,
+      "projection_ns": 16000000000,
+      "aggregate_CPU_ns": 224876000,
+      "group_peak_B": 17698816,
+      "stdout_pin": {
+        "bytes": 456,
+        "sha256": "065325e9bb5cfcc6a2b76b3b6c4b1912eb5096220b5ff54bf42aefee8338d23e"
+      },
+      "quiescent": true
+    }
+  ],
+  "whole_wall_total_ns": 5553533375,
+  "whole_CPU_total_ns": 5138832000,
+  "max_group_peak_B": 18644992,
+  "all_old_tolerances_and_physical_checks_preserved": true,
+  "actual_144_coefficient_columns_reused_no_forward_tick_removed": true,
+  "direct_Word_counts_not_total_executions": true,
+  "all_observability_and_error_work_included_in_whole_readings": true,
+  "speedup_accepted": false,
+  "matched_read_pending": true,
+  "product_claim": false
+}

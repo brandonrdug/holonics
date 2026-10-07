@@ -1,0 +1,605 @@
+{
+  "grade": "NATIVE CHECKED BOUNDED COMMUNICATION; no useful relation/product acceptance",
+  "source_commit": "498341a321e31807d7bb4469207813f30e0a4fc3",
+  "documentation_successor": "46cc0852f2e2be3eeee9c94163c0942914adc312",
+  "all294_source_bytes_independently_reverified": true,
+  "native_source_inputs": {
+    "bytes": 45940,
+    "sha256": "0eb284d10f126b65fe739d3537614521857ea682280d9deec996d2d383a88ebe"
+  },
+  "original_v37_validation": {
+    "bytes": 575691,
+    "sha256": "d60ad95faa841d8e5069c93f7c8c23c2b727320c1672ef2364fe3f0cac36a6c9"
+  },
+  "stages": {
+    "hnn-communication-498341a3-cache-preparation-20261006-v1": {
+      "postcleanup_acceptance_passed": true,
+      "wall_ns": 6189735470,
+      "projection_ns": 17000000000,
+      "measured_to_projected_ratio": [
+        6189735470,
+        17000000000
+      ],
+      "aggregate_CPU_ns": 5743387000,
+      "group_peak_bytes": 4294967296,
+      "peak_child_RSS_KiB": 31860,
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-communication-498341a3-workspace-check-20261006-v1": {
+      "postcleanup_acceptance_passed": true,
+      "wall_ns": 12294557850,
+      "projection_ns": 65000000000,
+      "measured_to_projected_ratio": [
+        12294557850,
+        65000000000
+      ],
+      "aggregate_CPU_ns": 19859392000,
+      "group_peak_bytes": 1669341184,
+      "peak_child_RSS_KiB": 1370484,
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-communication-498341a3-guard-lints-20261006-v1": {
+      "postcleanup_acceptance_passed": true,
+      "wall_ns": 15296812892,
+      "projection_ns": 65000000000,
+      "measured_to_projected_ratio": [
+        15296812892,
+        65000000000
+      ],
+      "aggregate_CPU_ns": 24978911000,
+      "group_peak_bytes": 2123300864,
+      "peak_child_RSS_KiB": 1429268,
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-communication-498341a3-guard-doctests-20261006-v1": {
+      "postcleanup_acceptance_passed": true,
+      "wall_ns": 19316873296,
+      "projection_ns": 65000000000,
+      "measured_to_projected_ratio": [
+        19316873296,
+        65000000000
+      ],
+      "aggregate_CPU_ns": 35008700000,
+      "group_peak_bytes": 2587697152,
+      "peak_child_RSS_KiB": 2150372,
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-communication-498341a3-lib-test-build-20261006-v1": {
+      "postcleanup_acceptance_passed": true,
+      "wall_ns": 27334942221,
+      "projection_ns": 65000000000,
+      "measured_to_projected_ratio": [
+        27334942221,
+        65000000000
+      ],
+      "aggregate_CPU_ns": 44920095000,
+      "group_peak_bytes": 3020529664,
+      "peak_child_RSS_KiB": 2996240,
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-communication-498341a3-control1-20261006-v1": {
+      "postcleanup_acceptance_passed": true,
+      "wall_ns": 515677046,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        515677046,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 445119000,
+      "group_peak_bytes": 20062208,
+      "peak_child_RSS_KiB": 29848,
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-communication-498341a3-control2-20261006-v1": {
+      "postcleanup_acceptance_passed": true,
+      "wall_ns": 513923643,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        513923643,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 444417000,
+      "group_peak_bytes": 18153472,
+      "peak_child_RSS_KiB": 30220,
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-communication-498341a3-control3-20261006-v1": {
+      "postcleanup_acceptance_passed": true,
+      "wall_ns": 464899968,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        464899968,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 398984000,
+      "group_peak_bytes": 17530880,
+      "peak_child_RSS_KiB": 27936,
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-communication-498341a3-control4-20261006-v1": {
+      "postcleanup_acceptance_passed": true,
+      "wall_ns": 454202233,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        454202233,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 388350000,
+      "group_peak_bytes": 17543168,
+      "peak_child_RSS_KiB": 28696,
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-communication-498341a3-control5-20261006-v1": {
+      "postcleanup_acceptance_passed": true,
+      "wall_ns": 480685056,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": [
+        480685056,
+        16000000000
+      ],
+      "aggregate_CPU_ns": 421634000,
+      "group_peak_bytes": 17772544,
+      "peak_child_RSS_KiB": 29672,
+      "quiescent_release": true,
+      "outer_error": null
+    }
+  },
+  "original_selected_artifact_pins": {
+    "hnn-communication-498341a3-cache-preparation-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "b927810376964b7fa473478e435c9680891829f0af241a896daf262483e2d551"
+    },
+    "hnn-communication-498341a3-cache-preparation-20261006-v1.config.json": {
+      "bytes": 6458,
+      "sha256": "21a3b45b003a9bc3d164678072fe310a075ef93b78373ddf957d6f9c11f2a328"
+    },
+    "hnn-communication-498341a3-cache-preparation-20261006-v1.final.json": {
+      "bytes": 5011,
+      "sha256": "4f6278aa51a0f9d6cf1e91cb4218e923dde98e428a8bc05bd783d05c73c16011"
+    },
+    "hnn-communication-498341a3-cache-preparation-20261006-v1.input_seal.json": {
+      "bytes": 4971,
+      "sha256": "4bfa9c211ba5828ccc95d073363c0bed02b7adb61effaeeb136b4231705db06f"
+    },
+    "hnn-communication-498341a3-cache-preparation-20261006-v1.output_seal.json": {
+      "bytes": 413253,
+      "sha256": "313b09cc4348022cb09540fbefaba936e554445fe902f12602124cebb863e844"
+    },
+    "hnn-communication-498341a3-cache-preparation-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "hnn-communication-498341a3-cache-preparation-20261006-v1.stdout": {
+      "bytes": 354,
+      "sha256": "9195aaa219bf4e0fd4013affd452c76b5546366d0fb41105d4cf422cedddcd21"
+    },
+    "hnn-communication-498341a3-workspace-check-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "e0f89c348cd7482f15857ec137cd7226c40c5a110c2233ec85afff7880e30383"
+    },
+    "hnn-communication-498341a3-workspace-check-20261006-v1.config.json": {
+      "bytes": 387019,
+      "sha256": "6b45ce2d36891b2e5dd54866a648af832dd0006e4a4abf9adadd696256a5453e"
+    },
+    "hnn-communication-498341a3-workspace-check-20261006-v1.final.json": {
+      "bytes": 4995,
+      "sha256": "a28a88e9b509759eb6192c6ed69544205af6f3426e0213035d803ea879447c2f"
+    },
+    "hnn-communication-498341a3-workspace-check-20261006-v1.input_seal.json": {
+      "bytes": 254131,
+      "sha256": "d3659d3f8a057bcfbdeb3957e3d9966e4e40cc11f26daa9d2b89b53e8580ac0e"
+    },
+    "hnn-communication-498341a3-workspace-check-20261006-v1.output_seal.json": {
+      "bytes": 803966,
+      "sha256": "f72e00a0fd3b8fa111c122b08df3df6e17256570f849c3db6be612114d708ab2"
+    },
+    "hnn-communication-498341a3-workspace-check-20261006-v1.stderr": {
+      "bytes": 922,
+      "sha256": "5f7706086fc9321efeac30472ad4aeb3ed182e2f1e89fb4119bee9bab495f4ad"
+    },
+    "hnn-communication-498341a3-workspace-check-20261006-v1.stdout": {
+      "bytes": 38961,
+      "sha256": "6841508c6aa8b46d0eada5206c81abbf60e9313a9f60f54cec1dcb992ec0389a"
+    },
+    "hnn-communication-498341a3-guard-lints-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "4abb5bec6dc7f7ae359f685362b877edf783a87c7a67b51e6040706196cf3024"
+    },
+    "hnn-communication-498341a3-guard-lints-20261006-v1.config.json": {
+      "bytes": 389129,
+      "sha256": "55f5786f6d02422438c362671cee79edd6fe08f6444687be849cc78f899c21de"
+    },
+    "hnn-communication-498341a3-guard-lints-20261006-v1.final.json": {
+      "bytes": 4940,
+      "sha256": "db8d914dfe1585aa2e67f0b2711c8d1001a35dc9f54f1d3ff3c7d5b225184018"
+    },
+    "hnn-communication-498341a3-guard-lints-20261006-v1.input_seal.json": {
+      "bytes": 255537,
+      "sha256": "7c7f2dac1122bfb1397d81c872c77ba6e7551d256910cf28efdf10a9479b34b1"
+    },
+    "hnn-communication-498341a3-guard-lints-20261006-v1.output_seal.json": {
+      "bytes": 1017588,
+      "sha256": "975722aaf1e718c9420fe53882b23bbfb751fa6accfc32a58278fc38690a7932"
+    },
+    "hnn-communication-498341a3-guard-lints-20261006-v1.stderr": {
+      "bytes": 299681,
+      "sha256": "30077235d91aa392f746ed04d22494df02f9cbbc88c694f561f5af26f7f014b7"
+    },
+    "hnn-communication-498341a3-guard-lints-20261006-v1.stdout": {
+      "bytes": 31498,
+      "sha256": "23e15e649a924819cbb9e556ccbad94a510f5da1b1621677357f513c817fe927"
+    },
+    "hnn-communication-498341a3-guard-doctests-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "b747ff648cbc1f723e9875b96f7b999dfcc9e2c58f8694f91025184aac81d48f"
+    },
+    "hnn-communication-498341a3-guard-doctests-20261006-v1.config.json": {
+      "bytes": 390904,
+      "sha256": "10cbdf44258ab8e690c67b681e5d9c372e062e65e1a84f1eb3429bf86499a8e5"
+    },
+    "hnn-communication-498341a3-guard-doctests-20261006-v1.final.json": {
+      "bytes": 4981,
+      "sha256": "f9e1affe132d1f462932ec4f3af73ac08af78c4f1a9873fb03df568cb8c735f2"
+    },
+    "hnn-communication-498341a3-guard-doctests-20261006-v1.input_seal.json": {
+      "bytes": 256628,
+      "sha256": "35b1052f180bd34ee7331b37f62e100f70088d932e1b6db801558bc93bc23ede"
+    },
+    "hnn-communication-498341a3-guard-doctests-20261006-v1.output_seal.json": {
+      "bytes": 1289409,
+      "sha256": "c1753644a7db836c3da4798adcb4ec009f9f91e1896ad19e2821940907d52ca1"
+    },
+    "hnn-communication-498341a3-guard-doctests-20261006-v1.stderr": {
+      "bytes": 407,
+      "sha256": "64a104cc0f977d05588e9647ad79907c112e7354eb60ca40e3ed1c818e16dba0"
+    },
+    "hnn-communication-498341a3-guard-doctests-20261006-v1.stdout": {
+      "bytes": 5769,
+      "sha256": "a575686836fbbe82177ee86db5315943fd37c82965d9a7a3b80b4f9e3bd0de4c"
+    },
+    "hnn-communication-498341a3-lib-test-build-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "b71e5501b1a14288ac9acea087db2f1a6450b7af6cf0815ddc9c43eb5598d3ac"
+    },
+    "hnn-communication-498341a3-lib-test-build-20261006-v1.config.json": {
+      "bytes": 392913,
+      "sha256": "b9555cbaad68af8248913053274807d523080a697ffe38fcb51a318a2173e93c"
+    },
+    "hnn-communication-498341a3-lib-test-build-20261006-v1.final.json": {
+      "bytes": 4982,
+      "sha256": "ac7926f45d1a032c1c416ae345ba135b2e933241253ec24f3b3c5f88499ccd8a"
+    },
+    "hnn-communication-498341a3-lib-test-build-20261006-v1.input_seal.json": {
+      "bytes": 257936,
+      "sha256": "c5bad4f355fa6072b5617964115853a0ebf4dde9491f4f9ae3c56d9c50894b4d"
+    },
+    "hnn-communication-498341a3-lib-test-build-20261006-v1.output_seal.json": {
+      "bytes": 1867506,
+      "sha256": "758a4d29fea05f8c8f948f9dad4028eeea947d6220fd7f9dddab0e98c56a056d"
+    },
+    "hnn-communication-498341a3-lib-test-build-20261006-v1.stderr": {
+      "bytes": 385,
+      "sha256": "c6d0bf15e9fc33aaf2a5522a02ad895aa62a3234ceb6e8cd20891d431c7be3a2"
+    },
+    "hnn-communication-498341a3-lib-test-build-20261006-v1.stdout": {
+      "bytes": 26524,
+      "sha256": "4f6edb19803d339c238773947de3f96fccbaa459a4780baf083c4b52d5d04937"
+    },
+    "hnn-communication-498341a3-control1-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "77212434050ebc37edebb80df43666b6f182aedadded6de12d9539f303273ca0"
+    },
+    "hnn-communication-498341a3-control1-20261006-v1.config.json": {
+      "bytes": 146365,
+      "sha256": "fdf035412ac2f03cc94698cae8c936609b07f9d180c25558a790eeb9ba89e614"
+    },
+    "hnn-communication-498341a3-control1-20261006-v1.final.json": {
+      "bytes": 4873,
+      "sha256": "ebf18369de2ec946a8a00d0df6ebefc22c0cf11e2c4093c0df9d631d56e14f34"
+    },
+    "hnn-communication-498341a3-control1-20261006-v1.input_seal.json": {
+      "bytes": 93207,
+      "sha256": "e9e2fe0592d830f6e689257bef058f2e7dade4b7aee9fd7741b2e7bbc6226078"
+    },
+    "hnn-communication-498341a3-control1-20261006-v1.output_seal.json": {
+      "bytes": 6643,
+      "sha256": "095cf2a0748d0687dac3f934872304d45c3d5df46b4c40677b008f5472aed16c"
+    },
+    "hnn-communication-498341a3-control1-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "hnn-communication-498341a3-control1-20261006-v1.stdout": {
+      "bytes": 3876,
+      "sha256": "2c4359bf8fcf50b99d589f31569d875bd2fb93716b3e7e266cd497d9942ed515"
+    },
+    "hnn-communication-498341a3-control2-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "1bc2c68c1f032b1978504808032d2593d426d985cbcc5634ef8816871f26b700"
+    },
+    "hnn-communication-498341a3-control2-20261006-v1.config.json": {
+      "bytes": 148612,
+      "sha256": "5c827d031e50ee4a8b3d18d170bb218a712be4412f9fbbd3608c9257d4a53dcf"
+    },
+    "hnn-communication-498341a3-control2-20261006-v1.final.json": {
+      "bytes": 4872,
+      "sha256": "6e52fdd9000efd29382db8ce41b466a500a4b43384ae56e7b01458831e541de5"
+    },
+    "hnn-communication-498341a3-control2-20261006-v1.input_seal.json": {
+      "bytes": 94670,
+      "sha256": "000750c60229c70eb9b814e5ac98d7dbf1ae66b0c004d3e30627e61b630f9d7a"
+    },
+    "hnn-communication-498341a3-control2-20261006-v1.output_seal.json": {
+      "bytes": 7086,
+      "sha256": "62ac35bc688767714178cae1f8c041b5c3148e8853a08e1074c4571e49381969"
+    },
+    "hnn-communication-498341a3-control2-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "hnn-communication-498341a3-control2-20261006-v1.stdout": {
+      "bytes": 288,
+      "sha256": "ba5f4c46897fcfccc23f04836d4988db2acd63ad4f2b642fd360e64a85a6d6da"
+    },
+    "hnn-communication-498341a3-control3-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "b646ea035ddbdb8372d37bff2dcd2cf051e4ffe655d3dc6d0eb3725d59546c40"
+    },
+    "hnn-communication-498341a3-control3-20261006-v1.config.json": {
+      "bytes": 150966,
+      "sha256": "7f22b12ae4575d29ec69873add4e0cfeb1dcd0d1f900d137950db3074f08f6f7"
+    },
+    "hnn-communication-498341a3-control3-20261006-v1.final.json": {
+      "bytes": 4872,
+      "sha256": "0615481f8af28cf987c08996ba7770e95174532d62f3aaa77e634e37820677f6"
+    },
+    "hnn-communication-498341a3-control3-20261006-v1.input_seal.json": {
+      "bytes": 96186,
+      "sha256": "1ed48afdfc13795802b429ef0c61e4a7f6d3db266e7b26523c3c174de0c00887"
+    },
+    "hnn-communication-498341a3-control3-20261006-v1.output_seal.json": {
+      "bytes": 4200,
+      "sha256": "47a862b967d5d5318c1fd9c0e178ad93960f23257826171efa323dc76e753511"
+    },
+    "hnn-communication-498341a3-control3-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "hnn-communication-498341a3-control3-20261006-v1.stdout": {
+      "bytes": 320,
+      "sha256": "9b90572e9934e04f7b5cc72519e6d06ef071af0f45e807271ef8abcdb52436b0"
+    },
+    "hnn-communication-498341a3-control4-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "692142c79f8f836781d72b80a9394d7ee6250da2ae3b282126f277e5df12a1c8"
+    },
+    "hnn-communication-498341a3-control4-20261006-v1.config.json": {
+      "bytes": 153240,
+      "sha256": "340086268bdd4575e6be83907c7098672204a0b7b2f4e3890084ce7f6dfc7d06"
+    },
+    "hnn-communication-498341a3-control4-20261006-v1.final.json": {
+      "bytes": 4873,
+      "sha256": "d0353d8b3a002a0056012ef65633a04e7a484a270851b733695aa6e1d4aa283b"
+    },
+    "hnn-communication-498341a3-control4-20261006-v1.input_seal.json": {
+      "bytes": 97662,
+      "sha256": "0cafeb4e40c428faeb1cb19260ca5e32d930438295be238bfa77ed89c0f03a0e"
+    },
+    "hnn-communication-498341a3-control4-20261006-v1.output_seal.json": {
+      "bytes": 2945,
+      "sha256": "fb576cb9c6351c5bb03a87faf3cf929d0cc25de857b3185852f70d47631b0ead"
+    },
+    "hnn-communication-498341a3-control4-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "hnn-communication-498341a3-control4-20261006-v1.stdout": {
+      "bytes": 2781,
+      "sha256": "2abea00c40df41c89ebb0875dbbc9ac0b1f12ba6141e47ee77210213950cc57a"
+    },
+    "hnn-communication-498341a3-control5-20261006-v1.acceptance.json": {
+      "bytes": 378,
+      "sha256": "494123f3b208ba30cd3f8b2858051cfbec46ba4b5d26e683595fbe538ffc8b88"
+    },
+    "hnn-communication-498341a3-control5-20261006-v1.config.json": {
+      "bytes": 155505,
+      "sha256": "95e0a232349275a3239747e6669e06431e12e910f07fe864399ab2086ab41d9f"
+    },
+    "hnn-communication-498341a3-control5-20261006-v1.final.json": {
+      "bytes": 4872,
+      "sha256": "5b662b5f61031b121b7e4c16480df072b74dde55a3f6913e87d8fbef1aa95516"
+    },
+    "hnn-communication-498341a3-control5-20261006-v1.input_seal.json": {
+      "bytes": 99134,
+      "sha256": "97fbd29c112f84dda4882a15b3998178110b75c41d98758350150b23847696b8"
+    },
+    "hnn-communication-498341a3-control5-20261006-v1.output_seal.json": {
+      "bytes": 5390,
+      "sha256": "204f7820d54ef32e8e2ade407bfbb645297d36186adc8f8c4e42df93ab142ce8"
+    },
+    "hnn-communication-498341a3-control5-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "hnn-communication-498341a3-control5-20261006-v1.stdout": {
+      "bytes": 233,
+      "sha256": "641334d671a6b588f805cd66fc5167d9b4e778a9e39c1a1b82949a947ab2ab1c"
+    }
+  },
+  "producing_lib_test_executable": {
+    "sha256": "c792b5af8decdbfc4363ba5562caae40cb573230692df01c6610f39e334b655c",
+    "bytes": 255371112
+  },
+  "exact_selectors": [
+    "hnn::tests::physical_communication::communication_deposits_after_the_whole_boundary_and_reuses_material_source_and_carry",
+    "hnn::tests::physical_communication::communication_observations_cannot_change_the_earlier_boundary",
+    "hnn::tests::physical_communication::communication_refuses_changed_source_or_partition_without_deposition_and_keeps_the_blind_end",
+    "hnn::tests::physical_communication::communication_returns_actual_multistation_held_receipts_without_a_joint_certificate",
+    "hnn::tests::physical::a_refused_resident_observation_keeps_material_and_carries_into_the_next_native_read"
+  ],
+  "accepted_scope": [
+    "whole blind native complex future boundary before observation",
+    "same Word receiving publication changes R; next unobserved native reads use contemporary R and actual carry",
+    "source sensitivity at matched learned material and entering carry",
+    "earlier boundary/carry/opening independent of later target",
+    "malformed observation preserves material and blind end; forward refusal executes no reception",
+    "actual multistation Held/UncertifiedDomain and absent domain receipts",
+    "exact source opening, field ticks and Word balances"
+  ],
+  "actual_single_future_output": {
+    "source_prefix": [
+      0,
+      1
+    ],
+    "chart": {
+      "classes": 4,
+      "source_rings_periods": [
+        [
+          0,
+          4
+        ]
+      ],
+      "decoder": "I_4",
+      "labels": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "encoding_fibre": [],
+      "located_advances": null,
+      "founded_encoding": null
+    },
+    "station": 2,
+    "crossing": 2,
+    "first": 2,
+    "grain": 16,
+    "blind": {
+      "tick": 2,
+      "complex_logits": [
+        [
+          "0",
+          "0"
+        ],
+        [
+          "0",
+          "0"
+        ],
+        [
+          "0",
+          "0"
+        ],
+        [
+          "0",
+          "0"
+        ]
+      ],
+      "grain_cells": [
+        {
+          "carry": 0,
+          "phase": 0,
+          "fibre": "0"
+        },
+        {
+          "carry": 0,
+          "phase": 0,
+          "fibre": "0"
+        },
+        {
+          "carry": 0,
+          "phase": 0,
+          "fibre": "0"
+        },
+        {
+          "carry": 0,
+          "phase": 0,
+          "fibre": "0"
+        }
+      ],
+      "phases": [
+        "0",
+        "0",
+        "0",
+        "0"
+      ],
+      "decision": "Held[0,1,2,3]/UncertifiedDomain",
+      "domain": null
+    },
+    "later_unobserved": {
+      "tick": 4,
+      "complex_logits": [
+        [
+          "-5975783189213/383415719685120",
+          "0"
+        ],
+        [
+          "-5975783189213/383415719685120",
+          "0"
+        ],
+        [
+          "-5975783189213/383415719685120",
+          "0"
+        ],
+        [
+          "17764470800833/383415719685120",
+          "1138600239253/191707859842560"
+        ]
+      ],
+      "grain_cells": [
+        {
+          "carry": -1,
+          "phase": 15,
+          "fibre": "17987699291107/383415719685120"
+        },
+        {
+          "carry": -1,
+          "phase": 15,
+          "fibre": "17987699291107/383415719685120"
+        },
+        {
+          "carry": -1,
+          "phase": 15,
+          "fibre": "17987699291107/383415719685120"
+        },
+        {
+          "carry": 0,
+          "phase": 0,
+          "fibre": "17764470800833/383415719685120"
+        }
+      ],
+      "phases": [
+        "0",
+        "0",
+        "0",
+        "1138600239253/383415719685120"
+      ],
+      "decision": "Held[0,1,2,3]/UncertifiedDomain",
+      "domain": null
+    }
+  },
+  "claim_limits": [
+    "fixture communication law, not meaningful language or an acquired reusable relation",
+    "no certified joint future completion or symbolic release",
+    "no probability/fibre-to-Encoded shortcut",
+    "no cold/device/nonlinear/adaptive/performance acceptance",
+    "native rational/source-clock/phase/lattice formal instantiation still owed #62"
+  ],
+  "path_redaction_only_in_copied_outputs": true,
+  "prior_failures_and_fixtures_preserved": true,
+  "source_owner_reran_compiler_or_native_jobs": false,
+  "Refs": [
+    63,
+    73,
+    148,
+    62
+  ]
+}

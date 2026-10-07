@@ -1,0 +1,521 @@
+{
+  "version": 1,
+  "grade": "Native source composition prepared; constituent scoped native acceptance preserved; combined compile/native acceptance pending",
+  "base": "49395016f8141bcc95b8dc73a9f99b1879c33005",
+  "communication_source": "0484f88a053727c332bb36732a6110b725431830",
+  "native_graft_paths": [
+    "crates/holonics/src/hnn/physical.rs",
+    "crates/holonics/src/hnn/physical/communication.rs",
+    "crates/holonics/src/hnn/tests/mod.rs",
+    "crates/holonics/src/hnn/tests/physical_communication.rs"
+  ],
+  "graft_inputs": {
+    "crates/holonics/src/hnn/physical.rs": {
+      "bytes": 9869,
+      "sha256": "d467a5b0399e9cb75b3f9c782b6016eb9680fa25d7daf8b301dd287f4d9b421f"
+    },
+    "crates/holonics/src/hnn/physical/communication.rs": {
+      "bytes": 16980,
+      "sha256": "fa59201ec77e37bc0cb7c760f386b47a18a8b97b4d1a89297f1d800750041840"
+    },
+    "crates/holonics/src/hnn/tests/mod.rs": {
+      "bytes": 646,
+      "sha256": "e0784288eba974bda7da4dd2017816dd30150dffe739ede253438080edee8c4b"
+    },
+    "crates/holonics/src/hnn/tests/physical_communication.rs": {
+      "bytes": 21049,
+      "sha256": "be25bd9a7ae539d3ac4e6077cebaa130d37ac1a6cae7631bb1f882b9c1831f18"
+    }
+  },
+  "radius_native_paths_preserved": [
+    "crates/holonics/src/hnn/prediction/charted.rs",
+    "crates/holonics/src/hnn/prediction/charted/linear_radius.rs"
+  ],
+  "constituent_controls": [
+    {
+      "family": "communication048",
+      "selector": "hnn::physical::communication::tests::one_future_decision_unites_the_blind_grain_leaders_with_completed_leaders",
+      "producer": "0484f88a053727c332bb36732a6110b725431830",
+      "raw_stdout": "research/records/receipts/communication-radius-integration-20261007/communication048/hnn-one-future-decision-0484f88a-control1-20261006-v1.stdout",
+      "bytes": 238,
+      "sha256": "0aa93a65d4d4359c67bac2fa6d07e2aa8607af0065475f2f334389ff0e979920",
+      "wall_ns": 221703294,
+      "aggregate_CPU_ns": 177946000,
+      "native_pass": true
+    },
+    {
+      "family": "communication048",
+      "selector": "hnn::tests::physical_communication::one_future_communication_carries_one_actual_source_label_through_the_whole_receiving_image",
+      "producer": "0484f88a053727c332bb36732a6110b725431830",
+      "raw_stdout": "research/records/receipts/communication-radius-integration-20261007/communication048/hnn-one-future-decision-0484f88a-control2-20261006-v1.stdout",
+      "bytes": 9051,
+      "sha256": "613481efd7b7e4c06c75f014b2ce2e01ce99d6b35c8f9bc05eba25ce77d920dd",
+      "wall_ns": 312176807,
+      "aggregate_CPU_ns": 275188000,
+      "native_pass": true
+    },
+    {
+      "family": "communication048",
+      "selector": "hnn::tests::physical_communication::one_future_source_publication_reaches_the_next_contemporary_communication_opening",
+      "producer": "0484f88a053727c332bb36732a6110b725431830",
+      "raw_stdout": "research/records/receipts/communication-radius-integration-20261007/communication048/hnn-one-future-decision-0484f88a-control3-20261006-v1.stdout",
+      "bytes": 7621,
+      "sha256": "6653a913555a4497892dd4db0dddc560d8692c3efe2059d825b29671c830949e",
+      "wall_ns": 384215183,
+      "aggregate_CPU_ns": 348732000,
+      "native_pass": true
+    },
+    {
+      "family": "communication048",
+      "selector": "hnn::tests::physical_communication::one_future_communication_keeps_refusal_and_multi_future_admission_honest",
+      "producer": "0484f88a053727c332bb36732a6110b725431830",
+      "raw_stdout": "research/records/receipts/communication-radius-integration-20261007/communication048/hnn-one-future-decision-0484f88a-control4-20261006-v1.stdout",
+      "bytes": 236,
+      "sha256": "a02f3dd97c10badd844e985fd48c1c3eeb4a2ef337f68714698b0758e70dc0c1",
+      "wall_ns": 232903342,
+      "aggregate_CPU_ns": 198416000,
+      "native_pass": true
+    },
+    {
+      "family": "communication048",
+      "selector": "hnn::tests::physical_communication::communication_deposits_after_the_whole_boundary_and_reuses_material_source_and_carry",
+      "producer": "0484f88a053727c332bb36732a6110b725431830",
+      "raw_stdout": "research/records/receipts/communication-radius-integration-20261007/communication048/hnn-one-future-decision-0484f88a-control5-20261006-v1.stdout",
+      "bytes": 3876,
+      "sha256": "60ef6e3cd6044c62380f322e176bd479116592e95282df12c44fb8f7b986a9b9",
+      "wall_ns": 292920873,
+      "aggregate_CPU_ns": 253015000,
+      "native_pass": true
+    },
+    {
+      "family": "communication048",
+      "selector": "hnn::tests::physical_communication::communication_observations_cannot_change_the_earlier_boundary",
+      "producer": "0484f88a053727c332bb36732a6110b725431830",
+      "raw_stdout": "research/records/receipts/communication-radius-integration-20261007/communication048/hnn-one-future-decision-0484f88a-control6-20261006-v1.stdout",
+      "bytes": 288,
+      "sha256": "b4d312ce4b5ecbe4489319d31a0e98d557c2c49801fec83995746081612272b9",
+      "wall_ns": 294416162,
+      "aggregate_CPU_ns": 254780000,
+      "native_pass": true
+    },
+    {
+      "family": "communication048",
+      "selector": "hnn::tests::physical_communication::communication_refuses_changed_source_or_partition_without_deposition_and_keeps_the_blind_end",
+      "producer": "0484f88a053727c332bb36732a6110b725431830",
+      "raw_stdout": "research/records/receipts/communication-radius-integration-20261007/communication048/hnn-one-future-decision-0484f88a-control7-20261006-v1.stdout",
+      "bytes": 320,
+      "sha256": "be8e86ea8693f8e9f6ad56bf5657ec4a904a48b6e9f5e31490c590c2aef344a3",
+      "wall_ns": 246458874,
+      "aggregate_CPU_ns": 212767000,
+      "native_pass": true
+    },
+    {
+      "family": "communication048",
+      "selector": "hnn::tests::physical_communication::communication_returns_actual_multistation_held_receipts_without_a_joint_certificate",
+      "producer": "0484f88a053727c332bb36732a6110b725431830",
+      "raw_stdout": "research/records/receipts/communication-radius-integration-20261007/communication048/hnn-one-future-decision-0484f88a-control8-20261006-v1.stdout",
+      "bytes": 2781,
+      "sha256": "00abef5c54f4aa7d5f5b32b517f9fdf3f0ff2f74c270088790b47c23e830afa3",
+      "wall_ns": 237620067,
+      "aggregate_CPU_ns": 196505000,
+      "native_pass": true
+    },
+    {
+      "family": "radius493",
+      "selector": "hnn::prediction::charted::linear_radius::tests::lazy_radius_columns_preserve_exact_images_zero_work_and_typed_shape_refusal",
+      "producer": "49395016f8141bcc95b8dc73a9f99b1879c33005",
+      "raw_stdout": "research/records/receipts/communication-radius-integration-20261007/radius493/hnn-charted-radius-reuse-49395016-control1-20261006-v1.stdout",
+      "bytes": 251,
+      "sha256": "dc83e60a694bb1b9aae34a8722d8b5e0f45b5d666f5f0e84c71c2103a40fb0fd",
+      "wall_ns": 228560814,
+      "aggregate_CPU_ns": 178328000,
+      "native_pass": true
+    },
+    {
+      "family": "radius493",
+      "selector": "hnn::prediction::charted::tests::contact_radius_faces_reuse_the_same_native_images_under_one_producing_word",
+      "producer": "49395016f8141bcc95b8dc73a9f99b1879c33005",
+      "raw_stdout": "research/records/receipts/communication-radius-integration-20261007/radius493/hnn-charted-radius-reuse-49395016-control2-20261006-v1.stdout",
+      "bytes": 350,
+      "sha256": "5c4f8305ab63e3f008121b313caf2958c2de5354185992e7581d21fc27534c5c",
+      "wall_ns": 258757330,
+      "aggregate_CPU_ns": 219655000,
+      "native_pass": true
+    },
+    {
+      "family": "radius493",
+      "selector": "hnn::prediction::charted::tests::source_response_re_represents_the_producing_chart",
+      "producer": "49395016f8141bcc95b8dc73a9f99b1879c33005",
+      "raw_stdout": "research/records/receipts/communication-radius-integration-20261007/radius493/hnn-charted-radius-reuse-49395016-control3-20261006-v1.stdout",
+      "bytes": 5659,
+      "sha256": "697ff18b9e5fc5b76d811132e8bcd27ab20291c08156a6de3a48d381a10e497a",
+      "wall_ns": 2996464395,
+      "aggregate_CPU_ns": 2936865000,
+      "native_pass": true
+    },
+    {
+      "family": "radius493",
+      "selector": "hnn::tests::physical_charted::charted_source_and_carry_error_enclose_the_same_exact_physical_passage",
+      "producer": "49395016f8141bcc95b8dc73a9f99b1879c33005",
+      "raw_stdout": "research/records/receipts/communication-radius-integration-20261007/radius493/hnn-charted-radius-reuse-49395016-control4-20261006-v1.stdout",
+      "bytes": 2845,
+      "sha256": "cc7804557f65e9ba7a205d94664285d1c694b9e5bcacd2b41f38452a6090c9f2",
+      "wall_ns": 373787036,
+      "aggregate_CPU_ns": 321304000,
+      "native_pass": true
+    },
+    {
+      "family": "radius493",
+      "selector": "hnn::tests::physical_charted::charted_receiving_learning_charges_both_covectors_and_keeps_its_physical_carry",
+      "producer": "49395016f8141bcc95b8dc73a9f99b1879c33005",
+      "raw_stdout": "research/records/receipts/communication-radius-integration-20261007/radius493/hnn-charted-radius-reuse-49395016-control5-20261006-v1.stdout",
+      "bytes": 14915,
+      "sha256": "5a120539969abd7e0ea18c6b82840f1ad6c531780ca648ddd8bb024c04efb61d",
+      "wall_ns": 639243695,
+      "aggregate_CPU_ns": 583167000,
+      "native_pass": true
+    },
+    {
+      "family": "radius493",
+      "selector": "hnn::tests::physical_charted::charted_zero_tolerance_refuses_the_actual_opening_error_and_retains_the_blind_end",
+      "producer": "49395016f8141bcc95b8dc73a9f99b1879c33005",
+      "raw_stdout": "research/records/receipts/communication-radius-integration-20261007/radius493/hnn-charted-radius-reuse-49395016-control6-20261006-v1.stdout",
+      "bytes": 418,
+      "sha256": "e820e6eb0a59568d919ce0eadaadd1402ef5fd527d52364fa8cb75125c5ff0b6",
+      "wall_ns": 349574544,
+      "aggregate_CPU_ns": 296152000,
+      "native_pass": true
+    },
+    {
+      "family": "radius493",
+      "selector": "hnn::tests::physical_charted::charted_loaded_pump_error_keeps_the_absolute_clock_across_the_carry",
+      "producer": "49395016f8141bcc95b8dc73a9f99b1879c33005",
+      "raw_stdout": "research/records/receipts/communication-radius-integration-20261007/radius493/hnn-charted-radius-reuse-49395016-control7-20261006-v1.stdout",
+      "bytes": 266,
+      "sha256": "23b4064b6a7c276e8d14af0d3e731f91b8263fdaeaca1bbce8c212c175f33bb3",
+      "wall_ns": 443636760,
+      "aggregate_CPU_ns": 378485000,
+      "native_pass": true
+    },
+    {
+      "family": "radius493",
+      "selector": "hnn::tests::physical_charted::charted_physical_balance_consumes_its_actual_opening_split",
+      "producer": "49395016f8141bcc95b8dc73a9f99b1879c33005",
+      "raw_stdout": "research/records/receipts/communication-radius-integration-20261007/radius493/hnn-charted-radius-reuse-49395016-control8-20261006-v1.stdout",
+      "bytes": 456,
+      "sha256": "065325e9bb5cfcc6a2b76b3b6c4b1912eb5096220b5ff54bf42aefee8338d23e",
+      "wall_ns": 263508801,
+      "aggregate_CPU_ns": 224876000,
+      "native_pass": true
+    }
+  ],
+  "original_queue_pins": {
+    "v40": {
+      "path": "research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v40/VALIDATION.json",
+      "bytes": 295159,
+      "sha256": "6781d785fba37c032c62a19e1ecb22febcdbe34a7a7f2bdd03826d082826dab7"
+    },
+    "v41": {
+      "path": "research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v41/VALIDATION.json",
+      "bytes": 315594,
+      "sha256": "17134acd54bffa9d8366d90edde16ae49edee56781add77b473f4d55adf9f127"
+    }
+  },
+  "changed_matched_read": {
+    "source_commit": "49395016f8141bcc95b8dc73a9f99b1879c33005",
+    "resource_cleanup_grade": "PASS",
+    "scientific_grade": "INCOMPLETE",
+    "planned_units": 8,
+    "matched_unit_count_reached": 2,
+    "teaching_publications_reached": 2,
+    "probes_reached": 0,
+    "carry_ticks_reached": [
+      3,
+      6
+    ],
+    "original_unit_bound_ns": 1277000000,
+    "actual_unit_ns": [
+      1055885183,
+      1484899450
+    ],
+    "second_unit_excess_ns": 207899450,
+    "actual_component_costs": [
+      {
+        "exact_sparse_forward_with_receiving_declaration_ns": 50214006,
+        "charted_forward_with_receiving_declaration_and_error_ns": 158710601,
+        "signed_saved_forward_ns": -108496595,
+        "blind_publication_ns": 33363,
+        "charted_comparison_and_deposition_ns": 834530806,
+        "charted_receive_ns": 993274770,
+        "exact_comparison_and_exterior_checks_ns": 10188248,
+        "whole_unit_ns": 1055885183
+      },
+      {
+        "exact_sparse_forward_with_receiving_declaration_ns": 68973520,
+        "charted_forward_with_receiving_declaration_and_error_ns": 452898501,
+        "signed_saved_forward_ns": -383924981,
+        "blind_publication_ns": 36318,
+        "charted_comparison_and_deposition_ns": 897938200,
+        "charted_receive_ns": 1350873019,
+        "exact_comparison_and_exterior_checks_ns": 61051951,
+        "whole_unit_ns": 1484899450
+      }
+    ],
+    "prior_204_units_ns": [
+      1156465388,
+      1597961135
+    ],
+    "observed_old_minus_new_units_ns": [
+      100580205,
+      113061685
+    ],
+    "single_changed_elapsed_read_not_a_causal_speedup_acceptance": true,
+    "full_non_timing_output_exactly_matches_204": true,
+    "same_current_material_and_carried_native_maps": true,
+    "balances_closed": true,
+    "actual_R_changes": true,
+    "fixed_original_component_tolerances": [
+      "1/16",
+      "1/16",
+      "1/16"
+    ],
+    "admitted_tolerance_checks": [
+      3,
+      1,
+      8,
+      64,
+      24
+    ],
+    "warm_selection": {
+      "retained_candidates": 5,
+      "compatible_candidates": 5,
+      "certificate_evaluations": 5,
+      "refinement_steps": 0
+    },
+    "held_uncertified_domains_remain": true,
+    "warm_charted_receive_alone_exceeds_whole_unit_by_ns": 73873019,
+    "narrow_measured_blocker": "Warm actual charted receiving/error consumer1350873019ns already exceeds whole matchedunit1277000000ns before its exact baseline/exterior companions; comparison/deposition897938200ns and forward+receiving declaration+error452898501ns. Inner solve/phase/rank/bit-growth contributions remain unseparated.",
+    "speedup_claim": false,
+    "useful_completion_or_product_claim": false,
+    "unchanged_failed_retry": false,
+    "controls_raised": false,
+    "wall_ns": 2915605970,
+    "projection_ns": 10972158131,
+    "aggregate_CPU_ns": 2855246000,
+    "group_peak_bytes": 84672512,
+    "quiescent_release": true,
+    "raw_output": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-radius-reuse-49395016-charted-compare-4plus4-20261006-v1.stdout",
+    "raw_output_pin": {
+      "bytes": 10078,
+      "sha256": "f7caea16299f60642dd64b585f0974531ac3e49bc746b80b7218329456bcad3a"
+    },
+    "runtime_output_file": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-radius-reuse-49395016-20261006/runtime-matched-4plus4-v1/physical-learn.txt",
+    "source_runtime_declared_and_sealed": true
+  },
+  "exact_measurements": {
+    "original_unit_bound_ns": {
+      "integer": 1277000000,
+      "prime_factorization": [
+        [
+          2,
+          6
+        ],
+        [
+          5,
+          6
+        ],
+        [
+          1277,
+          1
+        ]
+      ]
+    },
+    "second_unit_excess_ns": {
+      "integer": 207899450,
+      "prime_factorization": [
+        [
+          2,
+          1
+        ],
+        [
+          5,
+          2
+        ],
+        [
+          11,
+          1
+        ],
+        [
+          377999,
+          1
+        ]
+      ]
+    },
+    "wall_ns": {
+      "integer": 2915605970,
+      "prime_factorization": [
+        [
+          2,
+          1
+        ],
+        [
+          5,
+          1
+        ],
+        [
+          43,
+          1
+        ],
+        [
+          6780479,
+          1
+        ]
+      ]
+    },
+    "projection_ns": {
+      "integer": 10972158131,
+      "prime_factorization": [
+        [
+          11,
+          1
+        ],
+        [
+          47,
+          1
+        ],
+        [
+          21222743,
+          1
+        ]
+      ]
+    },
+    "aggregate_CPU_ns": {
+      "integer": 2855246000,
+      "prime_factorization": [
+        [
+          2,
+          4
+        ],
+        [
+          5,
+          3
+        ],
+        [
+          59,
+          1
+        ],
+        [
+          24197,
+          1
+        ]
+      ]
+    },
+    "group_peak_bytes": {
+      "integer": 84672512,
+      "prime_factorization": [
+        [
+          2,
+          18
+        ],
+        [
+          17,
+          1
+        ],
+        [
+          19,
+          1
+        ]
+      ]
+    },
+    "second_unit_ns": {
+      "integer": 1484899450,
+      "prime_factorization": [
+        [
+          2,
+          1
+        ],
+        [
+          5,
+          2
+        ],
+        [
+          29697989,
+          1
+        ]
+      ]
+    },
+    "warm_charted_receive_ns": {
+      "integer": 1350873019,
+      "prime_factorization": [
+        [
+          31,
+          1
+        ],
+        [
+          137,
+          1
+        ],
+        [
+          318077,
+          1
+        ]
+      ]
+    },
+    "warm_comparison_and_deposition_ns": {
+      "integer": 897938200,
+      "prime_factorization": [
+        [
+          2,
+          3
+        ],
+        [
+          5,
+          2
+        ],
+        [
+          37,
+          1
+        ],
+        [
+          121343,
+          1
+        ]
+      ]
+    },
+    "warm_forward_declaration_error_ns": {
+      "integer": 452898501,
+      "prime_factorization": [
+        [
+          3,
+          1
+        ],
+        [
+          11,
+          1
+        ],
+        [
+          347,
+          1
+        ],
+        [
+          39551,
+          1
+        ]
+      ]
+    }
+  },
+  "measured_to_projected_wall_ratio": [
+    2915605970,
+    10972158131
+  ],
+  "warm_unit_to_fixed_bound_ratio": [
+    29697989,
+    25540000
+  ],
+  "formal_future_read": "Accepted exact CausalChord/SourceHolon source at maintained2c33fa12a; unchanged; scope is ordered trivial-star chart/positive reads, all finite horizons; no native/coarse equivalence inferred",
+  "declaration_face_status": "Source-derived exact input equality/invalidation; no new cache implementation or native cost claim",
+  "no_owner_native_build_training_benchmark_generator": true,
+  "no_push_merge_public_mutation": true,
+  "resource_cleanup_separate_from_scientific_completion": true,
+  "future_useful_communication_acceptance_open": true
+}

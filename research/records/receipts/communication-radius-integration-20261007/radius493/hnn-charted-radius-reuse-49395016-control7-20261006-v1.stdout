@@ -1,0 +1,7 @@
+
+running 1 test
+test hnn::tests::physical_charted::charted_loaded_pump_error_keeps_the_absolute_clock_across_the_carry ... unit charted loaded clock elapsed_ms=201
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1050 filtered out; finished in 0.20s
+

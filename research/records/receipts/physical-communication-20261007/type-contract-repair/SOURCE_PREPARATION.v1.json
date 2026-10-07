@@ -1,0 +1,84 @@
+{
+  "grade": "SOURCE TYPE CONTRACT CORRECTED; fresh queue compile/runtime pending",
+  "source_base": "dd48efb4000fa14699d9e98338b038de2ae34323",
+  "changed_native_paths": [
+    "crates/holonics/src/hnn/physical/communication.rs"
+  ],
+  "native_delta": "Remove only Eq from PhysicalBoundary derive; retain Clone, Debug, PartialEq and all chart/read/decision/domain/station/grain fields",
+  "corrected_native_file": {
+    "bytes": 8306,
+    "sha256": "e316a6107a0e608d16bcd2f78a38360761f77fed95d0e0fb6432946fefa1c51c"
+  },
+  "equality_contract": {
+    "Encoded": "derived PartialEq compares cells and full EncodedChart value through Arc",
+    "EncodedChart_fields": [
+      "classes",
+      "sources",
+      "decoder",
+      "fibre",
+      "labels",
+      "advances",
+      "founded"
+    ],
+    "part_0_0": "retains complete cell-free producing chart",
+    "consumers": "resident chart admission, observed prefix and earlier-boundary controls require PartialEq; Communication, Reception and Publication derive Debug only; PhysicalObservation has no derive; none requires Eq",
+    "new_Eq_implementation": false,
+    "chart_count_or_pointer_substitution": false
+  },
+  "actual_failed_compile": {
+    "source": "dd48efb4000fa14699d9e98338b038de2ae34323",
+    "error": "E0277: Encoded does not implement Eq required by PhysicalBoundary derive",
+    "original_v36_VALIDATION": {
+      "bytes": 200351,
+      "sha256": "257376c6999b85efe56a94be8bc3c5866edc933de6ca02e39880c5ade059aa35"
+    },
+    "original_stderr": {
+      "bytes": 2423,
+      "sha256": "ca257798b02309e7cba722287325aad97fa5f4910d579681332a1ac700f22dca"
+    },
+    "path_redacted_stderr": {
+      "bytes": 2407,
+      "sha256": "98272151675f6177fe6f60c78861920b0c7d2a289d4bd6f1b8ca94809d049d7c"
+    },
+    "path_redaction_only": true,
+    "workspace_check": {
+      "postcleanup_acceptance_passed": false,
+      "wall_ns": 9935753139,
+      "projection_ns": 65000000000,
+      "measured_to_projected_ratio": [
+        9935753139,
+        65000000000
+      ],
+      "aggregate_CPU_ns": 15600793000,
+      "group_peak_bytes": 1832779776,
+      "peak_child_RSS_KiB": 1387092,
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "cache_preparation": {
+      "postcleanup_acceptance_passed": true,
+      "wall_ns": 5961916568,
+      "projection_ns": 17000000000,
+      "measured_to_projected_ratio": [
+        5961916568,
+        17000000000
+      ],
+      "aggregate_CPU_ns": 5004592000,
+      "group_peak_bytes": 3940188160,
+      "peak_child_RSS_KiB": 31836,
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "remaining_guards_link_and_five_controls": "UNRUN",
+    "previous_failures_preserved": true
+  },
+  "fixtures_selectors_source_material_phase_and_caps_unchanged": true,
+  "native_tests_launched_by_source_owner": false,
+  "claim": "type source repair only; no compile/runtime/acquisition/product acceptance",
+  "Refs": [
+    63,
+    73,
+    148,
+    62
+  ]
+}

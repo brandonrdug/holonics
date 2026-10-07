@@ -1,0 +1,83 @@
+{
+  "grade": "SOURCE REVIEWED; compiler/native acceptance pending",
+  "base": "ae4a6f3bbd8f74b3fbb07d00d9015b54cf4b40db",
+  "owned_native_paths": [
+    "crates/holonics/src/hnn/physical/communication.rs",
+    "crates/holonics/src/hnn/tests/physical_communication.rs"
+  ],
+  "equation": "C_comm=C_complete union leaders_grain(y_blind); only preserve producer Released(k) if C_comm={k}; otherwise Held with union; no domain/held domain never upgraded",
+  "unchanged_native_inputs": 292,
+  "native_inputs_total": 294,
+  "source_files": {
+    "crates/holonics/src/hnn/physical/communication.rs": {
+      "bytes": 16980,
+      "sha256": "fa59201ec77e37bc0cb7c760f386b47a18a8b97b4d1a89297f1d800750041840"
+    },
+    "crates/holonics/src/hnn/tests/physical_communication.rs": {
+      "bytes": 21049,
+      "sha256": "be25bd9a7ae539d3ac4e6077cebaa130d37ac1a6cae7631bb1f882b9c1831f18"
+    }
+  },
+  "selecting_observation_during_forward": false,
+  "prediction_repair_physics_changed": false,
+  "word_source_chart_clock_return_changed": false,
+  "direct_fixture_is_selected_native_material_claim": false,
+  "direct_control_words": 0,
+  "actual_native_words": 22,
+  "actual_full_ticks": 44,
+  "prospective_selectors": [
+    "hnn::tests::physical_communication::one_future_communication_carries_one_actual_source_label_through_the_whole_receiving_image",
+    "hnn::tests::physical_communication::one_future_source_publication_reaches_the_next_contemporary_communication_opening",
+    "hnn::tests::physical_communication::one_future_communication_keeps_refusal_and_multi_future_admission_honest",
+    "hnn::tests::physical_communication::communication_deposits_after_the_whole_boundary_and_reuses_material_source_and_carry",
+    "hnn::tests::physical_communication::communication_observations_cannot_change_the_earlier_boundary",
+    "hnn::tests::physical_communication::communication_refuses_changed_source_or_partition_without_deposition_and_keeps_the_blind_end",
+    "hnn::tests::physical_communication::communication_returns_actual_multistation_held_receipts_without_a_joint_certificate",
+    "hnn::physical::communication::tests::one_future_decision_unites_the_blind_grain_leaders_with_completed_leaders"
+  ],
+  "native_tests_or_compiler_run_by_source_owner": false,
+  "source_validation": [
+    "source and consuming calls inspected",
+    "eight exact selectors fixed",
+    "294 live source pins compared with sealed ae4, exactly two changed",
+    "rustfmt syntax check and whitespace check",
+    "local links and JSON parsed"
+  ],
+  "source_reviewed_predecessor": {
+    "workspace_arithmetic_guards_doctests": "PASS per queue accepted gates",
+    "runtime_controls": 0,
+    "failure": "LLVM allocation failure with debuginfo=2; rustc SIGABRT, Cargo101",
+    "wall_ns": 31736090596,
+    "projection_ns": 65000000000,
+    "aggregate_CPU_ns": 30529691000,
+    "group_memory_peak_bytes": 3023060992,
+    "failed_cleanup_acceptance": false,
+    "released_quiescent": true,
+    "raw_stderr_pin": {
+      "bytes": 2112,
+      "sha256": "2a5b0e56f96fe031a6373416a17c7d6f34a220f1fdae3d0f94616be02491ea97"
+    },
+    "published_stderr_pin": {
+      "bytes": 1968,
+      "sha256": "b5efde393a76cb6ae92a02331c81e1ed9b4e1d59c541af4b46404a22c5cd1051"
+    },
+    "redaction": "replace workspace path prefix only; original sealed failure retained by queue"
+  },
+  "next_compile_partition": {
+    "profile.test.package.holonics.debug": 0,
+    "profile.test.package.holonics.codegen-units": 16,
+    "authority": "existing queue descriptor; queue owns cache/toolchain/provider/projection/leases",
+    "cap_raise": false
+  },
+  "scope": [
+    "bounded receiving contract and full shared-label image controls",
+    "actual post-blind R and source E return then target-free read",
+    "no language/useful relation/generalization/joint-future/product acceptance"
+  ],
+  "Refs": [
+    63,
+    73,
+    148,
+    62
+  ]
+}

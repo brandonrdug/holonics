@@ -1,0 +1,96 @@
+{
+  "source_base": "a33204b6775a1b0d369de0ac6c6c82a9cb9eec4b",
+  "status": "SOURCE_REVIEW_REPAIR_ONLY; original a332 not compiled; corrected native acceptance pending",
+  "changed_native_files": {
+    "crates/holonics/src/hnn/physical.rs": {
+      "bytes": 9869,
+      "sha256": "d467a5b0399e9cb75b3f9c782b6016eb9680fa25d7daf8b301dd287f4d9b421f"
+    },
+    "crates/holonics/src/hnn/physical/communication.rs": {
+      "bytes": 8310,
+      "sha256": "900a83c195c919f9a581cc515968eaee9e1d0b5c7905069aff57dcfb76517d83"
+    },
+    "crates/holonics/src/hnn/tests/physical_communication.rs": {
+      "bytes": 11704,
+      "sha256": "9b43af572bf6f81d5fa9b02aa503f5420179d5c073b351d56e0a122f164945c8"
+    }
+  },
+  "selected_native_tests": [
+    "hnn::tests::physical_communication::communication_deposits_after_the_whole_boundary_and_reuses_material_source_and_carry",
+    "hnn::tests::physical_communication::communication_observations_cannot_change_the_earlier_boundary",
+    "hnn::tests::physical_communication::communication_refuses_changed_source_or_partition_without_deposition_and_keeps_the_blind_end",
+    "hnn::tests::physical_communication::communication_returns_actual_multistation_held_receipts_without_a_joint_certificate",
+    "hnn::tests::physical::a_refused_resident_observation_keeps_material_and_carries_into_the_next_native_read"
+  ],
+  "ordinary_type_gate": [
+    "cargo",
+    "check",
+    "--workspace",
+    "--all-targets"
+  ],
+  "syntax_and_format_only": true,
+  "rustfmt_edition": "2024",
+  "rustfmt_skip_children": true,
+  "whitespace_passed": true,
+  "compiler_or_native_execution_by_owner": false,
+  "native_statistical_unit": "one actual Word/comparison; not a scientific accuracy trial",
+  "new_fixture_declared_actual_words": 11,
+  "new_fixture_declared_full_ticks": 22,
+  "affected_regression_actual_words": 2,
+  "affected_regression_full_ticks": 2,
+  "fixed_fixture_operands": {
+    "classes": 4,
+    "source_prefix": [
+      0,
+      1
+    ],
+    "requested_aperture": 3,
+    "post_blind_observations": [
+      [
+        0,
+        1,
+        3
+      ],
+      [
+        0,
+        1,
+        2
+      ]
+    ],
+    "compared": [
+      false,
+      false,
+      true
+    ],
+    "source_conditioning_control": [
+      2,
+      1
+    ],
+    "source_scale": "1/3",
+    "training_or_holdout_claim": false
+  },
+  "source_review_correction": {
+    "actual_suffix_decisions_from": "PhysicalRepair.cells",
+    "actual_suffix_domains_from": "PhysicalRepair.domains",
+    "sparse_domain_status": "Held/UncertifiedDomain; actual completion None; joint completion owed",
+    "grain_from_actual_forward_phases": true,
+    "duplicate_ReceivingPhases_declare_removed": true,
+    "unit_phase_aperture_admission": "a<=period on each current unit source; pre-phase/pre-Word; necessary not sufficient",
+    "nonunit_source": "existing actual age/rounding law; no injectivity/joint certificate inferred",
+    "old_failure_preserved": "independent source review of a332; no compiler/lease launched",
+    "reviewer_message_identifier_in_private_mailbox_only": true
+  },
+  "architecture_lens": {
+    "source_recovery": "CausalRelevance/FaceMap/StandingLaw, Navigator, ReceivingPhases, retention::{Diamond,contained,separator}, receiver::release",
+    "accessible_self_model": "actual state/chart/phase/Held/domain/error/applicability; autonomous chooser not implemented",
+    "continued_costs": [
+      "construction/revision",
+      "recognition/route-selection",
+      "navigation",
+      "refinement/re-expansion",
+      "applicability/error self-description",
+      "received consequence"
+    ],
+    "universal_speedup_claim": false
+  }
+}

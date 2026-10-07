@@ -2,10 +2,10 @@
 
 October 7. Refs #63, #73, #62.
 
-[source-only; native acceptance pending] The existing charted physical receiver now locates each
+[established-bounded; source493 native controls passed, combined integration pending] The existing charted physical receiver now locates each
 needed contact radius coefficient once per borrowed producing Word and reuses it for its other
 source-coordinate error responses. The component bound is exactly unchanged. No performance,
-scientific completion or useful-learning acceptance follows from source preparation.
+scientific completion or useful-learning acceptance follows from those bounded controls.
 
 ## The measured failure and the work it does not distinguish
 
@@ -123,3 +123,13 @@ must reconcile the narrow `charted.rs` consuming hunks at integration. Any later
 uses this changed computational partition only after native acceptance and a prospective
 projection under the original cadence; it is not an unchanged failed-source replay. No speedup
 or completed matched read is credited until its whole producing receipt passes.
+
+## Scoped terminal acceptance and local composition
+
+The [integration receipt](receipts/communication-radius-integration-20261007/SCOPED_INTEGRATION.v1.json)
+preserves source048 communication PASS8 and source493 radius PASS8 separately, with their exact
+raw outputs and source pins. Source493's changed matched read remains INCOMPLETE after two
+teaching publications and no probes: the second unit 1484899450 ns exceeds the original
+1277000000 ns bound. There is no accepted speedup or useful-product result. The original
+preparation/failure scopes above remain historical. The local combined communication/radius
+source requires its own native integration gate; no owner compiler or scientific replay ran.

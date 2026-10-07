@@ -1,0 +1,75 @@
+{
+  "source_base": "73fa7b720c680ebd289e50cfdc3d870b5c0bea86",
+  "status": "SOURCE_PREPARATION_ONLY; native compiler/runtime acceptance pending",
+  "changed_native_files": {
+    "crates/holonics/src/hnn/physical.rs": {
+      "bytes": 9741,
+      "sha256": "521055fa38b6a8b293d7bda909d7c6df84f100f436f1eb3616c39549370f50a0"
+    },
+    "crates/holonics/src/hnn/physical/communication.rs": {
+      "bytes": 6363,
+      "sha256": "cde171d2d324e0eab4c16e89cb8312f29d7fcc7dd566868428d43ccb22cbb150"
+    },
+    "crates/holonics/src/hnn/tests/mod.rs": {
+      "bytes": 646,
+      "sha256": "e0784288eba974bda7da4dd2017816dd30150dffe739ede253438080edee8c4b"
+    },
+    "crates/holonics/src/hnn/tests/physical_communication.rs": {
+      "bytes": 9087,
+      "sha256": "ce48b6b7ccd47826b270aaba33ea42c47453e28338b3cf2ea809f684d1d18d7e"
+    }
+  },
+  "selected_native_tests": [
+    "hnn::tests::physical_communication::communication_deposits_after_the_whole_boundary_and_reuses_material_source_and_carry",
+    "hnn::tests::physical_communication::communication_observations_cannot_change_the_earlier_boundary",
+    "hnn::tests::physical_communication::communication_refuses_changed_source_or_partition_without_deposition_and_keeps_the_blind_end",
+    "hnn::tests::physical::a_refused_resident_observation_keeps_material_and_carries_into_the_next_native_read"
+  ],
+  "ordinary_type_gate": [
+    "cargo",
+    "check",
+    "--workspace",
+    "--all-targets"
+  ],
+  "syntax_and_format_only": true,
+  "rustfmt_edition": "2024",
+  "rustfmt_skip_children": true,
+  "whitespace_passed": true,
+  "compiler_or_native_execution_by_owner": false,
+  "native_statistical_unit": "one actual Word/comparison; not a scientific accuracy trial",
+  "new_fixture_declared_actual_words": 10,
+  "new_fixture_declared_full_ticks": 20,
+  "affected_regression_actual_words": 2,
+  "affected_regression_full_ticks": 2,
+  "fixed_fixture_operands": {
+    "classes": 4,
+    "source_prefix": [
+      0,
+      1
+    ],
+    "requested_aperture": 3,
+    "post_blind_observations": [
+      [
+        0,
+        1,
+        3
+      ],
+      [
+        0,
+        1,
+        2
+      ]
+    ],
+    "compared": [
+      false,
+      false,
+      true
+    ],
+    "source_conditioning_control": [
+      2,
+      1
+    ],
+    "source_scale": "1/3",
+    "training_or_holdout_claim": false
+  }
+}

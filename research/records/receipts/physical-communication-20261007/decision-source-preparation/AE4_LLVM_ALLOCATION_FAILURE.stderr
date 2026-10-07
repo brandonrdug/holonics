@@ -1,0 +1,12 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling thiserror v2.0.19
+   Compiling quote v1.0.47
+   Compiling syn v3.0.3
+   Compiling thiserror-impl v2.0.19
+   Compiling holonics v0.1.0 (<workspace>/.local/lean-rust-pruning/admission-v1/hnn-one-future-ae4a6f3b-20261006/source-v1/crates/holonics)
+rustc-LLVM ERROR: out of memory
+Allocation failed
+error: could not compile `holonics` (lib test)
+
+Caused by:
+  process didn't exit successfully: `rustc --crate-name holonics --edition=2024 crates/holonics/src/lib.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --emit=dep-info,link -C embed-bitcode=no -C debuginfo=2 --test --check-cfg 'cfg(docsrs,test)' --check-cfg 'cfg(feature, values())' -C metadata=437db91bd8863782 -C extra-filename=-4ca36bb3d7db439e --out-dir <workspace>/.local/lean-rust-pruning/admission-v1/hnn-one-future-ae4a6f3b-20261006/cache-v2/debug/deps -C incremental=<workspace>/.local/lean-rust-pruning/admission-v1/hnn-one-future-ae4a6f3b-20261006/cache-v2/debug/incremental -L dependency=<workspace>/.local/lean-rust-pruning/admission-v1/hnn-one-future-ae4a6f3b-20261006/cache-v2/debug/deps --extern num_bigint=<workspace>/.local/lean-rust-pruning/admission-v1/hnn-one-future-ae4a6f3b-20261006/cache-v2/debug/deps/libnum_bigint-623b2a2ece9f0903.rlib --extern num_rational=<workspace>/.local/lean-rust-pruning/admission-v1/hnn-one-future-ae4a6f3b-20261006/cache-v2/debug/deps/libnum_rational-161e9b6af3b7caad.rlib --extern num_traits=<workspace>/.local/lean-rust-pruning/admission-v1/hnn-one-future-ae4a6f3b-20261006/cache-v2/debug/deps/libnum_traits-1af290354603b57b.rlib --extern rayon=<workspace>/.local/lean-rust-pruning/admission-v1/hnn-one-future-ae4a6f3b-20261006/cache-v2/debug/deps/librayon-1dba5f3412560c1c.rlib --extern thiserror=<workspace>/.local/lean-rust-pruning/admission-v1/hnn-one-future-ae4a6f3b-20261006/cache-v2/debug/deps/libthiserror-f2ffdb0e1d99793f.rlib` (signal: 6, SIGABRT: process abort signal)

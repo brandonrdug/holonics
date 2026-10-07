@@ -1,0 +1,8 @@
+
+running 1 test
+test hnn::tests::physical_charted::charted_zero_tolerance_refuses_the_actual_opening_error_and_retains_the_blind_end ... charted zero-tolerance blind whole output [Intact(0), Intact(1), Held { fibre: [0, 1, 2, 3], unresolved: UncertifiedDomain }]
+unit zero-tolerance refusal completed elapsed_ms=117
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1050 filtered out; finished in 0.12s
+

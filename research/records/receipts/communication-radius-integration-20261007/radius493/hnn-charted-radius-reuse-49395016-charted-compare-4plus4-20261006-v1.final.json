@@ -1,0 +1,99 @@
+{
+  "passed": false,
+  "label": "hnn-charted-radius-reuse-49395016-charted-compare-4plus4-20261006-v1",
+  "scientific_job": true,
+  "deferred_lock_busy": false,
+  "final_CPU_ns": 2855246000,
+  "CPU_reading_grain_ns": 1000,
+  "aggregate_CPU_limit_us": 17000000,
+  "final_CPU_source": "systemd retained oneshot CPUUsageNSec after all group processes exit",
+  "CPU_kernel_hard_total_limit": false,
+  "sampled_stop_margin_us": 1000000,
+  "aggregate_CPU_within_limit": true,
+  "no_overshoot_accepted": true,
+  "wall_ns": 2915605970,
+  "projection_ns": 10972158131,
+  "wall_source": "external monotonic_ns through final property read",
+  "quiescent": true,
+  "completion_event": "oneshot start job completed; no polling",
+  "unit_properties": {
+    "Description": "Owned holonics admission hnn-charted-radius-reuse-49395016-charted-compare-4plus4-20261006-v1 22d1c36486697c05c7089e160efefd82",
+    "LoadState": "loaded",
+    "ActiveState": "active",
+    "SubState": "exited",
+    "InvocationID": "9c33d23078a84e71a01c36860b0fbf89",
+    "Result": "success",
+    "ExecMainStatus": "0",
+    "ControlGroup": "",
+    "MemoryPeak": "84672512",
+    "CPUUsageNSec": "2855246000",
+    "TasksCurrent": "[not set]"
+  },
+  "outer_error": null,
+  "unit_start_exit": 0,
+  "unit_start_stdout": "",
+  "unit_start_stderr": "",
+  "config": {
+    "sha256": "a6f39fb10d87947b62d02c41b1b308d928892f35bfcfa606fc215c2f321f37cd",
+    "bytes": 181647
+  },
+  "receipt_pins": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-radius-reuse-49395016-charted-compare-4plus4-20261006-v1.config.json": {
+      "sha256": "a6f39fb10d87947b62d02c41b1b308d928892f35bfcfa606fc215c2f321f37cd",
+      "bytes": 181647
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-radius-reuse-49395016-charted-compare-4plus4-20261006-v1.external-lease.json": {
+      "sha256": "516207db1f7dbb788a8f346698c1c97ae62cecb641e6dc5ee1bdc5ee4f2f6081",
+      "bytes": 485
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-radius-reuse-49395016-charted-compare-4plus4-20261006-v1.lease-identity.json": {
+      "sha256": "7dc8ca3b59ee0c575a1d03e63fb24410022ab10643a1645040617f4fb32f490d",
+      "bytes": 562
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-radius-reuse-49395016-charted-compare-4plus4-20261006-v1.input_seal.json": {
+      "sha256": "afba4041f1c4cbe2927b77a508032850ea4389cd229a118bf9d2a693391b6a88",
+      "bytes": 112726
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-radius-reuse-49395016-charted-compare-4plus4-20261006-v1.stdout": {
+      "sha256": "f7caea16299f60642dd64b585f0974531ac3e49bc746b80b7218329456bcad3a",
+      "bytes": 10078
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-radius-reuse-49395016-charted-compare-4plus4-20261006-v1.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-radius-reuse-49395016-charted-compare-4plus4-20261006-v1.memory-gate.json": {
+      "sha256": "f9825eead6c6da6833b829663df621dcf283211e876d534c66d5c1422fe110c8",
+      "bytes": 120
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-radius-reuse-49395016-charted-compare-4plus4-20261006-v1.child-identity.json": {
+      "sha256": "667354aa309aa6b89d3e2d685d6d16a7089ae05e200f4bb44a514f938cd1204b",
+      "bytes": 75
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-radius-reuse-49395016-charted-compare-4plus4-20261006-v1.system-floor.json": {
+      "sha256": "992eaaa563bd504b591380346960ec3bcad34624e1e44b62212db764e3a32db1",
+      "bytes": 21181
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-radius-reuse-49395016-charted-compare-4plus4-20261006-v1.quiescence.json": {
+      "sha256": "aa5bee974aacd01692b43b791ad17b37104bb1a88b1ecb33a68a319da938f2c9",
+      "bytes": 129
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-radius-reuse-49395016-charted-compare-4plus4-20261006-v1.output_seal.json": {
+      "sha256": "078a5b1e487fa521e7f1b038ff30b6d25cb5c339f2514f47bfa4637de9be5b3d",
+      "bytes": 181185
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-radius-reuse-49395016-charted-compare-4plus4-20261006-v1.publication.json": {
+      "sha256": "7070b2209b4bf389734841f5866a59e560002aeddba8390079f84c7a10b0053e",
+      "bytes": 3244
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-radius-reuse-49395016-charted-compare-4plus4-20261006-v1.stage-quiescence.json": {
+      "sha256": "30f2ce8e632ccc797ad56c3b58f3f73f17200691cef488315c844c489ed88d9d",
+      "bytes": 135
+    }
+  },
+  "launcher_outside_native_group": true,
+  "lease_owner_outside_capped_group": true,
+  "lease_held_through_final_CPU_read_and_publication": true,
+  "stage_passed_before_cleanup": true,
+  "requires_cleanup_acceptance": true
+}

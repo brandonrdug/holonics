@@ -1,0 +1,80 @@
+{
+  "grade": "SOURCE PRESENT; native pending",
+  "base": "344a3e67cef8d3aa810782f334cc595f3a550ed1",
+  "owned_native_paths": [
+    "crates/holonics/src/hnn/physical/communication.rs",
+    "crates/holonics/src/hnn/tests/physical_communication.rs"
+  ],
+  "equation": "one intact prefix at population n -> blind point; hypothetical one common label at n+1 -> fixed_logits+label_logits[c]; actual union/domain accompanies point before q",
+  "changed_native_physics_owners": false,
+  "admission_consumed": "current DamagedSection::admit/physical_completion_opening/physical_word_is_exact; one future+period guard preWord",
+  "source_material_clock_and_decoder_unchanged": true,
+  "fixed_R_observation": [
+    0,
+    1,
+    3
+  ],
+  "fixed_E_observation": [
+    0,
+    1,
+    2
+  ],
+  "source_prefix": [
+    0,
+    1
+  ],
+  "later_unobserved_source": [
+    2,
+    1
+  ],
+  "mask": [
+    false,
+    false,
+    true
+  ],
+  "classes": 4,
+  "aperture": 3,
+  "tolerance": "1/16",
+  "source_scale": "1/3",
+  "new_native_controls": 3,
+  "new_actual_Words": 11,
+  "new_full_ticks": 22,
+  "affected_communication_controls": 4,
+  "affected_actual_Words": 11,
+  "affected_full_ticks": 22,
+  "native_tests_or_compiler_run_by_source_owner": false,
+  "no_product_or_holdout_claim": true,
+  "Refs": [
+    63,
+    73,
+    148,
+    62
+  ],
+  "new_selectors": [
+    "hnn::tests::physical_communication::one_future_communication_carries_one_actual_source_label_through_the_whole_receiving_image",
+    "hnn::tests::physical_communication::one_future_source_publication_reaches_the_next_contemporary_communication_opening",
+    "hnn::tests::physical_communication::one_future_communication_keeps_refusal_and_multi_future_admission_honest"
+  ],
+  "affected_selectors": [
+    "hnn::tests::physical_communication::communication_deposits_after_the_whole_boundary_and_reuses_material_source_and_carry",
+    "hnn::tests::physical_communication::communication_observations_cannot_change_the_earlier_boundary",
+    "hnn::tests::physical_communication::communication_refuses_changed_source_or_partition_without_deposition_and_keeps_the_blind_end",
+    "hnn::tests::physical_communication::communication_returns_actual_multistation_held_receipts_without_a_joint_certificate"
+  ],
+  "source_files": {
+    "crates/holonics/src/hnn/physical/communication.rs": {
+      "bytes": 11875,
+      "sha256": "7d3942e3e1fa935b0c0219536a4e3062c6e96274a1db3ee390d8a1248e4ca6e6"
+    },
+    "crates/holonics/src/hnn/tests/physical_communication.rs": {
+      "bytes": 20578,
+      "sha256": "fabb26a4a55b57693e124fe279651330d0df1d73bfe7d57528bc16dabad9f8be"
+    }
+  },
+  "source_owner_validation": [
+    "rustfmt edition2024 skip_children check PASS",
+    "git diff whitespace check PASS",
+    "three new and four affected exact selectors fixed before any native job",
+    "source/direct consumer/guard/population/clock/decoder review; old owner source untouched"
+  ]
+}

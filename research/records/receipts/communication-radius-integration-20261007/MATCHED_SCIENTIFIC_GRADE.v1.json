@@ -1,0 +1,91 @@
+{
+  "source_commit": "49395016f8141bcc95b8dc73a9f99b1879c33005",
+  "resource_cleanup_grade": "PASS",
+  "scientific_grade": "INCOMPLETE",
+  "planned_units": 8,
+  "matched_unit_count_reached": 2,
+  "teaching_publications_reached": 2,
+  "probes_reached": 0,
+  "carry_ticks_reached": [
+    3,
+    6
+  ],
+  "original_unit_bound_ns": 1277000000,
+  "actual_unit_ns": [
+    1055885183,
+    1484899450
+  ],
+  "second_unit_excess_ns": 207899450,
+  "actual_component_costs": [
+    {
+      "exact_sparse_forward_with_receiving_declaration_ns": 50214006,
+      "charted_forward_with_receiving_declaration_and_error_ns": 158710601,
+      "signed_saved_forward_ns": -108496595,
+      "blind_publication_ns": 33363,
+      "charted_comparison_and_deposition_ns": 834530806,
+      "charted_receive_ns": 993274770,
+      "exact_comparison_and_exterior_checks_ns": 10188248,
+      "whole_unit_ns": 1055885183
+    },
+    {
+      "exact_sparse_forward_with_receiving_declaration_ns": 68973520,
+      "charted_forward_with_receiving_declaration_and_error_ns": 452898501,
+      "signed_saved_forward_ns": -383924981,
+      "blind_publication_ns": 36318,
+      "charted_comparison_and_deposition_ns": 897938200,
+      "charted_receive_ns": 1350873019,
+      "exact_comparison_and_exterior_checks_ns": 61051951,
+      "whole_unit_ns": 1484899450
+    }
+  ],
+  "prior_204_units_ns": [
+    1156465388,
+    1597961135
+  ],
+  "observed_old_minus_new_units_ns": [
+    100580205,
+    113061685
+  ],
+  "single_changed_elapsed_read_not_a_causal_speedup_acceptance": true,
+  "full_non_timing_output_exactly_matches_204": true,
+  "same_current_material_and_carried_native_maps": true,
+  "balances_closed": true,
+  "actual_R_changes": true,
+  "fixed_original_component_tolerances": [
+    "1/16",
+    "1/16",
+    "1/16"
+  ],
+  "admitted_tolerance_checks": [
+    3,
+    1,
+    8,
+    64,
+    24
+  ],
+  "warm_selection": {
+    "retained_candidates": 5,
+    "compatible_candidates": 5,
+    "certificate_evaluations": 5,
+    "refinement_steps": 0
+  },
+  "held_uncertified_domains_remain": true,
+  "warm_charted_receive_alone_exceeds_whole_unit_by_ns": 73873019,
+  "narrow_measured_blocker": "Warm actual charted receiving/error consumer1350873019ns already exceeds whole matchedunit1277000000ns before its exact baseline/exterior companions; comparison/deposition897938200ns and forward+receiving declaration+error452898501ns. Inner solve/phase/rank/bit-growth contributions remain unseparated.",
+  "speedup_claim": false,
+  "useful_completion_or_product_claim": false,
+  "unchanged_failed_retry": false,
+  "controls_raised": false,
+  "wall_ns": 2915605970,
+  "projection_ns": 10972158131,
+  "aggregate_CPU_ns": 2855246000,
+  "group_peak_bytes": 84672512,
+  "quiescent_release": true,
+  "raw_output": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-radius-reuse-49395016-charted-compare-4plus4-20261006-v1.stdout",
+  "raw_output_pin": {
+    "bytes": 10078,
+    "sha256": "f7caea16299f60642dd64b585f0974531ac3e49bc746b80b7218329456bcad3a"
+  },
+  "runtime_output_file": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-radius-reuse-49395016-20261006/runtime-matched-4plus4-v1/physical-learn.txt",
+  "source_runtime_declared_and_sealed": true
+}
