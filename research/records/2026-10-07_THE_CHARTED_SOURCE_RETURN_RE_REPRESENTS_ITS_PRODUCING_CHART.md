@@ -172,3 +172,40 @@ Source inspection and `git diff --check` are the source owner's checks. All guar
 affected links, actual main, once-only falsifier and conditionally admitted matched read belong
 to the sole queue with its ordinary cache, memory/lease and measured fixed-deadline controls.
 The source packet preserves old failures and defines the cause gate before the cost read.
+
+
+## Continuation-v37: ownership failure and coherent test correction
+
+The bc32 snapshot matched all 292 committed inputs. Cache preparation passed, but the
+workspace check failed E0507 at `charted.rs:698`: the new falsifier called consuming
+`Word::pull_back(self, ...)` through `&Word`, then intended to consume that same pending
+Word through `observe`. The Word is deliberately non-Clone. This was an agent's test
+ownership defect, not evidence about the runtime 64-bit refusal. Guards, link, actual main,
+cause selector, publication and matched read remained unrun. Raw compiler stdout/stderr,
+resource failure and released lease are preserved in
+[the failed-bc32 manifest](receipts/charted-operand-01a10f0a-20261007/failed-bc32-v37/FAILURE.v37.json).
+Its wall/projection ratio is exactly `9842588817/65000000000`; the queue confirmed quiescence.
+
+[agent-inferred] The correction uses one explicitly accounted native return control, opened
+from the **original blind SourceMoment**, same producing field/material/frame, original cold
+charts, opening and station clock. It executes the identical full ticks and terminal junction.
+Before consuming it, the falsifier checks full opening receipt and split-work closure,
+operands, absolute clock, per-tick passage, emitted change, continuing carry and full release
+against the original blind Word. The control's real return supplies the old/refined source
+response checks. The original Word is consumed exactly once by `pending.observe`; its actual
+published opening covector and return remainder must equal the control return. No target enters
+the control's source, and no replay helper or synthetic return/publication is substituted.
+
+The additional control's setup, actual forward, identity checks and return are timed inside
+the falsifier's existing whole-unit clock and declared return-control work phase. The original
+six-phase forecast, fixed ceilings, old mathematical falsifier assertions, source operands,
+component tolerances and conditional matched gate remain. Native acceptance still belongs to
+the sole queue. This is an explicitly costed law control, not a new scientific performance path.
+
+All remaining calls in this test were reviewed together against their actual definitions:
+`Word` getters and releases borrow; `tick`/`last_junction` mutate only the owned control;
+`pull_back` consumes that control; `Operands::unsplit` consumes an owned operand clone;
+`observe` consumes the original pending Word after its last operand borrow. The equality
+assertions use their existing `PartialEq/Eq` owners. The correction changes only the test
+section; production consumer, Word APIs, guards, split-work balance and matched code are
+byte-identical to bc32. The new comment at the consuming call states this ownership rule.

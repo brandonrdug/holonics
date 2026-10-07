@@ -1,0 +1,49 @@
+{
+  "source_commit": "bc32c60f34a5a602074da2dca49fd9cd2e337886",
+  "continuation": "v37",
+  "source_match": "all292 committed/live/frozen exact",
+  "cache_preparation": "PASS",
+  "workspace_check": "FAIL Cargo101 E0507 borrowed Word at charted.rs698; consuming Word::pull_back self",
+  "later_guards_link_main_cause_runtime": "UNRUN",
+  "scientific_64bit_refusal_unique_operand": "still unmeasured",
+  "controls_raised": false,
+  "quiescent_and_lease_released": true,
+  "wall_ns": 9842588817,
+  "projection_ns": 65000000000,
+  "CPU_ns": 18765304000,
+  "group_peak_bytes": 1918910464,
+  "child_peak_RSS_KiB": 1395160,
+  "measured_over_projected": "9842588817/65000000000",
+  "raw_files": {
+    "workspace-check.stdout": {
+      "bytes": 38308,
+      "sha256": "490baeeeb53af6fc1bed39ab9f0df94e0d244349311c6975fbc4c4357a595652",
+      "source": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-operand-bc32c60f3-workspace-check-20261006-v1.stdout"
+    },
+    "workspace-check.stderr": {
+      "bytes": 1849,
+      "sha256": "08076b04535874c7f8eaa74fde4b91c16723b4e19b86cfd4f43e30d139e97077",
+      "source": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-operand-bc32c60f3-workspace-check-20261006-v1.stderr"
+    },
+    "workspace-check.acceptance.json": {
+      "bytes": 379,
+      "sha256": "8831712e46bc147d721ebd673c17092a4ca8f67f90d44232c5e72cc72fe859c7",
+      "source": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-operand-bc32c60f3-workspace-check-20261006-v1.acceptance.json"
+    },
+    "workspace-check.final.json": {
+      "bytes": 5301,
+      "sha256": "47be6ca895ed77fffb6625d67bb9c3314888bd603d97189dfd5ead807cb9a6a4",
+      "source": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-operand-bc32c60f3-workspace-check-20261006-v1.final.json"
+    },
+    "workspace-check.release.json": {
+      "bytes": 173,
+      "sha256": "13c1dc836e464aa27218a2c5e490c73bd780a4ff31f96bb44519cadb57cdda47",
+      "source": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-operand-bc32c60f3-workspace-check-20261006-v1.release.json"
+    }
+  },
+  "authoritative_queue_packet": {
+    "path": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v37/VALIDATION.json",
+    "bytes": 575691,
+    "sha256": "d60ad95faa841d8e5069c93f7c8c23c2b727320c1672ef2364fe3f0cac36a6c9"
+  }
+}

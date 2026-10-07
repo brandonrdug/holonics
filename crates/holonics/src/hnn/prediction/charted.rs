@@ -695,7 +695,27 @@ mod tests {
         let g=ratio.covector().unwrap();
         let ge=comparison_error(&reads,&pending.error.stations,&targets,&compared,phases.grain()).unwrap();
         let word=&pending.pending.word;
-        let back=word.pull_back(&g,theta.receiving_map(0).unwrap(),&current.lift()[0],&phases).unwrap();
+        // pull_back consumes its Word. This explicit native return control opens from the
+        // SAME blind source and cold charts; the original Word remains for observe below.
+        // Its construction, passage and return cost belong to this falsifier, not a speed read.
+        let control_started=std::time::Instant::now();
+        let mut control_charts=Charts::new();
+        let (mut control,control_opening)=crate::hnn::word::Word::open_charted_received(
+            &field,&theta,&current,&pending.pending.source,&mut control_charts,&WordOpening::Rest).unwrap();
+        for _ in 1..phases.junction_steps() {control.tick().unwrap();}
+        control.last_junction().unwrap();
+        assert_eq!(control_opening,pending.error.opening);
+        assert!(control_opening.closes());
+        assert_eq!(control.operands(),word.operands());
+        assert_eq!(control.opened_at(),word.opened_at());
+        assert_eq!(control.clock().ticks(),word.clock().ticks());
+        assert_eq!(control.recorded(),word.recorded());
+        assert_eq!(control.change().unwrap(),word.change().unwrap());
+        assert_eq!(control.reception_end().unwrap(),word.reception_end().unwrap());
+        assert_eq!(control.released().unwrap(),word.released().unwrap());
+        let back=control.pull_back(&g,theta.receiving_map(0).unwrap(),&current.lift()[0],&phases).unwrap();
+        println!("explicit identical native return control: opening_operands_clock_passage_change_carry_release_equal=true; control_setup_forward_identity_and_return_ns={}",
+            control_started.elapsed().as_nanos());
         let operands=word.operands();let opened_at=word.opened_at();
         let old=source_return_error_on(&field,&theta,&current,&phases,operands,opened_at,&g,&ge,&back);
         assert!(matches!(old,Err(HnnError::Carrier { what:"an operand's coordinate beyond the 64-bit word" })));
@@ -712,6 +732,8 @@ mod tests {
         let tolerance=ChartedTolerance {logits:rat(1,16),receiving_covector:rat(1,16),source_covector:rat(1,16)};
         let publication=pending.observe(&theta,&observed,&compared,&tolerance)
             .unwrap_or_else(|(_,e)|panic!("same first observed comparison refused: {e:?}"));
+        assert_eq!(publication.error.source_opening,back.opening);
+        assert_eq!(publication.error.return_remainders,back.released);
         assert!(publication.error.applied.holds());
         assert!(publication.error.applied.decrease>Rat::zero());
         assert_eq!(publication.error.tolerance.source_covector,tolerance.source_covector);
