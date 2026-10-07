@@ -1,0 +1,14 @@
+# Prospective new matched experiment; not a coverage retry or accepted rate.
+# Original 1/16 tolerances,4+4 spent OrderTwo, contemporary charted material and two continuing carries.
+# A matched unit contains an exact sparse Word/comparison and a charted Word/error/comparison.
+# Largest prior exact complete-section reading659479091ns plus charted fixture617575542ns =1277054633ns, rounded outward1278ms.
+# The exact reading belongs to failed coverage; its original563000000ns section bound and incomplete grade remain unchanged.
+# Eight new composite units8*1278000000ns, two exterior source batches2*228640195ns.
+# New matched rates unmeasured; stop on numerical refusal or first unit overrun. No tolerance tuning.
+# Native projection10681280390ns rounds to10682ms; controller separately290158131ns.
+# Whole outer10972158131ns; unchanged17CPU/4GiB/1thread/60wall policy.
+command = executed physical-learn
+projection = 8*(659479091+617575542 rounded to1278ms)+2*228640195 =10681280390ns; outer10972158131ns
+deadline_ms = 10682
+unit_bound_ms = 1277
+threads = 1
