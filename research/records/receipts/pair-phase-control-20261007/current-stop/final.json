@@ -1,0 +1,91 @@
+{
+  "passed": false,
+  "label": "hnn-pair-consumer-1f8a81ee-control2-20261006-v1",
+  "scientific_job": false,
+  "deferred_lock_busy": false,
+  "final_CPU_ns": 15935834000,
+  "CPU_reading_grain_ns": 1000,
+  "aggregate_CPU_limit_us": 17000000,
+  "final_CPU_source": "systemd retained oneshot CPUUsageNSec after all group processes exit",
+  "CPU_kernel_hard_total_limit": false,
+  "sampled_stop_margin_us": 1000000,
+  "aggregate_CPU_within_limit": true,
+  "no_overshoot_accepted": true,
+  "wall_ns": 16047764455,
+  "projection_ns": 16000000000,
+  "wall_source": "external monotonic_ns through final property read",
+  "quiescent": true,
+  "completion_event": "oneshot start job completed; no polling",
+  "unit_properties": {
+    "Description": "Owned holonics admission hnn-pair-consumer-1f8a81ee-control2-20261006-v1 4938e73851b65c9a1b1872bff38c6778",
+    "LoadState": "loaded",
+    "ActiveState": "failed",
+    "SubState": "failed",
+    "InvocationID": "7e8c3ef0f9a744dd8a5645503305502c",
+    "Result": "timeout",
+    "ExecMainStatus": "125",
+    "ControlGroup": "",
+    "MemoryPeak": "125902848",
+    "CPUUsageNSec": "15935834000",
+    "TasksCurrent": "[not set]"
+  },
+  "outer_error": "outer fixed wall projection exceeded",
+  "unit_start_exit": null,
+  "unit_start_stdout": "",
+  "unit_start_stderr": "",
+  "config": {
+    "sha256": "04f5e05a1d8b0fdfe7a2168b8fe636f1a1ae9f54a880052a82feb7afef88546b",
+    "bytes": 149955
+  },
+  "receipt_pins": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-consumer-1f8a81ee-control2-20261006-v1.config.json": {
+      "sha256": "04f5e05a1d8b0fdfe7a2168b8fe636f1a1ae9f54a880052a82feb7afef88546b",
+      "bytes": 149955
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-consumer-1f8a81ee-control2-20261006-v1.external-lease.json": {
+      "sha256": "1d578176c871bb3833474e97b5b7fe469ef88601cead95e9b8a67a09d29c38c2",
+      "bytes": 485
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-consumer-1f8a81ee-control2-20261006-v1.lease-identity.json": {
+      "sha256": "9415969f4ca275b34379ff88f1253eeddfa285bc3218a5d44f37e841301e1990",
+      "bytes": 562
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-consumer-1f8a81ee-control2-20261006-v1.input_seal.json": {
+      "sha256": "45ad6c5cd88ddd829609d5765046b4e8035868c3aaceb3073ef57eafe5626329",
+      "bytes": 95545
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-consumer-1f8a81ee-control2-20261006-v1.stdout": {
+      "sha256": "611cacb159805cecb9a88a0bea599fa9125baba880dcb6a986342a27474ebc5c",
+      "bytes": 135
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-consumer-1f8a81ee-control2-20261006-v1.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-consumer-1f8a81ee-control2-20261006-v1.memory-gate.json": {
+      "sha256": "115febbffb5692032dd29da8050f9ab156f01b73610bf18fd99cfc15d53d6f33",
+      "bytes": 120
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-consumer-1f8a81ee-control2-20261006-v1.child-identity.json": {
+      "sha256": "2d4e418e986b64f73e798b2ad7b0712aa527a4dddacbd259f1d394218b97a02c",
+      "bytes": 75
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-consumer-1f8a81ee-control2-20261006-v1.failure.json": {
+      "sha256": "eae0381827f5d2424506e674afa58bda5568dbb67c99b14ee97afee5eb294376",
+      "bytes": 255
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-consumer-1f8a81ee-control2-20261006-v1.publication.json": {
+      "sha256": "4f5ba45568464b6a7eea477f2f3f35e0abbae467cbac1f1659c0b442bceff9b3",
+      "bytes": 2217
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-pair-consumer-1f8a81ee-control2-20261006-v1.stage-quiescence.json": {
+      "sha256": "e53af060689fc2cea1589a85ccf75895c985dae35dad7053ae986208b0c1caf4",
+      "bytes": 135
+    }
+  },
+  "launcher_outside_native_group": true,
+  "lease_owner_outside_capped_group": true,
+  "lease_held_through_final_CPU_read_and_publication": true,
+  "stage_passed_before_cleanup": false,
+  "requires_cleanup_acceptance": true
+}

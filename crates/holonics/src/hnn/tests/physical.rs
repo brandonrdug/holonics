@@ -138,6 +138,110 @@ fn four_station_pair_coordinate_retains_carry_and_has_a_matched_source_dependent
     println!("four-station exact matched pair effects={effects:?}; no useful-margin or generalization acceptance asserted");
 }
 
+/// Current consumer's sparse PairOutputs contract at a nonzero source frame and carried tick.
+/// The historical pumped 8/3 completion-domain control remains a distinct, incomplete obligation.
+#[test]
+fn four_station_sparse_pair_return_at_nonzero_source_phase_matches_its_applied_direction() {
+    use crate::hnn::encoding::Encoded;
+    use crate::hnn::prediction::predict_sparse_by_field;
+    use crate::holarchy::terrain::{CyclicLaw, KnownTruth};
+    use crate::ratio::Rat;
+    use crate::ratio::linear::vector::{dot, sub};
+    let whole = std::time::Instant::now();
+    let work = crate::hnn::word::work::read();
+    let field = four_station_field();
+    let mut current = Current::at_rest(&field);
+    current.rekey(&field, 0, 2).unwrap();
+    let receiving = receiver(4);
+    let initial = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap();
+    let mut resident = PhysicalResident::new(&field, initial, current.clone(), WordOpening::Rest);
+    let teaching = KnownTruth::cyclic_class_orbit(CyclicLaw::OrderTwo { opening: 2 }, 4, 20261006001, 4).unwrap();
+    let mut last = None;
+    println!("nonzero-phase current consumer setup_ns={}; source_frame={current:?}", whole.elapsed().as_nanos());
+    for (index, observed) in Encoded::identity(&teaching, &field).unwrap().into_iter().enumerate() {
+        let started = std::time::Instant::now();
+        let damaged = DamagedSection::damage(&observed, &[2]).unwrap();
+        let received = resident.receive_sparse(&damaged, &receiving, |blind, _| {
+            assert!(blind.word.closes() && blind.opening.closes());
+            Some(PhysicalObservation { observed: observed.clone(), compared: vec![false, false, true, false], learning: PhysicalLearning::Receiving })
+        }).unwrap();
+        assert!(received.comparison.unwrap().unwrap().publication.stepped > 0);
+        println!("nonzero-phase current consumer R{index} role_ns={}; carry_tick={}", started.elapsed().as_nanos(), received.prediction.carry.ticks);
+        last = Some(observed);
+    }
+    let producing = resident.constitution().clone();
+    let entered = resident.opening().clone();
+    let WordOpening::Received { carry, .. } = &entered else { panic!("actual entered carry") };
+    let entered_tick = carry.ticks;
+    assert_eq!(entered_tick, 12);
+    assert_eq!(resident.current(), &current);
+    let observed = last.unwrap();
+    let damaged = DamagedSection::damage(&observed, &[2]).unwrap();
+    let mut phases = None;
+    let started = std::time::Instant::now();
+    let received = resident.receive_sparse(&damaged, &receiving, |blind, declared| {
+        phases = Some(declared.clone());
+        println!("nonzero-phase current pair blind before repeated teacher: {blind:?}");
+        Some(PhysicalObservation { observed: observed.clone(), compared: vec![false, false, true, false], learning: PhysicalLearning::PairOutputs })
+    }).unwrap();
+    println!("nonzero-phase current consumer pair role_ns={}", started.elapsed().as_nanos());
+    let publication = received.comparison.unwrap().unwrap();
+    let paired = publication.source_pairing.as_ref().unwrap();
+    assert_eq!(paired.producing_commit, producing.commit());
+    assert_eq!(paired.source_lift.as_slice(), current.lift());
+    assert_eq!(paired.opened_at, entered_tick);
+    assert_eq!(paired.junction_steps, 4);
+    assert_eq!(paired.response_ticks, 2);
+    assert_eq!(paired.crossings.len(), 1);
+    assert_eq!(paired.crossings[0].tick, entered_tick + 2);
+    assert!(paired.receiving < Rat::zero() && paired.source_move_squared > Rat::zero());
+    assert_eq!(paired.receiving, paired.opening);
+    assert_eq!(paired.opening, paired.deposition);
+    assert!(paired.defect.is_zero() && paired.composition_defect.is_zero());
+    assert_eq!(paired.return_remainders.entries, 0);
+    assert_eq!(paired.receiving, -&publication.source_certificate.as_ref().unwrap().joint.decrease);
+    let phases = phases.unwrap();
+    let started = std::time::Instant::now();
+    let no_deposit = predict_sparse_by_field(&field, &producing, &current, &damaged, &entered, &phases).unwrap().finish();
+    assert_eq!(no_deposit, received.prediction);
+    println!("nonzero-phase current consumer no-deposit role_ns={}", started.elapsed().as_nanos());
+    let learned = resident.constitution().clone();
+    assert_eq!(producing.source_port(0), learned.source_port(0));
+    assert_eq!(producing.receiving_map(0), learned.receiving_map(0));
+    let started = std::time::Instant::now();
+    // Fresh hypothetical material consequence at the original producing opening, discarded.
+    let applied = predict_sparse_by_field(&field, &learned, &current, &damaged, &entered, &phases).unwrap().finish();
+    let delta = sub(&applied.reads[2].read.logits, &received.prediction.reads[2].read.logits);
+    let covector = publication.ratio.covector().unwrap();
+    assert_eq!(paired.receiving, dot(&covector.logits()[2], &delta));
+    assert_eq!(paired.crossings[0].logit_move_squared, dot(&delta, &delta));
+    // Already reached quantities only: this does not construct a response operator or new Word.
+    let receiving_map_squared: Rat = producing.receiving_map(0).unwrap().entries().iter().map(|q| q*q).sum();
+    println!("nonzero-phase current consumer receiving_map_squared={receiving_map_squared}; actual_compared_covector={:?}; reached_feature_energy={:?}; actual_source_certificate={:?}; scale_does_not_by_itself_identify_the_weak_channel", covector.logits()[2], publication.feature_energy, publication.source_certificate);
+    println!("nonzero-phase current consumer applied-direction control role_ns={}", started.elapsed().as_nanos());
+    let actual_opening = resident.opening().clone();
+    let WordOpening::Received { carry: actual_carry, .. } = &actual_opening else { panic!("retained actual carry") };
+    assert_eq!(actual_carry, &received.prediction.carry);
+    let probes = KnownTruth::cyclic_class_orbit(CyclicLaw::OrderTwo { opening: 2 }, 4, 20261006011, 4).unwrap();
+    let later = Encoded::identity(&probes, &field).unwrap().remove(0);
+    let later = DamagedSection::damage(&later, &[2]).unwrap();
+    let started = std::time::Instant::now();
+    let expected = predict_sparse_by_field(&field, &learned, &current, &later, &actual_opening, &phases).unwrap().finish();
+    println!("nonzero-phase current consumer later matched Word role_ns={}", started.elapsed().as_nanos());
+    let started = std::time::Instant::now();
+    let next = resident.receive_sparse(&later, &receiving, |_, _| None).unwrap();
+    assert!(matches!(next.comparison, Ok(None)));
+    assert_eq!(next.prediction, expected);
+    assert_eq!(next.prediction.carry.ticks, received.prediction.carry.ticks + 3);
+    assert_eq!(resident.constitution(), &learned);
+    assert_eq!(resident.current(), &current);
+    assert!(next.prediction.balances.iter().all(|b| b.closes()));
+    println!("nonzero-phase current consumer actual later Word role_ns={}", started.elapsed().as_nanos());
+    // Exact state receipts are exterior test evidence, not retained event archives in the HNN.
+    println!("nonzero-phase current consumer producing={producing:?}; entered={entered:?}; learned={learned:?}; pair={paired:?}; actual_next={:?}; no completion-domain or useful1/16acceptance", next.prediction);
+    println!("nonzero-phase current consumer whole_control_ns={}; owner_work={:?}; includes_final_exact_state_receipt", whole.elapsed().as_nanos(), crate::hnn::word::work::read().since(work));
+}
+
 #[test]
 fn the_resident_retains_the_learned_pair_and_reads_the_correlated_family_on_its_carried_state() {
     let field = field();
