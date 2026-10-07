@@ -1,7 +1,8 @@
 # The receiving covector returns through the source clock and producing Word
 
 October 6. Refs #62, #73. Owner: HNN integration coordinator
-`01a1030c-707d-713c-a7b7-1e5edfef5030`. Source prepared; kernel acceptance pending the sole queue.
+`01a1030c-707d-713c-a7b7-1e5edfef5030`. Whole owner and independent importer accepted on
+`9a23c430c`; the concrete native instantiation remains owed.
 
 ## The directionality lens and the concrete next law
 
@@ -62,7 +63,8 @@ Atlas-first recovery identified:
   theorem requires its real periodic hypotheses.
 - `hnn.single-hole-loaded-grain-consumer`: the prepared `SingleHoleResponse` derives the
   normalized first/pair source and carries its shared label through the absolute loaded Word.
-  Its compiler/axiom receipt remains pending; its acceptance is not borrowed here.
+  Its decomposed providers and composed/facade/independent scope were subsequently accepted
+  separately. They were reused with their exact source/object identities for this return.
 - `navigator.current-chart-adjoint`: `NavigatorMachineCharts` already proves a spatial/current
   chart pairing and common-source sum of pullbacks. It does not contain this actual absolute
   loaded source/phase/normalized-pair consumer.
@@ -133,15 +135,16 @@ source-to-face sensitivity needed for that later release/decision account.
 
 ## What this changes and what remains owed
 
-The mathematical library now has a prepared explicit source return consuming the normalized
+The mathematical library now has a checked explicit source return consuming the normalized
 source and actual loaded Word, with phase/time and partition preserved. The native physical
 reader, retained Constitution/Current/carry, source admission and queued tests are untouched.
 No new reception, teaching pass, compile, benchmark or training was run by this owner.
 
-Its next acceptance is the new module's kernel/axiom checking under the exact local/provider
-closure, after the separately queued `SingleHoleResponse` dependency is accepted. The sole queue
-owns cache preflight, measured fixed projection, lease and deadline. This owner does not borrow
-root objects whose providers differ and does not launch a duplicate compiler.
+The sole queue accepted the whole return owner and its independent importer against the exact
+local/provider closure, using the separately accepted `SingleHoleResponse` dependencies.
+The [acceptance join](receipts/source-receiver-return-20261007/accepted-9a23c430/ACCEPTANCE_JOIN.v1.json)
+keeps the original queries, source/provider/object identities, projections and resource readings.
+This owner borrowed no root object with different providers and launched no duplicate compiler.
 
 The concrete Rust-rational/real embedding, `Encoded` producing source clock, actual R/phase
 map instantiation and lattice residual bridge remain #62 obligations. Nonlinear Words require
@@ -152,7 +155,7 @@ is descent alignment and the cost's directional derivative has the opposite sign
 
 Geometry's quantitative future-read form is complementary: W=sum L_i^T Q_i L_i tests the
 declared future kernel under positive receiving metrics. Its actual CausalChord/SourceHolon
-consumer is source-present and kernel-check pending. W measures reception, not stored energy;
+consumer was separately accepted at its bounded source pin. W measures reception, not stored energy;
 its finite/fixed, periodic, continuous measure/event and material-variation obligations are
 retained. The two-mass example conserves 5/4 mechanical energy while a currently hidden
 displacement later becomes visible. No hidden physical motion is pruned by this new return.
@@ -172,7 +175,8 @@ no compiler. Source hashes, the exact selectors and closure packet live in this 
 isolated `.local/source-receiver-return-01a1030c-20261006/` for queue/parent admission.
 
 Static whitespace/import and proof-source inspection are preparation receipts. They do not
-replace the pending kernel or native acceptance and do not establish runtime performance.
+replace the subsequent kernel acceptance or the owed native instantiation and do not establish
+runtime performance.
 
 The independent read-only Luna review verified the absolute loaded clock, normalized/shared
 source contrast and retained entered interior. It identified the unconstrained injection
@@ -180,4 +184,34 @@ scope and the existing cycle's Type-0 carrier. The final source now declares Typ
 carriers explicitly and requires/returns the actual storage-only response certificate.
 The native producing phase/lift, source-opening and rational/real bridges remain explicit
 boundary obligations. The reviewer also identified simplifier/elaboration checks that only
-the queue's compiler can resolve; no kernel acceptance is credited from this static review.
+the queue's compiler resolved; no kernel acceptance is credited from the static review.
+
+## October 7 whole-owner and independent-importer acceptance
+
+[formal-checked; bounded] Source `9a23c430c49f1ae475207d9638fa3f5b4cbcd0e0` passed the whole
+`SourceReceiverReturn` owner and an independently sealed `SourceReceiverReturnAudit` importer.
+Each emitted the same nine selected theorem axiom queries with only `propext`, `Classical.choice`
+and `Quot.sound`. These are **nine unique theorems and eighteen query executions**, not eighteen
+new theorems. Compiler exit was zero, selector/source/object/import metadata matched, and both
+resource groups released quiescently. The five primitive providers, composed consumer, facade
+and earlier independent facade audit were reused without another compiler execution.
+
+The owner compiler took 10550533324 ns inside its 12246704542 ns complete development read;
+aggregate CPU was 6314216000 ns and group peak was 4294967296 bytes. The importer compiler took
+1595207486 ns inside its 3268636056 ns complete development read; aggregate CPU was 3030443000 ns
+and group peak was 599965696 bytes. Each complete read's fixed projection was 21132554884 ns,
+with measured/projected ratios exactly `12246704542/21132554884` and
+`3268636056/21132554884`. These are compiler/resource readings, not HNN runtime performance.
+
+The [original owner queries](receipts/source-receiver-return-20261007/accepted-9a23c430/owner.compiler.v1.stdout)
+and [original independent queries](receipts/source-receiver-return-20261007/accepted-9a23c430/independent-importer.compiler.v1.stdout)
+are retained verbatim, alongside empty original stderr, original kernel receipts, the independent
+audit source and source/object/provider identity pins. All 150 local source bytes match the
+accepted snapshot. This integration changes no Lean source or proof. Earlier timeout, proof,
+selector and reserved-binder failures remain historical receipts on their producing pins.
+
+Only this complete producing-source return scope is promoted. A broad Lean library build was
+not performed. The native rational/Encoded/source-opening/clock/receiving-map/lattice bridge,
+nonlinear derivative/remainder, calibrated Riesz law and useful product gates remain owed in
+#62 and their consuming campaigns. No native experiment or learned relation is credited from
+the kernel receipt.

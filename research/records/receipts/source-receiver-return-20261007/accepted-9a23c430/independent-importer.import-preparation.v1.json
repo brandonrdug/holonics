@@ -1,0 +1,40 @@
+{
+  "target": "SourceReceiverReturnAudit",
+  "wall_ns": 5547275115,
+  "projection_ns": 12779337307,
+  "peak_RSS_KiB": 253652,
+  "module_count": 5036,
+  "bound_path_count": 30574,
+  "source_prefix_inferred_absence_count": 18535,
+  "complete_ordered_import_part_seal": true,
+  "actual_namespace_lookup_verified": true,
+  "compiler_launched": false,
+  "events": [
+    {
+      "phase": "load only reusable source-SHA headers and present-part byte identities",
+      "wall_ns": 2124126600,
+      "upstream_path_rows_not_individually_validated": 243762,
+      "reusable_present_paths": 31114,
+      "reusable_headers": 5036
+    },
+    {
+      "phase": "resolve and seal every consumed source and ordered object part",
+      "wall_ns": 1853423548,
+      "module_count": 5036,
+      "bound_path_count": 30543,
+      "reused_headers": 5035,
+      "freshly_parsed_headers": 1
+    },
+    {
+      "phase": "independent namespace validation and complete selected metadata postcheck",
+      "wall_ns": 787319743
+    },
+    {
+      "phase": "serialize complete reduced current graph",
+      "wall_ns": 781373968,
+      "bytes": 44945687
+    }
+  ],
+  "unused_upstream_paths_not_reverified": 243762,
+  "same_source_claims_and_resource_enforcement": true
+}
