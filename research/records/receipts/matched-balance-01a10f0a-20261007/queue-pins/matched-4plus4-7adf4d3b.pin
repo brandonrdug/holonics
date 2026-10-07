@@ -1,0 +1,12 @@
+# Changed source7adf4d3b matched balance consumer, fixed original projection.
+# Actual after-before+split=imposed-absorbed; bind source receipt to Word; all tick checks retained.
+# Same eight matched4+4 units, seeds20261006001:20261006011, Receiving only, three1/16 tolerances.
+# Exact659479091ns + prior charted fixture617575542ns; original strict1278ms composite bound unchanged.
+# Native10682ms and controller290158131ns; whole10972158131ns unchanged.
+# New diagnostics/new balance check rate unmeasured; stop on refusal or first unit overrun.
+# Original73 panic and coverage/causal incomplete receipts retained; no unchanged replay.
+command = executed physical-learn
+projection = original8*1278000000+2*228640195=10681280390ns; outer10972158131ns
+deadline_ms = 10682
+unit_bound_ms = 1277
+threads = 1
