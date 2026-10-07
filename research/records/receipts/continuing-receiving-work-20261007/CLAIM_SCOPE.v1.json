@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "grade": "SOURCE-DERIVED CLAIM QUALIFICATION; no changed native source or new probe executed",
+  "frozen_caller_source": "71f2e8508dd27756225e3d7d9d0eb3c991f89ff1",
+  "teaching_representative": [
+    2,
+    2,
+    3,
+    3
+  ],
+  "teaching_evidence": "prediction/charted.rs::source_response_re_represents_the_producing_chart expected damaged source and existing CyclicLaw",
+  "source_implied_probe_representative": [
+    0,
+    3,
+    1,
+    0
+  ],
+  "stored_first_probe_intact_source": [
+    0,
+    3,
+    null,
+    0
+  ],
+  "stored_output_pin": {
+    "path": "research/records/receipts/physical-acquisition-20261006/actual-development-67cd-v25/order2.stdout",
+    "bytes": 1086793,
+    "sha256": "6d8767eab958e483c8d8c9df72bbf0ccc128741799e8fcdf65575897fb880084"
+  },
+  "producer_provenance": "KnownTruth::cyclic unchanged between67cd42fc and71f2e8508; only class-orbit wrapper added; entire terrain/mod.rs Draw owner byte-equal. Orbit wrapper takes that existing first seeded passage.",
+  "per_orbit_invariant": "target-x_j constant under class translation",
+  "opening_differences_mod4": {
+    "teaching": 0,
+    "probe": 3
+  },
+  "identified_content_if_gate_passes": "source-dependent acquired receiving response on fixed probe orbit; not identified order-two key or complete teaching retention under common opening",
+  "scientific_native_generator_runs_by_owner": 0,
+  "new_fixture_count": 0,
+  "native_paths_changed_in_qualification": []
+}

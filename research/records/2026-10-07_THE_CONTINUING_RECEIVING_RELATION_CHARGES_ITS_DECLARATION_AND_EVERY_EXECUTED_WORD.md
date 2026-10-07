@@ -59,6 +59,23 @@ carry and class-translation source orbit are correlated. Spent seeds are develop
 four stations or four contexts are not independent scientific trials. A majority-driven response,
 a cache hit, an R change alone, or an arbitrarily small centered change cannot pass this gate.
 
+[source-derived qualification] A single class-translation orbit fixes every difference
+`target-x_j`. On that orbit a shifted copy of any intact station can match all targets; class
+coverage alone cannot identify which antecedent was acquired. The actual caller uses separately
+seeded teaching and probe representatives, not one representative across both roles. The native
+fixture fixes the teaching representative `[2,2,3,3]`. The stored first ordinary probe at the
+declared probe seed has intact input `[0,3,None,0]`; unchanged `KnownTruth::cyclic` and `Draw`
+code, with `cyclic_class_orbit` taking that producer's first passage, imply probe representative
+`[0,3,1,0]`. This is a source inference from existing output, not an executed new probe.
+Consequently the opening difference is zero in teaching and three in the probe orbit. A single
+fixed shifted copy of station one or three cannot fit both orbits. Nevertheless the declared
+gate reads final expected margins only on the probe orbit and does not prove retention of all
+teaching relations under the common opening. It identifies a source-dependent learned receiving
+response consistent with the declared probe relation; it does not identify the order-two key,
+exclude every alternative predictor, or certify all sixteen opening pairs. No new representative,
+curriculum, count or scientific run is introduced by this qualification. The original stored
+output remains at [order2.stdout](receipts/physical-acquisition-20261006/actual-development-67cd-v25/order2.stdout).
+
 ## Work is read at the actual owners
 
 The new child of existing Word, `word/work.rs`, supplies a monotone exterior `WorkRead`. It counts
