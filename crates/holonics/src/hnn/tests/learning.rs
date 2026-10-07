@@ -131,7 +131,7 @@ pub(super) fn chain_declaration(population: u64) -> FieldDeclaration {
     .by_lattice_rule()
 }
 
-pub(super) fn chain() -> Field {
+pub(crate) fn chain() -> Field {
     chain_with(integer(2))
 }
 

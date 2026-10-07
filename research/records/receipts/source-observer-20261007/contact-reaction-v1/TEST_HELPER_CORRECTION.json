@@ -1,0 +1,13 @@
+{
+  "grade": "SOURCE_CORRECTED_NATIVE_PENDING",
+  "failed_source": "59bb966b3132caec6234ab46391be613177f8e7e",
+  "failed_receipt": "../../2026-10-06-lean-rust-native-queue/continuation-v71/HNN_LIBTEST_FULL_STDERR.txt",
+  "failure": "E0603: the reference continuation control calls the sibling tests::learning::chain helper, whose pub(super) visibility excludes that caller",
+  "change": "Make only the cfg(test) learning::chain helper pub(crate); no production API or physical law changes",
+  "syntax_only": "rustfmt --edition 2024 --emit stdout --config skip_children=true crates/holonics/src/hnn/tests/learning.rs",
+  "syntax_exit": 0,
+  "diff_check": true,
+  "source_owner_jobs": 0,
+  "native_controls": "all eight unrun at failed v71; exact successor requires the sole queue's fresh libtest build",
+  "caps_changed": false
+}
