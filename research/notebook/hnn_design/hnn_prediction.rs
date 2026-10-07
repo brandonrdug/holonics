@@ -17,7 +17,7 @@
 //! cargo run --release -p holonics --example hnn_prediction -- executed repair <terrain> <A|B> <seed> <count> <out>
 //! cargo run --release -p holonics --example hnn_prediction -- executed physical-repair <A|B> <count> <aperture> <out> <pin> <terrain>=<seed>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed physical-receive <A|B|one> <count> <aperture> <out> <pin> <terrain>=<seed>…
-//! cargo run --release -p holonics --example hnn_prediction -- executed physical-learn <measure|held|coverage|attribution|charted-compare|exact-relation> <teaching count> <probe count> <out> <pin> <terrain>=<teaching seed>:<probe seed>…
+//! cargo run --release -p holonics --example hnn_prediction -- executed physical-learn <measure|held|coverage|attribution|charted-compare|exact-relation|pair-relation> <teaching count> <probe count> <out> <pin> <terrain>=<teaching seed>:<probe seed>…
 //! ```
 //!
 //! [definition; agent-inferred, the order pin and the bank pin] **The declaration**
@@ -381,7 +381,8 @@ fn main() {
             )
         }
         (Some("executed"), Some("physical-learn")) => {
-            let pin = pinned(&arguments[7], "executed physical-learn", clock, true);
+            let command = if arguments[3] == "pair-relation" {"executed physical-learn pair-relation"} else {"executed physical-learn"};
+            let pin = pinned(&arguments[7], command, clock, true);
             physical_receive::learn(
                 &arguments[3],
                 arguments[4].parse().expect("a teaching count"),

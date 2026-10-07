@@ -50,6 +50,94 @@ fn field() -> Field {
     .unwrap()
 }
 
+/// Exact notebook period-four geometry, not support::ring's unrelated radius-squared 65 chart.
+fn four_station_field() -> Field {
+    let quarter_ring = |lock| {
+        let mut declared = ring(4, lock);
+        declared.placements = (0..4).map(|j| FieldDeclaration::quarter_turn(j, 4)).collect();
+        declared
+    };
+    Field::declare(FieldDeclaration {
+        rings: vec![quarter_ring((0..4).collect()), quarter_ring(Vec::new()), quarter_ring(Vec::new())],
+        contacts: vec![contact(0, 1, 4, 0), contact(1, 2, 4, 0)],
+        loops: Vec::new(), sources: vec![0], offsets: vec![1, 2, 3], alphabet: 4,
+        step: integer(1), exponent_grain: 1, receivers: vec![receiver(3)],
+        crib: CribDeclaration { window: 16, offset: 1 }, population: 1 << 16,
+        lattice: Default::default(),
+    }.by_lattice_rule()).unwrap()
+}
+
+#[test]
+fn four_station_pair_coordinate_retains_carry_and_has_a_matched_source_dependent_consequence() {
+    use crate::hnn::encoding::Encoded;
+    use crate::hnn::prediction::predict_sparse_by_field;
+    use crate::holarchy::terrain::{CyclicLaw, KnownTruth};
+    use crate::ratio::Rat;
+    let field = four_station_field();
+    let current = Current::at_rest(&field);
+    let receiving = receiver(4);
+    let material = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap();
+    let mut resident = PhysicalResident::new(&field, material, current.clone(), WordOpening::Rest);
+    let teaching = KnownTruth::cyclic_class_orbit(CyclicLaw::OrderTwo { opening: 2 }, 4, 20261006001, 4).unwrap();
+    let mut last = None;
+    for observed in Encoded::identity(&teaching, &field).unwrap() {
+        let damaged = DamagedSection::damage(&observed, &[2]).unwrap();
+        let received = resident.receive_sparse(&damaged, &receiving, |blind, _| {
+            assert!(blind.word.closes() && blind.opening.closes());
+            Some(PhysicalObservation { observed: observed.clone(), compared: vec![false, false, true, false], learning: PhysicalLearning::Receiving })
+        }).unwrap();
+        assert!(received.comparison.unwrap().unwrap().publication.stepped > 0);
+        last = Some(observed);
+    }
+    let producing = resident.constitution().clone();
+    let entered = resident.opening().clone();
+    let observed = last.unwrap();
+    let damaged = DamagedSection::damage(&observed, &[2]).unwrap();
+    let mut phases = None;
+    let started = std::time::Instant::now();
+    let received = resident.receive_sparse(&damaged, &receiving, |blind, declared| {
+        phases = Some(declared.clone());
+        println!("four-station pair blind before repeated teacher: {blind:?}");
+        Some(PhysicalObservation { observed: observed.clone(), compared: vec![false, false, true, false], learning: PhysicalLearning::PairOutputs })
+    }).unwrap();
+    println!("four-station current pair coordinate whole_role_ns={}", started.elapsed().as_nanos());
+    let publication = received.comparison.unwrap().unwrap();
+    let pairing = publication.source_pairing.unwrap();
+    assert!(pairing.receiving < Rat::zero(), "own realized first-order descent");
+    assert!(pairing.source_move_squared > Rat::zero());
+    assert!(pairing.defect.is_zero() && pairing.composition_defect.is_zero());
+    assert_eq!(pairing.receiving, pairing.opening);
+    assert_eq!(pairing.opening, pairing.deposition);
+    assert_eq!(pairing.return_remainders.entries, 0);
+    let phases = phases.unwrap();
+    let control = predict_sparse_by_field(&field, &producing, &current, &damaged, &entered, &phases).unwrap().finish();
+    assert_eq!(control, received.prediction, "teacher cannot alter prior blind receipt or carry");
+    assert_eq!(producing.source_port(0), resident.constitution().source_port(0));
+    assert_eq!(producing.receiving_map(0), resident.constitution().receiving_map(0));
+    assert!(field.offsets().iter().any(|&d| producing.pair_port(0,d).unwrap().outputs() != resident.constitution().pair_port(0,d).unwrap().outputs()));
+    let common = resident.opening().clone();
+    let learned = resident.constitution().clone();
+    let probes = KnownTruth::cyclic_class_orbit(CyclicLaw::OrderTwo { opening: 2 }, 4, 20261006011, 4).unwrap();
+    let mut effects = Vec::new();
+    for (index, observed) in Encoded::identity(&probes, &field).unwrap().into_iter().enumerate() {
+        let damaged = DamagedSection::damage(&observed, &[2]).unwrap();
+        let started = std::time::Instant::now();
+        let received = resident.receive_sparse(&damaged, &receiving, |_, _| None).unwrap();
+        println!("four-station current continuing probe {index} whole_role_ns={}", started.elapsed().as_nanos());
+        assert!(matches!(received.comparison, Ok(None)));
+        assert!(received.prediction.balances.iter().all(|b| b.closes()));
+        let before = predict_sparse_by_field(&field, &producing, &current, &damaged, &common, &phases).unwrap().finish();
+        let after = predict_sparse_by_field(&field, &learned, &current, &damaged, &common, &phases).unwrap().finish();
+        if index == 0 { assert_eq!(received.prediction, after); }
+        effects.push(after.reads[2].read.logits.iter().zip(&before.reads[2].read.logits).map(|(a,b)| a-b).collect::<Vec<_>>());
+        assert_eq!(resident.constitution(), &learned, "probes do not deposit");
+    }
+    // Existing source translations are a mechanical perturbation control, not independent data.
+    assert!(effects.iter().flatten().any(|v| !v.is_zero()), "later receiving consequence");
+    assert!(effects[1..].iter().any(|e| e != &effects[0]), "source-dependent consequence");
+    println!("four-station exact matched pair effects={effects:?}; no useful-margin or generalization acceptance asserted");
+}
+
 #[test]
 fn the_resident_retains_the_learned_pair_and_reads_the_correlated_family_on_its_carried_state() {
     let field = field();

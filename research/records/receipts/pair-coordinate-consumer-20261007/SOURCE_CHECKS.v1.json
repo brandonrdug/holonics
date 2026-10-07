@@ -1,0 +1,56 @@
+{
+  "source_base": "d6ae400ea8a8181f8e6e641c0a02484598ca4a97",
+  "source_owner_compiler_native_test_training_generator_benchmark_runs": 0,
+  "rustfmt_parse_only": {
+    "command": "rustfmt --emit stdout --config skip_children=true --edition 2024 FILE > /dev/null",
+    "paths": [
+      "crates/holonics/src/hnn/tests/physical.rs",
+      "research/notebook/hnn_design/hnn_physical_receive.rs",
+      "research/notebook/hnn_design/hnn_prediction.rs"
+    ],
+    "passed": true,
+    "formatted_sources": false
+  },
+  "git_diff_check": true,
+  "native_laws_and_constructors_edited": false,
+  "source_changed_existing_paths": [
+    "crates/holonics/src/hnn/tests/physical.rs",
+    "research/notebook/hnn_design/hnn_physical_receive.rs",
+    "research/notebook/hnn_design/hnn_prediction.rs"
+  ],
+  "declaring_key_owner": "crates/holonics/src/hnn/receiving/declaration.rs::DeclaringMaterial",
+  "scientific_acceptance": "pending; negative d6 baseline preserved; no useful claim",
+  "prior_baseline_files": {
+    "HNN_FULL_ACTUAL_OUTPUT.txt": {
+      "bytes": 143897,
+      "sha256": "1070d527fb16925d8d74b10bcd619f31b796e2f3076fb43d4d90ca2f56b58ca6"
+    },
+    "SCIENTIFIC_RESULT.v1.json": {
+      "bytes": 3777,
+      "sha256": "ba22b8148737b72c0f755c3d525cdc992ef9fcaece7932f072d40dd3ccc251ff"
+    },
+    "OUTCOME.md": {
+      "bytes": 2483,
+      "sha256": "055bec074ae699b27571f1fb2262b099ad5cff418ff5f940943094b94b0a0621"
+    },
+    "VALIDATION.json": {
+      "bytes": 455376,
+      "sha256": "9674b50256c7bea98cb737f2cc759a7576aff205d79e265e39c98f8df6fca086"
+    }
+  },
+  "code_files": {
+    "crates/holonics/src/hnn/tests/physical.rs": {
+      "bytes": 19177,
+      "sha256": "502ac4cd909e6e1992976640f890e953dc25d816f0f968d76a9859cac1d17cb5"
+    },
+    "research/notebook/hnn_design/hnn_physical_receive.rs": {
+      "bytes": 87329,
+      "sha256": "47ad7ae32a2adcff56515783e8db313715daabce239d158c7f8cb0fc7a497686"
+    },
+    "research/notebook/hnn_design/hnn_prediction.rs": {
+      "bytes": 20238,
+      "sha256": "610138130cc6050ec5eb6559f8ea6aa2c51eeaf1817a51554926716844568676"
+    }
+  },
+  "two_owned_atlas_rows_have_standard_eight_columns": true
+}
