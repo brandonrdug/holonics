@@ -1,0 +1,12 @@
+
+running 1 test
+test hnn::prediction::charted::tests::source_response_re_represents_the_producing_chart ... same matched blind cells=[Intact(2), Intact(2), Held { fibre: [0, 1, 2, 3], unresolved: UncertifiedDomain }, Intact(3)]; actual ticks=3; producing charts=[ChartReading { key: Ring(0), width: 8, certificate: Ratio { numer: 140377, denom: 8589934592 }, target: Ratio { numer: 1, denom: 32768 }, steps: 6, start: Transpose }, ChartReading { key: Ring(1), width: 8, certificate: Ratio { numer: 140377, denom: 8589934592 }, target: Ratio { numer: 1, denom: 32768 }, steps: 6, start: Transpose }, ChartReading { key: Ring(2), width: 8, certificate: Ratio { numer: 140377, denom: 8589934592 }, target: Ratio { numer: 1, denom: 32768 }, steps: 6, start: Transpose }, ChartReading { key: Contact { contact: 0, carry: 0 }, width: 8, certificate: Ratio { numer: 17, denom: 8589934592 }, target: Ratio { numer: 1, denom: 32768 }, steps: 4, start: Transpose }, ChartReading { key: Contact { contact: 1, carry: 0 }, width: 8, certificate: Ratio { numer: 17, denom: 8589934592 }, target: Ratio { numer: 1, denom: 32768 }, steps: 4, start: Transpose }]
+FAILED
+
+failures:
+
+failures:
+    hnn::prediction::charted::tests::source_response_re_represents_the_producing_chart
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 1048 filtered out; finished in 0.19s
+

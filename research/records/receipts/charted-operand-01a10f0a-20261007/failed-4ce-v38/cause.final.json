@@ -1,0 +1,103 @@
+{
+  "passed": false,
+  "label": "hnn-charted-operand-4ce4b7d35-source-operand-cause-20261006-v1",
+  "scientific_job": false,
+  "deferred_lock_busy": false,
+  "final_CPU_ns": 375820000,
+  "CPU_reading_grain_ns": 1000,
+  "aggregate_CPU_limit_us": 17000000,
+  "final_CPU_source": "systemd retained oneshot CPUUsageNSec after all group processes exit",
+  "CPU_kernel_hard_total_limit": false,
+  "sampled_stop_margin_us": 1000000,
+  "aggregate_CPU_within_limit": true,
+  "no_overshoot_accepted": true,
+  "wall_ns": 439659069,
+  "projection_ns": 3995611383,
+  "wall_source": "external monotonic_ns through final property read",
+  "quiescent": true,
+  "completion_event": "oneshot start job completed; no polling",
+  "unit_properties": {
+    "Description": "Owned holonics admission hnn-charted-operand-4ce4b7d35-source-operand-cause-20261006-v1 51fa751fd40075d1dc64fdcce8c6c4fe",
+    "LoadState": "loaded",
+    "ActiveState": "failed",
+    "SubState": "failed",
+    "InvocationID": "0e07a68c7bc44bfdbb3499ee009afae7",
+    "Result": "exit-code",
+    "ExecMainStatus": "125",
+    "ControlGroup": "",
+    "MemoryPeak": "19181568",
+    "CPUUsageNSec": "375820000",
+    "TasksCurrent": "[not set]"
+  },
+  "outer_error": null,
+  "unit_start_exit": 1,
+  "unit_start_stdout": "",
+  "unit_start_stderr": "",
+  "config": {
+    "sha256": "06c03d8146c4c6aae42951a0baf22c392a57f4b47b9dfc68e492af406a23c4c3",
+    "bytes": 151836
+  },
+  "receipt_pins": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-operand-4ce4b7d35-source-operand-cause-20261006-v1.config.json": {
+      "sha256": "06c03d8146c4c6aae42951a0baf22c392a57f4b47b9dfc68e492af406a23c4c3",
+      "bytes": 151836
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-operand-4ce4b7d35-source-operand-cause-20261006-v1.external-lease.json": {
+      "sha256": "08d4e33438dc05c66952b205266fddbeeb5c998710dc789b2398ae490bb7d8c8",
+      "bytes": 485
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-operand-4ce4b7d35-source-operand-cause-20261006-v1.lease-identity.json": {
+      "sha256": "48c99f2d167ef1de14bc258a86a14e28c11e3c7a9c7f93f31550a916f1b36c81",
+      "bytes": 562
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-operand-4ce4b7d35-source-operand-cause-20261006-v1.input_seal.json": {
+      "sha256": "330bb46234ed746c33ac6d2c2915454dd115825b3e4175ac8d1b8f730378be03",
+      "bytes": 95938
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-operand-4ce4b7d35-source-operand-cause-20261006-v1.stdout": {
+      "sha256": "a2afb048c7186a1f8b1b4ded3ac85a5e51a3d57166cc9b50667f90be163ee57f",
+      "bytes": 1364
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-operand-4ce4b7d35-source-operand-cause-20261006-v1.stderr": {
+      "sha256": "e3634ac70e003f1dfee4b33adb61c730de8dbb489571211e8c096756e44430cc",
+      "bytes": 314
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-operand-4ce4b7d35-source-operand-cause-20261006-v1.memory-gate.json": {
+      "sha256": "e15818cb3bc8081503a40fb58e11210e45c5dc5219a4a11498d474d9fc77a907",
+      "bytes": 120
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-operand-4ce4b7d35-source-operand-cause-20261006-v1.child-identity.json": {
+      "sha256": "a5f8e9b014ef32aed9fb453a8c96709e3cb08e43d8556ce5da6c35469bd07af5",
+      "bytes": 75
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-operand-4ce4b7d35-source-operand-cause-20261006-v1.system-floor.json": {
+      "sha256": "1de5985b4fc55c9d68882ba985bde83493c57fd3b97fc184a9ea5ba5492fd43d",
+      "bytes": 1600
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-operand-4ce4b7d35-source-operand-cause-20261006-v1.quiescence.json": {
+      "sha256": "9c4c946ca1e42eb38758caa50f4f5bb29306154ae14e86acf1f4f8b1b54b5dbd",
+      "bytes": 131
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-operand-4ce4b7d35-source-operand-cause-20261006-v1.output_seal.json": {
+      "sha256": "7041f8ae52cf3c0c5899c61cffce5ad8ecd444a75419e16a89c83631130677a2",
+      "bytes": 13687
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-operand-4ce4b7d35-source-operand-cause-20261006-v1.failure.json": {
+      "sha256": "7b7ffeef9272545cff01b2c5aa1c7ded50a3f831b194903814f1295cf7379e75",
+      "bytes": 264
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-operand-4ce4b7d35-source-operand-cause-20261006-v1.publication.json": {
+      "sha256": "1608e68d971a3ff66b6b85da9c3ac1e5b04143470c3e938b2ec7acea89c8bfe8",
+      "bytes": 3130
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-operand-4ce4b7d35-source-operand-cause-20261006-v1.stage-quiescence.json": {
+      "sha256": "e8ebc103ac065fb25573c06b4dbbef6071f046655ff5e9a0ea41401884bf2ad1",
+      "bytes": 135
+    }
+  },
+  "launcher_outside_native_group": true,
+  "lease_owner_outside_capped_group": true,
+  "lease_held_through_final_CPU_read_and_publication": true,
+  "stage_passed_before_cleanup": false,
+  "requires_cleanup_acceptance": true
+}

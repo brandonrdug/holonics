@@ -1,0 +1,154 @@
+{
+  "source_commit": "4ce4b7d355fc8212e628d326ef97429288868dca",
+  "continuation": "v38",
+  "all292_native_inputs_verified": true,
+  "workspace": "PASS",
+  "three_guard_lints": "PASS",
+  "doctests": {
+    "passed": 56
+  },
+  "fresh_affected_links": {
+    "passed": 11
+  },
+  "cause": "FAIL WordEnded ticks4 at post-terminal change(); old64bit diagnostic and changed publication unreached",
+  "actual_main_and_original_matched": "UNRUN",
+  "reached_assertions": [
+    "actual opening and work closure",
+    "full operands",
+    "opened_at",
+    "clock",
+    "recorded passage"
+  ],
+  "unreached_assertions": [
+    "carried/emitted state equality",
+    "consuming pullback",
+    "old64bit operand",
+    "changed error",
+    "observed publication"
+  ],
+  "wall_ns": 439659069,
+  "projection_ns": 3995611383,
+  "CPU_ns": 375820000,
+  "group_peak_bytes": 19181568,
+  "measured_over_projected": "439659069/3995611383",
+  "quiescent_and_released": true,
+  "limits_or_tolerances_raised": false,
+  "raw_files": {
+    "cause.stdout": {
+      "bytes": 1364,
+      "sha256": "a2afb048c7186a1f8b1b4ded3ac85a5e51a3d57166cc9b50667f90be163ee57f",
+      "source": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-operand-4ce4b7d35-source-operand-cause-20261006-v1.stdout"
+    },
+    "cause.stderr": {
+      "bytes": 314,
+      "sha256": "e3634ac70e003f1dfee4b33adb61c730de8dbb489571211e8c096756e44430cc",
+      "source": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-operand-4ce4b7d35-source-operand-cause-20261006-v1.stderr"
+    },
+    "cause.acceptance.json": {
+      "bytes": 379,
+      "sha256": "7f2fd4b9e59557387edf3762819bdbd1056c4e9ce4a4f0bbe0e2c5ec1d6fc1da",
+      "source": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-operand-4ce4b7d35-source-operand-cause-20261006-v1.acceptance.json"
+    },
+    "cause.final.json": {
+      "bytes": 5367,
+      "sha256": "f4c656ad47be3c0520a9a58ccff5b2ea08fc137a58e1c3e0d40d156fead805dd",
+      "source": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-operand-4ce4b7d35-source-operand-cause-20261006-v1.final.json"
+    },
+    "cause.release.json": {
+      "bytes": 173,
+      "sha256": "70a2a3750d170580a7defa4e2d08169a60b50374a7c6101d1c7b020321db5db8",
+      "source": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-charted-operand-4ce4b7d35-source-operand-cause-20261006-v1.release.json"
+    }
+  },
+  "authoritative_packet": {
+    "path": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v38/VALIDATION.json",
+    "bytes": 275573,
+    "sha256": "866a564176605ada392513e71a743c3a1bdb3cfcea3d7bcfabfeb5821e762daa"
+  },
+  "accepted_stage_receipts": {
+    "hnn-charted-operand-4ce4b7d35-cache-preparation-20261006-v1": {
+      "postcleanup_acceptance_passed": true,
+      "wall_ns": 6875701713,
+      "projection_ns": 17000000000,
+      "measured_to_projected_ratio": [
+        6875701713,
+        17000000000
+      ],
+      "aggregate_CPU_ns": 5736384000,
+      "group_peak_bytes": 4294967296,
+      "peak_child_RSS_KiB": 31888,
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-charted-operand-4ce4b7d35-workspace-check-20261006-v1": {
+      "postcleanup_acceptance_passed": true,
+      "wall_ns": 9606901549,
+      "projection_ns": 65000000000,
+      "measured_to_projected_ratio": [
+        9606901549,
+        65000000000
+      ],
+      "aggregate_CPU_ns": 18203532000,
+      "group_peak_bytes": 2006056960,
+      "peak_child_RSS_KiB": 1414392,
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-charted-operand-4ce4b7d35-guard-lints-20261006-v1": {
+      "postcleanup_acceptance_passed": true,
+      "wall_ns": 14002339902,
+      "projection_ns": 65000000000,
+      "measured_to_projected_ratio": [
+        14002339902,
+        65000000000
+      ],
+      "aggregate_CPU_ns": 23406398000,
+      "group_peak_bytes": 2237853696,
+      "peak_child_RSS_KiB": 1451024,
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-charted-operand-4ce4b7d35-guard-doctests-20261006-v1": {
+      "postcleanup_acceptance_passed": true,
+      "wall_ns": 18387798565,
+      "projection_ns": 65000000000,
+      "measured_to_projected_ratio": [
+        18387798565,
+        65000000000
+      ],
+      "aggregate_CPU_ns": 32467168000,
+      "group_peak_bytes": 2577653760,
+      "peak_child_RSS_KiB": 2178056,
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-charted-operand-4ce4b7d35-host-cuda-link-20261006-v1": {
+      "postcleanup_acceptance_passed": true,
+      "wall_ns": 18950056997,
+      "projection_ns": 65000000000,
+      "measured_to_projected_ratio": [
+        18950056997,
+        65000000000
+      ],
+      "aggregate_CPU_ns": 52188030000,
+      "group_peak_bytes": 3386638336,
+      "peak_child_RSS_KiB": 2425220,
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "hnn-charted-operand-4ce4b7d35-source-operand-cause-20261006-v1": {
+      "postcleanup_acceptance_passed": false,
+      "wall_ns": 439659069,
+      "projection_ns": 3995611383,
+      "measured_to_projected_ratio": [
+        439659069,
+        3995611383
+      ],
+      "aggregate_CPU_ns": 375820000,
+      "group_peak_bytes": 19181568,
+      "peak_child_RSS_KiB": 26476,
+      "quiescent_release": true,
+      "outer_error": null
+    }
+  }
+}

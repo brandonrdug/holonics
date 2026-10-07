@@ -1,0 +1,4 @@
+
+thread 'hnn::prediction::charted::tests::source_response_re_represents_the_producing_chart' (302320) panicked at crates/holonics/src/hnn/prediction/charted.rs:713:37:
+called `Result::unwrap()` on an `Err` value: WordEnded { ticks: 4 }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

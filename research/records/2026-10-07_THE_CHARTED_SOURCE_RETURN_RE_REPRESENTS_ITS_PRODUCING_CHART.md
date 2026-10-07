@@ -209,3 +209,45 @@ All remaining calls in this test were reviewed together against their actual def
 assertions use their existing `PartialEq/Eq` owners. The correction changes only the test
 section; production consumer, Word APIs, guards, split-work balance and matched code are
 byte-identical to bc32. The new comment at the consuming call states this ownership rule.
+
+
+## Continuation-v38: the terminal-state domain, reviewed across the whole test
+
+Source 4ce passed workspace, three guarded lints, 56 doctests and 11 fresh affected links.
+The cause selector then failed `WordEnded { ticks: 4 }` at its post-terminal `change()` call.
+Opening/work, operands, absolute clock and passage equality had passed; carry/release,
+consuming return, original 64-bit operand, changed source error and publication were not reached.
+The actual main and matched read remained unrun. The actual failure and released resource
+receipts are preserved in
+[the v38 manifest](receipts/charted-operand-01a10f0a-20261007/failed-4ce-v38/FAILURE.v38.json).
+Measured/projected wall time is exactly `439659069/3995611383`; no limits changed.
+
+The previous call review missed an accessor's state domain. `Word::change` explicitly refuses
+an ended Word; `last_junction` marks it ended after emitting its final exchange. The actual
+production `predict` captures the pre-terminal point, then certifies it against
+`reception_end().change`. The queue's unapplied parsing-only patch at
+`TestControl.before-terminal-change.v1.patch` identifies this same missing join. Its owner was
+read before applying the consumer correction; parsing is not native acceptance.
+
+[agent-inferred] Capture the control's actual `change` immediately before its terminal
+junction. After termination compare it to the original predicted carry and to the legitimate
+`control.reception_end().change`. Keep the **whole** returned-carry equality and **whole**
+emitted-release equality, including momenta, actual phase, clock, balances and remainders.
+Explicit active/ended assertions state when those reads are permitted. No state is inferred
+by undoing the emitted exchange and no private unchecked accessor is exposed.
+
+The entire remaining lifecycle was read against `Word::{tick,last_junction,change,
+reception_end,released,operands,clock,recorded,opened_at,is_ended}`, and `port::{reverse,
+reverse_core,pull_back}`. The control is advanced while active, its state is captured before
+termination, post-terminal reads use legal borrowed receipts/getters, and `pull_back(self)`
+consumes it with no end covector. That ended-word return is allowed: `reverse_core` rejects
+only a supplied continuing end covector on an ended Word. Source response arithmetic uses
+`EndChange` values rather than advancing either Word. Original `pending.observe` consumes
+its original ended Word through the same valid return. After publication only owned receipts
+are read; no consumed or ended Word is asked for another future change/tick.
+
+All cause, old carrier refusal, exact chart-value, observed publication and applied-ray
+assertions remain. Only test lifecycle staging changes; production source is byte-identical,
+including the meaningful split-work balance, hardware guards, tolerances and matched protocol.
+The same six-phase forecast and cause-before-matched gate remain fixed. The sole queue owns
+fresh acceptance. This corrects the consumer's lifecycle as one whole, not the Word API.

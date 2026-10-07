@@ -703,15 +703,23 @@ mod tests {
         let (mut control,control_opening)=crate::hnn::word::Word::open_charted_received(
             &field,&theta,&current,&pending.pending.source,&mut control_charts,&WordOpening::Rest).unwrap();
         for _ in 1..phases.junction_steps() {control.tick().unwrap();}
+        // The terminal junction emits another exchange. change() reads the continuing motion
+        // only before that junction; afterward its legitimate receipt is reception_end().
+        assert!(!control.is_ended());
+        let control_before_terminal=control.change().unwrap();
         control.last_junction().unwrap();
+        assert!(control.is_ended() && word.is_ended());
         assert_eq!(control_opening,pending.error.opening);
         assert!(control_opening.closes());
         assert_eq!(control.operands(),word.operands());
         assert_eq!(control.opened_at(),word.opened_at());
         assert_eq!(control.clock().ticks(),word.clock().ticks());
         assert_eq!(control.recorded(),word.recorded());
-        assert_eq!(control.change().unwrap(),word.change().unwrap());
-        assert_eq!(control.reception_end().unwrap(),word.reception_end().unwrap());
+        let control_carry=control.reception_end().unwrap();
+        assert_eq!(control_before_terminal,pending.prediction().carry.change);
+        assert_eq!(control_carry.change,control_before_terminal);
+        assert_eq!(control_carry,pending.prediction().carry);
+        assert_eq!(control_carry,word.reception_end().unwrap());
         assert_eq!(control.released().unwrap(),word.released().unwrap());
         let back=control.pull_back(&g,theta.receiving_map(0).unwrap(),&current.lift()[0],&phases).unwrap();
         println!("explicit identical native return control: opening_operands_clock_passage_change_carry_release_equal=true; control_setup_forward_identity_and_return_ns={}",
