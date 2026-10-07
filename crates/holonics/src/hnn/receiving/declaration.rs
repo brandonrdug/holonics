@@ -308,7 +308,7 @@ mod tests {
             None,
         )
         .unwrap();
-        changed = changed.with_ring_resonator(0, law.clone()).unwrap();
+        changed = changed.with_ring_resonator(&field, 0, law.clone()).unwrap();
         let (phases, reused) = face.declare(&changed, &lifted, &other).unwrap();
         assert!(!reused);
         assert_eq!(phases.rank_scope(), RankScope::Linear);
@@ -317,7 +317,7 @@ mod tests {
             ReceivingPhases::declare(&field, &changed, &lifted, &other).unwrap()
         );
         changed = changed
-            .with_ring_resonator(0, law.with_symmetric_saturation(integer(1)).unwrap())
+            .with_ring_resonator(&field, 0, law.with_symmetric_saturation(integer(1)).unwrap())
             .unwrap();
         let (phases, reused) = face.declare(&changed, &lifted, &other).unwrap();
         assert!(!reused);

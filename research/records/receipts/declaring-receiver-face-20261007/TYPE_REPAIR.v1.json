@@ -1,0 +1,18 @@
+{
+  "failed_source": "f09a2bf97f44f01786b18314f378e351563ecde7",
+  "failed_grade": "workspace all-targets E0061 at two test calls; six native selectors and later gates UNRUN",
+  "producing_signature": "Constitution::with_ring_resonator(self, &Field, ring, law)",
+  "repair": "Supply &field at both test calls; original failed input preserved",
+  "native_changed_paths": [
+    "crates/holonics/src/hnn/receiving/declaration.rs"
+  ],
+  "patch_pin": {
+    "bytes": 964,
+    "sha256": "117efed9d2189f3224a806d16026ea4e5d38627e9ab96e59e49a76eecd083cc4"
+  },
+  "source_syntax_and_whitespace": "PASS",
+  "native_acceptance": "PENDING fresh sole queue source admission",
+  "predecessor485_PASS10": "unchanged independent scope",
+  "resource_guard_failure": false,
+  "native_runs_by_source_owner": 0
+}
