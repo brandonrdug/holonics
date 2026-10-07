@@ -1,0 +1,20 @@
+{
+  "scope": "saved v60 phase2 normal-law coefficient identities; no phase0/algorithm inference",
+  "native_Word_deposit_or_model_calls": 0,
+  "coordinate_unit_c": "2",
+  "current_prior": "8",
+  "reexpressed_prior": "32",
+  "R_star_times_c_equals_R": true,
+  "left_chart_residual_invariant": true,
+  "sample_trace_over_prior_invariant": "35/1024",
+  "chart_residual_exact": "4691/1073741824",
+  "carrier_units": {
+    "map": "u_R/c",
+    "map_remainder": "r_R/c",
+    "Gram": "c^2 u_H",
+    "Gram_remainder": "c^2 r_H",
+    "solved_chart": "u_X/c^2",
+    "released_residuals": "same scaling as their carrier"
+  },
+  "limitations": "No observed feature invented; per-teaching features remain unlogged. Exact coefficient identities hold for every f. Native lattice/floor/certified-step equivariance is not asserted; no transformed model is constructed or run."
+}

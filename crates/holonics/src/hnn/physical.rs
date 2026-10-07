@@ -49,6 +49,7 @@ pub struct PhysicalPublication {
     pub pullback: Pullback,
     pub publication: DepositReading,
     pub feature_energy: Vec<(crate::hnn::constitution::Locus, crate::ratio::Rat)>,
+    pub receiving_diagnostic: Option<crate::hnn::prediction::PhysicalReceivingDiagnostic>,
     pub source_certificate: Option<PhysicalSourceCertificate>,
     pub source_pairing: Option<PhysicalSourcePairing>,
 }
@@ -61,6 +62,9 @@ pub struct PhysicalReception {
     pub comparison: Result<Option<PhysicalPublication>, HnnError>,
     /// This request reused an equal declaring medium, not an old source or receiving read.
     pub declaring_face_reused: bool,
+    /// Opt-in exterior receiving features from the actual cached forward anchors.
+    /// Available on blind probes as well; never installed in the resident's retained state.
+    pub receiving_features: Option<Vec<Vec<crate::ratio::Rat>>>,
 }
 
 /// A retained physical receiver. Construction accepts an explicit source frame and opening;
@@ -143,12 +147,34 @@ impl<'f> PhysicalResident<'f> {
         self.receive_with(section, receiver, observation, true)
     }
 
+    /// The same sparse passage and deposition, additionally exposing the reached receiving
+    /// operands in its transient exterior publication. Ordinary reception keeps this disabled.
+    pub fn receive_sparse_with_receiving_diagnostic(
+        &mut self,
+        section: &DamagedSection,
+        receiver: &ReceiverDeclaration,
+        observation: impl FnOnce(&PhysicalRepair, &ReceivingPhases) -> Option<PhysicalObservation>,
+    ) -> Result<PhysicalReception, HnnError> {
+        self.receive_with_diagnostic(section, receiver, observation, true, true)
+    }
+
     fn receive_with(
         &mut self,
         section: &DamagedSection,
         receiver: &ReceiverDeclaration,
         observation: impl FnOnce(&PhysicalRepair, &ReceivingPhases) -> Option<PhysicalObservation>,
         sparse: bool,
+    ) -> Result<PhysicalReception, HnnError> {
+        self.receive_with_diagnostic(section, receiver, observation, sparse, false)
+    }
+
+    fn receive_with_diagnostic(
+        &mut self,
+        section: &DamagedSection,
+        receiver: &ReceiverDeclaration,
+        observation: impl FnOnce(&PhysicalRepair, &ReceivingPhases) -> Option<PhysicalObservation>,
+        sparse: bool,
+        read_receiving_operands: bool,
     ) -> Result<PhysicalReception, HnnError> {
         let chart = section.chart();
         if self.chart.as_ref().is_some_and(|bound| bound != chart) {
@@ -188,10 +214,19 @@ impl<'f> PhysicalResident<'f> {
                 reason: "the exact physical passage does not close its declared work receipts",
             });
         }
+        let receiving_features = read_receiving_operands.then(|| {
+            (0..pending.prediction().reads.len()).map(|station| pending.receiving_feature(station))
+                .collect::<Option<Vec<_>>>()
+        }).flatten();
         let (prediction, comparison, successor) = match observation(pending.prediction(), &phases) {
             None => (pending.finish(), Ok(None), None),
             Some(observation) => {
                 let result = match observation.learning {
+                    PhysicalLearning::Receiving if read_receiving_operands => pending.observe_receiving_diagnostic(
+                        &self.constitution,
+                        &observation.observed,
+                        &observation.compared,
+                    ),
                     PhysicalLearning::Receiving => pending.observe(
                         &self.constitution,
                         &observation.observed,
@@ -216,6 +251,7 @@ impl<'f> PhysicalResident<'f> {
                         constitution,
                         publication,
                         feature_energy,
+                        receiving_diagnostic,
                         source_certificate,
                         source_pairing,
                     }) => (
@@ -225,6 +261,7 @@ impl<'f> PhysicalResident<'f> {
                             pullback,
                             publication,
                             feature_energy,
+                            receiving_diagnostic,
                             source_certificate,
                             source_pairing,
                         })),
@@ -248,6 +285,7 @@ impl<'f> PhysicalResident<'f> {
             prediction,
             comparison,
             declaring_face_reused,
+            receiving_features,
         })
     }
 

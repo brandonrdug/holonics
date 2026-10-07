@@ -499,7 +499,7 @@ fn exact_relation(teaching_count: usize, probe_count: usize, out: &str, terrains
             let mut producing_phases=None;
             let mut forward_ns=0;
             let mut publication_ns=0;
-            let received=match resident.receive_sparse(&damaged,&receiver,|blind,phases| {
+            let received=match resident.receive_sparse_with_receiving_diagnostic(&damaged,&receiver,|blind,phases| {
                 forward_ns=started.elapsed().as_nanos();
                 assert_eq!(grain,phases.grain());
                 if pair_role && !teaching && index==0 {producing_phases=Some(phases.clone());}
@@ -526,6 +526,7 @@ fn exact_relation(teaching_count: usize, probe_count: usize, out: &str, terrains
                     Ok(Some(publication))=>{
                         let changed=holonics::hnn::ConstitutionRead::receiving_map(&material,0)!=holonics::hnn::ConstitutionRead::receiving_map(resident.constitution(),0);
                         publish(&mut output,format!("exact observed R publication; section={index}; R_changed={changed}; commit={}; loci={:?}; source_certificate={}; source_pairing={}; comparison follows whole blind output\n",publication.publication.commit,publication.publication.loci,publication.source_certificate.is_some(),publication.source_pairing.is_some()));
+                        publish_receiving_operands(&mut output,index,&publication,&received.prediction);
                     }
                     refusal=>{publish(&mut output,format!("INCOMPLETE: exact comparison refused {refusal:?}; actual blind carry retained\n"));interaction_work(&mut output,all_work,&declaration,completed,false);return;}
                 }
@@ -550,6 +551,8 @@ fn exact_relation(teaching_count: usize, probe_count: usize, out: &str, terrains
                     Ok(v)=>v,
                     Err(e)=>{publish(&mut output,format!("INCOMPLETE: exact initial control refused {e:?}\n"));interaction_work(&mut output,all_work,&declaration,completed,false);return;}
                 };
+                let before_feature=before.receiving_feature(2)
+                    .expect("the existing common-carry Word's actual receiving anchor");
                 if !exact_role(&mut output,if pair_role {"no-pair fixed-carry control"} else {"initial fixed-carry control"},initial_control_started,role_bound,Some(&before.prediction().carry),baseline) {
                     interaction_work(&mut output,all_work,&declaration,completed,false);return;
                 }
@@ -570,7 +573,12 @@ fn exact_relation(teaching_count: usize, probe_count: usize, out: &str, terrains
                     }
                 };
                 let after=matched.as_ref().map(|x|x.prediction()).unwrap_or(&received.prediction);
+                let after_feature=matched.as_ref().map(|x|x.receiving_feature(2)
+                    .expect("the existing learned common-carry Word's actual receiving anchor"))
+                    .unwrap_or_else(||received.receiving_features.as_ref()
+                        .expect("the actual first probe exposes its reached forward features")[2].clone());
                 assert!(closed(before.prediction()) && closed(after));
+                publish(&mut output,format!("matched common-carry receiving features; probe={index}; no_pair_feature={before_feature:?}; learned_feature={after_feature:?}; receiver_lift={:?}; common_entered_tick={}; producing_no_pair_commit={}; producing_learned_commit={}; no extra Word/comparison/deposit\n",current.lift(),if let WordOpening::Received {carry,..}=fixed {carry.ticks} else {0},baseline.commit(),material.commit()));
                 if pair_role {publish(&mut output,format!("pair fixed-carry material controls; probe={index}; no_pair_commit={}; no_pair={:?}; pair_commit={}; learned={:?}; actual_continuing={:?}; no observation or deposit\n",baseline.commit(),before.prediction().reads[2],material.commit(),after.reads[2],received.prediction.reads[2]));}
                 else {
                 publish(&mut output,format!("exact fixed-carry controls; probe={index}; initial={:?}; learned={:?}; actual_continuing={:?}; no observation or deposit\n",before.prediction().reads[2],after.reads[2],received.prediction.reads[2]));
@@ -613,6 +621,34 @@ fn exact_relation(teaching_count: usize, probe_count: usize, out: &str, terrains
     publish(&mut output,format!("bounded exact receiving relation; complete_interaction={complete}; initial_relation_already_passes={initial_passes}; centered_acquired_real_source_response_above_tolerance={acquired}; every_expected_common_and_continuing_margin_passes={learned_passes}; bounded_relation_gate={}; whole_interaction_ns={}; no charted/performance/product/generalization/order-two-key/full-teaching-retention claim\n",complete && !initial_passes && acquired && learned_passes,all_started.elapsed().as_nanos()));
     }
     interaction_work(&mut output,all_work,&declaration,completed,complete);
+}
+
+/// The actual reached R operands, read only AFTER the unchanged blind/comparison/publication.
+/// A port's linear read at its already reached feature costs no additional Word. Its arithmetic
+/// and full receipt publication are still charged in the existing whole unit/job measurement.
+fn publish_receiving_operands(output:&mut std::fs::File,index:usize,
+    publication:&holonics::hnn::physical::PhysicalPublication,
+    blind:&holonics::hnn::prediction::PhysicalRepair,
+) {
+    use holonics::hnn::constitution::{prequential_terms,receiving_class_metric};
+    let diagnostic=publication.receiving_diagnostic.as_ref()
+        .expect("the exact receiving publication exposes its already reached operands");
+    assert_eq!(diagnostic.crossings.len(),diagnostic.samples.len());
+    let metric=receiving_class_metric(&diagnostic.samples);
+    let terms=prequential_terms(&diagnostic.samples,diagnostic.before.map());
+    let mut applied=Vec::new();
+    for (crossing,sample) in diagnostic.crossings.iter().zip(&diagnostic.samples) {
+        let before=diagnostic.before.map().apply(&sample.feature).unwrap();
+        let after=diagnostic.after.map().apply(&sample.feature).unwrap();
+        assert_eq!(before,blind.reads[crossing.station].read.logits,
+            "the sample is the exact producing receiving chart's feature");
+        let delta:Vec<Rat>=after.iter().zip(&before).map(|(a,b)|a-b).collect();
+        let class:Rat=sample.covector.iter().zip(&delta).step_by(2).map(|(g,d)|g*d).sum();
+        let phase:Rat=sample.covector.iter().zip(&delta).skip(1).step_by(2).map(|(g,d)|g*d).sum();
+        applied.push((crossing.station,before,after,delta,
+            &sample.weight*class,&sample.weight*phase));
+    }
+    publish(output,format!("actual R producing operands; section={index}; diagnostic={diagnostic:?}; class_metric_even_only={metric:?}; actual_predeposit_prior_terms={terms:?}; actual_publication={:?}; applied_same_feature_reads_and_descent_class_phase={applied:?}; no additional Word, return or deposit; snapshots are exterior receipts, not retained state\n",publication.publication));
 }
 
 /// One lawful coordinate consumer, on a fresh contemporary Word after the R publications.

@@ -1,0 +1,38 @@
+{
+  "native_compiler_test_science_runs_by_source_owner": 0,
+  "parse_checks": [
+    {
+      "path": "crates/holonics/src/hnn/prediction.rs",
+      "rustfmt_parse_exit": 0,
+      "stderr": "",
+      "sha256": "6557e706054808bbf3ac0d79df5c81044b6162d0309b3902f67acb830ad532e0"
+    },
+    {
+      "path": "crates/holonics/src/hnn/physical.rs",
+      "rustfmt_parse_exit": 0,
+      "stderr": "",
+      "sha256": "b2c569239093985c6c86c1005c91d2a3d3ada92d9c535efd305eb25901617ab2"
+    },
+    {
+      "path": "crates/holonics/src/hnn/prediction/charted.rs",
+      "rustfmt_parse_exit": 0,
+      "stderr": "",
+      "sha256": "409a1fc3a5fbfae6031ffeb2431b78fe110ab8010d8e790708af0d7b85ed3ad4"
+    },
+    {
+      "path": "crates/holonics/src/hnn/tests/physical.rs",
+      "rustfmt_parse_exit": 0,
+      "stderr": "",
+      "sha256": "215ea8f3db412742a639b9426d35d09bc72ab279113b9ac99839db0117a49a54"
+    },
+    {
+      "path": "research/notebook/hnn_design/hnn_physical_receive.rs",
+      "rustfmt_parse_exit": 0,
+      "stderr": "",
+      "sha256": "60edb93ffafe22825d2f3359f11aaf4787dcaad095a60c2640d59fc64d18d6bb"
+    }
+  ],
+  "diff_check": "pass",
+  "record_links": 3,
+  "matched_protocol_claim": "unchanged originalfourRonepairfourprobe/seeds/gate; optinreceipt clone and cachedanchor reads only; type/native pending"
+}

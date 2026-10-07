@@ -160,12 +160,56 @@ fn four_station_sparse_pair_return_at_nonzero_source_phase_matches_its_applied_d
     println!("nonzero-phase current consumer setup_ns={}; source_frame={current:?}", whole.elapsed().as_nanos());
     for (index, observed) in Encoded::identity(&teaching, &field).unwrap().into_iter().enumerate() {
         let started = std::time::Instant::now();
+        let before = resident.constitution().receiving_law(0).unwrap().clone();
         let damaged = DamagedSection::damage(&observed, &[2]).unwrap();
-        let received = resident.receive_sparse(&damaged, &receiving, |blind, _| {
+        let received = resident.receive_sparse_with_receiving_diagnostic(&damaged, &receiving, |blind, _| {
             assert!(blind.word.closes() && blind.opening.closes());
             Some(PhysicalObservation { observed: observed.clone(), compared: vec![false, false, true, false], learning: PhysicalLearning::Receiving })
         }).unwrap();
-        assert!(received.comparison.unwrap().unwrap().publication.stepped > 0);
+        let publication = received.comparison.as_ref().unwrap().as_ref().unwrap();
+        assert!(publication.publication.stepped > 0);
+        let diagnostic = publication.receiving_diagnostic.as_ref().unwrap();
+        assert_eq!(diagnostic.before, before);
+        assert_eq!(&diagnostic.after, resident.constitution().receiving_law(0).unwrap());
+        assert_eq!(diagnostic.producing_commit + 1, publication.publication.commit);
+        assert_eq!(diagnostic.source_lift.as_slice(), current.lift());
+        assert_eq!(diagnostic.receiver, 0);
+        assert_eq!(diagnostic.samples.len(), 1, "only the actual compared crossing");
+        let crossing = &diagnostic.crossings[0];
+        let sample = &diagnostic.samples[0];
+        assert_eq!(received.receiving_features.as_ref().unwrap()[2], sample.feature);
+        assert_eq!(crossing.station, 2);
+        assert_eq!(crossing.tick, received.prediction.reads[2].tick);
+        let produced = before.map().apply(&sample.feature).unwrap();
+        assert_eq!(produced, received.prediction.reads[2].read.logits);
+        let gradient = publication.ratio.covector().unwrap();
+        assert_eq!(sample.covector,
+            gradient.logits()[2].iter().map(|g| -g).collect::<Vec<_>>());
+        let metric = crate::hnn::constitution::receiving_metric_samples(&diagnostic.samples).unwrap();
+        assert_eq!(metric[0].feature, sample.feature, "the class metric preserves features");
+        assert_eq!(metric[0].covector.iter().skip(1).step_by(2).collect::<Vec<_>>(),
+            sample.covector.iter().skip(1).step_by(2).collect::<Vec<_>>());
+        let prior = publication.publication.charts.iter()
+            .find(|(locus,_)| *locus == crate::hnn::constitution::Locus::ReceivingMap(0))
+            .unwrap().1.prior.as_ref().unwrap();
+        assert_eq!(prior.from, before.chart().scale());
+        assert_eq!(prior.to, diagnostic.after.chart().scale());
+        // A coordinate unit read, not a second model: (R/2)(2f)=Rf and
+        // |2f|^2/(4s)=|f|^2/s. Full algorithm/lattice covariance is not asserted.
+        let two = integer(2);
+        let four = &two * &two;
+        let scaled_feature: Vec<_> = sample.feature.iter().map(|f| &two*f).collect();
+        let scaled_read: Vec<Rat> = (0..before.map().rows()).map(|i|
+            (0..before.map().columns()).map(|j|
+                (before.map().get(i,j).unwrap()/&two)*&scaled_feature[j]).sum()).collect();
+        assert_eq!(scaled_read, produced);
+        let energy: Rat = sample.feature.iter().map(|f| f*f).sum();
+        let scaled_energy: Rat = scaled_feature.iter().map(|f| f*f).sum();
+        let s = Rat::from_integer(num_bigint::BigInt::from(1) << before.chart().scale() as usize);
+        assert_eq!(scaled_energy/(&four*&s), energy/&s);
+        let anchor = field.ring(0).rotate(&sample.feature, &-current.lift()[0].clone());
+        assert_eq!(field.ring(0).rotate(&anchor, &current.lift()[0]), sample.feature);
+        println!("nonzero-phase actual R producing operands R{index}: diagnostic={diagnostic:?}; publication={:?}; exact_unit_read_equal=true; same_feature_energy_prior_ratio=true; no extra Word/deposition",publication.publication);
         println!("nonzero-phase current consumer R{index} role_ns={}; carry_tick={}", started.elapsed().as_nanos(), received.prediction.carry.ticks);
         last = Some(observed);
     }
@@ -186,6 +230,7 @@ fn four_station_sparse_pair_return_at_nonzero_source_phase_matches_its_applied_d
     }).unwrap();
     println!("nonzero-phase current consumer pair role_ns={}", started.elapsed().as_nanos());
     let publication = received.comparison.unwrap().unwrap();
+    assert!(publication.receiving_diagnostic.is_none(), "pair return has no R normal sample");
     let paired = publication.source_pairing.as_ref().unwrap();
     assert_eq!(paired.producing_commit, producing.commit());
     assert_eq!(paired.source_lift.as_slice(), current.lift());
@@ -226,10 +271,15 @@ fn four_station_sparse_pair_return_at_nonzero_source_phase_matches_its_applied_d
     let later = Encoded::identity(&probes, &field).unwrap().remove(0);
     let later = DamagedSection::damage(&later, &[2]).unwrap();
     let started = std::time::Instant::now();
-    let expected = predict_sparse_by_field(&field, &learned, &current, &later, &actual_opening, &phases).unwrap().finish();
+    let expected_pending = predict_sparse_by_field(&field, &learned, &current, &later, &actual_opening, &phases).unwrap();
+    let probe_feature = expected_pending.receiving_feature(2).unwrap();
+    assert_eq!(learned.receiving_map(0).unwrap().apply(&probe_feature).unwrap(),
+        expected_pending.prediction().reads[2].read.logits);
+    let expected = expected_pending.finish();
     println!("nonzero-phase current consumer later matched Word role_ns={}", started.elapsed().as_nanos());
     let started = std::time::Instant::now();
     let next = resident.receive_sparse(&later, &receiving, |_, _| None).unwrap();
+    assert!(next.receiving_features.is_none(), "ordinary reception does not collect diagnostics");
     assert!(matches!(next.comparison, Ok(None)));
     assert_eq!(next.prediction, expected);
     assert_eq!(next.prediction.carry.ticks, received.prediction.carry.ticks + 3);

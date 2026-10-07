@@ -226,7 +226,7 @@ impl ChartedPhysicalPrediction<'_, '_> {
         match joined {
             Ok((ratio, pullback, constitution, publication, feature_energy, comparison)) => Ok(ChartedPhysicalPublication {
                 teaching: PhysicalTeaching { prediction, ratio, pullback, constitution, publication,
-                    feature_energy, source_certificate: None, source_pairing: None }, error: comparison }),
+                    feature_energy, receiving_diagnostic: None, source_certificate: None, source_pairing: None }, error: comparison }),
             Err(reason) => Err((ChartedPhysicalRepair { physical: prediction, error }, reason)),
         }
     }

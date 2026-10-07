@@ -3172,12 +3172,40 @@ pub struct PhysicalTeaching {
     /// Exterior feature-energy readings of exactly the admitted normal samples/factor family.
     /// A scalar diagnostic beside eta and the applied move, never a retained source or target.
     pub feature_energy: Vec<(crate::hnn::constitution::Locus, Rat)>,
+    /// Exterior operands of the reached R return, before/after its actual publication.
+    /// No receiving sample, normal-law snapshot or diagnostic enters retained physical state.
+    pub receiving_diagnostic: Option<PhysicalReceivingDiagnostic>,
     /// The source consumer's certificate of its applied relation, including carried corrections.
     /// The normal publication's step readings describe its proposed ray separately.
     pub source_certificate: Option<PhysicalSourceCertificate>,
     /// The applied source move's forward/return pairing on the declared compared crossings.
     /// Present for exact-linear E/pair learning; R-only learning changes no source relation.
     pub source_pairing: Option<PhysicalSourcePairing>,
+}
+
+/// [definition; agent-inferred] The already reached receiving operands at one publication.
+/// Each sample is `f=P_R^lift v_R`, `g=q-p` from the producing Word; the existing class metric
+/// scales even covector entries only. `before` and `after` include the actual map, Gram, chart,
+/// remainders and located pair. The publication separately carries eta, residual and PriorMove.
+/// Consume `(R_after-R_before)f` at this SAME feature: it includes the actual prior move.
+/// These are transient exterior receipts, never a retained tape or another forward/return call.
+#[derive(Debug)]
+pub struct PhysicalReceivingDiagnostic {
+    pub producing_commit: u64,
+    pub receiver: usize,
+    pub source_lift: Vec<BigInt>,
+    pub crossings: Vec<PhysicalReceivingCrossing>,
+    pub samples: Vec<crate::hnn::constitution::Sample>,
+    pub before: crate::hnn::constitution::NormalLaw,
+    pub after: crate::hnn::constitution::NormalLaw,
+}
+
+/// A compared station's actual receiving clock, paired in order with the diagnostic sample.
+#[derive(Debug)]
+pub struct PhysicalReceivingCrossing {
+    pub station: usize,
+    pub crossing: usize,
+    pub tick: usize,
 }
 
 /// One compared receiving crossing of the actual applied source perturbation, with R and the
@@ -3259,6 +3287,15 @@ impl PhysicalPrediction<'_, '_> {
         &self.prediction
     }
 
+    /// An exterior read of one already executed receiving anchor, in the producing read's
+    /// phase chart. It opens/scatters/returns nothing and keeps no occurrence for replay.
+    pub fn receiving_feature(&self, station: usize) -> Option<Vec<Rat>> {
+        let read = self.prediction.reads.get(station)?;
+        let receiver = self.phases.ring();
+        let anchor = self.word.anchor(read.crossing, receiver)?;
+        Some(self.field.ring(receiver).rotate(anchor, &self.current.lift()[receiver]))
+    }
+
     /// Finish without an observation, dropping the transient paired return.
     pub fn finish(self) -> PhysicalRepair {
         self.prediction
@@ -3286,7 +3323,19 @@ impl PhysicalPrediction<'_, '_> {
             observed,
             compared,
             PhysicalLearning::Receiving,
+            false,
         )
+    }
+
+    /// The same receiving comparison, with its already reached operands returned as an exterior
+    /// diagnostic. It changes no normal sample, step, prior move, successor or physical carry.
+    pub fn observe_receiving_diagnostic(
+        self,
+        contemporary: &crate::hnn::constitution::Constitution,
+        observed: &Encoded,
+        compared: &[bool],
+    ) -> Result<PhysicalTeaching, PhysicalTeachingRefusal> {
+        self.observe_at(contemporary, observed, compared, PhysicalLearning::Receiving, true)
     }
 
     /// An observed source-port comparison through the same blind Word, with R and every internal
@@ -3322,6 +3371,7 @@ impl PhysicalPrediction<'_, '_> {
             observed,
             compared,
             PhysicalLearning::SourcePorts,
+            false,
         )
     }
 
@@ -3339,7 +3389,7 @@ impl PhysicalPrediction<'_, '_> {
         observed: &Encoded,
         compared: &[bool],
     ) -> Result<PhysicalTeaching, PhysicalTeachingRefusal> {
-        self.observe_at(contemporary, observed, compared, PhysicalLearning::PairOutputs)
+        self.observe_at(contemporary, observed, compared, PhysicalLearning::PairOutputs, false)
     }
 
     fn observe_at(
@@ -3348,6 +3398,7 @@ impl PhysicalPrediction<'_, '_> {
         observed: &Encoded,
         compared: &[bool],
         learning: PhysicalLearning,
+        read_receiving_operands: bool,
     ) -> Result<PhysicalTeaching, PhysicalTeachingRefusal> {
         use crate::hnn::constitution::{FactorGradient, LinearLocus, Locus, Reach};
         use crate::hnn::port::Deposit;
@@ -3562,6 +3613,34 @@ impl PhysicalPrediction<'_, '_> {
                 (step.gradient.locus(), step.energy.clone())
             })).collect();
             let (constitution, publication) = contemporary.deposited(&deposit)?;
+            // Read only already executed operands. The normal-law snapshots and samples are
+            // returned to the exterior caller; none is installed in the contemporary successor.
+            let receiving_diagnostic = (read_receiving_operands && learning == PhysicalLearning::Receiving)
+                .then(|| {
+                    material.receiving_law(phases.ring())
+                        .zip(constitution.receiving_law(phases.ring()))
+                        .and_then(|(before, after)| {
+                            deposit.linear().iter()
+                                .find(|step| step.locus == LinearLocus::Receiving(phases.ring()))
+                                .map(|step| PhysicalReceivingDiagnostic {
+                                    producing_commit: material.commit(),
+                                    receiver: phases.ring(),
+                                    source_lift: current.lift().to_vec(),
+                                    crossings: prediction.reads.iter().zip(compared)
+                                        .filter_map(|(read, &crossed)| crossed.then_some(
+                                            PhysicalReceivingCrossing {
+                                                station: read.station,
+                                                crossing: read.crossing,
+                                                tick: read.tick,
+                                            }))
+                                        .collect(),
+                                    samples: step.samples.clone(),
+                                    before: before.clone(),
+                                    after: after.clone(),
+                                })
+                        })
+                })
+                .flatten();
             let source_certificate = if learning == PhysicalLearning::SourcePorts {
                 if !physical_source_only_change(field, material, &constitution, &publication.loci, &[])
                     || material.released() != constitution.released()
@@ -3666,10 +3745,11 @@ impl PhysicalPrediction<'_, '_> {
                 source_certificate,
                 source_pairing,
                 feature_energy,
+                receiving_diagnostic,
             ))
         })();
         match joined {
-            Ok((ratio, pullback, constitution, publication, source_certificate, source_pairing, feature_energy)) => {
+            Ok((ratio, pullback, constitution, publication, source_certificate, source_pairing, feature_energy, receiving_diagnostic)) => {
                 Ok(PhysicalTeaching {
                     prediction,
                     ratio,
@@ -3679,6 +3759,7 @@ impl PhysicalPrediction<'_, '_> {
                     source_certificate,
                     source_pairing,
                     feature_energy,
+                    receiving_diagnostic,
                 })
             }
             Err(error) => Err(PhysicalTeachingRefusal { prediction, error }),
