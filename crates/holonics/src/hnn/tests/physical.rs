@@ -357,6 +357,7 @@ fn source_observer_same_carrier_normal_comparison_preserves_carry_and_withholds_
     // view distinguishes it, while this current-source view deliberately does not; this is
     // not a sufficiency claim for a target that depends on that retained context.
     let probe = initial
+        .clone()
         .with_ports(
             0,
             None,
