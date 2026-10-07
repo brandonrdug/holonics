@@ -1,7 +1,7 @@
 //! The native contact return consumed by the next continuing Word (Refs #73 #62).
 //!
 //! [agent-inferred] Source admission happens at open through SourceMoment::open_storage on the
-//! producing constitution and Current. The full-tick contact return retains one reached change,
+//! producing constitution and Current. The full-tick contact return retains the reached change,
 //! not the word's recorded passages. Its comparison return uses the producing executed solves.
 //! Contact factors change C, K and D at the contact's held canonical state `(u, π = C w)`: the
 //! rate after the deposit solves `C′ w′ = C w` (the storage-resolution record §9); the reflected
@@ -27,6 +27,7 @@ pub struct ContactCut {
     producing: Constitution,
     current: Current,
     source: Arc<SourceMoment>,
+    opening_support: Vec<usize>,
     operands: Operands,
     change: EndChange,
     next_tick: usize,
@@ -43,6 +44,33 @@ pub struct ContinuationReceipt {
     pub opening: Rat,
     pub opening_difference: Rat,
     pub released: Remainders,
+    /// The actual applied storage-factor movements, including their quadratic terms and the
+    /// lattice/carry's effect. The proposal's eta times direction is not substituted here.
+    pub storage: Vec<ContactStorageMove>,
+    /// C_old <= (1 + epsilon) C_new, read by the existing fixed inertia search. This is the
+    /// held-momentum bound, distinct from publication.storage_growth's held-rate bound.
+    /// None withholds a uniform bound; actual held-state work remains explicitly charged.
+    pub held_momentum_growth: Option<Rat>,
+}
+
+/// One reached contact's actual material reaction, dC = dF F^T + F dF^T + dF dF^T.
+/// This identity includes the square term. It asserts no finite comparison decrease.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ContactStorageMove {
+    pub contact: usize,
+    pub factor: ExactRatMatrix,
+    pub linear: ExactRatMatrix,
+    pub quadratic: ExactRatMatrix,
+    pub storage: ExactRatMatrix,
+}
+
+/// C_old <= (1 + epsilon) C_new bounds the energy at held momentum. The storage-growth
+/// owner's argument order is deliberately reversed: its usual direction bounds held rate.
+fn certify_held_momentum_growth(
+    before: &[ExactRatMatrix],
+    after: &[ExactRatMatrix],
+) -> Result<Option<Rat>, HnnError> {
+    crate::hnn::constitution::certify_storage_growth(after, before)
 }
 
 impl<'c> Word<'c> {
@@ -56,7 +84,8 @@ impl<'c> Word<'c> {
         charts: &mut Charts,
     ) -> Result<Self, HnnError> {
         let mut word = Self::open_charted(field, producing, current, &source, charts)?;
-        word.native_source = Some((producing.clone(), current.clone(), source));
+        let support = word.change()?.support(field);
+        word.native_source = Some((producing.clone(), current.clone(), source, support));
         Ok(word)
     }
 
@@ -72,46 +101,65 @@ impl<'c> Word<'c> {
     ) -> Result<(Self, SourceOpeningReceipt), HnnError> {
         let (mut word, receipt) =
             Self::open_exact_received(field, producing, current, &source, opening)?;
-        word.native_source = Some((producing.clone(), current.clone(), source));
+        // Include the carried support before an opening split can put a small coordinate wholly
+        // into its remainder. Source rings are seeded separately by Diamond::opened.
+        let mut support = opening.support(field);
+        support.extend(word.change()?.support(field));
+        support.sort_unstable();
+        support.dedup();
+        word.native_source = Some((producing.clone(), current.clone(), source, support));
         Ok((word, receipt))
     }
 
-    /// Compare the actual receiving anchors and compose contact storage from that same return.
-    /// [agent-inferred] The first admitted material family is C at one reached contact; K and D
-    /// remain fixed. The receiver declaration, phases, map and lift come from this producer.
-    /// Targets use the same field encoding and phase transport; no map or covector is supplied.
-    pub fn compare_contact_storage(
-        self,
-        receiver: usize,
-        contact: usize,
-        targets: &Encoded,
-    ) -> Result<
-        (HolonRatio, InteractionReturn<ContactCut, WordReturn, Deposit, Vec<Option<usize>>, Remainders>),
-        HnnError,
-    > {
-        let (theta, current, source) = self.native_source.as_ref().ok_or(HnnError::Shape {
-            what: "a native comparison requires its source producer", expected: 1, found: 0,
-        })?.clone();
-        let field = self.field;
-        let declaration = field.receivers().get(receiver).ok_or(HnnError::Shape {
-            what: "the native admitted receiver", expected: field.receivers().len(), found: receiver,
+    fn contact_receiving(&self, receiver: usize) -> Result<(ReceivingPhases, Faces), HnnError> {
+        let (theta, current, _, _) = self.native_source.as_ref().ok_or(HnnError::Shape {
+            what: "a native reading requires its source producer", expected: 1, found: 0,
         })?;
-        if contact >= field.contacts().len() {
-            return Err(HnnError::Shape {
-                what: "the native compared contact", expected: field.contacts().len(), found: contact,
-            });
-        }
-        let phases = ReceivingPhases::declare(field, &theta, &current, declaration)?;
+        let declaration = self.field.receivers().get(receiver).ok_or(HnnError::Shape {
+            what: "the native admitted receiver", expected: self.field.receivers().len(), found: receiver,
+        })?;
+        let phases = ReceivingPhases::declare(self.field, theta, current, declaration)?;
         let reads: Vec<_> = phases.epochs().map(|epoch| {
             let anchor = self.anchor(epoch, phases.ring()).ok_or(HnnError::WordEnded {
                 ticks: self.ticks(),
             })?;
-            phases.read(field, &theta, &current, anchor)
+            phases.read(self.field, theta, current, anchor)
         }).collect::<Result<_, _>>()?;
+        let faces = Faces::of_reads(&reads, phases.grain())?;
+        Ok((phases, faces))
+    }
+
+    /// Read every complex receiving face, with its grain fibre, before any target/comparison.
+    /// This observes the actual Word; it neither deposits nor authorizes boundary release.
+    pub fn contact_faces(&self, receiver: usize) -> Result<Faces, HnnError> {
+        Ok(self.contact_receiving(receiver)?.1)
+    }
+
+    /// Compare a declared observed consequence and react at every reached contact's C factor.
+    /// K and D remain fixed. The full Encoded consequence declares the selective target clock;
+    /// `compared` projects its receiving stations, not unknown target cells/advances. No caller
+    /// selects a contact, map, gradient or step. Uncompared faces remain in the returned ratio.
+    /// The existing Gauss--Newton proposal selector and all native physical gates are retained;
+    /// their certificate does not prove full finite comparison decrease (constitution scope).
+    pub fn compare_contact_storage(
+        self,
+        receiver: usize,
+        targets: &Encoded,
+        compared: &[bool],
+    ) -> Result<
+        (HolonRatio, InteractionReturn<ContactCut, WordReturn, Deposit, Vec<Option<usize>>, Remainders>),
+        HnnError,
+    > {
+        let (theta, current, source, support) = self.native_source.as_ref().ok_or(HnnError::Shape {
+            what: "a native comparison requires its source producer", expected: 1, found: 0,
+        })?.clone();
+        let field = self.field;
+        let (phases, faces) = self.contact_receiving(receiver)?;
         let classes: Vec<usize> = targets.classes_read().collect();
-        let ratio = HolonRatio::compare(
-            Faces::of_reads(&reads, phases.grain())?, &classes,
+        let ratio = HolonRatio::compare_partition(
+            faces, &classes,
             &target_phases(field, current.lift(), phases.ring(), targets)?,
+            compared,
         )?;
         let returned = self.return_contact(
             &ratio.covector()?, theta.receiving_map(phases.ring()).ok_or(HnnError::Shape {
@@ -125,14 +173,21 @@ impl<'c> Word<'c> {
         let back = returned.pullback.into_present().ok_or(HnnError::Realization {
             what: "the actual compared contact adjoint",
         })?;
-        let diamond = Diamond::of(field, &phases);
-        let retained = |locus| locus == Locus::Channel(contact) && diamond.retains(field, locus);
-        let (steps, _) = crate::hnn::reference::compose_contact(
-            field, &theta, &back, &diamond, &retained, current.lift(), field.step(), contact,
-        )?;
-        let steps: Vec<_> = steps.into_iter().filter(|step| {
-            matches!(step.gradient, FactorGradient::Storage { .. })
-        }).collect();
+        let diamond = Diamond::opened(field, &phases, &support);
+        let retained = |locus| matches!(locus, Locus::Channel(_)) && diamond.retains(field, locus);
+        let mut steps = Vec::new();
+        for contact in 0..field.contacts().len() {
+            let (contact_steps, _) = crate::hnn::reference::compose_contact(
+                field, &theta, &back, &diamond, &retained, current.lift(), field.step(), contact,
+            )?;
+            steps.extend(contact_steps.into_iter().filter(|step| {
+                matches!(step.gradient, FactorGradient::Storage { .. })
+            }));
+        }
+        // A completely unconstrained reading causes no material statistic or deposit clock.
+        if ratio.stations().is_empty() {
+            steps.clear();
+        }
         let occupied = field.sources().iter().map(|&g| {
             let mut count = 0u64;
             for c in 0..field.ring(g).placements().len() {
@@ -142,9 +197,11 @@ impl<'c> Word<'c> {
             }
             Ok(count)
         }).collect::<Result<Vec<_>, HnnError>>()?.into_iter().max().unwrap_or(0);
-        let deposit = Deposit::new(theta.commit(), vec![], steps, vec![Locus::Channel(contact)])
+        let reached = steps.iter().map(|step| step.gradient.locus()).collect();
+        let deposit = Deposit::new(theta.commit(), vec![], steps, reached)
             .with_reach(Reach {
-                receiver: phases.ring(), stations: phases.epochs().map(|e| e as u64).collect(),
+                receiver: phases.ring(), stations: ratio.stations().iter()
+                    .map(|&j| (phases.first_epoch() + j) as u64).collect(),
                 entries: vec![0], phases: occupied,
                 loci: diamond.retained(field),
             });
@@ -169,7 +226,7 @@ impl<'c> Word<'c> {
         InteractionReturn<ContactCut, WordReturn, (), Vec<Option<usize>>, Remainders>,
         HnnError,
     > {
-        let (producing, current, source) = self.native_source.as_ref().ok_or(HnnError::Shape {
+        let (producing, current, source, opening_support) = self.native_source.as_ref().ok_or(HnnError::Shape {
             what: "a contact return requires its native source producer",
             expected: 1,
             found: 0,
@@ -219,6 +276,7 @@ impl<'c> Word<'c> {
             producing: producing.clone(),
             current: current.clone(),
             source: source.clone(),
+            opening_support: opening_support.clone(),
             operands: self.operands.clone(),
             change,
             next_tick,
@@ -238,6 +296,11 @@ impl<'c> Word<'c> {
 }
 
 impl ContactCut {
+    /// The support captured before this Word's first tick, not the reached cut's support.
+    pub fn opening_support(&self) -> &[usize] {
+        &self.opening_support
+    }
+
     pub fn change(&self) -> &EndChange {
         &self.change
     }
@@ -356,6 +419,32 @@ impl ContactCut {
                 });
             }
         }
+        // Read the applied movement, not eta times the unrounded proposal. Cross terms between
+        // contacts act through the next full coupled Word; none is removed by a local surrogate.
+        let mut storage = Vec::new();
+        for step in deposit.factors() {
+            if let FactorGradient::Storage { contact, .. } = step.gradient {
+                let before = self.producing.contact_storage(contact);
+                let factor = successor.contact_storage(contact).subtract(before)?;
+                let transpose = factor.transpose()?;
+                let linear = factor.multiply(&before.transpose()?)?
+                    .add(&before.multiply(&transpose)?)?;
+                let quadratic = factor.multiply(&transpose)?;
+                let changed = operands.contacts()[contact].forms().0
+                    .subtract(self.operands.contacts()[contact].forms().0)?;
+                if linear.add(&quadratic)? != changed {
+                    return Err(HnnError::Realization { what: "the full applied contact storage reaction" });
+                }
+                storage.push(ContactStorageMove { contact, factor, linear, quadratic, storage: changed });
+            }
+        }
+        let before_capacity: Vec<_> = self.operands.contacts().iter()
+            .map(|contact| contact.forms().0.clone()).collect();
+        let after_capacity: Vec<_> = operands.contacts().iter()
+            .map(|contact| contact.forms().0.clone()).collect();
+        let held_momentum_growth = certify_held_momentum_growth(
+            &before_capacity, &after_capacity,
+        )?;
         // [definition; the storage-resolution record §9, the deposit record §2–§3] The deposit is
         // a sudden change of the constitution between two ticks of one continuing motion, so the
         // contact's canonical state `(u, π = C w)` holds across it and the rate solves
@@ -379,8 +468,11 @@ impl ContactCut {
             .iter()
             .map(|wave| zeros(wave.len()))
             .collect();
+        // The held state is the actual unsplit opening; a zero lattice representative does not
+        // remove a carried coordinate's support from the comparison horizon.
+        let support = held.change.support(field);
         let mut word = Word::continuing(field, operands, &held.change, &nothing, self.next_tick)?;
-        word.native_source = Some((successor.clone(), current.clone(), source.clone()));
+        word.native_source = Some((successor.clone(), current.clone(), source.clone(), support));
         #[cfg(test)] eprintln!("unit next-word-open elapsed_ms={}", started.elapsed().as_millis());
         let opened = word.change()?;
         let opening = new.power(&opened)? + new.resonator_power(&opened)?;
@@ -402,6 +494,8 @@ impl ContactCut {
                     opening,
                     opening_difference,
                     released,
+                    storage,
+                    held_momentum_growth,
                 },
             },
         ))

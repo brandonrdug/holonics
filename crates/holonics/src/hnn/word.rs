@@ -173,6 +173,8 @@ pub struct Word<'c> {
         crate::hnn::constitution::Constitution,
         Current,
         std::sync::Arc<SourceMoment>,
+        // Support read at the actual opening, before any tick; never the cut-end support.
+        Vec<usize>,
     )>,
     field: &'c Field,
     operands: Operands,

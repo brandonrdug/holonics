@@ -1,0 +1,76 @@
+{
+  "grade": "SOURCE_PREPARED_NATIVE_PENDING",
+  "base": "ad49a011e7eb1e122c3fe26cb9c8c8d1cec1ad84",
+  "runtime_baseline": "192d084288ca7953d21531b6a923db9314b5ebbe",
+  "owned_paths": [
+    "crates/holonics/src/hnn/constitution.rs",
+    "crates/holonics/src/hnn/reference/continuation.rs",
+    "crates/holonics/src/hnn/word.rs",
+    "crates/holonics/src/hnn/word/continuation.rs",
+    "docs/atlas/objects.tsv",
+    "research/records/2026-10-07_THE_SOURCE_OBSERVER_READS_ONE_CARRIER_AND_RETURNS_THROUGH_ALL_REACHED_ANCHORS.md"
+  ],
+  "native_inputs_changed": {
+    "crates/holonics/src/hnn/constitution.rs": {
+      "bytes": 435321,
+      "sha256": "3644ed2cb7e7996b9b6e41e5681e765fcc2157f4d017e0994a3e2ebc1537a0eb"
+    },
+    "crates/holonics/src/hnn/reference/continuation.rs": {
+      "bytes": 28990,
+      "sha256": "65a0c9686d4cf8d2855959423db196d8f85c10f1a59fde07ca99d418568f83e3"
+    },
+    "crates/holonics/src/hnn/word.rs": {
+      "bytes": 146371,
+      "sha256": "ae979c581327aa33268f4be2051599f87cb0b75899916103fe90add2356e9909"
+    },
+    "crates/holonics/src/hnn/word/continuation.rs": {
+      "bytes": 23307,
+      "sha256": "6e928ef4b079844021b1329819d2469bb9a9aa6d5482915e0e463d19feb6a7aa"
+    }
+  },
+  "native_inputs_unchanged": 295,
+  "syntax": {
+    "command": [
+      "rustfmt",
+      "--edition",
+      "2024",
+      "--emit",
+      "stdout",
+      "--config",
+      "skip_children=true",
+      "crates/holonics/src/hnn/constitution.rs",
+      "crates/holonics/src/hnn/reference/continuation.rs",
+      "crates/holonics/src/hnn/word.rs",
+      "crates/holonics/src/hnn/word/continuation.rs"
+    ],
+    "exit": 0,
+    "wall_ns": 157838888,
+    "stderr": "",
+    "source_writes": false,
+    "type_or_native_validation": false
+  },
+  "diff_check": true,
+  "source_owner_native_jobs": 0,
+  "existing_proposal_and_publication_gates_unchanged": true,
+  "finite_comparison_decrease_claim": false,
+  "global_learning_or_stability_or_product_claim": false,
+  "private_messages_or_logs_published": false,
+  "test_selectors": [
+    "hnn::reference::continuation::exact_bound_comparison_storage_return_continues_one_actual_pump",
+    "hnn::reference::continuation::lattice_bound_material_return_reports_unresolved_next_contact_response",
+    "hnn::reference::continuation::native_contact_return_refuses_another_source_and_stale_deposit_without_cache_writes",
+    "hnn::reference::continuation::a_zero_receiving_map_returns_no_covector_to_the_contact",
+    "hnn::reference::continuation::reached_contact_storage_reacts_together_and_reenters_on_actual_support",
+    "hnn::reference::continuation::an_uncompared_contact_read_changes_no_material_statistic",
+    "hnn::reference::continuation::contact_constraint_partition_keeps_blind_free_faces",
+    "hnn::tests::word::a_carried_change_crosses_the_next_openings_references"
+  ],
+  "source_review": "independent physical admission derivation and precise source review; type/runtime not reviewed by peer",
+  "not_selected": [
+    "4096-tick storage_response control",
+    "classification fixture/scientific replay",
+    "training/generation/product run",
+    "CUDA/device build",
+    "whole-workspace build"
+  ]
+}

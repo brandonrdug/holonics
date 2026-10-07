@@ -427,7 +427,7 @@ proof of future sufficiency.
 
 ## Same-circuit construction contract after this diagnostic
 
-[design correction; next join unbuilt] Keep the observer as an analysis view and its identities
+[design correction; contact consumer extended below, native validation pending] Keep the observer as an analysis view and its identities
 as operator controls. The mod4 classification fixture and its one-grain/centered thresholds
 are retired as scientific or product steering. Preserve every negative output and the accepted
 code. Representation and decoding are receiver-relative aspects of the **same continuing
@@ -447,17 +447,18 @@ state, actual clock/pump phase, held momentum and separately priced work. The ca
 index and rest-seeded reach remain imposed choices; autonomous learned relevance/navigation
 and useful artifact release are not established.
 
-The selected minimal code join is to derive the contact-C reaction from **all actually reached
+The selected code join derives the contact-C reaction from **all actually reached
 contact covectors** of the whole declared comparison, using actual opening-support reach, rather
 than a caller-selected contact. Bind the combined certified deposit to that same ContactCut and
 continue the same full state. Capture opening support before evolution; cut-end support is not
-its substitute. Use `Diamond::opened` for the actual comparison horizon and the existing admitted
-continuing family for future retention. Compose every reached C factor through the existing
-owner. Its existing Gauss–Newton joint certificate is not a full coupled-Word decrease proof:
-the shared-ring contact solves have mixed material variation. Consume an actual bound on that
-joint ray or a charged realized comparison before crediting its decrease; otherwise refuse the
-unadmitted combined ray explicitly. Native storage/work/budget checks alone do not supply that
-missing comparison term;
+its substitute. Use `Diamond::opened` for the actual comparison horizon. The existing native
+publication retains every held locus; no future collapse or state quotient is added here.
+Compose every reached C factor through the existing owner. Its existing Gauss–Newton joint
+selector is not a full coupled-Word decrease proof: the shared-ring contact solves have mixed
+material variation. Physical publication keeps that selector and every actual storage, work,
+momentum, operand, source and budget gate. A full finite comparison decrease is an additional
+claim requiring the complete inequality below; it is not an invented condition on every
+meaningful interaction. Native storage/work/budget checks alone do not prove comparison decrease;
 no new contact-ranking score, expected answer or teacher-selected locus enters the machine.
 Keep other physical families at their existing laws for this first consumed join. General
 source/body/view derivatives and arbitrary topology changes retain their actual obligations.
@@ -488,9 +489,9 @@ actual creative output whole and its structured phase-bearing evolution. An unus
 output is not automatically failure. Product judgment and the independent physical/source/state
 controls remain separate; no authored control output accompanies generation as its answer.
 
-The smallest unbuilt terms at the selected existing contact consumer are now explicit: actual
-**opening** reach in `compare_contact_storage`, reaction at all reached C loci rather than a
-caller index, and the consumed joint material/comparison bound through their shared rings. The
+The prepared source now consumes actual **opening** reach in `compare_contact_storage` and
+reacts at all reached C loci rather than a caller index. Native validation is pending. The
+optional full joint material/comparison-decrease certificate through their shared rings is owed. The
 existing contact solve is `m_a^-1`, with
 `m_a=I+(G_a/(2h))(2C_a+hD_a+(h²/2)K_a)`; varying C is not a scalar change of a fixed head.
 The architecture does not replace a missing mixed term by a new easy one-contact terrain or a
@@ -511,6 +512,136 @@ objective for language or joint artifact construction. A requested constraint/fi
 actual subsequently observed consequence must define that application's comparison. Keep
 causal/state/work checks and grounded deterministic consequences separate from the actual
 whole creative output shown for human judgment.
+
+## The physical contact reaction, without a blanket scalar-decrease gate
+
+[source-prepared; type/native controls pending; Refs #73 #62] The October 7 consumer extension
+changes `word/continuation.rs`, the native source binding's opening-support field in `word.rs`,
+and `reference/continuation.rs`'s focused controls. The only change in `constitution.rs` is
+crate visibility of its existing `certify_storage_growth` helper. No selector, budget, lattice,
+step/deadline, material constructor, source map, receiving map or answer mechanism is changed.
+This is the helical pair's physical contact deposition on the same continuing current: pair,
+helix, tube and receiver faces/placement participate; cell holonomy and the tower remain attached.
+
+The previous paragraph's requirement to certify full comparison decrease before allowing any
+combined reaction was too broad. The existing owner distinguishes:
+
+- **Proposal selection:** `Constitution::certify_steps` retains every existing alignment,
+  covector-unit, per-family Gauss–Newton and joint-triangle check. Its own scope note at line 292
+  excludes the nonlinear second-order terms. These checks select a bounded material proposal;
+  their `CertifiedStep::decrease` must not be read as proof that this full nonlinear Word's
+  declared or quantized comparison decreased.
+- **Physical publication and continuation:** native producer/Deposit identity, reached unreleased
+  loci, constitution and carried-remainder budgets, factor Gram PSD, actual successor operand
+  certificates, committed storage-growth inertia, unchanged ring/pump/geometric declarations,
+  `C'_a w'_a=C_a w_a`, and exact charged deposition work remain enforced. A momentum outside the
+  new mass's range is refused. None of these implies or requires every comparison to decrease.
+- **Stability claim under held momentum:** the committed upper mass bound is for held rate.
+  The new receipt additionally reads `C_old <= (1+epsilon_p) C_new` using the same fixed inertia
+  search with its operands reversed. When available it bounds the held kinetic energy by
+  `1+epsilon_p`. `None` withholds that uniform bound; it is not silently treated as the old
+  held-rate bound. The existing actual work reading still charges any increase, and no unlimited
+  repetition or global stability claim follows from one interaction. This optional reading
+  neither raises the search ceiling nor introduces a new publication gate.
+
+The native Word captures source-opening support before any tick; received openings also retain
+the unsplit carried support, and held continuation captures `held.change.support(field)` before
+its opening split can move a small coordinate wholly into its remainder. Comparison uses
+`Diamond::opened`; the absolute pump
+clock is not the word-local diamond tick. It composes every contact through `compose_contact`,
+keeping all reached C families in one bound Deposit. K, D, geometry, E, R and the other families
+remain at their existing values. No contact is ranked, selected by its teacher, or omitted in
+favor of a one-contact surrogate.
+
+`contact_faces(receiver)` borrows the producing Word and publishes all complex receiving faces
+and their grain fibres before a target is supplied. `compare_contact_storage` consumes the same
+faces through `HolonRatio::compare_partition` and the same full Word return. Its mask projects
+stations of a **fully declared observed Encoded consequence**; `Reach.stations` names only those
+compared epochs, and a completely uncompared reading deposits no material statistics. Free
+station faces stay in the ratio receipt. This does **not** admit unknown placeholder cells:
+`target_phases` advances through every target, so an earlier ignored class can still change a
+later compared clock. A genuinely partial constraint clock/chart still needs its own admission.
+
+After native publication, the receipt reads each **actual** factor movement `Delta F_a` from the
+producing and successor materials, including the budgeted lattice/carry result. It checks
+
+```text
+Delta C_a = Delta F_a F_a^T + F_a Delta F_a^T + Delta F_a Delta F_a^T.
+C'_a w'_a = C_a w_a,
+E_committed - E_reached = W_deposition,
+E_opened - E_committed = opening_difference.
+```
+
+The full coupled successor Word then executes its ordinary junctions, rings, contacts and pump
+on the retained waves, displacement and momentum. Shared-ring effects are in that actual
+execution; the receipt does not replace them by a sum of independent predicted head changes.
+Applied quadratic terms are explicit even when a family vanishes at its grain. Proposal eta
+times direction is never substituted for the actual published displacement.
+
+### The exact additional inequality for a finite-decrease claim
+
+[derived, not assembled/formally/native certified] Let `F_a(t)=F_a+t Delta F_a`, `0<=t<=1`, for
+the actual applied movements. At fixed G, h, K and D,
+
+```text
+m_a(t) = I + G_a/(2h) (2 C_a(t) + h D_a + h^2 K_a/2),
+m'_a(t) = G_a/h (Delta F_a F_a^T + F_a Delta F_a^T + 2t Delta F_a Delta F_a^T),
+m''_a(t) = 2G_a/h Delta F_a Delta F_a^T,
+X'_a = -X_a m'_a X_a,
+X''_a = 2 X_a m'_a X_a m'_a X_a - X_a m''_a X_a,   X_a=m_a^-1.
+```
+
+For PSD C, D, K and positive G, h, `m_a>=I` and `||X_a||<=1`; signed/active families need their
+actual admission rather than that PSD premise. If the full native step is `x_(k+1)=T_k(t)x_k+b_k(t)`,
+
+```text
+x'_(k+1)  = T_k x'_k + T'_k x_k + b'_k,
+x''_(k+1) = T_k x''_k + 2 T'_k x'_k + T''_k x_k + b''_k.
+```
+
+The `2 T'_k x'_k` recurrence contains all ordered mixed contact/tick terms through shared rings.
+Initial derivatives must also be included when an admitted counterfactual opening holds momentum
+rather than rate; no derivative through an unknown/singular mass chart is assumed. The existing
+comparison return differentiates its executed producing operands with the observed opening held,
+and does not by itself certify that additional opening/material square.
+
+For a **specified differentiable comparison** `Phi(t)=L(f(t))`,
+
+```text
+Phi'' = f'^T Hess(L) f' + grad(L)^T f'',
+Phi(1)-Phi(0) = -a_actual + integral_0^1 (1-t) Phi''(t) dt,
+a_actual = -Phi'(0).
+```
+
+With `Phi''<=B2` and a certified total chart/deposit/reading defect `E_defect`, finite
+nonincrease requires `B2/2+E_defect<=a_actual`; half first-order decrease requires
+`B2/2+E_defect<=a_actual/2`. This is the missing inequality. The existing joint Gauss–Newton
+triangle supplies only the first Hessian term's surrogate bound. A full certificate also needs
+the square/resolvent/mixed terms, actual initial-state law, varying-metric coercivity and
+phase/odometer/quantized-reading joins. A softmax derivative is not silently substituted for the
+declared odometer covector. These are obligations for a decrease claim, not a reason to block
+the already lawful, explicitly powered interaction. No new global scalar objective is imposed.
+
+### Observable behavior and validation boundary
+
+The changed native consumer returns a Constitution and the same motion's next Word, with its
+actual clock, full state, material movement and work. Its blind faces and subsequent structured
+read can be observed without claiming global learning or strict error decrease. Genuine product
+generation still requires an actual joint artifact's boundary/constraint and release/refinement
+consumer: these contact regression faces are not creative text, useful repair, or an autonomous
+navigator. Do not relabel them as those products. Free coherent outcomes are permitted by that
+future consumer's actual domain; no exact authored text is installed as their truth.
+
+Focused mechanical controls cover two contacts sharing one ring, all-contact publication and
+actual support at reentry, exact held momentum/work and the applied quadratic identity, absence
+of deposition at a fully uncompared read, and retention of blind free faces under a station
+partition. Existing exact/lattice pump and producer-substitution controls remain. They are
+synthetic unit fixtures with physical/causal claims, not a training curriculum, independent
+holdout, scientific population or useful-output gate. Rust syntax parsing passed; no compiler,
+native test, training, generation, benchmark or scientific run was launched by this source owner.
+The [preparation receipt](receipts/source-observer-20261007/contact-reaction-v1/PREPARATION.json)
+pins all four changed native inputs and the selected controls. Native execution and any
+application-level join remain the sole queue's and construction owner's separate receipts.
 
 The once-only native process cost was `1660252916 ns`; program interaction `1639195572 ns`;
 complete admitted stage `2381862494 ns`; aggregate CPU `2296125000 ns`; group peak

@@ -7746,7 +7746,7 @@ fn factor_step(
 /// only gains the PSD term `(ε′ − ε) Q_k` as `ε` grows to `ε′`: a block's certified candidates are
 /// upward closed, and its least is found by bisection over the ordered candidates. An unchanged
 /// block certifies at `0`.
-fn certify_storage_growth(
+pub(crate) fn certify_storage_growth(
     before: &[ExactRatMatrix],
     after: &[ExactRatMatrix],
 ) -> Result<Option<Rat>, HnnError> {

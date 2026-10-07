@@ -48,7 +48,11 @@ fn contact_comparison(
     word.run(phases.last_epoch() + 1).unwrap();
     eprintln!("unit forward elapsed_ms={}", started.elapsed().as_millis());
     let targets: Vec<_> = (0..phases.aperture()).map(|i| (i+1)%field.alphabet()).collect();
-    let (ratio, returned) = word.compare_contact_storage(0, 0, &encoded(&field, &targets)).unwrap();
+    let blind = word.contact_faces(0).unwrap();
+    let (ratio, returned) = word.compare_contact_storage(
+        0, &encoded(&field, &targets), &vec![true; targets.len()],
+    ).unwrap();
+    assert_eq!(ratio.faces(), &blind);
     assert_eq!(ratio.stations().len(), targets.len());
     let back = returned.pullback.present().unwrap();
     assert!(back.transits[0].iter().any(|tick| tick.solved.iter().any(|x| !x.is_zero())));
@@ -109,6 +113,12 @@ fn native_storage_continuation(exact: bool) {
             successor.contact_scales(0)[0], material.released, successor.carried_remainders());
         assert!(material.stepped > 0);
         let receipt = returned.receipt;
+        assert_eq!(receipt.storage.len(), 1);
+        let movement = &receipt.storage[0];
+        assert_eq!(movement.contact, 0);
+        assert_eq!(movement.linear.add(&movement.quadratic).unwrap(), movement.storage);
+        assert_eq!(movement.factor, successor.contact_storage(0)
+            .subtract(theta.contact_storage(0)).unwrap());
         assert_eq!(
             &receipt.committed - &receipt.before,
             receipt.deposition_work
@@ -372,7 +382,9 @@ fn a_zero_receiving_map_returns_no_covector_to_the_contact() {
     let mut word = Word::open_source(&field, &theta, &current, source, &mut charts).unwrap();
     word.run(phases.last_epoch() + 1).unwrap();
     let targets: Vec<_> = (0..phases.aperture()).map(|i| (i + 1) % field.alphabet()).collect();
-    let (_, returned) = word.compare_contact_storage(0, 0, &encoded(&field, &targets)).unwrap();
+    let (_, returned) = word.compare_contact_storage(
+        0, &encoded(&field, &targets), &vec![true; targets.len()],
+    ).unwrap();
     let back = returned.pullback.present().unwrap();
     // The face's covector and the feature it pairs with are present: `R`'s step has its samples.
     assert!(back.reads.iter().any(|(f, _)| f.iter().any(|x| !x.is_zero())));
@@ -389,4 +401,139 @@ fn a_zero_receiving_map_returns_no_covector_to_the_contact() {
         };
         assert!(gradient.entries().iter().all(Rat::is_zero));
     }
+}
+
+// Two contacts meet at ring 1. This is a causal/material regression, not a generated answer
+// task, a population sample or an acceptance criterion for useful artifacts.
+#[test]
+fn reached_contact_storage_reacts_together_and_reenters_on_actual_support() {
+    let field = support::small_field(
+        &[2, 2, 2], vec![support::contact(0, 1, 1, 0), support::contact(1, 2, 1, 0)], 2,
+    ).with_exact_word();
+    let theta = resolved(&field);
+    let (current, source) = learning::moment(&field, 82, 9);
+    let source = Arc::new(source);
+    let mut charts = Charts::new();
+    let phases = learning::phases(&field, &theta, &current);
+    let mut word = Word::open_source(&field, &theta, &current, source.clone(), &mut charts).unwrap();
+    word.run(phases.junction_steps()).unwrap();
+    let blind = word.contact_faces(0).unwrap();
+    eprintln!("native coupled blind current_lift={:?} periods={:?} hop_clock={:?} change={:?} faces={blind:?}",
+        current.lift(), field.rings().iter().map(|ring| ring.period()).collect::<Vec<_>>(),
+        word.clock(), word.change().unwrap());
+    let targets = encoded(&field, &[1]);
+    let (ratio, returned) = word.compare_contact_storage(0, &targets, &[true]).unwrap();
+    assert_eq!(ratio.faces(), &blind);
+    let deposit = returned.deposit.into_present().unwrap();
+    assert_eq!(deposit.loci(), vec![Locus::Channel(0), Locus::Channel(1)]);
+    assert_eq!(deposit.factors().len(), 2);
+    let cut = returned.forward.into_present().unwrap();
+    let reached = cut.change().clone();
+    let tick = cut.next_tick();
+    let (successor, returned) = cut.continue_deposited(
+        &field, &current, &source, &deposit, &mut charts,
+    ).unwrap();
+    assert_eq!(returned.receipt.storage.len(), 2);
+    assert!(returned.deposit.present().unwrap().stepped > 0);
+    assert!(returned.receipt.storage.iter().any(|movement| {
+        movement.storage.entries().iter().any(|x| !x.is_zero())
+    }));
+    assert_eq!(&returned.receipt.committed - &returned.receipt.before,
+        returned.receipt.deposition_work);
+    let mut next = returned.forward.into_present().unwrap();
+    let opened = next.change().unwrap();
+    assert_eq!(opened.storage, reached.storage);
+    assert_eq!(opened.arrivals, reached.arrivals);
+    assert_eq!(next.opened_at(), tick);
+    for contact in 0..2 {
+        let before_factor = theta.contact_storage(contact);
+        let before = before_factor.multiply(&before_factor.transpose().unwrap()).unwrap();
+        let after = next.operands().contacts()[contact].forms().0;
+        assert_eq!(after.apply(&opened.states[contact][1]).unwrap(),
+            before.apply(&reached.states[contact][1]).unwrap());
+        assert_eq!(opened.states[contact][0], reached.states[contact][0]);
+        let movement = &returned.receipt.storage[contact];
+        assert_eq!(movement.storage, after.subtract(&before).unwrap());
+        assert_eq!(movement.linear.add(&movement.quadratic).unwrap(), movement.storage);
+    }
+    let support = opened.support(&field);
+    assert!(support.contains(&2), "actual reached motion opens at the receiving ring");
+    let phases = learning::phases(&field, &successor, &current);
+    next.run(phases.junction_steps()).unwrap();
+    assert!(next.field_balances().iter().all(|balance| balance.closes()));
+    let reentry = next.contact_faces(0).unwrap();
+    eprintln!("native coupled blind={blind:?} applied={:?} work={} held_growth={:?} reentry={reentry:?} opened_at={tick}",
+        returned.receipt.storage, returned.receipt.deposition_work, returned.receipt.held_momentum_growth);
+    let (_, returned) = next.compare_contact_storage(0, &targets, &[true]).unwrap();
+    let back = returned.pullback.present().unwrap();
+    let cut = returned.forward.present().unwrap();
+    assert_eq!(cut.opening_support(), support);
+    let opened = crate::hnn::retention::Diamond::opened(&field, &phases, &support);
+    let rest = crate::hnn::retention::Diamond::of(&field, &phases);
+    assert_eq!(opened.reach(2), Some(0));
+    assert_eq!(rest.reach(2), Some(2));
+    // The carried early slip contributes to the statistic; a source-only diamond omits it.
+    let energy = |diamond: &crate::hnn::retention::Diamond| -> Rat {
+        back.transits[1].iter().filter(|t| diamond.channel_window(&field, 1, t.tick))
+            .map(|t| t.rate.iter().zip(&t.midpoint).map(|(w, omega)| {
+                let slip = w - omega;
+                &slip * &slip
+            }).sum::<Rat>()).sum()
+    };
+    let deposit = returned.deposit.present().unwrap();
+    assert_eq!(deposit.factors()[1].energy, energy(&opened));
+    assert!(energy(&opened) > energy(&rest));
+}
+
+#[test]
+fn an_uncompared_contact_read_changes_no_material_statistic() {
+    let field = boundary().with_exact_word();
+    let theta = resolved(&field);
+    let (current, source) = learning::moment(&field, 82, 9);
+    let source = Arc::new(source);
+    let mut charts = Charts::new();
+    let phases = learning::phases(&field, &theta, &current);
+    let mut word = Word::open_source(&field, &theta, &current, source.clone(), &mut charts).unwrap();
+    word.run(phases.junction_steps()).unwrap();
+    let blind = word.contact_faces(0).unwrap();
+    let (ratio, returned) = word.compare_contact_storage(0, &encoded(&field, &[1]), &[false]).unwrap();
+    assert_eq!(ratio.faces(), &blind);
+    assert!(ratio.stations().is_empty());
+    assert!(returned.pullback.present().unwrap().transits.iter().flatten()
+        .all(|tick| tick.solved.iter().all(Rat::is_zero)));
+    let deposit = returned.deposit.into_present().unwrap();
+    assert!(deposit.factors().is_empty());
+    assert!(deposit.reach().unwrap().stations.is_empty());
+    let cut = returned.forward.into_present().unwrap();
+    let (successor, returned) = cut.continue_deposited(
+        &field, &current, &source, &deposit, &mut charts,
+    ).unwrap();
+    assert_eq!(successor.contact_storage(0), theta.contact_storage(0));
+    assert_eq!(successor.contact_scales(0), theta.contact_scales(0));
+    assert_eq!(returned.deposit.present().unwrap().stepped, 0);
+    assert!(returned.receipt.storage.is_empty());
+    assert!(returned.receipt.deposition_work.is_zero());
+}
+
+#[test]
+fn contact_constraint_partition_keeps_blind_free_faces() {
+    let field = learning::chain().with_exact_word();
+    let theta = learning::generic(&field, 81);
+    let (current, source) = learning::moment(&field, 82, 9);
+    let source = Arc::new(source);
+    let mut charts = Charts::new();
+    let phases = learning::phases(&field, &theta, &current);
+    assert_eq!(phases.aperture(), 2);
+    let mut word = Word::open_source(&field, &theta, &current, source, &mut charts).unwrap();
+    word.run(phases.junction_steps()).unwrap();
+    let blind = word.contact_faces(0).unwrap();
+    let (ratio, returned) = word.compare_contact_storage(
+        0, &encoded(&field, &[1, 2]), &[true, false],
+    ).unwrap();
+    assert_eq!(ratio.faces(), &blind);
+    assert_eq!(ratio.stations(), &[0]);
+    assert_eq!(ratio.covector().unwrap().logits()[1], vec![Rat::zero(); 2 * field.alphabet()]);
+    assert_eq!(returned.deposit.present().unwrap().reach().unwrap().stations,
+        vec![phases.first_epoch() as u64]);
+    assert_eq!(ratio.faces().faces.len(), 2);
 }
