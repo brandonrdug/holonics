@@ -1,0 +1,839 @@
+{
+  "HNN_grade": "SOURCE_MATCHED_LIBRARY_LINTS_57DOCS_PLUS_FRESH_LIBTEST_AND_PASS7",
+  "HNN_controls": [
+    {
+      "selector": "hnn::tests::physical::source_observer_full_state_identity_and_joined_adjoint_at_actual_clocks",
+      "passed": true,
+      "label": "hnn-source-observer-16a81a4c-control1-20261006-v1",
+      "stdout_pin": {
+        "sha256": "604bc620009ff7618e634d2d763b2f84a89008497cd987de410cdd8344bad0ee",
+        "bytes": 221
+      },
+      "stderr_pin": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "selector": "hnn::tests::physical::source_observer_same_carrier_normal_comparison_preserves_carry_and_withholds_release",
+      "passed": true,
+      "label": "hnn-source-observer-16a81a4c-control2-20261006-v1",
+      "stdout_pin": {
+        "sha256": "c9aacb225997fe759c310b77bd04b7cac3c020250e47f2878148c18308e2923f",
+        "bytes": 234
+      },
+      "stderr_pin": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "selector": "hnn::tests::physical::source_observer_carry_family_affine_witness_separates_the_omitted_source",
+      "passed": true,
+      "label": "hnn-source-observer-16a81a4c-control3-20261006-v1",
+      "stdout_pin": {
+        "sha256": "9618e7c61633c04f48ed03212679f97b71536acc70e4e169bcef8f764c7a9f18",
+        "bytes": 222
+      },
+      "stderr_pin": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "selector": "hnn::tests::physical::source_observer_refuses_foreign_stale_future_and_ignored_observations",
+      "passed": true,
+      "label": "hnn-source-observer-16a81a4c-control4-20261006-v1",
+      "stdout_pin": {
+        "sha256": "7cdcf720a87e61006b466888655fd0190e40d31514802beaa2b58fc5d3a3964f",
+        "bytes": 219
+      },
+      "stderr_pin": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "selector": "hnn::tests::port::the_word_return_is_the_exact_adjoint_of_its_tangent_map",
+      "passed": true,
+      "label": "hnn-source-observer-16a81a4c-control5-20261006-v1",
+      "stdout_pin": {
+        "sha256": "cf37731f3d463b9167f270ce6a630b4763b4104e6fcee45bdf466aa01d1561ce",
+        "bytes": 201
+      },
+      "stderr_pin": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "selector": "hnn::tests::port::the_word_return_pulls_back_through_the_executed_charts",
+      "passed": true,
+      "label": "hnn-source-observer-16a81a4c-control6-20261006-v1",
+      "stdout_pin": {
+        "sha256": "5ed06c08325eef5fa9e964c4257f71bb52ca7381edfd1eb97b65b99f7be84ccd",
+        "bytes": 200
+      },
+      "stderr_pin": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "selector": "hnn::tests::prior_carry::a_saved_state_restores_across_a_move",
+      "passed": true,
+      "label": "hnn-source-observer-16a81a4c-control7-20261006-v1",
+      "stdout_pin": {
+        "sha256": "5f45e962b78c8cb7f0880b1f7ff160ad5b8d92edf4053806b34bc6903d88904f",
+        "bytes": 189
+      },
+      "stderr_pin": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    }
+  ],
+  "HNN_scope": "Stationary completed-section current-source R objective; full88 opening return and actual six clocks, same R normal carrier; physical carry and raw context view preserved",
+  "new_HNN_workflow_cost": {
+    "jobs": 9,
+    "CPU_ns": 41656564000,
+    "wall_ns": 33718708991
+  },
+  "source_commit": "16a81a4ceadd48904667092777cbb6dd114ca4be",
+  "source_owner_native_or_scientific_runs": 0,
+  "authoritative_outcome": {
+    "path": "research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v66/OUTCOME.md",
+    "bytes": 2805,
+    "sha256": "b7cd68b7c2a35726b01ba8cd784ce8ce549620944f9f088fa8f9a2a3b2ea465b"
+  },
+  "authoritative_validation": {
+    "path": "research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v66/VALIDATION.json",
+    "bytes": 938174,
+    "sha256": "108c3c9b67022c1f768170cbedb78668fd012bcfa52620c159db61027c361ef3"
+  },
+  "stages": {
+    "hnn-source-observer-16a81a4c-cache-preparation-20261006-v1": {
+      "accepted": true,
+      "stage_wall_ns": 7975430799,
+      "native_wall_ns": 7863829773,
+      "CPU_ns": 6413222000,
+      "fixed_guard_ns": 17000000000,
+      "measured_to_guard": {
+        "numerator": 7975430799,
+        "denominator": 17000000000
+      },
+      "group_peak_bytes": 4294967296,
+      "child_RSS_KiB": 31076,
+      "memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 3809,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "inputs_unchanged": true,
+      "quiescent_released": true,
+      "wall_factored": {
+        "integer": 7975430799,
+        "prime_powers": [
+          [
+            3,
+            1
+          ],
+          [
+            7,
+            1
+          ],
+          [
+            47,
+            1
+          ],
+          [
+            8080477,
+            1
+          ]
+        ]
+      },
+      "CPU_factored": {
+        "integer": 6413222000,
+        "prime_powers": [
+          [
+            2,
+            4
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            19,
+            1
+          ],
+          [
+            168769,
+            1
+          ]
+        ]
+      },
+      "group_bytes_factored": {
+        "integer": 4294967296,
+        "prime_powers": [
+          [
+            2,
+            32
+          ]
+        ]
+      }
+    },
+    "hnn-source-observer-16a81a4c-lib-test-build-20261006-v1": {
+      "accepted": true,
+      "stage_wall_ns": 19696746554,
+      "native_wall_ns": 18814434612,
+      "CPU_ns": 29524481000,
+      "fixed_guard_ns": 65000000000,
+      "measured_to_guard": {
+        "numerator": 19696746554,
+        "denominator": 65000000000
+      },
+      "group_peak_bytes": 2620493824,
+      "child_RSS_KiB": 2290620,
+      "memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "inputs_unchanged": true,
+      "quiescent_released": true,
+      "wall_factored": {
+        "integer": 19696746554,
+        "prime_powers": [
+          [
+            2,
+            1
+          ],
+          [
+            9848373277,
+            1
+          ]
+        ]
+      },
+      "CPU_factored": {
+        "integer": 29524481000,
+        "prime_powers": [
+          [
+            2,
+            3
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            7,
+            1
+          ],
+          [
+            4217783,
+            1
+          ]
+        ]
+      },
+      "group_bytes_factored": {
+        "integer": 2620493824,
+        "prime_powers": [
+          [
+            2,
+            12
+          ],
+          [
+            13,
+            1
+          ],
+          [
+            29,
+            1
+          ],
+          [
+            1697,
+            1
+          ]
+        ]
+      }
+    },
+    "hnn-source-observer-16a81a4c-control1-20261006-v1": {
+      "accepted": true,
+      "stage_wall_ns": 458514262,
+      "native_wall_ns": 226557003,
+      "CPU_ns": 399007000,
+      "fixed_guard_ns": 16000000000,
+      "measured_to_guard": {
+        "numerator": 458514262,
+        "denominator": 16000000000
+      },
+      "group_peak_bytes": 23212032,
+      "child_RSS_KiB": 26672,
+      "memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "inputs_unchanged": true,
+      "quiescent_released": true,
+      "wall_factored": {
+        "integer": 458514262,
+        "prime_powers": [
+          [
+            2,
+            1
+          ],
+          [
+            79,
+            1
+          ],
+          [
+            2901989,
+            1
+          ]
+        ]
+      },
+      "CPU_factored": {
+        "integer": 399007000,
+        "prime_powers": [
+          [
+            2,
+            3
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            7,
+            2
+          ],
+          [
+            17,
+            1
+          ],
+          [
+            479,
+            1
+          ]
+        ]
+      },
+      "group_bytes_factored": {
+        "integer": 23212032,
+        "prime_powers": [
+          [
+            2,
+            12
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            1889,
+            1
+          ]
+        ]
+      }
+    },
+    "hnn-source-observer-16a81a4c-control2-20261006-v1": {
+      "accepted": true,
+      "stage_wall_ns": 598706396,
+      "native_wall_ns": 378360227,
+      "CPU_ns": 548961000,
+      "fixed_guard_ns": 16000000000,
+      "measured_to_guard": {
+        "numerator": 598706396,
+        "denominator": 16000000000
+      },
+      "group_peak_bytes": 19845120,
+      "child_RSS_KiB": 28604,
+      "memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "inputs_unchanged": true,
+      "quiescent_released": true,
+      "wall_factored": {
+        "integer": 598706396,
+        "prime_powers": [
+          [
+            2,
+            2
+          ],
+          [
+            149676599,
+            1
+          ]
+        ]
+      },
+      "CPU_factored": {
+        "integer": 548961000,
+        "prime_powers": [
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            7,
+            1
+          ],
+          [
+            26141,
+            1
+          ]
+        ]
+      },
+      "group_bytes_factored": {
+        "integer": 19845120,
+        "prime_powers": [
+          [
+            2,
+            12
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            5,
+            1
+          ],
+          [
+            17,
+            1
+          ],
+          [
+            19,
+            1
+          ]
+        ]
+      }
+    },
+    "hnn-source-observer-16a81a4c-control3-20261006-v1": {
+      "accepted": true,
+      "stage_wall_ns": 981646583,
+      "native_wall_ns": 777315116,
+      "CPU_ns": 942155000,
+      "fixed_guard_ns": 16000000000,
+      "measured_to_guard": {
+        "numerator": 981646583,
+        "denominator": 16000000000
+      },
+      "group_peak_bytes": 19709952,
+      "child_RSS_KiB": 27700,
+      "memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "inputs_unchanged": true,
+      "quiescent_released": true,
+      "wall_factored": {
+        "integer": 981646583,
+        "prime_powers": [
+          [
+            439,
+            1
+          ],
+          [
+            2236097,
+            1
+          ]
+        ]
+      },
+      "CPU_factored": {
+        "integer": 942155000,
+        "prime_powers": [
+          [
+            2,
+            3
+          ],
+          [
+            5,
+            4
+          ],
+          [
+            188431,
+            1
+          ]
+        ]
+      },
+      "group_bytes_factored": {
+        "integer": 19709952,
+        "prime_powers": [
+          [
+            2,
+            14
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            401,
+            1
+          ]
+        ]
+      }
+    },
+    "hnn-source-observer-16a81a4c-control4-20261006-v1": {
+      "accepted": true,
+      "stage_wall_ns": 494471500,
+      "native_wall_ns": 280498231,
+      "CPU_ns": 453736000,
+      "fixed_guard_ns": 16000000000,
+      "measured_to_guard": {
+        "numerator": 494471500,
+        "denominator": 16000000000
+      },
+      "group_peak_bytes": 20242432,
+      "child_RSS_KiB": 27584,
+      "memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "inputs_unchanged": true,
+      "quiescent_released": true,
+      "wall_factored": {
+        "integer": 494471500,
+        "prime_powers": [
+          [
+            2,
+            2
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            157,
+            1
+          ],
+          [
+            6299,
+            1
+          ]
+        ]
+      },
+      "CPU_factored": {
+        "integer": 453736000,
+        "prime_powers": [
+          [
+            2,
+            6
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            43,
+            1
+          ],
+          [
+            1319,
+            1
+          ]
+        ]
+      },
+      "group_bytes_factored": {
+        "integer": 20242432,
+        "prime_powers": [
+          [
+            2,
+            13
+          ],
+          [
+            7,
+            1
+          ],
+          [
+            353,
+            1
+          ]
+        ]
+      }
+    },
+    "hnn-source-observer-16a81a4c-control5-20261006-v1": {
+      "accepted": true,
+      "stage_wall_ns": 1541657667,
+      "native_wall_ns": 1329622869,
+      "CPU_ns": 1500315000,
+      "fixed_guard_ns": 16000000000,
+      "measured_to_guard": {
+        "numerator": 1541657667,
+        "denominator": 16000000000
+      },
+      "group_peak_bytes": 17399808,
+      "child_RSS_KiB": 25432,
+      "memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "inputs_unchanged": true,
+      "quiescent_released": true,
+      "wall_factored": {
+        "integer": 1541657667,
+        "prime_powers": [
+          [
+            3,
+            1
+          ],
+          [
+            11,
+            1
+          ],
+          [
+            46716899,
+            1
+          ]
+        ]
+      },
+      "CPU_factored": {
+        "integer": 1500315000,
+        "prime_powers": [
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            5,
+            4
+          ],
+          [
+            29,
+            1
+          ],
+          [
+            3449,
+            1
+          ]
+        ]
+      },
+      "group_bytes_factored": {
+        "integer": 17399808,
+        "prime_powers": [
+          [
+            2,
+            15
+          ],
+          [
+            3,
+            2
+          ],
+          [
+            59,
+            1
+          ]
+        ]
+      }
+    },
+    "hnn-source-observer-16a81a4c-control6-20261006-v1": {
+      "accepted": true,
+      "stage_wall_ns": 1711581135,
+      "native_wall_ns": 1483385644,
+      "CPU_ns": 1657243000,
+      "fixed_guard_ns": 16000000000,
+      "measured_to_guard": {
+        "numerator": 1711581135,
+        "denominator": 16000000000
+      },
+      "group_peak_bytes": 17620992,
+      "child_RSS_KiB": 25872,
+      "memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "inputs_unchanged": true,
+      "quiescent_released": true,
+      "wall_factored": {
+        "integer": 1711581135,
+        "prime_powers": [
+          [
+            3,
+            1
+          ],
+          [
+            5,
+            1
+          ],
+          [
+            11,
+            1
+          ],
+          [
+            227,
+            1
+          ],
+          [
+            45697,
+            1
+          ]
+        ]
+      },
+      "CPU_factored": {
+        "integer": 1657243000,
+        "prime_powers": [
+          [
+            2,
+            3
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            7,
+            1
+          ],
+          [
+            236749,
+            1
+          ]
+        ]
+      },
+      "group_bytes_factored": {
+        "integer": 17620992,
+        "prime_powers": [
+          [
+            2,
+            13
+          ],
+          [
+            3,
+            2
+          ],
+          [
+            239,
+            1
+          ]
+        ]
+      }
+    },
+    "hnn-source-observer-16a81a4c-control7-20261006-v1": {
+      "accepted": true,
+      "stage_wall_ns": 259954095,
+      "native_wall_ns": 46658967,
+      "CPU_ns": 217444000,
+      "fixed_guard_ns": 16000000000,
+      "measured_to_guard": {
+        "numerator": 259954095,
+        "denominator": 16000000000
+      },
+      "group_peak_bytes": 17539072,
+      "child_RSS_KiB": 25624,
+      "memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "inputs_unchanged": true,
+      "quiescent_released": true,
+      "wall_factored": {
+        "integer": 259954095,
+        "prime_powers": [
+          [
+            3,
+            1
+          ],
+          [
+            5,
+            1
+          ],
+          [
+            73,
+            1
+          ],
+          [
+            237401,
+            1
+          ]
+        ]
+      },
+      "CPU_factored": {
+        "integer": 217444000,
+        "prime_powers": [
+          [
+            2,
+            5
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            54361,
+            1
+          ]
+        ]
+      },
+      "group_bytes_factored": {
+        "integer": 17539072,
+        "prime_powers": [
+          [
+            2,
+            13
+          ],
+          [
+            2141,
+            1
+          ]
+        ]
+      }
+    }
+  }
+}

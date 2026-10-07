@@ -141,6 +141,9 @@ pub(super) fn run(
 /// `pair-relation` appends one fresh PairOutputs observation of the already seen last section.
 /// Contemporary no-deposit and source-translation controls isolate its later material effect;
 /// bias and the unchanged useful signal gate are separate from the applied descent certificate.
+/// `source-observer-relation` uses the accepted completed-section source-isolation carrier with
+/// exactly the preserved R-only four-teaching/four-probe criterion. It is a spent finite-cohort
+/// comparison with the saved single-anchor point, not an untouched holdout or domain release.
 pub(super) fn learn(
     role: &str,
     teaching_count: usize,
@@ -149,6 +152,10 @@ pub(super) fn learn(
     terrains: &[String],
     pin: &exterior::Pin,
 ) {
+    if role == "source-observer-relation" {
+        source_observer_relation(teaching_count, probe_count, out, terrains, pin);
+        return;
+    }
     if matches!(role, "exact-relation" | "pair-relation") {
         exact_relation(teaching_count, probe_count, out, terrains, pin, role == "pair-relation");
         return;
@@ -621,6 +628,192 @@ fn exact_relation(teaching_count: usize, probe_count: usize, out: &str, terrains
     publish(&mut output,format!("bounded exact receiving relation; complete_interaction={complete}; initial_relation_already_passes={initial_passes}; centered_acquired_real_source_response_above_tolerance={acquired}; every_expected_common_and_continuing_margin_passes={learned_passes}; bounded_relation_gate={}; whole_interaction_ns={}; no charted/performance/product/generalization/order-two-key/full-teaching-retention claim\n",complete && !initial_passes && acquired && learned_passes,all_started.elapsed().as_nanos()));
     }
     interaction_work(&mut output,all_work,&declaration,completed,complete);
+}
+
+/// [agent-inferred] The smallest acquisition comparison consumes the mechanically accepted
+/// source-isolation view. Its field, source clock/chart, teaching/probe orbit, initial prior,
+/// actual carry and strict useful criterion match the saved R-only point at d6ae400e/v56.
+/// Only the receiving carrier and its matched comparison/normal samples change. The saved
+/// baseline is retained separately; it is neither read by the student nor trained again here.
+/// No teacher reaches a forward constructor, and no probe calls observe. The completion domain
+/// remains withheld. All four reads are available only at the completed section's final tick.
+fn source_observer_relation(teaching_count:usize,probe_count:usize,out:&str,
+    terrains:&[String],pin:&exterior::Pin,
+) {
+    use holonics::hnn::prediction::predict_by_source_observer;
+    use holonics::hnn::receiving::{ReceivingCarrier,ReceivingPhases,SourceObserverMaterial};
+    use holonics::hnn::word::Absorption;
+    use num_traits::Signed;
+    assert_eq!((teaching_count,probe_count),(4,4),"preserved R-only complete class orbits");
+    assert_eq!(terrains,["order2=20261006001:20261006011".to_owned()],"spent source operands fixed before the read");
+    assert_eq!(pin.threads(),1,"the sole queue's calling-thread budget");
+    // Exterior admission caps, not constants in the machine. An absent measured unit bound is
+    // the first bounded development read only; the queue must seal and admit it independently.
+    assert!(pin.deadline_ms()>0 && pin.deadline_ms()<=60*1000,"unchanged sixty-second wall cap");
+    let all_started=Instant::now();
+    let all_work=holonics::hnn::word::work::read();
+    let shape=Declared {period:4,alphabet:repair_loop::CLASSES,request:2,stations:2,..order_declared()};
+    let field=declare_with_offsets(&shape,(1..4).collect());
+    let current=Current::at_rest(&field);
+    let receiver=ReceiverDeclaration {ring:0,aperture:4,..field.receivers()[0].clone()};
+    let initial=Constitution::initial(&field,CAMPAIGN_ONE_BUDGET).expect("unchanged declared initial material");
+    let phases=ReceivingPhases::declare(&field,&initial,&current,&receiver).expect("same physical receiving declaration");
+    let grain=phases.grain();
+    assert_eq!(grain,16,"the saved point's fixed receiving grain");
+    let tolerance=Rat::new(1.into(),grain.into());
+    let initial=SourceObserverMaterial::found(&field,initial,&current,&phases).expect("own pristine source-observer law");
+    assert_eq!(initial.receiving_law().receiving_prior(),Some(0),"the unchanged founding prior");
+    let mut material=initial.clone();
+    let mut opening=WordOpening::Rest;
+    let mut declaration=DeclarationWork::default();
+    declaration.selected(false);
+    let mut completed=0;
+    let mut common=None;
+    let mut pairs=Vec::new();
+    let mut initial_passes=true;
+    let mut learned_passes=true;
+    #[allow(clippy::disallowed_types,clippy::disallowed_methods)]
+    let mut output=std::fs::File::create(out).expect("requested whole output");
+    publish(&mut output,format!("source-observer-relation; completed-section current-source R-only objective; exactly4teachings+4blindprobes; OrderTwo seeds20261006001:20261006011; missing station2; period=4; alphabet={}; offsets={:?}; grain={grain}; tolerance={tolerance}; same initial E/body/pair/normal/eta/located-prior law; producing current={current:?}; initial tagged law={:?}; actual carry continues; preserved single-anchor baseline=d6ae400e/continuation-v56; baseline is not read by the student or replayed; whole_job_wall_guard_ms={}; measured_whole_role_bound_ms={:?}; absent unit bound means first bounded development cap, not a measured forecast\n",shape.alphabet,field.offsets(),initial.receiving_law(),pin.deadline_ms(),pin.unit_bound_ms()));
+    publish(&mut output,format!("fixed receiving gate: complete4+4; initial common-carry material fails some expected margin; centered acquired real response>{tolerance}; all learned common-carry and actual continuing expected margins>{tolerance}; comparison refusal means incomplete; spent correlated finite class orbits, no independent/holdout/generalization claim; anchors and whole reads available only at opened_at+3; Held erasures, no domain/product/material-gradient claim; every setup/Word/control/output/grading cost charged; no extra teacher or PairOutputs\n"));
+    if !source_observer_role(&mut output,"setup",all_started,all_started,pin) {
+        interaction_work(&mut output,all_work,&declaration,completed,false);return;
+    }
+    for (teaching,seed) in [(true,20261006001),(false,20261006011)] {
+        let truth=KnownTruth::cyclic_class_orbit(CyclicLaw::OrderTwo {opening:2},shape.alphabet,seed,4).expect("the same exterior finite class orbit");
+        for (index,observed) in Encoded::identity(&truth,&field).expect("the same complete producing chart").into_iter().enumerate() {
+            let started=Instant::now();
+            let before_work=holonics::hnn::word::work::read();
+            if !teaching && index==0 {common=Some(opening.clone());}
+            let damaged=DamagedSection::damage(&observed,&[2]).expect("predeclared erased station");
+            let pending=match predict_by_source_observer(&field,&material,&current,&damaged,&opening) {
+                Ok(v)=>v,
+                Err(e)=>{publish(&mut output,format!("INCOMPLETE: source-observer forward refused {e:?}\n"));interaction_work(&mut output,all_work,&declaration,completed,false);return;}
+            };
+            declaration.selected(true); // the actual same phases/view; admission/Operands still charged
+            let forward_ns=started.elapsed().as_nanos();
+            assert!(closed(pending.prediction()),"the native opening/Word/tick work balances close");
+            assert_eq!(pending.observation().carrier,ReceivingCarrier::SourceObserver);
+            assert_eq!(pending.observation().producing_commit,Some(material.commit()));
+            assert!(pending.prediction().reads.iter().all(|r|r.tick==pending.observation().available_at));
+            assert!(pending.prediction().domains.iter().all(Option::is_none),"no completion-domain release");
+            // Publish the complete blind station output and actual causal observer receipt before
+            // this scope may observe truth. The source constructor receives only damaged cells.
+            publish(&mut output,format!("observer blind; teaching={teaching}; section={index}; input={:?}; whole_cells={:?}; reads={:?}; actual_observation={:?}; carry_tick={}; producing_commit={}; forward_ns={forward_ns}; no expected class in forward\n",damaged.placed(),pending.prediction().cells,pending.prediction().reads,pending.observation(),pending.prediction().carry.ticks,material.commit()));
+            let published_ns=started.elapsed().as_nanos();
+            let prediction=if teaching {
+                let taught=match pending.observe(&material,&observed,&[false,false,true,false]) {
+                    Ok(v)=>v,
+                    Err(v)=>{
+                        opening=WordOpening::Received {carry:v.prediction.carry,absorption:Absorption::Nothing};
+                        publish(&mut output,format!("INCOMPLETE: observer comparison refused {:?}; actual blind carry retained={opening:?}\n",v.error));
+                        interaction_work(&mut output,all_work,&declaration,completed,false);return;
+                    }
+                };
+                assert_eq!(taught.samples.len(),1,"only the explicitly compared missing station contributes a normal statistic");
+                assert_eq!(taught.samples[0].feature,field.ring(0).rotate(&taught.observation.features[2],&current.lift()[0]));
+                let before_law=material.receiving_law();
+                let after_law=taught.material.receiving_law();
+                let before=before_law.map().apply(&taught.samples[0].feature).expect("same producing R feature");
+                assert_eq!(before,taught.prediction.reads[2].read.logits);
+                let after=after_law.map().apply(&taught.samples[0].feature).expect("same reached postdeposit read");
+                let delta:Vec<Rat>=after.iter().zip(&before).map(|(a,b)|a-b).collect();
+                let class:Rat=taught.samples[0].covector.iter().zip(&delta).step_by(2).map(|(g,d)|g*d).sum();
+                let phase:Rat=taught.samples[0].covector.iter().zip(&delta).skip(1).step_by(2).map(|(g,d)|g*d).sum();
+                let metric=holonics::hnn::constitution::receiving_class_metric(&taught.samples);
+                let terms=holonics::hnn::constitution::prequential_terms(&taught.samples,before_law.map());
+                publish(&mut output,format!("observer observed R operands; section={index}; samples={:?}; class_metric_even_only={metric:?}; actual_predeposit_prior_terms={terms:?}; before_law={before_law:?}; after_law={after_law:?}; R_changed={}; ratio={:?}; publication={:?}; applied_same_feature_before={before:?}; after={after:?}; delta={delta:?}; applied_class_descent={class}; applied_phase_descent={phase}; joined_full_opening_return_checked_by_owner=true; generic_material_return_withheld\n",taught.samples,before_law.map()!=after_law.map(),taught.ratio,taught.publication));
+                material=taught.material;
+                taught.prediction
+            } else {
+                // finish drops the transient Word. No observation, reverse, sample or deposit.
+                pending.finish()
+            };
+            let receive_ns=started.elapsed().as_nanos();
+            assert!(closed(&prediction));
+            let expected_tick=(if teaching {index+1} else {teaching_count+index+1})*(shape.period as usize-1);
+            assert_eq!(prediction.carry.ticks,expected_tick,"the saved point's actual continuation clock");
+            opening=WordOpening::Received {carry:prediction.carry.clone(),absorption:Absorption::Nothing};
+            publish(&mut output,format!("observer native reception; teaching={teaching}; section={index}; forward_ns={forward_ns}; blind_publication_ns={}; comparison_deposition_and_diagnostics_ns={}; receive_owner_calls={:?}; balances_close=true; retained_tick={}; current_commit={}\n",published_ns-forward_ns,receive_ns-published_ns,holonics::hnn::word::work::read().since(before_work),prediction.carry.ticks,material.commit()));
+            if !source_observer_role(&mut output,"primary reception",started,all_started,pin) {
+                interaction_work(&mut output,all_work,&declaration,completed,false);return;
+            }
+            if !teaching {
+                let fixed=common.as_ref().expect("actual post-four-teaching common carry");
+                let control_started=Instant::now();
+                let before=match predict_by_source_observer(&field,&initial,&current,&damaged,fixed) {
+                    Ok(v)=>v.finish(),
+                    Err(e)=>{publish(&mut output,format!("INCOMPLETE: initial common-carry observer control refused {e:?}\n"));interaction_work(&mut output,all_work,&declaration,completed,false);return;}
+                };
+                declaration.selected(true);
+                if !source_observer_role(&mut output,"initial common-carry control",control_started,all_started,pin) {
+                    interaction_work(&mut output,all_work,&declaration,completed,false);return;
+                }
+                let matched=if index==0 {None} else {
+                    let control_started=Instant::now();
+                    let after=match predict_by_source_observer(&field,&material,&current,&damaged,fixed) {
+                        Ok(v)=>v.finish(),
+                        Err(e)=>{publish(&mut output,format!("INCOMPLETE: learned common-carry observer control refused {e:?}\n"));interaction_work(&mut output,all_work,&declaration,completed,false);return;}
+                    };
+                    declaration.selected(true);
+                    if !source_observer_role(&mut output,"learned common-carry control",control_started,all_started,pin) {
+                        interaction_work(&mut output,all_work,&declaration,completed,false);return;
+                    }
+                    Some(after)
+                };
+                let after=matched.as_ref().unwrap_or(&prediction);
+                assert!(closed(&before) && closed(after));
+                publish(&mut output,format!("observer fixed-carry controls; probe={index}; initial={:?}; learned={:?}; actual_continuing={:?}; common_entered_tick={}; initial_commit={}; learned_commit={}; no observation/deposition; control carries are exterior and do not replace actual continuation\n",before.reads[2],after.reads[2],prediction.reads[2],if let WordOpening::Received {carry,..}=fixed {carry.ticks} else {0},initial.commit(),material.commit()));
+                // Exterior grading starts only after primary and controls are published. It
+                // cannot feed a prediction, choose a sample, stop on success, or tune material.
+                let target=observed.classes_read().nth(2).expect("same exterior expected relation");
+                let pre=before.reads[2].read.logits.clone();
+                let post=after.reads[2].read.logits.clone();
+                let actual=&prediction.reads[2].read.logits;
+                initial_passes &= margin(&pre,target)>tolerance;
+                learned_passes &= margin(&post,target)>tolerance && margin(actual,target)>tolerance;
+                publish(&mut output,format!("observer relation comparison after blind/control publication; probe={index}; truth={target}; initial_margin={}; learned_common_margin={}; continuing_margin={}; required={tolerance}\n",margin(&pre,target),margin(&post,target),margin(actual,target)));
+                pairs.push((pre,post));
+            }
+            completed+=1;
+            publish(&mut output,format!("observer whole unit; teaching={teaching}; section={index}; whole_unit_ns={}; all_owner_calls={:?}; timing is telemetry and never a measured baseline projection\n",started.elapsed().as_nanos(),holonics::hnn::word::work::read().since(before_work)));
+            if !source_observer_role(&mut output,"whole unit including output/controls/grading",started,all_started,pin) {
+                interaction_work(&mut output,all_work,&declaration,completed,false);return;
+            }
+        }
+    }
+    let mut acquired=false;
+    if let Some((pre,_))=pairs.first() {
+        let count=Rat::from_integer(pairs.len().into());
+        let mean:Vec<Rat>=(0..pre.len()).map(|j|pairs.iter().map(|(a,b)|&b[j]-&a[j]).sum::<Rat>()/&count).collect();
+        let centered:Vec<Vec<Rat>>=pairs.iter().map(|(a,b)|a.iter().zip(b).zip(&mean).map(|((a,b),m)|b-a-m).collect()).collect();
+        acquired=centered.iter().any(|row|row.iter().step_by(2).any(|x|x.abs()>tolerance));
+        publish(&mut output,format!("observer orbit acquisition; mean_acquired_logits={mean:?}; centered_acquired_logits={centered:?}; threshold={tolerance}; real components only; no station-binomial or independent statistical unit\n"));
+    }
+    if !source_observer_role(&mut output,"whole point including final grading",all_started,all_started,pin) {
+        interaction_work(&mut output,all_work,&declaration,completed,false);return;
+    }
+    let complete=completed==teaching_count+probe_count && pairs.len()==probe_count;
+    publish(&mut output,format!("bounded source-observer receiving relation; complete_interaction={complete}; initial_relation_already_passes={initial_passes}; centered_acquired_real_source_response_above_tolerance={acquired}; every_expected_common_and_continuing_margin_passes={learned_passes}; bounded_relation_gate={}; whole_interaction_ns={}; matched saved baseline gate=false; diagnostic acquisition only, no domain/generalization/context-retention/product claim\n",complete && !initial_passes && acquired && learned_passes,all_started.elapsed().as_nanos()));
+    interaction_work(&mut output,all_work,&declaration,completed,complete);
+}
+
+/// The first source-matched development read has a fixed admission cap, no invented forecast.
+/// A later measured pin may bound whole units; full-point time is checked only against its
+/// whole deadline. The external common-lease controller independently stops aggregate CPU.
+fn source_observer_role(output:&mut std::fs::File,name:&str,started:Instant,
+    all_started:Instant,pin:&exterior::Pin,
+) -> bool {
+    let elapsed=started.elapsed().as_nanos();
+    let unit=pin.unit_bound_ms();
+    publish(output,format!("observer execution role={name}; elapsed_ns={elapsed}; whole_job_elapsed_ns={}; measured_unit_bound_ms={unit:?}; fixed_wall_guard_ms={}; all setup/output/control costs remain in whole-job accounting\n",all_started.elapsed().as_nanos(),pin.deadline_ms()));
+    let whole=name=="whole point including final grading";
+    if all_started.elapsed().as_millis()>pin.deadline_ms()
+        || (!whole && unit.is_some_and(|bound|started.elapsed().as_millis()>bound)) {
+        publish(output,format!("INCOMPLETE: observer role {name} exceeded its sealed bound; no further Word/teacher; caps never raised\n"));
+        return false;
+    }
+    true
 }
 
 /// The actual reached R operands, read only AFTER the unchanged blind/comparison/publication.

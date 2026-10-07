@@ -4,10 +4,12 @@ October 7, 2026. Refs #73, #63; formal obligation #62.
 
 [definition; agent-inferred] This first consumer is a completed-section receiving view of the
 existing stationary three-ring field. It repairs the **carrier mismatch** between a source
-comparison and a history-dependent raw anchor. It is prepared source, with exact exterior
-algebra and peer source review; its Rust type, guard and native acceptance are pending with the
-sole bounded queue. No training, useful repair, generalization, cold continuation, device or
-Athena product result follows from this preparation.
+comparison and a history-dependent raw anchor. Source `16a81a4c` passed the sole queue's fresh
+library-test build and all seven selected native controls in continuation-v66. The accepted
+library check, three scoped guard lints and 57 doctests were reused only after the queue verified
+unchanged production/configuration/provider pins. This is mechanical acceptance of the declared
+current-source R scope. No training, useful repair, generalization, cold continuation, device or
+Athena product result follows from it.
 
 The [earlier complete receiving point](2026-10-07_THE_COMPLETE_PAIR_POINT_FAILS_WITH_A_PRIOR_DOMINATED_RECEIVING_MAP.md)
 remains negative evidence. Its four receiving comparisons and one pair comparison were on a
@@ -126,6 +128,16 @@ requires that difference, and preserves the distinct complete carried state. Thi
 negative scope control prevents treating source isolation as sufficiency for retained-context
 tasks. Other physical/context-sensitive views remain part of the broader HNN construction.
 
+Available context belongs to the continuing Holarchy, its aeon and admitted retention:
+participating regions, relevant reachable connections, retained dynamics and their clocks and
+transport/resource costs. A graph is shorthand for those owners, not a fixed token window,
+flattened adjacency or an acyclicity requirement on oscillatory motion. This one source view
+coexists with that contextual network; its finite completed-section aperture neither bounds all
+context nor supplies a universal compressed vector. The **morphodynamic circuit**, alongside
+Dynamic Geometry and Asymmetric Potential, names this evolving physical parameterized circuit
+in the existing Holarchy/aeon objects. Consolidation follows consumed operator equivalence,
+rather than introducing a parallel context architecture.
+
 Completion domains remain absent, so erased cells stay Held. Save/restore of observer material
 is explicitly refused: there is no serialised producing-view or device join. Raw restore also
 compares carriers. No device, communication, cold or task-answer release route is admitted.
@@ -150,16 +162,108 @@ The four added `hnn::tests::physical::source_observer_*` controls require:
 - Foreign/stale observations, changed intact clamps, empty comparison partitions, future
   stations and erased-label changes cannot contaminate the blind receipt or retained law.
 
-These controls are prepared and unrun. [Syntax receipt](receipts/source-observer-20261007/SOURCE_PARSE_CHECKS.v4.json)
-reports Rust 2024 parse and whitespace checks only. No native compiler/test/training/generation
-or benchmark was launched by this source owner. New matrix setup and controls have no measured
-runtime projection yet: the sole queue must admit a bounded development read under unchanged
-caps, preserve all failures and stop on excess. A budget guard is not called a measured forecast.
-No scientific replay, larger cap, extra teacher, tuned decoder or altered useful gate is requested.
+All four added controls and the three preserved Word/restore regressions passed at `16a81a4c`.
+The source import and ownership failures at v64/v65 remain preserved; no failed source was
+replayed and no cap was raised. [Syntax receipt](receipts/source-observer-20261007/SOURCE_PARSE_CHECKS.v4.json)
+is still a parse/whitespace receipt only. The [scoped acceptance summary](receipts/source-observer-20261007/MECHANICAL_ACCEPTANCE.v66.json)
+pins the authoritative [v66 outcome](receipts/2026-10-06-lean-rust-native-queue/continuation-v66/OUTCOME.md)
+and its [validation](receipts/2026-10-06-lean-rust-native-queue/continuation-v66/VALIDATION.json)
+belong to the sole queue's canonical integration, not this isolated source branch. No native
+compiler/test/training/generation or benchmark was launched by this source owner.
+
+The nine new HNN stages used `41656564000 ns` aggregate CPU and `33718708991 ns` stage wall time.
+The preserved cumulative native/build/guard account is 50 jobs, `512947133000 ns` aggregate CPU,
+`389716800369 ns` stage wall time; formal and earlier work remain separate. Of the four observer
+controls, the largest measured native wall was `777315116 ns` and corresponding stage wall
+`981646583 ns`. These are whole mechanical controls, not a cost model for acquisition. The new
+scientific caller's setup, teaching, controls, output and grading remain unmeasured together.
+
+## Prepared acquisition consumer and unchanged acceptance
+
+[agent-inferred] The smallest scientifically interpretable comparison uses the preserved
+R-only four-teaching/four-probe point at source `d6ae400e`, continuation-v56. The later four-R plus
+one-Pair point is a different mechanism and is not the baseline. The saved single-anchor point
+completed its partition and failed the fixed relation gate; its [whole output](receipts/source-observer-20261007/single-anchor-v56.actual-output.txt)
+is retained. The [source matching receipt](receipts/source-observer-20261007/BASELINE_MATCH.v1.json)
+checks the unchanged producing operands. The new caller never reads that output or retrains
+that baseline.
+
+`hnn_physical_receive::source_observer_relation`, dispatched by
+`executed physical-learn source-observer-relation`, consumes exactly four Receiving observations
+and four blind probes on the same spent OrderTwo class orbits, seeds
+`20261006001:20261006011`. Period and alphabet are four, every offset in `1..4` is declared,
+station 2 is erased, source Current is the same at-rest frame/lift, and the receiving aperture is
+four at grain 16. The producing identity Encoded chart, dense initial E/2, source/contact/body
+laws, zero pair-output factors, initial prior 0 and the existing normal/class-metric/eta/located
+prior law are unchanged. No old learned statistics are imported: the observer founds its own
+pristine tagged R law and then retains every actual successor.
+
+The same actual physical carry advances through ticks `3,6,9,12,15,18,21,24`; all common-carry
+controls enter the post-teaching carry at tick 12. Source and physical clocks and target-phase
+provenance match the saved point. The changed observer's readings are published only at the
+completed-section availability tick, rather than the earlier raw crossing's timestamp; this
+does not claim an earlier online prediction. No source, clock, prior, target or R gain is tuned.
+
+Each complete blind cell/read and observer receipt is flushed before the explicit observed
+comparison. Only the predeclared station contributes an R normal sample. The same Word supplies
+the full joined return; samples, actual before/after laws, prior terms, eta/publication and applied
+same-feature read changes are exterior receipts. Probes call `finish`, never `observe`, and
+controls do not replace the continuing carry. Truth is read for exterior grading only after
+primary and common-carry controls have been published.
+
+The fixed criterion is **complete 4+4**, the initial common-carry law fails at least one expected
+margin, a centered acquired real response strictly exceeds `1/16`, and **all four** learned
+common-carry **and** actual continuing expected-target margins strictly exceed `1/16`. Centering
+removes the class-orbit mean acquired logit change, exactly as in the saved point. Each complete
+correlated orbit is one development point; stations and fresh seeds are not independent tests
+or untouched holdout. A pass would support only acquisition of this bounded current-source
+relation; erasures remain Held, with no domain, contextual-retention or product release.
+
+The caller reads the existing native work counter before setup and after all attempted work.
+Whole-role and whole-unit timings include matrix setup, declarations, source construction,
+all Words, comparison/deposition, controls, formatting/output and grading; the queue's outer
+receipt includes its controller and full process costs. The existing initial and learned common
+controls are retained without an extra teacher, pair update or baseline training replay.
+
+The sole queue must independently admit a source-matched first bounded development read under
+unchanged `17 aggregate CPU s / 60 wall s / j1 / 4 GiB group`, with the one-second CPU stop margin
+and existing memory floors. An absent measured unit bound is labelled a fixed development cap,
+never a forecast. Runtime remains held until that admission and fresh example/guard checks are
+accepted. Its [prepared committed pin](../runs/source-observer-relation/first-development.pin) is
+a fixed first-development wall cap, with the independently enforced aggregate CPU/memory lease
+policy; it does not provide a measured projection. The first 4+4 point is spent once whether
+complete or incomplete. No later automatic
+replay, larger deadline or altered useful gate is authorized by this preparation; any later
+request must use measured matching whole-role upper costs from the actual read.
+
+## Concrete circuit consolidation at the consuming owner
+
+[agent-inferred; proposed, not implemented in this acquisition seal] The shared
+`prediction::physical_forward` already owns the same source imposition, native Word, physical
+balances and retained carry for raw/domain/source-observer receptions. Its arguments still
+represent the receiving role twice: an explicit `ReceivingPhases`, an optional observer holding
+its own phases, and an independent `completion_domain` flag. The consumer then refuses impossible
+combinations at runtime. This is one concrete duplicated representation to consolidate.
+
+A private typed receiving-view choice can carry either the raw phases with their sparse/domain
+admission or the SourceObserverView with its own phases. The common physical passage remains
+one owner; the consuming constructors `repair_by_field`, `predict_sparse_by_field` and
+`predict_by_source_observer` select a lawful view directly. This removes duplicate clock operands
+and invalid mode combinations while keeping each receiver chart and availability law explicit.
+The existing `ReceivingPhases::read_carrier` already shares the actual R/lift/read arithmetic;
+that consumed join is retained, not replaced by another representation.
+
+The equivalence is only the shared physical passage and unchanged raw/source branch semantics:
+raw anchors preserve reachable interior context, while this observer annihilates it. Their
+objectives, Gram carriers, publication times, domain admission and material derivatives are
+different and must not be merged. Acceptance for a later narrow refactor is the same complete
+blind reads/carry/balances at both views, the full88 joined observer identity, raw reachable-context
+distinction, carrier/clock/domain refusals and no additional Word or teaching. It should be
+sealed after the acquisition point, preserving the present scientifically interpretable delta.
 
 #62 owes the exact stationary observation theorem against the producing Word laws, joined
 full-opening transpose and carrier/clock composition in Lean. Existing Word/adjoint theorems are
-recovered owners, not a proof of this new consumed six-anchor instance. Scoped type, guard and
-native receipts are required before source acceptance; GPU parity and the save/current-key joins
-remain separate obligations. The next scientific claim would require a fixed relation-level
-acceptance and fresh independently reserved observations after that mechanical acceptance.
+recovered owners, not a proof of this new consumed six-anchor instance. Scoped mechanical
+acceptance is now v66; Lean, GPU parity and the save/current-key joins remain separate obligations.
+The prepared acquisition caller itself has no type/runtime or scientific result yet. Fresh
+independently reserved observations would additionally be required for a generalization claim.

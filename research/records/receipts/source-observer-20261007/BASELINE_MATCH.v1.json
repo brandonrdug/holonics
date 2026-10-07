@@ -1,0 +1,189 @@
+{
+  "baseline_source": "d6ae400ea8a8181f8e6e641c0a02484598ca4a97",
+  "accepted_observer_source": "16a81a4ceadd48904667092777cbb6dd114ca4be",
+  "preserved_whole_baseline_output": {
+    "path": ".local/wt/hnn-source-observer-01a1030c/research/records/receipts/source-observer-20261007/single-anchor-v56.actual-output.txt",
+    "bytes": 143897,
+    "sha256": "1070d527fb16925d8d74b10bcd619f31b796e2f3076fb43d4d90ca2f56b58ca6"
+  },
+  "authoritative_baseline_validation": {
+    "path": "research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v56/VALIDATION.json",
+    "bytes": 455376,
+    "sha256": "9674b50256c7bea98cb737f2cc759a7576aff205d79e265e39c98f8df6fca086"
+  },
+  "unchanged_files": [
+    {
+      "path": "crates/holonics/src/holarchy/terrain/known.rs",
+      "old": {
+        "bytes": 12890,
+        "sha256": "2252ebc84dde432b7027d71996506ac471d2feace40f4fbdd2b7a777cbe17106"
+      },
+      "accepted_observer": {
+        "bytes": 12890,
+        "sha256": "2252ebc84dde432b7027d71996506ac471d2feace40f4fbdd2b7a777cbe17106"
+      },
+      "byte_identical": true
+    },
+    {
+      "path": "crates/holonics/src/hnn/moment.rs",
+      "old": {
+        "bytes": 114255,
+        "sha256": "2585d881e1b3e7584a5982bc54107f8d79233de9a65dd423e6b515e2a48a548a"
+      },
+      "accepted_observer": {
+        "bytes": 114255,
+        "sha256": "2585d881e1b3e7584a5982bc54107f8d79233de9a65dd423e6b515e2a48a548a"
+      },
+      "byte_identical": true
+    },
+    {
+      "path": "crates/holonics/src/hnn/encoding.rs",
+      "old": {
+        "bytes": 59224,
+        "sha256": "50152ce0f52a501ec08e9cd0b7981950f8173ec4dcfe5a66286ad48d94bf9739"
+      },
+      "accepted_observer": {
+        "bytes": 59224,
+        "sha256": "50152ce0f52a501ec08e9cd0b7981950f8173ec4dcfe5a66286ad48d94bf9739"
+      },
+      "byte_identical": true
+    },
+    {
+      "path": "crates/holonics/src/hnn/word.rs",
+      "old": {
+        "bytes": 146260,
+        "sha256": "cee1db82700ed5e47bd686dc8a48e5eb50ea8316c3af21b081faeda8e5258bad"
+      },
+      "accepted_observer": {
+        "bytes": 146260,
+        "sha256": "cee1db82700ed5e47bd686dc8a48e5eb50ea8316c3af21b081faeda8e5258bad"
+      },
+      "byte_identical": true
+    },
+    {
+      "path": "crates/holonics/src/hnn/ratio.rs",
+      "old": {
+        "bytes": 22152,
+        "sha256": "4b223f2a9bae7b70291ed62ce026a5f6ca521df0b4d87be3769c26a32f91030c"
+      },
+      "accepted_observer": {
+        "bytes": 22152,
+        "sha256": "4b223f2a9bae7b70291ed62ce026a5f6ca521df0b4d87be3769c26a32f91030c"
+      },
+      "byte_identical": true
+    }
+  ],
+  "unchanged_functions": [
+    {
+      "path": "research/notebook/hnn_design/hnn_prediction.rs",
+      "function": "fn declare_with_offsets(",
+      "old": {
+        "bytes": 1904,
+        "sha256": "6374499d1d5380c479bdd79f1b1719cbe226065268a85453e6a7fe2e5b24d340"
+      },
+      "accepted_observer": {
+        "bytes": 1904,
+        "sha256": "6374499d1d5380c479bdd79f1b1719cbe226065268a85453e6a7fe2e5b24d340"
+      },
+      "byte_identical": true
+    },
+    {
+      "path": "crates/holonics/src/hnn/constitution.rs",
+      "function": "pub fn initial(field:",
+      "old": {
+        "bytes": 6882,
+        "sha256": "bb9641d6ef825ad9124c3f01bd9057ed0f02932e3c5e7f1b207d96bd3ac32ef0"
+      },
+      "accepted_observer": {
+        "bytes": 6882,
+        "sha256": "bb9641d6ef825ad9124c3f01bd9057ed0f02932e3c5e7f1b207d96bd3ac32ef0"
+      },
+      "byte_identical": true
+    },
+    {
+      "path": "research/notebook/hnn_design/hnn_prediction.rs",
+      "function": "fn order_declared(",
+      "old": {
+        "bytes": 181,
+        "sha256": "343c6685aeff4a653ae2895689eef95a09b6ad729d33d623ecf822bb6141d445"
+      },
+      "accepted_observer": {
+        "bytes": 181,
+        "sha256": "343c6685aeff4a653ae2895689eef95a09b6ad729d33d623ecf822bb6141d445"
+      },
+      "byte_identical": true
+    },
+    {
+      "path": "research/notebook/hnn_design/hnn_physical_receive.rs",
+      "function": "fn margin(",
+      "old": {
+        "bytes": 223,
+        "sha256": "124d0fc4335d4453b2d4fa9ebe1ebf94beff465142282124827bda0b013cacda"
+      },
+      "accepted_observer": {
+        "bytes": 223,
+        "sha256": "124d0fc4335d4453b2d4fa9ebe1ebf94beff465142282124827bda0b013cacda"
+      },
+      "byte_identical": true
+    }
+  ],
+  "protocol": {
+    "teachings": 4,
+    "probes": 4,
+    "teaching_seed": 20261006001,
+    "probe_seed": 20261006011,
+    "producer": "KnownTruth::cyclic_class_orbit(OrderTwo{opening:2},4,seed,4)",
+    "source_chart": "Encoded::identity; one producing D/labels/conduct",
+    "erasure": [
+      2
+    ],
+    "compared": [
+      false,
+      false,
+      true,
+      false
+    ],
+    "period": 4,
+    "alphabet": 4,
+    "offsets": [
+      1,
+      2,
+      3
+    ],
+    "source_current": "Current::at_rest with zero phase/lift; receiver ring0",
+    "receiver_aperture": 4,
+    "grain": 16,
+    "strict_margin_tolerance": {
+      "numerator": 1,
+      "denominator": 16
+    },
+    "initial_prior": 0,
+    "initial_map": "zero R, declared dense E/2, zero pair-output factors",
+    "normal_law": "original class metric, prequential preparation, eta, exact carried Gram/chart, located prior and deposition; no rescale or tuned gain",
+    "actual_carry_ticks": [
+      3,
+      6,
+      9,
+      12,
+      15,
+      18,
+      21,
+      24
+    ],
+    "common_entered_carry_tick": 12,
+    "baseline_gate": false,
+    "criterion": "complete4+4 AND NOT initial_all_margins_pass AND centered_acquired_real_response>1/16 AND ALL4learned_common_AND_actual_continuing_expected_margins>1/16"
+  },
+  "changed_seams_reviewed": {
+    "hnn/field.rs": "carrier-tag accessors only; Current/Field law unchanged",
+    "hnn/constitution.rs": "carrier field/default and propagation, pristine observer binding, save refusal; initial/normal arithmetic unchanged",
+    "hnn/prediction.rs": "physical_forward has same source opening/Word/end/carry; raw branch preserved; observer branch uses actual six anchors and final availability; observation R-only",
+    "hnn/port.rs": "raw reverse wraps joined seeds at only its receiving ring; full joined return consumed by observer; native exact/chart regressions PASSv66",
+    "hnn/physical.rs": "diagnostic exposes already reached receiving operands; does not alter raw physical source/Word/carry",
+    "notebook/exact_relation": "later pair-role branch is disabled for saved raw baseline; same R-only4+4 partition and margin formula"
+  },
+  "changed_observable": "source-relative carrier z_j=H_j chi v and its full matched transpose/normal samples; all station publication at completed-section opened_at+3, not old raw individual crossing time",
+  "scope": "one spent correlated finite development point, not holdout, independent trials, domain release, contextual-retention or product acceptance",
+  "baseline_replay_requested": false,
+  "extra_teaching_or_pair_updates_requested": false
+}

@@ -1,0 +1,38 @@
+{
+  "grade": "syntax and whitespace only; no compiler, guards, example or scientific runtime launched by source owner",
+  "base": "16a81a4ceadd48904667092777cbb6dd114ca4be",
+  "checked_files": [
+    {
+      "path": "research/notebook/hnn_design/hnn_physical_receive.rs",
+      "bytes": 108028,
+      "sha256": "6c72e96867651480e57e5e0a1e2703e81ad72504a12a3a0cd872ac9114739176",
+      "parser": "rustfmt --edition2024 --emit stdout",
+      "fixed_guard_seconds": 10,
+      "exit_code": 0,
+      "mutated_source": false
+    },
+    {
+      "path": "research/notebook/hnn_design/hnn_prediction.rs",
+      "bytes": 20419,
+      "sha256": "8e99eaf767d4ffc2f59c152cb52ad61bb9b1b44b98ba537f9368b3bf136b7f0e",
+      "parser": "rustfmt --edition2024 --emit stdout",
+      "fixed_guard_seconds": 10,
+      "exit_code": 0,
+      "mutated_source": false
+    }
+  ],
+  "diff_check_exit": 0,
+  "protocol_review": "source-only R; exact4+4; teacher after complete blind publication; probe finish only; same actual continuation and common postteaching carry; unchanged fixed1/16 gate; no baseline replay or tuned gain; current-source view coexists with retained morphodynamic circuit",
+  "source_owner_native_jobs": 0,
+  "new_acquisition_whole_runtime_measured": false,
+  "runtime_admission": "sole queue independent first-development admission pending; fixed caps are not forecasts",
+  "prepared_pin": {
+    "path": "research/runs/source-observer-relation/first-development.pin",
+    "bytes": 916,
+    "sha256": "5d8fbeb7292204bf3fa94919a8f51bbf2a4b603e9bb016b77d2807e185f10e9e",
+    "wall_guard_ms": 60000,
+    "threads": 1,
+    "measured_unit_bound": null,
+    "runtime_admission": "independent sole-queue review pending; cap only, not forecast; no launch by source owner"
+  }
+}
