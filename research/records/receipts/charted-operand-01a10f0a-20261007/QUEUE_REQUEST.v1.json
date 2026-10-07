@@ -1,0 +1,240 @@
+{
+  "atomic_patch": {
+    "bytes": 20326,
+    "path": "/home/b/Workspaces/holonics/.local/wt/hnn-charted-operand-01a10f0a/.local/charted-operand-01a10f0a-20261007/ATOMIC_NATIVE.v1.patch",
+    "sha256": "dd4e2117973b0f8cbcc8dd9f6fa9ec48b80ebe49e9a8574d52ce81463aff3292"
+  },
+  "branch": "codex/hnn-charted-operand-01a10f0a",
+  "cache_preflight": "Verify committed292 inputs and frozen snapshot, four changed/288 unchanged against7ad successor. Ordinary existing guarded workspace/affected11link/actual-main controls only. Accepted unchanged charted/sparse/balance fixtures are not replayed; new cause selector once. Current queue source lease released; no source-owner native process. Keep scientific and metadata-only identities separate.",
+  "candidate_compile_and_gate_commands": [
+    [
+      "bash",
+      "tools/gate.sh"
+    ],
+    [
+      "cargo",
+      "test",
+      "-p",
+      "holonics",
+      "--lib",
+      "--no-run",
+      "--message-format=json"
+    ],
+    [
+      "cargo",
+      "build",
+      "-p",
+      "holonics",
+      "--example",
+      "hnn_prediction",
+      "--message-format=json"
+    ]
+  ],
+  "cause_gate": {
+    "if_fail": "Preserve stdout/stderr, publication refusal/panic and resource/release receipt; source owner diagnoses next loop. No matched cost run, unchanged rerun, guard/cap/tolerance raise or larger budget.",
+    "must_observe": [
+      "same actual matched first blind source [Some(2),Some(2),None,Some(3)] and Held output before observation",
+      "same bounded actual Word return succeeds",
+      "old bounded response consumer still returns exact original64-bit carrier refusal",
+      "print first actual response right side, integral numerators/positive denominator/magnitude bits, source coordinate/locus/absolute tick in original radius-then-signed-tick order",
+      "same producing chart matrices, weights and certificate readings after representation",
+      "changed source-return agrees with producing exact chart values",
+      "same first observation satisfies original1/16 component tolerances and charged applied-R publication; producing Word/local balances close"
+    ],
+    "selector": "hnn::prediction::charted::tests::source_response_re_represents_the_producing_chart"
+  },
+  "changed_native_paths": [
+    "crates/holonics/src/hnn/prediction/charted.rs",
+    "crates/holonics/src/hnn/propagation.rs",
+    "crates/holonics/src/hnn/ring.rs",
+    "research/notebook/hnn_design/hnn_physical_receive.rs"
+  ],
+  "falsifier_projection": {
+    "early_stop": "Selector assertion/refusal ends; capture actual progress/cause and no cost read if not accepted. Queue enforces its fixed ordinary deadline and memory/common lease.",
+    "native_six_phase_projection_ns": 3705453252,
+    "no_foreground_wait_or_rebuild_ladder": true,
+    "no_limit_raise": true,
+    "phase_upper_prior_ns": 617575542,
+    "prior_controller_upper_ns": 290158131,
+    "prior_source": "accepted two-comparison charted receiving law fixture; largest prior applicable native law receipt retained",
+    "proposed_whole_upper_ns": 3995611383,
+    "status": "Queue binds ordinary stage forecast/deadline once from largest prelaunch measurements; source proposes declared finite six-phase forecast, not an execution cap or permission to raise any prior limit.",
+    "thread_budget": 1,
+    "work_phases": [
+      "actual producing blind charted Word",
+      "actual paired return and old refused response",
+      "first-operand diagnostic tracing the same response prefix",
+      "changed source-return representation",
+      "direct same-chart-value response control",
+      "same first observed actual receiving publication"
+    ]
+  },
+  "fixed_read_partition": {
+    "carry_rule": "Actual charted and exact reference carries both continue Absorption::Nothing; matching absolute tick and native carried error box; no reset",
+    "classes": 4,
+    "component_tolerances": {
+      "logits": "1/16",
+      "receiving_covector": "1/16",
+      "source_covector": "1/16"
+    },
+    "length": 4,
+    "material_rule": "Both words read actual contemporary charted Theta at each step. Exact hypothetical successor is discarded. Only charted R publication continues.",
+    "missing_source_output": "Held UncertifiedDomain in both sparse routes; exact completion-domain calculation explicitly excluded in new control",
+    "observed_mask": [
+      false,
+      false,
+      true,
+      false
+    ],
+    "period": 4,
+    "probe_count": 4,
+    "receiving_grain": 16,
+    "seed_pair": [
+      20261006001,
+      20261006011
+    ],
+    "source_offsets": [
+      1,
+      2,
+      3
+    ],
+    "source_rule": "KnownTruth complete class translation orbit, same as coverage; spent correlated development",
+    "target_station": 2,
+    "teaching_count": 4,
+    "teaching_loci": [
+      "Receiving",
+      "Receiving",
+      "Receiving",
+      "Receiving"
+    ],
+    "terrain": "order2"
+  },
+  "guard_first_command": [
+    "cargo",
+    "clippy",
+    "-p",
+    "holonics",
+    "--all-targets",
+    "--",
+    "-D",
+    "clippy::disallowed_types",
+    "-D",
+    "clippy::disallowed_methods",
+    "-D",
+    "clippy::float_arithmetic"
+  ],
+  "hypothesis": "The deliberately unsplit source-response columns outgrow the i64 input carrier of ChartWords. Existing Operands::unsplit and ResonatorOperands::unsplit re-represent the SAME producing Xhat, weights and certificates with exact integer Rows. Consumer joins these values once; actual hardware Word and adjoint, dot certificate, chart refinement, decoder, tolerance and applied-R check remain. The actual v34 invocation/vector was not logged, so unique cause remains unvalidated until selector.",
+  "matched_observables": [
+    "complete exact/sparse same forward/opening/carry/ratio/Receiving return/deposit fixture passes",
+    "whole exact-sparse/charted blind cells published before target; no probe observation or deposition",
+    "same complete chart/material/frame, actual absolute ticks/resonator phases/conductances, full receiving/matrix shapes",
+    "actual coordinate carry/logit/Receiving-covector differences enclosed by native producing bounds",
+    "actual R change and charged applied comparison; E/pair/nonlinear publication unsupported; missing stations Held",
+    "separate exact sparse forward vs charted forward plus error cost, signed saved time, cold vs warm charts, boundary and comparison categories",
+    "all actual physical balances close; no refusal continuation or tolerance tuning",
+    "full immutable source/provider/executable/pin/time/CPU/memory/projection/cleanup/release receipts",
+    "producing ChartReading start/steps/certificate/target; previous retained key/shapes and actual route/certificate/final-target counts; successful comparison tolerance dimension checks",
+    "separate setup/selection/refinement/error-transport wall costs are explicitly unmeasured; charted total includes those costs and receipt allocation; signed cold/warm totals remain honest",
+    "existing real retained Charts only; no favorable warm reset/path, memoization subsystem, uncharged route receipt or universal per-operation speedup claim"
+  ],
+  "native_receipts_destination": "/home/b/Workspaces/holonics/.local/wt/hnn-charted-operand-01a10f0a/research/records/receipts/charted-operand-01a10f0a-20261007/native-validation-v1",
+  "native_test_selectors": [
+    "hnn::prediction::charted::tests::source_response_re_represents_the_producing_chart"
+  ],
+  "no_new_benchmark_before_cause_understood": true,
+  "no_source_owner_execution": true,
+  "not_acceptance": [
+    "unique old refused invocation before cause selector",
+    "native acceptance before queue receipts",
+    "full4+4 scientific acceptance before completion",
+    "reconstruction, useful communication, learned transfer or product output",
+    "GPU, nonlinear or E/pair publication",
+    "universal per-operation speedup or an amortized total before matched measurements"
+  ],
+  "ownership_evidence": [
+    "94691a4f81924b7b98613bc917215bef",
+    "734110c5679d49a0aaf0ee2536ec3f43",
+    "bf533e9eac3f45778988b0160a9ea155",
+    "77f72418ab3a4fbbbe32df58eeb448cc",
+    "e0a2dffaea704e05a91952e1e300a0b0"
+  ],
+  "predecessor": {
+    "all_balances_close": true,
+    "charged_source_residual": "0",
+    "charted_cold_forward_ns": 163874057,
+    "exact_cold_forward_ns": 49951977,
+    "grade": "balance gate accepted; first cold scientific comparison INCOMPLETE_FIRST_OBSERVED_COMPARISON_CARRIER_REFUSAL; no warm/probe/publication",
+    "no_speedup_inferred": true,
+    "packet": {
+      "bytes": 252681,
+      "path": "/home/b/Workspaces/holonics/.local/wt/hnn-charted-operand-01a10f0a/research/records/receipts/charted-operand-01a10f0a-20261007/predecessor/VALIDATION.v34.json",
+      "sha256": "af964297e97f1ec697be3f219690a8f7608f401c794b57357199236663f0ea5a"
+    },
+    "signed_saved_forward_ns": -113922080,
+    "source_split": "104844857/2199023255552",
+    "specific_operand_logged": false
+  },
+  "producer_consumer_equation": "Xhat_rows=Xhat_words=Q*2^(-L); paired response uses same producing Xhat/weights/absolute phase; source_error=abs(actual_return-paired_unsplit_response)+operator_error*abs(g)+(abs(unsplit_response)+operator_error)*error(g)",
+  "projection": {
+    "early_stop": "Any forward/comparison refusal or first whole unit beyond original guard ends before another unit. Preserve measured route/error/cost output as incomplete; no relaunch with raised limit.",
+    "native_deadline_ms": 10682,
+    "status": "Conditionally run changed existing4+4 matched read only after cause selector accepted. Original whole projection10972158131ns, native deadline10682ms, whole-unit guard1277ms, seeds, counts and tolerances unchanged. Queue binds fresh producing source/provider/executable/Pin/lease without expanding caps.",
+    "unit_guard_ms": 1277,
+    "whole_projection_ns": 10972158131
+  },
+  "remaining_blockers": [
+    "ordinary sole-queue native source guards/type/link/main",
+    "one actual-operand cause falsifier at unchanged carrier/tolerance",
+    "only if gate passes: changed existing matched read under original fixed control, or honest next refusal"
+  ],
+  "runtime_argv_template": [
+    "<queue source-matched notebook actual main>",
+    "executed",
+    "physical-learn",
+    "charted-compare",
+    "4",
+    "4",
+    "<queue owned output>",
+    "<queue measured committed pin>",
+    "order2=20261006001:20261006011"
+  ],
+  "runtime_policy": {
+    "aggregate_cpu_limit_us": 17000000,
+    "group_memory_max_bytes": 4294967296,
+    "no_limit_raise": true,
+    "pin_lease_projection_owned_by_queue": true,
+    "prelaunch_available_bytes": 8589934592,
+    "running_floor_bytes": 4294967296,
+    "threads": 1,
+    "wall_ceiling_ns": 60000000000
+  },
+  "scientific_predecessor": "7adf4d3bb4b6e3bfd06155f5758df11b55294beb",
+  "source_base": "0adc89f316528d634b1861b599b2f6286d8a1cee",
+  "source_commit": "bc32c60f34a5a602074da2dca49fd9cd2e337886",
+  "source_input_count": 292,
+  "source_input_manifest": {
+    "bytes": 48221,
+    "path": "/home/b/Workspaces/holonics/.local/wt/hnn-charted-operand-01a10f0a/.local/charted-operand-01a10f0a-20261007/SOURCE_INPUT_MANIFEST.v1.json",
+    "sha256": "0a4fe7bd1d3ef07bf988879a824a76337628d1d80866005647cf883122ae83b2"
+  },
+  "source_owner": "physical/charted worker01a10f0a; coordinator01a1030c owns broader communication/integration",
+  "source_owner_validation": [
+    "actual v34 packet and refused source graph read",
+    "existing producing chart-value/adjoint owners and exact conversion inspected",
+    "all45 worktrees checked; only old other ring hunks dirty, no unsplit overlap",
+    "git diff --check passed",
+    "all292 native inputs source-matched; four changed/288 same; source snapshot sealed"
+  ],
+  "source_snapshot_cwd": "/home/b/Workspaces/holonics/.local/wt/hnn-charted-operand-01a10f0a/.local/charted-operand-01a10f0a-20261007/source-v1",
+  "status": "SOURCE_READY; cause falsifier before any changed matched cost read; pending sole queue",
+  "test_runtime_argv_template": [
+    "<queue source-matched lib test executable>",
+    "hnn::prediction::charted::tests::source_response_re_represents_the_producing_chart",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "unchanged_native_inputs": 288,
+  "version": 1,
+  "worktree": "/home/b/Workspaces/holonics/.local/wt/hnn-charted-operand-01a10f0a"
+}
