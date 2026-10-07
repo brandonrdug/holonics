@@ -1,0 +1,22 @@
+{
+  "grade": "PREDICTION_FROM_SAVED_v80_OPERANDS_NOT_SUCCESSOR_RUNTIME",
+  "factor_coordinates": 36,
+  "factor_residue_payload_bits": 25784,
+  "normalization_residue_payload_bits": 520,
+  "total_residue_payload_bits": 26304,
+  "retained_cost": "existing actual Rat numerator/denominator bits enter CarrierBits::remainders and B_Theta; index/allocator/limb overhead is actual group RSS, not inferred from payload",
+  "scratch_cost": "actual Word/source moment, adjoint/certificate operands, candidate Constitution and unresolved receipt copies; captured by unchanged whole-group memory/CPU guard",
+  "decoder": "existing exact rational carry representation and coarse div_rem; no new format, cached source, generated table or precision decoder",
+  "first_successor_cost_unmeasured": true,
+  "denominator_growth": "exact common aggregates can grow and cancel; no O(L+log m) claim; over-budget candidate typed-refuses before publication",
+  "physical_word_realization": "only coarse lattice F/C/K/D enter native operators; exact unresolved Rat does not turn a physical forward into off-lattice arithmetic",
+  "native_execution_owner": "01a10352-66ea-73c8-b716-a835a9a04033",
+  "old_largest_native_word_wall_ns": 734352527,
+  "old_largest_native_word_CPU_ns": 682641000,
+  "new_physical_control_words": 3,
+  "old_word_cost_baseline_wall_projection_ns": 2203057581,
+  "old_word_cost_baseline_CPU_projection_ns": 2047923000,
+  "new_exact_carry_and_budget_control_costs_not_yet_measured": true,
+  "complete_launch_projection": "sole queue must seal cache and complete projection under existing16s native stage guard/17CPU s/60wall s/4GiB group; no extrapolation promoted to measured source speed; stop incomplete at fixed limit, no raised deadline",
+  "new_native_owner_launches": 0
+}

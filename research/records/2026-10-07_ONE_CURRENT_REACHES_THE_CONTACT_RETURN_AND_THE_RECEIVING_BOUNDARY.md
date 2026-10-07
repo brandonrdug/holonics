@@ -354,3 +354,79 @@ has an explicit final integer recovery identity and precision condition. The tra
 lesson is to charge actual representation, restoration and precision at the consuming
 receiver. That multiplication recovery does not certify an HNN future kernel, physical
 learning, or useful compression; no reference code was executed.
+
+## Exact unresolved contact material and its existing physical consumer
+
+[implementation; agent-inferred; native pending] Preserve the unresolved C/K/D directions and
+their normalization in the same Constitution. The missing all-future sensitivity is a reason
+to retain them, not an assumption permitting their release. At each physical factor or its
+normalization carrier, replace the fine/coarse pair of splits with the existing exact coarse
+division, whose general equations are already in `HNN/LatticeDeposit.div_rem_spec` and
+`rem_bounds`:
+
+`y=delta+r_old`, `q=floor(y/u+1/2)`, `r_new=y-q*u`,
+
+`value_new=value_old+q*u`, `-u/2<=r_new<u/2`,
+
+`value_new+r_new=value_old+r_old+delta`.
+
+The exact aggregate is one current coordinate. It contains neither occurrences nor a producing
+Word/source transcript. The common Carry branch applies to every `Carrier::Factor(0..2)` and
+`FactorScale(0..2)` deposition path, including ordinary reference deposition, rather than
+special-casing a fixture or the physical wrapper. A zero update keeps the remainder untouched.
+A later admitted update adds to it; a lossless rebase carries it into the new coarse cell. The
+normalization `h` has its own remainder under the same law, so no discarded normalization tail
+silently changes the later factor direction. The rate remains the existing `eta/h_after` at
+the actual carried statistic, not a substituted rate through hypothetical exact operands.
+
+`DepositReading::unresolved_contact_material` reads those contemporary successor coordinates
+after the existing budget/storage checks. The held contact continuation then publishes that
+same Constitution together with the actual current and carry. The unchanged native consumer
+still evaluates the physical factor `F`, its `FF^T` storage, the full finite `dC`, and held
+momentum/work. An unresolved direction is not counted as a physical storage or work move; the
+receipt names it explicitly. Other normal-map, chart and ring carriers retain their existing
+approximation law and its stated future-sensitivity debts. This bounded change does not claim
+to repair those other families or recover residues lost in older commits.
+
+[cost contract] An exact rational remainder can accumulate denominator cost. The old
+`O(L+log m)` theorem applies to the gamma-grid carriers, not these exact physical coordinates.
+Their actual numerator and denominator bits already enter `CarrierBits::remainders` and
+`B_Theta`; an over-budget successor is refused before publication, preserving the predecessor.
+No larger budget or runtime limit is introduced. Exact reduction/cancellation uses the existing
+Ratio arithmetic and the coarse division's remainder decoder. The existing continuing-state
+format can represent rational carries; no format, decoder or compatibility branch is added.
+Physical cold restore remains an unaccepted contract, not a consequence of that representation.
+
+The preserved v80 operands predict factor-residue payload
+`25784 bits=2^3*11*293 bits` and normalization-residue payload
+`520 bits=2^3*5*13 bits`, totaling `26304 bits=2^6*3*137 bits`. This is an arithmetic payload
+calculation at the predecessor's operands, not a successor memory measurement: the exact
+normalization may alter the actual carried `h` and rate. It excludes tree/node allocations,
+integer limb capacity, indices, length headers and allocator overhead. The live Word, source
+moment, pullback/certificate matrices, candidate Constitution and the transient unresolved
+receipt's copies are scratch and must be charged by the queue's whole-group CPU/peak-memory
+receipt. The parent pin and fresh source/cache seals must match; source precision cannot be
+treated as free merely because only 36 roles were counted. This is the same representation-cost
+lesson recovered from the pinned multiplication reference, without adopting its machine or
+claiming multiplication is learning.
+
+[focused controls prepared, not run] Three fixed controls are sealed before queue execution:
+
+- exact opposite/later contributions and normalization accumulation across all six contact
+  carriers, with zero arithmetic release and lossless rebase;
+- a synthetic contact-deposition successor exceeding the existing budget, refused atomically
+  with the predecessor unchanged;
+- the unchanged first native observation, then ordinary communication with source `[1,0]`,
+  then a different declared comparison `[1,0,2]`, consuming the same unresolved material.
+  Its actual return checks `delta+r_old=dF+r_new`, the normalization identity, the finite
+  physical storage/work account, ordinary-carry preservation and the explicit unresolved
+  receipt. It does not assert immediate storage movement or useful output.
+
+These are bounded law controls. A full interaction is the unit; its 36 coordinates are not 36
+independent scientific observations. The fixed seed/source/target are already spent fixtures,
+not an untouched holdout or a new training curriculum. The original physical/storage/output
+gate and all of its assertions remain unchanged and failed; it is not replayed in this request.
+Full nonlinear comparison decrease and future material sensitivity remain open, but no such
+proof is needed to preserve the actual unresolved coordinates. Source syntax and whitespace
+checks are the only owner execution. The sole queue owns all fresh type/guard/native checks,
+fixed projection, cache matching and unchanged resource limits.

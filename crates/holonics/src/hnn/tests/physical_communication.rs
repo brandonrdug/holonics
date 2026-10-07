@@ -146,6 +146,51 @@ fn the_fixed_v79_contact_observation_accounts_for_its_actual_material_and_remain
 }
 
 #[test]
+fn the_actual_unresolved_contact_return_survives_a_different_physical_passage() {
+    use crate::hnn::constitution::{Carrier, Locus};
+    use crate::hnn::physical::contact::ContactObservation;
+    let field=field();
+    let initial=contact_material(&field);
+    let mut actual=PhysicalReceiver::new(&field,initial.clone(),Current::at_rest(&field),WordOpening::Rest).unwrap();
+    let taught=actual.communicate_contact(&encoded(&field,&[0,1]),&receiver(), |_| {
+        Some(ContactObservation { observed:encoded(&field,&[0,1,3]),compared:vec![false,false,true] })
+    }).unwrap();
+    assert!(taught.closes());
+    let publication=taught.comparison.as_ref().unwrap().as_ref().unwrap();
+    contact_causal_receipt(&initial,actual.constitution(),publication);
+    let learned=actual.constitution().clone();
+    let pending:Vec<_>=learned.carried_remainders().into_iter().filter(|(l,c,_,_)|
+        *l==Locus::Channel(0) && matches!(c,Carrier::Factor(_) | Carrier::FactorScale(_))).collect();
+    assert_eq!(pending,publication.publication.unresolved_contact_material);
+    assert_eq!(pending.iter().filter(|(_,c,_,_)| *c==Carrier::Factor(0)).count(),
+        initial.contact_storage(0).entries().len());
+    assert!(publication.publication.released.iter().all(|(_,c,_,_)|
+        !matches!(c,Carrier::Factor(_) | Carrier::FactorScale(_))));
+    assert_eq!(learned.contact_storage(0),initial.contact_storage(0),
+        "exact unresolved direction is not an immediate physical storage move");
+    assert!(learned.exact_bits() <= learned.budget());
+    let ordinary=actual.communicate(&encoded(&field,&[1,0]),&receiver(), |_| None).unwrap();
+    assert!(ordinary.closes());
+    assert_eq!(actual.constitution(),&learned);
+    let prior=actual.constitution().clone();
+    let next=actual.communicate_contact(&encoded(&field,&[1,0]),&receiver(), |_| {
+        Some(ContactObservation { observed:encoded(&field,&[1,0,2]),compared:vec![false,false,true] })
+    }).unwrap();
+    assert!(next.closes());
+    let publication=next.comparison.as_ref().unwrap().as_ref().unwrap();
+    contact_causal_receipt(&prior,actual.constitution(),publication);
+    assert!(publication.publication.released.iter().all(|(_,c,_,_)|
+        !matches!(c,Carrier::Factor(_) | Carrier::FactorScale(_))));
+    println!("whole ordinary boundary carrying unresolved contact material: {:?}",ordinary.boundary);
+    println!("whole next blind boundary with a different source: {:?}",next.boundary);
+    println!("exact successor unresolved contact material: {:?}",publication.publication.unresolved_contact_material);
+    println!("actual successor carrier costs: {:?}",actual.constitution().carrier_bits());
+    // The second declared comparison consumes its own source and the same retained material;
+    // contact_causal_receipt proves delta+r_old=dF+r_new exactly, including its normalization.
+    // No changed grain/step, repeated teacher, storage-gain or useful-output assertion.
+}
+
+#[test]
 fn complete_contact_return_publishes_held_point_before_existing_communication() {
     use crate::hnn::physical::contact::ContactObservation;
     let field = field();

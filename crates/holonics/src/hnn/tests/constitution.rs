@@ -1250,7 +1250,13 @@ fn flat(entries: &[Rat], n: usize) -> ExactRatMatrix {
 fn a_carried_remainder_takes_its_lattice_and_clock_bits() {
     for (_, _, theta, _) in chain_run() {
         let mut bound = 0u64;
-        for (locus, _, _, r) in theta.carried_remainders() {
+        for (locus, carrier, _, r) in theta.carried_remainders() {
+            if matches!(carrier, Carrier::Factor(_) | Carrier::FactorScale(_)) {
+                // These physical coordinates now retain exact unresolved material. Their
+                // rational bits are charged directly, not bounded by the old gamma-grid theorem.
+                bound += r.numer().bits() + r.denom().bits();
+                continue;
+            }
             let lattice = theta.lattice(locus).unwrap();
             let k = gamma_length(theta.clock(locus));
             let scaled = &r * Rat::from_integer(BigInt::one() << (lattice.exponent() + k) as usize);
@@ -1261,7 +1267,63 @@ fn a_carried_remainder_takes_its_lattice_and_clock_bits() {
             bound += u64::from(lattice.exponent() + 2 * k + 1);
         }
         assert!(theta.carrier_bits().remainders <= bound);
+        assert!(theta.exact_bits() <= theta.budget());
     }
+}
+
+/// Actual C/K/D material and normalization share exact coarse accumulation. A later opposite
+/// contribution cancels the same contemporary remainder; no finite future or tolerance kernel
+/// is assumed, and the other carriers retain their separately declared gamma law.
+#[test]
+fn unresolved_contact_direction_and_normalization_accumulate_without_release() {
+    use crate::hnn::constitution::Carry;
+    let lattice = Lattice::new(15);
+    let tiny = Rat::new(BigInt::one(), BigInt::from(3) << 31usize);
+    for carrier in [Carrier::Factor(0), Carrier::Factor(1), Carrier::Factor(2),
+        Carrier::FactorScale(0), Carrier::FactorScale(1), Carrier::FactorScale(2)] {
+        let mut carry = Carry::default();
+        let mut value = vec![Rat::zero(); 2];
+        let mut exact = vec![Rat::zero(); 2];
+        for (m,update) in [vec![tiny.clone(), -&tiny],
+            vec![&tiny / integer(7), &tiny / integer(11)],
+            vec![-&tiny, tiny.clone()]].into_iter().enumerate() {
+            let mut at = BudgetedCarry::new(lattice,m as u64+1);
+            carry.deposit_all(&mut at,carrier,&mut value,&update);
+            assert!(at.released().is_empty());
+            for i in 0..2 {
+                exact[i] += &update[i];
+                assert_eq!(&value[i] + carry.at(i),exact[i]);
+                let r=carry.at(i);
+                assert!(-lattice.unit()/integer(2) <= r && r < lattice.unit()/integer(2));
+            }
+        }
+        assert!(value.iter().all(Rat::is_zero));
+        assert_eq!(carry.at(0),&tiny / integer(7));
+        assert_eq!(carry.at(1),&tiny / integer(11));
+        let mut at=BudgetedCarry::new(lattice,4);
+        at.rebase(2,&mut [(&mut carry,&mut value)]).unwrap();
+        for i in 0..2 { assert_eq!(&value[i] + carry.at(i),exact[i]); }
+        assert!(at.released().is_empty());
+    }
+}
+
+/// An exact unresolved contact coordinate cannot evade the existing constitution budget.
+/// This is a synthetic deposition-law control, not an observed physical teaching or a curriculum.
+#[test]
+fn unresolved_contact_material_is_refused_atomically_at_the_existing_budget() {
+    let field=chain();
+    let budget=Constitution::initial(&field,OPEN_BUDGET).unwrap().exact_bits()+1;
+    let theta=Constitution::initial(&field,budget).unwrap();
+    let before=theta.clone();
+    let tiny=Rat::new(BigInt::one(),BigInt::from(3)<<31usize);
+    let gradient=theta.contact_storage(0).scaled(&tiny);
+    let deposit=Deposit::new(theta.commit(),vec![],vec![FactorStep {
+        gradient:FactorGradient::Storage { contact:0,gradient },
+        energy:Rat::zero(),covector:Rat::one(),
+    }],vec![]).with_reach(chain_reach());
+    assert!(matches!(theta.deposited(&deposit),Err(HnnError::ConstitutionBudget { .. })));
+    assert_eq!(theta,before);
+    assert!(theta.carried_remainders().is_empty());
 }
 
 /// Lean `HNN/LatticeDeposit.{carry_zero, carry_entry_zero}`: a deposit whose updates are all zero

@@ -1,0 +1,114 @@
+{
+  "UTC": "2026-10-07T22:26:36.187282+00:00",
+  "predecessor": "7ab7ea4ef5125d29da19400483e5cea7a48ca8c3",
+  "grade": "SOURCE_PREPARED_NOT_TYPE_OR_NATIVE_ACCEPTED",
+  "owned_paths": [
+    "crates/holonics/src/hnn/constitution.rs",
+    "crates/holonics/src/hnn/tests/constitution.rs",
+    "crates/holonics/src/hnn/tests/physical_communication.rs",
+    "docs/atlas/objects.tsv",
+    "research/records/2026-10-07_ONE_CURRENT_REACHES_THE_CONTACT_RETURN_AND_THE_RECEIVING_BOUNDARY.md",
+    "research/records/receipts/hnn-resident-conformance-20261007/unresolved-contact-v6/REPRESENTATION_COST_AND_PROJECTION.v6.json"
+  ],
+  "path_pins": {
+    "crates/holonics/src/hnn/constitution.rs": {
+      "bytes": 440163,
+      "sha256": "473c8fa5dc92a7ee08b45ab34d85402cc7307c40be4fb4012d82a8ab90e43d91"
+    },
+    "crates/holonics/src/hnn/tests/constitution.rs": {
+      "bytes": 104311,
+      "sha256": "9480d909af20366cf13faf91bcdc86b840e377b182452131fdce9b3eaaa1d49e"
+    },
+    "crates/holonics/src/hnn/tests/physical_communication.rs": {
+      "bytes": 36200,
+      "sha256": "3370d28b12a93fab0012d296289bb7d3bdbd361bc499c88a3d128d871a522fcc"
+    },
+    "docs/atlas/objects.tsv": {
+      "bytes": 941051,
+      "sha256": "80cdafaa08a0d7721e3b4b50d2a68d9dfc16f64a9da3bcaaa7ca89b541d11b49"
+    },
+    "research/records/2026-10-07_ONE_CURRENT_REACHES_THE_CONTACT_RETURN_AND_THE_RECEIVING_BOUNDARY.md": {
+      "bytes": 31893,
+      "sha256": "92bf387ef4add2a654cc14e00aa9825171ffe9ccc7989d8127624bcb3b0cb2ea"
+    },
+    "research/records/receipts/hnn-resident-conformance-20261007/unresolved-contact-v6/REPRESENTATION_COST_AND_PROJECTION.v6.json": {
+      "bytes": 1778,
+      "sha256": "7972c4322ba03756cad6c85bd3b537becafa13cef4604875c0a02d95aa624d6f"
+    }
+  },
+  "syntax_and_whitespace": [
+    {
+      "argv": [
+        "rustfmt",
+        "--edition",
+        "2024",
+        "--config",
+        "skip_children=true",
+        "--emit",
+        "stdout",
+        "crates/holonics/src/hnn/constitution.rs"
+      ],
+      "exit_code": 0,
+      "compiler_or_test": false
+    },
+    {
+      "argv": [
+        "rustfmt",
+        "--edition",
+        "2024",
+        "--config",
+        "skip_children=true",
+        "--emit",
+        "stdout",
+        "crates/holonics/src/hnn/tests/constitution.rs"
+      ],
+      "exit_code": 0,
+      "compiler_or_test": false
+    },
+    {
+      "argv": [
+        "rustfmt",
+        "--edition",
+        "2024",
+        "--config",
+        "skip_children=true",
+        "--emit",
+        "stdout",
+        "crates/holonics/src/hnn/tests/physical_communication.rs"
+      ],
+      "exit_code": 0,
+      "compiler_or_test": false
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "original_acceptance_selectors_and_function_bodies_unchanged": [
+    "hnn::tests::physical_communication::complete_contact_return_publishes_held_point_before_existing_communication",
+    "hnn::tests::physical_communication::a_shared_execution_clock_reanchors_the_next_section_without_resetting_its_carry",
+    "hnn::tests::physical_charted::a_shared_charted_enclosure_survives_view_changes_and_bars_unsupported_futures",
+    "hnn::tests::physical_communication::communication_deposits_after_the_whole_boundary_and_reuses_material_source_and_carry",
+    "hnn::tests::physical_charted::charted_loaded_pump_error_keeps_the_absolute_clock_across_the_carry",
+    "hnn::tests::propagation::a_stored_transit_is_the_reference_holons_midpoint_advance",
+    "hnn::tests::word::a_carried_change_crosses_the_next_openings_references"
+  ],
+  "fixed_new_selectors": [
+    "hnn::tests::constitution::unresolved_contact_direction_and_normalization_accumulate_without_release",
+    "hnn::tests::constitution::unresolved_contact_material_is_refused_atomically_at_the_existing_budget",
+    "hnn::tests::physical_communication::the_actual_unresolved_contact_return_survives_a_different_physical_passage"
+  ],
+  "changed_law": "exact coarse remainder for physical Factor and FactorScale carriers on every common Carry path; explicit contemporary unresolved receipt; unchanged certified step, material unit and physical continuation",
+  "no_failed_selector_replay": true,
+  "no_other_carrier_or_lobe_step_change": true,
+  "new_Lean_or_CUDA_kernel_changes": false,
+  "source_owner_compilers_native_tests_training_device_jobs": 0,
+  "Claude_bridge": "not used; direct identity repair remains external owner",
+  "no_private_message_publication": true,
+  "queue_must_seal_projection_cache_before_launch": true,
+  "all_local_record_links_verified": 11
+}

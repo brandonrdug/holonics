@@ -408,6 +408,23 @@
 //! coefficient-to-receiver norm, unit and admitted-future join remains owed in #62.
 //! Brandon may override this choice.
 //!
+//! [definition; agent-inferred, October 7] **Unresolved physical material is retained exactly.**
+//! C/K/D factor carriers and their three normalization carriers instead use one coarse split:
+//! `delta + r_old = q u + r_new`, `value_new = value_old + q u`, `r_new in [-u/2,u/2)`.
+//! The same constitution owns value, normalization and unresolved direction; its common Resident
+//! owns the physical current receiving their eventual finite reaction. There is no fine release
+//! at these carriers: the next
+//! admitted deposition and a lossless rebase consume this one contemporary rational aggregate,
+//! never an update list or a retained Word. Its actual numerator/denominator bits enter B_Theta,
+//! and an over-budget successor is refused before publication. No logarithmic gamma bit bound,
+//! all-future extinction, full nonlinear score decrease or immediate storage move is asserted.
+//! The existing contact consumer retains its paired source/clock/chart and finite held-momentum
+//! work account; [`DepositReading::unresolved_contact_material`] names its unresolved successor.
+//! This repairs future contact accumulation, not residuals already released by older commits.
+//! Other carrier families keep the separately declared gamma approximation and its open future
+//! sensitivity obligations. These coarse identities consume `HNN/LatticeDeposit.{div_rem_spec,
+//! rem_bounds}` directly. No step, material unit, observed target or acceptance changes.
+//!
 //! A [`NormalLaw`] keeps `W` and its Gram `H` of the locus's own width (no global Gram), each
 //! carried, and the **solved chart** `X̂ ≈ H⁻¹` of the carried Gram (the lattice word, Lean
 //! `HNN/LatticeWord`; [`SolvedChart`]): a lattice matrix on `2^(−L_s)ℤ` with its certified left
@@ -437,7 +454,8 @@
 //! [`Constitution::deposited_within`], the lock's half-turn, the re-base and the executed source
 //! move alike). Past `B_Θ` the deposit is refused with [`HnnError::ConstitutionBudget`], naming the loci that grew most; the predecessor
 //! stays published. The lattice bounds the entries' bits (`lattice_bits_bounded`) and the clock the
-//! remainders' (`remainder_rat_bits_bounded`); [`Constitution::carrier_bits`] reads the three parts
+//! bounded carriers' remainders (`remainder_rat_bits_bounded`); exact unresolved contact material
+//! instead pays its actual rational bits. [`Constitution::carrier_bits`] reads the three parts
 //! separately, and [`DepositReading`] the released residuals and their bits, with each chart's
 //! certificate and released prox residual ([`ChartReading`]). The deposit clocks,
 //! like the commit counter, are counters of `⌈log₂ m⌉` bits and are not counted against `B_Θ`.
@@ -468,9 +486,9 @@
 //! | `HNN/Normal.{founding_off_node, chain_founding, channel_fixed_node}` | the founding ([`Constitution::initial`]; `Constitution::{fixed_nodes, standing_contrasts}` the tests' readings) |
 //! | `HNN/LatticeDeposit.{quot, rem, div_rem_spec, rem_bounds, quot_eq_zero_of_bounds, fine}` | [`Lattice::div_rem`] (the carry's fine split), [`Lattice::div_rem_coordinate`] (its coarse split) |
 //! | `HNN/LatticeDeposit.{gammaLength, gamma_kraft_lt_one}` | [`gamma_length`] |
-//! | `HNN/LatticeDeposit.{carry, release, carry_accounting, lattice_deposit_accounting, carry_zero, carry_entry_zero, carry_entry_below_grain}` | [`BudgetedCarry`], the carried deposit of every entry |
+//! | `HNN/LatticeDeposit.{carry, release, carry_accounting, lattice_deposit_accounting, carry_zero, carry_entry_zero, carry_entry_below_grain}` | [`BudgetedCarry`], the separately bounded carriers; physical factors and normalization consume `div_rem_spec`/`rem_bounds` directly |
 //! | `HNN/LatticeDeposit/Rebase.{Carried.rebase, rebase_value_add_rem, rebase_onLattice, history_accounting, history_release_lt, history_within_founding_unit}` | `BudgetedCarry::rebase` (crate-internal), the re-base onto a finer lattice; [`Constitution::rebased`] at a contact's channel, which the declared schedule never calls |
-//! | `HNN/LatticeDeposit.{carried_remainder_bounded, remainder_numerator_bounded, remainder_rat_bits_bounded}` | [`Constitution::carried_remainders`], [`CarrierBits::remainders`] |
+//! | `HNN/LatticeDeposit.{rem_bounds, carried_remainder_bounded, remainder_numerator_bounded, remainder_rat_bits_bounded}` | [`Constitution::carried_remainders`], [`CarrierBits::remainders`]; gamma bit bounds exclude exact contact factor/normalization remainders |
 //! | `HNN/LatticeDeposit.{release_bounded, release_bounded_since_founding, within_one_unit_since_founding, remainder_below_grain}` | [`DepositReading::released`] |
 //! | `HNN/LatticeDeposit.{carried_gram_posDef, carried_gram_posDef_rule}` | [`NormalLaw::gram`] (the carried Gram) |
 //! | `HNN/LatticeDeposit.{lattice_bits_bounded, lattice_rat_bits_bounded}` | [`Constitution::carrier_bits`] |
@@ -618,7 +636,8 @@ pub fn gamma_length(clock: u64) -> u32 {
 /// [definition; agent-inferred] **One deposit's budgeted carry at one locus** (Lean
 /// `HNN/LatticeDeposit.{step, carry, release}`; the module header states the law): the locus's
 /// lattice `2^(−L)ℤ`, the clock `m` the deposit advances it to (its precision `k_m` names the fine
-/// lattice `2^(−L−k_m)ℤ`), and what the deposit does there, staged by carrier and entry until it
+/// lattice `2^(−L−k_m)ℤ` for bounded carriers; physical factor/normalization carriers keep the
+/// whole exact coarse remainder), and what the deposit does there, staged by carrier and entry until it
 /// publishes: each entry's released residual `e` (exact) and its applied coordinate `q`, and whether
 /// any update at the locus was nonzero (only then does the clock advance).
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -684,7 +703,8 @@ impl BudgetedCarry {
     }
 
     /// **The released residuals** `e ≠ 0`, exact, by carrier and entry (Lean `release`): each at most
-    /// `½·2^(−L−k_m)` (`release_bounded`).
+    /// `½·2^(−L−k_m)` (`release_bounded`) at bounded carriers. Physical contact factors and their
+    /// normalization retain the exact coarse remainder and release nothing here.
     pub fn released(&self) -> Vec<(Carrier, usize, Rat)> {
         self.staged
             .iter()
@@ -778,13 +798,17 @@ impl BudgetedCarry {
 
 /// [definition] **The carried remainders of one lattice-valued array** (Lean `Carried.rem`), by
 /// flat entry index; a zero remainder is not stored, so two carriers with one content compare equal.
+/// Physical contact factors/normalization keep an arbitrary exact rational in the coarse cell;
+/// other carriers keep the separately declared gamma-grid remainder.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub(crate) struct Carry(BTreeMap<usize, Rat>);
 
 impl Carry {
     /// **One entry's budgeted deposit** (Lean `carry`, `carry_accounting`): `y = Δ + r_prev` split at
     /// the fine lattice `2^(−L−k_m)ℤ` into `y_f + e` and `y_f` at the lattice into `q·2^(−L) + r`; the
-    /// entry moves by `q·2^(−L)`, `r` is carried and `e` is staged for release. A zero update moves
+    /// entry moves by `q·2^(−L)`, `r` is carried and `e` is staged for release. Contact factors and
+    /// normalization instead divide y directly at the coarse unit and retain its exact remainder.
+    /// A zero update moves
     /// nothing and releases nothing (`carry_entry_zero`). A residual staged by an earlier step of the
     /// same deposit at this entry is taken back into `y`, so the deposit releases once per entry.
     fn deposit(
@@ -801,7 +825,7 @@ impl Carry {
         at.moved = true;
         let staged = at.staged.remove(&(carrier, index));
         let previous = self.0.remove(&index);
-        let carried = carried_entry(&at.lattice, at.precision(), entry, update, staged, previous);
+        let carried = carried_entry(&at.lattice, at.precision(), carrier, entry, update, staged, previous);
         self.adopt(at, carrier, index, entry, carried)
     }
 
@@ -843,6 +867,7 @@ impl Carry {
                     carried_entry(
                         &lattice,
                         precision,
+                        carrier,
                         &current[index],
                         &updates[index],
                         staged,
@@ -900,7 +925,9 @@ struct CarriedEntry {
 /// residual and coordinate an earlier step of the same deposit staged there, and the remainder the
 /// entry carries.
 ///
-/// [proved-derived] The two splits compose into one floor. With `y = Δ + r_prev` and `k = k_m ≥ 1`,
+/// Contact factors and normalization use one exact coarse division instead, with no fine release.
+/// For other carriers, [proved-derived] the two splits compose into one floor.
+/// With `y = Δ + r_prev` and `k = k_m ≥ 1`,
 /// the applied coordinate is `q = ⌊y·2^L + 1/2 + 2^(−k−1)⌋` (Lean
 /// `HNN/LatticeDeposit.{quot_fine_eq_floor, step_coordinate_eq_floor}`). So `q` moves only where
 /// `y` crosses `(z − 1/2)·2^(−L) − 2^(−L−k−1)`, half a fine unit below the boundary of one rounding
@@ -908,6 +935,7 @@ struct CarriedEntry {
 fn carried_entry(
     lattice: &Lattice,
     precision: u32,
+    carrier: Carrier,
     entry: &Rat,
     update: &Rat,
     staged: Option<Staged>,
@@ -915,6 +943,20 @@ fn carried_entry(
 ) -> CarriedEntry {
     let (staged, applied) = staged.unwrap_or_else(|| (Rat::zero(), BigInt::zero()));
     let previous = previous.unwrap_or_else(Rat::zero);
+    if matches!(carrier, Carrier::Factor(_) | Carrier::FactorScale(_)) {
+        // [definition; agent-inferred, October 7] No admitted-future kernel certifies dropping
+        // a physical C/K/D direction or its normalization. Keep one exact contemporary
+        // remainder in this same constitution. Its actual bits enter B_Theta before publication.
+        let moving = update + &staged + previous;
+        let (quotient, remainder) = lattice.div_rem(&moving);
+        let entry = entry + Rat::new(quotient.clone(), lattice.scale());
+        let applied = applied + quotient;
+        return CarriedEntry {
+            entry,
+            remainder,
+            staged: (!applied.is_zero()).then_some((Rat::zero(), applied)),
+        };
+    }
     let exponent = lattice.exponent + precision;
     // y = Δ + staged + r_prev. The carried remainder lies on the fine lattice of an earlier
     // clock, so it moves the fine point by its own coordinate and adds nothing to `e`.
@@ -3291,12 +3333,17 @@ pub struct DepositReading {
     pub loci: Vec<Locus>,
     pub released: Vec<(Locus, Carrier, usize, Rat)>,
     pub released_bits: u64,
+    /// Exact unresolved C/K/D factor and normalization coordinates in the successor constitution.
+    /// This is a transient reading of contemporary material, not an update history or a physical
+    /// storage/work claim. The next admitted deposition and lossless rebase consume the same carry.
+    pub unresolved_contact_material: Vec<(Locus, Carrier, usize, Rat)>,
     pub stepped: u64,
     /// [definition; agent-inferred, October 2; the
     /// [contact loop record](../../../../research/records/2026-10-02_THE_CONTACT_LOOP_THE_RETURN_REACHES_EVERY_CONTACT_AND_ITS_CHANGE_IS_RELEASED_BEFORE_THE_LATER_CUT.md)]
     /// **The rounding refusals**: every family certified at a step `η > 0` none of whose entries
     /// took a nonzero lattice coordinate, so its constitution did not change at this deposit. Its
-    /// move is released below the fine lattice or carried as a remainder below the coarse one
+    /// physical factor move is retained as an exact remainder below the coarse lattice; other
+    /// carriers may also release below their separately declared fine lattice
     /// ([`Constitution::carried_remainders`] says which); it is not necessarily lost. Only a
     /// positively certified family either moves material coordinates or is named here: a reached
     /// family with no admitted step is outside this list. The aggregate `stepped` count includes
@@ -6231,6 +6278,10 @@ impl Constitution {
         let reading = DepositReading {
             storage_growth,
             storage_product: next.storage_product.clone(),
+            unresolved_contact_material: next.carries.iter().filter(|((l,c),_)|
+                retained.contains(l) && matches!(l, Locus::Channel(_))
+                    && matches!(c, Carrier::Factor(_) | Carrier::FactorScale(_)))
+                .flat_map(|((l,c),carry)| carry.0.iter().map(|(i,r)| (*l,*c,*i,r.clone()))).collect(),
             steps: certified
                 .into_iter()
                 .map(|((locus, _), reading)| (locus, reading))
