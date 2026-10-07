@@ -585,6 +585,7 @@ fn causal_read(prediction: &holonics::hnn::prediction::PhysicalRepair, target: u
 // These controls exclude carry-mediated effects and allocate ordered interactions to the
 // later actual publication. They do not construct reordered or hypothetical deposit materials.
 #[allow(clippy::too_many_arguments)]
+#[allow(clippy::disallowed_types)] // exterior receipt writer; never a native state or input
 fn causal_attribution(output: &mut std::fs::File, field: &Field, current: &Current, receiver: &ReceiverDeclaration, opening: &WordOpening, materials: &[Constitution], controls: &[(usize, DamagedSection, CausalRead, CausalRead)], target: usize, bound: u128) -> bool {
     use holonics::hnn::{prediction::repair_by_field, receiving::ReceivingPhases};
     assert_eq!(materials.len(), 5);
