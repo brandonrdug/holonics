@@ -1,0 +1,55 @@
+{
+  "source_base": "9410077e6395b5b0cb376f298a03cae0308eefed",
+  "mathematical_review_pin": "0a0a0b72eff9a1a95377c6196132d93c01b2917e",
+  "status": "prepared source; syntax and source/math review only; type, guards, native and Lean pending",
+  "edition": "2024 declared by Cargo.toml",
+  "source_owner_compiler_test_training_generator_benchmark_runs": 0,
+  "checks": [
+    {
+      "path": "crates/holonics/src/hnn/constitution.rs",
+      "rustfmt_parse_exit": 0,
+      "stderr": "",
+      "sha256": "131a1dc1244a99858902535ad2582e8b874c373b6d3f923876cd6c9fc1810d12"
+    },
+    {
+      "path": "crates/holonics/src/hnn/field.rs",
+      "rustfmt_parse_exit": 0,
+      "stderr": "",
+      "sha256": "d6c8d1a04c29862920617ff95c02b50bae40e4120c171dce19aac5b297ada2f7"
+    },
+    {
+      "path": "crates/holonics/src/hnn/port.rs",
+      "rustfmt_parse_exit": 0,
+      "stderr": "",
+      "sha256": "fb62daa8daafb259b8696353247a017b005fd027264160abf7a61b96206b0df2"
+    },
+    {
+      "path": "crates/holonics/src/hnn/prediction.rs",
+      "rustfmt_parse_exit": 0,
+      "stderr": "",
+      "sha256": "b8a5e7ee45fb6af8ddc164eb646e85e97d6b5ab943fa21c6b59be7d3c79db4ac"
+    },
+    {
+      "path": "crates/holonics/src/hnn/receiving.rs",
+      "rustfmt_parse_exit": 0,
+      "stderr": "",
+      "sha256": "120919c0d2d2eec235aade0a0c5b8b7c09d53495cfd229a04db7ee83b69ed301"
+    },
+    {
+      "path": "crates/holonics/src/hnn/tests/physical.rs",
+      "rustfmt_parse_exit": 0,
+      "stderr": "",
+      "sha256": "9490636cd472b6057a2c13ef7f7cf88c72eeee350644ca53a7c5993d2eae5491"
+    }
+  ],
+  "diff_check_exit": 0,
+  "diff_check_output": "",
+  "relative_record_links": 3,
+  "missing_record_links": [],
+  "fixed_syntax_guard_seconds": 10,
+  "measured_syntax_wall_ns": 628317632,
+  "native_projection_measured": false,
+  "followup_scope": "observation/clock/coefficient/full88 mathematics unchanged; distinct CurrentSourceReceivingReturn with no generic material return; compile_fail guard and R-only publication assertion; reachable entered-context raw-view negative control; no context/retention sufficiency claim",
+  "unrun_guard": "CurrentSourceReceivingReturn cannot be assigned to WordReturn (compile_fail E0308); actual sole-queue doctest grade pending",
+  "peer_review": "Claude actual source review at0a; independent causal/full-adjoint/context review at0a and actual scope-only followup diff found no source defect; controls/doctest/type/native remain unrun"
+}

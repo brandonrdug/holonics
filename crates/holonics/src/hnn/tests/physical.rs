@@ -352,6 +352,35 @@ fn source_observer_same_carrier_normal_comparison_preserves_carry_and_withholds_
         at_rest.prediction().carry.change,
         continued.prediction().carry.change
     );
+    // The entered interior is reachable from the preceding actual sparse passage. The raw
+    // view distinguishes it, while this current-source view deliberately does not; this is
+    // not a sufficiency claim for a target that depends on that retained context.
+    let probe = initial
+        .with_ports(
+            0,
+            None,
+            None,
+            Some(crate::ratio::linear::ExactRatMatrix::identity(8).unwrap()),
+        )
+        .unwrap();
+    let raw_rest = predict_sparse_by_field(
+        &field,
+        &probe,
+        &current,
+        &section,
+        &WordOpening::Rest,
+        &phases,
+    )
+    .unwrap()
+    .finish();
+    let raw_continued =
+        predict_sparse_by_field(&field, &probe, &current, &section, &carry, &phases)
+            .unwrap()
+            .finish();
+    assert_ne!(
+        raw_rest.reads[2].read.logits[0], raw_continued.reads[2].read.logits[0],
+        "an admitted raw/context view still distinguishes the reachable entered interior"
+    );
     assert_eq!(continued.prediction().carry.ticks, 6);
     assert!(continued.prediction().reads.iter().all(|r| r.tick == 6));
     assert!(continued.prediction().balances.iter().all(|b| b.closes()));
@@ -377,8 +406,15 @@ fn source_observer_same_carrier_normal_comparison_preserves_carry_and_withholds_
         "prior/Gram/deposition must use the same observer carrier, not a history-dependent raw preview"
     );
     assert!(
-        b.full_adjoint.storage[0].iter().any(|v| !v.is_zero()),
+        b.full_adjoint.opening().storage[0]
+            .iter()
+            .any(|v| !v.is_zero()),
         "nonzero-R actual comparison return"
+    );
+    assert_eq!(
+        b.publication.loci,
+        vec![crate::hnn::constitution::Locus::ReceivingMap(0)],
+        "the typed current-source return publishes only R, not source, pair or body learning"
     );
     assert!(matches!(b.prediction.cells[2], RepairedCell::Held { .. }));
     assert_eq!(initial.receiving_law(0).unwrap(), &old_law);

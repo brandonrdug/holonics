@@ -111,7 +111,20 @@ including on a comparison refusal.
 
 The coefficients depend on body material. Generic body/source deposition would additionally
 need the coefficient derivative `d chi`; it is **not** supplied or claimed here. The generic
-material ticks returned by the Word at fixed chi are discarded. This consumer changes R only.
+material ticks returned by the Word at fixed chi are discarded. This consumer changes R only. `CurrentSourceReceivingReturn` exposes the full opening-state
+covector as an exterior receipt, with no generic `WordReturn`, material ticks or conversion
+to `compose_return`. A compile-fail guard rejects that conversion; the actual teaching control
+requires publication at ReceivingMap(0) only. Source/pair/body learning additionally owes the
+coefficient and comparison derivatives at their producing operands.
+
+This is a **current-source-only R objective** and a source-isolation view. It is not a global
+compression replacement, a contextual continuation objective, or a retention quotient for all
+admitted future receivers. A reachable entered interior from the actual sparse prior passage
+`[2,2,None,3]` changes the raw crossing-two face while its source-observer image vanishes. The
+native control compares both raw views on the actual prior carry and the same current source,
+requires that difference, and preserves the distinct complete carried state. This deliberately
+negative scope control prevents treating source isolation as sufficiency for retained-context
+tasks. Other physical/context-sensitive views remain part of the broader HNN construction.
 
 Completion domains remain absent, so erased cells stay Held. Save/restore of observer material
 is explicitly refused: there is no serialised producing-view or device join. Raw restore also
@@ -128,7 +141,8 @@ The four added `hnn::tests::physical::source_observer_*` controls require:
 - One carrier through the actual blind read, observed ratio, sample, R change and prior/Gram;
   raw borrowing and save refuse; admission holds immediately after binding and after R-only
   successors. Continued physical carry and balances are preserved while matched source features
-  and normal successors are invariant to an entered interior at the same material/source.
+  and normal successors are invariant to an entered interior at the same material/source. The admitted raw view must still
+  distinguish that **reachable** interior; source isolation does not replace that context view.
 - The [exact ten-term affine witness](receipts/source-observer-20261007/affine-witness.tsv) has
   coefficient sum zero and raw feature sum zero across four actual carried openings, while its
   source-response and declared exterior target contrasts are nonzero. This detects the omitted
@@ -136,7 +150,7 @@ The four added `hnn::tests::physical::source_observer_*` controls require:
 - Foreign/stale observations, changed intact clamps, empty comparison partitions, future
   stations and erased-label changes cannot contaminate the blind receipt or retained law.
 
-These controls are prepared and unrun. [Syntax receipt](receipts/source-observer-20261007/SOURCE_PARSE_CHECKS.v3.json)
+These controls are prepared and unrun. [Syntax receipt](receipts/source-observer-20261007/SOURCE_PARSE_CHECKS.v4.json)
 reports Rust 2024 parse and whitespace checks only. No native compiler/test/training/generation
 or benchmark was launched by this source owner. New matrix setup and controls have no measured
 runtime projection yet: the sole queue must admit a bounded development read under unchanged

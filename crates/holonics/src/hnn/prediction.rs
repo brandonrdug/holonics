@@ -3204,15 +3204,43 @@ pub fn predict_by_source_observer<'f, 'm>(
 
 /// The observer's reached R comparison. The full opening adjoint is an exterior receipt;
 /// no Word, source occurrence or target is installed in the successor material.
+/// This type exposes neither a pair/source deposit nor the generic material ticks: the
+/// observer's material-dependent coefficients have not been differentiated.
 #[derive(Debug)]
 pub struct SourceObserverTeaching {
     pub prediction: PhysicalRepair,
     pub observation: crate::hnn::receiving::SourceObserverReceipt,
-    pub full_adjoint: crate::hnn::port::ChangeCovector,
+    pub full_adjoint: CurrentSourceReceivingReturn,
     pub ratio: crate::hnn::ratio::HolonRatio,
     pub material: crate::hnn::receiving::SourceObserverMaterial,
     pub publication: crate::hnn::constitution::DepositReading,
     pub samples: Vec<crate::hnn::constitution::Sample>,
+}
+
+/// The complete opening-state derivative of this **current-source-only R objective** at
+/// fixed physical body and observer coefficients. This is an exterior observation receipt,
+/// not a context-dependent continuation objective, a retention quotient, or a material return.
+/// Pair/body/source learning must not consume it as the complete learning return: that join
+/// additionally owes the observer-coefficient and comparison derivatives at their operands.
+///
+/// ```compile_fail,E0308
+/// use holonics::hnn::prediction::CurrentSourceReceivingReturn;
+/// use holonics::hnn::port::WordReturn;
+/// fn cannot_deposit_generic_material(returned: CurrentSourceReceivingReturn) {
+///     let _: WordReturn = returned;
+/// }
+/// ```
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CurrentSourceReceivingReturn {
+    opening: crate::hnn::port::ChangeCovector,
+}
+
+impl CurrentSourceReceivingReturn {
+    /// Read the full opening-state pairing receipt. This does not expose material ticks or
+    /// provide a conversion to the generic Word return consumed by compose_return.
+    pub fn opening(&self) -> &crate::hnn::port::ChangeCovector {
+        &self.opening
+    }
 }
 
 #[derive(Debug)]
@@ -3236,6 +3264,9 @@ impl SourceObserverPrediction<'_, '_> {
     /// One carrier through blind read, observed ratio, located-prior preparation and normal
     /// deposition. Only R is stepped. The actual Word receives all six transposed anchor seeds
     /// in one reverse sweep; replacing it with the old source marginal fails the full identity.
+    /// The declared observation is a current-source comparison in this completed section.
+    /// This owner makes no sufficiency claim for targets that depend on retained interior
+    /// context; its physical carry continues without being substituted for a context view.
     pub fn observe(
         self,
         contemporary: &crate::hnn::receiving::SourceObserverMaterial,
@@ -3366,7 +3397,9 @@ impl SourceObserverPrediction<'_, '_> {
                 Ok(SourceObserverTeaching {
                     prediction,
                     observation,
-                    full_adjoint,
+                    full_adjoint: CurrentSourceReceivingReturn {
+                        opening: full_adjoint,
+                    },
                     ratio,
                     material,
                     publication,
