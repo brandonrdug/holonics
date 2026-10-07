@@ -211,13 +211,14 @@ same-feature read changes are exterior receipts. Probes call `finish`, never `ob
 controls do not replace the continuing carry. Truth is read for exterior grading only after
 primary and common-carry controls have been published.
 
-The fixed criterion is **complete 4+4**, the initial common-carry law fails at least one expected
+The launch criterion for this engineering fixture was **complete 4+4**, the initial common-carry law fails at least one expected
 margin, a centered acquired real response strictly exceeds `1/16`, and **all four** learned
 common-carry **and** actual continuing expected-target margins strictly exceed `1/16`. Centering
 removes the class-orbit mean acquired logit change, exactly as in the saved point. Each complete
 correlated orbit is one development point; stations and fresh seeds are not independent tests
-or untouched holdout. A pass would support only acquisition of this bounded current-source
-relation; erasures remain Held, with no domain, contextual-retention or product release.
+or untouched holdout. This criterion reads this fixed classification fixture. It is not a definition of learning or
+usefulness; erasures remain Held, with no domain, contextual-retention or product release. The
+completed v68 point and the architectural qualification below supersede its prepared status.
 
 The caller reads the existing native work counter before setup and after all attempted work.
 Whole-role and whole-unit timings include matrix setup, declarations, source construction,
@@ -228,8 +229,8 @@ controls are retained without an extra teacher, pair update or baseline training
 The sole queue must independently admit a source-matched first bounded development read under
 unchanged `17 aggregate CPU s / 60 wall s / j1 / 4 GiB group`, with the one-second CPU stop margin
 and existing memory floors. An absent measured unit bound is labelled a fixed development cap,
-never a forecast. Runtime remains held until that admission and fresh example/guard checks are
-accepted. Its [prepared committed pin](../runs/source-observer-relation/first-development.pin) is
+never a forecast. At preparation, runtime was held until that admission and fresh example/guard checks were
+accepted. V68 subsequently executed this point once under the stricter queue guard. Its [prepared committed pin](../runs/source-observer-relation/first-development.pin) is
 a fixed first-development wall cap, with the independently enforced aggregate CPU/memory lease
 policy; it does not provide a measured projection. The first 4+4 point is spent once whether
 complete or incomplete. No later automatic
@@ -273,7 +274,7 @@ independently reserved observations would additionally be required for a general
 The sole queue's fresh example Clippy/type/three-guard check at `606eceb4f` rejected five
 `std::fs::File` helper parameters in `source_observer_role`, `publish_receiving_operands`,
 `exact_pair_observation`, `exact_role` and `interaction_work`. Example linking and the 4+4
-acquisition were not launched: the scientific point is **unspent**. The v66 seven-control
+acquisition were not launched at v67: the point was then **unspent**. V68 below spends it once. The v66 seven-control
 acceptance remains separate and unchanged. Full raw Cargo output is preserved in the canonical
 v67 receipts; the [boundary correction receipt](receipts/source-observer-20261007/BOUNDARY_CORRECTION.v1.json)
 pins it and the corrected source.
@@ -284,8 +285,8 @@ existing `publish` sink. File creation stays at the existing explicit exterior b
 publisher's now-unneeded disallowed-type allowance is removed; no allowance is added and the
 three denied guard flags are unchanged. Every helper body, stdout/file receipt, write/flush
 order, teaching/probe law, strict criterion, physical carry and work counter is unchanged.
-This is a boundary repair, not native acceptance or an acquisition result. Fresh example
-validation remains with the sole queue; the same unchanged failed source is not replayed.
+This was a boundary repair. The sole queue subsequently passed its fresh example guards/link
+and executed the once-only v68 point; the failed v67 source itself was not replayed.
 
 V67's two HNN stages used `16002893000 ns` aggregate CPU and `17165080544 ns` stage wall time.
 The cumulative HNN native/build/guard account is now 52 jobs, `528950026000 ns` aggregate CPU
@@ -298,7 +299,7 @@ reviewed producing-operand and seed-reuse consolidation does not enter this boun
 
 ## Separate producing-operand and covector consolidation
 
-[agent-inferred; implemented source-only, native acceptance pending] This successor is isolated
+[agent-inferred; native accepted in v68 at `192d0842`] This successor was isolated
 from the boundary-only acquisition seal. `SourceObserverView::check_identity` now reads the
 same producing `Operands::weights` and `ContactOperands::{forms,solve}` that the Word consumes.
 The duplicated half/third participation weights, quarter stiffness action and scalar `8/27`
@@ -326,3 +327,197 @@ raw context, affine falsifier, and foreign/stale/future/partition refusals. The 
 launches none. No scientific 4+4 replay, extra teacher, larger cap or broadened material
 derivative/domain/retention claim is requested. The current boundary-only loop remains pinned
 independently; this successor is held until its outcome is reviewed.
+
+
+## V68 mechanical acceptance and the spent classification diagnostic
+
+[mechanically checked] Source `192d084288ca7953d21531b6a923db9314b5ebbe` passed the sole queue's
+fresh library check, all three denied guard lints, `57=3*19` doctests, fresh library-test build and
+four exact observer regressions. These checks accept the existing producing-operand reuse and
+source-covector reuse in their declared scope. Source `1bd596a8` separately passed fresh example
+guards/link and completed its original four-teaching/four-probe point. That point is **spent**;
+it was not replayed at the consolidation source. The [selected queue receipt](receipts/source-observer-20261007/v68/QUEUE_ACCEPTANCE.v1.json)
+keeps exact source identities, stage guards, costs and acceptance. The [full actual output](receipts/source-observer-20261007/v68/HNN_ACTUAL_FULL_OUTPUT.txt)
+is preserved whole. No new compiler, model, generator or scientific job was launched by this
+source/evidence integration.
+
+The initial scores are all zero. In every probe, learned common-carry and actual continuing
+**complete complex scores** are exactly equal. The source-relative identity holds while the
+native carry advances; this does not mean the carry was reset or is dispensable to other views.
+The real centered response exceeds one grain. Its largest component is
+`195662553406111/2850108085370880`, at probe 1/class 1, which is a wrong desired-class direction.
+Source-dependent change is established; correct relation acquisition does not follow.
+
+| Blind source | Exterior desired third symbol | Raw leading class | Point leaders at grain 16 | Desired real score minus best rival |
+|---|---:|---:|---|---|
+| `[0,3,_,0]` | 1 | 1 | `{0,1,3}` | `326811701891/213758106402816` |
+| `[1,0,_,1]` | 2 | 1 | `{1}` | `-1856766975554081/12825486384168960` |
+| `[2,1,_,2]` | 3 | 2 | `{2,3}` | `-798275019195547/25650972768337920` |
+| `[3,2,_,3]` | 0 | 2 | `{1,2,3}` | `-593376720252919/6412743192084480` |
+
+All four margins fail the fixed `1/16`; three are negative even against threshold zero. Every
+missing cell remains Held with UncertifiedDomain. These are diagnostic point leaders, not
+released repaired symbols. The same raw-anchor R-only baseline v56 also failed its fixed gate;
+its common/continuing scores differ after the first probe, whereas this observer cancels that
+interior contribution. The later pair mechanism and its different cohorts are not combined
+with either point.
+
+[derived from saved operands] The [exact operand account](receipts/source-observer-20261007/v68/SAVED_OPERAND_ACCOUNT.v1.json)
+checks every before/after map on its actual compared feature, map succession and the telescope
+of all four actual publication differences on every final probe feature. Every teacher changes
+R and has positive own real and phase descent pairing. Every eta is one and every real class
+metric four. Current prior moves are `0→0, 0→1, 1→0, 0→0`, with map rebase factors
+`1,1/2,2,1`; `LocatedPrior.from=0` is the founding exponent, not the current prior. Net map
+increments include these moves and the actual carried/rounded publication. Own-comparison
+descent does not ensure another passage's target preference. `NormalLaw` explicitly retains a
+prox iterate, not the minimizer of an accumulated objective.
+
+### What the symbolic scores contain
+
+The symbols `0,1,2,3` have identity exterior labels and decoder; they are not words or imposed
+semantic categories. Full teachers are `[2,2,3,3]`, `[3,3,0,0]`, `[0,0,1,1]`, `[1,1,2,2]`.
+Only their third station is observed after blind publication. Full probes are
+`[0,3,1,0]`, `[1,0,2,1]`, `[2,1,3,2]`, `[3,2,0,3]`, with that station absent from the student.
+The producer rule is `u_t=u_(t-2)+1 mod4`. The fixed dense sign source port has no certified
+class-equivariance making symbol `+1` a native quarter-turn. R-only fitting of these correlated
+finite points therefore cannot establish discovery of that gauge, order-two keys or usefulness.
+
+For probe `[1,0,_,1]`, the source is exactly
+`m=nu(3)[P^(-1)E(1)+P^(-2)E(0)+P^(-4)E(1)]`,
+`nu(3)=699051/2097152=1/3+1/6291456`.
+The normalization is a dyadic chart of population three, with its own discrepancy; exact
+rational arithmetic does not turn it into exact `1/3`. Source clocks are `1,2,4`, phase residues
+`1,2,0`, windings `0,0,1`; the physical word opens at tick 15 and publishes the observer at 18.
+The period-four rotor acts on node pairs, keeping both quadratures, with `P^(-4)=I`. A value at
+that rotor alone cannot distinguish a whole winding; the explicit clock remains a separate
+operand. This route constructs a fresh station moment and does not retain an occurrence series.
+
+The final complex score is `y=R_final H2 sum_i chi_i v_i=R_final H2 m`. All eight coordinates,
+source station terms, source-only anchor terms and actual publication terms are in the
+[exact decomposition](receipts/source-observer-20261007/v68/EXACT_DECOMPOSITION.v1.json).
+It reconstructs the producing material equation and verifies it against every saved source/H2
+feature. Actual individual carried anchor vectors were not printed: reconstructed source-only
+anchor terms are labelled as such. Carried-interior terms cancel by the full `chi O=[I|0]`
+identity, without cancellation of the actual continuing state.
+
+The real target-2 versus rival-1 margin separates into station contributions
+`836642139729127/12825486384168960`,
+`-914899086772901/12825486384168960`,
+`-1778510028510307/12825486384168960`.
+It also separates into actual publication effects
+`0,0,-18819901586689/178131755335680,-501734061312473/12825486384168960`.
+The last teacher favors its own comparison, yet its actual map change worsens this different
+probe's target contrast. This is a direct finite cross-feature effect, not a proof that no
+relation can be learned or an attribution to an ever-growing prior.
+
+Odd input coordinates contribute to the **real** scores through full E/H/R products. For
+class 1 those terms are `236233932271673/2565097276833792`; for class 2 they are
+`-84543972895349/1282548638416896`. The odd output coordinates are also computed, and the
+comparison uses phase covectors. Thus the machinery does not discard phase merely because the
+margin reports a real output difference. The reduction occurs in the **evaluation gate**, which
+ignores those final phase readings. A real margin with fixed grain is not invariant under an
+arbitrary output-frame rotation or logit rescaling; a legitimate rechart must carry source,
+physical operators/metric, observer, decoder, comparison and grain together. No universal
+scale-free usefulness criterion is established here.
+
+R, Gram, solved chart, carried remainders and the located prior pair persist. The Word, teacher
+and anchor series do not persist in the HNN. Their historical decomposition is possible because
+this exterior receipt saved the operands; exact retained values are not an occurrence tape or
+proof of future sufficiency.
+
+## Same-circuit construction contract after this diagnostic
+
+[design correction; next join unbuilt] Keep the observer as an analysis view and its identities
+as operator controls. The mod4 classification fixture and its one-grain/centered thresholds
+are retired as scientific or product steering. Preserve every negative output and the accepted
+code. Representation and decoding are receiver-relative aspects of the **same continuing
+Holon**: its constitution, coupled currents, phases, navigators, ports, morphology and admitted
+future. They are not a separate embedding subsystem or a fixed context vector/window. Joint
+artifact construction/repair/navigation is the application; a one-symbol continuation stream
+is not selected as its replacement. This follows the existing foundation and prototype lessons
+D2 (codec architecture), D4 (a scalar improves while output worsens) and D8 (an easier example
+displaces failed acceptance).
+
+The existing source trace gives one concrete native construction anchor:
+`Word::open_source_exact_received → actual coupled receiver anchors → HolonRatio →`
+`same Word return → reference::compose_contact → bound ContactCut deposit →`
+`ContactCut::continue_deposited → Word::continuing`.
+This path already changes physical contact C in the same circuit while keeping its reached full
+state, actual clock/pump phase, held momentum and separately priced work. The callback's contact
+index and rest-seeded reach remain imposed choices; autonomous learned relevance/navigation
+and useful artifact release are not established.
+
+The selected minimal code join is to derive the contact-C reaction from **all actually reached
+contact covectors** of the whole declared comparison, using actual opening-support reach, rather
+than a caller-selected contact. Bind the combined certified deposit to that same ContactCut and
+continue the same full state. Capture opening support before evolution; cut-end support is not
+its substitute. Use `Diamond::opened` for the actual comparison horizon and the existing admitted
+continuing family for future retention. Compose every reached C factor through the existing
+owner. Its existing Gauss–Newton joint certificate is not a full coupled-Word decrease proof:
+the shared-ring contact solves have mixed material variation. Consume an actual bound on that
+joint ray or a charged realized comparison before crediting its decrease; otherwise refuse the
+unadmitted combined ray explicitly. Native storage/work/budget checks alone do not supply that
+missing comparison term;
+no new contact-ranking score, expected answer or teacher-selected locus enters the machine.
+Keep other physical families at their existing laws for this first consumed join. General
+source/body/view derivatives and arbitrary topology changes retain their actual obligations.
+
+The behavior to expose is an actual joint artifact's blind full structured read, its declared
+comparison, physical contact deformation and reentry of the same current. The receipt contains
+ring storage/waves, contact displacement/rates and held momentum, phases/windings/pump clocks,
+complex receiving faces and their unresolved fibre, material change and work. Existing coupled
+boundary/future certification governs release or Hold. A point class head is not that receipt,
+and no useful-output claim follows before the actual joint boundary and navigation/refinement
+consumer acts on it. The existing `Reference::Resident` owns moments/current/material/charts,
+receiver family and carry; `PhysicalResident` currently opens fresh station sources; the bank's
+joint lock refinement is a different receiving law. Moving state between these owners or adding
+an embedding layer does not join their missing source/clock/domain squares.
+
+No replacement dataset, new scientific run, threshold change or next-token default accompanies
+this contract. Geometry supplies the actual response/transport/work relation inside this same
+contact continuation. The construction owner must consume the chosen native contact reaction
+and requested joint boundary before scheduling scientific evidence.
+
+
+The governing joint-field contract is already recovered in
+[the September 29 one-family record, §§1–2](2026-09-29_THE_TEXT_CHART_IS_THE_ONE_MACHINES_FIELD_TORI_HELICES_EGGS_AND_TUBES_ARE_ONE_FAMILY.md).
+Its §3 copy/moiré acceptance was agent-inferred; it does not license a new exact-target product
+gate. Native generation is joint differentiation/integration and boundary release of coupled
+information, not an imposed next-symbol stream or reproduction of the observed snippet. Show
+actual creative output whole and its structured phase-bearing evolution. An unusual or chaotic
+output is not automatically failure. Product judgment and the independent physical/source/state
+controls remain separate; no authored control output accompanies generation as its answer.
+
+The smallest unbuilt terms at the selected existing contact consumer are now explicit: actual
+**opening** reach in `compare_contact_storage`, reaction at all reached C loci rather than a
+caller index, and the consumed joint material/comparison bound through their shared rings. The
+existing contact solve is `m_a^-1`, with
+`m_a=I+(G_a/(2h))(2C_a+hD_a+(h²/2)K_a)`; varying C is not a scalar change of a fixed head.
+The architecture does not replace a missing mixed term by a new easy one-contact terrain or a
+larger budget. State/metric/constitutive variation and held momentum remain joined. A structured
+view may render that actual joint deformation and phase/winding, but no separate representation
+or new metric is trained. This is the concrete construction subject; it is not an assertion that
+contact reaction alone completes autonomous navigation or general artifact release.
+
+
+Exact deterministic consequences remain legitimate controls: arithmetic, conservation and
+reversibility have their declared exact relations. Open-ended expression permits multiple
+coherent outcomes. A curated text or synthetic expected answer is not its objective by default;
+an encounter is evidence from which relationships may form and be revised, not authority for
+repeated reinforcement until reproduction. Prediction and observed comparison remain lawful
+when their target provenance and consequence are declared. At the native contact consumer, an
+Encoded target denotes the supported observed face comparison; it does not become a universal
+objective for language or joint artifact construction. A requested constraint/fibre and the
+actual subsequently observed consequence must define that application's comparison. Keep
+causal/state/work checks and grounded deterministic consequences separate from the actual
+whole creative output shown for human judgment.
+
+The once-only native process cost was `1660252916 ns`; program interaction `1639195572 ns`;
+complete admitted stage `2381862494 ns`; aggregate CPU `2296125000 ns`; group peak
+`26243072 bytes`. Its fixed complete-stage guard was `16000000000 ns`; measured/guard is
+`2381862494/16000000000`. The source pin's looser 60-second ceiling did not change that guard.
+These are measurements of this spent point, not a forecast or speedup for consolidation or
+contact adaptation. V68's HNN preparation/build/guard/control stages used `132682669000 ns`
+CPU and `99903785138 ns` stage wall over thirteen jobs; cumulative HNN account is
+`661632695000 ns` CPU and `506785666051 ns` stage wall over sixty-five jobs. Other formal
+lanes are separate. Both workflow leases were released; no broad build or cap increase occurred.

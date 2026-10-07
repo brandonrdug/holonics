@@ -1,0 +1,65 @@
+{
+  "source_base": "192d084288ca7953d21531b6a923db9314b5ebbe",
+  "integration": "documentation and preserved exact queue/saved-operand evidence only",
+  "saved_arithmetic_guard_seconds": 10,
+  "saved_operand_reproduction": true,
+  "full_88_algebra_reconstructed_not_new_native_experiment": true,
+  "new_links_resolve": true,
+  "historical_canonical_v66_links_available_in_main_checkout": true,
+  "source_owner_compiler_tests_training_generation_benchmark_jobs": 0,
+  "future_contact_code_join_unbuilt": true,
+  "new_scientific_run_not_authorized": true,
+  "private_messages_or_human_logs_copied": false,
+  "artifacts": [
+    {
+      "path": "EXACT_DECOMPOSITION.v1.json",
+      "bytes": 32203,
+      "sha256": "0dab7459dae6b8f21944826de6bdb16689fb0a80cdf6b5e15869060ba35334e1"
+    },
+    {
+      "path": "HNN_ACTUAL_FULL_OUTPUT.txt",
+      "bytes": 231894,
+      "sha256": "f21c867ab0cd0d6adcb2e0939b977dc0f3e99f8ed485f70b3691b418626309a8"
+    },
+    {
+      "path": "HNN_CONSOLIDATION_CONTROL1_STDOUT.txt",
+      "bytes": 221,
+      "sha256": "a26a848687157de35d5bae77c5492ebdb747d98e04d7a0354c6998d91700485e"
+    },
+    {
+      "path": "HNN_CONSOLIDATION_CONTROL2_STDOUT.txt",
+      "bytes": 234,
+      "sha256": "a50e149065bded524c179e32576b763949ad39473363f84ab6f5ca86133e6a6a"
+    },
+    {
+      "path": "HNN_CONSOLIDATION_CONTROL3_STDOUT.txt",
+      "bytes": 222,
+      "sha256": "a7ca61a60f47540ff3e8283d0422a681c457cc77375f3be1a0ca160cb048de9c"
+    },
+    {
+      "path": "HNN_CONSOLIDATION_CONTROL4_STDOUT.txt",
+      "bytes": 219,
+      "sha256": "7cdcf720a87e61006b466888655fd0190e40d31514802beaa2b58fc5d3a3964f"
+    },
+    {
+      "path": "QUEUE_ACCEPTANCE.v1.json",
+      "bytes": 142793,
+      "sha256": "45622fb0a5d2c8c4d236c762aaff8d1ba77b8982e7b9b85cc68550e71539ba27"
+    },
+    {
+      "path": "SAVED_OPERAND_ACCOUNT.v1.json",
+      "bytes": 108577,
+      "sha256": "94597629672e64ff1467ffa553420ad14c0fb199801c14a197ce789bd38c777e"
+    },
+    {
+      "path": "decompose_saved.py",
+      "bytes": 6137,
+      "sha256": "6bc8cf54c91291d6b1caec405134ce576c61ca0f9782ae4652594f0646ce309a"
+    },
+    {
+      "path": "parse_saved.py",
+      "bytes": 4299,
+      "sha256": "fed4cff06c1dcced127da2e44721ef107752edb01b137d0c8694bd88ac3d6a29"
+    }
+  ]
+}
