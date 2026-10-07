@@ -1,0 +1,76 @@
+{
+  "base": "1bd596a80084c9c6a90e5d9ce0171cd5fb99b12c",
+  "grade": "source/math review and Rust2024 parse/diffcheck only; compiler/guards/native unrun",
+  "checked_source_files": [
+    {
+      "path": "crates/holonics/src/hnn/receiving.rs",
+      "bytes": 99700,
+      "sha256": "6b61b28f08e2b56c51b8a3e72c554ef9aadd109f6d1b32e5d58cff1ad11c4b85",
+      "parse_exit": 0,
+      "fixed_guard_seconds": 10
+    },
+    {
+      "path": "crates/holonics/src/hnn/prediction.rs",
+      "bytes": 198261,
+      "sha256": "06f1570e2e7d4d4d6f465fb24e849c6b815c1b9fd9da508aaca4af156b74e1ff",
+      "parse_exit": 0,
+      "fixed_guard_seconds": 10
+    }
+  ],
+  "two_source_hunks_sha256": "add39a540f8b960c4c1e7ee04fbf2617fbb16025103d86769a6aa48f97aaaab5",
+  "geometry_candidate_patch": {
+    "path": "/home/b/Workspaces/holonics/.local/wt/hnn-source-observer-01a1030c/.local/source-observer-20261007/operand-consolidation-v1/SOURCE_OBSERVER_OPERAND_CONSOLIDATION.candidate.v1.patch",
+    "bytes": 2732,
+    "sha256": "3366b6b02833febef52cc4c67af38253fd91ecdc1c301c834e96e2a0fab7ba97"
+  },
+  "provided_geometry_candidate_sha256": "6b61b28f08e2b56c51b8a3e72c554ef9aadd109f6d1b32e5d58cff1ad11c4b85",
+  "combined_owner_review": {
+    "path": "/home/b/Workspaces/holonics/.local/wt/hnn-source-observer-01a1030c/.local/source-observer-20261007/operand-consolidation-v1/INDEPENDENT_OWNER_REVIEW.v2.json",
+    "bytes": 8154,
+    "sha256": "54151e7301815499f675a92202c38584b448a40d2470bac683c61239d6353635"
+  },
+  "actual_owner_consumer_trace": {
+    "Operands::weights": "Executed storage-port then incident contact weights; no lattice admitted, so exact weights equal half/third. Contact order fixed (0,1),(1,2), middle waves contact0.to then contact1.from match incident/end_slot.",
+    "participation": "Same weighted sum, exact matrix linear extension for all opening coordinates.",
+    "ContactOperands::forms": "Actual C=I, K=D=I/4 admitted by declare.",
+    "contact_operator": "h=1,G=2 => I+(2/(2*1))*(2I+I/4+I/8)=27I/8.",
+    "ContactOperands::solve": "Actual executed inverse=8I/27; no chart admitted.",
+    "transit_solve": "Full identity channel/unit h gives og-oh+2Cw-Ku, matching candidate right.",
+    "transit_update": "G/(2h)=1 gives u_next=u+zeta, w_next=2zeta-w, arriving_from=og-zeta, arriving_to=oh+zeta; unchanged.",
+    "element_step": "Unchanged producing ring solve/Cayley L applied at the same anchor."
+  },
+  "seed_reuse": {
+    "grade": "definitionally identical source-only review, parser pass; not native accepted",
+    "changed_path": "crates/holonics/src/hnn/prediction.rs",
+    "base_sha256": "b8a5e7ee45fb6af8ddc164eb646e85e97d6b5ab943fa21c6b59be7d3c79db4ac",
+    "candidate_sha256": "06f1570e2e7d4d4d6f465fb24e849c6b815c1b9fd9da508aaca4af156b74e1ff",
+    "original": "expected_source=source_covector(g,R,lift); seeds=source_seeds(source_covector(g,R,lift))",
+    "successor": "expected_source=source_covector(g,R,lift); seeds=source_seeds(expected_source)",
+    "same_operands": "Same immutable view/gradient/map/lift; no operation between assignments; source_covector already validates gradient/map shapes; source_seeds applies same transposes, all six actual clocks and shapes. expected_source retained for full opening equality.",
+    "removed_work": "One duplicate source_covector evaluation per actual observed comparison; measured timing/speedup not inferred",
+    "standalone_seeds_helper": "Retained for existing nonzero R/lift full88 native differential control; no parallel transpose owner added.",
+    "same_teacher_carrier_return": "No target, source, carry, comparison mask, R sample/Gram/prior, generic material scope or word consumed differently.",
+    "source_parse_exit": 0,
+    "git_apply_combined_check_exit": 0
+  },
+  "preserved_observer": {
+    "chi_and_H_polynomial_coefficients": true,
+    "all_admission_refusals": true,
+    "pristine_carrier_binding_and_R_scope": true,
+    "full88_identity_and_joined_return": true,
+    "material_coefficient_derivative_still_owed": true,
+    "actual_carry_and_clock_contracts": true
+  },
+  "cost_qualification": "Contact solve matrix materialization/multiplication replace scalar scaling; weight construction/arithmetic differs. Runtime/setup cost not inferred equal or lower; old timing does not project changed owner.",
+  "independent_active_source_unchanged": true,
+  "boundary_acquisition_not_retimed": true,
+  "hold": "Separate successor behind the original boundary-only acquisition review; no new scientific point/replay requested",
+  "native_selectors": [
+    "hnn::tests::physical::source_observer_full_state_identity_and_joined_adjoint_at_actual_clocks",
+    "hnn::tests::physical::source_observer_same_carrier_normal_comparison_preserves_carry_and_withholds_release",
+    "hnn::tests::physical::source_observer_carry_family_affine_witness_separates_the_omitted_source",
+    "hnn::tests::physical::source_observer_refuses_foreign_stale_future_and_ignored_observations"
+  ],
+  "guards": "Same denied types/methods/float_arithmetic, no new allowance or reduced check; fresh source-bound library/test build/native acceptance needed",
+  "source_owner_compiler_native_scientific_jobs": 0
+}

@@ -1457,18 +1457,22 @@ impl SourceObserverView {
         let storage = &selectors[..3];
         let arriving = [&selectors[3..5], &selectors[5..7]];
         let state = [&selectors[7..9], &selectors[9..11]];
-        let v = [
-            storage[0]
-                .add(&arriving[0][0])?
-                .scaled(&crate::ratio::rat(1, 2)),
-            storage[1]
-                .add(&arriving[0][1])?
-                .add(&arriving[1][0])?
-                .scaled(&crate::ratio::rat(1, 3)),
-            storage[2]
-                .add(&arriving[1][1])?
-                .scaled(&crate::ratio::rat(1, 2)),
+        // Read the producing participation law once; declaration already admits this chain.
+        let incident = [
+            vec![&arriving[0][0]],
+            vec![&arriving[0][1], &arriving[1][0]],
+            vec![&arriving[1][1]],
         ];
+        let v = (0..3)
+            .map(|r| {
+                let weights = self.operands.weights(r);
+                let mut anchor = storage[r].scaled(&weights[0]);
+                for (weight, wave) in weights[1..].iter().zip(&incident[r]) {
+                    anchor = anchor.add(&wave.scaled(weight))?;
+                }
+                Ok::<_, HnnError>(anchor)
+            })
+            .collect::<Result<Vec<_>, _>>()?;
         let mut next = Vec::new();
         for (r, stored) in storage.iter().enumerate() {
             let identity = ExactRatMatrix::identity(width)?;
@@ -1483,11 +1487,15 @@ impl SourceObserverView {
         for (a, (g, h)) in [(0, 1), (1, 2)].into_iter().enumerate() {
             let outgoing_g = v[g].scaled(&integer(2)).subtract(&arriving[a][0])?;
             let outgoing_h = v[h].scaled(&integer(2)).subtract(&arriving[a][1])?;
-            let zeta = outgoing_g
+            // The admitted unit hop/full channel has right = og - oh + 2 C w - K u.
+            // C, K and the executed solve belong to the same ContactOperands as the Word.
+            let contact = &self.operands.contacts()[a];
+            let (c, k, _) = contact.forms();
+            let right = outgoing_g
                 .subtract(&outgoing_h)?
-                .add(&state[a][1].scaled(&integer(2)))?
-                .subtract(&state[a][0].scaled(&crate::ratio::rat(1, 4)))?
-                .scaled(&crate::ratio::rat(8, 27));
+                .add(&c.multiply(&state[a][1])?.scaled(&integer(2)))?
+                .subtract(&k.multiply(&state[a][0])?)?;
+            let zeta = contact.solve()?.multiply(&right)?;
             next_arriving.push(outgoing_g.subtract(&zeta)?);
             next_arriving.push(outgoing_h.add(&zeta)?);
             next_state.push(state[a][0].add(&zeta)?);

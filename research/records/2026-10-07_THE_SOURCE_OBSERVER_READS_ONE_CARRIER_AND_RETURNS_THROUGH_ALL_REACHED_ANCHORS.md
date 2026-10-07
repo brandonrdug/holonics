@@ -295,3 +295,34 @@ aggregate CPU limit and unchanged memory/thread/lease policy. The committed sour
 60-second ceiling is looser; it does not increase the queue's effective deadline. Neither that
 pin nor the fixed acquisition operands/criterion changes in this correction. The separately
 reviewed producing-operand and seed-reuse consolidation does not enter this boundary-only source.
+
+## Separate producing-operand and covector consolidation
+
+[agent-inferred; implemented source-only, native acceptance pending] This successor is isolated
+from the boundary-only acquisition seal. `SourceObserverView::check_identity` now reads the
+same producing `Operands::weights` and `ContactOperands::{forms,solve}` that the Word consumes.
+The duplicated half/third participation weights, quarter stiffness action and scalar `8/27`
+solve leave this check. Under the unchanged admission, the producing weights are exactly those
+half/third weights; `h=1`, `G=2`, `C=I`, `K=D=I/4` gives `m=27I/8`, so its actual solve is `8I/27`.
+Full identity channels preserve the same incident order, signs and contact update. The complete
+88-coordinate identity still must pass; no observer domain or refused material is enlarged.
+
+`SourceObserverPrediction::observe` also reuses its already validated `expected_source` in
+`view.source_seeds(&expected_source)`. The earlier wrapper recomputed
+`source_covector(gradient.logits(), map, lift)` with identical immutable operands. The same
+expected covector now supplies the six transposed anchor seeds and the later full-opening
+equality. The standalone wrapper remains used by the existing nonzero-R/lift differential
+control. No comparison, teacher, gradient sign, R normal sample, clock, carry or generic material
+return changes. This removes duplicate work at the actual receiving consumer, not an authored
+task predictor or a second operator owner.
+
+The [source review and parse receipt](receipts/source-observer-20261007/OPERAND_CONSOLIDATION.v1.json)
+pins the geometry lane's candidate and the exact two source hunks against `1bd596a8`. It gives
+no type/native or performance credit. Materializing the contact solve and multiplying its actual
+forms can change setup cost; removing duplicate covector arithmetic is not a measured speedup.
+Fresh source/config/cache admission is required, with the unchanged guard flags and existing
+four observer controls: full88 identity/joined adjoint, same-carrier normal/carry and reachable
+raw context, affine falsifier, and foreign/stale/future/partition refusals. The source owner
+launches none. No scientific 4+4 replay, extra teacher, larger cap or broadened material
+derivative/domain/retention claim is requested. The current boundary-only loop remains pinned
+independently; this successor is held until its outcome is reviewed.

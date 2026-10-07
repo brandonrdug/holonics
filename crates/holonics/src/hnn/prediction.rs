@@ -3330,7 +3330,7 @@ impl SourceObserverPrediction<'_, '_> {
                 })?;
             let lift = &current.lift()[phases.ring()];
             let expected_source = view.source_covector(gradient.logits(), map, lift)?;
-            let seeds = view.seeds(gradient.logits(), map, lift)?;
+            let seeds = view.source_seeds(&expected_source)?;
             let (back, full) = word.pull_back_joined(seeds)?;
             // Differentiate the entire actual opening, including every arriving wave and
             // contact state. An old raw-anchor return has nonzero interior columns here.
