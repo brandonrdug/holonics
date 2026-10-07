@@ -480,7 +480,20 @@ fn charted_compare(teaching_count: usize, probe_count: usize, out: &str, terrain
             assert_eq!(charted.prediction.physical.carry.ticks,exact_prediction.carry.ticks);
             assert_eq!(charted.prediction.physical.carry.change.resonator_phases,exact_prediction.carry.change.resonator_phases);
             assert_eq!(charted.prediction.physical.carry.conductances,exact_prediction.carry.conductances);
-            assert!(closed(&exact_prediction) && closed(&charted.prediction.physical));
+            let exact_opening_residual = &exact_prediction.opening.after - &exact_prediction.opening.before
+                - &exact_prediction.opening.imposed + &exact_prediction.opening.absorbed;
+            let charted_opening_residual = &charted.prediction.physical.opening.after
+                - &charted.prediction.physical.opening.before - &charted.prediction.physical.opening.imposed
+                + &charted.prediction.physical.opening.absorbed;
+            let charted_opening_work = &charted_opening_residual + &charted.prediction.error.opening.split;
+            publish(&mut output,format!("matched balances; exact_opening_residual={exact_opening_residual}; exact_word_closes={}; exact_failed_tick={:?}; charted_opening_residual={charted_opening_residual}; charted_opening_split={}; charted_charged_opening_residual={charted_opening_work}; charted_source_receipts_match={}; charted_word_closes={}; charted_failed_tick={:?}; charted_balance_closes={}\n",
+                exact_prediction.word.closes(),exact_prediction.balances.iter().position(|balance|!balance.closes()),
+                charted.prediction.error.opening.split,
+                charted.prediction.physical.opening==charted.prediction.error.opening.source,
+                charted.prediction.physical.word.closes(),charted.prediction.physical.balances.iter().position(|balance|!balance.closes()),
+                charted.prediction.closes()));
+            assert!(closed(&exact_prediction) && charted.prediction.closes(),
+                "the exact balance and charted balance with its actual opening split must close");
             let actual=coordinates(&charted.prediction.physical.carry.change);let reference=coordinates(&exact_prediction.carry.change);let radius=coordinates(&charted.prediction.error.end);
             assert_eq!(actual.len(),reference.len());assert_eq!(actual.len(),radius.len());
             let differences:Vec<_>=actual.iter().zip(&reference).map(|(a,b)|(a-b).abs()).collect();

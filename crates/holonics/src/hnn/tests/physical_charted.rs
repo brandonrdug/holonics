@@ -241,3 +241,53 @@ fn exact_sparse_comparison_keeps_the_complete_forward_and_receiving_return() {
     assert_eq!(sparse.pullback.receiving,complete.pullback.receiving);
     assert_eq!(sparse.constitution,complete.constitution);
 }
+
+/// The matched notebook used the exact source predicate on a charted physical receipt.
+/// Force its missing signed work through an actual non-dyadic source, and refuse corrupted
+/// opening, Word and local tick receipts rather than bypassing any balance assertion.
+#[test]
+fn charted_physical_balance_consumes_its_actual_opening_split() {
+    use crate::hnn::prediction::predict_sparse_by_field;
+    let started = std::time::Instant::now();
+    let field = field();
+    let theta = material(&field, true);
+    let current = Current::at_rest(&field);
+    let observed = encoded(&field, &[0, 1, 2]);
+    let damaged = DamagedSection::damage(&observed, &[2]).unwrap();
+    let phases = ReceivingPhases::declare(&field, &theta, &current, &receiver()).unwrap();
+    let exact = predict_sparse_by_field(&field, &theta, &current, &damaged,
+        &WordOpening::Rest, &phases).unwrap().finish();
+    assert!(exact.opening.closes() && exact.word.closes());
+    assert!(exact.balances.iter().all(|balance| balance.closes()));
+    let mut resident = ChartedPhysicalResident::new(&field, theta, current,
+        WordOpening::Rest, tolerance()).unwrap();
+    let prediction = resident.receive(&damaged, &receiver(), |_| None).unwrap().prediction;
+    let split = prediction.error.opening.split.clone();
+    assert!(!split.is_zero(), "the source must exercise the omitted opening work");
+    let residual = &prediction.physical.opening.after - &prediction.physical.opening.before
+        - &prediction.physical.opening.imposed + &prediction.physical.opening.absorbed;
+    assert_eq!(residual, -&split, "the exact-only residual is the negative split work");
+    assert!(!prediction.physical.opening.closes(), "the exact-only predicate must expose the omission");
+    assert!(prediction.closes(), "the full actual charted work balance must close");
+
+    let mut omitted = prediction.clone();
+    omitted.error.opening.split = Rat::zero();
+    assert!(!omitted.closes(), "missing actual split work must refuse");
+    let mut foreign = prediction.clone();
+    foreign.physical.opening.after += &split;
+    assert!(foreign.physical.opening.closes());
+    assert!(!foreign.closes(), "an exact-closing substituted source receipt must refuse");
+    let mut detached = prediction.clone();
+    detached.physical.word.open += &split;
+    detached.physical.word.end += &split;
+    assert!(detached.physical.word.closes(), "the isolated Word identity can still close");
+    assert!(!detached.closes(), "a different Word opening must refuse");
+    let mut word = prediction.clone();
+    word.physical.word.end += &split;
+    assert!(!word.closes(), "Word balance corruption must refuse");
+    let mut tick = prediction.clone();
+    tick.physical.balances[0].after += &split;
+    assert!(!tick.closes(), "local tick balance corruption must refuse");
+    println!("charted balance falsifier; split={split}; exact_only_opening_residual={residual}; charged_opening_residual={}; whole_output={:?}; elapsed_ns={}",
+        &residual + &split, prediction.physical.cells, started.elapsed().as_nanos());
+}

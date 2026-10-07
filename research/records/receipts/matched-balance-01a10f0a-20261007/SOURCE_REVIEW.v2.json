@@ -1,0 +1,29 @@
+{
+  "grade": "source-inspected only; no Rust compiler or native runtime",
+  "native_files": 292,
+  "unchanged_native_files": 289,
+  "changed_native_paths": [
+    "crates/holonics/src/hnn/prediction/charted.rs",
+    "crates/holonics/src/hnn/tests/physical_charted.rs",
+    "research/notebook/hnn_design/hnn_physical_receive.rs"
+  ],
+  "other_inputs_identical_to_failed73_manifest": true,
+  "assertion_law": "after-before+split=imposed-absorbed; actual source receipt bound to Word opening; unchanged Word and every tick closure",
+  "scientific_partition_material_source_clock_phase_encoding_decoder_tolerances_unchanged": true,
+  "existing_assertions_preserved_except_exact_only_charted_predicate_replaced_by_full_work_law": true,
+  "original_failure_preserved": true,
+  "coordinator_reconciliation_pending": false,
+  "no_native_jobs": true,
+  "manifest": {
+    "path": "/home/b/Workspaces/holonics/.local/wt/hnn-matched-balance-01a10f0a/.local/matched-balance-01a10f0a-20261007/SOURCE_INPUT_MANIFEST.v2.json",
+    "bytes": 48200,
+    "sha256": "0ae270cdbdca45760bd6f536ef570a01ec2ac3f899d55dd6fcd262ef4918db77"
+  },
+  "atomic_patch": {
+    "path": "/home/b/Workspaces/holonics/.local/wt/hnn-matched-balance-01a10f0a/.local/matched-balance-01a10f0a-20261007/ATOMIC_NATIVE.v2.patch",
+    "bytes": 7814,
+    "sha256": "f1c810394e83cea2aef10e5c9e640f94d387cb7e089f4e64d02da975b674ab01"
+  },
+  "ownership_message": "94691a4f81924b7b98613bc917215bef",
+  "v2_change": "Detached Word falsifier moves both Word endpoints, so its isolated Word closure still holds and only the opening join rejects it; coordinator exact disjoint ownership confirmed."
+}

@@ -1,0 +1,54 @@
+{
+  "status_sha256": "634e1f801544816ba232a3a6dba26b0df2591d10ef40d0a844b5ecadd88b2e6b",
+  "status_bytes": 555165,
+  "original_status_path": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v33/STATUS.json",
+  "scope": "exact extracted original matched failure; no rerun; full continuation-v33 remains preserved by queue",
+  "matched": {
+    "source_commit": "73fa7b720c680ebd289e50cfdc3d870b5c0bea86",
+    "native_result": "FAIL_PANIC_FIRST_TEACHING_BALANCE_ASSERTION",
+    "native_exit": 101,
+    "wrapper_exit": 125,
+    "full_protocol_complete": false,
+    "first_blind_cells": "Held all four, exact tick=charted tick=3; material commit0",
+    "cost_and_error_rows_reached": false,
+    "no_matched_speedup_or_full_error_result": true,
+    "wall_ns": 663389390,
+    "projection_ns": 10972158131,
+    "final_CPU_ns": 596842000,
+    "group_peak_bytes": 84021248,
+    "native_time_incomplete": true,
+    "raw_stdout": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-matched-73fa7b72-charted-compare-4plus4-20261006-v1.stdout",
+    "raw_stderr": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-matched-73fa7b72-charted-compare-4plus4-20261006-v1.stderr",
+    "publication": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-matched-73fa7b72-charted-compare-4plus4-20261006-v1.publication.json",
+    "release": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-matched-73fa7b72-charted-compare-4plus4-20261006-v1.release.json",
+    "prior_law_fixture_pass_independent": true,
+    "old_coverage_not_replayed": true
+  },
+  "pins": {
+    "raw_stdout": {
+      "original_path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-matched-73fa7b72-charted-compare-4plus4-20261006-v1.stdout",
+      "copy": "original-failed-matched.stdout",
+      "bytes": 1111,
+      "sha256": "7e86cd7ed9d573f33f5ec32aca0845cbd51247e5a1daf421f4eb4d3c4fc257c1"
+    },
+    "raw_stderr": {
+      "original_path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-matched-73fa7b72-charted-compare-4plus4-20261006-v1.stderr",
+      "copy": "original-failed-matched.stderr",
+      "bytes": 281,
+      "sha256": "127373553322d5783ac8cade03502e9c7070cf3368c9e77f84532749bd632be5"
+    },
+    "publication": {
+      "original_path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-matched-73fa7b72-charted-compare-4plus4-20261006-v1.publication.json",
+      "copy": "original-failed-matched.publication.json",
+      "bytes": 3313,
+      "sha256": "df712d8dc7766b64a0379f17a53c3ce1486401b1d0111352744d290b4d74219e"
+    },
+    "release": {
+      "original_path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-matched-73fa7b72-charted-compare-4plus4-20261006-v1.release.json",
+      "copy": "original-failed-matched.release.json",
+      "bytes": 172,
+      "sha256": "9722dfe147c1c0135611306403be23b161b9a3051397b1d80168ddfe36593599"
+    }
+  },
+  "claim": "First balance conjunction failed without component diagnostics; source diagnosis is a missing signed opening-work consumer; no measured particular conjunct, cost/error enclosure or speedup inferred."
+}

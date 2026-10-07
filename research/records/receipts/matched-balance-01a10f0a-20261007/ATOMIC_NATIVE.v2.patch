@@ -1,0 +1,111 @@
+diff --git a/crates/holonics/src/hnn/prediction/charted.rs b/crates/holonics/src/hnn/prediction/charted.rs
+index e8d2ef46b..8427ae9b0 100644
+--- a/crates/holonics/src/hnn/prediction/charted.rs
++++ b/crates/holonics/src/hnn/prediction/charted.rs
+@@ -72,6 +72,22 @@ pub struct ChartedPhysicalRepair {
+     pub error: ChartedErrorReceipt,
+ }
+ 
++impl ChartedPhysicalRepair {
++    /// Close the actual source opening, Word and every executed tick with their stated work.
++    /// `after - before + split = imposed - absorbed`: projecting onto `physical.opening`
++    /// alone omits the signed opening split and is the exact-only law when `split = 0`.
++    /// The two copies of the producing source receipt and the Word's opening must agree;
++    /// coordinate error radii never stand in for any of these power identities (Refs #73 #62).
++    pub fn closes(&self) -> bool {
++        self.error.opening.source == self.physical.opening
++            && self.error.opening.closes()
++            && self.physical.opening.after
++                == &self.physical.word.open + &self.physical.word.resonator_open
++            && self.physical.word.closes()
++            && self.physical.balances.iter().all(|balance| balance.closes())
++    }
++}
++
+ /// Both covector operands and the actual applied receiving move, independently of normal proposals.
+ #[derive(Debug)]
+ pub struct ChartedComparisonReceipt {
+diff --git a/crates/holonics/src/hnn/tests/physical_charted.rs b/crates/holonics/src/hnn/tests/physical_charted.rs
+index 368777432..1597f037c 100644
+--- a/crates/holonics/src/hnn/tests/physical_charted.rs
++++ b/crates/holonics/src/hnn/tests/physical_charted.rs
+@@ -241,3 +241,53 @@ fn exact_sparse_comparison_keeps_the_complete_forward_and_receiving_return() {
+     assert_eq!(sparse.pullback.receiving,complete.pullback.receiving);
+     assert_eq!(sparse.constitution,complete.constitution);
+ }
++
++/// The matched notebook used the exact source predicate on a charted physical receipt.
++/// Force its missing signed work through an actual non-dyadic source, and refuse corrupted
++/// opening, Word and local tick receipts rather than bypassing any balance assertion.
++#[test]
++fn charted_physical_balance_consumes_its_actual_opening_split() {
++    use crate::hnn::prediction::predict_sparse_by_field;
++    let started = std::time::Instant::now();
++    let field = field();
++    let theta = material(&field, true);
++    let current = Current::at_rest(&field);
++    let observed = encoded(&field, &[0, 1, 2]);
++    let damaged = DamagedSection::damage(&observed, &[2]).unwrap();
++    let phases = ReceivingPhases::declare(&field, &theta, &current, &receiver()).unwrap();
++    let exact = predict_sparse_by_field(&field, &theta, &current, &damaged,
++        &WordOpening::Rest, &phases).unwrap().finish();
++    assert!(exact.opening.closes() && exact.word.closes());
++    assert!(exact.balances.iter().all(|balance| balance.closes()));
++    let mut resident = ChartedPhysicalResident::new(&field, theta, current,
++        WordOpening::Rest, tolerance()).unwrap();
++    let prediction = resident.receive(&damaged, &receiver(), |_| None).unwrap().prediction;
++    let split = prediction.error.opening.split.clone();
++    assert!(!split.is_zero(), "the source must exercise the omitted opening work");
++    let residual = &prediction.physical.opening.after - &prediction.physical.opening.before
++        - &prediction.physical.opening.imposed + &prediction.physical.opening.absorbed;
++    assert_eq!(residual, -&split, "the exact-only residual is the negative split work");
++    assert!(!prediction.physical.opening.closes(), "the exact-only predicate must expose the omission");
++    assert!(prediction.closes(), "the full actual charted work balance must close");
++
++    let mut omitted = prediction.clone();
++    omitted.error.opening.split = Rat::zero();
++    assert!(!omitted.closes(), "missing actual split work must refuse");
++    let mut foreign = prediction.clone();
++    foreign.physical.opening.after += &split;
++    assert!(foreign.physical.opening.closes());
++    assert!(!foreign.closes(), "an exact-closing substituted source receipt must refuse");
++    let mut detached = prediction.clone();
++    detached.physical.word.open += &split;
++    detached.physical.word.end += &split;
++    assert!(detached.physical.word.closes(), "the isolated Word identity can still close");
++    assert!(!detached.closes(), "a different Word opening must refuse");
++    let mut word = prediction.clone();
++    word.physical.word.end += &split;
++    assert!(!word.closes(), "Word balance corruption must refuse");
++    let mut tick = prediction.clone();
++    tick.physical.balances[0].after += &split;
++    assert!(!tick.closes(), "local tick balance corruption must refuse");
++    println!("charted balance falsifier; split={split}; exact_only_opening_residual={residual}; charged_opening_residual={}; whole_output={:?}; elapsed_ns={}",
++        &residual + &split, prediction.physical.cells, started.elapsed().as_nanos());
++}
+diff --git a/research/notebook/hnn_design/hnn_physical_receive.rs b/research/notebook/hnn_design/hnn_physical_receive.rs
+index 6a97c98a4..8e790c2e6 100644
+--- a/research/notebook/hnn_design/hnn_physical_receive.rs
++++ b/research/notebook/hnn_design/hnn_physical_receive.rs
+@@ -480,7 +480,20 @@ fn charted_compare(teaching_count: usize, probe_count: usize, out: &str, terrain
+             assert_eq!(charted.prediction.physical.carry.ticks,exact_prediction.carry.ticks);
+             assert_eq!(charted.prediction.physical.carry.change.resonator_phases,exact_prediction.carry.change.resonator_phases);
+             assert_eq!(charted.prediction.physical.carry.conductances,exact_prediction.carry.conductances);
+-            assert!(closed(&exact_prediction) && closed(&charted.prediction.physical));
++            let exact_opening_residual = &exact_prediction.opening.after - &exact_prediction.opening.before
++                - &exact_prediction.opening.imposed + &exact_prediction.opening.absorbed;
++            let charted_opening_residual = &charted.prediction.physical.opening.after
++                - &charted.prediction.physical.opening.before - &charted.prediction.physical.opening.imposed
++                + &charted.prediction.physical.opening.absorbed;
++            let charted_opening_work = &charted_opening_residual + &charted.prediction.error.opening.split;
++            publish(&mut output,format!("matched balances; exact_opening_residual={exact_opening_residual}; exact_word_closes={}; exact_failed_tick={:?}; charted_opening_residual={charted_opening_residual}; charted_opening_split={}; charted_charged_opening_residual={charted_opening_work}; charted_source_receipts_match={}; charted_word_closes={}; charted_failed_tick={:?}; charted_balance_closes={}\n",
++                exact_prediction.word.closes(),exact_prediction.balances.iter().position(|balance|!balance.closes()),
++                charted.prediction.error.opening.split,
++                charted.prediction.physical.opening==charted.prediction.error.opening.source,
++                charted.prediction.physical.word.closes(),charted.prediction.physical.balances.iter().position(|balance|!balance.closes()),
++                charted.prediction.closes()));
++            assert!(closed(&exact_prediction) && charted.prediction.closes(),
++                "the exact balance and charted balance with its actual opening split must close");
+             let actual=coordinates(&charted.prediction.physical.carry.change);let reference=coordinates(&exact_prediction.carry.change);let radius=coordinates(&charted.prediction.error.end);
+             assert_eq!(actual.len(),reference.len());assert_eq!(actual.len(),radius.len());
+             let differences:Vec<_>=actual.iter().zip(&reference).map(|(a,b)|(a-b).abs()).collect();

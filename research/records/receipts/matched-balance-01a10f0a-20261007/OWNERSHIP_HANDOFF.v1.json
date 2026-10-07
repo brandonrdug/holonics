@@ -1,0 +1,37 @@
+{
+  "grade": "exact disjoint ownership named by HNN coordinator",
+  "issued": "2026-10-07T01:14:47Z",
+  "handoff_note": "94691a4f81924b7b98613bc917215bef",
+  "owners": {
+    "physical_balance": "01a10f0a",
+    "validation_queue": "01a10352"
+  },
+  "source_successor_from": "73fa7b720",
+  "owned_paths": [
+    "crates/holonics/src/hnn/physical.rs: the shared exact/sparse backend selection and one child-module declaration",
+    "crates/holonics/src/hnn/physical/communication.rs: new, the source-prefix and requested-boundary consumer",
+    "crates/holonics/src/hnn/tests/physical_communication.rs: new",
+    "crates/holonics/src/hnn/tests/mod.rs: its declaration only",
+    "docs/atlas/objects.tsv: the communication row only",
+    "the owner's dated law record and receipts"
+  ],
+  "read_only_paths": [
+    "crates/holonics/src/hnn/prediction.rs",
+    "crates/holonics/src/hnn/prediction/charted.rs",
+    "crates/holonics/src/hnn/word.rs",
+    "crates/holonics/src/hnn/reference.rs",
+    "Encoded, SourceMoment, field and material owners",
+    "crates/holonics-cuda",
+    "existing charted tests, canonical guides and plans"
+  ],
+  "scope": "An intact Encoded prefix placed once in the declared receiving aperture; the existing exact sparse Word supplies the complex receiving readings over the requested future section; the whole blind coface precedes the observed comparison, which compares requested stations only and reaches the existing normal deposit through the same Word.",
+  "open": [
+    "nonlinear adaptation",
+    "an acquired relation of use",
+    "a useful text or other raw codec",
+    "an autonomous action family",
+    "product evidence",
+    "the charted dependency, blocked by the continuation-v33 balance failure"
+  ],
+  "provenance_note": "The handoff note's text is internal agent communication and is not reproduced; this receipt keeps the ownership, scope and open items it declared."
+}

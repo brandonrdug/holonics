@@ -1,0 +1,4 @@
+
+thread 'main' (167830) panicked at crates/holonics/../../research/notebook/hnn_design/hnn_physical_receive.rs:483:13:
+assertion failed: closed(&exact_prediction) && closed(&charted.prediction.physical)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

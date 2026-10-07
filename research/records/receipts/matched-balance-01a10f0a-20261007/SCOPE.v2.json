@@ -1,0 +1,17 @@
+{
+  "status": "SOURCE_IMPLEMENTED; EXACT DISJOINT OWNERSHIP CONFIRMED; QUEUE VALIDATION PENDING",
+  "base": "73fa7b720c680ebd289e50cfdc3d870b5c0bea86",
+  "paths": [
+    "crates/holonics/src/hnn/prediction/charted.rs",
+    "crates/holonics/src/hnn/tests/physical_charted.rs",
+    "research/notebook/hnn_design/hnn_physical_receive.rs"
+  ],
+  "native_jobs": 0,
+  "consumer_equation": "after-before+split=imposed-absorbed; source.after=word.open+word.resonator_open; actual Word and every field tick close",
+  "selector": "hnn::tests::physical_charted::charted_physical_balance_consumes_its_actual_opening_split",
+  "source_law_changed": false,
+  "authority": "Parent assigned matched balance diagnosis/repair; isolated three native hunks, no shared or peer modification.",
+  "worktree": "/home/b/Workspaces/holonics/.local/wt/hnn-matched-balance-01a10f0a",
+  "base_with_unchanged_pin_metadata": "15f79b83d2a5b281c11d520defefb33f645710ed",
+  "ownership_message": "94691a4f81924b7b98613bc917215bef"
+}

@@ -72,6 +72,22 @@ pub struct ChartedPhysicalRepair {
     pub error: ChartedErrorReceipt,
 }
 
+impl ChartedPhysicalRepair {
+    /// Close the actual source opening, Word and every executed tick with their stated work.
+    /// `after - before + split = imposed - absorbed`: projecting onto `physical.opening`
+    /// alone omits the signed opening split and is the exact-only law when `split = 0`.
+    /// The two copies of the producing source receipt and the Word's opening must agree;
+    /// coordinate error radii never stand in for any of these power identities (Refs #73 #62).
+    pub fn closes(&self) -> bool {
+        self.error.opening.source == self.physical.opening
+            && self.error.opening.closes()
+            && self.physical.opening.after
+                == &self.physical.word.open + &self.physical.word.resonator_open
+            && self.physical.word.closes()
+            && self.physical.balances.iter().all(|balance| balance.closes())
+    }
+}
+
 /// Both covector operands and the actual applied receiving move, independently of normal proposals.
 #[derive(Debug)]
 pub struct ChartedComparisonReceipt {

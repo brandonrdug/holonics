@@ -1,0 +1,204 @@
+{
+  "version": 2,
+  "status": "SOURCE_READY; exact disjoint ownership confirmed; sole queue validation requested under unchanged ordinary controls",
+  "source_base": "73fa7b720c680ebd289e50cfdc3d870b5c0bea86",
+  "accepted_charted_source": "0da1652c59fb27eb7fde3ba63e7a705aa251d207",
+  "accepted_charted_receipt": "fb7859a2e1c2e173d766fec61d39b10eb408dfc4",
+  "integrated_accepted_consumer": "59be8493e446fc15b8b3e5841273c8bb5b10a80d",
+  "worktree": "/home/b/Workspaces/holonics/.local/wt/hnn-matched-balance-01a10f0a",
+  "branch": "codex/hnn-matched-balance-01a10f0a",
+  "source_snapshot_cwd": "/home/b/Workspaces/holonics/.local/wt/hnn-matched-balance-01a10f0a/.local/matched-balance-01a10f0a-20261007/source-v2",
+  "source_input_count": 292,
+  "source_input_manifest": {
+    "path": "/home/b/Workspaces/holonics/.local/wt/hnn-matched-balance-01a10f0a/.local/matched-balance-01a10f0a-20261007/SOURCE_INPUT_MANIFEST.v2.json",
+    "bytes": 48200,
+    "sha256": "0ae270cdbdca45760bd6f536ef570a01ec2ac3f899d55dd6fcd262ef4918db77"
+  },
+  "atomic_patch": {
+    "path": "/home/b/Workspaces/holonics/.local/wt/hnn-matched-balance-01a10f0a/.local/matched-balance-01a10f0a-20261007/ATOMIC_NATIVE.v2.patch",
+    "bytes": 7814,
+    "sha256": "f1c810394e83cea2aef10e5c9e640f94d387cb7e089f4e64d02da975b674ab01"
+  },
+  "changed_native_paths": [
+    "crates/holonics/src/hnn/prediction/charted.rs",
+    "crates/holonics/src/hnn/tests/physical_charted.rs",
+    "research/notebook/hnn_design/hnn_physical_receive.rs"
+  ],
+  "hypothesis": "The first matched balance failure has an exact-only consumer which omits existing signed opening split work. New complete repair closure binds both source receipt copies, opening-to-Word identity, Word and all tick balances; old failure alone does not measure which conjunct failed. Added primitive diagnostics before asserting. No actual work law changed.",
+  "fixed_read_partition": {
+    "classes": 4,
+    "length": 4,
+    "target_station": 2,
+    "period": 4,
+    "source_offsets": [
+      1,
+      2,
+      3
+    ],
+    "teaching_count": 4,
+    "probe_count": 4,
+    "teaching_loci": [
+      "Receiving",
+      "Receiving",
+      "Receiving",
+      "Receiving"
+    ],
+    "terrain": "order2",
+    "seed_pair": [
+      20261006001,
+      20261006011
+    ],
+    "source_rule": "KnownTruth complete class translation orbit, same as coverage; spent correlated development",
+    "observed_mask": [
+      false,
+      false,
+      true,
+      false
+    ],
+    "component_tolerances": {
+      "logits": "1/16",
+      "receiving_covector": "1/16",
+      "source_covector": "1/16"
+    },
+    "receiving_grain": 16,
+    "material_rule": "Both words read actual contemporary charted Theta at each step. Exact hypothetical successor is discarded. Only charted R publication continues.",
+    "carry_rule": "Actual charted and exact reference carries both continue Absorption::Nothing; matching absolute tick and native carried error box; no reset",
+    "missing_source_output": "Held UncertifiedDomain in both sparse routes; exact completion-domain calculation explicitly excluded in new control"
+  },
+  "candidate_compile_and_gate_commands": [
+    [
+      "bash",
+      "tools/gate.sh"
+    ],
+    [
+      "cargo",
+      "test",
+      "-p",
+      "holonics",
+      "--lib",
+      "--no-run",
+      "--message-format=json"
+    ],
+    [
+      "cargo",
+      "build",
+      "-p",
+      "holonics",
+      "--example",
+      "hnn_prediction",
+      "--message-format=json"
+    ]
+  ],
+  "native_test_selectors": [
+    "hnn::tests::physical_charted::charted_physical_balance_consumes_its_actual_opening_split"
+  ],
+  "test_runtime_argv_template": [
+    "<queue source-matched lib test executable>",
+    "hnn::tests::physical_charted::charted_physical_balance_consumes_its_actual_opening_split",
+    "--exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "runtime_argv_template": [
+    "<queue source-matched notebook actual main>",
+    "executed",
+    "physical-learn",
+    "charted-compare",
+    "4",
+    "4",
+    "<queue owned output>",
+    "<queue measured committed pin>",
+    "order2=20261006001:20261006011"
+  ],
+  "cache_preflight": "Verify immutable292 inputs; all289 unchanged native inputs identical to frozen73. Rebuild3 changed library/test/notebook inputs and required guards. Reuse accepted unchanged charted fixtures and sparse-forward/return fixture; run only new balance law fixture once. Fresh memory/common lease, provider/executable/pin binding owned by sole queue. No old coverage/causal replay.",
+  "projection": {
+    "status": "Queue-owned bind to changed producing source before launch; keep original failed matched full projection10972158131ns, unit guard1277ms/deadline10682ms, all runtime ceilings unchanged; no limit raise.",
+    "unit_partition": "eight sequential matched units; each executes exact sparse forward plus charted forward/error, then teaching exact comparison and actual charted R comparison or blind no-deposit probe; separate boundary checks",
+    "prior_inputs_only": "Largest exact physical teaching floor562ms and exact physical probe518904387ns; accepted charted receiving fixture617575542ns includes its source fixture/control/comparison path; accepted loaded fixture412687446ns. These are prior distinct total readings, not a measured new rate or permission to add caps. Use queue development/cache preflight and largest measured relevant units; fix projection once before runtime.",
+    "no_tolerance_or_limit_raise": true,
+    "early_stop": "comparison refusal preserves measured forward/carry error and cost then ends; whole unit exceeding fixed bound ends before next unit",
+    "terminal32_prior_measurement": "Actual coverage probe659479091ns is a prior measurement of a distinct material/read, preserved with its failed563000000ns bound. It grants no higher-bound repeat or accepted four-probe protocol. The new unrun matched/causal prospective projection remains queue-owned, fixed from its declared units and relevant largest prelaunch measurements under unchanged group caps.",
+    "first_failed_run": {
+      "source_commit": "73fa7b720c680ebd289e50cfdc3d870b5c0bea86",
+      "failure": "first balance assertion before cost/error output",
+      "wall_ns": 663389390,
+      "full_projection_ns": 10972158131,
+      "no_valid_new_unit_rate_measured": true,
+      "do_not_relaunch_unchanged": true
+    }
+  },
+  "runtime_policy": {
+    "aggregate_cpu_limit_us": 17000000,
+    "wall_ceiling_ns": 60000000000,
+    "group_memory_max_bytes": 4294967296,
+    "threads": 1,
+    "prelaunch_available_bytes": 8589934592,
+    "running_floor_bytes": 4294967296,
+    "no_limit_raise": true,
+    "pin_lease_projection_owned_by_queue": true
+  },
+  "acceptance_observables": [
+    "complete exact/sparse same forward/opening/carry/ratio/Receiving return/deposit fixture passes",
+    "whole exact-sparse/charted blind cells published before target; no probe observation or deposition",
+    "same complete chart/material/frame, actual absolute ticks/resonator phases/conductances, full receiving/matrix shapes",
+    "actual coordinate carry/logit/Receiving-covector differences enclosed by native producing bounds",
+    "actual R change and charged applied comparison; E/pair/nonlinear publication unsupported; missing stations Held",
+    "separate exact sparse forward vs charted forward plus error cost, signed saved time, cold vs warm charts, boundary and comparison categories",
+    "all actual physical balances close; no refusal continuation or tolerance tuning",
+    "full immutable source/provider/executable/pin/time/CPU/memory/projection/cleanup/release receipts"
+  ],
+  "source_owner_validation": [
+    "source/owner/consumer and exact signed opening-work identities recovered from atlas, prior record and concrete producing code",
+    "all292 files individually hashed, exactly3 changed and289 identical to original failed matched73 manifest",
+    "git diff --check passed; new exact falsifier, guards, type/link/main/runtime pending queue"
+  ],
+  "not_acceptance": [
+    "reconstruction or useful product",
+    "learned relation or transfer",
+    "all exact/charted states identical",
+    "matched timing or complete error result before actual read",
+    "GPU, nonlinear or E/pair publication"
+  ],
+  "remaining_blockers": [
+    "sole queue source-matched required guard/workspace/type/link/main closure",
+    "new nonzero actual opening-split selector executed once",
+    "changed matched4+4 read under original fixed protocol/tolerances/projection, or honest measured early stop"
+  ],
+  "no_source_owner_execution": true,
+  "unchanged_scientific_operands": true,
+  "failure_correction": "ChartedPhysicalRepair consumes actual existing source split work instead of projecting its source subreceipt into the exact-only helper; no predicate weakened by adding tolerance or bypassing any source/Word/local balance. Original failed run preserved.",
+  "guard_first_command": [
+    "cargo",
+    "clippy",
+    "-p",
+    "holonics",
+    "--all-targets",
+    "--",
+    "-D",
+    "clippy::disallowed_types",
+    "-D",
+    "clippy::disallowed_methods",
+    "-D",
+    "clippy::float_arithmetic"
+  ],
+  "submission_stage_order": "Queue admit unchanged ordinary guarded build controls, fresh source-matched affected libtest/main and one new law selector, then changed matched read only. Never replay original73 unchanged or broaden tests/sweeps.",
+  "priority": "matched first, causal next, return syntax after native; source/provider identities must remain separate",
+  "coverage_terminal32": {
+    "status": "INCOMPLETE; never replay unchanged",
+    "four_R_observations_published": true,
+    "R_rows_0_1_equal": false,
+    "erasure_probes": [
+      "Held[1,2]",
+      "Held[0,1,2]"
+    ],
+    "largest_actual_probe_ns": 659479091,
+    "old_fixed_section_bound_ns": 563000000,
+    "old_bound_excess_ns": 96479091,
+    "not_a_new_bound_or_cap": true
+  },
+  "metadata_pin_base": "15f79b83d2a5b281c11d520defefb33f645710ed",
+  "native_receipts_destination": "/home/b/Workspaces/holonics/.local/wt/hnn-matched-balance-01a10f0a/research/records/receipts/matched-balance-01a10f0a-20261007/native-validation-v1",
+  "source_owner": "matched balance worker01a10f0a, parent-assigned disjoint lane; coordinator01a1030c owns communication and integration",
+  "changes_since_v1": "Detached Word falsifier moves both Word endpoints, so its isolated Word closure still holds and only the opening join rejects it; coordinator exact disjoint ownership confirmed.",
+  "coordinator_ownership_message": "94691a4f81924b7b98613bc917215bef"
+}
