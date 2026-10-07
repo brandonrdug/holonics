@@ -207,6 +207,7 @@ fn source_observer_same_carrier_normal_comparison_preserves_carry_and_withholds_
     use crate::hnn::prediction::{predict_by_source_observer, predict_sparse_by_field};
     use crate::hnn::receiving::{ReceivingCarrier, SourceObserverMaterial};
     use crate::hnn::word::Absorption;
+    use crate::ratio::Rat;
     let field = four_station_field();
     let initial = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap();
     let old_law = initial.receiving_law(0).unwrap().clone();
