@@ -136,6 +136,33 @@ with its consumer. Names identify roles; semantic policing alone establishes nei
 nor failure. Consolidation joins actual Holon data and dynamics at shared relations, rather than
 giving parallel implementations the same label or freezing a library abstraction prematurely.
 
+<a id="relation-index"></a>
+
+[project-postulate, October 7; wording agent-inferred] **The common index is organized by
+operations and relations.** Disciplinary names are aliases for recovering a construction. For
+each entry state what evolves, what couples, what is preserved, the boundary transformation and
+the next admitted composition, then its source maps, hypotheses and receipt. Use the existing
+[expression atlas](atlas/README.md), whose rows already carry expressions, scope, owners, grades
+and relations; this contract routes those rows rather than creating another language or library.
+Similar words or patterns do not prove equivalence. A cross-domain equivalence needs the producing
+maps and their commuting relation or complete residual. A speculative bridge remains developable
+under its stated hypothesis and owed consumer.
+
+The musical reading is generative: learn chord relations, transitions and compositional structure
+from the passage, then use those relations in a new composition. Reproducing a song alone does
+not establish that acquisition. A musical chord and the receiver's causal transfer chord share
+a word; their relationship still needs an explicit producing chart. No musical consumer is
+certified by the analogy.
+
+| Operation and relation to recover | Domain aliases and existing operator/source maps |
+|---|---|
+| **Interconnect:** coupled participants retain their laws; interface flow/effort pairs cancel shared power; the joined whole can compose again or return a gluing defect. | Circuit junction, coupled network, shared interface. [Objects atlas](atlas/objects.tsv): `holarchy.interconnect-typed`, `holarchy.shared-face-cancels`; `Holon::interconnect` and `Holarchy::whole`. |
+| **Move and rechart:** motion changes; the boundary map transports state and metric; physical work and the next move remain explicit. | Motion, frame transport, change of basis. [Geometry atlas](atlas/geometry.tsv): `motion.turn-boost-split`, `motion.finite-work-chart`; Lean `Geometry/Motion`, Rust `geometry::motion`. |
+| **Enter and encode:** the source evolves by its transport; `D E = ρ` and `E T = U E` join its boundary reading and native advance; phase/carry reaches the next entrance. | Codec, coordinate encoding, source entrance. [Objects atlas](atlas/objects.tsv): `hnn.encoded-source-type`, `hnn.encoded-located-step`; `Encoded::{through,check_step}`, `Field::selective_step`, `SourceMoment::ingest`. |
+| **Compare, return and depose:** a produced/target ratio gives its covector through the producing operands; reached deposition changes the constitution that the next reception meets. | Comparison, learning, material adaptation. [Objects atlas](atlas/objects.tsv): `ratio.loss-is-log-ratio`, `ratio.log-derivative`, `hnn.normal-statistic-standing`; `HolonRatio::covector`, `Constitution::deposited`. Each material/receiving normal relation keeps its own hypotheses. |
+| **Retain and continue:** an admitted future factors through the quotient; a boundary crossing carries its current interior, clock and residual into the next interaction. | Memory, state reduction, continuation. [Information atlas](atlas/information.tsv): `info.standing-quotient`, `retention.action-sufficient-quotient`; [objects atlas](atlas/objects.tsv): `hnn.reception-cut`, `hnn.reception-carry`; `Word::open_received`, `Reference::mount_continued`. Their quotient and carry obligations differ. |
+| **Locate keys and compose navigators:** contacts constrain producing configurations; restrictions preserve the admitted faces; located relations support further navigation and converging landmarks. | Source identification, resonant composition, generative relationships. [Objects atlas](atlas/objects.tsv): `key.menu-loop-closure`, `key.consistent-fibre`, `key.gauge-orbit`, `compression.encoder-decoder-square`; `compression::keys::{Menu,Gauge}` and the declared navigator transports. A new domain supplies its chart and acceptance. |
+
 [source-audit] **Current types and roles**, read at public
 [`3c67beee`](https://github.com/brandonrdug/holonics/commit/3c67beee7f656798f912c974f12c482ea12c5e42).
 This is a map of that realization, not a prescribed final type hierarchy:

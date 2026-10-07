@@ -79,3 +79,23 @@ restriction and device checks. A changed mathematical relation needs its own gra
 acceptance; earlier proofs and measurements retain their original scope. This addresses the
 recorded failures of an unrepaired cause reaching a new consumer, parallel owners without a
 shared law, and source/receipt drift. No code owner is moved by this contract update.
+
+## Relation-first refinement, October 7
+
+[project-postulate; wording agent-inferred] Brandon located the terminology's fraying in the
+different disciplinary names for the relationships of one dynamic structure. The musical example
+distinguishes learning generative chords, transitions and compositional relationships from
+reproducing songs. It describes the intended acquisition, not a passed musical HNN consumer.
+
+[definition; agent-inferred] The [common relation index](../../docs/ELEMENTARY_OBJECTS.md#relation-index)
+routes the existing atlas by interconnection, motion/recharting, source entrance, comparison and
+deposition, retention/continuation, and key location/composition. Each entry names what evolves,
+what couples, what is preserved, its boundary transformation and the next admitted composition,
+with domain aliases and actual source maps. The atlas already owns the equations, hypotheses,
+grades and joins; no topical vocabulary library or replacement schema is introduced.
+
+Cross-domain equivalence requires the producing maps and their commuting relation or complete
+residual. Unproved bridges remain hypotheses that can be derived, developed and tested. The
+shared word "chord" supplies no equivalence between a musical relation and a causal transfer
+object. This joins the recorded failures of incompatible meanings at consumers and a copied
+output credited as generation, while retaining the previous source/version obligations.
