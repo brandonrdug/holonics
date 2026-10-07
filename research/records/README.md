@@ -27,6 +27,8 @@ records derive its laws and measure the prototype, whose code is in history.
 
 ### Current (September 24 onward)
 
+- [The charted source return re-represents its producing chart](2026-10-07_THE_CHARTED_SOURCE_RETURN_RE_REPRESENTS_ITS_PRODUCING_CHART.md) (#73, #63, #62): preserve the continuation-v34 passed opening balance and incomplete cold comparison; promote the existing exact chart-value representation for unsplit source responses, with actual operand falsifier and retained route/check receipts; execution pending, no speedup claim.
+
 - [The source class orbit covers the receiving comparison before any probe](2026-10-06_THE_SOURCE_CLASS_ORBIT_COVERS_THE_RECEIVING_COMPARISON_BEFORE_ANY_PROBE.md) (#73, #148, #63): complete class translations of independently seeded KnownTruth cyclic representatives, fixed four Receiving comparisons and four blind probes, actual zero/one row gate and explicit correlated development scope; actual 8c cost body consumed, one identical exterior control removed, new native acceptance pending.
 
 - [The physical acquisition read separates context from bias and carry](2026-10-06_THE_PHYSICAL_ACQUISITION_READ_SEPARATES_CONTEXT_FROM_BIAS_AND_CARRY.md) (#73, #148, #63): existing producer/caller class correction and prepared same-Word withheld teaching; exact archived movements and whole outputs, covered-class failure with recovered phase-local teaching features, U6 consumer/split qualification, and actual exterior cost categories; source coverage changes remain pending the sole queue.

@@ -1,0 +1,57 @@
+{
+  "research/records/receipts/charted-operand-01a10f0a-20261007/predecessor/VALIDATION.v34.json": {
+    "bytes": 252681,
+    "sha256": "af964297e97f1ec697be3f219690a8f7608f401c794b57357199236663f0ea5a",
+    "source": "/home/b/Workspaces/holonics/.local/wt/hnn-matched-balance-01a10f0a/research/records/receipts/matched-balance-01a10f0a-20261007/native-validation-v1/VALIDATION.json"
+  },
+  "research/records/receipts/charted-operand-01a10f0a-20261007/predecessor/opening-work-balance.stdout": {
+    "bytes": 456,
+    "sha256": "7b2060c5be4621d12c99309714e349eb2ab2fae705029588a6b083222db2cab3",
+    "source": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-matched-balance-7adf4d3b-opening-work-balance-20261006-v1.stdout"
+  },
+  "research/records/receipts/charted-operand-01a10f0a-20261007/predecessor/opening-work-balance.stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "source": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-matched-balance-7adf4d3b-opening-work-balance-20261006-v1.stderr"
+  },
+  "research/records/receipts/charted-operand-01a10f0a-20261007/predecessor/opening-work-balance.acceptance.json": {
+    "bytes": 378,
+    "sha256": "27678e41040ca49c4c4a593eaed4f443272db9b2bd7ddb4e50af9c2281893acc",
+    "source": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-matched-balance-7adf4d3b-opening-work-balance-20261006-v1.acceptance.json"
+  },
+  "research/records/receipts/charted-operand-01a10f0a-20261007/predecessor/opening-work-balance.final.json": {
+    "bytes": 5082,
+    "sha256": "e7d183312bb2448472ed30cdd2f3329a55f6c6b8fa52c43c5b57f3530fcdacd2",
+    "source": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-matched-balance-7adf4d3b-opening-work-balance-20261006-v1.final.json"
+  },
+  "research/records/receipts/charted-operand-01a10f0a-20261007/predecessor/opening-work-balance.release.json": {
+    "bytes": 172,
+    "sha256": "52a1dd8adf78d2e0f907473f9955a828396b461cbb127f55836d346313513dcf",
+    "source": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-matched-balance-7adf4d3b-opening-work-balance-20261006-v1.release.json"
+  },
+  "research/records/receipts/charted-operand-01a10f0a-20261007/predecessor/charted-compare-4plus4.stdout": {
+    "bytes": 2297,
+    "sha256": "92cad97b2e0348e4cad98cf8118bedceeae2f80e48f0d1d3d7e0abc5ebd5755d",
+    "source": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-matched-balance-7adf4d3b-charted-compare-4plus4-20261006-v1.stdout"
+  },
+  "research/records/receipts/charted-operand-01a10f0a-20261007/predecessor/charted-compare-4plus4.stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "source": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-matched-balance-7adf4d3b-charted-compare-4plus4-20261006-v1.stderr"
+  },
+  "research/records/receipts/charted-operand-01a10f0a-20261007/predecessor/charted-compare-4plus4.acceptance.json": {
+    "bytes": 377,
+    "sha256": "fb01b5a6bd43147b77d9f01ebcb6869dcc8e4a7dcd1be884d4e074e5a4ae7e15",
+    "source": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-matched-balance-7adf4d3b-charted-compare-4plus4-20261006-v1.acceptance.json"
+  },
+  "research/records/receipts/charted-operand-01a10f0a-20261007/predecessor/charted-compare-4plus4.final.json": {
+    "bytes": 5115,
+    "sha256": "0252f0cc45b0617b52e2561fcb267abfa185042eff392a8dea9bb4ac5287689f",
+    "source": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-matched-balance-7adf4d3b-charted-compare-4plus4-20261006-v1.final.json"
+  },
+  "research/records/receipts/charted-operand-01a10f0a-20261007/predecessor/charted-compare-4plus4.release.json": {
+    "bytes": 172,
+    "sha256": "ad4d599e2529acaed92628542e7ff8f586968447e137e8e798ceda13960271cb",
+    "source": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-matched-balance-7adf4d3b-charted-compare-4plus4-20261006-v1.release.json"
+  }
+}

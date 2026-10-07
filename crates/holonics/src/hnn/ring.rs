@@ -1386,7 +1386,6 @@ impl ResonatorOperands {
     /// **The executed charts with no transient split**: every phase's solve the executed chart's
     /// exact values, its certificate kept (the resonator's part of the word's executed linear map,
     /// on which a return pairs exactly: `Operands::unsplit`).
-    #[cfg(test)]
     pub(crate) fn unsplit(mut self) -> Result<Self, HnnError> {
         for phase in &mut self.phases {
             if let PhaseSolve::Chart(chart) = &phase.solve {

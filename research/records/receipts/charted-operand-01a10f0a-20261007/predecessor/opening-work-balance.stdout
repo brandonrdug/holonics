@@ -1,0 +1,7 @@
+
+running 1 test
+test hnn::tests::physical_charted::charted_physical_balance_consumes_its_actual_opening_split ... charted balance falsifier; split=8191/301989888; exact_only_opening_residual=-8191/301989888; charged_opening_residual=0; whole_output=[Intact(0), Intact(1), Held { fibre: [0, 1, 2, 3], unresolved: UncertifiedDomain }]; elapsed_ns=48563030
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1047 filtered out; finished in 0.05s
+

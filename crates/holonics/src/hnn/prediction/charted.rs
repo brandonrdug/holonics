@@ -16,7 +16,7 @@
 //! immediate comparison; the resident retains Theta, frame, charts, carry and its current box.
 
 use super::*;
-use crate::hnn::chart::{Charts, Remainders};
+use crate::hnn::chart::{ChartReading, Charts, Remainders};
 use crate::hnn::constitution::{Constitution, LinearLocus, Locus, Reach};
 use crate::hnn::field::ReceiverDeclaration;
 use crate::hnn::port::{Deposit, WordReturn};
@@ -60,6 +60,8 @@ pub struct ChartedStationError {
 #[derive(Clone, Debug)]
 pub struct ChartedErrorReceipt {
     pub opening: ChartedSourceOpeningReceipt,
+    /// Producing chart selection/refinement readings; these are not retained response columns.
+    pub charts: Vec<ChartReading>,
     pub initial: EndChange,
     pub end: EndChange,
     pub stations: Vec<ChartedStationError>,
@@ -362,7 +364,7 @@ fn predict<'f, 'm>(field: &'f Field, material: &'m Constitution, current: &Curre
         word: WordBalance::of(&word.released()?), carry };
     Ok(ChartedPhysicalPrediction { pending: PhysicalPrediction { field, material, current: current.clone(),
         phases: phases.clone(), chart: section.chart().clone(), opening_support: opening.support(field),
-        source, word, prediction }, error: ChartedErrorReceipt { opening: receipt, initial, end: radius, stations: errors } })
+        source, word, prediction }, error: ChartedErrorReceipt { opening: receipt, charts: operands.charts(), initial, end: radius, stations: errors } })
 }
 
 fn sup(x: &[Rat]) -> Rat { x.iter().map(|x| x.abs()).max().unwrap_or_else(Rat::zero) }
@@ -517,6 +519,17 @@ fn receiving_error(field:&Field,current:&Current,phases:&ReceivingPhases,back:&W
 fn source_return_error(field:&Field,material:&Constitution,current:&Current,phases:&ReceivingPhases,
     operands:&Operands,opened_at:usize,g:&RatioCovector,ge:&[Vec<Rat>],back:&WordReturn)
     ->Result<(Vec<Vec<Rat>>,Vec<Vec<Rat>>),HnnError> {
+    // [agent-inferred] These columns are the unsplit linear response of the producing
+    // charts, not transient hardware Words. Re-represent the SAME Xhat and weights as exact
+    // integer rows before their rational coordinates outgrow the i64 input carrier. No inverse,
+    // refinement, certificate, tolerance or actual forward/adjoint operand is replaced.
+    let linear = operands.clone().unsplit()?;
+    source_return_error_on(field,material,current,phases,&linear,opened_at,g,ge,back)
+}
+
+fn source_return_error_on(field:&Field,material:&Constitution,current:&Current,phases:&ReceivingPhases,
+    operands:&Operands,opened_at:usize,g:&RatioCovector,ge:&[Vec<Rat>],back:&WordReturn)
+    ->Result<(Vec<Vec<Rat>>,Vec<Vec<Rat>>),HnnError> {
     let mut error:Vec<_>=field.rings().iter().map(|r|vec![Rat::zero();r.width()]).collect();
     let mut rounding=error.clone();
     for &ring in field.sources() {for coordinate in 0..field.ring(ring).width() {
@@ -562,4 +575,152 @@ fn same_interior(field:&Field,a:&Constitution,b:&Constitution)->bool {
         && a.contact_stiffness_signature(a_index)==b.contact_stiffness_signature(a_index)
         && a.contact_surface_storage(a_index)==b.contact_surface_storage(a_index)
     })
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::compression::landmark::context::{BaseMeasure, StopPrior};
+    use crate::geometry::RatVec3;
+    use crate::geometry::screw::ScrewGenerator;
+    use crate::hnn::chart::ChartStart;
+    use crate::hnn::constitution::CAMPAIGN_ONE_BUDGET;
+    use crate::hnn::field::{ContactDeclaration, CribDeclaration, FieldDeclaration, RingDeclaration};
+    use crate::holarchy::terrain::{CyclicLaw, KnownTruth};
+    use crate::ratio::linear::vector::integral;
+    use crate::ratio::{integer, rat};
+    use num_traits::ToPrimitive;
+
+    // Exact operands of the refused matched first comparison, not a new source family.
+    fn matched_field() -> Field {
+        let ring = |lock| RingDeclaration {
+            period: 4,
+            screw: ScrewGenerator::new(RatVec3::from_i64(0,0,1), RatVec3::zero()),
+            placements: (0..4).map(|node| FieldDeclaration::quarter_turn(node,4)).collect(),
+            lock, reflector: vec![0,3,2,1], admittance: integer(2), initial: 0,
+        };
+        let contact = |from,to| ContactDeclaration {
+            from, to, channel: (0..4).map(|node|(node,node)).collect(),
+            admittance: integer(2), exponent: Rat::zero(),
+        };
+        Field::declare(FieldDeclaration {
+            rings: vec![ring((0..4).collect()),ring(Vec::new()),ring(Vec::new())],
+            contacts: vec![contact(0,1),contact(1,2)], loops: Vec::new(), sources: vec![0],
+            offsets: vec![1,2,3], alphabet: 4, step: integer(1), exponent_grain: 1,
+            receivers: vec![ReceiverDeclaration { ring:0, aperture:3, tolerance:rat(1,16),
+                depth:1, prior:StopPrior::half(), mass:1, base:BaseMeasure::Even, receiving_prior:0 }],
+            crib: CribDeclaration { window:16, offset:1 }, population:1<<16, lattice:Default::default(),
+        }.by_lattice_rule()).unwrap()
+    }
+
+    // Trace the first refused transit of the SAME response-column loop. The right side is read
+    // through the producing chart's exact values, so its numerator/denominator survives refusal.
+    fn refused_response_operand(field:&Field, phases:&ReceivingPhases, operands:&Operands, opened_at:usize) {
+        let linear=operands.clone().unsplit().unwrap();
+        for &source in field.sources() { for coordinate in 0..field.ring(source).width() {
+            let mut point=EndChange::rest(field,operands);point.storage[source][coordinate]=Rat::one();
+            let mut radius=EndChange::rest(field,operands);
+            for crossing in 0..phases.junction_steps()-1 {
+                let (error,stage)=match tick_error(operands,&point,&radius,opened_at+crossing) {
+                    Ok(next)=> {
+                        radius=next;
+                        match physical_signed_tick(operands,&point,opened_at+crossing) {
+                            Ok(next)=>{point=next;continue},
+                            Err(error)=>(error,"signed response tick"),
+                        }
+                    }
+                    Err(error)=>(error,"response radius"),
+                };
+                assert!(matches!(error,HnnError::Carrier { what:"an operand's coordinate beyond the 64-bit word" }));
+                let centers=physical_signed_junctions(operands,&point).unwrap();
+                if stage=="signed response tick" {
+                    for (r,ring) in operands.rings().iter().enumerate() {
+                        let c=&centers[r];
+                        let right=add(&scale(&integer(2),&c.storage_wave),&ring.contrast().apply(&c.contrast).unwrap());
+                        let (numerators,denominator)=integral(&right);
+                        if numerators.iter().any(|n|n.to_i64().is_none()) {
+                            let refused=crate::hnn::propagation::element_step(ring,&c.storage_wave,&c.contrast);
+                            assert!(matches!(refused,Err(HnnError::Carrier { what:"an operand's coordinate beyond the 64-bit word" })));
+                            println!("old response refused: stage={stage}; source_ring={source}; coordinate={coordinate}; absolute_tick={}; ring={r}; exact_right={right:?}; integral_numerators={numerators:?}; positive_denominator={denominator}; magnitude_bits={:?}",
+                                opened_at+crossing,numerators.iter().map(|n|n.bits()).collect::<Vec<_>>());
+                            return;
+                        }
+                    }
+                }
+                for (a,contact) in operands.contacts().iter().enumerate() {
+                    let (from,to)=contact.ends();
+                    let args=[outgoing(operands,&centers,from,a),outgoing(operands,&centers,to,a),
+                        point.states[a][0].as_slice(),point.states[a][1].as_slice()];
+                    let (right,image)=crate::hnn::propagation::transit_solve(&linear.contacts()[a],
+                        linear.step(),args[0],args[1],args[2],args[3]).unwrap();
+                    let (numerators,denominator)=integral(&right);
+                    if numerators.iter().any(|n|n.to_i64().is_none()) {
+                        let refused=crate::hnn::propagation::transit_solve(contact,operands.step(),
+                            args[0],args[1],args[2],args[3]);
+                        assert!(matches!(refused,Err(HnnError::Carrier { what:"an operand's coordinate beyond the 64-bit word" })));
+                        assert_eq!(image,contact.solve().unwrap().apply(&right).unwrap());
+                        println!("old response refused: stage={stage}; source_ring={source}; coordinate={coordinate}; absolute_tick={}; contact={a}; exact_right={right:?}; integral_numerators={numerators:?}; positive_denominator={denominator}; magnitude_bits={:?}; same_Xhat_image={image:?}",
+                            opened_at+crossing,numerators.iter().map(|n|n.bits()).collect::<Vec<_>>());
+                        return;
+                    }
+                }
+                panic!("the diagnosed matched refusal must expose its producing operand");
+            }
+        }}
+        panic!("the actual refused response operand must be reproduced");
+    }
+
+    #[test]
+    fn source_response_re_represents_the_producing_chart() {
+        let started=std::time::Instant::now();
+        let field=matched_field();let theta=Constitution::initial(&field,CAMPAIGN_ONE_BUDGET).unwrap();
+        let current=Current::at_rest(&field);
+        let receiver=ReceiverDeclaration {aperture:4,..field.receivers()[0].clone()};
+        let phases=ReceivingPhases::declare(&field,&theta,&current,&receiver).unwrap();
+        let truth=KnownTruth::cyclic_class_orbit(CyclicLaw::OrderTwo {opening:2},4,20261006001,4).unwrap();
+        let observed=Encoded::identity(&truth,&field).unwrap().remove(0);
+        let damaged=DamagedSection::damage(&observed,&[2]).unwrap();
+        assert_eq!(damaged.placed(),vec![Some(2),Some(2),None,Some(3)]);
+        let mut charts=Charts::new();
+        let pending=predict(&field,&theta,&current,&damaged,&WordOpening::Rest,None,&phases,&mut charts).unwrap();
+        println!("same matched blind cells={:?}; actual ticks={}; producing charts={:?}",
+            pending.prediction().cells,pending.prediction().carry.ticks,pending.error().charts);
+        assert!(matches!(pending.prediction().cells[2],RepairedCell::Held {..}));
+        let compared=[false,false,true,false];
+        let reads:Vec<_>=pending.prediction().reads.iter().map(|r|r.read.clone()).collect();
+        let targets:Vec<_>=observed.classes_read().collect();
+        let ratio=HolonRatio::compare_partition(Faces::of_reads(&reads,phases.grain()).unwrap(),&targets,
+            &target_phases(&field,current.lift(),0,&observed).unwrap(),&compared).unwrap();
+        let g=ratio.covector().unwrap();
+        let ge=comparison_error(&reads,&pending.error.stations,&targets,&compared,phases.grain()).unwrap();
+        let word=&pending.pending.word;
+        let back=word.pull_back(&g,theta.receiving_map(0).unwrap(),&current.lift()[0],&phases).unwrap();
+        let operands=word.operands();let opened_at=word.opened_at();
+        let old=source_return_error_on(&field,&theta,&current,&phases,operands,opened_at,&g,&ge,&back);
+        assert!(matches!(old,Err(HnnError::Carrier { what:"an operand's coordinate beyond the 64-bit word" })));
+        refused_response_operand(&field,&phases,operands,opened_at);
+        let linear=operands.clone().unsplit().unwrap();
+        assert_eq!(linear.charts(),operands.charts());
+        for (r,l) in operands.rings().iter().zip(linear.rings()) {assert_eq!(r.solve().unwrap(),l.solve().unwrap());}
+        for (r,l) in operands.contacts().iter().zip(linear.contacts()) {assert_eq!(r.solve().unwrap(),l.solve().unwrap());}
+        for ring in 0..field.rings().len() {assert_eq!(operands.weights(ring),linear.weights(ring));}
+        let changed=source_return_error(&field,&theta,&current,&phases,operands,opened_at,&g,&ge,&back).unwrap();
+        assert_eq!(changed,source_return_error_on(&field,&theta,&current,&phases,&linear,opened_at,&g,&ge,&back).unwrap());
+        // The same bounded carrier still refuses the original right side above. Only the
+        // certificate's unsplit response calculus changes representation; no target enters it.
+        let tolerance=ChartedTolerance {logits:rat(1,16),receiving_covector:rat(1,16),source_covector:rat(1,16)};
+        let publication=pending.observe(&theta,&observed,&compared,&tolerance)
+            .unwrap_or_else(|(_,e)|panic!("same first observed comparison refused: {e:?}"));
+        assert!(publication.error.applied.holds());
+        assert!(publication.error.applied.decrease>Rat::zero());
+        assert_eq!(publication.error.tolerance.source_covector,tolerance.source_covector);
+        assert!(publication.teaching.publication.stepped>0);
+        assert!(publication.teaching.prediction.word.closes());
+        assert!(publication.teaching.prediction.balances.iter().all(|b|b.closes()));
+        println!("changed matched comparison: commit={}; source_error={:?}; source_rounding={:?}; applied={:?}; chart_starts={:?}; elapsed_ns={}",
+            publication.teaching.publication.commit,publication.error.source_covectors,publication.error.source_rounding,
+            publication.error.applied,linear.charts().iter().map(|r|(r.start,r.steps)).collect::<Vec<(ChartStart,u32)>>(),
+            started.elapsed().as_nanos());
+    }
 }

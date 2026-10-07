@@ -462,6 +462,14 @@ fn charted_compare(teaching_count: usize, probe_count: usize, out: &str, terrain
         let truth=KnownTruth::cyclic_class_orbit(CyclicLaw::OrderTwo {opening:2},shape.alphabet,seed,4).expect("same predeclared source orbit");
         for (index,observed) in Encoded::identity(&truth,&field).unwrap().into_iter().enumerate() {
             let whole=Instant::now();
+            // Exterior receipt cost is charged to this same whole unit. Retained charts still
+            // travel through the existing key/shape/certificate/refinement owner; no shortcut.
+            let route_receipt_started=Instant::now();
+            let previous_routes:Vec<_>=resident.charts().keys().map(|key| {
+                let chart=resident.charts().get(key).expect("a retained key's chart");
+                (key.clone(),chart.rows(),chart.columns(),chart.exponent())
+            }).collect();
+            let route_receipt_ns=route_receipt_started.elapsed().as_nanos();
             let damaged=DamagedSection::damage(&observed,&[2]).unwrap();
             let material=resident.constitution().clone();
             let exact_started=Instant::now();
@@ -477,6 +485,35 @@ fn charted_compare(teaching_count: usize, probe_count: usize, out: &str, terrain
                 teaching.then(||(observed.clone(),vec![false,false,true,false]))
             }) {Ok(v)=>v,Err(e)=>{publish(&mut output,format!("INCOMPLETE: charted forward refused {e:?}\n"));return;}};
             let charted_whole_ns=charted_started.elapsed().as_nanos();
+            let readings=&charted.prediction.error.charts;
+            let chart_exponent=field.word_lattice().expect("declared chart lattice").chart_exponent();
+            let candidate=|reading:&holonics::hnn::chart::ChartReading| {
+                previous_routes.iter().find(|(key,..)|*key==reading.key)
+            };
+            let compatible=|reading:&holonics::hnn::chart::ChartReading| {
+                candidate(reading).is_some_and(|(_,rows,columns,exponent)|
+                    *rows==reading.width && *columns==reading.width && *exponent==chart_exponent)
+            };
+            // Every Newton-Schulz step re-certifies; warm admission, cold seed and exact
+            // fallback each have their actual certificate calls. Count from producing starts
+            // and retained shapes, rather than treating a warm key as an accepted certificate.
+            let certificate_calls:u64=readings.iter().map(|r|1+u64::from(r.steps)
+                +u64::from(compatible(r) && r.start!=holonics::hnn::chart::ChartStart::Warm)
+                +u64::from(r.start==holonics::hnn::chart::ChartStart::Exact)).sum();
+            let admitted_tolerance_checks=match &charted.comparison {
+                Ok(Some(publication))=>Some((3usize, // the three nonnegative tolerance declarations
+                    1usize, // one compared station's supremum against the logit tolerance
+                    publication.error.logit_covectors[2].len(), // components read by that supremum
+                    publication.error.receiving_covector.entries().len(),
+                    publication.error.source_covectors.iter().map(Vec::len).sum::<usize>())),
+                _=>None, // no invented visited-check count for an early refusal or blind probe
+            };
+            publish(&mut output,format!("matched producing chart work; selected_routes={}; retained_candidates={}; shape_checks={}; compatible_candidates={}; certificate_evaluations={certificate_calls}; final_target_admissions={}; refinement_steps={}; route_receipt_ns={route_receipt_ns}; admitted_tolerance_checks=(declaration,logit_order,logit_components,receiving_orders,source_orders)={admitted_tolerance_checks:?}; chart_readings={readings:?}; setup_selection_refinement_and_error_transport_wall_costs_unseparated
+",
+                readings.len(),readings.iter().filter(|r|candidate(r).is_some()).count(),
+                readings.iter().filter(|r|candidate(r).is_some()).count(),
+                readings.iter().filter(|r|compatible(r)).count(),readings.len(),
+                readings.iter().map(|r|u64::from(r.steps)).sum::<u64>()));
             assert_eq!(charted.prediction.physical.carry.ticks,exact_prediction.carry.ticks);
             assert_eq!(charted.prediction.physical.carry.change.resonator_phases,exact_prediction.carry.change.resonator_phases);
             assert_eq!(charted.prediction.physical.carry.conductances,exact_prediction.carry.conductances);

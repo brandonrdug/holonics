@@ -1,7 +1,6 @@
 # The matched charted balance consumes its opening split work
 
-**Date.** October 7. **Issues.** #73, #63, #62. **Grade.** Source-inspected diagnosis;
-implemented consumer only, execution and acceptance pending the sole native queue.
+**Date.** October 7. **Issues.** #73, #63, #62. **Grade.** Native-checked opening-work consumer and falsifier (continuation-v34); matched scientific comparison remains incomplete at its distinct operand-carrier refusal.
 
 ## The measured failure and its exact scope
 
@@ -109,3 +108,37 @@ The isolated worktree starts from frozen scientific source 73fa7b72 with its met
 at inspection. Only the charted balance method, appended falsifier and matched balance
 consumer/diagnostics are changed; all broader communication functions and shared dirty
 paths remain untouched. Coordinator message `94691a4f81924b7b98613bc917215bef` confirms disjoint ownership: its communication lane leaves prediction/charted, Word and existing charted tests read-only. This worker owns only the matched balance consumer, its method and the narrow falsifier. Queue execution and coordinator integration remain separate owners.
+
+
+## Continuation-v34: the balance passes; the comparison is incomplete
+
+Source `7adf4d3bb4b6e3bfd06155f5758df11b55294beb` passed workspace, guarded lints,
+56 doctests, 11 selected fresh links and the actual main. The new opening-work falsifier
+passed once: its actual split is `8191/301989888`, its exact-only residual the negative,
+and its charged residual zero. The original four charted and one sparse fixtures were not
+replayed. Metadata-only `0adc89f316528d634b1861b599b2f6286d8a1cee` binds the unchanged
+four-teaching/four-probe protocol and its original fixed Pin.
+
+The first actual matched unit's exact opening residual is zero. Its charted exact-only
+residual is `-104844857/2199023255552`, its actual opening split the positive opposite,
+and the charged residual zero. Both source receipt copies, the opening-to-Word join,
+both Words and every tick close. Actual blind output remains the whole Held output above.
+The observed exact comparison succeeded; `exact=None` in the output is its absent error.
+The charted observed comparison refused `Carrier { what: "an operand's coordinate beyond
+the 64-bit word" }`. No charted successor, warm unit or probe was reached. The numerical
+component tolerances remain `1/16`; no carrier or deadline was raised.
+
+The exact sparse cold forward took `49951977 ns`; the charted forward including declaration
+and error transport took `163874057 ns`. Signed saved time is `-113922080 ns`, so the cold
+charted route costs `113922080 = 2^5 * 5 * 113 * 6301 ns` more. The largest actual logit difference
+is zero; largest actual carry difference `110431307/561126113280` is inside the reported
+box. These results establish this balance join and one cold enclosure, not a complete
+matched read or speedup. Full wrapper wall time is `665995463 ns` against the unchanged
+projection `10972158131 ns`; measured/projected is exactly `665995463/10972158131`.
+
+The thin authoritative v34 packet, passed balance output, failed matched output and their
+resource/release receipts are preserved in
+[the successor receipts](receipts/charted-operand-01a10f0a-20261007/predecessor/PREDECESSOR_FILES.v1.json).
+The new [operand consumer record](2026-10-07_THE_CHARTED_SOURCE_RETURN_RE_REPRESENTS_ITS_PRODUCING_CHART.md)
+works on this measured refusal. This record's original source-only execution boundary is
+superseded only for the checks explicitly reported here; scientific acceptance remains incomplete.

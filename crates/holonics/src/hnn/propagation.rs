@@ -1103,8 +1103,9 @@ impl Operands {
     /// **The executed charts with no transient split**: every solve the executed chart's exact
     /// values and every junction weight the executed one, the word unsplit. The executed word's
     /// linear map, on which its return pairs exactly (Lean `HNN/LatticeWord.executed_adjoint_unique`,
-    /// the law's own tests; the retired linear readout's pairing check read it too).
-    #[cfg(test)]
+    /// the law's own tests). The charted source-return certificate consumes this representation
+    /// when its unsplit response coordinates outgrow the hardware input carrier; the same
+    /// chart values, weights and certificates remain, not the exact inverse of the operator.
     pub(crate) fn unsplit(mut self) -> Result<Self, HnnError> {
         let exact = |solve: &Solve| -> Result<Solve, HnnError> { Solve::exact(&solve.matrix()?) };
         for ring in &mut self.rings {
