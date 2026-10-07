@@ -133,6 +133,9 @@
 
 use std::ops::Range;
 
+mod declaration;
+pub(crate) use declaration::DeclaringFace;
+
 use num_bigint::{BigInt, BigUint};
 use num_traits::{One, ToPrimitive, Zero};
 

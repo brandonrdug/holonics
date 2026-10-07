@@ -63,6 +63,19 @@ output chart has an additive comparison, the explicit defect is
 
 `delta_gamma(x) = pi_out(F_gamma^u x) - T_gamma^u(pi_in x)`.
 
+The signed defect already belongs to `Transport/ChangingReceiver/Defect.passageDefect`.
+Its `passage_transformer_exists_iff` gives the exact presented-fibre criterion, and
+`passageDefect_comp`/`passageDefect_comp_additive` retain the actual shared middle face.
+This HNN source join specializes that owner rather than defining another generic defect.
+For `xdot=A(t)x+f(t)` and `y=q(t)x`, against `ydot=Abar(t)y+fbar(t)`, its
+`rateDefect`/`moving_receiver_rate` include the complete rate defect
+
+`d=(qdot+qA-Abar q)x+qf-fbar`.
+
+The actual differentiability hypotheses, source forcing, chart/support motion and nonlinear
+remainder remain operands. Integrating the signed law or reading its admitted events must
+preserve them; an autonomous coarse law is not inferred from the notation alone.
+
 This is a receiver/chart quantity, not a global error number. A bare class set has no subtraction:
 its defect is the actual unequal/plural image, not an invented numerical distance. A finite
 grain or a small present projection does not establish zero defect under later clocks, drives,

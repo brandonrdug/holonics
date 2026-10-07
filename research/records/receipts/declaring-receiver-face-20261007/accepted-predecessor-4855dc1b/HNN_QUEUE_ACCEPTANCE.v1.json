@@ -1,0 +1,1457 @@
+{
+  "grade_scope": "Exact HNN subset of original continuation-v44; fields retained verbatim. Foreign formal diagnostics excluded.",
+  "original_validation_pin": {
+    "bytes": 493158,
+    "sha256": "6e515ab15ff7dd618af67dd317c9768f993bcbf7b75b32e862de1bbc68058fa0"
+  },
+  "HNN": {
+    "source_commit": "4855dc1bde031611f6e77f1416e306573e3a7485",
+    "status": "PASS10 exact combined native integration controls",
+    "source_manifest": {
+      "bytes": 49515,
+      "sha256": "d52b0d7737b9dfc7573a0332663002800a98022822912701a0eb75ec49ae5eeb"
+    },
+    "source_inputs": 295,
+    "unchanged_inputs_from493": 291,
+    "four_changed_grafts_match_048": true,
+    "controls": [
+      {
+        "number": 1,
+        "selector": "hnn::physical::communication::tests::one_future_decision_unites_the_blind_grain_leaders_with_completed_leaders",
+        "label": "hnn-communication-radius-integration-4855dc1b-control1-20261006-v1",
+        "wall_ns": 237712910,
+        "projection_ns": 16000000000,
+        "aggregate_CPU_ns": 175886000,
+        "group_peak_B": 19525632,
+        "stdout_pin": {
+          "bytes": 238,
+          "sha256": "bf104ef66433a43c528998c73d5dab1663ba24cd0430b73697f276351f1c49e3"
+        },
+        "quiescent": true
+      },
+      {
+        "number": 2,
+        "selector": "hnn::tests::physical_communication::one_future_communication_carries_one_actual_source_label_through_the_whole_receiving_image",
+        "label": "hnn-communication-radius-integration-4855dc1b-control2-20261006-v1",
+        "wall_ns": 321203292,
+        "projection_ns": 16000000000,
+        "aggregate_CPU_ns": 272801000,
+        "group_peak_B": 17182720,
+        "stdout_pin": {
+          "bytes": 9051,
+          "sha256": "990b77c44a620d6edb1f1052622839930a3131d72410f9664aac41253c4c519e"
+        },
+        "quiescent": true
+      },
+      {
+        "number": 3,
+        "selector": "hnn::tests::physical_communication::one_future_source_publication_reaches_the_next_contemporary_communication_opening",
+        "label": "hnn-communication-radius-integration-4855dc1b-control3-20261006-v1",
+        "wall_ns": 410391465,
+        "projection_ns": 16000000000,
+        "aggregate_CPU_ns": 341983000,
+        "group_peak_B": 17420288,
+        "stdout_pin": {
+          "bytes": 7621,
+          "sha256": "8504ca8a322e3bb2f14ee03ab8a5e645f32648e91731229322a499ff6f0ff56a"
+        },
+        "quiescent": true
+      },
+      {
+        "number": 4,
+        "selector": "hnn::tests::physical_communication::one_future_communication_keeps_refusal_and_multi_future_admission_honest",
+        "label": "hnn-communication-radius-integration-4855dc1b-control4-20261006-v1",
+        "wall_ns": 245703239,
+        "projection_ns": 16000000000,
+        "aggregate_CPU_ns": 202054000,
+        "group_peak_B": 17682432,
+        "stdout_pin": {
+          "bytes": 236,
+          "sha256": "0b951563d832ca16091140c82e750814c656e29922e9500deb980f740b221cbc"
+        },
+        "quiescent": true
+      },
+      {
+        "number": 5,
+        "selector": "hnn::tests::physical_communication::communication_deposits_after_the_whole_boundary_and_reuses_material_source_and_carry",
+        "label": "hnn-communication-radius-integration-4855dc1b-control5-20261006-v1",
+        "wall_ns": 293040863,
+        "projection_ns": 16000000000,
+        "aggregate_CPU_ns": 249517000,
+        "group_peak_B": 17444864,
+        "stdout_pin": {
+          "bytes": 3876,
+          "sha256": "1ae13792cc753e5ea154039e092f5fad99e9481f1a73a615b0399903b0ab596b"
+        },
+        "quiescent": true
+      },
+      {
+        "number": 6,
+        "selector": "hnn::tests::physical_communication::communication_observations_cannot_change_the_earlier_boundary",
+        "label": "hnn-communication-radius-integration-4855dc1b-control6-20261006-v1",
+        "wall_ns": 313659861,
+        "projection_ns": 16000000000,
+        "aggregate_CPU_ns": 251295000,
+        "group_peak_B": 17735680,
+        "stdout_pin": {
+          "bytes": 288,
+          "sha256": "7463f8ec592414d6760ae478742b106769f1d2d8a0cc242bfe2e6170b6a14544"
+        },
+        "quiescent": true
+      },
+      {
+        "number": 7,
+        "selector": "hnn::tests::physical_communication::communication_refuses_changed_source_or_partition_without_deposition_and_keeps_the_blind_end",
+        "label": "hnn-communication-radius-integration-4855dc1b-control7-20261006-v1",
+        "wall_ns": 257792406,
+        "projection_ns": 16000000000,
+        "aggregate_CPU_ns": 208060000,
+        "group_peak_B": 17428480,
+        "stdout_pin": {
+          "bytes": 320,
+          "sha256": "80aa70adc60007b6ac5aa1dd7595a124b6e2bdb9f3e6c785230cc32fe1f5239a"
+        },
+        "quiescent": true
+      },
+      {
+        "number": 8,
+        "selector": "hnn::tests::physical_communication::communication_returns_actual_multistation_held_receipts_without_a_joint_certificate",
+        "label": "hnn-communication-radius-integration-4855dc1b-control8-20261006-v1",
+        "wall_ns": 246771972,
+        "projection_ns": 16000000000,
+        "aggregate_CPU_ns": 198994000,
+        "group_peak_B": 17440768,
+        "stdout_pin": {
+          "bytes": 2781,
+          "sha256": "d2aff75a3d83205ae41d909197e966d8df6825da4e511495d10834fe3860f115"
+        },
+        "quiescent": true
+      },
+      {
+        "number": 9,
+        "selector": "hnn::prediction::charted::linear_radius::tests::lazy_radius_columns_preserve_exact_images_zero_work_and_typed_shape_refusal",
+        "label": "hnn-communication-radius-integration-4855dc1b-control9-20261006-v1",
+        "wall_ns": 217419300,
+        "projection_ns": 16000000000,
+        "aggregate_CPU_ns": 181074000,
+        "group_peak_B": 17076224,
+        "stdout_pin": {
+          "bytes": 251,
+          "sha256": "905f78b39df5af49cbc363233726fb6a871e5051ed176f11c025f1d3a86afe12"
+        },
+        "quiescent": true
+      },
+      {
+        "number": 10,
+        "selector": "hnn::prediction::charted::tests::contact_radius_faces_reuse_the_same_native_images_under_one_producing_word",
+        "label": "hnn-communication-radius-integration-4855dc1b-control10-20261006-v1",
+        "wall_ns": 266494657,
+        "projection_ns": 16000000000,
+        "aggregate_CPU_ns": 215912000,
+        "group_peak_B": 17948672,
+        "stdout_pin": {
+          "bytes": 350,
+          "sha256": "7c515c995341bbb5bf94b4daf8b9e3c68dd803655ce8ce3eda9186c4460a01ec"
+        },
+        "quiescent": true
+      }
+    ],
+    "sum_controls_wall_ns": 2810189965,
+    "sum_controls_CPU_ns": 2297576000,
+    "max_controls_group_peak_B": 19525632,
+    "science_read_requested": false,
+    "standalone_scope_promoted_without_fresh_gate": false,
+    "all_admitted_resources_released": true,
+    "useful_product_or_performance_acceptance": false,
+    "old493_scientific_INCOMPLETE_unchanged": true
+  },
+  "HNN_stages_count": 15,
+  "HNN_sum_all_stage_wall_ns": 80799605621,
+  "HNN_sum_all_stage_CPU_ns": 123296925000,
+  "stages": {
+    "hnn-communication-radius-integration-4855dc1b-cache-preparation-20261006-v1": {
+      "postcleanup_accepted": true,
+      "wall_ns": 7428798487,
+      "projection_ns": 17000000000,
+      "measured_to_projected_ratio": {
+        "numerator": 7428798487,
+        "denominator": 17000000000
+      },
+      "aggregate_CPU_ns": 6267486000,
+      "group_peak_bytes": 4294967296,
+      "peak_child_RSS_KiB": 32124,
+      "factored_wall_ns": {
+        "integer": 7428798487,
+        "prime_powers": [
+          [
+            11,
+            1
+          ],
+          [
+            41,
+            1
+          ],
+          [
+            16471837,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "factored_CPU_ns": {
+        "integer": 6267486000,
+        "prime_powers": [
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            617,
+            1
+          ],
+          [
+            1693,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "factored_group_bytes": {
+        "integer": 4294967296,
+        "prime_powers": [
+          [
+            2,
+            32
+          ]
+        ],
+        "zero": false
+      },
+      "input_unchanged": true,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 2967,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "CPU_guard": false,
+      "wall_guard": false,
+      "host_floor_guard": false,
+      "quiescent_released": true
+    },
+    "hnn-communication-radius-integration-4855dc1b-workspace-check-20261006-v1": {
+      "postcleanup_accepted": true,
+      "wall_ns": 11123498484,
+      "projection_ns": 65000000000,
+      "measured_to_projected_ratio": {
+        "numerator": 11123498484,
+        "denominator": 65000000000
+      },
+      "aggregate_CPU_ns": 20375023000,
+      "group_peak_bytes": 1875062784,
+      "peak_child_RSS_KiB": 1373584,
+      "factored_wall_ns": {
+        "integer": 11123498484,
+        "prime_powers": [
+          [
+            2,
+            2
+          ],
+          [
+            3,
+            2
+          ],
+          [
+            7,
+            1
+          ],
+          [
+            44140867,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "factored_CPU_ns": {
+        "integer": 20375023000,
+        "prime_powers": [
+          [
+            2,
+            3
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            29,
+            1
+          ],
+          [
+            702587,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "factored_group_bytes": {
+        "integer": 1875062784,
+        "prime_powers": [
+          [
+            2,
+            12
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            7,
+            1
+          ],
+          [
+            21799,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "input_unchanged": true,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "CPU_guard": false,
+      "wall_guard": false,
+      "host_floor_guard": false,
+      "quiescent_released": true
+    },
+    "hnn-communication-radius-integration-4855dc1b-guard-lints-20261006-v1": {
+      "postcleanup_accepted": true,
+      "wall_ns": 17260024538,
+      "projection_ns": 65000000000,
+      "measured_to_projected_ratio": {
+        "numerator": 17260024538,
+        "denominator": 65000000000
+      },
+      "aggregate_CPU_ns": 26057644000,
+      "group_peak_bytes": 1865105408,
+      "peak_child_RSS_KiB": 1405592,
+      "factored_wall_ns": {
+        "integer": 17260024538,
+        "prime_powers": [
+          [
+            2,
+            1
+          ],
+          [
+            251,
+            1
+          ],
+          [
+            283,
+            1
+          ],
+          [
+            121493,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "factored_CPU_ns": {
+        "integer": 26057644000,
+        "prime_powers": [
+          [
+            2,
+            5
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            331,
+            1
+          ],
+          [
+            19681,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "factored_group_bytes": {
+        "integer": 1865105408,
+        "prime_powers": [
+          [
+            2,
+            14
+          ],
+          [
+            113837,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "input_unchanged": true,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "CPU_guard": false,
+      "wall_guard": false,
+      "host_floor_guard": false,
+      "quiescent_released": true
+    },
+    "hnn-communication-radius-integration-4855dc1b-guard-doctests-20261006-v1": {
+      "postcleanup_accepted": true,
+      "wall_ns": 20163321184,
+      "projection_ns": 65000000000,
+      "measured_to_projected_ratio": {
+        "numerator": 20163321184,
+        "denominator": 65000000000
+      },
+      "aggregate_CPU_ns": 36589647000,
+      "group_peak_bytes": 2641637376,
+      "peak_child_RSS_KiB": 2045844,
+      "factored_wall_ns": {
+        "integer": 20163321184,
+        "prime_powers": [
+          [
+            2,
+            5
+          ],
+          [
+            20023,
+            1
+          ],
+          [
+            31469,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "factored_CPU_ns": {
+        "integer": 36589647000,
+        "prime_powers": [
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            12196549,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "factored_group_bytes": {
+        "integer": 2641637376,
+        "prime_powers": [
+          [
+            2,
+            12
+          ],
+          [
+            3,
+            2
+          ],
+          [
+            7,
+            1
+          ],
+          [
+            29,
+            1
+          ],
+          [
+            353,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "input_unchanged": true,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "CPU_guard": false,
+      "wall_guard": false,
+      "host_floor_guard": false,
+      "quiescent_released": true
+    },
+    "hnn-communication-radius-integration-4855dc1b-lib-test-build-20261006-v1": {
+      "postcleanup_accepted": true,
+      "wall_ns": 22013772963,
+      "projection_ns": 65000000000,
+      "measured_to_projected_ratio": {
+        "numerator": 22013772963,
+        "denominator": 65000000000
+      },
+      "aggregate_CPU_ns": 31709549000,
+      "group_peak_bytes": 2501865472,
+      "peak_child_RSS_KiB": 2413736,
+      "factored_wall_ns": {
+        "integer": 22013772963,
+        "prime_powers": [
+          [
+            3,
+            1
+          ],
+          [
+            7,
+            1
+          ],
+          [
+            13,
+            1
+          ],
+          [
+            80636531,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "factored_CPU_ns": {
+        "integer": 31709549000,
+        "prime_powers": [
+          [
+            2,
+            3
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            31709549,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "factored_group_bytes": {
+        "integer": 2501865472,
+        "prime_powers": [
+          [
+            2,
+            12
+          ],
+          [
+            89,
+            1
+          ],
+          [
+            6863,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "input_unchanged": true,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "CPU_guard": false,
+      "wall_guard": false,
+      "host_floor_guard": false,
+      "quiescent_released": true
+    },
+    "hnn-communication-radius-integration-4855dc1b-control1-20261006-v1": {
+      "postcleanup_accepted": true,
+      "wall_ns": 237712910,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": {
+        "numerator": 237712910,
+        "denominator": 16000000000
+      },
+      "aggregate_CPU_ns": 175886000,
+      "group_peak_bytes": 19525632,
+      "peak_child_RSS_KiB": 17036,
+      "factored_wall_ns": {
+        "integer": 237712910,
+        "prime_powers": [
+          [
+            2,
+            1
+          ],
+          [
+            5,
+            1
+          ],
+          [
+            23771291,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "factored_CPU_ns": {
+        "integer": 175886000,
+        "prime_powers": [
+          [
+            2,
+            4
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            87943,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "factored_group_bytes": {
+        "integer": 19525632,
+        "prime_powers": [
+          [
+            2,
+            12
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            7,
+            1
+          ],
+          [
+            227,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "input_unchanged": true,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "CPU_guard": false,
+      "wall_guard": false,
+      "host_floor_guard": false,
+      "quiescent_released": true
+    },
+    "hnn-communication-radius-integration-4855dc1b-control2-20261006-v1": {
+      "postcleanup_accepted": true,
+      "wall_ns": 321203292,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": {
+        "numerator": 321203292,
+        "denominator": 16000000000
+      },
+      "aggregate_CPU_ns": 272801000,
+      "group_peak_bytes": 17182720,
+      "peak_child_RSS_KiB": 26392,
+      "factored_wall_ns": {
+        "integer": 321203292,
+        "prime_powers": [
+          [
+            2,
+            2
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            43,
+            1
+          ],
+          [
+            271,
+            1
+          ],
+          [
+            2297,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "factored_CPU_ns": {
+        "integer": 272801000,
+        "prime_powers": [
+          [
+            2,
+            3
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            37,
+            1
+          ],
+          [
+            73,
+            1
+          ],
+          [
+            101,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "factored_group_bytes": {
+        "integer": 17182720,
+        "prime_powers": [
+          [
+            2,
+            12
+          ],
+          [
+            5,
+            1
+          ],
+          [
+            839,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "input_unchanged": true,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "CPU_guard": false,
+      "wall_guard": false,
+      "host_floor_guard": false,
+      "quiescent_released": true
+    },
+    "hnn-communication-radius-integration-4855dc1b-control3-20261006-v1": {
+      "postcleanup_accepted": true,
+      "wall_ns": 410391465,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": {
+        "numerator": 410391465,
+        "denominator": 16000000000
+      },
+      "aggregate_CPU_ns": 341983000,
+      "group_peak_bytes": 17420288,
+      "peak_child_RSS_KiB": 26948,
+      "factored_wall_ns": {
+        "integer": 410391465,
+        "prime_powers": [
+          [
+            3,
+            1
+          ],
+          [
+            5,
+            1
+          ],
+          [
+            11,
+            2
+          ],
+          [
+            173,
+            1
+          ],
+          [
+            1307,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "factored_CPU_ns": {
+        "integer": 341983000,
+        "prime_powers": [
+          [
+            2,
+            3
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            341983,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "factored_group_bytes": {
+        "integer": 17420288,
+        "prime_powers": [
+          [
+            2,
+            12
+          ],
+          [
+            4253,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "input_unchanged": true,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "CPU_guard": false,
+      "wall_guard": false,
+      "host_floor_guard": false,
+      "quiescent_released": true
+    },
+    "hnn-communication-radius-integration-4855dc1b-control4-20261006-v1": {
+      "postcleanup_accepted": true,
+      "wall_ns": 245703239,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": {
+        "numerator": 245703239,
+        "denominator": 16000000000
+      },
+      "aggregate_CPU_ns": 202054000,
+      "group_peak_bytes": 17682432,
+      "peak_child_RSS_KiB": 25312,
+      "factored_wall_ns": {
+        "integer": 245703239,
+        "prime_powers": [
+          [
+            71,
+            1
+          ],
+          [
+            3460609,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "factored_CPU_ns": {
+        "integer": 202054000,
+        "prime_powers": [
+          [
+            2,
+            4
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            101027,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "factored_group_bytes": {
+        "integer": 17682432,
+        "prime_powers": [
+          [
+            2,
+            12
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            1439,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "input_unchanged": true,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "CPU_guard": false,
+      "wall_guard": false,
+      "host_floor_guard": false,
+      "quiescent_released": true
+    },
+    "hnn-communication-radius-integration-4855dc1b-control5-20261006-v1": {
+      "postcleanup_accepted": true,
+      "wall_ns": 293040863,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": {
+        "numerator": 293040863,
+        "denominator": 16000000000
+      },
+      "aggregate_CPU_ns": 249517000,
+      "group_peak_bytes": 17444864,
+      "peak_child_RSS_KiB": 26364,
+      "factored_wall_ns": {
+        "integer": 293040863,
+        "prime_powers": [
+          [
+            881,
+            1
+          ],
+          [
+            332623,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "factored_CPU_ns": {
+        "integer": 249517000,
+        "prime_powers": [
+          [
+            2,
+            3
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            249517,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "factored_group_bytes": {
+        "integer": 17444864,
+        "prime_powers": [
+          [
+            2,
+            12
+          ],
+          [
+            4259,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "input_unchanged": true,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "CPU_guard": false,
+      "wall_guard": false,
+      "host_floor_guard": false,
+      "quiescent_released": true
+    },
+    "hnn-communication-radius-integration-4855dc1b-control6-20261006-v1": {
+      "postcleanup_accepted": true,
+      "wall_ns": 313659861,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": {
+        "numerator": 313659861,
+        "denominator": 16000000000
+      },
+      "aggregate_CPU_ns": 251295000,
+      "group_peak_bytes": 17735680,
+      "peak_child_RSS_KiB": 26272,
+      "factored_wall_ns": {
+        "integer": 313659861,
+        "prime_powers": [
+          [
+            3,
+            1
+          ],
+          [
+            104553287,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "factored_CPU_ns": {
+        "integer": 251295000,
+        "prime_powers": [
+          [
+            2,
+            3
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            5,
+            4
+          ],
+          [
+            11,
+            1
+          ],
+          [
+            1523,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "factored_group_bytes": {
+        "integer": 17735680,
+        "prime_powers": [
+          [
+            2,
+            13
+          ],
+          [
+            5,
+            1
+          ],
+          [
+            433,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "input_unchanged": true,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "CPU_guard": false,
+      "wall_guard": false,
+      "host_floor_guard": false,
+      "quiescent_released": true
+    },
+    "hnn-communication-radius-integration-4855dc1b-control7-20261006-v1": {
+      "postcleanup_accepted": true,
+      "wall_ns": 257792406,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": {
+        "numerator": 257792406,
+        "denominator": 16000000000
+      },
+      "aggregate_CPU_ns": 208060000,
+      "group_peak_bytes": 17428480,
+      "peak_child_RSS_KiB": 25264,
+      "factored_wall_ns": {
+        "integer": 257792406,
+        "prime_powers": [
+          [
+            2,
+            1
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            467,
+            1
+          ],
+          [
+            92003,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "factored_CPU_ns": {
+        "integer": 208060000,
+        "prime_powers": [
+          [
+            2,
+            5
+          ],
+          [
+            5,
+            4
+          ],
+          [
+            101,
+            1
+          ],
+          [
+            103,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "factored_group_bytes": {
+        "integer": 17428480,
+        "prime_powers": [
+          [
+            2,
+            12
+          ],
+          [
+            5,
+            1
+          ],
+          [
+            23,
+            1
+          ],
+          [
+            37,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "input_unchanged": true,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "CPU_guard": false,
+      "wall_guard": false,
+      "host_floor_guard": false,
+      "quiescent_released": true
+    },
+    "hnn-communication-radius-integration-4855dc1b-control8-20261006-v1": {
+      "postcleanup_accepted": true,
+      "wall_ns": 246771972,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": {
+        "numerator": 246771972,
+        "denominator": 16000000000
+      },
+      "aggregate_CPU_ns": 198994000,
+      "group_peak_bytes": 17440768,
+      "peak_child_RSS_KiB": 25644,
+      "factored_wall_ns": {
+        "integer": 246771972,
+        "prime_powers": [
+          [
+            2,
+            2
+          ],
+          [
+            3,
+            2
+          ],
+          [
+            157,
+            1
+          ],
+          [
+            43661,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "factored_CPU_ns": {
+        "integer": 198994000,
+        "prime_powers": [
+          [
+            2,
+            4
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            99497,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "factored_group_bytes": {
+        "integer": 17440768,
+        "prime_powers": [
+          [
+            2,
+            13
+          ],
+          [
+            2129,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "input_unchanged": true,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "CPU_guard": false,
+      "wall_guard": false,
+      "host_floor_guard": false,
+      "quiescent_released": true
+    },
+    "hnn-communication-radius-integration-4855dc1b-control9-20261006-v1": {
+      "postcleanup_accepted": true,
+      "wall_ns": 217419300,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": {
+        "numerator": 217419300,
+        "denominator": 16000000000
+      },
+      "aggregate_CPU_ns": 181074000,
+      "group_peak_bytes": 17076224,
+      "peak_child_RSS_KiB": 17228,
+      "factored_wall_ns": {
+        "integer": 217419300,
+        "prime_powers": [
+          [
+            2,
+            2
+          ],
+          [
+            3,
+            2
+          ],
+          [
+            5,
+            2
+          ],
+          [
+            7,
+            1
+          ],
+          [
+            34511,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "factored_CPU_ns": {
+        "integer": 181074000,
+        "prime_powers": [
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            103,
+            1
+          ],
+          [
+            293,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "factored_group_bytes": {
+        "integer": 17076224,
+        "prime_powers": [
+          [
+            2,
+            12
+          ],
+          [
+            11,
+            1
+          ],
+          [
+            379,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "input_unchanged": true,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "CPU_guard": false,
+      "wall_guard": false,
+      "host_floor_guard": false,
+      "quiescent_released": true
+    },
+    "hnn-communication-radius-integration-4855dc1b-control10-20261006-v1": {
+      "postcleanup_accepted": true,
+      "wall_ns": 266494657,
+      "projection_ns": 16000000000,
+      "measured_to_projected_ratio": {
+        "numerator": 266494657,
+        "denominator": 16000000000
+      },
+      "aggregate_CPU_ns": 215912000,
+      "group_peak_bytes": 17948672,
+      "peak_child_RSS_KiB": 24624,
+      "factored_wall_ns": {
+        "integer": 266494657,
+        "prime_powers": [
+          [
+            11,
+            1
+          ],
+          [
+            13,
+            1
+          ],
+          [
+            83,
+            1
+          ],
+          [
+            22453,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "factored_CPU_ns": {
+        "integer": 215912000,
+        "prime_powers": [
+          [
+            2,
+            6
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            137,
+            1
+          ],
+          [
+            197,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "factored_group_bytes": {
+        "integer": 17948672,
+        "prime_powers": [
+          [
+            2,
+            13
+          ],
+          [
+            7,
+            1
+          ],
+          [
+            313,
+            1
+          ]
+        ],
+        "zero": false
+      },
+      "input_unchanged": true,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "CPU_guard": false,
+      "wall_guard": false,
+      "host_floor_guard": false,
+      "quiescent_released": true
+    }
+  }
+}

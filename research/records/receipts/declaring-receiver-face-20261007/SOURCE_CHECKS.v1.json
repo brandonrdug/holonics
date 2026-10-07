@@ -1,0 +1,44 @@
+{
+  "status": "PASS source syntax/child formatting/whitespace/atlas shape only; no type or runtime acceptance",
+  "native_files": [
+    {
+      "path": "crates/holonics/src/hnn/receiving/declaration.rs",
+      "syntax_parse_exit": 0,
+      "stderr": ""
+    },
+    {
+      "path": "crates/holonics/src/hnn/receiving.rs",
+      "syntax_parse_exit": 0,
+      "stderr": ""
+    },
+    {
+      "path": "crates/holonics/src/hnn/physical.rs",
+      "syntax_parse_exit": 0,
+      "stderr": ""
+    },
+    {
+      "path": "crates/holonics/src/hnn/physical/communication.rs",
+      "syntax_parse_exit": 0,
+      "stderr": ""
+    },
+    {
+      "path": "crates/holonics/src/hnn/prediction/charted.rs",
+      "syntax_parse_exit": 0,
+      "stderr": ""
+    },
+    {
+      "path": "crates/holonics/src/hnn/tests/physical_charted.rs",
+      "syntax_parse_exit": 0,
+      "stderr": ""
+    },
+    {
+      "path": "crates/holonics/src/hnn/tests/physical_communication.rs",
+      "syntax_parse_exit": 0,
+      "stderr": ""
+    }
+  ],
+  "child_formatting": "PASS",
+  "diff_check": "PASS",
+  "atlas_8_columns": "PASS",
+  "owner_compiler_native_scientific_runs": 0
+}

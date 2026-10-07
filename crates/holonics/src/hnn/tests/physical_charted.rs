@@ -119,6 +119,7 @@ fn charted_source_and_carry_error_enclose_the_same_exact_physical_passage() {
         None
     }).unwrap();
     let exact=repair_by_field(&field,&theta,&current,&damaged,&WordOpening::Rest,&phases).unwrap();
+    assert!(!first.declaring_face_reused);
     assert!(first.prediction.error.opening.closes());
     assert!(positive(&first.prediction.error.opening.error));
     assert!(first.prediction.physical.word.closes());
@@ -130,6 +131,7 @@ fn charted_source_and_carry_error_enclose_the_same_exact_physical_passage() {
     let exact_opening=WordOpening::Received {carry:exact.carry.clone(),absorption:Absorption::Nothing};
     let exact_second=repair_by_field(&field,&theta,&current,&damaged,&exact_opening,&phases).unwrap();
     let second=resident.receive(&damaged,&receiver(),|_|None).unwrap();
+    assert!(second.declaring_face_reused);
     contains(&second.prediction.physical.carry.change,&exact_second.carry.change,&second.prediction.error.end);
     assert_eq!(second.prediction.error.stations[0].tick,first.prediction.physical.carry.ticks);
     let old=&first.prediction.error.end;
@@ -153,6 +155,7 @@ fn charted_receiving_learning_charges_both_covectors_and_keeps_its_physical_carr
         Some((observed,vec![false,false,true]))
     }).unwrap();
     let publication=first.comparison.unwrap().unwrap();
+    assert!(!first.declaring_face_reused);
     comparison_contains(&field,&publication,&exact_first);
     assert!(publication.teaching.publication.stepped>0);
     assert!(publication.error.applied.holds());
@@ -169,6 +172,7 @@ fn charted_receiving_learning_charges_both_covectors_and_keeps_its_physical_carr
         Some((observed,vec![false,false,true]))
     }).unwrap();
     let second_publication=second.comparison.unwrap().unwrap();
+    assert!(second.declaring_face_reused, "learned R does not enter the declaration; actual error and pullback remain fresh");
     comparison_contains(&field,&second_publication,&exact_second);
     assert!(second_publication.error.source_covectors[0].iter().any(|e|!e.is_zero()));
     assert!(second_publication.error.return_remainders.entries>0);

@@ -22,7 +22,7 @@ use crate::hnn::field::ReceiverDeclaration;
 use crate::hnn::port::{Deposit, WordReturn};
 use crate::hnn::propagation::{Junction, Operands};
 use crate::hnn::ratio::{Faces, HolonRatio, RatioCovector, target_phases};
-use crate::hnn::receiving::ReceivingRead;
+use crate::hnn::receiving::{DeclaringFace, ReceivingRead};
 use crate::hnn::retention::Diamond;
 use crate::hnn::word::{Absorption, ChartedSourceOpeningReceipt, EndChange};
 use crate::holon::deposition::JointReading;
@@ -118,6 +118,8 @@ pub struct ChartedPhysicalPublication {
 pub struct ChartedPhysicalReception {
     pub prediction: ChartedPhysicalRepair,
     pub comparison: Result<Option<ChartedPhysicalPublication>, HnnError>,
+    /// Equal declaring inputs reused their face; actual point/error/comparison reads are fresh.
+    pub declaring_face_reused: bool,
 }
 
 /// The one actual blind Word, borrowed material and error box awaiting an immediate comparison.
@@ -242,6 +244,7 @@ pub struct ChartedPhysicalResident<'f> {
     charts: Charts,
     chart: Option<Encoded>,
     tolerance: ChartedTolerance,
+    declaring: DeclaringFace<'f>,
 }
 
 impl<'f> ChartedPhysicalResident<'f> {
@@ -252,7 +255,7 @@ impl<'f> ChartedPhysicalResident<'f> {
             return Err(HnnError::Unadmitted { reason: "the charted physical resident has no declared Word lattice" });
         }
         Ok(Self { field, constitution, current, opening, bound: None,
-            charts: Charts::new(), chart: None, tolerance })
+            charts: Charts::new(), chart: None, tolerance, declaring: DeclaringFace::new(field) })
     }
     pub fn constitution(&self) -> &Constitution { &self.constitution }
     pub fn opening(&self) -> &WordOpening { &self.opening }
@@ -265,7 +268,7 @@ impl<'f> ChartedPhysicalResident<'f> {
         if self.chart.as_ref().is_some_and(|chart| chart != section.chart()) {
             return Err(HnnError::Unadmitted { reason: "the charted resident's producing source chart changed" });
         }
-        let phases = ReceivingPhases::declare(self.field, &self.constitution, &self.current, receiver)?;
+        let (phases, declaring_face_reused) = self.declaring.declare(&self.constitution, &self.current, receiver)?;
         let mut charts = self.charts.clone();
         let pending = predict(self.field, &self.constitution, &self.current, section,
             &self.opening, self.bound.as_ref(), &phases, &mut charts)?;
@@ -286,7 +289,7 @@ impl<'f> ChartedPhysicalResident<'f> {
         self.bound = Some(prediction.error.end.clone());
         self.chart = Some(section.chart().clone());
         self.charts = charts;
-        Ok(ChartedPhysicalReception { prediction, comparison })
+        Ok(ChartedPhysicalReception { prediction, comparison, declaring_face_reused })
     }
 }
 

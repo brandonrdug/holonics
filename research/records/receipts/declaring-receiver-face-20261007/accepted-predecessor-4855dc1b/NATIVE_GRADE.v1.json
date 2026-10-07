@@ -1,0 +1,161 @@
+{
+  "source_commit": "4855dc1bde031611f6e77f1416e306573e3a7485",
+  "status": "PASS10 exact combined native integration controls",
+  "source_manifest": {
+    "bytes": 49515,
+    "sha256": "d52b0d7737b9dfc7573a0332663002800a98022822912701a0eb75ec49ae5eeb"
+  },
+  "source_inputs": 295,
+  "unchanged_inputs_from493": 291,
+  "four_changed_grafts_match_048": true,
+  "controls": [
+    {
+      "number": 1,
+      "selector": "hnn::physical::communication::tests::one_future_decision_unites_the_blind_grain_leaders_with_completed_leaders",
+      "label": "hnn-communication-radius-integration-4855dc1b-control1-20261006-v1",
+      "wall_ns": 237712910,
+      "projection_ns": 16000000000,
+      "aggregate_CPU_ns": 175886000,
+      "group_peak_B": 19525632,
+      "stdout_pin": {
+        "bytes": 238,
+        "sha256": "bf104ef66433a43c528998c73d5dab1663ba24cd0430b73697f276351f1c49e3"
+      },
+      "quiescent": true
+    },
+    {
+      "number": 2,
+      "selector": "hnn::tests::physical_communication::one_future_communication_carries_one_actual_source_label_through_the_whole_receiving_image",
+      "label": "hnn-communication-radius-integration-4855dc1b-control2-20261006-v1",
+      "wall_ns": 321203292,
+      "projection_ns": 16000000000,
+      "aggregate_CPU_ns": 272801000,
+      "group_peak_B": 17182720,
+      "stdout_pin": {
+        "bytes": 9051,
+        "sha256": "990b77c44a620d6edb1f1052622839930a3131d72410f9664aac41253c4c519e"
+      },
+      "quiescent": true
+    },
+    {
+      "number": 3,
+      "selector": "hnn::tests::physical_communication::one_future_source_publication_reaches_the_next_contemporary_communication_opening",
+      "label": "hnn-communication-radius-integration-4855dc1b-control3-20261006-v1",
+      "wall_ns": 410391465,
+      "projection_ns": 16000000000,
+      "aggregate_CPU_ns": 341983000,
+      "group_peak_B": 17420288,
+      "stdout_pin": {
+        "bytes": 7621,
+        "sha256": "8504ca8a322e3bb2f14ee03ab8a5e645f32648e91731229322a499ff6f0ff56a"
+      },
+      "quiescent": true
+    },
+    {
+      "number": 4,
+      "selector": "hnn::tests::physical_communication::one_future_communication_keeps_refusal_and_multi_future_admission_honest",
+      "label": "hnn-communication-radius-integration-4855dc1b-control4-20261006-v1",
+      "wall_ns": 245703239,
+      "projection_ns": 16000000000,
+      "aggregate_CPU_ns": 202054000,
+      "group_peak_B": 17682432,
+      "stdout_pin": {
+        "bytes": 236,
+        "sha256": "0b951563d832ca16091140c82e750814c656e29922e9500deb980f740b221cbc"
+      },
+      "quiescent": true
+    },
+    {
+      "number": 5,
+      "selector": "hnn::tests::physical_communication::communication_deposits_after_the_whole_boundary_and_reuses_material_source_and_carry",
+      "label": "hnn-communication-radius-integration-4855dc1b-control5-20261006-v1",
+      "wall_ns": 293040863,
+      "projection_ns": 16000000000,
+      "aggregate_CPU_ns": 249517000,
+      "group_peak_B": 17444864,
+      "stdout_pin": {
+        "bytes": 3876,
+        "sha256": "1ae13792cc753e5ea154039e092f5fad99e9481f1a73a615b0399903b0ab596b"
+      },
+      "quiescent": true
+    },
+    {
+      "number": 6,
+      "selector": "hnn::tests::physical_communication::communication_observations_cannot_change_the_earlier_boundary",
+      "label": "hnn-communication-radius-integration-4855dc1b-control6-20261006-v1",
+      "wall_ns": 313659861,
+      "projection_ns": 16000000000,
+      "aggregate_CPU_ns": 251295000,
+      "group_peak_B": 17735680,
+      "stdout_pin": {
+        "bytes": 288,
+        "sha256": "7463f8ec592414d6760ae478742b106769f1d2d8a0cc242bfe2e6170b6a14544"
+      },
+      "quiescent": true
+    },
+    {
+      "number": 7,
+      "selector": "hnn::tests::physical_communication::communication_refuses_changed_source_or_partition_without_deposition_and_keeps_the_blind_end",
+      "label": "hnn-communication-radius-integration-4855dc1b-control7-20261006-v1",
+      "wall_ns": 257792406,
+      "projection_ns": 16000000000,
+      "aggregate_CPU_ns": 208060000,
+      "group_peak_B": 17428480,
+      "stdout_pin": {
+        "bytes": 320,
+        "sha256": "80aa70adc60007b6ac5aa1dd7595a124b6e2bdb9f3e6c785230cc32fe1f5239a"
+      },
+      "quiescent": true
+    },
+    {
+      "number": 8,
+      "selector": "hnn::tests::physical_communication::communication_returns_actual_multistation_held_receipts_without_a_joint_certificate",
+      "label": "hnn-communication-radius-integration-4855dc1b-control8-20261006-v1",
+      "wall_ns": 246771972,
+      "projection_ns": 16000000000,
+      "aggregate_CPU_ns": 198994000,
+      "group_peak_B": 17440768,
+      "stdout_pin": {
+        "bytes": 2781,
+        "sha256": "d2aff75a3d83205ae41d909197e966d8df6825da4e511495d10834fe3860f115"
+      },
+      "quiescent": true
+    },
+    {
+      "number": 9,
+      "selector": "hnn::prediction::charted::linear_radius::tests::lazy_radius_columns_preserve_exact_images_zero_work_and_typed_shape_refusal",
+      "label": "hnn-communication-radius-integration-4855dc1b-control9-20261006-v1",
+      "wall_ns": 217419300,
+      "projection_ns": 16000000000,
+      "aggregate_CPU_ns": 181074000,
+      "group_peak_B": 17076224,
+      "stdout_pin": {
+        "bytes": 251,
+        "sha256": "905f78b39df5af49cbc363233726fb6a871e5051ed176f11c025f1d3a86afe12"
+      },
+      "quiescent": true
+    },
+    {
+      "number": 10,
+      "selector": "hnn::prediction::charted::tests::contact_radius_faces_reuse_the_same_native_images_under_one_producing_word",
+      "label": "hnn-communication-radius-integration-4855dc1b-control10-20261006-v1",
+      "wall_ns": 266494657,
+      "projection_ns": 16000000000,
+      "aggregate_CPU_ns": 215912000,
+      "group_peak_B": 17948672,
+      "stdout_pin": {
+        "bytes": 350,
+        "sha256": "7c515c995341bbb5bf94b4daf8b9e3c68dd803655ce8ce3eda9186c4460a01ec"
+      },
+      "quiescent": true
+    }
+  ],
+  "sum_controls_wall_ns": 2810189965,
+  "sum_controls_CPU_ns": 2297576000,
+  "max_controls_group_peak_B": 19525632,
+  "science_read_requested": false,
+  "standalone_scope_promoted_without_fresh_gate": false,
+  "all_admitted_resources_released": true,
+  "useful_product_or_performance_acceptance": false,
+  "old493_scientific_INCOMPLETE_unchanged": true
+}

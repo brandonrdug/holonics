@@ -92,6 +92,7 @@ fn communication_deposits_after_the_whole_boundary_and_reuses_material_source_an
         })
         .unwrap();
     assert!(taught.closes());
+    assert!(!taught.declaring_face_reused);
     assert_eq!(taught.carry.ticks, 2);
     assert!(taught.comparison.unwrap().unwrap().publication.stepped > 0);
     assert_ne!(
@@ -115,6 +116,8 @@ fn communication_deposits_after_the_whole_boundary_and_reuses_material_source_an
         .communicate(&source, &receiver(), |_| None)
         .unwrap();
     assert!(prior.closes() && next.closes());
+    assert!(!prior.declaring_face_reused);
+    assert!(next.declaring_face_reused, "R changed; the actual rank producer is independent of R");
     assert_ne!(
         next.boundary.readings()[0].read.logits,
         prior.boundary.readings()[0].read.logits
@@ -137,6 +140,7 @@ fn communication_deposits_after_the_whole_boundary_and_reuses_material_source_an
         .communicate(&encoded(&field, &[2, 1]), &receiver(), |_| None)
         .unwrap();
     assert!(changed.closes());
+    assert!(!changed.declaring_face_reused);
     assert_ne!(
         next.boundary.readings()[0].read.logits,
         changed.boundary.readings()[0].read.logits
@@ -417,6 +421,7 @@ fn one_future_source_publication_reaches_the_next_contemporary_communication_ope
         })
         .unwrap();
     assert!(received.closes());
+    assert!(!received.declaring_face_reused);
     assert!(received.comparison.unwrap().unwrap().publication.stepped > 0);
     let producing = resident.constitution().clone();
     let mut emitted = None;
@@ -431,6 +436,7 @@ fn one_future_source_publication_reaches_the_next_contemporary_communication_ope
         })
         .unwrap();
     assert!(taught.closes());
+    assert!(taught.declaring_face_reused);
     assert_eq!(taught.boundary, emitted.unwrap());
     let publication = taught.comparison.unwrap().unwrap();
     assert!(publication.publication.stepped > 0);
@@ -465,6 +471,8 @@ fn one_future_source_publication_reaches_the_next_contemporary_communication_ope
         .communicate_one_future(&later_source, &receiver(), |_| None)
         .unwrap();
     assert!(before.closes() && after.closes());
+    assert!(!before.declaring_face_reused);
+    assert!(after.declaring_face_reused, "new E and a different source still execute under the same declaring medium");
     assert_eq!(after.carry.ticks, taught.carry.ticks + 2);
     assert_ne!(
         before.boundary.readings()[0].read.logits,

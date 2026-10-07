@@ -23,7 +23,7 @@ use crate::hnn::prediction::{
     PhysicalTeaching, PhysicalTeachingRefusal, predict_by_field, predict_sparse_by_field,
 };
 use crate::hnn::ratio::HolonRatio;
-use crate::hnn::receiving::ReceivingPhases;
+use crate::hnn::receiving::{DeclaringFace, ReceivingPhases};
 use crate::hnn::word::{Absorption, WordOpening};
 
 /// One supported affine material relation per declared comparison; no coupled R/E ray.
@@ -59,6 +59,8 @@ pub struct PhysicalPublication {
 pub struct PhysicalReception {
     pub prediction: PhysicalRepair,
     pub comparison: Result<Option<PhysicalPublication>, HnnError>,
+    /// This request reused an equal declaring medium, not an old source or receiving read.
+    pub declaring_face_reused: bool,
 }
 
 /// A retained physical receiver. Construction accepts an explicit source frame and opening;
@@ -71,6 +73,7 @@ pub struct PhysicalResident<'f> {
     current: Current,
     opening: WordOpening,
     chart: Option<Encoded>,
+    declaring: DeclaringFace<'f>,
 }
 
 impl<'f> PhysicalResident<'f> {
@@ -86,6 +89,7 @@ impl<'f> PhysicalResident<'f> {
             current,
             opening,
             chart: None,
+            declaring: DeclaringFace::new(field),
         }
     }
 
@@ -152,8 +156,8 @@ impl<'f> PhysicalResident<'f> {
                 reason: "the continuing physical receiver's complete producing chart changed",
             });
         }
-        let phases =
-            ReceivingPhases::declare(self.field, &self.constitution, &self.current, receiver)?;
+        let (phases, declaring_face_reused) =
+            self.declaring.declare(&self.constitution, &self.current, receiver)?;
         let pending = if sparse {
             predict_sparse_by_field(
                 self.field,
@@ -243,6 +247,7 @@ impl<'f> PhysicalResident<'f> {
         Ok(PhysicalReception {
             prediction,
             comparison,
+            declaring_face_reused,
         })
     }
 

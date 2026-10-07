@@ -167,6 +167,8 @@ pub struct PhysicalCommunication {
     pub word: WordBalance,
     pub carry: ReceptionCarry,
     pub comparison: Result<Option<PhysicalPublication>, HnnError>,
+    /// The coefficient declaration was reused; the actual communicated Word still executed.
+    pub declaring_face_reused: bool,
 }
 
 impl PhysicalCommunication {
@@ -284,6 +286,7 @@ impl PhysicalResident<'_> {
         })?;
         Ok(PhysicalCommunication {
             boundary,
+            declaring_face_reused: received.declaring_face_reused,
             opening: prediction.opening,
             balances: prediction.balances,
             word: prediction.word,

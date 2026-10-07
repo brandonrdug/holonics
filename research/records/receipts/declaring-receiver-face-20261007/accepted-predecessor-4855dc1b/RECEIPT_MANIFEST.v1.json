@@ -1,0 +1,100 @@
+{
+  "accepted_source": "4855dc1bde031611f6e77f1416e306573e3a7485",
+  "grade_scope": "Ten bounded native controls and original gates; no product/performance/scientific completion credit",
+  "files": {
+    "NATIVE_GRADE.v1.json": {
+      "bytes": 6235,
+      "sha256": "6ef1c3dca98583bb14b6f5b4f6f0eb00f0388f085eac37f17f8e59983bc282ea"
+    },
+    "HNN_INTEGRATION_4855_PASS10_RAW.v1.txt": {
+      "bytes": 26376,
+      "sha256": "198c50d55724f82891400cdb426bfc8d3738ae457759758d61b7f12a70907f8a"
+    },
+    "hnn-communication-radius-integration-4855dc1b-control1-20261006-v1.stdout": {
+      "bytes": 238,
+      "sha256": "bf104ef66433a43c528998c73d5dab1663ba24cd0430b73697f276351f1c49e3"
+    },
+    "hnn-communication-radius-integration-4855dc1b-control1-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "hnn-communication-radius-integration-4855dc1b-control2-20261006-v1.stdout": {
+      "bytes": 9051,
+      "sha256": "990b77c44a620d6edb1f1052622839930a3131d72410f9664aac41253c4c519e"
+    },
+    "hnn-communication-radius-integration-4855dc1b-control2-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "hnn-communication-radius-integration-4855dc1b-control3-20261006-v1.stdout": {
+      "bytes": 7621,
+      "sha256": "8504ca8a322e3bb2f14ee03ab8a5e645f32648e91731229322a499ff6f0ff56a"
+    },
+    "hnn-communication-radius-integration-4855dc1b-control3-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "hnn-communication-radius-integration-4855dc1b-control4-20261006-v1.stdout": {
+      "bytes": 236,
+      "sha256": "0b951563d832ca16091140c82e750814c656e29922e9500deb980f740b221cbc"
+    },
+    "hnn-communication-radius-integration-4855dc1b-control4-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "hnn-communication-radius-integration-4855dc1b-control5-20261006-v1.stdout": {
+      "bytes": 3876,
+      "sha256": "1ae13792cc753e5ea154039e092f5fad99e9481f1a73a615b0399903b0ab596b"
+    },
+    "hnn-communication-radius-integration-4855dc1b-control5-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "hnn-communication-radius-integration-4855dc1b-control6-20261006-v1.stdout": {
+      "bytes": 288,
+      "sha256": "7463f8ec592414d6760ae478742b106769f1d2d8a0cc242bfe2e6170b6a14544"
+    },
+    "hnn-communication-radius-integration-4855dc1b-control6-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "hnn-communication-radius-integration-4855dc1b-control7-20261006-v1.stdout": {
+      "bytes": 320,
+      "sha256": "80aa70adc60007b6ac5aa1dd7595a124b6e2bdb9f3e6c785230cc32fe1f5239a"
+    },
+    "hnn-communication-radius-integration-4855dc1b-control7-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "hnn-communication-radius-integration-4855dc1b-control8-20261006-v1.stdout": {
+      "bytes": 2781,
+      "sha256": "d2aff75a3d83205ae41d909197e966d8df6825da4e511495d10834fe3860f115"
+    },
+    "hnn-communication-radius-integration-4855dc1b-control8-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "hnn-communication-radius-integration-4855dc1b-control9-20261006-v1.stdout": {
+      "bytes": 251,
+      "sha256": "905f78b39df5af49cbc363233726fb6a871e5051ed176f11c025f1d3a86afe12"
+    },
+    "hnn-communication-radius-integration-4855dc1b-control9-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "hnn-communication-radius-integration-4855dc1b-control10-20261006-v1.stdout": {
+      "bytes": 350,
+      "sha256": "7c515c995341bbb5bf94b4daf8b9e3c68dd803655ce8ce3eda9186c4460a01ec"
+    },
+    "hnn-communication-radius-integration-4855dc1b-control10-20261006-v1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "HNN_QUEUE_ACCEPTANCE.v1.json": {
+      "bytes": 32625,
+      "sha256": "1ea6fb2053864eee39da896bc5169a87ccaa13956679fe788b294a9f978969e0"
+    }
+  },
+  "original_pins_rehashed": true,
+  "owner_native_runs": 0
+}
