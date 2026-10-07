@@ -1,0 +1,130 @@
+{
+  "version": 1,
+  "grade": "STATIC SOURCE PREPARATION ONLY; type/native/scientific acceptance pending",
+  "base_commit": "b80221de4959628b0673e9df692a0196f9c32ae6",
+  "checks": [
+    {
+      "check": "Rust syntax/parse only",
+      "argv": [
+        "rustfmt",
+        "--emit",
+        "stdout",
+        "--config",
+        "skip_children=true",
+        "--edition",
+        "2024",
+        "crates/holonics/src/hnn/word.rs"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "check": "Rust syntax/parse only",
+      "argv": [
+        "rustfmt",
+        "--emit",
+        "stdout",
+        "--config",
+        "skip_children=true",
+        "--edition",
+        "2024",
+        "crates/holonics/src/hnn/word/work.rs"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "check": "Rust syntax/parse only",
+      "argv": [
+        "rustfmt",
+        "--emit",
+        "stdout",
+        "--config",
+        "skip_children=true",
+        "--edition",
+        "2024",
+        "crates/holonics/src/hnn/propagation.rs"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "check": "Rust syntax/parse only",
+      "argv": [
+        "rustfmt",
+        "--emit",
+        "stdout",
+        "--config",
+        "skip_children=true",
+        "--edition",
+        "2024",
+        "crates/holonics/src/hnn/port.rs"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "check": "Rust syntax/parse only",
+      "argv": [
+        "rustfmt",
+        "--emit",
+        "stdout",
+        "--config",
+        "skip_children=true",
+        "--edition",
+        "2024",
+        "research/notebook/hnn_design/hnn_physical_receive.rs"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "check": "Whitespace",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "check": "Atlas added row unique/eight columns/record owner present",
+      "status": "PASS"
+    }
+  ],
+  "owned_source_and_claim_files": {
+    "crates/holonics/src/hnn/word.rs": {
+      "bytes": 146260,
+      "sha256": "cee1db82700ed5e47bd686dc8a48e5eb50ea8316c3af21b081faeda8e5258bad"
+    },
+    "crates/holonics/src/hnn/word/work.rs": {
+      "bytes": 5515,
+      "sha256": "1710ab55822f882c3d0d21fcaa42565c62221632b0061840da3724495f75b459"
+    },
+    "crates/holonics/src/hnn/propagation.rs": {
+      "bytes": 66089,
+      "sha256": "5784d92fa12cb7c70db3bda0dc5576cb96bf2e83e919e2d25bf5c59884b99a07"
+    },
+    "crates/holonics/src/hnn/port.rs": {
+      "bytes": 68884,
+      "sha256": "b84cdca1b649daafcd41d17998e0150cd0e44059cc9f229715412c817628374f"
+    },
+    "research/notebook/hnn_design/hnn_physical_receive.rs": {
+      "bytes": 61808,
+      "sha256": "687ff355ed36b8b98bd8c9d93d62bd094de2cfc259214d4371d7233079fa487c"
+    },
+    "docs/atlas/objects.tsv": {
+      "bytes": 919488,
+      "sha256": "7c03e2fb334c51a9aac5417b3e8580c89080f85e2351abdbbcdcd186f85a63b4"
+    },
+    "research/records/2026-10-07_THE_CONTINUING_RECEIVING_RELATION_CHARGES_ITS_DECLARATION_AND_EVERY_EXECUTED_WORD.md": {
+      "bytes": 8816,
+      "sha256": "e952cd392793a8ea920771b0e9421ac02f326046dc2909d4feca701fadbab33d"
+    }
+  },
+  "source_owner_compiler_native_test_training_generator_benchmark_runs": 0,
+  "scientific_job_requested": false,
+  "predecessor": "Corrected declaration input8c04058c is separately frozen and queued; failedf09 workspace E0061 retained. Accepted485 ten controls remain scope-limited predecessor evidence."
+}

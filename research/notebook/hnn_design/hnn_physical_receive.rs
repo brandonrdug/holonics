@@ -147,7 +147,6 @@ pub(super) fn learn(
         charted_compare(teaching_count, probe_count, out, terrains, pin);
         return;
     }
-    use holonics::hnn::field::FieldMaterial;
     use holonics::hnn::prediction::{RepairedCell, repair_by_field};
     use holonics::hnn::receiving::ReceivingPhases;
     use num_bigint::BigInt;
@@ -438,6 +437,13 @@ fn charted_compare(teaching_count: usize, probe_count: usize, out: &str, terrain
     use holonics::hnn::receiving::ReceivingPhases;
     use holonics::hnn::word::{Absorption, EndChange};
     use num_traits::Signed;
+    let total_work_before=holonics::hnn::word::work::read();
+    let mut declaration_work=DeclarationWork::default();
+    let mut completed_units=0usize;
+    let mut relation_rows=Vec::new();
+    let mut common_probe_opening=None;
+    let mut relation_complete=true;
+    let mut initial_relation_complete=true;
     assert_eq!((teaching_count,probe_count),(4,4),"matched fixed complete class orbits");
     assert_eq!(terrains.len(),1);
     assert_eq!(terrains[0],"order2=20261006001:20261006011","spent coverage baseline operands");
@@ -447,6 +453,7 @@ fn charted_compare(teaching_count: usize, probe_count: usize, out: &str, terrain
     let current=Current::at_rest(&field);
     let receiver=ReceiverDeclaration {ring:0,aperture:4,..field.receivers()[0].clone()};
     let theta=Constitution::initial(&field,CAMPAIGN_ONE_BUDGET).expect("same baseline material");
+    let initial=theta.clone();
     let grain=ReceivingPhases::declare(&field,&theta,&current,&receiver).unwrap().grain();
     // The accepted fixture's one-grain component bounds, fixed without consulting output.
     // These are numerical component tolerances; missing-source release still has no certificate.
@@ -457,11 +464,14 @@ fn charted_compare(teaching_count: usize, probe_count: usize, out: &str, terrain
     #[allow(clippy::disallowed_types, clippy::disallowed_methods)]
     let mut output=std::fs::File::create(out).expect("requested output");
     publish(&mut output,format!("charted-compare; exact_sparse_baseline; R_only; source_family=complete_order2_class_orbit; seeds=20261006001:20261006011; grain={grain}; fixed_tolerance={tolerance:?}; same_contemporary_charted_material; exact_reference_carry_continues; no_completion_or_speedup_claim\n"));
+    publish(&mut output,format!("declared interaction: four Receiving teachings then four unobserved probes, in producer class-translation order; terrain x_t=x_(t-2)+1 modulo4 after opening2; station2 absent from every blind source; expected relation is the terrain's class at station2; compare only after publication; probe truth never deposits; all probes additionally compare initial/learned material under one fixed actual post-teaching carry; initial control is exterior, not retained by HNN; complete bounded relation requires all common-carry learned and actual continuing target margins>{}; initial common-carry material must fail at least one expected margin; acquired centered real source response must exceed the same grain tolerance; unchanged material during probes; actual error and work balances close; spent source families are not independent or unseen; no admission or timing budget is raised\n",Rat::new(1.into(),grain.into())));
     let coordinates=|e: &EndChange| -> Vec<Rat> { e.storage.iter().flatten().chain(e.arrivals.iter().flatten().flatten()).chain(e.states.iter().flatten().flatten()).chain(e.resonators.iter().flatten().flatten().flatten()).cloned().collect() };
     for (teaching,seed) in [(true,20261006001),(false,20261006011)] {
         let truth=KnownTruth::cyclic_class_orbit(CyclicLaw::OrderTwo {opening:2},shape.alphabet,seed,4).expect("same predeclared source orbit");
         for (index,observed) in Encoded::identity(&truth,&field).unwrap().into_iter().enumerate() {
             let whole=Instant::now();
+            let unit_work_before=holonics::hnn::word::work::read();
+            if !teaching && index==0 {common_probe_opening=Some(reference_opening.clone());}
             // Exterior receipt cost is charged to this same whole unit. Retained charts still
             // travel through the existing key/shape/certificate/refinement owner; no shortcut.
             let route_receipt_started=Instant::now();
@@ -474,7 +484,7 @@ fn charted_compare(teaching_count: usize, probe_count: usize, out: &str, terrain
             let material=resident.constitution().clone();
             let exact_started=Instant::now();
             let phases=ReceivingPhases::declare(&field,&material,&current,&receiver).unwrap();
-            let exact=match predict_sparse_by_field(&field,&material,&current,&damaged,&reference_opening,&phases) {Ok(v)=>v,Err(e)=>{publish(&mut output,format!("INCOMPLETE: exact sparse forward refused {e:?}\n"));return;}};
+            let exact=match predict_sparse_by_field(&field,&material,&current,&damaged,&reference_opening,&phases) {Ok(v)=>v,Err(e)=>{publish(&mut output,format!("INCOMPLETE: exact sparse forward refused {e:?}\n"));interaction_work(&mut output,total_work_before,&declaration_work,completed_units,false);return;}};
             let exact_forward_ns=exact_started.elapsed().as_nanos();
             let exact_prediction=exact.prediction().clone();
             let charted_started=Instant::now();let mut charted_forward_ns=0;let mut blind_publication_done_ns=0;
@@ -483,7 +493,8 @@ fn charted_compare(teaching_count: usize, probe_count: usize, out: &str, terrain
                 publish(&mut output,format!("matched {teaching} section {index}; input={:?}; exact sparse blind cells={:?}; charted blind cells={:?}; exact tick={}; charted tick={}; producing_commit={}\n",damaged.placed(),exact_prediction.cells,blind.cells,exact_prediction.carry.ticks,blind.carry.ticks,material.commit()));
                 blind_publication_done_ns=charted_started.elapsed().as_nanos();
                 teaching.then(||(observed.clone(),vec![false,false,true,false]))
-            }) {Ok(v)=>v,Err(e)=>{publish(&mut output,format!("INCOMPLETE: charted forward refused {e:?}\n"));return;}};
+            }) {Ok(v)=>v,Err(e)=>{publish(&mut output,format!("INCOMPLETE: charted forward refused {e:?}\n"));interaction_work(&mut output,total_work_before,&declaration_work,completed_units,false);return;}};
+            declaration_work.selected(charted.declaring_face_reused);
             let charted_whole_ns=charted_started.elapsed().as_nanos();
             let readings=&charted.prediction.error.charts;
             let chart_exponent=field.word_lattice().expect("declared chart lattice").chart_exponent();
@@ -546,6 +557,34 @@ fn charted_compare(teaching_count: usize, probe_count: usize, out: &str, terrain
                 assert!(differences.iter().zip(&r.logits).all(|(d,r)|d<=r),"same producing receiver error");
                 differences.into_iter().max().unwrap()
             }).max().unwrap();
+            let source_control_started=Instant::now();
+            if !teaching {
+                // These fixed exterior controls never enter the resident or observe a target.
+                // All four source variations meet exactly the same actual post-teaching carry.
+                let common=common_probe_opening.as_ref().expect("fixed post-teaching carry");
+                let before_phases=ReceivingPhases::declare(&field,&initial,&current,&receiver).unwrap();
+                let before=match predict_sparse_by_field(&field,&initial,&current,&damaged,common,&before_phases) {Ok(v)=>v,Err(e)=>{publish(&mut output,format!("INCOMPLETE: initial common-carry control refused {e:?}\n"));interaction_work(&mut output,total_work_before,&declaration_work,completed_units,false);return;}};
+                let matched=if index==0 {
+                    assert_eq!(&reference_opening,common);
+                    None // the identical actual exact Word has already executed
+                } else {
+                    match predict_sparse_by_field(&field,&material,&current,&damaged,common,&phases) {Ok(v)=>Some(v),Err(e)=>{publish(&mut output,format!("INCOMPLETE: learned common-carry control refused {e:?}\n"));interaction_work(&mut output,total_work_before,&declaration_work,completed_units,false);return;}}
+                };
+                let after=matched.as_ref().map(|v|v.prediction()).unwrap_or(&exact_prediction);
+                assert!(closed(before.prediction()) && closed(after));
+                // Producer truth is read only after both native outputs have been published.
+                publish(&mut output,format!("fixed common-carry probe {index}; initial={:?}; learned={:?}; actual_continuing={:?}; common_opening={common:?}; controls never deposit\n",before.prediction().reads[2],after.reads[2],charted.prediction.physical.reads[2]));
+                let target=observed.classes_read().nth(2).expect("exterior relation truth");
+                let pre=before.prediction().reads[2].read.logits.clone();
+                let post=after.reads[2].read.logits.clone();
+                let actual=&charted.prediction.physical.reads[2].read.logits;
+                let minimum=Rat::new(1.into(),grain.into());
+                initial_relation_complete &= margin(&pre,target)>minimum;
+                relation_complete &= margin(&post,target)>minimum && margin(actual,target)>minimum;
+                publish(&mut output,format!("predeclared relation probe {index}; truth={target}; common_initial_margin={}; common_learned_margin={}; actual_continuing_margin={}; minimum={minimum}; no point selected by output\n",margin(&pre,target),margin(&post,target),margin(actual,target)));
+                relation_rows.push((pre,post));
+            }
+            let common_carry_controls_ns=source_control_started.elapsed().as_nanos();
             let exact_compare_started=Instant::now();
             let mut stop_reason=None;
             if teaching {
@@ -564,11 +603,40 @@ fn charted_compare(teaching_count: usize, probe_count: usize, out: &str, terrain
             } else {drop(exact);assert_eq!(resident.constitution(),&material,"no probe deposition");}
             let exact_comparison_ns=exact_compare_started.elapsed().as_nanos();
             reference_opening=WordOpening::Received {carry:exact_prediction.carry,absorption:Absorption::Nothing};
-            publish(&mut output,format!("matched costs; teaching={teaching}; section={index}; cold_charts={}; exact_sparse_forward_with_receiving_declaration_ns={exact_forward_ns}; charted_forward_with_receiving_declaration_and_error_ns={charted_forward_ns}; signed_saved_forward_ns={}; blind_publication_ns={}; charted_comparison_and_deposition_ns={}; charted_receive_ns={charted_whole_ns}; exact_comparison_and_exterior_checks_ns={exact_comparison_ns}; largest_actual_logit_error={logit_max}; largest_actual_carry_error={}; largest_carry_bound={}; balances_close=true; whole_unit_ns={}; no_completion_cost_removed_from_grade\n",teaching && index==0,exact_forward_ns as i128-charted_forward_ns as i128,blind_publication_done_ns-charted_forward_ns,charted_whole_ns-blind_publication_done_ns,differences.iter().max().unwrap(),radius.iter().max().unwrap(),whole.elapsed().as_nanos()));
-            if let Some(reason)=stop_reason {publish(&mut output,format!("INCOMPLETE: {reason}; measured forward and carry errors above; no subsequent unit\n"));return;}
-            if whole.elapsed().as_millis()>bound {publish(&mut output,format!("INCOMPLETE: matched unit exceeded fixed {bound}ms; no subsequent unit\n"));return;}
+            completed_units+=1;
+            publish(&mut output,format!("matched owner work; teaching={teaching}; section={index}; declaration={declaration_work:?}; native_calls_this_whole_unit={:?}; counts_include_all_actual_declaration_and_control_Words; returned native motion/error/covectors unchanged; arithmetic and energy are separate axes\n",holonics::hnn::word::work::read().since(unit_work_before)));
+            publish(&mut output,format!("matched costs; teaching={teaching}; section={index}; cold_charts={}; exact_sparse_forward_with_receiving_declaration_ns={exact_forward_ns}; charted_forward_with_receiving_declaration_and_error_ns={charted_forward_ns}; signed_saved_forward_ns={}; blind_publication_ns={}; charted_comparison_and_deposition_ns={}; charted_receive_ns={charted_whole_ns}; fixed_common_carry_controls_and_receipt_ns={common_carry_controls_ns}; exact_comparison_and_exterior_checks_ns={exact_comparison_ns}; largest_actual_logit_error={logit_max}; largest_actual_carry_error={}; largest_carry_bound={}; balances_close=true; whole_unit_ns={}; no_completion_cost_removed_from_grade\n",teaching && index==0,exact_forward_ns as i128-charted_forward_ns as i128,blind_publication_done_ns-charted_forward_ns,charted_whole_ns-blind_publication_done_ns,differences.iter().max().unwrap(),radius.iter().max().unwrap(),whole.elapsed().as_nanos()));
+            if let Some(reason)=stop_reason {publish(&mut output,format!("INCOMPLETE: {reason}; measured forward and carry errors above; no subsequent unit\n"));interaction_work(&mut output,total_work_before,&declaration_work,completed_units,false);return;}
+            if whole.elapsed().as_millis()>bound {publish(&mut output,format!("INCOMPLETE: matched unit exceeded fixed {bound}ms; no subsequent unit\n"));interaction_work(&mut output,total_work_before,&declaration_work,completed_units,false);return;}
         }
     }
+    let mut acquired_source_response=false;
+    if let Some((pre,_))=relation_rows.first() {
+        let count=Rat::from_integer(relation_rows.len().into());
+        let mean:Vec<Rat>=(0..pre.len()).map(|j|relation_rows.iter().map(|(a,b)|&b[j]-&a[j]).sum::<Rat>()/&count).collect();
+        let minimum=Rat::new(1.into(),grain.into());
+        acquired_source_response=relation_rows.iter().any(|(a,b)|a.iter().zip(b).zip(&mean).enumerate().any(|(j,((a,b),mean))|j%2==0 && (b-a-mean).abs()>minimum));
+    }
+    let complete=completed_units==teaching_count+probe_count && relation_rows.len()==probe_count;
+    publish(&mut output,format!("bounded continuing relation; complete_interaction={complete}; initial_common_carry_relation_already_passes={initial_relation_complete}; fixed_common_carry_acquired_real_source_response_above_tolerance={acquired_source_response}; every_common_and_continuing_expected_margin_at_declared_grain={relation_complete}; bounded_relation_gate={}; no independent/general-language/product claim\n",complete && !initial_relation_complete && acquired_source_response && relation_complete));
+    interaction_work(&mut output,total_work_before,&declaration_work,completed_units,complete);
+}
+
+#[derive(Debug,Default)]
+struct DeclarationWork { selections:u64, constructions:u64, reuses:u64, invalidations:u64 }
+impl DeclarationWork {
+    fn selected(&mut self,reused:bool) {
+        self.selections+=1;
+        if reused {self.reuses+=1;} else {
+            self.invalidations+=u64::from(self.constructions>0);
+            self.constructions+=1;
+        }
+    }
+}
+fn interaction_work(output:&mut std::fs::File,before:holonics::hnn::word::work::WorkRead,
+    declaration:&DeclarationWork,completed:usize,complete:bool,
+) {
+    publish(output,format!("interaction work receipt; completed_units={completed}; complete={complete}; declaration={declaration:?}; native_owner_calls={:?}; includes_setup_declarations_all_basis_Words_exact_reference_charted_and_exterior_controls; partial_attempts_retained; thread_scope=one_calling_thread; no FLOP_energy_or_speedup_conversion; whole_resource_time_in_outer_queue_receipt\n",holonics::hnn::word::work::read().since(before)));
 }
 
 // The fixed class contrast is the logged wrong release (two against true three), not a

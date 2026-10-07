@@ -94,6 +94,7 @@
 //! ```
 
 pub mod continuation;
+pub mod work;
 
 use std::collections::BTreeSet;
 
@@ -2070,6 +2071,7 @@ impl<'c> Word<'c> {
         change: EndChange,
         opened_at: usize,
     ) -> Result<Self, HnnError> {
+        work::reached(work::Event::WordOpenAttempt);
         let EndChange {
             storage,
             arrivals,
@@ -2262,6 +2264,7 @@ impl<'c> Word<'c> {
             opened_at,
         };
         word.peak_bits = word.state_bits();
+        work::reached(work::Event::WordOpen);
         Ok(word)
     }
 
@@ -2518,6 +2521,7 @@ impl<'c> Word<'c> {
     /// Every ring's junction at this step, its anchor carried, recorded; with the junctions'
     /// residual term and its bound.
     fn junctions(&mut self) -> Result<(Vec<Junction>, Rat, Rat), HnnError> {
+        work::reached(work::Event::JunctionAttempt);
         if self.ended {
             return Err(HnnError::WordEnded {
                 ticks: self.passage.len(),
@@ -2585,6 +2589,7 @@ impl<'c> Word<'c> {
             rates: Vec::new(),
         });
         self.clock.advance(&1u32.into());
+        work::reached(work::Event::Junction);
         Ok((junctions, residual, bound))
     }
 
@@ -2921,6 +2926,7 @@ impl<'c> Word<'c> {
         self.peak_bits = self.peak_bits.max(self.state_bits());
         self.settled = Some(balance.after.clone());
         self.balances.push(balance.clone());
+        work::reached(work::Event::FullTick);
         Ok(balance)
     }
 

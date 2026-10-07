@@ -1056,6 +1056,7 @@ fn reverse_core(
     receiving: usize,
     end: Option<&ChangeCovector>,
 ) -> Result<(WordReturn, ChangeCovector), HnnError> {
+    crate::hnn::word::work::reached(crate::hnn::word::work::Event::ReturnAttempt);
     let field = word.field();
     let operands = word.operands();
     let records = word.recorded();
@@ -1532,6 +1533,7 @@ fn reverse_core(
             .collect(),
         resonators: resonator_state_bar,
     };
+    crate::hnn::word::work::reached(crate::hnn::word::work::Event::Return);
     Ok((
         WordReturn {
             opening: storage_bar,

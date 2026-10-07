@@ -931,6 +931,7 @@ impl Operands {
         lattice: Option<WordLattice>,
         charts: &Charts,
     ) -> Result<Self, HnnError> {
+        crate::hnn::word::work::reached(crate::hnn::word::work::Event::MaterialCutAttempt);
         // Each ring's operands read only its own material, the standings and its own chart; each
         // contact's only its own factors, its two rings' screws and its own chart: the rings, then
         // the contacts, run together.
@@ -1012,6 +1013,7 @@ impl Operands {
             exact_weights.push(exact);
             junction_certificates.push(certificate);
         }
+        crate::hnn::word::work::reached(crate::hnn::word::work::Event::MaterialCut);
         Ok(Self {
             step: field.step().clone(),
             rings,
