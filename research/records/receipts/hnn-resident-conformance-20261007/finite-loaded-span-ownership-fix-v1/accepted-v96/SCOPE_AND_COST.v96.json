@@ -1,0 +1,104 @@
+{
+  "utc": "2026-10-08T01:21:32.142051+00:00",
+  "queue_receipt": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v96/VALIDATION.json",
+  "source_commit": "224c058772b78e4f4fc78b4f353359157ec30548",
+  "verified_native_input_count": 303,
+  "native_inputs_unchanged_during_receipt_integration": true,
+  "grade": "FOUR_FINITE_LOADED_SPAN_CONTROLS_PASS_ORIGINAL_OUTPUT_GATE_FAILED",
+  "accepted_claim": "Actual declared finite loaded-field response at opened pump clock, joint factor-ray response bound, zero receiving-map and empty-comparison controls, and native contact consumer matches its source-bound finite witness. No learned output or global stability claim.",
+  "excluded_claims": [
+    "independent-review acceptance",
+    "useful physical F/C movement or acquired output",
+    "all-future extinction",
+    "nonlinear descent",
+    "logarithmic exact denominator cost",
+    "cold restore",
+    "CUDA parity",
+    "other carriers sensitivity contract"
+  ],
+  "new_HNN_guard_native_cost": {
+    "jobs": 9,
+    "CPU_ns": 95524629000,
+    "wall_ns": 67767984658
+  },
+  "nine_stage_sums_verified": true,
+  "largest_control_wall_ns": 896182651,
+  "largest_control_CPU_ns": 845853000,
+  "largest_control_group_peak_bytes": 23306240,
+  "all_stages_caps_unchanged_and_leases_released": true,
+  "raw_control_copies_verified": {
+    "CONTROL1_FULL_STDOUT.txt": {
+      "from": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v96/artifacts/.local/lean-rust-pruning/admission-v1/hnn-loadedclone-224c-control1-20261006-v1.stdout",
+      "pin": {
+        "bytes": 231,
+        "sha256": "66291d015c61c3291b940a3b7958a7069742f799d846bac706a7080980331a19"
+      }
+    },
+    "CONTROL1_FULL_STDERR.txt": {
+      "from": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v96/artifacts/.local/lean-rust-pruning/admission-v1/hnn-loadedclone-224c-control1-20261006-v1.stderr",
+      "pin": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    "CONTROL2_FULL_STDOUT.txt": {
+      "from": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v96/artifacts/.local/lean-rust-pruning/admission-v1/hnn-loadedclone-224c-control2-20261006-v1.stdout",
+      "pin": {
+        "bytes": 213,
+        "sha256": "190a7fe5eb5a2add434e8404e82f9a46fdf879daf0e715451e637b1ac4db7c6b"
+      }
+    },
+    "CONTROL2_FULL_STDERR.txt": {
+      "from": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v96/artifacts/.local/lean-rust-pruning/admission-v1/hnn-loadedclone-224c-control2-20261006-v1.stderr",
+      "pin": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    "CONTROL3_FULL_STDOUT.txt": {
+      "from": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v96/artifacts/.local/lean-rust-pruning/admission-v1/hnn-loadedclone-224c-control3-20261006-v1.stdout",
+      "pin": {
+        "bytes": 214,
+        "sha256": "d9e85293e3c51dcb66d99caf8b05c7339a57d580623ecad0d248c15e58f03431"
+      }
+    },
+    "CONTROL3_FULL_STDERR.txt": {
+      "from": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v96/artifacts/.local/lean-rust-pruning/admission-v1/hnn-loadedclone-224c-control3-20261006-v1.stderr",
+      "pin": {
+        "bytes": 140,
+        "sha256": "17ba4c72a56825aacd1b46e2318acfd8f12424a220ff55f4497901013b2b290a"
+      }
+    },
+    "CONTROL4_FULL_STDOUT.txt": {
+      "from": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v96/artifacts/.local/lean-rust-pruning/admission-v1/hnn-loadedclone-224c-control4-20261006-v1.stdout",
+      "pin": {
+        "bytes": 223,
+        "sha256": "89ea8d5599cdb36b81ae00a579f84886a18734f332a938e54d3c73581a21366f"
+      }
+    },
+    "CONTROL4_FULL_STDERR.txt": {
+      "from": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v96/artifacts/.local/lean-rust-pruning/admission-v1/hnn-loadedclone-224c-control4-20261006-v1.stderr",
+      "pin": {
+        "bytes": 143,
+        "sha256": "910773ebeac34b07e369f445be4a7fa1e59100c316bfd6aa9fc27fe7b25fe863"
+      }
+    }
+  },
+  "original_output_gate": {
+    "passed": 0,
+    "failed": 1,
+    "unlaunched": 6,
+    "caller_checks_unlaunched": [
+      "hnn_prediction",
+      "holonics-cuda --lib"
+    ],
+    "failed_selector": "hnn::tests::physical_communication::complete_contact_return_publishes_held_point_before_existing_communication",
+    "failure": "identical actual 6x6 contact factor despite aggregate stepped>0; continued-output gate not reached",
+    "all_fixture_and_original_acceptance_assertions_preserved": true,
+    "blind_failed_selector_replay_requested": false
+  },
+  "original_failed_selector_replayed": false,
+  "no_bank_or_observation_join_acceptance": true,
+  "source_owner_jobs": 0,
+  "role_of_receipt": "Version-bound finite loaded-span prerequisite only; original learning/output gates remain unresolved."
+}

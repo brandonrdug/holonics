@@ -759,3 +759,27 @@ there are no added Words, solve-column reads, teachers or production-law changes
 The sibling constructions either already clone a reused operand or move distinct
 operands once. Syntax and source checks pass; fresh type/native validation belongs
 to the sole queue under the unchanged caps and a successor-matched projection.
+
+[measured; October 8, continuation-v96] The sole queue subsequently accepted the exact
+successor `224c058772b78e4f4fc78b4f353359157ec30548`: fresh library check, three
+guards, 57 doctests, test binary and all four focused controls passed. The complete
+[`VALIDATION.json`](receipts/hnn-resident-conformance-20261007/finite-loaded-span-ownership-fix-v1/accepted-v96/VALIDATION.json),
+four unfiltered stdout/stderr pairs and
+[`SCOPE_AND_COST.v96.json`](receipts/hnn-resident-conformance-20261007/finite-loaded-span-ownership-fix-v1/accepted-v96/SCOPE_AND_COST.v96.json)
+retain the exact source, inputs, launch seals, costs and exclusions.
+The nine stages consumed 95,524,629,000 CPU ns and 67,767,984,658 combined wall ns;
+these sums include cache preparation once and are not one stage's runtime or deadline.
+The largest control consumed 845,853,000 CPU ns and 896,182,651 wall ns; the largest
+control group peak was 23,306,240 bytes. Every stage kept its existing caps and
+released its lease. This receipt integration changes no native input.
+
+The accepted claim is the actual finite loaded-field response at the producing pump
+clock, the joint factor-ray response bound, zero-map/empty-comparison controls and
+the native contact selector's consumption of its source-bound witness. It proves
+neither acquisition nor global stability. The original seven-item gate remains
+zero passed, one failed and six unlaunched; its failed output selector was not
+replayed. The failure remains identical actual contact factors despite an aggregate
+stepped count, before the continued-output assertions. No new observation-backed
+bank comparison, learned output, nonlinear descent, cold restore or CUDA parity
+is credited. This source-bound finite witness is a prerequisite for the separately
+owned continuing receiving/comparison join, not evidence that the join executes.
