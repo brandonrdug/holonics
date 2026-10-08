@@ -1,0 +1,5 @@
+'Holonics.Foundation.CausalChord.futureReadForm_pairing' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Foundation.CausalChord.futureReadForm_zero_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Objects.SourceHolon.matrixReader_futureAgreement_iff_zero_futureReadScore' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]

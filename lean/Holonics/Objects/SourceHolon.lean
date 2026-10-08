@@ -592,6 +592,54 @@ theorem impulse_moment (U : Matrix (Fin n) (Fin n) K) (I : Matrix (Fin n) (Fin m
 
 end Chord
 
+/-! ### Positive future-read score of the actual continuing source
+
+The existing future-agreement theorem owns the continuing-source action. The chord's finite
+form now gives that same quotient a positive observation score. A finite truncation is exact
+only with the separately owned finite-horizon certificate (`RelativeCompleteness` or `FaceMap`).
+-/
+
+section FutureScore
+
+open Matrix Foundation.CausalChord
+
+variable {K : Type*} [Field K] [PartialOrder K] [StarRing K] [TrivialStar K] [AddLeftMono K]
+variable {n m p : ℕ}
+
+/-- [proved-derived; kernel-check pending] Actual source moments are future-indistinguishable
+iff every finite positive future-read score is zero. This consumes the composed reads `C Uᵏ`
+and the existing native continuing-source law; a currently zero face is insufficient. -/
+theorem matrixReader_futureAgreement_iff_zero_futureReadScore
+    (U : Matrix (Fin n) (Fin n) K) (I : Matrix (Fin n) (Fin m) K)
+    (C : Matrix (Fin p) (Fin n) K) (Q : Matrix (Fin p) (Fin p) K) (hQ : Q.PosDef)
+    (l l' : List (Fin m → K)) :
+    futureAgreement (fun (_ : Unit) l => C *ᵥ (matrixReader U I).moment l)
+      appendLetter l l' ↔
+    ∀ N : ℕ,
+      ((matrixReader U I).moment l - (matrixReader U I).moment l') ⬝ᵥ
+        (futureReadForm (fun k : Fin N => C * U ^ k.val) (fun _ => Q) *ᵥ
+          ((matrixReader U I).moment l - (matrixReader U I).moment l')) = 0 := by
+  let d := (matrixReader U I).moment l - (matrixReader U I).moment l'
+  change futureAgreement
+    (fun (_ : Unit) l => (Matrix.mulVecLin C) ((matrixReader U I).moment l))
+    appendLetter l l' ↔ _
+  rw [native_futureAgreement_iff]
+  change (∀ k : ℕ, C *ᵥ ((Matrix.mulVecLin U ^ k) d) = 0) ↔ _
+  simp only [mulVecLin_pow_apply]
+  constructor
+  · intro h N
+    apply (futureReadForm_zero_iff _ _ (fun _ => hQ) d).mpr
+    intro k
+    rw [← Matrix.mulVec_mulVec]
+    exact h k.val
+  · intro h k
+    have hk := (futureReadForm_zero_iff
+      (fun i : Fin (k + 1) => C * U ^ i.val) (fun _ => Q) (fun _ => hQ) d).mp
+        (h (k + 1)) ⟨k, Nat.lt_succ_self k⟩
+    simpa only [← Matrix.mulVec_mulVec] using hk
+
+end FutureScore
+
 /-! ## 6. The moment of a contracting affine advance is a fractal address -/
 
 section Address
@@ -680,6 +728,7 @@ section Audit
 #print axioms charmatrix_mul_truncatedResolvent
 #print axioms numerator_expansion
 #print axioms impulse_moment
+#print axioms matrixReader_futureAgreement_iff_zero_futureReadScore
 #print axioms descend_eq_moment
 #print axioms no_identity_advance_realizes_the_address
 #print axioms cantor_separates_the_orders

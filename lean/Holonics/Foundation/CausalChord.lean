@@ -733,6 +733,62 @@ theorem full_atlas_determines_the_operator_fin_two {K : Type*} [Field K]
 
 end Linearization
 
+/-! ## The positive form of a declared finite receiver future
+
+[agent-inferred] Put the form beside the chord that owns source/transport/readout together.
+`L i` is the actual composed read `Cᵢ Φᵢ`, so a moving receiver, clock or chart belongs in this
+operand. This form measures observations. It is physical storage only under a separate material
+calibration. No dense runtime matrix or cost saving is asserted by the following identities.
+-/
+
+section FiniteFuture
+
+variable {K ι n m : Type*} [CommRing K] [Fintype ι] [Fintype n] [Fintype m]
+
+/-- [definition] The finite future-read form `Σᵢ Lᵢᵀ Qᵢ Lᵢ`, including interference within each
+actual receiver reading before it is paired. The declared index may carry positive integration
+weights through `Q`. -/
+def futureReadForm (L : ι → Matrix m n K) (Q : ι → Matrix m m K) : Matrix n n K :=
+  ∑ i, (L i)ᵀ * Q i * L i
+
+/-- [proved-derived; kernel-check pending] The form is exactly the sum of the actual quadratic
+receiver readings; no independent modal intensities replace their coherent sum. -/
+theorem futureReadForm_pairing (L : ι → Matrix m n K) (Q : ι → Matrix m m K) (x : n → K) :
+    x ⬝ᵥ (futureReadForm L Q *ᵥ x) =
+      ∑ i, (L i *ᵥ x) ⬝ᵥ (Q i *ᵥ (L i *ᵥ x)) := by
+  have hs : futureReadForm L Q *ᵥ x = ∑ i, ((L i)ᵀ * Q i * L i) *ᵥ x := by
+    simpa only [futureReadForm] using
+      (Matrix.sum_mulVec Finset.univ (fun i => (L i)ᵀ * Q i * L i) x)
+  rw [hs, dotProduct_sum]
+  apply Finset.sum_congr rfl
+  intro i _
+  rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec,
+    dotProduct_mulVec, Matrix.vecMul_transpose]
+
+/-- [proved-derived; kernel-check pending] Positive receiver metrics identify exactly the
+declared future kernel: zero observation score iff every actual future reading vanishes. A
+semidefinite metric would instead test only its own observed quotient. -/
+theorem futureReadForm_zero_iff [PartialOrder K] [StarRing K] [TrivialStar K] [AddLeftMono K]
+    (L : ι → Matrix m n K) (Q : ι → Matrix m m K) (hQ : ∀ i, (Q i).PosDef)
+    (x : n → K) :
+    x ⬝ᵥ (futureReadForm L Q *ᵥ x) = 0 ↔ ∀ i, L i *ᵥ x = 0 := by
+  rw [futureReadForm_pairing]
+  have hn : ∀ i, 0 ≤ (L i *ᵥ x) ⬝ᵥ (Q i *ᵥ (L i *ᵥ x)) := by
+    intro i
+    simpa only [star_trivial] using
+      (hQ i).posSemidef.dotProduct_mulVec_nonneg (L i *ᵥ x)
+  rw [Finset.sum_eq_zero_iff_of_nonneg (fun i _ => hn i)]
+  constructor
+  · intro h i
+    by_contra hi
+    have hp : 0 < (L i *ᵥ x) ⬝ᵥ (Q i *ᵥ (L i *ᵥ x)) := by
+      simpa only [star_trivial] using (hQ i).dotProduct_mulVec_pos hi
+    exact (ne_of_gt hp) (h i (Finset.mem_univ i))
+  · intro h i _
+    rw [h i, Matrix.mulVec_zero, dotProduct_zero]
+
+end FiniteFuture
+
 section Axioms
 
 #print axioms adjugate_eq_det_smul_right
@@ -767,6 +823,8 @@ section Axioms
 #print axioms Linearization.zeroWitness_numerator
 #print axioms Linearization.spectrum_does_not_determine_response
 #print axioms Linearization.full_atlas_determines_the_operator_fin_two
+#print axioms futureReadForm_pairing
+#print axioms futureReadForm_zero_iff
 
 end Axioms
 

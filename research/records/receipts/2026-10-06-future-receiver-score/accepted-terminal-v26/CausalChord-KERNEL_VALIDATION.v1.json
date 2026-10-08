@@ -1,0 +1,181 @@
+{
+  "kernel_accepted": true,
+  "compiler_exit": 0,
+  "compiler_wall_ns": 5030064905,
+  "axioms": {
+    "Holonics.Foundation.CausalChord.adjugate_eq_det_smul_right": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Foundation.CausalChord.adjugate_conj": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Foundation.CausalChord.charmatrix_conj": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Foundation.CausalChord.charpoly_conj": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Foundation.CausalChord.Linearization.resolvent_identity": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Foundation.CausalChord.Linearization.denominator_ne_zero": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Foundation.CausalChord.Linearization.denominator_smul_transfer_eq_numerator": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Foundation.CausalChord.Linearization.rebase_denominator": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Foundation.CausalChord.Linearization.rebase_numerator": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Foundation.CausalChord.Linearization.rebase_transfer": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Foundation.CausalChord.charpoly_dvd_of_quotient": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Foundation.CausalChord.Linearization.transfer_eq_resolvent": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Foundation.CausalChord.Linearization.charmatrix_intertwine": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Foundation.CausalChord.Linearization.transfer_descend": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Foundation.CausalChord.Linearization.descended_denominator_clears": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Foundation.CausalChord.Linearization.release_cancels": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Foundation.CausalChord.Linearization.cancellingWitness_denominator": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Foundation.CausalChord.Linearization.cancellingWitness_numerator": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Foundation.CausalChord.Linearization.cancellation_is_strict": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Foundation.CausalChord.rateForm_congruence": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Foundation.CausalChord.seam_iff_gSkew": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Foundation.CausalChord.gSkew_eigenvalue_re_eq_zero": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Foundation.CausalChord.seam_eigenvalue_re_eq_half": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Foundation.CausalChord.semisimple_imaginary_has_conserving_receiver": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Foundation.CausalChord.jordan_eigenvalue_eq_I": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Foundation.CausalChord.jordan_has_no_conserving_receiver": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Foundation.CausalChord.Linearization.nilpotentWitness_denominator": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Foundation.CausalChord.Linearization.zeroWitness_denominator": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Foundation.CausalChord.Linearization.nilpotentWitness_numerator": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Foundation.CausalChord.Linearization.zeroWitness_numerator": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Foundation.CausalChord.Linearization.spectrum_does_not_determine_response": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Foundation.CausalChord.Linearization.full_atlas_determines_the_operator_fin_two": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Foundation.CausalChord.futureReadForm_pairing": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Foundation.CausalChord.futureReadForm_zero_iff": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "selector_count_matches": true,
+  "standard_axioms_only": true,
+  "metadata_unchanged": true,
+  "broad_library_checked": false
+}

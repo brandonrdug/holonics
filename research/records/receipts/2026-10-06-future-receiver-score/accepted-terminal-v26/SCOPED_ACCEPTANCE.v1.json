@@ -1,0 +1,227 @@
+{
+  "schema": 1,
+  "status": "PASS: exact accepted owners, actual continuing-source consumer and independent importer integrated; complete-library gate separate",
+  "scope": "Declared finite composed reads and positive receiver metrics in trivial-star ordered charts; actual continuing-source native linear family; no arbitrary continuous-event relevance or physical-energy/performance claim",
+  "query_counts": {
+    "CausalChord": 34,
+    "SourceHolon": 20,
+    "Audit": 3
+  },
+  "new_actual_names": [
+    "Holonics.Foundation.CausalChord.futureReadForm",
+    "Holonics.Foundation.CausalChord.futureReadForm_pairing",
+    "Holonics.Foundation.CausalChord.futureReadForm_zero_iff",
+    "Holonics.Objects.SourceHolon.matrixReader_futureAgreement_iff_zero_futureReadScore"
+  ],
+  "source_and_object_pins": {
+    "CausalChord": {
+      "source_bytes": 46612,
+      "source_sha256": "4b2c01a136c8c5cf4921d4660975ba6a8d6af5b7c9f61e0d55dcc8b1d6469aa8",
+      "object_bytes": 1800432,
+      "object_sha256": "dd23e5b12a8026958380724be51d73addf2bee71b00b814cc2aea52719a0ea9e"
+    },
+    "SourceHolon": {
+      "source_bytes": 36493,
+      "source_sha256": "ee0bb62a8a091c41a5e91d5ac6ce2ce831e692caf982b3ecf043439c747d5568",
+      "object_bytes": 1900936,
+      "object_sha256": "1fdd2902eb8f52cae3f478eb17916df799badc431ad29943f3436d513483a7d7"
+    },
+    "Audit": {
+      "source_bytes": 273,
+      "source_sha256": "52a714e8f9f1f13587bfbe7a762ed510ef70ded0c43fbf43c59a79c862238e2f",
+      "object_bytes": 1552,
+      "object_sha256": "b3f5b87d337bca8a1d5d8efce42e14e066c9aaf0b48ecdb62f9d88f0ba703868"
+    }
+  },
+  "accepted_original_bindings_sha256": "100e1fc9cfd178dc6f047d6834103ab9a77a2ba041a2ca8853993181264ca9a1",
+  "accepted_original_full_validation_sha256": "3e62578e200b891bd97edb9fe52dcd5f36eeec79a9cd0b6085af13b6583a0a05",
+  "derived_scope": "This is a scoped integration summary; original pins identify the original independent raw receipts, not this derivative file. Full namespaces/catalogs/objects are retained in the source-owner receipt store; no worktree removal or duplicate compilation.",
+  "whole_CausalChord34_SourceHolon20_independent_importer3_standard_queries_PASS": true,
+  "prior_primitive2_not_replayed": true,
+  "provider_provenance": "All16customsources matched maintainedtree in originalbinding; SourceHolon/importer customprovider objects agreed. ActualcurrentFracPackingnativeprovenancechecked withoutrebuild; catalogdigestreuse declared.",
+  "separate_gate": "No whole Lean package or HNN runtime result is inferred. Source annotations preserved exactly.",
+  "stages": {
+    "geometry-future-provider-provenance-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 1057643575,
+      "projection_ns": 12779337307,
+      "measured_to_projected_ratio": [
+        1057643575,
+        12779337307
+      ],
+      "aggregate_CPU_ns": 953211000,
+      "group_peak_bytes": 376811520,
+      "peak_child_RSS_KiB": 289704,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "inner_output_seal_retained": true,
+      "absent_inner_metrics_not_inferred": false,
+      "declared_outputs_missing_at_terminal": [],
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "geometry-future-causal-chord-v2-preparation-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 3464472445,
+      "projection_ns": 12779337307,
+      "measured_to_projected_ratio": [
+        3464472445,
+        12779337307
+      ],
+      "aggregate_CPU_ns": 3118351000,
+      "group_peak_bytes": 239636480,
+      "peak_child_RSS_KiB": 178008,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "inner_output_seal_retained": true,
+      "absent_inner_metrics_not_inferred": false,
+      "declared_outputs_missing_at_terminal": [],
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "geometry-future-causal-chord-v2-development-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 6455497811,
+      "projection_ns": 21132554884,
+      "measured_to_projected_ratio": [
+        6455497811,
+        21132554884
+      ],
+      "aggregate_CPU_ns": 6054007000,
+      "group_peak_bytes": 532697088,
+      "peak_child_RSS_KiB": 2705972,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "inner_output_seal_retained": true,
+      "absent_inner_metrics_not_inferred": false,
+      "declared_outputs_missing_at_terminal": [],
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "geometry-future-source-holon-v2-preparation-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 4450418934,
+      "projection_ns": 12779337307,
+      "measured_to_projected_ratio": [
+        4450418934,
+        12779337307
+      ],
+      "aggregate_CPU_ns": 4042246000,
+      "group_peak_bytes": 263585792,
+      "peak_child_RSS_KiB": 209992,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "inner_output_seal_retained": true,
+      "absent_inner_metrics_not_inferred": false,
+      "declared_outputs_missing_at_terminal": [],
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "geometry-future-source-holon-v2-development-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 11803493810,
+      "projection_ns": 21132554884,
+      "measured_to_projected_ratio": [
+        11803493810,
+        21132554884
+      ],
+      "aggregate_CPU_ns": 8043492000,
+      "group_peak_bytes": 3215634432,
+      "peak_child_RSS_KiB": 3354884,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "inner_output_seal_retained": true,
+      "absent_inner_metrics_not_inferred": false,
+      "declared_outputs_missing_at_terminal": [],
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "geometry-future-audit-v2-preparation-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 4852447167,
+      "projection_ns": 12779337307,
+      "measured_to_projected_ratio": [
+        4852447167,
+        12779337307
+      ],
+      "aggregate_CPU_ns": 4384057000,
+      "group_peak_bytes": 413986816,
+      "peak_child_RSS_KiB": 226556,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "inner_output_seal_retained": true,
+      "absent_inner_metrics_not_inferred": false,
+      "declared_outputs_missing_at_terminal": [],
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "geometry-future-audit-v2-development-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 3379164116,
+      "projection_ns": 21132554884,
+      "measured_to_projected_ratio": [
+        3379164116,
+        21132554884
+      ],
+      "aggregate_CPU_ns": 3002311000,
+      "group_peak_bytes": 629796864,
+      "peak_child_RSS_KiB": 3254796,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "inner_output_seal_retained": true,
+      "absent_inner_metrics_not_inferred": false,
+      "declared_outputs_missing_at_terminal": [],
+      "quiescent_release": true,
+      "outer_error": null
+    }
+  }
+}

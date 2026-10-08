@@ -1,0 +1,78 @@
+'Holonics.Foundation.CausalChord.adjugate_eq_det_smul_right' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Foundation.CausalChord.adjugate_conj' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Foundation.CausalChord.charmatrix_conj' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Foundation.CausalChord.charpoly_conj' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Foundation.CausalChord.Linearization.resolvent_identity' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Foundation.CausalChord.Linearization.denominator_ne_zero' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Foundation.CausalChord.Linearization.denominator_smul_transfer_eq_numerator' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Foundation.CausalChord.Linearization.rebase_denominator' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Foundation.CausalChord.Linearization.rebase_numerator' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Foundation.CausalChord.Linearization.rebase_transfer' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Foundation.CausalChord.charpoly_dvd_of_quotient' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Foundation.CausalChord.Linearization.transfer_eq_resolvent' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Foundation.CausalChord.Linearization.charmatrix_intertwine' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Foundation.CausalChord.Linearization.transfer_descend' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Foundation.CausalChord.Linearization.descended_denominator_clears' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Foundation.CausalChord.Linearization.release_cancels' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Foundation.CausalChord.Linearization.cancellingWitness_denominator' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Foundation.CausalChord.Linearization.cancellingWitness_numerator' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Foundation.CausalChord.Linearization.cancellation_is_strict' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Foundation.CausalChord.rateForm_congruence' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Foundation.CausalChord.seam_iff_gSkew' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Foundation.CausalChord.gSkew_eigenvalue_re_eq_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Foundation.CausalChord.seam_eigenvalue_re_eq_half' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Foundation.CausalChord.semisimple_imaginary_has_conserving_receiver' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Foundation.CausalChord.jordan_eigenvalue_eq_I' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Foundation.CausalChord.jordan_has_no_conserving_receiver' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Foundation.CausalChord.Linearization.nilpotentWitness_denominator' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Foundation.CausalChord.Linearization.zeroWitness_denominator' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Foundation.CausalChord.Linearization.nilpotentWitness_numerator' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Foundation.CausalChord.Linearization.zeroWitness_numerator' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Foundation.CausalChord.Linearization.spectrum_does_not_determine_response' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Foundation.CausalChord.Linearization.full_atlas_determines_the_operator_fin_two' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Foundation.CausalChord.futureReadForm_pairing' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Foundation.CausalChord.futureReadForm_zero_iff' depends on axioms: [propext, Classical.choice, Quot.sound]

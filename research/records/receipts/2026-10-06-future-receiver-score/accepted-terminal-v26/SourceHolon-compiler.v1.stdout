@@ -1,0 +1,32 @@
+'Holonics.Objects.SourceHolon.ClockedRing.moment_closed_form' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Objects.SourceHolon.ClockedRing.moment_unit_clock' depends on axioms: [propext, Quot.sound]
+'Holonics.Objects.SourceHolon.jointMoment_append_one' depends on axioms: [propext, Quot.sound]
+'Holonics.Objects.SourceHolon.clock_changes_the_moment' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Objects.SourceHolon.sourceFrame_append_one' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Objects.SourceHolon.moment_eq_receivingPhase_sourceFrame' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Objects.SourceHolon.moment_append' depends on axioms: [propext, Quot.sound]
+'Holonics.Objects.SourceHolon.momentStanding' depends on axioms: [propext, Quot.sound]
+'Holonics.Objects.SourceHolon.moment_eq_iff_futureAgreement' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Objects.SourceHolon.native_futureAgreement_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Objects.SourceHolon.observable_native_minimal' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Objects.SourceHolon.unobservable_native_not_minimal' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Objects.SourceHolon.offset_separates_exactly_at_its_offset' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Objects.SourceHolon.charmatrix_mul_truncatedResolvent' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Objects.SourceHolon.numerator_expansion' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Objects.SourceHolon.impulse_moment' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Objects.SourceHolon.matrixReader_futureAgreement_iff_zero_futureReadScore' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Objects.SourceHolon.descend_eq_moment' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Objects.SourceHolon.no_identity_advance_realizes_the_address' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Objects.SourceHolon.cantor_separates_the_orders' depends on axioms: [propext, Classical.choice, Quot.sound]

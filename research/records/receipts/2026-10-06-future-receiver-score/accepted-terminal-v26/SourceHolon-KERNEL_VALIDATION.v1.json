@@ -1,0 +1,107 @@
+{
+  "kernel_accepted": true,
+  "compiler_exit": 0,
+  "compiler_wall_ns": 10103108241,
+  "axioms": {
+    "Holonics.Objects.SourceHolon.ClockedRing.moment_closed_form": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Objects.SourceHolon.ClockedRing.moment_unit_clock": [
+      "propext",
+      "Quot.sound"
+    ],
+    "Holonics.Objects.SourceHolon.jointMoment_append_one": [
+      "propext",
+      "Quot.sound"
+    ],
+    "Holonics.Objects.SourceHolon.clock_changes_the_moment": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Objects.SourceHolon.sourceFrame_append_one": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Objects.SourceHolon.moment_eq_receivingPhase_sourceFrame": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Objects.SourceHolon.moment_append": [
+      "propext",
+      "Quot.sound"
+    ],
+    "Holonics.Objects.SourceHolon.momentStanding": [
+      "propext",
+      "Quot.sound"
+    ],
+    "Holonics.Objects.SourceHolon.moment_eq_iff_futureAgreement": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Objects.SourceHolon.native_futureAgreement_iff": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Objects.SourceHolon.observable_native_minimal": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Objects.SourceHolon.unobservable_native_not_minimal": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Objects.SourceHolon.offset_separates_exactly_at_its_offset": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Objects.SourceHolon.charmatrix_mul_truncatedResolvent": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Objects.SourceHolon.numerator_expansion": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Objects.SourceHolon.impulse_moment": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Objects.SourceHolon.matrixReader_futureAgreement_iff_zero_futureReadScore": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Objects.SourceHolon.descend_eq_moment": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Objects.SourceHolon.no_identity_advance_realizes_the_address": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Objects.SourceHolon.cantor_separates_the_orders": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "selector_count_matches": true,
+  "standard_axioms_only": true,
+  "metadata_unchanged": true,
+  "broad_library_checked": false
+}
