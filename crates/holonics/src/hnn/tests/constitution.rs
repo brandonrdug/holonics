@@ -2719,6 +2719,80 @@ fn a_receiving_deposit_absorbs_its_phase_comparisons_through_the_map_before_it()
     assert_eq!(later(&restored), later(&next));
 }
 
+/// **A sparse checkpoint restores and continues exactly** (Epime's review of the sparse statistics):
+/// a categorical face, uncarried, reaches class 3 alone, so the statistic holds one class and reads
+/// the other three as the exact zero. Its checkpoint restores onto a fresh declaration, and the next
+/// window, a soft face whose observed masses `q̃ = (0, ½, ½, 0)` reach classes 1 and 2 and leave
+/// class 0 at zero, deposited on the restored and on the kept constitution gives one successor
+/// holding classes 1, 2 and 3, whose own checkpoint restores again.
+#[test]
+fn a_sparse_checkpoint_restores_and_continues_exactly() {
+    use crate::hnn::constitution::ContinuingState;
+    let (field, theta, map) = receiving_chain();
+    let n = map.columns();
+    let e01: Vec<Rat> = (0..n).map(|i| if i < 2 { Rat::one() } else { Rat::zero() }).collect();
+    let statistics = |theta: &Constitution| {
+        theta
+            .receiving_law(2)
+            .unwrap()
+            .phase_statistics()
+            .cloned()
+            .expect("a receiving law declares its phase statistics")
+    };
+    let restore = |theta: &Constitution| {
+        let state = theta.continuing_state(0).unwrap();
+        let read = ContinuingState::from_text(&state.to_text()).unwrap();
+        assert_eq!(read, state);
+        Constitution::initial(&field, OPEN_BUDGET)
+            .unwrap()
+            .continued(&read)
+            .unwrap()
+    };
+    assert_eq!(statistics(&theta).reached().count(), 0);
+
+    // A categorical face at `e_0 + e_1`, target class 3 at the gap ¾.
+    let produced = [rat(1, 8), rat(1, 8), rat(1, 4), rat(1, 2)];
+    let categorical = Sample {
+        weight: integer(1),
+        feature: e01.clone(),
+        covector: (0..4)
+            .flat_map(|c| {
+                let q = if c == 3 { Rat::one() } else { Rat::zero() };
+                let phase = if c == 3 { rat(3, 8) } else { Rat::zero() };
+                [q - &produced[c], phase]
+            })
+            .collect(),
+        masses: None,
+    };
+    let (kept, _) = theta
+        .deposited(&receiving_window(&theta, vec![categorical]))
+        .unwrap();
+    assert_eq!(statistics(&kept).reached().collect::<Vec<_>>(), vec![3]);
+    let restored = restore(&kept);
+    assert_eq!(restored, kept);
+
+    // The next window, on the restored and on the kept constitution alike.
+    let soft = |theta: &Constitution| {
+        let window = receiving_window(
+            theta,
+            vec![Sample {
+                weight: integer(1),
+                feature: e01.clone(),
+                covector: vec![
+                    rat(-1, 4), Rat::zero(), rat(1, 4), rat(1, 32),
+                    rat(1, 4), rat(-1, 32), rat(-1, 4), Rat::zero(),
+                ],
+                masses: Some(vec![rat(1, 4); 4]),
+            }],
+        );
+        theta.deposited(&window).map(|(successor, _)| successor)
+    };
+    let (from_kept, from_restored) = (soft(&kept).unwrap(), soft(&restored).unwrap());
+    assert_eq!(from_restored, from_kept);
+    assert_eq!(statistics(&from_kept).reached().collect::<Vec<_>>(), vec![1, 2, 3]);
+    assert_eq!(restore(&from_kept), from_kept);
+}
+
 /// **Only a reached face of nonnegative weight is absorbed** ([`absorb_phase`]): a zero weight, a
 /// zero feature, a covector that is no face's and a face of no observed mass leave the statistics
 /// as they were; a negative weight, a negative observed mass (carried masses a covector contradicts)
