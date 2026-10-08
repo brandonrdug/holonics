@@ -1012,6 +1012,8 @@ Its five parts:
      gives the axis, `m` is the axis's accumulated bend: a code in resonance curves its own carrier,
      and off resonance its bends cancel. This is the split of
      [emanation and resonance](#emanation-and-resonance) read on a strand.
+   - The face is an aggregate, not an inverse of the word: many words share it. What a receiver
+     decodes from it is only its admitted quotient, through the continuation squares (item 4).
 2. **Pairing (pair contact, §4; the reflector).** A fixed-point-free involution `σ` on `A` pairs the
    strand with its complement read backward, `σ̄(w) = σ(w)ᴿ`, an involutive anti-automorphism of
    words (`σ̄(vw) = σ̄(w)σ̄(v)`). Its fixed words, the `σ`-palindromes, have even length and are
@@ -1027,6 +1029,12 @@ Its five parts:
      reciprocal (`boundary_involution_reciprocal`). No letter pairs with itself, and each strand is
      the other's key. The Enigma is this object at one position: a reflector conjugated by a
      moving frame.
+   - **The partner's face.** The phase transport conjugates an operator at a fixed phase, while
+     placement acts on a carrier, so the pairing reaches the faces only through an equivariant
+     embedding. It is a carrier involution `J` with `J E(a) = E(σ(a))` and `JĜJ = Ĝ⁻¹`: the dyad,
+     inverting the navigator. Then the partner strand's face is the dyad half-turn of the strand's,
+     `m(σ̄(u)) = JĜⁿ⁻¹ m(u)`, and `(JĜⁿ⁻¹)² = 1`. A duplex carries one face and its reflection,
+     and a reading of both checks their consistency.
    - **The contact's reading.** Position `k` meets position `n−1−k` of the partner through a
      helical pair contact. `lock_iff_zero_power` proves, on a face of positive weight with
      null-definite material (`xᵀDx = 0 → x = 0`), that advancing the pair at integer rates `q, p`
@@ -1043,7 +1051,8 @@ Its five parts:
    partition the strand into epochs, the cells of its frame: residues modulo its period at its
    grain. Receivers of coprime periods meet in exactly one position per pair of residues (the
    Chinese remainder theorem): intersecting partitions, as the located transport reads digits and
-   residues. On a duplex the frames of period `p` are `p` phases on each of two strands, and the
+   residues. The residues fix a position only modulo the product of the periods. The position itself
+   needs the carry, the winding count the helix keeps, or a declared fundamental domain. On a duplex the frames of period `p` are `p` phases on each of two strands, and the
    dihedral group acts on these `2p` frames simply transitively: `S` advances every phase, and `U`
    exchanges the strands with the phase reversed.
 4. **Decoder and channel (Holonic Compression; retention).** The duplex stores each letter twice,

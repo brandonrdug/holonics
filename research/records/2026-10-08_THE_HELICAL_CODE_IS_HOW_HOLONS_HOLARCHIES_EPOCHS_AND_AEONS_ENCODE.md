@@ -89,6 +89,10 @@ The module was written without a compiler and goes to the sole queue for its Lea
 claim. Its second part states the perfected laws:
 - **resonance on a strand:** `(1 − Ĝ⁻ᵖ) m_{Np} = (1 − Ĝ⁻ᴺᵖ) m_p` in any ring, so `Ĝᵖ = 1` gives
   `m_{Np} = N·m_p`;
+- **the partner's face:** for a carrier involution `J` with `J E = E σ` and `JĜJ = Ĝ⁻¹`,
+  `m(σ̄(u)) = JĜⁿ⁻¹ m(u)` and `(JĜⁿ⁻¹)² = 1`. This is the equivariant join between the phase
+  transport (conjugation at a fixed phase) and placement (an action on a carrier), which Epime's
+  composition read found the two maps need;
 - **the dihedral pairing:**
   - on the index line, the half-turn `k ↦ c−k` inverts the shift;
   - the half-turns of `⟨S, U⟩` are the `SʲU`;
@@ -111,11 +115,14 @@ claim. Its second part states the perfected laws:
    that conservation without crossings is a theorem.
 3. The energy split between twist and writhe as a constitutive law, with its buckling threshold (#62).
 4. **The consumer.** A native owner of the helical code, built from the existing owners:
-   - placement on a navigator's helix (the source port);
+   - placement on a navigator's helix (the source port), with the carrier involution `J` of the
+     partner's face;
    - the declared embedding of letters into contact velocities, so that complementarity is zero
      slip through `lock_iff_zero_power`;
-   - receivers' frames;
-   - the decoder's quotient with its declared channel.
+   - receivers' frames, keeping the carry: residues fix a position only modulo the product of the
+     periods;
+   - the decoder's quotient with its declared channel. The aggregate face is not an inverse of the
+     word, so the decoder reads only the admitted quotient through the continuation squares.
 
    Its round trip, stated at the consumer: `decode(read_R(pair(place(u)))) = class_R(u)` for every
    word `u` and every admitted defect of the declared channel.
