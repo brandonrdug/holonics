@@ -318,12 +318,15 @@ impl PhaseStatistics {
     /// **A saved statistic restored exactly** from its parts: per class the Gram `S_c` (`n×n`),
     /// the moment `m_c` (`n`) and the second `s_c`, with the cell count `N`. A sum of receipts is
     /// `Σ w q [x; t][x; t]ᵀ` with `w q ≥ 0`, so its augmented statistic `[[S_c, m_c], [m_cᵀ, s_c]]`
-    /// is symmetric positive semidefinite, and every symmetric positive semidefinite matrix is such
-    /// a sum: that is exactly the reachable form. Refused unless every extent matches the declared
-    /// classes and features, every augmented statistic passes the exact test
-    /// ([`positive_semidefinite`]) and the cell count is nonnegative. Without it a restored
-    /// indefinite Gram would give the family no minimum (Epime's review, October 8: `S = −2` at the
-    /// unit prior returns a false minimum and a negative leverage).
+    /// is symmetric positive semidefinite: the checked necessary moment condition. The count is
+    /// `N = Σ w·#{c : q_c > 0} ≥ 0`, and `N = 0` forces every weighted increment to zero, so a
+    /// nonzero statistic with `N = 0` is refused too. These are necessary conditions of a producing
+    /// passage, not a proof that one exists for every accepted state (Epime's review, October 8).
+    /// Refused unless every extent matches the declared classes and features, every augmented
+    /// statistic passes the exact test ([`positive_semidefinite`]), the cell count is nonnegative,
+    /// and a zero count carries zero statistics. Without the test a restored indefinite Gram would
+    /// give the family no minimum (`S = −2` at the unit prior returned a false minimum and a negative
+    /// leverage).
     pub fn from_parts(
         classes: usize,
         features: usize,
@@ -360,6 +363,12 @@ impl PhaseStatistics {
             }
         }
         if cells.is_negative() {
+            return Err(PhaseFamilyError::Malformed);
+        }
+        let carries = gram.iter().flatten().flatten().any(|entry| !entry.is_zero())
+            || moment.iter().flatten().any(|entry| !entry.is_zero())
+            || second.iter().any(|entry| !entry.is_zero());
+        if cells.is_zero() && carries {
             return Err(PhaseFamilyError::Malformed);
         }
         Ok(Self {
@@ -1635,15 +1644,15 @@ mod tests {
         );
     }
 
-    /// **A restored statistic must be a sum of receipts** (Epime's review, October 8): its
-    /// augmented statistic `[[S, m], [mᵀ, s]]` is symmetric positive semidefinite. An indefinite
+    /// **A restored statistic must meet a sum of receipts' necessary conditions** (Epime's review,
+    /// October 8): its augmented statistic `[[S, m], [mᵀ, s]]` is symmetric positive semidefinite. An indefinite
     /// Gram (`S = −2`), a moment the Gram cannot carry (`S = 1, m = 2, s = 3`: determinant `−1`) and
     /// an asymmetric Gram are refused; a rank-one sum (`S = 1, m = 1, s = 1`) and an absorbed
     /// statistic's own parts are restored exactly.
     #[test]
     fn a_restored_statistic_must_be_a_sum_of_receipts() {
         let one_class = |gram: Vec<Vec<Rat>>, moment: Vec<Rat>, second: Rat| {
-            PhaseStatistics::from_parts(1, gram.len(), vec![gram], vec![moment], vec![second], Rat::zero())
+            PhaseStatistics::from_parts(1, gram.len(), vec![gram], vec![moment], vec![second], Rat::one())
         };
         assert_eq!(
             one_class(vec![ints(&[-2])], ints(&[0]), Rat::zero()),
@@ -1681,6 +1690,16 @@ mod tests {
         assert_eq!(
             PhaseStatistics::from_parts(1, 1, vec![vec![ints(&[1])]], vec![ints(&[0])], vec![Rat::zero()], integer(-1)),
             Err(PhaseFamilyError::Malformed)
+        );
+        // A zero count carries no receipt: nonzero statistics with N = 0 are unreachable, and the
+        // founded (all-zero) statistic restores.
+        assert_eq!(
+            PhaseStatistics::from_parts(1, 1, vec![vec![ints(&[1])]], vec![ints(&[1])], vec![Rat::one()], Rat::zero()),
+            Err(PhaseFamilyError::Malformed)
+        );
+        assert_eq!(
+            PhaseStatistics::from_parts(1, 1, vec![vec![ints(&[0])]], vec![ints(&[0])], vec![Rat::zero()], Rat::zero()),
+            Ok(PhaseStatistics::founded(1, 1))
         );
     }
 }
