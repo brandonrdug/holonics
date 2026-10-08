@@ -1,0 +1,288 @@
+[
+  {
+    "stage": "hnn-c1-62bb-all-targets-guard-lints-20261008-v2",
+    "message": {
+      "rendered": "error: use of a disallowed type `std::fs::File`\n  --> crates/holonics/../../research/notebook/hnn_design/hnn_continuing_behavior.rs:30:1\n   |\n30 | use std::fs::File;\n   | ^^^^^^^^^^^^^^^^^^\n   |\n   = note: no file system inside the machinery (guard 7)\n   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.92.0/index.html#disallowed_types\n   = note: requested on the command line with `-D clippy::disallowed-types`\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "note",
+          "message": "no file system inside the machinery (guard 7)",
+          "rendered": null,
+          "spans": []
+        },
+        {
+          "children": [],
+          "code": null,
+          "level": "help",
+          "message": "for further information visit https://rust-lang.github.io/rust-clippy/rust-1.92.0/index.html#disallowed_types",
+          "rendered": null,
+          "spans": []
+        },
+        {
+          "children": [],
+          "code": null,
+          "level": "note",
+          "message": "requested on the command line with `-D clippy::disallowed-types`",
+          "rendered": null,
+          "spans": []
+        }
+      ],
+      "level": "error",
+      "message": "use of a disallowed type `std::fs::File`",
+      "spans": [
+        {
+          "byte_end": 2379,
+          "byte_start": 2361,
+          "column_end": 19,
+          "column_start": 1,
+          "expansion": null,
+          "file_name": "crates/holonics/../../research/notebook/hnn_design/hnn_continuing_behavior.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 30,
+          "line_start": 30,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 19,
+              "highlight_start": 1,
+              "text": "use std::fs::File;"
+            }
+          ]
+        }
+      ],
+      "code": {
+        "code": "clippy::disallowed_types",
+        "explanation": null
+      }
+    }
+  },
+  {
+    "stage": "hnn-c1-62bb-all-targets-guard-lints-20261008-v2",
+    "message": {
+      "rendered": "error: use of a disallowed method `std::fs::create_dir_all`\n    --> crates/holonics/../../research/notebook/hnn_design/hnn_continuing_behavior.rs:1038:5\n     |\n1038 |     std::fs::create_dir_all(out).expect(\"the output receipt directory\");\n     |     ^^^^^^^^^^^^^^^^^^^^^^^\n     |\n     = note: no file system inside the machinery (guard 7)\n     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.92.0/index.html#disallowed_methods\n     = note: requested on the command line with `-D clippy::disallowed-methods`\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "note",
+          "message": "no file system inside the machinery (guard 7)",
+          "rendered": null,
+          "spans": []
+        },
+        {
+          "children": [],
+          "code": null,
+          "level": "help",
+          "message": "for further information visit https://rust-lang.github.io/rust-clippy/rust-1.92.0/index.html#disallowed_methods",
+          "rendered": null,
+          "spans": []
+        },
+        {
+          "children": [],
+          "code": null,
+          "level": "note",
+          "message": "requested on the command line with `-D clippy::disallowed-methods`",
+          "rendered": null,
+          "spans": []
+        }
+      ],
+      "level": "error",
+      "message": "use of a disallowed method `std::fs::create_dir_all`",
+      "spans": [
+        {
+          "byte_end": 45448,
+          "byte_start": 45425,
+          "column_end": 28,
+          "column_start": 5,
+          "expansion": null,
+          "file_name": "crates/holonics/../../research/notebook/hnn_design/hnn_continuing_behavior.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 1038,
+          "line_start": 1038,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 28,
+              "highlight_start": 5,
+              "text": "    std::fs::create_dir_all(out).expect(\"the output receipt directory\");"
+            }
+          ]
+        }
+      ],
+      "code": {
+        "code": "clippy::disallowed_methods",
+        "explanation": null
+      }
+    }
+  },
+  {
+    "stage": "hnn-c1-62bb-all-targets-guard-lints-20261008-v2",
+    "message": {
+      "rendered": "error: use of a disallowed method `std::fs::File::create`\n    --> crates/holonics/../../research/notebook/hnn_design/hnn_continuing_behavior.rs:1040:24\n     |\n1040 |         BufWriter::new(File::create(format!(\"{out}/ACTUAL_OUTPUT.txt\")).expect(\"actual output\"));\n     |                        ^^^^^^^^^^^^\n     |\n     = note: no file system inside the machinery (guard 7)\n     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.92.0/index.html#disallowed_methods\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "note",
+          "message": "no file system inside the machinery (guard 7)",
+          "rendered": null,
+          "spans": []
+        },
+        {
+          "children": [],
+          "code": null,
+          "level": "help",
+          "message": "for further information visit https://rust-lang.github.io/rust-clippy/rust-1.92.0/index.html#disallowed_methods",
+          "rendered": null,
+          "spans": []
+        }
+      ],
+      "level": "error",
+      "message": "use of a disallowed method `std::fs::File::create`",
+      "spans": [
+        {
+          "byte_end": 45550,
+          "byte_start": 45538,
+          "column_end": 36,
+          "column_start": 24,
+          "expansion": null,
+          "file_name": "crates/holonics/../../research/notebook/hnn_design/hnn_continuing_behavior.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 1040,
+          "line_start": 1040,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 36,
+              "highlight_start": 24,
+              "text": "        BufWriter::new(File::create(format!(\"{out}/ACTUAL_OUTPUT.txt\")).expect(\"actual output\"));"
+            }
+          ]
+        }
+      ],
+      "code": {
+        "code": "clippy::disallowed_methods",
+        "explanation": null
+      }
+    }
+  },
+  {
+    "stage": "hnn-c1-62bb-all-targets-guard-lints-20261008-v2",
+    "message": {
+      "rendered": "error: use of a disallowed type `std::fs::File`\n    --> crates/holonics/../../research/notebook/hnn_design/hnn_continuing_behavior.rs:1040:24\n     |\n1040 |         BufWriter::new(File::create(format!(\"{out}/ACTUAL_OUTPUT.txt\")).expect(\"actual output\"));\n     |                        ^^^^\n     |\n     = note: no file system inside the machinery (guard 7)\n     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.92.0/index.html#disallowed_types\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "note",
+          "message": "no file system inside the machinery (guard 7)",
+          "rendered": null,
+          "spans": []
+        },
+        {
+          "children": [],
+          "code": null,
+          "level": "help",
+          "message": "for further information visit https://rust-lang.github.io/rust-clippy/rust-1.92.0/index.html#disallowed_types",
+          "rendered": null,
+          "spans": []
+        }
+      ],
+      "level": "error",
+      "message": "use of a disallowed type `std::fs::File`",
+      "spans": [
+        {
+          "byte_end": 45542,
+          "byte_start": 45538,
+          "column_end": 28,
+          "column_start": 24,
+          "expansion": null,
+          "file_name": "crates/holonics/../../research/notebook/hnn_design/hnn_continuing_behavior.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 1040,
+          "line_start": 1040,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 28,
+              "highlight_start": 24,
+              "text": "        BufWriter::new(File::create(format!(\"{out}/ACTUAL_OUTPUT.txt\")).expect(\"actual output\"));"
+            }
+          ]
+        }
+      ],
+      "code": {
+        "code": "clippy::disallowed_types",
+        "explanation": null
+      }
+    }
+  },
+  {
+    "stage": "hnn-c1-62bb-all-targets-guard-lints-20261008-v2",
+    "message": {
+      "rendered": "error: use of a disallowed method `std::process::exit`\n    --> crates/holonics/../../research/notebook/hnn_design/hnn_continuing_behavior.rs:1058:9\n     |\n1058 |         std::process::exit(2);\n     |         ^^^^^^^^^^^^^^^^^^\n     |\n     = note: no process inside the machinery (guard 7)\n     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.92.0/index.html#disallowed_methods\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "note",
+          "message": "no process inside the machinery (guard 7)",
+          "rendered": null,
+          "spans": []
+        },
+        {
+          "children": [],
+          "code": null,
+          "level": "help",
+          "message": "for further information visit https://rust-lang.github.io/rust-clippy/rust-1.92.0/index.html#disallowed_methods",
+          "rendered": null,
+          "spans": []
+        }
+      ],
+      "level": "error",
+      "message": "use of a disallowed method `std::process::exit`",
+      "spans": [
+        {
+          "byte_end": 46428,
+          "byte_start": 46410,
+          "column_end": 27,
+          "column_start": 9,
+          "expansion": null,
+          "file_name": "crates/holonics/../../research/notebook/hnn_design/hnn_continuing_behavior.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 1058,
+          "line_start": 1058,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 27,
+              "highlight_start": 9,
+              "text": "        std::process::exit(2);"
+            }
+          ]
+        }
+      ],
+      "code": {
+        "code": "clippy::disallowed_methods",
+        "explanation": null
+      }
+    }
+  }
+]
