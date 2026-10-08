@@ -55,7 +55,7 @@ within a declared inner family**:
 [definition; agent-inferred] A receiving map's phase rows read, for class `c` at the realified
 native feature `x`, the lifted phase `y_c = v_cᵀx/2`. An actual receipt `k` (weight `w`, feature
 `x_k`, observed masses `q_k`, lifted doubled targets `t_kc = 2φ̂_kc`) contributes the exact phase
-comparison `(w q_kc/8)(t_kc − v_cᵀx_k)²`, whose gradient is the deposited phase covector. The sum
+comparison `(w q_kc/8)(t_kc − v_cᵀx_k)²`. Its gradient is the comparison's phase gradient; the deposited sample carries the negative, the descent covector `+½q_cΔ_c`, and the producer reads `t` back with that sign. The sum
 is exactly quadratic, so its sufficient statistic is, per class,
 
 ```text

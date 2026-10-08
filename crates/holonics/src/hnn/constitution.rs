@@ -470,8 +470,8 @@
 //! absorbed in the deposit's own successor ([`absorb_phase`]), through the map in force before it and
 //! only for the readings that reached the locus, so they are a quotient of those readings
 //! sufficient for the phase comparison's quadratic (no reading, tape or journal is kept), and a
-//! checkpoint writes and restores them whole ([`write_phase`]). [open] Their entries are exact
-//! rationals that grow with the readings, and they are not yet counted in `B_Θ`
+//! checkpoint writes and restores them whole ([`write_phase`]). Their entries are exact rationals
+//! that grow with the readings, and every one is charged among the law's entries in `B_Θ`
 //! ([`Constitution::carrier_bits`]); the Lean counterpart is owed (#62).
 //!
 //! [definition] **The budget and stop rule** (design (d), R3 §5): the successor is computed exactly

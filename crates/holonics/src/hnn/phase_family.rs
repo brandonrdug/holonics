@@ -13,8 +13,10 @@
 //! (w q_kc / 8) (t_kc − v_cᵀ x_k)²        Δ = (t − vᵀx)/2 ,  ½ q Δ² = (q/8)(t − vᵀx)²
 //! ```
 //!
-//! and whose gradient in `v_c`, `−(w q_kc / 4)(t_kc − v_cᵀ x_k) x_k`, is the deposited phase covector
-//! (the covector's phase part `−½ q_c Δ_c` on `Im f_c`, times the feature).
+//! whose gradient in `v_c` is `−(w q_kc / 4)(t_kc − v_cᵀ x_k) x_k`: the comparison's phase gradient
+//! `−½ q_c Δ_c` on `Im f_c`, times the feature. The sample a deposit carries holds its negative, the
+//! descent covector `+½ q_c Δ_c` ([`crate::hnn::reference::compose_return`] negates the gradient), so
+//! the producer reads the target back from the descent entry with that sign.
 //!
 //! [definition; agent-inferred, October 8] **The sufficient statistic** ([`PhaseStatistics`]). The
 //! cumulative comparison of the reached receipts is exactly quadratic in the phase rows `V = (v_c)`,
