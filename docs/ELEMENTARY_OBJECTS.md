@@ -1189,14 +1189,17 @@ Its five parts:
    sits at its tick through the phase transport, `Ĝ(τ(k))⁻¹ E(u_k)`, so the strand's face is the
    phase-carried moment `m = Σ_k Ĝ(τ(k))⁻¹ E(u_k)`. Each letter selects its step's screw: the
    strand is a serial screw word, the motor chart.
-   - **Resonating lengths.** With a fixed advance (`τ(k) = k`, one `Ĝ`), a word repeating with
-     period `p` has `(1 − Ĝ⁻ᵖ) m_{Np} = (1 − Ĝ⁻ᴺᵖ) m_p`. In resonance, `Ĝᵖ = 1` on the face (the
-     period is whole turns), the face grows with every repeat, `m_{Np} = N·m_p`. Off resonance,
-     with `1 − Ĝ⁻ᵖ` invertible and `Ĝ` an isometry, it stays bounded by `2‖(1 − Ĝ⁻ᵖ)⁻¹‖·|m_p|`,
-     a small divisor that grows near resonance. When `E(a)` is the bend a letter gives the axis,
-     `m` is the axis's accumulated bend: a code in resonance curves its own carrier, and off
-     resonance its bends cancel. This is the split of
-     [emanation and resonance](#emanation-and-resonance) read on a strand.
+   - **Resonating lengths.** [formal-checked] With a fixed advance (`τ(k) = k`, one `Ĝ`), a word
+     repeating with period `p` has `(1 − Ĝ⁻ᵖ) m_{Np} = (1 − Ĝ⁻ᴺᵖ) m_p`. In resonance the face is
+     fixed, `Ĝ⁻ᵖ m_p = m_p` (the period is whole turns), and it grows with every repeat,
+     `m_{Np} = N·m_p`.
+     - [proved-standard; on a normed carrier] Off resonance, with `1 − Ĝ⁻ᵖ` invertible and `Ĝ`
+       an isometry, the face stays bounded by `2‖(1 − Ĝ⁻ᵖ)⁻¹‖·|m_p|`, a small divisor that grows
+       near resonance.
+     - [interpretation] When `E(a)` is the bend a letter gives the axis, `m` is the axis's
+       accumulated bend: a code in resonance curves its own carrier, and off resonance its bends
+       cancel. This is the split of [emanation and resonance](#emanation-and-resonance) read on
+       a strand.
    - For letter-selected screws and located clocks, the repeated word's own monodromy over one
      period replaces `Ĝᵖ`, in the frame convention its owner declares. The occurrence count never
      stands in for the clock.

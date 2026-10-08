@@ -35,8 +35,9 @@ proved part's hypotheses:
 5. a **topology**: the linking number of closed strands, split as twist plus writhe and changed
    only by crossings.
 
-Its roles: the Holon is the addressed current, the Holarchy the paired and nested duplex, the epoch
-a frame cell, and the aeon the passage whose charge on closed strands is the linking number.
+Its roles: the Holon is the addressed current, the Holarchy the paired and nested duplex, an epoch
+an interval between a receiver's section arrivals (across which a residue recurs), and the aeon the
+passage whose charge on closed strands is the linking number.
 
 ## 3. What is already proved, and under which hypotheses (owners)
 
@@ -68,8 +69,8 @@ family under a declared direction:
 `Prop`s. No current crate reads the linking number. The retired Rust owner checked both half-sums at
 every reading and tested declared directions
 (`13f8c734:crates/holonics-cuda/src/topological_receiver.rs`: `linking_number`, with its half-sums;
-`linking_under_directions`). The Lean module's docstring still describes that owner as present,
-and its repin goes with the module's queue check. The projected writhe is not
+`linking_under_directions`). The Lean module's docstrings now name that owner as retired (this
+delta). The projected writhe is not
 projection invariant (`projectedWrithe_is_not_projection_invariant`), and it is not the ribbon
 writhe that `Lk = Tw + Wr` needs. The Reidemeister colouring laws are local Swing transports, and a
 full-turn phase forgets the writhe (`Geometry/HolonicUnknotting`). Topological conservation alone
@@ -100,11 +101,13 @@ new import passed 8 queries. The full research library and the HNN were not reru
 [native-v2](receipts/2026-10-08-helical-code/native-v2/HANDOFF.md). The first attempt, `12fcee787`,
 failed at one statement (an inferred `Group (α → α)`); [native-v1](receipts/2026-10-08-helical-code/native-v1/VALIDATION.json)
 keeps it unrewritten. The module states:
-- the complement-reverse anti-automorphism and its involution;
+- the complement-reverse: an anti-homomorphism of words for every `σ`, and an involution, hence an
+  anti-automorphism, when `σ` is one;
 - the fixed words of a fixed-point-free pairing have even length and correspond to their first
   halves;
 - the pairing read through every frame is a fixed-point-free involution;
-- one crossing change moves the signed crossing sum by exactly 2, so the linking number moves by 1.
+- one crossing change moves the signed crossing sum by `−2sᵢ` and its half by `−sᵢ`: by 2 and 1 in
+  magnitude when `sᵢ ∈ {±1}`.
 
 Its atlas rows are `helical.*` in `geometry.tsv`. The accepted scope is the review's:
 - the partner's face holds under a uniform clock with constant openings;
@@ -113,8 +116,11 @@ Its atlas rows are `helical.*` in `geometry.tsv`. The accepted scope is the revi
 - letter-level freedom is not carrier-level freedom.
 
 Its second part states the perfected laws:
-- **resonance on a strand:** `(1 − Ĝ⁻ᵖ) m_{Np} = (1 − Ĝ⁻ᴺᵖ) m_p` in any ring, so `Ĝᵖ = 1` gives
-  `m_{Np} = N·m_p`;
+- **resonance on a strand:** a repeat's face is a geometric sum of the period's face, with
+  `(1 − Ĝ⁻ᵖ) m_{Np} = (1 − Ĝ⁻ᴺᵖ) m_p`. This holds for any monoid acting distributively (a ring on a
+  module for the `1 − x` form), and a fixed face `x^p m_p = m_p` gives `m_{Np} = N·m_p`. The
+  off-resonance norm bound and the bend reading need a norm, an isometric `Ĝ` and an invertible
+  `1 − Ĝ⁻ᵖ`, and are not part of the module;
 - **the partner's face:** for an additive carrier involution `J` with `J E = E σ` and
   `JĜJ = Ĝ⁻¹`, under the declared uniform tick with constant openings `α, β`:
   `m_β(σ̄(u)) = JĜⁿ⁻¹⁺ᵅ⁺ᵝ m_α(u)`, an involution. Epime's composition read found that the two maps
@@ -125,15 +131,17 @@ Its second part states the perfected laws:
 - **the dihedral pairing:**
   - on the index line, the half-turn `k ↦ c−k` inverts the shift;
   - the half-turns of `⟨S, U⟩` are the `SʲU`;
-  - on the `2p` frames of a duplex, the group acts simply transitively;
+  - on a duplex's frames (`2p` of them when `p > 0`), the group acts simply transitively;
 - **four letters:**
   - the fixed-point-free involutions of a four-element set, with the identity, are a Klein group
     acting regularly;
   - every substitution has one type, and the pairing preserves it;
-- **the inner code:** single-strand substitutions at contacts with intact partners slip exactly
-  those contacts, and each repair has two members;
-- **the duplex passage:** on a ribbon, flipping a core self-crossing flips two inter-strand
-  crossings of equal sign, so the signed sum moves by 4 and `Lk` by 2.
+- **the inner code:** for equal-length substitutions with the partner intact, the slipped indices
+  are exactly the substituted ones, and the two proposed repairs are distinct. Exhaustive
+  repair-family support is the native consumer's;
+- **the duplex passage:** for the declared ribbon sign pattern `(s, es, es, s)`, the inter-strand
+  sum moves by `−4es` and `Lk` by `−2es`. This is arithmetic of the declared pattern; the ribbon
+  geometry is owed with `Lk = Tw + Wr`.
 
 ## 5. Owed
 
@@ -160,17 +168,18 @@ Its second part states the perfected laws:
    - The pairing reverses the passage. Its navigator is the dyad-conjugated inverse of the strand's
      step: `F′ = R∘F⁻¹∘R` with `F(ℓ) = ℓ + A(λ(c(ℓ)))` and `R` the gauge's reflection. This is
      `USU = S⁻¹` on the navigator, with complemented labels `σ∘λ`.
-   - With class-dependent advances, `F⁻¹` is keyed by the arrival's class, not the emission's. The
-     partner's advance at its position `k` is the strand's advance at position `n−2−k`, so the
-     partner is not a located transport of the same form. This is the reversed relation the native
-     path must declare.
+   - With class-dependent advances, the partner's step `ℓ′_k → ℓ′_{k+1}` advances by
+     `A(u_{n−1−k}) = A(σ(p_k))`, a function of its own letter `p_k`. That letter is read at the
+     step's arrival `ℓ′_{k+1}`, not at its departure, so the partner is the arrival-read transport
+     with advances `A∘σ`. This is the reversed relation the native path declares.
    - Where `F` is not injective, the reversal has a preimage fibre. The paired strand's actual lifts
      resolve it: each strand is the other's key.
    - The labels enter no chart (the relabelling law), so `σ` acts only on the boundary decoder.
-   - Each transport `T_c` is a cyclic shift, a permutation matrix, so `T_c⁻¹ = T_cᵀ`. The partner's
-     chart is therefore the adjoint chart: the antiparallel complementary strand is the adjoint
-     passage. It runs in reversed order with transposed transports, the same shape as the learning
-     covector's return through the producing operands.
+   - Each transport `T_c` is a cyclic shift, a permutation matrix, so `T_c⁻¹ = T_cᵀ` in the
+     canonical native coordinates, and there the partner's coordinate chart is the transpose chart.
+     A physical adjoint, meaning a power or learning return, is fixed by the reversal and
+     reflection, the producing frames and the material metric. This kinematic step does not
+     establish one.
 
    [agent-inferred] **The chart.** On a rotation carrier the dyad is conjugation: `BUB = U⁻¹` for
    `U` multiplication by a unit `ζ`. So complements embed as conjugates off the real axis, and a
