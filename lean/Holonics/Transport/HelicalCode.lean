@@ -36,9 +36,9 @@ phase-carried moment; `Foundation/TopologicalReceiver` owns the geometric crossi
 number, which this module reads only through ℤ-valued signs.
 
 [proved-derived; formal-checked] Part one states, for an arbitrary alphabet `α` and `σ : α → α`:
-- §1 `complementReverse σ w = σ(w)ᴿ` is an anti-automorphism of words
-  (`complementReverse_append`), an involution when `σ` is (`complementReverse_involutive`), and
-  length-preserving;
+- §1 `complementReverse σ w = σ(w)ᴿ` is an anti-homomorphism of words for every `σ`
+  (`complementReverse_append`), an involution, hence an anti-automorphism, when `σ` is one
+  (`complementReverse_involutive`), and length-preserving;
 - §2 when `σ` fixes no letter, a word equal to its own pairing has even length
   (`even_length_of_fixed`); for an involution the fixed words of length `2m` correspond to the
   words of length `m`, each fixed word being its first half followed by that half's pairing
@@ -68,10 +68,10 @@ hypotheses named:
   their own relation, `J S_a J = S_(σ a)⁻¹`, and are out of scope;
 - §7 the dihedral pairing. On the index line the half-turn `k ↦ c − k` inverts the shift
   (`halfTurn_inverts_shift`). In any group with `U² = 1` and `U S U = S⁻¹`: `(SʲU)² = 1` and
-  `S⁻ᵏ U Sᵏ = S⁻²ᵏ U` (`dihedral_reflection_sq`, `dihedral_conj`). On the `2p` frames
+  `S⁻ᵏ U Sᵏ = S⁻²ᵏ U` (`dihedral_reflection_sq`, `dihedral_conj`). On the frames
   `ZMod p × Bool`, with `t` the unit shift and `u_c (r, b) = (c − r, ¬b)`: `u_c t u_c = t⁻¹`
-  pointwise, `t^j` is the shift by `j`, and the `2p` maps `t^j`, `t^j ∘ u_c` send a base frame to
-  every frame exactly once (`frameFlip_frameShift_frameFlip`, `frameShift_iterate`,
+  pointwise, `t^j` is the shift by `j`, and the maps `t^j`, `t^j ∘ u_c` send a base frame to every
+  frame exactly once (`2p` frames when `p > 0`; `ZMod 0` is `ℤ`) (`frameFlip_frameShift_frameFlip`, `frameShift_iterate`,
   `dihedralFrame_bijective`);
 - §8 four letters. The fixed-point-free involutions of `Fin 4` are exactly the three nonidentity
   translations of the Klein group `V`, which is closed, abelian and regular, and the pairing
@@ -121,8 +121,9 @@ theorem complementReverse_cons (σ : α → α) (a : α) (w : List α) :
     complementReverse σ (a :: w) = complementReverse σ w ++ [σ a] := by
   simp only [complementReverse, List.map_cons, List.reverse_cons]
 
-/-- [proved-derived; formal-checked] **An anti-automorphism of words**: the second strand of a join
-is the join of the second strands in the opposite order, `σ̄(vw) = σ̄(w)σ̄(v)`. -/
+/-- [proved-derived; formal-checked] **An anti-homomorphism of words** for every `σ` (an
+anti-automorphism when `σ` is a bijection, as an involution is): the second strand of a join is the
+join of the second strands in the opposite order, `σ̄(vw) = σ̄(w)σ̄(v)`. -/
 theorem complementReverse_append (σ : α → α) (u v : List α) :
     complementReverse σ (u ++ v) = complementReverse σ v ++ complementReverse σ u := by
   simp only [complementReverse, List.map_append, List.reverse_append]
@@ -267,8 +268,9 @@ theorem involutive_of_mul_self {p : Equiv.Perm α} (h : p * p = 1) : Function.In
 involution.** `S⁻ᵈσSᵈ` is again an involution, and no letter pairs with itself. -/
 theorem phaseTransport_pairing (S σ : Equiv.Perm α) (hσ : σ * σ = 1) (hfree : ∀ x, σ x ≠ x)
     (d : ℤ) :
-    Function.Involutive (phaseTransport S σ d) ∧ ∀ x, phaseTransport S σ d x ≠ x :=
-  ⟨involutive_of_mul_self (phaseTransport_mul_self S σ hσ d), phaseTransport_ne_self S σ hfree d⟩
+    Function.Involutive ⇑(phaseTransport S σ d) ∧ ∀ x, phaseTransport S σ d x ≠ x :=
+  ⟨involutive_of_mul_self (p := phaseTransport S σ d) (phaseTransport_mul_self S σ hσ d),
+    phaseTransport_ne_self S σ hfree d⟩
 
 /-- [proved-derived; formal-checked] **The pairing is reciprocal at every phase**: each strand is
 the other's key. -/
@@ -729,15 +731,16 @@ theorem frameShift_iterate (p j : ℕ) (x : ZMod p × Bool) :
     push_cast
     ring
 
-/-- [definition] The `2p` maps `t^j` and `t^j ∘ u_c` applied to a base frame `x₀`, indexed by
-`(j, ε) ∈ ZMod p × Bool`. -/
+/-- [definition] The maps `t^j` and `t^j ∘ u_c` applied to a base frame `x₀`, indexed by
+`(j, ε) ∈ ZMod p × Bool` (`2p` of them when `p > 0`). -/
 def dihedralFrame (p : ℕ) (c : ZMod p) (x₀ : ZMod p × Bool) :
     ZMod p × Bool → ZMod p × Bool
   | (j, false) => frameShift p j x₀
   | (j, true) => frameShift p j (frameFlip p c x₀)
 
-/-- [proved-derived; formal-checked] **The dihedral group acts simply transitively on the `2p`
-frames**: the maps `t^j` and `t^j ∘ u_c` send a base frame to every frame exactly once. -/
+/-- [proved-derived; formal-checked] **The dihedral group acts simply transitively on the frames**
+(`2p` of them when `p > 0`): the maps `t^j` and `t^j ∘ u_c` send a base frame to every frame
+exactly once. -/
 theorem dihedralFrame_bijective (p : ℕ) (c : ZMod p) (x₀ : ZMod p × Bool) :
     Function.Bijective (dihedralFrame p c x₀) := by
   obtain ⟨r₀, b₀⟩ := x₀
