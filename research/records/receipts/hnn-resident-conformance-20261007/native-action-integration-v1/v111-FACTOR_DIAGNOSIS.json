@@ -1,0 +1,2684 @@
+{
+  "source_commit": "14418468094aa9f19efe77a8166919280b68be95",
+  "actual_output_sha256": "15e6ca3d730d0532670e7c8245115a632f6b5e4cba143173df0dbc498be809eb",
+  "scope": "Exact exterior analysis of the saved native receipt. No compiler, HNN run, changed observation, proposed policy or new material.",
+  "factor_lattice_unit": {
+    "numerator": "1",
+    "denominator": "64",
+    "abs_lower_inclusive_power_two": -6,
+    "abs_upper_exclusive_power_two": -5
+  },
+  "coordinate_contract": "one contact; families C/K/D in order; row-major 2 by 2 factors; 12 full-state variation columns",
+  "publications": [
+    {
+      "credit_line": 50,
+      "publication_line": 51,
+      "role": "contact observation 1",
+      "all_twelve_reached_nonzero": true,
+      "all_twelve_delayed_nonzero": true,
+      "each_within_plus_carried_equals_total": true,
+      "zero_actual_factor_linear_quadratic_form_movements": true,
+      "deposition_work": {
+        "numerator": "0",
+        "denominator": "1",
+        "zero": true
+      },
+      "loaded_gamma": [
+        {
+          "numerator": "225303534640926251526360443732289404991812114117685905225905730897369928448911181422953207567515764892381705",
+          "denominator": "30445921933420642380647709093890885943549988939255292381815883481973768616232763244519701573924219256832",
+          "abs_lower_inclusive_power_two": 12,
+          "abs_upper_exclusive_power_two": 13
+        },
+        {
+          "numerator": "225303534640926251526360443732289404991812114117685905225905730897369928448911181422953207567515764892381705",
+          "denominator": "30445921933420642380647709093890885943549988939255292381815883481973768616232763244519701573924219256832",
+          "abs_lower_inclusive_power_two": 12,
+          "abs_upper_exclusive_power_two": 13
+        }
+      ],
+      "loaded_gain_parts": [
+        {
+          "numerator": "1",
+          "denominator": "2",
+          "abs_lower_inclusive_power_two": -1,
+          "abs_upper_exclusive_power_two": 0
+        },
+        {
+          "numerator": "13",
+          "denominator": "4",
+          "abs_lower_inclusive_power_two": 1,
+          "abs_upper_exclusive_power_two": 2
+        },
+        {
+          "numerator": "225333980562859672168741091441383295877755664106625160518287546780851902217527414186197727269089689111638537",
+          "denominator": "30445921933420642380647709093890885943549988939255292381815883481973768616232763244519701573924219256832",
+          "abs_lower_inclusive_power_two": 12,
+          "abs_upper_exclusive_power_two": 13
+        }
+      ],
+      "joint_curvature": {
+        "numerator": "136228292202325142689",
+        "denominator": "618970019642690137449562112",
+        "abs_lower_inclusive_power_two": -23,
+        "abs_upper_exclusive_power_two": -22
+      },
+      "joint_decrease": {
+        "numerator": "76710132629149847065",
+        "denominator": "309485009821345068724781056",
+        "abs_lower_inclusive_power_two": -22,
+        "abs_upper_exclusive_power_two": -21
+      },
+      "joint_holds": true,
+      "no_released_covectors": true,
+      "families": [
+        {
+          "family": "C",
+          "step": {
+            "numerator": "1",
+            "denominator": "32768",
+            "abs_lower_inclusive_power_two": -15,
+            "abs_upper_exclusive_power_two": -14
+          },
+          "prepared_scale_inferred_four_matching_coordinates": {
+            "numerator": "21",
+            "denominator": "16",
+            "abs_lower_inclusive_power_two": 0,
+            "abs_upper_exclusive_power_two": 1
+          },
+          "scale_before": {
+            "numerator": "1",
+            "denominator": "1",
+            "abs_lower_inclusive_power_two": 0,
+            "abs_upper_exclusive_power_two": 1
+          },
+          "scale_applied_delta": {
+            "numerator": "5",
+            "denominator": "16",
+            "abs_lower_inclusive_power_two": -2,
+            "abs_upper_exclusive_power_two": -1
+          },
+          "scale_remainder_before": {
+            "numerator": "0",
+            "denominator": "1",
+            "zero": true
+          },
+          "scale_remainder_after": {
+            "numerator": "-32805638203291693510368365544593096018021396007998516824096301604668004084377981",
+            "denominator": "4561877587347352159193349335661705508871559312030074727605714980148342285156250000",
+            "abs_lower_inclusive_power_two": -8,
+            "abs_upper_exclusive_power_two": -7
+          },
+          "energy_plus_old_remainder_equals_scale_delta_plus_new_remainder": true,
+          "actual_reached_energy": {
+            "numerator": "87048819240172241014847081365605617219021305562587489722043101855730560001684384",
+            "denominator": "285117349209209509949584333478856594304472457001879670475357186259271392822265625",
+            "abs_lower_inclusive_power_two": -2,
+            "abs_upper_exclusive_power_two": -1
+          },
+          "alignment": {
+            "numerator": "2526735543910671883",
+            "denominator": "4722366482869645213696",
+            "abs_lower_inclusive_power_two": -11,
+            "abs_upper_exclusive_power_two": -10
+          },
+          "curvature": {
+            "numerator": "271366036132177382291931302594513588053307379750616775028797083971207094828725468494470101575592913162620231074042330222664320663752283175327717805583567858127765118625197969211643478121255087154729130678992755272725555555138096091",
+            "denominator": "41218986842950986653298579339682790897202993356337914031821649758543671358326721700918194446580986505812209447746700913047188475747891530778237008179074914420803933807060257131879924820775839199768700112956796506292912256362479616",
+            "abs_lower_inclusive_power_two": 2,
+            "abs_upper_exclusive_power_two": 3
+          },
+          "covector": {
+            "numerator": "5655337816490614167",
+            "denominator": "4611686018427387904",
+            "abs_lower_inclusive_power_two": 0,
+            "abs_upper_exclusive_power_two": 1
+          },
+          "gain": {
+            "numerator": "28847520372131754395966377328904900427577656111948424020718374369273135913862727083785042403238018720778118871431641332515654109",
+            "denominator": "4493025039951607108476273590701652559217343559146725609654199361155425341616538650884112765862477762581870671935675717124096",
+            "abs_lower_inclusive_power_two": 12,
+            "abs_upper_exclusive_power_two": 13
+          },
+          "moves": {
+            "numerator": "9406910286623160461814106545865876640010373838402880391483147776385703203898622076479462176620691307799",
+            "denominator": "4586997231980143023221641790604173881593129978336562247475177678773845752176969616140037106220251373109248",
+            "abs_lower_inclusive_power_two": -9,
+            "abs_upper_exclusive_power_two": -8
+          },
+          "bound": {
+            "numerator": "974056089",
+            "denominator": "268435456",
+            "abs_lower_inclusive_power_two": 1,
+            "abs_upper_exclusive_power_two": 2
+          },
+          "own_curvature_admits_double_at_printed_ray": true,
+          "covector_admits_double": true,
+          "coordinates": [
+            {
+              "row": 0,
+              "column": 0,
+              "within_word": {
+                "numerator": "-1443503222374534554406168081593956502406568452547665763896426694078614992415175353",
+                "denominator": "74148613483233152555777614598691848271182170405060262239178605391617500000000000000",
+                "abs_lower_inclusive_power_two": -6,
+                "abs_upper_exclusive_power_two": -5
+              },
+              "carried": {
+                "numerator": "-1920017176963222874494003865736938969602624161805162880573230850186213049083827",
+                "denominator": "289643021418879502171006307026140032309305353144766649371791427311005859375000000",
+                "abs_lower_inclusive_power_two": -8,
+                "abs_upper_exclusive_power_two": -7
+              },
+              "total": {
+                "numerator": "-387005523935423922055326614244522575724968047593957492264634758345257106596127013",
+                "denominator": "14829722696646630511155522919738369654236434081012052447835721078323500000000000000",
+                "abs_lower_inclusive_power_two": -6,
+                "abs_upper_exclusive_power_two": -5
+              },
+              "proposed_delta": {
+                "numerator": "387005523935423922055326614244522575724968047593957492264634758345257106596127013",
+                "denominator": "637796713737378285023776729732107802089400556956166351676518692136537088000000000000000",
+                "abs_lower_inclusive_power_two": -21,
+                "abs_upper_exclusive_power_two": -20
+              },
+              "applied_delta": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_before": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_after": {
+                "numerator": "387005523935423922055326614244522575724968047593957492264634758345257106596127013",
+                "denominator": "637796713737378285023776729732107802089400556956166351676518692136537088000000000000000",
+                "abs_lower_inclusive_power_two": -21,
+                "abs_upper_exclusive_power_two": -20
+              },
+              "accounting_closes": true
+            },
+            {
+              "row": 0,
+              "column": 1,
+              "within_word": {
+                "numerator": "121955481953731005517505174761908773913886398441337030567885233054801927239720910089",
+                "denominator": "16816905537997278999650362990983311187904116247867667475845707702818849000000000000000",
+                "abs_lower_inclusive_power_two": -8,
+                "abs_upper_exclusive_power_two": -7
+              },
+              "carried": {
+                "numerator": "-22619521391507935457703978401173444319640941235731153714499275276370606927018761867",
+                "denominator": "3503521987082766458260492289788189830813357551639097390801189104753926875000000000000",
+                "abs_lower_inclusive_power_two": -8,
+                "abs_upper_exclusive_power_two": -7
+              },
+              "total": {
+                "numerator": "66908896372464576602630392181381205898049402549137463691443558641115069950154265637",
+                "denominator": "84084527689986394998251814954916555939520581239338337379228538514094245000000000000000",
+                "abs_lower_inclusive_power_two": -11,
+                "abs_upper_exclusive_power_two": -10
+              },
+              "proposed_delta": {
+                "numerator": "-66908896372464576602630392181381205898049402549137463691443558641115069950154265637",
+                "denominator": "3616307366890934876084814057581051237846901157941463214005860984414165288960000000000000000",
+                "abs_lower_inclusive_power_two": -26,
+                "abs_upper_exclusive_power_two": -25
+              },
+              "applied_delta": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_before": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_after": {
+                "numerator": "-66908896372464576602630392181381205898049402549137463691443558641115069950154265637",
+                "denominator": "3616307366890934876084814057581051237846901157941463214005860984414165288960000000000000000",
+                "abs_lower_inclusive_power_two": -26,
+                "abs_upper_exclusive_power_two": -25
+              },
+              "accounting_closes": true
+            },
+            {
+              "row": 1,
+              "column": 0,
+              "within_word": {
+                "numerator": "121955481953731005517505174761908773913886398441337030567885233054801927239720910089",
+                "denominator": "16816905537997278999650362990983311187904116247867667475845707702818849000000000000000",
+                "abs_lower_inclusive_power_two": -8,
+                "abs_upper_exclusive_power_two": -7
+              },
+              "carried": {
+                "numerator": "-22619521391507935457703978401173444319640941235731153714499275276370606927018761867",
+                "denominator": "3503521987082766458260492289788189830813357551639097390801189104753926875000000000000",
+                "abs_lower_inclusive_power_two": -8,
+                "abs_upper_exclusive_power_two": -7
+              },
+              "total": {
+                "numerator": "66908896372464576602630392181381205898049402549137463691443558641115069950154265637",
+                "denominator": "84084527689986394998251814954916555939520581239338337379228538514094245000000000000000",
+                "abs_lower_inclusive_power_two": -11,
+                "abs_upper_exclusive_power_two": -10
+              },
+              "proposed_delta": {
+                "numerator": "-66908896372464576602630392181381205898049402549137463691443558641115069950154265637",
+                "denominator": "3616307366890934876084814057581051237846901157941463214005860984414165288960000000000000000",
+                "abs_lower_inclusive_power_two": -26,
+                "abs_upper_exclusive_power_two": -25
+              },
+              "applied_delta": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_before": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_after": {
+                "numerator": "-66908896372464576602630392181381205898049402549137463691443558641115069950154265637",
+                "denominator": "3616307366890934876084814057581051237846901157941463214005860984414165288960000000000000000",
+                "abs_lower_inclusive_power_two": -26,
+                "abs_upper_exclusive_power_two": -25
+              },
+              "accounting_closes": true
+            },
+            {
+              "row": 1,
+              "column": 1,
+              "within_word": {
+                "numerator": "-5951323235246562764402094545786310630079646356851957789845572031048572777023197189",
+                "denominator": "970206088730612249979828634095191030071391321992365431298790829008779750000000000000",
+                "abs_lower_inclusive_power_two": -8,
+                "abs_upper_exclusive_power_two": -7
+              },
+              "carried": {
+                "numerator": "40411567212807658735748746277620282762061028049254188165116837520650962155057003",
+                "denominator": "24255152218265306249495715852379775751784783049809135782469770725219493750000000000",
+                "abs_lower_inclusive_power_two": -10,
+                "abs_upper_exclusive_power_two": -9
+              },
+              "total": {
+                "numerator": "-1444953515578085471657381564893833106532401744960596754413632843407511430273639023",
+                "denominator": "323402029576870749993276211365063676690463773997455143766263609669593250000000000000",
+                "abs_lower_inclusive_power_two": -8,
+                "abs_upper_exclusive_power_two": -7
+              },
+              "proposed_delta": {
+                "numerator": "1444953515578085471657381564893833106532401744960596754413632843407511430273639023",
+                "denominator": "13908874488042057215710823298388658607103465992082550823099465324669866496000000000000000",
+                "abs_lower_inclusive_power_two": -24,
+                "abs_upper_exclusive_power_two": -23
+              },
+              "applied_delta": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_before": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_after": {
+                "numerator": "1444953515578085471657381564893833106532401744960596754413632843407511430273639023",
+                "denominator": "13908874488042057215710823298388658607103465992082550823099465324669866496000000000000000",
+                "abs_lower_inclusive_power_two": -24,
+                "abs_upper_exclusive_power_two": -23
+              },
+              "accounting_closes": true
+            }
+          ],
+          "max_abs_remainder_after": {
+            "numerator": "387005523935423922055326614244522575724968047593957492264634758345257106596127013",
+            "denominator": "637796713737378285023776729732107802089400556956166351676518692136537088000000000000000",
+            "abs_lower_inclusive_power_two": -21,
+            "abs_upper_exclusive_power_two": -20
+          },
+          "joint_admits_double_one_family_at_fixed_printed_bounds": false
+        },
+        {
+          "family": "K",
+          "step": {
+            "numerator": "1",
+            "denominator": "4096",
+            "abs_lower_inclusive_power_two": -12,
+            "abs_upper_exclusive_power_two": -11
+          },
+          "prepared_scale_inferred_four_matching_coordinates": {
+            "numerator": "53",
+            "denominator": "32",
+            "abs_lower_inclusive_power_two": 0,
+            "abs_upper_exclusive_power_two": 1
+          },
+          "scale_before": {
+            "numerator": "1",
+            "denominator": "1",
+            "abs_lower_inclusive_power_two": 0,
+            "abs_upper_exclusive_power_two": 1
+          },
+          "scale_applied_delta": {
+            "numerator": "21",
+            "denominator": "32",
+            "abs_lower_inclusive_power_two": -1,
+            "abs_upper_exclusive_power_two": 0
+          },
+          "scale_remainder_before": {
+            "numerator": "0",
+            "denominator": "1",
+            "zero": true
+          },
+          "scale_remainder_after": {
+            "numerator": "-33985650639887387824471149515413903462972372090093305398318721497649127110743053",
+            "denominator": "9123755174694704318386698671323411017743118624060149455211429960296684570312500000",
+            "abs_lower_inclusive_power_two": -9,
+            "abs_upper_exclusive_power_two": -8
+          },
+          "energy_plus_old_remainder_equals_scale_delta_plus_new_remainder": true,
+          "actual_reached_energy": {
+            "numerator": "186046208836047260034899995423142955529092163279668117955755693435845316317401096",
+            "denominator": "285117349209209509949584333478856594304472457001879670475357186259271392822265625",
+            "abs_lower_inclusive_power_two": -1,
+            "abs_upper_exclusive_power_two": 0
+          },
+          "alignment": {
+            "numerator": "10258453315294484263",
+            "denominator": "75557863725914323419136",
+            "abs_lower_inclusive_power_two": -13,
+            "abs_upper_exclusive_power_two": -12
+          },
+          "curvature": {
+            "numerator": "340427159178437806117683689650229899927313236768103814004691395360278000384421226931087410126337643934474727520369689848791412442963922036741476601039994743937453773476677285866853238020796595741137176581703333630331192583163227",
+            "denominator": "2289943713497277036294365518871266160955721853129884112878980542141315075462595650051010802587832583656233858208150050724843804208216196154346500454393050801155774100392236507326662490043102177764927784053155361460717347575693312",
+            "abs_lower_inclusive_power_two": -3,
+            "abs_upper_exclusive_power_two": -2
+          },
+          "covector": {
+            "numerator": "5655337816490614167",
+            "denominator": "4611686018427387904",
+            "abs_lower_inclusive_power_two": 0,
+            "abs_upper_exclusive_power_two": 1
+          },
+          "gain": {
+            "numerator": "28847520372131754395966377328904900427577656111948424020718374369273135913862727083785042403238018720778118871431641332515654109",
+            "denominator": "4493025039951607108476273590701652559217343559146725609654199361155425341616538650884112765862477762581870671935675717124096",
+            "abs_lower_inclusive_power_two": 12,
+            "abs_upper_exclusive_power_two": 13
+          },
+          "moves": {
+            "numerator": "106208242271172035841419537584066041160192533939143426589389557710599154217248740802739974515399790927",
+            "denominator": "2293498615990071511610820895302086940796564989168281123737588839386922876088484808070018553110125686554624",
+            "abs_lower_inclusive_power_two": -15,
+            "abs_upper_exclusive_power_two": -14
+          },
+          "bound": {
+            "numerator": "1170966741",
+            "denominator": "2147483648",
+            "abs_lower_inclusive_power_two": -1,
+            "abs_upper_exclusive_power_two": 0
+          },
+          "own_curvature_admits_double_at_printed_ray": true,
+          "covector_admits_double": true,
+          "coordinates": [
+            {
+              "row": 0,
+              "column": 0,
+              "within_word": {
+                "numerator": "-2518312992961033253041535315647160868958739152307806453056891516373163982522793033",
+                "denominator": "593188907865865220446220916789534786169457363240482097913428843132940000000000000000",
+                "abs_lower_inclusive_power_two": -8,
+                "abs_upper_exclusive_power_two": -7
+              },
+              "carried": {
+                "numerator": "-102401243674272283880530122184837455686885039744657646920364553105417998850044371",
+                "denominator": "18537153370808288138944403649672962067795542601265065559794651347904375000000000000",
+                "abs_lower_inclusive_power_two": -8,
+                "abs_upper_exclusive_power_two": -7
+              },
+              "total": {
+                "numerator": "-1159030558107549267443699845112391890187812084827370230901711443149307989144842581",
+                "denominator": "118637781573173044089244183357906957233891472648096419582685768626588000000000000000",
+                "abs_lower_inclusive_power_two": -7,
+                "abs_upper_exclusive_power_two": -6
+              },
+              "proposed_delta": {
+                "numerator": "1159030558107549267443699845112391890187812084827370230901711443149307989144842581",
+                "denominator": "804838710192405931101432539900040797874719750444686110448940254362772992000000000000000",
+                "abs_lower_inclusive_power_two": -20,
+                "abs_upper_exclusive_power_two": -19
+              },
+              "applied_delta": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_before": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_after": {
+                "numerator": "1159030558107549267443699845112391890187812084827370230901711443149307989144842581",
+                "denominator": "804838710192405931101432539900040797874719750444686110448940254362772992000000000000000",
+                "abs_lower_inclusive_power_two": -20,
+                "abs_upper_exclusive_power_two": -19
+              },
+              "accounting_closes": true
+            },
+            {
+              "row": 0,
+              "column": 1,
+              "within_word": {
+                "numerator": "274243554026622806059555056383188763484159833224057390480928909517986319724803067417",
+                "denominator": "26907048860795646399440580785573297900646585996588267961353132324510158400000000000000",
+                "abs_lower_inclusive_power_two": -7,
+                "abs_upper_exclusive_power_two": -6
+              },
+              "carried": {
+                "numerator": "-168425194504846449622595656277163120173651778920079117632456019492867558575800872827",
+                "denominator": "28028175896662131666083938318305518646506860413112779126409512838031415000000000000000",
+                "abs_lower_inclusive_power_two": -8,
+                "abs_upper_exclusive_power_two": -7
+              },
+              "total": {
+                "numerator": "2813884182549255360546580658927804202936353136519535938844278270120836587300855737577",
+                "denominator": "672676221519891159986014519639332447516164649914706699033828308112753960000000000000000",
+                "abs_lower_inclusive_power_two": -8,
+                "abs_upper_exclusive_power_two": -7
+              },
+              "proposed_delta": {
+                "numerator": "-2813884182549255360546580658927804202936353136519535938844278270120836587300855737577",
+                "denominator": "4563435486790941629345122501233231323949660985021370246245491242236922864640000000000000000",
+                "abs_lower_inclusive_power_two": -21,
+                "abs_upper_exclusive_power_two": -20
+              },
+              "applied_delta": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_before": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_after": {
+                "numerator": "-2813884182549255360546580658927804202936353136519535938844278270120836587300855737577",
+                "denominator": "4563435486790941629345122501233231323949660985021370246245491242236922864640000000000000000",
+                "abs_lower_inclusive_power_two": -21,
+                "abs_upper_exclusive_power_two": -20
+              },
+              "accounting_closes": true
+            },
+            {
+              "row": 1,
+              "column": 0,
+              "within_word": {
+                "numerator": "274243554026622806059555056383188763484159833224057390480928909517986319724803067417",
+                "denominator": "26907048860795646399440580785573297900646585996588267961353132324510158400000000000000",
+                "abs_lower_inclusive_power_two": -7,
+                "abs_upper_exclusive_power_two": -6
+              },
+              "carried": {
+                "numerator": "-168425194504846449622595656277163120173651778920079117632456019492867558575800872827",
+                "denominator": "28028175896662131666083938318305518646506860413112779126409512838031415000000000000000",
+                "abs_lower_inclusive_power_two": -8,
+                "abs_upper_exclusive_power_two": -7
+              },
+              "total": {
+                "numerator": "2813884182549255360546580658927804202936353136519535938844278270120836587300855737577",
+                "denominator": "672676221519891159986014519639332447516164649914706699033828308112753960000000000000000",
+                "abs_lower_inclusive_power_two": -8,
+                "abs_upper_exclusive_power_two": -7
+              },
+              "proposed_delta": {
+                "numerator": "-2813884182549255360546580658927804202936353136519535938844278270120836587300855737577",
+                "denominator": "4563435486790941629345122501233231323949660985021370246245491242236922864640000000000000000",
+                "abs_lower_inclusive_power_two": -21,
+                "abs_upper_exclusive_power_two": -20
+              },
+              "applied_delta": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_before": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_after": {
+                "numerator": "-2813884182549255360546580658927804202936353136519535938844278270120836587300855737577",
+                "denominator": "4563435486790941629345122501233231323949660985021370246245491242236922864640000000000000000",
+                "abs_lower_inclusive_power_two": -21,
+                "abs_upper_exclusive_power_two": -20
+              },
+              "accounting_closes": true
+            },
+            {
+              "row": 1,
+              "column": 1,
+              "within_word": {
+                "numerator": "-89725103736877242445605857013499480083267316341808652626370674637749068249083686289",
+                "denominator": "7761648709844897999838629072761528240571130575938923450390326632070238000000000000000",
+                "abs_lower_inclusive_power_two": -7,
+                "abs_upper_exclusive_power_two": -6
+              },
+              "carried": {
+                "numerator": "4128708604809651936336739746867261754057786108343435576827673789529516163124087027",
+                "denominator": "194041217746122449995965726819038206014278264398473086259758165801755950000000000000",
+                "abs_lower_inclusive_power_two": -6,
+                "abs_upper_exclusive_power_two": -5
+              },
+              "total": {
+                "numerator": "25141080151836278335954577620396996693014709330642923482245425647810526091959931597",
+                "denominator": "2587216236614965999946209690920509413523710191979641150130108877356746000000000000000",
+                "abs_lower_inclusive_power_two": -7,
+                "abs_upper_exclusive_power_two": -6
+              },
+              "proposed_delta": {
+                "numerator": "-25141080151836278335954577620396996693014709330642923482245425647810526091959931597",
+                "denominator": "17551674949195929343635086543204735861344849942389885562482658623988164864000000000000000",
+                "abs_lower_inclusive_power_two": -20,
+                "abs_upper_exclusive_power_two": -19
+              },
+              "applied_delta": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_before": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_after": {
+                "numerator": "-25141080151836278335954577620396996693014709330642923482245425647810526091959931597",
+                "denominator": "17551674949195929343635086543204735861344849942389885562482658623988164864000000000000000",
+                "abs_lower_inclusive_power_two": -20,
+                "abs_upper_exclusive_power_two": -19
+              },
+              "accounting_closes": true
+            }
+          ],
+          "max_abs_remainder_after": {
+            "numerator": "1159030558107549267443699845112391890187812084827370230901711443149307989144842581",
+            "denominator": "804838710192405931101432539900040797874719750444686110448940254362772992000000000000000",
+            "abs_lower_inclusive_power_two": -20,
+            "abs_upper_exclusive_power_two": -19
+          },
+          "joint_admits_double_one_family_at_fixed_printed_bounds": false
+        },
+        {
+          "family": "D",
+          "step": {
+            "numerator": "1",
+            "denominator": "512",
+            "abs_lower_inclusive_power_two": -9,
+            "abs_upper_exclusive_power_two": -8
+          },
+          "prepared_scale_inferred_four_matching_coordinates": {
+            "numerator": "69",
+            "denominator": "64",
+            "abs_lower_inclusive_power_two": 0,
+            "abs_upper_exclusive_power_two": 1
+          },
+          "scale_before": {
+            "numerator": "1",
+            "denominator": "1",
+            "abs_lower_inclusive_power_two": 0,
+            "abs_upper_exclusive_power_two": 1
+          },
+          "scale_applied_delta": {
+            "numerator": "5",
+            "denominator": "64",
+            "abs_lower_inclusive_power_two": -4,
+            "abs_upper_exclusive_power_two": -3
+          },
+          "scale_remainder_before": {
+            "numerator": "0",
+            "denominator": "1",
+            "zero": true
+          },
+          "scale_remainder_after": {
+            "numerator": "27953950748459913500861217215277731552119044262993320652570468983495793739371651",
+            "denominator": "18247510349389408636773397342646822035486237248120298910422859920593369140625000000",
+            "abs_lower_inclusive_power_two": -10,
+            "abs_upper_exclusive_power_two": -9
+          },
+          "energy_plus_old_remainder_equals_scale_delta_plus_new_remainder": true,
+          "actual_reached_energy": {
+            "numerator": "22711573387414179113262232572024385985538770769881119891083693754372699341417184",
+            "denominator": "285117349209209509949584333478856594304472457001879670475357186259271392822265625",
+            "abs_lower_inclusive_power_two": -4,
+            "abs_upper_exclusive_power_two": -3
+          },
+          "alignment": {
+            "numerator": "15349552056508504759",
+            "denominator": "151115727451828646838272",
+            "abs_lower_inclusive_power_two": -14,
+            "abs_upper_exclusive_power_two": -13
+          },
+          "curvature": {
+            "numerator": "20876900864533048486056078108073072715310964606564542021534220970349273709490859930265275443581519695070231583019152079723782209790900381683794301437634382510816618203725544931929926562606603739576648910945197320832562110410271",
+            "denominator": "904669121381640310634811069183710088278803695063657921137375028994099782898803219773238835590254847864191153860009896582654342403245904653568987833834291674530676187809278620178434563967645304796020852959271253910406853363236864",
+            "abs_lower_inclusive_power_two": -6,
+            "abs_upper_exclusive_power_two": -5
+          },
+          "covector": {
+            "numerator": "5655337816490614167",
+            "denominator": "4611686018427387904",
+            "abs_lower_inclusive_power_two": 0,
+            "abs_upper_exclusive_power_two": 1
+          },
+          "gain": {
+            "numerator": "28847520372131754395966377328904900427577656111948424020718374369273135913862727083785042403238018720778118871431641332515654109",
+            "denominator": "4493025039951607108476273590701652559217343559146725609654199361155425341616538650884112765862477762581870671935675717124096",
+            "abs_lower_inclusive_power_two": 12,
+            "abs_upper_exclusive_power_two": 13
+          },
+          "moves": {
+            "numerator": "527576045840917792249294299964478524476426602921526547966852190751932619407199207281252463862420392051",
+            "denominator": "73391955711682288371546268649666782105490079653384995959602842860381532034831513858240593699524021969747968",
+            "abs_lower_inclusive_power_two": -18,
+            "abs_upper_exclusive_power_two": -17
+          },
+          "bound": {
+            "numerator": "7381641973",
+            "denominator": "34359738368",
+            "abs_lower_inclusive_power_two": -3,
+            "abs_upper_exclusive_power_two": -2
+          },
+          "own_curvature_admits_double_at_printed_ray": true,
+          "covector_admits_double": true,
+          "coordinates": [
+            {
+              "row": 0,
+              "column": 0,
+              "within_word": {
+                "numerator": "-486493695780774863481827352819459032906082468670079622926788670525536497233060743",
+                "denominator": "296594453932932610223110458394767393084728681620241048956714421566470000000000000000",
+                "abs_lower_inclusive_power_two": -10,
+                "abs_upper_exclusive_power_two": -9
+              },
+              "carried": {
+                "numerator": "148389842592320131750321422311958185989949152047530373781840051430410001309272313",
+                "denominator": "18537153370808288138944403649672962067795542601265065559794651347904375000000000000",
+                "abs_lower_inclusive_power_two": -7,
+                "abs_upper_exclusive_power_two": -6
+              },
+              "total": {
+                "numerator": "377548757139269448904663080834374388586620792818081271516530430472204704743059253",
+                "denominator": "59318890786586522044622091678953478616945736324048209791342884313294000000000000000",
+                "abs_lower_inclusive_power_two": -8,
+                "abs_upper_exclusive_power_two": -7
+              },
+              "proposed_delta": {
+                "numerator": "-377548757139269448904663080834374388586620792818081271516530430472204704743059253",
+                "denominator": "32744027714195760168631394606782320196554046450874611804821272140938288000000000000000",
+                "abs_lower_inclusive_power_two": -17,
+                "abs_upper_exclusive_power_two": -16
+              },
+              "applied_delta": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_before": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_after": {
+                "numerator": "-377548757139269448904663080834374388586620792818081271516530430472204704743059253",
+                "denominator": "32744027714195760168631394606782320196554046450874611804821272140938288000000000000000",
+                "abs_lower_inclusive_power_two": -17,
+                "abs_upper_exclusive_power_two": -16
+              },
+              "accounting_closes": true
+            },
+            {
+              "row": 0,
+              "column": 1,
+              "within_word": {
+                "numerator": "189837805368578449154058647666049331368799941023628230154696514190558770942122697337",
+                "denominator": "67267622151989115998601451963933244751616464991470669903382830811275396000000000000000",
+                "abs_lower_inclusive_power_two": -9,
+                "abs_upper_exclusive_power_two": -8
+              },
+              "carried": {
+                "numerator": "59114023703399548306721194657847216673604016477055778132386848214532766809577352937",
+                "denominator": "56056351793324263332167876636611037293013720826225558252819025676062830000000000000000",
+                "abs_lower_inclusive_power_two": -10,
+                "abs_upper_exclusive_power_two": -9
+              },
+              "total": {
+                "numerator": "1303873169063289535610620406277329956885623803980475819567803660239990455568077604307",
+                "denominator": "336338110759945579993007259819666223758082324957353349516914154056376980000000000000000",
+                "abs_lower_inclusive_power_two": -9,
+                "abs_upper_exclusive_power_two": -8
+              },
+              "proposed_delta": {
+                "numerator": "-1303873169063289535610620406277329956885623803980475819567803660239990455568077604307",
+                "denominator": "185658637139489960156140007420455755514461443376459048933336613039120092960000000000000000",
+                "abs_lower_inclusive_power_two": -18,
+                "abs_upper_exclusive_power_two": -17
+              },
+              "applied_delta": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_before": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_after": {
+                "numerator": "-1303873169063289535610620406277329956885623803980475819567803660239990455568077604307",
+                "denominator": "185658637139489960156140007420455755514461443376459048933336613039120092960000000000000000",
+                "abs_lower_inclusive_power_two": -18,
+                "abs_upper_exclusive_power_two": -17
+              },
+              "accounting_closes": true
+            },
+            {
+              "row": 1,
+              "column": 0,
+              "within_word": {
+                "numerator": "189837805368578449154058647666049331368799941023628230154696514190558770942122697337",
+                "denominator": "67267622151989115998601451963933244751616464991470669903382830811275396000000000000000",
+                "abs_lower_inclusive_power_two": -9,
+                "abs_upper_exclusive_power_two": -8
+              },
+              "carried": {
+                "numerator": "59114023703399548306721194657847216673604016477055778132386848214532766809577352937",
+                "denominator": "56056351793324263332167876636611037293013720826225558252819025676062830000000000000000",
+                "abs_lower_inclusive_power_two": -10,
+                "abs_upper_exclusive_power_two": -9
+              },
+              "total": {
+                "numerator": "1303873169063289535610620406277329956885623803980475819567803660239990455568077604307",
+                "denominator": "336338110759945579993007259819666223758082324957353349516914154056376980000000000000000",
+                "abs_lower_inclusive_power_two": -9,
+                "abs_upper_exclusive_power_two": -8
+              },
+              "proposed_delta": {
+                "numerator": "-1303873169063289535610620406277329956885623803980475819567803660239990455568077604307",
+                "denominator": "185658637139489960156140007420455755514461443376459048933336613039120092960000000000000000",
+                "abs_lower_inclusive_power_two": -18,
+                "abs_upper_exclusive_power_two": -17
+              },
+              "applied_delta": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_before": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_after": {
+                "numerator": "-1303873169063289535610620406277329956885623803980475819567803660239990455568077604307",
+                "denominator": "185658637139489960156140007420455755514461443376459048933336613039120092960000000000000000",
+                "abs_lower_inclusive_power_two": -18,
+                "abs_upper_exclusive_power_two": -17
+              },
+              "accounting_closes": true
+            },
+            {
+              "row": 1,
+              "column": 1,
+              "within_word": {
+                "numerator": "17022427774698990473230620073136309161034385388795479356820655974325798929455441911",
+                "denominator": "3880824354922448999919314536380764120285565287969461725195163316035119000000000000000",
+                "abs_lower_inclusive_power_two": -8,
+                "abs_upper_exclusive_power_two": -7
+              },
+              "carried": {
+                "numerator": "143914092867723140861283306433633521551101725151710950532664526741899809505826143",
+                "denominator": "77616487098448979998386290727615282405711305759389234503903266320702380000000000000",
+                "abs_lower_inclusive_power_two": -10,
+                "abs_upper_exclusive_power_two": -9
+              },
+              "total": {
+                "numerator": "8072710806028382505431595131605995079529823882127008961151294103806929801582249687",
+                "denominator": "1293608118307482999973104845460254706761855095989820575065054438678373000000000000000",
+                "abs_lower_inclusive_power_two": -8,
+                "abs_upper_exclusive_power_two": -7
+              },
+              "proposed_delta": {
+                "numerator": "-8072710806028382505431595131605995079529823882127008961151294103806929801582249687",
+                "denominator": "714071681305730615985153874694060598132544012986380957435910050150461896000000000000000",
+                "abs_lower_inclusive_power_two": -17,
+                "abs_upper_exclusive_power_two": -16
+              },
+              "applied_delta": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_before": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_after": {
+                "numerator": "-8072710806028382505431595131605995079529823882127008961151294103806929801582249687",
+                "denominator": "714071681305730615985153874694060598132544012986380957435910050150461896000000000000000",
+                "abs_lower_inclusive_power_two": -17,
+                "abs_upper_exclusive_power_two": -16
+              },
+              "accounting_closes": true
+            }
+          ],
+          "max_abs_remainder_after": {
+            "numerator": "377548757139269448904663080834374388586620792818081271516530430472204704743059253",
+            "denominator": "32744027714195760168631394606782320196554046450874611804821272140938288000000000000000",
+            "abs_lower_inclusive_power_two": -17,
+            "abs_upper_exclusive_power_two": -16
+          },
+          "joint_admits_double_one_family_at_fixed_printed_bounds": false
+        }
+      ]
+    },
+    {
+      "credit_line": 63,
+      "publication_line": 64,
+      "role": "contact observation 2",
+      "all_twelve_reached_nonzero": true,
+      "all_twelve_delayed_nonzero": true,
+      "each_within_plus_carried_equals_total": true,
+      "zero_actual_factor_linear_quadratic_form_movements": true,
+      "deposition_work": {
+        "numerator": "0",
+        "denominator": "1",
+        "zero": true
+      },
+      "loaded_gamma": [
+        {
+          "numerator": "14765494090331667221555676470277584442797882076862216814364104214018515066848029454603680074081009741632298650601",
+          "denominator": "1995303939828655219058128263177233101196492075123034841534685739874632900033430371992843162348697633215741952",
+          "abs_lower_inclusive_power_two": 12,
+          "abs_upper_exclusive_power_two": 13
+        },
+        {
+          "numerator": "14765494090331667221555676470277584442797882076862216814364104214018515066848029454603680074081009741632298650601",
+          "denominator": "1995303939828655219058128263177233101196492075123034841534685739874632900033430371992843162348697633215741952",
+          "abs_lower_inclusive_power_two": 12,
+          "abs_upper_exclusive_power_two": 13
+        }
+      ],
+      "loaded_gain_parts": [
+        {
+          "numerator": "1",
+          "denominator": "2",
+          "abs_lower_inclusive_power_two": -1,
+          "abs_upper_exclusive_power_two": 0
+        },
+        {
+          "numerator": "13",
+          "denominator": "4",
+          "abs_lower_inclusive_power_two": 1,
+          "abs_upper_exclusive_power_two": 2
+        },
+        {
+          "numerator": "14767489394271495876774734598540761675899078568937339849205638899758389699748062884975672917243358439265514392553",
+          "denominator": "1995303939828655219058128263177233101196492075123034841534685739874632900033430371992843162348697633215741952",
+          "abs_lower_inclusive_power_two": 12,
+          "abs_upper_exclusive_power_two": 13
+        }
+      ],
+      "joint_curvature": {
+        "numerator": "120385304183081927025",
+        "denominator": "618970019642690137449562112",
+        "abs_lower_inclusive_power_two": -23,
+        "abs_upper_exclusive_power_two": -22
+      },
+      "joint_decrease": {
+        "numerator": "132348655023245025343",
+        "denominator": "618970019642690137449562112",
+        "abs_lower_inclusive_power_two": -23,
+        "abs_upper_exclusive_power_two": -22
+      },
+      "joint_holds": true,
+      "no_released_covectors": true,
+      "families": [
+        {
+          "family": "C",
+          "step": {
+            "numerator": "1",
+            "denominator": "32768",
+            "abs_lower_inclusive_power_two": -15,
+            "abs_upper_exclusive_power_two": -14
+          },
+          "prepared_scale_inferred_four_matching_coordinates": {
+            "numerator": "107",
+            "denominator": "64",
+            "abs_lower_inclusive_power_two": 0,
+            "abs_upper_exclusive_power_two": 1
+          },
+          "scale_before": {
+            "numerator": "21",
+            "denominator": "16",
+            "abs_lower_inclusive_power_two": 0,
+            "abs_upper_exclusive_power_two": 1
+          },
+          "scale_applied_delta": {
+            "numerator": "23",
+            "denominator": "64",
+            "abs_lower_inclusive_power_two": -2,
+            "abs_upper_exclusive_power_two": -1
+          },
+          "scale_remainder_before": {
+            "numerator": "-32805638203291693510368365544593096018021396007998516824096301604668004084377981",
+            "denominator": "4561877587347352159193349335661705508871559312030074727605714980148342285156250000",
+            "abs_lower_inclusive_power_two": -8,
+            "abs_upper_exclusive_power_two": -7
+          },
+          "scale_remainder_after": {
+            "numerator": "140871203845457359407372726424389394362543508416911762087105211063216736203454604585389280841506404153",
+            "denominator": "30224459003557866032145169380204818988954026635906457085116818843544561673526871442810772705078125000000",
+            "abs_lower_inclusive_power_two": -8,
+            "abs_upper_exclusive_power_two": -7
+          },
+          "energy_plus_old_remainder_equals_scale_delta_plus_new_remainder": true,
+          "actual_reached_energy": {
+            "numerator": "175314656837438647495846449949524900282086470660178195043051571483147067384015008486828066500811464352",
+            "denominator": "472257171930591656752268271565700296702406666186038391954950294430383776148857366293918323516845703125",
+            "abs_lower_inclusive_power_two": -2,
+            "abs_upper_exclusive_power_two": -1
+          },
+          "alignment": {
+            "numerator": "16136888160788813323",
+            "denominator": "18889465931478580854784",
+            "abs_lower_inclusive_power_two": -11,
+            "abs_upper_exclusive_power_two": -10
+          },
+          "curvature": {
+            "numerator": "25154133657492318082453194152347515800100341050400753675413060794624354112347630031345479882084739846195982375135535917295805725359208974342635352988641830881826005745124368247942460337975143165955795777459539086398355986245846708045491089",
+            "denominator": "2810066674043313901696029980749188284404656418075819287167198238376370874155320110925986322530700889807631007866258751006841495366433067708696910772476369348751613932213850448932937081018585566824783773802872172308811370439276474161692672",
+            "abs_lower_inclusive_power_two": 3,
+            "abs_upper_exclusive_power_two": 4
+          },
+          "covector": {
+            "numerator": "2598024730765000835",
+            "denominator": "2305843009213693952",
+            "abs_lower_inclusive_power_two": 0,
+            "abs_upper_exclusive_power_two": 1
+          },
+          "gain": {
+            "numerator": "1890551305588138597506377571340551834141814384903230149521655889901846498975037840140638327644825362300277921116750713651704792393021",
+            "denominator": "294454889018268523461101066040223502120867827492239809554297609332681955188181477024341214223563342648565476355976443797444755456",
+            "abs_lower_inclusive_power_two": 12,
+            "abs_upper_exclusive_power_two": 13
+          },
+          "moves": {
+            "numerator": "838226614500166983698918452919680050044640251107485577102345869043360295956768625598773059064448058515762267",
+            "denominator": "300613450595050653169853516389035139504087366260264943450533244356122755214669880763353471793250393988087676928",
+            "abs_lower_inclusive_power_two": -9,
+            "abs_upper_exclusive_power_two": -8
+          },
+          "bound": {
+            "numerator": "4543193535",
+            "denominator": "1073741824",
+            "abs_lower_inclusive_power_two": 2,
+            "abs_upper_exclusive_power_two": 3
+          },
+          "own_curvature_admits_double_at_printed_ray": true,
+          "covector_admits_double": true,
+          "coordinates": [
+            {
+              "row": 0,
+              "column": 0,
+              "within_word": {
+                "numerator": "-341641704224802315198742725034624643981008520706270432294553037966609532046944676517261142033477880138886213",
+                "denominator": "99133203085769444798832941050133785801870311963109588593474654124941807833000785645275053395385742187500000000",
+                "abs_lower_inclusive_power_two": -9,
+                "abs_upper_exclusive_power_two": -8
+              },
+              "carried": {
+                "numerator": "-1552022496955557088219197276725016557494774757884361302497602504119358297496478506394546009369131479378507",
+                "denominator": "50994446031774405760716533462002976235529995865797113474009595743282822959362544056211447219848632812500000",
+                "abs_lower_inclusive_power_two": -6,
+                "abs_upper_exclusive_power_two": -5
+              },
+              "total": {
+                "numerator": "-68546396700130720299935963897715445545935727551703444986732496040298817599593854958127726209123866858177629",
+                "denominator": "2023126593587131526506794715308852771466741060471624257009686818876363425163281339699490885620117187500000000",
+                "abs_lower_inclusive_power_two": -5,
+                "abs_upper_exclusive_power_two": -4
+              },
+              "proposed_delta": {
+                "numerator": "68546396700130720299935963897715445545935727551703444986732496040298817599593854958127726209123866858177629",
+                "denominator": "110834967303077413548148241683480190232033942256877463296018682685322693884145204914096908677812500000000000000000",
+                "abs_lower_inclusive_power_two": -21,
+                "abs_upper_exclusive_power_two": -20
+              },
+              "applied_delta": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_before": {
+                "numerator": "387005523935423922055326614244522575724968047593957492264634758345257106596127013",
+                "denominator": "637796713737378285023776729732107802089400556956166351676518692136537088000000000000000",
+                "abs_lower_inclusive_power_two": -21,
+                "abs_upper_exclusive_power_two": -20
+              },
+              "retained_remainder_after": {
+                "numerator": "34764646439282182045101770907080461997618714307531149052972128871217186148051970009459887811539290681039644899",
+                "denominator": "28373751629587817868325949870970928699400689217760630603780782767442609634341172458008808621520000000000000000000000",
+                "abs_lower_inclusive_power_two": -20,
+                "abs_upper_exclusive_power_two": -19
+              },
+              "accounting_closes": true
+            },
+            {
+              "row": 0,
+              "column": 1,
+              "within_word": {
+                "numerator": "16050015200183412735291249887536877437621638511058192157774064804133379800869789517737497556940378037894440729",
+                "denominator": "7137590622175400025515971755609632577734662461343890378730175096995810163976056566459803844467773437500000000000",
+                "abs_lower_inclusive_power_two": -9,
+                "abs_upper_exclusive_power_two": -8
+              },
+              "carried": {
+                "numerator": "-341382048416365649469146828407941309130696219729206509571061257464292594403657182287626836553061093113280351",
+                "denominator": "74349902314327083599124705787600339351402733972332191445105990593706355874750589233956290046539306640625000000",
+                "abs_lower_inclusive_power_two": -8,
+                "abs_upper_exclusive_power_two": -7
+              },
+              "total": {
+                "numerator": "-2388951635398241373392406519946498319846456940420804680149687987491244180268757140267811250307640985854353281",
+                "denominator": "1019655803167914289359424536515661796819237494477698625532882156713687166282293795208543406352539062500000000000",
+                "abs_lower_inclusive_power_two": -9,
+                "abs_upper_exclusive_power_two": -8
+              },
+              "proposed_delta": {
+                "numerator": "2388951635398241373392406519946498319846456940420804680149687987491244180268757140267811250307640985854353281",
+                "denominator": "55860823520751016428266713808474015876945106897466241501193416073402637717609183276704841973617500000000000000000000",
+                "abs_lower_inclusive_power_two": -25,
+                "abs_upper_exclusive_power_two": -24
+              },
+              "applied_delta": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_before": {
+                "numerator": "-66908896372464576602630392181381205898049402549137463691443558641115069950154265637",
+                "denominator": "3616307366890934876084814057581051237846901157941463214005860984414165288960000000000000000",
+                "abs_lower_inclusive_power_two": -26,
+                "abs_upper_exclusive_power_two": -25
+              },
+              "retained_remainder_after": {
+                "numerator": "86746561704489962446726446703104246134720958394027218827436703542196096316532462591240677115735790591416250609",
+                "denominator": "3575092705328065051409069683742337016124486841437839456076378628697768813926987729709109886311520000000000000000000000",
+                "abs_lower_inclusive_power_two": -26,
+                "abs_upper_exclusive_power_two": -25
+              },
+              "accounting_closes": true
+            },
+            {
+              "row": 1,
+              "column": 0,
+              "within_word": {
+                "numerator": "16050015200183412735291249887536877437621638511058192157774064804133379800869789517737497556940378037894440729",
+                "denominator": "7137590622175400025515971755609632577734662461343890378730175096995810163976056566459803844467773437500000000000",
+                "abs_lower_inclusive_power_two": -9,
+                "abs_upper_exclusive_power_two": -8
+              },
+              "carried": {
+                "numerator": "-341382048416365649469146828407941309130696219729206509571061257464292594403657182287626836553061093113280351",
+                "denominator": "74349902314327083599124705787600339351402733972332191445105990593706355874750589233956290046539306640625000000",
+                "abs_lower_inclusive_power_two": -8,
+                "abs_upper_exclusive_power_two": -7
+              },
+              "total": {
+                "numerator": "-2388951635398241373392406519946498319846456940420804680149687987491244180268757140267811250307640985854353281",
+                "denominator": "1019655803167914289359424536515661796819237494477698625532882156713687166282293795208543406352539062500000000000",
+                "abs_lower_inclusive_power_two": -9,
+                "abs_upper_exclusive_power_two": -8
+              },
+              "proposed_delta": {
+                "numerator": "2388951635398241373392406519946498319846456940420804680149687987491244180268757140267811250307640985854353281",
+                "denominator": "55860823520751016428266713808474015876945106897466241501193416073402637717609183276704841973617500000000000000000000",
+                "abs_lower_inclusive_power_two": -25,
+                "abs_upper_exclusive_power_two": -24
+              },
+              "applied_delta": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_before": {
+                "numerator": "-66908896372464576602630392181381205898049402549137463691443558641115069950154265637",
+                "denominator": "3616307366890934876084814057581051237846901157941463214005860984414165288960000000000000000",
+                "abs_lower_inclusive_power_two": -26,
+                "abs_upper_exclusive_power_two": -25
+              },
+              "retained_remainder_after": {
+                "numerator": "86746561704489962446726446703104246134720958394027218827436703542196096316532462591240677115735790591416250609",
+                "denominator": "3575092705328065051409069683742337016124486841437839456076378628697768813926987729709109886311520000000000000000000000",
+                "abs_lower_inclusive_power_two": -26,
+                "abs_upper_exclusive_power_two": -25
+              },
+              "accounting_closes": true
+            },
+            {
+              "row": 1,
+              "column": 1,
+              "within_word": {
+                "numerator": "-4832401983348511563399384330906191637640021021857885255479733647048384284854022460068368873272715708716533429",
+                "denominator": "713759062217540002551597175560963257773466246134389037873017509699581016397605656645980384446777343750000000000",
+                "abs_lower_inclusive_power_two": -8,
+                "abs_upper_exclusive_power_two": -7
+              },
+              "carried": {
+                "numerator": "-163835261914983533049618339133644890755582062035232194982297155584689607268048631377602290250077859113361337",
+                "denominator": "16994263386131904822657075608594363280320624907961643758881369278561452771371563253475723439208984375000000000",
+                "abs_lower_inclusive_power_two": -7,
+                "abs_upper_exclusive_power_two": -6
+              },
+              "total": {
+                "numerator": "-11713482983777819951483354574519277049374467627337637444736214181605347790112064977927665063775985791477709583",
+                "denominator": "713759062217540002551597175560963257773466246134389037873017509699581016397605656645980384446777343750000000000",
+                "abs_lower_inclusive_power_two": -6,
+                "abs_upper_exclusive_power_two": -5
+              },
+              "proposed_delta": {
+                "numerator": "11713482983777819951483354574519277049374467627337637444736214181605347790112064977927665063775985791477709583",
+                "denominator": "39102576464525711499786699665931811113861574828226369050835391251381846402326428293693389381532250000000000000000000",
+                "abs_lower_inclusive_power_two": -22,
+                "abs_upper_exclusive_power_two": -21
+              },
+              "applied_delta": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_before": {
+                "numerator": "1444953515578085471657381564893833106532401744960596754413632843407511430273639023",
+                "denominator": "13908874488042057215710823298388658607103465992082550823099465324669866496000000000000000",
+                "abs_lower_inclusive_power_two": -24,
+                "abs_upper_exclusive_power_two": -23
+              },
+              "retained_remainder_after": {
+                "numerator": "504823639401516863532327309512865367994887447554673296631924867957713702850493805159761775391754601908014816031",
+                "denominator": "1251282446864822767993174389309817955643570394503243809626732520044219084874445705398188460209032000000000000000000000",
+                "abs_lower_inclusive_power_two": -22,
+                "abs_upper_exclusive_power_two": -21
+              },
+              "accounting_closes": true
+            }
+          ],
+          "max_abs_remainder_after": {
+            "numerator": "34764646439282182045101770907080461997618714307531149052972128871217186148051970009459887811539290681039644899",
+            "denominator": "28373751629587817868325949870970928699400689217760630603780782767442609634341172458008808621520000000000000000000000",
+            "abs_lower_inclusive_power_two": -20,
+            "abs_upper_exclusive_power_two": -19
+          },
+          "joint_admits_double_one_family_at_fixed_printed_bounds": false
+        },
+        {
+          "family": "K",
+          "step": {
+            "numerator": "1",
+            "denominator": "4096",
+            "abs_lower_inclusive_power_two": -12,
+            "abs_upper_exclusive_power_two": -11
+          },
+          "prepared_scale_inferred_four_matching_coordinates": {
+            "numerator": "81",
+            "denominator": "32",
+            "abs_lower_inclusive_power_two": 1,
+            "abs_upper_exclusive_power_two": 2
+          },
+          "scale_before": {
+            "numerator": "53",
+            "denominator": "32",
+            "abs_lower_inclusive_power_two": 0,
+            "abs_upper_exclusive_power_two": 1
+          },
+          "scale_applied_delta": {
+            "numerator": "7",
+            "denominator": "8",
+            "abs_lower_inclusive_power_two": -1,
+            "abs_upper_exclusive_power_two": 0
+          },
+          "scale_remainder_before": {
+            "numerator": "-33985650639887387824471149515413903462972372090093305398318721497649127110743053",
+            "denominator": "9123755174694704318386698671323411017743118624060149455211429960296684570312500000",
+            "abs_lower_inclusive_power_two": -9,
+            "abs_upper_exclusive_power_two": -8
+          },
+          "scale_remainder_after": {
+            "numerator": "1287648923428598907809811558761151921087169505046058504449693340403879042384224053203694373920100103423",
+            "denominator": "196458983523126129208943600971331323428201173133391971053259322483039650877924664378270022583007812500000",
+            "abs_lower_inclusive_power_two": -8,
+            "abs_upper_exclusive_power_two": -7
+          },
+          "energy_plus_old_remainder_equals_scale_delta_plus_new_remainder": true,
+          "actual_reached_energy": {
+            "numerator": "5435033186092593330904371957735966810505102880401931761923373721669410736125462826790683544651642621064",
+            "denominator": "6139343235097691537779487530354103857131286660418499095414353827594989089935145761820938205718994140625",
+            "abs_lower_inclusive_power_two": -1,
+            "abs_upper_exclusive_power_two": 0
+          },
+          "alignment": {
+            "numerator": "6155899985335708079",
+            "denominator": "37778931862957161709568",
+            "abs_lower_inclusive_power_two": -13,
+            "abs_upper_exclusive_power_two": -12
+          },
+          "curvature": {
+            "numerator": "119272648747537908058702738690278472893464428052084317413147010270128034124648924849920797195876743688183737927539684027690428467985556453314165870463793095385379960284576954239702183891104362679849817262705330557851689159162075",
+            "denominator": "664654864688552064956187724298235983225243531067177248182561245791583513966467671670134654719370908634915949774701148509705231153405154439356807388123153067002129444104776129110686618425208795360341851153750308995400953491357696",
+            "abs_lower_inclusive_power_two": -3,
+            "abs_upper_exclusive_power_two": -2
+          },
+          "covector": {
+            "numerator": "2598024730765000835",
+            "denominator": "2305843009213693952",
+            "abs_lower_inclusive_power_two": 0,
+            "abs_upper_exclusive_power_two": 1
+          },
+          "gain": {
+            "numerator": "1890551305588138597506377571340551834141814384903230149521655889901846498975037840140638327644825362300277921116750713651704792393021",
+            "denominator": "294454889018268523461101066040223502120867827492239809554297609332681955188181477024341214223563342648565476355976443797444755456",
+            "abs_lower_inclusive_power_two": 12,
+            "abs_upper_exclusive_power_two": 13
+          },
+          "moves": {
+            "numerator": "250399521811288973990913233755110396972288519268904536735985421699826241916952903704474372797357175",
+            "denominator": "4479489484355608421114884561136888556243290994469299069799978201927583742360321890761754986543214231552",
+            "abs_lower_inclusive_power_two": -15,
+            "abs_upper_exclusive_power_two": -14
+          },
+          "bound": {
+            "numerator": "5146087815",
+            "denominator": "8589934592",
+            "abs_lower_inclusive_power_two": -1,
+            "abs_upper_exclusive_power_two": 0
+          },
+          "own_curvature_admits_double_at_printed_ray": true,
+          "covector_admits_double": true,
+          "coordinates": [
+            {
+              "row": 0,
+              "column": 0,
+              "within_word": {
+                "numerator": "6714677236312829622984655239387337391289227093158666983442343880787376819810103463240213776075562108711109527",
+                "denominator": "793065624686155558390663528401070286414962495704876708747797232999534462664006285162200427163085937500000000000",
+                "abs_lower_inclusive_power_two": -7,
+                "abs_upper_exclusive_power_two": -6
+              },
+              "carried": {
+                "numerator": "4670943467136689421589674193313413928782236244168862626396392394162697742681653236996550393452409524117063",
+                "denominator": "407955568254195246085732267696023809884239966926376907792076765946262583674900352449691577758789062500000000",
+                "abs_lower_inclusive_power_two": -7,
+                "abs_upper_exclusive_power_two": -6
+              },
+              "total": {
+                "numerator": "2256427333775221979793568838741230581263127764546133704165275813577094461654748193708786820135292317656382857",
+                "denominator": "113295089240879365484380504057295755202137499386410958392542461857076351809143755023171489594726562500000000000",
+                "abs_lower_inclusive_power_two": -6,
+                "abs_upper_exclusive_power_two": -5
+              },
+              "proposed_delta": {
+                "numerator": "-2256427333775221979793568838741230581263127764546133704165275813577094461654748193708786820135292317656382857",
+                "denominator": "1174643485249437261342057066066042389935761593638308816613880244534167615557202452080242004118125000000000000000000",
+                "abs_lower_inclusive_power_two": -19,
+                "abs_upper_exclusive_power_two": -18
+              },
+              "applied_delta": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_before": {
+                "numerator": "1159030558107549267443699845112391890187812084827370230901711443149307989144842581",
+                "denominator": "804838710192405931101432539900040797874719750444686110448940254362772992000000000000000",
+                "abs_lower_inclusive_power_two": -20,
+                "abs_upper_exclusive_power_two": -19
+              },
+              "retained_remainder_after": {
+                "numerator": "-1915967934683996908002946736312827056307952058998553334809092703048555737915329500167184046054515883136118854069",
+                "denominator": "3984390701966091190472257568096015786662103325621143505954281789459896551970030717456180877968680000000000000000000000",
+                "abs_lower_inclusive_power_two": -21,
+                "abs_upper_exclusive_power_two": -20
+              },
+              "accounting_closes": true
+            },
+            {
+              "row": 0,
+              "column": 1,
+              "within_word": {
+                "numerator": "-651591606586644257197135225075622406700510086531957481102084532189394609284450713003494121621866306239073773011",
+                "denominator": "57100724977403200204127774044877060621877299690751123029841400775966481311808452531678430755742187500000000000000",
+                "abs_lower_inclusive_power_two": -7,
+                "abs_upper_exclusive_power_two": -6
+              },
+              "carried": {
+                "numerator": "986412127496899168940348971246622566421285825802412700086869346100131189144367342013320097884830717910361937",
+                "denominator": "84971316930659524113285378042971816401603124539808218794406846392807263856857816267378617196044921875000000000",
+                "abs_lower_inclusive_power_two": -7,
+                "abs_upper_exclusive_power_two": -6
+              },
+              "total": {
+                "numerator": "66729840776757303732421796462177265885171529037064221043145966804103845092095507866609373708520332524789637",
+                "denominator": "337874112292326628426791562395722252200457394619829130354091128851872670484073683619398998554687500000000000000",
+                "abs_lower_inclusive_power_two": -13,
+                "abs_upper_exclusive_power_two": -12
+              },
+              "proposed_delta": {
+                "numerator": "-66729840776757303732421796462177265885171529037064221043145966804103845092095507866609373708520332524789637",
+                "denominator": "3503078796246842483528974918918848310814342267418388423511216823936215847578875951765928817015000000000000000000000",
+                "abs_lower_inclusive_power_two": -26,
+                "abs_upper_exclusive_power_two": -25
+              },
+              "applied_delta": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_before": {
+                "numerator": "-2813884182549255360546580658927804202936353136519535938844278270120836587300855737577",
+                "denominator": "4563435486790941629345122501233231323949660985021370246245491242236922864640000000000000000",
+                "abs_lower_inclusive_power_two": -21,
+                "abs_upper_exclusive_power_two": -20
+              },
+              "retained_remainder_after": {
+                "numerator": "-1888311013032953209616093368272670997661878039866903751587041766583150434784061303280600241538097911745453159051",
+                "denominator": "2970610819217322426032570731243183367570562242770793383137511866697911038746886807097507636828720000000000000000000000",
+                "abs_lower_inclusive_power_two": -21,
+                "abs_upper_exclusive_power_two": -20
+              },
+              "accounting_closes": true
+            },
+            {
+              "row": 1,
+              "column": 0,
+              "within_word": {
+                "numerator": "-651591606586644257197135225075622406700510086531957481102084532189394609284450713003494121621866306239073773011",
+                "denominator": "57100724977403200204127774044877060621877299690751123029841400775966481311808452531678430755742187500000000000000",
+                "abs_lower_inclusive_power_two": -7,
+                "abs_upper_exclusive_power_two": -6
+              },
+              "carried": {
+                "numerator": "986412127496899168940348971246622566421285825802412700086869346100131189144367342013320097884830717910361937",
+                "denominator": "84971316930659524113285378042971816401603124539808218794406846392807263856857816267378617196044921875000000000",
+                "abs_lower_inclusive_power_two": -7,
+                "abs_upper_exclusive_power_two": -6
+              },
+              "total": {
+                "numerator": "66729840776757303732421796462177265885171529037064221043145966804103845092095507866609373708520332524789637",
+                "denominator": "337874112292326628426791562395722252200457394619829130354091128851872670484073683619398998554687500000000000000",
+                "abs_lower_inclusive_power_two": -13,
+                "abs_upper_exclusive_power_two": -12
+              },
+              "proposed_delta": {
+                "numerator": "-66729840776757303732421796462177265885171529037064221043145966804103845092095507866609373708520332524789637",
+                "denominator": "3503078796246842483528974918918848310814342267418388423511216823936215847578875951765928817015000000000000000000000",
+                "abs_lower_inclusive_power_two": -26,
+                "abs_upper_exclusive_power_two": -25
+              },
+              "applied_delta": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_before": {
+                "numerator": "-2813884182549255360546580658927804202936353136519535938844278270120836587300855737577",
+                "denominator": "4563435486790941629345122501233231323949660985021370246245491242236922864640000000000000000",
+                "abs_lower_inclusive_power_two": -21,
+                "abs_upper_exclusive_power_two": -20
+              },
+              "retained_remainder_after": {
+                "numerator": "-1888311013032953209616093368272670997661878039866903751587041766583150434784061303280600241538097911745453159051",
+                "denominator": "2970610819217322426032570731243183367570562242770793383137511866697911038746886807097507636828720000000000000000000000",
+                "abs_lower_inclusive_power_two": -21,
+                "abs_upper_exclusive_power_two": -20
+              },
+              "accounting_closes": true
+            },
+            {
+              "row": 1,
+              "column": 1,
+              "within_word": {
+                "numerator": "113613397161631140598998929361142631106737369378702573107090106935584112729662599222628050582692420491566363471",
+                "denominator": "5710072497740320020412777404487706062187729969075112302984140077596648131180845253167843075574218750000000000000",
+                "abs_lower_inclusive_power_two": -6,
+                "abs_upper_exclusive_power_two": -5
+              },
+              "carried": {
+                "numerator": "-15162861680355712500438203047785784266928578298781729749687221378210311362881647179740898032688944932415435449",
+                "denominator": "951678749623386670068796234081284343697954994845852050497356679599441355196807542194640512595703125000000000000",
+                "abs_lower_inclusive_power_two": -6,
+                "abs_upper_exclusive_power_two": -5
+              },
+              "total": {
+                "numerator": "22636227079496865596369711074427925505165899586012194608966778666322244552372716144182662386558750897073750777",
+                "denominator": "5710072497740320020412777404487706062187729969075112302984140077596648131180845253167843075574218750000000000000",
+                "abs_lower_inclusive_power_two": -8,
+                "abs_upper_exclusive_power_two": -7
+              },
+              "proposed_delta": {
+                "numerator": "-22636227079496865596369711074427925505165899586012194608966778666322244552372716144182662386558750897073750777",
+                "denominator": "59202031656571637971639676129728536452762384319370764357339564324522047824083003584844197007553500000000000000000000",
+                "abs_lower_inclusive_power_two": -22,
+                "abs_upper_exclusive_power_two": -21
+              },
+              "applied_delta": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_before": {
+                "numerator": "-25141080151836278335954577620396996693014709330642923482245425647810526091959931597",
+                "denominator": "17551674949195929343635086543204735861344849942389885562482658623988164864000000000000000",
+                "abs_lower_inclusive_power_two": -20,
+                "abs_upper_exclusive_power_two": -19
+              },
+              "retained_remainder_after": {
+                "numerator": "-45553467277829192730517388376498901895655461220028672599390366791991443979304467603123818326753039945619459751323",
+                "denominator": "25101661422386374499975222679004899455971250951413204087511975273597348277411193519973939531202684000000000000000000000",
+                "abs_lower_inclusive_power_two": -20,
+                "abs_upper_exclusive_power_two": -19
+              },
+              "accounting_closes": true
+            }
+          ],
+          "max_abs_remainder_after": {
+            "numerator": "45553467277829192730517388376498901895655461220028672599390366791991443979304467603123818326753039945619459751323",
+            "denominator": "25101661422386374499975222679004899455971250951413204087511975273597348277411193519973939531202684000000000000000000000",
+            "abs_lower_inclusive_power_two": -20,
+            "abs_upper_exclusive_power_two": -19
+          },
+          "joint_admits_double_one_family_at_fixed_printed_bounds": false
+        },
+        {
+          "family": "D",
+          "step": {
+            "numerator": "1",
+            "denominator": "1024",
+            "abs_lower_inclusive_power_two": -10,
+            "abs_upper_exclusive_power_two": -9
+          },
+          "prepared_scale_inferred_four_matching_coordinates": {
+            "numerator": "39",
+            "denominator": "32",
+            "abs_lower_inclusive_power_two": 0,
+            "abs_upper_exclusive_power_two": 1
+          },
+          "scale_before": {
+            "numerator": "69",
+            "denominator": "64",
+            "abs_lower_inclusive_power_two": 0,
+            "abs_upper_exclusive_power_two": 1
+          },
+          "scale_applied_delta": {
+            "numerator": "9",
+            "denominator": "64",
+            "abs_lower_inclusive_power_two": -3,
+            "abs_upper_exclusive_power_two": -2
+          },
+          "scale_remainder_before": {
+            "numerator": "27953950748459913500861217215277731552119044262993320652570468983495793739371651",
+            "denominator": "18247510349389408636773397342646822035486237248120298910422859920593369140625000000",
+            "abs_lower_inclusive_power_two": -10,
+            "abs_upper_exclusive_power_two": -9
+          },
+          "scale_remainder_after": {
+            "numerator": "1010313861319104688623002006174464444869388647945805093779572990621893777110819031294155304262856814409",
+            "denominator": "196458983523126129208943600971331323428201173133391971053259322483039650877924664378270022583007812500000",
+            "abs_lower_inclusive_power_two": -8,
+            "abs_upper_exclusive_power_two": -7
+          },
+          "energy_plus_old_remainder_equals_scale_delta_plus_new_remainder": true,
+          "actual_reached_energy": {
+            "numerator": "885512392315209284931273630418526827350940317244465099867889469415605765756961344073212045717800103712",
+            "denominator": "6139343235097691537779487530354103857131286660418499095414353827594989089935145761820938205718994140625",
+            "abs_lower_inclusive_power_two": -3,
+            "abs_upper_exclusive_power_two": -2
+          },
+          "alignment": {
+            "numerator": "11448520865139172463",
+            "denominator": "75557863725914323419136",
+            "abs_lower_inclusive_power_two": -13,
+            "abs_upper_exclusive_power_two": -12
+          },
+          "curvature": {
+            "numerator": "4887143115986098414357663470935473514052739027652870574933142810228765212573694332831997343587619528851968203054736431470343483830954422521341401044655173418320453362584414942206805313916659403314076557724116852961727708364763952548425",
+            "denominator": "76837760618371864499500819786110617151689823931760683633478076830603891090184534283132438506698852455677410371343012722843322138925904195159681153934900724379926943458972473213009998309101949092865181314922285961569060910448966090358784",
+            "abs_lower_inclusive_power_two": -4,
+            "abs_upper_exclusive_power_two": -3
+          },
+          "covector": {
+            "numerator": "2598024730765000835",
+            "denominator": "2305843009213693952",
+            "abs_lower_inclusive_power_two": 0,
+            "abs_upper_exclusive_power_two": 1
+          },
+          "gain": {
+            "numerator": "1890551305588138597506377571340551834141814384903230149521655889901846498975037840140638327644825362300277921116750713651704792393021",
+            "denominator": "294454889018268523461101066040223502120867827492239809554297609332681955188181477024341214223563342648565476355976443797444755456",
+            "abs_lower_inclusive_power_two": 12,
+            "abs_upper_exclusive_power_two": 13
+          },
+          "moves": {
+            "numerator": "23265323672446779165283851889581456008323374684211642134810336257753260768647569609308928795956738724325",
+            "denominator": "1174271291386916613944740298394668513687841274454159935353645485766104512557304221731849499192384351515967488",
+            "abs_lower_inclusive_power_two": -16,
+            "abs_upper_exclusive_power_two": -15
+          },
+          "bound": {
+            "numerator": "3063691515",
+            "denominator": "8589934592",
+            "abs_lower_inclusive_power_two": -2,
+            "abs_upper_exclusive_power_two": -1
+          },
+          "own_curvature_admits_double_at_printed_ray": true,
+          "covector_admits_double": true,
+          "coordinates": [
+            {
+              "row": 0,
+              "column": 0,
+              "within_word": {
+                "numerator": "-814259795143806676395174761887070640731384851003699717425430341576087727924664362395786996838284022327055393",
+                "denominator": "396532812343077779195331764200535143207481247852438354373898616499767231332003142581100213581542968750000000000",
+                "abs_lower_inclusive_power_two": -9,
+                "abs_upper_exclusive_power_two": -8
+              },
+              "carried": {
+                "numerator": "3360164118699486526618978226698807952493745621114709195660310780747227185225000675920578027653911847092937",
+                "denominator": "815911136508390492171464535392047619768479933852753815584153531892525167349800704899383155517578125000000000",
+                "abs_lower_inclusive_power_two": -8,
+                "abs_upper_exclusive_power_two": -7
+              },
+              "total": {
+                "numerator": "116968566649163396505949808041221432025796502979721278809354385409580669156383709443087703514502447908587427",
+                "denominator": "56647544620439682742190252028647877601068749693205479196271230928538175904571877511585744797363281250000000000",
+                "abs_lower_inclusive_power_two": -9,
+                "abs_upper_exclusive_power_two": -8
+              },
+              "proposed_delta": {
+                "numerator": "-116968566649163396505949808041221432025796502979721278809354385409580669156383709443087703514502447908587427",
+                "denominator": "70696135686308724062253434531752551246133799617120438036946496198815643528905703134459009507109375000000000000000",
+                "abs_lower_inclusive_power_two": -20,
+                "abs_upper_exclusive_power_two": -19
+              },
+              "applied_delta": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_before": {
+                "numerator": "-377548757139269448904663080834374388586620792818081271516530430472204704743059253",
+                "denominator": "32744027714195760168631394606782320196554046450874611804821272140938288000000000000000",
+                "abs_lower_inclusive_power_two": -17,
+                "abs_upper_exclusive_power_two": -16
+              },
+              "retained_remainder_after": {
+                "numerator": "-343019002842026500496242497108119523029137395604843877747964860368552852533361468639220100742798816905907282511",
+                "denominator": "26016177932561610454909263907684938858577238259100321197596310601164156818637298753480915498616250000000000000000000",
+                "abs_lower_inclusive_power_two": -17,
+                "abs_upper_exclusive_power_two": -16
+              },
+              "accounting_closes": true
+            },
+            {
+              "row": 0,
+              "column": 1,
+              "within_word": {
+                "numerator": "4717701965794515306069852464133988526400335793744218832415294370687571902809346735212536838586468275278805787",
+                "denominator": "4078623212671657157437698146062647187276949977910794502131528626854748665129175180834173625410156250000000000000",
+                "abs_lower_inclusive_power_two": -10,
+                "abs_upper_exclusive_power_two": -9
+              },
+              "carried": {
+                "numerator": "-88569295804260444052889300963935044248892286284922884774358441360845874151159383743491135123198935120074197",
+                "denominator": "366030288316687180795690859262032439883828844171481557883598722922862059691079823921015581767578125000000000000",
+                "abs_lower_inclusive_power_two": -13,
+                "abs_upper_exclusive_power_two": -12
+              },
+              "total": {
+                "numerator": "26115508687829292506363601773750986233388752225985546814507102168667025135874995214495449330495760987585853143",
+                "denominator": "28550362488701600102063887022438530310938649845375561514920700387983240655904226265839215377871093750000000000000",
+                "abs_lower_inclusive_power_two": -11,
+                "abs_upper_exclusive_power_two": -10
+              },
+              "proposed_delta": {
+                "numerator": "-26115508687829292506363601773750986233388752225985546814507102168667025135874995214495449330495760987585853143",
+                "denominator": "35630852385899596927375731004003285828051435007028700770621034084203084338568474379767340791583125000000000000000000",
+                "abs_lower_inclusive_power_two": -21,
+                "abs_upper_exclusive_power_two": -20
+              },
+              "applied_delta": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_before": {
+                "numerator": "-1303873169063289535610620406277329956885623803980475819567803660239990455568077604307",
+                "denominator": "185658637139489960156140007420455755514461443376459048933336613039120092960000000000000000",
+                "abs_lower_inclusive_power_two": -18,
+                "abs_upper_exclusive_power_two": -17
+              },
+              "retained_remainder_after": {
+                "numerator": "-25424159264462681077959784314425330830623916501189691495533930536873293607835803729660541660429363152878604317281",
+                "denominator": "3278038419502762917318567252368302296180732020646640470897135135746683759148299642938595352825647500000000000000000000",
+                "abs_lower_inclusive_power_two": -17,
+                "abs_upper_exclusive_power_two": -16
+              },
+              "accounting_closes": true
+            },
+            {
+              "row": 1,
+              "column": 0,
+              "within_word": {
+                "numerator": "4717701965794515306069852464133988526400335793744218832415294370687571902809346735212536838586468275278805787",
+                "denominator": "4078623212671657157437698146062647187276949977910794502131528626854748665129175180834173625410156250000000000000",
+                "abs_lower_inclusive_power_two": -10,
+                "abs_upper_exclusive_power_two": -9
+              },
+              "carried": {
+                "numerator": "-88569295804260444052889300963935044248892286284922884774358441360845874151159383743491135123198935120074197",
+                "denominator": "366030288316687180795690859262032439883828844171481557883598722922862059691079823921015581767578125000000000000",
+                "abs_lower_inclusive_power_two": -13,
+                "abs_upper_exclusive_power_two": -12
+              },
+              "total": {
+                "numerator": "26115508687829292506363601773750986233388752225985546814507102168667025135874995214495449330495760987585853143",
+                "denominator": "28550362488701600102063887022438530310938649845375561514920700387983240655904226265839215377871093750000000000000",
+                "abs_lower_inclusive_power_two": -11,
+                "abs_upper_exclusive_power_two": -10
+              },
+              "proposed_delta": {
+                "numerator": "-26115508687829292506363601773750986233388752225985546814507102168667025135874995214495449330495760987585853143",
+                "denominator": "35630852385899596927375731004003285828051435007028700770621034084203084338568474379767340791583125000000000000000000",
+                "abs_lower_inclusive_power_two": -21,
+                "abs_upper_exclusive_power_two": -20
+              },
+              "applied_delta": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_before": {
+                "numerator": "-1303873169063289535610620406277329956885623803980475819567803660239990455568077604307",
+                "denominator": "185658637139489960156140007420455755514461443376459048933336613039120092960000000000000000",
+                "abs_lower_inclusive_power_two": -18,
+                "abs_upper_exclusive_power_two": -17
+              },
+              "retained_remainder_after": {
+                "numerator": "-25424159264462681077959784314425330830623916501189691495533930536873293607835803729660541660429363152878604317281",
+                "denominator": "3278038419502762917318567252368302296180732020646640470897135135746683759148299642938595352825647500000000000000000000",
+                "abs_lower_inclusive_power_two": -17,
+                "abs_upper_exclusive_power_two": -16
+              },
+              "accounting_closes": true
+            },
+            {
+              "row": 1,
+              "column": 1,
+              "within_word": {
+                "numerator": "25732283485818038457019824961305701512285601099604891958253845134739104116139910132382274464117617706170513721",
+                "denominator": "2855036248870160010206388702243853031093864984537556151492070038798324065590422626583921537787109375000000000000",
+                "abs_lower_inclusive_power_two": -7,
+                "abs_upper_exclusive_power_two": -6
+              },
+              "carried": {
+                "numerator": "8096648836769889206553016844132402187856388306379332285778371119048660644364108145401505589262935186668641",
+                "denominator": "1858747557858177089978117644690008483785068349308304786127649764842658896868764730848907251163482666015625000",
+                "abs_lower_inclusive_power_two": -8,
+                "abs_upper_exclusive_power_two": -7
+              },
+              "total": {
+                "numerator": "5452676585585226896897894119127581610404716219743363764172774739085406695126168606245569578460783736127649471",
+                "denominator": "407862321267165715743769814606264718727694997791079450213152862685474866512917518083417362541015625000000000000",
+                "abs_lower_inclusive_power_two": -7,
+                "abs_upper_exclusive_power_two": -6
+              },
+              "proposed_delta": {
+                "numerator": "-5452676585585226896897894119127581610404716219743363764172774739085406695126168606245569578460783736127649471",
+                "denominator": "509012176941422813248224728628618368972163357243267153866014772631472633408121062568104868451187500000000000000000",
+                "abs_lower_inclusive_power_two": -17,
+                "abs_upper_exclusive_power_two": -16
+              },
+              "applied_delta": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_before": {
+                "numerator": "-8072710806028382505431595131605995079529823882127008961151294103806929801582249687",
+                "denominator": "714071681305730615985153874694060598132544012986380957435910050150461896000000000000000",
+                "abs_lower_inclusive_power_two": -17,
+                "abs_upper_exclusive_power_two": -16
+              },
+              "retained_remainder_after": {
+                "numerator": "-515529002757470048116330087448701707526722525811532673099006871684518146785738820072859975292122517446824797541",
+                "denominator": "23414560139305449409418337516916444972719514433190289077836679541047741136773568878132823948754625000000000000000000",
+                "abs_lower_inclusive_power_two": -16,
+                "abs_upper_exclusive_power_two": -15
+              },
+              "accounting_closes": true
+            }
+          ],
+          "max_abs_remainder_after": {
+            "numerator": "515529002757470048116330087448701707526722525811532673099006871684518146785738820072859975292122517446824797541",
+            "denominator": "23414560139305449409418337516916444972719514433190289077836679541047741136773568878132823948754625000000000000000000",
+            "abs_lower_inclusive_power_two": -16,
+            "abs_upper_exclusive_power_two": -15
+          },
+          "joint_admits_double_one_family_at_fixed_printed_bounds": false
+        }
+      ]
+    },
+    {
+      "credit_line": 76,
+      "publication_line": 77,
+      "role": "contact observation 3",
+      "all_twelve_reached_nonzero": true,
+      "all_twelve_delayed_nonzero": true,
+      "each_within_plus_carried_equals_total": true,
+      "zero_actual_factor_linear_quadratic_form_movements": true,
+      "deposition_work": {
+        "numerator": "0",
+        "denominator": "1",
+        "zero": true
+      },
+      "loaded_gamma": [
+        {
+          "numerator": "14765495337324654955391667903359552256004022463668452122108240014967048607214503120068025635405504210675260820985",
+          "denominator": "1995303939828655219058128263177233101196492075123034841534685739874632900033430371992843162348697633215741952",
+          "abs_lower_inclusive_power_two": 12,
+          "abs_upper_exclusive_power_two": 13
+        },
+        {
+          "numerator": "14765495337324654955391667903359552256004022463668452122108240014967048607214503120068025635405504210675260820985",
+          "denominator": "1995303939828655219058128263177233101196492075123034841534685739874632900033430371992843162348697633215741952",
+          "abs_lower_inclusive_power_two": 12,
+          "abs_upper_exclusive_power_two": 13
+        }
+      ],
+      "loaded_gain_parts": [
+        {
+          "numerator": "1",
+          "denominator": "2",
+          "abs_lower_inclusive_power_two": -1,
+          "abs_upper_exclusive_power_two": 0
+        },
+        {
+          "numerator": "13",
+          "denominator": "4",
+          "abs_lower_inclusive_power_two": 1,
+          "abs_upper_exclusive_power_two": 2
+        },
+        {
+          "numerator": "14767490641264483610610726031622729489105218955743575156949774700706923240114536550440018478567852908308476562937",
+          "denominator": "1995303939828655219058128263177233101196492075123034841534685739874632900033430371992843162348697633215741952",
+          "abs_lower_inclusive_power_two": 12,
+          "abs_upper_exclusive_power_two": 13
+        }
+      ],
+      "joint_curvature": {
+        "numerator": "1238017267805831898025",
+        "denominator": "9903520314283042199192993792",
+        "abs_lower_inclusive_power_two": -23,
+        "abs_upper_exclusive_power_two": -22
+      },
+      "joint_decrease": {
+        "numerator": "44282288837231499235",
+        "denominator": "309485009821345068724781056",
+        "abs_lower_inclusive_power_two": -23,
+        "abs_upper_exclusive_power_two": -22
+      },
+      "joint_holds": true,
+      "no_released_covectors": true,
+      "families": [
+        {
+          "family": "C",
+          "step": {
+            "numerator": "1",
+            "denominator": "32768",
+            "abs_lower_inclusive_power_two": -15,
+            "abs_upper_exclusive_power_two": -14
+          },
+          "prepared_scale_inferred_four_matching_coordinates": {
+            "numerator": "143",
+            "denominator": "64",
+            "abs_lower_inclusive_power_two": 1,
+            "abs_upper_exclusive_power_two": 2
+          },
+          "scale_before": {
+            "numerator": "107",
+            "denominator": "64",
+            "abs_lower_inclusive_power_two": 0,
+            "abs_upper_exclusive_power_two": 1
+          },
+          "scale_applied_delta": {
+            "numerator": "9",
+            "denominator": "16",
+            "abs_lower_inclusive_power_two": -1,
+            "abs_upper_exclusive_power_two": 0
+          },
+          "scale_remainder_before": {
+            "numerator": "140871203845457359407372726424389394362543508416911762087105211063216736203454604585389280841506404153",
+            "denominator": "30224459003557866032145169380204818988954026635906457085116818843544561673526871442810772705078125000000",
+            "abs_lower_inclusive_power_two": -8,
+            "abs_upper_exclusive_power_two": -7
+          },
+          "scale_remainder_after": {
+            "numerator": "-21947572655519628001880983891228440457075423740550897378230634953312393341816034129565437357434723893816561919853714670335284269689338399",
+            "denominator": "26846426423212591054596396468857122498021246894876355775631084681810292367094493247561779908584549023861429354429895708560943603515625000000",
+            "abs_lower_inclusive_power_two": -11,
+            "abs_upper_exclusive_power_two": -10
+          },
+          "energy_plus_old_remainder_equals_scale_delta_plus_new_remainder": true,
+          "actual_reached_energy": {
+            "numerator": "233656883400575228349869304691840510274423700396115321620678961604347856759632018019058726002971034545085180925765070913259425160223597984",
+            "denominator": "419475412862696735228068694825892539031581982732443058994235698153285818235851456993152811071633578497834833662967120446264743804931640625",
+            "abs_lower_inclusive_power_two": -1,
+            "abs_upper_exclusive_power_two": 0
+          },
+          "alignment": {
+            "numerator": "9484405842370024913",
+            "denominator": "9444732965739290427392",
+            "abs_lower_inclusive_power_two": -10,
+            "abs_upper_exclusive_power_two": -9
+          },
+          "curvature": {
+            "numerator": "437953315299871209707171025831525594088871565188921460174700252496652046889274833751503183066642134367657923704500256988089828422765520147040226341811934580404041193555149551545665709263418826989464817174540099615922207843773852477101675",
+            "denominator": "28226116145524358387571729717346757321028914913708006232706232305119796727006563614211916186134272330657007891513759775738363234707475010466821648384249245690585407801255194241513876929874185381052515585073492802209042783430232441356288",
+            "abs_lower_inclusive_power_two": 3,
+            "abs_upper_exclusive_power_two": 4
+          },
+          "covector": {
+            "numerator": "1371706097117379637",
+            "denominator": "1152921504606846976",
+            "abs_lower_inclusive_power_two": 0,
+            "abs_upper_exclusive_power_two": 1
+          },
+          "gain": {
+            "numerator": "1890551465229642855770097641943426907151924563571195928817345023848531607753228229626890253116080552624871505538490421425026325344909",
+            "denominator": "294454889018268523461101066040223502120867827492239809554297609332681955188181477024341214223563342648565476355976443797444755456",
+            "abs_lower_inclusive_power_two": 12,
+            "abs_upper_exclusive_power_two": 13
+          },
+          "moves": {
+            "numerator": "11351033200826937337816556140673000326494925227106529857691052671886798568980017499369950377959379849147175",
+            "denominator": "2348542582773833227889480596789337027375682548908319870707290971532209025114608443463698998384768703031934976",
+            "abs_lower_inclusive_power_two": -8,
+            "abs_upper_exclusive_power_two": -7
+          },
+          "bound": {
+            "numerator": "2990702537",
+            "denominator": "536870912",
+            "abs_lower_inclusive_power_two": 2,
+            "abs_upper_exclusive_power_two": 3
+          },
+          "own_curvature_admits_double_at_printed_ray": true,
+          "covector_admits_double": true,
+          "coordinates": [
+            {
+              "row": 0,
+              "column": 0,
+              "within_word": {
+                "numerator": "-1677710763368583632640828766388916032161586065984414682257316594076275466784020634470306695060108438356559381406201042508603407054465439573",
+                "denominator": "109090240703847989047248849143292434277673638176005509183516788548308489618669686847235169152343564287436919281492909545898437500000000000000",
+                "abs_lower_inclusive_power_two": -7,
+                "abs_upper_exclusive_power_two": -6
+              },
+              "carried": {
+                "numerator": "-63165697284139364734811728822470839675371673899096253401802815991083348837569909659856549358014286494691929922686934674546407698397168189",
+                "denominator": "2181804814076959780944976982865848685553472763520110183670335770966169792373393736944703383046871285748738385629858190917968750000000000000",
+                "abs_lower_inclusive_power_two": -6,
+                "abs_upper_exclusive_power_two": -5
+              },
+              "total": {
+                "numerator": "-4835995627575551869381415207512458015930169760939227352347457393630442908662516117463134162960822763091155877540547776235923791974323849023",
+                "denominator": "109090240703847989047248849143292434277673638176005509183516788548308489618669686847235169152343564287436919281492909545898437500000000000000",
+                "abs_lower_inclusive_power_two": -5,
+                "abs_upper_exclusive_power_two": -4
+              },
+              "proposed_delta": {
+                "numerator": "4835995627575551869381415207512458015930169760939227352347457393630442908662516117463134162960822763091155877540547776235923791974323849023",
+                "denominator": "7987151063372934366083371738875298868074153092694419360380365190352954375920519792207170144657986402868981482113784865312500000000000000000000000",
+                "abs_lower_inclusive_power_two": -21,
+                "abs_upper_exclusive_power_two": -20
+              },
+              "applied_delta": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_before": {
+                "numerator": "34764646439282182045101770907080461997618714307531149052972128871217186148051970009459887811539290681039644899",
+                "denominator": "28373751629587817868325949870970928699400689217760630603780782767442609634341172458008808621520000000000000000000000",
+                "abs_lower_inclusive_power_two": -20,
+                "abs_upper_exclusive_power_two": -19
+              },
+              "retained_remainder_after": {
+                "numerator": "6258288786070126197836314347521797329630337261552289843574723583363276214723237007522123730032894039714009060904053792709581369513768307272469",
+                "denominator": "3418500655123615908683683104238627915535737523673211486242796301471064472893982471064668821913618180427924074344699922353750000000000000000000000000",
+                "abs_lower_inclusive_power_two": -20,
+                "abs_upper_exclusive_power_two": -19
+              },
+              "accounting_closes": true
+            },
+            {
+              "row": 0,
+              "column": 1,
+              "within_word": {
+                "numerator": "25590395114105713165113565104372453175519650166042981132096451159212762418308596281096695006596078912536820809330649904644799932131356935337",
+                "denominator": "4948333318326544783183207797139744818835276227663609896564321528551273089102856995390587272750304076078138658608518377001953125000000000000000",
+                "abs_lower_inclusive_power_two": -8,
+                "abs_upper_exclusive_power_two": -7
+              },
+              "carried": {
+                "numerator": "-117451824760105496216451415742761709246454731029586891285259805516834100637734672931229468086599012444035749237356288268333542547788341871",
+                "denominator": "9123033403994367225632757738089500034725804254542053644108262405146152450410872041649312818492448517843175993009805267333984375000000000000",
+                "abs_lower_inclusive_power_two": -7,
+                "abs_upper_exclusive_power_two": -6
+              },
+              "total": {
+                "numerator": "-190577373178877539913448413972507489598786979722024743505142336765590268837993451584010842417876127185540847885057004260496567728945198477467",
+                "denominator": "24741666591632723915916038985698724094176381138318049482821607642756365445514284976952936363751520380390693293042591885009765625000000000000000",
+                "abs_lower_inclusive_power_two": -8,
+                "abs_upper_exclusive_power_two": -7
+              },
+              "proposed_delta": {
+                "numerator": "190577373178877539913448413972507489598786979722024743505142336765590268837993451584010842417876127185540847885057004260496567728945198477467",
+                "denominator": "1811485861172981514227708710376917783279217921423094310934266825172050052458773888872586188808431316170685000143406407452875000000000000000000000000",
+                "abs_lower_inclusive_power_two": -24,
+                "abs_upper_exclusive_power_two": -23
+              },
+              "applied_delta": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_before": {
+                "numerator": "86746561704489962446726446703104246134720958394027218827436703542196096316532462591240677115735790591416250609",
+                "denominator": "3575092705328065051409069683742337016124486841437839456076378628697768813926987729709109886311520000000000000000000000",
+                "abs_lower_inclusive_power_two": -26,
+                "abs_upper_exclusive_power_two": -25
+              },
+              "retained_remainder_after": {
+                "numerator": "100379492997913315733172416212930519904886153276044720922428281609305602973628772318211043973479106001802169449475565884669192460843019885440251",
+                "denominator": "775315948582036088089459328041320811243505270369084365079866201173637422452355224437466888810008603321053180061377942389830500000000000000000000000000",
+                "abs_lower_inclusive_power_two": -23,
+                "abs_upper_exclusive_power_two": -22
+              },
+              "accounting_closes": true
+            },
+            {
+              "row": 1,
+              "column": 0,
+              "within_word": {
+                "numerator": "25590395114105713165113565104372453175519650166042981132096451159212762418308596281096695006596078912536820809330649904644799932131356935337",
+                "denominator": "4948333318326544783183207797139744818835276227663609896564321528551273089102856995390587272750304076078138658608518377001953125000000000000000",
+                "abs_lower_inclusive_power_two": -8,
+                "abs_upper_exclusive_power_two": -7
+              },
+              "carried": {
+                "numerator": "-117451824760105496216451415742761709246454731029586891285259805516834100637734672931229468086599012444035749237356288268333542547788341871",
+                "denominator": "9123033403994367225632757738089500034725804254542053644108262405146152450410872041649312818492448517843175993009805267333984375000000000000",
+                "abs_lower_inclusive_power_two": -7,
+                "abs_upper_exclusive_power_two": -6
+              },
+              "total": {
+                "numerator": "-190577373178877539913448413972507489598786979722024743505142336765590268837993451584010842417876127185540847885057004260496567728945198477467",
+                "denominator": "24741666591632723915916038985698724094176381138318049482821607642756365445514284976952936363751520380390693293042591885009765625000000000000000",
+                "abs_lower_inclusive_power_two": -8,
+                "abs_upper_exclusive_power_two": -7
+              },
+              "proposed_delta": {
+                "numerator": "190577373178877539913448413972507489598786979722024743505142336765590268837993451584010842417876127185540847885057004260496567728945198477467",
+                "denominator": "1811485861172981514227708710376917783279217921423094310934266825172050052458773888872586188808431316170685000143406407452875000000000000000000000000",
+                "abs_lower_inclusive_power_two": -24,
+                "abs_upper_exclusive_power_two": -23
+              },
+              "applied_delta": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_before": {
+                "numerator": "86746561704489962446726446703104246134720958394027218827436703542196096316532462591240677115735790591416250609",
+                "denominator": "3575092705328065051409069683742337016124486841437839456076378628697768813926987729709109886311520000000000000000000000",
+                "abs_lower_inclusive_power_two": -26,
+                "abs_upper_exclusive_power_two": -25
+              },
+              "retained_remainder_after": {
+                "numerator": "100379492997913315733172416212930519904886153276044720922428281609305602973628772318211043973479106001802169449475565884669192460843019885440251",
+                "denominator": "775315948582036088089459328041320811243505270369084365079866201173637422452355224437466888810008603321053180061377942389830500000000000000000000000000",
+                "abs_lower_inclusive_power_two": -23,
+                "abs_upper_exclusive_power_two": -22
+              },
+              "accounting_closes": true
+            },
+            {
+              "row": 1,
+              "column": 1,
+              "within_word": {
+                "numerator": "-527371137647734680276236925207650889374675444913005852262751829964501994705323286474292951642999018760984453158568273262649736869874548141",
+                "denominator": "109800295524997295484834492540083095092498732862358207764001217349510497539264578300086995697122131865639171418828070495605468750000000000000",
+                "abs_lower_inclusive_power_two": -8,
+                "abs_upper_exclusive_power_two": -7
+              },
+              "carried": {
+                "numerator": "-559775866820513700022451670746389975385274095902772983599013294631500154139235102463175824551551225483558491549750549043413443328573330021",
+                "denominator": "71370192091248242065142420151054011810124176360532835046600791277181823400521975895056547203129385712665461422238245822143554687500000000000",
+                "abs_lower_inclusive_power_two": -7,
+                "abs_upper_exclusive_power_two": -6
+              },
+              "total": {
+                "numerator": "-6017114041943608281346704480875753689858754233974845250465346560722843004651301591143108287463337251187989240685466177760905148626611908751",
+                "denominator": "475801280608321613767616134340360078734161175736885566977338608514545489336813172633710314687529238084436409481588305480957031250000000000000",
+                "abs_lower_inclusive_power_two": -7,
+                "abs_upper_exclusive_power_two": -6
+              },
+              "proposed_delta": {
+                "numerator": "6017114041943608281346704480875753689858754233974845250465346560722843004651301591143108287463337251187989240685466177760905148626611908751",
+                "denominator": "34836266561018875273609782891863803524600344642751813671812823561000962547284113247549734400162140695590096156603969374093750000000000000000000000",
+                "abs_lower_inclusive_power_two": -23,
+                "abs_upper_exclusive_power_two": -22
+              },
+              "applied_delta": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_before": {
+                "numerator": "504823639401516863532327309512865367994887447554673296631924867957713702850493805159761775391754601908014816031",
+                "denominator": "1251282446864822767993174389309817955643570394503243809626732520044219084874445705398188460209032000000000000000000000",
+                "abs_lower_inclusive_power_two": -22,
+                "abs_upper_exclusive_power_two": -21
+              },
+              "retained_remainder_after": {
+                "numerator": "8590658238927040191948880789129360516055923262946194132379667097920097226625343465346010128353661626845685897382596161128637997175575209179803",
+                "denominator": "14909922088116078617104987077717707908528947507097776251535888484108411970237600469951286323269396217712561155026498892112125000000000000000000000000",
+                "abs_lower_inclusive_power_two": -21,
+                "abs_upper_exclusive_power_two": -20
+              },
+              "accounting_closes": true
+            }
+          ],
+          "max_abs_remainder_after": {
+            "numerator": "6258288786070126197836314347521797329630337261552289843574723583363276214723237007522123730032894039714009060904053792709581369513768307272469",
+            "denominator": "3418500655123615908683683104238627915535737523673211486242796301471064472893982471064668821913618180427924074344699922353750000000000000000000000000",
+            "abs_lower_inclusive_power_two": -20,
+            "abs_upper_exclusive_power_two": -19
+          },
+          "joint_admits_double_one_family_at_fixed_printed_bounds": false
+        },
+        {
+          "family": "K",
+          "step": {
+            "numerator": "1",
+            "denominator": "4096",
+            "abs_lower_inclusive_power_two": -12,
+            "abs_upper_exclusive_power_two": -11
+          },
+          "prepared_scale_inferred_four_matching_coordinates": {
+            "numerator": "237",
+            "denominator": "64",
+            "abs_lower_inclusive_power_two": 1,
+            "abs_upper_exclusive_power_two": 2
+          },
+          "scale_before": {
+            "numerator": "81",
+            "denominator": "32",
+            "abs_lower_inclusive_power_two": 1,
+            "abs_upper_exclusive_power_two": 2
+          },
+          "scale_applied_delta": {
+            "numerator": "75",
+            "denominator": "64",
+            "abs_lower_inclusive_power_two": 0,
+            "abs_upper_exclusive_power_two": 1
+          },
+          "scale_remainder_before": {
+            "numerator": "1287648923428598907809811558761151921087169505046058504449693340403879042384224053203694373920100103423",
+            "denominator": "196458983523126129208943600971331323428201173133391971053259322483039650877924664378270022583007812500000",
+            "abs_lower_inclusive_power_two": -8,
+            "abs_upper_exclusive_power_two": -7
+          },
+          "scale_remainder_after": {
+            "numerator": "-185988476252639578029301590178463613820486101739902456241195597977638882947884044547405432757522051570081721361207951731728723919764964381",
+            "denominator": "26846426423212591054596396468857122498021246894876355775631084681810292367094493247561779908584549023861429354429895708560943603515625000000",
+            "abs_lower_inclusive_power_two": -8,
+            "abs_upper_exclusive_power_two": -7
+          },
+          "energy_plus_old_remainder_equals_scale_delta_plus_new_remainder": true,
+          "actual_reached_energy": {
+            "numerator": "485917316489406675609105265282864025225742968237432996366746948240027004776664973895716149508402917445393309465145492688155517308828263496",
+            "denominator": "419475412862696735228068694825892539031581982732443058994235698153285818235851456993152811071633578497834833662967120446264743804931640625",
+            "abs_lower_inclusive_power_two": 0,
+            "abs_upper_exclusive_power_two": 1
+          },
+          "alignment": {
+            "numerator": "2546568820595845079",
+            "denominator": "37778931862957161709568",
+            "abs_lower_inclusive_power_two": -14,
+            "abs_upper_exclusive_power_two": -13
+          },
+          "curvature": {
+            "numerator": "133151731223781299393069319350364292471667343910446226259215239370764311662674125736260004163102050240632623916379705395938005150459047506493756207198389956324700136541594038009355005084070748030233204028599421447714985168138877128957525",
+            "denominator": "1639205559858599775989350822103693165902716243877561250847532305719549676590603398040158688142908852387784754588650938087324205630419289496739864617277882120105108127124746095210879963927508247314457201385008767180139966089577943260987392",
+            "abs_lower_inclusive_power_two": -4,
+            "abs_upper_exclusive_power_two": -3
+          },
+          "covector": {
+            "numerator": "1371706097117379637",
+            "denominator": "1152921504606846976",
+            "abs_lower_inclusive_power_two": 0,
+            "abs_upper_exclusive_power_two": 1
+          },
+          "gain": {
+            "numerator": "1890551465229642855770097641943426907151924563571195928817345023848531607753228229626890253116080552624871505538490421425026325344909",
+            "denominator": "294454889018268523461101066040223502120867827492239809554297609332681955188181477024341214223563342648565476355976443797444755456",
+            "abs_lower_inclusive_power_two": 12,
+            "abs_upper_exclusive_power_two": 13
+          },
+          "moves": {
+            "numerator": "1901612735311282998850920885953210295458240120041494555634497494586098264221728026541832808269198119165075",
+            "denominator": "75153362648762663292463379097258784876021841565066235862633311089030688803667470190838367948312598497021919232",
+            "abs_lower_inclusive_power_two": -16,
+            "abs_upper_exclusive_power_two": -15
+          },
+          "bound": {
+            "numerator": "6924549911",
+            "denominator": "17179869184",
+            "abs_lower_inclusive_power_two": -2,
+            "abs_upper_exclusive_power_two": -1
+          },
+          "own_curvature_admits_double_at_printed_ray": true,
+          "covector_admits_double": true,
+          "coordinates": [
+            {
+              "row": 0,
+              "column": 0,
+              "within_word": {
+                "numerator": "-1910994088488670330769517851794098238558344639260321160699026169684693522623535648152349087088926843026948265887943166905878728653418868953",
+                "denominator": "872721925630783912377990793146339474221389105408044073468134308386467916949357494777881353218748514299495354251943276367187500000000000000000",
+                "abs_lower_inclusive_power_two": -9,
+                "abs_upper_exclusive_power_two": -8
+              },
+              "carried": {
+                "numerator": "1034621468268192534979686269200039282909900971177028254295421293746287721841600338226595848247811974540469800576971769927715802396512480281",
+                "denominator": "87272192563078391237799079314633947422138910540804407346813430838646791694935749477788135321874851429949535425194327636718750000000000000000",
+                "abs_lower_inclusive_power_two": -7,
+                "abs_upper_exclusive_power_two": -6
+              },
+              "total": {
+                "numerator": "24592479866452638539438323149289488602159373389241869919111331684484500570823521090710231473437880181859328687701966566680114563590979399",
+                "denominator": "2544378791926483709556824469814400799479268528886425870169487779552384597519992696145426685768946105829432519684965820312500000000000000000",
+                "abs_lower_inclusive_power_two": -7,
+                "abs_upper_exclusive_power_two": -6
+              },
+              "proposed_delta": {
+                "numerator": "-24592479866452638539438323149289488602159373389241869919111331684484500570823521090710231473437880181859328687701966566680114563590979399",
+                "denominator": "38593137515940904906557913558144831326501545046149307598730790640250569575183249215133831969743374533220832458581561562500000000000000000000000",
+                "abs_lower_inclusive_power_two": -21,
+                "abs_upper_exclusive_power_two": -20
+              },
+              "applied_delta": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_before": {
+                "numerator": "-1915967934683996908002946736312827056307952058998553334809092703048555737915329500167184046054515883136118854069",
+                "denominator": "3984390701966091190472257568096015786662103325621143505954281789459896551970030717456180877968680000000000000000000000",
+                "abs_lower_inclusive_power_two": -21,
+                "abs_upper_exclusive_power_two": -20
+              },
+              "retained_remainder_after": {
+                "numerator": "-4573974578685291936149367887234274334986692476746616540721300094525432647815728847000633596513514389619096918825848576204876535917628769419",
+                "denominator": "4090872576689735920095138837163352120609163774891826605465463807866560374969424416804186188792797700521408240609645525625000000000000000000000000",
+                "abs_lower_inclusive_power_two": -20,
+                "abs_upper_exclusive_power_two": -19
+              },
+              "accounting_closes": true
+            },
+            {
+              "row": 0,
+              "column": 1,
+              "within_word": {
+                "numerator": "2084537881336674136937295670506488140273155479767210726171160930285561939316967746244417562003308367744964896888349235556885374290537109913741",
+                "denominator": "197933332733061791327328311885589792753411049106544395862572861142050923564114279815623490910012163043125546344340735080078125000000000000000000",
+                "abs_lower_inclusive_power_two": -7,
+                "abs_upper_exclusive_power_two": -6
+              },
+              "carried": {
+                "numerator": "-11916215660203055941416596589747768436477084610413160844518302048834533273675782674018133783493042033838553624407031916810913009654238015213",
+                "denominator": "4123611098605453985986006497616454015696063523053008247136934607126060907585714162825489393958586730065115548840431980834960937500000000000000",
+                "abs_lower_inclusive_power_two": -9,
+                "abs_upper_exclusive_power_two": -8
+              },
+              "total": {
+                "numerator": "52157225160238877646527552903399836390422600636806172608078704549707046282087247513501625530884218969679804238510748398274536200935644316673",
+                "denominator": "6825287335622820390597527996054820439772794796777392960778374522139687019452216545366327272759040104935363667046232244140625000000000000000000",
+                "abs_lower_inclusive_power_two": -8,
+                "abs_upper_exclusive_power_two": -7
+              },
+              "proposed_delta": {
+                "numerator": "-52157225160238877646527552903399836390422600636806172608078704549707046282087247513501625530884218969679804238510748398274536200935644316673",
+                "denominator": "103525958306726939684583304644159516430473751477519496429086384751814772711051220560116452073209120311659596101757250679125000000000000000000000000",
+                "abs_lower_inclusive_power_two": -21,
+                "abs_upper_exclusive_power_two": -20
+              },
+              "applied_delta": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_before": {
+                "numerator": "-1888311013032953209616093368272670997661878039866903751587041766583150434784061303280600241538097911745453159051",
+                "denominator": "2970610819217322426032570731243183367570562242770793383137511866697911038746886807097507636828720000000000000000000000",
+                "abs_lower_inclusive_power_two": -21,
+                "abs_upper_exclusive_power_two": -20
+              },
+              "retained_remainder_after": {
+                "numerator": "-12504287119597011762600617931767782711902544038071455577341592387946701466388034515230383791799401803826971400493146109208389743882291689945463",
+                "denominator": "10973751580513055606565830292280908741630217656617066621483156783692365907371429379372343919760166753035917186786268571987250000000000000000000000000",
+                "abs_lower_inclusive_power_two": -20,
+                "abs_upper_exclusive_power_two": -19
+              },
+              "accounting_closes": true
+            },
+            {
+              "row": 1,
+              "column": 0,
+              "within_word": {
+                "numerator": "2084537881336674136937295670506488140273155479767210726171160930285561939316967746244417562003308367744964896888349235556885374290537109913741",
+                "denominator": "197933332733061791327328311885589792753411049106544395862572861142050923564114279815623490910012163043125546344340735080078125000000000000000000",
+                "abs_lower_inclusive_power_two": -7,
+                "abs_upper_exclusive_power_two": -6
+              },
+              "carried": {
+                "numerator": "-11916215660203055941416596589747768436477084610413160844518302048834533273675782674018133783493042033838553624407031916810913009654238015213",
+                "denominator": "4123611098605453985986006497616454015696063523053008247136934607126060907585714162825489393958586730065115548840431980834960937500000000000000",
+                "abs_lower_inclusive_power_two": -9,
+                "abs_upper_exclusive_power_two": -8
+              },
+              "total": {
+                "numerator": "52157225160238877646527552903399836390422600636806172608078704549707046282087247513501625530884218969679804238510748398274536200935644316673",
+                "denominator": "6825287335622820390597527996054820439772794796777392960778374522139687019452216545366327272759040104935363667046232244140625000000000000000000",
+                "abs_lower_inclusive_power_two": -8,
+                "abs_upper_exclusive_power_two": -7
+              },
+              "proposed_delta": {
+                "numerator": "-52157225160238877646527552903399836390422600636806172608078704549707046282087247513501625530884218969679804238510748398274536200935644316673",
+                "denominator": "103525958306726939684583304644159516430473751477519496429086384751814772711051220560116452073209120311659596101757250679125000000000000000000000000",
+                "abs_lower_inclusive_power_two": -21,
+                "abs_upper_exclusive_power_two": -20
+              },
+              "applied_delta": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_before": {
+                "numerator": "-1888311013032953209616093368272670997661878039866903751587041766583150434784061303280600241538097911745453159051",
+                "denominator": "2970610819217322426032570731243183367570562242770793383137511866697911038746886807097507636828720000000000000000000000",
+                "abs_lower_inclusive_power_two": -21,
+                "abs_upper_exclusive_power_two": -20
+              },
+              "retained_remainder_after": {
+                "numerator": "-12504287119597011762600617931767782711902544038071455577341592387946701466388034515230383791799401803826971400493146109208389743882291689945463",
+                "denominator": "10973751580513055606565830292280908741630217656617066621483156783692365907371429379372343919760166753035917186786268571987250000000000000000000000000",
+                "abs_lower_inclusive_power_two": -20,
+                "abs_upper_exclusive_power_two": -19
+              },
+              "accounting_closes": true
+            },
+            {
+              "row": 1,
+              "column": 1,
+              "within_word": {
+                "numerator": "-20693059038930584648521339440934365650134770642161421570153315273297421419901787267735834982897817055432632186484321339429683855852434555941",
+                "denominator": "878402364199978363878675940320664760739989862898865662112009738796083980314116626400695965576977054925113371350624563964843750000000000000000",
+                "abs_lower_inclusive_power_two": -6,
+                "abs_upper_exclusive_power_two": -5
+              },
+              "carried": {
+                "numerator": "17034546113359906027292770378763946861491841821945043106609982347113384963603155556244404083254108460330863735755120848049356068967941563871",
+                "denominator": "570961536729985936521139361208432094480993410884262680372806330217454587204175807160452377625035085701323691377905966577148437500000000000000",
+                "abs_lower_inclusive_power_two": -6,
+                "abs_upper_exclusive_power_two": -5
+              },
+              "total": {
+                "numerator": "23893718253700173371692664947710727926028272696934127240068849463133740271113292214774075629136849161997685430268746516133743751092394016729",
+                "denominator": "3806410244866572910140929074722880629873289405895084535818708868116363914694505381069682517500233904675491275852706443847656250000000000000000",
+                "abs_lower_inclusive_power_two": -8,
+                "abs_upper_exclusive_power_two": -7
+              },
+              "proposed_delta": {
+                "numerator": "-23893718253700173371692664947710727926028272696934127240068849463133740271113292214774075629136849161997685430268746516133743751092394016729",
+                "denominator": "57735630594136177901017612205396653393918053708616642239298176111589007858086257620064944425443547866117851672133851340281250000000000000000000000",
+                "abs_lower_inclusive_power_two": -22,
+                "abs_upper_exclusive_power_two": -21
+              },
+              "applied_delta": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_before": {
+                "numerator": "-45553467277829192730517388376498901895655461220028672599390366791991443979304467603123818326753039945619459751323",
+                "denominator": "25101661422386374499975222679004899455971250951413204087511975273597348277411193519973939531202684000000000000000000000",
+                "abs_lower_inclusive_power_two": -20,
+                "abs_upper_exclusive_power_two": -19
+              },
+              "retained_remainder_after": {
+                "numerator": "-13639017506600081544790944282983416140606387828371868829369342123241209321522664957937842015502468404889625234000563465186641038633881277038899",
+                "denominator": "6119976842978434857507866893772045259755313693113364077365606667828434832957143307726884109097016073808492277246188242069812500000000000000000000000",
+                "abs_lower_inclusive_power_two": -19,
+                "abs_upper_exclusive_power_two": -18
+              },
+              "accounting_closes": true
+            }
+          ],
+          "max_abs_remainder_after": {
+            "numerator": "13639017506600081544790944282983416140606387828371868829369342123241209321522664957937842015502468404889625234000563465186641038633881277038899",
+            "denominator": "6119976842978434857507866893772045259755313693113364077365606667828434832957143307726884109097016073808492277246188242069812500000000000000000000000",
+            "abs_lower_inclusive_power_two": -19,
+            "abs_upper_exclusive_power_two": -18
+          },
+          "joint_admits_double_one_family_at_fixed_printed_bounds": false
+        },
+        {
+          "family": "D",
+          "step": {
+            "numerator": "1",
+            "denominator": "2048",
+            "abs_lower_inclusive_power_two": -11,
+            "abs_upper_exclusive_power_two": -10
+          },
+          "prepared_scale_inferred_four_matching_coordinates": {
+            "numerator": "45",
+            "denominator": "32",
+            "abs_lower_inclusive_power_two": 0,
+            "abs_upper_exclusive_power_two": 1
+          },
+          "scale_before": {
+            "numerator": "39",
+            "denominator": "32",
+            "abs_lower_inclusive_power_two": 0,
+            "abs_upper_exclusive_power_two": 1
+          },
+          "scale_applied_delta": {
+            "numerator": "3",
+            "denominator": "16",
+            "abs_lower_inclusive_power_two": -3,
+            "abs_upper_exclusive_power_two": -2
+          },
+          "scale_remainder_before": {
+            "numerator": "1010313861319104688623002006174464444869388647945805093779572990621893777110819031294155304262856814409",
+            "denominator": "196458983523126129208943600971331323428201173133391971053259322483039650877924664378270022583007812500000",
+            "abs_lower_inclusive_power_two": -8,
+            "abs_upper_exclusive_power_two": -7
+          },
+          "scale_remainder_after": {
+            "numerator": "-80998032227981361888808967960516517115590780193423281022978931722897037692242401436301613782949715355694047286881319407994244360456327037",
+            "denominator": "13423213211606295527298198234428561249010623447438177887815542340905146183547246623780889954292274511930714677214947854280471801757812500000",
+            "abs_lower_inclusive_power_two": -8,
+            "abs_upper_exclusive_power_two": -7
+          },
+          "energy_plus_old_remainder_equals_scale_delta_plus_new_remainder": true,
+          "actual_reached_energy": {
+            "numerator": "73963248834926134618187881960317712144995838614932775822683631522206609754995502783698187904891476806123688406145724411691712602189218784",
+            "denominator": "419475412862696735228068694825892539031581982732443058994235698153285818235851456993152811071633578497834833662967120446264743804931640625",
+            "abs_lower_inclusive_power_two": -3,
+            "abs_upper_exclusive_power_two": -2
+          },
+          "alignment": {
+            "numerator": "7426186338417446041",
+            "denominator": "37778931862957161709568",
+            "abs_lower_inclusive_power_two": -13,
+            "abs_upper_exclusive_power_two": -12
+          },
+          "curvature": {
+            "numerator": "1106444002582676316540928786805901998238361346849455134072027843448460497930048413899649566617353732212521164362914533135205651653727696784003279580865854003316520852299434188498430595380913636547754564875336988541068941419361377686332761",
+            "denominator": "9835233359151598655936104932622158995416297463265367505085193834317298059543620388240952128857453114326708527531905628523945233782515736980439187703667292720630648762748476571265279783565049483886743208310052603080839796537467659565924352",
+            "abs_lower_inclusive_power_two": -4,
+            "abs_upper_exclusive_power_two": -3
+          },
+          "covector": {
+            "numerator": "1371706097117379637",
+            "denominator": "1152921504606846976",
+            "abs_lower_inclusive_power_two": 0,
+            "abs_upper_exclusive_power_two": 1
+          },
+          "gain": {
+            "numerator": "1890551465229642855770097641943426907151924563571195928817345023848531607753228229626890253116080552624871505538490421425026325344909",
+            "denominator": "294454889018268523461101066040223502120867827492239809554297609332681955188181477024341214223563342648565476355976443797444755456",
+            "abs_lower_inclusive_power_two": 12,
+            "abs_upper_exclusive_power_two": 13
+          },
+          "moves": {
+            "numerator": "5267244085330679889782776097353528996174448360824433202226200750691495955455539896741241521397377295890661",
+            "denominator": "150306725297525326584926758194517569752043683130132471725266622178061377607334940381676735896625196994043838464",
+            "abs_lower_inclusive_power_two": -15,
+            "abs_upper_exclusive_power_two": -14
+          },
+          "bound": {
+            "numerator": "2037263687",
+            "denominator": "4294967296",
+            "abs_lower_inclusive_power_two": -2,
+            "abs_upper_exclusive_power_two": -1
+          },
+          "own_curvature_admits_double_at_printed_ray": true,
+          "covector_admits_double": true,
+          "coordinates": [
+            {
+              "row": 0,
+              "column": 0,
+              "within_word": {
+                "numerator": "-179394744305486476779378561125413565902493228758617917387050447141216423040191686791246735740761503803368293441162548841259384032808112009",
+                "denominator": "62337280402198850884142199510452819587242078957717433819152450599033422639239821055562953801339179592821096732281662597656250000000000000000",
+                "abs_lower_inclusive_power_two": -9,
+                "abs_upper_exclusive_power_two": -8
+              },
+              "carried": {
+                "numerator": "68528423948369553308012706808935604512806921855320717958226652400379103110809602751890564956472619688027131073273258073904807449584016517",
+                "denominator": "10909024070384798904724884914329243427767363817600550918351678854830848961866968684723516915234356428743691928149290954589843750000000000000",
+                "abs_lower_inclusive_power_two": -8,
+                "abs_upper_exclusive_power_two": -7
+              },
+              "total": {
+                "numerator": "1485373747796376794864858344479529219194824272902503296619712966026649163151042302536895448073574260897507188842792481067376609753703876617",
+                "denominator": "436360962815391956188995396573169737110694552704022036734067154193233958474678747388940676609374257149747677125971638183593750000000000000000",
+                "abs_lower_inclusive_power_two": -9,
+                "abs_upper_exclusive_power_two": -8
+              },
+              "proposed_delta": {
+                "numerator": "-1485373747796376794864858344479529219194824272902503296619712966026649163151042302536895448073574260897507188842792481067376609753703876617",
+                "denominator": "1256719572908328833824306742130728842878800311787583465794113404076513800407074792480149148634997860591273310122798317968750000000000000000000000",
+                "abs_lower_inclusive_power_two": -20,
+                "abs_upper_exclusive_power_two": -19
+              },
+              "applied_delta": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_before": {
+                "numerator": "-343019002842026500496242497108119523029137395604843877747964860368552852533361468639220100742798816905907282511",
+                "denominator": "26016177932561610454909263907684938858577238259100321197596310601164156818637298753480915498616250000000000000000000",
+                "abs_lower_inclusive_power_two": -17,
+                "abs_upper_exclusive_power_two": -16
+              },
+              "retained_remainder_after": {
+                "numerator": "-415265309332412176466386581026752972706070510450540578122484482706866356816524870229582525521066018417941298495420253858660638246508806037191",
+                "denominator": "28904550176891563177959055069006763386212407171114419713264608293759817409362720227043430418604950793599286132824361313281250000000000000000000000",
+                "abs_lower_inclusive_power_two": -17,
+                "abs_upper_exclusive_power_two": -16
+              },
+              "accounting_closes": true
+            },
+            {
+              "row": 0,
+              "column": 1,
+              "within_word": {
+                "numerator": "382890120681433475149571855224267653018558944369484392583158997452954274361328150178446312034093559213117382314549834572952962798051362749313",
+                "denominator": "98966666366530895663664155942794896376705524553272197931286430571025461782057139907811745455006081521562773172170367540039062500000000000000000",
+                "abs_lower_inclusive_power_two": -9,
+                "abs_upper_exclusive_power_two": -8
+              },
+              "carried": {
+                "numerator": "29166309636050621282737284524517922832764417113581437452339583546225183604801428049642361764884961279852290280137880770022419628723361111527",
+                "denominator": "16494444394421815943944025990465816062784254092212032988547738428504243630342856651301957575834346920260462195361727923339843750000000000000000",
+                "abs_lower_inclusive_power_two": -10,
+                "abs_upper_exclusive_power_two": -9
+              },
+              "total": {
+                "numerator": "22315519139909488113839822494855007600605817882038920691887859949212215039605468739052019304936133075689244959815084767723499222815661176739",
+                "denominator": "3958666654661235826546566237711795855068220982130887917251457222841018471282285596312469818200243260862510926886814701601562500000000000000000",
+                "abs_lower_inclusive_power_two": -8,
+                "abs_upper_exclusive_power_two": -7
+              },
+              "proposed_delta": {
+                "numerator": "-22315519139909488113839822494855007600605817882038920691887859949212215039605468739052019304936133075689244959815084767723499222815661176739",
+                "denominator": "11400959965424359180454110764609972062596476428536957201684196801782133197292982517379913076416700591284031469434026340612500000000000000000000000",
+                "abs_lower_inclusive_power_two": -19,
+                "abs_upper_exclusive_power_two": -18
+              },
+              "applied_delta": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_before": {
+                "numerator": "-25424159264462681077959784314425330830623916501189691495533930536873293607835803729660541660429363152878604317281",
+                "denominator": "3278038419502762917318567252368302296180732020646640470897135135746683759148299642938595352825647500000000000000000000",
+                "abs_lower_inclusive_power_two": -17,
+                "abs_upper_exclusive_power_two": -16
+              },
+              "retained_remainder_after": {
+                "numerator": "-2547026851118364096938488545923574880092424792421816489559002845414385625298757530149151765779518570932600228720029554270745089644950371529997",
+                "denominator": "262222079204760261150444547586029357439718957856350015638736526440989063537738597899738000757584113599532723796982605834087500000000000000000000000",
+                "abs_lower_inclusive_power_two": -17,
+                "abs_upper_exclusive_power_two": -16
+              },
+              "accounting_closes": true
+            },
+            {
+              "row": 1,
+              "column": 0,
+              "within_word": {
+                "numerator": "382890120681433475149571855224267653018558944369484392583158997452954274361328150178446312034093559213117382314549834572952962798051362749313",
+                "denominator": "98966666366530895663664155942794896376705524553272197931286430571025461782057139907811745455006081521562773172170367540039062500000000000000000",
+                "abs_lower_inclusive_power_two": -9,
+                "abs_upper_exclusive_power_two": -8
+              },
+              "carried": {
+                "numerator": "29166309636050621282737284524517922832764417113581437452339583546225183604801428049642361764884961279852290280137880770022419628723361111527",
+                "denominator": "16494444394421815943944025990465816062784254092212032988547738428504243630342856651301957575834346920260462195361727923339843750000000000000000",
+                "abs_lower_inclusive_power_two": -10,
+                "abs_upper_exclusive_power_two": -9
+              },
+              "total": {
+                "numerator": "22315519139909488113839822494855007600605817882038920691887859949212215039605468739052019304936133075689244959815084767723499222815661176739",
+                "denominator": "3958666654661235826546566237711795855068220982130887917251457222841018471282285596312469818200243260862510926886814701601562500000000000000000",
+                "abs_lower_inclusive_power_two": -8,
+                "abs_upper_exclusive_power_two": -7
+              },
+              "proposed_delta": {
+                "numerator": "-22315519139909488113839822494855007600605817882038920691887859949212215039605468739052019304936133075689244959815084767723499222815661176739",
+                "denominator": "11400959965424359180454110764609972062596476428536957201684196801782133197292982517379913076416700591284031469434026340612500000000000000000000000",
+                "abs_lower_inclusive_power_two": -19,
+                "abs_upper_exclusive_power_two": -18
+              },
+              "applied_delta": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_before": {
+                "numerator": "-25424159264462681077959784314425330830623916501189691495533930536873293607835803729660541660429363152878604317281",
+                "denominator": "3278038419502762917318567252368302296180732020646640470897135135746683759148299642938595352825647500000000000000000000",
+                "abs_lower_inclusive_power_two": -17,
+                "abs_upper_exclusive_power_two": -16
+              },
+              "retained_remainder_after": {
+                "numerator": "-2547026851118364096938488545923574880092424792421816489559002845414385625298757530149151765779518570932600228720029554270745089644950371529997",
+                "denominator": "262222079204760261150444547586029357439718957856350015638736526440989063537738597899738000757584113599532723796982605834087500000000000000000000000",
+                "abs_lower_inclusive_power_two": -17,
+                "abs_upper_exclusive_power_two": -16
+              },
+              "accounting_closes": true
+            },
+            {
+              "row": 1,
+              "column": 1,
+              "within_word": {
+                "numerator": "2274035100605117449983445936517939030714330164913136034784636087910201920421781528311169195047105336825275012691427644022899037217911276459",
+                "denominator": "439201182099989181939337970160332380369994931449432831056004869398041990157058313200347982788488527462556685675312281982421875000000000000000",
+                "abs_lower_inclusive_power_two": -8,
+                "abs_upper_exclusive_power_two": -7
+              },
+              "carried": {
+                "numerator": "1028850292359301875668679362572708793875799249431364928480586129762560799195469960901823414773637655316631235773567773047655046587405368797",
+                "denominator": "114192307345997187304227872241686418896198682176852536074561266043490917440835161432090475525007017140264738275581193315429687500000000000000",
+                "abs_lower_inclusive_power_two": -7,
+                "abs_upper_exclusive_power_two": -6
+              },
+              "total": {
+                "numerator": "27001656975277206877739588434456215697692084871813004958743191876986888308418885971045456758098084048186712317888982674893479937734371677939",
+                "denominator": "1903205122433286455070464537361440314936644702947542267909354434058181957347252690534841258750116952337745637926353221923828125000000000000000",
+                "abs_lower_inclusive_power_two": -7,
+                "abs_upper_exclusive_power_two": -6
+              },
+              "proposed_delta": {
+                "numerator": "-27001656975277206877739588434456215697692084871813004958743191876986888308418885971045456758098084048186712317888982674893479937734371677939",
+                "denominator": "5481230752607864990602937867600948107017536744488921731578940770087564037160087748740342825200336822732707437227897279140625000000000000000000000",
+                "abs_lower_inclusive_power_two": -18,
+                "abs_upper_exclusive_power_two": -17
+              },
+              "applied_delta": {
+                "numerator": "0",
+                "denominator": "1",
+                "zero": true
+              },
+              "retained_remainder_before": {
+                "numerator": "-515529002757470048116330087448701707526722525811532673099006871684518146785738820072859975292122517446824797541",
+                "denominator": "23414560139305449409418337516916444972719514433190289077836679541047741136773568878132823948754625000000000000000000",
+                "abs_lower_inclusive_power_two": -16,
+                "abs_upper_exclusive_power_two": -15
+              },
+              "retained_remainder_after": {
+                "numerator": "-3396741278040168959518328141374574256139736573137851030693335064698092262523763094797795242642172578496161340123821616539056188808859140467597",
+                "denominator": "126068307309980894783867570954821806461403345123245199826315637712013972854682018221027884979607746922852271056241637420234375000000000000000000000",
+                "abs_lower_inclusive_power_two": -16,
+                "abs_upper_exclusive_power_two": -15
+              },
+              "accounting_closes": true
+            }
+          ],
+          "max_abs_remainder_after": {
+            "numerator": "3396741278040168959518328141374574256139736573137851030693335064698092262523763094797795242642172578496161340123821616539056188808859140467597",
+            "denominator": "126068307309980894783867570954821806461403345123245199826315637712013972854682018221027884979607746922852271056241637420234375000000000000000000000",
+            "abs_lower_inclusive_power_two": -16,
+            "abs_upper_exclusive_power_two": -15
+          },
+          "joint_admits_double_one_family_at_fixed_printed_bounds": false
+        }
+      ]
+    }
+  ]
+}

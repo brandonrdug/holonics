@@ -103,6 +103,11 @@ pub mod continuation;
 pub mod finite_gain;
 pub mod work;
 pub mod variation;
+pub mod action;
+mod action_return;
+mod world_boundary;
+pub use world_boundary::SourceWaveReturn;
+pub use action_return::NativeReceivingReturn;
 
 use std::collections::BTreeSet;
 
@@ -210,6 +215,7 @@ pub struct Word<'c> {
     fields: Vec<FieldBalance>,
     /// Every full tick's break receipts, per contact where its break law is declared.
     partings: Vec<Vec<Option<BreakReceipt>>>,
+    source_returns: Vec<SourceWaveReturn>,
     /// The refinement clock's ticks at the word's open: zero for a word opened at rest, the ticks
     /// of the refinement's earlier words for a continuing word ([`Word::continuing`]).
     opened_at: usize,
@@ -322,6 +328,8 @@ pub struct FieldBalance {
     pub loaded_port: Rat,
     /// The loaded return's lattice split, an explicit field residual.
     pub loaded_split: Rat,
+    /// Matched exterior wave work, negative of the participating World port work.
+    pub boundary: Rat,
     /// **The interconnection's defect**: resonator port work plus the field's signed loaded-port
     /// work. [definition] It is zero **by construction** for a loaded port: the field's term is
     /// formed as the negative of the resonator's received work (`loaded_port = −port`), the
@@ -362,6 +370,7 @@ impl FieldBalance {
                 + &self.resonator_chart
                 + &self.resonator_split
                 + &self.interconnection
+                + &self.boundary
             && executed.abs() <= &self.bound + &self.resonator_bound
     }
 }
@@ -1283,6 +1292,8 @@ pub struct WordBalance {
     pub interconnection: Rat,
     /// The field's loaded-return split work over the word.
     pub loaded_split: Rat,
+    /// Matched exterior wave work, negative of the participating World port work.
+    pub boundary: Rat,
     pub change: EndChange,
     pub commit: Option<CommitWork>,
     pub released: Remainders,
@@ -1307,6 +1318,7 @@ impl WordBalance {
         let port = resonators(|r| &r.port);
         let loaded_port: Rat = released.balances.iter().map(|tick| &tick.loaded_port).sum();
         let loaded_split = sum(|tick| &tick.loaded_split);
+        let boundary = sum(|tick| &tick.boundary);
         let resonator_bound = resonators(|r| &r.bound);
         Self {
             open,
@@ -1323,6 +1335,7 @@ impl WordBalance {
             pump: resonators(|r| &r.pump),
             interconnection: &port + loaded_port,
             loaded_split,
+            boundary,
             port,
             resonator_dissipation: resonators(|r| &r.dissipation),
             resonator_integration: resonators(|r| &r.integration),
@@ -1414,7 +1427,8 @@ impl WordBalance {
             + &self.pump
             - &self.resonator_dissipation
             + &self.resonator_integration
-            + &self.interconnection;
+            + &self.interconnection
+            + &self.boundary;
         let identity = match &self.commit {
             Some(commit) => &commit.committed + &self.resonator_end == terms + &commit.deposition,
             None => &self.end + &self.resonator_end == terms,
@@ -2271,6 +2285,7 @@ impl<'c> Word<'c> {
             resonators,
             fields: Vec::new(),
             partings: Vec::new(),
+            source_returns: Vec::new(),
             opened_at,
         };
         word.peak_bits = word.state_bits();
@@ -2893,6 +2908,7 @@ impl<'c> Word<'c> {
             contrast,
             loaded_port: loaded_port.clone(),
             loaded_split: loaded_split.clone(),
+            boundary: Rat::zero(),
             residual,
             bound,
         };
@@ -2923,6 +2939,7 @@ impl<'c> Word<'c> {
             pump,
             loaded_port: loaded_port.clone(),
             loaded_split: loaded_split.clone(),
+            boundary: Rat::zero(),
             interconnection: &port + &loaded_port,
             port,
             resonator_dissipation,
@@ -3077,6 +3094,7 @@ impl<'c> Word<'c> {
             resonators,
             fields,
             partings,
+            source_returns,
             opened_at,
         } = self;
         KeptWord {
@@ -3096,6 +3114,7 @@ impl<'c> Word<'c> {
             resonators,
             fields,
             partings,
+            source_returns,
             opened_at,
         }
     }
@@ -3210,6 +3229,7 @@ pub(crate) struct KeptWord {
     resonators: Vec<Option<Resonance>>,
     fields: Vec<FieldBalance>,
     partings: Vec<Vec<Option<BreakReceipt>>>,
+    source_returns: Vec<SourceWaveReturn>,
     opened_at: usize,
 }
 
@@ -3241,6 +3261,7 @@ impl KeptWord {
             resonators,
             fields,
             partings,
+            source_returns,
             opened_at,
         } = self;
         Word {
@@ -3262,6 +3283,7 @@ impl KeptWord {
             resonators,
             fields,
             partings,
+            source_returns,
             opened_at,
         }
     }

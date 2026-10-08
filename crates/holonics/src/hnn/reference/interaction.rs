@@ -33,12 +33,61 @@ impl Resident {
     }
 
     pub(crate) fn admit_exact_current(&self) -> Result<(), HnnError> {
+        self.admit_no_participating_world()?;
         if self.held_contact_variation.is_some() {
             return Err(HnnError::Unadmitted {
                 reason: "this consumer has no transport or rebase for the held contact material variation",
             });
         }
         self.admit_exact_current_point()
+    }
+
+    pub(crate) fn admit_no_participating_world(&self) -> Result<(), HnnError> {
+        if self.participating_world.is_some() {
+            return Err(HnnError::Unadmitted {
+                reason: "this view has no participating World transport, derivative or passage serialization",
+            });
+        }
+        Ok(())
+    }
+
+    pub fn participating_world(&self) -> Option<&crate::hnn::physical::action::BoundJointWorld> {
+        self.participating_world.as_ref()
+    }
+
+    pub(crate) fn participating_world_mut(&mut self)
+        -> Result<&mut crate::hnn::physical::action::BoundJointWorld, HnnError>
+    {
+        self.participating_world.as_mut().ok_or(HnnError::Unadmitted {
+            reason: "an actual retained participating World precedes native action execution",
+        })
+    }
+
+    pub(crate) fn bind_participating_world(&mut self,
+        world: crate::hnn::physical::action::BoundJointWorld) -> Result<(), HnnError>
+    {
+        self.admit_exact_current()?;
+        self.admit_receiving_chart(world.common_chart())?;
+        if !self.pending.is_empty() || !self.staged.is_empty()
+            || self.opens != Opens::OnMotion || self.field.sources().len() != 1
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "one retained World on a continuing source current without pending returns",
+            });
+        }
+        let source = self.field.sources()[0];
+        let wave = vec![Rat::zero(); self.field.ring(source).width()];
+        world.admit(world.common_chart(), &wave, self.field.ring(source).admittance(),
+            self.field.step(), self.carried.as_ref().map_or(0, |c| c.ticks))?;
+        let ops = crate::hnn::propagation::Operands::exact_at_cut(&self.field,
+            &self.constitution, &self.current)?;
+        if ops.resonators()[source].is_some() {
+            return Err(HnnError::Unadmitted {
+                reason: "the actual World return requires a nonloaded source storage port",
+            });
+        }
+        self.participating_world = Some(world);
+        Ok(())
     }
 
     pub(crate) fn admit_exact_current_point(&self) -> Result<(), HnnError> {
@@ -112,6 +161,38 @@ impl Resident {
         Ok(())
     }
 
+    pub(crate) fn receiving_chart(&self) -> Option<&Encoded> { self.receiving_chart.as_ref() }
+
+    /// Publish an actual affine observer translation at the already published blind crossing.
+    /// It executes no second Word and preserves every current/tangent value and clock.
+    /// The receiving-only consumer supplies native deposited material; the full propagation
+    /// and canonical-state equality is checked before its exceptional publication is admitted.
+    pub(crate) fn publish_receiving_translation(
+        &mut self, material:Constitution, point:HolonState<ReceptionCarry>, chart:&Encoded,
+    ) -> Result<Option<crate::hnn::word::variation::VariationReading>,HnnError> {
+        if self.carried.as_ref()!=Some(&point.configuration) {
+            return Err(HnnError::Unadmitted {
+                reason:"an observer translation keeps the already executed full blind current",
+            });
+        }
+        let old_ops = crate::hnn::propagation::Operands::exact_at_cut(&self.field,&self.constitution,&self.current)?;
+        let new_ops = crate::hnn::propagation::Operands::exact_at_cut(&self.field,&material,&self.current)?;
+        if old_ops != new_ops
+            || crate::hnn::word::PowerForm::read(&self.field,&self.constitution,&self.current)?
+                != crate::hnn::word::PowerForm::read(&self.field,&material,&self.current)?
+        {
+            return Err(HnnError::Unadmitted {
+                reason:"an observer translation changes no producing propagation or physical power form",
+            });
+        }
+        let variation = self.held_contact_variation.as_ref().map(|held|
+            held.rebound_receiving(&self.field,&self.current,&material,&point.configuration)
+        ).transpose()?;
+        let reading = variation.as_ref().map(|held| held.reading().clone());
+        self.publish_reception_with_variation_kind(Some(material),point,None,None,chart,variation,true)?;
+        Ok(reading)
+    }
+
     /// The native return publishes a library Holon point, with its real producing commit.
     /// This is the wave/descriptor configuration chart; it is not a proof that the continuous
     /// Field::holarchy storage chart includes the arriving-wave delay coordinates (#62).
@@ -138,6 +219,19 @@ impl Resident {
         chart: &Encoded,
         variation: Option<crate::hnn::word::variation::HeldContactVariation>,
     ) -> Result<(), HnnError> {
+        self.publish_reception_with_variation_kind(material,point,charts,error,chart,variation,false)
+    }
+
+    fn publish_reception_with_variation_kind(
+        &mut self,
+        material: Option<Constitution>,
+        point: HolonState<ReceptionCarry>,
+        charts: Option<Charts>,
+        error: Option<EndChange>,
+        chart: &Encoded,
+        variation: Option<crate::hnn::word::variation::HeldContactVariation>,
+        receiving_translation:bool,
+    ) -> Result<(), HnnError> {
         self.admit_receiving_chart(chart)?;
         // The invariant belongs to this owner even when a future caller omits its preflight.
         // No unimplemented transport/absorption can silently turn a nonzero box into an exact
@@ -147,12 +241,13 @@ impl Resident {
         match (&self.held_contact_variation,&variation) {
             (None,None) => {},
             (Some(old),Some(new)) if error.is_none()
-                && (next == self.constitution || old.action()==
+                && (receiving_translation || next == self.constitution || old.action()==
                     crate::hnn::word::variation::ContactVariationAction::RealizedFactorTranslation)
                 && new.matches(&next,&point.configuration)
                 && new.coordinates() == old.coordinates()
                 && new.action() == old.action()
-                && old.reading().words.checked_add(1)==Some(new.reading().words) => {},
+                && (if receiving_translation { old.reading().words==new.reading().words }
+                    else { old.reading().words.checked_add(1)==Some(new.reading().words) }) => {},
             _ => return Err(HnnError::Unadmitted {
                 reason:"publication must transport/rebase the held differential at its actual material, clock and parameter identity",
             }),

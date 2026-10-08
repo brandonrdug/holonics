@@ -354,6 +354,10 @@ impl ReceiverFace {
             &self.offset,
         ))
     }
+
+    /// The declared explicit motion of this chart, for a consumer's clock admission.
+    /// Reading this does not advance either participant or choose a receiving face.
+    pub fn chart_rate(&self) -> &[Rat] { &self.chart_rate }
 }
 
 /// [definition] **The face's motion over the solved step**, split into the three terms of the

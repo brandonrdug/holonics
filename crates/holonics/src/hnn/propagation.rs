@@ -1549,6 +1549,8 @@ pub struct TickBalance {
     pub loaded_port: Rat,
     /// The loaded return's lattice split contribution to the field power balance.
     pub loaded_split: Rat,
+    /// Work supplied by a matched exterior wave return; not a solve or chart residual.
+    pub boundary: Rat,
     pub residual: Rat,
     pub bound: Rat,
 }
@@ -1564,6 +1566,7 @@ impl TickBalance {
                 + &self.residual
                 + &self.loaded_port
                 + &self.loaded_split
+                + &self.boundary
             && (&self.residual + &self.loaded_split).abs() <= self.bound
     }
 }

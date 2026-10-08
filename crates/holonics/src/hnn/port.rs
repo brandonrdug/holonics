@@ -1248,6 +1248,12 @@ fn reverse_core_joined(
         // A word that ended stopped after its last junction; a continuing word's every step is a
         // full tick.
         if t + 1 < steps || !word.is_ended() {
+            // The actual exterior returned wave is held in this R-only conditional return.
+            // Reverse its overwrite before the native element/loaded stage. No World adjoint
+            // or full material derivative is inferred from this conditional source costate.
+            for returned in word.source_returns().iter().filter(|returned| returned.tick == t + 1) {
+                storage_bar[returned.ring].fill(Rat::zero());
+            }
             // Reverse the loaded storage-port stage first. Its drive covector then enters the
             // element transpose, so the junction and contact receive the complete loaded path.
             let loaded = indexed(rings.len(), |r| {

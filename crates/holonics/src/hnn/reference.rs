@@ -512,6 +512,8 @@ pub struct Resident {
     held_contact_variation: Option<crate::hnn::word::variation::HeldContactVariation>,
     /// The complete cell-free codec chart admitted by receiving views.
     receiving_chart: Option<Encoded>,
+    /// Actual participating World law/current on its common native clock. No step history.
+    participating_world: Option<crate::hnn::physical::action::BoundJointWorld>,
     /// [definition; agent-inferred, October 4; record B §8] **What the admitted future's words open
     /// on** (the port's declared reception, [`Reception::opens`]): the retention a re-base of the
     /// contacts' grain is admitted against ([`Resident::refine_contact_grain`]).
@@ -862,6 +864,7 @@ impl Resident {
             + self.carry_error_bits()
             + self.held_contact_variation.as_ref().map_or(0, |j| j.reading().retained_bits)
             + receiving_chart
+            + self.participating_world.as_ref().map_or(0, |world| world.current_bits())
             + pending
             + staged
             + arrived
@@ -1061,6 +1064,7 @@ impl Reference {
             carried_error: None,
             held_contact_variation: None,
             receiving_chart: None,
+            participating_world: None,
             opens: self.reception.opens(),
         })
     }

@@ -936,6 +936,8 @@ pub(crate) fn released(
             contrast,
             loaded_port,
             loaded_split,
+            // This device view does not admit a participating World boundary.
+            boundary: Rat::zero(),
             residual,
             bound: bound + loaded_split_bound,
         });

@@ -16,6 +16,7 @@
 
 pub mod communication;
 pub mod contact;
+pub mod action;
 
 use crate::hnn::HnnError;
 use crate::hnn::constitution::{Constitution, DepositReading};

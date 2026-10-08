@@ -1,0 +1,66 @@
+{
+  "source_commit": "14418468094aa9f19efe77a8166919280b68be95",
+  "grade": "CONTINUING_PROPAGATION_UPDATE_FOUNDATION_FACTOR_MOVEMENT_GATE_FAILED",
+  "actual_output": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v111/ACTUAL_OUTPUT.txt",
+  "actual_output_pin": {
+    "sha256": "15e6ca3d730d0532670e7c8245115a632f6b5e4cba143173df0dbc498be809eb",
+    "bytes": 331804
+  },
+  "actual_whole_reading": "whole actual interaction; complete_passages=7/7; actual_receiving_movements=2; actual_contact_factor_publications=0; nonzero_delayed_comparisons=3; held_future_matches_actual_clock=true; retained_state_bits=301683; final_held_reading=Some(VariationReading { parameters: 12, state_coordinates: 36, retained_ratios: 432, retained_bits: 259098, column_ticks: 180, words: 5, next_tick: 19 }); final_material_commit=5; source_Current=Current { lift: [0, 0] }; owner_calls=Some(WorkRead { material_cut_attempts: 23, material_cuts: 23, word_open_attempts: 57, words_opened: 57, junction_attempts: 141, junctions: 141, full_ticks: 99, return_attempts: 5, returns: 5, overflowed: false }); wall_ns=506130311; resident_bytes=Some((11649024, 11649024)); integrated_operation_acceptance=false",
+  "complete_passages": 7,
+  "receiving_movements": 2,
+  "contact_factor_movements": 0,
+  "required_contact_factor_movements": 2,
+  "nonzero_delayed_comparisons": 3,
+  "same_tick_rebase_and_clock_receipts": [
+    {
+      "line": 51,
+      "role": "contact observation 1",
+      "factor_moved": false,
+      "material_commit": 3,
+      "rebase_closes": true,
+      "certified_steps": [
+        "family: Factor(0), step: CertifiedStep { exponent: -15, step: Ratio { numer: 1, denom: 32768 }",
+        "family: Factor(1), step: CertifiedStep { exponent: -12, step: Ratio { numer: 1, denom: 4096 }",
+        "family: Factor(2), step: CertifiedStep { exponent: -9, step: Ratio { numer: 1, denom: 512 }"
+      ]
+    },
+    {
+      "line": 64,
+      "role": "contact observation 2",
+      "factor_moved": false,
+      "material_commit": 4,
+      "rebase_closes": true,
+      "certified_steps": [
+        "family: Factor(0), step: CertifiedStep { exponent: -15, step: Ratio { numer: 1, denom: 32768 }",
+        "family: Factor(1), step: CertifiedStep { exponent: -12, step: Ratio { numer: 1, denom: 4096 }",
+        "family: Factor(2), step: CertifiedStep { exponent: -10, step: Ratio { numer: 1, denom: 1024 }"
+      ]
+    },
+    {
+      "line": 77,
+      "role": "contact observation 3",
+      "factor_moved": false,
+      "material_commit": 5,
+      "rebase_closes": true,
+      "certified_steps": [
+        "family: Factor(0), step: CertifiedStep { exponent: -15, step: Ratio { numer: 1, denom: 32768 }",
+        "family: Factor(1), step: CertifiedStep { exponent: -12, step: Ratio { numer: 1, denom: 4096 }",
+        "family: Factor(2), step: CertifiedStep { exponent: -11, step: Ratio { numer: 1, denom: 2048 }"
+      ]
+    }
+  ],
+  "native_gate_failure_not_resource_or_compiler_stop": true,
+  "all_nine_supporting_controls_passed": true,
+  "source_consumer_count": "hnn_continuing_behavior.rs:643-648 counts nonzero actual continuation material-factor entries; :732 requires at least2",
+  "source_consumer_pin": {
+    "sha256": "4b7f7210b0204fa453ae8fb92cbe77ba3395fed039fba9281ee15d92e0e0a6be",
+    "bytes": 32067
+  },
+  "measured_scope": "All seven actual native passages completed; three conditional publications advance normal-law/material commit and rebase, but no C/K/D factor displacement was returned. This does not establish full HNN learning or the separate comprehensive action/observer join.",
+  "quantization_or_step_policy_cause_not_proved_by_queue": true,
+  "no_selection_or_fixture_change_to_force_pass": true,
+  "unchanged_resource_caps": true,
+  "all_released": true,
+  "source_owner_edits_by_queue": false
+}

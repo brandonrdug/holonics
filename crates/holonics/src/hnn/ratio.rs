@@ -485,10 +485,138 @@ impl HolonRatio {
     }
 }
 
+/// A comparison with an actually received complex face, in the same receiving chart.
+///
+/// [agent-inferred] A participating Holon's observation need not be a single class. At the
+/// declared grain its mass chart is `q`, so the reached real covector is `p_tilde - q_tilde`
+/// and the imaginary covector is `-q_tilde (phi_q - phi_p)/2`. This is the same comparison
+/// law as the categorical ratio, without selecting a class from an observed superposition.
+/// The observation's original grain cells, phases and unresolved fibres remain present.
+///
+/// Chart, source, clock and encounter provenance belong to the producing interaction owner.
+/// This arithmetic owner checks equal grain and class extent; equality of those extents alone
+/// does not certify the two boundary charts. Requested consequences never construct a target
+/// here: `observed` is the actual post-interaction receipt, with `None` on uncompared regions.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ReceivingFaceRatio {
+    produced: Faces,
+    observed: Vec<Option<Face>>,
+    stations: Vec<usize>,
+    branch: BigInt,
+}
+
+impl ReceivingFaceRatio {
+    /// Pair actually produced and observed faces after their common chart/clock transport.
+    /// A missing region contributes neither a comparison nor a covector.
+    pub fn compare_partition(
+        produced: Faces,
+        observed: Vec<Option<Face>>,
+        branch: BigInt,
+    ) -> Result<Self, HnnError> {
+        if produced.faces.len() != observed.len() {
+            return Err(HnnError::Shape {
+                what: "one observed receiving region slot per produced region",
+                expected: produced.faces.len(),
+                found: observed.len(),
+            });
+        }
+        let stations: Vec<_> = observed.iter().enumerate()
+            .filter_map(|(j, q)| q.as_ref().map(|_| j)).collect();
+        for &j in &stations {
+            let p = &produced.faces[j];
+            let q = observed[j].as_ref().expect("an observed receiving region");
+            if p.cells().is_empty() || p.grain() != q.grain()
+                || p.cells().len() != q.cells().len()
+                || p.phases().len() != p.cells().len()
+                || q.phases().len() != q.cells().len()
+            {
+                return Err(HnnError::Unadmitted {
+                    reason: "paired receiving faces keep their declared grain and complete class extent",
+                });
+            }
+        }
+        Ok(Self { produced, observed, stations, branch })
+    }
+
+    pub fn faces(&self) -> &Faces { &self.produced }
+    pub fn observed(&self) -> &[Option<Face>] { &self.observed }
+    pub fn stations(&self) -> &[usize] { &self.stations }
+
+    /// The actual target-to-produced phase gap, including its winding and unresolved phase.
+    pub fn phase_gap(&self, station: usize, class: usize) -> Result<Reading, HnnError> {
+        let q = self.observed.get(station).and_then(Option::as_ref)
+            .ok_or(HnnError::Unadmitted { reason: "an actual compared receiving region" })?;
+        let p = &self.produced.faces[station];
+        let (Some(p), Some(q)) = (p.phases().get(class), q.phases().get(class)) else {
+            return Err(HnnError::CellOutside { code: class, alphabet: p.cells().len() });
+        };
+        Ok(Reading::of_turns(&(q - p)))
+    }
+
+    /// The undivided `(q_tilde : p_tilde)` mass pair at a compared class and its phase winding.
+    /// The open phase remains in `phase_gap`; neither the pair nor its branch is collapsed.
+    pub fn log_ratio(&self, station: usize, class: usize) -> Result<LogRatio, HnnError> {
+        let gap = self.phase_gap(station, class)?;
+        let q = self.observed[station].as_ref().expect("a compared receiving region");
+        let p_mass = self.produced.faces[station].odometer_masses()?[class].clone();
+        let q_mass = q.odometer_masses()?[class].clone();
+        let winding = (&self.branch + gap.windings()).to_i64().ok_or(HnnError::CountOverflow)?;
+        LogRatio::new(GaussianRat::real(q_mass), GaussianRat::real(p_mass), winding)
+            .map_err(|_| HnnError::Unadmitted { reason: "a nonzero paired receiving mass" })
+    }
+
+    /// Cross-entropy at the observed grain representative, region by region.
+    /// This enclosure is an exterior reading, not retained state or a descent certificate.
+    pub fn code_length(&self) -> Result<ExactInterval, HnnError> {
+        let mut total = ExactInterval::point(Rat::zero());
+        for &j in &self.stations {
+            let q = self.observed[j].as_ref().expect("a compared receiving region");
+            for (class, mass) in q.odometer_masses()?.iter().enumerate() {
+                let length = self.produced.faces[j].code_length(class)?;
+                let weighted = ExactInterval::new(&length.lower * mass, &length.upper * mass)?;
+                total = interval_sum(&total, &weighted)?;
+            }
+        }
+        Ok(total)
+    }
+
+    /// The phase part of the same comparison, weighted by the actually observed mass.
+    pub fn excess(&self) -> Result<Rat, HnnError> {
+        let mut total = Rat::zero();
+        for &j in &self.stations {
+            let q = self.observed[j].as_ref().expect("a compared receiving region");
+            for (class, mass) in q.odometer_masses()?.iter().enumerate() {
+                let gap = self.phase_gap(j, class)?.turns();
+                total += mass * &gap * &gap / integer(2);
+            }
+        }
+        Ok(total)
+    }
+
+    /// The reached covector uses both producing operands and the observed target face.
+    /// Unobserved regions have exactly zero covectors; no class leader is substituted for q.
+    pub fn covector(&self) -> Result<RatioCovector, HnnError> {
+        let mut logits: Vec<_> = self.produced.faces.iter()
+            .map(|p| vec![Rat::zero(); 2 * p.cells().len()]).collect();
+        for &j in &self.stations {
+            let p = &self.produced.faces[j];
+            let q = self.observed[j].as_ref().expect("a compared receiving region");
+            let p_mass = p.odometer_masses()?;
+            let q_mass = q.odometer_masses()?;
+            for class in 0..p.cells().len() {
+                logits[j][2 * class] = &p_mass[class] - &q_mass[class];
+                let gap = &q.phases()[class] - &p.phases()[class];
+                logits[j][2 * class + 1] = -(&q_mass[class] * gap) / integer(2);
+            }
+        }
+        Ok(RatioCovector { logits })
+    }
+}
+
 /// [definition] **`R⁻¹dR` at the face**: per receiving phase, the gradient of the ratio's log on
 /// the realified logits `[Re f_0, Im f_0, …]`, magnitude in bits per unit of the base-2 exponent and
 /// phase in turns (`ln 2` relates bits to nats: a declared factor, never evaluated). Only a
-/// [`HolonRatio`] constructs one:
+/// The declared comparison owners [`HolonRatio`] and [`ReceivingFaceRatio`] construct one:
 ///
 /// ```compile_fail,E0451
 /// use holonics::hnn::ratio::RatioCovector;

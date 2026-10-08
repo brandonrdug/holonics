@@ -20,6 +20,7 @@ use crate::hnn::ratio::HolonRatio;
 use crate::hnn::word::continuation::ContinuationReceipt;
 use crate::hnn::word::{ FieldBalance, ReceptionCarry, SourceOpeningReceipt, Word, WordBalance};
 use crate::hnn::word::variation::{HeldContactComparison, VariationBudget, VariationReading};
+use crate::hnn::word::variation::gain::{ContactStationResponse, StationResponseReading};
 use crate::holon::HolonState;
 use std::sync::Arc;
 use crate::ratio::linear::ExactRatMatrix;
@@ -74,6 +75,9 @@ pub struct ContactCommunication {
     /// Opt-in continuing-material full differential at the actually producing material.
     pub held_comparison: Result<Option<HeldContactComparison>, HnnError>,
     pub held_publication: Result<Option<HeldContactPublication>, HnnError>,
+    /// Actual transient raw-factor station matrix, independent of local RHS gain bounds.
+    pub station_response: Option<ContactStationResponse>,
+    pub compared_response: Option<StationResponseReading>,
 }
 
 impl ContactCommunication {
@@ -114,6 +118,7 @@ impl PhysicalReceiver<'_> {
         receiver: &ReceiverDeclaration,
         observation: impl FnOnce(&PhysicalBoundary) -> Option<ContactObservation>,
     ) -> Result<ContactCommunication, HnnError> {
+        self.resident.admit_no_participating_world()?;
         self.resident.admit_exact_current_point()?;
         let held = self.resident.held_contact_variation().cloned();
         let first = source.len();
@@ -146,8 +151,14 @@ impl PhysicalReceiver<'_> {
             j.opened(&word)
         }).transpose()?;
         word.run(phases.junction_steps())?;
-        let next_held = held.as_ref().zip(held_opening.as_ref())
-            .map(|(j,opened)| j.advanced(&word,opened)).transpose()?;
+        let held_response = held.as_ref().zip(held_opening.as_ref())
+            .map(|(j,opened)| j.advanced_with_station_response(&word,opened,&phases,
+                j.station_response_budget())).transpose()?;
+        let (next_held, station_response) = match held_response {
+            Some((next,response)) => (Some(next),Some(response)),
+            None => (None,None),
+        };
+        let mut compared_response = None;
         let reads = phases.epochs().enumerate().map(|(station, crossing)| {
             Ok(StationRead { station, crossing, tick: opened_at + crossing,
                 read: phases.read(self.field, self.resident.constitution(), self.resident.current(),
@@ -184,9 +195,13 @@ impl PhysicalReceiver<'_> {
                             reason:"the held observation keeps its producing chart/source and actual partition",
                         });
                     }
-                    word.compare_contacts_held(receiver_index,&observed.observed,&observed.compared,
+                    let credit = word.compare_contacts_held(receiver_index,&observed.observed,&observed.compared,
                         held,held_opening.as_ref().expect("the admitted held opening"),
-                        next_held.as_ref().expect("the admitted next differential").reading().clone())
+                        next_held.as_ref().expect("the admitted next differential").reading().clone())?;
+                    let response = station_response.as_ref().expect("the admitted station response");
+                    response.check_pullback(&credit.ratio.covector()?,&credit.total)?;
+                    compared_response = Some(response.select(&observed.compared)?);
+                    Ok(credit)
                 })();
                 held_comparison = match joined {
                     Ok(mut credit) => {
@@ -258,6 +273,6 @@ impl PhysicalReceiver<'_> {
         Ok(ContactCommunication { boundary, opening: blind.opening, balances: blind.balances,
             word: blind.word, blind_carry: blind.carry,
             carry: self.resident.carried().expect("the returned physical point was published").clone(),
-            comparison,held_comparison,held_publication })
+            comparison,held_comparison,held_publication,station_response,compared_response })
     }
 }

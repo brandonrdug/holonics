@@ -18,6 +18,7 @@ use crate::hnn::ratio::{HolonRatio, target_phases};
 use crate::hnn::retention::Diamond;
 
 mod rebase;
+pub mod gain;
 
 /// The parameter family whose first variation the current carries. A realized translation
 /// holds the actually applied factor increments as exterior controls: P = I. It differentiates
@@ -470,6 +471,17 @@ impl HeldContactVariation {
     /// Advance columns through this Word's recorded producing ticks. All primal states and
     /// midpoints come from this Word; this is no second simulation of the physical passage.
     pub(crate) fn advanced(&self, word: &Word<'_>, opened: &[EndChange]) -> Result<Self, HnnError> {
+        self.advance_contact_columns(word, opened, |_, _| Ok(()))
+    }
+
+    /// The one column transport, optionally observed BEFORE its producing junction.
+    /// The observer writes only its own transient reading; it changes no current column.
+    fn advance_contact_columns(&self, word: &Word<'_>, opened: &[EndChange],
+        mut observe: impl FnMut(usize, &[EndChange]) -> Result<(), HnnError>) -> Result<Self, HnnError>
+    {
+        if opened.len() != self.coordinates.len() {
+            return refuse("the contact column transport preserves its complete parameter population");
+        }
         let count = word
             .ticks()
             .checked_mul(self.coordinates.len())
@@ -495,6 +507,7 @@ impl HeldContactVariation {
             .checked_add(word.ticks())
             .ok_or(HnnError::CountOverflow)?;
         for t in 0..word.ticks() {
+            observe(t, &next.columns)?;
             for (coordinate, chi) in next.coordinates.iter().zip(&mut next.columns) {
                 *chi = word.contact_first_variation(t, chi, coordinate, &next.producing)?;
             }

@@ -54,27 +54,18 @@ impl PhysicalBoundary {
         grain: u64,
         unite_point: bool,
     ) -> Self {
-        let decisions = prediction.cells[first..]
-            .iter()
-            .zip(&prediction.reads[first..])
-            .zip(&prediction.domains[first..])
-            .map(|((decision, point), domain)| {
-                if unite_point {
-                    communication_decision(decision, point, domain.as_ref())
-                } else {
-                    decision.clone()
-                }
-            })
-            .collect();
-        Self {
-            chart,
-            first,
-            grain,
-            readings: prediction.reads[first..].to_vec(),
-            decisions,
-            domains: prediction.domains[first..].to_vec(),
-        }
+        let readings = prediction.reads.iter().filter(|read| read.station >= first)
+            .cloned().collect::<Vec<_>>();
+        let decisions = readings.iter().map(|point| {
+            let decision = &prediction.cells[point.station];
+            if unite_point {
+                communication_decision(decision, point, prediction.domains[point.station].as_ref())
+            } else { decision.clone() }
+        }).collect();
+        let domains = readings.iter().map(|point| prediction.domains[point.station].clone()).collect();
+        Self { chart, first, grain, readings, decisions, domains }
     }
+
     pub fn chart(&self) -> &Encoded {
         &self.chart
     }
