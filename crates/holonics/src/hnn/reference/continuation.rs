@@ -29,13 +29,20 @@ fn resonant(field: &Field, theta: Constitution) -> Constitution {
 // This finite control's channel grain is derived from its actual coarse comparison receipt.
 // At unit 2^-6 and certified step 2^-6, the largest exact released factor displacement is
 // 979302663067977851/11028940175733273133056; the lattice control's is 23937/268435456.
-// Both lie strictly between 2^-14 and 2^-13. Seven rebase levels are therefore the least whose
-// half-unit is below those responses: unit 2^-13. No caller step, covector, target or pump changes.
-// Rebase publishes a new native commit before the actual comparison is recomputed.
+// Both lie strictly between 2^-14 and 2^-13, so seven rebase levels (unit 2^-13) sufficed while
+// the storage family stepped alone. Since the reached C/K/D return (127cd1612) the joint
+// certificate steps the three forms together and halves the storage step: the lattice control's
+// largest storage displacement is half of the one above (23937/2^29 up to the h′ shift; the
+// v116 receipt's C stayed in its cell while K and D moved), strictly between 2^-15 and 2^-14.
+// Eight levels are therefore the least whose half-unit is below the response: unit 2^-14. The
+// rule is unchanged: the least grain whose half-unit is below the actual response. No caller step,
+// covector, target, certificate or pump changes, and the re-base is lossless
+// (`BudgetedCarry::rebase`). Rebase publishes a new native commit before the actual comparison is
+// recomputed.
 fn resolved(field: &Field) -> Constitution {
     let every = crate::hnn::retention::loci(field).into_iter().collect();
     resonant(field, learning::generic(field, 81))
-        .rebased(Locus::Channel(0), 7, &every).unwrap()
+        .rebased(Locus::Channel(0), 8, &every).unwrap()
 }
 
 fn contact_comparison(
