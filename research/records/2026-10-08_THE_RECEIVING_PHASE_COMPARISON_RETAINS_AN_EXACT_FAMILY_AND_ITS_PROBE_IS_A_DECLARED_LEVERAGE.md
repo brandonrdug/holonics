@@ -117,12 +117,7 @@ native prediction. With no receipt yet (`N = 0`) the family is a single member a
 decision holds, so the family is founded by earlier receipts, such as the receiver's prior
 observations.
 
-Brandon's lens of October 8 (relayed by Epime): noise is an unresolved field of possibilities,
-and repeated traversal over the terrain organizes it into music, repair or generation. Here the
-declared family is that unresolved field, each actual encounter is a re-traversal that restricts
-it, and release at tolerance is its organization. The lens adds no subsystem. It keeps physical
-iteration, prediction and learning publication distinct in their accounting while they share one
-state.
+Brandon's lens of October 8 (relayed by Epime): noise is an unresolved field of possibilities, and repeated traversal over the terrain organizes it into music, repair or generation. Here the declared family is that unresolved field. Each actual encounter is a re-traversal that updates the comparison's sufficient statistics, and the declared family is then recomputed. This is not a restriction: the centre moves, `τ = ε·N` changes, and neither nesting nor truth coverage is claimed (an actual World face can fall outside the native prediction). Release at tolerance is the organization. The lens adds no subsystem. It keeps physical iteration, prediction and learning publication distinct in their accounting while they share one state.
 
 ## 5. Located defects in the receiving deposit
 

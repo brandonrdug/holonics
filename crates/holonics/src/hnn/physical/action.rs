@@ -758,10 +758,14 @@ pub struct AdmittedWaves {
     declared_for: DeclaredFor,
 }
 
-/// The producing feature an admitted declaration was read from: the material commit, the opening
-/// tick, the compared station, the preparation's ring and map, and the opening's source wave (the
-/// work's cross term). A declaration admits only at that same feature (Epime's review, October 8:
-/// an admitted wave is a checked membership, never a caller's precondition).
+/// The producing feature an admitted declaration was read from, by everything that decides the
+/// admitted set and the probes it offers: the material commit, the opening tick and the compared
+/// station; the preparation's ring and map `B`, the opening's source wave `m` and the work's
+/// coefficient `c = P(e)` (so `P(m + Bu) − P(m)` is the same function of `u`); and the native
+/// feature map itself, `x(u) = x₀ + J u`. The commit is a local counter, not an identity, so the
+/// operands it would stand for are compared directly. A declaration admits only at an equal
+/// feature (Epime's review, October 8: an admitted wave is a checked membership, never a caller's
+/// precondition).
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct DeclaredFor {
     producing_commit: u64,
@@ -770,10 +774,17 @@ struct DeclaredFor {
     ring: usize,
     map: ExactRatMatrix,
     source_wave: Vec<Rat>,
+    unit_power: Rat,
+    baseline_feature: Vec<Rat>,
+    jacobian: ExactRatMatrix,
 }
 
 impl DeclaredFor {
     fn of(feature: &ProspectiveFeature) -> Self {
+        let mut unit = vec![Rat::zero(); feature.source_wave().len()];
+        if let Some(first) = unit.first_mut() {
+            *first = Rat::one();
+        }
         Self {
             producing_commit: feature.producing_commit(),
             opened_at: feature.opened_at(),
@@ -781,6 +792,9 @@ impl DeclaredFor {
             ring: feature.preparation().ring(),
             map: feature.preparation().map().clone(),
             source_wave: feature.source_wave().to_vec(),
+            unit_power: feature.storage_power(&unit),
+            baseline_feature: feature.baseline_feature().to_vec(),
+            jacobian: feature.jacobian().clone(),
         }
     }
 }
@@ -804,6 +818,12 @@ impl AdmittedWaves {
             });
         }
         if controls == 0 {
+            // The one point `u = ()` is still enumerated under the declared capacity.
+            if capacity < 1 {
+                return Err(HnnError::Unadmitted {
+                    reason: "the declared finite lattice's bounding box exceeds its declared enumeration capacity",
+                });
+            }
             let admitted = feature.preparation_work(&[])? <= supply;
             return Ok(Self {
                 exponent,
