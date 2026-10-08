@@ -250,10 +250,28 @@ Its second part states the perfected laws:
        claim that families are cheap.
      - When fitting the transport couples the factors, only supported extendable prefixes count
        (forward and backward support), and that added cost is stated.
-   - **Release.** The class is released exactly when it is constant over the complete family: zero
-     width through `width_over_readings` over the complete readings, never a sample. Otherwise the
-     consumer holds, naming the slipped contacts and two actual witness members with their differing
-     classes. A declared template side collapses each factor.
+   - **Release.** Readings at different positions are never pooled: one trajectory's readings
+     legitimately vary from position to position. Each receipt coordinate is compared across the
+     supported alternatives, and under the declared supremum norm
+     `diameter(class_R(F)) = max(diameter(E(X_0)), …, diameter(E(X_n)), diameter(winding(X_n)))`.
+     The equality holds because every supported state extends to an actual member, in the
+     fit-constrained variant after backward pruning. A coordinate attaining the maximum supplies
+     two witness members.
+     - Release happens exactly when the family is nonempty and every coordinate's set is a
+       singleton. It is never certified from a sample.
+     - Otherwise the consumer holds, naming the slipped contacts and two actual witness members
+       with their differing classes.
+     - A declared template side collapses each factor.
+     - Routed through `width_over_readings`, the aggregate checks only structural coherence. The
+       consumer owes the complete-support/diameter equation, the nonempty family and the witness
+       extensions.
+   - **Coverage.** The truth round trip is conditional on the channel's coverage. On the covered
+     repairable channel, at most one strand changed at each contact, the truth lies in the supported
+     family and release is exactly constancy of that family. A coordinated complementary change
+     leaves no slip, so its local family is the observed letter alone, and release returns the
+     observed class, which may differ from the truth. The binary local factors are therefore never
+     the complete preimage family of a channel that also admits unwitnessed coordinated
+     substitutions.
    - **Absorption, against known truth only.** A coordinated substitution is absorbed exactly when
      the damaged word's class equals the truth's class. Its carried shift `Δ = A(u′_i) − A(u_i)` is
      a signed representative that moves every later absolute lift. The count stays on the
@@ -298,9 +316,11 @@ admitted channel and its separation are declared operands.
   unseen words:
   - single-strand substitutions at contacts with intact partners are located exactly (the slipped
     contacts are the substituted ones);
-  - with a template frame, the repair is unique and the round trip holds;
-  - without one, the class is returned exactly when every repair decodes to the same class, and
-    otherwise the decoder refuses, naming the contacts and the classes;
+  - on the covered repairable channel (at most one strand changed at each contact), the truth lies
+    in the supported family. With a template frame the repair is unique and the round trip holds.
+    Without one, the class is released exactly when it is constant over the complete supported
+    family, and otherwise the decoder holds, naming the contacts, two witness members and their
+    classes;
   - coordinated in-kernel substitutions keep the class;
   - coordinated out-of-kernel substitutions are counted against the known truth as the residual,
     never claimed as refused (online they have no witness);
