@@ -89,18 +89,21 @@ reads residues and carries (`compression::keys::transport`, `CarryHelix`), and t
 squares (`hnn/encoding.rs`) are its conduct. The compression kernel is the greatest
 navigator-invariant blind subgroup (`Foundation/CausalRelevance`).
 
-## 4. The laws specified; the module being prepared
+## 4. The laws written: an unvalidated module sent to the queue
 
-[definition; specified, not yet on disk] `Transport/HelicalCode` will state, building on the owners
-above, laws it does not duplicate:
+[proved-derived; Lean unvalidated] `Transport/HelicalCode` (`lean/Holonics/Transport/HelicalCode.lean`,
+imported from `lean/HolonicsResearch.lean`, outside the `Framework` closure until validated) states,
+building on the owners above and duplicating none of them:
 - the complement-reverse anti-automorphism and its involution;
 - the fixed words of a fixed-point-free pairing have even length and correspond to their first
   halves;
 - the pairing read through every frame is a fixed-point-free involution;
 - one crossing change moves the signed crossing sum by exactly 2, so the linking number moves by 1.
 
-A worker is preparing the module without a compiler. Its frozen source goes to the sole queue for
-the Lean check before any claim. Its second part states the perfected laws:
+It was written without a compiler. Its frozen source goes to the sole queue for the Lean check,
+and every `formal-checked` tag in it stands only with that receipt. Its atlas rows are
+`helical.*` in `geometry.tsv`, graded `proved-derived` until the receipt. Its second part states
+the perfected laws:
 - **resonance on a strand:** `(1 − Ĝ⁻ᵖ) m_{Np} = (1 − Ĝ⁻ᴺᵖ) m_p` in any ring, so `Ĝᵖ = 1` gives
   `m_{Np} = N·m_p`;
 - **the partner's face:** for an additive carrier involution `J` with `J E = E σ` and

@@ -60,9 +60,9 @@ in this order.
    Not proved here, and said so: `HalvesAgree` itself is the classical evenness of the signed
    crossing count between two components (Seifert), and `LinkingIsProjectionInvariant` is the
    classical invariance under a change of admissible projection. Both are `Prop`s, neither is an
-   `axiom`, and the Rust owner **discharges the first computationally at every reading** —
-   `TopologicalError::LinkingHalvesDisagree` names both half-sums if it ever fails — and **tests
-   the second** across a declared candidate family.
+   `axiom`. The retired Rust owner **discharged the first computationally at every reading** —
+   `TopologicalError::LinkingHalvesDisagree` named both half-sums if it ever failed — and **tested
+   the second** across a declared candidate family (`13f8c734`; no current crate reads them).
 
    [counterexample] The projected writhe is given **no** invariance statement, and
    `projectedWrithe_is_not_projection_invariant` says why: the would-be invariance is false, with a
@@ -558,10 +558,11 @@ position this holds — it is the statement that the signed crossing count betwe
 even, equivalently that each half-sum computes the linking number — and it is **not proved here**:
 this file builds no Seifert surface and no homology of a complement.
 
-The Rust owner discharges it *computationally at every reading*: `linking_number` computes both
-half-sums separately and refuses with `TopologicalError::LinkingHalvesDisagree`, naming both, if
-they ever part. So the hypothesis of `linking_is_an_integer` is checked on every actual reading
-rather than assumed. -/
+The retired Rust owner (`13f8c734:crates/holonics-cuda/src/topological_receiver.rs`) discharged it
+*computationally at every reading*: `linking_number` computed both half-sums separately and refused
+with `TopologicalError::LinkingHalvesDisagree`, naming both, if they parted. No current crate reads
+the linking number, so the hypothesis of `linking_is_an_integer` is now a declared operand of any
+consumer. -/
 def HalvesAgree (cross : κ → Crossing) (w : Place) : Prop :=
   linkingOver cross w = linkingUnder cross w
 
@@ -594,10 +595,10 @@ theorem linkingTotal_even_of_halvesAgree (cross : κ → Crossing) (w : Place)
 /-- [open] **Invariance of the linking number under a change of admissible projection.**
 
 Classically true; this file constructs no isotopy, no Reidemeister move and no diagram calculus,
-so it is stated as a `Prop` and left unproved rather than assumed as an `axiom`. The Rust owner
-tests it at every reading: `linking_under_directions` returns the reading under every declared
-admissible candidate and `LinkingAcrossDirections::agree` says on the actual data whether they
-agree, with the degenerate candidates returned by name rather than silently skipped. -/
+so it is stated as a `Prop` and left unproved rather than assumed as an `axiom`. The retired Rust
+owner (`13f8c734`) tested it at every reading: `linking_under_directions` returned the reading under
+every declared admissible candidate and `LinkingAcrossDirections::agree` said on the actual data
+whether they agreed, with the degenerate candidates returned by name. -/
 def LinkingIsProjectionInvariant {κ' : Type*} [Fintype κ']
     (cross : κ → Crossing) (w : Place) (cross' : κ' → Crossing) (w' : Place) : Prop :=
   linkingTotal cross w = linkingTotal cross' w'
