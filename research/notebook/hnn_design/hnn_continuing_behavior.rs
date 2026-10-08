@@ -300,6 +300,10 @@ pub(super) fn run(out: &str, pin: &exterior::Pin) {
             pin.threads()
         ),
     );
+    if !accepted {
+        // The complete receipt was flushed; a refused native operation is not process success.
+        std::process::exit(2);
+    }
 }
 
 fn exercise(mut output: &mut impl Write, pin: &exterior::Pin) -> bool {
@@ -401,6 +405,7 @@ fn exercise(mut output: &mut impl Write, pin: &exterior::Pin) -> bool {
                     &mut output,
                     format!("INCOMPLETE: {role} native forward refused {error:?}\n"),
                 );
+                point(&mut output, "after receiving refusal", &receiver);
                 return false;
             }
         };
@@ -434,6 +439,7 @@ fn exercise(mut output: &mut impl Write, pin: &exterior::Pin) -> bool {
                     &mut output,
                     format!("INCOMPLETE: {role} comparison/publication is {other:?}\n"),
                 );
+                point(&mut output, "after receiving comparison refusal", &receiver);
                 return false;
             }
         }
@@ -514,6 +520,7 @@ fn exercise(mut output: &mut impl Write, pin: &exterior::Pin) -> bool {
                     "INCOMPLETE: current held-material future refused {error:?}; no derivative reset or bypass\n"
                 ),
             );
+            point(&mut output, "after prospective future refusal", &receiver);
             return false;
         }
     };
@@ -565,7 +572,8 @@ fn exercise(mut output: &mut impl Write, pin: &exterior::Pin) -> bool {
             })
         }) {
             Ok(v) => v,
-            Err(error) => { publish(&mut output, format!("INCOMPLETE: {role} native forward/held future refused {error:?}; no reset/skip/restart\n")); return false; }
+            Err(error) => { publish(&mut output, format!("INCOMPLETE: {role} native forward/held future refused {error:?}; no reset/skip/restart\n")); point(&mut output, "after contact forward refusal", &receiver);
+                return false; }
         };
         let closed = receipt.closes();
         publish(
@@ -616,6 +624,7 @@ fn exercise(mut output: &mut impl Write, pin: &exterior::Pin) -> bool {
                     &mut output,
                     format!("INCOMPLETE: {role} held comparison is {other:?}\n"),
                 );
+                point(&mut output, "after held comparison refusal", &receiver);
                 return false;
             }
         }
@@ -685,6 +694,7 @@ fn exercise(mut output: &mut impl Write, pin: &exterior::Pin) -> bool {
                         "INCOMPLETE: {role} native material publication/rebase is {other:?}; the held gradient is not a finite Deposit by itself\n"
                     ),
                 );
+                point(&mut output, "after material/rebase refusal", &receiver);
                 return false;
             }
         }

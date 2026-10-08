@@ -1,0 +1,65 @@
+{
+  "kind": "bounded_complete_changed_source_first_development",
+  "status": "PREPARED_NOT_ADMITTED_NUMERICAL_PIN_AND_COMBINED_SOURCE_SEAL_PENDING_QUEUE",
+  "source_handoff": "/home/b/Workspaces/holonics/.local/wt/hnn-continuing-runner-01a10f0a/.local/continuing-runner-20261008/SOURCE_HANDOFF.v2.json",
+  "integration_owner_worktree": "/home/b/Workspaces/holonics/.local/wt/hnn-integrated-current-01a1030c",
+  "native_source_owner": "01a1030c",
+  "native_executor": "01a10352",
+  "runner_owner": "01a10f0a",
+  "build_entry": "existing holonics hnn_prediction example; library/guards/example fresh typecheck under existing queue allocator",
+  "runtime_argv": [
+    "<integrated fresh hnn_prediction executable>",
+    "executed",
+    "continuing-behavior",
+    "<queue isolated output directory>",
+    "<queue-fixed committed first-complete-development pin>"
+  ],
+  "complete_passages": 7,
+  "declared_input": {
+    "source": "KnownTruth::cyclic_class_orbit(CyclicLaw::Alternation,2,20261008001,3)",
+    "blind_consequence_source": "KnownTruth::cyclic_class_orbit(CyclicLaw::Alternation,2,20261008011,3)",
+    "codec": "Encoded::identity; source prefix2; later observed suffix1; full original chart D/fibre",
+    "correlated_terrain": true,
+    "field": "source ring4/loaded interior ring1; width2 contact node0; actual initial Constitution; Half pump at1/16; actual Receiving observations acquire zero R"
+  },
+  "acceptance": [
+    "7 complete actual native passages with1 Resident",
+    ">=2 actual finite C/K/D factor movements, separately from normalization/counter movement",
+    "later total=within+carried reached covector with nonzero delayed contribution",
+    "native publication with declared realized-factor-translation P=I and successor same-tick full sensitivity",
+    "actual work/clock/canonical carry closes",
+    "whole actual blind complex boundary/D/fibre/decision before each later observation; final blind consequence"
+  ],
+  "retained_admission": {
+    "ratios": "derive actual parameters*full EndChange numerical coordinates before admission",
+    "bits": 1048576,
+    "column_ticks": "parameters*aperture3*five contact Words (12*3*5=180 in declared shape)"
+  },
+  "host_threads": 1,
+  "host_thread_reason": "Each passage consumes previous actual carry/material/variation. Existing within-passage owner realization uses pinned one-thread allocation; no independent sweep or worker job.",
+  "cost_declaration": "Sole queue selects existing first complete changed-source development allocation; no whole timing read yet, no old unrelated unit-rate borrowed, no pin numerical limit invented/raised here. Optional committed measured unit bound stops after first unit above projection. All failures preserve whole actual output plus always-emitted whole wall/work/RSS receipt.",
+  "stop_on": [
+    "first native/type/codec/certificate/publication/rebase refusal",
+    "fixed outer wall/CPU/memory queue guard",
+    "first complete unit slower than a prior actually matched measured upper, when the committed pin has one",
+    "nonzero exit2 or integrated_operation_acceptance=false",
+    "no raised budget or timeout retry"
+  ],
+  "preserve": [
+    "full stdout and unfiltered stderr",
+    "ACTUAL_OUTPUT.txt whole including failures",
+    "all native source/pin/input hashes",
+    "wall nanoseconds, aggregate CPU nanoseconds, peak bytes, exit, cleanup/quiescence/lease receipt",
+    "actual complete or partial passage count and whole operation acceptance",
+    "queue projection, deadline and measured/projected exact ratio when measured projection is available"
+  ],
+  "no_owner_native_jobs": true,
+  "no_paid_compute_or_public_action": true,
+  "primary_dimension_correction": {
+    "state_coordinates": 28,
+    "factor_coordinates": 12,
+    "retained_ratios": 336,
+    "column_ticks": 180,
+    "reason": "source realified widths8 and2; actual source derives full EndChange count"
+  }
+}

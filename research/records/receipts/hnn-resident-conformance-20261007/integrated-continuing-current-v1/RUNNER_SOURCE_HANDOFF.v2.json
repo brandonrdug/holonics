@@ -1,0 +1,95 @@
+{
+  "status": "SOURCE_READY_INTEGRATION_AND_NATIVE_UNRUN",
+  "base": "693c61705b9c38c913f3da27b2d194f349116860",
+  "worktree": "/home/b/Workspaces/holonics/.local/wt/hnn-continuing-runner-01a10f0a",
+  "branch": "codex/hnn-continuing-runner-01a10f0a",
+  "owned_paths": [
+    "research/notebook/hnn_design/hnn_continuing_behavior.rs",
+    "research/notebook/hnn_design/hnn_prediction.rs"
+  ],
+  "source_files": [
+    {
+      "path": "research/notebook/hnn_design/hnn_continuing_behavior.rs",
+      "bytes": 31719,
+      "sha256": "f455681c6f656642071237d0c13aff0ff0d37a12c07108fe254e50f877bf7206"
+    },
+    {
+      "path": "research/notebook/hnn_design/hnn_prediction.rs",
+      "bytes": 20896,
+      "sha256": "a23187140707098737706f8e054a9fe6893a29220a16e02bbcb7839bac9ab895"
+    }
+  ],
+  "patch": {
+    "path": "/home/b/Workspaces/holonics/.local/wt/hnn-continuing-runner-01a10f0a/.local/continuing-runner-20261008/RUNNER_NATIVE.v2.patch",
+    "bytes": 34647,
+    "sha256": "1aa14c610bb4adb6f970aaf0e519842b3d712f559bb12e1aaaf022949a63156e"
+  },
+  "consuming_api": [
+    "PhysicalReceiver::resident",
+    "PhysicalReceiver::communicate",
+    "PhysicalReceiver::begin_continuing_contact_variation",
+    "PhysicalReceiver::communicate_contact",
+    "ContactCommunication::held_comparison",
+    "ContactCommunication::held_publication",
+    "HeldContactPublication::{publication,continuation,parameter_transport,rebase}"
+  ],
+  "command": "hnn_prediction executed continuing-behavior <out-directory> <committed-pin>",
+  "fixed_declared_input": {
+    "source": "KnownTruth::cyclic_class_orbit(CyclicLaw::Alternation,2,20261008001,3)",
+    "blind_consequence_source": "KnownTruth::cyclic_class_orbit(CyclicLaw::Alternation,2,20261008011,3)",
+    "codec": "Encoded::identity; source prefix2; later observed suffix1; full original chart D/fibre",
+    "correlated_terrain": true,
+    "field": "source ring4/loaded interior ring1; width2 contact node0; actual initial Constitution; Half pump at1/16; actual Receiving observations acquire zero R"
+  },
+  "whole_passages": 7,
+  "sequence": [
+    "Receiving observation0",
+    "Receiving observation1",
+    "blind contact",
+    "contact observation1",
+    "contact observation2",
+    "contact observation3",
+    "blind consequence"
+  ],
+  "whole_acceptance": [
+    "7 complete actual native passages with1 Resident",
+    ">=2 actual finite C/K/D factor movements, separately from normalization/counter movement",
+    "later total=within+carried reached covector with nonzero delayed contribution",
+    "native publication with declared realized-factor-translation P=I and successor same-tick full sensitivity",
+    "actual work/clock/canonical carry closes",
+    "whole actual blind complex boundary/D/fibre/decision before each later observation; final blind consequence"
+  ],
+  "variation_budget": {
+    "ratios": "derive actual parameters*full EndChange numerical coordinates before admission",
+    "bits": 1048576,
+    "column_ticks": "parameters*aperture3*five contact Words (12*3*5=180 in declared shape)"
+  },
+  "cost_protocol": "Sole queue selects existing first complete changed-source development allocation; no whole timing read yet, no old unrelated unit-rate borrowed, no pin numerical limit invented/raised here. Optional committed measured unit bound stops after first unit above projection. All failures preserve whole actual output plus always-emitted whole wall/work/RSS receipt.",
+  "output_files": [
+    "<out-directory>/ACTUAL_OUTPUT.txt; full stdout duplicate; queue raw stderr/CPU/wall/peak RSS"
+  ],
+  "source_checks": {
+    "rustfmt_edition2024_parse": true,
+    "staged_whitespace": true,
+    "native_typecheck": false,
+    "native_runtime": false
+  },
+  "native_jobs_by_owner": 0,
+  "integration_notes": [
+    "Apply only two-path patch in active core checkout; frozen693 untouched",
+    "Current public APIs are core-owned active successor; base693 alone intentionally cannot compile/run this continuing mode",
+    "Include new runner consumer in existing atlas native source/continuing comparison row in same integrated commit; this worker did not edit core-owned atlas",
+    "Core owns deposited direction/native conditional witness and rebase, not runner",
+    "Source lift fixed station query tau+1+j; absolute carried/pump clock advances; no full-stream-ingest claim",
+    "No authored readout/task routine, extra machine state, end-held/restart, foreign identity shortcut or expected-string acceptance"
+  ],
+  "supersedes": "SOURCE_HANDOFF.v1.json / RUNNER_NATIVE.v1.patch",
+  "failure_receipt": "On owner refusal print actual retained point/future after refusal, emit whole cost receipt, flush outputs and exit2; process success cannot replace whole operation acceptance.",
+  "primary_dimension_correction": {
+    "state_coordinates": 28,
+    "factor_coordinates": 12,
+    "retained_ratios": 336,
+    "column_ticks": 180,
+    "reason": "source realified widths8 and2; actual source derives full EndChange count"
+  }
+}

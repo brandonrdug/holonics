@@ -1,6 +1,6 @@
 {
   "status": "JOINED_SOURCE_PREPARED_TYPE_AND_WHOLE_RUN_PENDING",
-  "source_manifest_sha256": "38fd80c774146145ef1cccdf4837a7dd81c537cae2f932a6277963f49dad2b9b",
+  "source_manifest_sha256": "9d320cb87798f340d24e8c3f9c715738ff11d917034994000a2e88d0d10afc6d",
   "source_input_count": 306,
   "source_parse_checks": [
     "crates/holonics/src/hnn/constitution.rs",
@@ -50,5 +50,6 @@
     "column_ticks": 180,
     "exact_bits_bound": 1048576,
     "basis": "Field::Ring::width=2*placements; 10storage+10arrivals+4contact+4loaded. Runner derives actual count; worker prose22/264 is not used."
-  }
+  },
+  "runner_revision": "v2 source f455681c6f656642071237d0c13aff0ff0d37a12c07108fe254e50f877bf7206: print actual retained point/future after owner refusal, whole cost receipt then exit2 when incomplete; no count/physics/resource change"
 }

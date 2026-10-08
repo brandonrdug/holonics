@@ -8,7 +8,7 @@
     "crates/holonics/src/hnn/reference/interaction.rs": "38945a8acba2dbbf6c6e28f5e7d9303f2b4feab017a46adf554e5b17031fb985",
     "crates/holonics/src/hnn/physical/contact.rs": "c6232d3e46732ef8cff5c928af5daf4c19b2ea234e29a387722d7e4171c9db5b",
     "crates/holonics/src/hnn/tests/physical_communication.rs": "8e6bb407f494396202680b7c33b117a1ff2f8b8fd9f68dfe2d7127e2017087c8",
-    "research/notebook/hnn_design/hnn_continuing_behavior.rs": "9103713b59f6b11468f48cc19fdb8f7122a88128fba3ee352fe8d8bd488c0d1b",
+    "research/notebook/hnn_design/hnn_continuing_behavior.rs": "f455681c6f656642071237d0c13aff0ff0d37a12c07108fe254e50f877bf7206",
     "research/notebook/hnn_design/hnn_prediction.rs": "a23187140707098737706f8e054a9fe6893a29220a16e02bbcb7839bac9ab895"
   },
   "reviewer": "GPT-6 Luna bounded source/law review; no source mutation, native tests or scientific run",
@@ -19,7 +19,8 @@
     "Same-tick canonical derivative uses both old and successor dC terms; successor dC sums every new C row weighted by P[i,j] for each old column, then all full state columns reindex through inverse P. An initial concern about mixing was retracted after source inspection.",
     "Native held before/after point is checked against existing PowerForm::held, with actual same clock/reference/phase and whole state. Unsupported singular charts/material/source/receiver changes refuse.",
     "Resident publishes material/carry/new sensitivity after detached checks; any postblind update/rebase/publication failure retains blind carry and pre-publication advanced derivative at old material.",
-    "Runner integrated byte-for-byte from its isolated owned two-path handoff, acquires initial zero R by actual receiving comparisons before contact admission, emits actual blind complete boundary/decoder fibre before observed partition, and counts actual factor movements separately from statistics. It uses a correlated fixed terrain application; no target-string/holdout/product acceptance."
+    "Runner integrated byte-for-byte from its isolated owned two-path handoff, acquires initial zero R by actual receiving comparisons before contact admission, emits actual blind complete boundary/decoder fibre before observed partition, and counts actual factor movements separately from statistics. It uses a correlated fixed terrain application; no target-string/holdout/product acceptance.",
+    "Primary read-only review of exact runner v2 followup: after native/comparison/material/rebase refusal displays actual retained point/future; whole output/cost flush precedes nonzero exit2 on incomplete acceptance. No law/budget/sequence changes."
   ],
   "native_type_or_runtime_grade": false,
   "limitations": [
