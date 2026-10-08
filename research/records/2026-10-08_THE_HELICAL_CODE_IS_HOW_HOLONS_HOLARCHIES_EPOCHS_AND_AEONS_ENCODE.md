@@ -25,8 +25,9 @@ proved part's hypotheses:
 2. a **pairing** by a fixed-point-free involution `σ` through helical pair contacts, read backward:
    the reflection of the dihedral group `⟨S, U | U² = 1, USU = S⁻¹⟩` of the screw `S` and the dyad
    half-turn `U`, lifted by `σ`;
-3. **frames**: receivers' residue partitions, whose cells are epochs, on which the dihedral group
-   acts simply transitively;
+3. **frames**: receivers' residue partitions, read together with the whole winding and the epoch
+   (an interval between section arrivals, across which a residue recurs). The dihedral group acts
+   simply transitively on a duplex's frames;
 4. a **decoder** with its declared channel: the pairing as an inner repetition code that locates
    single-strand defects, and a quotient with a designed kernel as the outer code, with the
    coordinated substitutions outside the kernel as its counted residual;
@@ -63,36 +64,51 @@ family under a declared direction:
 - it is an integer under `HalvesAgree` (`linking_is_an_integer`).
 
 `HalvesAgree` and invariance under admissible projections (`LinkingIsProjectionInvariant`) are open
-`Prop`s, checked and tested by the Rust owner at every reading. The projected writhe is not
+`Prop`s. No current crate reads the linking number. The retired Rust owner checked both half-sums at
+every reading and tested declared directions
+(`13f8c734:crates/holonics-cuda/src/topological_receiver.rs`: `linking_number`, with its half-sums;
+`linking_under_directions`). The Lean module's docstring still describes that owner as present,
+and its repin goes with the module's queue check. The projected writhe is not
 projection invariant (`projectedWrithe_is_not_projection_invariant`), and it is not the ribbon
 writhe that `Lk = Tw + Wr` needs. The Reidemeister colouring laws are local Swing transports, and a
 full-turn phase forgets the writhe (`Geometry/HolonicUnknotting`). Topological conservation alone
 supplies no stored-energy or access theorem.
+
+[formal-checked] The meet of coprime frames already has owners:
+- `HNN/Prediction.joint_residue_determines_position`: two addresses below the product with equal
+  residues are equal;
+- `Geometry/PairResonance.diagonal_step_generates_the_coprime_torus`;
+- `HNN/Prediction.joint_class_not_additive`: a joint class is not a sum of per-factor functions.
+
+The meet is unique only modulo the product of the periods. The absolute position needs the whole
+winding, and on class-dependent steps the actual source-to-clock relation.
 
 [built] The HNN's source moments are the strand's face (`SourceMoment`). The located transport
 reads residues and carries (`compression::keys::transport`, `CarryHelix`), and the HNN's encoding
 squares (`hnn/encoding.rs`) are its conduct. The compression kernel is the greatest
 navigator-invariant blind subgroup (`Foundation/CausalRelevance`).
 
-## 4. The laws written now
+## 4. The laws specified; the module being prepared
 
-[definition; owed to the validation queue] `Transport/HelicalCode` states, building on the owners
-above:
+[definition; specified, not yet on disk] `Transport/HelicalCode` will state, building on the owners
+above, laws it does not duplicate:
 - the complement-reverse anti-automorphism and its involution;
 - the fixed words of a fixed-point-free pairing have even length and correspond to their first
   halves;
 - the pairing read through every frame is a fixed-point-free involution;
-- two frames of coprime periods meet in exactly one position per pair of residues;
 - one crossing change moves the signed crossing sum by exactly 2, so the linking number moves by 1.
 
-The module was written without a compiler and goes to the sole queue for its Lean check before any
-claim. Its second part states the perfected laws:
+A worker is preparing the module without a compiler. Its frozen source goes to the sole queue for
+the Lean check before any claim. Its second part states the perfected laws:
 - **resonance on a strand:** `(1 − Ĝ⁻ᵖ) m_{Np} = (1 − Ĝ⁻ᴺᵖ) m_p` in any ring, so `Ĝᵖ = 1` gives
   `m_{Np} = N·m_p`;
-- **the partner's face:** for a carrier involution `J` with `J E = E σ` and `JĜJ = Ĝ⁻¹`,
-  `m(σ̄(u)) = JĜⁿ⁻¹ m(u)` and `(JĜⁿ⁻¹)² = 1`. This is the equivariant join between the phase
-  transport (conjugation at a fixed phase) and placement (an action on a carrier), which Epime's
-  composition read found the two maps need;
+- **the partner's face:** for an additive carrier involution `J` with `J E = E σ` and
+  `JĜJ = Ĝ⁻¹`, under the declared uniform tick with constant openings `α, β`:
+  `m_β(σ̄(u)) = JĜⁿ⁻¹⁺ᵅ⁺ᵝ m_α(u)`, an involution. Epime's composition read found that the two maps
+  need this equivariant join: the phase transport conjugates at a fixed phase, while placement acts
+  on a carrier. The recurrence carrier `q = Ĝⁿ⁻¹ f` reads the same join as `JĜ⁻⁽ⁿ⁻¹⁾` in the
+  ending frame. Epime's finite witness, with ticks `(0, 2)`, shows the uniform-tick hypothesis is
+  needed. Letter-selected screws need `J S_a J = S_{σ(a)}⁻¹`, and then `J F′_k J = F_n⁻¹ F_{n−k}`;
 - **the dihedral pairing:**
   - on the index line, the half-turn `k ↦ c−k` inverts the shift;
   - the half-turns of `⟨S, U⟩` are the `SʲU`;
@@ -109,23 +125,45 @@ claim. Its second part states the perfected laws:
 ## 5. Owed
 
 1. `Lk = Tw + Wr` (Călugăreanu–White–Fuller), first for polygonal ribbons, with the ribbon writhe
-   as the core's Gauss sum (#62). The closure law `ΔLk = ΔTw + Wr` (supercoiling as the closure
-   remainder) consumes it.
+   as the core's Gauss sum (#62). The closure law `ΔLk = Lk − (Tw₀ + Wr₀) = ΔTw + ΔWr`
+   (supercoiling as the closure remainder; `Wr₀ = 0` for a planar relaxed core) consumes it.
 2. Projection invariance of `Lk` and `HalvesAgree` (the open `Prop`s of `TopologicalReceiver`), so
    that conservation without crossings is a theorem.
 3. The energy split between twist and writhe as a constitutive law, with its buckling threshold (#62).
-4. **The consumer.** A native owner of the helical code, built from the existing owners:
-   - placement on a navigator's helix (the source port), with the carrier involution `J` of the
-     partner's face;
-   - the declared embedding of letters into contact velocities, so that complementarity is zero
-     slip through `lock_iff_zero_power`;
-   - receivers' frames, keeping the carry: residues fix a position only modulo the product of the
-     periods;
-   - the decoder's quotient with its declared channel. The aggregate face is not an inverse of the
-     word, so the decoder reads only the admitted quotient through the continuation squares.
+4. **The consumer.** It is not a separate subsystem: it is the paired chart and lift on the existing
+   native path `LocatedTransport::reflected`/`reflect_key` → `PassageChart` → `Encoding::squares`
+   → `Encoded`/`SourceMoment` (Epime's read). It adds:
+   - the two strand contact ports, `v₋ = v₊ ∘ σ` with `v₊` injective on the admitted contact
+     alphabet;
+   - the declared reversed incidence `k ↔ n−1−k`. The offset-chain repair support handles its
+     certified forest, but a constant offset is not this cyclic gluing;
+   - the lift `B` where `σ` descends through the founded fibre. Otherwise the duplex is paired
+     before that quotient.
 
-   Its round trip, stated at the consumer: `decode(read_R(pair(place(u)))) = class_R(u)` for every
-   word `u` and every admitted defect of the declared channel.
+   [agent-inferred] **The chart.** On a rotation carrier the dyad is conjugation: `BUB = U⁻¹` for
+   `U` multiplication by a unit `ζ`. So complements embed as conjugates off the real axis, and a
+   letter on the axis would be its own complement. For four letters, the vertices `±2 ± i` of a
+   rectangle in `ℤ[i]` have exactly the Klein symmetry: conjugation is `σ`, and negation and
+   `−conj` are the other two types. The square `±1 ± i` would add a quarter-turn merging the types.
+   The turn is a Pythagorean unit such as `ζ = (3+4i)/5`. Its angle is irrational, since the only
+   roots of unity in `ℚ(i)` are `±1, ±i`, so it never locks and stays exact. In space, the same
+   chart is the dyad `diag(1, −1, −1)` about `x`, the helix about `z`, and the letters at
+   `(±2, ±1, 0)`.
+
+   **Its two invariants** (Epime's read):
+   1. pairing, placement and receiver transport commute, with `Encoding::squares` and the admitted
+      successor quotient keeping every separator;
+   2. under the declared channel, the actual antecedent lies in the compatible repair family, and
+      release requires the receiver's quotient to be constant over that whole family.
+
+   With `s` unmarked slipped contacts the family is factored into `s` binary choices, `2^s` words.
+   Storing the factors does not make an arbitrary receiver's class image cheap. The round trip
+   `decode(read_R(pair(place(u)))) = class_R(u)` holds for template-assisted single-strand repairs
+   and coordinated in-kernel defects. Ambiguous families are held or refused. Coordinated
+   out-of-kernel changes are the declared residual, for which the equation guarantees nothing.
+   The source moment's coordinates stay bounded while its exact count bits grow, and neither it nor
+   the CRT recovers a whole word past its admitted capacity. The decoder, fibre, clock and carry
+   residuals are kept. A grain split is not a corruption witness.
 
 ## 6. Acceptance (fixed before any build; the channel revised the same day)
 
@@ -145,7 +183,8 @@ admitted channel and its separation are declared operands.
   - without one, the class is returned exactly when every repair decodes to the same class, and
     otherwise the decoder refuses, naming the contacts and the classes;
   - coordinated in-kernel substitutions keep the class;
-  - coordinated out-of-kernel substitutions are counted as the residual, never claimed as refused;
+  - coordinated out-of-kernel substitutions are counted against the known truth as the residual,
+    never claimed as refused (online they have no witness);
   - two frames of coprime periods recover each position from its residue pair;
   - a crossing change moves the linking reading by exactly its sign, and a duplex passage by two.
 - **No catered machinery.** No authored decoder table. The kernel is the receiver's own quotient,

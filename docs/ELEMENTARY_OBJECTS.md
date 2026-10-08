@@ -1005,13 +1005,17 @@ Its five parts:
    sits at its tick through the phase transport, `Ĝ(τ(k))⁻¹ E(u_k)`, so the strand's face is the
    phase-carried moment `m = Σ_k Ĝ(τ(k))⁻¹ E(u_k)`. Each letter selects its step's screw: the
    strand is a serial screw word, the motor chart.
-   - **Resonating lengths.** With `τ(k) = k`, a word repeating with period `p` has
-     `(1 − Ĝ⁻ᵖ) m_{Np} = (1 − Ĝ⁻ᴺᵖ) m_p`. In resonance, `Ĝᵖ = 1` on the face (the period is
-     whole turns), the face grows with every repeat, `m_{Np} = N·m_p`. Off resonance, with
-     `1 − Ĝ⁻ᵖ` invertible and `Ĝ` an isometry, it stays bounded. When `E(a)` is the bend a letter
-     gives the axis, `m` is the axis's accumulated bend: a code in resonance curves its own carrier,
-     and off resonance its bends cancel. This is the split of
+   - **Resonating lengths.** With a fixed advance (`τ(k) = k`, one `Ĝ`), a word repeating with
+     period `p` has `(1 − Ĝ⁻ᵖ) m_{Np} = (1 − Ĝ⁻ᴺᵖ) m_p`. In resonance, `Ĝᵖ = 1` on the face (the
+     period is whole turns), the face grows with every repeat, `m_{Np} = N·m_p`. Off resonance,
+     with `1 − Ĝ⁻ᵖ` invertible and `Ĝ` an isometry, it stays bounded by `2‖(1 − Ĝ⁻ᵖ)⁻¹‖·|m_p|`,
+     a small divisor that grows near resonance. When `E(a)` is the bend a letter gives the axis,
+     `m` is the axis's accumulated bend: a code in resonance curves its own carrier, and off
+     resonance its bends cancel. This is the split of
      [emanation and resonance](#emanation-and-resonance) read on a strand.
+   - For letter-selected screws and located clocks, the repeated word's own monodromy over one
+     period replaces `Ĝᵖ`, in the frame convention its owner declares. The occurrence count never
+     stands in for the clock.
    - The face is an aggregate, not an inverse of the word: many words share it. What a receiver
      decodes from it is only its admitted quotient, through the continuation squares (item 4).
 2. **Pairing (pair contact, §4; the reflector).** A fixed-point-free involution `σ` on `A` pairs the
@@ -1031,28 +1035,53 @@ Its five parts:
      moving frame.
    - **The partner's face.** The phase transport conjugates an operator at a fixed phase, while
      placement acts on a carrier, so the pairing reaches the faces only through an equivariant
-     embedding. It is a carrier involution `J` with `J E(a) = E(σ(a))` and `JĜJ = Ĝ⁻¹`: the dyad,
-     inverting the navigator. Then the partner strand's face is the dyad half-turn of the strand's,
-     `m(σ̄(u)) = JĜⁿ⁻¹ m(u)`, and `(JĜⁿ⁻¹)² = 1`. A duplex carries one face and its reflection,
-     and a reading of both checks their consistency.
+     embedding. It is an additive carrier involution `J` with `J E(a) = E(σ(a))` and `JĜJ = Ĝ⁻¹`:
+     the dyad, inverting the navigator. With the uniform tick `τ(k) = k` and one navigator `Ĝ`, the
+     partner strand's face is the dyad half-turn of the strand's, `m(σ̄(u)) = JĜⁿ⁻¹ m(u)`, and
+     `(JĜⁿ⁻¹)² = 1`. Constant openings `α, β` of the two strands are kept, not reset: the relation
+     is then `JĜⁿ⁻¹⁺ᵅ⁺ᵝ`. A duplex carries one face and its reflection, and a reading of both checks
+     their consistency. `SourceMoment`'s fixed-step recurrence references the newest letter,
+     `m(u) = Σ_k Uⁿ⁻¹⁻ᵏ I E(u_k)`. With a native lift `B` (`I E σ = B I E`, `BUB = U⁻¹`, `B² = 1`),
+     the same law reads `m(σ̄(u)) = B U⁻⁽ⁿ⁻¹⁾ m(u)` there.
+   - The lift exists only where `σ` descends through `E`'s fibres; otherwise the duplex is formed
+     before the quotient, keeping the separator. Fixed-point-freedom survives only on the
+     unmerged contact alphabet: a quotient that merges `a` with `σ(a)` loses it there. On a
+     rotation carrier the dyad is conjugation, so complements embed as conjugates off the real axis
+     (`agent-inferred`; four letters at the vertices of a rectangle with exactly Klein symmetry,
+     `±2 ± i` in `ℤ[i]`, under a Pythagorean turn such as `(3+4i)/5`, whose angle is irrational).
+   - Letter-selected screws `S_a` do not inherit this. Their duplex needs its own stated relation
+     `J S_a J = S_{σ(a)}⁻¹` (on the located route, whose clock advances by `A(u)`, it is
+     `A(σ(a)) = A(a)`). Then, with frames `F_k = S_{u_0}⋯S_{u_{k−1}}`, the partner's frame at `k` is
+     the dyad image of the strand's frame at `n−k`, re-based at the end: `J F′_k J = F_n⁻¹ F_{n−k}`.
+     The faces then relate by a fixed transform only where the frames commute.
    - **The contact's reading.** Position `k` meets position `n−1−k` of the partner through a
      helical pair contact. `lock_iff_zero_power` proves, on a face of positive weight with
      null-definite material (`xᵀDx = 0 → x = 0`), that advancing the pair at integer rates `q, p`
      reads zero power exactly when `q v_a = p v_b`: a synchronization of velocities. Reading
-     `σ`-complementarity as zero slip needs a declared embedding of the letters into contact
-     velocities in which `a` and `σ(a)` synchronize at the lock rates and no other pair does. The
-     embedding is the consumer's, and is owed.
+     complementarity as zero slip needs two strand charts. The same injective chart on both sides
+     would lock equal letters, not complements. With `v₋(b) = v₊(σ(b))` and `v₊` injective on the
+     admitted contact alphabet, the unit-rate slip `v₊(a) − v₋(b)` vanishes exactly when
+     `b = σ(a)`. Orientation and other rates belong to the declared port embedding, and the pair
+     rate port's congruence transports its material power. The embedding is the consumer's, and is
+     owed.
    - **Four letters.** On four letters the fixed-point-free involutions are exactly three, and with
      the identity they form the Klein group `V`, abelian and acting simply transitively. So `σ` is
      one of them, every point substitution `a ↦ v·a` has exactly one of three types `v`, and the
      pairing preserves the type, `σ(v·a) = v·σ(a)`: a slipped contact is repaired by the same type
      on either strand.
-3. **Frames (receiver and epoch, §§10, 12).** A receiver reads the strand at its section. Its ticks
-   partition the strand into epochs, the cells of its frame: residues modulo its period at its
-   grain. Receivers of coprime periods meet in exactly one position per pair of residues (the
-   Chinese remainder theorem): intersecting partitions, as the located transport reads digits and
-   residues. The residues fix a position only modulo the product of the periods. The position itself
-   needs the carry, the winding count the helix keeps, or a declared fundamental domain. On a duplex the frames of period `p` are `p` phases on each of two strands, and the
+3. **Frames (receiver and epoch, §§10, 12).** A receiver reads the strand at its section. Its
+   arrivals at the section cut the passage into epochs, contiguous intervals (`Aeon/Clock/Epoch`).
+   Its frame reads each position as a residue, the phase modulo its period at its grain, and a
+   residue class recurs across the epochs. A position is therefore read as a triple: the residue,
+   the whole winding (the carry) and the actual epoch reading. Receivers of coprime periods reading
+   the same lifted clock meet in exactly one position per pair of residues (the Chinese remainder
+   theorem; `HNN/Prediction.joint_residue_determines_position`,
+   `Geometry/PairResonance.diagonal_step_generates_the_coprime_torus`): intersecting partitions,
+   as the located transport reads digits and residues. The joint residue is not a sum of separate
+   marginal faces (`joint_class_not_additive`). The
+   residues fix only the common lift modulo the product of the periods; the absolute position needs
+   the whole winding or a declared fundamental domain. The clock need not advance once per letter:
+   on the located route it advances by `A(u)`. On a duplex the frames of period `p` are `p` phases on each of two strands, and the
    dihedral group acts on these `2p` frames simply transitively: `S` advances every phase, and `U`
    exchanges the strands with the phase reversed.
 4. **Decoder and channel (Holonic Compression; retention).** The duplex stores each letter twice,
@@ -1068,8 +1097,8 @@ Its five parts:
    - **The outer code: the quotient.** A receiver's face maps frame words to classes. Its kernel,
      the differences no admitted receiver distinguishes (`Foundation/CausalRelevance`), absorbs the
      coordinated substitutions it contains: they change no class. A coordinated substitution
-     outside the kernel changes the class without a witness. It is the code's residual, counted
-     and never claimed as refused.
+     outside the kernel changes the class without a witness. It is the code's residual, never
+     claimed as refused. Only a comparison with known truth counts it; online it is invisible.
    - A designed kernel holds the likely coordinated substitutions. On four letters, a frame
      position whose kernel contains a type `v ∈ V` absorbs every substitution of that type there.
      Retention keeps the quotient ([the retention contract](#the-retention-contract)).
@@ -1079,11 +1108,13 @@ Its five parts:
    - **Proved** (`Foundation/TopologicalReceiver`): `Lk` is symmetric (`linkingNumber_comm`),
      unmoved by viewing from the other side or rescaling the direction
      (`linkingTotal_neg_direction`, `linkingTotal_smul_direction`), and an integer where the over
-     and under half-sums agree (`linking_is_an_integer` under `HalvesAgree`, which the Rust owner
-     checks at every reading).
-   - **Owed:** its invariance under every admissible projection (`LinkingIsProjectionInvariant`,
-     an open `Prop` the Rust owner tests over declared directions), and `HalvesAgree` itself. With
-     them, `Lk` is conserved by every motion without a crossing.
+     and under half-sums agree (`linking_is_an_integer` under `HalvesAgree`).
+   - **Owed:** its invariance under every admissible projection (`LinkingIsProjectionInvariant`, an
+     open `Prop`) and `HalvesAgree` itself. With them, `Lk` is conserved by every motion without a
+     crossing. No current crate reads the linking number. The retired Rust owner checked both
+     half-sums at every reading and tested declared directions
+     (`13f8c734:crates/holonics-cuda/src/topological_receiver.rs`, `linking_number`,
+     `linking_under_directions`).
    - **Crossing changes.** One strand passing through the other flips one crossing between them
      and moves `Lk` by ±1. The core passing through itself, one duplex segment through another,
      flips four strand crossings. Where the strands run beside the core as a ribbon (each strand's
@@ -1095,9 +1126,10 @@ Its five parts:
      is not projection invariant (`projectedWrithe_is_not_projection_invariant`). The
      decomposition is owed (#62).
    - **Closure is a division with remainder.** Closing a duplex of `n` steps with relaxed turn `θ₀`
-     fixes the integer `Lk`. The relaxed twist `nθ₀/2π` is generally not an integer, so with the
-     decomposition the remainder `ΔLk = Lk − nθ₀/2π = ΔTw + Wr` is carried as strain, in twist
-     and writhe (supercoiling). How the stored energy divides between them is the constitution's
+     fixes the integer `Lk`. The relaxed twist `Tw₀ = nθ₀/2π` is generally not an integer. So with
+     the decomposition the remainder `ΔLk = Lk − (Tw₀ + Wr₀) = ΔTw + ΔWr` is carried as strain, in
+     twist and writhe (supercoiling). Here `Wr₀` is the relaxed core's writhe, zero for a planar
+     relaxed core. How the stored energy divides between them is the constitution's
      law (bending and twisting stiffness), and past a threshold of twist the core buckles into
      writhe, a joint's snap. Conservation alone gives no energy or access theorem.
 
@@ -1106,7 +1138,8 @@ Its five parts:
   potential.
 - A **Holarchy** is the paired duplex and its nesting: two strands joined by pair contacts, a helix
   of helices, many duplexes joined.
-- An **epoch** is a frame cell at a receiver's section.
+- An **epoch** is an interval between arrivals at a receiver's section. Within it, a position is
+  read by its residue, and the epoch count is its whole winding.
 - An **aeon** is the strand's passage, from opening to close. On closed strands its conserved
   charge is the linking number, which cycles read as whole windings, and its boundary is where the
   decoder's quotient is taken.
@@ -1115,9 +1148,11 @@ Its five parts:
 - complementarity stores each letter twice, which gives a built-in key, reciprocity and an exact
   location for every single-strand defect;
 - the pairing is a dihedral reflection, so positions, frames and shape transform together;
-- a non-locking repeat (an irrational or high-order winding, `Aeon/Clock/CarryWord`,
-  `never_locks_iff_irrational`) keeps the placement from resonating with itself, while a word
-  repeating in whole turns resonates and shapes its carrier;
+- an irrational winding never recurs exactly (`Aeon/Clock/CarryWord`,
+  `never_locks_iff_irrational`), but it comes near at every grain, and the small divisor
+  `|1 − ζ^q|` measures how near. The golden winding keeps it largest,
+  `liminf_q q·‖qφ‖ = 1/√5`, the most any irrational attains (Hurwitz). A word repeating in whole
+  turns resonates and shapes its carrier;
 - a designed kernel absorbs the likely coordinated defects, and the rest is a counted residual;
 - on closed strands the topology fixes `Lk`, so twist and writhe exchange and only crossings change
   it. The energy of that exchange is constitutive.
