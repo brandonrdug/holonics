@@ -1,0 +1,23 @@
+error[E0308]: mismatched types
+   --> crates/holonics/src/hnn/tests/physical_communication.rs:94:37
+    |
+ 94 |     theta = theta.with_ports(0,Some(map),None,None).unwrap();
+    |                                ---- ^^^ expected `Vec<Ratio<BigInt>>`, found `ExactRatMatrix`
+    |                                |
+    |                                arguments to this enum variant are incorrect
+    |
+    = note: expected struct `Vec<Ratio<num_bigint::BigInt>>`
+               found struct `ratio::linear::ExactRatMatrix`
+help: the type constructed contains `ratio::linear::ExactRatMatrix` due to the type of the argument passed
+   --> crates/holonics/src/hnn/tests/physical_communication.rs:94:32
+    |
+ 94 |     theta = theta.with_ports(0,Some(map),None,None).unwrap();
+    |                                ^^^^^---^
+    |                                     |
+    |                                     this argument influences the type of `Some`
+note: tuple variant defined here
+   --> <rust standard library>/core/src/option.rs:607:5
+    |
+607 |     Some(#[stable(feature = "rust1", since = "1.0.0")] T),
+    |     ^^^^
+

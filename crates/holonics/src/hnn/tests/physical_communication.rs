@@ -89,9 +89,13 @@ fn held_variation_fixture() -> (Field,Constitution,WordOpening,ReceiverDeclarati
     }
     let contact_factor = ExactRatMatrix::identity(2).unwrap();
     theta = theta.with_channel(0,contact_factor.clone(),contact_factor.clone(),contact_factor).unwrap();
+    // Fixed two-class complex contrast R(z_0,z_1)=(z_0-z_1,z_1-z_0), packed
+    // [Re_0,Im_0,Re_1,Im_1]. Both classes exist before any observed comparison.
     let map = ExactRatMatrix::new(vec![vec![integer(1),integer(0),integer(-1),integer(0)],
-        vec![integer(0),integer(1),integer(0),integer(-1)]]).unwrap();
-    theta = theta.with_ports(0,Some(map),None,None).unwrap();
+        vec![integer(0),integer(1),integer(0),integer(-1)],
+        vec![integer(-1),integer(0),integer(1),integer(0)],
+        vec![integer(0),integer(-1),integer(0),integer(1)]]).unwrap();
+    theta = theta.with_ports(0,None,None,Some(map)).unwrap();
     let ring_factor = ExactRatMatrix::identity(2).unwrap();
     let pump = PumpDeclaration::new(rat(1,16),
         ParametronCarrier::new(integer(1),integer(0)).unwrap(),PumpStep::Half).unwrap();

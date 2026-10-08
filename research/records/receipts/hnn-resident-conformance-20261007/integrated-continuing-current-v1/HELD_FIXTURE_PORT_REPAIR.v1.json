@@ -1,0 +1,185 @@
+{
+  "status": "HELD_FIXTURE_RECEIVING_PORT_AND_COMPLEX_CHART_REPAIRED_TYPE_AND_BEHAVIOR_PENDING",
+  "predecessor_source_commit": "c1b43b7d7250fa04df6da60859923579949b9aae",
+  "queue_receipt": "research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v108/VALIDATION.json",
+  "queue_receipt_sha256": "411890d3d11ad983173ea34bb11fedf2a9a53692d8b5b4277085a7fa1b36083b",
+  "raw_rendered_error_sha256": "f8777b585172f37acf16375c76ac51305c59ffa3d9d5f3c1749d707038e95cab",
+  "saved_diagnostics": "v108-LIB-TEST-BUILD_DIAGNOSTICS.txt",
+  "diagnostic_normalization": "Only the absolute toolchain source path is replaced with <rust standard library>; compiler error text unchanged.",
+  "component_grade": "INTEGRATED_SOURCE_OR_RUNTIME_REFUSED_OR_FAILED",
+  "HNN_output_grade_unchanged": "FOUR_FINITE_LOADED_SPAN_CONTROLS_PASS_ORIGINAL_OUTPUT_GATE_FAILED",
+  "stages": {
+    "hnn-integrated-c1b4-cache-preparation-20261008-v1": {
+      "phase": "cache-preparation",
+      "accepted_stage": true,
+      "whole_wall_ns": 8898998242,
+      "CPU_ns": 6999944000,
+      "fixed_guard_ns": 17000000000,
+      "measured_to_guard": {
+        "numerator": 8898998242,
+        "denominator": 17000000000
+      },
+      "group_peak_bytes": 4294967296,
+      "child_RSS_KiB": 31288,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 3533,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "wall_stop": false,
+      "CPU_stop": false,
+      "floor_stop": false,
+      "inputs_unchanged": true,
+      "quiescent_released": true
+    },
+    "hnn-integrated-c1b4-example-check-20261008-v1": {
+      "phase": "example-check",
+      "accepted_stage": true,
+      "whole_wall_ns": 8624391536,
+      "CPU_ns": 8497737000,
+      "fixed_guard_ns": 65000000000,
+      "measured_to_guard": {
+        "numerator": 8624391536,
+        "denominator": 65000000000
+      },
+      "group_peak_bytes": 1142607872,
+      "child_RSS_KiB": 859716,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "wall_stop": false,
+      "CPU_stop": false,
+      "floor_stop": false,
+      "inputs_unchanged": true,
+      "quiescent_released": true
+    },
+    "hnn-integrated-c1b4-library-guard-lints-20261008-v1": {
+      "phase": "library-guard-lints",
+      "accepted_stage": true,
+      "whole_wall_ns": 10551542273,
+      "CPU_ns": 10573018000,
+      "fixed_guard_ns": 65000000000,
+      "measured_to_guard": {
+        "numerator": 10551542273,
+        "denominator": 65000000000
+      },
+      "group_peak_bytes": 1154695168,
+      "child_RSS_KiB": 913048,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "wall_stop": false,
+      "CPU_stop": false,
+      "floor_stop": false,
+      "inputs_unchanged": true,
+      "quiescent_released": true
+    },
+    "hnn-integrated-c1b4-guard-doctests-20261008-v1": {
+      "phase": "guard-doctests",
+      "accepted_stage": true,
+      "whole_wall_ns": 22531895632,
+      "CPU_ns": 42197381000,
+      "fixed_guard_ns": 65000000000,
+      "measured_to_guard": {
+        "numerator": 22531895632,
+        "denominator": 65000000000
+      },
+      "group_peak_bytes": 2845306880,
+      "child_RSS_KiB": 2281008,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "wall_stop": false,
+      "CPU_stop": false,
+      "floor_stop": false,
+      "inputs_unchanged": true,
+      "quiescent_released": true
+    },
+    "hnn-integrated-c1b4-lib-test-build-20261008-v1": {
+      "phase": "lib-test-build",
+      "accepted_stage": false,
+      "whole_wall_ns": 14623735729,
+      "CPU_ns": 15302751000,
+      "fixed_guard_ns": 65000000000,
+      "measured_to_guard": {
+        "numerator": 14623735729,
+        "denominator": 65000000000
+      },
+      "group_peak_bytes": 1436426240,
+      "child_RSS_KiB": 1319468,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "wall_stop": false,
+      "CPU_stop": false,
+      "floor_stop": false,
+      "inputs_unchanged": true,
+      "quiescent_released": true
+    }
+  },
+  "all_released": true,
+  "accepted_predecessor_checks": [
+    "example-check",
+    "library-guard-lints",
+    "guard-doctests:57 passed,0 failed"
+  ],
+  "repair": {
+    "path": "crates/holonics/src/hnn/tests/physical_communication.rs",
+    "prior_sha256": "8e6bb407f494396202680b7c33b117a1ff2f8b8fd9f68dfe2d7127e2017087c8",
+    "successor_sha256": "b70c6d17718830755a272310441fc31b9b717e2c062da51b8badc15bdf976455",
+    "changed_native_inputs": [
+      "crates/holonics/src/hnn/tests/physical_communication.rs"
+    ],
+    "unchanged_native_inputs": 305,
+    "api": "Constitution::with_ports(ring, Option<Vec<Rat>> standing, Option<ExactRatMatrix> source, Option<ExactRatMatrix> receiving)",
+    "call_site": "Move the readout matrix to the receiving slot; no standing or source replacement.",
+    "additional_static_defect": "The proposed call-slot-only patch would install a 2x4 matrix. ReceivingPhases::read_carrier requires 2*alphabet=4 rows and receiver ring width=4 columns.",
+    "agent_inferred_chart": "Retain both original rows for class0 complex contrast z0-z1; add their negatives for class1 z1-z0. Realification is [Re0,Im0,Re1,Im1]. Exact fixed mechanical chart, declared before comparisons, no desired target injection, fitted answer or acquisition claim.",
+    "nearby_review": "Reviewed both with_ports calls in physical_communication.rs: material source in source slot is correct. New rebase fixtures and production runner contain no with_ports calls. Checked new with_element/with_channel/with_ring_resonator dimensions against ring/contact widths. No other mismatch found.",
+    "preserved": "All assertions, comparison masks, observations, targets, source clock, nonzero carried opening, native law/adjoint/oracle/rebase/update checks, runner source, selectors, variation budgets and resource caps unchanged.",
+    "source_parse_command": [
+      "rustfmt",
+      "--edition",
+      "2024",
+      "--config",
+      "skip_children=true",
+      "--emit",
+      "stdout",
+      "crates/holonics/src/hnn/tests/physical_communication.rs"
+    ],
+    "parse_only_pass": true,
+    "whitespace_pass": true,
+    "source_owner_builds_tests_training_benchmarks_scientific_runs": 0,
+    "reuse_scope": "Only cfg(test) fixture source changes. Accepted non-test library/example/guard/doctest inputs are unchanged; sole queue decides reuse from exact input/config seals. Test build, all focused controls and whole behavior remain pending."
+  },
+  "whole_native_behavior_acceptance": false,
+  "scientific_validation_or_acquisition_acceptance": false
+}

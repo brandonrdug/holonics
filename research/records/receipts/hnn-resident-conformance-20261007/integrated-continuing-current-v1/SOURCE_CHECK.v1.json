@@ -1,6 +1,6 @@
 {
-  "status": "LIBRARY_CHECK_PASSED_AT_C341_RUNNER_IMPORT_REPAIRED_EXAMPLE_AND_WHOLE_RUN_PENDING",
-  "source_manifest_sha256": "fff079f6f1f05fa74498d89f34fa47a573ddc6c5b3320c3b677d7296998845f3",
+  "status": "PREDECESSOR_LIBRARY_EXAMPLE_GUARDS_57_DOCTESTS_PASS_HELD_FIXTURE_REPAIRED_TEST_BUILD_AND_WHOLE_PENDING",
+  "source_manifest_sha256": "c0d36c00d84e1402750275f64e4d33bc9bc40f0071e671af411c39a12d24d00a",
   "source_input_count": 306,
   "source_parse_checks": [
     "crates/holonics/src/hnn/constitution.rs",
@@ -54,7 +54,8 @@
   "runner_revision": "v3 import-only successor aabf856da37f18d9fc97fab5abe1d395cf9a0e4ff87685c0ae699eba685277a0: remove duplicate FieldMaterial method import; all v2 assertions/refusal output/exit2, physics, fixed count and resource policy unchanged",
   "compile_repair_receipt": "RUNNER_COMPILE_REPAIR.v1.json",
   "incremental_parse_checks": [
-    "research/notebook/hnn_design/hnn_continuing_behavior.rs"
+    "crates/holonics/src/hnn/tests/physical_communication.rs"
   ],
-  "source_inputs_reverified": 306
+  "source_inputs_reverified": 306,
+  "fixture_repair_receipt": "HELD_FIXTURE_PORT_REPAIR.v1.json"
 }

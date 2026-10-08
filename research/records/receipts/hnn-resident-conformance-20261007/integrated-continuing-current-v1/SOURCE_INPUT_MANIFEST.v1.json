@@ -479,8 +479,8 @@
       "sha256": "c5eb98795e16a1fe15e73e4cedd71f678bbde2c197856c770d6d082bf1a81f8d"
     },
     "crates/holonics/src/hnn/tests/physical_communication.rs": {
-      "bytes": 72322,
-      "sha256": "8e6bb407f494396202680b7c33b117a1ff2f8b8fd9f68dfe2d7127e2017087c8"
+      "bytes": 72600,
+      "sha256": "b70c6d17718830755a272310441fc31b9b717e2c062da51b8badc15bdf976455"
     },
     "crates/holonics/src/hnn/tests/physics.rs": {
       "bytes": 64392,
