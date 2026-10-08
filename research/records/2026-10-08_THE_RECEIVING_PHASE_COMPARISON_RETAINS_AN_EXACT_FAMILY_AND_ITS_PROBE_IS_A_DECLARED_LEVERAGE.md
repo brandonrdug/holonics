@@ -95,6 +95,35 @@ outcome meets at least two exact blocks and its declared leverage strictly excee
 comparison's. The leverage is a convention compared exactly, not an entropy or a guaranteed gain.
 The counted partition and `release` are unchanged. Atlas `release.leverage-probe`.
 
+## 4b. The Ask consumer on the action path
+
+[definition; agent-inferred] `Word::prospective_feature` reads, at the one compared station, the
+native feature the receiving map multiplies, as an exact affine function of the admitted control,
+`x(u) = x₀ + J u`. It mirrors the request path's checks, and its consumer equation is checked in
+tests: `R x₀` is the request path's baseline, and `R J` is its response, row by row.
+`AdmittedWaves` declares the finite probe set: the controls `u ∈ 2^(−j)ℤ^m` whose model
+preparation work `P(m + Bu) − P(m)` (the owner's `PowerForm::ring_power`, cross term included and
+possibly negative) does not exceed the declared supply. `B` must have full column rank, and a
+declared enumeration capacity refuses, never truncates.
+
+`PreparedPhysicalProbe::ask` reads the receiving law's phase family at `τ = ε_bits·N`. It offers
+through `receiver::release` the admitted wave whose image meets at least two blocks with the
+greatest total leverage; ties fall to the lexicographically least `u`, a declared convention.
+Otherwise it holds, with a typed reason. `encounter` executes exactly the request path's actual
+World encounter, return, carry publication, comparison and deposit through one shared private
+execution. It returns the native prediction made before the encounter, and a `PhaseDiscrepancy`
+that reads the actual World face's lifted phase block against it. A miss is falsification of the
+native prediction. With no receipt yet (`N = 0`) the family is a single member and the first
+decision holds, so the family is founded by earlier receipts, such as the receiver's prior
+observations.
+
+Brandon's lens of October 8 (relayed by Epime): noise is an unresolved field of possibilities,
+and repeated traversal over the terrain organizes it into music, repair or generation. Here the
+declared family is that unresolved field, each actual encounter is a re-traversal that restricts
+it, and release at tolerance is its organization. The lens adds no subsystem. It keeps physical
+iteration, prediction and learning publication distinct in their accounting while they share one
+state.
+
 ## 5. Located defects in the receiving deposit
 
 - **Soft faces were misread (repaired).** `face_masses` reconstructed `p̃` from the covector,

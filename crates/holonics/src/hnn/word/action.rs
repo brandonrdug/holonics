@@ -6,10 +6,49 @@
 //! A requested receiving carrier is distinct from the later world observation.
 //! Only a singleton fibre releases a control. No class chooser, minimum-norm
 //! representative, effort/wave identification or selection-policy derivative is supplied.
+//!
+//! [definition; agent-inferred, October 8] **The native feature read of an informative probe.**
+//! The receiving read of one station multiplies a single vector, the feature
+//! `x = P_receiver^lift · anchor` (`ReceivingPhases::read`: logits `f = R x`, class phases
+//! `φ_c = Im f_c / 2`). On the same exact linear domain `x(u) = x0 + J u`, where `x0` is the
+//! baseline passage's feature at the compared station and row `j` of `J` is the matched reverse law
+//! of the unit covector `e_j` in the place of the receiving row `R_i` that
+//! [`Word::prospective_port_preparation`] reverses. [`Word::prospective_feature`] returns `(x0, J)`
+//! and nothing else: no request, no residual and no control fibre are formed, because an
+//! informative probe is not a request. `y(0) + L u` is never installed as a requested carrier or as
+//! a target, and a candidate control is a point of a declared finite lattice
+//! (`physical::action::AdmittedWaves`), never a sample of a control fibre. The consumer equations,
+//! checked by [`ProspectiveFeature::agrees_with`] and by `tests/physical_ask.rs` against an
+//! independent forward perturbation: at the one compared station `R J` is the response that
+//! [`Word::prospective_port_preparation`] forms row by row, `R x0` is its baseline reading, and
+//! `x(u)` is the feature an independently executed forward Word reads after the injection `B u`.
+//! [definition] The feature is the NATIVE passage's. The actual World's reflected return replaces
+//! the source storage after every full tick, which this baseline does not model, so `x(u)` predicts
+//! the native readout only and the executed feature may differ from it.
+//!
+//! [definition; agent-inferred, October 8] **The model preparation work of a candidate.** The
+//! existing owner of the storage power is [`PowerForm::ring_power`], `P(s) = (h/4) Y |s|²` at the
+//! preparation's ring. For the opening's source wave `m` the work of the control `u` is
+//! `W(u) = P(m + B u) − P(m) = h Y (m · B u) / 2 + h Y |B u|² / 4`
+//! ([`ProspectiveFeature::preparation_work`]), the same quantity
+//! [`PortPreparationReceipt::work`] reports when `u` is applied. No second formula is kept: the
+//! bound of the admitted lattice is derived from `P` at a unit wave.
+//!
+//! [definition; agent-inferred, October 8] **Recorded failures checked**
+//! ([lessons](../../../../../research/records/2026-09-29_LESSONS_THE_FAILURES_THAT_REPEATED_AFTER_THEY_WERE_RECORDED.md)).
+//! Lesson 5 (no authored routine): this owner selects nothing; the probe's choice belongs to the
+//! retained family and the release law (`physical::action`). Lesson 4 (no tape): no occurrence,
+//! old Word or response column is retained. A requested carrier stays distinct from a probe: the
+//! applied preparation of a probe carries an empty `requested`, and
+//! [`AppliedPortPreparation::verify_execution`] refuses it rather than verifying nothing.
+//!
+//! [open] The Lean counterpart of the affine feature read (`R J` = the response, `x(u)` against a
+//! forward perturbation) is owed (#62); `tests/physical_ask.rs` checks it exactly on the declared
+//! fixtures.
 
 use std::sync::Arc;
 
-use num_traits::Zero;
+use num_traits::{One, Zero};
 
 use super::{EndChange, FieldBalance, PowerForm, Word, WordBalance};
 use crate::hnn::HnnError;
@@ -245,58 +284,9 @@ impl ProspectiveControl {
                 what: "the released control solves its producing relation",
             });
         }
-        let added = self.preparation.map.apply(&control)?;
-        let ring = self.preparation.ring;
-        let mut opening = self.producer.opening.clone();
-        let old = opening.storage[ring].clone();
-        for (x, delta) in opening.storage[ring].iter_mut().zip(&added) {
-            *x += delta;
-        }
-        let form = PowerForm::read(
-            baseline.field,
-            &self.producer.constitution,
-            &self.producer.current,
-        )?;
-        let before =
-            form.power(&self.producer.opening)? + form.resonator_power(&self.producer.opening)?;
-        let after = form.power(&opening)? + form.resonator_power(&opening)?;
-        let quadratic = form.ring_power(ring, &added);
-        let cross = form.ring_power(ring, &opening.storage[ring])
-            - form.ring_power(ring, &old)
-            - &quadratic;
-        let receipt = PortPreparationReceipt {
-            before: before.clone(),
-            after: after.clone(),
-            work: after - before,
-            cross,
-            quadratic,
-            added,
-        };
-        if !receipt.closes() {
-            return Err(HnnError::Realization {
-                what: "the actual source preparation work closes",
-            });
-        }
-        // No encoded answer or synthesized SourceMoment: only the actual wave port changes.
-        let mut word = Word::on_change(
-            baseline.field,
-            baseline.operands.clone(),
-            opening.clone(),
-            baseline.opened_at,
-        )?;
-        let mut producer = self.producer;
-        producer.opening = opening;
-        producer
-            .support
-            .extend(producer.opening.support(baseline.field));
-        producer.support.sort_unstable();
-        producer.support.dedup();
-        word.native_source = Some((
-            producer.constitution.clone(),
-            producer.current.clone(),
-            producer.source.clone(),
-            producer.support.clone(),
-        ));
+        // The shared tail: the same physical application serves a probe's admitted control.
+        let (word, receipt, producer) =
+            apply_control(self.producer, &self.preparation, &baseline, &control)?;
         let applied = AppliedPortPreparation {
             producer,
             preparation: self.preparation,
@@ -310,6 +300,69 @@ impl ProspectiveControl {
         };
         Ok((word, receipt, applied))
     }
+}
+
+/// [definition; agent-inferred, October 8] **One admitted control applied at the whole producing
+/// opening**: the tail that `ProspectiveControl::prepare` (a request's unique preimage) and
+/// `ProspectiveFeature::prepare_control` (a probe's lattice point) share, moved out of `prepare`
+/// with its checks and their order unchanged. Only the actual wave port changes: the added wave
+/// `B u` enters the opening's source storage, the model preparation work is read from the one
+/// power form at the opening's own material, current and pump phase and must close, and the
+/// controlled Word opens on that change with the producer's source binding. No encoded answer and
+/// no synthesized `SourceMoment` is made. Returns the controlled Word, the receipt and the producer
+/// with its opening and support advanced to the controlled change.
+fn apply_control<'c>(
+    mut producer: ActionProducer,
+    preparation: &PortPreparation,
+    baseline: &Word<'c>,
+    control: &[Rat],
+) -> Result<(Word<'c>, PortPreparationReceipt, ActionProducer), HnnError> {
+    let added = preparation.map.apply(control)?;
+    let ring = preparation.ring;
+    let mut opening = producer.opening.clone();
+    let old = opening.storage[ring].clone();
+    for (x, delta) in opening.storage[ring].iter_mut().zip(&added) {
+        *x += delta;
+    }
+    let form = PowerForm::read(baseline.field, &producer.constitution, &producer.current)?;
+    let before = form.power(&producer.opening)? + form.resonator_power(&producer.opening)?;
+    let after = form.power(&opening)? + form.resonator_power(&opening)?;
+    let quadratic = form.ring_power(ring, &added);
+    let cross =
+        form.ring_power(ring, &opening.storage[ring]) - form.ring_power(ring, &old) - &quadratic;
+    let receipt = PortPreparationReceipt {
+        before: before.clone(),
+        after: after.clone(),
+        work: after - before,
+        cross,
+        quadratic,
+        added,
+    };
+    if !receipt.closes() {
+        return Err(HnnError::Realization {
+            what: "the actual source preparation work closes",
+        });
+    }
+    // No encoded answer or synthesized SourceMoment: only the actual wave port changes.
+    let mut word = Word::on_change(
+        baseline.field,
+        baseline.operands.clone(),
+        opening.clone(),
+        baseline.opened_at,
+    )?;
+    producer.opening = opening;
+    producer
+        .support
+        .extend(producer.opening.support(baseline.field));
+    producer.support.sort_unstable();
+    producer.support.dedup();
+    word.native_source = Some((
+        producer.constitution.clone(),
+        producer.current.clone(),
+        producer.source.clone(),
+        producer.support.clone(),
+    ));
+    Ok((word, receipt, producer))
 }
 
 /// Model source preparation work at fixed material/phase. Actual world effort/flow
@@ -370,6 +423,8 @@ impl AppliedPortPreparation {
     pub fn phases(&self) -> &ReceivingPhases {
         &self.phases
     }
+    /// One requested carrier per station of the aperture; EMPTY for a probe's applied
+    /// preparation, which has no requested consequence (a probe is not a request).
     pub fn requested(&self) -> &[Vec<Rat>] {
         &self.requested
     }
@@ -403,6 +458,14 @@ impl AppliedPortPreparation {
     /// This checks no requested-vs-world equality and certifies no world prediction.
     pub fn verify_execution(&self, word: &Word<'_>) -> Result<(), HnnError> {
         self.verify_producer(word)?;
+        // A probe's applied preparation (`ProspectiveFeature::prepare_control`) carries no
+        // requested consequence: verifying it would compare nothing and pass. A request's
+        // always carries one carrier per station of its aperture.
+        if self.requested.len() != self.phases.aperture() {
+            return Err(HnnError::Unadmitted {
+                reason: "a probe's applied preparation carries no requested consequence to verify",
+            });
+        }
         for ((epoch, target), selected) in self
             .phases
             .epochs()
@@ -430,6 +493,196 @@ impl AppliedPortPreparation {
             }
         }
         Ok(())
+    }
+}
+
+/// [definition; agent-inferred, October 8] **The native feature read at one compared station**
+/// (module header): the baseline feature `x0`, its Jacobian `J` in the declared controls, and the
+/// operands that produced them. Nothing is requested and nothing is selected: `x(u) = x0 + J u` is
+/// the NATIVE passage's feature after the declared wave `B u`, a prediction of the readout and not
+/// of the actual World's reflected return. Source-private, like [`ProspectiveControl`]: it keeps
+/// the producing operands and is transient, never resident history.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ProspectiveFeature {
+    producer: ActionProducer,
+    preparation: PortPreparation,
+    phases: ReceivingPhases,
+    compared: Vec<bool>,
+    /// The one compared station, an index into the receiving aperture.
+    station: usize,
+    /// The word tick (junction step) at which that station reads the passage.
+    crossing: usize,
+    /// `x0 = P_receiver^lift · anchor`, one entry per coordinate of the receiving ring.
+    baseline_feature: Vec<Rat>,
+    /// `J`, the receiving ring's width by the preparation's controls.
+    jacobian: ExactRatMatrix,
+    /// The baseline receiving reading at every station of the aperture, as
+    /// [`ProspectiveControl::baseline`] holds it.
+    baseline: Vec<Vec<Rat>>,
+    /// `R J`: the receiving map's rows at the compared station applied to `J`.
+    response: ExactRatMatrix,
+    /// The one power form of the opening's own material, current and pump phase.
+    form: PowerForm,
+    prediction_word: WordBalance,
+    prediction_balances: Vec<FieldBalance>,
+}
+
+impl ProspectiveFeature {
+    /// The one compared station, an index into the receiving aperture.
+    pub fn station(&self) -> usize {
+        self.station
+    }
+    /// The word tick (junction step) at which the compared station reads the passage.
+    pub fn crossing(&self) -> usize {
+        self.crossing
+    }
+    /// The absolute pump clock of that crossing, `opened_at + crossing`.
+    pub fn tick(&self) -> usize {
+        self.producer.opened_at + self.crossing
+    }
+    /// `x0`, the baseline passage's feature at the compared station.
+    pub fn baseline_feature(&self) -> &[Rat] {
+        &self.baseline_feature
+    }
+    /// `J`: `x(u) = x0 + J u` on the declared exact linear domain.
+    pub fn jacobian(&self) -> &ExactRatMatrix {
+        &self.jacobian
+    }
+    /// The baseline receiving logits at the compared station, `R x0`.
+    pub fn baseline_logits(&self) -> &[Rat] {
+        &self.baseline[self.station]
+    }
+    /// The baseline receiving logits at every station of the aperture.
+    pub fn baseline(&self) -> &[Vec<Rat>] {
+        &self.baseline
+    }
+    /// `R J` at the compared station: the rows are its realified receiving coordinates.
+    pub fn response(&self) -> &ExactRatMatrix {
+        &self.response
+    }
+    pub fn phases(&self) -> &ReceivingPhases {
+        &self.phases
+    }
+    pub fn preparation(&self) -> &PortPreparation {
+        &self.preparation
+    }
+    pub fn compared(&self) -> &[bool] {
+        &self.compared
+    }
+    pub fn current(&self) -> &Current {
+        &self.producer.current
+    }
+    pub fn producing_commit(&self) -> u64 {
+        self.producer.constitution.commit()
+    }
+    pub fn opened_at(&self) -> usize {
+        self.producer.opened_at
+    }
+    pub fn prediction_word(&self) -> &WordBalance {
+        &self.prediction_word
+    }
+    pub fn prediction_balances(&self) -> &[FieldBalance] {
+        &self.prediction_balances
+    }
+    /// `m`, the opening's current source storage wave at the preparation's ring.
+    pub fn source_wave(&self) -> &[Rat] {
+        &self.producer.opening.storage[self.preparation.ring]
+    }
+
+    /// The existing owner's storage power at the preparation's ring, `P(s) = (h/4) Y |s|²`
+    /// ([`PowerForm::ring_power`]), under the opening's own material, current and pump phase.
+    pub fn storage_power(&self, wave: &[Rat]) -> Rat {
+        self.form.ring_power(self.preparation.ring, wave)
+    }
+
+    /// **The model preparation work of the control `u`**: `W(u) = P(m + B u) − P(m)`, with `P` the
+    /// owner's [`Self::storage_power`] and `m` the opening's [`Self::source_wave`]; that is
+    /// `h Y (m · B u) / 2 + h Y |B u|² / 4`. It is the `work` of the [`PortPreparationReceipt`]
+    /// that applying `u` returns. Actual world-port work is a separate supply.
+    pub fn preparation_work(&self, control: &[Rat]) -> Result<Rat, HnnError> {
+        let added = self.preparation.map.apply(control)?;
+        let old = self.source_wave();
+        let wave: Vec<Rat> = old.iter().zip(&added).map(|(m, delta)| m + delta).collect();
+        Ok(self.storage_power(&wave) - self.storage_power(old))
+    }
+
+    /// `x(u) = x0 + J u`: the native feature at the compared station after the declared wave.
+    pub fn feature_at(&self, control: &[Rat]) -> Result<Vec<Rat>, HnnError> {
+        let moved = self.jacobian.apply(control)?;
+        Ok(self
+            .baseline_feature
+            .iter()
+            .zip(&moved)
+            .map(|(x, delta)| x + delta)
+            .collect())
+    }
+
+    /// **The consumer equations against the request path.** For a [`ProspectiveControl`] that reads
+    /// the same producing opening, phases, preparation and compared station, `R x0` is its
+    /// baseline reading at that station and `R J` is its response, row by row. `false` when the
+    /// two do not read the same opening (so nothing is compared); an error is a refusal of the
+    /// receiving map, not a disagreement.
+    pub fn agrees_with(&self, control: &ProspectiveControl) -> Result<bool, HnnError> {
+        if control.compared() != self.compared.as_slice()
+            || control.phases() != &self.phases
+            || control.preparation() != &self.preparation
+            || control.producing_commit() != self.producing_commit()
+            || control.opened_at() != self.opened_at()
+            || control.current() != self.current()
+        {
+            return Ok(false);
+        }
+        let map = self
+            .producer
+            .constitution
+            .receiving_map(self.phases.ring())
+            .ok_or(HnnError::MissingReceivingMap {
+                ring: self.phases.ring(),
+            })?;
+        let reads = control.baseline().get(self.station) == Some(&map.apply(&self.baseline_feature)?);
+        let rows = &map.multiply(&self.jacobian)? == control.response();
+        Ok(reads && rows)
+    }
+
+    /// Apply one admitted control of the declared domain at the original full native source
+    /// opening: the probe's counterpart of [`ProspectiveControl::prepare`], with its producer,
+    /// opening and shape checks and the one shared physical application ([`apply_control`]), and
+    /// without any fibre or request. The applied preparation carries an empty `requested`.
+    pub(crate) fn prepare_control<'c>(
+        self,
+        baseline: Word<'c>,
+        control: &[Rat],
+    ) -> Result<(Word<'c>, PortPreparationReceipt, AppliedPortPreparation), HnnError> {
+        if !self.producer.matches(&baseline)
+            || baseline.ticks() != 0
+            || baseline.is_ended()
+            || baseline.change()? != self.producer.opening
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "the action consumes its own whole producing source opening",
+            });
+        }
+        if control.len() != self.preparation.controls() {
+            return Err(HnnError::Shape {
+                what: "the admitted source wave control",
+                expected: self.preparation.controls(),
+                found: control.len(),
+            });
+        }
+        let (word, receipt, producer) =
+            apply_control(self.producer, &self.preparation, &baseline, control)?;
+        let applied = AppliedPortPreparation {
+            producer,
+            preparation: self.preparation,
+            phases: self.phases,
+            requested: Vec::new(),
+            compared: self.compared,
+            baseline: self.baseline,
+            response: self.response,
+            control: control.to_vec(),
+            injection: receipt.added.clone(),
+        };
+        Ok((word, receipt, applied))
     }
 }
 
@@ -569,6 +822,139 @@ impl Word<'_> {
             response,
             residual,
             fibre,
+        })
+    }
+}
+
+impl Word<'_> {
+    /// **Read the native feature of the one compared station through this source-bound exact
+    /// native opening** (module header): `x0` and `J` with `x(u) = x0 + J u` on the preparation's
+    /// declared controls. It mirrors [`Word::prospective_port_preparation`] up to the reverse
+    /// sweeps: the same producer check, field check, baseline Word run and closed-balance check, and
+    /// exactly one compared station. Row `j` of `J` replaces the receiving row `R_i` by the unit
+    /// covector `e_j` in the same loop (rotate by `−lift`, the anchor differential at the
+    /// station's epoch, the opening dual at the preparation's ring, the preparation transpose).
+    /// No request is read, so no target, residual or fibre exists here; the opening and the Word
+    /// are left unrun and unchanged.
+    pub fn prospective_feature(
+        &self,
+        phases: &ReceivingPhases,
+        preparation: &PortPreparation,
+        compared: &[bool],
+    ) -> Result<ProspectiveFeature, HnnError> {
+        let producer = ActionProducer::of(self)?;
+        if self.field != &preparation.field {
+            return Err(HnnError::Unadmitted {
+                reason: "the preparation belongs to its actually declared field",
+            });
+        }
+        if compared.len() != phases.aperture() {
+            return Err(HnnError::Shape {
+                what: "the complete receiving partition",
+                expected: phases.aperture(),
+                found: compared.len(),
+            });
+        }
+        let selected: Vec<usize> = compared
+            .iter()
+            .enumerate()
+            .filter(|(_, chosen)| **chosen)
+            .map(|(station, _)| station)
+            .collect();
+        let [station] = selected[..] else {
+            return Err(HnnError::Unadmitted {
+                reason: "a native feature read compares exactly one declared receiving station",
+            });
+        };
+        let mut baseline_word = Word::on_change(
+            self.field,
+            self.operands.clone(),
+            producer.opening.clone(),
+            self.opened_at,
+        )?;
+        // Full ticks retain the real end for the later current; anchors are read at their
+        // own junctions. Loaded pump phases read opened_at+k exactly as the controlled Word.
+        baseline_word.run(phases.junction_steps())?;
+        let prediction_word = WordBalance::of(&baseline_word.released()?);
+        let prediction_balances = baseline_word.field_balances().to_vec();
+        if !prediction_word.closes() || prediction_balances.iter().any(|b| !b.closes()) {
+            return Err(HnnError::Unadmitted {
+                reason: "the native prospective passage exposes its actual closed work receipts",
+            });
+        }
+        let baseline = phases
+            .epochs()
+            .map(|epoch| {
+                let anchor =
+                    baseline_word
+                        .anchor(epoch, phases.ring())
+                        .ok_or(HnnError::WordEnded {
+                            ticks: baseline_word.ticks(),
+                        })?;
+                Ok(phases
+                    .read(
+                        self.field,
+                        &producer.constitution,
+                        &producer.current,
+                        anchor,
+                    )?
+                    .logits)
+            })
+            .collect::<Result<Vec<_>, HnnError>>()?;
+        let map = producer.constitution.receiving_map(phases.ring()).ok_or(
+            HnnError::MissingReceivingMap {
+                ring: phases.ring(),
+            },
+        )?;
+        let crossing = phases.epochs().nth(station).ok_or(HnnError::Shape {
+            what: "the compared station inside the receiving aperture",
+            expected: phases.aperture(),
+            found: station,
+        })?;
+        let anchor = baseline_word
+            .anchor(crossing, phases.ring())
+            .ok_or(HnnError::WordEnded {
+                ticks: baseline_word.ticks(),
+            })?;
+        let ring = self.field.ring(phases.ring());
+        let lift = &producer.current.lift()[phases.ring()];
+        // x0 is what the receiving read multiplies: `ReceivingPhases::read` forms logits as R x0.
+        let baseline_feature = ring.rotate(anchor, lift);
+        if map.apply(&baseline_feature)? != baseline[station] {
+            return Err(HnnError::Realization {
+                what: "the native feature reproduces the baseline receiving reading",
+            });
+        }
+        let width = baseline_feature.len();
+        let preparation_transpose = preparation.map.transpose()?;
+        let mut rows = Vec::with_capacity(width);
+        for coordinate in 0..width {
+            let mut unit = vec![Rat::zero(); width];
+            unit[coordinate] = Rat::one();
+            // P is a declared permutation: its transpose is the inverse rotor.
+            let anchor_row = ring.rotate(&unit, &(-lift));
+            let mut anchors = vec![None; baseline_word.ticks()];
+            anchors[crossing] = Some(anchor_row);
+            let opening_dual = baseline_word.anchor_differential(anchors, phases.ring())?;
+            rows.push(preparation_transpose.apply(&opening_dual.storage[preparation.ring])?);
+        }
+        let jacobian = ExactRatMatrix::shaped(width, preparation.controls(), rows)?;
+        let response = map.multiply(&jacobian)?;
+        let form = PowerForm::read(self.field, &producer.constitution, &producer.current)?;
+        Ok(ProspectiveFeature {
+            producer,
+            preparation: preparation.clone(),
+            phases: phases.clone(),
+            compared: compared.to_vec(),
+            station,
+            crossing,
+            baseline_feature,
+            jacobian,
+            baseline,
+            response,
+            form,
+            prediction_word,
+            prediction_balances,
         })
     }
 }
