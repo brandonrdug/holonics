@@ -161,6 +161,93 @@ pinned below their cells.
 4. a word as a fluid program: a native statement of the family-376 constructions on the Swing's
    moves.
 
+## 8. Evolution is of the joints
+
+[project-postulate; lens] Brandon, October 8: evolution itself is of the joints and about complex
+action transport. He named carcinization (a teaching example, not an inevitability), similar
+fingers with an opposable thumb, the vocal cords, the spine and limbs for traversal, eyes, jumping
+spiders, webs, ommatidia, siphonophores, and plants, trees and fruits. This section reads them as
+mathematics only. A Haiku recollection of the older thinking (read-only) supplied the earlier
+owners cited below.
+
+[agent-inferred; owners named] Each is read in the objects.
+- **The articulated body is a serial screw word** (`docs/HOLON.md`, `Transport/SerialScrewChain`,
+  atlas `screw.*`, `chain.*`). Fingers, spine and limbs are chains of joints, and the motor chart
+  is serial screw words.
+  - A grasp closes a loop: the opposed thumb joins two chains into one circuit whose holonomy must
+    close (`menu_loop_closure`; holonomy only on declared circuits). The contact wrenches must also
+    positively span the wrench space. A positive spanning set of `ℝᵈ` has at least `d + 1`
+    vectors, so a frictionless grasp needs at least 4 contacts in the plane (`d = 3`) and 7 in
+    space (`d = 6`); friction cones lower the count (atlas `chain.force-closure-count`).
+  - A chain with more joints than its task has dimensions moves in the kernel of its Jacobian
+    without moving its end: self-motion, as in the spine and the hand.
+- **Gaits are locks of coupled rings** (atlas `lock.farey-neighbour`, `Geometry/Farey`). Limbs are
+  oscillating rings coupled through the body. A gait is a phase lock, and the gaits of one
+  network are its symmetry-breaking patterns (Golubitsky, Stewart, Buono and Collins, *Nature*
+  1999).
+- **Voice is a valve, a tube and a conjugation.** The vocal folds are a self-oscillating valve fed
+  by the airflow (the glottal rate law, `2026-08-13_THE_MOUTH_IS*`). Their periodic opening
+  modulates the tract's boundary, a pump in the parametron's sense, and the tract is a tube whose
+  resonances filter the source. A song is an ordered word of gears, and a changed voice conjugates
+  it (`2026-07-15_THE_GEAR_IS*`): transposition is conjugation by a frame. The ossicles are an
+  impedance-matching joint, by area and lever ratios.
+- **An eye is a frame transport and a partition** (`embodied-optical-receiver-atlas`: aperture,
+  propagation, sampling).
+  - A compound eye is a hexagonal partition of a curved surface, and curvature sets the angles
+    between facets (`2026-07-25_THE_HEXAGON_CARRIES*`). A closed trivalent mesh of genus zero has
+    `Σ_f (6 − n_f) = 12`, so a closed hexagonal mesh needs twelve pentagons
+    (`2026-09-27_EGG_PACKING*`; atlas `globe.closed-mesh-twelve`). Each facet's diffraction is the
+    cyclic face amplitude law (`Geometry/HolonicPlatonicDiffraction`).
+  - A jumping spider's principal eye moves a narrow retina behind a fixed lens, a moving
+    partition. It reads depth from the defocus between layered retinas (Nagata et al., *Science*
+    2012): a ratio of two partitions' faces.
+- **A web is a mode code that locates a mass.** A mass `m` at `x` on a structure with modes `φ_n`
+  of modal mass `M_n` shifts each frequency by `δω_n/ω_n = −m φ_n(x)²/(2M_n)` to first order
+  (Rayleigh; atlas `receiver.web-mode-locates-mass`). Several modes' shifts locate `x`. This is
+  thunder's ranging, not the drum's single spectrum. Tension and mass return the disturbance to
+  the leg (`2026-07-13_THE_MEDIUM_CLOSES*`), and a hair is a cantilever reading its base moment
+  (`2026-09-27_EGG_PACKING*`). The web is built by the spider's own serial word and read by its
+  modes.
+- **A siphonophore is a Holarchy** (`2026-09-19_SIPHONOPHORE*`; atlas `holarchy.*`): colony and
+  zooids are each Holons at their own boundaries, whole and part at once.
+- **Phyllotaxis is the golden winding.** Successive primordia at the golden angle never lock
+  (`rotation.lock-or-quasicrystal`). Their gaps take at most three lengths, which are the
+  continued-fraction residues (`rotation.three-distance`). The golden ratio keeps its near-returns
+  farthest, `liminf_q q‖qφ‖ = 1/√5`, the most any irrational attains (Hurwitz; atlas
+  `rotation.golden-hurwitz`), so primordia spread at every grain. The visible spiral pairs are
+  consecutive Fibonacci numbers: consecutive convergents, Farey neighbours by Cassini's identity
+  `F_{n−1}F_{n+1} − F_n² = (−1)ⁿ` (`rotation.golden-approximants`).
+  - A tree chooses no global branch vector (`2026-07-13_THE_WORLD_GROWS*`). Its axes are founded and
+    then conducted (`2026-07-15_THE_CHART_REVOLVES*`). Shared vertices between branches are mutual
+    constraints that lower the degrees of freedom (Brandon, August 21).
+- **A fruit is a globe holding dormant modes.** It is a relatively complete region: its interior
+  persists, coupled to the exterior but not determined by it. Its seeds are dormant modes that
+  reopen when the constitution changes (the parametron's dormancy).
+- **Convergent form is a landmark** (`compression.landmarks`: faces where navigator paths
+  converge). Repeated crab form is many paths converging on one face. It stays a hypothesis to test
+  as a receiver (`2026-09-27_EGG_PACKING*`).
+- **Evolution as complex action transport.** Deposition is the only law that changes a
+  constitution, from covectors that actually reached it. Across aeons the joints that carry the
+  action are the ones reshaped: §6's loop of currents curving the constitution, at the scale of
+  lineages. Brandon's earlier pair is action transport with entropy under least action
+  (`HolonicEntropyActionInduction`; the August 26 record), and a gravity well as a vortex of action
+  transport (August 25).
+- **The helical code** ([record](2026-10-08_THE_HELICAL_CODE_IS_HOW_HOLONS_HOLARCHIES_EPOCHS_AND_AEONS_ENCODE.md)):
+  the duplex's pair contacts are joints. Its closure stores the twist remainder as strain, and
+  past a threshold the core buckles into writhe, a snap.
+
+**Recover when a step needs them** (in `13f8c734`, absent now):
+- `docs/plans/THE_CONTINUING_OBJECT_IS_THE_SHARED_CARRIER.md:43`, a bounded Holon whole and part at
+  once;
+- `docs/MATHEMATICS_AND_NATIVE_CONDUCT.md:600-601`, the Fibonacci matrix's eigenvalue as a clock
+  residue.
+
+**No owner yet:**
+- phyllotaxis was absent from the repository, its history and Brandon's messages until this
+  section;
+- the larynx and its formants have no mathematics here;
+- gait locks have no native statement.
+
 **Recorded failures checked.** An uncertified deposition step (item 1 must certify). A refusal
 answered with a larger limit (thresholds follow the reached stress by law, not a raised cap). An
 authored routine standing in for learning (avalanches are the medium's own release, not a scripted
