@@ -130,6 +130,29 @@ perception. A medium that never releases never learns through its joints.
 
 The receipt is the distribution of landing-event sizes over a passage.
 
+[measured source analysis; agent-inferred, October 8, after the lens] **What actually binds the
+landing.** A read-only analysis of the owners corrects the lens's first reading:
+- **The reached covector is not small.** About `G/h′ = 2^-5`, some `2^10` above the cell.
+- **The certified step is small.** `η = a/(s κ² b)` (constitution.rs `certify_steps`) reads the
+  uniform gain bound `κ²`, which is loose on this field.
+- **Every lever except L1′ falls short:**
+  - the cheap certificate repairs (`s = ln 2/2`, the joint halving, the minimum with the passive
+    gain) total about `2^10`;
+  - a derived refining grain gives 6 levels where 22 are needed;
+  - accumulation needs the clock to grow by `e^(~2^18)`;
+  - the avalanche carry is structurally forbidden: entries carry independently
+    (`carry_entry_zero`), and deposition is edgewise local (`deposit_local_*`,
+    `unreached_edge_unchanged`). A force-coupled release would need the exact station response
+    `A` it does not yet have.
+- **L1′, the one lawful closer.** Certify with the exact tangent: replace `C = s κ² b` by
+  `s|A d|²(1 + ε_ray)`, keeping today's bound as a minimum. Here `A = ∂(station logits)/∂(raw
+  factors)` is built so far only on the held path (`word/variation/gain.rs`). It closes the gap only
+  if `κ² b/|A d|² ≥ 2^22` for `C` (about `2^20` for `K` and `D`).
+
+The deciding measurement is that ratio, printed as exact ratios per family on 0279's own operands.
+Crackling is therefore downstream of L1′: no threshold law can release joints the certificate keeps
+pinned below their cells.
+
 **Owed (#62, #73):**
 1. the avalanche carry as a certified deposition, which never raises a limit and never takes an
    uncertified step, with its Lean statement;
