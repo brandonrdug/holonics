@@ -8,7 +8,7 @@
 //! |---|---|---|
 //! | **threshold commit**: `Released`, with `Widen` its named proposal | a width over a compatible fibre, decided at a declared tolerance by the caller's declared law ([`DecisionLaw`]; its data form [`DecisionRule`]) | [`release`]: `Released` inside the law's own tolerance (`ReleaseLaw.sound`), `Widen` wide enough for the width (`ReleaseLaw.widenSound`) |
 //! | **certified draw**: `Drawn` | a declared key `u ∈ [0, 1)` read by the inverse CDF of an exact interval face ([`draw`], [`draw_exact`]) | the certificate `Σ_(j<i) upper_j ≤ u < Σ_(j≤i) lower_j` (`certified_inverseCDF_class`), decided through [`release`] at tolerance zero |
-//! | **probe**: `Ask` | the named observation the owner computed and offered ([`ObservationProbe`]), carrying the partition of the fibre it is chosen by ([`ProbePartition`]) | [`release`]: only an offered probe; [`ProbePartition::new`]: one fibre's partitions, the probe's strictly more informative than its comparison's |
+//! | **probe**: `Ask` | the named observation the owner computed and offered ([`ObservationProbe`]), carrying the separation it is chosen by ([`ProbeSeparation`]): a uniform finite fibre's counted partition ([`ProbePartition`]), or a quadratic family's declared leverage ([`LeverageSeparation`]) | [`release`]: only an offered probe; [`ProbePartition::new`]: one fibre's partitions, the probe's strictly more informative than its comparison's; [`LeverageSeparation::new`]: at least two exact outcome cells and a leverage strictly above its comparison's |
 //! | **typed refusal**: `Hold`, `Unresolved`, `NoContinuationBridges` | nothing is emitted: the plural fibre is kept (`Hold`); a key the enclosure leaves plural keeps its unresolved draw mass with its exact crossing bounds (`Unresolved`); no admitted continuation reaches the receiver's section (`NoContinuationBridges`, the stop law's refusal when no stop fits the aperture) | unconstrained, as in Lean: which one is the caller's declared law |
 //!
 //! Malformed operands (an empty or unnormalizable face, a key outside `[0, 1)`, a forged width) are
@@ -44,6 +44,24 @@
 //! both partition one nonempty fibre into nonempty classes and the probe's product is strictly below
 //! its comparison's: an offered probe always separates the fibre more than the move it would
 //! replace. The criterion is information, not a residual width.
+//!
+//! [definition; agent-inferred, October 8] **The leverage probe of a quadratic compatible family.**
+//! A continuum family has no class counts, and none is invented for it. When the declared
+//! compatible family is the quadratic set `E = {W : tr((W − W̄) H (W − W̄)ᵀ) ≤ ρ}` with `H`
+//! positive definite, a probe reading `y = W x` has as its outcome set the ball
+//! `|y − W̄x|² ≤ ρ·s` with leverage `s = xᵀH⁻¹x`. Probes of the family are compared by this
+//! **declared leverage convention**, exactly: with weight `w` the normal update
+//! `H′ = H + w x xᵀ` contracts the leverage at the same `x` to `s/(1 + w·s)` (Sherman–Morrison),
+//! and over one family `s(x) > s(x′)` is a comparison of rationals in which no logarithm is formed.
+//! It is not an entropy and not a guaranteed information gain: that needs a declared probability
+//! or a fixed volume law, which the family does not carry (the determinant ratio
+//! `det H′/det H = 1 + w·s` is a Gram reading of the same leverage). A [`LeverageSeparation`] is
+//! offered only when its outcome meets at least two exact outcome cells (`classes ≥ 2`: two
+//! feasible members whose readings lie in different half-open grain cells) and its leverage
+//! strictly exceeds its comparison's (`against`, zero for no observation). The family is a
+//! declared inner family: the probe certifies distinguishability within it, never coverage of a
+//! wider family, and its continuous cells carry no counts or probabilities. The Lean statement (the
+//! outcome ball and the contraction) is owed (#62).
 //!
 //! [established-bounded] **What the draw does not claim.** The certificate is sufficient, not
 //! necessary: normalization can make every compatible face agree where the prefix bounds still
@@ -111,14 +129,32 @@ use crate::receiver::face::{
 // -------------------------------------------------------------------------------------------
 
 /// **The probe an owner offers**: the named observation whose outcome would separate the fibre, and
-/// the partition it is chosen by. The owner that computed it offers it through
+/// the separation it is chosen by. The owner that computed it offers it through
 /// [`LawfulOptions::assemble`]; a law may ask only for the probe offered.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ObservationProbe {
     /// The observation's declared name.
     pub observation: String,
-    /// The fibre's partition by its outcomes, against the compared move's (module header).
-    pub partition: ProbePartition,
+    /// The separation the probe is chosen by: the fibre's counted partition by its outcomes, or a
+    /// quadratic family's declared leverage, each against the compared move's (module header).
+    pub partition: ProbeSeparation,
+}
+
+/// **The separation a probe is chosen by** (module header): a uniform finite fibre's counted
+/// partition ([`ProbePartition`]), or a quadratic family's declared leverage
+/// ([`LeverageSeparation`]). Each is constructed only by its own checked constructor: a counted
+/// partition is strictly more informative than the one it is compared against, and a leverage
+/// separation meets at least two exact outcome cells with a leverage strictly above its
+/// comparison's. The two orders are not compared with each other, and [`release`] compares an
+/// offered probe by equality, separation and all.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum ProbeSeparation {
+    /// A uniform finite fibre's partition by the probe's outcomes: counted classes, compared as
+    /// `∏_c |c|^|c|` ([`ProbePartition`]).
+    Counted(ProbePartition),
+    /// A quadratic family's outcome cells and declared leverage, compared as rationals
+    /// ([`LeverageSeparation`]).
+    Leverage(LeverageSeparation),
 }
 
 /// [proved-derived; formal-checked] **The partition a probe is chosen by** (module header): the
@@ -194,6 +230,70 @@ pub fn partition_product(sizes: &[usize]) -> BigUint {
     sizes.iter().fold(BigUint::from(1u32), |product, &size| {
         product * BigUint::from(size).pow(size as u32)
     })
+}
+
+/// [definition; agent-inferred, October 8] **The leverage probe of a quadratic compatible family**
+/// (module header). When the declared compatible family is the quadratic set
+/// `E = {W : tr((W − W̄) H (W − W̄)ᵀ) ≤ ρ}` with `H` positive definite, a probe reading `y = W x`
+/// has as its outcome set the ball `|y − W̄x|² ≤ ρ·s` with leverage `s = xᵀH⁻¹x`. Probes of the
+/// family are compared by this **declared leverage convention**, exactly: with weight `w` the
+/// normal update `H′ = H + w x xᵀ` contracts the leverage at the same `x` to `s/(1 + w·s)`
+/// (Sherman–Morrison), and over one family `s(x) > s(x′)` is a comparison of rationals in which no
+/// logarithm is formed. It is not an entropy and not a guaranteed information gain: that needs a
+/// declared probability or a fixed volume law, which the family does not carry (the determinant
+/// ratio `det H′/det H = 1 + w·s` is a Gram reading of the same leverage).
+///
+/// The family is a declared inner family. A leverage separation is offered only when the probe's
+/// outcome meets at least two exact outcome cells (`classes ≥ 2`: two feasible members whose
+/// readings lie in different half-open grain cells; the offering owner certifies the count, and it
+/// is not recomputed here) and its leverage strictly exceeds its comparison's (`against`, zero for
+/// no observation). That certifies distinguishability within the declared family, never coverage of
+/// a wider family, and its continuous cells carry no counts or probabilities. It is constructed
+/// only by [`Self::new`]. The Lean statement (the outcome ball and the contraction) is owed (#62).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct LeverageSeparation {
+    classes: usize,
+    leverage: Rat,
+    against: Rat,
+}
+
+impl LeverageSeparation {
+    /// The probe's exact outcome cells, its leverage `s = xᵀH⁻¹x` and the compared leverage;
+    /// refused unless the outcome meets at least two cells
+    /// ([`WidthRefusal::LeverageProbeClasses`]) and `0 ≤ against < leverage`
+    /// ([`WidthRefusal::LeverageProbeNotInformative`]).
+    pub fn new(classes: usize, leverage: Rat, against: Rat) -> Result<Self, WidthRefusal> {
+        if classes < 2 {
+            return Err(WidthRefusal::LeverageProbeClasses { classes });
+        }
+        if against < Rat::zero() || leverage <= against {
+            return Err(WidthRefusal::LeverageProbeNotInformative {
+                leverage: leverage.to_string(),
+                against: against.to_string(),
+            });
+        }
+        Ok(Self {
+            classes,
+            leverage,
+            against,
+        })
+    }
+
+    /// The number of exact outcome cell blocks the declared family meets, at least two, each
+    /// holding a reading of a feasible member.
+    pub fn classes(&self) -> usize {
+        self.classes
+    }
+
+    /// The probe's leverage `s = xᵀH⁻¹x`, strictly above [`Self::against`].
+    pub fn leverage(&self) -> &Rat {
+        &self.leverage
+    }
+
+    /// The compared leverage, nonnegative (zero for no observation).
+    pub fn against(&self) -> &Rat {
+        &self.against
+    }
 }
 
 // -------------------------------------------------------------------------------------------

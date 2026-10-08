@@ -111,7 +111,7 @@ use holonics::receiver::population::{
     ChaseFamily, MachineChaser, MachineDeclaration, MachineReceipt, MachineRelease, Plan,
     Population, PopulationError, Posterior, Release, selected_fibre,
 };
-use holonics::receiver::release::ReleaseReturn;
+use holonics::receiver::release::{ProbeSeparation, ReleaseReturn};
 use num_bigint::{BigInt, BigUint};
 
 use exterior::{difference, enclosure, per};
@@ -1638,14 +1638,23 @@ fn move_lines(reading: &MoveReading, indent: &str) {
 /// the law did not release.
 fn uncertified(receipt: &MachineReceipt) -> Vec<String> {
     let probe_line = |law: &ReleaseReturn| match law {
-        ReleaseReturn::Ask { probe } => format!(
-            "the law asked {} (classes {:?}, ∏|c|^|c| = {}) against the commit (classes {:?}, {})",
-            probe.observation,
-            probe.partition.classes(),
-            factored(&probe.partition.product()),
-            probe.partition.against(),
-            factored(&probe.partition.against_product())
-        ),
+        ReleaseReturn::Ask { probe } => match &probe.partition {
+            ProbeSeparation::Counted(counted) => format!(
+                "the law asked {} (classes {:?}, ∏|c|^|c| = {}) against the commit (classes {:?}, {})",
+                probe.observation,
+                counted.classes(),
+                factored(&counted.product()),
+                counted.against(),
+                factored(&counted.against_product())
+            ),
+            ProbeSeparation::Leverage(leverage) => format!(
+                "the law asked {} (outcome cells {}, leverage {}) against the commit (leverage {})",
+                probe.observation,
+                leverage.classes(),
+                leverage.leverage(),
+                leverage.against()
+            ),
+        },
         other => format!("the law returned {other:?}"),
     };
     receipt

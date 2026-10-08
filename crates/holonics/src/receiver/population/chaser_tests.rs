@@ -101,10 +101,11 @@ fn the_chasers_release_is_the_pre_u3_rule_through_the_one_law() {
                                 decided[0] += 1;
                             }
                             MachineRelease::Law(ReleaseReturn::Ask { probe }) => {
-                                assert_eq!(probe.partition.classes(), &worths[chosen].classes[..]);
-                                assert!(
-                                    probe.partition.product() < probe.partition.against_product()
-                                );
+                                let ProbeSeparation::Counted(counted) = &probe.partition else {
+                                    panic!("the chaser offers a counted partition, got {probe:?}");
+                                };
+                                assert_eq!(counted.classes(), &worths[chosen].classes[..]);
+                                assert!(counted.product() < counted.against_product());
                                 decided[1] += 1;
                             }
                             MachineRelease::Commit { law, price: cost } => {
@@ -139,7 +140,9 @@ fn the_price_is_the_separating_term_of_the_cornering_arm() {
     let worths = vec![worth(None, 0, 0, &[4]), worth(None, 5, 0, &[2, 2])];
     let expected_probe = ObservationProbe {
         observation: "admitted motion 1 of 2".to_owned(),
-        partition: ProbePartition::new(vec![2, 2], vec![4]).expect("a separating partition"),
+        partition: ProbeSeparation::Counted(
+            ProbePartition::new(vec![2, 2], vec![4]).expect("a separating partition"),
+        ),
     };
     assert_eq!(
         release_among(&worths, Plan::Robust, 4, 1).expect("a lawful release"),

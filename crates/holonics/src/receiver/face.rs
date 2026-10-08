@@ -965,6 +965,33 @@ pub enum WidthRefusal {
         /// The same product over the compared classes, as prose.
         against: String,
     },
+    /// A leverage probe whose outcome does not meet at least two exact outcome cells of the
+    /// declared family (`receiver::release::LeverageSeparation`): with one cell, no two feasible
+    /// members of the family are told apart.
+    #[error(
+        "a leverage probe whose outcome meets {classes} exact cells of the declared family does \
+         not distinguish it: at least two cells, each holding a reading of a feasible member, \
+         are required"
+    )]
+    LeverageProbeClasses {
+        /// The exact outcome cells the declared family meets.
+        classes: usize,
+    },
+    /// A leverage probe whose leverage is not strictly above its comparison's, or whose comparison
+    /// is negative (`receiver::release::LeverageSeparation`): `0 ≤ against < leverage` is the
+    /// declared convention's order, a leverage `xᵀH⁻¹x` being nonnegative. The leverage is a
+    /// declared convention, not an information.
+    #[error(
+        "a leverage probe's leverage {leverage} is not strictly above its comparison's {against}, \
+         or the comparison is negative: it distinguishes the declared family no more than the move \
+         it would replace"
+    )]
+    LeverageProbeNotInformative {
+        /// `s = xᵀH⁻¹x` of the probe, as prose.
+        leverage: String,
+        /// The compared leverage, as prose.
+        against: String,
+    },
     /// A declared width law returned a draw: a width decision carries no key, and a draw is
     /// decided only by `receiver::release::draw` (the separating term between the two acts).
     #[error(

@@ -253,8 +253,8 @@ use crate::holarchy::terrain::{
 use crate::ratio::Rat;
 use crate::receiver::face::{DiameterNorm, ReceiverWidth, WidthWitness};
 use crate::receiver::release::{
-    BeyondTolerance, DecisionRule, LawfulOptions, ObservationProbe, ProbePartition, ReleaseReturn,
-    WithinTolerance, partition_product, release,
+    BeyondTolerance, DecisionRule, LawfulOptions, ObservationProbe, ProbePartition,
+    ProbeSeparation, ReleaseReturn, WithinTolerance, partition_product, release,
 };
 
 /// [definition] **The machine's declaration** (module header): the declared runner family it reads,
@@ -472,10 +472,10 @@ fn release_among(
     let offered = match probe {
         Some(p) => Some(ObservationProbe {
             observation: format!("admitted motion {p} of {}", worths.len()),
-            partition: ProbePartition::new(
+            partition: ProbeSeparation::Counted(ProbePartition::new(
                 worths[p].classes.clone(),
                 worths[commit].classes.clone(),
-            )?,
+            )?),
         }),
         None => None,
     };

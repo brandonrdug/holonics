@@ -336,7 +336,9 @@ fn plural_options(ask: Option<ObservationProbe>, bridges: bool) -> LawfulOptions
 fn probe() -> ObservationProbe {
     ObservationProbe {
         observation: "observe-x".to_owned(),
-        partition: ProbePartition::new(vec![1, 1], vec![2]).expect("a separating partition"),
+        partition: ProbeSeparation::Counted(
+            ProbePartition::new(vec![1, 1], vec![2]).expect("a separating partition"),
+        ),
     }
 }
 
@@ -496,8 +498,9 @@ fn a_law_naming_an_unoffered_probe_or_a_draw_is_refused() {
             ReleaseReturn::Ask {
                 probe: ObservationProbe {
                     observation: "an-observation-nobody-computed".to_owned(),
-                    partition: ProbePartition::new(vec![1, 1], vec![2])
-                        .expect("a separating partition"),
+                    partition: ProbeSeparation::Counted(
+                        ProbePartition::new(vec![1, 1], vec![2]).expect("a separating partition"),
+                    ),
                 },
             }
         }
@@ -567,6 +570,107 @@ fn the_probe_partition_compares_information_by_its_product() {
         assert!(matches!(
             ProbePartition::new(classes, against),
             Err(WidthRefusal::ProbeClasses { .. })
+        ));
+    }
+}
+
+/// **The leverage separation is a declared convention, compared exactly** (module header; its Lean
+/// statement is owed, #62). An offered separation meets at least two exact outcome cells and has a
+/// leverage strictly above its comparison's. A leverage `xᵀH⁻¹x` is nonnegative, so the comparison
+/// is too (zero for no observation): `(2, 1, 0)` and `(3, 5/2, 1/2)` are offered. One cell or none
+/// tells no two members apart; an equal, a lesser or a negative comparison offers nothing. Each
+/// refusal names its own cause and carries the operands exactly.
+#[test]
+fn the_leverage_separation_needs_two_cells_and_a_leverage_above_its_comparison() {
+    let unit =
+        LeverageSeparation::new(2, integer(1), Rat::zero()).expect("two cells, one above zero");
+    assert_eq!(unit.classes(), 2);
+    assert_eq!(unit.leverage(), &integer(1));
+    assert_eq!(unit.against(), &Rat::zero());
+    let spread = LeverageSeparation::new(3, ratio(5, 2), ratio(1, 2)).expect("5/2 above 1/2");
+    assert_eq!(spread.classes(), 3);
+    assert_eq!(spread.leverage(), &ratio(5, 2));
+    assert_eq!(spread.against(), &ratio(1, 2));
+    for classes in [0, 1] {
+        assert!(matches!(
+            LeverageSeparation::new(classes, integer(1), Rat::zero()),
+            Err(WidthRefusal::LeverageProbeClasses { classes: found }) if found == classes
+        ));
+    }
+    for (offered, compared, shown) in [
+        (integer(1), integer(1), ("1", "1")),
+        (ratio(1, 2), integer(1), ("1/2", "1")),
+        (integer(1), ratio(-1, 2), ("1", "-1/2")),
+    ] {
+        assert!(matches!(
+            LeverageSeparation::new(2, offered, compared),
+            Err(WidthRefusal::LeverageProbeNotInformative { ref leverage, ref against })
+                if (leverage.as_str(), against.as_str()) == shown
+        ));
+    }
+}
+
+fn leverage_probe() -> ObservationProbe {
+    ObservationProbe {
+        observation: "observe-w-x".to_owned(),
+        partition: ProbeSeparation::Leverage(
+            LeverageSeparation::new(2, integer(1), Rat::zero()).expect("a separating leverage"),
+        ),
+    }
+}
+
+/// **An offered leverage probe is asked for as offered, and no other probe is lawful.** The asking
+/// law and the declared rule return the offered leverage probe through [`release`]. A law returning
+/// another leverage under the offered name, or the offered name carrying a counted partition, names
+/// a probe the owner did not compute and is refused: the offer is compared by equality, separation
+/// and all.
+#[test]
+fn an_offered_leverage_probe_is_asked_and_no_other_probe_is_lawful() {
+    struct Inventing(ObservationProbe);
+    impl DecisionLaw for Inventing {
+        fn name(&self) -> &str {
+            "inventing"
+        }
+        fn decide(&self, _options: &LawfulOptions) -> ReleaseReturn {
+            ReleaseReturn::Ask {
+                probe: self.0.clone(),
+            }
+        }
+    }
+    let offered = leverage_probe();
+    let options = plural_options(Some(offered.clone()), true);
+    assert_eq!(
+        release(&AskingLaw, &options).expect("lawful"),
+        ReleaseReturn::Ask {
+            probe: offered.clone()
+        }
+    );
+    let asking = DecisionRule::new("ask", WithinTolerance::Release, BeyondTolerance::Ask);
+    assert_eq!(
+        release(&asking, &options).expect("lawful"),
+        ReleaseReturn::Ask {
+            probe: offered.clone()
+        }
+    );
+    let other_leverage = ObservationProbe {
+        observation: offered.observation.clone(),
+        partition: ProbeSeparation::Leverage(
+            LeverageSeparation::new(2, integer(2), Rat::zero()).expect("a separating leverage"),
+        ),
+    };
+    let counted = ObservationProbe {
+        observation: offered.observation.clone(),
+        partition: ProbeSeparation::Counted(
+            ProbePartition::new(vec![1, 1], vec![2]).expect("a separating partition"),
+        ),
+    };
+    for invented in [other_leverage, counted] {
+        assert_ne!(invented, offered);
+        let refusal = release(&Inventing(invented), &options).expect_err("refused");
+        assert!(matches!(
+            refusal,
+            WidthRefusal::ProbeNotOffered { ref law, ref probe }
+                if law == "inventing" && *probe == offered.observation
         ));
     }
 }
