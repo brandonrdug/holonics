@@ -1,0 +1,513 @@
+{
+  "grade": "WHOLE_CANONICAL_PASS63_IMPORTERS_PASS15",
+  "source_family_and_original_importer_pins": [
+    {
+      "module": "HolonicsResearch.Hodge.HodgeAffineTriangleBoundarySource",
+      "source": {
+        "path": "/home/b/Workspaces/holonics/.local/wt/hodge-reopen/lean/HolonicsResearch/Hodge/HodgeAffineTriangleBoundarySource.lean",
+        "sha256": "1b8a2c18b822358b7179c26579f1ae452542f8cd6948dc0b282a5a463066c841",
+        "bytes": 7658
+      },
+      "object": {
+        "path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hodge-modular3536-20261006/objects-v1/HolonicsResearch/Hodge/HodgeAffineTriangleBoundarySource.olean",
+        "sha256": "c223dfe2bdf92db8354ccbbe68e054e87722dd97ce991ab5c6346be9ee9c21fe",
+        "bytes": 440240
+      },
+      "kernel": {
+        "path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hodge-modular3536-part0-20261006/KERNEL_VALIDATION.v1.json",
+        "sha256": "caa9dd990a164b6ca0377b9d118726dc9b9540e0716a1c628c7f071ae281ce28",
+        "bytes": 405
+      },
+      "queries": 1,
+      "durable_object": {
+        "path": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v59/artifacts/.local/lean-rust-pruning/admission-v1/hodge-modular3536-20261006/objects-v1/HolonicsResearch/Hodge/HodgeAffineTriangleBoundarySource.olean",
+        "sha256": "c223dfe2bdf92db8354ccbbe68e054e87722dd97ce991ab5c6346be9ee9c21fe",
+        "bytes": 440240
+      },
+      "durable_kernel": {
+        "path": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v61/artifacts/.local/lean-rust-pruning/admission-v1/hodge-modular3536-part0-20261006/KERNEL_VALIDATION.v1.json",
+        "sha256": "caa9dd990a164b6ca0377b9d118726dc9b9540e0716a1c628c7f071ae281ce28",
+        "bytes": 405
+      }
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeAffineTriangleSource",
+      "source": {
+        "path": "/home/b/Workspaces/holonics/.local/wt/hodge-reopen/lean/HolonicsResearch/Hodge/HodgeAffineTriangleSource.lean",
+        "sha256": "710bb554f0440914a384fd14dc9ef709afc1ee7f4c2d654cc71498524f084ff3",
+        "bytes": 29618
+      },
+      "object": {
+        "path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-20261006/objects-v1/HolonicsResearch/Hodge/HodgeAffineTriangleSource.olean",
+        "sha256": "3f1673cb42c9079514849c3d0e904b1ae4e857fc853d08b7d5d5d7fe8f42c70f",
+        "bytes": 1598576
+      },
+      "kernel": {
+        "path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-part1-20261006/KERNEL_VALIDATION.v1.json",
+        "sha256": "15f3ed251168a8a0a0fd88e932f7b0e1d23411721075af127d3cced83db5870c",
+        "bytes": 2871
+      },
+      "queries": 15,
+      "durable_object": {
+        "path": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v61/artifacts/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-20261006/objects-v1/HolonicsResearch/Hodge/HodgeAffineTriangleSource.olean",
+        "sha256": "3f1673cb42c9079514849c3d0e904b1ae4e857fc853d08b7d5d5d7fe8f42c70f",
+        "bytes": 1598576
+      },
+      "durable_kernel": {
+        "path": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v61/artifacts/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-part1-20261006/KERNEL_VALIDATION.v1.json",
+        "sha256": "15f3ed251168a8a0a0fd88e932f7b0e1d23411721075af127d3cced83db5870c",
+        "bytes": 2871
+      }
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeAffineTriangleConeSource",
+      "source": {
+        "path": "/home/b/Workspaces/holonics/.local/wt/hodge-reopen/lean/HolonicsResearch/Hodge/HodgeAffineTriangleConeSource.lean",
+        "sha256": "31ee8d3ba7648aa199551aa0e4ca50229fd539814975606e86f50457bf5cba6b",
+        "bytes": 8783
+      },
+      "object": {
+        "path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-20261006/objects-v1/HolonicsResearch/Hodge/HodgeAffineTriangleConeSource.olean",
+        "sha256": "89cc385c759da95388face85dac1c574b46274d6f8133f5ffce1dfb8e4fe8358",
+        "bytes": 501192
+      },
+      "kernel": {
+        "path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-part2-20261006/KERNEL_VALIDATION.v1.json",
+        "sha256": "77206a54916b9f0a7878dba73c9513d05287998688af70ca9bbb5713e622405f",
+        "bytes": 588
+      },
+      "queries": 2,
+      "durable_object": {
+        "path": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v61/artifacts/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-20261006/objects-v1/HolonicsResearch/Hodge/HodgeAffineTriangleConeSource.olean",
+        "sha256": "89cc385c759da95388face85dac1c574b46274d6f8133f5ffce1dfb8e4fe8358",
+        "bytes": 501192
+      },
+      "durable_kernel": {
+        "path": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v61/artifacts/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-part2-20261006/KERNEL_VALIDATION.v1.json",
+        "sha256": "77206a54916b9f0a7878dba73c9513d05287998688af70ca9bbb5713e622405f",
+        "bytes": 588
+      }
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeAffineTetrahedronResidualSource",
+      "source": {
+        "path": "/home/b/Workspaces/holonics/.local/wt/hodge-reopen/lean/HolonicsResearch/Hodge/HodgeAffineTetrahedronResidualSource.lean",
+        "sha256": "f8862daa65e29784741ecd10974a1255a188ed686ea8bd82e181aedeb0911f7c",
+        "bytes": 17287
+      },
+      "object": {
+        "path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-20261006/objects-v1/HolonicsResearch/Hodge/HodgeAffineTetrahedronResidualSource.olean",
+        "sha256": "1277897ca50a01d6e1e667602648c8a6002308cb395d13f2fa392615446c71cb",
+        "bytes": 1468344
+      },
+      "kernel": {
+        "path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-part3-20261006/KERNEL_VALIDATION.v1.json",
+        "sha256": "c65707d77aac33ecffe09719751f19a930cc954d2f9ad99a576233c354b8a5fc",
+        "bytes": 922
+      },
+      "queries": 4,
+      "durable_object": {
+        "path": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v61/artifacts/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-20261006/objects-v1/HolonicsResearch/Hodge/HodgeAffineTetrahedronResidualSource.olean",
+        "sha256": "1277897ca50a01d6e1e667602648c8a6002308cb395d13f2fa392615446c71cb",
+        "bytes": 1468344
+      },
+      "durable_kernel": {
+        "path": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v61/artifacts/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-part3-20261006/KERNEL_VALIDATION.v1.json",
+        "sha256": "c65707d77aac33ecffe09719751f19a930cc954d2f9ad99a576233c354b8a5fc",
+        "bytes": 922
+      }
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeAffineTetrahedronConeSource",
+      "source": {
+        "path": "/home/b/Workspaces/holonics/.local/wt/hodge-reopen/lean/HolonicsResearch/Hodge/HodgeAffineTetrahedronConeSource.lean",
+        "sha256": "fa8edf369adab245ad075f757b7b29baca14f130de466b9ae7bc862fb82d4636",
+        "bytes": 14876
+      },
+      "object": {
+        "path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-20261006/objects-v1/HolonicsResearch/Hodge/HodgeAffineTetrahedronConeSource.olean",
+        "sha256": "50f95f68cd90e170571e562c06b089ba71a286d85dc4bae898e482aed9118934",
+        "bytes": 776152
+      },
+      "kernel": {
+        "path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-part4-20261006/KERNEL_VALIDATION.v1.json",
+        "sha256": "b58fe399b92cdd4debb68ee6e8e3b54650b1ec8ab1a6865bc28264180a128976",
+        "bytes": 1100
+      },
+      "queries": 5,
+      "durable_object": {
+        "path": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v61/artifacts/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-20261006/objects-v1/HolonicsResearch/Hodge/HodgeAffineTetrahedronConeSource.olean",
+        "sha256": "50f95f68cd90e170571e562c06b089ba71a286d85dc4bae898e482aed9118934",
+        "bytes": 776152
+      },
+      "durable_kernel": {
+        "path": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v61/artifacts/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-part4-20261006/KERNEL_VALIDATION.v1.json",
+        "sha256": "b58fe399b92cdd4debb68ee6e8e3b54650b1ec8ab1a6865bc28264180a128976",
+        "bytes": 1100
+      }
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeAffineDegreeThreeReception",
+      "source": {
+        "path": "/home/b/Workspaces/holonics/.local/wt/hodge-reopen/lean/HolonicsResearch/Hodge/HodgeAffineDegreeThreeReception.lean",
+        "sha256": "e5e3b44212e18a53a2d82dcd0995ac51c85cd2b2fc2ef3e5a256c1b2c7eb0342",
+        "bytes": 8556
+      },
+      "object": {
+        "path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-20261006/objects-v1/HolonicsResearch/Hodge/HodgeAffineDegreeThreeReception.olean",
+        "sha256": "25cf092f65eb343cb4b8d6b7244fbfb647ad335815a3b2b99a3b133c98902ee0",
+        "bytes": 238048
+      },
+      "kernel": {
+        "path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-part5-20261006/KERNEL_VALIDATION.v1.json",
+        "sha256": "da974333599bd28aab582be04f005b986d6bbe5aa2e8b840001b5299234cd538",
+        "bytes": 1106
+      },
+      "queries": 5,
+      "durable_object": {
+        "path": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v61/artifacts/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-20261006/objects-v1/HolonicsResearch/Hodge/HodgeAffineDegreeThreeReception.olean",
+        "sha256": "25cf092f65eb343cb4b8d6b7244fbfb647ad335815a3b2b99a3b133c98902ee0",
+        "bytes": 238048
+      },
+      "durable_kernel": {
+        "path": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v61/artifacts/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-part5-20261006/KERNEL_VALIDATION.v1.json",
+        "sha256": "da974333599bd28aab582be04f005b986d6bbe5aa2e8b840001b5299234cd538",
+        "bytes": 1106
+      }
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeAffineFourSourceBoundary",
+      "source": {
+        "path": "/home/b/Workspaces/holonics/.local/wt/hodge-reopen/lean/HolonicsResearch/Hodge/HodgeAffineFourSourceBoundary.lean",
+        "sha256": "eacf4c46e1181ad966281ed8f705fa2581a7f3cc4843cda546d3eb434249b279",
+        "bytes": 24110
+      },
+      "object": {
+        "path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-20261006/objects-v1/HolonicsResearch/Hodge/HodgeAffineFourSourceBoundary.olean",
+        "sha256": "1e4e5899007bd312039cda365b82d07d1181d93ffea1488e87344012e1f2182b",
+        "bytes": 1578776
+      },
+      "kernel": {
+        "path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-part6-20261006/KERNEL_VALIDATION.v1.json",
+        "sha256": "8de0444011afbb8d73dd3cb1aa02979138f2073853bbdb2a5bd75d44034ae2dd",
+        "bytes": 2177
+      },
+      "queries": 12,
+      "durable_object": {
+        "path": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v61/artifacts/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-20261006/objects-v1/HolonicsResearch/Hodge/HodgeAffineFourSourceBoundary.olean",
+        "sha256": "1e4e5899007bd312039cda365b82d07d1181d93ffea1488e87344012e1f2182b",
+        "bytes": 1578776
+      },
+      "durable_kernel": {
+        "path": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v61/artifacts/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-part6-20261006/KERNEL_VALIDATION.v1.json",
+        "sha256": "8de0444011afbb8d73dd3cb1aa02979138f2073853bbdb2a5bd75d44034ae2dd",
+        "bytes": 2177
+      }
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeAffineFourReception",
+      "source": {
+        "path": "/home/b/Workspaces/holonics/.local/wt/hodge-reopen/lean/HolonicsResearch/Hodge/HodgeAffineFourReception.lean",
+        "sha256": "0e5db057cd18adea69348eeb9322446452e46c5ee132b2b09659b664a02bbbaf",
+        "bytes": 8170
+      },
+      "object": {
+        "path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-20261006/objects-v1/HolonicsResearch/Hodge/HodgeAffineFourReception.olean",
+        "sha256": "796e10e34dbdbaa390f8030a3ad01dd470e9ad4aaa76191f7379fb354a667b1f",
+        "bytes": 207128
+      },
+      "kernel": {
+        "path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-part7-20261006/KERNEL_VALIDATION.v1.json",
+        "sha256": "d71306274fd68a21322ddef27119258b3a0775960da1da76ca2c97276255ff90",
+        "bytes": 750
+      },
+      "queries": 3,
+      "durable_object": {
+        "path": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v61/artifacts/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-20261006/objects-v1/HolonicsResearch/Hodge/HodgeAffineFourReception.olean",
+        "sha256": "796e10e34dbdbaa390f8030a3ad01dd470e9ad4aaa76191f7379fb354a667b1f",
+        "bytes": 207128
+      },
+      "durable_kernel": {
+        "path": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v61/artifacts/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-part7-20261006/KERNEL_VALIDATION.v1.json",
+        "sha256": "d71306274fd68a21322ddef27119258b3a0775960da1da76ca2c97276255ff90",
+        "bytes": 750
+      }
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeAffineFourResidualSource",
+      "source": {
+        "path": "/home/b/Workspaces/holonics/.local/wt/hodge-reopen/lean/HolonicsResearch/Hodge/HodgeAffineFourResidualSource.lean",
+        "sha256": "0438d3c225bcc229ec7efa31573b2f5d2342da1692f484b747ee96b556e1b18a",
+        "bytes": 9625
+      },
+      "object": {
+        "path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-20261006/objects-v1/HolonicsResearch/Hodge/HodgeAffineFourResidualSource.olean",
+        "sha256": "a402a76e9471af8f81e74e44d091a6fa7fb120a147c7981b3c502cb61d060759",
+        "bytes": 570672
+      },
+      "kernel": {
+        "path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-part8-20261006/KERNEL_VALIDATION.v1.json",
+        "sha256": "f363196a3be1918ac38baf2decbceaa90926a88b5c6a0628ec998533ea24cc28",
+        "bytes": 1237
+      },
+      "queries": 6,
+      "durable_object": {
+        "path": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v61/artifacts/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-20261006/objects-v1/HolonicsResearch/Hodge/HodgeAffineFourResidualSource.olean",
+        "sha256": "a402a76e9471af8f81e74e44d091a6fa7fb120a147c7981b3c502cb61d060759",
+        "bytes": 570672
+      },
+      "durable_kernel": {
+        "path": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v61/artifacts/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-part8-20261006/KERNEL_VALIDATION.v1.json",
+        "sha256": "f363196a3be1918ac38baf2decbceaa90926a88b5c6a0628ec998533ea24cc28",
+        "bytes": 1237
+      }
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeAffineFourConeSource",
+      "source": {
+        "path": "/home/b/Workspaces/holonics/.local/wt/hodge-reopen/lean/HolonicsResearch/Hodge/HodgeAffineFourConeSource.lean",
+        "sha256": "6c79ee019c3812f248bf236e4129e50a97039786dcfc3b8cad1cbc9128a95bdf",
+        "bytes": 11480
+      },
+      "object": {
+        "path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-20261006/objects-v1/HolonicsResearch/Hodge/HodgeAffineFourConeSource.olean",
+        "sha256": "8e48a3d8f6ee630b374fa21c660aab9d31869d8e95a39109d093b5a770f740e7",
+        "bytes": 581320
+      },
+      "kernel": {
+        "path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-part9-20261006/KERNEL_VALIDATION.v1.json",
+        "sha256": "5cc3f330d21c4124201ebfa38a038458d8a74739bd3d1bb1987037e9ec4ee523",
+        "bytes": 1074
+      },
+      "queries": 5,
+      "durable_object": {
+        "path": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v61/artifacts/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-20261006/objects-v1/HolonicsResearch/Hodge/HodgeAffineFourConeSource.olean",
+        "sha256": "8e48a3d8f6ee630b374fa21c660aab9d31869d8e95a39109d093b5a770f740e7",
+        "bytes": 581320
+      },
+      "durable_kernel": {
+        "path": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v61/artifacts/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-part9-20261006/KERNEL_VALIDATION.v1.json",
+        "sha256": "5cc3f330d21c4124201ebfa38a038458d8a74739bd3d1bb1987037e9ec4ee523",
+        "bytes": 1074
+      }
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeBarycentricAffineSourceComplex",
+      "source": {
+        "path": "/home/b/Workspaces/holonics/.local/wt/hodge-reopen/lean/HolonicsResearch/Hodge/HodgeBarycentricAffineSourceComplex.lean",
+        "sha256": "35362eed48a056e0ca547bda1ddf5b079e4445470589b071a78442690465943e",
+        "bytes": 11243
+      },
+      "object": {
+        "path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-20261006/objects-v1/HolonicsResearch/Hodge/HodgeBarycentricAffineSourceComplex.olean",
+        "sha256": "653220a4725d6ad16006c24f9505bcd80ccaef32d3148b47cd6c42ac759e40cd",
+        "bytes": 220336
+      },
+      "kernel": {
+        "path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-part10-20261006/KERNEL_VALIDATION.v1.json",
+        "sha256": "4586597595baa548a5b6908724bf9372cbe697fa7a4be232967e4ae5df049033",
+        "bytes": 11004
+      },
+      "queries": 63,
+      "durable_object": {
+        "path": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v61/artifacts/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-20261006/objects-v1/HolonicsResearch/Hodge/HodgeBarycentricAffineSourceComplex.olean",
+        "sha256": "653220a4725d6ad16006c24f9505bcd80ccaef32d3148b47cd6c42ac759e40cd",
+        "bytes": 220336
+      },
+      "durable_kernel": {
+        "path": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v61/artifacts/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-part10-20261006/KERNEL_VALIDATION.v1.json",
+        "sha256": "4586597595baa548a5b6908724bf9372cbe697fa7a4be232967e4ae5df049033",
+        "bytes": 11004
+      }
+    },
+    {
+      "module": "NativeDegreeThreeConsumer",
+      "source": {
+        "path": "/home/b/Workspaces/holonics/.local/wt/hodge-reopen/.local/hodge-20261006/canonical-import-repair-v59/NativeDegreeThreeConsumer.lean",
+        "sha256": "0b7b3c661695f2bde158b6b4749a1a039d0952ba906023bbfbfdb72247e7cdf9",
+        "bytes": 2482
+      },
+      "object": {
+        "path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-20261006/objects-v1/NativeDegreeThreeConsumer.olean",
+        "sha256": "72d08ed048d260e0203b447980a776cffb821dcbf2908dfdf6e4e29fabcec50f",
+        "bytes": 44256
+      },
+      "kernel": {
+        "path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-importer1-20261006/KERNEL_VALIDATION.v1.json",
+        "sha256": "402c7fa88de62ecb24204ef691ab893c06d1aaba3b6a2156974403d0087dfdc7",
+        "bytes": 1227
+      },
+      "queries": 7,
+      "durable_object": {
+        "path": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v61/artifacts/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-20261006/objects-v1/NativeDegreeThreeConsumer.olean",
+        "sha256": "72d08ed048d260e0203b447980a776cffb821dcbf2908dfdf6e4e29fabcec50f",
+        "bytes": 44256
+      },
+      "durable_kernel": {
+        "path": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v61/artifacts/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-importer1-20261006/KERNEL_VALIDATION.v1.json",
+        "sha256": "402c7fa88de62ecb24204ef691ab893c06d1aaba3b6a2156974403d0087dfdc7",
+        "bytes": 1227
+      }
+    },
+    {
+      "module": "NativeGeometryFourConsumer",
+      "source": {
+        "path": "/home/b/Workspaces/holonics/.local/wt/hodge-reopen/.local/hodge-20261006/canonical-import-repair-v59/NativeGeometryFourConsumer.lean",
+        "sha256": "e43ba40063895f6ecd7d884ad09b8f6063604a1c7a6a971e459910d14021c949",
+        "bytes": 1288
+      },
+      "object": {
+        "path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-20261006/objects-v1/NativeGeometryFourConsumer.olean",
+        "sha256": "84caf093fcd4d738e8938cd3166e21d79e0f99f2ae557d74cece058bb86c1b31",
+        "bytes": 29480
+      },
+      "kernel": {
+        "path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-importer2-20261006/KERNEL_VALIDATION.v1.json",
+        "sha256": "67bb7f5834c3c43f83f5825019ff6dde939d5da83e05b53e033eef65cbd44de4",
+        "bytes": 640
+      },
+      "queries": 3,
+      "durable_object": {
+        "path": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v61/artifacts/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-20261006/objects-v1/NativeGeometryFourConsumer.olean",
+        "sha256": "84caf093fcd4d738e8938cd3166e21d79e0f99f2ae557d74cece058bb86c1b31",
+        "bytes": 29480
+      },
+      "durable_kernel": {
+        "path": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v61/artifacts/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-importer2-20261006/KERNEL_VALIDATION.v1.json",
+        "sha256": "67bb7f5834c3c43f83f5825019ff6dde939d5da83e05b53e033eef65cbd44de4",
+        "bytes": 640
+      }
+    },
+    {
+      "module": "NativeFourHomotopyConsumer",
+      "source": {
+        "path": "/home/b/Workspaces/holonics/.local/wt/hodge-reopen/.local/hodge-20261006/canonical-import-repair-v59/NativeFourHomotopyConsumer.lean",
+        "sha256": "c7297435738df332793b1c0ac22ebf651cbabd0a46709dc41e4f90ca058ffa05",
+        "bytes": 1908
+      },
+      "object": {
+        "path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-20261006/objects-v1/NativeFourHomotopyConsumer.olean",
+        "sha256": "8dc63e0c3e33d813a3873aef12503fe388d26f683a5a4b584e5fba2f51929672",
+        "bytes": 42936
+      },
+      "kernel": {
+        "path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-importer3-20261006/KERNEL_VALIDATION.v1.json",
+        "sha256": "4a955ff9c74e46d649d6d57f67d66119f535252179c362ebd5628595eb96cdb6",
+        "bytes": 967
+      },
+      "queries": 5,
+      "durable_object": {
+        "path": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v61/artifacts/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-20261006/objects-v1/NativeFourHomotopyConsumer.olean",
+        "sha256": "8dc63e0c3e33d813a3873aef12503fe388d26f683a5a4b584e5fba2f51929672",
+        "bytes": 42936
+      },
+      "durable_kernel": {
+        "path": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v61/artifacts/.local/lean-rust-pruning/admission-v1/hodge-modularrepair3536-importer3-20261006/KERNEL_VALIDATION.v1.json",
+        "sha256": "4a955ff9c74e46d649d6d57f67d66119f535252179c362ebd5628595eb96cdb6",
+        "bytes": 967
+      }
+    }
+  ],
+  "declarations_preserved_once": 253,
+  "canonical_queries": 63,
+  "original_importer_queries": 15,
+  "only_standard_axioms": true,
+  "all_actual_source_object_kernel_bytes_rehashed": true,
+  "queue_outcome": {
+    "path": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v61/OUTCOME.md",
+    "sha256": "bc1e6dd46391a3a08c506204d748a97d12343b4f1f2a06c673b1fe099130ee64",
+    "bytes": 2680
+  },
+  "queue_validation": {
+    "path": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v61/VALIDATION.json",
+    "sha256": "e437b79c679b06842bd8a47c297831afa1ab00eeefdd47f96283e5196e99e657",
+    "bytes": 811329
+  },
+  "validated_source_packet_request": {
+    "path": "/home/b/Workspaces/holonics/.local/wt/hodge-reopen/.local/hodge-20261006/canonical-import-repair-v59/SOURCE_MATCHED_CANONICAL_MODULE_REQUEST.v59.json",
+    "sha256": "7143d38191abf87e2029fb3e19eb2f5383c1e69d62e3452b3aef4cb6b44126aa",
+    "bytes": 11386
+  },
+  "original_v57_v59_frozen_packets_and_failed_receipts_retained": true,
+  "substantive_source_return": "d_source Cone4(R4) = R4",
+  "consumer_homotopy": "P4 >> d5 + d4 >> P3 = geometricSd4 - id",
+  "consumer_cycle": "d4 z = 0 implies d5(P4 z) = geometricSd4 z - z",
+  "source_receiver_scope": "Free rational affine source currents realized into the declared sphere singular chain complex; closed rational four-current z",
+  "remaining_obligations": [
+    "SphereH4 filling",
+    "unconditional six-pair independence",
+    "whole-power spanning",
+    "algebraic-cycle square",
+    "general complex NS regularity"
+  ],
+  "root_external_ancestor_sources_matched": 35,
+  "new_builds_run_by_this_lane": 0,
+  "root_integrated_source_files": [
+    {
+      "path": "/home/b/Workspaces/holonics/lean/HolonicsResearch/Hodge/HodgeAffineTriangleBoundarySource.lean",
+      "sha256": "1b8a2c18b822358b7179c26579f1ae452542f8cd6948dc0b282a5a463066c841",
+      "bytes": 7658
+    },
+    {
+      "path": "/home/b/Workspaces/holonics/lean/HolonicsResearch/Hodge/HodgeAffineTriangleSource.lean",
+      "sha256": "710bb554f0440914a384fd14dc9ef709afc1ee7f4c2d654cc71498524f084ff3",
+      "bytes": 29618
+    },
+    {
+      "path": "/home/b/Workspaces/holonics/lean/HolonicsResearch/Hodge/HodgeAffineTriangleConeSource.lean",
+      "sha256": "31ee8d3ba7648aa199551aa0e4ca50229fd539814975606e86f50457bf5cba6b",
+      "bytes": 8783
+    },
+    {
+      "path": "/home/b/Workspaces/holonics/lean/HolonicsResearch/Hodge/HodgeAffineTetrahedronResidualSource.lean",
+      "sha256": "f8862daa65e29784741ecd10974a1255a188ed686ea8bd82e181aedeb0911f7c",
+      "bytes": 17287
+    },
+    {
+      "path": "/home/b/Workspaces/holonics/lean/HolonicsResearch/Hodge/HodgeAffineTetrahedronConeSource.lean",
+      "sha256": "fa8edf369adab245ad075f757b7b29baca14f130de466b9ae7bc862fb82d4636",
+      "bytes": 14876
+    },
+    {
+      "path": "/home/b/Workspaces/holonics/lean/HolonicsResearch/Hodge/HodgeAffineDegreeThreeReception.lean",
+      "sha256": "e5e3b44212e18a53a2d82dcd0995ac51c85cd2b2fc2ef3e5a256c1b2c7eb0342",
+      "bytes": 8556
+    },
+    {
+      "path": "/home/b/Workspaces/holonics/lean/HolonicsResearch/Hodge/HodgeAffineFourSourceBoundary.lean",
+      "sha256": "eacf4c46e1181ad966281ed8f705fa2581a7f3cc4843cda546d3eb434249b279",
+      "bytes": 24110
+    },
+    {
+      "path": "/home/b/Workspaces/holonics/lean/HolonicsResearch/Hodge/HodgeAffineFourReception.lean",
+      "sha256": "0e5db057cd18adea69348eeb9322446452e46c5ee132b2b09659b664a02bbbaf",
+      "bytes": 8170
+    },
+    {
+      "path": "/home/b/Workspaces/holonics/lean/HolonicsResearch/Hodge/HodgeAffineFourResidualSource.lean",
+      "sha256": "0438d3c225bcc229ec7efa31573b2f5d2342da1692f484b747ee96b556e1b18a",
+      "bytes": 9625
+    },
+    {
+      "path": "/home/b/Workspaces/holonics/lean/HolonicsResearch/Hodge/HodgeAffineFourConeSource.lean",
+      "sha256": "6c79ee019c3812f248bf236e4129e50a97039786dcfc3b8cad1cbc9128a95bdf",
+      "bytes": 11480
+    },
+    {
+      "path": "/home/b/Workspaces/holonics/lean/HolonicsResearch/Hodge/HodgeBarycentricAffineSourceComplex.lean",
+      "sha256": "35362eed48a056e0ca547bda1ddf5b079e4445470589b071a78442690465943e",
+      "bytes": 11243
+    }
+  ],
+  "root_integration": {
+    "source_files": 11,
+    "atlas_rows_updated_or_added": 5,
+    "external_ancestor_sources_match": 35,
+    "clean_previous_root_entry_verified": true,
+    "other_dirty_paths_not_overwritten": true,
+    "no_build_repeated": true,
+    "no_git_commit_push_or_merge_performed": true,
+    "accepted_record_portion": "/home/b/Workspaces/holonics/research/records/2026-10-07_THE_ACCEPTED_DEGREE_THREE_CONE_ENTERS_THE_ACTUAL_GEOMETRIC_DEGREE_FOUR_CURRENT.md",
+    "prior_worktree_history_and_queue_failed_receipts_preserved": true
+  }
+}
