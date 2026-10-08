@@ -126,8 +126,11 @@
 //! the objects): the statement is in the family, its image and its blocks, and the arrays are only
 //! its realization.
 //!
-//! [established-bounded] **Cost, stated, not bounded away.** Each image performs `K` fresh exact
-//! `n×n` solves (no factorization is held); [`PhaseImage::witnesses`] reads every candidate arc of
+//! [established-bounded] **Cost, stated, not bounded away.** The statistic holds `S_c` and `m_c`
+//! only for the classes a receipt has reached ([`PhaseStatistics`]), so founding costs `K + 1`
+//! rationals and a reached class `n² + n`; the family solves only the reached classes (an
+//! unreached class is the prior's `v̂_c = 0`) but holds every class's shape. Each image performs `K`
+//! fresh exact `n×n` solves (no factorization is held); [`PhaseImage::witnesses`] reads every candidate arc of
 //! each class before it stops the walk at two; [`PhaseImage::blocks`] has no outcome capacity and
 //! grows with the product of the classes' arc counts. The semantics are complete or refused: no
 //! walk is truncated to fit a budget. Finite exact semantics on a declared fixture do not imply a
@@ -136,6 +139,9 @@
 //! [open] The Lean counterpart is owed (#62): the Cauchy–Schwarz image, the Sherman–Morrison
 //! contraction and the half-open block rule; the atlas rows are owed with the first consumer. The
 //! exact reference here is `Rat` throughout and nothing in it consumes a float.
+
+use std::borrow::Cow;
+use std::collections::BTreeMap;
 
 use num_bigint::BigInt;
 use num_traits::{One, Signed, Zero};
@@ -301,24 +307,52 @@ fn solve(shape: &[Vec<Rat>], rhs: &[Rat]) -> Result<Vec<Rat>, PhaseFamilyError> 
 /// `m_c = Σ_k w q_kc t_kc x_k` and the second `s_c = Σ_k w q_kc t_kc²`, with the declared cell
 /// count `N = Σ_k w · #{c : q_kc > 0}`. Absorbing a receipt is exact addition; no sample is
 /// retained.
+///
+/// [agent-inferred, October 8] **A class no receipt has reached holds its Gram and moment as the
+/// exact zero, which is not stored** (Epime's resource review of v116: a dense founding cost
+/// `K·n²` rationals per receiving law, `256·512²` on a wide field, before any receipt). The
+/// statistic is the same object: founded with every class at zero, every comparison absorbed, and
+/// every accessor reading an unreached class's sums as zero; only the reached classes' `S_c` and
+/// `m_c` are held, so the representation is canonical (a class is held exactly when its Gram or
+/// moment is nonzero) and two statistics are equal exactly when their sums are. The seconds and
+/// the count are one rational per class and one in all, held whole.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PhaseStatistics {
     classes: usize,
     features: usize,
-    gram: Vec<Vec<Vec<Rat>>>,
-    moment: Vec<Vec<Rat>>,
+    reached: BTreeMap<usize, ClassSums>,
     second: Vec<Rat>,
     cells: Rat,
 }
 
+/// One reached class's Gram `S_c` (`n×n`) and moment `m_c` (`n`), held once a receipt has made
+/// either nonzero.
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct ClassSums {
+    gram: Vec<Vec<Rat>>,
+    moment: Vec<Rat>,
+}
+
+impl ClassSums {
+    fn zero(features: usize) -> Self {
+        Self {
+            gram: vec![vec![Rat::zero(); features]; features],
+            moment: vec![Rat::zero(); features],
+        }
+    }
+
+    fn is_zero(&self) -> bool {
+        self.gram.iter().flatten().all(Rat::is_zero) && self.moment.iter().all(Rat::is_zero)
+    }
+}
+
 impl PhaseStatistics {
-    /// The statistic before any receipt reached the locus: every entry zero.
+    /// The statistic before any receipt reached the locus: every entry zero, none of it stored.
     pub fn founded(classes: usize, features: usize) -> Self {
         Self {
             classes,
             features,
-            gram: vec![vec![vec![Rat::zero(); features]; features]; classes],
-            moment: vec![vec![Rat::zero(); features]; classes],
+            reached: BTreeMap::new(),
             second: vec![Rat::zero(); classes],
             cells: Rat::zero(),
         }
@@ -346,16 +380,44 @@ impl PhaseStatistics {
     ) -> Result<Self, PhaseFamilyError> {
         require_extent(classes, gram.len())?;
         require_extent(classes, moment.len())?;
+        let reached = gram
+            .into_iter()
+            .zip(moment)
+            .enumerate()
+            .map(|(class, (gram, moment))| (class, gram, moment))
+            .collect();
+        Self::from_reached(classes, features, reached, second, cells)
+    }
+
+    /// **A saved statistic restored from the classes it holds** ([`PhaseStatistics::from_parts`]'s
+    /// law): each listed class's Gram and moment, in strictly ascending class order, every other
+    /// class's being the exact zero, with every class's second and the cell count. The same
+    /// conditions are checked (an unlisted class's augmented statistic `[[0, 0], [0, s_c]]` is
+    /// positive semidefinite exactly when `s_c ≥ 0`), and a listed class whose sums are zero is not
+    /// held, so the restored statistic is the canonical one.
+    pub(crate) fn from_reached(
+        classes: usize,
+        features: usize,
+        reached: Vec<(usize, Vec<Vec<Rat>>, Vec<Rat>)>,
+        second: Vec<Rat>,
+        cells: Rat,
+    ) -> Result<Self, PhaseFamilyError> {
         require_extent(classes, second.len())?;
-        for ((class_gram, class_moment), class_second) in gram.iter().zip(&moment).zip(&second) {
+        let mut held = BTreeMap::new();
+        let mut previous: Option<usize> = None;
+        for (class, class_gram, class_moment) in reached {
+            if class >= classes || previous.is_some_and(|before| class <= before) {
+                return Err(PhaseFamilyError::Malformed);
+            }
+            previous = Some(class);
             require_extent(features, class_gram.len())?;
             require_extent(features, class_moment.len())?;
-            for row in class_gram {
+            for row in &class_gram {
                 require_extent(features, row.len())?;
             }
             let augmented: Vec<Vec<Rat>> = class_gram
                 .iter()
-                .zip(class_moment)
+                .zip(&class_moment)
                 .map(|(row, moment)| {
                     let mut row = row.clone();
                     row.push(moment.clone());
@@ -363,42 +425,63 @@ impl PhaseStatistics {
                 })
                 .chain(std::iter::once({
                     let mut row = class_moment.clone();
-                    row.push(class_second.clone());
+                    row.push(second[class].clone());
                     row
                 }))
                 .collect();
             if !positive_semidefinite(&augmented) {
                 return Err(PhaseFamilyError::Malformed);
             }
+            let sums = ClassSums {
+                gram: class_gram,
+                moment: class_moment,
+            };
+            if !sums.is_zero() {
+                held.insert(class, sums);
+            }
+        }
+        for (class, class_second) in second.iter().enumerate() {
+            if !held.contains_key(&class) && class_second.is_negative() {
+                return Err(PhaseFamilyError::Malformed);
+            }
         }
         if cells.is_negative() {
             return Err(PhaseFamilyError::Malformed);
         }
-        let carries = gram.iter().flatten().flatten().any(|entry| !entry.is_zero())
-            || moment.iter().flatten().any(|entry| !entry.is_zero())
-            || second.iter().any(|entry| !entry.is_zero());
+        let carries = !held.is_empty() || second.iter().any(|entry| !entry.is_zero());
         if cells.is_zero() && carries {
             return Err(PhaseFamilyError::Malformed);
         }
         Ok(Self {
             classes,
             features,
-            gram,
-            moment,
+            reached: held,
             second,
             cells,
         })
     }
 
-    /// **Its exact bits**: every retained rational (each class's Gram, moment and second, and the
-    /// cell count) by its numerator's and denominator's bits. A fixed extent is not a fixed memory:
+    /// **Its exact bits**: every retained rational (each reached class's Gram and moment, every
+    /// class's second, and the cell count) by its numerator's and denominator's bits; an unreached
+    /// class's zero sums are not retained and charge nothing. A fixed extent is not a fixed memory:
     /// the rationals grow, and the owner that retains them charges this census.
     pub fn bits(&self) -> u64 {
         let bits = |value: &Rat| value.numer().bits() + value.denom().bits();
-        self.gram.iter().flatten().flatten().map(bits).sum::<u64>()
-            + self.moment.iter().flatten().map(bits).sum::<u64>()
+        self.reached
+            .values()
+            .map(|sums| {
+                sums.gram.iter().flatten().map(bits).sum::<u64>()
+                    + sums.moment.iter().map(bits).sum::<u64>()
+            })
+            .sum::<u64>()
             + self.second.iter().map(bits).sum::<u64>()
             + bits(&self.cells)
+    }
+
+    /// The reached classes, ascending: those whose Gram or moment some receipt has made nonzero.
+    /// Every other class's Gram and moment are the exact zero.
+    pub fn reached(&self) -> impl Iterator<Item = usize> + '_ {
+        self.reached.keys().copied()
     }
 
     /// The number of classes `K`.
@@ -411,16 +494,25 @@ impl PhaseStatistics {
         self.features
     }
 
-    /// `S_c`, the class's Gram, `n` rows of `n`. As with slice indexing, `class < classes()` is the
+    /// `S_c`, the class's Gram, `n` rows of `n`: borrowed where the class is reached, the exact zero
+    /// built on reading where it is not. As with slice indexing, `class < classes()` is the
     /// caller's precondition (here and in [`PhaseStatistics::moment`] and
     /// [`PhaseStatistics::second`]).
-    pub fn gram(&self, class: usize) -> &[Vec<Rat>] {
-        &self.gram[class]
+    pub fn gram(&self, class: usize) -> Cow<'_, [Vec<Rat>]> {
+        assert!(class < self.classes, "a class of the statistic");
+        match self.reached.get(&class) {
+            Some(sums) => Cow::Borrowed(sums.gram.as_slice()),
+            None => Cow::Owned(vec![vec![Rat::zero(); self.features]; self.features]),
+        }
     }
 
-    /// `m_c`, the class's moment, `n` entries.
-    pub fn moment(&self, class: usize) -> &[Rat] {
-        &self.moment[class]
+    /// `m_c`, the class's moment, `n` entries (borrowed where reached, the exact zero otherwise).
+    pub fn moment(&self, class: usize) -> Cow<'_, [Rat]> {
+        assert!(class < self.classes, "a class of the statistic");
+        match self.reached.get(&class) {
+            Some(sums) => Cow::Borrowed(sums.moment.as_slice()),
+            None => Cow::Owned(vec![Rat::zero(); self.features]),
+        }
     }
 
     /// `s_c`, the class's second.
@@ -462,6 +554,7 @@ impl PhaseStatistics {
             return Err(PhaseFamilyError::NotADistribution);
         }
         let mut compared: usize = 0;
+        let features = self.features;
         for (class, mass) in masses.iter().enumerate() {
             if mass.is_zero() {
                 continue;
@@ -470,12 +563,20 @@ impl PhaseStatistics {
             let scale = weight * mass;
             let target = &doubled_target[class];
             let weighted = &scale * target;
+            let sums = self
+                .reached
+                .entry(class)
+                .or_insert_with(|| ClassSums::zero(features));
             for (i, left) in feature.iter().enumerate() {
                 let lever = &scale * left;
                 for (j, right) in feature.iter().enumerate() {
-                    self.gram[class][i][j] += &lever * right;
+                    sums.gram[i][j] += &lever * right;
                 }
-                self.moment[class][i] += &weighted * left;
+                sums.moment[i] += &weighted * left;
+            }
+            // A receipt that leaves a newly opened class at zero (a zero feature) holds nothing.
+            if sums.is_zero() {
+                self.reached.remove(&class);
             }
             self.second[class] += &weighted * target;
         }
@@ -498,15 +599,29 @@ impl PhaseStatistics {
         let mut shapes = Vec::with_capacity(self.classes);
         let mut minimizer = Vec::with_capacity(self.classes);
         let mut minimum = Rat::zero();
-        for ((gram, moment), second) in self.gram.iter().zip(&self.moment).zip(&self.second) {
-            let mut shape = gram.clone();
-            for (i, row) in shape.iter_mut().enumerate() {
-                row[i] += &ridge;
+        for (class, second) in self.second.iter().enumerate() {
+            match self.reached.get(&class) {
+                Some(sums) => {
+                    let mut shape = sums.gram.clone();
+                    for (i, row) in shape.iter_mut().enumerate() {
+                        row[i] += &ridge;
+                    }
+                    let centre = solve(&shape, &sums.moment)?;
+                    minimum += (second - dot(&centre, &sums.moment)) * eighth();
+                    shapes.push(shape);
+                    minimizer.push(centre);
+                }
+                None => {
+                    // The prior alone, `A_c = 2^k I` with `m_c = 0`: `v̂_c = 0` exactly, no solve.
+                    let mut shape = vec![vec![Rat::zero(); self.features]; self.features];
+                    for (i, row) in shape.iter_mut().enumerate() {
+                        row[i] = ridge.clone();
+                    }
+                    minimum += second * eighth();
+                    shapes.push(shape);
+                    minimizer.push(vec![Rat::zero(); self.features]);
+                }
             }
-            let centre = solve(&shape, moment)?;
-            minimum += (second - dot(&centre, moment)) * eighth();
-            shapes.push(shape);
-            minimizer.push(centre);
         }
         Ok(PhaseFamily {
             features: self.features,
@@ -1088,7 +1203,7 @@ mod tests {
         let mut direct = Rat::zero();
         for class in 0..2 {
             let curvature = quadratic(&shapes[class], &rows[class]);
-            let linear = dot(&rows[class], statistics.moment(class));
+            let linear = dot(&rows[class], &statistics.moment(class));
             direct += (curvature - integer(2) * linear + statistics.second(class)) * rat(1, 8);
         }
         direct -= family.minimum();
@@ -1651,6 +1766,63 @@ mod tests {
             PhaseFamilyError::ZeroGrain.to_string(),
             "the grain of an outcome block must be a positive integer"
         );
+    }
+
+    /// **An unreached class is the exact zero and is not held** (Epime's resource review of v116): a
+    /// wide founded statistic holds no class and charges only its seconds and count; a receipt
+    /// opens exactly the classes whose Gram or moment it makes nonzero (a zero feature opens none,
+    /// while its second and the count still move); the dense parts restore the same canonical
+    /// statistic; and a restore lists its reached classes ascending inside the declared classes,
+    /// with every unlisted class's second nonnegative.
+    #[test]
+    fn an_unreached_class_is_the_exact_zero_and_is_not_held() {
+        let wide = PhaseStatistics::founded(256, 512);
+        assert_eq!(wide.reached().count(), 0);
+        // 256 zero seconds and the zero count, one bit each (a zero's denominator is one).
+        assert_eq!(wide.bits(), 257);
+        assert!(wide.second(255).is_zero());
+
+        let mut statistics = PhaseStatistics::founded(3, 2);
+        statistics
+            .absorb(&integer(1), &ints(&[1, 2]), &[Rat::zero(), Rat::one(), Rat::zero()], &ints(&[0, 3, 0]))
+            .unwrap();
+        assert_eq!(statistics.reached().collect::<Vec<_>>(), vec![1]);
+        assert_eq!(statistics.gram(0).to_vec(), vec![ints(&[0, 0]), ints(&[0, 0])]);
+        assert_eq!(statistics.gram(1).to_vec(), vec![ints(&[1, 2]), ints(&[2, 4])]);
+        assert_eq!(statistics.moment(1).to_vec(), ints(&[3, 6]));
+        assert_eq!(statistics.second(1), &integer(9));
+        // A zero feature compares its class (its second and the count move) and opens no Gram.
+        statistics
+            .absorb(&integer(2), &ints(&[0, 0]), &[Rat::zero(), Rat::zero(), Rat::one()], &ints(&[0, 0, 5]))
+            .unwrap();
+        assert_eq!(statistics.reached().collect::<Vec<_>>(), vec![1]);
+        assert_eq!(statistics.second(2), &integer(50));
+        assert_eq!(statistics.cells(), &integer(3));
+        let dense = PhaseStatistics::from_parts(
+            3,
+            2,
+            (0..3).map(|c| statistics.gram(c).to_vec()).collect(),
+            (0..3).map(|c| statistics.moment(c).to_vec()).collect(),
+            (0..3).map(|c| statistics.second(c).clone()).collect(),
+            statistics.cells().clone(),
+        )
+        .unwrap();
+        assert_eq!(dense, statistics);
+
+        let listed = |reached: Vec<(usize, Vec<Vec<Rat>>, Vec<Rat>)>, second: Vec<Rat>| {
+            PhaseStatistics::from_reached(3, 2, reached, second, integer(3))
+        };
+        let class1 = (1, vec![ints(&[1, 2]), ints(&[2, 4])], ints(&[3, 6]));
+        assert_eq!(listed(vec![class1.clone()], ints(&[0, 9, 50])), Ok(statistics.clone()));
+        assert_eq!(
+            listed(vec![class1.clone(), class1.clone()], ints(&[0, 9, 50])),
+            Err(PhaseFamilyError::Malformed)
+        );
+        assert_eq!(
+            listed(vec![(3, vec![ints(&[0, 0]), ints(&[0, 0])], ints(&[0, 0]))], ints(&[0, 9, 50])),
+            Err(PhaseFamilyError::Malformed)
+        );
+        assert_eq!(listed(vec![class1], ints(&[-1, 9, 50])), Err(PhaseFamilyError::Malformed));
     }
 
     /// **A restored statistic must meet a sum of receipts' necessary conditions** (Epime's review,

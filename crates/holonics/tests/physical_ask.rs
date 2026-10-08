@@ -730,7 +730,9 @@ fn cells(receiver: &PhysicalReceiver<'_>) -> Rat {
         .receiving_law(1)
         .unwrap()
         .phase_statistics()
-        .map_or_else(Rat::zero, |statistics| statistics.cells().clone())
+        .unwrap()
+        .cells()
+        .clone()
 }
 
 /// The candidates (images that meet two outcome blocks) and the argmax of total leverage with the
@@ -786,11 +788,11 @@ fn before_any_reading_the_family_is_one_member_and_the_probe_holds_with_its_reas
         let waves = AdmittedWaves::declare(probe.feature(), 1, rat(1, 4), 1 << 12).unwrap();
         // The do-nothing wave costs no work and is admitted at a nonnegative supply.
         assert!(waves.contains(&[Rat::zero(), Rat::zero()]));
-        // No soft observed face has reached the receiving map: its phase statistics are not yet
-        // founded (they are founded lazily by the first), so the probe holds for that reason.
+        // No reading has reached the receiving map: its family is the prior alone, a single
+        // member, whose image meets one block whatever the wave. Nothing separates.
         let held = probe.ask(&waves).unwrap();
         assert_eq!(held.release, ReleaseReturn::Hold);
-        assert_eq!(held.held, Some(ProbeHold::NoPhaseStatistics));
+        assert_eq!(held.held, Some(ProbeHold::NoSeparatingWave));
         assert_eq!(held.candidates, 0);
         assert!(held.control.is_none() && held.prediction.is_none());
         // The empty lattice holds for its own typed reason: a supply below the least work
@@ -1071,14 +1073,7 @@ fn successive_probes_run_on_one_receiver_and_one_world_and_each_is_actually_rece
             // is recorded below, and the receiver is exercised on every round whatever the
             // family says: the admission of a later opening does not depend on the Ask.
             (ReleaseReturn::Hold, None) => {
-                // Before the first encounter no soft face has founded the statistics; after it,
-                // a hold means no admitted wave separates the family.
-                let expected = if round == 0 {
-                    ProbeHold::NoPhaseStatistics
-                } else {
-                    ProbeHold::NoSeparatingWave
-                };
-                assert_eq!(decision.held, Some(expected));
+                assert_eq!(decision.held, Some(ProbeHold::NoSeparatingWave));
                 outcomes.push("hold");
                 vec![Rat::zero(); 2]
             }

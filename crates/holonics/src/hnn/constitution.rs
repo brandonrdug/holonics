@@ -463,10 +463,8 @@
 //! one-hot reconstruction otherwise ([`face_masses`]). The reconstruction is exact for a one-hot `q`
 //! and was wrong for a soft one (it accepted `p̃ = (⅚, ⅙)` for `(½, ½)` against `q̃ = (⅔, ⅓)`), a
 //! located cause repaired here, in its owner, before its new consumer. Beside its Gram `H` and the
-//! prior's pair, the receiving law keeps the exact statistics of the phase comparison its soft
-//! observed faces made (faces carrying their own masses, the action path's World receipts; founded
-//! lazily at the first, so a law no such face reaches holds none and pays nothing)
-//! ([`NormalLaw::phase_statistics`], `hnn::phase_family`): per class the sums
+//! prior's pair, the receiving law keeps the exact statistics of the phase comparison its readings
+//! made ([`NormalLaw::phase_statistics`], `hnn::phase_family`): per class the sums
 //! `S_c = Σ w q_c f fᵀ`, `m_c = Σ w q_c t_c f`, `s_c = Σ w q_c t_c²` of the doubled lifted phase
 //! target `t_c = 2 φ_q,c` the readings observed, with the declared cell count `N`. They are
 //! absorbed in the deposit's own successor ([`absorb_phase`]), through the map in force before it and
@@ -2052,9 +2050,8 @@ pub struct NormalLaw {
     /// [definition; agent-inferred, October 8] The receiving law's exact phase-comparison statistics
     /// ([`PhaseStatistics`]): per class one fixed-size sum of the readings that reached the map, in
     /// the doubled lifted phase targets the map's imaginary rows are regressed on, absorbed in the
-    /// deposit's own successor ([`absorb_phase`]); no reading is kept. Founded lazily by the
-    /// first reached face that carries its own masses (a soft observed face); `None` before then,
-    /// and always on a source or contrast law.
+    /// deposit's own successor ([`absorb_phase`]); no reading is kept. `None` on a source or
+    /// contrast law.
     phase: Option<PhaseStatistics>,
 }
 
@@ -2118,13 +2115,15 @@ impl NormalLaw {
 
     /// **The receiving map's law as its field declares its prior**: founded at `2^k I`
     /// ([`NormalLaw::with_scaled_prior`]) with the prequential pair carried from zero
-    /// ([`LocatedPrior`]), so the readings move `k` (`ReceiverDeclaration::receiving_prior`). Its
-    /// phase statistics are not founded here: the deposit founds them lazily
-    /// ([`PhaseStatistics::founded`], `m/2` classes on the map's `n` features, the rows being
-    /// realified `[Re, Im]` per class) at the first reached face that carries its own masses.
+    /// ([`LocatedPrior`]), so the readings move `k` (`ReceiverDeclaration::receiving_prior`), and
+    /// with the phase statistics founded empty ([`PhaseStatistics::founded`]): the receiving map's
+    /// rows are realified `[Re, Im]` per class, so its `m` rows are `m/2` classes, each regressed
+    /// on the map's `n` features.
     pub fn with_receiving_prior(map: ExactRatMatrix, from: u32) -> Self {
+        let phase = PhaseStatistics::founded(map.rows() / 2, map.columns());
         Self {
             located: Some(LocatedPrior::founded(from)),
+            phase: Some(phase),
             ..Self::with_scaled_prior(map, from)
         }
     }
@@ -2796,11 +2795,6 @@ pub(crate) fn absorb_phase(
     let four = Rat::from_integer(BigInt::from(4));
     for sample in samples {
         if sample.weight.is_zero() || sample.feature.iter().all(|x| x.is_zero()) {
-            continue;
-        }
-        // Only a face carrying its own masses is retained: the categorical faces of the text path
-        // have no consumer of this statistic, and founding one for them is the cost refused above.
-        if sample.masses.is_none() {
             continue;
         }
         let Some(masses) = face_masses(sample) else {
@@ -7050,21 +7044,10 @@ impl Constitution {
                         // yet replaced; the map `prequential_terms` read in pass 1), so a refused
                         // deposit absorbs nothing: the constitution publishes the successor whole
                         // or not at all.
-                        // The statistics are founded lazily, at the first reached face that carries
-                        // its own masses (a soft observed face, the action path's World receipt): a
-                        // receiving law no such face has reached holds none and pays nothing
-                        // (Epime's resource review, October 8: an eager dense founding cost
-                        // 256 · 512² rationals on a wide field before any receipt).
-                        if let LinearLocus::Receiving(_) = step.locus {
-                            if step.samples.iter().any(|sample| {
-                                sample.masses.is_some() && !sample.weight.is_zero()
-                            }) {
-                                let (rows, columns) = (law.map().rows(), law.map().columns());
-                                let phase = next
-                                    .phase
-                                    .get_or_insert_with(|| PhaseStatistics::founded(rows / 2, columns));
-                                absorb_phase(phase, law.map(), &step.samples).map_err(refused)?;
-                            }
+                        if let (LinearLocus::Receiving(_), Some(phase)) =
+                            (step.locus, next.phase.as_mut())
+                        {
+                            absorb_phase(phase, law.map(), &step.samples).map_err(refused)?;
                         }
                         // A located prior reads its window's terms and moves (the prior carry's
                         // design §3), one atomic successor of the stepped law.
@@ -9610,25 +9593,30 @@ fn write_law(s: &mut String, law: &NormalLaw) {
 }
 
 /// [definition; agent-inferred, October 8] **The phase statistics as text**, every value exact and
-/// nothing rounded (a checkpoint restores them whole; the readings were never kept): `phase K n N`
-/// (classes, features, cells), then per class its Gram `S_c` as `n` rows of `n`, its moment `m_c`
-/// as one line of `n`, and its second `s_c` as one line. The reason they are written whole: they
-/// are nonzero from the first receiving deposit on, so a save that refused nonzero statistics
-/// could never be written again, and one that dropped them would restore another constitution
-/// (`continued` is the saved one, `ContinuingState`).
+/// nothing rounded (a checkpoint restores them whole; the readings were never kept):
+/// `phase K n N R` (classes, features, cells, reached classes), the `K` seconds `s_c` as one line,
+/// then per reached class (ascending) `class c`, its Gram `S_c` as `n` rows of `n` and its moment
+/// `m_c` as one line of `n`. An unreached class's Gram and moment are the exact zero and are not
+/// written ([`PhaseStatistics`]). The reason they are written whole: they are nonzero from the
+/// first receiving deposit on, so a save that refused nonzero statistics could never be written
+/// again, and one that dropped them would restore another constitution (`continued` is the saved
+/// one, `ContinuingState`).
 fn write_phase(s: &mut String, phase: &PhaseStatistics) {
+    let reached: Vec<usize> = phase.reached().collect();
     *s += &format!(
-        "phase {} {} {}\n",
+        "phase {} {} {} {}\n",
         phase.classes(),
         phase.features(),
-        phase.cells()
+        phase.cells(),
+        reached.len()
     );
-    for class in 0..phase.classes() {
-        for row in phase.gram(class) {
+    write_values(s, (0..phase.classes()).map(|class| phase.second(class)));
+    for class in reached {
+        *s += &format!("class {class}\n");
+        for row in phase.gram(class).iter() {
             write_values(s, row.iter());
         }
         write_values(s, phase.moment(class).iter());
-        write_values(s, std::iter::once(phase.second(class)));
     }
 }
 
@@ -9645,29 +9633,35 @@ fn read_phase(
         "phase",
         "the phase statistics",
     )?;
-    let [classes, features, cells] = match words.as_slice() {
+    let [classes, features, cells, held] = match words.as_slice() {
         [none] if none == "none" => return Ok(None),
-        [classes, features, cells] => [classes, features, cells],
+        [classes, features, cells, held] => [classes, features, cells, held],
         _ => return refuse("the phase statistics"),
     };
-    let (classes, features) = (
+    let (classes, features, held) = (
         number(Some(classes), "the phase statistics' classes")?,
         number(Some(features), "the phase statistics' features")?,
+        number(Some(held), "the phase statistics' reached classes")?,
     );
     let cells = cells
         .parse::<Rat>()
         .map_err(|_| HnnError::ContinuingState {
             what: "the phase statistics' cells",
         })?;
-    if classes != map.rows() / 2 || features != map.columns() {
+    if classes != map.rows() / 2 || features != map.columns() || held > classes {
         return refuse("the phase statistics against the receiving map's classes and features");
     }
-    let (mut grams, mut moments, mut seconds) = (
-        Vec::with_capacity(classes),
-        Vec::with_capacity(classes),
-        Vec::with_capacity(classes),
-    );
-    for _ in 0..classes {
+    let seconds = rats(next(lines, "the phase seconds")?, "the phase seconds")?;
+    if seconds.len() != classes {
+        return refuse("the phase seconds' width");
+    }
+    let mut reached = Vec::with_capacity(held);
+    for _ in 0..held {
+        let words = head(next(lines, "a phase class")?, "class", "a phase class")?;
+        let [class] = words.as_slice() else {
+            return refuse("a phase class");
+        };
+        let class = number(Some(class), "a phase class")?;
         let mut gram = Vec::with_capacity(features);
         for _ in 0..features {
             let row = rats(next(lines, "a phase Gram row")?, "a phase Gram row")?;
@@ -9680,15 +9674,9 @@ fn read_phase(
         if moment.len() != features {
             return refuse("a phase moment's width");
         }
-        let [second] = <[Rat; 1]>::try_from(rats(next(lines, "a phase second")?, "a phase second")?)
-            .map_err(|_| HnnError::ContinuingState {
-                what: "a phase second (one value)",
-            })?;
-        grams.push(gram);
-        moments.push(moment);
-        seconds.push(second);
+        reached.push((class, gram, moment));
     }
-    PhaseStatistics::from_parts(classes, features, grams, moments, seconds, cells)
+    PhaseStatistics::from_reached(classes, features, reached, seconds, cells)
         .map(Some)
         .map_err(|_| HnnError::ContinuingState {
             what: "the phase statistics off their form",

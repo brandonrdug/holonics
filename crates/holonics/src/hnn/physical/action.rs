@@ -1231,16 +1231,6 @@ impl PreparedPhysicalProbe<'_, '_> {
         let feature = &self.feature;
         let phases = feature.phases();
         let station = feature.station();
-        // A declaration that admits no wave holds for that reason first, whatever the family.
-        if admitted.is_empty() {
-            return Ok(ProbeDecision {
-                release: decide_probe(station, None)?,
-                control: None,
-                prediction: None,
-                candidates: 0,
-                held: Some(ProbeHold::NoAdmittedWave),
-            });
-        }
         let Some(family) = declared_family(self.owner.constitution(), phases)? else {
             return Ok(ProbeDecision {
                 release: decide_probe(station, None)?,
