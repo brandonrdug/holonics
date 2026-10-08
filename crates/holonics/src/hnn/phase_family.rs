@@ -372,6 +372,17 @@ impl PhaseStatistics {
         })
     }
 
+    /// **Its exact bits**: every retained rational (each class's Gram, moment and second, and the
+    /// cell count) by its numerator's and denominator's bits. A fixed extent is not a fixed memory:
+    /// the rationals grow, and the owner that retains them charges this census.
+    pub fn bits(&self) -> u64 {
+        let bits = |value: &Rat| value.numer().bits() + value.denom().bits();
+        self.gram.iter().flatten().flatten().map(bits).sum::<u64>()
+            + self.moment.iter().flatten().map(bits).sum::<u64>()
+            + self.second.iter().map(bits).sum::<u64>()
+            + bits(&self.cells)
+    }
+
     /// The number of classes `K`.
     pub fn classes(&self) -> usize {
         self.classes

@@ -2384,7 +2384,9 @@ impl NormalLaw {
         }
     }
 
-    /// Its bits by carrier.
+    /// Its bits by carrier. A receiving law's retained phase statistics are its entries too
+    /// (Epime's review, October 8: retained and checkpointed, they are charged to the census the
+    /// budget admits against, never carried outside it).
     fn carrier_bits(&self) -> CarrierBits {
         CarrierBits {
             entries: self
@@ -2393,7 +2395,8 @@ impl NormalLaw {
                 .iter()
                 .chain(self.gram.iter().flatten())
                 .map(bits)
-                .sum(),
+                .sum::<u64>()
+                + self.phase.as_ref().map_or(0, |phase| phase.bits()),
             remainders: self.map_carry.bits() + self.gram_carry.bits(),
             solved: self.chart.bits(self.gram.len()),
         }
