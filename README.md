@@ -50,17 +50,22 @@ not a blind search over keys.
 [Keys, locks and navigation](docs/ELEMENTARY_OBJECTS.md#keys-locks-and-navigation) ·
 [the line](docs/THE_MACHINE.md#the-line-the-rebuild-serves)
 
-**The machine is geometry.** The HNN (Holonic neural network) is a continuing field of complex
+**The HNN is a morphodynamic circuit.** The Holonic neural network is a continuing field of complex
 parametron rings, annular rings that store, oscillate and lock, joined by helical pair contacts,
-which slip, dissipate and address. Information is phase and winding on the rings. Learning deposits
-into the material of the contacts a comparison actually reached. A weight matrix is one chart of
-this object, never the object.
+which slip, dissipate and address. Its geometry and constitution govern motion; admitted motion
+can change geometry and couplings, with its work accounted for. Information is phase and winding
+on the rings. Learning deposits a comparison actually reached into the constitution. **Dynamic
+Geometry** and **Asymmetric Potential** name aspects of this same construction, with their
+consumers still subject to the gates below. A graph, tree or weight matrix is a declared chart of
+the continuing circuit.
 [The machine](docs/THE_MACHINE.md) · [the HNN formula](docs/HNN_FORMULA.md) ·
+[language and operators](docs/ELEMENTARY_OBJECTS.md#the-morphodynamic-circuit) ·
 [helical geometry](docs/HELICAL_GEOMETRY.md) · [winding and carry](docs/WINDING_CARRY_AND_PLACEMENT.md)
 
-**Memory is a quotient, not a tape.** What a system retains is the least it must keep so that
-every future it admits reads alike: the future-sufficient quotient of its constitution. It is not
-a log of events, and not a replay.
+**Memory is a quotient, not a tape.** Retention is a quotient sufficient for every admitted future,
+including admitted actions. The constitution suffices for it but is not minimal. Its representation
+keeps the decoder and unresolved fibre that future receivers may read. It is not a log of events,
+and not a replay.
 
 **Loss is the logarithm of a ratio.** Comparing a produced Holon with its target gives a relative
 transport `R`. The loss is `log R`, whose winding is the branch of the logarithm, and its
@@ -105,61 +110,72 @@ application) carry no machinery.
 
 ## What exists now
 
-As of September 27, 2026. The repository was reset on September 24 to what functions, and is being
-rebuilt from the elementary objects. Everything earlier is in git history.
-[Construction state](CONSTRUCTION_STATE.md) · [the rebuild plan](docs/plans/THE_REBUILD.md) ·
-[tracking issue #63](https://github.com/brandonrdug/holonics/issues/63)
+The source and receipt snapshot below is **October 8, 2026**, read at published main
+[`4323ed14`](https://github.com/brandonrdug/holonics/commit/4323ed146bc186baa1b749ee3c3ac38877796437).
+The September 24 reset retained what functions; earlier implementations remain in git history.
+[CONSTRUCTION_STATE](CONSTRUCTION_STATE.md) owns current position, and
+[THE_REBUILD](docs/plans/THE_REBUILD.md) owns order. This README routes those owners rather than
+repeating their measurement ledger. Each receipt keeps its own source pin. The
+[publication lineage map](research/records/receipts/2026-10-08_publication-lineage/PUBLICATION_MAP.json)
+pairs each original commit of the integration with its published counterpart, so a receipt that
+cites an original integration commit resolves. A receipt citing a commit outside the integration
+identifies its source by file hashes. The [records README](research/records/README.md) routes the
+later records, and each states its own scope.
 
-| Built | Where |
+| Present construction | Evidence and limit |
 |---|---|
-| The Holon law and its operators: exact ratio and ring arithmetic, geometry (frames, screws, winding), navigators, receivers, standing and release | [`crates/holonics`](crates/holonics) |
-| The HNN's first two campaigns (source moments, rings, contacts, the receiving word, deposition), on the host and resident on an NVIDIA card, each law with host/card parity | `holonics::hnn`, [`crates/holonics-cuda`](crates/holonics-cuda) |
-| The landmark tree: a context-tree-weighting receiver stored where its paths part, whose count registers carry at a ceiling | `compression::landmark::context`, `kernels/tree.cu` |
-| The receiving population of eggs: dormancy, death as exchange, birth, composition at ports, an evolved prior | `receiver::population` |
-| Terrain with known truth: moiré sheets, tree sources, rotor cribs, switching aeons, digit products and prime streams | `holarchy::terrain` |
-| The Lean mathematics: 1,514 files and over 22,000 theorem and lemma declarations on Mathlib, with no `sorry` and no declared axioms (12 finite checks use `native_decide`) | [`lean/`](lean/README.md) |
-| The expression atlas: 2,697 derived expressions, identities, bounds and counterexamples, each with its owner and grade | [`docs/atlas/`](docs/atlas/README.md) |
+| The Holon law, exact ratio/ring arithmetic, frames, screws, winding, navigators, receivers and release | [`crates/holonics`](crates/holonics), with the [operator contract](docs/ELEMENTARY_OBJECTS.md#operator-contract) and Lean counterparts |
+| HNN host and resident CUDA word, source moments, paired adjoint, comparison, deposition and reception carry | [`holonics::hnn`](crates/holonics/src/hnn), [`holonics-cuda::hnn`](crates/holonics-cuda/src/hnn); [carry receipt](research/records/2026-10-03_THE_RECEPTION_CARRIES_THE_INTERIOR_CHANGE_THE_SOURCE_PORT_IMPOSES_THE_MOMENT_AND_REST_IS_COMPLETE_ABSORPTION.md). Per-law parity is scoped to its actual fixture. |
+| Exact source entrance through the producing `Encoded` chart; the card steps by located digits | [Entrance tests](crates/holonics/tests/source_entrance.rs), [encoding/ingest receipt](research/records/2026-10-05_THE_FIELDS_ENTRIES_TAKE_ONLY_THE_ENCODED_SOURCE.md). A refused occurrence moves nothing; a failed device open is discarded. |
+| Host save and cold continuation of contemporary material, charts, clock and arrived comparison | [Cold-restore tests](crates/holonics/tests/resident_cold_restore.rs), [PR #384](https://github.com/brandonrdug/holonics/pull/384). This establishes the declared host continuation cases; card passage restore, the general action-sufficient quotient and broader adaptive retention keep their own gates. |
+| Nonlinear loaded parametron with an executed-domain certificate and carried pump cycle | [Quartic domain](research/records/2026-10-05_THE_QUARTIC_STEP_NEEDS_AN_EXECUTED_DOMAIN_BEFORE_A_LOCK.md), [continuing component](research/records/2026-10-05_THE_LOADED_COMPONENT_CARRIES_ITS_ADMITTED_PUMP_CYCLE.md). The ordinary rounded word and whole nonlinear field are separate joins, and `Holon::interconnect` refuses a loaded quartic element until the joined nonlinear relation is retained. |
+| Located-key release and two-sided repair on declared known-truth terrain | [Pair comparison](research/records/2026-10-05_THE_PAIR_GAIN_IS_THE_JOINED_BANKS_LOG_DETERMINANT.md), [reflection repair](research/records/2026-10-05_REPAIR_BY_REFLECTION_THE_LOCATED_PAIR_RESTRICTS_THE_ERASED_CELLS_FROM_BOTH_SIDES.md). These receipts do not establish useful learned physical repair. |
+| Charted physical reception: the source-opening split and the receiving-error covectors, charged at their producing operands | Implemented at [`hnn::prediction::charted`](crates/holonics/src/hnn/prediction/charted.rs) ([record](research/records/2026-10-06_THE_CHARTED_PHYSICAL_RECEIVER_CHARGES_ITS_SOURCE_STATE_AND_BOTH_COVECTOR_ERRORS.md)). Four fixed-law fixtures were accepted at source `0da1652c`, an unpublished commit whose files the receipt pins by SHA-256 (the owner has changed since) ([scoped receipt](research/records/receipts/charted-physical-learning-20261006/integrated-source-v1/SCOPED_ACCEPTANCE.v1.json)): Receiving-only publication, with product, erasure and general-boundary acceptance excluded and a missing station held. The stronger physical acceptance remains open. |
+| Landmark-tree compression and receiving populations | Historical scoped readings in [CONSTRUCTION_STATE](CONSTRUCTION_STATE.md#measured-receiving-faces); the count tree earns most of the text compression. Compression scores are not generation acceptance. |
+| Lean mathematics and the expression atlas | [`lean/`](lean/README.md), [`docs/atlas/`](docs/atlas/README.md); each law keeps its hypotheses, consumer and epistemic grade. |
+| Two current scoped Lean acceptances: the declared future-read score on the continuing source, and the affine Hodge source family entering the geometric degree-four current | Future read: [record](research/records/2026-10-06_A_CURRENTLY_HIDDEN_MODE_CAN_REACH_A_FUTURE_RECEIVER.md), [scoped receipt](research/records/receipts/2026-10-06-future-receiver-score/accepted-terminal-v26/SCOPED_ACCEPTANCE.v1.json); declared finite composed reads and positive receiver metrics only, with no physical-energy or performance claim. Hodge: [record](research/records/2026-10-07_THE_ACCEPTED_DEGREE_THREE_CONE_ENTERS_THE_ACTUAL_GEOMETRIC_DEGREE_FOUR_CURRENT.md), which links its canonical acceptance receipt; sphere filling, unconditional six-pair independence, whole-power spanning and the algebraic-cycle square stay open. This README infers no whole-library build, runtime result, target resolution or product from either. |
 
-**Measured.** A *cell* is one symbol of a stream: a byte, or a letter marking a channel or a
-section. Code lengths are in bits, and `ε` is the remainder below the reading's grain of 1/16
-bit. *Held out* means the later part of a stream, scored after that measurement's choices were
-made on the earlier part. A tail once scored becomes development data for later choices. The
-comparisons are classical online compressors: order-0 and order-1 byte counters, and PPM-2
-(prediction by partial matching with two bytes of context). The text measurements use Brandon's
-private conversation data, which is never published: only its counts, bits and hashes are.
-- **Standing cut (text; 6,148 cells, the last 1,190 held out).** The full HNN codes
-  `3 + 1/16 + ε` bits a cell held out, strictly below order-0, order-1 and PPM-2. This is the
-  landmark tree weighed with the rings' wave.
-  - The tree does nearly all of it. The wave earns `5 − 13/16 − ε` bits over the held-out cells
-    after its selection charge, and has not paid for its computation.
-  - This tail has since been used in development.
+**Athena remains incomplete.** Meaningful autonomous physical repair and a useful decoded boundary
+have not passed their acceptance. A native response must join its producing chart, source clock,
+learned receiving material, preserved remainder and continuing carry. Teacher-forced next-cell
+scores, component tests and restore fixtures each establish their own narrower claim. The actual
+output, whole, decides usefulness; the spent diagnostic split stays spent, and the separate
+evaluation partition stays closed.
 
-  [Record](research/records/2026-09-26_CAMPAIGN_ONE_MEETS_ITS_CRITERION_THE_TREE_RECEIVES_AND_THE_WAVE_IS_WEIGHED.md)
-- **Wide cut (text, `2²⁰` cells, the last `2¹⁷` held out).** The landmark tree alone, at depth
-  `48`, codes `1 + 15/16 + ε` bits a cell, below PPM-2. This counts contexts only; it is not the
-  full HNN.
-  [Record](research/records/2026-09-26_THE_LANDMARK_TREE_AT_SCALE_THE_STOP_PRIOR_LOCAL_WEIGHING_THE_WIDE_CUT_AND_THE_STORAGE_WHERE_PATHS_PART.md)
-- **Curated conversation stream.** Channels are ports, turns are epochs and conversations are
-  aeons. Against the flat stream of the same bytes, the population's code differs by
-  `−1820 + 9/16 + ε` bits on its development cells and by `−535 + 8/16 + ε` bits on the held-out
-  tail. This is on the development partition only, and says nothing yet about answers.
-- **Terrain with known truth.** The true family is among the population's declared candidates. The
-  test is that selection finds it and pays only its description:
-  - base-10 digit products code at exactly their truth, `108857 + 3/16 + ε` bits, against the
-    landmark tree's `273520 + 7/16`;
-  - a prime stream codes in `15 + 9/16 + ε` bits, the key's description, against the tree's
-    `161780 + 3/16`.
+**The next learning receipt must distinguish the relations learned.** Keep each source head,
+producing chart, cohort, seed, damage and mechanism with its own result. The
+[pair-gain receipt](research/records/2026-10-05_THE_PAIR_GAIN_IS_THE_JOINED_BANKS_LOG_DETERMINANT.md)
+explicitly measures regressions on repeated request spaces; the
+[reflection-repair receipt](research/records/2026-10-05_REPAIR_BY_REFLECTION_THE_LOCATED_PAIR_RESTRICTS_THE_ERASED_CELLS_FROM_BOTH_SIDES.md)
+uses separate damage/read cohorts. Their totals do not form one U6 acceptance bar. A result
+dominated by the common class does not establish acquired relations: report the distinguishing
+damaged cells and intact clamps, compare the same declared source/receiver task before and after
+reached deposition on the respective contemporary material, and check the retained result through
+cold continuation. The charted source-opening and receiving-error pullbacks are implemented at
+their owner (the charted physical reception row above), and the opening balance alone is an energy
+reading, not a learned relation. A learned relation shown on distinguishing cells through cold
+continuation is the stronger acceptance, and it remains open. This public status credits
+completion only at published source and consuming receipts.
 
-  [Record](research/records/2026-09-27_THE_RECEIVING_POPULATION_WAS_BUILT_ON_TERRAIN_WITH_KNOWN_TRUTH_AND_THE_CURATED_SOURCE_NOW_CODES_BELOW_THE_FLAT_STREAM.md)
+The [foundation supplement](docs/plans/HNN_ATHENA_FOUNDATION.md) joins dynamic geometry, asymmetric
+potentials and receiver-relative tolerance to the existing owners. An asymmetric potential is a
+constitutive proposal, and a changing geometry is a relation to be joined at its consumer: the
+symmetric quartic component establishes neither as a generic adaptive HNN consumer.
 
-**Not yet.** Athena answers nothing today. The order is fixed in advance in the
-[unified plan](docs/plans/THE_REBUILD.md#the-unified-plan-september-28): one retention contract and
-F0's memory experiment, one release contract and the chase's motion rebase come next; the text chart
-(F4, then Athena-0, F5, whose responses Brandon judges blind against a retrieval control) follows
-them.
+| Open workstream | Existing issue and acceptance |
+|---|---|
+| Host HNN: capacity, rekey, save and continuation | [#73](https://github.com/brandonrdug/holonics/issues/73), formal obligations [#62](https://github.com/brandonrdug/holonics/issues/62); continuation must preserve the source/clock/remainder relation. |
+| Device consumers | [#76](https://github.com/brandonrdug/holonics/issues/76); consume the same host relation, with actual capacity, refusal parity and card restore receipts. |
+| Physical repair: producing chart, source clock and receiver decoding | [#73](https://github.com/brandonrdug/holonics/issues/73), product acceptance [#148](https://github.com/brandonrdug/holonics/issues/148); show the learned physical output and its receipt. |
+| Targets and equation extraction | [Equation extraction #146](https://github.com/brandonrdug/holonics/issues/146), [Hodge spectrum #20](https://github.com/brandonrdug/holonics/issues/20), [Weierstrass division #22](https://github.com/brandonrdug/holonics/issues/22), [Israel junction #23](https://github.com/brandonrdug/holonics/issues/23), [neck sources #32](https://github.com/brandonrdug/holonics/issues/32); exact formal scope stays in [#62](https://github.com/brandonrdug/holonics/issues/62). |
 
-The data's evaluation partition stays unread until that judgement, and is read once. The owed
-formal statements are listed in [#62](https://github.com/brandonrdug/holonics/issues/62).
+RH, Hodge, complex Euler/Navier–Stokes and BSD remain attached to the same construction, and none
+is solved here. The [comma/ghost record](research/records/2026-10-05_THE_GHOST_LIVES_IN_THE_GAP_THE_JOINTS_OF_THE_LENS.md)
+joins exact nonclosure and turn/boost normality with six explicitly owed statements. Recursive
+coarse-graining and the RH source-law join remain pending research, as does the Navier–Stokes
+response bound; the Hodge work keeps the open items that its scoped acceptance lists (the scoped
+Lean acceptances row above). The comma calculations and gap interpretations prove no RH claim. The
+[program index #63](https://github.com/brandonrdug/holonics/issues/63) routes this breadth.
 
 ## What has not worked
 
@@ -218,9 +234,8 @@ Failures are published with the same care as results.
 - [`accelerators/`](accelerators/README.md) holds device-only builds.
 
 **Research**
-- [Research reading routes](research/records/README.md) are the best way into the 1,253
-  dated records, from July 10, 2026 on. Each route starts from a guide and follows its records to
-  their owners.
+- [Research reading routes](research/records/README.md) route the dated records from July 10, 2026
+  on. Each route starts from a guide and follows its records to their owners.
 - The [research entry](research/README.md) explains what each research surface is for.
 - The [notebook](research/notebook/README.md) holds symbolic derivations and local Lean checks.
   [`hnn_design`](research/notebook/hnn_design/README.md) holds the HNN's measurement harnesses and
@@ -258,6 +273,7 @@ git grep -n 'NormalizedKernel' 13f8c734            # the pre-reset tree
   [HNN routes](research/records/README.md#hnn-the-continuing-object-and-its-consumer), then the
   [landmark tree](research/records/2026-09-26_THE_LANDMARK_TREE_AT_SCALE_THE_STOP_PRIOR_LOCAL_WEIGHING_THE_WIDE_CUT_AND_THE_STORAGE_WHERE_PATHS_PART.md)
   and the [population](research/records/2026-09-27_THE_EGG_IS_A_GENERATORS_GENOME_SELECTION_IS_BAYES_AND_THE_FACES_OF_INTEGERS_ARE_MOIRES_OF_GRATINGS.md).
+  Historical authored arithmetic families were retired under the no-catered-machinery law.
 - **Mathematics.** Start with [ELEMENTARY_OBJECTS](docs/ELEMENTARY_OBJECTS.md), its
   [targets](docs/ELEMENTARY_OBJECTS.md#the-targets) and the
   [RH upper-bound record](research/records/2026-09-14_THE_HALF_CENTRED_FACE_AND_THE_DE_BRUIJN_NEWMAN_UPPER_BOUND.md). To find any expression by name, search
@@ -276,8 +292,14 @@ git grep -n 'NormalizedKernel' 13f8c734            # the pre-reset tree
 - **Practice.** The working practice is written for the agents in [CLAUDE.md](CLAUDE.md) and
   [AGENTS.md](AGENTS.md). It covers exact arithmetic, "recover before implementing", deletion as
   consolidation, and privacy.
-- **Checks.** A change passes `cargo check`, then the tests of the laws it touched. A kernel change
-  also runs the GPU suite alone on an idle card, and a Lean change runs the Lean build.
+- **Checks.** A change passes the gate (`bash tools/gate.sh`: the workspace check, the guard lints
+  and the guards' doctests), then the tests of the laws it touched. A kernel change also runs the
+  GPU suite alone on an idle card, and a Lean change runs the Lean build.
+- **Execution.** Builds and native validations are admitted through one queue against declared
+  thread and memory ceilings. Reuse receipts for unchanged checked inputs; project changed work from
+  measured cost, fix the deadline once, and report an overrun as incomplete rather than raising it.
+  The [waiting audit](research/records/2026-09-30_AUDIT_WAITING_DEADLINES_AND_CONCURRENCY_THE_WORKERS_BLOCKED_ON_THEIR_OWN_RUNS.md)
+  records the repeated waiting and raised-limit failures this practice addresses.
 - **Formal counterparts.** A new law lands with its Lean counterpart, or names the obligation it
   leaves in #62.
 - **What we have learned about working this way.** The
@@ -320,9 +342,10 @@ Mathlib, CSLib and PhysLib fetched by Lake. The CUDA crate builds without a CUDA
 reports that its kernels are absent and refuses to open a card.
 
 ```bash
-cargo check --workspace --all-targets          # everything compiles
+bash tools/gate.sh                             # the workspace check, guard lints and guard doctests
 cargo test -p holonics                         # the host laws
-cargo test -p holonics-cuda -- --include-ignored --test-threads=1  # on an idle NVIDIA card
+mkdir -p .local                                # the GPU lock lives here
+flock .local/gpu.lock cargo test -p holonics-cuda -- --include-ignored --test-threads=1  # alone, on an idle NVIDIA card
 bash tools/lean_check.sh                       # the Lean foundation, Holonics
 bash tools/lean_check.sh HolonicsResearch      # the research library
 ```
