@@ -17,6 +17,80 @@ between them. Every other object below is a part, a dual, a comparison or a cont
 picture. Neither half reduces to the other: the ring is the reactive (second-order, storing) cell,
 the contact is the dissipative (first-order, addressing) cell.
 
+<a id="the-morphodynamic-circuit"></a>
+
+## The morphodynamic circuit
+
+[project-postulate, October 7] **Morphodynamic circuit** is the organizing description of the
+continuing physical and parametric circuit formed by these objects
+([terminology record](../research/records/2026-10-07_THE_HNN_IS_A_MORPHODYNAMIC_CIRCUIT_AND_ITS_LANGUAGE_FOLLOWS_THE_EXISTING_OBJECTS.md)). Geometry and constitution
+govern motion; admitted motion can change geometry and couplings, with physical work accounted
+for and changes to the constitution obeying deposition. This names their composition, not another
+elementary object or a second implementation alongside the Holon. **Dynamic Geometry** describes
+its changing geometry and transported frames; **Asymmetric Potential** describes a constitutive
+relation. An asymmetric scalar potential can have a symmetric Hessian. Directed active forces
+require their own relations and power terms; the phrases do not certify nonreciprocity or a
+generic adaptive HNN consumer ([the foundation supplement](plans/HNN_ATHENA_FOUNDATION.md#what-asymmetry-mathematically-requires)).
+
+[definition; agent-inferred] The hierarchy follows the existing composition law: a **Holon** is
+the law and its ports; interconnection returns a **Holarchy**, the whole with its retained
+constituents and restrictions. The HNN's **field** realizes that whole through parametrons, pair
+contacts and navigators, with Holons participating as receivers. A receiver partitions or charts
+the whole at its declared grain and clock. A graph or tree is such a scaled view, carrying its
+restriction and unresolved fibre; it does not replace the continuing motion. Compression and
+navigation belong within the circuit: resonating modes meet terrain, pair contacts locate keys,
+and converging paths present landmarks. They are not a separate context store attached to it.
+
+[established-bounded; source-checked] **The field's Holarchy is a checked chart, and
+interconnection has an admission test.** `Field::holarchy(Θ)` builds each ring and each contact as
+its own Holon and interconnects them at every contact end. The result is a read-only Holarchy chart
+of the contemporary constitution, checked by `Holon::interconnect`'s typed gluing (the mount
+refuses with the gluing defect). The resident keeps that chart's parametric orientation, the complex
+its aeons run on, and not the joined constituents; the `Word` executes the passage. Constituent-native
+execution and a resident that holds the whole therefore remain consuming joins, named by the
+[library spine](plans/THE_REBUILD.md#the-library-spine-october-5). Admission is itself a test:
+`Holon::interconnect` refuses a loaded quartic element (`joining loaded quartic elements`) until the
+joined nonlinear constitutive relation is retained, so the executed quartic component is not yet a
+constituent of an interconnection. Owners: [`Field::holarchy`](../crates/holonics/src/hnn/field.rs),
+[`Holon::interconnect`](../crates/holonics/src/holarchy/mod.rs) and the resident's mount in
+[`reference.rs`](../crates/holonics/src/hnn/reference.rs), read at
+[`3c67beee`](https://github.com/brandonrdug/holonics/commit/3c67beee7f656798f912c974f12c482ea12c5e42)
+and unchanged at published main
+[`4323ed14`](https://github.com/brandonrdug/holonics/commit/4323ed146bc186baa1b749ee3c3ac38877796437).
+
+The following map routes the common language to its existing owners. It does not claim that a
+general law has passed every HNN consumer; the operator contract and receipts below retain that
+scope.
+
+| Language | Meaning and existing operator or owner |
+|---|---|
+| Holon; Holarchy; morphodynamic circuit | Law with ports; interconnected whole with retained constituents. Rust [`Holon`](../crates/holonics/src/holon/mod.rs), [`Holon::interconnect`](../crates/holonics/src/holarchy/mod.rs); HNN [`Field::holarchy`](../crates/holonics/src/hnn/field.rs). |
+| Field; interacting regions | One continuing whole, with actual incidence, current and material. HNN [`Field`](../crates/holonics/src/hnn/field.rs); a region belongs to a receiver's partition, with certified finite counts. |
+| Dynamic Geometry; swing; transport | Physical motion and its work; coordinate changes transport state and metric. [`geometry::motion`](../crates/holonics/src/geometry/motion.rs), Lean [`Geometry/Motion`](../lean/Holonics/Geometry/Motion.lean) and [`FrameTransport`](../lean/Holonics/Geometry/FrameTransport.lean). |
+| Constitution; Asymmetric Potential | Element relations, including storage, contacts, pumps and active power. [`holon::element`](../crates/holonics/src/holon/element.rs), HNN [`Constitution`](../crates/holonics/src/hnn/constitution.rs); the executed quartic component and proposed general asymmetric consumer have separate scope. |
+| Parametron; pair contact | Storage and oscillation joined through slip, dissipation and lock address. [`holon::parametron`](../crates/holonics/src/holon/parametron.rs), [`PairContact` and `ContactMaterial`](../crates/holonics/src/holon/contact.rs). |
+| Navigator; key; phase, winding and carry | Configuration and clock of the producing motion; its address and lifted phase. [`Navigator`, `Clock`, `PhaseLift`](../crates/holonics/src/navigator/mod.rs), [winding and placement](WINDING_CARRY_AND_PLACEMENT.md). A spectral mode belongs to the declared constitution, not to an index of contexts. |
+| Source; entrance; phase-carried moment | A participating source enters through its producing chart and clock. HNN [`Encoded::identity` and `through`](../crates/holonics/src/hnn/encoding.rs), [`SourceMoment::ingest`](../crates/holonics/src/hnn/moment.rs). |
+| Receiver; reception; receipt | A participating Holon changes with the source and returns regional readings, clocks and unresolved fibres. [`JointLaw::interact`](../crates/holonics/src/receiver/reception.rs), [`ReceiptLaw::receive`](../crates/holonics/src/receiver/receipt.rs); HNN [`ReceivingPhases::read`](../crates/holonics/src/hnn/receiving.rs) is a declared receiving chart. |
+| Face; chart; grain; decoder | A receiver's reading and its representation, preserving carry, phase and unresolved remainder. [`GrainCell`](../crates/holonics/src/receiver/face.rs), [the receiver atlas](RECEIVER_HOLARCHY.md#no-object-has-one-intrinsic-face-the-receiver-atlas). A codec is an exterior chart of the same objects. |
+| Comparison; ratio; loss | Relative transport through the producing operands; `log R` with branch and `R⁻¹dR`. HNN [`HolonRatio::compare_partition`, `log_ratio`, `covector`](../crates/holonics/src/hnn/ratio.rs), `RatioCovector::descent`; the phase part completes the comparison. |
+| Deposition | Change to a constitution from a covector that reached that locus. HNN [`Constitution::deposited` and `deposited_within`](../crates/holonics/src/hnn/constitution.rs); producing chart, clock, material and adjoint must agree at the consumer. |
+| Retention; continuing interior | Quotient sufficient for admitted future reception and actions, retaining its decoder and residual. Lean [`Foundation/Standing`](../lean/Holonics/Foundation/Standing.lean); HNN [`Reference::mount_continued`](../crates/holonics/src/hnn/reference.rs) consumes the declared saved constitution, chart and carry. |
+| Causal composition; tube; tower | Joined interactions, longitudinal continuation and transverse restriction with a gluing result or defect. [`holon::restriction`](../crates/holonics/src/holon/restriction.rs), [the causal chord](RECEIVER_HOLARCHY.md#the-causal-chord); the chord's Rust prototype is retired. |
+| Compression; navigation; landmarks | Resonating modes coupled to terrain; kernel quotient, residual cokernel, converging faces and located keys. [`compression::keys::Menu`](../crates/holonics/src/compression/keys.rs), [keys and navigation](#keys-locks-and-navigation); the landmark count tree retains its narrower measuring scope. |
+| Comma | A declared exact nonclosure of transports, such as `(3:2)^12 / 2^7 = 3^12:2^19`. Lean [`Mathematics/Comma`](../lean/HolonicsResearch/Mathematics/Comma.lean). The [comma/ghost interpretation](../research/records/2026-10-05_THE_GHOST_LIVES_IN_THE_GAP_THE_JOINTS_OF_THE_LENS.md) carries its owed statements and proves no RH claim. |
+| Aeon; epoch; cycle | Causal container; division at a receiver's section; closed loop. [`aeon::{Aeon,Epochs,Cycle}`](../crates/holonics/src/aeon/mod.rs). Elapsed time pairs the receiver's clock with a passage. |
+
+Several shared words need their operand stated at the consuming call:
+
+| Word | Distinction to preserve |
+|---|---|
+| Port | A Holon interface carries effort and flow paired as power. HNN [`ExecutionPort`](../crates/holonics/src/hnn/port.rs) is the host/device execution interface implementing admitted operations. An API adapter alone is not a physical port. |
+| Context | Actual continuing causal coupling, current, storage, clocks and interior return. A landmark-tree address or an exterior text aperture is a particular chart. A transformer context window supplies no HNN law ([continuing context](RECEIVER_HOLARCHY.md#a-displayed-body-is-a-cut-its-plates-can-be-continuing-bodies)). |
+| Source | Distinguish the producing Holon and its encoded passage from a source term in an element relation. A source-only receiving face does not establish sufficiency for retained interior context. |
+| Memory | Retention is future sufficiency; storage is an element's energy relation; device memory is a resource of its realization. Their capacities and owners differ. |
+| Boundary | State the oriented-cell boundary, selected Holon interface, receiver's crossing section or exterior codec chart. Their maps and clocks need not coincide. |
+
 <a id="the-holon-as-one-object"></a>
 
 ## The Holon as one object
@@ -53,11 +127,80 @@ Navigator,Restriction,Law,Conformance}`); the Rust core `holonics` mirrors it fa
 later owner implements or charts it.
 
 <a id="operator-contract"></a>
-[definition] **Operator contract** (September 24, [the rebuild](plans/THE_REBUILD.md)).
+[definition] **Operator contract** (September 24, [the rebuild](plans/THE_REBUILD.md); the
+representation contract below, October 7).
 Each object's operations and their owners are listed below. The *current* column is the
-checked code today. The *target* column is its home in the main `holonics` library and the
+source owner; a receipt establishes only its declared consuming checks. The *target* column is
+its home in the main `holonics` library and the
 Lean `Holonics` library in the rebuild. A target name is not importable until its owner is
 built. Each rebuild step updates this table in the same commit.
+
+[project-postulate, October 7; wording agent-inferred] **The ontology guides speculative
+engineering; its current data types are revisable hypotheses.** Since the September 24 reset,
+derivation, representation design, formalization and experiment develop together. The objects
+state the mathematical operands and relations; current structs, field layouts and API names
+propose how to realize them. Develop a type, its partition or its consuming relation when that
+proposal is insufficient. Derive improvements independently from the objects, their operators
+and measured failures, including missing relations beyond the latest request.
+
+[definition; agent-inferred] **Distinguish law drift from abstraction insufficiency.** Drift
+breaks a stated relation or its hypotheses: for example, a comparison uses different producing
+operands, a constitution changes without a reached covector, or active power goes unaccounted.
+Insufficiency means the present abstraction cannot express an admitted interaction, changing
+geometry, retained interior or restriction. State the missing relation and revise its carrier
+with its consumer. Names identify roles; semantic policing alone establishes neither fidelity
+nor failure. Consolidation joins actual Holon data and dynamics at shared relations, rather than
+giving parallel implementations the same label or freezing a library abstraction prematurely.
+
+<a id="relation-index"></a>
+
+[project-postulate, October 7; wording agent-inferred] **The common index is organized by
+operations and relations.** Disciplinary names are aliases for recovering a construction. For
+each entry state what evolves, what couples, what is preserved, the boundary transformation and
+the next admitted composition, then its source maps, hypotheses and receipt. Use the existing
+[expression atlas](atlas/README.md), whose rows already carry expressions, scope, owners, grades
+and relations; this contract routes those rows rather than creating another language or library.
+Similar words or patterns do not prove equivalence. A cross-domain equivalence needs the producing
+maps and their commuting relation or complete residual. A speculative bridge remains developable
+under its stated hypothesis and owed consumer.
+
+The musical reading is generative: learn chord relations, transitions and compositional structure
+from the passage, then use those relations in a new composition. Reproducing a song alone does
+not establish that acquisition. A musical chord and the receiver's causal transfer chord share
+a word; their relationship still needs an explicit producing chart. No musical consumer is
+certified by the analogy.
+
+| Operation and relation to recover | Domain aliases and existing operator/source maps |
+|---|---|
+| **Interconnect:** coupled participants retain their laws; interface flow/effort pairs cancel shared power; the joined whole can compose again or return a gluing defect. | Circuit junction, coupled network, shared interface. [Objects atlas](atlas/objects.tsv): `holarchy.interconnect-typed`, `holarchy.shared-face-cancels`; `Holon::interconnect` and `Holarchy::whole`. |
+| **Move and rechart:** motion changes; the boundary map transports state and metric; physical work and the next move remain explicit. | Motion, frame transport, change of basis. [Geometry atlas](atlas/geometry.tsv): `motion.turn-boost-split`, `motion.finite-work-chart`; Lean `Geometry/Motion`, Rust `geometry::motion`. |
+| **Enter and encode:** the source evolves by its transport; `D E = ρ` and `E T = U E` join its boundary reading and native advance; phase/carry reaches the next entrance. | Codec, coordinate encoding, source entrance. [Objects atlas](atlas/objects.tsv): `hnn.encoded-source-type`, `hnn.encoded-located-step`; `Encoded::{through,check_step}`, `Field::selective_step`, `SourceMoment::ingest`. |
+| **Compare, return and depose:** a produced/target ratio gives its covector through the producing operands; reached deposition changes the constitution that the next reception meets. | Comparison, learning, material adaptation. [Objects atlas](atlas/objects.tsv): `ratio.loss-is-log-ratio`, `ratio.log-derivative`, `hnn.normal-statistic-standing`; `HolonRatio::covector`, `Constitution::deposited`. Each material/receiving normal relation keeps its own hypotheses. |
+| **Retain and continue:** an admitted future factors through the quotient; a boundary crossing carries its current interior, clock and residual into the next interaction. | Memory, state reduction, continuation. [Information atlas](atlas/information.tsv): `info.standing-quotient`, `retention.action-sufficient-quotient`; [objects atlas](atlas/objects.tsv): `hnn.reception-cut`, `hnn.reception-carry`; `Word::open_received`, `Reference::mount_continued`. Their quotient and carry obligations differ. |
+| **Locate keys and compose navigators:** contacts constrain producing configurations; restrictions preserve the admitted faces; located relations support further navigation and converging landmarks. | Source identification, resonant composition, generative relationships. [Objects atlas](atlas/objects.tsv): `key.menu-loop-closure`, `key.consistent-fibre`, `key.gauge-orbit`, `compression.encoder-decoder-square`; `compression::keys::{Menu,Gauge}` and the declared navigator transports. A new domain supplies its chart and acceptance. |
+
+[source-audit] **Types and roles as read at** public
+[`3c67beee`](https://github.com/brandonrdug/holonics/commit/3c67beee7f656798f912c974f12c482ea12c5e42).
+This is a map of that realization, not a prescribed final type hierarchy:
+
+| Current type and source owner | Actual role and consuming relation | Redesign obligation |
+|---|---|---|
+| [`holon::Holon`](../crates/holonics/src/holon/mod.rs) | The law and ports, including element relations, complex/connection, navigators and restrictions; `HolonState<C>` is a point on its motion. `Holon::interconnect` returns a Holarchy or gluing defect. | A richer law or state carrier must keep its actual port, power, incidence and restriction relations explicit. |
+| [`hnn::Field`](../crates/holonics/src/hnn/field.rs) | Checked ring/contact declaration, incidence, source/receiver placement and exact realization grains. `Field::holarchy(Θ)` builds a read-only Holarchy chart from the contemporary constitution; mount consumes that chart. | Fixed declared placement and a constructed chart do not by themselves implement changing geometry or constituent-native execution. Join those relations at their consumers. |
+| [`hnn::Word`](../crates/holonics/src/hnn/word.rs) | One execution over a borrowed field: producing operands, hop clock, storage/arrival/contact/resonator motion, finite transient return and carried remainders. Opening, ticking, comparison, pullback and release consume it. | Preserve the executed forward/return relation, reached loci, actual clocks and reception carry; a new representation must not turn transient execution into retained occurrence history. |
+| [`hnn::reference::Resident`](../crates/holonics/src/hnn/reference.rs) | Continuing host realization: `Field`, `Current`, `Constitution`, source moments, pending comparisons/deposits, receiver declarations, charts, aeon state and reception carry. Mount certifies the Holarchy and keeps its parametric orientation; `mount_continued` consumes saved continuation. | The resident presently keeps that orientation, not the whole Holarchy. Retaining and executing the joined constituents is a concrete consuming join; save/restore must preserve the admitted future of the redesigned carrier. |
+| [`hnn::moment::SourceMoment`](../crates/holonics/src/hnn/moment.rs) | Closing source-ring phase and offset moments, with bounded entering state; `ingest(Encoded, …)` enters through the producing chart and clock. It holds no per-occurrence list. | A broader source family needs its transport, sufficient quotient and capacity relation. The current closing-ring/count carrier is a scoped realization, not the final definition of a source Holon. |
+
+[definition; agent-inferred] **A redesign carries its evidence through a consuming join.** State
+the changed mathematical hypothesis or representation, source/import version, admitted family,
+receiver, clock, grain and residual. Where the law is preserved, prove or check the consumer's
+relation, such as `decode(T_native(encode x)) = T(x)`, `E_next T = U E`, or its complete residual.
+An earlier theorem keeps its original hypotheses; an experimental receipt keeps its original
+source and cohort. Neither automatically certifies redesigned code. Reuse unchanged evidence
+within its checked scope, then verify the changed forward/adjoint, deposition, restriction,
+continuation or host/device join it actually affects. A changed law receives its own grade and
+acceptance. The unchanged historical receipt remains history. A moved, added or retired source
+owner updates this contract and its atlas rows in the same change.
 
 | Object | Operations | Current owners | Target |
 |---|---|---|---|
@@ -80,6 +223,47 @@ built. Each rebuild step updates this table in the same commit.
 
 The restructure's detailed contracts are in history at
 [`13f8c734`](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/plans/THE_REPOSITORY_RESTRUCTURE.md).
+
+[established-bounded; source-checked] **HNN consumers and their remaining joins, as read at**
+[`3c67beee`](https://github.com/brandonrdug/holonics/commit/3c67beee7f656798f912c974f12c482ea12c5e42).
+These qualify the table's HNN, receiver, navigator, parametron and compression rows; they add no
+new owner or general theorem.
+
+| Operation and existing owner | Consuming relation and evidence | Remaining acceptance |
+|---|---|---|
+| Source admission and transport: `hnn::encoding::Encoded`, `Field::selective_step`, `SourceMoment::ingest`; CUDA `hnn::moment` and `hnn::port` | The producing chart carries classes, decoder `D`, labels, fibre and conduct. The located step reads `a_g(c)` plus carry and checks its chart squares at the consumer; identity input reads its declared lock fits. [Encoding and device-ingest receipt](../research/records/2026-10-05_THE_FIELDS_ENTRIES_TAKE_ONLY_THE_ENCODED_SOURCE.md), atlas `hnn.encoded-source-type`, `hnn.card-located-source-ingest`. | Equal class counts do not identify producing charts or clocks. Erased cells do not determine their located advances. Repair must consume the supported chart and source-time relation, or return the typed obstruction before opening the word. |
+| Received source and physical word: `hnn::word::SourceOpeningReceipt`, `WordOpening::Received`, reception carry and paired pullback | [Source-entrance tests](../crates/holonics/tests/source_entrance.rs) exercise actual source material, offsets and continuing physical words. The [carry receipt](../research/records/2026-10-03_THE_RECEPTION_CARRIES_THE_INTERIOR_CHANGE_THE_SOURCE_PORT_IMPOSES_THE_MOMENT_AND_REST_IS_COMPLETE_ABSORPTION.md) states the chained balance and its boundaries. | Useful learned physical repair must join the source entrance to the reached comparison, learned receiving material and decoded boundary. A closed component balance or next-cell score is narrower evidence. |
+| Retain and cold-mount: host `Resident::continuing_state`, `Reference::mount_continued`, `reference::passage` | Retain the contemporary constitution, carry, lift, optional moment, aeon, balance, kept charts, address-reader kinds, declaring phases, handles and arrived comparison. [Cold-restore tests](../crates/holonics/tests/resident_cold_restore.rs) and [PR #384](https://github.com/brandonrdug/holonics/pull/384) check the subsequent host receipt/state relation without borrowing live predecessors; atlas `hnn.resident-passage`. | Carry alone omits charts the word reads. Card passage restore, shared-clock rekey/capacity and the general action-sufficient adaptive quotient keep their own consumers and obligations in #73, #76 and #62. |
+| Nonlinear pump/lock: `holon::parametron::{PeriodicDomain,PeriodicLock,MountedParametron}`, `ResonatorOperands::mount_periodic` | The existing [executed-domain and carried-cycle receipt](../research/records/2026-10-05_THE_LOADED_COMPONENT_CARRIES_ITS_ADMITTED_PUMP_CYCLE.md) is the component's claim. | The ordinary rounded word, whole nonlinear interconnection and generic asymmetric/adaptive material are separate consuming joins. |
+| Release and decoding: `hnn::prediction`, physical receiving material, producing `Encoded::decoder`, `receiver::release` | `D E = ρ` is the producing reconstruction square (or its retained defect); the learned receiving map needs its own joined comparison and reconstruction relation. A reading keeps its receiver's grain, carry, phase class and remainder. [Foundation supplement](plans/HNN_ATHENA_FOUNDATION.md). | No meaningful autonomous physical-repair output or Athena product acceptance is inferred here. #148 requires the actual output, compatible fibre/keys, health, atomic transition and cold continuation. |
+
+Both readings are pinned. Source after `3c67beee`, through published main
+[`4323ed14`](https://github.com/brandonrdug/holonics/commit/4323ed146bc186baa1b749ee3c3ac38877796437),
+adds and changes consumers, such as the charted physical receiver below, and neither table is
+refreshed here. A row is refreshed only by reading its owner at a new pin.
+
+The [comma/ghost record](../research/records/2026-10-05_THE_GHOST_LIVES_IN_THE_GAP_THE_JOINTS_OF_THE_LENS.md)
+joins ratio nonclosure, turn/boost normality and six owed statements. Recursive coarse-graining and
+the RH source-law join remain target work alongside Hodge and complex Euler/Navier–Stokes;
+they are not a proved RH consequence of the component receipts.
+
+[definition; agent-inferred from the consuming relations above] **A physical-learning receipt.**
+The opening receipt `E_after − E_before = imposed − absorbed` is an energy reading. The charted
+consumer [`hnn::prediction::charted`](../crates/holonics/src/hnn/prediction/charted.rs) charges the
+charted source-opening and receiving-error pullbacks at their producing operands before it
+publishes a reached deposit to R. Four fixed-law fixtures were accepted at source `0da1652c`,
+an unpublished commit whose files the receipt pins by SHA-256 (the owner has changed since),
+([scoped receipt](../research/records/receipts/charted-physical-learning-20261006/integrated-source-v1/SCOPED_ACCEPTANCE.v1.json)),
+which excludes product, erasure and general-boundary acceptance. A learning receipt goes further.
+It keeps the producing chart, clock, clamps, damaged-cell partition, cohort, seed and mechanism
+fixed across its declared comparison and names each contemporary constitution and its producing
+covector. It reports which distinguishing relations changed after deposition and which persist
+through cold continuation. A common-class majority or a total assembled from different cohorts
+cannot establish acquisition. The
+[pair-gain regressions](../research/records/2026-10-05_THE_PAIR_GAIN_IS_THE_JOINED_BANKS_LOG_DETERMINANT.md)
+and [reflection repair](../research/records/2026-10-05_REPAIR_BY_REFLECTION_THE_LOCATED_PAIR_RESTRICTS_THE_ERASED_CELLS_FROM_BOTH_SIDES.md)
+keep their separate claims. #62 retains formal source/receiver squares; #73 consumes the native
+learning relation; #76 consumes its device equivalent; #148 requires the actual useful boundary.
 
 [definition] **Use of a Holon's material across an event boundary.** These are admissibility
 conditions on a Holon's existing ports, element relations and admitted futures, not a separate
