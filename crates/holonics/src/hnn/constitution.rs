@@ -2738,6 +2738,11 @@ pub(crate) fn face_masses(sample: &Sample) -> Option<Vec<Rat>> {
         .then(|| carried.clone());
     }
     let mut masses: Vec<Rat> = covector.iter().step_by(2).map(|c| -c).collect();
+    // One class: its only face is the unit mass, and its magnitude entry `q − p̃ = 1 − 1` is zero,
+    // so no entry marks the target (Epime's review, October 8: a single-class phase comparison).
+    if masses.len() == 1 {
+        return masses[0].is_zero().then(|| vec![Rat::one()]);
+    }
     if let Some(target) = (0..masses.len()).find(|&c| masses[c].is_negative()) {
         masses[target] += Rat::one();
     }
