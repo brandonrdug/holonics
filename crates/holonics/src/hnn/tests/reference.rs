@@ -847,10 +847,13 @@ fn the_carry_passes_each_receptions_end_to_the_next() {
             let (_, on) = ratio.read_on(&field, &theta, &mut charts, &opening).unwrap();
             assert_eq!(faces, on);
             assert_eq!(&charts, resident.charts(), "the read keeps the refine's charts");
+            let mut fresh_charts = Charts::new();
             let (_, fresh) = ratio
-                .read_on(&field, &theta, &mut Charts::new(), &opening)
+                .read_on(&field, &theta, &mut fresh_charts, &opening)
                 .unwrap();
             separated += usize::from(fresh != faces);
+            // Diagnosis only: whether the kept charts differ from cold ones at all.
+            eprintln!("carry-chain charts window={} kept_equals_fresh={}", receptions + 1, charts == fresh_charts);
             let moving = |carry: &crate::hnn::ReceptionCarry| {
                 let change = &carry.change;
                 change
@@ -983,10 +986,13 @@ fn a_cold_restore_continues_the_carry_chain_where_the_kept_charts_have_moved() {
                 },
                 None => WordOpening::Rest,
             };
+            let mut fresh_charts = Charts::new();
             let (_, fresh) = ratio
-                .read_on(&field, resident.constitution(), &mut Charts::new(), &word_opening)
+                .read_on(&field, resident.constitution(), &mut fresh_charts, &word_opening)
                 .unwrap();
             let (whole, refined) = reference.refine(&mut resident, &moment, &phases).unwrap();
+            // Diagnosis only: whether the kept charts differ from cold ones at all.
+            eprintln!("cold-restore charts window={receptions} kept_equals_fresh={}", resident.charts() == &fresh_charts);
             let (cold, restored_refined) =
                 reference.refine(&mut restored, &moment, &phases).unwrap();
             assert_eq!(restored_refined.forward, refined.forward);
