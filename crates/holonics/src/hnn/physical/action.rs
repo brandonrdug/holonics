@@ -755,6 +755,34 @@ pub struct AdmittedWaves {
     supply: Rat,
     controls: Vec<Vec<Rat>>,
     enumerated: usize,
+    declared_for: DeclaredFor,
+}
+
+/// The producing feature an admitted declaration was read from: the material commit, the opening
+/// tick, the compared station, the preparation's ring and map, and the opening's source wave (the
+/// work's cross term). A declaration admits only at that same feature (Epime's review, October 8:
+/// an admitted wave is a checked membership, never a caller's precondition).
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct DeclaredFor {
+    producing_commit: u64,
+    opened_at: usize,
+    station: usize,
+    ring: usize,
+    map: ExactRatMatrix,
+    source_wave: Vec<Rat>,
+}
+
+impl DeclaredFor {
+    fn of(feature: &ProspectiveFeature) -> Self {
+        Self {
+            producing_commit: feature.producing_commit(),
+            opened_at: feature.opened_at(),
+            station: feature.station(),
+            ring: feature.preparation().ring(),
+            map: feature.preparation().map().clone(),
+            source_wave: feature.source_wave().to_vec(),
+        }
+    }
 }
 
 impl AdmittedWaves {
@@ -766,6 +794,7 @@ impl AdmittedWaves {
         supply: Rat,
         capacity: usize,
     ) -> Result<Self, HnnError> {
+        let declared_for = DeclaredFor::of(feature);
         let preparation = feature.preparation();
         let map = preparation.map();
         let controls = preparation.controls();
@@ -778,6 +807,7 @@ impl AdmittedWaves {
             let admitted = feature.preparation_work(&[])? <= supply;
             return Ok(Self {
                 exponent,
+                declared_for: declared_for.clone(),
                 supply,
                 controls: if admitted { vec![Vec::new()] } else { Vec::new() },
                 enumerated: 1,
@@ -807,6 +837,7 @@ impl AdmittedWaves {
         if rho.is_negative() {
             return Ok(Self {
                 exponent,
+                declared_for: declared_for.clone(),
                 supply,
                 controls: Vec::new(),
                 enumerated: 0,
@@ -822,6 +853,7 @@ impl AdmittedWaves {
             let Some((low, high)) = lattice_interval(&centre, &radius_sq) else {
                 return Ok(Self {
                     exponent,
+                    declared_for: declared_for.clone(),
                     supply,
                     controls: Vec::new(),
                     enumerated: 0,
@@ -864,6 +896,7 @@ impl AdmittedWaves {
         admitted.sort();
         Ok(Self {
             exponent,
+            declared_for: declared_for.clone(),
             supply,
             controls: admitted,
             enumerated,
@@ -897,6 +930,18 @@ impl AdmittedWaves {
         self.controls
             .binary_search_by(|admitted| admitted.as_slice().cmp(control))
             .is_ok()
+    }
+    /// Whether this declaration was read from `feature`: the same material commit, opening,
+    /// station, preparation and source wave ([`DeclaredFor`]).
+    pub fn declared_for(&self, feature: &ProspectiveFeature) -> bool {
+        self.declared_for == DeclaredFor::of(feature)
+    }
+}
+
+/// The refusal of an admitted declaration read from another feature.
+fn foreign_declaration() -> HnnError {
+    HnnError::Unadmitted {
+        reason: "an admitted wave declaration admits only at the feature it was declared from",
     }
 }
 
@@ -1148,8 +1193,12 @@ impl PreparedPhysicalProbe<'_, '_> {
     /// Candidates are the admitted waves whose image meets at least two outcome blocks; the
     /// offered one has the greatest total leverage, ties broken by the lexicographically least
     /// `u` (declared conventions). The probe is offered to the existing release law, which asks
-    /// exactly when it is offered.
-    pub fn ask(&self, admitted: &[Vec<Rat>]) -> Result<ProbeDecision, HnnError> {
+    /// exactly when it is offered. The admitted waves are a declaration read from this same
+    /// feature ([`AdmittedWaves::declared_for`]); another opening's declaration is refused.
+    pub fn ask(&self, admitted: &AdmittedWaves) -> Result<ProbeDecision, HnnError> {
+        if !admitted.declared_for(&self.feature) {
+            return Err(foreign_declaration());
+        }
         let feature = &self.feature;
         let phases = feature.phases();
         let station = feature.station();
@@ -1165,7 +1214,7 @@ impl PreparedPhysicalProbe<'_, '_> {
         let grain = phases.grain();
         let mut candidates = 0usize;
         let mut best: Option<Candidate> = None;
-        for control in admitted {
+        for control in admitted.controls() {
             let x = feature.feature_at(control)?;
             let image = family.image(&x).map_err(|_| image_refusal())?;
             let Some(witnesses) = image.witnesses(grain).map_err(|_| blocks_refusal())? else {
@@ -1237,7 +1286,11 @@ impl PreparedPhysicalProbe<'_, '_> {
     /// application and no fibre or request. A control of the wrong shape is refused before any
     /// physical work. The native prediction for the control is made first, at the material the
     /// control meets; the executed World face is then read against it ([`PhaseDiscrepancy`]).
-    pub fn encounter(self, control: &[Rat]) -> Result<ProbeReception, HnnError> {
+    pub fn encounter(
+        self,
+        admitted: &AdmittedWaves,
+        control: &[Rat],
+    ) -> Result<ProbeReception, HnnError> {
         let Self {
             owner,
             word,
@@ -1252,6 +1305,16 @@ impl PreparedPhysicalProbe<'_, '_> {
                 what: "the admitted source wave control",
                 expected: feature.preparation().controls(),
                 found: control.len(),
+            });
+        }
+        // An admitted wave is a checked membership in a declaration read from this same feature,
+        // before any physical work (Epime's review, October 8).
+        if !admitted.declared_for(&feature) {
+            return Err(foreign_declaration());
+        }
+        if !admitted.contains(control) {
+            return Err(HnnError::Unadmitted {
+                reason: "the control is not a member of its admitted wave declaration",
             });
         }
         let prediction = predict_native(owner.constitution(), &feature, control)?;

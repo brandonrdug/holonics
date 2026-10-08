@@ -790,13 +790,17 @@ fn before_any_reading_the_family_is_one_member_and_the_probe_holds_with_its_reas
         assert!(waves.contains(&[Rat::zero(), Rat::zero()]));
         // No reading has reached the receiving map: its family is the prior alone, a single
         // member, whose image meets one block whatever the wave. Nothing separates.
-        let held = probe.ask(waves.controls()).unwrap();
+        let held = probe.ask(&waves).unwrap();
         assert_eq!(held.release, ReleaseReturn::Hold);
         assert_eq!(held.held, Some(ProbeHold::NoSeparatingWave));
         assert_eq!(held.candidates, 0);
         assert!(held.control.is_none() && held.prediction.is_none());
-        // The empty lattice holds for its own typed reason.
-        let empty = probe.ask(&[]).unwrap();
+        // The empty lattice holds for its own typed reason: a supply below the least work
+        // `−c|m|²` (the storage power of the opening's own source wave) admits no wave.
+        let least = probe.feature().storage_power(probe.feature().source_wave());
+        let none = AdmittedWaves::declare(probe.feature(), 1, -least - integer(1), 1 << 12).unwrap();
+        assert!(none.is_empty());
+        let empty = probe.ask(&none).unwrap();
         assert_eq!(empty.release, ReleaseReturn::Hold);
         assert_eq!(empty.held, Some(ProbeHold::NoAdmittedWave));
         // Asking executes nothing: no World step, deposit or carry.
@@ -828,7 +832,7 @@ fn after_one_deposited_encounter_the_retained_family_separates_waves_and_asks() 
         assert_eq!(probe.opened_at(), carried_ticks);
         let waves = AdmittedWaves::declare(probe.feature(), 1, rat(1, 4), 1 << 12).unwrap();
         assert!(waves.contains(&[Rat::zero(), Rat::zero()]));
-        let decision = probe.ask(waves.controls()).unwrap();
+        let decision = probe.ask(&waves).unwrap();
 
         // The candidates and the offered wave, recomputed through the family API alone.
         let phases = probe.receiving_phases();
@@ -903,11 +907,11 @@ fn the_asked_wave_executes_one_actual_encounter_and_the_receipt_is_absorbed() {
         .prepare_probe(&source, declared, &actuators(&field), &COMPARED)
         .unwrap();
     let waves = AdmittedWaves::declare(probe.feature(), 1, rat(1, 4), 1 << 12).unwrap();
-    let decision = probe.ask(waves.controls()).unwrap();
+    let decision = probe.ask(&waves).unwrap();
     let control = decision.control.clone().expect("an asked wave");
     let work = probe.feature().preparation_work(&control).unwrap();
     let grain = probe.receiving_phases().grain();
-    let reception = probe.encounter(&control).unwrap();
+    let reception = probe.encounter(&waves, &control).unwrap();
     let ActionCommunication::Received(received) = &reception.reception else {
         panic!("the asked wave is actually received: {:?}", reception.reception);
     };
@@ -994,7 +998,7 @@ fn absorbing_the_receipt_contracts_the_leverage_at_the_probed_feature_while_the_
     );
     let chosen = chosen.unwrap();
     // The probe asks exactly the frozen statistics' argmax, and recomputing is identical.
-    let decision = probe.ask(waves.controls()).unwrap();
+    let decision = probe.ask(&waves).unwrap();
     assert_eq!(decision.control.as_ref(), Some(&chosen));
     assert_eq!(
         before,
@@ -1002,7 +1006,7 @@ fn absorbing_the_receipt_contracts_the_leverage_at_the_probed_feature_while_the_
     );
 
     // Absorb that receipt by actually executing the chosen wave.
-    let reception = probe.encounter(&chosen).unwrap();
+    let reception = probe.encounter(&waves, &chosen).unwrap();
     assert!(matches!(
         reception.reception,
         ActionCommunication::Received(_)
@@ -1058,7 +1062,7 @@ fn successive_probes_run_on_one_receiver_and_one_world_and_each_is_actually_rece
             .unwrap();
         assert_eq!(probe.opened_at(), world_tick);
         let waves = AdmittedWaves::declare(probe.feature(), 1, rat(1, 4), 1 << 12).unwrap();
-        let decision = probe.ask(waves.controls()).unwrap();
+        let decision = probe.ask(&waves).unwrap();
         let control = match (&decision.release, &decision.control) {
             (ReleaseReturn::Ask { .. }, Some(wave)) => {
                 outcomes.push("ask");
@@ -1075,7 +1079,7 @@ fn successive_probes_run_on_one_receiver_and_one_world_and_each_is_actually_rece
             }
             other => panic!("round {round}: {other:?}"),
         };
-        let reception = probe.encounter(&control).unwrap();
+        let reception = probe.encounter(&waves, &control).unwrap();
         let ActionCommunication::Received(received) = &reception.reception else {
             panic!("round {round}: not actually received: {:?}", reception.reception);
         };
@@ -1109,8 +1113,9 @@ fn a_control_of_the_wrong_shape_is_refused_before_either_participant_moves() {
     let probe = receiver
         .prepare_probe(&source, declared, &actuators(&field), &COMPARED)
         .unwrap();
+    let waves = AdmittedWaves::declare(probe.feature(), 1, rat(1, 4), 1 << 12).unwrap();
     // Two actuators, one control.
-    assert!(probe.encounter(&[Rat::zero()]).is_err());
+    assert!(probe.encounter(&waves, &[Rat::zero()]).is_err());
     assert_eq!(receiver.participating_world().unwrap().state(), &world_before);
     assert_eq!(receiver.opening(), opening_before);
     assert_eq!(receiver.constitution().commit(), commit_before);
@@ -1121,4 +1126,27 @@ fn a_control_of_the_wrong_shape_is_refused_before_either_participant_moves() {
             .is_err()
     );
     assert_eq!(receiver.participating_world().unwrap().state(), &world_before);
+}
+
+/// **An admitted wave is a checked membership** (Epime's review, October 8): a control outside its
+/// declaration, though of the right shape, is refused before either participant moves.
+#[test]
+fn a_control_outside_its_declaration_is_refused_before_either_participant_moves() {
+    let (field, theta, source) = world_fixture();
+    let declared = &field.receivers()[0];
+    let mut receiver = world_receiver(&field, theta, &source);
+    let world_before = receiver.participating_world().unwrap().state().clone();
+    let opening_before = receiver.opening();
+    let commit_before = receiver.constitution().commit();
+    let probe = receiver
+        .prepare_probe(&source, declared, &actuators(&field), &COMPARED)
+        .unwrap();
+    let waves = AdmittedWaves::declare(probe.feature(), 1, rat(1, 4), 1 << 12).unwrap();
+    assert!(waves.declared_for(probe.feature()));
+    let outside = vec![integer(1 << 20), integer(1 << 20)];
+    assert!(!waves.contains(&outside));
+    assert!(probe.encounter(&waves, &outside).is_err());
+    assert_eq!(receiver.participating_world().unwrap().state(), &world_before);
+    assert_eq!(receiver.opening(), opening_before);
+    assert_eq!(receiver.constitution().commit(), commit_before);
 }
