@@ -2839,3 +2839,114 @@ fn a_moved_prior_keeps_the_phase_statistics_and_the_ridge_is_read_at_its_scale()
     assert_eq!(NormalLaw::with_prior(zero.clone()).phase_statistics(), None);
     assert_eq!(NormalLaw::with_scaled_prior(zero, 2).phase_statistics(), None);
 }
+
+// -------------------------------------------------------------------------------------------
+// the receiving step's alignment, certified against the smooth face (October 8)
+
+/// **The odometer's misreading of a receiving step's alignment, exactly**
+/// ([`crate::hnn::constitution::odometer_alignment_defect_probe`]). Two classes at `p̃ = (½, ½)` with
+/// the magnitude move `Δ_Re = (1, −1)`: every class `s` reads `Σ_c p̃_c |Δ_c − Δ_s| = 1`, so the
+/// defect is `1/16`. Three classes at `p̃ = (½, ¼, ¼)` with `Δ_Re = (0, 2, 4)` read `3/2, 3/2, 5/2`,
+/// the least `3/2`, so a weight-two face's defect is `2 · (3/2) / 16 = 3/16`. The phase rows add
+/// nothing. A face whose masses are unread (a covector that is no face's `q − p̃`) has no bound.
+#[test]
+fn the_odometer_defect_is_read_exactly_at_the_least_class() {
+    use crate::hnn::constitution::odometer_alignment_defect_probe;
+    let two = Sample {
+        weight: Rat::one(),
+        feature: vec![Rat::one()],
+        covector: vec![rat(1, 8), rat(1, 5), rat(-1, 8), rat(1, 7)],
+        masses: Some(vec![rat(1, 2), rat(1, 2)]),
+    };
+    let unit_two = vec![vec![Rat::one()], vec![integer(9)], vec![-Rat::one()], vec![integer(-9)]];
+    assert_eq!(odometer_alignment_defect_probe(&[two], &unit_two), Some(rat(1, 16)));
+
+    let three = Sample {
+        weight: integer(2),
+        feature: vec![Rat::one()],
+        covector: vec![
+            rat(1, 4),
+            Rat::zero(),
+            rat(-1, 8),
+            Rat::zero(),
+            rat(-1, 8),
+            Rat::zero(),
+        ],
+        masses: Some(vec![rat(1, 2), rat(1, 4), rat(1, 4)]),
+    };
+    let unit_three = vec![
+        vec![Rat::zero()],
+        vec![integer(5)],
+        vec![integer(2)],
+        vec![Rat::zero()],
+        vec![integer(4)],
+        vec![integer(-3)],
+    ];
+    assert_eq!(odometer_alignment_defect_probe(&[three], &unit_three), Some(rat(3, 16)));
+
+    // No face: the one-hot reconstruction of (½, 0, ½, 0) leaves a negative mass.
+    let stray = Sample {
+        weight: Rat::one(),
+        feature: vec![Rat::one()],
+        covector: vec![rat(1, 2), Rat::zero(), rat(1, 2), Rat::zero()],
+        masses: None,
+    };
+    assert_eq!(odometer_alignment_defect_probe(&[stray], &unit_two), None);
+}
+
+/// **A receiving step its alignment cannot certify is refused, and one it can is taken.** On the
+/// chain's four classes, a soft face at `p̃ = (¼, ¼, ¼, ¼)` observed as `q̃ = (¼ + ε, ¼ − ε, ¼, ¼)`
+/// with no phase gap. The class metric is `4` here, and one reading's step is `Δ = c·(4 g_Re, g_Im)`
+/// with `c = w fᵀX̂f > 0`, so the alignment is `8cε²` and the odometer's defect `cε/8`: the step is
+/// certified exactly when `ε > 1/64`. At `ε = 1/128` the map's step is refused (no certified map step
+/// at the receiving locus; the deposit itself is admitted, so its phase statistics still absorb the
+/// reading), and at `ε = 1/8` it is taken with an alignment below the uncorrected one.
+#[test]
+fn a_receiving_step_its_alignment_cannot_certify_is_refused() {
+    let (field, theta, map) = receiving_chain();
+    let (a, n) = (field.alphabet(), map.columns());
+    assert_eq!(a, 4);
+    let e0: Vec<Rat> = (0..n).map(|i| if i == 0 { Rat::one() } else { Rat::zero() }).collect();
+    let quarter = rat(1, 4);
+    let face = |epsilon: Rat| Sample {
+        weight: Rat::one(),
+        feature: e0.clone(),
+        covector: vec![
+            epsilon.clone(),
+            Rat::zero(),
+            -epsilon,
+            Rat::zero(),
+            Rat::zero(),
+            Rat::zero(),
+            Rat::zero(),
+            Rat::zero(),
+        ],
+        masses: Some(vec![quarter.clone(); 4]),
+    };
+    let map_steps = |reading: &crate::hnn::constitution::DepositReading| {
+        reading
+            .steps
+            .iter()
+            .filter(|(locus, step)| *locus == Locus::ReceivingMap(2) && step.family == Family::Map)
+            .count()
+    };
+
+    let (refused, reading) = theta
+        .deposited(&receiving_window(&theta, vec![face(rat(1, 128))]))
+        .unwrap();
+    assert_eq!(map_steps(&reading), 0);
+    assert_eq!(
+        refused
+            .receiving_law(2)
+            .unwrap()
+            .phase_statistics()
+            .unwrap()
+            .cells(),
+        &integer(4)
+    );
+
+    let (_, reading) = theta
+        .deposited(&receiving_window(&theta, vec![face(rat(1, 8))]))
+        .unwrap();
+    assert_eq!(map_steps(&reading), 1);
+}

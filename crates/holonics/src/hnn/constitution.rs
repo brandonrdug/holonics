@@ -6916,6 +6916,27 @@ impl Constitution {
                             prepared_step.covector = oscillation.max(Rat::one());
                         }
                     }
+                    // The receiving step's alignment certified against the smooth face it descends
+                    // ([`odometer_alignment_defect`], October 8): the odometer's misreading is taken
+                    // off it, and an alignment it leaves at or below zero, or a face whose masses
+                    // are unread, refuses the map's step (the Gram and chart still move). A negative
+                    // alignment is left for the certificate to refuse, as before.
+                    if let (LinearLocus::Receiving(_), Some(prepared_step)) =
+                        (step.locus, step_prepared.as_mut())
+                    {
+                        if !prepared_step.alignment.is_negative() {
+                            let defect = odometer_alignment_defect(
+                                &step.samples,
+                                &prepared_step.unit.to_rows(),
+                            );
+                            prepared_step.alignment = match defect {
+                                Some(defect) if prepared_step.alignment > defect => {
+                                    &prepared_step.alignment - &defect
+                                }
+                                _ => Rat::zero(),
+                            };
+                        }
+                    }
                     prepared.linear = Some((*index, step.locus, step_prepared));
                 }
                 LocusStep::Factor(step) => {
@@ -7284,6 +7305,55 @@ pub(crate) fn receiving_fisher_face_probe(
     unit: &[Vec<Rat>],
 ) -> Option<(Rat, Rat, Rat)> {
     receiving_fisher_face(samples, unit)
+}
+
+/// [proved-derived; agent-inferred, October 8] **What the odometer misreads of a receiving step's
+/// alignment.** The certified decrease is of the smooth score at the grain representative, whose
+/// linear term pairs the smooth face's `p − q` with the move (Lean
+/// `HNN/Ratio/Certificate.codeLength_add_le_odometer`), while the deposited alignment
+/// `a = Σ_t w ⟨g_t, Δ_t⟩` pairs the odometer covector `g_t = q − p̃` (`Δ_t = D f_t`). The target
+/// cancels in the difference, `(p − q) − (p̃ − q) = p − p̃`, so the gap holds for a one-hot and a soft
+/// target alike. At the representative each odometer weight over its face weight lies in
+/// `[1, 2/(e ln 2)]` (the chord above `2^y` on the cell and `HNN/Ratio/Resolution.two_rpow_ge_chord`
+/// below it), so the normalized masses lie within `K = 2/(e ln 2) < 17/16` of each other both ways,
+/// and `Resolution.odometer_mismatch_le` reads every class `s`:
+///
+/// ```text
+/// |⟨p − p̃, Δ⟩| ≤ (K − 1) Σ_c p̃_c |Δ_c − Δ_s| ,     the phase rows exact (their comparison is quadratic)
+/// a_cert = a − (1/16) Σ_t |w_t| min_s Σ_c p̃_(t,c) |Δ_(t,c) − Δ_(t,s)|
+/// ```
+///
+/// This returns that subtracted defect over the magnitude rows of the reached faces, `None` when a
+/// reached sample's face masses are unread ([`face_masses`]): its gap cannot be bounded, so the
+/// map's step is refused rather than advertised as a descent. The composition of the two Lean
+/// statements for a soft target is owed (#62).
+fn odometer_alignment_defect(samples: &[Sample], unit: &[Vec<Rat>]) -> Option<Rat> {
+    let mut defect = Rat::zero();
+    for sample in samples.iter().filter(|s| !s.weight.is_zero()) {
+        let masses = face_masses(sample)?;
+        let delta: Vec<Rat> = unit
+            .iter()
+            .map(|row| row.iter().zip(&sample.feature).map(|(d, f)| d * f).sum())
+            .collect();
+        let real: Vec<&Rat> = delta.iter().step_by(2).collect();
+        let spread = (0..real.len())
+            .map(|s| {
+                masses
+                    .iter()
+                    .zip(&real)
+                    .map(|(p, d)| p * (*d - real[s]).abs())
+                    .sum::<Rat>()
+            })
+            .min()?;
+        defect += sample.weight.abs() * spread;
+    }
+    Some(defect / Rat::from_integer(BigInt::from(16)))
+}
+
+/// The receiving step's odometer defect for a test ([`odometer_alignment_defect`]).
+#[cfg(test)]
+pub(crate) fn odometer_alignment_defect_probe(samples: &[Sample], unit: &[Vec<Rat>]) -> Option<Rat> {
+    odometer_alignment_defect(samples, unit)
 }
 
 /// One locus's deposited carried remainders, budgeted carry and chart readings, or the refusal its
