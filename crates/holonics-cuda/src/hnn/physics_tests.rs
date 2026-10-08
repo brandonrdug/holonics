@@ -136,6 +136,7 @@ fn the_prox_deposit_on_the_card_equals_the_host_and_is_measured() {
                     })
                     .collect(),
                 covector: (0..m).map(|_| dyadic(&mut draw, 5, 8)).collect(),
+                masses: None,
             })
             .collect();
         let proxy = Rat::one();

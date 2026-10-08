@@ -2301,6 +2301,7 @@ pub fn compose_return(
             weight: one.clone(),
             feature: feature.clone(),
             covector: negated(gradient),
+            masses: None,
         })
         .collect();
     if retained(Locus::ReceivingMap(receiving)) {
@@ -2409,6 +2410,7 @@ pub fn compose_return(
                 weight: one.clone(),
                 feature,
                 covector: negated(h),
+                masses: None,
             });
         }
         let mut pair_pullbacks = Vec::new();
@@ -2751,6 +2753,7 @@ fn compose_ring(
                 weight: one.clone(),
                 feature: tick.contrast.clone(),
                 covector: negated(&tick.adjoint),
+                masses: None,
             });
         }
     }

@@ -37,6 +37,7 @@ fn sample(weight: Rat, feature: Vec<Rat>, covector: Vec<Rat>) -> Sample {
         weight,
         feature,
         covector,
+        masses: None,
     }
 }
 
@@ -2427,9 +2428,414 @@ fn the_receiving_step_pairs_the_original_covector() {
         weight: Rat::from_integer(1.into()),
         feature: vec![Rat::from_integer(1.into())],
         covector: vec![half.clone(), Rat::zero(), -half.clone(), Rat::zero()],
+        masses: None,
     };
     let unit = vec![vec![half.clone()], vec![Rat::zero()], vec![-half.clone()], vec![Rat::zero()]];
     let (_, oscillation, alignment) = receiving_fisher_face_probe(&[sample], &unit).unwrap();
     assert_eq!(alignment, half);
     assert_eq!(oscillation, Rat::from_integer(1.into()));
+}
+
+// -------------------------------------------------------------------------------------------
+// the receiving law's face masses and its phase statistics (October 8)
+
+/// A receiving face as a sample: weight one, the given feature, covector and carried masses.
+fn face_sample(feature: Vec<Rat>, covector: Vec<Rat>, masses: Option<Vec<Rat>>) -> Sample {
+    Sample {
+        weight: Rat::one(),
+        feature,
+        covector,
+        masses,
+    }
+}
+
+/// **A soft observed face carries its own masses** (the located defect, repaired in its owner): the
+/// descent covector `(⅙, 0, −⅙, 0)` is `q̃ − p̃` for `p̃ = (½, ½)` against the soft `q̃ = (⅔, ⅓)`.
+/// The one-hot reconstruction reads it as the one-hot target at class 0 with `p̃ = (⅚, ⅙)`, a
+/// distribution too, and accepts it; the carried masses are read as they stand, and every consumer
+/// of the face's masses (the prequential terms, the class metric) sees them. Where `q̃` is one-hot
+/// the two readings agree, and carried masses that are no distribution over the covector's classes
+/// are refused, not reread as a one-hot face.
+#[test]
+fn a_soft_observed_face_carries_its_own_masses_and_the_one_hot_reconstruction_is_unchanged() {
+    use crate::hnn::constitution::{
+        face_masses, prequential_terms, receiving_class_metric, receiving_fisher_face_probe,
+    };
+    let feature = vec![Rat::one(), Rat::zero()];
+    let soft = vec![rat(1, 6), Rat::zero(), rat(-1, 6), Rat::zero()];
+    let carried = face_sample(feature.clone(), soft.clone(), Some(vec![rat(1, 2), rat(1, 2)]));
+    let reconstructed = face_sample(feature.clone(), soft, None);
+    assert_eq!(face_masses(&carried), Some(vec![rat(1, 2), rat(1, 2)]));
+    assert_eq!(face_masses(&reconstructed), Some(vec![rat(5, 6), rat(1, 6)]));
+
+    // The prequential terms read the masses: the read through this map is (1, 0) at the two class
+    // rows, so the curvature is Var_p̃ = p̃_0 (1 − p̃_0), ¼ at the face's own masses and 5/36 at the
+    // reconstruction's; the alignment Σ g_Re · read = ⅙ does not depend on them.
+    let map = ExactRatMatrix::shaped(
+        4,
+        2,
+        vec![
+            vec![Rat::one(), Rat::zero()],
+            vec![Rat::zero(), Rat::zero()],
+            vec![Rat::zero(), Rat::one()],
+            vec![Rat::zero(), Rat::zero()],
+        ],
+    )
+    .unwrap();
+    assert_eq!(
+        prequential_terms(&[carried], &map),
+        Some((rat(1, 6), rat(1, 4)))
+    );
+    assert_eq!(
+        prequential_terms(&[reconstructed], &map),
+        Some((rat(1, 6), rat(5, 36)))
+    );
+
+    // The Fisher face reads them: a unit step that moves class 0's magnitude by 1 has the curvature
+    // 2 (119/80) Var_p̃ (¼ and 5/36 here), the oscillation 1 and the original covector's alignment ⅙.
+    let unit = vec![vec![Rat::one()], vec![Rat::zero()], vec![Rat::zero()], vec![Rat::zero()]];
+    let soft = vec![rat(1, 6), Rat::zero(), rat(-1, 6), Rat::zero()];
+    let fisher = |masses: Option<Vec<Rat>>| {
+        let sample = face_sample(vec![Rat::one()], soft.clone(), masses);
+        receiving_fisher_face_probe(&[sample], &unit)
+    };
+    assert_eq!(
+        fisher(Some(vec![rat(1, 2), rat(1, 2)])),
+        Some((rat(119, 160), Rat::one(), rat(1, 6)))
+    );
+    assert_eq!(fisher(None), Some((rat(119, 288), Rat::one(), rat(1, 6))));
+
+    // The class metric reads the masses: p̃ = (⅞, ⅛) against q̃ = (⅛, ⅞) is a trace 7/32 (the
+    // power of two at or below 32/7 is 4), the reconstruction's (¾, ¼) a trace 3/8 (8/3: 2).
+    let steep = vec![rat(-3, 4), Rat::zero(), rat(3, 4), Rat::zero()];
+    let carried = face_sample(feature.clone(), steep.clone(), Some(vec![rat(7, 8), rat(1, 8)]));
+    let reconstructed = face_sample(feature.clone(), steep, None);
+    assert_eq!(receiving_class_metric(&[carried]), Some(integer(4)));
+    assert_eq!(receiving_class_metric(&[reconstructed]), Some(integer(2)));
+
+    // A one-hot target: the reconstruction is exact and the carried masses agree with it.
+    let one_hot = vec![rat(-1, 4), Rat::zero(), rat(1, 4), Rat::zero()];
+    let masses = Some(vec![rat(1, 4), rat(3, 4)]);
+    assert_eq!(
+        face_masses(&face_sample(feature.clone(), one_hot.clone(), None)),
+        masses
+    );
+    assert_eq!(
+        face_masses(&face_sample(feature.clone(), one_hot.clone(), masses.clone())),
+        masses
+    );
+
+    // Carried masses must be a distribution over the covector's classes: a wrong count, a negative
+    // entry or a sum off one is no face, whatever the one-hot reconstruction would have read.
+    for refused in [
+        vec![Rat::one()],
+        vec![rat(3, 2), rat(-1, 2)],
+        vec![rat(1, 2), rat(1, 4)],
+        vec![rat(1, 3), rat(1, 3), rat(1, 3)],
+    ] {
+        let covector = vec![rat(1, 6), Rat::zero(), rat(-1, 6), Rat::zero()];
+        assert_eq!(
+            face_masses(&face_sample(feature.clone(), covector, Some(refused))),
+            None
+        );
+    }
+}
+
+/// The chain's constitution with its receiving map `W` of quarters (so the predicted phases
+/// `W_(2c+1) · f` are nonzero), founded at the declared prior.
+fn receiving_chain() -> (crate::hnn::field::Field, Constitution, ExactRatMatrix) {
+    let field = chain();
+    let opening = Constitution::initial(&field, OPEN_BUDGET).unwrap();
+    let (rows, n) = {
+        let map = opening.receiving_law(2).unwrap().map();
+        (map.rows(), map.columns())
+    };
+    let map = ExactRatMatrix::shaped(
+        rows,
+        n,
+        (0..rows)
+            .map(|r| {
+                (0..n)
+                    .map(|j| rat(((3 * r + 5 * j) % 7) as i64 - 3, 4))
+                    .collect()
+            })
+            .collect(),
+    )
+    .unwrap();
+    let theta = opening.with_ports(2, None, None, Some(map.clone())).unwrap();
+    (field, theta, map)
+}
+
+/// A hand-built deposit of one receiving window at ring 2's map alone, on the chain's reach.
+fn receiving_window(theta: &Constitution, samples: Vec<Sample>) -> Deposit {
+    Deposit::new(
+        theta.commit(),
+        vec![LinearStep {
+            locus: LinearLocus::Receiving(2),
+            samples,
+        }],
+        Vec::new(),
+        vec![Locus::ReceivingMap(2)],
+    )
+    .with_reach(chain_reach())
+}
+
+/// **A receiving deposit absorbs its window's phase comparisons into its own successor**, from the
+/// map in force before it. Two readings on the chain's four classes, the map `W` of quarters:
+/// - a soft face of weight 1 at the feature `e_0`, carried `p̃ = (½, ¼, ⅛, ⅛)` against the observed
+///   `q̃ = (¼, ¼, ½, 0)` with phase gaps `Δ = (½, −¼, ¼, ·)` (class 3 has no mass, and a stray
+///   covector entry there carries none): its covector is `(q̃_c − p̃_c, q̃_c Δ_c / 2)`;
+/// - a one-hot face of weight 2 at `e_0 + e_1`, uncarried, target class 3 at the gap `Δ = ¾`, with a
+///   stray phase entry at a class of no mass.
+/// The lifted doubled targets are `t_c = W_(2c+1) f + 2Δ_c` at the classes of mass, and the
+/// statistics are the hand sums `S_c = Σ w q_c f fᵀ`, `m_c = Σ w q_c t_c f`, `s_c = Σ w q_c t_c²`
+/// and `N = Σ w #{c : q_c > 0} = 3 + 2`. The statistics are written whole by a checkpoint and a
+/// restored constitution holds them again.
+#[test]
+fn a_receiving_deposit_absorbs_its_phase_comparisons_through_the_map_before_it() {
+    use crate::hnn::constitution::ContinuingState;
+    use crate::hnn::phase_family::PhaseStatistics;
+    let (field, theta, map) = receiving_chain();
+    let (a, n) = (field.alphabet(), map.columns());
+    assert_eq!((a, map.rows()), (4, 8));
+    let at = |r: usize, j: usize| map.get(r, j).unwrap().clone();
+    let unit = |j: usize| -> Vec<Rat> { (0..n).map(|i| if i == j { Rat::one() } else { Rat::zero() }).collect() };
+    let e0 = unit(0);
+    let e01: Vec<Rat> = (0..n).map(|i| if i < 2 { Rat::one() } else { Rat::zero() }).collect();
+
+    // The soft face.
+    let produced = [rat(1, 2), rat(1, 4), rat(1, 8), rat(1, 8)];
+    let observed = [rat(1, 4), rat(1, 4), rat(1, 2), Rat::zero()];
+    let gaps = [rat(1, 2), rat(-1, 4), rat(1, 4), rat(1, 3)];
+    let mut soft_covector: Vec<Rat> = (0..a)
+        .flat_map(|c| [&observed[c] - &produced[c], &observed[c] * &gaps[c] / integer(2)])
+        .collect();
+    soft_covector[7] = rat(1, 3);
+    let soft = Sample {
+        weight: integer(1),
+        feature: e0.clone(),
+        covector: soft_covector,
+        masses: Some(produced.to_vec()),
+    };
+    // The one-hot face.
+    let produced_hot = [rat(1, 8), rat(1, 8), rat(1, 4), rat(1, 2)];
+    let gap_hot = rat(3, 4);
+    let mut hot_covector: Vec<Rat> = (0..a)
+        .flat_map(|c| {
+            let q = if c == 3 { Rat::one() } else { Rat::zero() };
+            let phase = if c == 3 { &gap_hot / integer(2) } else { Rat::zero() };
+            [q - &produced_hot[c], phase]
+        })
+        .collect();
+    hot_covector[1] = rat(1, 16);
+    let hot = Sample {
+        weight: integer(2),
+        feature: e01.clone(),
+        covector: hot_covector,
+        masses: None,
+    };
+
+    let deposit = receiving_window(&theta, vec![soft, hot]);
+    let (next, _) = theta.deposited(&deposit).unwrap();
+    let phase = next
+        .receiving_law(2)
+        .unwrap()
+        .phase_statistics()
+        .expect("a receiving law carries phase statistics");
+
+    // The hand targets: the prediction at the map before the deposit plus twice the gap.
+    let soft_target = |c: usize| {
+        let predicted = at(2 * c + 1, 0);
+        if observed[c].is_zero() { predicted } else { predicted + integer(2) * &gaps[c] }
+    };
+    let hot_target = |c: usize| {
+        let predicted = at(2 * c + 1, 0) + at(2 * c + 1, 1);
+        if c == 3 { predicted + integer(2) * &gap_hot } else { predicted }
+    };
+    let mut expected = PhaseStatistics::founded(a, n);
+    let soft_targets: Vec<Rat> = (0..a).map(|c| soft_target(c)).collect();
+    expected
+        .absorb(&integer(1), &e0, &observed, &soft_targets)
+        .unwrap();
+    let hot_targets: Vec<Rat> = (0..a).map(|c| hot_target(c)).collect();
+    let hot_masses = vec![Rat::zero(), Rat::zero(), Rat::zero(), Rat::one()];
+    expected
+        .absorb(&integer(2), &e01, &hot_masses, &hot_targets)
+        .unwrap();
+    assert_eq!(phase, &expected);
+
+    // And the sums, by hand: N, then class 0 (the soft face alone) and class 3 (the one-hot alone).
+    assert_eq!((phase.classes(), phase.features()), (a, n));
+    assert_eq!(phase.cells(), &integer(5));
+    let zeros = vec![vec![Rat::zero(); n]; n];
+    let mut gram0 = zeros.clone();
+    gram0[0][0] = rat(1, 4);
+    assert_eq!(phase.gram(0), &gram0[..]);
+    let mut moment0 = vec![Rat::zero(); n];
+    moment0[0] = rat(1, 4) * soft_target(0);
+    assert_eq!(phase.moment(0), &moment0[..]);
+    assert_eq!(phase.second(0), &(rat(1, 4) * soft_target(0) * soft_target(0)));
+    let mut gram3 = zeros;
+    for (i, j) in [(0, 0), (0, 1), (1, 0), (1, 1)] {
+        gram3[i][j] = integer(2);
+    }
+    assert_eq!(phase.gram(3), &gram3[..]);
+    let moment3: Vec<Rat> = (0..n)
+        .map(|j| if j < 2 { integer(2) * hot_target(3) } else { Rat::zero() })
+        .collect();
+    assert_eq!(phase.moment(3), &moment3[..]);
+    assert_eq!(phase.second(3), &(integer(2) * hot_target(3) * hot_target(3)));
+
+    // A checkpoint writes the statistics whole and a restored constitution holds them again.
+    let state = next.continuing_state(0).unwrap();
+    let read = ContinuingState::from_text(&state.to_text()).unwrap();
+    assert_eq!(read, state);
+    let restored = Constitution::initial(&field, OPEN_BUDGET)
+        .unwrap()
+        .continued(&read)
+        .unwrap();
+    assert_eq!(restored, next);
+    assert_eq!(restored.receiving_law(2).unwrap().phase_statistics(), Some(&expected));
+}
+
+/// **Only a reached face of nonnegative weight is absorbed** ([`absorb_phase`]): a zero weight, a
+/// zero feature, a covector that is no face's and a face of no observed mass leave the statistics
+/// as they were; a negative weight, a negative observed mass (carried masses a covector contradicts)
+/// and observed masses that are no distribution are refused, typed. On a zero map the lifted target
+/// is `4 g_(2c+1) / q_c`, so the reached one-hot face below (`g = (½, ⅛, −½, 0)` on `p̃ = (½, ½)`,
+/// target class 0, gap `¼`) absorbs `q = (1, 0)`, `t = (½, 0)`.
+#[test]
+fn only_a_reached_face_of_nonnegative_weight_is_absorbed_and_the_rest_is_skipped_or_refused() {
+    use crate::hnn::constitution::absorb_phase;
+    use crate::hnn::phase_family::PhaseStatistics;
+    let map = ExactRatMatrix::zero(4, 2).unwrap();
+    let founded = PhaseStatistics::founded(2, 2);
+    let absorbed = |samples: &[Sample]| {
+        let mut statistics = founded.clone();
+        absorb_phase(&mut statistics, &map, samples).map(|()| statistics)
+    };
+    let feature = vec![Rat::one(), Rat::zero()];
+    let hot = vec![rat(1, 2), rat(1, 8), rat(-1, 2), Rat::zero()];
+    let reached = face_sample(feature.clone(), hot.clone(), None);
+
+    let statistics = absorbed(&[reached.clone()]).unwrap();
+    assert_eq!(statistics.cells(), &integer(1));
+    assert_eq!(statistics.gram(0), &[vec![Rat::one(), Rat::zero()], vec![Rat::zero(), Rat::zero()]][..]);
+    assert_eq!(statistics.moment(0), &[rat(1, 2), Rat::zero()][..]);
+    assert_eq!(statistics.second(0), &rat(1, 4));
+    assert_eq!(statistics.second(1), &Rat::zero());
+
+    // Skipped: nothing reached the locus, or the covector is no face's, or no class has mass.
+    let skipped = [
+        Sample { weight: Rat::zero(), ..reached.clone() },
+        Sample { feature: vec![Rat::zero(); 2], ..reached.clone() },
+        face_sample(feature.clone(), vec![Rat::one(); 4], None),
+        face_sample(feature.clone(), vec![rat(-1, 2), Rat::zero(), rat(-1, 2), Rat::zero()], None),
+    ];
+    for sample in skipped {
+        assert_eq!(absorbed(&[sample]).unwrap(), founded);
+    }
+    // A covector off the map's rows is a shape refusal, not a skipped face.
+    assert!(matches!(
+        absorbed(&[face_sample(feature.clone(), vec![rat(1, 2), rat(1, 8), rat(-1, 2)], None)]),
+        Err(HnnError::Shape { .. })
+    ));
+
+    // Refused: the sample is a face, but its comparison cannot be a regression's.
+    let refused = [
+        Sample { weight: integer(-1), ..reached },
+        // carried p̃ = (½, ½) with q̃ = p̃ + g = (−¼, 5/4): a negative observed mass
+        face_sample(
+            feature.clone(),
+            vec![rat(-3, 4), Rat::zero(), rat(3, 4), Rat::zero()],
+            Some(vec![rat(1, 2), rat(1, 2)]),
+        ),
+        // carried p̃ = (½, ½) with q̃ = (¾, ¾): no distribution
+        face_sample(
+            feature,
+            vec![rat(1, 4), Rat::zero(), rat(1, 4), Rat::zero()],
+            Some(vec![rat(1, 2), rat(1, 2)]),
+        ),
+    ];
+    for sample in refused {
+        assert!(matches!(absorbed(&[sample]), Err(HnnError::Unadmitted { .. })));
+    }
+}
+
+/// **A move of the prior leaves the phase statistics as they were**, and `prior_scale` reads the
+/// ridge `2^k I` in force: the receiving law below (the prior carry's fixture) holds statistics
+/// and moves `k = 2` to `k′ = 1` by its pair's Newton point; the moved law holds the same
+/// statistics, and the sources and contrasts of a constitution hold none.
+#[test]
+fn a_moved_prior_keeps_the_phase_statistics_and_the_ridge_is_read_at_its_scale() {
+    use crate::hnn::constitution::LocatedPrior;
+    use crate::hnn::phase_family::PhaseStatistics;
+    let lattice = Lattice::new(4);
+    let rule = ChartRule::new(lattice, 16);
+    let map = ExactRatMatrix::shaped(
+        4,
+        2,
+        vec![
+            vec![rat(1, 2), rat(-1, 4)],
+            vec![rat(1, 8), Rat::zero()],
+            vec![rat(-3, 4), rat(1, 2)],
+            vec![Rat::zero(), rat(1, 16)],
+        ],
+    )
+    .unwrap();
+    let law = NormalLaw::with_receiving_prior(map, 2);
+    assert_eq!(law.prior_scale(), 2);
+    assert_eq!(law.phase_statistics(), Some(&PhaseStatistics::founded(2, 2)));
+    // One deposit so the Gram has a support (the prior carry's window at t = 1).
+    let reading = |feature: [Rat; 2], masses: [Rat; 2], target: usize| {
+        let covector: Vec<Rat> = (0..2)
+            .flat_map(|c| {
+                let q = if c == target { Rat::one() } else { Rat::zero() };
+                [q - &masses[c], rat(1, 16)]
+            })
+            .collect();
+        face_sample(feature.to_vec(), covector, None)
+    };
+    let samples = vec![
+        reading([rat(-1, 4), rat(1, 2)], [rat(3, 8), rat(5, 8)], 0),
+        reading([rat(1, 4), rat(-1, 4)], [rat(5, 8), rat(3, 8)], 0),
+        reading([rat(-1, 2), rat(1, 4)], [rat(3, 8), rat(5, 8)], 0),
+    ];
+    let mut at = BudgetedCarry::new(lattice, 1);
+    let (law, _) = law.deposited(&samples, &rat(1, 4), &rule, &mut at).unwrap();
+    // The statistics a window left, and a pair whose Newton point asks for k′ = 1.
+    let mut statistics = PhaseStatistics::founded(2, 2);
+    statistics
+        .absorb(&Rat::one(), &[rat(1, 2), rat(-1, 4)], &[rat(1, 2), rat(1, 2)], &[rat(1, 3), rat(-2, 3)])
+        .unwrap();
+    let s = rat(5, 3);
+    let law = law
+        .with_phase(Some(statistics.clone()))
+        .with_located(Some(LocatedPrior::from_parts(2, Rat::zero(), s.clone(), s)));
+    let (moved, read) = law
+        .moved_prior(&rule, &mut BudgetedCarry::new(lattice, 2))
+        .unwrap()
+        .unwrap();
+    assert_eq!((read.from, read.to, read.held), (2, 1, None));
+    assert_eq!(moved.prior_scale(), 1);
+    assert_eq!(moved.phase_statistics(), Some(&statistics));
+
+    // Sources and contrasts hold none; the receiving law is founded empty at its declared ridge.
+    let mut declared = super::learning::chain_declaration(1 << 16);
+    declared.receivers[0].receiving_prior = 3;
+    let field = crate::hnn::field::Field::declare(declared.by_lattice_rule()).unwrap();
+    let theta = Constitution::initial(&field, OPEN_BUDGET).unwrap();
+    let receiving = theta.receiving_law(2).unwrap();
+    assert_eq!(receiving.prior_scale(), 3);
+    assert_eq!(
+        receiving.phase_statistics(),
+        Some(&PhaseStatistics::founded(field.alphabet(), receiving.map().columns()))
+    );
+    assert_eq!(theta.source_law(0).unwrap().phase_statistics(), None);
+    for g in 0..field.rings().len() {
+        assert_eq!(theta.contrast_law(g).phase_statistics(), None);
+    }
+    let zero = ExactRatMatrix::zero(4, 2).unwrap();
+    assert_eq!(NormalLaw::with_prior(zero.clone()).phase_statistics(), None);
+    assert_eq!(NormalLaw::with_scaled_prior(zero, 2).phase_statistics(), None);
 }

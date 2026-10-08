@@ -151,6 +151,7 @@ pub mod field;
 pub mod keys;
 pub mod moment;
 pub mod pending;
+pub mod phase_family;
 pub mod port;
 pub mod prediction;
 pub mod physical;

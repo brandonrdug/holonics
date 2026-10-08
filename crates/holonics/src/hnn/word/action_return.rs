@@ -92,20 +92,29 @@ impl Word<'_> {
                     reason: "the observed receiving samples keep every actual producing crossing",
                 });
             }
-            step.samples = std::mem::take(&mut step.samples)
-                .into_iter()
-                .enumerate()
-                .filter_map(|(j, sample)| {
-                    (ratio.stations().contains(&j)
-                        && !sample.weight.is_zero()
-                        && sample.feature.iter().any(|x| !x.is_zero())
-                        && sample.covector.iter().any(|x| !x.is_zero()))
-                    .then(|| {
-                        actual_stations.push((phases.first_epoch() + j) as u64);
-                        sample
-                    })
-                })
-                .collect();
+            // [definition; agent-inferred, October 8] **Each kept sample carries its own produced
+            // masses `p̃`.** The observed face is soft: the covector's magnitude entries are
+            // `q̃ − p̃` with `q̃` the observed face's odometer masses, so `p̃` cannot be read back from
+            // it (the one-hot reconstruction reads `(⅚, ⅙)` for `p̃ = (½, ½)` against
+            // `q̃ = (⅔, ⅓)`). The sample at index `j` is the comparison at receiving phase `j`:
+            // `compose_return` makes one sample per `back.reads[j]`, whose gradient `pull_back_full`
+            // took as `covector.logits()[j]` of this very `ratio` (negated), and
+            // `ReceivingFaceRatio::covector` built that entry from `faces[j].odometer_masses()`,
+            // `q̃_j` and the phases. So `ratio.faces().faces[j].odometer_masses()` is exactly the
+            // `p̃` of sample `j`'s covector; the same `j` selects the compared station above.
+            let mut kept = Vec::new();
+            for (j, mut sample) in std::mem::take(&mut step.samples).into_iter().enumerate() {
+                if ratio.stations().contains(&j)
+                    && !sample.weight.is_zero()
+                    && sample.feature.iter().any(|x| !x.is_zero())
+                    && sample.covector.iter().any(|x| !x.is_zero())
+                {
+                    actual_stations.push((phases.first_epoch() + j) as u64);
+                    sample.masses = Some(ratio.faces().faces[j].odometer_masses()?);
+                    kept.push(sample);
+                }
+            }
+            step.samples = kept;
         }
         linear.retain(|step| !step.samples.is_empty());
         actual_stations.sort_unstable();

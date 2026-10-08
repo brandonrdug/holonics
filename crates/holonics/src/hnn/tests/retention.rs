@@ -1180,6 +1180,7 @@ fn the_source_step_reads_the_retention_under_the_carry() {
         weight: integer(1),
         feature: unit(port.columns()),
         covector: unit(port.rows()),
+        masses: None,
     }];
     let step = integer(1);
     let every: BTreeSet<Locus> = loci(&field).into_iter().collect();

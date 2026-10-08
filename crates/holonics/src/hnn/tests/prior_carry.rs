@@ -42,6 +42,7 @@ fn reading(feature: &[Rat], masses: &[Rat], target: usize, phase: &Rat) -> Sampl
         weight: Rat::one(),
         feature: feature.to_vec(),
         covector,
+        masses: None,
     }
 }
 

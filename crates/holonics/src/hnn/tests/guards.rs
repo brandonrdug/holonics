@@ -127,6 +127,7 @@ fn guard_four_the_constitution_keeps_no_journal() {
             weight: weight.clone(),
             feature: vec![feature.clone(); features],
             covector: vec![Rat::one(); covectors],
+            masses: None,
         };
         let alphabet = field.alphabet();
         let mut linear = vec![

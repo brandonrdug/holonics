@@ -455,6 +455,25 @@
 //! statistic like `H`: it accumulates over deposits, starting at 1, so a factor step is
 //! preconditioned by its family's own feature energy.
 //!
+//! [definition; agent-inferred, October 8] **The receiving law's face masses and phase
+//! statistics.** A receiving sample's covector is `q − p̃` on its class entries (the odometer chart
+//! of `hnn::ratio`), one equation in two distributions, so the masses `p̃` that the class metric, the
+//! Fisher face and the located prior's terms read are the face's own where its producer carries them
+//! ([`Sample::masses`]: the action path's soft observed World face, whose `q̃` is no class) and the
+//! one-hot reconstruction otherwise ([`face_masses`]). The reconstruction is exact for a one-hot `q`
+//! and was wrong for a soft one (it accepted `p̃ = (⅚, ⅙)` for `(½, ½)` against `q̃ = (⅔, ⅓)`), a
+//! located cause repaired here, in its owner, before its new consumer. Beside its Gram `H` and the
+//! prior's pair, the receiving law keeps the exact statistics of the phase comparison its readings
+//! made ([`NormalLaw::phase_statistics`], `hnn::phase_family`): per class the sums
+//! `S_c = Σ w q_c f fᵀ`, `m_c = Σ w q_c t_c f`, `s_c = Σ w q_c t_c²` of the doubled lifted phase
+//! target `t_c = 2 φ_q,c` the readings observed, with the declared cell count `N`. They are
+//! absorbed in the deposit's own successor ([`absorb_phase`]), through the map in force before it and
+//! only for the readings that reached the locus, so they are a quotient of those readings
+//! sufficient for the phase comparison's quadratic (no reading, tape or journal is kept), and a
+//! checkpoint writes and restores them whole ([`write_phase`]). [open] Their entries are exact
+//! rationals that grow with the readings, and they are not yet counted in `B_Θ`
+//! ([`Constitution::carrier_bits`]); the Lean counterpart is owed (#62).
+//!
 //! [definition] **The budget and stop rule** (design (d), R3 §5): the successor is computed exactly
 //! and its exact bits (every numerator and denominator: the lattice entries, the carried remainders,
 //! the statistics and the solved charts at their lattices) are counted before publication, over the
@@ -481,6 +500,8 @@
 //! | `HNN/LatticeWord.{chart_release_read, carried_chart_release_read}` | [`ChartRule::read`] (the released prox residual's move of a read) |
 //! | `HNN/LatticeWord.{roundedIter_certificate, newton_schulz_iter_left, inverse_chart_deviation}` | [`ChartRule`] (the lattice `L_s`, the target `δ_ℓ`, the refinement count) |
 //! | `HNN/Normal.normalStatistic_standing`, `objective_eq_statisticObjective`, for its statistic `H` only (carried on the lattice) | [`NormalLaw::gram`] (keeps `H`, never the samples) |
+//! | `HNN/Ratio.{odometer_covector_descends, odometer_eq_face_at_integer_cells}` (the covector `q̃ − p̃`, whose masses are the face's own) | [`Sample::masses`], [`face_masses`] |
+//! | `HNN/Ratio.receivingPhase_phase_pullback` (the phase part `+q_c Δ_c / 2` of the descent covector); the statistics' Lean counterpart is owed (#62) | [`NormalLaw::phase_statistics`], [`absorb_phase`] (`hnn::phase_family::PhaseStatistics`) |
 //! | `HNN/Normal.deposit_local`, `windowGram_apply_eq_zero` | [`Constitution::deposited`] (per locus, only what reached it inside its causal diamond) |
 //! | `HNN/Normal.reaction_deposit_storage_unchanged`, `reaction_deposits_keep_committed_energy`; `Holon/Deposition.committed_energy_bound` | [`DepositReading::storage_growth`], [`Constitution::storage_product`] (refused when uncertified: [`HnnError::UncertifiedStorage`]) |
 //! | `Holon/Deposition.{certified_step_descends, quadratic_upper_model, gauss_newton_curvature, joint_cauchy_schwarz}`, `HNN/Normal.certified_normal_step` | [`NormalLaw::prepare`] (the unit step and its readings), [`Constitution::deposited`] (the certified steps: [`StepReading`]) |
@@ -517,6 +538,7 @@ use crate::hnn::contact::{
 };
 use crate::hnn::field::{ConstitutionRead, Field, lattice_exponent};
 use crate::hnn::moment::PairPort;
+use crate::hnn::phase_family::PhaseStatistics;
 use crate::hnn::port::Deposit;
 use crate::hnn::propagation::gram;
 use crate::hnn::realization::{indexed, outer_integral};
@@ -1986,6 +2008,19 @@ pub struct Sample {
     pub weight: Rat,
     pub feature: Vec<Rat>,
     pub covector: Vec<Rat>,
+    /// [definition; agent-inferred, October 8] **The face's own odometer masses `p̃`** on its classes
+    /// (one entry per class, nonnegative, summing to one exactly): the very `p̃` the covector's
+    /// magnitude entries `q − p̃` were formed from, `None` where the producer has none. A receiving
+    /// covector is one equation in two distributions, `g_(2c) = q_c − p̃_c`, and
+    /// [`face_masses`] can split it alone only for a one-hot `q` (it reads `q` as the class whose
+    /// entry is positive). A soft observed face (`hnn::ratio::ReceivingFaceRatio`: the World's
+    /// actual face) is not one-hot: with `p̃ = (½, ½)` against `q = (⅔, ⅓)` the covector `(⅙, −⅙)`
+    /// would be read as `p̃ = (⅚, ⅙)`, a distribution too, and accepted. A producer whose target is not
+    /// one-hot therefore carries `p̃` beside the covector, and every consumer of the face's masses
+    /// reads them here ([`face_masses`]). Every one-hot comparison and every source and contrast
+    /// sample leaves it `None`. The class metric's copy ([`receiving_metric_samples`]) carries it
+    /// through although its scaled covector is no longer `q − p̃`.
+    pub masses: Option<Vec<Rat>>,
 }
 
 /// [definition] **One locus's deposition owner** (design (c), `NormalLaw`): the map `W` (`m × n`)
@@ -2012,6 +2047,12 @@ pub struct NormalLaw {
     /// The receiving prior's carried pair on a receiving law ([`LocatedPrior`]); `None` on a source
     /// or contrast law.
     located: Option<LocatedPrior>,
+    /// [definition; agent-inferred, October 8] The receiving law's exact phase-comparison statistics
+    /// ([`PhaseStatistics`]): per class one fixed-size sum of the readings that reached the map, in
+    /// the doubled lifted phase targets the map's imaginary rows are regressed on, absorbed in the
+    /// deposit's own successor ([`absorb_phase`]); no reading is kept. `None` on a source or
+    /// contrast law.
+    phase: Option<PhaseStatistics>,
 }
 
 impl NormalLaw {
@@ -2034,6 +2075,7 @@ impl NormalLaw {
             map_carry: Carry::default(),
             gram_carry: Carry::default(),
             located: None,
+            phase: None,
         }
     }
 
@@ -2067,15 +2109,21 @@ impl NormalLaw {
             map_carry: Carry::default(),
             gram_carry: Carry::default(),
             located: None,
+            phase: None,
         }
     }
 
     /// **The receiving map's law as its field declares its prior**: founded at `2^k I`
     /// ([`NormalLaw::with_scaled_prior`]) with the prequential pair carried from zero
-    /// ([`LocatedPrior`]), so the readings move `k` (`ReceiverDeclaration::receiving_prior`).
+    /// ([`LocatedPrior`]), so the readings move `k` (`ReceiverDeclaration::receiving_prior`), and
+    /// with the phase statistics founded empty ([`PhaseStatistics::founded`]): the receiving map's
+    /// rows are realified `[Re, Im]` per class, so its `m` rows are `m/2` classes, each regressed
+    /// on the map's `n` features.
     pub fn with_receiving_prior(map: ExactRatMatrix, from: u32) -> Self {
+        let phase = PhaseStatistics::founded(map.rows() / 2, map.columns());
         Self {
             located: Some(LocatedPrior::founded(from)),
+            phase: Some(phase),
             ..Self::with_scaled_prior(map, from)
         }
     }
@@ -2096,10 +2144,33 @@ impl NormalLaw {
         self.located.as_ref()
     }
 
+    /// The exponent `k` of the prior ridge `2^k I` in force (moved by the located prior): the
+    /// solved chart's scale ([`SolvedChart::scale`]), which the Gram's diagonal off the chart's
+    /// support holds at `2^k` and [`NormalLaw::moved_prior`] moves together with the Gram, the map
+    /// and the chart.
+    pub fn prior_scale(&self) -> u32 {
+        self.chart.scale
+    }
+
+    /// [definition; agent-inferred, October 8] The receiving law's exact phase-comparison
+    /// statistics ([`PhaseStatistics`]): per class the sums of the readings that reached the map,
+    /// the doubled lifted phase target regressed on the feature, with no reading kept. They are
+    /// absorbed at the deposit that carried the reading, from the map in force before it
+    /// ([`absorb_phase`]). `None` on a source or contrast law.
+    pub fn phase_statistics(&self) -> Option<&PhaseStatistics> {
+        self.phase.as_ref()
+    }
+
     /// The law with its carried pair replaced (a test's pair at a chosen Newton point).
     #[cfg(test)]
     pub(crate) fn with_located(self, located: Option<LocatedPrior>) -> Self {
         Self { located, ..self }
+    }
+
+    /// The law with its phase statistics replaced (a test's statistics at a chosen point).
+    #[cfg(test)]
+    pub(crate) fn with_phase(self, phase: Option<PhaseStatistics>) -> Self {
+        Self { phase, ..self }
     }
 
     /// `W`.
@@ -2580,6 +2651,8 @@ impl NormalLaw {
             .collect();
         map_carry.deposit_all(at, Carrier::Map, &mut map, &update);
         let certificate = chart.certificate().clone();
+        // The phase statistics are the readings' own sums: a move of the prior (the ridge, the map's
+        // value, the chart and the pair) changes none of them.
         let moved = Self {
             map: flat_matrix(m, n, map)?,
             carrier: self.carrier,
@@ -2588,6 +2661,7 @@ impl NormalLaw {
             map_carry,
             gram_carry: self.gram_carry.clone(),
             located: Some(pair.rebased(&x)),
+            phase: self.phase.clone(),
         };
         Ok(Some((
             moved,
@@ -2604,7 +2678,9 @@ impl NormalLaw {
 /// [definition; agent-inferred, October 4; the prior carry's design §2] **A window's prequential
 /// terms at the receiving map in force**: with `δ_t = W z_t` the read of reading `z_t` through the
 /// map before the window's deposit (every read of one word's return is read through that map), its
-/// covector `g_t = q − p̃` and masses `p̃` as [`receiving_fisher_face`] derives them,
+/// covector `g_t = q − p̃` and masses `p̃` as [`face_masses`] reads them (the producer's own where it
+/// carries them, [`Sample::masses`]; [`receiving_fisher_face`] and [`receiving_class_metric`] read the
+/// same),
 /// `(Σ_t w_t ⟨g_t,Re, δ_t,Re⟩, Σ_t |w_t| Var_p̃_t(δ_t,Re))`: the code's alignment and its curvature
 /// in units of `ln 2`. The pair takes the class part only: its law is the code in bits, whose
 /// Hessian in the class exponents is `ln 2 (diag p − p pᵀ)`; the phase pairing belongs to the
@@ -2612,7 +2688,7 @@ impl NormalLaw {
 pub fn prequential_terms(samples: &[Sample], map: &ExactRatMatrix) -> Option<(Rat, Rat)> {
     let (mut alignment, mut curvature) = (Rat::zero(), Rat::zero());
     for sample in samples.iter().filter(|s| !s.weight.is_zero()) {
-        let masses = face_masses(&sample.covector)?;
+        let masses = face_masses(sample)?;
         let read: Vec<Rat> = (0..map.rows())
             .step_by(2)
             .map(|i| {
@@ -2636,10 +2712,28 @@ pub fn prequential_terms(samples: &[Sample], map: &ExactRatMatrix) -> Option<(Ra
     Some((alignment, curvature))
 }
 
-/// **A receiving covector's face masses**: the descent covector is `q − p̃` on its class (even)
-/// entries, so the masses are `p̃ = q − covector`, with `q` the one-hot target at the class whose
-/// entry is positive. `None` where that is not a distribution (a covector that is not a face's).
-fn face_masses(covector: &[Rat]) -> Option<Vec<Rat>> {
+/// [definition; agent-inferred, October 8] **A receiving sample's face masses `p̃`**: the descent
+/// covector is `q − p̃` on its class (even) entries, one equation in two distributions, so the masses
+/// are the face's own where the producer carries them ([`Sample::masses`]), and otherwise
+/// `p̃ = q − covector` with `q` the one-hot target at the class whose entry is positive.
+/// - **Carried masses** are read as they stand when they are a distribution over the covector's
+///   classes (one entry per class, none negative, summing to one exactly), and refused (`None`)
+///   otherwise: a producer's own `p̃` that is not a distribution is a defect, and is not reread as a
+///   one-hot face. This is the only reading of a soft observed target, whose `q` is no class.
+/// - **Uncarried masses** are the one-hot reconstruction, unchanged. It is exact for a one-hot `q`
+///   and wrong for a soft one (see [`Sample::masses`]: `p̃ = (½, ½)` against `q = (⅔, ⅓)` is read
+///   as `(⅚, ⅙)`), which is why a soft producer carries its masses.
+///
+/// `None` where the sample is not a face's (a covector that is not `q − p̃`).
+pub(crate) fn face_masses(sample: &Sample) -> Option<Vec<Rat>> {
+    let covector = &sample.covector;
+    if let Some(carried) = &sample.masses {
+        let classes = covector.iter().step_by(2).count();
+        return (carried.len() == classes
+            && !carried.iter().any(Signed::is_negative)
+            && carried.iter().sum::<Rat>() == Rat::one())
+        .then(|| carried.clone());
+    }
     let mut masses: Vec<Rat> = covector.iter().step_by(2).map(|c| -c).collect();
     if let Some(target) = (0..masses.len()).find(|&c| masses[c].is_negative()) {
         masses[target] += Rat::one();
@@ -2648,6 +2742,110 @@ fn face_masses(covector: &[Rat]) -> Option<Vec<Rat>> {
         return None;
     }
     Some(masses)
+}
+
+/// [definition; agent-inferred, October 8] **A receiving window's phase comparisons absorbed into the
+/// law's exact statistics** ([`PhaseStatistics::absorb`], one fixed-size sum per class, no reading
+/// kept). The receiving map `W` has realified rows, `W_(2c)` the class's magnitude and `W_(2c+1)` its
+/// doubled phase: the produced face's phase is `φ_p,c = Im(W f)_c / 2` turns (the tree face's grain
+/// logits are real, `hnn::receiving::grain_logits`), so `pred_c = W_(2c+1) · f = 2 φ_p,c`. The
+/// comparison's descent covector `g` is the negated `R⁻¹dR` of `hnn::ratio`
+/// (`ReceivingFaceRatio::covector`, and `HolonRatio::covector` at the one-hot target, negated by
+/// `reference::compose_return`):
+///
+/// ```text
+/// g_(2c)   = q_c − p̃_c                              the magnitude part, p̃ the face's odometer masses
+/// g_(2c+1) = + q_c Δ_c / 2 ,  Δ_c = φ_q,c − φ_p,c     the phase part, on the unwrapped branch
+/// ```
+///
+/// so the observed mass is `q_c = p̃_c + g_(2c)` and the observed phase, lifted onto the produced
+/// phase's branch and doubled, is
+///
+/// ```text
+/// t_c = 2 φ_q,c = pred_c + 2 Δ_c = pred_c + 4 g_(2c+1) / q_c      where q_c > 0
+/// t_c = pred_c                                                    where q_c = 0 (it carries zero weight)
+/// ```
+///
+/// The reading `(w, f, q, t)` is absorbed with `map` the map **in force before the deposit**: the one
+/// the faces were produced by and [`prequential_terms`] reads. Only a reading that reached the locus
+/// is absorbed, as [`NormalLaw::prepare`] reads one (nonzero weight, a nonzero feature: the Gram
+/// `H` and these sums are over the same readings), and only a face's (the masses [`face_masses`]
+/// reads: a covector that is not `q − p̃` has no phase comparison and is not absorbed, as it
+/// leaves the prior unread). A map without a phase row per class has no phase comparison, and a face
+/// of no observed mass (a one-hot reconstruction with no positive entry) compares no class.
+/// Refused, typed: a face of negative weight, of a negative observed mass (the regression's weights
+/// `w q_c` are nonnegative) or of observed masses that are no distribution (a producer's carried
+/// `p̃` that its covector contradicts), and any refusal of the statistics themselves (a shape off
+/// the law's). The caller absorbs into the deposit's own successor, which a refusal discards whole,
+/// so the published law never holds a partial window.
+pub(crate) fn absorb_phase(
+    phase: &mut PhaseStatistics,
+    map: &ExactRatMatrix,
+    samples: &[Sample],
+) -> Result<(), HnnError> {
+    let (rows, columns) = (map.rows(), map.columns());
+    let four = Rat::from_integer(BigInt::from(4));
+    for sample in samples {
+        if sample.weight.is_zero() || sample.feature.iter().all(|x| x.is_zero()) {
+            continue;
+        }
+        let Some(masses) = face_masses(sample) else {
+            continue;
+        };
+        if 2 * masses.len() != rows {
+            continue;
+        }
+        if sample.covector.len() != rows || sample.feature.len() != columns {
+            return Err(HnnError::Shape {
+                what: "a receiving sample (feature, covector) against the map in force",
+                expected: columns + rows,
+                found: sample.feature.len() + sample.covector.len(),
+            });
+        }
+        if sample.weight.is_negative() {
+            return Err(HnnError::Unadmitted {
+                reason: "a receiving face of negative weight has no phase statistics",
+            });
+        }
+        let observed: Vec<Rat> = masses
+            .iter()
+            .enumerate()
+            .map(|(class, produced)| produced + &sample.covector[2 * class])
+            .collect();
+        if observed.iter().any(Signed::is_negative) {
+            return Err(HnnError::Unadmitted {
+                reason: "a receiving face whose observed mass is negative",
+            });
+        }
+        if observed.iter().all(|mass| mass.is_zero()) {
+            continue;
+        }
+        if observed.iter().sum::<Rat>() != Rat::one() {
+            return Err(HnnError::Unadmitted {
+                reason: "a receiving face whose observed masses are no distribution",
+            });
+        }
+        let doubled: Vec<Rat> = observed
+            .iter()
+            .enumerate()
+            .map(|(class, mass)| {
+                let predicted: Rat = (0..columns)
+                    .map(|j| map.get(2 * class + 1, j).expect("in range") * &sample.feature[j])
+                    .sum();
+                if mass.is_positive() {
+                    &predicted + &four * &sample.covector[2 * class + 1] / mass
+                } else {
+                    predicted
+                }
+            })
+            .collect();
+        phase
+            .absorb(&sample.weight, &sample.feature, &observed, &doubled)
+            .map_err(|_| HnnError::Unadmitted {
+                reason: "the receiving law's phase statistics refuse a reading",
+            })?;
+    }
+    Ok(())
 }
 
 /// [definition; agent-inferred] **A normal law's step prepared at its unit step**
@@ -6812,6 +7010,16 @@ impl Constitution {
                         let (mut next, mut reading) = prepared
                             .stepped(&step_of(Family::Map), at)
                             .map_err(refused)?;
+                        // The receiving map's window of phase comparisons is absorbed into the same
+                        // successor, read through the map in force before this deposit (`law` is not
+                        // yet replaced; the map `prequential_terms` read in pass 1), so a refused
+                        // deposit absorbs nothing: the constitution publishes the successor whole
+                        // or not at all.
+                        if let (LinearLocus::Receiving(_), Some(phase)) =
+                            (step.locus, next.phase.as_mut())
+                        {
+                            absorb_phase(phase, law.map(), &step.samples).map_err(refused)?;
+                        }
                         // A located prior reads its window's terms and moves (the prior carry's
                         // design §3), one atomic successor of the stepped law.
                         match (&mut next.located, &terms) {
@@ -6970,6 +7178,7 @@ pub fn receiving_metric_samples(samples: &[Sample]) -> Option<Vec<Sample>> {
                     .enumerate()
                     .map(|(i, c)| if i % 2 == 0 { c * &scale } else { c.clone() })
                     .collect(),
+                masses: sample.masses.clone(),
             })
             .collect(),
     )
@@ -6990,7 +7199,7 @@ pub fn receiving_metric_samples(samples: &[Sample]) -> Option<Vec<Sample>> {
 pub fn receiving_class_metric(samples: &[Sample]) -> Option<Rat> {
     let (mut trace, mut count, mut classes) = (Rat::zero(), 0u64, 0usize);
     for sample in samples.iter().filter(|s| !s.weight.is_zero()) {
-        let masses = face_masses(&sample.covector)?;
+        let masses = face_masses(sample)?;
         classes = masses.len();
         trace += Rat::one() - masses.iter().map(|p| p * p).sum::<Rat>();
         count += 1;
@@ -7039,8 +7248,9 @@ fn receiving_fisher_face(samples: &[Sample], unit: &[Vec<Rat>]) -> Option<(Rat, 
             .collect();
         let real: Vec<&Rat> = delta.iter().step_by(2).collect();
         let imaginary: Vec<&Rat> = delta.iter().skip(1).step_by(2).collect();
-        // The covector is the descent `q − p̃`; the masses are `p̃ = q − covector`.
-        let masses = face_masses(&sample.covector)?;
+        // The covector is the descent `q − p̃`; the masses are the face's own `p̃` where the producer
+        // carries them, and `p̃ = q − covector` for the one-hot target otherwise.
+        let masses = face_masses(sample)?;
         let mean: Rat = masses.iter().zip(&real).map(|(p, d)| p * *d).sum();
         let second: Rat = masses.iter().zip(&real).map(|(p, d)| p * *d * *d).sum();
         let variance = second - &mean * &mean;
@@ -7921,7 +8131,8 @@ pub(crate) fn certify_storage_growth(
 ///   the contrast's normal law, the slices) with their statistics, its source port's normal law
 ///   whole (the map `E`, the carried Gram `H`, the solved chart `X̂` with its lattice, support and
 ///   certificate, and the carried remainders) with its pair ports and the navigator's transport
-///   modulus `ρ`, its receiving map's normal law whole with its located prior's pair, its landmark
+///   modulus `ρ`, its receiving map's normal law whole with its located prior's pair and its phase
+///   statistics, its landmark
 ///   tree's executed standing, its population's reading, and its resonator's declared gains with their
 ///   statistics;
 /// - every contact's channel factors `c`, `b`, `F` and their statistics;
@@ -8094,6 +8305,7 @@ impl LearnedRing {
                 (Some(saved), Some(declared)) => {
                     !same_law_shape(saved, declared)
                         || saved.receiving_prior() != declared.receiving_prior()
+                        || saved.phase.is_some() != declared.phase.is_some()
                         || saved.carrier() != declared.carrier()
                 }
                 _ => true,
@@ -8664,6 +8876,9 @@ impl LearnedRing {
         let passive_scale = scalar(lines, "passive-scale", "a ring's passive scale")?;
         let contrast_map = read_matrix(lines, "contrast", "a ring's contrast")?;
         let contrast = read_law(lines, contrast_map)?;
+        if contrast.phase.is_some() {
+            return refuse("a contrast law (it carries no phase statistics)");
+        }
         let count = number(
             head(next(lines, "a ring's slices")?, "slices", "a ring's slices")?.first(),
             "a ring's slices",
@@ -8684,8 +8899,10 @@ impl LearnedRing {
             read_optional_law(lines, "source", "a ring's source law")?
         };
         if let Some(law) = &source {
-            if law.located.is_some() || law.chart.scale != 0 {
-                return refuse("a source law (founded at the unit prior, with no located pair)");
+            if law.located.is_some() || law.phase.is_some() || law.chart.scale != 0 {
+                return refuse(
+                    "a source law (founded at the unit prior, with no located pair or phase statistics)",
+                );
             }
         }
         let transport = scalar(lines, "transport", "a ring's transport modulus")?;
@@ -9257,8 +9474,9 @@ fn read_rows(
 
 /// **A normal law's parts as text** ([`ContinuingState::to_text`]), its map written by its caller:
 /// `gram n` with its rows, `chart L_s δ k`, `support s` with the support, `block` with the chart's
-/// integer coordinates, `map-carry c` and `gram-carry c` each with `index value` lines, and
-/// `located from A₀ A₁ S` or `located none`.
+/// integer coordinates, `map-carry c` and `gram-carry c` each with `index value` lines,
+/// `located from A₀ A₁ S` or `located none`, and `phase none` or the phase statistics
+/// ([`write_phase`]).
 fn write_law(s: &mut String, law: &NormalLaw) {
     let join = |values: &mut dyn Iterator<Item = String>| values.collect::<Vec<_>>().join(" ");
     *s += &format!("gram {}\n", law.gram.len());
@@ -9290,6 +9508,96 @@ fn write_law(s: &mut String, law: &NormalLaw) {
         Some(pair) => *s += &format!("located {} {} {} {}\n", pair.from, pair.a0, pair.a1, pair.s),
         None => *s += "located none\n",
     }
+    match &law.phase {
+        Some(phase) => write_phase(s, phase),
+        None => *s += "phase none\n",
+    }
+}
+
+/// [definition; agent-inferred, October 8] **The phase statistics as text**, every value exact and
+/// nothing rounded (a checkpoint restores them whole; the readings were never kept): `phase K n N`
+/// (classes, features, cells), then per class its Gram `S_c` as `n` rows of `n`, its moment `m_c`
+/// as one line of `n`, and its second `s_c` as one line. The reason they are written whole: they
+/// are nonzero from the first receiving deposit on, so a save that refused nonzero statistics
+/// could never be written again, and one that dropped them would restore another constitution
+/// (`continued` is the saved one, `ContinuingState`).
+fn write_phase(s: &mut String, phase: &PhaseStatistics) {
+    *s += &format!(
+        "phase {} {} {}\n",
+        phase.classes(),
+        phase.features(),
+        phase.cells()
+    );
+    for class in 0..phase.classes() {
+        for row in phase.gram(class) {
+            write_values(s, row.iter());
+        }
+        write_values(s, phase.moment(class).iter());
+        write_values(s, std::iter::once(phase.second(class)));
+    }
+}
+
+/// **The phase statistics read from their text** ([`write_phase`]) beside the map of their law, or
+/// none. Refused where the declared classes and features are not the map's own (`m/2` classes of
+/// `n` features, so nothing is allocated off the shape the map declared) or any line is off its
+/// form.
+fn read_phase(
+    lines: &mut std::str::Lines<'_>,
+    map: &ExactRatMatrix,
+) -> Result<Option<PhaseStatistics>, HnnError> {
+    let words = head(
+        next(lines, "the phase statistics")?,
+        "phase",
+        "the phase statistics",
+    )?;
+    let [classes, features, cells] = match words.as_slice() {
+        [none] if none == "none" => return Ok(None),
+        [classes, features, cells] => [classes, features, cells],
+        _ => return refuse("the phase statistics"),
+    };
+    let (classes, features) = (
+        number(Some(classes), "the phase statistics' classes")?,
+        number(Some(features), "the phase statistics' features")?,
+    );
+    let cells = cells
+        .parse::<Rat>()
+        .map_err(|_| HnnError::ContinuingState {
+            what: "the phase statistics' cells",
+        })?;
+    if classes != map.rows() / 2 || features != map.columns() {
+        return refuse("the phase statistics against the receiving map's classes and features");
+    }
+    let (mut grams, mut moments, mut seconds) = (
+        Vec::with_capacity(classes),
+        Vec::with_capacity(classes),
+        Vec::with_capacity(classes),
+    );
+    for _ in 0..classes {
+        let mut gram = Vec::with_capacity(features);
+        for _ in 0..features {
+            let row = rats(next(lines, "a phase Gram row")?, "a phase Gram row")?;
+            if row.len() != features {
+                return refuse("a phase Gram row's width");
+            }
+            gram.push(row);
+        }
+        let moment = rats(next(lines, "a phase moment")?, "a phase moment")?;
+        if moment.len() != features {
+            return refuse("a phase moment's width");
+        }
+        let [second] = <[Rat; 1]>::try_from(rats(next(lines, "a phase second")?, "a phase second")?)
+            .map_err(|_| HnnError::ContinuingState {
+                what: "a phase second (one value)",
+            })?;
+        grams.push(gram);
+        moments.push(moment);
+        seconds.push(second);
+    }
+    PhaseStatistics::from_parts(classes, features, grams, moments, seconds, cells)
+        .map(Some)
+        .map_err(|_| HnnError::ContinuingState {
+            what: "the phase statistics off their form",
+        })
 }
 
 /// **A normal law read from its parts** ([`write_law`]) beside its map. Refused where the chart's
@@ -9421,6 +9729,7 @@ fn read_law(lines: &mut std::str::Lines<'_>, map: ExactRatMatrix) -> Result<Norm
         }
         _ => return refuse("the located pair"),
     };
+    let phase = read_phase(lines, &map)?;
     // The scale founds the Gram off its support, the support is exactly the rows that leave
     // `2^k I` (as `GramBlock::of` reads it), and the scale bounds the chart's lattice from below.
     // A lawful prior never passes the carrier's residual shift (a move there holds), so no larger
@@ -9456,6 +9765,7 @@ fn read_law(lines: &mut std::str::Lines<'_>, map: ExactRatMatrix) -> Result<Norm
         map_carry,
         gram_carry,
         located,
+        phase,
     })
 }
 

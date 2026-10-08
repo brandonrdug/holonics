@@ -331,6 +331,7 @@ fn class_metric_direction_pairs_with_the_original_comparison_covector() {
         weight: Rat::one(),
         feature: vec![Rat::one()],
         covector: vec![rat(1, 2), Rat::zero(), rat(-1, 2), Rat::zero()],
+        masses: None,
     };
     let metric = receiving_class_metric(std::slice::from_ref(&original)).unwrap();
     assert_eq!(metric, integer(2));

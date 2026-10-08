@@ -541,10 +541,10 @@ impl Deposit {
         self.reached.clone()
     }
 
-    /// Its exact bits, a reading: every entry of every linear sample (its weight, feature and
-    /// covector), of every factor step (its descent direction and feature energy), each by its
-    /// numerator's and denominator's bits, and of every landmark step (its address letters' codes
-    /// and its class, as naturals).
+    /// Its exact bits, a reading: every entry of every linear sample (its weight, feature,
+    /// covector and carried face masses), of every factor step (its descent direction and feature
+    /// energy), each by its numerator's and denominator's bits, and of every landmark step (its
+    /// address letters' codes and its class, as naturals).
     pub fn bits(&self) -> u64 {
         let bits = |x: &Rat| x.numer().bits() + x.denom().bits();
         let linear: u64 = self
@@ -555,6 +555,7 @@ impl Deposit {
                 std::iter::once(&sample.weight)
                     .chain(&sample.feature)
                     .chain(&sample.covector)
+                    .chain(sample.masses.iter().flatten())
             })
             .map(bits)
             .sum();

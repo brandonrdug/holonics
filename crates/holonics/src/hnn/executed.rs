@@ -222,6 +222,7 @@ pub fn pair_deposit(
             weight: Rat::one(),
             feature: unit_feature(x),
             covector: slip.clone(),
+            masses: None,
         })
         .collect();
     let retained = retained_on_motion(field, &[ring]);

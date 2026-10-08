@@ -3362,6 +3362,7 @@ impl SourceObserverPrediction<'_, '_> {
                         weight: Rat::one(),
                         feature: field.ring(0).rotate(feature, lift),
                         covector: gradient.iter().map(|x| -x).collect(),
+                        masses: None,
                     })
                 })
                 .collect();
