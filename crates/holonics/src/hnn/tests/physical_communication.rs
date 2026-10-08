@@ -168,7 +168,7 @@ fn finite_loaded_span_carries_the_actual_contact_response_at_its_clock() {
                 sum
             };
             let before = norm(&state);
-            let mut word = Word::continuing(&field,operands,&state,&nothing,opened_at).unwrap();
+            let mut word = Word::continuing(&field,operands.clone(),&state,&nothing,opened_at).unwrap();
             assert!(word.tick().unwrap().closes());
             assert!(norm(&word.change().unwrap()) <= &witness.gamma[0]*before);
         }

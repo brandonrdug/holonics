@@ -1,0 +1,45 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling thiserror v2.0.19
+   Compiling quote v1.0.47
+   Compiling syn v3.0.3
+   Compiling thiserror-impl v2.0.19
+   Compiling holonics v0.1.0 (/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-loadedspan-eed8-20261008/source-v1/crates/holonics)
+error[E0382]: borrow of moved value: `operands`
+    --> crates/holonics/src/hnn/tests/physical_communication.rs:148:50
+     |
+ 146 |         let operands = Operands::exact_at_cut(&field,&ray,&current).unwrap();
+     |             --------   ----------------------------------------------------- this reinitialization might get skipped
+     |             |
+     |             move occurs because `operands` has type `hnn::propagation::Operands`, which does not implement the `Copy` trait
+ 147 |         for opened_at in [0,1] {
+     |         ---------------------- inside of this loop
+ 148 |             let witness = FiniteContactSpans::of(&operands,opened_at,&reach).unwrap()
+     |                                                  ^^^^^^^^^ value borrowed here after move
+...
+ 171 |             let mut word = Word::continuing(&field,operands,&state,&nothing,opened_at).unwrap();
+     |                                                    -------- value moved here, in previous iteration of loop
+     |
+note: consider changing this parameter type in method `continuing` to borrow instead if owning the value isn't necessary
+    --> crates/holonics/src/hnn/word.rs:2034:19
+     |
+2032 |     pub fn continuing(
+     |            ---------- in this method
+2033 |         field: &'c Field,
+2034 |         operands: Operands,
+     |                   ^^^^^^^^ this parameter takes ownership of the value
+help: consider moving the expression out of the loop so it is only moved once
+     |
+ 147 ~         let mut value = Word::continuing(&field,operands,&state,&nothing,opened_at);
+ 148 ~         for opened_at in [0,1] {
+ 149 |             let witness = FiniteContactSpans::of(&operands,opened_at,&reach).unwrap()
+ ...
+ 171 |             let before = norm(&state);
+ 172 ~             let mut word = value.unwrap();
+     |
+help: consider cloning the value if the performance cost is acceptable
+     |
+ 171 |             let mut word = Word::continuing(&field,operands.clone(),&state,&nothing,opened_at).unwrap();
+     |                                                            ++++++++
+
+For more information about this error, try `rustc --explain E0382`.
+error: could not compile `holonics` (lib test) due to 1 previous error

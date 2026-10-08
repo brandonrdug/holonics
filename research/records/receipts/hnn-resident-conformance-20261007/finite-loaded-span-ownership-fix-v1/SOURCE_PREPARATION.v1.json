@@ -1,0 +1,215 @@
+{
+  "utc": "2026-10-08T01:11:00.270118+00:00",
+  "base": "eed88d0a31e4ceb5b823dbe734180a2a0bfbedfe",
+  "source_owner_jobs": 0,
+  "source_change": {
+    "path": "crates/holonics/src/hnn/tests/physical_communication.rs",
+    "before": {
+      "bytes": 54931,
+      "sha256": "6e81df1ec81440bbbc11b585dfcf29c809ddb86ada2066defadc7b415dda0e43"
+    },
+    "after": {
+      "bytes": 54939,
+      "sha256": "5113a22e965709dfe79bd68ba5da3fdd67dddecf860a07be26e2416ef1c5e972"
+    },
+    "exact_change": "Own a clone of the same immutable producing operands in each pump-phase Word"
+  },
+  "only_native_changed_path": "crates/holonics/src/hnn/tests/physical_communication.rs",
+  "unchanged_native_inputs": 302,
+  "predecessor_303_input_seals_reverified": true,
+  "source_invariants": {
+    "all_bytes_outside_the_single_clone_expression_unchanged": true,
+    "production_inputs_byte_identical": true,
+    "all_original_seven_acceptance_function_bodies_unchanged": true,
+    "new_finite_controls_assertions_unchanged": true,
+    "three_joint_factor_rays_and_two_phases_unchanged": true,
+    "witness_and_rest_borrow_the_same_operands_each_phase": true,
+    "six_words_and_six_operand_clones": true,
+    "no_added_word_or_solve_column_work": true
+  },
+  "sibling_review": "Initial response Word already clones new; old/new/D-only propagation Words own distinct operands once; no repeated moved producer found in the two finite controls or adjacent mechanical control.",
+  "predecessor_queue": {
+    "validation": "/home/b/Workspaces/holonics/research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v90/VALIDATION.json",
+    "pin": {
+      "bytes": 311489,
+      "sha256": "72fc44d8f36268b1e5710c90f196b1cdad4e9a579b22d38683bf9a74a721d893"
+    },
+    "grade": "FINITE_LOADED_SPAN_SOURCE_OR_CONTROL_REFUSED",
+    "source_commit": "eed88d0a31e4ceb5b823dbe734180a2a0bfbedfe",
+    "per_selector": [
+      {
+        "selector": "hnn::tests::physical_communication::finite_loaded_span_carries_the_actual_contact_response_at_its_clock",
+        "status": "UNLAUNCHED_AFTER_FIRST_REFUSAL"
+      },
+      {
+        "selector": "hnn::reference::continuation::a_zero_receiving_map_returns_no_covector_to_the_contact",
+        "status": "UNLAUNCHED_AFTER_FIRST_REFUSAL"
+      },
+      {
+        "selector": "hnn::reference::continuation::an_uncompared_contact_read_changes_no_material_statistic",
+        "status": "UNLAUNCHED_AFTER_FIRST_REFUSAL"
+      },
+      {
+        "selector": "hnn::tests::physical_communication::native_contact_step_consumes_the_finite_loaded_span_witness",
+        "status": "UNLAUNCHED_AFTER_FIRST_REFUSAL"
+      }
+    ],
+    "stages": {
+      "hnn-loadedspan-eed8-cache-preparation-20261006-v1": {
+        "phase": "cache-preparation",
+        "accepted_stage": true,
+        "whole_wall_ns": 8811410496,
+        "CPU_ns": 6863614000,
+        "fixed_guard_ns": 17000000000,
+        "measured_to_guard": {
+          "numerator": 8811410496,
+          "denominator": 17000000000
+        },
+        "group_peak_bytes": 4294967296,
+        "child_RSS_KiB": 31220,
+        "memory_events_delta": {
+          "low": 0,
+          "high": 0,
+          "max": 3832,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0,
+          "sock_throttled": 0
+        },
+        "wall_stop": false,
+        "CPU_stop": false,
+        "floor_stop": false,
+        "inputs_unchanged": true,
+        "quiescent_released": true
+      },
+      "hnn-loadedspan-eed8-library-check-20261006-v1": {
+        "phase": "library-check",
+        "accepted_stage": true,
+        "whole_wall_ns": 6887125166,
+        "CPU_ns": 6921072000,
+        "fixed_guard_ns": 65000000000,
+        "measured_to_guard": {
+          "numerator": 6887125166,
+          "denominator": 65000000000
+        },
+        "group_peak_bytes": 1001041920,
+        "child_RSS_KiB": 885504,
+        "memory_events_delta": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0,
+          "sock_throttled": 0
+        },
+        "wall_stop": false,
+        "CPU_stop": false,
+        "floor_stop": false,
+        "inputs_unchanged": true,
+        "quiescent_released": true
+      },
+      "hnn-loadedspan-eed8-library-guard-lints-20261006-v1": {
+        "phase": "library-guard-lints",
+        "accepted_stage": true,
+        "whole_wall_ns": 9402254270,
+        "CPU_ns": 9570139000,
+        "fixed_guard_ns": 65000000000,
+        "measured_to_guard": {
+          "numerator": 9402254270,
+          "denominator": 65000000000
+        },
+        "group_peak_bytes": 1007181824,
+        "child_RSS_KiB": 931160,
+        "memory_events_delta": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0,
+          "sock_throttled": 0
+        },
+        "wall_stop": false,
+        "CPU_stop": false,
+        "floor_stop": false,
+        "inputs_unchanged": true,
+        "quiescent_released": true
+      },
+      "hnn-loadedspan-eed8-guard-doctests-20261006-v1": {
+        "phase": "guard-doctests",
+        "accepted_stage": true,
+        "whole_wall_ns": 20840686758,
+        "CPU_ns": 40062036000,
+        "fixed_guard_ns": 65000000000,
+        "measured_to_guard": {
+          "numerator": 20840686758,
+          "denominator": 65000000000
+        },
+        "group_peak_bytes": 2747129856,
+        "child_RSS_KiB": 2055308,
+        "memory_events_delta": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0,
+          "sock_throttled": 0
+        },
+        "wall_stop": false,
+        "CPU_stop": false,
+        "floor_stop": false,
+        "inputs_unchanged": true,
+        "quiescent_released": true
+      },
+      "hnn-loadedspan-eed8-lib-test-build-20261006-v1": {
+        "phase": "lib-test-build",
+        "accepted_stage": false,
+        "whole_wall_ns": 14353888299,
+        "CPU_ns": 15430817000,
+        "fixed_guard_ns": 65000000000,
+        "measured_to_guard": {
+          "numerator": 14353888299,
+          "denominator": 65000000000
+        },
+        "group_peak_bytes": 1477492736,
+        "child_RSS_KiB": 1389868,
+        "memory_events_delta": {
+          "low": 0,
+          "high": 0,
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0,
+          "oom_group_kill": 0,
+          "sock_throttled": 0
+        },
+        "wall_stop": false,
+        "CPU_stop": false,
+        "floor_stop": false,
+        "inputs_unchanged": true,
+        "quiescent_released": true
+      }
+    },
+    "unchanged_resource_caps": true,
+    "diagnostic": {
+      "file": "LIBTEST_E0382.v90.stderr",
+      "pin": {
+        "bytes": 2528,
+        "sha256": "bf987c4fbbdb0650338a5fc38034790a4a802276c1fbed1039362117ce1e2898"
+      }
+    }
+  },
+  "checks": {
+    "rustfmt_parse_emit_stdout": {
+      "exit_code": 0,
+      "source_mutated": false
+    },
+    "git_diff_check": {
+      "exit_code": 0
+    }
+  },
+  "successor_type_and_native_acceptance": false,
+  "scope": "Control ownership/lifecycle fix only. Existing source-bound successes remain predecessor-bound; all four finite loaded-span controls unlaunched; no learned material, useful output or new law credit.",
+  "queue_requirement": "Fresh source-matched cfg(test) artifact before controls; queue owns exact unchanged source/guard cache treatment, complete successor projection including six clones, fixed caps and admission. No owner execution."
+}

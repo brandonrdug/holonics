@@ -739,3 +739,23 @@ nonzero material, acquired output, all-future domain release, cold continuation 
 parity is asserted. The ring's own learned gain ray, modulated schedule, nonlinear and
 charted residual inputs, tighter admitted source-specific certificate and Lean closure
 of the concrete loaded stage inequalities remain separately owed in #62.
+
+### October 8: the finite loaded-span control's producing operands
+
+[measured; source-bound] Queue continuation-v90 tested `eed88d0a3`: the library check,
+three guards and 57 doctests passed, but the test binary was refused with E0382.
+The joint-ray control moved its `Operands` into the first pump-phase Word and tried
+to borrow those operands for the second phase. All four native controls remained
+unlaunched. The saved diagnostic and complete stage costs are retained in
+[`finite-loaded-span-ownership-fix-v1`](receipts/hnn-resident-conformance-20261007/finite-loaded-span-ownership-fix-v1).
+These are predecessor results, not successor acceptance or an executor failure.
+
+[implementation; agent-inferred] Each phase's Word now owns a clone of the same
+immutable operands used by that phase's finite witness and complete starting state.
+The declaration and ray remain fixed; `opened_at` still supplies the actual pump
+phase to both witness and Word. Both phase iterations, all factor rays and all
+assertions remain. The six Word constructions make six explicit operand clones;
+there are no added Words, solve-column reads, teachers or production-law changes.
+The sibling constructions either already clone a reused operand or move distinct
+operands once. Syntax and source checks pass; fresh type/native validation belongs
+to the sole queue under the unchanged caps and a successor-matched projection.
