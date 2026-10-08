@@ -1,6 +1,7 @@
 {
-  "claim": "Parser and whitespace only; no compiler/native tests/training by owner",
+  "claim": "Rust parser and whitespace only; no compiler/native tests/training by owner",
   "base": "14418468094aa9f19efe77a8166919280b68be95",
+  "core_predecessor": "6a4d4e15d63620aeb4eb9d6ba5eb3955e7850145",
   "parser": [
     {
       "path": "crates/holonics-cuda/src/hnn/readout.rs",
@@ -9,6 +10,16 @@
     },
     {
       "path": "crates/holonics/src/hnn/physical.rs",
+      "parser_exit": 0,
+      "stderr": ""
+    },
+    {
+      "path": "crates/holonics/src/hnn/physical/action.rs",
+      "parser_exit": 0,
+      "stderr": ""
+    },
+    {
+      "path": "crates/holonics/src/hnn/physical/action/world.rs",
       "parser_exit": 0,
       "stderr": ""
     },
@@ -53,41 +64,6 @@
       "stderr": ""
     },
     {
-      "path": "crates/holonics/src/hnn/word/finite_gain.rs",
-      "parser_exit": 0,
-      "stderr": ""
-    },
-    {
-      "path": "crates/holonics/src/hnn/word/variation.rs",
-      "parser_exit": 0,
-      "stderr": ""
-    },
-    {
-      "path": "crates/holonics/src/hnn/word/variation/rebase.rs",
-      "parser_exit": 0,
-      "stderr": ""
-    },
-    {
-      "path": "crates/holonics/src/receiver/reception.rs",
-      "parser_exit": 0,
-      "stderr": ""
-    },
-    {
-      "path": "research/notebook/hnn_design/hnn_continuing_behavior.rs",
-      "parser_exit": 0,
-      "stderr": ""
-    },
-    {
-      "path": "crates/holonics/src/hnn/physical/action.rs",
-      "parser_exit": 0,
-      "stderr": ""
-    },
-    {
-      "path": "crates/holonics/src/hnn/physical/action/world.rs",
-      "parser_exit": 0,
-      "stderr": ""
-    },
-    {
       "path": "crates/holonics/src/hnn/word/action.rs",
       "parser_exit": 0,
       "stderr": ""
@@ -98,12 +74,32 @@
       "stderr": ""
     },
     {
+      "path": "crates/holonics/src/hnn/word/finite_gain.rs",
+      "parser_exit": 0,
+      "stderr": ""
+    },
+    {
+      "path": "crates/holonics/src/hnn/word/variation.rs",
+      "parser_exit": 0,
+      "stderr": ""
+    },
+    {
       "path": "crates/holonics/src/hnn/word/variation/gain.rs",
       "parser_exit": 0,
       "stderr": ""
     },
     {
+      "path": "crates/holonics/src/hnn/word/variation/rebase.rs",
+      "parser_exit": 0,
+      "stderr": ""
+    },
+    {
       "path": "crates/holonics/src/hnn/word/world_boundary.rs",
+      "parser_exit": 0,
+      "stderr": ""
+    },
+    {
+      "path": "crates/holonics/src/receiver/reception.rs",
       "parser_exit": 0,
       "stderr": ""
     },
@@ -116,10 +112,20 @@
       "path": "crates/holonics/tests/physical_action.rs",
       "parser_exit": 0,
       "stderr": ""
+    },
+    {
+      "path": "research/notebook/hnn_design/hnn_continuing_behavior.rs",
+      "parser_exit": 0,
+      "stderr": ""
+    },
+    {
+      "path": "research/notebook/hnn_design/hnn_prediction.rs",
+      "parser_exit": 0,
+      "stderr": ""
     }
   ],
   "diff_check_exit": 0,
   "diff_check_output": "",
-  "runner": "API adapter not yet integrated, excluded from first immutable core commit",
-  "scientific_protocol": "World plus held HNN-only J unadmitted; do not launch whole runner"
+  "runner": "narrow persistent-World API adapter and honest closed/scoped domains integrated; no native runner launched",
+  "scientific_protocol": "World plus held HNN-only J unadmitted; do not launch combined foundation protocol"
 }

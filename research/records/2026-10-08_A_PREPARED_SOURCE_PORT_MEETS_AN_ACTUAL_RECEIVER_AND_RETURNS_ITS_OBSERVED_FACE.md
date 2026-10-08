@@ -239,3 +239,13 @@ Geometry's independent 8-row/12-column law control checks every row with the fre
 reverse law plus the incoming full opening pairing. The point coordinate domain remains
 distinct from the loaded local RHS-stream bound. Its test and overhead are unmeasured here;
 the sole queue owns compile/native acceptance under the existing budgets.
+
+The narrow runner adapter preserves the original `continuing-behavior` closed-field
+seven-passage/C/K/D-movement acceptance unchanged. A separate `native-world-history`
+selector uses the two existing receiving observations and two scoped actual World
+encounters, then ends with that same World retained. It does not start the unsupported
+HNN-only held-contact future, discard World, clear J or claim the full foundation passed.
+Its name is a dispatch selector; full history/choice evidence is the separately bounded
+mechanical law control, not inferred from two observed faces. The sole queue receives
+compiler/mechanical selectors first; any scoped World run requires source-matched measured
+preflight/projection under the same caps and a fresh specific admission.

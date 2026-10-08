@@ -388,6 +388,11 @@ fn main() {
             let pin = pinned(&arguments[4], "executed continuing-behavior", clock, true);
             continuing_behavior::run(&arguments[3], &pin)
         }
+        (Some("executed"), Some("native-world-history")) => {
+            assert_eq!(arguments.len(), 5, "native-world-history <out> <committed pin>");
+            let pin = pinned(&arguments[4], "executed native-world-history", clock, true);
+            continuing_behavior::run_world_history(&arguments[3], &pin)
+        }
         (Some("executed"), Some("physical-learn")) => {
             let command = match arguments[3].as_str() {
                 "pair-relation" => "executed physical-learn pair-relation",
