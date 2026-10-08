@@ -902,3 +902,66 @@ impl Remainders {
         }
     }
 }
+
+#[cfg(test)]
+mod witness {
+    use super::*;
+    use crate::ratio::{integer, rat};
+
+    /// **Two certified charts of one operator can split one image into different representatives**
+    /// (the October 8 trace of the carry-chain regressions). The word's face reads the junction's
+    /// carried representatives (`Word::anchor`), never their remainders, and a representative is the
+    /// chart's image split at the transients' lattice ([`carry`]), so the read is not invariant
+    /// under the choice among certified charts: where a chart puts an image exactly on a tie of the
+    /// transients' lattice (ties upward) and another certified chart of the same operator puts it one
+    /// chart unit below, the two representatives differ by one transient unit. This is why the
+    /// resident's kept charts are a retained operand. The read through them is the law's, and the
+    /// retention quotient must not merge residents that differ only in their charts, while a chain
+    /// whose images straddle no tie reads them equal (the regressions' printed separation count).
+    #[test]
+    fn two_certified_charts_of_one_operator_split_one_image_differently() {
+        let lattice = WordLattice::new(28, 12, 12);
+        let entries = |rows: [[i64; 2]; 2]| -> Vec<Vec<Rat>> {
+            rows.iter().map(|row| row.iter().map(|&x| integer(x)).collect()).collect()
+        };
+        let operator_matrix = ExactRatMatrix::shaped(2, 2, entries([[3, 1], [1, 2]])).unwrap();
+        let operator = Operator::of(&operator_matrix).unwrap();
+        let target = lattice.target();
+        // The rounded exact inverse, certified at the target.
+        let exact = ChartWords::of_matrix(
+            &operator_matrix.inverse().unwrap(),
+            lattice.chart_exponent(),
+        )
+        .unwrap();
+        assert!(certificate_of(&operator, &exact).unwrap() <= target);
+        // A second certified chart of the same operator: its first coordinate one chart unit lower.
+        let mut coordinates: Vec<BigInt> =
+            exact.words().iter().map(|&word| BigInt::from(word)).collect();
+        coordinates[0] -= BigInt::one();
+        let other = ChartWords::of_coordinates(2, 2, lattice.chart_exponent(), &coordinates).unwrap();
+        assert!(certificate_of(&operator, &other).unwrap() <= target);
+        assert_ne!(exact, other);
+        // A right side whose first image under the first chart lies exactly on a tie of the
+        // transients' lattice: X̂₀₀ s = u/2 with u = 2^(−L_w).
+        let transients = lattice.transient();
+        let tie = transients.unit() * rat(1, 2);
+        let right = vec![&tie / exact.entry(0, 0), Rat::zero()];
+        let image = |chart: &ChartWords| chart.to_matrix().unwrap().apply(&right).unwrap();
+        let (first, second) = (image(&exact), image(&other));
+        assert_eq!(first[0], tie);
+        assert!(second[0] < tie);
+        let (mut kept, mut cold) = (vec![Rat::zero(); 2], vec![Rat::zero(); 2]);
+        let read_kept = carry(&transients, &first, &mut kept);
+        let read_cold = carry(&transients, &second, &mut cold);
+        // Ties upward: the first reads one transient unit, the second zero.
+        assert_eq!(read_kept[0], transients.unit());
+        assert!(read_cold[0].is_zero());
+        assert_ne!(read_kept, read_cold);
+        // Each split is exact: representative plus remainder is the chart's image.
+        for (read, (rest, image)) in [(&read_kept, (&kept, &first)), (&read_cold, (&cold, &second))] {
+            for i in 0..2 {
+                assert_eq!(&read[i] + &rest[i], image[i].clone());
+            }
+        }
+    }
+}
