@@ -197,41 +197,67 @@ Its second part states the perfected laws:
    the CRT recovers a whole word past its admitted capacity. The decoder, fibre, clock and carry
    residuals are kept. A grain split is not a corruption witness.
 
-   **The first consumer, step 1** (`agent-inferred`; designed from a read-only survey of the
-   native path at `f12fb506c`, for review before any build). It is one file beside the located
-   transport, `compression/keys/duplex.rs`. It consumes `LocatedTransport`, `PairContact`/`pair_lock`,
-   `Encoding::{found, encode, readout}` and `width_over_readings` → `LawfulOptions::assemble` →
-   `release`. It founds no subsystem. The terms it adds, each stated as its equation at the consumer:
-   - `LocatedTransport::lifts(key, u)`: `ℓ₀ = key mod D`, `ℓ_{k+1} = ℓ_k + A(u_k) mod D`. These
-     are the driven lifts that the private `driven_patches` already steps.
-   - `Pairing::new(σ)`: refused unless `σ∘σ = id` and `σ(a) ≠ a` for every class. Its
-     complement-reverse is `σ̄(w)_k = σ(w_{n−1−k})`, with `σ̄∘σ̄ = id` and
-     `σ̄(vw) = σ̄(w)σ̄(v)`.
-   - **The partner, paired before the quotient.** Its lifts are `ℓ′_k = R(ℓ_{n−1−k})`, with `R`
-     the gauge's reflection (`reflect_key`). Since `reflected` is `R∘F∘R` and regenerates the same
-     passage, the partner is that mirror chart read in reverse, with complemented labels. Two
-     equations are checked at the consumer, using the existing `step` and `emit`:
-     `lt.reflected().step(ℓ′_{k+1}) = ℓ′_k`, and `σ(lt.reflected().emit(ℓ′_k)) = σ̄(u)_k`. No
-     `F⁻¹` is needed while the duplex is formed from the actual strand. Each strand is the
-     other's key.
-   - **Contacts.** A declared injective chart `v₊` of the classes into `ℚ³`, with `v₋ = v₊∘σ`.
-     The slip `s_k = v₊(u_k) − v₋(p_{n−1−k})` is read through `PairContact` at unit rates, and
-     the lock through `pair_lock(pair, 1, 1)`. The law is
-     `slipped = {k : p_{n−1−k} ≠ σ(u_k)}`.
-   - **The receiver's class** is `class_R(u) = (E e_{ℓ_k})_k`, the founded encoding's reading of
-     the placed lifts. `E` is the receiver's own quotient (`ker E ∩ R = ⋂_w ker(ρ T_w)`), not an
-     authored table. A substitution at `i` shifts every later lift by
-     `Δ = A(u′_i) − A(u_i)`. It is absorbed exactly when `E(e_{ℓ_k+Δ} − e_{ℓ_k}) = 0` for every
-     later `k`, which is the designed-placement law (item 5) on this carrier. On most helices
-     that blind subgroup is trivial, so nothing is absorbed. That is the receiver's honest
-     kernel, never enlarged.
-   - **Repair and release.** The repair family is factored per slipped contact,
-     `{u′_k, σ(p′_{n−1−k})}`, and a template frame collapses each factor. Release requires the
-     class to be constant over the whole family: zero width through `width_over_readings` at
-     tolerance zero. Otherwise the decoder holds, naming the contacts and the classes.
-   - `CarryHelix::of_residues(r)`: the unique `ℓ < D` with `residues(ℓ) = r` (the Lean owner is
-     `joint_residue_determines_position`). The absolute position keeps the carry from
-     `step_digits`.
+   **The first consumer, step 1** (`agent-inferred`). It was designed from a read-only survey of the
+   native path at `f12fb506c`, then corrected by Epime's source review (proceed, with five
+   corrections and the carried support). Its owned slice:
+   - `compression/keys/duplex.rs` and its tests;
+   - the `pub mod duplex` export in `compression/keys.rs`;
+   - two methods in `compression/keys/transport.rs`;
+   - the `helical.*` atlas owners.
+
+   It consumes `LocatedTransport`, `PairContact`/`pair_lock`, `Encoding::{found, encode}` and
+   `width_over_readings` → `LawfulOptions::assemble` → `release`, and founds no subsystem. Its
+   equations at the consumer:
+   - **Lifts, with the carry.** `LocatedTransport::lifts(key, u)` gives the `n + 1` absolute lifts
+     `ℓ₀ = key mod D`, `ℓ_{k+1} = ℓ_k + A(u_k)`, unreduced: phase `ℓ mod D`, whole winding
+     `ℓ div D`. `CarryHelix::of_residues(r)` gives the unique `ℓ ∈ [0, D)` with `residues(ℓ) = r`
+     (Lean `joint_residue_determines_position`); the absolute position keeps the winding.
+   - **Fit first.** The clean strand must be a passage of the transport,
+     `emit(ℓ_k mod D) = u_k` for every `k < n`. Otherwise the consumer returns the located defect,
+     never a duplex. No inverse branch of a non-injective `F` is chosen.
+   - **The partner, paired before the quotient.**
+     - `Pairing::new(σ)` refuses fixed points and non-involutions, and `σ̄(w)_k = σ(w_{n−1−k})`.
+     - The partner's `n + 1` lifts are `ℓ′_k = R(ℓ_n mod D) + (ℓ_n − ℓ_{n−k})`, `k = 0..n`, with
+       `R` the gauge's `reflect_key`. Their phases are `R(ℓ_{n−k})`, and the partner ends at
+       `reflect_key(key)`.
+     - Partner letter `k` is carried by the step `ℓ′_k → ℓ′_{k+1}` and read at its arrival. For
+       every `k < n` the consumer checks `lt.reflected().step(ℓ′_{k+1}) = ℓ′_k` and
+       `σ(lt.reflected().emit(ℓ′_{k+1})) = σ̄(u)_k`.
+     - This is `F′ = R∘F⁻¹∘R`, the reversed step keyed by arrival. `T_c⁻¹ = T_cᵀ` holds in the
+       native coordinates only; a physical paired return keeps `R`, the reversed order, the
+       complemented labels and the producing frames.
+   - **Contacts, kinematic only.** A declared injective chart `v₊` with `v₋ = v₊∘σ`. The unit-rate
+     slip `v₊(a) − v₋(b)` vanishes exactly when `b = σ(a)`, read through `PairContact` and
+     `pair_lock`. A power claim needs a declared positive-weight `ContactMaterial` that is definite
+     on the attained slips; none is made in this step.
+   - **The receiver's class** is `class_R(w) = ((E e_{ℓ_k mod D})_{k=0..n}, ℓ_n div D)`: every
+     receiving state, the terminal included, and the terminal carry probe. It is a read-only
+     receipt tuple, never retained as a per-occurrence chain; the continuing retained object
+     stays the future-sufficient quotient. `E` is founded from the development keys' chart and is
+     the receiver's own quotient, never an authored table.
+   - **The channel and inner code.** Substitutions at declared contacts on either strand, at
+     equal length: single-strand, or coordinated and complementary. The slipped contacts are
+     `{k : p′_{n−1−k} ≠ σ(u′_k)}`.
+   - **The repair family, exact and carried.** For the independent factors `F_k` (the clean letter,
+     or the two candidates at a slipped contact), the support keeps full carried positions:
+     `X_0 = {key}`, `X_{k+1} = {x + A(a) : x ∈ X_k, a ∈ F_k}`, with back-pointers to actual
+     members.
+     - `E` reads `x mod D`, and the carry probe reads the division with remainder of `x`. The
+       quotient is taken only after every admitted terminal and carry receiver is included.
+     - Since `0 ≤ A(a) < D` with at most two candidates a contact, `|X_k| ≤ k(D − 1) + 1`. A
+       rolling exact support needs at most two such sets, and the transition work is bounded by
+       `Σ_k |X_k||F_k|`. This is polynomial for this declared independent channel, not a general
+       claim that families are cheap.
+     - When fitting the transport couples the factors, only supported extendable prefixes count
+       (forward and backward support), and that added cost is stated.
+   - **Release.** The class is released exactly when it is constant over the complete family: zero
+     width through `width_over_readings` over the complete readings, never a sample. Otherwise the
+     consumer holds, naming the slipped contacts and two actual witness members with their differing
+     classes. A declared template side collapses each factor.
+   - **Absorption, against known truth only.** A coordinated substitution is absorbed exactly when
+     the damaged word's class equals the truth's class. Its carried shift `Δ = A(u′_i) − A(u_i)` is
+     a signed representative that moves every later absolute lift. The count stays on the
+     acceptance side, never inside the decoder.
 
    **The three boundary charts**, each with `σ` as its own half-turn. Each is a known-truth
    `SteppedTerrain` over the chart's alphabet. Placement uses the terrain's truth transport, so
