@@ -1099,9 +1099,13 @@ Its five parts:
      coordinated substitutions it contains: they change no class. A coordinated substitution
      outside the kernel changes the class without a witness. It is the code's residual, never
      claimed as refused. Only a comparison with known truth counts it; online it is invisible.
-   - A designed kernel holds the likely coordinated substitutions. On four letters, a frame
-     position whose kernel contains a type `v ∈ V` absorbs every substitution of that type there.
-     Retention keeps the quotient ([the retention contract](#the-retention-contract)).
+   - The kernel is the receiver's, fixed by the admitted future. It is never enlarged to hide a
+     defect that an admitted probe distinguishes ([the retention contract](#the-retention-contract)).
+     What is designed is the placement `P`. A coordinated substitution `T_{i,v}` of type `v` at
+     position `i` is absorbed, `q(P(T_{i,v}u)) = q(P(u))`, exactly when its reached difference
+     `δ_{i,v}(u) = P(T_{i,v}u) − P(u)` lies in the kernel. Absorbing a type at a position needs this
+     for every admitted background `u`: under located advances a substitution moves the later
+     placements, so the difference is the reached one, not the letter's.
 5. **Topology (cycle).** For two closed strands the linking number `Lk`, the whole windings of one
    about the other, is half the signed count of the crossings between them in a declared
    projection.
@@ -1153,7 +1157,8 @@ Its five parts:
   `|1 − ζ^q|` measures how near. The golden winding keeps it largest,
   `liminf_q q·‖qφ‖ = 1/√5`, the most any irrational attains (Hurwitz). A word repeating in whole
   turns resonates and shapes its carrier;
-- a designed kernel absorbs the likely coordinated defects, and the rest is a counted residual;
+- a designed placement puts the likely coordinated defects' reached differences in the receiver's
+  kernel, and the rest is the residual;
 - on closed strands the topology fixes `Lk`, so twist and writhe exchange and only crossings change
   it. The energy of that exchange is constitutive.
 

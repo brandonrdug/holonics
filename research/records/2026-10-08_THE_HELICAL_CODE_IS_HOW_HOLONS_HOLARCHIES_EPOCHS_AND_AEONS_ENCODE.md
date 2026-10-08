@@ -28,9 +28,10 @@ proved part's hypotheses:
 3. **frames**: receivers' residue partitions, read together with the whole winding and the epoch
    (an interval between section arrivals, across which a residue recurs). The dihedral group acts
    simply transitively on a duplex's frames;
-4. a **decoder** with its declared channel: the pairing as an inner repetition code that locates
-   single-strand defects, and a quotient with a designed kernel as the outer code, with the
-   coordinated substitutions outside the kernel as its counted residual;
+4. a **decoder** with its declared channel. The pairing is an inner repetition code that locates
+   single-strand defects. The receiver's quotient is the outer code: its kernel is fixed by the
+   admitted future, and the placement is designed to put likely defects' reached differences in
+   it. Coordinated substitutions outside the kernel are the residual;
 5. a **topology**: the linking number of closed strands, split as twist plus writhe and changed
    only by crossings.
 
@@ -140,6 +141,25 @@ the Lean check before any claim. Its second part states the perfected laws:
    - the lift `B` where `σ` descends through the founded fibre. Otherwise the duplex is paired
      before that quotient.
 
+   [agent-inferred; read from the owner] **Where the pairing sits on the native path.**
+   - `LocatedTransport::reflected` (`A ↦ −A`, `λ ↦ λ∘(c ↦ −c)`, `reflect_key`) is the dihedral
+     **gauge** of the receiving chart. It is the mirror chart that regenerates the same passage, an
+     ambiguity of location kept in each fibre. It is not the pairing.
+   - The pairing reverses the passage. Its navigator is the dyad-conjugated inverse of the strand's
+     step: `F′ = R∘F⁻¹∘R` with `F(ℓ) = ℓ + A(λ(c(ℓ)))` and `R` the gauge's reflection. This is
+     `USU = S⁻¹` on the navigator, with complemented labels `σ∘λ`.
+   - With class-dependent advances, `F⁻¹` is keyed by the arrival's class, not the emission's. The
+     partner's advance at its position `k` is the strand's advance at position `n−2−k`, so the
+     partner is not a located transport of the same form. This is the reversed relation the native
+     path must declare.
+   - Where `F` is not injective, the reversal has a preimage fibre. The paired strand's actual lifts
+     resolve it: each strand is the other's key.
+   - The labels enter no chart (the relabelling law), so `σ` acts only on the boundary decoder.
+   - Each transport `T_c` is a cyclic shift, a permutation matrix, so `T_c⁻¹ = T_cᵀ`. The partner's
+     chart is therefore the adjoint chart: the antiparallel complementary strand is the adjoint
+     passage. It runs in reversed order with transposed transports, the same shape as the learning
+     covector's return through the producing operands.
+
    [agent-inferred] **The chart.** On a rotation carrier the dyad is conjugation: `BUB = U⁻¹` for
    `U` multiplication by a unit `ζ`. So complements embed as conjugates off the real axis, and a
    letter on the axis would be its own complement. For four letters, the vertices `±2 ± i` of a
@@ -164,6 +184,12 @@ the Lean check before any claim. Its second part states the perfected laws:
    The source moment's coordinates stay bounded while its exact count bits grow, and neither it nor
    the CRT recovers a whole word past its admitted capacity. The decoder, fibre, clock and carry
    residuals are kept. A grain split is not a corruption witness.
+
+5. **The designed-placement law** (Epime's typed form over `Foundation/CausalRelevance`'s additive
+   carrier). `q(P(T_{i,v}u)) = q(P(u))` iff `δ_{i,v}(u) = P(T_{i,v}u) − P(u) ∈ K`, for every admitted
+   background `u`. The type `v` is a substitution operator, and the kernel holds its reached
+   difference. The law is owed to #62 with the consumer, and its types and hypotheses are kept
+   when the consumer is built.
 
 ## 6. Acceptance (fixed before any build; the channel revised the same day)
 
