@@ -27,7 +27,6 @@
 //! Lessons 3/6/7/9 are consumers here: unrepaired owner refusal ends the whole run, deposition
 //! must be the native certified return, actual output decides behavior, and no budget is raised.
 
-use std::fs::File;
 use std::io::{BufWriter, Write};
 use std::time::Instant;
 
@@ -1035,9 +1034,13 @@ pub(super) fn run_world_history(out: &str, pin: &exterior::Pin) {
 }
 
 fn run_domain(out: &str, pin: &exterior::Pin, world_domain: bool) {
-    std::fs::create_dir_all(out).expect("the output receipt directory");
-    let mut output =
-        BufWriter::new(File::create(format!("{out}/ACTUAL_OUTPUT.txt")).expect("actual output"));
+    #[allow(clippy::disallowed_types, clippy::disallowed_methods)] // exterior output, never the retained machine state
+    let mut output = {
+        std::fs::create_dir_all(out).expect("the output receipt directory");
+        BufWriter::new(
+            std::fs::File::create(format!("{out}/ACTUAL_OUTPUT.txt")).expect("actual output"),
+        )
+    };
     let all = Instant::now();
     let before_work = holonics::hnn::word::work::read();
     let accepted = exercise(&mut output, pin, world_domain);
@@ -1055,6 +1058,7 @@ fn run_domain(out: &str, pin: &exterior::Pin, world_domain: bool) {
     );
     if !accepted {
         // The complete receipt was flushed; a refused native operation is not process success.
+        #[allow(clippy::disallowed_methods)] // exterior notebook: a refused run exits nonzero
         std::process::exit(2);
     }
 }
