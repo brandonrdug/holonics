@@ -1,0 +1,227 @@
+{
+  "status": "boundary_AW_shuffle_prefix_PASS_normalized_prefix_FAIL",
+  "whole_canonical_Foundation_accepted": false,
+  "prefix_object_not_a_full_owner_replacement": true,
+  "Product_Pair": "not reached",
+  "rows": [
+    {
+      "name": "boundary",
+      "source_sha256": "f1cd58ae0336f3bc0bd68d99dcc5a1be224369a282b187ab9e0e140829741650",
+      "kernel": {
+        "kernel_accepted": true,
+        "compiler_exit": 0,
+        "compiler_wall_ns": 12275685686,
+        "axioms": {
+          "Holonics.DiagonalChainTransport.boundary_pairTwoShuffleAtom": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "Holonics.DiagonalChainTransport.boundary_pairTwoShuffle": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ]
+        },
+        "selector_count_matches": true,
+        "standard_axioms_only": true,
+        "metadata_unchanged": true,
+        "broad_library_checked": false
+      },
+      "post_cleanup_acceptance": {
+        "passed": true,
+        "final_CPU_receipt": {
+          "sha256": "9215ac15c07817b83f31c94e2e3a18cc1af9f69d840fb867037bc5ed740d387a",
+          "bytes": 4986
+        },
+        "cleanup_receipt": {
+          "sha256": "c12910c16e20ad1ed05abca1e4268dd8a7eee8e246aa44304518b048e7ef2e05",
+          "bytes": 735
+        },
+        "lease_still_held": true,
+        "scientific_job": false,
+        "requires_matching_release_receipt": true
+      },
+      "release": {
+        "released_after_final_publication_and_owned_unit_cleanup": true,
+        "quiescence_confirmed": true,
+        "external_controller_PID": 1560389,
+        "monotonic_ns": 293780030063924
+      },
+      "wall_ns": 15193252903,
+      "projection_ns": 17000000000,
+      "measured_to_projected": [
+        15193252903,
+        17000000000
+      ],
+      "CPU_ns": 13151573000,
+      "group_peak_bytes": 1728073728
+    },
+    {
+      "name": "aw",
+      "source_sha256": "c409920cd4631d87cb2eb586066ed85bf0cf3161ce01e2c8b270f1a02c00345c",
+      "kernel": {
+        "kernel_accepted": true,
+        "compiler_exit": 0,
+        "compiler_wall_ns": 11334153226,
+        "axioms": {
+          "Holonics.DiagonalChainTransport.boundary_pairTwoShuffle": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "Holonics.DiagonalChainTransport.pairFourReceiver_boundaryFiveAtom": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "Holonics.DiagonalChainTransport.pairFourReceiver_boundaryFive_zero": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ]
+        },
+        "selector_count_matches": true,
+        "standard_axioms_only": true,
+        "metadata_unchanged": true,
+        "broad_library_checked": false
+      },
+      "post_cleanup_acceptance": {
+        "passed": true,
+        "final_CPU_receipt": {
+          "sha256": "d72f7eef78af24a2b068dc5daa2c48b61f1c535a94329061a3eb392f3e4aee8e",
+          "bytes": 4895
+        },
+        "cleanup_receipt": {
+          "sha256": "f67f8a800b4d5137ec4a69605812ebd9a20f8592f9012606d343ba8ebd97cd57",
+          "bytes": 723
+        },
+        "lease_still_held": true,
+        "scientific_job": false,
+        "requires_matching_release_receipt": true
+      },
+      "release": {
+        "released_after_final_publication_and_owned_unit_cleanup": true,
+        "quiescence_confirmed": true,
+        "external_controller_PID": 1563732,
+        "monotonic_ns": 293952365651269
+      },
+      "wall_ns": 14267801633,
+      "projection_ns": 17000000000,
+      "measured_to_projected": [
+        14267801633,
+        17000000000
+      ],
+      "CPU_ns": 13539124000,
+      "group_peak_bytes": 925163520
+    },
+    {
+      "name": "shuffle",
+      "source_sha256": "b6ea06838a984fb4a7fa708ed13de563053603d7fb7736d31ef1610727efb26e",
+      "kernel": {
+        "kernel_accepted": true,
+        "compiler_exit": 0,
+        "compiler_wall_ns": 11195584307,
+        "axioms": {
+          "Holonics.DiagonalChainTransport.pairFourReceiver_pairTwoShuffleAtom": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ]
+        },
+        "selector_count_matches": true,
+        "standard_axioms_only": true,
+        "metadata_unchanged": true,
+        "broad_library_checked": false
+      },
+      "post_cleanup_acceptance": {
+        "passed": true,
+        "final_CPU_receipt": {
+          "sha256": "7061ac6fa44034f7bf7d2348dcc58480760c75a68dde80906d026676f40441d1",
+          "bytes": 4969
+        },
+        "cleanup_receipt": {
+          "sha256": "eb0a169047853d09426d8b9fc832c745bee5d577484481451a059eb501e24606",
+          "bytes": 733
+        },
+        "lease_still_held": true,
+        "scientific_job": false,
+        "requires_matching_release_receipt": true
+      },
+      "release": {
+        "released_after_final_publication_and_owned_unit_cleanup": true,
+        "quiescence_confirmed": true,
+        "external_controller_PID": 1565046,
+        "monotonic_ns": 294067826305426
+      },
+      "wall_ns": 14129633122,
+      "projection_ns": 17000000000,
+      "measured_to_projected": [
+        14129633122,
+        17000000000
+      ],
+      "CPU_ns": 13576560000,
+      "group_peak_bytes": 762556416
+    },
+    {
+      "name": "normalized",
+      "source_sha256": "7947076db69db3e6812d5ef213f067b1d78acb68567c89c5fc0fdf309db85461",
+      "kernel": {
+        "kernel_accepted": false,
+        "compiler_exit": 1,
+        "compiler_wall_ns": 10665811644,
+        "axioms": {
+          "Holonics.DiagonalChainTransport.normalizedTwoCoefficient_degenerate_zero": [
+            "propext",
+            "sorryAx",
+            "Classical.choice",
+            "Quot.sound"
+          ]
+        },
+        "selector_count_matches": true,
+        "standard_axioms_only": false,
+        "metadata_unchanged": true,
+        "broad_library_checked": false
+      },
+      "post_cleanup_acceptance": {
+        "passed": false,
+        "final_CPU_receipt": {
+          "sha256": "fc00140bd3c69053bed2174adfb9df7ad63d26e596f15bb80a53b55104566e61",
+          "bytes": 5275
+        },
+        "cleanup_receipt": {
+          "sha256": "80c709cf28fcf8663b6e507361ef45eca884d1e75f4df55a2ffa4ca43f3623ee",
+          "bytes": 799
+        },
+        "lease_still_held": true,
+        "scientific_job": false,
+        "requires_matching_release_receipt": true
+      },
+      "release": {
+        "released_after_final_publication_and_owned_unit_cleanup": true,
+        "quiescence_confirmed": true,
+        "external_controller_PID": 1566937,
+        "monotonic_ns": 294195138705151
+      },
+      "wall_ns": 13577406339,
+      "projection_ns": 17000000000,
+      "measured_to_projected": [
+        13577406339,
+        17000000000
+      ],
+      "CPU_ns": 13403817000,
+      "group_peak_bytes": 480206848
+    }
+  ],
+  "normalized_residual": "s0 initialVertex repeatVertexEdge return unfolded too early; exact compiler output preserved",
+  "correction_source_sha256": "695f2da74d29a0eec3051bc30c197ed200269ede75d4d85eab33e39443311c2c",
+  "caps_raised": false,
+  "_scoped_evidence": {
+    "original_receipt_pin": {
+      "bytes": 7167,
+      "sha256": "cee608cf70f720bd9f0821ca1ff97b15f1b596a5bf1c00d4ada042de1e769a2d"
+    },
+    "raw_machine_paths_and_runtime_copies_kept_private": true,
+    "mathematical_and_validation_values_preserved": true
+  }
+}

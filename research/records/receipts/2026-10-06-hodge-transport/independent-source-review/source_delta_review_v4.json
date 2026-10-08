@@ -1,0 +1,136 @@
+{
+  "scope": "Independent source review of detector-v4 s0 proof sequencing, exact normalized prefix, and canonical SectionResidual v2 import-only repair",
+  "source_review_result": "No mathematical defect found in these bounded deltas; new source/import bytes remain kernel unaccepted",
+  "verified_source_pins": [
+    {
+      "path": {
+        "private_machine_path_sha256": "ccf4785a7978a64723b27e89671287d7d6ea3233916bf4c4cd3aa6ad3b140f4f"
+      },
+      "sha256": "695f2da74d29a0eec3051bc30c197ed200269ede75d4d85eab33e39443311c2c",
+      "bytes": 69878
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "ee45656c563e1811f0e77a06f64c1c1b9188d7e4063735a5db0ee0aee5edcb00"
+      },
+      "sha256": "cc737e41d69ec55c29a15898f405bd555bc0f40ab65713789840fc4cded2a8a2",
+      "bytes": 84009
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "d0d4afd76b0c88d50264cdb2616ce0abde86f302f6327607b97c2f4ad6146509"
+      },
+      "sha256": "6e2ddfc2bea154fa3ad34a04c843eac272604263067fd3932917b11c4ae85c0c",
+      "bytes": 35094
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "2ec41fcf164e4a3fb733031ad647246188b9c36cf88aebdef0538ca8b2844c03"
+      },
+      "sha256": "841d5b94895b05d30f949e3c57e8c11c2413914d9923b2713f5536780dbb3acd",
+      "bytes": 4683
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "6db725aca6380a52e83dcf44b109af7a8a8b13fd344b5e5c5c869b398db4ba03"
+      },
+      "sha256": "42b02c455bb012fe616bf2334db4fa288f5d7d8a98c725b70b62c62b529a9d6b",
+      "bytes": 15959
+    }
+  ],
+  "verified_predecessor_pins": [
+    {
+      "path": {
+        "private_machine_path_sha256": "df01e40eb880e0d3269e3fe783f03bad485a7a02f5c535f146f7e3665e7677f8"
+      },
+      "sha256": "3409d618bdc87b72b5243eaaf5ac3b7d0fd6bbdccd5e9744f4c59cc41adb48f7",
+      "bytes": 69861
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "b2b189782d63aa3cc5e0697015031371d1f444ab1127810e855bdbac3e7071aa"
+      },
+      "sha256": "cc737e41d69ec55c29a15898f405bd555bc0f40ab65713789840fc4cded2a8a2",
+      "bytes": 84009
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "4ea2efe329a8875890e923bc8f5b7ccd21f932828d249bdc4957f11bc8e87c52"
+      },
+      "sha256": "6e2ddfc2bea154fa3ad34a04c843eac272604263067fd3932917b11c4ae85c0c",
+      "bytes": 35094
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "68b748227af6627bf43e5f476c7251608396331b0d7fe6a36916bb545d5718b9"
+      },
+      "sha256": "1466a879657e02cfc5a41193beaa13b926bb097ae62feb216ba2cfe224f841da",
+      "bytes": 4673
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "496b95dfd2a20de654b7892577ef1ddbdac1804dcdfb63655f19368bc12f3351"
+      },
+      "sha256": "42b02c455bb012fe616bf2334db4fa288f5d7d8a98c725b70b62c62b529a9d6b",
+      "bytes": 15959
+    }
+  ],
+  "foundation_delta": {
+    "anchor": "DiagonalChainTransport.lean:1409-1411",
+    "exact_single_proof_replacement_verified": true,
+    "equations_maps_hypotheses_unchanged": true,
+    "reason": "Unfold only the correction first, explicitly use d1 s0 = id on the still-folded initialVertex(repeatVertexEdge vertex), then unfold initialVertex and cancel. This addresses the exact v3 residual without discarding a degenerate source term.",
+    "prior_failure_stdout": {
+      "private_machine_path_sha256": "b2545102e63e1c24c849ef022ab984adf92738102f6c97e38fe461fbee3a6c85"
+    },
+    "s1_proof_unchanged": true,
+    "product_pair_byte_identical_to_v3": true
+  },
+  "canonical_delta": {
+    "anchor": "SectionResidual.lean:4",
+    "exact_single_import_replacement_verified": true,
+    "all_remaining_module_bytes_unchanged": true,
+    "partition_consumer_byte_identical_to_v1": true,
+    "reason": "The replacement publicly imports the old Complex.Basic owner and supplies Complex.instModule, specializing to Module \u211d \u2102 required by the existing linear receiver at line 103.",
+    "mathlib_owner": {
+      "private_machine_path_sha256": "f0283059a8a4de2a9ccc1e54bb3f0d61a2da6f6d57456e72eeadfdd97854754a"
+    },
+    "mathlib_owner_sha256": "e89fa5a5b6c21325b50c351b7e3f1303201e6bec4006e4650cca1f8913c6ba71",
+    "mathlib_instance_line": 97,
+    "prior_failure_stdout": {
+      "private_machine_path_sha256": "a1579a719c3469690918af6a110c343e92ad2263b22edbe526df1d46dfb936a2"
+    }
+  },
+  "normalized_prefix": {
+    "request": {
+      "private_machine_path_sha256": "c23a2345670150db72949418af2bc4141adebfaf0b113727e8d71cd6b8823372"
+    },
+    "sha256": "7546c50c6ae28b95448f22503cef53db9d248e8fb956ced868e5a191c21487b8",
+    "bytes": 69016,
+    "source_prefix_bytes": 68891,
+    "source_prefix_sha256": "ce39911124d074876e028ec9ab2f29598e2ace39a2c68e1b200ce2e5bbaaf3aa",
+    "exact_prefix_and_only_declared_suffix_verified": true,
+    "acceptance": [
+      "Holonics.DiagonalChainTransport.normalizedTwoCoefficient_degenerate_zero"
+    ],
+    "whole_module_acceptance_barred": true,
+    "kernel_status": "unchecked by reviewer"
+  },
+  "remaining_blocker": "Queue-owned acceptance of the new normalized prefix, complete Foundation, Product/Pair and changed importing consumers; canonical SectionResidual provider and Partition consumer also require their exact-source checks.",
+  "no_compiler_jobs_or_owner_edits": true,
+  "measurement": {
+    "wall_ns": 2103634,
+    "peak_resident_bytes": 19501056,
+    "threads": 1,
+    "outer_deadline_ns": 2000000000,
+    "projection_basis": "Prior small local source/hash review completed within 2-second bound; no compiler invocation"
+  },
+  "_scoped_evidence": {
+    "original_receipt_pin": {
+      "bytes": 6230,
+      "sha256": "da5c924204c053245b63fc98cb923bdab81e935e3bee94d3d4be1e28a0259472"
+    },
+    "raw_machine_paths_and_runtime_copies_kept_private": true,
+    "mathematical_and_validation_values_preserved": true
+  }
+}

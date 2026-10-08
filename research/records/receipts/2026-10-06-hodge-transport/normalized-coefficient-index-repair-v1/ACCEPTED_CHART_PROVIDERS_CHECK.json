@@ -1,0 +1,77 @@
+{
+  "status": "five complete chart/current/fourcycle owners accepted; normalized/public/pair still pending",
+  "receipt": {
+    "private_machine_path_sha256": "ff182e2c748ff45d950fd2ea0fbb21386c814b3d41160762930b471371a6e04f"
+  },
+  "receipt_pin": {
+    "sha256": "e4fed1827abd13ed8569c90e044c8df769b26cbcf78973344d2ec48d382adf0f",
+    "bytes": 197365
+  },
+  "accepted_selectors": 48,
+  "owners": [
+    {
+      "module": "HolonicsResearch.Hodge.HodgeTopologicalProductRealization",
+      "source_pin": {
+        "sha256": "bb8b13e71e7c04e46e2b66058c2d3a80d73c02048078421e708730a1cd27e820",
+        "bytes": 8991
+      },
+      "compiler_wall_ns": 5779138552,
+      "selectors": 4,
+      "standard_axioms_only": true,
+      "quiescent_release": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeTopologicalSingularCurrent",
+      "source_pin": {
+        "sha256": "d5bc66089c8a528ffa20ccf18a56aa393c799af69579170884b38e40de4f24c3",
+        "bytes": 21747
+      },
+      "compiler_wall_ns": 5077298921,
+      "selectors": 15,
+      "standard_axioms_only": true,
+      "quiescent_release": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSphereProductCurrent",
+      "source_pin": {
+        "sha256": "d478959cc584cb2dd8019a4985c2129fc4b08cba42488f13ae5fb84f75727f64",
+        "bytes": 14778
+      },
+      "compiler_wall_ns": 5797360838,
+      "selectors": 11,
+      "standard_axioms_only": true,
+      "quiescent_release": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSphereProductReconstruction",
+      "source_pin": {
+        "sha256": "baa0db745e69a05ed1388699874c550c47d0adab656b179675bad305ff875805",
+        "bytes": 19823
+      },
+      "compiler_wall_ns": 4566130894,
+      "selectors": 13,
+      "standard_axioms_only": true,
+      "quiescent_release": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSphereProductFourCycle",
+      "source_pin": {
+        "sha256": "db0a4d2bebb605919b7a12d303e80efdfab0bcde0d0050dfd4dd5f512462a4d3",
+        "bytes": 7123
+      },
+      "compiler_wall_ns": 3388629012,
+      "selectors": 5,
+      "standard_axioms_only": true,
+      "quiescent_release": true
+    }
+  ],
+  "failed_previous_normalized_owner": "two exact Fin.succ/literal face-index residuals, four sorryAx chains rejected; preceding complete receipts preserved",
+  "_scoped_evidence": {
+    "original_receipt_pin": {
+      "bytes": 2404,
+      "sha256": "911d176e575d744d01456da4a9397ed974f330a09027fc73f35bc63c407545ce"
+    },
+    "raw_machine_paths_and_runtime_copies_kept_private": true,
+    "mathematical_and_validation_values_preserved": true
+  }
+}

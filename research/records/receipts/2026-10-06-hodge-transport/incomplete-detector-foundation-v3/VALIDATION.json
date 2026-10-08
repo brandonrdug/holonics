@@ -1,0 +1,42 @@
+{
+  "status": "Foundation_detector_v3_INCOMPLETE_fixed_wall",
+  "source_sha256": "3409d618bdc87b72b5243eaaf5ac3b7d0fd6bbdccd5e9744f4c59cc41adb48f7",
+  "kernel_accepted": false,
+  "compiler_result": "no terminal result or kernel receipt",
+  "projection_ns": 17000000000,
+  "wall_ns": 17183424368,
+  "final_CPU_ns": 11074305000,
+  "peak_group_bytes": 4049846272,
+  "outer_error": "outer fixed wall projection exceeded",
+  "Product_Pair": "not reached",
+  "caps_raised": false,
+  "unchanged_retry_requested": false,
+  "acceptance": {
+    "passed": false,
+    "final_CPU_receipt": {
+      "sha256": "51b429f0eb4eac9b959f55352ccd061678026de98533b5a22298fc89a5c55237",
+      "bytes": 4410
+    },
+    "cleanup_receipt": {
+      "sha256": "8f5ab331af1cae7c8ce48a77d00b7be6910bd6ffcb4d12c0ef875487da3be3c4",
+      "bytes": 780
+    },
+    "lease_still_held": true,
+    "scientific_job": false,
+    "requires_matching_release_receipt": true
+  },
+  "release": {
+    "released_after_final_publication_and_owned_unit_cleanup": true,
+    "quiescence_confirmed": true,
+    "external_controller_PID": 1533836,
+    "monotonic_ns": 292971080263128
+  },
+  "_scoped_evidence": {
+    "original_receipt_pin": {
+      "bytes": 1135,
+      "sha256": "31b061536c67e5d1623435f02392c0039c9e85c54492d60ba6365326b37da463"
+    },
+    "raw_machine_paths_and_runtime_copies_kept_private": true,
+    "mathematical_and_validation_values_preserved": true
+  }
+}

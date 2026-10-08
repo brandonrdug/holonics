@@ -1,0 +1,1650 @@
+{
+  "main_base": "3a242c990e2fc5bfd31fea7c194372168db8ba09",
+  "sources_verified": 30,
+  "objects_rehashed": 60,
+  "Hodge_queries": 368,
+  "core_queries": 16,
+  "first_visible_Hodge_oleans_bound": 27,
+  "owners": [
+    {
+      "module": "HolonicsResearch.Foundation.DiagonalChainTransport",
+      "source": "lean/HolonicsResearch/Foundation/DiagonalChainTransport.lean",
+      "source_pin": {
+        "sha256": "695f2da74d29a0eec3051bc30c197ed200269ede75d4d85eab33e39443311c2c",
+        "bytes": 69878
+      },
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-full-foundation-v4/VALIDATION.json",
+      "receipt_pin": {
+        "sha256": "ac8536463f7d8b173f75bdabe752de42df152cba0511a48ab068d61268b590ce",
+        "bytes": 19331
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "c0ea8374870f6e13d84ef4857560bacc1c6c753ea71807dc1b28222324499cb0",
+            "bytes": 297870
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "c752ae7cd8c7680397bc049806b06caa1b93a6016b051af823344a4209742790",
+            "bytes": 2066592
+          }
+        }
+      ],
+      "queries": 20
+    },
+    {
+      "module": "HolonicsResearch.Foundation.ProductFactorCurrent",
+      "source": "lean/HolonicsResearch/Foundation/ProductFactorCurrent.lean",
+      "source_pin": {
+        "sha256": "5879a1b5239136365fc4b5a64ef4154c8a950b01470a853915162cdad008e9b6",
+        "bytes": 14510
+      },
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-product-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "sha256": "a11927bd33c7622e2a7040fb8be9945f844aacb46b6142d4608b1e88c26fab09",
+        "bytes": 286903
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "d05957c217b0877adcb1ab7e47755758addb8e43519e1e0d83bc232be2c594ee",
+            "bytes": 39022
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "7f48438ac6a58df4c3859cb083ec4cf43ac19f55442aabba74f6ca97d16018a1",
+            "bytes": 717320
+          }
+        }
+      ],
+      "queries": 24
+    },
+    {
+      "module": "HolonicsResearch.Foundation.ProductAxisBoundary",
+      "source": "lean/HolonicsResearch/Foundation/ProductAxisBoundary.lean",
+      "source_pin": {
+        "sha256": "911c9140c862a9db348447f4968cec9487b6ef7e1dc9442890c78e1d69bcf2e3",
+        "bytes": 29580
+      },
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-product-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "sha256": "a11927bd33c7622e2a7040fb8be9945f844aacb46b6142d4608b1e88c26fab09",
+        "bytes": 286903
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "9ab8ce033c066f799f703e35d5eaea7c4e04a274cffa76651cecf94de80908cb",
+            "bytes": 94744
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "849de3dbc96cdba3efa9dcca2e23d83cbdc1f8f2a46211c7c961f1d215fb9242",
+            "bytes": 1656176
+          }
+        }
+      ],
+      "queries": 33
+    },
+    {
+      "module": "HolonicsResearch.Foundation.ProductAugmentation",
+      "source": "lean/HolonicsResearch/Foundation/ProductAugmentation.lean",
+      "source_pin": {
+        "sha256": "d7de6a57fce6b259b56e85fee4c3c3cd26ed21fd62b1da0aeeac99a58fdebeca",
+        "bytes": 14993
+      },
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-product-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "sha256": "a11927bd33c7622e2a7040fb8be9945f844aacb46b6142d4608b1e88c26fab09",
+        "bytes": 286903
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "001d9c16ef2d2ceb7d76da7b71861bde312a50f0bbed34468640c14fedff4c60",
+            "bytes": 46400
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "9234d1a8b5ec63317a576668b081a96349d512ecd27bf11e18bab0722d944709",
+            "bytes": 747256
+          }
+        }
+      ],
+      "queries": 16
+    },
+    {
+      "module": "HolonicsResearch.Foundation.ProductEdgeContraction",
+      "source": "lean/HolonicsResearch/Foundation/ProductEdgeContraction.lean",
+      "source_pin": {
+        "sha256": "eb039e4c4a05e31329b1a9aa9deb7517c56b7814e026391e146958934a8ed681",
+        "bytes": 11549
+      },
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-product-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "sha256": "a11927bd33c7622e2a7040fb8be9945f844aacb46b6142d4608b1e88c26fab09",
+        "bytes": 286903
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "b4c241d1b0e194256efc69c31bc46cc7c7db5696a0d317541f9b9f889c2cc6af",
+            "bytes": 40603
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "cb19cc1e45490b3efd3d52ef094a074883d1641d180fd9232ef39698924c5ee0",
+            "bytes": 699304
+          }
+        }
+      ],
+      "queries": 8
+    },
+    {
+      "module": "HolonicsResearch.Foundation.ProductDegreeTwoNormalization",
+      "source": "lean/HolonicsResearch/Foundation/ProductDegreeTwoNormalization.lean",
+      "source_pin": {
+        "sha256": "91737d2bcbd861434eedccba52b701ce462c7b5df06d457df5c03a8ccb6e00fc",
+        "bytes": 24474
+      },
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-product-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "sha256": "a11927bd33c7622e2a7040fb8be9945f844aacb46b6142d4608b1e88c26fab09",
+        "bytes": 286903
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "893aab460ddf9f19ada630022e0c3d9cf5b6bb194aa64736928829bd52ead1cb",
+            "bytes": 75235
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "42ee03023d9ece96c65995331ad23eeb1acfb2adbd82f9339ae4537273ae9558",
+            "bytes": 726424
+          }
+        }
+      ],
+      "queries": 17
+    },
+    {
+      "module": "HolonicsResearch.Foundation.ProductDegreeTwo",
+      "source": "lean/HolonicsResearch/Foundation/ProductDegreeTwo.lean",
+      "source_pin": {
+        "sha256": "bccb75cb5224603d569dde39b1437940ec026e1d0eb5eb615f64d315b0d42692",
+        "bytes": 21634
+      },
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-product-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "sha256": "a11927bd33c7622e2a7040fb8be9945f844aacb46b6142d4608b1e88c26fab09",
+        "bytes": 286903
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "271f95bf7e92fd6a4d070d6c94c62ef58620cea711ac8fa6809f16dc3357a9ba",
+            "bytes": 57701
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "db377ce3e3e88eba706a04c3b6e6427d936c006c4a9235a1bd8f4795b4c546a1",
+            "bytes": 929640
+          }
+        }
+      ],
+      "queries": 19
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeTopologicalProductRealization",
+      "source": "lean/HolonicsResearch/Hodge/HodgeTopologicalProductRealization.lean",
+      "source_pin": {
+        "sha256": "bb8b13e71e7c04e46e2b66058c2d3a80d73c02048078421e708730a1cd27e820",
+        "bytes": 8991
+      },
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-product-diagonal-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "sha256": "e4fed1827abd13ed8569c90e044c8df769b26cbcf78973344d2ec48d382adf0f",
+        "bytes": 197365
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "d2b8593826b0602313925ca7862547960323b98daa9b5c92efea441dbd61882f",
+            "bytes": 31574
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "e944ec8b6cffe192b7ac9ecf873795d22352ad4957fa1db35dc303fca7507760",
+            "bytes": 96024
+          }
+        }
+      ],
+      "queries": 4
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeTopologicalSingularCurrent",
+      "source": "lean/HolonicsResearch/Hodge/HodgeTopologicalSingularCurrent.lean",
+      "source_pin": {
+        "sha256": "d5bc66089c8a528ffa20ccf18a56aa393c799af69579170884b38e40de4f24c3",
+        "bytes": 21747
+      },
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-product-diagonal-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "sha256": "e4fed1827abd13ed8569c90e044c8df769b26cbcf78973344d2ec48d382adf0f",
+        "bytes": 197365
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "379ae02b644d1bf109679255376cb0bea1707a6626dcf7107567cf400cca7ec3",
+            "bytes": 66774
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "3364c32f682245009dbd3c417989f592cbb46b23081d6055c39e87091b20ce14",
+            "bytes": 398536
+          }
+        }
+      ],
+      "queries": 15
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSphereProductCurrent",
+      "source": "lean/HolonicsResearch/Hodge/HodgeSphereProductCurrent.lean",
+      "source_pin": {
+        "sha256": "d478959cc584cb2dd8019a4985c2129fc4b08cba42488f13ae5fb84f75727f64",
+        "bytes": 14778
+      },
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-product-diagonal-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "sha256": "e4fed1827abd13ed8569c90e044c8df769b26cbcf78973344d2ec48d382adf0f",
+        "bytes": 197365
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "27220661d8b225c9873d23a26baace949bb6ec2ae88de27628679baf64448ae7",
+            "bytes": 56423
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "c2e0b57693dac4bacff5f8f7948777fa6c3ad758990b216df3011a1c160df48e",
+            "bytes": 274360
+          }
+        }
+      ],
+      "queries": 11
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSphereProductReconstruction",
+      "source": "lean/HolonicsResearch/Hodge/HodgeSphereProductReconstruction.lean",
+      "source_pin": {
+        "sha256": "baa0db745e69a05ed1388699874c550c47d0adab656b179675bad305ff875805",
+        "bytes": 19823
+      },
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-product-diagonal-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "sha256": "e4fed1827abd13ed8569c90e044c8df769b26cbcf78973344d2ec48d382adf0f",
+        "bytes": 197365
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "92ef07363d334f1b9976ec64355893c03f946bfeae734990542364e839e13879",
+            "bytes": 67287
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "1eb4a63363a4746077fc55ab09d8a0cdb7b993489d1db956a1ba34578c0e245c",
+            "bytes": 319464
+          }
+        }
+      ],
+      "queries": 13
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSphereProductFourCycle",
+      "source": "lean/HolonicsResearch/Hodge/HodgeSphereProductFourCycle.lean",
+      "source_pin": {
+        "sha256": "db0a4d2bebb605919b7a12d303e80efdfab0bcde0d0050dfd4dd5f512462a4d3",
+        "bytes": 7123
+      },
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-product-diagonal-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "sha256": "e4fed1827abd13ed8569c90e044c8df769b26cbcf78973344d2ec48d382adf0f",
+        "bytes": 197365
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "98eb3216cb90129a4805adc222e27704510d8e1df345d532d3ffc233ff35eb00",
+            "bytes": 28045
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "76c41bad3fc6fcdac5a6724e73fb6bf96e95b7430afdf9aff8e7deab70eb3cd7",
+            "bytes": 471936
+          }
+        }
+      ],
+      "queries": 5
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSphereNormalizedCoefficient",
+      "source": "lean/HolonicsResearch/Hodge/HodgeSphereNormalizedCoefficient.lean",
+      "source_pin": {
+        "sha256": "aaae98651a47755a263b8a28fc32f73b9abd423f06eeee338fdf0492eee41a8c",
+        "bytes": 11157
+      },
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-normalized-coefficient-continuation-v1/VALIDATION.json",
+      "receipt_pin": {
+        "sha256": "3ddb8c8307e8fd9a841d5b22cceac208afb155190d7f151676243fcc706dd708",
+        "bytes": 190211
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "01516a747d3e33e1f013bdb01fe6131ff2d1461f159f6ef3cae9fb9324f58785",
+            "bytes": 47510
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "c7da236b6a2de22dabc38f921a361e969fa0e812c6f458f9397a7890740174df",
+            "bytes": 403544
+          }
+        }
+      ],
+      "queries": 10
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProductDiagonal",
+      "source": "lean/HolonicsResearch/Hodge/HodgeProductDiagonal.lean",
+      "source_pin": {
+        "sha256": "85047a43f7020aba3e97236d386f6b1f561cc91b8e7ef093b4ae34e3e0ef29c5",
+        "bytes": 11709
+      },
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-normalized-coefficient-continuation-v1/VALIDATION.json",
+      "receipt_pin": {
+        "sha256": "3ddb8c8307e8fd9a841d5b22cceac208afb155190d7f151676243fcc706dd708",
+        "bytes": 190211
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "769024b0b93b8a1e381b29c1f1351a50981cb501bafdff2210bfb4b7a28b3cf9",
+            "bytes": 45073
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "941f7ec503b4fe5066dbf79436d046edd3b81d7138b0ac8a5037bae88fbbcc68",
+            "bytes": 240104
+          }
+        }
+      ],
+      "queries": 45
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSphereChainCurrent",
+      "source": "lean/HolonicsResearch/Hodge/HodgeSphereChainCurrent.lean",
+      "source_pin": {
+        "sha256": "091a334e3a171012c3566fd93cf35432a16910dc3298b7082dcbbf21c24ec88e",
+        "bytes": 7565
+      },
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-normalized-coefficient-continuation-v1/VALIDATION.json",
+      "receipt_pin": {
+        "sha256": "3ddb8c8307e8fd9a841d5b22cceac208afb155190d7f151676243fcc706dd708",
+        "bytes": 190211
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "3473123b9dc94b668d50371205adedb92e5e12402206f39c4f482ec5d26b9051",
+            "bytes": 27352
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "03833ed45a30a47729cd7112b6b1ed60db5785ec50e2b5bc9bbcc58aca639fe1",
+            "bytes": 176720
+          }
+        }
+      ],
+      "queries": 2
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProductMixedFilling",
+      "source": "lean/HolonicsResearch/Hodge/HodgeProductMixedFilling.lean",
+      "source_pin": {
+        "sha256": "9fa6ba333fd1d0f4e9b4bc1595d495d14734e67109e788fa4a7d26f6242613de",
+        "bytes": 73978
+      },
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-normalized-coefficient-continuation-v1/VALIDATION.json",
+      "receipt_pin": {
+        "sha256": "3ddb8c8307e8fd9a841d5b22cceac208afb155190d7f151676243fcc706dd708",
+        "bytes": 190211
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "612c5679e4a25be3b3e08f6f363db5f58d4d2ae59590d9057d69cc2e4fedf5fb",
+            "bytes": 221246
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "0c16ac3cefc13ebe81614b133a936bca79d6f76b1d6a24d779dcc4123b1391d7",
+            "bytes": 2132440
+          }
+        }
+      ],
+      "queries": 4
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSphereRulingCurrent",
+      "source": "lean/HolonicsResearch/Hodge/HodgeSphereRulingCurrent.lean",
+      "source_pin": {
+        "sha256": "4b25419ee1a4023d3bf2960e4bf7036a506ab4b0403489b8016f69feaa9ff985",
+        "bytes": 9696
+      },
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-ruling-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "sha256": "d136d60b5586ade875659b70b8d860679a6b1c666929cbaa503ba18beee1d600",
+        "bytes": 323549
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "dc93540bc8fd8f4e1d3e8fb0e5a85a3e5f3a073880ee1cc9426310ced52a5a35",
+            "bytes": 37395
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "2083fba503cd589c9807e82ee1668e14b8105b3510237740f97238614a0baa1f",
+            "bytes": 175024
+          }
+        }
+      ],
+      "queries": 10
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProductRulingReconstruction",
+      "source": "lean/HolonicsResearch/Hodge/HodgeProductRulingReconstruction.lean",
+      "source_pin": {
+        "sha256": "9b1713839c7393da8d65f777ee8b096958877dc4b0c2ffe4c85223a94b5137b6",
+        "bytes": 6959
+      },
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-ruling-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "sha256": "d136d60b5586ade875659b70b8d860679a6b1c666929cbaa503ba18beee1d600",
+        "bytes": 323549
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "c5bf64d04ecd513c19900f9315095ebc15172f0630ed2c2bf5faea868af7e81d",
+            "bytes": 25647
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "80715c3b34b2fa75cc0cb050e0c84529654c1e11f12974917ddbbc16ec8d5421",
+            "bytes": 130664
+          }
+        }
+      ],
+      "queries": 7
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProductRulingBoundary",
+      "source": "lean/HolonicsResearch/Hodge/HodgeProductRulingBoundary.lean",
+      "source_pin": {
+        "sha256": "747b1149beac46ecb2dbbde25c8225446cd4b0c8b560a2f84f5e9bdb7e776a92",
+        "bytes": 4776
+      },
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-ruling-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "sha256": "d136d60b5586ade875659b70b8d860679a6b1c666929cbaa503ba18beee1d600",
+        "bytes": 323549
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "3fee38ee534159455825462ff19ca443c7a173ac871a26887045671dc7128c1b",
+            "bytes": 15527
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "4adcad22bc81a18bc3a40b1cf1cb1480d6ef612775a88aada14fa7e49ea3dbb9",
+            "bytes": 153256
+          }
+        }
+      ],
+      "queries": 1
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProductRulingDecomposition",
+      "source": "lean/HolonicsResearch/Hodge/HodgeProductRulingDecomposition.lean",
+      "source_pin": {
+        "sha256": "02b904d96abb418f10287cd9aee00f729f2afcb208e4f6d5c54b020e99a48e2f",
+        "bytes": 6915
+      },
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-ruling-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "sha256": "d136d60b5586ade875659b70b8d860679a6b1c666929cbaa503ba18beee1d600",
+        "bytes": 323549
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "8af0b482dd78b93de0e6272dcff3c7ba10dbef2b909c97b2a75ee35e57e6f1e7",
+            "bytes": 26088
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "0ae57f2fd66fd27d9eb901f530263ee25d722f733669364abf35d116c5a4fa1b",
+            "bytes": 101848
+          }
+        }
+      ],
+      "queries": 3
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProductSingularCohomologyDual",
+      "source": "lean/HolonicsResearch/Hodge/HodgeProductSingularCohomologyDual.lean",
+      "source_pin": {
+        "sha256": "17f89144751c1279222669c0ab35ba34d01e5a0b821aff70d9a82d4617bcb444",
+        "bytes": 6543
+      },
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-ruling-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "sha256": "d136d60b5586ade875659b70b8d860679a6b1c666929cbaa503ba18beee1d600",
+        "bytes": 323549
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "d34f77a0bfbfce718be511d17b5836e913bfe66ae8527a6dbb8c209e2d5993b3",
+            "bytes": 18886
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "12f8d8dc455701f570814cfc29e3ddffeb8714e2b608729a16932137a0e3b6cd",
+            "bytes": 262984
+          }
+        }
+      ],
+      "queries": 5
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSurfaceCycleClass",
+      "source": "lean/HolonicsResearch/Hodge/HodgeSurfaceCycleClass.lean",
+      "source_pin": {
+        "sha256": "d01463217a8004ffdbd42721f1bc5b30da378494bf41ee4cb60086d2b0140a10",
+        "bytes": 4170
+      },
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-ruling-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "sha256": "d136d60b5586ade875659b70b8d860679a6b1c666929cbaa503ba18beee1d600",
+        "bytes": 323549
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "b459f7be2da55314d1a9389c9085e85cc9a670faac5fd8c145d1da19ea955a73",
+            "bytes": 13508
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "52c10a7e924edddf2fb97d3dfa2671c667868a93405fe92031ea86b294a12ad7",
+            "bytes": 69312
+          }
+        }
+      ],
+      "queries": 4
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProjectiveLineType11Form",
+      "source": "lean/HolonicsResearch/Hodge/HodgeProjectiveLineType11Form.lean",
+      "source_pin": {
+        "sha256": "6d1e44f900f984170780c86fa4819d29e5f613f7c7cb0a42c8699b70cdb100fa",
+        "bytes": 11818
+      },
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-ruling-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "sha256": "d136d60b5586ade875659b70b8d860679a6b1c666929cbaa503ba18beee1d600",
+        "bytes": 323549
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "baa148cd5737ff0cb70f4515363e762ed96db13195c1b082daf1f41171e866a1",
+            "bytes": 40110
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "31751cbc649dd74b0871e1ae85a35d43a698a3be70baaf7914a6351cf7897c4d",
+            "bytes": 441552
+          }
+        }
+      ],
+      "queries": 9
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSurfaceType11Period",
+      "source": "lean/HolonicsResearch/Hodge/HodgeSurfaceType11Period.lean",
+      "source_pin": {
+        "sha256": "0c7edaa38bf6fba7326aed0fee9c9013ee145309461dcb6597ed8a6cab6abe56",
+        "bytes": 20786
+      },
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-ruling-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "sha256": "d136d60b5586ade875659b70b8d860679a6b1c666929cbaa503ba18beee1d600",
+        "bytes": 323549
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "6eaa3235de4d96e61a32f25463097762e658806fa5063742d2edb100e031e996",
+            "bytes": 66344
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "4de7713da1927cc983af2f4cd1827f679812b769e03cc115d7304790e96f0221",
+            "bytes": 577848
+          }
+        }
+      ],
+      "queries": 17
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProjectiveLinePowerType11",
+      "source": "lean/HolonicsResearch/Hodge/HodgeProjectiveLinePowerType11.lean",
+      "source_pin": {
+        "sha256": "3da1876a436f31fa924f446c2838d571b09e7abaf404d6106581e51022a7ea72",
+        "bytes": 17010
+      },
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-ruling-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "sha256": "d136d60b5586ade875659b70b8d860679a6b1c666929cbaa503ba18beee1d600",
+        "bytes": 323549
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "b0d51512ea52ec3be5359034075bbbcd774ea65752e28cba71c6be0fadb6acd3",
+            "bytes": 50413
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "b830629ea46442604821349c4c26013f2f3aefd61328479c4f30c140f7826417",
+            "bytes": 530912
+          }
+        }
+      ],
+      "queries": 6
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSpherePowerRulingHomology",
+      "source": "lean/HolonicsResearch/Hodge/HodgeSpherePowerRulingHomology.lean",
+      "source_pin": {
+        "sha256": "61a94ce064ddf2b427f2b3a6c304dbf3bb62112ebe71988a2b378d9d2ee31cc8",
+        "bytes": 80123
+      },
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-ruling-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "sha256": "d136d60b5586ade875659b70b8d860679a6b1c666929cbaa503ba18beee1d600",
+        "bytes": 323549
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "62c28bc3885831f622db70c2f14b40e04637eacceca1d16355642446c1496d96",
+            "bytes": 258398
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "56f0dcab043e12a4552d74ab17e7af25eeca40210a27bc5a1cc78bcfa298e4c5",
+            "bytes": 1717360
+          }
+        }
+      ],
+      "queries": 32
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSpherePowerPairHomology",
+      "source": "lean/HolonicsResearch/Hodge/HodgeSpherePowerPairHomology.lean",
+      "source_pin": {
+        "sha256": "d6c8fd064c84345cffded11574b18801b433123d5582f5cec94d5ed4bffb49aa",
+        "bytes": 35929
+      },
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-pair-carrier-join-repair-v1/VALIDATION.json",
+      "receipt_pin": {
+        "sha256": "2a9bd07dc936cfb2a170076aee09a118375dade513b5ff1bc938d3efb2f742e4",
+        "bytes": 125278
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "2dd71f8b896c7819e9b4ed893b45ea196ddc7452dbef1960cf38c8dfdf6e1926",
+            "bytes": 116688
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "e02824653569868910aaf2627a42c3952a926504d06b2318ae3a34906927b838",
+            "bytes": 513984
+          }
+        }
+      ],
+      "queries": 28
+    },
+    {
+      "module": "Holonics.Foundation.SectionResidual",
+      "source": "lean/Holonics/Foundation/SectionResidual.lean",
+      "source_pin": {
+        "sha256": "841d5b94895b05d30f949e3c57e8c11c2413914d9923b2713f5536780dbb3acd",
+        "bytes": 4683
+      },
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-canonical-section-v2/VALIDATION.json",
+      "receipt_pin": {
+        "sha256": "d925e471d88a7b3d23f27c72b4a86daa1556a9ea411ff83f96ee47f5bf61b2d6",
+        "bytes": 19490
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "56283c4b94a0d2e8b604fecbbb846349b975e16185dbaf567bc315d31d044d17",
+            "bytes": 12098
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "f978fa5ec4a7a35204367b9abae55308b0f6ad2d3a3d147056383f9cba8b2247",
+            "bytes": 260696
+          }
+        }
+      ],
+      "queries": 4
+    },
+    {
+      "module": "Holonics.Physics.PartitionedHodgeEnergy",
+      "source": "lean/Holonics/Physics/PartitionedHodgeEnergy.lean",
+      "source_pin": {
+        "sha256": "42b02c455bb012fe616bf2334db4fa288f5d7d8a98c725b70b62c62b529a9d6b",
+        "bytes": 15959
+      },
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-canonical-consumer-v1/VALIDATION.json",
+      "receipt_pin": {
+        "sha256": "9d1beafdbc6183e66b95d79c802855ceee39e39a960d3678b57aaf6e3fc49e53",
+        "bytes": 19606
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "d587eb6de8d16388b21ebb8322eb6a5fbcd488a94494e858de9ba0e3a9013710",
+            "bytes": 72682
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "b2139ee033839e8861505950352f03671f600c918859edc332548f89e9a05ae2",
+            "bytes": 1097208
+          }
+        }
+      ],
+      "queries": 7
+    },
+    {
+      "module": "Holonics.Physics.TemporalHodgeResidue",
+      "source": "lean/Holonics/Physics/TemporalHodgeResidue.lean",
+      "source_pin": {
+        "sha256": "0bbe6c79889c85332e73c0404f4a4737cc4663144a6c81d702d93daf639288cb",
+        "bytes": 8709
+      },
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-transport-v3/VALIDATION.json",
+      "receipt_pin": {
+        "sha256": "a44d77b7faaf201f3649cab640b2f3d1ea558c878de999e8ec2e915ecb44888c",
+        "bytes": 6771
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "db1d25473677942e5eacd8783e87e919993be3d764b7fee03d261884a3c75d55",
+            "bytes": 26298
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "255060e139177ca26597a914eb09b842a317db8831d7a6e505d87d7fd1195efa",
+            "bytes": 473560
+          }
+        }
+      ],
+      "queries": 5
+    }
+  ],
+  "broad_library_and_Cargo_acceptance": false,
+  "native_compile_or_tests_here": false,
+  "scoped_receipts": [
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/exact_cut.json",
+      "original_pin": {
+        "bytes": 1135,
+        "sha256": "c0241513b6e78ef869a9a699cc8fcd1947ab709c052acd410b3a2689863ce2a8"
+      },
+      "integrated_pin": {
+        "bytes": 1425,
+        "sha256": "833243746a7d66dc056b0cb548ccf1b30218632aaa214296279cd99a88168c58"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/exact_cut.py",
+      "original_pin": {
+        "bytes": 3884,
+        "sha256": "b1ccc02527e0b406bfbf974c2a1364d40ff4773131f1d2a8dc11384e8f050330"
+      },
+      "integrated_pin": {
+        "bytes": 3884,
+        "sha256": "b1ccc02527e0b406bfbf974c2a1364d40ff4773131f1d2a8dc11384e8f050330"
+      },
+      "scoped": false
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/exact_detector.json",
+      "original_pin": {
+        "bytes": 2454,
+        "sha256": "ac00a85288cfffb932300b01d2247105500d9c8788ea30ef88c43759c088eac6"
+      },
+      "integrated_pin": {
+        "bytes": 2744,
+        "sha256": "f62b23141bb373dc98d36acc149646ee7645082b013b62ae2de1af42226f0407"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/exact_detector.py",
+      "original_pin": {
+        "bytes": 5361,
+        "sha256": "1fc103d9fe0e16ee3c708e340cbbd7bf89c2f14604a4c49c08a22f789fb47d66"
+      },
+      "integrated_pin": {
+        "bytes": 5361,
+        "sha256": "1fc103d9fe0e16ee3c708e340cbbd7bf89c2f14604a4c49c08a22f789fb47d66"
+      },
+      "scoped": false
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/exact_shuffle.json",
+      "original_pin": {
+        "bytes": 2286,
+        "sha256": "60a0231c97f057d7f0fe4664b74461e95ad75950ea28fcacd3bf91f3a93c5281"
+      },
+      "integrated_pin": {
+        "bytes": 2576,
+        "sha256": "5dc3b1d087ac8ae76269005adf57acb18fcb186894c8ca52e0504a01e5e6d2a8"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/exact_shuffle.py",
+      "original_pin": {
+        "bytes": 2602,
+        "sha256": "a56371f1cbf60c281257c60098b3725fc0f4c17b249144251807ca290abb62f3"
+      },
+      "integrated_pin": {
+        "bytes": 2602,
+        "sha256": "a56371f1cbf60c281257c60098b3725fc0f4c17b249144251807ca290abb62f3"
+      },
+      "scoped": false
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/failed-detector-foundation-v2/FAILURE.json",
+      "original_pin": {
+        "bytes": 645,
+        "sha256": "3b286329a84ab6f73e3fd01b6d23baee1858cb4fb6d7fa273d7bed463073aa9e"
+      },
+      "integrated_pin": {
+        "bytes": 934,
+        "sha256": "5803fbe5865681e44185d0f027c005955259557c99593656bbf7bd1198a4e839"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/formal_partition_v3_accepted.json",
+      "original_pin": {
+        "bytes": 4610,
+        "sha256": "9063b2e2cedaf3c4035dbc6e3cfa9e4cd871aa978329fe787d271c763f9024e7"
+      },
+      "integrated_pin": {
+        "bytes": 4900,
+        "sha256": "b7ba1b0adf8062ce7c34d09a4f330df8e091b0820ff4121abb6672335ae43cba"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/formal_v1_failed.json",
+      "original_pin": {
+        "bytes": 3796,
+        "sha256": "6fb1224f0505d61997966cbe1afcbe8cf12eadef1a16bad3491c94398d1b246a"
+      },
+      "integrated_pin": {
+        "bytes": 4086,
+        "sha256": "304332d88680b9e18d9126c5e7b722a22cf78697d1c63ceecf7ec8c45e05d1e5"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/incomplete-detector-foundation-v3/VALIDATION.json",
+      "original_pin": {
+        "bytes": 1135,
+        "sha256": "31b061536c67e5d1623435f02392c0039c9e85c54492d60ba6365326b37da463"
+      },
+      "integrated_pin": {
+        "bytes": 1425,
+        "sha256": "3d5920f669c31ab292a4352b3f2d67b99e789a235754dbf7ffdc519b5ef7f7a7"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/independent-source-review/source_delta_review_v3.json",
+      "original_pin": {
+        "bytes": 1829,
+        "sha256": "e5a1a15ea7863cc493f797556a65b74394b65a05ab32797f5788669b42c25f26"
+      },
+      "integrated_pin": {
+        "bytes": 1947,
+        "sha256": "5cc8354ab4689a2fc1aa00f69b74aa706020aee69bf8674d8dda27656c7d9240"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/independent-source-review/source_delta_review_v4.json",
+      "original_pin": {
+        "bytes": 6230,
+        "sha256": "da5c924204c053245b63fc98cb923bdab81e935e3bee94d3d4be1e28a0259472"
+      },
+      "integrated_pin": {
+        "bytes": 5820,
+        "sha256": "57c1c8253b0d1c10c70c4fa034a520401c01db12ec92ebcd02b807fdda5783ea"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/independent-source-review/source_ordinal_audit.json",
+      "original_pin": {
+        "bytes": 2635,
+        "sha256": "ba05b304a39e7cc25ce02f426ecd9610c5cd5b1fc9c1de7ed0170f4944f1f5c7"
+      },
+      "integrated_pin": {
+        "bytes": 2802,
+        "sha256": "574dd803cec9bdf152ae47b5102f423b2a03bc7f5730a13ebb7807194fa71b02"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/independent-source-review/source_ordinal_audit_v2.json",
+      "original_pin": {
+        "bytes": 2726,
+        "sha256": "73470dbaf1b3cc8942660b04c7eb3536641ca9237ceeee373f2f28f7c693fafb"
+      },
+      "integrated_pin": {
+        "bytes": 2833,
+        "sha256": "e33477dd8ee9baa64b3cdc3dff791adec3baba36acfa7108ef71953ed2affbb1"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/native-full-producer-cost-diagnosis-v2/VALIDATION.json",
+      "original_pin": {
+        "bytes": 26405,
+        "sha256": "a1e846498ad3bcbec7eea611947c46df96ae2f5294eaf81535bd0b725f3a86b9"
+      },
+      "integrated_pin": {
+        "bytes": 16067,
+        "sha256": "bc94eb452f0e1e67aa10293da386d1bfcf4cce383d04d822bad96ed87a407f20"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/native-validation-canonical-consumer-v1/VALIDATION.json",
+      "original_pin": {
+        "bytes": 19606,
+        "sha256": "9d1beafdbc6183e66b95d79c802855ceee39e39a960d3678b57aaf6e3fc49e53"
+      },
+      "integrated_pin": {
+        "bytes": 10861,
+        "sha256": "ee807ac799981c17c5facf403bf2aa6fe899f144e3ab76ff3455c2a8f45ec8a5"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/native-validation-canonical-recursive-v1-refusal/VALIDATION.json",
+      "original_pin": {
+        "bytes": 1913,
+        "sha256": "93cc122b6560c3826b63e3b8e5457bc0c478560f77bc4a7a39182a578519541c"
+      },
+      "integrated_pin": {
+        "bytes": 2152,
+        "sha256": "1cbd2f2cdb16010f5678723314a6aa2ff2db5dddaed7f3d4384f3749c25df278"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/native-validation-canonical-section-v2/VALIDATION.json",
+      "original_pin": {
+        "bytes": 19490,
+        "sha256": "d925e471d88a7b3d23f27c72b4a86daa1556a9ea411ff83f96ee47f5bf61b2d6"
+      },
+      "integrated_pin": {
+        "bytes": 10857,
+        "sha256": "a03a83198d5f94f4d160eb8d246d270897847cfe64b2e45184be0bb99acafbe1"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/native-validation-cm-finite-cut-v1/VALIDATION.json",
+      "original_pin": {
+        "bytes": 3162,
+        "sha256": "9fc3889ac0e08f269d5ced2568fa2869083ac3c1ac16b3759aef2016da4c51e6"
+      },
+      "integrated_pin": {
+        "bytes": 3440,
+        "sha256": "01fa00d71130e09fd599d4d1b41645d693df8238adb9e1476293e7338cedd4a8"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/native-validation-detector-v3-prefixes/VALIDATION.json",
+      "original_pin": {
+        "bytes": 7167,
+        "sha256": "cee608cf70f720bd9f0821ca1ff97b15f1b596a5bf1c00d4ada042de1e769a2d"
+      },
+      "integrated_pin": {
+        "bytes": 7457,
+        "sha256": "1856ec6b85c88cf132b78e393dc55730d64ea08f786b0ba5a4313d3795f94cbf"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/native-validation-full-foundation-v4/VALIDATION.json",
+      "original_pin": {
+        "bytes": 19331,
+        "sha256": "ac8536463f7d8b173f75bdabe752de42df152cba0511a48ab068d61268b590ce"
+      },
+      "integrated_pin": {
+        "bytes": 10866,
+        "sha256": "188e2b57981998ac046ddb71c7e2dc55f86368fec580d5362c2403a705931e34"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/native-validation-full-product-v3-incomplete/VALIDATION.json",
+      "original_pin": {
+        "bytes": 35486,
+        "sha256": "996ab06b2fe0acc2270a9ee8cdfaebca796b48b07ee4e0c36de67c3ffa263a46"
+      },
+      "integrated_pin": {
+        "bytes": 21855,
+        "sha256": "9d6f3cf4ebe6d51695d4cdd9fbb2d39e0256f09fa468c24f8aa55bd50306f002"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/native-validation-normalized-coefficient-continuation-v1/VALIDATION.json",
+      "original_pin": {
+        "bytes": 190211,
+        "sha256": "3ddb8c8307e8fd9a841d5b22cceac208afb155190d7f151676243fcc706dd708"
+      },
+      "integrated_pin": {
+        "bytes": 114027,
+        "sha256": "e7532383ef6a9c9acbb447bc32c9f19aa3819be1059eb8b97312e96d858ba201"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/native-validation-pair-carrier-join-repair-v1/VALIDATION.json",
+      "original_pin": {
+        "bytes": 125278,
+        "sha256": "2a9bd07dc936cfb2a170076aee09a118375dade513b5ff1bc938d3efb2f742e4"
+      },
+      "integrated_pin": {
+        "bytes": 68972,
+        "sha256": "3ec630564ebf5e39d49df2b25c249d1198dfee4fabe9dc85297970b0990f266c"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/native-validation-product-diagonal-owner-decomposition-v1/VALIDATION.json",
+      "original_pin": {
+        "bytes": 197365,
+        "sha256": "e4fed1827abd13ed8569c90e044c8df769b26cbcf78973344d2ec48d382adf0f"
+      },
+      "integrated_pin": {
+        "bytes": 122049,
+        "sha256": "907fe220de02907125a4c97e45ceb3dbcf3768200a9507660984e63d5a07b4ac"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/native-validation-product-diagonal-repair-v1-incomplete/VALIDATION.json",
+      "original_pin": {
+        "bytes": 34803,
+        "sha256": "fa513e4190ddd18c977abdb0f11cea1d9cbdcc9f6ad7d0df5920e6c7ae1bb025"
+      },
+      "integrated_pin": {
+        "bytes": 20766,
+        "sha256": "b8392a52594e8f3e6cd69ec337930a801a3ec219dd7aa4750dc414c4d3a71233"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/native-validation-product-owner-decomposition-v1/VALIDATION.json",
+      "original_pin": {
+        "bytes": 286903,
+        "sha256": "a11927bd33c7622e2a7040fb8be9945f844aacb46b6142d4608b1e88c26fab09"
+      },
+      "integrated_pin": {
+        "bytes": 176274,
+        "sha256": "204dc085594dd5bfb9fd1c172a93821a861e6b36f5912657c604425232491dbe"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/native-validation-provider-rebind-product-incomplete/VALIDATION.json",
+      "original_pin": {
+        "bytes": 14177,
+        "sha256": "a0f33391787b235d271152438529995b3c3cc0f7b8b18c30f310325ba57767d7"
+      },
+      "integrated_pin": {
+        "bytes": 9677,
+        "sha256": "71243cca88eaacb6e8a8c68c79ba8a5f65840304262f90d591400931be561c00"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/native-validation-recursive-v2-refusal/VALIDATION.json",
+      "original_pin": {
+        "bytes": 6933,
+        "sha256": "7957726b3e02c0a8052e7fc0af671e16ebff5ea36a0258d4fe190fc1a31f72c0"
+      },
+      "integrated_pin": {
+        "bytes": 6420,
+        "sha256": "f23efda194453fca7b9037e92dc5b5bccccb1c681f943ddac18e44b9beda1a4e"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/native-validation-recursive-v3/VALIDATION.json",
+      "original_pin": {
+        "bytes": 1630,
+        "sha256": "5699b1952d90d534c4a3812b8752734b89cf839c8413a978015b0cb9891f526f"
+      },
+      "integrated_pin": {
+        "bytes": 1902,
+        "sha256": "2d9e7b592d46a7e9a094e9009bb5254aa4fdde190d1b5153975569ffdd60a6e6"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/native-validation-ruling-owner-decomposition-v1/VALIDATION.json",
+      "original_pin": {
+        "bytes": 323549,
+        "sha256": "d136d60b5586ade875659b70b8d860679a6b1c666929cbaa503ba18beee1d600"
+      },
+      "integrated_pin": {
+        "bytes": 194539,
+        "sha256": "8530f5bc069a0f6600856e98a4640cc72d0c7070b8b01e369880bbdc142c9aab"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/native-validation-transport-v2/VALIDATION.json",
+      "original_pin": {
+        "bytes": 667,
+        "sha256": "47406b454ca68c07023240ce9787dafcef0b9465e9e40f75343dee3b699ead47"
+      },
+      "integrated_pin": {
+        "bytes": 843,
+        "sha256": "ebcd2e73527220567b38093189736ad26e28e163fe6efdb51ee1e0fecd2b4d2d"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/native-validation-transport-v3/VALIDATION.json",
+      "original_pin": {
+        "bytes": 6771,
+        "sha256": "a44d77b7faaf201f3649cab640b2f3d1ea558c878de999e8ec2e915ecb44888c"
+      },
+      "integrated_pin": {
+        "bytes": 7065,
+        "sha256": "a5ac36fee20c100443b77ffe40da05f1f8c720b7a600a056f81c9509cb3d6ac9"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/normalized-coefficient-index-repair-v1/ACCEPTED_CHART_PROVIDERS_CHECK.json",
+      "original_pin": {
+        "bytes": 2404,
+        "sha256": "911d176e575d744d01456da4a9397ed974f330a09027fc73f35bc63c407545ce"
+      },
+      "integrated_pin": {
+        "bytes": 2622,
+        "sha256": "15689ff08a82f75a6ae3ef2b7002a2e3ff8daf0a16bdfefd2fdb763173eb70bd"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/normalized-coefficient-index-repair-v1/PROOF_DELTA_CHECK.json",
+      "original_pin": {
+        "bytes": 1676,
+        "sha256": "6d07e4d472a0122126cd4b85e69aaaa596095eed4bcc551e7dfbc1164cf593b4"
+      },
+      "integrated_pin": {
+        "bytes": 1892,
+        "sha256": "2d6dbd2ed1f7bf5d6e383b8b086d1f29cc861ccda811e696fb0535e88bc6b36a"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/normalized-coefficient-index-repair-v1/VALIDATION_REQUEST.json",
+      "original_pin": {
+        "bytes": 50976,
+        "sha256": "c8fe0f5be1f5ae8c5b898582a0dbe6477dc11e69a74818c99ee000dd3b8e9641"
+      },
+      "integrated_pin": {
+        "bytes": 46676,
+        "sha256": "f05971ee5eaa483355d49c521f22f0ee66109e51ff7d0a35de3962202086e54a"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/pair-carrier-join-repair-v1/ACCEPTED_RULING_PROVIDERS_CHECK.json",
+      "original_pin": {
+        "bytes": 4328,
+        "sha256": "c11febcc539b56f9651e6f7cdd46451c6148914cd48eef4f71a9c5ae45257511"
+      },
+      "integrated_pin": {
+        "bytes": 4555,
+        "sha256": "947202bbbaa35f323db011bd9c011c7898abbc5ae7096304edb2812dd835f887"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/pair-carrier-join-repair-v1/PROOF_DELTA_CHECK.json",
+      "original_pin": {
+        "bytes": 2464,
+        "sha256": "d14344d2714fc0a96802e86f8790a94851b656fb07d631fb31c89a144acf8d88"
+      },
+      "integrated_pin": {
+        "bytes": 2695,
+        "sha256": "ab0e77be40257ebf218f6283cc9fc029f852ddd809b9e0f795474e9b76e00969"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/pair-carrier-join-repair-v1/READ_INTEGRITY.json",
+      "original_pin": {
+        "bytes": 612,
+        "sha256": "5a85df8d45de23940360319e56ed7d161096163ca4966b55712d5435d471c232"
+      },
+      "integrated_pin": {
+        "bytes": 901,
+        "sha256": "94dfcf75def2ecb3c134f307d5ca6bf34b83c5de68ff36355c15f61e983f6147"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/pair-carrier-join-repair-v1/VALIDATION_REQUEST.json",
+      "original_pin": {
+        "bytes": 63107,
+        "sha256": "cacf02506e635d875aba75fd75a8a2bd3c4d2dd8f6de9e191ebc7f547ce9b828"
+      },
+      "integrated_pin": {
+        "bytes": 55958,
+        "sha256": "5492369fa1da1c6d4c6eee63fa2b31c561832540aa38cd24abb74f39fa0098a6"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/product-degree-two-axis-linear-receivers/PROOF_DELTA_CHECK.json",
+      "original_pin": {
+        "bytes": 2155,
+        "sha256": "b043e54a385b69942af0b48bcfec9051cb7ede436ec3068a3f247c73a248c403"
+      },
+      "integrated_pin": {
+        "bytes": 2445,
+        "sha256": "9bd8b085aca976eb8e130d0c9cb81ae94f816a18b8ef99a3b812373324089b28"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/product-degree-two-axis-linear-receivers/PROVIDER_REBIND_REQUEST.json",
+      "original_pin": {
+        "bytes": 26016,
+        "sha256": "c7d71f0ca192ce86ea68285d0d72cb37c88604e28a52e9d40411a97662cf6d2c"
+      },
+      "integrated_pin": {
+        "bytes": 25289,
+        "sha256": "0002370dd373a4f533a91f103487783f1f84a26e3e2d7fc4c94f9d949ac618a9"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/product-degree-two-single-current-extension/PROOF_DELTA_CHECK.json",
+      "original_pin": {
+        "bytes": 1177,
+        "sha256": "cf66e3f25498a1626752e02df77c305f40c7b231e0e86e0ae6b2661a842cde63"
+      },
+      "integrated_pin": {
+        "bytes": 1467,
+        "sha256": "6d14f7d1ace263bfa51ff75aa4d0275ada913030695a3866bfc959f811d83cab"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/product-diagonal-owner-decomposition-v1/LOCAL_SOURCE_GRAPH.json",
+      "original_pin": {
+        "bytes": 61165,
+        "sha256": "5997e27439150da7f1973c49d8a05174caebf17dc651a132a31965c436a798ca"
+      },
+      "integrated_pin": {
+        "bytes": 60411,
+        "sha256": "a533606fef0ea8b77627507ffefec1e19296d204a83e98cd510f3a8311cd7e41"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/product-diagonal-owner-decomposition-v1/SOURCE_INTEGRITY.json",
+      "original_pin": {
+        "bytes": 12717,
+        "sha256": "6a82ca1c36b71f7afedc946255f90a0186d61138b60b54310d2a7faf680500e3"
+      },
+      "integrated_pin": {
+        "bytes": 12564,
+        "sha256": "4d8002a734fd0a62a225535215ab8ccc38a60b11c4f9ec9dca6f92e62b9f064a"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/product-diagonal-owner-decomposition-v1/SOURCE_PLAN.json",
+      "original_pin": {
+        "bytes": 4152,
+        "sha256": "1208ff1c75999a2b0a20eaba22ee3d5cba87a746d813f9c5eaec87288c90a1bb"
+      },
+      "integrated_pin": {
+        "bytes": 4442,
+        "sha256": "df9060545db8cf0597b49470349690a7c8fa12dbf2fd520f2b22638a158d16d7"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/product-diagonal-owner-decomposition-v1/VALIDATION_REQUEST.json",
+      "original_pin": {
+        "bytes": 49036,
+        "sha256": "b1a93fbf063d6c8cf194f47c145ef663ee9ed18d0edc67cf0188b8e96ad6f348"
+      },
+      "integrated_pin": {
+        "bytes": 45962,
+        "sha256": "38e3e39268cfe2b3fc201a25a881cfe436fe11ca68448f4e69091adbbf093b73"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/product-diagonal-proof-repair-v1/ACCEPTED_PROVIDERS_CHECK.json",
+      "original_pin": {
+        "bytes": 3420,
+        "sha256": "c30a39db0cb41acb829a3091c8f80b3cca61b3b1efc48d4e3773e375e61616cd"
+      },
+      "integrated_pin": {
+        "bytes": 3647,
+        "sha256": "54d8ef785e0dd53cfde62c2b6a1518a0bca834a75ac83ef55fd328d501bdd66a"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/product-diagonal-proof-repair-v1/PROOF_DELTA_CHECK.json",
+      "original_pin": {
+        "bytes": 4081,
+        "sha256": "1d4fd6af577c6dffeeb31c4e6b74b7789636382d97a67eaf69ad3bb70fe2852d"
+      },
+      "integrated_pin": {
+        "bytes": 4315,
+        "sha256": "78e536f3a1e9d44f95aa3093e037cc493b31accac62fb873233e8acdd3d233ff"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/product-diagonal-proof-repair-v1/VALIDATION_REQUEST.json",
+      "original_pin": {
+        "bytes": 41486,
+        "sha256": "eb64be77b26f5ff67cf8c09383390cf7b261fc4e31f171b066aab4643a128756"
+      },
+      "integrated_pin": {
+        "bytes": 39022,
+        "sha256": "0edbcae5ce736dd867333010dd600b1bb86edb589c52dffe17093df72cef7e75"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/product-owner-decomposition-v1/LOCAL_SOURCE_GRAPH.json",
+      "original_pin": {
+        "bytes": 57588,
+        "sha256": "5e6f071e497eeaa47b9300d1c57389ffe04f52359284987f44afcbab577fe29a"
+      },
+      "integrated_pin": {
+        "bytes": 57246,
+        "sha256": "92c314dc9f56861e2d004741cec6f70d89a9071870b83680635884bd6aef8d8b"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/product-owner-decomposition-v1/SOURCE_INTEGRITY.json",
+      "original_pin": {
+        "bytes": 10821,
+        "sha256": "7142a590a31280d44f6aa681406be66a1dd943ded418c9f5e8f36f2a029a4e3c"
+      },
+      "integrated_pin": {
+        "bytes": 10820,
+        "sha256": "5232598fd377933e3f0e7392c18edede930345bcc5ea172d07d3194536e99435"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/product-owner-decomposition-v1/SOURCE_PLAN.json",
+      "original_pin": {
+        "bytes": 6045,
+        "sha256": "91f99a5f950fb406bbf88d0d81c4fcabc7ff7825a7aeb80854c30417f87240a3"
+      },
+      "integrated_pin": {
+        "bytes": 6276,
+        "sha256": "296f5a84ecde4755cd36ba14b7ee02ea8c5227c59232e261ae43d77c15223ff4"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/product-owner-decomposition-v1/VALIDATION_REQUEST.json",
+      "original_pin": {
+        "bytes": 34743,
+        "sha256": "e325f7c612af8ab45b5a296d3a48a6cd8fcbd2c5d266a93eb78ccd1b2477da7d"
+      },
+      "integrated_pin": {
+        "bytes": 33863,
+        "sha256": "75a858804cb68081daa5ab534758d1999113bd005a45344fbe14099e697bdf07"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/provider-rebind-v1/EDGE_CHECK.json",
+      "original_pin": {
+        "bytes": 701,
+        "sha256": "fa83e698bb832dbea8ff8c403779e37292ecac3e1cfdc9a356c18ce57d188f5d"
+      },
+      "integrated_pin": {
+        "bytes": 972,
+        "sha256": "db0b5ee17b7d836bbe5e536522fa175ba541731cc9b9f6dc8dd93b19e33bb3c6"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/provider-rebind-v1/EXACT_ACCEPTANCE_CHECK.v7.json",
+      "original_pin": {
+        "bytes": 1707,
+        "sha256": "150632790f649e85013c74c12978c23ebaef4a9e2d64aa838fb5b48f26cf9862"
+      },
+      "integrated_pin": {
+        "bytes": 1863,
+        "sha256": "1b626e14293bd7f1802267e6048fc14691c7f4f93753ee96c76bb55f1f4f52f8"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/provider-rebind-v1/VALIDATION_REQUEST.json",
+      "original_pin": {
+        "bytes": 24765,
+        "sha256": "79801caa5b3b259c1d679f81ea2c35830626426524b7cadbea3d1dd56f43b10b"
+      },
+      "integrated_pin": {
+        "bytes": 24291,
+        "sha256": "e210d6e495b39a094bac91210475b28df29932579db0a9ff0eabad43f40ba2ce"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/ruling-owner-decomposition-v1/ACCEPTED_CONTINUATION_CHECK.json",
+      "original_pin": {
+        "bytes": 14731,
+        "sha256": "4af762890aa70c98c2eb0ca485d329935e40e478abd9d7b192aa3ab5bab87d63"
+      },
+      "integrated_pin": {
+        "bytes": 11699,
+        "sha256": "4368708a174f2907278ae5024ad75a8d1d4fc613771d5287760045f38aaf4d6f"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/ruling-owner-decomposition-v1/MEASURED_DIAGNOSIS.json",
+      "original_pin": {
+        "bytes": 2184,
+        "sha256": "5bddfd95fe5d1cabb711b8d82af0bcf1f8a2870a148700de5ac50ddc1aeadeae"
+      },
+      "integrated_pin": {
+        "bytes": 2402,
+        "sha256": "26fb32bacffb9f5b138024696b429aea7357edff22f1eb6235dfa59ae4284748"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/ruling-owner-decomposition-v1/SOURCE_INTEGRITY.json",
+      "original_pin": {
+        "bytes": 6274,
+        "sha256": "4959f6c80a640f2d817852faa78fe2afeaa8861912693634b80d23c60e6b846f"
+      },
+      "integrated_pin": {
+        "bytes": 6354,
+        "sha256": "1d338ad6dbf46544e353440d1143055a1f41f5684dc77bea0eaa0493a228da36"
+      },
+      "scoped": true
+    },
+    {
+      "path": "research/records/receipts/2026-10-06-hodge-transport/ruling-owner-decomposition-v1/VALIDATION_REQUEST.json",
+      "original_pin": {
+        "bytes": 56569,
+        "sha256": "173631760711bd77e885dfe746f3fa34f717030882122bfcaa5cfce4946b63ae"
+      },
+      "integrated_pin": {
+        "bytes": 51369,
+        "sha256": "0897f6e1f6f0df9b30358af046c3b244da3252d5dadb43ad7841791a6e186e13"
+      },
+      "scoped": true
+    }
+  ],
+  "original_admission_pin": {
+    "bytes": 50453,
+    "sha256": "241045c06e7f3d6b572b609acde48e5a2833ebb2a843bfd8006d6987411e2c2b"
+  }
+}

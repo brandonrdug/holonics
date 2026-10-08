@@ -1,0 +1,281 @@
+{
+  "status": "exact source decomposition integrity passed; all kernel acceptance pending",
+  "prior_source_sha256": "6dedfc094a78df6f22a23f1d804379d3b39139c4231a37806e5158c59a9d2ee0",
+  "declarations_preserved_once": 170,
+  "all_declaration_bodies_byte_identical": true,
+  "all_definitions_maps_hypotheses_and_theorem_signatures_unchanged": true,
+  "original19consumer_queries_retained": true,
+  "source_ranges_concatenate_to_entire_original_body": true,
+  "source_order_preserved": true,
+  "single_namespace_preserved": true,
+  "no_private_declarations_or_local_options_moved": true,
+  "no_import_cycles": true,
+  "no_parallel_library_or_aliases": true,
+  "compiler_launched": false,
+  "modules": [
+    {
+      "module": "HolonicsResearch.Foundation.ProductFactorCurrent",
+      "source": {
+        "private_machine_path_sha256": "5ff912dada07671ab91bc25334d59d917d695ec7668816e7707b4a36deb7e808"
+      },
+      "canonical_path": {
+        "private_machine_path_sha256": "57e3e2fa29854dd26179ee0b9c546bd1dcc6885702104113e7b8ca03aa8c9141"
+      },
+      "pin": {
+        "sha256": "5879a1b5239136365fc4b5a64ef4154c8a950b01470a853915162cdad008e9b6",
+        "bytes": 14510
+      },
+      "imports": [
+        "HolonicsResearch.Foundation.DiagonalChainTransport",
+        "Mathlib.LinearAlgebra.DirectSum.Finsupp"
+      ],
+      "body_start_bytes": 632,
+      "body_bytes": 12945,
+      "original_source_start_bytes": 780,
+      "original_source_end_bytes": 13725,
+      "axiom_selectors": [
+        "factorBoundary_generator",
+        "h1ClosedPart_boundary_zero",
+        "h1ClosedPart_reconstruction",
+        "h1_extended_boundary",
+        "pairCurrent_generator",
+        "pairCurrent_add_left",
+        "pairCurrent_add_right",
+        "pairCurrent_smul_left",
+        "pairCurrent_smul_right",
+        "pairCurrent_neg_left",
+        "pairCurrent_neg_right",
+        "pairCurrent_sub_left",
+        "pairCurrent_sub_right",
+        "pairCurrent_zero_left",
+        "pairCurrent_zero_right",
+        "mapPairLeft_generator",
+        "mapPairRight_generator",
+        "mapPairLeft_pairCurrent",
+        "mapPairRight_pairCurrent",
+        "mapPairLeft_comp",
+        "mapPairRight_comp",
+        "mapPairLeft_right_commute",
+        "extendedH1_apply",
+        "extendedH1_boundary"
+      ],
+      "complete_owner": true
+    },
+    {
+      "module": "HolonicsResearch.Foundation.ProductAxisBoundary",
+      "source": {
+        "private_machine_path_sha256": "5cf2dc5b807c65852911dc3c765af8a0c5ee1a347f583611004755083441b8ba"
+      },
+      "canonical_path": {
+        "private_machine_path_sha256": "83b6744dab4433d2f5ce281e35ef0b41d66c45db1257d4232baf5eef93281537"
+      },
+      "pin": {
+        "sha256": "911c9140c862a9db348447f4968cec9487b6ef7e1dc9442890c78e1d69bcf2e3",
+        "bytes": 29580
+      },
+      "imports": [
+        "HolonicsResearch.Foundation.ProductFactorCurrent"
+      ],
+      "body_start_bytes": 591,
+      "body_bytes": 27475,
+      "original_source_start_bytes": 13725,
+      "original_source_end_bytes": 41200,
+      "axiom_selectors": [
+        "leftAxis_generator",
+        "middleAxis_generator",
+        "rightAxis_generator",
+        "leftMiddleAxis_generator",
+        "rightMiddleAxis_generator",
+        "totalBoundaryThree_rightMiddle_generator",
+        "totalBoundaryThree_leftMiddle_generator",
+        "totalBoundaryThree_rightMiddleAxis",
+        "totalBoundaryThree_leftMiddleAxis",
+        "totalBoundaryThree_rightMiddle",
+        "totalBoundaryThree_leftMiddle",
+        "mapPairLeft_extendedH1_boundary",
+        "mapPairRight_extendedH1_boundary",
+        "boundary_middleJointFillingLeft",
+        "boundary_middleJointFillingRight",
+        "leftOneAxis_generator",
+        "rightOneAxis_generator",
+        "totalBoundaryOne_leftOneAxis",
+        "totalBoundaryOne_rightOneAxis",
+        "totalBoundaryTwo_leftAxis",
+        "totalBoundaryTwo_middleAxis",
+        "totalBoundaryTwo_rightAxis",
+        "totalOneAxisReconstruction",
+        "totalBoundaryOne_axisDecomposition",
+        "leftAxisProjection_generator",
+        "middleAxisProjection_generator",
+        "rightAxisProjection_generator",
+        "leftOneAxisProjection_generator",
+        "rightOneAxisProjection_generator",
+        "totalTwoAxisReconstruction",
+        "leftOneAxisProjection_totalBoundaryTwo",
+        "rightOneAxisProjection_totalBoundaryTwo",
+        "coupledAxisBoundaryEquations"
+      ],
+      "complete_owner": true
+    },
+    {
+      "module": "HolonicsResearch.Foundation.ProductAugmentation",
+      "source": {
+        "private_machine_path_sha256": "8636b35293f26d88f88112a5a19e28513f7c42cf77a917975027d5d02eec879e"
+      },
+      "canonical_path": {
+        "private_machine_path_sha256": "ed836dbaef76c6e260ee550bae52c890ff828db8d04aedcae021fd4fe48a7679"
+      },
+      "pin": {
+        "sha256": "d7de6a57fce6b259b56e85fee4c3c3cd26ed21fd62b1da0aeeac99a58fdebeca",
+        "bytes": 14993
+      },
+      "imports": [
+        "HolonicsResearch.Foundation.ProductAxisBoundary"
+      ],
+      "body_start_bytes": 586,
+      "body_bytes": 13616,
+      "original_source_start_bytes": 41200,
+      "original_source_end_bytes": 54816,
+      "axiom_selectors": [
+        "pairFirstAugmentation_generator",
+        "pairFirstBase_generator",
+        "pairFirstAugmentation_pairCurrent",
+        "pairFirstBase_current",
+        "productAugmentation_generator",
+        "totalBoundaryOne_productH0SeparatedAtom",
+        "totalBoundaryOne_productH0Separated",
+        "diagonalBoundaryOne_productH0Diagonal",
+        "pairSecondAugmentation_generator",
+        "pairSecondBase_generator",
+        "pairSecondAugmentation_pairCurrent",
+        "pairSecondBase_current",
+        "pairSecondAugmentation_mapPairLeft",
+        "pairSecondAugmentation_mapPairRight_boundary",
+        "mapPairRight_h0_boundary",
+        "mapPairLeft_pairSecondBase"
+      ],
+      "complete_owner": true
+    },
+    {
+      "module": "HolonicsResearch.Foundation.ProductEdgeContraction",
+      "source": {
+        "private_machine_path_sha256": "37030b20c195c4c2d66d1ede23402f113726c47ca4a452578c221b8ab7ecd5f0"
+      },
+      "canonical_path": {
+        "private_machine_path_sha256": "490fbc80c0d90963488284940bc715e4547556250a2274e021c17312afc1d1e6"
+      },
+      "pin": {
+        "sha256": "eb039e4c4a05e31329b1a9aa9deb7517c56b7814e026391e146958934a8ed681",
+        "bytes": 11549
+      },
+      "imports": [
+        "HolonicsResearch.Foundation.ProductAugmentation"
+      ],
+      "body_start_bytes": 574,
+      "body_bytes": 10519,
+      "original_source_start_bytes": 54816,
+      "original_source_end_bytes": 65335,
+      "axiom_selectors": [
+        "productOneBaseResidual_closed",
+        "totalBoundaryTwo_productTotalOneFilling",
+        "diagonalBoundaryTwo_productH1Diagonal_of_closed",
+        "pairFirstAugmentation_mapPairRight",
+        "pairFirstAugmentation_mapPairLeft_boundary",
+        "mapPairLeft_h0_boundary",
+        "mapPairLeft_factorBoundary_sq",
+        "mapPairRight_factorBoundary_sq"
+      ],
+      "complete_owner": true
+    },
+    {
+      "module": "HolonicsResearch.Foundation.ProductDegreeTwoNormalization",
+      "source": {
+        "private_machine_path_sha256": "cdc69bb0c2332773701890e463f717f52836b84bca641c90bbf31ba64756f5e7"
+      },
+      "canonical_path": {
+        "private_machine_path_sha256": "56b505d3963e0e1666f304f4483355c9d60b1ccecf2c570fc51e11612c8f8183"
+      },
+      "pin": {
+        "sha256": "91737d2bcbd861434eedccba52b701ce462c7b5df06d457df5c03a8ccb6e00fc",
+        "bytes": 24474
+      },
+      "imports": [
+        "HolonicsResearch.Foundation.ProductEdgeContraction"
+      ],
+      "body_start_bytes": 624,
+      "body_bytes": 22897,
+      "original_source_start_bytes": 65335,
+      "original_source_end_bytes": 88232,
+      "axiom_selectors": [
+        "coupledRightMiddleContraction_boundary",
+        "coupledLeftMiddleCorrection_boundary",
+        "coupledMiddleCorrection_boundary",
+        "mixedFirstBoundary_closed_of_totalBoundary",
+        "mixedSecondBoundary_closed_of_totalBoundary",
+        "correctedFirstOuter_closed",
+        "correctedSecondOuter_closed",
+        "coupledMiddleCorrection_reduces_to_outer",
+        "productFirstFactorDegreeTwoCurrent_closed",
+        "productSecondFactorDegreeTwoCurrent_closed",
+        "leftOuterNormalizationCorrection_boundary",
+        "rightOuterNormalizationCorrection_boundary",
+        "productDegreeTwoNormalizationFiller_boundary",
+        "totalBoundaryOne_totalBoundaryTwo",
+        "diagonalBoundaryOne_diagonalBoundaryTwo",
+        "boundary_middlePolarizedFilling",
+        "boundary_middlePolarizedFillingCurrent"
+      ],
+      "complete_owner": true
+    },
+    {
+      "module": "HolonicsResearch.Foundation.ProductDegreeTwo",
+      "source": {
+        "private_machine_path_sha256": "727fcedbc581c0b6c855b127307ac4d88070007cd83ff8e30cff8f02f0c46efa"
+      },
+      "canonical_path": {
+        "private_machine_path_sha256": "e9bddc0650758c275bac98edcb39f9c645d39b0cd0f5c74aab15f0075838670b"
+      },
+      "pin": {
+        "sha256": "bccb75cb5224603d569dde39b1437940ec026e1d0eb5eb615f64d315b0d42692",
+        "bytes": 21634
+      },
+      "imports": [
+        "HolonicsResearch.Foundation.ProductDegreeTwoNormalization"
+      ],
+      "body_start_bytes": 653,
+      "body_bytes": 19840,
+      "original_source_start_bytes": 88232,
+      "original_source_end_bytes": 108072,
+      "axiom_selectors": [
+        "diagonalBoundaryOne_productH0Diagonal",
+        "totalBoundaryTwo_productTotalOneFilling",
+        "diagonalBoundaryTwo_productH1Diagonal_of_closed",
+        "productFirstFactorDegreeTwoCurrent_closed",
+        "productSecondFactorDegreeTwoCurrent_closed",
+        "leftOuterNormalizationCorrection_boundary",
+        "rightOuterNormalizationCorrection_boundary",
+        "productDegreeTwoNormalizationFiller_boundary",
+        "coupledMiddleCorrection_reduces_to_outer",
+        "totalBoundaryOne_totalBoundaryTwo",
+        "diagonalBoundaryOne_diagonalBoundaryTwo",
+        "realizedProductCurrentEquiv_boundary_one",
+        "realizedProductCurrentEquiv_boundary_two",
+        "realizedProductCurrentEquiv_boundary_three",
+        "realizedProductFirstFactorDegreeTwoCurrent_closed",
+        "realizedProductSecondFactorDegreeTwoCurrent_closed",
+        "realizedProductDegreeTwoNormalizationFiller_boundary",
+        "productAugmentation_diagonalBoundaryOne",
+        "realizedProductLowDegreeCurrentDatum"
+      ],
+      "complete_owner": true
+    }
+  ],
+  "_scoped_evidence": {
+    "original_receipt_pin": {
+      "bytes": 10821,
+      "sha256": "7142a590a31280d44f6aa681406be66a1dd943ded418c9f5e8f36f2a029a4e3c"
+    },
+    "raw_machine_paths_and_runtime_copies_kept_private": true,
+    "mathematical_and_validation_values_preserved": true
+  }
+}

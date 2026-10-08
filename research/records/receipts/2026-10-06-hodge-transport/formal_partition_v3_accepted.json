@@ -1,0 +1,119 @@
+{
+  "status": "PASS focused exact Partitionv3 kernel/selectors and post-cleanup admission only",
+  "source_sha256": "4fba9d012bddfacc2acfdd97c6d3b5fce8d67df81afa5de6028ebd7a670c3541",
+  "kernel": {
+    "kernel_accepted": true,
+    "compiler_exit": 0,
+    "compiler_wall_ns": 2867180087,
+    "axioms": {
+      "Holonics.Physics.PartitionedHodgeEnergy.cycleBoundary_is_adjoint": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "Holonics.Physics.PartitionedHodgeEnergy.cycleHeatStep_cut_return": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "Holonics.Physics.PartitionedHodgeEnergy.cut_harmonic_laplacian_defect": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "Holonics.Physics.PartitionedHodgeEnergy.cut_heat_commutation_fails": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    "selector_count_matches": true,
+    "standard_axioms_only": true,
+    "metadata_unchanged": true,
+    "broad_library_checked": false
+  },
+  "pre_cleanup_final_passed_flag": false,
+  "stage_passed_before_cleanup": true,
+  "post_cleanup_acceptance_passed": true,
+  "released_quiescent": true,
+  "projection_ns": 17000000000,
+  "fixed_deadline_ns": 17000000000,
+  "stage_wall_ns": 5707328126,
+  "measured_to_projected": {
+    "numerator": 5707328126,
+    "denominator": 17000000000
+  },
+  "aggregate_CPU_ns": 5534787000,
+  "CPU_reading_grain_ns": 1000,
+  "aggregate_CPU_limit_us": 17000000,
+  "group_memory_peak_bytes": 418889728,
+  "peak_child_RSS_bytes": 3468595200,
+  "standard_axioms_only": true,
+  "prior_failures_preserved": true,
+  "broad_repository_or_importing_gate_passed": false,
+  "files": [
+    {
+      "relative_path": "research/records/receipts/2026-10-06-hodge-transport/partition-native-v3/hodge-partition-development-20261006-v3.config.json",
+      "sha256": "74d37d268369bb190ee17cab9562dab3f7a51c2bcb050478372c016b25847ffe",
+      "bytes": 8912
+    },
+    {
+      "relative_path": "research/records/receipts/2026-10-06-hodge-transport/partition-native-v3/hodge-partition-development-20261006-v3.final.json",
+      "sha256": "fba591f0fa4986536c8018a0eacad14407117356abe0421b882d02df0deca520",
+      "bytes": 4756
+    },
+    {
+      "relative_path": "research/records/receipts/2026-10-06-hodge-transport/partition-native-v3/hodge-partition-development-20261006-v3.output_seal.json",
+      "sha256": "139bd289c5df27c396a94fdfb4cf3dc9fb6a2bd73d42d3d255c5a3a293fe10db",
+      "bytes": 366879
+    },
+    {
+      "relative_path": "research/records/receipts/2026-10-06-hodge-transport/partition-native-v3/hodge-partition-development-20261006-v3.acceptance.json",
+      "sha256": "73d5b4d13b04ac2843e9276454d8f3b0e45cc323fdfce285465f15d622834a4a",
+      "bytes": 378
+    },
+    {
+      "relative_path": "research/records/receipts/2026-10-06-hodge-transport/partition-native-v3/hodge-partition-development-20261006-v3.release.json",
+      "sha256": "3fcea6ffd1c1624147904bfd08457a27190a4a76706301d639fb5554276b6d1a",
+      "bytes": 175
+    },
+    {
+      "relative_path": "research/records/receipts/2026-10-06-hodge-transport/partition-native-v3/hodge-partition-development-20261006-v3.unit-cleanup.json",
+      "sha256": "654539e5e38a4e02a7bc5a2b3be12bc17d3ae7dcd2a1c2dc2f08f622defa577e",
+      "bytes": 705
+    },
+    {
+      "relative_path": "research/records/receipts/2026-10-06-hodge-transport/partition-native-v3/hodge-partition-development-20261006-v3.stdout",
+      "sha256": "7f6e265fc7cfffe62d48dc9ef54064794fcaa81d7ef326353066d5cd3382255d",
+      "bytes": 4063
+    },
+    {
+      "relative_path": "research/records/receipts/2026-10-06-hodge-transport/partition-native-v3/hodge-partition-development-20261006-v3.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "relative_path": "research/records/receipts/2026-10-06-hodge-transport/partition-native-v3/KERNEL_VALIDATION.v3.json",
+      "sha256": "5ccf0ca60fc5990c41316431750c154a4bd6b5c7a16c551be476dafcd112dea2",
+      "bytes": 813
+    },
+    {
+      "relative_path": "research/records/receipts/2026-10-06-hodge-transport/partition-native-v3/COMPILER_REQUEST.v3.json",
+      "sha256": "19a241476e542a8db7219a61e978b50174f2a4cf70be77755532e60b70d4b8e5",
+      "bytes": 3320
+    },
+    {
+      "relative_path": "research/records/receipts/2026-10-06-hodge-transport/partition-native-v3/PartitionedHodgeEnergy.lean",
+      "sha256": "4fba9d012bddfacc2acfdd97c6d3b5fce8d67df81afa5de6028ebd7a670c3541",
+      "bytes": 11854
+    }
+  ],
+  "_scoped_evidence": {
+    "original_receipt_pin": {
+      "bytes": 4610,
+      "sha256": "9063b2e2cedaf3c4035dbc6e3cfa9e4cd871aa978329fe787d271c763f9024e7"
+    },
+    "raw_machine_paths_and_runtime_copies_kept_private": true,
+    "mathematical_and_validation_values_preserved": true
+  }
+}

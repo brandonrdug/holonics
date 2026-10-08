@@ -1,0 +1,104 @@
+{
+  "status": "six complete mathematical owners accepted; downstream failed source separate",
+  "receipt": {
+    "private_machine_path_sha256": "f694437d3dd0dae50d12334a94dbb7ab6c29afe856cc313729895fb3ac8148bf"
+  },
+  "receipt_sha256": "a11927bd33c7622e2a7040fb8be9945f844aacb46b6142d4608b1e88c26fab09",
+  "source_checks_match": true,
+  "selector_total": 117,
+  "owners": [
+    {
+      "module": "HolonicsResearch.Foundation.ProductFactorCurrent",
+      "source_pin": {
+        "sha256": "5879a1b5239136365fc4b5a64ef4154c8a950b01470a853915162cdad008e9b6",
+        "bytes": 14510
+      },
+      "selectors": 24,
+      "compiler_wall_ns": 6985384275,
+      "complete_stage_wall_ns": 8668529342,
+      "group_peak_bytes": 1499332608,
+      "fixed_compiler_ns": 17000000000,
+      "standard_axioms_only": true,
+      "quiescent_release": true
+    },
+    {
+      "module": "HolonicsResearch.Foundation.ProductAxisBoundary",
+      "source_pin": {
+        "sha256": "911c9140c862a9db348447f4968cec9487b6ef7e1dc9442890c78e1d69bcf2e3",
+        "bytes": 29580
+      },
+      "selectors": 33,
+      "compiler_wall_ns": 7409898985,
+      "complete_stage_wall_ns": 9088769980,
+      "group_peak_bytes": 709971968,
+      "fixed_compiler_ns": 17000000000,
+      "standard_axioms_only": true,
+      "quiescent_release": true
+    },
+    {
+      "module": "HolonicsResearch.Foundation.ProductAugmentation",
+      "source_pin": {
+        "sha256": "d7de6a57fce6b259b56e85fee4c3c3cd26ed21fd62b1da0aeeac99a58fdebeca",
+        "bytes": 14993
+      },
+      "selectors": 16,
+      "compiler_wall_ns": 3940711471,
+      "complete_stage_wall_ns": 5644118927,
+      "group_peak_bytes": 643506176,
+      "fixed_compiler_ns": 17000000000,
+      "standard_axioms_only": true,
+      "quiescent_release": true
+    },
+    {
+      "module": "HolonicsResearch.Foundation.ProductEdgeContraction",
+      "source_pin": {
+        "sha256": "eb039e4c4a05e31329b1a9aa9deb7517c56b7814e026391e146958934a8ed681",
+        "bytes": 11549
+      },
+      "selectors": 8,
+      "compiler_wall_ns": 4330260505,
+      "complete_stage_wall_ns": 6023977282,
+      "group_peak_bytes": 809717760,
+      "fixed_compiler_ns": 17000000000,
+      "standard_axioms_only": true,
+      "quiescent_release": true
+    },
+    {
+      "module": "HolonicsResearch.Foundation.ProductDegreeTwoNormalization",
+      "source_pin": {
+        "sha256": "91737d2bcbd861434eedccba52b701ce462c7b5df06d457df5c03a8ccb6e00fc",
+        "bytes": 24474
+      },
+      "selectors": 17,
+      "compiler_wall_ns": 6740760839,
+      "complete_stage_wall_ns": 8445883023,
+      "group_peak_bytes": 649158656,
+      "fixed_compiler_ns": 17000000000,
+      "standard_axioms_only": true,
+      "quiescent_release": true
+    },
+    {
+      "module": "HolonicsResearch.Foundation.ProductDegreeTwo",
+      "source_pin": {
+        "sha256": "bccb75cb5224603d569dde39b1437940ec026e1d0eb5eb615f64d315b0d42692",
+        "bytes": 21634
+      },
+      "selectors": 19,
+      "compiler_wall_ns": 4264707421,
+      "complete_stage_wall_ns": 5968340682,
+      "group_peak_bytes": 514895872,
+      "fixed_compiler_ns": 17000000000,
+      "standard_axioms_only": true,
+      "quiescent_release": true
+    }
+  ],
+  "downstream_HodgeProductDiagonal": "failed12proof/typeerrors; original rejected bytes preserved; repaired full source fresh acceptance pending",
+  "_scoped_evidence": {
+    "original_receipt_pin": {
+      "bytes": 3420,
+      "sha256": "c30a39db0cb41acb829a3091c8f80b3cca61b3b1efc48d4e3773e375e61616cd"
+    },
+    "raw_machine_paths_and_runtime_copies_kept_private": true,
+    "mathematical_and_validation_values_preserved": true
+  }
+}

@@ -1,0 +1,316 @@
+{
+  "status": "PASS exact v15 source, kernel, standard-axiom, preparation/development acceptance and release evidence; no new compiler execution",
+  "validation": {
+    "private_machine_path_sha256": "54c4228664b5c9baa7e9186a0768b0a5c2754a405ccac34c3315e9bbb77507cf"
+  },
+  "validation_pin": {
+    "sha256": "3ddb8c8307e8fd9a841d5b22cceac208afb155190d7f151676243fcc706dd708",
+    "bytes": 190211
+  },
+  "accepted_complete_owners": [
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSphereNormalizedCoefficient",
+      "source_pin": {
+        "sha256": "aaae98651a47755a263b8a28fc32f73b9abd423f06eeee338fdf0492eee41a8c",
+        "bytes": 11157
+      },
+      "queries": 10,
+      "standard_axioms_only": true,
+      "kernel_accepted": true,
+      "complete_stages_and_release_accepted": true,
+      "receipt_pins_verified": [
+        {
+          "path": {
+            "private_machine_path_sha256": "60174e6673c568cb7c017d3116064bcadeaf408fd1229888d23b9635229e228b"
+          },
+          "durable_copy": {
+            "private_machine_path_sha256": "8577724ff34c9ff52d28a83cb91e716fab2763f8caa783d0f6aebb30a7ed654f"
+          },
+          "pin": {
+            "sha256": "c071f7df2d7751c8265b651eb667f971d7213bfa4ff355d9c90d1d58536873b1",
+            "bytes": 1764
+          }
+        },
+        {
+          "path": {
+            "private_machine_path_sha256": "8c597d7f046b5aa67c33771587647dbc2f9e0f1610874eb88894eb3a7fa3cb56"
+          },
+          "durable_copy": {
+            "private_machine_path_sha256": "4fad658f58748de88a96e08eba9a77ae1aed248138ead378f4692b774180528f"
+          },
+          "pin": {
+            "sha256": "3b3f5e8e3a26ea91e5d213f1ce9a78b24fc04943ff70df7db20f80a85aaac533",
+            "bytes": 378
+          }
+        },
+        {
+          "path": {
+            "private_machine_path_sha256": "df8d89c0776920f4ab2b66990a9402098311f3f5aa8c747e77974fdec9583c32"
+          },
+          "durable_copy": {
+            "private_machine_path_sha256": "4d1aa2f328e06663bdf8f3be823b4b2828504fae830035af24211efdef48c510"
+          },
+          "pin": {
+            "sha256": "f1653d94463a39d3888fdcaceb3d74dd30d490700b2feb3e862a4b155ca1c913",
+            "bytes": 175
+          }
+        },
+        {
+          "path": {
+            "private_machine_path_sha256": "4261b1248cd8501e32238d8beebc25b64ac218b4e624d53a9830839cd43680a7"
+          },
+          "durable_copy": {
+            "private_machine_path_sha256": "1b9dec0f4131ec44811380d0785bf4c6a1d2e6c7b49b06c3ae5eadf8f8ec2106"
+          },
+          "pin": {
+            "sha256": "136370d6c8f804e5c61c2d90cbef21061d6b7b2f9844cb821645e4c70545f4f0",
+            "bytes": 378
+          }
+        },
+        {
+          "path": {
+            "private_machine_path_sha256": "41ea7911fb304a8ee55061195ebba38f688f931d4f4aec5e93fc09b89cf5ba77"
+          },
+          "durable_copy": {
+            "private_machine_path_sha256": "4c25f54ea439bc469ed53f94dab8dcd6dc413c268469a27bb1110c75d9043a2e"
+          },
+          "pin": {
+            "sha256": "0736d086eb463e110639da185e41b929c27c67416da6051f15f6318f22698992",
+            "bytes": 175
+          }
+        }
+      ]
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProductDiagonal",
+      "source_pin": {
+        "sha256": "85047a43f7020aba3e97236d386f6b1f561cc91b8e7ef093b4ae34e3e0ef29c5",
+        "bytes": 11709
+      },
+      "queries": 45,
+      "standard_axioms_only": true,
+      "kernel_accepted": true,
+      "complete_stages_and_release_accepted": true,
+      "receipt_pins_verified": [
+        {
+          "path": {
+            "private_machine_path_sha256": "7f047b3b9fd14c8b772f314d175efa7959831d9fa277b1a043e5f9f43d288efc"
+          },
+          "durable_copy": {
+            "private_machine_path_sha256": "f1590ac6a66e21e028e0f3d31f9cb60cdf756bb018b10a9602a32d7343a1c77d"
+          },
+          "pin": {
+            "sha256": "d29acad1ed229bdeead91446685428f88e175dafb4665633147bbe12b8acea8b",
+            "bytes": 6995
+          }
+        },
+        {
+          "path": {
+            "private_machine_path_sha256": "3d2ee179659c759d7bad02648f9d5b4522d3d514c1a6fe3c6f459d2be5aa14fd"
+          },
+          "durable_copy": {
+            "private_machine_path_sha256": "721d0ae1065d9936b6cb96a2bca9d981858348476668bdc2fb7788e555385eb9"
+          },
+          "pin": {
+            "sha256": "d58c8c31d658377869a4f351844226f3f2459606f32a42b094376ee7a089a726",
+            "bytes": 378
+          }
+        },
+        {
+          "path": {
+            "private_machine_path_sha256": "c8a470c18dc18c51788e379827aa5df49c318368376818fc9c898b09262709cb"
+          },
+          "durable_copy": {
+            "private_machine_path_sha256": "c6f3d990e4e3bb845bf4e65ca5265a924474f6e3a4db176566e19c6eb9c68434"
+          },
+          "pin": {
+            "sha256": "9cd118b2f2f4f652e3a9c6c80239857e4a59fb3a60051456941999921ec56033",
+            "bytes": 175
+          }
+        },
+        {
+          "path": {
+            "private_machine_path_sha256": "ffb2472c6f38e1d184944a6ea77a5c3a28c3b558ae293efdcfc0d1605f58857d"
+          },
+          "durable_copy": {
+            "private_machine_path_sha256": "ef631c3a23aea23ba2a54def10a75ecb47999c13a1c676a46f7a16d06d0b264f"
+          },
+          "pin": {
+            "sha256": "6339858c6531b8d714d0d7acfa67efa0a27802f165dd23abdd766e6222cf5a4f",
+            "bytes": 378
+          }
+        },
+        {
+          "path": {
+            "private_machine_path_sha256": "216011d80e72bcd2cd80c4d4ad1de1fa64fb550cd8b09858e3de5db4afd884ca"
+          },
+          "durable_copy": {
+            "private_machine_path_sha256": "0d0e82d0b1d828f5e03a42167fd69af9198125259fc4a035fbf254e80f2bea23"
+          },
+          "pin": {
+            "sha256": "0af6fd146c2e4e416a3cc661109e19331e04f64dd8732dc8cf7971663baa0ba4",
+            "bytes": 175
+          }
+        }
+      ]
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSphereChainCurrent",
+      "source_pin": {
+        "sha256": "091a334e3a171012c3566fd93cf35432a16910dc3298b7082dcbbf21c24ec88e",
+        "bytes": 7565
+      },
+      "queries": 2,
+      "standard_axioms_only": true,
+      "kernel_accepted": true,
+      "complete_stages_and_release_accepted": true,
+      "receipt_pins_verified": [
+        {
+          "path": {
+            "private_machine_path_sha256": "5894f2418d9435a29bd645894af4ce5e36f1cd1827de53143bc1a3e3141b3348"
+          },
+          "durable_copy": {
+            "private_machine_path_sha256": "b97cba53ff976274b7f7f216e05c0c3f27b8ffe5091b144036fcd86e47482116"
+          },
+          "pin": {
+            "sha256": "6549917515f5b08b6580a59d28e09cca035dc9e7ba68412748e959cd3dbb7e3c",
+            "bytes": 522
+          }
+        },
+        {
+          "path": {
+            "private_machine_path_sha256": "6173cba084382e8da27386fabc41970fbe17d4305a2957c6eee3bcfee661b187"
+          },
+          "durable_copy": {
+            "private_machine_path_sha256": "1f398edf1f32913e92eddbd3fba1ae867ae869fceb4281f4555a8f1948823dd4"
+          },
+          "pin": {
+            "sha256": "dac7a9fff7507bd59497912bbc9c67d4c743ab7b7b8d27be0cb9fe12670ff2c8",
+            "bytes": 378
+          }
+        },
+        {
+          "path": {
+            "private_machine_path_sha256": "afc3ce0e8700521b1c6283253586bf1f7d9ee0be88ed52c62cd10e4e29efc91a"
+          },
+          "durable_copy": {
+            "private_machine_path_sha256": "f271bb6b656ec5f18cface8c2735e15abcd852fb9dfedbc402704ee2ba26a3f7"
+          },
+          "pin": {
+            "sha256": "e7f04038c08c5d025e5d832b3f0b1a0a9abfc83d8b6c2bb35b212dc1b89fb26a",
+            "bytes": 175
+          }
+        },
+        {
+          "path": {
+            "private_machine_path_sha256": "3335380c9949df3218d37da6be4c14bd3697dd3db68bad8404bccd91860bd938"
+          },
+          "durable_copy": {
+            "private_machine_path_sha256": "dfe3a700a18874f50ad3ad0426170722638c932b602a735205971d288cb0dc86"
+          },
+          "pin": {
+            "sha256": "b513c89d9e8ff59904c0a83418f653a54de6f326dc5cdb22724c34271593d9d6",
+            "bytes": 378
+          }
+        },
+        {
+          "path": {
+            "private_machine_path_sha256": "66923ac7e75202cbb52228927ec603cdde3c185dbce1ba9e47f059e261ce7a72"
+          },
+          "durable_copy": {
+            "private_machine_path_sha256": "2cbefe918543ed0a8cfd4d7718ef30a94476e82b6e5a291e3c7a3f4b4dfdb105"
+          },
+          "pin": {
+            "sha256": "eb9e9a31ec35ca38aff6a354a200842f5e56f7dd7ed9402d6d5b90c0458272d4",
+            "bytes": 175
+          }
+        }
+      ]
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProductMixedFilling",
+      "source_pin": {
+        "sha256": "9fa6ba333fd1d0f4e9b4bc1595d495d14734e67109e788fa4a7d26f6242613de",
+        "bytes": 73978
+      },
+      "queries": 4,
+      "standard_axioms_only": true,
+      "kernel_accepted": true,
+      "complete_stages_and_release_accepted": true,
+      "receipt_pins_verified": [
+        {
+          "path": {
+            "private_machine_path_sha256": "f97a49d65392d7fe42a0f459bb5f0fda22e4041db21911a5a446d5e5cc06181e"
+          },
+          "durable_copy": {
+            "private_machine_path_sha256": "8d189b3cf1734f9484ad3b517e77afce340893965bbd38d289b5f3508bb4eff1"
+          },
+          "pin": {
+            "sha256": "7ff2756b35f623a44a014cfe9a5f465beaaab0ed6f8cc7b6ea0312d721cf49ce",
+            "bytes": 832
+          }
+        },
+        {
+          "path": {
+            "private_machine_path_sha256": "27d52349e6d6c03208e8b961ecdc4ff9b9149de2a5f190f4371a90380ae9a6cc"
+          },
+          "durable_copy": {
+            "private_machine_path_sha256": "8901f15aa275ee6fd475883dd637e47d07d6e385476bbdb8cda5e2dcc9ef4610"
+          },
+          "pin": {
+            "sha256": "b8e229b833962dda1a2e8130ba9fc7a3141755bfadb55185f3c6ddf3e12ceafa",
+            "bytes": 378
+          }
+        },
+        {
+          "path": {
+            "private_machine_path_sha256": "e858d024b38585de8133ed8da99980be7314c86059a19c447aad53ad2d27db90"
+          },
+          "durable_copy": {
+            "private_machine_path_sha256": "78b36b383b0dad3821ab83bedecd1b08f7eea7154755c673f4fd1af64823a463"
+          },
+          "pin": {
+            "sha256": "cd13e167ca85f2eef03156ea1d14c7fee3490694710e587568b61bcf79abfded",
+            "bytes": 175
+          }
+        },
+        {
+          "path": {
+            "private_machine_path_sha256": "939fe4e372c5ce18269e39170fd9b1558d53d83deca72f9aa62846f3054905f7"
+          },
+          "durable_copy": {
+            "private_machine_path_sha256": "a9eff4d30c1f4c1bc32eecd0c81c13036974a28e40e53f544f320ffb5af08480"
+          },
+          "pin": {
+            "sha256": "c3c1448bab08d0738f39f3302d82580853b18a07b4d577b77692add299004b1a",
+            "bytes": 378
+          }
+        },
+        {
+          "path": {
+            "private_machine_path_sha256": "924fce34d40074858df5524d957555803b16250ce000d85262b14da365b8e08d"
+          },
+          "durable_copy": {
+            "private_machine_path_sha256": "49c4b30db88de7886eac0f7c6a97bfa2c1456a26b37b4bb3e14592fd104fa2aa"
+          },
+          "pin": {
+            "sha256": "ecbe6602d4dafeefb5fffbb20913e360086f1ab1bb5aee189289d9d937156604",
+            "bytes": 175
+          }
+        }
+      ]
+    }
+  ],
+  "total_queries": 61,
+  "new_ruling_owners_accepted": false,
+  "final_Pair_accepted": false,
+  "default_or_whole_research_library_checked": false,
+  "_scoped_evidence": {
+    "original_receipt_pin": {
+      "bytes": 14731,
+      "sha256": "4af762890aa70c98c2eb0ca485d329935e40e478abd9d7b192aa3ab5bab87d63"
+    },
+    "raw_machine_paths_and_runtime_copies_kept_private": true,
+    "mathematical_and_validation_values_preserved": true
+  }
+}

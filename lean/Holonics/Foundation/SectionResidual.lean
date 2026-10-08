@@ -1,6 +1,8 @@
 import Mathlib.Algebra.Module.LinearMap.Basic
 import Mathlib.Data.Real.Basic
 import Mathlib.Tactic.Abel
+import Mathlib.LinearAlgebra.Complex.Module
+import Mathlib.Tactic.Ring
 
 /-!
 # Section residuals
@@ -64,4 +66,51 @@ theorem residual_reconstructs_with_shift {q : E →ₗ[ℝ] Q}
         s'.value (q x) + (remainder s x - shift s s' (q x)) := by abel
     _ = x := h
 
+/-! [agent-inferred] A possibly nonlinear receiving face reads the exact source
+return at its contemporary section. The lower return is composed through the
+first section, so its mixed term is retained. These are the general laws from
+the accepted private recursive section source, relocated into their existing
+owner; the Hodge cut below is their concrete consumer. -/
+
+section ReceivingFace
+variable {P : Type*} [AddCommGroup P] [Module ℝ P]
+
+def receiverDefect {q : E →ₗ[ℝ] Q} (R : E → ℂ) (s : Section q) (x : E) : ℂ :=
+  R (s.value (q x)+remainder s x)-R (s.value (q x))
+
+theorem exact_receiver_defect {q : E →ₗ[ℝ] Q} (R : E → ℂ) (s : Section q) (x : E) :
+    R x = R (s.value (q x))+receiverDefect R s x := by
+  unfold receiverDefect
+  rw [source_reconstructs]
+  ring
+
+/-- No linearity of either section or the receiving face is assumed. The
+second-level defect is read through the first section at its actual pivot. -/
+theorem two_level_receiver_defects {q : E →ₗ[ℝ] Q} {p : Q →ₗ[ℝ] P}
+    (R : E → ℂ) (s₁ : Section q) (s₂ : Section p) (x : E) :
+    R x = R (s₁.value (s₂.value (p (q x))))+
+      receiverDefect R s₁ x+receiverDefect (fun y => R (s₁.value y)) s₂ (q x) := by
+  have h₂ := exact_receiver_defect (fun y => R (s₁.value y)) s₂ (q x)
+  calc
+    R x = R (s₁.value (q x))+receiverDefect R s₁ x := exact_receiver_defect R s₁ x
+    _ = (R (s₁.value (s₂.value (p (q x))))+
+        receiverDefect (fun y => R (s₁.value y)) s₂ (q x))+receiverDefect R s₁ x := by rw [h₂]
+    _ = _ := by ring
+
+/-- A linear receiving face reads its remainder additively at one level.
+At a deeper level the composite face must still satisfy this hypothesis. -/
+theorem linear_receiver_defect {q : E →ₗ[ℝ] Q}
+    (R : E →ₗ[ℝ] ℂ) (s : Section q) (x : E) :
+    receiverDefect R s x = R (remainder s x) := by
+  unfold receiverDefect
+  rw [map_add]
+  ring
+
+end ReceivingFace
+
 end Holonics.Foundation.SectionResidual
+
+#print axioms Holonics.Foundation.SectionResidual.receiverDefect
+#print axioms Holonics.Foundation.SectionResidual.exact_receiver_defect
+#print axioms Holonics.Foundation.SectionResidual.two_level_receiver_defects
+#print axioms Holonics.Foundation.SectionResidual.linear_receiver_defect

@@ -1,0 +1,22 @@
+{
+  "kernel_accepted": false,
+  "terminal_queue_summary": {
+    "private_machine_path_sha256": "44e1117076d57344489c112e79f1316c2e3d1b728dedcf72fb10f7af6fb7ff80"
+  },
+  "actual_diagnostics": "stages and queue contain unfiltered compiler outputs; source versions copied",
+  "all_native_or_Lean_children_reaped": true,
+  "common_lease_held": false,
+  "remaining_queue_frozen_for_Protein": true,
+  "caps_or_deadlines_raised": false,
+  "manifest": {
+    "private_machine_path_sha256": "fd73bc4f88b4120b210feafa20b83e63b7cb8ef5dfb77203b432cca598c8e9ef"
+  },
+  "_scoped_evidence": {
+    "original_receipt_pin": {
+      "bytes": 667,
+      "sha256": "47406b454ca68c07023240ce9787dafcef0b9465e9e40f75343dee3b699ead47"
+    },
+    "raw_machine_paths_and_runtime_copies_kept_private": true,
+    "mathematical_and_validation_values_preserved": true
+  }
+}

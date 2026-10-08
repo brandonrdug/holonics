@@ -1,0 +1,126 @@
+{
+  "status": "genuine full mathematical owners implemented; no execution here",
+  "prior_full_source_sha256": "7b88ae51a553d9cf9397ae5e9c60ffe7832b6557e2ec1bd2188f0812e655af6e",
+  "resource_evidence": {
+    "compiler_wall_ns": 17126229334,
+    "fixed_compiler_wall_ns": 17000000000,
+    "aggregate_CPU_ns": 12315379000,
+    "group_peak_bytes": 4294967296,
+    "memory_max_events": 2987,
+    "OOM_kills": 0,
+    "queries_reached": 0,
+    "exact_expensive_proof": "not located; no diagnostic"
+  },
+  "choice": "agent-inferred: one ownership chain at existing mathematical boundaries, reducing live elaboration and making checked whole providers reusable. No declaration body, signature or corrected universe scope is changed.",
+  "units": [
+    {
+      "module": "HolonicsResearch.Hodge.HodgeTopologicalProductRealization",
+      "declarations": 17,
+      "first": "topologicalProductTopCat",
+      "last": "homeomorphicTopologicalProductSimplexRealization",
+      "body_bytes": 7596,
+      "original_source_ranges": [
+        [
+          1301,
+          8853
+        ]
+      ]
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeTopologicalSingularCurrent",
+      "declarations": 28,
+      "first": "topologicalSingularChainComplex",
+      "last": "topologicalFactorBoundary_sq",
+      "body_bytes": 20045,
+      "original_source_ranges": [
+        [
+          8853,
+          26416
+        ],
+        [
+          63472,
+          65667
+        ]
+      ]
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSphereProductCurrent",
+      "declarations": 30,
+      "first": "SphereSSet",
+      "last": "productChainDiagonalEquiv_generator",
+      "body_bytes": 13315,
+      "original_source_ranges": [
+        [
+          26416,
+          39489
+        ]
+      ]
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSphereProductReconstruction",
+      "declarations": 26,
+      "first": "productChainDiagonalEquiv_boundary_generator",
+      "last": "productReconstructionBoundaryHolon",
+      "body_bytes": 18179,
+      "original_source_ranges": [
+        [
+          39489,
+          57597
+        ]
+      ]
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSphereProductFourCycle",
+      "declarations": 6,
+      "first": "pairTwoBoundary_factor_incidence",
+      "last": "sphereProductFundamentalFourChain_closed",
+      "body_bytes": 5911,
+      "original_source_ranges": [
+        [
+          57597,
+          63472
+        ]
+      ]
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSphereNormalizedCoefficient",
+      "declarations": 16,
+      "first": "sphereRawCoefficient",
+      "last": "pairFourReceiver_pairTwoShuffle_pairCurrent",
+      "body_bytes": 9392,
+      "original_source_ranges": [
+        [
+          65667,
+          74989
+        ]
+      ]
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProductDiagonal",
+      "declarations": 15,
+      "first": "productChainDiagonalEquiv_boundary_five_generator",
+      "last": "sphereProductFundamentalFourHomologyClass_ne_zero",
+      "body_bytes": 8490,
+      "original_source_ranges": [
+        [
+          74989,
+          83402
+        ]
+      ]
+    }
+  ],
+  "relocated_generic_helpers": "topologicalCurrentToChain_boundary and topologicalFactorBoundary_sq move into generic singular-current owner; they depend only on its generic chart, not later sphere-product definitions; neither has a simp attribute.",
+  "existing_public_consumer": "HodgeProductDiagonal keeps degree-five boundary join, actual product nonboundary receiver, quotient descent and explicit nonzero class, with all45original full target queries",
+  "acceptance": "all7complete owners separately checked with pinned accepted Foundation/product provider edges; final consumer original45queries; then all10remaining complete downstream owners through Pair",
+  "fixed_limits": "Existing17sCPU/wall and4GiB per complete owner unchanged; queue derives import preparation projections from current measured units and stops on first failed scope. No unchanged retry, capraise, or prefix claim.",
+  "queue_owner": "01a10352-66ea-73c8-b716-a835a9a04033",
+  "compiler_launched": false,
+  "_scoped_evidence": {
+    "original_receipt_pin": {
+      "bytes": 4152,
+      "sha256": "1208ff1c75999a2b0a20eaba22ee3d5cba87a746d813f9c5eaec87288c90a1bb"
+    },
+    "raw_machine_paths_and_runtime_copies_kept_private": true,
+    "mathematical_and_validation_values_preserved": true
+  }
+}

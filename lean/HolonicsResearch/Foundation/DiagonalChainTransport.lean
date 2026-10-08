@@ -1,8 +1,9 @@
 import Holonics.Foundation.Holon
 import Mathlib.AlgebraicTopology.SimplicialSet.Basic
+import Mathlib.Tactic.Ring
 
 /-!
-# Exact diagonal-to-product chain transport in degrees zero through three
+# Exact diagonal-to-product chain transport and the degree-four pair current
 
 A product simplex arrives diagonally: both factors are sampled over the same ordered source
 simplex.  The receiving product complex instead separates it into the three degree-two incidence
@@ -284,6 +285,54 @@ def rejoinThreeAtom {X Y : SSet} : TotalThreeOccurrence X Y →
 def rejoinThree (X Y : SSet) : Current (TotalThreeOccurrence X Y) →ₗ[ℚ]
     Current (DiagonalOccurrence X Y 3) :=
   extend rejoinThreeAtom
+
+/-- The complete boundary of a degree-four diagonal occurrence. -/
+def diagonalBoundaryFourAtom {X Y : SSet}
+    (occurrence : DiagonalOccurrence X Y 4) :
+    Current (DiagonalOccurrence X Y 3) :=
+  generator (diagonalFace 0 occurrence) - generator (diagonalFace 1 occurrence) +
+    generator (diagonalFace 2 occurrence) - generator (diagonalFace 3 occurrence) +
+      generator (diagonalFace 4 occurrence)
+
+def diagonalBoundaryFour (X Y : SSet) :
+    Current (DiagonalOccurrence X Y 4) →ₗ[ℚ]
+      Current (DiagonalOccurrence X Y 3) :=
+  extend diagonalBoundaryFourAtom
+
+/-- [agent-inferred] The two degree-two factor currents meet in the complete six signed
+shuffles.  Their signs count exchanges of a right step past a left step.  Every source map is
+retained, including degenerate occurrences; no homology or cellular-reduction premise enters. -/
+def pairTwoShuffleAtom {X Y : SSet}
+    (occurrence : Simplex X 2 × Simplex Y 2) :
+    Current (DiagonalOccurrence X Y 4) :=
+  generator (X.σ 3 (X.σ 2 occurrence.1), Y.σ 1 (Y.σ 0 occurrence.2)) -
+    generator (X.σ 3 (X.σ 1 occurrence.1), Y.σ 2 (Y.σ 0 occurrence.2)) +
+      generator (X.σ 2 (X.σ 1 occurrence.1), Y.σ 3 (Y.σ 0 occurrence.2)) +
+        generator (X.σ 3 (X.σ 0 occurrence.1), Y.σ 2 (Y.σ 1 occurrence.2)) -
+          generator (X.σ 2 (X.σ 0 occurrence.1), Y.σ 3 (Y.σ 1 occurrence.2)) +
+            generator (X.σ 1 (X.σ 0 occurrence.1), Y.σ 3 (Y.σ 2 occurrence.2))
+
+def pairTwoShuffle (X Y : SSet) :
+    Current (Simplex X 2 × Simplex Y 2) →ₗ[ℚ]
+      Current (DiagonalOccurrence X Y 4) :=
+  extend pairTwoShuffleAtom
+
+/-- The separated boundary of the actual `2 × 2` current, with positive second-factor sign
+because the first factor has even degree. -/
+def pairTwoBoundaryAtom {X Y : SSet}
+    (occurrence : Simplex X 2 × Simplex Y 2) :
+    Current (TotalThreeOccurrence X Y) :=
+  generator (.leftMiddle (face 0 occurrence.1) occurrence.2) -
+    generator (.leftMiddle (face 1 occurrence.1) occurrence.2) +
+      generator (.leftMiddle (face 2 occurrence.1) occurrence.2) +
+        generator (.rightMiddle occurrence.1 (face 0 occurrence.2)) -
+          generator (.rightMiddle occurrence.1 (face 1 occurrence.2)) +
+            generator (.rightMiddle occurrence.1 (face 2 occurrence.2))
+
+def pairTwoBoundary (X Y : SSet) :
+    Current (Simplex X 2 × Simplex Y 2) →ₗ[ℚ]
+      Current (TotalThreeOccurrence X Y) :=
+  extend pairTwoBoundaryAtom
 
 /-- The degree-one part of the retained diagonal reconstruction homotopy. -/
 def diagonalReconstructionFillerOneAtom {X Y : SSet}
@@ -884,10 +933,498 @@ def separationBoundaryHolon (X Y : SSet) :
     simp only [LinearMap.comp_apply] at law
     simpa using law
 
+@[simp] private theorem face_0_degenerate_1_tetrahedron {X : SSet}
+    (simplex : Simplex X 3) :
+    face 0 (X.σ 1 simplex) = X.σ 0 (face 0 simplex) := by
+  simpa [face] using
+    (X.δ_comp_σ_of_le_apply (i := (0 : Fin 4)) (j := (0 : Fin 3))
+      (by decide) simplex)
+
+@[simp] private theorem face_1_degenerate_1_tetrahedron {X : SSet}
+    (simplex : Simplex X 3) :
+    face 1 (X.σ 1 simplex) = simplex := by
+  exact X.δ_comp_σ_self_apply 1 simplex
+
+@[simp] private theorem face_2_degenerate_1_tetrahedron {X : SSet}
+    (simplex : Simplex X 3) :
+    face 2 (X.σ 1 simplex) = simplex := by
+  exact X.δ_comp_σ_succ_apply 1 simplex
+
+@[simp] private theorem face_3_degenerate_1_tetrahedron {X : SSet}
+    (simplex : Simplex X 3) :
+    face 3 (X.σ 1 simplex) = X.σ 1 (face 2 simplex) := by
+  simpa [face] using
+    (X.δ_comp_σ_of_gt_apply (i := (2 : Fin 4)) (j := (1 : Fin 3))
+      (by decide) simplex)
+
+@[simp] private theorem face_4_degenerate_1_tetrahedron {X : SSet}
+    (simplex : Simplex X 3) :
+    face 4 (X.σ 1 simplex) = X.σ 1 (face 3 simplex) := by
+  simpa [face] using
+    (X.δ_comp_σ_of_gt_apply (i := (3 : Fin 4)) (j := (1 : Fin 3))
+      (by decide) simplex)
+
+@[simp] private theorem face_0_degenerate_2_tetrahedron {X : SSet}
+    (simplex : Simplex X 3) :
+    face 0 (X.σ 2 simplex) = X.σ 1 (face 0 simplex) := by
+  simpa [face] using
+    (X.δ_comp_σ_of_le_apply (i := (0 : Fin 4)) (j := (1 : Fin 3))
+      (by decide) simplex)
+
+@[simp] private theorem face_1_degenerate_2_tetrahedron {X : SSet}
+    (simplex : Simplex X 3) :
+    face 1 (X.σ 2 simplex) = X.σ 1 (face 1 simplex) := by
+  simpa [face] using
+    (X.δ_comp_σ_of_le_apply (i := (1 : Fin 4)) (j := (1 : Fin 3))
+      (by decide) simplex)
+
+@[simp] private theorem face_2_degenerate_2_tetrahedron {X : SSet}
+    (simplex : Simplex X 3) :
+    face 2 (X.σ 2 simplex) = simplex := by
+  exact X.δ_comp_σ_self_apply 2 simplex
+
+@[simp] private theorem face_3_degenerate_2_tetrahedron {X : SSet}
+    (simplex : Simplex X 3) :
+    face 3 (X.σ 2 simplex) = simplex := by
+  exact X.δ_comp_σ_succ_apply 2 simplex
+
+@[simp] private theorem face_4_degenerate_2_tetrahedron {X : SSet}
+    (simplex : Simplex X 3) :
+    face 4 (X.σ 2 simplex) = X.σ 2 (face 3 simplex) := by
+  simpa [face] using
+    (X.δ_comp_σ_of_gt_apply (i := (3 : Fin 4)) (j := (2 : Fin 3))
+      (by decide) simplex)
+
+@[simp] private theorem face_0_degenerate_3_tetrahedron {X : SSet}
+    (simplex : Simplex X 3) :
+    face 0 (X.σ 3 simplex) = X.σ 2 (face 0 simplex) := by
+  simpa [face] using
+    (X.δ_comp_σ_of_le_apply (i := (0 : Fin 4)) (j := (2 : Fin 3))
+      (by decide) simplex)
+
+@[simp] private theorem face_1_degenerate_3_tetrahedron {X : SSet}
+    (simplex : Simplex X 3) :
+    face 1 (X.σ 3 simplex) = X.σ 2 (face 1 simplex) := by
+  simpa [face] using
+    (X.δ_comp_σ_of_le_apply (i := (1 : Fin 4)) (j := (2 : Fin 3))
+      (by decide) simplex)
+
+@[simp] private theorem face_2_degenerate_3_tetrahedron {X : SSet}
+    (simplex : Simplex X 3) :
+    face 2 (X.σ 3 simplex) = X.σ 2 (face 2 simplex) := by
+  simpa [face] using
+    (X.δ_comp_σ_of_le_apply (i := (2 : Fin 4)) (j := (2 : Fin 3))
+      (by decide) simplex)
+
+@[simp] private theorem face_3_degenerate_3_tetrahedron {X : SSet}
+    (simplex : Simplex X 3) :
+    face 3 (X.σ 3 simplex) = simplex := by
+  exact X.δ_comp_σ_self_apply 3 simplex
+
+@[simp] private theorem face_4_degenerate_3_tetrahedron {X : SSet}
+    (simplex : Simplex X 3) :
+    face 4 (X.σ 3 simplex) = simplex := by
+  exact X.δ_comp_σ_succ_apply 3 simplex
+
+/-- The thirty faces of the six actual shuffles return exactly the two polarized factor
+boundaries.  The twelve internal faces cancel at their addressed source maps. -/
+theorem boundary_pairTwoShuffleAtom {X Y : SSet}
+    (occurrence : Simplex X 2 × Simplex Y 2) :
+    diagonalBoundaryFour X Y (pairTwoShuffleAtom occurrence) =
+      rejoinThree X Y (pairTwoBoundaryAtom occurrence) := by
+  simp [diagonalBoundaryFour, diagonalBoundaryFourAtom, pairTwoShuffleAtom,
+    rejoinThree, rejoinThreeAtom, pairTwoBoundaryAtom, diagonalFace]
+  module
+
+/-- Coproduct extension preserves the complete signed shuffle boundary return. -/
+theorem boundary_pairTwoShuffle (X Y : SSet) :
+    (diagonalBoundaryFour X Y).comp (pairTwoShuffle X Y) =
+      (rejoinThree X Y).comp (pairTwoBoundary X Y) := by
+  apply Finsupp.lhom_ext
+  intro occurrence coefficient
+  rw [show Finsupp.single occurrence coefficient =
+      coefficient • generator occurrence by simp [generator]]
+  simp only [LinearMap.comp_apply, map_smul, pairTwoShuffle,
+    pairTwoBoundary, extend_generator]
+  exact congrArg (coefficient • ·) (boundary_pairTwoShuffleAtom occurrence)
+
+/-! ## The actual degree-four pair coefficient and its degree-five boundary -/
+
+def frontTwoFourMap : SimplexCategory.mk 2 ⟶ SimplexCategory.mk 4 :=
+  (SimplexCategory.δ 3 : SimplexCategory.mk 2 ⟶ SimplexCategory.mk 3) ≫
+    (SimplexCategory.δ 4 : SimplexCategory.mk 3 ⟶ SimplexCategory.mk 4)
+
+def backTwoFourMap : SimplexCategory.mk 2 ⟶ SimplexCategory.mk 4 :=
+  (SimplexCategory.δ 0 : SimplexCategory.mk 2 ⟶ SimplexCategory.mk 3) ≫
+    (SimplexCategory.δ 0 : SimplexCategory.mk 3 ⟶ SimplexCategory.mk 4)
+
+def frontThreeFiveMap : SimplexCategory.mk 3 ⟶ SimplexCategory.mk 5 :=
+  (SimplexCategory.δ 4 : SimplexCategory.mk 3 ⟶ SimplexCategory.mk 4) ≫
+    (SimplexCategory.δ 5 : SimplexCategory.mk 4 ⟶ SimplexCategory.mk 5)
+
+def backThreeFiveMap : SimplexCategory.mk 3 ⟶ SimplexCategory.mk 5 :=
+  (SimplexCategory.δ 0 : SimplexCategory.mk 3 ⟶ SimplexCategory.mk 4) ≫
+    (SimplexCategory.δ 0 : SimplexCategory.mk 4 ⟶ SimplexCategory.mk 5)
+
+def frontTwoFour {X : SSet} (simplex : Simplex X 4) : Simplex X 2 :=
+  X.map frontTwoFourMap.op simplex
+
+def backTwoFour {X : SSet} (simplex : Simplex X 4) : Simplex X 2 :=
+  X.map backTwoFourMap.op simplex
+
+def frontThreeFive {X : SSet} (simplex : Simplex X 5) : Simplex X 3 :=
+  X.map frontThreeFiveMap.op simplex
+
+def backThreeFive {X : SSet} (simplex : Simplex X 5) : Simplex X 3 :=
+  X.map backThreeFiveMap.op simplex
+
+private theorem restriction_comp {X : SSet} {a b c : ℕ}
+    (f : SimplexCategory.mk a ⟶ SimplexCategory.mk b)
+    (g : SimplexCategory.mk b ⟶ SimplexCategory.mk c)
+    (simplex : Simplex X c) :
+    X.map f.op (X.map g.op simplex) = X.map (f ≫ g).op simplex := by
+  change (X.map g.op ≫ X.map f.op) simplex = _
+  rw [← Functor.map_comp]
+  rfl
+
+theorem frontTwoFour_eq_faces {X : SSet} (simplex : Simplex X 4) :
+    frontTwoFour simplex = face 3 (face 4 simplex) := by
+  change X.map frontTwoFourMap.op simplex =
+    X.map (SimplexCategory.δ 3 : SimplexCategory.mk 2 ⟶ SimplexCategory.mk 3).op
+      (X.map (SimplexCategory.δ 4 : SimplexCategory.mk 3 ⟶ SimplexCategory.mk 4).op simplex)
+  exact (restriction_comp
+      (SimplexCategory.δ 3 : SimplexCategory.mk 2 ⟶ SimplexCategory.mk 3)
+      (SimplexCategory.δ 4 : SimplexCategory.mk 3 ⟶ SimplexCategory.mk 4) simplex).symm
+
+theorem backTwoFour_eq_faces {X : SSet} (simplex : Simplex X 4) :
+    backTwoFour simplex = face 0 (face 0 simplex) := by
+  change X.map backTwoFourMap.op simplex =
+    X.map (SimplexCategory.δ 0 : SimplexCategory.mk 2 ⟶ SimplexCategory.mk 3).op
+      (X.map (SimplexCategory.δ 0 : SimplexCategory.mk 3 ⟶ SimplexCategory.mk 4).op simplex)
+  exact (restriction_comp
+      (SimplexCategory.δ 0 : SimplexCategory.mk 2 ⟶ SimplexCategory.mk 3)
+      (SimplexCategory.δ 0 : SimplexCategory.mk 3 ⟶ SimplexCategory.mk 4) simplex).symm
+
+/-- The coefficient reads both actual triangle restrictions of one addressed product simplex.
+It is the `(2,2)` Alexander--Whitney component, with the two cochains kept as operands. -/
+def pairFourReceiver {X Y : SSet}
+    (left : Simplex X 2 → ℚ) (right : Simplex Y 2 → ℚ) :
+    Current (DiagonalOccurrence X Y 4) →ₗ[ℚ] ℚ :=
+  Finsupp.linearCombination ℚ fun occurrence =>
+    left (frontTwoFour occurrence.1) * right (backTwoFour occurrence.2)
+
+@[simp] theorem pairFourReceiver_generator {X Y : SSet}
+    (left : Simplex X 2 → ℚ) (right : Simplex Y 2 → ℚ)
+    (occurrence : DiagonalOccurrence X Y 4) :
+    pairFourReceiver left right (generator occurrence) =
+      left (frontTwoFour occurrence.1) * right (backTwoFour occurrence.2) := by
+  simp [pairFourReceiver, generator]
+
+def diagonalBoundaryFiveAtom {X Y : SSet}
+    (occurrence : DiagonalOccurrence X Y 5) :
+    Current (DiagonalOccurrence X Y 4) :=
+  generator (diagonalFace 0 occurrence) - generator (diagonalFace 1 occurrence) +
+    generator (diagonalFace 2 occurrence) - generator (diagonalFace 3 occurrence) +
+      generator (diagonalFace 4 occurrence) - generator (diagonalFace 5 occurrence)
+
+def diagonalBoundaryFive (X Y : SSet) :
+    Current (DiagonalOccurrence X Y 5) →ₗ[ℚ]
+      Current (DiagonalOccurrence X Y 4) :=
+  extend diagonalBoundaryFiveAtom
+
+@[simp] private theorem frontTwoFour_face_0 {X : SSet} (simplex : Simplex X 5) :
+    frontTwoFour (face 0 simplex) = face 0 (frontThreeFive simplex) := by
+  change X.map frontTwoFourMap.op
+      (X.map (SimplexCategory.δ 0 : SimplexCategory.mk 4 ⟶ SimplexCategory.mk 5).op simplex) =
+    X.map (SimplexCategory.δ 0 : SimplexCategory.mk 2 ⟶ SimplexCategory.mk 3).op
+      (X.map frontThreeFiveMap.op simplex)
+  rw [restriction_comp, restriction_comp]
+  have mapsEqual : frontTwoFourMap ≫
+      (SimplexCategory.δ 0 : SimplexCategory.mk 4 ⟶ SimplexCategory.mk 5) =
+    (SimplexCategory.δ 0 : SimplexCategory.mk 2 ⟶ SimplexCategory.mk 3) ≫
+      frontThreeFiveMap := by decide
+  rw [mapsEqual]
+
+@[simp] private theorem frontTwoFour_face_1 {X : SSet} (simplex : Simplex X 5) :
+    frontTwoFour (face 1 simplex) = face 1 (frontThreeFive simplex) := by
+  change X.map frontTwoFourMap.op
+      (X.map (SimplexCategory.δ 1 : SimplexCategory.mk 4 ⟶ SimplexCategory.mk 5).op simplex) =
+    X.map (SimplexCategory.δ 1 : SimplexCategory.mk 2 ⟶ SimplexCategory.mk 3).op
+      (X.map frontThreeFiveMap.op simplex)
+  rw [restriction_comp, restriction_comp]
+  have mapsEqual : frontTwoFourMap ≫
+      (SimplexCategory.δ 1 : SimplexCategory.mk 4 ⟶ SimplexCategory.mk 5) =
+    (SimplexCategory.δ 1 : SimplexCategory.mk 2 ⟶ SimplexCategory.mk 3) ≫
+      frontThreeFiveMap := by decide
+  rw [mapsEqual]
+
+@[simp] private theorem frontTwoFour_face_2 {X : SSet} (simplex : Simplex X 5) :
+    frontTwoFour (face 2 simplex) = face 2 (frontThreeFive simplex) := by
+  change X.map frontTwoFourMap.op
+      (X.map (SimplexCategory.δ 2 : SimplexCategory.mk 4 ⟶ SimplexCategory.mk 5).op simplex) =
+    X.map (SimplexCategory.δ 2 : SimplexCategory.mk 2 ⟶ SimplexCategory.mk 3).op
+      (X.map frontThreeFiveMap.op simplex)
+  rw [restriction_comp, restriction_comp]
+  have mapsEqual : frontTwoFourMap ≫
+      (SimplexCategory.δ 2 : SimplexCategory.mk 4 ⟶ SimplexCategory.mk 5) =
+    (SimplexCategory.δ 2 : SimplexCategory.mk 2 ⟶ SimplexCategory.mk 3) ≫
+      frontThreeFiveMap := by decide
+  rw [mapsEqual]
+
+@[simp] private theorem frontTwoFour_face_3 {X : SSet} (simplex : Simplex X 5) :
+    frontTwoFour (face 3 simplex) = face 3 (frontThreeFive simplex) := by
+  change X.map frontTwoFourMap.op
+      (X.map (SimplexCategory.δ 3 : SimplexCategory.mk 4 ⟶ SimplexCategory.mk 5).op simplex) =
+    X.map (SimplexCategory.δ 3 : SimplexCategory.mk 2 ⟶ SimplexCategory.mk 3).op
+      (X.map frontThreeFiveMap.op simplex)
+  rw [restriction_comp, restriction_comp]
+  have mapsEqual : frontTwoFourMap ≫
+      (SimplexCategory.δ 3 : SimplexCategory.mk 4 ⟶ SimplexCategory.mk 5) =
+    (SimplexCategory.δ 3 : SimplexCategory.mk 2 ⟶ SimplexCategory.mk 3) ≫
+      frontThreeFiveMap := by decide
+  rw [mapsEqual]
+
+@[simp] private theorem frontTwoFour_face_4 {X : SSet} (simplex : Simplex X 5) :
+    frontTwoFour (face 4 simplex) = face 3 (frontThreeFive simplex) := by
+  change X.map frontTwoFourMap.op
+      (X.map (SimplexCategory.δ 4 : SimplexCategory.mk 4 ⟶ SimplexCategory.mk 5).op simplex) =
+    X.map (SimplexCategory.δ 3 : SimplexCategory.mk 2 ⟶ SimplexCategory.mk 3).op
+      (X.map frontThreeFiveMap.op simplex)
+  rw [restriction_comp, restriction_comp]
+  have mapsEqual : frontTwoFourMap ≫
+      (SimplexCategory.δ 4 : SimplexCategory.mk 4 ⟶ SimplexCategory.mk 5) =
+    (SimplexCategory.δ 3 : SimplexCategory.mk 2 ⟶ SimplexCategory.mk 3) ≫
+      frontThreeFiveMap := by decide
+  rw [mapsEqual]
+
+@[simp] private theorem frontTwoFour_face_5 {X : SSet} (simplex : Simplex X 5) :
+    frontTwoFour (face 5 simplex) = face 3 (frontThreeFive simplex) := by
+  change X.map frontTwoFourMap.op
+      (X.map (SimplexCategory.δ 5 : SimplexCategory.mk 4 ⟶ SimplexCategory.mk 5).op simplex) =
+    X.map (SimplexCategory.δ 3 : SimplexCategory.mk 2 ⟶ SimplexCategory.mk 3).op
+      (X.map frontThreeFiveMap.op simplex)
+  rw [restriction_comp, restriction_comp]
+  have mapsEqual : frontTwoFourMap ≫
+      (SimplexCategory.δ 5 : SimplexCategory.mk 4 ⟶ SimplexCategory.mk 5) =
+    (SimplexCategory.δ 3 : SimplexCategory.mk 2 ⟶ SimplexCategory.mk 3) ≫
+      frontThreeFiveMap := by decide
+  rw [mapsEqual]
+
+@[simp] private theorem backTwoFour_face_0 {X : SSet} (simplex : Simplex X 5) :
+    backTwoFour (face 0 simplex) = face 0 (backThreeFive simplex) := by
+  change X.map backTwoFourMap.op
+      (X.map (SimplexCategory.δ 0 : SimplexCategory.mk 4 ⟶ SimplexCategory.mk 5).op simplex) =
+    X.map (SimplexCategory.δ 0 : SimplexCategory.mk 2 ⟶ SimplexCategory.mk 3).op
+      (X.map backThreeFiveMap.op simplex)
+  rw [restriction_comp, restriction_comp]
+  have mapsEqual : backTwoFourMap ≫
+      (SimplexCategory.δ 0 : SimplexCategory.mk 4 ⟶ SimplexCategory.mk 5) =
+    (SimplexCategory.δ 0 : SimplexCategory.mk 2 ⟶ SimplexCategory.mk 3) ≫
+      backThreeFiveMap := by decide
+  rw [mapsEqual]
+
+@[simp] private theorem backTwoFour_face_1 {X : SSet} (simplex : Simplex X 5) :
+    backTwoFour (face 1 simplex) = face 0 (backThreeFive simplex) := by
+  change X.map backTwoFourMap.op
+      (X.map (SimplexCategory.δ 1 : SimplexCategory.mk 4 ⟶ SimplexCategory.mk 5).op simplex) =
+    X.map (SimplexCategory.δ 0 : SimplexCategory.mk 2 ⟶ SimplexCategory.mk 3).op
+      (X.map backThreeFiveMap.op simplex)
+  rw [restriction_comp, restriction_comp]
+  have mapsEqual : backTwoFourMap ≫
+      (SimplexCategory.δ 1 : SimplexCategory.mk 4 ⟶ SimplexCategory.mk 5) =
+    (SimplexCategory.δ 0 : SimplexCategory.mk 2 ⟶ SimplexCategory.mk 3) ≫
+      backThreeFiveMap := by decide
+  rw [mapsEqual]
+
+@[simp] private theorem backTwoFour_face_2 {X : SSet} (simplex : Simplex X 5) :
+    backTwoFour (face 2 simplex) = face 0 (backThreeFive simplex) := by
+  change X.map backTwoFourMap.op
+      (X.map (SimplexCategory.δ 2 : SimplexCategory.mk 4 ⟶ SimplexCategory.mk 5).op simplex) =
+    X.map (SimplexCategory.δ 0 : SimplexCategory.mk 2 ⟶ SimplexCategory.mk 3).op
+      (X.map backThreeFiveMap.op simplex)
+  rw [restriction_comp, restriction_comp]
+  have mapsEqual : backTwoFourMap ≫
+      (SimplexCategory.δ 2 : SimplexCategory.mk 4 ⟶ SimplexCategory.mk 5) =
+    (SimplexCategory.δ 0 : SimplexCategory.mk 2 ⟶ SimplexCategory.mk 3) ≫
+      backThreeFiveMap := by decide
+  rw [mapsEqual]
+
+@[simp] private theorem backTwoFour_face_3 {X : SSet} (simplex : Simplex X 5) :
+    backTwoFour (face 3 simplex) = face 1 (backThreeFive simplex) := by
+  change X.map backTwoFourMap.op
+      (X.map (SimplexCategory.δ 3 : SimplexCategory.mk 4 ⟶ SimplexCategory.mk 5).op simplex) =
+    X.map (SimplexCategory.δ 1 : SimplexCategory.mk 2 ⟶ SimplexCategory.mk 3).op
+      (X.map backThreeFiveMap.op simplex)
+  rw [restriction_comp, restriction_comp]
+  have mapsEqual : backTwoFourMap ≫
+      (SimplexCategory.δ 3 : SimplexCategory.mk 4 ⟶ SimplexCategory.mk 5) =
+    (SimplexCategory.δ 1 : SimplexCategory.mk 2 ⟶ SimplexCategory.mk 3) ≫
+      backThreeFiveMap := by decide
+  rw [mapsEqual]
+
+@[simp] private theorem backTwoFour_face_4 {X : SSet} (simplex : Simplex X 5) :
+    backTwoFour (face 4 simplex) = face 2 (backThreeFive simplex) := by
+  change X.map backTwoFourMap.op
+      (X.map (SimplexCategory.δ 4 : SimplexCategory.mk 4 ⟶ SimplexCategory.mk 5).op simplex) =
+    X.map (SimplexCategory.δ 2 : SimplexCategory.mk 2 ⟶ SimplexCategory.mk 3).op
+      (X.map backThreeFiveMap.op simplex)
+  rw [restriction_comp, restriction_comp]
+  have mapsEqual : backTwoFourMap ≫
+      (SimplexCategory.δ 4 : SimplexCategory.mk 4 ⟶ SimplexCategory.mk 5) =
+    (SimplexCategory.δ 2 : SimplexCategory.mk 2 ⟶ SimplexCategory.mk 3) ≫
+      backThreeFiveMap := by decide
+  rw [mapsEqual]
+
+@[simp] private theorem backTwoFour_face_5 {X : SSet} (simplex : Simplex X 5) :
+    backTwoFour (face 5 simplex) = face 3 (backThreeFive simplex) := by
+  change X.map backTwoFourMap.op
+      (X.map (SimplexCategory.δ 5 : SimplexCategory.mk 4 ⟶ SimplexCategory.mk 5).op simplex) =
+    X.map (SimplexCategory.δ 3 : SimplexCategory.mk 2 ⟶ SimplexCategory.mk 3).op
+      (X.map backThreeFiveMap.op simplex)
+  rw [restriction_comp, restriction_comp]
+  have mapsEqual : backTwoFourMap ≫
+      (SimplexCategory.δ 5 : SimplexCategory.mk 4 ⟶ SimplexCategory.mk 5) =
+    (SimplexCategory.δ 3 : SimplexCategory.mk 2 ⟶ SimplexCategory.mk 3) ≫
+      backThreeFiveMap := by decide
+  rw [mapsEqual]
+
+/-- The degree-five boundary of the actual pair coefficient is the sum of the (3,2) and
+(2,3) cochain boundary returns. The shared middle face cancels with opposite signs. -/
+theorem pairFourReceiver_boundaryFiveAtom {X Y : SSet}
+    (left : Simplex X 2 → ℚ) (right : Simplex Y 2 → ℚ)
+    (occurrence : DiagonalOccurrence X Y 5) :
+    pairFourReceiver left right (diagonalBoundaryFiveAtom occurrence) =
+      (left (face 0 (frontThreeFive occurrence.1)) -
+        left (face 1 (frontThreeFive occurrence.1)) +
+          left (face 2 (frontThreeFive occurrence.1)) -
+            left (face 3 (frontThreeFive occurrence.1))) *
+        right (face 0 (backThreeFive occurrence.2)) +
+      left (face 3 (frontThreeFive occurrence.1)) *
+        (right (face 0 (backThreeFive occurrence.2)) -
+          right (face 1 (backThreeFive occurrence.2)) +
+            right (face 2 (backThreeFive occurrence.2)) -
+              right (face 3 (backThreeFive occurrence.2))) := by
+  simp [diagonalBoundaryFiveAtom, diagonalFace]
+  ring
+
+/-- Closed factor cochains annihilate every actual degree-five product boundary. -/
+theorem pairFourReceiver_boundaryFive_zero {X Y : SSet}
+    (left : Simplex X 2 → ℚ) (right : Simplex Y 2 → ℚ)
+    (hleft : ∀ simplex : Simplex X 3,
+      left (face 0 simplex) - left (face 1 simplex) +
+        left (face 2 simplex) - left (face 3 simplex) = 0)
+    (hright : ∀ simplex : Simplex Y 3,
+      right (face 0 simplex) - right (face 1 simplex) +
+        right (face 2 simplex) - right (face 3 simplex) = 0)
+    (current : Current (DiagonalOccurrence X Y 5)) :
+    pairFourReceiver left right (diagonalBoundaryFive X Y current) = 0 := by
+  induction current using Finsupp.induction_linear with
+  | zero => simp
+  | add a b ha hb => simp [map_add, ha, hb]
+  | single occurrence coefficient =>
+      rw [show Finsupp.single occurrence coefficient =
+          coefficient • generator occurrence by simp [generator]]
+      simp only [map_smul, diagonalBoundaryFive, extend_generator,
+        pairFourReceiver_boundaryFiveAtom, hleft, hright,
+        zero_mul, mul_zero, zero_add, smul_zero]
+
+/-- Normalization is imposed on the producing cochain, never by erasing addressed degenerate
+source occurrences. On each complete signed shuffle population only the matching face returns. -/
+theorem pairFourReceiver_pairTwoShuffleAtom {X Y : SSet}
+    (left : Simplex X 2 → ℚ) (right : Simplex Y 2 → ℚ)
+    (hleft : ∀ (i : Fin 2) (edge : Simplex X 1), left (X.σ i edge) = 0)
+    (occurrence : Simplex X 2 × Simplex Y 2) :
+    pairFourReceiver left right (pairTwoShuffleAtom occurrence) =
+      left occurrence.1 * right occurrence.2 := by
+  have hconstant (vertex : Simplex X 0) : left (repeatVertexTriangle vertex) = 0 :=
+    hleft 0 (repeatVertexEdge vertex)
+  simp [pairTwoShuffleAtom, frontTwoFour_eq_faces, backTwoFour_eq_faces,
+    hleft, hconstant]
+
+/-- A closed two-cochain reads a first-repeated edge exactly as its initial constant triangle.
+The equality follows from a retained degenerate three-prism, not a quotient deletion. -/
+theorem twoCochain_degenerateFirst_value {X : SSet}
+    (receive : Simplex X 2 → ℚ)
+    (closed : ∀ simplex : Simplex X 3,
+      receive (face 0 simplex) - receive (face 1 simplex) +
+        receive (face 2 simplex) - receive (face 3 simplex) = 0)
+    (edge : Simplex X 1) :
+    receive (X.σ 0 edge) =
+      receive (repeatVertexTriangle (initialVertex edge)) := by
+  have law := closed (X.σ 1 (X.σ 0 edge))
+  have returned : receive (X.σ 0 edge) -
+      receive (repeatVertexTriangle (initialVertex edge)) = 0 := by
+    simpa only [face_zero_degenerateOneTriangle, face_zero_repeatFirst,
+      face_one_degenerateOneTriangle, face_two_degenerateOneTriangle,
+      face_three_degenerateOneTriangle, face_two_repeatFirst,
+      repeatLast_repeatVertexEdge, initialVertex, sub_self, zero_add] using law
+  exact sub_eq_zero.mp returned
+
+/-- The second retained degenerate prism returns the terminal constant triangle. -/
+theorem twoCochain_degenerateLast_value {X : SSet}
+    (receive : Simplex X 2 → ℚ)
+    (closed : ∀ simplex : Simplex X 3,
+      receive (face 0 simplex) - receive (face 1 simplex) +
+        receive (face 2 simplex) - receive (face 3 simplex) = 0)
+    (edge : Simplex X 1) :
+    receive (X.σ 1 edge) =
+      receive (repeatVertexTriangle (terminalVertex edge)) := by
+  have law := closed (X.σ 2 (X.σ 1 edge))
+  have returned : receive (repeatVertexTriangle (terminalVertex edge)) -
+      receive (X.σ 1 edge) = 0 := by
+    simpa only [face_zero_degenerateTwoTriangle, face_zero_repeatLast,
+      repeatLast_repeatVertexEdge, face_one_degenerateTwoTriangle,
+      face_one_repeatLast, face_two_degenerateTwoTriangle,
+      face_three_degenerateTwoTriangle, terminalVertex, sub_add_cancel] using law
+  exact (sub_eq_zero.mp returned).symm
+
+def twoCoefficientCorrection {X : SSet} (receive : Simplex X 2 → ℚ)
+    (edge : Simplex X 1) : ℚ :=
+  receive (repeatVertexTriangle (initialVertex edge))
+
+/-- [agent-inferred] Normalize the producing cochain by its actual one-cochain boundary.
+This changes no closed-cycle value and retains all degenerate source occurrences. -/
+def normalizedTwoCoefficient {X : SSet} (receive : Simplex X 2 → ℚ)
+    (simplex : Simplex X 2) : ℚ :=
+  receive simplex -
+    (twoCoefficientCorrection receive (face 0 simplex) -
+      twoCoefficientCorrection receive (face 1 simplex) +
+        twoCoefficientCorrection receive (face 2 simplex))
+
+@[simp] private theorem initial_repeatVertexEdge {X : SSet} (vertex : Simplex X 0) :
+    initialVertex (repeatVertexEdge vertex) = vertex := by
+  exact X.δ_comp_σ_succ_apply 0 vertex
+
+theorem normalizedTwoCoefficient_degenerate_zero {X : SSet}
+    (receive : Simplex X 2 → ℚ)
+    (closed : ∀ simplex : Simplex X 3,
+      receive (face 0 simplex) - receive (face 1 simplex) +
+        receive (face 2 simplex) - receive (face 3 simplex) = 0)
+    (i : Fin 2) (edge : Simplex X 1) :
+    normalizedTwoCoefficient receive (X.σ i edge) = 0 := by
+  fin_cases i
+  · change normalizedTwoCoefficient receive (X.σ 0 edge) = 0
+    rw [normalizedTwoCoefficient, face_zero_repeatFirst, face_one_repeatFirst,
+      face_two_repeatFirst, twoCochain_degenerateFirst_value receive closed]
+    simp only [twoCoefficientCorrection]
+    rw [initial_repeatVertexEdge]
+    simp only [initialVertex, sub_self, zero_add]
+  · change normalizedTwoCoefficient receive (X.σ 1 edge) = 0
+    rw [normalizedTwoCoefficient, face_zero_repeatLast, face_one_repeatLast,
+      face_two_repeatLast, twoCochain_degenerateLast_value receive closed]
+    simp only [twoCoefficientCorrection, initial_repeatVertexEdge,
+      terminalVertex, sub_add_cancel, sub_self]
+
 section Audit
 
 #print axioms boundary_rejoinOne
 #print axioms boundary_separateOne
+#print axioms boundary_pairTwoShuffleAtom
+#print axioms boundary_pairTwoShuffle
+#print axioms pairFourReceiver_boundaryFiveAtom
+#print axioms pairFourReceiver_boundaryFive_zero
+#print axioms pairFourReceiver_pairTwoShuffleAtom
+#print axioms normalizedTwoCoefficient_degenerate_zero
 #print axioms boundary_diagonalReconstructionFillerOne
 #print axioms boundary_separateTwoAtom
 #print axioms boundary_separateTwo

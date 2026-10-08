@@ -1,0 +1,139 @@
+{
+  "status": "PASS exact sources and complete source/provider-matched kernel, query, axiom and quiescent release checks",
+  "receipt": {
+    "private_machine_path_sha256": "3833a4162c83277d49b64661be1d4aa570e9abac7909ce09560663edcda73b88"
+  },
+  "receipt_pin": {
+    "sha256": "d136d60b5586ade875659b70b8d860679a6b1c666929cbaa503ba18beee1d600",
+    "bytes": 323549
+  },
+  "terminal_index": {
+    "private_machine_path_sha256": "c1798e9654b59d82ae9207f4dae9e7951ebb534bcc836d72cbd03c3dd0306b75"
+  },
+  "terminal_index_pin": {
+    "sha256": "b1f3b822585fa3ee7e512a58c8bc835357f8cc1fdd22b9b4cddb6b2ba2c9c5c5",
+    "bytes": 4721
+  },
+  "accepted_modules": [
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSphereRulingCurrent",
+      "source_pin": {
+        "sha256": "4b25419ee1a4023d3bf2960e4bf7036a506ab4b0403489b8016f69feaa9ff985",
+        "bytes": 9696
+      },
+      "query_count": 10,
+      "compiler_wall_ns": 13613371310,
+      "standard_axioms_only": true,
+      "quiescent_release": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProductRulingReconstruction",
+      "source_pin": {
+        "sha256": "9b1713839c7393da8d65f777ee8b096958877dc4b0c2ffe4c85223a94b5137b6",
+        "bytes": 6959
+      },
+      "query_count": 7,
+      "compiler_wall_ns": 2478807127,
+      "standard_axioms_only": true,
+      "quiescent_release": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProductRulingBoundary",
+      "source_pin": {
+        "sha256": "747b1149beac46ecb2dbbde25c8225446cd4b0c8b560a2f84f5e9bdb7e776a92",
+        "bytes": 4776
+      },
+      "query_count": 1,
+      "compiler_wall_ns": 1791485812,
+      "standard_axioms_only": true,
+      "quiescent_release": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProductRulingDecomposition",
+      "source_pin": {
+        "sha256": "02b904d96abb418f10287cd9aee00f729f2afcb208e4f6d5c54b020e99a48e2f",
+        "bytes": 6915
+      },
+      "query_count": 3,
+      "compiler_wall_ns": 1871089285,
+      "standard_axioms_only": true,
+      "quiescent_release": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProductSingularCohomologyDual",
+      "source_pin": {
+        "sha256": "17f89144751c1279222669c0ab35ba34d01e5a0b821aff70d9a82d4617bcb444",
+        "bytes": 6543
+      },
+      "query_count": 5,
+      "compiler_wall_ns": 1943317250,
+      "standard_axioms_only": true,
+      "quiescent_release": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSurfaceCycleClass",
+      "source_pin": {
+        "sha256": "d01463217a8004ffdbd42721f1bc5b30da378494bf41ee4cb60086d2b0140a10",
+        "bytes": 4170
+      },
+      "query_count": 4,
+      "compiler_wall_ns": 2717384055,
+      "standard_axioms_only": true,
+      "quiescent_release": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProjectiveLineType11Form",
+      "source_pin": {
+        "sha256": "6d1e44f900f984170780c86fa4819d29e5f613f7c7cb0a42c8699b70cdb100fa",
+        "bytes": 11818
+      },
+      "query_count": 9,
+      "compiler_wall_ns": 2769629101,
+      "standard_axioms_only": true,
+      "quiescent_release": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSurfaceType11Period",
+      "source_pin": {
+        "sha256": "0c7edaa38bf6fba7326aed0fee9c9013ee145309461dcb6597ed8a6cab6abe56",
+        "bytes": 20786
+      },
+      "query_count": 17,
+      "compiler_wall_ns": 3304964262,
+      "standard_axioms_only": true,
+      "quiescent_release": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProjectiveLinePowerType11",
+      "source_pin": {
+        "sha256": "3da1876a436f31fa924f446c2838d571b09e7abaf404d6106581e51022a7ea72",
+        "bytes": 17010
+      },
+      "query_count": 6,
+      "compiler_wall_ns": 3035313105,
+      "standard_axioms_only": true,
+      "quiescent_release": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSpherePowerRulingHomology",
+      "source_pin": {
+        "sha256": "61a94ce064ddf2b427f2b3a6c304dbf3bb62112ebe71988a2b378d9d2ee31cc8",
+        "bytes": 80123
+      },
+      "query_count": 32,
+      "compiler_wall_ns": 6513692767,
+      "standard_axioms_only": true,
+      "quiescent_release": true
+    }
+  ],
+  "total_accepted_queries": 94,
+  "failed_Pair_accepted": false,
+  "_scoped_evidence": {
+    "original_receipt_pin": {
+      "bytes": 4328,
+      "sha256": "c11febcc539b56f9651e6f7cdd46451c6148914cd48eef4f71a9c5ae45257511"
+    },
+    "raw_machine_paths_and_runtime_copies_kept_private": true,
+    "mathematical_and_validation_values_preserved": true
+  }
+}

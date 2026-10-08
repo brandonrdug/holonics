@@ -1,0 +1,131 @@
+{
+  "scope": "independent source ordinal-map audit of sealed submission-detector-v2-consumer-naturality; no Lean invocation",
+  "passed": true,
+  "pins": [
+    {
+      "path": {
+        "private_machine_path_sha256": "e38994f5183e7b4a7c5ce3c458c2f798a275add998f0079c6798f09dbf61d4d9"
+      },
+      "sha256": "ea87796977c69766ede1dd8e7e508e1a0e49b9438f26cd7fb42e57ed1f6eb193"
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "c94e6d599eb012f5c868cd56316cd8c845c83ae9285122c91572dba54746ea8e"
+      },
+      "sha256": "cc737e41d69ec55c29a15898f405bd555bc0f40ab65713789840fc4cded2a8a2"
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "54b69e5c93594e97ac04bf36744a1a45305f7cbd186a7bc1f894216befdc8ab6"
+      },
+      "sha256": "6e2ddfc2bea154fa3ad34a04c843eac272604263067fd3932917b11c4ae85c0c"
+    }
+  ],
+  "shuffle_atoms": [
+    {
+      "sign": 1,
+      "front_left": [
+        0,
+        1,
+        2
+      ],
+      "back_right": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "sign": -1,
+      "front_left": [
+        0,
+        1,
+        1
+      ],
+      "back_right": [
+        1,
+        1,
+        2
+      ]
+    },
+    {
+      "sign": 1,
+      "front_left": [
+        0,
+        1,
+        1
+      ],
+      "back_right": [
+        1,
+        2,
+        2
+      ]
+    },
+    {
+      "sign": 1,
+      "front_left": [
+        0,
+        0,
+        1
+      ],
+      "back_right": [
+        1,
+        1,
+        2
+      ]
+    },
+    {
+      "sign": -1,
+      "front_left": [
+        0,
+        0,
+        1
+      ],
+      "back_right": [
+        1,
+        2,
+        2
+      ]
+    },
+    {
+      "sign": 1,
+      "front_left": [
+        0,
+        0,
+        0
+      ],
+      "back_right": [
+        2,
+        2,
+        2
+      ]
+    }
+  ],
+  "boundary_faces_before_cancellation": 30,
+  "boundary_faces_after_cancellation": 18,
+  "normalized_shuffle_surviving_terms": 1,
+  "product_source_atoms": 96,
+  "product_boundary_faces_before_cancellation": 480,
+  "product_boundary_nonzero_terms": 0,
+  "aw_five_boundary_polynomial_terms": 6,
+  "local_import_modules_read": 88,
+  "local_import_cycles": [],
+  "local_proof_holes": [],
+  "wall_ns": 41656027,
+  "peak_resident_bytes": 22564864,
+  "outer_deadline_ns": 2000000000,
+  "threads": 1,
+  "limits": [
+    "exact simplicial ordinal maps and formal finite chain identities only",
+    "linear extension and homology descent were source-reviewed, not kernel checked",
+    "no proof of sphereH4 vanishing or algebraic cycle realization"
+  ],
+  "_scoped_evidence": {
+    "original_receipt_pin": {
+      "bytes": 2726,
+      "sha256": "73470dbaf1b3cc8942660b04c7eb3536641ca9237ceeee373f2f28f7c693fafb"
+    },
+    "raw_machine_paths_and_runtime_copies_kept_private": true,
+    "mathematical_and_validation_values_preserved": true
+  }
+}

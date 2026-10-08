@@ -1,0 +1,39 @@
+{
+  "status": "bounded producing source delta checked, not kernel accepted",
+  "source_sha256": "3cd9249a1f2333fd9d23af9e96ec9ec440d429ef8094fdc5f7526def7912ae3b",
+  "previous_source_sha256": "4cfc9b6a48eac9142d440bdee01ed47097b832fe62f9660c7dd11ce30e0b7d72",
+  "existing_declaration_names_preserved": 170,
+  "same_changed_theorem_signatures": [
+    "totalBoundaryThree_rightMiddle",
+    "totalBoundaryThree_leftMiddle",
+    "totalBoundaryThree_rightMiddleAxis",
+    "totalBoundaryThree_leftMiddleAxis"
+  ],
+  "all_text_outside_four_proof_region_unchanged": true,
+  "new_mathematical_statements": 0,
+  "imports_unchanged": [
+    "HolonicsResearch.Foundation.DiagonalChainTransport",
+    "Mathlib.LinearAlgebra.DirectSum.Finsupp"
+  ],
+  "audit_count_unchanged": 19,
+  "Finsupp_induction_linear_calls": [
+    44,
+    40
+  ],
+  "module_tactic_calls": [
+    41,
+    35
+  ],
+  "proof_direction": "existing generator law -> single complete-current axis extension -> decomposable pair consumer, via existing pair transport law",
+  "timing_or_memory_improvement": "not yet measured; structural work reduction only",
+  "whole_owner_checks_pending": true,
+  "compiler_launched": false,
+  "_scoped_evidence": {
+    "original_receipt_pin": {
+      "bytes": 1177,
+      "sha256": "cf66e3f25498a1626752e02df77c305f40c7b231e0e86e0ae6b2661a842cde63"
+    },
+    "raw_machine_paths_and_runtime_copies_kept_private": true,
+    "mathematical_and_validation_values_preserved": true
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "status": "source delta checks passed; kernel pending",
+  "source": {
+    "private_machine_path_sha256": "0daf099e08cfd7ae84779fa91507c464044c918d0d5a745413ea8947037e8efd"
+  },
+  "source_pin": {
+    "sha256": "7b88ae51a553d9cf9397ae5e9c60ffe7832b6557e2ec1bd2188f0812e655af6e",
+    "bytes": 86561
+  },
+  "previous_source_pin": {
+    "sha256": "cc737e41d69ec55c29a15898f405bd555bc0f40ab65713789840fc4cded2a8a2",
+    "bytes": 84009
+  },
+  "declaration_names_preserved": 138,
+  "changed_declarations": [
+    "productChainDiagonalEquiv_boundary_four_generator",
+    "topologicalFactorBoundary_sq",
+    "sphereRawCoefficient_cycle",
+    "sphereRawSimplexCoefficient_closed",
+    "sphereNormalizedCurrentCoefficient_return",
+    "sphereNormalizedSimplexCoefficient_closed",
+    "pairFourReceiver_pairTwoShuffle_pairCurrent",
+    "productChainDiagonalEquiv_boundary_five_generator",
+    "productChainDiagonalEquiv_boundary_five",
+    "sphereProductFundamentalFourChain_not_mem_boundary_range",
+    "sphereProductFourReceiverOnCycles_boundaries",
+    "sphereProductFourReceiverOnHomology_fundamental"
+  ],
+  "all_definitions_unchanged": true,
+  "all_other_statements_maps_and_hypotheses_unchanged": true,
+  "one_scope_annotation": {
+    "declaration": "topologicalFactorBoundary_sq",
+    "before": "implicit TopCat universe generalized by factor-only statement",
+    "after": "TopCat.{0}",
+    "evidence": "saved compiler diagnostic1316:38: topologicalChainEquivCurrent expectsTopCat.{0}, wrapperZ wasTopCat.{u_1}",
+    "meaning": "matches existing rational singular chart and all declared sphere consumers; no higher-universe chart claim"
+  },
+  "imports": [
+    "HolonicsResearch.Foundation.ProductDegreeTwo",
+    "HolonicsResearch.Hodge.HodgeSphereProductRulingProjections",
+    "HolonicsResearch.Hodge.HodgeSphereHomologyEquivalence",
+    "HolonicsResearch.Hodge.HodgeSphereFundamentalDetector",
+    "Mathlib.LinearAlgebra.Basis.VectorSpace"
+  ],
+  "axiom_selectors": [
+    "sphereDetectorFromHomology",
+    "sphereNormalizedCurrentCoefficient_return",
+    "sphereNormalizedSimplexCoefficient_closed",
+    "sphereNormalizedSimplexCoefficient_degenerate",
+    "productChainDiagonalEquiv_boundary_five",
+    "sphereProductFourReceiver_boundary",
+    "sphereProductFourReceiver_fundamental",
+    "sphereProductFundamentalFourChain_not_mem_boundary_range",
+    "sphereProductFourReceiverOnHomology_fundamental",
+    "sphereProductFundamentalFourHomologyClass_ne_zero",
+    "topologicalProductSimplexEquiv",
+    "topologicalProductSimplexRealization",
+    "homeomorphicTopologicalProductSimplexEquiv",
+    "homeomorphicTopologicalProductSimplexRealization",
+    "topologicalSimplexMap_comp",
+    "topologicalSimplexMap_id",
+    "topologicalChainEquivCurrent",
+    "topologicalChainEquivCurrent_boundary",
+    "topologicalChainMap_simplexGenerator",
+    "topologicalChainEquivCurrent_map",
+    "productSimplexEquiv",
+    "productChainEquivCurrent",
+    "productChainDiagonalEquiv",
+    "pairTwoBoundary_factor_incidence",
+    "pairTwoShuffle_closed",
+    "productChainDiagonalEquiv_boundary_four",
+    "sphereProductFundamentalFourChain_closed",
+    "productChainDiagonalEquiv_boundary_generator",
+    "productChainDiagonalEquiv_boundary_three_generator",
+    "productChainDiagonalEquiv_boundary",
+    "productChainDiagonalEquiv_boundary_three",
+    "separatedProductThreeChain_boundary",
+    "productBoundarySeparationHolon",
+    "separatedProductCycle_boundary",
+    "productCycleSeparationHolon",
+    "rejoinedProductThreeChain_boundary",
+    "rejoinedProductChain_of_separatedBoundary",
+    "productChainDiagonalEquiv_boundary_rejoined",
+    "rejoinedProductChain_boundary",
+    "rejoinedProductCycle",
+    "productRoundTripDefectChain_diagonal",
+    "productRoundTripDefectChain_boundary",
+    "productRoundTripDefectCycle",
+    "productRoundTripDefectFillerChain_boundary",
+    "productReconstructionBoundaryHolon"
+  ],
+  "axiom_selector_count": 45,
+  "all_other_source_blocks_unchanged": true,
+  "compiler_launched": false,
+  "_scoped_evidence": {
+    "original_receipt_pin": {
+      "bytes": 4081,
+      "sha256": "1d4fd6af577c6dffeeb31c4e6b74b7789636382d97a67eaf69ad3bb70fe2852d"
+    },
+    "raw_machine_paths_and_runtime_copies_kept_private": true,
+    "mathematical_and_validation_values_preserved": true
+  }
+}

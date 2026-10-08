@@ -1,5 +1,6 @@
 import Mathlib.Tactic
 import Mathlib.Data.Complex.Basic
+import Holonics.Foundation.SectionResidual
 
 /-!
 # A finite Hodge energy cut
@@ -185,6 +186,169 @@ theorem witness_cut_ledger_retains_mixed_term :
           pieceCross rightCut hWitness eWitness := by
   constructor <;> exact pieceEnergy_add _ _ _
 
+/-! ## The same cut fails the heat consumer's commuting square
+
+The differential below is the cyclic vertex-to-edge incidence; cycleBoundary
+is its unit-metric adjoint. Thus the Laplacian is the actual incidence-adjoint
+composition on this declared four-edge cycle, not an arbitrary operator chosen
+to make a receiver fail. This is a finite closed cycle, with no continuum or
+algebraic-cycle interpretation imposed on its cut.
+-/
+
+def cycleCoboundary (p : Edge → ℝ) (i : Edge) : ℝ := p (i + 1) - p i
+
+def cycleLaplacian (v : Edge → ℝ) : Edge → ℝ :=
+  cycleCoboundary (cycleBoundary v)
+
+def cut (A : Finset Edge) (v : Edge → ℝ) : Edge → ℝ :=
+  fun i => if i ∈ A then v i else 0
+
+def cycleHeatStep (step : ℝ) (v : Edge → ℝ) : Edge → ℝ :=
+  v - step • cycleLaplacian v
+
+private theorem cycleIndex_neg_one : (-1 : Edge) = 3 := by decide
+
+theorem cycleBoundary_is_adjoint (p v : Edge → ℝ) :
+    (∑ i, cycleCoboundary p i * v i) = ∑ i, p i * cycleBoundary v i := by
+  simp [cycleCoboundary, cycleBoundary, Fin.sum_univ_succ, cycleIndex_neg_one]
+  ring
+
+theorem cut_sub (A : Finset Edge) (v w : Edge → ℝ) :
+    cut A (v - w) = cut A v - cut A w := by
+  funext i
+  by_cases hi : i ∈ A <;> simp [cut, hi]
+
+theorem cut_smul (A : Finset Edge) (a : ℝ) (v : Edge → ℝ) :
+    cut A (a • v) = a • cut A v := by
+  funext i
+  by_cases hi : i ∈ A <;> simp [cut, hi]
+
+/-- The same heat/receiver return as the general temporal Hodge consumer,
+specialized to actual cyclic incidence and its declared unit-metric adjoint. -/
+theorem cycleHeatStep_cut_return (A : Finset Edge) (step : ℝ) (v : Edge → ℝ) :
+    cut A (cycleHeatStep step v) = cycleHeatStep step (cut A v) +
+      step • (cycleLaplacian (cut A v) - cut A (cycleLaplacian v)) := by
+  simp only [cycleHeatStep, cut_sub, cut_smul, smul_sub]
+  abel
+
+theorem harmonicWitness_laplacian_zero : cycleLaplacian hWitness = 0 := by
+  funext i
+  simp [cycleLaplacian, cycleCoboundary, hWitness_boundary_zero]
+
+/-- The source harmonic current is locally silent, but its cut creates a
+seam return of 5/2. Reusing global harmonicity at the cut would erase it. -/
+theorem cut_harmonic_laplacian_defect :
+    (cycleLaplacian (cut leftCut hWitness) -
+      cut leftCut (cycleLaplacian hWitness)) 0 = (5 / 2 : ℝ) := by
+  norm_num [cycleLaplacian, cycleCoboundary, cycleBoundary, cut,
+    leftCut, hWitness, cycleIndex_neg_one] <;> decide
+
+/-- At any nonzero step the left cut and the declared Euler heat step fail
+to commute. This supplies the fixed acceptance's exact falsifier. -/
+theorem cut_heat_commutation_fails (step : ℝ) (hstep : step ≠ 0) :
+    cut leftCut (cycleHeatStep step hWitness) ≠
+      cycleHeatStep step (cut leftCut hWitness) := by
+  intro heq
+  have hr := congrFun (cycleHeatStep_cut_return leftCut step hWitness) 0
+  have hc := congrFun heq 0
+  have hd := cut_harmonic_laplacian_defect
+  simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul] at hr
+  rw [hd, hc] at hr
+  have hz : step * (5 / 2 : ℝ) = 0 := by linarith
+  exact hstep ((mul_eq_zero.mp hz).resolve_right (by norm_num))
+
 end Holonics.Physics.PartitionedHodgeEnergy
 
 end
+
+#print axioms Holonics.Physics.PartitionedHodgeEnergy.cycleBoundary_is_adjoint
+#print axioms Holonics.Physics.PartitionedHodgeEnergy.cycleHeatStep_cut_return
+#print axioms Holonics.Physics.PartitionedHodgeEnergy.cut_harmonic_laplacian_defect
+#print axioms Holonics.Physics.PartitionedHodgeEnergy.cut_heat_commutation_fails
+
+/-! ## The two-level nonlinear cut receiver
+
+The same parked Hodge current consumes the generic section return in its
+canonical owner. The original private importing receipt is retained; these
+relocated source/import bytes require their own check. -/
+
+noncomputable section
+namespace Holonics.Physics.PartitionedHodgeEnergy.RecursiveCutReadout
+
+open Holonics.Foundation.SectionResidual
+
+def pairMeans : (Edge → ℝ) →ₗ[ℝ] (ℝ × ℝ) where
+  toFun x := ((x 0 + x 1) / 2, (x 2 + x 3) / 2)
+  map_add' := by intro x y; ext <;> simp <;> ring
+  map_smul' := by intro a x; ext <;> simp <;> ring
+
+def wholeMean : (ℝ × ℝ) →ₗ[ℝ] ℝ where
+  toFun y := (y.1 + y.2) / 2
+  map_add' := by intro x y; simp; ring
+  map_smul' := by intro a x; simp; ring
+
+def pairSection : Section pairMeans where
+  value y := ![y.1, y.1, y.2, y.2]
+  rightInverse := by intro y; ext <;> simp [pairMeans] <;> ring
+
+def wholeSection : Section wholeMean where
+  value a := (a, a)
+  rightInverse := by intro a; simp [wholeMean] <;> ring
+
+def cutEnergyRead (A : Finset Edge) (v : Edge → ℝ) : ℂ := pieceEnergy A v
+
+/-- Two section returns for the actual nonlinear local energy receiver, using
+the exact accepted theorem without imposing linearity on the energy reading. -/
+theorem recursive_cut_energy_receiver (A : Finset Edge) (x : Edge → ℝ) :
+    cutEnergyRead A x =
+      cutEnergyRead A (pairSection.value
+        (wholeSection.value (wholeMean (pairMeans x)))) +
+      receiverDefect (cutEnergyRead A) pairSection x +
+      receiverDefect (fun y => cutEnergyRead A (pairSection.value y))
+        wholeSection (pairMeans x) :=
+  two_level_receiver_defects (cutEnergyRead A) pairSection wholeSection x
+
+def source : Edge → ℝ := ![1, 2, 3, 4]
+
+@[simp] private theorem source_zero : source 0 = 1 := rfl
+@[simp] private theorem source_one : source 1 = 2 := rfl
+@[simp] private theorem source_two : source 2 = 3 := rfl
+@[simp] private theorem source_three : source 3 = 4 := rfl
+
+theorem source_is_parked_hodge_current : source = hWitness + eWitness := by
+  funext i
+  fin_cases i <;> norm_num [source, hWitness, eWitness]
+
+/-- The two-level quotient retains the parked current's harmonic part. The
+local energy returns are 1/2 and -8; dropping the latter gives the wrong cut. -/
+theorem parked_cut_receipt :
+    pairSection.value (wholeSection.value (wholeMean (pairMeans source))) = hWitness ∧
+      cutEnergyRead leftCut source = (5 : ℂ) ∧
+      cutEnergyRead leftCut hWitness = (25 / 2 : ℂ) ∧
+      receiverDefect (cutEnergyRead leftCut) pairSection source = (1 / 2 : ℂ) ∧
+      receiverDefect (fun y => cutEnergyRead leftCut (pairSection.value y))
+        wholeSection (pairMeans source) = (-8 : ℂ) := by
+  constructor
+  · funext i
+    fin_cases i <;> norm_num [pairSection, wholeSection, pairMeans, wholeMean,
+      hWitness, Matrix.vecHead, Matrix.vecTail]
+  · norm_num [cutEnergyRead, pieceEnergy, leftCut, hWitness,
+      receiverDefect, remainder, pairSection, wholeSection, pairMeans, wholeMean,
+      Matrix.vecHead, Matrix.vecTail]
+
+/-- Reading the lower remainder alone gives energy 2. The actual translated
+pivot return is -8. Its missing mixed term is exactly -10 from the parked cut. -/
+theorem lower_remainder_energy_is_not_pivot_return :
+    cutEnergyRead leftCut (pairSection.value
+      (remainder wholeSection (pairMeans source))) = (2 : ℂ) ∧
+      receiverDefect (fun y => cutEnergyRead leftCut (pairSection.value y))
+        wholeSection (pairMeans source) = (-8 : ℂ) := by
+  norm_num [cutEnergyRead, pieceEnergy, leftCut, receiverDefect,
+    remainder, pairSection, wholeSection, pairMeans, wholeMean,
+    Matrix.vecHead, Matrix.vecTail]
+
+end Holonics.Physics.PartitionedHodgeEnergy.RecursiveCutReadout
+
+#print axioms Holonics.Physics.PartitionedHodgeEnergy.RecursiveCutReadout.recursive_cut_energy_receiver
+#print axioms Holonics.Physics.PartitionedHodgeEnergy.RecursiveCutReadout.parked_cut_receipt
+#print axioms Holonics.Physics.PartitionedHodgeEnergy.RecursiveCutReadout.lower_remainder_energy_is_not_pivot_return

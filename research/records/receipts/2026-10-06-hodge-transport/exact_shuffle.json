@@ -1,0 +1,173 @@
+{
+  "scope": "finite exact affine source-map incidence; not a Lean receipt or nonboundary theorem",
+  "shuffle_paths": [
+    {
+      "vertices": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          2,
+          0
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          2,
+          2
+        ]
+      ],
+      "sign": 1
+    },
+    {
+      "vertices": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          2,
+          2
+        ]
+      ],
+      "sign": -1
+    },
+    {
+      "vertices": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          2
+        ]
+      ],
+      "sign": 1
+    },
+    {
+      "vertices": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          2,
+          2
+        ]
+      ],
+      "sign": 1
+    },
+    {
+      "vertices": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          2
+        ]
+      ],
+      "sign": -1
+    },
+    {
+      "vertices": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          2
+        ]
+      ],
+      "sign": 1
+    }
+  ],
+  "single_pair_boundary_faces_before_cancellation": 30,
+  "single_pair_boundary_faces_after_cancellation": 18,
+  "product_fundamental_source_occurrences": 96,
+  "source_boundary_faces_before_cancellation": 480,
+  "source_boundary_faces_after_cancellation": 0,
+  "zero_test": "every coefficient exactly zero, integer arithmetic",
+  "wall_ns": 372247,
+  "peak_resident_bytes": 13553664,
+  "outer_deadline_ns": 2000000000,
+  "threads": 1,
+  "_scoped_evidence": {
+    "original_receipt_pin": {
+      "bytes": 2286,
+      "sha256": "60a0231c97f057d7f0fe4664b74461e95ad75950ea28fcacd3bf91f3a93c5281"
+    },
+    "raw_machine_paths_and_runtime_copies_kept_private": true,
+    "mathematical_and_validation_values_preserved": true
+  }
+}

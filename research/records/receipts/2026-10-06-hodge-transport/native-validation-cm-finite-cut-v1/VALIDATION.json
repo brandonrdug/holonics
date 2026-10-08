@@ -1,0 +1,112 @@
+{
+  "status": "CM_FINITE_CUT_LEAF_PASS",
+  "kernel": {
+    "kernel_accepted": true,
+    "compiler_exit": 0,
+    "compiler_wall_ns": 7222412557,
+    "axioms": {
+      "Holonics.Hodge.CMGraphSource.cmActualFixedBase_quasiCompact": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "Holonics.Hodge.CMGraphSource.cmActualFiniteCutCycle_Y_eq_Serre": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "Holonics.Hodge.CMGraphSource.cmActualFiniteCutCycle_Z_eq_Serre": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "Holonics.Hodge.CMGraphSource.cmActualFiniteCutPushforward_coefficient": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "Holonics.Hodge.CMGraphSource.cmActualFiniteCutPushforward_eq_lengthDegree": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "Holonics.Hodge.CMGraphSource.cmActualFiniteCutPushforward_eq_pointCycle": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    "selector_count_matches": true,
+    "standard_axioms_only": true,
+    "metadata_unchanged": true,
+    "broad_library_checked": false
+  },
+  "source_sha256": "6118339770a6f825dad42910918caca8e6378a15d381a7fd177d2e3db5c4aa5d",
+  "claim": "actual AlgebraicCycle.map of finite CM cut equals2\u00b7point, explicitzero weights",
+  "not_claimed": [
+    "analytic CMGammaDelta cuptrace",
+    "Chow codimension pairing",
+    "Betti pairing",
+    "broad library"
+  ],
+  "rows": [
+    {
+      "label": "cm-finite-cut-leaf-import-preparation-20261006-v1",
+      "passed": false,
+      "wall_ns": 3717168587,
+      "projection_ns": 17000000000,
+      "measured_to_projected": [
+        3717168587,
+        17000000000
+      ],
+      "aggregate_CPU_ns": 3637034000,
+      "group_peak_bytes": 322707456,
+      "peak_child_RSS_KiB": 315144,
+      "quiescent_release": true
+    },
+    {
+      "label": "cm-finite-cut-leaf-import-preparation-20261006-v3",
+      "passed": true,
+      "wall_ns": 12895893733,
+      "projection_ns": 17000000000,
+      "measured_to_projected": [
+        12895893733,
+        17000000000
+      ],
+      "aggregate_CPU_ns": 11925089000,
+      "group_peak_bytes": 1026068480,
+      "peak_child_RSS_KiB": 389068,
+      "quiescent_release": true
+    },
+    {
+      "label": "cm-finite-cut-leaf-development-20261006-v1",
+      "passed": true,
+      "wall_ns": 10113692319,
+      "projection_ns": 17000000000,
+      "measured_to_projected": [
+        10113692319,
+        17000000000
+      ],
+      "aggregate_CPU_ns": 6132334000,
+      "group_peak_bytes": 3902517248,
+      "peak_child_RSS_KiB": 3233204,
+      "quiescent_release": true
+    }
+  ],
+  "current_accepted_custom_providers": 30,
+  "additional_unchanged_predecessor_source_object_tuples": 86,
+  "complete_import_seal_retained": {
+    "private_machine_path_sha256": "62eaf558d3960f9d4ae9fb50f43f10f8ba006c10518edc40e88f496234cce8b9"
+  },
+  "all_prior_failures_retained": true,
+  "no_dependency_compile_or_owner_source_edit": true,
+  "original17s_deadlines_CPUcaps_unchanged": true,
+  "_scoped_evidence": {
+    "original_receipt_pin": {
+      "bytes": 3162,
+      "sha256": "9fc3889ac0e08f269d5ced2568fa2869083ac3c1ac16b3759aef2016da4c51e6"
+    },
+    "raw_machine_paths_and_runtime_copies_kept_private": true,
+    "mathematical_and_validation_values_preserved": true
+  }
+}

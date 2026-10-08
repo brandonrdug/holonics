@@ -1,0 +1,115 @@
+{
+  "scope": "failed exact focused compiler sources, not accepted theorem modules",
+  "receipts": {
+    "temporal": {
+      "kernel_accepted": false,
+      "compiler_exit": 1,
+      "compiler_wall_ns": 4456545435,
+      "axioms": {
+        "Holonics.Physics.CoarseHodgeTransport.laplacianDefect_eq_four_returns": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Physics.CoarseHodgeTransport.harmonic_image_iff_defect_zero": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Physics.CoarseHodgeTransport.eulerHeatStep_receiver_return": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Physics.CoarseHodgeTransport.eulerHeatStep_commutes_iff": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Physics.CoarseHodgeTransport.moving_heat_receiver_rate": [
+          "propext",
+          "sorryAx",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      "selector_count_matches": true,
+      "standard_axioms_only": false,
+      "metadata_unchanged": true,
+      "broad_library_checked": false,
+      "source_sha256": "ea71aa8f1ed0a5c0cce014973b6d94415b6a8f62b67ae6258c544cc5e76176c6",
+      "source_obligation": "Final CLM scalar simplification after abelian normal form",
+      "stage_wall_ns": 7401958499,
+      "projection_ns": 17000000000,
+      "measured_to_projected_ratio": [
+        7401958499,
+        17000000000
+      ],
+      "final_CPU_ns": 6257166000,
+      "CPU_reading_grain_ns": 1000,
+      "aggregate_CPU_limit_us": 17000000,
+      "lease_released_after_publication_and_cleanup": true,
+      "peak_resident_bytes": null,
+      "peak_resident_status": "not present in returned stage receipt; not inferred from declared memory cap",
+      "declared_group_memory_cap_bytes": 4294967296
+    },
+    "partition": {
+      "kernel_accepted": false,
+      "compiler_exit": 1,
+      "compiler_wall_ns": 3301374268,
+      "axioms": {
+        "Holonics.Physics.PartitionedHodgeEnergy.cycleBoundary_is_adjoint": [
+          "propext",
+          "sorryAx",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Physics.PartitionedHodgeEnergy.cycleHeatStep_cut_return": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Physics.PartitionedHodgeEnergy.cut_harmonic_laplacian_defect": [
+          "propext",
+          "sorryAx",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Physics.PartitionedHodgeEnergy.cut_heat_commutation_fails": [
+          "propext",
+          "sorryAx",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      "selector_count_matches": true,
+      "standard_axioms_only": false,
+      "metadata_unchanged": true,
+      "broad_library_checked": false,
+      "source_sha256": "efe5e93215addb6a33c752d45ca22c0a9b8c2e1466939bbeb8838cde3d4826c8",
+      "source_obligation": "Exact (-1:Fin4)=3 normalization before adjoint ring and harmonic cut norm_num",
+      "stage_wall_ns": 6182917460,
+      "projection_ns": 17000000000,
+      "measured_to_projected_ratio": [
+        6182917460,
+        17000000000
+      ],
+      "final_CPU_ns": 5876287000,
+      "CPU_reading_grain_ns": 1000,
+      "aggregate_CPU_limit_us": 17000000,
+      "lease_released_after_publication_and_cleanup": true,
+      "peak_resident_bytes": null,
+      "peak_resident_status": "not present in returned stage receipt; not inferred from declared memory cap",
+      "declared_group_memory_cap_bytes": 4294967296
+    }
+  },
+  "correction_snapshot": "v2-proof-normalization, separate immutable sources; validation pending",
+  "_scoped_evidence": {
+    "original_receipt_pin": {
+      "bytes": 3796,
+      "sha256": "6fb1224f0505d61997966cbe1afcbe8cf12eadef1a16bad3491c94398d1b246a"
+    },
+    "raw_machine_paths_and_runtime_copies_kept_private": true,
+    "mathematical_and_validation_values_preserved": true
+  }
+}

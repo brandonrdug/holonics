@@ -1,0 +1,23 @@
+{
+  "status": "exact_stale_edge_verified_and_current_provider_staged",
+  "accepted_provider_actual_importAllArts": "750568dd5983e010",
+  "stale_consumer_expected_importAllArts": "d647d7db6ca62a27",
+  "current_source_Lake_hash": "93b2b2c1bb6dbba5",
+  "cached_consumer_source_matches_frozen_current": true,
+  "stale_cache_trace": {
+    "private_machine_path_sha256": "e538aaf389d8907d0a08fe6d0e52df0fee1f5e47564852c2c7b48c16d8be80d8"
+  },
+  "trace_sha256": "018ab04e36b5cbf6065b3997f0ce6b5b765a9f7742ddfb4b44848c6fe3402a6d",
+  "mathematical_source_changed_in_dependency_repair": false,
+  "cache_trace_modified": false,
+  "compiler_launched": false,
+  "verification_wall_ns": 2689299,
+  "_scoped_evidence": {
+    "original_receipt_pin": {
+      "bytes": 701,
+      "sha256": "fa83e698bb832dbea8ff8c403779e37292ecac3e1cfdc9a356c18ce57d188f5d"
+    },
+    "raw_machine_paths_and_runtime_copies_kept_private": true,
+    "mathematical_and_validation_values_preserved": true
+  }
+}

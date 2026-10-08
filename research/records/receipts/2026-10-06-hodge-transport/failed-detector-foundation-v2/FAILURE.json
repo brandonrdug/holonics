@@ -1,0 +1,24 @@
+{
+  "status": "detector_v2_Foundation_FAIL",
+  "kernel_accepted": false,
+  "source_sha256": "ea87796977c69766ede1dd8e7e508e1a0e49b9438f26cd7fb42e57ed1f6eb193",
+  "repair_sha256": "3409d618bdc87b72b5243eaaf5ac3b7d0fd6bbdccd5e9744f4c59cc41adb48f7",
+  "producing_failures": [
+    "frontTwoFour equality simplified to True",
+    "backTwoFour equality simplified to True",
+    "shuffle constant triangle degeneracy not exposed",
+    "normalized s0 outer face rewrite blocked by unfolding",
+    "normalized s1 outer face rewrite blocked by unfolding"
+  ],
+  "Product_Pair": "not reached",
+  "failed_snapshot_preserved": true,
+  "caps_raised": false,
+  "_scoped_evidence": {
+    "original_receipt_pin": {
+      "bytes": 645,
+      "sha256": "3b286329a84ab6f73e3fd01b6d23baee1858cb4fb6d7fa273d7bed463073aa9e"
+    },
+    "raw_machine_paths_and_runtime_copies_kept_private": true,
+    "mathematical_and_validation_values_preserved": true
+  }
+}

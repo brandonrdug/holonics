@@ -1,0 +1,59 @@
+{
+  "status": "recursive_v3_PASS",
+  "kernel": {
+    "kernel_accepted": true,
+    "compiler_exit": 0,
+    "compiler_wall_ns": 5830238044,
+    "axioms": {
+      "Holonics.Physics.PartitionedHodgeEnergy.RecursiveCutReadout.recursive_cut_energy_receiver": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "Holonics.Physics.PartitionedHodgeEnergy.RecursiveCutReadout.parked_cut_receipt": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "Holonics.Physics.PartitionedHodgeEnergy.RecursiveCutReadout.lower_remainder_energy_is_not_pivot_return": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    "selector_count_matches": true,
+    "standard_axioms_only": true,
+    "metadata_unchanged": true,
+    "broad_library_checked": false
+  },
+  "source_sha256": "ce142e22c0deba0ce360d2d8d6b223a95f190c563d0f5cb71d730121720c0f9b",
+  "accepted_Partitionv3_RHv8_unchanged": true,
+  "wall_ns": 8916301934,
+  "projection_ns": 17000000000,
+  "measured_to_projected": [
+    8916301934,
+    17000000000
+  ],
+  "aggregate_CPU_ns": 6252163000,
+  "group_peak_bytes": 1528414208,
+  "peak_child_RSS_KiB": 3313208,
+  "release": {
+    "released_after_final_publication_and_owned_unit_cleanup": true,
+    "quiescence_confirmed": true,
+    "external_controller_PID": 1531034,
+    "monotonic_ns": 292881293413677
+  },
+  "prior_v1_v2_failures_preserved": true,
+  "full_import_seal_retained": {
+    "private_machine_path_sha256": "02c575d74a07ca4fe41b2913ba23d1070f1fb0e1d6eb2f2d995cd420147bbcf2"
+  },
+  "broad_library_checked": false,
+  "_scoped_evidence": {
+    "original_receipt_pin": {
+      "bytes": 1630,
+      "sha256": "5699b1952d90d534c4a3812b8752734b89cf839c8413a978015b0cb9891f526f"
+    },
+    "raw_machine_paths_and_runtime_copies_kept_private": true,
+    "mathematical_and_validation_values_preserved": true
+  }
+}

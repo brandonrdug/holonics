@@ -1,0 +1,68 @@
+{
+  "status": "Measured complete-owner fixed-limit failure; no declaration-level cause claimed",
+  "terminal_index": {
+    "private_machine_path_sha256": "c04e8af4ec1997c42134285393f18da84214de0e2450902e58c29dad995acd04"
+  },
+  "terminal_index_pin": {
+    "sha256": "c6e85162c106af3353ff572294e025e06d6a5cbc8858d4911601fb20d6d33f28",
+    "bytes": 3657
+  },
+  "validation": {
+    "private_machine_path_sha256": "54c4228664b5c9baa7e9186a0768b0a5c2754a405ccac34c3315e9bbb77507cf"
+  },
+  "validation_pin": {
+    "sha256": "3ddb8c8307e8fd9a841d5b22cceac208afb155190d7f151676243fcc706dd708",
+    "bytes": 190211
+  },
+  "failed_source_pin": {
+    "sha256": "e0ab94ed9f0e283115e9ad02442c0b92dc1be1fe88da4e7e6190dcb95381be28",
+    "bytes": 21153
+  },
+  "compiler": {
+    "kernel_accepted": false,
+    "compiler_exit": 124,
+    "compiler_wall_ns": 17131751974,
+    "axioms": {},
+    "selector_count_matches": false,
+    "standard_axioms_only": true,
+    "metadata_unchanged": true,
+    "broad_library_checked": false
+  },
+  "development": {
+    "accepted": false,
+    "wall_ns": 18939665994,
+    "projection_ns": 21132554884,
+    "measured_to_projected_ratio": [
+      18939665994,
+      21132554884
+    ],
+    "aggregate_CPU_ns": 9019827000,
+    "group_peak_bytes": 4294967296,
+    "child_peak_RSS_KiB": 3422116,
+    "memory_events_delta": {
+      "low": 0,
+      "high": 0,
+      "max": 5490,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0,
+      "sock_throttled": 0
+    },
+    "aggregate_CPU_guard_triggered": false,
+    "quiescent_release": true
+  },
+  "native_diagnostics_empty": true,
+  "failing_declaration_unlocated": true,
+  "agent_inferred_choice": "Separate the existing simplex/current chart, rejoined geometric currents, actual degree-three boundary witness, and public homology consumer. Previous maintained product/chart decompositions passed under the same caps; this limits retained elaboration per complete consuming owner. No claim that any particular proof caused the cap event.",
+  "no_unchanged_module_retry": true,
+  "no_limit_raise": true,
+  "accepted_providers_recompile": false,
+  "_scoped_evidence": {
+    "original_receipt_pin": {
+      "bytes": 2184,
+      "sha256": "5bddfd95fe5d1cabb711b8d82af0bcf1f8a2870a148700de5ac50ddc1aeadeae"
+    },
+    "raw_machine_paths_and_runtime_copies_kept_private": true,
+    "mathematical_and_validation_values_preserved": true
+  }
+}

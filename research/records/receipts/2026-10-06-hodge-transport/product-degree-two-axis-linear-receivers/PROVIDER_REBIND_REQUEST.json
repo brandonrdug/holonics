@@ -1,0 +1,589 @@
+{
+  "status": "changed full-source early axis producing proofs, fixed acceptance",
+  "source_base": "3c67beee7f656798f912c974f12c482ea12c5e42",
+  "source_root": {
+    "private_machine_path_sha256": "4cf3eb7244c1d6f3ef8c8d170c5f9907b88a21bdc1e91a3771d536dc054e698c"
+  },
+  "first_object_lookup_root": {
+    "private_machine_path_sha256": "2ecc0b6c873b7d8242ed7752acb795bbd38e19c7aa332c9d45e313dff356159b"
+  },
+  "accepted_provider": {
+    "module": "HolonicsResearch.Foundation.DiagonalChainTransport",
+    "source": {
+      "module": "HolonicsResearch.Foundation.DiagonalChainTransport",
+      "source": {
+        "private_machine_path_sha256": "2f5e2a7b65c88c4dd611d701230e24a67ec604ff6d9a32509538baa3b4297b68"
+      },
+      "pin": {
+        "sha256": "695f2da74d29a0eec3051bc30c197ed200269ede75d4d85eab33e39443311c2c",
+        "bytes": 69878
+      },
+      "public_base_source_sha256": "10d6a605fa3d6a764e8d8e5c80b760fd54fd2676e30ef12e353016976fbf02b2",
+      "source_changed_from_public_base": true,
+      "live_root_source_matches": false,
+      "imports": [
+        "Holonics.Foundation.Holon"
+      ],
+      "changed_providers": [],
+      "axiom_selectors": [
+        "boundary_rejoinOne",
+        "boundary_separateOne",
+        "boundary_pairTwoShuffleAtom",
+        "boundary_pairTwoShuffle",
+        "pairFourReceiver_boundaryFiveAtom",
+        "pairFourReceiver_boundaryFive_zero",
+        "pairFourReceiver_pairTwoShuffleAtom",
+        "normalizedTwoCoefficient_degenerate_zero",
+        "boundary_diagonalReconstructionFillerOne",
+        "boundary_separateTwoAtom",
+        "boundary_separateTwo",
+        "boundary_separateThreeAtom",
+        "boundary_separateThree",
+        "separationBoundaryHolon",
+        "boundary_diagonalRoundTripDefectTwo",
+        "diagonalRoundTripDefectBoundaryHolon",
+        "boundary_diagonalReconstructionFillerOneAtom",
+        "boundary_diagonalReconstructionFillerTwoAtom",
+        "diagonalReconstructionHomotopyTwo",
+        "diagonalRoundTripDefectTwo_eq_boundary_of_cycle"
+      ]
+    },
+    "objects": [
+      {
+        "path": {
+          "private_machine_path_sha256": "2cc417595696a3f16f2b05de8f6546de6b01170367fdb76b07f7e0e7e09dccb6"
+        },
+        "original": {
+          "private_machine_path_sha256": "2d94855cebf3b32ba267e19b3ec41756c5c46dca6480dff42ddac78c7c5ef7ad"
+        },
+        "pin": {
+          "sha256": "c752ae7cd8c7680397bc049806b06caa1b93a6016b051af823344a4209742790",
+          "bytes": 2066592
+        }
+      },
+      {
+        "path": {
+          "private_machine_path_sha256": "2c06073c2ce6c40467ff1d9a95b49b106d5624d4c21b14942a062014c4ea921a"
+        },
+        "original": {
+          "private_machine_path_sha256": "eb9c16d9a04ef23d4994a02af0175d409e5e8e9eebb301bd72bc3f230c930372"
+        },
+        "pin": {
+          "sha256": "c0ea8374870f6e13d84ef4857560bacc1c6c753ea71807dc1b28222324499cb0",
+          "bytes": 297870
+        }
+      }
+    ],
+    "acceptance": {
+      "private_machine_path_sha256": "a164101229297db14377036dd6b27f79c7a0f4c24b566963dd7da8ede4951383"
+    },
+    "acceptance_pin": {
+      "sha256": "ac8536463f7d8b173f75bdabe752de42df152cba0511a48ab068d61268b590ce",
+      "bytes": 19331
+    },
+    "kernel_receipt": {
+      "private_machine_path_sha256": "c8b20b78d31a13a0788f08b73619b0502f708150b2ddf2efb6a1da6b8d1aecc7"
+    },
+    "kernel_pin": {
+      "sha256": "6477481f528d6c375e6370c8617859239ad2247e900a33f2875ceba24f774f62",
+      "bytes": 3079
+    },
+    "standard_queries": 20,
+    "importAllArts_hash": "750568dd5983e010"
+  },
+  "stale_cached_edge": {
+    "cached_consumer": "HolonicsResearch.Foundation.ProductDegreeTwo",
+    "direct_dependency": "HolonicsResearch.Foundation.DiagonalChainTransport",
+    "old_expected_importAllArts": "d647d7db6ca62a27",
+    "new_accepted_provider_importAllArts": "750568dd5983e010",
+    "current_import_edge_matches": false,
+    "new_source_sha256": "695f2da74d29a0eec3051bc30c197ed200269ede75d4d85eab33e39443311c2c",
+    "accepted_provider_kernel": {
+      "private_machine_path_sha256": "c8b20b78d31a13a0788f08b73619b0502f708150b2ddf2efb6a1da6b8d1aecc7"
+    },
+    "reason": "New provider object changes the exact consumed import artifact. Original cached intermediary is bound to its old provider and needs a focused changed-edge source check before current Product/Pair admission. This is not evidence that any law or historical record is dead.",
+    "no_compiler_launched": true
+  },
+  "rebuild_order": [
+    {
+      "module": "HolonicsResearch.Foundation.ProductDegreeTwo",
+      "source": {
+        "private_machine_path_sha256": "9d242def1fad29b894e279fc2827c90ae773a2adbbafb2fe0d99b7441f51e3c2"
+      },
+      "pin": {
+        "sha256": "6dedfc094a78df6f22a23f1d804379d3b39139c4231a37806e5158c59a9d2ee0",
+        "bytes": 109213
+      },
+      "public_base_source_sha256": "4cfc9b6a48eac9142d440bdee01ed47097b832fe62f9660c7dd11ce30e0b7d72",
+      "source_changed_from_public_base": true,
+      "live_root_source_matches": false,
+      "imports": [
+        "HolonicsResearch.Foundation.DiagonalChainTransport"
+      ],
+      "changed_providers": [
+        "HolonicsResearch.Foundation.DiagonalChainTransport"
+      ],
+      "axiom_selectors": [
+        "diagonalBoundaryOne_productH0Diagonal",
+        "totalBoundaryTwo_productTotalOneFilling",
+        "diagonalBoundaryTwo_productH1Diagonal_of_closed",
+        "productFirstFactorDegreeTwoCurrent_closed",
+        "productSecondFactorDegreeTwoCurrent_closed",
+        "leftOuterNormalizationCorrection_boundary",
+        "rightOuterNormalizationCorrection_boundary",
+        "productDegreeTwoNormalizationFiller_boundary",
+        "coupledMiddleCorrection_reduces_to_outer",
+        "totalBoundaryOne_totalBoundaryTwo",
+        "diagonalBoundaryOne_diagonalBoundaryTwo",
+        "realizedProductCurrentEquiv_boundary_one",
+        "realizedProductCurrentEquiv_boundary_two",
+        "realizedProductCurrentEquiv_boundary_three",
+        "realizedProductFirstFactorDegreeTwoCurrent_closed",
+        "realizedProductSecondFactorDegreeTwoCurrent_closed",
+        "realizedProductDegreeTwoNormalizationFiller_boundary",
+        "productAugmentation_diagonalBoundaryOne",
+        "realizedProductLowDegreeCurrentDatum"
+      ],
+      "only_producing_proof_changed": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProductDiagonal",
+      "source": {
+        "private_machine_path_sha256": "1491e0fba7e7e8acb02f6694455232ee06717b7822982c41fb6be4e7fb64ffe7"
+      },
+      "pin": {
+        "sha256": "cc737e41d69ec55c29a15898f405bd555bc0f40ab65713789840fc4cded2a8a2",
+        "bytes": 84009
+      },
+      "public_base_source_sha256": "3f50ddc6d8917c1bf3beed482ad4d45935868a63fe0dd4f77f929788c63b0d20",
+      "source_changed_from_public_base": true,
+      "live_root_source_matches": false,
+      "imports": [
+        "HolonicsResearch.Foundation.ProductDegreeTwo",
+        "HolonicsResearch.Hodge.HodgeSphereProductRulingProjections",
+        "HolonicsResearch.Hodge.HodgeSphereHomologyEquivalence",
+        "HolonicsResearch.Hodge.HodgeSphereFundamentalDetector"
+      ],
+      "changed_providers": [
+        "HolonicsResearch.Foundation.ProductDegreeTwo"
+      ],
+      "axiom_selectors": [
+        "sphereDetectorFromHomology",
+        "sphereNormalizedCurrentCoefficient_return",
+        "sphereNormalizedSimplexCoefficient_closed",
+        "sphereNormalizedSimplexCoefficient_degenerate",
+        "productChainDiagonalEquiv_boundary_five",
+        "sphereProductFourReceiver_boundary",
+        "sphereProductFourReceiver_fundamental",
+        "sphereProductFundamentalFourChain_not_mem_boundary_range",
+        "sphereProductFourReceiverOnHomology_fundamental",
+        "sphereProductFundamentalFourHomologyClass_ne_zero",
+        "topologicalProductSimplexEquiv",
+        "topologicalProductSimplexRealization",
+        "homeomorphicTopologicalProductSimplexEquiv",
+        "homeomorphicTopologicalProductSimplexRealization",
+        "topologicalSimplexMap_comp",
+        "topologicalSimplexMap_id",
+        "topologicalChainEquivCurrent",
+        "topologicalChainEquivCurrent_boundary",
+        "topologicalChainMap_simplexGenerator",
+        "topologicalChainEquivCurrent_map",
+        "productSimplexEquiv",
+        "productChainEquivCurrent",
+        "productChainDiagonalEquiv",
+        "pairTwoBoundary_factor_incidence",
+        "pairTwoShuffle_closed",
+        "productChainDiagonalEquiv_boundary_four",
+        "sphereProductFundamentalFourChain_closed",
+        "productChainDiagonalEquiv_boundary_generator",
+        "productChainDiagonalEquiv_boundary_three_generator",
+        "productChainDiagonalEquiv_boundary",
+        "productChainDiagonalEquiv_boundary_three",
+        "separatedProductThreeChain_boundary",
+        "productBoundarySeparationHolon",
+        "separatedProductCycle_boundary",
+        "productCycleSeparationHolon",
+        "rejoinedProductThreeChain_boundary",
+        "rejoinedProductChain_of_separatedBoundary",
+        "productChainDiagonalEquiv_boundary_rejoined",
+        "rejoinedProductChain_boundary",
+        "rejoinedProductCycle",
+        "productRoundTripDefectChain_diagonal",
+        "productRoundTripDefectChain_boundary",
+        "productRoundTripDefectCycle",
+        "productRoundTripDefectFillerChain_boundary",
+        "productReconstructionBoundaryHolon"
+      ]
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSphereChainCurrent",
+      "source": {
+        "private_machine_path_sha256": "22affa5215b53e7f9d7aef5fb098201cccaa7b0f3eb3057a4e4c867ad21eddc5"
+      },
+      "pin": {
+        "sha256": "091a334e3a171012c3566fd93cf35432a16910dc3298b7082dcbbf21c24ec88e",
+        "bytes": 7565
+      },
+      "public_base_source_sha256": "091a334e3a171012c3566fd93cf35432a16910dc3298b7082dcbbf21c24ec88e",
+      "source_changed_from_public_base": false,
+      "live_root_source_matches": true,
+      "imports": [
+        "HolonicsResearch.Foundation.DiagonalChainTransport",
+        "HolonicsResearch.Hodge.HodgeSphereDegreeOneFilling"
+      ],
+      "changed_providers": [
+        "HolonicsResearch.Foundation.DiagonalChainTransport"
+      ],
+      "axiom_selectors": [
+        "sphereChainEquivCurrent",
+        "sphereChainToCurrent_boundary"
+      ]
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProductMixedFilling",
+      "source": {
+        "private_machine_path_sha256": "5a19ebdcc766df8170d39e8d9df8779a9f9746feb5b950d5d5124cc60f5ebdbf"
+      },
+      "pin": {
+        "sha256": "9fa6ba333fd1d0f4e9b4bc1595d495d14734e67109e788fa4a7d26f6242613de",
+        "bytes": 73978
+      },
+      "public_base_source_sha256": "9fa6ba333fd1d0f4e9b4bc1595d495d14734e67109e788fa4a7d26f6242613de",
+      "source_changed_from_public_base": false,
+      "live_root_source_matches": true,
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeProductDiagonal",
+        "HolonicsResearch.Hodge.HodgeSphereChainCurrent",
+        "HolonicsResearch.Hodge.HodgeCommonStarNormalization",
+        "HolonicsResearch.Hodge.HodgeSphereLowDegreeHomology",
+        "HolonicsResearch.Foundation.ProductDegreeTwo"
+      ],
+      "changed_providers": [
+        "HolonicsResearch.Hodge.HodgeProductDiagonal",
+        "HolonicsResearch.Hodge.HodgeSphereChainCurrent",
+        "HolonicsResearch.Foundation.ProductDegreeTwo"
+      ],
+      "axiom_selectors": [
+        "spherePairDiagonalH0_boundary",
+        "spherePairDiagonalH1_boundary",
+        "totalBoundaryThree_rightMiddleCurrent",
+        "exists_mixedCurrentFilling"
+      ]
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProductRulingDecomposition",
+      "source": {
+        "private_machine_path_sha256": "e3750e173357327f9cb21a7c11701df51ec1d0e72f90385517bb0be5a58f3af3"
+      },
+      "pin": {
+        "sha256": "e0ab94ed9f0e283115e9ad02442c0b92dc1be1fe88da4e7e6190dcb95381be28",
+        "bytes": 21153
+      },
+      "public_base_source_sha256": "e0ab94ed9f0e283115e9ad02442c0b92dc1be1fe88da4e7e6190dcb95381be28",
+      "source_changed_from_public_base": false,
+      "live_root_source_matches": true,
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeProductMixedFilling",
+        "HolonicsResearch.Hodge.HodgeRefinedBoundaryObstruction"
+      ],
+      "changed_providers": [
+        "HolonicsResearch.Hodge.HodgeProductMixedFilling"
+      ],
+      "axiom_selectors": [
+        "exists_productDegreeTwoRulingDecomposition",
+        "rulingHomologyMap_surjective",
+        "rulingHomologyEquivalence"
+      ]
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProductSingularCohomologyDual",
+      "source": {
+        "private_machine_path_sha256": "fedae74c3bbe888a0bfddb4e16c960406186fdc97fdf730be06d86e7cb590a1a"
+      },
+      "pin": {
+        "sha256": "17f89144751c1279222669c0ab35ba34d01e5a0b821aff70d9a82d4617bcb444",
+        "bytes": 6543
+      },
+      "public_base_source_sha256": "17f89144751c1279222669c0ab35ba34d01e5a0b821aff70d9a82d4617bcb444",
+      "source_changed_from_public_base": false,
+      "live_root_source_matches": true,
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeProductRulingDecomposition"
+      ],
+      "changed_providers": [
+        "HolonicsResearch.Hodge.HodgeProductRulingDecomposition"
+      ],
+      "axiom_selectors": [
+        "rulingEvaluationDualEquivalence",
+        "rulingEvaluation_eq_intersection_swap",
+        "surfaceRulingHomologyEquivalence",
+        "singularCohomologyDual",
+        "singularCohomologyDual_evaluation"
+      ]
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSurfaceCycleClass",
+      "source": {
+        "private_machine_path_sha256": "1eb90f36860812f47038c3ceb7a50aa04a59f5e9736639bd8719fb7f31419d81"
+      },
+      "pin": {
+        "sha256": "d01463217a8004ffdbd42721f1bc5b30da378494bf41ee4cb60086d2b0140a10",
+        "bytes": 4170
+      },
+      "public_base_source_sha256": "d01463217a8004ffdbd42721f1bc5b30da378494bf41ee4cb60086d2b0140a10",
+      "source_changed_from_public_base": false,
+      "live_root_source_matches": true,
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeProductSingularCohomologyDual"
+      ],
+      "changed_providers": [
+        "HolonicsResearch.Hodge.HodgeProductSingularCohomologyDual"
+      ],
+      "axiom_selectors": [
+        "cellularToSingularCohomologyEquivalence",
+        "singularDivisorCycleClass",
+        "singularDivisorCycleClass_evaluation",
+        "divisorCycleClassNaturality"
+      ]
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProjectiveLineType11Form",
+      "source": {
+        "private_machine_path_sha256": "81ed1bbf4524361fa38eb1736a8737006a651c8598f87227bba672ccbb1a6cc1"
+      },
+      "pin": {
+        "sha256": "6d1e44f900f984170780c86fa4819d29e5f613f7c7cb0a42c8699b70cdb100fa",
+        "bytes": 11818
+      },
+      "public_base_source_sha256": "6d1e44f900f984170780c86fa4819d29e5f613f7c7cb0a42c8699b70cdb100fa",
+      "source_changed_from_public_base": false,
+      "live_root_source_matches": true,
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeSurfaceCycleClass"
+      ],
+      "changed_providers": [
+        "HolonicsResearch.Hodge.HodgeSurfaceCycleClass"
+      ],
+      "axiom_selectors": [
+        "orientation_areaForm_eq_complexArea",
+        "complexArea_mul",
+        "fsForm_isType11",
+        "fsForm_inversion",
+        "fsForm_transition",
+        "fsDifferentialForm_contDiff",
+        "fsDifferentialForm_closed",
+        "normalizedTransitionWinding_eq_one",
+        "projectiveLineType11Certificate"
+      ]
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSurfaceType11Period",
+      "source": {
+        "private_machine_path_sha256": "eecf3536d0d54322b059338bb5d05a9ac331f8f089136700a09c662a5f728741"
+      },
+      "pin": {
+        "sha256": "0c7edaa38bf6fba7326aed0fee9c9013ee145309461dcb6597ed8a6cab6abe56",
+        "bytes": 20786
+      },
+      "public_base_source_sha256": "0c7edaa38bf6fba7326aed0fee9c9013ee145309461dcb6597ed8a6cab6abe56",
+      "source_changed_from_public_base": false,
+      "live_root_source_matches": true,
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeProjectiveLineType11Form"
+      ],
+      "changed_providers": [
+        "HolonicsResearch.Hodge.HodgeProjectiveLineType11Form"
+      ],
+      "axiom_selectors": [
+        "surfaceFactorForm_isType11",
+        "surfaceFactorForm_transition",
+        "surfaceFactorForm_crossed_zero",
+        "surfaceFactorDifferentialForm_closed",
+        "surfaceType11Current_isType11",
+        "surfaceType11Current_transition",
+        "surfaceType11DifferentialForm_contDiff",
+        "surfaceType11DifferentialForm_closed",
+        "type11PeriodFunctional_eq_rulingEvaluation",
+        "surfaceType11PeriodMap_evaluation",
+        "firstFactor_period_ledger",
+        "secondFactor_period_ledger",
+        "surfaceType11PeriodMap_eq_singularCohomologyDual",
+        "surfaceType11AnalyticCertificate",
+        "rationalType11_eq_top",
+        "singularDivisorCycleClass_mem_rationalType11",
+        "surfaceType11Conclusion"
+      ]
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProjectiveLinePowerType11",
+      "source": {
+        "private_machine_path_sha256": "d4cb65da8aad26bad8613708f010d352e77cfd00a83a6de715fca63cf61466dd"
+      },
+      "pin": {
+        "sha256": "3da1876a436f31fa924f446c2838d571b09e7abaf404d6106581e51022a7ea72",
+        "bytes": 17010
+      },
+      "public_base_source_sha256": "3da1876a436f31fa924f446c2838d571b09e7abaf404d6106581e51022a7ea72",
+      "source_changed_from_public_base": false,
+      "live_root_source_matches": true,
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeSurfaceType11Period"
+      ],
+      "changed_providers": [
+        "HolonicsResearch.Hodge.HodgeSurfaceType11Period"
+      ],
+      "axiom_selectors": [
+        "powerFactorDifferentialForm_closed",
+        "powerType11DifferentialForm_contDiff",
+        "powerType11DifferentialForm_closed",
+        "powerType11Period_basis",
+        "coefficients_eq_of_periods_eq",
+        "powerType11AnalyticCertificate"
+      ]
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSpherePowerRulingHomology",
+      "source": {
+        "private_machine_path_sha256": "01ffcb77d2d740b176c764e9c5249c7c342f1a95558f87428169c290aca86f42"
+      },
+      "pin": {
+        "sha256": "61a94ce064ddf2b427f2b3a6c304dbf3bb62112ebe71988a2b378d9d2ee31cc8",
+        "bytes": 80123
+      },
+      "public_base_source_sha256": "61a94ce064ddf2b427f2b3a6c304dbf3bb62112ebe71988a2b378d9d2ee31cc8",
+      "source_changed_from_public_base": false,
+      "live_root_source_matches": true,
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeProjectiveLinePowerType11",
+        "HolonicsResearch.Hodge.HodgeRefinedBoundaryObstruction",
+        "HolonicsResearch.Hodge.HodgeSphereHomologyEquivalence",
+        "HolonicsResearch.Hodge.HodgeProductRulingDecomposition",
+        "HolonicsResearch.Hodge.HodgeSphereProductFiniteComplex"
+      ],
+      "changed_providers": [
+        "HolonicsResearch.Hodge.HodgeProjectiveLinePowerType11",
+        "HolonicsResearch.Hodge.HodgeProductRulingDecomposition"
+      ],
+      "axiom_selectors": [
+        "spherePowerCellComplex_d",
+        "spherePowerCellHomologyIsoModule",
+        "spherePowerHomologyEquivCellModule",
+        "spherePowerEvenCellIndexEquiv",
+        "spherePowerEvenCellIndex_card",
+        "spherePowerCellModule_finrank_even",
+        "spherePowerOddCellIndex_isEmpty",
+        "spherePowerCellModule_finrank_odd",
+        "spherePowerCellModule_pascal",
+        "spherePowerSuccessorSimplexRealization",
+        "spherePowerLowDegreeCurrentDatumFromTwo",
+        "coordinateRulingCycle_boundary_zero",
+        "crossed_projection_coordinateRulingCycle",
+        "coordinateProjection_spherePowerRulingHomologyMap",
+        "spherePowerRulingHomologyMap_injective",
+        "spherePowerRulingHomologyMap_surjective_one",
+        "spherePowerRulingHomologyMap_surjective_two",
+        "spherePowerPrefixCurrentMap",
+        "lastCoordinateRulingCurrentMap",
+        "exists_spherePowerSuccessorChainDecomposition",
+        "exists_spherePowerSuccessorHomologyDecomposition",
+        "coordinateRulingCyclesMap_then_spherePowerPrefix",
+        "spherePowerPrefixHomologyMap_coordinateRuling",
+        "sphereCycleMap_lastCoordinateRuling",
+        "lastCoordinateRulingHomologyMap_fundamental",
+        "spherePowerSuccessorHomologyMap_assembly",
+        "spherePowerRulingHomologyMap_surjective_successor",
+        "spherePowerRulingHomologyMap_surjective_from_two",
+        "spherePowerRulingHomologyMap_surjective",
+        "spherePowerRulingHomologyEquiv",
+        "spherePowerRulingHomologyEquivOne",
+        "spherePowerRulingHomologyEquivTwo"
+      ]
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSpherePowerPairHomology",
+      "source": {
+        "private_machine_path_sha256": "e08b189d0a2fe63b87db02c1963447332bce0c8f79ef8e199da1d2ab18dd790d"
+      },
+      "pin": {
+        "sha256": "6e2ddfc2bea154fa3ad34a04c843eac272604263067fd3932917b11c4ae85c0c",
+        "bytes": 35094
+      },
+      "public_base_source_sha256": "9784c847c171e483e48fcdab394cb38dde7010952b280f9368fe6e3720f3af3c",
+      "source_changed_from_public_base": true,
+      "live_root_source_matches": false,
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeSpherePowerRulingHomology",
+        "HolonicsResearch.Hodge.HodgeProjectiveLineRealization"
+      ],
+      "changed_providers": [
+        "HolonicsResearch.Hodge.HodgeSpherePowerRulingHomology"
+      ],
+      "axiom_selectors": [
+        "coordinatePair_four_card",
+        "pairCoordinate_then_matching_projection",
+        "pairCoordinateChainMap_matching_retract",
+        "pairCoordinateChain_closed",
+        "sourceFourCycleFromSphereFaces",
+        "fourfoldPairSourceFromSphereFaces_closed",
+        "pairCoordinateHomologyMorphism_fromSphereFaces",
+        "pairCoordinateHomologyClass_fromSphereFaces",
+        "coordinatePairClassMapFromSphereFaces_unit",
+        "coordinatePairClassMapFromSphereFaces_injective",
+        "coordinatePairClassMapFromSphereFaces_injective_of_fillings",
+        "pairCoordinateHomologyMap_matching_retract",
+        "pairCoordinateHomologyMap_injective",
+        "crossedPairTopMap_factorsThroughSphere",
+        "crossedPairChainMap_factorsThroughSphere",
+        "crossedPairHomologyMap_factorsThroughSphereH4",
+        "crossedPairHomologyMap_eq_zero_of_sphereH4_subsingleton",
+        "coordinatePairClassMap_injective",
+        "sphereH4SubsingletonOfFillings",
+        "surfaceCellHomologyIsoQFour",
+        "sphereProductH4EquivQOfReduction",
+        "sourceFourHomologyClassOfReduction_ne_zero",
+        "coordinatePairClassMapOfReduction_injective",
+        "coordinatePairClassMapOfReductions_surjective",
+        "coordinatePairHomologyEquivOfReductions",
+        "cellFourGenerator_closed",
+        "sourceFourCycleOfReduction",
+        "fourfoldPairClassesOfReduction"
+      ]
+    }
+  ],
+  "first_changed_edge_consumer": "HolonicsResearch.Foundation.ProductDegreeTwo",
+  "transitive_source_module_count": 88,
+  "remaining_unchanged_cached_imports": "reuse only after exact source/hash/native provider-edge preflight in current lookup order; cached outputs for listed modules cannot supply acceptance against new provider",
+  "admission": "existing shared queue only; first ProductDegreeTwo then HodgeProductDiagonal; stop on producing proof/source mismatch/limit; remaining ten downstream joins follow accepted predecessors",
+  "acceptance": "each source/import read publishes a separate full-owner kernel+axiom+cleanup+release receipt; accepted Foundation not recompiled; Product/Pair acceptance distinct",
+  "threads": 1,
+  "memory_bytes": 4294967296,
+  "fixed_limits": "existing shared queue measured preparation deadline and original17s compiler CPU/wall unchanged; no capraise",
+  "no_edited_math_source": true,
+  "old_cache_objects_traces_and_receipts_untouched": true,
+  "no_synthetic_cache_trace_or_forged_provider_acceptance": true,
+  "new_library_created": false,
+  "prior_request": {
+    "private_machine_path_sha256": "d1eae67856415764929dbcefa0b2055af90bafbd894721c39ff59c83b505c0e6"
+  },
+  "proof_improvement_request": {
+    "private_machine_path_sha256": "699194fa71c2d9364749c730d6a6ad1d143ed1827f9b9b4c969534adf0299259"
+  },
+  "proof_delta_check": {
+    "private_machine_path_sha256": "907142f69ae70e1ac4ec3feca45e117f9fd2d1df24389ec9d99ac2360abbd8ea"
+  },
+  "prior_complete_producer_measurement_recovery": "Complete predecessor full-module diagnostics read; fixed CPU frontier at lines637\u2013703, no completed object.",
+  "fallback_frozen_source_root": {
+    "private_machine_path_sha256": "fa9b39db065749cc8a97d619067eb9d52e579473beda7954860cc9534fa7f261"
+  },
+  "no_additional_mathematical_statement_change": true,
+  "scope": "Same complete 19-query ProductDegreeTwo owner against accepted Foundation, then all declared complete downstream owners; no smaller prefix acceptance.",
+  "old_unchanged_failed_run_preserved": true,
+  "_scoped_evidence": {
+    "original_receipt_pin": {
+      "bytes": 26016,
+      "sha256": "c7d71f0ca192ce86ea68285d0d72cb37c88604e28a52e9d40411a97662cf6d2c"
+    },
+    "raw_machine_paths_and_runtime_copies_kept_private": true,
+    "mathematical_and_validation_values_preserved": true
+  }
+}

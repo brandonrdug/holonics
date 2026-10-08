@@ -1,0 +1,334 @@
+{
+  "status": "PASS exact source ownership integrity; no kernel acceptance",
+  "previous_source_sha256": "7b88ae51a553d9cf9397ae5e9c60ffe7832b6557e2ec1bd2188f0812e655af6e",
+  "all138declarations_preserved_once": true,
+  "all_bodies_definitions_equations_maps_hypotheses_and_statements_byte_identical": true,
+  "corrected_universe_scope_unchanged": true,
+  "all_retained_ranges_sorted_reconstruct_entire_original_body": true,
+  "generic_boundary_helpers_relocated_to_actual_owner": true,
+  "namespace_and_open_context_identical": true,
+  "all_original45public_consumer_queries_retained": true,
+  "no_private_or_local_scope_command_affected": true,
+  "no_aliases_or_parallel_library": true,
+  "no_import_cycle": true,
+  "compiler_launched": false,
+  "modules": [
+    {
+      "module": "HolonicsResearch.Hodge.HodgeTopologicalProductRealization",
+      "source": {
+        "private_machine_path_sha256": "aff35611ec9f2864757a1dc084f931b9835cc3e9606fb8b1205f59c83c82ac6e"
+      },
+      "canonical_path": {
+        "private_machine_path_sha256": "f681da9e88783dd6b05bdf1e91f7a408f002d96696a8d353a1bfcbab5e38c81f"
+      },
+      "pin": {
+        "sha256": "bb8b13e71e7c04e46e2b66058c2d3a80d73c02048078421e708730a1cd27e820",
+        "bytes": 8991
+      },
+      "imports": [
+        "HolonicsResearch.Foundation.ProductDegreeTwo",
+        "HolonicsResearch.Hodge.HodgeSphereProductRulingProjections",
+        "HolonicsResearch.Hodge.HodgeSphereHomologyEquivalence",
+        "HolonicsResearch.Hodge.HodgeSphereFundamentalDetector",
+        "Mathlib.LinearAlgebra.Basis.VectorSpace"
+      ],
+      "body_source_ranges": [
+        {
+          "original_start_byte": 1304,
+          "original_end_byte": 8900,
+          "new_start_byte": 1114,
+          "new_end_byte": 8710
+        }
+      ],
+      "axiom_selectors": [
+        "split_join_topologicalProductSimplex",
+        "join_split_topologicalProductSimplex",
+        "splitTopologicalProductSimplex_face",
+        "homeomorphicTopologicalProductSimplexEquiv_face"
+      ],
+      "declarations": 17,
+      "complete_mathematical_owner": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeTopologicalSingularCurrent",
+      "source": {
+        "private_machine_path_sha256": "55c1f12ec9ad7edf79ebca708a1f6a6e4c9a60708e5cc1220391a8da855f6b7b"
+      },
+      "canonical_path": {
+        "private_machine_path_sha256": "df05b812f80a8bec2d4faa98e896f292e15ef8fb1c5ba0113b7cbc5c1b2b90be"
+      },
+      "pin": {
+        "sha256": "d5bc66089c8a528ffa20ccf18a56aa393c799af69579170884b38e40de4f24c3",
+        "bytes": 21747
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeTopologicalProductRealization"
+      ],
+      "body_source_ranges": [
+        {
+          "original_start_byte": 8900,
+          "original_end_byte": 26744,
+          "new_start_byte": 896,
+          "new_end_byte": 18740
+        },
+        {
+          "original_start_byte": 64149,
+          "original_end_byte": 66350,
+          "new_start_byte": 18740,
+          "new_end_byte": 20941
+        }
+      ],
+      "axiom_selectors": [
+        "topologicalSimplicialModule_face_generator",
+        "boundary_topologicalSimplexGenerator",
+        "topologicalChainToCurrent_generator",
+        "topologicalCurrentToChain_generator",
+        "sigmaInjection_eq_smul_topologicalSimplexGenerator",
+        "topologicalCurrent_chain_roundtrip",
+        "topologicalChain_current_roundtrip",
+        "topologicalChainEquivCurrent_boundary",
+        "topologicalSimplexMap_comp",
+        "topologicalSimplexMap_id",
+        "topologicalCurrentMap_generator",
+        "topologicalChainMap_simplexGenerator",
+        "topologicalChainEquivCurrent_map",
+        "topologicalCurrentToChain_boundary",
+        "topologicalFactorBoundary_sq"
+      ],
+      "declarations": 28,
+      "complete_mathematical_owner": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSphereProductCurrent",
+      "source": {
+        "private_machine_path_sha256": "543fd5bf542ca531a0bf3e6ab60548867849440af09ae1e6e9dee69fc0dc71f1"
+      },
+      "canonical_path": {
+        "private_machine_path_sha256": "44868c9609fe4f539be51f87c7cfd9b517e338541726c267269ddc987b23e635"
+      },
+      "pin": {
+        "sha256": "d478959cc584cb2dd8019a4985c2129fc4b08cba42488f13ae5fb84f75727f64",
+        "bytes": 14778
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeTopologicalSingularCurrent"
+      ],
+      "body_source_ranges": [
+        {
+          "original_start_byte": 26744,
+          "original_end_byte": 40059,
+          "new_start_byte": 891,
+          "new_end_byte": 14206
+        }
+      ],
+      "axiom_selectors": [
+        "split_join_productSimplex",
+        "join_split_productSimplex",
+        "splitProductSimplex_face",
+        "productSimplicialModule_face_generator",
+        "boundary_productSimplexGenerator",
+        "chainToProductCurrent_generator",
+        "productCurrentToChain_generator",
+        "sigmaInjection_eq_smul_productGenerator",
+        "productCurrent_chain_roundtrip",
+        "chain_productCurrent_roundtrip",
+        "productChainDiagonalEquiv_generator"
+      ],
+      "declarations": 30,
+      "complete_mathematical_owner": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSphereProductReconstruction",
+      "source": {
+        "private_machine_path_sha256": "b8656d35d5ccd82d31a30c0f2dc2ee7ec66a1a926eb7d2c0bc642166614b606d"
+      },
+      "canonical_path": {
+        "private_machine_path_sha256": "fad52ff248b7e6cf8ee042767c36aae6b91ac7d71a908b5c424d662d5f1b1991"
+      },
+      "pin": {
+        "sha256": "baa0db745e69a05ed1388699874c550c47d0adab656b179675bad305ff875805",
+        "bytes": 19823
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeSphereProductCurrent"
+      ],
+      "body_source_ranges": [
+        {
+          "original_start_byte": 40059,
+          "original_end_byte": 58238,
+          "new_start_byte": 888,
+          "new_end_byte": 19067
+        }
+      ],
+      "axiom_selectors": [
+        "productChainDiagonalEquiv_boundary_generator",
+        "productChainDiagonalEquiv_boundary_three_generator",
+        "productChainDiagonalEquiv_boundary",
+        "productChainDiagonalEquiv_boundary_three",
+        "separatedProductThreeChain_boundary",
+        "separatedProductCycle_boundary",
+        "rejoinedProductThreeChain_boundary",
+        "rejoinedProductChain_of_separatedBoundary",
+        "productChainDiagonalEquiv_boundary_rejoined",
+        "rejoinedProductChain_boundary",
+        "productRoundTripDefectChain_diagonal",
+        "productRoundTripDefectChain_boundary",
+        "productRoundTripDefectFillerChain_boundary"
+      ],
+      "declarations": 26,
+      "complete_mathematical_owner": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSphereProductFourCycle",
+      "source": {
+        "private_machine_path_sha256": "4d79b7d7cad96f06ba0d3892cf1ba240f38d8913d8d37162e6abe613efd1a850"
+      },
+      "canonical_path": {
+        "private_machine_path_sha256": "dc1a9578e5304f9f5bdbdd115f3c755dbaad931a501fc6976f88c6980b190601"
+      },
+      "pin": {
+        "sha256": "db0a4d2bebb605919b7a12d303e80efdfab0bcde0d0050dfd4dd5f512462a4d3",
+        "bytes": 7123
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeSphereProductReconstruction"
+      ],
+      "body_source_ranges": [
+        {
+          "original_start_byte": 58238,
+          "original_end_byte": 64149,
+          "new_start_byte": 889,
+          "new_end_byte": 6800
+        }
+      ],
+      "axiom_selectors": [
+        "pairTwoBoundary_factor_incidence",
+        "pairTwoShuffle_closed",
+        "productChainDiagonalEquiv_boundary_four_generator",
+        "productChainDiagonalEquiv_boundary_four",
+        "sphereProductFundamentalFourChain_closed"
+      ],
+      "declarations": 6,
+      "complete_mathematical_owner": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSphereNormalizedCoefficient",
+      "source": {
+        "private_machine_path_sha256": "fc7b2de46a14c36d9617c4ec0d8e9dcfdf67315c9f7126d76257b64c5de94f68"
+      },
+      "canonical_path": {
+        "private_machine_path_sha256": "8f0d1563f0a77cb65c3f6a751a34fda82c75e699cc5eb2d86d857b0770fe3cbb"
+      },
+      "pin": {
+        "sha256": "b20f0eb95f5ef73fadc5aa8162a977f330af1985a1650d67496f4b96bd534084",
+        "bytes": 10875
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeSphereProductFourCycle"
+      ],
+      "body_source_ranges": [
+        {
+          "original_start_byte": 66350,
+          "original_end_byte": 75742,
+          "new_start_byte": 886,
+          "new_end_byte": 10278
+        }
+      ],
+      "axiom_selectors": [
+        "sphereRawCoefficient_cycle",
+        "sphereRawCoefficient_boundary",
+        "sphereRawCoefficient_fundamental",
+        "sphereRawSimplexCoefficient_closed",
+        "sphereNormalizedCurrentCoefficient_return",
+        "sphereNormalizedCurrentCoefficient_boundary",
+        "sphereNormalizedSimplexCoefficient_closed",
+        "sphereNormalizedSimplexCoefficient_degenerate",
+        "sphereNormalizedCurrentCoefficient_fundamental",
+        "pairFourReceiver_pairTwoShuffle_pairCurrent"
+      ],
+      "declarations": 16,
+      "complete_mathematical_owner": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProductDiagonal",
+      "source": {
+        "private_machine_path_sha256": "3e09b3c3bfeb07a746dc2bc53425d7fca4f3e1cdd8f41d194e31df27d33b85e3"
+      },
+      "canonical_path": {
+        "private_machine_path_sha256": "2b9d57326363dc5b8fa79fe9af2b35b6d7cea46b5c73986af7d710b0e152760d"
+      },
+      "pin": {
+        "sha256": "85047a43f7020aba3e97236d386f6b1f561cc91b8e7ef093b4ae34e3e0ef29c5",
+        "bytes": 11709
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeSphereNormalizedCoefficient"
+      ],
+      "body_source_ranges": [
+        {
+          "original_start_byte": 75742,
+          "original_end_byte": 84232,
+          "new_start_byte": 890,
+          "new_end_byte": 9380
+        }
+      ],
+      "axiom_selectors": [
+        "sphereDetectorFromHomology",
+        "sphereNormalizedCurrentCoefficient_return",
+        "sphereNormalizedSimplexCoefficient_closed",
+        "sphereNormalizedSimplexCoefficient_degenerate",
+        "productChainDiagonalEquiv_boundary_five",
+        "sphereProductFourReceiver_boundary",
+        "sphereProductFourReceiver_fundamental",
+        "sphereProductFundamentalFourChain_not_mem_boundary_range",
+        "sphereProductFourReceiverOnHomology_fundamental",
+        "sphereProductFundamentalFourHomologyClass_ne_zero",
+        "topologicalProductSimplexEquiv",
+        "topologicalProductSimplexRealization",
+        "homeomorphicTopologicalProductSimplexEquiv",
+        "homeomorphicTopologicalProductSimplexRealization",
+        "topologicalSimplexMap_comp",
+        "topologicalSimplexMap_id",
+        "topologicalChainEquivCurrent",
+        "topologicalChainEquivCurrent_boundary",
+        "topologicalChainMap_simplexGenerator",
+        "topologicalChainEquivCurrent_map",
+        "productSimplexEquiv",
+        "productChainEquivCurrent",
+        "productChainDiagonalEquiv",
+        "pairTwoBoundary_factor_incidence",
+        "pairTwoShuffle_closed",
+        "productChainDiagonalEquiv_boundary_four",
+        "sphereProductFundamentalFourChain_closed",
+        "productChainDiagonalEquiv_boundary_generator",
+        "productChainDiagonalEquiv_boundary_three_generator",
+        "productChainDiagonalEquiv_boundary",
+        "productChainDiagonalEquiv_boundary_three",
+        "separatedProductThreeChain_boundary",
+        "productBoundarySeparationHolon",
+        "separatedProductCycle_boundary",
+        "productCycleSeparationHolon",
+        "rejoinedProductThreeChain_boundary",
+        "rejoinedProductChain_of_separatedBoundary",
+        "productChainDiagonalEquiv_boundary_rejoined",
+        "rejoinedProductChain_boundary",
+        "rejoinedProductCycle",
+        "productRoundTripDefectChain_diagonal",
+        "productRoundTripDefectChain_boundary",
+        "productRoundTripDefectCycle",
+        "productRoundTripDefectFillerChain_boundary",
+        "productReconstructionBoundaryHolon"
+      ],
+      "declarations": 15,
+      "complete_mathematical_owner": true
+    }
+  ],
+  "_scoped_evidence": {
+    "original_receipt_pin": {
+      "bytes": 12717,
+      "sha256": "6a82ca1c36b71f7afedc946255f90a0186d61138b60b54310d2a7faf680500e3"
+    },
+    "raw_machine_paths_and_runtime_copies_kept_private": true,
+    "mathematical_and_validation_values_preserved": true
+  }
+}

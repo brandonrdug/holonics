@@ -1,0 +1,114 @@
+{
+  "status": "concrete source plan; queue coordination before any execution",
+  "source_sha256": "6dedfc094a78df6f22a23f1d804379d3b39139c4231a37806e5158c59a9d2ee0",
+  "source_base": "3c67beee7f656798f912c974f12c482ea12c5e42",
+  "diagnosis_receipt": {
+    "private_machine_path_sha256": "c132bc03232104bac7d66acccc7af81093fbe2bdc11d50faa8bef01eb6621011"
+  },
+  "actual_v3_measurement": {
+    "compiler_wall_ns": 17111924217,
+    "compiler_deadline_ns": 17000000000,
+    "aggregate_CPU_ns": 15639496000,
+    "group_peak_bytes": 4294860800,
+    "group_memory_limit_bytes": 4294967296,
+    "memory_events_delta": {
+      "low": 0,
+      "high": 0,
+      "max": 9,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0,
+      "sock_throttled": 0
+    },
+    "raw_compiler_stdout_bytes": 0,
+    "raw_compiler_stderr_bytes": 0
+  },
+  "exact_expensive_proof": "unlocated: v3 emitted no command diagnostic; v2 trace is not v3 evidence",
+  "choice": "agent-inferred: split existing ownership by mathematical factor/pair current, axis laws, augmentation, edge contraction, degree-two normalization, and realization boundaries. No changes to declaration bodies or statements.",
+  "units": [
+    {
+      "module": "HolonicsResearch.Foundation.ProductFactorCurrent",
+      "source_path": "lean/HolonicsResearch/Foundation/ProductFactorCurrent.lean",
+      "predecessor": "HolonicsResearch.Foundation.DiagonalChainTransport",
+      "existing_declarations": 34,
+      "first": "FactorSimplex",
+      "last": "extendedH1_boundary",
+      "old_body_bytes": 12945,
+      "body_unchanged": true
+    },
+    {
+      "module": "HolonicsResearch.Foundation.ProductAxisBoundary",
+      "source_path": "lean/HolonicsResearch/Foundation/ProductAxisBoundary.lean",
+      "predecessor": "HolonicsResearch.Foundation.ProductFactorCurrent",
+      "existing_declarations": 52,
+      "first": "leftAxis",
+      "last": "coupledAxisBoundaryEquations",
+      "old_body_bytes": 27475,
+      "body_unchanged": true
+    },
+    {
+      "module": "HolonicsResearch.Foundation.ProductAugmentation",
+      "source_path": "lean/HolonicsResearch/Foundation/ProductAugmentation.lean",
+      "predecessor": "HolonicsResearch.Foundation.ProductAxisBoundary",
+      "existing_declarations": 24,
+      "first": "pairFirstAugmentation",
+      "last": "mapPairLeft_pairSecondBase",
+      "old_body_bytes": 13616,
+      "body_unchanged": true
+    },
+    {
+      "module": "HolonicsResearch.Foundation.ProductEdgeContraction",
+      "source_path": "lean/HolonicsResearch/Foundation/ProductEdgeContraction.lean",
+      "predecessor": "HolonicsResearch.Foundation.ProductAugmentation",
+      "existing_declarations": 11,
+      "first": "productOneBaseResidual",
+      "last": "mapPairRight_factorBoundary_sq",
+      "old_body_bytes": 10519,
+      "body_unchanged": true
+    },
+    {
+      "module": "HolonicsResearch.Foundation.ProductDegreeTwoNormalization",
+      "source_path": "lean/HolonicsResearch/Foundation/ProductDegreeTwoNormalization.lean",
+      "predecessor": "HolonicsResearch.Foundation.ProductEdgeContraction",
+      "existing_declarations": 29,
+      "first": "coupledRightMiddleContraction",
+      "last": "boundary_middlePolarizedFillingCurrent",
+      "old_body_bytes": 22897,
+      "body_unchanged": true
+    },
+    {
+      "module": "HolonicsResearch.Foundation.ProductDegreeTwo",
+      "source_path": "lean/HolonicsResearch/Foundation/ProductDegreeTwo.lean",
+      "predecessor": "HolonicsResearch.Foundation.ProductDegreeTwoNormalization",
+      "existing_declarations": 20,
+      "first": "ProductSimplexRealization",
+      "last": "realizedProductLowDegreeCurrentDatum",
+      "old_body_bytes": 19840,
+      "body_unchanged": true
+    }
+  ],
+  "complete_dependency_topology": "accepted DiagonalChainTransport -> ProductFactorCurrent -> ProductAxisBoundary -> ProductAugmentation -> ProductEdgeContraction -> ProductDegreeTwoNormalization -> existing ProductDegreeTwo realization consumer -> unchanged declared 11 downstream full owners through HodgeSpherePowerPairHomology",
+  "semantic_relation_status": "CAUSAL: Lean proof imports and declared consuming references; full acceptance of new source is OPEN pending queue checks. Runtime timings are APPARATUS, not proof readiness.",
+  "why_cost_should_improve": [
+    "Each separately accepted reusable provider is elaborated once; a later failure no longer repeats previously completed producer proofs.",
+    "Each compiler process retains only its own current proof elaboration and loads predecessors from checked objects; this targets v3 measured memory limit events.",
+    "Original source has170declarations; no new owner exceeds52declarations. This is a structural bound, not a measured timing projection.",
+    "Existing ProductDegreeTwo performs its actual product realization consumer with original full19axiom reads; no prefix acceptance is promoted to whole-owner acceptance."
+  ],
+  "limits": "same fixed17sCPU/wall and4GiB per actual full module; queue must derive stage preparation projections from its current measured units, stop on errors or exceeded projection; no cap raises",
+  "queue_request": "preflight partition/provider binding, then compile each full module in dependency order once. Each must publish independent kernel/axiom/cleanup/release receipts. On failure diagnose that actual complete module, reuse accepted predecessors. No unrelated or unchanged retry.",
+  "acceptance": "all6fullmodules kernel accepted with pinned provider edges; original19selectors standard at ProductDegreeTwo; then all11unchanged declared full downstream owners must be validated against new artifacts.",
+  "existing_names_definitions_signatures_hypotheses": "preserved exactly once in same namespace; no duplicate library or compatibility aliases",
+  "preserve_sources_receipts": true,
+  "compiler_launched": false,
+  "queue_owner": "01a10352-66ea-73c8-b716-a835a9a04033",
+  "routing": "direct thread tools unavailable; parent routing required",
+  "_scoped_evidence": {
+    "original_receipt_pin": {
+      "bytes": 6045,
+      "sha256": "91f99a5f950fb406bbf88d0d81c4fcabc7ff7825a7aeb80854c30417f87240a3"
+    },
+    "raw_machine_paths_and_runtime_copies_kept_private": true,
+    "mathematical_and_validation_values_preserved": true
+  }
+}

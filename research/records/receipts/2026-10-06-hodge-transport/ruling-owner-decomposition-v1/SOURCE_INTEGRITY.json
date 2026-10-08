@@ -1,0 +1,170 @@
+{
+  "status": "PASS source-body and ownership integrity only; all four new complete owners kernel pending",
+  "original_source_pin": {
+    "sha256": "e0ab94ed9f0e283115e9ad02442c0b92dc1be1fe88da4e7e6190dcb95381be28",
+    "bytes": 21153
+  },
+  "declarations_preserved_once": 20,
+  "source_blocks_byte_identical": true,
+  "statements_and_proof_bodies_unchanged": true,
+  "preamble_contexts_unchanged": true,
+  "forward_local_references": [],
+  "new_hypotheses": [],
+  "placeholder_declarations": [],
+  "original_public_three_queries_retained": [
+    "exists_productDegreeTwoRulingDecomposition",
+    "rulingHomologyMap_surjective",
+    "rulingHomologyEquivalence"
+  ],
+  "complete_owner_query_counts": [
+    10,
+    7,
+    1,
+    3
+  ],
+  "compiler_launched": false,
+  "modules": [
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSphereRulingCurrent",
+      "source": {
+        "private_machine_path_sha256": "4c59d1fa6066da847b75af5c41d314b9e245ec70e7bd22252b380987745c1967"
+      },
+      "canonical_path": {
+        "private_machine_path_sha256": "b35abf05b94380fda106f939a378392b5953f159ead10707630123f768d7dc89"
+      },
+      "pin": {
+        "sha256": "4b25419ee1a4023d3bf2960e4bf7036a506ab4b0403489b8016f69feaa9ff985",
+        "bytes": 9696
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeProductMixedFilling",
+        "HolonicsResearch.Hodge.HodgeRefinedBoundaryObstruction"
+      ],
+      "axiom_selectors": [
+        "sphereToProductSimplex",
+        "sphereToProductChainMap_generator",
+        "split_firstRuling_simplex",
+        "split_secondRuling_simplex",
+        "productChainDiagonalEquiv_firstRuling_generator",
+        "productChainDiagonalEquiv_secondRuling_generator",
+        "pairCurrent_univ_sum_left",
+        "pairCurrent_univ_sum_right",
+        "productChainDiagonalEquiv_firstRulingCycle",
+        "productChainDiagonalEquiv_secondRulingCycle"
+      ],
+      "complete_owner": true,
+      "declarations_moved_once": true,
+      "declarations": [
+        "sphereToProductSimplex",
+        "sphereToProductChainMap_generator",
+        "split_firstRuling_simplex",
+        "split_secondRuling_simplex",
+        "productChainDiagonalEquiv_firstRuling_generator",
+        "productChainDiagonalEquiv_secondRuling_generator",
+        "pairCurrent_univ_sum_left",
+        "pairCurrent_univ_sum_right",
+        "productChainDiagonalEquiv_firstRulingCycle",
+        "productChainDiagonalEquiv_secondRulingCycle"
+      ],
+      "purpose": "The actual sphere-to-product simplex map and the complete geometric ruling current chart."
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProductRulingReconstruction",
+      "source": {
+        "private_machine_path_sha256": "5c2be4d180ab651b4daab04ff36ee62edaa71f642c032d5323c05b0b58b224e6"
+      },
+      "canonical_path": {
+        "private_machine_path_sha256": "3d6fba92b10e67b78c48e5f1b30d303ed821071fe60e1bfafbb5699a2af94f4d"
+      },
+      "pin": {
+        "sha256": "9b1713839c7393da8d65f777ee8b096958877dc4b0c2ffe4c85223a94b5137b6",
+        "bytes": 6959
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeSphereRulingCurrent"
+      ],
+      "axiom_selectors": [
+        "firstRulingSeparatedCurrent_eq",
+        "rejoinTwo_rightAxis_base",
+        "rejoinTwo_leftAxis_base",
+        "rejoinTwo_firstRulingSeparatedCurrent",
+        "rejoinTwo_secondRulingSeparatedCurrent",
+        "rejoinedProductChain_firstRulingSeparatedCurrent",
+        "rejoinedProductChain_secondRulingSeparatedCurrent"
+      ],
+      "complete_owner": true,
+      "declarations_moved_once": true,
+      "declarations": [
+        "firstRulingSeparatedCurrent_eq",
+        "rejoinTwo_rightAxis_base",
+        "rejoinTwo_leftAxis_base",
+        "rejoinTwo_firstRulingSeparatedCurrent",
+        "rejoinTwo_secondRulingSeparatedCurrent",
+        "rejoinedProductChain_firstRulingSeparatedCurrent",
+        "rejoinedProductChain_secondRulingSeparatedCurrent"
+      ],
+      "purpose": "The separated outer currents rejoin to the existing geometric ruling chains exactly."
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProductRulingBoundary",
+      "source": {
+        "private_machine_path_sha256": "c1fb36ed2f9c737008f5059521fa852a3e4a777885d9a836cdd4b8abf756c7ff"
+      },
+      "canonical_path": {
+        "private_machine_path_sha256": "c3fbb2dc0a54de11d9ec13d85648ac5111c2e27a87f370e9d0f60b45405c8c1e"
+      },
+      "pin": {
+        "sha256": "747b1149beac46ecb2dbbde25c8225446cd4b0c8b560a2f84f5e9bdb7e776a92",
+        "bytes": 4776
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeProductRulingReconstruction"
+      ],
+      "axiom_selectors": [
+        "exists_productDegreeTwoRulingDecomposition"
+      ],
+      "complete_owner": true,
+      "declarations_moved_once": true,
+      "declarations": [
+        "exists_productDegreeTwoRulingDecomposition"
+      ],
+      "purpose": "The coupled filling and reconstruction defect return an actual singular three-boundary witness."
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProductRulingDecomposition",
+      "source": {
+        "private_machine_path_sha256": "9ca724d7f27303520886d8e9cb128bb4a0f52cc1d581d1d624c46ed3fe10b874"
+      },
+      "canonical_path": {
+        "private_machine_path_sha256": "fcf908b144de53f1602f28afd7208e2636d2b1dbe344ff0c4d730eb6aee8cded"
+      },
+      "pin": {
+        "sha256": "02b904d96abb418f10287cd9aee00f729f2afcb208e4f6d5c54b020e99a48e2f",
+        "bytes": 6915
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeProductRulingBoundary"
+      ],
+      "axiom_selectors": [
+        "exists_productDegreeTwoRulingDecomposition",
+        "rulingHomologyMap_surjective",
+        "rulingHomologyEquivalence"
+      ],
+      "complete_owner": true,
+      "declarations_moved_once": true,
+      "declarations": [
+        "rulingHomologyMap_surjective",
+        "rulingHomologyEquivalence"
+      ],
+      "purpose": "The public ruling homology consumer derives surjectivity and the equivalence from the actual boundary witness."
+    }
+  ],
+  "_scoped_evidence": {
+    "original_receipt_pin": {
+      "bytes": 6274,
+      "sha256": "4959f6c80a640f2d817852faa78fe2afeaa8861912693634b80d23c60e6b846f"
+    },
+    "raw_machine_paths_and_runtime_copies_kept_private": true,
+    "mathematical_and_validation_values_preserved": true
+  }
+}

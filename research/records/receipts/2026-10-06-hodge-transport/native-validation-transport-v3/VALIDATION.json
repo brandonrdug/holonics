@@ -1,0 +1,238 @@
+{
+  "status": "Temporal_v4_and_Partition_v3_PASS_private_recursive_v1_FAIL",
+  "Temporal": {
+    "kernel_accepted": true,
+    "compiler_exit": 0,
+    "compiler_wall_ns": 3087101803,
+    "axioms": {
+      "Holonics.Physics.CoarseHodgeTransport.laplacianDefect_eq_four_returns": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "Holonics.Physics.CoarseHodgeTransport.harmonic_image_iff_defect_zero": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "Holonics.Physics.CoarseHodgeTransport.eulerHeatStep_receiver_return": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "Holonics.Physics.CoarseHodgeTransport.eulerHeatStep_commutes_iff": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "Holonics.Physics.CoarseHodgeTransport.moving_heat_receiver_rate": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    "selector_count_matches": true,
+    "standard_axioms_only": true,
+    "metadata_unchanged": true,
+    "broad_library_checked": false
+  },
+  "Partition": {
+    "kernel_accepted": true,
+    "compiler_exit": 0,
+    "compiler_wall_ns": 2867180087,
+    "axioms": {
+      "Holonics.Physics.PartitionedHodgeEnergy.cycleBoundary_is_adjoint": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "Holonics.Physics.PartitionedHodgeEnergy.cycleHeatStep_cut_return": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "Holonics.Physics.PartitionedHodgeEnergy.cut_harmonic_laplacian_defect": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "Holonics.Physics.PartitionedHodgeEnergy.cut_heat_commutation_fails": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    "selector_count_matches": true,
+    "standard_axioms_only": true,
+    "metadata_unchanged": true,
+    "broad_library_checked": false
+  },
+  "recursive": {
+    "kernel_accepted": false,
+    "compiler_exit": 1,
+    "compiler_wall_ns": 2356964510,
+    "axioms": {
+      "Holonics.Physics.PartitionedHodgeEnergy.RecursiveCutReadout.recursive_cut_energy_receiver": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "Holonics.Physics.PartitionedHodgeEnergy.RecursiveCutReadout.parked_cut_receipt": [
+        "propext",
+        "sorryAx",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "Holonics.Physics.PartitionedHodgeEnergy.RecursiveCutReadout.lower_remainder_energy_is_not_pivot_return": [
+        "propext",
+        "sorryAx",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    "selector_count_matches": true,
+    "standard_axioms_only": false,
+    "metadata_unchanged": true,
+    "broad_library_checked": false
+  },
+  "rows": [
+    {
+      "label": "hodge-temporal-target-binding-20261006-v3",
+      "passed": true,
+      "wall_ns": 3613446156,
+      "projection_ns": 12779337307,
+      "measured_to_projected": [
+        3613446156,
+        12779337307
+      ],
+      "aggregate_CPU_ns": 3494174000,
+      "group_peak_bytes": 328806400,
+      "peak_child_RSS_KiB": 321392,
+      "released_quiescent": true
+    },
+    {
+      "label": "hodge-temporal-development-20261006-v3",
+      "passed": false,
+      "wall_ns": 11514449632,
+      "projection_ns": 17000000000,
+      "measured_to_projected": [
+        11514449632,
+        17000000000
+      ],
+      "aggregate_CPU_ns": 6854889000,
+      "group_peak_bytes": 4183629824,
+      "peak_child_RSS_KiB": 3476572,
+      "released_quiescent": true
+    },
+    {
+      "label": "hodge-partition-target-binding-20261006-v3",
+      "passed": true,
+      "wall_ns": 3452535558,
+      "projection_ns": 12779337307,
+      "measured_to_projected": [
+        3452535558,
+        12779337307
+      ],
+      "aggregate_CPU_ns": 3387360000,
+      "group_peak_bytes": 323686400,
+      "peak_child_RSS_KiB": 314976,
+      "released_quiescent": true
+    },
+    {
+      "label": "hodge-partition-development-20261006-v3",
+      "passed": true,
+      "wall_ns": 5707328126,
+      "projection_ns": 17000000000,
+      "measured_to_projected": [
+        5707328126,
+        17000000000
+      ],
+      "aggregate_CPU_ns": 5534787000,
+      "group_peak_bytes": 418889728,
+      "peak_child_RSS_KiB": 3387300,
+      "released_quiescent": true
+    },
+    {
+      "label": "hodge-temporal-target-binding-20261006-v4",
+      "passed": true,
+      "wall_ns": 3545339401,
+      "projection_ns": 12779337307,
+      "measured_to_projected": [
+        3545339401,
+        12779337307
+      ],
+      "aggregate_CPU_ns": 3471846000,
+      "group_peak_bytes": 329138176,
+      "peak_child_RSS_KiB": 321392,
+      "released_quiescent": true
+    },
+    {
+      "label": "hodge-temporal-development-20261006-v4",
+      "passed": true,
+      "wall_ns": 6030155907,
+      "projection_ns": 17000000000,
+      "measured_to_projected": [
+        6030155907,
+        17000000000
+      ],
+      "aggregate_CPU_ns": 5855324000,
+      "group_peak_bytes": 408686592,
+      "peak_child_RSS_KiB": 3494812,
+      "released_quiescent": true
+    },
+    {
+      "label": "hodge-recursive-consumer-import-preparation-20261006-v1",
+      "passed": true,
+      "wall_ns": 11257356821,
+      "projection_ns": 12779337307,
+      "measured_to_projected": [
+        11257356821,
+        12779337307
+      ],
+      "aggregate_CPU_ns": 10692380000,
+      "group_peak_bytes": 568455168,
+      "peak_child_RSS_KiB": 392840,
+      "released_quiescent": true
+    },
+    {
+      "label": "hodge-recursive-consumer-development-20261006-v1",
+      "passed": false,
+      "wall_ns": 5226294827,
+      "projection_ns": 17000000000,
+      "measured_to_projected": [
+        5226294827,
+        17000000000
+      ],
+      "aggregate_CPU_ns": 4917262000,
+      "group_peak_bytes": 438972416,
+      "peak_child_RSS_KiB": 3356264,
+      "released_quiescent": true
+    }
+  ],
+  "previous_v1_v2_receipts_preserved": {
+    "private_machine_path_sha256": "614b5cf1b216635850d591b2ca55ab2b16666fe9423770b9d2ab47baa1d27724"
+  },
+  "complete_import_seals_retained": {
+    "hodge-temporal": {
+      "private_machine_path_sha256": "ed86ed91e58d29b3ecbce414f3f48fae45f93d480f0f7f32ab19ece4b57c830a"
+    },
+    "hodge-partition": {
+      "private_machine_path_sha256": "7fb324c62523eb5f6904b9aae04216e11ac84d8e9e52d0c55afe94dd7580aede"
+    },
+    "hodge-recursive-consumer": {
+      "private_machine_path_sha256": "5d72505ecba1c94a69b64f93da9f35dbbbf4ef77e7d6b701446e20f20d77c233"
+    }
+  },
+  "all_prior_failed_source_and_receipts_preserved": true,
+  "owner_source_changed_by_queue": false,
+  "broad_library_Cargo_GPU_checked": false,
+  "no_cap_or_deadline_raised": true,
+  "_scoped_evidence": {
+    "original_receipt_pin": {
+      "bytes": 6771,
+      "sha256": "a44d77b7faaf201f3649cab640b2f3d1ea558c878de999e8ec2e915ecb44888c"
+    },
+    "raw_machine_paths_and_runtime_copies_kept_private": true,
+    "mathematical_and_validation_values_preserved": true
+  }
+}

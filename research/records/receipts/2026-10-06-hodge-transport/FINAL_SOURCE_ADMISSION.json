@@ -1,0 +1,1523 @@
+{
+  "status": "PASS live source and exact accepted object reconciliation",
+  "source_base": "3c67beee7f656798f912c974f12c482ea12c5e42",
+  "Hodge_complete_dependency_owners": 27,
+  "Hodge_standard_axiom_query_reads": 368,
+  "core_complete_owners": 3,
+  "core_standard_axiom_query_reads": 16,
+  "exact_object_artifacts_verified": 60,
+  "terminal_index_pin": {
+    "sha256": "4ad0b8332120680745411dca32ad87f2291211e8d1b932b7486531872729ed9b",
+    "bytes": 2537
+  },
+  "native_Hodge_olean_lookup": "Every first-visible .olean in the exact final Pair LEAN_PATH matches its accepted object pin; auxiliary .ilean pins verified at their retained receipt paths.",
+  "Hodge": [
+    {
+      "module": "HolonicsResearch.Foundation.DiagonalChainTransport",
+      "source": "lean/HolonicsResearch/Foundation/DiagonalChainTransport.lean",
+      "source_pin": {
+        "sha256": "695f2da74d29a0eec3051bc30c197ed200269ede75d4d85eab33e39443311c2c",
+        "bytes": 69878
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "c0ea8374870f6e13d84ef4857560bacc1c6c753ea71807dc1b28222324499cb0",
+            "bytes": 297870
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "c752ae7cd8c7680397bc049806b06caa1b93a6016b051af823344a4209742790",
+            "bytes": 2066592
+          }
+        }
+      ],
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-full-foundation-v4/VALIDATION.json",
+      "receipt_pin": {
+        "bytes": 10866,
+        "sha256": "188e2b57981998ac046ddb71c7e2dc55f86368fec580d5362c2403a705931e34"
+      },
+      "standard_axiom_query_reads": 20,
+      "kernel_accepted": true,
+      "original_receipt_pin": {
+        "sha256": "ac8536463f7d8b173f75bdabe752de42df152cba0511a48ab068d61268b590ce",
+        "bytes": 19331
+      },
+      "receipt_is_scoped_summary": true
+    },
+    {
+      "module": "HolonicsResearch.Foundation.ProductFactorCurrent",
+      "source": "lean/HolonicsResearch/Foundation/ProductFactorCurrent.lean",
+      "source_pin": {
+        "sha256": "5879a1b5239136365fc4b5a64ef4154c8a950b01470a853915162cdad008e9b6",
+        "bytes": 14510
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "d05957c217b0877adcb1ab7e47755758addb8e43519e1e0d83bc232be2c594ee",
+            "bytes": 39022
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "7f48438ac6a58df4c3859cb083ec4cf43ac19f55442aabba74f6ca97d16018a1",
+            "bytes": 717320
+          }
+        }
+      ],
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-product-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "bytes": 176274,
+        "sha256": "204dc085594dd5bfb9fd1c172a93821a861e6b36f5912657c604425232491dbe"
+      },
+      "standard_axiom_query_reads": 24,
+      "kernel_accepted": true,
+      "axiom_selectors": [
+        "factorBoundary_generator",
+        "h1ClosedPart_boundary_zero",
+        "h1ClosedPart_reconstruction",
+        "h1_extended_boundary",
+        "pairCurrent_generator",
+        "pairCurrent_add_left",
+        "pairCurrent_add_right",
+        "pairCurrent_smul_left",
+        "pairCurrent_smul_right",
+        "pairCurrent_neg_left",
+        "pairCurrent_neg_right",
+        "pairCurrent_sub_left",
+        "pairCurrent_sub_right",
+        "pairCurrent_zero_left",
+        "pairCurrent_zero_right",
+        "mapPairLeft_generator",
+        "mapPairRight_generator",
+        "mapPairLeft_pairCurrent",
+        "mapPairRight_pairCurrent",
+        "mapPairLeft_comp",
+        "mapPairRight_comp",
+        "mapPairLeft_right_commute",
+        "extendedH1_apply",
+        "extendedH1_boundary"
+      ],
+      "original_receipt_pin": {
+        "sha256": "a11927bd33c7622e2a7040fb8be9945f844aacb46b6142d4608b1e88c26fab09",
+        "bytes": 286903
+      },
+      "receipt_is_scoped_summary": true
+    },
+    {
+      "module": "HolonicsResearch.Foundation.ProductAxisBoundary",
+      "source": "lean/HolonicsResearch/Foundation/ProductAxisBoundary.lean",
+      "source_pin": {
+        "sha256": "911c9140c862a9db348447f4968cec9487b6ef7e1dc9442890c78e1d69bcf2e3",
+        "bytes": 29580
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "9ab8ce033c066f799f703e35d5eaea7c4e04a274cffa76651cecf94de80908cb",
+            "bytes": 94744
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "849de3dbc96cdba3efa9dcca2e23d83cbdc1f8f2a46211c7c961f1d215fb9242",
+            "bytes": 1656176
+          }
+        }
+      ],
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-product-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "bytes": 176274,
+        "sha256": "204dc085594dd5bfb9fd1c172a93821a861e6b36f5912657c604425232491dbe"
+      },
+      "standard_axiom_query_reads": 33,
+      "kernel_accepted": true,
+      "axiom_selectors": [
+        "leftAxis_generator",
+        "middleAxis_generator",
+        "rightAxis_generator",
+        "leftMiddleAxis_generator",
+        "rightMiddleAxis_generator",
+        "totalBoundaryThree_rightMiddle_generator",
+        "totalBoundaryThree_leftMiddle_generator",
+        "totalBoundaryThree_rightMiddleAxis",
+        "totalBoundaryThree_leftMiddleAxis",
+        "totalBoundaryThree_rightMiddle",
+        "totalBoundaryThree_leftMiddle",
+        "mapPairLeft_extendedH1_boundary",
+        "mapPairRight_extendedH1_boundary",
+        "boundary_middleJointFillingLeft",
+        "boundary_middleJointFillingRight",
+        "leftOneAxis_generator",
+        "rightOneAxis_generator",
+        "totalBoundaryOne_leftOneAxis",
+        "totalBoundaryOne_rightOneAxis",
+        "totalBoundaryTwo_leftAxis",
+        "totalBoundaryTwo_middleAxis",
+        "totalBoundaryTwo_rightAxis",
+        "totalOneAxisReconstruction",
+        "totalBoundaryOne_axisDecomposition",
+        "leftAxisProjection_generator",
+        "middleAxisProjection_generator",
+        "rightAxisProjection_generator",
+        "leftOneAxisProjection_generator",
+        "rightOneAxisProjection_generator",
+        "totalTwoAxisReconstruction",
+        "leftOneAxisProjection_totalBoundaryTwo",
+        "rightOneAxisProjection_totalBoundaryTwo",
+        "coupledAxisBoundaryEquations"
+      ],
+      "original_receipt_pin": {
+        "sha256": "a11927bd33c7622e2a7040fb8be9945f844aacb46b6142d4608b1e88c26fab09",
+        "bytes": 286903
+      },
+      "receipt_is_scoped_summary": true
+    },
+    {
+      "module": "HolonicsResearch.Foundation.ProductAugmentation",
+      "source": "lean/HolonicsResearch/Foundation/ProductAugmentation.lean",
+      "source_pin": {
+        "sha256": "d7de6a57fce6b259b56e85fee4c3c3cd26ed21fd62b1da0aeeac99a58fdebeca",
+        "bytes": 14993
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "001d9c16ef2d2ceb7d76da7b71861bde312a50f0bbed34468640c14fedff4c60",
+            "bytes": 46400
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "9234d1a8b5ec63317a576668b081a96349d512ecd27bf11e18bab0722d944709",
+            "bytes": 747256
+          }
+        }
+      ],
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-product-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "bytes": 176274,
+        "sha256": "204dc085594dd5bfb9fd1c172a93821a861e6b36f5912657c604425232491dbe"
+      },
+      "standard_axiom_query_reads": 16,
+      "kernel_accepted": true,
+      "axiom_selectors": [
+        "pairFirstAugmentation_generator",
+        "pairFirstBase_generator",
+        "pairFirstAugmentation_pairCurrent",
+        "pairFirstBase_current",
+        "productAugmentation_generator",
+        "totalBoundaryOne_productH0SeparatedAtom",
+        "totalBoundaryOne_productH0Separated",
+        "diagonalBoundaryOne_productH0Diagonal",
+        "pairSecondAugmentation_generator",
+        "pairSecondBase_generator",
+        "pairSecondAugmentation_pairCurrent",
+        "pairSecondBase_current",
+        "pairSecondAugmentation_mapPairLeft",
+        "pairSecondAugmentation_mapPairRight_boundary",
+        "mapPairRight_h0_boundary",
+        "mapPairLeft_pairSecondBase"
+      ],
+      "original_receipt_pin": {
+        "sha256": "a11927bd33c7622e2a7040fb8be9945f844aacb46b6142d4608b1e88c26fab09",
+        "bytes": 286903
+      },
+      "receipt_is_scoped_summary": true
+    },
+    {
+      "module": "HolonicsResearch.Foundation.ProductEdgeContraction",
+      "source": "lean/HolonicsResearch/Foundation/ProductEdgeContraction.lean",
+      "source_pin": {
+        "sha256": "eb039e4c4a05e31329b1a9aa9deb7517c56b7814e026391e146958934a8ed681",
+        "bytes": 11549
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "b4c241d1b0e194256efc69c31bc46cc7c7db5696a0d317541f9b9f889c2cc6af",
+            "bytes": 40603
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "cb19cc1e45490b3efd3d52ef094a074883d1641d180fd9232ef39698924c5ee0",
+            "bytes": 699304
+          }
+        }
+      ],
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-product-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "bytes": 176274,
+        "sha256": "204dc085594dd5bfb9fd1c172a93821a861e6b36f5912657c604425232491dbe"
+      },
+      "standard_axiom_query_reads": 8,
+      "kernel_accepted": true,
+      "axiom_selectors": [
+        "productOneBaseResidual_closed",
+        "totalBoundaryTwo_productTotalOneFilling",
+        "diagonalBoundaryTwo_productH1Diagonal_of_closed",
+        "pairFirstAugmentation_mapPairRight",
+        "pairFirstAugmentation_mapPairLeft_boundary",
+        "mapPairLeft_h0_boundary",
+        "mapPairLeft_factorBoundary_sq",
+        "mapPairRight_factorBoundary_sq"
+      ],
+      "original_receipt_pin": {
+        "sha256": "a11927bd33c7622e2a7040fb8be9945f844aacb46b6142d4608b1e88c26fab09",
+        "bytes": 286903
+      },
+      "receipt_is_scoped_summary": true
+    },
+    {
+      "module": "HolonicsResearch.Foundation.ProductDegreeTwoNormalization",
+      "source": "lean/HolonicsResearch/Foundation/ProductDegreeTwoNormalization.lean",
+      "source_pin": {
+        "sha256": "91737d2bcbd861434eedccba52b701ce462c7b5df06d457df5c03a8ccb6e00fc",
+        "bytes": 24474
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "893aab460ddf9f19ada630022e0c3d9cf5b6bb194aa64736928829bd52ead1cb",
+            "bytes": 75235
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "42ee03023d9ece96c65995331ad23eeb1acfb2adbd82f9339ae4537273ae9558",
+            "bytes": 726424
+          }
+        }
+      ],
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-product-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "bytes": 176274,
+        "sha256": "204dc085594dd5bfb9fd1c172a93821a861e6b36f5912657c604425232491dbe"
+      },
+      "standard_axiom_query_reads": 17,
+      "kernel_accepted": true,
+      "axiom_selectors": [
+        "coupledRightMiddleContraction_boundary",
+        "coupledLeftMiddleCorrection_boundary",
+        "coupledMiddleCorrection_boundary",
+        "mixedFirstBoundary_closed_of_totalBoundary",
+        "mixedSecondBoundary_closed_of_totalBoundary",
+        "correctedFirstOuter_closed",
+        "correctedSecondOuter_closed",
+        "coupledMiddleCorrection_reduces_to_outer",
+        "productFirstFactorDegreeTwoCurrent_closed",
+        "productSecondFactorDegreeTwoCurrent_closed",
+        "leftOuterNormalizationCorrection_boundary",
+        "rightOuterNormalizationCorrection_boundary",
+        "productDegreeTwoNormalizationFiller_boundary",
+        "totalBoundaryOne_totalBoundaryTwo",
+        "diagonalBoundaryOne_diagonalBoundaryTwo",
+        "boundary_middlePolarizedFilling",
+        "boundary_middlePolarizedFillingCurrent"
+      ],
+      "original_receipt_pin": {
+        "sha256": "a11927bd33c7622e2a7040fb8be9945f844aacb46b6142d4608b1e88c26fab09",
+        "bytes": 286903
+      },
+      "receipt_is_scoped_summary": true
+    },
+    {
+      "module": "HolonicsResearch.Foundation.ProductDegreeTwo",
+      "source": "lean/HolonicsResearch/Foundation/ProductDegreeTwo.lean",
+      "source_pin": {
+        "sha256": "bccb75cb5224603d569dde39b1437940ec026e1d0eb5eb615f64d315b0d42692",
+        "bytes": 21634
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "271f95bf7e92fd6a4d070d6c94c62ef58620cea711ac8fa6809f16dc3357a9ba",
+            "bytes": 57701
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "db377ce3e3e88eba706a04c3b6e6427d936c006c4a9235a1bd8f4795b4c546a1",
+            "bytes": 929640
+          }
+        }
+      ],
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-product-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "bytes": 176274,
+        "sha256": "204dc085594dd5bfb9fd1c172a93821a861e6b36f5912657c604425232491dbe"
+      },
+      "standard_axiom_query_reads": 19,
+      "kernel_accepted": true,
+      "axiom_selectors": [
+        "diagonalBoundaryOne_productH0Diagonal",
+        "totalBoundaryTwo_productTotalOneFilling",
+        "diagonalBoundaryTwo_productH1Diagonal_of_closed",
+        "productFirstFactorDegreeTwoCurrent_closed",
+        "productSecondFactorDegreeTwoCurrent_closed",
+        "leftOuterNormalizationCorrection_boundary",
+        "rightOuterNormalizationCorrection_boundary",
+        "productDegreeTwoNormalizationFiller_boundary",
+        "coupledMiddleCorrection_reduces_to_outer",
+        "totalBoundaryOne_totalBoundaryTwo",
+        "diagonalBoundaryOne_diagonalBoundaryTwo",
+        "realizedProductCurrentEquiv_boundary_one",
+        "realizedProductCurrentEquiv_boundary_two",
+        "realizedProductCurrentEquiv_boundary_three",
+        "realizedProductFirstFactorDegreeTwoCurrent_closed",
+        "realizedProductSecondFactorDegreeTwoCurrent_closed",
+        "realizedProductDegreeTwoNormalizationFiller_boundary",
+        "productAugmentation_diagonalBoundaryOne",
+        "realizedProductLowDegreeCurrentDatum"
+      ],
+      "original_receipt_pin": {
+        "sha256": "a11927bd33c7622e2a7040fb8be9945f844aacb46b6142d4608b1e88c26fab09",
+        "bytes": 286903
+      },
+      "receipt_is_scoped_summary": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeTopologicalProductRealization",
+      "source": "lean/HolonicsResearch/Hodge/HodgeTopologicalProductRealization.lean",
+      "source_pin": {
+        "sha256": "bb8b13e71e7c04e46e2b66058c2d3a80d73c02048078421e708730a1cd27e820",
+        "bytes": 8991
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "d2b8593826b0602313925ca7862547960323b98daa9b5c92efea441dbd61882f",
+            "bytes": 31574
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "e944ec8b6cffe192b7ac9ecf873795d22352ad4957fa1db35dc303fca7507760",
+            "bytes": 96024
+          }
+        }
+      ],
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-product-diagonal-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "bytes": 122049,
+        "sha256": "907fe220de02907125a4c97e45ceb3dbcf3768200a9507660984e63d5a07b4ac"
+      },
+      "standard_axiom_query_reads": 4,
+      "kernel_accepted": true,
+      "axiom_selectors": [
+        "split_join_topologicalProductSimplex",
+        "join_split_topologicalProductSimplex",
+        "splitTopologicalProductSimplex_face",
+        "homeomorphicTopologicalProductSimplexEquiv_face"
+      ],
+      "original_receipt_pin": {
+        "sha256": "e4fed1827abd13ed8569c90e044c8df769b26cbcf78973344d2ec48d382adf0f",
+        "bytes": 197365
+      },
+      "receipt_is_scoped_summary": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeTopologicalSingularCurrent",
+      "source": "lean/HolonicsResearch/Hodge/HodgeTopologicalSingularCurrent.lean",
+      "source_pin": {
+        "sha256": "d5bc66089c8a528ffa20ccf18a56aa393c799af69579170884b38e40de4f24c3",
+        "bytes": 21747
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "379ae02b644d1bf109679255376cb0bea1707a6626dcf7107567cf400cca7ec3",
+            "bytes": 66774
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "3364c32f682245009dbd3c417989f592cbb46b23081d6055c39e87091b20ce14",
+            "bytes": 398536
+          }
+        }
+      ],
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-product-diagonal-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "bytes": 122049,
+        "sha256": "907fe220de02907125a4c97e45ceb3dbcf3768200a9507660984e63d5a07b4ac"
+      },
+      "standard_axiom_query_reads": 15,
+      "kernel_accepted": true,
+      "axiom_selectors": [
+        "topologicalSimplicialModule_face_generator",
+        "boundary_topologicalSimplexGenerator",
+        "topologicalChainToCurrent_generator",
+        "topologicalCurrentToChain_generator",
+        "sigmaInjection_eq_smul_topologicalSimplexGenerator",
+        "topologicalCurrent_chain_roundtrip",
+        "topologicalChain_current_roundtrip",
+        "topologicalChainEquivCurrent_boundary",
+        "topologicalSimplexMap_comp",
+        "topologicalSimplexMap_id",
+        "topologicalCurrentMap_generator",
+        "topologicalChainMap_simplexGenerator",
+        "topologicalChainEquivCurrent_map",
+        "topologicalCurrentToChain_boundary",
+        "topologicalFactorBoundary_sq"
+      ],
+      "original_receipt_pin": {
+        "sha256": "e4fed1827abd13ed8569c90e044c8df769b26cbcf78973344d2ec48d382adf0f",
+        "bytes": 197365
+      },
+      "receipt_is_scoped_summary": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSphereProductCurrent",
+      "source": "lean/HolonicsResearch/Hodge/HodgeSphereProductCurrent.lean",
+      "source_pin": {
+        "sha256": "d478959cc584cb2dd8019a4985c2129fc4b08cba42488f13ae5fb84f75727f64",
+        "bytes": 14778
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "27220661d8b225c9873d23a26baace949bb6ec2ae88de27628679baf64448ae7",
+            "bytes": 56423
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "c2e0b57693dac4bacff5f8f7948777fa6c3ad758990b216df3011a1c160df48e",
+            "bytes": 274360
+          }
+        }
+      ],
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-product-diagonal-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "bytes": 122049,
+        "sha256": "907fe220de02907125a4c97e45ceb3dbcf3768200a9507660984e63d5a07b4ac"
+      },
+      "standard_axiom_query_reads": 11,
+      "kernel_accepted": true,
+      "axiom_selectors": [
+        "split_join_productSimplex",
+        "join_split_productSimplex",
+        "splitProductSimplex_face",
+        "productSimplicialModule_face_generator",
+        "boundary_productSimplexGenerator",
+        "chainToProductCurrent_generator",
+        "productCurrentToChain_generator",
+        "sigmaInjection_eq_smul_productGenerator",
+        "productCurrent_chain_roundtrip",
+        "chain_productCurrent_roundtrip",
+        "productChainDiagonalEquiv_generator"
+      ],
+      "original_receipt_pin": {
+        "sha256": "e4fed1827abd13ed8569c90e044c8df769b26cbcf78973344d2ec48d382adf0f",
+        "bytes": 197365
+      },
+      "receipt_is_scoped_summary": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSphereProductReconstruction",
+      "source": "lean/HolonicsResearch/Hodge/HodgeSphereProductReconstruction.lean",
+      "source_pin": {
+        "sha256": "baa0db745e69a05ed1388699874c550c47d0adab656b179675bad305ff875805",
+        "bytes": 19823
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "92ef07363d334f1b9976ec64355893c03f946bfeae734990542364e839e13879",
+            "bytes": 67287
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "1eb4a63363a4746077fc55ab09d8a0cdb7b993489d1db956a1ba34578c0e245c",
+            "bytes": 319464
+          }
+        }
+      ],
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-product-diagonal-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "bytes": 122049,
+        "sha256": "907fe220de02907125a4c97e45ceb3dbcf3768200a9507660984e63d5a07b4ac"
+      },
+      "standard_axiom_query_reads": 13,
+      "kernel_accepted": true,
+      "axiom_selectors": [
+        "productChainDiagonalEquiv_boundary_generator",
+        "productChainDiagonalEquiv_boundary_three_generator",
+        "productChainDiagonalEquiv_boundary",
+        "productChainDiagonalEquiv_boundary_three",
+        "separatedProductThreeChain_boundary",
+        "separatedProductCycle_boundary",
+        "rejoinedProductThreeChain_boundary",
+        "rejoinedProductChain_of_separatedBoundary",
+        "productChainDiagonalEquiv_boundary_rejoined",
+        "rejoinedProductChain_boundary",
+        "productRoundTripDefectChain_diagonal",
+        "productRoundTripDefectChain_boundary",
+        "productRoundTripDefectFillerChain_boundary"
+      ],
+      "original_receipt_pin": {
+        "sha256": "e4fed1827abd13ed8569c90e044c8df769b26cbcf78973344d2ec48d382adf0f",
+        "bytes": 197365
+      },
+      "receipt_is_scoped_summary": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSphereProductFourCycle",
+      "source": "lean/HolonicsResearch/Hodge/HodgeSphereProductFourCycle.lean",
+      "source_pin": {
+        "sha256": "db0a4d2bebb605919b7a12d303e80efdfab0bcde0d0050dfd4dd5f512462a4d3",
+        "bytes": 7123
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "98eb3216cb90129a4805adc222e27704510d8e1df345d532d3ffc233ff35eb00",
+            "bytes": 28045
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "76c41bad3fc6fcdac5a6724e73fb6bf96e95b7430afdf9aff8e7deab70eb3cd7",
+            "bytes": 471936
+          }
+        }
+      ],
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-product-diagonal-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "bytes": 122049,
+        "sha256": "907fe220de02907125a4c97e45ceb3dbcf3768200a9507660984e63d5a07b4ac"
+      },
+      "standard_axiom_query_reads": 5,
+      "kernel_accepted": true,
+      "axiom_selectors": [
+        "pairTwoBoundary_factor_incidence",
+        "pairTwoShuffle_closed",
+        "productChainDiagonalEquiv_boundary_four_generator",
+        "productChainDiagonalEquiv_boundary_four",
+        "sphereProductFundamentalFourChain_closed"
+      ],
+      "original_receipt_pin": {
+        "sha256": "e4fed1827abd13ed8569c90e044c8df769b26cbcf78973344d2ec48d382adf0f",
+        "bytes": 197365
+      },
+      "receipt_is_scoped_summary": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSphereNormalizedCoefficient",
+      "source": "lean/HolonicsResearch/Hodge/HodgeSphereNormalizedCoefficient.lean",
+      "source_pin": {
+        "sha256": "aaae98651a47755a263b8a28fc32f73b9abd423f06eeee338fdf0492eee41a8c",
+        "bytes": 11157
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "01516a747d3e33e1f013bdb01fe6131ff2d1461f159f6ef3cae9fb9324f58785",
+            "bytes": 47510
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "c7da236b6a2de22dabc38f921a361e969fa0e812c6f458f9397a7890740174df",
+            "bytes": 403544
+          }
+        }
+      ],
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-normalized-coefficient-continuation-v1/VALIDATION.json",
+      "receipt_pin": {
+        "bytes": 114027,
+        "sha256": "e7532383ef6a9c9acbb447bc32c9f19aa3819be1059eb8b97312e96d858ba201"
+      },
+      "standard_axiom_query_reads": 10,
+      "kernel_accepted": true,
+      "axiom_selectors": [
+        "sphereRawCoefficient_cycle",
+        "sphereRawCoefficient_boundary",
+        "sphereRawCoefficient_fundamental",
+        "sphereRawSimplexCoefficient_closed",
+        "sphereNormalizedCurrentCoefficient_return",
+        "sphereNormalizedCurrentCoefficient_boundary",
+        "sphereNormalizedSimplexCoefficient_closed",
+        "sphereNormalizedSimplexCoefficient_degenerate",
+        "sphereNormalizedCurrentCoefficient_fundamental",
+        "pairFourReceiver_pairTwoShuffle_pairCurrent"
+      ],
+      "original_receipt_pin": {
+        "sha256": "3ddb8c8307e8fd9a841d5b22cceac208afb155190d7f151676243fcc706dd708",
+        "bytes": 190211
+      },
+      "receipt_is_scoped_summary": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProductDiagonal",
+      "source": "lean/HolonicsResearch/Hodge/HodgeProductDiagonal.lean",
+      "source_pin": {
+        "sha256": "85047a43f7020aba3e97236d386f6b1f561cc91b8e7ef093b4ae34e3e0ef29c5",
+        "bytes": 11709
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "769024b0b93b8a1e381b29c1f1351a50981cb501bafdff2210bfb4b7a28b3cf9",
+            "bytes": 45073
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "941f7ec503b4fe5066dbf79436d046edd3b81d7138b0ac8a5037bae88fbbcc68",
+            "bytes": 240104
+          }
+        }
+      ],
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-normalized-coefficient-continuation-v1/VALIDATION.json",
+      "receipt_pin": {
+        "bytes": 114027,
+        "sha256": "e7532383ef6a9c9acbb447bc32c9f19aa3819be1059eb8b97312e96d858ba201"
+      },
+      "standard_axiom_query_reads": 45,
+      "kernel_accepted": true,
+      "axiom_selectors": [
+        "sphereDetectorFromHomology",
+        "sphereNormalizedCurrentCoefficient_return",
+        "sphereNormalizedSimplexCoefficient_closed",
+        "sphereNormalizedSimplexCoefficient_degenerate",
+        "productChainDiagonalEquiv_boundary_five",
+        "sphereProductFourReceiver_boundary",
+        "sphereProductFourReceiver_fundamental",
+        "sphereProductFundamentalFourChain_not_mem_boundary_range",
+        "sphereProductFourReceiverOnHomology_fundamental",
+        "sphereProductFundamentalFourHomologyClass_ne_zero",
+        "topologicalProductSimplexEquiv",
+        "topologicalProductSimplexRealization",
+        "homeomorphicTopologicalProductSimplexEquiv",
+        "homeomorphicTopologicalProductSimplexRealization",
+        "topologicalSimplexMap_comp",
+        "topologicalSimplexMap_id",
+        "topologicalChainEquivCurrent",
+        "topologicalChainEquivCurrent_boundary",
+        "topologicalChainMap_simplexGenerator",
+        "topologicalChainEquivCurrent_map",
+        "productSimplexEquiv",
+        "productChainEquivCurrent",
+        "productChainDiagonalEquiv",
+        "pairTwoBoundary_factor_incidence",
+        "pairTwoShuffle_closed",
+        "productChainDiagonalEquiv_boundary_four",
+        "sphereProductFundamentalFourChain_closed",
+        "productChainDiagonalEquiv_boundary_generator",
+        "productChainDiagonalEquiv_boundary_three_generator",
+        "productChainDiagonalEquiv_boundary",
+        "productChainDiagonalEquiv_boundary_three",
+        "separatedProductThreeChain_boundary",
+        "productBoundarySeparationHolon",
+        "separatedProductCycle_boundary",
+        "productCycleSeparationHolon",
+        "rejoinedProductThreeChain_boundary",
+        "rejoinedProductChain_of_separatedBoundary",
+        "productChainDiagonalEquiv_boundary_rejoined",
+        "rejoinedProductChain_boundary",
+        "rejoinedProductCycle",
+        "productRoundTripDefectChain_diagonal",
+        "productRoundTripDefectChain_boundary",
+        "productRoundTripDefectCycle",
+        "productRoundTripDefectFillerChain_boundary",
+        "productReconstructionBoundaryHolon"
+      ],
+      "original_receipt_pin": {
+        "sha256": "3ddb8c8307e8fd9a841d5b22cceac208afb155190d7f151676243fcc706dd708",
+        "bytes": 190211
+      },
+      "receipt_is_scoped_summary": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSphereChainCurrent",
+      "source": "lean/HolonicsResearch/Hodge/HodgeSphereChainCurrent.lean",
+      "source_pin": {
+        "sha256": "091a334e3a171012c3566fd93cf35432a16910dc3298b7082dcbbf21c24ec88e",
+        "bytes": 7565
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "3473123b9dc94b668d50371205adedb92e5e12402206f39c4f482ec5d26b9051",
+            "bytes": 27352
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "03833ed45a30a47729cd7112b6b1ed60db5785ec50e2b5bc9bbcc58aca639fe1",
+            "bytes": 176720
+          }
+        }
+      ],
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-normalized-coefficient-continuation-v1/VALIDATION.json",
+      "receipt_pin": {
+        "bytes": 114027,
+        "sha256": "e7532383ef6a9c9acbb447bc32c9f19aa3819be1059eb8b97312e96d858ba201"
+      },
+      "standard_axiom_query_reads": 2,
+      "kernel_accepted": true,
+      "axiom_selectors": [
+        "sphereChainEquivCurrent",
+        "sphereChainToCurrent_boundary"
+      ],
+      "original_receipt_pin": {
+        "sha256": "3ddb8c8307e8fd9a841d5b22cceac208afb155190d7f151676243fcc706dd708",
+        "bytes": 190211
+      },
+      "receipt_is_scoped_summary": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProductMixedFilling",
+      "source": "lean/HolonicsResearch/Hodge/HodgeProductMixedFilling.lean",
+      "source_pin": {
+        "sha256": "9fa6ba333fd1d0f4e9b4bc1595d495d14734e67109e788fa4a7d26f6242613de",
+        "bytes": 73978
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "612c5679e4a25be3b3e08f6f363db5f58d4d2ae59590d9057d69cc2e4fedf5fb",
+            "bytes": 221246
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "0c16ac3cefc13ebe81614b133a936bca79d6f76b1d6a24d779dcc4123b1391d7",
+            "bytes": 2132440
+          }
+        }
+      ],
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-normalized-coefficient-continuation-v1/VALIDATION.json",
+      "receipt_pin": {
+        "bytes": 114027,
+        "sha256": "e7532383ef6a9c9acbb447bc32c9f19aa3819be1059eb8b97312e96d858ba201"
+      },
+      "standard_axiom_query_reads": 4,
+      "kernel_accepted": true,
+      "axiom_selectors": [
+        "spherePairDiagonalH0_boundary",
+        "spherePairDiagonalH1_boundary",
+        "totalBoundaryThree_rightMiddleCurrent",
+        "exists_mixedCurrentFilling"
+      ],
+      "original_receipt_pin": {
+        "sha256": "3ddb8c8307e8fd9a841d5b22cceac208afb155190d7f151676243fcc706dd708",
+        "bytes": 190211
+      },
+      "receipt_is_scoped_summary": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSphereRulingCurrent",
+      "source": "lean/HolonicsResearch/Hodge/HodgeSphereRulingCurrent.lean",
+      "source_pin": {
+        "sha256": "4b25419ee1a4023d3bf2960e4bf7036a506ab4b0403489b8016f69feaa9ff985",
+        "bytes": 9696
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "dc93540bc8fd8f4e1d3e8fb0e5a85a3e5f3a073880ee1cc9426310ced52a5a35",
+            "bytes": 37395
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "2083fba503cd589c9807e82ee1668e14b8105b3510237740f97238614a0baa1f",
+            "bytes": 175024
+          }
+        }
+      ],
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-ruling-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "bytes": 194539,
+        "sha256": "8530f5bc069a0f6600856e98a4640cc72d0c7070b8b01e369880bbdc142c9aab"
+      },
+      "standard_axiom_query_reads": 10,
+      "kernel_accepted": true,
+      "axiom_selectors": [
+        "sphereToProductSimplex",
+        "sphereToProductChainMap_generator",
+        "split_firstRuling_simplex",
+        "split_secondRuling_simplex",
+        "productChainDiagonalEquiv_firstRuling_generator",
+        "productChainDiagonalEquiv_secondRuling_generator",
+        "pairCurrent_univ_sum_left",
+        "pairCurrent_univ_sum_right",
+        "productChainDiagonalEquiv_firstRulingCycle",
+        "productChainDiagonalEquiv_secondRulingCycle"
+      ],
+      "original_receipt_pin": {
+        "sha256": "d136d60b5586ade875659b70b8d860679a6b1c666929cbaa503ba18beee1d600",
+        "bytes": 323549
+      },
+      "receipt_is_scoped_summary": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProductRulingReconstruction",
+      "source": "lean/HolonicsResearch/Hodge/HodgeProductRulingReconstruction.lean",
+      "source_pin": {
+        "sha256": "9b1713839c7393da8d65f777ee8b096958877dc4b0c2ffe4c85223a94b5137b6",
+        "bytes": 6959
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "c5bf64d04ecd513c19900f9315095ebc15172f0630ed2c2bf5faea868af7e81d",
+            "bytes": 25647
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "80715c3b34b2fa75cc0cb050e0c84529654c1e11f12974917ddbbc16ec8d5421",
+            "bytes": 130664
+          }
+        }
+      ],
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-ruling-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "bytes": 194539,
+        "sha256": "8530f5bc069a0f6600856e98a4640cc72d0c7070b8b01e369880bbdc142c9aab"
+      },
+      "standard_axiom_query_reads": 7,
+      "kernel_accepted": true,
+      "axiom_selectors": [
+        "firstRulingSeparatedCurrent_eq",
+        "rejoinTwo_rightAxis_base",
+        "rejoinTwo_leftAxis_base",
+        "rejoinTwo_firstRulingSeparatedCurrent",
+        "rejoinTwo_secondRulingSeparatedCurrent",
+        "rejoinedProductChain_firstRulingSeparatedCurrent",
+        "rejoinedProductChain_secondRulingSeparatedCurrent"
+      ],
+      "original_receipt_pin": {
+        "sha256": "d136d60b5586ade875659b70b8d860679a6b1c666929cbaa503ba18beee1d600",
+        "bytes": 323549
+      },
+      "receipt_is_scoped_summary": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProductRulingBoundary",
+      "source": "lean/HolonicsResearch/Hodge/HodgeProductRulingBoundary.lean",
+      "source_pin": {
+        "sha256": "747b1149beac46ecb2dbbde25c8225446cd4b0c8b560a2f84f5e9bdb7e776a92",
+        "bytes": 4776
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "3fee38ee534159455825462ff19ca443c7a173ac871a26887045671dc7128c1b",
+            "bytes": 15527
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "4adcad22bc81a18bc3a40b1cf1cb1480d6ef612775a88aada14fa7e49ea3dbb9",
+            "bytes": 153256
+          }
+        }
+      ],
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-ruling-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "bytes": 194539,
+        "sha256": "8530f5bc069a0f6600856e98a4640cc72d0c7070b8b01e369880bbdc142c9aab"
+      },
+      "standard_axiom_query_reads": 1,
+      "kernel_accepted": true,
+      "axiom_selectors": [
+        "exists_productDegreeTwoRulingDecomposition"
+      ],
+      "original_receipt_pin": {
+        "sha256": "d136d60b5586ade875659b70b8d860679a6b1c666929cbaa503ba18beee1d600",
+        "bytes": 323549
+      },
+      "receipt_is_scoped_summary": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProductRulingDecomposition",
+      "source": "lean/HolonicsResearch/Hodge/HodgeProductRulingDecomposition.lean",
+      "source_pin": {
+        "sha256": "02b904d96abb418f10287cd9aee00f729f2afcb208e4f6d5c54b020e99a48e2f",
+        "bytes": 6915
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "8af0b482dd78b93de0e6272dcff3c7ba10dbef2b909c97b2a75ee35e57e6f1e7",
+            "bytes": 26088
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "0ae57f2fd66fd27d9eb901f530263ee25d722f733669364abf35d116c5a4fa1b",
+            "bytes": 101848
+          }
+        }
+      ],
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-ruling-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "bytes": 194539,
+        "sha256": "8530f5bc069a0f6600856e98a4640cc72d0c7070b8b01e369880bbdc142c9aab"
+      },
+      "standard_axiom_query_reads": 3,
+      "kernel_accepted": true,
+      "axiom_selectors": [
+        "exists_productDegreeTwoRulingDecomposition",
+        "rulingHomologyMap_surjective",
+        "rulingHomologyEquivalence"
+      ],
+      "original_receipt_pin": {
+        "sha256": "d136d60b5586ade875659b70b8d860679a6b1c666929cbaa503ba18beee1d600",
+        "bytes": 323549
+      },
+      "receipt_is_scoped_summary": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProductSingularCohomologyDual",
+      "source": "lean/HolonicsResearch/Hodge/HodgeProductSingularCohomologyDual.lean",
+      "source_pin": {
+        "sha256": "17f89144751c1279222669c0ab35ba34d01e5a0b821aff70d9a82d4617bcb444",
+        "bytes": 6543
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "d34f77a0bfbfce718be511d17b5836e913bfe66ae8527a6dbb8c209e2d5993b3",
+            "bytes": 18886
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "12f8d8dc455701f570814cfc29e3ddffeb8714e2b608729a16932137a0e3b6cd",
+            "bytes": 262984
+          }
+        }
+      ],
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-ruling-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "bytes": 194539,
+        "sha256": "8530f5bc069a0f6600856e98a4640cc72d0c7070b8b01e369880bbdc142c9aab"
+      },
+      "standard_axiom_query_reads": 5,
+      "kernel_accepted": true,
+      "axiom_selectors": [
+        "rulingEvaluationDualEquivalence",
+        "rulingEvaluation_eq_intersection_swap",
+        "surfaceRulingHomologyEquivalence",
+        "singularCohomologyDual",
+        "singularCohomologyDual_evaluation"
+      ],
+      "original_receipt_pin": {
+        "sha256": "d136d60b5586ade875659b70b8d860679a6b1c666929cbaa503ba18beee1d600",
+        "bytes": 323549
+      },
+      "receipt_is_scoped_summary": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSurfaceCycleClass",
+      "source": "lean/HolonicsResearch/Hodge/HodgeSurfaceCycleClass.lean",
+      "source_pin": {
+        "sha256": "d01463217a8004ffdbd42721f1bc5b30da378494bf41ee4cb60086d2b0140a10",
+        "bytes": 4170
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "b459f7be2da55314d1a9389c9085e85cc9a670faac5fd8c145d1da19ea955a73",
+            "bytes": 13508
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "52c10a7e924edddf2fb97d3dfa2671c667868a93405fe92031ea86b294a12ad7",
+            "bytes": 69312
+          }
+        }
+      ],
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-ruling-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "bytes": 194539,
+        "sha256": "8530f5bc069a0f6600856e98a4640cc72d0c7070b8b01e369880bbdc142c9aab"
+      },
+      "standard_axiom_query_reads": 4,
+      "kernel_accepted": true,
+      "axiom_selectors": [
+        "cellularToSingularCohomologyEquivalence",
+        "singularDivisorCycleClass",
+        "singularDivisorCycleClass_evaluation",
+        "divisorCycleClassNaturality"
+      ],
+      "original_receipt_pin": {
+        "sha256": "d136d60b5586ade875659b70b8d860679a6b1c666929cbaa503ba18beee1d600",
+        "bytes": 323549
+      },
+      "receipt_is_scoped_summary": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProjectiveLineType11Form",
+      "source": "lean/HolonicsResearch/Hodge/HodgeProjectiveLineType11Form.lean",
+      "source_pin": {
+        "sha256": "6d1e44f900f984170780c86fa4819d29e5f613f7c7cb0a42c8699b70cdb100fa",
+        "bytes": 11818
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "baa148cd5737ff0cb70f4515363e762ed96db13195c1b082daf1f41171e866a1",
+            "bytes": 40110
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "31751cbc649dd74b0871e1ae85a35d43a698a3be70baaf7914a6351cf7897c4d",
+            "bytes": 441552
+          }
+        }
+      ],
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-ruling-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "bytes": 194539,
+        "sha256": "8530f5bc069a0f6600856e98a4640cc72d0c7070b8b01e369880bbdc142c9aab"
+      },
+      "standard_axiom_query_reads": 9,
+      "kernel_accepted": true,
+      "axiom_selectors": [
+        "orientation_areaForm_eq_complexArea",
+        "complexArea_mul",
+        "fsForm_isType11",
+        "fsForm_inversion",
+        "fsForm_transition",
+        "fsDifferentialForm_contDiff",
+        "fsDifferentialForm_closed",
+        "normalizedTransitionWinding_eq_one",
+        "projectiveLineType11Certificate"
+      ],
+      "original_receipt_pin": {
+        "sha256": "d136d60b5586ade875659b70b8d860679a6b1c666929cbaa503ba18beee1d600",
+        "bytes": 323549
+      },
+      "receipt_is_scoped_summary": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSurfaceType11Period",
+      "source": "lean/HolonicsResearch/Hodge/HodgeSurfaceType11Period.lean",
+      "source_pin": {
+        "sha256": "0c7edaa38bf6fba7326aed0fee9c9013ee145309461dcb6597ed8a6cab6abe56",
+        "bytes": 20786
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "6eaa3235de4d96e61a32f25463097762e658806fa5063742d2edb100e031e996",
+            "bytes": 66344
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "4de7713da1927cc983af2f4cd1827f679812b769e03cc115d7304790e96f0221",
+            "bytes": 577848
+          }
+        }
+      ],
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-ruling-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "bytes": 194539,
+        "sha256": "8530f5bc069a0f6600856e98a4640cc72d0c7070b8b01e369880bbdc142c9aab"
+      },
+      "standard_axiom_query_reads": 17,
+      "kernel_accepted": true,
+      "axiom_selectors": [
+        "surfaceFactorForm_isType11",
+        "surfaceFactorForm_transition",
+        "surfaceFactorForm_crossed_zero",
+        "surfaceFactorDifferentialForm_closed",
+        "surfaceType11Current_isType11",
+        "surfaceType11Current_transition",
+        "surfaceType11DifferentialForm_contDiff",
+        "surfaceType11DifferentialForm_closed",
+        "type11PeriodFunctional_eq_rulingEvaluation",
+        "surfaceType11PeriodMap_evaluation",
+        "firstFactor_period_ledger",
+        "secondFactor_period_ledger",
+        "surfaceType11PeriodMap_eq_singularCohomologyDual",
+        "surfaceType11AnalyticCertificate",
+        "rationalType11_eq_top",
+        "singularDivisorCycleClass_mem_rationalType11",
+        "surfaceType11Conclusion"
+      ],
+      "original_receipt_pin": {
+        "sha256": "d136d60b5586ade875659b70b8d860679a6b1c666929cbaa503ba18beee1d600",
+        "bytes": 323549
+      },
+      "receipt_is_scoped_summary": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProjectiveLinePowerType11",
+      "source": "lean/HolonicsResearch/Hodge/HodgeProjectiveLinePowerType11.lean",
+      "source_pin": {
+        "sha256": "3da1876a436f31fa924f446c2838d571b09e7abaf404d6106581e51022a7ea72",
+        "bytes": 17010
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "b0d51512ea52ec3be5359034075bbbcd774ea65752e28cba71c6be0fadb6acd3",
+            "bytes": 50413
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "b830629ea46442604821349c4c26013f2f3aefd61328479c4f30c140f7826417",
+            "bytes": 530912
+          }
+        }
+      ],
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-ruling-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "bytes": 194539,
+        "sha256": "8530f5bc069a0f6600856e98a4640cc72d0c7070b8b01e369880bbdc142c9aab"
+      },
+      "standard_axiom_query_reads": 6,
+      "kernel_accepted": true,
+      "axiom_selectors": [
+        "powerFactorDifferentialForm_closed",
+        "powerType11DifferentialForm_contDiff",
+        "powerType11DifferentialForm_closed",
+        "powerType11Period_basis",
+        "coefficients_eq_of_periods_eq",
+        "powerType11AnalyticCertificate"
+      ],
+      "original_receipt_pin": {
+        "sha256": "d136d60b5586ade875659b70b8d860679a6b1c666929cbaa503ba18beee1d600",
+        "bytes": 323549
+      },
+      "receipt_is_scoped_summary": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSpherePowerRulingHomology",
+      "source": "lean/HolonicsResearch/Hodge/HodgeSpherePowerRulingHomology.lean",
+      "source_pin": {
+        "sha256": "61a94ce064ddf2b427f2b3a6c304dbf3bb62112ebe71988a2b378d9d2ee31cc8",
+        "bytes": 80123
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "62c28bc3885831f622db70c2f14b40e04637eacceca1d16355642446c1496d96",
+            "bytes": 258398
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "56f0dcab043e12a4552d74ab17e7af25eeca40210a27bc5a1cc78bcfa298e4c5",
+            "bytes": 1717360
+          }
+        }
+      ],
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-ruling-owner-decomposition-v1/VALIDATION.json",
+      "receipt_pin": {
+        "bytes": 194539,
+        "sha256": "8530f5bc069a0f6600856e98a4640cc72d0c7070b8b01e369880bbdc142c9aab"
+      },
+      "standard_axiom_query_reads": 32,
+      "kernel_accepted": true,
+      "axiom_selectors": [
+        "spherePowerCellComplex_d",
+        "spherePowerCellHomologyIsoModule",
+        "spherePowerHomologyEquivCellModule",
+        "spherePowerEvenCellIndexEquiv",
+        "spherePowerEvenCellIndex_card",
+        "spherePowerCellModule_finrank_even",
+        "spherePowerOddCellIndex_isEmpty",
+        "spherePowerCellModule_finrank_odd",
+        "spherePowerCellModule_pascal",
+        "spherePowerSuccessorSimplexRealization",
+        "spherePowerLowDegreeCurrentDatumFromTwo",
+        "coordinateRulingCycle_boundary_zero",
+        "crossed_projection_coordinateRulingCycle",
+        "coordinateProjection_spherePowerRulingHomologyMap",
+        "spherePowerRulingHomologyMap_injective",
+        "spherePowerRulingHomologyMap_surjective_one",
+        "spherePowerRulingHomologyMap_surjective_two",
+        "spherePowerPrefixCurrentMap",
+        "lastCoordinateRulingCurrentMap",
+        "exists_spherePowerSuccessorChainDecomposition",
+        "exists_spherePowerSuccessorHomologyDecomposition",
+        "coordinateRulingCyclesMap_then_spherePowerPrefix",
+        "spherePowerPrefixHomologyMap_coordinateRuling",
+        "sphereCycleMap_lastCoordinateRuling",
+        "lastCoordinateRulingHomologyMap_fundamental",
+        "spherePowerSuccessorHomologyMap_assembly",
+        "spherePowerRulingHomologyMap_surjective_successor",
+        "spherePowerRulingHomologyMap_surjective_from_two",
+        "spherePowerRulingHomologyMap_surjective",
+        "spherePowerRulingHomologyEquiv",
+        "spherePowerRulingHomologyEquivOne",
+        "spherePowerRulingHomologyEquivTwo"
+      ],
+      "original_receipt_pin": {
+        "sha256": "d136d60b5586ade875659b70b8d860679a6b1c666929cbaa503ba18beee1d600",
+        "bytes": 323549
+      },
+      "receipt_is_scoped_summary": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSpherePowerPairHomology",
+      "source": "lean/HolonicsResearch/Hodge/HodgeSpherePowerPairHomology.lean",
+      "source_pin": {
+        "sha256": "d6c8fd064c84345cffded11574b18801b433123d5582f5cec94d5ed4bffb49aa",
+        "bytes": 35929
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "2dd71f8b896c7819e9b4ed893b45ea196ddc7452dbef1960cf38c8dfdf6e1926",
+            "bytes": 116688
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "e02824653569868910aaf2627a42c3952a926504d06b2318ae3a34906927b838",
+            "bytes": 513984
+          }
+        }
+      ],
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-pair-carrier-join-repair-v1/VALIDATION.json",
+      "receipt_pin": {
+        "bytes": 68972,
+        "sha256": "3ec630564ebf5e39d49df2b25c249d1198dfee4fabe9dc85297970b0990f266c"
+      },
+      "standard_axiom_query_reads": 28,
+      "kernel_accepted": true,
+      "axiom_selectors": [
+        "coordinatePair_four_card",
+        "pairCoordinate_then_matching_projection",
+        "pairCoordinateChainMap_matching_retract",
+        "pairCoordinateChain_closed",
+        "sourceFourCycleFromSphereFaces",
+        "fourfoldPairSourceFromSphereFaces_closed",
+        "pairCoordinateHomologyMorphism_fromSphereFaces",
+        "pairCoordinateHomologyClass_fromSphereFaces",
+        "coordinatePairClassMapFromSphereFaces_unit",
+        "coordinatePairClassMapFromSphereFaces_injective",
+        "coordinatePairClassMapFromSphereFaces_injective_of_fillings",
+        "pairCoordinateHomologyMap_matching_retract",
+        "pairCoordinateHomologyMap_injective",
+        "crossedPairTopMap_factorsThroughSphere",
+        "crossedPairChainMap_factorsThroughSphere",
+        "crossedPairHomologyMap_factorsThroughSphereH4",
+        "crossedPairHomologyMap_eq_zero_of_sphereH4_subsingleton",
+        "coordinatePairClassMap_injective",
+        "sphereH4SubsingletonOfFillings",
+        "surfaceCellHomologyIsoQFour",
+        "sphereProductH4EquivQOfReduction",
+        "sourceFourHomologyClassOfReduction_ne_zero",
+        "coordinatePairClassMapOfReduction_injective",
+        "coordinatePairClassMapOfReductions_surjective",
+        "coordinatePairHomologyEquivOfReductions",
+        "cellFourGenerator_closed",
+        "sourceFourCycleOfReduction",
+        "fourfoldPairClassesOfReduction"
+      ],
+      "original_receipt_pin": {
+        "sha256": "2a9bd07dc936cfb2a170076aee09a118375dade513b5ff1bc938d3efb2f742e4",
+        "bytes": 125278
+      },
+      "receipt_is_scoped_summary": true
+    }
+  ],
+  "core": [
+    {
+      "module": "Holonics.Foundation.SectionResidual",
+      "source": "lean/Holonics/Foundation/SectionResidual.lean",
+      "source_pin": {
+        "sha256": "841d5b94895b05d30f949e3c57e8c11c2413914d9923b2713f5536780dbb3acd",
+        "bytes": 4683
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "56283c4b94a0d2e8b604fecbbb846349b975e16185dbaf567bc315d31d044d17",
+            "bytes": 12098
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "f978fa5ec4a7a35204367b9abae55308b0f6ad2d3a3d147056383f9cba8b2247",
+            "bytes": 260696
+          }
+        }
+      ],
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-canonical-section-v2/VALIDATION.json",
+      "receipt_pin": {
+        "bytes": 10857,
+        "sha256": "a03a83198d5f94f4d160eb8d246d270897847cfe64b2e45184be0bb99acafbe1"
+      },
+      "standard_axiom_query_reads": 4,
+      "kernel_accepted": true,
+      "original_receipt_pin": {
+        "sha256": "d925e471d88a7b3d23f27c72b4a86daa1556a9ea411ff83f96ee47f5bf61b2d6",
+        "bytes": 19490
+      },
+      "receipt_is_scoped_summary": true
+    },
+    {
+      "module": "Holonics.Physics.PartitionedHodgeEnergy",
+      "source": "lean/Holonics/Physics/PartitionedHodgeEnergy.lean",
+      "source_pin": {
+        "sha256": "42b02c455bb012fe616bf2334db4fa288f5d7d8a98c725b70b62c62b529a9d6b",
+        "bytes": 15959
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "d587eb6de8d16388b21ebb8322eb6a5fbcd488a94494e858de9ba0e3a9013710",
+            "bytes": 72682
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "b2139ee033839e8861505950352f03671f600c918859edc332548f89e9a05ae2",
+            "bytes": 1097208
+          }
+        }
+      ],
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-canonical-consumer-v1/VALIDATION.json",
+      "receipt_pin": {
+        "bytes": 10861,
+        "sha256": "ee807ac799981c17c5facf403bf2aa6fe899f144e3ab76ff3455c2a8f45ec8a5"
+      },
+      "standard_axiom_query_reads": 7,
+      "kernel_accepted": true,
+      "original_receipt_pin": {
+        "sha256": "9d1beafdbc6183e66b95d79c802855ceee39e39a960d3678b57aaf6e3fc49e53",
+        "bytes": 19606
+      },
+      "receipt_is_scoped_summary": true
+    },
+    {
+      "module": "Holonics.Physics.TemporalHodgeResidue",
+      "source": "lean/Holonics/Physics/TemporalHodgeResidue.lean",
+      "source_pin": {
+        "sha256": "0bbe6c79889c85332e73c0404f4a4737cc4663144a6c81d702d93daf639288cb",
+        "bytes": 8709
+      },
+      "objects": [
+        {
+          "kind": "ilean",
+          "pin": {
+            "sha256": "db1d25473677942e5eacd8783e87e919993be3d764b7fee03d261884a3c75d55",
+            "bytes": 26298
+          }
+        },
+        {
+          "kind": "olean",
+          "pin": {
+            "sha256": "255060e139177ca26597a914eb09b842a317db8831d7a6e505d87d7fd1195efa",
+            "bytes": 473560
+          }
+        }
+      ],
+      "receipt": "research/records/receipts/2026-10-06-hodge-transport/native-validation-transport-v3/VALIDATION.json",
+      "receipt_pin": {
+        "bytes": 7065,
+        "sha256": "a5ac36fee20c100443b77ffe40da05f1f8c720b7a600a056f81c9509cb3d6ac9"
+      },
+      "standard_axiom_query_reads": 5,
+      "kernel_accepted": true,
+      "original_receipt_pin": {
+        "sha256": "a44d77b7faaf201f3649cab640b2f3d1ea558c878de999e8ec2e915ecb44888c",
+        "bytes": 6771
+      },
+      "receipt_is_scoped_summary": true
+    }
+  ],
+  "allowed_axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "whole_default_or_research_library_checked": false,
+  "current_source_Cargo_gate_checked_by_this_lane": false,
+  "compiler_launched_by_this_lane": false,
+  "scope": {
+    "actual_product_source": "closed96-term singular four-current; actual five-boundary detector; nonzero rational H4 class",
+    "pair_consumer": "class(insert_pair c)=H4(insert_pair)(class c); classMap(1_pair)=family(pair)",
+    "six_pair_independence": "Injectivity retains [Subsingleton SphereH4], or explicit SphereHigherEvenCycleFillings",
+    "open": [
+      "sphereH4 filling",
+      "whole-power degree-four spanning",
+      "codimension-two algebraic cycle comparison",
+      "classical source construction and primitive algebraicity",
+      "continuum receiver and general complex NS regularity"
+    ]
+  },
+  "integration_scoped_original_admission_pin": {
+    "bytes": 50453,
+    "sha256": "241045c06e7f3d6b572b609acde48e5a2833ebb2a843bfd8006d6987411e2c2b"
+  },
+  "raw_machine_paths_and_runtime_copies_private": true
+}

@@ -15,8 +15,10 @@ singular-chain map, and transport of any closed source degree-four chain into a 
 singular-homology class.  At factor count four, the address population is proved to have cardinal
 six.
 
-The standing surface and whole-power cellular reductions, if supplied, construct the common closed
-source from the degree-four cellular generator.  Pair projections separate every returned class,
+The common closed source is now constructed directly by the six signed shuffles of the two
+retained sphere fundamental cycles, without a cellular reduction. Its normalized (2,2) receiver
+annihilates actual singular five-boundaries and reads the explicit current as one, yielding a
+nonzero homology source. Pair projections separate every returned class under degree-four sphere vanishing,
 and the whole-graded power carrier upgrades the complete coordinate-pair map to a linear
 equivalence in one theorem.  These are genuine topological homology classes; realizing them as
 codimension-two algebraic cycles remains a separate source obligation.
@@ -138,6 +140,12 @@ theorem pairCoordinateChainMap_matching_retract {factorCount : ℕ}
 structure SourceFourCycle where
   chain : SphereProductSingularChainComplex.X 4
   closed : SphereProductSingularChainComplex.d 4 3 chain = 0
+
+/-- The common degree-four source has an actual construction from the two retained sphere
+fundamental cycles and the separately derived nonboundary receiver. -/
+def sourceFourCycleFromSphereFaces : SourceFourCycle where
+  chain := HodgeProductDiagonal.sphereProductFundamentalFourChain
+  closed := HodgeProductDiagonal.sphereProductFundamentalFourChain_closed
 
 /-- [definition] Transport a closed source chain into one addressed coordinate plane. -/
 def pairCoordinateChain {factorCount : ℕ}
@@ -530,6 +538,95 @@ def pairCoordinateHomologyFamily {factorCount : ℕ} (source : SourceFourCycle) 
     CoordinatePair factorCount → SpherePowerH4 factorCount :=
   fun pair => pairCoordinateHomologyClass pair source
 
+/-- All six coordinate-pair classes are constructed from the same genuine source, independently
+of the still owed sphere filling and whole-power cellular reduction. -/
+def fourfoldPairClassesFromSphereFaces : CoordinatePair 4 → SpherePowerH4 4 :=
+  pairCoordinateHomologyFamily sourceFourCycleFromSphereFaces
+
+/-- Every member of the explicit coordinate-pair family has a genuinely closed singular source
+current, by the already proved functorial transport law. -/
+theorem fourfoldPairSourceFromSphereFaces_closed (pair : CoordinatePair 4) :
+    (SpherePowerChains 4).d 4 3
+      (pairCoordinateChain pair sourceFourCycleFromSphereFaces) = 0 :=
+  pairCoordinateChain_closed pair sourceFourCycleFromSphereFaces
+
+/-- The actual nonzero shuffle source consumes the existing whole coordinate-pair transport. -/
+def coordinatePairClassMapFromSphereFaces (factorCount : ℕ) :
+    (CoordinatePair factorCount → ℚ) →ₗ[ℚ] SpherePowerH4 factorCount :=
+  coordinatePairClassMap factorCount HodgeProductDiagonal.sphereProductFundamentalFourHomologyClass
+
+/-- The freshly lifted transported current and the transported source homology class are the
+same actual occurrence. This is the consumer equation joining the two existing constructions. -/
+theorem pairCoordinateHomologyMorphism_fromSphereFaces {factorCount : ℕ}
+    (pair : CoordinatePair factorCount) :
+    pairCoordinateHomologyMorphism pair sourceFourCycleFromSphereFaces =
+      HodgeProductDiagonal.sphereProductFundamentalFourCycleLift ≫
+        SphereProductSingularChainComplex.homologyπ 4 ≫
+          HomologicalComplex.homologyMap (pairCoordinateChainMap pair) 4 := by
+  let targetMorphism : ScalarModule ⟶ (SpherePowerChains factorCount).X 4 :=
+    ModuleCat.ofHom
+      (LinearMap.toSpanSingleton ℚ _ (pairCoordinateChain pair sourceFourCycleFromSphereFaces))
+  have targetClosed : targetMorphism ≫ (SpherePowerChains factorCount).d 4 3 = 0 := by
+    ext
+    change (SpherePowerChains factorCount).d 4 3
+      ((1 : ℚ) • pairCoordinateChain pair sourceFourCycleFromSphereFaces) = 0
+    simpa using pairCoordinateChain_closed pair sourceFourCycleFromSphereFaces
+  let targetLift : ScalarModule ⟶ (SpherePowerChains factorCount).cycles 4 :=
+    (SpherePowerChains factorCount).liftCycles targetMorphism 3 (by simp) targetClosed
+  have targetLift_i : targetLift ≫ (SpherePowerChains factorCount).iCycles 4 =
+      targetMorphism := by
+    apply HomologicalComplex.liftCycles_i
+  change targetLift ≫ (SpherePowerChains factorCount).homologyπ 4 = _
+  rw [HomologicalComplex.homologyπ_naturality, ← Category.assoc]
+  apply congrArg (fun lifted => lifted ≫ (SpherePowerChains factorCount).homologyπ 4)
+  apply (cancel_mono ((SpherePowerChains factorCount).iCycles 4)).1
+  rw [targetLift_i, Category.assoc,
+    HomologicalComplex.cyclesMap_i, ← Category.assoc,
+    HodgeProductDiagonal.sphereProductFundamentalFourCycleLift_i]
+  apply ModuleCat.hom_ext
+  apply LinearMap.ext
+  intro coefficient
+  change coefficient • pairCoordinateChain pair sourceFourCycleFromSphereFaces =
+    (pairCoordinateChainMap pair).f 4
+      (coefficient • HodgeProductDiagonal.sphereProductFundamentalFourChain)
+  exact ((pairCoordinateChainMap pair).f 4).hom.map_smul coefficient
+    HodgeProductDiagonal.sphereProductFundamentalFourChain |>.symm
+
+theorem pairCoordinateHomologyClass_fromSphereFaces {factorCount : ℕ}
+    (pair : CoordinatePair factorCount) :
+    pairCoordinateHomologyClass pair sourceFourCycleFromSphereFaces =
+      HomologicalComplex.homologyMap (pairCoordinateChainMap pair) 4
+        HodgeProductDiagonal.sphereProductFundamentalFourHomologyClass := by
+  unfold pairCoordinateHomologyClass
+  rw [pairCoordinateHomologyMorphism_fromSphereFaces]
+  rfl
+
+/-- A unit at one coordinate address returns exactly the class in the constructed source
+family. The complete class map therefore consumes that family, rather than a parallel source. -/
+theorem coordinatePairClassMapFromSphereFaces_unit {factorCount : ℕ}
+    (pair : CoordinatePair factorCount) :
+    coordinatePairClassMapFromSphereFaces factorCount (Pi.single pair 1) =
+      pairCoordinateHomologyFamily sourceFourCycleFromSphereFaces pair := by
+  classical
+  change coordinatePairClassMapFromSphereFaces factorCount (Pi.single pair 1) =
+    pairCoordinateHomologyClass pair sourceFourCycleFromSphereFaces
+  rw [pairCoordinateHomologyClass_fromSphereFaces]
+  simp [coordinatePairClassMapFromSphereFaces, coordinatePairClassMap]
+
+/-- Only degree-four sphere vanishing remains for separation of the six explicit pair classes;
+the source no longer needs a hypothesized surface cellular reduction. Global spanning and
+algebraic-cycle realization are distinct obligations. -/
+theorem coordinatePairClassMapFromSphereFaces_injective [Subsingleton SphereH4]
+    (factorCount : ℕ) : Function.Injective (coordinatePairClassMapFromSphereFaces factorCount) :=
+  coordinatePairClassMap_injective _
+    HodgeProductDiagonal.sphereProductFundamentalFourHomologyClass_ne_zero
+
+theorem coordinatePairClassMapFromSphereFaces_injective_of_fillings
+    (fillings : SphereHigherEvenCycleFillings) :
+    Function.Injective (coordinatePairClassMapFromSphereFaces 4) := by
+  letI : Subsingleton SphereH4 := sphereH4SubsingletonOfFillings fillings
+  exact coordinatePairClassMapFromSphereFaces_injective 4
+
 /-! ## The standing cellular residual supplies the source conditionally -/
 
 /-- [definition] The degree-four generator in the exact finite cellular complex. -/
@@ -567,6 +664,13 @@ section Audit
 #print axioms pairCoordinate_then_matching_projection
 #print axioms pairCoordinateChainMap_matching_retract
 #print axioms pairCoordinateChain_closed
+#print axioms sourceFourCycleFromSphereFaces
+#print axioms fourfoldPairSourceFromSphereFaces_closed
+#print axioms pairCoordinateHomologyMorphism_fromSphereFaces
+#print axioms pairCoordinateHomologyClass_fromSphereFaces
+#print axioms coordinatePairClassMapFromSphereFaces_unit
+#print axioms coordinatePairClassMapFromSphereFaces_injective
+#print axioms coordinatePairClassMapFromSphereFaces_injective_of_fillings
 #print axioms pairCoordinateHomologyMap_matching_retract
 #print axioms pairCoordinateHomologyMap_injective
 #print axioms crossedPairTopMap_factorsThroughSphere

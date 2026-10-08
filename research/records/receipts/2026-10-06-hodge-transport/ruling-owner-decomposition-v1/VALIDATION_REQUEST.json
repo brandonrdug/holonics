@@ -1,0 +1,1334 @@
+{
+  "status": "Frozen complete ruling-owner continuation; all new bytes unaccepted",
+  "source_base": "3c67beee7f656798f912c974f12c482ea12c5e42",
+  "source_root": {
+    "private_machine_path_sha256": "dcafb849eec9675ec690f6fa67a187bf465a23019817c0f09d333fbdc88c9aa6"
+  },
+  "first_object_lookup_root": {
+    "private_machine_path_sha256": "8134b8d8260645d789cc1420a1469063348f889c967cac06215479f791635470"
+  },
+  "fallback_frozen_source_root": {
+    "private_machine_path_sha256": "fa9b39db065749cc8a97d619067eb9d52e579473beda7954860cc9534fa7f261"
+  },
+  "remaining_unchanged_cached_imports": "reuse only after exact source/hash/native provider-edge preflight in current lookup order; cached outputs for listed modules cannot supply acceptance against new provider",
+  "local_source_graph": {
+    "private_machine_path_sha256": "01b786c21d937ba3efe416493477b54c367c52cf21cb6e5dae381ea12b5d6463"
+  },
+  "transitive_source_module_count": 102,
+  "source_integrity": {
+    "private_machine_path_sha256": "1d9eadb9c81a5ce6896c324371e015b7a0aeea20c1df4491f503230440ff1b04"
+  },
+  "measured_diagnosis": {
+    "private_machine_path_sha256": "b22e7ead78e412f23f4e50859c74bdd24b89ed00d426397cdae388283bcc3a2c"
+  },
+  "prior_request": {
+    "private_machine_path_sha256": "c873c18493f1ed460fc7a5617cf3d9e27a7890860a9c1f4a3ad50a5e00dbe549"
+  },
+  "accepted_provider": {
+    "module": "HolonicsResearch.Foundation.DiagonalChainTransport",
+    "source": {
+      "module": "HolonicsResearch.Foundation.DiagonalChainTransport",
+      "source": {
+        "private_machine_path_sha256": "2f5e2a7b65c88c4dd611d701230e24a67ec604ff6d9a32509538baa3b4297b68"
+      },
+      "pin": {
+        "sha256": "695f2da74d29a0eec3051bc30c197ed200269ede75d4d85eab33e39443311c2c",
+        "bytes": 69878
+      },
+      "public_base_source_sha256": "10d6a605fa3d6a764e8d8e5c80b760fd54fd2676e30ef12e353016976fbf02b2",
+      "source_changed_from_public_base": true,
+      "live_root_source_matches": false,
+      "imports": [
+        "Holonics.Foundation.Holon"
+      ],
+      "changed_providers": [],
+      "axiom_selectors": [
+        "boundary_rejoinOne",
+        "boundary_separateOne",
+        "boundary_pairTwoShuffleAtom",
+        "boundary_pairTwoShuffle",
+        "pairFourReceiver_boundaryFiveAtom",
+        "pairFourReceiver_boundaryFive_zero",
+        "pairFourReceiver_pairTwoShuffleAtom",
+        "normalizedTwoCoefficient_degenerate_zero",
+        "boundary_diagonalReconstructionFillerOne",
+        "boundary_separateTwoAtom",
+        "boundary_separateTwo",
+        "boundary_separateThreeAtom",
+        "boundary_separateThree",
+        "separationBoundaryHolon",
+        "boundary_diagonalRoundTripDefectTwo",
+        "diagonalRoundTripDefectBoundaryHolon",
+        "boundary_diagonalReconstructionFillerOneAtom",
+        "boundary_diagonalReconstructionFillerTwoAtom",
+        "diagonalReconstructionHomotopyTwo",
+        "diagonalRoundTripDefectTwo_eq_boundary_of_cycle"
+      ]
+    },
+    "objects": [
+      {
+        "path": {
+          "private_machine_path_sha256": "83f46d815c0c80a8e60b93aba6a31a8ac0544f0bbfa6e2657875a65973e0bd8a"
+        },
+        "original": {
+          "private_machine_path_sha256": "2d94855cebf3b32ba267e19b3ec41756c5c46dca6480dff42ddac78c7c5ef7ad"
+        },
+        "pin": {
+          "sha256": "c752ae7cd8c7680397bc049806b06caa1b93a6016b051af823344a4209742790",
+          "bytes": 2066592
+        }
+      },
+      {
+        "path": {
+          "private_machine_path_sha256": "f629d58c0c9f4c6eb26f93dab9551d147c89a8879bada4916099268242b1605a"
+        },
+        "original": {
+          "private_machine_path_sha256": "eb9c16d9a04ef23d4994a02af0175d409e5e8e9eebb301bd72bc3f230c930372"
+        },
+        "pin": {
+          "sha256": "c0ea8374870f6e13d84ef4857560bacc1c6c753ea71807dc1b28222324499cb0",
+          "bytes": 297870
+        }
+      }
+    ],
+    "acceptance": {
+      "private_machine_path_sha256": "a164101229297db14377036dd6b27f79c7a0f4c24b566963dd7da8ede4951383"
+    },
+    "acceptance_pin": {
+      "sha256": "ac8536463f7d8b173f75bdabe752de42df152cba0511a48ab068d61268b590ce",
+      "bytes": 19331
+    },
+    "kernel_receipt": {
+      "private_machine_path_sha256": "c8b20b78d31a13a0788f08b73619b0502f708150b2ddf2efb6a1da6b8d1aecc7"
+    },
+    "kernel_pin": {
+      "sha256": "6477481f528d6c375e6370c8617859239ad2247e900a33f2875ceba24f774f62",
+      "bytes": 3079
+    },
+    "standard_queries": 20,
+    "importAllArts_hash": "750568dd5983e010"
+  },
+  "accepted_complete_product_owners": [
+    {
+      "module": "HolonicsResearch.Foundation.ProductFactorCurrent",
+      "source_pin": {
+        "sha256": "5879a1b5239136365fc4b5a64ef4154c8a950b01470a853915162cdad008e9b6",
+        "bytes": 14510
+      },
+      "selectors": [
+        "factorBoundary_generator",
+        "h1ClosedPart_boundary_zero",
+        "h1ClosedPart_reconstruction",
+        "h1_extended_boundary",
+        "pairCurrent_generator",
+        "pairCurrent_add_left",
+        "pairCurrent_add_right",
+        "pairCurrent_smul_left",
+        "pairCurrent_smul_right",
+        "pairCurrent_neg_left",
+        "pairCurrent_neg_right",
+        "pairCurrent_sub_left",
+        "pairCurrent_sub_right",
+        "pairCurrent_zero_left",
+        "pairCurrent_zero_right",
+        "mapPairLeft_generator",
+        "mapPairRight_generator",
+        "mapPairLeft_pairCurrent",
+        "mapPairRight_pairCurrent",
+        "mapPairLeft_comp",
+        "mapPairRight_comp",
+        "mapPairLeft_right_commute",
+        "extendedH1_apply",
+        "extendedH1_boundary"
+      ],
+      "receipt": {
+        "private_machine_path_sha256": "f694437d3dd0dae50d12334a94dbb7ab6c29afe856cc313729895fb3ac8148bf"
+      },
+      "compiler_wall_ns": 6985384275,
+      "standard_axioms_only": true
+    },
+    {
+      "module": "HolonicsResearch.Foundation.ProductAxisBoundary",
+      "source_pin": {
+        "sha256": "911c9140c862a9db348447f4968cec9487b6ef7e1dc9442890c78e1d69bcf2e3",
+        "bytes": 29580
+      },
+      "selectors": [
+        "leftAxis_generator",
+        "middleAxis_generator",
+        "rightAxis_generator",
+        "leftMiddleAxis_generator",
+        "rightMiddleAxis_generator",
+        "totalBoundaryThree_rightMiddle_generator",
+        "totalBoundaryThree_leftMiddle_generator",
+        "totalBoundaryThree_rightMiddleAxis",
+        "totalBoundaryThree_leftMiddleAxis",
+        "totalBoundaryThree_rightMiddle",
+        "totalBoundaryThree_leftMiddle",
+        "mapPairLeft_extendedH1_boundary",
+        "mapPairRight_extendedH1_boundary",
+        "boundary_middleJointFillingLeft",
+        "boundary_middleJointFillingRight",
+        "leftOneAxis_generator",
+        "rightOneAxis_generator",
+        "totalBoundaryOne_leftOneAxis",
+        "totalBoundaryOne_rightOneAxis",
+        "totalBoundaryTwo_leftAxis",
+        "totalBoundaryTwo_middleAxis",
+        "totalBoundaryTwo_rightAxis",
+        "totalOneAxisReconstruction",
+        "totalBoundaryOne_axisDecomposition",
+        "leftAxisProjection_generator",
+        "middleAxisProjection_generator",
+        "rightAxisProjection_generator",
+        "leftOneAxisProjection_generator",
+        "rightOneAxisProjection_generator",
+        "totalTwoAxisReconstruction",
+        "leftOneAxisProjection_totalBoundaryTwo",
+        "rightOneAxisProjection_totalBoundaryTwo",
+        "coupledAxisBoundaryEquations"
+      ],
+      "receipt": {
+        "private_machine_path_sha256": "f694437d3dd0dae50d12334a94dbb7ab6c29afe856cc313729895fb3ac8148bf"
+      },
+      "compiler_wall_ns": 7409898985,
+      "standard_axioms_only": true
+    },
+    {
+      "module": "HolonicsResearch.Foundation.ProductAugmentation",
+      "source_pin": {
+        "sha256": "d7de6a57fce6b259b56e85fee4c3c3cd26ed21fd62b1da0aeeac99a58fdebeca",
+        "bytes": 14993
+      },
+      "selectors": [
+        "pairFirstAugmentation_generator",
+        "pairFirstBase_generator",
+        "pairFirstAugmentation_pairCurrent",
+        "pairFirstBase_current",
+        "productAugmentation_generator",
+        "totalBoundaryOne_productH0SeparatedAtom",
+        "totalBoundaryOne_productH0Separated",
+        "diagonalBoundaryOne_productH0Diagonal",
+        "pairSecondAugmentation_generator",
+        "pairSecondBase_generator",
+        "pairSecondAugmentation_pairCurrent",
+        "pairSecondBase_current",
+        "pairSecondAugmentation_mapPairLeft",
+        "pairSecondAugmentation_mapPairRight_boundary",
+        "mapPairRight_h0_boundary",
+        "mapPairLeft_pairSecondBase"
+      ],
+      "receipt": {
+        "private_machine_path_sha256": "f694437d3dd0dae50d12334a94dbb7ab6c29afe856cc313729895fb3ac8148bf"
+      },
+      "compiler_wall_ns": 3940711471,
+      "standard_axioms_only": true
+    },
+    {
+      "module": "HolonicsResearch.Foundation.ProductEdgeContraction",
+      "source_pin": {
+        "sha256": "eb039e4c4a05e31329b1a9aa9deb7517c56b7814e026391e146958934a8ed681",
+        "bytes": 11549
+      },
+      "selectors": [
+        "productOneBaseResidual_closed",
+        "totalBoundaryTwo_productTotalOneFilling",
+        "diagonalBoundaryTwo_productH1Diagonal_of_closed",
+        "pairFirstAugmentation_mapPairRight",
+        "pairFirstAugmentation_mapPairLeft_boundary",
+        "mapPairLeft_h0_boundary",
+        "mapPairLeft_factorBoundary_sq",
+        "mapPairRight_factorBoundary_sq"
+      ],
+      "receipt": {
+        "private_machine_path_sha256": "f694437d3dd0dae50d12334a94dbb7ab6c29afe856cc313729895fb3ac8148bf"
+      },
+      "compiler_wall_ns": 4330260505,
+      "standard_axioms_only": true
+    },
+    {
+      "module": "HolonicsResearch.Foundation.ProductDegreeTwoNormalization",
+      "source_pin": {
+        "sha256": "91737d2bcbd861434eedccba52b701ce462c7b5df06d457df5c03a8ccb6e00fc",
+        "bytes": 24474
+      },
+      "selectors": [
+        "coupledRightMiddleContraction_boundary",
+        "coupledLeftMiddleCorrection_boundary",
+        "coupledMiddleCorrection_boundary",
+        "mixedFirstBoundary_closed_of_totalBoundary",
+        "mixedSecondBoundary_closed_of_totalBoundary",
+        "correctedFirstOuter_closed",
+        "correctedSecondOuter_closed",
+        "coupledMiddleCorrection_reduces_to_outer",
+        "productFirstFactorDegreeTwoCurrent_closed",
+        "productSecondFactorDegreeTwoCurrent_closed",
+        "leftOuterNormalizationCorrection_boundary",
+        "rightOuterNormalizationCorrection_boundary",
+        "productDegreeTwoNormalizationFiller_boundary",
+        "totalBoundaryOne_totalBoundaryTwo",
+        "diagonalBoundaryOne_diagonalBoundaryTwo",
+        "boundary_middlePolarizedFilling",
+        "boundary_middlePolarizedFillingCurrent"
+      ],
+      "receipt": {
+        "private_machine_path_sha256": "f694437d3dd0dae50d12334a94dbb7ab6c29afe856cc313729895fb3ac8148bf"
+      },
+      "compiler_wall_ns": 6740760839,
+      "standard_axioms_only": true
+    },
+    {
+      "module": "HolonicsResearch.Foundation.ProductDegreeTwo",
+      "source_pin": {
+        "sha256": "bccb75cb5224603d569dde39b1437940ec026e1d0eb5eb615f64d315b0d42692",
+        "bytes": 21634
+      },
+      "selectors": [
+        "diagonalBoundaryOne_productH0Diagonal",
+        "totalBoundaryTwo_productTotalOneFilling",
+        "diagonalBoundaryTwo_productH1Diagonal_of_closed",
+        "productFirstFactorDegreeTwoCurrent_closed",
+        "productSecondFactorDegreeTwoCurrent_closed",
+        "leftOuterNormalizationCorrection_boundary",
+        "rightOuterNormalizationCorrection_boundary",
+        "productDegreeTwoNormalizationFiller_boundary",
+        "coupledMiddleCorrection_reduces_to_outer",
+        "totalBoundaryOne_totalBoundaryTwo",
+        "diagonalBoundaryOne_diagonalBoundaryTwo",
+        "realizedProductCurrentEquiv_boundary_one",
+        "realizedProductCurrentEquiv_boundary_two",
+        "realizedProductCurrentEquiv_boundary_three",
+        "realizedProductFirstFactorDegreeTwoCurrent_closed",
+        "realizedProductSecondFactorDegreeTwoCurrent_closed",
+        "realizedProductDegreeTwoNormalizationFiller_boundary",
+        "productAugmentation_diagonalBoundaryOne",
+        "realizedProductLowDegreeCurrentDatum"
+      ],
+      "receipt": {
+        "private_machine_path_sha256": "f694437d3dd0dae50d12334a94dbb7ab6c29afe856cc313729895fb3ac8148bf"
+      },
+      "compiler_wall_ns": 4264707421,
+      "standard_axioms_only": true
+    }
+  ],
+  "accepted_complete_hodge_chart_owners": [
+    {
+      "module": "HolonicsResearch.Hodge.HodgeTopologicalProductRealization",
+      "source_pin": {
+        "sha256": "bb8b13e71e7c04e46e2b66058c2d3a80d73c02048078421e708730a1cd27e820",
+        "bytes": 8991
+      },
+      "queries": 4,
+      "compiler_wall_ns": 5779138552,
+      "receipt": {
+        "private_machine_path_sha256": "ff182e2c748ff45d950fd2ea0fbb21386c814b3d41160762930b471371a6e04f"
+      },
+      "receipt_pin": {
+        "sha256": "e4fed1827abd13ed8569c90e044c8df769b26cbcf78973344d2ec48d382adf0f",
+        "bytes": 197365
+      }
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeTopologicalSingularCurrent",
+      "source_pin": {
+        "sha256": "d5bc66089c8a528ffa20ccf18a56aa393c799af69579170884b38e40de4f24c3",
+        "bytes": 21747
+      },
+      "queries": 15,
+      "compiler_wall_ns": 5077298921,
+      "receipt": {
+        "private_machine_path_sha256": "ff182e2c748ff45d950fd2ea0fbb21386c814b3d41160762930b471371a6e04f"
+      },
+      "receipt_pin": {
+        "sha256": "e4fed1827abd13ed8569c90e044c8df769b26cbcf78973344d2ec48d382adf0f",
+        "bytes": 197365
+      }
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSphereProductCurrent",
+      "source_pin": {
+        "sha256": "d478959cc584cb2dd8019a4985c2129fc4b08cba42488f13ae5fb84f75727f64",
+        "bytes": 14778
+      },
+      "queries": 11,
+      "compiler_wall_ns": 5797360838,
+      "receipt": {
+        "private_machine_path_sha256": "ff182e2c748ff45d950fd2ea0fbb21386c814b3d41160762930b471371a6e04f"
+      },
+      "receipt_pin": {
+        "sha256": "e4fed1827abd13ed8569c90e044c8df769b26cbcf78973344d2ec48d382adf0f",
+        "bytes": 197365
+      }
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSphereProductReconstruction",
+      "source_pin": {
+        "sha256": "baa0db745e69a05ed1388699874c550c47d0adab656b179675bad305ff875805",
+        "bytes": 19823
+      },
+      "queries": 13,
+      "compiler_wall_ns": 4566130894,
+      "receipt": {
+        "private_machine_path_sha256": "ff182e2c748ff45d950fd2ea0fbb21386c814b3d41160762930b471371a6e04f"
+      },
+      "receipt_pin": {
+        "sha256": "e4fed1827abd13ed8569c90e044c8df769b26cbcf78973344d2ec48d382adf0f",
+        "bytes": 197365
+      }
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSphereProductFourCycle",
+      "source_pin": {
+        "sha256": "db0a4d2bebb605919b7a12d303e80efdfab0bcde0d0050dfd4dd5f512462a4d3",
+        "bytes": 7123
+      },
+      "queries": 5,
+      "compiler_wall_ns": 3388629012,
+      "receipt": {
+        "private_machine_path_sha256": "ff182e2c748ff45d950fd2ea0fbb21386c814b3d41160762930b471371a6e04f"
+      },
+      "receipt_pin": {
+        "sha256": "e4fed1827abd13ed8569c90e044c8df769b26cbcf78973344d2ec48d382adf0f",
+        "bytes": 197365
+      }
+    }
+  ],
+  "accepted_complete_continuation_owners": [
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSphereNormalizedCoefficient",
+      "source_pin": {
+        "sha256": "aaae98651a47755a263b8a28fc32f73b9abd423f06eeee338fdf0492eee41a8c",
+        "bytes": 11157
+      },
+      "selectors": [
+        "sphereRawCoefficient_cycle",
+        "sphereRawCoefficient_boundary",
+        "sphereRawCoefficient_fundamental",
+        "sphereRawSimplexCoefficient_closed",
+        "sphereNormalizedCurrentCoefficient_return",
+        "sphereNormalizedCurrentCoefficient_boundary",
+        "sphereNormalizedSimplexCoefficient_closed",
+        "sphereNormalizedSimplexCoefficient_degenerate",
+        "sphereNormalizedCurrentCoefficient_fundamental",
+        "pairFourReceiver_pairTwoShuffle_pairCurrent"
+      ],
+      "receipt": {
+        "private_machine_path_sha256": "54c4228664b5c9baa7e9186a0768b0a5c2754a405ccac34c3315e9bbb77507cf"
+      },
+      "receipt_pin": {
+        "sha256": "3ddb8c8307e8fd9a841d5b22cceac208afb155190d7f151676243fcc706dd708",
+        "bytes": 190211
+      },
+      "compiler_wall_ns": 2785315958,
+      "standard_axioms_only": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProductDiagonal",
+      "source_pin": {
+        "sha256": "85047a43f7020aba3e97236d386f6b1f561cc91b8e7ef093b4ae34e3e0ef29c5",
+        "bytes": 11709
+      },
+      "selectors": [
+        "sphereDetectorFromHomology",
+        "sphereNormalizedCurrentCoefficient_return",
+        "sphereNormalizedSimplexCoefficient_closed",
+        "sphereNormalizedSimplexCoefficient_degenerate",
+        "productChainDiagonalEquiv_boundary_five",
+        "sphereProductFourReceiver_boundary",
+        "sphereProductFourReceiver_fundamental",
+        "sphereProductFundamentalFourChain_not_mem_boundary_range",
+        "sphereProductFourReceiverOnHomology_fundamental",
+        "sphereProductFundamentalFourHomologyClass_ne_zero",
+        "topologicalProductSimplexEquiv",
+        "topologicalProductSimplexRealization",
+        "homeomorphicTopologicalProductSimplexEquiv",
+        "homeomorphicTopologicalProductSimplexRealization",
+        "topologicalSimplexMap_comp",
+        "topologicalSimplexMap_id",
+        "topologicalChainEquivCurrent",
+        "topologicalChainEquivCurrent_boundary",
+        "topologicalChainMap_simplexGenerator",
+        "topologicalChainEquivCurrent_map",
+        "productSimplexEquiv",
+        "productChainEquivCurrent",
+        "productChainDiagonalEquiv",
+        "pairTwoBoundary_factor_incidence",
+        "pairTwoShuffle_closed",
+        "productChainDiagonalEquiv_boundary_four",
+        "sphereProductFundamentalFourChain_closed",
+        "productChainDiagonalEquiv_boundary_generator",
+        "productChainDiagonalEquiv_boundary_three_generator",
+        "productChainDiagonalEquiv_boundary",
+        "productChainDiagonalEquiv_boundary_three",
+        "separatedProductThreeChain_boundary",
+        "productBoundarySeparationHolon",
+        "separatedProductCycle_boundary",
+        "productCycleSeparationHolon",
+        "rejoinedProductThreeChain_boundary",
+        "rejoinedProductChain_of_separatedBoundary",
+        "productChainDiagonalEquiv_boundary_rejoined",
+        "rejoinedProductChain_boundary",
+        "rejoinedProductCycle",
+        "productRoundTripDefectChain_diagonal",
+        "productRoundTripDefectChain_boundary",
+        "productRoundTripDefectCycle",
+        "productRoundTripDefectFillerChain_boundary",
+        "productReconstructionBoundaryHolon"
+      ],
+      "receipt": {
+        "private_machine_path_sha256": "54c4228664b5c9baa7e9186a0768b0a5c2754a405ccac34c3315e9bbb77507cf"
+      },
+      "receipt_pin": {
+        "sha256": "3ddb8c8307e8fd9a841d5b22cceac208afb155190d7f151676243fcc706dd708",
+        "bytes": 190211
+      },
+      "compiler_wall_ns": 2430759563,
+      "standard_axioms_only": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSphereChainCurrent",
+      "source_pin": {
+        "sha256": "091a334e3a171012c3566fd93cf35432a16910dc3298b7082dcbbf21c24ec88e",
+        "bytes": 7565
+      },
+      "selectors": [
+        "sphereChainEquivCurrent",
+        "sphereChainToCurrent_boundary"
+      ],
+      "receipt": {
+        "private_machine_path_sha256": "54c4228664b5c9baa7e9186a0768b0a5c2754a405ccac34c3315e9bbb77507cf"
+      },
+      "receipt_pin": {
+        "sha256": "3ddb8c8307e8fd9a841d5b22cceac208afb155190d7f151676243fcc706dd708",
+        "bytes": 190211
+      },
+      "compiler_wall_ns": 2094813482,
+      "standard_axioms_only": true
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProductMixedFilling",
+      "source_pin": {
+        "sha256": "9fa6ba333fd1d0f4e9b4bc1595d495d14734e67109e788fa4a7d26f6242613de",
+        "bytes": 73978
+      },
+      "selectors": [
+        "spherePairDiagonalH0_boundary",
+        "spherePairDiagonalH1_boundary",
+        "totalBoundaryThree_rightMiddleCurrent",
+        "exists_mixedCurrentFilling"
+      ],
+      "receipt": {
+        "private_machine_path_sha256": "54c4228664b5c9baa7e9186a0768b0a5c2754a405ccac34c3315e9bbb77507cf"
+      },
+      "receipt_pin": {
+        "sha256": "3ddb8c8307e8fd9a841d5b22cceac208afb155190d7f151676243fcc706dd708",
+        "bytes": 190211
+      },
+      "compiler_wall_ns": 11956836153,
+      "standard_axioms_only": true
+    }
+  ],
+  "accepted_object_seeds": [
+    {
+      "path": {
+        "private_machine_path_sha256": "01456fc0b6a7c1c6e30270892cb0d8af2bfc90ddfe9f506465976edd86576860"
+      },
+      "original": {
+        "private_machine_path_sha256": "83f46d815c0c80a8e60b93aba6a31a8ac0544f0bbfa6e2657875a65973e0bd8a"
+      },
+      "pin": {
+        "sha256": "c752ae7cd8c7680397bc049806b06caa1b93a6016b051af823344a4209742790",
+        "bytes": 2066592
+      }
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "3bcd9f1428bbd104395094ee44a8bbffcda138b3ded8c3c7aa81f480ccde0fc1"
+      },
+      "original": {
+        "private_machine_path_sha256": "70365dab850c6a48cd9842d8bbbcb238854479790e013d28f5eb4a6a1a973954"
+      },
+      "pin": {
+        "sha256": "001d9c16ef2d2ceb7d76da7b71861bde312a50f0bbed34468640c14fedff4c60",
+        "bytes": 46400
+      }
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "85890d25396cc211e74576167e01558b52ce98113243ce112f7627a4ff067dbb"
+      },
+      "original": {
+        "private_machine_path_sha256": "83746a91af92a5df34b85dc93db614f056b72b70270bdf9dad756ffc90d4f874"
+      },
+      "pin": {
+        "sha256": "9234d1a8b5ec63317a576668b081a96349d512ecd27bf11e18bab0722d944709",
+        "bytes": 747256
+      }
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "4af68c0edaad335f868f76c51bea66079f4d35a36a35de805e7bb2556d754fd2"
+      },
+      "original": {
+        "private_machine_path_sha256": "5e04b13c6bb3d8d8ef85b29f6dd429cba576eefa820d95a7d021436d7b2a5a87"
+      },
+      "pin": {
+        "sha256": "9ab8ce033c066f799f703e35d5eaea7c4e04a274cffa76651cecf94de80908cb",
+        "bytes": 94744
+      }
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "c7e6ac3f2be1f49b05a6bd7e92057f3acb85e514f0b264aff07418c8d229addd"
+      },
+      "original": {
+        "private_machine_path_sha256": "e97ecfdf8babc8dd6e806c5915f4f93b69eddafb1ffa402e2cd1e0fcd87d3956"
+      },
+      "pin": {
+        "sha256": "849de3dbc96cdba3efa9dcca2e23d83cbdc1f8f2a46211c7c961f1d215fb9242",
+        "bytes": 1656176
+      }
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "b8d1f752a72319803fccc2b94b71e9ab071f4a8b093294b82a08f7a84536a609"
+      },
+      "original": {
+        "private_machine_path_sha256": "77c75e13ddd191734b5125fdfa24253982f6ae6e82657e5ca9c9186e63501b46"
+      },
+      "pin": {
+        "sha256": "271f95bf7e92fd6a4d070d6c94c62ef58620cea711ac8fa6809f16dc3357a9ba",
+        "bytes": 57701
+      }
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "08f4ae30ad41ecc8fe734b0996662cbab6c507fef5465b48a2502052eceafbe0"
+      },
+      "original": {
+        "private_machine_path_sha256": "89b016ffc75bbcee37927f1ae9d41fc0e83134c670986a42c4b812a8b24df783"
+      },
+      "pin": {
+        "sha256": "db377ce3e3e88eba706a04c3b6e6427d936c006c4a9235a1bd8f4795b4c546a1",
+        "bytes": 929640
+      }
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "56069afcb299dccb30b2e96d2d06e0af5823e2965eb66c4b16526c22c727cfa0"
+      },
+      "original": {
+        "private_machine_path_sha256": "fb025ddefaaa6f5c971d882cfc15b1160f0fa2ca4a9b97ed19b8630293a6590f"
+      },
+      "pin": {
+        "sha256": "893aab460ddf9f19ada630022e0c3d9cf5b6bb194aa64736928829bd52ead1cb",
+        "bytes": 75235
+      }
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "302d7ec27d04343fdbc10db5be772eb7cab311221f79e020ed334f9f2fd365ff"
+      },
+      "original": {
+        "private_machine_path_sha256": "d1015b88841819cb6cae4d411fd6d78807f0c3ed70c663af24746086e2a8afff"
+      },
+      "pin": {
+        "sha256": "42ee03023d9ece96c65995331ad23eeb1acfb2adbd82f9339ae4537273ae9558",
+        "bytes": 726424
+      }
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "a25a971f2ab612ac3869ec010151bd0a6b4a58ba86f2b1b67ca70adb48918c6c"
+      },
+      "original": {
+        "private_machine_path_sha256": "ea4c19e8968cb74e5c88d8f62ddc73065023f6999e461f931b1d6f11c020d1fa"
+      },
+      "pin": {
+        "sha256": "b4c241d1b0e194256efc69c31bc46cc7c7db5696a0d317541f9b9f889c2cc6af",
+        "bytes": 40603
+      }
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "d0d49bedabf48c7b7638ed7d13aeed83147eebd2c5b4279bfaea2373a924d2db"
+      },
+      "original": {
+        "private_machine_path_sha256": "d21577c3523035cb506bddf054f91f4fac4d0f8b27827fccda9208ac5a136390"
+      },
+      "pin": {
+        "sha256": "cb19cc1e45490b3efd3d52ef094a074883d1641d180fd9232ef39698924c5ee0",
+        "bytes": 699304
+      }
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "d8198a097e220487a601c7b362222e68d7185839835bb5ca500ebfaf81bc8b1f"
+      },
+      "original": {
+        "private_machine_path_sha256": "1d3425cc475620859edc17c3a1388062322de8bd4846155927017937226a5ffe"
+      },
+      "pin": {
+        "sha256": "d05957c217b0877adcb1ab7e47755758addb8e43519e1e0d83bc232be2c594ee",
+        "bytes": 39022
+      }
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "f9dbc08aeefe0603c2739604df4fce8516fea6b8f18bf66345b673a6e6c386e6"
+      },
+      "original": {
+        "private_machine_path_sha256": "51df3738fa2816e3643a85b9605b1dc9ca7eb40da043f2c7a3f64324269bb7dc"
+      },
+      "pin": {
+        "sha256": "7f48438ac6a58df4c3859cb083ec4cf43ac19f55442aabba74f6ca97d16018a1",
+        "bytes": 717320
+      }
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "98841b678e6cf0501937c5ee1bec51ab6068763cca5e304edda2098c80b9e857"
+      },
+      "original": {
+        "private_machine_path_sha256": "f629d58c0c9f4c6eb26f93dab9551d147c89a8879bada4916099268242b1605a"
+      },
+      "pin": {
+        "sha256": "c0ea8374870f6e13d84ef4857560bacc1c6c753ea71807dc1b28222324499cb0",
+        "bytes": 297870
+      }
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "222dc11b94f529b00f68b65ff2e2543e836dadf6ea05603eb21aa1d45b753cc4"
+      },
+      "original": {
+        "private_machine_path_sha256": "65934459215a49a349a269146bbf79d2dbb7a7a039dd085a3608c04ea79c9cb1"
+      },
+      "pin": {
+        "sha256": "27220661d8b225c9873d23a26baace949bb6ec2ae88de27628679baf64448ae7",
+        "bytes": 56423
+      }
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "843954bab2c0cf161a1d75902635334dc82ec984bbc596e7b4c6f9cedc1f8bf0"
+      },
+      "original": {
+        "private_machine_path_sha256": "8513e3524430d4756be6680e088e69852e81132bf7cca86d83ce3e721449612d"
+      },
+      "pin": {
+        "sha256": "c2e0b57693dac4bacff5f8f7948777fa6c3ad758990b216df3011a1c160df48e",
+        "bytes": 274360
+      }
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "d713976dd564ed257562698f250f7d54ec61e7f50abf2014f2280f844b37b54a"
+      },
+      "original": {
+        "private_machine_path_sha256": "3563dae021824a5484cc613a0220fae5d9401a60e4122b4f5cdf7e3cbf85c77a"
+      },
+      "pin": {
+        "sha256": "98eb3216cb90129a4805adc222e27704510d8e1df345d532d3ffc233ff35eb00",
+        "bytes": 28045
+      }
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "5fea2fbd7d595b4a95ce0a29b3058d8f1afd2910c0931b4b30ae76f8f6be6982"
+      },
+      "original": {
+        "private_machine_path_sha256": "66b69655e5875dcac54c09af0237b05a14e727df7263f324f3225cb3fa0b22f1"
+      },
+      "pin": {
+        "sha256": "76c41bad3fc6fcdac5a6724e73fb6bf96e95b7430afdf9aff8e7deab70eb3cd7",
+        "bytes": 471936
+      }
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "12b9136a59a2c9d03d2ad6a0e73ffd17507e3a0809e6adfca662f20843142c5e"
+      },
+      "original": {
+        "private_machine_path_sha256": "df3138b4660a74312d90b918090c22a4929ab1eee336653ebe4e0d1359b0abc8"
+      },
+      "pin": {
+        "sha256": "92ef07363d334f1b9976ec64355893c03f946bfeae734990542364e839e13879",
+        "bytes": 67287
+      }
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "2a0bd7f06f734ea1f689e2a25db4b8d244823ea78bd1552fd6f41a5d6290e37d"
+      },
+      "original": {
+        "private_machine_path_sha256": "cc5ffffeb9be519b0cd922dca5a3dadfd861d59d3b7f7e28cc4be907b69d9ef7"
+      },
+      "pin": {
+        "sha256": "1eb4a63363a4746077fc55ab09d8a0cdb7b993489d1db956a1ba34578c0e245c",
+        "bytes": 319464
+      }
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "7b0f2f4031bdfa3cb4779af5c845f2efc8eabe52f1bc512c23c606d098aee03f"
+      },
+      "original": {
+        "private_machine_path_sha256": "2d9a4cec923ec02278d92a971dbf20d1ad29ea0f8b46fb359777cd6b66243034"
+      },
+      "pin": {
+        "sha256": "d2b8593826b0602313925ca7862547960323b98daa9b5c92efea441dbd61882f",
+        "bytes": 31574
+      }
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "e5b2421aa65eab35afa217c6cd8ac3256a93209c01c8cf393fa1ed12d3a73263"
+      },
+      "original": {
+        "private_machine_path_sha256": "838bfc545c00839596cda8525a27956f37ba75c840a59d3348e92702590438e6"
+      },
+      "pin": {
+        "sha256": "e944ec8b6cffe192b7ac9ecf873795d22352ad4957fa1db35dc303fca7507760",
+        "bytes": 96024
+      }
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "006865f657166e08df08dba4efc4ab685c3012270f9f56d73bd0242657367537"
+      },
+      "original": {
+        "private_machine_path_sha256": "83f4f88b2dbe1d70859541ea3cbb3420ccba024b2af88608731ded54704ed409"
+      },
+      "pin": {
+        "sha256": "379ae02b644d1bf109679255376cb0bea1707a6626dcf7107567cf400cca7ec3",
+        "bytes": 66774
+      }
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "1bcd747e6e64f986b2afc54c326d524322da2962ee1b26e5bde028b1ef034c1d"
+      },
+      "original": {
+        "private_machine_path_sha256": "a5aa876e218f6d0e3b4441a0f69ce0aa1e97f4a2151699d9367c27187d743b5f"
+      },
+      "pin": {
+        "sha256": "3364c32f682245009dbd3c417989f592cbb46b23081d6055c39e87091b20ce14",
+        "bytes": 398536
+      }
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "cb4af9e1e85a3651013f847fa202b94de84819e69caa4702bb51aaf624311afa"
+      },
+      "original": {
+        "private_machine_path_sha256": "bb663cae60be84ff489fc7fbb5d672d71984b91783fbf62034839aa33210b937"
+      },
+      "pin": {
+        "sha256": "01516a747d3e33e1f013bdb01fe6131ff2d1461f159f6ef3cae9fb9324f58785",
+        "bytes": 47510
+      }
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "3457a402f085fc9e17d145dc2446ec5447b46b9f088cfa6505bb62963195f1f0"
+      },
+      "original": {
+        "private_machine_path_sha256": "4c76d7ffd7997a3fe227f7c7008565f93ec2015a1d9832354b27ad20afc39de6"
+      },
+      "pin": {
+        "sha256": "c7da236b6a2de22dabc38f921a361e969fa0e812c6f458f9397a7890740174df",
+        "bytes": 403544
+      }
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "bdfeb9cf9e2ca81d861e9d84f5ed3fbc5420df30fbbf001824ef2e6051fb7000"
+      },
+      "original": {
+        "private_machine_path_sha256": "813585c69594a54bf3a9c23a20939344fc6d71e03a2794067b6e7f451e77ee96"
+      },
+      "pin": {
+        "sha256": "769024b0b93b8a1e381b29c1f1351a50981cb501bafdff2210bfb4b7a28b3cf9",
+        "bytes": 45073
+      }
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "377c4400a88d501ce7ec3f57f337d5725695a275f0fd1efbc738acf06c8b580d"
+      },
+      "original": {
+        "private_machine_path_sha256": "3e689159c0235b1281c9a3f2b8b4b979d0c600e1c8aa8bd91ea0a2ec2a83826f"
+      },
+      "pin": {
+        "sha256": "941f7ec503b4fe5066dbf79436d046edd3b81d7138b0ac8a5037bae88fbbcc68",
+        "bytes": 240104
+      }
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "ff24b1d23b2c9243bb4eb164ce688f2c8706408fe8720f6e2d3ed8a7d4361d94"
+      },
+      "original": {
+        "private_machine_path_sha256": "d5f61064cffdf71955871bb78c5b4e6a9f6528762cb9d72e0531e8e02b11d1eb"
+      },
+      "pin": {
+        "sha256": "3473123b9dc94b668d50371205adedb92e5e12402206f39c4f482ec5d26b9051",
+        "bytes": 27352
+      }
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "fa6b4f51f12d8531aa1f0e4c5f8b05757edc9cc363ceeff7f8a6b2c1b9cea1f3"
+      },
+      "original": {
+        "private_machine_path_sha256": "9e0fac1b48ca51e56f33cacaf23d3757243306676dd6a5e84a057831baecc7d3"
+      },
+      "pin": {
+        "sha256": "03833ed45a30a47729cd7112b6b1ed60db5785ec50e2b5bc9bbcc58aca639fe1",
+        "bytes": 176720
+      }
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "310f6c9740d1f483e44e55a8169a87d48e420decd6b792e07f08b9672174e04c"
+      },
+      "original": {
+        "private_machine_path_sha256": "a584534bd6387f4ec566ef8907dd19c69292abbbd1cbe558aaed9ce8824545b4"
+      },
+      "pin": {
+        "sha256": "612c5679e4a25be3b3e08f6f363db5f58d4d2ae59590d9057d69cc2e4fedf5fb",
+        "bytes": 221246
+      }
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "34ffc18af0b4b6844b90fe4b40f8da02485e8a10420341e124cee443692ee1ea"
+      },
+      "original": {
+        "private_machine_path_sha256": "eb06c4e1c93e638e63d861ff1f092c841702a8e97a24d3fb289269e32d00bf60"
+      },
+      "pin": {
+        "sha256": "0c16ac3cefc13ebe81614b133a936bca79d6f76b1d6a24d779dcc4123b1391d7",
+        "bytes": 2132440
+      }
+    }
+  ],
+  "accepted_provider_modules": 16,
+  "accepted_providers_recompile": false,
+  "failed_consumer_artifact_not_reused": true,
+  "rebuild_order": [
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSphereRulingCurrent",
+      "source": {
+        "private_machine_path_sha256": "4c59d1fa6066da847b75af5c41d314b9e245ec70e7bd22252b380987745c1967"
+      },
+      "canonical_path": {
+        "private_machine_path_sha256": "b35abf05b94380fda106f939a378392b5953f159ead10707630123f768d7dc89"
+      },
+      "pin": {
+        "sha256": "4b25419ee1a4023d3bf2960e4bf7036a506ab4b0403489b8016f69feaa9ff985",
+        "bytes": 9696
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeProductMixedFilling",
+        "HolonicsResearch.Hodge.HodgeRefinedBoundaryObstruction"
+      ],
+      "axiom_selectors": [
+        "sphereToProductSimplex",
+        "sphereToProductChainMap_generator",
+        "split_firstRuling_simplex",
+        "split_secondRuling_simplex",
+        "productChainDiagonalEquiv_firstRuling_generator",
+        "productChainDiagonalEquiv_secondRuling_generator",
+        "pairCurrent_univ_sum_left",
+        "pairCurrent_univ_sum_right",
+        "productChainDiagonalEquiv_firstRulingCycle",
+        "productChainDiagonalEquiv_secondRulingCycle"
+      ],
+      "complete_owner": true,
+      "declarations_moved_once": true,
+      "declarations": [
+        "sphereToProductSimplex",
+        "sphereToProductChainMap_generator",
+        "split_firstRuling_simplex",
+        "split_secondRuling_simplex",
+        "productChainDiagonalEquiv_firstRuling_generator",
+        "productChainDiagonalEquiv_secondRuling_generator",
+        "pairCurrent_univ_sum_left",
+        "pairCurrent_univ_sum_right",
+        "productChainDiagonalEquiv_firstRulingCycle",
+        "productChainDiagonalEquiv_secondRulingCycle"
+      ],
+      "purpose": "The actual sphere-to-product simplex map and the complete geometric ruling current chart."
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProductRulingReconstruction",
+      "source": {
+        "private_machine_path_sha256": "5c2be4d180ab651b4daab04ff36ee62edaa71f642c032d5323c05b0b58b224e6"
+      },
+      "canonical_path": {
+        "private_machine_path_sha256": "3d6fba92b10e67b78c48e5f1b30d303ed821071fe60e1bfafbb5699a2af94f4d"
+      },
+      "pin": {
+        "sha256": "9b1713839c7393da8d65f777ee8b096958877dc4b0c2ffe4c85223a94b5137b6",
+        "bytes": 6959
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeSphereRulingCurrent"
+      ],
+      "axiom_selectors": [
+        "firstRulingSeparatedCurrent_eq",
+        "rejoinTwo_rightAxis_base",
+        "rejoinTwo_leftAxis_base",
+        "rejoinTwo_firstRulingSeparatedCurrent",
+        "rejoinTwo_secondRulingSeparatedCurrent",
+        "rejoinedProductChain_firstRulingSeparatedCurrent",
+        "rejoinedProductChain_secondRulingSeparatedCurrent"
+      ],
+      "complete_owner": true,
+      "declarations_moved_once": true,
+      "declarations": [
+        "firstRulingSeparatedCurrent_eq",
+        "rejoinTwo_rightAxis_base",
+        "rejoinTwo_leftAxis_base",
+        "rejoinTwo_firstRulingSeparatedCurrent",
+        "rejoinTwo_secondRulingSeparatedCurrent",
+        "rejoinedProductChain_firstRulingSeparatedCurrent",
+        "rejoinedProductChain_secondRulingSeparatedCurrent"
+      ],
+      "purpose": "The separated outer currents rejoin to the existing geometric ruling chains exactly."
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProductRulingBoundary",
+      "source": {
+        "private_machine_path_sha256": "c1fb36ed2f9c737008f5059521fa852a3e4a777885d9a836cdd4b8abf756c7ff"
+      },
+      "canonical_path": {
+        "private_machine_path_sha256": "c3fbb2dc0a54de11d9ec13d85648ac5111c2e27a87f370e9d0f60b45405c8c1e"
+      },
+      "pin": {
+        "sha256": "747b1149beac46ecb2dbbde25c8225446cd4b0c8b560a2f84f5e9bdb7e776a92",
+        "bytes": 4776
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeProductRulingReconstruction"
+      ],
+      "axiom_selectors": [
+        "exists_productDegreeTwoRulingDecomposition"
+      ],
+      "complete_owner": true,
+      "declarations_moved_once": true,
+      "declarations": [
+        "exists_productDegreeTwoRulingDecomposition"
+      ],
+      "purpose": "The coupled filling and reconstruction defect return an actual singular three-boundary witness."
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProductRulingDecomposition",
+      "source": {
+        "private_machine_path_sha256": "9ca724d7f27303520886d8e9cb128bb4a0f52cc1d581d1d624c46ed3fe10b874"
+      },
+      "canonical_path": {
+        "private_machine_path_sha256": "fcf908b144de53f1602f28afd7208e2636d2b1dbe344ff0c4d730eb6aee8cded"
+      },
+      "pin": {
+        "sha256": "02b904d96abb418f10287cd9aee00f729f2afcb208e4f6d5c54b020e99a48e2f",
+        "bytes": 6915
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeProductRulingBoundary"
+      ],
+      "axiom_selectors": [
+        "exists_productDegreeTwoRulingDecomposition",
+        "rulingHomologyMap_surjective",
+        "rulingHomologyEquivalence"
+      ],
+      "complete_owner": true,
+      "declarations_moved_once": true,
+      "declarations": [
+        "rulingHomologyMap_surjective",
+        "rulingHomologyEquivalence"
+      ],
+      "purpose": "The public ruling homology consumer derives surjectivity and the equivalence from the actual boundary witness."
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProductSingularCohomologyDual",
+      "source": {
+        "private_machine_path_sha256": "fedae74c3bbe888a0bfddb4e16c960406186fdc97fdf730be06d86e7cb590a1a"
+      },
+      "pin": {
+        "sha256": "17f89144751c1279222669c0ab35ba34d01e5a0b821aff70d9a82d4617bcb444",
+        "bytes": 6543
+      },
+      "public_base_source_sha256": "17f89144751c1279222669c0ab35ba34d01e5a0b821aff70d9a82d4617bcb444",
+      "source_changed_from_public_base": false,
+      "live_root_source_matches": true,
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeProductRulingDecomposition"
+      ],
+      "changed_providers": [
+        "HolonicsResearch.Hodge.HodgeProductRulingDecomposition"
+      ],
+      "axiom_selectors": [
+        "rulingEvaluationDualEquivalence",
+        "rulingEvaluation_eq_intersection_swap",
+        "surfaceRulingHomologyEquivalence",
+        "singularCohomologyDual",
+        "singularCohomologyDual_evaluation"
+      ]
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSurfaceCycleClass",
+      "source": {
+        "private_machine_path_sha256": "1eb90f36860812f47038c3ceb7a50aa04a59f5e9736639bd8719fb7f31419d81"
+      },
+      "pin": {
+        "sha256": "d01463217a8004ffdbd42721f1bc5b30da378494bf41ee4cb60086d2b0140a10",
+        "bytes": 4170
+      },
+      "public_base_source_sha256": "d01463217a8004ffdbd42721f1bc5b30da378494bf41ee4cb60086d2b0140a10",
+      "source_changed_from_public_base": false,
+      "live_root_source_matches": true,
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeProductSingularCohomologyDual"
+      ],
+      "changed_providers": [
+        "HolonicsResearch.Hodge.HodgeProductSingularCohomologyDual"
+      ],
+      "axiom_selectors": [
+        "cellularToSingularCohomologyEquivalence",
+        "singularDivisorCycleClass",
+        "singularDivisorCycleClass_evaluation",
+        "divisorCycleClassNaturality"
+      ]
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProjectiveLineType11Form",
+      "source": {
+        "private_machine_path_sha256": "81ed1bbf4524361fa38eb1736a8737006a651c8598f87227bba672ccbb1a6cc1"
+      },
+      "pin": {
+        "sha256": "6d1e44f900f984170780c86fa4819d29e5f613f7c7cb0a42c8699b70cdb100fa",
+        "bytes": 11818
+      },
+      "public_base_source_sha256": "6d1e44f900f984170780c86fa4819d29e5f613f7c7cb0a42c8699b70cdb100fa",
+      "source_changed_from_public_base": false,
+      "live_root_source_matches": true,
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeSurfaceCycleClass"
+      ],
+      "changed_providers": [
+        "HolonicsResearch.Hodge.HodgeSurfaceCycleClass"
+      ],
+      "axiom_selectors": [
+        "orientation_areaForm_eq_complexArea",
+        "complexArea_mul",
+        "fsForm_isType11",
+        "fsForm_inversion",
+        "fsForm_transition",
+        "fsDifferentialForm_contDiff",
+        "fsDifferentialForm_closed",
+        "normalizedTransitionWinding_eq_one",
+        "projectiveLineType11Certificate"
+      ]
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSurfaceType11Period",
+      "source": {
+        "private_machine_path_sha256": "eecf3536d0d54322b059338bb5d05a9ac331f8f089136700a09c662a5f728741"
+      },
+      "pin": {
+        "sha256": "0c7edaa38bf6fba7326aed0fee9c9013ee145309461dcb6597ed8a6cab6abe56",
+        "bytes": 20786
+      },
+      "public_base_source_sha256": "0c7edaa38bf6fba7326aed0fee9c9013ee145309461dcb6597ed8a6cab6abe56",
+      "source_changed_from_public_base": false,
+      "live_root_source_matches": true,
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeProjectiveLineType11Form"
+      ],
+      "changed_providers": [
+        "HolonicsResearch.Hodge.HodgeProjectiveLineType11Form"
+      ],
+      "axiom_selectors": [
+        "surfaceFactorForm_isType11",
+        "surfaceFactorForm_transition",
+        "surfaceFactorForm_crossed_zero",
+        "surfaceFactorDifferentialForm_closed",
+        "surfaceType11Current_isType11",
+        "surfaceType11Current_transition",
+        "surfaceType11DifferentialForm_contDiff",
+        "surfaceType11DifferentialForm_closed",
+        "type11PeriodFunctional_eq_rulingEvaluation",
+        "surfaceType11PeriodMap_evaluation",
+        "firstFactor_period_ledger",
+        "secondFactor_period_ledger",
+        "surfaceType11PeriodMap_eq_singularCohomologyDual",
+        "surfaceType11AnalyticCertificate",
+        "rationalType11_eq_top",
+        "singularDivisorCycleClass_mem_rationalType11",
+        "surfaceType11Conclusion"
+      ]
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeProjectiveLinePowerType11",
+      "source": {
+        "private_machine_path_sha256": "d4cb65da8aad26bad8613708f010d352e77cfd00a83a6de715fca63cf61466dd"
+      },
+      "pin": {
+        "sha256": "3da1876a436f31fa924f446c2838d571b09e7abaf404d6106581e51022a7ea72",
+        "bytes": 17010
+      },
+      "public_base_source_sha256": "3da1876a436f31fa924f446c2838d571b09e7abaf404d6106581e51022a7ea72",
+      "source_changed_from_public_base": false,
+      "live_root_source_matches": true,
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeSurfaceType11Period"
+      ],
+      "changed_providers": [
+        "HolonicsResearch.Hodge.HodgeSurfaceType11Period"
+      ],
+      "axiom_selectors": [
+        "powerFactorDifferentialForm_closed",
+        "powerType11DifferentialForm_contDiff",
+        "powerType11DifferentialForm_closed",
+        "powerType11Period_basis",
+        "coefficients_eq_of_periods_eq",
+        "powerType11AnalyticCertificate"
+      ]
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSpherePowerRulingHomology",
+      "source": {
+        "private_machine_path_sha256": "01ffcb77d2d740b176c764e9c5249c7c342f1a95558f87428169c290aca86f42"
+      },
+      "pin": {
+        "sha256": "61a94ce064ddf2b427f2b3a6c304dbf3bb62112ebe71988a2b378d9d2ee31cc8",
+        "bytes": 80123
+      },
+      "public_base_source_sha256": "61a94ce064ddf2b427f2b3a6c304dbf3bb62112ebe71988a2b378d9d2ee31cc8",
+      "source_changed_from_public_base": false,
+      "live_root_source_matches": true,
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeProjectiveLinePowerType11",
+        "HolonicsResearch.Hodge.HodgeRefinedBoundaryObstruction",
+        "HolonicsResearch.Hodge.HodgeSphereHomologyEquivalence",
+        "HolonicsResearch.Hodge.HodgeProductRulingDecomposition",
+        "HolonicsResearch.Hodge.HodgeSphereProductFiniteComplex"
+      ],
+      "changed_providers": [
+        "HolonicsResearch.Hodge.HodgeProjectiveLinePowerType11",
+        "HolonicsResearch.Hodge.HodgeProductRulingDecomposition"
+      ],
+      "axiom_selectors": [
+        "spherePowerCellComplex_d",
+        "spherePowerCellHomologyIsoModule",
+        "spherePowerHomologyEquivCellModule",
+        "spherePowerEvenCellIndexEquiv",
+        "spherePowerEvenCellIndex_card",
+        "spherePowerCellModule_finrank_even",
+        "spherePowerOddCellIndex_isEmpty",
+        "spherePowerCellModule_finrank_odd",
+        "spherePowerCellModule_pascal",
+        "spherePowerSuccessorSimplexRealization",
+        "spherePowerLowDegreeCurrentDatumFromTwo",
+        "coordinateRulingCycle_boundary_zero",
+        "crossed_projection_coordinateRulingCycle",
+        "coordinateProjection_spherePowerRulingHomologyMap",
+        "spherePowerRulingHomologyMap_injective",
+        "spherePowerRulingHomologyMap_surjective_one",
+        "spherePowerRulingHomologyMap_surjective_two",
+        "spherePowerPrefixCurrentMap",
+        "lastCoordinateRulingCurrentMap",
+        "exists_spherePowerSuccessorChainDecomposition",
+        "exists_spherePowerSuccessorHomologyDecomposition",
+        "coordinateRulingCyclesMap_then_spherePowerPrefix",
+        "spherePowerPrefixHomologyMap_coordinateRuling",
+        "sphereCycleMap_lastCoordinateRuling",
+        "lastCoordinateRulingHomologyMap_fundamental",
+        "spherePowerSuccessorHomologyMap_assembly",
+        "spherePowerRulingHomologyMap_surjective_successor",
+        "spherePowerRulingHomologyMap_surjective_from_two",
+        "spherePowerRulingHomologyMap_surjective",
+        "spherePowerRulingHomologyEquiv",
+        "spherePowerRulingHomologyEquivOne",
+        "spherePowerRulingHomologyEquivTwo"
+      ]
+    },
+    {
+      "module": "HolonicsResearch.Hodge.HodgeSpherePowerPairHomology",
+      "source": {
+        "private_machine_path_sha256": "e08b189d0a2fe63b87db02c1963447332bce0c8f79ef8e199da1d2ab18dd790d"
+      },
+      "pin": {
+        "sha256": "6e2ddfc2bea154fa3ad34a04c843eac272604263067fd3932917b11c4ae85c0c",
+        "bytes": 35094
+      },
+      "public_base_source_sha256": "9784c847c171e483e48fcdab394cb38dde7010952b280f9368fe6e3720f3af3c",
+      "source_changed_from_public_base": true,
+      "live_root_source_matches": false,
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeSpherePowerRulingHomology",
+        "HolonicsResearch.Hodge.HodgeProjectiveLineRealization"
+      ],
+      "changed_providers": [
+        "HolonicsResearch.Hodge.HodgeSpherePowerRulingHomology"
+      ],
+      "axiom_selectors": [
+        "coordinatePair_four_card",
+        "pairCoordinate_then_matching_projection",
+        "pairCoordinateChainMap_matching_retract",
+        "pairCoordinateChain_closed",
+        "sourceFourCycleFromSphereFaces",
+        "fourfoldPairSourceFromSphereFaces_closed",
+        "pairCoordinateHomologyMorphism_fromSphereFaces",
+        "pairCoordinateHomologyClass_fromSphereFaces",
+        "coordinatePairClassMapFromSphereFaces_unit",
+        "coordinatePairClassMapFromSphereFaces_injective",
+        "coordinatePairClassMapFromSphereFaces_injective_of_fillings",
+        "pairCoordinateHomologyMap_matching_retract",
+        "pairCoordinateHomologyMap_injective",
+        "crossedPairTopMap_factorsThroughSphere",
+        "crossedPairChainMap_factorsThroughSphere",
+        "crossedPairHomologyMap_factorsThroughSphereH4",
+        "crossedPairHomologyMap_eq_zero_of_sphereH4_subsingleton",
+        "coordinatePairClassMap_injective",
+        "sphereH4SubsingletonOfFillings",
+        "surfaceCellHomologyIsoQFour",
+        "sphereProductH4EquivQOfReduction",
+        "sourceFourHomologyClassOfReduction_ne_zero",
+        "coordinatePairClassMapOfReduction_injective",
+        "coordinatePairClassMapOfReductions_surjective",
+        "coordinatePairHomologyEquivOfReductions",
+        "cellFourGenerator_closed",
+        "sourceFourCycleOfReduction",
+        "fourfoldPairClassesOfReduction"
+      ]
+    }
+  ],
+  "admission": "Shared queue only. Preflight all16 exact accepted provider sources/artifacts. Compile the four complete maintained ruling owners in dependency order, then all seven complete original downstream owners through Pair. Stop at the first failed or incomplete owner and return exact diagnostics; retain every accepted predecessor. No partial-source acceptance, unchanged whole-owner retry, source edits by queue, or cap raise.",
+  "acceptance": "Independent source/provider-matched complete-module kernel, exact selector-count, standard-axiom, cleanup and quiescent release receipts for each declared owner. Public ruling owner retains all original three queries. Earlier product nonboundary receipt does not imply downstream Pair acceptance.",
+  "threads": 1,
+  "memory_bytes": 4294967296,
+  "fixed_limits": "Original17s compilerCPU/wall and4GiB complete-module caps unchanged. Queue derives preparation/development projections from retained measured phase-unit maxima before launch; every projection/deadline fixed once. Stop early on evidence and never raise a cap.",
+  "no_new_mathematical_statements_or_hypotheses": true,
+  "declarations_moved_once": 20,
+  "new_library_created": false,
+  "all_original_downstream_scopes_retained": true,
+  "original_public_target_queries": [
+    "exists_productDegreeTwoRulingDecomposition",
+    "rulingHomologyMap_surjective",
+    "rulingHomologyEquivalence"
+  ],
+  "queue_owner": "01a10352-66ea-73c8-b716-a835a9a04033",
+  "compiler_launched_by_owner": false,
+  "_scoped_evidence": {
+    "original_receipt_pin": {
+      "bytes": 56569,
+      "sha256": "173631760711bd77e885dfe746f3fa34f717030882122bfcaa5cfce4946b63ae"
+    },
+    "raw_machine_paths_and_runtime_copies_kept_private": true,
+    "mathematical_and_validation_values_preserved": true
+  }
+}

@@ -392,6 +392,17 @@ exact and coexact sectors, with a harmonic representative of each cohomology cla
 fixed metric. The constructed heat step fixes harmonic modes and transports exact residues;
 changing geometry changes the representative and its projection.[^2]
 
+[proved-derived; new formal check pending] The existing temporal Hodge consumer now
+retains the complete source/receiver return `e_Δ(x)=Δ_C(qx)−q(Δ_Dx)`.
+For its finite Euler step, `q T_D(a)x=T_C(a)(qx)+a e_Δ(x)`; at a nonzero
+step this square commutes exactly when `e_Δ(x)=0`. With an actual moving
+receiver, `ẋ=−νΔ_Dx` gives `(q(t)x(t))̇=−νΔ_C(qx)+q̇x+νe_Δ(x)`.
+Both differential and metric-adjoint defects contribute to `e_Δ`; chain
+compatibility alone is insufficient. The parked four-cycle's harmonic current
+has a nonzero cut defect `5/2`, and its recursive quadratic energy receiver
+keeps the mixed return. The [source, hypotheses and exact witness](../research/records/2026-10-06_THE_HODGE_CUT_RETURNS_ITS_HEAT_AND_MOVING_RECEIVER_DEFECT.md)
+retain the finite scope and separate algebraic-cycle and continuum obligations.
+
 [definition] Electromagnetism also uses Hodge duality directly: the six components of its
 field-strength two-form split into electric and magnetic triples in an observer chart.
 The metric-dependent spacetime dual and the positive spatial energy pairing have different

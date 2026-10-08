@@ -1,0 +1,1559 @@
+{
+  "status": "actual local source graph pinned; source-only, kernel pending",
+  "module_count": 93,
+  "no_cycles": true,
+  "modules": {
+    "Holonics.Foundation.Receiver": {
+      "source": {
+        "private_machine_path_sha256": "e68049416f1a0b6bde36e7ebf4b360a7dfce39a35ea35ab44a1521104e3031ba"
+      },
+      "pin": {
+        "sha256": "32695757b94827663d9ad6547a125b2a8b0700ab99b890a64c9bf662da7c69c0",
+        "bytes": 10544
+      },
+      "imports": [
+        "Mathlib.Algebra.Group.Subgroup.Ker",
+        "Mathlib.LinearAlgebra.Prod",
+        "Mathlib.Logic.Relation",
+        "Mathlib.Data.Set.Operations"
+      ],
+      "local_providers": []
+    },
+    "Holonics.Foundation.Lineage": {
+      "source": {
+        "private_machine_path_sha256": "35da38408e79382760e218f9ab160679c15837b7aa833983d439fe4a5852c9ed"
+      },
+      "pin": {
+        "sha256": "d0120d764009f01c3d718fbbbafd1861b07b3710743a85daf8335982f6509577",
+        "bytes": 9458
+      },
+      "imports": [
+        "Holonics.Foundation.Receiver",
+        "Mathlib.Logic.Equiv.Defs"
+      ],
+      "local_providers": [
+        "Holonics.Foundation.Receiver"
+      ]
+    },
+    "Holonics.Foundation.AddressedBoundary": {
+      "source": {
+        "private_machine_path_sha256": "09e9970c5eb4695a577c747ee225ef3eb7cc6084e893c315e70bb7cf9596dc8e"
+      },
+      "pin": {
+        "sha256": "e1970e501c02440c44cbdd9944df292e669140475844179dc524f23d3900d1d7",
+        "bytes": 3973
+      },
+      "imports": [
+        "Holonics.Foundation.Lineage",
+        "Mathlib.Data.Finsupp.Basic"
+      ],
+      "local_providers": [
+        "Holonics.Foundation.Lineage"
+      ]
+    },
+    "Holonics.Foundation.Holon": {
+      "source": {
+        "private_machine_path_sha256": "95b844b69be6d34ef327ba02388826f3e6fed8f7a916f8a501edfeff7284cbed"
+      },
+      "pin": {
+        "sha256": "2be19f90c9ed0bfff5e67e270b940f314b308c44564460508732ea7b40d1cf53",
+        "bytes": 16898
+      },
+      "imports": [
+        "Holonics.Foundation.AddressedBoundary",
+        "Mathlib.Tactic"
+      ],
+      "local_providers": [
+        "Holonics.Foundation.AddressedBoundary"
+      ]
+    },
+    "HolonicsResearch.Foundation.DiagonalChainTransport": {
+      "source": {
+        "private_machine_path_sha256": "2f5e2a7b65c88c4dd611d701230e24a67ec604ff6d9a32509538baa3b4297b68"
+      },
+      "pin": {
+        "sha256": "695f2da74d29a0eec3051bc30c197ed200269ede75d4d85eab33e39443311c2c",
+        "bytes": 69878
+      },
+      "imports": [
+        "Holonics.Foundation.Holon",
+        "Mathlib.AlgebraicTopology.SimplicialSet.Basic",
+        "Mathlib.Tactic.Ring"
+      ],
+      "local_providers": [
+        "Holonics.Foundation.Holon"
+      ]
+    },
+    "HolonicsResearch.Foundation.ProductFactorCurrent": {
+      "source": {
+        "private_machine_path_sha256": "5ff912dada07671ab91bc25334d59d917d695ec7668816e7707b4a36deb7e808"
+      },
+      "pin": {
+        "sha256": "5879a1b5239136365fc4b5a64ef4154c8a950b01470a853915162cdad008e9b6",
+        "bytes": 14510
+      },
+      "imports": [
+        "HolonicsResearch.Foundation.DiagonalChainTransport",
+        "Mathlib.LinearAlgebra.DirectSum.Finsupp"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Foundation.DiagonalChainTransport"
+      ]
+    },
+    "HolonicsResearch.Foundation.ProductAxisBoundary": {
+      "source": {
+        "private_machine_path_sha256": "5cf2dc5b807c65852911dc3c765af8a0c5ee1a347f583611004755083441b8ba"
+      },
+      "pin": {
+        "sha256": "911c9140c862a9db348447f4968cec9487b6ef7e1dc9442890c78e1d69bcf2e3",
+        "bytes": 29580
+      },
+      "imports": [
+        "HolonicsResearch.Foundation.ProductFactorCurrent"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Foundation.ProductFactorCurrent"
+      ]
+    },
+    "HolonicsResearch.Foundation.ProductAugmentation": {
+      "source": {
+        "private_machine_path_sha256": "8636b35293f26d88f88112a5a19e28513f7c42cf77a917975027d5d02eec879e"
+      },
+      "pin": {
+        "sha256": "d7de6a57fce6b259b56e85fee4c3c3cd26ed21fd62b1da0aeeac99a58fdebeca",
+        "bytes": 14993
+      },
+      "imports": [
+        "HolonicsResearch.Foundation.ProductAxisBoundary"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Foundation.ProductAxisBoundary"
+      ]
+    },
+    "HolonicsResearch.Foundation.ProductEdgeContraction": {
+      "source": {
+        "private_machine_path_sha256": "37030b20c195c4c2d66d1ede23402f113726c47ca4a452578c221b8ab7ecd5f0"
+      },
+      "pin": {
+        "sha256": "eb039e4c4a05e31329b1a9aa9deb7517c56b7814e026391e146958934a8ed681",
+        "bytes": 11549
+      },
+      "imports": [
+        "HolonicsResearch.Foundation.ProductAugmentation"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Foundation.ProductAugmentation"
+      ]
+    },
+    "HolonicsResearch.Foundation.ProductDegreeTwoNormalization": {
+      "source": {
+        "private_machine_path_sha256": "cdc69bb0c2332773701890e463f717f52836b84bca641c90bbf31ba64756f5e7"
+      },
+      "pin": {
+        "sha256": "91737d2bcbd861434eedccba52b701ce462c7b5df06d457df5c03a8ccb6e00fc",
+        "bytes": 24474
+      },
+      "imports": [
+        "HolonicsResearch.Foundation.ProductEdgeContraction"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Foundation.ProductEdgeContraction"
+      ]
+    },
+    "HolonicsResearch.Foundation.ProductDegreeTwo": {
+      "source": {
+        "private_machine_path_sha256": "727fcedbc581c0b6c855b127307ac4d88070007cd83ff8e30cff8f02f0c46efa"
+      },
+      "pin": {
+        "sha256": "bccb75cb5224603d569dde39b1437940ec026e1d0eb5eb615f64d315b0d42692",
+        "bytes": 21634
+      },
+      "imports": [
+        "HolonicsResearch.Foundation.ProductDegreeTwoNormalization"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Foundation.ProductDegreeTwoNormalization"
+      ]
+    },
+    "Holonics.Foundation.TransportLift": {
+      "source": {
+        "private_machine_path_sha256": "642f199bbab1932b0b4bf0bd2a98cf045061fe2a1b7f1c9c5802099fbdfe18e9"
+      },
+      "pin": {
+        "sha256": "1de68847c8ec65e16088eaa89d09fc6b60546e9c32e5d2c865d26191ea54b113",
+        "bytes": 5724
+      },
+      "imports": [
+        "Holonics.Foundation.Receiver",
+        "Mathlib.Algebra.Group.Subgroup.Ker"
+      ],
+      "local_providers": [
+        "Holonics.Foundation.Receiver"
+      ]
+    },
+    "HolonicsResearch.Geometry.DivisorAtlas": {
+      "source": {
+        "private_machine_path_sha256": "2e21059bbb0248c03a6dd6958a3fe896c2a1fb71d101ccccd0854d0368282e7f"
+      },
+      "pin": {
+        "sha256": "e6124e395f762632e77052eb8ec03efa631e385c5da0d2a49970d4230f6ed77c",
+        "bytes": 7335
+      },
+      "imports": [
+        "Mathlib.Data.Finsupp.Defs",
+        "Mathlib.Tactic"
+      ],
+      "local_providers": []
+    },
+    "HolonicsResearch.Hodge.HodgeConjecture": {
+      "source": {
+        "private_machine_path_sha256": "ee1e5e494b5d84c97aea41b684426bc714b451e9aed16c023c383f446a832ccb"
+      },
+      "pin": {
+        "sha256": "34434503c36f7afef71fc912b1fa2b3004867c28cd52e12b916400f737c73161",
+        "bytes": 4143
+      },
+      "imports": [
+        "Mathlib.LinearAlgebra.Span.Basic",
+        "Mathlib.Data.Rat.Lemmas",
+        "Mathlib.Algebra.Category.ModuleCat.Basic"
+      ],
+      "local_providers": []
+    },
+    "HolonicsResearch.Hodge.HodgeConstructivePassage": {
+      "source": {
+        "private_machine_path_sha256": "f08697880048d507c9af60e807455336d0d5abc093daad88a6eb726612722a1c"
+      },
+      "pin": {
+        "sha256": "12407e6d12e10598183eb3e64c63fa9f4eeca3a3a95605e0f706601ce142471f",
+        "bytes": 29469
+      },
+      "imports": [
+        "Holonics.Foundation.TransportLift",
+        "HolonicsResearch.Geometry.DivisorAtlas",
+        "HolonicsResearch.Hodge.HodgeConjecture",
+        "Mathlib.LinearAlgebra.FiniteDimensional.Basic",
+        "Mathlib.LinearAlgebra.BilinearForm.Orthogonal"
+      ],
+      "local_providers": [
+        "Holonics.Foundation.TransportLift",
+        "HolonicsResearch.Geometry.DivisorAtlas",
+        "HolonicsResearch.Hodge.HodgeConjecture"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeProjectiveLineProduct": {
+      "source": {
+        "private_machine_path_sha256": "01509b8c2e5e9f70123c1af016d3d2507277f261bb7ceee6f79dde07d0bce96d"
+      },
+      "pin": {
+        "sha256": "12260eab695684c91b9760b6c47df91596c319112a94baca483dc51904cb9181",
+        "bytes": 17399
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeConstructivePassage",
+        "Mathlib.LinearAlgebra.Projectivization.Basic",
+        "Mathlib.LinearAlgebra.StdBasis"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeConstructivePassage"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeProjectiveLineAtlas": {
+      "source": {
+        "private_machine_path_sha256": "c057e8b0f26ffde85273fe3651f4d95b9ef3017b98a836757b02fe1aaf3df7d4"
+      },
+      "pin": {
+        "sha256": "468dcf0fa8f03be69d6b9132925a07579820377bcd43421dbe12413b83cc75aa",
+        "bytes": 13142
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeProjectiveLineProduct"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeProjectiveLineProduct"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeProjectiveLineDivisors": {
+      "source": {
+        "private_machine_path_sha256": "9f8dd07183efb1e661210f6904bc8a34cb8db6d626c479d6f104223655836377"
+      },
+      "pin": {
+        "sha256": "e0dd0c09ab73c7c4d80075571de98c9bd22b69684d2b59cbe55ee9c1a5718ff5",
+        "bytes": 11215
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeProjectiveLineAtlas"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeProjectiveLineAtlas"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeProjectiveLineHolomorphicAtlas": {
+      "source": {
+        "private_machine_path_sha256": "8676092e34a6d861f3013cf3f9faa7c6dc3d0966fe5fe9b1a62278aaabf8fa81"
+      },
+      "pin": {
+        "sha256": "b6612f95cbc888c19155362c33568d85935c71274d5915363310cac0337e9c01",
+        "bytes": 9119
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeProjectiveLineDivisors",
+        "Mathlib.Analysis.Calculus.Deriv.Inv"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeProjectiveLineDivisors"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeProjectiveLineCellularCohomology": {
+      "source": {
+        "private_machine_path_sha256": "8215adf10bc8a7232d1826867e5ff130d015715dcbd69e869b1ce94398d89f50"
+      },
+      "pin": {
+        "sha256": "7050654bfbf281ccfd5ff5f5e589a6b84dba5b6df0e98e8871e709b6cadf3568",
+        "bytes": 12389
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeProjectiveLineHolomorphicAtlas"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeProjectiveLineHolomorphicAtlas"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeProjectiveLineTopology": {
+      "source": {
+        "private_machine_path_sha256": "3912ff08befec01407195ad137069f301f06d0c8020104be9f7e6edb38506545"
+      },
+      "pin": {
+        "sha256": "fb50b81304eccd8ad8da2b7ae41fc2cc893b39b40f73a2b6de40f902f9c2be45",
+        "bytes": 5430
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeProjectiveLineCellularCohomology",
+        "Mathlib.Topology.Compactification.OnePoint.Sphere"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeProjectiveLineCellularCohomology"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeProjectiveLineSegre": {
+      "source": {
+        "private_machine_path_sha256": "f076b90fe7586385a90bb9c48ae3036acded7e2c34e764dccb04cf80eb27b94e"
+      },
+      "pin": {
+        "sha256": "d8c56c00be70e3330202a87b65ac775f1ed9cc2cd9eb7053cd858025f8dc4b4f",
+        "bytes": 11657
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeProjectiveLineTopology"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeProjectiveLineTopology"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeProjectiveLineSingularReduction": {
+      "source": {
+        "private_machine_path_sha256": "54e6e850ab13a478818280c6c9c6769227e0435c3fba2b4cbb3532964a5979af"
+      },
+      "pin": {
+        "sha256": "7e245ed5230c4456e9c7a53dc2214b71327c8df5470f1a50b18effbbc528ebfe",
+        "bytes": 5919
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeProjectiveLineSegre",
+        "Mathlib.Algebra.Category.ModuleCat.Topology.Homology",
+        "Mathlib.AlgebraicTopology.SingularHomology.Basic"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeProjectiveLineSegre"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeTwoSphereFundamentalCycle": {
+      "source": {
+        "private_machine_path_sha256": "c4fa896adf1a0b2fd722345a134c90d7a7c965f802c097bd6b69bc967e8cec87"
+      },
+      "pin": {
+        "sha256": "bb914755b5db1350033c21e53f5361ae9a5926c9f83d22e9dbb6a5b115e6f5d1",
+        "bytes": 13608
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeProjectiveLineTopology",
+        "HolonicsResearch.Hodge.HodgeProjectiveLineSingularReduction",
+        "Mathlib.Analysis.Normed.Module.Normalize"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeProjectiveLineTopology",
+        "HolonicsResearch.Hodge.HodgeProjectiveLineSingularReduction"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeSphereProductFiniteComplex": {
+      "source": {
+        "private_machine_path_sha256": "150e013749ea58b9b4a742f9afda9a701fe49c64800e4c58ff93811bf20e9144"
+      },
+      "pin": {
+        "sha256": "c97d27ee95875fb74e639cd0df20d3dd156afdc49122931f5e988648366a65ef",
+        "bytes": 7822
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeProjectiveLineSingularReduction",
+        "Mathlib.Algebra.Homology.SingleHomology",
+        "Mathlib.Algebra.Homology.Homotopy"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeProjectiveLineSingularReduction"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeSphereProductRulingCycles": {
+      "source": {
+        "private_machine_path_sha256": "9481deab40360095855ce7d3aaf71dc4ca76b502f4ebd3baca800dcbca7e82db"
+      },
+      "pin": {
+        "sha256": "ed035f571fc197b10b125cb95fe84164990f83c7502df40a86d1700404d76e31",
+        "bytes": 2804
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeTwoSphereFundamentalCycle",
+        "HolonicsResearch.Hodge.HodgeSphereProductFiniteComplex"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeTwoSphereFundamentalCycle",
+        "HolonicsResearch.Hodge.HodgeSphereProductFiniteComplex"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeSphereProductRulingHomology": {
+      "source": {
+        "private_machine_path_sha256": "346ce23d1aa4baee46da3d554997eaee608b2be0b44ed90bcaba0f256bb04fd3"
+      },
+      "pin": {
+        "sha256": "5dee3f335aaecd6f74cf344406779dd71cb69f281ce6621ad038be049763d414",
+        "bytes": 3874
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeSphereProductRulingCycles"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeSphereProductRulingCycles"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeTetrahedralSphereComplex": {
+      "source": {
+        "private_machine_path_sha256": "a647237a9e7ae74c0222ec76be946e5a19213abcf09925440f2c999d31ca2f98"
+      },
+      "pin": {
+        "sha256": "770d2b20c26e097b8e458d134d3c44206559514323e2e0adf0e242d9d5b980e4",
+        "bytes": 7953
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeTwoSphereFundamentalCycle"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeTwoSphereFundamentalCycle"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeSphereProductRulingProjections": {
+      "source": {
+        "private_machine_path_sha256": "b15591ca806ef97f0e47b7834931ed84f25d0decedb954d6cccecf550b02312d"
+      },
+      "pin": {
+        "sha256": "e2706b87a1fb7cac934d261657ff426bd7f8b461fa23a1e4dfcdca195c98ddc8",
+        "bytes": 20952
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeSphereProductRulingHomology",
+        "HolonicsResearch.Hodge.HodgeTetrahedralSphereComplex"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeSphereProductRulingHomology",
+        "HolonicsResearch.Hodge.HodgeTetrahedralSphereComplex"
+      ]
+    },
+    "HolonicsResearch.Foundation.OrderedWordChain": {
+      "source": {
+        "private_machine_path_sha256": "93d2fa71851ffd4ed3f591513f216ee53aac69bb1238c7aa2269ed297651b61f"
+      },
+      "pin": {
+        "sha256": "5b45b80c1211b7899af581270aaf0b7b5f8cbc4bcedbdd1c94433aea3f051678",
+        "bytes": 9595
+      },
+      "imports": [
+        "Holonics.Foundation.Holon"
+      ],
+      "local_providers": [
+        "Holonics.Foundation.Holon"
+      ]
+    },
+    "Holonics.Foundation.BoundaryReceiver": {
+      "source": {
+        "private_machine_path_sha256": "3c5f9343f4f25cdf7587e86b437df2dd10046f9acb83aad02813a2574d522da9"
+      },
+      "pin": {
+        "sha256": "89a378888ba68da287dfc83df15fdebf9b4b72b143dec3953d8625fcfc8146d1",
+        "bytes": 2138
+      },
+      "imports": [
+        "Mathlib.Algebra.Group.Subgroup.Ker"
+      ],
+      "local_providers": []
+    },
+    "HolonicsResearch.Hodge.HodgeSphereFundamentalDetector": {
+      "source": {
+        "private_machine_path_sha256": "5b258ebf7b0e1d6d8a3723cbba5bb2d221546ed59cbf54b801e29323a3864bee"
+      },
+      "pin": {
+        "sha256": "b65e5ca646df5072c8ead639c4e6796c4f2565ca91b1ed6af5a990c2256335fb",
+        "bytes": 8382
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeSphereProductRulingProjections",
+        "Holonics.Foundation.BoundaryReceiver"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeSphereProductRulingProjections",
+        "Holonics.Foundation.BoundaryReceiver"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeTetrahedralChainComplex": {
+      "source": {
+        "private_machine_path_sha256": "beaf3f6c0aa8f8f3b46ec79d52b590340bf4a31417539d061ba1c17b42edf6be"
+      },
+      "pin": {
+        "sha256": "65680eca17c391f171ac47fd57be3374400e9000c4878f9b18da44d7402eeb9e",
+        "bytes": 6364
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeTetrahedralSphereComplex"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeTetrahedralSphereComplex"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeTetrahedralRealizationChainMap": {
+      "source": {
+        "private_machine_path_sha256": "0eb6afd3f9270f913b26f506936bc808c87b430e36894ac9e16f136efc8dccd0"
+      },
+      "pin": {
+        "sha256": "646bb6ca3a87a392facd45a532cb0ccd6b63e60ce25d64c01a2f0806517c293d",
+        "bytes": 9552
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeTetrahedralChainComplex"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeTetrahedralChainComplex"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeTetrahedralReduction": {
+      "source": {
+        "private_machine_path_sha256": "9805d7e34eaf8d574b4e52ca1107cb478e9c2f0bf618ec1d195bccc67eee9ada"
+      },
+      "pin": {
+        "sha256": "e7999d57bc60deab6a8363d1e9867f69074af6776e369a892abacc5801f9bc87",
+        "bytes": 4916
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeSphereFundamentalDetector",
+        "HolonicsResearch.Hodge.HodgeTetrahedralRealizationChainMap"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeSphereFundamentalDetector",
+        "HolonicsResearch.Hodge.HodgeTetrahedralRealizationChainMap"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeTetrahedralCarrierAssembly": {
+      "source": {
+        "private_machine_path_sha256": "c01ed5f1c665189f64831e31f83f3b8b3f61a7ee5e02bef961060a42df755669"
+      },
+      "pin": {
+        "sha256": "f4d23e31fbc1edeaa76ce847261ca8f1d3d56432757895bcaf8448aac516e8c9",
+        "bytes": 9892
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeTetrahedralReduction"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeTetrahedralReduction"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeStellarSubdivision": {
+      "source": {
+        "private_machine_path_sha256": "34bc1b6aef83b8bd1999d1e850e9e449965a798343be57cebe95871a7b177775"
+      },
+      "pin": {
+        "sha256": "31be3a2d00082e000f8e33d8aaa57a011324e9031038318c1997cee86caf6cc3",
+        "bytes": 17198
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeTetrahedralCarrierAssembly"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeTetrahedralCarrierAssembly"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeTetrahedralStellarSubdivision": {
+      "source": {
+        "private_machine_path_sha256": "38c0f7cae22c7bc4da1c467ab344594043092a9db185e94bdec137455b7fcfa5"
+      },
+      "pin": {
+        "sha256": "13527b3051f4b9cd9ea4d1ff537fcba418df9ae333c4f72ec6bc27fe4d359ece",
+        "bytes": 23193
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeStellarSubdivision"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeStellarSubdivision"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeStellarSubdivisionHomotopy": {
+      "source": {
+        "private_machine_path_sha256": "1685994d35c7f5162b3f21b571a5e568f2419b55dbea5502eb8d0df6e947aece"
+      },
+      "pin": {
+        "sha256": "0e3d91a93053bff8960e28d0463dc061643098f47da8fd3bceba114d3e894cb8",
+        "bytes": 22097
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeTetrahedralStellarSubdivision"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeTetrahedralStellarSubdivision"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeStellarSubdivisionMeshObstruction": {
+      "source": {
+        "private_machine_path_sha256": "1011e0f55fc2eadd06adc58f9fa1797c6f122104e40d3c89d79e66bc9bb95814"
+      },
+      "pin": {
+        "sha256": "589df67d45eb2571634dc9cbaf8cc7b3d4f7e761f866b4c04d8c4f1784c765f0",
+        "bytes": 4970
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeStellarSubdivisionHomotopy"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeStellarSubdivisionHomotopy"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeBarycentricEdgeSubdivision": {
+      "source": {
+        "private_machine_path_sha256": "ab11f0481ccab42d093326d3dd825c10df508b26665749cd37807050cd831665"
+      },
+      "pin": {
+        "sha256": "c9141294702ed464d4ddf502300ddeefe63109c7c5812391727afa8497e700c7",
+        "bytes": 13028
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeStellarSubdivisionMeshObstruction"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeStellarSubdivisionMeshObstruction"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeBarycentricTriangleSubdivision": {
+      "source": {
+        "private_machine_path_sha256": "4e7d1e51a890cfd257bbb84e50276c6aa4792029338fffd566a3e5481188a8c2"
+      },
+      "pin": {
+        "sha256": "3c6d6beeb93165d3232a87d1c0866dcddc74075ea9d8634350b4532494b3b249",
+        "bytes": 20329
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeBarycentricEdgeSubdivision"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeBarycentricEdgeSubdivision"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeBarycentricCoverSmallness": {
+      "source": {
+        "private_machine_path_sha256": "ac43d1583a205759c526fce23681a28105570fdff2856a6a794dbd39ef761b9e"
+      },
+      "pin": {
+        "sha256": "b65af5e93cd4016af6596028f050bdf9c5bf59eeda273d316940d875cc0810bf",
+        "bytes": 9231
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeBarycentricTriangleSubdivision",
+        "Mathlib.Topology.MetricSpace.Pseudo.Lemmas"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeBarycentricTriangleSubdivision"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeBarycentricSubdivisionHomotopy": {
+      "source": {
+        "private_machine_path_sha256": "46e2000c578e168f9935cdb1fef1a820db7b4ff1a75953241d470fe592620a8f"
+      },
+      "pin": {
+        "sha256": "1457f570d864736aba66dea8ef2c22f94cc1255bfb754cda479cd53ed4de4584",
+        "bytes": 18513
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeBarycentricCoverSmallness"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeBarycentricCoverSmallness"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeBarycentricDegreeTwoFilling": {
+      "source": {
+        "private_machine_path_sha256": "14bc238fc2634b2f3047e0f340a92bdda8c0eda27ba0420aeb59f5320d514398"
+      },
+      "pin": {
+        "sha256": "f9f9ceb5fbb1c5ca2c7aa8473a9f77b7bc9209306218afe822c8ecddc4c891c0",
+        "bytes": 4749
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeBarycentricSubdivisionHomotopy"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeBarycentricSubdivisionHomotopy"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeBarycentricAffineSourceComplex": {
+      "source": {
+        "private_machine_path_sha256": "fc6b13214d6b19abbbccefbd6930fd6bc2455e3c9572ba27a95d524cf44a7f32"
+      },
+      "pin": {
+        "sha256": "787fc2616f94fbea3a06e16354a855d0dae3dad4749f73587f4a754a477469ec",
+        "bytes": 27689
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeBarycentricDegreeTwoFilling"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeBarycentricDegreeTwoFilling"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeBarycentricTetrahedron": {
+      "source": {
+        "private_machine_path_sha256": "ccabf87e28972b2cba96d0c8275106afbaa6cad2cf10e1bd0058343eda2a730d"
+      },
+      "pin": {
+        "sha256": "b0a19f9ced12172694a1ce093bf92afe12612c9c31b9c1817f6db67ab8617706",
+        "bytes": 33774
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeBarycentricTriangleSubdivision",
+        "HolonicsResearch.Hodge.HodgeTetrahedralStellarSubdivision"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeBarycentricTriangleSubdivision",
+        "HolonicsResearch.Hodge.HodgeTetrahedralStellarSubdivision"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeRefinementWords": {
+      "source": {
+        "private_machine_path_sha256": "4a58ca8e527624580e6067603e861f67a22e32ea8e5cdd5db30491ecb9e2bdba"
+      },
+      "pin": {
+        "sha256": "77f86b690108377f83aa013920638a3377c9331c91647dfdc79c268c9dcf6c29",
+        "bytes": 17386
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeBarycentricTetrahedron",
+        "HolonicsResearch.Hodge.HodgeBarycentricTriangleSubdivision",
+        "HolonicsResearch.Hodge.HodgeBarycentricEdgeSubdivision"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeBarycentricTetrahedron",
+        "HolonicsResearch.Hodge.HodgeBarycentricTriangleSubdivision",
+        "HolonicsResearch.Hodge.HodgeBarycentricEdgeSubdivision"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeIteratedBarycentricHomology": {
+      "source": {
+        "private_machine_path_sha256": "5656dee25e44bc9c137874562be8fd6a23e5d2e045e15d3ef58b4ddcacc03ae2"
+      },
+      "pin": {
+        "sha256": "742b533960e2ba8d201723c7994d13cd29a42d047f0351518c51df3437aa9b11",
+        "bytes": 4779
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeBarycentricAffineSourceComplex",
+        "HolonicsResearch.Hodge.HodgeRefinementWords"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeBarycentricAffineSourceComplex",
+        "HolonicsResearch.Hodge.HodgeRefinementWords"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeBarycentricTetrahedronCoverSmallness": {
+      "source": {
+        "private_machine_path_sha256": "21178f1871dc8e21c12fc186c6ff2b312b03a1d45315ef7533155eb3f2e390f3"
+      },
+      "pin": {
+        "sha256": "01e65cf0e9039a1e37c0eb3eae0690dc1801161a44ddb2765defaf57fceae50e",
+        "bytes": 9635
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeBarycentricTetrahedron",
+        "Mathlib.Topology.MetricSpace.Pseudo.Lemmas"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeBarycentricTetrahedron"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeTetrahedralLabelCarry": {
+      "source": {
+        "private_machine_path_sha256": "1a82022bb4770edac5ac48b6fc3d6227eab10252bd79c13fff30a95195d066b1"
+      },
+      "pin": {
+        "sha256": "7eac1ab4ce3468754e7933721e0d42033e6b2a94e689f3aa53926bfebf078cfe",
+        "bytes": 15159
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeTetrahedralCarrierAssembly"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeTetrahedralCarrierAssembly"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeTetrahedralStarCover": {
+      "source": {
+        "private_machine_path_sha256": "34dcd2274297587419346e6879808fdfa82821b0a71ceba49f895a76d0f79cb9"
+      },
+      "pin": {
+        "sha256": "10eaeab541e794ae9e5d96ab00497b24ec2df05424b5d98003b2723be190103f",
+        "bytes": 6945
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeTetrahedralLabelCarry"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeTetrahedralLabelCarry"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeFiniteClosedStarLabeling": {
+      "source": {
+        "private_machine_path_sha256": "36cad2712aed55ed6dd5eb9895d513267c95db4e2bf6284e44d29772e33d3ffa"
+      },
+      "pin": {
+        "sha256": "0a188e47698d67b6a692644e45ed2641075cc39998ce1c4e2195150f21168799",
+        "bytes": 9061
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeBarycentricTetrahedronCoverSmallness",
+        "HolonicsResearch.Hodge.HodgeTetrahedralStarCover"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeBarycentricTetrahedronCoverSmallness",
+        "HolonicsResearch.Hodge.HodgeTetrahedralStarCover"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeRadialSpernerCarry": {
+      "source": {
+        "private_machine_path_sha256": "20c13fc20786bc4d264f7f9b3513c6c915faa6a4c46f0366a0eb5de650497aad"
+      },
+      "pin": {
+        "sha256": "acc86d07e38ef1a567ed8718961ae6179860657dbea608e4ead8bb1f1fdc0be0",
+        "bytes": 11140
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeFiniteClosedStarLabeling"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeFiniteClosedStarLabeling"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeBarycentricChainSupport": {
+      "source": {
+        "private_machine_path_sha256": "b7163e1ea006d382a2a41aba90239668abb669dbcacc2b22cb55225ebbd691eb"
+      },
+      "pin": {
+        "sha256": "c396dfab0bcd71e1ca1f5913130fb0c3f295d146c57b1bc4775c28513c7c8dc5",
+        "bytes": 8154
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeBarycentricSubdivisionHomotopy",
+        "Mathlib.Algebra.Category.ModuleCat.Products"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeBarycentricSubdivisionHomotopy"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgePointCarry": {
+      "source": {
+        "private_machine_path_sha256": "b49b135469a1862a8c9b3a49d96a3f05dde0aecde7a6388c0df0dedf0217976c"
+      },
+      "pin": {
+        "sha256": "9dabeda0ca86a3755b7f4b9db2026b85db691ab75bc7c8d1dbfc2ff9694b849d",
+        "bytes": 21816
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeRadialSpernerCarry",
+        "HolonicsResearch.Hodge.HodgeBarycentricChainSupport"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeRadialSpernerCarry",
+        "HolonicsResearch.Hodge.HodgeBarycentricChainSupport"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeRadialCurrent": {
+      "source": {
+        "private_machine_path_sha256": "4d0faa7b8fb0ba1d55c3825463577a1b847b57fcc12b99d1e2aada80ad2adf47"
+      },
+      "pin": {
+        "sha256": "94142d8eeb6d455a49a32de8a9367c658575b7f2073acb4052b5ed0e4c708b80",
+        "bytes": 27770
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgePointCarry",
+        "HolonicsResearch.Hodge.HodgeRefinementWords",
+        "HolonicsResearch.Hodge.HodgeTetrahedralRealizationChainMap"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgePointCarry",
+        "HolonicsResearch.Hodge.HodgeRefinementWords",
+        "HolonicsResearch.Hodge.HodgeTetrahedralRealizationChainMap"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeRefinedCycleCarrier": {
+      "source": {
+        "private_machine_path_sha256": "cc73da8399c01b3b263564eb0f5e254352a15144c69b3d8034a28e2ac82c83f2"
+      },
+      "pin": {
+        "sha256": "96ef56aa34f99f9dd3fe4551693eb750deea0100a1aa6758573422baf752aa92",
+        "bytes": 4221
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeIteratedBarycentricHomology",
+        "HolonicsResearch.Hodge.HodgeRadialCurrent"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeIteratedBarycentricHomology",
+        "HolonicsResearch.Hodge.HodgeRadialCurrent"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeRefinedTriangleClosedStar": {
+      "source": {
+        "private_machine_path_sha256": "8033b6b988c04c0dfaf0de72ef81cc9421e4c2c7801e7600f64a5b8d8b2c6ddb"
+      },
+      "pin": {
+        "sha256": "9eee69d36b0d761d307b60f309d2a324c7ecff4e89a69b580fce6dfc275c7356",
+        "bytes": 10631
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeRefinedCycleCarrier",
+        "HolonicsResearch.Hodge.HodgeFiniteClosedStarLabeling"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeRefinedCycleCarrier",
+        "HolonicsResearch.Hodge.HodgeFiniteClosedStarLabeling"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeTetrahedralBoundaryCoordinates": {
+      "source": {
+        "private_machine_path_sha256": "01b486e196fbcc3bf4c89db2edc2e0ca223dfa3abe4e7487ed36f591ce4b77b2"
+      },
+      "pin": {
+        "sha256": "0baa1a3f67e857035eaea1c137d996c2f9ba9b4c0f41017ec56e48da8fa1b463",
+        "bytes": 9797
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeRefinedTriangleClosedStar"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeRefinedTriangleClosedStar"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeTetrahedralBoundaryRadial": {
+      "source": {
+        "private_machine_path_sha256": "57f9ef6c2c8d40d08cd32ec3b69d416ca9ffeaa3a84639e1096049dc78661350"
+      },
+      "pin": {
+        "sha256": "0faa77e8b370a1aecebd013956e51e889834053cc6a1cf6f377f274e221a6a20",
+        "bytes": 12421
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeTetrahedralBoundaryCoordinates"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeTetrahedralBoundaryCoordinates"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeTetrahedralStarContraction": {
+      "source": {
+        "private_machine_path_sha256": "464fb2a36e1f4442849921d857591c6bf945ad919f2f1cdb50e0d59b1bd94a2b"
+      },
+      "pin": {
+        "sha256": "b15c28078709b328b2dbc8c0941da4f0cc5332b3a72d5344bbcff61440031a64",
+        "bytes": 10670
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeTetrahedralBoundaryRadial",
+        "Mathlib.Topology.Homotopy.Affine"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeTetrahedralBoundaryRadial"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeCommonStarAffineCarrier": {
+      "source": {
+        "private_machine_path_sha256": "8c5698160c9dcc36dd19e0ca16bbef23c16e9a55bf738b423875636b5d0c0bd2"
+      },
+      "pin": {
+        "sha256": "de4bf579a99622fa86cb8df6a2a0717172c2d867cf460e50b73193e49242d43d",
+        "bytes": 40913
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeTetrahedralStarContraction"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeTetrahedralStarContraction"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeRefinedTriangleAffineCarrier": {
+      "source": {
+        "private_machine_path_sha256": "ce86f88a3334209b0b97e7b226e1cd61aa0c925d47c5851d93801fc92c9eea03"
+      },
+      "pin": {
+        "sha256": "e7d2ece609e11e8195723fa2d800f323c6dee95c1174f5c385f6e407c19de622",
+        "bytes": 13349
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeCommonStarAffineCarrier",
+        "HolonicsResearch.Hodge.HodgeRefinedTriangleClosedStar"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeCommonStarAffineCarrier",
+        "HolonicsResearch.Hodge.HodgeRefinedTriangleClosedStar"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeTriangleHomotopyPrism": {
+      "source": {
+        "private_machine_path_sha256": "ef9c51f0ecaf6e7c39750481f53b55351120fe706d8d6c98f49e9459cca696ab"
+      },
+      "pin": {
+        "sha256": "1826069b49ecf6ec7a86e5472722f94ca72b8c096e818c37fe5bc072d0aeddb0",
+        "bytes": 80207
+      },
+      "imports": [
+        "Holonics.Foundation.Holon",
+        "HolonicsResearch.Hodge.HodgeRefinedTriangleAffineCarrier"
+      ],
+      "local_providers": [
+        "Holonics.Foundation.Holon",
+        "HolonicsResearch.Hodge.HodgeRefinedTriangleAffineCarrier"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeLabelWordContraction": {
+      "source": {
+        "private_machine_path_sha256": "b63aa0b5855c710892013e5457418ea390c3e5bf9dc33529bc29b790e09ed0e6"
+      },
+      "pin": {
+        "sha256": "ec171f7016b978fb4205e3fdad04b0872cdc09099437c916cb8b4a6148a4ca37",
+        "bytes": 31721
+      },
+      "imports": [
+        "HolonicsResearch.Foundation.OrderedWordChain",
+        "HolonicsResearch.Hodge.HodgeTriangleHomotopyPrism",
+        "Mathlib.LinearAlgebra.Finsupp.Supported"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Foundation.OrderedWordChain",
+        "HolonicsResearch.Hodge.HodgeTriangleHomotopyPrism"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeLabelEdgeCancellation": {
+      "source": {
+        "private_machine_path_sha256": "ab703059bc5fb429feb5497b340cacae0b5d528f2109df0e0b5e60fd36351989"
+      },
+      "pin": {
+        "sha256": "8a8b43aa41dbddcd453c6dc4c6bc707fb5f4ecd50250df1835527a376821caeb",
+        "bytes": 10402
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeTriangleHomotopyPrism"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeTriangleHomotopyPrism"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeCommonStarNormalization": {
+      "source": {
+        "private_machine_path_sha256": "ed94891d6a71180f9f10bae1cf17e06ea7a3be05bc26c0d22edffbcbbeebf5e7"
+      },
+      "pin": {
+        "sha256": "cf24dca229784e5339b41726f2a69c3b9102f25848a8e1ce9687a86fd619a2a0",
+        "bytes": 6889
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeLabelWordContraction",
+        "HolonicsResearch.Hodge.HodgeLabelEdgeCancellation"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeLabelWordContraction",
+        "HolonicsResearch.Hodge.HodgeLabelEdgeCancellation"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeFiniteCarrier": {
+      "source": {
+        "private_machine_path_sha256": "5072d3a60e8c14768dbba24ae1d6a1e7113ab78b73e16ef742d90667b923ff0e"
+      },
+      "pin": {
+        "sha256": "2517b67de71e818d79687a8587a97cb0a38248e22328bba8b706fca2cbf7917b",
+        "bytes": 14145
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeBarycentricChainSupport",
+        "HolonicsResearch.Hodge.HodgeTetrahedralStarCover"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeBarycentricChainSupport",
+        "HolonicsResearch.Hodge.HodgeTetrahedralStarCover"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeRefinedBoundaryObstruction": {
+      "source": {
+        "private_machine_path_sha256": "23c9fc15470272750f78c99ce87cd1662b78f82a8a73945f50050e7762a9b55e"
+      },
+      "pin": {
+        "sha256": "9ddcdbadadb5b1aca68a730efcc309d9a0ba66cf3f84073c83137c2f1f7f99c1",
+        "bytes": 10796
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeRadialCurrent",
+        "HolonicsResearch.Hodge.HodgeFiniteCarrier",
+        "HolonicsResearch.Hodge.HodgeSphereProductRulingProjections",
+        "Mathlib.Algebra.Homology.ShortComplex.ModuleCat"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeRadialCurrent",
+        "HolonicsResearch.Hodge.HodgeFiniteCarrier",
+        "HolonicsResearch.Hodge.HodgeSphereProductRulingProjections"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeSphereHomologyEquivalence": {
+      "source": {
+        "private_machine_path_sha256": "9e5254aea0ddef342c5bc6cbd7946ac3393b191f66652fa74b8236471b86a617"
+      },
+      "pin": {
+        "sha256": "e9fd1558e5c9d9bee80bff2c88e9fc99c057b78bf7b39b48bbf006ce6885761d",
+        "bytes": 6431
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeCommonStarNormalization",
+        "HolonicsResearch.Hodge.HodgeRefinedBoundaryObstruction"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeCommonStarNormalization",
+        "HolonicsResearch.Hodge.HodgeRefinedBoundaryObstruction"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeProductDiagonal": {
+      "source": {
+        "private_machine_path_sha256": "1491e0fba7e7e8acb02f6694455232ee06717b7822982c41fb6be4e7fb64ffe7"
+      },
+      "pin": {
+        "sha256": "cc737e41d69ec55c29a15898f405bd555bc0f40ab65713789840fc4cded2a8a2",
+        "bytes": 84009
+      },
+      "imports": [
+        "HolonicsResearch.Foundation.ProductDegreeTwo",
+        "HolonicsResearch.Hodge.HodgeSphereProductRulingProjections",
+        "HolonicsResearch.Hodge.HodgeSphereHomologyEquivalence",
+        "HolonicsResearch.Hodge.HodgeSphereFundamentalDetector",
+        "Mathlib.LinearAlgebra.Basis.VectorSpace"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Foundation.ProductDegreeTwo",
+        "HolonicsResearch.Hodge.HodgeSphereProductRulingProjections",
+        "HolonicsResearch.Hodge.HodgeSphereHomologyEquivalence",
+        "HolonicsResearch.Hodge.HodgeSphereFundamentalDetector"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeBarycentricEdgeCoverSmallness": {
+      "source": {
+        "private_machine_path_sha256": "4ca69ed74e922a76bcbb6597a69ca1e2b07f86d0c3c2b01fdc1d546a5d83d093"
+      },
+      "pin": {
+        "sha256": "62a7ea0f2e14d85213a6266c085cebab07b4c056160a1a20c779776e3e4a57c2",
+        "bytes": 9339
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeRefinementWords",
+        "Mathlib.Topology.MetricSpace.Pseudo.Lemmas"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeRefinementWords"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeRefinedEdgeClosedStar": {
+      "source": {
+        "private_machine_path_sha256": "137992db6679bece0f97d5e249dac6ba31e737111bcc8540ead087e18dfbaf3c"
+      },
+      "pin": {
+        "sha256": "a827fc68376c5090ce85fe6d9e0f69b62c53d7abccbea6179447560748611382",
+        "bytes": 12681
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeBarycentricEdgeCoverSmallness",
+        "HolonicsResearch.Hodge.HodgeFiniteClosedStarLabeling",
+        "HolonicsResearch.Hodge.HodgePointCarry"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeBarycentricEdgeCoverSmallness",
+        "HolonicsResearch.Hodge.HodgeFiniteClosedStarLabeling",
+        "HolonicsResearch.Hodge.HodgePointCarry"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeRefinedEdgeAffineCarrier": {
+      "source": {
+        "private_machine_path_sha256": "7370fd615efec164dc32e54fd0fc6b1800c40e05778da9cd2e7069ca02c5ff8c"
+      },
+      "pin": {
+        "sha256": "fd3501002fa8e4158fadf2c233ad0cfa15df41ada56cdb90e35001a9922766ce",
+        "bytes": 9377
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeRefinedEdgeClosedStar",
+        "HolonicsResearch.Hodge.HodgeCommonStarAffineCarrier"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeRefinedEdgeClosedStar",
+        "HolonicsResearch.Hodge.HodgeCommonStarAffineCarrier"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeSphereDegreeOneFilling": {
+      "source": {
+        "private_machine_path_sha256": "92fa50ad9b35e24a9b408dd8013b80bdc211255e8125587d67cbae01a9a2eeaf"
+      },
+      "pin": {
+        "sha256": "86bce9e87315a17dcf259ef7df467427e20553333c4ac29b9be7283b237e5e0e",
+        "bytes": 26999
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeRefinedEdgeAffineCarrier",
+        "HolonicsResearch.Hodge.HodgeTriangleHomotopyPrism",
+        "HolonicsResearch.Hodge.HodgeBarycentricSubdivisionHomotopy",
+        "HolonicsResearch.Hodge.HodgeRadialCurrent",
+        "HolonicsResearch.Hodge.HodgeIteratedBarycentricHomology"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeRefinedEdgeAffineCarrier",
+        "HolonicsResearch.Hodge.HodgeTriangleHomotopyPrism",
+        "HolonicsResearch.Hodge.HodgeBarycentricSubdivisionHomotopy",
+        "HolonicsResearch.Hodge.HodgeRadialCurrent",
+        "HolonicsResearch.Hodge.HodgeIteratedBarycentricHomology"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeSphereChainCurrent": {
+      "source": {
+        "private_machine_path_sha256": "22affa5215b53e7f9d7aef5fb098201cccaa7b0f3eb3057a4e4c867ad21eddc5"
+      },
+      "pin": {
+        "sha256": "091a334e3a171012c3566fd93cf35432a16910dc3298b7082dcbbf21c24ec88e",
+        "bytes": 7565
+      },
+      "imports": [
+        "HolonicsResearch.Foundation.DiagonalChainTransport",
+        "HolonicsResearch.Hodge.HodgeSphereDegreeOneFilling"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Foundation.DiagonalChainTransport",
+        "HolonicsResearch.Hodge.HodgeSphereDegreeOneFilling"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeSphereLowDegreeHomology": {
+      "source": {
+        "private_machine_path_sha256": "619cbd693ffa1393b7eab626e399e352252b93403cb4159c017798d0bb603740"
+      },
+      "pin": {
+        "sha256": "8318f5f87f6602009b86398f4721807f4a900d6781e18b19a3ccfe27a0c63f8f",
+        "bytes": 5341
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeTwoSphereFundamentalCycle",
+        "Mathlib.AlgebraicTopology.SingularHomology.HomologyZero",
+        "Mathlib.Analysis.Normed.Module.Connected"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeTwoSphereFundamentalCycle"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeProductMixedFilling": {
+      "source": {
+        "private_machine_path_sha256": "5a19ebdcc766df8170d39e8d9df8779a9f9746feb5b950d5d5124cc60f5ebdbf"
+      },
+      "pin": {
+        "sha256": "9fa6ba333fd1d0f4e9b4bc1595d495d14734e67109e788fa4a7d26f6242613de",
+        "bytes": 73978
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeProductDiagonal",
+        "HolonicsResearch.Hodge.HodgeSphereChainCurrent",
+        "HolonicsResearch.Hodge.HodgeCommonStarNormalization",
+        "HolonicsResearch.Hodge.HodgeSphereLowDegreeHomology",
+        "HolonicsResearch.Foundation.ProductDegreeTwo",
+        "Mathlib.LinearAlgebra.DirectSum.Finsupp"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeProductDiagonal",
+        "HolonicsResearch.Hodge.HodgeSphereChainCurrent",
+        "HolonicsResearch.Hodge.HodgeCommonStarNormalization",
+        "HolonicsResearch.Hodge.HodgeSphereLowDegreeHomology",
+        "HolonicsResearch.Foundation.ProductDegreeTwo"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeProductRulingDecomposition": {
+      "source": {
+        "private_machine_path_sha256": "e3750e173357327f9cb21a7c11701df51ec1d0e72f90385517bb0be5a58f3af3"
+      },
+      "pin": {
+        "sha256": "e0ab94ed9f0e283115e9ad02442c0b92dc1be1fe88da4e7e6190dcb95381be28",
+        "bytes": 21153
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeProductMixedFilling",
+        "HolonicsResearch.Hodge.HodgeRefinedBoundaryObstruction"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeProductMixedFilling",
+        "HolonicsResearch.Hodge.HodgeRefinedBoundaryObstruction"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeProductSingularCohomologyDual": {
+      "source": {
+        "private_machine_path_sha256": "fedae74c3bbe888a0bfddb4e16c960406186fdc97fdf730be06d86e7cb590a1a"
+      },
+      "pin": {
+        "sha256": "17f89144751c1279222669c0ab35ba34d01e5a0b821aff70d9a82d4617bcb444",
+        "bytes": 6543
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeProductRulingDecomposition",
+        "Mathlib.LinearAlgebra.Dual.BaseChange"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeProductRulingDecomposition"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeSurfaceCycleClass": {
+      "source": {
+        "private_machine_path_sha256": "1eb90f36860812f47038c3ceb7a50aa04a59f5e9736639bd8719fb7f31419d81"
+      },
+      "pin": {
+        "sha256": "d01463217a8004ffdbd42721f1bc5b30da378494bf41ee4cb60086d2b0140a10",
+        "bytes": 4170
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeProductSingularCohomologyDual"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeProductSingularCohomologyDual"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeProjectiveLineType11Form": {
+      "source": {
+        "private_machine_path_sha256": "81ed1bbf4524361fa38eb1736a8737006a651c8598f87227bba672ccbb1a6cc1"
+      },
+      "pin": {
+        "sha256": "6d1e44f900f984170780c86fa4819d29e5f613f7c7cb0a42c8699b70cdb100fa",
+        "bytes": 11818
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeSurfaceCycleClass",
+        "Mathlib.Analysis.Calculus.DifferentialForm.Basic",
+        "Mathlib.Analysis.InnerProductSpace.TwoDim",
+        "Mathlib.MeasureTheory.Integral.CircleIntegral"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeSurfaceCycleClass"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeSurfaceType11Period": {
+      "source": {
+        "private_machine_path_sha256": "eecf3536d0d54322b059338bb5d05a9ac331f8f089136700a09c662a5f728741"
+      },
+      "pin": {
+        "sha256": "0c7edaa38bf6fba7326aed0fee9c9013ee145309461dcb6597ed8a6cab6abe56",
+        "bytes": 20786
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeProjectiveLineType11Form"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeProjectiveLineType11Form"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeProjectiveLinePowerType11": {
+      "source": {
+        "private_machine_path_sha256": "d4cb65da8aad26bad8613708f010d352e77cfd00a83a6de715fca63cf61466dd"
+      },
+      "pin": {
+        "sha256": "3da1876a436f31fa924f446c2838d571b09e7abaf404d6106581e51022a7ea72",
+        "bytes": 17010
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeSurfaceType11Period"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeSurfaceType11Period"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeSpherePowerRulingHomology": {
+      "source": {
+        "private_machine_path_sha256": "01ffcb77d2d740b176c764e9c5249c7c342f1a95558f87428169c290aca86f42"
+      },
+      "pin": {
+        "sha256": "61a94ce064ddf2b427f2b3a6c304dbf3bb62112ebe71988a2b378d9d2ee31cc8",
+        "bytes": 80123
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeProjectiveLinePowerType11",
+        "HolonicsResearch.Hodge.HodgeRefinedBoundaryObstruction",
+        "HolonicsResearch.Hodge.HodgeSphereHomologyEquivalence",
+        "HolonicsResearch.Hodge.HodgeProductRulingDecomposition",
+        "HolonicsResearch.Hodge.HodgeSphereProductFiniteComplex",
+        "Mathlib.Data.Fintype.Powerset"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeProjectiveLinePowerType11",
+        "HolonicsResearch.Hodge.HodgeRefinedBoundaryObstruction",
+        "HolonicsResearch.Hodge.HodgeSphereHomologyEquivalence",
+        "HolonicsResearch.Hodge.HodgeProductRulingDecomposition",
+        "HolonicsResearch.Hodge.HodgeSphereProductFiniteComplex"
+      ]
+    },
+    "HolonicsResearch.Foundation.CycleFilling": {
+      "source": {
+        "private_machine_path_sha256": "f918833b7657dd9667b8cfaa79c15507701a39c5f630e119748124efc19f9cff"
+      },
+      "pin": {
+        "sha256": "35cffb5eb3f831cfb1183b6c4abc03c3582bc15a7b2d3d55cf91018178fc1059",
+        "bytes": 2398
+      },
+      "imports": [
+        "Mathlib.Algebra.Homology.SingleHomology",
+        "Mathlib.Algebra.Homology.ShortComplex.ModuleCat"
+      ],
+      "local_providers": []
+    },
+    "HolonicsResearch.Hodge.HodgeSmoothProjectiveReceiver": {
+      "source": {
+        "private_machine_path_sha256": "e0525129cbd7c86f420b56431ae0a1e23017640356c78cc89f0ae2512e4b3c9f"
+      },
+      "pin": {
+        "sha256": "7adef626517bccb88d2e1515395829ae35eef6ca8a8d7b206b74d31931778397",
+        "bytes": 62120
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeConstructivePassage",
+        "HolonicsResearch.Hodge.HodgeProjectiveLineSingularReduction",
+        "Mathlib.AlgebraicGeometry.AlgebraicCycle.Basic",
+        "Mathlib.AlgebraicGeometry.Morphisms.Smooth",
+        "Mathlib.AlgebraicGeometry.ProjectiveSpectrum.Proper",
+        "Mathlib.Topology.KrullDimension",
+        "Mathlib.Data.Complex.Basic",
+        "Mathlib.Algebra.DirectSum.Module",
+        "Mathlib.Algebra.Module.Submodule.RestrictScalars",
+        "Mathlib.LinearAlgebra.Basis.VectorSpace",
+        "Mathlib.LinearAlgebra.TensorProduct.Basic"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeConstructivePassage",
+        "HolonicsResearch.Hodge.HodgeProjectiveLineSingularReduction"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeProjectiveSpaceAmbient": {
+      "source": {
+        "private_machine_path_sha256": "9102ebd365147de67d2dbf7c379991572c125b99c8226f5fab6726dfc11dd538"
+      },
+      "pin": {
+        "sha256": "a8deeea2c9c6b4f1482a297294e30bdbc9ed5a99055f5e195ce715950173b12e",
+        "bytes": 11607
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeSmoothProjectiveReceiver",
+        "Mathlib.AlgebraicGeometry.Morphisms.ClosedImmersion"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeSmoothProjectiveReceiver"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeProjectiveLineScheme": {
+      "source": {
+        "private_machine_path_sha256": "433a8b39d9f0a99505eff045631ee7a08bac8c1c2ed2d189049746f47d1fc27c"
+      },
+      "pin": {
+        "sha256": "099e23db1629ef7366e9043e1767e772f15138b71ba1a7ba7f79163d29387527",
+        "bytes": 27371
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeProjectiveSpaceAmbient",
+        "Mathlib.Algebra.Polynomial.Homogenize",
+        "Mathlib.AlgebraicGeometry.Morphisms.Smooth"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeProjectiveSpaceAmbient"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeProjectiveLineAnalyticComparison": {
+      "source": {
+        "private_machine_path_sha256": "4f36dcf586f48b7d4185c41ea70746226d935f4bf3c53276c40a3b2e9ecf836f"
+      },
+      "pin": {
+        "sha256": "e45ca23b28363e8da2e28266d07b82cab9fd3d78ecbcb9332b077fb6984b1b17",
+        "bytes": 54262
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeProjectiveLineScheme",
+        "HolonicsResearch.Hodge.HodgeProjectiveLineTopology",
+        "Mathlib.AlgebraicGeometry.AlgClosed.Basic",
+        "Mathlib.Analysis.Complex.Polynomial.Basic",
+        "Mathlib.Topology.Algebra.Polynomial"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeProjectiveLineScheme",
+        "HolonicsResearch.Hodge.HodgeProjectiveLineTopology"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeProjectiveLineRealization": {
+      "source": {
+        "private_machine_path_sha256": "bddc0c6b99aea2c5da3ffc57ce76ea459e778141f56c22b7625d4bff77ade771"
+      },
+      "pin": {
+        "sha256": "a80ea1e22cc7b041cbc372cbba2b72be0aa291a7a0f40b2aa5682c69b3ff3274",
+        "bytes": 44821
+      },
+      "imports": [
+        "HolonicsResearch.Foundation.CycleFilling",
+        "HolonicsResearch.Hodge.HodgeProjectiveLineAnalyticComparison",
+        "HolonicsResearch.Hodge.HodgeSphereLowDegreeHomology",
+        "HolonicsResearch.Hodge.HodgeSphereHomologyEquivalence",
+        "Mathlib.RingTheory.KrullDimension.PID"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Foundation.CycleFilling",
+        "HolonicsResearch.Hodge.HodgeProjectiveLineAnalyticComparison",
+        "HolonicsResearch.Hodge.HodgeSphereLowDegreeHomology",
+        "HolonicsResearch.Hodge.HodgeSphereHomologyEquivalence"
+      ]
+    },
+    "HolonicsResearch.Hodge.HodgeSpherePowerPairHomology": {
+      "source": {
+        "private_machine_path_sha256": "e08b189d0a2fe63b87db02c1963447332bce0c8f79ef8e199da1d2ab18dd790d"
+      },
+      "pin": {
+        "sha256": "6e2ddfc2bea154fa3ad34a04c843eac272604263067fd3932917b11c4ae85c0c",
+        "bytes": 35094
+      },
+      "imports": [
+        "HolonicsResearch.Hodge.HodgeSpherePowerRulingHomology",
+        "HolonicsResearch.Hodge.HodgeProjectiveLineRealization"
+      ],
+      "local_providers": [
+        "HolonicsResearch.Hodge.HodgeSpherePowerRulingHomology",
+        "HolonicsResearch.Hodge.HodgeProjectiveLineRealization"
+      ]
+    }
+  },
+  "_scoped_evidence": {
+    "original_receipt_pin": {
+      "bytes": 57588,
+      "sha256": "5e6f071e497eeaa47b9300d1c57389ffe04f52359284987f44afcbab577fe29a"
+    },
+    "raw_machine_paths_and_runtime_copies_kept_private": true,
+    "mathematical_and_validation_values_preserved": true
+  }
+}

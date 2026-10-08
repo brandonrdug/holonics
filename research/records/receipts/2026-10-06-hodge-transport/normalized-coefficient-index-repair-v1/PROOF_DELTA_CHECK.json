@@ -1,0 +1,48 @@
+{
+  "status": "PASS source delta only; kernel pending",
+  "source": {
+    "private_machine_path_sha256": "c0a30b10fb97f27f80d9f3f744f0451175b477951be19e3d2a6e92fb1b7d472c"
+  },
+  "source_pin": {
+    "sha256": "aaae98651a47755a263b8a28fc32f73b9abd423f06eeee338fdf0492eee41a8c",
+    "bytes": 11157
+  },
+  "previous_source_pin": {
+    "sha256": "b20f0eb95f5ef73fadc5aa8162a977f330af1985a1650d67496f4b96bd534084",
+    "bytes": 10875
+  },
+  "declaration_names_preserved": 16,
+  "changed_proof_bodies": [
+    "sphereRawSimplexCoefficient_closed",
+    "sphereNormalizedSimplexCoefficient_closed"
+  ],
+  "all_statements_definitions_maps_hypotheses_and_universe_scope_unchanged": true,
+  "all_other_source_blocks_unchanged": true,
+  "imports_unchanged": [
+    "HolonicsResearch.Hodge.HodgeSphereProductFourCycle"
+  ],
+  "original10axiom_queries_retained": [
+    "sphereRawCoefficient_cycle",
+    "sphereRawCoefficient_boundary",
+    "sphereRawCoefficient_fundamental",
+    "sphereRawSimplexCoefficient_closed",
+    "sphereNormalizedCurrentCoefficient_return",
+    "sphereNormalizedCurrentCoefficient_boundary",
+    "sphereNormalizedSimplexCoefficient_closed",
+    "sphereNormalizedSimplexCoefficient_degenerate",
+    "sphereNormalizedCurrentCoefficient_fundamental",
+    "pairFourReceiver_pairTwoShuffle_pairCurrent"
+  ],
+  "repair": "Rewrite nested Fin.succ face addresses with existing Fin.succ_zero_eq_one, Fin.succ_one_eq_two and local rfl((2:Fin3).succ=(3:Fin4)) before the rational polynomial join.",
+  "local_index_equalities_added": 2,
+  "new_maintained_declarations": 0,
+  "compiler_launched": false,
+  "_scoped_evidence": {
+    "original_receipt_pin": {
+      "bytes": 1676,
+      "sha256": "6d07e4d472a0122126cd4b85e69aaaa596095eed4bcc551e7dfbc1164cf593b4"
+    },
+    "raw_machine_paths_and_runtime_copies_kept_private": true,
+    "mathematical_and_validation_values_preserved": true
+  }
+}

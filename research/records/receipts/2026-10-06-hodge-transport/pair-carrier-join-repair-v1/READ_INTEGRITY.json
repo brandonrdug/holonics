@@ -1,0 +1,26 @@
+{
+  "status": "PASS frozen source, sole complete consuming target, and all52 retained artifact pins; Pair kernel pending",
+  "source_pin": {
+    "sha256": "d6c8fd064c84345cffded11574b18801b433123d5582f5cec94d5ed4bffb49aa",
+    "bytes": 35929
+  },
+  "request_pin": {
+    "sha256": "cacf02506e635d875aba75fd75a8a2bd3c4d2dd8f6de9e191ebc7f547ce9b828",
+    "bytes": 63107
+  },
+  "local_sources_verified": 102,
+  "accepted_provider_modules": 26,
+  "accepted_seed_artifacts_verified": 52,
+  "Pair_queries_retained": 28,
+  "rejected_Pair_artifact_seeded": false,
+  "compiler_launched": false,
+  "elapsed_ns": 23243388,
+  "_scoped_evidence": {
+    "original_receipt_pin": {
+      "bytes": 612,
+      "sha256": "5a85df8d45de23940360319e56ed7d161096163ca4966b55712d5435d471c232"
+    },
+    "raw_machine_paths_and_runtime_copies_kept_private": true,
+    "mathematical_and_validation_values_preserved": true
+  }
+}

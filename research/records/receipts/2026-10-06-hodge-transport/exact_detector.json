@@ -1,0 +1,163 @@
+{
+  "passed": true,
+  "arithmetic": "exact integers and rational coefficient chart; no floats",
+  "projection_ns": 2000000000,
+  "deadline_ns": 2000000000,
+  "wall_ns": 97511739,
+  "peak_resident_bytes": 13766656,
+  "threads": 1,
+  "sphere_two_sources": 20,
+  "sphere_three_sources": 34,
+  "affine_five_sources_per_factor": 74,
+  "actual_product_five_boundary_reads": 5476,
+  "signed_four_source_occurrences": 96,
+  "actual_fundamental_value": 1,
+  "six_shuffle_example": [
+    {
+      "sign": 1,
+      "front_left": [
+        1,
+        2,
+        3
+      ],
+      "back_right": [
+        1,
+        2,
+        3
+      ],
+      "normalized_return": 1,
+      "raw_return": 64
+    },
+    {
+      "sign": -1,
+      "front_left": [
+        1,
+        2,
+        2
+      ],
+      "back_right": [
+        2,
+        2,
+        3
+      ],
+      "normalized_return": 0,
+      "raw_return": -49
+    },
+    {
+      "sign": 1,
+      "front_left": [
+        1,
+        2,
+        2
+      ],
+      "back_right": [
+        2,
+        3,
+        3
+      ],
+      "normalized_return": 0,
+      "raw_return": 70
+    },
+    {
+      "sign": 1,
+      "front_left": [
+        1,
+        1,
+        2
+      ],
+      "back_right": [
+        2,
+        2,
+        3
+      ],
+      "normalized_return": 0,
+      "raw_return": 28
+    },
+    {
+      "sign": -1,
+      "front_left": [
+        1,
+        1,
+        2
+      ],
+      "back_right": [
+        2,
+        3,
+        3
+      ],
+      "normalized_return": 0,
+      "raw_return": -40
+    },
+    {
+      "sign": 1,
+      "front_left": [
+        1,
+        1,
+        1
+      ],
+      "back_right": [
+        3,
+        3,
+        3
+      ],
+      "normalized_return": 0,
+      "raw_return": 40
+    }
+  ],
+  "raw_single_pair_expected_product": 64,
+  "raw_single_pair_shuffle_return": 113,
+  "universal_boundary_polynomial": [
+    [
+      [
+        "a0",
+        "b0"
+      ],
+      1
+    ],
+    [
+      [
+        "a1",
+        "b0"
+      ],
+      -1
+    ],
+    [
+      [
+        "a2",
+        "b0"
+      ],
+      1
+    ],
+    [
+      [
+        "a3",
+        "b1"
+      ],
+      -1
+    ],
+    [
+      [
+        "a3",
+        "b2"
+      ],
+      1
+    ],
+    [
+      [
+        "a3",
+        "b3"
+      ],
+      -1
+    ]
+  ],
+  "status": "exact exterior incidence/normalization witness; formal validation pending",
+  "limits": "finite affine sphere-face carrier; all singular five-boundaries require the Lean source theorem",
+  "_scoped_evidence": {
+    "original_receipt_pin": {
+      "bytes": 2454,
+      "sha256": "ac00a85288cfffb932300b01d2247105500d9c8788ea30ef88c43759c088eac6"
+    },
+    "raw_machine_paths_and_runtime_copies_kept_private": true,
+    "mathematical_and_validation_values_preserved": true
+  }
+}

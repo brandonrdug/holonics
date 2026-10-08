@@ -1,0 +1,52 @@
+{
+  "status": "exact_acceptance_evidence_verified",
+  "rows": [
+    {
+      "receipt": {
+        "private_machine_path_sha256": "a164101229297db14377036dd6b27f79c7a0f4c24b566963dd7da8ede4951383"
+      },
+      "source_sha256": "695f2da74d29a0eec3051bc30c197ed200269ede75d4d85eab33e39443311c2c",
+      "verified_evidence_copies": 49,
+      "standard_queries": 20,
+      "whole_stage_wall_ns": 14202543563,
+      "ceiling_ns": 17000000000,
+      "canonical_source_matches": true,
+      "kernel_postcleanup_release_pass": true
+    },
+    {
+      "receipt": {
+        "private_machine_path_sha256": "b1847acf1f872382dc4ea7025d59511ad9d1c9dd7bcdfcde5ba3c26c9e50a208"
+      },
+      "source_sha256": "841d5b94895b05d30f949e3c57e8c11c2413914d9923b2713f5536780dbb3acd",
+      "verified_evidence_copies": 49,
+      "standard_queries": 4,
+      "whole_stage_wall_ns": 3671567600,
+      "ceiling_ns": 17000000000,
+      "canonical_source_matches": true,
+      "kernel_postcleanup_release_pass": true
+    },
+    {
+      "receipt": {
+        "private_machine_path_sha256": "09777a4db1f4284c175c464ab84221fba6064d4f014ebc78ba2e42714802c408"
+      },
+      "source_sha256": "42b02c455bb012fe616bf2334db4fa288f5d7d8a98c725b70b62c62b529a9d6b",
+      "verified_evidence_copies": 49,
+      "standard_queries": 7,
+      "whole_stage_wall_ns": 7445591150,
+      "ceiling_ns": 17000000000,
+      "canonical_source_matches": true,
+      "kernel_postcleanup_release_pass": true
+    }
+  ],
+  "verification_wall_ns": 209258061,
+  "peak_RSS_KiB": 20148,
+  "compiler_or_heavy_build_launched": false,
+  "_scoped_evidence": {
+    "original_receipt_pin": {
+      "bytes": 1707,
+      "sha256": "150632790f649e85013c74c12978c23ebaef4a9e2d64aa838fb5b48f26cf9862"
+    },
+    "raw_machine_paths_and_runtime_copies_kept_private": true,
+    "mathematical_and_validation_values_preserved": true
+  }
+}

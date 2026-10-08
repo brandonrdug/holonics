@@ -1,0 +1,155 @@
+{
+  "status": "recursive_v2_FAIL",
+  "kernel": {
+    "kernel_accepted": false,
+    "compiler_exit": 1,
+    "compiler_wall_ns": 3907848346,
+    "axioms": {
+      "Holonics.Physics.PartitionedHodgeEnergy.RecursiveCutReadout.recursive_cut_energy_receiver": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "Holonics.Physics.PartitionedHodgeEnergy.RecursiveCutReadout.parked_cut_receipt": [
+        "propext",
+        "sorryAx",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "Holonics.Physics.PartitionedHodgeEnergy.RecursiveCutReadout.lower_remainder_energy_is_not_pivot_return": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    "selector_count_matches": true,
+    "standard_axioms_only": false,
+    "metadata_unchanged": true,
+    "broad_library_checked": false
+  },
+  "raw_residuals": "line31 no goals; line67 coordinates2/3 remain; line70 Matrix.vecHead Complexcast residual",
+  "accepted_Partitionv3_RHv8_unchanged": true,
+  "full_import_seal_retained": {
+    "private_machine_path_sha256": "3cedf58e251cdb68d5ed14d84eed761657894e4e2ffe97755adda32d5a2f4ce8"
+  },
+  "previous_receipts_preserved": {
+    "private_machine_path_sha256": "a99707d707633e84c52e5c5fcb6fed7ce3c83175b0c0d0892d74872697e002c4"
+  },
+  "release": {
+    "released_after_final_publication_and_owned_unit_cleanup": true,
+    "quiescence_confirmed": true,
+    "external_controller_PID": 1521672,
+    "monotonic_ns": 292383222027352
+  },
+  "final_accounting": {
+    "passed": false,
+    "label": "hodge-recursive-consumer-development-20261006-v2",
+    "scientific_job": false,
+    "deferred_lock_busy": false,
+    "final_CPU_ns": 5286917000,
+    "CPU_reading_grain_ns": 1000,
+    "aggregate_CPU_limit_us": 17000000,
+    "final_CPU_source": "systemd retained oneshot CPUUsageNSec after all group processes exit",
+    "CPU_kernel_hard_total_limit": false,
+    "sampled_stop_margin_us": 1000000,
+    "aggregate_CPU_within_limit": true,
+    "no_overshoot_accepted": true,
+    "wall_ns": 6808450308,
+    "projection_ns": 17000000000,
+    "wall_source": "external monotonic_ns through final property read",
+    "quiescent": true,
+    "completion_event": "oneshot start job completed; no polling",
+    "unit_properties": {
+      "Description": "Owned holonics admission hodge-recursive-consumer-development-20261006-v2 d463bf2897391e426731c7852329742f",
+      "LoadState": "loaded",
+      "ActiveState": "failed",
+      "SubState": "failed",
+      "InvocationID": "7b29fbc077394c499f57657f2f6d2a0b",
+      "Result": "exit-code",
+      "ExecMainStatus": "125",
+      "ControlGroup": "",
+      "MemoryPeak": "973701120",
+      "CPUUsageNSec": "5286917000",
+      "TasksCurrent": "[not set]"
+    },
+    "outer_error": null,
+    "unit_start_exit": 1,
+    "unit_start_stdout": "",
+    "unit_start_stderr": "",
+    "config": {
+      "sha256": "9c1df8a2c44faa1b109d44a784563361d6ca582d233b053f7cfac5a897f315ab",
+      "bytes": 9019
+    },
+    "receipt_pins": {
+      "private-path-5d25b597ef0f806865cd04aaa7bbe0af949fb31b269e67eb6dcf3c749cb14c1f": {
+        "sha256": "9c1df8a2c44faa1b109d44a784563361d6ca582d233b053f7cfac5a897f315ab",
+        "bytes": 9019
+      },
+      "private-path-f8b04b13048eab2688227ae9eca12c8f7ada8f39791ffe5c2f0cd69b23c09dfd": {
+        "sha256": "13f5915c3bb1d575df8970258074331ef01a86347ba6dbd456230316b225a079",
+        "bytes": 487
+      },
+      "private-path-0ecd5aae1fb3408aec79d530165bc3ce54744c10acbb18db79cbec09b6f7bafa": {
+        "sha256": "30b2062fe08732d6936d6a27656fb34f0eb90b74e8deb480dd5a5d88def83460",
+        "bytes": 565
+      },
+      "private-path-283a038e28f8b5615027bd97239194802af62175d8c99226d9a90224b44aeedc": {
+        "sha256": "2b1337a35fe746e98b015690b488584753cf571c99ef7b0024ada73fc28fe285",
+        "bytes": 6096
+      },
+      "private-path-8dea84bafca852771a3cebebae2793c99c1042769da43c3751a2fad599712215": {
+        "sha256": "60dccc8e91e65c3e76ecf2c6a352e9fa1eafa5237852c6735c5663349e4e91a9",
+        "bytes": 2904
+      },
+      "private-path-dc65bf0aa384bf4779ab0a03fa3b1e092d87e0f310375bb1e7bbb588e37c49be": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "private-path-f1c86e991c621b277edccc846912dbefecd870afe609b4d387f8792e62100f85": {
+        "sha256": "eb1a1cdc7c3c971f5928c76a11dc6a068ff699895d4274ff8255d64a2163ce22",
+        "bytes": 120
+      },
+      "private-path-260fa5dabf5797b49280e3564c225107b4af2fd590dc8ee65351769156b0ad55": {
+        "sha256": "5144fbd7df6ca31438de3828f2698cbde8d13a63a08e3ddadef1a4be47d989a2",
+        "bytes": 78
+      },
+      "private-path-5cddd35b213ddbeb3c2b7674c3b2ff1e64a9e7b9b721a1b1967cd027ba1fc3e9": {
+        "sha256": "8e308fe880381d1bc64df45781be2d9f98e951abe4e2792ab75fca9d43f6ac1d",
+        "bytes": 50245
+      },
+      "private-path-ef91e2c6d4279364766362c14636656829b073559e25cdcb3920d474c4ed421e": {
+        "sha256": "507e61b0078fc496b92761183537e928c10b363d8d8075985ba230ea0f325994",
+        "bytes": 130
+      },
+      "private-path-235c4ebce86ad78a4a449f0e70dc31f3a8d21fd7ce09e1a72d6e6b4aad12b8f7": {
+        "sha256": "0509b5239407385a7644a56f7aecb87348f05e4a077de9c45d18c0c9db3528c3",
+        "bytes": 439613
+      },
+      "private-path-131a1daa7a479af4048760c89328025bfcb853de494d2a853d8da623c4003d9d": {
+        "sha256": "078a2e529738d78d33e4993b1e525f9f69a36938f8450055f6ced3e8853d71c5",
+        "bytes": 248
+      },
+      "private-path-012c567a96d2717f76e9def87e6da01a6b24762f383f27a57836afba5857a69f": {
+        "sha256": "570aa8e89e8ff11579d54670b0f566ef14adbe882760073b2f38de508be4ce51",
+        "bytes": 3694
+      },
+      "private-path-1da5eb3bbd628ab39d0f90768c19dbb48788df32d49b413b8ccb75899aad6642": {
+        "sha256": "13a52495f2a064eccada35ae06797b2705631f19d768b0d56542d29940822c32",
+        "bytes": 136
+      }
+    },
+    "launcher_outside_native_group": true,
+    "lease_owner_outside_capped_group": true,
+    "lease_held_through_final_CPU_read_and_publication": true,
+    "stage_passed_before_cleanup": false,
+    "requires_cleanup_acceptance": true
+  },
+  "_scoped_evidence": {
+    "original_receipt_pin": {
+      "bytes": 6933,
+      "sha256": "7957726b3e02c0a8052e7fc0af671e16ebff5ea36a0258d4fe190fc1a31f72c0"
+    },
+    "raw_machine_paths_and_runtime_copies_kept_private": true,
+    "mathematical_and_validation_values_preserved": true
+  }
+}

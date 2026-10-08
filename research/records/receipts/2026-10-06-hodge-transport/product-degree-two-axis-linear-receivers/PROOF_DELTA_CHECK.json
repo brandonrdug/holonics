@@ -1,0 +1,68 @@
+{
+  "status": "source structural checks passed; kernel pending",
+  "source": {
+    "sha256": "6dedfc094a78df6f22a23f1d804379d3b39139c4231a37806e5158c59a9d2ee0",
+    "bytes": 109213
+  },
+  "previous_source": {
+    "sha256": "3cd9249a1f2333fd9d23af9e96ec9ec440d429ef8094fdc5f7526def7912ae3b",
+    "bytes": 108444
+  },
+  "existing_declaration_names_preserved": 170,
+  "changed_proof_bodies": [
+    "totalBoundaryOne_leftOneAxis",
+    "totalBoundaryOne_rightOneAxis",
+    "totalBoundaryTwo_leftAxis",
+    "totalBoundaryTwo_middleAxis",
+    "totalBoundaryTwo_rightAxis"
+  ],
+  "every_theorem_signature_preserved": true,
+  "all_source_outside_five_axis_proof_region_unchanged": true,
+  "imports": [
+    "HolonicsResearch.Foundation.DiagonalChainTransport",
+    "Mathlib.LinearAlgebra.DirectSum.Finsupp"
+  ],
+  "same_axiom_selectors": [
+    "diagonalBoundaryOne_productH0Diagonal",
+    "totalBoundaryTwo_productTotalOneFilling",
+    "diagonalBoundaryTwo_productH1Diagonal_of_closed",
+    "productFirstFactorDegreeTwoCurrent_closed",
+    "productSecondFactorDegreeTwoCurrent_closed",
+    "leftOuterNormalizationCorrection_boundary",
+    "rightOuterNormalizationCorrection_boundary",
+    "productDegreeTwoNormalizationFiller_boundary",
+    "coupledMiddleCorrection_reduces_to_outer",
+    "totalBoundaryOne_totalBoundaryTwo",
+    "diagonalBoundaryOne_diagonalBoundaryTwo",
+    "realizedProductCurrentEquiv_boundary_one",
+    "realizedProductCurrentEquiv_boundary_two",
+    "realizedProductCurrentEquiv_boundary_three",
+    "realizedProductFirstFactorDegreeTwoCurrent_closed",
+    "realizedProductSecondFactorDegreeTwoCurrent_closed",
+    "realizedProductDegreeTwoNormalizationFiller_boundary",
+    "productAugmentation_diagonalBoundaryOne",
+    "realizedProductLowDegreeCurrentDatum"
+  ],
+  "new_mathematical_statements": 0,
+  "induction_linear_calls_before_after": [
+    40,
+    35
+  ],
+  "module_tactic_calls_before_after": [
+    35,
+    29
+  ],
+  "linearCombination_linear_comp_calls": 6,
+  "lhom_ext_calls_added": 1,
+  "placeholders_found": false,
+  "compiler_launched": false,
+  "timing_or_memory_improvement": "unmeasured; structural source reduction only",
+  "_scoped_evidence": {
+    "original_receipt_pin": {
+      "bytes": 2155,
+      "sha256": "b043e54a385b69942af0b48bcfec9051cb7ede436ec3068a3f247c73a248c403"
+    },
+    "raw_machine_paths_and_runtime_copies_kept_private": true,
+    "mathematical_and_validation_values_preserved": true
+  }
+}

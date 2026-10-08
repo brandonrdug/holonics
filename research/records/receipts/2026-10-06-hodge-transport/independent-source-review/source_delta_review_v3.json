@@ -1,0 +1,46 @@
+{
+  "scope": "independent source review of detector-v3 producing-proof delta, against retained detector-v2",
+  "passed": true,
+  "source_pins": [
+    {
+      "path": {
+        "private_machine_path_sha256": "df01e40eb880e0d3269e3fe783f03bad485a7a02f5c535f146f7e3665e7677f8"
+      },
+      "sha256": "3409d618bdc87b72b5243eaaf5ac3b7d0fd6bbdccd5e9744f4c59cc41adb48f7"
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "b2b189782d63aa3cc5e0697015031371d1f444ab1127810e855bdbac3e7071aa"
+      },
+      "sha256": "cc737e41d69ec55c29a15898f405bd555bc0f40ab65713789840fc4cded2a8a2"
+    },
+    {
+      "path": {
+        "private_machine_path_sha256": "4ea2efe329a8875890e923bc8f5b7ccd21f932828d249bdc4957f11bc8e87c52"
+      },
+      "sha256": "6e2ddfc2bea154fa3ad34a04c843eac272604263067fd3932917b11c4ae85c0c"
+    }
+  ],
+  "unchanged_definition_count": 66,
+  "unchanged_theorem_signature_count": 90,
+  "new_helper": "initial_repeatVertexEdge",
+  "mathematical_review": "restriction composition returned directly; constant triangle follows from hleft 0; explicit s0/s1 normalization reduces by outer faces and d1 s0=id",
+  "v2_kernel_status": "rejected; five proof-script failures, sorryAx in shuffle-evaluation and normalization declarations",
+  "v3_kernel_status": "unchecked by reviewer; shared validation queue owns execution",
+  "product_pair_status": "unchanged pins, not reached in v2 validation",
+  "wall_ns": 2850901,
+  "peak_resident_bytes": 18456576,
+  "outer_deadline_ns": 2000000000,
+  "threads": 1,
+  "v2_receipt_retained": {
+    "private_machine_path_sha256": "d19bec7e9a46bdf1ede5e8c7f730b9d433c5963d7ba27c0db7e84b91a33f6e0c"
+  },
+  "_scoped_evidence": {
+    "original_receipt_pin": {
+      "bytes": 1829,
+      "sha256": "e5a1a15ea7863cc493f797556a65b74394b65a05ab32797f5788669b42c25f26"
+    },
+    "raw_machine_paths_and_runtime_copies_kept_private": true,
+    "mathematical_and_validation_values_preserved": true
+  }
+}

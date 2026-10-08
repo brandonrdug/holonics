@@ -1,0 +1,71 @@
+{
+  "status": "canonical_provider_v1_REFUSED",
+  "scope": "Actual SectionResidual line103 lacks Module \u211d \u2102; three standard queries and one sorryAx, full file rejected. Canonical consumer not launched.",
+  "rows": [
+    {
+      "label": "canonical-section-residual-import-preparation-20261006-v1",
+      "passed": true,
+      "wall_ns": 7979929848,
+      "projection_ns": 12779337307,
+      "measured_to_projected": [
+        7979929848,
+        12779337307
+      ],
+      "aggregate_CPU_ns": 7740885000,
+      "group_peak_bytes": 436920320,
+      "thread_budget": 1,
+      "memory_cap_bytes": 4294967296,
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    {
+      "label": "canonical-section-residual-development-20261006-v1",
+      "passed": false,
+      "wall_ns": 5018048946,
+      "projection_ns": 17000000000,
+      "measured_to_projected": [
+        5018048946,
+        17000000000
+      ],
+      "aggregate_CPU_ns": 3338745000,
+      "group_peak_bytes": 1610153984,
+      "thread_budget": 1,
+      "memory_cap_bytes": 4294967296,
+      "quiescent_release": true,
+      "outer_error": null
+    }
+  ],
+  "source_pins": [
+    {
+      "path": {
+        "private_machine_path_sha256": "68b748227af6627bf43e5f476c7251608396331b0d7fe6a36916bb545d5718b9"
+      },
+      "pin": {
+        "sha256": "1466a879657e02cfc5a41193beaa13b926bb097ae62feb216ba2cfe224f841da",
+        "bytes": 4673
+      }
+    }
+  ],
+  "preserved_all_original_failures": true,
+  "unchanged_limits": true,
+  "no_dependency_compile": true,
+  "external_large_immutable_seals": [
+    {
+      "origin": {
+        "private_machine_path_sha256": "1be885ceace4e92551b87975fb46c750a70f8b2f3ca8511e6f9e5aa44c788b08"
+      },
+      "pin": {
+        "sha256": "3006d754614ed58c593950785089c229e383a8c0b7515299f0a76b39cc2df63d",
+        "bytes": 57509004
+      }
+    }
+  ],
+  "_scoped_evidence": {
+    "original_receipt_pin": {
+      "bytes": 1913,
+      "sha256": "93cc122b6560c3826b63e3b8e5457bc0c478560f77bc4a7a39182a578519541c"
+    },
+    "raw_machine_paths_and_runtime_copies_kept_private": true,
+    "mathematical_and_validation_values_preserved": true
+  }
+}

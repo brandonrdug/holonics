@@ -1,0 +1,61 @@
+{
+  "status": "PASS one proof-body source delta only; new full Pair kernel validation pending",
+  "source": {
+    "private_machine_path_sha256": "18a59320fce34ae5cb6237ee0b1f0cbba05eef33618a026c6d1a5a9b840cee6e"
+  },
+  "source_pin": {
+    "sha256": "d6c8fd064c84345cffded11574b18801b433123d5582f5cec94d5ed4bffb49aa",
+    "bytes": 35929
+  },
+  "previous_source_pin": {
+    "sha256": "6e2ddfc2bea154fa3ad34a04c843eac272604263067fd3932917b11c4ae85c0c",
+    "bytes": 35094
+  },
+  "changed_proof_bodies": [
+    "pairCoordinateHomologyMorphism_fromSphereFaces"
+  ],
+  "top_level_declaration_count_preserved": 51,
+  "all_statements_maps_definitions_hypotheses_and_imports_unchanged": true,
+  "all_other_source_blocks_unchanged": true,
+  "original28axiom_queries_retained": [
+    "coordinatePair_four_card",
+    "pairCoordinate_then_matching_projection",
+    "pairCoordinateChainMap_matching_retract",
+    "pairCoordinateChain_closed",
+    "sourceFourCycleFromSphereFaces",
+    "fourfoldPairSourceFromSphereFaces_closed",
+    "pairCoordinateHomologyMorphism_fromSphereFaces",
+    "pairCoordinateHomologyClass_fromSphereFaces",
+    "coordinatePairClassMapFromSphereFaces_unit",
+    "coordinatePairClassMapFromSphereFaces_injective",
+    "coordinatePairClassMapFromSphereFaces_injective_of_fillings",
+    "pairCoordinateHomologyMap_matching_retract",
+    "pairCoordinateHomologyMap_injective",
+    "crossedPairTopMap_factorsThroughSphere",
+    "crossedPairChainMap_factorsThroughSphere",
+    "crossedPairHomologyMap_factorsThroughSphereH4",
+    "crossedPairHomologyMap_eq_zero_of_sphereH4_subsingleton",
+    "coordinatePairClassMap_injective",
+    "sphereH4SubsingletonOfFillings",
+    "surfaceCellHomologyIsoQFour",
+    "sphereProductH4EquivQOfReduction",
+    "sourceFourHomologyClassOfReduction_ne_zero",
+    "coordinatePairClassMapOfReduction_injective",
+    "coordinatePairClassMapOfReductions_surjective",
+    "coordinatePairHomologyEquivOfReductions",
+    "cellFourGenerator_closed",
+    "sourceFourCycleOfReduction",
+    "fourfoldPairClassesOfReduction"
+  ],
+  "new_maintained_declarations": 0,
+  "compiler_launched": false,
+  "repair": "Bind the source morphism at exactly (SpherePowerChains n).X 4 and its lift at exactly .cycles 4; prove targetLift_i via the existing universal lift inclusion before rewriting the naturality consumer. Avoid exposing the semireducible coproduct carrier through unfold.",
+  "_scoped_evidence": {
+    "original_receipt_pin": {
+      "bytes": 2464,
+      "sha256": "d14344d2714fc0a96802e86f8790a94851b656fb07d631fb31c89a144acf8d88"
+    },
+    "raw_machine_paths_and_runtime_copies_kept_private": true,
+    "mathematical_and_validation_values_preserved": true
+  }
+}

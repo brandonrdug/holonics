@@ -1,4 +1,5 @@
 import Holonics.Hodge.HodgeGreenOperator
+import Holonics.Transport.ChangingReceiver.Defect
 
 /-!
 # Temporal Hodge residues
@@ -100,4 +101,103 @@ theorem closed_class_representative
 
 end TemporalHodgeEvolution
 
+/-! ## A moving or coarse receiver retains its Hodge transport defect
+
+[agent-inferred] A cochain square alone does not fix the metric adjoint: a cut,
+changed constitution, or nonisometric chart can change it. The four-term return
+below extends the existing heat consumer, rather than declaring a second Hodge
+decomposition or assuming the receiver is a reducing subcomplex. The rates use
+the existing changing-receiver owner. Boundary conditions are part of the supplied
+differentials and adjoints; no continuum boundary or algebraic-cycle claim follows.
+-/
+namespace CoarseHodgeTransport
+
+variable {F : Type*} [NormedAddCommGroup F] [InnerProductSpace ℝ F]
+  [FiniteDimensional ℝ F]
+
+def differentialDefect (D : Differential E) (C : Differential F)
+    (q : E →L[ℝ] F) (x : E) : F := C.d (q x) - q (D.d x)
+
+def codifferentialDefect (D : Differential E) (C : Differential F)
+    (q : E →L[ℝ] F) (x : E) : F := C.delta (q x) - q (D.delta x)
+
+def laplacianDefect (D : Differential E) (C : Differential F)
+    (q : E →L[ℝ] F) (x : E) : F := C.laplacian (q x) - q (D.laplacian x)
+
+/-- Both differential and adjoint squares contribute, with their signed returns
+kept before taking a norm. This identity requires no isometry or injectivity of q. -/
+theorem laplacianDefect_eq_four_returns (D : Differential E) (C : Differential F)
+    (q : E →L[ℝ] F) (x : E) :
+    laplacianDefect D C q x =
+      C.d (codifferentialDefect D C q x) +
+        differentialDefect D C q (D.delta x) +
+        C.delta (differentialDefect D C q x) +
+        codifferentialDefect D C q (D.d x) := by
+  simp only [laplacianDefect, differentialDefect, codifferentialDefect,
+    Differential.laplacian, ContinuousLinearMap.add_apply,
+    ContinuousLinearMap.comp_apply, map_add, map_sub]
+  abel
+
+/-- A source harmonic mode stays harmonic exactly when this receiver's
+Laplacian defect vanishes on that mode. Chain compatibility alone is insufficient. -/
+theorem harmonic_image_iff_defect_zero (D : Differential E) (C : Differential F)
+    (q : E →L[ℝ] F) {h : E} (hh : h ∈ D.harmonic) :
+    q h ∈ C.harmonic ↔ laplacianDefect D C q h = 0 := by
+  have hz : D.laplacian h = 0 := LinearMap.mem_ker.mp hh
+  change C.laplacian (q h) = 0 ↔ _
+  simp [laplacianDefect, hz]
+
+/-- The actual finite Euler heat consumer returns the unresolved operator term.
+The step is algebraic; its stability remains a separate spectral condition. -/
+theorem eulerHeatStep_receiver_return (D : Differential E) (C : Differential F)
+    (q : E →L[ℝ] F) (step : ℝ) (x : E) :
+    q (TemporalHodgeEvolution.eulerHeatStep (D := D) step x) =
+      TemporalHodgeEvolution.eulerHeatStep (D := C) step (q x) +
+        step • laplacianDefect D C q x := by
+  simp only [TemporalHodgeEvolution.eulerHeatStep_apply, laplacianDefect,
+    map_sub, map_smul, smul_sub]
+  abel
+
+/-- Zero step hides every defect. At a nonzero declared step, heat and receiver
+commute at a source precisely when its complete Laplacian defect is zero. -/
+theorem eulerHeatStep_commutes_iff (D : Differential E) (C : Differential F)
+    (q : E →L[ℝ] F) (step : ℝ) (hstep : step ≠ 0) (x : E) :
+    q (TemporalHodgeEvolution.eulerHeatStep (D := D) step x) =
+        TemporalHodgeEvolution.eulerHeatStep (D := C) step (q x) ↔
+      laplacianDefect D C q x = 0 := by
+  rw [eulerHeatStep_receiver_return]
+  constructor
+  · intro heq
+    have hz : step • laplacianDefect D C q x = 0 := by
+      exact add_left_cancel (heq.trans (add_zero _).symm)
+    exact (smul_eq_zero.mp hz).resolve_left hstep
+  · intro hz
+    simp [hz]
+
+/-- The changing-chart theorem is consumed with the actual two Hodge heat
+rates. Qdot survives even where instantaneous Laplacians intertwine. -/
+theorem moving_heat_receiver_rate (D : Differential E) (C : Differential F)
+    (q : ℝ → E →L[ℝ] F) (qdot : E →L[ℝ] F)
+    (x : ℝ → E) (time nu : ℝ)
+    (hq : HasDerivAt q qdot time)
+    (hx : HasDerivAt x (-nu • D.laplacian (x time)) time) :
+    HasDerivAt (fun t => q t (x t))
+      (-nu • C.laplacian (q time (x time)) +
+        (qdot (x time) + nu • laplacianDefect D C (q time) (x time))) time := by
+  have hr := Holonics.Transport.ChangingReceiver.moving_receiver_rate q x time qdot
+    (fun z => -nu • D.laplacian z) (fun z => -nu • C.laplacian z) hq hx
+  convert hr using 1
+  simp only [Holonics.Transport.ChangingReceiver.rateDefect, laplacianDefect,
+    map_smul, smul_sub, neg_smul]
+  abel_nf
+  simp only [map_zsmul, map_smul]
+
+end CoarseHodgeTransport
+
 end Holonics.Physics
+
+#print axioms Holonics.Physics.CoarseHodgeTransport.laplacianDefect_eq_four_returns
+#print axioms Holonics.Physics.CoarseHodgeTransport.harmonic_image_iff_defect_zero
+#print axioms Holonics.Physics.CoarseHodgeTransport.eulerHeatStep_receiver_return
+#print axioms Holonics.Physics.CoarseHodgeTransport.eulerHeatStep_commutes_iff
+#print axioms Holonics.Physics.CoarseHodgeTransport.moving_heat_receiver_rate
