@@ -124,10 +124,10 @@ fn declare() -> Result<(Field, ReceiverDeclaration), holonics::hnn::HnnError> {
         receiving_prior: 0,
     };
     // Source period four holds both classes at distinct phase addresses and exceeds aperture
-    // three. The interior's width-two loaded component keeps the actual Half pump clock.
+    // three. The legal period-two interior has width four and keeps the actual Half pump clock.
     let field = Field::declare(
         FieldDeclaration {
-            rings: vec![ring(4, (0..4).collect()), ring(1, Vec::new())],
+            rings: vec![ring(4, (0..4).collect()), ring(2, Vec::new())],
             contacts: vec![ContactDeclaration {
                 from: 0,
                 to: 1,
@@ -751,6 +751,10 @@ fn exercise(mut output: &mut impl Write, pin: &exterior::Pin) -> bool {
             "INCOMPLETE: the whole continuing-operation acceptance did not pass; actual output above remains the receipt\n",
         );
     }
+    publish(
+        &mut output,
+        "Response attribution: source, carried state and material can all change across the printed passages; their separate finite effects on a later boundary are unisolated here. Actual reached publication and retained state are distinct from output improvement, acquired relations, usefulness or adaptation.\n",
+    );
     publish(
         &mut output,
         "Scope: section-source clock and absolute carried pump clock are separately printed. This run adds no unsupported ingest, save/cold/device continuation, policy derivative, foreign codec or completion-domain release. No useful-language/product conclusion follows from the operation acceptance.\n",

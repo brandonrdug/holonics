@@ -1,0 +1,4 @@
+
+thread 'hnn::tests::physical_communication::continuing_contact_comparison_deposits_and_rebases_without_resetting_delayed_credit' (1945516) panicked at crates/holonics/src/hnn/tests/physical_communication.rs:82:26:
+called `Result::unwrap()` on an `Err` value: RingPeriod { ring: 1, period: 1 }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

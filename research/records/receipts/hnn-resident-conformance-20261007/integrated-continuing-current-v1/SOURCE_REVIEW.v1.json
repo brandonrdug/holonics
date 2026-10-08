@@ -7,8 +7,8 @@
     "crates/holonics/src/hnn/word/continuation.rs": "f76e89d824026ecfabe92ff1fb0b9f44717084f00f3d0b098fac0a4e0d11be78",
     "crates/holonics/src/hnn/reference/interaction.rs": "38945a8acba2dbbf6c6e28f5e7d9303f2b4feab017a46adf554e5b17031fb985",
     "crates/holonics/src/hnn/physical/contact.rs": "c6232d3e46732ef8cff5c928af5daf4c19b2ea234e29a387722d7e4171c9db5b",
-    "crates/holonics/src/hnn/tests/physical_communication.rs": "b70c6d17718830755a272310441fc31b9b717e2c062da51b8badc15bdf976455",
-    "research/notebook/hnn_design/hnn_continuing_behavior.rs": "aabf856da37f18d9fc97fab5abe1d395cf9a0e4ff87685c0ae699eba685277a0",
+    "crates/holonics/src/hnn/tests/physical_communication.rs": "24504d4086d8dc6bbbbd90a9b3a5f9be96a0075b5f13b3ece95108b4d59ce98d",
+    "research/notebook/hnn_design/hnn_continuing_behavior.rs": "4b7f7210b0204fa453ae8fb92cbe77ba3395fed039fba9281ee15d92e0e0a6be",
     "research/notebook/hnn_design/hnn_prediction.rs": "a23187140707098737706f8e054a9fe6893a29220a16e02bbcb7839bac9ab895"
   },
   "reviewer": "GPT-6 Luna bounded source/law review; no source mutation, native tests or scientific run",
@@ -43,5 +43,17 @@
     "basis": "with_ports standing/source/receiving signature and ReceivingPhases::read_carrier 2*alphabet complex shape. Preserve original complex contrast and supply its opposite for second declared class.",
     "production_runner_and_assertions_unchanged": true,
     "test_compile_and_whole_runtime_pending": true
+  },
+  "ring_initializer_review": {
+    "reviewer": "Primary source review against actual constructor owners; no native run",
+    "changed_native_inputs": [
+      "crates/holonics/src/hnn/tests/physical_communication.rs",
+      "research/notebook/hnn_design/hnn_continuing_behavior.rs"
+    ],
+    "constructor_review_receipt": "RING_PERIOD_INITIALIZER_REPAIR.v1.json",
+    "old_invalid_dimensions": "fixture20/240,runner28/336",
+    "new_legal_dimensions": "fixture28/336,runner36/432",
+    "production_law_and_assertions_preserved": true,
+    "native_admission_whole_behavior_and_comprehensive_action_perception_pending": true
   }
 }

@@ -1,0 +1,4 @@
+
+thread 'hnn::tests::physical_communication::held_contact_variation_refuses_untransported_future_without_clearing_it' (1945542) panicked at crates/holonics/src/hnn/tests/physical_communication.rs:82:26:
+called `Result::unwrap()` on an `Err` value: RingPeriod { ring: 1, period: 1 }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

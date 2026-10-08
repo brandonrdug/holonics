@@ -1124,12 +1124,35 @@ complete first development cost, fixed projection and output acceptance belong t
 the sole queue; no owner build/training/benchmark/scientific job ran here and no
 cap or precision ladder is admitted.
 
-[source-derived cost dimension] The joined runner's period-four source has realified
-width eight and its interior width two. Its complete change therefore has
-`d=10+10+4+4=28` numeric coordinates (storage, arrival, contact and loaded state),
-with `p=12` raw factor coordinates and `336` retained state ratios. Five three-tick
-contact passages charge `180` column-ticks. The runner derives this count from the
-actual EndChange shape; an initial worker cost description of `22/264` was corrected
-before queue handoff and is not an admission reading. Its fixed `2^20` exact-bit
-bound, scratch copies, loaded/certificate solves, whole output formatting and
-allocations still need the complete measured cost, not the smaller fixture's rate.
+[source-derived cost dimension; corrected after native v110] The joined runner's
+period-four source has realified width eight. The interior now has the minimum legal
+period two and realified width four, as `Ring::declare` requires a period of at least
+two and exactly that many placements. Its complete change has
+`d=12+12+4+8=36` numeric coordinates (storage, arrival, contact and loaded state),
+with `p=12` raw factor coordinates and `432` retained state ratios. Five three-tick
+contact passages still charge `180` column-ticks. The runner derives its ratio
+allocation from the actual EndChange shape. The contact unit fixture uses two
+period-two rings, a width-two contact and a width-four loaded ring, giving
+`d=8+8+4+8=28`, `p=12` and `336` retained ratios; its independent analytic count
+remains an assertion. Its resonator forms derive their width from the actual ring.
+The old `20/240` fixture and `28/336` runner dimensions describe the invalid
+period-one declarations, not accepted motion; the initial `22/264` worker prose
+was already corrected before handoff. The fixed `2^20` exact-bit bound, column-tick
+limits, runtime/CPU/memory caps, source/receiver clocks, Half pump, comparison
+partitions and factor-movement/output gate are unchanged. Scratch, native solves,
+whole output and allocations require the complete changed-source cost, not a
+borrowed fixture rate.
+
+[native evidence; not completion] On immutable `b45eacceb`, v110 built the release
+library and example and passed the contact derivative control and five rebase
+controls. The actual whole run refused `RingPeriod { ring: 1, period: 1 }` with
+zero material cuts, zero Word openings and zero full ticks. The three physical
+contact controls refused at the same declaration. The complete actual output and
+exact stage costs are preserved in the `integrated-continuing-current-v1` receipts.
+The period-two successor is source-prepared only. The native ring law is unchanged;
+no gate is weakened or limit raised. Structural review also checks placement count
+and circle, locks/reflector, endpoints/channel injectivity, source chart, receiving
+map/ports, even positive resonator forms and opening phase/canonical dimensions.
+The native owners must still certify observability, Floquet admission and actual
+seven-passage output/state/update behavior. The six passed controls do not establish
+that behavior or acquired relations.

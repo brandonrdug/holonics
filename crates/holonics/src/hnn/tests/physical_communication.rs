@@ -65,7 +65,13 @@ fn contact_material(field: &Field) -> Constitution {
     super::learning::generic(field, 81).rebased(Locus::Channel(0), 7, &reads).unwrap()
 }
 
-/// Small fixed physical law fixture: twelve contact-factor coordinates, twenty full-state
+// Two legal period-two rings have widths 4+4: storage and arrivals each have eight
+// coordinates, the width-two contact has four, and the loaded ring has eight.
+const HELD_FIXTURE_PARAMETERS: usize = 3 * 2 * 2;
+const HELD_FIXTURE_STATE_COORDINATES: usize = 2 * (4 + 4) + 2 * 2 + 2 * 4;
+const HELD_FIXTURE_RATIOS: usize = HELD_FIXTURE_PARAMETERS * HELD_FIXTURE_STATE_COORDINATES;
+
+/// Small fixed physical law fixture: twelve contact-factor coordinates, twenty-eight full-state
 /// coordinates. Its maps/material are declared before either observation; no output is authored.
 fn held_variation_fixture() -> (Field,Constitution,WordOpening,ReceiverDeclaration) {
     use crate::hnn::propagation::Operands;
@@ -75,7 +81,7 @@ fn held_variation_fixture() -> (Field,Constitution,WordOpening,ReceiverDeclarati
     use crate::ratio::linear::ExactRatMatrix;
     let declared = receiver();
     let field = Field::declare(FieldDeclaration {
-        rings:vec![ring(2,vec![0,1]),ring(1,vec![])], contacts:vec![contact(0,1,1,0)],
+        rings:vec![ring(2,vec![0,1]),ring(2,vec![])], contacts:vec![contact(0,1,1,0)],
         loops:vec![],sources:vec![0],offsets:vec![],alphabet:2,step:integer(1),exponent_grain:1,
         receivers:vec![declared.clone()],crib:CribDeclaration { window:16,offset:1 },
         population:1<<16,lattice:Default::default(),
@@ -96,7 +102,7 @@ fn held_variation_fixture() -> (Field,Constitution,WordOpening,ReceiverDeclarati
         vec![integer(-1),integer(0),integer(1),integer(0)],
         vec![integer(0),integer(-1),integer(0),integer(1)]]).unwrap();
     theta = theta.with_ports(0,None,None,Some(map)).unwrap();
-    let ring_factor = ExactRatMatrix::identity(2).unwrap();
+    let ring_factor = ExactRatMatrix::identity(field.ring(1).width()).unwrap();
     let pump = PumpDeclaration::new(rat(1,16),
         ParametronCarrier::new(integer(1),integer(0)).unwrap(),PumpStep::Half).unwrap();
     theta = theta.with_ring_resonator(&field,1,ResonatorMaterial::new(ring_factor.clone(),
@@ -124,11 +130,12 @@ fn held_contact_variation_returns_the_delayed_full_state_credit() {
     let (field,theta,opening,declared) = held_variation_fixture();
     let current = Current::at_rest(&field);
     let mut actual = PhysicalReceiver::new(&field,theta.clone(),current.clone(),opening.clone()).unwrap();
-    let budget = VariationBudget { ratios:240,bits:1<<20,column_ticks:72 };
+    let budget = VariationBudget { ratios:HELD_FIXTURE_RATIOS,bits:1<<20,column_ticks:72 };
     let before = actual.opening();
     let admitted = actual.begin_held_contact_variation(budget).unwrap();
     assert_eq!(format!("{:?}",actual.opening()),format!("{before:?}"),"admission resets no primal coordinate");
-    assert_eq!((admitted.parameters,admitted.state_coordinates,admitted.retained_ratios),(12,20,240));
+    assert_eq!((admitted.parameters,admitted.state_coordinates,admitted.retained_ratios),
+        (HELD_FIXTURE_PARAMETERS,HELD_FIXTURE_STATE_COORDINATES,HELD_FIXTURE_RATIOS));
     let first_source = encoded(&field,&[0]);
     let first = actual.communicate_contact(&first_source,&declared,|_| None).unwrap();
     assert!(first.closes());
@@ -216,14 +223,14 @@ fn held_contact_variation_refuses_untransported_future_without_clearing_it() {
     let mut incorrect = opening.clone();
     if let WordOpening::Received { carry,.. } = &mut incorrect { carry.momenta[0][0] += integer(1); }
     let mut refused = PhysicalReceiver::new(&field,theta.clone(),Current::at_rest(&field),incorrect).unwrap();
-    assert!(refused.begin_held_contact_variation(VariationBudget { ratios:240,bits:1<<20,column_ticks:72 }).is_err());
+    assert!(refused.begin_held_contact_variation(VariationBudget { ratios:HELD_FIXTURE_RATIOS,bits:1<<20,column_ticks:72 }).is_err());
     assert!(refused.into_resident().held_contact_variation().is_none());
     let mut incorrect_phase = opening.clone();
     if let WordOpening::Received { carry,.. } = &mut incorrect_phase { carry.change.resonator_phases[1] = Some(1); }
     let mut refused = PhysicalReceiver::new(&field,theta.clone(),Current::at_rest(&field),incorrect_phase).unwrap();
-    assert!(refused.begin_held_contact_variation(VariationBudget { ratios:240,bits:1<<20,column_ticks:72 }).is_err());
+    assert!(refused.begin_held_contact_variation(VariationBudget { ratios:HELD_FIXTURE_RATIOS,bits:1<<20,column_ticks:72 }).is_err());
     let mut actual = PhysicalReceiver::new(&field,theta,Current::at_rest(&field),opening).unwrap();
-    actual.begin_held_contact_variation(VariationBudget { ratios:240,bits:1<<20,column_ticks:0 }).unwrap();
+    actual.begin_held_contact_variation(VariationBudget { ratios:HELD_FIXTURE_RATIOS,bits:1<<20,column_ticks:0 }).unwrap();
     let mut resident = actual.into_resident();
     let carry = resident.carried().cloned();
     let bits = resident.state_bits();
@@ -263,7 +270,7 @@ fn continuing_contact_comparison_deposits_and_rebases_without_resetting_delayed_
     let mut actual = PhysicalReceiver::new(&field,theta,current.clone(),opening).unwrap();
     // Five full three-tick passages, twelve columns each; no admission changes mid-run.
     actual.begin_continuing_contact_variation(VariationBudget {
-        ratios:240,bits:1<<20,column_ticks:180,
+        ratios:HELD_FIXTURE_RATIOS,bits:1<<20,column_ticks:180,
     }).unwrap();
     let blind = actual.communicate_contact(&encoded(&field,&[0]),&declared,|_|None).unwrap();
     assert!(blind.closes());

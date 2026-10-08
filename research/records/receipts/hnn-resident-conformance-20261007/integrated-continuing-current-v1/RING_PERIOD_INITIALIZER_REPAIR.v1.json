@@ -1,0 +1,525 @@
+{
+  "status": "LEGAL_RING_PERIOD_AND_DEPENDENT_DIMENSIONS_SOURCE_REPAIRED_WHOLE_BEHAVIOR_PENDING",
+  "predecessor_source_commit": "b45eacceb3caeb77946f58132dbd27fab731b3b4",
+  "queue_receipt": "research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v110/VALIDATION.json",
+  "queue_receipt_sha256": "0192af798cc786a5b83e4f1fcad6818fd1ac03de6748327eadf93ce0ada4228e",
+  "component_grade": "INTEGRATED_PRODUCING_FAILURE_OR_FIXED_RESOURCE_STOP",
+  "HNN_historical_output_grade_unchanged": "FOUR_FINITE_LOADED_SPAN_CONTROLS_PASS_ORIGINAL_OUTPUT_GATE_FAILED",
+  "stages": {
+    "hnn-integrated-b45e-partition-release-cache-preparation-20261008-v1": {
+      "phase": "release-cache-preparation",
+      "accepted_stage": true,
+      "whole_wall_ns": 506170507,
+      "CPU_ns": 397699000,
+      "fixed_guard_ns": 17000000000,
+      "measured_to_guard": {
+        "numerator": 506170507,
+        "denominator": 17000000000
+      },
+      "group_peak_bytes": 232706048,
+      "child_RSS_KiB": 24816,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "wall_stop": false,
+      "CPU_stop": false,
+      "floor_stop": false,
+      "inputs_unchanged": true,
+      "quiescent_released": true,
+      "in_group_complete_output_seal_missing": false
+    },
+    "hnn-integrated-b45e-partition-release-library-build-20261008-v1": {
+      "phase": "release-library-build",
+      "accepted_stage": true,
+      "whole_wall_ns": 21454660264,
+      "CPU_ns": 57358445000,
+      "fixed_guard_ns": 65000000000,
+      "measured_to_guard": {
+        "numerator": 21454660264,
+        "denominator": 65000000000
+      },
+      "group_peak_bytes": 2170118144,
+      "child_RSS_KiB": 2058296,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "wall_stop": false,
+      "CPU_stop": false,
+      "floor_stop": false,
+      "inputs_unchanged": true,
+      "quiescent_released": true,
+      "in_group_complete_output_seal_missing": false
+    },
+    "hnn-integrated-b45e-partition-release-example-build-20261008-v1": {
+      "phase": "release-example-build",
+      "accepted_stage": true,
+      "whole_wall_ns": 48012366124,
+      "CPU_ns": 55240864000,
+      "fixed_guard_ns": 65000000000,
+      "measured_to_guard": {
+        "numerator": 48012366124,
+        "denominator": 65000000000
+      },
+      "group_peak_bytes": 1570906112,
+      "child_RSS_KiB": 1282348,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "wall_stop": false,
+      "CPU_stop": false,
+      "floor_stop": false,
+      "inputs_unchanged": true,
+      "quiescent_released": true,
+      "in_group_complete_output_seal_missing": false
+    },
+    "hnn-integrated-b45e-partition-whole-continuing-runtime-20261008-v1": {
+      "phase": "whole-continuing-runtime",
+      "accepted_stage": false,
+      "whole_wall_ns": 274950922,
+      "CPU_ns": 182343000,
+      "fixed_guard_ns": 16000000000,
+      "measured_to_guard": {
+        "numerator": 274950922,
+        "denominator": 16000000000
+      },
+      "group_peak_bytes": 19664896,
+      "child_RSS_KiB": 17296,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "wall_stop": false,
+      "CPU_stop": false,
+      "floor_stop": false,
+      "inputs_unchanged": true,
+      "quiescent_released": true,
+      "in_group_complete_output_seal_missing": false
+    },
+    "hnn-integrated-b45e-partition-control1-20261008-v1": {
+      "phase": "control1",
+      "accepted_stage": false,
+      "whole_wall_ns": 379643437,
+      "CPU_ns": 233343000,
+      "fixed_guard_ns": 16000000000,
+      "measured_to_guard": {
+        "numerator": 379643437,
+        "denominator": 16000000000
+      },
+      "group_peak_bytes": 17047552,
+      "child_RSS_KiB": 19164,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "wall_stop": false,
+      "CPU_stop": false,
+      "floor_stop": false,
+      "inputs_unchanged": true,
+      "quiescent_released": true,
+      "in_group_complete_output_seal_missing": false
+    },
+    "hnn-integrated-b45e-partition-control2-20261008-v1": {
+      "phase": "control2",
+      "accepted_stage": false,
+      "whole_wall_ns": 300269858,
+      "CPU_ns": 215391000,
+      "fixed_guard_ns": 16000000000,
+      "measured_to_guard": {
+        "numerator": 300269858,
+        "denominator": 16000000000
+      },
+      "group_peak_bytes": 17784832,
+      "child_RSS_KiB": 19012,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "wall_stop": false,
+      "CPU_stop": false,
+      "floor_stop": false,
+      "inputs_unchanged": true,
+      "quiescent_released": true,
+      "in_group_complete_output_seal_missing": false
+    },
+    "hnn-integrated-b45e-partition-control3-20261008-v1": {
+      "phase": "control3",
+      "accepted_stage": false,
+      "whole_wall_ns": 339989445,
+      "CPU_ns": 211780000,
+      "fixed_guard_ns": 16000000000,
+      "measured_to_guard": {
+        "numerator": 339989445,
+        "denominator": 16000000000
+      },
+      "group_peak_bytes": 18223104,
+      "child_RSS_KiB": 19200,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "wall_stop": false,
+      "CPU_stop": false,
+      "floor_stop": false,
+      "inputs_unchanged": true,
+      "quiescent_released": true,
+      "in_group_complete_output_seal_missing": false
+    },
+    "hnn-integrated-b45e-partition-control4-20261008-v1": {
+      "phase": "control4",
+      "accepted_stage": true,
+      "whole_wall_ns": 2176769307,
+      "CPU_ns": 1506882000,
+      "fixed_guard_ns": 16000000000,
+      "measured_to_guard": {
+        "numerator": 2176769307,
+        "denominator": 16000000000
+      },
+      "group_peak_bytes": 18882560,
+      "child_RSS_KiB": 28992,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "wall_stop": false,
+      "CPU_stop": false,
+      "floor_stop": false,
+      "inputs_unchanged": true,
+      "quiescent_released": true,
+      "in_group_complete_output_seal_missing": false
+    },
+    "hnn-integrated-b45e-partition-control5-20261008-v1": {
+      "phase": "control5",
+      "accepted_stage": true,
+      "whole_wall_ns": 301819239,
+      "CPU_ns": 212660000,
+      "fixed_guard_ns": 16000000000,
+      "measured_to_guard": {
+        "numerator": 301819239,
+        "denominator": 16000000000
+      },
+      "group_peak_bytes": 17874944,
+      "child_RSS_KiB": 17304,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "wall_stop": false,
+      "CPU_stop": false,
+      "floor_stop": false,
+      "inputs_unchanged": true,
+      "quiescent_released": true,
+      "in_group_complete_output_seal_missing": false
+    },
+    "hnn-integrated-b45e-partition-control6-20261008-v1": {
+      "phase": "control6",
+      "accepted_stage": true,
+      "whole_wall_ns": 363963400,
+      "CPU_ns": 226606000,
+      "fixed_guard_ns": 16000000000,
+      "measured_to_guard": {
+        "numerator": 363963400,
+        "denominator": 16000000000
+      },
+      "group_peak_bytes": 17707008,
+      "child_RSS_KiB": 17452,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "wall_stop": false,
+      "CPU_stop": false,
+      "floor_stop": false,
+      "inputs_unchanged": true,
+      "quiescent_released": true,
+      "in_group_complete_output_seal_missing": false
+    },
+    "hnn-integrated-b45e-partition-control7-20261008-v1": {
+      "phase": "control7",
+      "accepted_stage": true,
+      "whole_wall_ns": 344545119,
+      "CPU_ns": 215170000,
+      "fixed_guard_ns": 16000000000,
+      "measured_to_guard": {
+        "numerator": 344545119,
+        "denominator": 16000000000
+      },
+      "group_peak_bytes": 17203200,
+      "child_RSS_KiB": 17304,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "wall_stop": false,
+      "CPU_stop": false,
+      "floor_stop": false,
+      "inputs_unchanged": true,
+      "quiescent_released": true,
+      "in_group_complete_output_seal_missing": false
+    },
+    "hnn-integrated-b45e-partition-control8-20261008-v1": {
+      "phase": "control8",
+      "accepted_stage": true,
+      "whole_wall_ns": 251026052,
+      "CPU_ns": 214155000,
+      "fixed_guard_ns": 16000000000,
+      "measured_to_guard": {
+        "numerator": 251026052,
+        "denominator": 16000000000
+      },
+      "group_peak_bytes": 18468864,
+      "child_RSS_KiB": 17260,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "wall_stop": false,
+      "CPU_stop": false,
+      "floor_stop": false,
+      "inputs_unchanged": true,
+      "quiescent_released": true,
+      "in_group_complete_output_seal_missing": false
+    },
+    "hnn-integrated-b45e-partition-control9-20261008-v1": {
+      "phase": "control9",
+      "accepted_stage": true,
+      "whole_wall_ns": 366022473,
+      "CPU_ns": 225106000,
+      "fixed_guard_ns": 16000000000,
+      "measured_to_guard": {
+        "numerator": 366022473,
+        "denominator": 16000000000
+      },
+      "group_peak_bytes": 18280448,
+      "child_RSS_KiB": 24340,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "wall_stop": false,
+      "CPU_stop": false,
+      "floor_stop": false,
+      "inputs_unchanged": true,
+      "quiescent_released": true,
+      "in_group_complete_output_seal_missing": false
+    }
+  },
+  "per_selector": [
+    {
+      "selector": "hnn::tests::physical_communication::continuing_contact_comparison_deposits_and_rebases_without_resetting_delayed_credit",
+      "status": "REFUSED_OR_FAILED",
+      "stage_label": "hnn-integrated-b45e-partition-control1-20261008-v1"
+    },
+    {
+      "selector": "hnn::tests::physical_communication::held_contact_variation_returns_the_delayed_full_state_credit",
+      "status": "REFUSED_OR_FAILED",
+      "stage_label": "hnn-integrated-b45e-partition-control2-20261008-v1"
+    },
+    {
+      "selector": "hnn::tests::physical_communication::held_contact_variation_refuses_untransported_future_without_clearing_it",
+      "status": "REFUSED_OR_FAILED",
+      "stage_label": "hnn-integrated-b45e-partition-control3-20261008-v1"
+    },
+    {
+      "selector": "hnn::tests::port::every_channel_gradient_is_the_tangent_words_derivative",
+      "status": "PASS",
+      "stage_label": "hnn-integrated-b45e-partition-control4-20261008-v1"
+    },
+    {
+      "selector": "hnn::word::variation::rebase::tests::fixed_factor_translation_differentiates_the_native_held_rate",
+      "status": "PASS",
+      "stage_label": "hnn-integrated-b45e-partition-control5-20261008-v1"
+    },
+    {
+      "selector": "hnn::word::variation::rebase::tests::identity_crossing_keeps_a_singular_compatible_rate_tangent",
+      "status": "PASS",
+      "stage_label": "hnn-integrated-b45e-partition-control6-20261008-v1"
+    },
+    {
+      "selector": "hnn::word::variation::rebase::tests::parameter_rechart_transforms_full_hidden_credit_by_the_inverse_dual",
+      "status": "PASS",
+      "stage_label": "hnn-integrated-b45e-partition-control7-20261008-v1"
+    },
+    {
+      "selector": "hnn::word::variation::rebase::tests::parameter_rechart_refuses_a_truncated_or_mismatched_phase_column",
+      "status": "PASS",
+      "stage_label": "hnn-integrated-b45e-partition-control8-20261008-v1"
+    },
+    {
+      "selector": "hnn::word::variation::rebase::tests::native_canonical_state_and_current_parameter_columns_survive_two_rebases",
+      "status": "PASS",
+      "stage_label": "hnn-integrated-b45e-partition-control9-20261008-v1"
+    }
+  ],
+  "all_released": true,
+  "actual_output": {
+    "file": "v110-ACTUAL_OUTPUT.txt",
+    "bytes": 1250,
+    "sha256": "99ece410e0ff3975c287de8d83f9e76ca21860552d13d4750ca46d6ef03e0a0a",
+    "Word_open_attempts": 0,
+    "Words_opened": 0,
+    "material_cuts": 0,
+    "full_ticks": 0,
+    "integrated_operation_acceptance": false
+  },
+  "repair": {
+    "changed_native_inputs": [
+      "crates/holonics/src/hnn/tests/physical_communication.rs",
+      "research/notebook/hnn_design/hnn_continuing_behavior.rs"
+    ],
+    "unchanged_native_inputs": 304,
+    "source_hashes": {
+      "crates/holonics/src/hnn/tests/physical_communication.rs": "24504d4086d8dc6bbbbd90a9b3a5f9be96a0075b5f13b3ece95108b4d59ce98d",
+      "research/notebook/hnn_design/hnn_continuing_behavior.rs": "4b7f7210b0204fa453ae8fb92cbe77ba3395fed039fba9281ee15d92e0e0a6be"
+    },
+    "agent_inferred": "Minimum legal interiorperiod2 with period-sized placements/width4 storage,arrivals and loaded forms; unchanged width2 contact/Half pump. Ring law unchanged, invalid predecessor behavior never executed.",
+    "runner_dimension": {
+      "ring_periods": [
+        4,
+        2
+      ],
+      "ring_widths": [
+        8,
+        4
+      ],
+      "contact_width": 2,
+      "loaded_width": 4,
+      "full_EndChange_coordinates": 36,
+      "factor_coordinates": 12,
+      "retained_ratios": 432,
+      "column_ticks": 180,
+      "exact_bits_bound": 1048576,
+      "basis": "12storage+12arrivals+4contact+8loaded; p=3*2*2. Runner derives ratio allocation from actual EndChange."
+    },
+    "fixture_dimension": {
+      "ring_periods": [
+        2,
+        2
+      ],
+      "ring_widths": [
+        4,
+        4
+      ],
+      "contact_width": 2,
+      "loaded_width": 4,
+      "full_EndChange_coordinates": 28,
+      "factor_coordinates": 12,
+      "retained_ratios": 336,
+      "two_Word_column_ticks": 72,
+      "five_Word_column_ticks": 180,
+      "exact_bits_bound": 1048576,
+      "basis": "8storage+8arrivals+4contact+8loaded; p=3*2*2. Independent analytic count asserted against admission."
+    },
+    "resource_scope": "Correct ratio counts follow legal geometry. Time/aggregateCPU/memory/floors,exact-bit and column-tick limits unchanged. Complete changed-source cost queue-owned/unmeasured.",
+    "preserved": "All targets,observations,masks,delayed-credit/adjoint/material/rebase/phase/refusal assertions,seeds,7passages,>=2actual factor movements,sourceclock and whole blind output. Only independent dimension assertion corrected.",
+    "constructor_contract_review": [
+      {
+        "owner": "field::Ring::declare",
+        "contract": "period>=2,placements=period,axis/common nonzero circle,in-range locks/key,positive admittance,reflector involution",
+        "finding": "Sourceperiod2/4,interiorperiod2. Constructors generate exact placement/reflection count, test circle x^2+y^2=65 and runner quarter-turn circle. Interior empty lock/source complete locks preserved."
+      },
+      {
+        "owner": "field::Contact::declare / Field::declare",
+        "contract": "valid distinct ends,injective in-range channel,positive step/grain/classes,exponent lattice,reached rings,source capacity,lattice rule",
+        "finding": "Ends0/1,channel(0,0),width2,admittance2,exponent0,step1,grain1,classes2,crib offset1 and empty offsets. All rings reached; by_lattice_rule derives changed fan-in. Population2^16 exceeds source support capacity."
+      },
+      {
+        "owner": "Constitution::{with_element,with_channel,with_ports}",
+        "contract": "element/slice shape,contact rows,standing/source/receiving slots,E/R chart",
+        "finding": "Elements/slices derive actual ring widths; contact factors2x2. Fixture R4x4 in receiving slot on width4 receiver. Initial E fits2classes; runner R remains initialzero before real comparisons."
+      },
+      {
+        "owner": "ResonatorMaterial::new / Constitution::with_ring_resonator / PumpDeclaration::new",
+        "contract": "same even symmetric square forms,storage/dissipation PSD,ring width,nonnegative pump,unit carrier",
+        "finding": "Identity4 forms derived from actual ring width. Half step,strength1/16,axis(1,0) unchanged. Native Floquet certification remains queue gate."
+      },
+      {
+        "owner": "word::{EndChange::rest,Word::continuing} / HeldContactVariation::begin",
+        "contract": "complete wave/contact/loaded shape,canonical momentum,prior-tick phase,reference,budget",
+        "finding": "Seed/injection derive whole shape; fixed1/3 motion preserved. Openingtick1 has phaseAt(0)=0, nexttick7 phase0 assertion unchanged. Fixture28/336 and runner36/432; parameters12,column-ticks72/180 unchanged."
+      },
+      {
+        "owner": "ReceivingPhases::declare / Encoded::identity / KnownTruth::cyclic_class_orbit",
+        "contract": "valid receiver,tolerance/aperture,classes/source chart,actual rank",
+        "finding": "Receiver0,aperture3,depth1,tolerance1/16; classes2 admitted at sourceperiod2/4. Same identity/source/prefix/postblind comparisons. Native observability remains a gate; no rank bypass. Rebase fixture is already legal period2 and passed unchanged."
+      }
+    ],
+    "interpretation": "Native operations and material updates/persistent state are separate from usefulness,acquisition,adaptation or output improvement. Printed final attribution identifies source/carry/material co-variation; no isolated finite material effect inferred and no separate objective/test project added. External schedule is not the comprehensive HNN architecture.",
+    "parse_only_pass": [
+      "crates/holonics/src/hnn/tests/physical_communication.rs",
+      "research/notebook/hnn_design/hnn_continuing_behavior.rs"
+    ],
+    "whitespace_pass": true,
+    "source_owner_builds_tests_training_benchmarks_scientific_runs": 0,
+    "reuse_scope": "Production library and six passing other controls byte-identical. Queue verifies dependency/config seals; successor changed test binary and release example needed. Dynamic observability/Floquet and actual whole behavior pending."
+  },
+  "whole_native_behavior_acceptance": false,
+  "scientific_validation_or_acquisition_acceptance": false
+}

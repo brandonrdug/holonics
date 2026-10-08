@@ -1,6 +1,6 @@
 {
-  "status": "PREDECESSOR_LIBRARY_EXAMPLE_GUARDS_57_DOCTESTS_PASS_HELD_FIXTURE_REPAIRED_TEST_BUILD_AND_WHOLE_PENDING",
-  "source_manifest_sha256": "c0d36c00d84e1402750275f64e4d33bc9bc40f0071e671af411c39a12d24d00a",
+  "status": "RELEASE_COMPILED_SIX_OTHER_CONTROLS_PASS_PREDECESSOR_PERIOD_REFUSES_ZERO_WORDS_LEGAL_PERIOD_SUCCESSOR_PENDING",
+  "source_manifest_sha256": "b4dc4ad115fe5f0b4b56c9cb031b83cfc31f43ad37c48e6c861d9568fe161ad3",
   "source_input_count": 306,
   "source_parse_checks": [
     "crates/holonics/src/hnn/constitution.rs",
@@ -38,24 +38,49 @@
   "source_clock_scope": "fixed source Current station entrance tau+1+j, independent advancing carried hop/pump clock; no full-stream ingestion claim",
   "cost": "Fixed declared dimension/column-tick/bit domain; complete joined first development timing and peak allocation are unmeasured; sole queue owns measured complete projection/cache/guard protocol under unchanged caps",
   "declared_runner_dimension": {
-    "ring_widths": [
-      8,
+    "ring_periods": [
+      4,
       2
     ],
+    "ring_widths": [
+      8,
+      4
+    ],
     "contact_width": 2,
-    "loaded_width": 2,
+    "loaded_width": 4,
+    "full_EndChange_coordinates": 36,
+    "factor_coordinates": 12,
+    "retained_ratios": 432,
+    "column_ticks": 180,
+    "exact_bits_bound": 1048576,
+    "basis": "12storage+12arrivals+4contact+8loaded; p=3*2*2. Runner derives ratio allocation from actual EndChange."
+  },
+  "runner_revision": "v5 legal period2 interior,width4,actual36state/432ratios; fixed7passages/180column-ticks/bit/cost caps; final attribution exposes source/carry/material co-variation; comprehensive action/perception architecture remains beyond this operation gate",
+  "compile_repair_receipt": "RUNNER_COMPILE_REPAIR.v1.json",
+  "incremental_parse_checks": [
+    "crates/holonics/src/hnn/tests/physical_communication.rs",
+    "research/notebook/hnn_design/hnn_continuing_behavior.rs"
+  ],
+  "source_inputs_reverified": 306,
+  "fixture_repair_receipt": "HELD_FIXTURE_PORT_REPAIR.v1.json",
+  "ring_period_repair_receipt": "RING_PERIOD_INITIALIZER_REPAIR.v1.json",
+  "declared_fixture_dimension": {
+    "ring_periods": [
+      2,
+      2
+    ],
+    "ring_widths": [
+      4,
+      4
+    ],
+    "contact_width": 2,
+    "loaded_width": 4,
     "full_EndChange_coordinates": 28,
     "factor_coordinates": 12,
     "retained_ratios": 336,
-    "column_ticks": 180,
+    "two_Word_column_ticks": 72,
+    "five_Word_column_ticks": 180,
     "exact_bits_bound": 1048576,
-    "basis": "Field::Ring::width=2*placements; 10storage+10arrivals+4contact+4loaded. Runner derives actual count; worker prose22/264 is not used."
-  },
-  "runner_revision": "v3 import-only successor aabf856da37f18d9fc97fab5abe1d395cf9a0e4ff87685c0ae699eba685277a0: remove duplicate FieldMaterial method import; all v2 assertions/refusal output/exit2, physics, fixed count and resource policy unchanged",
-  "compile_repair_receipt": "RUNNER_COMPILE_REPAIR.v1.json",
-  "incremental_parse_checks": [
-    "crates/holonics/src/hnn/tests/physical_communication.rs"
-  ],
-  "source_inputs_reverified": 306,
-  "fixture_repair_receipt": "HELD_FIXTURE_PORT_REPAIR.v1.json"
+    "basis": "8storage+8arrivals+4contact+8loaded; p=3*2*2. Independent analytic count asserted against admission."
+  }
 }

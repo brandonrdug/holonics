@@ -479,8 +479,8 @@
       "sha256": "c5eb98795e16a1fe15e73e4cedd71f678bbde2c197856c770d6d082bf1a81f8d"
     },
     "crates/holonics/src/hnn/tests/physical_communication.rs": {
-      "bytes": 72600,
-      "sha256": "b70c6d17718830755a272310441fc31b9b717e2c062da51b8badc15bdf976455"
+      "bytes": 73162,
+      "sha256": "24504d4086d8dc6bbbbd90a9b3a5f9be96a0075b5f13b3ece95108b4d59ce98d"
     },
     "crates/holonics/src/hnn/tests/physics.rs": {
       "bytes": 64392,
@@ -1123,8 +1123,8 @@
       "sha256": "956863c53d52a35a8083d1f984b3d55ff778249cdf4ac02cd8ca6318e68c0c2d"
     },
     "research/notebook/hnn_design/hnn_continuing_behavior.rs": {
-      "bytes": 31704,
-      "sha256": "aabf856da37f18d9fc97fab5abe1d395cf9a0e4ff87685c0ae699eba685277a0"
+      "bytes": 32067,
+      "sha256": "4b7f7210b0204fa453ae8fb92cbe77ba3395fed039fba9281ee15d92e0e0a6be"
     },
     "research/notebook/hnn_design/hnn_executed_loop.rs": {
       "bytes": 38885,
