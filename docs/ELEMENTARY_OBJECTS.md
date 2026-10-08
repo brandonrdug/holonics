@@ -992,6 +992,65 @@ Intelligence does not enumerate keys:
   faces only a receiver of the right standing decodes: keys that move with their holders, not
   static ones.
 
+## The helical code: how Holons encode
+
+[definition; Brandon, October 8: "the helical code object would be what I'm trying to do with
+Holons, Holarchies, Epochs, and Aeons"] The **helical code** is the encoding every Holon carries.
+It is a composition of the objects above, not a new noun, and it is the critical object of the
+rebuild ([record](../research/records/2026-10-08_THE_HELICAL_CODE_IS_HOW_HOLONS_HOLARCHIES_EPOCHS_AND_AEONS_ENCODE.md)).
+Its five parts:
+
+1. **Strand (navigator, §3).** A source word `u = (u_k)` over an alphabet `A` is placed on a
+   navigator's helix (circle plus carry). Letter `k` sits at its tick through the phase transport,
+   `Ĝ(τ(k))⁻¹ E(u_k)`, so the strand's face is the phase-carried moment
+   `m = Σ_k Ĝ(τ(k))⁻¹ E(u_k)`. The helix is the orbit of one screw, and each letter selects its
+   step's screw: the strand is a serial screw word, the motor chart.
+2. **Pairing (pair contact, §4; the reflector).** A fixed-point-free involution `σ` on `A` pairs the
+   strand with its complement read backward, `w ↦ σ(w)ᴿ`, an involutive anti-automorphism of
+   words. Position `k` locks against position `n−1−k` of the second strand through a helical pair
+   contact, and the lock is zero slip, exactly when the letters are `σ`-complementary
+   (`HelicalPairInteraction.lock_iff_zero_power`). Read at any phase, the pairing is again a
+   fixed-point-free involution: `S⁻ᵈσSᵈ` (`phaseTransport`, `reflectedReturn_involutive`,
+   `reflectedReturn_no_fixed_point`). So no letter pairs with itself at any phase, every pairing is
+   reciprocal, and each strand is the other's key. A failed lock is a slip: a located defect.
+3. **Frames (receiver and epoch, §§10, 12).** A receiver reads the strand at its section. Its ticks
+   partition the strand into epochs, the cells of its frame: residues modulo its period at its
+   grain. Receivers of coprime periods meet in exactly one position per pair of residues (the
+   Chinese remainder theorem): intersecting partitions, as the located transport reads digits and
+   residues.
+4. **Decoder (Holonic Compression; retention).** A receiver's face maps frame words to classes. Its
+   kernel, the differences no admitted receiver distinguishes, is placed where the likely defects
+   fall, so a slip inside the kernel changes no class. The decoder is a quotient with a designed
+   kernel, and retention keeps that quotient.
+5. **Topology (cycle).** For closed strands the linking number, the whole windings of one strand
+   about the other, is conserved. It splits as twist plus writhe: the local winding, the phase
+   part, plus the coiling of the axis, a helix of helices (the tower). Only a crossing changes it:
+   by ±1 per crossing change between components, and by ±2 for a passage of a paired strand.
+
+**The roles.**
+- A **Holon** is the current the code addresses: the motion along the strand, already present as
+  potential.
+- A **Holarchy** is the paired duplex and its nesting: two strands joined by pair contacts, a helix
+  of helices, many duplexes joined.
+- An **epoch** is a frame cell at a receiver's section.
+- An **aeon** is the strand's passage, from opening to close. Its conserved charge is the linking
+  number, which cycles read as whole windings, and its boundary is where the decoder's quotient is
+  taken.
+
+**Why it works:**
+- complementarity gives a built-in key and reciprocity;
+- a non-locking repeat (an irrational or high-order winding, `Aeon/Clock/CarryWord`,
+  `never_locks_iff_irrational`) keeps the placement from resonating with itself;
+- a designed kernel absorbs the likely defects;
+- the topology conserves access and stored energy, exchanged between twist and writhe and changed
+  only by crossings.
+
+The same composition reads the Enigma (rotor stepping as phase transport, the reflector as `σ`, the
+Bombe as loop closure), the retina and lens (the lens a frame transport, the retina the partition),
+a web read through its modes, and a phyllotactic spiral (the golden winding that never locks, its
+Fibonacci parastichies the Farey convergents at each grain). The laws not yet proved are in
+`Transport/HelicalCode` and #62.
+
 ## Emanation and resonance
 
 [proved-derived; formal-checked] A drive splits uniquely and `C`-orthogonally into its component in
