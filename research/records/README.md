@@ -27,6 +27,8 @@ records derive its laws and measure the prototype, whose code is in history.
 
 ### Current (September 24 onward)
 
+- [The receiving phase comparison retains an exact family, and its probe is a declared leverage](2026-10-08_THE_RECEIVING_PHASE_COMPARISON_RETAINS_AN_EXACT_FAMILY_AND_ITS_PROBE_IS_A_DECLARED_LEVERAGE.md) (#73, #62, #63): the v113 request out of image by construction; the exact phase family and its leverage probe; soft face masses and the certified receiving alignment repaired; consecutive encounters admitted; the port-Holon World model (C1b) next
+
 - [The charted source return re-represents its producing chart](2026-10-07_THE_CHARTED_SOURCE_RETURN_RE_REPRESENTS_ITS_PRODUCING_CHART.md) (#73, #63, #62): preserve the continuation-v34 passed opening balance and incomplete cold comparison; promote the existing exact chart-value representation for unsplit source responses, with actual operand falsifier and retained route/check receipts; execution pending, no speedup claim.
 
 - [The source class orbit covers the receiving comparison before any probe](2026-10-06_THE_SOURCE_CLASS_ORBIT_COVERS_THE_RECEIVING_COMPARISON_BEFORE_ANY_PROBE.md) (#73, #148, #63): complete class translations of independently seeded KnownTruth cyclic representatives, fixed four Receiving comparisons and four blind probes, actual zero/one row gate and explicit correlated development scope; actual 8c cost body consumed, one identical exterior control removed, new native acceptance pending.
