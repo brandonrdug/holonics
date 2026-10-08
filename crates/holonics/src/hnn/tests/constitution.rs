@@ -2648,25 +2648,19 @@ fn a_receiving_deposit_absorbs_its_phase_comparisons_through_the_map_before_it()
         let predicted = at(2 * c + 1, 0);
         if observed[c].is_zero() { predicted } else { predicted + integer(2) * &gaps[c] }
     };
-    let hot_target = |c: usize| {
-        let predicted = at(2 * c + 1, 0) + at(2 * c + 1, 1);
-        if c == 3 { predicted + integer(2) * &gap_hot } else { predicted }
-    };
     let mut expected = PhaseStatistics::founded(a, n);
     let soft_targets: Vec<Rat> = (0..a).map(|c| soft_target(c)).collect();
     expected
         .absorb(&integer(1), &e0, &observed, &soft_targets)
         .unwrap();
-    let hot_targets: Vec<Rat> = (0..a).map(|c| hot_target(c)).collect();
-    let hot_masses = vec![Rat::zero(), Rat::zero(), Rat::zero(), Rat::one()];
-    expected
-        .absorb(&integer(2), &e01, &hot_masses, &hot_targets)
-        .unwrap();
+    // The one-hot face carries no masses of its own: the text path's categorical faces have no
+    // consumer of this statistic and are not retained (it is founded lazily by the soft face).
     assert_eq!(phase, &expected);
 
-    // And the sums, by hand: N, then class 0 (the soft face alone) and class 3 (the one-hot alone).
+    // And the sums, by hand: N counts the soft face's three classes of positive mass; class 0 holds
+    // the soft face alone and class 3 (no soft mass) holds nothing.
     assert_eq!((phase.classes(), phase.features()), (a, n));
-    assert_eq!(phase.cells(), &integer(5));
+    assert_eq!(phase.cells(), &integer(3));
     let zeros = vec![vec![Rat::zero(); n]; n];
     let mut gram0 = zeros.clone();
     gram0[0][0] = rat(1, 4);
@@ -2675,16 +2669,14 @@ fn a_receiving_deposit_absorbs_its_phase_comparisons_through_the_map_before_it()
     moment0[0] = rat(1, 4) * soft_target(0);
     assert_eq!(phase.moment(0), &moment0[..]);
     assert_eq!(phase.second(0), &(rat(1, 4) * soft_target(0) * soft_target(0)));
-    let mut gram3 = zeros;
-    for (i, j) in [(0, 0), (0, 1), (1, 0), (1, 1)] {
-        gram3[i][j] = integer(2);
-    }
-    assert_eq!(phase.gram(3), &gram3[..]);
-    let moment3: Vec<Rat> = (0..n)
-        .map(|j| if j < 2 { integer(2) * hot_target(3) } else { Rat::zero() })
-        .collect();
-    assert_eq!(phase.moment(3), &moment3[..]);
-    assert_eq!(phase.second(3), &(integer(2) * hot_target(3) * hot_target(3)));
+    assert_eq!(phase.gram(3), &zeros[..]);
+    assert_eq!(phase.moment(3), &vec![Rat::zero(); n][..]);
+    assert_eq!(phase.second(3), &Rat::zero());
+
+    // A receiving law that only categorical faces reach founds no statistics at all.
+    let hot_only = receiving_window(&theta, vec![hot_only_sample(&e01)]);
+    let (categorical, _) = theta.deposited(&hot_only).unwrap();
+    assert_eq!(categorical.receiving_law(2).unwrap().phase_statistics(), None);
 
     // A checkpoint writes the statistics whole and a restored constitution holds them again.
     let state = next.continuing_state(0).unwrap();
@@ -2785,7 +2777,8 @@ fn a_moved_prior_keeps_the_phase_statistics_and_the_ridge_is_read_at_its_scale()
     .unwrap();
     let law = NormalLaw::with_receiving_prior(map, 2);
     assert_eq!(law.prior_scale(), 2);
-    assert_eq!(law.phase_statistics(), Some(&PhaseStatistics::founded(2, 2)));
+    // Founded lazily by the deposit at the first soft face, so none is held at founding.
+    assert_eq!(law.phase_statistics(), None);
     // One deposit so the Gram has a support (the prior carry's window at t = 1).
     let reading = |feature: [Rat; 2], masses: [Rat; 2], target: usize| {
         let covector: Vec<Rat> = (0..2)
@@ -2820,17 +2813,14 @@ fn a_moved_prior_keeps_the_phase_statistics_and_the_ridge_is_read_at_its_scale()
     assert_eq!(moved.prior_scale(), 1);
     assert_eq!(moved.phase_statistics(), Some(&statistics));
 
-    // Sources and contrasts hold none; the receiving law is founded empty at its declared ridge.
+    // Sources and contrasts hold none; the receiving law holds none until a soft face reaches it.
     let mut declared = super::learning::chain_declaration(1 << 16);
     declared.receivers[0].receiving_prior = 3;
     let field = crate::hnn::field::Field::declare(declared.by_lattice_rule()).unwrap();
     let theta = Constitution::initial(&field, OPEN_BUDGET).unwrap();
     let receiving = theta.receiving_law(2).unwrap();
     assert_eq!(receiving.prior_scale(), 3);
-    assert_eq!(
-        receiving.phase_statistics(),
-        Some(&PhaseStatistics::founded(field.alphabet(), receiving.map().columns()))
-    );
+    assert_eq!(receiving.phase_statistics(), None);
     assert_eq!(theta.source_law(0).unwrap().phase_statistics(), None);
     for g in 0..field.rings().len() {
         assert_eq!(theta.contrast_law(g).phase_statistics(), None);
@@ -2949,4 +2939,21 @@ fn a_receiving_step_its_alignment_cannot_certify_is_refused() {
         .deposited(&receiving_window(&theta, vec![face(rat(1, 8))]))
         .unwrap();
     assert_eq!(map_steps(&reading), 1);
+}
+
+/// A categorical (one-hot, uncarried) receiving face on the chain's four classes, target class 3.
+fn hot_only_sample(feature: &[Rat]) -> Sample {
+    let produced = [rat(1, 8), rat(1, 8), rat(1, 4), rat(1, 2)];
+    let covector: Vec<Rat> = (0..4)
+        .flat_map(|c| {
+            let q = if c == 3 { Rat::one() } else { Rat::zero() };
+            [q - &produced[c], Rat::zero()]
+        })
+        .collect();
+    Sample {
+        weight: integer(1),
+        feature: feature.to_vec(),
+        covector,
+        masses: None,
+    }
 }

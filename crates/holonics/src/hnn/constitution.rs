@@ -463,8 +463,10 @@
 //! one-hot reconstruction otherwise ([`face_masses`]). The reconstruction is exact for a one-hot `q`
 //! and was wrong for a soft one (it accepted `p̃ = (⅚, ⅙)` for `(½, ½)` against `q̃ = (⅔, ⅓)`), a
 //! located cause repaired here, in its owner, before its new consumer. Beside its Gram `H` and the
-//! prior's pair, the receiving law keeps the exact statistics of the phase comparison its readings
-//! made ([`NormalLaw::phase_statistics`], `hnn::phase_family`): per class the sums
+//! prior's pair, the receiving law keeps the exact statistics of the phase comparison its soft
+//! observed faces made (faces carrying their own masses, the action path's World receipts; founded
+//! lazily at the first, so a law no such face reaches holds none and pays nothing)
+//! ([`NormalLaw::phase_statistics`], `hnn::phase_family`): per class the sums
 //! `S_c = Σ w q_c f fᵀ`, `m_c = Σ w q_c t_c f`, `s_c = Σ w q_c t_c²` of the doubled lifted phase
 //! target `t_c = 2 φ_q,c` the readings observed, with the declared cell count `N`. They are
 //! absorbed in the deposit's own successor ([`absorb_phase`]), through the map in force before it and
@@ -2050,8 +2052,9 @@ pub struct NormalLaw {
     /// [definition; agent-inferred, October 8] The receiving law's exact phase-comparison statistics
     /// ([`PhaseStatistics`]): per class one fixed-size sum of the readings that reached the map, in
     /// the doubled lifted phase targets the map's imaginary rows are regressed on, absorbed in the
-    /// deposit's own successor ([`absorb_phase`]); no reading is kept. `None` on a source or
-    /// contrast law.
+    /// deposit's own successor ([`absorb_phase`]); no reading is kept. Founded lazily by the
+    /// first reached face that carries its own masses (a soft observed face); `None` before then,
+    /// and always on a source or contrast law.
     phase: Option<PhaseStatistics>,
 }
 
@@ -2115,15 +2118,13 @@ impl NormalLaw {
 
     /// **The receiving map's law as its field declares its prior**: founded at `2^k I`
     /// ([`NormalLaw::with_scaled_prior`]) with the prequential pair carried from zero
-    /// ([`LocatedPrior`]), so the readings move `k` (`ReceiverDeclaration::receiving_prior`), and
-    /// with the phase statistics founded empty ([`PhaseStatistics::founded`]): the receiving map's
-    /// rows are realified `[Re, Im]` per class, so its `m` rows are `m/2` classes, each regressed
-    /// on the map's `n` features.
+    /// ([`LocatedPrior`]), so the readings move `k` (`ReceiverDeclaration::receiving_prior`). Its
+    /// phase statistics are not founded here: the deposit founds them lazily
+    /// ([`PhaseStatistics::founded`], `m/2` classes on the map's `n` features, the rows being
+    /// realified `[Re, Im]` per class) at the first reached face that carries its own masses.
     pub fn with_receiving_prior(map: ExactRatMatrix, from: u32) -> Self {
-        let phase = PhaseStatistics::founded(map.rows() / 2, map.columns());
         Self {
             located: Some(LocatedPrior::founded(from)),
-            phase: Some(phase),
             ..Self::with_scaled_prior(map, from)
         }
     }
@@ -2795,6 +2796,11 @@ pub(crate) fn absorb_phase(
     let four = Rat::from_integer(BigInt::from(4));
     for sample in samples {
         if sample.weight.is_zero() || sample.feature.iter().all(|x| x.is_zero()) {
+            continue;
+        }
+        // Only a face carrying its own masses is retained: the categorical faces of the text path
+        // have no consumer of this statistic, and founding one for them is the cost refused above.
+        if sample.masses.is_none() {
             continue;
         }
         let Some(masses) = face_masses(sample) else {
@@ -7044,10 +7050,21 @@ impl Constitution {
                         // yet replaced; the map `prequential_terms` read in pass 1), so a refused
                         // deposit absorbs nothing: the constitution publishes the successor whole
                         // or not at all.
-                        if let (LinearLocus::Receiving(_), Some(phase)) =
-                            (step.locus, next.phase.as_mut())
-                        {
-                            absorb_phase(phase, law.map(), &step.samples).map_err(refused)?;
+                        // The statistics are founded lazily, at the first reached face that carries
+                        // its own masses (a soft observed face, the action path's World receipt): a
+                        // receiving law no such face has reached holds none and pays nothing
+                        // (Epime's resource review, October 8: an eager dense founding cost
+                        // 256 · 512² rationals on a wide field before any receipt).
+                        if let LinearLocus::Receiving(_) = step.locus {
+                            if step.samples.iter().any(|sample| {
+                                sample.masses.is_some() && !sample.weight.is_zero()
+                            }) {
+                                let (rows, columns) = (law.map().rows(), law.map().columns());
+                                let phase = next
+                                    .phase
+                                    .get_or_insert_with(|| PhaseStatistics::founded(rows / 2, columns));
+                                absorb_phase(phase, law.map(), &step.samples).map_err(refused)?;
+                            }
                         }
                         // A located prior reads its window's terms and moves (the prior carry's
                         // design §3), one atomic successor of the stepped law.

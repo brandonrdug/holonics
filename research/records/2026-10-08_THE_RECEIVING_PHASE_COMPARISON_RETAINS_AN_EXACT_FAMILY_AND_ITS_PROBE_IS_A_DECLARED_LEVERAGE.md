@@ -63,7 +63,11 @@ S_c = Σ w q_c x xᵀ,   m_c = Σ w q_c t_c x,   s_c = Σ w q_c t_c²,   N = Σ 
 ```
 
 absorbed in the deposit's own successor through the map in force before it, and saved and
-restored exactly. No sample is kept. Under the receiving law's prior ridge `2^k I` (a declared
+restored exactly. The statistics are founded lazily, at the first reached face that carries its
+own masses (a soft observed face, the action path's World receipt). The text path's categorical
+faces have no consumer of this statistic and are not retained. An eager dense founding cost
+`C·n²` zero rationals on every receiving law, `256·512²` on a wide test field, before any receipt
+(Epime's resource review, October 8; the v116 allocation refusal). No sample is kept. Under the receiving law's prior ridge `2^k I` (a declared
 convention of the family, not a deposited loss) and the declared cumulative tolerance
 `τ = ε_bits·N`,
 
