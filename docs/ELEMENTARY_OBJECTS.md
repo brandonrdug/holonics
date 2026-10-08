@@ -1001,31 +1001,96 @@ rebuild ([record](../research/records/2026-10-08_THE_HELICAL_CODE_IS_HOW_HOLONS_
 Its five parts:
 
 1. **Strand (navigator, §3).** A source word `u = (u_k)` over an alphabet `A` is placed on a
-   navigator's helix (circle plus carry). Letter `k` sits at its tick through the phase transport,
-   `Ĝ(τ(k))⁻¹ E(u_k)`, so the strand's face is the phase-carried moment
-   `m = Σ_k Ĝ(τ(k))⁻¹ E(u_k)`. The helix is the orbit of one screw, and each letter selects its
-   step's screw: the strand is a serial screw word, the motor chart.
+   navigator's helix, the orbit of one screw `S` (a turn with a rise: circle plus carry). Letter `k`
+   sits at its tick through the phase transport, `Ĝ(τ(k))⁻¹ E(u_k)`, so the strand's face is the
+   phase-carried moment `m = Σ_k Ĝ(τ(k))⁻¹ E(u_k)`. Each letter selects its step's screw: the
+   strand is a serial screw word, the motor chart.
+   - **Resonating lengths.** With `τ(k) = k`, a word repeating with period `p` has
+     `(1 − Ĝ⁻ᵖ) m_{Np} = (1 − Ĝ⁻ᴺᵖ) m_p`. In resonance, `Ĝᵖ = 1` on the face (the period is
+     whole turns), the face grows with every repeat, `m_{Np} = N·m_p`. Off resonance, with
+     `1 − Ĝ⁻ᵖ` invertible and `Ĝ` an isometry, it stays bounded. When `E(a)` is the bend a letter
+     gives the axis, `m` is the axis's accumulated bend: a code in resonance curves its own carrier,
+     and off resonance its bends cancel. This is the split of
+     [emanation and resonance](#emanation-and-resonance) read on a strand.
 2. **Pairing (pair contact, §4; the reflector).** A fixed-point-free involution `σ` on `A` pairs the
-   strand with its complement read backward, `w ↦ σ(w)ᴿ`, an involutive anti-automorphism of
-   words. Position `k` locks against position `n−1−k` of the second strand through a helical pair
-   contact, and the lock is zero slip, exactly when the letters are `σ`-complementary
-   (`HelicalPairInteraction.lock_iff_zero_power`). Read at any phase, the pairing is again a
-   fixed-point-free involution: `S⁻ᵈσSᵈ` (`phaseTransport`, `reflectedReturn_involutive`,
-   `reflectedReturn_no_fixed_point`). So no letter pairs with itself at any phase, every pairing is
-   reciprocal, and each strand is the other's key. A failed lock is a slip: a located defect.
+   strand with its complement read backward, `σ̄(w) = σ(w)ᴿ`, an involutive anti-automorphism of
+   words (`σ̄(vw) = σ̄(w)σ̄(v)`). Its fixed words, the `σ`-palindromes, have even length and are
+   fixed by their first half.
+   - **Geometry.** Reading backward is the half-turn `k ↦ n−1−k` of the index line (the Swing's
+     `S_a`, `a = (n−1)/2`). In space it is the half-turn `U` about a dyad axis perpendicular to the
+     helix, which inverts the screw, `USU = S⁻¹`. Positions, frames and the duplex's shape carry one
+     dihedral group `⟨S, U | U² = 1, USU = S⁻¹⟩`: its half-turns are the `SʲU`, about dyads at
+     every half step, and the pairing is its reflection lifted by `σ`.
+   - **The Enigma's two properties.** Read through any frame `A` (a rotor's stepping, a phase of the
+     helix), the pairing `A⁻¹σA` is again a fixed-point-free involution (`phaseTransport`;
+     `reflectedReturn_involutive` at each fixed frame; `reflectedReturn_no_fixed_point`), and it is
+     reciprocal (`boundary_involution_reciprocal`). No letter pairs with itself, and each strand is
+     the other's key. The Enigma is this object at one position: a reflector conjugated by a
+     moving frame.
+   - **The contact's reading.** Position `k` meets position `n−1−k` of the partner through a
+     helical pair contact. `lock_iff_zero_power` proves, on a face of positive weight with
+     null-definite material (`xᵀDx = 0 → x = 0`), that advancing the pair at integer rates `q, p`
+     reads zero power exactly when `q v_a = p v_b`: a synchronization of velocities. Reading
+     `σ`-complementarity as zero slip needs a declared embedding of the letters into contact
+     velocities in which `a` and `σ(a)` synchronize at the lock rates and no other pair does. The
+     embedding is the consumer's, and is owed.
+   - **Four letters.** On four letters the fixed-point-free involutions are exactly three, and with
+     the identity they form the Klein group `V`, abelian and acting simply transitively. So `σ` is
+     one of them, every point substitution `a ↦ v·a` has exactly one of three types `v`, and the
+     pairing preserves the type, `σ(v·a) = v·σ(a)`: a slipped contact is repaired by the same type
+     on either strand.
 3. **Frames (receiver and epoch, §§10, 12).** A receiver reads the strand at its section. Its ticks
    partition the strand into epochs, the cells of its frame: residues modulo its period at its
    grain. Receivers of coprime periods meet in exactly one position per pair of residues (the
    Chinese remainder theorem): intersecting partitions, as the located transport reads digits and
-   residues.
-4. **Decoder (Holonic Compression; retention).** A receiver's face maps frame words to classes. Its
-   kernel, the differences no admitted receiver distinguishes, is placed where the likely defects
-   fall, so a slip inside the kernel changes no class. The decoder is a quotient with a designed
-   kernel, and retention keeps that quotient.
-5. **Topology (cycle).** For closed strands the linking number, the whole windings of one strand
-   about the other, is conserved. It splits as twist plus writhe: the local winding, the phase
-   part, plus the coiling of the axis, a helix of helices (the tower). Only a crossing changes it:
-   by ±1 per crossing change between components, and by ±2 for a passage of a paired strand.
+   residues. On a duplex the frames of period `p` are `p` phases on each of two strands, and the
+   dihedral group acts on these `2p` frames simply transitively: `S` advances every phase, and `U`
+   exchanges the strands with the phase reversed.
+4. **Decoder and channel (Holonic Compression; retention).** The duplex stores each letter twice,
+   once as itself and once as its complement: per contact, a repetition code of length two and
+   distance two. The admitted channel is part of the decoder's operands.
+   - **The inner code: the pairing.** Substitutions on one strand at contacts whose partners are
+     intact make exactly those contacts slip: each such defect is located exactly. Each slipped
+     contact's repair has two members, since either strand may be the damaged one. A frame that
+     marks the template strand resolves them. Without one, the decoder returns a class only when
+     every member decodes to the same class, and otherwise refuses, naming the contacts and the
+     classes. A coordinated substitution of both strands at a contact, complementary, makes a
+     valid duplex, which the pairing cannot witness.
+   - **The outer code: the quotient.** A receiver's face maps frame words to classes. Its kernel,
+     the differences no admitted receiver distinguishes (`Foundation/CausalRelevance`), absorbs the
+     coordinated substitutions it contains: they change no class. A coordinated substitution
+     outside the kernel changes the class without a witness. It is the code's residual, counted
+     and never claimed as refused.
+   - A designed kernel holds the likely coordinated substitutions. On four letters, a frame
+     position whose kernel contains a type `v ∈ V` absorbs every substitution of that type there.
+     Retention keeps the quotient ([the retention contract](#the-retention-contract)).
+5. **Topology (cycle).** For two closed strands the linking number `Lk`, the whole windings of one
+   about the other, is half the signed count of the crossings between them in a declared
+   projection.
+   - **Proved** (`Foundation/TopologicalReceiver`): `Lk` is symmetric (`linkingNumber_comm`),
+     unmoved by viewing from the other side or rescaling the direction
+     (`linkingTotal_neg_direction`, `linkingTotal_smul_direction`), and an integer where the over
+     and under half-sums agree (`linking_is_an_integer` under `HalvesAgree`, which the Rust owner
+     checks at every reading).
+   - **Owed:** its invariance under every admissible projection (`LinkingIsProjectionInvariant`,
+     an open `Prop` the Rust owner tests over declared directions), and `HalvesAgree` itself. With
+     them, `Lk` is conserved by every motion without a crossing.
+   - **Crossing changes.** One strand passing through the other flips one crossing between them
+     and moves `Lk` by ±1. The core passing through itself, one duplex segment through another,
+     flips four strand crossings. Where the strands run beside the core as a ribbon (each strand's
+     tangent parallel or antiparallel to the core's), the two crossings between different strands
+     carry the same sign, so `Lk` moves by ±2.
+   - **Twist and writhe.** For a ribbon, `Lk = Tw + Wr` (Călugăreanu–White–Fuller). The twist is
+     one strand's winding about the core, the phase part. The writhe is the core's own coiling, a
+     helix of helices (the tower), read as the core's Gauss double integral; the projected writhe
+     is not projection invariant (`projectedWrithe_is_not_projection_invariant`). The
+     decomposition is owed (#62).
+   - **Closure is a division with remainder.** Closing a duplex of `n` steps with relaxed turn `θ₀`
+     fixes the integer `Lk`. The relaxed twist `nθ₀/2π` is generally not an integer, so with the
+     decomposition the remainder `ΔLk = Lk − nθ₀/2π = ΔTw + Wr` is carried as strain, in twist
+     and writhe (supercoiling). How the stored energy divides between them is the constitution's
+     law (bending and twisting stiffness), and past a threshold of twist the core buckles into
+     writhe, a joint's snap. Conservation alone gives no energy or access theorem.
 
 **The roles.**
 - A **Holon** is the current the code addresses: the motion along the strand, already present as
@@ -1033,23 +1098,30 @@ Its five parts:
 - A **Holarchy** is the paired duplex and its nesting: two strands joined by pair contacts, a helix
   of helices, many duplexes joined.
 - An **epoch** is a frame cell at a receiver's section.
-- An **aeon** is the strand's passage, from opening to close. Its conserved charge is the linking
-  number, which cycles read as whole windings, and its boundary is where the decoder's quotient is
-  taken.
+- An **aeon** is the strand's passage, from opening to close. On closed strands its conserved
+  charge is the linking number, which cycles read as whole windings, and its boundary is where the
+  decoder's quotient is taken.
 
 **Why it works:**
-- complementarity gives a built-in key and reciprocity;
+- complementarity stores each letter twice, which gives a built-in key, reciprocity and an exact
+  location for every single-strand defect;
+- the pairing is a dihedral reflection, so positions, frames and shape transform together;
 - a non-locking repeat (an irrational or high-order winding, `Aeon/Clock/CarryWord`,
-  `never_locks_iff_irrational`) keeps the placement from resonating with itself;
-- a designed kernel absorbs the likely defects;
-- the topology conserves access and stored energy, exchanged between twist and writhe and changed
-  only by crossings.
+  `never_locks_iff_irrational`) keeps the placement from resonating with itself, while a word
+  repeating in whole turns resonates and shapes its carrier;
+- a designed kernel absorbs the likely coordinated defects, and the rest is a counted residual;
+- on closed strands the topology fixes `Lk`, so twist and writhe exchange and only crossings change
+  it. The energy of that exchange is constitutive.
 
-The same composition reads the Enigma (rotor stepping as phase transport, the reflector as `σ`, the
-Bombe as loop closure), the retina and lens (the lens a frame transport, the retina the partition),
-a web read through its modes, and a phyllotactic spiral (the golden winding that never locks, its
-Fibonacci parastichies the Farey convergents at each grain). The laws not yet proved are in
-`Transport/HelicalCode` and #62.
+The same composition reads:
+- the Enigma: rotor stepping as phase transport, the reflector as `σ`, the Bombe as loop closure
+  (`menu_loop_closure`);
+- the retina and lens: the lens a frame transport, the retina the partition;
+- a web read through its modes;
+- a phyllotactic spiral: the golden winding that never locks, its parastichies the Farey
+  neighbours among the golden ratio's convergents at each grain.
+
+The laws not yet proved are in `Transport/HelicalCode` and #62.
 
 ## Emanation and resonance
 
