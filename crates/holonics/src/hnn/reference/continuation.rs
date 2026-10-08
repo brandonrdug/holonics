@@ -227,16 +227,19 @@ fn native_contact_return_refuses_another_source_and_stale_deposit_without_cache_
     assert_eq!(charts, before);
 }
 
-// [derivation] **At held momentum a storage deposit is felt through the motion itself, and the
+// [derivation] **At held momentum a contact deposit is felt through the motion itself, and the
 // lattice word opens the held momentum in the rate's remainder.** The deposit holds the contact's
-// canonical state `(u, π = C w)`, so the successor opens at `C′ w′ = C w` and the transit's right
-// side `h(α_g − α_h) + 2C w − hKu` is unchanged: under the exact solve `m′(ζ′ − ζ) = −(G/h)ΔC ζ =
-// −ΔC(w + w⁺)`, `w⁺ = (G/h)ζ − w` the predecessor's next rate. Summed, the midpoint rates are the
-// displacement's travel. On the lattice the successor's opening rate is the split of `w + δ`,
-// `C′δ = −ΔC w`: while the representatives agree the solve reads them alone, so the per-tick
-// response is the 2026-10-02 identity `ΔC(ŵ − ŵ⁺)`, the solve remainders differ by the accumulated
-// image difference, and the rate remainders by the opening's `δ` plus the accumulated rate-image
-// difference. Record
+// canonical state `(u, π = C w)`, so the successor opens at `C′ w′ = C w`. The reached C/K/D return
+// moves the three forms together, so the transit's right side `h(α_g − α_h) + 2C w − hKu` moves by
+// `−hΔK u` alone and `m′ − m = (G/2h)(2ΔC + hΔD + (h²/2)ΔK)`: under the exact solve, with the
+// midpoint rate `ω = (G/2h)ζ`, `w⁺ = 2ω − w` the predecessor's next rate and `u + ½hω` its midpoint
+// displacement, `m′(ζ′ − ζ) = −ΔC(w + w⁺) − hΔD ω − hΔK(u + ½hω)`, the storage response joined by
+// the stiffness and dissipation terms whose pulls `compose_contact` reads. Summed, the midpoint
+// rates are the displacement's travel. On the lattice the successor's opening rate is the split of
+// `w + δ`, `C′δ = −ΔC w`: while the representatives agree the solve reads them alone, so the
+// per-tick response is the 2026-10-02 identity `ΔC(ŵ − ŵ⁺)` with the same stiffness and dissipation
+// terms, the solve remainders differ by the accumulated image difference, and the rate remainders
+// by the opening's `δ` plus the accumulated rate-image difference. Record
 // `research/records/2026-10-02_A_STORAGE_DEPOSIT_IS_FELT_ONLY_THROUGH_THE_RATE_S_JUMP_AND_THE_WORD_HOLDS_IT_BELOW_ONE_UNIT.md`
 // §9; Lean `HNN/StorageResolution` (§1–§4 at one rate), the held-momentum statements in #62.
 #[test]
@@ -275,15 +278,21 @@ fn storage_response(exact: bool, ticks: usize) {
     assert_eq!(&h, successor.operands().step());
     let g = before.conductance().clone();
     assert_eq!(&g, after.conductance());
-    assert_eq!(before.forms().1, after.forms().1);
-    assert_eq!(before.forms().2, after.forms().2);
     let storage = before.forms().0.clone();
     let delta = after.forms().0.subtract(&storage).unwrap();
+    let delta_k = after.forms().1.subtract(before.forms().1).unwrap();
+    let delta_d = after.forms().2.subtract(before.forms().2).unwrap();
     let operator = after.operator().clone();
     let inverse = operator.inverse().unwrap();
     let unit = if exact { Rat::zero() } else { field.word_lattice().unwrap().transient().unit() };
-    eprintln!("storage response exact={exact} h={h} G={g} G/h={} unit={unit} dC={:?} m'={:?}",
-        &g / &h, delta.to_rows(), operator.to_rows());
+    eprintln!("storage response exact={exact} h={h} G={g} G/h={} unit={unit} dC={:?} dK={:?} dD={:?} m'={:?}",
+        &g / &h, delta.to_rows(), delta_k.to_rows(), delta_d.to_rows(), operator.to_rows());
+    // The stiffness and dissipation terms of one tick's response at its midpoint rate `ω` and
+    // midpoint displacement `u + ½hω`: `hΔD ω + hΔK(u + ½hω)`.
+    let joined = |omega: &[Rat], displacement: &[Rat]| {
+        let midpoint = add(displacement, &scale(&(&h / &two), omega));
+        add(&scale(&h, &delta_d.apply(omega).unwrap()), &scale(&h, &delta_k.apply(&midpoint).unwrap()))
+    };
     assert_eq!(predecessor.solve_remainders(), successor.solve_remainders());
     // The opening holds the momentum: `C′(ŵ′ + ρ′) = C w`, and the jump `δ = ŵ′ + ρ′ − w`.
     let rate0 = predecessor.change().unwrap().states[0][1].clone();
@@ -321,21 +330,26 @@ fn storage_response(exact: bool, ticks: usize) {
         let zeta_after = image(&s.rates[0], &r_after, &successor.solve_remainders()[0]);
         let difference = sub(&zeta_after, &zeta);
         accumulated = add(&accumulated, &difference);
+        // The predecessor's midpoint rate `ω = (G/2h)ζ`, at the tick's opening displacement.
+        let omega = scale(&(&g / &(&two * &h)), &zeta);
+        let terms = joined(&omega, &p.states[0][0]);
         if exact {
-            // The right side is unchanged at held momentum; the deposit acts on the motion.
+            // At held momentum the right side moves by `−hΔK u` alone; the deposit acts on the motion.
             let motion = scale(&(&g / &h), &zeta);
             assert_eq!(
                 operator.apply(&difference).unwrap(),
-                scale(&-Rat::one(), &delta.apply(&motion).unwrap()),
-                "m'(ζ' − ζ) = −ΔC(w + w⁺) under the exact solve at held momentum"
+                scale(&-Rat::one(), &add(&delta.apply(&motion).unwrap(), &terms)),
+                "m'(ζ' − ζ) = −ΔC(w + w⁺) − hΔD ω − hΔK(u + ½hω) under the exact solve at held momentum"
             );
-            eprintln!("storage tick={} w={rate:?} w'={:?} difference={difference:?} motion={motion:?}",
+            eprintln!("storage tick={} w={rate:?} w'={:?} difference={difference:?} motion={motion:?} joined={terms:?}",
                 tick + 1, s.states[0][1]);
             continue;
         }
-        // On the lattice the solve reads the representatives alone: the 2026-10-02 response.
+        // On the lattice the solve reads the representatives alone: the 2026-10-02 response, joined
+        // by the stiffness and dissipation terms.
         let jump = sub(&scale(&two, rate), &scale(&(&g / &h), &zeta));
-        material = add(&material, &inverse.apply(&delta.apply(&jump).unwrap()).unwrap());
+        let response = sub(&delta.apply(&jump).unwrap(), &terms);
+        material = add(&material, &inverse.apply(&response).unwrap());
         rate_images = add(&rate_images, &scale(&two, &sub(&s.rates[0], &p.rates[0])));
         let (pc, sc) = (predecessor.change().unwrap(), successor.change().unwrap());
         let equal = pc == sc;
