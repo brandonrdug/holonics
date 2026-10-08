@@ -226,12 +226,14 @@ Its second part states the perfected laws:
      never a duplex. No inverse branch of a non-injective `F` is chosen.
    - **The partner, paired before the quotient.**
      - `Pairing::new(σ)` refuses fixed points and non-involutions, and `σ̄(w)_k = σ(w_{n−1−k})`.
-     - The partner's `n + 1` lifts are `ℓ′_k = R(ℓ_n mod D) + (ℓ_n − ℓ_{n−k})`, `k = 0..n`, with
-       `R` the gauge's `reflect_key`. Their phases are `R(ℓ_{n−k})`, and the partner ends at
+     - The partner's `n + 1` absolute lifts are `ℓ′_k = R(ℓ_n mod D) + (ℓ_n − ℓ_{n−k})`,
+       `k = 0..n`, with `R` the gauge's `reflect_key`. Their phases are `R(ℓ_{n−k} mod D)`. The
+       absolute endpoint is `ℓ′_n = R(ℓ_n mod D) + ℓ_n − ℓ_0`, and only its phase equals
        `reflect_key(key)`.
-     - Partner letter `k` is carried by the step `ℓ′_k → ℓ′_{k+1}` and read at its arrival. For
-       every `k < n` the consumer checks `lt.reflected().step(ℓ′_{k+1}) = ℓ′_k` and
-       `σ(lt.reflected().emit(ℓ′_{k+1})) = σ̄(u)_k`.
+     - Partner letter `k` is carried by the step `ℓ′_k → ℓ′_{k+1}` and read at its arrival
+       phase. For every `k < n` the consumer checks, on phases,
+       `lt.reflected().step(ℓ′_{k+1} mod D) = Some(ℓ′_k mod D)` and
+       `lt.reflected().emit(ℓ′_{k+1} mod D).map(σ) = Some(σ̄(u)_k)`.
      - This is `F′ = R∘F⁻¹∘R`, the reversed step keyed by arrival. `T_c⁻¹ = T_cᵀ` holds in the
        native coordinates only; a physical paired return keeps `R`, the reversed order, the
        complemented labels and the producing frames.
@@ -271,9 +273,13 @@ Its second part states the perfected laws:
      - Otherwise the consumer holds, naming the slipped contacts and two actual witness members
        with their differing classes.
      - A declared template side collapses each factor.
-     - Routed through `width_over_readings`, the aggregate checks only structural coherence. The
-       consumer owes the complete-support/diameter equation, the nonempty family and the witness
-       extensions.
+     - The owners' routes are distinct. `width_over_readings` (`receiver/face.rs:771`) computes
+       the exact diameter of a provided finite family and enforces its family ceiling, so it may
+       read each coordinate's complete support. `ReceiverWidth::declared` (`:555`) checks only the
+       structural coherence of an owner-computed aggregate, so it may carry the computed maximum.
+       The consumer owes the complete-support/diameter equation and the witness extensions.
+     - An empty fit-constrained family returns the typed no-compatible-source defect. The two
+       witness members are owed only for a nonempty, nonconstant family.
    - **Coverage.** The truth round trip is conditional on the channel's coverage. On the covered
      repairable channel, at most one strand changed at each contact, the truth lies in the supported
      family and release is exactly constancy of that family. A coordinated complementary change
