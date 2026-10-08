@@ -202,6 +202,48 @@ fn require_extent(expected: usize, found: usize) -> Result<(), PhaseFamilyError>
     }
 }
 
+/// **Whether a square matrix is symmetric positive semidefinite**, exactly: symmetric
+/// elimination without pivoting (`LDLᵀ` over `ℚ`), refusing a negative pivot, and at a zero pivot
+/// requiring the rest of its row to vanish (a semidefinite matrix with a zero diagonal entry has
+/// that whole row and column zero). No root or float is formed.
+pub(crate) fn positive_semidefinite(matrix: &[Vec<Rat>]) -> bool {
+    let n = matrix.len();
+    if matrix.iter().any(|row| row.len() != n) {
+        return false;
+    }
+    for i in 0..n {
+        for j in 0..i {
+            if matrix[i][j] != matrix[j][i] {
+                return false;
+            }
+        }
+    }
+    let mut work: Vec<Vec<Rat>> = matrix.to_vec();
+    for k in 0..n {
+        let pivot = work[k][k].clone();
+        if pivot.is_negative() {
+            return false;
+        }
+        if pivot.is_zero() {
+            if work[k][k + 1..].iter().any(|entry| !entry.is_zero()) {
+                return false;
+            }
+            continue;
+        }
+        for i in k + 1..n {
+            let factor = &work[i][k] / &pivot;
+            if factor.is_zero() {
+                continue;
+            }
+            for j in k + 1..n {
+                let delta = &factor * &work[k][j];
+                work[i][j] -= delta;
+            }
+        }
+    }
+    true
+}
+
 /// **The exact solution of `A z = b`** by Gauss–Jordan over `ℚ`, for a square `A` of the extent
 /// of `b`. A pivot is the first nonzero entry at or below the diagonal; the refusal is
 /// [`PhaseFamilyError::Singular`] when a column has none, which a positive definite `A` never has.
@@ -274,10 +316,14 @@ impl PhaseStatistics {
     }
 
     /// **A saved statistic restored exactly** from its parts: per class the Gram `S_c` (`n×n`),
-    /// the moment `m_c` (`n`) and the second `s_c`, with the cell count `N`. Refused unless every
-    /// extent matches the declared classes and features, every Gram is symmetric, and every second
-    /// and the cell count are nonnegative, as every sum of receipts is. (Positive semidefiniteness
-    /// of `S_c` is not re-proved here; the family's ridge keeps `A_c` invertible whatever it is.)
+    /// the moment `m_c` (`n`) and the second `s_c`, with the cell count `N`. A sum of receipts is
+    /// `Σ w q [x; t][x; t]ᵀ` with `w q ≥ 0`, so its augmented statistic `[[S_c, m_c], [m_cᵀ, s_c]]`
+    /// is symmetric positive semidefinite, and every symmetric positive semidefinite matrix is such
+    /// a sum: that is exactly the reachable form. Refused unless every extent matches the declared
+    /// classes and features, every augmented statistic passes the exact test
+    /// ([`positive_semidefinite`]) and the cell count is nonnegative. Without it a restored
+    /// indefinite Gram would give the family no minimum (Epime's review, October 8: `S = −2` at the
+    /// unit prior returns a false minimum and a negative leverage).
     pub fn from_parts(
         classes: usize,
         features: usize,
@@ -289,21 +335,31 @@ impl PhaseStatistics {
         require_extent(classes, gram.len())?;
         require_extent(classes, moment.len())?;
         require_extent(classes, second.len())?;
-        for (class_gram, class_moment) in gram.iter().zip(&moment) {
+        for ((class_gram, class_moment), class_second) in gram.iter().zip(&moment).zip(&second) {
             require_extent(features, class_gram.len())?;
             require_extent(features, class_moment.len())?;
             for row in class_gram {
                 require_extent(features, row.len())?;
             }
-            for i in 0..features {
-                for j in 0..i {
-                    if class_gram[i][j] != class_gram[j][i] {
-                        return Err(PhaseFamilyError::Malformed);
-                    }
-                }
+            let augmented: Vec<Vec<Rat>> = class_gram
+                .iter()
+                .zip(class_moment)
+                .map(|(row, moment)| {
+                    let mut row = row.clone();
+                    row.push(moment.clone());
+                    row
+                })
+                .chain(std::iter::once({
+                    let mut row = class_moment.clone();
+                    row.push(class_second.clone());
+                    row
+                }))
+                .collect();
+            if !positive_semidefinite(&augmented) {
+                return Err(PhaseFamilyError::Malformed);
             }
         }
-        if cells.is_negative() || second.iter().any(Signed::is_negative) {
+        if cells.is_negative() {
             return Err(PhaseFamilyError::Malformed);
         }
         Ok(Self {
@@ -778,7 +834,7 @@ impl PhaseImage {
 mod tests {
     use super::*;
     use num_bigint::BigInt;
-    use num_traits::Zero;
+    use num_traits::{One, Zero};
 
     use crate::ratio::{Rat, integer, rat};
 
@@ -1565,6 +1621,55 @@ mod tests {
         assert_eq!(
             PhaseFamilyError::ZeroGrain.to_string(),
             "the grain of an outcome block must be a positive integer"
+        );
+    }
+
+    /// **A restored statistic must be a sum of receipts** (Epime's review, October 8): its
+    /// augmented statistic `[[S, m], [mᵀ, s]]` is symmetric positive semidefinite. An indefinite
+    /// Gram (`S = −2`), a moment the Gram cannot carry (`S = 1, m = 2, s = 3`: determinant `−1`) and
+    /// an asymmetric Gram are refused; a rank-one sum (`S = 1, m = 1, s = 1`) and an absorbed
+    /// statistic's own parts are restored exactly.
+    #[test]
+    fn a_restored_statistic_must_be_a_sum_of_receipts() {
+        let one_class = |gram: Vec<Vec<Rat>>, moment: Vec<Rat>, second: Rat| {
+            PhaseStatistics::from_parts(1, gram.len(), vec![gram], vec![moment], vec![second], Rat::zero())
+        };
+        assert_eq!(
+            one_class(vec![ints(&[-2])], ints(&[0]), Rat::zero()),
+            Err(PhaseFamilyError::Malformed)
+        );
+        assert_eq!(
+            one_class(vec![ints(&[1])], ints(&[2]), integer(3)),
+            Err(PhaseFamilyError::Malformed)
+        );
+        assert_eq!(
+            one_class(vec![ints(&[1, 2]), ints(&[3, 4])], ints(&[0, 0]), Rat::zero()),
+            Err(PhaseFamilyError::Malformed)
+        );
+        assert!(one_class(vec![ints(&[1])], ints(&[1]), integer(1)).is_ok());
+        assert!(!positive_semidefinite(&[ints(&[0, 1]), ints(&[1, 0])]));
+        assert!(positive_semidefinite(&[ints(&[0, 0]), ints(&[0, 3])]));
+
+        let mut absorbed = PhaseStatistics::founded(2, 2);
+        absorbed
+            .absorb(&integer(2), &ints(&[1, -1]), &[rat(1, 3), rat(2, 3)], &[rat(1, 2), integer(-3)])
+            .unwrap();
+        absorbed
+            .absorb(&Rat::one(), &ints(&[2, 5]), &[Rat::one(), Rat::zero()], &[integer(7), Rat::zero()])
+            .unwrap();
+        let restored = PhaseStatistics::from_parts(
+            2,
+            2,
+            (0..2).map(|c| absorbed.gram(c).to_vec()).collect(),
+            (0..2).map(|c| absorbed.moment(c).to_vec()).collect(),
+            (0..2).map(|c| absorbed.second(c).clone()).collect(),
+            absorbed.cells().clone(),
+        )
+        .unwrap();
+        assert_eq!(restored, absorbed);
+        assert_eq!(
+            PhaseStatistics::from_parts(1, 1, vec![vec![ints(&[1])]], vec![ints(&[0])], vec![Rat::zero()], integer(-1)),
+            Err(PhaseFamilyError::Malformed)
         );
     }
 }
