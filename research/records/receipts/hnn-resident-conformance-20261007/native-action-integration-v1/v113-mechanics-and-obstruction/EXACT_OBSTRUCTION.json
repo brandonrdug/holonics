@@ -1,0 +1,63 @@
+{
+  "claim": "Exact saved-output diagnosis; no new native passage/test/training",
+  "source": "ab860c504750f4b626eb488c3f86044ab9bc442e",
+  "actual_output_sha256": "0fcf9fe72dd4990f95eef1a2874aecf636c06b0be8cd129d147fcab6452e498c",
+  "source_actuator_B_shape": [
+    8,
+    2
+  ],
+  "response_shape": [
+    4,
+    2
+  ],
+  "L": [
+    [
+      "17631/8389120",
+      "2790511/18875520"
+    ],
+    [
+      "-1316581/254819520",
+      "59625587/2038556160"
+    ],
+    [
+      "-11821327/4077112320",
+      "-600437747/4077112320"
+    ],
+    [
+      "-5709047/679518720",
+      "-16718647/679518720"
+    ]
+  ],
+  "residual": [
+    "-1693500855834108031024472237/9591521028891434819222400000",
+    "-228754944660146747389053359/4795760514445717409611200000",
+    "1691368219041229247349479069/9591521028891434819222400000",
+    "44525886728834902347325241/2397880257222858704805600000"
+  ],
+  "rank_L": 2,
+  "rank_augmented": 3,
+  "control_kernel_dimension": 0,
+  "annihilator": [
+    "256487976521/250299919078",
+    "-36131340745/250299919078",
+    "1",
+    "0"
+  ],
+  "lambda_L": [
+    "0",
+    "0"
+  ],
+  "lambda_residual": "418125525796689164689180314521717/181944443908030423289024500104960000",
+  "decision": "No control in the entire declared Q^2 source-E domain realizes the original quiet 4-coordinate carrier. Keep obstruction/Hold.",
+  "not_established": [
+    "learned relation is the causal deficiency",
+    "larger grain/limit repairs reachability",
+    "a finite retained-alternative/probe partition exists"
+  ],
+  "physical_result": {
+    "encounters": 0,
+    "World_commit": 0,
+    "native_tick": 4,
+    "reset_or_action": false
+  }
+}

@@ -272,3 +272,79 @@ Cumulative native/guard accounting is 181 stages, CPU `1998078067000 ns` and wal
 `1489458390583 ns`. Source reception is separate (wall `563262246 ns`, self CPU
 `75428599 ns`, child CPU `521930 microseconds`, self peak `23696 KiB`). The corrected
 successor is again a source handoff; type/native acceptance must come from the queue.
+
+## v113: mechanics accepted; original requested action is obstructed
+
+The sole queue compiled `ab860c504750f4b626eb488c3f86044ab9bc442e` and passed all nine
+selected mechanical controls, including actual prior World history entering the later native
+carry/choice, full conjugate wave work, preserving both actual states, and all eight station
+rows against the independent current+delayed adjoint. These are scoped mechanism receipts,
+not acquired-relation, useful output, unseen/holdout or full architecture acceptance.
+
+The scoped acquired-R run then **held before either actual encounter**: zero of two,
+World commit zero, native tick four. The original quiet four-coordinate future carrier was
+not changed. This is an out-of-image request, not a plural compatible control fibre:
+
+```
+B = current E_source : Q^2 -> Q^8
+L = R P A I B : Q^2 -> Q^4
+rank L = 2; nullity L = 0; rank [L | requested-baseline] = 3.
+lambda = (256487976521/250299919078,
+          -36131340745/250299919078, 1, 0)
+lambda^T L = (0,0)
+lambda^T(requested-baseline) =
+  418125525796689164689180314521717 /
+  181944443908030423289024500104960000 != 0.
+```
+
+The [exact saved-output diagnosis](receipts/hnn-resident-conformance-20261007/native-action-integration-v1/v113-mechanics-and-obstruction/EXACT_OBSTRUCTION.json)
+is independently reproducible with its adjacent `diagnose_obstruction.py`; it reads saved
+matrices with rational arithmetic and executes no HNN passage. Full
+[actual output](receipts/hnn-resident-conformance-20261007/native-action-integration-v1/v113-mechanics-and-obstruction/ACTUAL_OUTPUT.txt)
+and [validation](receipts/hnn-resident-conformance-20261007/native-action-integration-v1/v113-mechanics-and-obstruction/VALIDATION.json)
+are preserved. There is no `u` in the **entire** declared control domain. Its zero nullity
+means a compatible request would be unique here; the general singleton-only limitation is
+real but is not this run's producing failure. No grain, chart or admission mismatch is
+reported. L already has full column rank. Whether the learned relation itself is the causal
+deficiency is not established; fixed source-E actuation/horizon and the retained baseline
+can obstruct a requested consequence even for a correct relation. Neither clipping, a larger
+grain nor a larger compute limit can remove the printed annihilator contradiction.
+
+### The recovered decision owner and the concrete missing operands
+
+The existing `receiver::release` owns ObservationProbe, ProbePartition, LawfulOptions,
+DecisionRule and the Ask/Hold checks. Atlas `release.probe-partition` requires one **nonempty
+finite surviving source/constitution fibre** with complete outcome classes; it is not the
+control equation's empty fibre. Atlas `navigator.action-consequence` requires a situated
+source family `F_o`, admissible controls and requested receiving relation, with an explicit
+existential/robust/expected quantifier. `MachineChaser` computes real partitions in its own
+admitted terrain and offers them to release; its authored terrain/motion/score is not the
+HNN World action's missing producer. HNN Reference release assembles Ask=None, and the
+physical station consumer supplies class-domain widths with Ask=None. Their existing calls
+do not produce an HNN native informative probe.
+
+This runner supplies one contemporary constitution/source and an exterior quiet carrier at
+one preselected future station. It supplies no certified surviving source/World alternatives,
+no alternative-to-native-observed-receipt map, no finite complete candidate observation family
+or dominance partition, and no goal producer that selects request and attended stations from
+that family. Counting sampled points from an infinite control fibre or partitioning the two
+class-input coordinates would forge that missing operand. Even an informative observation
+of current alternatives cannot make an exact no-solution equation solvable at this cut.
+
+[agent-inferred decision] Preserve the complete obstruction/Hold and both current participants.
+Do not substitute `y(0)+Lu`, use a least-squares/minimum-norm point, silently add actuators or
+change the original requested consequence. Do not relaunch this unchanged scoped failure.
+The next consuming work must supply (a) the actual admitted source/evolution alternatives
+and observation restriction, (b) a physically declared control/goal relation, and (c) the
+complete prospective observation partition/clock/chart and DecisionRule offer. If a newly
+justified actuator or observation family changes the image, that is a separately pinned law,
+with its own work and projection, not a repair receipt for this request. The complex rings
+do not by themselves authorize extra quadrature controls beyond the declared B.
+
+The v113 World stage controller measured wall `245069813 ns`, CPU `196096000 ns`, group
+peak `19935232 bytes`; internal whole operation wall was `39542246 ns`. No physical
+encounter executed. Nineteen new compilation/guard/control stages cost CPU `226713310000 ns`
+and wall `154381832282 ns`; cumulative 200 stages CPU `2224791377000 ns`, wall
+`1643840222865 ns`. Every lease was released. Original v111 C/K/D movement zero versus
+required two remains failed. No new native run, training or scientific sweep accompanied
+this source diagnosis and handoff.
