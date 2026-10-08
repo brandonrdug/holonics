@@ -32,7 +32,7 @@ use holonics::hnn::constitution::{CAMPAIGN_ONE_BUDGET, Constitution};
 use holonics::hnn::encoding::Encoded;
 use holonics::hnn::field::{
     ConstitutionRead, ContactDeclaration, CribDeclaration, Current, Field, FieldDeclaration,
-    FieldMaterial, ReceiverDeclaration, RingDeclaration,
+    ReceiverDeclaration, RingDeclaration,
 };
 use holonics::hnn::physical::communication::PhysicalBoundary;
 use holonics::hnn::physical::contact::ContactObservation;

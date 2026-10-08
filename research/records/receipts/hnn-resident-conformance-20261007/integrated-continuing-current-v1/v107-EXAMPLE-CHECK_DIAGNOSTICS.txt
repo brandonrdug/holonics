@@ -1,0 +1,131 @@
+    Checking holonics v0.1.0 (<queue immutable source>/crates/holonics)
+warning: method `anchor_differential_joined` is never used
+   --> crates/holonics/src/hnn/port.rs:941:19
+    |
+849 | impl<'c> Word<'c> {
+    | ----------------- method in this implementation
+...
+941 |     pub(crate) fn anchor_differential_joined(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `seeds` is never used
+    --> crates/holonics/src/hnn/receiving.rs:1606:19
+     |
+1310 | impl SourceObserverView {
+     | ----------------------- method in this implementation
+...
+1606 |     pub(crate) fn seeds(
+     |                   ^^^^^
+
+warning: `holonics` (lib) generated 2 warnings
+error[E0034]: multiple applicable items in scope
+   --> crates/holonics/../../research/notebook/hnn_design/hnn_continuing_behavior.rs:426:38
+    |
+426 |                 let changed = before.receiving_map(declared.ring)
+    |                                      ^^^^^^^^^^^^^ multiple `receiving_map` found
+    |
+    = note: candidate #1 is defined in an impl of the trait `FieldMaterial` for the type `T`
+    = note: candidate #2 is defined in an impl of the trait `holonics::hnn::ConstitutionRead` for the type `holonics::hnn::Constitution`
+help: disambiguate the method for candidate #1
+    |
+426 -                 let changed = before.receiving_map(declared.ring)
+426 +                 let changed = FieldMaterial::receiving_map(&before, declared.ring)
+    |
+help: disambiguate the method for candidate #2
+    |
+426 -                 let changed = before.receiving_map(declared.ring)
+426 +                 let changed = holonics::hnn::ConstitutionRead::receiving_map(&before, declared.ring)
+    |
+
+error[E0034]: multiple applicable items in scope
+   --> crates/holonics/../../research/notebook/hnn_design/hnn_continuing_behavior.rs:427:48
+    |
+427 |                     != receiver.constitution().receiving_map(declared.ring);
+    |                                                ^^^^^^^^^^^^^ multiple `receiving_map` found
+    |
+    = note: candidate #1 is defined in an impl of the trait `FieldMaterial` for the type `T`
+    = note: candidate #2 is defined in an impl of the trait `holonics::hnn::ConstitutionRead` for the type `holonics::hnn::Constitution`
+help: disambiguate the method for candidate #1
+    |
+427 -                     != receiver.constitution().receiving_map(declared.ring);
+427 +                     != FieldMaterial::receiving_map(&receiver.constitution(), declared.ring);
+    |
+help: disambiguate the method for candidate #2
+    |
+427 -                     != receiver.constitution().receiving_map(declared.ring);
+427 +                     != holonics::hnn::ConstitutionRead::receiving_map(&receiver.constitution(), declared.ring);
+    |
+
+error[E0034]: multiple applicable items in scope
+   --> crates/holonics/../../research/notebook/hnn_design/hnn_continuing_behavior.rs:498:41
+    |
+498 |                 receiver.constitution().contact_storage(a),
+    |                                         ^^^^^^^^^^^^^^^ multiple `contact_storage` found
+    |
+    = note: candidate #1 is defined in an impl of the trait `FieldMaterial` for the type `T`
+    = note: candidate #2 is defined in an impl of the trait `holonics::hnn::ConstitutionRead` for the type `holonics::hnn::Constitution`
+help: disambiguate the method for candidate #1
+    |
+498 -                 receiver.constitution().contact_storage(a),
+498 +                 FieldMaterial::contact_storage(&receiver.constitution(), a),
+    |
+help: disambiguate the method for candidate #2
+    |
+498 -                 receiver.constitution().contact_storage(a),
+498 +                 holonics::hnn::ConstitutionRead::contact_storage(&receiver.constitution(), a),
+    |
+
+error[E0034]: multiple applicable items in scope
+   --> crates/holonics/../../research/notebook/hnn_design/hnn_continuing_behavior.rs:499:41
+    |
+499 |                 receiver.constitution().contact_stiffness(a),
+    |                                         ^^^^^^^^^^^^^^^^^ multiple `contact_stiffness` found
+    |
+    = note: candidate #1 is defined in an impl of the trait `FieldMaterial` for the type `T`
+    = note: candidate #2 is defined in an impl of the trait `holonics::hnn::ConstitutionRead` for the type `holonics::hnn::Constitution`
+help: disambiguate the method for candidate #1
+    |
+499 -                 receiver.constitution().contact_stiffness(a),
+499 +                 FieldMaterial::contact_stiffness(&receiver.constitution(), a),
+    |
+help: disambiguate the method for candidate #2
+    |
+499 -                 receiver.constitution().contact_stiffness(a),
+499 +                 holonics::hnn::ConstitutionRead::contact_stiffness(&receiver.constitution(), a),
+    |
+
+error[E0034]: multiple applicable items in scope
+   --> crates/holonics/../../research/notebook/hnn_design/hnn_continuing_behavior.rs:500:41
+    |
+500 |                 receiver.constitution().contact_dissipation(a),
+    |                                         ^^^^^^^^^^^^^^^^^^^ multiple `contact_dissipation` found
+    |
+    = note: candidate #1 is defined in an impl of the trait `FieldMaterial` for the type `T`
+    = note: candidate #2 is defined in an impl of the trait `holonics::hnn::ConstitutionRead` for the type `holonics::hnn::Constitution`
+help: disambiguate the method for candidate #1
+    |
+500 -                 receiver.constitution().contact_dissipation(a),
+500 +                 FieldMaterial::contact_dissipation(&receiver.constitution(), a),
+    |
+help: disambiguate the method for candidate #2
+    |
+500 -                 receiver.constitution().contact_dissipation(a),
+500 +                 holonics::hnn::ConstitutionRead::contact_dissipation(&receiver.constitution(), a),
+    |
+
+error[E0282]: type annotations needed
+   --> crates/holonics/../../research/notebook/hnn_design/hnn_continuing_behavior.rs:503:19
+    |
+503 |             .map(|f| f.rows() * f.columns())
+    |                   ^  - type must be known at this point
+    |
+help: consider giving this closure parameter an explicit type
+    |
+503 |             .map(|f: /* Type */| f.rows() * f.columns())
+    |                    ++++++++++++
+
+Some errors have detailed explanations: E0034, E0282.
+For more information about an error, try `rustc --explain E0034`.
+error: could not compile `holonics` (example "hnn_prediction") due to 6 previous errors

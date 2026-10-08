@@ -1123,8 +1123,8 @@
       "sha256": "956863c53d52a35a8083d1f984b3d55ff778249cdf4ac02cd8ca6318e68c0c2d"
     },
     "research/notebook/hnn_design/hnn_continuing_behavior.rs": {
-      "bytes": 31719,
-      "sha256": "f455681c6f656642071237d0c13aff0ff0d37a12c07108fe254e50f877bf7206"
+      "bytes": 31704,
+      "sha256": "aabf856da37f18d9fc97fab5abe1d395cf9a0e4ff87685c0ae699eba685277a0"
     },
     "research/notebook/hnn_design/hnn_executed_loop.rs": {
       "bytes": 38885,

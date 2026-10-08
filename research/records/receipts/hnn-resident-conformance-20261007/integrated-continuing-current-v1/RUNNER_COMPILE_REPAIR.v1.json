@@ -1,0 +1,124 @@
+{
+  "status": "MINIMAL_RUNNER_TRAIT_IMPORT_REPAIR_PREPARED_EXAMPLE_AND_RUNTIME_PENDING",
+  "predecessor_source_commit": "c341d1b1398f12b8e88ac0b494fbd46879c700ee",
+  "queue_receipt": "research/records/receipts/2026-10-06-lean-rust-native-queue/continuation-v107/VALIDATION.json",
+  "queue_receipt_sha256": "51deffaedb2ad159d2c519de505ed71a26df1a4f03ae3ebf1c13f9d4c5efa869",
+  "raw_example_stderr_sha256": "0d48c5893f578ca7e18646b61f937a39cad3fe19e25df861631abbe598a6cd9b",
+  "saved_diagnostics": "v107-EXAMPLE-CHECK_DIAGNOSTICS.txt",
+  "diagnostic_normalization": "Only the first compiler line replaces the absolute private immutable-source path with <queue immutable source>; all diagnostics unchanged.",
+  "component_grade": "INTEGRATED_SOURCE_OR_RUNTIME_REFUSED_OR_FAILED",
+  "HNN_output_grade_unchanged": "FOUR_FINITE_LOADED_SPAN_CONTROLS_PASS_ORIGINAL_OUTPUT_GATE_FAILED",
+  "stages": {
+    "hnn-integrated-c341-cache-preparation-20261008-v1": {
+      "phase": "cache-preparation",
+      "accepted_stage": true,
+      "whole_wall_ns": 8537426709,
+      "CPU_ns": 6767536000,
+      "fixed_guard_ns": 17000000000,
+      "measured_to_guard": {
+        "numerator": 8537426709,
+        "denominator": 17000000000
+      },
+      "group_peak_bytes": 4294967296,
+      "child_RSS_KiB": 31276,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 3840,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "wall_stop": false,
+      "CPU_stop": false,
+      "floor_stop": false,
+      "inputs_unchanged": true,
+      "quiescent_released": true
+    },
+    "hnn-integrated-c341-library-check-20261008-v1": {
+      "phase": "library-check",
+      "accepted_stage": true,
+      "whole_wall_ns": 7629657641,
+      "CPU_ns": 7597699000,
+      "fixed_guard_ns": 65000000000,
+      "measured_to_guard": {
+        "numerator": 7629657641,
+        "denominator": 65000000000
+      },
+      "group_peak_bytes": 1056161792,
+      "child_RSS_KiB": 889352,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "wall_stop": false,
+      "CPU_stop": false,
+      "floor_stop": false,
+      "inputs_unchanged": true,
+      "quiescent_released": true
+    },
+    "hnn-integrated-c341-example-check-20261008-v1": {
+      "phase": "example-check",
+      "accepted_stage": false,
+      "whole_wall_ns": 2510692438,
+      "CPU_ns": 2506085000,
+      "fixed_guard_ns": 65000000000,
+      "measured_to_guard": {
+        "numerator": 2510692438,
+        "denominator": 65000000000
+      },
+      "group_peak_bytes": 659058688,
+      "child_RSS_KiB": 547208,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "wall_stop": false,
+      "CPU_stop": false,
+      "floor_stop": false,
+      "inputs_unchanged": true,
+      "quiescent_released": true
+    }
+  },
+  "all_released": true,
+  "repair": {
+    "path": "research/notebook/hnn_design/hnn_continuing_behavior.rs",
+    "prior_sha256": "f455681c6f656642071237d0c13aff0ff0d37a12c07108fe254e50f877bf7206",
+    "successor_sha256": "aabf856da37f18d9fc97fab5abe1d395cf9a0e4ff87685c0ae699eba685277a0",
+    "changed_native_inputs": [
+      "research/notebook/hnn_design/hnn_continuing_behavior.rs"
+    ],
+    "unchanged_native_inputs": 305,
+    "agent_inferred": "Drop FieldMaterial from the runner import: its blanket ConstitutionRead implementation delegates the same receiving_map and contact factor reads. Keep ConstitutionRead in scope; do not change assertions or material law.",
+    "compiler_diagnostics": "Five E0034 ambiguities and one downstream E0282 in the example. The source repair is not yet compiler-verified.",
+    "source_parse_command": [
+      "rustfmt",
+      "--edition",
+      "2024",
+      "--config",
+      "skip_children=true",
+      "--emit",
+      "stdout",
+      "research/notebook/hnn_design/hnn_continuing_behavior.rs"
+    ],
+    "parse_only_pass": true,
+    "whitespace_pass": true,
+    "whole_gate_unchanged": true,
+    "resource_caps_unchanged": true,
+    "source_owner_builds_tests_training_benchmarks_scientific_runs": 0,
+    "library_reuse_scope": "Queue v107 accepted the c341 library check. All library/native code inputs are byte-identical; reuse only if sole queue verifies its exact dependency/input seal. Example and all later gates remain pending."
+  },
+  "whole_native_behavior_acceptance": false,
+  "scientific_validation_or_acquisition_acceptance": false
+}
