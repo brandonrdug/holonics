@@ -1,0 +1,109 @@
+{
+  "version": 7,
+  "date_UTC": "2026-10-08",
+  "grade": "SOURCE_PREPARED_NATIVE_PENDING",
+  "base": "64a2f5771d86635ffff19cecacb3d26c6f2d7e42",
+  "owned_native_paths": [
+    "crates/holonics/src/hnn/constitution.rs",
+    "crates/holonics/src/hnn/word/continuation.rs",
+    "crates/holonics/src/hnn/physical/contact.rs",
+    "crates/holonics/src/hnn/reference/continuation.rs",
+    "crates/holonics/src/hnn/tests/physical_communication.rs"
+  ],
+  "source_hashes": {
+    "crates/holonics/src/hnn/constitution.rs": {
+      "bytes": 440174,
+      "sha256": "86a929b983e9e9fd5ade8c3dad5c1e1e8f4a8fa3cd1333162b11a44e96b58309"
+    },
+    "crates/holonics/src/hnn/word/continuation.rs": {
+      "bytes": 25506,
+      "sha256": "3956270df317a53b6d32c624b6b0675a1309b12f26104d8fd4007f0e364c5cbc"
+    },
+    "crates/holonics/src/hnn/physical/contact.rs": {
+      "bytes": 9696,
+      "sha256": "7e25e419d0cdda07d84addbf2cc426f4ee042b47a70751302daf70abbbc1cdac"
+    },
+    "crates/holonics/src/hnn/reference/continuation.rs": {
+      "bytes": 29456,
+      "sha256": "16c82e87a9f5f6f86b413dc378e32c136e6de50c8ce9eb40f9a886dd7034a44e"
+    },
+    "crates/holonics/src/hnn/tests/physical_communication.rs": {
+      "bytes": 46506,
+      "sha256": "f42580a8bac4f48bc6ba858ad156f743821d59be607d03cd799e2f5aa373ac18"
+    }
+  },
+  "preparation_checks": [
+    {
+      "argv": [
+        "rustfmt",
+        "--edition",
+        "2024",
+        "--emit",
+        "stdout",
+        "--config",
+        "skip_children=true",
+        "crates/holonics/src/hnn/constitution.rs",
+        "crates/holonics/src/hnn/word/continuation.rs",
+        "crates/holonics/src/hnn/physical/contact.rs",
+        "crates/holonics/src/hnn/reference/continuation.rs",
+        "crates/holonics/src/hnn/tests/physical_communication.rs"
+      ],
+      "stdout_destination": "/dev/null",
+      "exit_code": 0,
+      "source_mutated": false,
+      "compiler_or_test": false
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "original_acceptance_function_text_checks": [
+    {
+      "selector": "hnn::tests::physical_communication::complete_contact_return_publishes_held_point_before_existing_communication",
+      "function_text_unchanged": true
+    },
+    {
+      "selector": "hnn::tests::physical_communication::a_shared_execution_clock_reanchors_the_next_section_without_resetting_its_carry",
+      "function_text_unchanged": true
+    },
+    {
+      "selector": "hnn::tests::physical_charted::a_shared_charted_enclosure_survives_view_changes_and_bars_unsupported_futures",
+      "function_text_unchanged": true
+    },
+    {
+      "selector": "hnn::tests::physical_communication::communication_deposits_after_the_whole_boundary_and_reuses_material_source_and_carry",
+      "function_text_unchanged": true
+    },
+    {
+      "selector": "hnn::tests::physical_charted::charted_loaded_pump_error_keeps_the_absolute_clock_across_the_carry",
+      "function_text_unchanged": true
+    },
+    {
+      "selector": "hnn::tests::propagation::a_stored_transit_is_the_reference_holons_midpoint_advance",
+      "function_text_unchanged": true
+    },
+    {
+      "selector": "hnn::tests::word::a_carried_change_crosses_the_next_openings_references",
+      "function_text_unchanged": true
+    }
+  ],
+  "source_owner_compilers_tests_training_device_jobs": 0,
+  "source_change": "same executed Word compose_contact now retains C/K/D; actual full signed finite form movement plus existing held momentum/work reaches continuing Word and common Resident",
+  "unchanged_parameters": [
+    "grain",
+    "step selector and law",
+    "source fixture and chart",
+    "observation/mask",
+    "material budget",
+    "absolute clock/pump law",
+    "geometry/basis"
+  ],
+  "private_messages_published": false,
+  "canonical_docs_owned_by_parent_untouched": true,
+  "new_source_controls_unrun": true
+}

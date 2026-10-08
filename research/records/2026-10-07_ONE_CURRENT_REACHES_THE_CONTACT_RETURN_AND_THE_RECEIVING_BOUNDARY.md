@@ -317,7 +317,7 @@ rational aggregate and a finer dyadic aggregate are both quotient candidates; th
 denominator/bit cost and future sensitivity must be justified rather than assuming a record
 of observations.
 
-[causal repair contract, pending consumer] The existing contact consumer is
+[historical causal repair contract at v79, pending consumer then] The contact consumer was
 `PhysicalReceiver::communicate_contact -> same Word::compare_contact_storage ->
 Constitution::deposited -> ContactCut::continue_deposited -> Resident::publish_reception`.
 A tolerance-sized trial belongs at this actual comparison/constitution join: its candidate
@@ -555,3 +555,79 @@ Rational payload is not an RSS bound: retained field/material state, exact sourc
 native Word/adjoint operands, chart certificates and receipt copies remain charged.
 This owner ran no compiler, control or scientific job. A future source-to-wave-to-receiver
 control still needs its exact consumer, bounded selector and complete sole-queue projection.
+
+
+## Complete contact material return, prepared October 8 (native pending)
+
+[agent-inferred; source recovery] A concrete consumer defect separated the reached comparison
+from the contact's constitution. `reference::compose_contact` already returns all three form
+covectors from the producing Word's actual solves and midpoint rates:
+
+    C_bar = sum_t 2 r_bar_t (w_t - omega_t)^T
+    K_bar = -h sum_t r_bar_t (u_t + h omega_t/2)^T
+    D_bar = -h sum_t r_bar_t omega_t^T.
+
+Their symmetric pulls reach the actual C/K/D factors; the existing deposition owner multiplies
+K-gradient columns by the producing signature. The former `compare_contact_storage` consumer
+threw away the K and D steps. `Word::compare_contacts` now retains all three returned families
+at the same opened Diamond, comparison partition and producing commit. No target enters the
+blind source opening. The current field remains a superposition of its actual paired-coordinate
+waves, storage, two-ended arrivals and contact state; no task solver or scalar surrogate enters.
+This is completing an existing material consumer, not defining the architecture as a symbol
+prediction task. Geometry and basis stay fixed, so the continuation transport is identity.
+
+[definition; complete finite reaction] `ContactMaterialMove` reads the actual applied coarse
+factor difference dF from the successor, never eta times its proposal and never F plus its
+unresolved material remainder. With Sigma the producing K signature (identity for C and D),
+
+    dA = dF Sigma F^T + F Sigma dF^T + dF Sigma dF^T,
+    A in {C,K,D}.
+
+The consumer checks this against each actual before/after `ContactOperands` form. It refuses a
+changed signature. The ordinary native contact operator consumes these contemporary forms:
+
+    M = I + G/(2h) (2C + hD + h^2 K/2),
+    dM = G/(2h) (2dC + hdD + h^2 dK/2).
+
+The next Word receives the reached field at its existing absolute tick with storage/arrivals,
+displacement and pump phases carried. Across deposition, pi=Cw is held and C_new w_new=pi.
+The actual charged work is
+
+    W_dep = (pi^T w_new - pi^T w_old + u^T dK u)/2
+
+for this fixed-geometry, contact-only change. Other unchanged field/pump terms cancel. D makes
+no stored-energy change at this cut; its physical consumer is the subsequent native tick's
+h omega^T D_new omega. The already executed `PowerForm::held`, native operator/boost admission,
+storage-growth, exact carry/budget checks and common Resident publication remain the gates.
+The receipt reports all three applied linear/quadratic/form movements and the actual held work.
+An empty comparison still returns no material statistic. The ephemeral Word/adjoint/receipt is
+consumed, not installed as retained replay history.
+
+[scope; tests prepared, not run] Two bounded selectors are added:
+
+- `all_reached_contact_families_return_through_the_same_continuing_field`: the unchanged spent
+  mechanical source/material/observation fixture returns three actual nonzero covectors, joins
+  each family's delta plus prior residual to applied factor plus successor residual and release,
+  joins its energy to the normalization statistic, and consumes that material/current on a
+  different source. Each actual producing Word's contact heat is checked against its own reached
+  midpoint and contemporary D. This is a causal/conservation control, not scientific validation.
+- `finite_signed_contact_reaction_holds_momentum_and_reaches_the_next_tick`: declared mechanical
+  C/K/D factor changes, including negative K columns, exercise the full finite square term,
+  canonical momentum/work and exact next-tick dissipative balance, including a matched D-only
+  subsequent heat difference. These test-only declarations
+  do not substitute for a learned update or claim an acquired relation.
+
+All existing production callers and native fixtures use the retired-name successor; structural
+three-family counts and typed C lookups replace positional C-only assumptions. The original
+`complete_contact_return_publishes_held_point_before_existing_communication` fixture and all its
+nonzero-C, held-momentum, different-source and later-output assertions remain unchanged. Its
+predecessor failure is retained. No blind replay of that spent failed gate is requested here.
+The complete C/K/D source is unaccepted until fresh sole-queue native receipts exist. The v82
+C-only conservation controls validate their exact predecessor, not this broader material path.
+
+[remaining scope] The inherited proposal certificate is Gauss--Newton, not a proof of the full
+nonlinear finite score change. Completing K/D return does not establish useful material motion,
+acquired relations, all-future sensitivity, moving-geometry decoder joins, cold continuation or
+device parity. Grain, step law, masks, teacher, source chart and physical budget remain fixed.
+The outer queue must seal fresh source/config/cache and a measured complete projection under
+its existing caps before any native execution. This owner executes no compiler or native job.

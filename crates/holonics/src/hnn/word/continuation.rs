@@ -12,7 +12,7 @@
 use std::sync::Arc;
 
 use super::*;
-use crate::hnn::constitution::{Constitution, DepositReading, FactorGradient, Locus, Reach};
+use crate::hnn::constitution::{Constitution, DepositReading, FactorGradient, Family, Locus, Reach};
 use crate::hnn::port::{Deposit, WordReturn};
 use crate::hnn::encoding::Encoded;
 use crate::hnn::ratio::{Faces, HolonRatio, RatioCovector, target_phases};
@@ -44,24 +44,73 @@ pub struct ContinuationReceipt {
     pub opening: Rat,
     pub opening_difference: Rat,
     pub released: Remainders,
-    /// The actual applied storage-factor movements, including their quadratic terms and the
+    /// The actual applied C/K/D-factor movements, including their quadratic terms and the
     /// lattice/carry's effect. The proposal's eta times direction is not substituted here.
-    pub storage: Vec<ContactStorageMove>,
+    pub material: Vec<ContactMaterialMove>,
     /// C_old <= (1 + epsilon) C_new, read by the existing fixed inertia search. This is the
     /// held-momentum bound, distinct from publication.storage_growth's held-rate bound.
     /// None withholds a uniform bound; actual held-state work remains explicitly charged.
     pub held_momentum_growth: Option<Rat>,
 }
 
-/// One reached contact's actual material reaction, dC = dF F^T + F dF^T + dF dF^T.
-/// This identity includes the square term. It asserts no finite comparison decrease.
+/// One reached contact family's actual finite reaction:
+/// `dA = dF Sigma F^T + F Sigma dF^T + dF Sigma dF^T`.
+/// Sigma is the producing K signature, or identity for C/D. D changes the next tick's
+/// `h omega^T D omega`; it contributes no stored energy at the held cut. This identity includes
+/// the square term, uses the applied coarse factor, and asserts no finite comparison decrease.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct ContactStorageMove {
+pub struct ContactMaterialMove {
     pub contact: usize,
+    /// Existing channel families: Factor(0) is C, Factor(1) is K, Factor(2) is D.
+    pub family: Family,
     pub factor: ExactRatMatrix,
     pub linear: ExactRatMatrix,
     pub quadratic: ExactRatMatrix,
-    pub storage: ExactRatMatrix,
+    pub form: ExactRatMatrix,
+}
+
+impl ContactMaterialMove {
+    /// Read the full finite movement against the forms actually admitted to each Word.
+    pub(crate) fn between(
+        producing: &Constitution,
+        successor: &Constitution,
+        before: &Operands,
+        after: &Operands,
+        contact: usize,
+        family: Family,
+    ) -> Result<Self, HnnError> {
+        let (old_factor, new_factor, old_form, new_form, signature) = match family {
+            Family::Factor(0) => (producing.contact_storage(contact),
+                successor.contact_storage(contact), before.contacts()[contact].forms().0,
+                after.contacts()[contact].forms().0, None),
+            Family::Factor(1) => {
+                let signature = producing.contact_stiffness_signature(contact);
+                if signature != successor.contact_stiffness_signature(contact) {
+                    return Err(HnnError::Realization { what: "the continuing contact keeps its producing stiffness signature" });
+                }
+                (producing.contact_stiffness(contact), successor.contact_stiffness(contact),
+                    before.contacts()[contact].forms().1, after.contacts()[contact].forms().1, signature)
+            },
+            Family::Factor(2) => (producing.contact_dissipation(contact),
+                successor.contact_dissipation(contact), before.contacts()[contact].forms().2,
+                after.contacts()[contact].forms().2, None),
+            _ => return Err(HnnError::Realization { what: "a finite contact movement is a C/K/D factor family" }),
+        };
+        let factor = new_factor.subtract(old_factor)?;
+        let signed = |factor: &ExactRatMatrix| match signature {
+            Some(signs) => crate::hnn::constitution::signed_columns(factor, signs),
+            None => Ok(factor.clone()),
+        };
+        let transpose = factor.transpose()?;
+        let linear = signed(&factor)?.multiply(&old_factor.transpose()?)?
+            .add(&signed(old_factor)?.multiply(&transpose)?)?;
+        let quadratic = signed(&factor)?.multiply(&transpose)?;
+        let form = new_form.subtract(old_form)?;
+        if linear.add(&quadratic)? != form {
+            return Err(HnnError::Realization { what: "the full applied C/K/D contact reaction" });
+        }
+        Ok(Self { contact, family, factor, linear, quadratic, form })
+    }
 }
 
 /// C_old <= (1 + epsilon) C_new bounds the energy at held momentum. The storage-growth
@@ -135,13 +184,13 @@ impl<'c> Word<'c> {
         Ok(self.contact_receiving(receiver)?.1)
     }
 
-    /// Compare a declared observed consequence and react at every reached contact's C factor.
-    /// K and D remain fixed. The full Encoded consequence declares the selective target clock;
+    /// Compare a declared observed consequence and react at every reached contact's C/K/D factors.
+    /// The full Encoded consequence declares the selective target clock;
     /// `compared` projects its receiving stations, not unknown target cells/advances. No caller
     /// selects a contact, map, gradient or step. Uncompared faces remain in the returned ratio.
     /// The existing Gauss--Newton proposal selector and all native physical gates are retained;
     /// their certificate does not prove full finite comparison decrease (constitution scope).
-    pub fn compare_contact_storage(
+    pub fn compare_contacts(
         self,
         receiver: usize,
         targets: &Encoded,
@@ -180,9 +229,7 @@ impl<'c> Word<'c> {
             let (contact_steps, _) = crate::hnn::reference::compose_contact(
                 field, &theta, &back, &diamond, &retained, current.lift(), field.step(), contact,
             )?;
-            steps.extend(contact_steps.into_iter().filter(|step| {
-                matches!(step.gradient, FactorGradient::Storage { .. })
-            }));
+            steps.extend(contact_steps);
         }
         // A completely unconstrained reading causes no material statistic or deposit clock.
         if ratio.stations().is_empty() {
@@ -421,22 +468,16 @@ impl ContactCut {
         }
         // Read the applied movement, not eta times the unrounded proposal. Cross terms between
         // contacts act through the next full coupled Word; none is removed by a local surrogate.
-        let mut storage = Vec::new();
+        let mut material = Vec::new();
         for step in deposit.factors() {
-            if let FactorGradient::Storage { contact, .. } = step.gradient {
-                let before = self.producing.contact_storage(contact);
-                let factor = successor.contact_storage(contact).subtract(before)?;
-                let transpose = factor.transpose()?;
-                let linear = factor.multiply(&before.transpose()?)?
-                    .add(&before.multiply(&transpose)?)?;
-                let quadratic = factor.multiply(&transpose)?;
-                let changed = operands.contacts()[contact].forms().0
-                    .subtract(self.operands.contacts()[contact].forms().0)?;
-                if linear.add(&quadratic)? != changed {
-                    return Err(HnnError::Realization { what: "the full applied contact storage reaction" });
-                }
-                storage.push(ContactStorageMove { contact, factor, linear, quadratic, storage: changed });
-            }
+            let (contact, family) = match step.gradient {
+                FactorGradient::Storage { contact, .. } => (contact, Family::Factor(0)),
+                FactorGradient::Stiffness { contact, .. } => (contact, Family::Factor(1)),
+                FactorGradient::Dissipation { contact, .. } => (contact, Family::Factor(2)),
+                _ => unreachable!("the bound contact deposit was admitted above"),
+            };
+            material.push(ContactMaterialMove::between(&self.producing, &successor,
+                &self.operands, &operands, contact, family)?);
         }
         let before_capacity: Vec<_> = self.operands.contacts().iter()
             .map(|contact| contact.forms().0.clone()).collect();
@@ -494,7 +535,7 @@ impl ContactCut {
                     opening,
                     opening_difference,
                     released,
-                    storage,
+                    material,
                     held_momentum_growth,
                 },
             },

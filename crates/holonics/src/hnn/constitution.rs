@@ -2877,7 +2877,7 @@ impl Boost {
 
 /// A gradient on a signed factor: `∂⟨K̄, b diag(σ) bᵀ⟩/∂b = (K̄ + K̄ᵀ) b diag(σ)`, the Gram factor's
 /// gradient with each column multiplied by its sign.
-fn signed_columns(
+pub(crate) fn signed_columns(
     gradient: &ExactRatMatrix,
     signature: &[bool],
 ) -> Result<ExactRatMatrix, HnnError> {

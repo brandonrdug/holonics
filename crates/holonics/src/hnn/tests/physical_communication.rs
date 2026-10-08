@@ -75,12 +75,13 @@ fn contact_causal_receipt(before: &Constitution, after: &Constitution,
     let locus = Locus::Channel(0);
     assert_eq!(publication.comparison_return.commit(), before.commit());
     assert_eq!(publication.publication.commit, after.commit());
-    let movement = publication.continuation.storage.iter().find(|m| m.contact == 0).unwrap();
+    let movement = publication.continuation.material.iter()
+        .find(|m| m.contact == 0 && m.family == Family::Factor(0)).unwrap();
     assert_eq!(before.contact_storage(0).add(&movement.factor).unwrap(),
         *after.contact_storage(0), "the producer's actual factor reaches the resident unchanged");
     let old_capacity = before.contact_storage(0).multiply(&before.contact_storage(0).transpose().unwrap()).unwrap();
     let new_capacity = after.contact_storage(0).multiply(&after.contact_storage(0).transpose().unwrap()).unwrap();
-    assert_eq!(new_capacity.subtract(&old_capacity).unwrap(), movement.storage);
+    assert_eq!(new_capacity.subtract(&old_capacity).unwrap(), movement.form);
     let steps = publication.comparison_return.factors().iter().filter(|s| {
         matches!(s.gradient, FactorGradient::Storage { contact: 0, .. })
     }).collect::<Vec<_>>();
@@ -128,6 +129,163 @@ fn contact_causal_receipt(before: &Constitution, after: &Constitution,
         prior.iter().filter(|(l,_,_,_)| *l==locus).collect::<Vec<_>>(),
         next.iter().filter(|(l,_,_,_)| *l==locus).collect::<Vec<_>>(), movement,
         publication.continuation.deposition_work);
+}
+
+#[test]
+fn all_reached_contact_families_return_through_the_same_continuing_field() {
+    use crate::hnn::constitution::{Carrier, FactorGradient, Family, Locus};
+    use crate::hnn::physical::contact::ContactObservation;
+    use crate::ratio::Rat;
+    use crate::ratio::linear::vector::dot;
+    let field = field();
+    let mut actual = PhysicalReceiver::new(&field, contact_material(&field),
+        Current::at_rest(&field), WordOpening::Rest).unwrap();
+    for (source, target) in [([0,1], [0,1,3]), ([1,0], [1,0,2])] {
+        let before = actual.constitution().clone();
+        let entered = actual.opening();
+        let receipt = actual.communicate_contact(&encoded(&field, &source), &receiver(), |_| {
+            Some(ContactObservation { observed: encoded(&field, &target), compared: vec![false,false,true] })
+        }).unwrap();
+        assert!(receipt.closes());
+        let publication = receipt.comparison.as_ref().unwrap().as_ref().unwrap();
+        let after = actual.constitution();
+        assert_eq!(publication.comparison_return.commit(), before.commit());
+        assert_eq!(publication.publication.commit, after.commit());
+        assert_eq!(publication.comparison_return.factors().len(), 3);
+        assert_eq!(publication.continuation.material.len(), 3);
+        let prior = before.carried_remainders();
+        let next = after.carried_remainders();
+        let carry = |xs: &[(Locus, Carrier, usize, Rat)], carrier, entry| xs.iter()
+            .filter(|(l,c,i,_)| *l == Locus::Channel(0) && *c == carrier && *i == entry)
+            .map(|(_,_,_,r)| r.clone()).sum::<Rat>();
+        let released = |carrier, entry| publication.publication.released.iter()
+            .filter(|(l,c,i,_)| *l == Locus::Channel(0) && *c == carrier && *i == entry)
+            .map(|(_,_,_,r)| r.clone()).sum::<Rat>();
+        for family in 0..3 {
+            let step = &publication.comparison_return.factors()[family];
+            assert_eq!(step.gradient.family(), Family::Factor(family));
+            let (FactorGradient::Storage { gradient, .. }
+                | FactorGradient::Stiffness { gradient, .. }
+                | FactorGradient::Dissipation { gradient, .. }) = &step.gradient else {
+                panic!("the actual comparison returns C/K/D factors");
+            };
+            assert!(gradient.entries().iter().any(|x| !x.is_zero()),
+                "this fixed observation must actually reach each returned family");
+            let movement = &publication.continuation.material[family];
+            assert_eq!(movement.contact, 0);
+            assert_eq!(movement.family, Family::Factor(family));
+            assert_eq!(movement.linear.add(&movement.quadratic).unwrap(), movement.form);
+            let h = &after.contact_scales(0)[family];
+            let eta = publication.publication.family_step(Locus::Channel(0), Family::Factor(family));
+            let proposed = gradient.scaled(&(&eta / h)); // this fixture's signature is identity
+            for (i, (delta, applied)) in proposed.entries().iter().zip(movement.factor.entries()).enumerate() {
+                assert_eq!(delta + carry(&prior, Carrier::Factor(family), i),
+                    applied + carry(&next, Carrier::Factor(family), i) + released(Carrier::Factor(family), i));
+            }
+            assert_eq!(&step.energy + carry(&prior, Carrier::FactorScale(family), 0),
+                h - &before.contact_scales(0)[family] + carry(&next, Carrier::FactorScale(family), 0)
+                    + released(Carrier::FactorScale(family), 0));
+        }
+        // This is the producing Word's actual physical dissipation, before this observation.
+        // The next loop uses the already published material and current on a different source.
+        let d = before.contact_dissipation(0);
+        let dissipation = d.multiply(&d.transpose().unwrap()).unwrap();
+        assert_eq!(publication.pullback.transits[0].len(), receipt.balances.len());
+        for (index, (tick, balance)) in publication.pullback.transits[0].iter().zip(&receipt.balances).enumerate() {
+            assert_eq!(tick.tick, index, "the adjoint and Diamond use this Word's local crossing");
+            assert_eq!(balance.dissipation,
+                field.step() * dot(&tick.midpoint, &dissipation.apply(&tick.midpoint).unwrap()));
+        }
+        let entering_tick = match entered { WordOpening::Rest => 0,
+            WordOpening::Received { carry, .. } => carry.ticks };
+        for reading in receipt.boundary.readings() {
+            assert_eq!(reading.tick, entering_tick + reading.crossing,
+                "the receiving boundary places this local crossing on the actual carried clock");
+        }
+        assert_eq!(receipt.carry.ticks, entering_tick + 3);
+        assert_eq!(receipt.carry.momenta, receipt.blind_carry.momenta);
+        assert!(after.exact_bits() <= after.budget());
+        println!("whole C/K/D blind boundary: {:?}", receipt.boundary);
+        println!("actual C/K/D applied material and held work: {:?}", publication.continuation);
+        println!("actual C/K/D unresolved material: {:?}", publication.publication.unresolved_contact_material);
+    }
+    // Conservation and passage coupling do not establish a material/output gain. The spent
+    // original seven-selector gate and its nonzero-C/output assertions remain unchanged.
+}
+
+#[test]
+fn finite_signed_contact_reaction_holds_momentum_and_reaches_the_next_tick() {
+    use crate::hnn::constitution::Family;
+    use crate::hnn::propagation::Operands;
+    use crate::hnn::word::{PowerForm, Word};
+    use crate::hnn::word::continuation::ContactMaterialMove;
+    use crate::ratio::linear::ExactRatMatrix;
+    use crate::ratio::linear::vector::{add, dot, scale};
+    let field = field();
+    let current = Current::at_rest(&field);
+    let width = field.contact(0).width();
+    let identity = ExactRatMatrix::identity(width).unwrap();
+    // A mechanical finite-action control, not a learning curriculum or a tuned output gate.
+    // C and D are positive Gram forms; K has alternating positive/negative columns. Their
+    // combined contact operator is admitted at the same h/G by the existing boost owner.
+    let signs: Vec<_> = (0..width).map(|j| j % 2 == 0).collect();
+    let before = material(&field).with_channel(0, identity.clone(), identity.clone(), identity.clone())
+        .unwrap().with_contact_signature(&field, 0, signs.clone()).unwrap();
+    let moved = identity.scaled(&integer(2));
+    let after = before.clone().with_channel(0, moved.clone(), moved.clone(), moved.clone())
+        .unwrap().with_contact_signature(&field, 0, signs).unwrap();
+    let old_operands = Operands::exact_at_cut(&field, &before, &current).unwrap();
+    let new_operands = Operands::exact_at_cut(&field, &after, &current).unwrap();
+    let movements: Vec<_> = (0..3).map(|family| ContactMaterialMove::between(&before, &after,
+        &old_operands, &new_operands, 0, Family::Factor(family)).unwrap()).collect();
+    for movement in &movements {
+        assert_eq!(movement.factor, identity);
+        assert_eq!(movement.linear, movement.quadratic.scaled(&integer(2)));
+        assert_eq!(movement.form, movement.quadratic.scaled(&integer(3)));
+    }
+    assert!(movements[1].form.get(1,1).unwrap() < &integer(0),
+        "the full K reaction consumes the producing negative column");
+    let mut source = PhysicalReceiver::new(&field, before.clone(), current.clone(), WordOpening::Rest).unwrap();
+    let blind = source.communicate_contact(&encoded(&field, &[0,1]), &receiver(), |_| None).unwrap();
+    assert!(blind.closes());
+    let old = PowerForm::read(&field, &before, &current).unwrap();
+    let new = PowerForm::read(&field, &after, &current).unwrap();
+    let held = old.held(&new, &blind.carry.change).unwrap();
+    let u = &blind.carry.change.states[0][0];
+    let w = &blind.carry.change.states[0][1];
+    let pi = &blind.carry.momenta[0];
+    let wp = &held.change.states[0][1];
+    assert_eq!(held.change.states[0][0], *u);
+    assert_eq!(new_operands.contacts()[0].forms().0.apply(wp).unwrap(), *pi);
+    let expected_work = (dot(pi, wp) - dot(pi, w)
+        + dot(u, &movements[1].form.apply(u).unwrap())) / integer(2);
+    assert_eq!(held.deposition, expected_work);
+    assert_eq!(new.power(&held.change).unwrap() - old.power(&blind.carry.change).unwrap(), expected_work);
+    let d_only = before.clone().with_channel(0, identity.clone(), identity, moved).unwrap();
+    assert_eq!(old.held(&PowerForm::read(&field, &d_only, &current).unwrap(), &blind.carry.change)
+        .unwrap().deposition, integer(0), "D is dissipative, not stored energy at this cut");
+    let nothing: Vec<_> = held.change.storage.iter().map(|wave| vec![integer(0); wave.len()]).collect();
+    let mut old_word = Word::continuing(&field, old_operands, &blind.carry.change, &nothing, blind.carry.ticks).unwrap();
+    let mut new_word = Word::continuing(&field, new_operands, &held.change, &nothing, blind.carry.ticks).unwrap();
+    let mut d_word = Word::continuing(&field, Operands::exact_at_cut(&field, &d_only, &current).unwrap(),
+        &blind.carry.change, &nothing, blind.carry.ticks).unwrap();
+    for word in [&mut old_word, &mut new_word, &mut d_word] {
+        let entering = word.change().unwrap();
+        let balance = word.tick().unwrap();
+        let end = word.change().unwrap();
+        let omega = scale(&rat(1,2), &add(&entering.states[0][1], &end.states[0][1]));
+        assert_eq!(balance.dissipation,
+            field.step() * dot(&omega, &word.operands().contacts()[0].forms().2.apply(&omega).unwrap()));
+        assert!(balance.closes());
+        assert_eq!(word.opened_at(), blind.carry.ticks);
+    }
+    assert_ne!(old_word.change().unwrap(), new_word.change().unwrap(),
+        "the finite material reaction reaches a later actual field tick");
+    assert_ne!(old_word.field_balances()[0].dissipation, d_word.field_balances()[0].dissipation,
+        "D alone changes the subsequent actual dissipative work at matched entering state/time");
+    println!("finite signed C/K/D reaction: {movements:?} held_work={expected_work}");
+    println!("actual old/new/D-only next-tick balances: {:?} / {:?} / {:?}",
+        old_word.field_balances(), new_word.field_balances(), d_word.field_balances());
 }
 
 #[test]

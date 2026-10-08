@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "date_UTC": "2026-10-08",
+  "grade": "BOUNDED_SOURCE_INSPECTION_NO_RUNTIME_ACCEPTANCE",
+  "review_base": "64a2f5771d86635ffff19cecacb3d26c6f2d7e42",
+  "source_hashes": {
+    "crates/holonics/src/hnn/constitution.rs": {
+      "bytes": 440174,
+      "sha256": "86a929b983e9e9fd5ade8c3dad5c1e1e8f4a8fa3cd1333162b11a44e96b58309"
+    },
+    "crates/holonics/src/hnn/word/continuation.rs": {
+      "bytes": 25506,
+      "sha256": "3956270df317a53b6d32c624b6b0675a1309b12f26104d8fd4007f0e364c5cbc"
+    },
+    "crates/holonics/src/hnn/physical/contact.rs": {
+      "bytes": 9696,
+      "sha256": "7e25e419d0cdda07d84addbf2cc426f4ee042b47a70751302daf70abbbc1cdac"
+    },
+    "crates/holonics/src/hnn/reference/continuation.rs": {
+      "bytes": 29456,
+      "sha256": "16c82e87a9f5f6f86b413dc378e32c136e6de50c8ce9eb40f9a886dd7034a44e"
+    },
+    "crates/holonics/src/hnn/tests/physical_communication.rs": {
+      "bytes": 46506,
+      "sha256": "f42580a8bac4f48bc6ba858ad156f743821d59be607d03cd799e2f5aa373ac18"
+    }
+  },
+  "reviewer": "Codex primary plus bounded GPT-6 Luna source review",
+  "defects_remaining_in_reviewed_source": [],
+  "verified_source_claims": [
+    "compose_contact supplies existing executed C/K/D covectors; consumer no longer discards K/D",
+    "signed finite expansion matches producing K-column signature, rejects changed signature, and compares against admitted contemporary forms",
+    "existing deposit signs stiffness-gradient columns once; no duplicate pullback or authored direction",
+    "PowerForm.held holds Cw and displacement, charges actual C/signed-K energy; D adds no cut storage",
+    "next exact native tick consumes D through actual midpoint heat; matched D-only mechanical control now prepared",
+    "common Resident publication stages candidate carry/material/charts and preserves blind carry/old material on refusal",
+    "empty compared partition emits no factor statistic; masks and blind source binding unchanged",
+    "two-pass actual transient adjoint carries Word-local ticks; actual boundary places crossing on entering carry tick; source Current distinct"
+  ],
+  "tests_scope": [
+    "actual all-family comparison/carry/normalization and different-source physical passage conservation",
+    "declared mechanical signed finite action, canonical held work and actual D-only next-tick heat"
+  ],
+  "controls_not_executed": true,
+  "claim_withheld": [
+    "type correctness until fresh lib/libtest compile",
+    "full nonlinear finite comparison decrease",
+    "useful learned material/output change",
+    "cold continuation",
+    "device parity",
+    "all-future sensitivity",
+    "moving geometry/decoder transport"
+  ]
+}

@@ -2,7 +2,7 @@
 //!
 //! [agent-inferred] A complete source-opened Word executes all its declared ticks. Only after
 //! its blind complex boundary is observed may a declared comparison return through that same
-//! Word to every reached C factor. ContactCut transports the actual end at held Cw and charges
+//! Word to every reached C/K/D factor. ContactCut transports the actual end at held Cw and charges
 //! its work. The returned library HolonState is published into the common Resident; the next
 //! existing communicate call consumes that material and carry. No target enters the opening,
 //! no source is reinjected at deposition and no coordinate error is replaced by a work residual.
@@ -39,7 +39,7 @@ pub struct ContactPublication {
     /// Neither this return nor its producing Word is installed in the common resident.
     pub comparison_return: Deposit,
     /// `stepped` includes normalization-statistic coordinates. Physical factor movement is
-    /// the actual finite difference in `continuation.storage`, not that aggregate count.
+    /// the actual finite differences in `continuation.material`, not that aggregate count.
     pub publication: DepositReading,
     pub continuation: ContinuationReceipt,
 }
@@ -71,7 +71,7 @@ impl ContactCommunication {
 
 impl PhysicalReceiver<'_> {
     /// A declared Field receiver observes a full-tick native passage, then optionally changes
-    /// reached C through the existing contact return. The later communication is the ordinary
+    /// reached C/K/D through the existing contact return. The later communication is the ordinary
     /// receiver of the same common resident, not another contact experiment or saved Word.
     pub fn communicate_contact(
         &mut self,
@@ -139,7 +139,7 @@ impl PhysicalReceiver<'_> {
                         reason: "the native contact observation keeps its producing chart/source and requested partition",
                     });
                 }
-                let (ratio, returned) = word.compare_contact_storage(receiver_index,
+                let (ratio, returned) = word.compare_contacts(receiver_index,
                     &observed.observed, &observed.compared)?;
                 let cut = returned.forward.into_present().ok_or(HnnError::Realization { what: "the reached contact cut" })?;
                 let pullback = returned.pullback.into_present().ok_or(HnnError::Realization { what: "the reached contact covector" })?;
