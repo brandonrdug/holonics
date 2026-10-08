@@ -185,6 +185,61 @@ the Lean check before any claim. Its second part states the perfected laws:
    the CRT recovers a whole word past its admitted capacity. The decoder, fibre, clock and carry
    residuals are kept. A grain split is not a corruption witness.
 
+   **The first consumer, step 1** (`agent-inferred`; designed from a read-only survey of the
+   native path at `f12fb506c`, for review before any build). It is one file beside the located
+   transport, `compression/keys/duplex.rs`. It consumes `LocatedTransport`, `PairContact`/`pair_lock`,
+   `Encoding::{found, encode, readout}` and `width_over_readings` → `LawfulOptions::assemble` →
+   `release`. It founds no subsystem. The terms it adds, each stated as its equation at the consumer:
+   - `LocatedTransport::lifts(key, u)`: `ℓ₀ = key mod D`, `ℓ_{k+1} = ℓ_k + A(u_k) mod D`. These
+     are the driven lifts that the private `driven_patches` already steps.
+   - `Pairing::new(σ)`: refused unless `σ∘σ = id` and `σ(a) ≠ a` for every class. Its
+     complement-reverse is `σ̄(w)_k = σ(w_{n−1−k})`, with `σ̄∘σ̄ = id` and
+     `σ̄(vw) = σ̄(w)σ̄(v)`.
+   - **The partner, paired before the quotient.** Its lifts are `ℓ′_k = R(ℓ_{n−1−k})`, with `R`
+     the gauge's reflection (`reflect_key`). Since `reflected` is `R∘F∘R` and regenerates the same
+     passage, the partner is that mirror chart read in reverse, with complemented labels. Two
+     equations are checked at the consumer, using the existing `step` and `emit`:
+     `lt.reflected().step(ℓ′_{k+1}) = ℓ′_k`, and `σ(lt.reflected().emit(ℓ′_k)) = σ̄(u)_k`. No
+     `F⁻¹` is needed while the duplex is formed from the actual strand. Each strand is the
+     other's key.
+   - **Contacts.** A declared injective chart `v₊` of the classes into `ℚ³`, with `v₋ = v₊∘σ`.
+     The slip `s_k = v₊(u_k) − v₋(p_{n−1−k})` is read through `PairContact` at unit rates, and
+     the lock through `pair_lock(pair, 1, 1)`. The law is
+     `slipped = {k : p_{n−1−k} ≠ σ(u_k)}`.
+   - **The receiver's class** is `class_R(u) = (E e_{ℓ_k})_k`, the founded encoding's reading of
+     the placed lifts. `E` is the receiver's own quotient (`ker E ∩ R = ⋂_w ker(ρ T_w)`), not an
+     authored table. A substitution at `i` shifts every later lift by
+     `Δ = A(u′_i) − A(u_i)`. It is absorbed exactly when `E(e_{ℓ_k+Δ} − e_{ℓ_k}) = 0` for every
+     later `k`, which is the designed-placement law (item 5) on this carrier. On most helices
+     that blind subgroup is trivial, so nothing is absorbed. That is the receiver's honest
+     kernel, never enlarged.
+   - **Repair and release.** The repair family is factored per slipped contact,
+     `{u′_k, σ(p′_{n−1−k})}`, and a template frame collapses each factor. Release requires the
+     class to be constant over the whole family: zero width through `width_over_readings` at
+     tolerance zero. Otherwise the decoder holds, naming the contacts and the classes.
+   - `CarryHelix::of_residues(r)`: the unique `ℓ < D` with `residues(ℓ) = r` (the Lean owner is
+     `joint_residue_determines_position`). The absolute position keeps the carry from
+     `step_digits`.
+
+   **The three boundary charts**, each with `σ` as its own half-turn. Each is a known-truth
+   `SteppedTerrain` over the chart's alphabet. Placement uses the terrain's truth transport, so
+   location's cost of `D^|A|` is not spent; location is a separate, built capability.
+   - Text bytes in base four, two bits a digit, with `σ(x) = 3 − x` (bit complement) and the
+     rectangle chart `v₊ ∈ {(±2, ±1, 0)}`, where `σ` is the dyad `diag(1, −1, −1)`.
+   - Twelve pitch classes, with `σ(x) = x + 6 mod 12` (the tritone).
+   - Eight signed amplitude levels, with `σ(x) = 7 − x` (phase inversion).
+
+   Byte passages themselves stay refused on the located route (`Unencoded`); the text chart is
+   their base-four boundary chart. The acceptance reads exact counts on unseen keys and words:
+   located slips, released and held families, absorbed and residual coordinated substitutions
+   against truth, and CRT recovery.
+
+   **Deferred to later steps, named.**
+   - Step 2: the partner's face on the HNN carrier, `m(σ̄u) = B U⁻⁽ⁿ⁻¹⁾ m(u)`, which needs a
+     located moment chart (`PassageChart::moment` admits ticks 0 to 2 only).
+   - Step 3: the linking reading of a closed duplex and its crossing changes. No current crate
+     reads the linking number, and the retired owner is at `13f8c734`.
+
 5. **The designed-placement law** (Epime's typed form over `Foundation/CausalRelevance`'s additive
    carrier). `q(P(T_{i,v}u)) = q(P(u))` iff `δ_{i,v}(u) = P(T_{i,v}u) − P(u) ∈ K`, for every admitted
    background `u`. The type `v` is a substitution operator, and the kernel holds its reached
