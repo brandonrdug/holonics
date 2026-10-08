@@ -126,6 +126,13 @@
 //! the objects): the statement is in the family, its image and its blocks, and the arrays are only
 //! its realization.
 //!
+//! [established-bounded] **Cost, stated, not bounded away.** Each image performs `K` fresh exact
+//! `n×n` solves (no factorization is held); [`PhaseImage::witnesses`] reads every candidate arc of
+//! each class before it stops the walk at two; [`PhaseImage::blocks`] has no outcome capacity and
+//! grows with the product of the classes' arc counts. The semantics are complete or refused: no
+//! walk is truncated to fit a budget. Finite exact semantics on a declared fixture do not imply a
+//! bounded-memory completion in general, nor a device realization (Epime's review, October 8).
+//!
 //! [open] The Lean counterpart is owed (#62): the Cauchy–Schwarz image, the Sherman–Morrison
 //! contraction and the half-open block rule; the atlas rows are owed with the first consumer. The
 //! exact reference here is `Rat` throughout and nothing in it consumes a float.

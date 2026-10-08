@@ -1112,13 +1112,16 @@ fn predict_native(
     }))
 }
 
-/// **The one decision on the probe.** Its reading is the **outcome block** (the tuple of lifted
-/// half-open phase arcs at the receiver's grain) of the compared station's native phase readout,
-/// over the declared family's image, read in the **discrete metric on blocks**: two distinct
-/// blocks are at distance one, whatever their phase separation, as the station decision reads
-/// its classes (`hnn::prediction`). Its width is therefore one, attained by the offered probe's two
-/// feasible witnesses in distinct blocks, when a probe is offered, and zero (one block met at
-/// every admitted wave) when none is. It is not the phases' sup-norm width (Epime's review,
+/// **The one decision on the probe.** Its reading is, for a member `V` of the declared family,
+/// the tuple of **outcome blocks** over the admitted controls,
+/// `R(V) = (block_L(V x(u)/2))_(u ∈ AdmittedWaves)` (each block the tuple of lifted half-open phase
+/// arcs at the receiver's grain), in the supremum over the control index of the **discrete metric
+/// on blocks**: two distinct blocks are at distance one, whatever their phase separation, as the
+/// station decision reads its classes (`hnn::prediction`). One member keeps its identity across the
+/// controls, and outcomes of different controls are never pooled (two deterministic controls can
+/// meet different blocks while each has zero width). The diameter is one exactly when some single
+/// admitted control meets two feasible blocks, attained by that control's two witnesses (each the
+/// reading of a family member, by the equality case of `hnn::phase_family`), and zero otherwise. It is not the phases' sup-norm width (Epime's review,
 /// October 8: two blocks need not be a unit phase apart, and one block can hold a nonzero image).
 /// The existing release law at tolerance zero `Hold`s inside the tolerance and `Ask`s beyond it,
 /// only for the probe offered.

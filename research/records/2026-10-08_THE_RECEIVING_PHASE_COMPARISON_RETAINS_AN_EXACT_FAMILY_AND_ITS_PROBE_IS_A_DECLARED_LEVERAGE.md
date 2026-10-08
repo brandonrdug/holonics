@@ -184,6 +184,43 @@ v111's zero C/K/D movement stays its failed gate.
 
 ## 9. Receipts
 
-No compile, test or run has happened yet. The queue's receipts (compile, the new laws' tests, the
-re-measured receiving regressions) and their costs will be added here, with the measured-to-
-projected ratios.
+**v114 (superseded pin `62bbc7f07`).** The workspace all-targets check, 57/57 doctests and the
+library-test build passed. The guard lints failed on five notebook filesystem and process uses
+inherited unchanged from base `11648e57`. The queue stopped there, so no runtime or mathematical
+acceptance carries forward. Receipt: `receipts/2026-10-06-lean-rust-native-queue/continuation-v114/`.
+
+**v115 (packet 5, `51f7806ddba2399af6c6d02dd27e2f5c54694a22`, all 316 native inputs sealed).**
+
+- Gate 1 passed: the workspace all-targets check, the all-targets guard lints (which close the five
+  v114 diagnostics) and 57/57 doctests.
+- 143/143 scoped runtime tests passed:
+  - 125/125 selected library tests (`receiver::release`, `receiver::population::chaser`,
+    `hnn::phase_family`, `hnn::tests::{constitution, prior_carry, guards, retention,
+    rebase_boundary}`);
+  - 10/10 `physical_ask`;
+  - 4/4 `physical_action`;
+  - 4/4 `native_action_return`.
+- The `holonics-cuda` all-targets check passed. It was compile-only, with no GPU workload.
+- Stage times, measured against a 65 s guard per compile stage:
+
+  | Stage | Wall (ns) | CPU (ns) | Group peak (bytes) |
+  |---|---|---|---|
+  | workspace check | 13 091 000 775 | 23 551 201 000 | 2 003 533 824 |
+  | guard lints | 18 003 983 010 | 30 008 251 000 | 2 202 677 248 |
+  | doctests | 22 156 454 199 | 40 033 059 000 | 2 772 676 608 |
+  | lib-test build | 24 001 880 146 | 36 310 756 000 | 2 777 206 784 |
+
+  The 27 new native and guard units cost CPU `196507593000 ns` and wall `143301555466 ns`.
+- No earlier `physical_action` or `native_action_return` assertion changed against `11648e57`, and
+  the v113 obstruction still holds.
+- Receipt: `receipts/2026-10-06-lean-rust-native-queue/continuation-v115/VALIDATION.json` (sha256
+  `050cb6dcfd8acdac49a28a885a5408acaba6e8bb4ddc7271e6d143b117ea3cb6`).
+
+**What v115 does not establish.**
+
+- No World truth coverage, whole-HNN learning or mathematical acceptance.
+- The hold/ask/ask integration test executes a zero wave after the first Hold, to found the
+  phase statistics. That is admission and continuity mechanics, not an autonomous Ask bootstrap.
+- R5's effect on receiving tests outside the selected modules (the text path) was not run in v115.
+- The independent consumer review's repairs (`faac32f00`, `19b2dcc10`, `d7e2e5988` and this
+  commit) follow v115 and need their own run.
