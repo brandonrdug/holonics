@@ -245,7 +245,15 @@ impl<'c> Word<'c> {
             }
             Ok(count)
         }).collect::<Result<Vec<_>, HnnError>>()?.into_iter().max().unwrap_or(0);
-        let reached = steps.iter().map(|step| step.gradient.locus()).collect();
+        // The deposit's loci are the distinct reached loci in first-reached order, as
+        // `compose_return` reads them: a contact returns one step per form (C, K and D).
+        let mut reached = Vec::new();
+        for step in &steps {
+            let locus = step.gradient.locus();
+            if !reached.contains(&locus) {
+                reached.push(locus);
+            }
+        }
         let deposit = Deposit::new(theta.commit(), vec![], steps, reached)
             .with_reach(Reach {
                 receiver: phases.ring(), stations: ratio.stations().iter()
