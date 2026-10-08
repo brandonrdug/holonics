@@ -83,7 +83,8 @@ pub(super) fn chain_with(first_admittance: Rat) -> Field {
 
 /// **The exposure's chain**: the chain with no pair offset (`Δ = ∅`), declared over a population of
 /// `population` cells (an exposure's cut is exactly its field's population). Without the offset
-/// counts its capacity is `n* = 17` cells (`71` with `Δ = {1}`), the smallest cut on which the
+/// counts its capacity is `n* = 28` cells (the moment's capacity law: `N(27) ≥ 4^27`,
+/// `N(28) < 4^28`; with `Δ = {1}` it is read from the same law, `Field::capacity`), the smallest cut on which the
 /// exposure's protocol runs its aeons, keys and budget stop. Its receiver's tree reads the active
 /// suffix address, which the resident keeps beside the tree whether or not the moment keeps earlier
 /// cells for its offset counts (the landmark tree).
