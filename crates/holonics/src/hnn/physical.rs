@@ -95,6 +95,9 @@ impl<'f> PhysicalReceiver<'f> {
 
     pub fn constitution(&self) -> &Constitution { self.resident.constitution() }
     pub fn current(&self) -> &Current { self.resident.current() }
+    /// Read the same retained current/material and its exact work/storage readings without
+    /// remounting the receiver or dropping its already certified declaring-face cache.
+    pub fn resident(&self) -> &Resident { &self.resident }
     pub fn opening(&self) -> WordOpening { self.resident.reception_opening() }
 
     /// Execute one unobserved query and retain its physical end without a deposition.

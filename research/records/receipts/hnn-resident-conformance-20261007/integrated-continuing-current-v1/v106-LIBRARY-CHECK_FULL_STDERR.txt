@@ -1,0 +1,15 @@
+    Checking thiserror v2.0.19
+    Checking holonics v0.1.0 (/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/hnn-heldvariation-693c-20261008/source-v1/crates/holonics)
+error[E0624]: method `set` is private
+    --> crates/holonics/src/hnn/word/variation.rs:419:19
+     |
+ 419 |         direction.set(coordinate.row, coordinate.column, integer(1))?;
+     |                   ^^^ private method
+     |
+    ::: crates/holonics/src/ratio/linear.rs:1025:5
+     |
+1025 |     fn set(&mut self, row: usize, column: usize, value: Rat) -> Result<(), ExactLinearError> {
+     |     ---------------------------------------------------------------------------------------- private method defined here
+
+For more information about this error, try `rustc --explain E0624`.
+error: could not compile `holonics` (lib) due to 1 previous error

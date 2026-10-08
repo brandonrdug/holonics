@@ -1,18 +1,50 @@
-//! The held contact material's first variation through two continuing full Words (Refs #73 #62).
+//! The contact material's first variation through a bounded continuing current (Refs #73 #62).
 //!
 //! [agent-inferred] Recover the local tangent equations in `hnn/tests/port`, using the existing
 //! junction, element, loaded solve and contact variation owners. The retained columns are
 //! `EndChange`, not Words or source occurrences. For a later observed ratio the ordinary native
 //! contact consumer reads `g = g_this_word + J_open^* mu_open`. This is a differential at one
-//! material point, not a Deposit: updating that point requires its held-state/update/rebase jet.
+//! material point. The continuing consumer binds the reached sum to the source-owned ContactCut
+//! and rebases under its explicitly declared realized-factor-translation action. It claims no
+//! learner-policy derivative or finite decrease of the historical comparison.
 
+use super::continuation::ContactCut;
 use super::*;
-use crate::hnn::constitution::{Constitution, Locus};
+use crate::hnn::constitution::{Constitution, FactorGradient, FactorStep, Family, Locus, Reach};
 use crate::hnn::field::ConstitutionRead;
-use crate::hnn::port::{ChangeCovector, WordReturn};
+use crate::hnn::port::{ChangeCovector, Deposit, WordReturn};
 use crate::hnn::propagation::transit_variation;
 use crate::hnn::ratio::{HolonRatio, target_phases};
 use crate::hnn::retention::Diamond;
+
+mod rebase;
+
+/// The parameter family whose first variation the current carries. A realized translation
+/// holds the actually applied factor increments as exterior controls: P = I. It differentiates
+/// neither observation selection nor the learner's dyadic/quotient/rounding decisions. The
+/// contemporary normalization and unresolved factor material stay in Constitution as values;
+/// no derivative of that policy or of a never-rounded learner is asserted.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ContactVariationAction {
+    FixedMaterial,
+    RealizedFactorTranslation,
+}
+
+/// The exact metric operands of one reached family. The opening columns use the native wave
+/// coordinates (s,a,u/(hG),w/G,u_R/(hY),w_R/Y); their dual uses the reciprocal units. These are
+/// current first-variation readings, not reconstructed energies of a previous passage or a
+/// Gauss--Newton Hessian of the historical score. The native factor statistic adds the current
+/// feature energy and this declared opening-column squared norm. Its covector ceiling covers
+/// the current solved transit RHS and the opening dual's l1 norm in that same chart.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ReachedContactMetric {
+    pub contact: usize,
+    pub family: Family,
+    pub within_word_energy: Rat,
+    pub within_word_covector: Rat,
+    pub opening_column_power: Rat,
+    pub opening_dual_bound: Rat,
+}
 
 /// Exact resource admission, supplied before the first passage. Counts concern ratios and
 /// column-ticks; the external admission queue also measures CPU, wall and resident memory.
@@ -56,11 +88,13 @@ pub struct HeldContactVariation {
     columns: Vec<EndChange>,
     budget: VariationBudget,
     reading: VariationReading,
+    action: ContactVariationAction,
 }
 
 /// The transient comparison through the held material and actual carried current. Both terms
-/// have the ratio-gradient sign; the negative is the descent direction. This type deliberately
-/// has no Deposit conversion or certified finite-step field.
+/// have the ratio-gradient sign; the negative is the descent direction. Only its producing
+/// Word can bind the combined covector to a ContactCut. The native proposal/storage gates do
+/// not certify finite decrease of the historical comparison that reached this differential.
 #[derive(Debug)]
 pub struct HeldContactComparison {
     pub producing_commit: u64,
@@ -72,6 +106,9 @@ pub struct HeldContactComparison {
     pub carried: Vec<Rat>,
     pub total: Vec<Rat>,
     pub reading: VariationReading,
+    pub metric: Vec<ReachedContactMetric>,
+    pub action: ContactVariationAction,
+    pub(crate) reaction: Option<(ContactCut, Deposit)>,
 }
 
 fn refuse<T>(reason: &'static str) -> Result<T, HnnError> {
@@ -135,6 +172,64 @@ fn same_shape(dual: &ChangeCovector, column: &EndChange) -> bool {
                 (None, None) => true,
                 _ => false,
             })
+}
+
+/// Positive coordinate norm and its dual in the same wave chart used by the native loaded
+/// certificate. The discrete pump tags carry the frame; they are not squared state entries.
+fn opening_power(ops: &Operands, column: &EndChange) -> Result<Rat, HnnError> {
+    let mut power: Rat = column
+        .storage
+        .iter()
+        .flatten()
+        .chain(column.arrivals.iter().flatten().flatten())
+        .map(|x| x * x)
+        .sum();
+    for (state, contact) in column.states.iter().zip(ops.contacts()) {
+        let scales = [
+            ops.step() * contact.conductance(),
+            contact.conductance().clone(),
+        ];
+        for (xs, scale) in state.iter().zip(scales) {
+            power += xs.iter().map(|x| (x / &scale) * (x / &scale)).sum::<Rat>();
+        }
+    }
+    for (state, law) in column.resonators.iter().zip(ops.resonators()) {
+        if let (Some(state), Some(law)) = (state, law) {
+            let scales = [ops.step() * law.admittance(), law.admittance().clone()];
+            for (xs, scale) in state.iter().zip(scales) {
+                power += xs.iter().map(|x| (x / &scale) * (x / &scale)).sum::<Rat>();
+            }
+        }
+    }
+    Ok(power)
+}
+
+fn opening_dual_bound(ops: &Operands, dual: &ChangeCovector) -> Rat {
+    let mut bound: Rat = dual
+        .storage
+        .iter()
+        .flatten()
+        .chain(dual.arrivals.iter().flatten().flatten())
+        .map(Signed::abs)
+        .sum();
+    for (state, contact) in dual.states.iter().zip(ops.contacts()) {
+        let scales = [
+            ops.step() * contact.conductance(),
+            contact.conductance().clone(),
+        ];
+        for (xs, scale) in state.iter().zip(scales) {
+            bound += xs.iter().map(|x| (x * &scale).abs()).sum::<Rat>();
+        }
+    }
+    for (state, law) in dual.resonators.iter().zip(ops.resonators()) {
+        if let (Some(state), Some(law)) = (state, law) {
+            let scales = [ops.step() * law.admittance(), law.admittance().clone()];
+            for (xs, scale) in state.iter().zip(scales) {
+                bound += xs.iter().map(|x| (x * &scale).abs()).sum::<Rat>();
+            }
+        }
+    }
+    bound
 }
 
 impl HeldContactVariation {
@@ -238,6 +333,7 @@ impl HeldContactVariation {
                 words: 0,
                 next_tick,
             },
+            action: ContactVariationAction::FixedMaterial,
         };
         retained.read_bits()?;
         Ok(retained)
@@ -248,6 +344,14 @@ impl HeldContactVariation {
     }
     pub fn coordinates(&self) -> &[ContactCoordinate] {
         &self.coordinates
+    }
+    pub fn action(&self) -> ContactVariationAction {
+        self.action
+    }
+    pub(crate) fn with_realized_translations(mut self) -> Result<Self, HnnError> {
+        self.action = ContactVariationAction::RealizedFactorTranslation;
+        self.read_bits()?;
+        Ok(self)
     }
     /// Current full-state columns, not a history. Discrete phase tags are the primal tags.
     pub fn columns(&self) -> &[EndChange] {
@@ -269,10 +373,8 @@ impl HeldContactVariation {
             .checked_mul(self.coordinates.len())
             .and_then(|n| n.checked_add(self.reading.column_ticks))
             .ok_or(HnnError::CountOverflow)?;
-        if self.reading.words >= 2 || count > self.budget.column_ticks {
-            return refuse(
-                "the held variation exceeds its two-Word or predeclared column-tick domain",
-            );
+        if count > self.budget.column_ticks {
+            return refuse("the held variation exceeds its predeclared column-tick domain");
         }
         Ok(())
     }
@@ -304,6 +406,10 @@ impl HeldContactVariation {
                 self.reading.column_ticks,
                 self.reading.words,
                 self.reading.next_tick,
+                match self.action {
+                    ContactVariationAction::FixedMaterial => 0,
+                    ContactVariationAction::RealizedFactorTranslation => 1,
+                },
             ])
         {
             bits = bits
@@ -335,10 +441,9 @@ impl HeldContactVariation {
                 .ne(self.references.iter())
             || word.is_ended()
             || word.fields.len() != word.ticks()
-            || self.reading.words >= 2
         {
             return refuse(
-                "the two-Word variation keeps its exact material, reference, clock and complete-tick domain",
+                "the continuing variation keeps its exact material, reference, clock and complete-tick domain",
             );
         }
         let mut columns: Vec<_> = self
@@ -380,7 +485,11 @@ impl HeldContactVariation {
         let mut next = self.clone();
         next.columns = opened.to_vec();
         next.reading.column_ticks = column_ticks;
-        next.reading.words += 1;
+        next.reading.words = next
+            .reading
+            .words
+            .checked_add(1)
+            .ok_or(HnnError::CountOverflow)?;
         next.reading.next_tick = word
             .opened_at()
             .checked_add(word.ticks())
@@ -415,8 +524,9 @@ impl Word<'_> {
         let (from, to) = contact.ends();
         let width = contact.width();
         let factor = factors(theta, a)[coordinate.family];
-        let mut direction = ExactRatMatrix::zero(factor.rows(), factor.columns())?;
-        direction.set(coordinate.row, coordinate.column, integer(1))?;
+        let mut direction = vec![vec![Rat::zero(); factor.columns()]; factor.rows()];
+        direction[coordinate.row][coordinate.column] = integer(1);
+        let direction = ExactRatMatrix::shaped(factor.rows(), factor.columns(), direction)?;
         let mut forms = [
             ExactRatMatrix::zero(width, width)?,
             ExactRatMatrix::zero(width, width)?,
@@ -460,7 +570,7 @@ impl Word<'_> {
         opened: &[EndChange],
         reading: VariationReading,
     ) -> Result<HeldContactComparison, HnnError> {
-        let (theta, current, _, support) = self
+        let (theta, current, source, support) = self
             .native_source
             .as_ref()
             .ok_or(HnnError::Unadmitted {
@@ -473,6 +583,8 @@ impl Word<'_> {
             );
         }
         let field = self.field;
+        let cut = self.contact_cut()?;
+        let ops = self.operands.clone();
         let (phases, faces) = self.contact_receiving(receiver)?;
         let ratio = HolonRatio::compare_partition(
             faces,
@@ -496,36 +608,130 @@ impl Word<'_> {
             );
         }
         let diamond = Diamond::opened(field, &phases, &support);
-        let pulls = (0..field.contacts().len())
+        let contact_returns = (0..field.contacts().len())
             .map(|a| {
                 crate::hnn::reference::compose_contact(
                     field,
                     &theta,
                     &back,
                     &diamond,
-                    &|_| false,
+                    &|locus| diamond.retains(field, locus),
                     current.lift(),
                     field.step(),
                     a,
                 )
-                .map(|(_, pull)| pull)
             })
             .collect::<Result<Vec<_>, _>>()?;
         let within_word = held
             .coordinates
             .iter()
             .map(|coordinate| {
-                let pull = &pulls[coordinate.contact];
+                let pull = &contact_returns[coordinate.contact].1;
                 let form = [&pull.storage, &pull.stiffness, &pull.dissipation][coordinate.family];
                 Ok(form.get(coordinate.row, coordinate.column)?.clone())
             })
             .collect::<Result<Vec<_>, HnnError>>()?;
         let carried: Vec<_> = opened.iter().map(|chi| opening.pairing(chi)).collect();
-        let total = within_word
+        let total: Vec<Rat> = within_word
             .iter()
             .zip(&carried)
             .map(|(a, b)| a + b)
             .collect();
+        let dual_bound = opening_dual_bound(&ops, &opening);
+        let mut metric = Vec::new();
+        let mut steps = Vec::new();
+        let mut loci = diamond.retained(field);
+        for (a, (current_steps, _)) in contact_returns.iter().enumerate() {
+            if theta.released().contains(&Locus::Channel(a)) {
+                continue;
+            }
+            for (family, factor) in factors(&theta, a).into_iter().enumerate() {
+                let family_tag = crate::hnn::constitution::Family::Factor(family);
+                let now = current_steps
+                    .iter()
+                    .find(|s| s.gradient.family() == family_tag);
+                let mut descent = vec![vec![Rat::zero(); factor.columns()]; factor.rows()];
+                let mut column_power = Rat::zero();
+                for (i, coordinate) in held.coordinates.iter().enumerate() {
+                    if coordinate.contact == a && coordinate.family == family {
+                        descent[coordinate.row][coordinate.column] = -total[i].clone();
+                        column_power += opening_power(&ops, &opened[i])?;
+                    }
+                }
+                let energy = now.map_or_else(Rat::zero, |s| s.energy.clone());
+                let covector = now.map_or_else(Rat::zero, |s| s.covector.clone());
+                let reading = ReachedContactMetric {
+                    contact: a,
+                    family: family_tag,
+                    within_word_energy: energy.clone(),
+                    within_word_covector: covector.clone(),
+                    opening_column_power: column_power.clone(),
+                    opening_dual_bound: dual_bound.clone(),
+                };
+                // This declared positive material metric normalizes the reached combined
+                // covector. It is not an estimate of missing historical feature energies.
+                if descent.iter().flatten().any(|x| !x.is_zero()) && !ratio.stations().is_empty() {
+                    let gradient =
+                        ExactRatMatrix::shaped(factor.rows(), factor.columns(), descent)?;
+                    let gradient = match family {
+                        0 => FactorGradient::Storage {
+                            contact: a,
+                            gradient,
+                        },
+                        1 => FactorGradient::Stiffness {
+                            contact: a,
+                            gradient,
+                        },
+                        _ => FactorGradient::Dissipation {
+                            contact: a,
+                            gradient,
+                        },
+                    };
+                    steps.push(FactorStep {
+                        gradient,
+                        energy: energy + column_power,
+                        covector: covector + &dual_bound,
+                    });
+                    loci.insert(Locus::Channel(a));
+                }
+                metric.push(reading);
+            }
+        }
+        let reaction = if held.action == ContactVariationAction::RealizedFactorTranslation
+            && !steps.is_empty()
+        {
+            let occupied = field
+                .sources()
+                .iter()
+                .map(|&g| {
+                    let mut n = 0u64;
+                    for class in 0..field.ring(g).placements().len() {
+                        if source.phase_counts(g, class)?.iter().any(|x| *x != 0) {
+                            n = n.checked_add(1).ok_or(HnnError::CountOverflow)?;
+                        }
+                    }
+                    Ok(n)
+                })
+                .collect::<Result<Vec<_>, HnnError>>()?
+                .into_iter()
+                .max()
+                .unwrap_or(0);
+            let reached = steps.iter().map(|s| s.gradient.locus()).collect();
+            let deposit = Deposit::new(theta.commit(), vec![], steps, reached).with_reach(Reach {
+                receiver: phases.ring(),
+                stations: ratio
+                    .stations()
+                    .iter()
+                    .map(|&j| (phases.first_epoch() + j) as u64)
+                    .collect(),
+                entries: vec![0],
+                phases: occupied,
+                loci,
+            });
+            Some((cut.bind_comparison(deposit.clone()), deposit))
+        } else {
+            None
+        };
         Ok(HeldContactComparison {
             producing_commit: theta.commit(),
             coordinates: held.coordinates.clone(),
@@ -536,6 +742,9 @@ impl Word<'_> {
             carried,
             total,
             reading,
+            metric,
+            action: held.action,
+            reaction,
         })
     }
 }

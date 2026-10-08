@@ -1,0 +1,30 @@
+{
+  "status": "INDEPENDENT_READ_ONLY_SOURCE_REVIEW_WITH_PRIMARY_SOURCE_INTEGRATION",
+  "base": "693c61705b9c38c913f3da27b2d194f349116860",
+  "source_hashes": {
+    "crates/holonics/src/hnn/word/variation.rs": "9bee1f605e2be35780f738074887e6f167a76a742a0acdbda21c1d81b3e855d4",
+    "crates/holonics/src/hnn/word/variation/rebase.rs": "7b4ecc2157797619efc0d51c0f2fc48e801bc80f6278f3acc2bb9e2c14b804d2",
+    "crates/holonics/src/hnn/word/continuation.rs": "f76e89d824026ecfabe92ff1fb0b9f44717084f00f3d0b098fac0a4e0d11be78",
+    "crates/holonics/src/hnn/reference/interaction.rs": "38945a8acba2dbbf6c6e28f5e7d9303f2b4feab017a46adf554e5b17031fb985",
+    "crates/holonics/src/hnn/physical/contact.rs": "c6232d3e46732ef8cff5c928af5daf4c19b2ea234e29a387722d7e4171c9db5b",
+    "crates/holonics/src/hnn/tests/physical_communication.rs": "8e6bb407f494396202680b7c33b117a1ff2f8b8fd9f68dfe2d7127e2017087c8",
+    "research/notebook/hnn_design/hnn_continuing_behavior.rs": "9103713b59f6b11468f48cc19fdb8f7122a88128fba3ee352fe8d8bd488c0d1b",
+    "research/notebook/hnn_design/hnn_prediction.rs": "a23187140707098737706f8e054a9fe6893a29220a16e02bbcb7839bac9ab895"
+  },
+  "reviewer": "GPT-6 Luna bounded source/law review; no source mutation, native tests or scientific run",
+  "observations": [
+    "Combined ratio gradient is actual same Word contact pullback plus full opening covector paired with Pi_int retained EndChange columns; descent has negative total sign in raw Gram-factor coordinates.",
+    "Declared metric uses positive native wave coordinates and their reciprocal dual; it does not reconstruct old feature energies or claim a historical Hessian.",
+    "Same source-bound full-tick ContactCut binds immutable reached Deposit. Native current loaded ray/storage gates and actual coarse finite Gram reaction remain separate from historical finite score descent.",
+    "Same-tick canonical derivative uses both old and successor dC terms; successor dC sums every new C row weighted by P[i,j] for each old column, then all full state columns reindex through inverse P. An initial concern about mixing was retracted after source inspection.",
+    "Native held before/after point is checked against existing PowerForm::held, with actual same clock/reference/phase and whole state. Unsupported singular charts/material/source/receiver changes refuse.",
+    "Resident publishes material/carry/new sensitivity after detached checks; any postblind update/rebase/publication failure retains blind carry and pre-publication advanced derivative at old material.",
+    "Runner integrated byte-for-byte from its isolated owned two-path handoff, acquires initial zero R by actual receiving comparisons before contact admission, emits actual blind complete boundary/decoder fibre before observed partition, and counts actual factor movements separately from statistics. It uses a correlated fixed terrain application; no target-string/holdout/product acceptance."
+  ],
+  "native_type_or_runtime_grade": false,
+  "limitations": [
+    "Actual learner/rounding/selection-policy derivative and historical finite-curvature bound are not admitted.",
+    "Exact source-to-output whole run, acquired relation, global stability, save/cold/device and domain release are pending their own evidence.",
+    "11changed/newRustfiles parse via rustfmt stdout only; compilation/whole-runcost/actualoutput belong to sole queue."
+  ]
+}

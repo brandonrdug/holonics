@@ -18,6 +18,7 @@
 //! cargo run --release -p holonics --example hnn_prediction -- executed physical-repair <A|B> <count> <aperture> <out> <pin> <terrain>=<seed>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed physical-receive <A|B|one> <count> <aperture> <out> <pin> <terrain>=<seed>…
 //! cargo run --release -p holonics --example hnn_prediction -- executed physical-learn <measure|held|coverage|attribution|charted-compare|exact-relation|pair-relation|source-observer-relation> <teaching count> <probe count> <out> <pin> <terrain>=<teaching seed>:<probe seed>…
+//! cargo run --release -p holonics --example hnn_prediction -- executed continuing-behavior <out> <pin>
 //! ```
 //!
 //! [definition; agent-inferred, the order pin and the bank pin] **The declaration**
@@ -68,6 +69,8 @@ mod keys_loop;
 mod repair_loop;
 #[path = "hnn_physical_receive.rs"]
 mod physical_receive;
+#[path = "hnn_continuing_behavior.rs"]
+mod continuing_behavior;
 #[path = "hnn_text_repair.rs"]
 mod text_repair;
 #[path = "hnn_transport_loop.rs"]
@@ -379,6 +382,11 @@ fn main() {
                 &arguments[8..],
                 &pin,
             )
+        }
+        (Some("executed"), Some("continuing-behavior")) => {
+            assert_eq!(arguments.len(), 5, "continuing-behavior <out> <committed pin>");
+            let pin = pinned(&arguments[4], "executed continuing-behavior", clock, true);
+            continuing_behavior::run(&arguments[3], &pin)
         }
         (Some("executed"), Some("physical-learn")) => {
             let command = match arguments[3].as_str() {

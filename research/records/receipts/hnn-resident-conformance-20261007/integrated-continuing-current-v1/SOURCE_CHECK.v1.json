@@ -1,0 +1,54 @@
+{
+  "status": "JOINED_SOURCE_PREPARED_TYPE_AND_WHOLE_RUN_PENDING",
+  "source_manifest_sha256": "38fd80c774146145ef1cccdf4837a7dd81c537cae2f932a6277963f49dad2b9b",
+  "source_input_count": 306,
+  "source_parse_checks": [
+    "crates/holonics/src/hnn/constitution.rs",
+    "crates/holonics/src/hnn/physical.rs",
+    "crates/holonics/src/hnn/physical/contact.rs",
+    "crates/holonics/src/hnn/reference/interaction.rs",
+    "crates/holonics/src/hnn/tests/physical_communication.rs",
+    "crates/holonics/src/hnn/word.rs",
+    "crates/holonics/src/hnn/word/continuation.rs",
+    "crates/holonics/src/hnn/word/variation.rs",
+    "research/notebook/hnn_design/hnn_prediction.rs",
+    "crates/holonics/src/hnn/word/variation/rebase.rs",
+    "research/notebook/hnn_design/hnn_continuing_behavior.rs"
+  ],
+  "parse_only": true,
+  "whitespace_pass": true,
+  "builds_tests_training_benchmarks_scientific_runs_by_coordinator": 0,
+  "native_acceptance": false,
+  "whole_run_acceptance": false,
+  "required_whole_gate": "Seven actual native passages on one Resident; >=2 actual C/K/D factor movements (not normalization/stepped); nonzero delayed comparison; full canonical sensitivity rebase and work/clock/actual output; correlated KnownTruth development, no holdout/product credit",
+  "frozen_predecessor": {
+    "commit": "693c61705b9c38c913f3da27b2d194f349116860",
+    "queue": "v106",
+    "status": "LIBRARY_CHECK_E0624_PRIVATE_MATRIX_SETTER_NO_LATER_GATE_LAUNCHED",
+    "correction": "public ExactRatMatrix::shaped on owned raw basis; no scoped API loosening"
+  },
+  "review": {
+    "model": "GPT-6 Luna read-only",
+    "comparison_metric_sign_and_atomicity": "no concrete defect found after full source review",
+    "rebase_general_P": "initial alleged restriction retracted after reviewing sum of all successor C rows and inverse full-column transport",
+    "grade": "SOURCE_REVIEW_ONLY_NOT_TYPE_OR_RUNTIME"
+  },
+  "parameter_scope": "explicit realized applied-factor translations, P=I; no learner/rounding/observation-selection policy derivative",
+  "certificate_scope": "reached-covector quadratic proposal/native loaded-ray/storage physical admission; no historical finite score decrease/global stability",
+  "source_clock_scope": "fixed source Current station entrance tau+1+j, independent advancing carried hop/pump clock; no full-stream ingestion claim",
+  "cost": "Fixed declared dimension/column-tick/bit domain; complete joined first development timing and peak allocation are unmeasured; sole queue owns measured complete projection/cache/guard protocol under unchanged caps",
+  "declared_runner_dimension": {
+    "ring_widths": [
+      8,
+      2
+    ],
+    "contact_width": 2,
+    "loaded_width": 2,
+    "full_EndChange_coordinates": 28,
+    "factor_coordinates": 12,
+    "retained_ratios": 336,
+    "column_ticks": 180,
+    "exact_bits_bound": 1048576,
+    "basis": "Field::Ring::width=2*placements; 10storage+10arrivals+4contact+4loaded. Runner derives actual count; worker prose22/264 is not used."
+  }
+}

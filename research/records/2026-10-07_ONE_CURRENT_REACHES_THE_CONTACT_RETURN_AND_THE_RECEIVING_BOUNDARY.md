@@ -1004,3 +1004,132 @@ consumers without differential transport explicitly refuse before mutation, keep
 the retained state. The finite v96 response certificate remains its separately
 accepted baseline, not acceptance of this source or of delayed-gradient deposition.
 The bank proposal and broader rebase/device/acquisition work remain outside this unit.
+
+### October 8: one continuing consumer crosses actual contact publications
+
+[source-prepared; integrated type/native/whole-run acceptance pending] The first
+fixed-material component at `693c61705` is superseded by the continuing consumer in
+this section. The queue's immutable v106 library check found E0624 at its private
+matrix setter; the successor constructs the basis through the existing public
+`ExactRatMatrix::shaped`, preserving its declared dimensions. No later v106 gate
+or control ran. The earlier v96 acceptance still belongs to its separate finite
+loaded-span source, not to this integrated extension.
+
+The consumer remains `PhysicalReceiver::communicate_contact` on one `Resident`:
+actual source section and carried state → complete blind Word and boundary →
+optional later observed partition → same Word's full adjoint plus retained opening
+credit → source-bound `ContactCut` → actual native C/K/D deposition → canonical
+held state and sensitivity rechart → atomic material/current publication → the
+next actual source section and receiver. There is no second learning runtime,
+receiver answer routine, retained Word, prior source occurrence or sensitivity
+end/restart between publications. The hard-coded two-Word restriction is replaced
+by the declared total column-tick, ratio and numeric-bit budgets, fixed before
+admission. A forward budget refusal occurs before observation. A comparison,
+certificate, rechart or publication refusal retains the accounted blind end and its
+already advanced differential at the unchanged material, with the actual error.
+
+`begin_held_contact_variation` retains the prospective fixed-material domain.
+`begin_continuing_contact_variation` explicitly declares the realized applied-factor
+translation action. Its finite native applied increments are exterior controls of
+that action family, so `P = d theta_plus / d theta_minus = I`. This is not an inferred
+identity from a before/after material delta, nor a derivative through observation
+selection, normalization, dyadic step choice, the coarse quotient, rounding,
+refusal or the learner's policy. The native Constitution still retains its actual
+normalization and unresolved factor direction and accounts for their exact bits;
+no derivative of a never-rounded learner or historical policy is asserted.
+
+For the actual current Word, `compare_contacts_held` reads
+
+    g_i = g_i,current + <mu_open, Pi_int chi_i>.
+
+The current factor pullback and the carried opening term both have the ratio-gradient
+sign. Their negative, in the same raw C/K/D Gram-factor coordinates, is the reached
+factor descent direction. A previously reached contact can contribute through its
+opening column even where the new Word's local contact window contributes no
+feature. Only nonzero reached families stage a factor step; zero receiving maps or
+empty comparisons do not manufacture a material statistic. The full source-producing
+chart, observed prefix, clock and partition remain checked after blind output. The
+private cut is made by that same full-tick Word and binds its actual combined
+Deposit; the runner supplies neither a covector nor a successor material.
+
+[agent-inferred; explicit metric at the consumer] The existing native normalization
+owner needs a declared metric for that combined covector. `ReachedContactMetric`
+therefore exposes the current feature energy and solved transit RHS scale alongside
+the current opening-column and opening-dual readings, in the same positive wave
+coordinates used by the finite loaded certificate:
+
+    z = (s, a, u/(hG), w/G, u_R/(hY), w_R/Y),
+    energy_family = energy_current + sum_(i in family) ||chi_i||_z^2,
+    covector_bound = bound_current + ||mu_open||_(z dual),1.
+
+The dual uses reciprocal units (`mu_u hG`, `mu_w G`, and the loaded analogues).
+Its l1 norm bounds the dual pairing in this chart; discrete pump phase tags are
+matched frames, not additional squared coordinates. These values bind into the
+actual Deposit and its source-bound cut. They are a declared positive normalization
+of the reached first variation, not reconstructed historical feature energies or
+a Gauss--Newton Hessian of the old trajectory. The actual `factor_prepared`, coarse
+factor/normalization carry and `factor_step` owners execute unchanged.
+
+The existing native finite loaded-ray, joint proposal, budget and storage gates
+admit the supplied material direction and read its current producing clock and
+whole loaded field. Their current-Word gain is not a finite bound on the old
+trajectory that generated `chi`. `HeldContactPublication` states this distinction:
+physical proposal admission, actual coarse material reaction and held-state work
+are returned; no historical finite-score decrease, global stability, complete
+learner-policy gradient or useful output is certified. Actual factor displacement
+is `ContinuationReceipt.material`, including the quadratic Gram term, separately
+from a normalization or unresolved-direction move and aggregate `stepped` count.
+
+The rechart consumes the already advanced variation and the actual blind/held
+carries at the same native crossing. Its rate equation is
+
+    C_plus delta_w_plus = C_minus delta_w_minus
+                         + deltaC_minus w_minus - deltaC_plus w_plus.
+
+It preserves all storage, arrival, displacement and loaded state columns and
+absolute phase tags, then reexpresses them through the explicitly supplied `P^-1`
+in the successor factor coordinates. The prospective realized translation uses
+`P=I`; a general admitted invertible transport can supply its actual derivative.
+A nonidentity singular storage crossing without the selected rank/fibre derivative,
+a singular parameter transport, changed source/receiver/pump/reference/released
+chart, wrong topology or exceeded exact budget refuses atomically. Compatible
+identity storage crossings preserve their singular tangent without inventing an
+inverse. The next Word recomputes forcing at the actual successor factors. Other
+consumers and save/cold/device paths still refuse this future until they transport
+its retained sensitivity; dropping it would change the admitted future.
+
+The input route is explicitly the native station-section source law
+`m_g = sum_j G_g(tau_g+1+j)^-1 E_g(c_j)`, with the already admitted identity producing
+chart and unit source steps. The source Current lift is held at this receiving
+section; the full carried hop clock and pump phase advance independently. A section
+is imposed once at the actual source storage entrance. There is no extra ingest,
+reinjection at deposition, guessed selective advance through erased data or claim
+that this laboratory section query is an ingested symbol-stream trajectory.
+
+[acceptance fixed; not run here] The owner integration control uses the existing
+mechanical fixture, five complete passages and three genuine Constitution
+publications, retaining nonzero delayed credit throughout. It checks the deposited
+negative total, bound metric operands, explicit P, actual canonical momentum and
+phase, new material/variation binding, clocks and exact work. It prints actual
+factor families moved separately from statistic/remainder publication. Its known
+maps and synthetic classes are a unit fixture for this join, not acquired relations,
+an untouched holdout or scientific validation. The separate runner owns the actual
+whole behavior consumer: two real receiving comparisons locate R from its zero
+opening, then a blind contact passage, three observed contact passages, and a blind
+consequence on that same common Resident. Its correlated KnownTruth terrain is
+truth production outside the predictor. Complete actual complex output/decoder
+fibres are displayed before observations, and at least two actual finite factor
+movements are a gate rather than assumed from publication count. The whole source,
+complete first development cost, fixed projection and output acceptance belong to
+the sole queue; no owner build/training/benchmark/scientific job ran here and no
+cap or precision ladder is admitted.
+
+[source-derived cost dimension] The joined runner's period-four source has realified
+width eight and its interior width two. Its complete change therefore has
+`d=10+10+4+4=28` numeric coordinates (storage, arrival, contact and loaded state),
+with `p=12` raw factor coordinates and `336` retained state ratios. Five three-tick
+contact passages charge `180` column-ticks. The runner derives this count from the
+actual EndChange shape; an initial worker cost description of `22/264` was corrected
+before queue handoff and is not an admission reading. Its fixed `2^20` exact-bit
+bound, scratch copies, loaded/certificate solves, whole output formatting and
+allocations still need the complete measured cost, not the smaller fixture's rate.

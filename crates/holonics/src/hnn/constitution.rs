@@ -3176,7 +3176,13 @@ impl Family {
 /// family's output (the element's adjoint `u_t` for the element's families and the standing, the
 /// transit's solved `r̄_t` for a channel's and a resonator's, the turned opening at a phase for a
 /// pair port), which the certified step reads as the linear loci read theirs (module header, "The
-/// factor families' certified step").
+/// factor families' certified step"). The continuing contact consumer supplies its explicit
+/// `ReachedContactMetric`: current feature energy plus the retained opening columns' squared
+/// wave-coordinate norm, and current RHS scale plus the full opening dual's bound in that same
+/// chart. This is a declared positive normalization of the reached combined covector, never
+/// reconstructed old-passage feature energy or a claimed historical Gauss--Newton Hessian. Its
+/// native loaded-ray/joint proposal certificate remains physical proposal admission, with no
+/// finite decrease assertion for the historical comparison or the learner's discrete policy.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct FactorStep {
     pub gradient: FactorGradient,

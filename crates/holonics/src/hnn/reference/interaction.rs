@@ -50,10 +50,25 @@ impl Resident {
         Ok(())
     }
 
-    /// Admit a prospective two-Word fixed-material differential on the existing current.
+    /// Admit a prospective fixed-material differential on the existing current.
     /// No physical coordinate is reset; the derivative before this declaration is not claimed.
     pub fn begin_held_contact_variation(&mut self,
         budget: crate::hnn::word::variation::VariationBudget,
+    ) -> Result<crate::hnn::word::variation::VariationReading,HnnError> {
+        self.begin_contact_variation(budget,false)
+    }
+
+    /// Admit continuing sensitivity through actual contact publications. Applied increments
+    /// are declared exterior controls of the realized factor-translation action, with P=I;
+    /// the learner's selection/rounding policy is not differentiated. No primal state resets.
+    pub fn begin_continuing_contact_variation(&mut self,
+        budget:crate::hnn::word::variation::VariationBudget,
+    ) -> Result<crate::hnn::word::variation::VariationReading,HnnError> {
+        self.begin_contact_variation(budget,true)
+    }
+
+    fn begin_contact_variation(&mut self,
+        budget:crate::hnn::word::variation::VariationBudget,translations:bool,
     ) -> Result<crate::hnn::word::variation::VariationReading,HnnError> {
         self.admit_exact_current()?;
         if self.opens != Opens::OnMotion || !self.pending.is_empty() || !self.staged.is_empty() {
@@ -63,6 +78,7 @@ impl Resident {
         }
         let held = crate::hnn::word::variation::HeldContactVariation::begin(
             &self.field,&self.constitution,&self.current,self.carried.as_ref(),budget)?;
+        let held = if translations { held.with_realized_translations()? } else { held };
         let reading = held.reading().clone();
         self.held_contact_variation = Some(held);
         Ok(reading)
@@ -130,12 +146,15 @@ impl Resident {
         let next = material.unwrap_or_else(|| self.constitution.clone());
         match (&self.held_contact_variation,&variation) {
             (None,None) => {},
-            (Some(old),Some(new)) if next == self.constitution && error.is_none()
+            (Some(old),Some(new)) if error.is_none()
+                && (next == self.constitution || old.action()==
+                    crate::hnn::word::variation::ContactVariationAction::RealizedFactorTranslation)
                 && new.matches(&next,&point.configuration)
                 && new.coordinates() == old.coordinates()
-                && new.reading().words == old.reading().words+1 => {},
+                && new.action() == old.action()
+                && old.reading().words.checked_add(1)==Some(new.reading().words) => {},
             _ => return Err(HnnError::Unadmitted {
-                reason:"publication must transport the held differential at the same material, clock and parameter identity",
+                reason:"publication must transport/rebase the held differential at its actual material, clock and parameter identity",
             }),
         }
         if point.commit != next.commit() || !point.configuration.fits(&self.field) {

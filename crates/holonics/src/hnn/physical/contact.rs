@@ -22,6 +22,7 @@ use crate::hnn::word::{ FieldBalance, ReceptionCarry, SourceOpeningReceipt, Word
 use crate::hnn::word::variation::{HeldContactComparison, VariationBudget, VariationReading};
 use crate::holon::HolonState;
 use std::sync::Arc;
+use crate::ratio::linear::ExactRatMatrix;
 
 /// The observed full consequence and its receiving partition. Prefix cells remain unclamped
 /// by the comparison: they certify the producing source, not an additional desired answer.
@@ -45,6 +46,19 @@ pub struct ContactPublication {
     pub continuation: ContinuationReceipt,
 }
 
+/// The reached current+delayed covector's actual native material return. The existing loaded
+/// ray, joint proposal and storage gates admit this supplied direction; they do not bound the
+/// old trajectory's second variation or prove historical score decrease. The explicit P=I
+/// identifies the realized applied-factor-translation action, not the learner-policy derivative.
+#[derive(Debug)]
+pub struct HeldContactPublication {
+    pub comparison_return: Deposit,
+    pub publication: DepositReading,
+    pub continuation: ContinuationReceipt,
+    pub parameter_transport: ExactRatMatrix,
+    pub rebase: VariationReading,
+}
+
 /// Whole blind communication, then the comparison and the actual current it leaves behind.
 /// `blind_carry` belongs to the forward receipt; `carry` may include the held-momentum material
 /// reaction. The complex boundary is unchanged by any subsequent observation.
@@ -57,8 +71,9 @@ pub struct ContactCommunication {
     pub blind_carry: ReceptionCarry,
     pub carry: ReceptionCarry,
     pub comparison: Result<Option<ContactPublication>, HnnError>,
-    /// Opt-in held-material full differential. It stages no finite material publication.
+    /// Opt-in continuing-material full differential at the actually producing material.
     pub held_comparison: Result<Option<HeldContactComparison>, HnnError>,
+    pub held_publication: Result<Option<HeldContactPublication>, HnnError>,
 }
 
 impl ContactCommunication {
@@ -69,12 +84,21 @@ impl ContactCommunication {
                 &p.continuation.committed - &p.continuation.before == p.continuation.deposition_work
                     && &p.continuation.opening - &p.continuation.committed == p.continuation.opening_difference
             })
+            && self.held_publication.as_ref().ok().and_then(|p| p.as_ref()).is_none_or(|p| {
+                &p.continuation.committed - &p.continuation.before == p.continuation.deposition_work
+                    && &p.continuation.opening - &p.continuation.committed == p.continuation.opening_difference
+                    && p.rebase.next_tick==self.carry.ticks
+            })
     }
 }
 
 impl PhysicalReceiver<'_> {
     pub fn begin_held_contact_variation(&mut self, budget:VariationBudget) -> Result<VariationReading,HnnError> {
         self.resident.begin_held_contact_variation(budget)
+    }
+
+    pub fn begin_continuing_contact_variation(&mut self,budget:VariationBudget) -> Result<VariationReading,HnnError> {
+        self.resident.begin_continuing_contact_variation(budget)
     }
 
     pub fn end_held_contact_variation(&mut self) -> Option<VariationReading> {
@@ -146,9 +170,10 @@ impl PhysicalReceiver<'_> {
         let boundary = PhysicalBoundary::of_suffix(&blind, section.chart().clone(), first, phases.grain(), false);
         let mut comparison = Ok(None);
         let mut held_comparison = Ok(None);
+        let mut held_publication = Ok(None);
         if let Some(observed) = observation(&boundary) {
             if let Some(held) = &held {
-                held_comparison = (|| {
+                let joined = (|| {
                     if observed.observed.len() != receiver.aperture
                         || observed.observed.part(0..0)? != *section.chart()
                         || observed.observed.part(0..first)? != *source
@@ -162,7 +187,39 @@ impl PhysicalReceiver<'_> {
                     word.compare_contacts_held(receiver_index,&observed.observed,&observed.compared,
                         held,held_opening.as_ref().expect("the admitted held opening"),
                         next_held.as_ref().expect("the admitted next differential").reading().clone())
-                })().map(Some);
+                })();
+                held_comparison = match joined {
+                    Ok(mut credit) => {
+                        if let Some((cut,deposit)) = credit.reaction.take() {
+                            held_publication = (|| {
+                                let mut charts = self.resident.reception_charts();
+                                let (material,returned) = cut.continue_deposited(self.field,
+                                    self.resident.current(),&moment,&deposit,&mut charts)?;
+                                let next_word = returned.forward.into_present().ok_or(HnnError::Realization {
+                                    what:"the continuing comparison's actual held current",
+                                })?;
+                                let carry = next_word.reception_end()?;
+                                let publication = returned.deposit.into_present().ok_or(HnnError::Realization {
+                                    what:"the continuing comparison's actual material publication",
+                                })?;
+                                // A declared action operand, never inferred from a finite delta.
+                                // The realized applied increments are held as exterior controls.
+                                let parameter_transport = ExactRatMatrix::identity(held.coordinates().len())?;
+                                let rebased = next_held.as_ref().expect("the admitted next differential")
+                                    .rebased(self.field,self.resident.current(),&material,
+                                        &blind.carry,&carry,&parameter_transport)?;
+                                let rebase = rebased.reading().clone();
+                                self.resident.publish_reception_with_variation(Some(material.clone()),
+                                    HolonState::at(carry,material.commit()),Some(charts),None,
+                                    section.chart(),Some(rebased))?;
+                                Ok(HeldContactPublication { comparison_return:deposit,publication,
+                                    continuation:returned.receipt,parameter_transport,rebase })
+                            })().map(Some);
+                        }
+                        Ok(Some(credit))
+                    },
+                    Err(error) => Err(error),
+                };
             } else {
             let joined = (|| {
                 if observed.observed.len() != receiver.aperture
@@ -193,7 +250,7 @@ impl PhysicalReceiver<'_> {
             comparison = joined.map(Some);
             }
         }
-        if !matches!(comparison, Ok(Some(_))) {
+        if !matches!(comparison, Ok(Some(_))) && !matches!(held_publication, Ok(Some(_))) {
             let commit = self.resident.constitution().commit();
             self.resident.publish_reception_with_variation(None,
                 HolonState::at(blind.carry.clone(), commit),None,None,section.chart(),next_held)?;
@@ -201,6 +258,6 @@ impl PhysicalReceiver<'_> {
         Ok(ContactCommunication { boundary, opening: blind.opening, balances: blind.balances,
             word: blind.word, blind_carry: blind.carry,
             carry: self.resident.carried().expect("the returned physical point was published").clone(),
-            comparison,held_comparison })
+            comparison,held_comparison,held_publication })
     }
 }

@@ -261,19 +261,9 @@ impl<'c> Word<'c> {
         }))
     }
 
-    /// Consume the actual comparison return and retain its reached full-tick change. A terminal
-    /// junction has different arriving/outgoing ports and cannot issue this cut. The pulled-back
-    /// covector uses the actual producing operands, including warm charts and pump phases.
-    pub(crate) fn return_contact(
-        self,
-        covector: &RatioCovector,
-        map: &ExactRatMatrix,
-        lift: &num_bigint::BigInt,
-        phases: &ReceivingPhases,
-    ) -> Result<
-        InteractionReturn<ContactCut, WordReturn, (), Vec<Option<usize>>, Remainders>,
-        HnnError,
-    > {
+    /// Capture the actual full-tick end before consuming this Word's adjoint. Both ordinary
+    /// and continuing-material comparisons use this one producer/clock/phase admission.
+    pub(super) fn contact_cut(&self) -> Result<ContactCut,HnnError> {
         let (producing, current, source, opening_support) = self.native_source.as_ref().ok_or(HnnError::Shape {
             what: "a contact return requires its native source producer",
             expected: 1,
@@ -317,7 +307,7 @@ impl<'c> Word<'c> {
             .fold(self.carried.released(), |reading, resonance| {
                 reading.join(&Remainders::of(resonance.remainders.all()))
             });
-        let cut = ContactCut {
+        Ok(ContactCut {
             released,
             deposit: None,
             field: self.field.clone(),
@@ -329,7 +319,24 @@ impl<'c> Word<'c> {
             change,
             opened_at: self.opened_at,
             next_tick,
-        };
+        })
+
+    }
+
+    /// Consume the actual comparison return and retain its reached full-tick change. A terminal
+    /// junction has different arriving/outgoing ports and cannot issue this cut. The pulled-back
+    /// covector uses the actual producing operands, including warm charts and pump phases.
+    pub(crate) fn return_contact(
+        self,
+        covector: &RatioCovector,
+        map: &ExactRatMatrix,
+        lift: &num_bigint::BigInt,
+        phases: &ReceivingPhases,
+    ) -> Result<
+        InteractionReturn<ContactCut, WordReturn, (), Vec<Option<usize>>, Remainders>,
+        HnnError,
+    > {
+        let cut = self.contact_cut()?;
         let phase_carry = cut.change.resonator_phases.clone();
         let back = self.pull_back(covector, map, lift, phases)?;
         let released = back.released.clone();
@@ -345,6 +352,13 @@ impl<'c> Word<'c> {
 }
 
 impl ContactCut {
+    /// Source-private binding by the actual comparison consumer. A caller cannot replace the
+    /// covector once the native cut has been issued.
+    pub(super) fn bind_comparison(mut self, deposit:Deposit) -> Self {
+        self.deposit = Some(deposit);
+        self
+    }
+
     /// The support captured before this Word's first tick, not the reached cut's support.
     pub fn opening_support(&self) -> &[usize] {
         &self.opening_support

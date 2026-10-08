@@ -245,6 +245,93 @@ fn held_contact_variation_refuses_untransported_future_without_clearing_it() {
     assert_eq!(resident.carried(),carry.as_ref(),"explicit derivative-future retirement keeps the physical point");
 }
 
+/// A mechanical integration control of the existing consumer, not scientific acquisition.
+/// It crosses three real Constitution publications without ending/restarting the derivative.
+/// Actual coarse factor movement is read separately from normalization and unresolved material.
+#[test]
+fn continuing_contact_comparison_deposits_and_rebases_without_resetting_delayed_credit() {
+    use crate::hnn::constitution::{FactorGradient,Family};
+    use crate::hnn::physical::contact::ContactObservation;
+    use crate::hnn::word::variation::{ContactVariationAction,VariationBudget};
+    use crate::ratio::linear::ExactRatMatrix;
+    let (field,theta,opening,declared) = held_variation_fixture();
+    let current = Current::at_rest(&field);
+    let mut actual = PhysicalReceiver::new(&field,theta,current.clone(),opening).unwrap();
+    // Five full three-tick passages, twelve columns each; no admission changes mid-run.
+    actual.begin_continuing_contact_variation(VariationBudget {
+        ratios:240,bits:1<<20,column_ticks:180,
+    }).unwrap();
+    let blind = actual.communicate_contact(&encoded(&field,&[0]),&declared,|_|None).unwrap();
+    assert!(blind.closes());
+    assert!(blind.held_publication.unwrap().is_none());
+    let mut actual_factor_moves = 0usize;
+    for passage in 0..3 {
+        let before_material = actual.constitution().clone();
+        let class = (passage+1)%2;
+        let source = encoded(&field,&[class]);
+        let observed = encoded(&field,&[class,1-class,class]);
+        let mut saw_blind = false;
+        let result = actual.communicate_contact(&source,&declared,|boundary| {
+            saw_blind = true;
+            assert!(!boundary.readings().is_empty());
+            Some(ContactObservation { observed,compared:vec![false,true,true] })
+        }).unwrap();
+        assert!(saw_blind);
+        assert!(result.closes());
+        let credit = result.held_comparison.as_ref().unwrap().as_ref().unwrap();
+        let publication = result.held_publication.as_ref().unwrap().as_ref().unwrap();
+        assert_eq!(credit.producing_commit,before_material.commit());
+        assert_eq!(credit.action,ContactVariationAction::RealizedFactorTranslation);
+        assert!(credit.carried.iter().any(|x| !x.is_zero()));
+        for (i,coordinate) in credit.coordinates.iter().enumerate() {
+            assert_eq!(credit.total[i],&credit.within_word[i]+&credit.carried[i]);
+            if let Some(step) = publication.comparison_return.factors().iter().find(|s|
+                s.gradient.locus()==crate::hnn::constitution::Locus::Channel(coordinate.contact)
+                    && s.gradient.family()==Family::Factor(coordinate.family)) {
+                let gradient = match &step.gradient {
+                    FactorGradient::Storage { gradient,.. } |
+                    FactorGradient::Stiffness { gradient,.. } |
+                    FactorGradient::Dissipation { gradient,.. } => gradient,
+                    _ => unreachable!(),
+                };
+                assert_eq!(gradient.get(coordinate.row,coordinate.column).unwrap(),&-credit.total[i].clone());
+                let metric = credit.metric.iter().find(|m|
+                    m.contact==coordinate.contact && m.family==Family::Factor(coordinate.family)).unwrap();
+                assert_eq!(step.energy,&metric.within_word_energy+&metric.opening_column_power);
+                assert_eq!(step.covector,&metric.within_word_covector+&metric.opening_dual_bound);
+            }
+        }
+        assert_eq!(publication.parameter_transport,ExactRatMatrix::identity(12).unwrap());
+        assert_eq!(publication.rebase.words,passage+2);
+        assert_eq!(publication.rebase.column_ticks,(passage+2)*36);
+        assert_eq!(result.carry.ticks,1+(passage+2)*3);
+        assert_eq!(result.carry.momenta,result.blind_carry.momenta);
+        assert_eq!(result.carry.change.resonator_phases,result.blind_carry.change.resonator_phases);
+        assert_ne!(actual.constitution(),&before_material,"the actual reached normalization/carry/material is published");
+        actual_factor_moves += publication.continuation.material.iter()
+            .filter(|m| m.factor.entries().iter().any(|x| !x.is_zero())).count();
+        let resident = actual.into_resident();
+        assert_eq!(resident.current(),&current,"the declared station-section source lift is a distinct clock");
+        assert_eq!(resident.carried(),Some(&result.carry));
+        let retained = resident.held_contact_variation().unwrap();
+        assert!(retained.matches(resident.constitution(),&result.carry));
+        assert_eq!(retained.reading(),&publication.rebase);
+        assert!(retained.columns().iter().any(|chi|
+            chi.states.iter().flatten().flatten().any(|x| !x.is_zero())));
+        actual = PhysicalReceiver::from_resident(&field,resident).unwrap();
+    }
+    let final_blind = actual.communicate_contact(&encoded(&field,&[1]),&declared,|_|None).unwrap();
+    assert!(final_blind.closes());
+    assert!(final_blind.held_comparison.unwrap().is_none());
+    assert!(final_blind.held_publication.unwrap().is_none());
+    let resident = actual.into_resident();
+    assert_eq!(resident.held_contact_variation().unwrap().reading().words,5);
+    assert_eq!(resident.held_contact_variation().unwrap().reading().column_ticks,180);
+    assert_eq!(resident.carried().unwrap().ticks,16);
+    // Read the actual coarse reaction; no relation-level output claim from a statistic move.
+    println!("continuing physical publications=3 actual_factor_families_moved={actual_factor_moves}");
+}
+
 /// Mechanical finite variations use the actual contact decoder and complete loaded Word.
 /// The fixed samples challenge the certificate; its uniform ray argument is the factor
 /// triangle/Gram law, not an empirical claim inferred from these samples.
