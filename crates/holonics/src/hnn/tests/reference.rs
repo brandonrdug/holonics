@@ -876,7 +876,16 @@ fn the_carry_passes_each_receptions_end_to_the_next() {
                 .compare(&mut resident, pending, &encoded(&field, window))
                 .unwrap();
             assert_eq!(resident.carried(), Some(&carry));
-            reference.deposit(&mut resident, staged).unwrap();
+            let deposited = reference.deposit(&mut resident, staged).unwrap();
+            let reading = deposited.deposit.present().unwrap();
+            // Progress and diagnosis only (no assertion): what each deposit moved, per window.
+            eprintln!(
+                "carry-chain window={receptions} separated={separated} stepped={} vanished={:?} unresolved={} loci={:?}",
+                reading.stepped,
+                reading.vanished,
+                reading.unresolved_contact_material.len(),
+                reading.steps.iter().map(|(locus, _)| *locus).collect::<Vec<_>>()
+            );
         }
         let mut fed = 0;
         while fed < window.len() {
@@ -987,7 +996,16 @@ fn a_cold_restore_continues_the_carry_chain_where_the_kept_charts_have_moved() {
                 reference.compare(&mut restored, cold, &target).unwrap();
             assert_eq!(restored_compared.forward, compared.forward);
             assert_eq!(restored_compared.deposit, compared.deposit);
-            reference.deposit(&mut resident, staged).unwrap();
+            let deposited = reference.deposit(&mut resident, staged).unwrap();
+            let reading = deposited.deposit.present().unwrap();
+            // Progress and diagnosis only (no assertion): what each deposit moved, per window.
+            eprintln!(
+                "cold-restore window={receptions} separated={separated} stepped={} vanished={:?} unresolved={} loci={:?}",
+                reading.stepped,
+                reading.vanished,
+                reading.unresolved_contact_material.len(),
+                reading.steps.iter().map(|(locus, _)| *locus).collect::<Vec<_>>()
+            );
             reference.deposit(&mut restored, restored_staged).unwrap();
             assert_eq!(restored.constitution(), resident.constitution());
             assert_eq!(restored.carried(), resident.carried());
