@@ -1,0 +1,266 @@
+{
+  "label": "helical-code-20261008-v130-compile",
+  "scope_unit": "holonics-prune-admission-helical-code-20261008-v130-compile",
+  "scientific_job": false,
+  "stage_kind": "lean_compile",
+  "cwd": "/home/b/Workspaces/holonics",
+  "scope": "Exact frozen helical module and 81 standard-axiom queries; independent source review and native consumer excluded",
+  "projection_ns": 21132554884,
+  "aggregate_cpu_limit_us": 17000000,
+  "aggregate_cpu_stop_margin_us": 1000000,
+  "group_memory_max_bytes": 8589934592,
+  "address_space_max_bytes": -1,
+  "minimum_MemAvailable_KiB": 12582912,
+  "system_floor_MemAvailable_KiB": 4194304,
+  "thread_budget": 1,
+  "input_directories": [],
+  "no_new_resource_runner": "Unchanged admission driver provides all lease/lifecycle/aggregate resource controls; argv only calls accepted metadata verifier around the original submitted Lean command.",
+  "forbidden_axioms": [
+    "sorryAx"
+  ],
+  "no_unchanged_failed_read_retry": true,
+  "inputs": [
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/materialize_helical_repair_v130.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130/COMPILER_REQUEST.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130/source-v1/Holonics/Transport/HelicalCode.lean",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130/SOURCE_ADMISSION.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130/current-imports.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130/import-preparation.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130-prep.acceptance.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130-prep.release.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130-prep.output_seal.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/check_lean_owner_v5.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/verify_lean_metadata_v1.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/lean_budget_v5.py",
+    "/home/b/Workspaces/holonics/.local/hodge-cut-cartier-20261003/runner-recovery-02/import_sealer.py",
+    "/usr/bin/python3.14",
+    "/usr/bin/env",
+    "/usr/bin/timeout",
+    "/home/b/.local/lib/lean-4.33.0/bin/lean",
+    "/home/b/.local/lib/lean-4.33.0/lib/lean/libleanshared_1.so",
+    "/home/b/.local/lib/lean-4.33.0/lib/lean/libleanshared.so",
+    "/home/b/.local/lib/lean-4.33.0/lib/lean/libLake_shared.so",
+    "/home/b/.local/lib/lean-4.33.0/lib/lean/libleanshared_2.so",
+    "/home/b/.local/lib/lean-4.33.0/lib/lean/libInit_shared.so",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/final_stage_memory_v120.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/leased_stage_memory_v120.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/bounded_stage_memory_v120.py"
+  ],
+  "outputs": [
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130/objects-v1/Holonics/Transport/HelicalCode.olean",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130/objects-v1/Holonics/Transport/HelicalCode.ilean",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130/compiler.stdout",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130/compiler.stderr",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130/KERNEL_VALIDATION.json"
+  ],
+  "argv": [
+    "/usr/bin/python3.14",
+    "-B",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/check_lean_owner_v5.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130/COMPILER_REQUEST.json"
+  ],
+  "source_commit": "0669655169b8c2b7c76980e0aaff082458def032",
+  "expected_inputs": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/materialize_helical_repair_v130.py": {
+      "sha256": "80a504e28f39d11487197f557cfc756d56f3214d0c89a697e1b7aadec0e39006",
+      "bytes": 12382
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130/COMPILER_REQUEST.json": {
+      "sha256": "34da99b03170d82c58f7e6ecf6e16363bcf3e47b207360b70bd053eb888d1e1f",
+      "bytes": 7605
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130/source-v1/Holonics/Transport/HelicalCode.lean": {
+      "sha256": "cc90fef6c381d098f0b3334aadad29d05c734b53f26f2374dcfe84355384b004",
+      "bytes": 57654
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130/SOURCE_ADMISSION.json": {
+      "sha256": "94672f78aa153557b082857251a057576d4609374e750908746b9b8f9cf835d9",
+      "bytes": 6444
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130/current-imports.json": {
+      "sha256": "5207ff96445d72a7166dee4690abf9c6f07dec11c177e8ceff3dfab949b4e68a",
+      "bytes": 46708240
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130/import-preparation.json": {
+      "sha256": "9a1121db649874a5f4d1b1a16b0e9501501e138b76712486688eee05c81433d2",
+      "bytes": 1244
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130-prep.acceptance.json": {
+      "sha256": "699bdea7844a3c6c9f4a832189d55f39a9e15304b39bab3439e2773d1854fa52",
+      "bytes": 378
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130-prep.release.json": {
+      "sha256": "a7bd85ab18eae2c4b62ec3b4b0039823f2f01c3ab9863a03975db54603bd401d",
+      "bytes": 175
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130-prep.output_seal.json": {
+      "sha256": "e4490293efe24da8f4d11796caa8bb0f657cc43bb9f693122adfc72bf9b85f54",
+      "bytes": 374433
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/check_lean_owner_v5.py": {
+      "sha256": "938113c2385ccafad539de5bcd6252a3ef315261e15ff3312757fb1a95ba723e",
+      "bytes": 2194
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/verify_lean_metadata_v1.py": {
+      "sha256": "cff6b3ce7c52698766dd59eb249c822960c36667c87d7e8e6cc6bae10c5d41ad",
+      "bytes": 772
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/lean_budget_v5.py": {
+      "sha256": "ad9ee8b7658a53011a020e159847ac9b23d4b491e3b262c2f49d23afa43b974e",
+      "bytes": 5550
+    },
+    "/home/b/Workspaces/holonics/.local/hodge-cut-cartier-20261003/runner-recovery-02/import_sealer.py": {
+      "sha256": "b323b6177c66c48d27a6a39ae580220e0c908430d0bbfbc2c33aa6b5b48b36da",
+      "bytes": 13162
+    },
+    "/usr/bin/python3.14": {
+      "sha256": "ac12d99c156d3c0ec708a2baf664d35b74f455572fe35fd57faa420ade5c3845",
+      "bytes": 14424
+    },
+    "/usr/bin/env": {
+      "sha256": "795586b56f6da560c3cf4e25c1a6e4f274a8576906e88d94c207db7255b07163",
+      "bytes": 72408
+    },
+    "/usr/bin/timeout": {
+      "sha256": "1425639cf3339b1117536df91cd4ba3229f8fa84e87322dee24e87121ed3feb3",
+      "bytes": 68320
+    },
+    "/home/b/.local/lib/lean-4.33.0/bin/lean": {
+      "sha256": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550",
+      "bytes": 9024
+    },
+    "/home/b/.local/lib/lean-4.33.0/lib/lean/libleanshared_1.so": {
+      "sha256": "2f96493ac9046f64ec7bcb78102a4c1e7cd9a7042487f246af45eda8a96667f5",
+      "bytes": 6232
+    },
+    "/home/b/.local/lib/lean-4.33.0/lib/lean/libleanshared.so": {
+      "sha256": "f2a36d5e56b936afc07bdbea18542de0bce6a9977ebc325915272c300d992d42",
+      "bytes": 229196736
+    },
+    "/home/b/.local/lib/lean-4.33.0/lib/lean/libLake_shared.so": {
+      "sha256": "feb2914d056638438613284b1f98278579ff8d8d99d0567e9823167806d150c0",
+      "bytes": 12311904
+    },
+    "/home/b/.local/lib/lean-4.33.0/lib/lean/libleanshared_2.so": {
+      "sha256": "2f96493ac9046f64ec7bcb78102a4c1e7cd9a7042487f246af45eda8a96667f5",
+      "bytes": 6232
+    },
+    "/home/b/.local/lib/lean-4.33.0/lib/lean/libInit_shared.so": {
+      "sha256": "2f96493ac9046f64ec7bcb78102a4c1e7cd9a7042487f246af45eda8a96667f5",
+      "bytes": 6232
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/final_stage_memory_v120.py": {
+      "sha256": "b6913802127facc4945da4bbdd0f18cb5457cc8e03765b649653e6cfe12adfc4",
+      "bytes": 11218
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/leased_stage_memory_v120.py": {
+      "sha256": "1191c531c35016eada85739a5ca94dabefd9074c75781e4a20fb28d4b887f1d1",
+      "bytes": 5538
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/bounded_stage_memory_v120.py": {
+      "sha256": "5ebc628494a7bff53f01362475110002eedae3b6395517f394f9972c541eff41",
+      "bytes": 13550
+    }
+  },
+  "explicit_user_8GiB_authorization": true,
+  "allocation_basis": {
+    "development_read": true,
+    "declared_compile_units": 1,
+    "largest_prior_accepted_complete_compiler_wall_ns": 15278561897,
+    "existing_fixed_child_window_ns": 17000000000,
+    "largest_prior_full_import_preparation_wall_ns": 12779337307,
+    "existing_complete_wrapper_ceiling_ns": 21132554884,
+    "new_elaboration_unmeasured": true,
+    "no_unchanged_failed_retry": true,
+    "no_deadline_or_CPU_cap_increase": true,
+    "memory_ceiling_authorized_by_parent": 8589934592
+  },
+  "mathematical_input_identity": {
+    "target": "Holonics.Transport.HelicalCode",
+    "source_sha256": "cc90fef6c381d098f0b3334aadad29d05c734b53f26f2374dcfe84355384b004",
+    "consumed_imports_sha256": "92fd138bf1229a2cbe4e066223a1b72757508fef08d45e2848eba3352aed538a"
+  },
+  "expected_axiom_selectors": [
+    "Holonics.Transport.HelicalCode.complementReverse",
+    "Holonics.Transport.HelicalCode.complementReverse_nil",
+    "Holonics.Transport.HelicalCode.complementReverse_cons",
+    "Holonics.Transport.HelicalCode.complementReverse_append",
+    "Holonics.Transport.HelicalCode.length_complementReverse",
+    "Holonics.Transport.HelicalCode.complementReverse_involutive",
+    "Holonics.Transport.HelicalCode.complementReverse_ne_of_middle",
+    "Holonics.Transport.HelicalCode.even_length_of_fixed",
+    "Holonics.Transport.HelicalCode.eq_complementReverse_of_fixed",
+    "Holonics.Transport.HelicalCode.fixed_eq_take_append",
+    "Holonics.Transport.HelicalCode.complementReverse_append_self",
+    "Holonics.Transport.HelicalCode.length_append_complementReverse",
+    "Holonics.Transport.HelicalCode.firstHalfEquiv",
+    "Holonics.Transport.HelicalCode.card_fixedWords",
+    "Holonics.Transport.HelicalCode.phaseTransport_eq_reflectedReturn",
+    "Holonics.Transport.HelicalCode.phaseTransport_mul_self",
+    "Holonics.Transport.HelicalCode.phaseTransport_ne_self",
+    "Holonics.Transport.HelicalCode.involutive_of_mul_self",
+    "Holonics.Transport.HelicalCode.phaseTransport_pairing",
+    "Holonics.Transport.HelicalCode.phaseTransport_reciprocal",
+    "Holonics.Transport.HelicalCode.complementReverse_involutive_at_phase",
+    "Holonics.Transport.HelicalCode.even_length_of_fixed_at_phase",
+    "Holonics.Transport.HelicalCode.card_fixedWords_at_phase",
+    "Holonics.Transport.HelicalCode.crossingChange",
+    "Holonics.Transport.HelicalCode.crossingChange_self",
+    "Holonics.Transport.HelicalCode.crossingChange_of_ne",
+    "Holonics.Transport.HelicalCode.sum_crossingChange_sub",
+    "Holonics.Transport.HelicalCode.sum_crossingChange_eq_pm_two",
+    "Holonics.Transport.HelicalCode.half_sum_crossingChange",
+    "Holonics.Transport.HelicalCode.geom_smul_sum_succ'",
+    "Holonics.Transport.HelicalCode.geom_smul_sum_sub",
+    "Holonics.Transport.HelicalCode.one_sub_smul_geom_sum",
+    "Holonics.Transport.HelicalCode.strandFace",
+    "Holonics.Transport.HelicalCode.strandFace_singleton",
+    "Holonics.Transport.HelicalCode.strandFace_append",
+    "Holonics.Transport.HelicalCode.repeatWord",
+    "Holonics.Transport.HelicalCode.strandFace_repeatWord",
+    "Holonics.Transport.HelicalCode.strandFace_repeatWord_sub",
+    "Holonics.Transport.HelicalCode.strandFace_repeatWord_one_sub",
+    "Holonics.Transport.HelicalCode.strandFace_repeatWord_of_fixed",
+    "Holonics.Transport.HelicalCode.strandFace_ofFn",
+    "Holonics.Transport.HelicalCode.face",
+    "Holonics.Transport.HelicalCode.face_ofFn",
+    "Holonics.Transport.HelicalCode.J_zpow",
+    "Holonics.Transport.HelicalCode.J_pow",
+    "Holonics.Transport.HelicalCode.strandFace_complementReverse_nat",
+    "Holonics.Transport.HelicalCode.face_complementReverse",
+    "Holonics.Transport.HelicalCode.partner_map_involutive",
+    "Holonics.Transport.HelicalCode.dihedral_swap",
+    "Holonics.Transport.HelicalCode.dihedral_reflection_sq",
+    "Holonics.Transport.HelicalCode.dihedral_conj",
+    "Holonics.Transport.HelicalCode.halfTurn_inverts_shift",
+    "Holonics.Transport.HelicalCode.frameShift",
+    "Holonics.Transport.HelicalCode.frameFlip",
+    "Holonics.Transport.HelicalCode.frameFlip_frameFlip",
+    "Holonics.Transport.HelicalCode.frameFlip_frameShift_frameFlip",
+    "Holonics.Transport.HelicalCode.frameShift_neg_frameShift",
+    "Holonics.Transport.HelicalCode.frameShift_iterate",
+    "Holonics.Transport.HelicalCode.dihedralFrame",
+    "Holonics.Transport.HelicalCode.dihedralFrame_bijective",
+    "Holonics.Transport.HelicalCode.kleinAct",
+    "Holonics.Transport.HelicalCode.kleinAct_zero_right",
+    "Holonics.Transport.HelicalCode.kleinAct_self",
+    "Holonics.Transport.HelicalCode.kleinAct_assoc",
+    "Holonics.Transport.HelicalCode.kleinAct_comm",
+    "Holonics.Transport.HelicalCode.kleinAct_regular",
+    "Holonics.Transport.HelicalCode.kleinAct_free_involution",
+    "Holonics.Transport.HelicalCode.kleinAct_injective",
+    "Holonics.Transport.HelicalCode.kleinAct_fourth",
+    "Holonics.Transport.HelicalCode.free_involution_eq_kleinAct",
+    "Holonics.Transport.HelicalCode.free_involution_iff",
+    "Holonics.Transport.HelicalCode.card_free_involutions_fin4",
+    "Holonics.Transport.HelicalCode.free_involution_commutes",
+    "Holonics.Transport.HelicalCode.getElem?_complementReverse_rev",
+    "Holonics.Transport.HelicalCode.slipped_contact_iff",
+    "Holonics.Transport.HelicalCode.slipped_contacts_eq",
+    "Holonics.Transport.HelicalCode.slipped_repairs_distinct",
+    "Holonics.Transport.HelicalCode.duplexSigns",
+    "Holonics.Transport.HelicalCode.duplex_passage_sum",
+    "Holonics.Transport.HelicalCode.duplex_passage_linking",
+    "Holonics.Transport.HelicalCode.duplex_passage_pm_four"
+  ]
+}

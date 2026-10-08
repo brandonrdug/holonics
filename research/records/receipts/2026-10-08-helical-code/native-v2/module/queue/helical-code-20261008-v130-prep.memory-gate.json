@@ -1,0 +1,6 @@
+{
+  "MemAvailable_bytes": 16372961280,
+  "minimum_bytes": 8589934592,
+  "passed": true,
+  "before_native_child": true
+}

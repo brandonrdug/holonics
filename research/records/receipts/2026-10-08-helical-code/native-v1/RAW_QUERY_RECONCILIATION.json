@@ -1,0 +1,13 @@
+{
+  "original_kernel_receipt_unchanged": true,
+  "source_not_recompiled": true,
+  "raw_query_count": 81,
+  "all81_selector_names_and_order_match": true,
+  "bad_axiom_queries": {
+    "Holonics.Transport.HelicalCode.phaseTransport_pairing": "propext,\n sorryAx,\n Classical.choice,\n Quot.sound"
+  },
+  "compiler_error_count": 1,
+  "compiler_exit": 1,
+  "kernel_accepted": false,
+  "parser_correction": "Declaration names may contain apostrophes; match through the closing quote before depends/does not depend. Original wrapper receipt preserved."
+}

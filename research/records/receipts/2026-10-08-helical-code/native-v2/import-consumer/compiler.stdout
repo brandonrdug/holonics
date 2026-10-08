@@ -1,0 +1,10 @@
+'Holonics.Transport.HelicalCode.phaseTransport_pairing' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalCode.face_complementReverse' depends on axioms: [propext]
+'Holonics.Transport.HelicalCode.strandFace_repeatWord_of_fixed' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Transport.HelicalCode.dihedralFrame_bijective' depends on axioms: [propext, Quot.sound]
+'Holonics.Transport.HelicalCode.card_free_involutions_fin4' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalCode.slipped_contacts_eq' depends on axioms: [propext, Quot.sound]
+'Holonics.Transport.HelicalCode.duplex_passage_linking' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalCode.geom_smul_sum_succ'' depends on axioms: [propext, Classical.choice, Quot.sound]

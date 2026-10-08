@@ -1,0 +1,358 @@
+{
+  "copies": [
+    {
+      "module": "Holonics.Foundation.Gluing",
+      "source_copy": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/integration-bd29-20261008/lean-source-v1/lean/Holonics/Foundation/Gluing.lean",
+      "source_pin": {
+        "sha256": "5f90c401cae7aa7f40fe42b8dc0a1f181a62e5f44e9bf6dd760bcdb8ccd06828",
+        "bytes": 6717
+      },
+      "parts": {
+        "main": {
+          "copy": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-import-20261008-v131/objects-v1/Holonics/Foundation/Gluing.olean",
+          "original": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130/objects-v1/Holonics/Foundation/Gluing.olean",
+          "pin": {
+            "sha256": "af6f425d9cbbd6fc31c53263f4953bd3a54b56cbd8b0e5301de48096d55f99cf",
+            "bytes": 178288
+          }
+        }
+      },
+      "provenance": {
+        "source_and_all_artifact_trace_parts_match": true,
+        "audit": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/integration-default-capacity-cache-audit-20261008-v119/RESULT.json"
+      }
+    },
+    {
+      "module": "Holonics.Foundation.GluingPassage",
+      "source_copy": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/integration-bd29-20261008/lean-source-v1/lean/Holonics/Foundation/GluingPassage.lean",
+      "source_pin": {
+        "sha256": "966612dd5ba3888bd8e57f2ea8c405f8ad188c877430b0c12b42ab301ef09719",
+        "bytes": 2831
+      },
+      "parts": {
+        "main": {
+          "copy": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-import-20261008-v131/objects-v1/Holonics/Foundation/GluingPassage.olean",
+          "original": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130/objects-v1/Holonics/Foundation/GluingPassage.olean",
+          "pin": {
+            "sha256": "4025653894b0f3195c4912ba0ba3923eb0fc400d6b4943c332a4fdd92d485836",
+            "bytes": 70584
+          }
+        }
+      },
+      "provenance": {
+        "source_and_all_artifact_trace_parts_match": true,
+        "audit": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/integration-default-capacity-cache-audit-20261008-v119/RESULT.json"
+      }
+    },
+    {
+      "module": "Holonics.Foundation.HolonicDifferenceCalculus",
+      "source_copy": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/integration-bd29-20261008/lean-source-v1/lean/Holonics/Foundation/HolonicDifferenceCalculus.lean",
+      "source_pin": {
+        "sha256": "addc8fef4d287cc4ce5df708e99dccd278a4a94e2e3f15a5bb44326ad97b0977",
+        "bytes": 17435
+      },
+      "parts": {
+        "main": {
+          "copy": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-import-20261008-v131/objects-v1/Holonics/Foundation/HolonicDifferenceCalculus.olean",
+          "original": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130/objects-v1/Holonics/Foundation/HolonicDifferenceCalculus.olean",
+          "pin": {
+            "sha256": "ba23d8d2a54829cc10b5147e6348a851aae309585c27272f3620dac7f06ae909",
+            "bytes": 457160
+          }
+        }
+      },
+      "provenance": {
+        "source_and_all_artifact_trace_parts_match": true,
+        "audit": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/integration-default-capacity-cache-audit-20261008-v119/RESULT.json"
+      }
+    },
+    {
+      "module": "Holonics.Foundation.HolonicDirectedPassage",
+      "source_copy": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/integration-bd29-20261008/lean-source-v1/lean/Holonics/Foundation/HolonicDirectedPassage.lean",
+      "source_pin": {
+        "sha256": "21062227a09719bb6bb27a825eac9b16ccf515bd01d08b9644af076a0bf014ec",
+        "bytes": 15691
+      },
+      "parts": {
+        "main": {
+          "copy": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-import-20261008-v131/objects-v1/Holonics/Foundation/HolonicDirectedPassage.olean",
+          "original": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130/objects-v1/Holonics/Foundation/HolonicDirectedPassage.olean",
+          "pin": {
+            "sha256": "a1ded9144b7c7a8df68804b11787d8298f10752f272d8085c4aa690cda391f77",
+            "bytes": 338200
+          }
+        }
+      },
+      "provenance": {
+        "source_and_all_artifact_trace_parts_match": true,
+        "audit": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/integration-default-capacity-cache-audit-20261008-v119/RESULT.json"
+      }
+    },
+    {
+      "module": "Holonics.Geometry.AffineSwing",
+      "source_copy": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/integration-bd29-20261008/lean-source-v1/lean/Holonics/Geometry/AffineSwing.lean",
+      "source_pin": {
+        "sha256": "09ce73d5bc9766c152c3ccfc3b16a5f9627e5a4b3cda828ef9f1cf9e91b5805f",
+        "bytes": 2184
+      },
+      "parts": {
+        "main": {
+          "copy": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-import-20261008-v131/objects-v1/Holonics/Geometry/AffineSwing.olean",
+          "original": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130/objects-v1/Holonics/Geometry/AffineSwing.olean",
+          "pin": {
+            "sha256": "5bb3f1fc695741756d16e04e35ad714e485f1cb762f43e87fcf46054e7d0cdd9",
+            "bytes": 76576
+          }
+        }
+      },
+      "provenance": {
+        "source_and_all_artifact_trace_parts_match": true,
+        "audit": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/integration-default-capacity-cache-audit-20261008-v119/RESULT.json"
+      }
+    },
+    {
+      "module": "Holonics.Geometry.CrossRatio",
+      "source_copy": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/integration-bd29-20261008/lean-source-v1/lean/Holonics/Geometry/CrossRatio.lean",
+      "source_pin": {
+        "sha256": "2fe42c8b97bfe226a82605777d1febc53843747c711dccda276e56938b3f1512",
+        "bytes": 6014
+      },
+      "parts": {
+        "main": {
+          "copy": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-import-20261008-v131/objects-v1/Holonics/Geometry/CrossRatio.olean",
+          "original": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130/objects-v1/Holonics/Geometry/CrossRatio.olean",
+          "pin": {
+            "sha256": "9bd8920bea8c848791567bb3a3c27321b228716e40914c915e9d177ba269ebf6",
+            "bytes": 387032
+          }
+        }
+      },
+      "provenance": {
+        "source_and_all_artifact_trace_parts_match": true,
+        "audit": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/integration-default-capacity-cache-audit-20261008-v119/RESULT.json"
+      }
+    },
+    {
+      "module": "Holonics.Geometry.Horizon",
+      "source_copy": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/integration-bd29-20261008/lean-source-v1/lean/Holonics/Geometry/Horizon.lean",
+      "source_pin": {
+        "sha256": "1ed9894a917aba66e69e4552297c3fb1f193e618ab4b089643e16d9e85f8c215",
+        "bytes": 15792
+      },
+      "parts": {
+        "main": {
+          "copy": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-import-20261008-v131/objects-v1/Holonics/Geometry/Horizon.olean",
+          "original": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130/objects-v1/Holonics/Geometry/Horizon.olean",
+          "pin": {
+            "sha256": "a6d7973e2396461956ac5773f6d0d799a5479e6d4d9fe2a9ccad2818a72c6f3a",
+            "bytes": 724016
+          }
+        }
+      },
+      "provenance": {
+        "source_and_all_artifact_trace_parts_match": true,
+        "audit": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/integration-default-capacity-cache-audit-20261008-v119/RESULT.json"
+      }
+    },
+    {
+      "module": "Holonics.Geometry.Polarisation",
+      "source_copy": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/integration-bd29-20261008/lean-source-v1/lean/Holonics/Geometry/Polarisation.lean",
+      "source_pin": {
+        "sha256": "15141a0dd8489645a133e10f3c537b624bc01479295d25df73cdf363b25f74d2",
+        "bytes": 5472
+      },
+      "parts": {
+        "main": {
+          "copy": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-import-20261008-v131/objects-v1/Holonics/Geometry/Polarisation.olean",
+          "original": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130/objects-v1/Holonics/Geometry/Polarisation.olean",
+          "pin": {
+            "sha256": "cc7808af8391a0b676bd1668293d41f60b239127d31133712184787c43abd87f",
+            "bytes": 174152
+          }
+        }
+      },
+      "provenance": {
+        "source_and_all_artifact_trace_parts_match": true,
+        "audit": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/integration-default-capacity-cache-audit-20261008-v119/RESULT.json"
+      }
+    },
+    {
+      "module": "Holonics.Geometry.ScrewGeometry",
+      "source_copy": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/integration-bd29-20261008/lean-source-v1/lean/Holonics/Geometry/ScrewGeometry.lean",
+      "source_pin": {
+        "sha256": "91020b35bc1cf591f7eae4e0537a70b8c218986d284852181c6689cec102719e",
+        "bytes": 7626
+      },
+      "parts": {
+        "main": {
+          "copy": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-import-20261008-v131/objects-v1/Holonics/Geometry/ScrewGeometry.olean",
+          "original": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130/objects-v1/Holonics/Geometry/ScrewGeometry.olean",
+          "pin": {
+            "sha256": "3fe77355d6bf3fc5e08e3fd60637b53535fff231eed1b68c69920f9a8b4f9075",
+            "bytes": 2049320
+          }
+        }
+      },
+      "provenance": {
+        "source_and_all_artifact_trace_parts_match": true,
+        "audit": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/integration-default-capacity-cache-audit-20261008-v119/RESULT.json"
+      }
+    },
+    {
+      "module": "Holonics.Geometry.Swing",
+      "source_copy": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/integration-bd29-20261008/lean-source-v1/lean/Holonics/Geometry/Swing.lean",
+      "source_pin": {
+        "sha256": "945876159a3560dbb8417aaccff4f9e79917004f06cd1369a80a3e94957444c3",
+        "bytes": 11469
+      },
+      "parts": {
+        "main": {
+          "copy": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-import-20261008-v131/objects-v1/Holonics/Geometry/Swing.olean",
+          "original": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130/objects-v1/Holonics/Geometry/Swing.olean",
+          "pin": {
+            "sha256": "73e83321888969f228fddca517f31d8ee848332bf4777ebbb75fa328248e3356",
+            "bytes": 673128
+          }
+        }
+      },
+      "provenance": {
+        "source_and_all_artifact_trace_parts_match": true,
+        "audit": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/integration-default-capacity-cache-audit-20261008-v119/RESULT.json"
+      }
+    },
+    {
+      "module": "Holonics.Geometry.Telescoping",
+      "source_copy": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/integration-bd29-20261008/lean-source-v1/lean/Holonics/Geometry/Telescoping.lean",
+      "source_pin": {
+        "sha256": "ff8783996008207d980f6d64cc144544825304bd23cd09428ec1cae43bc8e5cc",
+        "bytes": 929
+      },
+      "parts": {
+        "main": {
+          "copy": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-import-20261008-v131/objects-v1/Holonics/Geometry/Telescoping.olean",
+          "original": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130/objects-v1/Holonics/Geometry/Telescoping.olean",
+          "pin": {
+            "sha256": "4d3a1f9e210f369ef47aac722254978eea59aca59b63b938deeed088bedd30b2",
+            "bytes": 53592
+          }
+        }
+      },
+      "provenance": {
+        "source_and_all_artifact_trace_parts_match": true,
+        "audit": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/integration-default-capacity-cache-audit-20261008-v119/RESULT.json"
+      }
+    },
+    {
+      "module": "Holonics.Holon.QuadraticMoment",
+      "source_copy": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/integration-bd29-20261008/lean-source-v1/lean/Holonics/Holon/QuadraticMoment.lean",
+      "source_pin": {
+        "sha256": "f222d34a7bb68ccfc52f6b86b760302e8cc8de6b4ed8ed517f1cf5149585bc9c",
+        "bytes": 2811
+      },
+      "parts": {
+        "main": {
+          "copy": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-import-20261008-v131/objects-v1/Holonics/Holon/QuadraticMoment.olean",
+          "original": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130/objects-v1/Holonics/Holon/QuadraticMoment.olean",
+          "pin": {
+            "sha256": "db65bcf761ef07d805110c4ad26fa9878f7d015170aff36ea66180a9c0cb6617",
+            "bytes": 120488
+          }
+        }
+      },
+      "provenance": {
+        "source_and_all_artifact_trace_parts_match": true,
+        "audit": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/integration-default-capacity-cache-audit-20261008-v119/RESULT.json"
+      }
+    },
+    {
+      "module": "Holonics.Physics.HolonicSnellInteraction",
+      "source_copy": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/integration-bd29-20261008/lean-source-v1/lean/Holonics/Physics/HolonicSnellInteraction.lean",
+      "source_pin": {
+        "sha256": "175b95e411fe980d2fb22ac54a8b92e2dd8f760d6b2998373cecb6904c88f96f",
+        "bytes": 9464
+      },
+      "parts": {
+        "main": {
+          "copy": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-import-20261008-v131/objects-v1/Holonics/Physics/HolonicSnellInteraction.olean",
+          "original": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130/objects-v1/Holonics/Physics/HolonicSnellInteraction.olean",
+          "pin": {
+            "sha256": "942ff9f49ce42451ee24a19b700e67d2d888725ebd4e86d8e1df79102d257bef",
+            "bytes": 163384
+          }
+        }
+      },
+      "provenance": {
+        "source_and_all_artifact_trace_parts_match": true,
+        "audit": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/integration-default-capacity-cache-audit-20261008-v119/RESULT.json"
+      }
+    },
+    {
+      "module": "Holonics.Transport.HelicalPairInteraction",
+      "source_copy": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/integration-bd29-20261008/lean-source-v1/lean/Holonics/Transport/HelicalPairInteraction.lean",
+      "source_pin": {
+        "sha256": "5408e033f4d0d3adf22e75d01811d172752222a54ea0d762d2facf102f8cdd58",
+        "bytes": 22961
+      },
+      "parts": {
+        "main": {
+          "copy": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-import-20261008-v131/objects-v1/Holonics/Transport/HelicalPairInteraction.olean",
+          "original": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130/objects-v1/Holonics/Transport/HelicalPairInteraction.olean",
+          "pin": {
+            "sha256": "8865c32b66f17844824d4a0267c576395f12556756533818b1909566fce29245",
+            "bytes": 1069616
+          }
+        }
+      },
+      "provenance": {
+        "source_and_all_artifact_trace_parts_match": true,
+        "audit": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/integration-default-capacity-cache-audit-20261008-v119/RESULT.json"
+      }
+    },
+    {
+      "module": "Holonics.Transport.HolonicInteraction",
+      "source_copy": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/integration-bd29-20261008/lean-source-v1/lean/Holonics/Transport/HolonicInteraction.lean",
+      "source_pin": {
+        "sha256": "ed7aeaa89a12c73b32983536eaffd3b6369951fd55f8143afd5ef16bd455f1b5",
+        "bytes": 31518
+      },
+      "parts": {
+        "main": {
+          "copy": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-import-20261008-v131/objects-v1/Holonics/Transport/HolonicInteraction.olean",
+          "original": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130/objects-v1/Holonics/Transport/HolonicInteraction.olean",
+          "pin": {
+            "sha256": "46649f243a94f8b6094b9a1c54a769af23d5e2573406787eab8e5f110a891dad",
+            "bytes": 961152
+          }
+        }
+      },
+      "provenance": {
+        "source_and_all_artifact_trace_parts_match": true,
+        "audit": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/integration-default-capacity-cache-audit-20261008-v119/RESULT.json"
+      }
+    },
+    {
+      "module": "Holonics.Transport.HelicalCode",
+      "source_copy": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130/source-v1/Holonics/Transport/HelicalCode.lean",
+      "source_pin": {
+        "sha256": "cc90fef6c381d098f0b3334aadad29d05c734b53f26f2374dcfe84355384b004",
+        "bytes": 57654
+      },
+      "parts": {
+        "main": {
+          "copy": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-import-20261008-v131/objects-v1/Holonics/Transport/HelicalCode.olean",
+          "original": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130/objects-v1/Holonics/Transport/HelicalCode.olean",
+          "pin": {
+            "sha256": "fd6c506d2f10a932e84fa413d98bf8a95bf1b4964ad2e9bd0cccc7370570abfb",
+            "bytes": 1467736
+          }
+        }
+      },
+      "provenance": {
+        "kernel": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130/KERNEL_VALIDATION.json",
+        "acceptance": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130-compile.acceptance.json",
+        "release": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130-compile.release.json"
+      }
+    }
+  ],
+  "source_commit": "0669655169b8c2b7c76980e0aaff082458def032"
+}

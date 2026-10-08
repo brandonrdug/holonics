@@ -1,0 +1,377 @@
+[
+  {
+    "path": "COMPILER_REQUEST.json",
+    "sha256": "f0efb51645b135bb0d0552099568f002ef18bbc7b6d0d34688834a83557e4905",
+    "bytes": 7605
+  },
+  {
+    "path": "KERNEL_VALIDATION.json",
+    "sha256": "c4c49bcd15a5e07bfc94f65e754480f511f4b7f3e201accc1d85aa5d64fc91db",
+    "bytes": 8305
+  },
+  {
+    "path": "PREPARATION_REQUEST.json",
+    "sha256": "a19ebdaae95c5a55f3c52d3f022cfd705a1b7ed8c65597b150673968db404775",
+    "bytes": 5451
+  },
+  {
+    "path": "PROVIDER_NAMESPACE.json",
+    "sha256": "f17dc2589dcd671f989941203c8d651687b50fc4275f5c171c8fae8c7555e80f",
+    "bytes": 17674
+  },
+  {
+    "path": "RAW_QUERY_RECONCILIATION.json",
+    "sha256": "de55430ba72e1c09d46fc38a86aff56c3ea15f00d94ce4ba91535d37dd690e4c",
+    "bytes": 548
+  },
+  {
+    "path": "SOURCE_ADMISSION.json",
+    "sha256": "ee6ace707b87f8b9410f6754da4d66403b0a2f5aa64b453fc6875987a4a12d03",
+    "bytes": 6181
+  },
+  {
+    "path": "compiler.stderr",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "compiler.stdout",
+    "sha256": "75f66177d5c93479999f722d38989d9c2bf7d17db2c3939b1167acff2fe1ed42",
+    "bytes": 14912
+  },
+  {
+    "path": "current-imports.json",
+    "sha256": "de0a36685fabceca74edd9183582410225e3bf73d48a4365a3124d0d831db2d6",
+    "bytes": 46701723
+  },
+  {
+    "path": "import-preparation.json",
+    "sha256": "b25a85f5fdc4345d560cfd2da25253060981e7470b9196f25a3bcbc6c4a5a820",
+    "bytes": 1244
+  },
+  {
+    "path": "objects-v1/Holonics/Foundation/Gluing.olean",
+    "sha256": "af6f425d9cbbd6fc31c53263f4953bd3a54b56cbd8b0e5301de48096d55f99cf",
+    "bytes": 178288
+  },
+  {
+    "path": "objects-v1/Holonics/Foundation/GluingPassage.olean",
+    "sha256": "4025653894b0f3195c4912ba0ba3923eb0fc400d6b4943c332a4fdd92d485836",
+    "bytes": 70584
+  },
+  {
+    "path": "objects-v1/Holonics/Foundation/HolonicDifferenceCalculus.olean",
+    "sha256": "ba23d8d2a54829cc10b5147e6348a851aae309585c27272f3620dac7f06ae909",
+    "bytes": 457160
+  },
+  {
+    "path": "objects-v1/Holonics/Foundation/HolonicDirectedPassage.olean",
+    "sha256": "a1ded9144b7c7a8df68804b11787d8298f10752f272d8085c4aa690cda391f77",
+    "bytes": 338200
+  },
+  {
+    "path": "objects-v1/Holonics/Geometry/AffineSwing.olean",
+    "sha256": "5bb3f1fc695741756d16e04e35ad714e485f1cb762f43e87fcf46054e7d0cdd9",
+    "bytes": 76576
+  },
+  {
+    "path": "objects-v1/Holonics/Geometry/CrossRatio.olean",
+    "sha256": "9bd8920bea8c848791567bb3a3c27321b228716e40914c915e9d177ba269ebf6",
+    "bytes": 387032
+  },
+  {
+    "path": "objects-v1/Holonics/Geometry/Horizon.olean",
+    "sha256": "a6d7973e2396461956ac5773f6d0d799a5479e6d4d9fe2a9ccad2818a72c6f3a",
+    "bytes": 724016
+  },
+  {
+    "path": "objects-v1/Holonics/Geometry/Polarisation.olean",
+    "sha256": "cc7808af8391a0b676bd1668293d41f60b239127d31133712184787c43abd87f",
+    "bytes": 174152
+  },
+  {
+    "path": "objects-v1/Holonics/Geometry/ScrewGeometry.olean",
+    "sha256": "3fe77355d6bf3fc5e08e3fd60637b53535fff231eed1b68c69920f9a8b4f9075",
+    "bytes": 2049320
+  },
+  {
+    "path": "objects-v1/Holonics/Geometry/Swing.olean",
+    "sha256": "73e83321888969f228fddca517f31d8ee848332bf4777ebbb75fa328248e3356",
+    "bytes": 673128
+  },
+  {
+    "path": "objects-v1/Holonics/Geometry/Telescoping.olean",
+    "sha256": "4d3a1f9e210f369ef47aac722254978eea59aca59b63b938deeed088bedd30b2",
+    "bytes": 53592
+  },
+  {
+    "path": "objects-v1/Holonics/Holon/QuadraticMoment.olean",
+    "sha256": "db65bcf761ef07d805110c4ad26fa9878f7d015170aff36ea66180a9c0cb6617",
+    "bytes": 120488
+  },
+  {
+    "path": "objects-v1/Holonics/Physics/HolonicSnellInteraction.olean",
+    "sha256": "942ff9f49ce42451ee24a19b700e67d2d888725ebd4e86d8e1df79102d257bef",
+    "bytes": 163384
+  },
+  {
+    "path": "objects-v1/Holonics/Transport/HelicalPairInteraction.olean",
+    "sha256": "8865c32b66f17844824d4a0267c576395f12556756533818b1909566fce29245",
+    "bytes": 1069616
+  },
+  {
+    "path": "objects-v1/Holonics/Transport/HolonicInteraction.olean",
+    "sha256": "46649f243a94f8b6094b9a1c54a769af23d5e2573406787eab8e5f110a891dad",
+    "bytes": 961152
+  },
+  {
+    "path": "source-v1/Holonics/Transport/HelicalCode.lean",
+    "sha256": "0c21e195c31a3b433123fbec7fabefaec23083514543f77b742b93c331453f0a",
+    "bytes": 57404
+  },
+  {
+    "path": "submitted/lean/Holonics/Transport/HelicalCode.lean",
+    "sha256": "9077b60c6e0c4cede258e61d5c081a6ce8f881e495105633199979d491f590fa",
+    "bytes": 52038
+  },
+  {
+    "path": "submitted/lean/HolonicsResearch/Foundation/TopologicalReceiver.lean",
+    "sha256": "318b2133282883518ca30d7614f48a28770ea9aa42e22e5836860624dc28677c",
+    "bytes": 33262
+  },
+  {
+    "path": "submitted/lean/HolonicsResearch.lean",
+    "sha256": "472ebcea28d5141f930653c0bb1f679e74c06d60d69adbc7d8a6af8153eac522",
+    "bytes": 69748
+  },
+  {
+    "path": "queue/helical-code-20261008-v129-compile.acceptance.json",
+    "sha256": "31188d5722a48b624400bd0131524cdb60638b11859ce9877de0a29823916224",
+    "bytes": 379
+  },
+  {
+    "path": "queue/helical-code-20261008-v129-compile.child-identity.json",
+    "sha256": "422a1d80e7344b9d9f5bf4221917b01e6c5e1920cf98aef52eef7fc9028d9515",
+    "bytes": 78
+  },
+  {
+    "path": "queue/helical-code-20261008-v129-compile.config.json",
+    "sha256": "129bdcb420983f81a4e3be814904a1a38d5fce9eed4b8a8a0d7184c0a74435e9",
+    "bytes": 14997
+  },
+  {
+    "path": "queue/helical-code-20261008-v129-compile.external-lease.json",
+    "sha256": "b30e7e5acf13c1c9e55b0dd535ffbaebc2e13c830d10b2ad332f041cb9b83b56",
+    "bytes": 487
+  },
+  {
+    "path": "queue/helical-code-20261008-v129-compile.failure.json",
+    "sha256": "dec78bf17ac1963cb70d02894c333fe5765c99fdd643f5e9cfab566abb52e333",
+    "bytes": 234
+  },
+  {
+    "path": "queue/helical-code-20261008-v129-compile.final.json",
+    "sha256": "27f2dc4d77fb047218c934ce987a3a654b6a960ee394fb6660636ad1327f47c2",
+    "bytes": 5167
+  },
+  {
+    "path": "queue/helical-code-20261008-v129-compile.input_seal.json",
+    "sha256": "b842e3149656af23eefa8fb41e57715d5d85c205aecdbd9826761275f9906749",
+    "bytes": 6889
+  },
+  {
+    "path": "queue/helical-code-20261008-v129-compile.lease-identity.json",
+    "sha256": "f153c3dc9bba44e35587dd10e38627d91e5c3d5c6e85b6fc8618061f9a690f14",
+    "bytes": 565
+  },
+  {
+    "path": "queue/helical-code-20261008-v129-compile.memory-gate.json",
+    "sha256": "441d206cb571e0ac8ea9409ab9e18bf36be02fdaa0895886d92551f7ef9edd71",
+    "bytes": 121
+  },
+  {
+    "path": "queue/helical-code-20261008-v129-compile.memory-growth.ndjson",
+    "sha256": "6da9290167345e8b37cce279ebdc1af95aa00030bd85ebeab370803cd97ffb91",
+    "bytes": 11934
+  },
+  {
+    "path": "queue/helical-code-20261008-v129-compile.output_seal.json",
+    "sha256": "249090e65b3acaa9df7bf510022f3b74fc8b36b3344183b35bc081d36442d58c",
+    "bytes": 827746
+  },
+  {
+    "path": "queue/helical-code-20261008-v129-compile.publication.json",
+    "sha256": "0eeb0a525603fbd776dc46bb9e4c98d5009a0316ff96fbd94193277885aec760",
+    "bytes": 3513
+  },
+  {
+    "path": "queue/helical-code-20261008-v129-compile.quiescence.json",
+    "sha256": "e9e1355d3bb276a1f8547a467d09aba999453a23fa52f9534b680c4f6faa3cd8",
+    "bytes": 130
+  },
+  {
+    "path": "queue/helical-code-20261008-v129-compile.release.json",
+    "sha256": "93822f4fda679868c310cb08ef0600fd94ff3485d5352588b7b947a275645bee",
+    "bytes": 175
+  },
+  {
+    "path": "queue/helical-code-20261008-v129-compile.stage-quiescence.json",
+    "sha256": "8af8a769fe2ff988800d5f6838fa907dff9d38868366211d9b9e26de153767ea",
+    "bytes": 136
+  },
+  {
+    "path": "queue/helical-code-20261008-v129-compile.stderr",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "queue/helical-code-20261008-v129-compile.stdout",
+    "sha256": "5ddde47d890f72cd8412e700a41fe53849e6957e5ad2e575352e0e8ea318fc53",
+    "bytes": 21885
+  },
+  {
+    "path": "queue/helical-code-20261008-v129-compile.system-floor.json",
+    "sha256": "d7b706b9d2117fe9bd6d07f089bd818b99ee75ff59034388a233a06ba9c0f702",
+    "bytes": 96304
+  },
+  {
+    "path": "queue/helical-code-20261008-v129-compile.unit-cleanup.json",
+    "sha256": "494749ec11ea8f56bf86f3f7d34cb9438de4a0aaac76c38ad99fb9bfc4c5f2e1",
+    "bytes": 755
+  },
+  {
+    "path": "queue/helical-code-20261008-v129-prep.acceptance.json",
+    "sha256": "712b2441d2d702c9aa7f15e2bf87d5c02b9ee8e6cffd1afa4b732296b56edd84",
+    "bytes": 378
+  },
+  {
+    "path": "queue/helical-code-20261008-v129-prep.child-identity.json",
+    "sha256": "dbc6a0f33db24813b0b8355b898732577a8f4e6b639fc8e1748220b74aad8abd",
+    "bytes": 78
+  },
+  {
+    "path": "queue/helical-code-20261008-v129-prep.config.json",
+    "sha256": "8fa514eeb80578002d73cbbd52ba3926347fe0c4ea7d63f9fb965de3ee1f6f7d",
+    "bytes": 10537
+  },
+  {
+    "path": "queue/helical-code-20261008-v129-prep.external-lease.json",
+    "sha256": "f04a40162768b236a8cfc71ec7d3bba4da49a6c9298602456be3b0eba8a0fbf3",
+    "bytes": 487
+  },
+  {
+    "path": "queue/helical-code-20261008-v129-prep.final.json",
+    "sha256": "df4811733dc14c542edbfc1a3a87d6cb9da45be4fd77ac6a7884f4169baa3544",
+    "bytes": 4877
+  },
+  {
+    "path": "queue/helical-code-20261008-v129-prep.input_seal.json",
+    "sha256": "e70d3a682818b0e4e44f771b871a92660a67f33b15d26d8df2106874c5cb96cb",
+    "bytes": 7536
+  },
+  {
+    "path": "queue/helical-code-20261008-v129-prep.lease-identity.json",
+    "sha256": "f26e0507c0015fcd6ed23982a5f04673220f98e9f283450cc3a26f069a3fc7a2",
+    "bytes": 565
+  },
+  {
+    "path": "queue/helical-code-20261008-v129-prep.memory-gate.json",
+    "sha256": "2e01cd2a30168110aaa0901664dd0b5e8a4f0d9d7c317a62c1297f36eb5b97f3",
+    "bytes": 120
+  },
+  {
+    "path": "queue/helical-code-20261008-v129-prep.memory-growth.ndjson",
+    "sha256": "9a67ef647ba6b604cae9d58d1c2f421b143df913949c9e6c7d2d5d497e811b5b",
+    "bytes": 6348
+  },
+  {
+    "path": "queue/helical-code-20261008-v129-prep.output_seal.json",
+    "sha256": "2bfa05c64b376cec3516aed6068845d37b19819a9db321fd692cef80649ee77f",
+    "bytes": 431892
+  },
+  {
+    "path": "queue/helical-code-20261008-v129-prep.publication.json",
+    "sha256": "7868ce54aa6d498ee666e268471d33c4c281aaf7d5bb12a7b27c4a7fe6dba601",
+    "bytes": 3074
+  },
+  {
+    "path": "queue/helical-code-20261008-v129-prep.quiescence.json",
+    "sha256": "af5f9966b298b2e773758a7b86d2112f50a260b451b377a5ea10a0ddea50dafb",
+    "bytes": 130
+  },
+  {
+    "path": "queue/helical-code-20261008-v129-prep.release.json",
+    "sha256": "dfefc3d5af79d395fbde64ec2ea7c1888ffc17f30d37ecb0db160a374ac39fc5",
+    "bytes": 175
+  },
+  {
+    "path": "queue/helical-code-20261008-v129-prep.stage-quiescence.json",
+    "sha256": "457a5d8d012d2f457f320c18f4c73d3b079d601d8520dd3232a21ce7a4fe67f0",
+    "bytes": 136
+  },
+  {
+    "path": "queue/helical-code-20261008-v129-prep.stderr",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "queue/helical-code-20261008-v129-prep.stdout",
+    "sha256": "a03280260db1bb4ff657208127ffbdd34978343ea70b96afd9257c7fc05be672",
+    "bytes": 2071
+  },
+  {
+    "path": "queue/helical-code-20261008-v129-prep.system-floor.json",
+    "sha256": "9e4c5ea71e407b62a6ccbe4f3ebd18cd1cc24bca3332ebe5548a490ad1200bba",
+    "bytes": 50750
+  },
+  {
+    "path": "queue/helical-code-20261008-v129-prep.unit-cleanup.json",
+    "sha256": "7e2408c680c41d65ac3cc354c583f43b4395d63d1b6e79c404fc5a29ec78910e",
+    "bytes": 689
+  },
+  {
+    "path": "queue/materialize_helical_v128.py",
+    "sha256": "933c6187643e4d7ba076952aacde0cda5f3e9bd145d02efc50d29c0f22008e08",
+    "bytes": 11948
+  },
+  {
+    "path": "queue/check_lean_owner_v4.py",
+    "sha256": "be0385a9322ee34ddf9784afb962554f9468793d3822980fcbfebd6f313eefc5",
+    "bytes": 2200
+  },
+  {
+    "path": "queue/check_lean_owner_v5.py",
+    "sha256": "938113c2385ccafad539de5bcd6252a3ef315261e15ff3312757fb1a95ba723e",
+    "bytes": 2194
+  },
+  {
+    "path": "queue/verify_lean_metadata_v1.py",
+    "sha256": "cff6b3ce7c52698766dd59eb249c822960c36667c87d7e8e6cc6bae10c5d41ad",
+    "bytes": 772
+  },
+  {
+    "path": "queue/prepare_ns_namespace_v1.py",
+    "sha256": "85b5a0626525cf14d6dbf8ecf9098ee8804df8facf1cad8c5e2f8eeb36aeea7c",
+    "bytes": 10766
+  },
+  {
+    "path": "queue/check_namespace_lookup_v1.py",
+    "sha256": "9210e5aa18f9daeb7ac8ced18e253f08805577119a5f2b5e211017d9a873679c",
+    "bytes": 886
+  },
+  {
+    "path": "queue/final_stage_memory_v120.py",
+    "sha256": "b6913802127facc4945da4bbdd0f18cb5457cc8e03765b649653e6cfe12adfc4",
+    "bytes": 11218
+  },
+  {
+    "path": "queue/leased_stage_memory_v120.py",
+    "sha256": "1191c531c35016eada85739a5ca94dabefd9074c75781e4a20fb28d4b887f1d1",
+    "bytes": 5538
+  },
+  {
+    "path": "queue/bounded_stage_memory_v120.py",
+    "sha256": "5ebc628494a7bff53f01362475110002eedae3b6395517f394f9972c541eff41",
+    "bytes": 13550
+  }
+]

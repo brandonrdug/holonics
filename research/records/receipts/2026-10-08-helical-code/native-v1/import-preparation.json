@@ -1,0 +1,40 @@
+{
+  "target": "Holonics.Transport.HelicalCode",
+  "wall_ns": 6190696627,
+  "projection_ns": 17000000000,
+  "peak_RSS_KiB": 323292,
+  "module_count": 4592,
+  "bound_path_count": 28090,
+  "source_prefix_inferred_absence_count": 41410,
+  "complete_ordered_import_part_seal": true,
+  "actual_namespace_lookup_verified": true,
+  "compiler_launched": false,
+  "events": [
+    {
+      "phase": "load only reusable source-SHA headers and present-part byte identities",
+      "wall_ns": 883308478,
+      "upstream_path_rows_not_individually_validated": 139317,
+      "reusable_present_paths": 29516,
+      "reusable_headers": 4947
+    },
+    {
+      "phase": "resolve and seal every consumed source and ordered object part",
+      "wall_ns": 3577321684,
+      "module_count": 4592,
+      "bound_path_count": 28078,
+      "reused_headers": 4533,
+      "freshly_parsed_headers": 59
+    },
+    {
+      "phase": "independent namespace validation and complete selected metadata postcheck",
+      "wall_ns": 920175898
+    },
+    {
+      "phase": "serialize complete reduced current graph",
+      "wall_ns": 798336832,
+      "bytes": 46701723
+    }
+  ],
+  "unused_upstream_paths_not_reverified": 139317,
+  "same_source_claims_and_resource_enforcement": true
+}

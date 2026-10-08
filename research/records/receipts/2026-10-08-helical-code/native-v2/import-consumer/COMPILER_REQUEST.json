@@ -1,0 +1,43 @@
+{
+  "target": "HelicalImportConsumer",
+  "source": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-import-20261008-v131/source-v1/HelicalImportConsumer.lean",
+  "sealer": "/home/b/Workspaces/holonics/.local/hodge-cut-cartier-20261003/runner-recovery-02/import_sealer.py",
+  "metadata_verifier": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/verify_lean_metadata_v1.py",
+  "import_seal": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-import-20261008-v131/current-imports.json",
+  "expected_selectors": [
+    "Holonics.Transport.HelicalCode.phaseTransport_pairing",
+    "Holonics.Transport.HelicalCode.face_complementReverse",
+    "Holonics.Transport.HelicalCode.strandFace_repeatWord_of_fixed",
+    "Holonics.Transport.HelicalCode.dihedralFrame_bijective",
+    "Holonics.Transport.HelicalCode.card_free_involutions_fin4",
+    "Holonics.Transport.HelicalCode.slipped_contacts_eq",
+    "Holonics.Transport.HelicalCode.duplex_passage_linking",
+    "Holonics.Transport.HelicalCode.geom_smul_sum_succ'"
+  ],
+  "compiler_stdout": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-import-20261008-v131/compiler.stdout",
+  "compiler_stderr": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-import-20261008-v131/compiler.stderr",
+  "kernel_receipt": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-import-20261008-v131/KERNEL_VALIDATION.json",
+  "compiler_argv": [
+    "/usr/bin/timeout",
+    "--signal=TERM",
+    "--kill-after=1s",
+    "17s",
+    "/usr/bin/env",
+    "-i",
+    "PATH=/usr/bin",
+    "HOME=/home/b",
+    "LANG=C",
+    "LC_ALL=C",
+    "LEAN_PATH=/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-import-20261008-v131/objects-v1:/home/b/Workspaces/holonics/lean/.lake/packages/physlib/.lake/build/lib/lean:/home/b/Workspaces/holonics/lean/.lake/packages/cslib/.lake/build/lib/lean:/home/b/Workspaces/holonics/lean/.lake/packages/mathlib/.lake/build/lib/lean:/home/b/Workspaces/holonics/lean/.lake/packages/plausible/.lake/build/lib/lean:/home/b/Workspaces/holonics/lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/home/b/Workspaces/holonics/lean/.lake/packages/importGraph/.lake/build/lib/lean:/home/b/Workspaces/holonics/lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/home/b/Workspaces/holonics/lean/.lake/packages/aesop/.lake/build/lib/lean:/home/b/Workspaces/holonics/lean/.lake/packages/Qq/.lake/build/lib/lean:/home/b/Workspaces/holonics/lean/.lake/packages/batteries/.lake/build/lib/lean:/home/b/.local/lib/lean-4.33.0/lib/lean",
+    "/home/b/.local/lib/lean-4.33.0/bin/lean",
+    "-j1",
+    "-M8192",
+    "-R",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-import-20261008-v131/source-v1",
+    "-o",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-import-20261008-v131/objects-v1/HelicalImportConsumer.olean",
+    "-i",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-import-20261008-v131/objects-v1/HelicalImportConsumer.ilean",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-import-20261008-v131/source-v1/HelicalImportConsumer.lean"
+  ]
+}

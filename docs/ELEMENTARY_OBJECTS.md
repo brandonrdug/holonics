@@ -1170,7 +1170,9 @@ The same composition reads:
 - a phyllotactic spiral: the golden winding that never locks, its parastichies the Farey
   neighbours among the golden ratio's convergents at each grain.
 
-The laws not yet proved are in `Transport/HelicalCode` and #62.
+The laws above that are proved are kernel-checked in `Transport/HelicalCode` (accepted at `0669655169b8`;
+[receipt](../research/records/receipts/2026-10-08-helical-code/native-v2/HANDOFF.md)), and those owed
+are in #62.
 
 ## Emanation and resonance
 

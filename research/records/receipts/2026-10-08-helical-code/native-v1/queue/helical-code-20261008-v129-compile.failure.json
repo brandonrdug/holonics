@@ -1,0 +1,9 @@
+{
+  "provisional_passed": false,
+  "final_acceptance_requires_external_CPU_read": true,
+  "label": "helical-code-20261008-v129-compile",
+  "error_type": "SystemExit",
+  "error": "1",
+  "child_launched": true,
+  "child_reaped": true
+}

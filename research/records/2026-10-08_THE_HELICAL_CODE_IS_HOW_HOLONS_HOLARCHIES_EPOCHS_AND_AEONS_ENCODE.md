@@ -89,21 +89,30 @@ reads residues and carries (`compression::keys::transport`, `CarryHelix`), and t
 squares (`hnn/encoding.rs`) are its conduct. The compression kernel is the greatest
 navigator-invariant blind subgroup (`Foundation/CausalRelevance`).
 
-## 4. The laws written: an unvalidated module sent to the queue
+## 4. The laws, kernel-checked
 
-[proved-derived; Lean unvalidated] `Transport/HelicalCode` (`lean/Holonics/Transport/HelicalCode.lean`,
-imported from `lean/HolonicsResearch.lean`, outside the `Framework` closure until validated) states,
-building on the owners above and duplicating none of them:
+[formal-checked; conditional where marked] `Transport/HelicalCode`
+(`lean/Holonics/Transport/HelicalCode.lean`, imported from `lean/HolonicsResearch.lean`, outside the
+`Framework` closure) states the following, building on the owners above and duplicating none of
+them. The sole queue accepted it at `0669655169b8`: the compiler exited zero, and all 81 declarations
+carry only `propext`, `Classical.choice` and `Quot.sound`. A narrow consumer of the research root's
+new import passed 8 queries. The full research library and the HNN were not rerun. Receipt:
+[native-v2](receipts/2026-10-08-helical-code/native-v2/HANDOFF.md). The first attempt, `12fcee787`,
+failed at one statement (an inferred `Group (α → α)`); [native-v1](receipts/2026-10-08-helical-code/native-v1/VALIDATION.json)
+keeps it unrewritten. The module states:
 - the complement-reverse anti-automorphism and its involution;
 - the fixed words of a fixed-point-free pairing have even length and correspond to their first
   halves;
 - the pairing read through every frame is a fixed-point-free involution;
 - one crossing change moves the signed crossing sum by exactly 2, so the linking number moves by 1.
 
-It was written without a compiler. Its frozen source goes to the sole queue for the Lean check,
-and every `formal-checked` tag in it stands only with that receipt. Its atlas rows are
-`helical.*` in `geometry.tsv`, graded `proved-derived` until the receipt. Its second part states
-the perfected laws:
+Its atlas rows are `helical.*` in `geometry.tsv`. The accepted scope is the review's:
+- the partner's face holds under a uniform clock with constant openings;
+- the crossing laws are arithmetic on declared signed diagrams;
+- two repairs are proved distinct, not exhaustive;
+- letter-level freedom is not carrier-level freedom.
+
+Its second part states the perfected laws:
 - **resonance on a strand:** `(1 − Ĝ⁻ᵖ) m_{Np} = (1 − Ĝ⁻ᴺᵖ) m_p` in any ring, so `Ĝᵖ = 1` gives
   `m_{Np} = N·m_p`;
 - **the partner's face:** for an additive carrier involution `J` with `J E = E σ` and
