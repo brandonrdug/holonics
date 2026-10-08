@@ -1092,10 +1092,16 @@ fn predict_native(
     }))
 }
 
-/// **The one decision on the probe**: its width is declared as the station decision's is
-/// (`hnn::prediction`): a point of width zero when nothing is offered, and a pair of distinct
-/// outcome cells of unit sup-norm width when a probe is. The existing release law at tolerance
-/// zero `Hold`s inside the tolerance and `Ask`s beyond it, only for the probe offered.
+/// **The one decision on the probe.** Its reading is the **outcome block** (the tuple of lifted
+/// half-open phase arcs at the receiver's grain) of the compared station's native phase readout,
+/// over the declared family's image, read in the **discrete metric on blocks**: two distinct
+/// blocks are at distance one, whatever their phase separation, as the station decision reads
+/// its classes (`hnn::prediction`). Its width is therefore one, attained by the offered probe's two
+/// feasible witnesses in distinct blocks, when a probe is offered, and zero (one block met at
+/// every admitted wave) when none is. It is not the phases' sup-norm width (Epime's review,
+/// October 8: two blocks need not be a unit phase apart, and one block can hold a nonzero image).
+/// The existing release law at tolerance zero `Hold`s inside the tolerance and `Ask`s beyond it,
+/// only for the probe offered.
 fn decide_probe(station: usize, offered: Option<ObservationProbe>) -> Result<ReleaseReturn, HnnError> {
     let (diameter, attaining, read) = if offered.is_some() {
         (Rat::one(), WidthWitness::Pair { left: 0, right: 1 }, 2)
@@ -1103,8 +1109,8 @@ fn decide_probe(station: usize, offered: Option<ObservationProbe>) -> Result<Rel
         (Rat::zero(), WidthWitness::Point, 1)
     };
     let width = ReceiverWidth::declared(
-        format!("the native station {station}'s phase readout"),
-        "the compared station's lifted class phases over the retained phase family's image at the admitted source waves",
+        format!("the native station {station}'s phase outcome block"),
+        "the compared station's native phase readout over the declared family's image at the admitted source waves, read as its outcome block in the discrete metric on blocks (two distinct blocks at distance one)",
         DiameterNorm::Supremum,
         diameter,
         attaining,
