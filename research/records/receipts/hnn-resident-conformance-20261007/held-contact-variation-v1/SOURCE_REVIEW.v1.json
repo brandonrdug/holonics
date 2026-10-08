@@ -1,0 +1,37 @@
+{
+  "grade": "INDEPENDENT_READ_ONLY_SOURCE_REVIEW_NO_NATIVE_ACCEPTANCE",
+  "native_manifest_sha256": "cb523a42f50f528b61b58503aae0665aa7867ea4e0145e83993030431612242f",
+  "reviewed_owners": [
+    "word/variation.rs",
+    "propagation.rs::transit_variation",
+    "prediction.rs::physical_signed_tick",
+    "port.rs::pull_back_full",
+    "reference/interaction.rs",
+    "physical/contact.rs",
+    "tests/physical_communication.rs",
+    "tests/port.rs"
+  ],
+  "findings": [
+    "Existing full signed tick plus selected contact forcing is the full exact forward first variation in the admitted quadratic unsplit domain.",
+    "Full opening ChangeCovector pairs with Pi_int-projected inherited EndChange columns; within-Word raw compose_contact gradient supplies the direct term with the same ratio-gradient sign.",
+    "Initial contact and loaded momentum, loaded topology and actual previous phase gates make the same-material crossing identity on rates; no independent momentum correction is added.",
+    "Complete dual topology validation precedes zip pairing.",
+    "Full contemporary material equality catches a same-commit changed point; exact references and clock are bound.",
+    "Independent tangent equation remains the oracle for the promoted local transit primitive.",
+    "Two-Word reverse-chain test source uses the transpose source-storage projection, checks every one of twelve coordinates, and asserts physical receipts/material/clock/persistence.",
+    "Ordinary consumers and save/regrain refuse the held future; publication requires its matching next derivative and unchanged material."
+  ],
+  "fixed_defects_before_seal": [
+    "initial canonical momentum/topology/phase admission",
+    "restored independent local tangent equation after initial proposed delegation to the promoted helper",
+    "reused physical_signed_tick rather than keeping a duplicated homogeneous implementation"
+  ],
+  "unverified": [
+    "Rust type checking and native controls",
+    "fixture nonzero delayed credit and storage-only defect assertions",
+    "whole-unit CPU/wall/peak resident memory under fixed queue caps",
+    "update/rebase derivative and finite delayed-response deposition certificate"
+  ],
+  "source_edits_by_reviewer": 0,
+  "jobs_by_reviewer": 0
+}

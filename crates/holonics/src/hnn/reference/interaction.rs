@@ -33,12 +33,49 @@ impl Resident {
     }
 
     pub(crate) fn admit_exact_current(&self) -> Result<(), HnnError> {
+        if self.held_contact_variation.is_some() {
+            return Err(HnnError::Unadmitted {
+                reason: "this consumer has no transport or rebase for the held contact material variation",
+            });
+        }
+        self.admit_exact_current_point()
+    }
+
+    pub(crate) fn admit_exact_current_point(&self) -> Result<(), HnnError> {
         if self.carried_error.as_ref().is_some_and(|e| coefficients(e).any(|x| !x.is_zero())) {
             return Err(HnnError::Unadmitted {
                 reason: "this current carries an enclosure whose transport this consumer does not admit",
             });
         }
         Ok(())
+    }
+
+    /// Admit a prospective two-Word fixed-material differential on the existing current.
+    /// No physical coordinate is reset; the derivative before this declaration is not claimed.
+    pub fn begin_held_contact_variation(&mut self,
+        budget: crate::hnn::word::variation::VariationBudget,
+    ) -> Result<crate::hnn::word::variation::VariationReading,HnnError> {
+        self.admit_exact_current()?;
+        if self.opens != Opens::OnMotion || !self.pending.is_empty() || !self.staged.is_empty() {
+            return Err(HnnError::Unadmitted {
+                reason:"the held contact variation starts on a continuing current without pending or staged returns",
+            });
+        }
+        let held = crate::hnn::word::variation::HeldContactVariation::begin(
+            &self.field,&self.constitution,&self.current,self.carried.as_ref(),budget)?;
+        let reading = held.reading().clone();
+        self.held_contact_variation = Some(held);
+        Ok(reading)
+    }
+
+    pub fn held_contact_variation(&self) -> Option<&crate::hnn::word::variation::HeldContactVariation> {
+        self.held_contact_variation.as_ref()
+    }
+
+    /// Explicitly end this differential future while keeping the physical current. Starting
+    /// another prospective domain later grants no derivative through this discarded one.
+    pub fn end_held_contact_variation(&mut self) -> Option<crate::hnn::word::variation::VariationReading> {
+        self.held_contact_variation.take().map(|held| held.reading().clone())
     }
 
     pub(crate) fn admit_receiving_view(&self, field: &Field) -> Result<(), HnnError> {
@@ -73,12 +110,34 @@ impl Resident {
         error: Option<EndChange>,
         chart: &Encoded,
     ) -> Result<(), HnnError> {
+        self.publish_reception_with_variation(material,point,charts,error,chart,None)
+    }
+
+    pub(crate) fn publish_reception_with_variation(
+        &mut self,
+        material: Option<Constitution>,
+        point: HolonState<ReceptionCarry>,
+        charts: Option<Charts>,
+        error: Option<EndChange>,
+        chart: &Encoded,
+        variation: Option<crate::hnn::word::variation::HeldContactVariation>,
+    ) -> Result<(), HnnError> {
         self.admit_receiving_chart(chart)?;
         // The invariant belongs to this owner even when a future caller omits its preflight.
         // No unimplemented transport/absorption can silently turn a nonzero box into an exact
         // point. A supported charted producer returns its new box explicitly.
-        if error.is_none() { self.admit_exact_current()?; }
+        if error.is_none() { self.admit_exact_current_point()?; }
         let next = material.unwrap_or_else(|| self.constitution.clone());
+        match (&self.held_contact_variation,&variation) {
+            (None,None) => {},
+            (Some(old),Some(new)) if next == self.constitution && error.is_none()
+                && new.matches(&next,&point.configuration)
+                && new.coordinates() == old.coordinates()
+                && new.reading().words == old.reading().words+1 => {},
+            _ => return Err(HnnError::Unadmitted {
+                reason:"publication must transport the held differential at the same material, clock and parameter identity",
+            }),
+        }
         if point.commit != next.commit() || !point.configuration.fits(&self.field) {
             return Err(HnnError::ContinuingState {
                 what: "the returned Holon point and its producing material/field",
@@ -141,6 +200,7 @@ impl Resident {
         self.constitution = next;
         self.carried = Some(point.configuration);
         self.carried_error = error;
+        self.held_contact_variation = variation;
         self.receiving_chart = Some(chart.clone());
         self.charts = next_charts;
         self.tally = next_tally;

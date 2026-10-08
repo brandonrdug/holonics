@@ -10,6 +10,9 @@
 //! is called only after the blind forward law completes. It may publish the whole receipt before
 //! obtaining an observation. The observation never enters the forward constructor. This is a
 //! receiving view of the common circuit; the source section is not retained.
+//! An explicitly admitted held-contact future retains the full material first variation in
+//! that same Resident and consumes it in `communicate_contact`. Other views refuse that future
+//! until their differential transport exists; no old Word or source passage is retained.
 
 pub mod communication;
 pub mod contact;

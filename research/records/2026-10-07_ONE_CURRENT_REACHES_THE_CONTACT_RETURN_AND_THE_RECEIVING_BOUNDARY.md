@@ -783,3 +783,224 @@ stepped count, before the continued-output assertions. No new observation-backed
 bank comparison, learned output, nonlinear descent, cold restore or CUDA parity
 is credited. This source-bound finite witness is a prerequisite for the separately
 owned continuing receiving/comparison join, not evidence that the join executes.
+
+### October 8: the return through an earlier carried current
+
+[source-inspected; native inputs identical to accepted `224c058`] The ordinary
+`Reference::refine` executes and transiently keeps its Word; `compare` consumes that
+same Word at the same commit, or rereads the contemporary pending source quotient.
+It already pulls the observed ratio back and composes the current Word's material
+return. `expose_from` compares each actual next input window before ingesting it.
+It does not call `Word::compare_contacts` or `ContactCut::continue_deposited`.
+The production native caller is `PhysicalReceiver::communicate_contact`; its
+callers in this source are finite controls. This is a caller distinction, not the
+absence of a Word or a participating carried current in ordinary execution.
+
+The native observed contact comparison is already target-bearing and uses the
+producing Word and its `HolonRatio::compare_partition`. The separate bank's
+`read_turn_covector` differentiates Floquet growth; the retired optimizer does not
+identify that quantity with this observed ratio. The current geometry reconciliation
+at `e043a97f13c3eabc4c6f85a4d965bfe8d7886909` preserves that distinction.
+No new bank stage or objective is implied by the missing caller.
+
+[source-inspected] `port::reverse_core_joined` returns both a `WordReturn` and the
+complete opening `ChangeCovector`. The ordinary receiving wrapper discards the
+latter. `WordReturn.opening` contains storage coordinates only; the complete
+covector also includes both arrivals, contact displacement/rate and loaded-ring
+displacement/rate. `pull_back_continuing` already exposes it for a declared
+anchor/end comparison. `return_contact` currently calls the storage-only wrapper,
+and `compose_contact` forms C/K/D returns from this Word's actual transit ticks.
+`ReceptionCarry` and `continue_deposited` transport the primal state, references,
+canonical momenta and absolute pump clock. No retained derivative of this carry
+with respect to contact-factor coordinates, or consumer pairing it with a later
+opening covector, was found in those owners or the common `Resident`.
+
+This is an omitted term only for a claim that the later observation differentiates
+the material through the earlier carried current. The current return is a valid
+conditional derivative at a fixed entered interior. `PhysicalSourcePairing`
+explicitly fixes that interior and varies the contemporary source opening; it
+does not certify the derivative of historical carried motion with respect to E,
+pair ports or contact factors. `SourceMoment`'s phase-count quotient is not a
+contact-state Jacobian. The atlas's exact finite Word variation and the full
+opening-state adjoint likewise do not implement this material/current join.
+
+[recovered owner] The independently implemented tangent in `hnn/tests/port.rs`
+already differentiates junction, element, transit, loaded return and receiving
+read, and compares it with the Word's own adjoint. It derives exact first variations
+of quadratic Gram forms before solving at the producing point. It does not take a
+finite central difference of a constitutive inverse as an exact tangent, persist
+between receptions or differentiate the carry seam. A new consumer should recover
+these local equations and the existing solve owners, not add another primal engine.
+
+[implementation contract, preceding the source preparation below] The first admitted differential is
+with respect to the same pinned physical contact-factor coordinates throughout a
+sequence of complete exact Words. For every unreleased contact a, take all entries
+of its C/K/D Gram factors: `beta=(F_a,C, F_a,K, F_a,D)`. The field and factor shapes,
+producing material point/commit, all other operators, source/receiving maps,
+decoder and actual input/clock path are fixed when varying beta. Keep the complete
+complex state in its realified chart, both arrival ends, loaded state and pump
+phase. The initial physical configuration is fixed in this prospective domain:
+`J_0=0`, with canonical momenta derived from the varied material and that same
+configuration. This initial condition makes no claim about earlier untracked
+material dependence. It does not reset the actual physical current.
+
+For each actual tick and reception opening, differentiate their producing maps:
+
+    J_next = D_x F_(Theta,t) J + D_beta F_(Theta,t),
+    J_open = D_x O_(Theta,current,source) J_end + D_beta O,
+    deltaC = deltaF_C F_C^T + F_C deltaF_C^T,
+    deltaK = deltaF_K F_K^T + F_K deltaF_K^T,
+    deltaD = deltaF_D F_D^T + F_D deltaF_D^T,
+    delta_zeta = m^-1 (delta_right - delta_m zeta).
+
+The first domain is unsigned Gram contact material, fixed ring element and
+quadratic loaded material, exact unsplit solves, unchanged topology and no release,
+rekey, deposition or chart change. Actual known input can advance `Current` through
+its existing `Encoded` clock law: that path is independent of these contact-factor
+variations. A changing declared port reference is differentiated at the actual
+opening; it is not silently equated with the previous reference. Source storage is
+replaced once by the declared source-port imposition, with its absorbed/imposed
+work, not added again to the old source storage. Ingestion of an observed window
+still occurs only after its blind comparison and counts that window once.
+
+The complete carry differential obeys `delta_pi=deltaC w+C delta_w`; loaded
+capacity has its corresponding momentum identity. At a general held opening,
+`C_next delta_w_next=delta_pi_old-deltaC_next w_next`. At unchanged contact
+material the old/new factor dependence cancels and the actual stored rate's
+differential passes through, including the existing zero-residual singular hold.
+This cancellation must be checked, not inferred from the primal energy receipt.
+Clock indices and phase classes are discrete operands, not differentiable slots.
+
+At the next actual observed comparison, expose the complete opening covector
+through the existing receiving-map/phase transpose and the same reverse sweep.
+The material covector is
+
+    g_beta = g_beta,within_this_Word + J_open^* mu_open.
+
+The second term is paired before J is overwritten by the current Word's end.
+The first term already has a local owner; `compose_contact` stores its negative
+as a descent factor return. The new term must use the same sign convention and
+factor coordinate identities. A first implementation should return this typed,
+producer-bound differential and prove its consumption by the actual observed
+comparison; it must not silently convert it into a certified Deposit. The current
+finite loaded-span certificate bounds injections within the current Word. It does
+not yet certify a proposed displacement whose response also enters through J,
+nor the normal statistic, cross terms and Gauss--Newton bound for that full map.
+v96 supplies a version-bound prerequisite, not that additional certificate.
+
+[cost contract] With realified ring width n_g, contact width k_a and loaded rings L,
+the full change dimension is
+`d=sum_g n_g+sum_a(n_from+n_to+2k_a)+sum_(g in L)2n_g`.
+The canonical-momentum payload adds `sum_a k_a+sum_(g in L)n_g` coordinates.
+For p raw factor entries a dense retained differential uses `d_carry*p` exact
+ratios, independent of the number of previous Words; it stores no Words, samples
+or replay cuts. The two-ring 8/6, one-contact width6, one-loaded-width8 geometry
+has d=56, d_carry=70 and p=108 for three 6-by-6 factors: 7,560 ratios including
+momentum tangents. One fixed direction uses 70 ratios but is not a full gradient.
+Every tick requires p applications of its actual local state maps and contact/
+loaded solves, plus form-variation assembly; solve operands are shared rather than
+reinverted for each parameter column. Arbitrary rational bit growth, allocations,
+scratch copies, pairing and receipts must enter a measured whole-unit projection.
+These are dimensions and operation counts, not a measured runtime or launch seal.
+
+[identity and rebase] A material update ends this first pinned-point domain.
+Keeping the physical point while invalidating an unsupported sensitivity leaves
+the primal carry intact; it grants no fresh full-history gradient. A genuine
+coordinate change requires its actual Jacobian (`J_new=J_old D chi^-1`, plus the
+state-coordinate derivative where that chart depends on beta). A physical deposit
+requires the tangent of its actual update, quantization/certificate branches and
+held-state transport. The finite `ContactMaterialMove` identity, including its
+quadratic square, is not that derivative. No stale Jacobian is relabelled as one
+at new parameters. Save/restore or another consumer must retain the admitted
+differential or explicitly refuse that future; quietly omitting it is not a
+future-sufficient quotient.
+
+[fixed acceptance before implementation] Use two complete Words on the same
+material, one actual contact and one loaded ring, nonzero carried arrivals/state,
+actual source and receiving map, and an absolute clock crossing a nontrivial pump
+phase. Check the local tangent equations and momentum/source-opening identities;
+pair the later observed ratio with the retained differential and add the current
+Word term. An independent two-Word adjoint test may temporarily keep those two
+Words as a finite verification oracle, while the production differential keeps
+neither. Require exact directional/pairing equality and the unchanged primal
+work/phase/input-once receipt. A finite perturbed trajectory is not equal to the
+tangent without an explicit remainder theorem. These controls certify a scoped
+differential, not acquired relations, useful output, global stability or native
+deposition across changing material.
+
+
+### October 8: the bounded held-material consumer is source-prepared
+
+[source-prepared; type/native acceptance pending] The continuing owner is the same
+`Resident`, with an explicitly admitted `HeldContactVariation`. The existing
+`PhysicalReceiver::communicate_contact` reads it before its blind passage and returns
+an optional `HeldContactComparison` after the actual observation. No separate runtime,
+bank objective or two-Word replay consumer was added. The producer-bound return reads
+`within_word + carried`, in the ratio-gradient sign; it exposes no Deposit conversion.
+The ordinary unadmitted path retains its existing contact reaction.
+
+The homogeneous full-state map reuses `prediction::physical_signed_tick`, already
+consumed by physical completion. Only that method's crate visibility changes.
+`propagation::transit_variation` promotes the recovered contact tangent and reuses
+`transit_right`, the executed solve and update. One basis column is propagated by
+that existing signed tick, then adds the selected contact's forcing at its recorded
+primal state/midpoint. The independent equation in `tests/port` remains independent
+and checks the promoted primitive rather than replacing its oracle with production
+code. `pull_back_full` preserves the complete existing opening dual without another
+reverse sweep. Legacy `pull_back` selects the original WordReturn.
+
+The implemented first domain is two complete exact unsplit Words with unchanged
+unsigned C/K/D Gram factors, all other material operators, port references and
+field. Every unreleased raw factor entry is a coordinate. The material equality
+operand includes the full contemporary constitution, not the commit alone; it
+serves only identity, never historical replay. Contact/loaded canonical momentum
+and the absolute previous pump phase are checked at admission. The source seam
+uses `interior_of`: source storage is replaced, and arrivals, contact state and
+loaded state continue. No source moment or prior Word is installed in the derivative.
+Canonical momentum tangents are derived as `deltaC w+C delta_w`, rather than stored
+as independent rows; the same-material cancellation therefore needs no additional
+rate correction. No historical derivative before this prospective admission is
+claimed and the physical point is not reset.
+
+The first control has realified widths 4 and 2, one contact of width 2 and one loaded
+ring of width 2: d=20, p=12, hence 240 retained state ratios. Six ticks require 72
+column-ticks. It declares 240 ratios, 2^20 numeric bits and 72 column-ticks before
+passage. Numeric bits include the full contemporary identity operand, ratios,
+references and integer coordinate/clock metadata; allocator capacity and transient
+peak memory need the queue's actual resource measurement. Each column-tick executes
+one existing signed full tick and one selected-contact forcing solve/update. Its
+solves are the producing operands, not newly inverted per column. Detached opening
+and successor columns add scratch copies beside the resident state. This is a fixed
+work/allocation description, not a measured timing projection.
+
+Two unrun controls are fixed: the actual two-Word observed comparison must return
+nonzero delayed visibility and all twelve coordinates must equal an independent
+first-Word reverse-end-dual contraction; source storage is projected in both forward
+and transpose seams, and storage-only credit must differ. They check actual full
+state, absolute pump clock, unchanged material/current, energy receipts and common
+Resident persistence. The refusal control checks inconsistent momentum/phase,
+same-commit foreign factor identity, untransported save/regrain and the zero-work
+preflight. A third passage refuses the two-Word domain while retaining the current
+and derivative. Explicitly ending that admitted derivative future keeps the primal
+point and grants no new derivative through earlier motion. These are structural
+physics/adjoint controls; no output accuracy, acquisition or synthetic scientific
+validation is inferred from them.
+
+[unresolved extension] A real deposit still requires the actual update jet. At the
+held contact crossing its prospective derivative obeys
+
+    C_plus delta_w_plus = C_minus delta_w_minus
+                         + deltaC_minus w_minus - deltaC_plus w_plus.
+
+With `theta_plus=U(theta_minus, observation)`, `delta theta_plus=D U delta theta_minus`
+is also required. A nonsingular C_plus supplies its unique rate derivative; a singular
+C_plus needs the selected rank/preimage-fibre branch and its null-fibre variation.
+Reexpressing a derivative in current factor coordinates requires the actual inverse
+coordinate jet when it exists; a quantized/noninjective update does not supply it.
+The native normalization, step certificate, lattice selection, refusal/release and
+budget branches have not supplied that complete jet or a finite bound for the added
+carried response. Thus held-mode material publication, save, regrain and ordinary
+consumers without differential transport explicitly refuse before mutation, keeping
+the retained state. The finite v96 response certificate remains its separately
+accepted baseline, not acceptance of this source or of delayed-gradient deposition.
+The bank proposal and broader rebase/device/acquisition work remain outside this unit.

@@ -65,6 +65,186 @@ fn contact_material(field: &Field) -> Constitution {
     super::learning::generic(field, 81).rebased(Locus::Channel(0), 7, &reads).unwrap()
 }
 
+/// Small fixed physical law fixture: twelve contact-factor coordinates, twenty full-state
+/// coordinates. Its maps/material are declared before either observation; no output is authored.
+fn held_variation_fixture() -> (Field,Constitution,WordOpening,ReceiverDeclaration) {
+    use crate::hnn::propagation::Operands;
+    use crate::hnn::ring::{PumpDeclaration,PumpStep,ResonatorMaterial};
+    use crate::hnn::word::{EndChange,Word};
+    use crate::holon::parametron::Carrier as ParametronCarrier;
+    use crate::ratio::linear::ExactRatMatrix;
+    let declared = receiver();
+    let field = Field::declare(FieldDeclaration {
+        rings:vec![ring(2,vec![0,1]),ring(1,vec![])], contacts:vec![contact(0,1,1,0)],
+        loops:vec![],sources:vec![0],offsets:vec![],alphabet:2,step:integer(1),exponent_grain:1,
+        receivers:vec![declared.clone()],crib:CribDeclaration { window:16,offset:1 },
+        population:1<<16,lattice:Default::default(),
+    }.by_lattice_rule()).unwrap();
+    let mut theta = Constitution::initial(&field,CAMPAIGN_ONE_BUDGET).unwrap();
+    for g in 0..2 {
+        let n = field.ring(g).width();
+        let zero = ExactRatMatrix::zero(n,n).unwrap();
+        theta = theta.with_element(g,zero.clone(),zero,
+            vec![(vec![integer(0);n],vec![integer(0);n]);n]).unwrap();
+    }
+    let contact_factor = ExactRatMatrix::identity(2).unwrap();
+    theta = theta.with_channel(0,contact_factor.clone(),contact_factor.clone(),contact_factor).unwrap();
+    let map = ExactRatMatrix::new(vec![vec![integer(1),integer(0),integer(-1),integer(0)],
+        vec![integer(0),integer(1),integer(0),integer(-1)]]).unwrap();
+    theta = theta.with_ports(0,Some(map),None,None).unwrap();
+    let ring_factor = ExactRatMatrix::identity(2).unwrap();
+    let pump = PumpDeclaration::new(rat(1,16),
+        ParametronCarrier::new(integer(1),integer(0)).unwrap(),PumpStep::Half).unwrap();
+    theta = theta.with_ring_resonator(&field,1,ResonatorMaterial::new(ring_factor.clone(),
+        ring_factor.clone(),ring_factor,Some(pump)).unwrap()).unwrap();
+    let ops = Operands::exact_at_cut(&field,&theta,&Current::at_rest(&field)).unwrap();
+    let mut seed = EndChange::rest(&field,&ops);
+    for x in seed.storage.iter_mut().chain(seed.arrivals.iter_mut().flatten())
+        .chain(seed.states.iter_mut().flatten())
+        .chain(seed.resonators.iter_mut().flatten().flatten()).flatten() { *x=rat(1,3); }
+    let nothing = seed.storage.iter().map(|s| vec![integer(0);s.len()]).collect::<Vec<_>>();
+    // Fixed initial motion at crossing 1: this is not a fitted prior or a material history.
+    let carry = Word::continuing(&field,ops,&seed,&nothing,1).unwrap().reception_end().unwrap();
+    (field,theta,WordOpening::Received { carry,absorption:crate::hnn::word::Absorption::Nothing },declared)
+}
+
+#[test]
+fn held_contact_variation_returns_the_delayed_full_state_credit() {
+    use crate::hnn::physical::contact::ContactObservation;
+    use crate::hnn::moment::SourceMoment;
+    use crate::hnn::retention::Diamond;
+    use crate::hnn::word::{Absorption,Word};
+    use crate::hnn::word::variation::VariationBudget;
+    use crate::ratio::linear::vector::dot;
+    use std::sync::Arc;
+    let (field,theta,opening,declared) = held_variation_fixture();
+    let current = Current::at_rest(&field);
+    let mut actual = PhysicalReceiver::new(&field,theta.clone(),current.clone(),opening.clone()).unwrap();
+    let budget = VariationBudget { ratios:240,bits:1<<20,column_ticks:72 };
+    let before = actual.opening();
+    let admitted = actual.begin_held_contact_variation(budget).unwrap();
+    assert_eq!(format!("{:?}",actual.opening()),format!("{before:?}"),"admission resets no primal coordinate");
+    assert_eq!((admitted.parameters,admitted.state_coordinates,admitted.retained_ratios),(12,20,240));
+    let first_source = encoded(&field,&[0]);
+    let first = actual.communicate_contact(&first_source,&declared,|_| None).unwrap();
+    assert!(first.closes());
+    assert!(first.comparison.unwrap().is_none());
+    assert!(first.held_comparison.unwrap().is_none());
+    let resident = actual.into_resident();
+    let columns = resident.held_contact_variation().unwrap().columns().to_vec();
+    assert!(columns.iter().any(|chi| chi.arrivals.iter().flatten().flatten().any(|x| !x.is_zero())));
+    assert!(columns.iter().any(|chi| chi.states.iter().flatten().flatten().any(|x| !x.is_zero())));
+    assert!(columns.iter().any(|chi| chi.resonators.iter().flatten().flatten().flatten().any(|x| !x.is_zero())));
+    let mut actual = PhysicalReceiver::from_resident(&field,resident).unwrap();
+    let second = actual.communicate_contact(&encoded(&field,&[1]),&declared,|blind| {
+        assert!(!blind.readings().is_empty());
+        Some(ContactObservation { observed:encoded(&field,&[1,0,1]),compared:vec![false,true,true] })
+    }).unwrap();
+    assert!(second.closes());
+    assert!(second.comparison.as_ref().unwrap().is_none(),"a differential is not a certified Deposit");
+    let credit = second.held_comparison.as_ref().unwrap().as_ref().unwrap();
+    assert!(credit.carried.iter().any(|x| !x.is_zero()),"the later observed ratio reaches earlier material motion");
+    assert_eq!(actual.constitution(),&theta);
+    assert_eq!(second.carry,second.blind_carry);
+    assert_eq!(credit.reading.words,2);
+    assert_eq!(credit.reading.column_ticks,72);
+    assert_eq!(credit.reading.next_tick,7);
+    assert_eq!(second.carry.change.resonator_phases[1],Some(0));
+    // Full dual versus storage-only: the prior source storage is replaced, while arrival,
+    // contact and loaded coordinates still contribute to this observed comparison.
+    let storage_only:Vec<_> = columns.iter().map(|chi| credit.opening.storage.iter()
+        .zip(&chi.storage).enumerate().filter(|(g,_)| !field.sources().contains(g))
+        .map(|(_, (a,b))| dot(a,b)).sum::<crate::ratio::Rat>()).collect();
+    assert_ne!(credit.carried,storage_only);
+    for (index,chi) in columns.iter().enumerate() {
+        let mut opened = chi.clone();
+        for &g in field.sources() { opened.storage[g].fill(integer(0)); }
+        assert_eq!(credit.carried[index],credit.opening.pairing(&opened));
+    }
+    // Independent two-Word reverse-chain oracle. Only this finite control temporarily
+    // reconstructs the first Word; no production history/Word is retained or replayed.
+    let section = DamagedSection::of_runs(3,&first_source,vec![(0,first_source.clone())]).unwrap();
+    let mut source = SourceMoment::open_with(&field,&current,&theta).unwrap();
+    for &g in field.sources() {
+        source = source.station_section(&field,&current,g,&section.placed()).unwrap();
+    }
+    let (mut prior,source_receipt) = Word::open_source_exact_received(&field,&theta,&current,Arc::new(source),&opening).unwrap();
+    prior.run(3).unwrap();
+    assert!(source_receipt.closes());
+    assert_eq!(prior.reception_end().unwrap(),first.carry);
+    let mut end_dual = credit.opening.clone();
+    for &g in field.sources() { end_dual.storage[g].fill(integer(0)); }
+    let (prior_back,_) = prior.pull_back_continuing(vec![None;3],0,Some(&end_dual)).unwrap();
+    let phases = ReceivingPhases::declare(&field,&theta,&current,&declared).unwrap();
+    let diamond = Diamond::opened(&field,&phases,&opening.support(&field));
+    let (_,prior_pull) = crate::hnn::reference::compose_contact(&field,&theta,&prior_back,&diamond,
+        &|_| false,current.lift(),field.step(),0).unwrap();
+    for (i,coordinate) in credit.coordinates.iter().enumerate() {
+        let form = [&prior_pull.storage,&prior_pull.stiffness,&prior_pull.dissipation][coordinate.family];
+        assert_eq!(credit.carried[i],*form.get(coordinate.row,coordinate.column).unwrap());
+        assert_eq!(credit.total[i],&credit.within_word[i]+&credit.carried[i]);
+    }
+    let resident = actual.into_resident();
+    // Derived canonical momentum tangents introduce no independent state or double count.
+    let c = crate::hnn::field::ConstitutionRead::contact_storage(&theta,0);
+    let capacity = c.multiply(&c.transpose().unwrap()).unwrap();
+    assert_eq!(capacity.apply(&second.carry.change.states[0][1]).unwrap(),second.carry.momenta[0]);
+    assert!(resident.state_bits() >= credit.reading.retained_bits);
+    assert_eq!(resident.held_contact_variation().unwrap().reading(),&credit.reading);
+    assert!(matches!(resident.reception_opening(),WordOpening::Received { absorption:Absorption::Nothing,.. }));
+    let before_bits = resident.state_bits();
+    let before_carry = resident.carried().cloned();
+    let mut actual = PhysicalReceiver::from_resident(&field,resident).unwrap();
+    let mut observed = false;
+    assert!(actual.communicate_contact(&encoded(&field,&[0]),&declared,|_| { observed=true;None }).is_err());
+    assert!(!observed);
+    let resident = actual.into_resident();
+    assert_eq!(resident.state_bits(),before_bits);
+    assert_eq!(resident.carried(),before_carry.as_ref());
+    assert_eq!(resident.held_contact_variation().unwrap().reading().words,2);
+    println!("held two-Word actual differential: {:?}",credit.reading);
+}
+
+#[test]
+fn held_contact_variation_refuses_untransported_future_without_clearing_it() {
+    use crate::hnn::word::variation::VariationBudget;
+    let (field,theta,opening,declared) = held_variation_fixture();
+    let mut incorrect = opening.clone();
+    if let WordOpening::Received { carry,.. } = &mut incorrect { carry.momenta[0][0] += integer(1); }
+    let mut refused = PhysicalReceiver::new(&field,theta.clone(),Current::at_rest(&field),incorrect).unwrap();
+    assert!(refused.begin_held_contact_variation(VariationBudget { ratios:240,bits:1<<20,column_ticks:72 }).is_err());
+    assert!(refused.into_resident().held_contact_variation().is_none());
+    let mut incorrect_phase = opening.clone();
+    if let WordOpening::Received { carry,.. } = &mut incorrect_phase { carry.change.resonator_phases[1] = Some(1); }
+    let mut refused = PhysicalReceiver::new(&field,theta.clone(),Current::at_rest(&field),incorrect_phase).unwrap();
+    assert!(refused.begin_held_contact_variation(VariationBudget { ratios:240,bits:1<<20,column_ticks:72 }).is_err());
+    let mut actual = PhysicalReceiver::new(&field,theta,Current::at_rest(&field),opening).unwrap();
+    actual.begin_held_contact_variation(VariationBudget { ratios:240,bits:1<<20,column_ticks:0 }).unwrap();
+    let mut resident = actual.into_resident();
+    let carry = resident.carried().cloned();
+    let bits = resident.state_bits();
+    let factor = crate::ratio::linear::ExactRatMatrix::identity(2).unwrap();
+    let foreign = resident.constitution().clone().with_channel(0,
+        factor.scaled(&integer(2)),factor.clone(),factor).unwrap();
+    assert_eq!(foreign.commit(),resident.constitution().commit(),"commit alone does not stamp the material point");
+    assert!(!resident.held_contact_variation().unwrap().matches(&foreign,resident.carried().unwrap()));
+    assert!(resident.refine_contact_grain(1).is_err());
+    assert!(resident.continuing_state(0).is_err());
+    assert_eq!(resident.carried(),carry.as_ref());
+    assert_eq!(resident.state_bits(),bits);
+    assert!(resident.held_contact_variation().is_some());
+    let mut actual = PhysicalReceiver::from_resident(&field,resident).unwrap();
+    let mut called = false;
+    assert!(actual.communicate_contact(&encoded(&field,&[0]),&declared,|_| { called=true;None }).is_err());
+    assert!(!called,"the fixed column-tick budget refuses before the blind passage/observation");
+    let mut resident = actual.into_resident();
+    assert_eq!(resident.carried(),carry.as_ref());
+    assert_eq!(resident.state_bits(),bits);
+    let ended = resident.end_held_contact_variation().unwrap();
+    assert_eq!(ended.words,0);
+    assert_eq!(resident.carried(),carry.as_ref(),"explicit derivative-future retirement keeps the physical point");
+}
+
 /// Mechanical finite variations use the actual contact decoder and complete loaded Word.
 /// The fixed samples challenge the certificate; its uniform ray argument is the factor
 /// triangle/Gram law, not an empirical claim inferred from these samples.

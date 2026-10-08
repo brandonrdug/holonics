@@ -882,6 +882,19 @@ impl<'c> Word<'c> {
         lift: &BigInt,
         phases: &ReceivingPhases,
     ) -> Result<WordReturn, HnnError> {
+        Ok(reverse(&self, covector, map, lift, phases)?.0)
+    }
+
+    /// The same receiving return, retaining its complete opening dual. A held-material
+    /// continuation pairs it with the carried first variation before discarding this Word.
+    /// This adds no backward replay and supplies no finite-deposition certificate.
+    pub fn pull_back_full(
+        self,
+        covector: &RatioCovector,
+        map: &ExactRatMatrix,
+        lift: &BigInt,
+        phases: &ReceivingPhases,
+    ) -> Result<(WordReturn, ChangeCovector), HnnError> {
         reverse(&self, covector, map, lift, phases)
     }
 
@@ -1031,7 +1044,7 @@ fn reverse(
     map: &ExactRatMatrix,
     lift: &BigInt,
     phases: &ReceivingPhases,
-) -> Result<WordReturn, HnnError> {
+) -> Result<(WordReturn, ChangeCovector), HnnError> {
     let field = word.field();
     let steps = word.recorded().len();
     if steps != phases.junction_steps() {
@@ -1063,9 +1076,9 @@ fn reverse(
             .ok_or(HnnError::WordEnded { ticks: steps })?;
         reads.push((receiving_ring.rotate(anchor, lift), gradient));
     }
-    let (mut back, _) = reverse_core(word, read_covector, receiving, None)?;
+    let (mut back, opening) = reverse_core(word, read_covector, receiving, None)?;
     back.reads = reads;
-    Ok(back)
+    Ok((back, opening))
 }
 
 /// **The reverse sweep** over a word's own per-tick waves (module header, "The word's return"):

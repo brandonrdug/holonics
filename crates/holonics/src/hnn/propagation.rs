@@ -1338,6 +1338,19 @@ pub fn transit_solve(
     displacement: &[Rat],
     rate: &[Rat],
 ) -> Result<(Vec<Rat>, Vec<Rat>), HnnError> {
+    let right = transit_right(contact,step,outgoing_from,outgoing_to,displacement,rate);
+    let image = contact.solve.apply(&right)?;
+    Ok((right, image))
+}
+
+fn transit_right(
+    contact: &ContactOperands,
+    step: &Rat,
+    outgoing_from: &[Rat],
+    outgoing_to: &[Rat],
+    displacement: &[Rat],
+    rate: &[Rat],
+) -> Vec<Rat> {
     let (alpha_from, alpha_to) = channel_waves(contact, outgoing_from, outgoing_to);
     let h = step;
     let mut right = scale(h, &sub(&alpha_from, &alpha_to));
@@ -1348,8 +1361,7 @@ pub fn transit_solve(
     if contact.stiffness_rows.is_some() {
         right = sub(&right, &scale(h, &stiffened));
     }
-    let image = contact.solve.apply(&right)?;
-    Ok((right, image))
+    right
 }
 
 /// **The transit's update at a solved `ζ`**: `ω = (G/2h)ζ`, `w′ = 2ω − w`, `u′ = u + hω`, and the
@@ -1393,6 +1405,35 @@ pub fn transit_update(
         channel_in: (alpha_from, alpha_to),
         channel_out: (out_from, out_to),
     }
+}
+
+/// Exact first variation of the existing transit at fixed port conductance. The forms are
+/// first variations, not finite form differences; the primal midpoint and state belong to the
+/// producing tick. This promotes the contact equation of the independent tangent control.
+/// `M dω = h(dα_g-dα_h)+2C dw-hK du+2dC(w-ω)-h dD ω-h dK(u+hω/2)`.
+/// The same executed solve/update owns the homogeneous and forced parts. No inverse is rebuilt.
+#[allow(clippy::too_many_arguments)]
+pub(crate) fn transit_variation(
+    contact: &ContactOperands,
+    step: &Rat,
+    outgoing_from: &[Rat],
+    outgoing_to: &[Rat],
+    displacement: &[Rat],
+    rate: &[Rat],
+    primal_displacement: &[Rat],
+    primal_rate: &[Rat],
+    primal_midpoint: &[Rat],
+    forms: &[ExactRatMatrix; 3],
+) -> Result<Transit, HnnError> {
+    let mut right = transit_right(contact, step, outgoing_from, outgoing_to,
+        displacement, rate);
+    let [dc, dk, dd] = forms;
+    right = add(&right, &scale(&integer(2), &dc.apply(&sub(primal_rate, primal_midpoint))?));
+    right = sub(&right, &scale(step, &dd.apply(primal_midpoint)?));
+    right = sub(&right, &scale(step, &dk.apply(&add(primal_displacement,
+        &scale(&(step / integer(2)), primal_midpoint)))?));
+    let solved = contact.solve.apply(&right)?;
+    Ok(transit_update(contact, step, &solved, outgoing_from, outgoing_to, displacement, rate))
 }
 
 /// **The transit's chart term** `⟨ω, m ζ − right⟩` at the solved `ζ` the word carried (the chart's

@@ -717,6 +717,10 @@ fn tangent(cut: &Cut, plus: (&Field, &Constitution), minus: (&Field, &Constituti
                 (&d_states[a][0], &d_states[a][1]),
             );
             let omega = &passed.midpoint;
+            // Keep the independent equation below; compare the recovered production primitive
+            // against it rather than replacing the C/K/D forward oracle by its own code.
+            let produced = dg.is_zero().then(|| crate::hnn::propagation::transit_variation(
+                contact,&h,d_out_from,d_out_to,du,dw,u,w,omega,&d_forms[a]).unwrap());
             let d_m = dc
                 .scaled(&two)
                 .add(&dd.scaled(&h))
@@ -743,6 +747,13 @@ fn tangent(cut: &Cut, plus: (&Field, &Constitution), minus: (&Field, &Constituti
             let mut arrive_to = d_out_to.clone();
             for (index, coordinate) in select_to.iter().enumerate() {
                 arrive_to[*coordinate] = &d_alpha_to[index] + &exchange[index];
+            }
+            if let Some(produced) = produced {
+                assert_eq!(produced.midpoint,d_omega);
+                assert_eq!(produced.displacement,add(du,&scale(&h,&d_omega)));
+                assert_eq!(produced.rate,sub(&scale(&two,&d_omega),dw));
+                assert_eq!(produced.arrive_from,arrive_from);
+                assert_eq!(produced.arrive_to,arrive_to);
             }
             d_states[a] = [
                 add(du, &scale(&h, &d_omega)),

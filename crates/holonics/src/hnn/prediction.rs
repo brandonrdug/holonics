@@ -2288,7 +2288,7 @@ fn physical_signed_junctions(
         .collect()
 }
 
-fn physical_signed_tick(
+pub(crate) fn physical_signed_tick(
     operands: &crate::hnn::propagation::Operands,
     state: &crate::hnn::word::EndChange,
     tick: usize,

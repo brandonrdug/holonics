@@ -161,7 +161,7 @@ impl<'c> Word<'c> {
         Ok((word, receipt))
     }
 
-    fn contact_receiving(&self, receiver: usize) -> Result<(ReceivingPhases, Faces), HnnError> {
+    pub(super) fn contact_receiving(&self, receiver: usize) -> Result<(ReceivingPhases, Faces), HnnError> {
         let (theta, current, _, _) = self.native_source.as_ref().ok_or(HnnError::Shape {
             what: "a native reading requires its source producer", expected: 1, found: 0,
         })?;

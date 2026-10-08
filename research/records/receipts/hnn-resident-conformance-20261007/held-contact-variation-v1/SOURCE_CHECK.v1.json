@@ -1,0 +1,117 @@
+{
+  "utc": "2026-10-08T02:05:55.587272+00:00",
+  "grade": "SOURCE_PREPARED_NATIVE_UNRUN",
+  "manifest_sha256": "cb523a42f50f528b61b58503aae0665aa7867ea4e0145e83993030431612242f",
+  "base_native_input_count": 303,
+  "source_input_count": 304,
+  "changed_native_inputs": [
+    "crates/holonics/src/hnn/physical.rs",
+    "crates/holonics/src/hnn/physical/contact.rs",
+    "crates/holonics/src/hnn/port.rs",
+    "crates/holonics/src/hnn/prediction.rs",
+    "crates/holonics/src/hnn/propagation.rs",
+    "crates/holonics/src/hnn/reference.rs",
+    "crates/holonics/src/hnn/reference/interaction.rs",
+    "crates/holonics/src/hnn/tests/physical_communication.rs",
+    "crates/holonics/src/hnn/tests/port.rs",
+    "crates/holonics/src/hnn/word.rs",
+    "crates/holonics/src/hnn/word/continuation.rs"
+  ],
+  "added_native_inputs": [
+    "crates/holonics/src/hnn/word/variation.rs"
+  ],
+  "unchanged_baseline_inputs": 292,
+  "parser": [
+    {
+      "path": "crates/holonics/src/hnn/physical.rs",
+      "exit": 0,
+      "stderr": ""
+    },
+    {
+      "path": "crates/holonics/src/hnn/physical/contact.rs",
+      "exit": 0,
+      "stderr": ""
+    },
+    {
+      "path": "crates/holonics/src/hnn/port.rs",
+      "exit": 0,
+      "stderr": ""
+    },
+    {
+      "path": "crates/holonics/src/hnn/prediction.rs",
+      "exit": 0,
+      "stderr": ""
+    },
+    {
+      "path": "crates/holonics/src/hnn/propagation.rs",
+      "exit": 0,
+      "stderr": ""
+    },
+    {
+      "path": "crates/holonics/src/hnn/reference.rs",
+      "exit": 0,
+      "stderr": ""
+    },
+    {
+      "path": "crates/holonics/src/hnn/reference/interaction.rs",
+      "exit": 0,
+      "stderr": ""
+    },
+    {
+      "path": "crates/holonics/src/hnn/tests/physical_communication.rs",
+      "exit": 0,
+      "stderr": ""
+    },
+    {
+      "path": "crates/holonics/src/hnn/tests/port.rs",
+      "exit": 0,
+      "stderr": ""
+    },
+    {
+      "path": "crates/holonics/src/hnn/word.rs",
+      "exit": 0,
+      "stderr": ""
+    },
+    {
+      "path": "crates/holonics/src/hnn/word/continuation.rs",
+      "exit": 0,
+      "stderr": ""
+    },
+    {
+      "path": "crates/holonics/src/hnn/word/variation.rs",
+      "exit": 0,
+      "stderr": ""
+    }
+  ],
+  "diff_check_exit": 0,
+  "source_owner_compilers_tests_training_benchmarks_scientific_jobs": 0,
+  "selectors": [
+    "hnn::tests::physical_communication::held_contact_variation_returns_the_delayed_full_state_credit",
+    "hnn::tests::physical_communication::held_contact_variation_refuses_untransported_future_without_clearing_it",
+    "hnn::tests::port::every_channel_gradient_is_the_tangent_words_derivative"
+  ],
+  "claim": "prospective full held-contact differential through the existing common Resident/native contact consumer; no Deposit conversion",
+  "native_acceptance": "pending fresh library, guards, doctests, test compilation and bounded selected controls; v96 is not this source",
+  "retention": "one full material identity operand plus current full EndChange columns, no prior Words/source occurrences",
+  "scope": "two complete exact unsplit Words; all unreleased unsigned C/K/D raw factor entries; fixed full material and port references; fixed prospective initial configuration; exact ratio/bit/column-tick caps",
+  "small_control": {
+    "parameters": 12,
+    "state_coordinates": 20,
+    "retained_state_ratios": 240,
+    "column_ticks": 72,
+    "numeric_bits_cap": 1048576,
+    "absolute_ticks": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "final_carry_tick": 7,
+    "pump_period": 2
+  },
+  "costs": "dimensions and primitive counts only; native CPU/wall/RSS and complete fixed projection unmeasured; detached current/opening/successor copies and transient forcing matrices must be charged",
+  "unsupported": "all material updates and rebases, save/cold/device, source/receiver/ring learning, changed references, chart/split/nonlinear/signed-K, release/rekey and third Word; refuse without silently clearing held future",
+  "rebase_obligation": "derive actual update U and smooth/branch/quantized coordinate jet, held-state crossing and full finite response bound before extending or depositing delayed credit"
+}

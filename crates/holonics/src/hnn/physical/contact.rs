@@ -19,6 +19,7 @@ use crate::hnn::prediction::{DamagedSection, PhysicalRepair, RepairedCell, Stati
 use crate::hnn::ratio::HolonRatio;
 use crate::hnn::word::continuation::ContinuationReceipt;
 use crate::hnn::word::{ FieldBalance, ReceptionCarry, SourceOpeningReceipt, Word, WordBalance};
+use crate::hnn::word::variation::{HeldContactComparison, VariationBudget, VariationReading};
 use crate::holon::HolonState;
 use std::sync::Arc;
 
@@ -56,6 +57,8 @@ pub struct ContactCommunication {
     pub blind_carry: ReceptionCarry,
     pub carry: ReceptionCarry,
     pub comparison: Result<Option<ContactPublication>, HnnError>,
+    /// Opt-in held-material full differential. It stages no finite material publication.
+    pub held_comparison: Result<Option<HeldContactComparison>, HnnError>,
 }
 
 impl ContactCommunication {
@@ -70,6 +73,14 @@ impl ContactCommunication {
 }
 
 impl PhysicalReceiver<'_> {
+    pub fn begin_held_contact_variation(&mut self, budget:VariationBudget) -> Result<VariationReading,HnnError> {
+        self.resident.begin_held_contact_variation(budget)
+    }
+
+    pub fn end_held_contact_variation(&mut self) -> Option<VariationReading> {
+        self.resident.end_held_contact_variation()
+    }
+
     /// A declared Field receiver observes a full-tick native passage, then optionally changes
     /// reached C/K/D through the existing contact return. The later communication is the ordinary
     /// receiver of the same common resident, not another contact experiment or saved Word.
@@ -79,7 +90,8 @@ impl PhysicalReceiver<'_> {
         receiver: &ReceiverDeclaration,
         observation: impl FnOnce(&PhysicalBoundary) -> Option<ContactObservation>,
     ) -> Result<ContactCommunication, HnnError> {
-        self.resident.admit_exact_current()?;
+        self.resident.admit_exact_current_point()?;
+        let held = self.resident.held_contact_variation().cloned();
         let first = source.len();
         if first == 0 || first >= receiver.aperture {
             return Err(HnnError::Unadmitted {
@@ -105,7 +117,13 @@ impl PhysicalReceiver<'_> {
             self.resident.constitution(), self.resident.current(), moment.clone(),
             &self.resident.reception_opening())?;
         let opened_at = word.opened_at();
+        let held_opening = held.as_ref().map(|j| {
+            j.admit_ticks(phases.junction_steps())?;
+            j.opened(&word)
+        }).transpose()?;
         word.run(phases.junction_steps())?;
+        let next_held = held.as_ref().zip(held_opening.as_ref())
+            .map(|(j,opened)| j.advanced(&word,opened)).transpose()?;
         let reads = phases.epochs().enumerate().map(|(station, crossing)| {
             Ok(StationRead { station, crossing, tick: opened_at + crossing,
                 read: phases.read(self.field, self.resident.constitution(), self.resident.current(),
@@ -127,7 +145,25 @@ impl PhysicalReceiver<'_> {
         }
         let boundary = PhysicalBoundary::of_suffix(&blind, section.chart().clone(), first, phases.grain(), false);
         let mut comparison = Ok(None);
+        let mut held_comparison = Ok(None);
         if let Some(observed) = observation(&boundary) {
+            if let Some(held) = &held {
+                held_comparison = (|| {
+                    if observed.observed.len() != receiver.aperture
+                        || observed.observed.part(0..0)? != *section.chart()
+                        || observed.observed.part(0..first)? != *source
+                        || observed.compared.len() != receiver.aperture
+                        || observed.compared[..first].iter().any(|x| *x)
+                        || !observed.compared[first..].iter().any(|x| *x) {
+                        return Err(HnnError::Unadmitted {
+                            reason:"the held observation keeps its producing chart/source and actual partition",
+                        });
+                    }
+                    word.compare_contacts_held(receiver_index,&observed.observed,&observed.compared,
+                        held,held_opening.as_ref().expect("the admitted held opening"),
+                        next_held.as_ref().expect("the admitted next differential").reading().clone())
+                })().map(Some);
+            } else {
             let joined = (|| {
                 if observed.observed.len() != receiver.aperture
                     || observed.observed.part(0..0)? != *section.chart()
@@ -155,14 +191,16 @@ impl PhysicalReceiver<'_> {
                 Ok(ContactPublication { ratio, pullback, comparison_return: deposit, publication, continuation })
             })();
             comparison = joined.map(Some);
+            }
         }
         if !matches!(comparison, Ok(Some(_))) {
             let commit = self.resident.constitution().commit();
-            self.resident.publish_reception(None, HolonState::at(blind.carry.clone(), commit),
-                None, None, section.chart())?;
+            self.resident.publish_reception_with_variation(None,
+                HolonState::at(blind.carry.clone(), commit),None,None,section.chart(),next_held)?;
         }
         Ok(ContactCommunication { boundary, opening: blind.opening, balances: blind.balances,
             word: blind.word, blind_carry: blind.carry,
-            carry: self.resident.carried().expect("the returned physical point was published").clone(), comparison })
+            carry: self.resident.carried().expect("the returned physical point was published").clone(),
+            comparison,held_comparison })
     }
 }

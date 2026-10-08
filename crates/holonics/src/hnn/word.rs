@@ -69,8 +69,11 @@
 //! [`ReceptionCarry`]), at that crossing's tick: the field's elapsed ticks are the hops every
 //! earlier word ran, so a declared resonator's pump continues across receptions. The resident, not [`Current`], holds the one carried change and its tick (guard
 //! 16 stands). Complete absorption ([`Absorption::Complete`]) is the rest limit: the word at rest,
-//! exactly, on a field with no declared resonator. The return stops at the opening: the covector
-//! reaching the carried change is a reading, deposited nowhere, and no tape of words is kept.
+//! exactly, on a field with no declared resonator. The conditional return stops at the opening.
+//! The opt-in held-contact domain ([`variation::HeldContactVariation`]) retains the complete
+//! material first variation of that current and pairs it with the next full opening covector.
+//! That differential stages no deposition until its finite-response/update/rebase law exists;
+//! neither path keeps a tape of Words.
 //!
 //! [definition; agent-inferred] **Within a step the rings, then the contacts, run together** (the
 //! hardware law; `hnn::realization`): every junction reads only its own storage and arrivals and
@@ -96,6 +99,7 @@
 pub mod continuation;
 pub mod finite_gain;
 pub mod work;
+pub mod variation;
 
 use std::collections::BTreeSet;
 

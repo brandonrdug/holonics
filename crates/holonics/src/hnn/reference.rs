@@ -507,6 +507,9 @@ pub struct Resident {
     /// The charted current's enclosure at that same carried crossing. A receiver view cannot
     /// discard it; consumers without its transport refuse before changing the resident.
     carried_error: Option<EndChange>,
+    /// Prospective full-state contact-factor first variation in its explicitly held domain.
+    /// Other consumers refuse this admitted future until their transport/rebase exists.
+    held_contact_variation: Option<crate::hnn::word::variation::HeldContactVariation>,
     /// The complete cell-free codec chart admitted by receiving views.
     receiving_chart: Option<Encoded>,
     /// [definition; agent-inferred, October 4; record B §8] **What the admitted future's words open
@@ -857,6 +860,7 @@ impl Resident {
         lift + moments
             + carried
             + self.carry_error_bits()
+            + self.held_contact_variation.as_ref().map_or(0, |j| j.reading().retained_bits)
             + receiving_chart
             + pending
             + staged
@@ -1055,6 +1059,7 @@ impl Reference {
             wall: WallTimes::default(),
             carried: None,
             carried_error: None,
+            held_contact_variation: None,
             receiving_chart: None,
             opens: self.reception.opens(),
         })
