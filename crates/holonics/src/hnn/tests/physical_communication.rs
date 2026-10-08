@@ -65,6 +65,139 @@ fn contact_material(field: &Field) -> Constitution {
     super::learning::generic(field, 81).rebased(Locus::Channel(0), 7, &reads).unwrap()
 }
 
+/// Mechanical finite variations use the actual contact decoder and complete loaded Word.
+/// The fixed samples challenge the certificate; its uniform ray argument is the factor
+/// triangle/Gram law, not an empirical claim inferred from these samples.
+#[test]
+fn finite_loaded_span_carries_the_actual_contact_response_at_its_clock() {
+    use crate::hnn::constitution::Reach;
+    use crate::hnn::propagation::{Operands, participation, transit};
+    use crate::hnn::ring::{PumpDeclaration, PumpStep, ResonatorMaterial};
+    use crate::hnn::word::{EndChange, Word};
+    use crate::hnn::word::finite_gain::FiniteContactSpans;
+    use crate::holon::parametron::Carrier as ParametronCarrier;
+    use crate::ratio::linear::ExactRatMatrix;
+    use crate::ratio::linear::vector::{dot, scale, sub};
+    let field = field();
+    let current = Current::at_rest(&field);
+    let width = field.contact(0).width();
+    let factor = ExactRatMatrix::identity(width).unwrap();
+    let ring_factor = ExactRatMatrix::identity(field.ring(0).width()).unwrap();
+    let pump = PumpDeclaration::new(rat(1,16),
+        ParametronCarrier::new(integer(1),integer(0)).unwrap(),PumpStep::Half).unwrap();
+    let zeros=vec![integer(0);field.ring(0).width()];
+    let base = material(&field).with_element(0,ExactRatMatrix::zero(zeros.len(),zeros.len()).unwrap(),
+        ring_factor.scaled(&rat(1,3)),vec![(zeros.clone(),zeros);field.ring(0).width()]).unwrap()
+        .with_channel(0,factor.clone(),factor.clone(),factor.clone()).unwrap()
+        .with_ring_resonator(&field,0,ResonatorMaterial::new(ring_factor.clone(),ring_factor.clone(),
+            ring_factor,Some(pump)).unwrap()).unwrap();
+    let old = Operands::exact_at_cut(&field,&base,&current).unwrap();
+    let moved = base.clone().with_channel(0,factor.scaled(&integer(2)),factor.clone(),factor.clone()).unwrap();
+    let new = Operands::exact_at_cut(&field,&moved,&current).unwrap();
+    let outgoing_g = vec![rat(1,3);field.ring(0).width()];
+    let outgoing_h = vec![rat(-1,5);field.ring(1).width()];
+    let u = vec![rat(1,7);width];
+    let w = vec![rat(-1,11);width];
+    let before = transit(&old.contacts()[0],field.step(),&outgoing_g,&outgoing_h,&u,&w).unwrap();
+    let after = transit(&new.contacts()[0],field.step(),&outgoing_g,&outgoing_h,&u,&w).unwrap();
+    let eta = sub(&after.midpoint,&before.midpoint);
+    let delta_c = new.contacts()[0].forms().0.subtract(old.contacts()[0].forms().0).unwrap();
+    let forcing = scale(&integer(2),&delta_c.apply(&sub(&w,&before.midpoint)).unwrap());
+    let g = old.contacts()[0].conductance();
+    // Geometry equation (13), in the native normalized operator m=(G/2h) M.
+    assert_eq!(scale(&(integer(2)*field.step()/g),&new.contacts()[0].operator().apply(&eta).unwrap()),forcing);
+    assert_eq!(sub(&after.displacement,&before.displacement),scale(field.step(),&eta));
+    assert_eq!(sub(&after.rate,&before.rate),scale(&integer(2),&eta));
+    assert!(eta.iter().any(|x| !x.is_zero()));
+    let mut response = EndChange::rest(&field,&new);
+    response.arrivals[0] = [sub(&after.arrive_from,&before.arrive_from),sub(&after.arrive_to,&before.arrive_to)];
+    response.states[0] = [sub(&after.displacement,&before.displacement),sub(&after.rate,&before.rate)];
+    // This is a test of one produced response, not a replacement for retained material.
+    let reach = Reach { receiver:0,stations:vec![1,2,3],entries:vec![0],phases:1,
+        loci:crate::hnn::retention::loci(&field).into_iter().collect() };
+    let spans = FiniteContactSpans::of(&new,0,&reach).unwrap();
+    let reading = spans.read(&[(integer(4),integer(1))]).unwrap();
+    assert_eq!(reading.station_sum,integer(3)+integer(2)*&reading.gamma[1]
+        + &reading.gamma[1]*&reading.gamma[2]);
+    let zeta = scale(&(integer(2)*field.step()/g),&eta);
+    let input = dot(&forcing,&forcing);
+    assert!(dot(&zeta,&zeta)<=input,"the actual successor normalized resolvent is contractive");
+    let nothing: Vec<_> = response.storage.iter().map(|s| vec![integer(0);s.len()]).collect();
+    let mut word = Word::continuing(&field,new.clone(),&response,&nothing,1).unwrap();
+    let mut product = integer(1);
+    let mut actual_directional = integer(0);
+    for j in 1..=3 {
+        let state = word.change().unwrap();
+        let arrivals: Vec<&[crate::ratio::Rat]> = new.incident(0).iter()
+            .map(|&a| state.arrivals[a][new.end_slot(a,0)].as_slice()).collect();
+        let anchor = participation(new.weights(0),&state.storage[0],&arrivals).unwrap();
+        let actual = dot(&anchor,&anchor);
+        assert!(actual <= &reading.receiving_projection*&reading.contact_injection[0]*&product*&input);
+        actual_directional += actual;
+        if j<3 { assert!(word.tick().unwrap().closes()); product *= &reading.gamma[j]; }
+    }
+    assert!(actual_directional < &reading.receiving_projection*&reading.contact_injection[0]*&reading.station_sum*&input,
+        "the actual directional read can be tighter than the uniform product; neither is an eta improvement claim");
+    // A nontrivial simultaneous factor ray: C/K rise, D falls but remains Gram-positive.
+    // The whole-state stage includes nonzero waves, contact state and loaded state.
+    for lambda in [integer(0),rat(1,2),integer(1)] {
+        let ray = base.clone().with_channel(0,factor.scaled(&(integer(1)+&lambda)),
+            factor.scaled(&(integer(1)+&lambda)),factor.scaled(&(integer(1)-&lambda/integer(2)))).unwrap();
+        let operands = Operands::exact_at_cut(&field,&ray,&current).unwrap();
+        for opened_at in [0,1] {
+            let witness = FiniteContactSpans::of(&operands,opened_at,&reach).unwrap()
+                .read(&[(integer(4),integer(4))]).unwrap();
+            let mut state = EndChange::rest(&field,&operands);
+            for x in state.storage.iter_mut().flatten()
+                .chain(state.arrivals.iter_mut().flatten().flatten())
+                .chain(state.states.iter_mut().flatten().flatten())
+                .chain(state.resonators.iter_mut().flatten().flatten().flatten()) { *x=rat(1,3); }
+            let norm = |state:&EndChange| {
+                let mut sum:crate::ratio::Rat = state.storage.iter().flatten()
+                    .chain(state.arrivals.iter().flatten().flatten()).map(|x|x*x).sum();
+                for (xs,(u,w)) in state.states.iter().zip(&witness.contact_coordinates) {
+                    sum += xs[0].iter().map(|x|(x/u)*(x/u)).sum::<crate::ratio::Rat>();
+                    sum += xs[1].iter().map(|x|(x/w)*(x/w)).sum::<crate::ratio::Rat>();
+                }
+                for (xs,scales) in state.resonators.iter().zip(&witness.ring_coordinates) {
+                    if let (Some(xs),Some((u,w)))=(xs,scales) {
+                        sum += xs[0].iter().map(|x|(x/u)*(x/u)).sum::<crate::ratio::Rat>();
+                        sum += xs[1].iter().map(|x|(x/w)*(x/w)).sum::<crate::ratio::Rat>();
+                    }
+                }
+                sum
+            };
+            let before = norm(&state);
+            let mut word = Word::continuing(&field,operands,&state,&nothing,opened_at).unwrap();
+            assert!(word.tick().unwrap().closes());
+            assert!(norm(&word.change().unwrap()) <= &witness.gamma[0]*before);
+        }
+    }
+}
+
+#[test]
+fn native_contact_step_consumes_the_finite_loaded_span_witness() {
+    use crate::hnn::constitution::Locus;
+    use crate::hnn::physical::contact::ContactObservation;
+    let field=field();
+    let mut actual=PhysicalReceiver::new(&field,contact_material(&field),
+        Current::at_rest(&field),WordOpening::Rest).unwrap();
+    let receipt=actual.communicate_contact(&encoded(&field,&[0,1]),&receiver(), |_| {
+        Some(ContactObservation { observed:encoded(&field,&[0,1,3]),compared:vec![false,false,true] })
+    }).unwrap();
+    assert!(receipt.closes());
+    let publication=&receipt.comparison.as_ref().unwrap().as_ref().unwrap().publication;
+    let witness=publication.loaded.as_ref().expect("actual contact selector consumes its finite witness");
+    assert!(publication.pumped.is_none());
+    assert_eq!(witness.opened_at,0);
+    assert_eq!(witness.stations,vec![2]);
+    assert_eq!(witness.station_sum,integer(1)+&witness.gamma[1]);
+    for (locus,step) in &publication.steps {
+        let Locus::Channel(a)=*locus else { panic!("native contact-only comparison"); };
+        assert_eq!(step.gain,witness.gain(a,&step.readout));
+    }
+}
+
 /// Trace the fixed v79 observation through its actual return, two carry resolutions and
 /// producer/current publication. It changes no acceptance, fixture, material or future read.
 fn contact_causal_receipt(before: &Constitution, after: &Constitution,

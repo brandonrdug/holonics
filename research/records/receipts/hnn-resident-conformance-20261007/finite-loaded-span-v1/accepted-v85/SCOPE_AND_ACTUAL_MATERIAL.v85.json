@@ -1,0 +1,141 @@
+{
+  "source_commit": "127cd161287beae54e7f467661104c70c4bbb3b5",
+  "raw_control4_pin": {
+    "sha256": "8cf415fc71e2c0dbcbdecf9a2ee7474ab90102f2a7b7fbeaa8685b43c113e414",
+    "bytes": 143758
+  },
+  "actual_applied_material": [
+    {
+      "pass": 1,
+      "contact": 0,
+      "family": 0,
+      "factor": {
+        "entries": 36,
+        "nonzero_entries": 0
+      },
+      "linear": {
+        "entries": 36,
+        "nonzero_entries": 0
+      },
+      "quadratic": {
+        "entries": 36,
+        "nonzero_entries": 0
+      },
+      "form": {
+        "entries": 36,
+        "nonzero_entries": 0
+      }
+    },
+    {
+      "pass": 1,
+      "contact": 0,
+      "family": 1,
+      "factor": {
+        "entries": 36,
+        "nonzero_entries": 0
+      },
+      "linear": {
+        "entries": 36,
+        "nonzero_entries": 0
+      },
+      "quadratic": {
+        "entries": 36,
+        "nonzero_entries": 0
+      },
+      "form": {
+        "entries": 36,
+        "nonzero_entries": 0
+      }
+    },
+    {
+      "pass": 1,
+      "contact": 0,
+      "family": 2,
+      "factor": {
+        "entries": 36,
+        "nonzero_entries": 0
+      },
+      "linear": {
+        "entries": 36,
+        "nonzero_entries": 0
+      },
+      "quadratic": {
+        "entries": 36,
+        "nonzero_entries": 0
+      },
+      "form": {
+        "entries": 36,
+        "nonzero_entries": 0
+      }
+    },
+    {
+      "pass": 2,
+      "contact": 0,
+      "family": 0,
+      "factor": {
+        "entries": 36,
+        "nonzero_entries": 0
+      },
+      "linear": {
+        "entries": 36,
+        "nonzero_entries": 0
+      },
+      "quadratic": {
+        "entries": 36,
+        "nonzero_entries": 0
+      },
+      "form": {
+        "entries": 36,
+        "nonzero_entries": 0
+      }
+    },
+    {
+      "pass": 2,
+      "contact": 0,
+      "family": 1,
+      "factor": {
+        "entries": 36,
+        "nonzero_entries": 0
+      },
+      "linear": {
+        "entries": 36,
+        "nonzero_entries": 0
+      },
+      "quadratic": {
+        "entries": 36,
+        "nonzero_entries": 0
+      },
+      "form": {
+        "entries": 36,
+        "nonzero_entries": 0
+      }
+    },
+    {
+      "pass": 2,
+      "contact": 0,
+      "family": 2,
+      "factor": {
+        "entries": 36,
+        "nonzero_entries": 0
+      },
+      "linear": {
+        "entries": 36,
+        "nonzero_entries": 0
+      },
+      "quadratic": {
+        "entries": 36,
+        "nonzero_entries": 0
+      },
+      "form": {
+        "entries": 36,
+        "nonzero_entries": 0
+      }
+    }
+  ],
+  "all_two_pass_three_family_6x6_applied_factor_linear_quadratic_form_entries_zero": true,
+  "actual_reached_covectors_and_unresolved_conservation_are_tested_but_no_useful_applied_material_or_learned_output_claim": true,
+  "mechanical_nonzero_signed_material_fixture_predeclared_not_learned": true,
+  "coupled_field_Floquet_margin_refresh_after_D_change_not_verified_existing_reach_is_per_ring": true,
+  "global_pumped_stability_claim": false,
+  "scientific_replay": false
+}

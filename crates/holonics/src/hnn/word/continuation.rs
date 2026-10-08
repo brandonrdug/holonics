@@ -30,6 +30,7 @@ pub struct ContactCut {
     opening_support: Vec<usize>,
     operands: Operands,
     change: EndChange,
+    opened_at: usize,
     next_tick: usize,
     released: Remainders,
     deposit: Option<Deposit>,
@@ -326,6 +327,7 @@ impl<'c> Word<'c> {
             opening_support: opening_support.clone(),
             operands: self.operands.clone(),
             change,
+            opened_at: self.opened_at,
             next_tick,
         };
         let phase_carry = cut.change.resonator_phases.clone();
@@ -419,7 +421,17 @@ impl ContactCut {
         }
         #[cfg(test)] let started = std::time::Instant::now();
         #[cfg(test)] eprintln!("unit certificate begin elapsed_ms=0");
-        let (successor, publication) = self.producing.deposited(deposit)?;
+        // The exact contact route reads the entire loaded field, at the producing
+        // absolute clock, rather than multiplying undriven local ring certificates.
+        let (successor, publication) = if self.operands.lattice().is_none() {
+            let spans = super::finite_gain::FiniteContactSpans::of(&self.operands, self.opened_at,
+                deposit.reach().ok_or(HnnError::MissingReach)?)?;
+            self.producing.deposited_with_contact_spans(deposit, &spans)?
+        } else {
+            // Historical charted consumer keeps its conditional certificate. It issues
+            // no loaded witness: rounding/split residual inputs are not covered here.
+            self.producing.deposited(deposit)?
+        };
         #[cfg(test)] eprintln!("unit certificate end elapsed_ms={}", started.elapsed().as_millis());
         let mut next_charts = charts.clone();
         let operands = if self.operands.lattice().is_some() {

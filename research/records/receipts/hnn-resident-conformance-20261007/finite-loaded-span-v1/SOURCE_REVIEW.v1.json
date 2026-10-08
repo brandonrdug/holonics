@@ -1,0 +1,46 @@
+{
+  "base": "127cd161287beae54e7f467661104c70c4bbb3b5",
+  "source_pins": {
+    "crates/holonics/src/hnn/constitution.rs": {
+      "bytes": 443287,
+      "sha256": "189669aa64472b841aa1efbac9b31edc0d6a5c17a330220b396dcd7ecdec046c"
+    },
+    "crates/holonics/src/hnn/word.rs": {
+      "bytes": 146392,
+      "sha256": "ea6a280ec7ba59a2a5815d9be803c6ac41f1062727091dced94f260072843772"
+    },
+    "crates/holonics/src/hnn/word/continuation.rs": {
+      "bytes": 26227,
+      "sha256": "531298bcdeeff2d8d81afb5310185552f1fa78d4e0b2ddd7175d7d29e5f0ec21"
+    },
+    "crates/holonics/src/hnn/word/finite_gain.rs": {
+      "bytes": 10888,
+      "sha256": "a750aa905f4ab78747959879275a3f05bbc5ad2f5455d96da472b5a8dea378d5"
+    },
+    "crates/holonics/src/hnn/tests/physical_communication.rs": {
+      "bytes": 54931,
+      "sha256": "6e81df1ec81440bbbc11b585dfcf29c809ddb86ada2066defadc7b415dda0e43"
+    }
+  },
+  "grade": "BOUNDED_SOURCE_REVIEW_ONLY_NATIVE_PENDING",
+  "checked_claims": [
+    "Contact chart u/(hG),w/G makes solve-output coefficient13/(4h^2); actual m>=I uniform on unsigned factor rays",
+    "Complete junction output plus simultaneous contrast and element solve retained",
+    "Loaded solve includes e and returned storage, not only homogeneous(u,w) map",
+    "Ring/junction/source/receiving material fixed; contact C/K bound uses existing joint-ray Schur triangle; Gram D not improvement assumption",
+    "Actual opened_at+k phases and tau<k<j products; empty product=1; stage maxima for disjoint parallel blocks",
+    "Geometry producer response uses actual two-transit subtraction; material remains resident, no pulse replaces it",
+    "Whole resident bound is safe and loose, no retention-collapse invariance asserted; charted legacy path distinct with loaded=None",
+    "Current test/source shape independently read and math reviewed; type and native execution pending"
+  ],
+  "source_review_defects_resolved": [
+    "Declared producing coordinate scales rather than mixing raw state units",
+    "Junction contrast c participates as state-derived input",
+    "Actual descriptor m versus M normalization kept in response control",
+    "Carrier restrictions and charted route evidence boundary explicit"
+  ],
+  "no_blocker_found_within_scope": true,
+  "nonlinear_descent_claim": false,
+  "all_future_or_global_stability_claim": false,
+  "raw_private_messages_included": false
+}

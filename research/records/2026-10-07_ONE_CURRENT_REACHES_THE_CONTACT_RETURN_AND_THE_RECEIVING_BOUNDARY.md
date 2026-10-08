@@ -631,3 +631,111 @@ acquired relations, all-future sensitivity, moving-geometry decoder joins, cold 
 device parity. Grain, step law, masks, teacher, source chart and physical budget remain fixed.
 The outer queue must seal fresh source/config/cache and a measured complete projection under
 its existing caps before any native execution. This owner executes no compiler or native job.
+
+## Accepted contact baseline and finite loaded gain, October 8
+
+[native-checked at 127cd1612 only] Sole-queue continuation v85 passed the fresh library,
+three guards, 57 doctests, fresh libtest and four scoped controls. Its largest control used
+995883241 ns wall and 935686000 ns aggregate CPU, with 19075072 bytes group peak.
+Both learning passes applied zero C/K/D factor and form entries. The seven-selector original
+gate remains one failed and six unlaunched; no acquired relation, useful output or global
+pumped stability follows. The unchanged queue receipt is preserved in
+`receipts/hnn-resident-conformance-20261007/finite-loaded-span-v1/accepted-v85/`.
+This receipt does not accept the successor gain source below.
+
+[proved-derived; source-prepared] The concrete missing dependency was the gain read by
+`Constitution::certify_steps`, not a demand for global pumped stability. Its old channel
+gain multiplies undriven ring reaches; that does not certify the loop through the loaded
+ring's returned port. `word::finite_gain::FiniteContactSpans` now supplies the exact native
+contact route with the whole finite map at the actual producing clock. The generic/charted
+route keeps its separately conditional gain and issues no loaded witness.
+
+The fixed geometry owner's
+[contact response derivation at cb842d3e](https://github.com/brandonrdug/holonics/blob/cb842d3e51ce5c2897f2129b918a6963717afc51/research/records/2026-10-07_PLASMA_AND_GAS_CURRENTS_CROSS_THE_SAME_MOVING_TUBE.md#an-actual-material-perturbation-produces-a-contact-response)
+joins the existing actual contact solve. At fixed incident waves, u,w,K,D,G,h,
+
+    M_plus eta = 2 DeltaC (w - omega_minus), eta = omega_plus - omega_minus,
+    Delta(u_next,w_next,a_g,a_h) = (h eta,2 eta,-2 iota_g eta/G,2 iota_h eta/G).
+
+The right-hand side includes the changed material's source term. Native continuation still
+retains and directly solves the changed constitution: this single response is neither an
+additional source nor an operationally equivalent replacement for permanent material.
+Executed chart defects and future constitutive changes are not dropped into an invented
+emitter. The new mechanical control checks this subtraction against both actual transits.
+
+[definition; agent-inferred] Use the positive coordinate metric on the full wave chart:
+storage and both arrivals, contact (u/(hG),w/G), loaded ring (u/(hY),w/Y).
+h,G,Y are the producing clock/port declarations and are fixed over this contact-only ray.
+The metric is not signed physical storage; the existing work/heat/held-momentum receipt
+continues to read the actual forms independently. No hidden field is projected away.
+
+The junction J=2 1 w^T-I and simultaneous contrast c=(w-e_storage)^T x feed the
+existing element, s'=E b+X Wc c, E=2X-I. Exact Schur bounds give a complete stage bound
+
+    gamma_JE = max(1,2 norm(E)^2) norm(J)^2
+               + 2 norm(X Wc)^2 norm(w-e_storage)^2.
+
+Each parallel ring/contact stage uses the maximum block bound, not a product over blocks.
+In normalized loaded-ring coordinates, its correction is (-2,1,2) omega/Y and
+its right-hand side is h e - h^2 Y K_t U + 2Y C W. Reading the actual executed
+phase solve X_t once by its columns gives
+
+    gamma_loaded,t = 2 [1 + (9/Y^2) norm(X_t)^2
+                          (h^2 + h^4 Y^2 norm(K_t)^2 + 4Y^2 norm(C)^2)].
+
+For contacts m=I+G/(2h)(2C+hD+h^2 K/2) >= I on every unsigned joint factor ray,
+so norm(m^-1)<=1. The whole local correction in this chart is
+(-zeta/h,+zeta/h,zeta/(2h),zeta/h), giving b=13/(4h^2). Thus
+
+    gamma_contact,a = 2 [1 + b (2h^2 + 4G^2 norm(C)^2 + h^4 G^2 norm(K)^2)],
+    gamma_t = max gamma_JE * max gamma_loaded,t * max gamma_contact.
+
+The loaded and element maps are fixed because this consumer admits contact-factor steps
+only. C/K form norms at every joint ray are bounded by the existing factor Schur triangle
+S(F+eta D), uniformly for 0<=lambda<=eta, and are recomputed after each halving.
+D remains Gram-positive throughout its ray; a decrease is not assumed to improve gamma.
+Signed contact learning remains refused by the existing ActiveContact gate. Quartic and
+split/charted execution do not receive this linear witness.
+
+At station j, P_j reads the participation anchor before tick j; a contact RHS variation
+at tau has already passed its actual solve and decoder after tick tau. With absolute phase
+opened_at+k in each intermediate T_k,
+
+    Phi_jtau = P_j T_(j-1) ... T_(tau+1) S_tau,
+    p = sum weights_receiver^2,
+    G_jtau = p b product_(tau<k<j) gamma_k,
+    kappa_a^2 = norm(R)^2 sum_j sum_(tau<j) G_jtau.
+
+This proves the actual norm-bound premise of `Holon/Deposition.station_tick_gain` for
+this declared finite, exact linear domain; its general Lean theorem is reused, not claimed
+to have proved these new producing stage bounds. The empty product is one. The implementation
+computes a[0]=0, a[j]=1+gamma_(j-1) a[j-1] and sums a[j] at the compared stations.
+The current constitution is held whole: the witness is deliberately conservative and makes
+no collapse/release-invariance claim. Old generic retention-relative gain remains unchanged.
+
+[cost and retention] Preparation performs one existing ring inverse read, two local products
+per ring, and sum_r(P_r n_r) executed loaded solve-column reads, with local Schur scans;
+it never launches whole-field basis Words. Temporary dense storage is O(max n_r^2), and
+the context/receipt holds O(span+contacts+loaded-rings) exact scalars, not states or a replay
+history. Each joint-ray read costs O(contacts+span+stations) scalar operations after existing
+factor norms. Exact numerator/denominator widths can grow with span and phases; no logarithmic
+bit-cost bound is asserted. No precision, teacher, amplitude, grain or budget changes.
+The conservative product may shrink eta; it is not offered as a tuning improvement.
+A measured complete projection and cache preflight are still the sole queue's launch inputs.
+
+[controls prepared, unrun] `finite_loaded_span_carries_the_actual_contact_response_at_its_clock`
+checks the actual finite storage response, empty/intermediate products and subsequent pumped
+Word anchor reads; it challenges a nontrivial joint C/K/D factor ray at both pump phases with
+all full-state components nonzero and nonzero element contrast. A directional anchor sum is
+strictly below the uniform product bound in this fixed control; that tighter direction does
+not certify arbitrary inputs, the joint ray, or a replacement eta. The symbolic factor/Gram
+argument, not sampling the ray, supplies uniformity.
+`native_contact_step_consumes_the_finite_loaded_span_witness` checks the actual production
+selector's recorded gain against its loaded receipt on the unchanged observation fixture.
+These are physics/interface controls, not a curriculum or scientific holdout.
+
+[scope] The existing proposal remains Gauss--Newton: no full finite score descent, learned
+nonzero material, acquired output, all-future domain release, cold continuation or device
+parity is asserted. The ring's own learned gain ray, modulated schedule, nonlinear and
+charted residual inputs, tighter admitted source-specific certificate and Lean closure
+of the concrete loaded stage inequalities remain separately owed in #62.

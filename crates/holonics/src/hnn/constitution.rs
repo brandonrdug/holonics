@@ -139,6 +139,15 @@
 //!   and a modulated pump's passage-dependent schedule. [`DepositReading::pumped`] reports each ring's
 //!   decision, bounds and reach, the span factor at the longest span and the families held.
 //!
+//! [agent-inferred, October 8; finite native contact scope] The exact source-bound
+//! ContactCut consumer instead reads `word::finite_gain` on the complete loaded field,
+//! including return ports, at the producing absolute clock. Its positive wave-chart
+//! metric bounds every finite tick uniformly along the joint unsigned C/K/D factor
+//! ray; fixed ring material needs no global Floquet stability hypothesis. The generic
+//! and charted consumers above retain their conditional scope. This closes a finite
+//! gain input to the existing Gauss--Newton proposal, not its owed full nonlinear
+//! second derivatives. `DepositReading::loaded` records which consumer actually ran.
+//!
 //! [definition; agent-inferred, September 29] **The factor families' certified step** (the
 //! [factor step's record](../../../../research/records/2026-09-29_THE_FACTOR_FAMILIES_CERTIFIED_STEP_PINNED_BEFORE_ITS_RUNS.md);
 //! Lean `Holon/Deposition.{factor_unit_step_alignment, square_ray_move, square_ray_deriv_bound,
@@ -3366,6 +3375,10 @@ pub struct DepositReading {
     /// (`None` when every resonator is certified passive; module header, "The pumped medium's
     /// reach").
     pub pumped: Option<PumpedReading>,
+    /// The native contact return's finite whole-loaded-field witness. The gain uses
+    /// this positive wave-coordinate metric, not signed physical storage or a local
+    /// undriven Floquet state map. None for the older generic deposition route.
+    pub loaded: Option<crate::hnn::word::finite_gain::LoadedSpanReading>,
 }
 
 impl DepositReading {
@@ -5458,6 +5471,7 @@ impl Constitution {
         reach: Option<&Reach>,
         linear: &[(Locus, LinearLocus, &PreparedStep)],
         factors: &[(Locus, &FactorPrepared)],
+        loaded: Option<&crate::hnn::word::finite_gain::FiniteContactSpans>,
     ) -> Result<CertifiedSteps, HnnError> {
         /// A normal law's readings at the certificate's faces: its alignment at its floor, its
         /// covector scale, feature moves and unit step's Schur norms at their ceilings, and (the
@@ -5529,13 +5543,14 @@ impl Constitution {
             }
         }
         if parts.is_empty() {
-            return Ok((BTreeMap::new(), None, None));
+            return Ok((BTreeMap::new(), None, None, None));
         }
         let reach = reach.ok_or(HnnError::MissingReach)?;
         // A declared boost is refused where the word reads its channel's transit (`Reach::loci`,
         // record B §8): a released channel's stiffness is zero, so its signature signs nothing.
         if let Some(contact) = (0..self.contacts.len()).find(|&contact| {
-            self.contacts[contact].boost.is_some() && reach.loci.contains(&Locus::Channel(contact))
+            self.contacts[contact].boost.is_some()
+                && (loaded.is_some() || reach.loci.contains(&Locus::Channel(contact)))
         }) {
             return Err(HnnError::ActiveContact { contact });
         }
@@ -5572,14 +5587,14 @@ impl Constitution {
             && !parts.iter().any(|(locus, family, _)| {
                 *locus == Locus::ReceivingMap(reach.receiver) && *family == Family::Map
             });
-        let rings = self.ring_reaches(span, |ring| {
+        let rings = if loaded.is_some() { Vec::new() } else { self.ring_reaches(span, |ring| {
             reach.reads_ring(ring)
                 && !(silent
                     && self.rings[ring]
                         .resonator
                         .as_ref()
                         .is_some_and(|law| law.saturation().is_some() && !pumped(law)))
-        })?;
+        })? };
         let factors = (!rings.is_empty()).then(|| Self::factors_of(&rings, span));
         let mut held = Vec::new();
         if !rings.is_empty() {
@@ -5608,7 +5623,7 @@ impl Constitution {
             held: held.clone(),
         });
         if parts.is_empty() {
-            return Ok((BTreeMap::new(), None, pumped_reading));
+            return Ok((BTreeMap::new(), None, pumped_reading, None));
         }
         let place: BTreeMap<(Locus, Family), usize> = parts
             .iter()
@@ -5720,11 +5735,21 @@ impl Constitution {
                     _ => &base.0 * &base.1,
                 }
             };
+        let loaded_read = |steps: &[Option<CertifiedStep>]| {
+            loaded.map(|spans| {
+                let forms = channel_base.iter().enumerate().map(|(a,(c,k))| (
+                    square_ray(steps,(Locus::Channel(a),Family::Factor(0)),c),
+                    square_ray(steps,(Locus::Channel(a),Family::Factor(1)),k),
+                )).collect::<Vec<_>>();
+                spans.read(&forms)
+            }).transpose()
+        };
         // Each family's gain `κ²` and moves `b` at the end of every ray.
         let curvature = |index: usize,
                          steps: &[Option<CertifiedStep>],
                          readout: &Rat,
-                         sums: &(Rat, Rat)|
+                         sums: &(Rat, Rat),
+                         loaded: Option<&crate::hnn::word::finite_gain::LoadedSpanReading>|
          -> Result<(Rat, Rat), HnnError> {
             let (locus, family, part) = &parts[index];
             let prepared = match part {
@@ -5780,6 +5805,9 @@ impl Constitution {
                     moves.own(&prepared.energy, own)?,
                 )),
                 (Locus::Channel(a), moves) => {
+                    if let Some(loaded) = loaded {
+                        return Ok((loaded.gain(a,readout),moves.own(&prepared.energy,own)?));
+                    }
                     let conductance = self.conductances[a]
                         .as_ref()
                         .ok_or(HnnError::UncertifiedConductance { contact: a })?;
@@ -5831,8 +5859,9 @@ impl Constitution {
         let reading = |steps: &[Option<CertifiedStep>]| -> Result<Vec<(Rat, Rat)>, HnnError> {
             let (readout, amplitude) = gains(steps);
             let sums = sums(&amplitude);
+            let loaded = loaded_read(steps)?;
             (0..parts.len())
-                .map(|index| curvature(index, steps, &readout, &sums))
+                .map(|index| curvature(index, steps, &readout, &sums, loaded.as_ref()))
                 .collect()
         };
         let alignment = |part: &Part<'_>| -> (Rat, Rat) {
@@ -5951,7 +5980,7 @@ impl Constitution {
                     )
                 })
                 .collect();
-            return Ok((readings, Some(joint), pumped_reading));
+            return Ok((readings, Some(joint), pumped_reading, loaded_read(&steps)?));
         }
     }
 
@@ -5993,6 +6022,27 @@ impl Constitution {
         deposit: &Deposit,
         retained: &BTreeSet<Locus>,
     ) -> Result<(Self, DepositReading), HnnError> {
+        self.deposited_in(deposit,retained,None)
+    }
+
+    /// Source-private native contact consumer. ContactCut constructs the witness
+    /// from its own producing operands; ring/source/receiving families cannot change
+    /// under its ray. The complete current constitution remains resident (held()).
+    pub(crate) fn deposited_with_contact_spans(&self, deposit:&Deposit,
+        loaded:&crate::hnn::word::finite_gain::FiniteContactSpans)
+        -> Result<(Self,DepositReading),HnnError>
+    {
+        if !deposit.linear().is_empty() || deposit.factors().iter().any(|s|
+            !matches!(s.gradient.locus(),Locus::Channel(_))) {
+            return Err(HnnError::Realization { what: "the finite contact span keeps ring and receiving material fixed" });
+        }
+        self.deposited_in(deposit,&self.held(),Some(loaded))
+    }
+
+    fn deposited_in(&self, deposit:&Deposit, retained:&BTreeSet<Locus>,
+        loaded:Option<&crate::hnn::word::finite_gain::FiniteContactSpans>)
+        -> Result<(Self,DepositReading),HnnError>
+    {
         if deposit.commit() != self.commit {
             return Err(HnnError::StaleDeposit {
                 staged: deposit.commit(),
@@ -6099,7 +6149,7 @@ impl Constitution {
             return Err(refusal);
         }
         // The certificate reads every prepared step at once.
-        let (certified, joint, pumped) = {
+        let (certified, joint, pumped, loaded) = {
             let linear: Vec<(Locus, LinearLocus, &PreparedStep)> = regions
                 .iter()
                 .zip(&ready)
@@ -6124,7 +6174,7 @@ impl Constitution {
                         .map(move |prepared| (*locus, prepared))
                 })
                 .collect();
-            self.certify_steps(deposit.reach(), &linear, &factors)?
+            self.certify_steps(deposit.reach(), &linear, &factors, loaded)?
         };
         let mut certified = certified;
         // The standing's fold (module header, "Within a lobe", "At a node"): each standing
@@ -6302,6 +6352,7 @@ impl Constitution {
             lobe,
             lock,
             pumped,
+            loaded,
         };
         Ok((next, reading))
     }
@@ -7030,6 +7081,7 @@ type CertifiedSteps = (
     BTreeMap<(Locus, Family), StepReading>,
     Option<JointReading>,
     Option<PumpedReading>,
+    Option<crate::hnn::word::finite_gain::LoadedSpanReading>,
 );
 
 /// One locus's pass-1 preparation: its budgeted carry (opened by its first step), its linear step's

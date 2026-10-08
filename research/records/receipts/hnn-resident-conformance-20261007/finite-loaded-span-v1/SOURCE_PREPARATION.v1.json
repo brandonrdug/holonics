@@ -1,0 +1,112 @@
+{
+  "utc": "2026-10-08T00:44:30.941188+00:00",
+  "base": "127cd161287beae54e7f467661104c70c4bbb3b5",
+  "geometry_derivation": "cb842d3e51ce5c2897f2129b918a6963717afc51",
+  "grade": "SOURCE_PREPARED_SYNTAX_CHECKED_NATIVE_PENDING",
+  "source_pins": {
+    "crates/holonics/src/hnn/constitution.rs": {
+      "bytes": 443287,
+      "sha256": "189669aa64472b841aa1efbac9b31edc0d6a5c17a330220b396dcd7ecdec046c"
+    },
+    "crates/holonics/src/hnn/word.rs": {
+      "bytes": 146392,
+      "sha256": "ea6a280ec7ba59a2a5815d9be803c6ac41f1062727091dced94f260072843772"
+    },
+    "crates/holonics/src/hnn/word/continuation.rs": {
+      "bytes": 26227,
+      "sha256": "531298bcdeeff2d8d81afb5310185552f1fa78d4e0b2ddd7175d7d29e5f0ec21"
+    },
+    "crates/holonics/src/hnn/word/finite_gain.rs": {
+      "bytes": 10888,
+      "sha256": "a750aa905f4ab78747959879275a3f05bbc5ad2f5455d96da472b5a8dea378d5"
+    },
+    "crates/holonics/src/hnn/tests/physical_communication.rs": {
+      "bytes": 54931,
+      "sha256": "6e81df1ec81440bbbc11b585dfcf29c809ddb86ada2066defadc7b415dda0e43"
+    }
+  },
+  "syntax": {
+    "crates/holonics/src/hnn/constitution.rs": {
+      "exit_code": 0,
+      "stderr": ""
+    },
+    "crates/holonics/src/hnn/word.rs": {
+      "exit_code": 0,
+      "stderr": ""
+    },
+    "crates/holonics/src/hnn/word/continuation.rs": {
+      "exit_code": 0,
+      "stderr": ""
+    },
+    "crates/holonics/src/hnn/word/finite_gain.rs": {
+      "exit_code": 0,
+      "stderr": ""
+    },
+    "crates/holonics/src/hnn/tests/physical_communication.rs": {
+      "exit_code": 0,
+      "stderr": ""
+    }
+  },
+  "diff_check_exit": 0,
+  "original_gate_bodies": [
+    {
+      "selector": "hnn::tests::physical_communication::complete_contact_return_publishes_held_point_before_existing_communication",
+      "body_sha256": "9a0fd1e5628cf7b1cc38187d9bdb58919480df0799884d23cd29613a854fbac3",
+      "unchanged": true
+    },
+    {
+      "selector": "hnn::tests::physical_communication::a_shared_execution_clock_reanchors_the_next_section_without_resetting_its_carry",
+      "body_sha256": "a17e2abcb0308c2dae0d0df1259747b57adaaca081ee5c78b8eab4d13a957bc9",
+      "unchanged": true
+    },
+    {
+      "selector": "hnn::tests::physical_charted::a_shared_charted_enclosure_survives_view_changes_and_bars_unsupported_futures",
+      "body_sha256": "3c69a746aab85ccbcdf4ce760e445fe770eea0948eb7cfb715faa7962251d9c8",
+      "unchanged": true
+    },
+    {
+      "selector": "hnn::tests::physical_communication::communication_deposits_after_the_whole_boundary_and_reuses_material_source_and_carry",
+      "body_sha256": "0f16e74e3e36d0e259f9c58f5aa7733c6e699195d370cdf19ae238aca0cb0934",
+      "unchanged": true
+    },
+    {
+      "selector": "hnn::tests::physical_charted::charted_loaded_pump_error_keeps_the_absolute_clock_across_the_carry",
+      "body_sha256": "d081ea8ff0eeaa7d1c1e57d5a76b0ef7f2f61f9da5b109c1d1c1df8dc7784bf5",
+      "unchanged": true
+    },
+    {
+      "selector": "hnn::tests::propagation::a_stored_transit_is_the_reference_holons_midpoint_advance",
+      "body_sha256": "2c3d9c54c69f1a8754010501246409b25cbc8ceec3b7e6e3a077b68a63bc7fb8",
+      "unchanged": true
+    },
+    {
+      "selector": "hnn::tests::word::a_carried_change_crosses_the_next_openings_references",
+      "body_sha256": "483fcf722d08232fa91b668f5bcd963efd1fd385bc7e236d88eb857f4aaff66c",
+      "unchanged": true
+    }
+  ],
+  "predecessor_v85": {
+    "validation": {
+      "bytes": 363942,
+      "sha256": "499e93c845a15b1777cb071aa5d38aeb90c4dad6bfc98fff80b6107d6a10bd36"
+    },
+    "full_controls_passed": true,
+    "applied_C_K_D_forms_zero": true,
+    "output_gate_failed": true
+  },
+  "owner_jobs": 0,
+  "scope": "Exact linear source-owned native contact whole-field finite gain, existing joint Gauss-Newton selector; whole material retained; no finite nonlinear decrease, stability, eta improvement, acquisition or release claim",
+  "fixed_controls": [
+    "hnn::tests::physical_communication::finite_loaded_span_carries_the_actual_contact_response_at_its_clock",
+    "hnn::tests::physical_communication::native_contact_step_consumes_the_finite_loaded_span_witness"
+  ],
+  "cost": {
+    "preparation": "local ring solve matrix and Schur reads; one n-column executed loaded solve per phase; no whole-field basis Words",
+    "ray": "O(contact_count+finite_span+station_count) exact scalar operations plus existing factor-ray norms",
+    "temporary_dense": "O(max_ring_width_squared)",
+    "retained_constitution_change": "none; finite bound lives in transient context and DepositReading only",
+    "exact_width_bound": "not established; queue measures complete cost"
+  },
+  "caps_unchanged": true,
+  "queue_projection_and_cache": "required; owner does not launch"
+}

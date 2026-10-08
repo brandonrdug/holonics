@@ -94,6 +94,7 @@
 //! ```
 
 pub mod continuation;
+pub mod finite_gain;
 pub mod work;
 
 use std::collections::BTreeSet;
