@@ -2696,6 +2696,27 @@ fn a_receiving_deposit_absorbs_its_phase_comparisons_through_the_map_before_it()
         .unwrap();
     assert_eq!(restored, next);
     assert_eq!(restored.receiving_law(2).unwrap().phase_statistics(), Some(&expected));
+
+    // Restore, then update (Epime's review of the sparse checkpoint): the next window deposited on
+    // the restored constitution returns the uninterrupted successor, the statistic and every other
+    // part alike, so the checkpoint written from the held classes is the statistic itself. A soft
+    // face of uniform masses at `e_0 + e_1` against `q̃ = (0, ½, ½, 0)` with gaps `(·, ⅛, −⅛, ·)`.
+    let later = |theta: &Constitution| {
+        let window = receiving_window(
+            theta,
+            vec![Sample {
+                weight: integer(1),
+                feature: e01.clone(),
+                covector: vec![
+                    rat(-1, 4), Rat::zero(), rat(1, 4), rat(1, 32),
+                    rat(1, 4), rat(-1, 32), rat(-1, 4), Rat::zero(),
+                ],
+                masses: Some(vec![rat(1, 4); 4]),
+            }],
+        );
+        theta.deposited(&window).map(|(successor, _)| successor)
+    };
+    assert_eq!(later(&restored), later(&next));
 }
 
 /// **Only a reached face of nonnegative weight is absorbed** ([`absorb_phase`]): a zero weight, a
