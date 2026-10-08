@@ -2714,7 +2714,7 @@ fn a_receiving_deposit_absorbs_its_phase_comparisons_through_the_map_before_it()
                 masses: Some(vec![rat(1, 4); 4]),
             }],
         );
-        theta.deposited(&window).map(|(successor, _)| successor)
+        theta.deposited(&window).unwrap().0
     };
     assert_eq!(later(&restored), later(&next));
 }

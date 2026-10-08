@@ -716,7 +716,7 @@ fn the_fixed_v79_contact_observation_accounts_for_its_actual_material_and_remain
 
 #[test]
 fn the_actual_unresolved_contact_return_survives_a_different_physical_passage() {
-    use crate::hnn::constitution::{Carrier, Locus};
+    use crate::hnn::constitution::{Carrier, Family, Locus};
     use crate::hnn::physical::contact::ContactObservation;
     let field=field();
     let initial=contact_material(&field);
@@ -731,12 +731,23 @@ fn the_actual_unresolved_contact_return_survives_a_different_physical_passage() 
     let pending:Vec<_>=learned.carried_remainders().into_iter().filter(|(l,c,_,_)|
         *l==Locus::Channel(0) && matches!(c,Carrier::Factor(_) | Carrier::FactorScale(_))).collect();
     assert_eq!(pending,publication.publication.unresolved_contact_material);
-    assert_eq!(pending.iter().filter(|(_,c,_,_)| *c==Carrier::Factor(0)).count(),
-        initial.contact_storage(0).entries().len());
     assert!(publication.publication.released.iter().all(|(_,c,_,_)|
         !matches!(c,Carrier::Factor(_) | Carrier::FactorScale(_))));
-    assert_eq!(learned.contact_storage(0),initial.contact_storage(0),
-        "exact unresolved direction is not an immediate physical storage move");
+    // Conditioned on the actual sub-cell displacement (Epime's review, October 8): the storage
+    // family's move stays below its cell exactly when the publication reads it as vanished, and
+    // only then is the exact unresolved direction not an immediate physical storage move, with
+    // every storage entry pending. complete_contact_return_publishes_held_point_before_existing_
+    // communication demands that move on these same operands and stays the failed acceptance while
+    // it vanishes; a move that leaves its cell is a physical storage move here too.
+    if publication.publication.vanished.contains(&(Locus::Channel(0), Family::Factor(0))) {
+        assert_eq!(pending.iter().filter(|(_,c,_,_)| *c==Carrier::Factor(0)).count(),
+            initial.contact_storage(0).entries().len());
+        assert_eq!(learned.contact_storage(0),initial.contact_storage(0),
+            "exact unresolved direction is not an immediate physical storage move");
+    } else {
+        assert_ne!(learned.contact_storage(0),initial.contact_storage(0),
+            "a storage move that left its cell is an immediate physical storage move");
+    }
     assert!(learned.exact_bits() <= learned.budget());
     let ordinary=actual.communicate(&encoded(&field,&[1,0]),&receiver(), |_| None).unwrap();
     assert!(ordinary.closes());
