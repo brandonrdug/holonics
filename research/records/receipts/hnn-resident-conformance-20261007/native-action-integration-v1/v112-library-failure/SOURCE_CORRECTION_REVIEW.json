@@ -1,0 +1,36 @@
+{
+  "UTC": "2026-10-08",
+  "source_predecessor": "de894803ee9643832999b97490284eea08d07b95",
+  "actual_feedback": "five library compile errors; preparation passed; nine selectors and World behavior unlaunched; all leases released",
+  "changes": "owned exact-ratio negative coefficient; existing transpose/apply API; explicit receiving trait; neighboring cfg-test callers corrected",
+  "physics_scope": "No assertion, carrier, state/clock/work, derivative scope, acceptance or resource cap changed",
+  "static_only": [
+    {
+      "path": "crates/holonics/src/hnn/physical/action/world.rs",
+      "parser_exit": 0,
+      "stderr": ""
+    },
+    {
+      "path": "crates/holonics/src/hnn/word/action.rs",
+      "parser_exit": 0,
+      "stderr": ""
+    },
+    {
+      "path": "crates/holonics/src/hnn/word/variation/gain.rs",
+      "parser_exit": 0,
+      "stderr": ""
+    },
+    {
+      "path": "crates/holonics/tests/physical_action.rs",
+      "parser_exit": 0,
+      "stderr": ""
+    }
+  ],
+  "diff_check_exit": 0,
+  "diff_check_output": "",
+  "prior_feedback": {
+    "VALIDATION.json": "621ffb79dab5a47963720f1ccb288f147a5c9dec0e12cb9b5f361f5d388bf426",
+    "LIBRARY_CHECK_RENDERED_ERRORS.txt": "22c9b8e47b55f65d748171f0e684c99424317be73447fb68792d7b55a16b5de7"
+  },
+  "owner_execution": "No compiler, tests, native World behavior, benchmark or training; sole queue owns next run"
+}

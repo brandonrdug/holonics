@@ -276,7 +276,7 @@ impl BoundJointWorld {
                 rows[i][j] = coefficients.system.get(i, j)?.clone();
             }
             for j in 0..pi {
-                rows[i][n + j] = -coefficients.external_target.get(i, j)?;
+                rows[i][n + j] = -coefficients.external_target.get(i, j)?.clone();
             }
         }
         for i in 0..pi {

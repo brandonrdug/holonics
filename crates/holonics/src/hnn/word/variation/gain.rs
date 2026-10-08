@@ -155,7 +155,10 @@ impl ContactStationResponse {
         {
             return refuse("the realized response and ratio use the same complete receiving chart");
         }
-        Ok(self.matrix.apply_transpose(&covector.logits().concat())?)
+        Ok(self
+            .matrix
+            .transpose()?
+            .apply(&covector.logits().concat())?)
     }
 
     /// Independent forward-tangent/adjoint consuming square, checked exactly.
@@ -202,16 +205,16 @@ impl HeldContactVariation {
         let (theta, current, _, _) = word.native_source.as_ref().ok_or(HnnError::Unadmitted {
             reason: "a station response keeps its actual native producing material/current",
         })?;
-        if theta.receiving_carrier(phases.ring()) != ReceivingCarrier::Anchor {
+        if FieldMaterial::receiving_carrier(theta, phases.ring()) != ReceivingCarrier::Anchor {
             return refuse(
                 "a variable/non-anchor observer supplies its own coefficient differential",
             );
         }
-        let map = theta
-            .receiving_map(phases.ring())
-            .ok_or(HnnError::MissingReceivingMap {
+        let map = FieldMaterial::receiving_map(theta, phases.ring()).ok_or(
+            HnnError::MissingReceivingMap {
                 ring: phases.ring(),
-            })?;
+            },
+        )?;
         if map.columns() != word.field.ring(phases.ring()).width()
             || map.rows()
                 != word
@@ -516,7 +519,7 @@ mod tests {
         // not copies installed as runtime state or purported World trial branches.
         for (station, epoch) in phases.epochs().enumerate() {
             for component in 0..response.rows_per_station {
-                let map = theta.receiving_map(phases.ring()).unwrap();
+                let map = FieldMaterial::receiving_map(&theta, phases.ring()).unwrap();
                 let row = (0..map.columns())
                     .map(|j| map.get(component, j).unwrap().clone())
                     .collect::<Vec<_>>();
@@ -563,7 +566,7 @@ mod tests {
         let (back, dual) = second
             .pull_back_full(
                 &covector,
-                theta.receiving_map(phases.ring()).unwrap(),
+                FieldMaterial::receiving_map(&theta, phases.ring()).unwrap(),
                 &current.lift()[phases.ring()],
                 &phases,
             )

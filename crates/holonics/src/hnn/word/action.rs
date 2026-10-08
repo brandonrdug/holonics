@@ -504,6 +504,7 @@ impl Word<'_> {
                 ring: phases.ring(),
             },
         )?;
+        let preparation_transpose = preparation.map.transpose()?;
         let mut rows = Vec::new();
         let mut residual = Vec::new();
         for (((epoch, target), base), selected) in
@@ -524,11 +525,7 @@ impl Word<'_> {
                 let mut anchors = vec![None; baseline_word.ticks()];
                 anchors[epoch] = Some(anchor_row);
                 let opening_dual = baseline_word.anchor_differential(anchors, phases.ring())?;
-                rows.push(
-                    preparation
-                        .map
-                        .apply_transpose(&opening_dual.storage[preparation.ring])?,
-                );
+                rows.push(preparation_transpose.apply(&opening_dual.storage[preparation.ring])?);
                 residual.push(&target[coordinate] - &base[coordinate]);
             }
         }

@@ -249,3 +249,26 @@ Its name is a dispatch selector; full history/choice evidence is the separately 
 mechanical law control, not inferred from two observed faces. The sole queue receives
 compiler/mechanical selectors first; any scoped World run requires source-matched measured
 preflight/projection under the same caps and a fresh specific admission.
+
+## First actual compiler feedback: v112
+
+The sole queue's source-matched attempt on `de894803ee9643832999b97490284eea08d07b95`
+passed preparation and stopped at five library compile errors. No mechanical selector or
+World behavior launched, and every lease was released. The preserved
+[compiler diagnostics](receipts/hnn-resident-conformance-20261007/native-action-integration-v1/v112-library-failure/LIBRARY_CHECK_RENDERED_ERRORS.txt)
+and [validation](receipts/hnn-resident-conformance-20261007/native-action-integration-v1/v112-library-failure/VALIDATION.json)
+are producing failure evidence, not a physics or runtime result.
+
+The correction copies the borrowed exact Robin coefficient before negating it, uses the
+existing `ExactRatMatrix::transpose()?.apply(...)` API (one cached preparation transpose),
+and explicitly selects FieldMaterial's receiving methods where ConstitutionRead is also in
+scope. Nearby test-only calls were inspected: the obstruction control's nonexistent matrix
+transpose-apply call and the station-row test's ambiguous receiving-map calls receive the
+same API correction. No carrier, clock, assertion, wave/energy equation, derivative scope,
+acceptance or budget changes.
+
+The two v112 preparation/check stages cost CPU `13468376000 ns` and wall `15389099244 ns`.
+Cumulative native/guard accounting is 181 stages, CPU `1998078067000 ns` and wall
+`1489458390583 ns`. Source reception is separate (wall `563262246 ns`, self CPU
+`75428599 ns`, child CPU `521930 microseconds`, self peak `23696 KiB`). The corrected
+successor is again a source handoff; type/native acceptance must come from the queue.

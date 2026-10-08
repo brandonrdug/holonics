@@ -268,7 +268,9 @@ fn a_plural_preimage_keeps_its_kernel_and_an_unreachable_request_returns_its_obs
             assert!(
                 prospect
                     .response()
-                    .apply_transpose(covector)
+                    .transpose()
+                    .unwrap()
+                    .apply(covector)
                     .unwrap()
                     .iter()
                     .all(Zero::is_zero)

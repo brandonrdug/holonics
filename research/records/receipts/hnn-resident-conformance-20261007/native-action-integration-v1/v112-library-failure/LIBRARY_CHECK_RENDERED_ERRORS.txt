@@ -1,0 +1,114 @@
+error[E0308]: `?` operator has incompatible types
+   --> crates/holonics/src/hnn/physical/action/world.rs:279:35
+    |
+279 |                 rows[i][n + j] = -coefficients.external_target.get(i, j)?;
+    |                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `Ratio<BigInt>`, found `&Ratio<BigInt>`
+    |
+    = note: `?` operator cannot convert from `&Ratio<_>` to `Ratio<_>`
+    = note: expected struct `Ratio<_>`
+            found reference `&Ratio<_>`
+help: consider using clone here
+    |
+279 |                 rows[i][n + j] = -coefficients.external_target.get(i, j)?.clone();
+    |                                                                          ++++++++
+
+
+
+error[E0599]: no method named `apply_transpose` found for struct `ratio::linear::ExactRatMatrix` in the current scope
+   --> crates/holonics/src/hnn/word/variation/gain.rs:158:24
+    |
+158 |         Ok(self.matrix.apply_transpose(&covector.logits().concat())?)
+    |                        ^^^^^^^^^^^^^^^
+    |
+   ::: crates/holonics/src/ratio/linear.rs:75:1
+    |
+ 75 | pub struct ExactRatMatrix {
+    | ------------------------- method `apply_transpose` not found for this struct
+    |
+help: there is a method `transpose` with a similar name, but with different arguments
+   --> crates/holonics/src/ratio/linear.rs:199:5
+    |
+199 |     pub fn transpose(&self) -> Result<Self, ExactLinearError> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+error[E0034]: multiple applicable items in scope
+    --> crates/holonics/src/hnn/word/variation/gain.rs:205:18
+     |
+ 205 |         if theta.receiving_carrier(phases.ring()) != ReceivingCarrier::Anchor {
+     |                  ^^^^^^^^^^^^^^^^^ multiple `receiving_carrier` found
+     |
+note: candidate #1 is defined in an impl of the trait `field::FieldMaterial` for the type `T`
+    --> crates/holonics/src/hnn/field.rs:321:5
+     |
+ 321 |     fn receiving_carrier(&self, ring: usize) -> crate::hnn::receiving::ReceivingCarrier {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+note: candidate #2 is defined in an impl of the trait `field::ConstitutionRead` for the type `constitution::Constitution`
+    --> crates/holonics/src/hnn/constitution.rs:9463:5
+     |
+9463 |     fn receiving_carrier(&self, ring: usize) -> crate::hnn::receiving::ReceivingCarrier {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+help: disambiguate the method for candidate #1
+     |
+ 205 -         if theta.receiving_carrier(phases.ring()) != ReceivingCarrier::Anchor {
+ 205 +         if field::FieldMaterial::receiving_carrier(&theta, phases.ring()) != ReceivingCarrier::Anchor {
+     |
+help: disambiguate the method for candidate #2
+     |
+ 205 -         if theta.receiving_carrier(phases.ring()) != ReceivingCarrier::Anchor {
+ 205 +         if field::ConstitutionRead::receiving_carrier(&theta, phases.ring()) != ReceivingCarrier::Anchor {
+     |
+
+
+
+error[E0034]: multiple applicable items in scope
+    --> crates/holonics/src/hnn/word/variation/gain.rs:211:14
+     |
+ 211 |             .receiving_map(phases.ring())
+     |              ^^^^^^^^^^^^^ multiple `receiving_map` found
+     |
+note: candidate #1 is defined in an impl of the trait `field::FieldMaterial` for the type `T`
+    --> crates/holonics/src/hnn/field.rs:318:5
+     |
+ 318 |     fn receiving_map(&self, ring: usize) -> Option<&ExactRatMatrix> {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+note: candidate #2 is defined in an impl of the trait `field::ConstitutionRead` for the type `constitution::Constitution`
+    --> crates/holonics/src/hnn/constitution.rs:9512:5
+     |
+9512 |     fn receiving_map(&self, ring: usize) -> Option<&ExactRatMatrix> {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+help: disambiguate the method for candidate #1
+     |
+ 210 -         let map = theta
+ 211 -             .receiving_map(phases.ring())
+ 210 +         let map = field::FieldMaterial::receiving_map(&theta, phases.ring())
+     |
+help: disambiguate the method for candidate #2
+     |
+ 210 -         let map = theta
+ 211 -             .receiving_map(phases.ring())
+ 210 +         let map = field::ConstitutionRead::receiving_map(&theta, phases.ring())
+     |
+
+
+
+error[E0599]: no method named `apply_transpose` found for struct `ratio::linear::ExactRatMatrix` in the current scope
+   --> crates/holonics/src/hnn/word/action.rs:530:26
+    |
+528 | /                     preparation
+529 | |                         .map
+530 | |                         .apply_transpose(&opening_dual.storage[preparation.ring])?,
+    | |_________________________-^^^^^^^^^^^^^^^
+    |
+   ::: crates/holonics/src/ratio/linear.rs:75:1
+    |
+ 75 |   pub struct ExactRatMatrix {
+    |   ------------------------- method `apply_transpose` not found for this struct
+    |
+help: there is a method `transpose` with a similar name, but with different arguments
+   --> crates/holonics/src/ratio/linear.rs:199:5
+    |
+199 |     pub fn transpose(&self) -> Result<Self, ExactLinearError> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
