@@ -246,8 +246,10 @@ port (4) and the encounter's station tangents (5).
 `E fᵀ + f Eᵀ` for all three families. The executed stiffness is `K = b Σ bᵀ` with the contact's
 declared signature `Σ = diag(σ)` (`contact::signed_stiffness`), so the stiffness coordinate's
 derivative is `E Σ bᵀ + b Σ Eᵀ`. The shared `coordinate_forms` now reads the signature. Without a
-declared boost, `Σ = 1` and nothing changes; with one, the held variation's stiffness columns were
-the wrong tangent.
+declared boost, `Σ = 1` and nothing changes. With a boost, the held variation's stiffness columns
+would have been the wrong tangent, but `HeldContactVariation::begin` refuses signatures, so the defect
+was latent. Today the correction is reachable only through `MaterialDirection::of_coordinate`
+(Epime's review).
 
 ## 4. The owners it consumes, and the implementation
 
