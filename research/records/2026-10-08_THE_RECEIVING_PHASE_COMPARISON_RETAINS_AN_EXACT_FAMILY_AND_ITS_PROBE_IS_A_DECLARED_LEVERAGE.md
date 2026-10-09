@@ -210,8 +210,10 @@ and the Resident retains it beside the bound World.
   All seven passed once at `0a7fa87a4`, with the fifteen affected fixtures, after the workspace
   all-targets check.
 
-Not joined: the face chart `Cξ⁺ + o`, the Ask over keys, learning through the model, and the
-World/Robin and all-material first and second variation.
+Not joined: the grain-level observation relation of a declared face (`Face::of_read` at the
+encounter's grain) and the conditioning of retained fibres on actual declared face observations (the
+raw face chart `Cξ⁺ + o` joins at C1b-2b, below), the Ask over keys, learning through the model, and
+the World/Robin and all-material first and second variation.
 
 **The coupled prospect (C1b-2a)** [definition; agent-inferred, October 9; source under validation].
 In an actual encounter each later incident wave depends on the returned ones through the native

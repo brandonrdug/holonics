@@ -93,11 +93,14 @@
 //! fibres reach. The keys are immutable declarations, held separately as the World's own are.
 //!
 //! The owner's test is `tests/world_model.rs`; the receiving-phase record's §7 states this owner, its
-//! acceptance and its receipt, and the atlas rows are `hnn.world-model-filter` and
-//! `hnn.world-model-return-image`. The bits read the mutable model state only: not the immutable key
-//! laws, the solves' workspace or process memory. Owed beyond C1b-1: C2's finite forward cover, the
-//! face chart `Cξ⁺ + o`, the Ask over keys, learning through the model, and the World/Robin and
-//! all-material first and second variation.
+//! acceptance and its receipts, and its atlas rows are the `hnn.world-model-*` rows. The bits read the
+//! mutable model state only: not the immutable key laws, the solves' workspace or process memory. A
+//! coupled passage also keeps the transient post-step states of that one passage (ticks by storage
+//! values), never retained history; a CPU or CUDA memory budget counts that workspace and the rational
+//! carrier sizes beyond the bits. Owed: C2's finite forward cover; the grain-level observation
+//! relation of a declared face (`Face::of_read` at the encounter's grain) and the conditioning of
+//! retained fibres on actual declared face observations; the Ask over keys; learning through the
+//! model; and the World/Robin and all-material first and second variation.
 
 use crate::hnn::HnnError;
 use crate::hnn::physical::action::WaveJointStep;
