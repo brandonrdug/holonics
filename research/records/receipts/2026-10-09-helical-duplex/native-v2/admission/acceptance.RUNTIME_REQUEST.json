@@ -1,0 +1,36 @@
+{
+  "native_argv": [
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-20261009-v132/cache-v2/debug/deps/holonics-70b68d2f7e1f6408",
+    "compression::keys::duplex::tests::",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "expected_names": [
+    "compression::keys::duplex::tests::a_changed_transport_on_the_same_helix_is_refused_its_founded_quotient",
+    "compression::keys::duplex::tests::a_malformed_partner_contact_is_refused_before_any_index_arithmetic",
+    "compression::keys::duplex::tests::a_pairing_is_a_fixed_point_free_involution_and_its_complement_reverse_an_anti_automorphism",
+    "compression::keys::duplex::tests::a_repair_family_is_released_exactly_when_every_coordinate_is_constant",
+    "compression::keys::duplex::tests::a_strand_that_is_no_passage_returns_its_located_defect_and_never_a_duplex",
+    "compression::keys::duplex::tests::a_substitution_carries_a_signed_shift_that_moves_every_later_lift",
+    "compression::keys::duplex::tests::a_template_frame_collapses_each_slipped_factor_and_the_round_trip_holds",
+    "compression::keys::duplex::tests::an_empty_fit_constrained_family_is_the_typed_no_compatible_source_defect",
+    "compression::keys::duplex::tests::an_unreached_lift_is_refused_and_never_substituted",
+    "compression::keys::duplex::tests::coordinated_substitutions_are_outside_the_coverage_and_counted_against_the_truth",
+    "compression::keys::duplex::tests::coprime_residues_recover_the_lift_and_the_winding_keeps_the_carry",
+    "compression::keys::duplex::tests::every_supported_state_extends_to_an_actual_member",
+    "compression::keys::duplex::tests::placement_pairs_the_partner_before_the_quotient_on_unseen_keys_and_lengths",
+    "compression::keys::duplex::tests::single_strand_damage_slips_exactly_the_damaged_contacts",
+    "compression::keys::duplex::tests::the_family_diameter_is_the_maximum_over_its_coordinates_and_the_supports_are_exact",
+    "compression::keys::duplex::tests::the_held_witnesses_are_actual_members_that_attain_the_diameter",
+    "compression::keys::duplex::tests::the_lifts_carry_the_winding_and_step_the_phase",
+    "compression::keys::duplex::tests::the_receipts_state_which_seeds_are_development_and_which_are_acceptance",
+    "compression::keys::duplex::tests::the_supports_keep_the_carry_and_the_class_reads_the_winding",
+    "compression::keys::duplex::tests::the_transport_alone_resolves_the_side_when_the_key_is_known",
+    "compression::keys::duplex::tests::the_unit_rate_slip_vanishes_exactly_on_the_complement"
+  ],
+  "per_unit_upper_ns": 1472265594,
+  "native_stdout": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-20261009-v132/acceptance.native.stdout",
+  "native_stderr": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-20261009-v132/acceptance.native.stderr",
+  "result": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-20261009-v132/acceptance.RUNTIME_RESULT.json",
+  "source_commit": "02658c6c2ddaf94b0bf66eb9c7db91307f1fc2ce"
+}

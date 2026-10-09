@@ -1,0 +1,47 @@
+{
+  "kernel_accepted": true,
+  "compiler_exit": 0,
+  "compiler_wall_ns": 1390450058,
+  "axioms": {
+    "Holonics.Transport.HelicalCode.phaseTransport_pairing": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.face_complementReverse": [
+      "propext"
+    ],
+    "Holonics.Transport.HelicalCode.strandFace_repeatWord_of_fixed": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.dihedralFrame_bijective": [
+      "propext",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.card_free_involutions_fin4": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.slipped_contacts_eq": [
+      "propext",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.duplex_passage_linking": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.geom_smul_sum_succ'": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "selector_count_matches": true,
+  "standard_axioms_only": true,
+  "metadata_unchanged": true,
+  "broad_library_checked": false
+}

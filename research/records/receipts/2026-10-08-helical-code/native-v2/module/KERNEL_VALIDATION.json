@@ -1,0 +1,310 @@
+{
+  "kernel_accepted": true,
+  "compiler_exit": 0,
+  "compiler_wall_ns": 5706544620,
+  "axioms": {
+    "Holonics.Transport.HelicalCode.complementReverse": [],
+    "Holonics.Transport.HelicalCode.complementReverse_nil": [
+      "propext"
+    ],
+    "Holonics.Transport.HelicalCode.complementReverse_cons": [
+      "propext"
+    ],
+    "Holonics.Transport.HelicalCode.complementReverse_append": [
+      "propext"
+    ],
+    "Holonics.Transport.HelicalCode.length_complementReverse": [
+      "propext"
+    ],
+    "Holonics.Transport.HelicalCode.complementReverse_involutive": [
+      "propext",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.complementReverse_ne_of_middle": [
+      "propext"
+    ],
+    "Holonics.Transport.HelicalCode.even_length_of_fixed": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.eq_complementReverse_of_fixed": [
+      "propext"
+    ],
+    "Holonics.Transport.HelicalCode.fixed_eq_take_append": [
+      "propext",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.complementReverse_append_self": [
+      "propext",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.length_append_complementReverse": [
+      "propext",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.firstHalfEquiv": [
+      "propext",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.card_fixedWords": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.phaseTransport_eq_reflectedReturn": [
+      "propext"
+    ],
+    "Holonics.Transport.HelicalCode.phaseTransport_mul_self": [
+      "propext"
+    ],
+    "Holonics.Transport.HelicalCode.phaseTransport_ne_self": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.involutive_of_mul_self": [
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.phaseTransport_pairing": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.phaseTransport_reciprocal": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.complementReverse_involutive_at_phase": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.even_length_of_fixed_at_phase": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.card_fixedWords_at_phase": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.crossingChange": [],
+    "Holonics.Transport.HelicalCode.crossingChange_self": [],
+    "Holonics.Transport.HelicalCode.crossingChange_of_ne": [],
+    "Holonics.Transport.HelicalCode.sum_crossingChange_sub": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.sum_crossingChange_eq_pm_two": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.half_sum_crossingChange": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.geom_smul_sum_succ'": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.geom_smul_sum_sub": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.one_sub_smul_geom_sum": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.strandFace": [
+      "propext"
+    ],
+    "Holonics.Transport.HelicalCode.strandFace_singleton": [
+      "propext"
+    ],
+    "Holonics.Transport.HelicalCode.strandFace_append": [
+      "propext"
+    ],
+    "Holonics.Transport.HelicalCode.repeatWord": [],
+    "Holonics.Transport.HelicalCode.strandFace_repeatWord": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.strandFace_repeatWord_sub": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.strandFace_repeatWord_one_sub": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.strandFace_repeatWord_of_fixed": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.strandFace_ofFn": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.face": [
+      "propext"
+    ],
+    "Holonics.Transport.HelicalCode.face_ofFn": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.J_zpow": [
+      "propext"
+    ],
+    "Holonics.Transport.HelicalCode.J_pow": [
+      "propext"
+    ],
+    "Holonics.Transport.HelicalCode.strandFace_complementReverse_nat": [
+      "propext"
+    ],
+    "Holonics.Transport.HelicalCode.face_complementReverse": [
+      "propext"
+    ],
+    "Holonics.Transport.HelicalCode.partner_map_involutive": [
+      "propext"
+    ],
+    "Holonics.Transport.HelicalCode.dihedral_swap": [
+      "propext"
+    ],
+    "Holonics.Transport.HelicalCode.dihedral_reflection_sq": [
+      "propext"
+    ],
+    "Holonics.Transport.HelicalCode.dihedral_conj": [
+      "propext",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.halfTurn_inverts_shift": [
+      "propext"
+    ],
+    "Holonics.Transport.HelicalCode.frameShift": [
+      "propext",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.frameFlip": [
+      "propext",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.frameFlip_frameFlip": [
+      "propext",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.frameFlip_frameShift_frameFlip": [
+      "propext",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.frameShift_neg_frameShift": [
+      "propext",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.frameShift_iterate": [
+      "propext",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.dihedralFrame": [
+      "propext",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.dihedralFrame_bijective": [
+      "propext",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.kleinAct": [
+      "propext"
+    ],
+    "Holonics.Transport.HelicalCode.kleinAct_zero_right": [
+      "propext"
+    ],
+    "Holonics.Transport.HelicalCode.kleinAct_self": [
+      "propext"
+    ],
+    "Holonics.Transport.HelicalCode.kleinAct_assoc": [
+      "propext"
+    ],
+    "Holonics.Transport.HelicalCode.kleinAct_comm": [
+      "propext"
+    ],
+    "Holonics.Transport.HelicalCode.kleinAct_regular": [
+      "propext",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.kleinAct_free_involution": [
+      "propext"
+    ],
+    "Holonics.Transport.HelicalCode.kleinAct_injective": [
+      "propext"
+    ],
+    "Holonics.Transport.HelicalCode.kleinAct_fourth": [
+      "propext"
+    ],
+    "Holonics.Transport.HelicalCode.free_involution_eq_kleinAct": [
+      "propext"
+    ],
+    "Holonics.Transport.HelicalCode.free_involution_iff": [
+      "propext"
+    ],
+    "Holonics.Transport.HelicalCode.card_free_involutions_fin4": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.free_involution_commutes": [
+      "propext"
+    ],
+    "Holonics.Transport.HelicalCode.getElem?_complementReverse_rev": [
+      "propext",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.slipped_contact_iff": [
+      "propext",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.slipped_contacts_eq": [
+      "propext",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.slipped_repairs_distinct": [
+      "propext",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.duplexSigns": [
+      "propext"
+    ],
+    "Holonics.Transport.HelicalCode.duplex_passage_sum": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.duplex_passage_linking": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalCode.duplex_passage_pm_four": [
+      "propext",
+      "Quot.sound"
+    ]
+  },
+  "selector_count_matches": true,
+  "standard_axioms_only": true,
+  "metadata_unchanged": true,
+  "broad_library_checked": false
+}

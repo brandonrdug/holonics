@@ -1,0 +1,1 @@
+helical-duplex malformed contact: partner contacts 3 and usize::MAX on a duplex of 3 are refused as IndexOutside before any reversal

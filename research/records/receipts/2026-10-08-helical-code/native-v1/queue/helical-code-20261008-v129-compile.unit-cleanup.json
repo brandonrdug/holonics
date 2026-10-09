@@ -1,0 +1,22 @@
+{
+  "owned_unit": "holonics-prune-admission-helical-code-20261008-v129-compile.service",
+  "stop_exit": 0,
+  "final_state": {
+    "Description": "Owned holonics admission helical-code-20261008-v129-compile f5609022a3a8a1b8fdd56bc7b585848f",
+    "LoadState": "loaded",
+    "ActiveState": "failed",
+    "SubState": "failed",
+    "InvocationID": "1b6171db52f247f88dc296cc3f41f69f",
+    "Result": "exit-code",
+    "ExecMainStatus": "125",
+    "ControlGroup": "",
+    "MemoryPeak": "4303589376",
+    "CPUUsageNSec": "7906420000",
+    "TasksCurrent": "[not set]"
+  },
+  "no_unrelated_units_stopped": true,
+  "accounting_captured_before_stop": true,
+  "catchable_cleanup_signals_blocked": true,
+  "lease_retention_events": 0,
+  "pending_catchable_signals": []
+}

@@ -1,0 +1,26 @@
+
+running 21 tests
+test compression::keys::duplex::tests::a_changed_transport_on_the_same_helix_is_refused_its_founded_quotient ... ok
+test compression::keys::duplex::tests::a_malformed_partner_contact_is_refused_before_any_index_arithmetic ... ok
+test compression::keys::duplex::tests::a_pairing_is_a_fixed_point_free_involution_and_its_complement_reverse_an_anti_automorphism ... ok
+test compression::keys::duplex::tests::a_repair_family_is_released_exactly_when_every_coordinate_is_constant ... ok
+test compression::keys::duplex::tests::a_strand_that_is_no_passage_returns_its_located_defect_and_never_a_duplex ... ok
+test compression::keys::duplex::tests::a_substitution_carries_a_signed_shift_that_moves_every_later_lift ... ok
+test compression::keys::duplex::tests::a_template_frame_collapses_each_slipped_factor_and_the_round_trip_holds ... ok
+test compression::keys::duplex::tests::an_empty_fit_constrained_family_is_the_typed_no_compatible_source_defect ... ok
+test compression::keys::duplex::tests::an_unreached_lift_is_refused_and_never_substituted ... ok
+test compression::keys::duplex::tests::coordinated_substitutions_are_outside_the_coverage_and_counted_against_the_truth ... ok
+test compression::keys::duplex::tests::coprime_residues_recover_the_lift_and_the_winding_keeps_the_carry ... ok
+test compression::keys::duplex::tests::every_supported_state_extends_to_an_actual_member ... ok
+test compression::keys::duplex::tests::placement_pairs_the_partner_before_the_quotient_on_unseen_keys_and_lengths ... ok
+test compression::keys::duplex::tests::single_strand_damage_slips_exactly_the_damaged_contacts ... ok
+test compression::keys::duplex::tests::the_family_diameter_is_the_maximum_over_its_coordinates_and_the_supports_are_exact ... ok
+test compression::keys::duplex::tests::the_held_witnesses_are_actual_members_that_attain_the_diameter ... ok
+test compression::keys::duplex::tests::the_lifts_carry_the_winding_and_step_the_phase ... ok
+test compression::keys::duplex::tests::the_receipts_state_which_seeds_are_development_and_which_are_acceptance ... ok
+test compression::keys::duplex::tests::the_supports_keep_the_carry_and_the_class_reads_the_winding ... ok
+test compression::keys::duplex::tests::the_transport_alone_resolves_the_side_when_the_key_is_known ... ok
+test compression::keys::duplex::tests::the_unit_rate_slip_vanishes_exactly_on_the_complement ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 1120 filtered out; finished in 1.92s
+

@@ -1,0 +1,173 @@
+{"phase": "precompile sealed JSON read", "wall_ns": 271576020}
+{"phase": "precompile metadata", "wall_ns": 327246616}
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v129/source-v1/Holonics/Transport/HelicalCode.lean:140:36: warning: Unused tactic linter: `done` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v129/source-v1/Holonics/Transport/HelicalCode.lean:141:6: warning: Unused tactic linter: `simp [complementReverse, hσ.comp_self]` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v129/source-v1/Holonics/Transport/HelicalCode.lean:141:6: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v129/source-v1/Holonics/Transport/HelicalCode.lean:235:8: warning: Unused tactic linter: `exact ⟨fun u => ⟨u.1, u.2⟩, fun v => ⟨v.1, v.2⟩, fun _ => rfl, fun _ => rfl⟩` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v129/source-v1/Holonics/Transport/HelicalCode.lean:235:8: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v129/source-v1/Holonics/Transport/HelicalCode.lean:270:25: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Group (α → α)
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v129/source-v1/Holonics/Transport/HelicalCode.lean:315:6: warning: Unused tactic linter: `simp [crossingChange]` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v129/source-v1/Holonics/Transport/HelicalCode.lean:315:6: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v129/source-v1/Holonics/Transport/HelicalCode.lean:321:6: warning: Unused tactic linter: `simp [crossingChange, hk]` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v129/source-v1/Holonics/Transport/HelicalCode.lean:321:6: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v129/source-v1/Holonics/Transport/HelicalCode.lean:425:33: warning: Unused tactic linter: `done` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v129/source-v1/Holonics/Transport/HelicalCode.lean:426:8: warning: Unused tactic linter: `simp [strandFace, ih, smul_add, smul_smul, pow_succ', add_assoc]` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v129/source-v1/Holonics/Transport/HelicalCode.lean:426:8: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v129/source-v1/Holonics/Transport/HelicalCode.lean:485:57: warning: Unused tactic linter: `done` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v129/source-v1/Holonics/Transport/HelicalCode.lean:486:8: warning: Unused tactic linter: `simp [List.ofFn_succ, strandFace, ih, Fin.sum_univ_succ, Finset.smul_sum, pow_succ',
+  smul_smul]` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v129/source-v1/Holonics/Transport/HelicalCode.lean:486:8: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v129/source-v1/Holonics/Transport/HelicalCode.lean:751:10: warning: Unused tactic linter: `aesop` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v129/source-v1/Holonics/Transport/HelicalCode.lean:751:10: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v129/source-v1/Holonics/Transport/HelicalCode.lean:873:6: warning: Unused tactic linter: `rfl` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v129/source-v1/Holonics/Transport/HelicalCode.lean:874:6: warning: Unused tactic linter: `simp` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v129/source-v1/Holonics/Transport/HelicalCode.lean:873:6: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v129/source-v1/Holonics/Transport/HelicalCode.lean:874:6: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v129/source-v1/Holonics/Transport/HelicalCode.lean:926:13: warning: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v129/source-v1/Holonics/Transport/HelicalCode.lean:966:6: warning: Unused tactic linter: `(simp only [h1, h2]; ring)` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v129/source-v1/Holonics/Transport/HelicalCode.lean:966:6: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+'Holonics.Transport.HelicalCode.complementReverse' does not depend on any axioms
+'Holonics.Transport.HelicalCode.complementReverse_nil' depends on axioms: [propext]
+'Holonics.Transport.HelicalCode.complementReverse_cons' depends on axioms: [propext]
+'Holonics.Transport.HelicalCode.complementReverse_append' depends on axioms: [propext]
+'Holonics.Transport.HelicalCode.length_complementReverse' depends on axioms: [propext]
+'Holonics.Transport.HelicalCode.complementReverse_involutive' depends on axioms: [propext, Quot.sound]
+'Holonics.Transport.HelicalCode.complementReverse_ne_of_middle' depends on axioms: [propext]
+'Holonics.Transport.HelicalCode.even_length_of_fixed' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalCode.eq_complementReverse_of_fixed' depends on axioms: [propext]
+'Holonics.Transport.HelicalCode.fixed_eq_take_append' depends on axioms: [propext, Quot.sound]
+'Holonics.Transport.HelicalCode.complementReverse_append_self' depends on axioms: [propext, Quot.sound]
+'Holonics.Transport.HelicalCode.length_append_complementReverse' depends on axioms: [propext, Quot.sound]
+'Holonics.Transport.HelicalCode.firstHalfEquiv' depends on axioms: [propext, Quot.sound]
+'Holonics.Transport.HelicalCode.card_fixedWords' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalCode.phaseTransport_eq_reflectedReturn' depends on axioms: [propext]
+'Holonics.Transport.HelicalCode.phaseTransport_mul_self' depends on axioms: [propext]
+'Holonics.Transport.HelicalCode.phaseTransport_ne_self' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalCode.involutive_of_mul_self' depends on axioms: [Quot.sound]
+'Holonics.Transport.HelicalCode.phaseTransport_pairing' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Transport.HelicalCode.phaseTransport_reciprocal' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalCode.complementReverse_involutive_at_phase' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Transport.HelicalCode.even_length_of_fixed_at_phase' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Transport.HelicalCode.card_fixedWords_at_phase' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalCode.crossingChange' does not depend on any axioms
+'Holonics.Transport.HelicalCode.crossingChange_self' does not depend on any axioms
+'Holonics.Transport.HelicalCode.crossingChange_of_ne' does not depend on any axioms
+'Holonics.Transport.HelicalCode.sum_crossingChange_sub' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalCode.sum_crossingChange_eq_pm_two' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalCode.half_sum_crossingChange' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalCode.geom_smul_sum_succ'' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalCode.geom_smul_sum_sub' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalCode.one_sub_smul_geom_sum' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalCode.strandFace' depends on axioms: [propext]
+'Holonics.Transport.HelicalCode.strandFace_singleton' depends on axioms: [propext]
+'Holonics.Transport.HelicalCode.strandFace_append' depends on axioms: [propext]
+'Holonics.Transport.HelicalCode.repeatWord' does not depend on any axioms
+'Holonics.Transport.HelicalCode.strandFace_repeatWord' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalCode.strandFace_repeatWord_sub' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalCode.strandFace_repeatWord_one_sub' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Transport.HelicalCode.strandFace_repeatWord_of_fixed' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Transport.HelicalCode.strandFace_ofFn' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalCode.face' depends on axioms: [propext]
+'Holonics.Transport.HelicalCode.face_ofFn' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalCode.J_zpow' depends on axioms: [propext]
+'Holonics.Transport.HelicalCode.J_pow' depends on axioms: [propext]
+'Holonics.Transport.HelicalCode.strandFace_complementReverse_nat' depends on axioms: [propext]
+'Holonics.Transport.HelicalCode.face_complementReverse' depends on axioms: [propext]
+'Holonics.Transport.HelicalCode.partner_map_involutive' depends on axioms: [propext]
+'Holonics.Transport.HelicalCode.dihedral_swap' depends on axioms: [propext]
+'Holonics.Transport.HelicalCode.dihedral_reflection_sq' depends on axioms: [propext]
+'Holonics.Transport.HelicalCode.dihedral_conj' depends on axioms: [propext, Quot.sound]
+'Holonics.Transport.HelicalCode.halfTurn_inverts_shift' depends on axioms: [propext]
+'Holonics.Transport.HelicalCode.frameShift' depends on axioms: [propext, Quot.sound]
+'Holonics.Transport.HelicalCode.frameFlip' depends on axioms: [propext, Quot.sound]
+'Holonics.Transport.HelicalCode.frameFlip_frameFlip' depends on axioms: [propext, Quot.sound]
+'Holonics.Transport.HelicalCode.frameFlip_frameShift_frameFlip' depends on axioms: [propext, Quot.sound]
+'Holonics.Transport.HelicalCode.frameShift_neg_frameShift' depends on axioms: [propext, Quot.sound]
+'Holonics.Transport.HelicalCode.frameShift_iterate' depends on axioms: [propext, Quot.sound]
+'Holonics.Transport.HelicalCode.dihedralFrame' depends on axioms: [propext, Quot.sound]
+'Holonics.Transport.HelicalCode.dihedralFrame_bijective' depends on axioms: [propext, Quot.sound]
+'Holonics.Transport.HelicalCode.kleinAct' depends on axioms: [propext]
+'Holonics.Transport.HelicalCode.kleinAct_zero_right' depends on axioms: [propext]
+'Holonics.Transport.HelicalCode.kleinAct_self' depends on axioms: [propext]
+'Holonics.Transport.HelicalCode.kleinAct_assoc' depends on axioms: [propext]
+'Holonics.Transport.HelicalCode.kleinAct_comm' depends on axioms: [propext]
+'Holonics.Transport.HelicalCode.kleinAct_regular' depends on axioms: [propext, Quot.sound]
+'Holonics.Transport.HelicalCode.kleinAct_free_involution' depends on axioms: [propext]
+'Holonics.Transport.HelicalCode.kleinAct_injective' depends on axioms: [propext]
+'Holonics.Transport.HelicalCode.kleinAct_fourth' depends on axioms: [propext]
+'Holonics.Transport.HelicalCode.free_involution_eq_kleinAct' depends on axioms: [propext]
+'Holonics.Transport.HelicalCode.free_involution_iff' depends on axioms: [propext]
+'Holonics.Transport.HelicalCode.card_free_involutions_fin4' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalCode.free_involution_commutes' depends on axioms: [propext]
+'Holonics.Transport.HelicalCode.getElem?_complementReverse_rev' depends on axioms: [propext, Quot.sound]
+'Holonics.Transport.HelicalCode.slipped_contact_iff' depends on axioms: [propext, Quot.sound]
+'Holonics.Transport.HelicalCode.slipped_contacts_eq' depends on axioms: [propext, Quot.sound]
+'Holonics.Transport.HelicalCode.slipped_repairs_distinct' depends on axioms: [propext, Quot.sound]
+'Holonics.Transport.HelicalCode.duplexSigns' depends on axioms: [propext]
+'Holonics.Transport.HelicalCode.duplex_passage_sum' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalCode.duplex_passage_linking' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalCode.duplex_passage_pm_four' depends on axioms: [propext, Quot.sound]
+{"phase": "Lean compiler", "wall_ns": 10627758773, "exit": 1}
+{"phase": "postcompile sealed JSON read", "wall_ns": 224874589}
+{"phase": "postcompile metadata", "wall_ns": 321129434}
+{"kernel_accepted": false, "compiler_exit": 1, "compiler_wall_ns": 10627758773, "axioms": {"Holonics.Transport.HelicalCode.complementReverse": [], "Holonics.Transport.HelicalCode.complementReverse_nil": ["propext"], "Holonics.Transport.HelicalCode.complementReverse_cons": ["propext"], "Holonics.Transport.HelicalCode.complementReverse_append": ["propext"], "Holonics.Transport.HelicalCode.length_complementReverse": ["propext"], "Holonics.Transport.HelicalCode.complementReverse_involutive": ["propext", "Quot.sound"], "Holonics.Transport.HelicalCode.complementReverse_ne_of_middle": ["propext"], "Holonics.Transport.HelicalCode.even_length_of_fixed": ["propext", "Classical.choice", "Quot.sound"], "Holonics.Transport.HelicalCode.eq_complementReverse_of_fixed": ["propext"], "Holonics.Transport.HelicalCode.fixed_eq_take_append": ["propext", "Quot.sound"], "Holonics.Transport.HelicalCode.complementReverse_append_self": ["propext", "Quot.sound"], "Holonics.Transport.HelicalCode.length_append_complementReverse": ["propext", "Quot.sound"], "Holonics.Transport.HelicalCode.firstHalfEquiv": ["propext", "Quot.sound"], "Holonics.Transport.HelicalCode.card_fixedWords": ["propext", "Classical.choice", "Quot.sound"], "Holonics.Transport.HelicalCode.phaseTransport_eq_reflectedReturn": ["propext"], "Holonics.Transport.HelicalCode.phaseTransport_mul_self": ["propext"], "Holonics.Transport.HelicalCode.phaseTransport_ne_self": ["propext", "Classical.choice", "Quot.sound"], "Holonics.Transport.HelicalCode.involutive_of_mul_self": ["Quot.sound"], "Holonics.Transport.HelicalCode.phaseTransport_pairing": ["propext", "sorryAx", "Classical.choice", "Quot.sound"], "Holonics.Transport.HelicalCode.phaseTransport_reciprocal": ["propext", "Classical.choice", "Quot.sound"], "Holonics.Transport.HelicalCode.complementReverse_involutive_at_phase": ["propext", "Classical.choice", "Quot.sound"], "Holonics.Transport.HelicalCode.even_length_of_fixed_at_phase": ["propext", "Classical.choice", "Quot.sound"], "Holonics.Transport.HelicalCode.card_fixedWords_at_phase": ["propext", "Classical.choice", "Quot.sound"], "Holonics.Transport.HelicalCode.crossingChange": [], "Holonics.Transport.HelicalCode.crossingChange_self": [], "Holonics.Transport.HelicalCode.crossingChange_of_ne": [], "Holonics.Transport.HelicalCode.sum_crossingChange_sub": ["propext", "Classical.choice", "Quot.sound"], "Holonics.Transport.HelicalCode.sum_crossingChange_eq_pm_two": ["propext", "Classical.choice", "Quot.sound"], "Holonics.Transport.HelicalCode.half_sum_crossingChange": ["propext", "Classical.choice", "Quot.sound"], "Holonics.Transport.HelicalCode.geom_smul_sum_sub": ["propext", "Classical.choice", "Quot.sound"], "Holonics.Transport.HelicalCode.one_sub_smul_geom_sum": ["propext", "Classical.choice", "Quot.sound"], "Holonics.Transport.HelicalCode.strandFace": ["propext"], "Holonics.Transport.HelicalCode.strandFace_singleton": ["propext"], "Holonics.Transport.HelicalCode.strandFace_append": ["propext"], "Holonics.Transport.HelicalCode.repeatWord": [], "Holonics.Transport.HelicalCode.strandFace_repeatWord": ["propext", "Classical.choice", "Quot.sound"], "Holonics.Transport.HelicalCode.strandFace_repeatWord_sub": ["propext", "Classical.choice", "Quot.sound"], "Holonics.Transport.HelicalCode.strandFace_repeatWord_one_sub": ["propext", "Classical.choice", "Quot.sound"], "Holonics.Transport.HelicalCode.strandFace_repeatWord_of_fixed": ["propext", "Classical.choice", "Quot.sound"], "Holonics.Transport.HelicalCode.strandFace_ofFn": ["propext", "Classical.choice", "Quot.sound"], "Holonics.Transport.HelicalCode.face": ["propext"], "Holonics.Transport.HelicalCode.face_ofFn": ["propext", "Classical.choice", "Quot.sound"], "Holonics.Transport.HelicalCode.J_zpow": ["propext"], "Holonics.Transport.HelicalCode.J_pow": ["propext"], "Holonics.Transport.HelicalCode.strandFace_complementReverse_nat": ["propext"], "Holonics.Transport.HelicalCode.face_complementReverse": ["propext"], "Holonics.Transport.HelicalCode.partner_map_involutive": ["propext"], "Holonics.Transport.HelicalCode.dihedral_swap": ["propext"], "Holonics.Transport.HelicalCode.dihedral_reflection_sq": ["propext"], "Holonics.Transport.HelicalCode.dihedral_conj": ["propext", "Quot.sound"], "Holonics.Transport.HelicalCode.halfTurn_inverts_shift": ["propext"], "Holonics.Transport.HelicalCode.frameShift": ["propext", "Quot.sound"], "Holonics.Transport.HelicalCode.frameFlip": ["propext", "Quot.sound"], "Holonics.Transport.HelicalCode.frameFlip_frameFlip": ["propext", "Quot.sound"], "Holonics.Transport.HelicalCode.frameFlip_frameShift_frameFlip": ["propext", "Quot.sound"], "Holonics.Transport.HelicalCode.frameShift_neg_frameShift": ["propext", "Quot.sound"], "Holonics.Transport.HelicalCode.frameShift_iterate": ["propext", "Quot.sound"], "Holonics.Transport.HelicalCode.dihedralFrame": ["propext", "Quot.sound"], "Holonics.Transport.HelicalCode.dihedralFrame_bijective": ["propext", "Quot.sound"], "Holonics.Transport.HelicalCode.kleinAct": ["propext"], "Holonics.Transport.HelicalCode.kleinAct_zero_right": ["propext"], "Holonics.Transport.HelicalCode.kleinAct_self": ["propext"], "Holonics.Transport.HelicalCode.kleinAct_assoc": ["propext"], "Holonics.Transport.HelicalCode.kleinAct_comm": ["propext"], "Holonics.Transport.HelicalCode.kleinAct_regular": ["propext", "Quot.sound"], "Holonics.Transport.HelicalCode.kleinAct_free_involution": ["propext"], "Holonics.Transport.HelicalCode.kleinAct_injective": ["propext"], "Holonics.Transport.HelicalCode.kleinAct_fourth": ["propext"], "Holonics.Transport.HelicalCode.free_involution_eq_kleinAct": ["propext"], "Holonics.Transport.HelicalCode.free_involution_iff": ["propext"], "Holonics.Transport.HelicalCode.card_free_involutions_fin4": ["propext", "Classical.choice", "Quot.sound"], "Holonics.Transport.HelicalCode.free_involution_commutes": ["propext"], "Holonics.Transport.HelicalCode.getElem?_complementReverse_rev": ["propext", "Quot.sound"], "Holonics.Transport.HelicalCode.slipped_contact_iff": ["propext", "Quot.sound"], "Holonics.Transport.HelicalCode.slipped_contacts_eq": ["propext", "Quot.sound"], "Holonics.Transport.HelicalCode.slipped_repairs_distinct": ["propext", "Quot.sound"], "Holonics.Transport.HelicalCode.duplexSigns": ["propext"], "Holonics.Transport.HelicalCode.duplex_passage_sum": ["propext", "Classical.choice", "Quot.sound"], "Holonics.Transport.HelicalCode.duplex_passage_linking": ["propext", "Classical.choice", "Quot.sound"], "Holonics.Transport.HelicalCode.duplex_passage_pm_four": ["propext", "Quot.sound"]}, "selector_count_matches": false, "standard_axioms_only": false, "metadata_unchanged": true, "broad_library_checked": false}

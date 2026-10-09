@@ -1,0 +1,17 @@
+{
+  "native_exit": 0,
+  "projection_exceeded": false,
+  "wall_ns": 19166227,
+  "events": [
+    {
+      "event": "test_completed",
+      "selector": "compression::keys::duplex::tests::a_changed_transport_on_the_same_helix_is_refused_its_founded_quotient",
+      "result": "ok",
+      "unit_wall_ns": 16648039,
+      "elapsed_ms": 16
+    }
+  ],
+  "expected_names": [
+    "compression::keys::duplex::tests::a_changed_transport_on_the_same_helix_is_refused_its_founded_quotient"
+  ]
+}

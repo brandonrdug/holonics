@@ -1,0 +1,163 @@
+{
+  "argv": [
+    "/usr/bin/python3.14",
+    "-B",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/prepare_ns_namespace_v1.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-import-20261008-v131/PREPARATION_REQUEST.json"
+  ],
+  "cwd": "/home/b/Workspaces/holonics",
+  "inputs": {
+    "/home/b/.local/lib/lean-4.33.0/bin/lean": {
+      "sha256": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550",
+      "bytes": 9024
+    },
+    "/home/b/.local/lib/lean-4.33.0/lib/lean/libInit_shared.so": {
+      "sha256": "2f96493ac9046f64ec7bcb78102a4c1e7cd9a7042487f246af45eda8a96667f5",
+      "bytes": 6232
+    },
+    "/home/b/.local/lib/lean-4.33.0/lib/lean/libLake_shared.so": {
+      "sha256": "feb2914d056638438613284b1f98278579ff8d8d99d0567e9823167806d150c0",
+      "bytes": 12311904
+    },
+    "/home/b/.local/lib/lean-4.33.0/lib/lean/libleanshared.so": {
+      "sha256": "f2a36d5e56b936afc07bdbea18542de0bce6a9977ebc325915272c300d992d42",
+      "bytes": 229196736
+    },
+    "/home/b/.local/lib/lean-4.33.0/lib/lean/libleanshared_1.so": {
+      "sha256": "2f96493ac9046f64ec7bcb78102a4c1e7cd9a7042487f246af45eda8a96667f5",
+      "bytes": 6232
+    },
+    "/home/b/.local/lib/lean-4.33.0/lib/lean/libleanshared_2.so": {
+      "sha256": "2f96493ac9046f64ec7bcb78102a4c1e7cd9a7042487f246af45eda8a96667f5",
+      "bytes": 6232
+    },
+    "/home/b/Workspaces/holonics/.local/hodge-cut-cartier-20261003/runner-recovery-02/import_sealer.py": {
+      "sha256": "b323b6177c66c48d27a6a39ae580220e0c908430d0bbfbc2c33aa6b5b48b36da",
+      "bytes": 13162
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/bounded_stage_memory_v120.py": {
+      "sha256": "5ebc628494a7bff53f01362475110002eedae3b6395517f394f9972c541eff41",
+      "bytes": 13550
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/canonical-partitioned-hodge-20261006/current-imports.v1.json": {
+      "sha256": "9702749138fadee7f50ca46a8f038c057be8ab8c8321592a07329670cf38f28d",
+      "bytes": 94560335
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/check_namespace_lookup_v1.py": {
+      "sha256": "9210e5aa18f9daeb7ac8ced18e253f08805577119a5f2b5e211017d9a873679c",
+      "bytes": 886
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/final_stage_memory_v120.py": {
+      "sha256": "b6913802127facc4945da4bbdd0f18cb5457cc8e03765b649653e6cfe12adfc4",
+      "bytes": 11218
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v129/current-imports.json": {
+      "sha256": "de0a36685fabceca74edd9183582410225e3bf73d48a4365a3124d0d831db2d6",
+      "bytes": 46701723
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130/KERNEL_VALIDATION.json": {
+      "sha256": "a47a92b8dcd70a48ab464c3e67ad09e6366c4d3f7c29f5302f6897b8cfa24aeb",
+      "bytes": 8413
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130/SOURCE_ADMISSION.json": {
+      "sha256": "94672f78aa153557b082857251a057576d4609374e750908746b9b8f9cf835d9",
+      "bytes": 6444
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130/current-imports.json": {
+      "sha256": "5207ff96445d72a7166dee4690abf9c6f07dec11c177e8ceff3dfab949b4e68a",
+      "bytes": 46708240
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130/submitted/lean/HolonicsResearch.lean": {
+      "sha256": "472ebcea28d5141f930653c0bb1f679e74c06d60d69adbc7d8a6af8153eac522",
+      "bytes": 69748
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130-compile.acceptance.json": {
+      "sha256": "1359e8a45ffcbdb41659e9ca83a5e846b5ebbeee1ce5a996981839ff3bc9c044",
+      "bytes": 378
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130-compile.release.json": {
+      "sha256": "8bfb6b1fa6a69bf92c7540d27eb343fdffd4afc3bd9fda89afeb2e1b662b7d6e",
+      "bytes": 175
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-import-20261008-v131/CONSUMER_SCOPE.json": {
+      "sha256": "4c527289cb875e6c264ac1ab575de3bc92b265737c17566fd9a25d66257576f8",
+      "bytes": 1551
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-import-20261008-v131/PREPARATION_REQUEST.json": {
+      "sha256": "c835deed46a8ec5be4963036312a9de18401fc0373beacfa0d382006ddef8acb",
+      "bytes": 6007
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-import-20261008-v131/PROVIDER_NAMESPACE.json": {
+      "sha256": "4b7dd4bbef30b59a96e5f291bd93b4d455fe9bff1f6ca7aeb300d79210359ce7",
+      "bytes": 18888
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-import-20261008-v131/source-v1/HelicalImportConsumer.lean": {
+      "sha256": "6fc368d9303f1d98ae3b1ac20ae3fd766b5940280a716a95e1df80b2577637c2",
+      "bytes": 590
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-import-20261008-v131-prep.config.json": {
+      "sha256": "3936d23aa78e65d45e2cfeebc6e16eec3cc830b448cbc1140a8299be20d755e7",
+      "bytes": 10986
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/integration-lean-bd29-20261008/importer1/current-imports.v117.json": {
+      "sha256": "1628dd0f01a7f64f5e6d008e496d4be84938ce24dd60d3afee1c01bfc939ca39",
+      "bytes": 50055428
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/leased_stage_memory_v120.py": {
+      "sha256": "1191c531c35016eada85739a5ca94dabefd9074c75781e4a20fb28d4b887f1d1",
+      "bytes": 5538
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/materialize_helical_import_v131.py": {
+      "sha256": "7a9132254581f04bdb9489b824dbacd3c741fff7a2cf364ec5311ae3be471433",
+      "bytes": 8110
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/prepare_ns_namespace_v1.py": {
+      "sha256": "85b5a0626525cf14d6dbf8ecf9098ee8804df8facf1cad8c5e2f8eeb36aeea7c",
+      "bytes": 10766
+    },
+    "/usr/bin/env": {
+      "sha256": "795586b56f6da560c3cf4e25c1a6e4f274a8576906e88d94c207db7255b07163",
+      "bytes": 72408
+    },
+    "/usr/bin/python3.14": {
+      "sha256": "ac12d99c156d3c0ec708a2baf664d35b74f455572fe35fd57faa420ade5c3845",
+      "bytes": 14424
+    },
+    "/usr/bin/timeout": {
+      "sha256": "1425639cf3339b1117536df91cd4ba3229f8fa84e87322dee24e87121ed3feb3",
+      "bytes": 68320
+    }
+  },
+  "source_scope": "Exact newly added HolonicsResearch import line plus eight consumed accepted axiom queries; no full research library or native consumer acceptance",
+  "CPU_count": 1,
+  "per_process_RLIMIT_CPU_seconds": 17,
+  "CPU_affinity": [
+    0
+  ],
+  "cap_ns": 17000000000,
+  "projection_ns": 17000000000,
+  "system_floor_MemAvailable_KiB": 4194304,
+  "system_floor_sampling_period_ns": 10000000,
+  "host_MemTotal_bytes": 32746164224,
+  "host_MemAvailable_bytes": 16409022464,
+  "minimum_MemAvailable_bytes": 8589934592,
+  "group_memory_max_bytes": 4294967296,
+  "group_swap_max_bytes": 0,
+  "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/holonics-prune-admission-helical-code-import-20261008-v131-prep.service",
+  "memory_events_before": {
+    "low": 0,
+    "high": 0,
+    "max": 0,
+    "oom": 0,
+    "oom_kill": 0,
+    "oom_group_kill": 0,
+    "sock_throttled": 0
+  },
+  "group_cap_includes_page_cache_and_is_stricter_than_RSS": true,
+  "sealed_before_execution": true,
+  "aggregate_cpu_limit_us": 17000000,
+  "aggregate_cpu_source": "dedicated cgroup cpu.stat usage_usec, including exited children and controller",
+  "aggregate_cpu_at_seal_us": 302208,
+  "aggregate_cpu_stop_margin_us": 1000000,
+  "aggregate_cpu_stop_us": 16000000
+}

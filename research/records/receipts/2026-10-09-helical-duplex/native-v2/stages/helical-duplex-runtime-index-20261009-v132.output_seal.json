@@ -1,0 +1,203 @@
+{
+  "exit": 0,
+  "wall_ns": 43223117,
+  "CPU_count": 1,
+  "CPU_affinity": [
+    0
+  ],
+  "CPU_user_us": 21316,
+  "CPU_system_us": 15573,
+  "CPU_reading_grain_ns": 1000,
+  "timing_source": "monotonic_ns wall; glibc wait4 integer timeval CPU",
+  "peak_child_RSS_KiB": 24760,
+  "cap_ns": 17000000000,
+  "projection_ns": 17000000000,
+  "projection_kill_triggered": false,
+  "system_floor_breached": false,
+  "system_floor_sampling_period_ns": 10000000,
+  "group_memory_max_bytes": 8589934592,
+  "group_memory_peak_bytes": 40415232,
+  "group_memory_current_bytes": 25710592,
+  "memory_events_after": {
+    "low": 0,
+    "high": 0,
+    "max": 0,
+    "oom": 0,
+    "oom_kill": 0,
+    "oom_group_kill": 0,
+    "sock_throttled": 0
+  },
+  "memory_events_delta": {
+    "low": 0,
+    "high": 0,
+    "max": 0,
+    "oom": 0,
+    "oom_kill": 0,
+    "oom_group_kill": 0,
+    "sock_throttled": 0
+  },
+  "stdout": {
+    "sha256": "c434dffbe72dcadb7f3b43c8c485a25c8c9d75ac87791276a70151606adf6324",
+    "bytes": 441
+  },
+  "stderr": {
+    "sha256": "054e7a96e60ca6c1c022dc2f6c34166a607bcf9f0482d2624d46137f20f8f58c",
+    "bytes": 133
+  },
+  "outputs": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-20261009-v132/index.RUNTIME_RESULT.json": {
+      "sha256": "b8a904149c608feddcc56e971640972cb999afc4c9c77fe6a2dc34e82cc4beae",
+      "bytes": 472
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-20261009-v132/index.native.stdout": {
+      "sha256": "977d961b849da37956ec2cdaa3354365f4689543b17a8aadbb8a6ae3ecea941b",
+      "bytes": 228
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-20261009-v132/index.native.stderr": {
+      "sha256": "054e7a96e60ca6c1c022dc2f6c34166a607bcf9f0482d2624d46137f20f8f58c",
+      "bytes": 133
+    }
+  },
+  "all_outputs_present": true,
+  "inputs_unchanged": true,
+  "within_projection": true,
+  "sealed_before_audit": true,
+  "aggregate_cpu_limit_us": 17000000,
+  "aggregate_cpu_used_us": 233706,
+  "aggregate_cpu_guard_triggered": false,
+  "aggregate_cpu_samples": [
+    {
+      "since_start_ns": 5567521,
+      "usage_usec": 150368
+    },
+    {
+      "since_start_ns": 6781004,
+      "usage_usec": 151705
+    },
+    {
+      "since_start_ns": 7891294,
+      "usage_usec": 152810
+    },
+    {
+      "since_start_ns": 8997046,
+      "usage_usec": 153897
+    },
+    {
+      "since_start_ns": 10102807,
+      "usage_usec": 154994
+    },
+    {
+      "since_start_ns": 11209130,
+      "usage_usec": 156088
+    },
+    {
+      "since_start_ns": 12310383,
+      "usage_usec": 157188
+    },
+    {
+      "since_start_ns": 13401968,
+      "usage_usec": 158275
+    },
+    {
+      "since_start_ns": 14486140,
+      "usage_usec": 159353
+    },
+    {
+      "since_start_ns": 15570311,
+      "usage_usec": 160433
+    },
+    {
+      "since_start_ns": 16683997,
+      "usage_usec": 161541
+    },
+    {
+      "since_start_ns": 17778618,
+      "usage_usec": 162630
+    },
+    {
+      "since_start_ns": 18862158,
+      "usage_usec": 163686
+    },
+    {
+      "since_start_ns": 19945066,
+      "usage_usec": 164765
+    },
+    {
+      "since_start_ns": 21027154,
+      "usage_usec": 165842
+    },
+    {
+      "since_start_ns": 22113419,
+      "usage_usec": 166923
+    },
+    {
+      "since_start_ns": 23199363,
+      "usage_usec": 168004
+    },
+    {
+      "since_start_ns": 24289285,
+      "usage_usec": 169083
+    },
+    {
+      "since_start_ns": 25392192,
+      "usage_usec": 170180
+    },
+    {
+      "since_start_ns": 26493385,
+      "usage_usec": 171275
+    },
+    {
+      "since_start_ns": 27629483,
+      "usage_usec": 172404
+    },
+    {
+      "since_start_ns": 28732990,
+      "usage_usec": 173531
+    },
+    {
+      "since_start_ns": 29838522,
+      "usage_usec": 174592
+    },
+    {
+      "since_start_ns": 30940296,
+      "usage_usec": 175686
+    },
+    {
+      "since_start_ns": 32042751,
+      "usage_usec": 176782
+    },
+    {
+      "since_start_ns": 33147411,
+      "usage_usec": 177879
+    },
+    {
+      "since_start_ns": 34268671,
+      "usage_usec": 178991
+    },
+    {
+      "since_start_ns": 35371257,
+      "usage_usec": 180088
+    },
+    {
+      "since_start_ns": 36472199,
+      "usage_usec": 180916
+    },
+    {
+      "since_start_ns": 39787541,
+      "usage_usec": 183477
+    },
+    {
+      "since_start_ns": 40920102,
+      "usage_usec": 184604
+    },
+    {
+      "since_start_ns": 42016056,
+      "usage_usec": 185694
+    }
+  ],
+  "aggregate_cpu_scope": "whole dedicated cgroup, including controller and already-reaped descendants",
+  "CPU_kernel_hard_total_limit": false,
+  "aggregate_cpu_stop_margin_us": 1000000,
+  "aggregate_cpu_stop_us": 16000000,
+  "acceptance_provisional_until_external_final_CPU_read": true
+}

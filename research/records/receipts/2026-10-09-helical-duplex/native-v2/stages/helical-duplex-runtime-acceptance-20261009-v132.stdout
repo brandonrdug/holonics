@@ -1,0 +1,47 @@
+
+running 21 tests
+test compression::keys::duplex::tests::a_changed_transport_on_the_same_helix_is_refused_its_founded_quotient ... ok
+UNIT_EVENT {"event": "test_completed", "selector": "compression::keys::duplex::tests::a_changed_transport_on_the_same_helix_is_refused_its_founded_quotient", "result": "ok", "unit_wall_ns": 15312177, "elapsed_ms": 15}
+test compression::keys::duplex::tests::a_malformed_partner_contact_is_refused_before_any_index_arithmetic ... ok
+UNIT_EVENT {"event": "test_completed", "selector": "compression::keys::duplex::tests::a_malformed_partner_contact_is_refused_before_any_index_arithmetic", "result": "ok", "unit_wall_ns": 249137, "elapsed_ms": 15}
+test compression::keys::duplex::tests::a_pairing_is_a_fixed_point_free_involution_and_its_complement_reverse_an_anti_automorphism ... ok
+UNIT_EVENT {"event": "test_completed", "selector": "compression::keys::duplex::tests::a_pairing_is_a_fixed_point_free_involution_and_its_complement_reverse_an_anti_automorphism", "result": "ok", "unit_wall_ns": 10472469, "elapsed_ms": 26}
+test compression::keys::duplex::tests::a_repair_family_is_released_exactly_when_every_coordinate_is_constant ... ok
+test compression::keys::duplex::tests::a_strand_that_is_no_passage_returns_its_located_defect_and_never_a_duplex ... UNIT_EVENT {"event": "test_completed", "selector": "compression::keys::duplex::tests::a_repair_family_is_released_exactly_when_every_coordinate_is_constant", "result": "ok", "unit_wall_ns": 894877179, "elapsed_ms": 920}
+ok
+UNIT_EVENT {"event": "test_completed", "selector": "compression::keys::duplex::tests::a_strand_that_is_no_passage_returns_its_located_defect_and_never_a_duplex", "result": "ok", "unit_wall_ns": 10548923, "elapsed_ms": 931}
+test compression::keys::duplex::tests::a_substitution_carries_a_signed_shift_that_moves_every_later_lift ... ok
+UNIT_EVENT {"event": "test_completed", "selector": "compression::keys::duplex::tests::a_substitution_carries_a_signed_shift_that_moves_every_later_lift", "result": "ok", "unit_wall_ns": 358211, "elapsed_ms": 931}
+test compression::keys::duplex::tests::a_template_frame_collapses_each_slipped_factor_and_the_round_trip_holds ... ok
+UNIT_EVENT {"event": "test_completed", "selector": "compression::keys::duplex::tests::a_template_frame_collapses_each_slipped_factor_and_the_round_trip_holds", "result": "ok", "unit_wall_ns": 10389505, "elapsed_ms": 942}
+test compression::keys::duplex::tests::an_empty_fit_constrained_family_is_the_typed_no_compatible_source_defect ... ok
+UNIT_EVENT {"event": "test_completed", "selector": "compression::keys::duplex::tests::an_empty_fit_constrained_family_is_the_typed_no_compatible_source_defect", "result": "ok", "unit_wall_ns": 22389195, "elapsed_ms": 964}
+test compression::keys::duplex::tests::an_unreached_lift_is_refused_and_never_substituted ... ok
+UNIT_EVENT {"event": "test_completed", "selector": "compression::keys::duplex::tests::an_unreached_lift_is_refused_and_never_substituted", "result": "ok", "unit_wall_ns": 2845741, "elapsed_ms": 967}
+test compression::keys::duplex::tests::coordinated_substitutions_are_outside_the_coverage_and_counted_against_the_truth ... ok
+test compression::keys::duplex::tests::coprime_residues_recover_the_lift_and_the_winding_keeps_the_carry ... UNIT_EVENT {"event": "test_completed", "selector": "compression::keys::duplex::tests::coordinated_substitutions_are_outside_the_coverage_and_counted_against_the_truth", "result": "ok", "unit_wall_ns": 470671005, "elapsed_ms": 1438}
+ok
+UNIT_EVENT {"event": "test_completed", "selector": "compression::keys::duplex::tests::coprime_residues_recover_the_lift_and_the_winding_keeps_the_carry", "result": "ok", "unit_wall_ns": 205515, "elapsed_ms": 1438}
+test compression::keys::duplex::tests::every_supported_state_extends_to_an_actual_member ... ok
+UNIT_EVENT {"event": "test_completed", "selector": "compression::keys::duplex::tests::every_supported_state_extends_to_an_actual_member", "result": "ok", "unit_wall_ns": 41291668, "elapsed_ms": 1479}
+test compression::keys::duplex::tests::placement_pairs_the_partner_before_the_quotient_on_unseen_keys_and_lengths ... ok
+test compression::keys::duplex::tests::single_strand_damage_slips_exactly_the_damaged_contacts ... UNIT_EVENT {"event": "test_completed", "selector": "compression::keys::duplex::tests::placement_pairs_the_partner_before_the_quotient_on_unseen_keys_and_lengths", "result": "ok", "unit_wall_ns": 2598338, "elapsed_ms": 1482}
+ok
+test compression::keys::duplex::tests::the_family_diameter_is_the_maximum_over_its_coordinates_and_the_supports_are_exact ... UNIT_EVENT {"event": "test_completed", "selector": "compression::keys::duplex::tests::single_strand_damage_slips_exactly_the_damaged_contacts", "result": "ok", "unit_wall_ns": 20107932, "elapsed_ms": 1502}
+ok
+UNIT_EVENT {"event": "test_completed", "selector": "compression::keys::duplex::tests::the_family_diameter_is_the_maximum_over_its_coordinates_and_the_supports_are_exact", "result": "ok", "unit_wall_ns": 328414492, "elapsed_ms": 1830}
+test compression::keys::duplex::tests::the_held_witnesses_are_actual_members_that_attain_the_diameter ... ok
+UNIT_EVENT {"event": "test_completed", "selector": "compression::keys::duplex::tests::the_held_witnesses_are_actual_members_that_attain_the_diameter", "result": "ok", "unit_wall_ns": 33873280, "elapsed_ms": 1864}
+test compression::keys::duplex::tests::the_lifts_carry_the_winding_and_step_the_phase ... ok
+test compression::keys::duplex::tests::the_receipts_state_which_seeds_are_development_and_which_are_acceptance ... UNIT_EVENT {"event": "test_completed", "selector": "compression::keys::duplex::tests::the_lifts_carry_the_winding_and_step_the_phase", "result": "ok", "unit_wall_ns": 928600, "elapsed_ms": 1865}
+ok
+test compression::keys::duplex::tests::the_supports_keep_the_carry_and_the_class_reads_the_winding ... UNIT_EVENT {"event": "test_completed", "selector": "compression::keys::duplex::tests::the_receipts_state_which_seeds_are_development_and_which_are_acceptance", "result": "ok", "unit_wall_ns": 1113727, "elapsed_ms": 1866}
+ok
+test compression::keys::duplex::tests::the_transport_alone_resolves_the_side_when_the_key_is_known ... UNIT_EVENT {"event": "test_completed", "selector": "compression::keys::duplex::tests::the_supports_keep_the_carry_and_the_class_reads_the_winding", "result": "ok", "unit_wall_ns": 9726872, "elapsed_ms": 1876}
+ok
+UNIT_EVENT {"event": "test_completed", "selector": "compression::keys::duplex::tests::the_transport_alone_resolves_the_side_when_the_key_is_known", "result": "ok", "unit_wall_ns": 16503319, "elapsed_ms": 1892}
+test compression::keys::duplex::tests::the_unit_rate_slip_vanishes_exactly_on_the_complement ... ok
+UNIT_EVENT {"event": "test_completed", "selector": "compression::keys::duplex::tests::the_unit_rate_slip_vanishes_exactly_on_the_complement", "result": "ok", "unit_wall_ns": 25729253, "elapsed_ms": 1918}
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 1120 filtered out; finished in 1.92s
+

@@ -1,0 +1,7 @@
+
+running 1 test
+test compression::keys::duplex::tests::the_family_diameter_is_the_maximum_over_its_coordinates_and_the_supports_are_exact ... ok
+UNIT_EVENT {"event": "test_completed", "selector": "compression::keys::duplex::tests::the_family_diameter_is_the_maximum_over_its_coordinates_and_the_supports_are_exact", "result": "ok", "unit_wall_ns": 1183199259, "elapsed_ms": 1183}
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1140 filtered out; finished in 1.18s
+

@@ -212,6 +212,37 @@ impl CarryHelix {
         self.periods.iter().map(|&d| lift % d).collect()
     }
 
+    /// **The lift of a residue tuple**: the unique `ℓ ∈ [0, D)` with `residues(ℓ) = r`, the inverse
+    /// of [`CarryHelix::residues`] on the declared fundamental domain.
+    ///
+    /// [proved-derived] The periods are pairwise coprime, so two addresses below the product with
+    /// equal residues are equal and every tuple below the periods is attained (`D` addresses, `D`
+    /// tuples): Lean `HNN/Prediction.joint_residue_determines_position`, the Chinese remainder
+    /// theorem. The lift is rebuilt ring by ring, `ℓ_g = ℓ_(g−1) + (d_0⋯d_(g−1)) t_g` with the one
+    /// digit `t_g < d_g` that matches `r_g` (Garner's recurrence, a scan of at most `d_g`
+    /// candidates a ring). The residues fix the lift only modulo the product: the absolute position
+    /// needs the whole winding `ℓ div D` (kept by [`LocatedTransport::lifts`]) or a declared
+    /// fundamental domain, here `[0, D)`. Refused with a wrong length or a residue `r_g ≥ d_g`.
+    pub fn of_residues(&self, residues: &[u64]) -> Result<u64, CompressionError> {
+        if residues.len() != self.periods.len()
+            || residues.iter().zip(&self.periods).any(|(&r, &d)| r >= d)
+        {
+            return Err(helix_refusal(
+                "a residue chart has one residue below each ring's period",
+            ));
+        }
+        let mut lift = residues[0];
+        let mut modulus = self.periods[0];
+        for (&r, &d) in residues.iter().zip(&self.periods).skip(1) {
+            let turns = (0..d)
+                .find(|&t| (lift + modulus * t) % d == r)
+                .ok_or_else(|| helix_refusal("pairwise coprime rings determine a lift"))?;
+            lift += modulus * turns;
+            modulus *= d;
+        }
+        Ok(lift)
+    }
+
     /// The lift of digits, `Σ_g τ_g ∏_(h<g) d_h`.
     pub fn of_digits(&self, digits: &[u64]) -> u64 {
         digits
@@ -456,6 +487,35 @@ impl LocatedTransport {
                 Some(class)
             })
             .collect()
+    }
+
+    /// **The absolute lifts of a word from a key**: the `n + 1` lifts
+    /// `ℓ_0 = key mod D`, `ℓ_(k+1) = ℓ_k + A(u_k)` with no reduction. It reads no label.
+    ///
+    /// [definition] Helix = circle + carry: each lift is its phase `ℓ mod D` (what the receiving
+    /// chart reads) and its whole winding `ℓ div D` (the carry), `ℓ = (ℓ div D) D + ℓ mod D`
+    /// (Lean `Geometry/PhaseCarry.winding_add`). The driven reading's private stepping
+    /// (`driven_patches`) takes the same steps modulo `D`; this keeps the winding it discards, and a
+    /// consumer takes the quotient to `ℤ/D` only after the terminal carry probe is read. Refused
+    /// with a class outside the advances and with an overflow of the machine word.
+    pub fn lifts(&self, key: u64, word: &[usize]) -> Result<Vec<u64>, CompressionError> {
+        let mut lift = key % self.helix.period();
+        let mut lifts = Vec::with_capacity(word.len() + 1);
+        lifts.push(lift);
+        for &class in word {
+            let advance = *self
+                .advances
+                .get(class)
+                .ok_or(CompressionError::IndexOutside {
+                    index: class,
+                    population: self.advances.len(),
+                })?;
+            lift = lift
+                .checked_add(advance)
+                .ok_or_else(|| helix_refusal("an absolute lift stays within the machine word"))?;
+            lifts.push(lift);
+        }
+        Ok(lifts)
     }
 
     /// **A passage's key fibre**: every key whose regenerated passage is the passage.

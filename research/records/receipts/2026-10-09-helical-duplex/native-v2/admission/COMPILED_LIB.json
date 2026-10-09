@@ -1,0 +1,42 @@
+{
+  "row": {
+    "reason": "compiler-artifact",
+    "package_id": "path+file:///home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-20261009-v132/source-v2/crates/holonics#0.1.0",
+    "manifest_path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-20261009-v132/source-v2/crates/holonics/Cargo.toml",
+    "target": {
+      "kind": [
+        "lib"
+      ],
+      "crate_types": [
+        "lib"
+      ],
+      "name": "holonics",
+      "src_path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-20261009-v132/source-v2/crates/holonics/src/lib.rs",
+      "edition": "2024",
+      "doc": true,
+      "doctest": true,
+      "test": true
+    },
+    "profile": {
+      "opt_level": "0",
+      "debuginfo": 0,
+      "debug_assertions": true,
+      "overflow_checks": true,
+      "test": true
+    },
+    "features": [],
+    "filenames": [
+      "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-20261009-v132/cache-v2/debug/deps/holonics-70b68d2f7e1f6408"
+    ],
+    "executable": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-20261009-v132/cache-v2/debug/deps/holonics-70b68d2f7e1f6408",
+    "fresh": false
+  },
+  "executable_pin": {
+    "sha256": "dc7e3910b055255a9f0e23aba2d43fc284c59561efba5994224c9aa812904e1c",
+    "bytes": 73564784
+  },
+  "source_admission": {
+    "sha256": "28d0b5460b496c7d17d2ce9e4ac211ccead27f7579a49d129d8da14be8c947bd",
+    "bytes": 59785
+  }
+}

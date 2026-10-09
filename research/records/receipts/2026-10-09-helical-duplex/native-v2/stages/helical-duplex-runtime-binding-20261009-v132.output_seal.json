@@ -1,0 +1,271 @@
+{
+  "exit": 0,
+  "wall_ns": 62752064,
+  "CPU_count": 1,
+  "CPU_affinity": [
+    0
+  ],
+  "CPU_user_us": 36878,
+  "CPU_system_us": 17837,
+  "CPU_reading_grain_ns": 1000,
+  "timing_source": "monotonic_ns wall; glibc wait4 integer timeval CPU",
+  "peak_child_RSS_KiB": 24944,
+  "cap_ns": 17000000000,
+  "projection_ns": 17000000000,
+  "projection_kill_triggered": false,
+  "system_floor_breached": false,
+  "system_floor_sampling_period_ns": 10000000,
+  "group_memory_max_bytes": 8589934592,
+  "group_memory_peak_bytes": 38350848,
+  "group_memory_current_bytes": 23396352,
+  "memory_events_after": {
+    "low": 0,
+    "high": 0,
+    "max": 0,
+    "oom": 0,
+    "oom_kill": 0,
+    "oom_group_kill": 0,
+    "sock_throttled": 0
+  },
+  "memory_events_delta": {
+    "low": 0,
+    "high": 0,
+    "max": 0,
+    "oom": 0,
+    "oom_kill": 0,
+    "oom_group_kill": 0,
+    "sock_throttled": 0
+  },
+  "stdout": {
+    "sha256": "efd48b625d8e2b3af4c52d021083b62429e00a26ca92c14211b46a665a16d60d",
+    "bytes": 449
+  },
+  "stderr": {
+    "sha256": "5a3d212fc7648b4130d7cd083969427fb96c4b9908c647cfe8e573c4ec327a2b",
+    "bytes": 212
+  },
+  "outputs": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-20261009-v132/binding.RUNTIME_RESULT.json": {
+      "sha256": "c4bc2c4afd6215069360b2ce915aa6fff53d0dc241927027489cc2ebbc4994ee",
+      "bytes": 481
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-20261009-v132/binding.native.stdout": {
+      "sha256": "c796d216724cc149ebe725ef0cb85444bcc861e075b0e0d099b56e954955e9d8",
+      "bytes": 231
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-20261009-v132/binding.native.stderr": {
+      "sha256": "5a3d212fc7648b4130d7cd083969427fb96c4b9908c647cfe8e573c4ec327a2b",
+      "bytes": 212
+    }
+  },
+  "all_outputs_present": true,
+  "inputs_unchanged": true,
+  "within_projection": true,
+  "sealed_before_audit": true,
+  "aggregate_cpu_limit_us": 17000000,
+  "aggregate_cpu_used_us": 250348,
+  "aggregate_cpu_guard_triggered": false,
+  "aggregate_cpu_samples": [
+    {
+      "since_start_ns": 5480297,
+      "usage_usec": 145751
+    },
+    {
+      "since_start_ns": 6711344,
+      "usage_usec": 147107
+    },
+    {
+      "since_start_ns": 7817566,
+      "usage_usec": 148211
+    },
+    {
+      "since_start_ns": 8922196,
+      "usage_usec": 149307
+    },
+    {
+      "since_start_ns": 10025944,
+      "usage_usec": 150404
+    },
+    {
+      "since_start_ns": 11128239,
+      "usage_usec": 151494
+    },
+    {
+      "since_start_ns": 12232006,
+      "usage_usec": 152593
+    },
+    {
+      "since_start_ns": 13330264,
+      "usage_usec": 153688
+    },
+    {
+      "since_start_ns": 14417180,
+      "usage_usec": 154767
+    },
+    {
+      "since_start_ns": 15503105,
+      "usage_usec": 155847
+    },
+    {
+      "since_start_ns": 16621079,
+      "usage_usec": 156960
+    },
+    {
+      "since_start_ns": 17709769,
+      "usage_usec": 158044
+    },
+    {
+      "since_start_ns": 18794832,
+      "usage_usec": 159122
+    },
+    {
+      "since_start_ns": 19878832,
+      "usage_usec": 160201
+    },
+    {
+      "since_start_ns": 20962152,
+      "usage_usec": 161280
+    },
+    {
+      "since_start_ns": 22045381,
+      "usage_usec": 162358
+    },
+    {
+      "since_start_ns": 23138930,
+      "usage_usec": 163418
+    },
+    {
+      "since_start_ns": 24229573,
+      "usage_usec": 164500
+    },
+    {
+      "since_start_ns": 25339272,
+      "usage_usec": 165601
+    },
+    {
+      "since_start_ns": 26444052,
+      "usage_usec": 166696
+    },
+    {
+      "since_start_ns": 27583477,
+      "usage_usec": 167826
+    },
+    {
+      "since_start_ns": 28698015,
+      "usage_usec": 168930
+    },
+    {
+      "since_start_ns": 29802484,
+      "usage_usec": 170027
+    },
+    {
+      "since_start_ns": 30906252,
+      "usage_usec": 171123
+    },
+    {
+      "since_start_ns": 32012685,
+      "usage_usec": 172222
+    },
+    {
+      "since_start_ns": 33085405,
+      "usage_usec": 173288
+    },
+    {
+      "since_start_ns": 34186267,
+      "usage_usec": 174380
+    },
+    {
+      "since_start_ns": 35283843,
+      "usage_usec": 175469
+    },
+    {
+      "since_start_ns": 37068437,
+      "usage_usec": 177246
+    },
+    {
+      "since_start_ns": 38207601,
+      "usage_usec": 178369
+    },
+    {
+      "since_start_ns": 39309715,
+      "usage_usec": 179467
+    },
+    {
+      "since_start_ns": 40406691,
+      "usage_usec": 180557
+    },
+    {
+      "since_start_ns": 41505539,
+      "usage_usec": 181649
+    },
+    {
+      "since_start_ns": 42602344,
+      "usage_usec": 182740
+    },
+    {
+      "since_start_ns": 43699299,
+      "usage_usec": 183831
+    },
+    {
+      "since_start_ns": 44795483,
+      "usage_usec": 184922
+    },
+    {
+      "since_start_ns": 45888841,
+      "usage_usec": 185997
+    },
+    {
+      "since_start_ns": 46982781,
+      "usage_usec": 187087
+    },
+    {
+      "since_start_ns": 48083072,
+      "usage_usec": 188181
+    },
+    {
+      "since_start_ns": 49222096,
+      "usage_usec": 189306
+    },
+    {
+      "since_start_ns": 50336544,
+      "usage_usec": 190412
+    },
+    {
+      "since_start_ns": 51446924,
+      "usage_usec": 191517
+    },
+    {
+      "since_start_ns": 52551724,
+      "usage_usec": 192615
+    },
+    {
+      "since_start_ns": 53666322,
+      "usage_usec": 193717
+    },
+    {
+      "since_start_ns": 57089415,
+      "usage_usec": 196149
+    },
+    {
+      "since_start_ns": 58211097,
+      "usage_usec": 197270
+    },
+    {
+      "since_start_ns": 59341324,
+      "usage_usec": 198390
+    },
+    {
+      "since_start_ns": 60446635,
+      "usage_usec": 199490
+    },
+    {
+      "since_start_ns": 61546415,
+      "usage_usec": 200584
+    }
+  ],
+  "aggregate_cpu_scope": "whole dedicated cgroup, including controller and already-reaped descendants",
+  "CPU_kernel_hard_total_limit": false,
+  "aggregate_cpu_stop_margin_us": 1000000,
+  "aggregate_cpu_stop_us": 16000000,
+  "acceptance_provisional_until_external_final_CPU_read": true
+}

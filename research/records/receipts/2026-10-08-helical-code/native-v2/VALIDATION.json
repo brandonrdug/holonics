@@ -1,0 +1,125 @@
+{
+  "accepted_source_commit": "0669655169b8c2b7c76980e0aaff082458def032",
+  "accepted_source_tree": "502b55395da01ad6643ec653f7a567292f5ba892",
+  "accepted_source_SHA256": "015948248d21d3b6bd98b21741c02f2fb732eef7013265c556bbc6f1555b9fe8",
+  "kernel_accepted": true,
+  "module_compiler_exit": 0,
+  "module_axiom_query_count": 81,
+  "standard_axioms_only": true,
+  "no_sorryAx": true,
+  "import_consumer_accepted": true,
+  "import_consumer_axiom_query_count": 8,
+  "actual_research_root_new_import_line": 297,
+  "unchanged_Default_Framework_closure": true,
+  "topology_delta_comments_only": true,
+  "retained_import_sources_and_actual_object_parts_sealed": true,
+  "stages": [
+    {
+      "label": "helical-code-20261008-v130-prep",
+      "passed": true,
+      "projection_ns": 17000000000,
+      "wall_ns": 6324585137,
+      "measured_over_projected_ratio": [
+        6324585137,
+        17000000000
+      ],
+      "aggregate_CPU_ns": 5471896000,
+      "aggregate_CPU_cap_us": 17000000,
+      "group_cap_bytes": 4294967296,
+      "group_peak_bytes": 360140800,
+      "peak_child_RSS_KiB": 323236,
+      "inputs_unchanged": true,
+      "projection_limit_not_exceeded": true,
+      "quiescence_confirmed": true,
+      "released": true
+    },
+    {
+      "label": "helical-code-20261008-v130-compile",
+      "passed": true,
+      "projection_ns": 21132554884,
+      "wall_ns": 7650204678,
+      "measured_over_projected_ratio": [
+        7650204678,
+        21132554884
+      ],
+      "aggregate_CPU_ns": 6659715000,
+      "aggregate_CPU_cap_us": 17000000,
+      "group_cap_bytes": 8589934592,
+      "group_peak_bytes": 569438208,
+      "peak_child_RSS_KiB": 3484632,
+      "inputs_unchanged": true,
+      "projection_limit_not_exceeded": true,
+      "quiescence_confirmed": true,
+      "released": true
+    },
+    {
+      "label": "helical-code-import-20261008-v131-prep",
+      "passed": true,
+      "projection_ns": 17000000000,
+      "wall_ns": 6050809771,
+      "measured_over_projected_ratio": [
+        6050809771,
+        17000000000
+      ],
+      "aggregate_CPU_ns": 5629734000,
+      "aggregate_CPU_cap_us": 17000000,
+      "group_cap_bytes": 4294967296,
+      "group_peak_bytes": 361066496,
+      "peak_child_RSS_KiB": 323292,
+      "inputs_unchanged": true,
+      "projection_limit_not_exceeded": true,
+      "quiescence_confirmed": true,
+      "released": true
+    },
+    {
+      "label": "helical-code-import-20261008-v131-compile",
+      "passed": true,
+      "projection_ns": 21132554884,
+      "wall_ns": 3159255262,
+      "measured_over_projected_ratio": [
+        3159255262,
+        21132554884
+      ],
+      "aggregate_CPU_ns": 3021431000,
+      "aggregate_CPU_cap_us": 17000000,
+      "group_cap_bytes": 8589934592,
+      "group_peak_bytes": 450232320,
+      "peak_child_RSS_KiB": 3393596,
+      "inputs_unchanged": true,
+      "projection_limit_not_exceeded": true,
+      "quiescence_confirmed": true,
+      "released": true
+    }
+  ],
+  "native_queue_free_at_completion": true,
+  "original_failed_v1_receipt": "../native-v1/VALIDATION.json",
+  "v1_original_source_commit": "12fcee78736a4e947adfbc0e76cb5bec2b9b4a68",
+  "original_failure_preserved": true,
+  "source_refinement": "Explicit permutation argument/coercion in phaseTransport_pairing plus anti-homomorphism and positive-period prose; all other equations/proofs unchanged",
+  "queue_parser_fix": "Ownedv5capturesapostropheinsidequalified declarationname; v1raw81reconciliationretained, nounchangedcompilerrepeat",
+  "review_scope": {
+    "uniform_clock_and_constant_openings_only": true,
+    "located_and_letter_selected_clock_partner_face_proved": false,
+    "declared_signed_sum_arithmetic_only": true,
+    "ribbon_geometry_projection_invariance_or_Lk_Tw_Wr_proved": false,
+    "two_repairs_distinct_only": true,
+    "repair_channel_exhaustive_or_native_consumer_accepted": false,
+    "letter_freedom_implies_additive_carrier_freedom": false
+  },
+  "remaining_native_consumer_dependencies": [
+    "Fitting passage/emit equations, n letters and n+1 lifts with terminal receiving state and full carry",
+    "Complete reachable joint repair family, actual supported witnesses and declared equal-length substitution channel",
+    "Actual complemented reversed incidence and physical/material adjoint, including positive weight and null-definiteness on attained slips for power claims",
+    "Future-sufficient quotient over all admitted receivers including endpoint/carry probes; modulo-only charts do not remove winding"
+  ],
+  "full_research_library_checked": false,
+  "HNN_or_GPU_rerun": false,
+  "native_implementation_added_by_queue": false,
+  "no_deadline_CPU_or_memory_cap_increase": true,
+  "git_commit_push_merge_or_history_change": false,
+  "local_evidence_only_no_publication": true,
+  "custody_wall_ns": 244442598,
+  "copied_file_count": 140,
+  "copied_bytes": 115175917,
+  "all_copied_SHA256_pins_match": true
+}

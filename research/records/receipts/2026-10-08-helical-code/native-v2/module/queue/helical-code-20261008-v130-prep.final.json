@@ -1,0 +1,103 @@
+{
+  "passed": false,
+  "label": "helical-code-20261008-v130-prep",
+  "scientific_job": false,
+  "deferred_lock_busy": false,
+  "final_CPU_ns": 5471896000,
+  "CPU_reading_grain_ns": 1000,
+  "aggregate_CPU_limit_us": 17000000,
+  "final_CPU_source": "systemd retained oneshot CPUUsageNSec after all group processes exit",
+  "CPU_kernel_hard_total_limit": false,
+  "sampled_stop_margin_us": 1000000,
+  "aggregate_CPU_within_limit": true,
+  "no_overshoot_accepted": true,
+  "wall_ns": 6324585137,
+  "projection_ns": 17000000000,
+  "wall_source": "external monotonic_ns through final property read",
+  "quiescent": true,
+  "completion_event": "oneshot start job completed; no polling",
+  "unit_properties": {
+    "Description": "Owned holonics admission helical-code-20261008-v130-prep a90e515f46734da38ce1ad36d9d01118",
+    "LoadState": "loaded",
+    "ActiveState": "active",
+    "SubState": "exited",
+    "InvocationID": "9ca79395498645ba9f689a4a90b08791",
+    "Result": "success",
+    "ExecMainStatus": "0",
+    "ControlGroup": "",
+    "MemoryPeak": "360140800",
+    "CPUUsageNSec": "5471896000",
+    "TasksCurrent": "[not set]"
+  },
+  "outer_error": null,
+  "unit_start_exit": 0,
+  "unit_start_stdout": "",
+  "unit_start_stderr": "",
+  "config": {
+    "sha256": "451c482279d1f47ebf951f50d00adf4587fa8b43d42b1148a41cc005b608a12f",
+    "bytes": 11588
+  },
+  "receipt_pins": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130-prep.config.json": {
+      "sha256": "451c482279d1f47ebf951f50d00adf4587fa8b43d42b1148a41cc005b608a12f",
+      "bytes": 11588
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130-prep.external-lease.json": {
+      "sha256": "ff34580e5be0a1ed269f95cba016aae717be4b18bafc6e6188f956c6685d5df2",
+      "bytes": 487
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130-prep.lease-identity.json": {
+      "sha256": "b95fea14b7e0f96ee599922139e370762df479536fddfc546df251c77a7a43c7",
+      "bytes": 565
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130-prep.input_seal.json": {
+      "sha256": "692519065d1a10efb86f53b6477c915e0201ba03a9658905f9f47d2a6a55338e",
+      "bytes": 8233
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130-prep.memory-growth.ndjson": {
+      "sha256": "65bba09eb76c1e2c3c4a9cc32050021abb7e62803a3c463bd0b28251ccfbd619",
+      "bytes": 5484
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130-prep.stdout": {
+      "sha256": "fea79a0bfd6deb24d8b2ebc8faf9023f8843639286189b8240d23ac29bfe6603",
+      "bytes": 2071
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130-prep.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130-prep.memory-gate.json": {
+      "sha256": "6063e4a3792920f50320b706561ca2f1aa965326455994fb5091daea2058226c",
+      "bytes": 120
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130-prep.child-identity.json": {
+      "sha256": "8627916e68a288d77ef2fc7da5bd17c12974c7f175b3f3ba06f89cdec5c06492",
+      "bytes": 78
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130-prep.system-floor.json": {
+      "sha256": "d40a079b0428db757fcba3817170fefcbdbd323296d0030be70b459331c86c5d",
+      "bytes": 44364
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130-prep.quiescence.json": {
+      "sha256": "1a53413155875a9b561ebe7a371afa973a4f5f90c8959312494bac42637ee0f8",
+      "bytes": 130
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130-prep.output_seal.json": {
+      "sha256": "e4490293efe24da8f4d11796caa8bb0f657cc43bb9f693122adfc72bf9b85f54",
+      "bytes": 374433
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130-prep.publication.json": {
+      "sha256": "6ee4c0303a61a065106d51af4332d0bab2ed77cad0c6a14af0cd46b0dd05ae03",
+      "bytes": 3074
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-code-20261008-v130-prep.stage-quiescence.json": {
+      "sha256": "f1bbd59f37918b1ff09c83fe58b1c63723941f457ef0fdb51356703ed662fa87",
+      "bytes": 136
+    }
+  },
+  "launcher_outside_native_group": true,
+  "lease_owner_outside_capped_group": true,
+  "lease_held_through_final_CPU_read_and_publication": true,
+  "stage_passed_before_cleanup": true,
+  "requires_cleanup_acceptance": true
+}

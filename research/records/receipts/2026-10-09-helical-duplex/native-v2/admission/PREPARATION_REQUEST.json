@@ -1,0 +1,25 @@
+{
+  "output_root": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-20261009-v132",
+  "cache_partitions": [
+    {
+      "origin": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/integration-c6-targeted-20261008-v120/cache-v2",
+      "paths": [
+        "debug/deps",
+        "debug/build",
+        "debug/.fingerprint",
+        ".rustc_info.json"
+      ]
+    }
+  ],
+  "source_snapshot_path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-20261009-v132/SOURCE_NATIVE_INPUTS.json",
+  "source_manifest_pin": {
+    "sha256": "28d0b5460b496c7d17d2ce9e4ac211ccead27f7579a49d129d8da14be8c947bd",
+    "bytes": 59785
+  },
+  "owner_request": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-20261009-v132/SOURCE_ADMISSION.json",
+  "owner_request_pin": {
+    "sha256": "a3dd3810b3703f37b33e22bc64dc95bf3a25fb1d745d827b529aa26294097ea9",
+    "bytes": 81237
+  },
+  "preserved_failure": "Original c6fcc82a source is preserved and unexecuted; review defects corrected in 02658c6c. All prior queue receipts remain immutable."
+}
