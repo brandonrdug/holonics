@@ -1,0 +1,54 @@
+{
+  "kernel_accepted": true,
+  "compiler_exit": 0,
+  "compiler_wall_ns": 8506973666,
+  "axioms": {
+    "Holonics.Transport.DeletionReceiver.expect_cons": [
+      "propext",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.DeletionReceiver.expect_pow_length": [
+      "propext",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.DeletionReceiver.expect_genPoly": [
+      "propext",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.DeletionReceiver.mean_receipt_difference": [
+      "propext",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.DeletionReceiver.transport_comp": [
+      "propext",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.DeletionReceiver.norm_transport_sub": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.DeletionReceiver.expect_expect": [
+      "propext",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.DeletionReceiver.expect_trace": [
+      "propext",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.DeletionReceiver.covector_column": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.DeletionReceiver.covector_sum_zero": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "selector_count_matches": true,
+  "standard_axioms_only": true,
+  "metadata_unchanged": true,
+  "broad_library_checked": false
+}

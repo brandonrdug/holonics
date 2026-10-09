@@ -1,0 +1,454 @@
+{
+  "files": {
+    "admission/deletion-receiver-20261009-v143/COMPILER_REQUEST.json": {
+      "sha256": "27e242b1bbdbd3df667a16e5bacbe0573a48d06c4a8c5274b2e24ea34e9cf49d",
+      "bytes": 3476
+    },
+    "admission/deletion-receiver-20261009-v143/DeletionReceiver.submitted.lean": {
+      "sha256": "e391c76fef015ebf07f0b3a5d53d4440f3a117290cca1c9daf27e957621f33c4",
+      "bytes": 48308
+    },
+    "admission/deletion-receiver-20261009-v143/HolonicsResearch.lean": {
+      "sha256": "7ae9bec1aae7f45de3db6a0ace4ad6edf0a81f47cd6aaf1e1350d9febadca37c",
+      "bytes": 69831
+    },
+    "admission/deletion-receiver-20261009-v143/KERNEL_VALIDATION.json": {
+      "sha256": "effcc812339c9fc31f690ad88f13632ab4bc406bf94a086441115d3366aa0357",
+      "bytes": 1357
+    },
+    "admission/deletion-receiver-20261009-v143/PREPARATION_REQUEST.json": {
+      "sha256": "527080d0fb8bb11b300078a12058aa2b4bbb771c6d5b4611557f94c55b696f93",
+      "bytes": 5106
+    },
+    "admission/deletion-receiver-20261009-v143/PROVIDER_NAMESPACE.json": {
+      "sha256": "248264b9e517c0c69c19253914f38cdaea2ff97437405efb9282f4968ead5b8e",
+      "bytes": 19
+    },
+    "admission/deletion-receiver-20261009-v143/SOURCE_ADMISSION.json": {
+      "sha256": "16a7fc1943398f5e550b46892ea7f1f7488022756303340db3585b497c36fbb7",
+      "bytes": 1562
+    },
+    "admission/deletion-receiver-20261009-v143/compiler.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "admission/deletion-receiver-20261009-v143/compiler.stdout": {
+      "sha256": "ae446427020286170c5ee90efdc59dc85caaf938507297b4856a1f6d99ad05cf",
+      "bytes": 27701
+    },
+    "admission/deletion-receiver-20261009-v143/current-imports.json": {
+      "sha256": "1e1184922a8e355020e8fa52ca3cb4ca82d41164492ee5f3c41718fcd42f3c7d",
+      "bytes": 44607738
+    },
+    "admission/deletion-receiver-20261009-v143/import-preparation.json": {
+      "sha256": "3da9965d56881516159d2f8a1a5d3ee3cab8770042c41decede5ae5d61117bdf",
+      "bytes": 1248
+    },
+    "admission/deletion-receiver-20261009-v143/information.tsv": {
+      "sha256": "484c61049cb1991e808a2ebd3915f68b240e35632f97b37c98ee6614445776a1",
+      "bytes": 218948
+    },
+    "admission/deletion-receiver-20261009-v143/objects-v1/Holonics/Transport/DeletionReceiver.ilean": {
+      "sha256": "5f25f7f2cdf213460ea7bf605ffff4c8c2fd47fe0898a4387eb1d415d7c2270e",
+      "bytes": 66085
+    },
+    "admission/deletion-receiver-20261009-v143/objects-v1/Holonics/Transport/DeletionReceiver.olean": {
+      "sha256": "0bf30664e46873946f519c6b66630a12239dc14c3118a2a2c5f455fc7fd08d72",
+      "bytes": 1563168
+    },
+    "admission/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean": {
+      "sha256": "6d8919e00337b9c94a5c9ab0cbe45bab7309df4a1e5bbec7538a1748dc579f69",
+      "bytes": 48973
+    },
+    "admission/deletion-receiver-import-20261009-v144/COMPILER_REQUEST.json": {
+      "sha256": "b70fce9c64e5e7909243d0fa07c699f806301903934dfee77b0e350dc4fdfc47",
+      "bytes": 3521
+    },
+    "admission/deletion-receiver-import-20261009-v144/CONSUMER_SCOPE.json": {
+      "sha256": "75d6bc5a37ad054c475961a52468f3c2ce981aa5329fce5910026c3181cd82eb",
+      "bytes": 1664
+    },
+    "admission/deletion-receiver-import-20261009-v144/KERNEL_VALIDATION.json": {
+      "sha256": "8ab0acae71360ce6119a8ea9f1c40c17e885b882fa789a4a9966e29730a2cb46",
+      "bytes": 1356
+    },
+    "admission/deletion-receiver-import-20261009-v144/PREPARATION_REQUEST.json": {
+      "sha256": "e14238660b9f0c371b21ff26e88509765f03a67157c80ef710582ac5ee28cc87",
+      "bytes": 5527
+    },
+    "admission/deletion-receiver-import-20261009-v144/PROVIDER_NAMESPACE.json": {
+      "sha256": "f9c0b3136b16a497f0ff9c194c0c1788874d3f5f0fb302b096ef4e04f179c653",
+      "bytes": 1420
+    },
+    "admission/deletion-receiver-import-20261009-v144/compiler.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "admission/deletion-receiver-import-20261009-v144/compiler.stdout": {
+      "sha256": "3654f0913a7d05614041b10fcdc82c5ac3bc08b58e30253323f7093afa52a0dd",
+      "bytes": 1008
+    },
+    "admission/deletion-receiver-import-20261009-v144/current-imports.json": {
+      "sha256": "db1ece53220cbbf95afb9bc74a6931d89e2e2386d1e5d5c0704bb8489db6a587",
+      "bytes": 46159774
+    },
+    "admission/deletion-receiver-import-20261009-v144/import-preparation.json": {
+      "sha256": "f69671d9e7083fc444ca12f4a38a0dce44a6508cb833bdccf7288cc0ef581b58",
+      "bytes": 1241
+    },
+    "admission/deletion-receiver-import-20261009-v144/objects-v1/DeletionReceiverImportConsumer.ilean": {
+      "sha256": "a7ed366a9e20d71f1b71264cb2988f0fc95d97a93afabe07d0252003eff8bab2",
+      "bytes": 1795
+    },
+    "admission/deletion-receiver-import-20261009-v144/objects-v1/DeletionReceiverImportConsumer.olean": {
+      "sha256": "5a430e3ffadd4b04f398bdc5cdbe4a08f1d6599806302ad422e2d680193c7101",
+      "bytes": 1568
+    },
+    "admission/deletion-receiver-import-20261009-v144/objects-v1/Holonics/Transport/DeletionReceiver.ilean": {
+      "sha256": "5f25f7f2cdf213460ea7bf605ffff4c8c2fd47fe0898a4387eb1d415d7c2270e",
+      "bytes": 66085
+    },
+    "admission/deletion-receiver-import-20261009-v144/objects-v1/Holonics/Transport/DeletionReceiver.olean": {
+      "sha256": "0bf30664e46873946f519c6b66630a12239dc14c3118a2a2c5f455fc7fd08d72",
+      "bytes": 1563168
+    },
+    "admission/deletion-receiver-import-20261009-v144/source-v1/DeletionReceiverImportConsumer.lean": {
+      "sha256": "044e7ad5527882f3b53553e892af222775bc39846aa78f3742f3c8d4e2b251d9",
+      "bytes": 708
+    },
+    "stages/deletion-receiver-20261009-v143-prep.acceptance.json": {
+      "sha256": "b01333303787478c6bb12a81bf77f78ddfa8a512cc94e783cdfed491268493a0",
+      "bytes": 378
+    },
+    "stages/deletion-receiver-20261009-v143-prep.child-identity.json": {
+      "sha256": "6f718e49db9603316e8c7bf925d78033f0bbee1dda7322e4a5774f2023beb344",
+      "bytes": 78
+    },
+    "stages/deletion-receiver-20261009-v143-prep.config.json": {
+      "sha256": "83668a88ad01d908958a4f53984fb3e017b6ced049cf786664f98cc456a9c310",
+      "bytes": 9292
+    },
+    "stages/deletion-receiver-20261009-v143-prep.external-lease.json": {
+      "sha256": "29e8a1652dbbe55895fd19715d9b1743dacd8dba0c1fa89d99243e6de20cd301",
+      "bytes": 487
+    },
+    "stages/deletion-receiver-20261009-v143-prep.final.json": {
+      "sha256": "d76b97f274d828a73498012904e9afba2cff4f80bebdf9f332f538cd74b427d0",
+      "bytes": 4955
+    },
+    "stages/deletion-receiver-20261009-v143-prep.input_seal.json": {
+      "sha256": "88591aa8c917c1491e005fa768a9814357acf6467ec00b83c82c7b45f5d35c07",
+      "bytes": 6771
+    },
+    "stages/deletion-receiver-20261009-v143-prep.lease-identity.json": {
+      "sha256": "9f4334e6b1a603b04de91929a44f2dde415eb0e3dc62ca898725b6472991055b",
+      "bytes": 565
+    },
+    "stages/deletion-receiver-20261009-v143-prep.memory-gate.json": {
+      "sha256": "0337ed21809832de20f142b434c635966b61a68bc5ecc01bac6dcac283742904",
+      "bytes": 121
+    },
+    "stages/deletion-receiver-20261009-v143-prep.memory-growth.ndjson": {
+      "sha256": "1486956646f672b921dca0404cad9196ef0344994ad6ce91e91a92a821d6e4d0",
+      "bytes": 5678
+    },
+    "stages/deletion-receiver-20261009-v143-prep.output_seal.json": {
+      "sha256": "7232305e2d8786b9759faabb2d1c023f5789f12fe7f6779b4fb47186ef753e08",
+      "bytes": 382345
+    },
+    "stages/deletion-receiver-20261009-v143-prep.publication.json": {
+      "sha256": "3c81fba40135154c963ca1ba5fd1db26e77221dec0c3cd2732fff4c0ee8bd78a",
+      "bytes": 3134
+    },
+    "stages/deletion-receiver-20261009-v143-prep.quiescence.json": {
+      "sha256": "706edef01ab690d0f2912af4bf60e0828dde1363444bc863c7e5ed35de441767",
+      "bytes": 130
+    },
+    "stages/deletion-receiver-20261009-v143-prep.release.json": {
+      "sha256": "5473d022c0d570f7d983e3ea1a6dcff25694fafce3275257f5ee2d5adc122455",
+      "bytes": 175
+    },
+    "stages/deletion-receiver-20261009-v143-prep.stage-quiescence.json": {
+      "sha256": "0c9be3f78944c00c6691cad77ba5a215c4580d9e37397c2bbdec6240ce3c4bb6",
+      "bytes": 136
+    },
+    "stages/deletion-receiver-20261009-v143-prep.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "stages/deletion-receiver-20261009-v143-prep.stdout": {
+      "sha256": "bf7975172e6c72d4bb9fa4c9eb39da841e265fbcba2623b6c356b234789063dc",
+      "bytes": 2075
+    },
+    "stages/deletion-receiver-20261009-v143-prep.system-floor.json": {
+      "sha256": "5f73c954d6aa6303483211d93c26370c0c41d94524d5c1f0148a5d2790da7ecb",
+      "bytes": 45540
+    },
+    "stages/deletion-receiver-20261009-v143-prep.unit-cleanup.json": {
+      "sha256": "7710e4e88f3606243cef5de41800db1df59c736d3b7d66d42039be22f3887f8e",
+      "bytes": 699
+    },
+    "stages/deletion-receiver-20261009-v143-compile.acceptance.json": {
+      "sha256": "e98e5fc513ea1bad3b4190d810dc15ddb62cd328d04dd8eba2c1db657eba9705",
+      "bytes": 378
+    },
+    "stages/deletion-receiver-20261009-v143-compile.child-identity.json": {
+      "sha256": "12519c164c8f71212c4532273c851e57f6170fafe35984b8d0b5e4c12b104eda",
+      "bytes": 78
+    },
+    "stages/deletion-receiver-20261009-v143-compile.config.json": {
+      "sha256": "608fe3e4dd0eb0bf0309954c80510503be672403f582d4e67fa123c40a537280",
+      "bytes": 10897
+    },
+    "stages/deletion-receiver-20261009-v143-compile.external-lease.json": {
+      "sha256": "56018a33bfeb7ff1847d48ed21dff5cc53c22a997bd47cf593bd72074d2e5553",
+      "bytes": 487
+    },
+    "stages/deletion-receiver-20261009-v143-compile.final.json": {
+      "sha256": "970d9cfa43a9c01867c1a66acc380714e2ce75c59130131f0296e39df61e93ca",
+      "bytes": 5009
+    },
+    "stages/deletion-receiver-20261009-v143-compile.input_seal.json": {
+      "sha256": "4c6da1e97fa6ad7632ccf62b15872b47018fad3f980bda2cf9276ea6b6dbfa2b",
+      "bytes": 6958
+    },
+    "stages/deletion-receiver-20261009-v143-compile.lease-identity.json": {
+      "sha256": "73d591879723a07c2ba99bfa53c79b706302b984be71da7d9473f14398a35569",
+      "bytes": 565
+    },
+    "stages/deletion-receiver-20261009-v143-compile.memory-gate.json": {
+      "sha256": "67fc21753e528db9dbe93477060afd3bd25052b155b0576525ef3d9ecc89567e",
+      "bytes": 121
+    },
+    "stages/deletion-receiver-20261009-v143-compile.memory-growth.ndjson": {
+      "sha256": "ca3c1b520bec0985c2f468aa958c8f3046e00f7fd0d38519335069b7f1fbb28c",
+      "bytes": 11447
+    },
+    "stages/deletion-receiver-20261009-v143-compile.output_seal.json": {
+      "sha256": "53a4a6de7aec8b15b8a38fecb33b39ec86fd7c6d13741705abb84483de9dac05",
+      "bytes": 792639
+    },
+    "stages/deletion-receiver-20261009-v143-compile.publication.json": {
+      "sha256": "18bb0d86906068959e4fc6904810c0e5f15898c8c1e3d86ef5553896e4c0861c",
+      "bytes": 3936
+    },
+    "stages/deletion-receiver-20261009-v143-compile.quiescence.json": {
+      "sha256": "8ddb157812e0243a7379055d95c84fbb53d2fa2701e67f37a2193a1568a609e4",
+      "bytes": 130
+    },
+    "stages/deletion-receiver-20261009-v143-compile.release.json": {
+      "sha256": "93fbdaf734604bb50eb3486e04248dd6ee69c7aa8d33082ded3b11c02d8a143e",
+      "bytes": 175
+    },
+    "stages/deletion-receiver-20261009-v143-compile.stage-quiescence.json": {
+      "sha256": "db07d0fa71b75356491ff4664feec31bc858773f665e8c18751b173627fcdfcc",
+      "bytes": 136
+    },
+    "stages/deletion-receiver-20261009-v143-compile.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "stages/deletion-receiver-20261009-v143-compile.stdout": {
+      "sha256": "71bad56b01b683306cbe91e3bfe7427329cb5b1a2f340c20911827b8e99fb8bf",
+      "bytes": 29098
+    },
+    "stages/deletion-receiver-20261009-v143-compile.system-floor.json": {
+      "sha256": "58cd28e8f115b32a394aeaf5f8512b3f24d8e0082b0921ef50f4bcdd8c90b17f",
+      "bytes": 92647
+    },
+    "stages/deletion-receiver-20261009-v143-compile.unit-cleanup.json": {
+      "sha256": "9b1bd6092b8f8abbe471fdc17388594b1c7f0182c2524a92e87cce1a1708a7c3",
+      "bytes": 705
+    },
+    "stages/deletion-receiver-import-20261009-v144-prep.acceptance.json": {
+      "sha256": "fb3125371a05f20a839186c03036cf51fda96a6c4d867519b84dc785c3832c93",
+      "bytes": 378
+    },
+    "stages/deletion-receiver-import-20261009-v144-prep.child-identity.json": {
+      "sha256": "0720613d5761655a64857bf95f7e257f356e61f215288761c84d7e610f5efe4d",
+      "bytes": 78
+    },
+    "stages/deletion-receiver-import-20261009-v144-prep.config.json": {
+      "sha256": "cf51d7cc9c3a0f3a2b77dc5306da7d813b0984b43750f50f96f098f8b20de339",
+      "bytes": 9974
+    },
+    "stages/deletion-receiver-import-20261009-v144-prep.external-lease.json": {
+      "sha256": "207b2adb167b748ff7ea5108b0e2cd65223c52c7c558ee8537e4862d12a07f95",
+      "bytes": 487
+    },
+    "stages/deletion-receiver-import-20261009-v144-prep.final.json": {
+      "sha256": "002e0cd405f04d95429755def6624d2e890e3b66f5f285e95934d4fc31897175",
+      "bytes": 5067
+    },
+    "stages/deletion-receiver-import-20261009-v144-prep.input_seal.json": {
+      "sha256": "65d16b4725b7c7165ecc70209798cf1e8f549cc404a1ee0a67d009a36bea2583",
+      "bytes": 7318
+    },
+    "stages/deletion-receiver-import-20261009-v144-prep.lease-identity.json": {
+      "sha256": "519b28c075fe39d06bde08a260033c1740aa89ee8d40ec6fa2a9c7291d8281c3",
+      "bytes": 565
+    },
+    "stages/deletion-receiver-import-20261009-v144-prep.memory-gate.json": {
+      "sha256": "c16b6b088407af1e79864d8dd0a453795001946d5eb392ba2b91f34f05e0c052",
+      "bytes": 121
+    },
+    "stages/deletion-receiver-import-20261009-v144-prep.memory-growth.ndjson": {
+      "sha256": "4671fecd51c84b0ef1052a89040abeb0a4a5c1f8889a27ec1c3e7707d2eb4d19",
+      "bytes": 4331
+    },
+    "stages/deletion-receiver-import-20261009-v144-prep.output_seal.json": {
+      "sha256": "da12e656d6566b5855d93ffeca0bae09e5e2db766f57f0ac907e3956d9fa5e16",
+      "bytes": 294396
+    },
+    "stages/deletion-receiver-import-20261009-v144-prep.publication.json": {
+      "sha256": "f7a416e6957c5d7fc84d4e218383d8d6c64c5c721a3394f55674e02f53b9a1de",
+      "bytes": 3218
+    },
+    "stages/deletion-receiver-import-20261009-v144-prep.quiescence.json": {
+      "sha256": "5c09985b49bf4ccebe8b31676886dfc4530182de4155da85523452392be9301b",
+      "bytes": 130
+    },
+    "stages/deletion-receiver-import-20261009-v144-prep.release.json": {
+      "sha256": "7a70d7c4aaf918e2e56bb2578f047e422ab06236881413781c2c1e381b2b9909",
+      "bytes": 175
+    },
+    "stages/deletion-receiver-import-20261009-v144-prep.stage-quiescence.json": {
+      "sha256": "2f081c1d1b20023521fdc3bc0be6bbea58d67a24b99e72c9fff87bdc9f53e2a1",
+      "bytes": 136
+    },
+    "stages/deletion-receiver-import-20261009-v144-prep.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "stages/deletion-receiver-import-20261009-v144-prep.stdout": {
+      "sha256": "489d0c905ec0c7ab7671d32e15f2b5e303d61022aa0f596ad791c4582dbde717",
+      "bytes": 2066
+    },
+    "stages/deletion-receiver-import-20261009-v144-prep.system-floor.json": {
+      "sha256": "0f34c5b91fa96be035004bc5b488e323fdf5ee760ea1534181d6e293584ca4d5",
+      "bytes": 34284
+    },
+    "stages/deletion-receiver-import-20261009-v144-prep.unit-cleanup.json": {
+      "sha256": "6618a22277ffe9966e5900c433538f621a75884fee62df600737d351e0f62b7a",
+      "bytes": 713
+    },
+    "stages/deletion-receiver-import-20261009-v144-compile.acceptance.json": {
+      "sha256": "8d189282f08f478c677344d0dc6252395781c8b988361ac69f5a044fa95541dc",
+      "bytes": 378
+    },
+    "stages/deletion-receiver-import-20261009-v144-compile.child-identity.json": {
+      "sha256": "3a0099e1b1aecd104633e4410f572fdbcc84e5cd78f824c1ab2e0d02b657bf6c",
+      "bytes": 78
+    },
+    "stages/deletion-receiver-import-20261009-v144-compile.config.json": {
+      "sha256": "55fecfb2e962cea047bef14f54bb8a74f42cd757cfdabde0e6a13fde7603f6db",
+      "bytes": 10611
+    },
+    "stages/deletion-receiver-import-20261009-v144-compile.external-lease.json": {
+      "sha256": "ea5aeab6f6dcac1497b035c85013075c5980225e49e72ba75df230342fb1d1e6",
+      "bytes": 487
+    },
+    "stages/deletion-receiver-import-20261009-v144-compile.final.json": {
+      "sha256": "bc2c029092326630d6bdd57976579183390ed920f77a186f9393ba5070803246",
+      "bytes": 5119
+    },
+    "stages/deletion-receiver-import-20261009-v144-compile.input_seal.json": {
+      "sha256": "adf7109504e3ab624c786acef9afedbe895254feac6a78d7656ab6d39f133692",
+      "bytes": 6850
+    },
+    "stages/deletion-receiver-import-20261009-v144-compile.lease-identity.json": {
+      "sha256": "12ac4134b262943471c50529034bd4a1f9d982129244ad0009fa1090101c393a",
+      "bytes": 565
+    },
+    "stages/deletion-receiver-import-20261009-v144-compile.memory-gate.json": {
+      "sha256": "501ebe3640453d2dea5710b607629933a79046d1c966f9130921f66465515365",
+      "bytes": 121
+    },
+    "stages/deletion-receiver-import-20261009-v144-compile.memory-growth.ndjson": {
+      "sha256": "6b3d7312979b21377a21f4c9316f14eb8d62c63885eb312aea0f22ed0ea286ce",
+      "bytes": 9765
+    },
+    "stages/deletion-receiver-import-20261009-v144-compile.output_seal.json": {
+      "sha256": "ca255ab6473c348bdc7e41ca0897b76533eb2cbb1f804944a3a3eae9456175b4",
+      "bytes": 677109
+    },
+    "stages/deletion-receiver-import-20261009-v144-compile.publication.json": {
+      "sha256": "594f47633c93a9887c40001241ac2b93d0877465729398e9ef5769f3d5fea706",
+      "bytes": 4024
+    },
+    "stages/deletion-receiver-import-20261009-v144-compile.quiescence.json": {
+      "sha256": "58db77533e27737e8029be5b94a00df2698c5ccdc80168e935d02e5e1b57c9ac",
+      "bytes": 130
+    },
+    "stages/deletion-receiver-import-20261009-v144-compile.release.json": {
+      "sha256": "beb66123f2ab2fab5855e4fc743b6957d595ef975484f829ee0cea5bec4e29be",
+      "bytes": 175
+    },
+    "stages/deletion-receiver-import-20261009-v144-compile.stage-quiescence.json": {
+      "sha256": "33dc87288b1bb218ba7fe4b10345dae02aeca282f4e82055e2ea506f75c5dde4",
+      "bytes": 136
+    },
+    "stages/deletion-receiver-import-20261009-v144-compile.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "stages/deletion-receiver-import-20261009-v144-compile.stdout": {
+      "sha256": "abd4b1902f77501bd53b49866d2d3c8dd9bd69d15705754b17382495f0adee9b",
+      "bytes": 2403
+    },
+    "stages/deletion-receiver-import-20261009-v144-compile.system-floor.json": {
+      "sha256": "5df6c3c664ab47c3e49819756bafe394e548fea7354d80807e351f05f34256b6",
+      "bytes": 78803
+    },
+    "stages/deletion-receiver-import-20261009-v144-compile.unit-cleanup.json": {
+      "sha256": "fdc0fbcaafb007ed5ef7db3ad0f5864de464ab9a93461719413a805eef0dceb8",
+      "bytes": 719
+    },
+    "queue-source/materialize_deletion_receiver_v143.py": {
+      "sha256": "4a044a1ef030ea12d453f6504ce77c08bf64940f9f3e6df26efe352a12525f2e",
+      "bytes": 7594
+    },
+    "queue-source/materialize_deletion_import_v144.py": {
+      "sha256": "e21310402275c7abdb052c6ad42f5ef20267ce27d18c6d04d9d8b6e93f5eed75",
+      "bytes": 7925
+    },
+    "queue-source/check_lean_owner_v5.py": {
+      "sha256": "938113c2385ccafad539de5bcd6252a3ef315261e15ff3312757fb1a95ba723e",
+      "bytes": 2194
+    },
+    "queue-source/verify_lean_metadata_v1.py": {
+      "sha256": "cff6b3ce7c52698766dd59eb249c822960c36667c87d7e8e6cc6bae10c5d41ad",
+      "bytes": 772
+    },
+    "queue-source/prepare_ns_namespace_v1.py": {
+      "sha256": "85b5a0626525cf14d6dbf8ecf9098ee8804df8facf1cad8c5e2f8eeb36aeea7c",
+      "bytes": 10766
+    },
+    "queue-source/check_namespace_lookup_v1.py": {
+      "sha256": "9210e5aa18f9daeb7ac8ced18e253f08805577119a5f2b5e211017d9a873679c",
+      "bytes": 886
+    },
+    "queue-source/final_stage_memory_v120.py": {
+      "sha256": "b6913802127facc4945da4bbdd0f18cb5457cc8e03765b649653e6cfe12adfc4",
+      "bytes": 11218
+    },
+    "queue-source/leased_stage_memory_v120.py": {
+      "sha256": "1191c531c35016eada85739a5ca94dabefd9074c75781e4a20fb28d4b887f1d1",
+      "bytes": 5538
+    },
+    "queue-source/bounded_stage_memory_v120.py": {
+      "sha256": "5ebc628494a7bff53f01362475110002eedae3b6395517f394f9972c541eff41",
+      "bytes": 13550
+    },
+    "HANDOFF.md": {
+      "sha256": "559ff79c8750bf6b06a3aadb7f1821635774eabc3a13c32e63a01a9beb7e05dc",
+      "bytes": 1488
+    },
+    "VALIDATION.json": {
+      "sha256": "b0521f2faf6320b083e7b5897a711987821e475eeccd56fb1e82259f6668b3cd",
+      "bytes": 1838
+    }
+  },
+  "count": 112,
+  "all_copies_verified": true
+}
