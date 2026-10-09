@@ -379,8 +379,11 @@ Its second part states the perfected laws:
      - or a report of redundancy.
 
    **Deferred to later steps, named.**
-   - Step 2: the partner's face on the HNN carrier, `m(σ̄u) = B U⁻⁽ⁿ⁻¹⁾ m(u)`, which needs a
-     located moment chart (`PassageChart::moment` admits ticks 0 to 2 only).
+   - Step 2: the partner's face on the HNN carrier, by the general law above,
+     `moment_U(σ̄u) = B Σ_j (BUB)^j E(u_j)`. It reduces to `B U⁻⁽ⁿ⁻¹⁾ moment_U(u)` only under the
+     stated conjugacy `BUB = U⁻¹`. Its first real caller is `SourceMoment::encode` and
+     `open_storage`. A paired admission and a located moment chart are built only as that caller
+     consumes them; a recurrence implementation that nothing consumes is never grown beside it.
    - Step 3: the linking reading of a closed duplex and its crossing changes. No current crate
      reads the linking number, and the retired owner is at `13f8c734`.
 
