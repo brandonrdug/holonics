@@ -1,0 +1,991 @@
+{
+  "source_commit": "d81d39d3b8f99eefbe84097c2fddb191a4b2c1e0",
+  "source_tree": "c130586f67c21342f5d49a38cac35ffa6be496f0",
+  "native_gate_passed": true,
+  "guard_doctests": 57,
+  "native_files_git_matched": 347,
+  "source_clean_after_validation": true,
+  "finite_decrease_tests": 11,
+  "physical_communication_tests": 21,
+  "fixture_partition_all_exact_once": true,
+  "runtime_partition_result": {
+    "results": [
+      {
+        "label": "actual-l-finite-01-20261009-v156",
+        "selector": "hnn::tests::finite_decrease::the_first_reach_is_read_from_the_owner_split_entry_by_entry",
+        "accepted": true,
+        "elapsed_ns": 364824993,
+        "exit": 0
+      },
+      {
+        "label": "actual-l-finite-02-20261009-v156",
+        "selector": "hnn::tests::finite_decrease::a_signed_remainder_moves_the_first_reach_off_the_widest_entry",
+        "accepted": true,
+        "elapsed_ns": 334571899,
+        "exit": 0
+      },
+      {
+        "label": "actual-l-finite-03-20261009-v156",
+        "selector": "hnn::tests::finite_decrease::the_certified_exponents_declared_reproduce_the_native_deposit",
+        "accepted": true,
+        "elapsed_ns": 1069594147,
+        "exit": 0
+      },
+      {
+        "label": "actual-l-finite-04-20261009-v156",
+        "selector": "hnn::tests::finite_decrease::the_first_reach_commits_its_proposed_reach_or_refuses_typed",
+        "accepted": true,
+        "elapsed_ns": 1677718970,
+        "exit": 0
+      },
+      {
+        "label": "actual-l-finite-05-20261009-v156",
+        "selector": "hnn::tests::finite_decrease::a_declared_exponent_past_the_covector_scale_refuses_typed",
+        "accepted": true,
+        "elapsed_ns": 1013506808,
+        "exit": 0
+      },
+      {
+        "label": "actual-l-finite-06-20261009-v156",
+        "selector": "hnn::tests::finite_decrease::the_reading_identity_reads_gauge_normalized_cells_never_endpoints",
+        "accepted": true,
+        "elapsed_ns": 398244566,
+        "exit": 0
+      },
+      {
+        "label": "actual-l-finite-07-20261009-v156",
+        "selector": "hnn::tests::finite_decrease::the_admission_is_an_exact_strict_improvement_and_refuses_typed",
+        "accepted": true,
+        "elapsed_ns": 370016285,
+        "exit": 0
+      },
+      {
+        "label": "actual-l-finite-08-20261009-v156",
+        "selector": "hnn::tests::finite_decrease::a_received_opening_issues_no_candidate",
+        "accepted": true,
+        "elapsed_ns": 871414644,
+        "exit": 0
+      },
+      {
+        "label": "actual-l-finite-09-20261009-v156",
+        "selector": "hnn::tests::finite_decrease::an_admission_binds_its_own_cut_by_equality",
+        "accepted": true,
+        "elapsed_ns": 5376897168,
+        "exit": 0
+      },
+      {
+        "label": "actual-l-finite-10-20261009-v156",
+        "selector": "hnn::tests::finite_decrease::a_post_admission_refusal_keeps_the_cut_for_the_certified_continuation",
+        "accepted": true,
+        "elapsed_ns": 1124216972,
+        "exit": 0
+      },
+      {
+        "label": "actual-l-physical-01-20261009-v156",
+        "selector": "hnn::tests::physical_communication::held_contact_variation_returns_the_delayed_full_state_credit",
+        "accepted": true,
+        "elapsed_ns": 536173862,
+        "exit": 0
+      },
+      {
+        "label": "actual-l-physical-02-20261009-v156",
+        "selector": "hnn::tests::physical_communication::held_contact_variation_refuses_untransported_future_without_clearing_it",
+        "accepted": true,
+        "elapsed_ns": 384629866,
+        "exit": 0
+      },
+      {
+        "label": "actual-l-physical-03-20261009-v156",
+        "selector": "hnn::tests::physical_communication::continuing_contact_comparison_deposits_and_rebases_without_resetting_delayed_credit",
+        "accepted": true,
+        "elapsed_ns": 975281552,
+        "exit": 0
+      },
+      {
+        "label": "actual-l-physical-04-20261009-v156",
+        "selector": "hnn::tests::physical_communication::finite_loaded_span_carries_the_actual_contact_response_at_its_clock",
+        "accepted": true,
+        "elapsed_ns": 394646586,
+        "exit": 0
+      },
+      {
+        "label": "actual-l-physical-05-20261009-v156",
+        "selector": "hnn::tests::physical_communication::native_contact_step_consumes_the_finite_loaded_span_witness",
+        "accepted": true,
+        "elapsed_ns": 1134249673,
+        "exit": 0
+      },
+      {
+        "label": "actual-l-physical-06-20261009-v156",
+        "selector": "hnn::tests::physical_communication::all_reached_contact_families_return_through_the_same_continuing_field",
+        "accepted": true,
+        "elapsed_ns": 1752808368,
+        "exit": 0
+      },
+      {
+        "label": "actual-l-physical-07-20261009-v156",
+        "selector": "hnn::tests::physical_communication::finite_signed_contact_reaction_holds_momentum_and_reaches_the_next_tick",
+        "accepted": true,
+        "elapsed_ns": 395612866,
+        "exit": 0
+      },
+      {
+        "label": "actual-l-physical-08-20261009-v156",
+        "selector": "hnn::tests::physical_communication::the_fixed_v79_contact_observation_accounts_for_its_actual_material_and_remainders",
+        "accepted": true,
+        "elapsed_ns": 1136425147,
+        "exit": 0
+      },
+      {
+        "label": "actual-l-physical-09-20261009-v156",
+        "selector": "hnn::tests::physical_communication::the_actual_unresolved_contact_return_survives_a_different_physical_passage",
+        "accepted": true,
+        "elapsed_ns": 1957058088,
+        "exit": 0
+      },
+      {
+        "label": "actual-l-physical-10-20261009-v156",
+        "selector": "hnn::tests::physical_communication::complete_contact_return_publishes_held_point_before_existing_communication",
+        "accepted": true,
+        "elapsed_ns": 2079519363,
+        "exit": 0
+      },
+      {
+        "label": "actual-l-physical-11-20261009-v156",
+        "selector": "hnn::tests::physical_communication::the_landing_tangent_is_read_beside_the_uniform_certificate_on_the_complete_contact_return",
+        "accepted": true,
+        "elapsed_ns": 3969652322,
+        "exit": 0
+      },
+      {
+        "label": "actual-l-physical-12-20261009-v156",
+        "selector": "hnn::tests::physical_communication::the_learned_change_acceptance_is_read_on_the_complete_contact_return",
+        "accepted": true,
+        "elapsed_ns": 2892648269,
+        "exit": 0
+      },
+      {
+        "label": "actual-l-physical-13-20261009-v156",
+        "selector": "hnn::tests::physical_communication::a_shared_execution_clock_reanchors_the_next_section_without_resetting_its_carry",
+        "accepted": true,
+        "elapsed_ns": 412613447,
+        "exit": 0
+      },
+      {
+        "label": "actual-l-physical-14-20261009-v156",
+        "selector": "hnn::tests::physical_communication::communication_deposits_after_the_whole_boundary_and_reuses_material_source_and_carry",
+        "accepted": true,
+        "elapsed_ns": 474395482,
+        "exit": 0
+      },
+      {
+        "label": "actual-l-physical-15-20261009-v156",
+        "selector": "hnn::tests::physical_communication::communication_observations_cannot_change_the_earlier_boundary",
+        "accepted": true,
+        "elapsed_ns": 454053573,
+        "exit": 0
+      },
+      {
+        "label": "actual-l-physical-16-20261009-v156",
+        "selector": "hnn::tests::physical_communication::communication_refuses_changed_source_or_partition_without_deposition_and_keeps_the_blind_end",
+        "accepted": true,
+        "elapsed_ns": 386071746,
+        "exit": 0
+      },
+      {
+        "label": "actual-l-physical-17-20261009-v156",
+        "selector": "hnn::tests::physical_communication::communication_returns_actual_multistation_held_receipts_without_a_joint_certificate",
+        "accepted": true,
+        "elapsed_ns": 379941965,
+        "exit": 0
+      },
+      {
+        "label": "actual-l-physical-18-20261009-v156",
+        "selector": "hnn::tests::physical_communication::one_future_communication_carries_one_actual_source_label_through_the_whole_receiving_image",
+        "accepted": true,
+        "elapsed_ns": 476861110,
+        "exit": 0
+      },
+      {
+        "label": "actual-l-physical-19-20261009-v156",
+        "selector": "hnn::tests::physical_communication::one_future_source_publication_reaches_the_next_contemporary_communication_opening",
+        "accepted": true,
+        "elapsed_ns": 524271559,
+        "exit": 0
+      },
+      {
+        "label": "actual-l-physical-20-20261009-v156",
+        "selector": "hnn::tests::physical_communication::one_future_communication_keeps_refusal_and_multi_future_admission_honest",
+        "accepted": true,
+        "elapsed_ns": 400294815,
+        "exit": 0
+      },
+      {
+        "label": "actual-l-physical-21-20261009-v156",
+        "selector": "hnn::tests::physical_communication::the_finite_decrease_landing_is_read_on_the_complete_contact_return",
+        "accepted": true,
+        "elapsed_ns": 2092278308,
+        "exit": 0
+      }
+    ],
+    "declared_count": 31,
+    "wall_ns": 35811645929,
+    "passed": true,
+    "no_parallel_native_jobs": true
+  },
+  "results": [
+    {
+      "label": "actual-l-prep8-20261009-v153",
+      "accepted": true,
+      "exit": 0,
+      "wall_ns": 8666862975,
+      "projection_ns": 17000000000,
+      "child_wall_ns": 8463417336,
+      "aggregate_CPU_ns": 6287975000,
+      "group_peak_B": 7433379840,
+      "peak_child_RSS_KiB": 39736,
+      "group_limit_B": 8589934592,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 8666862975,
+        "denominator": 17000000000
+      },
+      "selectors": []
+    },
+    {
+      "label": "actual-l-check-20261009-v153",
+      "accepted": true,
+      "exit": 0,
+      "wall_ns": 28868242058,
+      "projection_ns": 65000000000,
+      "child_wall_ns": 26961585338,
+      "aggregate_CPU_ns": 27811054000,
+      "group_peak_B": 1667997696,
+      "peak_child_RSS_KiB": 1444536,
+      "group_limit_B": 8589934592,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 28868242058,
+        "denominator": 65000000000
+      },
+      "selectors": []
+    },
+    {
+      "label": "actual-l-clippy-20261009-v153",
+      "accepted": true,
+      "exit": 0,
+      "wall_ns": 34278677201,
+      "projection_ns": 65000000000,
+      "child_wall_ns": 32343729913,
+      "aggregate_CPU_ns": 33219947000,
+      "group_peak_B": 1742258176,
+      "peak_child_RSS_KiB": 1466376,
+      "group_limit_B": 8589934592,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 34278677201,
+        "denominator": 65000000000
+      },
+      "selectors": []
+    },
+    {
+      "label": "actual-l-doc-20261009-v153",
+      "accepted": true,
+      "exit": 0,
+      "wall_ns": 41381947539,
+      "projection_ns": 65000000000,
+      "child_wall_ns": 39616211836,
+      "aggregate_CPU_ns": 40043935000,
+      "group_peak_B": 1998503936,
+      "peak_child_RSS_KiB": 1673188,
+      "group_limit_B": 8589934592,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 41381947539,
+        "denominator": 65000000000
+      },
+      "selectors": []
+    },
+    {
+      "label": "actual-l-build-20261009-v153",
+      "accepted": true,
+      "exit": 0,
+      "wall_ns": 40514619219,
+      "projection_ns": 65000000000,
+      "child_wall_ns": 38809049166,
+      "aggregate_CPU_ns": 39506178000,
+      "group_peak_B": 2385764352,
+      "peak_child_RSS_KiB": 2105852,
+      "group_limit_B": 8589934592,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 40514619219,
+        "denominator": 65000000000
+      },
+      "selectors": []
+    },
+    {
+      "label": "actual-l-development-20261009-v156",
+      "accepted": true,
+      "exit": 0,
+      "wall_ns": 985096117,
+      "projection_ns": 17000000000,
+      "child_wall_ns": 686992150,
+      "aggregate_CPU_ns": 899124000,
+      "group_peak_B": 37507072,
+      "peak_child_RSS_KiB": 29784,
+      "group_limit_B": 8589934592,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 985096117,
+        "denominator": 17000000000
+      },
+      "selectors": [
+        "hnn::tests::finite_decrease::the_landing_on_0279_is_a_measured_outcome"
+      ]
+    },
+    {
+      "label": "actual-l-finite-01-20261009-v156",
+      "accepted": true,
+      "exit": 0,
+      "wall_ns": 271888055,
+      "projection_ns": 17000000000,
+      "child_wall_ns": 6230319,
+      "aggregate_CPU_ns": 217057000,
+      "group_peak_B": 26415104,
+      "peak_child_RSS_KiB": 23832,
+      "group_limit_B": 8589934592,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 271888055,
+        "denominator": 17000000000
+      },
+      "selectors": [
+        "hnn::tests::finite_decrease::the_first_reach_is_read_from_the_owner_split_entry_by_entry"
+      ]
+    },
+    {
+      "label": "actual-l-finite-02-20261009-v156",
+      "accepted": true,
+      "exit": 0,
+      "wall_ns": 250113302,
+      "projection_ns": 17000000000,
+      "child_wall_ns": 5835891,
+      "aggregate_CPU_ns": 211305000,
+      "group_peak_B": 25063424,
+      "peak_child_RSS_KiB": 24840,
+      "group_limit_B": 8589934592,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 250113302,
+        "denominator": 17000000000
+      },
+      "selectors": [
+        "hnn::tests::finite_decrease::a_signed_remainder_moves_the_first_reach_off_the_widest_entry"
+      ]
+    },
+    {
+      "label": "actual-l-finite-03-20261009-v156",
+      "accepted": true,
+      "exit": 0,
+      "wall_ns": 979210542,
+      "projection_ns": 17000000000,
+      "child_wall_ns": 712681633,
+      "aggregate_CPU_ns": 915381000,
+      "group_peak_B": 26435584,
+      "peak_child_RSS_KiB": 29940,
+      "group_limit_B": 8589934592,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 979210542,
+        "denominator": 17000000000
+      },
+      "selectors": [
+        "hnn::tests::finite_decrease::the_certified_exponents_declared_reproduce_the_native_deposit"
+      ]
+    },
+    {
+      "label": "actual-l-finite-04-20261009-v156",
+      "accepted": true,
+      "exit": 0,
+      "wall_ns": 1587964202,
+      "projection_ns": 17000000000,
+      "child_wall_ns": 1338270977,
+      "aggregate_CPU_ns": 1540398000,
+      "group_peak_B": 26669056,
+      "peak_child_RSS_KiB": 29600,
+      "group_limit_B": 8589934592,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 1587964202,
+        "denominator": 17000000000
+      },
+      "selectors": [
+        "hnn::tests::finite_decrease::the_first_reach_commits_its_proposed_reach_or_refuses_typed"
+      ]
+    },
+    {
+      "label": "actual-l-finite-05-20261009-v156",
+      "accepted": true,
+      "exit": 0,
+      "wall_ns": 924697010,
+      "projection_ns": 17000000000,
+      "child_wall_ns": 677481365,
+      "aggregate_CPU_ns": 877929000,
+      "group_peak_B": 26288128,
+      "peak_child_RSS_KiB": 29624,
+      "group_limit_B": 8589934592,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 924697010,
+        "denominator": 17000000000
+      },
+      "selectors": [
+        "hnn::tests::finite_decrease::a_declared_exponent_past_the_covector_scale_refuses_typed"
+      ]
+    },
+    {
+      "label": "actual-l-finite-06-20261009-v156",
+      "accepted": true,
+      "exit": 0,
+      "wall_ns": 307712202,
+      "projection_ns": 17000000000,
+      "child_wall_ns": 47266058,
+      "aggregate_CPU_ns": 254766000,
+      "group_peak_B": 24186880,
+      "peak_child_RSS_KiB": 23916,
+      "group_limit_B": 8589934592,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 307712202,
+        "denominator": 17000000000
+      },
+      "selectors": [
+        "hnn::tests::finite_decrease::the_reading_identity_reads_gauge_normalized_cells_never_endpoints"
+      ]
+    },
+    {
+      "label": "actual-l-finite-07-20261009-v156",
+      "accepted": true,
+      "exit": 0,
+      "wall_ns": 285439597,
+      "projection_ns": 17000000000,
+      "child_wall_ns": 47657471,
+      "aggregate_CPU_ns": 250784000,
+      "group_peak_B": 24338432,
+      "peak_child_RSS_KiB": 23976,
+      "group_limit_B": 8589934592,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 285439597,
+        "denominator": 17000000000
+      },
+      "selectors": [
+        "hnn::tests::finite_decrease::the_admission_is_an_exact_strict_improvement_and_refuses_typed"
+      ]
+    },
+    {
+      "label": "actual-l-finite-08-20261009-v156",
+      "accepted": true,
+      "exit": 0,
+      "wall_ns": 783050301,
+      "projection_ns": 17000000000,
+      "child_wall_ns": 529508458,
+      "aggregate_CPU_ns": 730443000,
+      "group_peak_B": 25800704,
+      "peak_child_RSS_KiB": 29532,
+      "group_limit_B": 8589934592,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 783050301,
+        "denominator": 17000000000
+      },
+      "selectors": [
+        "hnn::tests::finite_decrease::a_received_opening_issues_no_candidate"
+      ]
+    },
+    {
+      "label": "actual-l-finite-09-20261009-v156",
+      "accepted": true,
+      "exit": 0,
+      "wall_ns": 5287867991,
+      "projection_ns": 17000000000,
+      "child_wall_ns": 5005607569,
+      "aggregate_CPU_ns": 5196608000,
+      "group_peak_B": 26685440,
+      "peak_child_RSS_KiB": 30208,
+      "group_limit_B": 8589934592,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 5287867991,
+        "denominator": 17000000000
+      },
+      "selectors": [
+        "hnn::tests::finite_decrease::an_admission_binds_its_own_cut_by_equality"
+      ]
+    },
+    {
+      "label": "actual-l-finite-10-20261009-v156",
+      "accepted": true,
+      "exit": 0,
+      "wall_ns": 1035803969,
+      "projection_ns": 17000000000,
+      "child_wall_ns": 769778113,
+      "aggregate_CPU_ns": 974815000,
+      "group_peak_B": 25649152,
+      "peak_child_RSS_KiB": 30240,
+      "group_limit_B": 8589934592,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 1035803969,
+        "denominator": 17000000000
+      },
+      "selectors": [
+        "hnn::tests::finite_decrease::a_post_admission_refusal_keeps_the_cut_for_the_certified_continuation"
+      ]
+    },
+    {
+      "label": "actual-l-physical-01-20261009-v156",
+      "accepted": true,
+      "exit": 0,
+      "wall_ns": 444034799,
+      "projection_ns": 17000000000,
+      "child_wall_ns": 180531158,
+      "aggregate_CPU_ns": 385226000,
+      "group_peak_B": 25489408,
+      "peak_child_RSS_KiB": 30336,
+      "group_limit_B": 8589934592,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 444034799,
+        "denominator": 17000000000
+      },
+      "selectors": [
+        "hnn::tests::physical_communication::held_contact_variation_returns_the_delayed_full_state_credit"
+      ]
+    },
+    {
+      "label": "actual-l-physical-02-20261009-v156",
+      "accepted": true,
+      "exit": 0,
+      "wall_ns": 294951743,
+      "projection_ns": 17000000000,
+      "child_wall_ns": 35345701,
+      "aggregate_CPU_ns": 241907000,
+      "group_peak_B": 25677824,
+      "peak_child_RSS_KiB": 28848,
+      "group_limit_B": 8589934592,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 294951743,
+        "denominator": 17000000000
+      },
+      "selectors": [
+        "hnn::tests::physical_communication::held_contact_variation_refuses_untransported_future_without_clearing_it"
+      ]
+    },
+    {
+      "label": "actual-l-physical-03-20261009-v156",
+      "accepted": true,
+      "exit": 0,
+      "wall_ns": 889512340,
+      "projection_ns": 17000000000,
+      "child_wall_ns": 626799620,
+      "aggregate_CPU_ns": 829258000,
+      "group_peak_B": 26595328,
+      "peak_child_RSS_KiB": 31004,
+      "group_limit_B": 8589934592,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 889512340,
+        "denominator": 17000000000
+      },
+      "selectors": [
+        "hnn::tests::physical_communication::continuing_contact_comparison_deposits_and_rebases_without_resetting_delayed_credit"
+      ]
+    },
+    {
+      "label": "actual-l-physical-04-20261009-v156",
+      "accepted": true,
+      "exit": 0,
+      "wall_ns": 307155249,
+      "projection_ns": 17000000000,
+      "child_wall_ns": 53750242,
+      "aggregate_CPU_ns": 260317000,
+      "group_peak_B": 26140672,
+      "peak_child_RSS_KiB": 28192,
+      "group_limit_B": 8589934592,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 307155249,
+        "denominator": 17000000000
+      },
+      "selectors": [
+        "hnn::tests::physical_communication::finite_loaded_span_carries_the_actual_contact_response_at_its_clock"
+      ]
+    },
+    {
+      "label": "actual-l-physical-05-20261009-v156",
+      "accepted": true,
+      "exit": 0,
+      "wall_ns": 1046609507,
+      "projection_ns": 17000000000,
+      "child_wall_ns": 794621694,
+      "aggregate_CPU_ns": 987486000,
+      "group_peak_B": 26824704,
+      "peak_child_RSS_KiB": 31120,
+      "group_limit_B": 8589934592,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 1046609507,
+        "denominator": 17000000000
+      },
+      "selectors": [
+        "hnn::tests::physical_communication::native_contact_step_consumes_the_finite_loaded_span_witness"
+      ]
+    },
+    {
+      "label": "actual-l-physical-06-20261009-v156",
+      "accepted": true,
+      "exit": 0,
+      "wall_ns": 1664109839,
+      "projection_ns": 17000000000,
+      "child_wall_ns": 1396552585,
+      "aggregate_CPU_ns": 1601708000,
+      "group_peak_B": 27025408,
+      "peak_child_RSS_KiB": 31188,
+      "group_limit_B": 8589934592,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 1664109839,
+        "denominator": 17000000000
+      },
+      "selectors": [
+        "hnn::tests::physical_communication::all_reached_contact_families_return_through_the_same_continuing_field"
+      ]
+    },
+    {
+      "label": "actual-l-physical-07-20261009-v156",
+      "accepted": true,
+      "exit": 0,
+      "wall_ns": 308101863,
+      "projection_ns": 17000000000,
+      "child_wall_ns": 60370652,
+      "aggregate_CPU_ns": 262096000,
+      "group_peak_B": 26533888,
+      "peak_child_RSS_KiB": 30052,
+      "group_limit_B": 8589934592,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 308101863,
+        "denominator": 17000000000
+      },
+      "selectors": [
+        "hnn::tests::physical_communication::finite_signed_contact_reaction_holds_momentum_and_reaches_the_next_tick"
+      ]
+    },
+    {
+      "label": "actual-l-physical-08-20261009-v156",
+      "accepted": true,
+      "exit": 0,
+      "wall_ns": 1048551864,
+      "projection_ns": 17000000000,
+      "child_wall_ns": 797930000,
+      "aggregate_CPU_ns": 1004989000,
+      "group_peak_B": 27222016,
+      "peak_child_RSS_KiB": 31352,
+      "group_limit_B": 8589934592,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 1048551864,
+        "denominator": 17000000000
+      },
+      "selectors": [
+        "hnn::tests::physical_communication::the_fixed_v79_contact_observation_accounts_for_its_actual_material_and_remainders"
+      ]
+    },
+    {
+      "label": "actual-l-physical-09-20261009-v156",
+      "accepted": true,
+      "exit": 0,
+      "wall_ns": 1868631910,
+      "projection_ns": 17000000000,
+      "child_wall_ns": 1603905638,
+      "aggregate_CPU_ns": 1797637000,
+      "group_peak_B": 27947008,
+      "peak_child_RSS_KiB": 32992,
+      "group_limit_B": 8589934592,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 1868631910,
+        "denominator": 17000000000
+      },
+      "selectors": [
+        "hnn::tests::physical_communication::the_actual_unresolved_contact_return_survives_a_different_physical_passage"
+      ]
+    },
+    {
+      "label": "actual-l-physical-10-20261009-v156",
+      "accepted": true,
+      "exit": 0,
+      "wall_ns": 1996185131,
+      "projection_ns": 17000000000,
+      "child_wall_ns": 1719821554,
+      "aggregate_CPU_ns": 1920310000,
+      "group_peak_B": 27504640,
+      "peak_child_RSS_KiB": 32804,
+      "group_limit_B": 8589934592,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 1996185131,
+        "denominator": 17000000000
+      },
+      "selectors": [
+        "hnn::tests::physical_communication::complete_contact_return_publishes_held_point_before_existing_communication"
+      ]
+    },
+    {
+      "label": "actual-l-physical-11-20261009-v156",
+      "accepted": true,
+      "exit": 0,
+      "wall_ns": 3884636582,
+      "projection_ns": 17000000000,
+      "child_wall_ns": 3621474810,
+      "aggregate_CPU_ns": 3816265000,
+      "group_peak_B": 29569024,
+      "peak_child_RSS_KiB": 34828,
+      "group_limit_B": 8589934592,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 3884636582,
+        "denominator": 17000000000
+      },
+      "selectors": [
+        "hnn::tests::physical_communication::the_landing_tangent_is_read_beside_the_uniform_certificate_on_the_complete_contact_return"
+      ]
+    },
+    {
+      "label": "actual-l-physical-12-20261009-v156",
+      "accepted": true,
+      "exit": 0,
+      "wall_ns": 2807163889,
+      "projection_ns": 17000000000,
+      "child_wall_ns": 2541420243,
+      "aggregate_CPU_ns": 2738682000,
+      "group_peak_B": 28336128,
+      "peak_child_RSS_KiB": 33508,
+      "group_limit_B": 8589934592,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 2807163889,
+        "denominator": 17000000000
+      },
+      "selectors": [
+        "hnn::tests::physical_communication::the_learned_change_acceptance_is_read_on_the_complete_contact_return"
+      ]
+    },
+    {
+      "label": "actual-l-physical-13-20261009-v156",
+      "accepted": true,
+      "exit": 0,
+      "wall_ns": 321284843,
+      "projection_ns": 17000000000,
+      "child_wall_ns": 79843463,
+      "aggregate_CPU_ns": 285960000,
+      "group_peak_B": 26222592,
+      "peak_child_RSS_KiB": 29596,
+      "group_limit_B": 8589934592,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 321284843,
+        "denominator": 17000000000
+      },
+      "selectors": [
+        "hnn::tests::physical_communication::a_shared_execution_clock_reanchors_the_next_section_without_resetting_its_carry"
+      ]
+    },
+    {
+      "label": "actual-l-physical-14-20261009-v156",
+      "accepted": true,
+      "exit": 0,
+      "wall_ns": 385683098,
+      "projection_ns": 17000000000,
+      "child_wall_ns": 131565227,
+      "aggregate_CPU_ns": 334892000,
+      "group_peak_B": 26468352,
+      "peak_child_RSS_KiB": 30780,
+      "group_limit_B": 8589934592,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 385683098,
+        "denominator": 17000000000
+      },
+      "selectors": [
+        "hnn::tests::physical_communication::communication_deposits_after_the_whole_boundary_and_reuses_material_source_and_carry"
+      ]
+    },
+    {
+      "label": "actual-l-physical-15-20261009-v156",
+      "accepted": true,
+      "exit": 0,
+      "wall_ns": 364073694,
+      "projection_ns": 17000000000,
+      "child_wall_ns": 105792495,
+      "aggregate_CPU_ns": 312696000,
+      "group_peak_B": 25690112,
+      "peak_child_RSS_KiB": 30564,
+      "group_limit_B": 8589934592,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 364073694,
+        "denominator": 17000000000
+      },
+      "selectors": [
+        "hnn::tests::physical_communication::communication_observations_cannot_change_the_earlier_boundary"
+      ]
+    },
+    {
+      "label": "actual-l-physical-16-20261009-v156",
+      "accepted": true,
+      "exit": 0,
+      "wall_ns": 295232448,
+      "projection_ns": 17000000000,
+      "child_wall_ns": 51068820,
+      "aggregate_CPU_ns": 260181000,
+      "group_peak_B": 26411008,
+      "peak_child_RSS_KiB": 29408,
+      "group_limit_B": 8589934592,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 295232448,
+        "denominator": 17000000000
+      },
+      "selectors": [
+        "hnn::tests::physical_communication::communication_refuses_changed_source_or_partition_without_deposition_and_keeps_the_blind_end"
+      ]
+    },
+    {
+      "label": "actual-l-physical-17-20261009-v156",
+      "accepted": true,
+      "exit": 0,
+      "wall_ns": 293702562,
+      "projection_ns": 17000000000,
+      "child_wall_ns": 44530033,
+      "aggregate_CPU_ns": 250402000,
+      "group_peak_B": 26464256,
+      "peak_child_RSS_KiB": 29544,
+      "group_limit_B": 8589934592,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 293702562,
+        "denominator": 17000000000
+      },
+      "selectors": [
+        "hnn::tests::physical_communication::communication_returns_actual_multistation_held_receipts_without_a_joint_certificate"
+      ]
+    },
+    {
+      "label": "actual-l-physical-18-20261009-v156",
+      "accepted": true,
+      "exit": 0,
+      "wall_ns": 388111316,
+      "projection_ns": 17000000000,
+      "child_wall_ns": 118118851,
+      "aggregate_CPU_ns": 319862000,
+      "group_peak_B": 27004928,
+      "peak_child_RSS_KiB": 30424,
+      "group_limit_B": 8589934592,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 388111316,
+        "denominator": 17000000000
+      },
+      "selectors": [
+        "hnn::tests::physical_communication::one_future_communication_carries_one_actual_source_label_through_the_whole_receiving_image"
+      ]
+    },
+    {
+      "label": "actual-l-physical-19-20261009-v156",
+      "accepted": true,
+      "exit": 0,
+      "wall_ns": 437557627,
+      "projection_ns": 17000000000,
+      "child_wall_ns": 193951383,
+      "aggregate_CPU_ns": 391239000,
+      "group_peak_B": 25587712,
+      "peak_child_RSS_KiB": 31016,
+      "group_limit_B": 8589934592,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 437557627,
+        "denominator": 17000000000
+      },
+      "selectors": [
+        "hnn::tests::physical_communication::one_future_source_publication_reaches_the_next_contemporary_communication_opening"
+      ]
+    },
+    {
+      "label": "actual-l-physical-20-20261009-v156",
+      "accepted": true,
+      "exit": 0,
+      "wall_ns": 316098008,
+      "projection_ns": 17000000000,
+      "child_wall_ns": 52629102,
+      "aggregate_CPU_ns": 256246000,
+      "group_peak_B": 26566656,
+      "peak_child_RSS_KiB": 29452,
+      "group_limit_B": 8589934592,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 316098008,
+        "denominator": 17000000000
+      },
+      "selectors": [
+        "hnn::tests::physical_communication::one_future_communication_keeps_refusal_and_multi_future_admission_honest"
+      ]
+    },
+    {
+      "label": "actual-l-physical-21-20261009-v156",
+      "accepted": true,
+      "exit": 0,
+      "wall_ns": 2004471610,
+      "projection_ns": 17000000000,
+      "child_wall_ns": 1749817093,
+      "aggregate_CPU_ns": 1954138000,
+      "group_peak_B": 28270592,
+      "peak_child_RSS_KiB": 32680,
+      "group_limit_B": 8589934592,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 2004471610,
+        "denominator": 17000000000
+      },
+      "selectors": [
+        "hnn::tests::physical_communication::the_finite_decrease_landing_is_read_on_the_complete_contact_return"
+      ]
+    }
+  ],
+  "learning_fixture_reading": {
+    "fixture": "hnn::tests::physical_communication::the_finite_decrease_landing_is_read_on_the_complete_contact_return",
+    "candidate_admitted": "Phase",
+    "criteria_met": 4,
+    "criteria_required": 4,
+    "readings": [
+      "finite-decrease landing criterion 1 (a reached C/K/D deposit commits q != 0): 3 of 3 families => PASS",
+      "finite-decrease landing criterion 2 (the later compared-station response differs from the unmoved-material control): 8 coordinates differ at [2] => PASS",
+      "finite-decrease landing criterion 3 (the world and material energy balance closes exactly on a committed change): identities exact=true, chain residual=0 => PASS",
+      "finite-decrease landing criterion 4 (the same difference survives a cold restore): restore=material=true carry=true current=true => PASS"
+    ],
+    "families_committed": 3,
+    "later_compared_station": 2,
+    "changed_coordinates": 8,
+    "chain_residual": 0,
+    "cold_material_carry_current_equal": true,
+    "scope": "One exact0279 Rest-opening comparison and native continuation; fixture reading, not a general learning or certified curvature claim."
+  },
+  "previous_R_baseline_0of4_preserved": true,
+  "Lean_grade": "PENDING; separate source/import check",
+  "full_native_workspace_runtime_suite": false,
+  "source_edited_by_queue": false,
+  "publication_performed": false
+}

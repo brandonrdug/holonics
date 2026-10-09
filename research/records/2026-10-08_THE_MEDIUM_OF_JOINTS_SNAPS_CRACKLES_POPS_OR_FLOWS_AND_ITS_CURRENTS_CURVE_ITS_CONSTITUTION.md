@@ -229,7 +229,8 @@ and what was represented.**
   - the finite-ray remainder of `A` along `[0, 2^-10]` and the simultaneous-family residuals;
   - the committed-storage checks.
 
-  No larger deposit is admitted. The candidate laws are not exhaustive:
+  Before the finite-decrease law, no larger deposit was admitted. The candidate laws were these, and
+  candidate (b) is built (below):
   - (a) L1′ a priori: the exact-tangent curvature plus a certified bound on the variation of `A`
     along the executed ray;
   - (b) a posteriori exact decrease. Epime's source review (October 8) narrows it.
@@ -257,6 +258,26 @@ and what was represented.**
 [measured; queue terminal validation of `e8795670d`, October 8] All four native tests passed: the
 landing tangent, the chart witness and both carry chains. Split gate 1 passed. The four
 learned-change criteria remain NOT-MET.
+
+[measured, October 9; native PASS at `d81d39d3b` and Lean `HNN/FiniteDecrease` kernel-checked;
+[receipt](receipts/2026-10-09-finite-decrease/PUBLICATION.md)] **The first landing.**
+- **The step.** The finite-decrease admission issued one joint candidate, each family at its own
+  first reach `η = 2⁻¹⁰`, produced by the native deposit law. It re-read the candidate on a transient
+  Rest Word.
+- **The admission.** The classical code-length enclosure was unchanged (an exact cell witness) and
+  the exact phase excess strictly decreased, so the candidate was admitted on its phase part. C
+  committed 5, K 2 and D 4 of their 36 lattice coordinates, each by one unit.
+- **The reader.** The acceptance reader, which read 0 of 4 at `6f0bd8dfd`
+  ([receipt](receipts/2026-10-09-acceptance-reader/PUBLICATION.md)), reads 4 of 4 on the fixture:
+  - the compared station's later response differs from the unmoved control in 8 realified
+    coordinates;
+  - the world and material balance closes exactly, with chain residual 0;
+  - the cold restore reproduces material, carry, current and the difference.
+- **The defect.** The returned `e` (the re-read end minus the held continuation) is nonzero in all
+  40 coordinates, near `2⁻¹⁸`. The claim is the declared same-Rest re-read, not the held
+  continuation.
+- **Scope.** One fixture and its declared comparison, not general learning. Received openings, the
+  held variation and charted operands still refuse.
 
 **Owed (#62, #73):**
 1. the avalanche carry as a certified deposition, which never raises a limit and never takes an

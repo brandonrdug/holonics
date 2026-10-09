@@ -16,6 +16,19 @@ The retained independent briefs are paused with Claude; the product acceptance b
 
 ## Current construction
 
+**October 9: the first learned landing** (#73; the
+[medium-of-joints record](research/records/2026-10-08_THE_MEDIUM_OF_JOINTS_SNAPS_CRACKLES_POPS_OR_FLOWS_AND_ITS_CURRENTS_CURVE_ITS_CONSTITUTION.md) §7).
+- **Before:** the certified contact step landed 22, 20 and 20 binary orders below the material lattice, and the
+  learned-change acceptance read 0 of 4.
+- **The law:** the finite-decrease landing (`hnn::word::continuation::FiniteDecrease`, Lean
+  `HNN/FiniteDecrease`). It admits a declared first-reach step only by an exact strict improvement of the same
+  passage's re-read.
+- **The result:** on the 0279 fixture it admitted a step at `2⁻¹⁰`. C, K and D committed lattice changes, the
+  later output moved, the energy closed exactly, and a cold restore reproduced the change. The reading is 4 of 4,
+  for one fixture and its declared comparison.
+- **Still owed:** continuing (Received) openings, the World-sensitive circuit, and generation learning from its
+  own release.
+
 **October 6 HNN integration.** The [blind receiving return](research/records/2026-10-06_THE_BLIND_RECEIVING_RETURN_IS_JOINED_BUT_RELEASE_NEEDS_THE_EXECUTED_COUPLED_DOMAIN.md)
 now consumes its actual continuing Word's pullback and the existing normal deposition at R.
 The committed physical lane passes two teaching controls and retained carry: a reached deposit

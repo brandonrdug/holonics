@@ -1,0 +1,12 @@
+unit certificate begin elapsed_ms=0
+unit certificate end elapsed_ms=9
+unit successor-operands elapsed_ms=10
+unit next-word-open elapsed_ms=11
+unit certificate begin elapsed_ms=0
+unit certificate end elapsed_ms=11
+unit successor-operands elapsed_ms=12
+unit next-word-open elapsed_ms=14
+unit certificate begin elapsed_ms=0
+unit certificate end elapsed_ms=9
+unit successor-operands elapsed_ms=10
+unit next-word-open elapsed_ms=12

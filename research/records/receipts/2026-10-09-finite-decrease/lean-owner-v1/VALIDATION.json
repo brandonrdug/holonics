@@ -1,0 +1,144 @@
+{
+  "source_admission": {
+    "source_commit": "d81d39d3b8f99eefbe84097c2fddb191a4b2c1e0",
+    "source_tree": "c130586f67c21342f5d49a38cac35ffa6be496f0",
+    "submitted_source_pin": {
+      "sha256": "eee30693d916b221c36e5a1ee65504ab2a80316f7a1f9c797eb630c2ed623dd3",
+      "bytes": 13052
+    },
+    "compiled_source_pin": {
+      "sha256": "63fcd808527306e82c909714d56b08eb0e68630fb5dff331a4b7b9c453dc6c56",
+      "bytes": 13783
+    },
+    "source_prefix_exact": true,
+    "only_appendix_twelve_axiom_queries_added": true,
+    "selectors": [
+      "Holonics.HNN.FiniteDecrease.split_spec",
+      "Holonics.HNN.FiniteDecrease.split_bounds",
+      "Holonics.HNN.FiniteDecrease.quot_ne_zero_of_half_lt",
+      "Holonics.HNN.FiniteDecrease.first_reach_endpoint",
+      "Holonics.HNN.FiniteDecrease.zero_direction_stays",
+      "Holonics.HNN.FiniteDecrease.codeLength_shift",
+      "Holonics.HNN.FiniteDecrease.cellCode_gauge",
+      "Holonics.HNN.FiniteDecrease.Station.code_eq_cells",
+      "Holonics.HNN.FiniteDecrease.witness_code_eq",
+      "Holonics.HNN.FiniteDecrease.witness_total_eq",
+      "Holonics.HNN.FiniteDecrease.admission_sound",
+      "Holonics.HNN.FiniteDecrease.equal_endpoints_need_the_witness"
+    ],
+    "target": "Holonics.HNN.FiniteDecrease",
+    "consumed_custom_providers_current_git_matched": 121,
+    "exact_added_import_line": "import Holonics.HNN.FiniteDecrease",
+    "full_default_library_unrun": true,
+    "reason": "Focused new law and exact newly added import are admitted; a full library command requires a separately source-matched aggregate closure and workload projection.",
+    "scope": "Exact split/remainder first-reach endpoint, gauge reading identity and sound strict admission; no claim of later perception improvement.",
+    "source_grade_before_native": "proved-derived; native acceptance pending"
+  },
+  "kernel_accepted": true,
+  "compiler_exit": 0,
+  "compiler_wall_ns": 9616080203,
+  "queries_required": 12,
+  "queries_reached": 12,
+  "nonstandard_queries": [],
+  "meaningful_error_records": [],
+  "all_query_results": {
+    "Holonics.HNN.FiniteDecrease.split_spec": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.FiniteDecrease.split_bounds": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.FiniteDecrease.quot_ne_zero_of_half_lt": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.FiniteDecrease.first_reach_endpoint": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.FiniteDecrease.zero_direction_stays": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.FiniteDecrease.codeLength_shift": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.FiniteDecrease.cellCode_gauge": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.FiniteDecrease.Station.code_eq_cells": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.FiniteDecrease.witness_code_eq": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.FiniteDecrease.witness_total_eq": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.FiniteDecrease.admission_sound": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.FiniteDecrease.equal_endpoints_need_the_witness": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "metadata_unchanged": true,
+  "results": [
+    {
+      "unit": "prep",
+      "accepted": true,
+      "wall_ns": 7925389336,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 6310853000,
+      "group_peak_B": 902729728,
+      "group_limit_B": 8589934592,
+      "measured_to_projected": {
+        "numerator": 7925389336,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true
+    },
+    {
+      "unit": "compile",
+      "accepted": true,
+      "wall_ns": 11599400260,
+      "projection_ns": 21132554884,
+      "aggregate_CPU_ns": 6677393000,
+      "group_peak_B": 4626259968,
+      "group_limit_B": 8589934592,
+      "measured_to_projected": {
+        "numerator": 11599400260,
+        "denominator": 21132554884
+      },
+      "quiescent_released": true
+    }
+  ],
+  "importer_launched": false,
+  "whole_owner_acceptance_required_before_importer": true,
+  "prior_failed_sources_and_logs_preserved": true,
+  "no_unchanged_retry_or_within_job_limit_raise": true,
+  "current_user_authorized_8GiB": true,
+  "provider_rebuilt": false,
+  "queue_quiescent_released": true
+}

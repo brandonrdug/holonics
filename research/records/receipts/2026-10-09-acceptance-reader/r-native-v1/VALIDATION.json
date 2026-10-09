@@ -1,0 +1,143 @@
+{
+  "source_commit": "6f0bd8dfd3aa32d1f9a800c96d5074822c658dce",
+  "source_tree": "4f755a50346e7b8049b2b9c43db6151aff81329a",
+  "native_files_git_matched": 346,
+  "scope": "Corrected acceptance READING of actual contact deposit, later response, balance and cold restore; a passing test alone does not mean learned-change criteria passed. Finite material-decrease implementation is separate.",
+  "all_native_stages_passed": true,
+  "test_count": 1,
+  "test_names": [
+    "hnn::tests::physical_communication::the_learned_change_acceptance_is_read_on_the_complete_contact_return"
+  ],
+  "all_guard_doctests": 57,
+  "results": [
+    {
+      "unit": "prep8",
+      "passed": true,
+      "quiescence_confirmed": true,
+      "complete_stage_wall_ns": 8473554560,
+      "projection_ns": 17000000000,
+      "measured_to_projected": {
+        "numerator": 8473554560,
+        "denominator": 17000000000
+      },
+      "aggregate_CPU_ns": 6368547000,
+      "group_peak_bytes": 8530575360,
+      "child_wall_ns": 8216987825,
+      "child_peak_RSS_KiB": 39572,
+      "exit_status": 0,
+      "thread_budget": 1,
+      "group_memory_max_bytes": 8589934592
+    },
+    {
+      "unit": "check",
+      "passed": true,
+      "quiescence_confirmed": true,
+      "complete_stage_wall_ns": 26837925231,
+      "projection_ns": 65000000000,
+      "measured_to_projected": {
+        "numerator": 26837925231,
+        "denominator": 65000000000
+      },
+      "aggregate_CPU_ns": 25866792000,
+      "group_peak_bytes": 1691025408,
+      "child_wall_ns": 25056306902,
+      "child_peak_RSS_KiB": 1406860,
+      "exit_status": 0,
+      "thread_budget": 1,
+      "group_memory_max_bytes": 8589934592
+    },
+    {
+      "unit": "clippy",
+      "passed": true,
+      "quiescence_confirmed": true,
+      "complete_stage_wall_ns": 34023723558,
+      "projection_ns": 65000000000,
+      "measured_to_projected": {
+        "numerator": 34023723558,
+        "denominator": 65000000000
+      },
+      "aggregate_CPU_ns": 32989875000,
+      "group_peak_bytes": 1751158784,
+      "child_wall_ns": 32178706871,
+      "child_peak_RSS_KiB": 1438604,
+      "exit_status": 0,
+      "thread_budget": 1,
+      "group_memory_max_bytes": 8589934592
+    },
+    {
+      "unit": "doc",
+      "passed": true,
+      "quiescence_confirmed": true,
+      "complete_stage_wall_ns": 40672409823,
+      "projection_ns": 65000000000,
+      "measured_to_projected": {
+        "numerator": 40672409823,
+        "denominator": 65000000000
+      },
+      "aggregate_CPU_ns": 39510267000,
+      "group_peak_bytes": 2045865984,
+      "child_wall_ns": 38954863341,
+      "child_peak_RSS_KiB": 1620440,
+      "exit_status": 0,
+      "thread_budget": 1,
+      "group_memory_max_bytes": 8589934592
+    },
+    {
+      "unit": "build",
+      "passed": true,
+      "quiescence_confirmed": true,
+      "complete_stage_wall_ns": 40402357278,
+      "projection_ns": 65000000000,
+      "measured_to_projected": {
+        "numerator": 40402357278,
+        "denominator": 65000000000
+      },
+      "aggregate_CPU_ns": 39269609000,
+      "group_peak_bytes": 2433949696,
+      "child_wall_ns": 38482949579,
+      "child_peak_RSS_KiB": 2084780,
+      "exit_status": 0,
+      "thread_budget": 1,
+      "group_memory_max_bytes": 8589934592
+    },
+    {
+      "unit": "runtime",
+      "passed": true,
+      "quiescence_confirmed": true,
+      "complete_stage_wall_ns": 2159956748,
+      "projection_ns": 17000000000,
+      "measured_to_projected": {
+        "numerator": 2159956748,
+        "denominator": 17000000000
+      },
+      "aggregate_CPU_ns": 2048229000,
+      "group_peak_bytes": 40644608,
+      "child_wall_ns": 1834509839,
+      "child_peak_RSS_KiB": 32412,
+      "exit_status": 0,
+      "thread_budget": 1,
+      "group_memory_max_bytes": 8589934592
+    }
+  ],
+  "source_changes_by_queue": false,
+  "no_demo_run": true,
+  "raw_runtime_stdout": "stages/actual-r-runtime-20261009-v140.stdout",
+  "raw_runtime_stderr": "stages/actual-r-runtime-20261009-v140.stderr",
+  "public_publication": false,
+  "learning_reading": {
+    "trust_assertions_passed": true,
+    "criteria_met": 0,
+    "criteria_required": 4,
+    "learning_accepted": false,
+    "C_K_D_committed_families": 0,
+    "lattice_coordinates_per_family": 36,
+    "each_family_nonzero_committed_coordinates": 0,
+    "later_compared_station": 2,
+    "later_response_difference_norm_squared": 0,
+    "energy_identities_close": true,
+    "committed_change_present": false,
+    "cold_material_carry_current_reproduced": true,
+    "cold_response_difference_nonzero": false,
+    "whole_passage_serialization_refused": true
+  }
+}
