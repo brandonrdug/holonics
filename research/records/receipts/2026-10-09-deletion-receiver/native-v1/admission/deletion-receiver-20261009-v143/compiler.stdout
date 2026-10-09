@@ -1,0 +1,283 @@
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:154:6: warning: Unused tactic linter: `simp [channel]` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:154:6: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:163:6: warning: Unused tactic linter: `simp [channel]` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:163:6: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:178:70: warning: Unused tactic linter: `done` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:178:78: warning: Unused tactic linter: `(simp; done)` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:182:8: warning: Unused tactic linter: `(simp [hK b, ih, mul_add]; done)` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:178:78: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:182:8: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:190:96: warning: Unused tactic linter: `done` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:191:6: warning: Unused tactic linter: `(simp; done)` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:191:6: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:212:62: warning: Unused tactic linter: `done` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:213:8: warning: Unused tactic linter: `(simp only [channel_cons, List.map_append, List.sum_append]; done)` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:213:8: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:359:6: warning: Unused tactic linter: `(simp only [Function.comp_apply]; exact transport_comp p₁ p₂ w)` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:359:6: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:366:6: warning: Unused tactic linter: `(rw [List.length_cons]; ring)` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:366:6: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:402:45: warning: Unused tactic linter: `done` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:403:6: warning: Unused tactic linter: `(rw [transport_sub_one_sub]; exact norm_mul p w)` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:403:6: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:418:6: warning: Unused tactic linter: `exact norm_transport_sub_of_norm_one p 1 (by simp)` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:418:6: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:439:6: warning: Unused tactic linter: `simp [genPoly]` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:439:6: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:446:6: warning: Unused tactic linter: `simp [genPoly]` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:446:6: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:461:8: warning: Unused tactic linter: `(simp [genPoly_nil]; done)` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:466:8: warning: Unused tactic linter: `(simp only [List.cons_append, genPoly_cons, genPoly_append φ z y y', List.length_cons];
+  ring)` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:461:8: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:466:8: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:621:25: warning: Unused tactic linter: `simp [embeddings]` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:622:30: warning: Unused tactic linter: `simp [embeddings]` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:621:25: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:622:30: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:628:6: warning: Unused tactic linter: `simp [embeddings]` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:628:6: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:637:6: warning: Unused tactic linter: `simp [embeddings]` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:637:6: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:645:20: warning: Unused tactic linter: `done` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:646:8: warning: Unused tactic linter: `exact absurd h (Nat.lt_irrefl _)` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:650:20: warning: Unused tactic linter: `done` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:651:8: warning: Unused tactic linter: `(simp only [List.length_cons, List.length_nil] at h; omega)` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:662:15: warning: Unused tactic linter: `done` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:663:8: warning: Unused tactic linter: `(rw [ite_self, add_zero]; done)` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:646:8: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:651:8: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:663:8: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:673:47: warning: Unused tactic linter: `done` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:674:8: warning: Unused tactic linter: `(simp [hab]; done)` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:676:63: warning: Unused tactic linter: `done` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:677:8: warning: Unused tactic linter: `(simp [hab]; done)` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:674:8: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:677:8: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:689:60: warning: Unused tactic linter: `done` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:690:10: warning: Unused tactic linter: `(simp [hab, hty]; done)` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:693:61: warning: Unused tactic linter: `done` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:694:10: warning: Unused tactic linter: `(simp [hab, hty]; done)` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:697:47: warning: Unused tactic linter: `done` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:698:8: warning: Unused tactic linter: `(simp [hab]; done)` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:690:10: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:694:10: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:698:8: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:750:52: warning: Unused tactic linter: `done` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:751:10: warning: Unused tactic linter: `(rw [expect_nil, if_pos rfl, embeddings_nil_right];
+  simp only [List.length_nil, Nat.sub_self, pow_zero, Nat.cast_one, mul_one]; done)` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:754:51: warning: Unused tactic linter: `done` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:755:10: warning: Unused tactic linter: `(rw [expect_nil, embeddings_nil_cons, Nat.cast_zero, mul_zero];
+  exact if_neg (List.cons_ne_nil b y).symm)` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:805:10: warning: Unused tactic linter: `simpa only [List.length_cons] using key` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:751:10: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:755:10: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:805:10: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:857:55: warning: Unused tactic linter: `done` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:858:6: warning: Unused tactic linter: `(simp only [survival, posterior, Finset.sum_div]; done)` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:858:6: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:872:10: warning: Unused tactic linter: `(simp [hab] <;> ring)` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:875:10: warning: Unused tactic linter: `(simp [hab] <;> ring)` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:883:54: warning: Unused tactic linter: `done` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:884:12: warning: Unused tactic linter: `(simp only [Fintype.sum_ite_eq, Finset.mul_sum]; done)` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:885:12: warning: Unused tactic linter: `simp [Finset.mul_sum]` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:872:10: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:875:10: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:884:12: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:885:12: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:908:6: warning: Unused tactic linter: `(unfold survival; exact sub_self _)` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:909:6: warning: Unused tactic linter: `simp [survival]` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:908:6: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:909:6: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:921:6: warning: Unused tactic linter: `(rw [sub_div, div_self hN]; done)` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+<queue-admission>/deletion-receiver-20261009-v143/source-v1/Holonics/Transport/DeletionReceiver.lean:921:6: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+'Holonics.Transport.DeletionReceiver.expect_cons' depends on axioms: [propext, Quot.sound]
+'Holonics.Transport.DeletionReceiver.expect_pow_length' depends on axioms: [propext, Quot.sound]
+'Holonics.Transport.DeletionReceiver.expect_genPoly' depends on axioms: [propext, Quot.sound]
+'Holonics.Transport.DeletionReceiver.mean_receipt_difference' depends on axioms: [propext, Quot.sound]
+'Holonics.Transport.DeletionReceiver.transport_comp' depends on axioms: [propext, Quot.sound]
+'Holonics.Transport.DeletionReceiver.norm_transport_sub' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.DeletionReceiver.expect_expect' depends on axioms: [propext, Quot.sound]
+'Holonics.Transport.DeletionReceiver.expect_trace' depends on axioms: [propext, Quot.sound]
+'Holonics.Transport.DeletionReceiver.covector_column' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.DeletionReceiver.covector_sum_zero' depends on axioms: [propext, Classical.choice, Quot.sound]

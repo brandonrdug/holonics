@@ -58,7 +58,10 @@ the arc that the receiver's circle reads near the landmark. A polynomial with co
 `exp(Θ(n^{1/3}))` traces for mean-based reconstruction (De–O'Donnell–Servedio 2017; Nazarov–Peres
 2017). Multi-symbol statistics, several phases at once, give `exp(Õ(n^{1/5}))` (Chase 2021). The
 public OpenAI catalogue's family 122 states an `n^{Ω(log log n)}` lower bound and a quasipolynomial
-decoder; these are its claims and were not checked here. The opposite pole is the flat spectrum:
+decoder; these are its claims and were not checked here. The catalogue lists family 122 and then
+124 (three-machine scheduling), with no 123 between them. Brandon's item 123 (October 9) is that
+omitted slot: an information-reconstruction item to engineer, whose transfer to scheduling stays
+exploratory until a concrete operation joins them. The opposite pole is the flat spectrum:
 binary sequences that resonate nowhere (that catalogue's families 076, ultraflat Littlewood
 polynomials, and 179, Barker sequences) are the keys that no first-moment reading locates.
 
@@ -146,8 +149,14 @@ key location by resonance across a receiver family with soft constituents.
 ## 6. The joins owed
 
 1. A native deletion receiver: its clock (survivor epochs), its transport `T_p`, and the moment law
-   of §2. Lean, owed in #62: the moment law and the composition `T_{p₁} ∘ T_{p₂} = T_{p₁p₂}`, both
-   short.
+   of §2. **The Lean is kernel-checked** (`formal-checked`; `Transport/DeletionReceiver` at
+   `d5f7c140b`, [receipt](receipts/2026-10-09-deletion-receiver/PUBLICATION.md)). It covers:
+   - the clock law `expect_pow_length` and the moment law `expect_genPoly`;
+   - the transports composing (`transport_comp`) and the channels composing for every reading
+     (`expect_expect`);
+   - the likelihood with its embedding count (`expect_trace`);
+   - the covector `r − ρ s` (`covector_column`, `covector_sum_zero`).
+   The native receiver in Rust stays owed, with its consumer (item 2).
 2. The trace likelihood as the machine's own pair-contact passage with slip, its forward–backward as
    passage and adjoint, and its covector `r − ρ s` deposited by the existing law. This must not be an
    authored decoder (the catered-machinery antipattern): the alignment lattice is the pair contact's

@@ -296,6 +296,7 @@ import Holonics.Transport.HolonicInteraction
 import Holonics.Transport.HelicalPairInteraction
 import Holonics.Transport.HelicalCode
 import Holonics.Transport.HelicalRepair
+import Holonics.Transport.DeletionReceiver
 import Holonics.Transport.NavigatorTraceFaces
 import Holonics.Transport.CellHolonomy
 import Holonics.Geometry.PhaseCarry

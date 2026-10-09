@@ -1,0 +1,21 @@
+{
+  "files": {
+    "native-v1/admission/deletion-receiver-20261009-v143/compiler.stdout": {
+      "original": {
+        "bytes": 27701,
+        "sha256": "ae446427020286170c5ee90efdc59dc85caaf938507297b4856a1f6d99ad05cf"
+      },
+      "projected": {
+        "bytes": 23381,
+        "sha256": "108c2293339a439ecb0f377e86867fd5520cf378f85726463be84243abbf5dce"
+      },
+      "replaced": {
+        "<queue-admission>/": 90
+      }
+    }
+  },
+  "placeholders": {
+    "<queue-admission>/": "the absolute host directory holding the sole queue's admissions; the admission label and the paths that follow are kept"
+  },
+  "rule": "each absolute host prefix below is replaced by its placeholder; no other byte changes. The placeholder does not occur in the original, so substituting the prefix back restores the original bytes, whose sha256 and size are pinned here and in the unchanged native-v1/FILE_HASHES.json; checked locally before commit."
+}
