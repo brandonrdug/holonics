@@ -1,14 +1,14 @@
 {
   "source_admission": {
     "source_commit": "2c5943c234420bdf2657d0f7237d00df88f0099e",
-    "root_import": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/received-opening-lean-20261009-v169/HNN.submitted.lean",
+    "root_import": "<queue-admission>/received-opening-lean-20261009-v169/HNN.submitted.lean",
     "root_pin": {
       "sha256": "c30a7d9a6222fa31890b065d2e2889dd50623fd196487cf4719ebe2d6de63264",
       "bytes": 45795
     },
     "actual_added_line_number": 10,
     "actual_added_import": "import Holonics.HNN.FiniteDecrease",
-    "consumer_source": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/received-opening-import-20261009-v171/source-v1/FiniteDecreaseImportConsumer.lean",
+    "consumer_source": "<queue-admission>/received-opening-import-20261009-v171/source-v1/FiniteDecreaseImportConsumer.lean",
     "consumer_pin": {
       "sha256": "e7cf4d29f2927d1db372ba8602877b94fbfe3e6511c35e968eccf4327e39ddd7",
       "bytes": 961
@@ -33,7 +33,7 @@
     "full_HNN_aggregate_compiled": false,
     "exact_HNN_new_import_consumed": true,
     "native_finite_decrease_validated_separately": true,
-    "accepted_provider_kernel": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/received-opening-lean-20261009-v169/KERNEL_VALIDATION.json",
+    "accepted_provider_kernel": "<queue-admission>/received-opening-lean-20261009-v169/KERNEL_VALIDATION.json",
     "target": "FiniteDecreaseImportConsumer",
     "selectors": [
       "Holonics.HNN.FiniteDecrease.split_spec",

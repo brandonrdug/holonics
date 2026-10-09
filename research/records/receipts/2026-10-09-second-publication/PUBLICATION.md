@@ -13,9 +13,17 @@ and resource controls and outcomes.
   checks were not rerun. Committed: the handoff, validation, every stage's stdout and stderr of at
   most 200,000 bytes, `native-v1/admission/UNAFFECTED_GUARD_REUSE.json` (the reuse of the
   received-landing pin's unchanged guards) and `native-v1/FILE_HASHES.json`; the clippy stdout and the
-  rest of the packet are hashed only in [OMITTED.md](native-v1/OMITTED.md). The join also names the
+  rest of the packet are hashed only in [OMITTED.md](native-v1/OMITTED.md). The committed stages are
+  whole, except the host paths projected below. The join also names the
   early copies of the runtime stdout and stderr, kept under `actual-reading-v1/` and byte-identical to
   the `native-v1` stage's.
+- **Projected host paths** ([PROJECTION.json](PROJECTION.json)). Five committed stage files carry
+  absolute host paths in their original bytes: the build and check stdout and stderr and the clippy
+  stderr. They are published with two host prefixes replaced by `<queue-admission>/` and
+  `<cargo-registry>/`; every admission label, crate version, diagnostic and reading is unchanged, and
+  no other byte changes. Each file's original sha256 and size, as pinned in the unchanged
+  `native-v1/FILE_HASHES.json`, stand beside its projected pins; the placeholders do not occur in the
+  originals, so substituting the prefixes back restores the pinned bytes.
 - **The reading: 4 of 4.** On 0279's own task the first call landed at Rest and published; the
   second call repeated the observation at the received opening the first left, landed (both
   `Ok(Phase)`) and published, at first reaches C `2⁻¹³`, K `2⁻¹⁴`, D `2⁻¹³`.

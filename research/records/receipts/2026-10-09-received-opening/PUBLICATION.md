@@ -7,8 +7,9 @@ resource controls and outcomes.
 
 - **Native** ([handoff](native-v1/HANDOFF.md), [validation](native-v1/VALIDATION.json)). The gate
   (check, guard clippy, all 57 guard doctests, build) and all 14 finite-decrease and 21
-  physical-communication fixtures passed. Committed: the handoff and validation, the whole stdout and
-  stderr of every stage at most 200,000 bytes, and `native-v1/FILE_HASHES.json`. Three stdouts are
+  physical-communication fixtures passed. Committed: the handoff and validation, the stdout and
+  stderr of every stage at most 200,000 bytes (whole, except the host paths projected below), and
+  `native-v1/FILE_HASHES.json`. Three stdouts are
   hashed only in [OMITTED.md](native-v1/OMITTED.md): the clippy stage (2,743,015 bytes) and two
   physical fixtures (218,996 and 400,329 bytes); their stderr is committed.
 - **The received reading.** On 0279's carry after a full first Word (3 ticks, one contact moving),
@@ -22,7 +23,16 @@ resource controls and outcomes.
 - **Lean** ([owner](lean-owner-v1/HANDOFF.md), [import](lean-import-v1/HANDOFF.md)).
   `HNN/FiniteDecrease` (source sha256 `3a911d53`, 15,377 bytes) and its `HNN` import were
   kernel-checked, 15 queries each, all on standard axioms only. Committed: each handoff,
-  validation, kernel result, compiler stdout and stderr, and hash manifest.
+  validation (the import validation with its host paths projected), kernel result, compiler stdout
+  and stderr, and hash manifest.
+- **Projected host paths** ([PROJECTION.json](PROJECTION.json)). Seven committed files carry
+  absolute host paths in their original bytes: the build and check stdout and stderr and the clippy
+  and doc stderr of `native-v1`, and `lean-import-v1/VALIDATION.json`. They are published with two
+  host prefixes replaced by `<queue-admission>/` and `<cargo-registry>/`; every admission label,
+  crate version, diagnostic and reading is unchanged, and no other byte changes. Each file's original
+  sha256 and size, as pinned in its subdirectory's unchanged `FILE_HASHES.json`, stand beside its
+  projected pins; the placeholders do not occur in the originals, so substituting the prefixes back
+  restores the pinned bytes.
 - **Hashed only:** each subdirectory's `OMITTED.md`.
 - **Scope.** The proposal is the existing fixed-rate covector; the exact finite admission alone
   decides. The opening's held-crossing term `J_open` with its initial-state certificate, an

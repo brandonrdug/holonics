@@ -1,0 +1,107 @@
+{
+  "files": {
+    "lean-import-v1/VALIDATION.json": {
+      "original": {
+        "bytes": 6204,
+        "sha256": "862f431c183ceb01a9f48df591a18a49d40302996da6130b233a7f894cfb1d9f"
+      },
+      "projected": {
+        "bytes": 6060,
+        "sha256": "826e90f9de215c7316d93feccde7c6dedaa82bd0aee05f03babe678fe973ae80"
+      },
+      "replaced": {
+        "<cargo-registry>/": 0,
+        "<queue-admission>/": 3
+      }
+    },
+    "native-v1/stages/actual-received-build-20261009-v168.stderr": {
+      "original": {
+        "bytes": 379,
+        "sha256": "58b42a1adf23d9830e69be0f685b931e9ce0d34a42dc9586585c12b227eec9b3"
+      },
+      "projected": {
+        "bytes": 331,
+        "sha256": "cffc28c5686eddf2bb881fb77720afa02311db0b5a6e35fc6b92eeb56afac1b9"
+      },
+      "replaced": {
+        "<cargo-registry>/": 0,
+        "<queue-admission>/": 1
+      }
+    },
+    "native-v1/stages/actual-received-build-20261009-v168.stdout": {
+      "original": {
+        "bytes": 28382,
+        "sha256": "907e537044b8d81da2a44a73f4b761e1231728bd7af310d5bb122feef1cfe954"
+      },
+      "projected": {
+        "bytes": 23446,
+        "sha256": "e9819d67e2b71c40cc3faa95e51a9f1441102cfe87e0ef2ce8863b8dd232d145"
+      },
+      "replaced": {
+        "<cargo-registry>/": 50,
+        "<queue-admission>/": 57
+      }
+    },
+    "native-v1/stages/actual-received-check-20261009-v168.stderr": {
+      "original": {
+        "bytes": 257,
+        "sha256": "6e41a2e97016ce895076f767f1113a816bffda44f3c85b491bd210c624e78d43"
+      },
+      "projected": {
+        "bytes": 209,
+        "sha256": "f07095d62bd7d68a9d07fa7aaec9d64d973ed5624548b85ef4196175eb1427cb"
+      },
+      "replaced": {
+        "<cargo-registry>/": 0,
+        "<queue-admission>/": 1
+      }
+    },
+    "native-v1/stages/actual-received-check-20261009-v168.stdout": {
+      "original": {
+        "bytes": 38998,
+        "sha256": "b2c0cec78707468aa6c161380dbc2375e95be7251f389d5f584ca0900703fd53"
+      },
+      "projected": {
+        "bytes": 32862,
+        "sha256": "ac8636276b0317b02cfd35ddf2e75f461e1df5a3facede8949db13a087754235"
+      },
+      "replaced": {
+        "<cargo-registry>/": 50,
+        "<queue-admission>/": 82
+      }
+    },
+    "native-v1/stages/actual-received-clippy-20261009-v168.stderr": {
+      "original": {
+        "bytes": 226,
+        "sha256": "35afd2d73109984d0946e74d4292b9805e9688ec00b6cdd9e94ec11a436bd869"
+      },
+      "projected": {
+        "bytes": 178,
+        "sha256": "5387c44b2ec40775364d557139a05af3b8e8a8678b49c59fd9f2fb3a6b572116"
+      },
+      "replaced": {
+        "<cargo-registry>/": 0,
+        "<queue-admission>/": 1
+      }
+    },
+    "native-v1/stages/actual-received-doc-20261009-v168.stderr": {
+      "original": {
+        "bytes": 1432,
+        "sha256": "f0f639878c9a51ef496560e4bfe9d25faadde73b6e4dc036e426c768092b53c6"
+      },
+      "projected": {
+        "bytes": 1384,
+        "sha256": "cc4a02567bd5e4c5a700a4e8a1ccceec6481f53c3769339f6a289f912fcdc3b0"
+      },
+      "replaced": {
+        "<cargo-registry>/": 0,
+        "<queue-admission>/": 1
+      }
+    }
+  },
+  "placeholders": {
+    "<cargo-registry>/": "the absolute host directory of the crates.io registry sources; each crate name and version that follows is kept",
+    "<queue-admission>/": "the absolute host directory holding the sole queue's admissions; the admission label, its source copy (source-v1) and build cache (cache-v2) that follow are kept"
+  },
+  "rule": "each absolute host prefix below is replaced by its placeholder; no other byte changes. The placeholders do not occur in the originals, so substituting each prefix back restores the original bytes, whose sha256 and size are pinned here and in the unchanged FILE_HASHES.json of each subdirectory (checked locally before publication)."
+}
