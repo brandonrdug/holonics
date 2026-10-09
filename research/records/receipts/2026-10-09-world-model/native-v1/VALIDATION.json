@@ -1,0 +1,213 @@
+{
+  "source_commit": "0a7fa87a448232a273e7f9375d85f1dd90df649c",
+  "source_tree": "aaea23f1e3e4f198f19323cdce3ed6994bb3a17a",
+  "source_inputs": 352,
+  "cleared_operational_parent": "fce952952a8b54943e370d566ae201d79f53c9af",
+  "header_only_successor_verified": true,
+  "grade": "native scoped checks passed",
+  "world_model_tests": 7,
+  "affected_guards": 15,
+  "unique_fixtures": 22,
+  "fixtures": [
+    "the_world_key_reproduces_every_actual_step_and_its_fibre_is_the_batch_preimage",
+    "a_disconnected_key_is_eliminated_only_by_its_exact_annihilator",
+    "a_non_passive_key_is_held_at_its_certified_cut_while_the_tick_advances",
+    "an_interrupted_encounter_is_absorbed_through_its_executed_steps_without_rollback",
+    "binding_is_refused_without_a_world_off_its_tick_or_off_the_source_frame",
+    "the_resident_charges_the_models_current_bits_at_every_encounter",
+    "the_return_image_separates_the_free_and_forced_responses_and_holds_the_actual_returns",
+    "a_held_preimage_or_foreign_clock_changes_neither_actual_participant",
+    "actual_prior_world_history_changes_native_carry_and_matched_later_choice",
+    "an_actual_world_face_changes_r_then_the_later_native_prospect",
+    "paired_actual_faces_keep_mass_phase_and_unobserved_regions",
+    "a_plural_preimage_keeps_its_kernel_and_an_unreachable_request_returns_its_obstruction",
+    "a_unique_preparation_uses_the_full_loaded_opening_and_actual_pump_clock",
+    "an_unconstrained_request_retains_the_whole_control_domain",
+    "the_current_receiving_material_changes_the_prospect_and_stale_producing_words_refuse",
+    "hnn::tests::guards::guard_eleven_refine_and_compare_leave_the_constitution",
+    "hnn::tests::guards::guard_fifteen_the_budget_is_refused_never_rounded",
+    "hnn::tests::guards::guard_fifteen_the_grain_reading_rounds_nothing",
+    "hnn::tests::guards::guard_five_the_collapse_runs_only_at_the_carry_out",
+    "hnn::tests::guards::guard_four_the_constitution_keeps_no_journal",
+    "hnn::tests::guards::guard_nine_the_alphabet_does_not_fix_the_architecture",
+    "hnn::tests::guards::guard_one_the_moment_is_sized_once_and_lossy_past_its_capacity"
+  ],
+  "workspace_all_targets_check_passed": true,
+  "fresh_executables": 4,
+  "results": [
+    {
+      "label": "actual-c1b-prep8-20261009-v206",
+      "accepted": true,
+      "wall_ns": 9169318185,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 6467318000,
+      "child_wall_ns": 8964989809,
+      "exit": 0,
+      "peak_child_RSS_KiB": 39784,
+      "group_memory_peak_bytes": 8448020480,
+      "group_memory_max_bytes": 8589934592,
+      "thread_budget": 1,
+      "measured_to_projected": {
+        "numerator": 9169318185,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true
+    },
+    {
+      "label": "actual-c1b-check4-20261009-v207",
+      "accepted": true,
+      "wall_ns": 26968060377,
+      "projection_ns": 65000000000,
+      "aggregate_CPU_ns": 27170679000,
+      "child_wall_ns": 24997595057,
+      "exit": 0,
+      "peak_child_RSS_KiB": 1513152,
+      "group_memory_peak_bytes": 1823686656,
+      "group_memory_max_bytes": 4294967296,
+      "thread_budget": 4,
+      "measured_to_projected": {
+        "numerator": 26968060377,
+        "denominator": 65000000000
+      },
+      "quiescent_released": true
+    },
+    {
+      "label": "actual-c1b-build4-20261009-v207",
+      "accepted": true,
+      "wall_ns": 56520477615,
+      "projection_ns": 65000000000,
+      "aggregate_CPU_ns": 57800242000,
+      "child_wall_ns": 54451083621,
+      "exit": 0,
+      "peak_child_RSS_KiB": 2157392,
+      "group_memory_peak_bytes": 2434633728,
+      "group_memory_max_bytes": 4294967296,
+      "thread_budget": 4,
+      "measured_to_projected": {
+        "numerator": 56520477615,
+        "denominator": 65000000000
+      },
+      "quiescent_released": true
+    },
+    {
+      "label": "c1b-first-20261009-v208",
+      "accepted": true,
+      "wall_ns": 1204673928,
+      "projection_ns": 16387764493,
+      "aggregate_CPU_ns": 1149701000,
+      "child_wall_ns": 984309933,
+      "exit": 0,
+      "peak_child_RSS_KiB": 23916,
+      "group_memory_peak_bytes": 26533888,
+      "group_memory_max_bytes": 4294967296,
+      "thread_budget": 1,
+      "measured_to_projected": {
+        "numerator": 1204673928,
+        "denominator": 16387764493
+      },
+      "quiescent_released": true
+    },
+    {
+      "label": "c1b-remaining-20261009-v208",
+      "accepted": true,
+      "wall_ns": 1902093772,
+      "projection_ns": 31775528986,
+      "aggregate_CPU_ns": 1833964000,
+      "child_wall_ns": 1668044383,
+      "exit": 0,
+      "peak_child_RSS_KiB": 24940,
+      "group_memory_peak_bytes": 27262976,
+      "group_memory_max_bytes": 4294967296,
+      "thread_budget": 1,
+      "measured_to_projected": {
+        "numerator": 1902093772,
+        "denominator": 31775528986
+      },
+      "quiescent_released": true
+    },
+    {
+      "label": "c1b-native-action-return-20261009-v209",
+      "accepted": true,
+      "wall_ns": 799260279,
+      "projection_ns": 21517019324,
+      "aggregate_CPU_ns": 738294000,
+      "child_wall_ns": 572627600,
+      "exit": 0,
+      "peak_child_RSS_KiB": 24924,
+      "group_memory_peak_bytes": 27295744,
+      "group_memory_max_bytes": 4294967296,
+      "thread_budget": 1,
+      "measured_to_projected": {
+        "numerator": 799260279,
+        "denominator": 21517019324
+      },
+      "quiescent_released": true
+    },
+    {
+      "label": "c1b-physical-action-20261009-v209",
+      "accepted": true,
+      "wall_ns": 391080692,
+      "projection_ns": 21517019324,
+      "aggregate_CPU_ns": 339503000,
+      "child_wall_ns": 184689762,
+      "exit": 0,
+      "peak_child_RSS_KiB": 24928,
+      "group_memory_peak_bytes": 25980928,
+      "group_memory_max_bytes": 4294967296,
+      "thread_budget": 1,
+      "measured_to_projected": {
+        "numerator": 391080692,
+        "denominator": 21517019324
+      },
+      "quiescent_released": true
+    },
+    {
+      "label": "c1b-guards-20261009-v209",
+      "accepted": true,
+      "wall_ns": 540818170,
+      "projection_ns": 36904783817,
+      "aggregate_CPU_ns": 488337000,
+      "child_wall_ns": 282843495,
+      "exit": 0,
+      "peak_child_RSS_KiB": 30664,
+      "group_memory_peak_bytes": 27287552,
+      "group_memory_max_bytes": 4294967296,
+      "thread_budget": 1,
+      "measured_to_projected": {
+        "numerator": 540818170,
+        "denominator": 36904783817
+      },
+      "quiescent_released": true
+    }
+  ],
+  "earlier_host_memory_refusal": {
+    "label": "actual-c1b-check-20261009-v206",
+    "child_launched": false,
+    "failure": {
+      "provisional_passed": false,
+      "final_acceptance_requires_external_CPU_read": true,
+      "label": "actual-c1b-check-20261009-v206",
+      "error_type": "AssertionError",
+      "error": "('fresh host memory gate refused', 12517847040, 12884901888)",
+      "child_launched": false,
+      "child_reaped": false
+    }
+  },
+  "changed_resource_partition": "One Cargo job and four codegen CPUs under existing 4 GiB group reservation/8 GiB host gate; unchanged 4 GiB system floor. Maximum authority remains 8 GiB.",
+  "prelaunch_identifier_correction": "Underscore in scope_unit rejected before runner lease/child; preserved config, corrected identifier only.",
+  "scope": "Declared future input word; correlated current-state fibre; exact incompatible/held returns and binding refusal; interrupted executed steps absorbed without rollback; mutable values/tags/cuts/reached tick charged.",
+  "not_certified": [
+    "Coupled source/World future certificate",
+    "C2 finite forward cover",
+    "Ask over keys",
+    "Learning through model",
+    "World/Robin all-material first and second variation",
+    "CUDA parity",
+    "Immutable-law or workspace/process/device memory charged as mutable state bits"
+  ],
+  "all_quiescent_released": true,
+  "no_runtime_fixture_repeated": true,
+  "no_limits_raised_after_launch": true,
+  "production_edits_by_queue": false,
+  "publication_by_queue": false
+}

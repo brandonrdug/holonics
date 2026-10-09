@@ -1,0 +1,11 @@
+
+running 6 tests
+test a_disconnected_key_is_eliminated_only_by_its_exact_annihilator ... ok
+test a_non_passive_key_is_held_at_its_certified_cut_while_the_tick_advances ... ok
+test an_interrupted_encounter_is_absorbed_through_its_executed_steps_without_rollback ... ok
+test binding_is_refused_without_a_world_off_its_tick_or_off_the_source_frame ... ok
+test the_resident_charges_the_models_current_bits_at_every_encounter ... ok
+test the_return_image_separates_the_free_and_forced_responses_and_holds_the_actual_returns ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 1.66s
+

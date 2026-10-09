@@ -1,0 +1,12 @@
+
+running 7 tests
+test hnn::tests::guards::guard_eleven_refine_and_compare_leave_the_constitution ... ok
+test hnn::tests::guards::guard_fifteen_the_budget_is_refused_never_rounded ... ok
+test hnn::tests::guards::guard_fifteen_the_grain_reading_rounds_nothing ... ok
+test hnn::tests::guards::guard_five_the_collapse_runs_only_at_the_carry_out ... ok
+test hnn::tests::guards::guard_four_the_constitution_keeps_no_journal ... ok
+test hnn::tests::guards::guard_nine_the_alphabet_does_not_fix_the_architecture ... ok
+test hnn::tests::guards::guard_one_the_moment_is_sized_once_and_lossy_past_its_capacity ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 1174 filtered out; finished in 0.28s
+
