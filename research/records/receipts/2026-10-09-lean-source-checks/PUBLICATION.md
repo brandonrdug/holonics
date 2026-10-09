@@ -35,7 +35,7 @@ statement headers of v3 equal v2's.
 
 The fixed deadline was 154,785,618,970 ns throughout. The first v3 admission was refused before any
 compiler launched, for insufficient measured memory headroom; the later admission ran once under the
-same bounds. Both failed admissions and every failure are kept.
+same bounds. The refused admission and every compiler failure are kept.
 
 ## Projected host paths and hashed files
 
