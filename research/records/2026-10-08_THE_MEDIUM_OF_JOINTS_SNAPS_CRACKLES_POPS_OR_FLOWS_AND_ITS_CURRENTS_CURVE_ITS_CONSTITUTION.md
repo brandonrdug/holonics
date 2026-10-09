@@ -299,8 +299,13 @@ learned-change criteria remain NOT-MET.
   producing constitution where `C` is injective; and Rest unmoved where `C′` is injective. The Rust
   crossing returns `w` itself whenever `C w = π` (the zero-target short circuit of `held_rate`), a
   singular `C` included, which the Lean statement does not cover.
-- **Measured:** nothing yet. The native gate, the fixtures (0279's received carry) and the Lean owner
-  go to the sole queue.
+- **Measured** (native PASS at `2c5943c23`, Lean owner and import kernel-checked;
+  [receipt](receipts/2026-10-09-received-opening/PUBLICATION.md)). On 0279's carry after a full first
+  Word (3 ticks, one contact moving), the landing re-entered the received opening through `θ′` and
+  admitted the candidate on its phase part, at first reaches C `2⁻¹¹`, K `2⁻¹⁰`, D `2⁻¹¹`, reaching 2, 9
+  and 2 entries; the held momentum and the finite crossing identity held exactly. The fixture reads
+  the candidate and publishes nothing, so a learned publication at a received opening, and its later
+  response, are not yet measured. All 14 finite-decrease and 21 physical fixtures pass.
 
 **Owed (#62, #73):**
 1. the avalanche carry as a certified deposition, which never raises a limit and never takes an

@@ -1,0 +1,7 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling syn v3.0.3
+   Compiling thiserror v2.0.19
+   Compiling thiserror-impl v2.0.19
+   Compiling holonics v0.1.0 (/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/actual-received-20261009-v168/source-v1/crates/holonics)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 36.86s

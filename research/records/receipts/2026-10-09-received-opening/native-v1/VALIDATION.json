@@ -1,0 +1,973 @@
+{
+  "source_commit": "2c5943c234420bdf2657d0f7237d00df88f0099e",
+  "source_tree": "38c5e0833feb80b44a259601a660703f532bf177",
+  "native_files": 347,
+  "all_native_stages_and_fixtures_accepted": true,
+  "fixtures_expected": 35,
+  "fixtures_accepted": 35,
+  "results": [
+    {
+      "label": "actual-received-prep8-20261009-v168",
+      "accepted": true,
+      "complete_wall_ns": 10105322193,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 7714445000,
+      "group_peak_B": 6769016832,
+      "child_wall_ns": 9856838501,
+      "child_peak_RSS_KiB": 39352,
+      "measured_to_projected": {
+        "numerator": 10105322193,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": []
+    },
+    {
+      "label": "actual-received-check-20261009-v168",
+      "accepted": true,
+      "complete_wall_ns": 22853461438,
+      "projection_ns": 65000000000,
+      "aggregate_CPU_ns": 21899130000,
+      "group_peak_B": 1682681856,
+      "child_wall_ns": 20936530249,
+      "child_peak_RSS_KiB": 1470188,
+      "measured_to_projected": {
+        "numerator": 22853461438,
+        "denominator": 65000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": []
+    },
+    {
+      "label": "actual-received-clippy-20261009-v168",
+      "accepted": true,
+      "complete_wall_ns": 32309794734,
+      "projection_ns": 65000000000,
+      "aggregate_CPU_ns": 31377560000,
+      "group_peak_B": 1764777984,
+      "child_wall_ns": 30533366049,
+      "child_peak_RSS_KiB": 1489812,
+      "measured_to_projected": {
+        "numerator": 32309794734,
+        "denominator": 65000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": []
+    },
+    {
+      "label": "actual-received-doc-20261009-v168",
+      "accepted": true,
+      "complete_wall_ns": 40139647213,
+      "projection_ns": 65000000000,
+      "aggregate_CPU_ns": 38714635000,
+      "group_peak_B": 2042712064,
+      "child_wall_ns": 38261045322,
+      "child_peak_RSS_KiB": 1678692,
+      "measured_to_projected": {
+        "numerator": 40139647213,
+        "denominator": 65000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": []
+    },
+    {
+      "label": "actual-received-build-20261009-v168",
+      "accepted": true,
+      "complete_wall_ns": 38565272631,
+      "projection_ns": 65000000000,
+      "aggregate_CPU_ns": 37455950000,
+      "group_peak_B": 2395582464,
+      "child_wall_ns": 36880161589,
+      "child_peak_RSS_KiB": 2077316,
+      "measured_to_projected": {
+        "numerator": 38565272631,
+        "denominator": 65000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": []
+    },
+    {
+      "label": "actual-received-development-20261009-v170",
+      "accepted": true,
+      "complete_wall_ns": 1505826496,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 1430437000,
+      "group_peak_B": 28143616,
+      "child_wall_ns": 1222098995,
+      "child_peak_RSS_KiB": 29804,
+      "measured_to_projected": {
+        "numerator": 1505826496,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": [
+        "hnn::tests::finite_decrease::a_received_opening_reads_its_landing_from_the_crossed_carry"
+      ]
+    },
+    {
+      "label": "actual-received-finite-01-20261009-v170",
+      "accepted": true,
+      "complete_wall_ns": 283694231,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 219250000,
+      "group_peak_B": 26619904,
+      "child_wall_ns": 7119660,
+      "child_peak_RSS_KiB": 24016,
+      "measured_to_projected": {
+        "numerator": 283694231,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": [
+        "hnn::tests::finite_decrease::the_first_reach_is_read_from_the_owner_split_entry_by_entry"
+      ]
+    },
+    {
+      "label": "actual-received-finite-02-20261009-v170",
+      "accepted": true,
+      "complete_wall_ns": 255245659,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 210678000,
+      "group_peak_B": 23945216,
+      "child_wall_ns": 6078339,
+      "child_peak_RSS_KiB": 23868,
+      "measured_to_projected": {
+        "numerator": 255245659,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": [
+        "hnn::tests::finite_decrease::a_signed_remainder_moves_the_first_reach_off_the_widest_entry"
+      ]
+    },
+    {
+      "label": "actual-received-finite-03-20261009-v170",
+      "accepted": true,
+      "complete_wall_ns": 947656685,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 894239000,
+      "group_peak_B": 25116672,
+      "child_wall_ns": 696518991,
+      "child_peak_RSS_KiB": 29604,
+      "measured_to_projected": {
+        "numerator": 947656685,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": [
+        "hnn::tests::finite_decrease::the_certified_exponents_declared_reproduce_the_native_deposit"
+      ]
+    },
+    {
+      "label": "actual-received-finite-04-20261009-v170",
+      "accepted": true,
+      "complete_wall_ns": 1578199722,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 1520950000,
+      "group_peak_B": 25636864,
+      "child_wall_ns": 1322105904,
+      "child_peak_RSS_KiB": 29676,
+      "measured_to_projected": {
+        "numerator": 1578199722,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": [
+        "hnn::tests::finite_decrease::the_first_reach_commits_its_proposed_reach_or_refuses_typed"
+      ]
+    },
+    {
+      "label": "actual-received-finite-05-20261009-v170",
+      "accepted": true,
+      "complete_wall_ns": 906833788,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 866099000,
+      "group_peak_B": 25456640,
+      "child_wall_ns": 664681490,
+      "child_peak_RSS_KiB": 29472,
+      "measured_to_projected": {
+        "numerator": 906833788,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": [
+        "hnn::tests::finite_decrease::a_declared_exponent_past_the_covector_scale_refuses_typed"
+      ]
+    },
+    {
+      "label": "actual-received-finite-06-20261009-v170",
+      "accepted": true,
+      "complete_wall_ns": 295357282,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 246663000,
+      "group_peak_B": 23834624,
+      "child_wall_ns": 46032096,
+      "child_peak_RSS_KiB": 23840,
+      "measured_to_projected": {
+        "numerator": 295357282,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": [
+        "hnn::tests::finite_decrease::the_reading_identity_reads_gauge_normalized_cells_never_endpoints"
+      ]
+    },
+    {
+      "label": "actual-received-finite-07-20261009-v170",
+      "accepted": true,
+      "complete_wall_ns": 282690289,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 246646000,
+      "group_peak_B": 24645632,
+      "child_wall_ns": 46380409,
+      "child_peak_RSS_KiB": 23832,
+      "measured_to_projected": {
+        "numerator": 282690289,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": [
+        "hnn::tests::finite_decrease::the_admission_is_an_exact_strict_improvement_and_refuses_typed"
+      ]
+    },
+    {
+      "label": "actual-received-finite-08-20261009-v170",
+      "accepted": true,
+      "complete_wall_ns": 765349562,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 719465000,
+      "group_peak_B": 24924160,
+      "child_wall_ns": 519271369,
+      "child_peak_RSS_KiB": 29240,
+      "measured_to_projected": {
+        "numerator": 765349562,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": [
+        "hnn::tests::finite_decrease::an_opening_that_is_not_the_words_own_issues_no_candidate"
+      ]
+    },
+    {
+      "label": "actual-received-finite-09-20261009-v170",
+      "accepted": true,
+      "complete_wall_ns": 5213793302,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 5134068000,
+      "group_peak_B": 26353664,
+      "child_wall_ns": 4943959460,
+      "child_peak_RSS_KiB": 29996,
+      "measured_to_projected": {
+        "numerator": 5213793302,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": [
+        "hnn::tests::finite_decrease::an_admission_binds_its_own_cut_by_equality"
+      ]
+    },
+    {
+      "label": "actual-received-finite-10-20261009-v170",
+      "accepted": true,
+      "complete_wall_ns": 1035685173,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 963340000,
+      "group_peak_B": 25513984,
+      "child_wall_ns": 760333343,
+      "child_peak_RSS_KiB": 30088,
+      "measured_to_projected": {
+        "numerator": 1035685173,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": [
+        "hnn::tests::finite_decrease::a_post_admission_refusal_keeps_the_cut_for_the_certified_continuation"
+      ]
+    },
+    {
+      "label": "actual-received-finite-11-20261009-v170",
+      "accepted": true,
+      "complete_wall_ns": 923886988,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 874934000,
+      "group_peak_B": 25485312,
+      "child_wall_ns": 674562693,
+      "child_peak_RSS_KiB": 29644,
+      "measured_to_projected": {
+        "numerator": 923886988,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": [
+        "hnn::tests::finite_decrease::the_landing_on_0279_is_a_measured_outcome"
+      ]
+    },
+    {
+      "label": "actual-received-finite-12-20261009-v170",
+      "accepted": true,
+      "complete_wall_ns": 337976914,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 309645000,
+      "group_peak_B": 24375296,
+      "child_wall_ns": 101776158,
+      "child_peak_RSS_KiB": 27528,
+      "measured_to_projected": {
+        "numerator": 337976914,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": [
+        "hnn::tests::finite_decrease::a_carry_crosses_into_its_producing_constitution_unchanged"
+      ]
+    },
+    {
+      "label": "actual-received-finite-14-20261009-v170",
+      "accepted": true,
+      "complete_wall_ns": 1544638979,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 1485458000,
+      "group_peak_B": 25722880,
+      "child_wall_ns": 1280527449,
+      "child_peak_RSS_KiB": 29984,
+      "measured_to_projected": {
+        "numerator": 1544638979,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": [
+        "hnn::tests::finite_decrease::an_admission_binds_its_opening_by_value"
+      ]
+    },
+    {
+      "label": "actual-received-physical-01-20261009-v170",
+      "accepted": true,
+      "complete_wall_ns": 444827760,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 376888000,
+      "group_peak_B": 25411584,
+      "child_wall_ns": 177276906,
+      "child_peak_RSS_KiB": 30488,
+      "measured_to_projected": {
+        "numerator": 444827760,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": [
+        "hnn::tests::physical_communication::held_contact_variation_returns_the_delayed_full_state_credit"
+      ]
+    },
+    {
+      "label": "actual-received-physical-02-20261009-v170",
+      "accepted": true,
+      "complete_wall_ns": 283189244,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 236900000,
+      "group_peak_B": 25378816,
+      "child_wall_ns": 35357977,
+      "child_peak_RSS_KiB": 28860,
+      "measured_to_projected": {
+        "numerator": 283189244,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": [
+        "hnn::tests::physical_communication::held_contact_variation_refuses_untransported_future_without_clearing_it"
+      ]
+    },
+    {
+      "label": "actual-received-physical-03-20261009-v170",
+      "accepted": true,
+      "complete_wall_ns": 905562654,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 822127000,
+      "group_peak_B": 25190400,
+      "child_wall_ns": 628854302,
+      "child_peak_RSS_KiB": 31140,
+      "measured_to_projected": {
+        "numerator": 905562654,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": [
+        "hnn::tests::physical_communication::continuing_contact_comparison_deposits_and_rebases_without_resetting_delayed_credit"
+      ]
+    },
+    {
+      "label": "actual-received-physical-04-20261009-v170",
+      "accepted": true,
+      "complete_wall_ns": 298470234,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 251726000,
+      "group_peak_B": 24481792,
+      "child_wall_ns": 52009144,
+      "child_peak_RSS_KiB": 28468,
+      "measured_to_projected": {
+        "numerator": 298470234,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": [
+        "hnn::tests::physical_communication::finite_loaded_span_carries_the_actual_contact_response_at_its_clock"
+      ]
+    },
+    {
+      "label": "actual-received-physical-05-20261009-v170",
+      "accepted": true,
+      "complete_wall_ns": 1026512185,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 965306000,
+      "group_peak_B": 25722880,
+      "child_wall_ns": 767864302,
+      "child_peak_RSS_KiB": 30980,
+      "measured_to_projected": {
+        "numerator": 1026512185,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": [
+        "hnn::tests::physical_communication::native_contact_step_consumes_the_finite_loaded_span_witness"
+      ]
+    },
+    {
+      "label": "actual-received-physical-06-20261009-v170",
+      "accepted": true,
+      "complete_wall_ns": 2671977240,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 2611031000,
+      "group_peak_B": 26824704,
+      "child_wall_ns": 2409121342,
+      "child_peak_RSS_KiB": 32284,
+      "measured_to_projected": {
+        "numerator": 2671977240,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": [
+        "hnn::tests::physical_communication::all_reached_contact_families_return_through_the_same_continuing_field"
+      ]
+    },
+    {
+      "label": "actual-received-physical-07-20261009-v170",
+      "accepted": true,
+      "complete_wall_ns": 326019931,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 263993000,
+      "group_peak_B": 25800704,
+      "child_wall_ns": 71259492,
+      "child_peak_RSS_KiB": 29804,
+      "measured_to_projected": {
+        "numerator": 326019931,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": [
+        "hnn::tests::physical_communication::finite_signed_contact_reaction_holds_momentum_and_reaches_the_next_tick"
+      ]
+    },
+    {
+      "label": "actual-received-physical-08-20261009-v170",
+      "accepted": true,
+      "complete_wall_ns": 1045523463,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 984814000,
+      "group_peak_B": 25964544,
+      "child_wall_ns": 794290844,
+      "child_peak_RSS_KiB": 31520,
+      "measured_to_projected": {
+        "numerator": 1045523463,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": [
+        "hnn::tests::physical_communication::the_fixed_v79_contact_observation_accounts_for_its_actual_material_and_remainders"
+      ]
+    },
+    {
+      "label": "actual-received-physical-09-20261009-v170",
+      "accepted": true,
+      "complete_wall_ns": 3286905988,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 3217967000,
+      "group_peak_B": 28352512,
+      "child_wall_ns": 3031711105,
+      "child_peak_RSS_KiB": 33356,
+      "measured_to_projected": {
+        "numerator": 3286905988,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": [
+        "hnn::tests::physical_communication::the_actual_unresolved_contact_return_survives_a_different_physical_passage"
+      ]
+    },
+    {
+      "label": "actual-received-physical-10-20261009-v170",
+      "accepted": true,
+      "complete_wall_ns": 1966071641,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 1905585000,
+      "group_peak_B": 27398144,
+      "child_wall_ns": 1714797544,
+      "child_peak_RSS_KiB": 32456,
+      "measured_to_projected": {
+        "numerator": 1966071641,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": [
+        "hnn::tests::physical_communication::complete_contact_return_publishes_held_point_before_existing_communication"
+      ]
+    },
+    {
+      "label": "actual-received-physical-11-20261009-v170",
+      "accepted": true,
+      "complete_wall_ns": 3838618572,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 3754714000,
+      "group_peak_B": 29171712,
+      "child_wall_ns": 3559806249,
+      "child_peak_RSS_KiB": 34628,
+      "measured_to_projected": {
+        "numerator": 3838618572,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": [
+        "hnn::tests::physical_communication::the_landing_tangent_is_read_beside_the_uniform_certificate_on_the_complete_contact_return"
+      ]
+    },
+    {
+      "label": "actual-received-physical-12-20261009-v170",
+      "accepted": true,
+      "complete_wall_ns": 2772439077,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 2704402000,
+      "group_peak_B": 27308032,
+      "child_wall_ns": 2503458585,
+      "child_peak_RSS_KiB": 33184,
+      "measured_to_projected": {
+        "numerator": 2772439077,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": [
+        "hnn::tests::physical_communication::the_learned_change_acceptance_is_read_on_the_complete_contact_return"
+      ]
+    },
+    {
+      "label": "actual-received-physical-13-20261009-v170",
+      "accepted": true,
+      "complete_wall_ns": 337908314,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 280654000,
+      "group_peak_B": 25403392,
+      "child_wall_ns": 77404154,
+      "child_peak_RSS_KiB": 30096,
+      "measured_to_projected": {
+        "numerator": 337908314,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": [
+        "hnn::tests::physical_communication::a_shared_execution_clock_reanchors_the_next_section_without_resetting_its_carry"
+      ]
+    },
+    {
+      "label": "actual-received-physical-14-20261009-v170",
+      "accepted": true,
+      "complete_wall_ns": 396844717,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 332130000,
+      "group_peak_B": 26193920,
+      "child_wall_ns": 130622334,
+      "child_peak_RSS_KiB": 31048,
+      "measured_to_projected": {
+        "numerator": 396844717,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": [
+        "hnn::tests::physical_communication::communication_deposits_after_the_whole_boundary_and_reuses_material_source_and_carry"
+      ]
+    },
+    {
+      "label": "actual-received-physical-15-20261009-v170",
+      "accepted": true,
+      "complete_wall_ns": 347007402,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 305479000,
+      "group_peak_B": 25718784,
+      "child_wall_ns": 102590894,
+      "child_peak_RSS_KiB": 30616,
+      "measured_to_projected": {
+        "numerator": 347007402,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": [
+        "hnn::tests::physical_communication::communication_observations_cannot_change_the_earlier_boundary"
+      ]
+    },
+    {
+      "label": "actual-received-physical-16-20261009-v170",
+      "accepted": true,
+      "complete_wall_ns": 299624265,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 246712000,
+      "group_peak_B": 25726976,
+      "child_wall_ns": 49552251,
+      "child_peak_RSS_KiB": 29792,
+      "measured_to_projected": {
+        "numerator": 299624265,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": [
+        "hnn::tests::physical_communication::communication_refuses_changed_source_or_partition_without_deposition_and_keeps_the_blind_end"
+      ]
+    },
+    {
+      "label": "actual-received-physical-17-20261009-v170",
+      "accepted": true,
+      "complete_wall_ns": 280610251,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 243404000,
+      "group_peak_B": 25341952,
+      "child_wall_ns": 43748256,
+      "child_peak_RSS_KiB": 29900,
+      "measured_to_projected": {
+        "numerator": 280610251,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": [
+        "hnn::tests::physical_communication::communication_returns_actual_multistation_held_receipts_without_a_joint_certificate"
+      ]
+    },
+    {
+      "label": "actual-received-physical-18-20261009-v170",
+      "accepted": true,
+      "complete_wall_ns": 357963359,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 314002000,
+      "group_peak_B": 25464832,
+      "child_wall_ns": 116186397,
+      "child_peak_RSS_KiB": 30816,
+      "measured_to_projected": {
+        "numerator": 357963359,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": [
+        "hnn::tests::physical_communication::one_future_communication_carries_one_actual_source_label_through_the_whole_receiving_image"
+      ]
+    },
+    {
+      "label": "actual-received-physical-19-20261009-v170",
+      "accepted": true,
+      "complete_wall_ns": 445701805,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 387505000,
+      "group_peak_B": 25673728,
+      "child_wall_ns": 190516000,
+      "child_peak_RSS_KiB": 30804,
+      "measured_to_projected": {
+        "numerator": 445701805,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": [
+        "hnn::tests::physical_communication::one_future_source_publication_reaches_the_next_contemporary_communication_opening"
+      ]
+    },
+    {
+      "label": "actual-received-physical-20-20261009-v170",
+      "accepted": true,
+      "complete_wall_ns": 295653055,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 248152000,
+      "group_peak_B": 25411584,
+      "child_wall_ns": 61057036,
+      "child_peak_RSS_KiB": 29868,
+      "measured_to_projected": {
+        "numerator": 295653055,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": [
+        "hnn::tests::physical_communication::one_future_communication_keeps_refusal_and_multi_future_admission_honest"
+      ]
+    },
+    {
+      "label": "actual-received-physical-21-20261009-v170",
+      "accepted": true,
+      "complete_wall_ns": 1977072868,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 1923603000,
+      "group_peak_B": 27336704,
+      "child_wall_ns": 1726850642,
+      "child_peak_RSS_KiB": 32976,
+      "measured_to_projected": {
+        "numerator": 1977072868,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": [
+        "hnn::tests::physical_communication::the_finite_decrease_landing_is_read_on_the_complete_contact_return"
+      ]
+    }
+  ],
+  "runtime_partition": {
+    "results": [
+      {
+        "label": "actual-received-finite-01-20261009-v170",
+        "selector": "hnn::tests::finite_decrease::the_first_reach_is_read_from_the_owner_split_entry_by_entry",
+        "accepted": true,
+        "elapsed_ns": 379462563,
+        "exit": 0
+      },
+      {
+        "label": "actual-received-finite-02-20261009-v170",
+        "selector": "hnn::tests::finite_decrease::a_signed_remainder_moves_the_first_reach_off_the_widest_entry",
+        "accepted": true,
+        "elapsed_ns": 344735568,
+        "exit": 0
+      },
+      {
+        "label": "actual-received-finite-03-20261009-v170",
+        "selector": "hnn::tests::finite_decrease::the_certified_exponents_declared_reproduce_the_native_deposit",
+        "accepted": true,
+        "elapsed_ns": 1037243044,
+        "exit": 0
+      },
+      {
+        "label": "actual-received-finite-04-20261009-v170",
+        "selector": "hnn::tests::finite_decrease::the_first_reach_commits_its_proposed_reach_or_refuses_typed",
+        "accepted": true,
+        "elapsed_ns": 1666054197,
+        "exit": 0
+      },
+      {
+        "label": "actual-received-finite-05-20261009-v170",
+        "selector": "hnn::tests::finite_decrease::a_declared_exponent_past_the_covector_scale_refuses_typed",
+        "accepted": true,
+        "elapsed_ns": 996228058,
+        "exit": 0
+      },
+      {
+        "label": "actual-received-finite-06-20261009-v170",
+        "selector": "hnn::tests::finite_decrease::the_reading_identity_reads_gauge_normalized_cells_never_endpoints",
+        "accepted": true,
+        "elapsed_ns": 385432047,
+        "exit": 0
+      },
+      {
+        "label": "actual-received-finite-07-20261009-v170",
+        "selector": "hnn::tests::finite_decrease::the_admission_is_an_exact_strict_improvement_and_refuses_typed",
+        "accepted": true,
+        "elapsed_ns": 373547761,
+        "exit": 0
+      },
+      {
+        "label": "actual-received-finite-08-20261009-v170",
+        "selector": "hnn::tests::finite_decrease::an_opening_that_is_not_the_words_own_issues_no_candidate",
+        "accepted": true,
+        "elapsed_ns": 851975274,
+        "exit": 0
+      },
+      {
+        "label": "actual-received-finite-09-20261009-v170",
+        "selector": "hnn::tests::finite_decrease::an_admission_binds_its_own_cut_by_equality",
+        "accepted": true,
+        "elapsed_ns": 5304077909,
+        "exit": 0
+      },
+      {
+        "label": "actual-received-finite-10-20261009-v170",
+        "selector": "hnn::tests::finite_decrease::a_post_admission_refusal_keeps_the_cut_for_the_certified_continuation",
+        "accepted": true,
+        "elapsed_ns": 1122706657,
+        "exit": 0
+      },
+      {
+        "label": "actual-received-finite-11-20261009-v170",
+        "selector": "hnn::tests::finite_decrease::the_landing_on_0279_is_a_measured_outcome",
+        "accepted": true,
+        "elapsed_ns": 1011091013,
+        "exit": 0
+      },
+      {
+        "label": "actual-received-finite-12-20261009-v170",
+        "selector": "hnn::tests::finite_decrease::a_carry_crosses_into_its_producing_constitution_unchanged",
+        "accepted": true,
+        "elapsed_ns": 425853771,
+        "exit": 0
+      },
+      {
+        "label": "actual-received-finite-14-20261009-v170",
+        "selector": "hnn::tests::finite_decrease::an_admission_binds_its_opening_by_value",
+        "accepted": true,
+        "elapsed_ns": 1632236402,
+        "exit": 0
+      },
+      {
+        "label": "actual-received-physical-01-20261009-v170",
+        "selector": "hnn::tests::physical_communication::held_contact_variation_returns_the_delayed_full_state_credit",
+        "accepted": true,
+        "elapsed_ns": 530129612,
+        "exit": 0
+      },
+      {
+        "label": "actual-received-physical-02-20261009-v170",
+        "selector": "hnn::tests::physical_communication::held_contact_variation_refuses_untransported_future_without_clearing_it",
+        "accepted": true,
+        "elapsed_ns": 367196410,
+        "exit": 0
+      },
+      {
+        "label": "actual-received-physical-03-20261009-v170",
+        "selector": "hnn::tests::physical_communication::continuing_contact_comparison_deposits_and_rebases_without_resetting_delayed_credit",
+        "accepted": true,
+        "elapsed_ns": 995402798,
+        "exit": 0
+      },
+      {
+        "label": "actual-received-physical-04-20261009-v170",
+        "selector": "hnn::tests::physical_communication::finite_loaded_span_carries_the_actual_contact_response_at_its_clock",
+        "accepted": true,
+        "elapsed_ns": 387315124,
+        "exit": 0
+      },
+      {
+        "label": "actual-received-physical-05-20261009-v170",
+        "selector": "hnn::tests::physical_communication::native_contact_step_consumes_the_finite_loaded_span_witness",
+        "accepted": true,
+        "elapsed_ns": 1110744352,
+        "exit": 0
+      },
+      {
+        "label": "actual-received-physical-06-20261009-v170",
+        "selector": "hnn::tests::physical_communication::all_reached_contact_families_return_through_the_same_continuing_field",
+        "accepted": true,
+        "elapsed_ns": 2759366162,
+        "exit": 0
+      },
+      {
+        "label": "actual-received-physical-07-20261009-v170",
+        "selector": "hnn::tests::physical_communication::finite_signed_contact_reaction_holds_momentum_and_reaches_the_next_tick",
+        "accepted": true,
+        "elapsed_ns": 413972609,
+        "exit": 0
+      },
+      {
+        "label": "actual-received-physical-08-20261009-v170",
+        "selector": "hnn::tests::physical_communication::the_fixed_v79_contact_observation_accounts_for_its_actual_material_and_remainders",
+        "accepted": true,
+        "elapsed_ns": 1135430734,
+        "exit": 0
+      },
+      {
+        "label": "actual-received-physical-09-20261009-v170",
+        "selector": "hnn::tests::physical_communication::the_actual_unresolved_contact_return_survives_a_different_physical_passage",
+        "accepted": true,
+        "elapsed_ns": 3377241981,
+        "exit": 0
+      },
+      {
+        "label": "actual-received-physical-10-20261009-v170",
+        "selector": "hnn::tests::physical_communication::complete_contact_return_publishes_held_point_before_existing_communication",
+        "accepted": true,
+        "elapsed_ns": 2053211586,
+        "exit": 0
+      },
+      {
+        "label": "actual-received-physical-11-20261009-v170",
+        "selector": "hnn::tests::physical_communication::the_landing_tangent_is_read_beside_the_uniform_certificate_on_the_complete_contact_return",
+        "accepted": true,
+        "elapsed_ns": 3924486293,
+        "exit": 0
+      },
+      {
+        "label": "actual-received-physical-12-20261009-v170",
+        "selector": "hnn::tests::physical_communication::the_learned_change_acceptance_is_read_on_the_complete_contact_return",
+        "accepted": true,
+        "elapsed_ns": 2857850615,
+        "exit": 0
+      },
+      {
+        "label": "actual-received-physical-13-20261009-v170",
+        "selector": "hnn::tests::physical_communication::a_shared_execution_clock_reanchors_the_next_section_without_resetting_its_carry",
+        "accepted": true,
+        "elapsed_ns": 424224306,
+        "exit": 0
+      },
+      {
+        "label": "actual-received-physical-14-20261009-v170",
+        "selector": "hnn::tests::physical_communication::communication_deposits_after_the_whole_boundary_and_reuses_material_source_and_carry",
+        "accepted": true,
+        "elapsed_ns": 485409061,
+        "exit": 0
+      },
+      {
+        "label": "actual-received-physical-15-20261009-v170",
+        "selector": "hnn::tests::physical_communication::communication_observations_cannot_change_the_earlier_boundary",
+        "accepted": true,
+        "elapsed_ns": 435597565,
+        "exit": 0
+      },
+      {
+        "label": "actual-received-physical-16-20261009-v170",
+        "selector": "hnn::tests::physical_communication::communication_refuses_changed_source_or_partition_without_deposition_and_keeps_the_blind_end",
+        "accepted": true,
+        "elapsed_ns": 389464690,
+        "exit": 0
+      },
+      {
+        "label": "actual-received-physical-17-20261009-v170",
+        "selector": "hnn::tests::physical_communication::communication_returns_actual_multistation_held_receipts_without_a_joint_certificate",
+        "accepted": true,
+        "elapsed_ns": 380928967,
+        "exit": 0
+      },
+      {
+        "label": "actual-received-physical-18-20261009-v170",
+        "selector": "hnn::tests::physical_communication::one_future_communication_carries_one_actual_source_label_through_the_whole_receiving_image",
+        "accepted": true,
+        "elapsed_ns": 444960015,
+        "exit": 0
+      },
+      {
+        "label": "actual-received-physical-19-20261009-v170",
+        "selector": "hnn::tests::physical_communication::one_future_source_publication_reaches_the_next_contemporary_communication_opening",
+        "accepted": true,
+        "elapsed_ns": 529321736,
+        "exit": 0
+      },
+      {
+        "label": "actual-received-physical-20-20261009-v170",
+        "selector": "hnn::tests::physical_communication::one_future_communication_keeps_refusal_and_multi_future_admission_honest",
+        "accepted": true,
+        "elapsed_ns": 379633029,
+        "exit": 0
+      },
+      {
+        "label": "actual-received-physical-21-20261009-v170",
+        "selector": "hnn::tests::physical_communication::the_finite_decrease_landing_is_read_on_the_complete_contact_return",
+        "accepted": true,
+        "elapsed_ns": 2065567090,
+        "exit": 0
+      }
+    ],
+    "declared_count": 34,
+    "wall_ns": 40979329265,
+    "projection_exceeded": false,
+    "passed": true,
+    "no_parallel_native_jobs": true
+  },
+  "scope": "Fixed-rate proposal, value/clock-bound own received opening and candidate reopening at held momentum; exact finite admission decides. No complete opening derivative, World/bank/CUDA or repeated learned-publication improvement claim.",
+  "primary_received_stdout": "\nrunning 1 test\ntest hnn::tests::finite_decrease::a_received_opening_reads_its_landing_from_the_crossed_carry ... 0279 received landing: declared=Some(DeclaredExponents { steps: {(Channel(0), Factor(0)): DeclaredExponent { exponent: -11, reach: Some(FirstReach { exponent: -11, certified: -33, endpoint: -10, reached: [(7, -1), (26, 1)] }) }, (Channel(0), Factor(1)): DeclaredExponent { exponent: -10, reach: Some(FirstReach { exponent: -10, certified: -32, endpoint: -9, reached: [(1, -1), (3, -1), (4, 1), (9, -1), (10, 1), (15, -1), (25, 1), (27, 1), (28, -1)] }) }, (Channel(0), Factor(2)): DeclaredExponent { exponent: -11, reach: Some(FirstReach { exponent: -11, certified: -32, endpoint: -10, reached: [(0, 1), (24, -1)] }) }} }) outcome=Ok(Phase)\nok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1158 filtered out; finished in 1.22s\n\n",
+  "source_edits_or_publication_by_queue": false,
+  "prior_failed_source_and_receipts_preserved": true,
+  "no_limit_raise": true,
+  "queue_quiescent_released": true
+}

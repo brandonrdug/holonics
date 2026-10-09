@@ -1,0 +1,114 @@
+{
+  "status": "PASS scoped Received-opening step A",
+  "source_commit": "2c5943c234420bdf2657d0f7237d00df88f0099e",
+  "source_tree": "38c5e0833feb80b44a259601a660703f532bf177",
+  "reviewed_predecessor": "3b888e599fea8719209533146c06bfbb2cd1a711",
+  "comments_only_successor_verified": true,
+  "source_still_current_and_clean": true,
+  "native_fixtures": 35,
+  "guard_doctests": 57,
+  "native_receipt": "research/records/receipts/2026-10-09-received-opening/native-v1/HANDOFF.md",
+  "primary_received_reading": {
+    "source_commit": "2c5943c234420bdf2657d0f7237d00df88f0099e",
+    "outcome": "Ok(Phase)",
+    "declared_first_reach_exponents": [
+      -11,
+      -10,
+      -11
+    ],
+    "declared_reached_entry_counts": [
+      2,
+      9,
+      2
+    ],
+    "Cprime_wprime_eq_held_momentum_checked": true,
+    "finite_crossing_identity_checked": true,
+    "candidate_published_by_this_fixture": false,
+    "complete_wall_ns": 1505826496,
+    "group_peak_B": 28143616,
+    "child_peak_RSS_KiB": 29804,
+    "all_bounds_unchanged": true,
+    "quiescent_released": true
+  },
+  "Lean_submitted_source_sha256": "3a911d53f07a16df0e90c6ff47f1e12fd7600771501c8ecfda9b0af97c10ad4d",
+  "Lean_whole_owner_queries": 15,
+  "Lean_whole_owner_compiler_wall_ns": 8770129486,
+  "Lean_whole_owner_results": [
+    {
+      "unit": "prep",
+      "accepted": true,
+      "wall_ns": 7832301671,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 6200469000,
+      "group_peak_B": 854093824,
+      "group_limit_B": 8589934592,
+      "measured_to_projected": {
+        "numerator": 7832301671,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true
+    },
+    {
+      "unit": "compile",
+      "accepted": true,
+      "wall_ns": 10708919491,
+      "projection_ns": 21132554884,
+      "aggregate_CPU_ns": 5965765000,
+      "group_peak_B": 4689125376,
+      "group_limit_B": 8589934592,
+      "measured_to_projected": {
+        "numerator": 10708919491,
+        "denominator": 21132554884
+      },
+      "quiescent_released": true
+    }
+  ],
+  "Lean_owner_receipt": "research/records/receipts/2026-10-09-received-opening/lean-owner-v1/HANDOFF.md",
+  "Lean_affected_HNN_import_queries": 15,
+  "Lean_import_compiler_wall_ns": 8085679208,
+  "Lean_import_results": [
+    {
+      "unit": "prep",
+      "accepted": true,
+      "wall_ns": 5259454924,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 4758242000,
+      "group_peak_B": 307400704,
+      "group_limit_B": 8589934592,
+      "measured_to_projected": {
+        "numerator": 5259454924,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true
+    },
+    {
+      "unit": "compile",
+      "accepted": true,
+      "wall_ns": 10051617696,
+      "projection_ns": 21132554884,
+      "aggregate_CPU_ns": 5707834000,
+      "group_peak_B": 4474216448,
+      "group_limit_B": 8589934592,
+      "measured_to_projected": {
+        "numerator": 10051617696,
+        "denominator": 21132554884
+      },
+      "quiescent_released": true
+    }
+  ],
+  "Lean_import_receipt": "research/records/receipts/2026-10-09-received-opening/lean-import-v1/HANDOFF.md",
+  "all_standard_axioms_only": true,
+  "scope": "Fixed-rate proposal, value/clock-bound own received opening and candidate reopening at held momentum; exact finite admission decides. No complete opening derivative, World/bank/CUDA or repeated learned-publication improvement claim.",
+  "producing_Lean_identity_hypothesis": "C.mulVec injective; finite crossing identity requires no invertibility; Rest identity requires Cprime.mulVec injective",
+  "singular_Rust_producing_identity": "held_rate zero-target short circuit, outside general Lean injectivity theorem",
+  "full_library_or_HNN_aggregate_build": false,
+  "all_caps_deadlines_heartbeat_concurrency_unchanged": true,
+  "source_edits_push_merge_or_publication_by_queue": false,
+  "queue_quiescent_released": true,
+  "prior_failed_sources_and_receipts_preserved": true,
+  "open_obligations": [
+    "complete opening derivative J_open and initial-state curvature certificate",
+    "repeated learned-publication improvement",
+    "World/bank-release/CUDA learning joins"
+  ]
+}
