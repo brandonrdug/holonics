@@ -183,9 +183,13 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn main() {
+// An ordinary exterior status return, never `std::process::exit` (guard 7: no process inside the
+// machinery): the error is printed as before and the status returned, so the boundary receipt and
+// the owned resources end normally.
+fn main() -> std::process::ExitCode {
     if let Err(error) = run() {
         eprintln!("helical duplex demonstration failed: {error}");
-        std::process::exit(1);
+        return std::process::ExitCode::FAILURE;
     }
+    std::process::ExitCode::SUCCESS
 }
