@@ -8,7 +8,6 @@ The queue's local packet also holds the accepted objects, the import seals, larg
 - `native-v1/admission/import-smoke/objects-v1/HelicalRepairImportConsumer.olean`: 1560 bytes
 - `native-v1/admission/import-smoke/objects-v1/Holonics/Transport/HelicalRepair.ilean`: 75847 bytes
 - `native-v1/admission/import-smoke/objects-v1/Holonics/Transport/HelicalRepair.olean`: 846016 bytes
-- `native-v1/admission/import-smoke/source-v1/HelicalRepairImportConsumer.lean`: 590 bytes
 - `native-v1/admission/objects-v1/Holonics/Transport/HelicalRepair.ilean`: 75847 bytes
 - `native-v1/admission/objects-v1/Holonics/Transport/HelicalRepair.olean`: 846016 bytes
 - `native-v1/admission/source-v1/Holonics/Transport/HelicalRepair.lean`: 47513 bytes
