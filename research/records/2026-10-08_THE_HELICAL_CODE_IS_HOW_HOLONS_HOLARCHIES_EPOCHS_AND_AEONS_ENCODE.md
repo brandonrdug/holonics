@@ -387,6 +387,14 @@ Its second part states the perfected laws:
    - Step 3: the linking reading of a closed duplex and its crossing changes. No current crate
      reads the linking number, and the retired owner is at `13f8c734`.
 
+   **A runnable example** (`implemented-exact`; a known-truth smoke run, not a regression or product
+   gate). `crates/holonics/examples/helical_duplex.rs` (`9e8041d0a`), run with
+   `cargo run -p holonics --example helical_duplex`, prints one fixed-key duplex on the carry
+   regression fixture: the navigator and its cell labels, the partner and lifts, the receiver's
+   class, an intact release, a one-sided hold with two actual witnesses, and a coordinated change
+   released with a residual that only the harness labels
+   ([receipt](receipts/2026-10-09-helical-duplex-demo/PUBLICATION.md)).
+
    **The support and diameter laws, kernel-checked** (`formal-checked`). `Transport/HelicalRepair`
    was accepted at `5efbb1cc0`: 56 declarations using only standard axioms, and a narrow
    research-root import check of 8 queries ([receipt](receipts/2026-10-09-helical-repair/native-v1/HANDOFF.md)).

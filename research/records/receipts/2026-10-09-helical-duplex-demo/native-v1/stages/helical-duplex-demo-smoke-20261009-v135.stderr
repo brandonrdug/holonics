@@ -1,0 +1,33 @@
+   Compiling holonics v0.1.0 (/home/b/Workspaces/holonics/.local/wt/helical-duplex-demo/crates/holonics)
+warning: method `anchor_differential_joined` is never used
+   --> crates/holonics/src/hnn/port.rs:942:19
+    |
+850 | impl<'c> Word<'c> {
+    | ----------------- method in this implementation
+...
+942 |     pub(crate) fn anchor_differential_joined(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `seeds` is never used
+    --> crates/holonics/src/hnn/receiving.rs:1606:19
+     |
+1310 | impl SourceObserverView {
+     | ----------------------- method in this implementation
+...
+1606 |     pub(crate) fn seeds(
+     |                   ^^^^^
+
+warning: method `advanced` is never used
+   --> crates/holonics/src/hnn/word/variation.rs:473:19
+    |
+236 | impl HeldContactVariation {
+    | ------------------------- method in this implementation
+...
+473 |     pub(crate) fn advanced(&self, word: &Word<'_>, opened: &[EndChange]) -> Result<Self, HnnError> {
+    |                   ^^^^^^^^
+
+warning: `holonics` (lib) generated 3 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 32.79s
+     Running `/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-demo-20261009-v135/cache-v2/debug/examples/helical_duplex`
