@@ -1587,6 +1587,13 @@ impl MaterialDirection {
 ///   `δC w` terms cancel, singular `C` included) and every source ring's storage replaced (`Π_int`).
 ///   No contact factor enters the source opening.
 ///
+/// - **At the encounter's own compared stations** (the held-carry record §3d): the participation
+///   anchor is linear in the change at the junction's fixed weights, so the receiving ring's anchor
+///   tangent is `δv = ŵ_s δs + Σ_a ŵ_a δa`, and the read `R P^τ v` (`τ` the receiving ring's integer
+///   lift, which no first variation moves) has tangent `R P^τ δv`. Where the World is located with a
+///   declared face, the World's observed face, affine in its state, has tangent
+///   `C_S δψ_S + C_R δψ_R`. [`Self::comparison_credit`] pairs both with the encounter's own covector.
+///
 /// It retains no Word, event or trajectory: `χ` is overwritten at each tick. The scope is an exact,
 /// unsplit Word on fixed operands with nothing deposited or released between the two Words; a
 /// lattice Word, a deposited parameter or a nonlinear passage owes its own differential and is
@@ -1603,6 +1610,48 @@ pub struct MaterialTangent {
     /// The World port, where the Word meets a participating World: the source ring and the World's
     /// own state tangent `ψ` (its extent's coordinates). `None` for a Word with no World.
     port: Option<(usize, Vec<Rat>)>,
+    /// The tangent's reading at each compared station of its own encounter, bounded by the
+    /// receiver's aperture and consumed by that encounter's comparison.
+    stations: Vec<StationTangent>,
+}
+
+/// [definition; agent-inferred, October 9] **The tangent at one compared station** of the encounter
+/// that carried it: the receiving anchor's tangent `δv`, the produced logits' tangent `R P^τ δv` once
+/// read, and the observed face's tangent through the located key's declared face (`None` when the
+/// key declares no face: the World's face is then not located).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct StationTangent {
+    pub station: usize,
+    pub anchor: Vec<Rat>,
+    pub produced: Option<Vec<Rat>>,
+    pub observed: Option<Vec<Rat>>,
+}
+
+/// [definition; agent-inferred, October 9; the held-carry record §3d] **The first variation of the
+/// encounter's own comparison** along one material direction, as its series. With `g_j` the
+/// comparison's covector at station `j` (`ReceivingFaceRatio::covector`: real entries `p̃ − q̃`,
+/// imaginary entries `−q̃ (φ_q − φ_p)/2`):
+/// - `magnitude = Σ_j ⟨Re g_j, δℓ_p,j⟩`, the produced real logits against the smooth score at the
+///   grain representative;
+/// - `produced_phase = Σ_j ⟨Im g_j, δℓ_p,j⟩`, the produced phases;
+/// - `observed_phase = −Σ_j ⟨Im g_j, δℓ_q,j⟩`, the observed phases: the phase term reads only the
+///   gap `φ_q − φ_p`, so the target's covector is the produced one's negative.
+///
+/// The observed masses `q̃` are the World face's reading at its grain, constant inside its cell, so
+/// they contribute no first variation; a finite step that moves the target across a cell boundary is
+/// a jump the landing must re-read, not a tangent.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ComparisonCredit {
+    pub magnitude: Rat,
+    pub produced_phase: Rat,
+    pub observed_phase: Rat,
+}
+
+impl ComparisonCredit {
+    /// The series' sum: the directional derivative of the comparison's smooth score.
+    pub fn total(&self) -> Rat {
+        &(&self.magnitude + &self.produced_phase) + &self.observed_phase
+    }
 }
 
 impl MaterialTangent {
@@ -1674,6 +1723,7 @@ impl MaterialTangent {
             ticks: 0,
             tangent,
             port: None,
+            stations: Vec::new(),
         })
     }
 
@@ -1712,6 +1762,106 @@ impl MaterialTangent {
     /// The World's state tangent `ψ`, where the tangent crosses a World port.
     pub fn world(&self) -> Option<&[Rat]> {
         self.port.as_ref().map(|(_, world)| world.as_slice())
+    }
+
+    /// **The anchor tangent** `δv = ŵ_s δs + Σ_a ŵ_a δa` that ring `ring`'s next junction reads: the
+    /// participation at the junction's own weights, which a contact-material direction does not move.
+    pub fn anchor(&self, word: &Word<'_>, ring: usize) -> Result<Vec<Rat>, HnnError> {
+        let operands = word.operands();
+        let storage = self.tangent.storage.get(ring).ok_or(HnnError::RingOutside {
+            ring,
+            rings: self.tangent.storage.len(),
+        })?;
+        let incoming: Vec<&[Rat]> = operands
+            .incident(ring)
+            .iter()
+            .map(|&a| self.tangent.arrivals[a][operands.end_slot(a, ring)].as_slice())
+            .collect();
+        crate::hnn::propagation::participation(operands.weights(ring), storage, &incoming)
+    }
+
+    /// **Hold the tangent at a compared station** of its own encounter, at the tick the World's
+    /// target face is received: the receiving ring's anchor tangent, and `observed`, the World face's
+    /// tangent through the located key (`None` when not located).
+    pub fn observe_station(
+        &mut self,
+        word: &Word<'_>,
+        ring: usize,
+        station: usize,
+        observed: Option<Vec<Rat>>,
+    ) -> Result<(), HnnError> {
+        if self.stations.iter().any(|held| held.station == station) {
+            return Err(HnnError::Unadmitted {
+                reason: "a compared station is held once per encounter",
+            });
+        }
+        let anchor = self.anchor(word, ring)?;
+        self.stations.push(StationTangent {
+            station,
+            anchor,
+            produced: None,
+            observed,
+        });
+        Ok(())
+    }
+
+    /// **Read the held anchor tangents** through the actual read's own linear part `read` (the
+    /// receiving map at the read's lift, `δv ↦ R P^τ δv`), after the encounter's reads.
+    pub fn read_stations(
+        &mut self,
+        mut read: impl FnMut(&[Rat]) -> Result<Vec<Rat>, HnnError>,
+    ) -> Result<(), HnnError> {
+        for held in &mut self.stations {
+            held.produced = Some(read(&held.anchor)?);
+        }
+        Ok(())
+    }
+
+    /// The tangent's held stations, in the order they were compared.
+    pub fn stations(&self) -> &[StationTangent] {
+        &self.stations
+    }
+
+    /// **The first variation of the encounter's own comparison** ([`ComparisonCredit`]): every
+    /// compared station of `ratio` must be held, read, and located on the World's side.
+    pub fn comparison_credit(
+        &self,
+        ratio: &crate::hnn::ratio::ReceivingFaceRatio,
+    ) -> Result<ComparisonCredit, HnnError> {
+        let covector = ratio.covector()?;
+        let mut credit = ComparisonCredit {
+            magnitude: Rat::zero(),
+            produced_phase: Rat::zero(),
+            observed_phase: Rat::zero(),
+        };
+        for &station in ratio.stations() {
+            let held = self
+                .stations
+                .iter()
+                .find(|held| held.station == station)
+                .ok_or(HnnError::Unadmitted {
+                    reason: "the comparison credit holds the tangent at every compared station",
+                })?;
+            let (Some(produced), Some(observed)) = (&held.produced, &held.observed) else {
+                return Err(HnnError::Unadmitted {
+                    reason: "the comparison credit reads the produced tangent and the located World face's tangent",
+                });
+            };
+            let g = &covector.logits()[station];
+            if produced.len() != g.len() || observed.len() != g.len() {
+                return Err(HnnError::Shape {
+                    what: "a station's logit tangents against its covector",
+                    expected: g.len(),
+                    found: produced.len().min(observed.len()),
+                });
+            }
+            for class in 0..g.len() / 2 {
+                credit.magnitude += &g[2 * class] * &produced[2 * class];
+                credit.produced_phase += &g[2 * class + 1] * &produced[2 * class + 1];
+                credit.observed_phase -= &g[2 * class + 1] * &observed[2 * class + 1];
+            }
+        }
+        Ok(credit)
     }
 
     /// **Follow the Word's next full tick** (eq. 2): call after the Word has executed it.

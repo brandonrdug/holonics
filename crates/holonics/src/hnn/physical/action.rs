@@ -112,6 +112,7 @@ use crate::hnn::word::{
 use crate::holon::HolonState;
 use crate::ratio::Rat;
 use crate::ratio::linear::ExactRatMatrix;
+use crate::ratio::linear::vector::sub;
 use crate::receiver::face::{DiameterNorm, ReceiverWidth, WidthWitness};
 use crate::receiver::release::{
     BeyondTolerance, DecisionRule, LawfulOptions, LeverageSeparation, ObservationProbe,
@@ -563,12 +564,30 @@ impl<'f> PhysicalReceiver<'f> {
             }
             located = Some((located_key, model.tick()));
         }
+        // [agent-inferred, October 9; the held-carry record §3d] At each compared station's tick the
+        // tangents hold the receiving anchor's tangent and, through the located key's declared face
+        // (affine in the World's state, read after the step as the World reads its face), the
+        // observed face's tangent.
+        let compared = applied.compared();
         let mut observe = |word: &Word<'_>, t: usize, _step: &WaveJointStep| -> Result<(), HnnError> {
             if let Some((key, tick)) = &located {
                 let offset = u64::try_from(t - 1).map_err(|_| HnnError::CountOverflow)?;
                 let charts = key.charts(tick.checked_add(offset).ok_or(HnnError::CountOverflow)?)?;
                 for tangent in tangents.iter_mut() {
                     tangent.step_through_port(word, &charts.f, &charts.g, &charts.p, &charts.q)?;
+                    for (station, (&epoch, &yes)) in epochs.iter().zip(compared).enumerate() {
+                        if !yes || epoch != t {
+                            continue;
+                        }
+                        let observed = match (key.face(), tangent.world()) {
+                            (Some(face), Some(psi)) => Some(sub(
+                                &face.read(psi)?,
+                                &face.read(&vec![Rat::zero(); psi.len()])?,
+                            )),
+                            _ => None,
+                        };
+                        tangent.observe_station(word, phases.ring(), station, observed)?;
+                    }
                 }
             }
             Ok(())
@@ -614,6 +633,13 @@ impl<'f> PhysicalReceiver<'f> {
                 })
             })
             .collect::<Result<Vec<_>, HnnError>>()?;
+        for tangent in tangents.iter_mut() {
+            tangent.read_stations(|anchor| {
+                Ok(phases
+                    .read(self.field, &producing, self.current(), anchor)?
+                    .logits)
+            })?;
+        }
         let blind = PhysicalRepair {
             cells: section
                 .placed()

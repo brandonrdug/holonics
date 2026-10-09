@@ -493,3 +493,167 @@ fn a_teaching_encounter_is_refused_until_the_world_is_located() {
         before
     );
 }
+
+/// The fixture's key, declaring the face the actual World reads (its receiver's own state).
+fn faced_key(field: &Field) -> ModelKey {
+    key(field, medium(&unit_storage(), source_input(true)))
+        .with_face(ReceiverFace::receiver_state(N, N).unwrap(), N)
+        .unwrap()
+}
+
+/// One station's produced logits and the World's observed raw face, as the encounter executed them.
+struct StationLogits {
+    station: usize,
+    produced: Vec<Rat>,
+    observed: Vec<Rat>,
+}
+
+/// The compared stations' logits of one encounter at `control` on `theta`.
+fn compared_logits(
+    field: &Field,
+    theta: Constitution,
+    source: &Encoded,
+    control: &[Rat],
+) -> Vec<StationLogits> {
+    let mut receiver = bound(field, theta, source, vec![faced_key(field)]);
+    let preparation = actuator(field);
+    let probe = receiver
+        .prepare_probe(source, &field.receivers()[0], &preparation, &[false, true])
+        .unwrap();
+    let waves = admitted(&probe, 0);
+    let reception = probe.encounter(&waves, control).unwrap();
+    let ActionCommunication::Received(received) = reception.reception else {
+        panic!("the encounter completes");
+    };
+    let ratio = &received.comparison.as_ref().unwrap().returned.ratio;
+    ratio
+        .stations()
+        .iter()
+        .map(|&station| {
+            let read = received
+                .boundary
+                .readings()
+                .iter()
+                .find(|read| read.station == station)
+                .unwrap();
+            StationLogits {
+                station,
+                produced: read.read.logits.clone(),
+                observed: received.encounter.steps()[read.crossing - 1]
+                    .joint
+                    .face()
+                    .to_vec(),
+            }
+        })
+        .collect()
+}
+
+/// The comparison's three parts at frozen covector `g`, on one encounter's logits.
+fn parts(g: &[Vec<Rat>], logits: &[StationLogits]) -> [Rat; 3] {
+    let mut parts = [Rat::zero(), Rat::zero(), Rat::zero()];
+    for held in logits {
+        let g = &g[held.station];
+        for class in 0..g.len() / 2 {
+            parts[0] += &g[2 * class] * &held.produced[2 * class];
+            parts[1] += &g[2 * class + 1] * &held.produced[2 * class + 1];
+            parts[2] -= &g[2 * class + 1] * &held.observed[2 * class + 1];
+        }
+    }
+    parts
+}
+
+/// **The encounter's own comparison is credited through the World.** One teaching encounter on `θ`
+/// holds, at its compared station, the produced logits' tangent and the observed face's tangent
+/// through the located key's declared face, and pairs them with its own comparison's covector. The
+/// encounters on `θ ± εH`, read at the frozen covector, confirm each part of the series to second
+/// order on `ε = 2⁻⁴ … 2⁻⁸`; the World's face moves with the native material.
+#[test]
+fn the_encounters_comparison_is_credited_through_the_world() {
+    let (field, base, source) = fixture();
+    let declared = Declared::new(&field, base);
+    let direction = declared.storage_direction(&field);
+    let control = vec![integer(1)];
+
+    let mut receiver = bound(
+        &field,
+        declared.at(&Rat::zero()),
+        &source,
+        vec![faced_key(&field)],
+    );
+    let preparation = actuator(&field);
+    let probe = receiver
+        .prepare_probe(&source, &field.receivers()[0], &preparation, &[false, true])
+        .unwrap();
+    let waves = admitted(&probe, 0);
+    let (reception, tangents) = probe
+        .encounter_teaching(&waves, &control, &[direction])
+        .unwrap();
+    let ActionCommunication::Received(received) = reception.reception else {
+        panic!("the teaching encounter completes");
+    };
+    let ratio = &received.comparison.as_ref().unwrap().returned.ratio;
+    // The read the tangent differentiates is the comparison's produced face: equal phases.
+    for &station in ratio.stations() {
+        let read = received
+            .boundary
+            .readings()
+            .iter()
+            .find(|read| read.station == station)
+            .unwrap();
+        assert_eq!(ratio.faces().faces[station].phases(), &read.read.phases[..]);
+    }
+    let credit = tangents[0].comparison_credit(ratio).unwrap();
+    let g = ratio.covector().unwrap().logits().to_vec();
+    println!(
+        "comparison credit: magnitude {}, produced phase {}, observed phase {}; total {}",
+        credit.magnitude,
+        credit.produced_phase,
+        credit.observed_phase,
+        credit.total()
+    );
+    assert!(
+        !credit.observed_phase.is_zero(),
+        "the World's observed face moves with the native material"
+    );
+    let tangent = [
+        credit.magnitude.clone(),
+        credit.produced_phase.clone(),
+        credit.observed_phase.clone(),
+    ];
+
+    let mut residuals: Vec<(Rat, [Rat; 3])> = Vec::new();
+    for j in 4..9 {
+        let epsilon = rat(1, 1i64 << j);
+        let up = parts(
+            &g,
+            &compared_logits(&field, declared.at(&epsilon), &source, &control),
+        );
+        let down = parts(
+            &g,
+            &compared_logits(&field, declared.at(&-epsilon.clone()), &source, &control),
+        );
+        let two = integer(2) * &epsilon;
+        let r: [Rat; 3] = std::array::from_fn(|k| ((&up[k] - &down[k]) / &two - &tangent[k]).abs());
+        println!(
+            "comparison credit: ε = 2^-{j}: central residuals {} {} {}",
+            r[0], r[1], r[2]
+        );
+        residuals.push((epsilon, r));
+    }
+    for k in 0..3 {
+        let (first_epsilon, first) = &residuals[0];
+        let scaled_first = &first[k] / (first_epsilon * first_epsilon);
+        for pair in residuals.windows(2) {
+            assert!(
+                pair[1].1[k].clone() * integer(2) <= pair[0].1[k],
+                "part {k}: the residual halves at least"
+            );
+        }
+        for (epsilon, residual) in &residuals {
+            assert!(
+                &residual[k] / (epsilon * epsilon) <= &scaled_first * integer(2),
+                "part {k}: the residual stays O(ε²)"
+            );
+        }
+    }
+}

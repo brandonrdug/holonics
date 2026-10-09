@@ -166,6 +166,67 @@ the loop is **experience → location → material response → production**, wi
 fields whose history is not persistently exciting (a narrowband source, a history shorter than the
 key's state, or nonlinear keys). The Ask stays on its branch until such a field is declared.
 
+## 3d. The encounter's own comparison is credited through the World
+
+[definition; agent-inferred, October 9] The encounter compares its produced station reads with the
+World's observed faces, and its covector `g_j` (`ReceivingFaceRatio::covector`) has real entries
+`p̃ − q̃` and imaginary entries `−q̃ (φ_q − φ_p)/2`. The existing return (`NativeReceivingReturn`)
+pulls `g` back with the World's returns held, so it is not a derivative through the World. The
+tangent supplies that derivative forward, at the two places the comparison reads:
+
+- **The produced read.** The station read is `ℓ_p = R P^τ v`. The lift `τ` is an integer winding, so
+  no first variation moves it. The participation anchor `v = ŵ_s s + Σ_a ŵ_a a_a` is linear in the
+  change at the junction's weights, which a contact-material direction does not move. Hence
+  `δℓ_p = R P^τ δv` with `δv = ŵ_s χ.s + Σ_a ŵ_a χ.a_a` at the station's epoch.
+- **The observed face.** The World reads its face on its state after the step (`JointStep::face`).
+  The located key's declared face (`KeyFace`, affine, chart rate 0) reads on the same convention as
+  the coupled prospect (`hnn.world-model-key-face`), so `δf = C_S ψ_S + C_R ψ_R` with `ψ` the World
+  tangent of (4).
+
+The first variation of the comparison's smooth score is reported as its series:
+
+```text
+dℓ/dε = Σ_j ⟨Re g_j, Re δℓ_p,j⟩ + Σ_j ⟨Im g_j, Im δℓ_p,j⟩ − Σ_j ⟨Im g_j, Im δf_j⟩            (5)
+          magnitude                  produced phase            observed phase
+```
+
+The phase term reads only the gap `φ_q − φ_p`, so the observed covector is the produced covector's
+negative. The observed masses `q̃` are the World face's reading at its grain. They are constant inside
+their cell, so they contribute no first variation, and a finite step that moves a target across a
+cell boundary is a jump that the landing must re-read. The credit refuses when the key declares no
+face, because the World's face is then not located. Its hypotheses are exactly one live key, an exact
+unsplit Word, and contact-material directions only. If the key's face differs from the World's, the
+credit is the credit of the key's hypothesis: a true port law with a wrong face is a different key.
+Owners: `MaterialTangent::{anchor, observe_station, read_stations, comparison_credit}`,
+`StationTangent`, `ComparisonCredit`; `execute_prepared` holds the stations in its observer and
+reads them through the actual read's own map and lift (`ReceivingPhases::read`).
+
+[measured; local developer read, not claim-bearing] `the_encounters_comparison_is_credited_through_the_world`
+(`tests/material_tangent_world.rs`) declares the fixture's key with the World's own face and runs one
+teaching encounter, then ten encounters on `θ ± εH` read at the frozen covector. Exit 0, test body
+3.16 s, whole command 3,260,215,635 ns, on the source committed with this section
+([receipt](receipts/2026-10-09-material-tangent/CREDIT_DEV_TESTS.v1.json)); the claim-bearing
+run is the sole queue's. On the fixture every part is negative, so moving along `+H` lowers the
+comparison's smooth score:
+
+| part | enclosure |
+|---|---|
+| magnitude | `−2⁻⁴ < · < −2⁻⁵` |
+| produced phase | `−2⁻¹⁰ < · < −2⁻¹¹` |
+| observed phase | `−2⁻⁹ < · < −2⁻¹⁰` |
+| total | `−2⁻⁴ < · < −2⁻⁵` |
+
+The observed phase exceeds the produced phase in magnitude (`|obs| > |prod|`, quotient floor 1), and
+the magnitude part exceeds the observed phase by quotient floor 34. **The World's face moves with the
+native material, and more than the native read's own phase does.** A credit that held the World
+fixed would miss that whole part. On `ε = 2⁻⁴ … 2⁻⁸` each part's exact central residual divides by
+these ratios at each halving:
+- magnitude: a ratio in `(3, 63/16)` at `j = 4`, then in `(63/16, 4)`;
+- produced phase: a ratio in `(63/16, 4)` throughout;
+- observed phase: a ratio in `(4, 4 + 2⁻⁶)`, falling toward 4.
+
+For every part, `4ʲ r_j` stays within a factor below 2 across the ladder.
+
 ## 4. The owners it consumes, and the implementation
 
 - `propagation::{transit_solve, transit_update, ContactOperands::solve}` for (1).
@@ -175,6 +236,9 @@ key's state, or nonlinear keys). The Ask stays on its branch until such a field 
 - `port::ChangeCovector::pairing` for the credit.
 - `word::continuation::{ContactCut, FiniteDecrease}` and `Constitution::first_reach` for the landing.
 
+- `ratio::ReceivingFaceRatio::covector`, `receiving::ReceivingPhases::read`,
+  `propagation::participation` and `physical::action::KeyFace` for the comparison credit (5).
+
 The new consumer is one carrier in `hnn::word::continuation`, `MaterialTangent`. It holds the
 declared direction's identity (contact, its `δC`, `δK`, `δD`, and the producing commit) and the
 state-shaped `χ`. Its operations are `held_opening`, `step` (eq. 2, called in lockstep with the
@@ -183,7 +247,9 @@ Word's full ticks, as `prediction` advances its completion columns), `carried`, 
 then consumes it.
 
 **Owed (#62).** The tangent identity (2) as a Lean statement at the executed transit (the `HNN/Propagation`
-owner), and the crossing (3) at `HNN/MoveDirection`'s held-momentum law.
+owner), the crossing (3) at `HNN/MoveDirection`'s held-momentum law, and the series (5) as the
+derivative of the receiving ratio's smooth score at its grain representative with the target's
+masses held in their cell.
 
 **Recorded failures checked.** An uncertified deposition step: the tangent proposes, and only the
 landing's exact strict improvement admits. A tape kept as retention: the forward route keeps none. An
