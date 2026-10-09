@@ -78,9 +78,11 @@
 //! each of its pairs: the image's consequence is `σ y`, not `σ f(y)`. The deposit moves the column of
 //! `f(y)` by its slip. Equivariance asks the column of `σ f(y)` to move by `B` of that, and for
 //! equivariant `E` and `E_0` one has `B Δ_y = P^(−δ) E_0 e_(σy) − (E − E_0) e_(σ f(y))`, the slip of a
-//! pair at offset `−δ`, which the law does not read. Nor is its prior equivariant: the founded `E_0` is
-//! the declared sign sequence, which this admission itself refuses (above). An equivariant deposit
-//! needs the reversal law of the pair port, which is owed. The carrier therefore keeps no port, and
+//! pair at offset `−δ`, which the forward law does not read (measured: one forward deposit takes an
+//! equivariant port off its subspace, the owner's test). Nor is its prior equivariant: the founded `E_0`
+//! is the declared sign sequence, which this admission itself refuses (above). The equivariant deposit
+//! reads that pair by the reversal law of the pair port ([`PairedCarrier::deposit`], "The paired
+//! deposit" below). The carrier still keeps no port, and
 //! **every read re-certifies the source port it reads** ([`PairedCarrier::partner_face`]): a port that
 //! a deposit, or any declared change, has taken off the equivariant subspace is refused with the typed
 //! [`PairedDefect::Equivariance`] naming the first failing column, and a different equivariant port is
@@ -139,7 +141,7 @@
 //!   [`PairedDefect::Transport`]).
 //! - The pair ports read an oriented offset moment whose orientation reverses under the dyad and whose
 //!   weight is `ν̂` of the pair population `n − δ`: refused ([`DyadRefusal::PairOffsets`]) until the
-//!   pair-port reversal law is built.
+//!   moment's own pair-port reversal is built (the deposit's is [`PairedCarrier::deposit`]).
 //! - A located clock, a continued section, a reframe, a ring that did not tick once a cell, and a count
 //!   of a class outside the family have no unit-tick phase relation ([`DyadRefusal`]).
 //!
@@ -148,6 +150,44 @@
 //! and `cells`, the opening lift, `encode`'s carrying `P^(−c)` and `open_storage`'s lift `P^τ`. It
 //! refuses everything listed above and any other moment than the field's own single-source,
 //! ingest-only passage.
+//!
+//! **The paired deposit** ([`PairedCarrier::deposit`]; helical step 3, #386; Lean `HNN/PairedDeposit`).
+//! [proved-derived; agent-inferred, October 9] With `B E_0 = E_0 Σ`, `B E = E Σ` and `B P B = P⁻¹`, the
+//! lift of a located pair's slip is the slip of its dyad image read against the clock (Lean
+//! `reversal_identity`, from `lift_pow`):
+//!
+//! ```text
+//! B Δ_y = P^(−δ) E_0 e_(σy) − (E − E_0) e_(σ f(y))  =:  Δ^R          the pair-port reversal law
+//! ```
+//!
+//! The dyad image's slip is read by its own law at `−δ` (`hnn::executed::oriented_slip`), never formed
+//! as `B Δ`: the identity is the check at every pair ([`PairedDefect::Reversal`]). The slip reads the
+//! ring's rotor alone, as the forward deposit does, so `P^(−δ)` is exact at every modulus; the partner
+//! face, which reads the moment's weights, refuses a damped transport on its own.
+//! - **One step for both orientations.** Each located pair and its dyad image enter one certified step
+//!   with weight one each (`hnn::executed::deposit_reads`). The features' multiset is `Σ`-invariant, so
+//!   `ΔH = Σ w f fᵀ` commutes with `Σ` and the aggregate `G = Σ w g fᵀ` satisfies `B G = G Σ`.
+//! - **The chart commutes on pair features.** A pair's feature is a unit column, so from the founding
+//!   `H_0 = 2^k I` the Gram stays diagonal, and each step of the chart (the warm start's rank-one steps,
+//!   the refinements, the restart) acts on each diagonal entry alone with the same rounding: `X̂ Σ = Σ X̂`,
+//!   so `D = G X̂` satisfies `B D = D Σ` (Lean `mul_commuting_stays`).
+//! - **The lattice keeps the subspace.** The budgeted carry is entrywise, so equivariant remainders
+//!   stay equivariant and the committed port stays equivariant (Lean `deposit_stays_equivariant`). The
+//!   successor is re-admitted inside the deposit, and a port that left the subspace is refused
+//!   ([`PairedDefect::Deposited`]).
+//! - **Not built here: the symmetrized chart.** Where other deposits have made the Gram non-diagonal,
+//!   `X̂` need not commute with `Σ`; `½(X̂ + Σ X̂ Σ)` does (Lean `symmetrized_commutes`; its certified
+//!   bound is owed, #62). It is built with its first consumer, the comparison's general route
+//!   (`compose_return`); until then the re-admission refuses such a deposit, typed.
+//!
+//! [proved-derived] On the equivariant subspace `|Δ^R| = |Δ_y|` (`B` permutes coordinates), so the
+//! paired slip is twice the forward one there, and the paired deposit descends the forward slip within
+//! the subspace: its fixed point is the forward slip's least point among equivariant ports. When the
+//! located law asks a column for a content the pairing forbids (a column that is one pair's
+//! consequence and another's dyad image with different carried priors), no equivariant port closes
+//! every slip; the slip that remains is the law's incompatibility with the pairing, read and returned
+//! (the owner's test reads a 4-cycle law beside a duplex whose strands move disjoint columns, where
+//! every slip closes in one deposit).
 //!
 //! **Information at the retained quotient: redundancy.** At modulus one the partner's retained counts
 //! are a fixed bijection of the strand's, and its face is `B P^(−(n−1))` of the strand's. So for this
@@ -164,6 +204,7 @@
 //! | the port carries the pairing, `B E = E Σ_σ` | owed (#62) | [`PairedCarrier::certify`], [`PairedCarrier::equivariant_port`] |
 //! | the partner's counts are the strand's reflected and complemented | owed (#62) | [`SourceMoment::dyad`], [`PairedCarrier::partner_moment`] |
 //! | `s(0)(σ̄u) = B P^(−(n−1)) s(0)(u)`, `m̃(σ̄u) = B P^(c₀) m̃(u)` | `Transport/HelicalCode.{strandFace_complementReverse_nat, face_complementReverse, partner_map_involutive}` (the bridge to the moment is owed, #62) | [`PairedCarrier::partner_face`], [`PairedCarrier::half_turn`] |
+//! | the pair-port reversal law `B Δ_y = Δ^R` and the equivariant deposit; the symmetrized chart commutes | `HNN/PairedDeposit.{lift_pow, reversal_identity, mul_commuting_stays, deposit_stays_equivariant, symmetrized_commutes}` (the symmetrized chart's certified bound is owed, #62) | [`PairedCarrier::deposit`], `hnn::executed::{oriented_slip, deposit_reads}` |
 //!
 //! **Recorded failures checked.** An authored routine standing in for learning: the port's follower
 //! columns are the code's own relation `E(σa) = B E(a)` on a free leader, never a decoder or a table.
@@ -179,7 +220,10 @@ use thiserror::Error;
 
 use crate::compression::keys::duplex::Pairing;
 use crate::hnn::HnnError;
+use crate::hnn::constitution::Constitution;
+use crate::hnn::executed::{OrientedRead, PairDeposit, class_at, deposit_reads, oriented_slip};
 use crate::hnn::field::{Current, Field, FieldMaterial, Ring};
+use crate::hnn::keys::LocatedPair;
 use crate::hnn::moment::{DyadRefusal, SourceMoment};
 use crate::ratio::Rat;
 use crate::ratio::linear::{ExactLinearError, ExactRatMatrix};
@@ -537,6 +581,42 @@ pub enum PairedDefect {
         "class {class} of the family does not fit ring {ring}'s lock: it does not tick the ring, so the tick is not one a cell"
     )]
     LockMisses { ring: usize, class: usize },
+    /// The declared prior `E_0` a deposit reads is not equivariant, so the reversal identity's
+    /// hypothesis fails: the first failing column, its partner and row, as [`PairedDefect::Equivariance`].
+    #[error(
+        "ring {ring}'s declared prior is not equivariant: column {column} against its partner column {partner} first differs at row {row}"
+    )]
+    PriorEquivariance {
+        ring: usize,
+        column: usize,
+        partner: usize,
+        row: usize,
+    },
+    /// A located class lies outside the pairing's family, so its dyad image is not defined.
+    #[error("located class {class} lies outside ring {ring}'s paired family: it has no dyad image")]
+    OutsideFamily { ring: usize, class: usize },
+    /// The pair-port reversal law's check failed: the lift of a located pair's slip differs from the
+    /// slip its dyad image reads against the clock, at `row`.
+    #[error(
+        "the lift of pair {antecedent} → {consequence}'s slip differs from its dyad image's at row {row}: the reversal law's check fails"
+    )]
+    Reversal {
+        ring: usize,
+        antecedent: usize,
+        consequence: usize,
+        row: usize,
+    },
+    /// The deposit's successor port is not equivariant (the re-admission after the deposit): the
+    /// first failing column, its partner and row.
+    #[error(
+        "ring {ring}'s deposited source port is not equivariant: column {column} against its partner column {partner} first differs at row {row}"
+    )]
+    Deposited {
+        ring: usize,
+        column: usize,
+        partner: usize,
+        row: usize,
+    },
     /// The moment is not a strand the dyad reads.
     #[error(transparent)]
     Dyad(#[from] DyadRefusal),
@@ -869,6 +949,110 @@ impl PairedCarrier {
             read: read[self.ring].clone(),
             transported,
         })
+    }
+
+    /// **The equivariant deposit of a located pair** (module header, "The paired deposit"): the
+    /// located pair `y → f(y)` at `+δ` and its dyad image `σy → σf(y)` read against the clock at `−δ`,
+    /// every read one sample of one certified step (`hnn::executed::deposit_reads`). In order, each
+    /// refusal typed: the carrier's ring in `field`; the source port the constitution holds now and the
+    /// declared prior `E_0` are equivariant ([`PairedDefect::Equivariance`],
+    /// [`PairedDefect::PriorEquivariance`]); every located class is in the family
+    /// ([`PairedDefect::OutsideFamily`]); at every pair the lift of the forward slip is the slip of its
+    /// dyad image, `B Δ_y = Δ^R` ([`PairedDefect::Reversal`]); the certified deposit
+    /// (`hnn::executed::pair_deposit`'s conditions); and the successor port is re-admitted
+    /// ([`PairedDefect::Deposited`]).
+    pub fn deposit(
+        &self,
+        field: &Field,
+        constitution: &Constitution,
+        prior: &ExactRatMatrix,
+        located: &LocatedPair,
+    ) -> Result<(Constitution, PairDeposit), PairedDefect> {
+        self.ring_of(field)?;
+        let ring = self.ring;
+        let port = constitution
+            .source_port(ring)
+            .ok_or(PairedDefect::MissingSourcePort { ring })?
+            .clone();
+        self.certify(&port)?;
+        self.certify(prior).map_err(|defect| match defect {
+            PairedDefect::Equivariance {
+                ring,
+                column,
+                partner,
+                row,
+            } => PairedDefect::PriorEquivariance {
+                ring,
+                column,
+                partner,
+                row,
+            },
+            other => other,
+        })?;
+        let image = |class: usize| {
+            self.sigma
+                .image(class)
+                .ok_or(PairedDefect::OutsideFamily { ring, class })
+        };
+        let classes = located
+            .map
+            .iter()
+            .map(|&(from, to)| Ok((class_at(field, ring, from)?, class_at(field, ring, to)?)))
+            .collect::<Result<Vec<(usize, usize)>, HnnError>>()?;
+        let reversed = classes
+            .iter()
+            .map(|&(y, x)| Ok((image(y)?, image(x)?)))
+            .collect::<Result<Vec<(usize, usize)>, PairedDefect>>()?;
+        let forward = BigInt::from(located.offset);
+        let backward = -&forward;
+        for (&(y, x), &pair) in classes.iter().zip(&reversed) {
+            let lifted = self.lift(&oriented_slip(field, ring, &port, prior, &forward, (y, x))?)?;
+            let against = oriented_slip(field, ring, &port, prior, &backward, pair)?;
+            if let Some(row) = lifted.iter().zip(&against).position(|(a, b)| a != b) {
+                return Err(PairedDefect::Reversal {
+                    ring,
+                    antecedent: y,
+                    consequence: x,
+                    row,
+                });
+            }
+        }
+        let reads: Vec<OrientedRead> = classes
+            .iter()
+            .map(|&pair| (forward.clone(), pair))
+            .chain(reversed.iter().map(|&pair| (backward.clone(), pair)))
+            .collect();
+        let (next, deposited) = deposit_reads(field, constitution, prior, ring, &reads)?;
+        let successor = next
+            .source_port(ring)
+            .ok_or(PairedDefect::MissingSourcePort { ring })?;
+        self.certify(successor).map_err(|defect| match defect {
+            PairedDefect::Equivariance {
+                ring,
+                column,
+                partner,
+                row,
+            } => PairedDefect::Deposited {
+                ring,
+                column,
+                partner,
+                row,
+            },
+            other => other,
+        })?;
+        Ok((
+            next,
+            PairDeposit {
+                offset: located.offset,
+                classes,
+                reversed,
+                slip_before: deposited.slip_before,
+                slip_after: deposited.slip_after,
+                certificate: deposited.certificate,
+                consumer: deposited.consumer,
+                source: deposited.source,
+            },
+        ))
     }
 }
 

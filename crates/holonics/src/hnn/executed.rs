@@ -33,6 +33,7 @@
 //! | Law | Lean | Rust |
 //! |---|---|---|
 //! | a located pair's deposit: the pair contact's slip against the carried prior, its exact line minimizer and the consumer `(E − B) T = P^δ B` (lane B, October 5) | owed (#62); the slip's derivative is `contact.dq` | [`pair_deposit`] |
+//! | the deposit of oriented reads: slips at signed turns `P^t B e_y − (E − B) e_x`, one certified step for every read (October 9; the paired carrier's dyad images at `−δ`) | `HNN/PairedDeposit.reversal_identity` (the paired read) | `oriented_slip`, `deposit_reads`, [`crate::hnn::paired::PairedCarrier::deposit`] |
 //! | the closed contacts are the deposit's distances: a contact `y → x` at `δ` is closed exactly where its slip vanishes | owed (#62) | [`pair_slip`], read by `hnn::prediction::closed_pairs` |
 
 use std::sync::OnceLock;
@@ -110,6 +111,9 @@ pub struct PairDeposit {
     pub offset: usize,
     /// `(y, f(y))` on the exterior chart.
     pub classes: Vec<(usize, usize)>,
+    /// The dyad images `(σy, σf(y))`, read against the clock at `−δ`
+    /// (`hnn::paired::PairedCarrier::deposit`); empty for the forward deposit.
+    pub reversed: Vec<(usize, usize)>,
     pub slip_before: Rat,
     pub slip_after: Rat,
     /// The certified step: `η`, `a`, `C` and `c`.
@@ -121,7 +125,7 @@ pub struct PairDeposit {
 
 /// The encoding's one class at a ring's port: each class is its own port (THE_MACHINE guard 9: no
 /// fold), so a port holds at most one; refused at a port that holds none.
-fn class_at(field: &Field, ring: usize, port: usize) -> Result<usize, HnnError> {
+pub(crate) fn class_at(field: &Field, ring: usize, port: usize) -> Result<usize, HnnError> {
     let geometry = field.ring(ring);
     let classes: Vec<usize> = (0..field.alphabet())
         .filter(|&code| geometry.port(code) == port)
@@ -155,7 +159,22 @@ pub fn pair_slip(
     offset: usize,
     (y, x): (usize, usize),
 ) -> Result<Vec<Rat>, HnnError> {
-    let image = field.ring(ring).rotate(&column(prior, y)?, &BigInt::from(offset));
+    oriented_slip(field, ring, port, prior, &BigInt::from(offset), (y, x))
+}
+
+/// [definition; agent-inferred, October 9] **A pair contact's slip read at signed turns `t`**:
+/// `Δ = P^t B e_y − (E − B) e_x`. A located pair reads `t = δ` ([`pair_slip`]); its dyad image is
+/// read against the clock, `t = −δ` (`hnn::paired::PairedCarrier::deposit`). The slip reads the
+/// ring's rotor alone, as [`pair_slip`] does, so `P^(−δ)` is exact at every modulus.
+pub(crate) fn oriented_slip(
+    field: &Field,
+    ring: usize,
+    port: &ExactRatMatrix,
+    prior: &ExactRatMatrix,
+    turns: &BigInt,
+    (y, x): (usize, usize),
+) -> Result<Vec<Rat>, HnnError> {
+    let image = field.ring(ring).rotate(&column(prior, y)?, turns);
     let (learned, base) = (column(port, x)?, column(prior, x)?);
     Ok(image
         .iter()
@@ -164,18 +183,21 @@ pub fn pair_slip(
         .collect())
 }
 
-/// The slips `Δ_y` of every located class at the port `E`.
-fn pair_slips(
+/// [definition; agent-inferred, October 9] **One oriented read of a deposit**: the signed turns `t`
+/// and the classes `(y, x)` of the slip `P^t B e_y − (E − B) e_x`, which moves column `x`.
+pub(crate) type OrientedRead = (BigInt, (usize, usize));
+
+/// The slips of every oriented read at the port `E`.
+fn oriented_slips(
     field: &Field,
     ring: usize,
     port: &ExactRatMatrix,
     prior: &ExactRatMatrix,
-    offset: usize,
-    classes: &[(usize, usize)],
+    reads: &[OrientedRead],
 ) -> Result<Vec<Vec<Rat>>, HnnError> {
-    classes
+    reads
         .iter()
-        .map(|&pair| pair_slip(field, ring, port, prior, offset, pair))
+        .map(|(turns, pair)| oriented_slip(field, ring, port, prior, turns, *pair))
         .collect()
 }
 
@@ -192,6 +214,51 @@ pub fn pair_deposit(
     ring: usize,
     located: &crate::hnn::keys::LocatedPair,
 ) -> Result<(Constitution, PairDeposit), HnnError> {
+    let classes = located
+        .map
+        .iter()
+        .map(|&(from, to)| Ok((class_at(field, ring, from)?, class_at(field, ring, to)?)))
+        .collect::<Result<Vec<_>, HnnError>>()?;
+    let turns = BigInt::from(located.offset);
+    let reads: Vec<OrientedRead> = classes.iter().map(|&pair| (turns.clone(), pair)).collect();
+    let (next, deposited) = deposit_reads(field, constitution, prior, ring, &reads)?;
+    Ok((
+        next,
+        PairDeposit {
+            offset: located.offset,
+            classes,
+            reversed: Vec::new(),
+            slip_before: deposited.slip_before,
+            slip_after: deposited.slip_after,
+            certificate: deposited.certificate,
+            consumer: deposited.consumer,
+            source: deposited.source,
+        },
+    ))
+}
+
+/// What one certified deposit of oriented reads measured ([`deposit_reads`]).
+pub(crate) struct DepositedReads {
+    pub slip_before: Rat,
+    pub slip_after: Rat,
+    pub certificate: CertifiedStep,
+    pub consumer: bool,
+    pub source: SourceStep,
+}
+
+/// [definition; agent-inferred, October 9] **One certified deposit of oriented reads** ([`PairDeposit`],
+/// "The deposition"): one sample per read, feature `e_x`, covector its slip, weight one, all in one
+/// call of the source port's normal law, so one `η` serves every read; the slip `Q = Σ_r |Δ_r|²` is
+/// quadratic along the unit step and its step is the library's certified step. The forward deposit
+/// reads each located pair at `+δ` ([`pair_deposit`]); the paired carrier's adds each dyad image at
+/// `−δ` (`hnn::paired::PairedCarrier::deposit`).
+pub(crate) fn deposit_reads(
+    field: &Field,
+    constitution: &Constitution,
+    prior: &ExactRatMatrix,
+    ring: usize,
+    reads: &[OrientedRead],
+) -> Result<(Constitution, DepositedReads), HnnError> {
     let port = constitution
         .source_port(ring)
         .ok_or(HnnError::MissingSourcePort { ring })?
@@ -203,24 +270,19 @@ pub fn pair_deposit(
             found: prior.rows() * prior.columns(),
         });
     }
-    let classes = located
-        .map
-        .iter()
-        .map(|&(from, to)| Ok((class_at(field, ring, from)?, class_at(field, ring, to)?)))
-        .collect::<Result<Vec<_>, HnnError>>()?;
-    let slips = pair_slips(field, ring, &port, prior, located.offset, &classes)?;
+    let slips = oriented_slips(field, ring, &port, prior, reads)?;
     let slip_before = squared(&slips);
     let unit_feature = |class: usize| -> Vec<Rat> {
         (0..field.alphabet())
             .map(|code| if code == class { Rat::one() } else { Rat::zero() })
             .collect()
     };
-    let samples: Vec<Sample> = classes
+    let samples: Vec<Sample> = reads
         .iter()
         .zip(&slips)
-        .map(|(&(_, x), slip)| Sample {
+        .map(|((_, (_, x)), slip)| Sample {
             weight: Rat::one(),
-            feature: unit_feature(x),
+            feature: unit_feature(*x),
             covector: slip.clone(),
             masses: None,
         })
@@ -237,12 +299,12 @@ pub fn pair_deposit(
     let moved = unit
         .source_port(ring)
         .ok_or(HnnError::MissingSourcePort { ring })?;
-    let direction: Vec<Vec<Rat>> = classes
+    let direction: Vec<Vec<Rat>> = reads
         .iter()
-        .map(|&(_, x)| {
-            Ok(column(moved, x)?
+        .map(|(_, (_, x))| {
+            Ok(column(moved, *x)?
                 .iter()
-                .zip(column(&port, x)?)
+                .zip(column(&port, *x)?)
                 .map(|(a, b)| a - b)
                 .collect())
         })
@@ -275,7 +337,7 @@ pub fn pair_deposit(
     if stepped.entries().iter().any(|entry| entry.abs() > entry_bound()) {
         return Err(refused("a deposit within the entry bound"));
     }
-    let after = pair_slips(field, ring, stepped, prior, located.offset, &classes)?;
+    let after = oriented_slips(field, ring, stepped, prior, reads)?;
     let slip_after = squared(&after);
     if slip_after > &slip_before - certificate.decrease() {
         return Err(refused("a deposit whose slip falls by its certified decrease"));
@@ -283,9 +345,7 @@ pub fn pair_deposit(
     let consumer = after.iter().flatten().all(Zero::is_zero);
     Ok((
         next,
-        PairDeposit {
-            offset: located.offset,
-            classes,
+        DepositedReads {
             slip_before,
             slip_after,
             certificate,

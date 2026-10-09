@@ -1924,3 +1924,156 @@ fn one_actual_pair_deposit_takes_the_equivariant_port_off_its_subspace() {
         other => panic!("an equivariant port moved by one located pair is refused at its column: {other:?}"),
     }
 }
+
+/// The two-ring field of the deposit readings: source ring 0 of period 4 (lock `0 … 3`, reflector
+/// `p ↦ −p`) holding the four classes paired `(0 1)(2 3)`, joined to a ring of period 2.
+fn deposit_field() -> Field {
+    declare(
+        vec![
+            ring_declaration(4, vec![0, 1, 2, 3], reflection(4, 0)),
+            ring_declaration(2, vec![0, 1], reflection(2, 0)),
+        ],
+        vec![ContactDeclaration {
+            from: 0,
+            to: 1,
+            channel: vec![(0, 0)],
+            admittance: integer(2),
+            exponent: integer(0),
+        }],
+        vec![0],
+        4,
+        Vec::new(),
+    )
+}
+
+/// The pair located by loop closure over `passages`, each read from its second cell.
+fn located_over(field: &Field, passages: &[Vec<usize>]) -> crate::hnn::keys::LocatedPair {
+    use crate::hnn::keys::{PairLocation, station_pairs};
+    let mut location = PairLocation::open(field, 0);
+    for passage in passages {
+        for observation in station_pairs(field, 0, &encoded(field, passage), 1).unwrap() {
+            location.observe(&observation);
+        }
+    }
+    location.survivors().located().expect("the passages' law is located")
+}
+
+/// [measured, October 9; helical step 3, loop 2; the module header, "The paired deposit"] **The paired
+/// deposit learns a located pair on both strands and keeps the port equivariant.** On the real
+/// constitution with the declared equivariant port, two terrains are located by loop closure and
+/// deposited:
+/// - a strand alternating classes `0` and `2` (located `δ = 1`, `0 ↔ 2`), whose partner strand
+///   alternates `1` and `3`: the strands' reads move disjoint columns. The forward deposit alone takes
+///   the port off its subspace (the control, at column 0 against partner 1); one paired deposit closes
+///   every slip of both orientations, and the port stays equivariant, so the partner face reads exactly.
+/// - a strand stepping `y ↦ y + 1` over all four classes (located `δ = 1`, a 4-cycle), whose dyad
+///   images move the same columns as other forward reads: the paired deposits descend the slip within
+///   the subspace, keep the port equivariant and the partner face exact, and the slip that remains is
+///   read, not asserted (the module header's compatibility of a law with the pairing).
+#[test]
+fn the_paired_deposit_learns_both_strands_and_keeps_the_port_equivariant() {
+    use crate::hnn::executed::pair_deposit;
+    let field = deposit_field();
+    let declared = PairingDeclaration::Family {
+        table: vec![(0, 1), (1, 0), (2, 3), (3, 2)],
+    };
+    let founded_port = declared_source_port(&field, 0).unwrap().unwrap();
+    let completed = PairedCarrier::complete_port(&field, 0, &declared, &founded_port).unwrap();
+    let carrier = PairedCarrier::admit(&field, 0, &declared, &completed).unwrap();
+    let placed = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET)
+        .unwrap()
+        .with_ports(0, None, Some(completed.clone()), None)
+        .unwrap();
+    let opening = vec![BigInt::from(4 + 1), BigInt::zero()];
+    let u = vec![2, 0, 1, 3, 3, 0, 2, 1, 0];
+    let strand = run(&field, 0, &opening, None, &u);
+    let exact = |constitution: &Constitution| {
+        carrier
+            .partner_face(&field, constitution, &strand.current, &strand.moment, 3)
+            .map(|face| face.is_exact())
+    };
+    assert_eq!(exact(&placed), Ok(true));
+
+    // The duplex on disjoint columns.
+    let alternating: Vec<Vec<usize>> = [0usize, 2, 0]
+        .iter()
+        .map(|&start| (0..8).map(|k| if k % 2 == 0 { start } else { 2 - start }).collect())
+        .collect();
+    let located = located_over(&field, &alternating);
+    eprintln!(
+        "alternating strand: located offset {}, map {:?}, cycle {}, turns {:?}",
+        located.offset, located.map, located.cycle, located.turns
+    );
+    assert_eq!((located.offset, located.map.clone()), (1, vec![(0, 2), (2, 0)]));
+    let (forward_only, _) = pair_deposit(&field, &placed, &completed, 0, &located).unwrap();
+    let control = carrier.partner_face(&field, &forward_only, &strand.current, &strand.moment, 3);
+    eprintln!("control, the forward deposit alone: {control:?}");
+    assert!(matches!(
+        control,
+        Err(PairedDefect::Equivariance {
+            ring: 0,
+            column: 0,
+            partner: 1,
+            ..
+        })
+    ));
+    let (learned, deposit) = carrier.deposit(&field, &placed, &completed, &located).unwrap();
+    eprintln!(
+        "paired deposit: forward {:?}, reversed {:?}, slip {} -> {}, step {}, consumer {}",
+        deposit.classes,
+        deposit.reversed,
+        deposit.slip_before,
+        deposit.slip_after,
+        deposit.certificate.step,
+        deposit.consumer
+    );
+    assert_eq!(deposit.reversed, vec![(1, 3), (3, 1)]);
+    assert!(deposit.certificate.holds());
+    assert!(deposit.consumer, "both strands' slips close on disjoint columns");
+    assert_eq!(
+        carrier.certify(ConstitutionRead::source_port(&learned, 0).unwrap()),
+        Ok(())
+    );
+    assert_eq!(exact(&learned), Ok(true));
+
+    // The duplex on shared columns.
+    let stepping: Vec<Vec<usize>> = [0usize, 1, 3]
+        .iter()
+        .map(|&start| (0..8).map(|k| (start + k) % 4).collect())
+        .collect();
+    let located = located_over(&field, &stepping);
+    eprintln!(
+        "stepping strand: located offset {}, map {:?}, cycle {}, turns {:?}",
+        located.offset, located.map, located.cycle, located.turns
+    );
+    assert_eq!(
+        (located.offset, located.map.clone()),
+        (1, vec![(0, 1), (1, 2), (2, 3), (3, 0)])
+    );
+    let mut constitution = placed.clone();
+    let mut deposits = 0u32;
+    for _ in 0..3 {
+        match carrier.deposit(&field, &constitution, &completed, &located) {
+            Ok((next, deposit)) => {
+                assert!(deposit.certificate.holds());
+                assert!(deposit.slip_after < deposit.slip_before);
+                assert_eq!(exact(&next), Ok(true));
+                deposits += 1;
+                eprintln!(
+                    "stepping strand, paired deposit {deposits}: reversed {:?}, slip {} -> {}, step {}, consumer {}",
+                    deposit.reversed,
+                    deposit.slip_before,
+                    deposit.slip_after,
+                    deposit.certificate.step,
+                    deposit.consumer
+                );
+                constitution = next;
+            }
+            Err(refusal) => {
+                eprintln!("stepping strand: paired deposit {} is refused: {refusal}", deposits + 1);
+                break;
+            }
+        }
+    }
+    assert!(deposits >= 1, "the first paired deposit on shared columns certifies");
+}
