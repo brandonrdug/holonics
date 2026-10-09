@@ -1,0 +1,275 @@
+{
+  "files": {
+    "stages/egg-two-torsion-20261009-v136-prep.acceptance.json": {
+      "sha256": "29d56abbfe682b9185b1a85a9066c186f3decadb0bcfc0355cda6782fc735d11",
+      "bytes": 378
+    },
+    "stages/egg-two-torsion-20261009-v136-prep.child-identity.json": {
+      "sha256": "900d58794c04b76108bbf81818f2ea574d1da966fcbb1055f7549983b42416cc",
+      "bytes": 78
+    },
+    "stages/egg-two-torsion-20261009-v136-prep.config.json": {
+      "sha256": "35fdd8c8f50b99fdce323939451bd69e37d270f66df642704e89aca086c3d9c2",
+      "bytes": 10220
+    },
+    "stages/egg-two-torsion-20261009-v136-prep.external-lease.json": {
+      "sha256": "ae3c3a5949c2afd6f3b93dce39e14db08da573367bc6253db5e6066fbd7e875b",
+      "bytes": 487
+    },
+    "stages/egg-two-torsion-20261009-v136-prep.final.json": {
+      "sha256": "0eff4b3d8e5f367eaf11fb61124fdd1f35ce1dfe33ad909fa2a8f6cc497f6d92",
+      "bytes": 4925
+    },
+    "stages/egg-two-torsion-20261009-v136-prep.input_seal.json": {
+      "sha256": "eb9f8c6c7ff0d9f8a075dcb303d1309bab938f591299be3a89c722e78b3320b3",
+      "bytes": 7396
+    },
+    "stages/egg-two-torsion-20261009-v136-prep.lease-identity.json": {
+      "sha256": "80c1bde6cdf24b0819bab90f707b12ef14fcf95e6c830c7d96cb66a2f1d725a5",
+      "bytes": 565
+    },
+    "stages/egg-two-torsion-20261009-v136-prep.memory-gate.json": {
+      "sha256": "8f80c5f3303e3b7c8a3556a771d0d2a6b32ac2f9af5b84c32a2354623e5a6659",
+      "bytes": 120
+    },
+    "stages/egg-two-torsion-20261009-v136-prep.memory-growth.ndjson": {
+      "sha256": "f911184c259dd96250eec6d7cd9aefb2c64e2389ac56284e93ee8668f6f57110",
+      "bytes": 7980
+    },
+    "stages/egg-two-torsion-20261009-v136-prep.output_seal.json": {
+      "sha256": "3cc3ad3bf923b4538db47ca010630a56ce9cc9e9754b174107652c288893178f",
+      "bytes": 555376
+    },
+    "stages/egg-two-torsion-20261009-v136-prep.publication.json": {
+      "sha256": "1005ed694d7f7cdec0459c96de9215130f977f3d137f7ad66dade87f08532334",
+      "bytes": 3110
+    },
+    "stages/egg-two-torsion-20261009-v136-prep.quiescence.json": {
+      "sha256": "d8e64ac7ee5d1e55fca0e1cb3fc67562d630303e1d24dc8fd7814ceea0536bc9",
+      "bytes": 130
+    },
+    "stages/egg-two-torsion-20261009-v136-prep.release.json": {
+      "sha256": "2a1ec5cdc49cb7e622dc6adcc9d51b0231abd2782806f01dca549e156cfd1fb5",
+      "bytes": 175
+    },
+    "stages/egg-two-torsion-20261009-v136-prep.stage-quiescence.json": {
+      "sha256": "6d37e26e30f6372e68e14596105faa438e2f2a49b9ea408a41fd3914e45e6a48",
+      "bytes": 136
+    },
+    "stages/egg-two-torsion-20261009-v136-prep.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "stages/egg-two-torsion-20261009-v136-prep.stdout": {
+      "sha256": "1ce0d0d21fc902ac42abf6901c752cf47f76704512ff23bc54796d683e960f3b",
+      "bytes": 2081
+    },
+    "stages/egg-two-torsion-20261009-v136-prep.system-floor.json": {
+      "sha256": "c4992faaba8c129f73cef52cfc440bd6dfb47ad6c0ce80c79601e3474ce1ec6e",
+      "bytes": 64777
+    },
+    "stages/egg-two-torsion-20261009-v136-prep.unit-cleanup.json": {
+      "sha256": "45e240a4830d50055db0f41b8a01f210671955edc6e41d0a4d14e7612e987da4",
+      "bytes": 695
+    },
+    "stages/egg-two-torsion-20261009-v136-compile.acceptance.json": {
+      "sha256": "c0f5c6b83ebd8d682f755fb484f6744f703a586bfead0912b46c01c254b1b8b0",
+      "bytes": 378
+    },
+    "stages/egg-two-torsion-20261009-v136-compile.child-identity.json": {
+      "sha256": "876713a7afc1b5673d1e7d4f1296bf161380790a1bc9a5fc392989cf0485ccf5",
+      "bytes": 78
+    },
+    "stages/egg-two-torsion-20261009-v136-compile.config.json": {
+      "sha256": "55d526c52e84790309a23793ae02841ae5e5e171716b004151a88e4c0b2c8be7",
+      "bytes": 11170
+    },
+    "stages/egg-two-torsion-20261009-v136-compile.external-lease.json": {
+      "sha256": "391b650f95db6734808111eec05eb0780c4a20de91739ae91e6ed74b067d504b",
+      "bytes": 487
+    },
+    "stages/egg-two-torsion-20261009-v136-compile.final.json": {
+      "sha256": "837dac594b73cf6f38c2c958cd257510592eafe6af3c6dabc30b113e799adede",
+      "bytes": 4977
+    },
+    "stages/egg-two-torsion-20261009-v136-compile.input_seal.json": {
+      "sha256": "0a414a4e3376d0d37bbcb1c6c9ca7873e4b5de8810ced992475949c10e6bd189",
+      "bytes": 7101
+    },
+    "stages/egg-two-torsion-20261009-v136-compile.lease-identity.json": {
+      "sha256": "6aa8fb1e2dca9923056b9d8fd06988cd9dc8efe2e14f8ef43677b7b5d62fe367",
+      "bytes": 565
+    },
+    "stages/egg-two-torsion-20261009-v136-compile.memory-gate.json": {
+      "sha256": "fbe7562bd3b0a510356682e1013a5b91a7a942f8287a48e9383a97718ddde9c2",
+      "bytes": 121
+    },
+    "stages/egg-two-torsion-20261009-v136-compile.memory-growth.ndjson": {
+      "sha256": "46112fbba980519defdebe5853249130e79923774af89d5d6a623dfcefceaa25",
+      "bytes": 13528
+    },
+    "stages/egg-two-torsion-20261009-v136-compile.output_seal.json": {
+      "sha256": "070aaab3706be13a83686ee358f6be4adeb8f0494713dbf0a89c97558d338734",
+      "bytes": 942067
+    },
+    "stages/egg-two-torsion-20261009-v136-compile.publication.json": {
+      "sha256": "def2e094b2658c630bcdccd216f92aa80a29ac679b7cb06e8b10d941505d43c4",
+      "bytes": 3907
+    },
+    "stages/egg-two-torsion-20261009-v136-compile.quiescence.json": {
+      "sha256": "7a8678c3cd90e3e03dd6c5631d779b42b44f60c5ec30ec8937a15b5947364bd2",
+      "bytes": 130
+    },
+    "stages/egg-two-torsion-20261009-v136-compile.release.json": {
+      "sha256": "c91263b8186c7248a709b51af6e1b6640d74e251340cafc28d6a531f05fe75f0",
+      "bytes": 175
+    },
+    "stages/egg-two-torsion-20261009-v136-compile.stage-quiescence.json": {
+      "sha256": "32f93c7cf0541d27601269a432f7941d05ec88d65168abfceef7eb47e09cc17a",
+      "bytes": 136
+    },
+    "stages/egg-two-torsion-20261009-v136-compile.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "stages/egg-two-torsion-20261009-v136-compile.stdout": {
+      "sha256": "c8ddffd9784ec7bc8556d038baf77500359b970073f5c2a963dbda70c4ebe129",
+      "bytes": 2916
+    },
+    "stages/egg-two-torsion-20261009-v136-compile.system-floor.json": {
+      "sha256": "2d528812dbbb02c095e28dcab9f1723db9f0d93d0ee0dcf579857177e3b4594f",
+      "bytes": 109223
+    },
+    "stages/egg-two-torsion-20261009-v136-compile.unit-cleanup.json": {
+      "sha256": "d6326abce2bb933189976781c9e6daeb746ddaa31915cf8c3ec6cac30601de5a",
+      "bytes": 701
+    },
+    "admission/COMPILER_REQUEST.json": {
+      "sha256": "017ca13c8c8a37ee5d8ce7d509a6951ccf7d132dbaf5057a9a97436291be0b77",
+      "bytes": 3533
+    },
+    "admission/KERNEL_VALIDATION.json": {
+      "sha256": "e180b3c7fbb510224bf09730e53266e65d3b73017304386d5dabbcdd5670c5a4",
+      "bytes": 1682
+    },
+    "admission/PREPARATION_REQUEST.json": {
+      "sha256": "56b811f7e5efb4aa3a4ec44556a59e5b1002645b115ed91137488647584f943a",
+      "bytes": 5712
+    },
+    "admission/PROVIDER_NAMESPACE.json": {
+      "sha256": "f94cd48a02c0c7df948625fa391900b1a336f58334d96b8edfe47a8f0b9d71c8",
+      "bytes": 106
+    },
+    "admission/SOURCE_ADMISSION.json": {
+      "sha256": "33d9af116d690f93c3f480fbbd7e855a2e90bc76694abd0c074b643b78c50e00",
+      "bytes": 1955
+    },
+    "admission/compiler.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "admission/compiler.stdout": {
+      "sha256": "9aa7c6859f887f1ba9c6cb18a00388a1143e48f0229ede2f9058fd1f84d7cbcd",
+      "bytes": 1264
+    },
+    "admission/current-imports.json": {
+      "sha256": "3d5e5fb90ba763fcfd2166948b40eb19ac826b587bc61041cf75237d77ef2569",
+      "bytes": 49897921
+    },
+    "admission/import-preparation.json": {
+      "sha256": "892042e0dacc21d99c8c341d90927a0de24843185d27e147c4c716fde6a35fce",
+      "bytes": 1252
+    },
+    "admission/objects-v1/HolonicsResearch/Geometry/EggModular.ilean": {
+      "sha256": "054db1b973e6e207b04c0f736f0cc69b396031ce1947c3fc9e40bedfa51d8c06",
+      "bytes": 23821
+    },
+    "admission/objects-v1/HolonicsResearch/Geometry/EggModular.olean": {
+      "sha256": "6463f5c5a255237e1529d6115c4b11956c5d2d6de7d132ea7ee0d11180c2a1ef",
+      "bytes": 1694528
+    },
+    "admission/source-v1/HolonicsResearch/Geometry/EggModular.lean": {
+      "sha256": "d17596df6a3c1b536f4254a8e3cee39f10a8cd68732ffaa404a031ce151404f3",
+      "bytes": 14166
+    },
+    "queue-source/materialize_egg_v136.py": {
+      "sha256": "38da7c02e39922d12048a8e94bf79ec3d80175a328ed6d268b4e2bd385c0d53d",
+      "bytes": 7229
+    },
+    "queue-source/package_egg_v136.py": {
+      "sha256": "0ab3d47e5a0c9f02204e4810994300eb95ebd6bfe0df2c4e459db6a04a714721",
+      "bytes": 7795
+    },
+    "queue-source/prepare_ns_namespace_v1.py": {
+      "sha256": "85b5a0626525cf14d6dbf8ecf9098ee8804df8facf1cad8c5e2f8eeb36aeea7c",
+      "bytes": 10766
+    },
+    "queue-source/check_namespace_lookup_v1.py": {
+      "sha256": "9210e5aa18f9daeb7ac8ced18e253f08805577119a5f2b5e211017d9a873679c",
+      "bytes": 886
+    },
+    "queue-source/check_lean_owner_v5.py": {
+      "sha256": "938113c2385ccafad539de5bcd6252a3ef315261e15ff3312757fb1a95ba723e",
+      "bytes": 2194
+    },
+    "queue-source/verify_lean_metadata_v1.py": {
+      "sha256": "cff6b3ce7c52698766dd59eb249c822960c36667c87d7e8e6cc6bae10c5d41ad",
+      "bytes": 772
+    },
+    "queue-source/lean_budget_v5.py": {
+      "sha256": "ad9ee8b7658a53011a020e159847ac9b23d4b491e3b262c2f49d23afa43b974e",
+      "bytes": 5550
+    },
+    "queue-source/final_stage_memory_v120.py": {
+      "sha256": "b6913802127facc4945da4bbdd0f18cb5457cc8e03765b649653e6cfe12adfc4",
+      "bytes": 11218
+    },
+    "queue-source/leased_stage_memory_v120.py": {
+      "sha256": "1191c531c35016eada85739a5ca94dabefd9074c75781e4a20fb28d4b887f1d1",
+      "bytes": 5538
+    },
+    "queue-source/bounded_stage_memory_v120.py": {
+      "sha256": "5ebc628494a7bff53f01362475110002eedae3b6395517f394f9972c541eff41",
+      "bytes": 13550
+    },
+    "coordination/EGG_SOURCE_STATUS.v136.md": {
+      "sha256": "119ae2650b5f0d4a8513b8afa737408ab9560e2fd4eec6d96e1978569480f7fc",
+      "bytes": 2133
+    },
+    "coordination/EGG_CHECKPOINT.v136.md": {
+      "sha256": "6f477c5e353c655744a69c51996e68975cef132d49dc50b8bb3ac759b1623841",
+      "bytes": 1077
+    },
+    "coordination/EGG_EARLY_TERMINAL.v136.md": {
+      "sha256": "0e6a75b7d513ee49f8620f54f3eb86138f1844797feadf6f39a8f0ff4dd502e1",
+      "bytes": 2333
+    },
+    "handoffs/b9ed5221e7e94b758d7137da77069300.json": {
+      "sha256": "fadcc3fce968960b59288482b4790efe1765e43a860f61a824aecd5dafa90939",
+      "bytes": 2032
+    },
+    "handoffs/0e8b130eaffd4522841d439be07f20ef.json": {
+      "sha256": "696937a7d6f652eab4e3a3ac1407bd6b8bf1420c7d01bc1f1fc196b56c6ed534",
+      "bytes": 1090
+    },
+    "handoffs/746435372009400fbf00c119d17862a7.json": {
+      "sha256": "a6e6110f0f7358aa333ec3bc5e0568f5e29324dca878e09cd4bc7e1e2c51db1d",
+      "bytes": 4792
+    },
+    "handoffs/c586563ae8ba46ffbda8bbfd89e009e8.json": {
+      "sha256": "c44ef3ef58b6b50ec073a3def7dafd5472a0932d9210076a77724f37c265bbb3",
+      "bytes": 1771
+    },
+    "VALIDATION.json": {
+      "sha256": "892e30c3d32498acc20d6bfc8b3b919a2d82b2645f4228f5bd7031007eeb0af6",
+      "bytes": 5592
+    },
+    "HANDOFF.md": {
+      "sha256": "abaa7c8a493edd1b67d96c7b817fc596a501f1582bc83450f5bc5152fc8d5304",
+      "bytes": 2756
+    }
+  },
+  "count": 67,
+  "total_bytes": 53491303,
+  "all_reflink_copies_byte_verified": true
+}

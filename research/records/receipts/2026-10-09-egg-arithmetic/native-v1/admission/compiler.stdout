@@ -1,0 +1,15 @@
+'Holonics.Geometry.EggModular.legendreJ_anharmonic' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Geometry.EggModular.legendreJ_sub_1728' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Geometry.EggModular.legendreJ_half' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Geometry.EggModular.egg_j_of_legendre_lambda' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Geometry.EggModular.hyperbolic_circle_euclidean_equation' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.EggModular.hyperbolic_circle_vertical_extent' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.EggModular.egg_hypergeometric_coefficient' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Geometry.EggModular.wallis_centralBinom' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Geometry.EggModular.egg_period_coefficient' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Geometry.EggModular.egg_to_fullTwoTorsion' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Geometry.EggModular.egg_321_fullTwoTorsion' depends on axioms: [propext, Classical.choice, Quot.sound]
