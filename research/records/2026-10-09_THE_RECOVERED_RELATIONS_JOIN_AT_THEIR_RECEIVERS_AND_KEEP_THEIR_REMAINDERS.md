@@ -233,6 +233,90 @@ fractional LP face lifts to an integral packing. `GluingPassage` owns exactly
 that possible obstruction. Decisive check: one global realizer exists for every
 claimed coarse cell, or its obstruction stays visible.
 
+## 3a. Packed cycles meet one contextual relation and both peers' returns
+
+[lens-derived; agent-inferred interface] Packing supplies geometry to keys,
+locks and association when actual contacts, medium and receiving sections are
+present. The useful join is one relation over compatible navigator configurations,
+physical configuration/medium, both participants' constitutions, context, local
+clocks/phase, admitted drives, wave passages, responses and continuations. A
+speaker's emission and a partner's possible response belong to that coupled
+relation. Perception restricts it by encountered waves; generation restricts the
+same relation by requested observable continuations and admitted drives. Selection
+belongs to the actual Ask join. The partner's actual return changes the future
+propagation through the contemporary constitution.
+
+This keeps laughter's acoustic tones, text cues, timing and reader state in a
+many-to-many contextual fibre. A shared face neither installs a universal meaning
+nor identifies its producing configurations. Cycles compose into voices, chords,
+ordered passages and songs at their actual incidence and clocks. Volume-filling
+noise and interference require their spatial coupling and receiving boundaries;
+a scalar capacity or chord label does not supply those laws. Evidence retains its
+source/port lineage: projecting an inferred consequence onto another port cannot
+be counted as a second independent observation.
+
+**Existing owners and scope:** `crates/holonics/src/compression/mod.rs` joins
+`resonance`, `cost` and `keys`: the constitution's resonating/emanating split,
+a codec pivot carrying its decoder and residual, and the loop-closure key fibre.
+`HolonicsResearch/Foundation/AcousticReceiver` proves a Cayley resonator bank's
+causality and linear superposition, then the failure of nonlinear response or
+quantization before coherent superposition. Colour and timbre are receivers of
+one co-present complex mode population, with explicit metamers and unisons:
+neither face refines the other. Its Gaussian-rational Rust mirror at
+`1a6299e4` was retired for having no current consuming call. These are mathematical
+owners, not a current native acoustic production claim.
+
+`Holonics/Foundation/RelationLadder`'s `songSituation` and
+`equalMusicalFaceGivesEqualPotential` prove receiver-relative agreement through
+the admitted transposition, nonzero tempo scale and revoicing family. A richer
+receiver separates the occurrences. This is a declared exact example of a
+future-relative quotient, not learned song recognition or a fixed acoustic/text
+semantic assignment. `HolonicsResearch/Foundation/HolonicGranularBoundaryRadiation`
+proves the finite Stokes reflection and boundary/scale naturality; it explicitly
+leaves each acoustic or linguistic constitutive matrix, ports and receiver family
+owed. `WorldModel::coupled_prospect` already carries incident waves, returned
+waves and native readings together through one key coordinate. Its grain-face
+conditioning and Ask joins remain the concrete native interfaces above.
+
+**Exact distinction for a broader consumer:** for a nonzero real wave `w`,
+`Rplus={(w,w),(-w,-w)}` and `Rminus={(w,-w),(-w,w)}` have identical
+per-port marginals and total component energy `2 w^2`. The additive receiver
+`(u,v) -> u+v` reads `{2w,-2w}` on the first and `{0}` on the second.
+Keeping component energies or independent per-port possibilities therefore loses
+an observable joint continuation. Coherent wave superposition within one
+possibility and a plural fibre of epistemic possibilities are different
+compositions; neither replaces the other. This exact witness scopes a future
+correlation check; C2 keeps its already fixed retained-constraint acceptance.
+
+**Compression interface:** quotient only configurations no admitted observable
+joint continuation distinguishes, including the next probe chosen from an earlier
+response. The descent square must cover those adaptive controls; when a newly
+admitted context, receiver or probe separates the fibre, refine it and retain the
+obstruction/remainder. `ReceiverHistoryCompression` supplies the existing
+`q T_i=U_i q` law; applying it to this coupled family still requires the actual
+source/action/receiver transport. Fixed importance rankings, independently
+conditioned marginals and modality-specific answer tables would repeat recorded
+failures rather than implement this interface.
+
+**Recovered room evidence:** the August 28 SENS4 record measures one body's
+source-neutral acoustic port/quadrature production, exact carried-phase room
+transport, overlapping self-echo/other-speaker lineages and changed later conduct
+of that same body. Historical sources at `1a6299e4` are
+`crates/holonic-life/src/native_intelligence/membrane_acoustic.rs`,
+`crates/holonic-life/src/mathematical_source/acoustic.rs`, and
+`crates/holonic-engine/src/{phase_current,wave_propagation}.rs`, consumed by
+`crates/holonic-life/examples/the_athena_radiation_becomes_voice_and_its_room_return_cultivates_the_body_sens4.rs`.
+The September 7 phase/compression record retains relative-phase cross terms,
+receiver-history forms and class/occurrence/progression distinctions; September 8
+recovers reflection, restriction, contact and compression without merging their
+scopes. `docs/RETRACTIONS.md` keeps August 28 acoustic receipts while retracting
+the corpus/prose claims. It separately retracts September 2's reafference-shaped
+lifecycle: file readback and an authored one-edge deposit were not physical return
+or learning. These older mechanisms are recovery operands, not present consumers.
+The current join is the contextual coupled relation, its provenance and adaptive
+quotient at the existing World/Ask and compression owners; no separate modality
+product is inserted into the order.
+
 ## 4. Reflection, trefoil and the actual arithmetic source
 
 **Already owned:** `FractalString` proves harmonic counting/Mobius inversion,
@@ -341,8 +425,9 @@ lower bound.
 
 1. C2's owned source/acceptance stays first and belongs in receiving-phase §7.
 2. The subsequent face conditioning and Ask joins stay explicit there and in
-   #62/#73; the future-sufficient quotient is credited only at its actual
-   discard-and-descend consumer.
+   #62/#73; the contextual perception/generation relation, evidence provenance
+   and adaptive joint-future quotient join those same owners. The future-sufficient
+   quotient is credited only at its actual discard-and-descend consumer.
 3. The torus projector and transformed kernel become a U7 designed-placement
    interface, with current Fourier owners and a periodic-field consumer named.
    The two bounded Lean source lanes are reserved to Codex implementation:
@@ -371,6 +456,7 @@ and a positive/finite identity credited as the missing global analytic bound.
 - [Helical designed-placement and probe-separator obligations](https://github.com/brandonrdug/holonics/issues/62#issuecomment-6072315297); [carried support's discharged scope](https://github.com/brandonrdug/holonics/issues/62#issuecomment-6073101548).
 - [Actual finite Mobius receiver and its exterior](2026-10-09_THE_ACTUAL_FINITE_MOBIUS_RECEIVER_RETAINS_ITS_MELLIN_VALUE_AND_EXTERIOR.md); [egg arithmetic twist and distinct gap operator](2026-10-09_THE_EGGS_ARITHMETIC_TWIST_AND_THE_GAPS_OPERATOR_ARE_DISTINCT_DATA.md).
 - [Integration by reflection, with the retained alias correction](2026-08-21_THE_TRAPEZOID_IS_THE_INTERACTION_PROFILE_AND_POISSON_SUMMATION_OWNS_INTEGRATION_BY_REFLECTION.md); [holes, zeta and the irrational helix](2026-09-25_THE_MUSIC_IS_IN_THE_HOLES_HEARING_MULTIPLIES_BY_ZETA_AND_A_QUASICRYSTAL_IS_A_HELIX_THAT_NEVER_LOCKS.md).
+- [Historical full-duplex acoustic return](2026-08-28_ATHENA_RADIATION_BECAME_EXACT_ACOUSTIC_CURRENT_AND_ITS_FULL_DUPLEX_ROOM_RETURN_CHANGED_THE_SAME_BODY.md); [phase, compression and class/occurrence recovery](2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md); [reflection and packing recovery](2026-09-08_HOLONICS_REJOINS_CLASSICAL_LEARNING_REFLECTION_PACKING_AND_COMPRESSION.md).
 - [Nagel, On Global Optimality of Fibonacci Lattices in the Torus](https://arxiv.org/html/2502.17082v2); [Ghys, Knots and dynamics, section 3.1](https://perso.ens-lyon.fr/ghys/articles/knotsdynamics.pdf); [Zagier's Selberg/Mayer account](https://people.mpim-bonn.mpg.de/zagier/files/tex/NewPointsSelbergZeta/fulltext.pdf); [Borthwick's modular scattering formula, slide 64](https://math.dartmouth.edu/~specgeom/Borthwick_slides.pdf).
 - [Multiplication certificate source, pinned Round11](https://github.com/Swapnil-jain/integer-mult-kappa/blob/1a580dcc91dad5fbcffb5c80b7641a96bfa24e16/lean/Round11.lean).
 
