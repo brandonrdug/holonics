@@ -241,6 +241,44 @@ theorem egg_period_coefficient (j : ℕ) :
 
 end Period
 
+/-! ## The actual rational egg, with its arithmetic twist retained
+
+[agent-inferred] The September 24 egg equation gives a full-two-torsion cubic,
+not merely its `j` invariant. With `u = a²+w²+2wx`, put `X = -u` and
+`V = (2w/b)uy`. Then `V² = X(X+(a-w)²)(X+(a+w)²)`. Thus the actual rational
+egg enters `EllipticCurve/GeneralFace.E (-(a-w)²) (-(a+w)²)`. The negative
+Legendre twist is carried by this equation; it is not discarded by labelling.
+
+The equation transport below needs only `b ≠ 0`. A birational inverse also needs
+`w ≠ 0` and `X ≠ 0`; nonsingular projective/group transport requires distinct
+roots and a declared rational origin. Those stronger claims are not inferred
+from this polynomial identity. The dated October 9 egg/arithmetic record names
+the existing descent consumer and the remaining group/source obligations (#62).
+-/
+
+/-- The actual Hügelschäffer equation transports to the full-two-torsion cubic.
+This retains the arithmetic twist which the modular invariant alone forgets. -/
+theorem egg_to_fullTwoTorsion (a b w x y : ℚ) (hb : b ≠ 0)
+    (hegg : (a ^ 2 + w ^ 2 + 2 * w * x) * y ^ 2 = b ^ 2 * (a ^ 2 - x ^ 2)) :
+    ((2 * w / b) * (a ^ 2 + w ^ 2 + 2 * w * x) * y) ^ 2 =
+      (-(a ^ 2 + w ^ 2 + 2 * w * x)) *
+        (-(a ^ 2 + w ^ 2 + 2 * w * x) + (a - w) ^ 2) *
+        (-(a ^ 2 + w ^ 2 + 2 * w * x) + (a + w) ^ 2) := by
+  field_simp [hb]
+  linear_combination (4 * w ^ 2 * (a ^ 2 + w ^ 2 + 2 * w * x)) * hegg
+
+/-- A concrete consuming equation: the egg `a=3,b=2,w=1` enters the integral
+model `GeneralFace.E (-4) (-16)`, with all producing operands retained. -/
+theorem egg_321_fullTwoTorsion (x y : ℚ)
+    (hegg : (10 + 2 * x) * y ^ 2 = 4 * (9 - x ^ 2)) :
+    ((2 * x + 10) * y) ^ 2 =
+      (-2 * x - 10) * (-2 * x - 10 + 4) * (-2 * x - 10 + 16) := by
+  have h : ((3 : ℚ) ^ 2 + 1 ^ 2 + 2 * 1 * x) * y ^ 2 =
+      2 ^ 2 * (3 ^ 2 - x ^ 2) := by
+    convert hegg using 1 <;> ring
+  have transported := egg_to_fullTwoTorsion 3 2 1 x y (by norm_num) h
+  convert transported using 1 <;> ring
+
 end Holonics.Geometry.EggModular
 
 section Audit
@@ -254,4 +292,6 @@ open Holonics.Geometry.EggModular
 #print axioms egg_hypergeometric_coefficient
 #print axioms wallis_centralBinom
 #print axioms egg_period_coefficient
+#print axioms egg_to_fullTwoTorsion
+#print axioms egg_321_fullTwoTorsion
 end Audit
