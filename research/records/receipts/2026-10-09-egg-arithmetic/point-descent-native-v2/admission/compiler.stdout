@@ -1,0 +1,17 @@
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/egg-point-descent-repair-20261009-v145/source-v1/lean/HolonicsResearch/EllipticCurve/EggSource.lean:171:23: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+'Holonics.EllipticCurve.EggSource.egg_doubles_enter_descent' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.EllipticCurve.EggSource.inverse_affine_equation' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.EllipticCurve.EggSource.inverse_affine_returns_carrier' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.EllipticCurve.EggSource.homogeneous_infinity_classification' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.EllipticCurve.EggSource.secondInfinityCarrier_is_two_torsion' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.EllipticCurve.EggSource.egg_321_receiving_model_rank_bound' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]

@@ -456,6 +456,7 @@ The divisor-source transport of the paper `divisor-source-transport-boundary` is
 - [Mass-energy and Maxwell bounds unify transport](2026-09-12_MASS_ENERGY_AND_MAXWELL_BOUNDS_UNIFY_TRANSPORT.md): units, source/receiver frames and the physical current.
 - [Compact fibres return charge and recover the physics](2026-09-13_COMPACT_FIBRES_RETURN_CHARGE_AND_THE_RESEARCH_WORKFLOW_RECOVERS_ITS_PHYSICS.md): the compactification, gauge and matter-Hamiltonian chain.
 - [Mass, flux gaps and navigation return their source maps](2026-09-13_MASS_FLUX_GAPS_AND_OPTIMAL_NAVIGATION_RETURN_THEIR_SOURCE_MAPS.md): oriented source geometry and scoped navigation consequences.
+- [The egg's arithmetic twist and the gap's operator are distinct data](2026-10-09_THE_EGGS_ARITHMETIC_TWIST_AND_THE_GAPS_OPERATOR_ARE_DISTINCT_DATA.md) (#62, #147): the actual egg-to-full-two-torsion map, the same-j/different-prime-factor obstruction, the source-qualified descent bound, and the explicit optical, Hodge and continuum gap domains; the equation transport and the actual point's doubling-to-descent join are kernel-checked ([receipts](receipts/2026-10-09-egg-arithmetic/PUBLICATION.md)); the original projective/group equivalence stays owed
 
 Follow the relevant RH/Hodge/NS/BSD/Yang–Mills/Iwasawa source at its own statement. Their objects
 are reusable construction material; a conjecture's endpoint neither proves nor postpones a

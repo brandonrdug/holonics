@@ -1,0 +1,41 @@
+{
+  "kernel_accepted": true,
+  "compiler_exit": 0,
+  "compiler_wall_ns": 10073507353,
+  "axioms": {
+    "Holonics.EllipticCurve.EggSource.egg_doubles_enter_descent": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.EllipticCurve.EggSource.inverse_affine_equation": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.EllipticCurve.EggSource.inverse_affine_returns_carrier": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.EllipticCurve.EggSource.homogeneous_infinity_classification": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.EllipticCurve.EggSource.secondInfinityCarrier_is_two_torsion": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.EllipticCurve.EggSource.egg_321_receiving_model_rank_bound": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "selector_count_matches": true,
+  "standard_axioms_only": true,
+  "metadata_unchanged": true,
+  "broad_library_checked": false
+}

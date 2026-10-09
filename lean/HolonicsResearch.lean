@@ -657,6 +657,7 @@ import HolonicsResearch.Computation.AdviceBar
 import HolonicsResearch.Computation.UniformityBar
 import HolonicsResearch.EllipticCurve.GeneralMordell
 import HolonicsResearch.EllipticCurve.GeneralTwoTorsion
+import HolonicsResearch.EllipticCurve.EggSource
 import HolonicsResearch.EllipticCurve.GeneralRealPlace
 import HolonicsResearch.EllipticCurve.GeneralTwoAdic
 import HolonicsResearch.EllipticCurve.GeneralOddPlace

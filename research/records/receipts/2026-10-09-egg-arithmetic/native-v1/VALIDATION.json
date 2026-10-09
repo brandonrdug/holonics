@@ -1,0 +1,149 @@
+{
+  "base_commit": "b34c87770272ab8688bc59605c690b47fe996428",
+  "submitted_source_pin": {
+    "sha256": "d17596df6a3c1b536f4254a8e3cee39f10a8cd68732ffaa404a031ce151404f3",
+    "bytes": 14166
+  },
+  "source_was_owned_dirty_snapshot": true,
+  "target": "HolonicsResearch.Geometry.EggModular",
+  "kernel_accepted": true,
+  "native_compiler_exit": 0,
+  "compiler_wall_ns": 12258404019,
+  "new_equation_selectors": [
+    "Holonics.Geometry.EggModular.egg_to_fullTwoTorsion",
+    "Holonics.Geometry.EggModular.egg_321_fullTwoTorsion"
+  ],
+  "all_actual_axiom_selectors": [
+    "Holonics.Geometry.EggModular.legendreJ_anharmonic",
+    "Holonics.Geometry.EggModular.legendreJ_sub_1728",
+    "Holonics.Geometry.EggModular.legendreJ_half",
+    "Holonics.Geometry.EggModular.egg_j_of_legendre_lambda",
+    "Holonics.Geometry.EggModular.hyperbolic_circle_euclidean_equation",
+    "Holonics.Geometry.EggModular.hyperbolic_circle_vertical_extent",
+    "Holonics.Geometry.EggModular.egg_hypergeometric_coefficient",
+    "Holonics.Geometry.EggModular.wallis_centralBinom",
+    "Holonics.Geometry.EggModular.egg_period_coefficient",
+    "Holonics.Geometry.EggModular.egg_to_fullTwoTorsion",
+    "Holonics.Geometry.EggModular.egg_321_fullTwoTorsion"
+  ],
+  "axioms": {
+    "Holonics.Geometry.EggModular.legendreJ_anharmonic": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.EggModular.legendreJ_sub_1728": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.EggModular.legendreJ_half": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.EggModular.egg_j_of_legendre_lambda": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.EggModular.hyperbolic_circle_euclidean_equation": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.EggModular.hyperbolic_circle_vertical_extent": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.EggModular.egg_hypergeometric_coefficient": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.EggModular.wallis_centralBinom": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.EggModular.egg_period_coefficient": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.EggModular.egg_to_fullTwoTorsion": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.EggModular.egg_321_fullTwoTorsion": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "standard_axioms_only": true,
+  "custom_import_count": 0,
+  "direct_imports": [
+    "Mathlib.Analysis.SpecialFunctions.Pow.Real",
+    "Mathlib.Analysis.Complex.UpperHalfPlane.Metric",
+    "Mathlib.Analysis.SpecialFunctions.OrdinaryHypergeometric",
+    "Mathlib.Analysis.SpecialFunctions.Integrals.Basic",
+    "Mathlib.Tactic"
+  ],
+  "ordered_current_import_module_count": 4920,
+  "metadata_unchanged": true,
+  "foreign_hash_reuse_assumptions": "The pinned RH catalog is immutable and its stored digests came from prior byte hashing. Cataloged files remain immutable through preparation and compiler execution; matching presence/size/mtime/ctime permits digest reuse, not a fresh byte read. Postcheck compares lstat/stat metadata and symlink targets without rehashing. This requires truthful filesystem metadata and no privileged or adversarial mutation that preserves/restores all checked stamps.",
+  "fresh_first_namespace_outputs": true,
+  "results": [
+    {
+      "unit": "prep",
+      "accepted": true,
+      "quiescence_confirmed": true,
+      "complete_stage_wall_ns": 8989509972,
+      "child_stage_wall_ns": 8223671807,
+      "projection_ns": 17000000000,
+      "measured_to_projected": {
+        "numerator": 8989509972,
+        "denominator": 17000000000
+      },
+      "aggregate_CPU_ns": 7758830000,
+      "aggregate_CPU_limit_us": 17000000,
+      "group_peak_bytes": 575610880,
+      "child_peak_RSS_KiB": 323340,
+      "CPU_affinity_count": 1,
+      "group_memory_ceiling_bytes": 4294967296
+    },
+    {
+      "unit": "compile",
+      "accepted": true,
+      "quiescence_confirmed": true,
+      "complete_stage_wall_ns": 14333975988,
+      "child_stage_wall_ns": 13728794573,
+      "projection_ns": 21132554884,
+      "measured_to_projected": {
+        "numerator": 14333975988,
+        "denominator": 21132554884
+      },
+      "aggregate_CPU_ns": 9046309000,
+      "aggregate_CPU_limit_us": 17000000,
+      "group_peak_bytes": 4648902656,
+      "child_peak_RSS_KiB": 3671012,
+      "CPU_affinity_count": 1,
+      "group_memory_ceiling_bytes": 8589934592
+    }
+  ],
+  "claim_scope": "Affine rational equation transport with b!=0, negative twist retained; concrete a3,b2,w1 equation. No projective/group map, prime-count formalization, BSD or mass-gap claim.",
+  "formalized_actual_GeneralFace_group_map": false,
+  "full_research_root_or_Framework_checked": false,
+  "checkpoint_0332_kernel_incomplete_report_preserved": true,
+  "source_freeze_released_on_terminal_acceptance": true,
+  "remaining_obligations": [
+    "smooth projective extension with origin/exceptional points",
+    "actual Point/group transport to GeneralFace.E(-4,-16)",
+    "formal prime11 counting witness",
+    "general BSD and physical continuum mass-gap"
+  ],
+  "publication": "Local source/provenance/receipt files only; no owner edits, push, merge, history rewrite or worktree/branch deletion."
+}

@@ -1,0 +1,372 @@
+{
+  "target": "HolonicsResearch.EllipticCurve.EggSource",
+  "source_admission": {
+    "source_commit": "f78070c8a996740a36f4915272ae83d67bb47512",
+    "source_tree": "8f395c2a7ac725a9e5250f3996fb18f353420ccf",
+    "source_base": "f2c03e8dfff3a0fa153e6b072863625bdbb441cf",
+    "lean_source_root": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/egg-point-descent-20261009-v138/source-v1",
+    "lean_source_inputs": {
+      "lean/HolonicsResearch/EllipticCurve/EggSource.lean": {
+        "sha256": "07d844746a48af61cc798a6f01c313dfbf279895d05fbc764867a5827b2dd0ac",
+        "bytes": 8142
+      },
+      "lean/HolonicsResearch/EllipticCurve/GeneralTwoTorsion.lean": {
+        "sha256": "7bd81c3e2cebd6f754f9b7cf0749f0522f746332e29754aef37b88c6e294c953",
+        "bytes": 9667
+      },
+      "lean/HolonicsResearch/EllipticCurve/GeneralMordell.lean": {
+        "sha256": "9f49efd8f4e400dbbb53c699b364b7b6133ffd0b0aa8fa93ae7043d24f47d890",
+        "bytes": 34139
+      },
+      "lean/HolonicsResearch/EllipticCurve/UniversalBSD.lean": {
+        "sha256": "b46ff4078ac7cb907bb69b916b6d067c86b806e57d56b859b9805d470b69fb4b",
+        "bytes": 12064
+      },
+      "lean/HolonicsResearch/EllipticCurve/FamilyDivisorRank.lean": {
+        "sha256": "ee45dc19f9e85f436b13bad0ad52e4afc27c595d6416f77369022b2f45b3c37f",
+        "bytes": 14436
+      },
+      "lean/HolonicsResearch/EllipticCurve/FamilyPrimeRank.lean": {
+        "sha256": "5a3065523ff492a19f775367465033f893a57b66bdacca0b6061cabc3575c41d",
+        "bytes": 13270
+      },
+      "lean/HolonicsResearch/EllipticCurve/FamilyLogRank.lean": {
+        "sha256": "f4a2e90352c5521d59c3f9333bed5913e89c02d4c186e35db25d07453c35b4b1",
+        "bytes": 9317
+      },
+      "lean/HolonicsResearch/EllipticCurve/FamilyRank.lean": {
+        "sha256": "151f9db51af9815a11820d18095c1f038cd9dd9d8f3b17a80471248813a7103d",
+        "bytes": 9196
+      },
+      "lean/HolonicsResearch/EllipticCurve/BirchSwinnertonDyer.lean": {
+        "sha256": "41f372d73e3c6e5a1e031fc8b1846c74c3b8663f845b0c5681792d3cf031a1c8",
+        "bytes": 15342
+      },
+      "lean/HolonicsResearch/EllipticCurve/DistantWindings.lean": {
+        "sha256": "c3a65f780f907e3910c1c933d0cd680e58688261c36436cb707e906f94d299f5",
+        "bytes": 43236
+      },
+      "lean/HolonicsResearch/EllipticCurve/WindingCensus.lean": {
+        "sha256": "792176cb7af2f54834bac3663f1fa76ff7548ba044237f1733993e12b0024b7e",
+        "bytes": 17409
+      },
+      "lean/HolonicsResearch/EllipticCurve/Descent.lean": {
+        "sha256": "34c3a05aaf0bcc028009ff89275c8fde66a898efd527813da10e3b2dd40ac449",
+        "bytes": 16565
+      },
+      "lean/HolonicsResearch/EllipticCurve/RankOne.lean": {
+        "sha256": "745bd50f3ec89d968dc9c93a50001c6fd0b5f1febb4a97ac4216503bda131602",
+        "bytes": 9443
+      },
+      "lean/HolonicsResearch/EllipticCurve/FrameDescent.lean": {
+        "sha256": "c3f229bc64277c87b2798606f5769a3a511465dcf77ea515912bc1775a1ebbd8",
+        "bytes": 17140
+      },
+      "lean/HolonicsResearch/EllipticCurve/TateLedger.lean": {
+        "sha256": "a644beace5c70a13d61fd8e781364526a44c1603b685c426b8a0da75621c68ce",
+        "bytes": 7492
+      },
+      "lean/HolonicsResearch/EllipticCurve/RankZero.lean": {
+        "sha256": "1e41cae637714bf2b6a5d98b086a4988399e8cdb2b47cc0395b740d70294a8f8",
+        "bytes": 9379
+      },
+      "lean/HolonicsResearch/EllipticCurve/MinusFourth.lean": {
+        "sha256": "6c7dc48d9751cd856fc173d99fd984e35b2193c6646e0a2d4c14d9e4c6660183",
+        "bytes": 23127
+      },
+      "lean/HolonicsResearch/EllipticCurve/ReflectionCensus.lean": {
+        "sha256": "6c2ffa6704e67e2dfe449ba380e8abdaa32c5819138b1c7509b95230c9ad2e05",
+        "bytes": 8547
+      },
+      "lean/HolonicsResearch/EllipticCurve/FamilyFace.lean": {
+        "sha256": "ca03b615f570253cc4e30eefa2e1f05aa8f7254f89d08f80adebd5d7a498cab9",
+        "bytes": 36571
+      },
+      "lean/HolonicsResearch/EllipticCurve/FaceHomomorphism.lean": {
+        "sha256": "775e539b0b88b2108238ebb3225a53261b4272ce6dc30abc59629adf1c95982d",
+        "bytes": 43865
+      },
+      "lean/HolonicsResearch/EllipticCurve/FaithfulFace.lean": {
+        "sha256": "46c5286479f077514f54c3a3b9be226bcc1e1f7f254755c273ba556efdba7aa4",
+        "bytes": 40890
+      },
+      "lean/HolonicsResearch/EllipticCurve/ChordFace.lean": {
+        "sha256": "25ed85bf138f27dd322a33fc489cb1239971cc83b75935654a256dd1b50f4178",
+        "bytes": 12610
+      },
+      "lean/HolonicsResearch/EllipticCurve/FamilyCollision.lean": {
+        "sha256": "732d3e13b68e90f179e291391f6dd62bfbd7c5132375779bc172588261156b4a",
+        "bytes": 10271
+      },
+      "lean/HolonicsResearch/EllipticCurve/FamilyMordell.lean": {
+        "sha256": "6bfd07d9a8735de95e6f996b9d1a1eb3238bb5b70879ab1f1223cacf0651548c",
+        "bytes": 21837
+      },
+      "lean/HolonicsResearch/EllipticCurve/FiveDescent.lean": {
+        "sha256": "f21e258fddaf590849ca673ae4d02d531424c59fdf4a66dd7f80dd35fda9af67",
+        "bytes": 24276
+      },
+      "lean/HolonicsResearch/EllipticCurve/FiveTranslation.lean": {
+        "sha256": "f291991a077d7b06f40e1dbd71dcb72bb14a198b6e99a6104cfa054ff2187e50",
+        "bytes": 14518
+      },
+      "lean/HolonicsResearch/EllipticCurve/FiveHeight.lean": {
+        "sha256": "7f7bd5c89aa2bb44aac7efc5edc58f12e34983e0755e014de7c6c7025a4cfb2c",
+        "bytes": 8089
+      },
+      "lean/HolonicsResearch/EllipticCurve/FiveHalving.lean": {
+        "sha256": "29dc2b5a31466b11185e18f08eb13f0f6b178dcb1db43cd9d60b634dcf1ab480",
+        "bytes": 9326
+      },
+      "lean/HolonicsResearch/EllipticCurve/FaceImageFive.lean": {
+        "sha256": "8e9ef761bebd94fdb00986bf128a086e8bf9b14088c80b4021732315c1d88aaa",
+        "bytes": 56280
+      },
+      "lean/HolonicsResearch/EllipticCurve/FamilySupport.lean": {
+        "sha256": "6742c7a2ba54be7e97c0408a743d1056e1e9866c4294fab28586d4c26274a648",
+        "bytes": 16209
+      },
+      "lean/HolonicsResearch/EllipticCurve/FamilyKernel.lean": {
+        "sha256": "925c2b55d90bdc9b20fc72fccfb8cc88a29489aa020fc6e46cfcac5ae60ca987",
+        "bytes": 9228
+      },
+      "lean/HolonicsResearch/EllipticCurve/FamilyHalving.lean": {
+        "sha256": "36f1aad3c5572671f315244c9d230330832f3b8fa796cd2bdc4931d388fd5c96",
+        "bytes": 5409
+      },
+      "lean/HolonicsResearch/EllipticCurve/FamilyHeight.lean": {
+        "sha256": "67cfaf40107da47f7053afea97c5bcd0a032a7f4d76f23f3e5cc696bc3a8fb74",
+        "bytes": 18134
+      },
+      "lean/HolonicsResearch/EllipticCurve/FamilyImage.lean": {
+        "sha256": "fcc0ca0ad78e31ff75e3fe3ead302ee67d19b5cc371ec1b85ceb354bc28d2379",
+        "bytes": 5391
+      },
+      "lean/HolonicsResearch/EllipticCurve/FamilyHom.lean": {
+        "sha256": "d2a2c8033d54ac3004d8ed89886a316bf7f1d2bc389d11eed10f1ee79223c890",
+        "bytes": 22085
+      },
+      "lean/HolonicsResearch/EllipticCurve/FamilyPairing.lean": {
+        "sha256": "05473552eb1b339a7bb2d85911884f5220b4821ff33b432529c189bc7012b345",
+        "bytes": 10526
+      },
+      "lean/HolonicsResearch/EllipticCurve/FamilyOddDescent.lean": {
+        "sha256": "6b271c65dc26cdc2441b0123f29285f9fcd77e3e38701f93456c6d7a6115bb68",
+        "bytes": 39815
+      },
+      "lean/HolonicsResearch/EllipticCurve/FamilySevenDescent.lean": {
+        "sha256": "0d39a025e543fb031f867255142c5f22e91f20ccab0fbc750fb6be2fb113303d",
+        "bytes": 50706
+      },
+      "lean/HolonicsResearch/EllipticCurve/FamilyFiveDescent.lean": {
+        "sha256": "1d53c1f401c3a3685f799f463c56c1cad435af34b1f821ca5a468122deb481d0",
+        "bytes": 60227
+      },
+      "lean/HolonicsResearch/EllipticCurve/FamilyGenocchi.lean": {
+        "sha256": "e89b725a1a79f690c2f68bb8602456afa8fdc6c3509adc2ca3d789b2bc1b8965",
+        "bytes": 73188
+      },
+      "lean/HolonicsResearch/EllipticCurve/FamilyWitness.lean": {
+        "sha256": "b99cedf167e73869dad242797eb1ed8c2300ec5513904ab76fea54b7214c3bcb",
+        "bytes": 42455
+      },
+      "lean/HolonicsResearch/EllipticCurve/FiveWitness.lean": {
+        "sha256": "fbb6f9153a85a26a11840fe95ae36c707936bc538e6a0c4f44c041d0f82bf59a",
+        "bytes": 26103
+      },
+      "lean/HolonicsResearch/EllipticCurve/HeckeWitness.lean": {
+        "sha256": "78bd7441e72562a07fd6c78b7c7be3705b65e7a8fbb1058af2fa58f616746fc3",
+        "bytes": 20197
+      },
+      "lean/HolonicsResearch/EllipticCurve/HeckeEuler.lean": {
+        "sha256": "e79e4c2b6d5bbb543a82ee3bfe2dfdb2af4ae0cc5567c29e0bf2fc5e0d506450",
+        "bytes": 38837
+      },
+      "lean/HolonicsResearch/EllipticCurve/GaussCoefficient.lean": {
+        "sha256": "5e65cea3497260c23a9a93b6f10446a1fef28559778c76199600aa7c9b525972",
+        "bytes": 46070
+      },
+      "lean/HolonicsResearch/EllipticCurve/HeckeTheta.lean": {
+        "sha256": "9ba4e5358e372924784edd9dd1963443e9f94805d4f82cb7417d0d600b578bc9",
+        "bytes": 69549
+      },
+      "lean/HolonicsResearch/EllipticCurve/FiveTheta.lean": {
+        "sha256": "3d4f645235329ba8d4a5749e0bd70005df9a176f9f7e09bf02756d5d67e6dbc3",
+        "bytes": 90894
+      },
+      "lean/HolonicsResearch/EllipticCurve/FiveTwist.lean": {
+        "sha256": "36154923381688bd16665a07a39627b1cb3920d9094bd57715c61f10f8a9636d",
+        "bytes": 3899
+      },
+      "lean/HolonicsResearch/EllipticCurve/FivePositivity.lean": {
+        "sha256": "ffcfac35976e2ec4c54526e635f15ac7ce6f86182a2797dccc1936c245f75281",
+        "bytes": 46743
+      },
+      "lean/HolonicsResearch/EllipticCurve/FiveDerivative.lean": {
+        "sha256": "74905ec71b061cba7aac19b6be45adc42557cc2863450b3c1fd31f72cea12a00",
+        "bytes": 10704
+      },
+      "lean/HolonicsResearch/EllipticCurve/FamilyThetaFE.lean": {
+        "sha256": "9b516c02a16934243ba6575a8bf23608ad863e1a89dacf31f3d7296ca4ff7dd8",
+        "bytes": 36116
+      },
+      "lean/HolonicsResearch/EllipticCurve/FamilyDuplication.lean": {
+        "sha256": "31445274af6d128d716784c274eb95a66c57e2e062150e3c2dab02f02d63147d",
+        "bytes": 58599
+      },
+      "lean/HolonicsResearch/EllipticCurve/FamilyThetaOdd.lean": {
+        "sha256": "72a2539583b14cad265d2262d3024c5cdc92bdd9ffb4260f9fbd4bde6b8e1717",
+        "bytes": 17383
+      },
+      "lean/HolonicsResearch/EllipticCurve/FamilyOddGauss.lean": {
+        "sha256": "4d5ad5fd148f2d2eebd8baa05ec72b9378f5a8557b6ccd6bbadc7a8b48e0a330",
+        "bytes": 12902
+      },
+      "lean/HolonicsResearch/EllipticCurve/FamilyGauss.lean": {
+        "sha256": "3369589e6e639a2d02387e000f1f6cc1c4b8fd4bb5123504db3c214d7d33b199",
+        "bytes": 8845
+      },
+      "lean/HolonicsResearch/EllipticCurve/FamilyTheta.lean": {
+        "sha256": "b9b0ad4c3de3ff39c71e2819d3dbf18b9f9408e2931e083434bd6e98b01f2f40",
+        "bytes": 19199
+      },
+      "lean/HolonicsResearch/EllipticCurve/GeneralCollision.lean": {
+        "sha256": "a81dff70e9c7ee0a8a8f668342a72befe30658446a4b01e38c85f37a32de6777",
+        "bytes": 10827
+      },
+      "lean/HolonicsResearch/EllipticCurve/GeneralHalving.lean": {
+        "sha256": "3f1efdd11c4073d55a46140ce68455e4e4f6d65ef6253d6fe9a0f1cb2a9c228a",
+        "bytes": 11002
+      },
+      "lean/HolonicsResearch/EllipticCurve/GeneralSupport.lean": {
+        "sha256": "9735de92085b961328708da895b578f4087cd5ce30813a135bad2e908905bffe",
+        "bytes": 18039
+      },
+      "lean/HolonicsResearch/EllipticCurve/GeneralHom.lean": {
+        "sha256": "a64f53f896a55183839cb39333ce87bc35fc84e1925a37b65aa64ed22418b9f6",
+        "bytes": 18383
+      },
+      "lean/HolonicsResearch/EllipticCurve/GeneralFace.lean": {
+        "sha256": "0abb4b6acffa358956842a863ea7293d787af14c79779b20876ab67e9eaca960",
+        "bytes": 8289
+      },
+      "lean/HolonicsResearch/EllipticCurve/GeneralHeight.lean": {
+        "sha256": "adaa7d86f1d7d859cd2a17c444daa93049f0260700fe1f15927e7114b7921792",
+        "bytes": 37872
+      },
+      "lean/HolonicsResearch/EllipticCurve/GeneralCertificate.lean": {
+        "sha256": "fe0908285338fd4deb2f7559857cb83ebe707525b25de4695c04b47f2982d3d8",
+        "bytes": 8535
+      },
+      "lean/HolonicsResearch/Geometry/EggModular.lean": {
+        "sha256": "d17596df6a3c1b536f4254a8e3cee39f10a8cd68732ffaa404a031ce151404f3",
+        "bytes": 14166
+      }
+    },
+    "immutable_committed_snapshot_not_live_worktree": true,
+    "subset": "Complete own-source closure of two direct EggSource providers",
+    "target": "HolonicsResearch.EllipticCurve.EggSource",
+    "target_pin": {
+      "sha256": "07d844746a48af61cc798a6f01c313dfbf279895d05fbc764867a5827b2dd0ac",
+      "bytes": 8142
+    },
+    "selectors": [
+      "Holonics.EllipticCurve.EggSource.egg_doubles_enter_descent",
+      "Holonics.EllipticCurve.EggSource.inverse_affine_equation",
+      "Holonics.EllipticCurve.EggSource.inverse_affine_returns_carrier",
+      "Holonics.EllipticCurve.EggSource.homogeneous_infinity_classification",
+      "Holonics.EllipticCurve.EggSource.secondInfinityCarrier_is_two_torsion",
+      "Holonics.EllipticCurve.EggSource.egg_321_receiving_model_rank_bound"
+    ],
+    "cache_audit_target": "HolonicsResearch.EllipticCurve.GeneralTwoTorsion",
+    "owner_handoff": "/home/b/Workspaces/holonics/.local/agent-mailbox/messages/e26ad397e29246b795096cbcd55e82d2.json",
+    "scope": "Actual affine egg Point and doubling-to-descent join, inverse nonzero-X carrier, infinity classification/two torsion and receiving-model rank bound. No projective/group equivalence or original-egg rank transfer."
+  },
+  "kernel_accepted": false,
+  "compiler_exit": 1,
+  "compiler_wall_ns": 5517855699,
+  "queries": {
+    "Holonics.EllipticCurve.EggSource.egg_doubles_enter_descent": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.EllipticCurve.EggSource.inverse_affine_equation": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.EllipticCurve.EggSource.inverse_affine_returns_carrier": [],
+    "Holonics.EllipticCurve.EggSource.homogeneous_infinity_classification": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.EllipticCurve.EggSource.secondInfinityCarrier_is_two_torsion": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.EllipticCurve.EggSource.egg_321_receiving_model_rank_bound": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "standard_axioms_only": false,
+  "metadata_unchanged": true,
+  "import_module_count": 5393,
+  "results": [
+    {
+      "unit": "provenance",
+      "accepted": true,
+      "quiescent_released": true,
+      "wall_ns": 1130781733,
+      "projection_ns": 17000000000,
+      "measured_to_projected": {
+        "numerator": 1130781733,
+        "denominator": 17000000000
+      },
+      "aggregate_CPU_ns": 945710000,
+      "group_peak_B": 180350976,
+      "child_peak_RSS_KiB": 50536
+    },
+    {
+      "unit": "prep",
+      "accepted": true,
+      "quiescent_released": true,
+      "wall_ns": 7241270550,
+      "projection_ns": 17000000000,
+      "measured_to_projected": {
+        "numerator": 7241270550,
+        "denominator": 17000000000
+      },
+      "aggregate_CPU_ns": 6726690000,
+      "group_peak_B": 502472704,
+      "child_peak_RSS_KiB": 271988
+    },
+    {
+      "unit": "compile",
+      "accepted": false,
+      "quiescent_released": true,
+      "wall_ns": 7558736932,
+      "projection_ns": 21132554884,
+      "measured_to_projected": {
+        "numerator": 7558736932,
+        "denominator": 21132554884
+      },
+      "aggregate_CPU_ns": 5456046000,
+      "group_peak_B": 1154945024,
+      "child_peak_RSS_KiB": null
+    }
+  ],
+  "queue_quiescent_released": true,
+  "provider_rebuilt": false,
+  "full_library_checked": false,
+  "no_deadline_CPU_memory_or_concurrency_raise": true,
+  "scientific_source_edited": false,
+  "failed_snapshot_and_output_preserved": true,
+  "publication": "Local immutable receipt; no push, merge or source/worktree deletion."
+}
