@@ -116,6 +116,36 @@ solve. A nonlinear passage owes its actual differential, and a chart, split or r
 branch receipt. A deposited parameter changes the crossing to eq. (26) of the plasma record, which is
 not this scope.
 
+## 3a. Across the World port: the tangent is located with the World
+
+[definition; agent-inferred, October 9] A Word that meets a participating World emits its source
+ring's storage as the incident wave and receives the reflected wave in its place
+(`Word::return_source_wave`). The World is foreign, so its own tangent is not available to the
+machine. Its model is: the World model's live keys each carry charts `ξ⁺ = F ξ + G a`,
+`b = P ξ + Q a`. When exactly one key is live, its charts stand for the World, and the tangent
+crosses the port as
+
+```text
+δa = χ.storage[source],   δb = P ψ + Q δa,   ψ ← F ψ + G δa,   χ.storage[source] ← δb            (4)
+```
+
+with `ψ = 0` at a held opening of both participants. With more than one live key the World's
+tangent is not located, and the teaching encounter is refused before any physical work. This joins
+selection to material response: **the Ask's work of locating the World's key is what lets the World's
+return teach the native material.** The loop is one piece, not two consumers placed side by side
+(`PreparedPhysicalProbe::encounter_teaching`; `execute_word`'s read-only per-tick observer).
+
+## 3b. Measured in development
+
+[measured; developer feedback, not claim-bearing acceptance] On 0279's field, the sole queue ran the
+two tests of `hnn::tests::material_tangent` on `dbeb851d` (exit 0; 136,875,964,732 ns wall; peak
+child RSS 2,622,224 KiB; [receipt](receipts/2026-10-09-material-tangent/DEV_TESTS.v1.json)). On
+`ε = 2⁻⁴ … 2⁻⁸` the exact central residual divides by at least 4 at each halving
+(`4 r_(j+1) ≤ r_j`, and `r_j < 5 r_(j+1)`), and `4ʲ r_j` keeps one integer part across the ladder:
+`5` within one Word, `4` across the crossing into the next opening. The tangent is the passage's
+derivative at second order, including the same-`C` crossing that cancels both `δC w` terms. The
+World-port tangent (4) has its own test, `tests/material_tangent_world.rs`, queued.
+
 ## 4. The owners it consumes, and the implementation
 
 - `propagation::{transit_solve, transit_update, ContactOperands::solve}` for (1).
