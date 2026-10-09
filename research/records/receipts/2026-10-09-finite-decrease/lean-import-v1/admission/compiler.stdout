@@ -1,0 +1,14 @@
+'Holonics.HNN.FiniteDecrease.split_spec' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.HNN.FiniteDecrease.split_bounds' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.HNN.FiniteDecrease.quot_ne_zero_of_half_lt' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.HNN.FiniteDecrease.first_reach_endpoint' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.HNN.FiniteDecrease.zero_direction_stays' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.HNN.FiniteDecrease.codeLength_shift' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.HNN.FiniteDecrease.cellCode_gauge' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.HNN.FiniteDecrease.Station.code_eq_cells' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.HNN.FiniteDecrease.witness_code_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.HNN.FiniteDecrease.witness_total_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.HNN.FiniteDecrease.admission_sound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.HNN.FiniteDecrease.equal_endpoints_need_the_witness' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]

@@ -1,0 +1,742 @@
+{
+  "files": {
+    "admission/COMPILER_REQUEST.json": {
+      "sha256": "24c6e234adfefac22c5b253ede7ba4a0b1eeb77b6ea28d8909f79e71abaaa8d5",
+      "bytes": 3543
+    },
+    "admission/CONSUMER_SCOPE.json": {
+      "sha256": "a942fa1a1a3fbfce97300183a6d24344b909cffca3fac3397b75d768b94803ec",
+      "bytes": 1689
+    },
+    "admission/KERNEL_VALIDATION.json": {
+      "sha256": "bcf18cda1fa70dfa003875087cf9e2eebebb4218b09f3b2bb70fe3aca33df226",
+      "bytes": 1732
+    },
+    "admission/PREPARATION_REQUEST.json": {
+      "sha256": "e923257f6bb21f00d9a430063ec904bbde42d3c50b1ac99628c18d12ab005626",
+      "bytes": 5406
+    },
+    "admission/PROVIDER_NAMESPACE.json": {
+      "sha256": "7069f4e1a4f5378b743e179d18f0d9dcaf8992fe611befc26f9b24284c5b0ca7",
+      "bytes": 164948
+    },
+    "admission/SOURCE_ADMISSION.json": {
+      "sha256": "05260b9d516bd862603b02330b8533e1a1716b0823dbebdc037203d9816354c2",
+      "bytes": 2503
+    },
+    "admission/compiler.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "admission/compiler.stdout": {
+      "sha256": "c5314f88a02ab766f10b126d52701fd69f0fa37236d8a79b7e44d465528c0423",
+      "bytes": 1296
+    },
+    "admission/current-imports.json": {
+      "sha256": "741c7253098506e9f91aaf81510b55f7566498eacce3f5f0fafba340d7e0ee5e",
+      "bytes": 51188909
+    },
+    "admission/import-preparation.json": {
+      "sha256": "24a6645471f6531aebc2dbd4ef16fbfec84820e522cf75b6a83b92af73560e18",
+      "bytes": 1239
+    },
+    "admission/objects-v1/FiniteDecreaseImportConsumer.ilean": {
+      "sha256": "2ce744901c00245f899cbad1637eacbd0ab93beaab4445237bb957864fd47cf0",
+      "bytes": 1953
+    },
+    "admission/objects-v1/FiniteDecreaseImportConsumer.olean": {
+      "sha256": "822a1466ee69c6c4ff5e43ebf8168b992677debb48c006f96ff3a4014faab98a",
+      "bytes": 1552
+    },
+    "admission/objects-v1/Holonics/Aeon/Clock/Groupoid.olean": {
+      "sha256": "94ebd294a2e44ca120559c6d4298bbed55dd76ec090870b713dcb33bf5500cb1",
+      "bytes": 534552
+    },
+    "admission/objects-v1/Holonics/Aeon/Clock/Reading.olean": {
+      "sha256": "b6e59459bd0e5ef6249736210b8b2380e88bbb96a3abbcaa4090dfbbee868513",
+      "bytes": 1022920
+    },
+    "admission/objects-v1/Holonics/Aeon/Clock/Winding.olean": {
+      "sha256": "13cd71b3dfdbefe4b99a7e45e98ebf5e10e948a33af589e19f1c4a0086ae4f2f",
+      "bytes": 740280
+    },
+    "admission/objects-v1/Holonics/Compression/Core/FaceMap.olean": {
+      "sha256": "b7edc4b51f15343a7cdf9193d881e0b240f24a332f64f99d2d7c6d537bab4b59",
+      "bytes": 1402144
+    },
+    "admission/objects-v1/Holonics/Computation/DependentMachineLearningCarrier.olean": {
+      "sha256": "3cc06591f7dd47833e9a8350099764f23d4c86ceadc281825c018b3d34790c5b",
+      "bytes": 109680
+    },
+    "admission/objects-v1/Holonics/Computation/ExactForeignWeight.olean": {
+      "sha256": "4689fa7c4ac9d6e42367821e6519590fb7610f99b4d5d06bbe884f31a852a12a",
+      "bytes": 172280
+    },
+    "admission/objects-v1/Holonics/Computation/HolonicAdjointNormalization.olean": {
+      "sha256": "d49193bfe199c3a72006f589662403a47c8bfaf8deda8a73a78300bd6b26493f",
+      "bytes": 1058616
+    },
+    "admission/objects-v1/Holonics/Computation/HolonicArchitectureCharts.olean": {
+      "sha256": "6242ef1af08bd8eb9755d90c430f7657101d26413769c32047940a890c2bd04c",
+      "bytes": 639104
+    },
+    "admission/objects-v1/Holonics/Computation/HolonicConstitutiveCirculation.olean": {
+      "sha256": "427f2a72dfa3133abd63c3cf78339ce6f6c5034a84468f386d7b109f7a2bfa53",
+      "bytes": 1514616
+    },
+    "admission/objects-v1/Holonics/Computation/HolonicConstitutiveFibre.olean": {
+      "sha256": "be5ada2a552d9dd1839a727c730ee2719c06d32b6d93ec40991589996d65ecc3",
+      "bytes": 579728
+    },
+    "admission/objects-v1/Holonics/Computation/HolonicCultivationCharts.olean": {
+      "sha256": "7ee7d495eff02c762e84542e9c97b2dd01283e488d09bcd99decd2214fc71f29",
+      "bytes": 608448
+    },
+    "admission/objects-v1/Holonics/Computation/HolonicDiffusionCharts.olean": {
+      "sha256": "aebe87e30bfe3309d79b52d832fb262b2b53cb5d2e19e8808d76e8497fa7be14",
+      "bytes": 590040
+    },
+    "admission/objects-v1/Holonics/Computation/HolonicInformationTheory.olean": {
+      "sha256": "4900f2e0043e8bb6306a71c2beb2ddc4bd971cf7c207c703c1289bb4b2430060",
+      "bytes": 2320
+    },
+    "admission/objects-v1/Holonics/Computation/HolonicIntelligenceLifecycle.olean": {
+      "sha256": "2c2397d25c83ec3a405b15aa3c3d7da94377e34651dcb8ce87e511094aab6479",
+      "bytes": 885584
+    },
+    "admission/objects-v1/Holonics/Computation/HolonicNeuralEcology.olean": {
+      "sha256": "edbe920fa76c48929753a86c0b303843ee630ba5c9d959b2d1e0603f43d6b0b2",
+      "bytes": 510152
+    },
+    "admission/objects-v1/Holonics/Computation/HolonicOrientedSiteTransport.olean": {
+      "sha256": "517b78544b92b8cfc2a30fd8f6fcd6627bf55cb3f27fc98676871b1ec8c669ef",
+      "bytes": 2528272
+    },
+    "admission/objects-v1/Holonics/Computation/HolonicRecurrentEcology.olean": {
+      "sha256": "a17f7ca997192ba35736711cdea6ca646e96bacdee2b5b027330f576cc220555",
+      "bytes": 1282792
+    },
+    "admission/objects-v1/Holonics/Computation/HolonicWorldReturnDeposit.olean": {
+      "sha256": "1e2894b87cfe901713073b80156ffb8ba170882685e3bdbeccd9c72320dfea7e",
+      "bytes": 638456
+    },
+    "admission/objects-v1/Holonics/Computation/IntrinsicHolonProfile.olean": {
+      "sha256": "c36e0e29b57daedd47e62a32846e8a09adf018c3de80968f2d0d575fd021121a",
+      "bytes": 805072
+    },
+    "admission/objects-v1/Holonics/Computation/MachineLearningChart.olean": {
+      "sha256": "966c9be59dd5b58af379224681630fb2f56590d813eceffd03d2eeb21a79bd82",
+      "bytes": 297816
+    },
+    "admission/objects-v1/Holonics/Computation/MachineLearningStrictLift.olean": {
+      "sha256": "a9200931ff3d353fad921e00620321307dcb6904b6a02d259c7f64f11e6de531",
+      "bytes": 350064
+    },
+    "admission/objects-v1/Holonics/Computation/NativeMorphologyVariant.olean": {
+      "sha256": "71b87f58cd36eb1eca574c525daa9e80993ff21ee470aec92fea0890014b1a96",
+      "bytes": 1158096
+    },
+    "admission/objects-v1/Holonics/Computation/NativeTransportScaffold.olean": {
+      "sha256": "fb8bd807046e03d0632f00d1afa201abc821bf3d65d3ed5b03c589762d77a244",
+      "bytes": 754784
+    },
+    "admission/objects-v1/Holonics/Computation/SituatedMachineLearning.olean": {
+      "sha256": "dfd3552ccaddd43d5f55d15ed71ca06713980d1bea50bdbbb5fbbebe123543c7",
+      "bytes": 289488
+    },
+    "admission/objects-v1/Holonics/Coupling/Paying.olean": {
+      "sha256": "b2f5cda815c705fcd69595f84e22596bda38d8f5fb9a2511a74ecb381c397ba1",
+      "bytes": 748240
+    },
+    "admission/objects-v1/Holonics/Foundation/AddressedBoundary.olean": {
+      "sha256": "a028ad2c9a759a8e02a2cc9a64fc7f709cad8046ee43de72368f82ec9c1f541c",
+      "bytes": 57688
+    },
+    "admission/objects-v1/Holonics/Foundation/CausalNaturalHolon.olean": {
+      "sha256": "4da5fe344d138eccbeacef7a0c5c15ccaa73126b466203b0057faafdbcc18987",
+      "bytes": 424768
+    },
+    "admission/objects-v1/Holonics/Foundation/CausalRelevance.olean": {
+      "sha256": "c855f4d7c7f7916de32dc269c5637469378f6436e8f7b5d2495dc485db866d45",
+      "bytes": 291336
+    },
+    "admission/objects-v1/Holonics/Foundation/Chronology.olean": {
+      "sha256": "fefc9a2c7cc9fc93e613867772e445bdb8b6d5effa8850b42cd5a5840889b41b",
+      "bytes": 331992
+    },
+    "admission/objects-v1/Holonics/Foundation/ComparisonCell.olean": {
+      "sha256": "c5bbac5c7979cf53473b82fa4e4d36f2b26462f18e7ccbd2498819c76284cd32",
+      "bytes": 111048
+    },
+    "admission/objects-v1/Holonics/Foundation/CompleteReceiverHistory.olean": {
+      "sha256": "c9b02fb780d8efe01de89d5815a21578c988cd55420ae7976ed82f28100cc7e7",
+      "bytes": 118040
+    },
+    "admission/objects-v1/Holonics/Foundation/ConnectionLineage.olean": {
+      "sha256": "4525815e05eed9267fbac1dc47979b62de3ec2db0f0fb4be90fde85b38c36acb",
+      "bytes": 312640
+    },
+    "admission/objects-v1/Holonics/Foundation/FiniteCrossEntropyReceiver.olean": {
+      "sha256": "8a5f47600c75d25c28099b06fdf4efc16a650313234010318d46d968499fe768",
+      "bytes": 104312
+    },
+    "admission/objects-v1/Holonics/Foundation/Gluing.olean": {
+      "sha256": "af6f425d9cbbd6fc31c53263f4953bd3a54b56cbd8b0e5301de48096d55f99cf",
+      "bytes": 178288
+    },
+    "admission/objects-v1/Holonics/Foundation/GluingPassage.olean": {
+      "sha256": "4025653894b0f3195c4912ba0ba3923eb0fc400d6b4943c332a4fdd92d485836",
+      "bytes": 70584
+    },
+    "admission/objects-v1/Holonics/Foundation/HigherDifferenceTransport.olean": {
+      "sha256": "15cdf2febd206c28d02e8f5b163b7e6a68f137a9caaf33a06d07891803a147a7",
+      "bytes": 2299736
+    },
+    "admission/objects-v1/Holonics/Foundation/HodgeReceiver.olean": {
+      "sha256": "3650d00be94e44c1c1761d095343d4a9244dcfac48edd8146a30fb8e6ff31e85",
+      "bytes": 1275616
+    },
+    "admission/objects-v1/Holonics/Foundation/Holon.olean": {
+      "sha256": "14c03d1ea953c8401614855017c9d6ebd1257f3ce7682e1e1ad6a96070ec8bf6",
+      "bytes": 1126128
+    },
+    "admission/objects-v1/Holonics/Foundation/HolonicDifferenceCalculus.olean": {
+      "sha256": "ba23d8d2a54829cc10b5147e6348a851aae309585c27272f3620dac7f06ae909",
+      "bytes": 457160
+    },
+    "admission/objects-v1/Holonics/Foundation/HolonicDirectedPassage.olean": {
+      "sha256": "a1ded9144b7c7a8df68804b11787d8298f10752f272d8085c4aa690cda391f77",
+      "bytes": 338200
+    },
+    "admission/objects-v1/Holonics/Foundation/InformationReceiver.olean": {
+      "sha256": "686368137fa6fd419b6d45c5b9f63c52cdf9fbb95f972aa6c4f7fbff62128f08",
+      "bytes": 648392
+    },
+    "admission/objects-v1/Holonics/Foundation/JointReceiverDescent.olean": {
+      "sha256": "96d14c8f2f5c1264c7228fd3ad9a5297a6097e7e0d9ff069d0e6b602c4abc2a3",
+      "bytes": 276832
+    },
+    "admission/objects-v1/Holonics/Foundation/Lineage.olean": {
+      "sha256": "51f0524c62efa20f8d102fd7df2a1aab47fe635b51f6b6a273fdb73c30b41026",
+      "bytes": 571656
+    },
+    "admission/objects-v1/Holonics/Foundation/MeasuredDifferenceReceiver.olean": {
+      "sha256": "997f0b782b08cd870ad005f5403f4c50520ee469fccccfcae5bc6ef103c78b9a",
+      "bytes": 235952
+    },
+    "admission/objects-v1/Holonics/Foundation/NavigatorModeQuotient.olean": {
+      "sha256": "ec0931225ae3b13f9f739dea606c0d9ba862614960ebe0f5fc4972029cf5b044",
+      "bytes": 119800
+    },
+    "admission/objects-v1/Holonics/Foundation/Receiver.olean": {
+      "sha256": "813c23690a648d08ce7754bd736d4647a48b44aadf4b59df334e69b649543e15",
+      "bytes": 475152
+    },
+    "admission/objects-v1/Holonics/Foundation/ReceiverFamily.olean": {
+      "sha256": "2ae910580d446b287f1c7ab240a4efb41b04e7202bdd773d009915787079c05d",
+      "bytes": 9056
+    },
+    "admission/objects-v1/Holonics/Foundation/ReceiverHistoryCompression.olean": {
+      "sha256": "8182c551b68a3bd107c6f1e6a254222e0450becb4ee4cd1bd1a819bdf0bb7179",
+      "bytes": 194128
+    },
+    "admission/objects-v1/Holonics/Foundation/ReceiverQuotient.olean": {
+      "sha256": "04fcd601a349e35ebfc96e896380ae764dd6bfa93ced857710bf843d817202db",
+      "bytes": 136056
+    },
+    "admission/objects-v1/Holonics/Foundation/ReceiverRelease.olean": {
+      "sha256": "f004b597b46807aeb450a0c040f5aa94c1d496e8887b89892d944138d4d2b5a8",
+      "bytes": 1016800
+    },
+    "admission/objects-v1/Holonics/Foundation/RelationLadder/Comparison.olean": {
+      "sha256": "fd3eef3812a4351c7a81bf02ab38306fdb5ac243c169d136509bf09465fdf088",
+      "bytes": 187824
+    },
+    "admission/objects-v1/Holonics/Foundation/RigidityReceiver.olean": {
+      "sha256": "ac5f1431de9bdd33297cf57ae81e5e64422087989a475dec45210e342ba48588",
+      "bytes": 664936
+    },
+    "admission/objects-v1/Holonics/Foundation/Standing/Law.olean": {
+      "sha256": "01a66789937708b1292639d9649a6f50fe3823ef6df11ae4473a226ba7a9c518",
+      "bytes": 184360
+    },
+    "admission/objects-v1/Holonics/Foundation/Standing.olean": {
+      "sha256": "c70bddbe51db71c36ba08b5e1f1e79ef8636d8cc24253943d7d97f330493b99a",
+      "bytes": 1142744
+    },
+    "admission/objects-v1/Holonics/Foundation/TransportLift.olean": {
+      "sha256": "d26a7833a1b1bafc2ddbb50f6ee69d8ac1692c3e39fa4c2aac0caf4b2b968431",
+      "bytes": 146552
+    },
+    "admission/objects-v1/Holonics/Foundation/TransportWord.olean": {
+      "sha256": "9d516bb503727dab1bf150f8982f6f871f27e23a21ec0612013d495c5faa9f93",
+      "bytes": 331688
+    },
+    "admission/objects-v1/Holonics/Geometry/AffineSwing.olean": {
+      "sha256": "5bb3f1fc695741756d16e04e35ad714e485f1cb762f43e87fcf46054e7d0cdd9",
+      "bytes": 76576
+    },
+    "admission/objects-v1/Holonics/Geometry/ConnectionCalculus.olean": {
+      "sha256": "fd106d9a279139604ea9b7f6505403dbd08ee1e4b77c0feab8b7199b23869800",
+      "bytes": 182608
+    },
+    "admission/objects-v1/Holonics/Geometry/CrossRatio.olean": {
+      "sha256": "9bd8920bea8c848791567bb3a3c27321b228716e40914c915e9d177ba269ebf6",
+      "bytes": 387032
+    },
+    "admission/objects-v1/Holonics/Geometry/ExteriorBoundary.olean": {
+      "sha256": "ffc0396e96fa9d4bf5de24204bee3f0e66487d6f8d4b7854f537c3336dd33260",
+      "bytes": 127504
+    },
+    "admission/objects-v1/Holonics/Geometry/HolonicClockedPantographicSwing.olean": {
+      "sha256": "1244f95a622314c40001b3d91adc57d91fdafcf4294d913424cf1a0023920b74",
+      "bytes": 1842488
+    },
+    "admission/objects-v1/Holonics/Geometry/HolonicPantographicSwingJets.olean": {
+      "sha256": "c7729d8d4d59161f39f92908d1603553657d8a233e55c9982ce0918ae67e385c",
+      "bytes": 397632
+    },
+    "admission/objects-v1/Holonics/Geometry/Horizon.olean": {
+      "sha256": "a6d7973e2396461956ac5773f6d0d799a5479e6d4d9fe2a9ccad2818a72c6f3a",
+      "bytes": 724016
+    },
+    "admission/objects-v1/Holonics/Geometry/LocalFactor.olean": {
+      "sha256": "77f8753ecd5e34a01916d9a38987b677a2e721ed4bd76c625f1a95ef4ed7c830",
+      "bytes": 707080
+    },
+    "admission/objects-v1/Holonics/Geometry/PartitionFunction.olean": {
+      "sha256": "67d58d7f21263d0889d7a39e7849fb8ffa3789519807cc7e4a03ef518cfbd44a",
+      "bytes": 419472
+    },
+    "admission/objects-v1/Holonics/Geometry/PhaseCarry.olean": {
+      "sha256": "063fe96b52b116ae3dc3927c3190020c6bcb8ad61e2a476523248cfb5600a051",
+      "bytes": 309000
+    },
+    "admission/objects-v1/Holonics/Geometry/Polarisation.olean": {
+      "sha256": "cc7808af8391a0b676bd1668293d41f60b239127d31133712184787c43abd87f",
+      "bytes": 174152
+    },
+    "admission/objects-v1/Holonics/Geometry/ScrewGeometry.olean": {
+      "sha256": "3fe77355d6bf3fc5e08e3fd60637b53535fff231eed1b68c69920f9a8b4f9075",
+      "bytes": 2049320
+    },
+    "admission/objects-v1/Holonics/Geometry/Swing.olean": {
+      "sha256": "73e83321888969f228fddca517f31d8ee848332bf4777ebbb75fa328248e3356",
+      "bytes": 673128
+    },
+    "admission/objects-v1/Holonics/Geometry/SwingBridges.olean": {
+      "sha256": "693e9811b76a904aee4b9da727ee0e76a96921b370bf381c98b9f8227ddb5e0f",
+      "bytes": 1090152
+    },
+    "admission/objects-v1/Holonics/Geometry/Telescoping.olean": {
+      "sha256": "4d3a1f9e210f369ef47aac722254978eea59aca59b63b938deeed088bedd30b2",
+      "bytes": 53592
+    },
+    "admission/objects-v1/Holonics/Geometry/TraceSequence.olean": {
+      "sha256": "86aee9e6f5570a30d481fbf4bba3ead2c8119ebeee6434c05f3adcc51529d928",
+      "bytes": 559440
+    },
+    "admission/objects-v1/Holonics/Geometry/WindingLedger.olean": {
+      "sha256": "6206f2e4b2666b548fade26c9be543c87539a2418017701dbdeeef7f45bba23c",
+      "bytes": 793856
+    },
+    "admission/objects-v1/Holonics/HNN/FiniteDecrease.ilean": {
+      "sha256": "86ca7d625fbffa7d9b3e0e309c11ce185036b36a1948883e7b143c3220c6b09f",
+      "bytes": 24179
+    },
+    "admission/objects-v1/Holonics/HNN/FiniteDecrease.olean": {
+      "sha256": "8f88f45611cbc379561a5f5731e84f576cf5d0fdc6ad08b04e35d8e220cc6e02",
+      "bytes": 366368
+    },
+    "admission/objects-v1/Holonics/HNN/LatticeDeposit.olean": {
+      "sha256": "973096aa7f8d936a69b612617eca14b3e3353c566b69d0991a6f705af9cc4340",
+      "bytes": 1935304
+    },
+    "admission/objects-v1/Holonics/HNN/Propagation.olean": {
+      "sha256": "ce253b025feb7bb9702921d8cbc6e65bae36eeceeb5b6895105b71573c4d9555",
+      "bytes": 3131200
+    },
+    "admission/objects-v1/Holonics/HNN/Ratio.olean": {
+      "sha256": "c3543069033b40028434805f8188e4cf020a13a0d6df459e82dd6be3ece7b3e1",
+      "bytes": 1414088
+    },
+    "admission/objects-v1/Holonics/HNN/Retention.olean": {
+      "sha256": "1e0306491c63c4e0740286f399b17628680d63c6fb11613d62e9966985ff6821",
+      "bytes": 2537616
+    },
+    "admission/objects-v1/Holonics/Holarchy/Hearing.olean": {
+      "sha256": "b718cb09f78a5b2fc99fb7dfd9bd39f9a942ba9b9f5493e7de99627624ef0725",
+      "bytes": 594896
+    },
+    "admission/objects-v1/Holonics/Holarchy/Receipt.olean": {
+      "sha256": "8103e5de62038393752204c451f4cfd5121dd96afdb4e30cc6a641b107414464",
+      "bytes": 517448
+    },
+    "admission/objects-v1/Holonics/Holarchy/Reception.olean": {
+      "sha256": "1d9f0f7f04179793d2b344fd27a4bc34756e411bbd89fed8c09987f9b2029d7b",
+      "bytes": 2118168
+    },
+    "admission/objects-v1/Holonics/Holon/Cayley.olean": {
+      "sha256": "e359d409f764678b2b294d8f107b946874e4fcb3ab45803a9ef1c0cb48c525a9",
+      "bytes": 1678224
+    },
+    "admission/objects-v1/Holonics/Holon/Complex.olean": {
+      "sha256": "8eb5e020fed19e67cc34eb8f8a7e4ab884a6d0fca55f4dcfe325e1ba70dfd991",
+      "bytes": 794544
+    },
+    "admission/objects-v1/Holonics/Holon/Conformance.olean": {
+      "sha256": "7737bad5031fc0b104f95cdf0a9ba268570fc00fa11641e26616b745ebabf1e1",
+      "bytes": 1447592
+    },
+    "admission/objects-v1/Holonics/Holon/Deposition.olean": {
+      "sha256": "fee4c7f3129507ce8c2738fbcba94519d20b17f5dc68961a2e7009828daa744c",
+      "bytes": 3080272
+    },
+    "admission/objects-v1/Holonics/Holon/Dirac.olean": {
+      "sha256": "a2a7c99cc561ae4044db8a8b8c49864e005bcf92f71bffb1c7791ae095bf049a",
+      "bytes": 2938176
+    },
+    "admission/objects-v1/Holonics/Holon/Element.olean": {
+      "sha256": "f905fb4ba5bf4e88bc7511cafddce513dbdaaa7d71184a9e965556a74e72e23d",
+      "bytes": 1301968
+    },
+    "admission/objects-v1/Holonics/Holon/Law.olean": {
+      "sha256": "b891c7bab5eb009128fb131fcc6877c0bca612d153febcc311b3bdc0419eed00",
+      "bytes": 1052632
+    },
+    "admission/objects-v1/Holonics/Holon/Navigator.olean": {
+      "sha256": "fd1ee0ebc13e2dbea559d6ba05fddf974a2eec25ceda963ed9469eecdb92c14b",
+      "bytes": 272552
+    },
+    "admission/objects-v1/Holonics/Holon/Port.olean": {
+      "sha256": "8f10c0f3f414761e56cf857634725f92e3521944c6b123affdf9787518b961fe",
+      "bytes": 323408
+    },
+    "admission/objects-v1/Holonics/Holon/QuadraticMoment.olean": {
+      "sha256": "db65bcf761ef07d805110c4ad26fa9878f7d015170aff36ea66180a9c0cb6617",
+      "bytes": 120488
+    },
+    "admission/objects-v1/Holonics/Holon/Reaction.olean": {
+      "sha256": "b3bbfacfdf6e28519d82a6e3c7cabfe88c67fc040c289f4dd1f101b3e0871dbf",
+      "bytes": 685976
+    },
+    "admission/objects-v1/Holonics/Holon/Restriction/Morphism.olean": {
+      "sha256": "06097df6bc8bf34c6fff6688c3413d28cdaca058ead08d981d19312ede81ecc8",
+      "bytes": 691864
+    },
+    "admission/objects-v1/Holonics/Mathematics/PolynomialReading.olean": {
+      "sha256": "6cda426f253b912682c73868fd6563c16e6e1b6fc445223656ba947acf45cec3",
+      "bytes": 73160
+    },
+    "admission/objects-v1/Holonics/Objects/Pairing.olean": {
+      "sha256": "63f9b60c27dfcd31fd9fef629dac0c3a061652aaa244b6c7c9c87ae954862429",
+      "bytes": 1837920
+    },
+    "admission/objects-v1/Holonics/Objects/Parametron.olean": {
+      "sha256": "1b0c658db949dadfb4135c18e98cd1e9e45f7d4647cbe541ecd7483a73a9d988",
+      "bytes": 1528592
+    },
+    "admission/objects-v1/Holonics/Objects/Ratio/CarriedPower.olean": {
+      "sha256": "1c5726ff2ce927d135c8fdaa6bc7478461a6251c428edf2635e504e2408f944f",
+      "bytes": 359088
+    },
+    "admission/objects-v1/Holonics/Objects/Ratio/ExponentialKernel.olean": {
+      "sha256": "efb36a7571786084d1409ad7017377a0bd7b4a81a33ae960a43eab4827686d67",
+      "bytes": 11840
+    },
+    "admission/objects-v1/Holonics/Objects/Ratio/GaugeCalculus.olean": {
+      "sha256": "71ce12fdbd80ca245aa8c17eba6d963060bf8dadae1e5c78fe8aba0ac1e1c903",
+      "bytes": 235224
+    },
+    "admission/objects-v1/Holonics/Objects/Ratio/SelectedQuadratic/PositiveRoot.olean": {
+      "sha256": "3cfde72f4d04d4f1dc6a51bf1a3e3b3705c897e7e2764d3c0637ed5b44702fc2",
+      "bytes": 398712
+    },
+    "admission/objects-v1/Holonics/Objects/Ratio/SelectedQuadratic/SourceRoot.olean": {
+      "sha256": "07cc23ad7cff815492dca0bb92650c74fa88c07b1dee8b8b1ea497d94ebe3a29",
+      "bytes": 173760
+    },
+    "admission/objects-v1/Holonics/Objects/Ratio/SelectedQuadratic.olean": {
+      "sha256": "a166ef03c40b464ede20e2874ea8b0b33c585e36d3f19cc81571af80d3b6b6b3",
+      "bytes": 388240
+    },
+    "admission/objects-v1/Holonics/Objects/Ratio.olean": {
+      "sha256": "fd5921e2c0eed4d0d899a4b6ba59db72a6478b670cd18d5df783af2155ab9626",
+      "bytes": 1472528
+    },
+    "admission/objects-v1/Holonics/Objects/RatioPhase.olean": {
+      "sha256": "f4460be7088f5d5493470685ef6a11a5752c87340ed1c8f39a6c9cdaf4439618",
+      "bytes": 798584
+    },
+    "admission/objects-v1/Holonics/Physics/CoupledIncidence.olean": {
+      "sha256": "268846b424c0af25e24789b0952447367b79fb830f8653412812417bad2a0313",
+      "bytes": 683664
+    },
+    "admission/objects-v1/Holonics/Physics/HolonicMeasuredParametron.olean": {
+      "sha256": "abe4c02979d5af4c3f7fe7ac5a3e0d744bdb7802c240b19b5194cec19dc4c53d",
+      "bytes": 100960
+    },
+    "admission/objects-v1/Holonics/Physics/HolonicSnellInteraction.olean": {
+      "sha256": "942ff9f49ce42451ee24a19b700e67d2d888725ebd4e86d8e1df79102d257bef",
+      "bytes": 163384
+    },
+    "admission/objects-v1/Holonics/Physics/InformationDifference.olean": {
+      "sha256": "32fa7c438beaaf0be5ee1316f3d62ea2f9aeb7bc657a067aa8d5009584e0b728",
+      "bytes": 335528
+    },
+    "admission/objects-v1/Holonics/Physics/PhaseCarrier.olean": {
+      "sha256": "f319af48df4fa592551117afa0759936cc3edca90845c85d2b5395b83d0e8dbf",
+      "bytes": 400784
+    },
+    "admission/objects-v1/Holonics/Physics/PhysicalRealization.olean": {
+      "sha256": "d4990f8717738786ef0752d0bda8ac39f98cec674ce47861c457c699170f1d82",
+      "bytes": 718616
+    },
+    "admission/objects-v1/Holonics/Transport/AffineJointBall.olean": {
+      "sha256": "379bdaecceb10c65f5eeb2f0276eea9f0a50ea20e38b85321e12546ed310d3f2",
+      "bytes": 333680
+    },
+    "admission/objects-v1/Holonics/Transport/CellHolonomy.olean": {
+      "sha256": "04ccd05e16e3c8b0970e912660567da47d9d0087e8dfef60d8340b261143ca29",
+      "bytes": 192712
+    },
+    "admission/objects-v1/Holonics/Transport/ChangingReceiver/Defect.olean": {
+      "sha256": "70a3efd5253ae74cc6dd7743fa4741c8461fbf33008d22740efda2012b24052c",
+      "bytes": 235864
+    },
+    "admission/objects-v1/Holonics/Transport/EditRigidity.olean": {
+      "sha256": "507047ddf3fc5162d47b375cc461d431e155d685dce4279cd93c85c4dabcb5ee",
+      "bytes": 1181360
+    },
+    "admission/objects-v1/Holonics/Transport/HelicalPairInteraction.olean": {
+      "sha256": "8865c32b66f17844824d4a0267c576395f12556756533818b1909566fce29245",
+      "bytes": 1069616
+    },
+    "admission/objects-v1/Holonics/Transport/HolonicComposition.olean": {
+      "sha256": "746f9f00a380a548a25fe4e178a1f43b1e9a50278028ad887fa33f3c0bf8b886",
+      "bytes": 461120
+    },
+    "admission/objects-v1/Holonics/Transport/HolonicInteraction.olean": {
+      "sha256": "46649f243a94f8b6094b9a1c54a769af23d5e2573406787eab8e5f110a891dad",
+      "bytes": 961152
+    },
+    "admission/objects-v1/Holonics/Transport/JetStaircase.olean": {
+      "sha256": "a5ea7327e4f03dea9b568834d27a004a7e2a9adb0a0980cbd405eb03c80939fb",
+      "bytes": 352320
+    },
+    "admission/objects-v1/Holonics/Transport/JunctionLaw.olean": {
+      "sha256": "c24de8e632832aee941c45bfacacb766e484680e86827ca865e76d130ddea0c1",
+      "bytes": 1275800
+    },
+    "admission/objects-v1/Holonics/Transport/NavigatorTraceFaces.olean": {
+      "sha256": "c0f84d8b35e02a1f85338e0cfa24dbd700e7e5628ca73a5c5d03aaf76987e319",
+      "bytes": 458744
+    },
+    "admission/objects-v1/Holonics/Transport/SituatedReturnedDifference.olean": {
+      "sha256": "5bd7cc997bb1b50a9ba5061453d2561ec93e8632d91a7edf5ce67df4a51dd9ee",
+      "bytes": 232928
+    },
+    "admission/objects-v1/Holonics/Transport/WorldTube.olean": {
+      "sha256": "398a313c79070dbbd965971343972d1d94b9084f384d8a6ec61b6742d1060889",
+      "bytes": 705248
+    },
+    "admission/source-v1/FiniteDecreaseImportConsumer.lean": {
+      "sha256": "feb09b6de1dac8385df5120e2b0c2437b9062d627e2c7d461166e53cef88c6f2",
+      "bytes": 766
+    },
+    "stages/finite-decrease-import-20261009-v158-prep.acceptance.json": {
+      "sha256": "7b5328fc9b2902589ed674e36c3f61549e4ea606b3f54c73aa548c2ac8e0aff3",
+      "bytes": 378
+    },
+    "stages/finite-decrease-import-20261009-v158-prep.child-identity.json": {
+      "sha256": "cbba0752fdb4f7e23b75a9f526078f4d02de552e0147ffcaf27ebeda3ee7acd2",
+      "bytes": 78
+    },
+    "stages/finite-decrease-import-20261009-v158-prep.config.json": {
+      "sha256": "e461ad7a03a0486a863a6a239c9d21759f986a7089d6eb2d8c6b6e92b5aa7b35",
+      "bytes": 9990
+    },
+    "stages/finite-decrease-import-20261009-v158-prep.external-lease.json": {
+      "sha256": "1c755d72ee97f04e131f6acdb9e9361caaba0b8f8860c46fe200e4aaea493d9f",
+      "bytes": 487
+    },
+    "stages/finite-decrease-import-20261009-v158-prep.final.json": {
+      "sha256": "423ff2fad2787e29980e910339cbf91667ff744026ea0fff9157b491f8b91f7e",
+      "bytes": 5035
+    },
+    "stages/finite-decrease-import-20261009-v158-prep.input_seal.json": {
+      "sha256": "f9fc0ad4cd42d8dae2aacac6d1c0e9bebd3f0e80fea01ad39cc1f3b69f6f4378",
+      "bytes": 7323
+    },
+    "stages/finite-decrease-import-20261009-v158-prep.lease-identity.json": {
+      "sha256": "48c107291c3ebd4cb0463bf234a0acbb197df811693ef5093824dc94a8a25e65",
+      "bytes": 565
+    },
+    "stages/finite-decrease-import-20261009-v158-prep.memory-gate.json": {
+      "sha256": "1b5d2eb32c01ff65419d97adc6ca77427f9605c7e9a5f41d52176bfc4f98437f",
+      "bytes": 121
+    },
+    "stages/finite-decrease-import-20261009-v158-prep.memory-growth.ndjson": {
+      "sha256": "f9538a6edc7ad7b517d9eb548f77ed061a6ca82f066ca710965717e4476735c6",
+      "bytes": 4812
+    },
+    "stages/finite-decrease-import-20261009-v158-prep.output_seal.json": {
+      "sha256": "aed3d5954e6c3d607eacec83473149735ec4d07c6bd5aabd41fa3d5148c1efd7",
+      "bytes": 332366
+    },
+    "stages/finite-decrease-import-20261009-v158-prep.publication.json": {
+      "sha256": "ef1f5fd1ecf4321fa960680cf1580826b478064c470f70a94e8c6eb018097b5f",
+      "bytes": 3194
+    },
+    "stages/finite-decrease-import-20261009-v158-prep.quiescence.json": {
+      "sha256": "dba40ecb07b7b7fd86756c9459e83b26f4fe909ab469ade26796ee36a3c2d2b3",
+      "bytes": 130
+    },
+    "stages/finite-decrease-import-20261009-v158-prep.release.json": {
+      "sha256": "8860ca4cf89b46310973aaa88c932e3b2268736c19a3a930ab7d3eca6f6358fc",
+      "bytes": 175
+    },
+    "stages/finite-decrease-import-20261009-v158-prep.stage-quiescence.json": {
+      "sha256": "1f3c05002cc2dc1642f3400802f3d7e44151c71d91d11f039a73b8f4fcdb3f63",
+      "bytes": 136
+    },
+    "stages/finite-decrease-import-20261009-v158-prep.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "stages/finite-decrease-import-20261009-v158-prep.stdout": {
+      "sha256": "21bddaf00770c5d318323f70c103ecddb67bb8ecfba0456043043005b259f20f",
+      "bytes": 2156
+    },
+    "stages/finite-decrease-import-20261009-v158-prep.system-floor.json": {
+      "sha256": "43051fde373c3e3c432ca68b184c6a76c44f50512527e797b38fb16d1296201d",
+      "bytes": 38820
+    },
+    "stages/finite-decrease-import-20261009-v158-prep.unit-cleanup.json": {
+      "sha256": "45adf9138007e692d84d7c3eb6252c4095e856124e40628b85f03ad9d9408ae8",
+      "bytes": 709
+    },
+    "stages/finite-decrease-import-20261009-v158-compile.acceptance.json": {
+      "sha256": "2453131fb71ff9b2b2ba2d7e6fef3b66d9b82944f139feb541758699b34e3ed2",
+      "bytes": 378
+    },
+    "stages/finite-decrease-import-20261009-v158-compile.child-identity.json": {
+      "sha256": "09581a6748fbbae93b267420853fa6e8e45e8c8ec307a955c1f96d69ef679922",
+      "bytes": 78
+    },
+    "stages/finite-decrease-import-20261009-v158-compile.config.json": {
+      "sha256": "864580395af28a5943d8b2bca9698b76261972a40a7b765e9c538b7d12834d6c",
+      "bytes": 10619
+    },
+    "stages/finite-decrease-import-20261009-v158-compile.external-lease.json": {
+      "sha256": "48de06d0a8be2bae20808e65d7bf41fe7c2a40aae2c949acff17a0404493a5e1",
+      "bytes": 487
+    },
+    "stages/finite-decrease-import-20261009-v158-compile.final.json": {
+      "sha256": "365de6f57043e92663ad3b17e291cbc9934825ca42d67e037636c989dbbba846",
+      "bytes": 5086
+    },
+    "stages/finite-decrease-import-20261009-v158-compile.input_seal.json": {
+      "sha256": "8993ef23173cba0bc1588bf0a20da83970af2037db027bb05848b415f9185fa4",
+      "bytes": 6830
+    },
+    "stages/finite-decrease-import-20261009-v158-compile.lease-identity.json": {
+      "sha256": "0445abcc562ba0ac4c9564e5fef39108ce130d5d6bb69dbb103233cb55789b1f",
+      "bytes": 565
+    },
+    "stages/finite-decrease-import-20261009-v158-compile.memory-gate.json": {
+      "sha256": "c1a281366bc4ad7891e56c31b2295290075d85d203f583667feee5fb6cb762c1",
+      "bytes": 121
+    },
+    "stages/finite-decrease-import-20261009-v158-compile.memory-growth.ndjson": {
+      "sha256": "360534488f23b5ef83a0d41da22ad01fa2a8aa8cadea2da3ee6b8d0053bc1b5d",
+      "bytes": 7901
+    },
+    "stages/finite-decrease-import-20261009-v158-compile.output_seal.json": {
+      "sha256": "93ebb6d6c1dc67ae3a5994eebe4b0ad134428d05a9ccedd83b0490c5d7ae343a",
+      "bytes": 545366
+    },
+    "stages/finite-decrease-import-20261009-v158-compile.publication.json": {
+      "sha256": "34c219d8f81107b6e643e747a171876ea5ab12ac51e744053bbdd3a66039d092",
+      "bytes": 3990
+    },
+    "stages/finite-decrease-import-20261009-v158-compile.quiescence.json": {
+      "sha256": "225f373813e02b98e1566c274105295b0fc601bd8331f58d1ca0a2104f0fac33",
+      "bytes": 130
+    },
+    "stages/finite-decrease-import-20261009-v158-compile.release.json": {
+      "sha256": "d865c6e0466297f44683c7044a8b223d3d030d149d4f9d25ee333b736e92775a",
+      "bytes": 175
+    },
+    "stages/finite-decrease-import-20261009-v158-compile.stage-quiescence.json": {
+      "sha256": "f74696969caf2aa38bc92b612aa1dd4210478e365bf67dfb0b7ed9a85d06aeb4",
+      "bytes": 136
+    },
+    "stages/finite-decrease-import-20261009-v158-compile.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "stages/finite-decrease-import-20261009-v158-compile.stdout": {
+      "sha256": "aca3ee7094ecb400bca3d37728ac94b8f67b2dba277d8d53058484607a0a3653",
+      "bytes": 2969
+    },
+    "stages/finite-decrease-import-20261009-v158-compile.system-floor.json": {
+      "sha256": "c9003457d8aac752801602802dd17378b774bc21553d6ee4c7a6bde1c4d9a2ce",
+      "bytes": 63853
+    },
+    "stages/finite-decrease-import-20261009-v158-compile.unit-cleanup.json": {
+      "sha256": "25ae6fcceaa441fd9e7944c05d3f5afd4b84ade04bce7e4b06810c361bc4635b",
+      "bytes": 715
+    },
+    "queue-source/materialize_finite_decrease_import_v158.py": {
+      "sha256": "b4beb1586c78d5b4a0c1cec9d426a57b440dac884a531b6750d8bd3f57f4a1f1",
+      "bytes": 8126
+    },
+    "queue-source/package_partial_math_v150.py": {
+      "sha256": "205ac9cce759dcba76fadb3dda9e7ea0f54a3e48dda98bfef7a7ac8033fdd3a3",
+      "bytes": 4079
+    },
+    "queue-source/check_lean_owner_v5.py": {
+      "sha256": "938113c2385ccafad539de5bcd6252a3ef315261e15ff3312757fb1a95ba723e",
+      "bytes": 2194
+    },
+    "queue-source/verify_lean_metadata_v1.py": {
+      "sha256": "cff6b3ce7c52698766dd59eb249c822960c36667c87d7e8e6cc6bae10c5d41ad",
+      "bytes": 772
+    },
+    "queue-source/prepare_ns_namespace_v1.py": {
+      "sha256": "85b5a0626525cf14d6dbf8ecf9098ee8804df8facf1cad8c5e2f8eeb36aeea7c",
+      "bytes": 10766
+    },
+    "queue-source/check_namespace_lookup_v1.py": {
+      "sha256": "9210e5aa18f9daeb7ac8ced18e253f08805577119a5f2b5e211017d9a873679c",
+      "bytes": 886
+    },
+    "queue-source/lean_budget_v5.py": {
+      "sha256": "ad9ee8b7658a53011a020e159847ac9b23d4b491e3b262c2f49d23afa43b974e",
+      "bytes": 5550
+    },
+    "queue-source/final_stage_memory_v120.py": {
+      "sha256": "b6913802127facc4945da4bbdd0f18cb5457cc8e03765b649653e6cfe12adfc4",
+      "bytes": 11218
+    },
+    "queue-source/leased_stage_memory_v120.py": {
+      "sha256": "1191c531c35016eada85739a5ca94dabefd9074c75781e4a20fb28d4b887f1d1",
+      "bytes": 5538
+    },
+    "queue-source/bounded_stage_memory_v120.py": {
+      "sha256": "5ebc628494a7bff53f01362475110002eedae3b6395517f394f9972c541eff41",
+      "bytes": 13550
+    },
+    "VALIDATION.json": {
+      "sha256": "5c17d7aa780fd3fca7792b4386f36f3b72acfe7b2ea42b56fbb5b839c66fedcc",
+      "bytes": 5449
+    },
+    "HANDOFF.md": {
+      "sha256": "52721a482ae6e13e43343811d4ab31535388072e4819bfe5679ae32fe283d6b4",
+      "bytes": 702
+    }
+  },
+  "count": 184,
+  "all_copies_verified": true
+}
