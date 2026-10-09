@@ -30,6 +30,21 @@
         "<repository>/research/records/receipts/": 2
       }
     },
+    "NATIVE_LEAN_JOIN.v3.json": {
+      "original": {
+        "bytes": 1729,
+        "sha256": "f039c0ac10d25bc70ad336e8b973a8be984a40849a3c29e9d5e3c04e12da7d7e"
+      },
+      "projected": {
+        "bytes": 1684,
+        "sha256": "d38066391600e2cef91b00a12dc6fa5f4f7413ae04db7b77c09ac0eed656427e"
+      },
+      "replaced": {
+        "<cargo-registry>/": 0,
+        "<queue-admission>/": 0,
+        "<repository>/research/records/receipts/": 3
+      }
+    },
     "lean-import-v1/VALIDATION.json": {
       "original": {
         "bytes": 4483,
@@ -57,6 +72,126 @@
       "replaced": {
         "<cargo-registry>/": 0,
         "<queue-admission>/": 2,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "loop3-native-formal-v1/lean-owner/compiler.stdout": {
+      "original": {
+        "bytes": 2680,
+        "sha256": "a6dc1174ebe46d1dc852210174dbc822d2f7f65da8c8ae577f1dca0cce125962"
+      },
+      "projected": {
+        "bytes": 2536,
+        "sha256": "d54fb20cebe8b334ee3c3b945c60a3a3fe784628b5fba24c168360bb35ec669e"
+      },
+      "replaced": {
+        "<cargo-registry>/": 0,
+        "<queue-admission>/": 3,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "loop3-native-formal-v1/stages/actual-loop3-build-20261009-v195.stderr": {
+      "original": {
+        "bytes": 224,
+        "sha256": "bf389fa3889e809d2538737e641aaed09c9b9a5351e7870d23ebe19803bd95a8"
+      },
+      "projected": {
+        "bytes": 176,
+        "sha256": "74908ad7c2875c5850e4c5636729e8fa541604cfafee2d74b21789772cddf66c"
+      },
+      "replaced": {
+        "<cargo-registry>/": 0,
+        "<queue-admission>/": 1,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "loop3-native-formal-v1/stages/actual-loop3-build-20261009-v195.stdout": {
+      "original": {
+        "bytes": 36121,
+        "sha256": "d07c067abd213633ccbf12d6e988a83e00a67de8c3f1d3414238c7d1ea3f2387"
+      },
+      "projected": {
+        "bytes": 30273,
+        "sha256": "b5113e0e136a0791b7fd4de9582cd74b7fdc9f7ff2648626446c9b1b87954c07"
+      },
+      "replaced": {
+        "<cargo-registry>/": 50,
+        "<queue-admission>/": 76,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "loop3-native-formal-v1/stages/actual-loop3-check-20261009-v195.stderr": {
+      "original": {
+        "bytes": 414,
+        "sha256": "8d8c4b803d9935cf5191c0d9010a1d2e8a19b019314819e0a9e473f1ca2b4f1c"
+      },
+      "projected": {
+        "bytes": 318,
+        "sha256": "11893b60b84ff4fd19f79e32d48477c1562fe3c95800686f5e062f30bca06a87"
+      },
+      "replaced": {
+        "<cargo-registry>/": 0,
+        "<queue-admission>/": 2,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "loop3-native-formal-v1/stages/actual-loop3-check-20261009-v195.stdout": {
+      "original": {
+        "bytes": 49785,
+        "sha256": "42c7e0e7f6652f2e7d8df02ce32b081066887326525dea5cfe31c353a9c3a639"
+      },
+      "projected": {
+        "bytes": 41441,
+        "sha256": "04c90dfe87bc505e3688cb9c26850f8ec572c4dbeadae353cd5de5699209acb7"
+      },
+      "replaced": {
+        "<cargo-registry>/": 50,
+        "<queue-admission>/": 128,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "loop3-native-formal-v1/stages/actual-loop3-clippy-20261009-v195.stderr": {
+      "original": {
+        "bytes": 223,
+        "sha256": "1ce37a7cdbf77de9646033e04be78b3e32c5f76d3e5a37ecc696518627a7e6a7"
+      },
+      "projected": {
+        "bytes": 175,
+        "sha256": "3491c582fc864c7af65b18e28252cb7052140b0c2a40754697898a513f6eadf0"
+      },
+      "replaced": {
+        "<cargo-registry>/": 0,
+        "<queue-admission>/": 1,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "loop3-native-formal-v1/stages/actual-loop3-doc-20261009-v195.stderr": {
+      "original": {
+        "bytes": 1429,
+        "sha256": "0aeb9ab724ed6cf1de143c04a8d3f5b277b0c1f8139b69093c438b73593588ab"
+      },
+      "projected": {
+        "bytes": 1381,
+        "sha256": "729f03f17d5349c9f76c745da610938324f92d0c1e57a64bac3f30ad67edab4e"
+      },
+      "replaced": {
+        "<cargo-registry>/": 0,
+        "<queue-admission>/": 1,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "loop3-native-formal-v1/stages/paired-deposit-lean-20261009-v196-compile.stdout": {
+      "original": {
+        "bytes": 4157,
+        "sha256": "3fbbba989112124447b04a921c824093cf92289716b7f681a8f53b56e1d65de1"
+      },
+      "projected": {
+        "bytes": 4013,
+        "sha256": "c191c38e5b24bb466fb495ebff2289428ca0fbea1a3fd361bbf0b7923084fdb1"
+      },
+      "replaced": {
+        "<cargo-registry>/": 0,
+        "<queue-admission>/": 3,
         "<repository>/research/records/receipts/": 0
       }
     },

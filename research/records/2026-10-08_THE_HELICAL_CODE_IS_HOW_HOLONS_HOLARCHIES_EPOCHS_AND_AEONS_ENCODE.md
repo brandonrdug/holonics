@@ -398,7 +398,21 @@ Its second part states the perfected laws:
        10, the law's incompatibility with the pairing (remainders `715827883/2³⁰`, `57264483/2³¹`,
        `5260321/2³⁰` above it).
      - Mirrored columns are not this law: the image is read, never copied.
-     - Loop 3 carries the pairing to every route as a constraint of the source law.
+     - Loop 3 made the pairing a constraint of the source law, so it holds on every route.
+       - On the general route, the Word's partner return is the dyad image only in a field that
+         commutes with the dyad.
+       - So a source law that declares the pairing projects each deposit onto the subspace,
+         `Π_V(G) e_a = ½(G e_a + B G e_(σa))`, with its Gram's arrivals and its chart symmetrized
+         exactly.
+       - Every slip reader reads one founding prior, the field's declared port completed by the
+         law's symmetry.
+     - Measured on the pair routes and on general features at the normal law:
+       - the forward deposit alone keeps the port on the subspace;
+       - the release's closed contacts through the founding prior are `[1, 3]`;
+       - a save restores the law, its prior and its contacts.
+
+       It is not an end-to-end participating world's comparison. The quadratic's invariance is owed
+       in Lean (#62).
 
    **The general partner law and its scope** (`proved-derived` for the identity, owed in Lean).
    - **The identity.** For a uniform tick, an involution `B` and `B E = E σ`, the recurrence face
@@ -420,8 +434,8 @@ Its second part states the perfected laws:
      - or a report of redundancy.
 
    **Deferred to later steps, named.**
-   - Step 3, the equivariant deposition, is built on the pair route (above); its general route is
-     loop 3.
+   - Step 3, the equivariant deposition, is built (above): the pair route, and the paired source law
+     that holds the port on its subspace on every route.
    - Step 4: the linking reading of a closed duplex and its crossing changes. No current crate
      reads the linking number, and the retired owner is at `13f8c734`. Its consumer in the machine
      is named before it is built.

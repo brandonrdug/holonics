@@ -1,0 +1,6 @@
+paired law, forward pair deposit: slip 4 -> 7635570237/17179869184, step 2, consumer false
+paired law, paired deposit: slip 8 -> 0, step 2, consumer true
+closed contacts through the founding prior: [1, 3]
+the image's slip read against the declared port alone: [Ratio { numer: 0, denom: 1 }, Ratio { numer: -1, denom: 1 }, Ratio { numer: 1, denom: 1 }, Ratio { numer: 1, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -1, denom: 1 }, Ratio { numer: 2, denom: 1 }, Ratio { numer: 0, denom: 1 }]
+general features on the paired law: chart lattice 41, certificate 761227/288230376151711744, target 1/34359738368
+the same samples on a plain law: Err(Equivariance { ring: 0, column: 0, partner: 1, row: 0 })

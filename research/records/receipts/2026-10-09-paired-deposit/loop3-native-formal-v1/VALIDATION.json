@@ -1,0 +1,673 @@
+{
+  "source_commit": "5c50803b1fdcb2c38583a8189356dfb70f07bfa5",
+  "source_tree": "8632e6539ded9d8fc0e9b0a668ccd82d91c7d23e",
+  "native_files_frozen": 350,
+  "all_declared_stages_accepted": true,
+  "required_native_fixtures": 44,
+  "passed_native_fixtures": 44,
+  "passed_test_names": [
+    "hnn::paired::tests::a_paired_source_law_keeps_its_port_on_the_subspace_on_pair_and_general_deposits",
+    "hnn::paired::tests::a_period_four_reflector_that_passes_declare_fails_the_dihedral_relation",
+    "hnn::paired::tests::a_port_that_a_later_change_takes_off_the_equivariant_subspace_is_refused_at_the_read",
+    "hnn::paired::tests::a_reflector_is_dihedral_exactly_when_it_is_c_minus_i",
+    "hnn::paired::tests::a_source_ring_behind_a_silent_ring_reads_and_one_behind_a_ticking_ring_is_refused",
+    "hnn::paired::tests::campaign_ones_five_classes_admit_no_pairing_and_the_alphabet_is_not_changed_to_fit",
+    "hnn::paired::tests::equivariance_names_the_first_failing_column_and_row",
+    "hnn::paired::tests::one_actual_pair_deposit_takes_the_equivariant_port_off_its_subspace",
+    "hnn::paired::tests::the_admitted_case_builds_each_follower_column_from_its_leader",
+    "hnn::paired::tests::the_founded_sign_matrix_is_refused_naming_its_first_failing_column",
+    "hnn::paired::tests::the_lift_is_an_involution_that_inverts_the_rotor_on_the_carrier",
+    "hnn::paired::tests::the_paired_deposit_learns_both_strands_and_keeps_the_port_equivariant",
+    "hnn::paired::tests::the_pairing_is_typed_and_a_fixed_point_free_involution_needs_an_even_family",
+    "hnn::paired::tests::the_partner_adds_no_information_at_the_retained_quotient",
+    "hnn::paired::tests::the_partner_read_refuses_where_normalization_or_rounding_would_break_it",
+    "hnn::paired::tests::the_partner_strands_moment_and_face_are_the_dyad_image_of_the_strands",
+    "hnn::paired::tests::the_phase_convention_is_pinned_by_a_hand_computed_anchor",
+    "hnn::paired::tests::the_real_constitution_is_read_at_its_current_port",
+    "hnn::paired::tests::the_ring_the_source_and_the_port_shape_are_certified",
+    "hnn::tests::executed::a_checkpoint_is_refused_onto_foreign_material_and_when_damaged",
+    "hnn::tests::executed::a_continuing_state_carries_the_receptions_end_inside_its_check",
+    "hnn::tests::executed::a_port_holding_no_class_refuses_the_pair_deposit",
+    "hnn::tests::executed::a_reading_is_zero_or_past_the_lattices_floor",
+    "hnn::tests::executed::a_restored_checkpoint_continues_exactly_over_successive_deposits",
+    "hnn::tests::executed::the_covector_pairs_with_the_exact_variation_three_ways",
+    "hnn::tests::executed::the_covector_predicts_the_executed_growths_change",
+    "hnn::tests::executed::the_dominant_multiplier_is_certified_or_refused_by_type",
+    "hnn::tests::executed::the_located_pairs_deposit_closes_its_slip_and_its_consumer_holds",
+    "hnn::tests::executed::the_monodromys_variation_is_its_derivative_forward_and_in_reverse",
+    "hnn::tests::executed::two_members_tied_in_growth_are_both_active",
+    "hnn::tests::prediction::the_closed_pair_contacts_are_the_deposits_distance",
+    "hnn::tests::prediction::a_candidates_pair_storage_joins_its_antecedent_at_the_contacts_weight",
+    "hnn::tests::prediction::the_pair_gain_is_the_joined_banks_determinant_and_a_neutral_member_does_not_move_it",
+    "hnn::tests::prediction::the_release_reads_the_located_pair_and_its_consumer_holds_at_seed_41",
+    "hnn::tests::prediction::the_release_reads_the_located_pair_and_its_consumer_holds_at_seed_42",
+    "hnn::tests::prediction::the_release_reads_a_located_map_that_fixes_its_antecedent_at_seed_41",
+    "hnn::tests::prediction::the_release_reads_a_located_map_that_fixes_its_antecedent_at_seed_42",
+    "an_observed_pair_deposit_changes_the_later_continuing_loaded_response",
+    "exact_source_reentry_preserves_the_entered_interior_and_counts_source_once",
+    "nonzero_offset_moments_drive_the_actual_loaded_port_without_marginal_source",
+    "same_phase_intact_swap_has_one_native_source_moment_and_one_physical_motion",
+    "sparse_source_moments_enter_the_actual_loaded_port_with_exact_work",
+    "hnn::tests::constitution::a_receiving_deposit_absorbs_its_phase_comparisons_through_the_map_before_it",
+    "hnn::tests::constitution::a_sparse_checkpoint_restores_and_continues_exactly"
+  ],
+  "failed_or_incomplete_stages": [],
+  "doctests_passed": 57,
+  "owner_axiom_queries": 10,
+  "exact_HNN_import_queries": 10,
+  "full_HNN_aggregate_or_Framework_compiled": false,
+  "primary_fixture_ran_once": true,
+  "raw_primary_stdout": "\nrunning 1 test\ntest hnn::paired::tests::a_paired_source_law_keeps_its_port_on_the_subspace_on_pair_and_general_deposits ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1176 filtered out; finished in 0.02s\n\n",
+  "raw_primary_stderr": "paired law, forward pair deposit: slip 4 -> 7635570237/17179869184, step 2, consumer false\npaired law, paired deposit: slip 8 -> 0, step 2, consumer true\nclosed contacts through the founding prior: [1, 3]\nthe image's slip read against the declared port alone: [Ratio { numer: 0, denom: 1 }, Ratio { numer: -1, denom: 1 }, Ratio { numer: 1, denom: 1 }, Ratio { numer: 1, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -1, denom: 1 }, Ratio { numer: 2, denom: 1 }, Ratio { numer: 0, denom: 1 }]\ngeneral features on the paired law: chart lattice 41, certificate 761227/288230376151711744, target 1/34359738368\nthe same samples on a plain law: Err(Equivariance { ring: 0, column: 0, partner: 1, row: 0 })\n",
+  "results": [
+    {
+      "label": "actual-loop3-prep8-20261009-v195",
+      "accepted": true,
+      "complete_wall_ns": 8649666631,
+      "fixed_projection_ns": 17000000000,
+      "child_wall_ns": 8457296987,
+      "child_exit": 0,
+      "aggregate_CPU_ns": 6205030000,
+      "aggregate_CPU_limit_us": 17000000,
+      "group_peak_B": 6422401024,
+      "child_peak_RSS_KiB": 39440,
+      "group_memory_max_B": 8589934592,
+      "CPU_affinity": [
+        0
+      ],
+      "thread_budget": 1,
+      "expected_test_names": [],
+      "aggregate_CPU_guard_triggered": false,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 8649666631,
+        "denominator": 17000000000
+      }
+    },
+    {
+      "label": "actual-loop3-check-20261009-v195",
+      "accepted": true,
+      "complete_wall_ns": 14221957581,
+      "fixed_projection_ns": 65000000000,
+      "child_wall_ns": 12385744453,
+      "child_exit": 0,
+      "aggregate_CPU_ns": 24219271000,
+      "aggregate_CPU_limit_us": 128000000,
+      "group_peak_B": 2113466368,
+      "child_peak_RSS_KiB": 1501832,
+      "group_memory_max_B": 8589934592,
+      "CPU_affinity": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "thread_budget": 4,
+      "expected_test_names": [],
+      "aggregate_CPU_guard_triggered": false,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 14221957581,
+        "denominator": 65000000000
+      }
+    },
+    {
+      "label": "actual-loop3-build-20261009-v195",
+      "accepted": true,
+      "complete_wall_ns": 29408820582,
+      "fixed_projection_ns": 65000000000,
+      "child_wall_ns": 27528154511,
+      "child_exit": 0,
+      "aggregate_CPU_ns": 55804519000,
+      "aggregate_CPU_limit_us": 128000000,
+      "group_peak_B": 3448266752,
+      "child_peak_RSS_KiB": 2180000,
+      "group_memory_max_B": 8589934592,
+      "CPU_affinity": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "thread_budget": 4,
+      "expected_test_names": [],
+      "aggregate_CPU_guard_triggered": false,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 29408820582,
+        "denominator": 65000000000
+      }
+    },
+    {
+      "label": "actual-loop3-clippy-20261009-v195",
+      "accepted": true,
+      "complete_wall_ns": 19119588759,
+      "fixed_projection_ns": 65000000000,
+      "child_wall_ns": 17218494355,
+      "child_exit": 0,
+      "aggregate_CPU_ns": 29620091000,
+      "aggregate_CPU_limit_us": 128000000,
+      "group_peak_B": 2427179008,
+      "child_peak_RSS_KiB": 1540640,
+      "group_memory_max_B": 8589934592,
+      "CPU_affinity": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "thread_budget": 4,
+      "expected_test_names": [],
+      "aggregate_CPU_guard_triggered": false,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 19119588759,
+        "denominator": 65000000000
+      }
+    },
+    {
+      "label": "actual-loop3-doc-20261009-v195",
+      "accepted": true,
+      "complete_wall_ns": 28410894677,
+      "fixed_projection_ns": 65000000000,
+      "child_wall_ns": 26708585571,
+      "child_exit": 0,
+      "aggregate_CPU_ns": 38309365000,
+      "aggregate_CPU_limit_us": 128000000,
+      "group_peak_B": 2128678912,
+      "child_peak_RSS_KiB": 1863204,
+      "group_memory_max_B": 8589934592,
+      "CPU_affinity": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "thread_budget": 4,
+      "expected_test_names": [],
+      "aggregate_CPU_guard_triggered": false,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 28410894677,
+        "denominator": 65000000000
+      }
+    },
+    {
+      "label": "paired-whole-law-primary-20261009-v197",
+      "accepted": true,
+      "complete_wall_ns": 289449248,
+      "fixed_projection_ns": 32992412132,
+      "child_wall_ns": 23503577,
+      "child_exit": 0,
+      "aggregate_CPU_ns": 234071000,
+      "aggregate_CPU_limit_us": 32992413,
+      "group_peak_B": 26959872,
+      "child_peak_RSS_KiB": 27100,
+      "group_memory_max_B": 8589934592,
+      "CPU_affinity": [
+        0
+      ],
+      "thread_budget": 1,
+      "expected_test_names": [
+        "hnn::paired::tests::a_paired_source_law_keeps_its_port_on_the_subspace_on_pair_and_general_deposits"
+      ],
+      "aggregate_CPU_guard_triggered": false,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 289449248,
+        "denominator": 32992412132
+      }
+    },
+    {
+      "label": "paired-whole-law-paired-20261009-v197",
+      "accepted": true,
+      "complete_wall_ns": 1147446530,
+      "fixed_projection_ns": 3280508608,
+      "child_wall_ns": 870344556,
+      "child_exit": 0,
+      "aggregate_CPU_ns": 1080465000,
+      "aggregate_CPU_limit_us": 3280509,
+      "group_peak_B": 27213824,
+      "child_peak_RSS_KiB": 28264,
+      "group_memory_max_B": 8589934592,
+      "CPU_affinity": [
+        0
+      ],
+      "thread_budget": 1,
+      "expected_test_names": [
+        "hnn::paired::tests::a_reflector_is_dihedral_exactly_when_it_is_c_minus_i",
+        "hnn::paired::tests::the_pairing_is_typed_and_a_fixed_point_free_involution_needs_an_even_family",
+        "hnn::paired::tests::campaign_ones_five_classes_admit_no_pairing_and_the_alphabet_is_not_changed_to_fit",
+        "hnn::paired::tests::a_period_four_reflector_that_passes_declare_fails_the_dihedral_relation",
+        "hnn::paired::tests::the_founded_sign_matrix_is_refused_naming_its_first_failing_column",
+        "hnn::paired::tests::the_ring_the_source_and_the_port_shape_are_certified",
+        "hnn::paired::tests::the_admitted_case_builds_each_follower_column_from_its_leader",
+        "hnn::paired::tests::equivariance_names_the_first_failing_column_and_row",
+        "hnn::paired::tests::the_lift_is_an_involution_that_inverts_the_rotor_on_the_carrier",
+        "hnn::paired::tests::the_phase_convention_is_pinned_by_a_hand_computed_anchor",
+        "hnn::paired::tests::the_partner_strands_moment_and_face_are_the_dyad_image_of_the_strands",
+        "hnn::paired::tests::the_partner_read_refuses_where_normalization_or_rounding_would_break_it",
+        "hnn::paired::tests::a_port_that_a_later_change_takes_off_the_equivariant_subspace_is_refused_at_the_read",
+        "hnn::paired::tests::the_real_constitution_is_read_at_its_current_port",
+        "hnn::paired::tests::a_source_ring_behind_a_silent_ring_reads_and_one_behind_a_ticking_ring_is_refused",
+        "hnn::paired::tests::the_partner_adds_no_information_at_the_retained_quotient",
+        "hnn::paired::tests::one_actual_pair_deposit_takes_the_equivariant_port_off_its_subspace",
+        "hnn::paired::tests::the_paired_deposit_learns_both_strands_and_keeps_the_port_equivariant"
+      ],
+      "aggregate_CPU_guard_triggered": false,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 1147446530,
+        "denominator": 3280508608
+      }
+    },
+    {
+      "label": "paired-whole-law-executed-20261009-v197",
+      "accepted": true,
+      "complete_wall_ns": 15957794329,
+      "fixed_projection_ns": 32992412132,
+      "child_wall_ns": 15658867058,
+      "child_exit": 0,
+      "aggregate_CPU_ns": 15834536000,
+      "aggregate_CPU_limit_us": 32992413,
+      "group_peak_B": 34758656,
+      "child_peak_RSS_KiB": 36700,
+      "group_memory_max_B": 8589934592,
+      "CPU_affinity": [
+        0
+      ],
+      "thread_budget": 1,
+      "expected_test_names": [
+        "hnn::tests::executed::the_monodromys_variation_is_its_derivative_forward_and_in_reverse",
+        "hnn::tests::executed::the_dominant_multiplier_is_certified_or_refused_by_type",
+        "hnn::tests::executed::a_reading_is_zero_or_past_the_lattices_floor",
+        "hnn::tests::executed::the_covector_pairs_with_the_exact_variation_three_ways",
+        "hnn::tests::executed::the_covector_predicts_the_executed_growths_change",
+        "hnn::tests::executed::two_members_tied_in_growth_are_both_active",
+        "hnn::tests::executed::the_located_pairs_deposit_closes_its_slip_and_its_consumer_holds",
+        "hnn::tests::executed::a_port_holding_no_class_refuses_the_pair_deposit",
+        "hnn::tests::executed::a_restored_checkpoint_continues_exactly_over_successive_deposits",
+        "hnn::tests::executed::a_checkpoint_is_refused_onto_foreign_material_and_when_damaged",
+        "hnn::tests::executed::a_continuing_state_carries_the_receptions_end_inside_its_check"
+      ],
+      "aggregate_CPU_guard_triggered": false,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 15957794329,
+        "denominator": 32992412132
+      }
+    },
+    {
+      "label": "paired-whole-law-prediction-distance-20261009-v197",
+      "accepted": true,
+      "complete_wall_ns": 321300847,
+      "fixed_projection_ns": 1634379184,
+      "child_wall_ns": 53861371,
+      "child_exit": 0,
+      "aggregate_CPU_ns": 265553000,
+      "aggregate_CPU_limit_us": 1634380,
+      "group_peak_B": 27480064,
+      "child_peak_RSS_KiB": 28252,
+      "group_memory_max_B": 8589934592,
+      "CPU_affinity": [
+        0
+      ],
+      "thread_budget": 1,
+      "expected_test_names": [
+        "hnn::tests::prediction::the_closed_pair_contacts_are_the_deposits_distance"
+      ],
+      "aggregate_CPU_guard_triggered": false,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 321300847,
+        "denominator": 1634379184
+      }
+    },
+    {
+      "label": "paired-whole-law-prediction-storage-20261009-v197",
+      "accepted": true,
+      "complete_wall_ns": 308093943,
+      "fixed_projection_ns": 1634379184,
+      "child_wall_ns": 32714848,
+      "child_exit": 0,
+      "aggregate_CPU_ns": 244826000,
+      "aggregate_CPU_limit_us": 1634380,
+      "group_peak_B": 26947584,
+      "child_peak_RSS_KiB": 28368,
+      "group_memory_max_B": 8589934592,
+      "CPU_affinity": [
+        0
+      ],
+      "thread_budget": 1,
+      "expected_test_names": [
+        "hnn::tests::prediction::a_candidates_pair_storage_joins_its_antecedent_at_the_contacts_weight"
+      ],
+      "aggregate_CPU_guard_triggered": false,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 308093943,
+        "denominator": 1634379184
+      }
+    },
+    {
+      "label": "paired-whole-law-prediction-gain-20261009-v197",
+      "accepted": true,
+      "complete_wall_ns": 270594015,
+      "fixed_projection_ns": 1634379184,
+      "child_wall_ns": 7144070,
+      "child_exit": 0,
+      "aggregate_CPU_ns": 218930000,
+      "aggregate_CPU_limit_us": 1634380,
+      "group_peak_B": 25391104,
+      "child_peak_RSS_KiB": 23832,
+      "group_memory_max_B": 8589934592,
+      "CPU_affinity": [
+        0
+      ],
+      "thread_budget": 1,
+      "expected_test_names": [
+        "hnn::tests::prediction::the_pair_gain_is_the_joined_banks_determinant_and_a_neutral_member_does_not_move_it"
+      ],
+      "aggregate_CPU_guard_triggered": false,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 270594015,
+        "denominator": 1634379184
+      }
+    },
+    {
+      "label": "paired-whole-law-order41-20261009-v197",
+      "accepted": true,
+      "complete_wall_ns": 14017703960,
+      "fixed_projection_ns": 31303528088,
+      "child_wall_ns": 13699276170,
+      "child_exit": 0,
+      "aggregate_CPU_ns": 13877048000,
+      "aggregate_CPU_limit_us": 31303529,
+      "group_peak_B": 46886912,
+      "child_peak_RSS_KiB": 44276,
+      "group_memory_max_B": 8589934592,
+      "CPU_affinity": [
+        0
+      ],
+      "thread_budget": 1,
+      "expected_test_names": [
+        "hnn::tests::prediction::the_release_reads_the_located_pair_and_its_consumer_holds_at_seed_41"
+      ],
+      "aggregate_CPU_guard_triggered": false,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 14017703960,
+        "denominator": 31303528088
+      }
+    },
+    {
+      "label": "paired-whole-law-order42-20261009-v197",
+      "accepted": true,
+      "complete_wall_ns": 13620720407,
+      "fixed_projection_ns": 31303528088,
+      "child_wall_ns": 13326115370,
+      "child_exit": 0,
+      "aggregate_CPU_ns": 13505258000,
+      "aggregate_CPU_limit_us": 31303529,
+      "group_peak_B": 43982848,
+      "child_peak_RSS_KiB": 44720,
+      "group_memory_max_B": 8589934592,
+      "CPU_affinity": [
+        0
+      ],
+      "thread_budget": 1,
+      "expected_test_names": [
+        "hnn::tests::prediction::the_release_reads_the_located_pair_and_its_consumer_holds_at_seed_42"
+      ],
+      "aggregate_CPU_guard_triggered": false,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 13620720407,
+        "denominator": 31303528088
+      }
+    },
+    {
+      "label": "paired-whole-law-fixed41-20261009-v197",
+      "accepted": true,
+      "complete_wall_ns": 14837390095,
+      "fixed_projection_ns": 31303528088,
+      "child_wall_ns": 14523124756,
+      "child_exit": 0,
+      "aggregate_CPU_ns": 14702174000,
+      "aggregate_CPU_limit_us": 31303529,
+      "group_peak_B": 45326336,
+      "child_peak_RSS_KiB": 44916,
+      "group_memory_max_B": 8589934592,
+      "CPU_affinity": [
+        0
+      ],
+      "thread_budget": 1,
+      "expected_test_names": [
+        "hnn::tests::prediction::the_release_reads_a_located_map_that_fixes_its_antecedent_at_seed_41"
+      ],
+      "aggregate_CPU_guard_triggered": false,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 14837390095,
+        "denominator": 31303528088
+      }
+    },
+    {
+      "label": "paired-whole-law-fixed42-20261009-v197",
+      "accepted": true,
+      "complete_wall_ns": 15119775193,
+      "fixed_projection_ns": 31303528088,
+      "child_wall_ns": 14812122192,
+      "child_exit": 0,
+      "aggregate_CPU_ns": 14987868000,
+      "aggregate_CPU_limit_us": 31303529,
+      "group_peak_B": 46788608,
+      "child_peak_RSS_KiB": 45324,
+      "group_memory_max_B": 8589934592,
+      "CPU_affinity": [
+        0
+      ],
+      "thread_budget": 1,
+      "expected_test_names": [
+        "hnn::tests::prediction::the_release_reads_a_located_map_that_fixes_its_antecedent_at_seed_42"
+      ],
+      "aggregate_CPU_guard_triggered": false,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 15119775193,
+        "denominator": 31303528088
+      }
+    },
+    {
+      "label": "paired-whole-law-entrance-20261009-v197",
+      "accepted": true,
+      "complete_wall_ns": 2164748436,
+      "fixed_projection_ns": 5502325716,
+      "child_wall_ns": 1948248417,
+      "child_exit": 0,
+      "aggregate_CPU_ns": 2094719000,
+      "aggregate_CPU_limit_us": 5502326,
+      "group_peak_B": 55627776,
+      "child_peak_RSS_KiB": 38456,
+      "group_memory_max_B": 8589934592,
+      "CPU_affinity": [
+        0
+      ],
+      "thread_budget": 1,
+      "expected_test_names": [
+        "same_phase_intact_swap_has_one_native_source_moment_and_one_physical_motion",
+        "sparse_source_moments_enter_the_actual_loaded_port_with_exact_work",
+        "exact_source_reentry_preserves_the_entered_interior_and_counts_source_once",
+        "nonzero_offset_moments_drive_the_actual_loaded_port_without_marginal_source",
+        "an_observed_pair_deposit_changes_the_later_continuing_loaded_response"
+      ],
+      "aggregate_CPU_guard_triggered": false,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 2164748436,
+        "denominator": 5502325716
+      }
+    },
+    {
+      "label": "paired-whole-law-state-phase-20261009-v197",
+      "accepted": true,
+      "complete_wall_ns": 297339288,
+      "fixed_projection_ns": 32992412132,
+      "child_wall_ns": 33157418,
+      "child_exit": 0,
+      "aggregate_CPU_ns": 245965000,
+      "aggregate_CPU_limit_us": 32992413,
+      "group_peak_B": 24666112,
+      "child_peak_RSS_KiB": 27964,
+      "group_memory_max_B": 8589934592,
+      "CPU_affinity": [
+        0
+      ],
+      "thread_budget": 1,
+      "expected_test_names": [
+        "hnn::tests::constitution::a_receiving_deposit_absorbs_its_phase_comparisons_through_the_map_before_it"
+      ],
+      "aggregate_CPU_guard_triggered": false,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 297339288,
+        "denominator": 32992412132
+      }
+    },
+    {
+      "label": "paired-whole-law-state-sparse-20261009-v197",
+      "accepted": true,
+      "complete_wall_ns": 298471748,
+      "fixed_projection_ns": 32992412132,
+      "child_wall_ns": 38695240,
+      "child_exit": 0,
+      "aggregate_CPU_ns": 250948000,
+      "aggregate_CPU_limit_us": 32992413,
+      "group_peak_B": 25931776,
+      "child_peak_RSS_KiB": 27908,
+      "group_memory_max_B": 8589934592,
+      "CPU_affinity": [
+        0
+      ],
+      "thread_budget": 1,
+      "expected_test_names": [
+        "hnn::tests::constitution::a_sparse_checkpoint_restores_and_continues_exactly"
+      ],
+      "aggregate_CPU_guard_triggered": false,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 298471748,
+        "denominator": 32992412132
+      }
+    },
+    {
+      "label": "paired-deposit-lean-20261009-v196-prep",
+      "accepted": true,
+      "complete_wall_ns": 6543929863,
+      "fixed_projection_ns": 17000000000,
+      "child_wall_ns": 5642622103,
+      "child_exit": 0,
+      "aggregate_CPU_ns": 5175850000,
+      "aggregate_CPU_limit_us": 17000000,
+      "group_peak_B": 736268288,
+      "child_peak_RSS_KiB": 198556,
+      "group_memory_max_B": 8589934592,
+      "CPU_affinity": [
+        0
+      ],
+      "thread_budget": 1,
+      "expected_test_names": [],
+      "aggregate_CPU_guard_triggered": false,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 6543929863,
+        "denominator": 17000000000
+      }
+    },
+    {
+      "label": "paired-deposit-lean-20261009-v196-compile",
+      "accepted": true,
+      "complete_wall_ns": 11074881089,
+      "fixed_projection_ns": 21132554884,
+      "child_wall_ns": 10589415137,
+      "child_exit": 0,
+      "aggregate_CPU_ns": 6312754000,
+      "aggregate_CPU_limit_us": 17000000,
+      "group_peak_B": 4668145664,
+      "child_peak_RSS_KiB": 3789032,
+      "group_memory_max_B": 8589934592,
+      "CPU_affinity": [
+        0
+      ],
+      "thread_budget": 1,
+      "expected_test_names": [],
+      "aggregate_CPU_guard_triggered": false,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 11074881089,
+        "denominator": 21132554884
+      }
+    },
+    {
+      "label": "paired-deposit-import-20261009-v198-prep",
+      "accepted": true,
+      "complete_wall_ns": 5163986151,
+      "fixed_projection_ns": 17000000000,
+      "child_wall_ns": 4692282094,
+      "child_exit": 0,
+      "aggregate_CPU_ns": 4702057000,
+      "aggregate_CPU_limit_us": 17000000,
+      "group_peak_B": 305750016,
+      "child_peak_RSS_KiB": 198672,
+      "group_memory_max_B": 8589934592,
+      "CPU_affinity": [
+        0
+      ],
+      "thread_budget": 1,
+      "expected_test_names": [],
+      "aggregate_CPU_guard_triggered": false,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 5163986151,
+        "denominator": 17000000000
+      }
+    },
+    {
+      "label": "paired-deposit-import-20261009-v198-compile",
+      "accepted": true,
+      "complete_wall_ns": 7314113921,
+      "fixed_projection_ns": 21132554884,
+      "child_wall_ns": 6862470801,
+      "child_exit": 0,
+      "aggregate_CPU_ns": 4871672000,
+      "aggregate_CPU_limit_us": 17000000,
+      "group_peak_B": 1141043200,
+      "child_peak_RSS_KiB": 3744792,
+      "group_memory_max_B": 8589934592,
+      "CPU_affinity": [
+        0
+      ],
+      "thread_budget": 1,
+      "expected_test_names": [],
+      "aggregate_CPU_guard_triggered": false,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 7314113921,
+        "denominator": 21132554884
+      }
+    }
+  ],
+  "scope": "Paired source law preserves its port on the paired subspace; pair routes and general features at NormalLaw; founding prior and state restore. General features are not an end-to-end World compose_return comparison. CUDA typed refusal only; quadratic invariance owed#62.",
+  "native_build_cores": 4,
+  "Cargo_jobs": 2,
+  "runtime_and_Lean_cores": 1,
+  "resident_ceiling_B": 8589934592,
+  "prior_loop2_acceptance_inherited": false,
+  "production_edits_by_queue": false,
+  "push_or_merge_by_queue": false,
+  "all_prior_failures_preserved": true,
+  "all_quiescent_released": true,
+  "runtime_budgets_measured_and_frozen_before_launch": true,
+  "limits_raised_after_launch": false
+}

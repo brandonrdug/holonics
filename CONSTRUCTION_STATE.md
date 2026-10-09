@@ -30,8 +30,11 @@ The helical code, the encoding every Holon carries, is defined in
     stays equivariant and the partner face exact. Where the strands move disjoint columns one deposit
     closes both (slip 8 to 0); where they share columns the slip descends toward the law's incompatibility
     with the pairing. It is the first learned helical code, on the located-pair route.
-- **Not built:** the paired source law on the comparison's general route (step 3, loop 3), and the
-  linking reading of closed strands.
+  - the paired source law (step 3, loop 3; the same receipt). A source law that declares the pairing
+    projects each deposit onto the paired subspace, from the covectors that reached it, and every slip
+    reader reads one founding prior. It is measured on the pair routes and on general features at the
+    normal law, not yet in a participating world's comparison.
+- **Not built:** the linking reading of closed strands.
 
 **October 9: the first learned landing** (#73; the
 [medium-of-joints record](research/records/2026-10-08_THE_MEDIUM_OF_JOINTS_SNAPS_CRACKLES_POPS_OR_FLOWS_AND_ITS_CURRENTS_CURVE_ITS_CONSTITUTION.md) §7).

@@ -1,0 +1,35 @@
+{"phase": "precompile sealed JSON read", "wall_ns": 248888313}
+{"phase": "precompile metadata", "wall_ns": 330626519}
+<queue-admission>/paired-deposit-lean-20261009-v196/source-v1/Holonics/HNN/PairedDeposit.lean:68:0: warning: automatically included section variable(s) unused in theorem `Holonics.HNN.PairedDeposit.reversal_identity`:
+  [DecidableEq m]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [DecidableEq m] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+<queue-admission>/paired-deposit-lean-20261009-v196/source-v1/Holonics/HNN/PairedDeposit.lean:85:0: warning: automatically included section variable(s) unused in theorem `Holonics.HNN.PairedDeposit.mul_commuting_stays`:
+  [DecidableEq n]
+  [DecidableEq m]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [DecidableEq n] [DecidableEq m] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+<queue-admission>/paired-deposit-lean-20261009-v196/source-v1/Holonics/HNN/PairedDeposit.lean:178:0: warning: automatically included section variable(s) unused in theorem `Holonics.HNN.PairedDeposit.projection_pairing`:
+  [DecidableEq n]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [DecidableEq n] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+'Holonics.HNN.PairedDeposit.lift_pow' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.HNN.PairedDeposit.reversal_identity' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.HNN.PairedDeposit.mul_commuting_stays' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.HNN.PairedDeposit.deposit_stays_equivariant' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.HNN.PairedDeposit.symmetrized_commutes' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.HNN.PairedDeposit.symmetrized_residual' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.HNN.PairedDeposit.rowNorm_smul_le' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.HNN.PairedDeposit.symmetrized_rowNorm_le' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.HNN.PairedDeposit.projection_equivariant' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.HNN.PairedDeposit.projection_pairing' depends on axioms: [propext, Classical.choice, Quot.sound]
+{"phase": "Lean compiler", "wall_ns": 9154875928, "exit": 0}
+{"phase": "postcompile sealed JSON read", "wall_ns": 233853445}
+{"phase": "postcompile metadata", "wall_ns": 337759543}
+{"kernel_accepted": true, "compiler_exit": 0, "compiler_wall_ns": 9154875928, "axioms": {"Holonics.HNN.PairedDeposit.lift_pow": ["propext", "Classical.choice", "Quot.sound"], "Holonics.HNN.PairedDeposit.reversal_identity": ["propext", "Classical.choice", "Quot.sound"], "Holonics.HNN.PairedDeposit.mul_commuting_stays": ["propext", "Classical.choice", "Quot.sound"], "Holonics.HNN.PairedDeposit.deposit_stays_equivariant": ["propext", "Classical.choice", "Quot.sound"], "Holonics.HNN.PairedDeposit.symmetrized_commutes": ["propext", "Classical.choice", "Quot.sound"], "Holonics.HNN.PairedDeposit.symmetrized_residual": ["propext", "Classical.choice", "Quot.sound"], "Holonics.HNN.PairedDeposit.rowNorm_smul_le": ["propext", "Classical.choice", "Quot.sound"], "Holonics.HNN.PairedDeposit.symmetrized_rowNorm_le": ["propext", "Classical.choice", "Quot.sound"], "Holonics.HNN.PairedDeposit.projection_equivariant": ["propext", "Classical.choice", "Quot.sound"], "Holonics.HNN.PairedDeposit.projection_pairing": ["propext", "Classical.choice", "Quot.sound"]}, "selector_count_matches": true, "standard_axioms_only": true, "metadata_unchanged": true, "broad_library_checked": false}
