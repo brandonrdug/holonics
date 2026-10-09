@@ -246,10 +246,20 @@ and exact bit costs]
 1. **The counterfactual image passage.** The factual passage and one lawfully changed passage go
    through the same contemporary Word and World, and their oriented later difference is read at the
    comparison.
-   - A partial checker exists but is uncompiled: the port Holon on `claude/hnn-ask-loop`
-     (`e11ad9f46`). It keeps one persistent `z` per key, with `ξ_t = c_t + N_t z` and returns
-     restricting `P(c_t + N_t z) + Q a_t = b_t`. It retires a key only on certified emptiness.
-   - It still needs the joint transition and observation maps of the coupled World and contact Word.
+   - A historical precursor, never compiled: the port Holon on `claude/hnn-ask-loop` (`e11ad9f46`,
+     not an ancestor of current main). It kept one persistent `z` per key, with `ξ_t = c_t + N_t z`
+     and returns restricting `P(c_t + N_t z) + Q a_t = b_t`, and it retired a key only on certified
+     emptiness. It is not the live implementation.
+   - The current join is owed by
+     [the receiving-phase record](2026-10-08_THE_RECEIVING_PHASE_COMPARISON_RETAINS_AN_EXACT_FAMILY_AND_ITS_PROBE_IS_A_DECLARED_LEVERAGE.md)'s
+     §7 (C1b, #73). The learned World model declares port Holon keys of the HNN's own kind, read on the
+     same Dirac commit and Robin termination as the World. Each key keeps a correlated joint image: its
+     state fibre at the current crossing. The complete `(a, b)` preimage filter restricts it, and only
+     an exact annihilator eliminates a key. The memory advances through every actual World step. Its
+     source is in progress, and no acceptance is claimed.
+   - The closed loop still needs the joint transition and observation maps of the coupled World and
+     contact Word: each later incident wave depends on the returned ones through the continuing
+     native source (C2's finite forward cover).
 2. **The World-sensitive circuit.** The Robin tangent joined with contact C/K/D and receiving
    material. Today `physical/contact.rs` admits no participating World, and `word/action_return.rs`
    deposits only the receiving map.
