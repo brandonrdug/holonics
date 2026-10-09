@@ -326,40 +326,57 @@ Its second part states the perfected laws:
    located slips, released and held families, absorbed and residual coordinated substitutions
    against truth, and CRT recovery.
 
-   **Step 2: the partner face on the HNN carrier** (`agent-inferred` design, read from a source
-   survey of `f034a7225`, for review before any build). The HNN carries no dyad. Its ring reflector
-   `F_g` is a port involution, checked only for `F_g² = 1` (`hnn/field.rs:730`) and read only as the
-   Bombe stage `ρ⁻ᵐFρᵐ`. Every declaration in the repository is `p ↦ −p`. That satisfies the
-   dihedral relation by arithmetic but is never required to, and it fixes port 0. The missing
-   terms, each with its equation:
-   1. the carrier lift of `F_g`: `(B_g v)[2F_g(i)+r] = v[2i+r]`, an involution because `F_g² = 1`;
-   2. the dihedral relation `F_g(F_g(i)+1) = i−1`, so that `B_g P_g B_g = P_g⁻¹`;
-   3. a fixed-point-free class involution `σ` declared on the field (the default `F_g` fixes port
-      0 and cannot serve);
-   4. the source port's equivariance, `B_g E_g = E_g Σ_σ`. The founded sign matrix `E_0` does not
-      have it;
-   5. the tick: a uniform tick, or `A∘σ = A` on the located route, with no pair ports or a
-      pair-port reversal law;
-   6. a located moment chart, `T_t = P^t ⊗ 1` for `t ∈ 0..=d_g`, which is closed under the dyad,
-      `B T_t B = T_{d_g−t}`. Today `PassageChart::moment` admits only `t ≤ 2`;
-   7. the Lean bridge `moment l = U^{n−1}·strandFace U⁻¹ (I∘E) l`, and the partner law at the
-      consumer.
+   **Step 2: the partner face on the HNN carrier** (`agent-inferred` design, corrected by Epime's
+   source review of `f034a7225` and `6269cc5af`; nothing is built). Three objects are named apart:
+   - `F_g`, the ring's port permutation;
+   - `B_g`, its realified carrier lift, `(B_g v)[2F_g(i)+r] = v[2i+r]`;
+   - `σ`, the class pairing.
 
-   **Dissipation makes the partner informative** (`proved-derived`, owed in Lean). The general law
-   needs no unitarity. Write `V = B U B`. The recurrence face `moment_U(w) = Σ_k U^{n−1−k} E(w_k)`
-   then gives `moment_U(σ̄u) = Σ_j U^j B E(u_j) = B Σ_j V^j E(u_j)`.
-   - For a conservative ring, `U` orthogonal, `V = U⁻¹` and the partner's face is
-     `B U^{−(n−1)} moment_U(u)`. It is a fixed transform of the strand's face: redundant, a pure
-     check.
-   - The HNN's founded rings are damped, `U = ρP` with `ρ < 1`, and there `V = ρP⁻¹ = Uᵀ`. The
-     partner's face is `B Σ_j (Uᵀ)^j E(u_j)`: the strand read through the adjoint, in forward
-     order. It weights the oldest letters most, where the strand's own face weights the newest
-     most. For `n ≥ 2` and an encoder whose images span the carrier, no fixed map recovers it from
-     the strand's face, because the weights `ρ^{2k−(n−1)}` differ position by position.
-   - So a duplex on a dissipative carrier holds both fading directions: the forward face and the
-     adjoint, backward face, which is the shape of the learning covector's return. The
-     antiparallel strand is the adjoint passage exactly when the transport dissipates; on a
-     conservative carrier it is the inverse passage, and redundant.
+   The HNN carries no dyad. `F_g` is checked only for `F_g² = 1` (`hnn/field.rs:730`) and read only
+   as the Bombe stage `ρ⁻ᵐFρᵐ`. The generic reflector keeps promising only that. The dihedral
+   relation `F_g(F_g(i)+1) = i−1`, which makes `B_g P_g B_g = P_g⁻¹`, is checked at the admission
+   and certificate of a **paired carrier**, never by tightening `Ring::declare`.
+
+   **The pairing needs an even family.** `FieldDeclaration::campaign_1` has five classes, so no
+   fixed-point-free involution exists on its one alphabet. The common alphabet is not changed to
+   fit. A paired carrier declares either an even admitted paired class family, or a typed pairing
+   between two partner charts or roles, the free swap on their disjoint union. Any other pairing is
+   refused.
+
+   The terms still missing, each with its equation:
+   1. the paired carrier's admission, which certifies `F_g² = 1`, the dihedral relation and the
+      declared `σ`;
+   2. the source port's equivariance `B_g E_g = E_g Σ_σ`, and its descent through the quotient.
+      The founded sign matrix `E_0` has neither;
+   3. the tick: a uniform tick for the recurrence law. For letter-selected serial screws the law is
+      `J S_a J = S_{σ(a)}⁻¹`. That reduces to `A∘σ = A` only on a common fixed-generator rotor
+      chart with its conjugacy declared;
+   4. no pair ports, or a pair-port reversal law;
+   5. a located moment chart, `T_t = P^t ⊗ 1` for `t ∈ 0..=d_g`, closed under the dyad,
+      `B T_t B = T_{d_g−t}`. Today `PassageChart::moment` admits only `t ≤ 2`;
+   6. the Lean bridge `moment l = U^{n−1}·strandFace U⁻¹ (I∘E) l`, and the partner law at
+      `SourceMoment::encode` and `open_storage`. That consumer joins the phase counts, the
+      normalization and rounding, the pair ports, the learned contemporary encoder and the modulus
+      refusal: a uniform exact recurrence is not automatically their law.
+
+   **The general partner law and its scope** (`proved-derived` for the identity, owed in Lean).
+   - **The identity.** For a uniform tick, an involution `B` and `B E = E σ`, the recurrence face
+     `moment_U(w) = Σ_k U^{n−1−k} E(w_k)` gives
+     `moment_U(σ̄u) = Σ_j U^j B E(u_j) = B Σ_j (BUB)^j E(u_j)`.
+   - **The redundant case.** When `BUB = U⁻¹` (a stated conjugacy, not implied by orthogonality
+     alone), the partner's face is `B U^{−(n−1)} moment_U(u)`: redundant, a pure check.
+   - **The adjoint case.** For `U = ρP` with `BPB = P⁻¹`, `BUB = ρP⁻¹`. This is `Uᵀ` only in the
+     declared Euclidean carrier. In a material metric `G` the physical adjoint is `G⁻¹UᵀG`, and
+     the actual word, material and clock return carry further terms. Within the Euclidean scope,
+     the partner's face is the strand read through `Uᵀ` in forward order: the backward fading,
+     the shape of the covector's return.
+   - **Information is not established by damping.** The differing weights `ρ^{2k−(n−1)}` rule
+     out a common linear map only under sufficient independent variation at each position. An
+     injective forward face can still admit a nonlinear decoder. The acceptance is therefore
+     fixed at the actual retained, grain-level quotient:
+     - either two admitted sources with the same forward retained face and distinct partner faces,
+       with exact residuals;
+     - or a report of redundancy.
 
    **Deferred to later steps, named.**
    - Step 2: the partner's face on the HNN carrier, `m(σ̄u) = B U⁻⁽ⁿ⁻¹⁾ m(u)`, which needs a
