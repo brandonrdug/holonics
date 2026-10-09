@@ -1,0 +1,1893 @@
+{
+  "namespace_fingerprint": {
+    "sha256": "640b03c4e30eeb2a0675bfcf98ea558bf39848f406689345c95874b395a417e3",
+    "bytes": 121805
+  },
+  "provenance_distinction": "30 native acceptances + 86 unchanged historical tuples + accepted finite-cut leaf. Publication and v9 acceptance do not claim 117 new individual provider checks.",
+  "original_binding_manifest": {
+    "sha256": "dc56954c06893fc9e98d6d3ceda8774678ba710fd200dd1353425fa5ec6edf14",
+    "bytes": 76978
+  },
+  "original_historical_manifest": {
+    "sha256": "a7fb209a3ad4e67da36ddf990eba1ee7efebe6bc87880c97fc5939e53bb7493c",
+    "bytes": 180043
+  },
+  "accepted_leaf_receipt": {
+    "sha256": "9fc3889ac0e08f269d5ced2568fa2869083ac3c1ac16b3759aef2016da4c51e6",
+    "bytes": 3162
+  },
+  "providers": [
+    {
+      "module": "CMActualAffineIdealTransport",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualAffineIdealTransport.lean",
+      "source_pin": {
+        "sha256": "8d7b028d3e6e608124da0c690ef419fde7fc21bb559a4a4b5a85d75a8b1c8cf5",
+        "bytes": 2930
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "01a81c5b28b82a55489c4c7e2c24489fd3198f423c0708895a5f3609d5cfa84d",
+          "bytes": 139672
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMActualAmbientCartierStalk",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualAmbientCartierStalk.lean",
+      "source_pin": {
+        "sha256": "35a561bbcde184d2ed19a89aa37095106f1b1ead9dd1a71dd84bcb5e5d341e7c",
+        "bytes": 5394
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "24c4ba1d70de1460c070bdeb20addc018f1f8caa505b6a343a55c3df71fa6908",
+          "bytes": 91120
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMActualAmbientCartierStalkJoin",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualAmbientCartierStalkJoin.lean",
+      "source_pin": {
+        "sha256": "24f9287123f4e29c420ce4346996bff8a8ed7506b1350d515cb4c0d645ec5946",
+        "bytes": 20995
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "0a751e41f8feb52583817f1fe035b8e4bc4ca74e2a90d968d73d7ce540ef5925",
+          "bytes": 284920
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMActualAmbientRegularFaces",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualAmbientRegularFaces.lean",
+      "source_pin": {
+        "sha256": "c40938bbb2112f2c5720f3d43e3e99cbdde841b9c3ff41f340da1900d333f505",
+        "bytes": 248
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "c097e545187fe031476321c30ca6e74f478f64e77c1b2e4f9fead0f63180011d",
+          "bytes": 2072
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMActualDiagonalCartierData",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualDiagonalCartierData.lean",
+      "source_pin": {
+        "sha256": "139f5eef097bc18feecc5479733d691aa8e5e3bb4d461397efe3e8490da03978",
+        "bytes": 8421
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "83bd9176b90febb65a4a50a76b8e8d04efb42755eb544724fbb4c87933bf524d",
+          "bytes": 232128
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMActualFixedCartierData",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualFixedCartierData.lean",
+      "source_pin": {
+        "sha256": "ad3c959a1cf1ffd1c53932bf5ec8d5d091cbbdf9c98dbe9ae30c06b500ba44e6",
+        "bytes": 6471
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "3b637e4253b868670a52f99eb4ae272de4285e63e5631622323be66b785f6f4b",
+          "bytes": 185496
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMActualFixedChartIdealTransport",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualFixedChartIdealTransport.lean",
+      "source_pin": {
+        "sha256": "c466824d5f5a4fc51598a3642597059bc12b7a953799d3a982a3401c507b1540",
+        "bytes": 4507
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "03ab452e54030d2e82982bb4dcac53e272be58dc45461f64eeca4fd9d709588f",
+          "bytes": 98816
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMActualFixedIdealJoin",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualFixedIdealJoin.lean",
+      "source_pin": {
+        "sha256": "be754174f9892f3a9b553bb28d02696c35b1153cea092bf7618d6f42dd30476e",
+        "bytes": 2317
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "6a9cb949930cab0e6626e25c7382d60d95aaae3c7daa575c0be059f1365908df",
+          "bytes": 31632
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMActualFixedIntrinsicLength",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualFixedIntrinsicLength.lean",
+      "source_pin": {
+        "sha256": "5e0042ce67dde6919b73cd832a17f43660ea38e4e4f2dd057703d32a36ab0f00",
+        "bytes": 4680
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "ead271df555b5396a757e71e3a68c7e2f82697214d15a8e519b4a483f915a78d",
+          "bytes": 53904
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMActualFixedIntrinsicStalk",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualFixedIntrinsicStalk.lean",
+      "source_pin": {
+        "sha256": "307c915ae0d56742192c4f2d91b59f6dc078f007fb22265b2449cfef5bf6786d",
+        "bytes": 9508
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "da4c7d17e533b9c3e2ebd8054c7860bf4ce70fe57cd02a046e61637d48694a8d",
+          "bytes": 148880
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMActualFixedOpenCover",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualFixedOpenCover.lean",
+      "source_pin": {
+        "sha256": "d700897694580f36ce5135981f1dcecb190a9b8b2fe95776309a7e89c232c4c1",
+        "bytes": 2292
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "d7875484e3290f7cd8da4b193c3a4ae198975545d182265c64b3d6b2d704aa71",
+          "bytes": 51864
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMActualFixedOriginSupport",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualFixedOriginSupport.lean",
+      "source_pin": {
+        "sha256": "1c82c0c9e5602b53f1a9f44aa6fa652dcde23a8fff796a8016b4d0ea1fffee8b",
+        "bytes": 10972
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "3c3e203f87e9f424230414ea7bade44dc6836a13c6259eab75e75d28d511f394",
+          "bytes": 221688
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMActualFixedOverlapEmpty",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualFixedOverlapEmpty.lean",
+      "source_pin": {
+        "sha256": "58911ca40504998838b18cd3d9219f953de8eaffd6b2a6ca8c57d22efac807a8",
+        "bytes": 3841
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "6beda44ca0073b336bea57d87f0b96b1008757bfb5d9ca15b2e1b47759d1cd9a",
+          "bytes": 90416
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMActualFixedResidueDegree",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualFixedResidueDegree.lean",
+      "source_pin": {
+        "sha256": "b442f0af8a9fabbd9e2b61c0f9080ba639a896b605c0847fa1e0454b5275e14f",
+        "bytes": 5261
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "304e6323ccefe4c1b020e2092c90cbf3c951cfd45324a69ef7a2762c65a63696",
+          "bytes": 87352
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMActualFixedStalkLength",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualFixedStalkLength.lean",
+      "source_pin": {
+        "sha256": "bf3d67def3f577650179c1fdf7109b039767b6d865432f66141c0da68027dd39",
+        "bytes": 7765
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "2918a3c25c6819cbbe064ad775d5adfa4745b6c91088920865745e44bd6eebe5",
+          "bytes": 117104
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMActualGraphAffineEquationCover",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualGraphAffineEquationCover.lean",
+      "source_pin": {
+        "sha256": "491441f76385cb5a4eb4fa1a2ec3a01b16187e2c5026eacadea86a33b8b07cba",
+        "bytes": 7233
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "acb4735a8c3e9cbde234db49d4ffcdad9fc54bd38ee8a657534170861b21ccd2",
+          "bytes": 230360
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMActualGraphDiagonalLengthDegree",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualGraphDiagonalLengthDegree.lean",
+      "source_pin": {
+        "sha256": "c33d257a647abe4a1febaeff05e4777e6866fd24122e57385fbfaaf2c212f189",
+        "bytes": 3778
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "6c8310201a9318de1bde3ced0ab0eb9688b7fb016f14e963aff97184dd4a6c21",
+          "bytes": 77816
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMActualGraphDiagonalMultiplicity",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualGraphDiagonalMultiplicity.lean",
+      "source_pin": {
+        "sha256": "852a01a8d628b2f9a19f3d85285246ea51988c19ed65bad880691cb23aee4fc2",
+        "bytes": 5775
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "f5e17a416ba33d244dcd89f9f3c9be84f7cff2b736014d6b2b5022492bfc2069",
+          "bytes": 73384
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMActualGraphDiagonalTorComparison",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualGraphDiagonalTorComparison.lean",
+      "source_pin": {
+        "sha256": "4fe2235fc6cc1624fbeee96c546ca3547963934f2f6da0cbde4988fbf99e24e8",
+        "bytes": 10369
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "06ce121271247fe51dc7104d38e884024781fdc14af9c51b9107cd5749d4dfb3",
+          "bytes": 209008
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMActualRestrictedChartCartierData",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualRestrictedChartCartierData.lean",
+      "source_pin": {
+        "sha256": "167973147af17ac011a075391fa754ca7434d3f76df903e8513968f83f444c80",
+        "bytes": 3609
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "d9b17aab19214009c38d0b1cff5bbf9ca43520d5f1efd1443690ba42714436c7",
+          "bytes": 64832
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMActualRestrictedFixedSupportCover",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualRestrictedFixedSupportCover.lean",
+      "source_pin": {
+        "sha256": "c4455cff447327f9a8eea55812ed5a4e3c41e169c7d4a5a9b952ba36a9a7d75d",
+        "bytes": 7049
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "00dde32ef27501abb755820b277976ccdcb70463a9f561883d752299044ae5b9",
+          "bytes": 215192
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMActualRestrictedYEquation",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualRestrictedYEquation.lean",
+      "source_pin": {
+        "sha256": "34e2399a4d985966ddad55adbfe808ff783bfb7b3e76acba0cbdd84035e8d3be",
+        "bytes": 6194
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "f1dd9e6995fa60a94b41f2657cc99fda6620675aaae53a001ccb4081d8dce59d",
+          "bytes": 215560
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMActualRestrictedYLength",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualRestrictedYLength.lean",
+      "source_pin": {
+        "sha256": "286098f359b132ccc4b8b73b1ace9aaf4b268b3df034d8f2ecdd57dbcb9a64c2",
+        "bytes": 6097
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "f7b225470fb604f89458815bc51f40b74710f39dc61c1b5278d81bbfe7ca8f01",
+          "bytes": 166624
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMActualRestrictedZEquation",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualRestrictedZEquation.lean",
+      "source_pin": {
+        "sha256": "f86149a8ad26270f04bc0b0f43a47c746ca49ff9923928f0c0097ca9fa6b3e31",
+        "bytes": 5703
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "b3e6867980a444c6569c7e4b2985bdfd545122520aea954d0563f564dc550a06",
+          "bytes": 170232
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMActualRestrictedZLength",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualRestrictedZLength.lean",
+      "source_pin": {
+        "sha256": "432e73a63fb6203e3463693caf770d1ca5b81f95c6ae53f7a80494a55dc6c2f5",
+        "bytes": 3375
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "e2cc17efb3bd0c9cf74e04c0da98a02d77c2afe2ffdb709f1e60a493aa360947",
+          "bytes": 93504
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMActualYRegularFaces",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualYRegularFaces.lean",
+      "source_pin": {
+        "sha256": "36792a6e83aca645d7d3672cec94dc80e684a3706cedccc708352f8317b1014f",
+        "bytes": 4563
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "a13bb03e415cb14998a2724337585fcb0cec385ad85141b2f0221acefc6d76e5",
+          "bytes": 99504
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMActualZRegularFaces",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualZRegularFaces.lean",
+      "source_pin": {
+        "sha256": "3d62f8d95e4e36675ce4a9f2fa7948659a2b530b2b0076d4de37ef4ab2461994",
+        "bytes": 4878
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "61281e0aee1d6c5d4f4307233d5b5e47d927a8818b03f3cc7707656615b76eeb",
+          "bytes": 101672
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMAffineEqualizer",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMAffineEqualizer.lean",
+      "source_pin": {
+        "sha256": "8a396d5469b371f424c3fa918145f790fce1c63363f7e979c48ccadfd1d1d980",
+        "bytes": 6636
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "90fafc05157dfc2f4848cae492dfeacc2109916c4f673c13f255fbc7bbe6f7d9",
+          "bytes": 297680
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMAmbientAwayIdeals",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMAmbientAwayIdeals.lean",
+      "source_pin": {
+        "sha256": "c845b57224da9b81178a5e3c7a6bf37bd5c6a4e419ab368227315499ce4d1064",
+        "bytes": 2174
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "397dbf0cca2d8d78945dd9c3ba98e9006e608bbb67d2b39f5141e3523d46dbfa",
+          "bytes": 62928
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMAmbientPairCover",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMAmbientPairCover.lean",
+      "source_pin": {
+        "sha256": "636bbce515ef2964e3455c2c488ebdaf4a50e14aa60753465b2500e62428100f",
+        "bytes": 2060
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "802b139311460317b396c688168baed9ceb98041d0ad0fe675610ed3b84f4c64",
+          "bytes": 100776
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMCartierScalarResolution",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMCartierScalarResolution.lean",
+      "source_pin": {
+        "sha256": "2565e7ec30028d13dde892c2674838eecb730145a099a1c975df6660fa618bae",
+        "bytes": 7624
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "e931ed07f8c4fdaa4886b3e078af0c3a5d701442baa22a020a10a627b5c28eeb",
+          "bytes": 293704
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMCartierStalkNaturality",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMCartierStalkNaturality.lean",
+      "source_pin": {
+        "sha256": "dc4066badbe7ee90a5e80a29bbc6e364760a354ae8713c82669b2649aa1410fc",
+        "bytes": 4797
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "3ea5107362d5ce56aafbb8202cd1672f96c6093a8f8470509d658ddf26226c3f",
+          "bytes": 214248
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMCartierTorZeroQuotient",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMCartierTorZeroQuotient.lean",
+      "source_pin": {
+        "sha256": "7a4a6bb58f0f4d772f27280cb160ffbe85611bb966c453d870a435d25e260bf8",
+        "bytes": 2201
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "cfc0b2c0838430117e581cde76809237877c08e82f7534ada37499efa64c2ae0",
+          "bytes": 61688
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMChartCover",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMChartCover.lean",
+      "source_pin": {
+        "sha256": "ffbec2912f198e13ac25f2082c13a1aab37f21b2964d9390aa47fc6def192c6f",
+        "bytes": 3278
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "e5f6c066b5b664feca6230ca0cf63518759f1a4007c7d1bb6d6f288f87fa6980",
+          "bytes": 188032
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMChartDerivativeCover",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMChartDerivativeCover.lean",
+      "source_pin": {
+        "sha256": "4c09f85828b97a450266689de06e3b32b86e6b28a18d7cb5ae0fde87e5b6bf39",
+        "bytes": 4327
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "159effb979824a7eb15f32231150e1172e158bfa4da8bc1c7783e2a48dfa003d",
+          "bytes": 306808
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMChartStability",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMChartStability.lean",
+      "source_pin": {
+        "sha256": "f8e898fb01148fc9062f498a8593125c292ccde19334102c04a020d9b79c84d5",
+        "bytes": 3498
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "955944275669ca6b2890bf6435c8402603468ec485659fb489aa954eefad074b",
+          "bytes": 82536
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMComplexBase",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMComplexBase.lean",
+      "source_pin": {
+        "sha256": "a0126c0503ebc613274a7e2a2471806e681e2a7df5ace86d6d16f64ea57f9b0d",
+        "bytes": 3725
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "46e1bd7de582a7ede779c92ccf418e8ca4024491f7f93dcd12fdee32df7d0bbb",
+          "bytes": 150192
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMComplexGraph",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMComplexGraph.lean",
+      "source_pin": {
+        "sha256": "4e09eb91ea4abe521e87ea792e1136feb403933c36a661e05a5c9e6eceb2cad4",
+        "bytes": 2139
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "c896e974bf526e825587626dbea044e5110b9e12effa23cc92c7624d07e4dded",
+          "bytes": 37496
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMComplexGraphCore",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMComplexGraphCore.lean",
+      "source_pin": {
+        "sha256": "85939b7c43b85d73b9f54ff658489c6017dffebc4d7bbd4b57af5beda6e640a3",
+        "bytes": 2106
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "07a6c0eb2ceea02999ce830ffe33380268d4386a59a7f847d8c5f36a6008f8b1",
+          "bytes": 34112
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMCoordinateRingOnly",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMCoordinateRingOnly.lean",
+      "source_pin": {
+        "sha256": "3963ff580696670e62abe5c6fc6edfee2a3199142366df7a622f80c0ebbac2f9",
+        "bytes": 1011
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "492b664135feb4db01f70f574aa22b650a59fa70ed809d81710ddf3e48546aa0",
+          "bytes": 23904
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMCoordinateTransport",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMCoordinateTransport.lean",
+      "source_pin": {
+        "sha256": "e413fdb778b63c1c6a415dc948fbedd4305bf3af3c1dc35199b05cb25c876454",
+        "bytes": 1209
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "812f7a088b3a85f391c2e4a2ccdf9887e96ac7350c528b4ee5db6c0af5875ef3",
+          "bytes": 44952
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMCurveCore",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMCurveCore.lean",
+      "source_pin": {
+        "sha256": "be35778bf01201076ef13c75585f4b6edfdeed718f860f385c77d45d9d7037b8",
+        "bytes": 803
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "407b25b15f25df1c9ed9f9108514ca92fd15973184994e98d3955c8617bc84e9",
+          "bytes": 85656
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMDegreeZeroOverlap",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMDegreeZeroOverlap.lean",
+      "source_pin": {
+        "sha256": "4e12fe5868a2da10492ff0f685287c31ff866895225c1a408043d488c3f27963",
+        "bytes": 3224
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "754e1f8739ff8785028f1522be882474fa7257ef1fe885b7e22df4066d828dae",
+          "bytes": 76856
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMFixedChartLimit",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMFixedChartLimit.lean",
+      "source_pin": {
+        "sha256": "07adb4fb55a480d53597f203f1a3fa60f94aa6aeff3fd8751f3711efc5263d2f",
+        "bytes": 1876
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "2e892e6ba9c62f2cfba50557df4c34e79ac544fa9cc062119875cc5ed35f283c",
+          "bytes": 101776
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMGlobalAmbientFaceCover",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMGlobalAmbientFaceCover.lean",
+      "source_pin": {
+        "sha256": "8f884e0347c9107f6e1aaf1cf1302cfaa4816bffa06c5657c6ee351aae3ee3ef",
+        "bytes": 4892
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "3c48c23dadc5a083c57acb1917efcf6b7eb021958aa0d5136d1ed7d8d31e0e66",
+          "bytes": 87088
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMGlobalRegularEquationCover",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMGlobalRegularEquationCover.lean",
+      "source_pin": {
+        "sha256": "303a6a0b51747ca63dc5301f41d051d5c9683089e809f757f65aead0a0e7b78e",
+        "bytes": 2965
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "7a746c18313aa02d473445a755b54974989d83caaf51a0d6a77578c65644b448",
+          "bytes": 70000
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMGradedDescent",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMGradedDescent.lean",
+      "source_pin": {
+        "sha256": "6622cdf14e43570fcedfddeef5cc409d995978275db90320e12e012c47071efc",
+        "bytes": 5235
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "cbac32096e77e9c50d4541a1b6efdff59632cd04b69a423891dc5820b94eab3a",
+          "bytes": 148744
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMGraphAffine",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMGraphAffine.lean",
+      "source_pin": {
+        "sha256": "8d47974993c58da79d4394156217c797f8966cf59a199b63e600df80ee40bb43",
+        "bytes": 6940
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "89f25fe01b996a0396dc1651822abe5fc4f218b760dd3f28d4516b9166ee6175",
+          "bytes": 240080
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMGraphChartPullback",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMGraphChartPullback.lean",
+      "source_pin": {
+        "sha256": "311b1be0b776ad37a01a7b623ed05fc24a17b585f7ab5681fdfad987f86f3ee8",
+        "bytes": 1719
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "47803e10c2e81450bbce37bfd994cc4ce2362b6a8c0ee82464bc6d675f12ed42",
+          "bytes": 48368
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMGraphHomogeneous",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMGraphHomogeneous.lean",
+      "source_pin": {
+        "sha256": "3ba4bfb0a2f923f9a1e6282dc797041d7121dcd2d8f2345b7405f2c5ca0ec7f8",
+        "bytes": 4840
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "38ea08b2537658838befb02cb8c58a7d627a59ac9f990b8a2f44984c5aed9751",
+          "bytes": 342880
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMGraphLocalEquations",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMGraphLocalEquations.lean",
+      "source_pin": {
+        "sha256": "79b0eb02f5b6130bc12add4fb4831e8c291364240f95d63e65baa463df95b07f",
+        "bytes": 5616
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "61b712a0ba38c0d0634f2bc32343598d6ba4e65df01326a542136e80f292c22b",
+          "bytes": 334424
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMGraphPrincipalCharts",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMGraphPrincipalCharts.lean",
+      "source_pin": {
+        "sha256": "fe16eb8bda7b17b1ae34eeb0e83bf9411c0eca570ca85cea32b271d3b20d9914",
+        "bytes": 2531
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "178c623597ddfedd38da610bcce4edd3e3c2cae7d4d900a145bb41ad1e1ed213",
+          "bytes": 80792
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMGraphRegular",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMGraphRegular.lean",
+      "source_pin": {
+        "sha256": "dc0065d7809468faa95bf75df39b41cf0e14fc007205b57adddebd13b0823fdc",
+        "bytes": 5187
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "e6853a1123b4bdb2d0288b641608b6c49d945ef677ff4d90e1771d3b41f10713",
+          "bytes": 175000
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMGraphSource",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMGraphSource.lean",
+      "source_pin": {
+        "sha256": "76710d57a3ac97bcf1db0919053577780db00d2651f885b77ca4d571e2bc1ccd",
+        "bytes": 4320
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "f20a603c6737bca3a4ec2610e08a2959afd2ef3aab3fc36345b238e1bba4b1df",
+          "bytes": 198192
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMOpenCoordinateExtension",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMOpenCoordinateExtension.lean",
+      "source_pin": {
+        "sha256": "e9c4b0f69d115a84105cf46291217ced5c1e69b61a102c825f4df1dc10f16686",
+        "bytes": 1246
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "47daa4a57fb9b6d35f69bfd0050754d0c421d69015498fbba308d779136224f2",
+          "bytes": 57088
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMOpenIdealCoordinates",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMOpenIdealCoordinates.lean",
+      "source_pin": {
+        "sha256": "9f239bd940635aeab298457553fecc6344b383df918b0e05cf182cf951b32ec3",
+        "bytes": 1726
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "d7fcc18f02bd1d8476a8b7f91b39e3fbcbef62cba68f08667d41dde85bf440ee",
+          "bytes": 106488
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMProjectiveCubic",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMProjectiveCubic.lean",
+      "source_pin": {
+        "sha256": "db58966f9bbfb194fb7291835e173a628c159cb93e3069a1b9ea6f03e8d34463",
+        "bytes": 5085
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "7b350eb472610db906506f4acbbef6b2dc28b35c4d32f8597c40b1f02ab1b65a",
+          "bytes": 87552
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMProjectiveFixedComparison",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMProjectiveFixedComparison.lean",
+      "source_pin": {
+        "sha256": "167de18d53e491a02250b1b95d1855e95f1ab57541e423a6a1bcf533584162fb",
+        "bytes": 1351
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "5a0af7ed6c44be2b943beca8908b49b7efcaae6960b1b38b96255c5a3a219bf7",
+          "bytes": 19560
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMProjectiveFixedPullback",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMProjectiveFixedPullback.lean",
+      "source_pin": {
+        "sha256": "4eb3c935b9dcfca160a9a8a2b13775ec57ec32721748515c94ec6fb20fe14a4c",
+        "bytes": 3156
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "030c531d8bf0a965094020c88460a87668aed1aca6fbb76ec934f15bce52031f",
+          "bytes": 47000
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMProjectiveGraph",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMProjectiveGraph.lean",
+      "source_pin": {
+        "sha256": "cd212f71a6490f20818cf849898ae0df188cf87391b65d75321084b31ff3823e",
+        "bytes": 1740
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "c7880e51b598c57b36bfc4a72948d3618d17a3b91118b30381dd75af45c8d8ed",
+          "bytes": 27080
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMResidueStalkBridge",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMResidueStalkBridge.lean",
+      "source_pin": {
+        "sha256": "64cfbb66523ce4df0f3071a1107125b98138e11983bb92affcd90b8b940ce98f",
+        "bytes": 8909
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "8f8625352ca06fa2faa7c315eeb676f6fb20fbefac53e18de8c7fc26148096d6",
+          "bytes": 290424
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMRestrictedOriginQuotient",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMRestrictedOriginQuotient.lean",
+      "source_pin": {
+        "sha256": "7c281c16526b7918043dea0c49153e952560687988bb4e714bc4f37aa655c1d6",
+        "bytes": 3210
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "d29624033626cbc301f168e96b2f2aa97c3024603595689279599526ab3fe523",
+          "bytes": 149896
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMSourceOverlap",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMSourceOverlap.lean",
+      "source_pin": {
+        "sha256": "fca28174bc21773c79e78f14c0528a2bd78b3d59806defee631d776368bf63a5",
+        "bytes": 3416
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "28f7ab62b4690d72af1134885c85712e204b9ba9f38a0c4bde9922981b90591f",
+          "bytes": 89424
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMSpecGammaRegular",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMSpecGammaRegular.lean",
+      "source_pin": {
+        "sha256": "45feae9aaf275efad2443941d448c0694ad2935619fe5a5e804f50c06e321c2e",
+        "bytes": 786
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "814a2fe3daaf7b8e1cf19d5d2b722c97617081203d7ad1b4b2054419bc48a3ca",
+          "bytes": 44840
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMSpecKernelCoordinates",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMSpecKernelCoordinates.lean",
+      "source_pin": {
+        "sha256": "97b2de0e90e9c1934f40d5155ad5ea8eab8cf0a886a510cfa1dcc1ee070285f4",
+        "bytes": 1341
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "b004a8dc6ae7b29be9ea8ee54745958a4b1464ac5a6bcbd57b009e9faa111a6d",
+          "bytes": 57328
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMUnitDegreeZeroChart",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMUnitDegreeZeroChart.lean",
+      "source_pin": {
+        "sha256": "041c175ada1f7b7598ccd2d62b65c543aa5bc20a013e4026842652ee90b8caa0",
+        "bytes": 1548
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "f69d26771ba08c72fd91fd85f276aa506becf7081fb286d73bf423302ff1ce0e",
+          "bytes": 44752
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMYActualFixedChart",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYActualFixedChart.lean",
+      "source_pin": {
+        "sha256": "c5c1b819e43c3f297cdcd58a4c548dcedfe212bdf9faaa9a71f592cdb1eea8c7",
+        "bytes": 1524
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "f548c0bea939a5d4b5a9663004e423b98574b329987cf34a2b6751f6bcd325c3",
+          "bytes": 19040
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMYActualFixedPointIso",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYActualFixedPointIso.lean",
+      "source_pin": {
+        "sha256": "519244d5e85fabb3273e829f85fe2fbd662024ef1e0059de4d01fa6385d0ac6f",
+        "bytes": 1219
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "b3b18c981531763fc48cae7af81a206f2d3b77a1d0bf05831fed5c35b64450a9",
+          "bytes": 21744
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMYActualFixedPointMap",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYActualFixedPointMap.lean",
+      "source_pin": {
+        "sha256": "beced67211ecaf2cd6664bc62e878803d73c17ad5731670235d019158fe3b02b",
+        "bytes": 1419
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "66105eb7cd91a9b9e7ac74e65fa276d09101bb44d1a6141718bbae31138c876b",
+          "bytes": 20744
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMYAmbientCoordinates",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYAmbientCoordinates.lean",
+      "source_pin": {
+        "sha256": "95b2deaf0adbc2c3962d9e1f2c08743db5e2aff7264868fa5c9cbc523be64d63",
+        "bytes": 2149
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "06c82c936c9d409bbd923024ba57c61c7e8da7d39b9a8ad690c8299c1e7b476b",
+          "bytes": 34576
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMYAmbientEquations",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYAmbientEquations.lean",
+      "source_pin": {
+        "sha256": "9f5e326208dcff9b32c1292679ac866be2f0ab45a8972e86bdc93f6539b1e56b",
+        "bytes": 8879
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "fe010d23a95ecbf1b7fe961ef785b65812b4bf73559eb24f85ef56b4d40552da",
+          "bytes": 449464
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMYAmbientFaceCoverage",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYAmbientFaceCoverage.lean",
+      "source_pin": {
+        "sha256": "f3dbaa98d2ebac2f7af87a66b49e483a2503028db4ca9caede485ea2a9c89a50",
+        "bytes": 3364
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "db9bcc19ed84d14387a9d7dca0f36e80050c13158c47dc35bd9acd30fc042f35",
+          "bytes": 216464
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMYAmbientFromSections",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYAmbientFromSections.lean",
+      "source_pin": {
+        "sha256": "5e7a46b99775b78c281bd724ebb983d3199b02c3d6f4497bfa1bca21e624b27f",
+        "bytes": 2540
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "418622d4059efb70d2187165be0eb698e701387444d9f20e195a8d454e01af08",
+          "bytes": 66536
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMYAmbientIdeals",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYAmbientIdeals.lean",
+      "source_pin": {
+        "sha256": "a2420a80c9e18bc95e353d406b7f426c289f2b2ba376e581e56c0c8e9b284834",
+        "bytes": 3646
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "986c24b51b73245ea4b1960481e4d8d8c17975e221f88e4d8d66d897ff1175f2",
+          "bytes": 56616
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMYAmbientProduct",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYAmbientProduct.lean",
+      "source_pin": {
+        "sha256": "c616019b022b319c1a31bee76de23dcd7a2bc63d5dd232f79ffb82141b138f6b",
+        "bytes": 5613
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "5d971a346abc25ea71f0c7803fbd7d7ce9c69a629df7989e07dee589da41c7e4",
+          "bytes": 121024
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMYAmbientRegular",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYAmbientRegular.lean",
+      "source_pin": {
+        "sha256": "ed7d9d53aa1d724da85c560a5096d1ba72fa795eeeac0a9d98f90bbf3215a15c",
+        "bytes": 8349
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "1bdea3f06fc99926b608b32ff535e8e13055a1ebe26629e4809a384194d98f42",
+          "bytes": 236344
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMYAmbientSections",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYAmbientSections.lean",
+      "source_pin": {
+        "sha256": "25feb5fc8e9a2d190eb412d97e097e741d16fab93dc71de3d10c258658db719e",
+        "bytes": 1786
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "f9972d5e298e73c717a81b629115226f6385e103388d939a41db11fbd5502909",
+          "bytes": 58752
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMYChartAction",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYChartAction.lean",
+      "source_pin": {
+        "sha256": "b024f8f2fcc5108823238db8873631ba9a0c726915841f6f2e7235749e22a315",
+        "bytes": 1172
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "d775a8a1270327f905204e3adbf04cb06884498dc816cf1da86755feffaf29e9",
+          "bytes": 41120
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMYChartEmbedding",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYChartEmbedding.lean",
+      "source_pin": {
+        "sha256": "4b0689dc3abaae06b6013b87f8f734fb695012354c64004c4f72b011f399168a",
+        "bytes": 2693
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "2d3ac5087864b7039d415c407977e5ffe5f1167fa3a2189cfa6f2b5ac175fbbc",
+          "bytes": 95760
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMYChartLocalization",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYChartLocalization.lean",
+      "source_pin": {
+        "sha256": "e92e5d491fbb2317cdebf0cb1d70fe10e3f110614cc4a65737a5700494a5fd45",
+        "bytes": 3821
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "f1412288f5903419fd960e13aba0a45c07bd60f9d534ba01473c5921969282ae",
+          "bytes": 231496
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMYChartReduced",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYChartReduced.lean",
+      "source_pin": {
+        "sha256": "1faaffe7fbd9c3b2749ae20d3bcc6dfc6ab9191e30a952da28884e95c138536b",
+        "bytes": 3176
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "a3d9537b6b689d6f2e81f1ac49b5d14dda579c70d3b3c6fdc69845d89316bc6a",
+          "bytes": 97992
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMYChartSheaf",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYChartSheaf.lean",
+      "source_pin": {
+        "sha256": "44f1d93d2beb3f871dec61e2ead1fb2a60321664bc6667809f781a2b110876c9",
+        "bytes": 6379
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "b375491ab47807919173e2ea93ac3ca681f8d62c03173fe68fd980958e235cf0",
+          "bytes": 148896
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMYComplexBaseOnly",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYComplexBaseOnly.lean",
+      "source_pin": {
+        "sha256": "f1bc8b2188374c5c4e0698b25756d42ae92bfac34908f8ae9b9f2f4defc29469",
+        "bytes": 1386
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "dd4a071a2b73b1d6b508762deb27f5408385cfa6677fd2b43729744c3d69288c",
+          "bytes": 59280
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMYCoordinateAction",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYCoordinateAction.lean",
+      "source_pin": {
+        "sha256": "0d01667a51d00b2ad2a4d2460ea72da36d054e5b446cb17f4e4410c096dc29c5",
+        "bytes": 3339
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "0c89b57c6d33fd4172fd970d2865cc669a7e22233520a01feb7a17704a8b9b2f",
+          "bytes": 178288
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMYCoordinateFractions",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYCoordinateFractions.lean",
+      "source_pin": {
+        "sha256": "fdd57624703e0efa8d6db673219f906f1bb4d105e9eb8db440895003357f1f65",
+        "bytes": 1111
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "d879de2666127ad7e2021f75b1cb91a90a6d79e5ecc6e14610fd7f528421a05a",
+          "bytes": 71408
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMYCoordinateGenerators",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYCoordinateGenerators.lean",
+      "source_pin": {
+        "sha256": "aece81c8992631b7e44a576f4b746e9d30ec6997a9171d6ebb29f5ea9d736d98",
+        "bytes": 2263
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "742f1661ba8bdfaf20486627efa73d9218d5b381ad608b4e32c375c768bf6e14",
+          "bytes": 94664
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMYDirectDenominator",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYDirectDenominator.lean",
+      "source_pin": {
+        "sha256": "ceac6c31e2b6c688c049fbe362e03a58b8ebc46d41c922adfbbf90f4517ef77e",
+        "bytes": 2248
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "6ee8f80f6a84c2b3eaffb53cfc33e3a794fffb20460c27418791417d79d767e6",
+          "bytes": 93840
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMYEisenstein",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYEisenstein.lean",
+      "source_pin": {
+        "sha256": "d9e5ef6819a79ccd7ec5f283d40138e3262fa1b59dea276fefe774b84cec2e5b",
+        "bytes": 2590
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "df3cb1454d5c6ead193bc709ab65d3371cfebab2916ad85dcefe6a09326297eb",
+          "bytes": 222200
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMYFixedPoint",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYFixedPoint.lean",
+      "source_pin": {
+        "sha256": "b92ac6e2d52b859eeac36e235d08758b67257c0046cefdb22c98150f3d5dbf8c",
+        "bytes": 6149
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "2693b4aba1e63fb4a116553f6c04a2665fa0373b5de81cae3e44e5121943e7f6",
+          "bytes": 195808
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMYFixedSquareAssociated",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYFixedSquareAssociated.lean",
+      "source_pin": {
+        "sha256": "3816c8508225932a8ee49e023827fab41fc0adf2e24d04d85d8e655991b55200",
+        "bytes": 897
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "e063eb2eee82a8ae308dfdcf6c58fcf4cb65fa074221e99037a7a00b023feba9",
+          "bytes": 14008
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMYMonoOnly",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYMonoOnly.lean",
+      "source_pin": {
+        "sha256": "16ae0f4d8a9e78af5a9226971b6e331414473cc90a836b3d7dc0fbcfdfb5e4c1",
+        "bytes": 579
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "0478c36473072ef7665a4c8c1520426bff016beaef4d55285766d35224c5c94c",
+          "bytes": 11536
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMYQuotientMap",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYQuotientMap.lean",
+      "source_pin": {
+        "sha256": "736b3ee2cacfc2cfcc90e049867573bfc880a86fec2e835613c711f13ab36f2e",
+        "bytes": 2547
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "7604f08d12054bdc9b9ebe4f8071865c0e932ae8aaad5bbfef240f3b0a7f9cf6",
+          "bytes": 192896
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMYScalarMap",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYScalarMap.lean",
+      "source_pin": {
+        "sha256": "ab231be187a2eae33fcf6b9e3c438359aa780f113cb2a773b89f272c0d0dc16c",
+        "bytes": 1557
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "13ccdffcb8237e7c9dfd714aac5442a7ce4f41a0c4f5f215e48474b4744212e1",
+          "bytes": 75440
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMYUnitDefinitions",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYUnitDefinitions.lean",
+      "source_pin": {
+        "sha256": "3f18cb64046e846790f3fec9e69a4445c1185a74a07fa1db7388258233226cc1",
+        "bytes": 2368
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "cd837d92754cc6bc3f87cfb42c160ba3b0fed7f7481971d08e454ae650ab03f4",
+          "bytes": 78640
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMZActualFixedChart",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZActualFixedChart.lean",
+      "source_pin": {
+        "sha256": "62df34b292c19ad8bb72cab1c39cc50bdc4caeae86a71ecd3c7971b2dc8348be",
+        "bytes": 1788
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "33ba488ff4fa8deba10338de6558a63670d066c9fda1749c1ce8c3b78ac1e688",
+          "bytes": 26064
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMZActualFixedPointIso",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZActualFixedPointIso.lean",
+      "source_pin": {
+        "sha256": "8155ddca627767a9fe0741b39a792f875502611be717cc1fa8502088c03f14f1",
+        "bytes": 2039
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "2a48799579dd05a67bb4f2c6b8f44afda18a8cfc119d7adf46bf63028bd4f036",
+          "bytes": 29840
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMZAmbientCoordinates",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZAmbientCoordinates.lean",
+      "source_pin": {
+        "sha256": "d1b5dba0bb818ebaaaa7bcb46b124230fc9bfe0cf91c2e6687496d04e4f83712",
+        "bytes": 2134
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "41051d4b0d712a65cedd2d1c7c4099f82dd32466917d19205e37dd7aa121b629",
+          "bytes": 35840
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMZAmbientIdeals",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZAmbientIdeals.lean",
+      "source_pin": {
+        "sha256": "6587a4fbb0420f77f63dd0edf513356a37c10ff600b63e4ffa57465d63459535",
+        "bytes": 3652
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "f8704ac5e559248d2c21dddc06ffe4a5c0f18eb52b800ef2fefeff77ac4d941c",
+          "bytes": 57744
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMZAmbientMap",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZAmbientMap.lean",
+      "source_pin": {
+        "sha256": "b93660d124628b74aad6b605b1d950229800f9d13aaf53ae20bdf4fd3ecbcbdc",
+        "bytes": 2064
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "e42766a60b927fdf930fdd07e5df392e25988ae1bc7edc469857bf8dd46e8fa3",
+          "bytes": 67528
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMZAmbientProduct",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZAmbientProduct.lean",
+      "source_pin": {
+        "sha256": "686c1aed41766a73093b58a2bb0a03d364bd1d3afb78ef5556d8807d5bf089d0",
+        "bytes": 6434
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "cc2e89876220c779dd639eaacdb04d18672fc9e623c3bad7d8da72a7afa4dcb8",
+          "bytes": 147104
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMZChartAction",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZChartAction.lean",
+      "source_pin": {
+        "sha256": "6e38e035bf531d8cde85bbb9c2641eeaaeee66d5514030272c4b238205ed1b2a",
+        "bytes": 1149
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "0d63d797ac17be48fd3b655abae040f32b4f7b3681dcc088889439966bf93dc9",
+          "bytes": 41688
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMZChartConjugacy",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZChartConjugacy.lean",
+      "source_pin": {
+        "sha256": "641def843cba21c2d7d399a0dfe7efde86704a803869a9fb9f3796b94171d294",
+        "bytes": 791
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "e2d3aaa81d42c4b6d26244805e24fbd4bf2b34288f7a4e7751915c9786f0bbb6",
+          "bytes": 20600
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMZChartEmbedding",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZChartEmbedding.lean",
+      "source_pin": {
+        "sha256": "84ef6af66990c2659460283374f082f7a7eabcd4864d82a266c22cf659d4e00b",
+        "bytes": 2616
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "2eb12cca16aad004f5ef937514a6f5d5680021587f15e8422aeb167942ec8e04",
+          "bytes": 99672
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMZChartEquation",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZChartEquation.lean",
+      "source_pin": {
+        "sha256": "67c111d7c5a44cfc0a4eb1f467845200e6eec5acaaba044c8ca9223035f13c1b",
+        "bytes": 2966
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "18d7dddac6977b172f1fe9219cc9973b9939e6b5f1e84425410b3d8ed88a6a9e",
+          "bytes": 153720
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMZChartLocalization",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZChartLocalization.lean",
+      "source_pin": {
+        "sha256": "3159e58644b7f559d39de17b8e5be83242eeff868bf62959860f259320c8e1f4",
+        "bytes": 6609
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "05547147526da779d37559b27b43bebfa38761b62b4be24781d17689ce6f96a7",
+          "bytes": 270824
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMZChartOtherOpen",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZChartOtherOpen.lean",
+      "source_pin": {
+        "sha256": "2a5a5e2dc234d769b13819e7ed70354ee697bd575f98455d812a990c431e9ed1",
+        "bytes": 1350
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "3f24c0fcf6a5f81e5535c4ba13ef013a3b6d364b320a91521f94140b3cd2df4a",
+          "bytes": 45856
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMZChartReduced",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZChartReduced.lean",
+      "source_pin": {
+        "sha256": "34fb130c43880f858870acf49300df218a1497aeaf2b8a941611b4d1303451db",
+        "bytes": 3297
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "e2b3735a68db5ecfc4ca0854b5818255b9cf263c8953d437e7433b3cf82dc426",
+          "bytes": 170808
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMZChartSheaf",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZChartSheaf.lean",
+      "source_pin": {
+        "sha256": "d297d2e4c966aa1ced7c33e978684f27f5cddfad975376d307d993e88c0e782a",
+        "bytes": 6059
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "15961087c772002aba2c890c973a7e1a4e5a238298e226486e1131017490fd87",
+          "bytes": 177784
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMZComplexBaseOnly",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZComplexBaseOnly.lean",
+      "source_pin": {
+        "sha256": "a4f5aedaff62ad070f871f6d327972d29b66bc6e6fe738477f176b795d5b96d3",
+        "bytes": 1409
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "5bba15754865392fd5e74ef24ecb8cc478ea3dd4cfb53a3dd6398b59f7f4807e",
+          "bytes": 59960
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMZCoordinateMap",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZCoordinateMap.lean",
+      "source_pin": {
+        "sha256": "d4c0c2740fb3d5057b980330cf93405ff50fd52ba36f7766a56ec80a49cf1ab4",
+        "bytes": 5099
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "f168cb153667fea0300c2d4a78c978668863be2871ec39a67d88a6287ae31d5c",
+          "bytes": 203272
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMZCoordinateStability",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZCoordinateStability.lean",
+      "source_pin": {
+        "sha256": "e9bb4035e25c258c34332e1224ed9228de0e3297ee536379d2dbc8dcbfb0edd2",
+        "bytes": 444
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "a733db4c5fbcecf147880fa5b580132920f7eb2984657357fc566095a4eef147",
+          "bytes": 25376
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMZCubicChart",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZCubicChart.lean",
+      "source_pin": {
+        "sha256": "74e7751d97074b1d729b6d3b857e282bfe380d0635c0603edaa64873efff3317",
+        "bytes": 1659
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "8df3c23e92e0911ad278f65ba381e9cec0b7919c8d00d2cd7d4b8efd152e7bae",
+          "bytes": 54216
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMZDiagonalFaces",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZDiagonalFaces.lean",
+      "source_pin": {
+        "sha256": "1bf4d672219fa455e6e17612fed6134fd4772d2276dce558a023c648ec417be2",
+        "bytes": 2409
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "c07c0320c4b3c4694318282731ff04dbc40ffbfdb3585b062115be644f7ed078",
+          "bytes": 126608
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMZDiagonalLocal",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZDiagonalLocal.lean",
+      "source_pin": {
+        "sha256": "28bf97a95271629ece7575a3562a738ce2663767d405279a47f99e1038833ea1",
+        "bytes": 8093
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "9cca5b4d449dc87f825d2bf7d6b64baed9a8ec512af4a1190809003789715223",
+          "bytes": 365384
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMZFixedPoint",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZFixedPoint.lean",
+      "source_pin": {
+        "sha256": "c2ab520f940a9a80c4c03399af456d973ec7bb3a50641e5527f9bf1e70c9bf03",
+        "bytes": 6384
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "3c00a831ba33938236cc9e80d8582c4226795985f663ca0ac150290682fed5b1",
+          "bytes": 243912
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMZScalarMap",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZScalarMap.lean",
+      "source_pin": {
+        "sha256": "ca1eca785fc522b07be59e2fdb112b5a9285dfe22ff02929796886165eef0bf9",
+        "bytes": 1796
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "080d1d2f0b31fba3da79847d7d793bbe49738a4ddceb8fdbe592cd4978c169ca",
+          "bytes": 105600
+        }
+      },
+      "provenance": "Exact accepted finite-cut closure binding;30 native acceptances plus86 unchanged historical tuples; no new individual86 acceptance",
+      "individually_recompiled_for_publication": false
+    },
+    {
+      "module": "CMActualFiniteCutCyclePushforward",
+      "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualFiniteCutCyclePushforward.lean",
+      "source_pin": {
+        "sha256": "6118339770a6f825dad42910918caca8e6378a15d381a7fd177d2e3db5c4aa5d",
+        "bytes": 5660
+      },
+      "selected_parts": {
+        "main": {
+          "sha256": "32655cae3ddede99b52b3d3da4c6af52082a5d41091f67716186d6fdfd950a83",
+          "bytes": 102424
+        }
+      },
+      "provenance": "Whole finite-cut6query native acceptance, unchanged source and emitted object, postmetadata/quiescence/release",
+      "individually_recompiled_for_publication": false
+    }
+  ]
+}

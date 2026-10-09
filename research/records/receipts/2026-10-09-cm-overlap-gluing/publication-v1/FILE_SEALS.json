@@ -1,0 +1,862 @@
+[
+  {
+    "path": "research/records/2026-10-09_THE_ACCEPTED_CM_OVERLAP_PRESERVES_ITS_SOURCE_BINDINGS_FOR_PUBLICATION.md",
+    "sha256": "ffe32314762f409ccf86b88dcbf388040abc579b7041ec041f2bba7dda77cb12",
+    "bytes": 2883
+  },
+  {
+    "path": "research/records/2026-10-09_THE_ACTUAL_CM_NATIVE_FAILURES_REPAIR_THE_PRODUCING_PROOFS_WITHOUT_CHANGING_THE_SOURCE.md",
+    "sha256": "081e2f0a47931b272a166ed4813a5ce721d7c5ed71ea3027d3d5a500a025d8a1",
+    "bytes": 5708
+  },
+  {
+    "path": "research/records/2026-10-09_THE_ACTUAL_CM_OVERLAP_RETURNS_EVERY_LOCALIZED_FUNCTION_TO_ITS_SOURCE.md",
+    "sha256": "215e13d30611b3846469a2e01926875cdca11a212188cbd3c7b4b3bcbc055712",
+    "bytes": 7782
+  },
+  {
+    "path": "research/records/2026-10-09_THE_ACTUAL_CM_TANGENT_CURRENT_RETURNS_ITS_CLOCK_THROUGH_THE_CHART_OVERLAP.md",
+    "sha256": "65da74314f4e45cf3892418b5354c4f1c2e51c9360dc1319b4e8dc29ece3c6ce",
+    "bytes": 11423
+  },
+  {
+    "path": "research/records/receipts/2026-10-07-cm-actual-analytic-cut/source-v1/CMActualGraphDiagonalAnalyticCut.lean",
+    "sha256": "aedcd9aff688f9aeff0b1eebfd462179b06fe6a58c22e86f2b78a421ee58373f",
+    "bytes": 27733
+  },
+  {
+    "path": "research/records/receipts/2026-10-07-cm-actual-analytic-cut/source-v1/CMActualGraphDiagonalAnalyticCutAudit.lean",
+    "sha256": "6be425e283f1c1333acdc4a9c7061f304ea03bcd232e19e1efd5b0eba593a411",
+    "bytes": 574
+  },
+  {
+    "path": "research/records/receipts/2026-10-07-cm-actual-analytic-cut/v2/source-v2/CMActualGraphDiagonalAnalyticCut.lean",
+    "sha256": "a46d829baaf1aee9e7175f403fc75715c33bd3b8ed1ac5f38b516ecc37c1573b",
+    "bytes": 28593
+  },
+  {
+    "path": "research/records/receipts/2026-10-07-cm-actual-analytic-cut/v2/source-v2/CMActualGraphDiagonalAnalyticCutAudit.lean",
+    "sha256": "6be425e283f1c1333acdc4a9c7061f304ea03bcd232e19e1efd5b0eba593a411",
+    "bytes": 574
+  },
+  {
+    "path": "research/records/receipts/2026-10-07-cm-actual-analytic-cut/v3/source-v3/CMActualGraphDiagonalAnalyticCut.lean",
+    "sha256": "7a0a4c4f197e4836a287049a90eed3e4cea2dbbf41094dad3c3ec8a56c570244",
+    "bytes": 28999
+  },
+  {
+    "path": "research/records/receipts/2026-10-07-cm-actual-analytic-cut/v3/source-v3/CMActualGraphDiagonalAnalyticCutAudit.lean",
+    "sha256": "6be425e283f1c1333acdc4a9c7061f304ea03bcd232e19e1efd5b0eba593a411",
+    "bytes": 574
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-chart-tangent/v4/source-v4/CMActualGraphDiagonalAnalyticCut.lean",
+    "sha256": "f20bc9d8b5f1c25355436d34c63494391a729cf8e328db58bfbb099cdf4c722e",
+    "bytes": 46692
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-chart-tangent/v4/source-v4/CMActualGraphDiagonalAnalyticCutAudit.lean",
+    "sha256": "bab336fe0506ef4b22f6c622f7645683dae830c8f286c4c0bd66fc8e45cc8d5f",
+    "bytes": 446
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/NATIVE_JOIN.v9.json",
+    "sha256": "9e5131ed4fe51df9b7fd85ce4d9e111ba034f05d77831cb77ea8956e6e4e3283",
+    "bytes": 2730
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/native-v9-first-read/HANDOFF.md",
+    "sha256": "0c4351c9106f30b303988d80aa56f8bf208f58af6792ad0324aa86efa1c54463",
+    "bytes": 709
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/native-v9-first-read/VALIDATION.json",
+    "sha256": "f412005ebfc9c908140e0071a3e5e11f604a96fa2228086c71183bf1504ddf88",
+    "bytes": 9634
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/native-v9-first-read/admission/KERNEL_VALIDATION.json",
+    "sha256": "27ce69e490acce2c2c54ede8c7d28e99304dd71483b09e00c3207ddb3c08ca56",
+    "bytes": 8327
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/native-v9-first-read/admission/compiler.stderr",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/native-v9-first-read/admission/compiler.stdout",
+    "sha256": "1d34d258d110a1955d43753710687e5fca40f8ed9111f30deadd2631976ec305",
+    "bytes": 12463
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/native-v9-import/HANDOFF.md",
+    "sha256": "e83eb366005adf7e8a4581f39ae5cf9964d25fef11a47e2e4560b9c616ba6710",
+    "bytes": 710
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/native-v9-import/VALIDATION.json",
+    "sha256": "3d14b5d54c0f72fdf0e7bfb6e0bc0c206fe2911eb01c55cba8e4212c6e905386",
+    "bytes": 2510
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/native-v9-import/admission/KERNEL_VALIDATION.json",
+    "sha256": "52442d4ace728204532e4357037a653ee0b21ce275bd885269b44c5cdb5c6685",
+    "bytes": 1202
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/native-v9-import/admission/compiler.stderr",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/native-v9-import/admission/compiler.stdout",
+    "sha256": "5026db54b9f0d211d1b630d3bbf06d2de709c9099e1f70956c28db520392de0d",
+    "bytes": 857
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/ATLAS_JOIN.json",
+    "sha256": "8e78fa8d3453cee93ed058a2aa120a62f2b9f4226bb66ef6ed5c118ea8369a0b",
+    "bytes": 5593
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/PROVENANCE.json",
+    "sha256": "bbe3eb9f8d2b832c7e557fda9bb7d6916733042ce5eb7bec26f6135f3a71fa05",
+    "bytes": 90457
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/PROVIDER_BINDINGS.json",
+    "sha256": "af75d1ac917b820d63970bfaf1614f935dce2fd21976ed1230043e34443f47d2",
+    "bytes": 86080
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/PUBLICATION_SCOPE.md",
+    "sha256": "14cef18c72c41e91ce0e257a42c9e3b074aea2fa51f769486a0e51320ed961ba",
+    "bytes": 2495
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/SELECTED_IMPORT_BINDINGS.importer.json",
+    "sha256": "eb1a1fea946fb7512c299264f47d5eb8280fc9f2beca3f7f6e81502695f796d5",
+    "bytes": 5716
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/SELECTED_IMPORT_BINDINGS.owner.json",
+    "sha256": "f4eacf44d2840c7cce97ee0c70a942ab80c706d06a610803cfa1d77c59344346",
+    "bytes": 5883938
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualAffineIdealTransport.lean",
+    "sha256": "8d7b028d3e6e608124da0c690ef419fde7fc21bb559a4a4b5a85d75a8b1c8cf5",
+    "bytes": 2930
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualAmbientCartierStalk.lean",
+    "sha256": "35a561bbcde184d2ed19a89aa37095106f1b1ead9dd1a71dd84bcb5e5d341e7c",
+    "bytes": 5394
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualAmbientCartierStalkJoin.lean",
+    "sha256": "24f9287123f4e29c420ce4346996bff8a8ed7506b1350d515cb4c0d645ec5946",
+    "bytes": 20995
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualAmbientRegularFaces.lean",
+    "sha256": "c40938bbb2112f2c5720f3d43e3e99cbdde841b9c3ff41f340da1900d333f505",
+    "bytes": 248
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualDiagonalCartierData.lean",
+    "sha256": "139f5eef097bc18feecc5479733d691aa8e5e3bb4d461397efe3e8490da03978",
+    "bytes": 8421
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualFiniteCutCyclePushforward.lean",
+    "sha256": "6118339770a6f825dad42910918caca8e6378a15d381a7fd177d2e3db5c4aa5d",
+    "bytes": 5660
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualFixedCartierData.lean",
+    "sha256": "ad3c959a1cf1ffd1c53932bf5ec8d5d091cbbdf9c98dbe9ae30c06b500ba44e6",
+    "bytes": 6471
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualFixedChartIdealTransport.lean",
+    "sha256": "c466824d5f5a4fc51598a3642597059bc12b7a953799d3a982a3401c507b1540",
+    "bytes": 4507
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualFixedIdealJoin.lean",
+    "sha256": "be754174f9892f3a9b553bb28d02696c35b1153cea092bf7618d6f42dd30476e",
+    "bytes": 2317
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualFixedIntrinsicLength.lean",
+    "sha256": "5e0042ce67dde6919b73cd832a17f43660ea38e4e4f2dd057703d32a36ab0f00",
+    "bytes": 4680
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualFixedIntrinsicStalk.lean",
+    "sha256": "307c915ae0d56742192c4f2d91b59f6dc078f007fb22265b2449cfef5bf6786d",
+    "bytes": 9508
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualFixedOpenCover.lean",
+    "sha256": "d700897694580f36ce5135981f1dcecb190a9b8b2fe95776309a7e89c232c4c1",
+    "bytes": 2292
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualFixedOriginSupport.lean",
+    "sha256": "1c82c0c9e5602b53f1a9f44aa6fa652dcde23a8fff796a8016b4d0ea1fffee8b",
+    "bytes": 10972
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualFixedOverlapEmpty.lean",
+    "sha256": "58911ca40504998838b18cd3d9219f953de8eaffd6b2a6ca8c57d22efac807a8",
+    "bytes": 3841
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualFixedResidueDegree.lean",
+    "sha256": "b442f0af8a9fabbd9e2b61c0f9080ba639a896b605c0847fa1e0454b5275e14f",
+    "bytes": 5261
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualFixedStalkLength.lean",
+    "sha256": "bf3d67def3f577650179c1fdf7109b039767b6d865432f66141c0da68027dd39",
+    "bytes": 7765
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualGraphAffineEquationCover.lean",
+    "sha256": "491441f76385cb5a4eb4fa1a2ec3a01b16187e2c5026eacadea86a33b8b07cba",
+    "bytes": 7233
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualGraphDiagonalLengthDegree.lean",
+    "sha256": "c33d257a647abe4a1febaeff05e4777e6866fd24122e57385fbfaaf2c212f189",
+    "bytes": 3778
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualGraphDiagonalMultiplicity.lean",
+    "sha256": "852a01a8d628b2f9a19f3d85285246ea51988c19ed65bad880691cb23aee4fc2",
+    "bytes": 5775
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualGraphDiagonalTorComparison.lean",
+    "sha256": "4fe2235fc6cc1624fbeee96c546ca3547963934f2f6da0cbde4988fbf99e24e8",
+    "bytes": 10369
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualRestrictedChartCartierData.lean",
+    "sha256": "167973147af17ac011a075391fa754ca7434d3f76df903e8513968f83f444c80",
+    "bytes": 3609
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualRestrictedFixedSupportCover.lean",
+    "sha256": "c4455cff447327f9a8eea55812ed5a4e3c41e169c7d4a5a9b952ba36a9a7d75d",
+    "bytes": 7049
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualRestrictedYEquation.lean",
+    "sha256": "34e2399a4d985966ddad55adbfe808ff783bfb7b3e76acba0cbdd84035e8d3be",
+    "bytes": 6194
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualRestrictedYLength.lean",
+    "sha256": "286098f359b132ccc4b8b73b1ace9aaf4b268b3df034d8f2ecdd57dbcb9a64c2",
+    "bytes": 6097
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualRestrictedZEquation.lean",
+    "sha256": "f86149a8ad26270f04bc0b0f43a47c746ca49ff9923928f0c0097ca9fa6b3e31",
+    "bytes": 5703
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualRestrictedZLength.lean",
+    "sha256": "432e73a63fb6203e3463693caf770d1ca5b81f95c6ae53f7a80494a55dc6c2f5",
+    "bytes": 3375
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualYRegularFaces.lean",
+    "sha256": "36792a6e83aca645d7d3672cec94dc80e684a3706cedccc708352f8317b1014f",
+    "bytes": 4563
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMActualZRegularFaces.lean",
+    "sha256": "3d62f8d95e4e36675ce4a9f2fa7948659a2b530b2b0076d4de37ef4ab2461994",
+    "bytes": 4878
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMAffineEqualizer.lean",
+    "sha256": "8a396d5469b371f424c3fa918145f790fce1c63363f7e979c48ccadfd1d1d980",
+    "bytes": 6636
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMAmbientAwayIdeals.lean",
+    "sha256": "c845b57224da9b81178a5e3c7a6bf37bd5c6a4e419ab368227315499ce4d1064",
+    "bytes": 2174
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMAmbientPairCover.lean",
+    "sha256": "636bbce515ef2964e3455c2c488ebdaf4a50e14aa60753465b2500e62428100f",
+    "bytes": 2060
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMCartierScalarResolution.lean",
+    "sha256": "2565e7ec30028d13dde892c2674838eecb730145a099a1c975df6660fa618bae",
+    "bytes": 7624
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMCartierStalkNaturality.lean",
+    "sha256": "dc4066badbe7ee90a5e80a29bbc6e364760a354ae8713c82669b2649aa1410fc",
+    "bytes": 4797
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMCartierTorZeroQuotient.lean",
+    "sha256": "7a4a6bb58f0f4d772f27280cb160ffbe85611bb966c453d870a435d25e260bf8",
+    "bytes": 2201
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMChartCover.lean",
+    "sha256": "ffbec2912f198e13ac25f2082c13a1aab37f21b2964d9390aa47fc6def192c6f",
+    "bytes": 3278
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMChartDerivativeCover.lean",
+    "sha256": "4c09f85828b97a450266689de06e3b32b86e6b28a18d7cb5ae0fde87e5b6bf39",
+    "bytes": 4327
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMChartStability.lean",
+    "sha256": "f8e898fb01148fc9062f498a8593125c292ccde19334102c04a020d9b79c84d5",
+    "bytes": 3498
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMComplexBase.lean",
+    "sha256": "a0126c0503ebc613274a7e2a2471806e681e2a7df5ace86d6d16f64ea57f9b0d",
+    "bytes": 3725
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMComplexGraph.lean",
+    "sha256": "4e09eb91ea4abe521e87ea792e1136feb403933c36a661e05a5c9e6eceb2cad4",
+    "bytes": 2139
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMComplexGraphCore.lean",
+    "sha256": "85939b7c43b85d73b9f54ff658489c6017dffebc4d7bbd4b57af5beda6e640a3",
+    "bytes": 2106
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMCoordinateRingOnly.lean",
+    "sha256": "3963ff580696670e62abe5c6fc6edfee2a3199142366df7a622f80c0ebbac2f9",
+    "bytes": 1011
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMCoordinateTransport.lean",
+    "sha256": "e413fdb778b63c1c6a415dc948fbedd4305bf3af3c1dc35199b05cb25c876454",
+    "bytes": 1209
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMCurveCore.lean",
+    "sha256": "be35778bf01201076ef13c75585f4b6edfdeed718f860f385c77d45d9d7037b8",
+    "bytes": 803
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMDegreeZeroOverlap.lean",
+    "sha256": "4e12fe5868a2da10492ff0f685287c31ff866895225c1a408043d488c3f27963",
+    "bytes": 3224
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMFixedChartLimit.lean",
+    "sha256": "07adb4fb55a480d53597f203f1a3fa60f94aa6aeff3fd8751f3711efc5263d2f",
+    "bytes": 1876
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMGlobalAmbientFaceCover.lean",
+    "sha256": "8f884e0347c9107f6e1aaf1cf1302cfaa4816bffa06c5657c6ee351aae3ee3ef",
+    "bytes": 4892
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMGlobalRegularEquationCover.lean",
+    "sha256": "303a6a0b51747ca63dc5301f41d051d5c9683089e809f757f65aead0a0e7b78e",
+    "bytes": 2965
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMGradedDescent.lean",
+    "sha256": "6622cdf14e43570fcedfddeef5cc409d995978275db90320e12e012c47071efc",
+    "bytes": 5235
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMGraphAffine.lean",
+    "sha256": "8d47974993c58da79d4394156217c797f8966cf59a199b63e600df80ee40bb43",
+    "bytes": 6940
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMGraphChartPullback.lean",
+    "sha256": "311b1be0b776ad37a01a7b623ed05fc24a17b585f7ab5681fdfad987f86f3ee8",
+    "bytes": 1719
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMGraphHomogeneous.lean",
+    "sha256": "3ba4bfb0a2f923f9a1e6282dc797041d7121dcd2d8f2345b7405f2c5ca0ec7f8",
+    "bytes": 4840
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMGraphLocalEquations.lean",
+    "sha256": "79b0eb02f5b6130bc12add4fb4831e8c291364240f95d63e65baa463df95b07f",
+    "bytes": 5616
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMGraphPrincipalCharts.lean",
+    "sha256": "fe16eb8bda7b17b1ae34eeb0e83bf9411c0eca570ca85cea32b271d3b20d9914",
+    "bytes": 2531
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMGraphRegular.lean",
+    "sha256": "dc0065d7809468faa95bf75df39b41cf0e14fc007205b57adddebd13b0823fdc",
+    "bytes": 5187
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMGraphSource.lean",
+    "sha256": "76710d57a3ac97bcf1db0919053577780db00d2651f885b77ca4d571e2bc1ccd",
+    "bytes": 4320
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMOpenCoordinateExtension.lean",
+    "sha256": "e9c4b0f69d115a84105cf46291217ced5c1e69b61a102c825f4df1dc10f16686",
+    "bytes": 1246
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMOpenIdealCoordinates.lean",
+    "sha256": "9f239bd940635aeab298457553fecc6344b383df918b0e05cf182cf951b32ec3",
+    "bytes": 1726
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMProjectiveCubic.lean",
+    "sha256": "db58966f9bbfb194fb7291835e173a628c159cb93e3069a1b9ea6f03e8d34463",
+    "bytes": 5085
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMProjectiveFixedComparison.lean",
+    "sha256": "167de18d53e491a02250b1b95d1855e95f1ab57541e423a6a1bcf533584162fb",
+    "bytes": 1351
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMProjectiveFixedPullback.lean",
+    "sha256": "4eb3c935b9dcfca160a9a8a2b13775ec57ec32721748515c94ec6fb20fe14a4c",
+    "bytes": 3156
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMProjectiveGraph.lean",
+    "sha256": "cd212f71a6490f20818cf849898ae0df188cf87391b65d75321084b31ff3823e",
+    "bytes": 1740
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMResidueStalkBridge.lean",
+    "sha256": "64cfbb66523ce4df0f3071a1107125b98138e11983bb92affcd90b8b940ce98f",
+    "bytes": 8909
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMRestrictedOriginQuotient.lean",
+    "sha256": "7c281c16526b7918043dea0c49153e952560687988bb4e714bc4f37aa655c1d6",
+    "bytes": 3210
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMSourceOverlap.lean",
+    "sha256": "fca28174bc21773c79e78f14c0528a2bd78b3d59806defee631d776368bf63a5",
+    "bytes": 3416
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMSpecGammaRegular.lean",
+    "sha256": "45feae9aaf275efad2443941d448c0694ad2935619fe5a5e804f50c06e321c2e",
+    "bytes": 786
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMSpecKernelCoordinates.lean",
+    "sha256": "97b2de0e90e9c1934f40d5155ad5ea8eab8cf0a886a510cfa1dcc1ee070285f4",
+    "bytes": 1341
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMUnitDegreeZeroChart.lean",
+    "sha256": "041c175ada1f7b7598ccd2d62b65c543aa5bc20a013e4026842652ee90b8caa0",
+    "bytes": 1548
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYActualFixedChart.lean",
+    "sha256": "c5c1b819e43c3f297cdcd58a4c548dcedfe212bdf9faaa9a71f592cdb1eea8c7",
+    "bytes": 1524
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYActualFixedPointIso.lean",
+    "sha256": "519244d5e85fabb3273e829f85fe2fbd662024ef1e0059de4d01fa6385d0ac6f",
+    "bytes": 1219
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYActualFixedPointMap.lean",
+    "sha256": "beced67211ecaf2cd6664bc62e878803d73c17ad5731670235d019158fe3b02b",
+    "bytes": 1419
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYAmbientCoordinates.lean",
+    "sha256": "95b2deaf0adbc2c3962d9e1f2c08743db5e2aff7264868fa5c9cbc523be64d63",
+    "bytes": 2149
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYAmbientEquations.lean",
+    "sha256": "9f5e326208dcff9b32c1292679ac866be2f0ab45a8972e86bdc93f6539b1e56b",
+    "bytes": 8879
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYAmbientFaceCoverage.lean",
+    "sha256": "f3dbaa98d2ebac2f7af87a66b49e483a2503028db4ca9caede485ea2a9c89a50",
+    "bytes": 3364
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYAmbientFromSections.lean",
+    "sha256": "5e7a46b99775b78c281bd724ebb983d3199b02c3d6f4497bfa1bca21e624b27f",
+    "bytes": 2540
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYAmbientIdeals.lean",
+    "sha256": "a2420a80c9e18bc95e353d406b7f426c289f2b2ba376e581e56c0c8e9b284834",
+    "bytes": 3646
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYAmbientProduct.lean",
+    "sha256": "c616019b022b319c1a31bee76de23dcd7a2bc63d5dd232f79ffb82141b138f6b",
+    "bytes": 5613
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYAmbientRegular.lean",
+    "sha256": "ed7d9d53aa1d724da85c560a5096d1ba72fa795eeeac0a9d98f90bbf3215a15c",
+    "bytes": 8349
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYAmbientSections.lean",
+    "sha256": "25feb5fc8e9a2d190eb412d97e097e741d16fab93dc71de3d10c258658db719e",
+    "bytes": 1786
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYChartAction.lean",
+    "sha256": "b024f8f2fcc5108823238db8873631ba9a0c726915841f6f2e7235749e22a315",
+    "bytes": 1172
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYChartEmbedding.lean",
+    "sha256": "4b0689dc3abaae06b6013b87f8f734fb695012354c64004c4f72b011f399168a",
+    "bytes": 2693
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYChartLocalization.lean",
+    "sha256": "e92e5d491fbb2317cdebf0cb1d70fe10e3f110614cc4a65737a5700494a5fd45",
+    "bytes": 3821
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYChartReduced.lean",
+    "sha256": "1faaffe7fbd9c3b2749ae20d3bcc6dfc6ab9191e30a952da28884e95c138536b",
+    "bytes": 3176
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYChartSheaf.lean",
+    "sha256": "44f1d93d2beb3f871dec61e2ead1fb2a60321664bc6667809f781a2b110876c9",
+    "bytes": 6379
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYComplexBaseOnly.lean",
+    "sha256": "f1bc8b2188374c5c4e0698b25756d42ae92bfac34908f8ae9b9f2f4defc29469",
+    "bytes": 1386
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYCoordinateAction.lean",
+    "sha256": "0d01667a51d00b2ad2a4d2460ea72da36d054e5b446cb17f4e4410c096dc29c5",
+    "bytes": 3339
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYCoordinateFractions.lean",
+    "sha256": "fdd57624703e0efa8d6db673219f906f1bb4d105e9eb8db440895003357f1f65",
+    "bytes": 1111
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYCoordinateGenerators.lean",
+    "sha256": "aece81c8992631b7e44a576f4b746e9d30ec6997a9171d6ebb29f5ea9d736d98",
+    "bytes": 2263
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYDirectDenominator.lean",
+    "sha256": "ceac6c31e2b6c688c049fbe362e03a58b8ebc46d41c922adfbbf90f4517ef77e",
+    "bytes": 2248
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYEisenstein.lean",
+    "sha256": "d9e5ef6819a79ccd7ec5f283d40138e3262fa1b59dea276fefe774b84cec2e5b",
+    "bytes": 2590
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYFixedPoint.lean",
+    "sha256": "b92ac6e2d52b859eeac36e235d08758b67257c0046cefdb22c98150f3d5dbf8c",
+    "bytes": 6149
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYFixedSquareAssociated.lean",
+    "sha256": "3816c8508225932a8ee49e023827fab41fc0adf2e24d04d85d8e655991b55200",
+    "bytes": 897
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYMonoOnly.lean",
+    "sha256": "16ae0f4d8a9e78af5a9226971b6e331414473cc90a836b3d7dc0fbcfdfb5e4c1",
+    "bytes": 579
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYQuotientMap.lean",
+    "sha256": "736b3ee2cacfc2cfcc90e049867573bfc880a86fec2e835613c711f13ab36f2e",
+    "bytes": 2547
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYScalarMap.lean",
+    "sha256": "ab231be187a2eae33fcf6b9e3c438359aa780f113cb2a773b89f272c0d0dc16c",
+    "bytes": 1557
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMYUnitDefinitions.lean",
+    "sha256": "3f18cb64046e846790f3fec9e69a4445c1185a74a07fa1db7388258233226cc1",
+    "bytes": 2368
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZActualFixedChart.lean",
+    "sha256": "62df34b292c19ad8bb72cab1c39cc50bdc4caeae86a71ecd3c7971b2dc8348be",
+    "bytes": 1788
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZActualFixedPointIso.lean",
+    "sha256": "8155ddca627767a9fe0741b39a792f875502611be717cc1fa8502088c03f14f1",
+    "bytes": 2039
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZAmbientCoordinates.lean",
+    "sha256": "d1b5dba0bb818ebaaaa7bcb46b124230fc9bfe0cf91c2e6687496d04e4f83712",
+    "bytes": 2134
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZAmbientIdeals.lean",
+    "sha256": "6587a4fbb0420f77f63dd0edf513356a37c10ff600b63e4ffa57465d63459535",
+    "bytes": 3652
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZAmbientMap.lean",
+    "sha256": "b93660d124628b74aad6b605b1d950229800f9d13aaf53ae20bdf4fd3ecbcbdc",
+    "bytes": 2064
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZAmbientProduct.lean",
+    "sha256": "686c1aed41766a73093b58a2bb0a03d364bd1d3afb78ef5556d8807d5bf089d0",
+    "bytes": 6434
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZChartAction.lean",
+    "sha256": "6e38e035bf531d8cde85bbb9c2641eeaaeee66d5514030272c4b238205ed1b2a",
+    "bytes": 1149
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZChartConjugacy.lean",
+    "sha256": "641def843cba21c2d7d399a0dfe7efde86704a803869a9fb9f3796b94171d294",
+    "bytes": 791
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZChartEmbedding.lean",
+    "sha256": "84ef6af66990c2659460283374f082f7a7eabcd4864d82a266c22cf659d4e00b",
+    "bytes": 2616
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZChartEquation.lean",
+    "sha256": "67c111d7c5a44cfc0a4eb1f467845200e6eec5acaaba044c8ca9223035f13c1b",
+    "bytes": 2966
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZChartLocalization.lean",
+    "sha256": "3159e58644b7f559d39de17b8e5be83242eeff868bf62959860f259320c8e1f4",
+    "bytes": 6609
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZChartOtherOpen.lean",
+    "sha256": "2a5a5e2dc234d769b13819e7ed70354ee697bd575f98455d812a990c431e9ed1",
+    "bytes": 1350
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZChartReduced.lean",
+    "sha256": "34fb130c43880f858870acf49300df218a1497aeaf2b8a941611b4d1303451db",
+    "bytes": 3297
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZChartSheaf.lean",
+    "sha256": "d297d2e4c966aa1ced7c33e978684f27f5cddfad975376d307d993e88c0e782a",
+    "bytes": 6059
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZComplexBaseOnly.lean",
+    "sha256": "a4f5aedaff62ad070f871f6d327972d29b66bc6e6fe738477f176b795d5b96d3",
+    "bytes": 1409
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZCoordinateMap.lean",
+    "sha256": "d4c0c2740fb3d5057b980330cf93405ff50fd52ba36f7766a56ec80a49cf1ab4",
+    "bytes": 5099
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZCoordinateStability.lean",
+    "sha256": "e9bb4035e25c258c34332e1224ed9228de0e3297ee536379d2dbc8dcbfb0edd2",
+    "bytes": 444
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZCubicChart.lean",
+    "sha256": "74e7751d97074b1d729b6d3b857e282bfe380d0635c0603edaa64873efff3317",
+    "bytes": 1659
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZDiagonalFaces.lean",
+    "sha256": "1bf4d672219fa455e6e17612fed6134fd4772d2276dce558a023c648ec417be2",
+    "bytes": 2409
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZDiagonalLocal.lean",
+    "sha256": "28bf97a95271629ece7575a3562a738ce2663767d405279a47f99e1038833ea1",
+    "bytes": 8093
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZFixedPoint.lean",
+    "sha256": "c2ab520f940a9a80c4c03399af456d973ec7bb3a50641e5527f9bf1e70c9bf03",
+    "bytes": 6384
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/frozen-provider-sources/CMZScalarMap.lean",
+    "sha256": "ca1eca785fc522b07be59e2fdb112b5a9285dfe22ff02929796886165eef0bf9",
+    "bytes": 1796
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/rejected-predecessors/v5/VALIDATION.json",
+    "sha256": "d9655999f577d3d4e3bfb15470bc0abd9675f1c8df176325568bbde41b6fc96b",
+    "bytes": 1051
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/rejected-predecessors/v5/compiler.stderr",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/rejected-predecessors/v5/compiler.stdout",
+    "sha256": "90576c0021ba5a2dcbbe5d3e200111400fc2cc4fdee93bd90e945ff2b3ab165a",
+    "bytes": 13472
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/rejected-predecessors/v6/VALIDATION.json",
+    "sha256": "ebbf7d008ca21d59b3622c52aa00929f88a8d7361b73cf90867d24a0f456c3b8",
+    "bytes": 8992
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/rejected-predecessors/v6/compiler.stderr",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/rejected-predecessors/v6/compiler.stdout",
+    "sha256": "70d0a79009dd4ed1f778e4a0d9164e9e8f6a46f63f6f0bf7b5de1328e0fe883e",
+    "bytes": 13253
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/rejected-predecessors/v7/VALIDATION.json",
+    "sha256": "4eae252fc90ca580f03dee0669bd6c8ef50f19e048b7add9d6fffad79d8d0a33",
+    "bytes": 10963
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/rejected-predecessors/v7/compiler.stderr",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/rejected-predecessors/v7/compiler.stdout",
+    "sha256": "bda93aac6a301baa38cd763fae4d3b05b73a38397e3a1c1766ff696451bb1244",
+    "bytes": 14210
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/rejected-predecessors/v8/VALIDATION.json",
+    "sha256": "958ac9b286b67c5a10c1e81fa642bf2f2a016e0f651aae700e03b5ed1a0b2773",
+    "bytes": 9935
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/rejected-predecessors/v8/compiler.stderr",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/rejected-predecessors/v8/compiler.stdout",
+    "sha256": "4238af081b1e703596c051dbb0eb71d9b32085540c70f709fcc6f0780b691e6f",
+    "bytes": 13151
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/verify_publication.py",
+    "sha256": "029e8f602ee79c6d14f4764f0dd7aecc0cce899258cb4951c2a8d354ed18307a",
+    "bytes": 6992
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/v5/source-v5/CMActualGraphDiagonalAnalyticCut.lean",
+    "sha256": "0822d404732a7bbd461a6e8bf54b08be3ca39efea065dd6506622aa12e485194",
+    "bytes": 63456
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/v5/source-v5/CMActualGraphDiagonalAnalyticCutAudit.lean",
+    "sha256": "61c683a8eaf8c29891072b6d385babf1795e93d9cb8739e1483fc8ba23a77a8e",
+    "bytes": 393
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/v6/source-v6/CMActualGraphDiagonalAnalyticCut.lean",
+    "sha256": "3c2c1f5fa860c93e34bdaa279d788a3fc49eb41a943ea765fc06cb2128809399",
+    "bytes": 65942
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/v6/source-v6/CMActualGraphDiagonalAnalyticCutAudit.lean",
+    "sha256": "61c683a8eaf8c29891072b6d385babf1795e93d9cb8739e1483fc8ba23a77a8e",
+    "bytes": 393
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/v7/source-v7/CMActualGraphDiagonalAnalyticCut.lean",
+    "sha256": "6897a36e6ad0610cc7bd34b4b6ebfd0e5b8012689c51e171a4aca8a4435f0d66",
+    "bytes": 66352
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/v7/source-v7/CMActualGraphDiagonalAnalyticCutAudit.lean",
+    "sha256": "61c683a8eaf8c29891072b6d385babf1795e93d9cb8739e1483fc8ba23a77a8e",
+    "bytes": 393
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/v7/source-v7-final/CMActualGraphDiagonalAnalyticCut.lean",
+    "sha256": "6df58041827779e02cc8c32feced64a1f8d1e51272cfb9bd480e87a7e3dfb02e",
+    "bytes": 66347
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/v7/source-v7-final/CMActualGraphDiagonalAnalyticCutAudit.lean",
+    "sha256": "61c683a8eaf8c29891072b6d385babf1795e93d9cb8739e1483fc8ba23a77a8e",
+    "bytes": 393
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/v8/source-v8/CMActualGraphDiagonalAnalyticCut.lean",
+    "sha256": "3516ad4fbeda4a8d8936eef91806ca841f47527db0d2ecca1b6aec2f0220cc55",
+    "bytes": 67453
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/v8/source-v8/CMActualGraphDiagonalAnalyticCutAudit.lean",
+    "sha256": "61c683a8eaf8c29891072b6d385babf1795e93d9cb8739e1483fc8ba23a77a8e",
+    "bytes": 393
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/v9/source-v9/CMActualGraphDiagonalAnalyticCut.lean",
+    "sha256": "2b213f4bcad6cd8bd466729ed9abbb32fecf378526a4cae786b5220c1251fc79",
+    "bytes": 67465
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/v9/source-v9/CMActualGraphDiagonalAnalyticCutAudit.lean",
+    "sha256": "61c683a8eaf8c29891072b6d385babf1795e93d9cb8739e1483fc8ba23a77a8e",
+    "bytes": 393
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/INTEGRATION.json",
+    "sha256": "6445607da27142fbfca3193dde8181f21dfb2e6b801ada42a57ede32d4738f0f",
+    "bytes": 2283
+  }
+]

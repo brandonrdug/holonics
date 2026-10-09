@@ -1,0 +1,225 @@
+CMActualGraphDiagonalAnalyticCut.lean:54:25: warning: This simp argument is unused:
+  Complex.I_sq
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [cmI_cube]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+CMActualGraphDiagonalAnalyticCut.lean:54:10: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+CMActualGraphDiagonalAnalyticCut.lean:54:49: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+CMActualGraphDiagonalAnalyticCut.lean:59:10: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+CMActualGraphDiagonalAnalyticCut.lean:59:39: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+CMActualGraphDiagonalAnalyticCut.lean:217:6: warning: `ext` did not consume the patterns `p`
+
+Note: This linter can be disabled with `set_option linter.unusedRCasesPattern false`
+CMActualGraphDiagonalAnalyticCut.lean:236:6: warning: `ext` did not consume the patterns `p`
+
+Note: This linter can be disabled with `set_option linter.unusedRCasesPattern false`
+CMActualGraphDiagonalAnalyticCut.lean:264:2: error: Type mismatch: After simplification, term
+  ContDiffAt.comp 0 hi0 he
+ has type
+  @ContDiffAt ℂ DenselyNormedField.toNontriviallyNormedField ℂ Complex.instNormedAddCommGroup
+    RCLike.innerProductSpace.toNormedSpace (ℂ × ℂ) Prod.normedAddCommGroup Prod.normedSpace ∞
+    (fun x => HasStrictFDerivAt.localInverse cmYParameterEquation cmYParameterDerivative 0 ⋯ (x, 0)) 0
+but is expected to have type
+  @ContDiffAt ℂ DenselyNormedField.toNontriviallyNormedField ℂ Complex.instNormedAddCommGroup
+    RCLike.innerProductSpace.toNormedSpace (ℂ × ℂ) Prod.normedAddCommGroup Prod.normedSpace ∞ cmYAnalyticGerm 0
+CMActualGraphDiagonalAnalyticCut.lean:277:2: error: Type mismatch: After simplification, term
+  ContDiffAt.comp 0 hi0 he
+ has type
+  @ContDiffAt ℂ DenselyNormedField.toNontriviallyNormedField ℂ Complex.instNormedAddCommGroup
+    RCLike.innerProductSpace.toNormedSpace (ℂ × ℂ) Prod.normedAddCommGroup Prod.normedSpace ∞
+    (fun x => HasStrictFDerivAt.localInverse cmZParameterEquation cmZParameterDerivative 0 ⋯ (x, 0)) 0
+but is expected to have type
+  @ContDiffAt ℂ DenselyNormedField.toNontriviallyNormedField ℂ Complex.instNormedAddCommGroup
+    RCLike.innerProductSpace.toNormedSpace (ℂ × ℂ) Prod.normedAddCommGroup Prod.normedSpace ∞ cmZAnalyticGerm 0
+'Holonics.Hodge.CMGraphSource.cmYPlanePoint_origin' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmZPlanePoint_origin' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYPlanePoint_actual_action' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmZPlanePoint_actual_action' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYAnalyticGerm_contDiff' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmZAnalyticGerm_contDiff' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYAnalyticGerm_coordinates' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmZAnalyticGerm_coordinates' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYAnalyticGerm_actual_source' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmZAnalyticGerm_actual_source' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYAnalyticGerm_graph_minus_diagonal' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmZAnalyticGerm_graph_minus_diagonal' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmActualGraphDiagonal_small_radius' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmGraphDiagonalLocalWinding_eq_Y_Serre' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmGraphDiagonalLocalWinding_eq_Z_Serre' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmActualFiniteCutPushforward_eq_two_localWindings' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmActualLocalWinding_source_radius' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmActualFiniteCutPushforward_actual_analytic_source' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+CMActualGraphDiagonalAnalyticCut.lean:641:2: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+CMActualGraphDiagonalAnalyticCut.lean:656:32: error(lean.invalidField): Invalid field `congr_deriv`: The environment does not contain `HasFDerivAtFilter.congr_deriv`, so it is not possible to project the field `congr_deriv` from an expression
+  HasFDerivAtFilter.prodMk hfirst hsecond
+of type
+  HasFDerivAtFilter (fun x => ((a / b) x, ((fun x => 1) / b) x))
+    ((ContinuousLinearMap.toSpanSingleton ℂ ((da * b t - a t * db) / b t ^ 2)).prod
+      (ContinuousLinearMap.toSpanSingleton ℂ ((0 * b t - 1 * db) / b t ^ 2)))
+    (𝓝 t ×ˢ pure t)
+CMActualGraphDiagonalAnalyticCut.lean:657:2: error: No goals to be solved
+CMActualGraphDiagonalAnalyticCut.lean:674:4: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+CMActualGraphDiagonalAnalyticCut.lean:676:4: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+CMActualGraphDiagonalAnalyticCut.lean:690:8: warning: Unused tactic linter: `simp only [Complex.I_sq]` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+CMActualGraphDiagonalAnalyticCut.lean:691:8: warning: Unused tactic linter: `ring` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+CMActualGraphDiagonalAnalyticCut.lean:694:8: warning: Unused tactic linter: `ring` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+CMActualGraphDiagonalAnalyticCut.lean:690:8: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+CMActualGraphDiagonalAnalyticCut.lean:691:8: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+CMActualGraphDiagonalAnalyticCut.lean:694:8: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+CMActualGraphDiagonalAnalyticCut.lean:693:4: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+CMActualGraphDiagonalAnalyticCut.lean:704:18: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+CMActualGraphDiagonalAnalyticCut.lean:768:56: error: unsolved goals
+case fst
+p : ℂ × ℂ
+⊢ p.1 * p.2 * 2 = -(p.1 * p.2 * Complex.I ^ 2 * 2)
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+CMActualGraphDiagonalAnalyticCut.lean:775:56: error: unsolved goals
+case fst
+p : ℂ × ℂ
+⊢ p.2 * 2 = -(p.2 * Complex.I ^ 2 * 2)
+CMActualGraphDiagonalAnalyticCut.lean:777:56: warning: This simp argument is unused:
+  mul_pow
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [cmZPlaneAction, cmZTangentField, smul_eq_mul, Complex.I_sq]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+CMActualGraphDiagonalAnalyticCut.lean:777:65: warning: This simp argument is unused:
+  Complex.I_sq
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [cmZPlaneAction, cmZTangentField, smul_eq_mul, mul_pow]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+CMActualGraphDiagonalAnalyticCut.lean:826:35: warning: This simp argument is unused:
+  hfirst
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [cmTangentClockReading, hfirstZero, hsecond, htangentFirst, smul_eq_mul]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+CMActualGraphDiagonalAnalyticCut.lean:942:6: error: Tactic `rewrite` failed: motive is not type correct:
+  fun _a => cmZPlanePoint (cmYToZOverlap p) ⋯ ≫ cubicIotaHom = cmZPlanePoint _a ⋯
+Error: Application type mismatch: The argument
+  cmZPlaneEquation_action (cmYToZOverlap p)
+has type
+  cmZPlaneEquation (cmZPlaneAction (cmYToZOverlap p)) = -cmZPlaneEquation (cmYToZOverlap p)
+but is expected to have type
+  cmZPlaneEquation _a = -cmZPlaneEquation (cmYToZOverlap p)
+in the application
+  congrArg (fun _a => _a = 0) (cmZPlaneEquation_action (cmYToZOverlap p))
+
+Explanation: The rewrite tactic rewrites an expression 'e' using an equality 'a = b' by the following process. First, it looks for all 'a' in 'e'. Second, it tries to abstract these occurrences of 'a' to create a function 'm := fun _a => ...', called the *motive*, with the property that 'm a' is definitionally equal to 'e'. Third, we observe that 'congrArg' implies that 'm a = m b', which can be used with lemmas such as 'Eq.mpr' to change the goal. However, if 'e' depends on specific properties of 'a', then the motive 'm' might not typecheck.
+
+Possible solutions: use rewrite's 'occs' configuration option to limit which occurrences are rewritten, or use 'simp' or 'conv' mode, which have strategies for certain kinds of dependencies (these tactics can handle proofs and 'Decidable' instances whose types depend on the rewritten term, and 'simp' can apply user-defined '@[congr]' theorems as well).
+
+p : ℂ × ℂ
+hp : cmYPlaneEquation p = 0
+hb : p.2 ≠ 0
+h : cmZPlanePoint (cmYToZOverlap p) ⋯ ≫ cubicIotaHom = cmZPlanePoint (cmZPlaneAction (cmYToZOverlap p)) ⋯
+⊢ cmZPlanePoint (cmYToZOverlap p) ⋯ ≫ cubicIotaHom = cmZPlanePoint (cmYToZOverlap (cmYPlaneAction p)) ⋯
+'Holonics.Hodge.CMGraphSource.cmYToZOverlap_inverse' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmZToYOverlap_inverse' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYToZOverlap_equation' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYToZOverlap_actual_source' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYToZOverlap_hasDerivAt' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYToZOverlap_tangent_residual' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYToZOverlap_tangent_returns' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYToZOverlap_actual_action' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYToZOverlap_equationTangent_residual' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYToZOverlap_tangentKernel_returns' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYTangentField_tangent' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmZTangentField_tangent' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYTangentField_bezout' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmZTangentField_bezout' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYTangentField_ne_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmZTangentField_ne_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYTangentField_actual_action' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmZTangentField_actual_action' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYToZOverlapTangent_smul' depends on axioms: [propext, Class

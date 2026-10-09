@@ -1,0 +1,15 @@
+'Holonics.Hodge.CMGraphSource.cmYOverlap_roundtrip' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmZOverlap_roundtrip' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmActualCubicOverlapRingEquiv' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmActualCubicOverlap_evaluation_square' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmActualCubicOverlap_spec_evaluation_square' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYOverlapReceiver_actual_point' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmZOverlapReceiver_actual_point' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]

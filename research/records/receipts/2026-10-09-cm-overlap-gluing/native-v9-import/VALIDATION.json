@@ -1,0 +1,90 @@
+{
+  "kernel_accepted": true,
+  "compiler_exit": 0,
+  "compiler_wall_ns": 8590564179,
+  "queries_required": 7,
+  "queries_reached": 7,
+  "nonstandard_queries": [],
+  "meaningful_error_records": [],
+  "all_query_results": {
+    "Holonics.Hodge.CMGraphSource.cmYOverlap_roundtrip": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmZOverlap_roundtrip": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmActualCubicOverlapRingEquiv": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmActualCubicOverlap_evaluation_square": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmActualCubicOverlap_spec_evaluation_square": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmYOverlapReceiver_actual_point": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmZOverlapReceiver_actual_point": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "metadata_unchanged": true,
+  "results": [
+    {
+      "unit": "prep",
+      "accepted": true,
+      "wall_ns": 5998584626,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 5223613000,
+      "group_peak_B": 506945536,
+      "group_limit_B": 8589934592,
+      "measured_to_projected": {
+        "numerator": 5998584626,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true
+    },
+    {
+      "unit": "compile",
+      "accepted": true,
+      "wall_ns": 10665492530,
+      "projection_ns": 21132554884,
+      "aggregate_CPU_ns": 5634477000,
+      "group_peak_B": 4635521024,
+      "group_limit_B": 8589934592,
+      "measured_to_projected": {
+        "numerator": 10665492530,
+        "denominator": 21132554884
+      },
+      "quiescent_released": true
+    }
+  ],
+  "importer_launched": false,
+  "whole_owner_acceptance_required_before_importer": true,
+  "prior_failed_sources_and_logs_preserved": true,
+  "no_unchanged_retry_or_within_job_limit_raise": true,
+  "provider_rebuilt": false,
+  "queue_quiescent_released": true,
+  "publication_state": "ACCEPTED exact importing consumer",
+  "expected_queries": 7,
+  "full_library_checked": false,
+  "raw_native_fingerprint": {
+    "sha256": "9331be77feac69d328ee44cd47ab8f1f1e0b66f7069c5d68835b71bd5fe2b438",
+    "bytes": 3643
+  }
+}

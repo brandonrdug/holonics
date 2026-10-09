@@ -1,0 +1,25 @@
+{
+  "compiler_exit": 124,
+  "compiler_wall_ns": 17155133211,
+  "queries_required": 59,
+  "queries_reached": 36,
+  "nonstandard_queries": [
+    "Holonics.Hodge.CMGraphSource.cmYAnalyticGerm_contDiff",
+    "Holonics.Hodge.CMGraphSource.cmZAnalyticGerm_contDiff",
+    "Holonics.Hodge.CMGraphSource.cmYAnalyticGerm_actual_source",
+    "Holonics.Hodge.CMGraphSource.cmZAnalyticGerm_actual_source",
+    "Holonics.Hodge.CMGraphSource.cmActualGraphDiagonal_small_radius",
+    "Holonics.Hodge.CMGraphSource.cmActualFiniteCutPushforward_actual_analytic_source",
+    "Holonics.Hodge.CMGraphSource.cmYToZOverlap_hasDerivAt",
+    "Holonics.Hodge.CMGraphSource.cmYTangentField_actual_action",
+    "Holonics.Hodge.CMGraphSource.cmZTangentField_actual_action"
+  ],
+  "importer_launched": false,
+  "publication_state": "REJECTED or incomplete predecessor; not a provider",
+  "expected_queries": 59,
+  "full_library_checked": false,
+  "raw_native_fingerprint": {
+    "sha256": "8d0bd244179b39eed7a91db299c9d24e0ab510544ae5c4d4c05d0174570efbb0",
+    "bytes": 1849
+  }
+}

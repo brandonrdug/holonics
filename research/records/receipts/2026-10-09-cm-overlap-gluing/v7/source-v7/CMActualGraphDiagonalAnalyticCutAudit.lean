@@ -1,0 +1,11 @@
+import CMActualGraphDiagonalAnalyticCut
+
+open Holonics.Hodge.CMGraphSource
+
+#print axioms cmYOverlap_roundtrip
+#print axioms cmZOverlap_roundtrip
+#print axioms cmActualCubicOverlapRingEquiv
+#print axioms cmActualCubicOverlap_evaluation_square
+#print axioms cmActualCubicOverlap_spec_evaluation_square
+#print axioms cmYOverlapReceiver_actual_point
+#print axioms cmZOverlapReceiver_actual_point

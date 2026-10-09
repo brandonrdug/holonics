@@ -1,0 +1,324 @@
+{
+  "kernel_accepted": false,
+  "compiler_exit": 124,
+  "compiler_wall_ns": 17186500034,
+  "queries_required": 59,
+  "queries_reached": 48,
+  "nonstandard_queries": [
+    "Holonics.Hodge.CMGraphSource.cmYAnalyticGerm_contDiff",
+    "Holonics.Hodge.CMGraphSource.cmZAnalyticGerm_contDiff",
+    "Holonics.Hodge.CMGraphSource.cmYAnalyticGerm_actual_source",
+    "Holonics.Hodge.CMGraphSource.cmZAnalyticGerm_actual_source",
+    "Holonics.Hodge.CMGraphSource.cmActualGraphDiagonal_small_radius",
+    "Holonics.Hodge.CMGraphSource.cmActualFiniteCutPushforward_actual_analytic_source"
+  ],
+  "meaningful_error_records": [
+    [
+      "280",
+      "2",
+      "Type mismatch: After simplification, term"
+    ],
+    [
+      "308",
+      "2",
+      "Type mismatch: After simplification, term"
+    ],
+    [
+      "1097",
+      "2",
+      "Type mismatch: After simplification, term"
+    ]
+  ],
+  "all_query_results": {
+    "Holonics.Hodge.CMGraphSource.cmYPlanePoint_origin": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmZPlanePoint_origin": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmYPlanePoint_actual_action": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmZPlanePoint_actual_action": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmYAnalyticGerm_contDiff": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmZAnalyticGerm_contDiff": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmYAnalyticGerm_coordinates": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmZAnalyticGerm_coordinates": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmYAnalyticGerm_actual_source": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmZAnalyticGerm_actual_source": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmYAnalyticGerm_graph_minus_diagonal": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmZAnalyticGerm_graph_minus_diagonal": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmActualGraphDiagonal_small_radius": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmGraphDiagonalLocalWinding_eq_Y_Serre": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmGraphDiagonalLocalWinding_eq_Z_Serre": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmActualFiniteCutPushforward_eq_two_localWindings": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmActualLocalWinding_source_radius": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmActualFiniteCutPushforward_actual_analytic_source": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmYToZOverlap_inverse": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmZToYOverlap_inverse": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmYToZOverlap_equation": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmYToZOverlap_actual_source": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmYToZOverlap_hasDerivAt": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmYToZOverlap_tangent_residual": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmYToZOverlap_tangent_returns": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmYToZOverlap_actual_action": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmYToZOverlap_equationTangent_residual": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmYToZOverlap_tangentKernel_returns": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmYTangentField_tangent": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmZTangentField_tangent": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmYTangentField_bezout": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmZTangentField_bezout": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmYTangentField_ne_zero": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmZTangentField_ne_zero": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmYTangentField_actual_action": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmZTangentField_actual_action": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmYToZOverlapTangent_smul": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmTangentClockReading_smul": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmTangentClockReading_reconstructs": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmYTangentClockReading_reconstructs": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmZTangentClockReading_reconstructs": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmActualCubic_tangentClock_overlap": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmActualCubic_tangentClock_overlap_of_tangent": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmActualCubic_tangentPath_overlap": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmActualCubic_tangentClock_Y_action": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmActualCubic_tangentClock_Z_action": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmActualCubic_overlap_receiver_coordinates": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmActualCubic_overlap_point_actual_action": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "metadata_unchanged": true,
+  "results": [
+    {
+      "unit": "prep",
+      "accepted": true,
+      "wall_ns": 5814954794,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 5076432000,
+      "group_peak_B": 482455552,
+      "group_limit_B": 8589934592,
+      "measured_to_projected": {
+        "numerator": 5814954794,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true
+    },
+    {
+      "unit": "compile",
+      "accepted": false,
+      "wall_ns": 19328390930,
+      "projection_ns": 21132554884,
+      "aggregate_CPU_ns": 14624337000,
+      "group_peak_B": 4635090944,
+      "group_limit_B": 8589934592,
+      "measured_to_projected": {
+        "numerator": 19328390930,
+        "denominator": 21132554884
+      },
+      "quiescent_released": true
+    }
+  ],
+  "importer_launched": false,
+  "whole_owner_acceptance_required_before_importer": true,
+  "prior_failed_sources_and_logs_preserved": true,
+  "no_unchanged_retry_or_within_job_limit_raise": true,
+  "provider_rebuilt": false,
+  "queue_quiescent_released": true,
+  "publication_state": "REJECTED or incomplete predecessor; not a provider",
+  "expected_queries": 59,
+  "full_library_checked": false,
+  "raw_native_fingerprint": {
+    "sha256": "ee373d4a1547034b65c087593a4aef30ea351d843caf1aaf5a86b7cd653b4c12",
+    "bytes": 14409
+  }
+}
