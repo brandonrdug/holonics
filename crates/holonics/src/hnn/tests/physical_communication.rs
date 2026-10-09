@@ -1448,11 +1448,16 @@ fn acceptance_cold(
 /// asserting acceptance only when a certified landing makes all four hold.
 ///
 /// 1. **Committed change.** A reached C/K/D deposit commits a nonzero lattice coordinate `q != 0`
-///    under its certified step: the family is not in `publication.publication.vanished` and its
-///    material moved. [agent-inferred] The criterion is met when at least one reached family commits;
+///    under its certified step: the family is not in `publication.publication.vanished`, its
+///    material moved, and every applied entry lies on the family's lattice (a movement off the
+///    lattice has no lattice coordinate, so it is refused as a reading and asserted against).
+///    [agent-inferred] The criterion is met when at least one reached family commits;
 ///    each family's label is printed beside it, so a stricter all-three reading is visible.
-/// 2. **Later response.** The later compared-station response differs from the unmoved-material
-///    control by an exact nonzero amount (0279's own comparison, with its exact difference printed).
+/// 2. **Later response.** The later response at the declared compared station (mask
+///    `[false, false, true]`, station 2) differs from the unmoved-material control by an exact
+///    nonzero amount, with station, crossing and tick identity checked. The whole field's
+///    difference is printed as a diagnostic only; a change at another station never passes the
+///    criterion.
 /// 3. **Energy accounting.** The world and material energy balance closes exactly: the opening
 ///    receipt `E_after - E_before = imposed - absorbed` of the deposit's word and of the later word,
 ///    the executed defects within their certified bounds, and the continuation's
@@ -1467,8 +1472,10 @@ fn acceptance_cold(
 ///    nothing accounts for no learned change, so the criterion is met only when criterion 1 is (a
 ///    no-change pass is never reported as learning).
 /// 4. **Cold continuation.** The same later-response difference survives a cold restore from exact
-///    text. [agent-inferred] It is met only when the restored later response equals the live one,
-///    their differences from the control are equal, and that difference is nonzero (criterion 2).
+///    text. It is met only when the restore reproduced the live material, carry and current, the
+///    cold word closes, the restored later response equals the live one, their differences from
+///    the control are equal, and that difference is nonzero (criterion 2). Equal output alone is
+///    not evidence that the saved point was restored.
 ///    `PhysicalReceiver` has no whole-passage cold path (`Resident::continuing_state` refuses its
 ///    receiving chart), so the restore is the narrower material-and-carry remount, and this test
 ///    prints that refusal beside it.
@@ -1604,6 +1611,7 @@ fn the_learned_change_acceptance_is_read_on_the_complete_contact_return() {
     let mut lineage = true;
     let mut remainder_split = true;
     let mut statistic_split = true;
+    let mut on_lattice = true;
     for (f, name) in ["C", "K", "D"].into_iter().enumerate() {
         let family = Family::Factor(f);
         let eta = publication.publication.family_step(locus, family);
@@ -1647,6 +1655,7 @@ fn the_learned_change_acceptance_is_read_on_the_complete_contact_return() {
             .collect();
         let entries = coordinates.len();
         let off_lattice = coordinates.iter().filter(|(_, r)| !r.is_zero()).count();
+        on_lattice &= off_lattice == 0;
         let q_nonzero = coordinates.iter().filter(|(q, _)| !q.is_zero()).count();
         let q_largest = coordinates
             .iter()
@@ -1694,7 +1703,8 @@ fn the_learned_change_acceptance_is_read_on_the_complete_contact_return() {
             .map(Signed::abs)
             .max()
             .unwrap_or_else(Rat::zero);
-        let committed = !vanished && moved && q_nonzero > 0 && eta.is_positive();
+        let committed =
+            !vanished && moved && off_lattice == 0 && q_nonzero > 0 && eta.is_positive();
         committed_families += usize::from(committed);
         let eta_reading = acceptance_exact(&eta);
         let largest_reading = acceptance_exact(&largest_with_prior);
@@ -1734,7 +1744,22 @@ fn the_learned_change_acceptance_is_read_on_the_complete_contact_return() {
         .flat_map(|(_, d)| d.iter())
         .map(|x| x * x)
         .sum();
-    let met2 = changed_coordinates > 0;
+    // The criterion reads the declared compared station only; the field difference is diagnostic.
+    let compared_stations: Vec<usize> = compared
+        .iter()
+        .enumerate()
+        .filter(|(_, c)| **c)
+        .map(|(station, _)| station)
+        .collect();
+    let compared_present = difference
+        .iter()
+        .any(|(station, _)| compared_stations.contains(station));
+    let compared_changed: usize = difference
+        .iter()
+        .filter(|(station, _)| compared_stations.contains(station))
+        .map(|(_, d)| d.iter().filter(|x| !x.is_zero()).count())
+        .sum();
+    let met2 = compared_present && compared_changed > 0;
     let cells_equal = next
         .boundary
         .readings()
@@ -1784,7 +1809,9 @@ fn the_learned_change_acceptance_is_read_on_the_complete_contact_return() {
     };
     println!(
         "learned-change acceptance criterion 2 (the later response differs from the unmoved-material \
-         control): {changed_coordinates} of {total_coordinates} realified logit coordinates differ; \
+         control): at the compared station(s) {compared_stations:?} (present={compared_present}), \
+         {compared_changed} coordinates differ; diagnostic over the whole field: \
+         {changed_coordinates} of {total_coordinates} realified logit coordinates differ; \
          difference (learned - control) = {difference_reading}; |difference|^2={squared_reading}; \
          distinguishing classes by station={distinguishing:?}; grain cells equal={cells_equal}; \
          leaders learned={leaders_learned:?} control={leaders_control:?}{attribution} => {}",
@@ -1903,7 +1930,13 @@ fn the_learned_change_acceptance_is_read_on_the_complete_contact_return() {
             );
             let closes = restored.later.closes();
             (
-                same_response && same_difference && met2,
+                material_back
+                    && carry_back
+                    && current_back
+                    && closes
+                    && same_response
+                    && same_difference
+                    && met2,
                 format!(
                     "the narrower material-and-carry cold remount ({bytes} bytes of exact text, a \
                      fresh founding at the declared budget): restored material == live \
@@ -1942,6 +1975,10 @@ fn the_learned_change_acceptance_is_read_on_the_complete_contact_return() {
     assert!(
         lineage,
         "each family's applied factor reaches the resident unchanged"
+    );
+    assert!(
+        on_lattice,
+        "every applied movement lies on its family's lattice, so q reads a lattice coordinate"
     );
     assert!(
         remainder_split,
