@@ -37,6 +37,17 @@ The helical code, the encoding every Holon carries, is defined in
     normal law, not yet in a participating world's comparison.
 - **Not built:** the linking reading of closed strands.
 
+**October 9: the World model** (#73; the
+[receiving-phase record](research/records/2026-10-08_THE_RECEIVING_PHASE_COMPARISON_RETAINS_AN_EXACT_FAMILY_AND_ITS_PROBE_IS_A_DECLARED_LEVERAGE.md) §7).
+- **Published (C1b):** the exact fixed-key filter over actual World steps, the coupled prospect of a prepared
+  action read before it runs, and a key's declared raw face. Each has its scoped native acceptance, and the
+  whole gate passed at their join ([receipts](research/records/receipts/2026-10-09-world-model/PUBLICATION.md)).
+- **In validation (C2):** the consequence of retained actual World history at one continuing crossing,
+  against a state-only matched control.
+- **Order of the recovered relations** ([record](research/records/2026-10-09_THE_RECOVERED_RELATIONS_JOIN_AT_THEIR_RECEIVERS_AND_KEEP_THEIR_REMAINDERS.md)): C2 first; then
+  two bounded Lean lanes, a finite torus subgroup receiver and the modular scattering residual; and the turn
+  menu's disjoint-coset fit as the first packing law.
+
 **October 9: the first learned landing** (#73; the
 [medium-of-joints record](research/records/2026-10-08_THE_MEDIUM_OF_JOINTS_SNAPS_CRACKLES_POPS_OR_FLOWS_AND_ITS_CURRENTS_CURVE_ITS_CONSTITUTION.md) §7).
 - **Before:** the certified contact step landed 22, 20 and 20 binary orders below the material lattice, and the
