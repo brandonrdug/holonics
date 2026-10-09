@@ -1252,7 +1252,7 @@ fn a_key_with_the_worlds_face_covers_its_observed_face_and_a_wrong_face_does_not
         vec![Rat::zero(); N],
         vec![rat(1, 4), rat(1, 8), rat(1, 16), rat(-1, 32)],
     ];
-    let (mut covered, mut separated) = (0, 0);
+    let (mut covered, mut separated, mut read_natively) = (0, 0, 0);
     for _ in 0..3 {
         let prepared = prepare(&mut receiver, &field, &source, &preparation, &request);
         if prepared.prospective().unique_control().is_none() {
@@ -1267,6 +1267,20 @@ fn a_key_with_the_worlds_face_covers_its_observed_face_and_a_wrong_face_does_not
         let communication = prepared.encounter().unwrap();
         let steps = steps_of(&communication);
         let actual = &steps[epoch - 1].face;
+        // The encounter's own blind read of the compared station, in the producing frame.
+        let native = match &communication {
+            ActionCommunication::Received(received) => received
+                .boundary
+                .readings()
+                .iter()
+                .find(|read| read.station == 1)
+                .map(|read| read.read.logits.clone()),
+            _ => None,
+        };
+        let station = native.as_deref().map(|logits| (1, logits));
+        if station.is_some() {
+            read_natively += 1;
+        }
         let truth = prospects[0].as_ref().unwrap();
         let faced = prospects[1].as_ref().unwrap();
         let faceless = prospects[2].as_ref().unwrap();
@@ -1278,18 +1292,38 @@ fn a_key_with_the_worlds_face_covers_its_observed_face_and_a_wrong_face_does_not
         let mut shifted = truth.faces[0].1.clone();
         shifted[0] += integer(1);
         assert_eq!(faced.faces[0].1, shifted);
-        // One k carries the World's own face key onto the waves and the observed face together.
+        // One k carries the World's own face key onto all three actual values together: the
+        // waves, the native receiving logits and the observed raw face.
         let face = Some((1, actual.as_slice()));
-        assert!(holds(truth, &steps, None, face));
+        assert!(holds(truth, &steps, station, face));
         covered += 1;
-        // Where the waves alone fix k, the true port law with the wrong face fails: no k that the
-        // waves admit can also absorb the face's offset.
+        // Where the waves alone fix k, the true port law with the wrong face fails the same
+        // combined check: no k that the waves admit can also absorb the face's offset.
         let (matrix, _) = stacked(truth, &steps, None, None).unwrap();
         if matrix.rank().unwrap() == truth.directions.len() {
-            assert!(!holds(faced, &steps, None, face));
+            assert!(!holds(faced, &steps, station, face));
             separated += 1;
         }
+        // An undeclared face is neutral: the faceless key carries no face rows in any direction,
+        // predicts the same waves and native readout as the same law with a face, and holds the
+        // actual waves and native readout with no face row at all.
+        assert!(
+            faceless
+                .directions
+                .iter()
+                .all(|direction| direction.faces.is_empty())
+        );
+        assert_eq!(faceless.point, truth.point);
+        for (bare, faced_direction) in faceless.directions.iter().zip(&truth.directions) {
+            assert_eq!(
+                (&bare.waves, &bare.features),
+                (&faced_direction.waves, &faced_direction.features)
+            );
+        }
+        assert!(holds(faceless, &steps, station, None));
     }
     assert!(covered > 0);
     assert!(separated > 0);
+    // The combined check read the actual native readout at least once, so it is never vacuous.
+    assert!(read_natively > 0);
 }
