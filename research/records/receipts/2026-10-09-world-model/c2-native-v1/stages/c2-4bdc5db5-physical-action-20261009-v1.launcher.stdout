@@ -1,0 +1,2 @@
+{"admitted": "c2-4bdc5db5-physical-action-20261009-v1", "MemAvailable_bytes": 12295806976}
+{"label": "c2-4bdc5db5-physical-action-20261009-v1", "deferred_lock_busy": false, "final_CPU_ns": 1364119000, "wall_ns": 1410505430, "quiescent": true, "outer_error": null, "passed": true}

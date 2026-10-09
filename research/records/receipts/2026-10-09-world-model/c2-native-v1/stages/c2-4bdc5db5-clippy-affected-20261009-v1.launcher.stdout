@@ -1,0 +1,2 @@
+{"admitted": "c2-4bdc5db5-clippy-affected-20261009-v1", "MemAvailable_bytes": 12227551232}
+{"label": "c2-4bdc5db5-clippy-affected-20261009-v1", "deferred_lock_busy": false, "final_CPU_ns": 12539207000, "wall_ns": 12404092371, "quiescent": true, "outer_error": null, "passed": true}

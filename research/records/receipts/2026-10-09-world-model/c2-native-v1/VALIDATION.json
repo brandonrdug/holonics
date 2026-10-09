@@ -1,0 +1,602 @@
+{
+  "grade": "Scoped C2 native acceptance PASS; final joined repository gate awaiting supplied pin",
+  "source_commit": "4bdc5db5f605421402557eed19808f1c3c1cbdcb",
+  "source_tree": "25328d909cc310951f01bf07e6eefcf2c9c39c19",
+  "source_inputs": 352,
+  "source_manifest": {
+    "sha256": "27ac813733b3ec15ff6d8e885f430a7b0e79ddd7a563657b084215e5ea89478f",
+    "bytes": 79054
+  },
+  "exact_frozen_Git_bytes_unchanged": true,
+  "workspace_all_targets_check_passed": true,
+  "four_fresh_test_executables": true,
+  "world_model_tests_passed": 11,
+  "affected_guards_passed": 15,
+  "unique_scoped_fixtures_passed": 26,
+  "fixtures": [
+    "a_disconnected_key_is_eliminated_only_by_its_exact_annihilator",
+    "a_held_preimage_or_foreign_clock_changes_neither_actual_participant",
+    "a_key_with_the_worlds_face_covers_its_observed_face_and_a_wrong_face_does_not",
+    "a_non_passive_key_is_held_at_its_certified_cut_while_the_tick_advances",
+    "a_plural_preimage_keeps_its_kernel_and_an_unreachable_request_returns_its_obstruction",
+    "a_prospect_is_refused_without_a_world_model_and_moves_no_participant",
+    "a_unique_preparation_uses_the_full_loaded_opening_and_actual_pump_clock",
+    "actual_prior_world_history_changes_native_carry_and_matched_later_choice",
+    "an_actual_world_face_changes_r_then_the_later_native_prospect",
+    "an_interrupted_encounter_is_absorbed_through_its_executed_steps_without_rollback",
+    "an_unconstrained_request_retains_the_whole_control_domain",
+    "binding_is_refused_without_a_world_off_its_tick_or_off_the_source_frame",
+    "hnn::tests::guards::guard_eleven_refine_and_compare_leave_the_constitution",
+    "hnn::tests::guards::guard_fifteen_the_budget_is_refused_never_rounded",
+    "hnn::tests::guards::guard_fifteen_the_grain_reading_rounds_nothing",
+    "hnn::tests::guards::guard_five_the_collapse_runs_only_at_the_carry_out",
+    "hnn::tests::guards::guard_four_the_constitution_keeps_no_journal",
+    "hnn::tests::guards::guard_nine_the_alphabet_does_not_fix_the_architecture",
+    "hnn::tests::guards::guard_one_the_moment_is_sized_once_and_lossy_past_its_capacity",
+    "paired_actual_faces_keep_mass_phase_and_unobserved_regions",
+    "retained_world_history_fixes_the_next_reading_that_its_state_only_control_leaves_open",
+    "the_current_receiving_material_changes_the_prospect_and_stale_producing_words_refuse",
+    "the_resident_charges_the_models_current_bits_at_every_encounter",
+    "the_return_image_separates_the_free_and_forced_responses_and_holds_the_actual_returns",
+    "the_world_key_reproduces_every_actual_step_and_its_fibre_is_the_batch_preimage",
+    "the_world_keys_coupled_prospect_holds_the_actual_encounter_before_it_runs"
+  ],
+  "each_scoped_fixture_executed_once": true,
+  "affected_library_and_test_guard_lints_passed": true,
+  "guard_doctests_passed": 57,
+  "whole_gate_sh_passed": false,
+  "all_targets_guard_lints_rerun": false,
+  "prior_d96cdbd8_gate_passed": true,
+  "final_joined_gate_run": false,
+  "final_joined_gate_awaits_supplied_pin": true,
+  "results": [
+    {
+      "label": "c2-4bdc5db5-check-20261009-v1",
+      "accepted": true,
+      "exit": 0,
+      "command_wall_ns": 30705005119,
+      "guarded_wall_ns": 32186862173,
+      "projection_ns": 65000000000,
+      "measured_to_projected": {
+        "numerator": 32186862173,
+        "denominator": 65000000000
+      },
+      "aggregate_CPU_ns": 32417004000,
+      "child_CPU_user_us": 27638631,
+      "child_CPU_system_us": 2218761,
+      "peak_child_RSS_KiB": 1527072,
+      "group_peak_bytes": 1656963072,
+      "reservation_bytes": 4294967296,
+      "enforced_cap_bytes": 4294967296,
+      "maximum_authorized_bytes": 8589934592,
+      "thread_budget": 4,
+      "fixtures": [],
+      "stdout": {
+        "sha256": "0104b0325affa59fcedb2d8a0586229cc6a11eaf47c491c4653125ff6034dba8",
+        "bytes": 46313
+      },
+      "stderr": {
+        "sha256": "513d6006e6b3a6f815a54f09e46d9dc13f8c3e1fd37e4f64a656c9cc4186632a",
+        "bytes": 600
+      },
+      "quiescent_released": true
+    },
+    {
+      "label": "c2-4bdc5db5-build-20261009-v1",
+      "accepted": true,
+      "exit": 0,
+      "command_wall_ns": 57769412771,
+      "guarded_wall_ns": 59354654392,
+      "projection_ns": 65000000000,
+      "measured_to_projected": {
+        "numerator": 59354654392,
+        "denominator": 65000000000
+      },
+      "aggregate_CPU_ns": 60518180000,
+      "child_CPU_user_us": 52236050,
+      "child_CPU_system_us": 4374581,
+      "peak_child_RSS_KiB": 2132856,
+      "group_peak_bytes": 2396835840,
+      "reservation_bytes": 4294967296,
+      "enforced_cap_bytes": 4294967296,
+      "maximum_authorized_bytes": 8589934592,
+      "thread_budget": 4,
+      "fixtures": [],
+      "stdout": {
+        "sha256": "0f4291d3ed4ef247d925bbb621a25382e72b21c48690c61ae980922b86062729",
+        "bytes": 35339
+      },
+      "stderr": {
+        "sha256": "7408a3a23ede92860aef0d627f9982583b1df73ffffc4910c4b0c1742a1b1aa5",
+        "bytes": 223
+      },
+      "quiescent_released": true
+    },
+    {
+      "label": "c2-4bdc5db5-c2-development-20261009-v1",
+      "accepted": true,
+      "exit": 0,
+      "command_wall_ns": 5797424426,
+      "guarded_wall_ns": 7088548073,
+      "projection_ns": 189929132768,
+      "measured_to_projected": {
+        "numerator": 7088548073,
+        "denominator": 189929132768
+      },
+      "aggregate_CPU_ns": 6975089000,
+      "child_CPU_user_us": 5384068,
+      "child_CPU_system_us": 124263,
+      "peak_child_RSS_KiB": 28660,
+      "group_peak_bytes": 32841728,
+      "reservation_bytes": 4294967296,
+      "enforced_cap_bytes": 4294967296,
+      "maximum_authorized_bytes": 8589934592,
+      "thread_budget": 1,
+      "fixtures": [
+        "retained_world_history_fixes_the_next_reading_that_its_state_only_control_leaves_open"
+      ],
+      "stdout": {
+        "sha256": "a4756046074f51d793b6eae8b1352fc5c29e9adadbd2d6790f94fa62ba2816bf",
+        "bytes": 211
+      },
+      "stderr": {
+        "sha256": "331a8a777563b78b0a636a9caaa0978c6e572b0e286f7f49c1aa7bc88ce5b1d7",
+        "bytes": 1247
+      },
+      "quiescent_released": true
+    },
+    {
+      "label": "c2-4bdc5db5-world-existing-20261009-v1",
+      "accepted": true,
+      "exit": 0,
+      "command_wall_ns": 11708882923,
+      "guarded_wall_ns": 13279798723,
+      "projection_ns": 81286517520,
+      "measured_to_projected": {
+        "numerator": 13279798723,
+        "denominator": 81286517520
+      },
+      "aggregate_CPU_ns": 12986424000,
+      "child_CPU_user_us": 10872057,
+      "child_CPU_system_us": 294008,
+      "peak_child_RSS_KiB": 28724,
+      "group_peak_bytes": 981884928,
+      "reservation_bytes": 4294967296,
+      "enforced_cap_bytes": 4294967296,
+      "maximum_authorized_bytes": 8589934592,
+      "thread_budget": 1,
+      "fixtures": [
+        "a_disconnected_key_is_eliminated_only_by_its_exact_annihilator",
+        "a_key_with_the_worlds_face_covers_its_observed_face_and_a_wrong_face_does_not",
+        "a_non_passive_key_is_held_at_its_certified_cut_while_the_tick_advances",
+        "a_prospect_is_refused_without_a_world_model_and_moves_no_participant",
+        "an_interrupted_encounter_is_absorbed_through_its_executed_steps_without_rollback",
+        "binding_is_refused_without_a_world_off_its_tick_or_off_the_source_frame",
+        "the_resident_charges_the_models_current_bits_at_every_encounter",
+        "the_return_image_separates_the_free_and_forced_responses_and_holds_the_actual_returns",
+        "the_world_key_reproduces_every_actual_step_and_its_fibre_is_the_batch_preimage",
+        "the_world_keys_coupled_prospect_holds_the_actual_encounter_before_it_runs"
+      ],
+      "stdout": {
+        "sha256": "1b2e4385645c221fe5295210606db0da200c228025edb338d8fb878d4f7555e4",
+        "bytes": 973
+      },
+      "stderr": {
+        "sha256": "7e3d5afb7a8921262eea646327aab1a5c1ae04029e592d5e9e87485475c7ff2b",
+        "bytes": 1247
+      },
+      "quiescent_released": true
+    },
+    {
+      "label": "c2-4bdc5db5-native-action-20261009-v1",
+      "accepted": true,
+      "exit": 0,
+      "command_wall_ns": 580471083,
+      "guarded_wall_ns": 1824341686,
+      "projection_ns": 33714607008,
+      "measured_to_projected": {
+        "numerator": 1824341686,
+        "denominator": 33714607008
+      },
+      "aggregate_CPU_ns": 1783380000,
+      "child_CPU_user_us": 516398,
+      "child_CPU_system_us": 33398,
+      "peak_child_RSS_KiB": 18320,
+      "group_peak_bytes": 19488768,
+      "reservation_bytes": 4294967296,
+      "enforced_cap_bytes": 4294967296,
+      "maximum_authorized_bytes": 8589934592,
+      "thread_budget": 1,
+      "fixtures": [
+        "a_held_preimage_or_foreign_clock_changes_neither_actual_participant",
+        "actual_prior_world_history_changes_native_carry_and_matched_later_choice",
+        "an_actual_world_face_changes_r_then_the_later_native_prospect",
+        "paired_actual_faces_keep_mass_phase_and_unobserved_regions"
+      ],
+      "stdout": {
+        "sha256": "9ecfa9c392ef23ed5e74e8768944319043d6f4d61b5e77875844e29d52337fec",
+        "bytes": 423
+      },
+      "stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "quiescent_released": true
+    },
+    {
+      "label": "c2-4bdc5db5-physical-action-20261009-v1",
+      "accepted": true,
+      "exit": 0,
+      "command_wall_ns": 185771087,
+      "guarded_wall_ns": 1410505430,
+      "projection_ns": 33714607008,
+      "measured_to_projected": {
+        "numerator": 1410505430,
+        "denominator": 33714607008
+      },
+      "aggregate_CPU_ns": 1364119000,
+      "child_CPU_user_us": 164082,
+      "child_CPU_system_us": 10365,
+      "peak_child_RSS_KiB": 18320,
+      "group_peak_bytes": 18550784,
+      "reservation_bytes": 4294967296,
+      "enforced_cap_bytes": 4294967296,
+      "maximum_authorized_bytes": 8589934592,
+      "thread_budget": 1,
+      "fixtures": [
+        "a_plural_preimage_keeps_its_kernel_and_an_unreachable_request_returns_its_obstruction",
+        "a_unique_preparation_uses_the_full_loaded_opening_and_actual_pump_clock",
+        "an_unconstrained_request_retains_the_whole_control_domain",
+        "the_current_receiving_material_changes_the_prospect_and_stale_producing_words_refuse"
+      ],
+      "stdout": {
+        "sha256": "5406f75768bdec25082cf8424cc50d62041f49823e181a06186c09b12dd804eb",
+        "bytes": 462
+      },
+      "stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "quiescent_released": true
+    },
+    {
+      "label": "c2-4bdc5db5-retention-guards-20261009-v1",
+      "accepted": true,
+      "exit": 0,
+      "command_wall_ns": 287153422,
+      "guarded_wall_ns": 1538235363,
+      "projection_ns": 57500562264,
+      "measured_to_projected": {
+        "numerator": 1538235363,
+        "denominator": 57500562264
+      },
+      "aggregate_CPU_ns": 1484224000,
+      "child_CPU_user_us": 265617,
+      "child_CPU_system_us": 5864,
+      "peak_child_RSS_KiB": 30720,
+      "group_peak_bytes": 19832832,
+      "reservation_bytes": 4294967296,
+      "enforced_cap_bytes": 4294967296,
+      "maximum_authorized_bytes": 8589934592,
+      "thread_budget": 1,
+      "fixtures": [
+        "hnn::tests::guards::guard_eleven_refine_and_compare_leave_the_constitution",
+        "hnn::tests::guards::guard_fifteen_the_budget_is_refused_never_rounded",
+        "hnn::tests::guards::guard_fifteen_the_grain_reading_rounds_nothing",
+        "hnn::tests::guards::guard_five_the_collapse_runs_only_at_the_carry_out",
+        "hnn::tests::guards::guard_four_the_constitution_keeps_no_journal",
+        "hnn::tests::guards::guard_nine_the_alphabet_does_not_fix_the_architecture",
+        "hnn::tests::guards::guard_one_the_moment_is_sized_once_and_lossy_past_its_capacity"
+      ],
+      "stdout": {
+        "sha256": "12abbb7f31a3c0bb807156eb0e226c48f0b3ca90d6ec3f235436736b1adefb4a",
+        "bytes": 705
+      },
+      "stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "quiescent_released": true
+    },
+    {
+      "label": "c2-4bdc5db5-clippy-affected-20261009-v1",
+      "accepted": true,
+      "exit": 0,
+      "command_wall_ns": 10994686574,
+      "guarded_wall_ns": 12404092371,
+      "projection_ns": 65000000000,
+      "measured_to_projected": {
+        "numerator": 12404092371,
+        "denominator": 65000000000
+      },
+      "aggregate_CPU_ns": 12539207000,
+      "child_CPU_user_us": 10070514,
+      "child_CPU_system_us": 765810,
+      "peak_child_RSS_KiB": 989008,
+      "group_peak_bytes": 1372868608,
+      "reservation_bytes": 4294967296,
+      "enforced_cap_bytes": 4294967296,
+      "maximum_authorized_bytes": 8589934592,
+      "thread_budget": 4,
+      "fixtures": [],
+      "stdout": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "sha256": "a9d95684b7d6b7b155c7cffa487d93976d526b45c88160924b2e87c4094c7c43",
+        "bytes": 314455
+      },
+      "quiescent_released": true
+    },
+    {
+      "label": "c2-4bdc5db5-doc-20261009-v1",
+      "accepted": true,
+      "exit": 0,
+      "command_wall_ns": 26911765287,
+      "guarded_wall_ns": 28380325785,
+      "projection_ns": 65000000000,
+      "measured_to_projected": {
+        "numerator": 28380325785,
+        "denominator": 65000000000
+      },
+      "aggregate_CPU_ns": 28782292000,
+      "child_CPU_user_us": 23178882,
+      "child_CPU_system_us": 3146843,
+      "peak_child_RSS_KiB": 1403484,
+      "group_peak_bytes": 1641533440,
+      "reservation_bytes": 4294967296,
+      "enforced_cap_bytes": 4294967296,
+      "maximum_authorized_bytes": 8589934592,
+      "thread_budget": 4,
+      "fixtures": [],
+      "stdout": {
+        "sha256": "67079a74c5e3279d655afc83d6a447a6ecc7f468dbe793784448624db51e9c34",
+        "bytes": 5894
+      },
+      "stderr": {
+        "sha256": "6a8a657229cf3ef7feda2846b1d6639700983d96ba390fd7350a8282fb0a1151",
+        "bytes": 39976
+      },
+      "quiescent_released": true
+    }
+  ],
+  "commands_manifest": {
+    "sha256": "60e7149c3ed141fd585e8ba60f68583c244de4ee14998d1c885d8083ef627358",
+    "bytes": 12221
+  },
+  "executable_pins": {
+    "physical_action": {
+      "sha256": "ecdaa84b53afb3570f100416e0701bfde03351713ae2e7af6a487381b3d06bee",
+      "bytes": 21718704
+    },
+    "native_action_return": {
+      "sha256": "ef7aaeb748aab1c2dd70d05f4611e2aac217cf413700717c076f5d3feb7d9286",
+      "bytes": 33948200
+    },
+    "world_model": {
+      "sha256": "24f49fcdc218f5c09bae062dde2011d32fe9a21f13a14b20fa4ffdf13132c472",
+      "bytes": 33031600
+    },
+    "holonics": {
+      "sha256": "606752ca28c6295a55a4413b4bc0d37ec6713c329ec963f0c751a80ec1fbd533",
+      "bytes": 76938208
+    }
+  },
+  "compiler_warnings": [
+    {
+      "message": "method `anchor_differential_joined` is never used",
+      "level": "warning",
+      "spans": [
+        {
+          "byte_end": 37640,
+          "byte_start": 37623,
+          "column_end": 18,
+          "column_start": 1,
+          "expansion": null,
+          "file_name": "crates/holonics/src/hnn/port.rs",
+          "is_primary": false,
+          "label": "method in this implementation",
+          "line_end": 850,
+          "line_start": 850,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 18,
+              "highlight_start": 1,
+              "text": "impl<'c> Word<'c> {"
+            }
+          ]
+        },
+        {
+          "byte_end": 42059,
+          "byte_start": 42033,
+          "column_end": 45,
+          "column_start": 19,
+          "expansion": null,
+          "file_name": "crates/holonics/src/hnn/port.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 942,
+          "line_start": 942,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 45,
+              "highlight_start": 19,
+              "text": "    pub(crate) fn anchor_differential_joined("
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "message": "method `seeds` is never used",
+      "level": "warning",
+      "spans": [
+        {
+          "byte_end": 63439,
+          "byte_start": 63416,
+          "column_end": 24,
+          "column_start": 1,
+          "expansion": null,
+          "file_name": "crates/holonics/src/hnn/receiving.rs",
+          "is_primary": false,
+          "label": "method in this implementation",
+          "line_end": 1310,
+          "line_start": 1310,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 24,
+              "highlight_start": 1,
+              "text": "impl SourceObserverView {"
+            }
+          ]
+        },
+        {
+          "byte_end": 75799,
+          "byte_start": 75794,
+          "column_end": 24,
+          "column_start": 19,
+          "expansion": null,
+          "file_name": "crates/holonics/src/hnn/receiving.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 1606,
+          "line_start": 1606,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 24,
+              "highlight_start": 19,
+              "text": "    pub(crate) fn seeds("
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "message": "method `advanced` is never used",
+      "level": "warning",
+      "spans": [
+        {
+          "byte_end": 9293,
+          "byte_start": 9268,
+          "column_end": 26,
+          "column_start": 1,
+          "expansion": null,
+          "file_name": "crates/holonics/src/hnn/word/variation.rs",
+          "is_primary": false,
+          "label": "method in this implementation",
+          "line_end": 236,
+          "line_start": 236,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 26,
+              "highlight_start": 1,
+              "text": "impl HeldContactVariation {"
+            }
+          ]
+        },
+        {
+          "byte_end": 18786,
+          "byte_start": 18778,
+          "column_end": 27,
+          "column_start": 19,
+          "expansion": null,
+          "file_name": "crates/holonics/src/hnn/word/variation.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 473,
+          "line_start": 473,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 27,
+              "highlight_start": 19,
+              "text": "    pub(crate) fn advanced(&self, word: &Word<'_>, opened: &[EndChange]) -> Result<Self, HnnError> {"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "message": "method `advanced` is never used",
+      "level": "warning",
+      "spans": [
+        {
+          "byte_end": 9293,
+          "byte_start": 9268,
+          "column_end": 26,
+          "column_start": 1,
+          "expansion": null,
+          "file_name": "crates/holonics/src/hnn/word/variation.rs",
+          "is_primary": false,
+          "label": "method in this implementation",
+          "line_end": 236,
+          "line_start": 236,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 26,
+              "highlight_start": 1,
+              "text": "impl HeldContactVariation {"
+            }
+          ]
+        },
+        {
+          "byte_end": 18786,
+          "byte_start": 18778,
+          "column_end": 27,
+          "column_start": 19,
+          "expansion": null,
+          "file_name": "crates/holonics/src/hnn/word/variation.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 473,
+          "line_start": 473,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 27,
+              "highlight_start": 19,
+              "text": "    pub(crate) fn advanced(&self, word: &Word<'_>, opened: &[EndChange]) -> Result<Self, HnnError> {"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "all_projections_fixed_before_launch": true,
+  "limits_raised_after_launch": false,
+  "all_leases_released": true,
+  "no_native_process_or_active_owned_unit_remaining": true,
+  "failed_unit_metadata_only": [],
+  "source_edits": false,
+  "Git_publication": false,
+  "GPU_runtime": false,
+  "cache_clearing": false,
+  "system_changes": false,
+  "private_correspondence_in_packet": false,
+  "scope": "Two actual encounters on one continuing receiver and World: retained reflected-wave constraints versus an incident-carried unbound control on the same physical state and second prepared action. Retained fibre and joint prospects lie in control; retained directions fix compared native logits while an exact control member changes relative quantized grain indices or lifted phase blocks. The single second execution agrees with fixed native point and joint waves/native cover; fixed raw faces agree conditionally, false-faced key remains Live. No action selection or model learning.",
+  "not_certified": [
+    "grain Face.of_read target coverage",
+    "conditioning retained fibres on actual declared face observations",
+    "deployed elimination of wrong-face alternatives",
+    "general plural raw-to-grain forward cover",
+    "Ask over keys",
+    "learning through the model",
+    "CUDA runtime parity",
+    "World/Robin full first/second material variation"
+  ]
+}

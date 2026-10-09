@@ -266,8 +266,9 @@ join].
   read and its actual waves were carried by one `k`. Where the waves alone fix `k`, a wrong face
   offset was incompatible, and a key without a face added no rows.
 
-**The consequence of retained World history (C2)** [definition; agent-inferred, October 9; source
-under validation]. Two actual encounters run on one receiver and one World. Before the first, the
+**The consequence of retained World history (C2)** [definition; agent-inferred, October 9; scoped
+native acceptance at `4bdc5db5f` ([receipt](receipts/2026-10-09-world-model/PUBLICATION.md)); the
+whole gate is owed at the final join]. Two actual encounters run on one receiver and one World. Before the first, the
 World model's prospect is read over its whole fibre, and one `k` of the World's key carries the
 actual passage.
 - **The matched control.** At the continuing crossing one prepared second action is read from the
@@ -300,6 +301,10 @@ actual passage.
     participants continue.
 - **False faces.** The family carries the World's law with a false face. The port filter keeps it
   live, and it is never counted as eliminated.
+- **Accepted.** At the continuing crossing the retained prospect lay in the control's. No
+  retained direction moved the compared station's logits, while a control member read a different
+  relative grain index or phase block. The once-executed second encounter read the retained
+  point's logits exactly, with one `k` carrying its waves and logits.
 - **Not claimed.**
   - A selection: both plans read one declared control.
   - The Ask over keys, which would read the key family's coupled future per admitted wave. The

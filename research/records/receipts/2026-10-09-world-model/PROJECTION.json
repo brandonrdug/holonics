@@ -1,5 +1,152 @@
 {
   "files": {
+    "c2-native-v1/stages/c2-4bdc5db5-build-20261009-v1.stderr": {
+      "original": {
+        "bytes": 223,
+        "sha256": "7408a3a23ede92860aef0d627f9982583b1df73ffffc4910c4b0c1742a1b1aa5"
+      },
+      "projected": {
+        "bytes": 178,
+        "sha256": "cf325eb64900b0228ac40f75e3a0d976b9a7b4de6610c2b52bd21b041ff4b809"
+      },
+      "replaced": {
+        "<c2-run>/": 1,
+        "<candidate-worktree>/": 0,
+        "<cargo-registry>/": 0,
+        "<coupled-run>/": 0,
+        "<face-run>/": 0,
+        "<gate-run>/": 0,
+        "<native-run>/": 0,
+        "<queue-admission>/": 0,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "c2-native-v1/stages/c2-4bdc5db5-build-20261009-v1.stdout": {
+      "original": {
+        "bytes": 35339,
+        "sha256": "0f4291d3ed4ef247d925bbb621a25382e72b21c48690c61ae980922b86062729"
+      },
+      "projected": {
+        "bytes": 29269,
+        "sha256": "7055bfa617191393c8135ed3832e7a8dcbe8f4d9e42d19f341717c242aac2734"
+      },
+      "replaced": {
+        "<c2-run>/": 86,
+        "<candidate-worktree>/": 0,
+        "<cargo-registry>/": 50,
+        "<coupled-run>/": 0,
+        "<face-run>/": 0,
+        "<gate-run>/": 0,
+        "<native-run>/": 0,
+        "<queue-admission>/": 0,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "c2-native-v1/stages/c2-4bdc5db5-c2-development-20261009-v1.stderr": {
+      "original": {
+        "bytes": 1247,
+        "sha256": "331a8a777563b78b0a636a9caaa0978c6e572b0e286f7f49c1aa7bc88ce5b1d7"
+      },
+      "projected": {
+        "bytes": 1202,
+        "sha256": "cd01dec33f3ac3e0d3f9c915b0c5e97cbbd542a523fa02e5287937612d0faa5e"
+      },
+      "replaced": {
+        "<c2-run>/": 1,
+        "<candidate-worktree>/": 0,
+        "<cargo-registry>/": 0,
+        "<coupled-run>/": 0,
+        "<face-run>/": 0,
+        "<gate-run>/": 0,
+        "<native-run>/": 0,
+        "<queue-admission>/": 0,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "c2-native-v1/stages/c2-4bdc5db5-check-20261009-v1.stderr": {
+      "original": {
+        "bytes": 600,
+        "sha256": "513d6006e6b3a6f815a54f09e46d9dc13f8c3e1fd37e4f64a656c9cc4186632a"
+      },
+      "projected": {
+        "bytes": 510,
+        "sha256": "1129ea5d4ef8d8e896c3623d65ace1ee037d4a0d599ee3ccabae5389fa0829d4"
+      },
+      "replaced": {
+        "<c2-run>/": 2,
+        "<candidate-worktree>/": 0,
+        "<cargo-registry>/": 0,
+        "<coupled-run>/": 0,
+        "<face-run>/": 0,
+        "<gate-run>/": 0,
+        "<native-run>/": 0,
+        "<queue-admission>/": 0,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "c2-native-v1/stages/c2-4bdc5db5-check-20261009-v1.stdout": {
+      "original": {
+        "bytes": 46313,
+        "sha256": "0104b0325affa59fcedb2d8a0586229cc6a11eaf47c491c4653125ff6034dba8"
+      },
+      "projected": {
+        "bytes": 38173,
+        "sha256": "300a9af2e30e9cd4bda733e22f95e78b700a749ea107846da3d6255e670ff215"
+      },
+      "replaced": {
+        "<c2-run>/": 132,
+        "<candidate-worktree>/": 0,
+        "<cargo-registry>/": 50,
+        "<coupled-run>/": 0,
+        "<face-run>/": 0,
+        "<gate-run>/": 0,
+        "<native-run>/": 0,
+        "<queue-admission>/": 0,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "c2-native-v1/stages/c2-4bdc5db5-doc-20261009-v1.stderr": {
+      "original": {
+        "bytes": 39976,
+        "sha256": "6a8a657229cf3ef7feda2846b1d6639700983d96ba390fd7350a8282fb0a1151"
+      },
+      "projected": {
+        "bytes": 38806,
+        "sha256": "8c204af2fad030533ea4283e61e014ce9e3835157e6fed83d20b8df7b6c262a5"
+      },
+      "replaced": {
+        "<c2-run>/": 26,
+        "<candidate-worktree>/": 0,
+        "<cargo-registry>/": 0,
+        "<coupled-run>/": 0,
+        "<face-run>/": 0,
+        "<gate-run>/": 0,
+        "<native-run>/": 0,
+        "<queue-admission>/": 0,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "c2-native-v1/stages/c2-4bdc5db5-world-existing-20261009-v1.stderr": {
+      "original": {
+        "bytes": 1247,
+        "sha256": "7e3d5afb7a8921262eea646327aab1a5c1ae04029e592d5e9e87485475c7ff2b"
+      },
+      "projected": {
+        "bytes": 1202,
+        "sha256": "168188519c70169290f7e84b3112cf088a72ce0745874a68e052f7cce14b9f4b"
+      },
+      "replaced": {
+        "<c2-run>/": 1,
+        "<candidate-worktree>/": 0,
+        "<cargo-registry>/": 0,
+        "<coupled-run>/": 0,
+        "<face-run>/": 0,
+        "<gate-run>/": 0,
+        "<native-run>/": 0,
+        "<queue-admission>/": 0,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
     "coupled-native-v1/stages/c1b2a-a739963f-build-20261009-v1.stderr": {
       "original": {
         "bytes": 195,
@@ -433,6 +580,7 @@
     }
   },
   "placeholders": {
+    "<c2-run>/": "the absolute host directory of the C2 validation's private run (its frozen source, copied dependency cache and target); the path that follows is kept",
     "<candidate-worktree>/": "the absolute host directory of the integration candidate's git worktree that the joined compilation built in place; the repository path that follows is kept",
     "<cargo-registry>/": "the absolute host directory of the crates.io registry sources; each crate name and version that follows is kept",
     "<coupled-run>/": "the absolute host directory of the C1b-2a validation's private run (its frozen source, copied dependency cache and target); the path that follows is kept",

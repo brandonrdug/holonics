@@ -1,0 +1,2 @@
+{"admitted": "c2-4bdc5db5-build-20261009-v1", "MemAvailable_bytes": 13814579200}
+{"label": "c2-4bdc5db5-build-20261009-v1", "deferred_lock_busy": false, "final_CPU_ns": 60518180000, "wall_ns": 59354654392, "quiescent": true, "outer_error": null, "passed": true}

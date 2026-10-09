@@ -267,3 +267,69 @@ and the whole gate ran on it once.
   bytes, over the compact limit) and the `producer/` copies.
 - **Scope.** Claimed: the repository's whole gate and the joined library-test compilation at this tree. Not
   claimed: any runtime fixture at this tree, or anything beyond the C1b-2a and C1b-2b scopes above.
+
+## C2: the consequence of retained World history at `4bdc5db5f`
+
+At one continuing crossing, the World model's retained memory is compared with its state-only matched
+control: the memory from before the first encounter, carried through that encounter's actual incident
+waves with no restriction by its reflected waves (`WorldModel::carried`). Both are read on one prepared
+second action through `PreparedPhysicalAction::world_prospect_of`, and the second encounter then executes
+once (the record's §7).
+- Source `4bdc5db5f` (full `4bdc5db5f605421402557eed19808f1c3c1cbdcb`, tree
+  `25328d909cc310951f01bf07e6eefcf2c9c39c19`), on main `ee8dda7a8`. This candidate joins it onto main
+  `88c166035`, a docs-only successor of `ee8dda7a8`, through the wording successor `7b6a8ed3e`. That
+  successor changes §7's text and only the doc comments of `admitted()` and `crossing()` in
+  `tests/world_model.rs`; with comments removed, the test file is line-identical to `4bdc5db5f`.
+- **Scoped native acceptance** ([handoff](c2-native-v1/HANDOFF.md),
+  [validation](c2-native-v1/VALIDATION.json)). With 352 frozen native inputs, every scoped stage passed:
+  - the workspace all-targets check;
+  - four freshly built test executables;
+  - 26 unique fixtures, each executed once: the eleven of `world_model` (the new C2 fixture among them),
+    `native_action_return` four, `physical_action` four and seven retention guards;
+  - the guard lints of the affected library and tests;
+  - all 57 guard doctests.
+
+  In the passed C2 fixture, every retained fibre and prospect lay in the control's. No retained direction
+  moved the compared native station's logits, while an exact control member differed from the retained
+  point in a relative quantized real index or a lifted phase block. The second encounter's actual native
+  logits equalled the retained point's, and one `k` carried its actual waves and logits. Raw-face point
+  parity was asserted only where the retained directions' face image is zero. The false-faced key stayed
+  live.
+- **The whole gate was not run at `4bdc5db5f`.** It is owed at this candidate's final join. The earlier
+  whole gate passed at `d96cdbd86` (above).
+- **Stages**, each within its fixed projection and released, the 4 GiB reservation enforced, and no limit
+  raised after launch:
+
+  | Stage | Exit | Wall ns | Projection ns | CPU ns | Child RSS KiB |
+  |---|---:|---:|---:|---:|---:|
+  | check | 0 | 30,705,005,119 | 65,000,000,000 | 32,417,004,000 | 1,527,072 |
+  | build | 0 | 57,769,412,771 | 65,000,000,000 | 60,518,180,000 | 2,132,856 |
+  | C2 development | 0 | 5,797,424,426 | 189,929,132,768 | 6,975,089,000 | 28,660 |
+  | world existing | 0 | 11,708,882,923 | 81,286,517,520 | 12,986,424,000 | 28,724 |
+  | native action | 0 | 580,471,083 | 33,714,607,008 | 1,783,380,000 | 18,320 |
+  | physical action | 0 | 185,771,087 | 33,714,607,008 | 1,364,119,000 | 18,320 |
+  | retention guards | 0 | 287,153,422 | 57,500,562,264 | 1,484,224,000 | 30,720 |
+  | clippy, affected | 0 | 10,994,686,574 | 65,000,000,000 | 12,539,207,000 | 989,008 |
+  | doctests | 0 | 26,911,765,287 | 65,000,000,000 | 28,782,292,000 | 1,403,484 |
+
+  The C2 development deadline is a counted-work allocation. The later runtime deadlines use the larger of
+  that measured fixture and the prior scoped runtime, all fixed before launch. The affected clippy stderr
+  (314,455 bytes) exceeds the compact limit and is hash-only.
+- **Projected host paths** ([PROJECTION.json](PROJECTION.json)). Seven stage outputs name the validation's
+  private run directory. One more placeholder is declared, `<c2-run>/`, beside the earlier eight.
+  - The seven outputs replace it 1, 86, 1, 2, 132, 26 and 1 times.
+  - The check and build stdout also replace `<cargo-registry>/` 50 times each.
+
+  There is no other byte change. All 31 entries invert to their pinned originals, and no host path remains.
+- **Hashed only:** [c2-native-v1/OMITTED.md](c2-native-v1/OMITTED.md). The manifest lists 212 files
+  (19,495,315 bytes), and 177 of them (19,333,598 bytes) are hash-only, among them the clippy stderr. They
+  also include `inherited-gate/`'s `FILE_HASHES.json` and `VALIDATION.json`, byte-identical to the
+  committed `joined-gate-v1` files.
+- **Scope.**
+  - Claimed: at one continuing crossing, the retained reflected-wave restrictions fix the compared native
+    station's reading of the declared second encounter. The incident-carried state-only control leaves
+    that reading open, and the actual second encounter reads the retained point.
+  - Not claimed: a selection or the Ask over keys; the removal of correlations alone at fixed marginals;
+    face conditioning by observed faces; the plural raw-to-grain relation; invariance under an arbitrary
+    common raw-logit shift (the observable removes only a common offset of whole cells); learning through
+    the model or the material; CUDA; or the whole gate at `4bdc5db5f`.

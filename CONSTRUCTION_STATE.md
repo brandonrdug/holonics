@@ -42,8 +42,9 @@ The helical code, the encoding every Holon carries, is defined in
 - **Published (C1b):** the exact fixed-key filter over actual World steps, the coupled prospect of a prepared
   action read before it runs, and a key's declared raw face. Each has its scoped native acceptance, and the
   whole gate passed at their join ([receipts](research/records/receipts/2026-10-09-world-model/PUBLICATION.md)).
-- **In validation (C2):** the consequence of retained actual World history at one continuing crossing,
-  against a state-only matched control.
+- **Accepted, scoped (C2):** at one continuing crossing, retained actual World history fixed the compared
+  station's reading of the next encounter, which a state-only matched control left open; the actual
+  encounter read the retained point. No selection and no learning through the model are claimed.
 - **Order of the recovered relations** ([record](research/records/2026-10-09_THE_RECOVERED_RELATIONS_JOIN_AT_THEIR_RECEIVERS_AND_KEEP_THEIR_REMAINDERS.md)): C2 first; then
   two bounded Lean lanes, a finite torus subgroup receiver and the modular scattering residual; and the turn
   menu's disjoint-coset fit as the first packing law.
