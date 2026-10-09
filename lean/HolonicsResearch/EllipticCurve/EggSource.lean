@@ -115,8 +115,8 @@ theorem inverse_affine_equation (a b w X V : ℚ) (hw : w ≠ 0) (hX : X ≠ 0)
 /-- The producing affine coordinates return the very same arithmetic operands. -/
 theorem inverse_affine_returns_carrier (a b w X V : ℚ)
     (hb : b ≠ 0) (hw : w ≠ 0) (hX : X ≠ 0) :
-    let x := (-X - a ^ 2 - w ^ 2) / (2 * w)
-    let y := (-b / (2 * w * X)) * V
+    let x := (-X - a ^ 2 - w ^ 2) / (2 * w);
+    let y := (-b / (2 * w * X)) * V;
     -(a ^ 2 + w ^ 2 + 2 * w * x) = X ∧
       (2 * w / b) * (a ^ 2 + w ^ 2 + 2 * w * x) * y = V := by
   dsimp
@@ -140,17 +140,18 @@ theorem homogeneous_infinities (a b w : ℚ) :
 declared lines. The zero triple remains excluded by projective coordinates. -/
 theorem homogeneous_infinity_classification (a b w X Y : ℚ) (hw : w ≠ 0) :
     homogeneousEquation a b w X Y 0 ↔ X = 0 ∨ Y = 0 := by
-  simp only [homogeneousEquation, mul_zero, add_zero, zero_mul, zero_pow,
-    zero_sub, mul_eq_zero, pow_eq_zero_iff (by norm_num : (2 : ℕ) ≠ 0)]
+  simp only [homogeneousEquation, mul_zero, zero_mul, mul_eq_zero,
+    pow_eq_zero_iff (by norm_num : (2 : ℕ) ≠ 0)]
   simp [hw]
 
 /-- The second source infinity point is assigned the actual `(0,0)` carrier;
 the declared source origin is assigned the existing group's zero. Extending
 these assignments to a complete projective equivalence remains separate. -/
 def secondInfinityCarrier (a w : ℚ) (ha : a ≠ 0) (hw : w ≠ 0)
-    (hm : a - w ≠ 0) (hp : a + w ≠ 0) : (E (rootA a w) (rootB a w)).Point := by
-  obtain ⟨hA, hB, hAB⟩ := roots_regular ha hw hm hp
-  exact Point.some 0 0 (nonsingular_of_cubic hA hB hAB (by ring))
+    (hm : a - w ≠ 0) (hp : a + w ≠ 0) : (E (rootA a w) (rootB a w)).Point :=
+  Point.some 0 0 (by
+    obtain ⟨hA, hB, hAB⟩ := roots_regular ha hw hm hp
+    exact nonsingular_of_cubic hA hB hAB (by ring))
 
 theorem secondInfinityCarrier_is_two_torsion (a w : ℚ)
     (ha : a ≠ 0) (hw : w ≠ 0) (hm : a - w ≠ 0) (hp : a + w ≠ 0) :
@@ -162,7 +163,7 @@ theorem secondInfinityCarrier_is_two_torsion (a w : ℚ)
 /-- An unconditional rank bound on the actual receiving model of `a=3,b=2,w=1`.
 This does not transfer a rank back to an unproved source-group equivalence. -/
 theorem egg_321_receiving_model_rank_bound :
-    ∃ r : ℕ, RankIsOn (E (-4) (-16)) r ∧ 2 ^ r ≤ 1296 := by
+    ∃ r : ℕ, UniversalBSD.RankIsOn (E (-4) (-16)) r ∧ 2 ^ r ≤ 1296 := by
   obtain ⟨r, hr, hbound⟩ :=
     GeneralTwoTorsion.theRankClauseIsWellPosedOnEveryFullTwoTorsionCurve
       (a := (-4 : ℤ)) (b := (-16 : ℤ)) (by norm_num) (by norm_num) (by norm_num)
