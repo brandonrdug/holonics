@@ -60,6 +60,18 @@
 //! source, so the image is a model response, not a certificate of that closed loop (C2's finite
 //! forward cover is owed).
 //!
+//! **The coupled prospect** (C1b-2a, [`WorldModel::coupled_prospect`]). In an actual encounter each
+//! later incident wave depends on the returned ones through the native source, so a declared word
+//! does not give the actual future. The prepared native Word's own prospective passage
+//! (`Word::prospective_coupled_passage`, opened on its actual unrun opening exactly as
+//! `Word::prospective_feature` opens its baseline) is run with each emitted `a_t` answered by a live
+//! key's charts, `b_t = P ξ_t + Q a_t` and `ξ_(t+1) = F ξ_t + G a_t`, from `ξ_T` at the World's crossing
+//! `T`, step `t` read at commit `T + t − 1`. It predicts the port waves and the native station
+//! features with their receiving logits: the native readout, not the World's observed face, whose
+//! key-owned face relation is a separate join. The prepared Word, the actual World and this memory
+//! stay unchanged. [incomplete, the first partial] Only the fibre's point `k = 0` is read here: the
+//! unit columns of `k`, the prepared action's read and the test are owed.
+//!
 //! **Bits.** The memory's current bits ([`WorldModel::current_bits`]) are every key state's values and
 //! cut and the reached tick; the Resident's state bits charge them at every step, whatever size the
 //! fibres reach. The keys are immutable declarations, held separately as the World's own are.
@@ -73,6 +85,9 @@
 
 use crate::hnn::HnnError;
 use crate::hnn::physical::action::WaveJointStep;
+use crate::hnn::receiving::ReceivingPhases;
+use crate::hnn::word::Word;
+use crate::hnn::word::action::CoupledPassage;
 use crate::holon::HolonState;
 use crate::holon::law::{CommitCoefficients, HolonLaw, ReferenceHolon, Scheme};
 use crate::ratio::Rat;
@@ -457,6 +472,62 @@ impl WorldModel {
             forced,
             directions,
         })
+    }
+
+    /// **The coupled prospect of a live key at its fibre's point** (the module header): the prepared
+    /// native Word's coupled prospective passage with each emitted wave answered by this key's charts
+    /// from `ξ_T = c`. A held or incompatible key is refused.
+    pub fn coupled_prospect(
+        &self,
+        key: usize,
+        word: &Word<'_>,
+        source_ring: usize,
+        phases: &ReceivingPhases,
+        compared: &[bool],
+    ) -> Result<CoupledPassage, HnnError> {
+        let (model, fibre) = self.live(key)?;
+        self.coupled_from(model, &fibre.point, word, source_ring, phases, compared)
+    }
+
+    /// The declared key `key` and its fibre at the current crossing, refused unless it is live.
+    fn live(&self, key: usize) -> Result<(&ModelKey, &StateFibre), HnnError> {
+        let (Some(model), Some(state)) = (self.keys.get(key), self.states.get(key)) else {
+            return Err(HnnError::Unadmitted {
+                reason: "a prospect names a declared key",
+            });
+        };
+        let KeyState::Live(fibre) = state else {
+            return Err(HnnError::Unadmitted {
+                reason: "a prospect starts from a live key at the current crossing; a held or incompatible key's span is refused",
+            });
+        };
+        Ok((model, fibre))
+    }
+
+    /// The coupled passage from one model state `ξ_T`, step `t` answered at commit `T + t − 1`.
+    fn coupled_from(
+        &self,
+        model: &ModelKey,
+        start: &[Rat],
+        word: &Word<'_>,
+        source_ring: usize,
+        phases: &ReceivingPhases,
+        compared: &[bool],
+    ) -> Result<CoupledPassage, HnnError> {
+        let tick = self.tick;
+        let mut state = start.to_vec();
+        let mut returns = |t: usize, incident: &[Rat]| -> Result<Vec<Rat>, HnnError> {
+            let offset = t
+                .checked_sub(1)
+                .and_then(|offset| u64::try_from(offset).ok())
+                .ok_or(HnnError::CountOverflow)?;
+            let commit = tick.checked_add(offset).ok_or(HnnError::CountOverflow)?;
+            let charts = model.charts(commit)?;
+            let reflected = add(&charts.p.apply(&state)?, &charts.q.apply(incident)?);
+            state = add(&charts.f.apply(&state)?, &charts.g.apply(incident)?);
+            Ok(reflected)
+        };
+        word.prospective_coupled_passage(source_ring, phases, compared, &mut returns)
     }
 
     /// **Absorb one actually executed World step** (the module header): every live key is restricted
