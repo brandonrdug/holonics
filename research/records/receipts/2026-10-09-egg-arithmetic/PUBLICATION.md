@@ -53,4 +53,5 @@ The sole queue checked two pins of it.
   of the source's infinity points, the explicit `(0,0)` assignment to the second one and its
   two-torsion, and the rank bound on the receiving model `E(-4,-16)`. It makes no claim to a
   projective or group equivalence with the original source, to a regular extension at the
-  exceptional points, or to a rank of the original source group (#62).
+  exceptional points, or to a rank of the original source group (#62). The receiving-model bound
+  assumes no BSD conjecture; the prime-11 counts stay a displayed table, not a formal claim.

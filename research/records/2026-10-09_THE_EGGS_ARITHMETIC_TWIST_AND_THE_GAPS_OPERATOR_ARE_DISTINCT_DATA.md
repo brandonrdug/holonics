@@ -278,13 +278,18 @@ source. The compiler exited `0` after `10,073,507,353 ns`; the complete compile
 stage took `12,236,369,152 ns` under the unchanged `21,132,554,884 ns`
 projection, a measured/projected ratio of exactly
 `12,236,369,152 / 21,132,554,884`. Aggregate CPU was `6,987,427,000 ns`, group
-peak `5,120,466,944 bytes` and child peak RSS `4,015,440 KiB`. All six audited
-conclusions depend only on `propext`, `Classical.choice` and `Quot.sound`. The
-module alone was checked, not the research root.
+peak `5,120,466,944 bytes` and child peak RSS `4,015,440 KiB`, under the fixed
+`17 s` aggregate CPU guard and the authorized `8 GiB` ceiling; no deadline or
+resource limit was raised and no dependency was rebuilt. All six audited
+conclusions depend only on `propext`, `Classical.choice` and `Quot.sound`, with
+no error and no `sorryAx`. The module alone was checked, not the research root.
 
 The point declarations above are therefore kernel-checked, with the scope
 unchanged: no projective/group equivalence, no regular extension at the
 exceptional points and no rank transfer to the original source group. The
+receiving-model bound assumes no BSD conjecture; the prime-11 counts remain a
+displayed table, and neither general BSD, a physical mass gap nor a
+full-library gate is claimed. The
 compact receipts of the rejected and the accepted pin are
 [point-descent-native-v1](receipts/2026-10-09-egg-arithmetic/point-descent-native-v1/HANDOFF.md)
 and
