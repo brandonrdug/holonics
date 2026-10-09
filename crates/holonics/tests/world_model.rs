@@ -1333,8 +1333,9 @@ fn a_key_with_the_worlds_face_covers_its_observed_face_and_a_wrong_face_does_not
 /// C2's declared observable of realified receiving logits at the receiver's grain `L`: per class after
 /// the first, its real row's grain index relative to the first class's, `⌊L Re f_c⌋ − ⌊L Re f_0⌋`,
 /// read as `carry · L + phase class` from the cells; and per class the block `⌊L φ_c⌋` of its lifted
-/// phase `φ_c = Im f_c / 2`. A common logit shift, which no face mass reads, and every cell's
-/// unresolved fibre are not part of it.
+/// phase `φ_c = Im f_c / 2`. Every cell's unresolved fibre is not part of it. The relative indices
+/// remove only a common offset of whole cells: a common raw shift that crosses a cell boundary can
+/// still move them.
 fn admitted(cells: &[GrainCell], phases: &[Rat], grain: u64) -> (Vec<BigInt>, Vec<BigInt>) {
     let index = |cell: &GrainCell| &cell.carry * BigInt::from(grain) + BigInt::from(cell.phase);
     let first = index(&cells[0]);
@@ -1353,7 +1354,7 @@ fn admitted_of(logits: &[Rat], grain: u64) -> (Vec<BigInt>, Vec<BigInt>) {
 /// A member of a station's image along one change of it: `point` moved until one relative real row has
 /// moved by `2/L` or, where no relative real row moves, one lifted phase by `1/L`. Either crosses a cell
 /// of the declared observable, which the caller reads; `None` when the change moves no relative real
-/// row and no phase (a common logit shift, which the observable does not read).
+/// row and no phase: a change common to every real row, which this witness never uses.
 fn crossing(point: &[Rat], change: &[Rat], grain: u64) -> Option<Vec<Rat>> {
     let scale = Rat::from_integer(BigInt::from(grain));
     let classes = point.len() / 2;

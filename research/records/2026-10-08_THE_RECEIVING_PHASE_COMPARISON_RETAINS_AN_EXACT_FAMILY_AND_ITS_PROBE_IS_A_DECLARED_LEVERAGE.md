@@ -289,8 +289,10 @@ actual passage.
   - no retained direction moves the compared station's logits, while a control direction does. Two
     exact members of the control's image differ in the declared observable: per class after the
     first, the real grain index relative to the first class's, `⌊L Re f_c⌋ − ⌊L Re f_0⌋`, and per
-    class the phase block `⌊L φ_c⌋` with `φ_c = Im f_c / 2`. The common logit shift and the cells'
-    fibres are not read;
+    class the phase block `⌊L φ_c⌋` with `φ_c = Im f_c / 2`. The cells' fibres are not read. The
+    relative indices remove only a common offset of whole cells, and a common raw shift that
+    crosses a cell boundary can still move them, so the witness moves a relative row or a phase,
+    never a common-only change;
   - the second encounter, executed once, reads exactly the retained point's logits, and one `k`
     carries its actual waves and logits. Its waves equal the retained point's only where no retained
     direction moves them, and a faced key's reading is the encounter's own reader on the predicted
