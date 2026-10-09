@@ -524,9 +524,13 @@ impl HeldContactVariation {
 /// contact's declared signature `Σ = diag(σ)` (`K = b Σ bᵀ`; `Σ = 1` without a boost). `E` is the
 /// coordinate's unit matrix.
 pub(crate) fn coordinate_forms(
+    field: &Field,
     theta: &Constitution,
     coordinate: &ContactCoordinate,
 ) -> Result<[ExactRatMatrix; 3], HnnError> {
+    if coordinate.contact >= field.contacts().len() || coordinate.family > 2 {
+        return refuse("a contact coordinate names a contact of the field and one of its three factor families");
+    }
     let a = coordinate.contact;
     let factor = factors(theta, a)[coordinate.family];
     let width = factor.rows();
@@ -576,7 +580,7 @@ impl Word<'_> {
         coordinate: &ContactCoordinate,
         theta: &Constitution,
     ) -> Result<EndChange, HnnError> {
-        self.contact_forms_variation(t, chi, coordinate.contact, &coordinate_forms(theta, coordinate)?)
+        self.contact_forms_variation(t, chi, coordinate.contact, &coordinate_forms(self.field, theta, coordinate)?)
     }
 
     /// [definition] **One tick of a contact material's first variation** at the form derivatives

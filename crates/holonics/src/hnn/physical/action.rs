@@ -110,10 +110,10 @@ use crate::hnn::word::action::{
     ProspectiveFeature,
 };
 use crate::hnn::word::continuation::{
-    AdmissionRefusal, Admitted, MaterialDirection, MaterialTangent, decide,
+    AdmissionRefusal, Admitted, MaterialDirection, MaterialTangent, decide, world_descent,
 };
 use crate::hnn::word::finite_gain::FiniteContactSpans;
-use crate::hnn::word::variation::VariationReading;
+use crate::hnn::word::variation::{ContactCoordinate, VariationReading};
 use crate::hnn::word::{
     FieldBalance, NativeReceivingReturn, PowerForm, ReceptionCarry, SourceOpeningReceipt,
     SourceWaveReturn, Word, WordBalance,
@@ -235,6 +235,35 @@ struct ActionFrame {
     source_length: usize,
     receiver_index: usize,
     opening: SourceOpeningReceipt,
+}
+
+/// [definition; agent-inferred, October 9; the held-carry record §5] **A World-sensitive proposal
+/// bound to the encounter that located it** ([`PhysicalReceiver::world_proposal`]): the descent's
+/// factor steps with the encounter's own reach and opening clock, and the receiver's state right
+/// after that encounter (its material commit, the World model's tick and the carried current), so
+/// that [`PhysicalReceiver::land_world_descent`] stages it only where nothing but the encounter's own
+/// publication has happened since. Its fields are private: a proposal is never assembled by hand.
+#[derive(Clone, Debug)]
+pub struct WorldProposal {
+    steps: Vec<FactorStep>,
+    reach: Reach,
+    opened_at: usize,
+    producing_commit: u64,
+    staged_commit: u64,
+    world_tick: u64,
+    carry: ReceptionCarry,
+}
+
+impl WorldProposal {
+    /// The proposed factor steps (the descent, normalized).
+    pub fn steps(&self) -> &[FactorStep] {
+        &self.steps
+    }
+
+    /// The material commit the encounter produced on.
+    pub fn producing_commit(&self) -> u64 {
+        self.producing_commit
+    }
 }
 
 /// [definition; agent-inferred, October 9; the held-carry record §5] **What a World landing read**:
@@ -523,6 +552,73 @@ impl<'f> PhysicalReceiver<'f> {
         })
     }
 
+    /// [definition; agent-inferred, October 9; the held-carry record §5] **Bind a World-sensitive
+    /// proposal to the encounter that located it.** `received` is this receiver's latest teaching
+    /// encounter, and `tangents` are the tangents it carried, one per raw coordinate. Every tangent
+    /// must be based at one producing commit. The receiver must still stand where that encounter left
+    /// it: the World model at the encounter's World tick and the carried current the encounter
+    /// published, so the only change since production is the encounter's own receiving publication.
+    /// The descent is assembled on the present material ([`world_descent`]); a coordinate whose
+    /// contact factor has changed no longer matches its tangent's direction and refuses. The ratio,
+    /// the normalizing contact steps, the reach and the opening clock are all read from `received`
+    /// itself.
+    pub fn world_proposal(
+        &self,
+        coordinates: &[ContactCoordinate],
+        tangents: &[MaterialTangent],
+        received: &ActionReception,
+    ) -> Result<WorldProposal, HnnError> {
+        let comparison = received.comparison.as_ref().map_err(|_| HnnError::Unadmitted {
+            reason: "a World proposal reads its encounter's own completed comparison",
+        })?;
+        let returned = &comparison.returned;
+        let producing_commit = tangents.first().map(MaterialTangent::commit).ok_or(
+            HnnError::Unadmitted {
+                reason: "a World proposal carries at least one tangent",
+            },
+        )?;
+        if tangents.iter().any(|t| t.commit() != producing_commit) {
+            return Err(HnnError::Unadmitted {
+                reason: "a World proposal's tangents share one producing commit",
+            });
+        }
+        let model = self.world_model().ok_or(HnnError::Unadmitted {
+            reason: "a World proposal reads the bound World model",
+        })?;
+        if model.tick() != received.encounter.after_world_tick
+            || self.resident.carried() != Some(&received.carry)
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "a World proposal binds the receiver as its encounter left it: no later step or reception",
+            });
+        }
+        let reach = returned
+            .deposit
+            .as_ref()
+            .and_then(|deposit| deposit.reach())
+            .cloned()
+            .ok_or(HnnError::Unadmitted {
+                reason: "a World proposal reads its encounter's own reach",
+            })?;
+        let steps = world_descent(
+            self.field,
+            self.constitution(),
+            coordinates,
+            tangents,
+            &returned.ratio,
+            &returned.contacts,
+        )?;
+        Ok(WorldProposal {
+            steps,
+            reach,
+            opened_at: received.encounter.before_native_tick,
+            producing_commit,
+            staged_commit: self.constitution().commit(),
+            world_tick: model.tick(),
+            carry: received.carry.clone(),
+        })
+    }
+
     /// [definition; agent-inferred, October 9; the held-carry record §5] **The located key's prospect
     /// of a probe, read as its receiving comparison**: the probe at `control` on `material`, from
     /// this receiver's present opening, answered by the World model's one live key from its located
@@ -607,9 +703,9 @@ impl<'f> PhysicalReceiver<'f> {
     /// [definition; agent-inferred, October 9; the held-carry record §5] **The World landing**: one
     /// declared contact step along a World-sensitive descent, admitted only by the located key's
     /// prospect of the next encounter.
-    /// - The proposal `steps` ([`crate::hnn::word::continuation::world_descent`]) is staged at the
-    ///   contemporary constitution, with the reach of the encounter that located it (`reach`, Word
-    ///   opened at `opened_at`), through the native declared-step law: the first reach read from the
+    /// - The bound proposal ([`Self::world_proposal`]) is staged at the contemporary constitution, the
+    ///   one it was bound on, with the reach and opening clock of the encounter that located it,
+    ///   through the native declared-step law: the first reach read from the
     ///   owner's own split, then the declared-step producer
     ///   (`Constitution::{first_reach, deposited_with_contact_spans_at}`), which commits at least one
     ///   lattice unit or refuses.
@@ -621,18 +717,32 @@ impl<'f> PhysicalReceiver<'f> {
     /// - An admitted `θ′` is published with the carried current crossed at held momentum
     ///   (`C′ w′ = π`, [`ReceptionCarry::crossed`]), and the stored energy's exact change at the
     ///   crossing is returned as the deposition work. A refusal changes nothing.
-    #[allow(clippy::too_many_arguments)]
     pub fn land_world_descent(
         &mut self,
-        steps: Vec<FactorStep>,
-        reach: Reach,
-        opened_at: usize,
+        proposal: WorldProposal,
         source: &Encoded,
         receiver: &ReceiverDeclaration,
         preparation: &PortPreparation,
         compared: &[bool],
         control: &[Rat],
     ) -> Result<WorldLanding, HnnError> {
+        let WorldProposal {
+            steps,
+            reach,
+            opened_at,
+            staged_commit,
+            world_tick,
+            carry,
+            ..
+        } = proposal;
+        if self.constitution().commit() != staged_commit
+            || self.world_model().map(WorldModel::tick) != Some(world_tick)
+            || self.resident.carried() != Some(&carry)
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "a World landing stages its proposal where the proposal was bound",
+            });
+        }
         let theta = self.constitution().clone();
         let mut loci: Vec<Locus> = steps.iter().map(|s| s.gradient.locus()).collect();
         loci.sort();

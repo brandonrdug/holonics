@@ -1544,11 +1544,12 @@ impl MaterialDirection {
     /// **The direction of one raw Gram-factor coordinate** (`word::variation::coordinate_forms`):
     /// its family's form derivative, the other two forms fixed.
     pub fn of_coordinate(
+        field: &Field,
         theta: &Constitution,
         coordinate: &super::variation::ContactCoordinate,
     ) -> Result<Self, HnnError> {
         let [storage, stiffness, dissipation] =
-            super::variation::coordinate_forms(theta, coordinate)?;
+            super::variation::coordinate_forms(field, theta, coordinate)?;
         Ok(Self {
             contact: coordinate.contact,
             storage: (coordinate.family == 0).then_some(storage),
@@ -1963,6 +1964,7 @@ impl MaterialTangent {
 /// declared twice, a tangent that does not carry its coordinate's direction, or a family the
 /// composed return did not reach.
 pub fn world_descent(
+    field: &Field,
     theta: &Constitution,
     coordinates: &[super::variation::ContactCoordinate],
     tangents: &[MaterialTangent],
@@ -1979,7 +1981,7 @@ pub fn world_descent(
     let mut families: std::collections::BTreeMap<(usize, usize), Vec<Vec<Option<Rat>>>> =
         std::collections::BTreeMap::new();
     for (coordinate, tangent) in coordinates.iter().zip(tangents) {
-        if tangent.direction() != &MaterialDirection::of_coordinate(theta, coordinate)? {
+        if tangent.direction() != &MaterialDirection::of_coordinate(field, theta, coordinate)? {
             return Err(HnnError::Unadmitted {
                 reason: "each material tangent carries its declared coordinate's direction",
             });

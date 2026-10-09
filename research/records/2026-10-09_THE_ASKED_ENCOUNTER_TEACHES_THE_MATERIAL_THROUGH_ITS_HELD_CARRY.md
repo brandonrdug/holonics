@@ -289,7 +289,13 @@ nothing task-specific enters. A fixture becoming the goal: (a)–(e) are fixed h
    the family's within-Word feature energy and covector scale from the encounter's own composed
    return (`NativeReceivingReturn::contacts`, whose gradients are the World-held reading of the
    same comparison). The tangents open at a held opening, so they add no opening-column power and
-   no dual bound.
+   no dual bound. The proposal is bound to its encounter (`PhysicalReceiver::world_proposal`,
+   `WorldProposal`). Every tangent shares one producing commit. The receiver must stand where that
+   encounter left it, with the World model at its tick and the carried current it published, so
+   the only change since production is the encounter's own receiving publication. The ratio, the
+   normalizing steps, the reach and the opening clock are read from the encounter itself.
+   `land_world_descent` accepts only a bound proposal and stages it only where it was bound (Epime's
+   review, October 9).
 2. **The step.** The proposal is staged at the contemporary constitution, which already carries
    the encounter's receiving deposit, with the encounter's own reach. It passes through the native
    declared-step law: the first reach read from the owner's own split, then the declared-step

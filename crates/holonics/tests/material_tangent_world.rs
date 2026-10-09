@@ -22,7 +22,7 @@ use holonics::hnn::propagation::Operands;
 use holonics::hnn::ring::ResonatorMaterial;
 use holonics::hnn::word::action::PortPreparation;
 use holonics::hnn::field::ConstitutionRead;
-use holonics::hnn::word::continuation::{MaterialDirection, world_descent};
+use holonics::hnn::word::continuation::{Admitted, MaterialDirection};
 use holonics::hnn::word::variation::ContactCoordinate;
 use holonics::hnn::{
     Constitution, Current, Encoded, Field, FieldDeclaration, RingDeclaration, WordOpening,
@@ -740,7 +740,7 @@ fn the_world_landing_reads_the_next_encounter() {
     let coordinates = all_coordinates(&theta);
     let directions: Vec<MaterialDirection> = coordinates
         .iter()
-        .map(|c| MaterialDirection::of_coordinate(&theta, c).unwrap())
+        .map(|c| MaterialDirection::of_coordinate(&field, &theta, c).unwrap())
         .collect();
 
     let mut receiver = bound(&field, theta.clone(), &source, vec![faced_key(&field)]);
@@ -755,16 +755,10 @@ fn the_world_landing_reads_the_next_encounter() {
     let ActionCommunication::Received(received) = reception.reception else {
         panic!("the teaching encounter completes");
     };
-    let returned = &received.comparison.as_ref().unwrap().returned;
-    let steps = world_descent(
-        &theta,
-        &coordinates,
-        &tangents,
-        &returned.ratio,
-        &returned.contacts,
-    )
-    .unwrap();
-    for step in &steps {
+    let proposal = receiver
+        .world_proposal(&coordinates, &tangents, &received)
+        .unwrap();
+    for step in proposal.steps() {
         println!(
             "world descent: family {:?}, entries {:?}",
             step.gradient.family(),
@@ -774,13 +768,9 @@ fn the_world_landing_reads_the_next_encounter() {
                 .collect::<Vec<_>>()
         );
     }
-    let reach = returned.deposit.as_ref().unwrap().reach().unwrap().clone();
-    let opened_at = received.encounter.before_native_tick;
     let landing = receiver
         .land_world_descent(
-            steps,
-            reach,
-            opened_at,
+            proposal,
             &source,
             &field.receivers()[0],
             &preparation,
@@ -804,9 +794,12 @@ fn the_world_landing_reads_the_next_encounter() {
         reading.decision,
         reading.deposition_work.as_ref().map(|w| w.to_string()),
     );
-    if reading.decision.is_err() {
-        return;
-    }
+    // [measured, October 9; LANDING_DEV_TESTS.v1] The landing on this fixture is admitted
+    // classically; kept as this fixture's regression of the measured outcome.
+    assert!(
+        matches!(reading.decision, Ok(Admitted::Classical)),
+        "the measured landing: admitted classically"
+    );
     // The actual next encounter on θ′, against the key's prospect and the matched control.
     let landed = second_comparison(&mut receiver, &field, &source, &control);
     assert_eq!(
@@ -828,6 +821,11 @@ fn the_world_landing_reads_the_next_encounter() {
         "world production: landed code {:?} excess {}; matched control code {:?} excess {}",
         landed.0, landed.1, unlanded.0, unlanded.1
     );
+    assert_eq!(unlanded.0, reading.producing.code_length().unwrap());
+    assert!(
+        landed.0.upper < unlanded.0.lower,
+        "the measured production: the landed next comparison lies strictly below the control's"
+    );
 }
 
 /// One round of the loop on `receiver`: a teaching encounter on every raw coordinate of contact 0,
@@ -847,7 +845,7 @@ fn loop_round(
     let coordinates = all_coordinates(&theta);
     let directions: Vec<MaterialDirection> = coordinates
         .iter()
-        .map(|c| MaterialDirection::of_coordinate(&theta, c).unwrap())
+        .map(|c| MaterialDirection::of_coordinate(&field, &theta, c).unwrap())
         .collect();
     let preparation = actuator(field);
     let probe = receiver
@@ -863,21 +861,12 @@ fn loop_round(
     let returned = &received.comparison.as_ref().unwrap().returned;
     let code = returned.ratio.code_length().unwrap();
     let excess = returned.ratio.excess().unwrap();
-    let steps = world_descent(
-        &theta,
-        &coordinates,
-        &tangents,
-        &returned.ratio,
-        &returned.contacts,
-    )
-    .unwrap();
-    let reach = returned.deposit.as_ref().unwrap().reach().unwrap().clone();
-    let opened_at = received.encounter.before_native_tick;
+    let proposal = receiver
+        .world_proposal(&coordinates, &tangents, &received)
+        .unwrap();
     let landing = receiver
         .land_world_descent(
-            steps,
-            reach,
-            opened_at,
+            proposal,
             source,
             &field.receivers()[0],
             &preparation,
