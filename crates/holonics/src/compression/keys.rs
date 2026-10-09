@@ -49,6 +49,7 @@ use crate::holon::contact::menu::{
 };
 use crate::navigator::Clock;
 
+pub mod duplex;
 mod edges;
 pub mod local;
 pub mod repair;
