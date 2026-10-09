@@ -16,6 +16,17 @@ The retained independent briefs are paused with Claude; the product acceptance b
 
 ## Current construction
 
+**October 8–9 helical code** ([record](research/records/2026-10-08_THE_HELICAL_CODE_IS_HOW_HOLONS_HOLARCHIES_EPOCHS_AND_AEONS_ENCODE.md); #386).
+The helical code, the encoding every Holon carries, is defined in
+[the guide](docs/ELEMENTARY_OBJECTS.md#the-helical-code-how-holons-encode).
+- **Kernel-checked:** `Transport/HelicalCode` (81 declarations) and `Transport/HelicalRepair` (56).
+- **Built and natively passed:**
+  - the duplex consumer `compression::keys::duplex` (a fixed key, read against truth);
+  - the paired carrier `hnn::paired`: the dihedral admission, and the partner face read through
+    `SourceMoment` with exact residual zero. At the retained quotient it is redundant.
+- **Not built:** an equivariant deposition of the source port, so there is no learned helical code
+  yet; and the linking reading of closed strands.
+
 **October 6 HNN integration.** The [blind receiving return](research/records/2026-10-06_THE_BLIND_RECEIVING_RETURN_IS_JOINED_BUT_RELEASE_NEEDS_THE_EXECUTED_COUPLED_DOMAIN.md)
 now consumes its actual continuing Word's pullback and the existing normal deposition at R.
 The committed physical lane passes two teaching controls and retained carry: a reached deposit

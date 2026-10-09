@@ -1,0 +1,18 @@
+plastic port: admitted exact, another equivariant port exact, 2 off-subspace ports refused
+reflector tables 3412, dihedral 14
+behind a silent ring: 12 words exact; behind a ticking ring: refused
+campaign 1: 3125 maps of five classes refused, 0 pairings exist
+family (0 1)(2 3), d = 5, axis 0: kind Family, pairs [(0, 1), (2, 3)], family [0, 1, 2, 3], axis 0
+roles {0,2,4} / {1,3,5}, d = 6, axis 2: kind Roles, pairs [(0, 1), (2, 3), (4, 5)], family [0, 1, 2, 3, 4, 5], axis 2
+roles {1} / {2} of four classes, d = 7, axis 3: kind Roles, pairs [(1, 2)], family [1, 2], axis 3
+founded E_0 on campaign 1: first failing column 0, row 0, for both declarations
+lift law: 27 reflectors, 81 vectors, 1749 powers, all exact
+pairings by class count [(1, 0), (2, 1), (3, 0), (4, 3), (5, 0), (6, 15)]
+generic: 1365 words, 951 (length, face) groups, 378 with two or more words, 30 with two or more retained count tables, largest 4; no group has two partner faces
+merged: 341 words, 30 (length, face) groups, 29 with two or more words, 29 with two or more retained count tables, largest 32; no group has two partner faces
+partner read: every refusal named, nothing rounded or substituted
+family (0 1)(2 3), d = 5, axis 0: 54 words, 294 cells, every count and face exact, residual zero
+roles {0,2,4} / {1,3,5}, d = 6, axis 2: 54 words, 342 cells, every count and face exact, residual zero
+roles {1} / {2} of four classes, d = 7, axis 3: 54 words, 390 cells, every count and face exact, residual zero
+anchor: n = 2, ν̂(2) = 1/2, phases 1 and 2, c₀ = 3, three words read exactly
+real constitution: founded refused at column 0, placed equivariant port exact, moved entry refused

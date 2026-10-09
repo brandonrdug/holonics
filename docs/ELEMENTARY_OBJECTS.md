@@ -1229,7 +1229,10 @@ Its five parts:
      is then `JĜⁿ⁻¹⁺ᵅ⁺ᵝ`. A duplex carries one face and its reflection, and a reading of both checks
      their consistency. `SourceMoment`'s fixed-step recurrence references the newest letter,
      `m(u) = Σ_k Uⁿ⁻¹⁻ᵏ I E(u_k)`. With a native lift `B` (`I E σ = B I E`, `BUB = U⁻¹`, `B² = 1`),
-     the same law reads `m(σ̄(u)) = B U⁻⁽ⁿ⁻¹⁾ m(u)` there.
+     the same law reads `m(σ̄(u)) = B U⁻⁽ⁿ⁻¹⁾ m(u)` there. On the HNN carrier it is read by
+     `hnn::paired` (`PairedCarrier::partner_face`). The admission certifies the dihedral reflector,
+     and `B E = E Σ_σ` is re-certified at every read. At the retained quotient of the undamped
+     carrier the partner face is redundant: a check.
    - The lift exists only where `σ` descends through `E`'s fibres; otherwise the duplex is formed
      before the quotient, keeping the separator. Fixed-point-freedom survives only on the
      unmerged contact alphabet: a quotient that merges `a` with `σ(a)` loses it there. On a

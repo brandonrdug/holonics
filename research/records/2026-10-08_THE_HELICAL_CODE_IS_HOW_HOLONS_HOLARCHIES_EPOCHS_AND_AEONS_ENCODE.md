@@ -327,7 +327,8 @@ Its second part states the perfected laws:
    against truth, and CRT recovery.
 
    **Step 2: the partner face on the HNN carrier** (`agent-inferred` design, corrected by Epime's
-   source review of `f034a7225` and `6269cc5af`; nothing is built). Three objects are named apart:
+   source review of `f034a7225` and `6269cc5af`; built at `083640894`, native PASS,
+   [receipt](receipts/2026-10-09-actual-h-r/PUBLICATION.md)). Three objects are named apart:
    - `F_g`, the ring's port permutation;
    - `B_g`, its realified carrier lift, `(B_g v)[2F_g(i)+r] = v[2i+r]`;
    - `σ`, the class pairing.
@@ -359,6 +360,30 @@ Its second part states the perfected laws:
       normalization and rounding, the pair ports, the learned contemporary encoder and the modulus
       refusal: a uniform exact recurrence is not automatically their law.
 
+   **What step 2 built** (`implemented-exact`: `hnn::paired` at `083640894`, 16 tests, native
+   PASS with the all-targets check, the guard clippy and the 57 guard doctests). Each missing term
+   above now has an owner or a typed refusal:
+   - Terms 1 and 2. `PairedCarrier::admit` certifies `F² = 1` and the dihedral relation, which holds
+     for exactly the `d` reflections `F(i) = F(0) − i`. It also certifies the typed pairing and
+     `B E = E Σ_σ` column by column. The carrier keeps no port: every partner read re-certifies the
+     port the constitution holds now, and names the first failing column.
+   - Term 3. The unit tick is certified from the field: every class of the family fits the source
+     ring's lock, and no earlier ring of the carry chain ticks. Letter-selected clocks are refused.
+   - Term 4. Declared pair offsets are refused; the pair-port reversal law is owed.
+   - Term 5. Located moments are refused; the located moment chart is owed.
+   - Term 6. The partner law is read at `SourceMoment::encode` and `open_storage`, through
+     `SourceMoment::dyad`. The dyad reflects the counts in phase and complements them in class,
+     with `c₀ = s + s′ + n + 1`. It gives `m̃(σ̄u) = B P^(c₀) m̃(u)` and
+     `s(0)(σ̄u) = B P^(−(n−1)) s(0)(u)`, with exact residual zero on every admitted read (162 words
+     over three settings). The Lean bridge is owed (#62).
+   - **Information: redundancy.** At the retained quotient of this undamped carrier the partner face
+     is a function of the forward face and `n`. Over 1,365 words, no group of equal length and
+     forward face had two partner faces. The partner is a check, not new information.
+   - **Not built: an equivariant deposition.** `pair_deposit` moves `E − E₀` without preserving
+     `B E = E Σ_σ`, so after a reached deposit the partner read refuses at the first failing column.
+     An equivariant deposit needs the reversed-pair adjoint, the pair-port reversal law; mirrored
+     columns are not that law.
+
    **The general partner law and its scope** (`proved-derived` for the identity, owed in Lean).
    - **The identity.** For a uniform tick, an involution `B` and `B E = E σ`, the recurrence face
      `moment_U(w) = Σ_k U^{n−1−k} E(w_k)` gives
@@ -379,11 +404,10 @@ Its second part states the perfected laws:
      - or a report of redundancy.
 
    **Deferred to later steps, named.**
-   - Step 2: the partner's face on the HNN carrier, by the general law above,
-     `moment_U(σ̄u) = B Σ_j (BUB)^j E(u_j)`. It reduces to `B U⁻⁽ⁿ⁻¹⁾ moment_U(u)` only under the
-     stated conjugacy `BUB = U⁻¹`. Its first real caller is `SourceMoment::encode` and
-     `open_storage`. A paired admission and a located moment chart are built only as that caller
-     consumes them; a recurrence implementation that nothing consumes is never grown beside it.
+   - The next helical step builds on step 2, which is built (above). An actually reached deposit
+     changes `E`. The partner consumer then reads the changed port with its exact relation or typed
+     defect, and the later response is read. An equivariant deposition needs the pair-port reversal
+     law (the reversed-pair adjoint).
    - Step 3: the linking reading of a closed duplex and its crossing changes. No current crate
      reads the linking number, and the retired owner is at `13f8c734`.
 
