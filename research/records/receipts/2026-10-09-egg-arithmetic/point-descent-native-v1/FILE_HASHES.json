@@ -1,0 +1,839 @@
+{
+  "files": {
+    "stages/egg-point-descent-20261009-v138-provenance.acceptance.json": {
+      "sha256": "81600205d222fde1226105be09443bf86b30ad40afe21156ca0bb1bd53fd81dd",
+      "bytes": 378
+    },
+    "stages/egg-point-descent-20261009-v138-provenance.child-identity.json": {
+      "sha256": "2d4a15be672f02843b0e4c048d80b9a624665108d2173cf2edefd9ea35d9658a",
+      "bytes": 78
+    },
+    "stages/egg-point-descent-20261009-v138-provenance.config.json": {
+      "sha256": "97bc385d232472fc10710e967419696202bcbc80cccd59515f0b30108e37e990",
+      "bytes": 36232
+    },
+    "stages/egg-point-descent-20261009-v138-provenance.external-lease.json": {
+      "sha256": "40503c796107c7ae39fb30092e80b8a131339c68785c0044838b7c2ad9d41bc2",
+      "bytes": 487
+    },
+    "stages/egg-point-descent-20261009-v138-provenance.final.json": {
+      "sha256": "0b6bdb44158bf2fe6b75bb8c87bdb53428e519d4a6311990cabeea9d1bcd617c",
+      "bytes": 5049
+    },
+    "stages/egg-point-descent-20261009-v138-provenance.input_seal.json": {
+      "sha256": "c78ece54f5eefeb5e3019488d12434c67c0ec14e0ada77e3fccb0b57cfef444e",
+      "bytes": 23642
+    },
+    "stages/egg-point-descent-20261009-v138-provenance.lease-identity.json": {
+      "sha256": "cd9cef4ba8b200c3a6a6609d2e28ecada95080624cb3dbfe9a84e1900ca47679",
+      "bytes": 565
+    },
+    "stages/egg-point-descent-20261009-v138-provenance.memory-gate.json": {
+      "sha256": "b26ad8c01b183e4c7f0ac67c0f4a2e26965cc0be87ec9eef80f2da7bc2dba240",
+      "bytes": 120
+    },
+    "stages/egg-point-descent-20261009-v138-provenance.memory-growth.ndjson": {
+      "sha256": "5554c67bf38a431548685c7c71203afbb56e1f171c4fcc03b282fb3569dda8d9",
+      "bytes": 871
+    },
+    "stages/egg-point-descent-20261009-v138-provenance.output_seal.json": {
+      "sha256": "83aa1bb79812cc0e32befc79d735d08fe85e422a77ec7bae6bc00a7c42027248",
+      "bytes": 47606
+    },
+    "stages/egg-point-descent-20261009-v138-provenance.publication.json": {
+      "sha256": "c1cab385be4c929f43abd5b2283b96159c75d76a0a545479384debccce13d470",
+      "bytes": 2955
+    },
+    "stages/egg-point-descent-20261009-v138-provenance.quiescence.json": {
+      "sha256": "762add0bb02aac7122a895de95a7eac2fe2bbe57e1c018a0b248a14eaca26f1e",
+      "bytes": 130
+    },
+    "stages/egg-point-descent-20261009-v138-provenance.release.json": {
+      "sha256": "ff0c116e357185335c2d3ff39163bb9b9035413c8c9df9b0eb45248b6bf054dd",
+      "bytes": 175
+    },
+    "stages/egg-point-descent-20261009-v138-provenance.stage-quiescence.json": {
+      "sha256": "077f7eb5da412a71216fbd5f6b6fc16b8664039ba93089ef08d18c5d37e7f13b",
+      "bytes": 136
+    },
+    "stages/egg-point-descent-20261009-v138-provenance.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "stages/egg-point-descent-20261009-v138-provenance.stdout": {
+      "sha256": "5eb780456bfa7c04c664e3bb39e4d2515aa77673c136c5330ca55db4515bc8f7",
+      "bytes": 3691
+    },
+    "stages/egg-point-descent-20261009-v138-provenance.system-floor.json": {
+      "sha256": "9641cdee75bb28d2d6518cc13da8e1d70a2bdb2155e2272c5967eba5978e8bd3",
+      "bytes": 5666
+    },
+    "stages/egg-point-descent-20261009-v138-provenance.unit-cleanup.json": {
+      "sha256": "12c753007f5df5208bc46e09fcff8d41bba25667d0e2b124c5b62ccb0a8838a1",
+      "bytes": 711
+    },
+    "stages/egg-point-descent-20261009-v138-prep.acceptance.json": {
+      "sha256": "d221c72269707deda34e2e8dececf3e5f394b6646c819b7e98d40fc8e630ae3b",
+      "bytes": 378
+    },
+    "stages/egg-point-descent-20261009-v138-prep.child-identity.json": {
+      "sha256": "3e708c724062cd171e772b94ba3f49b4864bd2eca3ea8eccf9027299210cf318",
+      "bytes": 78
+    },
+    "stages/egg-point-descent-20261009-v138-prep.config.json": {
+      "sha256": "9b5c3b75ab89c08444aea3e811ecde9182b7228c685041cd09f23f8dc2931de7",
+      "bytes": 10091
+    },
+    "stages/egg-point-descent-20261009-v138-prep.external-lease.json": {
+      "sha256": "a77b59d080313d809e1240a17e9d296297de77358c47f1bc3015c58c93a83670",
+      "bytes": 487
+    },
+    "stages/egg-point-descent-20261009-v138-prep.final.json": {
+      "sha256": "56d7fae74980d32c0bc03bf3d02800319c15675a59c4e627acc2c389cfa51d25",
+      "bytes": 4957
+    },
+    "stages/egg-point-descent-20261009-v138-prep.input_seal.json": {
+      "sha256": "832d950c946818c10ca44abc4c2e1e3dab3c2fc8f153c2b6d4da14f5091d5715",
+      "bytes": 7246
+    },
+    "stages/egg-point-descent-20261009-v138-prep.lease-identity.json": {
+      "sha256": "186d67f1cdcaf7faf6af64e07eea5cba1418054272cb03db67aac359422a5f1d",
+      "bytes": 565
+    },
+    "stages/egg-point-descent-20261009-v138-prep.memory-gate.json": {
+      "sha256": "4bbb51a90d5a8ea5e097ed86f2e572ac87f9e44b6a278b5d0b26150952cf63d2",
+      "bytes": 120
+    },
+    "stages/egg-point-descent-20261009-v138-prep.memory-growth.ndjson": {
+      "sha256": "495b5e0237944312c0f3dd678c7e771ebae153b43f5197692b37c8a15765f9ad",
+      "bytes": 6540
+    },
+    "stages/egg-point-descent-20261009-v138-prep.output_seal.json": {
+      "sha256": "a058b45b423df658bf15f06ead20d91979f1ed839f3d4c50cdea02b85fff72f7",
+      "bytes": 452419
+    },
+    "stages/egg-point-descent-20261009-v138-prep.publication.json": {
+      "sha256": "24f21f043810959d55aeca1b393b13a75f14e852d4ea0d1942962bd5cd23a6db",
+      "bytes": 3134
+    },
+    "stages/egg-point-descent-20261009-v138-prep.quiescence.json": {
+      "sha256": "01ad3c49cfdc1b6c88cd2168ba06cc888f9e01b9a3286b2575653411ff117665",
+      "bytes": 130
+    },
+    "stages/egg-point-descent-20261009-v138-prep.release.json": {
+      "sha256": "ae1bf840a720d8c643abd6514ea228744d7cf20a8d10564b155304783fb1e4dc",
+      "bytes": 175
+    },
+    "stages/egg-point-descent-20261009-v138-prep.stage-quiescence.json": {
+      "sha256": "09c22bde069b4b8cdb5409e9b0c320fe6f470eac5c798093c590cc457685cf2e",
+      "bytes": 136
+    },
+    "stages/egg-point-descent-20261009-v138-prep.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "stages/egg-point-descent-20261009-v138-prep.stdout": {
+      "sha256": "f3aadba2fef964d5484f350973ab7f55a433e737439cf939c44f3a8427138f8e",
+      "bytes": 2171
+    },
+    "stages/egg-point-descent-20261009-v138-prep.system-floor.json": {
+      "sha256": "41dfe03f31306486972371d7f06a60cf71299f58f683eaa955e50beafb5de0ae",
+      "bytes": 52009
+    },
+    "stages/egg-point-descent-20261009-v138-prep.unit-cleanup.json": {
+      "sha256": "b9797ad70d666b2a2c57791d8bfc9cbc40e8dc02ad2ab512351f924256868e1a",
+      "bytes": 699
+    },
+    "stages/egg-point-descent-20261009-v138-compile.acceptance.json": {
+      "sha256": "a5dbd21ab8ff0b931824519322cf0c09aa60d0dbafa0dc4e2d988434b5782345",
+      "bytes": 379
+    },
+    "stages/egg-point-descent-20261009-v138-compile.child-identity.json": {
+      "sha256": "83dbbee7d6cd6adc5d538ec8d4b4183b48b1d73d8e0c32c643f7fdaedf45feb4",
+      "bytes": 78
+    },
+    "stages/egg-point-descent-20261009-v138-compile.config.json": {
+      "sha256": "6af495158d4d54420abf3f083ef614ac1fb39246971a73d059ff580a6aa861c4",
+      "bytes": 11156
+    },
+    "stages/egg-point-descent-20261009-v138-compile.external-lease.json": {
+      "sha256": "8c0c492ecb774288199186c2ba6b00b52e793134c2b21ba0b872e2fd72ea8ed5",
+      "bytes": 487
+    },
+    "stages/egg-point-descent-20261009-v138-compile.failure.json": {
+      "sha256": "8061af69994165931357892b87c9cc61f551e810781bc1301858197b5b80b20b",
+      "bytes": 239
+    },
+    "stages/egg-point-descent-20261009-v138-compile.final.json": {
+      "sha256": "61f7889f764dd93cdbaf3e78f97b229d8df25353ac6f651ce80c99ff089943cd",
+      "bytes": 5249
+    },
+    "stages/egg-point-descent-20261009-v138-compile.input_seal.json": {
+      "sha256": "a3645341e452455dd51ca0a402417b3a8a4f9fd1338ddab9bc4a137f95fee5da",
+      "bytes": 7179
+    },
+    "stages/egg-point-descent-20261009-v138-compile.lease-identity.json": {
+      "sha256": "c75d83ac77968ad73dd32f57ff704d9910c3199a8c86d3a39facf444538458bc",
+      "bytes": 565
+    },
+    "stages/egg-point-descent-20261009-v138-compile.memory-gate.json": {
+      "sha256": "6179e86d47a5f94420896691c4d8fa392f1ac4c9fd4435d224df79bc5bc64eb5",
+      "bytes": 121
+    },
+    "stages/egg-point-descent-20261009-v138-compile.memory-growth.ndjson": {
+      "sha256": "d2c383d7c6cabfa629c14c9d5bfe26290753e92f6387bf1b6708d51934d81960",
+      "bytes": 6964
+    },
+    "stages/egg-point-descent-20261009-v138-compile.output_seal.json": {
+      "sha256": "0f8a90da76d1548ec3ba46d0f1bdfed37eb242ee635fc5f5601c5212cb82e1e6",
+      "bytes": 484042
+    },
+    "stages/egg-point-descent-20261009-v138-compile.publication.json": {
+      "sha256": "d70e26d58f47f93aab11c82017185e834e98cd3e6a69573793abf59437b7ccdd",
+      "bytes": 3581
+    },
+    "stages/egg-point-descent-20261009-v138-compile.quiescence.json": {
+      "sha256": "327db33a2aa4ad05abbe614d848e5b4338574b40c42fa21095c85b87a3fd5ae8",
+      "bytes": 130
+    },
+    "stages/egg-point-descent-20261009-v138-compile.release.json": {
+      "sha256": "2f5ba6bfa8848370c420801d0a79341d1487672625f68554f4468d159caaae12",
+      "bytes": 175
+    },
+    "stages/egg-point-descent-20261009-v138-compile.stage-quiescence.json": {
+      "sha256": "d76cdf2f5390bd6b4a38dbbbf4091c6fdc830ee219a0bc3b714866e0263386bc",
+      "bytes": 136
+    },
+    "stages/egg-point-descent-20261009-v138-compile.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "stages/egg-point-descent-20261009-v138-compile.stdout": {
+      "sha256": "4f54f17df463185738f2180a9aeea2326d2565d35f70456b33b148d99ba23c59",
+      "bytes": 5797
+    },
+    "stages/egg-point-descent-20261009-v138-compile.system-floor.json": {
+      "sha256": "6414693f4f0d8afcf089adb5c3dd8d9760b24ee2bcb8b96990de652738ba0f71",
+      "bytes": 55957
+    },
+    "stages/egg-point-descent-20261009-v138-compile.unit-cleanup.json": {
+      "sha256": "548bb544f25e615aec036e2586f1cfa083b9825ebf20c39ff2f2661984801eea",
+      "bytes": 765
+    },
+    "admission/CACHE_PROVENANCE_REQUEST.json": {
+      "sha256": "9bf79364701ca45825b22572246e1fe7c42425d4a64a69b1a650be2d4139b189",
+      "bytes": 25098
+    },
+    "admission/CACHE_PROVENANCE_RESULT.json": {
+      "sha256": "39c301f4e64e38d081eacfa93f125db50a26f47ceae097d68596adb0f40e1036",
+      "bytes": 1374457
+    },
+    "admission/COMPILER_REQUEST.json": {
+      "sha256": "1f20742f30f75f5e3ea1342833ea0b484a5b16d38bb5131b1e20df695ba8f0fe",
+      "bytes": 3351
+    },
+    "admission/KERNEL_VALIDATION.json": {
+      "sha256": "e5daca33aed860a702d38e62fe6e66185ac41e89abe695f42c93f4c64d33b97d",
+      "bytes": 1058
+    },
+    "admission/PREPARATION_REQUEST.json": {
+      "sha256": "8aeae7996a49460606ec37e2bff0b7c8975e856ae9229a3291c288f6dfe9dce3",
+      "bytes": 5046
+    },
+    "admission/PROVIDER_NAMESPACE.json": {
+      "sha256": "bc623ffec025073b856973fd236dbac329bb14fab1b3bfaa43962dc4441f6f7a",
+      "bytes": 69292
+    },
+    "admission/RAW_FAILURE_HANDOFF.txt": {
+      "sha256": "06591a73a32290688ed44675df716ac78280672c04b9eb627c1f5f354379297f",
+      "bytes": 6188
+    },
+    "admission/SOURCE_ADMISSION.json": {
+      "sha256": "5b9629a2747573e0a94e0ec5d856fef44676448f645f38ba66a4051e32d199ad",
+      "bytes": 12757
+    },
+    "admission/compiler.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "admission/compiler.stdout": {
+      "sha256": "1ce93211bcee9a36a31ca34b7f63aab8156f9185689b9ebda51e5d66e3190ae1",
+      "bytes": 4618
+    },
+    "admission/current-imports.json": {
+      "sha256": "f81944b7a1135e574925bb0c2e23c512dba56b74fc93a21366b6e6ef0e6f160e",
+      "bytes": 52593179
+    },
+    "admission/import-preparation.json": {
+      "sha256": "0617903f9cbb07ed6643c7805d33ceae4f5a51b97f824f1afbd24782f4d396b7",
+      "bytes": 1253
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/BirchSwinnertonDyer.olean": {
+      "sha256": "14976450b0f531479ed7a4955c9d44593665b10f9abc025fcd41e7d7e74a569c",
+      "bytes": 474760
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/ChordFace.olean": {
+      "sha256": "db7e12cf7e3a2be0d0f9d3cd6250153236cb609fe8d2c73f29184dfd82fd5374",
+      "bytes": 1319024
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/Descent.olean": {
+      "sha256": "c3a2731033227c85c9f623d07829272b0601335f49cea5398dff6ae23296b757",
+      "bytes": 522296
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/DistantWindings.olean": {
+      "sha256": "657575a4e2a58f155060ccb57c3e54956abca760649bf977ee3937ed1ccdd5fa",
+      "bytes": 4468320
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/FaceHomomorphism.olean": {
+      "sha256": "d8bba167a5f873c2d3c10f3323be7fcd7539ae5b92097e7c09149c3eb8426d60",
+      "bytes": 2066864
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/FaceImageFive.olean": {
+      "sha256": "ba5a98749c0aae124b7bd6fd71378717c926a77528ab40a79ed3e6ed84a39c68",
+      "bytes": 1987344
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/FaithfulFace.olean": {
+      "sha256": "1f5b3dcc8e6c8db04425a70ac31fa6012124e69fe7fe19df4d27b29df0c00b2d",
+      "bytes": 1813288
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/FamilyCollision.olean": {
+      "sha256": "395415778d2e387aa342ba624a40c2ff53128cf65e70e0895f561ffe70808743",
+      "bytes": 644208
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/FamilyDivisorRank.olean": {
+      "sha256": "6713e51b2daab4dbffc0a77fdc24e3fb6fb5fae133b14f313f27227aca3c7f18",
+      "bytes": 908888
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/FamilyDuplication.olean": {
+      "sha256": "4fa4b4ba693e57c0e4e825a391cbf3fc0f4a9fa0c46490f05b2d1d817adffff5",
+      "bytes": 3893200
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/FamilyFace.olean": {
+      "sha256": "4165db6a99fcd49d1dc78617074d77dc521cba20a0562beeecfe23fbf56e1488",
+      "bytes": 2450400
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/FamilyFiveDescent.olean": {
+      "sha256": "74e4f5bb7594e04fcafa450d9170a020bddcaf5655bc7cd6cced31e04b1e91de",
+      "bytes": 3925240
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/FamilyGauss.olean": {
+      "sha256": "1ded67f11e00a28482449deb70544f3fe4a89fce5a8bae38abf5faa32da0d8f1",
+      "bytes": 628192
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/FamilyGenocchi.olean": {
+      "sha256": "ab9ac977c86eb18cbd1d55c1c39fec36db8f14339ece8beddf888155d5fc2c81",
+      "bytes": 4698808
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/FamilyHalving.olean": {
+      "sha256": "5d41d0d2cc7624900ee345f22cecb64a13a4c103b8a19f748d809043a944c126",
+      "bytes": 2527496
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/FamilyHeight.olean": {
+      "sha256": "4221f8c64979ef72776a2b55d6f0c9caf94c3b7b087d1a164e751d63227aff7e",
+      "bytes": 2674176
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/FamilyHom.olean": {
+      "sha256": "d6516b7a571891dd1f05b8d1529d8503061acbbd11d2b083a0124772009bcd53",
+      "bytes": 1162392
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/FamilyImage.olean": {
+      "sha256": "6c43d372aec21c027ad5ec519731e8716ba9148a5f9b2ee67e4d06a5d886faf0",
+      "bytes": 550632
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/FamilyKernel.olean": {
+      "sha256": "bff69dbe717ba2c6e5f54d501757b45306664dd4e7ff21dc74ac4af1f906155e",
+      "bytes": 1928344
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/FamilyLogRank.olean": {
+      "sha256": "7aec68b836012cda271d3f031b3a7926722bcf1a1d8f6f7dd9e05342ce702686",
+      "bytes": 579256
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/FamilyMordell.olean": {
+      "sha256": "49e8fa3280868232be83eead7f209b725f7de7f2c3f4ccdf516e5e2708273008",
+      "bytes": 1289832
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/FamilyOddDescent.olean": {
+      "sha256": "8518ecf67263079e6aadaeb7f314e825166c88f1697d4454364467637a764432",
+      "bytes": 2433688
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/FamilyOddGauss.olean": {
+      "sha256": "a6498f57cb0bc2d7ae330778444a6fa58ee0115cf2f2f2adf9e44726af35dc4d",
+      "bytes": 798936
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/FamilyPairing.olean": {
+      "sha256": "b0958625a9f143035a96f254e59a36bffde42e7aec049f11dca5e10736b85f2c",
+      "bytes": 439736
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/FamilyPrimeRank.olean": {
+      "sha256": "926cafb15a96b2f144658bec59754037535e4ec9f32a4c25aaeb3726e9f58733",
+      "bytes": 1044904
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/FamilyRank.olean": {
+      "sha256": "89b8a61e8b497dd936d40ee0e7e9e554b33d91c95ff68deee7fdbb274c3d0b5e",
+      "bytes": 559952
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/FamilySevenDescent.olean": {
+      "sha256": "cd42ed6dd611e32f1c80747babd1f7667fe1280eb3158d59548d58e2b5107cef",
+      "bytes": 3303832
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/FamilySupport.olean": {
+      "sha256": "474581441c05da3f9d4efe462fa0d4783e239284204d615d9292fc4bb8e64b8f",
+      "bytes": 857088
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/FamilyTheta.olean": {
+      "sha256": "0437dc221d2424fd9583817b91e1eb64b3f8cc20f7a646f673eaadaae5daebc0",
+      "bytes": 1315440
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/FamilyThetaFE.olean": {
+      "sha256": "8f104dd42396f1ae340fc92b1d14f58f6993cf39566579510805e8d0233695e0",
+      "bytes": 1801360
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/FamilyThetaOdd.olean": {
+      "sha256": "be913c2d3cd3abb4e08b7ab99f8fafdeeddccb0b2c6686b6e1db9918189fafec",
+      "bytes": 1140424
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/FamilyWitness.olean": {
+      "sha256": "bcebfc8746f0beb8814a7680a0ba4babb1f3c3de5da70fe3572f12dd33b5fc39",
+      "bytes": 1382824
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/FiveDerivative.olean": {
+      "sha256": "dfcecac1ea85e336c576d2e524ff9d5efd5a4714d41b7fc8a0b75cb850cdf1d5",
+      "bytes": 366112
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/FiveDescent.olean": {
+      "sha256": "dba5a58c962ae11130d7ebb1b733955ab607d5b4abdcd95ac7b1476444e58e47",
+      "bytes": 1121256
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/FiveHalving.olean": {
+      "sha256": "34b9c6a1139e08dc70f44bbc5ea1fbd638745fcd6e5dbea1d8208442198df2f4",
+      "bytes": 4373768
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/FiveHeight.olean": {
+      "sha256": "a223dabc04c03c2429f1e4754df4fc6e2257d178ff937a9ba0c5c867f6b2edfc",
+      "bytes": 651944
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/FivePositivity.olean": {
+      "sha256": "12de7dd96db4f84a903c4c26397b055e3af130a2ef12b68c149c1a34e45f5cdf",
+      "bytes": 3029408
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/FiveTheta.olean": {
+      "sha256": "88eed8872fd752bc15507241184a0cfceb63e7b6a4f1b288b3779d5438c8d704",
+      "bytes": 5783368
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/FiveTranslation.olean": {
+      "sha256": "fe1b4f32fb49f6309c05093883a0d7054cd17943021685d5272474d648eae77b",
+      "bytes": 2374344
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/FiveTwist.olean": {
+      "sha256": "12fb0375abb63984ae1e5ab8c40a1548f787dfdd258c72bbe62d2cf7f831a405",
+      "bytes": 180160
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/FiveWitness.olean": {
+      "sha256": "5f531e77736da24f7f9ce405a2c2bf6c6f52b58904031ad980bafda4e408dd26",
+      "bytes": 1169104
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/FrameDescent.olean": {
+      "sha256": "2cdf86bd19744a6150027650c1df37e9948bdd116bc458e7ce7f9a8aa51aa929",
+      "bytes": 962472
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/GaussCoefficient.olean": {
+      "sha256": "1cd94ede5b3b9bf04a62fad670b98746efa675dc7c12d5657a6b42675a9eb5a5",
+      "bytes": 4073520
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/GeneralCertificate.olean": {
+      "sha256": "7975fa3fa810973c36dc8ac09b809a3a714d60106a889ee9b4d1c00f54af1661",
+      "bytes": 1343224
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/GeneralCollision.olean": {
+      "sha256": "cbfc694205d8f2795e0047d7363bc05a191ecf6c1a0cf969d1b307f745999ace",
+      "bytes": 440624
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/GeneralFace.olean": {
+      "sha256": "86945b56b6988da78df8485315e6d740a3ec7cdab26cc952d5766cf33f315ce6",
+      "bytes": 971048
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/GeneralHalving.olean": {
+      "sha256": "2b6f7f4ac7c47ef44ccc11d98d6f9d07b1c160e136c4919c4954b87d6c27872a",
+      "bytes": 1296808
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/GeneralHeight.olean": {
+      "sha256": "05720e76e17a92cf73c3374e045e7fcbf71695fea3052cae92b098175492fecc",
+      "bytes": 6297728
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/GeneralHom.olean": {
+      "sha256": "1204c7d97814e4e69ed6ea32034d1002a28f03c27a56ae6e58204f17b09b8a3d",
+      "bytes": 2141448
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/GeneralMordell.olean": {
+      "sha256": "b3f2e42497e3e75a86186e2e0dd3b7d557db67ca5b36c56bbd1d7f4bc59d2af2",
+      "bytes": 2294680
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/GeneralSupport.olean": {
+      "sha256": "00cd41e14c3f77381da7890429cd8e824b7c2d8a93e99ce834437f39a282e3a3",
+      "bytes": 926400
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/GeneralTwoTorsion.olean": {
+      "sha256": "041fa7b0e355f73738bd60d3e41dcae2ce8bb25f0a24018626f2aa9a4fac2c1e",
+      "bytes": 360648
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/HeckeEuler.olean": {
+      "sha256": "15dc885d03f05d5c8a8c5c0cf18cc5b3cc0f96c7cbe47e30a4d64e031b4047b2",
+      "bytes": 2976288
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/HeckeTheta.olean": {
+      "sha256": "a4f4b0cd18ed3179cb11d11c84115bb0a4f2e8e752a28b619eea4bac2655652e",
+      "bytes": 4335056
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/HeckeWitness.olean": {
+      "sha256": "07b64df41bed6538b5e4230704cb181381715b2a180ae4468899f658c6c75175",
+      "bytes": 696792
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/MinusFourth.olean": {
+      "sha256": "c9a9c70a49603829d96918c163381aa8beb88316c4edcc6915f266cd078986f2",
+      "bytes": 1425680
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/RankOne.olean": {
+      "sha256": "270affe9444fd64ef41c44db7790ed485b3935e2201224978014786b65cf25e6",
+      "bytes": 486104
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/RankZero.olean": {
+      "sha256": "07372180d2dc066b651cc07b09a60167c67d2669bcf6742350081030e84fe684",
+      "bytes": 1003872
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/ReflectionCensus.olean": {
+      "sha256": "cac3fea0038c84f0dfe7649b2021eb4193b0fd223db37504fba2dff8a36557c6",
+      "bytes": 275520
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/TateLedger.olean": {
+      "sha256": "cc3827361b9f9e32aa846f9a5fa31af04544810fa1b16405dff357ad4f05d5e8",
+      "bytes": 174504
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/UniversalBSD.olean": {
+      "sha256": "685abb192bd415df2e0e22e7e576f59dc0d8befede95e7abd9a896b380928566",
+      "bytes": 384304
+    },
+    "admission/objects-v1/HolonicsResearch/EllipticCurve/WindingCensus.olean": {
+      "sha256": "6bbfef0c6b145f3f493f32ae1d47ca4cc088e7477e53e2d7a2c5a91e9ec7bad1",
+      "bytes": 988648
+    },
+    "admission/objects-v1/HolonicsResearch/Geometry/EggModular.olean": {
+      "sha256": "6463f5c5a255237e1529d6115c4b11956c5d2d6de7d132ea7ee0d11180c2a1ef",
+      "bytes": 1694528
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/BirchSwinnertonDyer.lean": {
+      "sha256": "41f372d73e3c6e5a1e031fc8b1846c74c3b8663f845b0c5681792d3cf031a1c8",
+      "bytes": 15342
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/ChordFace.lean": {
+      "sha256": "25ed85bf138f27dd322a33fc489cb1239971cc83b75935654a256dd1b50f4178",
+      "bytes": 12610
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/Descent.lean": {
+      "sha256": "34c3a05aaf0bcc028009ff89275c8fde66a898efd527813da10e3b2dd40ac449",
+      "bytes": 16565
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/DistantWindings.lean": {
+      "sha256": "c3a65f780f907e3910c1c933d0cd680e58688261c36436cb707e906f94d299f5",
+      "bytes": 43236
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/EggSource.lean": {
+      "sha256": "07d844746a48af61cc798a6f01c313dfbf279895d05fbc764867a5827b2dd0ac",
+      "bytes": 8142
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/FaceHomomorphism.lean": {
+      "sha256": "775e539b0b88b2108238ebb3225a53261b4272ce6dc30abc59629adf1c95982d",
+      "bytes": 43865
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/FaceImageFive.lean": {
+      "sha256": "8e9ef761bebd94fdb00986bf128a086e8bf9b14088c80b4021732315c1d88aaa",
+      "bytes": 56280
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/FaithfulFace.lean": {
+      "sha256": "46c5286479f077514f54c3a3b9be226bcc1e1f7f254755c273ba556efdba7aa4",
+      "bytes": 40890
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/FamilyCollision.lean": {
+      "sha256": "732d3e13b68e90f179e291391f6dd62bfbd7c5132375779bc172588261156b4a",
+      "bytes": 10271
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/FamilyDivisorRank.lean": {
+      "sha256": "ee45dc19f9e85f436b13bad0ad52e4afc27c595d6416f77369022b2f45b3c37f",
+      "bytes": 14436
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/FamilyDuplication.lean": {
+      "sha256": "31445274af6d128d716784c274eb95a66c57e2e062150e3c2dab02f02d63147d",
+      "bytes": 58599
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/FamilyFace.lean": {
+      "sha256": "ca03b615f570253cc4e30eefa2e1f05aa8f7254f89d08f80adebd5d7a498cab9",
+      "bytes": 36571
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/FamilyFiveDescent.lean": {
+      "sha256": "1d53c1f401c3a3685f799f463c56c1cad435af34b1f821ca5a468122deb481d0",
+      "bytes": 60227
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/FamilyGauss.lean": {
+      "sha256": "3369589e6e639a2d02387e000f1f6cc1c4b8fd4bb5123504db3c214d7d33b199",
+      "bytes": 8845
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/FamilyGenocchi.lean": {
+      "sha256": "e89b725a1a79f690c2f68bb8602456afa8fdc6c3509adc2ca3d789b2bc1b8965",
+      "bytes": 73188
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/FamilyHalving.lean": {
+      "sha256": "36f1aad3c5572671f315244c9d230330832f3b8fa796cd2bdc4931d388fd5c96",
+      "bytes": 5409
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/FamilyHeight.lean": {
+      "sha256": "67cfaf40107da47f7053afea97c5bcd0a032a7f4d76f23f3e5cc696bc3a8fb74",
+      "bytes": 18134
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/FamilyHom.lean": {
+      "sha256": "d2a2c8033d54ac3004d8ed89886a316bf7f1d2bc389d11eed10f1ee79223c890",
+      "bytes": 22085
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/FamilyImage.lean": {
+      "sha256": "fcc0ca0ad78e31ff75e3fe3ead302ee67d19b5cc371ec1b85ceb354bc28d2379",
+      "bytes": 5391
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/FamilyKernel.lean": {
+      "sha256": "925c2b55d90bdc9b20fc72fccfb8cc88a29489aa020fc6e46cfcac5ae60ca987",
+      "bytes": 9228
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/FamilyLogRank.lean": {
+      "sha256": "f4a2e90352c5521d59c3f9333bed5913e89c02d4c186e35db25d07453c35b4b1",
+      "bytes": 9317
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/FamilyMordell.lean": {
+      "sha256": "6bfd07d9a8735de95e6f996b9d1a1eb3238bb5b70879ab1f1223cacf0651548c",
+      "bytes": 21837
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/FamilyOddDescent.lean": {
+      "sha256": "6b271c65dc26cdc2441b0123f29285f9fcd77e3e38701f93456c6d7a6115bb68",
+      "bytes": 39815
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/FamilyOddGauss.lean": {
+      "sha256": "4d5ad5fd148f2d2eebd8baa05ec72b9378f5a8557b6ccd6bbadc7a8b48e0a330",
+      "bytes": 12902
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/FamilyPairing.lean": {
+      "sha256": "05473552eb1b339a7bb2d85911884f5220b4821ff33b432529c189bc7012b345",
+      "bytes": 10526
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/FamilyPrimeRank.lean": {
+      "sha256": "5a3065523ff492a19f775367465033f893a57b66bdacca0b6061cabc3575c41d",
+      "bytes": 13270
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/FamilyRank.lean": {
+      "sha256": "151f9db51af9815a11820d18095c1f038cd9dd9d8f3b17a80471248813a7103d",
+      "bytes": 9196
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/FamilySevenDescent.lean": {
+      "sha256": "0d39a025e543fb031f867255142c5f22e91f20ccab0fbc750fb6be2fb113303d",
+      "bytes": 50706
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/FamilySupport.lean": {
+      "sha256": "6742c7a2ba54be7e97c0408a743d1056e1e9866c4294fab28586d4c26274a648",
+      "bytes": 16209
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/FamilyTheta.lean": {
+      "sha256": "b9b0ad4c3de3ff39c71e2819d3dbf18b9f9408e2931e083434bd6e98b01f2f40",
+      "bytes": 19199
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/FamilyThetaFE.lean": {
+      "sha256": "9b516c02a16934243ba6575a8bf23608ad863e1a89dacf31f3d7296ca4ff7dd8",
+      "bytes": 36116
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/FamilyThetaOdd.lean": {
+      "sha256": "72a2539583b14cad265d2262d3024c5cdc92bdd9ffb4260f9fbd4bde6b8e1717",
+      "bytes": 17383
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/FamilyWitness.lean": {
+      "sha256": "b99cedf167e73869dad242797eb1ed8c2300ec5513904ab76fea54b7214c3bcb",
+      "bytes": 42455
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/FiveDerivative.lean": {
+      "sha256": "74905ec71b061cba7aac19b6be45adc42557cc2863450b3c1fd31f72cea12a00",
+      "bytes": 10704
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/FiveDescent.lean": {
+      "sha256": "f21e258fddaf590849ca673ae4d02d531424c59fdf4a66dd7f80dd35fda9af67",
+      "bytes": 24276
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/FiveHalving.lean": {
+      "sha256": "29dc2b5a31466b11185e18f08eb13f0f6b178dcb1db43cd9d60b634dcf1ab480",
+      "bytes": 9326
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/FiveHeight.lean": {
+      "sha256": "7f7bd5c89aa2bb44aac7efc5edc58f12e34983e0755e014de7c6c7025a4cfb2c",
+      "bytes": 8089
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/FivePositivity.lean": {
+      "sha256": "ffcfac35976e2ec4c54526e635f15ac7ce6f86182a2797dccc1936c245f75281",
+      "bytes": 46743
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/FiveTheta.lean": {
+      "sha256": "3d4f645235329ba8d4a5749e0bd70005df9a176f9f7e09bf02756d5d67e6dbc3",
+      "bytes": 90894
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/FiveTranslation.lean": {
+      "sha256": "f291991a077d7b06f40e1dbd71dcb72bb14a198b6e99a6104cfa054ff2187e50",
+      "bytes": 14518
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/FiveTwist.lean": {
+      "sha256": "36154923381688bd16665a07a39627b1cb3920d9094bd57715c61f10f8a9636d",
+      "bytes": 3899
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/FiveWitness.lean": {
+      "sha256": "fbb6f9153a85a26a11840fe95ae36c707936bc538e6a0c4f44c041d0f82bf59a",
+      "bytes": 26103
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/FrameDescent.lean": {
+      "sha256": "c3f229bc64277c87b2798606f5769a3a511465dcf77ea515912bc1775a1ebbd8",
+      "bytes": 17140
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/GaussCoefficient.lean": {
+      "sha256": "5e65cea3497260c23a9a93b6f10446a1fef28559778c76199600aa7c9b525972",
+      "bytes": 46070
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/GeneralCertificate.lean": {
+      "sha256": "fe0908285338fd4deb2f7559857cb83ebe707525b25de4695c04b47f2982d3d8",
+      "bytes": 8535
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/GeneralCollision.lean": {
+      "sha256": "a81dff70e9c7ee0a8a8f668342a72befe30658446a4b01e38c85f37a32de6777",
+      "bytes": 10827
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/GeneralFace.lean": {
+      "sha256": "0abb4b6acffa358956842a863ea7293d787af14c79779b20876ab67e9eaca960",
+      "bytes": 8289
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/GeneralHalving.lean": {
+      "sha256": "3f1efdd11c4073d55a46140ce68455e4e4f6d65ef6253d6fe9a0f1cb2a9c228a",
+      "bytes": 11002
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/GeneralHeight.lean": {
+      "sha256": "adaa7d86f1d7d859cd2a17c444daa93049f0260700fe1f15927e7114b7921792",
+      "bytes": 37872
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/GeneralHom.lean": {
+      "sha256": "a64f53f896a55183839cb39333ce87bc35fc84e1925a37b65aa64ed22418b9f6",
+      "bytes": 18383
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/GeneralMordell.lean": {
+      "sha256": "9f49efd8f4e400dbbb53c699b364b7b6133ffd0b0aa8fa93ae7043d24f47d890",
+      "bytes": 34139
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/GeneralSupport.lean": {
+      "sha256": "9735de92085b961328708da895b578f4087cd5ce30813a135bad2e908905bffe",
+      "bytes": 18039
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/GeneralTwoTorsion.lean": {
+      "sha256": "7bd81c3e2cebd6f754f9b7cf0749f0522f746332e29754aef37b88c6e294c953",
+      "bytes": 9667
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/HeckeEuler.lean": {
+      "sha256": "e79e4c2b6d5bbb543a82ee3bfe2dfdb2af4ae0cc5567c29e0bf2fc5e0d506450",
+      "bytes": 38837
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/HeckeTheta.lean": {
+      "sha256": "9ba4e5358e372924784edd9dd1963443e9f94805d4f82cb7417d0d600b578bc9",
+      "bytes": 69549
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/HeckeWitness.lean": {
+      "sha256": "78bd7441e72562a07fd6c78b7c7be3705b65e7a8fbb1058af2fa58f616746fc3",
+      "bytes": 20197
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/MinusFourth.lean": {
+      "sha256": "6c7dc48d9751cd856fc173d99fd984e35b2193c6646e0a2d4c14d9e4c6660183",
+      "bytes": 23127
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/RankOne.lean": {
+      "sha256": "745bd50f3ec89d968dc9c93a50001c6fd0b5f1febb4a97ac4216503bda131602",
+      "bytes": 9443
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/RankZero.lean": {
+      "sha256": "1e41cae637714bf2b6a5d98b086a4988399e8cdb2b47cc0395b740d70294a8f8",
+      "bytes": 9379
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/ReflectionCensus.lean": {
+      "sha256": "6c2ffa6704e67e2dfe449ba380e8abdaa32c5819138b1c7509b95230c9ad2e05",
+      "bytes": 8547
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/TateLedger.lean": {
+      "sha256": "a644beace5c70a13d61fd8e781364526a44c1603b685c426b8a0da75621c68ce",
+      "bytes": 7492
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/UniversalBSD.lean": {
+      "sha256": "b46ff4078ac7cb907bb69b916b6d067c86b806e57d56b859b9805d470b69fb4b",
+      "bytes": 12064
+    },
+    "admission/source-v1/lean/HolonicsResearch/EllipticCurve/WindingCensus.lean": {
+      "sha256": "792176cb7af2f54834bac3663f1fa76ff7548ba044237f1733993e12b0024b7e",
+      "bytes": 17409
+    },
+    "admission/source-v1/lean/HolonicsResearch/Geometry/EggModular.lean": {
+      "sha256": "d17596df6a3c1b536f4254a8e3cee39f10a8cd68732ffaa404a031ce151404f3",
+      "bytes": 14166
+    },
+    "admission/source-v1/lean/lake-manifest.json": {
+      "sha256": "5e2b9522bf6b080d77946a055ed90b88513a1aa52d9fa0ceb01c6b01283783cd",
+      "bytes": 5310
+    },
+    "queue-source/package_native_item_v139.py": {
+      "sha256": "01cd6dbbba0ccc8348d6548c51f456faca85d9bf1dac713f36201f2f1d8be25d",
+      "bytes": 5367
+    },
+    "queue-source/prepare_ns_namespace_v1.py": {
+      "sha256": "85b5a0626525cf14d6dbf8ecf9098ee8804df8facf1cad8c5e2f8eeb36aeea7c",
+      "bytes": 10766
+    },
+    "queue-source/check_namespace_lookup_v1.py": {
+      "sha256": "9210e5aa18f9daeb7ac8ced18e253f08805577119a5f2b5e211017d9a873679c",
+      "bytes": 886
+    },
+    "queue-source/check_lean_owner_v5.py": {
+      "sha256": "938113c2385ccafad539de5bcd6252a3ef315261e15ff3312757fb1a95ba723e",
+      "bytes": 2194
+    },
+    "queue-source/verify_lean_metadata_v1.py": {
+      "sha256": "cff6b3ce7c52698766dd59eb249c822960c36667c87d7e8e6cc6bae10c5d41ad",
+      "bytes": 772
+    },
+    "queue-source/lean_budget_v5.py": {
+      "sha256": "ad9ee8b7658a53011a020e159847ac9b23d4b491e3b262c2f49d23afa43b974e",
+      "bytes": 5550
+    },
+    "queue-source/final_stage_memory_v120.py": {
+      "sha256": "b6913802127facc4945da4bbdd0f18cb5457cc8e03765b649653e6cfe12adfc4",
+      "bytes": 11218
+    },
+    "queue-source/leased_stage_memory_v120.py": {
+      "sha256": "1191c531c35016eada85739a5ca94dabefd9074c75781e4a20fb28d4b887f1d1",
+      "bytes": 5538
+    },
+    "queue-source/bounded_stage_memory_v120.py": {
+      "sha256": "5ebc628494a7bff53f01362475110002eedae3b6395517f394f9972c541eff41",
+      "bytes": 13550
+    },
+    "queue-source/materialize_egg_point_v138.py": {
+      "sha256": "381fc8711ae78f3b68e68af37292001e2207484dc8b6c9c37eed80eb330704b1",
+      "bytes": 12865
+    },
+    "submitted/e26ad397e29246b795096cbcd55e82d2.json": {
+      "sha256": "c726923a4de2b8944ca45260091bdf3503c9801d840ebeccbf86c9f7e82e8bca",
+      "bytes": 2966
+    },
+    "VALIDATION.json": {
+      "sha256": "9c3f8b6300180d05109db9cf4b8a3352871bf689294a54baeead393b21404832",
+      "bytes": 15895
+    },
+    "HANDOFF.md": {
+      "sha256": "66b0e62d35469ebecb15ddc7d082fefe9cb46aad0d8d069f2dddd1c5fbd5df1f",
+      "bytes": 1440
+    }
+  },
+  "count": 208,
+  "all_copies_byte_verified": true,
+  "total_bytes": 167176915
+}

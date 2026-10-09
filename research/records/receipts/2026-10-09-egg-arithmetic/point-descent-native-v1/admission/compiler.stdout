@@ -1,0 +1,74 @@
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/egg-point-descent-20261009-v138/source-v1/lean/HolonicsResearch/EllipticCurve/EggSource.lean:121:56: error: expected ';' or line break
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/egg-point-descent-20261009-v138/source-v1/lean/HolonicsResearch/EllipticCurve/EggSource.lean:143:44: warning: This simp argument is unused:
+  add_zero
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [homogeneousEquation, mul_zero, zero_mul, zero_pow, zero_sub, mul_eq_zero,
+    pow_eq_zero_iff (by norm_num : (2 : ℕ) ≠ 0)]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/egg-point-descent-20261009-v138/source-v1/lean/HolonicsResearch/EllipticCurve/EggSource.lean:143:64: warning: This simp argument is unused:
+  zero_pow
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [homogeneousEquation, mul_zero, add_zero, zero_mul, zero_sub, mul_eq_zero,
+    pow_eq_zero_iff (by norm_num : (2 : ℕ) ≠ 0)]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/egg-point-descent-20261009-v138/source-v1/lean/HolonicsResearch/EllipticCurve/EggSource.lean:144:4: warning: This simp argument is unused:
+  zero_sub
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [homogeneousEquation, mul_zero, add_zero, zero_mul, zero_pow, mul_eq_zero,
+    pow_eq_zero_iff (by norm_num : (2 : ℕ) ≠ 0)]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/egg-point-descent-20261009-v138/source-v1/lean/HolonicsResearch/EllipticCurve/EggSource.lean:159:2: error: Tactic `apply` failed: could not unify the conclusion of `@Point.add_self_of_Y_eq`
+  Point.some ?x₁ ?y₁ ?h₁ + Point.some ?x₁ ?y₁ ?h₁ = 0
+with the goal
+  ((And.casesOn ⋯ fun hA right => And.casesOn right fun hB hAB => Point.some 0 0 ⋯) +
+      And.casesOn ⋯ fun hA right => And.casesOn right fun hB hAB => Point.some 0 0 ⋯) =
+    0
+
+Note: The full type of `@Point.add_self_of_Y_eq` is
+  ∀ {F : Type ?u.32} [inst : Field F] {W : WeierstrassCurve.Affine F} [inst_1 : DecidableEq F] {x₁ y₁ : F}
+    {h₁ : W.Nonsingular x₁ y₁}, y₁ = W.negY x₁ y₁ → Point.some x₁ y₁ h₁ + Point.some x₁ y₁ h₁ = 0
+
+a w : ℚ
+ha : a ≠ 0
+hw : w ≠ 0
+hm : a - w ≠ 0
+hp : a + w ≠ 0
+⊢ ((And.casesOn ⋯ fun hA right => And.casesOn right fun hB hAB => Point.some 0 0 ⋯) +
+      And.casesOn ⋯ fun hA right => And.casesOn right fun hB hAB => Point.some 0 0 ⋯) =
+    0
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/egg-point-descent-20261009-v138/source-v1/lean/HolonicsResearch/EllipticCurve/EggSource.lean:165:13: error: Function expected at
+  RankIsOn
+but this term has type
+  ?m.1
+
+Note: Expected a function because this term is being applied to the argument
+  (E (-4) (-16))
+
+Hint: The identifier `RankIsOn` is unknown, and Lean's `autoImplicit` option causes an unknown identifier to be treated as an implicitly bound variable with an unknown type. However, the unknown type cannot be a function, and a function is what Lean expects here. This is often the result of a typo or a missing `import` or `open` statement.
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/egg-point-descent-20261009-v138/source-v1/lean/HolonicsResearch/EllipticCurve/EggSource.lean:170:2: error: unsolved goals
+x✝ : Sort u_1
+RankIsOn : x✝
+r : ℕ
+hr : UniversalBSD.RankIsOn (E ↑(-4) ↑(-16)) r
+hbound : 2 ^ r ≤ 4 * (-4 * -16 * (-4 - -16)).natAbs.divisors.card * (-4 * -16 * (-4 - -16)).natAbs.divisors.card
+⊢ sorry () ↔ UniversalBSD.RankIsOn (E (-4) (-16)) r
+'Holonics.EllipticCurve.EggSource.egg_doubles_enter_descent' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.EllipticCurve.EggSource.inverse_affine_equation' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.EllipticCurve.EggSource.inverse_affine_returns_carrier' does not depend on any axioms
+'Holonics.EllipticCurve.EggSource.homogeneous_infinity_classification' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.EllipticCurve.EggSource.secondInfinityCarrier_is_two_torsion' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'Holonics.EllipticCurve.EggSource.egg_321_receiving_model_rank_bound' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]

@@ -269,3 +269,25 @@ all six audited conclusions, imports and computational budgets are unchanged.
 The corrected source is pending a new sole-queue kernel acceptance. No local
 compiler or native job is run, and no projective/group equivalence or
 original-source rank transfer is added.
+
+### Kernel acceptance of the repaired pin, October 9 at 04:54 UTC
+
+The sole queue accepted the repaired pin `896a325f0`, source SHA-256
+`b3c37f282a1c3ac36fd1fbf7baf6c723326c9c7f06f100103297f7183892b503`, as a whole
+source. The compiler exited `0` after `10,073,507,353 ns`; the complete compile
+stage took `12,236,369,152 ns` under the unchanged `21,132,554,884 ns`
+projection, a measured/projected ratio of exactly
+`12,236,369,152 / 21,132,554,884`. Aggregate CPU was `6,987,427,000 ns`, group
+peak `5,120,466,944 bytes` and child peak RSS `4,015,440 KiB`. All six audited
+conclusions depend only on `propext`, `Classical.choice` and `Quot.sound`. The
+module alone was checked, not the research root.
+
+The point declarations above are therefore kernel-checked, with the scope
+unchanged: no projective/group equivalence, no regular extension at the
+exceptional points and no rank transfer to the original source group. The
+compact receipts of the rejected and the accepted pin are
+[point-descent-native-v1](receipts/2026-10-09-egg-arithmetic/point-descent-native-v1/HANDOFF.md)
+and
+[point-descent-native-v2](receipts/2026-10-09-egg-arithmetic/point-descent-native-v2/HANDOFF.md);
+the [publication note](receipts/2026-10-09-egg-arithmetic/PUBLICATION.md)
+lists what each commits and what it hashes only.
