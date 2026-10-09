@@ -1,0 +1,22 @@
+
+running 17 tests
+test hnn::paired::tests::a_period_four_reflector_that_passes_declare_fails_the_dihedral_relation ... ok
+test hnn::paired::tests::a_port_that_a_later_change_takes_off_the_equivariant_subspace_is_refused_at_the_read ... ok
+test hnn::paired::tests::a_reflector_is_dihedral_exactly_when_it_is_c_minus_i ... ok
+test hnn::paired::tests::a_source_ring_behind_a_silent_ring_reads_and_one_behind_a_ticking_ring_is_refused ... ok
+test hnn::paired::tests::campaign_ones_five_classes_admit_no_pairing_and_the_alphabet_is_not_changed_to_fit ... ok
+test hnn::paired::tests::equivariance_names_the_first_failing_column_and_row ... ok
+test hnn::paired::tests::one_actual_pair_deposit_takes_the_equivariant_port_off_its_subspace ... ok
+test hnn::paired::tests::the_admitted_case_builds_each_follower_column_from_its_leader ... ok
+test hnn::paired::tests::the_founded_sign_matrix_is_refused_naming_its_first_failing_column ... ok
+test hnn::paired::tests::the_lift_is_an_involution_that_inverts_the_rotor_on_the_carrier ... ok
+test hnn::paired::tests::the_pairing_is_typed_and_a_fixed_point_free_involution_needs_an_even_family ... ok
+test hnn::paired::tests::the_partner_adds_no_information_at_the_retained_quotient ... ok
+test hnn::paired::tests::the_partner_read_refuses_where_normalization_or_rounding_would_break_it ... ok
+test hnn::paired::tests::the_partner_strands_moment_and_face_are_the_dyad_image_of_the_strands ... ok
+test hnn::paired::tests::the_phase_convention_is_pinned_by_a_hand_computed_anchor ... ok
+test hnn::paired::tests::the_real_constitution_is_read_at_its_current_port ... ok
+test hnn::paired::tests::the_ring_the_source_and_the_port_shape_are_certified ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 1157 filtered out; finished in 0.82s
+

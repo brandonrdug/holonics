@@ -1,0 +1,120 @@
+{
+  "source_admission": {
+    "source_commit": "9ba6fe000d752556cf0e08694481f18c06d09166",
+    "source_tree": "3d2aa411bd3ecc63d434093981abd2a21d5d738e",
+    "submitted_source_pin": {
+      "sha256": "ba6e3c0b37be9dc17f96cde44f90e4ae2a1bd5610720fe674694cfb7c2eba142",
+      "bytes": 9850
+    },
+    "compiled_source_pin": {
+      "sha256": "1deff1a8b78e30a1816235e11e7d74fc10023fbb2d0f43bc18839942c2d9ba2c",
+      "bytes": 10333
+    },
+    "source_prefix_exact": true,
+    "only_appendix_eight_axiom_queries_added": true,
+    "selectors": [
+      "Holonics.HNN.PairedDeposit.lift_pow",
+      "Holonics.HNN.PairedDeposit.reversal_identity",
+      "Holonics.HNN.PairedDeposit.mul_commuting_stays",
+      "Holonics.HNN.PairedDeposit.deposit_stays_equivariant",
+      "Holonics.HNN.PairedDeposit.symmetrized_commutes",
+      "Holonics.HNN.PairedDeposit.symmetrized_residual",
+      "Holonics.HNN.PairedDeposit.rowNorm_smul_le",
+      "Holonics.HNN.PairedDeposit.symmetrized_rowNorm_le"
+    ],
+    "target": "Holonics.HNN.PairedDeposit",
+    "consumed_custom_providers_current_git_matched": 128,
+    "exact_added_import_line": "import Holonics.HNN.PairedDeposit",
+    "full_default_library_unrun": true,
+    "reason": "Focused new law and exact newly added import are admitted; a full library command requires a separately source-matched aggregate closure and workload projection.",
+    "scope": "Pair-port reversal, equivariant deposit and symmetrized chart certificate conditional on stated matrix commutation, involution and row-norm hypotheses. Native paired loop2 tested separately; native non-diagonal chart consumer loop3 owed.",
+    "source_grade_before_native": "proved-derived; native acceptance pending"
+  },
+  "kernel_accepted": true,
+  "compiler_exit": 0,
+  "compiler_wall_ns": 10097812036,
+  "queries_required": 8,
+  "queries_reached": 8,
+  "nonstandard_queries": [],
+  "meaningful_error_records": [],
+  "all_query_results": {
+    "Holonics.HNN.PairedDeposit.lift_pow": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.PairedDeposit.reversal_identity": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.PairedDeposit.mul_commuting_stays": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.PairedDeposit.deposit_stays_equivariant": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.PairedDeposit.symmetrized_commutes": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.PairedDeposit.symmetrized_residual": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.PairedDeposit.rowNorm_smul_le": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.PairedDeposit.symmetrized_rowNorm_le": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "metadata_unchanged": true,
+  "results": [
+    {
+      "unit": "prep",
+      "accepted": true,
+      "wall_ns": 5467627297,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 4899232000,
+      "group_peak_B": 335253504,
+      "group_limit_B": 8589934592,
+      "measured_to_projected": {
+        "numerator": 5467627297,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true
+    },
+    {
+      "unit": "compile",
+      "accepted": true,
+      "wall_ns": 12026010819,
+      "projection_ns": 21132554884,
+      "aggregate_CPU_ns": 6774577000,
+      "group_peak_B": 4586610688,
+      "group_limit_B": 8589934592,
+      "measured_to_projected": {
+        "numerator": 12026010819,
+        "denominator": 21132554884
+      },
+      "quiescent_released": true
+    }
+  ],
+  "importer_launched": false,
+  "whole_owner_acceptance_required_before_importer": true,
+  "prior_failed_sources_and_logs_preserved": true,
+  "no_unchanged_retry_or_within_job_limit_raise": true,
+  "current_user_authorized_8GiB": true,
+  "provider_rebuilt": false,
+  "queue_quiescent_released": true
+}

@@ -1,0 +1,10 @@
+{"phase": "load only reusable source-SHA headers and present-part byte identities", "wall_ns": 293583584, "upstream_path_rows_not_individually_validated": 31015, "reusable_present_paths": 30025, "reusable_headers": 5087}
+{"phase": "complete namespace closure progress", "modules": 1000, "elapsed_ns": 543597522}
+{"phase": "complete namespace closure progress", "modules": 2000, "elapsed_ns": 1032836649}
+{"phase": "complete namespace closure progress", "modules": 3000, "elapsed_ns": 1499617210}
+{"phase": "complete namespace closure progress", "modules": 4000, "elapsed_ns": 1972097862}
+{"phase": "complete namespace closure progress", "modules": 5000, "elapsed_ns": 2462519905}
+{"phase": "resolve and seal every consumed source and ordered object part", "wall_ns": 2510674904, "module_count": 5088, "bound_path_count": 31039, "reused_headers": 5087, "freshly_parsed_headers": 1}
+{"phase": "independent namespace validation and complete selected metadata postcheck", "wall_ns": 876769817}
+{"phase": "serialize complete reduced current graph", "wall_ns": 804118884, "bytes": 51234175}
+{"target": "PairedDepositImportConsumer", "wall_ns": 4486005147, "projection_ns": 17000000000, "peak_RSS_KiB": 198672, "module_count": 5088, "bound_path_count": 31050, "source_prefix_inferred_absence_count": 43067, "complete_ordered_import_part_seal": true, "actual_namespace_lookup_verified": true, "compiler_launched": false, "events": [{"phase": "load only reusable source-SHA headers and present-part byte identities", "wall_ns": 293583584, "upstream_path_rows_not_individually_validated": 31015, "reusable_present_paths": 30025, "reusable_headers": 5087}, {"phase": "resolve and seal every consumed source and ordered object part", "wall_ns": 2510674904, "module_count": 5088, "bound_path_count": 31039, "reused_headers": 5087, "freshly_parsed_headers": 1}, {"phase": "independent namespace validation and complete selected metadata postcheck", "wall_ns": 876769817}, {"phase": "serialize complete reduced current graph", "wall_ns": 804118884, "bytes": 51234175}], "unused_upstream_paths_not_reverified": 31015, "same_source_claims_and_resource_enforcement": true}

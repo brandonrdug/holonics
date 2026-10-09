@@ -1,0 +1,38 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling thiserror v2.0.19
+   Compiling quote v1.0.47
+   Compiling syn v3.0.3
+   Compiling thiserror-impl v2.0.19
+   Compiling holonics v0.1.0 (<queue-admission>/actual-loop3-20261009-v195/source-v1/crates/holonics)
+warning: method `anchor_differential_joined` is never used
+   --> crates/holonics/src/hnn/port.rs:942:19
+    |
+850 | impl<'c> Word<'c> {
+    | ----------------- method in this implementation
+...
+942 |     pub(crate) fn anchor_differential_joined(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `seeds` is never used
+    --> crates/holonics/src/hnn/receiving.rs:1606:19
+     |
+1310 | impl SourceObserverView {
+     | ----------------------- method in this implementation
+...
+1606 |     pub(crate) fn seeds(
+     |                   ^^^^^
+
+warning: method `advanced` is never used
+   --> crates/holonics/src/hnn/word/variation.rs:473:19
+    |
+236 | impl HeldContactVariation {
+    | ------------------------- method in this implementation
+...
+473 |     pub(crate) fn advanced(&self, word: &Word<'_>, opened: &[EndChange]) -> Result<Self, HnnError> {
+    |                   ^^^^^^^^
+
+warning: `holonics` (lib) generated 3 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 22.43s
+   Doc-tests holonics

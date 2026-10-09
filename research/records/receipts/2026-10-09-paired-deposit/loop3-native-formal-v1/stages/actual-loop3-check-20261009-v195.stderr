@@ -1,0 +1,4 @@
+    Checking thiserror v2.0.19
+   Compiling holonics-cuda v0.1.0 (<queue-admission>/actual-loop3-20261009-v195/source-v1/crates/holonics-cuda)
+    Checking holonics v0.1.0 (<queue-admission>/actual-loop3-20261009-v195/source-v1/crates/holonics)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 12.37s

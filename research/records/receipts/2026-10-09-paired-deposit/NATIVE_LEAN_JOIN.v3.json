@@ -1,0 +1,34 @@
+{
+  "status": "scoped PASS",
+  "source_commit": "5c50803b1fdcb2c38583a8189356dfb70f07bfa5",
+  "source_tree": "8632e6539ded9d8fc0e9b0a668ccd82d91c7d23e",
+  "required_native_fixtures": 44,
+  "passed_native_fixtures": 44,
+  "doctests_passed": 57,
+  "owner_standard_axiom_queries": 10,
+  "exact_HNN_import_standard_axiom_queries": 10,
+  "all_inputs_current_source_pinned": true,
+  "runtime_output_inherited_from_loop2": false,
+  "source_review_message": "ed30bd6f976246fdbe6230890862fef1",
+  "scope": "Paired source law preserves its port on the paired subspace; pair routes and general features at NormalLaw; founding prior and state restore. General features are not an end-to-end World compose_return comparison. CUDA typed refusal only; quadratic invariance owed#62.",
+  "resident_ceiling_B": 8589934592,
+  "native_compile_CPUs": 4,
+  "cargo_jobs": 2,
+  "runtime_Lean_CPUs": 1,
+  "fixed_budgets_all_passed": true,
+  "limits_raised_after_launch": false,
+  "all_quiescent_released": true,
+  "durable_handoff": "<repository>/research/records/receipts/2026-10-09-paired-deposit/loop3-native-formal-v1/HANDOFF.md",
+  "validation": {
+    "file": "<repository>/research/records/receipts/2026-10-09-paired-deposit/loop3-native-formal-v1/VALIDATION.json",
+    "pin": {
+      "sha256": "c73e912829d07e2802b3cb6b43ed2375844b15f3c8ab93f9cea32afec8825b1b",
+      "bytes": 26301
+    }
+  },
+  "receipt_hash_manifest": "<repository>/research/records/receipts/2026-10-09-paired-deposit/loop3-native-formal-v1/FILE_HASHES.json",
+  "publication_by_queue": false,
+  "full_HNN_or_Framework_aggregate_compiled": false,
+  "production_edits_by_queue": false,
+  "all_prior_failure_evidence_preserved": true
+}

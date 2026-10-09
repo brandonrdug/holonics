@@ -717,6 +717,10 @@ pub enum Decline {
     Kernel,
     /// The reaches' read on the card failed.
     Read,
+    /// [definition; agent-inferred, October 9] A paired port's law (`holonics::hnn::paired`, "The
+    /// paired deposit"): the host projects its step and symmetrizes its Gram and chart, which the card
+    /// does not form; its parity is owed (#76), and the raw mirror is never read as paired parity.
+    Paired,
 }
 
 /// [definition] **The normal-law mirror's tally** (the GPU suite's parity test; the exposure's path
@@ -734,6 +738,7 @@ pub struct NormalMirror {
     pub past_word: u64,
     pub kernel: u64,
     pub read: u64,
+    pub paired: u64,
     pub repeated: u64,
     pub lawless: u64,
     pub moved: u64,
@@ -749,12 +754,13 @@ impl NormalMirror {
             NormalDeposit::Declined(Decline::PastWord) => self.past_word += 1,
             NormalDeposit::Declined(Decline::Kernel) => self.kernel += 1,
             NormalDeposit::Declined(Decline::Read) => self.read += 1,
+            NormalDeposit::Declined(Decline::Paired) => self.paired += 1,
         }
     }
 
     /// The steps declined, every reason.
     pub fn declined(&self) -> u64 {
-        self.empty + self.off_dyadic + self.past_word + self.kernel + self.read
+        self.empty + self.off_dyadic + self.past_word + self.kernel + self.read + self.paired
     }
 
     /// The steps skipped.
@@ -819,6 +825,9 @@ pub fn normal_deposit_on_card(
     let scaled: Vec<Rat> = weights.iter().map(|weight| weight * proxy).collect();
     if samples.is_empty() {
         return Ok(NormalDeposit::Declined(Decline::Empty));
+    }
+    if before.symmetry().is_some() {
+        return Ok(NormalDeposit::Declined(Decline::Paired));
     }
     // The arrays and their remainders at the lattice and the fine lattice.
     let (Some(gram_words), Some(gram_rest), Some(map_words), Some(map_rest)) = (

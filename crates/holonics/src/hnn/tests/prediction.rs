@@ -1157,6 +1157,41 @@ fn sixty_field() -> Field {
     .unwrap()
 }
 
+/// One seed of the order-2 release (the consumer equation below), each phase's elapsed nanoseconds
+/// printed as it ends (CLAUDE.md, "Progress is an event"): the field and the deposit, the bank and
+/// the refinement, the request, and the generation. Every acceptance is the unpartitioned test's.
+fn order_two_release(seed: u64) {
+    let phase = std::time::Instant::now();
+    let field = sixty_field();
+    let theta = deposited(&field, 2);
+    eprintln!("order-2 seed {seed}: field and deposit {} ns", phase.elapsed().as_nanos());
+    let phase = std::time::Instant::now();
+    let bank = super::executed::declared_bank();
+    let refinement = Refinement::declare(&field, 0, 2, 1, 6, 4).unwrap();
+    eprintln!("order-2 seed {seed}: bank and refinement {} ns", phase.elapsed().as_nanos());
+    let phase = std::time::Instant::now();
+    let (current, moment, cells) = symbols_request(&field, seed, 8);
+    eprintln!("order-2 seed {seed}: request {} ns", phase.elapsed().as_nanos());
+    let phase = std::time::Instant::now();
+    let generated =
+        generate_by_bank(&field, &theta, &current, &moment, &refinement, &bank, 12).unwrap();
+    eprintln!("order-2 seed {seed}: generation {} ns", phase.elapsed().as_nanos());
+    assert_eq!(generated.contacts, vec![2]);
+    assert!(generated.release.released(), "seed {seed}: {:?}", generated.release);
+    assert!(generated.release.width.is_zero());
+    let mut passage = cells.clone();
+    passage.extend(&generated.release.classes);
+    for t in 0..6 {
+        let at = cells.len() + t;
+        assert_eq!(passage[at], (passage[at - 2] + 1) % 4, "seed {seed}, station {t}");
+    }
+    assert!(generated.locks[0].iter().all(|&station| station < 2));
+    let locked: usize = generated.locks.iter().map(Vec::len).sum();
+    assert_eq!(generated.members, 4 * locked);
+    assert_eq!(generated.certified, generated.members);
+    assert_eq!(generated.ticks_closed, generated.ticks);
+}
+
 /// [implemented-exact; the consumer equation] **The release reads the located pair: the released
 /// class at `t` is `f` of the class at `t − δ`** (`prediction::generate_by_bank` on a material
 /// holding the order-2 contact closed; `ρ(F^K(I_h)) = T(request)`): on a ring of the harness's
@@ -1168,35 +1203,21 @@ fn sixty_field() -> Field {
 /// contact, so it reads the span's law (`the_bank_generates_by_its_certified_locks`). [measured, lane
 /// C's record §5.4] On a ring of period 16 the bank's growths sit near one, and lane C's least member
 /// did not separate the fit from the antecedent's copy there; the law is read here in the harness's
-/// regime.
+/// regime. [agent-inferred, October 9] Read one drawn request a test (seeds 41 and 42), each phase's
+/// time printed, so each seed's read meets its own fixed bound and a stop names its phase.
 #[test]
-fn the_release_reads_the_located_pair_and_its_consumer_holds() {
+fn the_release_reads_the_located_pair_and_its_consumer_holds_at_seed_41() {
     use crate::hnn::constitution::CAMPAIGN_ONE_BUDGET;
+    order_two_release(41);
     let field = sixty_field();
-    let theta = deposited(&field, 2);
-    let bank = super::executed::declared_bank();
-    let refinement = Refinement::declare(&field, 0, 2, 1, 6, 4).unwrap();
-    for seed in [41u64, 42] {
-        let (current, moment, cells) = symbols_request(&field, seed, 8);
-        let generated =
-            generate_by_bank(&field, &theta, &current, &moment, &refinement, &bank, 12).unwrap();
-        assert_eq!(generated.contacts, vec![2]);
-        assert!(generated.release.released(), "seed {seed}: {:?}", generated.release);
-        assert!(generated.release.width.is_zero());
-        let mut passage = cells.clone();
-        passage.extend(&generated.release.classes);
-        for t in 0..6 {
-            let at = cells.len() + t;
-            assert_eq!(passage[at], (passage[at - 2] + 1) % 4, "seed {seed}, station {t}");
-        }
-        assert!(generated.locks[0].iter().all(|&station| station < 2));
-        let locked: usize = generated.locks.iter().map(Vec::len).sum();
-        assert_eq!(generated.members, 4 * locked);
-        assert_eq!(generated.certified, generated.members);
-        assert_eq!(generated.ticks_closed, generated.ticks);
-    }
     let opening = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap();
     assert!(crate::hnn::prediction::closed_pairs(&field, &opening, 0).unwrap().is_empty());
+}
+
+/// The order-2 release at seed 42 (the test above).
+#[test]
+fn the_release_reads_the_located_pair_and_its_consumer_holds_at_seed_42() {
+    order_two_release(42);
 }
 
 /// [implemented-exact; proved-derived, the joint gain's record §3] **The gain on equal material is
@@ -1252,18 +1273,12 @@ fn the_pair_gain_is_the_joined_banks_determinant_and_a_neutral_member_does_not_m
     assert!(matches!(gain(&pair, &alone_wide), Err(HnnError::NonpositiveDeclaration)));
 }
 
-/// [implemented-exact; the consumer equation] **The release reads a located map that fixes its
-/// antecedent** (`prediction::generate_by_bank`, the gain read by the joined bank): on the ring of
-/// the harness's period 60 with the identity deposited at `δ = 2` (the alternation's key, every
-/// column `(E − B) e_x = P^2 B e_x`), each drawn request's six stations are released whole at width
-/// zero, each released class its antecedent's (`x_t = x_(t−2)`: the request's last two cells
-/// continued), every lock certified on all four members. [measured, the joint gain's record §4]
-/// Under lane C's least member this test fails (seed 41: station 0 is not its antecedent): on the
-/// members where `P^2` half-turns the contact's line every candidate's two storages vanish in the
-/// first-order chart, and the least member read what remained (the regressions' record §5, §8).
-#[test]
-fn the_release_reads_a_located_map_that_fixes_its_antecedent() {
+/// One seed of the fixed-map release (the consumer equation below), each phase's elapsed
+/// nanoseconds printed as it ends: the field and the identity's deposit, the bank and the
+/// refinement, the request, and the generation. Every acceptance is the unpartitioned test's.
+fn fixed_map_release(seed: u64) {
     use crate::hnn::constitution::CAMPAIGN_ONE_BUDGET;
+    let phase = std::time::Instant::now();
     let field = sixty_field();
     let opening = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap();
     let prior = opening.source_port(0).unwrap().clone();
@@ -1277,26 +1292,53 @@ fn the_release_reads_a_located_map_that_fixes_its_antecedent() {
         .unwrap()
         .0;
     assert_eq!(crate::hnn::prediction::closed_pairs(&field, &theta, 0).unwrap(), vec![2]);
+    eprintln!("fixed map seed {seed}: field and deposit {} ns", phase.elapsed().as_nanos());
+    let phase = std::time::Instant::now();
     let bank = super::executed::declared_bank();
     let refinement = Refinement::declare(&field, 0, 2, 1, 6, 4).unwrap();
-    for seed in [41u64, 42] {
-        let (current, moment, cells) = symbols_request(&field, seed, 8);
-        let generated =
-            generate_by_bank(&field, &theta, &current, &moment, &refinement, &bank, 12).unwrap();
-        assert_eq!(generated.contacts, vec![2]);
-        assert!(generated.release.released(), "seed {seed}: {:?}", generated.release);
-        assert!(generated.release.width.is_zero());
-        let mut passage = cells.clone();
-        passage.extend(&generated.release.classes);
-        for t in 0..6 {
-            let at = cells.len() + t;
-            assert_eq!(passage[at], passage[at - 2], "seed {seed}, station {t}");
-        }
-        let locked: usize = generated.locks.iter().map(Vec::len).sum();
-        assert_eq!(generated.members, 4 * locked);
-        assert_eq!(generated.certified, generated.members);
-        assert_eq!(generated.ticks_closed, generated.ticks);
+    eprintln!("fixed map seed {seed}: bank and refinement {} ns", phase.elapsed().as_nanos());
+    let phase = std::time::Instant::now();
+    let (current, moment, cells) = symbols_request(&field, seed, 8);
+    eprintln!("fixed map seed {seed}: request {} ns", phase.elapsed().as_nanos());
+    let phase = std::time::Instant::now();
+    let generated =
+        generate_by_bank(&field, &theta, &current, &moment, &refinement, &bank, 12).unwrap();
+    eprintln!("fixed map seed {seed}: generation {} ns", phase.elapsed().as_nanos());
+    assert_eq!(generated.contacts, vec![2]);
+    assert!(generated.release.released(), "seed {seed}: {:?}", generated.release);
+    assert!(generated.release.width.is_zero());
+    let mut passage = cells.clone();
+    passage.extend(&generated.release.classes);
+    for t in 0..6 {
+        let at = cells.len() + t;
+        assert_eq!(passage[at], passage[at - 2], "seed {seed}, station {t}");
     }
+    let locked: usize = generated.locks.iter().map(Vec::len).sum();
+    assert_eq!(generated.members, 4 * locked);
+    assert_eq!(generated.certified, generated.members);
+    assert_eq!(generated.ticks_closed, generated.ticks);
+}
+
+/// [implemented-exact; the consumer equation] **The release reads a located map that fixes its
+/// antecedent** (`prediction::generate_by_bank`, the gain read by the joined bank): on the ring of
+/// the harness's period 60 with the identity deposited at `δ = 2` (the alternation's key, every
+/// column `(E − B) e_x = P^2 B e_x`), each drawn request's six stations are released whole at width
+/// zero, each released class its antecedent's (`x_t = x_(t−2)`: the request's last two cells
+/// continued), every lock certified on all four members. [measured, the joint gain's record §4]
+/// Under lane C's least member this test fails (seed 41: station 0 is not its antecedent): on the
+/// members where `P^2` half-turns the contact's line every candidate's two storages vanish in the
+/// first-order chart, and the least member read what remained (the regressions' record §5, §8).
+/// [agent-inferred, October 9] Read one drawn request a test (seeds 41 and 42), each phase's time
+/// printed, so each seed's read meets its own fixed bound and a stop names its phase.
+#[test]
+fn the_release_reads_a_located_map_that_fixes_its_antecedent_at_seed_41() {
+    fixed_map_release(41);
+}
+
+/// The fixed-map release at seed 42 (the test above).
+#[test]
+fn the_release_reads_a_located_map_that_fixes_its_antecedent_at_seed_42() {
+    fixed_map_release(42);
 }
 
 // -------------------------------------------------------------------------------------------

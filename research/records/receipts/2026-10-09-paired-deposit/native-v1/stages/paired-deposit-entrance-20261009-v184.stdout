@@ -1,0 +1,15 @@
+
+running 5 tests
+test an_observed_pair_deposit_changes_the_later_continuing_loaded_response ... reached source relation: slip_before=32 slip_after=0 next_ring0_delta_u0=-1694173032733231928/6782697611600234625 next_ring0_delta_w0=-1694173032733231928/6782697611600234625
+ok
+test exact_source_reentry_preserves_the_entered_interior_and_counts_source_once ... source re-entry: carried_crossing=2 opened_at=2 source_absorbed=40793/1631250 source_imposed=1/2
+ok
+test nonzero_offset_moments_drive_the_actual_loaded_port_without_marginal_source ... offset-only source entrance: pair_population=1 pair_weight=1 source_imposed=1/2
+ok
+test same_phase_intact_swap_has_one_native_source_moment_and_one_physical_motion ... ok
+test sparse_source_moments_enter_the_actual_loaded_port_with_exact_work ... source entrance: before=0 after=1/2 absorbed=0 imposed=1/2
+source passage: first loaded point at rest, second loaded point reached through contact return
+ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.95s
+

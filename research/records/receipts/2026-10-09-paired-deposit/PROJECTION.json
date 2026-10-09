@@ -1,0 +1,325 @@
+{
+  "files": {
+    "NATIVE_LEAN_JOIN.v1.json": {
+      "original": {
+        "bytes": 2610,
+        "sha256": "10f824f80cfbfec17c5f6db326d06b2089160ebbac0427d837e8eef2f864faa9"
+      },
+      "projected": {
+        "bytes": 2565,
+        "sha256": "4ba55a6dade7ae1d80aafb0c040a25d151033e68663205154766a384b1e020eb"
+      },
+      "replaced": {
+        "<cargo-registry>/": 0,
+        "<queue-admission>/": 0,
+        "<repository>/research/records/receipts/": 3
+      }
+    },
+    "NATIVE_LEAN_JOIN.v2.json": {
+      "original": {
+        "bytes": 2125,
+        "sha256": "3bc9e74dca87e2bd45b1d30c940dbc7000aa4729df2a6b7a5ff8a43f9f79425e"
+      },
+      "projected": {
+        "bytes": 2095,
+        "sha256": "6bf4e038ae39bbdb9fe6ed871a6b909295a329a8d5160183522686297f2b5a13"
+      },
+      "replaced": {
+        "<cargo-registry>/": 0,
+        "<queue-admission>/": 0,
+        "<repository>/research/records/receipts/": 2
+      }
+    },
+    "NATIVE_LEAN_JOIN.v3.json": {
+      "original": {
+        "bytes": 1729,
+        "sha256": "f039c0ac10d25bc70ad336e8b973a8be984a40849a3c29e9d5e3c04e12da7d7e"
+      },
+      "projected": {
+        "bytes": 1684,
+        "sha256": "d38066391600e2cef91b00a12dc6fa5f4f7413ae04db7b77c09ac0eed656427e"
+      },
+      "replaced": {
+        "<cargo-registry>/": 0,
+        "<queue-admission>/": 0,
+        "<repository>/research/records/receipts/": 3
+      }
+    },
+    "lean-import-v1/VALIDATION.json": {
+      "original": {
+        "bytes": 4483,
+        "sha256": "7a80bbc251c3e6413c2d5327e5ab8668df94edb55049aa2d340ba22864c28cce"
+      },
+      "projected": {
+        "bytes": 4339,
+        "sha256": "455cd8097ee91ba52656ce07a6aeec00c58398382973b0c674d2044e61e402e0"
+      },
+      "replaced": {
+        "<cargo-registry>/": 0,
+        "<queue-admission>/": 3,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "lean-owner-v1/admission/compiler.stdout": {
+      "original": {
+        "bytes": 1938,
+        "sha256": "56387e69ed7963ca98021fcb41c73e0452148a42e1237982d491732cbc8cc191"
+      },
+      "projected": {
+        "bytes": 1842,
+        "sha256": "d67414b3f2ae818942f9232e72f3802bebf3b195538236ce610d354edfaaf9b3"
+      },
+      "replaced": {
+        "<cargo-registry>/": 0,
+        "<queue-admission>/": 2,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "loop3-native-formal-v1/lean-owner/compiler.stdout": {
+      "original": {
+        "bytes": 2680,
+        "sha256": "a6dc1174ebe46d1dc852210174dbc822d2f7f65da8c8ae577f1dca0cce125962"
+      },
+      "projected": {
+        "bytes": 2536,
+        "sha256": "d54fb20cebe8b334ee3c3b945c60a3a3fe784628b5fba24c168360bb35ec669e"
+      },
+      "replaced": {
+        "<cargo-registry>/": 0,
+        "<queue-admission>/": 3,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "loop3-native-formal-v1/stages/actual-loop3-build-20261009-v195.stderr": {
+      "original": {
+        "bytes": 224,
+        "sha256": "bf389fa3889e809d2538737e641aaed09c9b9a5351e7870d23ebe19803bd95a8"
+      },
+      "projected": {
+        "bytes": 176,
+        "sha256": "74908ad7c2875c5850e4c5636729e8fa541604cfafee2d74b21789772cddf66c"
+      },
+      "replaced": {
+        "<cargo-registry>/": 0,
+        "<queue-admission>/": 1,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "loop3-native-formal-v1/stages/actual-loop3-build-20261009-v195.stdout": {
+      "original": {
+        "bytes": 36121,
+        "sha256": "d07c067abd213633ccbf12d6e988a83e00a67de8c3f1d3414238c7d1ea3f2387"
+      },
+      "projected": {
+        "bytes": 30273,
+        "sha256": "b5113e0e136a0791b7fd4de9582cd74b7fdc9f7ff2648626446c9b1b87954c07"
+      },
+      "replaced": {
+        "<cargo-registry>/": 50,
+        "<queue-admission>/": 76,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "loop3-native-formal-v1/stages/actual-loop3-check-20261009-v195.stderr": {
+      "original": {
+        "bytes": 414,
+        "sha256": "8d8c4b803d9935cf5191c0d9010a1d2e8a19b019314819e0a9e473f1ca2b4f1c"
+      },
+      "projected": {
+        "bytes": 318,
+        "sha256": "11893b60b84ff4fd19f79e32d48477c1562fe3c95800686f5e062f30bca06a87"
+      },
+      "replaced": {
+        "<cargo-registry>/": 0,
+        "<queue-admission>/": 2,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "loop3-native-formal-v1/stages/actual-loop3-check-20261009-v195.stdout": {
+      "original": {
+        "bytes": 49785,
+        "sha256": "42c7e0e7f6652f2e7d8df02ce32b081066887326525dea5cfe31c353a9c3a639"
+      },
+      "projected": {
+        "bytes": 41441,
+        "sha256": "04c90dfe87bc505e3688cb9c26850f8ec572c4dbeadae353cd5de5699209acb7"
+      },
+      "replaced": {
+        "<cargo-registry>/": 50,
+        "<queue-admission>/": 128,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "loop3-native-formal-v1/stages/actual-loop3-clippy-20261009-v195.stderr": {
+      "original": {
+        "bytes": 223,
+        "sha256": "1ce37a7cdbf77de9646033e04be78b3e32c5f76d3e5a37ecc696518627a7e6a7"
+      },
+      "projected": {
+        "bytes": 175,
+        "sha256": "3491c582fc864c7af65b18e28252cb7052140b0c2a40754697898a513f6eadf0"
+      },
+      "replaced": {
+        "<cargo-registry>/": 0,
+        "<queue-admission>/": 1,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "loop3-native-formal-v1/stages/actual-loop3-doc-20261009-v195.stderr": {
+      "original": {
+        "bytes": 1429,
+        "sha256": "0aeb9ab724ed6cf1de143c04a8d3f5b277b0c1f8139b69093c438b73593588ab"
+      },
+      "projected": {
+        "bytes": 1381,
+        "sha256": "729f03f17d5349c9f76c745da610938324f92d0c1e57a64bac3f30ad67edab4e"
+      },
+      "replaced": {
+        "<cargo-registry>/": 0,
+        "<queue-admission>/": 1,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "loop3-native-formal-v1/stages/paired-deposit-lean-20261009-v196-compile.stdout": {
+      "original": {
+        "bytes": 4157,
+        "sha256": "3fbbba989112124447b04a921c824093cf92289716b7f681a8f53b56e1d65de1"
+      },
+      "projected": {
+        "bytes": 4013,
+        "sha256": "c191c38e5b24bb466fb495ebff2289428ca0fbea1a3fd361bbf0b7923084fdb1"
+      },
+      "replaced": {
+        "<cargo-registry>/": 0,
+        "<queue-admission>/": 3,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "native-v1/stages/actual-paired-build-20261009-v179.stderr": {
+      "original": {
+        "bytes": 225,
+        "sha256": "79418b4db71918a0ff514a7e91a17d8d8a0b29ac69aeb4dec8ab0d5c999129ee"
+      },
+      "projected": {
+        "bytes": 177,
+        "sha256": "4459de50c3b4cf1f1207a3f37fc0ef2b1d679a9441850559c1f119af3a72e85f"
+      },
+      "replaced": {
+        "<cargo-registry>/": 0,
+        "<queue-admission>/": 1,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "native-v1/stages/actual-paired-build-20261009-v179.stdout": {
+      "original": {
+        "bytes": 36197,
+        "sha256": "12a0817c872a0a66a75331fe1b7bee669e4cb50a6efe2c842f514ac2e216fc74"
+      },
+      "projected": {
+        "bytes": 30349,
+        "sha256": "ecc0c2e9f16da61a3bf678a49fe1e9b1fb400a766d16d81dbdcd72abe1731d4c"
+      },
+      "replaced": {
+        "<cargo-registry>/": 50,
+        "<queue-admission>/": 76,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "native-v1/stages/actual-paired-check-20261009-v186.stderr": {
+      "original": {
+        "bytes": 224,
+        "sha256": "8b6f7a65535b29ed7ec2de86c821f60e82caeafa8283648c0f1595332f3cda34"
+      },
+      "projected": {
+        "bytes": 176,
+        "sha256": "fcf73f2407f215cede9b273cf7b8e75a1e08220bd3be63e6be02e6e5cf56499d"
+      },
+      "replaced": {
+        "<cargo-registry>/": 0,
+        "<queue-admission>/": 1,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "native-v1/stages/actual-paired-check-20261009-v186.stdout": {
+      "original": {
+        "bytes": 38833,
+        "sha256": "d4dddaff7c4c045a059d5bc5b703a29aff57b723bd083cdc3c2ea6b2d3036083"
+      },
+      "projected": {
+        "bytes": 32697,
+        "sha256": "b931f17554aff230645a706720d40ab788496a66995cbc0d5b0033591da08b78"
+      },
+      "replaced": {
+        "<cargo-registry>/": 50,
+        "<queue-admission>/": 82,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "native-v1/stages/actual-paired-clippy-20261009-v186.stderr": {
+      "original": {
+        "bytes": 224,
+        "sha256": "6419d861d4dacac03af5cea3b0888b70d01e9a37294c585818dc8574a463d6a4"
+      },
+      "projected": {
+        "bytes": 176,
+        "sha256": "036872132da2ee721aadd9c3fcd3195a9b02a2ea89bc93c31183158608b99aa4"
+      },
+      "replaced": {
+        "<cargo-registry>/": 0,
+        "<queue-admission>/": 1,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "native-v1/stages/actual-paired-doc-20261009-v186.stderr": {
+      "original": {
+        "bytes": 1430,
+        "sha256": "cedc55afa5c74a8fb301caad35756a66bf54be6498817348b25865652627861d"
+      },
+      "projected": {
+        "bytes": 1382,
+        "sha256": "e3456efd9f325c3b4fb01add45c04480f98f043cd3cd0777a174aff6aa3eee2b"
+      },
+      "replaced": {
+        "<cargo-registry>/": 0,
+        "<queue-admission>/": 1,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "release-read-v2/stages/actual-release-build-20261009-v189.stderr": {
+      "original": {
+        "bytes": 378,
+        "sha256": "552a9cab249d43444607eb905b1a29227476c6250a8002649348c169fae3777d"
+      },
+      "projected": {
+        "bytes": 330,
+        "sha256": "a06c4841851fc0b9a439aadec7ed54b793c5e6f06401a4ebad363d5678a2f5a6"
+      },
+      "replaced": {
+        "<cargo-registry>/": 0,
+        "<queue-admission>/": 1,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "release-read-v2/stages/actual-release-build-20261009-v189.stdout": {
+      "original": {
+        "bytes": 28325,
+        "sha256": "43057f9637958d0bac8c6cb2b2e139e0b2326afdc5e10962f9527bd1480b16fe"
+      },
+      "projected": {
+        "bytes": 23389,
+        "sha256": "fe5b13c3b0fbf4219ccca27c85c655e0bc1e895fc42d3bb0f80fec8cc1a94ce4"
+      },
+      "replaced": {
+        "<cargo-registry>/": 50,
+        "<queue-admission>/": 57,
+        "<repository>/research/records/receipts/": 0
+      }
+    }
+  },
+  "placeholders": {
+    "<cargo-registry>/": "the absolute host directory of the crates.io registry sources; each crate name and version that follows is kept",
+    "<queue-admission>/": "the absolute host directory holding the sole queue's admissions; the admission label, its source copy and build cache that follow are kept",
+    "<repository>/research/records/receipts/": "the main checkout's receipts directory, where the queue wrote the complete packets; the path that follows is the repository path"
+  },
+  "rule": "each absolute host prefix below is replaced by its placeholder; no other byte changes. The placeholders do not occur in the originals, so substituting each prefix back restores the original bytes, whose sha256 and size are pinned here (and, for files inside a subdirectory, in its unchanged FILE_HASHES.json); checked locally before commit."
+}

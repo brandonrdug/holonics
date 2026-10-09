@@ -1,0 +1,56 @@
+{
+  "source_commit": "9ba6fe000d752556cf0e08694481f18c06d09166",
+  "source_tree": "3d2aa411bd3ecc63d434093981abd2a21d5d738e",
+  "primary_paired_fixture_passed": true,
+  "required_native_gate_accepted": false,
+  "native_passed": 37,
+  "native_required": 39,
+  "doctests_passed": 57,
+  "Lean_owner8_standard": true,
+  "HNN_import8_standard": true,
+  "incomplete_consumers": [
+    "hnn::tests::prediction::the_release_reads_the_located_pair_and_its_consumer_holds",
+    "hnn::tests::prediction::the_release_reads_a_located_map_that_fixes_its_antecedent"
+  ],
+  "blocker": "Both existing period60 release consumers were stopped by original aggregateCPUguard at16051580/16053934\u00b5s, cap17000000 with1000000\u00b5sstopmargin; no assertion/finaltestresult. Need changed diagnostic phase/seed read or producingconsumerrepair preserving acceptance, no unchangedrerun/capraise.",
+  "native_receipt": {
+    "path": "<repository>/research/records/receipts/2026-10-09-paired-deposit/native-v1/VALIDATION.json",
+    "pin": {
+      "sha256": "0d7e0376a7ada533bbd82b62f110348c8d6855d9c3301904ec81546582daba9d",
+      "bytes": 80621
+    }
+  },
+  "owner_receipt": {
+    "path": "<repository>/research/records/receipts/2026-10-09-paired-deposit/lean-owner-v1/VALIDATION.json",
+    "pin": {
+      "sha256": "bc30b331a8e744a3b4d4f6f56df7d0befa9b2a49fb09d5de69b9e483283a0607",
+      "bytes": 4037
+    }
+  },
+  "import_receipt": {
+    "path": "<repository>/research/records/receipts/2026-10-09-paired-deposit/lean-import-v1/VALIDATION.json",
+    "pin": {
+      "sha256": "7a80bbc251c3e6413c2d5327e5ab8668df94edb55049aa2d340ba22864c28cce",
+      "bytes": 4483
+    }
+  },
+  "runtime_CPU1_native_compiler_CPU4_cargo_jobs2_memory8GiB": true,
+  "all_release_receipts_quiescent": true,
+  "no_limit_raise": true,
+  "queue_lease": {
+    "single_nonblocking_lock_succeeded": true,
+    "device": 55,
+    "inode": 55954599,
+    "opened_readonly": true,
+    "released_before_return": true
+  },
+  "live_author_worktree": {
+    "branch": "claude/helical-step3-loop3-20261009",
+    "HEAD": "9ba6fe000d752556cf0e08694481f18c06d09166",
+    "status": " M crates/holonics/src/hnn/constitution.rs\n M crates/holonics/src/hnn/field.rs\n M crates/holonics/src/hnn/mod.rs\n M crates/holonics/src/hnn/paired.rs\n M crates/holonics/src/hnn/prediction.rs\n M crates/holonics/src/ratio/linear/vector.rs\n",
+    "source_validation_uses_frozen_git_snapshot": true,
+    "author_moved_to_loop3_after_loop2_seal": true,
+    "queue_edits_to_author_source": false
+  },
+  "no_production_pruning_or_publication": true
+}
