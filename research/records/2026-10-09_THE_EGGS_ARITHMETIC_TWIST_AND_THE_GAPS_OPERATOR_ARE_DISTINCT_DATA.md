@@ -205,3 +205,67 @@ Opus subsequently confirmed the isolated successor based on
 mailbox `be4d1bd6f50b46f59501cd0c4cf0e674`. Only the two sealed source files were
 copied. Held root files remain untouched; the source origin/exceptional-point
 consumer belongs in the existing `EllipticCurve` owners.
+
+### Actual point consumer, October 9 at 03:42 UTC
+
+The isolated `EllipticCurve/EggSource.lean` now constructs `eggPoint` in the
+existing `GeneralFace.E (-(a-w)^2) (-(a+w)^2)` point group. Its hypotheses are
+`a ≠ 0`, `b ≠ 0`, `w ≠ 0`, `a-w ≠ 0`, `a+w ≠ 0`, plus the actual producing
+egg equation. The first, third, fourth and fifth hypotheses give distinct
+nonzero roots; the second permits the producing ordinate transport. No
+nonsingularity conclusion is assumed merely from a curve label or its `j`.
+
+The consuming equation is the existing descent face:
+`SqCls(slotOne(P+P),1) ∧ SqCls(slotTwo(P+P),1)`, for this actual `P=eggPoint`.
+The inverse chart returns exactly the original target operands when `X ≠ 0`,
+`b ≠ 0`, `w ≠ 0`. The homogeneous cubic retains both infinity representatives
+`[1:0:0]` and `[0:1:0]`; with `w ≠ 0`, its infinity equation is `XY²=0`.
+The proposed second-infinity carrier is the actual nonsingular `(0,0)` point,
+whose double is zero. This assignment is explicit, not a proof that the
+rational map extends regularly to both exceptional source points.
+
+The concrete receiving model `E(-4,-16)` also consumes the existing rank
+theorem: `∃r, RankIsOn E(-4,-16) r ∧ 2^r ≤ 1296`, using the exact divisor count
+of `768=2^8·3`, namely `18=2·3²`. It does not transfer that rank to the original
+homogeneous source group. A complete origin-preserving projective point/group
+equivalence remains owed: define the actual projective quotient, establish
+regular extension at both infinity points and prove its inverse/group join.
+Installing a group on a detached tagged source would not discharge this debt.
+
+These new point declarations are **source-complete, kernel-pending** at this
+write. Only the two earlier equation lemmas have terminal kernel acceptance.
+The one added research-root import is the exact new consumer module; Framework
+is unchanged. The next source checkpoint remains October 9 at **03:48 UTC**,
+independent of compiler admission or publication.
+
+### Failed point pin and bounded repair, October 9 at 04:50 UTC
+
+The sole queue rejected the complete first point pin
+`f78070c8a996740a36f4915272ae83d67bb47512`, source SHA-256
+`07d844746a48af61cc798a6f01c313dfbf279895d05fbc764867a5827b2dd0ac`, in
+notification `b46566a79091467d8fd4d28e094d559a`. The compiler exited `1` after
+`5,517,855,699 ns`; its complete compile stage took `7,558,736,932 ns` under
+the unchanged `21,132,554,884 ns` wrapper projection. Complete-stage
+measured/projected ratio is exactly `7,558,736,932 / 21,132,554,884`.
+Aggregate CPU was `5,456,046,000 ns`, group peak `1,154,945,024 bytes`;
+child RSS was unrecorded and is not inferred from group peak. All six queries
+were reached, but two included `sorryAx`; this is a whole-source rejection,
+not a passing partial audit or a timeout.
+
+The raw diagnostics, producing source, current-source provider/import seals
+and release receipts are preserved by the queue under
+`research/records/receipts/2026-10-09-egg-arithmetic/point-descent-native-v1/`.
+The failure-owner ledger is
+`research/records/receipts/2026-10-09-native-queue-batch/admission-v1/FAILURE_OWNER_LEDGER.v2.json`.
+The geometry owner read the full raw `admission/compiler.stdout` before
+editing. The failed commit and queue predecessor remain unchanged.
+
+The repair supplies explicit separators in the inverse-return `let` body,
+moves proof destructuring inside `Point.some`'s nonsingularity proof so that
+the actual point constructor unfolds, and names the actual rank owner
+`UniversalBSD.RankIsOn`. The three unused simplifier arguments reported in
+the same diagnostics are removed. Curve parameters, mathematical hypotheses,
+all six audited conclusions, imports and computational budgets are unchanged.
+The corrected source is pending a new sole-queue kernel acceptance. No local
+compiler or native job is run, and no projective/group equivalence or
+original-source rank transfer is added.
