@@ -871,8 +871,9 @@ fn binding_is_refused_without_a_world_off_its_tick_or_off_the_source_frame() {
 }
 
 /// Whether one `k` carries a coupled prospect's point onto every actual `(a_t, b_t)` of an
-/// encounter: the stacked change of every step against the stacked directions.
-fn holds(prospect: &CoupledProspect, steps: &[Executed]) -> bool {
+/// encounter and, where given, onto the actual receiving logits of one compared station: the
+/// stacked change of every value against the stacked directions.
+fn holds(prospect: &CoupledProspect, steps: &[Executed], station: Option<(usize, &[Rat])>) -> bool {
     if prospect.point.waves.len() != steps.len() {
         return false;
     }
@@ -899,6 +900,30 @@ fn holds(prospect: &CoupledProspect, steps: &[Executed]) -> bool {
                     .collect::<Vec<Rat>>(),
             );
             target.push(actual - &reflected[i]);
+        }
+    }
+    if let Some((compared, actual)) = station {
+        let Some(position) = prospect
+            .point
+            .features
+            .iter()
+            .position(|(read, _, _)| *read == compared)
+        else {
+            return false;
+        };
+        let predicted = &prospect.point.features[position].2;
+        if predicted.len() != actual.len() {
+            return false;
+        }
+        for (i, value) in actual.iter().enumerate() {
+            rows.push(
+                prospect
+                    .directions
+                    .iter()
+                    .map(|direction| direction.features[position].2[i].clone())
+                    .collect::<Vec<Rat>>(),
+            );
+            target.push(value - &predicted[i]);
         }
     }
     ExactRatMatrix::shaped(rows.len(), prospect.directions.len(), rows)
@@ -943,6 +968,7 @@ fn the_world_keys_coupled_prospect_holds_the_actual_encounter_before_it_runs() {
         vec![rat(1, 4), rat(1, 8), rat(1, 16), rat(-1, 32)],
     ];
     let mut predicted = 0;
+    let mut read_features = 0;
     for _ in 0..3 {
         let before = receiver.world_model().unwrap().clone();
         let prepared = receiver
@@ -967,17 +993,37 @@ fn the_world_keys_coupled_prospect_holds_the_actual_encounter_before_it_runs() {
         let prospects = prepared.world_prospect().unwrap();
         assert_eq!(prospects.len(), 3);
         // The prospect reads and writes nothing actual: the prepared Word still executes.
-        let steps = steps_of(&prepared.encounter().unwrap());
+        let communication = prepared.encounter().unwrap();
+        let steps = steps_of(&communication);
+        // The encounter's own blind read of the compared station, under the producing frame: the
+        // opening's receiving map and lift, which no reception publication moves.
+        let actual_logits = match &communication {
+            ActionCommunication::Received(received) => received
+                .boundary
+                .readings()
+                .iter()
+                .find(|read| read.station == 1)
+                .map(|read| read.read.logits.clone()),
+            _ => None,
+        };
         assert!(!steps.is_empty());
         let after = receiver.world_model().unwrap();
         assert_eq!(after.tick(), before.tick() + steps.len() as u64);
         // The World's own key is live, and one k carries its prospect onto the actual waves.
         let truth = prospects[0].as_ref().unwrap();
         assert_eq!(truth.tick, before.tick());
-        assert!(holds(truth, &steps));
+        // One k carries the waves and the native readout together.
+        let station = actual_logits.as_deref().map(|logits| (1, logits));
+        assert!(holds(truth, &steps, station));
+        if station.is_some() {
+            read_features += 1;
+        }
         if truth.directions.is_empty() {
             for (step, (incident, reflected)) in steps.iter().zip(&truth.point.waves) {
                 assert_eq!((&step.incident, &step.reflected), (incident, reflected));
+            }
+            if let Some(logits) = &actual_logits {
+                assert_eq!(&truth.point.features[0].2, logits);
             }
         }
         // The disconnected key, while live, returns every wave whole; its state reaches nothing,
@@ -1018,6 +1064,8 @@ fn the_world_keys_coupled_prospect_holds_the_actual_encounter_before_it_runs() {
         predicted += 1;
     }
     assert!(predicted > 0);
+    // The compared station's actual readout was measured against the true key's at least once.
+    assert!(read_features > 0);
 }
 
 /// The fixture's action prepared on a receiver, before its encounter.
