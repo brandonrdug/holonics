@@ -1,0 +1,75 @@
+{
+  "source_commit": "9e8041d0a60579077838fc37cc31457fee54a05b",
+  "source_tree": "c09bbaa22cf7a4b9efa5121a0e0c71fc494086a4",
+  "source_base": "90a9945dbf4f52a175e573c83a94b0e0e52c5e9b",
+  "command": [
+    "cargo",
+    "run",
+    "-p",
+    "holonics",
+    "--example",
+    "helical_duplex"
+  ],
+  "cwd": "/home/b/Workspaces/holonics/.local/wt/helical-duplex-demo",
+  "native_exit": 0,
+  "example_smoke_passed": true,
+  "native_files_git_matched": 347,
+  "live_worktree_remains_clean": true,
+  "default_dev_profile_preserved": true,
+  "results": [
+    {
+      "unit": "cache-prep",
+      "native_exit": 0,
+      "accepted": true,
+      "quiescence_confirmed": true,
+      "complete_stage_wall_ns": 9529464195,
+      "child_wall_ns": 9346619072,
+      "projection_ns": 17000000000,
+      "measured_to_projected": {
+        "numerator": 9529464195,
+        "denominator": 17000000000
+      },
+      "aggregate_CPU_ns": 6787542000,
+      "aggregate_CPU_limit_us": 17000000,
+      "group_peak_bytes": 4294967296,
+      "child_peak_RSS_KiB": 39172,
+      "CPU_affinity_count": 1,
+      "group_memory_ceiling_bytes": 4294967296
+    },
+    {
+      "unit": "smoke",
+      "native_exit": 0,
+      "accepted": true,
+      "quiescence_confirmed": true,
+      "complete_stage_wall_ns": 34575764857,
+      "child_wall_ns": 32822160044,
+      "projection_ns": 65000000000,
+      "measured_to_projected": {
+        "numerator": 34575764857,
+        "denominator": 65000000000
+      },
+      "aggregate_CPU_ns": 33579066000,
+      "aggregate_CPU_limit_us": 128000000,
+      "group_peak_bytes": 2229260288,
+      "child_peak_RSS_KiB": 1645936,
+      "CPU_affinity_count": 1,
+      "group_memory_ceiling_bytes": 8589934592
+    }
+  ],
+  "executable_pin": {
+    "sha256": "1b0232035a6aa068153aed4ce6b904c6b4a4130fb0b3317eefff76daddd54f34",
+    "bytes": 159556040
+  },
+  "scope": "Fixed-key known-truth example smoke only; no learned repair claim.",
+  "warnings": [
+    "anchor_differential_joined",
+    "SourceObserverView::seeds",
+    "HeldContactVariation::advanced"
+  ],
+  "not_accepted": [
+    "learned key discovery or learned repair",
+    "general damage-channel coverage",
+    "physical material power or continuing HNN partner return"
+  ],
+  "publication": "Local durable receipt files only; no push, merge, source changes or history/worktree cleanup."
+}

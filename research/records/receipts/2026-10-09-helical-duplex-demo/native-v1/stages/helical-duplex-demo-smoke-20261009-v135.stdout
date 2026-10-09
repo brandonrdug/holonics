@@ -1,0 +1,14 @@
+Helical duplex — known-truth calibration; no learned-repair claim
+Navigator: periods=[3, 4], joint period=12, advances=[9, 4, 10, 3], cell labels=[0, 3, 2, 1]
+Input passage: supplied key=1, letters=[0, 1], absolute lifts=[1, 10, 14]
+Paired representation: partner=[0, 1], absolute lifts=[0, 4, 13]
+Receiver result: readings=[[1, 0, 0, 0, 0, 0, 0, 0, 0, 0]; [0, 0, 0, 1, 0, 1, 0, 0, 1, 0]; [1, 0, 0, 0, 1, 0, 0, 0, 0, 0]], terminal winding=1
+Intact decode: Released; members=1, diameter=0, readings=[[1, 0, 0, 0, 0, 0, 0, 0, 0, 0]; [0, 0, 0, 1, 0, 1, 0, 0, 1, 0]; [1, 0, 0, 0, 1, 0, 0, 0, 0, 0]], terminal winding=1
+One-sided damage: strand contact 0 changes 0 to 1; partner=[0, 1]; carried shift=-5
+One-sided decode: Held; members=2, diameter=1, reached supports=[1, 2, 2], differing coordinate=1
+  witness 1: letters=[1, 1], lifts=[1, 5, 9], terminal winding=0
+  witness 2: letters=[0, 1], lifts=[1, 10, 14], terminal winding=1
+Harness-only known-truth check: source is among these witnesses=true; no class was released, so no residual label is assigned.
+Coordinated damage (outside one-sided coverage): strand=[1, 1], partner=[0, 0], slipped contacts=[]
+Coordinated decode: Released; members=1, diameter=0, readings=[[1, 0, 0, 0, 0, 0, 0, 0, 0, 0]; [0, 1, 0, 0, 0, 0, 1, 1, 0, 0]; [0, 0, 0, 1, 0, 1, 0, 0, 0, 1]], terminal winding=0
+Harness-only known-truth result: Residual { at: 1 }
