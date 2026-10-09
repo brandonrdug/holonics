@@ -175,10 +175,30 @@
 //!   stay equivariant and the committed port stays equivariant (Lean `deposit_stays_equivariant`). The
 //!   successor is re-admitted inside the deposit, and a port that left the subspace is refused
 //!   ([`PairedDefect::Deposited`]).
-//! - **Not built here: the symmetrized chart.** Where other deposits have made the Gram non-diagonal,
-//!   `X̂` need not commute with `Σ`; `½(X̂ + Σ X̂ Σ)` does (Lean `symmetrized_commutes`), and it keeps
-//!   the chart's certificate `‖1 − X̂H‖∞ ≤ δ` when `Σ H = H Σ` (Lean `symmetrized_rowNorm_le`). It is built with its first consumer, the comparison's general route
-//!   (`compose_return`); until then the re-admission refuses such a deposit, typed.
+//! - **Every route on a paired source law** (loop 3; [`PairedCarrier::found`], [`PortSymmetry`]).
+//!   On the general route (`hnn::reference::compose_return`) the Word's actual return is the
+//!   strand's; the partner's Word return is the dyad image only where the whole field commutes with
+//!   the dyad (rings, contacts, standing, pump, receiver), which a general field does not. The
+//!   pairing is therefore kept as a constraint of the constitution's form: a source law that
+//!   declares the symmetry projects every deposit onto the subspace, `Π_V(G) e_a = ½(G e_a +
+//!   B G e_(σa))` on the family, symmetrizes its Gram's arrivals `½(ΔH + Σ ΔH Σ)` and its chart
+//!   `X̂_s = ½(X̂ + Σ X̂ Σ)` exactly (on the coarsest lattice that holds the mean), reads its step's
+//!   alignment and moves on that final direction, and is re-admitted after the step
+//!   (`hnn::constitution::NormalLaw::{prepare, deposited}`). `Π_V` is the orthogonal projection of
+//!   this realified Euclidean chart, so the reached comparison's work on every admissible change is
+//!   unchanged and no datum is added; where `Π_V(G) = 0` there is no constrained descent, and the
+//!   step is refused rather than read as a match. A feature reaching a class outside the family is
+//!   refused ([`crate::hnn::HnnError::PairedOutside`]). The chart keeps its certificate (Lean
+//!   `symmetrized_rowNorm_le`), which is still computed exactly. On pair features the projection is
+//!   loop 2's paired reads (`G + B G Σ = 2Π_V(G)`).
+//! - **One founding prior.** Every slip reader reads the same `E_0`: the field's declared port
+//!   completed on the subspace by the law's symmetry (`hnn::constitution::founding_prior`, read by
+//!   `hnn::prediction::closed_pairs`), which a save keeps with the law.
+//! - **Scope.** The projection keeps the port's constraint, not the carrier's other conditions: the
+//!   partner face still refuses a damped transport, located, reframed, multiple-source, pair-offset,
+//!   leaky, outside-family and non-unit-tick moments; a zero source-face residual is not a zero
+//!   residual of the participating world. The card's mirror declines a paired law until its parity
+//!   is built (#76).
 //!
 //! [proved-derived] On the equivariant subspace `|Δ^R| = |Δ_y|` (`B` permutes coordinates), so the
 //! paired slip is twice the forward one there, and the paired deposit descends the forward slip within
@@ -204,7 +224,7 @@
 //! | the port carries the pairing, `B E = E Σ_σ` | owed (#62) | [`PairedCarrier::certify`], [`PairedCarrier::equivariant_port`] |
 //! | the partner's counts are the strand's reflected and complemented | owed (#62) | [`SourceMoment::dyad`], [`PairedCarrier::partner_moment`] |
 //! | `s(0)(σ̄u) = B P^(−(n−1)) s(0)(u)`, `m̃(σ̄u) = B P^(c₀) m̃(u)` | `Transport/HelicalCode.{strandFace_complementReverse_nat, face_complementReverse, partner_map_involutive}` (the bridge to the moment is owed, #62) | [`PairedCarrier::partner_face`], [`PairedCarrier::half_turn`] |
-//! | the pair-port reversal law `B Δ_y = Δ^R` and the equivariant deposit; the symmetrized chart commutes | `HNN/PairedDeposit.{lift_pow, reversal_identity, mul_commuting_stays, deposit_stays_equivariant, symmetrized_commutes, symmetrized_residual, symmetrized_rowNorm_le}` | [`PairedCarrier::deposit`], `hnn::executed::{oriented_slip, deposit_reads}` |
+//! | the pair-port reversal law `B Δ_y = Δ^R` and the equivariant deposit; the symmetrized chart commutes | `HNN/PairedDeposit.{lift_pow, reversal_identity, mul_commuting_stays, deposit_stays_equivariant, symmetrized_commutes, symmetrized_residual, symmetrized_rowNorm_le}` | [`PairedCarrier::deposit`], `hnn::executed::{oriented_slip, deposit_reads}`; every route: [`PairedCarrier::found`], [`PortSymmetry`], `hnn::constitution::{NormalLaw::symmetry, founding_prior}` |
 //!
 //! **Recorded failures checked.** An authored routine standing in for learning: the port's follower
 //! columns are the code's own relation `E(σa) = B E(a)` on a free leader, never a decoder or a table.
@@ -638,6 +658,133 @@ impl From<ExactLinearError> for PairedDefect {
 }
 
 // -------------------------------------------------------------------------------------------
+// the port's symmetry
+
+/// [definition; agent-inferred, October 9] **A paired port's declared symmetry** (module header,
+/// "The paired deposit"): the lift `B` as a gather permutation of the port's rows,
+/// `(B v)[j] = v[rows[j]]`, and `σ` on its columns (`None` outside the family). A source port's
+/// normal law that keeps it (`hnn::constitution::NormalLaw::symmetry`) projects every deposit onto
+/// `V = {W : W e_(σa) = B W e_a}`, so its port stays equivariant whatever route deposits it. It
+/// keeps the family's pairs `(leader, follower)` as the pairing declared them ([`Sigma::pairs`]),
+/// so the founding prior completed from the field's declared port is one value before and after a
+/// restore ([`PortSymmetry::completed`]).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PortSymmetry {
+    rows: Vec<usize>,
+    columns: Vec<Option<usize>>,
+    pairs: Vec<(usize, usize)>,
+}
+
+impl PortSymmetry {
+    /// **A symmetry from its parts** (a saved law's), `None` unless `rows` is an involutive
+    /// permutation, `columns` a fixed-point-free involution on its family, and `leaders` names each
+    /// pair of the family once (its follower is the leader's image).
+    pub fn from_parts(
+        rows: Vec<usize>,
+        columns: Vec<Option<usize>>,
+        leaders: &[usize],
+    ) -> Option<Self> {
+        let width = rows.len();
+        let rows_lawful = rows.iter().all(|&r| r < width) && (0..width).all(|j| rows[rows[j]] == j);
+        let columns_lawful = columns.iter().enumerate().all(|(a, image)| match *image {
+            Some(b) => b != a && columns.get(b).copied().flatten() == Some(a),
+            None => true,
+        });
+        if !rows_lawful || !columns_lawful {
+            return None;
+        }
+        let mut named = vec![false; columns.len()];
+        let mut pairs = Vec::with_capacity(leaders.len());
+        for &leader in leaders {
+            let follower = columns.get(leader).copied().flatten()?;
+            if named[leader] || named[follower] {
+                return None;
+            }
+            named[leader] = true;
+            named[follower] = true;
+            pairs.push((leader, follower));
+        }
+        let covered = columns
+            .iter()
+            .enumerate()
+            .all(|(class, image)| image.is_none() || named[class]);
+        covered.then_some(Self {
+            rows,
+            columns,
+            pairs,
+        })
+    }
+
+    /// The family's pairs `(leader, follower)`: the leader's column is free, the follower's is `B`
+    /// of it.
+    pub fn pairs(&self) -> &[(usize, usize)] {
+        &self.pairs
+    }
+
+    /// Its bits as a saved law carries them: each stored index at its binary length (at least one
+    /// bit), a column outside the family one bit.
+    pub fn bits(&self) -> u64 {
+        let length = |index: usize| u64::from(usize::BITS - index.leading_zeros()).max(1);
+        self.rows.iter().map(|&row| length(row)).sum::<u64>()
+            + self
+                .columns
+                .iter()
+                .map(|column| column.map_or(1, length))
+                .sum::<u64>()
+            + self.pairs.iter().map(|&(leader, _)| length(leader)).sum::<u64>()
+    }
+
+    /// **A port completed on the subspace** ([`PairedCarrier::equivariant_port`]): each leader's
+    /// column kept, each follower's set to `B` of its leader, `(E e_f)[j] = (E e_l)[rows[j]]`, the
+    /// columns outside the family kept. On the field's declared port it is the paired founding
+    /// prior (`hnn::constitution::founding_prior`).
+    pub fn completed(&self, free: &ExactRatMatrix) -> Result<ExactRatMatrix, ExactLinearError> {
+        let mut rows = free.to_rows();
+        for &(leader, follower) in &self.pairs {
+            for (row, entries) in rows.iter_mut().enumerate() {
+                entries[follower] = free.get(self.rows[row], leader)?.clone();
+            }
+        }
+        ExactRatMatrix::shaped(free.rows(), free.columns(), rows)
+    }
+
+    /// The lift's gather rows: `(B v)[j] = v[rows[j]]`.
+    pub fn rows(&self) -> &[usize] {
+        &self.rows
+    }
+
+    /// `σ` on the columns, `None` outside the family.
+    pub fn columns(&self) -> &[Option<usize>] {
+        &self.columns
+    }
+
+    /// The permutation `Σ` acts by on an index: `σ` on the family and the identity outside it.
+    pub fn column(&self, column: usize) -> usize {
+        self.columns[column].unwrap_or(column)
+    }
+
+    /// **The first column at which a map leaves the subspace** (module header, "The admission"):
+    /// for each class `a` of the family in ascending order, the first row `j` with
+    /// `W[rows[j]][a] ≠ W[j][σa]`, as `(a, σa, j)`; `None` on the subspace.
+    pub fn first_failure(
+        &self,
+        map: &ExactRatMatrix,
+    ) -> Result<Option<(usize, usize, usize)>, ExactLinearError> {
+        for (class, partner) in self.columns.iter().enumerate() {
+            let Some(partner) = *partner else {
+                continue;
+            };
+            for (row, &lifted) in self.rows.iter().enumerate() {
+                if map.get(lifted, class)? != map.get(row, partner)? {
+                    return Ok(Some((class, partner, row)));
+                }
+            }
+        }
+        Ok(None)
+    }
+}
+
+// -------------------------------------------------------------------------------------------
 // the carrier
 
 /// [definition; agent-inferred, October 8] **A paired carrier**: a source ring whose reflector is a
@@ -760,23 +907,47 @@ impl PairedCarrier {
                 expected_columns: classes,
             });
         }
-        for class in 0..classes {
-            let Some(partner) = self.sigma.image(class) else {
-                continue;
-            };
-            for row in 0..width {
-                let source = 2 * self.reflector[row / 2] + row % 2;
-                if port.get(source, class)? != port.get(row, partner)? {
-                    return Err(PairedDefect::Equivariance {
-                        ring: self.ring,
-                        column: class,
-                        partner,
-                        row,
-                    });
-                }
-            }
+        match self.symmetry().first_failure(port)? {
+            Some((column, partner, row)) => Err(PairedDefect::Equivariance {
+                ring: self.ring,
+                column,
+                partner,
+                row,
+            }),
+            None => Ok(()),
         }
-        Ok(())
+    }
+
+    /// **The carrier's symmetry of its port** ([`PortSymmetry`]): the lift's gather rows
+    /// `2F(⌊j/2⌋) + (j mod 2)` and `σ` on the chart's classes.
+    pub fn symmetry(&self) -> PortSymmetry {
+        PortSymmetry {
+            rows: (0..self.width())
+                .map(|row| 2 * self.reflector[row / 2] + row % 2)
+                .collect(),
+            columns: self.sigma.table().to_vec(),
+            pairs: self.sigma.pairs().to_vec(),
+        }
+    }
+
+    /// **A paired source port founded on a constitution** (module header, "The paired deposit"):
+    /// the field's founded port `E_0` completed to an equivariant one
+    /// ([`PairedCarrier::complete_port`]), the carrier admitted on it, and ring `ring`'s source law
+    /// placed at that port with the carrier's [`PortSymmetry`], so every later deposit of the port,
+    /// by any route, stays on its subspace. Returns the constitution, the carrier and the
+    /// equivariant prior the pair deposits read.
+    pub fn found(
+        field: &Field,
+        constitution: Constitution,
+        ring: usize,
+        declared: &PairingDeclaration,
+    ) -> Result<(Constitution, Self, ExactRatMatrix), PairedDefect> {
+        let founded = crate::hnn::constitution::declared_source_port(field, ring)?
+            .ok_or(PairedDefect::NotSource { ring })?;
+        let prior = Self::complete_port(field, ring, declared, &founded)?;
+        let carrier = Self::admit(field, ring, declared, &prior)?;
+        let placed = constitution.with_symmetric_source(ring, prior.clone(), carrier.symmetry())?;
+        Ok((placed, carrier, prior))
     }
 
     /// **A free port completed to an equivariant one**: the leader column of each pair is kept as
@@ -793,14 +964,7 @@ impl PairedCarrier {
                 expected_columns: classes,
             });
         }
-        let mut rows = free.to_rows();
-        for &(leader, follower) in self.sigma.pairs() {
-            for (row, entries) in rows.iter_mut().enumerate() {
-                let source = 2 * self.reflector[row / 2] + row % 2;
-                entries[follower] = free.get(source, leader)?.clone();
-            }
-        }
-        Ok(ExactRatMatrix::shaped(width, classes, rows)?)
+        Ok(self.symmetry().completed(free)?)
     }
 
     /// **`B v`**, the realified lift of the reflector (module header): node `i`'s pair of

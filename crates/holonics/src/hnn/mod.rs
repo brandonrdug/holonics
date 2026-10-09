@@ -492,6 +492,20 @@ pub enum HnnError {
         certificate: Box<Rat>,
         target: Box<Rat>,
     },
+    /// [definition; agent-inferred, October 9] A paired port's map is off its subspace
+    /// (`hnn::paired`, "The paired deposit"): the first failing column, its partner and row.
+    #[error(
+        "a paired port is not equivariant: column {column} against its partner column {partner} first differs at row {row}"
+    )]
+    PairedPort {
+        column: usize,
+        partner: usize,
+        row: usize,
+    },
+    /// [definition; agent-inferred, October 9] A paired port's deposit reaches a class outside its
+    /// pairing's family, where the subspace does not constrain the port.
+    #[error("a paired port's deposit reaches class {class}, outside its pairing's family")]
+    PairedOutside { class: usize },
 }
 
 impl From<encoding::EncodingError> for HnnError {

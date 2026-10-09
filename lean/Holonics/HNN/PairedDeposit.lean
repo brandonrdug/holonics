@@ -29,6 +29,12 @@ partner strand: `Qᵟ E₀ (Σ y) − (E − E₀) (Σ x)`, the **pair-port reve
    certified `‖1 − X H‖∞ ≤ δ` (`HNN/LatticeWord.rowNorm`, the certificate the Rust chart computes)
    gives a symmetrized chart certified by the same `δ` whenever `‖Σ‖∞ ≤ 1`, as for a permutation
    matrix. No invariance of the norm is needed: submultiplicativity (`rowNorm_mul_le`) suffices.
+6. **Every route projects onto the subspace** (`projection_equivariant`, `projection_pairing`): with
+   `B² = 1` and `Σ² = 1`, `G + B G Σ` lies on the subspace, so a paired source law's step
+   `Π_V(G) = ½(G + B G Σ)` keeps the port equivariant; and with `Bᵀ = B`, `Σᵀ = Σ`, `B G Σ` pairs
+   with every admissible change `B D = D Σ` exactly as `G` does, `tr((B G Σ)ᵀ D) = tr(Gᵀ D)`, so the
+   projection keeps the reached comparison's work and adds no datum. The quadratic's invariance,
+   `tr(D Σ F Σ Dᵀ) = tr(D F Dᵀ)` for admissible `D`, is owed (#62).
 
 [proved-derived] Written, not yet kernel-checked; the sole queue's owner check decides. No `sorry`,
 no `axiom`, no `native_decide`.
@@ -40,6 +46,7 @@ no `axiom`, no `native_decide`.
 | `mul_commuting_stays`, `deposit_stays_equivariant` | the paired deposit through `Constitution::stepped_source` |
 | `symmetrized_commutes` | the symmetrized chart in `NormalLaw::prepare` (owed, loop 3 of step 3) |
 | `symmetrized_residual`, `rowNorm_smul_le`, `symmetrized_rowNorm_le` | its certificate, read as today by the chart's exact `‖1 − X̂H‖∞` |
+| `projection_equivariant`, `projection_pairing` | the projected step in `NormalLaw::prepare` on a paired source law |
 -/
 
 namespace Holonics.HNN.PairedDeposit
@@ -154,5 +161,25 @@ theorem symmetrized_rowNorm_le {S X H : Matrix m m ℚ} {δ : ℚ} (hS : S * S =
         ring
 
 end SymmetrizedBound
+
+/-! ## Every route projects onto the subspace -/
+
+/-- [proved-derived] **The projection lands on the subspace**: with `B² = 1` and `Σ² = 1`,
+`B (G + B G Σ) = (G + B G Σ) Σ`. -/
+theorem projection_equivariant {B : Matrix n n R} {S : Matrix m m R} {G : Matrix n m R}
+    (hB : B * B = 1) (hS : S * S = 1) :
+    B * (G + B * G * S) = (G + B * G * S) * S := by
+  rw [Matrix.mul_add, Matrix.add_mul, ← Matrix.mul_assoc B (B * G) S, ← Matrix.mul_assoc B B G, hB,
+    Matrix.one_mul, Matrix.mul_assoc (B * G) S S, hS, Matrix.mul_one, add_comm]
+
+/-- [proved-derived] **The projection keeps the comparison's work**: with `Bᵀ = B`, `Σᵀ = Σ` and
+`Σ² = 1`, every admissible change `B D = D Σ` pairs with `B G Σ` as with `G`:
+`tr((B G Σ)ᵀ D) = tr(Gᵀ D)`. -/
+theorem projection_pairing {B : Matrix n n R} {S : Matrix m m R} {G D : Matrix n m R}
+    (hBt : Matrix.transpose B = B) (hSt : Matrix.transpose S = S) (hS : S * S = 1)
+    (hD : B * D = D * S) :
+    Matrix.trace (Matrix.transpose (B * G * S) * D) = Matrix.trace (Matrix.transpose G * D) := by
+  rw [Matrix.transpose_mul, Matrix.transpose_mul, hSt, hBt, Matrix.mul_assoc, Matrix.mul_assoc, hD,
+    Matrix.trace_mul_comm S, Matrix.mul_assoc, Matrix.mul_assoc, hS, Matrix.mul_one]
 
 end Holonics.HNN.PairedDeposit

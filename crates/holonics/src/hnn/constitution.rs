@@ -539,6 +539,7 @@ use crate::hnn::contact::{
 };
 use crate::hnn::field::{ConstitutionRead, Field, lattice_exponent};
 use crate::hnn::moment::PairPort;
+use crate::hnn::paired::PortSymmetry;
 use crate::hnn::phase_family::PhaseStatistics;
 use crate::hnn::port::Deposit;
 use crate::hnn::propagation::gram;
@@ -1856,6 +1857,78 @@ impl SolvedChart {
         }
         settled(warm, carried, exponent, scale, n, rule)
     }
+
+    /// [definition; agent-inferred, October 9] **The chart symmetrized by a paired port's pairing**
+    /// (`hnn::paired`, "The paired deposit"; Lean `HNN/PairedDeposit.{symmetrized_commutes,
+    /// symmetrized_rowNorm_le}`): `X̂_s = ½(X̂ + Σ X̂ Σ)` on the support, exactly, on the coarsest
+    /// lattice that holds the mean (the chart's own, or one level finer), so `X̂_s` commutes with `Σ`
+    /// and stays symmetric. The Lean bound gives `‖1 − X̂_s H′‖∞ ≤ ‖1 − X̂H′‖∞` on the actual carried
+    /// Gram; the certificate is still computed exactly here, never assumed, and refused above the
+    /// rule's target, as is a lattice past the residual's shift. The Gram commutes with `Σ`, so its
+    /// support is closed under it; a support that is not is refused. Returns the chart and the bits of
+    /// its certified residual.
+    fn symmetrized(
+        &self,
+        gram: &[Vec<Rat>],
+        symmetry: &PortSymmetry,
+        rule: &ChartRule,
+    ) -> Result<(Self, u64), HnnError> {
+        let s = self.support.len();
+        if s == 0 {
+            return Ok((self.clone(), 0));
+        }
+        let overflow = || HnnError::from(ExactLinearError::ExtentOverflow);
+        let failure = || HnnError::from(ExactLinearError::InverseCertificateFailure);
+        let position: BTreeMap<usize, usize> = self
+            .support
+            .iter()
+            .enumerate()
+            .map(|(a, &i)| (i, a))
+            .collect();
+        let images: Vec<usize> = self
+            .support
+            .iter()
+            .map(|&i| position.get(&symmetry.column(i)).copied().ok_or_else(failure))
+            .collect::<Result<_, HnnError>>()?;
+        let mut sums = vec![0i128; s * s];
+        for a in 0..s {
+            for b in 0..s {
+                sums[a * s + b] = self.block[a * s + b]
+                    .checked_add(self.block[images[a] * s + images[b]])
+                    .ok_or_else(overflow)?;
+            }
+        }
+        // The mean exactly, on the coarsest lattice that holds it: the chart's own when every sum is
+        // even, otherwise one level finer (Epime's review, October 9: a rounded mean adds a residual
+        // the averaging theorem does not cover).
+        let (block, exponent) = if sums.iter().all(|sum| sum % 2 == 0) {
+            (sums.iter().map(|sum| sum / 2).collect(), self.exponent)
+        } else {
+            (sums, self.exponent + 1)
+        };
+        let carried = GramBlock::of(gram, &self.prior())?;
+        if carried.support != self.support {
+            return Err(failure());
+        }
+        let shift = exponent + carried.exponent;
+        if shift > RESIDUAL_SHIFT {
+            return Err(overflow());
+        }
+        let (residual, certificate) =
+            certified(&block, &carried.coordinates, s, shift).ok_or_else(overflow)?;
+        if certificate > rule.target() {
+            return Err(failure());
+        }
+        Ok((
+            Self {
+                exponent,
+                block,
+                certificate,
+                ..self.clone()
+            },
+            residual_bits(&residual, shift),
+        ))
+    }
 }
 
 /// **A chart refined to its rule's target from a warm start** (the type's header, [`SolvedChart`]):
@@ -2054,6 +2127,10 @@ pub struct NormalLaw {
     /// deposit's own successor ([`absorb_phase`]); no reading is kept. `None` on a source or
     /// contrast law.
     phase: Option<PhaseStatistics>,
+    /// [definition; agent-inferred, October 9] A paired source port's declared symmetry
+    /// ([`PortSymmetry`]; `hnn::paired`, "The paired deposit"): the law keeps its map on the paired
+    /// subspace, projecting each deposit onto it ([`NormalLaw::prepare`]). `None` on every other law.
+    symmetry: Option<PortSymmetry>,
 }
 
 impl NormalLaw {
@@ -2077,6 +2154,7 @@ impl NormalLaw {
             gram_carry: Carry::default(),
             located: None,
             phase: None,
+            symmetry: None,
         }
     }
 
@@ -2111,6 +2189,7 @@ impl NormalLaw {
             gram_carry: Carry::default(),
             located: None,
             phase: None,
+            symmetry: None,
         }
     }
 
@@ -2160,6 +2239,74 @@ impl NormalLaw {
     /// ([`absorb_phase`]). `None` on a source or contrast law.
     pub fn phase_statistics(&self) -> Option<&PhaseStatistics> {
         self.phase.as_ref()
+    }
+
+    /// Whether the law is at its founding: the unit prior, no remainder, the identity chart, no
+    /// located pair, statistics or symmetry; only its map is declared.
+    fn is_founding(&self) -> bool {
+        *self == Self::with_prior(self.map.clone())
+    }
+
+    /// The paired port's declared symmetry, `None` unless the law's port is paired.
+    pub fn symmetry(&self) -> Option<&PortSymmetry> {
+        self.symmetry.as_ref()
+    }
+
+    /// **The law with a paired port's symmetry** (`hnn::paired`, "The paired deposit"): refused
+    /// unless the symmetry has the map's shape, the map lies on the subspace and the Gram commutes
+    /// with `Σ`.
+    pub(crate) fn with_symmetry(self, symmetry: PortSymmetry) -> Result<Self, HnnError> {
+        let (m, n) = (self.map.rows(), self.map.columns());
+        if symmetry.rows().len() != m || symmetry.columns().len() != n {
+            return Err(HnnError::Shape {
+                what: "a port symmetry against its law's map",
+                expected: m * n,
+                found: symmetry.rows().len() * symmetry.columns().len(),
+            });
+        }
+        self.admits_symmetry(&symmetry)?;
+        Ok(Self {
+            symmetry: Some(symmetry),
+            ..self
+        })
+    }
+
+    /// **Whether the whole law state keeps a paired port's symmetry** (Epime's review, October 9):
+    /// the map and its carried remainders on the subspace on the family (`B E = E Σ`,
+    /// `B r_E = r_E Σ`), the Gram and its remainders commuting with `Σ` (`Σ H Σ = H`,
+    /// `Σ r_H Σ = r_H`), and the solved chart commuting with `Σ` on a support closed under it. A law
+    /// that does not is refused, never repaired.
+    fn admits_symmetry(&self, symmetry: &PortSymmetry) -> Result<(), HnnError> {
+        for map in [&self.map, &self.map_remainder()] {
+            if let Some((column, partner, row)) = symmetry.first_failure(map)? {
+                return Err(HnnError::PairedPort {
+                    column,
+                    partner,
+                    row,
+                });
+            }
+        }
+        let n = self.gram.len();
+        let commutes = |matrix: &[Vec<Rat>]| {
+            (0..n).all(|i| {
+                (0..n).all(|j| matrix[i][j] == matrix[symmetry.column(i)][symmetry.column(j)])
+            })
+        };
+        let closed = self
+            .chart
+            .support
+            .iter()
+            .all(|&i| self.chart.support.contains(&symmetry.column(i)));
+        if !commutes(&self.gram)
+            || !commutes(&self.gram_remainder().to_rows())
+            || !commutes(&self.chart.dense(n))
+            || !closed
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "a paired port's Gram, its remainders and its chart commute with its pairing",
+            });
+        }
+        Ok(())
     }
 
     /// The law with its carried pair replaced (a test's pair at a chosen Newton point).
@@ -2260,24 +2407,46 @@ impl NormalLaw {
         if active.is_empty() {
             return Ok(None);
         }
+        // A paired port's deposit stays on its family (`hnn::paired`, "The paired deposit").
+        if let Some(symmetry) = &self.symmetry {
+            for (sample, _) in &active {
+                let outside = (0..n)
+                    .find(|&class| symmetry.columns()[class].is_none() && !sample.feature[class].is_zero());
+                if let Some(class) = outside {
+                    return Err(HnnError::PairedOutside { class });
+                }
+            }
+        }
         let mut law = self.clone();
-        // ΔH = Σ w f fᵀ, carried onto H.
+        // ΔH = Σ w f fᵀ, carried onto H; on a paired port ½(ΔH + Σ ΔH Σ), so H keeps commuting with Σ.
         let gram_update = gram_sum(
             n,
             active
                 .iter()
                 .map(|(sample, feature)| (&sample.weight, feature)),
         );
+        let gram_update = match &self.symmetry {
+            Some(symmetry) => symmetrized_gram(n, &gram_update, symmetry),
+            None => gram_update,
+        };
         let mut gram: Vec<Rat> = self.gram.iter().flatten().cloned().collect();
         law.gram_carry
             .deposit_all(at, Carrier::Gram, &mut gram, &gram_update);
         law.gram = gram.chunks(n).map(<[Rat]>::to_vec).collect();
-        // The chart of H', from the previous chart.
+        // The chart of H', from the previous chart; on a paired port symmetrized and re-certified.
         let features: Vec<(&Rat, &Chart)> = active
             .iter()
             .map(|(sample, feature)| (&sample.weight, feature))
             .collect();
-        let (chart, refinement) = self.chart.deposited(&law.gram, &features, rule)?;
+        let (chart, mut refinement) = self.chart.deposited(&law.gram, &features, rule)?;
+        let chart = match &self.symmetry {
+            Some(symmetry) => {
+                let (chart, bits) = chart.symmetrized(&law.gram, symmetry, rule)?;
+                refinement.residual_bits = bits;
+                chart
+            }
+            None => chart,
+        };
         law.chart = chart;
         // The unit step D = Σ w g (X̂f)ᵀ at the successor's chart. Each sample's term reads only its
         // own covector and reach: the samples run together. Each term's `|w| ‖g‖∞ ‖f‖₁` bounds its
@@ -2317,6 +2486,12 @@ impl NormalLaw {
                 .map(|(weight, covector, reach, ..)| (weight, covector, reach))
                 .collect::<Vec<_>>(),
         );
+        // A paired port's step is projected onto its subspace: `D = Π_V(G X̂)`, which with `X̂ Σ = Σ X̂`
+        // is `Π_V(G) X̂` (Lean `HNN/PairedDeposit.mul_commuting_stays`).
+        let unit = match &self.symmetry {
+            Some(symmetry) => unit.projected(symmetry.rows(), symmetry.columns()),
+            None => unit,
+        };
         // a = Σ w ⟨g, D f⟩ and b = Σ w |D f|², each sample's D f read once in the integral chart.
         let reads: Vec<(Rat, Rat)> = indexed(active.len(), |t| {
             let (sample, feature) = &active[t];
@@ -2369,6 +2544,16 @@ impl NormalLaw {
     /// the deposited Gram, summed over the arrivals (`deposition_residual_sum`), reported by its certificate
     /// ([`ChartReading::released`]); each carry entry is below `2^(−L) + 2^(−L−k_m)/2`
     /// (`carryDefect_bounded`).
+    ///
+    /// [proved-derived; agent-inferred, October 9; Epime's review] **On a paired port**
+    /// ([`NormalLaw::symmetry`]) the arrivals the law deposits are the symmetrized
+    /// `F_s = ½(F + Σ F Σ)` and the projected `G_s = Π_V(G)` (`Π_V(G) e_a = ½(G e_a + B G e_(σa))` on the
+    /// family), with the symmetrized chart `X̂_s`, and the balance above holds with them:
+    /// `W′H′ − (WH + W F_s + η G_s) = −η G_s(1 − X̂_s H′) + W c_H + c_W H′`. Against the raw arrivals
+    /// the difference is `W(F_s − F) + η(G_s − G)`, the constraint's normal reaction: it pairs to zero
+    /// with every change the subspace admits (`⟨G, D⟩ = ⟨G_s, D⟩` and `tr(D F Dᵀ) = tr(D F_s Dᵀ)` for
+    /// `B D = D Σ`), and it is neither rounding nor an observation. [`ChartReading::released`] is the
+    /// projected law's chart residual, never a residual of the unrestricted balance.
     pub fn deposited(
         &self,
         samples: &[Sample],
@@ -2397,7 +2582,8 @@ impl NormalLaw {
                 .chain(self.gram.iter().flatten())
                 .map(bits)
                 .sum::<u64>()
-                + self.phase.as_ref().map_or(0, |phase| phase.bits()),
+                + self.phase.as_ref().map_or(0, |phase| phase.bits())
+                + self.symmetry.as_ref().map_or(0, PortSymmetry::bits),
             remainders: self.map_carry.bits() + self.gram_carry.bits(),
             solved: self.chart.bits(self.gram.len()),
         }
@@ -2666,6 +2852,7 @@ impl NormalLaw {
             gram_carry: self.gram_carry.clone(),
             located: Some(pair.rebased(&x)),
             phase: self.phase.clone(),
+            symmetry: self.symmetry.clone(),
         };
         Ok(Some((
             moved,
@@ -2891,6 +3078,16 @@ impl PreparedStep {
         next.map_carry
             .deposit_all(at, Carrier::Map, &mut map, &update);
         next.map = flat_matrix(m, n, map)?;
+        // A paired port is re-admitted after every step (Lean `HNN/PairedDeposit.deposit_stays_equivariant`).
+        if let Some(symmetry) = &next.symmetry
+            && let Some((column, partner, row)) = symmetry.first_failure(&next.map)?
+        {
+            return Err(HnnError::PairedPort {
+                column,
+                partner,
+                row,
+            });
+        }
         let released = next.chart.certificate() * step * &self.shares;
         let reading = ChartReading {
             exponent: next.chart.exponent(),
@@ -2906,6 +3103,20 @@ impl PreparedStep {
         };
         Ok((next, reading))
     }
+}
+
+/// [definition; agent-inferred, October 9] **A Gram update symmetrized by a paired port's pairing**:
+/// `½(ΔH + Σ ΔH Σ)` on the flat `n × n` update, `Σ` acting by `σ` on the family and the identity
+/// outside it (`hnn::paired`, "The paired deposit").
+fn symmetrized_gram(n: usize, update: &[Rat], symmetry: &PortSymmetry) -> Vec<Rat> {
+    let half = Rat::new(BigInt::one(), BigInt::from(2));
+    (0..n * n)
+        .map(|k| {
+            let (i, j) = (k / n, k % n);
+            let image = &update[symmetry.column(i) * n + symmetry.column(j)];
+            (&update[k] + image) * &half
+        })
+        .collect()
 }
 
 /// **`Σ_t w_t f_t f_tᵀ` in the integral chart**: each feature charted once, the numerators summed
@@ -3742,6 +3953,27 @@ pub fn declared_source_port(field: &Field, ring: usize) -> Result<Option<ExactRa
             })
             .collect(),
     )?))
+}
+
+/// [definition; agent-inferred, October 9; Epime's review of the paired source law] **The source
+/// port's founding prior** `E₀`, the one decoder every slip reader uses (`hnn::executed::pair_slip`
+/// through its callers, `hnn::prediction::closed_pairs`): the field's declared port
+/// ([`declared_source_port`]) completed on the material's paired subspace where its source law is
+/// paired ([`PortSymmetry::completed`]), never the current learned port. It needs no further dense
+/// map: the field and the law's symmetry, which a save keeps, determine it, so it reads the same
+/// before and after a restore.
+pub fn founding_prior(
+    field: &Field,
+    material: &(impl crate::hnn::field::FieldMaterial + ?Sized),
+    ring: usize,
+) -> Result<Option<ExactRatMatrix>, HnnError> {
+    let Some(declared) = declared_source_port(field, ring)? else {
+        return Ok(None);
+    };
+    match material.source_symmetry(ring) {
+        Some(symmetry) => Ok(Some(symmetry.completed(&declared)?)),
+        None => Ok(Some(declared)),
+    }
 }
 
 fn scaled_identity(n: usize, value: Rat) -> ExactRatMatrix {
@@ -4753,6 +4985,32 @@ impl Constitution {
                 .unwrap_or(0);
             material.receiving = Some(NormalLaw::with_receiving_prior(receiving, prior));
         }
+        Ok(self)
+    }
+
+    /// **Place a paired source port** (`hnn::paired::PairedCarrier::found`): ring `ring`'s source
+    /// law founded at `source` with the carrier's symmetry, so every later deposit of the port is
+    /// projected onto its paired subspace (`hnn::paired`, "The paired deposit"). Refused where the
+    /// ring has no source law, or the port is off the subspace.
+    pub fn with_symmetric_source(
+        mut self,
+        ring: usize,
+        source: ExactRatMatrix,
+        symmetry: PortSymmetry,
+    ) -> Result<Self, HnnError> {
+        let founding = self.clock(Locus::SourcePort(ring)) == 0
+            && self
+                .rings
+                .get(ring)
+                .and_then(|material| material.source.as_ref())
+                .ok_or(HnnError::MissingSourcePort { ring })?
+                .is_founding();
+        if !founding {
+            return Err(HnnError::Unadmitted {
+                reason: "a paired source port is placed only on a founding law; a learned law is never reset",
+            });
+        }
+        self.rings[ring].source = Some(NormalLaw::with_prior(source).with_symmetry(symmetry)?);
         Ok(self)
     }
 
@@ -10113,6 +10371,25 @@ fn write_law(s: &mut String, law: &NormalLaw) {
         Some(phase) => write_phase(s, phase),
         None => *s += "phase none\n",
     }
+    match &law.symmetry {
+        Some(symmetry) => {
+            *s += &format!(
+                "symmetry {} {} {}\n",
+                symmetry.rows().len(),
+                symmetry.columns().len(),
+                symmetry.pairs().len()
+            );
+            *s += &join(&mut symmetry.rows().iter().map(ToString::to_string));
+            s.push('\n');
+            *s += &join(&mut symmetry.columns().iter().map(|column| {
+                column.map_or_else(|| "-".to_owned(), |partner| partner.to_string())
+            }));
+            s.push('\n');
+            *s += &join(&mut symmetry.pairs().iter().map(|(leader, _)| leader.to_string()));
+            s.push('\n');
+        }
+        None => *s += "symmetry none\n",
+    }
 }
 
 /// [definition; agent-inferred, October 8] **The phase statistics as text**, every value exact and
@@ -10336,6 +10613,7 @@ fn read_law(lines: &mut std::str::Lines<'_>, map: ExactRatMatrix) -> Result<Norm
         _ => return refuse("the located pair"),
     };
     let phase = read_phase(lines, &map)?;
+    let symmetry = read_symmetry(lines, &map)?;
     // The scale founds the Gram off its support, the support is exactly the rows that leave
     // `2^k I` (as `GramBlock::of` reads it), and the scale bounds the chart's lattice from below.
     // A lawful prior never passes the carrier's residual shift (a move there holds), so no larger
@@ -10357,7 +10635,7 @@ fn read_law(lines: &mut std::str::Lines<'_>, map: ExactRatMatrix) -> Result<Norm
     }
     let gram_carry = carries.pop().expect("two carries");
     let map_carry = carries.pop().expect("two carries");
-    Ok(NormalLaw {
+    let law = NormalLaw {
         map,
         carrier: crate::hnn::receiving::ReceivingCarrier::Anchor,
         gram,
@@ -10372,7 +10650,80 @@ fn read_law(lines: &mut std::str::Lines<'_>, map: ExactRatMatrix) -> Result<Norm
         gram_carry,
         located,
         phase,
-    })
+        symmetry,
+    };
+    // A saved paired law is admitted whole against its symmetry, never repaired.
+    if let Some(symmetry) = &law.symmetry
+        && law.admits_symmetry(symmetry).is_err()
+    {
+        return refuse("a saved paired law off its symmetry");
+    }
+    Ok(law)
+}
+
+/// **A paired port's symmetry read back** ([`write_law`]): `symmetry none`, or `symmetry m n p`
+/// with the lift's `m` gather rows on one line, the `n` columns' partners (`-` outside the family)
+/// on the next, and the `p` pairs' leaders on the third. Refused off its form, off the map's shape,
+/// or unless it is lawful ([`PortSymmetry::from_parts`]); the whole law is admitted against it after
+/// it is read ([`NormalLaw::admits_symmetry`]).
+fn read_symmetry(
+    lines: &mut std::str::Lines<'_>,
+    map: &ExactRatMatrix,
+) -> Result<Option<PortSymmetry>, HnnError> {
+    let shape = head(next(lines, "the symmetry")?, "symmetry", "the symmetry")?;
+    if let [none] = shape.as_slice()
+        && none == "none"
+    {
+        return Ok(None);
+    }
+    let [rows, columns, count] = shape.as_slice() else {
+        return refuse("the symmetry");
+    };
+    let size = |x: &String| {
+        x.parse::<usize>().map_err(|_| HnnError::ContinuingState {
+            what: "the symmetry's shape",
+        })
+    };
+    let (rows, columns, count) = (size(rows)?, size(columns)?, size(count)?);
+    if (rows, columns) != (map.rows(), map.columns()) {
+        return refuse("the symmetry's shape against its map");
+    }
+    let lifted: Vec<usize> = next(lines, "the symmetry's rows")?
+        .split_whitespace()
+        .map(|x| {
+            x.parse().map_err(|_| HnnError::ContinuingState {
+                what: "the symmetry's rows",
+            })
+        })
+        .collect::<Result<_, _>>()?;
+    let partners: Vec<Option<usize>> = next(lines, "the symmetry's columns")?
+        .split_whitespace()
+        .map(|x| {
+            if x == "-" {
+                Ok(None)
+            } else {
+                x.parse().map(Some).map_err(|_| HnnError::ContinuingState {
+                    what: "the symmetry's columns",
+                })
+            }
+        })
+        .collect::<Result<_, _>>()?;
+    let leaders: Vec<usize> = next(lines, "the symmetry's leaders")?
+        .split_whitespace()
+        .map(|x| {
+            x.parse().map_err(|_| HnnError::ContinuingState {
+                what: "the symmetry's leaders",
+            })
+        })
+        .collect::<Result<_, _>>()?;
+    if lifted.len() != rows || partners.len() != columns || leaders.len() != count {
+        return refuse("the symmetry's shape against its map");
+    }
+    let symmetry =
+        PortSymmetry::from_parts(lifted, partners, &leaders).ok_or(HnnError::ContinuingState {
+            what: "the symmetry (an involution of the rows, a fixed-point-free involution of the family and its pairs)",
+        })?;
+    Ok(Some(symmetry))
 }
 
 impl ConstitutionRead for Constitution {
@@ -10405,6 +10756,12 @@ impl ConstitutionRead for Constitution {
     }
     fn source_port(&self, ring: usize) -> Option<&ExactRatMatrix> {
         self.rings[ring].source.as_ref().map(NormalLaw::map)
+    }
+    fn source_symmetry(&self, ring: usize) -> Option<&PortSymmetry> {
+        self.rings
+            .get(ring)
+            .and_then(|material| material.source.as_ref())
+            .and_then(NormalLaw::symmetry)
     }
     fn transport(&self, ring: usize) -> Rat {
         self.rings[ring].transport.clone()

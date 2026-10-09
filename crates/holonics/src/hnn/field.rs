@@ -153,6 +153,11 @@ pub trait ConstitutionRead: Sync {
     fn slices(&self, ring: usize) -> &[(Vec<Rat>, Vec<Rat>)];
     /// The source port `E_g` (`2d_g × |A|`) on a source ring; `None` elsewhere.
     fn source_port(&self, ring: usize) -> Option<&ExactRatMatrix>;
+    /// The source port's paired symmetry (`hnn::paired`, "The paired deposit"), which completes its
+    /// founding prior (`hnn::constitution::founding_prior`); `None` unless the port is paired.
+    fn source_symmetry(&self, _ring: usize) -> Option<&crate::hnn::paired::PortSymmetry> {
+        None
+    }
     /// The factored pair port `E_g^(δ)` at a declared offset on a source ring; `None` elsewhere.
     fn pair_port(&self, ring: usize, offset: usize) -> Option<&PairPort>;
     /// The factor `c_a` (`k_a × m`) of the contact's storage `C_a = c_a c_aᵀ`.
@@ -250,6 +255,10 @@ pub trait FieldMaterial: Sync {
     fn slices(&self, ring: usize) -> &[(Vec<Rat>, Vec<Rat>)];
     /// The source port `E_g` on a source ring. ([`ConstitutionRead::source_port`])
     fn source_port(&self, ring: usize) -> Option<&ExactRatMatrix>;
+    /// The source port's paired symmetry. ([`ConstitutionRead::source_symmetry`])
+    fn source_symmetry(&self, _ring: usize) -> Option<&crate::hnn::paired::PortSymmetry> {
+        None
+    }
     /// The factored pair port at a declared offset. ([`ConstitutionRead::pair_port`])
     fn pair_port(&self, ring: usize, offset: usize) -> Option<&PairPort>;
     /// The contact storage factor `c_a`. ([`ConstitutionRead::contact_storage`])
@@ -290,6 +299,9 @@ impl<T: ConstitutionRead + ?Sized> FieldMaterial for T {
     }
     fn source_port(&self, ring: usize) -> Option<&ExactRatMatrix> {
         ConstitutionRead::source_port(self, ring)
+    }
+    fn source_symmetry(&self, ring: usize) -> Option<&crate::hnn::paired::PortSymmetry> {
+        ConstitutionRead::source_symmetry(self, ring)
     }
     fn pair_port(&self, ring: usize, offset: usize) -> Option<&PairPort> {
         ConstitutionRead::pair_port(self, ring, offset)

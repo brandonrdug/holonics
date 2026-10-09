@@ -2077,3 +2077,165 @@ fn the_paired_deposit_learns_both_strands_and_keeps_the_port_equivariant() {
     }
     assert!(deposits >= 1, "the first paired deposit on shared columns certifies");
 }
+
+/// [measured, October 9; helical step 3, loop 3; the module header, "Every route on a paired source
+/// law" and "One founding prior"] **A paired source law keeps its port on the subspace through every
+/// route.** On the real constitution founded with the paired source law ([`PairedCarrier::found`]):
+/// - the founding prior is one decoder: `founding_prior` completes the field's declared port by the
+///   law's symmetry to the carrier's prior, and the unpaired constitution reads the declared port;
+/// - the forward pair deposit alone, which took a plain port off its subspace (loop 1, the loop 2
+///   control), now keeps it there with the partner face exact, since the law projects its step;
+/// - the paired deposit closes both strands' slips, and the release's closed contacts, read through
+///   the founding prior, hold the located distance `1` and its dyad image's `3`; the field's declared
+///   port alone does not close the image's follower column;
+/// - general features (two phases' counts over the family, general covectors) deposited on the law:
+///   the successor's port is on the subspace, its chart commutes with `Σ` within the rule's target,
+///   and the same samples on a plain law leave the subspace;
+/// - a feature reaching a class outside the family is refused, typed;
+/// - a learned law is never re-founded, and a save restores the law with its symmetry, its founding
+///   prior and its closed contacts.
+#[test]
+fn a_paired_source_law_keeps_its_port_on_the_subspace_through_every_route() {
+    use crate::hnn::HnnError;
+    use crate::hnn::constitution::{
+        BudgetedCarry, ContinuingState, Locus, Sample, founding_prior,
+    };
+    use crate::hnn::executed::{pair_deposit, pair_slip};
+    use crate::hnn::prediction::closed_pairs;
+    let field = deposit_field();
+    let declared = PairingDeclaration::Family {
+        table: vec![(0, 1), (1, 0), (2, 3), (3, 2)],
+    };
+    let initial = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET).unwrap();
+    let (paired, carrier, prior) =
+        PairedCarrier::found(&field, initial.clone(), 0, &declared).unwrap();
+    let base = declared_source_port(&field, 0).unwrap().unwrap();
+    assert_eq!(founding_prior(&field, &paired, 0).unwrap(), Some(prior.clone()));
+    assert_eq!(founding_prior(&field, &initial, 0).unwrap(), Some(base.clone()));
+    let opening = vec![BigInt::from(4 + 1), BigInt::zero()];
+    let u = vec![2, 0, 1, 3, 3, 0, 2, 1, 0];
+    let strand = run(&field, 0, &opening, None, &u);
+    let exact = |constitution: &Constitution| {
+        carrier
+            .partner_face(&field, constitution, &strand.current, &strand.moment, 3)
+            .map(|face| face.is_exact())
+    };
+    assert_eq!(exact(&paired), Ok(true));
+
+    // The pair route.
+    let alternating: Vec<Vec<usize>> = [0usize, 2, 0]
+        .iter()
+        .map(|&start| (0..8).map(|k| if k % 2 == 0 { start } else { 2 - start }).collect())
+        .collect();
+    let located = located_over(&field, &alternating);
+    let (forward, deposit) = pair_deposit(&field, &paired, &prior, 0, &located).unwrap();
+    eprintln!(
+        "paired law, forward pair deposit: slip {} -> {}, step {}, consumer {}",
+        deposit.slip_before, deposit.slip_after, deposit.certificate.step, deposit.consumer
+    );
+    assert!(deposit.certificate.holds());
+    assert_eq!(exact(&forward), Ok(true));
+    let (learned, both) = carrier.deposit(&field, &paired, &prior, &located).unwrap();
+    eprintln!(
+        "paired law, paired deposit: slip {} -> {}, step {}, consumer {}",
+        both.slip_before, both.slip_after, both.certificate.step, both.consumer
+    );
+    assert!(both.consumer);
+    assert_eq!(exact(&learned), Ok(true));
+    let closed = closed_pairs(&field, &learned, 0).unwrap();
+    eprintln!("closed contacts through the founding prior: {closed:?}");
+    assert!(closed.contains(&1) && closed.contains(&3));
+    let port = ConstitutionRead::source_port(&learned, 0).unwrap();
+    assert!(pair_slip(&field, 0, port, &prior, 3, (1, 3)).unwrap().iter().all(Rat::is_zero));
+    let declared_read = pair_slip(&field, 0, port, &base, 3, (1, 3)).unwrap();
+    eprintln!("the image's slip read against the declared port alone: {declared_read:?}");
+    assert!(declared_read.iter().any(|x| !x.is_zero()));
+
+    // General features at the law.
+    let width = field.ring(0).width();
+    let samples = vec![
+        Sample {
+            weight: Rat::one(),
+            feature: vec![rat(1, 2), rat(1, 4), rat(1, 4), Rat::zero()],
+            covector: (0..width).map(|r| rat(r as i64 - 3, 4)).collect(),
+            masses: None,
+        },
+        Sample {
+            weight: Rat::one(),
+            feature: vec![Rat::zero(), rat(1, 3), Rat::zero(), rat(2, 3)],
+            covector: (0..width).map(|r| rat(1 - (r % 3) as i64, 2)).collect(),
+            masses: None,
+        },
+    ];
+    let rule = paired.chart_rule(Locus::SourcePort(0)).unwrap();
+    let lattice = paired.lattice(Locus::SourcePort(0)).unwrap();
+    let law = paired.source_law(0).unwrap();
+    let (next, reading) = law
+        .deposited(&samples, &Rat::one(), &rule, &mut BudgetedCarry::new(lattice, 1))
+        .unwrap();
+    let reading = reading.unwrap();
+    eprintln!(
+        "general features on the paired law: chart lattice {}, certificate {}, target {}",
+        reading.exponent, reading.certificate, reading.target
+    );
+    assert_eq!(carrier.certify(next.map()), Ok(()));
+    assert_ne!(next.map(), law.map());
+    assert!(reading.certificate <= rule.target());
+    let solved = next.solved();
+    let symmetry = carrier.symmetry();
+    for i in 0..solved.rows() {
+        for j in 0..solved.columns() {
+            assert_eq!(
+                solved.get(i, j).unwrap(),
+                solved.get(symmetry.column(i), symmetry.column(j)).unwrap()
+            );
+        }
+    }
+    let unpaired = initial.clone().with_ports(0, None, Some(prior.clone()), None).unwrap();
+    let (plain, _) = unpaired
+        .source_law(0)
+        .unwrap()
+        .deposited(&samples, &Rat::one(), &rule, &mut BudgetedCarry::new(lattice, 1))
+        .unwrap();
+    let left = carrier.certify(plain.map());
+    eprintln!("the same samples on a plain law: {left:?}");
+    assert!(matches!(left, Err(PairedDefect::Equivariance { .. })));
+
+    // A class outside the family.
+    let roles = PairingDeclaration::Roles {
+        first: vec![1],
+        second: vec![2],
+    };
+    let (partial, _, _) = PairedCarrier::found(&field, initial.clone(), 0, &roles).unwrap();
+    let outside = vec![Sample {
+        weight: Rat::one(),
+        feature: vec![Rat::one(), Rat::zero(), Rat::zero(), Rat::zero()],
+        covector: vec![Rat::one(); width],
+        masses: None,
+    }];
+    assert_eq!(
+        partial
+            .source_law(0)
+            .unwrap()
+            .deposited(&outside, &Rat::one(), &rule, &mut BudgetedCarry::new(lattice, 1)),
+        Err(HnnError::PairedOutside { class: 0 })
+    );
+
+    // Never re-founded, and saved whole.
+    assert!(matches!(
+        learned
+            .clone()
+            .with_symmetric_source(0, prior.clone(), carrier.symmetry()),
+        Err(HnnError::Unadmitted { .. })
+    ));
+    let state = learned.continuing_state(0).unwrap();
+    let read = ContinuingState::from_text(&state.to_text()).unwrap();
+    assert_eq!(read, state);
+    let restored = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET)
+        .unwrap()
+        .continued(&read)
+        .unwrap();
+    assert_eq!(restored, learned);
+    assert_eq!(founding_prior(&field, &restored, 0).unwrap(), Some(prior));
+    assert_eq!(closed_pairs(&field, &restored, 0).unwrap(), closed);
+}

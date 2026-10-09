@@ -1470,8 +1470,9 @@ const DERIVATIVE_BITS: u32 = 192;
 /// [record](../../../../research/records/2026-10-05_THE_RELEASE_READS_THE_LOCATED_PAIR_ON_EQUAL_MATERIAL.md)]
 /// **The pair contacts the source port holds closed**: the distances `δ ∈ [1, d)` of the receiving
 /// ring at which some pair contact `y → x` has zero slip, `P^δ B e_y − (E − B) e_x = 0` with
-/// `B e_y ≠ 0` (`hnn::executed::pair_slip`), `E` the material's source port and `B` the field's
-/// declared one (`hnn::constitution::declared_source_port`). It is the located pair's deposit read
+/// `B e_y ≠ 0` (`hnn::executed::pair_slip`), `E` the material's source port and `B` its founding
+/// prior (`hnn::constitution::founding_prior`: the field's declared port, completed on the paired
+/// subspace where the port is paired). It is the located pair's deposit read
 /// back from the material: the key's distance is read where its deposit left it, never declared by
 /// the caller, and a port that carries no located pair (every opening) closes none. Only the
 /// distance is read: which class follows which stays in `E`'s columns, where the bank's reading of
@@ -1482,7 +1483,7 @@ pub fn closed_pairs(
     material: &impl FieldMaterial,
     ring: usize,
 ) -> Result<Vec<usize>, HnnError> {
-    let Some(prior) = crate::hnn::constitution::declared_source_port(field, ring)? else {
+    let Some(prior) = crate::hnn::constitution::founding_prior(field, material, ring)? else {
         return Ok(Vec::new());
     };
     let port = material

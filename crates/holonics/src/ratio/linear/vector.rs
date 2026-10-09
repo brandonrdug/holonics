@@ -98,6 +98,29 @@ impl IntegralMatrix {
         })
     }
 
+    /// [definition; agent-inferred, October 9] **The projection onto a paired port's subspace**
+    /// (`hnn::paired`, "The paired deposit"): `½(M e_a + B M e_(σa))` on each column `a` of the
+    /// family, with `(B v)[j] = v[rows[j]]`, and the columns outside the family unchanged, over twice
+    /// the denominator. `rows` has the matrix's rows and `columns` its columns.
+    pub(crate) fn projected(&self, rows: &[usize], columns: &[Option<usize>]) -> Self {
+        let mut numerators = vec![BigInt::zero(); self.rows * self.columns];
+        for (j, &lifted) in rows.iter().enumerate().take(self.rows) {
+            for (a, partner) in columns.iter().enumerate().take(self.columns) {
+                let own = &self.numerators[j * self.columns + a];
+                numerators[j * self.columns + a] = match partner {
+                    Some(partner) => own + &self.numerators[lifted * self.columns + partner],
+                    None => own << 1usize,
+                };
+            }
+        }
+        Self {
+            rows: self.rows,
+            columns: self.columns,
+            numerators,
+            denominator: &self.denominator << 1usize,
+        }
+    }
+
     /// **`M v`** for `v` in the integral chart, in the integral chart: `N v / (D · d_v)`.
     pub(crate) fn apply(&self, (values, denominator): &Chart) -> Chart {
         let sums = (0..self.rows)
