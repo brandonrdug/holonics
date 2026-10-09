@@ -326,6 +326,41 @@ Its second part states the perfected laws:
    located slips, released and held families, absorbed and residual coordinated substitutions
    against truth, and CRT recovery.
 
+   **Step 2: the partner face on the HNN carrier** (`agent-inferred` design, read from a source
+   survey of `f034a7225`, for review before any build). The HNN carries no dyad. Its ring reflector
+   `F_g` is a port involution, checked only for `F_g² = 1` (`hnn/field.rs:730`) and read only as the
+   Bombe stage `ρ⁻ᵐFρᵐ`. Every declaration in the repository is `p ↦ −p`. That satisfies the
+   dihedral relation by arithmetic but is never required to, and it fixes port 0. The missing
+   terms, each with its equation:
+   1. the carrier lift of `F_g`: `(B_g v)[2F_g(i)+r] = v[2i+r]`, an involution because `F_g² = 1`;
+   2. the dihedral relation `F_g(F_g(i)+1) = i−1`, so that `B_g P_g B_g = P_g⁻¹`;
+   3. a fixed-point-free class involution `σ` declared on the field (the default `F_g` fixes port
+      0 and cannot serve);
+   4. the source port's equivariance, `B_g E_g = E_g Σ_σ`. The founded sign matrix `E_0` does not
+      have it;
+   5. the tick: a uniform tick, or `A∘σ = A` on the located route, with no pair ports or a
+      pair-port reversal law;
+   6. a located moment chart, `T_t = P^t ⊗ 1` for `t ∈ 0..=d_g`, which is closed under the dyad,
+      `B T_t B = T_{d_g−t}`. Today `PassageChart::moment` admits only `t ≤ 2`;
+   7. the Lean bridge `moment l = U^{n−1}·strandFace U⁻¹ (I∘E) l`, and the partner law at the
+      consumer.
+
+   **Dissipation makes the partner informative** (`proved-derived`, owed in Lean). The general law
+   needs no unitarity. Write `V = B U B`. The recurrence face `moment_U(w) = Σ_k U^{n−1−k} E(w_k)`
+   then gives `moment_U(σ̄u) = Σ_j U^j B E(u_j) = B Σ_j V^j E(u_j)`.
+   - For a conservative ring, `U` orthogonal, `V = U⁻¹` and the partner's face is
+     `B U^{−(n−1)} moment_U(u)`. It is a fixed transform of the strand's face: redundant, a pure
+     check.
+   - The HNN's founded rings are damped, `U = ρP` with `ρ < 1`, and there `V = ρP⁻¹ = Uᵀ`. The
+     partner's face is `B Σ_j (Uᵀ)^j E(u_j)`: the strand read through the adjoint, in forward
+     order. It weights the oldest letters most, where the strand's own face weights the newest
+     most. For `n ≥ 2` and an encoder whose images span the carrier, no fixed map recovers it from
+     the strand's face, because the weights `ρ^{2k−(n−1)}` differ position by position.
+   - So a duplex on a dissipative carrier holds both fading directions: the forward face and the
+     adjoint, backward face, which is the shape of the learning covector's return. The
+     antiparallel strand is the adjoint passage exactly when the transport dissipates; on a
+     conservative carrier it is the inverse passage, and redundant.
+
    **Deferred to later steps, named.**
    - Step 2: the partner's face on the HNN carrier, `m(σ̄u) = B U⁻⁽ⁿ⁻¹⁾ m(u)`, which needs a
      located moment chart (`PassageChart::moment` admits ticks 0 to 2 only).
