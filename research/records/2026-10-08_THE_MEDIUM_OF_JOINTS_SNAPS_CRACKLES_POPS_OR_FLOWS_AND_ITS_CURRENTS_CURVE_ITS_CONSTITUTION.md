@@ -159,10 +159,24 @@ landing.** A read-only analysis of the owners corrects the lens's first reading:
     - the existing checks on committed storage.
   - A minimum with today's bound is lawful only once the new bound is itself proved.
 
+[measured; read from the queue receipt `continuation-v116`'s exact readings of 0279] **The exact
+threshold.** The earlier thresholds of `2^22` for C and `2^20` for K and D were lower bounds, and
+the receipt's readings give the exact one:
+- the final steps are `η = 2^-33` (C) and `2^-31` (K, D);
+- `κ²b` lies in `[2^25, 2^26)` (C) and `[2^21, 2^22)` (K, D);
+- `κ²` is common to all three families and lies in `[2^26, 2^27)`. One tick's span bound `1 + γ[1]`
+  carries about `2^20` of it, an inferred reading;
+- every family's largest move reaches the half-unit `2^-16` first at `η = 2^-10`, a growth of `2^23`
+  for C and `2^21` for K and D;
+- under an own-certificate L1′ with `s = ½` and `ε_ray = 0`, that step is admitted exactly when
+  `|A d_f|² ≤ T_f = 2^11·a_f`, with `T_C` in `[2^3, 2^4)` and `T_K`, `T_D` in `[2^2, 2^3)`. The needed ratio `κ²b/T_f`
+  lies in `[2^21, 2^22)` (C), `[2^18, 2^19)` (K) and `[2^19, 2^20)` (D);
+- jointly, `|A(d_C + d_K + d_D)|² ≤ 2^11·Σ_f a_f`, which lies in `[2^4, 2^5)`.
+
 The deciding measurement reports the ratio's numerator `κ² b` and denominator `|A d|²` separately,
-per family, on 0279's own operands. `|A d| = 0` is a kernel or singularity case, not a favourable
-quotient. The measurement decides only whether the uniform certificate could be loose: at least
-`2^22` for `C` (`2^20` for `K` and `D`) makes L1′ worth certifying. It establishes neither
+per family, on 0279's own operands, together with `T_f`. `|A d| = 0` is a kernel or singularity case, not a favourable
+quotient. The measurement decides only whether the uniform certificate could be loose:
+`|A d_f|² ≤ T_f` makes L1′ worth certifying. It establishes neither
 finite-change admission nor grain selection. Crackling waits on a certified landing: no threshold
 law can release joints that the certificate keeps pinned below their cells.
 
