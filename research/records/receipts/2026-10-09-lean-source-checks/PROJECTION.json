@@ -1,5 +1,37 @@
 {
   "files": {
+    "geometry-f19f84d8-native-v1/HANDOFF.md": {
+      "original": {
+        "bytes": 952,
+        "sha256": "62fb3b408d5917159e26abaa95c001072afe6525dba13968cb24b619ebe2afe2"
+      },
+      "projected": {
+        "bytes": 952,
+        "sha256": "62fb3b408d5917159e26abaa95c001072afe6525dba13968cb24b619ebe2afe2"
+      },
+      "replaced": {
+        "<geometry-worktree>": 0,
+        "<geometry-native>": 0,
+        "<lean-toolchain>/": 0,
+        "<home>": 0
+      }
+    },
+    "geometry-f19f84d8-native-v1/VALIDATION.json": {
+      "original": {
+        "bytes": 14676,
+        "sha256": "1c3a4dbc26a6aec62ef0e22f96aceaeebaa4cbc1f4ae9389dddaaf64079eea04"
+      },
+      "projected": {
+        "bytes": 13904,
+        "sha256": "085fc73803169a5ddcc4dcb00d5c84f55d3bbeaf74f63bbc30aa3a418e8f6c97"
+      },
+      "replaced": {
+        "<geometry-worktree>": 5,
+        "<geometry-native>": 9,
+        "<lean-toolchain>/": 3,
+        "<home>": 0
+      }
+    },
     "modular-native-v1/HANDOFF.md": {
       "original": {
         "bytes": 1404,
@@ -194,6 +226,8 @@
     }
   },
   "placeholders": {
+    "<geometry-native>": "the absolute host directory of the geometry check's private native receipts (raw stdout/stderr, requests, objects); the path that follows is kept",
+    "<geometry-worktree>": "the absolute host directory of the geometry records lane's git worktree, where the check ran; the path that follows is kept",
     "<home>": "the host user's home directory, as the check's environment declared it (HOME)",
     "<lean-toolchain>/": "the absolute host directory of the Lean 4.33.0 toolchain the check invoked; the path that follows is kept",
     "<modular-worktree>/": "the absolute host directory of the modular scattering lane's git worktree, where the check ran from its lean/ directory; the path that follows is kept",

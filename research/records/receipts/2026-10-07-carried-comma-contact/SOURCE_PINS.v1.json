@@ -1,0 +1,327 @@
+{
+  "grade": "source-bound derived identities; no new native or kernel acceptance",
+  "geometry_code_commit": "aeacc12a219324a180dd4e388632536c1097036d",
+  "integration_pre_note_head": "6d976bbc4458e4a8993149c008e920985df36102",
+  "hnn_head": "1bd596a80084c9c6a90e5d9ce0171cd5fb99b12c",
+  "root_head_at_read": "b34c87770272ab8688bc59605c690b47fe996428",
+  "sources": [
+    {
+      "role": "hnn",
+      "path": "<repository>/.local/wt/hnn-source-observer-01a1030c/crates/holonics/src/hnn/ratio.rs",
+      "repository_path": "crates/holonics/src/hnn/ratio.rs",
+      "bytes": 22152,
+      "sha256": "4b223f2a9bae7b70291ed62ce026a5f6ca521df0b4d87be3769c26a32f91030c",
+      "locations": {
+        "pub struct PhaseRatio": [
+          314
+        ],
+        "pub fn compare_partition": [
+          362
+        ],
+        "pub fn covector": [
+          467
+        ]
+      }
+    },
+    {
+      "role": "hnn",
+      "path": "<repository>/.local/wt/hnn-source-observer-01a1030c/crates/holonics/src/hnn/field.rs",
+      "repository_path": "crates/holonics/src/hnn/field.rs",
+      "bytes": 118386,
+      "sha256": "d6c8d1a04c29862920617ff95c02b50bae40e4120c171dce19aac5b297ada2f7",
+      "locations": {
+        "pub fn point": [
+          851
+        ],
+        "fn split": [
+          864
+        ],
+        "pub fn rotate": [
+          901
+        ]
+      }
+    },
+    {
+      "role": "hnn",
+      "path": "<repository>/.local/wt/hnn-source-observer-01a1030c/crates/holonics/src/hnn/word/continuation.rs",
+      "repository_path": "crates/holonics/src/hnn/word/continuation.rs",
+      "bytes": 18198,
+      "sha256": "cb96ea4f09a24ca57e26cfd95436c69752670dacf9afb1450546e9b7d09d8092",
+      "locations": {
+        "pub fn compare_contact_storage": [
+          83
+        ],
+        "pub(crate) fn return_contact": [
+          162
+        ],
+        "pub fn continue_deposited": [
+          255
+        ]
+      }
+    },
+    {
+      "role": "hnn",
+      "path": "<repository>/.local/wt/hnn-source-observer-01a1030c/crates/holonics/src/hnn/word.rs",
+      "repository_path": "crates/holonics/src/hnn/word.rs",
+      "bytes": 146260,
+      "sha256": "cee1db82700ed5e47bd686dc8a48e5eb50ea8316c3af21b081faeda8e5258bad",
+      "locations": {
+        "fn held_rate": [
+          412
+        ],
+        "pub fn held": [
+          1078
+        ],
+        "pub fn reception_end": [
+          2373
+        ],
+        "pub fn balances": [
+          2413
+        ],
+        "pub fn anchor": [
+          2419
+        ]
+      }
+    },
+    {
+      "role": "hnn",
+      "path": "<repository>/.local/wt/hnn-source-observer-01a1030c/crates/holonics/src/hnn/propagation.rs",
+      "repository_path": "crates/holonics/src/hnn/propagation.rs",
+      "bytes": 66089,
+      "sha256": "5784d92fa12cb7c70db3bda0dc5576cb96bf2e83e919e2d25bf5c59884b99a07",
+      "locations": {
+        "pub fn contact_operator": [
+          391
+        ],
+        "pub struct TickBalance": [
+          1519
+        ]
+      }
+    },
+    {
+      "role": "hnn",
+      "path": "<repository>/.local/wt/hnn-source-observer-01a1030c/crates/holonics/src/hnn/ring.rs",
+      "repository_path": "crates/holonics/src/hnn/ring.rs",
+      "bytes": 175213,
+      "sha256": "5e7263b121ab508923eaba7afbbea532490e357da92abfc4b313c874f157d234",
+      "locations": {
+        "pub fn pumped_stiffness": [
+          942
+        ],
+        "pub fn energy": [
+          977
+        ],
+        "pub struct Floquet": [
+          1769,
+          2420,
+          2507
+        ]
+      }
+    },
+    {
+      "role": "hnn",
+      "path": "<repository>/.local/wt/hnn-source-observer-01a1030c/crates/holonics/src/hnn/retention.rs",
+      "repository_path": "crates/holonics/src/hnn/retention.rs",
+      "bytes": 30391,
+      "sha256": "287e881f98cf9d05969b2f0f3969bb7084320b873761c9d790dd04855b69a118",
+      "locations": {
+        "pub fn of": [
+          169
+        ],
+        "pub fn opened": [
+          189
+        ],
+        "pub fn continuing": [
+          203
+        ]
+      }
+    },
+    {
+      "role": "geometry",
+      "path": "<repository>/.local/wt/geometry-integration-01a10f3d/lean/Holonics/Geometry/FrameTransport.lean",
+      "repository_path": "lean/Holonics/Geometry/FrameTransport.lean",
+      "bytes": 42269,
+      "sha256": "9364dd0eff13d68cfdde97683a7b6c5084b0f2e1163dc44ad752aea5c71faa41",
+      "locations": {
+        "theorem tube_sweep_actual_volume": [
+          367
+        ],
+        "theorem egg_jacobian_hasDerivAt": [
+          531
+        ],
+        "theorem egg_relative_current_section_flux": [
+          568
+        ]
+      }
+    },
+    {
+      "role": "geometry",
+      "path": "<repository>/.local/wt/geometry-integration-01a10f3d/lean/Holonics/Geometry/Motion.lean",
+      "repository_path": "lean/Holonics/Geometry/Motion.lean",
+      "bytes": 56875,
+      "sha256": "0be5b5b2b2aa729a73a8530f3a751d0015a6735f34f23e1667faa8fe34e9e85e",
+      "locations": {
+        "theorem energy_rate_moving_metric": [
+          920,
+          941
+        ],
+        "theorem finite_work_form_rechart_defect": [
+          967
+        ]
+      }
+    },
+    {
+      "role": "recovered",
+      "path": "<repository>/.local/wt/geometry-integration-01a10f3d/lean/HolonicsResearch/Mathematics/Comma.lean",
+      "repository_path": "lean/HolonicsResearch/Mathematics/Comma.lean",
+      "bytes": 3436,
+      "sha256": "f819b0df1e428233f6fc0d5c2f379d02763700f4544ed74884199b02a3dc513a",
+      "locations": {
+        "theorem three_pow_ne_two_pow": [
+          33
+        ],
+        "theorem pythagorean_comma": [
+          55
+        ]
+      }
+    },
+    {
+      "role": "recovered",
+      "path": "<repository>/.local/wt/geometry-integration-01a10f3d/lean/HolonicsResearch/Geometry/TurnBoostNormality.lean",
+      "repository_path": "lean/HolonicsResearch/Geometry/TurnBoostNormality.lean",
+      "bytes": 3355,
+      "sha256": "2636207133434c724e1aba241a9325f488f3ceb4f183008fbb9dd29953c55ccb",
+      "locations": {
+        "theorem commutator_adjointIn": [
+          44
+        ]
+      }
+    },
+    {
+      "role": "recovered",
+      "path": "<repository>/.local/wt/geometry-integration-01a10f3d/research/records/2026-10-05_THE_GHOST_LIVES_IN_THE_GAP_THE_JOINTS_OF_THE_LENS.md",
+      "repository_path": "research/records/2026-10-05_THE_GHOST_LIVES_IN_THE_GAP_THE_JOINTS_OF_THE_LENS.md",
+      "bytes": 24071,
+      "sha256": "9e52b4e64166668a683080f931ba04ba597caf877212f58361ac5441beb727d4",
+      "locations": {
+        "### J3.": [
+          115
+        ],
+        "### J4.": [
+          148
+        ],
+        "### J6.": [
+          181
+        ]
+      }
+    },
+    {
+      "role": "recovered",
+      "path": "<repository>/research/records/2026-09-12_PERIPLUS_REBASE_AND_TEMPORAL_RESIDUES_JOIN_GAMMA_ZETA_AND_HODGE.md",
+      "repository_path": "research/records/2026-09-12_PERIPLUS_REBASE_AND_TEMPORAL_RESIDUES_JOIN_GAMMA_ZETA_AND_HODGE.md",
+      "bytes": 22529,
+      "sha256": "ceba53f671680b94ed345aec4400fb73917a086115e899433e7eee650e7c449d",
+      "locations": {
+        "## 2.": [
+          57
+        ],
+        "## 3.": [
+          78
+        ]
+      }
+    },
+    {
+      "role": "existing-consumer",
+      "path": "<repository>/lean/Holonics/Transport/SituatedReturnedDifference.lean",
+      "repository_path": "lean/Holonics/Transport/SituatedReturnedDifference.lean",
+      "bytes": 3087,
+      "sha256": "a8d1d4a933eae5f2ea504fac1cb8712eea4c8746da20309f3589205ac7d4f2e4",
+      "locations": {
+        "theorem dependentReturnedDifference_rebase": [
+          54
+        ]
+      }
+    },
+    {
+      "role": "existing-consumer",
+      "path": "<repository>/lean/Holonics/Transport/AddressedLinearizedPassage.lean",
+      "repository_path": "lean/Holonics/Transport/AddressedLinearizedPassage.lean",
+      "bytes": 4926,
+      "sha256": "5d86a65e6de31b066919ae898e40e4fc203dcc78981d69f0cab269b3cd22fe60",
+      "locations": {
+        "theorem addressedTwoStep_adjoint_reverseOrder": [
+          56
+        ]
+      }
+    },
+    {
+      "role": "existing-consumer",
+      "path": "<repository>/lean/Holonics/Transport/ChangingReceiver.lean",
+      "repository_path": "lean/Holonics/Transport/ChangingReceiver.lean",
+      "bytes": 12889,
+      "sha256": "076349edd4c133d8b48aab35398a8ff74fc183afa5c8c18997eeec217f5b0483",
+      "locations": {
+        "theorem actual_moving_chart_clock_action": [
+          68
+        ]
+      }
+    },
+    {
+      "role": "existing-consumer",
+      "path": "<repository>/lean/Holonics/Physics/TemporalHodgeResidue.lean",
+      "repository_path": "lean/Holonics/Physics/TemporalHodgeResidue.lean",
+      "bytes": 8709,
+      "sha256": "0bbe6c79889c85332e73c0404f4a4737cc4663144a6c81d702d93daf639288cb",
+      "locations": {
+        "theorem laplacianDefect_eq_four_returns": [
+          129
+        ],
+        "theorem moving_heat_receiver_rate": [
+          179
+        ]
+      }
+    },
+    {
+      "role": "existing-consumer",
+      "path": "<repository>/lean/Holonics/Physics/FluidReceiverClosure.lean",
+      "repository_path": "lean/Holonics/Physics/FluidReceiverClosure.lean",
+      "bytes": 15012,
+      "sha256": "3d879a586306f75f0924731dda463229ea530862baf424badd07306ceacd0114",
+      "locations": {
+        "theorem moving_galerkin_receiver_equation": [
+          221
+        ]
+      }
+    },
+    {
+      "role": "rh-peer-source-only",
+      "path": "<repository>/.local/rh-20260930/comma-recursive-receiver-20261006/openai-math-source-audit-v1/ACTUAL_GAUSSIAN_RESIDUE_CURRENT_JOIN.v1.txt",
+      "repository_path": "ACTUAL_GAUSSIAN_RESIDUE_CURRENT_JOIN.v1.txt",
+      "bytes": 4535,
+      "sha256": "c85c598a16152abe942b30ec40ad730c5e8a2593fff11413cc2110f1646fdd48",
+      "locations": {
+        "f1/f0=": [
+          15
+        ],
+        "Obtaining the complete actual": [
+          37
+        ]
+      }
+    },
+    {
+      "role": "rh-peer-source-only",
+      "path": "<repository>/.local/rh-20260930/comma-recursive-receiver-20261006/openai-math-source-audit-v1/GAUSSIAN_ZERO_COMB_SOURCE_JOIN.v1.txt",
+      "repository_path": "GAUSSIAN_ZERO_COMB_SOURCE_JOIN.v1.txt",
+      "bytes": 6482,
+      "sha256": "f713ca76b247b09d4a1fb2c0f2d98d4a5f6ad48e7afc583c3256e04faf005986",
+      "locations": {
+        "Unresolved estimate": [
+          104
+        ],
+        "Native scope:": [
+          117
+        ]
+      }
+    }
+  ]
+}

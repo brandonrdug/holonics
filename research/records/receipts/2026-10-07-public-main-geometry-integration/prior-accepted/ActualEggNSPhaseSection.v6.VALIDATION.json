@@ -1,0 +1,967 @@
+{
+  "claims": {
+    "actual_source_aa0f_seven_unique_original_queries_standard_axioms_only": true,
+    "fresh_consumed_main_object_export_accepted": true,
+    "exact_audit_e904_seven_query_consumer_accepted": true,
+    "all5367modules_current_source_and_ordered_parts_sealed_for_audit": true,
+    "initial_combined_export_failed_memory_pressure_and_child_wall_preserved": true,
+    "ordinary_failed_combined_export_not_repeated_with_larger_bounds": true,
+    "successful_changed_output_partition_excludes_unconsumed_IDE_ilean": true,
+    "performance_causality_not_established_warm_backing_pages_and_instrumentation_differ": true,
+    "default_or_fullResearch_library_checked": false,
+    "no_Reynolds_Piola_moving_domain_integral_or_global_NS_claim": true
+  },
+  "stages": {
+    "geometry-ns-phase-namespace-preparation-20261006-v2": {
+      "accepted_stage": true,
+      "wall_ns": 8783872910,
+      "projection_ns": 12779337307,
+      "measured_to_projected_ratio": [
+        8783872910,
+        12779337307
+      ],
+      "aggregate_CPU_ns": 7451834000,
+      "group_peak_bytes": 840265728,
+      "quiescent_release": true,
+      "outer_error": null,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "child_RSS_KiB": 399948,
+      "aggregate_CPU_guard_triggered": false
+    },
+    "geometry-ns-phase-development-20261006-v1": {
+      "accepted_stage": false,
+      "wall_ns": 15371359169,
+      "projection_ns": 17209087555,
+      "measured_to_projected_ratio": [
+        15371359169,
+        17209087555
+      ],
+      "aggregate_CPU_ns": 6581787000,
+      "group_peak_bytes": 4294967296,
+      "quiescent_release": true,
+      "outer_error": null,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 3405,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "child_RSS_KiB": 2908036,
+      "aggregate_CPU_guard_triggered": false
+    },
+    "geometry-ns-phase-whole-cost-diagnostic-20261006-v1": {
+      "accepted_stage": true,
+      "wall_ns": 7936632285,
+      "projection_ns": 17209087555,
+      "measured_to_projected_ratio": [
+        7936632285,
+        17209087555
+      ],
+      "aggregate_CPU_ns": 5346267000,
+      "group_peak_bytes": 1508438016,
+      "quiescent_release": true,
+      "outer_error": null,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "child_RSS_KiB": 3801952,
+      "aggregate_CPU_guard_triggered": false
+    },
+    "geometry-ns-phase-core-object-export-20261006-v1": {
+      "accepted_stage": true,
+      "wall_ns": 5215650995,
+      "projection_ns": 17209087555,
+      "measured_to_projected_ratio": [
+        5215650995,
+        17209087555
+      ],
+      "aggregate_CPU_ns": 4514225000,
+      "group_peak_bytes": 644530176,
+      "quiescent_release": true,
+      "outer_error": null,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "child_RSS_KiB": 3854384,
+      "aggregate_CPU_guard_triggered": false
+    },
+    "geometry-ns-phase-audit-import-preparation-20261006-v1": {
+      "accepted_stage": true,
+      "wall_ns": 5309604274,
+      "projection_ns": 12779337307,
+      "measured_to_projected_ratio": [
+        5309604274,
+        12779337307
+      ],
+      "aggregate_CPU_ns": 4830820000,
+      "group_peak_bytes": 310464512,
+      "quiescent_release": true,
+      "outer_error": null,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "child_RSS_KiB": 207800,
+      "aggregate_CPU_guard_triggered": false
+    },
+    "geometry-ns-phase-audit-development-20261006-v1": {
+      "accepted_stage": true,
+      "wall_ns": 4369811472,
+      "projection_ns": 17209087555,
+      "measured_to_projected_ratio": [
+        4369811472,
+        17209087555
+      ],
+      "aggregate_CPU_ns": 3570124000,
+      "group_peak_bytes": 1087668224,
+      "quiescent_release": true,
+      "outer_error": null,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "child_RSS_KiB": 3794308,
+      "aggregate_CPU_guard_triggered": false
+    }
+  },
+  "artifacts": {
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-namespace-preparation-20261006-v2.config.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-namespace-preparation-20261006-v2.config.json",
+      "bytes": 6662,
+      "sha256": "ed92291b3d98907c5e9e05c06e126d069d825d22cd2e3d4ce5c951df57f2c0e5"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-namespace-preparation-20261006-v2.external-lease.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-namespace-preparation-20261006-v2.external-lease.json",
+      "bytes": 487,
+      "sha256": "2ac1d8ae271b269cb6c822429d688aff19ec19536d3933eaf36fc5156d0c99e6"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-namespace-preparation-20261006-v2.lease-identity.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-namespace-preparation-20261006-v2.lease-identity.json",
+      "bytes": 565,
+      "sha256": "a2b504ea514ca25cc4257f9cbe132cf59ce43716565f73a654b61c28e86c96a7"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-namespace-preparation-20261006-v2.input_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-namespace-preparation-20261006-v2.input_seal.json",
+      "bytes": 4967,
+      "sha256": "df313ef4574a052d4165f4c641921b58f44bd647287616d6f680f654502f0a81"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-namespace-preparation-20261006-v2.stdout": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-namespace-preparation-20261006-v2.stdout",
+      "bytes": 2160,
+      "sha256": "d9135d0e9c807cc70f8199a0973a01df4baf0a579e3d058f63c6848db082a44a"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-namespace-preparation-20261006-v2.stderr": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-namespace-preparation-20261006-v2.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-namespace-preparation-20261006-v2.memory-gate.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-namespace-preparation-20261006-v2.memory-gate.json",
+      "bytes": 119,
+      "sha256": "ec9852231fafc8b90ec03286dc2c701c14f10852d02ac97a7690abcaf822c7ad"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-namespace-preparation-20261006-v2.child-identity.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-namespace-preparation-20261006-v2.child-identity.json",
+      "bytes": 78,
+      "sha256": "34582dc3ca2f42ba349a9118fe288854e5a35aa603f38f812a5c1b8bf0cf1471"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-namespace-preparation-20261006-v2.system-floor.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-namespace-preparation-20261006-v2.system-floor.json",
+      "bytes": 65001,
+      "sha256": "077ad09a4b83a40868c85afe3d86d29d3255115e86e5411368975956a9e8bdfe"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-namespace-preparation-20261006-v2.quiescence.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-namespace-preparation-20261006-v2.quiescence.json",
+      "bytes": 130,
+      "sha256": "06010e50e8bdb745d18e16fc210e116bd4f2d565d271c11479f997cb8223cbe9"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-namespace-preparation-20261006-v2.output_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-namespace-preparation-20261006-v2.output_seal.json",
+      "bytes": 553957,
+      "sha256": "3b24cc07598abe06eb30ea0ba11641aeb89940bbeeb3c3a0ede6d27d33db72c9"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-namespace-preparation-20261006-v2.publication.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-namespace-preparation-20261006-v2.publication.json",
+      "bytes": 3280,
+      "sha256": "9e1cd6ccf816856b7d49f34e35cf652a832d5bd23206aa625f50e59bb9363922"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-namespace-preparation-20261006-v2.stage-quiescence.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-namespace-preparation-20261006-v2.stage-quiescence.json",
+      "bytes": 136,
+      "sha256": "905da1bbe7c31dfc1674eaef48bc518089da40d9c5530fe5d517ffe8e75a4a05"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-namespace-preparation-20261006-v2.final.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-namespace-preparation-20261006-v2.final.json",
+      "bytes": 4936,
+      "sha256": "3bf2dbcda5a7fbeca9795057f05bf477252f47a1313d1ace9bcba443a822a8bf"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-namespace-preparation-20261006-v2.unit-cleanup.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-namespace-preparation-20261006-v2.unit-cleanup.json",
+      "bytes": 729,
+      "sha256": "a59c54d53f8fc7586846c3a7bf881f8bc1f4b7f0ccad0fbfdb55cf7f2b0e3851"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-namespace-preparation-20261006-v2.acceptance.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-namespace-preparation-20261006-v2.acceptance.json",
+      "bytes": 378,
+      "sha256": "abc18cbd90c0a48fd83f30e108d9b2b0f3aea745575814695dfc7c0a7f155230"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-namespace-preparation-20261006-v2.release.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-namespace-preparation-20261006-v2.release.json",
+      "bytes": 175,
+      "sha256": "4830107308356bebae8877cdc177a647561e59cbfdc98f8975a53869aaee7c33"
+    },
+    "<repository>/.local/wt/swept-transport/.local/sweep-20261006/integration-v6/lean/ActualEggNSPhaseSection.lean": {
+      "copy": ".local/wt/swept-transport/.local/sweep-20261006/integration-v6/lean/ActualEggNSPhaseSection.lean",
+      "bytes": 11468,
+      "sha256": "aa0f0f4a02cc6245e4fe6c7de8fd4936fa5e7b61c4031df68f20eac9aacd7047"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/ns-coupled-complex-20261006/current-imports.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/ns-coupled-complex-20261006/current-imports.v1.json",
+      "bytes": 97797441,
+      "sha256": "2f88e3c19f7d7d6593ae99200a18677248dad8881a22c3a0ed6aa994525b0a43"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-20261006/current-imports.v5.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-integrated-frame-20261006/current-imports.v5.json",
+      "bytes": 88981637,
+      "sha256": "9082794aad15aa5a2e82fff2ce5344cab27da3adc79de30c5636ed86ed204b72"
+    },
+    "<repository>/.local/wt/swept-transport/.local/sweep-20261006/QUEUE_REQUEST.v6.json": {
+      "copy": ".local/wt/swept-transport/.local/sweep-20261006/QUEUE_REQUEST.v6.json",
+      "bytes": 39354,
+      "sha256": "0b54d4e726aa64e027f550643eebff4d7b68bb6521636d356d0da617a8523aec"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/PROVIDER_NAMESPACE.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/PROVIDER_NAMESPACE.v1.json",
+      "bytes": 258372,
+      "sha256": "8ad395ecc825a639ea23e92f1ef2150a770f703ba226bdf485fa3f08ab8b9dfa"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-20261006/TERMINAL_ACCEPTANCE.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-integrated-frame-20261006/TERMINAL_ACCEPTANCE.v1.json",
+      "bytes": 3424,
+      "sha256": "64bea963dd0a12228c93818620e8a285e1a10bb2f02cba26bc7ccbdc7db72a76"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/check_namespace_lookup_v1.py": {
+      "copy": ".local/lean-rust-pruning/admission-v1/check_namespace_lookup_v1.py",
+      "bytes": 886,
+      "sha256": "9210e5aa18f9daeb7ac8ced18e253f08805577119a5f2b5e211017d9a873679c"
+    },
+    "<repository>/.local/hodge-cut-cartier-20261003/runner-recovery-02/import_sealer.py": {
+      "copy": ".local/hodge-cut-cartier-20261003/runner-recovery-02/import_sealer.py",
+      "bytes": 13162,
+      "sha256": "b323b6177c66c48d27a6a39ae580220e0c908430d0bbfbc2c33aa6b5b48b36da"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/final_stage.py": {
+      "copy": ".local/lean-rust-pruning/admission-v1/final_stage.py",
+      "bytes": 10968,
+      "sha256": "a0a5a94f157acf9a5127b756a036c6e86449dc2012af0f1e71d34aafa13bc79e"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/leased_stage_v2.py": {
+      "copy": ".local/lean-rust-pruning/admission-v1/leased_stage_v2.py",
+      "bytes": 5520,
+      "sha256": "bcf91456534e763a025613f39e82853d7a58529b399bb183d544d09a7a42f949"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/bounded_stage_v1.py": {
+      "copy": ".local/lean-rust-pruning/admission-v1/bounded_stage_v1.py",
+      "bytes": 12645,
+      "sha256": "84b7d003089fa19881690e368200b2168b9d179c8e6573bdafab54369235cec2"
+    },
+    "/usr/bin/python3.14": {
+      "copy": "external/usr/bin/python3.14",
+      "bytes": 14424,
+      "sha256": "ac12d99c156d3c0ec708a2baf664d35b74f455572fe35fd57faa420ade5c3845"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/prepare_ns_namespace_v1.py": {
+      "copy": ".local/lean-rust-pruning/admission-v1/prepare_ns_namespace_v1.py",
+      "bytes": 10766,
+      "sha256": "85b5a0626525cf14d6dbf8ecf9098ee8804df8facf1cad8c5e2f8eeb36aeea7c"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/PREPARATION_REQUEST.v2.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/PREPARATION_REQUEST.v2.json",
+      "bytes": 4664,
+      "sha256": "816fedef1dbe5d00fb137531b53c28fcd1869d91994b8e8cde3a59cdfc3def11"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/current-imports.v2.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/current-imports.v2.json",
+      "bytes": 54749944,
+      "sha256": "e0ae81fa20e12685dd87b8c9a071d73bc3ec53e5c7a9145c3807428867406fe1"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/import-preparation.v2.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/import-preparation.v2.json",
+      "bytes": 1239,
+      "sha256": "650d712b187afd14ce6709be97620b42c5c10a557462b4fdb15d78d9c8ba5d3a"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-development-20261006-v1.config.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-development-20261006-v1.config.json",
+      "bytes": 11324,
+      "sha256": "371745de3a445cefe90de5eaebea5bc8ee541ea3bd7bfd50fc9ef66f0e5343b8"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-development-20261006-v1.external-lease.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-development-20261006-v1.external-lease.json",
+      "bytes": 487,
+      "sha256": "df5f87db883d80a4f5bb7adc832cc6d42b4e39b8ca4c7bad48843c8cae865965"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-development-20261006-v1.lease-identity.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-development-20261006-v1.lease-identity.json",
+      "bytes": 565,
+      "sha256": "0a686cb0b7c45edb4ad7322643e5564ba441d587f7a795c5d940dcd3fdf95eff"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-development-20261006-v1.input_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-development-20261006-v1.input_seal.json",
+      "bytes": 7173,
+      "sha256": "0ff1cc1ed2b4092b4e699408ab0473d04a8042ecd8c00214dd61f393b15f65b8"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-development-20261006-v1.stdout": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-development-20261006-v1.stdout",
+      "bytes": 521,
+      "sha256": "ed8cceed6aa81f58796c7b97f2c830a90126153dfb08e7ea8c738976556fc239"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-development-20261006-v1.stderr": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-development-20261006-v1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-development-20261006-v1.memory-gate.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-development-20261006-v1.memory-gate.json",
+      "bytes": 120,
+      "sha256": "70096e23e7a70bc8d0481e5801d001b7a1188fb7b56a8be66feb679d6fccaf81"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-development-20261006-v1.child-identity.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-development-20261006-v1.child-identity.json",
+      "bytes": 78,
+      "sha256": "57d7acfa7a40edc36403556fced238160d75577d01d09cb3da3db12be94f505a"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-development-20261006-v1.system-floor.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-development-20261006-v1.system-floor.json",
+      "bytes": 119761,
+      "sha256": "c90883ace8245e4851c5660e2933ea6084886b3595403c31eb6e12fb4157e669"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-development-20261006-v1.quiescence.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-development-20261006-v1.quiescence.json",
+      "bytes": 132,
+      "sha256": "c3eb8a3a9af3caf28e32ab9288bf2007cd964a200aba790c6947ffdbc7d3acbf"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-development-20261006-v1.output_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-development-20261006-v1.output_seal.json",
+      "bytes": 1024373,
+      "sha256": "51b193e43e63136509c44bff2f6408bc471a45ec55ffc22cf6828a7b20723a07"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-development-20261006-v1.failure.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-development-20261006-v1.failure.json",
+      "bytes": 243,
+      "sha256": "f2335c6b49d893d42bdff1f28c3885ad7d9b2911ac12a569466f06a684a9e0b0"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-development-20261006-v1.publication.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-development-20261006-v1.publication.json",
+      "bytes": 3596,
+      "sha256": "dd14686d0a92ee3a4653b977ce518f18ee2b70efd1fdd1c5270a69a7b0485bfa"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-development-20261006-v1.stage-quiescence.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-development-20261006-v1.stage-quiescence.json",
+      "bytes": 136,
+      "sha256": "0d42c68491b65b5aaaf457db70f9b1c0eba6ddee3d773ee93e73daa3edfad2aa"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-development-20261006-v1.final.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-development-20261006-v1.final.json",
+      "bytes": 5036,
+      "sha256": "e866ee017850a76c798535783bbfba32514abda4ca4a32bf5baffe671472ce44"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-development-20261006-v1.unit-cleanup.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-development-20261006-v1.unit-cleanup.json",
+      "bytes": 769,
+      "sha256": "376205977d2730d623276f3c35aa6f473ce48b76213ea0bd22af2514900bd1ae"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-development-20261006-v1.acceptance.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-development-20261006-v1.acceptance.json",
+      "bytes": 379,
+      "sha256": "a17a9ab2826758b23d7b5378e1643811ae131466e9ff25cd3d4789bbb46019bb"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-development-20261006-v1.release.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-development-20261006-v1.release.json",
+      "bytes": 175,
+      "sha256": "1ee28e6533652d53661af37d5dab1dbe1771a0737170545ca45bea991ec8d35b"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/COMPILER_REQUEST.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/COMPILER_REQUEST.v1.json",
+      "bytes": 3089,
+      "sha256": "87ff53c4112c5e1035694a5b7ff42580b9ffdd56f91cb84553e5d1600f486bdb"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/materialize_lean_compiler_v5.py": {
+      "copy": ".local/lean-rust-pruning/admission-v1/materialize_lean_compiler_v5.py",
+      "bytes": 5331,
+      "sha256": "de9a1a486638c317d68a9704af4c95384eae684e99845c4d15f4a5d5c43a25ca"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/lean_budget_v5.py": {
+      "copy": ".local/lean-rust-pruning/admission-v1/lean_budget_v5.py",
+      "bytes": 5550,
+      "sha256": "ad9ee8b7658a53011a020e159847ac9b23d4b491e3b262c2f49d23afa43b974e"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/COMPLETE_DEVELOPMENT_BUDGET.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/COMPLETE_DEVELOPMENT_BUDGET.v1.json",
+      "bytes": 60016,
+      "sha256": "94494bc537cd05aac98687a671ecfb9fbf8352efc5f58f17f9356a6bc9acba35"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/check_lean_owner_v3.py": {
+      "copy": ".local/lean-rust-pruning/admission-v1/check_lean_owner_v3.py",
+      "bytes": 2076,
+      "sha256": "3641003e780bc46c56ad88af15a38cf8164f895eecdf3f7301ed9c064cd8d843"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/verify_lean_metadata_v1.py": {
+      "copy": ".local/lean-rust-pruning/admission-v1/verify_lean_metadata_v1.py",
+      "bytes": 772,
+      "sha256": "cff6b3ce7c52698766dd59eb249c822960c36667c87d7e8e6cc6bae10c5d41ad"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/PHASE_COST_CATALOG.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/PHASE_COST_CATALOG.v1.json",
+      "bytes": 23045,
+      "sha256": "239f8764229dbfe50a0f1ce9a0f0bd8cc0705788e66ca62c1652eab695cac1d2"
+    },
+    "/usr/bin/env": {
+      "copy": "external/usr/bin/env",
+      "bytes": 72408,
+      "sha256": "795586b56f6da560c3cf4e25c1a6e4f274a8576906e88d94c207db7255b07163"
+    },
+    "/usr/bin/timeout": {
+      "copy": "external/usr/bin/timeout",
+      "bytes": 68320,
+      "sha256": "1425639cf3339b1117536df91cd4ba3229f8fa84e87322dee24e87121ed3feb3"
+    },
+    "<lean-toolchain>/bin/lean": {
+      "copy": "external<lean-toolchain>/bin/lean",
+      "bytes": 9024,
+      "sha256": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550"
+    },
+    "<lean-toolchain>/lib/lean/libleanshared_1.so": {
+      "copy": "external<lean-toolchain>/lib/lean/libleanshared_1.so",
+      "bytes": 6232,
+      "sha256": "2f96493ac9046f64ec7bcb78102a4c1e7cd9a7042487f246af45eda8a96667f5"
+    },
+    "<lean-toolchain>/lib/lean/libleanshared.so": {
+      "copy": "external<lean-toolchain>/lib/lean/libleanshared.so",
+      "bytes": 229196736,
+      "sha256": "f2a36d5e56b936afc07bdbea18542de0bce6a9977ebc325915272c300d992d42"
+    },
+    "<lean-toolchain>/lib/lean/libLake_shared.so": {
+      "copy": "external<lean-toolchain>/lib/lean/libLake_shared.so",
+      "bytes": 12311904,
+      "sha256": "feb2914d056638438613284b1f98278579ff8d8d99d0567e9823167806d150c0"
+    },
+    "<lean-toolchain>/lib/lean/libleanshared_2.so": {
+      "copy": "external<lean-toolchain>/lib/lean/libleanshared_2.so",
+      "bytes": 6232,
+      "sha256": "2f96493ac9046f64ec7bcb78102a4c1e7cd9a7042487f246af45eda8a96667f5"
+    },
+    "<lean-toolchain>/lib/lean/libInit_shared.so": {
+      "copy": "external<lean-toolchain>/lib/lean/libInit_shared.so",
+      "bytes": 6232,
+      "sha256": "2f96493ac9046f64ec7bcb78102a4c1e7cd9a7042487f246af45eda8a96667f5"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/objects-v1/ActualEggNSPhaseSection.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/objects-v1/ActualEggNSPhaseSection.olean",
+      "bytes": 704816,
+      "sha256": "5ba450b57e3cd7117780715b6048ca20d197d984b0ead1af9ec8f01133bffc1d"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/objects-v1/ActualEggNSPhaseSection.ilean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/objects-v1/ActualEggNSPhaseSection.ilean",
+      "bytes": 33663,
+      "sha256": "39ba26b6723efed97b7180bfbd9b7218e204e0625b75f8b1b10371e803e72dda"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/compiler.v1.stdout": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/compiler.v1.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/compiler.v1.stderr": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/compiler.v1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/KERNEL_VALIDATION.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/KERNEL_VALIDATION.v1.json",
+      "bytes": 237,
+      "sha256": "b69b1718a5b38478ca334988fd9c045cea29d3318155c7d0e8b7a6e74a4c0863"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-whole-cost-diagnostic-20261006-v1.config.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-whole-cost-diagnostic-20261006-v1.config.json",
+      "bytes": 12520,
+      "sha256": "846bab911b94345c8108b5b0954330163deca2536536159f6ef61fee31a5a22a"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-whole-cost-diagnostic-20261006-v1.external-lease.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-whole-cost-diagnostic-20261006-v1.external-lease.json",
+      "bytes": 487,
+      "sha256": "e6aebb259b35b7e35f30c723ab12522f88416623d21ae5f8bd7141b60ad3177e"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-whole-cost-diagnostic-20261006-v1.lease-identity.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-whole-cost-diagnostic-20261006-v1.lease-identity.json",
+      "bytes": 565,
+      "sha256": "b5e7ccfe980e67a43775ba74ec7db642a68635357627f235ca4876762e5980fb"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-whole-cost-diagnostic-20261006-v1.input_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-whole-cost-diagnostic-20261006-v1.input_seal.json",
+      "bytes": 7991,
+      "sha256": "1a03d3731239e44afe8c7b2a9fd4e235a8ca99cd07114f777c8dbcf8923fdb59"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-whole-cost-diagnostic-20261006-v1.stdout": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-whole-cost-diagnostic-20261006-v1.stdout",
+      "bytes": 412437,
+      "sha256": "a9128ec7ae6ded38cc0236eb38365e3c2f3fe46f6a3691d576fd2cd7fe2691e3"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-whole-cost-diagnostic-20261006-v1.stderr": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-whole-cost-diagnostic-20261006-v1.stderr",
+      "bytes": 1091134,
+      "sha256": "32c8d10f98e2b06ba698b350e26c9e5531c838dc3165e3bed2ded33b1103d19c"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-whole-cost-diagnostic-20261006-v1.memory-gate.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-whole-cost-diagnostic-20261006-v1.memory-gate.json",
+      "bytes": 120,
+      "sha256": "60e8f74882526d1016d3028b87b610966ad3bdda34d2090a8655f64f1853260b"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-whole-cost-diagnostic-20261006-v1.child-identity.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-whole-cost-diagnostic-20261006-v1.child-identity.json",
+      "bytes": 78,
+      "sha256": "5ff5d7686dea7ca001069da5e66f3d70f659f53a0baeb8bdc5dad6c2a29f63a4"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-whole-cost-diagnostic-20261006-v1.system-floor.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-whole-cost-diagnostic-20261006-v1.system-floor.json",
+      "bytes": 59485,
+      "sha256": "2c4275b32082c0c6279c943716f25d7bb5167998397846eff694d5fd2400db5c"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-whole-cost-diagnostic-20261006-v1.quiescence.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-whole-cost-diagnostic-20261006-v1.quiescence.json",
+      "bytes": 130,
+      "sha256": "a7e9d8c04c426c9615e988b47a5cd0bb4603442e569ecb60795bf560defc9561"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-whole-cost-diagnostic-20261006-v1.output_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-whole-cost-diagnostic-20261006-v1.output_seal.json",
+      "bytes": 509371,
+      "sha256": "d5baf325dc00485e364036c1ca5c1c57c16c5b85a988516bf4b048db8bba6f67"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-whole-cost-diagnostic-20261006-v1.publication.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-whole-cost-diagnostic-20261006-v1.publication.json",
+      "bytes": 3533,
+      "sha256": "c257728945fd2d3ff6db30efc533ccbf1025d6027e8df00d06abf85655133ed4"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-whole-cost-diagnostic-20261006-v1.stage-quiescence.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-whole-cost-diagnostic-20261006-v1.stage-quiescence.json",
+      "bytes": 136,
+      "sha256": "c3d190b2ea0d2fc7fcacff6df47e6a71c8a64d6ed82b09ecd6b56dcdb7bdb256"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-whole-cost-diagnostic-20261006-v1.final.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-whole-cost-diagnostic-20261006-v1.final.json",
+      "bytes": 4947,
+      "sha256": "ea168561e1e87359d110b4d80cc1469c87e9d95b92c6fc524bf7c3c881d224f5"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-whole-cost-diagnostic-20261006-v1.unit-cleanup.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-whole-cost-diagnostic-20261006-v1.unit-cleanup.json",
+      "bytes": 729,
+      "sha256": "7356f96ce21d3e27dc0046e096479f025237342415634500bd65bc7c0680291a"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-whole-cost-diagnostic-20261006-v1.acceptance.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-whole-cost-diagnostic-20261006-v1.acceptance.json",
+      "bytes": 378,
+      "sha256": "7b08ed1734ef5592284008468b9d501fcb3d8249cb14b440820b66b5cb19e166"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-whole-cost-diagnostic-20261006-v1.release.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-whole-cost-diagnostic-20261006-v1.release.json",
+      "bytes": 175,
+      "sha256": "7a33bb3c9eaf4923c93b1bd9dee6912265782035438601491f44809e5992382f"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/WHOLE_COST_DIAGNOSTIC_REQUEST.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/WHOLE_COST_DIAGNOSTIC_REQUEST.v1.json",
+      "bytes": 3195,
+      "sha256": "976bc882114408013a17b7492ca9d6b351b62be24ad20baf0d7570e480fee0be"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/whole-cost.v1.stdout": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/whole-cost.v1.stdout",
+      "bytes": 411090,
+      "sha256": "0da2cc2ec260a6eac94e588cdf464569d32b3d2a3f060922548c86eb9bbdc350"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/whole-cost.v1.stderr": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/whole-cost.v1.stderr",
+      "bytes": 1091134,
+      "sha256": "32c8d10f98e2b06ba698b350e26c9e5531c838dc3165e3bed2ded33b1103d19c"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/whole-cost.v1.kernel-observation.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/whole-cost.v1.kernel-observation.json",
+      "bytes": 1266,
+      "sha256": "d38df2c559c497155b7bfd8d8db4b89fd963ecf730bd1587198eeef2b77447c6"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-core-object-export-20261006-v1.config.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-core-object-export-20261006-v1.config.json",
+      "bytes": 13620,
+      "sha256": "c4d612d6b6b8a203cb0ff0c64905381ade9f1a26574ccc75f16f930a60684460"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-core-object-export-20261006-v1.external-lease.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-core-object-export-20261006-v1.external-lease.json",
+      "bytes": 487,
+      "sha256": "3c231546b65a1f4d8c636bc962b91d82cd85c375074b20549ff69dfd30f99938"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-core-object-export-20261006-v1.lease-identity.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-core-object-export-20261006-v1.lease-identity.json",
+      "bytes": 565,
+      "sha256": "eace707018c9c19f0bbf14455a65d60a768ff3aa5495e400a503819eea57850d"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-core-object-export-20261006-v1.input_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-core-object-export-20261006-v1.input_seal.json",
+      "bytes": 8537,
+      "sha256": "a6764c5408e270ddb3e2154bc7e2d8b797e79394e9cb17ee900c3793977d4b75"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-core-object-export-20261006-v1.stdout": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-core-object-export-20261006-v1.stdout",
+      "bytes": 3173,
+      "sha256": "b5fcda573d71aff2c86235a67ca39c41b3c3696e432f1ec2cf6f3264d0f756a5"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-core-object-export-20261006-v1.stderr": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-core-object-export-20261006-v1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-core-object-export-20261006-v1.memory-gate.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-core-object-export-20261006-v1.memory-gate.json",
+      "bytes": 120,
+      "sha256": "dc9ec20ef257fb34e0cd5d0385f0cfc92c49ba7617f26e95c0efa06ca28a239d"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-core-object-export-20261006-v1.child-identity.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-core-object-export-20261006-v1.child-identity.json",
+      "bytes": 78,
+      "sha256": "c147a196d14f17a4c01fb63887babbba6d9a8763b592c49135e9d5e6a74f7092"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-core-object-export-20261006-v1.system-floor.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-core-object-export-20261006-v1.system-floor.json",
+      "bytes": 37477,
+      "sha256": "1f20c7cd676012dc3ebcb01afe6abf6491c71aa623df78f8fdd830de5c3ec012"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-core-object-export-20261006-v1.quiescence.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-core-object-export-20261006-v1.quiescence.json",
+      "bytes": 130,
+      "sha256": "13c42be41609b577999bac20a892f72348ca4a9e8287d0f8acb515843a350e5d"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-core-object-export-20261006-v1.output_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-core-object-export-20261006-v1.output_seal.json",
+      "bytes": 328343,
+      "sha256": "81c3830cb41cc7903f960d314a5e5b38580173180124be0e0a4ce0489c1f0d33"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-core-object-export-20261006-v1.publication.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-core-object-export-20261006-v1.publication.json",
+      "bytes": 3744,
+      "sha256": "35307b3aa6f14af0dabe010a2159c7be186c75130015038b2d5f2a42e2feea85"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-core-object-export-20261006-v1.stage-quiescence.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-core-object-export-20261006-v1.stage-quiescence.json",
+      "bytes": 136,
+      "sha256": "b8e5f86d415fcc03a09bff703918e47adf71f215090de75f9df20754ec4d8dae"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-core-object-export-20261006-v1.final.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-core-object-export-20261006-v1.final.json",
+      "bytes": 4893,
+      "sha256": "56a01a5d7c27cb090495831226528062006b4a2f39062678e22dcbc00e6352aa"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-core-object-export-20261006-v1.unit-cleanup.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-core-object-export-20261006-v1.unit-cleanup.json",
+      "bytes": 723,
+      "sha256": "dfb6b793db1932c4b8532e477124ed7a59a8d166c0c28c99b1de1d3d17782397"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-core-object-export-20261006-v1.acceptance.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-core-object-export-20261006-v1.acceptance.json",
+      "bytes": 378,
+      "sha256": "606dbdef75ab2335479b4005bc35758d7e27f149e8b0f2c78c16d4156f73745b"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-core-object-export-20261006-v1.release.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-core-object-export-20261006-v1.release.json",
+      "bytes": 175,
+      "sha256": "e3da9f871ce77bf385449e47b3f699c722c80bda49dea3a646f953175a6d0ccd"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/CORE_OBJECT_EXPORT_REQUEST.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/CORE_OBJECT_EXPORT_REQUEST.v1.json",
+      "bytes": 3458,
+      "sha256": "357c71615f12bc685c03b9d08fde74c6c5b02cc6cac4c7e22793d7bbaad9d092"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/core-export.v1.stdout": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/core-export.v1.stdout",
+      "bytes": 1826,
+      "sha256": "f001b6d94bf4f1f9379d7e55773882891a9aef6b73f12af90ae74af4701bcafc"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/core-export.v1.stderr": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/core-export.v1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/CORE_OBJECT_KERNEL_VALIDATION.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/CORE_OBJECT_KERNEL_VALIDATION.v1.json",
+      "bytes": 1266,
+      "sha256": "7c862b1c456e0e58b1b45c76fe706d36dbccf15f5dcb21736747a9fd2563d142"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-import-preparation-20261006-v1.config.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-import-preparation-20261006-v1.config.json",
+      "bytes": 7527,
+      "sha256": "2e7b44bcef59296e54b0e742e635cc8ee06dc209d3995a70a7cb2c64a631ed9f"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-import-preparation-20261006-v1.external-lease.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-import-preparation-20261006-v1.external-lease.json",
+      "bytes": 487,
+      "sha256": "af51625c110f5c218460fa8afa405ec4f2031d567e4188a58fb3e848a810d7f3"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-import-preparation-20261006-v1.lease-identity.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-import-preparation-20261006-v1.lease-identity.json",
+      "bytes": 565,
+      "sha256": "1415ff696ffba6adedd43475be4cbdee9e59c710a070c00f57968f211479092b"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-import-preparation-20261006-v1.input_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-import-preparation-20261006-v1.input_seal.json",
+      "bytes": 5527,
+      "sha256": "b215c2026e9fca42a6c19b80ae77ee95b19efde1679604dc74d637b6c5ffa7ff"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-import-preparation-20261006-v1.stdout": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-import-preparation-20261006-v1.stdout",
+      "bytes": 2158,
+      "sha256": "cfa27180be9006332308482643114471722e3c3494fe68798dc690184b59cf0b"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-import-preparation-20261006-v1.stderr": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-import-preparation-20261006-v1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-import-preparation-20261006-v1.memory-gate.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-import-preparation-20261006-v1.memory-gate.json",
+      "bytes": 120,
+      "sha256": "3feb6ec910b6eebe5c544d7a5b9bad5714490926e65b199daa8d3395688ca4fe"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-import-preparation-20261006-v1.child-identity.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-import-preparation-20261006-v1.child-identity.json",
+      "bytes": 78,
+      "sha256": "94922adf0a444ab3befe3bb42128fbb1f9d55ed08f4b671005c0daa0556d10b2"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-import-preparation-20261006-v1.system-floor.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-import-preparation-20261006-v1.system-floor.json",
+      "bytes": 39995,
+      "sha256": "81d339059acf8b841cd0bebd1cf1a3c62391c00d3b239be0968f83895b14b6ae"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-import-preparation-20261006-v1.quiescence.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-import-preparation-20261006-v1.quiescence.json",
+      "bytes": 130,
+      "sha256": "f21f0278f7f99ca0c2ef657d36fdbc503993343424dd697e62155e92b8eef6d2"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-import-preparation-20261006-v1.output_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-import-preparation-20261006-v1.output_seal.json",
+      "bytes": 342808,
+      "sha256": "a0ff0d315f6bc1d01c966c649a13d46c3e1211b099883392fbb465696dfa75ba"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-import-preparation-20261006-v1.publication.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-import-preparation-20261006-v1.publication.json",
+      "bytes": 3322,
+      "sha256": "849b57b9b48bff4a2e53771997b38dd62f41c0aecd3ae1820a580fa269076d0f"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-import-preparation-20261006-v1.stage-quiescence.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-import-preparation-20261006-v1.stage-quiescence.json",
+      "bytes": 136,
+      "sha256": "5247049ab04ed940b2447743c52af00aef593d9af0ee42b72077ca00f3c58951"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-import-preparation-20261006-v1.final.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-import-preparation-20261006-v1.final.json",
+      "bytes": 4981,
+      "sha256": "98332c7501422bd75a5d29b6dc174151be63f78b88e6d4f1b4fa40d8b0b4c98a"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-import-preparation-20261006-v1.unit-cleanup.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-import-preparation-20261006-v1.unit-cleanup.json",
+      "bytes": 735,
+      "sha256": "539c5878cc208b068111df0a39a35ec7e1ccf7901701fa64f1942d22d63f5e0d"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-import-preparation-20261006-v1.acceptance.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-import-preparation-20261006-v1.acceptance.json",
+      "bytes": 378,
+      "sha256": "d5b7710bc5023a481a2145305fd3af386a6c3db522fd6fbf03478ba9ecc71e56"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-import-preparation-20261006-v1.release.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-import-preparation-20261006-v1.release.json",
+      "bytes": 175,
+      "sha256": "952a518f5de81aa5ea78b3fe12ffda16b34e46bcb61149bf5c06c9102aaddb68"
+    },
+    "<repository>/.local/wt/swept-transport/.local/sweep-20261006/integration-v6/lean/ActualEggNSPhaseSectionAudit.lean": {
+      "copy": ".local/wt/swept-transport/.local/sweep-20261006/integration-v6/lean/ActualEggNSPhaseSectionAudit.lean",
+      "bytes": 617,
+      "sha256": "e904c77539446db96b680f468e526962202bad8325e8f99a0fd1bbc564f41754"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-20261006/PREPARATION_REQUEST.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-20261006/PREPARATION_REQUEST.v1.json",
+      "bytes": 4940,
+      "sha256": "5b0f26e7c96f476064a89808f02a282972e7603fd06caa553870de091752cc63"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-20261006/current-imports.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-20261006/current-imports.v1.json",
+      "bytes": 54785380,
+      "sha256": "1cb825126548f16044b16345b2c8a8c9f16b325186111a32f55ebc6b201e1128"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-20261006/import-preparation.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-20261006/import-preparation.v1.json",
+      "bytes": 1240,
+      "sha256": "e36b9e4a431c7121df4dedaa92a25e155428d541cf07e56c51e41be56930849f"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-development-20261006-v1.config.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-development-20261006-v1.config.json",
+      "bytes": 12089,
+      "sha256": "a6d85d04121caf084b0df500125e64defaa7c7d27927325ceeecd5146375b539"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-development-20261006-v1.external-lease.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-development-20261006-v1.external-lease.json",
+      "bytes": 487,
+      "sha256": "bb793f5033100c06d63a375836dae523aba639794932195a0d7e18008a73a25d"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-development-20261006-v1.lease-identity.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-development-20261006-v1.lease-identity.json",
+      "bytes": 565,
+      "sha256": "40721d34b737e476382e7b8f8cec0192b71faf86961a9424cb8920ff2c9ca38d"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-development-20261006-v1.input_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-development-20261006-v1.input_seal.json",
+      "bytes": 7467,
+      "sha256": "41bf9a4dd768b674c2fcc7ddec09be3f6a5b774e430c2bc2c79b003248d5b4c7"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-development-20261006-v1.stdout": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-development-20261006-v1.stdout",
+      "bytes": 2274,
+      "sha256": "fd561b8d3747cfde185a4b1338262a95ab4d1cf55706251ad0a5240d7610f137"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-development-20261006-v1.stderr": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-development-20261006-v1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-development-20261006-v1.memory-gate.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-development-20261006-v1.memory-gate.json",
+      "bytes": 120,
+      "sha256": "9020ef5635a7531e2f53f252b4990c116ef7e1420ceb57f744c40f1c24288b47"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-development-20261006-v1.child-identity.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-development-20261006-v1.child-identity.json",
+      "bytes": 78,
+      "sha256": "a4107a34671dd60c8a004e6723d830cc872ce44b1de171252b1835a3bcf44422"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-development-20261006-v1.system-floor.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-development-20261006-v1.system-floor.json",
+      "bytes": 31093,
+      "sha256": "acfc3823502fe30da94224442b5057ff085cc541bded1ca3b6292d49f5826ced"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-development-20261006-v1.quiescence.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-development-20261006-v1.quiescence.json",
+      "bytes": 130,
+      "sha256": "a39d700436e94d1d5625fb90ddbca7de5eed8b494e4b7cd5aab8d1f26d029531"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-development-20261006-v1.output_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-development-20261006-v1.output_seal.json",
+      "bytes": 271928,
+      "sha256": "8f8d185ded8df7c8e552635f7be9eb550313c6db0ca1074393eae6a65f60b9a0"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-development-20261006-v1.publication.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-development-20261006-v1.publication.json",
+      "bytes": 3996,
+      "sha256": "a7e0f853c57513022c8cc9757f4ab94d5378fabe5a8090a51be747f710c28764"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-development-20261006-v1.stage-quiescence.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-development-20261006-v1.stage-quiescence.json",
+      "bytes": 136,
+      "sha256": "9fde9bdc2d152275630fd010e1eba07e6b8c6a2daf388cdaf3f4807093d0b684"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-development-20261006-v1.final.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-development-20261006-v1.final.json",
+      "bytes": 4879,
+      "sha256": "300fd0ec8c1d5c7087f221ebafe893fcc65ac586067887f8aeea0dc526ad1365"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-development-20261006-v1.unit-cleanup.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-development-20261006-v1.unit-cleanup.json",
+      "bytes": 721,
+      "sha256": "1bf66d488b2fdd73b0424687a81a5e35e976a64b5237855c3cee995e81217cf9"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-development-20261006-v1.acceptance.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-development-20261006-v1.acceptance.json",
+      "bytes": 378,
+      "sha256": "db697b78f984c8a15744689151795bcf32ed454c4dc25d343bac5ec78a98bf9a"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-development-20261006-v1.release.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-development-20261006-v1.release.json",
+      "bytes": 175,
+      "sha256": "f2c6927343cd3216b21c4c19414b84306e2236806f97d1e99e974a5ff40e36e3"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-20261006/COMPILER_REQUEST.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-20261006/COMPILER_REQUEST.v1.json",
+      "bytes": 3411,
+      "sha256": "0ad3844f646adcd287da3e13dec345e5e0a48d2b79ad82845584bd4abcccc3e5"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-20261006/COMPLETE_DEVELOPMENT_BUDGET.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-20261006/COMPLETE_DEVELOPMENT_BUDGET.v1.json",
+      "bytes": 59974,
+      "sha256": "727034e849c5b59c11f7d25750ed32607c29614f6e5c597bac9bd8a5e50ef84b"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/objects-v1/ActualEggNSPhaseSectionAudit.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/objects-v1/ActualEggNSPhaseSectionAudit.olean",
+      "bytes": 1408,
+      "sha256": "c0beff0a3b6a09a8f09be29223dc836581d5a71ee819290ccafd6b34842900e9"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/objects-v1/ActualEggNSPhaseSectionAudit.ilean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/objects-v1/ActualEggNSPhaseSectionAudit.ilean",
+      "bytes": 1322,
+      "sha256": "a2d9bdda97eacb6856cf2c34921f2d60263b85568e63c328e3fab11a67965614"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-20261006/compiler.v1.stdout": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-20261006/compiler.v1.stdout",
+      "bytes": 927,
+      "sha256": "ff6e9a04b9dc3e35e12a142265015d5a1f692a36eb44bdc682225afe5f457e74"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-20261006/compiler.v1.stderr": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-20261006/compiler.v1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-20261006/KERNEL_VALIDATION.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-audit-20261006/KERNEL_VALIDATION.v1.json",
+      "bytes": 1266,
+      "sha256": "b631c1fc041d956e868ddef70dc91d7d9cf47798480e0ec238c1226f7d1c7d6b"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/PREPARATION_REQUEST.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/PREPARATION_REQUEST.v1.json",
+      "bytes": 4285,
+      "sha256": "2b6667dd2bb14a605544604935fe3fd3448e2b72517520f381f279ada617dc02"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/PREPARATION_INCOMPLETE.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/PREPARATION_INCOMPLETE.v1.json",
+      "bytes": 1202,
+      "sha256": "bc5087abff37723f7e2816ba71177a2ebff127c9d60b646d59a4ccd5a018d84f"
+    }
+  },
+  "no_source_math_or_core_algorithm_changed_by_queue": true,
+  "no_push_merge_or_historical_deletion": true,
+  "prior_failed_receipts_immutable": true,
+  "source_kernel_and_importable_object_acceptance_distinguished": true,
+  "scientific_job": false
+}

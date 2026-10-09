@@ -1,0 +1,175 @@
+{
+  "files": {
+    "ACCEPTED_PROVIDER_BASE_COMPARISON.v1.json": {
+      "original": {
+        "bytes": 23449,
+        "sha256": "5c139fb0cadf5c59ccf0b16dff55dc216d165a06ae4c53e47dcc2de1bc3e5cae"
+      },
+      "projected": {
+        "bytes": 22714,
+        "sha256": "abd7b628716663b65bd1af181cf11c82423c72c1e7ba928ed858e95651d1761d"
+      },
+      "replaced": {
+        "<repository>": 49,
+        "<lean-toolchain>/": 0,
+        "<home>": 0
+      }
+    },
+    "CURRENT_SOURCE_IMPORT_GRAPH.v1.json": {
+      "original": {
+        "bytes": 29099,
+        "sha256": "cea0550f8eaf66d75ce7df71b3fbebd66be907aae654ccd705ecdc64591ed8a4"
+      },
+      "projected": {
+        "bytes": 28394,
+        "sha256": "874b6ba868850cc60f7962c4399a74feaf47ecb4fc2e49623c106ace86d563e0"
+      },
+      "replaced": {
+        "<repository>": 47,
+        "<lean-toolchain>/": 0,
+        "<home>": 0
+      }
+    },
+    "OWNER_MATERIALIZATION.v1.json": {
+      "original": {
+        "bytes": 6933,
+        "sha256": "52605f0dbe2bdca3457a302c0dca17568ebb469ae8605f8d58539ac67beb5a7d"
+      },
+      "projected": {
+        "bytes": 6618,
+        "sha256": "4885f752a1d04be38115cd27adb692f09c8cb1bd998e0c6d23286c6712d6c339"
+      },
+      "replaced": {
+        "<repository>": 21,
+        "<lean-toolchain>/": 0,
+        "<home>": 0
+      }
+    },
+    "PRIOR_ACCEPTANCE_BINDINGS.v1.json": {
+      "original": {
+        "bytes": 4171,
+        "sha256": "a99cac8e403291a40c733f2ba31d43e4eaa7080830ddc82f767543113692ed8c"
+      },
+      "projected": {
+        "bytes": 3991,
+        "sha256": "ee999d51f6238a02b9a332383156287bdf2313735b8700627d3eebca253a82d5"
+      },
+      "replaced": {
+        "<repository>": 12,
+        "<lean-toolchain>/": 0,
+        "<home>": 0
+      }
+    },
+    "QUEUE_REQUEST.v1.json": {
+      "original": {
+        "bytes": 32618,
+        "sha256": "eb9f97592dc0c0709bdfd64a386824e656871f53b00759e057d48c574d0398bf"
+      },
+      "projected": {
+        "bytes": 31793,
+        "sha256": "6fb1f9aef49c97a4ae9cbb685918dd6be665ae9e5274d2aaef4f63050b124f1f"
+      },
+      "replaced": {
+        "<repository>": 55,
+        "<lean-toolchain>/": 0,
+        "<home>": 0
+      }
+    },
+    "prior-accepted/ActualEggNSPhaseSection.v6.VALIDATION.json": {
+      "original": {
+        "bytes": 61694,
+        "sha256": "04eb82f66e93f80d4709f9e8e871a09c0853f673e832b2faf600f2a5b6049b2f"
+      },
+      "projected": {
+        "bytes": 59261,
+        "sha256": "346f51a3f4f3a68682e176b1ae3c1016702f6ec8e4a314cd915daf3521e9a0f3"
+      },
+      "replaced": {
+        "<repository>": 151,
+        "<lean-toolchain>/": 12,
+        "<home>": 0
+      }
+    },
+    "prior-accepted/FrameTransport.v6.VALIDATION.json": {
+      "original": {
+        "bytes": 21446,
+        "sha256": "21507606e1551d3a0a2d5362f20fada652f6e26a6d7fb2fe6cfa40b21e5eba41"
+      },
+      "projected": {
+        "bytes": 20666,
+        "sha256": "af8be3940f12677c306c36673102bb669770d179fc398e9de2d9f763b05588ec"
+      },
+      "replaced": {
+        "<repository>": 52,
+        "<lean-toolchain>/": 0,
+        "<home>": 0
+      }
+    },
+    "prior-accepted/FutureRead.v26.ACCEPTED_BINDINGS.json": {
+      "original": {
+        "bytes": 23725,
+        "sha256": "100e1fc9cfd178dc6f047d6834103ab9a77a2ba041a2ca8853993181264ca9a1"
+      },
+      "projected": {
+        "bytes": 23290,
+        "sha256": "201040806aef2853a592251f3697d98c88a6e449a67b992e8d5ceae5acccff45"
+      },
+      "replaced": {
+        "<repository>": 29,
+        "<lean-toolchain>/": 0,
+        "<home>": 0
+      }
+    },
+    "prior-accepted/FutureRead.v26.VALIDATION.json": {
+      "original": {
+        "bytes": 83921,
+        "sha256": "3e62578e200b891bd97edb9fe52dcd5f36eeec79a9cd0b6085af13b6583a0a05"
+      },
+      "projected": {
+        "bytes": 80654,
+        "sha256": "a59375fc36de8f4aa7a98028811698b6a88e03650baf90c495fa9ba30fc57d37"
+      },
+      "replaced": {
+        "<repository>": 201,
+        "<lean-toolchain>/": 18,
+        "<home>": 0
+      }
+    },
+    "prior-accepted/Motion.v21.ACCEPTED_BINDINGS.json": {
+      "original": {
+        "bytes": 22080,
+        "sha256": "cb51bf90ec6678f6e6444d966e30506b4153160bba8faaf4c2bd7bbdbed075d6"
+      },
+      "projected": {
+        "bytes": 21690,
+        "sha256": "0165c0cc0a75d1b60235ee4045a180d9c5968eac7f004873d16a2ccdbf8dc14a"
+      },
+      "replaced": {
+        "<repository>": 26,
+        "<lean-toolchain>/": 0,
+        "<home>": 0
+      }
+    },
+    "prior-accepted/Motion.v21.VALIDATION.json": {
+      "original": {
+        "bytes": 105058,
+        "sha256": "2943b3c1181bdcdbb47a39a185d44977c8e80ba7542d68db76a74ce8a25f463d"
+      },
+      "projected": {
+        "bytes": 101395,
+        "sha256": "1c864152774555501a82e469454edbf9b300aa7de4ae611e58e5c9c919ee371b"
+      },
+      "replaced": {
+        "<repository>": 233,
+        "<lean-toolchain>/": 12,
+        "<home>": 0
+      }
+    }
+  },
+  "placeholders": {
+    "<repository>": "the absolute host directory of the repository's main checkout; the path that follows (a tracked path, or a worktree or private run directory under .local/) is kept",
+    "<lean-toolchain>/": "the absolute host directory of the Lean 4.33.0 toolchain the check invoked; the path that follows is kept",
+    "<home>": "the host user's home directory"
+  },
+  "rule": "each absolute host prefix below is replaced by its placeholder, the longer prefixes first; no other byte changes. The placeholders do not occur in the originals, so substituting each prefix back restores the original bytes, whose sha256 and size are pinned here; checked locally before commit. The originals stay in local custody."
+}

@@ -1,0 +1,112 @@
+{
+  "public_main_API": "gh api repos/brandonrdug/holonics/commits/main --jq .sha",
+  "public_main_commit": "3c67beee7f656798f912c974f12c482ea12c5e42",
+  "root_HEAD": "b34c87770272ab8688bc59605c690b47fe996428",
+  "integration_worktree": "<repository>/.local/wt/geometry-integration-01a10f3d",
+  "branch": "codex/geometry-public-main-01a10f3d",
+  "copy_scope": "four explicitly pinned accepted owners only; no wholesale worktree copy",
+  "owners": [
+    {
+      "relative_path": "lean/Holonics/Geometry/FrameTransport.lean",
+      "public_predecessor": {
+        "path": "<repository>/.local/wt/geometry-integration-01a10f3d/research/records/receipts/2026-10-07-public-main-geometry-integration/preserved-public-base/lean/Holonics/Geometry/FrameTransport.lean",
+        "bytes": 25975,
+        "sha256": "8e2dab7ef9ac4a4e0564e23621531742def4edf234e47947cec39422e13c1c7b"
+      },
+      "root_actual_preserved": {
+        "path": "<repository>/.local/wt/geometry-integration-01a10f3d/research/records/receipts/2026-10-07-public-main-geometry-integration/preserved-root-source/lean/Holonics/Geometry/FrameTransport.lean",
+        "bytes": 25975,
+        "sha256": "8e2dab7ef9ac4a4e0564e23621531742def4edf234e47947cec39422e13c1c7b"
+      },
+      "accepted_origin": {
+        "path": "<repository>/.local/wt/swept-transport/lean/Holonics/Geometry/FrameTransport.lean",
+        "bytes": 42269,
+        "sha256": "9364dd0eff13d68cfdde97683a7b6c5084b0f2e1163dc44ad752aea5c71faa41"
+      },
+      "materialized": "<repository>/.local/wt/geometry-integration-01a10f3d/lean/Holonics/Geometry/FrameTransport.lean",
+      "accepted_sha256": "9364dd0eff13d68cfdde97683a7b6c5084b0f2e1163dc44ad752aea5c71faa41",
+      "materialized_pin": {
+        "path": "<repository>/.local/wt/geometry-integration-01a10f3d/lean/Holonics/Geometry/FrameTransport.lean",
+        "bytes": 42269,
+        "sha256": "9364dd0eff13d68cfdde97683a7b6c5084b0f2e1163dc44ad752aea5c71faa41"
+      }
+    },
+    {
+      "relative_path": "lean/Holonics/Geometry/Motion.lean",
+      "public_predecessor": {
+        "path": "<repository>/.local/wt/geometry-integration-01a10f3d/research/records/receipts/2026-10-07-public-main-geometry-integration/preserved-public-base/lean/Holonics/Geometry/Motion.lean",
+        "bytes": 55845,
+        "sha256": "32df98dece1d3d0cbff9505bd9f4e15f0b2ee6244c490a3058c26a479b962fad"
+      },
+      "root_actual_preserved": {
+        "path": "<repository>/.local/wt/geometry-integration-01a10f3d/research/records/receipts/2026-10-07-public-main-geometry-integration/preserved-root-source/lean/Holonics/Geometry/Motion.lean",
+        "bytes": 55845,
+        "sha256": "32df98dece1d3d0cbff9505bd9f4e15f0b2ee6244c490a3058c26a479b962fad"
+      },
+      "accepted_origin": {
+        "path": "<repository>/.local/wt/swept-transport/lean/Holonics/Geometry/Motion.lean",
+        "bytes": 56875,
+        "sha256": "0be5b5b2b2aa729a73a8530f3a751d0015a6735f34f23e1667faa8fe34e9e85e"
+      },
+      "materialized": "<repository>/.local/wt/geometry-integration-01a10f3d/lean/Holonics/Geometry/Motion.lean",
+      "accepted_sha256": "0be5b5b2b2aa729a73a8530f3a751d0015a6735f34f23e1667faa8fe34e9e85e",
+      "materialized_pin": {
+        "path": "<repository>/.local/wt/geometry-integration-01a10f3d/lean/Holonics/Geometry/Motion.lean",
+        "bytes": 56875,
+        "sha256": "0be5b5b2b2aa729a73a8530f3a751d0015a6735f34f23e1667faa8fe34e9e85e"
+      }
+    },
+    {
+      "relative_path": "lean/Holonics/Foundation/CausalChord.lean",
+      "public_predecessor": {
+        "path": "<repository>/.local/wt/geometry-integration-01a10f3d/research/records/receipts/2026-10-07-public-main-geometry-integration/preserved-public-base/lean/Holonics/Foundation/CausalChord.lean",
+        "bytes": 43769,
+        "sha256": "bf9e8165102f911bf68d23edcf9a0136a70682539948db71f86d2cf789f74a0d"
+      },
+      "root_actual_preserved": {
+        "path": "<repository>/.local/wt/geometry-integration-01a10f3d/research/records/receipts/2026-10-07-public-main-geometry-integration/preserved-root-source/lean/Holonics/Foundation/CausalChord.lean",
+        "bytes": 46612,
+        "sha256": "4b2c01a136c8c5cf4921d4660975ba6a8d6af5b7c9f61e0d55dcc8b1d6469aa8"
+      },
+      "accepted_origin": {
+        "path": "<repository>/.local/wt/swept-transport/lean/Holonics/Foundation/CausalChord.lean",
+        "bytes": 46612,
+        "sha256": "4b2c01a136c8c5cf4921d4660975ba6a8d6af5b7c9f61e0d55dcc8b1d6469aa8"
+      },
+      "materialized": "<repository>/.local/wt/geometry-integration-01a10f3d/lean/Holonics/Foundation/CausalChord.lean",
+      "accepted_sha256": "4b2c01a136c8c5cf4921d4660975ba6a8d6af5b7c9f61e0d55dcc8b1d6469aa8",
+      "materialized_pin": {
+        "path": "<repository>/.local/wt/geometry-integration-01a10f3d/lean/Holonics/Foundation/CausalChord.lean",
+        "bytes": 46612,
+        "sha256": "4b2c01a136c8c5cf4921d4660975ba6a8d6af5b7c9f61e0d55dcc8b1d6469aa8"
+      }
+    },
+    {
+      "relative_path": "lean/Holonics/Objects/SourceHolon.lean",
+      "public_predecessor": {
+        "path": "<repository>/.local/wt/geometry-integration-01a10f3d/research/records/receipts/2026-10-07-public-main-geometry-integration/preserved-public-base/lean/Holonics/Objects/SourceHolon.lean",
+        "bytes": 34281,
+        "sha256": "762578e715f1a2dcb7c1873dd063ac9758bd7ce5ccc1e3aef192528a7bc7998e"
+      },
+      "root_actual_preserved": {
+        "path": "<repository>/.local/wt/geometry-integration-01a10f3d/research/records/receipts/2026-10-07-public-main-geometry-integration/preserved-root-source/lean/Holonics/Objects/SourceHolon.lean",
+        "bytes": 36493,
+        "sha256": "ee0bb62a8a091c41a5e91d5ac6ce2ce831e692caf982b3ecf043439c747d5568"
+      },
+      "accepted_origin": {
+        "path": "<repository>/.local/wt/swept-transport/lean/Holonics/Objects/SourceHolon.lean",
+        "bytes": 36493,
+        "sha256": "ee0bb62a8a091c41a5e91d5ac6ce2ce831e692caf982b3ecf043439c747d5568"
+      },
+      "materialized": "<repository>/.local/wt/geometry-integration-01a10f3d/lean/Holonics/Objects/SourceHolon.lean",
+      "accepted_sha256": "ee0bb62a8a091c41a5e91d5ac6ce2ce831e692caf982b3ecf043439c747d5568",
+      "materialized_pin": {
+        "path": "<repository>/.local/wt/geometry-integration-01a10f3d/lean/Holonics/Objects/SourceHolon.lean",
+        "bytes": 36493,
+        "sha256": "ee0bb62a8a091c41a5e91d5ac6ce2ce831e692caf982b3ecf043439c747d5568"
+      }
+    }
+  ],
+  "root_status": " M docs/atlas/geometry.tsv\n M lean/Holonics/Geometry/FrameTransport.lean\n M lean/Holonics/Geometry/Motion.lean\n",
+  "root_unchanged_after_materialization": true
+}

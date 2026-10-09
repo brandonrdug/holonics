@@ -1,0 +1,77 @@
+{
+  "scope": "reuse exact prior accepted source/object evidence only after current source/provider reconciliation; new combined importer acceptance pending",
+  "receipts": [
+    {
+      "origin": {
+        "path": "<repository>/.local/wt/swept-transport/research/records/receipts/2026-10-06-swept-derivative/native-validation-integrated-v6-terminal-completion/VALIDATION.json",
+        "bytes": 21446,
+        "sha256": "21507606e1551d3a0a2d5362f20fada652f6e26a6d7fb2fe6cfa40b21e5eba41"
+      },
+      "preserved": {
+        "path": "<repository>/.local/wt/geometry-integration-01a10f3d/research/records/receipts/2026-10-07-public-main-geometry-integration/prior-accepted/FrameTransport.v6.VALIDATION.json",
+        "bytes": 21446,
+        "sha256": "21507606e1551d3a0a2d5362f20fada652f6e26a6d7fb2fe6cfa40b21e5eba41"
+      }
+    },
+    {
+      "origin": {
+        "path": "<repository>/.local/wt/swept-transport/research/records/receipts/2026-10-06-decoding-work/MOTION_ACCEPTED_BINDINGS.v1.json",
+        "bytes": 22080,
+        "sha256": "cb51bf90ec6678f6e6444d966e30506b4153160bba8faaf4c2bd7bbdbed075d6"
+      },
+      "preserved": {
+        "path": "<repository>/.local/wt/geometry-integration-01a10f3d/research/records/receipts/2026-10-07-public-main-geometry-integration/prior-accepted/Motion.v21.ACCEPTED_BINDINGS.json",
+        "bytes": 22080,
+        "sha256": "cb51bf90ec6678f6e6444d966e30506b4153160bba8faaf4c2bd7bbdbed075d6"
+      }
+    },
+    {
+      "origin": {
+        "path": "<repository>/.local/wt/swept-transport/research/records/receipts/2026-10-06-decoding-work/queue-VALIDATION.json",
+        "bytes": 105058,
+        "sha256": "2943b3c1181bdcdbb47a39a185d44977c8e80ba7542d68db76a74ce8a25f463d"
+      },
+      "preserved": {
+        "path": "<repository>/.local/wt/geometry-integration-01a10f3d/research/records/receipts/2026-10-07-public-main-geometry-integration/prior-accepted/Motion.v21.VALIDATION.json",
+        "bytes": 105058,
+        "sha256": "2943b3c1181bdcdbb47a39a185d44977c8e80ba7542d68db76a74ce8a25f463d"
+      }
+    },
+    {
+      "origin": {
+        "path": "<repository>/.local/wt/swept-transport/research/records/receipts/2026-10-06-future-receiver-score/ACCEPTED_BINDINGS.v26.json",
+        "bytes": 23725,
+        "sha256": "100e1fc9cfd178dc6f047d6834103ab9a77a2ba041a2ca8853993181264ca9a1"
+      },
+      "preserved": {
+        "path": "<repository>/.local/wt/geometry-integration-01a10f3d/research/records/receipts/2026-10-07-public-main-geometry-integration/prior-accepted/FutureRead.v26.ACCEPTED_BINDINGS.json",
+        "bytes": 23725,
+        "sha256": "100e1fc9cfd178dc6f047d6834103ab9a77a2ba041a2ca8853993181264ca9a1"
+      }
+    },
+    {
+      "origin": {
+        "path": "<repository>/.local/wt/swept-transport/research/records/receipts/2026-10-06-future-receiver-score/native-validation-full-owner-consumer-v2/VALIDATION.json",
+        "bytes": 83921,
+        "sha256": "3e62578e200b891bd97edb9fe52dcd5f36eeec79a9cd0b6085af13b6583a0a05"
+      },
+      "preserved": {
+        "path": "<repository>/.local/wt/geometry-integration-01a10f3d/research/records/receipts/2026-10-07-public-main-geometry-integration/prior-accepted/FutureRead.v26.VALIDATION.json",
+        "bytes": 83921,
+        "sha256": "3e62578e200b891bd97edb9fe52dcd5f36eeec79a9cd0b6085af13b6583a0a05"
+      }
+    },
+    {
+      "origin": {
+        "path": "<repository>/.local/wt/swept-transport/research/records/receipts/2026-10-06-swept-derivative/native-validation-actual-NS-v6-complete/VALIDATION.json",
+        "bytes": 61694,
+        "sha256": "04eb82f66e93f80d4709f9e8e871a09c0853f673e832b2faf600f2a5b6049b2f"
+      },
+      "preserved": {
+        "path": "<repository>/.local/wt/geometry-integration-01a10f3d/research/records/receipts/2026-10-07-public-main-geometry-integration/prior-accepted/ActualEggNSPhaseSection.v6.VALIDATION.json",
+        "bytes": 61694,
+        "sha256": "04eb82f66e93f80d4709f9e8e871a09c0853f673e832b2faf600f2a5b6049b2f"
+      }
+    }
+  ]
+}

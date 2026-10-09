@@ -1,0 +1,398 @@
+{
+  "base": "3c67beee7f656798f912c974f12c482ea12c5e42",
+  "comparisons": [
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/sweep-20261006/QUEUE_REQUEST.v6.json",
+      "module": "Holonics.Geometry.FrameTransport",
+      "relative_path": "lean/Holonics/Geometry/FrameTransport.lean",
+      "expected_sha256": "9364dd0eff13d68cfdde97683a7b6c5084b0f2e1163dc44ad752aea5c71faa41",
+      "actual_sha256": "8e2dab7ef9ac4a4e0564e23621531742def4edf234e47947cec39422e13c1c7b",
+      "owner_override": true
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/thermo-medium-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Geometry.Motion",
+      "relative_path": "lean/Holonics/Geometry/Motion.lean",
+      "expected_sha256": "0be5b5b2b2aa729a73a8530f3a751d0015a6735f34f23e1667faa8fe34e9e85e",
+      "actual_sha256": "32df98dece1d3d0cbff9505bd9f4e15f0b2ee6244c490a3058c26a479b962fad",
+      "owner_override": true
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/thermo-medium-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Compression.Landmark.FixedPoint",
+      "relative_path": "lean/Holonics/Compression/Landmark/FixedPoint.lean",
+      "expected_sha256": "6d43de55250e67bc780d6b7a78435ffc169c2774387d9a6ce06d7e853db77f40",
+      "actual_sha256": "6d43de55250e67bc780d6b7a78435ffc169c2774387d9a6ce06d7e853db77f40",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/thermo-medium-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Geometry.CrossRatio",
+      "relative_path": "lean/Holonics/Geometry/CrossRatio.lean",
+      "expected_sha256": "2fe42c8b97bfe226a82605777d1febc53843747c711dccda276e56938b3f1512",
+      "actual_sha256": "2fe42c8b97bfe226a82605777d1febc53843747c711dccda276e56938b3f1512",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/thermo-medium-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Compression.Landmark.SiteKind",
+      "relative_path": "lean/Holonics/Compression/Landmark/SiteKind.lean",
+      "expected_sha256": "299768dd7adb6a9a3c5deedaee08dffe4118d3b95f878a7594f495e735218ebc",
+      "actual_sha256": "299768dd7adb6a9a3c5deedaee08dffe4118d3b95f878a7594f495e735218ebc",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/thermo-medium-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Physics.CompositeMassEnergy",
+      "relative_path": "lean/Holonics/Physics/CompositeMassEnergy.lean",
+      "expected_sha256": "cdbe477bb3423e4e5f869e863d1fc014df25aae48e94a9f108804df803283c33",
+      "actual_sha256": "cdbe477bb3423e4e5f869e863d1fc014df25aae48e94a9f108804df803283c33",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/thermo-medium-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Physics.HolonicMassShellFace",
+      "relative_path": "lean/Holonics/Physics/HolonicMassShellFace.lean",
+      "expected_sha256": "acdf233fa50037c9f0c4af2a6aaf1b324cbf9445db9cd4cdf8fe30adb4be58df",
+      "actual_sha256": "acdf233fa50037c9f0c4af2a6aaf1b324cbf9445db9cd4cdf8fe30adb4be58df",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/thermo-medium-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Fluid.NavierStokesMaterialPolygon",
+      "relative_path": "lean/Holonics/Fluid/NavierStokesMaterialPolygon.lean",
+      "expected_sha256": "22fef6996049fbfaf7d39be42da91a596aa1e9e57af80a10496950eb8def7f87",
+      "actual_sha256": "22fef6996049fbfaf7d39be42da91a596aa1e9e57af80a10496950eb8def7f87",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/thermo-medium-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Geometry.Swing",
+      "relative_path": "lean/Holonics/Geometry/Swing.lean",
+      "expected_sha256": "945876159a3560dbb8417aaccff4f9e79917004f06cd1369a80a3e94957444c3",
+      "actual_sha256": "945876159a3560dbb8417aaccff4f9e79917004f06cd1369a80a3e94957444c3",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/thermo-medium-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Geometry.AffineSwing",
+      "relative_path": "lean/Holonics/Geometry/AffineSwing.lean",
+      "expected_sha256": "09ce73d5bc9766c152c3ccfc3b16a5f9627e5a4b3cda828ef9f1cf9e91b5805f",
+      "actual_sha256": "09ce73d5bc9766c152c3ccfc3b16a5f9627e5a4b3cda828ef9f1cf9e91b5805f",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/thermo-medium-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Foundation.Gluing",
+      "relative_path": "lean/Holonics/Foundation/Gluing.lean",
+      "expected_sha256": "5f90c401cae7aa7f40fe42b8dc0a1f181a62e5f44e9bf6dd760bcdb8ccd06828",
+      "actual_sha256": "5f90c401cae7aa7f40fe42b8dc0a1f181a62e5f44e9bf6dd760bcdb8ccd06828",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/thermo-medium-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Foundation.GluingPassage",
+      "relative_path": "lean/Holonics/Foundation/GluingPassage.lean",
+      "expected_sha256": "966612dd5ba3888bd8e57f2ea8c405f8ad188c877430b0c12b42ab301ef09719",
+      "actual_sha256": "966612dd5ba3888bd8e57f2ea8c405f8ad188c877430b0c12b42ab301ef09719",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/thermo-medium-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Fluid.NavierStokes",
+      "relative_path": "lean/Holonics/Fluid/NavierStokes.lean",
+      "expected_sha256": "e7455a3002c215a8c25d11031ae2f862ee3d113a42674ebdb24f2a4db4c80991",
+      "actual_sha256": "e7455a3002c215a8c25d11031ae2f862ee3d113a42674ebdb24f2a4db4c80991",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/thermo-medium-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Geometry.Gyrogroup",
+      "relative_path": "lean/Holonics/Geometry/Gyrogroup.lean",
+      "expected_sha256": "552ac01619be9590d274ef3dc4e3b37405e65f6131c55dcbbfdb4a0cff902741",
+      "actual_sha256": "552ac01619be9590d274ef3dc4e3b37405e65f6131c55dcbbfdb4a0cff902741",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/thermo-medium-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Physics.Ellipse",
+      "relative_path": "lean/Holonics/Physics/Ellipse.lean",
+      "expected_sha256": "a37043c31fd0f9142500db8c1ea279d25bfc5dd9636a420c2948b867fb7b84cb",
+      "actual_sha256": "a37043c31fd0f9142500db8c1ea279d25bfc5dd9636a420c2948b867fb7b84cb",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/thermo-medium-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Transport.NavigatorTraceFaces",
+      "relative_path": "lean/Holonics/Transport/NavigatorTraceFaces.lean",
+      "expected_sha256": "49e223eb8c3d5b8bc950ae13d4a80a3e0d2c4d2e0c487ff08abe699a2972b849",
+      "actual_sha256": "49e223eb8c3d5b8bc950ae13d4a80a3e0d2c4d2e0c487ff08abe699a2972b849",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/thermo-medium-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Geometry.LocalFactor",
+      "relative_path": "lean/Holonics/Geometry/LocalFactor.lean",
+      "expected_sha256": "4058a7947dd1d86932e7ced7d92a7b3c3a2dec322fec8ca51e3d62f7f6c04c9d",
+      "actual_sha256": "4058a7947dd1d86932e7ced7d92a7b3c3a2dec322fec8ca51e3d62f7f6c04c9d",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/thermo-medium-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Geometry.PartitionFunction",
+      "relative_path": "lean/Holonics/Geometry/PartitionFunction.lean",
+      "expected_sha256": "6a2650e0ed3996ad18d58b0c5c23ff51bd5924900d5bc7aabdaebfcd0a1b3155",
+      "actual_sha256": "6a2650e0ed3996ad18d58b0c5c23ff51bd5924900d5bc7aabdaebfcd0a1b3155",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/thermo-medium-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Geometry.TraceSequence",
+      "relative_path": "lean/Holonics/Geometry/TraceSequence.lean",
+      "expected_sha256": "1ec3d0a525cfa9ca7d2b2444557379ac65697f9d55b19c961d469f01c49e9494",
+      "actual_sha256": "1ec3d0a525cfa9ca7d2b2444557379ac65697f9d55b19c961d469f01c49e9494",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/thermo-medium-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Transport.HelicalPairInteraction",
+      "relative_path": "lean/Holonics/Transport/HelicalPairInteraction.lean",
+      "expected_sha256": "5408e033f4d0d3adf22e75d01811d172752222a54ea0d762d2facf102f8cdd58",
+      "actual_sha256": "5408e033f4d0d3adf22e75d01811d172752222a54ea0d762d2facf102f8cdd58",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/thermo-medium-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Transport.HolonicInteraction",
+      "relative_path": "lean/Holonics/Transport/HolonicInteraction.lean",
+      "expected_sha256": "ed7aeaa89a12c73b32983536eaffd3b6369951fd55f8143afd5ef16bd455f1b5",
+      "actual_sha256": "ed7aeaa89a12c73b32983536eaffd3b6369951fd55f8143afd5ef16bd455f1b5",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/thermo-medium-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Physics.HolonicSnellInteraction",
+      "relative_path": "lean/Holonics/Physics/HolonicSnellInteraction.lean",
+      "expected_sha256": "175b95e411fe980d2fb22ac54a8b92e2dd8f760d6b2998373cecb6904c88f96f",
+      "actual_sha256": "175b95e411fe980d2fb22ac54a8b92e2dd8f760d6b2998373cecb6904c88f96f",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/thermo-medium-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Foundation.HolonicDirectedPassage",
+      "relative_path": "lean/Holonics/Foundation/HolonicDirectedPassage.lean",
+      "expected_sha256": "21062227a09719bb6bb27a825eac9b16ccf515bd01d08b9644af076a0bf014ec",
+      "actual_sha256": "21062227a09719bb6bb27a825eac9b16ccf515bd01d08b9644af076a0bf014ec",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/thermo-medium-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Foundation.HolonicDifferenceCalculus",
+      "relative_path": "lean/Holonics/Foundation/HolonicDifferenceCalculus.lean",
+      "expected_sha256": "addc8fef4d287cc4ce5df708e99dccd278a4a94e2e3f15a5bb44326ad97b0977",
+      "actual_sha256": "addc8fef4d287cc4ce5df708e99dccd278a4a94e2e3f15a5bb44326ad97b0977",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/thermo-medium-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Geometry.Polarisation",
+      "relative_path": "lean/Holonics/Geometry/Polarisation.lean",
+      "expected_sha256": "15141a0dd8489645a133e10f3c537b624bc01479295d25df73cdf363b25f74d2",
+      "actual_sha256": "15141a0dd8489645a133e10f3c537b624bc01479295d25df73cdf363b25f74d2",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/thermo-medium-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Geometry.Horizon",
+      "relative_path": "lean/Holonics/Geometry/Horizon.lean",
+      "expected_sha256": "1ed9894a917aba66e69e4552297c3fb1f193e618ab4b089643e16d9e85f8c215",
+      "actual_sha256": "1ed9894a917aba66e69e4552297c3fb1f193e618ab4b089643e16d9e85f8c215",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/thermo-medium-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Geometry.Telescoping",
+      "relative_path": "lean/Holonics/Geometry/Telescoping.lean",
+      "expected_sha256": "ff8783996008207d980f6d64cc144544825304bd23cd09428ec1cae43bc8e5cc",
+      "actual_sha256": "ff8783996008207d980f6d64cc144544825304bd23cd09428ec1cae43bc8e5cc",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/thermo-medium-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Geometry.ScrewGeometry",
+      "relative_path": "lean/Holonics/Geometry/ScrewGeometry.lean",
+      "expected_sha256": "91020b35bc1cf591f7eae4e0537a70b8c218986d284852181c6689cec102719e",
+      "actual_sha256": "91020b35bc1cf591f7eae4e0537a70b8c218986d284852181c6689cec102719e",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/thermo-medium-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Holon.QuadraticMoment",
+      "relative_path": "lean/Holonics/Holon/QuadraticMoment.lean",
+      "expected_sha256": "f222d34a7bb68ccfc52f6b86b760302e8cc8de6b4ed8ed517f1cf5149585bc9c",
+      "actual_sha256": "f222d34a7bb68ccfc52f6b86b760302e8cc8de6b4ed8ed517f1cf5149585bc9c",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/thermo-medium-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Foundation.TransportWord",
+      "relative_path": "lean/Holonics/Foundation/TransportWord.lean",
+      "expected_sha256": "345ece634e00c2b38d0eebf903074e1cd24715a6f3d4b22cb4aaeb09f906c72a",
+      "actual_sha256": "345ece634e00c2b38d0eebf903074e1cd24715a6f3d4b22cb4aaeb09f906c72a",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/thermo-medium-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Geometry.HolonicPantographicSwingJets",
+      "relative_path": "lean/Holonics/Geometry/HolonicPantographicSwingJets.lean",
+      "expected_sha256": "51c34caac9bd16deed9e31c4c1e3ed4c5c5680c5bc62d4438c8d9a6715b55939",
+      "actual_sha256": "51c34caac9bd16deed9e31c4c1e3ed4c5c5680c5bc62d4438c8d9a6715b55939",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/future-mode-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Objects.SourceHolon",
+      "relative_path": "lean/Holonics/Objects/SourceHolon.lean",
+      "expected_sha256": "ee0bb62a8a091c41a5e91d5ac6ce2ce831e692caf982b3ecf043439c747d5568",
+      "actual_sha256": "762578e715f1a2dcb7c1873dd063ac9758bd7ce5ccc1e3aef192528a7bc7998e",
+      "owner_override": true
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/future-mode-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Transport.SourceMoment",
+      "relative_path": "lean/Holonics/Transport/SourceMoment.lean",
+      "expected_sha256": "095b84a43b14e2768eb32d72d0bdabd63d7a931cfde8ab2dc92a3591ff6fd15e",
+      "actual_sha256": "095b84a43b14e2768eb32d72d0bdabd63d7a931cfde8ab2dc92a3591ff6fd15e",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/future-mode-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Foundation.ReceiverHistoryCompression",
+      "relative_path": "lean/Holonics/Foundation/ReceiverHistoryCompression.lean",
+      "expected_sha256": "404e28dfd7526c51d9711ccc975228b3cfab493a4d112def762469fe5b441ee0",
+      "actual_sha256": "404e28dfd7526c51d9711ccc975228b3cfab493a4d112def762469fe5b441ee0",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/future-mode-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Foundation.Lineage",
+      "relative_path": "lean/Holonics/Foundation/Lineage.lean",
+      "expected_sha256": "d0120d764009f01c3d718fbbbafd1861b07b3710743a85daf8335982f6509577",
+      "actual_sha256": "d0120d764009f01c3d718fbbbafd1861b07b3710743a85daf8335982f6509577",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/future-mode-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Foundation.Receiver",
+      "relative_path": "lean/Holonics/Foundation/Receiver.lean",
+      "expected_sha256": "32695757b94827663d9ad6547a125b2a8b0700ab99b890a64c9bf662da7c69c0",
+      "actual_sha256": "32695757b94827663d9ad6547a125b2a8b0700ab99b890a64c9bf662da7c69c0",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/future-mode-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Foundation.TransportWord",
+      "relative_path": "lean/Holonics/Foundation/TransportWord.lean",
+      "expected_sha256": "345ece634e00c2b38d0eebf903074e1cd24715a6f3d4b22cb4aaeb09f906c72a",
+      "actual_sha256": "345ece634e00c2b38d0eebf903074e1cd24715a6f3d4b22cb4aaeb09f906c72a",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/future-mode-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Foundation.Standing",
+      "relative_path": "lean/Holonics/Foundation/Standing.lean",
+      "expected_sha256": "bf8d951fa952394482357996ff358c1675af4775751e75bd407dcb0f605a0629",
+      "actual_sha256": "bf8d951fa952394482357996ff358c1675af4775751e75bd407dcb0f605a0629",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/future-mode-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Foundation.Standing.Law",
+      "relative_path": "lean/Holonics/Foundation/Standing/Law.lean",
+      "expected_sha256": "d29d9293eeac54ed0f13d282731e85d1609a4961e6e3d1ddce4db4e1190d9d9d",
+      "actual_sha256": "d29d9293eeac54ed0f13d282731e85d1609a4961e6e3d1ddce4db4e1190d9d9d",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/future-mode-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Foundation.CausalRelevance",
+      "relative_path": "lean/Holonics/Foundation/CausalRelevance.lean",
+      "expected_sha256": "1b0abc414881d1dbe5b1032cfde9ed2b2993f4c36910146ed4d8d8fcb4316d75",
+      "actual_sha256": "1b0abc414881d1dbe5b1032cfde9ed2b2993f4c36910146ed4d8d8fcb4316d75",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/future-mode-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Foundation.JointReceiverDescent",
+      "relative_path": "lean/Holonics/Foundation/JointReceiverDescent.lean",
+      "expected_sha256": "b334f39fa7d9eeefec4a373cf532119dccf9911c89577e0bdce272f7f3fdfc99",
+      "actual_sha256": "b334f39fa7d9eeefec4a373cf532119dccf9911c89577e0bdce272f7f3fdfc99",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/future-mode-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Foundation.CompleteReceiverHistory",
+      "relative_path": "lean/Holonics/Foundation/CompleteReceiverHistory.lean",
+      "expected_sha256": "1029450d1932590577401454b092296ac2ed17467c4c4ac7dfc83c36ddd9dbb7",
+      "actual_sha256": "1029450d1932590577401454b092296ac2ed17467c4c4ac7dfc83c36ddd9dbb7",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/future-mode-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Foundation.ReceiverFamily",
+      "relative_path": "lean/Holonics/Foundation/ReceiverFamily.lean",
+      "expected_sha256": "8ae595a4b215170a882c8cfd461410ec5a9cb8643017d7ad55f0ba9fb1fd63d4",
+      "actual_sha256": "8ae595a4b215170a882c8cfd461410ec5a9cb8643017d7ad55f0ba9fb1fd63d4",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/future-mode-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Foundation.ReceiverRelease",
+      "relative_path": "lean/Holonics/Foundation/ReceiverRelease.lean",
+      "expected_sha256": "15b940da5e3df804f051c6414912e3a7e6334d4f466c16d7d249a1d34558dab1",
+      "actual_sha256": "15b940da5e3df804f051c6414912e3a7e6334d4f466c16d7d249a1d34558dab1",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/future-mode-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Transport.ChangingReceiver.Defect",
+      "relative_path": "lean/Holonics/Transport/ChangingReceiver/Defect.lean",
+      "expected_sha256": "0fd69509667e6e3b3cee7c9ef853e29236c67c4f6c205dd1571b9bce4945c950",
+      "actual_sha256": "0fd69509667e6e3b3cee7c9ef853e29236c67c4f6c205dd1571b9bce4945c950",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/future-mode-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Foundation.RelationLadder.Comparison",
+      "relative_path": "lean/Holonics/Foundation/RelationLadder/Comparison.lean",
+      "expected_sha256": "97e90c7f7d571d2ea65f2bcea968fb11799aa46a01fc4a219a8447f182aeaa26",
+      "actual_sha256": "97e90c7f7d571d2ea65f2bcea968fb11799aa46a01fc4a219a8447f182aeaa26",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/future-mode-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Foundation.CausalChord",
+      "relative_path": "lean/Holonics/Foundation/CausalChord.lean",
+      "expected_sha256": "4b2c01a136c8c5cf4921d4660975ba6a8d6af5b7c9f61e0d55dcc8b1d6469aa8",
+      "actual_sha256": "bf9e8165102f911bf68d23edcf9a0136a70682539948db71f86d2cf789f74a0d",
+      "owner_override": true
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/future-mode-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Foundation.FractalPacking",
+      "relative_path": "lean/Holonics/Foundation/FractalPacking.lean",
+      "expected_sha256": "cc478f469e8ae0e2340ef3c479a0fa7c3e99b8f75ea5d09cb2172336364df30d",
+      "actual_sha256": "cc478f469e8ae0e2340ef3c479a0fa7c3e99b8f75ea5d09cb2172336364df30d",
+      "owner_override": false
+    },
+    {
+      "request": "<repository>/.local/wt/swept-transport/.local/future-mode-20261006/QUEUE_REQUEST.v2.json",
+      "module": "Holonics.Geometry.AffineSwing",
+      "relative_path": "lean/Holonics/Geometry/AffineSwing.lean",
+      "expected_sha256": "09ce73d5bc9766c152c3ccfc3b16a5f9627e5a4b3cda828ef9f1cf9e91b5805f",
+      "actual_sha256": "09ce73d5bc9766c152c3ccfc3b16a5f9627e5a4b3cda828ef9f1cf9e91b5805f",
+      "owner_override": false
+    }
+  ],
+  "nonowner_mismatches": []
+}

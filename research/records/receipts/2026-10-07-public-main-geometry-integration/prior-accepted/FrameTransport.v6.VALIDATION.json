@@ -1,0 +1,333 @@
+{
+  "accepted": true,
+  "acceptance_scope": "Existing exact-source FrameTransport object and ten selectors after independently sealed terminal-only metadata verification; no compiler rerun or consumer check",
+  "source_sha256": "9364dd0eff13d68cfdde97683a7b6c5084b0f2e1163dc44ad752aea5c71faa41",
+  "selectors": {
+    "Holonics.Geometry.FrameTransport.tube_section_area_vector": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FrameTransport.tube_section_flux": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FrameTransport.tube_sweep_hasFDerivAt": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FrameTransport.tube_sweep_slope_volume": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FrameTransport.tube_sweep_actual_volume": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FrameTransport.egg_chart_hasFDerivAt": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FrameTransport.egg_relative_current_section_flux": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FrameTransport.egg_chart_eq_tube_sweep": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FrameTransport.egg_jacobian_eq": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FrameTransport.egg_jacobian_hasDerivAt": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "object_pins": {
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-20261006/objects-v2/Holonics/Geometry/FrameTransport.olean": {
+      "sha256": "e7f75caa9dafed82f4a414f3902bb02abfb62f53e4cd2e817b1c30d5456d08a7",
+      "bytes": 2702840,
+      "durable_copy": "<repository>/.local/wt/swept-transport/research/records/receipts/2026-10-06-swept-derivative/native-validation-integrated-v6-incomplete/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-20261006/objects-v2/Holonics/Geometry/FrameTransport.olean"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-20261006/objects-v2/Holonics/Geometry/FrameTransport.ilean": {
+      "sha256": "7252386f6e821dfbf31c08908cae5ccd08552c623be10b86044657f21a094c64",
+      "bytes": 146191,
+      "durable_copy": "<repository>/.local/wt/swept-transport/research/records/receipts/2026-10-06-swept-derivative/native-validation-integrated-v6-incomplete/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-20261006/objects-v2/Holonics/Geometry/FrameTransport.ilean"
+    }
+  },
+  "original_attempt_passed": false,
+  "original_whole_stage_timeout_preserved": true,
+  "original_fixed_outer_ns": 14934073653,
+  "original_CPU_ns": 10694782000,
+  "terminal_CPU_ns": 1619351000,
+  "cumulative_CPU_ns": 12314133000,
+  "original_CPU_limit_ns": 17000000000,
+  "terminal_wall_ns": 1692310499,
+  "terminal_projection_ns": 3456515057,
+  "terminal_measured_to_projected": {
+    "numerator": 1692310499,
+    "denominator": 3456515057
+  },
+  "terminal_group_peak_bytes": 309846016,
+  "terminal_quiescent_release": true,
+  "compiler_rerun": false,
+  "actual_NS_consumer_checked": false,
+  "artifacts": {
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-20261006/TERMINAL_REQUEST.v1.json": {
+      "sha256": "12d74f762a89eb4027dfcdae9d3881e15ed8f053414b753399ba6658c56e3995",
+      "bytes": 8522,
+      "copy": "artifacts/12d74f762a89eb4027dfcdae9d3881e15ed8f053414b753399ba6658c56e3995"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/finish_lean_terminal_v1.py": {
+      "sha256": "b2405967a92419c9bb10ad5589727c3065a5d8c693d497d01f1cd11079ecf727",
+      "bytes": 4131,
+      "copy": "artifacts/b2405967a92419c9bb10ad5589727c3065a5d8c693d497d01f1cd11079ecf727"
+    },
+    "<repository>/.local/hodge-cut-cartier-20261003/runner-recovery-02/import_sealer.py": {
+      "sha256": "b323b6177c66c48d27a6a39ae580220e0c908430d0bbfbc2c33aa6b5b48b36da",
+      "bytes": 13162,
+      "copy": "artifacts/b323b6177c66c48d27a6a39ae580220e0c908430d0bbfbc2c33aa6b5b48b36da"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-20261006/COMPILER_REQUEST.v3.json": {
+      "sha256": "b02e6cef03026b292ae12cf6bee16528d05b2cc70ecb5bf19c3ddbeda78de45d",
+      "bytes": 3652,
+      "copy": "artifacts/b02e6cef03026b292ae12cf6bee16528d05b2cc70ecb5bf19c3ddbeda78de45d"
+    },
+    "<repository>/.local/wt/swept-transport/.local/sweep-20261006/integration-v6/lean/Holonics/Geometry/FrameTransport.lean": {
+      "sha256": "9364dd0eff13d68cfdde97683a7b6c5084b0f2e1163dc44ad752aea5c71faa41",
+      "bytes": 42269,
+      "copy": "artifacts/9364dd0eff13d68cfdde97683a7b6c5084b0f2e1163dc44ad752aea5c71faa41"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-20261006/current-imports.v5.json": {
+      "sha256": "9082794aad15aa5a2e82fff2ce5344cab27da3adc79de30c5636ed86ed204b72",
+      "bytes": 88981637,
+      "copy": "artifacts/9082794aad15aa5a2e82fff2ce5344cab27da3adc79de30c5636ed86ed204b72"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-20261006/compiler.v3.stdout": {
+      "sha256": "9bfb5c346c478f42d91b3f1d1020e251dca2961bec8ff8f6b6d91c28fd88bc75",
+      "bytes": 4005,
+      "copy": "artifacts/9bfb5c346c478f42d91b3f1d1020e251dca2961bec8ff8f6b6d91c28fd88bc75"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-20261006/compiler.v3.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "copy": "artifacts/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-20261006/objects-v2/Holonics/Geometry/FrameTransport.olean": {
+      "sha256": "e7f75caa9dafed82f4a414f3902bb02abfb62f53e4cd2e817b1c30d5456d08a7",
+      "bytes": 2702840,
+      "copy": "artifacts/e7f75caa9dafed82f4a414f3902bb02abfb62f53e4cd2e817b1c30d5456d08a7"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-20261006/objects-v2/Holonics/Geometry/FrameTransport.ilean": {
+      "sha256": "7252386f6e821dfbf31c08908cae5ccd08552c623be10b86044657f21a094c64",
+      "bytes": 146191,
+      "copy": "artifacts/7252386f6e821dfbf31c08908cae5ccd08552c623be10b86044657f21a094c64"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-development-20261006-v3.stdout": {
+      "sha256": "8ce0eae1efc42035ac6096b33f70f0f161b39db332fd71138b3be7b1bba5694d",
+      "bytes": 4185,
+      "copy": "artifacts/8ce0eae1efc42035ac6096b33f70f0f161b39db332fd71138b3be7b1bba5694d"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-development-20261006-v3.final.json": {
+      "sha256": "66a81415384e520b4699eb8af83336ff4570c695f3c28b725957c38e3b68e4a7",
+      "bytes": 4437,
+      "copy": "artifacts/66a81415384e520b4699eb8af83336ff4570c695f3c28b725957c38e3b68e4a7"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-development-20261006-v3.release.json": {
+      "sha256": "b37002686ed0b568d753abdba877797666bc64d6d4f72c9fffab1939ce07ca57",
+      "bytes": 175,
+      "copy": "artifacts/b37002686ed0b568d753abdba877797666bc64d6d4f72c9fffab1939ce07ca57"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-development-20261006-v3.config.json": {
+      "sha256": "1a0709cc27f6f50ea1eff2b2bf50ee8c02c43311e5eb722d445bc16779fd8a0e",
+      "bytes": 9648,
+      "copy": "artifacts/1a0709cc27f6f50ea1eff2b2bf50ee8c02c43311e5eb722d445bc16779fd8a0e"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-development-20261006-v3.input_seal.json": {
+      "sha256": "30f8ba773c31634fa024f6bf8152d7914414c524c1204cc2e024d3f74e7e10a2",
+      "bytes": 6086,
+      "copy": "artifacts/30f8ba773c31634fa024f6bf8152d7914414c524c1204cc2e024d3f74e7e10a2"
+    },
+    "<repository>/.local/wt/swept-transport/research/records/receipts/2026-10-06-swept-derivative/native-validation-integrated-v6-incomplete/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-20261006/COMPILER_REQUEST.v3.json": {
+      "sha256": "b02e6cef03026b292ae12cf6bee16528d05b2cc70ecb5bf19c3ddbeda78de45d",
+      "bytes": 3652,
+      "copy": "artifacts/b02e6cef03026b292ae12cf6bee16528d05b2cc70ecb5bf19c3ddbeda78de45d"
+    },
+    "<repository>/.local/wt/swept-transport/research/records/receipts/2026-10-06-swept-derivative/native-validation-integrated-v6-incomplete/.local/wt/swept-transport/.local/sweep-20261006/integration-v6/lean/Holonics/Geometry/FrameTransport.lean": {
+      "sha256": "9364dd0eff13d68cfdde97683a7b6c5084b0f2e1163dc44ad752aea5c71faa41",
+      "bytes": 42269,
+      "copy": "artifacts/9364dd0eff13d68cfdde97683a7b6c5084b0f2e1163dc44ad752aea5c71faa41"
+    },
+    "<repository>/.local/wt/swept-transport/research/records/receipts/2026-10-06-swept-derivative/native-validation-integrated-v6-incomplete/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-20261006/current-imports.v5.json": {
+      "sha256": "9082794aad15aa5a2e82fff2ce5344cab27da3adc79de30c5636ed86ed204b72",
+      "bytes": 88981637,
+      "copy": "artifacts/9082794aad15aa5a2e82fff2ce5344cab27da3adc79de30c5636ed86ed204b72"
+    },
+    "<repository>/.local/wt/swept-transport/research/records/receipts/2026-10-06-swept-derivative/native-validation-integrated-v6-incomplete/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-20261006/compiler.v3.stdout": {
+      "sha256": "9bfb5c346c478f42d91b3f1d1020e251dca2961bec8ff8f6b6d91c28fd88bc75",
+      "bytes": 4005,
+      "copy": "artifacts/9bfb5c346c478f42d91b3f1d1020e251dca2961bec8ff8f6b6d91c28fd88bc75"
+    },
+    "<repository>/.local/wt/swept-transport/research/records/receipts/2026-10-06-swept-derivative/native-validation-integrated-v6-incomplete/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-20261006/compiler.v3.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "copy": "artifacts/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "<repository>/.local/wt/swept-transport/research/records/receipts/2026-10-06-swept-derivative/native-validation-integrated-v6-incomplete/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-20261006/objects-v2/Holonics/Geometry/FrameTransport.olean": {
+      "sha256": "e7f75caa9dafed82f4a414f3902bb02abfb62f53e4cd2e817b1c30d5456d08a7",
+      "bytes": 2702840,
+      "copy": "artifacts/e7f75caa9dafed82f4a414f3902bb02abfb62f53e4cd2e817b1c30d5456d08a7"
+    },
+    "<repository>/.local/wt/swept-transport/research/records/receipts/2026-10-06-swept-derivative/native-validation-integrated-v6-incomplete/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-20261006/objects-v2/Holonics/Geometry/FrameTransport.ilean": {
+      "sha256": "7252386f6e821dfbf31c08908cae5ccd08552c623be10b86044657f21a094c64",
+      "bytes": 146191,
+      "copy": "artifacts/7252386f6e821dfbf31c08908cae5ccd08552c623be10b86044657f21a094c64"
+    },
+    "<repository>/.local/wt/swept-transport/research/records/receipts/2026-10-06-swept-derivative/native-validation-integrated-v6-incomplete/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-development-20261006-v3.stdout": {
+      "sha256": "8ce0eae1efc42035ac6096b33f70f0f161b39db332fd71138b3be7b1bba5694d",
+      "bytes": 4185,
+      "copy": "artifacts/8ce0eae1efc42035ac6096b33f70f0f161b39db332fd71138b3be7b1bba5694d"
+    },
+    "<repository>/.local/wt/swept-transport/research/records/receipts/2026-10-06-swept-derivative/native-validation-integrated-v6-incomplete/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-development-20261006-v3.final.json": {
+      "sha256": "66a81415384e520b4699eb8af83336ff4570c695f3c28b725957c38e3b68e4a7",
+      "bytes": 4437,
+      "copy": "artifacts/66a81415384e520b4699eb8af83336ff4570c695f3c28b725957c38e3b68e4a7"
+    },
+    "<repository>/.local/wt/swept-transport/research/records/receipts/2026-10-06-swept-derivative/native-validation-integrated-v6-incomplete/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-development-20261006-v3.release.json": {
+      "sha256": "b37002686ed0b568d753abdba877797666bc64d6d4f72c9fffab1939ce07ca57",
+      "bytes": 175,
+      "copy": "artifacts/b37002686ed0b568d753abdba877797666bc64d6d4f72c9fffab1939ce07ca57"
+    },
+    "<repository>/.local/wt/swept-transport/research/records/receipts/2026-10-06-swept-derivative/native-validation-integrated-v6-incomplete/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-development-20261006-v3.config.json": {
+      "sha256": "1a0709cc27f6f50ea1eff2b2bf50ee8c02c43311e5eb722d445bc16779fd8a0e",
+      "bytes": 9648,
+      "copy": "artifacts/1a0709cc27f6f50ea1eff2b2bf50ee8c02c43311e5eb722d445bc16779fd8a0e"
+    },
+    "<repository>/.local/wt/swept-transport/research/records/receipts/2026-10-06-swept-derivative/native-validation-integrated-v6-incomplete/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-development-20261006-v3.input_seal.json": {
+      "sha256": "30f8ba773c31634fa024f6bf8152d7914414c524c1204cc2e024d3f74e7e10a2",
+      "bytes": 6086,
+      "copy": "artifacts/30f8ba773c31634fa024f6bf8152d7914414c524c1204cc2e024d3f74e7e10a2"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/final_stage.py": {
+      "sha256": "a0a5a94f157acf9a5127b756a036c6e86449dc2012af0f1e71d34aafa13bc79e",
+      "bytes": 10968,
+      "copy": "artifacts/a0a5a94f157acf9a5127b756a036c6e86449dc2012af0f1e71d34aafa13bc79e"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/leased_stage_v2.py": {
+      "sha256": "bcf91456534e763a025613f39e82853d7a58529b399bb183d544d09a7a42f949",
+      "bytes": 5520,
+      "copy": "artifacts/bcf91456534e763a025613f39e82853d7a58529b399bb183d544d09a7a42f949"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/bounded_stage_v1.py": {
+      "sha256": "84b7d003089fa19881690e368200b2168b9d179c8e6573bdafab54369235cec2",
+      "bytes": 12645,
+      "copy": "artifacts/84b7d003089fa19881690e368200b2168b9d179c8e6573bdafab54369235cec2"
+    },
+    "/usr/bin/python3.14": {
+      "sha256": "ac12d99c156d3c0ec708a2baf664d35b74f455572fe35fd57faa420ade5c3845",
+      "bytes": 14424,
+      "copy": "artifacts/ac12d99c156d3c0ec708a2baf664d35b74f455572fe35fd57faa420ade5c3845"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-20261006/TERMINAL_KERNEL_VALIDATION.v1.json": {
+      "sha256": "85f62702c640f17c39878397f939f350b11c68a4c043fbafd610cc3017f3d5fe",
+      "bytes": 2886,
+      "copy": "artifacts/85f62702c640f17c39878397f939f350b11c68a4c043fbafd610cc3017f3d5fe"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-terminal-only-20261006-v1.config.json": {
+      "sha256": "2f80305336b51412f27976d941baaa228b67e88a26715cb2a98e772ba32f1adf",
+      "bytes": 17625,
+      "copy": "artifacts/2f80305336b51412f27976d941baaa228b67e88a26715cb2a98e772ba32f1adf"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-terminal-only-20261006-v1.external-lease.json": {
+      "sha256": "114bf7ee664ca7d622181b7dd8cde06f8cb38adce4d5833d1eba211a76790312",
+      "bytes": 487,
+      "copy": "artifacts/114bf7ee664ca7d622181b7dd8cde06f8cb38adce4d5833d1eba211a76790312"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-terminal-only-20261006-v1.lease-identity.json": {
+      "sha256": "f71edd338b5310b437580345ad20ef6efbd8dd92732f3b91b8b8d2a4dc067a7e",
+      "bytes": 565,
+      "copy": "artifacts/f71edd338b5310b437580345ad20ef6efbd8dd92732f3b91b8b8d2a4dc067a7e"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-terminal-only-20261006-v1.input_seal.json": {
+      "sha256": "37dcc5f38adfa7de93dce8acbc2b585b58d4364afbf6a91959897d28a3ea957f",
+      "bytes": 10807,
+      "copy": "artifacts/37dcc5f38adfa7de93dce8acbc2b585b58d4364afbf6a91959897d28a3ea957f"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-terminal-only-20261006-v1.stdout": {
+      "sha256": "e181f6c9105885357cd1b120a0346cf083d96b70746c0f0d064499b2a0928ad3",
+      "bytes": 2708,
+      "copy": "artifacts/e181f6c9105885357cd1b120a0346cf083d96b70746c0f0d064499b2a0928ad3"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-terminal-only-20261006-v1.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "copy": "artifacts/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-terminal-only-20261006-v1.memory-gate.json": {
+      "sha256": "1ad51127dc524f6b2242877d5fdefffb41bd6cc3a8afec02f36bdf7fe30f0f27",
+      "bytes": 120,
+      "copy": "artifacts/1ad51127dc524f6b2242877d5fdefffb41bd6cc3a8afec02f36bdf7fe30f0f27"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-terminal-only-20261006-v1.child-identity.json": {
+      "sha256": "adbe04383687c98da13ada66effcc2944b3a2852f403a9c26911f3a6b43592ba",
+      "bytes": 78,
+      "copy": "artifacts/adbe04383687c98da13ada66effcc2944b3a2852f403a9c26911f3a6b43592ba"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-terminal-only-20261006-v1.system-floor.json": {
+      "sha256": "ab6ab57fc5b29e6b466ae1ffc029869ffc73fb1fb08878804a5c887c120b21d3",
+      "bytes": 10848,
+      "copy": "artifacts/ab6ab57fc5b29e6b466ae1ffc029869ffc73fb1fb08878804a5c887c120b21d3"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-terminal-only-20261006-v1.quiescence.json": {
+      "sha256": "2edc4462395eb04e92cc26b8deb383f0c4b7d2930c6ea262ad9f683f7561a2be",
+      "bytes": 130,
+      "copy": "artifacts/2edc4462395eb04e92cc26b8deb383f0c4b7d2930c6ea262ad9f683f7561a2be"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-terminal-only-20261006-v1.output_seal.json": {
+      "sha256": "5d2421dbffaefc439ef5877afc75beb8a93c1af0d41b27756de3c828f7cb7309",
+      "bytes": 97254,
+      "copy": "artifacts/5d2421dbffaefc439ef5877afc75beb8a93c1af0d41b27756de3c828f7cb7309"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-terminal-only-20261006-v1.publication.json": {
+      "sha256": "cc9ee09b4b5aa1478945bc2112679078494771bb69778baba531920299279877",
+      "bytes": 3054,
+      "copy": "artifacts/cc9ee09b4b5aa1478945bc2112679078494771bb69778baba531920299279877"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-terminal-only-20261006-v1.stage-quiescence.json": {
+      "sha256": "7047b55933827b24e69b8ef154b0acd5aa55d355cc259e3c9ff267362fe2926b",
+      "bytes": 136,
+      "copy": "artifacts/7047b55933827b24e69b8ef154b0acd5aa55d355cc259e3c9ff267362fe2926b"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-terminal-only-20261006-v1.final.json": {
+      "sha256": "366bb1b3081cb3a9721f78062394efb86c5331cd3f1b7899d2f032aa1e43b26b",
+      "bytes": 4936,
+      "copy": "artifacts/366bb1b3081cb3a9721f78062394efb86c5331cd3f1b7899d2f032aa1e43b26b"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-terminal-only-20261006-v1.unit-cleanup.json": {
+      "sha256": "8bbaac893d2d2ff9dcde267c7c31136d4b67bcab3b39fc3a418ef83e316e15b1",
+      "bytes": 729,
+      "copy": "artifacts/8bbaac893d2d2ff9dcde267c7c31136d4b67bcab3b39fc3a418ef83e316e15b1"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-terminal-only-20261006-v1.acceptance.json": {
+      "sha256": "c0092fae848db960e606645ff92882e26018e0cf6aff692ef03f26f54a5fa413",
+      "bytes": 378,
+      "copy": "artifacts/c0092fae848db960e606645ff92882e26018e0cf6aff692ef03f26f54a5fa413"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-integrated-frame-terminal-only-20261006-v1.release.json": {
+      "sha256": "26e4dde64007b6e158a4d171a5c6e57c2477273bf044c4c6177634f2217d97b6",
+      "bytes": 175,
+      "copy": "artifacts/26e4dde64007b6e158a4d171a5c6e57c2477273bf044c4c6177634f2217d97b6"
+    }
+  }
+}

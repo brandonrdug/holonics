@@ -1,0 +1,55 @@
+{
+  "files": {
+    "GAUSSIAN_REBASE_SOURCE_PIN.v1.json": {
+      "original": {
+        "bytes": 484,
+        "sha256": "fbfb9a965ee366d13a4754c3bda47394c440a44587567614b4faa2be109c1f7e"
+      },
+      "projected": {
+        "bytes": 469,
+        "sha256": "15820862ca258e93d0f2bf38dfdbf750bb69de7e2acd38110ee7968cc774ff7c"
+      },
+      "replaced": {
+        "<repository>": 1,
+        "<lean-toolchain>/": 0,
+        "<home>": 0
+      }
+    },
+    "SOURCE_CHECK.v1.json": {
+      "original": {
+        "bytes": 7218,
+        "sha256": "c7a54a67e2510926bd3d69932ccdc0b900d5d74648dce363abeb9b6341c366dd"
+      },
+      "projected": {
+        "bytes": 6888,
+        "sha256": "74ef04dbd56119cf37320387d68a5e682f87746c3fa58ea559a8b7e1270b3850"
+      },
+      "replaced": {
+        "<repository>": 22,
+        "<lean-toolchain>/": 0,
+        "<home>": 0
+      }
+    },
+    "SOURCE_PINS.v1.json": {
+      "original": {
+        "bytes": 10620,
+        "sha256": "6cd3d5f2764366db24abdaf98ee0b03e753f47e7ad62ceb3724c8fe50ce04952"
+      },
+      "projected": {
+        "bytes": 10320,
+        "sha256": "75848aee7588464b3780f1b8678b49386ba22b2a0ccc71979adf45fc87717912"
+      },
+      "replaced": {
+        "<repository>": 20,
+        "<lean-toolchain>/": 0,
+        "<home>": 0
+      }
+    }
+  },
+  "placeholders": {
+    "<repository>": "the absolute host directory of the repository's main checkout; the path that follows (a tracked path, or a worktree or private run directory under .local/) is kept",
+    "<lean-toolchain>/": "the absolute host directory of the Lean 4.33.0 toolchain the check invoked; the path that follows is kept",
+    "<home>": "the host user's home directory"
+  },
+  "rule": "each absolute host prefix below is replaced by its placeholder, the longer prefixes first; no other byte changes. The placeholders do not occur in the originals, so substituting each prefix back restores the original bytes, whose sha256 and size are pinned here; checked locally before commit. The originals stay in local custody."
+}

@@ -1,0 +1,296 @@
+{
+  "version": 1,
+  "scope": "source-only full-field work and finite actual contact-material response reconciliation; no source owner changes, builds or new source injection",
+  "root_source_commit": "b34c87770272ab8688bc59605c690b47fe996428",
+  "geometry_record_base_commit": "fc52033108d504cb8e503a6c737c88a817ffde27",
+  "record": {
+    "base": "<repository>/.local/wt/geometry-integration-01a10f3d",
+    "path": "research/records/2026-10-07_PLASMA_AND_GAS_CURRENTS_CROSS_THE_SAME_MOVING_TUBE.md",
+    "bytes": 62100,
+    "sha256": "441c542592d4d785cd124c95ecbe8a6ef8b010b356ce27f531fd6973eccafa38",
+    "locations": [
+      {
+        "anchor": "### The continuing native wave",
+        "lines": [
+          673
+        ]
+      },
+      {
+        "anchor": "### An actual material perturbation",
+        "lines": [
+          779
+        ]
+      }
+    ]
+  },
+  "sources": [
+    {
+      "base": "<repository>",
+      "path": "crates/holonics/src/hnn/propagation.rs",
+      "bytes": 65760,
+      "sha256": "8601184b65412bb8383b90fcf2829cc2b0119a94878681e1dc2712a4d94b1c45",
+      "locations": [
+        {
+          "anchor": "pub fn contact_operator",
+          "lines": [
+            391
+          ]
+        },
+        {
+          "anchor": "pub fn transit_solve",
+          "lines": [
+            1349
+          ]
+        },
+        {
+          "anchor": "pub fn transit_update",
+          "lines": [
+            1375
+          ]
+        },
+        {
+          "anchor": "pub fn transit_defect",
+          "lines": [
+            1417
+          ]
+        }
+      ]
+    },
+    {
+      "base": "<repository>",
+      "path": "crates/holonics/src/hnn/word.rs",
+      "bytes": 80739,
+      "sha256": "0d73217c8a560c5d412fdad7cca13588103aaf67c889f0436c00cba91cbb2f12",
+      "locations": [
+        {
+          "anchor": "pub struct PowerForm",
+          "lines": [
+            352
+          ]
+        },
+        {
+          "anchor": "pub fn deposition_work",
+          "lines": [
+            446
+          ]
+        },
+        {
+          "anchor": "pub fn tick",
+          "lines": [
+            1050,
+            1300
+          ]
+        }
+      ]
+    },
+    {
+      "base": "<repository>",
+      "path": "crates/holonics/src/hnn/word/continuation.rs",
+      "bytes": 16624,
+      "sha256": "7bd1510815a8338833844be13c9d7ec79c8bdf9371e5779349aef0e4a9113e25",
+      "locations": [
+        {
+          "anchor": "pub fn continue_deposited",
+          "lines": [
+            232
+          ]
+        },
+        {
+          "anchor": "pub struct ContinuationReceipt",
+          "lines": [
+            36
+          ]
+        }
+      ]
+    },
+    {
+      "base": "<repository>",
+      "path": "crates/holonics/src/hnn/reference.rs",
+      "bytes": 191514,
+      "sha256": "cf6a7501643ac70ed3392121c67b3dc42e81768e85b258e411c8137dab8d2568",
+      "locations": [
+        {
+          "anchor": "pub(crate) fn compose_contact",
+          "lines": [
+            2460
+          ]
+        }
+      ]
+    },
+    {
+      "base": "<repository>",
+      "path": "lean/Holonics/HNN/Propagation.lean",
+      "bytes": 53379,
+      "sha256": "fb0664f563c9d1a794980763a42e103448e806cf0b8e1a13f6b6a4714bd4be7c",
+      "locations": [
+        {
+          "anchor": "def transitOperator",
+          "lines": [
+            355
+          ]
+        },
+        {
+          "anchor": "def TransitSolves",
+          "lines": [
+            360
+          ]
+        },
+        {
+          "anchor": "def arriveG",
+          "lines": [
+            368
+          ]
+        },
+        {
+          "anchor": "def arriveH",
+          "lines": [
+            371
+          ]
+        },
+        {
+          "anchor": "theorem transit_balance",
+          "lines": [
+            391,
+            418
+          ]
+        }
+      ]
+    },
+    {
+      "base": "<repository>",
+      "path": "lean/Holonics/HNN/Ring.lean",
+      "bytes": 52577,
+      "sha256": "c9001e09235dbbefd4bda1126eb4f5ac99e778f59c7c845569948ec97185a0e7",
+      "locations": [
+        {
+          "anchor": "theorem ring_material_commit_work",
+          "lines": [
+            291
+          ]
+        },
+        {
+          "anchor": "theorem loaded_material_rate_tangent",
+          "lines": [
+            372
+          ]
+        },
+        {
+          "anchor": "theorem loaded_tick_material_variation",
+          "lines": [
+            394
+          ]
+        }
+      ]
+    },
+    {
+      "base": "<repository>",
+      "path": "lean/Holonics/HNN/LatticeWord.lean",
+      "bytes": 92762,
+      "sha256": "449af711c1e3e4dba053a4f35bbdd679a02936ab65b0e6e33d1d19c7ff65ca9e",
+      "locations": [
+        {
+          "anchor": "theorem warm_start_residual",
+          "lines": [
+            206
+          ]
+        }
+      ]
+    },
+    {
+      "base": "<repository>",
+      "path": "lean/Holonics/Holon/Element.lean",
+      "bytes": 26059,
+      "sha256": "48197e7453f674319f04635043dfe6e9a2649c8440023c88dcbd49636239dd70",
+      "locations": [
+        {
+          "anchor": "theorem PortHolon.energy_balance",
+          "lines": [
+            162,
+            175,
+            194
+          ]
+        },
+        {
+          "anchor": "theorem horizontal_orthogonal_hidden",
+          "lines": [
+            391
+          ]
+        },
+        {
+          "anchor": "theorem energy_split",
+          "lines": [
+            397
+          ]
+        },
+        {
+          "anchor": "theorem hidden_energy_nonneg",
+          "lines": [
+            422
+          ]
+        }
+      ]
+    },
+    {
+      "base": "<repository>",
+      "path": "lean/Holonics/Holon/Deposition.lean",
+      "bytes": 63679,
+      "sha256": "5c2b58ebdd6aef52531f70f7d93b5395169f7157292ac03e38e4cb6226f8b4ff",
+      "locations": [
+        {
+          "anchor": "theorem span_transport_compose",
+          "lines": [
+            952
+          ]
+        },
+        {
+          "anchor": "theorem station_tick_gain",
+          "lines": [
+            965
+          ]
+        }
+      ]
+    },
+    {
+      "base": "<repository>",
+      "path": "lean/HolonicsResearch/Physics/HolonicDiscreteMaxwellOperator.lean",
+      "bytes": 49431,
+      "sha256": "8a7ce6145df80401fd63acf9f89a6f72423610df99e853ef54094c49df6081d5",
+      "locations": [
+        {
+          "anchor": "def boundaryPower",
+          "lines": [
+            581
+          ]
+        },
+        {
+          "anchor": "theorem boundaryPower_materialCoCurl_eq_zero",
+          "lines": [
+            588
+          ]
+        },
+        {
+          "anchor": "theorem poynting_balance",
+          "lines": [
+            596
+          ]
+        }
+      ]
+    },
+    {
+      "base": "<repository>/.local/wt/geometry-integration-01a10f3d",
+      "path": "lean/Holonics/Geometry/FrameTransport.lean",
+      "bytes": 42269,
+      "sha256": "9364dd0eff13d68cfdde97683a7b6c5084b0f2e1163dc44ad752aea5c71faa41",
+      "locations": [
+        {
+          "anchor": "theorem egg_relative_current_section_flux",
+          "lines": [
+            568
+          ]
+        }
+      ]
+    }
+  ],
+  "derivation_status": "finite identities manually derived from pinned producer equations; not newly kernel checked",
+  "finite_gain_status": "conditional positive-metric certificate for existing station_tick_gain hypotheses; no new validated span gain"
+}

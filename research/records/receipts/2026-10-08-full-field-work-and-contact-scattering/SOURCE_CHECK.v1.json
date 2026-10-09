@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "verified_at_utc": "2026-10-08T00:28:05Z",
+  "source_pins_sha256": "31ff249796622b8be29dd35030c25193317d69e28fae6db5b5f455518312e4fd",
+  "source_hashes_and_anchors_match": true,
+  "previous_native_source_pins_unchanged": [
+    {
+      "path": "crates/holonics/src/hnn/word.rs",
+      "sha256": "0d73217c8a560c5d412fdad7cca13588103aaf67c889f0436c00cba91cbb2f12",
+      "unchanged": true
+    },
+    {
+      "path": "crates/holonics/src/hnn/word/continuation.rs",
+      "sha256": "7bd1510815a8338833844be13c9d7ec79c8bdf9371e5779349aef0e4a9113e25",
+      "unchanged": true
+    },
+    {
+      "path": "lean/Holonics/HNN/Ring.lean",
+      "sha256": "c9001e09235dbbefd4bda1126eb4f5ac99e778f59c7c845569948ec97185a0e7",
+      "unchanged": true
+    },
+    {
+      "path": "lean/Holonics/Holon/Element.lean",
+      "sha256": "48197e7453f674319f04635043dfe6e9a2649c8440023c88dcbd49636239dd70",
+      "unchanged": true
+    },
+    {
+      "path": "lean/Holonics/Geometry/FrameTransport.lean",
+      "sha256": "9364dd0eff13d68cfdde97683a7b6c5084b0f2e1163dc44ad752aea5c71faa41",
+      "unchanged": true
+    }
+  ],
+  "accepted_geometry_and_queue_frozen": [
+    {
+      "path": "lean/Holonics/Geometry/FrameTransport.lean",
+      "expected_sha256": "9364dd0eff13d68cfdde97683a7b6c5084b0f2e1163dc44ad752aea5c71faa41",
+      "actual_sha256": "9364dd0eff13d68cfdde97683a7b6c5084b0f2e1163dc44ad752aea5c71faa41"
+    },
+    {
+      "path": "lean/Holonics/Geometry/Motion.lean",
+      "expected_sha256": "0be5b5b2b2aa729a73a8530f3a751d0015a6735f34f23e1667faa8fe34e9e85e",
+      "actual_sha256": "0be5b5b2b2aa729a73a8530f3a751d0015a6735f34f23e1667faa8fe34e9e85e"
+    },
+    {
+      "path": "lean/Holonics/Foundation/CausalChord.lean",
+      "expected_sha256": "4b2c01a136c8c5cf4921d4660975ba6a8d6af5b7c9f61e0d55dcc8b1d6469aa8",
+      "actual_sha256": "4b2c01a136c8c5cf4921d4660975ba6a8d6af5b7c9f61e0d55dcc8b1d6469aa8"
+    },
+    {
+      "path": "lean/Holonics/Objects/SourceHolon.lean",
+      "expected_sha256": "ee0bb62a8a091c41a5e91d5ac6ce2ce831e692caf982b3ecf043439c747d5568",
+      "actual_sha256": "ee0bb62a8a091c41a5e91d5ac6ce2ce831e692caf982b3ecf043439c747d5568"
+    },
+    {
+      "path": "research/records/receipts/2026-10-07-public-main-geometry-integration/QUEUE_REQUEST.v1.json",
+      "expected_sha256": "eb9f97592dc0c0709bdfd64a386824e656871f53b00759e057d48c574d0398bf",
+      "actual_sha256": "eb9f97592dc0c0709bdfd64a386824e656871f53b00759e057d48c574d0398bf"
+    }
+  ],
+  "changed_tracked_paths": [
+    "research/records/2026-10-07_PLASMA_AND_GAS_CURRENTS_CROSS_THE_SAME_MOVING_TUBE.md"
+  ],
+  "diff_check_exit_code": 0,
+  "builds": 0,
+  "simulations": 0,
+  "new_numerical_examples": 0,
+  "sealed_validation_reopened": false,
+  "execution_receipt": {
+    "kind": "source binding and whitespace check only",
+    "thread_budget": 1,
+    "fixed_deadline_ms": 2000,
+    "elapsed_ns": 13273890,
+    "checker_process_peak_resident_bytes": 20254720
+  }
+}

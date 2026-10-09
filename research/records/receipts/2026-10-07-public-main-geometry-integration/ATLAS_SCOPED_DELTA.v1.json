@@ -1,0 +1,29 @@
+{
+  "changed_rows": [
+    {
+      "path": "docs/atlas/geometry.tsv",
+      "id": "frame.tube-sweep-actual-volume",
+      "line": "frame.tube-sweep-actual-volume\ttube, receiver, face, placement\tF=dX from actual c_s=t, d1_s=−κ1t+Ωd2, d2_s=−κ2t−Ωd1 and varying a,b,ε; J=X_s·(X_u×X_v)=(1−κ1q1−κ2q2)ab(1+εu)(1+2εu)\tfull swept Fréchet derivative consumed by actual oriented volume; twist remains in derivative/metric while cancelling in J\tpointwise differentiability and declared proper-frame skew rates; positive factors give local rank, global injectivity separate; whole isolated owner v3 kernel-checked; canonical integration/library gate separate\tL:Geometry/FrameTransport:tube_sweep_hasFDerivAt; L:Geometry/FrameTransport:tube_sweep_actual_volume; N:2026-10-07_THE_ACCEPTED_GEOMETRY_OWNERS_JOIN_CURRENT_PUBLIC_MAIN.md\tformal-checked; exact prior accepted owner scope; fresh combined public-base import check pending\tuses:frame.tube-section-derivative, uses:frame.tube-section-area",
+      "delta": "only scoped record/status references changed from accepted atlas row"
+    },
+    {
+      "path": "docs/atlas/geometry.tsv",
+      "id": "frame.egg-actual-jacobian-clock",
+      "line": "frame.egg-actual-jacobian-clock\ttube, receiver, ratio, receipt\tF=fderiv(actual E1); J=ell*a*b*(1+δζ)^2*(1+εu)*(1+2εu); Jdot retains ell_dot,a_dot,b_dot,δ_dot,ε_dot from actual parameter clocks\tactual E1 volume clock joins the swept map and the preserved private NS phase-section receipt\tfixed proper frame; five actual HasDerivAt clocks; no inverse/positive J required; accepted exact v6 source; general Piola/integral theorem separate\tL:Geometry/FrameTransport:egg_chart_eq_tube_sweep; L:Geometry/FrameTransport:egg_jacobian_eq; L:Geometry/FrameTransport:egg_jacobian_hasDerivAt; N:2026-10-07_THE_ACCEPTED_GEOMETRY_OWNERS_JOIN_CURRENT_PUBLIC_MAIN.md\tformal-checked; exact prior accepted owner scope; fresh combined public-base import check pending\tuses:frame.tube-sweep-actual-volume, uses:frame.tube-section-area",
+      "delta": "only scoped record/status references changed from accepted atlas row"
+    },
+    {
+      "path": "docs/atlas/geometry.tsv",
+      "id": "motion.decoding-work-defect",
+      "line": "motion.decoding-work-defect\tswing, constitution, receiver, ratio, compression\tR=VP; (PTW)ᵀ(VᵀG1V)(PTW)−WᵀG0W=Wᵀ(TᵀG1T−G0)W+WᵀTᵀ(RᵀG1R−G1)TW\ta lossy ending decoder returns the transported storage-form defect; the existing chart theorem consumes it with VP=I\tfinite square matrices over a commutative ring; no inverse, symmetry or positivity\tL:Geometry/Motion:finite_work_form_rechart_defect; L:Geometry/Motion:finite_work_form_rechart; N:2026-10-07_THE_ACCEPTED_GEOMETRY_OWNERS_JOIN_CURRENT_PUBLIC_MAIN.md\tformal-checked; exact prior accepted owner scope; fresh combined public-base import check pending\tgeneralizes:motion.finite-work-chart, uses:motion.energy-moving-metric",
+      "delta": "only scoped record/status references changed from accepted atlas row"
+    },
+    {
+      "path": "docs/atlas/objects.tsv",
+      "id": "receipt.positive-future-read-form",
+      "line": "receipt.positive-future-read-form\treceipt, navigator, receiver, compression\tW = Σᵢ LᵢᵀQᵢLᵢ, Lᵢ = CᵢΦᵢ; xᵀWx = Σᵢ(Lᵢx)ᵀQᵢ(Lᵢx); Qᵢ ≻ 0 ⇒ zero score iff every declared future read is zero; actual source future agreement iff all finite-horizon scores of its moment difference vanish\tpositive future reception tests the existing source quotient without releasing a currently silent future-visible mode\tcommutative ordered ring with trivial star, additive order compatibility, finite declared reads and positive receiver metrics; source consumer over a field; finite truncation needs existing horizon certificate\tL:Foundation/CausalChord:futureReadForm_pairing; L:Foundation/CausalChord:futureReadForm_zero_iff; L:Objects/SourceHolon:matrixReader_futureAgreement_iff_zero_futureReadScore; N:2026-10-07_THE_ACCEPTED_GEOMETRY_OWNERS_JOIN_CURRENT_PUBLIC_MAIN.md\tformal-checked; exact prior accepted owner scope; fresh combined public-base import check pending\tuses:navigator.moment-minimal-iff-observable, uses:compression.finite-horizon-kernel, uses:receipt.causal-chord-transfer",
+      "delta": "only scoped record/status references changed from accepted atlas row"
+    }
+  ],
+  "all_other_rows_preserved": true
+}

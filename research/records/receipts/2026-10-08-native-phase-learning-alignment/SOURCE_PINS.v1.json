@@ -1,0 +1,268 @@
+{
+  "version": 1,
+  "scope": "bounded source-only check of continuing wave/contact learning, current executed phase-bank comparison and actual observation caller; one proposed existing-owner consumer join, no implementation or learning acceptance",
+  "root_source_commit": "b34c87770272ab8688bc59605c690b47fe996428",
+  "record_base_commit": "cb842d3e51ce5c2897f2129b918a6963717afc51",
+  "record": {
+    "base": "<repository>/.local/wt/geometry-integration-01a10f3d",
+    "path": "research/records/2026-10-07_PLASMA_AND_GAS_CURRENTS_CROSS_THE_SAME_MOVING_TUBE.md",
+    "bytes": 69215,
+    "sha256": "e3560711291c9b29f2261a2b2010d0b031169094c0cbe3669274a15090ba8517",
+    "locations": [
+      {
+        "anchor": "### The phase-sensitive learner",
+        "lines": [
+          906
+        ]
+      }
+    ]
+  },
+  "sources": [
+    {
+      "base": "<repository>",
+      "path": "crates/holonics/src/hnn/word/continuation.rs",
+      "bytes": 16624,
+      "sha256": "7bd1510815a8338833844be13c9d7ec79c8bdf9371e5779349aef0e4a9113e25",
+      "locations": [
+        {
+          "anchor": "pub fn compare_contact_storage",
+          "lines": [
+            64
+          ]
+        },
+        {
+          "anchor": "pub fn continue_deposited",
+          "lines": [
+            232
+          ]
+        }
+      ]
+    },
+    {
+      "base": "<repository>",
+      "path": "crates/holonics/src/hnn/reference/continuation.rs",
+      "bytes": 17860,
+      "sha256": "4040818daf18ee8734983c94122bf86377c96d9dd22752ae288c78848919fdb4",
+      "locations": [
+        {
+          "anchor": "fn contact_comparison",
+          "lines": [
+            39
+          ]
+        },
+        {
+          "anchor": "fn a_zero_receiving_map_returns_no_covector_to_the_contact",
+          "lines": [
+            305
+          ]
+        }
+      ]
+    },
+    {
+      "base": "<repository>",
+      "path": "crates/holonics/src/hnn/reference.rs",
+      "bytes": 191514,
+      "sha256": "cf6a7501643ac70ed3392121c67b3dc42e81768e85b258e411c8137dab8d2568",
+      "locations": [
+        {
+          "anchor": "pub fn compare_phase",
+          "lines": [
+            594
+          ]
+        },
+        {
+          "anchor": "pub fn expose_from",
+          "lines": [
+            3823
+          ]
+        }
+      ]
+    },
+    {
+      "base": "<repository>",
+      "path": "crates/holonics/src/hnn/pending.rs",
+      "bytes": 10735,
+      "sha256": "4f1d1f9f7d870a592559dcb10516cd48ca7ada4f416f4ab1626d69dc82064a6a",
+      "locations": [
+        {
+          "anchor": "pub struct PendingRatio",
+          "lines": [
+            63
+          ]
+        }
+      ]
+    },
+    {
+      "base": "<repository>",
+      "path": "crates/holonics/src/hnn/prediction.rs",
+      "bytes": 61360,
+      "sha256": "3cf1e0facda8dc1f782c0c06feb878c129b2208a17212e7430e841839f658630",
+      "locations": [
+        {
+          "anchor": "pub fn generate_by_bank",
+          "lines": [
+            475
+          ]
+        },
+        {
+          "anchor": "pub fn storage_over",
+          "lines": [
+            1030
+          ]
+        }
+      ]
+    },
+    {
+      "base": "<repository>",
+      "path": "crates/holonics/src/hnn/executed.rs",
+      "bytes": 254131,
+      "sha256": "1d564303e7262535af92da625fa9f2d847351d24b67a470fe053312519349f3e",
+      "locations": [
+        {
+          "anchor": "pub struct Request",
+          "lines": [
+            232,
+            381
+          ]
+        },
+        {
+          "anchor": "fn incumbent_request",
+          "lines": [
+            1577
+          ]
+        },
+        {
+          "anchor": "pub fn executed_move(",
+          "lines": [
+            3860
+          ]
+        }
+      ]
+    },
+    {
+      "base": "<repository>",
+      "path": "crates/holonics/src/hnn/ring.rs",
+      "bytes": 162137,
+      "sha256": "c86470c51d938c57d2d552ece6550f17ed84fba1f916b2cea41f04a436170176",
+      "locations": [
+        {
+          "anchor": "pub fn read_turn_covector",
+          "lines": [
+            3204
+          ]
+        }
+      ]
+    },
+    {
+      "base": "<repository>",
+      "path": "crates/holonics/src/hnn/moment.rs",
+      "bytes": 64935,
+      "sha256": "f8bbf2a2385eca996b0af9450c27a47aee79ccab97b1274022579547a1f9a2c1",
+      "locations": [
+        {
+          "anchor": "pub fn open_storage",
+          "lines": [
+            1264
+          ]
+        }
+      ]
+    },
+    {
+      "base": "<repository>",
+      "path": "crates/holonics/src/hnn/ratio.rs",
+      "bytes": 21873,
+      "sha256": "0470e0f6b0152511d15921f1664fc1cc8c1a3992f2a286906602f39bdaa957d0",
+      "locations": [
+        {
+          "anchor": "pub fn target_phases",
+          "lines": [
+            272
+          ]
+        },
+        {
+          "anchor": "pub fn covector",
+          "lines": [
+            464
+          ]
+        }
+      ]
+    },
+    {
+      "base": "<repository>",
+      "path": "lean/Holonics/HNN/ModeQuotient.lean",
+      "bytes": 33187,
+      "sha256": "573493a7fd07cd3ae8dce6b7f406158f889c14b851b9b36e829fe0e87feb474a",
+      "locations": [
+        {
+          "anchor": "theorem periodic_lift_exact",
+          "lines": [
+            142
+          ]
+        },
+        {
+          "anchor": "theorem learning_chart_le_kernel",
+          "lines": [
+            461
+          ]
+        }
+      ]
+    },
+    {
+      "base": "<repository>",
+      "path": "lean/Holonics/Physics/PhaseContactPassage.lean",
+      "bytes": 7502,
+      "sha256": "9ac32ca41d8a8d3c1f713d069141e11edfd633e365b592e4aa94e61093edccad",
+      "locations": [
+        {
+          "anchor": "def seamMix",
+          "lines": [
+            18
+          ]
+        },
+        {
+          "anchor": "theorem seamMix_energy_plus_heat",
+          "lines": [
+            85
+          ]
+        },
+        {
+          "anchor": "theorem interpolation_intensity_defect",
+          "lines": [
+            166,
+            174
+          ]
+        }
+      ]
+    },
+    {
+      "base": "<repository>",
+      "path": "lean/Holonics/Transport/HelicalPairInteraction.lean",
+      "bytes": 22961,
+      "sha256": "5408e033f4d0d3adf22e75d01811d172752222a54ea0d762d2facf102f8cdd58",
+      "locations": [
+        {
+          "anchor": "theorem pair_face_power_eq_zero_iff_material_null",
+          "lines": [
+            274
+          ]
+        }
+      ]
+    },
+    {
+      "base": "<repository>/.local/wt/geometry-integration-01a10f3d",
+      "path": "lean/Holonics/Objects/SourceHolon.lean",
+      "bytes": 36493,
+      "sha256": "ee0bb62a8a091c41a5e91d5ac6ce2ce831e692caf982b3ecf043439c747d5568",
+      "locations": [
+        {
+          "anchor": "theorem matrixReader_futureAgreement_iff_zero_futureReadScore",
+          "lines": [
+            612
+          ]
+        }
+      ]
+    }
+  ],
+  "architectural_relation_status": "proposed consumer relation; not implemented or newly kernel checked",
+  "private_principal_log_material_committed": false
+}

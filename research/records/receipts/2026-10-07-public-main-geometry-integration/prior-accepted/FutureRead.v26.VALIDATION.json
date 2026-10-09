@@ -1,0 +1,1258 @@
+{
+  "scope": "Geometry_full_owner_consumer_audit_PASS",
+  "whole_CausalChord34_SourceHolon20_independent_importer3_standard_queries_PASS": true,
+  "actual_FracPacking_current_source_native_metadata_verified_without_rebuild": true,
+  "prior_primitive2_accepted_independent_and_not_repeated": true,
+  "no_cached_target_object_acceptance": true,
+  "stages": {
+    "geometry-future-provider-provenance-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 1057643575,
+      "projection_ns": 12779337307,
+      "measured_to_projected_ratio": [
+        1057643575,
+        12779337307
+      ],
+      "aggregate_CPU_ns": 953211000,
+      "group_peak_bytes": 376811520,
+      "peak_child_RSS_KiB": 289704,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "inner_output_seal_retained": true,
+      "absent_inner_metrics_not_inferred": false,
+      "declared_outputs_missing_at_terminal": [],
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "geometry-future-causal-chord-v2-preparation-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 3464472445,
+      "projection_ns": 12779337307,
+      "measured_to_projected_ratio": [
+        3464472445,
+        12779337307
+      ],
+      "aggregate_CPU_ns": 3118351000,
+      "group_peak_bytes": 239636480,
+      "peak_child_RSS_KiB": 178008,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "inner_output_seal_retained": true,
+      "absent_inner_metrics_not_inferred": false,
+      "declared_outputs_missing_at_terminal": [],
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "geometry-future-causal-chord-v2-development-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 6455497811,
+      "projection_ns": 21132554884,
+      "measured_to_projected_ratio": [
+        6455497811,
+        21132554884
+      ],
+      "aggregate_CPU_ns": 6054007000,
+      "group_peak_bytes": 532697088,
+      "peak_child_RSS_KiB": 2705972,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "inner_output_seal_retained": true,
+      "absent_inner_metrics_not_inferred": false,
+      "declared_outputs_missing_at_terminal": [],
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "geometry-future-source-holon-v2-preparation-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 4450418934,
+      "projection_ns": 12779337307,
+      "measured_to_projected_ratio": [
+        4450418934,
+        12779337307
+      ],
+      "aggregate_CPU_ns": 4042246000,
+      "group_peak_bytes": 263585792,
+      "peak_child_RSS_KiB": 209992,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "inner_output_seal_retained": true,
+      "absent_inner_metrics_not_inferred": false,
+      "declared_outputs_missing_at_terminal": [],
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "geometry-future-source-holon-v2-development-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 11803493810,
+      "projection_ns": 21132554884,
+      "measured_to_projected_ratio": [
+        11803493810,
+        21132554884
+      ],
+      "aggregate_CPU_ns": 8043492000,
+      "group_peak_bytes": 3215634432,
+      "peak_child_RSS_KiB": 3354884,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "inner_output_seal_retained": true,
+      "absent_inner_metrics_not_inferred": false,
+      "declared_outputs_missing_at_terminal": [],
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "geometry-future-audit-v2-preparation-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 4852447167,
+      "projection_ns": 12779337307,
+      "measured_to_projected_ratio": [
+        4852447167,
+        12779337307
+      ],
+      "aggregate_CPU_ns": 4384057000,
+      "group_peak_bytes": 413986816,
+      "peak_child_RSS_KiB": 226556,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "inner_output_seal_retained": true,
+      "absent_inner_metrics_not_inferred": false,
+      "declared_outputs_missing_at_terminal": [],
+      "quiescent_release": true,
+      "outer_error": null
+    },
+    "geometry-future-audit-v2-development-20261006-v1": {
+      "accepted": true,
+      "wall_ns": 3379164116,
+      "projection_ns": 21132554884,
+      "measured_to_projected_ratio": [
+        3379164116,
+        21132554884
+      ],
+      "aggregate_CPU_ns": 3002311000,
+      "group_peak_bytes": 629796864,
+      "peak_child_RSS_KiB": 3254796,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "inner_output_seal_retained": true,
+      "absent_inner_metrics_not_inferred": false,
+      "declared_outputs_missing_at_terminal": [],
+      "quiescent_release": true,
+      "outer_error": null
+    }
+  },
+  "artifacts": {
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-provider-provenance-20261006-v1.config.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-provider-provenance-20261006-v1.config.json",
+      "bytes": 6069,
+      "sha256": "dae92fcdb30556490d0f3ee06bf0edccbf832421bafe64ee70892bdfe6172059"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-provider-provenance-20261006-v1.external-lease.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-provider-provenance-20261006-v1.external-lease.json",
+      "bytes": 487,
+      "sha256": "57427878bc4f39f8bb47a5d8f6deb6c634d90707cd37bfe36dba231ef1a6b1cd"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-provider-provenance-20261006-v1.lease-identity.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-provider-provenance-20261006-v1.lease-identity.json",
+      "bytes": 565,
+      "sha256": "ded9b30790658874a4378672f6b2ecf07936cd859e99cf7786869b71fa047583"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-provider-provenance-20261006-v1.input_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-provider-provenance-20261006-v1.input_seal.json",
+      "bytes": 4903,
+      "sha256": "bccd35d74e5f3b40d24891e79dcd8ee835f73d04abb2a6b8d7b0a4c42c8346af"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-provider-provenance-20261006-v1.stdout": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-provider-provenance-20261006-v1.stdout",
+      "bytes": 413,
+      "sha256": "f99d1e361d72569f7465e5dea48b6cf64ebfa08ed745c5589f004880b01cd819"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-provider-provenance-20261006-v1.stderr": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-provider-provenance-20261006-v1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-provider-provenance-20261006-v1.memory-gate.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-provider-provenance-20261006-v1.memory-gate.json",
+      "bytes": 120,
+      "sha256": "9941461548b97884814ccf90462ab3269b892808abac31779cea0e9d62da559f"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-provider-provenance-20261006-v1.child-identity.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-provider-provenance-20261006-v1.child-identity.json",
+      "bytes": 78,
+      "sha256": "fa9427383c346a6eecae584c0f9269dadc1e2819fb826d844eaef7a1e1eeff1c"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-provider-provenance-20261006-v1.system-floor.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-provider-provenance-20261006-v1.system-floor.json",
+      "bytes": 4452,
+      "sha256": "a1a134cefbec66553f5dd56e9d2e362abe6f4f7b815b423ee3b902714e1e812e"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-provider-provenance-20261006-v1.quiescence.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-provider-provenance-20261006-v1.quiescence.json",
+      "bytes": 130,
+      "sha256": "72b813c7c4c3f9a927e319b188ddc9cbf973fb32b85152fd14c264ea23a7e109"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-provider-provenance-20261006-v1.output_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-provider-provenance-20261006-v1.output_seal.json",
+      "bytes": 40411,
+      "sha256": "4ede7851533510d6a26d0c0d7f7659e67dcf6d1d20162854343c3bb6d4edfcde"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-provider-provenance-20261006-v1.publication.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-provider-provenance-20261006-v1.publication.json",
+      "bytes": 3012,
+      "sha256": "825654de5be149b47e512e7d41177aa94b5ff740cf22e8204d1fc49616183c3e"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-provider-provenance-20261006-v1.stage-quiescence.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-provider-provenance-20261006-v1.stage-quiescence.json",
+      "bytes": 136,
+      "sha256": "ca42dbfdca461d2be1169756c4756d4e2e2d8e04344ebdd05c292c5fab32ea52"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-provider-provenance-20261006-v1.final.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-provider-provenance-20261006-v1.final.json",
+      "bytes": 4871,
+      "sha256": "642046973f3efd47474bca6752994b678b17205aef2bd4eead741f00e95a04ba"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-provider-provenance-20261006-v1.unit-cleanup.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-provider-provenance-20261006-v1.unit-cleanup.json",
+      "bytes": 721,
+      "sha256": "530e5e3f4971bfef43c4e706d385d89b6a9c8bc381a97948daa179e25035fce3"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-provider-provenance-20261006-v1.acceptance.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-provider-provenance-20261006-v1.acceptance.json",
+      "bytes": 378,
+      "sha256": "3f79acddd4aa504ca0e13d8605d61359d0bab132e8dec7ab8efc574bed9fc51c"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-provider-provenance-20261006-v1.release.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-provider-provenance-20261006-v1.release.json",
+      "bytes": 175,
+      "sha256": "e6701b1e037f2388e0bbd4d291577949c857a15adf8a024f53825a2a51edc4bc"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/PROVIDER_PROVENANCE_REQUEST.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/PROVIDER_PROVENANCE_REQUEST.v1.json",
+      "bytes": 558,
+      "sha256": "5551dfa1ae94cf2f9a9a335ac970f778d539d06e11ddd9db9d10dc4ec9a9ece8"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/FractalPackingProviderProvenance.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/FractalPackingProviderProvenance.lean",
+      "bytes": 42,
+      "sha256": "9a23c1870e02db6745492623506fb20131480e888ae1153e0217efc0ef4e40f0"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/SOURCE_READINESS.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/SOURCE_READINESS.v1.json",
+      "bytes": 10661,
+      "sha256": "bcfef4d87c997fb6610e787cff76ed4963e53032845b189b1b91b19901fabc89"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/lean_request_preflight_v6.py": {
+      "copy": ".local/lean-rust-pruning/admission-v1/lean_request_preflight_v6.py",
+      "bytes": 8275,
+      "sha256": "154bc6778803b8b4a7642b45e969bb13e1698db32729113ed706fa9e5842efba"
+    },
+    "<repository>/.local/hodge-cut-cartier-20261003/runner-recovery-02/import_sealer.py": {
+      "copy": ".local/hodge-cut-cartier-20261003/runner-recovery-02/import_sealer.py",
+      "bytes": 13162,
+      "sha256": "b323b6177c66c48d27a6a39ae580220e0c908430d0bbfbc2c33aa6b5b48b36da"
+    },
+    "<repository>/.local/wt/swept-transport/.local/sweep-20261006/current-imports.v4.json": {
+      "copy": ".local/wt/swept-transport/.local/sweep-20261006/current-imports.v4.json",
+      "bytes": 81181496,
+      "sha256": "1b365a91d1b8cb05ada94564ea28ed62103c304e841580b56697847a882aed0e"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/final_stage.py": {
+      "copy": ".local/lean-rust-pruning/admission-v1/final_stage.py",
+      "bytes": 10968,
+      "sha256": "a0a5a94f157acf9a5127b756a036c6e86449dc2012af0f1e71d34aafa13bc79e"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/leased_stage_v2.py": {
+      "copy": ".local/lean-rust-pruning/admission-v1/leased_stage_v2.py",
+      "bytes": 5520,
+      "sha256": "bcf91456534e763a025613f39e82853d7a58529b399bb183d544d09a7a42f949"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/bounded_stage_v1.py": {
+      "copy": ".local/lean-rust-pruning/admission-v1/bounded_stage_v1.py",
+      "bytes": 12645,
+      "sha256": "84b7d003089fa19881690e368200b2168b9d179c8e6573bdafab54369235cec2"
+    },
+    "/usr/bin/python3.14": {
+      "copy": "external/usr/bin/python3.14",
+      "bytes": 14424,
+      "sha256": "ac12d99c156d3c0ec708a2baf664d35b74f455572fe35fd57faa420ade5c3845"
+    },
+    "<lean-toolchain>/lib/lean/libleanshared.so": {
+      "copy": "external<lean-toolchain>/lib/lean/libleanshared.so",
+      "bytes": 229196736,
+      "sha256": "f2a36d5e56b936afc07bdbea18542de0bce6a9977ebc325915272c300d992d42"
+    },
+    "<lean-toolchain>/include/lean/lean.h": {
+      "copy": "external<lean-toolchain>/include/lean/lean.h",
+      "bytes": 130609,
+      "sha256": "9018878554c5552ff3754865780d21825c2d0c5c4b47491b37bf6fe046adcd56"
+    },
+    "<lean-toolchain>/src/lean/lake/Lake/Build/Trace.lean": {
+      "copy": "external<lean-toolchain>/src/lean/lake/Lake/Build/Trace.lean",
+      "bytes": 13320,
+      "sha256": "ae8987432fdb2f722971c7dfa10096e138dfc9f244a75aeb5e7abbd2cbd94bff"
+    },
+    "<lean-toolchain>/src/lean/lake/Lake/Build/Module.lean": {
+      "copy": "external<lean-toolchain>/src/lean/lake/Lake/Build/Module.lean",
+      "bytes": 65428,
+      "sha256": "cd7b3e4802980fb9a9c1ed116650b2a95231917e4e024ca5b46b4f3821effa5c"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/NATIVE_PROVIDER_PROVENANCE.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/NATIVE_PROVIDER_PROVENANCE.v1.json",
+      "bytes": 42779,
+      "sha256": "e07369adee1eb5916228b9cba952eb5559c3cbe730cf38a55f7183169502c70b"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-preparation-20261006-v1.config.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-preparation-20261006-v1.config.json",
+      "bytes": 7577,
+      "sha256": "d78ceb3242c6a176d14ef67788ec660d8d91a335c11bef9a57532ec4b17d4483"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-preparation-20261006-v1.external-lease.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-preparation-20261006-v1.external-lease.json",
+      "bytes": 487,
+      "sha256": "3f6c568cc0e817e2a5875133381de5067fbeb900810adbe77b9f3db8056e8f63"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-preparation-20261006-v1.lease-identity.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-preparation-20261006-v1.lease-identity.json",
+      "bytes": 565,
+      "sha256": "13a350107d0fff84ccc2d2d3752a6fd7704150cf1fe7eb7c52cb324b3b5f3f66"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-preparation-20261006-v1.input_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-preparation-20261006-v1.input_seal.json",
+      "bytes": 5508,
+      "sha256": "73481980942464c382e96631365eb8a365656e043c24eb1ea6f12ace4dd7610b"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-preparation-20261006-v1.stdout": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-preparation-20261006-v1.stdout",
+      "bytes": 1974,
+      "sha256": "f17df7c0e884aa72187208f26f9f2500d3206f15a92754ce8b814498731e58dd"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-preparation-20261006-v1.stderr": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-preparation-20261006-v1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-preparation-20261006-v1.memory-gate.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-preparation-20261006-v1.memory-gate.json",
+      "bytes": 120,
+      "sha256": "af501abdf59826ca47011443adbe44f2c19ef64db562d259d901e6a8ea626afe"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-preparation-20261006-v1.child-identity.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-preparation-20261006-v1.child-identity.json",
+      "bytes": 78,
+      "sha256": "3bf57a82e8f1a896e16233dc2440397abdd7af4fcce6b6139147100e14318a8d"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-preparation-20261006-v1.system-floor.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-preparation-20261006-v1.system-floor.json",
+      "bytes": 25661,
+      "sha256": "ec963fa3f9b39c31d2119fabd5acaf25ba03ecfb69e3a366c147a2fab6092a6a"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-preparation-20261006-v1.quiescence.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-preparation-20261006-v1.quiescence.json",
+      "bytes": 130,
+      "sha256": "a84ff93b1224f4489acadfe51741e245853b55aed675b2a53eb91be738ed1294"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-preparation-20261006-v1.output_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-preparation-20261006-v1.output_seal.json",
+      "bytes": 223055,
+      "sha256": "865a57fe637f21eaa2416ce299d7819975ca95e24d5f65fa34ddd79a3ff05e17"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-preparation-20261006-v1.publication.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-preparation-20261006-v1.publication.json",
+      "bytes": 3348,
+      "sha256": "89a52e9a36e3e72dd50cd26968672a6c854ce56707f91cbe5e540e20058d44dd"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-preparation-20261006-v1.stage-quiescence.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-preparation-20261006-v1.stage-quiescence.json",
+      "bytes": 136,
+      "sha256": "9d52dd9f6b1a4e6338d71928d4870d57aa2f256afc6954aa1b32de5f1805374b"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-preparation-20261006-v1.final.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-preparation-20261006-v1.final.json",
+      "bytes": 4996,
+      "sha256": "3ed482df8e8f04d0f07fe77fcc6d333b9a5983a74073ba4d2d4d4e52073ae55f"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-preparation-20261006-v1.unit-cleanup.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-preparation-20261006-v1.unit-cleanup.json",
+      "bytes": 737,
+      "sha256": "89b86cc39de017888bf9ccb1c9889d89a7c2535e916747eab8a238119676818e"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-preparation-20261006-v1.acceptance.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-preparation-20261006-v1.acceptance.json",
+      "bytes": 378,
+      "sha256": "499c93e75efcaf06f1ba0155c80e17088aefe4199cb65ddf0b6ed3b5f057fa42"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-preparation-20261006-v1.release.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-preparation-20261006-v1.release.json",
+      "bytes": 175,
+      "sha256": "dcf362e569d169de795732110a893ac6ebc7fa844a83602cca7ac70b716ca7ac"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-20261006/PREPARATION_REQUEST.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-20261006/PREPARATION_REQUEST.v1.json",
+      "bytes": 4091,
+      "sha256": "7a8b435f41f38287198264447b9c51461ba60796ea89848b13d9fb4c1ec9092d"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Foundation/CausalChord.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Foundation/CausalChord.lean",
+      "bytes": 46612,
+      "sha256": "4b2c01a136c8c5cf4921d4660975ba6a8d6af5b7c9f61e0d55dcc8b1d6469aa8"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/materialize_geometry_future_owner_v1.py": {
+      "copy": ".local/lean-rust-pruning/admission-v1/materialize_geometry_future_owner_v1.py",
+      "bytes": 7205,
+      "sha256": "2a3135d17c1a6111dec5937a060f1f210fcff09fd5ff6cb75c0f6dfc74e66c41"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-20261006/PROVIDER_NAMESPACE.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-20261006/PROVIDER_NAMESPACE.v1.json",
+      "bytes": 210400,
+      "sha256": "aee3eeb1b3cb58a5f4a5f2860e1e9d74fb7f93f5030281a641fec9b731a93c52"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/SOURCE_READINESS.v2.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/SOURCE_READINESS.v2.json",
+      "bytes": 1234,
+      "sha256": "0687f36d82b89fa27eb8bc58e4299c4648520ed6604232671136e221f99b76ee"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/hnn-single-hole-formal-5d811c94-20261006/current-imports.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/hnn-single-hole-formal-5d811c94-20261006/current-imports.v1.json",
+      "bytes": 44874124,
+      "sha256": "e923db8c6fd023c6caf6ca461430fb7333d90d1f7114644de54a93e42c851131"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/prepare_ns_namespace_v1.py": {
+      "copy": ".local/lean-rust-pruning/admission-v1/prepare_ns_namespace_v1.py",
+      "bytes": 10766,
+      "sha256": "85b5a0626525cf14d6dbf8ecf9098ee8804df8facf1cad8c5e2f8eeb36aeea7c"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/check_namespace_lookup_v1.py": {
+      "copy": ".local/lean-rust-pruning/admission-v1/check_namespace_lookup_v1.py",
+      "bytes": 886,
+      "sha256": "9210e5aa18f9daeb7ac8ced18e253f08805577119a5f2b5e211017d9a873679c"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-20261006/current-imports.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-20261006/current-imports.v1.json",
+      "bytes": 34749031,
+      "sha256": "56bfb1c0a1578f2fde7e9789a910e89d4b9ba07bc7f4e5993e88aeaa3d798395"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-20261006/import-preparation.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-20261006/import-preparation.v1.json",
+      "bytes": 1242,
+      "sha256": "8a9b0bf538278dcc1e8eb04e22c35316dfbb0316844dc761761b8299e2c880be"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-development-20261006-v1.config.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-development-20261006-v1.config.json",
+      "bytes": 15399,
+      "sha256": "62cab9f03c3a449304ae507979dbf91dd7d6836b54ccd89f9a06e89db91adad2"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-development-20261006-v1.external-lease.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-development-20261006-v1.external-lease.json",
+      "bytes": 487,
+      "sha256": "937fbcdb28ed99cbe055541f5c2df2a04720b7cb0ca7b2534a249f10f05b8bda"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-development-20261006-v1.lease-identity.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-development-20261006-v1.lease-identity.json",
+      "bytes": 565,
+      "sha256": "78f8359bef8f9a3b58a389a4bb54dedac4d80afc5c9d62c800ea0b0aae130773"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-development-20261006-v1.input_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-development-20261006-v1.input_seal.json",
+      "bytes": 9035,
+      "sha256": "6a9a157432c3bddd68eb83ffbad9da0b7aca41045bb240715ed2f1ffddb5c277"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-development-20261006-v1.stdout": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-development-20261006-v1.stdout",
+      "bytes": 8733,
+      "sha256": "01ab820f75ecab5149884df0a4c74bbc2690b36274f3709cdf1b577fa8619d33"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-development-20261006-v1.stderr": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-development-20261006-v1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-development-20261006-v1.memory-gate.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-development-20261006-v1.memory-gate.json",
+      "bytes": 120,
+      "sha256": "40d3713f8c590554b756aa5caa08276a78c22d7e52b3b7e96803735d05505c0a"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-development-20261006-v1.child-identity.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-development-20261006-v1.child-identity.json",
+      "bytes": 78,
+      "sha256": "5e84561d2c8ee92294dba4b03ffb293694e21e3ca5b31bc98594a0fe253929e4"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-development-20261006-v1.system-floor.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-development-20261006-v1.system-floor.json",
+      "bytes": 46409,
+      "sha256": "7c1135c1547d1a7032a3ebda3f0898274a6890447384c14abe1a6add300e7b34"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-development-20261006-v1.quiescence.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-development-20261006-v1.quiescence.json",
+      "bytes": 130,
+      "sha256": "d0f295adbcac5819df6ea0452f37b2a7db328aa31ff857b33896f52012cc9dbf"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-development-20261006-v1.output_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-development-20261006-v1.output_seal.json",
+      "bytes": 413572,
+      "sha256": "756106538422025bb7cfb5349ae80d9c2c3daeeb547dfe8c1217ee5cf80933d3"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-development-20261006-v1.publication.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-development-20261006-v1.publication.json",
+      "bytes": 4139,
+      "sha256": "c0d0af2ec1daad5e81c632582105e8892f0126438df0185b816b5678a46c46de"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-development-20261006-v1.stage-quiescence.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-development-20261006-v1.stage-quiescence.json",
+      "bytes": 136,
+      "sha256": "a46ce34959b813592ea75b2ed35dfcd29a9191ac34aaadf457ddf570ffa7343d"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-development-20261006-v1.final.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-development-20261006-v1.final.json",
+      "bytes": 4998,
+      "sha256": "44d8d783b2a34594a625ee4f17f7fb382e0345d7fc6a96c6c4a3192288bf104f"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-development-20261006-v1.unit-cleanup.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-development-20261006-v1.unit-cleanup.json",
+      "bytes": 737,
+      "sha256": "6d352e58f608dce50e50e9b3133c95c0a1dbbde343d51f344731dfb88a141e65"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-development-20261006-v1.acceptance.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-development-20261006-v1.acceptance.json",
+      "bytes": 378,
+      "sha256": "6046f86146b3f06481cab7545f208f80758a954d527ab0de2373635c3e650785"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-development-20261006-v1.release.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-development-20261006-v1.release.json",
+      "bytes": 175,
+      "sha256": "0128326350778e2823bef4419e68a43dbae8ae7855dac7086046726f068d3d49"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-20261006/COMPILER_REQUEST.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-20261006/COMPILER_REQUEST.v1.json",
+      "bytes": 4164,
+      "sha256": "80204e33415bd0774de7c579b3c12a105c4ce0f69eab95d4cfca447f0c7ba2d9"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/materialize_lean_compiler_v5.py": {
+      "copy": ".local/lean-rust-pruning/admission-v1/materialize_lean_compiler_v5.py",
+      "bytes": 5331,
+      "sha256": "de9a1a486638c317d68a9704af4c95384eae684e99845c4d15f4a5d5c43a25ca"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/lean_budget_v5.py": {
+      "copy": ".local/lean-rust-pruning/admission-v1/lean_budget_v5.py",
+      "bytes": 5550,
+      "sha256": "ad9ee8b7658a53011a020e159847ac9b23d4b491e3b262c2f49d23afa43b974e"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-20261006/COMPLETE_DEVELOPMENT_BUDGET.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-20261006/COMPLETE_DEVELOPMENT_BUDGET.v1.json",
+      "bytes": 167520,
+      "sha256": "1d655a9e892e234ce908ecd273c81bba0a8204110153e16213011f3c5e463da0"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/check_lean_owner_v3.py": {
+      "copy": ".local/lean-rust-pruning/admission-v1/check_lean_owner_v3.py",
+      "bytes": 2076,
+      "sha256": "3641003e780bc46c56ad88af15a38cf8164f895eecdf3f7301ed9c064cd8d843"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/verify_lean_metadata_v1.py": {
+      "copy": ".local/lean-rust-pruning/admission-v1/verify_lean_metadata_v1.py",
+      "bytes": 772,
+      "sha256": "cff6b3ce7c52698766dd59eb249c822960c36667c87d7e8e6cc6bae10c5d41ad"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/PHASE_COST_CATALOG.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/PHASE_COST_CATALOG.v1.json",
+      "bytes": 23045,
+      "sha256": "239f8764229dbfe50a0f1ce9a0f0bd8cc0705788e66ca62c1652eab695cac1d2"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/KERNEL_VALIDATION.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/KERNEL_VALIDATION.v1.json",
+      "bytes": 237,
+      "sha256": "b69b1718a5b38478ca334988fd9c045cea29d3318155c7d0e8b7a6e74a4c0863"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/hodge-product-degree-two-development-20261006-v1.final.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/hodge-product-degree-two-development-20261006-v1.final.json",
+      "bytes": 4425,
+      "sha256": "3f4ef60f1086e496da58b2ac8f0ae9b018d56bcdf944ee1760df27f4c7d449eb"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/hodge-product-degree-two-development-20261006-v2.final.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/hodge-product-degree-two-development-20261006-v2.final.json",
+      "bytes": 4425,
+      "sha256": "db9b7d7687ff615de0d4a9717ab90d4567ef10b3b2b2fbe3971a30c1afecccf4"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/hodge-normalized-continuation-05-20261006/PHASE_COST_CATALOG.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/hodge-normalized-continuation-05-20261006/PHASE_COST_CATALOG.v1.json",
+      "bytes": 11159,
+      "sha256": "efc087f30b894248625861594529916de0aa7de63f60d944ccd64f75f28fd214"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/hodge-ruling-decomposed-11-20261006/PHASE_COST_CATALOG.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/hodge-ruling-decomposed-11-20261006/PHASE_COST_CATALOG.v1.json",
+      "bytes": 7248,
+      "sha256": "9efcaef04d621e96dc3ee8b28e335c5fc4265118754094308dd668640cf72ed8"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/hodge-pair-carrier-repair-20261006/PHASE_COST_CATALOG.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/hodge-pair-carrier-repair-20261006/PHASE_COST_CATALOG.v1.json",
+      "bytes": 678,
+      "sha256": "17c01868a5be1877100cacc5e24fdb34539b94c3183f0c367bff73968e0cf495"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/import-preparation.v2.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-ns-phase-20261006/import-preparation.v2.json",
+      "bytes": 1239,
+      "sha256": "650d712b187afd14ce6709be97620b42c5c10a557462b4fdb15d78d9c8ba5d3a"
+    },
+    "/usr/bin/env": {
+      "copy": "external/usr/bin/env",
+      "bytes": 72408,
+      "sha256": "795586b56f6da560c3cf4e25c1a6e4f274a8576906e88d94c207db7255b07163"
+    },
+    "/usr/bin/timeout": {
+      "copy": "external/usr/bin/timeout",
+      "bytes": 68320,
+      "sha256": "1425639cf3339b1117536df91cd4ba3229f8fa84e87322dee24e87121ed3feb3"
+    },
+    "<lean-toolchain>/bin/lean": {
+      "copy": "external<lean-toolchain>/bin/lean",
+      "bytes": 9024,
+      "sha256": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550"
+    },
+    "<lean-toolchain>/lib/lean/libleanshared_1.so": {
+      "copy": "external<lean-toolchain>/lib/lean/libleanshared_1.so",
+      "bytes": 6232,
+      "sha256": "2f96493ac9046f64ec7bcb78102a4c1e7cd9a7042487f246af45eda8a96667f5"
+    },
+    "<lean-toolchain>/lib/lean/libLake_shared.so": {
+      "copy": "external<lean-toolchain>/lib/lean/libLake_shared.so",
+      "bytes": 12311904,
+      "sha256": "feb2914d056638438613284b1f98278579ff8d8d99d0567e9823167806d150c0"
+    },
+    "<lean-toolchain>/lib/lean/libleanshared_2.so": {
+      "copy": "external<lean-toolchain>/lib/lean/libleanshared_2.so",
+      "bytes": 6232,
+      "sha256": "2f96493ac9046f64ec7bcb78102a4c1e7cd9a7042487f246af45eda8a96667f5"
+    },
+    "<lean-toolchain>/lib/lean/libInit_shared.so": {
+      "copy": "external<lean-toolchain>/lib/lean/libInit_shared.so",
+      "bytes": 6232,
+      "sha256": "2f96493ac9046f64ec7bcb78102a4c1e7cd9a7042487f246af45eda8a96667f5"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-20261006/objects-v1/Holonics/Foundation/CausalChord.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-20261006/objects-v1/Holonics/Foundation/CausalChord.olean",
+      "bytes": 1800432,
+      "sha256": "dd23e5b12a8026958380724be51d73addf2bee71b00b814cc2aea52719a0ea9e"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-20261006/objects-v1/Holonics/Foundation/CausalChord.ilean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-20261006/objects-v1/Holonics/Foundation/CausalChord.ilean",
+      "bytes": 111348,
+      "sha256": "72c306890e122d63385aba507816efba6f7c125270d0d7abe759a23a711925c1"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-20261006/compiler.v1.stdout": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-20261006/compiler.v1.stdout",
+      "bytes": 4320,
+      "sha256": "2e0027b6d1723eb5b00416ac9c91f11e9970e6dcae43050abb84a125020a1913"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-20261006/compiler.v1.stderr": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-20261006/compiler.v1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-20261006/KERNEL_VALIDATION.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-20261006/KERNEL_VALIDATION.v1.json",
+      "bytes": 5088,
+      "sha256": "a12288ea107567686f657caf502c3b25e4b10cceff489ec64e2972316982d80e"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-preparation-20261006-v1.config.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-preparation-20261006-v1.config.json",
+      "bytes": 9155,
+      "sha256": "ab17640434272731029434d4a753582fe30981179919e47c823592c5219ab4c8"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-preparation-20261006-v1.external-lease.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-preparation-20261006-v1.external-lease.json",
+      "bytes": 487,
+      "sha256": "bf93eb71b3ab9b70b695d7528b94d2b0c42354799c1d76f5b2d9831885ba9b31"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-preparation-20261006-v1.lease-identity.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-preparation-20261006-v1.lease-identity.json",
+      "bytes": 565,
+      "sha256": "c5463b7bd8b5622318074066360adabca0344cbd231a6641ec53cf08f349c555"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-preparation-20261006-v1.input_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-preparation-20261006-v1.input_seal.json",
+      "bytes": 6523,
+      "sha256": "fb3df08e29fa6108b93ce09739109206b280ec5e725404bb2f01b08656912d62"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-preparation-20261006-v1.stdout": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-preparation-20261006-v1.stdout",
+      "bytes": 2063,
+      "sha256": "2d6764361ee525e9f9a23f2b0508b78a308a797e94b9b8fd86410a4fd45b28f8"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-preparation-20261006-v1.stderr": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-preparation-20261006-v1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-preparation-20261006-v1.memory-gate.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-preparation-20261006-v1.memory-gate.json",
+      "bytes": 119,
+      "sha256": "9af3bdd2fbcf6f8d9ab1bd85153dffa6df87a329b108af2c7a2d9a81a7cf9c17"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-preparation-20261006-v1.child-identity.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-preparation-20261006-v1.child-identity.json",
+      "bytes": 78,
+      "sha256": "4302d67ebfb9642740f435e3f92f15935666ce44eda0656f6d9441e7d90ae24c"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-preparation-20261006-v1.system-floor.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-preparation-20261006-v1.system-floor.json",
+      "bytes": 32797,
+      "sha256": "e46c469cf3d211cf7556dbd529f79fdb42470760259605f0065e2098b6bdbe79"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-preparation-20261006-v1.quiescence.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-preparation-20261006-v1.quiescence.json",
+      "bytes": 130,
+      "sha256": "b10e34f7ce4bd249303d27bc5afe43c450991273e0cf2807fc3c04bcd1a9f4fe"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-preparation-20261006-v1.output_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-preparation-20261006-v1.output_seal.json",
+      "bytes": 285940,
+      "sha256": "370811709c962425c14910965b90630cabbfebcfcb9e3a86edd25a1743c0b8ff"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-preparation-20261006-v1.publication.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-preparation-20261006-v1.publication.json",
+      "bytes": 3348,
+      "sha256": "a30af24ca746a926242c1c19def82e9c52964d33984777f976b9a3a49123ab80"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-preparation-20261006-v1.stage-quiescence.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-preparation-20261006-v1.stage-quiescence.json",
+      "bytes": 136,
+      "sha256": "9db60a9c4eeafd3689e2a26b137f9e9b1b82af68fa5cf852372e72b410428f79"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-preparation-20261006-v1.final.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-preparation-20261006-v1.final.json",
+      "bytes": 4996,
+      "sha256": "f5b02aac4a6e2600cfd6f5c4b99e061a678c872315e0aed0dc953ee70453c802"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-preparation-20261006-v1.unit-cleanup.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-preparation-20261006-v1.unit-cleanup.json",
+      "bytes": 737,
+      "sha256": "0516609e50c8e1e775d3ea1ca3858f74e974fc352ec9dbbda40c3f31a1a12331"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-preparation-20261006-v1.acceptance.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-preparation-20261006-v1.acceptance.json",
+      "bytes": 378,
+      "sha256": "65ff71889b941ecca365730636c5851a21122ec8296f6128fb5f768012d70ba1"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-preparation-20261006-v1.release.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-preparation-20261006-v1.release.json",
+      "bytes": 175,
+      "sha256": "3a22f25bdc220533b4cef00b61d02e825edeb2d658cc5ccfda8baa28573f68ba"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-20261006/PREPARATION_REQUEST.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-20261006/PREPARATION_REQUEST.v1.json",
+      "bytes": 4652,
+      "sha256": "1afef757a9e2584b95baa887bb98dda6b221b245b52e3f3c4a84d1aceaf64671"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Objects/SourceHolon.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Objects/SourceHolon.lean",
+      "bytes": 36493,
+      "sha256": "ee0bb62a8a091c41a5e91d5ac6ce2ce831e692caf982b3ecf043439c747d5568"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-20261006/PROVIDER_NAMESPACE.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-20261006/PROVIDER_NAMESPACE.v1.json",
+      "bytes": 211275,
+      "sha256": "c452a39d6db6eeb9a8253b62fe8cb3ec261efd75050668906db00b973a7e578c"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-20261006/current-imports.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-20261006/current-imports.v1.json",
+      "bytes": 43060536,
+      "sha256": "9feaa8e2f0a993de7cff5453071c3fc531f4970db56249e2708254a97968edfa"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-20261006/import-preparation.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-20261006/import-preparation.v1.json",
+      "bytes": 1239,
+      "sha256": "adab4175d06657a64abcc5068c88423781fc06b8d18ecea52afa2787f3f62b41"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-development-20261006-v1.config.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-development-20261006-v1.config.json",
+      "bytes": 14734,
+      "sha256": "75152c910d3d741c2b2ce4b95b6ff8abd72469c43b6a312ce294965a6f018664"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-development-20261006-v1.external-lease.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-development-20261006-v1.external-lease.json",
+      "bytes": 487,
+      "sha256": "7d5bdb0e72c246b16c19b9374fa38607077b1f985334b6dd008409d2ab59c7e2"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-development-20261006-v1.lease-identity.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-development-20261006-v1.lease-identity.json",
+      "bytes": 565,
+      "sha256": "e331e8640927ceebd060c87e916960362039210e7b620c9aaf84941bb452433e"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-development-20261006-v1.input_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-development-20261006-v1.input_seal.json",
+      "bytes": 9031,
+      "sha256": "03ae377fdde8f41f6a3cf1460bc95b388a7a64763ca2fb58a5c4943deafa2d2f"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-development-20261006-v1.stdout": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-development-20261006-v1.stdout",
+      "bytes": 4877,
+      "sha256": "178c9631bc814cff2823600f05ae912f31905882a2aae774841e2dea73b88e70"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-development-20261006-v1.stderr": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-development-20261006-v1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-development-20261006-v1.memory-gate.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-development-20261006-v1.memory-gate.json",
+      "bytes": 119,
+      "sha256": "c52a932d016a42ecfb56c3fd8b1169ab6bc75de795a033b540b490312183f0ac"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-development-20261006-v1.child-identity.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-development-20261006-v1.child-identity.json",
+      "bytes": 78,
+      "sha256": "37f0d37b5ab2ae94cc636c7d60fef946510b1146c8079129b082e5d062fa93c3"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-development-20261006-v1.system-floor.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-development-20261006-v1.system-floor.json",
+      "bytes": 88781,
+      "sha256": "15ff3ba65282bea615431953c09604b107bb659f0d110e5efac8cdc909a5d784"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-development-20261006-v1.quiescence.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-development-20261006-v1.quiescence.json",
+      "bytes": 130,
+      "sha256": "55f36bfc54cb544e99b11b08e6b4171ce09c7dda03728f563eaf2170f03ba586"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-development-20261006-v1.output_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-development-20261006-v1.output_seal.json",
+      "bytes": 773007,
+      "sha256": "2a769139d72e4d8da9beb7fc451d0e98a63c1c532fae69d437a5b6fedc262d90"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-development-20261006-v1.publication.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-development-20261006-v1.publication.json",
+      "bytes": 4135,
+      "sha256": "270016061b459ff86ff10a961e1cff7ca8d2cc56c6e4bad0d9f19489b6f38504"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-development-20261006-v1.stage-quiescence.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-development-20261006-v1.stage-quiescence.json",
+      "bytes": 136,
+      "sha256": "e14eefa240a8a42aa28238fed6957cdb9a0cb8a0d255e4916973c2bed4800aed"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-development-20261006-v1.final.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-development-20261006-v1.final.json",
+      "bytes": 5000,
+      "sha256": "25efd7c0d51bf5eb1e6aa1528815cd606c36b6890110df167c02384cf3809923"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-development-20261006-v1.unit-cleanup.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-development-20261006-v1.unit-cleanup.json",
+      "bytes": 737,
+      "sha256": "41f0063f37614fc46a9c0fe12e3994620802c76ea28de439012d43bae79cbe08"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-development-20261006-v1.acceptance.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-development-20261006-v1.acceptance.json",
+      "bytes": 378,
+      "sha256": "2e8abaa13221e2400c528e7e397c87101750d276def917ad6e79fc73d37f64a6"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-development-20261006-v1.release.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-development-20261006-v1.release.json",
+      "bytes": 175,
+      "sha256": "80ec791f1db0f534e8c175c46734f238ad571d843fc97d05de06080e2b5e8c55"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-20261006/COMPILER_REQUEST.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-20261006/COMPILER_REQUEST.v1.json",
+      "bytes": 3499,
+      "sha256": "9b4bcf443150085da1e10634b8ff2b0e073a2d3c311fe0c92f01bee1ba0b4734"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-20261006/COMPLETE_DEVELOPMENT_BUDGET.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-20261006/COMPLETE_DEVELOPMENT_BUDGET.v1.json",
+      "bytes": 167517,
+      "sha256": "a9e1cad0309b8e9c7963f4c603d159ae5ab93d56eac380e2f26c03e739dfa1ff"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-20261006/objects-v1/Holonics/Objects/SourceHolon.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-20261006/objects-v1/Holonics/Objects/SourceHolon.olean",
+      "bytes": 1900936,
+      "sha256": "1fdd2902eb8f52cae3f478eb17916df799badc431ad29943f3436d513483a7d7"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-20261006/objects-v1/Holonics/Objects/SourceHolon.ilean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-20261006/objects-v1/Holonics/Objects/SourceHolon.ilean",
+      "bytes": 106267,
+      "sha256": "574d756f39459d549ddd4053ad532582181bef685e031a4f2f0c6b77f540965b"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-20261006/compiler.v1.stdout": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-20261006/compiler.v1.stdout",
+      "bytes": 2302,
+      "sha256": "85e962aa46294a18119b6ed8b991b94f476351419d57468dd4b1c5170e0b5752"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-20261006/compiler.v1.stderr": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-20261006/compiler.v1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-20261006/KERNEL_VALIDATION.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-20261006/KERNEL_VALIDATION.v1.json",
+      "bytes": 2833,
+      "sha256": "6e84346ba40dbbd5cbe8ae0b6408f26ba76e609a41b029af750849cc08462e6f"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-preparation-20261006-v1.config.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-preparation-20261006-v1.config.json",
+      "bytes": 10660,
+      "sha256": "9b126a2d03a006e392353520ee1e5461bd51239a1beb4633c6887fb1808d60b9"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-preparation-20261006-v1.external-lease.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-preparation-20261006-v1.external-lease.json",
+      "bytes": 487,
+      "sha256": "dda7492fde7a0243242483f23f91e824dcb810b4a3e797027beb21fa4fec37fb"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-preparation-20261006-v1.lease-identity.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-preparation-20261006-v1.lease-identity.json",
+      "bytes": 565,
+      "sha256": "53a33de816b8bfdb606f99b4c82d189f651a5956ae32dd761602aeeec265bb2b"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-preparation-20261006-v1.input_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-preparation-20261006-v1.input_seal.json",
+      "bytes": 7500,
+      "sha256": "badf5957d42880bf50ced6886404ec2ce246a70bff0203478aac317b2f21fb5f"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-preparation-20261006-v1.stdout": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-preparation-20261006-v1.stdout",
+      "bytes": 2056,
+      "sha256": "7af836f5b0248d28802eec957fbfdd66ad737fd8548f9821714c68f81650fe89"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-preparation-20261006-v1.stderr": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-preparation-20261006-v1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-preparation-20261006-v1.memory-gate.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-preparation-20261006-v1.memory-gate.json",
+      "bytes": 119,
+      "sha256": "c0e9cda36cc3ef58c72ce39fbeeffdc0438d43e4ccf7f4fec74a3a1318c2df20"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-preparation-20261006-v1.child-identity.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-preparation-20261006-v1.child-identity.json",
+      "bytes": 78,
+      "sha256": "cd2b8899ddf35519cb11a5618f7163842481080a0063330f0ee92a8c806ebcb8"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-preparation-20261006-v1.system-floor.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-preparation-20261006-v1.system-floor.json",
+      "bytes": 35452,
+      "sha256": "c215407a94ce5f163580c384bc67b192128e0d7b2aded29a82a1f9a52006277e"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-preparation-20261006-v1.quiescence.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-preparation-20261006-v1.quiescence.json",
+      "bytes": 130,
+      "sha256": "d3886f668d7bf8eb670aa1c15e9683dffbf734407e3d9382095791d9aaa460c1"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-preparation-20261006-v1.output_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-preparation-20261006-v1.output_seal.json",
+      "bytes": 308757,
+      "sha256": "4d2f3394f48786927297bb9f472f4aada5d996c4df0f014aadfe4798bea292f0"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-preparation-20261006-v1.publication.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-preparation-20261006-v1.publication.json",
+      "bytes": 3264,
+      "sha256": "78de0f968c7d42ab650e0d523a05567e6287732f70278cb21800dd41e6ff722b"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-preparation-20261006-v1.stage-quiescence.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-preparation-20261006-v1.stage-quiescence.json",
+      "bytes": 136,
+      "sha256": "6e4361c3d81230af70e75ace94f223962ec40ce0b6c0d40166f66f452af63a85"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-preparation-20261006-v1.final.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-preparation-20261006-v1.final.json",
+      "bytes": 4893,
+      "sha256": "67c094998f87668053e2a536479838f9ccc137a14fb3728109df7f26beba913d"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-preparation-20261006-v1.unit-cleanup.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-preparation-20261006-v1.unit-cleanup.json",
+      "bytes": 723,
+      "sha256": "118d4b5cc29d948192f1cf91396b78b25cb828990a3def867e8f2c70b46a4d11"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-preparation-20261006-v1.acceptance.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-preparation-20261006-v1.acceptance.json",
+      "bytes": 378,
+      "sha256": "67daf94827635595313ce780c22c71eb93c3a28e0d16196113f938623a9caa48"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-preparation-20261006-v1.release.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-preparation-20261006-v1.release.json",
+      "bytes": 175,
+      "sha256": "59d308140f4cdda7bc4bd4af1b33bdcbbd3d69955da45bc77f06b9d9b4483348"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-20261006/PREPARATION_REQUEST.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-20261006/PREPARATION_REQUEST.v1.json",
+      "bytes": 5161,
+      "sha256": "8393630ea44ec6a4cdf4e1ca8bedcfcad448267c15bf397ad762544bd0d9f16c"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/FiniteFutureReadAudit.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/FiniteFutureReadAudit.lean",
+      "bytes": 273,
+      "sha256": "52a714e8f9f1f13587bfbe7a762ed510ef70ded0c43fbf43c59a79c862238e2f"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-20261006/PROVIDER_NAMESPACE.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-20261006/PROVIDER_NAMESPACE.v1.json",
+      "bytes": 210125,
+      "sha256": "8fb0a5dcb03a2305259489f9755384f95cdc1a6cdf244f95c03c2c2fd20b79bb"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-20261006/current-imports.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-20261006/current-imports.v1.json",
+      "bytes": 43003917,
+      "sha256": "7110e409029144c9d8772a37680243ccabe09780b1b088c878149ae58163710f"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-20261006/import-preparation.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-20261006/import-preparation.v1.json",
+      "bytes": 1232,
+      "sha256": "43bbdc49062634a206adbf42e186f3a03fee4463ffd9a2e229019d5b90ec769d"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-development-20261006-v1.config.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-development-20261006-v1.config.json",
+      "bytes": 14056,
+      "sha256": "15efe2a77e19248d5ed254c34116f47bfb96f47952dd3a78bb7e9caf47641b1e"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-development-20261006-v1.external-lease.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-development-20261006-v1.external-lease.json",
+      "bytes": 487,
+      "sha256": "4a7d83d58f219f68876f88a6cb642fab59bfd36a0f00c92d761a8ec4cdc528d3"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-development-20261006-v1.lease-identity.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-development-20261006-v1.lease-identity.json",
+      "bytes": 565,
+      "sha256": "f8dbc642dc0fc9a9d34fa2fc0b1faf03844bc27a10e39e52bb59c912a19ae629"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-development-20261006-v1.input_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-development-20261006-v1.input_seal.json",
+      "bytes": 8952,
+      "sha256": "df15860ee0fc30aaea19d85b711d61f77a5524d0d2eb91979010169079d9cbf0"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-development-20261006-v1.stdout": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-development-20261006-v1.stdout",
+      "bytes": 1234,
+      "sha256": "549b5d47d1ae663e620519fc436310701a55857316e619f20af5d8e944dfaabb"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-development-20261006-v1.stderr": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-development-20261006-v1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-development-20261006-v1.memory-gate.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-development-20261006-v1.memory-gate.json",
+      "bytes": 119,
+      "sha256": "03480bcef09b6e1926f4169d1e8a633150a4b0a720d4ef7c3747bff55f82b299"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-development-20261006-v1.child-identity.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-development-20261006-v1.child-identity.json",
+      "bytes": 78,
+      "sha256": "807ad0b216f644ad23774a05f7a8c96387e2df5aae31151f63fc5cbe7cbceda4"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-development-20261006-v1.system-floor.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-development-20261006-v1.system-floor.json",
+      "bytes": 23004,
+      "sha256": "6acb455699c9174b32a349e1c402046066d9a4c8e16fad93b1ee9288fee6dc06"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-development-20261006-v1.quiescence.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-development-20261006-v1.quiescence.json",
+      "bytes": 130,
+      "sha256": "338bf6ddde9ca790557d5744069dbfa3e1cbd69c3b631de7a294cc07c93a004b"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-development-20261006-v1.output_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-development-20261006-v1.output_seal.json",
+      "bytes": 202372,
+      "sha256": "28ec3fd475b85bcae9eda623172af6021fc7177c4c763b24865b11fd3aee6ade"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-development-20261006-v1.publication.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-development-20261006-v1.publication.json",
+      "bytes": 4006,
+      "sha256": "5f5ff89b6fbee7efa316f75dee67ca14263fb869ea36d107dba726b91d59fda8"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-development-20261006-v1.stage-quiescence.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-development-20261006-v1.stage-quiescence.json",
+      "bytes": 136,
+      "sha256": "8e22b1b32d0c6ea090e959b185508e6f8b38630a1d44daf3a23813514602a6d9"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-development-20261006-v1.final.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-development-20261006-v1.final.json",
+      "bytes": 4893,
+      "sha256": "35e398c821c1b45e6a5d4610cd670e7bd47b3c4807daf9765d2d4c30999af9de"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-development-20261006-v1.unit-cleanup.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-development-20261006-v1.unit-cleanup.json",
+      "bytes": 723,
+      "sha256": "b15b541d5e4b6db1b03b89b0f2b9809c8440bb1cafc0e76ea34f8b08ebcf5aab"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-development-20261006-v1.acceptance.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-development-20261006-v1.acceptance.json",
+      "bytes": 378,
+      "sha256": "93727df6d5616723320c1dd16d3a5d7f09a654bb30dda4e96faf6ab60f15fdf7"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-development-20261006-v1.release.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-development-20261006-v1.release.json",
+      "bytes": 175,
+      "sha256": "4afc18a4af46dfcc864c67d532bf84a3b22c284dc9510108dd18132bc52eff05"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-20261006/COMPILER_REQUEST.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-20261006/COMPILER_REQUEST.v1.json",
+      "bytes": 2928,
+      "sha256": "012bfbf1544bfc26f8fa3d5370f15cca85c10d0a24047b2c8be334f90aa71453"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-20261006/COMPLETE_DEVELOPMENT_BUDGET.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-20261006/COMPLETE_DEVELOPMENT_BUDGET.v1.json",
+      "bytes": 167503,
+      "sha256": "3d4bada93531e390c872990242b3758d4c06c12a2d40f7d8e8ffbd19dee57dee"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-20261006/objects-v1/FiniteFutureReadAudit.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-20261006/objects-v1/FiniteFutureReadAudit.olean",
+      "bytes": 1552,
+      "sha256": "b3f5b87d337bca8a1d5d8efce42e14e066c9aaf0b48ecdb62f9d88f0ba703868"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-20261006/objects-v1/FiniteFutureReadAudit.ilean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-20261006/objects-v1/FiniteFutureReadAudit.ilean",
+      "bytes": 653,
+      "sha256": "8e7a43373732c917dac0b524ab2c7438d1b92f9789791dc18843369f18e4bb52"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-20261006/compiler.v1.stdout": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-20261006/compiler.v1.stdout",
+      "bytes": 379,
+      "sha256": "f54e7af771e96e5efd4288404501fa24fc1f0f1b0ed97ff0fc4466c8482f6176"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-20261006/compiler.v1.stderr": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-20261006/compiler.v1.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-20261006/KERNEL_VALIDATION.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-20261006/KERNEL_VALIDATION.v1.json",
+      "bytes": 662,
+      "sha256": "298e2aaa36128fdfc4eef8001400e68d4fc9b7622e15c9d563c8a8e3808eba74"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/FiniteFutureReadDevelopment.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/FiniteFutureReadDevelopment.lean",
+      "bytes": 2589,
+      "sha256": "13dc45a1420b4dabd4d88b8751c8037e49a490f377ba157d1c7053e283e325e1"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Foundation/CausalRelevance.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Foundation/CausalRelevance.lean",
+      "bytes": 13235,
+      "sha256": "1b0abc414881d1dbe5b1032cfde9ed2b2993f4c36910146ed4d8d8fcb4316d75"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Foundation/CompleteReceiverHistory.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Foundation/CompleteReceiverHistory.lean",
+      "bytes": 3876,
+      "sha256": "1029450d1932590577401454b092296ac2ed17467c4c4ac7dfc83c36ddd9dbb7"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Foundation/FractalPacking.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Foundation/FractalPacking.lean",
+      "bytes": 39784,
+      "sha256": "cc478f469e8ae0e2340ef3c479a0fa7c3e99b8f75ea5d09cb2172336364df30d"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Foundation/JointReceiverDescent.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Foundation/JointReceiverDescent.lean",
+      "bytes": 8689,
+      "sha256": "b334f39fa7d9eeefec4a373cf532119dccf9911c89577e0bdce272f7f3fdfc99"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Foundation/Lineage.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Foundation/Lineage.lean",
+      "bytes": 9458,
+      "sha256": "d0120d764009f01c3d718fbbbafd1861b07b3710743a85daf8335982f6509577"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Foundation/Receiver.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Foundation/Receiver.lean",
+      "bytes": 10544,
+      "sha256": "32695757b94827663d9ad6547a125b2a8b0700ab99b890a64c9bf662da7c69c0"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Foundation/ReceiverFamily.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Foundation/ReceiverFamily.lean",
+      "bytes": 696,
+      "sha256": "8ae595a4b215170a882c8cfd461410ec5a9cb8643017d7ad55f0ba9fb1fd63d4"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Foundation/ReceiverHistoryCompression.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Foundation/ReceiverHistoryCompression.lean",
+      "bytes": 7347,
+      "sha256": "404e28dfd7526c51d9711ccc975228b3cfab493a4d112def762469fe5b441ee0"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Foundation/ReceiverRelease.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Foundation/ReceiverRelease.lean",
+      "bytes": 47832,
+      "sha256": "15b940da5e3df804f051c6414912e3a7e6334d4f466c16d7d249a1d34558dab1"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Foundation/RelationLadder/Comparison.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Foundation/RelationLadder/Comparison.lean",
+      "bytes": 5055,
+      "sha256": "97e90c7f7d571d2ea65f2bcea968fb11799aa46a01fc4a219a8447f182aeaa26"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Foundation/Standing/Law.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Foundation/Standing/Law.lean",
+      "bytes": 9836,
+      "sha256": "d29d9293eeac54ed0f13d282731e85d1609a4961e6e3d1ddce4db4e1190d9d9d"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Foundation/Standing.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Foundation/Standing.lean",
+      "bytes": 53644,
+      "sha256": "bf8d951fa952394482357996ff358c1675af4775751e75bd407dcb0f605a0629"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Foundation/TransportWord.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Foundation/TransportWord.lean",
+      "bytes": 10118,
+      "sha256": "345ece634e00c2b38d0eebf903074e1cd24715a6f3d4b22cb4aaeb09f906c72a"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Geometry/AffineSwing.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Geometry/AffineSwing.lean",
+      "bytes": 2184,
+      "sha256": "09ce73d5bc9766c152c3ccfc3b16a5f9627e5a4b3cda828ef9f1cf9e91b5805f"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Transport/ChangingReceiver/Defect.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Transport/ChangingReceiver/Defect.lean",
+      "bytes": 7493,
+      "sha256": "0fd69509667e6e3b3cee7c9ef853e29236c67c4f6c205dd1571b9bce4945c950"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Transport/SourceMoment.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Transport/SourceMoment.lean",
+      "bytes": 17733,
+      "sha256": "095b84a43b14e2768eb32d72d0bdabd63d7a931cfde8ab2dc92a3591ff6fd15e"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/preserve_current_queue_v26.py": {
+      "copy": ".local/lean-rust-pruning/admission-v1/preserve_current_queue_v26.py",
+      "bytes": 11246,
+      "sha256": "a4f114bce7d38c678a370a0dbe04133ee2eb2f55d9334491cae49685b4e582a0"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/preserve_queue_package_v2.py": {
+      "copy": ".local/lean-rust-pruning/admission-v1/preserve_queue_package_v2.py",
+      "bytes": 3015,
+      "sha256": "4cf0d6fbb19f241af9cf76cf576dba2ef2f59f241522ec75f126221225c50b8e"
+    }
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "utc": "2026-10-08T01:13:40.869078+00:00",
+  "status": "READ_ONLY_RECOVERY; NO_IMPLEMENTATION_OR_JOBS; REQUIRED_CHART_COMPARISON_OPERANDS_UNJOINED",
+  "source_commit": "eed88d0a31e4ceb5b823dbe734180a2a0bfbedfe",
+  "source_worktree_clean": true,
+  "geometry_record_commit": "9a60f1a9e3ce35404b7eee8cdb5c799b2c1829f3",
+  "geometry_inspected_root": "b34c87770272ab8688bc59605c690b47fe996428",
+  "actual_successor_scope": "Later sealed eed88 source with compare_contacts C/K/D and retired executed bank optimizer; geometry root reference is historical on this branch.",
+  "existing_owners": [
+    {
+      "path": "hnn/receiving.rs",
+      "lines": "16,128,2088+",
+      "claim": "The actual wave face already has the declared C_S=R P_R^tau Pi_R; it reads the source-bound Word at admitted receiving stations."
+    },
+    {
+      "path": "hnn/ring.rs",
+      "lines": "2685,3550+",
+      "claim": "read_turn_covector differentiates log|mu| of the same per-crossing pump-modulated monodromy and returns all possibly active max-growth members with resolved/unresolved covector certificates."
+    },
+    {
+      "path": "hnn/word/continuation.rs",
+      "lines": "190+",
+      "claim": "compare_contacts compares actual Faces to observed Encoded target and partition, pulls RatioCovector through the same Word and composes actual C/K/D returns."
+    },
+    {
+      "path": "hnn/port.rs",
+      "lines": "899+",
+      "claim": "pull_back_continuing already accepts phase/map-transposed anchor covectors and an optional full ending covector; it returns actual producing WordReturn and complete opening costate."
+    },
+    {
+      "path": "hnn/reference.rs",
+      "lines": "expose_continuing",
+      "claim": "Current observed-window exposure compares before window ingestion; this order must be preserved."
+    },
+    {
+      "path": "hnn/executed.rs",
+      "lines": "16-28",
+      "claim": "S2 explicitly retired lock-face comparisons and the bank optimizer; historical recovery is not a current library consumer."
+    }
+  ],
+  "missing_operands": [
+    "Which admitted physical receiver face, encoding and absolute source/receiver/pump clock identify its complex amplitudes with the bank per-crossing turn, including period closure and any decoder/residual. Existing C_S is not absent; its bank chart join is absent.",
+    "Which declared observed Holon comparison makes the active bank growth cotangents its lambda_bank (with branches/enclosures retained), instead of substituting targetless growth maximization or a retired lock optimizer.",
+    "Which actual candidate port openings and input-once/work receipt replace BankPlacement source-image storage while keeping all hidden/through-flow state and the observation outside blind prediction."
+  ],
+  "rejected_shortcuts": [
+    "Forge a RatioCovector from bare growth derivatives",
+    "Restore the full retired optimizer",
+    "Add an arbitrary scalar objective or authored decoder",
+    "Treat a geometric pure storage embedding as continuing physical Word",
+    "Discard active member uncertainty or complex phase",
+    "Claim structural unit controls establish learned relations/usefulness"
+  ],
+  "source_pins": {
+    "crates/holonics/src/hnn/executed.rs": {
+      "bytes": 14059,
+      "sha256": "e9000546fd4b202c887336b020dc063286309fe01c217124e887f798baee518b"
+    },
+    "crates/holonics/src/hnn/ring.rs": {
+      "bytes": 175213,
+      "sha256": "5e7263b121ab508923eaba7afbbea532490e357da92abfc4b313c874f157d234"
+    },
+    "crates/holonics/src/hnn/receiving.rs": {
+      "bytes": 99700,
+      "sha256": "6b61b28f08e2b56c51b8a3e72c554ef9aadd109f6d1b32e5d58cff1ad11c4b85"
+    },
+    "crates/holonics/src/hnn/prediction.rs": {
+      "bytes": 198272,
+      "sha256": "5ae16d2519ef4d0ed4558e3d210e0db7245716bcafad4c9d1f13b935d177f0a8"
+    },
+    "crates/holonics/src/hnn/port.rs": {
+      "bytes": 70789,
+      "sha256": "fb62daa8daafb259b8696353247a017b005fd027264160abf7a61b96206b0df2"
+    },
+    "crates/holonics/src/hnn/word/continuation.rs": {
+      "bytes": 26227,
+      "sha256": "531298bcdeeff2d8d81afb5310185552f1fa78d4e0b2ddd7175d7d29e5f0ec21"
+    },
+    "crates/holonics/src/hnn/reference.rs": {
+      "bytes": 221923,
+      "sha256": "445ed9efcb9beb085236f2a5d4565188684918ac42d7ad7ae5e2e68fae3cfb10"
+    }
+  },
+  "independent_source_review": "Luna loaded_span_law_review; primary inspected relevant live owners; no defect alleged in the existing comparison/Word adjoint.",
+  "parent_action": "Resolve the source-version and exact bank receiver/comparison contract before the bank implementation; the minimal eed88 ownership-fix successor is separate and ready for the sole queue.",
+  "jobs": 0
+}

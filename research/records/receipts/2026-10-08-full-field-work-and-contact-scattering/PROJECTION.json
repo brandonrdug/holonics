@@ -1,0 +1,25 @@
+{
+  "files": {
+    "SOURCE_PINS.v1.json": {
+      "original": {
+        "bytes": 7452,
+        "sha256": "31ff249796622b8be29dd35030c25193317d69e28fae6db5b5f455518312e4fd"
+      },
+      "projected": {
+        "bytes": 7272,
+        "sha256": "424ec4a299c779c7c45c2296feb226e466139afb09bb08f525f0fd45d8055b0b"
+      },
+      "replaced": {
+        "<repository>": 12,
+        "<lean-toolchain>/": 0,
+        "<home>": 0
+      }
+    }
+  },
+  "placeholders": {
+    "<repository>": "the absolute host directory of the repository's main checkout; the path that follows (a tracked path, or a worktree or private run directory under .local/) is kept",
+    "<lean-toolchain>/": "the absolute host directory of the Lean 4.33.0 toolchain the check invoked; the path that follows is kept",
+    "<home>": "the host user's home directory"
+  },
+  "rule": "each absolute host prefix below is replaced by its placeholder, the longer prefixes first; no other byte changes. The placeholders do not occur in the originals, so substituting each prefix back restores the original bytes, whose sha256 and size are pinned here; checked locally before commit. The originals stay in local custody."
+}

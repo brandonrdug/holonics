@@ -1,0 +1,146 @@
+{
+  "grade": "source and declaration verification only",
+  "sources": [
+    {
+      "path": "<repository>/.local/wt/hnn-source-observer-01a1030c/crates/holonics/src/hnn/ratio.rs",
+      "sha256": "4b223f2a9bae7b70291ed62ce026a5f6ca521df0b4d87be3769c26a32f91030c",
+      "source_unchanged": true,
+      "declaration_locations_match": true
+    },
+    {
+      "path": "<repository>/.local/wt/hnn-source-observer-01a1030c/crates/holonics/src/hnn/field.rs",
+      "sha256": "d6c8d1a04c29862920617ff95c02b50bae40e4120c171dce19aac5b297ada2f7",
+      "source_unchanged": true,
+      "declaration_locations_match": true
+    },
+    {
+      "path": "<repository>/.local/wt/hnn-source-observer-01a1030c/crates/holonics/src/hnn/word/continuation.rs",
+      "sha256": "cb96ea4f09a24ca57e26cfd95436c69752670dacf9afb1450546e9b7d09d8092",
+      "source_unchanged": true,
+      "declaration_locations_match": true
+    },
+    {
+      "path": "<repository>/.local/wt/hnn-source-observer-01a1030c/crates/holonics/src/hnn/word.rs",
+      "sha256": "cee1db82700ed5e47bd686dc8a48e5eb50ea8316c3af21b081faeda8e5258bad",
+      "source_unchanged": true,
+      "declaration_locations_match": true
+    },
+    {
+      "path": "<repository>/.local/wt/hnn-source-observer-01a1030c/crates/holonics/src/hnn/propagation.rs",
+      "sha256": "5784d92fa12cb7c70db3bda0dc5576cb96bf2e83e919e2d25bf5c59884b99a07",
+      "source_unchanged": true,
+      "declaration_locations_match": true
+    },
+    {
+      "path": "<repository>/.local/wt/hnn-source-observer-01a1030c/crates/holonics/src/hnn/ring.rs",
+      "sha256": "5e7263b121ab508923eaba7afbbea532490e357da92abfc4b313c874f157d234",
+      "source_unchanged": true,
+      "declaration_locations_match": true
+    },
+    {
+      "path": "<repository>/.local/wt/hnn-source-observer-01a1030c/crates/holonics/src/hnn/retention.rs",
+      "sha256": "287e881f98cf9d05969b2f0f3969bb7084320b873761c9d790dd04855b69a118",
+      "source_unchanged": true,
+      "declaration_locations_match": true
+    },
+    {
+      "path": "<repository>/.local/wt/geometry-integration-01a10f3d/lean/Holonics/Geometry/FrameTransport.lean",
+      "sha256": "9364dd0eff13d68cfdde97683a7b6c5084b0f2e1163dc44ad752aea5c71faa41",
+      "source_unchanged": true,
+      "declaration_locations_match": true
+    },
+    {
+      "path": "<repository>/.local/wt/geometry-integration-01a10f3d/lean/Holonics/Geometry/Motion.lean",
+      "sha256": "0be5b5b2b2aa729a73a8530f3a751d0015a6735f34f23e1667faa8fe34e9e85e",
+      "source_unchanged": true,
+      "declaration_locations_match": true
+    },
+    {
+      "path": "<repository>/.local/wt/geometry-integration-01a10f3d/lean/HolonicsResearch/Mathematics/Comma.lean",
+      "sha256": "f819b0df1e428233f6fc0d5c2f379d02763700f4544ed74884199b02a3dc513a",
+      "source_unchanged": true,
+      "declaration_locations_match": true
+    },
+    {
+      "path": "<repository>/.local/wt/geometry-integration-01a10f3d/lean/HolonicsResearch/Geometry/TurnBoostNormality.lean",
+      "sha256": "2636207133434c724e1aba241a9325f488f3ceb4f183008fbb9dd29953c55ccb",
+      "source_unchanged": true,
+      "declaration_locations_match": true
+    },
+    {
+      "path": "<repository>/.local/wt/geometry-integration-01a10f3d/research/records/2026-10-05_THE_GHOST_LIVES_IN_THE_GAP_THE_JOINTS_OF_THE_LENS.md",
+      "sha256": "9e52b4e64166668a683080f931ba04ba597caf877212f58361ac5441beb727d4",
+      "source_unchanged": true,
+      "declaration_locations_match": true
+    },
+    {
+      "path": "<repository>/research/records/2026-09-12_PERIPLUS_REBASE_AND_TEMPORAL_RESIDUES_JOIN_GAMMA_ZETA_AND_HODGE.md",
+      "sha256": "ceba53f671680b94ed345aec4400fb73917a086115e899433e7eee650e7c449d",
+      "source_unchanged": true,
+      "declaration_locations_match": true
+    },
+    {
+      "path": "<repository>/lean/Holonics/Transport/SituatedReturnedDifference.lean",
+      "sha256": "a8d1d4a933eae5f2ea504fac1cb8712eea4c8746da20309f3589205ac7d4f2e4",
+      "source_unchanged": true,
+      "declaration_locations_match": true
+    },
+    {
+      "path": "<repository>/lean/Holonics/Transport/AddressedLinearizedPassage.lean",
+      "sha256": "5d86a65e6de31b066919ae898e40e4fc203dcc78981d69f0cab269b3cd22fe60",
+      "source_unchanged": true,
+      "declaration_locations_match": true
+    },
+    {
+      "path": "<repository>/lean/Holonics/Transport/ChangingReceiver.lean",
+      "sha256": "076349edd4c133d8b48aab35398a8ff74fc183afa5c8c18997eeec217f5b0483",
+      "source_unchanged": true,
+      "declaration_locations_match": true
+    },
+    {
+      "path": "<repository>/lean/Holonics/Physics/TemporalHodgeResidue.lean",
+      "sha256": "0bbe6c79889c85332e73c0404f4a4737cc4663144a6c81d702d93daf639288cb",
+      "source_unchanged": true,
+      "declaration_locations_match": true
+    },
+    {
+      "path": "<repository>/lean/Holonics/Physics/FluidReceiverClosure.lean",
+      "sha256": "3d879a586306f75f0924731dda463229ea530862baf424badd07306ceacd0114",
+      "source_unchanged": true,
+      "declaration_locations_match": true
+    },
+    {
+      "path": "<repository>/.local/rh-20260930/comma-recursive-receiver-20261006/openai-math-source-audit-v1/ACTUAL_GAUSSIAN_RESIDUE_CURRENT_JOIN.v1.txt",
+      "sha256": "c85c598a16152abe942b30ec40ad730c5e8a2593fff11413cc2110f1646fdd48",
+      "source_unchanged": true,
+      "declaration_locations_match": true
+    },
+    {
+      "path": "<repository>/.local/rh-20260930/comma-recursive-receiver-20261006/openai-math-source-audit-v1/GAUSSIAN_ZERO_COMB_SOURCE_JOIN.v1.txt",
+      "sha256": "f713ca76b247b09d4a1fb2c0f2d98d4a5f6ad48e7afc583c3256e04faf005986",
+      "source_unchanged": true,
+      "declaration_locations_match": true
+    },
+    {
+      "path": "<repository>/lean/Holonics/Transport/GaussianRebase.lean",
+      "sha256": "e982f5a959a7a3cc61a45037eb2411fb0fcae4786643fe7a2ed099c978b53c31",
+      "source_unchanged": true,
+      "declaration_locations_match": true
+    }
+  ],
+  "accepted_owner_hashes": {
+    "lean/Holonics/Geometry/FrameTransport.lean": "9364dd0eff13d68cfdde97683a7b6c5084b0f2e1163dc44ad752aea5c71faa41",
+    "lean/Holonics/Geometry/Motion.lean": "0be5b5b2b2aa729a73a8530f3a751d0015a6735f34f23e1667faa8fe34e9e85e",
+    "lean/Holonics/Foundation/CausalChord.lean": "4b2c01a136c8c5cf4921d4660975ba6a8d6af5b7c9f61e0d55dcc8b1d6469aa8",
+    "lean/Holonics/Objects/SourceHolon.lean": "ee0bb62a8a091c41a5e91d5ac6ce2ce831e692caf982b3ecf043439c747d5568"
+  },
+  "corrected_v3_hash_matches": true,
+  "existing_queue_request_unchanged": true,
+  "no_source_edits_or_new_compiler": true,
+  "specific_native_receiving_change_measured": false,
+  "new_kernel_acceptance": false,
+  "record": {
+    "path": "<repository>/.local/wt/geometry-integration-01a10f3d/research/records/2026-10-07_A_CARRIED_COMMA_REACHES_THE_NEXT_RECEIVER_THROUGH_THE_SAME_CONTACT.md",
+    "sha256": "5c31b13c9a6bd95abc32770931fedd550755167575ca6650923e8f2f7e51c337"
+  }
+}

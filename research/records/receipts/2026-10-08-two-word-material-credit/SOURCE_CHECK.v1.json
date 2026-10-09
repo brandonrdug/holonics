@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "verified_at_utc": "2026-10-08T01:38:49.611531+00:00",
+  "source_commit": "e5a476a1748743257b01bf3fbce7593656c2b79b",
+  "source_pins_sha256": "abba485a49e7e1a3f6499381290b7570f482bb815502cc63a06b8afee46c18be",
+  "fourteen_previously_sealed_owners_byte_equal": true,
+  "new_propagation_owner_equal_sealed_git_blob": true,
+  "all_new_and_old_anchors_match": true,
+  "accepted_geometry_and_queue_frozen": [
+    {
+      "path": "lean/Holonics/Geometry/FrameTransport.lean",
+      "expected_sha256": "9364dd0eff13d68cfdde97683a7b6c5084b0f2e1163dc44ad752aea5c71faa41",
+      "actual_sha256": "9364dd0eff13d68cfdde97683a7b6c5084b0f2e1163dc44ad752aea5c71faa41"
+    },
+    {
+      "path": "lean/Holonics/Geometry/Motion.lean",
+      "expected_sha256": "0be5b5b2b2aa729a73a8530f3a751d0015a6735f34f23e1667faa8fe34e9e85e",
+      "actual_sha256": "0be5b5b2b2aa729a73a8530f3a751d0015a6735f34f23e1667faa8fe34e9e85e"
+    },
+    {
+      "path": "lean/Holonics/Foundation/CausalChord.lean",
+      "expected_sha256": "4b2c01a136c8c5cf4921d4660975ba6a8d6af5b7c9f61e0d55dcc8b1d6469aa8",
+      "actual_sha256": "4b2c01a136c8c5cf4921d4660975ba6a8d6af5b7c9f61e0d55dcc8b1d6469aa8"
+    },
+    {
+      "path": "lean/Holonics/Objects/SourceHolon.lean",
+      "expected_sha256": "ee0bb62a8a091c41a5e91d5ac6ce2ce831e692caf982b3ecf043439c747d5568",
+      "actual_sha256": "ee0bb62a8a091c41a5e91d5ac6ce2ce831e692caf982b3ecf043439c747d5568"
+    },
+    {
+      "path": "research/records/receipts/2026-10-07-public-main-geometry-integration/QUEUE_REQUEST.v1.json",
+      "expected_sha256": "eb9f97592dc0c0709bdfd64a386824e656871f53b00759e057d48c574d0398bf",
+      "actual_sha256": "eb9f97592dc0c0709bdfd64a386824e656871f53b00759e057d48c574d0398bf"
+    }
+  ],
+  "changed_tracked_paths": [
+    "research/records/2026-10-07_PLASMA_AND_GAS_CURRENTS_CROSS_THE_SAME_MOVING_TUBE.md"
+  ],
+  "diff_check_exit_code": 0,
+  "builds": 0,
+  "tests_rerun": 0,
+  "simulations": 0,
+  "hnn_consumer_edits": 0,
+  "sealed_inputs_changed": false,
+  "execution_receipt": {
+    "kind": "source binding and whitespace only",
+    "thread_budget": 1,
+    "projected_upper_ns": 1000000000,
+    "fixed_deadline_ms": 1000,
+    "projection_basis": "Prior fourteen-owner sealed-source check 753367210 ns; a fifteen-owner linear read projection is 807179154 ns; unchanged sealed bindings reused, one additional git blob read.",
+    "elapsed_ns": 56751091,
+    "checker_process_peak_resident_bytes": 21540864
+  }
+}

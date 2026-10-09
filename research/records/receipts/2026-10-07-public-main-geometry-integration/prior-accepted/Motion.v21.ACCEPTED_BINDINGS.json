@@ -1,0 +1,513 @@
+{
+  "status": "PASS: exact accepted Motion source/object/importing-consumer bindings reconciled",
+  "terminal_v21": {
+    "path": "<repository>/research/records/receipts/2026-10-06-lean-rust-native-queue/terminal-v21/VALIDATION.json",
+    "sha256": "71143228c6d764927bbd8451f3bf03815c6cfe7b5c4834b62a128426d8e59409"
+  },
+  "queue_validation": {
+    "path": "<repository>/research/records/receipts/2026-10-06-lean-rust-native-queue/native-validation-motion-decoder-v1/VALIDATION.json",
+    "sha256": "2943b3c1181bdcdbb47a39a185d44977c8e80ba7542d68db76a74ce8a25f463d"
+  },
+  "source": {
+    "original": "<repository>/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Geometry/Motion.lean",
+    "preserved_copy": "<repository>/research/records/receipts/2026-10-06-lean-rust-native-queue/native-validation-motion-decoder-v1/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Geometry/Motion.lean",
+    "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Geometry/Motion.lean",
+    "bytes": 56875,
+    "sha256": "0be5b5b2b2aa729a73a8530f3a751d0015a6735f34f23e1667faa8fe34e9e85e"
+  },
+  "object": {
+    "original": "<repository>/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Geometry/Motion.olean",
+    "preserved_copy": "<repository>/research/records/receipts/2026-10-06-lean-rust-native-queue/native-validation-motion-decoder-v1/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Geometry/Motion.olean",
+    "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Geometry/Motion.olean",
+    "bytes": 4203160,
+    "sha256": "e1229d7bf24796b406b471e3c9a1fd345bee8235b207b704b591400035228d91"
+  },
+  "importing_consumer": {
+    "source_original": "<repository>/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/FiniteDecoderWorkAudit.lean",
+    "source_copy": "<repository>/research/records/receipts/2026-10-06-lean-rust-native-queue/native-validation-motion-decoder-v1/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/FiniteDecoderWorkAudit.lean",
+    "source_pin": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/FiniteDecoderWorkAudit.lean",
+      "bytes": 228,
+      "sha256": "7f0d757704bec8c2671caf8371129e7c98aba8d1db99d26ab17405721cd64636"
+    },
+    "object_original": "<repository>/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-20261006/objects-v1/FiniteDecoderWorkAudit.olean",
+    "object_copy": "<repository>/research/records/receipts/2026-10-06-lean-rust-native-queue/native-validation-motion-decoder-v1/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-20261006/objects-v1/FiniteDecoderWorkAudit.olean",
+    "object_pin": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-20261006/objects-v1/FiniteDecoderWorkAudit.olean",
+      "bytes": 1552,
+      "sha256": "7becaa339609f3895aef82bbb670b0d174a27077cc29d0e4a37221ca9db520cf"
+    }
+  },
+  "query_counts": {
+    "development": 2,
+    "whole_owner": 58,
+    "importer": 3
+  },
+  "kernel_validations": {
+    "development": {
+      "kernel_accepted": true,
+      "compiler_exit": 0,
+      "compiler_wall_ns": 3829215937,
+      "axioms": {
+        "Holonics.Geometry.Motion.finite_work_form_rechart_defect": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.finite_work_form_rechart": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      "selector_count_matches": true,
+      "standard_axioms_only": true,
+      "metadata_unchanged": true,
+      "broad_library_checked": false
+    },
+    "whole_owner": {
+      "kernel_accepted": true,
+      "compiler_exit": 0,
+      "compiler_wall_ns": 16992423344,
+      "axioms": {
+        "Holonics.Geometry.Motion.turn_add_boost": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.turn_isSkew": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.boost_isSymm": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.turn_boost_unique": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.skew_rate_conserves": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.energy_rate_is_boost": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.complex_rate_split": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.turn_portHamiltonian": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.boost_portHamiltonian": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.move_about_pivot": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.move_fixes_iff_pivot": [
+          "propext"
+        ],
+        "Holonics.Geometry.Motion.pivot_unique": [
+          "propext"
+        ],
+        "Holonics.Geometry.Motion.move_comp": [
+          "propext",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.translation_has_no_pivot": [
+          "propext",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.move_about_axis_then_falls": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.complex_move_about_pivot": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.complex_move_is_pantograph": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.complex_fall_has_no_pivot": [
+          "propext",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.swing_is_half_turn_move": [
+          "propext",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.swing_pivot_is_anchor": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.multiplier_cross_ratio": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.multiplier_trace_det_undivided": [
+          "propext",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.multiplier_trace_det": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.multiplier_half_turn_iff_traceless": [
+          "propext",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.multiplier_ratio_half_turn_iff_traceless": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.swing_word_linear_part": [
+          "propext"
+        ],
+        "Holonics.Geometry.Motion.even_swing_word_is_translation": [
+          "propext"
+        ],
+        "Holonics.Geometry.Motion.odd_swing_word_is_point_reflection": [
+          "propext"
+        ],
+        "Holonics.Geometry.Motion.odd_swing_word_is_swing": [
+          "propext"
+        ],
+        "Holonics.Geometry.Motion.det_half_turn_odd": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.power_is_boost_rate": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.normal_effort_is_turn_rate": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.sling_energy_gain": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.sling_speed_gain": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.traction_disk": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.turn_distance_from_one": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.turn_by_angle_distance_from_one": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.velocity_rate_is_log_derivative": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.acceleration_and_jerk": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.bellJet_two": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.derivation_iterate_of_log_rate": [
+          "propext",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.position_jets": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.rates_from_effort": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.quadraticGenerator_trace_det": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.quadraticGenerator_is_turn_of_energy": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.quadraticGenerator_sq": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.quadratic_turn": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.quadratic_boost": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.quadratic_fall": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.free_particle_step": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.quadratic_turn_energy_pos": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.iwasawa": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.iwasawa_unique": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.energy_rate_moving_metric": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.energy_rate_moving_metric_boost": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.finite_work_form_rechart": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.finite_work_form_rechart_defect": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.affine_quadratic_work": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      "selector_count_matches": true,
+      "standard_axioms_only": true,
+      "metadata_unchanged": true,
+      "broad_library_checked": false
+    },
+    "importer": {
+      "kernel_accepted": true,
+      "compiler_exit": 0,
+      "compiler_wall_ns": 10446737571,
+      "axioms": {
+        "Holonics.Geometry.Motion.finite_work_form_rechart_defect": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.finite_work_form_rechart": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Geometry.Motion.affine_quadratic_work": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      "selector_count_matches": true,
+      "standard_axioms_only": true,
+      "metadata_unchanged": true,
+      "broad_library_checked": false
+    }
+  },
+  "import_seals": {
+    "owner": {
+      "artifact": "<repository>/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/current-imports.v1.json",
+      "pin": {
+        "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/current-imports.v1.json",
+        "bytes": 46466747,
+        "sha256": "06c8f6bd15bb7cfb9c076295d3680d0bcc6fc96f2d93211c08c96b9f560ca2cc"
+      },
+      "module_count": 4912,
+      "actual_namespace_lookup_verified": true,
+      "hash_reuse_assumptions": "The pinned RH catalog is immutable and its stored digests came from prior byte hashing. Cataloged files remain immutable through preparation and compiler execution; matching presence/size/mtime/ctime permits digest reuse, not a fresh byte read. Postcheck compares lstat/stat metadata and symlink targets without rehashing. This requires truthful filesystem metadata and no privileged or adversarial mutation that preserves/restores all checked stamps."
+    },
+    "importer": {
+      "artifact": "<repository>/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-20261006/current-imports.v1.json",
+      "pin": {
+        "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-20261006/current-imports.v1.json",
+        "bytes": 46486428,
+        "sha256": "94c5b26f4898c267d858ab4ffddd71213b8366fe3d6f1f646e7ccc08636862be"
+      },
+      "module_count": 4913,
+      "actual_namespace_lookup_verified": true,
+      "hash_reuse_assumptions": "The pinned RH catalog is immutable and its stored digests came from prior byte hashing. Cataloged files remain immutable through preparation and compiler execution; matching presence/size/mtime/ctime permits digest reuse, not a fresh byte read. Postcheck compares lstat/stat metadata and symlink targets without rehashing. This requires truthful filesystem metadata and no privileged or adversarial mutation that preserves/restores all checked stamps."
+    }
+  },
+  "custom_dependency_count": 29,
+  "custom_dependency_sources_match_current_root": [
+    "Holonics.Geometry.AffineSwing",
+    "Holonics.Geometry.HolonicPantographicSwingJets",
+    "Holonics.Geometry.Swing",
+    "Holonics.Foundation.Gluing",
+    "Holonics.Foundation.GluingPassage",
+    "Holonics.Foundation.TransportWord",
+    "Holonics.Compression.Landmark.FixedPoint",
+    "Holonics.Compression.Landmark.SiteKind",
+    "Holonics.Transport.NavigatorTraceFaces",
+    "Holonics.Transport.HelicalPairInteraction",
+    "Holonics.Geometry.ScrewGeometry",
+    "Holonics.Holon.QuadraticMoment",
+    "Holonics.Transport.HolonicInteraction",
+    "Holonics.Physics.HolonicSnellInteraction",
+    "Holonics.Foundation.HolonicDirectedPassage",
+    "Holonics.Foundation.HolonicDifferenceCalculus",
+    "Holonics.Geometry.Telescoping",
+    "Holonics.Geometry.Horizon",
+    "Holonics.Geometry.CrossRatio",
+    "Holonics.Geometry.Polarisation",
+    "Holonics.Geometry.LocalFactor",
+    "Holonics.Geometry.TraceSequence",
+    "Holonics.Geometry.PartitionFunction",
+    "Holonics.Physics.CompositeMassEnergy",
+    "Holonics.Physics.HolonicMassShellFace",
+    "Holonics.Physics.Ellipse",
+    "Holonics.Fluid.NavierStokesMaterialPolygon",
+    "Holonics.Geometry.Gyrogroup",
+    "Holonics.Fluid.NavierStokes"
+  ],
+  "owner_importer_all_custom_sources_and_dependency_objects_agree": true,
+  "verified_preserved_artifact_count": 14,
+  "verified_preserved_artifacts": {
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Geometry/Motion.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/Holonics/Geometry/Motion.lean",
+      "bytes": 56875,
+      "sha256": "0be5b5b2b2aa729a73a8530f3a751d0015a6735f34f23e1667faa8fe34e9e85e"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Geometry/Motion.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/objects-v1/Holonics/Geometry/Motion.olean",
+      "bytes": 4203160,
+      "sha256": "e1229d7bf24796b406b471e3c9a1fd345bee8235b207b704b591400035228d91"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/FiniteDecoderWorkAudit.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoding-work-20261006/received-source-v1/lean/FiniteDecoderWorkAudit.lean",
+      "bytes": 228,
+      "sha256": "7f0d757704bec8c2671caf8371129e7c98aba8d1db99d26ab17405721cd64636"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-20261006/objects-v1/FiniteDecoderWorkAudit.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-20261006/objects-v1/FiniteDecoderWorkAudit.olean",
+      "bytes": 1552,
+      "sha256": "7becaa339609f3895aef82bbb670b0d174a27077cc29d0e4a37221ca9db520cf"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/current-imports.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/current-imports.v1.json",
+      "bytes": 46466747,
+      "sha256": "06c8f6bd15bb7cfb9c076295d3680d0bcc6fc96f2d93211c08c96b9f560ca2cc"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-20261006/current-imports.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-20261006/current-imports.v1.json",
+      "bytes": 46486428,
+      "sha256": "94c5b26f4898c267d858ab4ffddd71213b8366fe3d6f1f646e7ccc08636862be"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-development-20261006-v1.input_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-development-20261006-v1.input_seal.json",
+      "bytes": 9013,
+      "sha256": "e0ab882d31e861f3d1466abc86444e65ae6b5026b4041a01e54e4ac7302355c2"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-development-20261006-v1.output_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-development-20261006-v1.output_seal.json",
+      "bytes": 1262094,
+      "sha256": "2da944c84f106f93739d66988e581ab7d6cdbfd1531acc49e700f10471e6dbe9"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-development-20261006-v1.input_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-development-20261006-v1.input_seal.json",
+      "bytes": 8969,
+      "sha256": "7716e960de75697b9b4338d1377f0dbe14921ebc4e166c502849c50eab9e2f3c"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-development-20261006-v1.output_seal.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-development-20261006-v1.output_seal.json",
+      "bytes": 808132,
+      "sha256": "3f604138fda433df8529bdf4325d2373275a047bdd510b22f4a15fc40adcc9fe"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/COMPILER_REQUEST.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/COMPILER_REQUEST.v1.json",
+      "bytes": 4633,
+      "sha256": "a1ea84208b16a2a46235a64ff1f07be5a7a5c65109e6a30a2cab81c05c80eee9"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-20261006/COMPILER_REQUEST.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-20261006/COMPILER_REQUEST.v1.json",
+      "bytes": 3181,
+      "sha256": "7bb6dcf6f3b577ad7321e896f1fe008b1d14cce7c71e576fab8a8135a8f9d9b3"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/compiler.v1.stdout": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-motion-decoder-owner-20261006/compiler.v1.stdout",
+      "bytes": 7395,
+      "sha256": "459256df394362491d6c70f5ae11545989079f4ff5df9ee3e551691f493a2851"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-decoder-importer-20261006/compiler.v1.stdout": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-decoder-importer-20261006/compiler.v1.stdout",
+      "bytes": 337,
+      "sha256": "57a235c7ca2c553dbb68a08635df838e8471520c5f233391fae11f49a3f7ce38"
+    }
+  },
+  "root_motion_predecessor_unchanged": true,
+  "read_wall_ns": 606940343,
+  "compiler_rerun": false,
+  "Git_publication": false,
+  "future_read_request_accepted_by_this_receipt": false,
+  "physical_semantics_and_native_HNN_performance_separate": true
+}

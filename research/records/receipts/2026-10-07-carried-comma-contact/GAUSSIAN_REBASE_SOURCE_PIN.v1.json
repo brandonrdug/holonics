@@ -1,0 +1,18 @@
+{
+  "path": "<repository>/lean/Holonics/Transport/GaussianRebase.lean",
+  "repository_path": "lean/Holonics/Transport/GaussianRebase.lean",
+  "bytes": 2143,
+  "sha256": "e982f5a959a7a3cc61a45037eb2411fb0fcae4786643fe7a2ed099c978b53c31",
+  "locations": {
+    "theorem amplitude_cocycle": [
+      26
+    ],
+    "theorem act_comp": [
+      33
+    ],
+    "theorem unrebased_return": [
+      46
+    ]
+  },
+  "scope": "existing amplitude-plus-base action; not an RH bound"
+}

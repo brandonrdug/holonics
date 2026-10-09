@@ -1,0 +1,326 @@
+{
+  "version": 1,
+  "scope": "source-only support for HNN owner: exact common turn decoder, continuing-state adjoint at held reads, complete executed-chart residual and direct moving receiver/event variation; no consumer edits",
+  "root_head_commit": "b34c87770272ab8688bc59605c690b47fe996428",
+  "root_binding": "exact working source hashes below; unrelated root edits are preserved",
+  "record_base_commit": "9a60f1a9e3ce35404b7eee8cdb5c799b2c1829f3",
+  "record": {
+    "base": "<repository>/.local/wt/geometry-integration-01a10f3d",
+    "path": "research/records/2026-10-07_PLASMA_AND_GAS_CURRENTS_CROSS_THE_SAME_MOVING_TUBE.md",
+    "bytes": 77451,
+    "sha256": "0c734a8eba46a27b383f79d0e09fa8c1c5ba52aa5e1b88043672fd2ff8ff4335",
+    "locations": [
+      {
+        "anchor": "### The existing decoder and reverse map",
+        "lines": [
+          1001
+        ]
+      }
+    ]
+  },
+  "sources": [
+    {
+      "base": "<repository>",
+      "path": "crates/holonics/src/hnn/ring.rs",
+      "bytes": 162137,
+      "sha256": "c86470c51d938c57d2d552ece6550f17ed84fba1f916b2cea41f04a436170176",
+      "locations": [
+        {
+          "anchor": "pub fn turn(storage",
+          "lines": [
+            2558
+          ]
+        },
+        {
+          "anchor": "pub fn storage(&self) -> Option<Vec<ExactInterval>>",
+          "lines": [
+            2687
+          ]
+        },
+        {
+          "anchor": "pub fn read_turn_covector",
+          "lines": [
+            3204
+          ]
+        },
+        {
+          "anchor": "pub fn placed(pump",
+          "lines": [
+            565
+          ]
+        }
+      ]
+    },
+    {
+      "base": "<repository>",
+      "path": "crates/holonics/src/hnn/field.rs",
+      "bytes": 100365,
+      "sha256": "573c222a44b3030b72da7c64238b9144319658dfcbc6cc80da3c096338a1e30b",
+      "locations": [
+        {
+          "anchor": "pub fn rotate(&self",
+          "lines": [
+            785
+          ]
+        }
+      ]
+    },
+    {
+      "base": "<repository>",
+      "path": "crates/holonics/src/hnn/word.rs",
+      "bytes": 80739,
+      "sha256": "0d73217c8a560c5d412fdad7cca13588103aaf67c889f0436c00cba91cbb2f12",
+      "locations": [
+        {
+          "anchor": "pub fn opened_at",
+          "lines": [
+            1055
+          ]
+        },
+        {
+          "anchor": "pub fn change",
+          "lines": [
+            1077
+          ]
+        },
+        {
+          "anchor": "pub fn anchor",
+          "lines": [
+            1129
+          ]
+        }
+      ]
+    },
+    {
+      "base": "<repository>",
+      "path": "crates/holonics/src/hnn/port.rs",
+      "bytes": 65849,
+      "sha256": "4cbe3e6a6dd37df212f001cb9d49a972bce8c7c4fabfed74347d706fa55b2920",
+      "locations": [
+        {
+          "anchor": "pub struct ChangeCovector",
+          "lines": [
+            792
+          ]
+        },
+        {
+          "anchor": "pub fn pull_back_continuing",
+          "lines": [
+            845
+          ]
+        },
+        {
+          "anchor": "fn reverse_core",
+          "lines": [
+            999
+          ]
+        },
+        {
+          "anchor": "// The anchor covector of each receiving epoch",
+          "lines": [
+            975
+          ]
+        }
+      ]
+    },
+    {
+      "base": "<repository>",
+      "path": "crates/holonics/src/hnn/receiving.rs",
+      "bytes": 66881,
+      "sha256": "9fb993b8f7a239365967a823b2d2c2467dd2ab47e3cff834fcb5b131bd6f3dd6",
+      "locations": [
+        {
+          "anchor": "pub fn read(",
+          "lines": [
+            1321
+          ]
+        }
+      ]
+    },
+    {
+      "base": "<repository>",
+      "path": "crates/holonics/src/hnn/moment.rs",
+      "bytes": 64935,
+      "sha256": "f8bbf2a2385eca996b0af9450c27a47aee79ccab97b1274022579547a1f9a2c1",
+      "locations": [
+        {
+          "anchor": "pub fn open_parts",
+          "lines": [
+            1172
+          ]
+        },
+        {
+          "anchor": "pub fn open_storage",
+          "lines": [
+            1264
+          ]
+        }
+      ]
+    },
+    {
+      "base": "<repository>",
+      "path": "crates/holonics/src/hnn/prediction.rs",
+      "bytes": 61360,
+      "sha256": "3cf1e0facda8dc1f782c0c06feb878c129b2208a17212e7430e841839f658630",
+      "locations": [
+        {
+          "anchor": "pub fn of(",
+          "lines": [
+            843
+          ]
+        },
+        {
+          "anchor": "pub fn storage_over",
+          "lines": [
+            1030
+          ]
+        }
+      ]
+    },
+    {
+      "base": "<repository>",
+      "path": "crates/holonics/src/hnn/tests/prediction.rs",
+      "bytes": 63986,
+      "sha256": "dc9c9f0208eb33d71c33ff8ff9c0c031bd0a5ba065cbda28610454bea673a2a2",
+      "locations": [
+        {
+          "anchor": "fn the_bank_placement_is_the_sections_injection",
+          "lines": [
+            309
+          ]
+        },
+        {
+          "anchor": "fn the_bank_placement_under_a_dissipative_transport",
+          "lines": [
+            358
+          ]
+        }
+      ]
+    },
+    {
+      "base": "<repository>",
+      "path": "crates/holonics/src/hnn/reference.rs",
+      "bytes": 191514,
+      "sha256": "cf6a7501643ac70ed3392121c67b3dc42e81768e85b258e411c8137dab8d2568",
+      "locations": [
+        {
+          "anchor": "pub(crate) fn compose_contact",
+          "lines": [
+            2460
+          ]
+        }
+      ]
+    },
+    {
+      "base": "<repository>",
+      "path": "crates/holonics/src/hnn/word/continuation.rs",
+      "bytes": 16624,
+      "sha256": "7bd1510815a8338833844be13c9d7ec79c8bdf9371e5779349aef0e4a9113e25",
+      "locations": [
+        {
+          "anchor": "pub fn compare_contact_storage",
+          "lines": [
+            64
+          ]
+        },
+        {
+          "anchor": "pub fn continue_deposited",
+          "lines": [
+            232
+          ]
+        }
+      ]
+    },
+    {
+      "base": "<repository>",
+      "path": "lean/Holonics/HNN/LatticeWord.lean",
+      "bytes": 92762,
+      "sha256": "449af711c1e3e4dba053a4f35bbdd679a02936ab65b0e6e33d1d19c7ff65ca9e",
+      "locations": [
+        {
+          "anchor": "theorem executed_adjoint_pairing",
+          "lines": [
+            575
+          ]
+        },
+        {
+          "anchor": "theorem executed_adjoint_unique",
+          "lines": [
+            581
+          ]
+        },
+        {
+          "anchor": "theorem exact_adjoint_pairing_defect",
+          "lines": [
+            595
+          ]
+        }
+      ]
+    },
+    {
+      "base": "<repository>",
+      "path": "lean/Holonics/Transport/ChangingReceiver/Defect.lean",
+      "bytes": 7493,
+      "sha256": "0fd69509667e6e3b3cee7c9ef853e29236c67c4f6c205dd1571b9bce4945c950",
+      "locations": [
+        {
+          "anchor": "theorem moving_receiver_rate",
+          "lines": [
+            121
+          ]
+        },
+        {
+          "anchor": "theorem defect_zero_iff",
+          "lines": [
+            30
+          ]
+        }
+      ]
+    },
+    {
+      "base": "<repository>",
+      "path": "lean/Holonics/Transport/ChangingReceiver.lean",
+      "bytes": 12889,
+      "sha256": "076349edd4c133d8b48aab35398a8ff74fc183afa5c8c18997eeec217f5b0483",
+      "locations": [
+        {
+          "anchor": "theorem actual_moving_chart_clock_action",
+          "lines": [
+            68
+          ]
+        }
+      ]
+    },
+    {
+      "base": "<repository>",
+      "path": "lean/Holonics/Holarchy/Reception.lean",
+      "bytes": 29732,
+      "sha256": "4d1ea17631cfa3d81c28491ff4423686007c6989071920336a2470ac51a4ce09",
+      "locations": [
+        {
+          "anchor": "theorem moving_receiver_rate",
+          "lines": [
+            381,
+            413
+          ]
+        }
+      ]
+    },
+    {
+      "base": "<repository>/.local/wt/geometry-integration-01a10f3d",
+      "path": "lean/Holonics/Objects/SourceHolon.lean",
+      "bytes": 36493,
+      "sha256": "ee0bb62a8a091c41a5e91d5ac6ce2ce831e692caf982b3ecf043439c747d5568",
+      "locations": [
+        {
+          "anchor": "theorem matrixReader_futureAgreement_iff_zero_futureReadScore",
+          "lines": [
+            612
+          ]
+        }
+      ]
+    }
+  ],
+  "identities_status": "(17)-(20) manually derived from pinned equations; existing cited matrix/moving-receiver laws are owners, no new kernel check",
+  "review_scope": "held receiver/state pullback distinguished from learned decoder, actual clock/section and branch variation; actual observation is comparison data, its input admitted once"
+}

@@ -58,3 +58,24 @@ stage's target, exit, wall, CPU, charged peak and projection, and the SHA-256 of
 validation, file-hash and exact-reading files it summarizes). The largest charged group peak was
 8,129,134,592 bytes (`2¹⁴ · 496163`) under the 8,589,934,592-byte (`2³³`) job ceiling. Stages 001 and 002 were guard false
 positives, not source failures; the receipt keeps them.
+
+## The frame transport and the egg chart
+
+`Holonics/Geometry/FrameTransport` with its actual consumer `Holonics/Framework/Geometry`, checked
+at `f19f84d8` (tree `cd7c91d8`) by the sole queue: the full owner source, the full consumer source and
+an independent importer of the ten new selectors all passed, with twenty axiom queries on the
+standard axioms only ([handoff](geometry-f19f84d8-native-v1/HANDOFF.md),
+[validation](geometry-f19f84d8-native-v1/VALIDATION.json)). Two earlier attempts were interrupted
+before elaboration by the queue's foreign-Cargo guard and are kept as incomplete, with no proof
+result. Separately, a first setup stopped while Lake acquired packages the lane's worktree had not
+linked; that is a setup incompleteness, not an attempt. The validation's host
+paths are projected under `<geometry-worktree>`, `<geometry-native>` and `<lean-toolchain>/`
+([PROJECTION.json](PROJECTION.json)). Both files invert exactly to their pinned originals. The nineteen historical receipts this
+integration carries that named host paths (in `2026-10-07-carried-comma-contact`,
+`2026-10-07-public-main-geometry-integration` and five October 8 directories) are projected the same
+way under `<repository>`, `<lean-toolchain>/` and `<home>`, each directory's `PROJECTION.json` pinning
+every original's size and SHA-256. The merge onto
+`104db40d` changes no path of the checked provider closure, so the check applies to the merged
+owner and consumer unchanged. Scope: the swept derivative in the oriented-volume relation and the egg
+chart's Jacobian clock, under their local hypotheses; no native realization and no global Piola or
+integral claim.

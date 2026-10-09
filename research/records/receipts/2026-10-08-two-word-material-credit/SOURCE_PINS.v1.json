@@ -1,0 +1,539 @@
+{
+  "version": 1,
+  "scope": "Bounded delayed C/K/D credit through two actual words at one held parameter identity; exact full-state variational forcing and pairing with actual later opening costate; source/reference projection and separate deposited rebase scope",
+  "source_commit": "e5a476a1748743257b01bf3fbce7593656c2b79b",
+  "source_worktree_clean": true,
+  "preceding_sealed_source_pins": {
+    "path": "research/records/receipts/2026-10-08-current-shared-reception-contract/SOURCE_PINS.v1.json",
+    "source_commit": "eed88d0a31e4ceb5b823dbe734180a2a0bfbedfe",
+    "sha256": "1171b5cf843962833eb3a6c46d79e769a2ef7b1c07d19bb2f14de6e18e193293",
+    "all_fourteen_source_bytes_and_anchors_unchanged": true
+  },
+  "revision_guard_receipt": "First check stopped at source-HEAD mismatch; inspected eed88d0a-to-e5a476a1 diff: only a matched test ownership fix and HNN records/receipts; no producing owner changed. Fixed one-second deadline retained.",
+  "record_base_commit": "e043a97f13c3eabc4c6f85a4d965bfe8d7886909",
+  "record": {
+    "base": "<repository>/.local/wt/geometry-integration-01a10f3d",
+    "path": "research/records/2026-10-07_PLASMA_AND_GAS_CURRENTS_CROSS_THE_SAME_MOVING_TUBE.md",
+    "bytes": 93506,
+    "sha256": "a82001c9466d8c617cc462867b7b9c53ec90870bd11ac3f3d60a008484601923",
+    "section_line": 1242
+  },
+  "sources": [
+    {
+      "base": "<repository>/.local/wt/hnn-continuing-bank-01a1030c",
+      "path": "crates/holonics/src/hnn/executed.rs",
+      "bytes": 14059,
+      "sha256": "e9000546fd4b202c887336b020dc063286309fe01c217124e887f798baee518b",
+      "locations": [
+        {
+          "anchor": "What this module no longer holds",
+          "lines": [
+            16
+          ]
+        }
+      ],
+      "sealed_blob_binding": "unchanged bytes from verified preceding sealed-source receipt"
+    },
+    {
+      "base": "<repository>/.local/wt/hnn-continuing-bank-01a1030c",
+      "path": "crates/holonics/src/hnn/ring.rs",
+      "bytes": 175213,
+      "sha256": "5e7263b121ab508923eaba7afbbea532490e357da92abfc4b313c874f157d234",
+      "locations": [
+        {
+          "anchor": "pub fn placed(pump",
+          "lines": [
+            569
+          ]
+        },
+        {
+          "anchor": "pub fn turn(storage",
+          "lines": [
+            2890
+          ]
+        },
+        {
+          "anchor": "pub fn read_turn_covector",
+          "lines": [
+            3550
+          ]
+        },
+        {
+          "anchor": "pub fn storage(&self) -> Option<Vec<ExactInterval>>",
+          "lines": [
+            3019
+          ]
+        }
+      ],
+      "sealed_blob_binding": "unchanged bytes from verified preceding sealed-source receipt"
+    },
+    {
+      "base": "<repository>/.local/wt/hnn-continuing-bank-01a1030c",
+      "path": "crates/holonics/src/hnn/receiving.rs",
+      "bytes": 99700,
+      "sha256": "6b61b28f08e2b56c51b8a3e72c554ef9aadd109f6d1b32e5d58cff1ad11c4b85",
+      "locations": [
+        {
+          "anchor": "fn read_carrier(",
+          "lines": [
+            2113
+          ]
+        },
+        {
+          "anchor": "the executed read",
+          "lines": [
+            2122
+          ]
+        },
+        {
+          "anchor": "let wave = apply_rows(map",
+          "lines": [
+            2144
+          ]
+        }
+      ],
+      "sealed_blob_binding": "unchanged bytes from verified preceding sealed-source receipt"
+    },
+    {
+      "base": "<repository>/.local/wt/hnn-continuing-bank-01a1030c",
+      "path": "crates/holonics/src/hnn/ratio.rs",
+      "bytes": 22152,
+      "sha256": "4b223f2a9bae7b70291ed62ce026a5f6ca521df0b4d87be3769c26a32f91030c",
+      "locations": [
+        {
+          "anchor": "pub fn target_phases(",
+          "lines": [
+            275
+          ]
+        },
+        {
+          "anchor": "pub fn compare_partition(",
+          "lines": [
+            362
+          ]
+        },
+        {
+          "anchor": "pub fn covector(",
+          "lines": [
+            467
+          ]
+        },
+        {
+          "anchor": "covector[2 * ratio.target] -= Rat::one()",
+          "lines": [
+            480
+          ]
+        },
+        {
+          "anchor": "covector[2 * ratio.target + 1] = -gap / integer(2)",
+          "lines": [
+            482
+          ]
+        }
+      ],
+      "sealed_blob_binding": "unchanged bytes from verified preceding sealed-source receipt"
+    },
+    {
+      "base": "<repository>/.local/wt/hnn-continuing-bank-01a1030c",
+      "path": "crates/holonics/src/hnn/word.rs",
+      "bytes": 146392,
+      "sha256": "ea6a280ec7ba59a2a5815d9be803c6ac41f1062727091dced94f260072843772",
+      "locations": [
+        {
+          "anchor": "pub struct EndChange",
+          "lines": [
+            368
+          ]
+        },
+        {
+          "anchor": "pub fn opened_at(",
+          "lines": [
+            2295
+          ]
+        },
+        {
+          "anchor": "pub fn change(",
+          "lines": [
+            2317
+          ]
+        },
+        {
+          "anchor": "pub fn anchor(",
+          "lines": [
+            2422
+          ]
+        },
+        {
+          "anchor": "pub struct ReceptionCarry",
+          "lines": [
+            396
+          ]
+        },
+        {
+          "anchor": "pub fn crossed(",
+          "lines": [
+            487
+          ]
+        },
+        {
+          "anchor": "pub fn absorbed(",
+          "lines": [
+            576
+          ]
+        },
+        {
+          "anchor": "pub fn held(",
+          "lines": [
+            1081
+          ]
+        },
+        {
+          "anchor": "fn interior_of(",
+          "lines": [
+            1665
+          ]
+        },
+        {
+          "anchor": "pub fn open_exact_received(",
+          "lines": [
+            1801
+          ]
+        },
+        {
+          "anchor": "pub fn continuing(",
+          "lines": [
+            2032
+          ]
+        },
+        {
+          "anchor": "pub fn reception_end(",
+          "lines": [
+            2376
+          ]
+        }
+      ],
+      "sealed_blob_binding": "unchanged bytes from verified preceding sealed-source receipt"
+    },
+    {
+      "base": "<repository>/.local/wt/hnn-continuing-bank-01a1030c",
+      "path": "crates/holonics/src/hnn/word/continuation.rs",
+      "bytes": 26227,
+      "sha256": "531298bcdeeff2d8d81afb5310185552f1fa78d4e0b2ddd7175d7d29e5f0ec21",
+      "locations": [
+        {
+          "anchor": "pub fn contact_faces(",
+          "lines": [
+            184
+          ]
+        },
+        {
+          "anchor": "pub fn compare_contacts(",
+          "lines": [
+            194
+          ]
+        },
+        {
+          "anchor": "HolonRatio::compare_partition(",
+          "lines": [
+            209
+          ]
+        },
+        {
+          "anchor": "target_phases(field, current.lift()",
+          "lines": [
+            211
+          ]
+        },
+        {
+          "anchor": "pub fn continue_deposited",
+          "lines": [
+            367
+          ]
+        },
+        {
+          "anchor": "old.held(&new",
+          "lines": [
+            507
+          ]
+        }
+      ],
+      "sealed_blob_binding": "unchanged bytes from verified preceding sealed-source receipt"
+    },
+    {
+      "base": "<repository>/.local/wt/hnn-continuing-bank-01a1030c",
+      "path": "crates/holonics/src/hnn/port.rs",
+      "bytes": 70789,
+      "sha256": "fb62daa8daafb259b8696353247a017b005fd027264160abf7a61b96206b0df2",
+      "locations": [
+        {
+          "anchor": "pub struct ChangeCovector",
+          "lines": [
+            820
+          ]
+        },
+        {
+          "anchor": "pub fn pull_back_continuing(",
+          "lines": [
+            899
+          ]
+        },
+        {
+          "anchor": "pub(crate) fn pull_back_joined(",
+          "lines": [
+            920
+          ]
+        },
+        {
+          "anchor": "pub fn pairing(&self, change:",
+          "lines": [
+            829
+          ]
+        },
+        {
+          "anchor": "pub struct TransitTick",
+          "lines": [
+            761
+          ]
+        }
+      ],
+      "sealed_blob_binding": "unchanged bytes from verified preceding sealed-source receipt"
+    },
+    {
+      "base": "<repository>/.local/wt/hnn-continuing-bank-01a1030c",
+      "path": "crates/holonics/src/hnn/reference.rs",
+      "bytes": 221923,
+      "sha256": "445ed9efcb9beb085236f2a5d4565188684918ac42d7ad7ae5e2e68fae3cfb10",
+      "locations": [
+        {
+          "anchor": "pub fn expose_continuing<P>",
+          "lines": [
+            4376
+          ]
+        },
+        {
+          "anchor": "port.compare(&mut resident, pending, window)",
+          "lines": [
+            4559
+          ]
+        },
+        {
+          "anchor": "port.ingest(",
+          "lines": [
+            4426,
+            4700
+          ]
+        },
+        {
+          "anchor": "pub(crate) fn compose_contact(",
+          "lines": [
+            2806
+          ]
+        },
+        {
+          "anchor": "C\u0304 = \u03a3 2 r\u0304",
+          "lines": [
+            50,
+            2803,
+            2862
+          ]
+        }
+      ],
+      "sealed_blob_binding": "unchanged bytes from verified preceding sealed-source receipt"
+    },
+    {
+      "base": "<repository>/.local/wt/hnn-continuing-bank-01a1030c",
+      "path": "crates/holonics/src/hnn/prediction.rs",
+      "bytes": 198272,
+      "sha256": "5ae16d2519ef4d0ed4558e3d210e0db7245716bcafad4c9d1f13b935d177f0a8",
+      "locations": [
+        {
+          "anchor": "pub fn generate_by_bank(",
+          "lines": [
+            617
+          ]
+        },
+        {
+          "anchor": "pub struct BankPlacement",
+          "lines": [
+            993
+          ]
+        },
+        {
+          "anchor": "pub fn storage(&self, station",
+          "lines": [
+            1279
+          ]
+        },
+        {
+          "anchor": "fn physical_word_is_exact(",
+          "lines": [
+            2104
+          ]
+        },
+        {
+          "anchor": "fn physical_signed_tick(",
+          "lines": [
+            2291
+          ]
+        },
+        {
+          "anchor": "pub(super) fn physical_source_pairing(",
+          "lines": [
+            2432
+          ]
+        },
+        {
+          "anchor": "pub struct PhysicalSourcePairing",
+          "lines": [
+            3554
+          ]
+        }
+      ],
+      "sealed_blob_binding": "unchanged bytes from verified preceding sealed-source receipt"
+    },
+    {
+      "base": "<repository>/.local/wt/hnn-continuing-bank-01a1030c",
+      "path": "lean/Holonics/HNN/SourceReceiverReturn.lean",
+      "bytes": 13104,
+      "sha256": "294df662d9a7dff20e4540f0fc643e0a00081fbae49d471c4f146dc1c5d9bc53",
+      "locations": [
+        {
+          "anchor": "theorem sourceReturnAt_pairing",
+          "lines": [
+            94
+          ]
+        },
+        {
+          "anchor": "theorem sourceReturnAt_is_dual_of_sourceRead",
+          "lines": [
+            103
+          ]
+        },
+        {
+          "anchor": "theorem partitionReturn_pairing",
+          "lines": [
+            167
+          ]
+        }
+      ],
+      "sealed_blob_binding": "unchanged bytes from verified preceding sealed-source receipt"
+    },
+    {
+      "base": "<repository>/.local/wt/hnn-continuing-bank-01a1030c",
+      "path": "lean/Holonics/HNN/LatticeWord.lean",
+      "bytes": 92762,
+      "sha256": "449af711c1e3e4dba053a4f35bbdd679a02936ab65b0e6e33d1d19c7ff65ca9e",
+      "locations": [
+        {
+          "anchor": "theorem executed_adjoint_pairing",
+          "lines": [
+            575
+          ]
+        },
+        {
+          "anchor": "theorem exact_adjoint_pairing_defect",
+          "lines": [
+            595
+          ]
+        }
+      ],
+      "sealed_blob_binding": "unchanged bytes from verified preceding sealed-source receipt"
+    },
+    {
+      "base": "<repository>/.local/wt/hnn-continuing-bank-01a1030c",
+      "path": "lean/Holonics/Transport/ChangingReceiver/Defect.lean",
+      "bytes": 7493,
+      "sha256": "0fd69509667e6e3b3cee7c9ef853e29236c67c4f6c205dd1571b9bce4945c950",
+      "locations": [
+        {
+          "anchor": "theorem moving_receiver_rate",
+          "lines": [
+            121
+          ]
+        }
+      ],
+      "sealed_blob_binding": "unchanged bytes from verified preceding sealed-source receipt"
+    },
+    {
+      "base": "<repository>/.local/wt/hnn-continuing-bank-01a1030c",
+      "path": "lean/Holonics/Transport/ChangingReceiver.lean",
+      "bytes": 12889,
+      "sha256": "076349edd4c133d8b48aab35398a8ff74fc183afa5c8c18997eeec217f5b0483",
+      "locations": [
+        {
+          "anchor": "theorem actual_moving_chart_clock_action",
+          "lines": [
+            68
+          ]
+        }
+      ],
+      "sealed_blob_binding": "unchanged bytes from verified preceding sealed-source receipt"
+    },
+    {
+      "base": "<repository>/.local/wt/hnn-continuing-bank-01a1030c",
+      "path": "lean/Holonics/Holarchy/Reception.lean",
+      "bytes": 29732,
+      "sha256": "4d1ea17631cfa3d81c28491ff4423686007c6989071920336a2470ac51a4ce09",
+      "locations": [
+        {
+          "anchor": "theorem moving_receiver_rate",
+          "lines": [
+            381,
+            413
+          ]
+        }
+      ],
+      "sealed_blob_binding": "unchanged bytes from verified preceding sealed-source receipt"
+    },
+    {
+      "base": "<repository>/.local/wt/hnn-continuing-bank-01a1030c",
+      "path": "crates/holonics/src/hnn/propagation.rs",
+      "bytes": 65654,
+      "sha256": "5457d58cf2ec0f3515687134d770bcfe1e3723f391ea3af48d54025ef1be655e",
+      "locations": [
+        {
+          "anchor": "pub fn forms(&self)",
+          "lines": [
+            700
+          ]
+        },
+        {
+          "anchor": "pub fn operator(&self)",
+          "lines": [
+            705
+          ]
+        },
+        {
+          "anchor": "pub fn solve(&self)",
+          "lines": [
+            494,
+            710
+          ]
+        },
+        {
+          "anchor": "pub fn transit_solve(",
+          "lines": [
+            1333
+          ]
+        },
+        {
+          "anchor": "pub fn transit_update(",
+          "lines": [
+            1359
+          ]
+        },
+        {
+          "anchor": "pub fn transit_defect(",
+          "lines": [
+            1401
+          ]
+        }
+      ],
+      "sealed_blob_binding": "new owner verified against current sealed git blob"
+    }
+  ],
+  "law_status": "(23)-(26) manually derived from the current transit, reception carry and source-opening laws; no new kernel check or HNN implementation",
+  "consumer_open_term": "Full second-word opening ChangeCovector paired with actual first-word material tangent after reference crossing, source-storage projection and source opening derivative; direct second-word material term retained",
+  "domain": "same physical parameter identity/value across both passages; exact unsplit linear tick; nonsingular transit M; source/reader/geometry/pump/clock held; no saturation, discrete event, intermediate deposition/release; Absorption::Nothing",
+  "rebase_scope": "Actual held-momentum map and published parameter map need their own differential/branch receipt; historical tangent is not a gradient at a new value"
+}

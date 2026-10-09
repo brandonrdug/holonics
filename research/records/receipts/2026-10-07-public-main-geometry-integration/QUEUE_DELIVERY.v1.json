@@ -1,0 +1,45 @@
+{
+  "source_commit": "aeacc12a219324a180dd4e388632536c1097036d",
+  "source_branch": "codex/geometry-public-main-01a10f3d",
+  "published_base": "3c67beee7f656798f912c974f12c482ea12c5e42",
+  "queue_mailbox_id": "548cbf6f185c4e13b0e715624062f2fe",
+  "queue_topic": "geometry-public-main-integrated-consumer-queue-v1",
+  "request_sha256": "eb9f97592dc0c0709bdfd64a386824e656871f53b00759e057d48c574d0398bf",
+  "submission_body_sha256": "17b851b9f54d2bb9c0571e5194065d9d4a843ad23dc9397298e6a4f224fb65a6",
+  "one_coherent_packet_submitted": true,
+  "queued_priority": "behind HNN",
+  "queue_acknowledgement_or_kernel_result_inferred": false,
+  "compiler_or_native_launch_by_lane": false,
+  "owner_bindings": [
+    {
+      "relative_path": "lean/Holonics/Geometry/FrameTransport.lean",
+      "committed_sha256": "9364dd0eff13d68cfdde97683a7b6c5084b0f2e1163dc44ad752aea5c71faa41",
+      "working_sha256": "9364dd0eff13d68cfdde97683a7b6c5084b0f2e1163dc44ad752aea5c71faa41",
+      "matches_exact_accepted": true,
+      "root_preserved": true
+    },
+    {
+      "relative_path": "lean/Holonics/Geometry/Motion.lean",
+      "committed_sha256": "0be5b5b2b2aa729a73a8530f3a751d0015a6735f34f23e1667faa8fe34e9e85e",
+      "working_sha256": "0be5b5b2b2aa729a73a8530f3a751d0015a6735f34f23e1667faa8fe34e9e85e",
+      "matches_exact_accepted": true,
+      "root_preserved": true
+    },
+    {
+      "relative_path": "lean/Holonics/Foundation/CausalChord.lean",
+      "committed_sha256": "4b2c01a136c8c5cf4921d4660975ba6a8d6af5b7c9f61e0d55dcc8b1d6469aa8",
+      "working_sha256": "4b2c01a136c8c5cf4921d4660975ba6a8d6af5b7c9f61e0d55dcc8b1d6469aa8",
+      "matches_exact_accepted": true,
+      "root_preserved": true
+    },
+    {
+      "relative_path": "lean/Holonics/Objects/SourceHolon.lean",
+      "committed_sha256": "ee0bb62a8a091c41a5e91d5ac6ce2ce831e692caf982b3ecf043439c747d5568",
+      "working_sha256": "ee0bb62a8a091c41a5e91d5ac6ce2ce831e692caf982b3ecf043439c747d5568",
+      "matches_exact_accepted": true,
+      "root_preserved": true
+    }
+  ],
+  "fresh_combined_import_status": "pending queue result",
+  "source_only_bridge_kernel_accepted": false
+}

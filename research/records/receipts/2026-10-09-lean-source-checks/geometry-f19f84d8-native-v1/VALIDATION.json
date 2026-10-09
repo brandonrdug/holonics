@@ -1,0 +1,378 @@
+{
+  "result": "PASS",
+  "source_commit": "f19f84d8b20f059d3ec101d9bb8e073b79533e68",
+  "source_tree": "cd7c91d8fcda7486bc2188d4a2d7bb6dd72ab700",
+  "source_clean_unchanged_after": true,
+  "scope": "Full FrameTransport owner, full actual Framework.Geometry consumer, independent ten-selector importer; no full library aggregate or native geometry consumer claim",
+  "counts": {
+    "commands": 3,
+    "unique_selectors": 10,
+    "axiom_queries": 20,
+    "source_identical_local_dependencies_reused": 165,
+    "external_source_object_pairs_hashed": 8690
+  },
+  "source_pin": {
+    "sha256": "e8561ba2a10f534984b541c8683a2ce4b655747648638480b9f03fa78b94fd0d",
+    "bytes": 297935
+  },
+  "reference_object_pins": {
+    "sha256": "b6ea66261a60aabc62ea97b8232c806b218eb393d4f4345f9d54eeabfc26533f",
+    "bytes": 104377
+  },
+  "external_object_pins": {
+    "sha256": "51cd791c5d6e68bd8e781df106068c2b1a958a31a664c80f06a2423f335ff59d",
+    "bytes": 4263593
+  },
+  "stages": [
+    {
+      "kind": "owner-static-v3",
+      "module": "Holonics.Geometry.FrameTransport",
+      "passed": true,
+      "command": {
+        "target": "owner Holonics.Geometry.FrameTransport",
+        "argv": [
+          "/usr/bin/python3",
+          "-B",
+          "<geometry-native>/direct_static_owner.py",
+          "<geometry-native>/owner-static-v3/native/DIRECT_REQUEST.json"
+        ],
+        "cwd": "<geometry-worktree>",
+        "exit": 0,
+        "command_wall_ns": 16350883344,
+        "kernel_command_passed": true,
+        "expected_command_exit": true,
+        "diagnostic_lines": [],
+        "whole_stdout_SHA256": "b81dfef71a9bc29cfc717a3a4f4f797ceb639cd3793b68237a14ada1bc2a0b46",
+        "whole_stderr_SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "source_not_edited": true
+      },
+      "Lean_argv": [
+        "<lean-toolchain>/bin/lean",
+        "-o",
+        "<geometry-native>/objects/Holonics/Geometry/FrameTransport.olean",
+        "<geometry-worktree>/lean/Holonics/Geometry/FrameTransport.lean"
+      ],
+      "source_command_hash": {
+        "sha256": "85c6964174cba69e4d15cac304e4e6eaaa54bd6e9d73035b96ad13407b6c4767",
+        "bytes": 626
+      },
+      "source_input_manifest_hash": {
+        "sha256": "e8561ba2a10f534984b541c8683a2ce4b655747648638480b9f03fa78b94fd0d",
+        "bytes": 297935
+      },
+      "complete_config_hash": {
+        "sha256": "fe905509f47e9b85111302f8ea53f1ba30690a3f880ab53ba1e853ffc29e2186",
+        "bytes": 6840490
+      },
+      "whole_stdout": {
+        "sha256": "b81dfef71a9bc29cfc717a3a4f4f797ceb639cd3793b68237a14ada1bc2a0b46",
+        "bytes": 5795
+      },
+      "whole_stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "wall_ns": 16350883344,
+      "whole_group_CPU_ns": 21404542000,
+      "child_RSS_KiB": 3039876,
+      "charged_group_peak_bytes": 1936732160,
+      "observation_ns": 180000000000,
+      "deadline": null,
+      "CPU_time_limit": null,
+      "reservation_bytes": 7688425472,
+      "memory_ceiling_bytes": 8589934592,
+      "axiom_rows": [
+        [
+          "Holonics.Geometry.FrameTransport.tube_section_area_vector",
+          "propext, Classical.choice, Quot.sound"
+        ],
+        [
+          "Holonics.Geometry.FrameTransport.tube_section_flux",
+          "propext, Classical.choice, Quot.sound"
+        ],
+        [
+          "Holonics.Geometry.FrameTransport.tube_sweep_hasFDerivAt",
+          "propext, Classical.choice, Quot.sound"
+        ],
+        [
+          "Holonics.Geometry.FrameTransport.tube_sweep_slope_volume",
+          "propext, Classical.choice, Quot.sound"
+        ],
+        [
+          "Holonics.Geometry.FrameTransport.tube_sweep_actual_volume",
+          "propext, Classical.choice, Quot.sound"
+        ],
+        [
+          "Holonics.Geometry.FrameTransport.egg_chart_hasFDerivAt",
+          "propext, Classical.choice, Quot.sound"
+        ],
+        [
+          "Holonics.Geometry.FrameTransport.egg_relative_current_section_flux",
+          "propext,\n Classical.choice,\n Quot.sound"
+        ],
+        [
+          "Holonics.Geometry.FrameTransport.egg_chart_eq_tube_sweep",
+          "propext, Classical.choice, Quot.sound"
+        ],
+        [
+          "Holonics.Geometry.FrameTransport.egg_jacobian_eq",
+          "propext, Classical.choice, Quot.sound"
+        ],
+        [
+          "Holonics.Geometry.FrameTransport.egg_jacobian_hasDerivAt",
+          "propext, Classical.choice, Quot.sound"
+        ]
+      ],
+      "standard_axioms_only": true,
+      "declared_selectors_present": true,
+      "source_clean_unchanged": true,
+      "release": {
+        "released_after_final_publication_and_owned_unit_cleanup": true,
+        "quiescence_confirmed": true,
+        "external_controller_PID": 960803,
+        "monotonic_ns": 259532253756338
+      },
+      "resource_integrity": true,
+      "wall_to_observation": {
+        "numerator": 16350883344,
+        "denominator": 180000000000
+      }
+    },
+    {
+      "kind": "consumer-static-v3",
+      "module": "Holonics.Framework.Geometry",
+      "passed": true,
+      "command": {
+        "target": "consumer Holonics.Framework.Geometry",
+        "argv": [
+          "/usr/bin/python3",
+          "-B",
+          "<geometry-native>/direct_static_owner.py",
+          "<geometry-native>/consumer-static-v3/native/DIRECT_REQUEST.json"
+        ],
+        "cwd": "<geometry-worktree>",
+        "exit": 0,
+        "command_wall_ns": 6099717177,
+        "kernel_command_passed": true,
+        "expected_command_exit": true,
+        "diagnostic_lines": [],
+        "whole_stdout_SHA256": "925919d4bb8413991d1119179402023388bf430a8420c27f09f5113b8d0a9649",
+        "whole_stderr_SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "source_not_edited": true
+      },
+      "Lean_argv": [
+        "<lean-toolchain>/bin/lean",
+        "-o",
+        "<geometry-native>/objects/Holonics/Framework/Geometry.olean",
+        "<geometry-worktree>/lean/Holonics/Framework/Geometry.lean"
+      ],
+      "source_command_hash": {
+        "sha256": "5db6f8871aae9868c8ee1deb167a5223148668840b7705f8672160b473ff6c94",
+        "bytes": 627
+      },
+      "source_input_manifest_hash": {
+        "sha256": "e8561ba2a10f534984b541c8683a2ce4b655747648638480b9f03fa78b94fd0d",
+        "bytes": 297935
+      },
+      "complete_config_hash": {
+        "sha256": "8e74cf7feb38116adc1440be890f1397aaeff265fe276153efe4ce0f134f4f23",
+        "bytes": 6840905
+      },
+      "whole_stdout": {
+        "sha256": "925919d4bb8413991d1119179402023388bf430a8420c27f09f5113b8d0a9649",
+        "bytes": 1880
+      },
+      "whole_stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "wall_ns": 6099717177,
+      "whole_group_CPU_ns": 11000536000,
+      "child_RSS_KiB": 4028164,
+      "charged_group_peak_bytes": 1801228288,
+      "observation_ns": 180000000000,
+      "deadline": null,
+      "CPU_time_limit": null,
+      "reservation_bytes": 7688425472,
+      "memory_ceiling_bytes": 8589934592,
+      "axiom_rows": [],
+      "standard_axioms_only": true,
+      "declared_selectors_present": true,
+      "source_clean_unchanged": true,
+      "release": {
+        "released_after_final_publication_and_owned_unit_cleanup": true,
+        "quiescence_confirmed": true,
+        "external_controller_PID": 961247,
+        "monotonic_ns": 259547228708023
+      },
+      "resource_integrity": true,
+      "wall_to_observation": {
+        "numerator": 6099717177,
+        "denominator": 180000000000
+      }
+    },
+    {
+      "kind": "importer-static-v3",
+      "module": "Holonics.Framework.Geometry",
+      "passed": true,
+      "command": {
+        "target": "importer Holonics.Framework.Geometry",
+        "argv": [
+          "/usr/bin/python3",
+          "-B",
+          "<geometry-native>/direct_static_owner.py",
+          "<geometry-native>/importer-static-v3/native/DIRECT_REQUEST.json"
+        ],
+        "cwd": "<geometry-worktree>",
+        "exit": 0,
+        "command_wall_ns": 5408238255,
+        "kernel_command_passed": true,
+        "expected_command_exit": true,
+        "diagnostic_lines": [],
+        "whole_stdout_SHA256": "e3aa4ff07924a4d3cf2db37b5c820866dfc4a3a87964c9d9fe5e00bb556795f0",
+        "whole_stderr_SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "source_not_edited": true
+      },
+      "Lean_argv": [
+        "<lean-toolchain>/bin/lean",
+        "<geometry-native>/IndependentGeometryImporter.lean"
+      ],
+      "source_command_hash": {
+        "sha256": "ad49f496ca234e0429cce8206d7bd56ed0978957eb77d07a5979062f0536986e",
+        "bytes": 627
+      },
+      "source_input_manifest_hash": {
+        "sha256": "e8561ba2a10f534984b541c8683a2ce4b655747648638480b9f03fa78b94fd0d",
+        "bytes": 297935
+      },
+      "complete_config_hash": {
+        "sha256": "5f1687e2b1c2df6c1120a1c28dc19047c78c486f6181f36fb3002aa914caf91b",
+        "bytes": 6841135
+      },
+      "whole_stdout": {
+        "sha256": "e3aa4ff07924a4d3cf2db37b5c820866dfc4a3a87964c9d9fe5e00bb556795f0",
+        "bytes": 2814
+      },
+      "whole_stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "wall_ns": 5408238255,
+      "whole_group_CPU_ns": 10327056000,
+      "child_RSS_KiB": 4032796,
+      "charged_group_peak_bytes": 842076160,
+      "observation_ns": 180000000000,
+      "deadline": null,
+      "CPU_time_limit": null,
+      "reservation_bytes": 7688425472,
+      "memory_ceiling_bytes": 8589934592,
+      "axiom_rows": [
+        [
+          "Holonics.Geometry.FrameTransport.tube_section_area_vector",
+          "propext, Classical.choice, Quot.sound"
+        ],
+        [
+          "Holonics.Geometry.FrameTransport.tube_section_flux",
+          "propext, Classical.choice, Quot.sound"
+        ],
+        [
+          "Holonics.Geometry.FrameTransport.tube_sweep_hasFDerivAt",
+          "propext, Classical.choice, Quot.sound"
+        ],
+        [
+          "Holonics.Geometry.FrameTransport.tube_sweep_slope_volume",
+          "propext, Classical.choice, Quot.sound"
+        ],
+        [
+          "Holonics.Geometry.FrameTransport.tube_sweep_actual_volume",
+          "propext, Classical.choice, Quot.sound"
+        ],
+        [
+          "Holonics.Geometry.FrameTransport.egg_chart_hasFDerivAt",
+          "propext, Classical.choice, Quot.sound"
+        ],
+        [
+          "Holonics.Geometry.FrameTransport.egg_relative_current_section_flux",
+          "propext,\n Classical.choice,\n Quot.sound"
+        ],
+        [
+          "Holonics.Geometry.FrameTransport.egg_chart_eq_tube_sweep",
+          "propext, Classical.choice, Quot.sound"
+        ],
+        [
+          "Holonics.Geometry.FrameTransport.egg_jacobian_eq",
+          "propext, Classical.choice, Quot.sound"
+        ],
+        [
+          "Holonics.Geometry.FrameTransport.egg_jacobian_hasDerivAt",
+          "propext, Classical.choice, Quot.sound"
+        ]
+      ],
+      "standard_axioms_only": true,
+      "declared_selectors_present": true,
+      "source_clean_unchanged": true,
+      "release": {
+        "released_after_final_publication_and_owned_unit_cleanup": true,
+        "quiescence_confirmed": true,
+        "external_controller_PID": 961480,
+        "monotonic_ns": 259560899543882
+      },
+      "resource_integrity": true,
+      "wall_to_observation": {
+        "numerator": 5408238255,
+        "denominator": 180000000000
+      }
+    }
+  ],
+  "earlier_incomplete_attempts_preserved": [
+    {
+      "directory": "owner/native",
+      "status": "INCOMPLETE; owned interruption from broad foreign-Cargo guard",
+      "command_result_produced": false,
+      "source_unchanged": true,
+      "wall_ns": 2706054865,
+      "whole_group_CPU_ns": 3433870000,
+      "child_RSS_KiB": 21416,
+      "charged_peak_bytes": 110968832,
+      "concurrency_guard_triggered": true,
+      "no_resource_or_time_limit_reached": true,
+      "release": {
+        "released_after_final_publication_and_owned_unit_cleanup": true,
+        "quiescence_confirmed": true,
+        "external_controller_PID": 938423,
+        "monotonic_ns": 259183486187948
+      }
+    },
+    {
+      "directory": "owner-static-v2/native",
+      "status": "INCOMPLETE; owned interruption from broad foreign-Cargo guard",
+      "command_result_produced": false,
+      "source_unchanged": true,
+      "wall_ns": 11503621428,
+      "whole_group_CPU_ns": 16542575000,
+      "child_RSS_KiB": 104832,
+      "charged_peak_bytes": 4392734720,
+      "concurrency_guard_triggered": true,
+      "no_resource_or_time_limit_reached": true,
+      "release": {
+        "released_after_final_publication_and_owned_unit_cleanup": true,
+        "quiescence_confirmed": true,
+        "external_controller_PID": 958537,
+        "monotonic_ns": 259337237401271
+      }
+    }
+  ],
+  "actual_law_evidence": "The swept-map Frechet derivative is consumed by actual oriented volume; the egg chart equals that sweep and its Jacobian derivative retains all declared parameter clocks. Hypotheses remain pointwise/proper-frame/local-rank; global injectivity, Piola/integral law and native realization are outside this check.",
+  "process_guard_repair": "Foreign compiler presence records an incomplete resource receipt after own command completion; it cannot kill the useful command. Coordinated later stages observed no foreign compiler.",
+  "no_publication_or_source_edits": true,
+  "all_stage_leases_released": true,
+  "combined_ceiling_bytes": 8589934592,
+  "full_validation": {
+    "sha256": "bf5356d05de8c77a5c87fead845a7ee5797a1783fbf3f89954f6540a8210c954",
+    "bytes": 14546
+  },
+  "full_file_manifest": {
+    "sha256": "74395cf15ac37f6f0288d3e1f819705ff8bc484eda9349a451e70f89bb3734db",
+    "bytes": 40508
+  }
+}

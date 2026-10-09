@@ -1,0 +1,490 @@
+{
+  "status": "PASS: exact accepted existing CausalChord owner, actual SourceHolon consumer, independent importer bindings reconciled",
+  "scope": "Declared finite composed reads and positive receiver metrics in trivial-star ordered charts; actual continuing-source native linear family; no arbitrary continuous-event relevance or physical-energy/performance claim",
+  "terminal_v26": {
+    "path": "<repository>/.local/lean-rust-pruning/admission-v1/CURRENT_TERMINAL_INDEX.20261006.v26.json",
+    "sha256": "d049fd67687dc55ecf50ae8dc77029bdd73f849d14095fca42bb76c68412fa70"
+  },
+  "validation": {
+    "path": "<repository>/.local/wt/swept-transport/research/records/receipts/2026-10-06-future-receiver-score/native-validation-full-owner-consumer-v2/VALIDATION.json",
+    "sha256": "3e62578e200b891bd97edb9fe52dcd5f36eeec79a9cd0b6085af13b6583a0a05"
+  },
+  "sources": {
+    "CausalChord": {
+      "original": "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Foundation/CausalChord.lean",
+      "preserved_copy": "<repository>/.local/wt/swept-transport/research/records/receipts/2026-10-06-future-receiver-score/native-validation-full-owner-consumer-v2/.local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Foundation/CausalChord.lean",
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Foundation/CausalChord.lean",
+      "bytes": 46612,
+      "sha256": "4b2c01a136c8c5cf4921d4660975ba6a8d6af5b7c9f61e0d55dcc8b1d6469aa8"
+    },
+    "SourceHolon": {
+      "original": "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Objects/SourceHolon.lean",
+      "preserved_copy": "<repository>/.local/wt/swept-transport/research/records/receipts/2026-10-06-future-receiver-score/native-validation-full-owner-consumer-v2/.local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Objects/SourceHolon.lean",
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Objects/SourceHolon.lean",
+      "bytes": 36493,
+      "sha256": "ee0bb62a8a091c41a5e91d5ac6ce2ce831e692caf982b3ecf043439c747d5568"
+    },
+    "Audit": {
+      "original": "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/FiniteFutureReadAudit.lean",
+      "preserved_copy": "<repository>/.local/wt/swept-transport/research/records/receipts/2026-10-06-future-receiver-score/native-validation-full-owner-consumer-v2/.local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/FiniteFutureReadAudit.lean",
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/FiniteFutureReadAudit.lean",
+      "bytes": 273,
+      "sha256": "52a714e8f9f1f13587bfbe7a762ed510ef70ded0c43fbf43c59a79c862238e2f"
+    }
+  },
+  "objects": {
+    "CausalChord": {
+      "original": "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-20261006/objects-v1/Holonics/Foundation/CausalChord.olean",
+      "preserved_copy": "<repository>/.local/wt/swept-transport/research/records/receipts/2026-10-06-future-receiver-score/native-validation-full-owner-consumer-v2/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-20261006/objects-v1/Holonics/Foundation/CausalChord.olean",
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-20261006/objects-v1/Holonics/Foundation/CausalChord.olean",
+      "bytes": 1800432,
+      "sha256": "dd23e5b12a8026958380724be51d73addf2bee71b00b814cc2aea52719a0ea9e"
+    },
+    "SourceHolon": {
+      "original": "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-20261006/objects-v1/Holonics/Objects/SourceHolon.olean",
+      "preserved_copy": "<repository>/.local/wt/swept-transport/research/records/receipts/2026-10-06-future-receiver-score/native-validation-full-owner-consumer-v2/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-20261006/objects-v1/Holonics/Objects/SourceHolon.olean",
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-20261006/objects-v1/Holonics/Objects/SourceHolon.olean",
+      "bytes": 1900936,
+      "sha256": "1fdd2902eb8f52cae3f478eb17916df799badc431ad29943f3436d513483a7d7"
+    },
+    "Audit": {
+      "original": "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-20261006/objects-v1/FiniteFutureReadAudit.olean",
+      "preserved_copy": "<repository>/.local/wt/swept-transport/research/records/receipts/2026-10-06-future-receiver-score/native-validation-full-owner-consumer-v2/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-20261006/objects-v1/FiniteFutureReadAudit.olean",
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-20261006/objects-v1/FiniteFutureReadAudit.olean",
+      "bytes": 1552,
+      "sha256": "b3f5b87d337bca8a1d5d8efce42e14e066c9aaf0b48ecdb62f9d88f0ba703868"
+    }
+  },
+  "kernel_validations": {
+    "CausalChord": {
+      "kernel_accepted": true,
+      "compiler_exit": 0,
+      "compiler_wall_ns": 5030064905,
+      "axioms": {
+        "Holonics.Foundation.CausalChord.adjugate_eq_det_smul_right": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Foundation.CausalChord.adjugate_conj": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Foundation.CausalChord.charmatrix_conj": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Foundation.CausalChord.charpoly_conj": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Foundation.CausalChord.Linearization.resolvent_identity": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Foundation.CausalChord.Linearization.denominator_ne_zero": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Foundation.CausalChord.Linearization.denominator_smul_transfer_eq_numerator": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Foundation.CausalChord.Linearization.rebase_denominator": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Foundation.CausalChord.Linearization.rebase_numerator": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Foundation.CausalChord.Linearization.rebase_transfer": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Foundation.CausalChord.charpoly_dvd_of_quotient": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Foundation.CausalChord.Linearization.transfer_eq_resolvent": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Foundation.CausalChord.Linearization.charmatrix_intertwine": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Foundation.CausalChord.Linearization.transfer_descend": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Foundation.CausalChord.Linearization.descended_denominator_clears": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Foundation.CausalChord.Linearization.release_cancels": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Foundation.CausalChord.Linearization.cancellingWitness_denominator": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Foundation.CausalChord.Linearization.cancellingWitness_numerator": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Foundation.CausalChord.Linearization.cancellation_is_strict": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Foundation.CausalChord.rateForm_congruence": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Foundation.CausalChord.seam_iff_gSkew": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Foundation.CausalChord.gSkew_eigenvalue_re_eq_zero": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Foundation.CausalChord.seam_eigenvalue_re_eq_half": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Foundation.CausalChord.semisimple_imaginary_has_conserving_receiver": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Foundation.CausalChord.jordan_eigenvalue_eq_I": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Foundation.CausalChord.jordan_has_no_conserving_receiver": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Foundation.CausalChord.Linearization.nilpotentWitness_denominator": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Foundation.CausalChord.Linearization.zeroWitness_denominator": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Foundation.CausalChord.Linearization.nilpotentWitness_numerator": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Foundation.CausalChord.Linearization.zeroWitness_numerator": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Foundation.CausalChord.Linearization.spectrum_does_not_determine_response": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Foundation.CausalChord.Linearization.full_atlas_determines_the_operator_fin_two": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Foundation.CausalChord.futureReadForm_pairing": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Foundation.CausalChord.futureReadForm_zero_iff": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      "selector_count_matches": true,
+      "standard_axioms_only": true,
+      "metadata_unchanged": true,
+      "broad_library_checked": false
+    },
+    "SourceHolon": {
+      "kernel_accepted": true,
+      "compiler_exit": 0,
+      "compiler_wall_ns": 10103108241,
+      "axioms": {
+        "Holonics.Objects.SourceHolon.ClockedRing.moment_closed_form": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Objects.SourceHolon.ClockedRing.moment_unit_clock": [
+          "propext",
+          "Quot.sound"
+        ],
+        "Holonics.Objects.SourceHolon.jointMoment_append_one": [
+          "propext",
+          "Quot.sound"
+        ],
+        "Holonics.Objects.SourceHolon.clock_changes_the_moment": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Objects.SourceHolon.sourceFrame_append_one": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Objects.SourceHolon.moment_eq_receivingPhase_sourceFrame": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Objects.SourceHolon.moment_append": [
+          "propext",
+          "Quot.sound"
+        ],
+        "Holonics.Objects.SourceHolon.momentStanding": [
+          "propext",
+          "Quot.sound"
+        ],
+        "Holonics.Objects.SourceHolon.moment_eq_iff_futureAgreement": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Objects.SourceHolon.native_futureAgreement_iff": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Objects.SourceHolon.observable_native_minimal": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Objects.SourceHolon.unobservable_native_not_minimal": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Objects.SourceHolon.offset_separates_exactly_at_its_offset": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Objects.SourceHolon.charmatrix_mul_truncatedResolvent": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Objects.SourceHolon.numerator_expansion": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Objects.SourceHolon.impulse_moment": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Objects.SourceHolon.matrixReader_futureAgreement_iff_zero_futureReadScore": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Objects.SourceHolon.descend_eq_moment": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Objects.SourceHolon.no_identity_advance_realizes_the_address": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Objects.SourceHolon.cantor_separates_the_orders": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      "selector_count_matches": true,
+      "standard_axioms_only": true,
+      "metadata_unchanged": true,
+      "broad_library_checked": false
+    },
+    "Audit": {
+      "kernel_accepted": true,
+      "compiler_exit": 0,
+      "compiler_wall_ns": 1752130098,
+      "axioms": {
+        "Holonics.Foundation.CausalChord.futureReadForm_pairing": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Foundation.CausalChord.futureReadForm_zero_iff": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Objects.SourceHolon.matrixReader_futureAgreement_iff_zero_futureReadScore": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      "selector_count_matches": true,
+      "standard_axioms_only": true,
+      "metadata_unchanged": true,
+      "broad_library_checked": false
+    }
+  },
+  "seals": {
+    "CausalChord": {
+      "original": "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-20261006/current-imports.v1.json",
+      "pin": {
+        "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-20261006/current-imports.v1.json",
+        "bytes": 34749031,
+        "sha256": "56bfb1c0a1578f2fde7e9789a910e89d4b9ba07bc7f4e5993e88aeaa3d798395"
+      },
+      "module_count": 3703,
+      "hash_reuse_assumptions": "The pinned RH catalog is immutable and its stored digests came from prior byte hashing. Cataloged files remain immutable through preparation and compiler execution; matching presence/size/mtime/ctime permits digest reuse, not a fresh byte read. Postcheck compares lstat/stat metadata and symlink targets without rehashing. This requires truthful filesystem metadata and no privileged or adversarial mutation that preserves/restores all checked stamps.",
+      "actual_namespace_lookup_verified": true
+    },
+    "SourceHolon": {
+      "original": "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-20261006/current-imports.v1.json",
+      "pin": {
+        "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-20261006/current-imports.v1.json",
+        "bytes": 43060536,
+        "sha256": "9feaa8e2f0a993de7cff5453071c3fc531f4970db56249e2708254a97968edfa"
+      },
+      "module_count": 4610,
+      "hash_reuse_assumptions": "The pinned RH catalog is immutable and its stored digests came from prior byte hashing. Cataloged files remain immutable through preparation and compiler execution; matching presence/size/mtime/ctime permits digest reuse, not a fresh byte read. Postcheck compares lstat/stat metadata and symlink targets without rehashing. This requires truthful filesystem metadata and no privileged or adversarial mutation that preserves/restores all checked stamps.",
+      "actual_namespace_lookup_verified": true
+    },
+    "Audit": {
+      "original": "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-20261006/current-imports.v1.json",
+      "pin": {
+        "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-20261006/current-imports.v1.json",
+        "bytes": 43003917,
+        "sha256": "7110e409029144c9d8772a37680243ccabe09780b1b088c878149ae58163710f"
+      },
+      "module_count": 4611,
+      "hash_reuse_assumptions": "The pinned RH catalog is immutable and its stored digests came from prior byte hashing. Cataloged files remain immutable through preparation and compiler execution; matching presence/size/mtime/ctime permits digest reuse, not a fresh byte read. Postcheck compares lstat/stat metadata and symlink targets without rehashing. This requires truthful filesystem metadata and no privileged or adversarial mutation that preserves/restores all checked stamps.",
+      "actual_namespace_lookup_verified": true
+    }
+  },
+  "custom_provider_sources_match_current_root": 16,
+  "SourceHolon_and_importer_custom_provider_parts_agree": true,
+  "query_counts": {
+    "CausalChord": 34,
+    "SourceHolon": 20,
+    "Audit": 3
+  },
+  "new_actual_names": [
+    "Holonics.Foundation.CausalChord.futureReadForm",
+    "Holonics.Foundation.CausalChord.futureReadForm_pairing",
+    "Holonics.Foundation.CausalChord.futureReadForm_zero_iff",
+    "Holonics.Objects.SourceHolon.matrixReader_futureAgreement_iff_zero_futureReadScore"
+  ],
+  "verified_preserved_artifacts": {
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Foundation/CausalChord.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Foundation/CausalChord.lean",
+      "bytes": 46612,
+      "sha256": "4b2c01a136c8c5cf4921d4660975ba6a8d6af5b7c9f61e0d55dcc8b1d6469aa8"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-20261006/objects-v1/Holonics/Foundation/CausalChord.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-20261006/objects-v1/Holonics/Foundation/CausalChord.olean",
+      "bytes": 1800432,
+      "sha256": "dd23e5b12a8026958380724be51d73addf2bee71b00b814cc2aea52719a0ea9e"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-20261006/KERNEL_VALIDATION.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-20261006/KERNEL_VALIDATION.v1.json",
+      "bytes": 5088,
+      "sha256": "a12288ea107567686f657caf502c3b25e4b10cceff489ec64e2972316982d80e"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-20261006/current-imports.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-causal-chord-v2-20261006/current-imports.v1.json",
+      "bytes": 34749031,
+      "sha256": "56bfb1c0a1578f2fde7e9789a910e89d4b9ba07bc7f4e5993e88aeaa3d798395"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Objects/SourceHolon.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/Holonics/Objects/SourceHolon.lean",
+      "bytes": 36493,
+      "sha256": "ee0bb62a8a091c41a5e91d5ac6ce2ce831e692caf982b3ecf043439c747d5568"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-20261006/objects-v1/Holonics/Objects/SourceHolon.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-20261006/objects-v1/Holonics/Objects/SourceHolon.olean",
+      "bytes": 1900936,
+      "sha256": "1fdd2902eb8f52cae3f478eb17916df799badc431ad29943f3436d513483a7d7"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-20261006/KERNEL_VALIDATION.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-20261006/KERNEL_VALIDATION.v1.json",
+      "bytes": 2833,
+      "sha256": "6e84346ba40dbbd5cbe8ae0b6408f26ba76e609a41b029af750849cc08462e6f"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-20261006/current-imports.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-source-holon-v2-20261006/current-imports.v1.json",
+      "bytes": 43060536,
+      "sha256": "9feaa8e2f0a993de7cff5453071c3fc531f4970db56249e2708254a97968edfa"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/FiniteFutureReadAudit.lean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-read-score-20261006/source-v2/lean/FiniteFutureReadAudit.lean",
+      "bytes": 273,
+      "sha256": "52a714e8f9f1f13587bfbe7a762ed510ef70ded0c43fbf43c59a79c862238e2f"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-20261006/objects-v1/FiniteFutureReadAudit.olean": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-20261006/objects-v1/FiniteFutureReadAudit.olean",
+      "bytes": 1552,
+      "sha256": "b3f5b87d337bca8a1d5d8efce42e14e066c9aaf0b48ecdb62f9d88f0ba703868"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-20261006/KERNEL_VALIDATION.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-20261006/KERNEL_VALIDATION.v1.json",
+      "bytes": 662,
+      "sha256": "298e2aaa36128fdfc4eef8001400e68d4fc9b7622e15c9d563c8a8e3808eba74"
+    },
+    "<repository>/.local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-20261006/current-imports.v1.json": {
+      "copy": ".local/lean-rust-pruning/admission-v1/geometry-future-audit-v2-20261006/current-imports.v1.json",
+      "bytes": 43003917,
+      "sha256": "7110e409029144c9d8772a37680243ccabe09780b1b088c878149ae58163710f"
+    }
+  },
+  "verified_preserved_artifact_count": 12,
+  "read_wall_ns": 1574434890,
+  "accepted_Motion_and_swept_source_bytes_frozen": true,
+  "duplicate_compilation": false,
+  "whole_library_gate": false,
+  "Git_publication": false
+}
