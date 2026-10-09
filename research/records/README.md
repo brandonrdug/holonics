@@ -27,6 +27,8 @@ records derive its laws and measure the prototype, whose code is in history.
 
 ### Current (September 24 onward)
 
+- [The whole Athena model is one morphodynamic circuit, and its design file is its declaration](2026-10-09_THE_WHOLE_ATHENA_MODEL_IS_ONE_MORPHODYNAMIC_CIRCUIT_AND_ITS_DESIGN_FILE_IS_ITS_DECLARATION.md) (#63, #73, #386, #148, #62): Brandon's October 9 request to design the whole model at once, drawn as one composite whose nodes, edges and declared circuits each carry their own status; the finite-decrease landing measured on one fixture after the historical 0 of 4; the formal skeleton owed in #62; one exact design declaration that Rust instantiates and Lean states; where the history pulls against the framing
+
 - [The receiving phase comparison retains an exact family, and its probe is a declared leverage](2026-10-08_THE_RECEIVING_PHASE_COMPARISON_RETAINS_AN_EXACT_FAMILY_AND_ITS_PROBE_IS_A_DECLARED_LEVERAGE.md) (#73, #62, #63): the v113 request out of image by construction; the exact phase family and its leverage probe; soft face masses and the certified receiving alignment repaired; consecutive encounters admitted; the port-Holon World model (C1b) next
 
 - [The charted source return re-represents its producing chart](2026-10-07_THE_CHARTED_SOURCE_RETURN_RE_REPRESENTS_ITS_PRODUCING_CHART.md) (#73, #63, #62): preserve the continuation-v34 passed opening balance and incomplete cold comparison; promote the existing exact chart-value representation for unsplit source responses, with actual operand falsifier and retained route/check receipts; execution pending, no speedup claim.
