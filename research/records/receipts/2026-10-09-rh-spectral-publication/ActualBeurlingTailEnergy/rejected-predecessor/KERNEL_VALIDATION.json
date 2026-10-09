@@ -1,0 +1,35 @@
+{
+  "kernel_accepted": false,
+  "compiler_exit": 1,
+  "compiler_wall_ns": 4245299255,
+  "axioms": {
+    "Holonics.Zeta.ActualBeurlingTailEnergy.actual_tail_square_integral": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ActualBeurlingTailEnergy.actual_full_square_integrable": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ActualBeurlingTailEnergy.actual_full_energy_balance": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ActualBeurlingTailEnergy.actual_tail_energy_le_full": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "selector_count_matches": true,
+  "standard_axioms_only": false,
+  "metadata_unchanged": true,
+  "broad_library_checked": false
+}

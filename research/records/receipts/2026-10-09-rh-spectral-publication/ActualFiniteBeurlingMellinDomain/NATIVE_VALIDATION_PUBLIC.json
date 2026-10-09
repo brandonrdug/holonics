@@ -1,0 +1,84 @@
+{
+  "target": "ActualFiniteBeurlingMellinDomain",
+  "kernel_accepted": true,
+  "compiler_exit": 0,
+  "compiler_wall_ns": 7807813008,
+  "queries": {
+    "Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_log_receiver_left": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_log_receiver_l1_l2": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_mellin_convergent": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_mellin_log_fourier": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "standard_axioms_only": true,
+  "metadata_unchanged": true,
+  "full_library_checked": false,
+  "all_released": true,
+  "native_resource_stages": {
+    "rh-mellindomain9529-preparation-20261006-v1": {
+      "accepted_stage": true,
+      "whole_wall_ns": 6067453683,
+      "CPU_ns": 5330375000,
+      "fixed_guard_ns": 12779337307,
+      "measured_to_guard": {
+        "numerator": 6067453683,
+        "denominator": 12779337307
+      },
+      "group_peak_bytes": 290816000,
+      "child_RSS_KiB": 235524,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "outer_wall_stop": false,
+      "CPU_stop": false,
+      "floor_stop": false,
+      "inputs_unchanged": true
+    },
+    "rh-mellindomain9529-development-20261006-v1": {
+      "accepted_stage": true,
+      "whole_wall_ns": 9801313229,
+      "CPU_ns": 5462213000,
+      "fixed_guard_ns": 21132554884,
+      "measured_to_guard": {
+        "numerator": 9801313229,
+        "denominator": 21132554884
+      },
+      "group_peak_bytes": 3524440064,
+      "child_RSS_KiB": 1765276,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "outer_wall_stop": false,
+      "CPU_stop": false,
+      "floor_stop": false,
+      "inputs_unchanged": true
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "status": "WHOLE_MODULE_REJECTED",
+  "source_pin": {
+    "bytes": 11535,
+    "sha256": "59b7481ac49ff62878ed6db2bc8dbad71edc57ac530dcb6b12c96f0ac8a3b1b5"
+  },
+  "stdout_original": {
+    "bytes": 1662,
+    "sha256": "ff6482f0fb5c7fb4a40743c74a4f68d0d23b88576529b88659ab830b34014f69"
+  },
+  "stderr_original": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "projection": "Only absolute diagnostic source locations are replaced; the rejection and sorryAx printouts remain explicit."
+}

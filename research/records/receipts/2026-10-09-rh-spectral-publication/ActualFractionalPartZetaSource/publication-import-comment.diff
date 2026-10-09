@@ -1,0 +1,11 @@
+--- accepted-source/ActualFractionalPartZetaSource.lean
++++ lean/HolonicsResearch/Zeta/ActualFractionalPartZetaSource.lean
+@@ -16,7 +16,7 @@
+ /-!
+ Actual ordinary-zeta source for the finite Beurling Mellin value.
+ 
+-CORRECTED / UNRUN after actual v99 rejection. This is a separate exact source adapter, not a bound on
++The private source passed the whole-module v102 native gate. This is an exact source adapter, not a bound on
+ signed cancellation or a norm convergence port. The cached L-series
+ partial-sum integral is used only on Re(s)>1. The cutoff fractional-part
+ integral is proved holomorphic on Re(s)>0. The cached entire riemannZeta₀

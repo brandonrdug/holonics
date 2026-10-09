@@ -1,0 +1,16 @@
+lean/HolonicsResearch/Zeta/ActualFiniteBeurlingMellinValue.lean:59:2: warning: Unused tactic linter: `change
+  forwardFraction x = (Ioc (0 : ℝ) 1).indicator (fun y : ℝ => (y : ℂ)) x + cutFraction x` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+'Holonics.Zeta.ActualFiniteBeurlingMellinValue.actual_fraction_boundary_split_ae' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Zeta.ActualFiniteBeurlingMellinValue.actual_reciprocal_fraction_hasMellin' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Zeta.ActualFiniteBeurlingMellinValue.actual_finite_receiver_hasMellin' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Zeta.ActualFiniteBeurlingMellinValue.actual_finite_receiver_fourier_value' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]

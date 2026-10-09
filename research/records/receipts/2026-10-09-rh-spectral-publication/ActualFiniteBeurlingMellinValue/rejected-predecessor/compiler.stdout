@@ -1,0 +1,28 @@
+lean/HolonicsResearch/Zeta/ActualFiniteBeurlingMellinValue.lean:59:2: warning: Unused tactic linter: `change
+  forwardFraction x = (Ioc (0 : ℝ) 1).indicator (fun y : ℝ => (y : ℂ)) x + cutFraction x` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+lean/HolonicsResearch/Zeta/ActualFiniteBeurlingMellinValue.lean:144:4: error: Invalid rewrite argument: The pattern to be substituted is a metavariable (`?f
+  (if ?P then ?x else ?y)`) in this equality
+  ?f (if ?P then ?x else ?y) = if ?P then ?f ?x else ?f ?y
+lean/HolonicsResearch/Zeta/ActualFiniteBeurlingMellinValue.lean:142:29: warning: This simp argument is unused:
+  Complex.ofReal_zero
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [if_neg hx1]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+'Holonics.Zeta.ActualFiniteBeurlingMellinValue.actual_fraction_boundary_split_ae' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Zeta.ActualFiniteBeurlingMellinValue.actual_reciprocal_fraction_hasMellin' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Zeta.ActualFiniteBeurlingMellinValue.actual_finite_receiver_hasMellin' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Zeta.ActualFiniteBeurlingMellinValue.actual_finite_receiver_fourier_value' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]

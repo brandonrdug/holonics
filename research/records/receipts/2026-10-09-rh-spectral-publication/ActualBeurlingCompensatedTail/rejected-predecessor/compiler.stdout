@@ -1,0 +1,43 @@
+lean/HolonicsResearch/Zeta/ActualBeurlingCompensatedTail.lean:50:55: error(lean.unknownIdentifier): Unknown identifier `ofNat_re`
+lean/HolonicsResearch/Zeta/ActualBeurlingCompensatedTail.lean:50:66: error: linarith failed to find a contradiction
+N : ℕ
+hN : 0 < N
+s : ℂ
+hs : s.re < 1
+a : ℝ
+ha : 1 / ↑N ≤ a
+hNr : 0 < ↑N
+ha0 : 0 < a
+a✝ : -1 ≤ s.re - re 2
+⊢ False
+failed
+lean/HolonicsResearch/Zeta/ActualBeurlingCompensatedTail.lean:53:46: error(lean.invalidField): Invalid field `congr_fun`: The environment does not contain `And.congr_fun`, so it is not possible to project the field `congr_fun` from an expression
+  Integrable.const_mul hi ↑(harmonicMobius N)
+of type
+  AEStronglyMeasurable (fun x => ↑(harmonicMobius N) * ↑x ^ (s - 2)) (volume.restrict (Ioi a)) ∧
+    HasFiniteIntegral (fun x => ↑(harmonicMobius N) * ↑x ^ (s - 2)) (volume.restrict (Ioi a))
+lean/HolonicsResearch/Zeta/ActualBeurlingCompensatedTail.lean:63:55: error(lean.unknownIdentifier): Unknown identifier `ofNat_re`
+lean/HolonicsResearch/Zeta/ActualBeurlingCompensatedTail.lean:63:66: error: linarith failed to find a contradiction
+N : ℕ
+hN : 0 < N
+s : ℂ
+hs : s.re < 1
+a : ℝ
+ha : 1 / ↑N ≤ a
+hNr : 0 < ↑N
+ha0 : 0 < a
+a✝ : -1 ≤ s.re - re 2
+⊢ False
+failed
+'Holonics.Zeta.ActualBeurlingCompensatedTail.actual_tail_mellin_integrable' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Zeta.ActualBeurlingCompensatedTail.actual_tail_mellin_integral' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Zeta.ActualBeurlingCompensatedTail.actual_tail_mellin_norm' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]

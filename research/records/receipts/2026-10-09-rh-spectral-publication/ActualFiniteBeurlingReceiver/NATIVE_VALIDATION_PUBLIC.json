@@ -1,0 +1,232 @@
+{
+  "target": "ActualFiniteBeurlingReceiver",
+  "kernel_accepted": true,
+  "compiler_exit": 0,
+  "compiler_wall_ns": 4548249632,
+  "queries": {
+    "Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_truncated_floor_partition": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_reciprocal_phase_residual": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_nb_receiver": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_nb_tail_pointwise": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "standard_axioms_only": true,
+  "metadata_unchanged": true,
+  "full_library_checked": false,
+  "all_released": true,
+  "native_resource_stages": {
+    "rh-finitebeurling1401-preparation-20261006-v1": {
+      "accepted_stage": true,
+      "whole_wall_ns": 3944588406,
+      "CPU_ns": 3219166000,
+      "fixed_guard_ns": 12779337307,
+      "measured_to_guard": {
+        "numerator": 3944588406,
+        "denominator": 12779337307
+      },
+      "group_peak_bytes": 242311168,
+      "child_RSS_KiB": 182768,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "wall_stop": false,
+      "CPU_stop": false,
+      "floor_stop": false,
+      "inputs_unchanged": true,
+      "factored_measurements": {
+        "wall_ns": {
+          "integer": 3944588406,
+          "prime_powers": [
+            [
+              2,
+              1
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              11,
+              1
+            ],
+            [
+              113,
+              1
+            ],
+            [
+              239,
+              1
+            ],
+            [
+              2213,
+              1
+            ]
+          ]
+        },
+        "CPU_ns": {
+          "integer": 3219166000,
+          "prime_powers": [
+            [
+              2,
+              4
+            ],
+            [
+              5,
+              3
+            ],
+            [
+              1609583,
+              1
+            ]
+          ]
+        },
+        "group_peak_bytes": {
+          "integer": 242311168,
+          "prime_powers": [
+            [
+              2,
+              13
+            ],
+            [
+              11,
+              1
+            ],
+            [
+              2689,
+              1
+            ]
+          ]
+        },
+        "child_RSS_KiB": {
+          "integer": 182768,
+          "prime_powers": [
+            [
+              2,
+              4
+            ],
+            [
+              11423,
+              1
+            ]
+          ]
+        }
+      }
+    },
+    "rh-finitebeurling1401-development-20261006-v1": {
+      "accepted_stage": true,
+      "whole_wall_ns": 5845169573,
+      "CPU_ns": 3246463000,
+      "fixed_guard_ns": 21132554884,
+      "measured_to_guard": {
+        "numerator": 5845169573,
+        "denominator": 21132554884
+      },
+      "group_peak_bytes": 2166759424,
+      "child_RSS_KiB": 1097556,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "wall_stop": false,
+      "CPU_stop": false,
+      "floor_stop": false,
+      "inputs_unchanged": true,
+      "factored_measurements": {
+        "wall_ns": {
+          "integer": 5845169573,
+          "prime_powers": [
+            [
+              5845169573,
+              1
+            ]
+          ]
+        },
+        "CPU_ns": {
+          "integer": 3246463000,
+          "prime_powers": [
+            [
+              2,
+              3
+            ],
+            [
+              5,
+              3
+            ],
+            [
+              11,
+              1
+            ],
+            [
+              29,
+              1
+            ],
+            [
+              10177,
+              1
+            ]
+          ]
+        },
+        "group_peak_bytes": {
+          "integer": 2166759424,
+          "prime_powers": [
+            [
+              2,
+              13
+            ],
+            [
+              59,
+              1
+            ],
+            [
+              4483,
+              1
+            ]
+          ]
+        },
+        "child_RSS_KiB": {
+          "integer": 1097556,
+          "prime_powers": [
+            [
+              2,
+              2
+            ],
+            [
+              3,
+              1
+            ],
+            [
+              91463,
+              1
+            ]
+          ]
+        }
+      }
+    }
+  }
+}

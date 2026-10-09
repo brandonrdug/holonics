@@ -1,0 +1,19 @@
+--- accepted-source/ActualBeurlingTailEnergy.lean
++++ lean/HolonicsResearch/Zeta/ActualBeurlingTailEnergy.lean
+@@ -1,6 +1,6 @@
+ module
+ 
+-public import ActualFiniteBeurlingMellinDomain
++public import HolonicsResearch.Zeta.ActualFiniteBeurlingMellinDomain
+ public import Mathlib.Analysis.SpecialFunctions.ImproperIntegrals
+ 
+ @[expose] public section
+@@ -9,7 +9,7 @@
+ /-!
+ Actual full-ray receiver energy, with its arithmetic exterior retained.
+ 
+-PREPARED / UNRUN: only the sole native queue may check this source.
++The private source passed the whole-module v149 native gate with four standard-axiom queries.
+ The actual v83/v98 owners are accepted independently. No Mellin-value
+ consumer, norm convergence, Mertens estimate or RH hypothesis is imported.
+ 

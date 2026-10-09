@@ -1,0 +1,18 @@
+lean/HolonicsResearch/Zeta/ActualFiniteBeurlingReceiver.lean:85:5: warning: Variable name `hy` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _hy
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+'Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_truncated_floor_partition' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_reciprocal_phase_residual' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_nb_receiver' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_nb_tail_pointwise' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]

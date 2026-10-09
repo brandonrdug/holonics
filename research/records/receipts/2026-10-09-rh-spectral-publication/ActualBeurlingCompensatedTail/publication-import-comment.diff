@@ -1,0 +1,20 @@
+--- accepted-source/ActualBeurlingCompensatedTail.lean
++++ lean/HolonicsResearch/Zeta/ActualBeurlingCompensatedTail.lean
+@@ -1,6 +1,6 @@
+ module
+ 
+-public import ActualFiniteBeurlingMellinDomain
++public import HolonicsResearch.Zeta.ActualFiniteBeurlingMellinDomain
+ public import Mathlib.Analysis.SpecialFunctions.ImproperIntegrals
+ 
+ @[expose] public section
+@@ -9,7 +9,8 @@
+ /-!
+ Actual exterior Mellin compensation at a declared physical cut.
+ 
+-PREPARED / UNRUN. The sole native queue owns any check. This is the
++The private source passed the whole-module v149 native gate with three standard-axiom queries.
++The sole native queue owns rechecks after import relocation. This is the
+ exterior component of the same actual finite Mobius receiver, not an
+ independent approximation family. N>0, a>=1/N and Re(s)<1 pay the actual
+ tail integral. There is no assumed signed cancellation, denominator

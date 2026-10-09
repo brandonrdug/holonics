@@ -1,0 +1,29 @@
+{
+  "kernel_accepted": false,
+  "compiler_exit": 1,
+  "compiler_wall_ns": 7504257213,
+  "axioms": {
+    "Holonics.Zeta.ActualBeurlingCompensatedTail.actual_tail_mellin_integrable": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ActualBeurlingCompensatedTail.actual_tail_mellin_integral": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ActualBeurlingCompensatedTail.actual_tail_mellin_norm": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "selector_count_matches": true,
+  "standard_axioms_only": false,
+  "metadata_unchanged": true,
+  "broad_library_checked": false
+}

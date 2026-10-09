@@ -1,0 +1,22 @@
+{
+  "status": "PUBLICATION_INTEGRITY_CHECK_PASSED",
+  "command": [
+    "python3",
+    "-B",
+    "research/records/receipts/2026-10-09-rh-spectral-publication/verify_publication.py"
+  ],
+  "exit_code": 0,
+  "wall_ns": 36594799,
+  "checker_children_peak_RSS_bytes": 26935296,
+  "compiler_run": false,
+  "native_jobs_started": 0,
+  "source_count": 6,
+  "native_queries_checked_from_receipts": 23,
+  "new_native_queries_accepted_here": 0,
+  "canonical_import_graph_checked_by_Lean": false,
+  "files_manifest_sha256": "d77367a5d474f3db76b9f3fe0c1fe9f19c307973ab4cecfe913123441bbaf5a7",
+  "verification_stdout_sha256": "926ec11e628c3221995db5289c0d018d418d8f810a3f2873bca2645f221dd14d",
+  "verification_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "excluded_evidence": "Compiler objects/full private ordered import graphs and control namespaces remain privately preserved. Only public scoped source/proof/log seals are checked here.",
+  "recheck_reason": "New source atlas row explicitly joins the actual floor/phase decomposition to ratio.div-rem; cross-shard atlas relation validation added. No mathematical proof changed."
+}

@@ -1,0 +1,12 @@
+--- accepted-source/ActualFiniteBeurlingReceiver.lean
++++ lean/HolonicsResearch/Zeta/ActualFiniteBeurlingReceiver.lean
+@@ -16,7 +16,8 @@
+ Actual finite ordinary-Mobius receiver, on the reciprocal coordinate y=1/x.
+ The physical step is chi_(0,1] on x>0. Ordinary fractional part is retained
+ at integers. No Mellin identity, norm convergence, RH, or Mertens estimate
+-is a premise. PREPARED SOURCE: native acceptance is a separate receipt.
++is a premise. The private source passed the focused v83 native gate. The publication
++receipt keeps its exact accepted source hash and public-owner mapping.
+ 
+ The consumer is the Nyman-Beurling residual, not another RH-equivalence
+ port. The cached finite convolution owner used by the Farey arithmetic
