@@ -270,6 +270,26 @@ impl PreparedPhysicalAction<'_, '_> {
         let model = self.owner.world_model().ok_or(HnnError::Unadmitted {
             reason: "a World prospect reads the bound World model",
         })?;
+        self.world_prospect_of(model)
+    }
+
+    /// **The coupled prospect of this prepared action from a matched memory** (`model`, C2): exactly
+    /// [`Self::world_prospect`]'s read, from `model` in place of the bound memory. The memory is
+    /// matched to the bound one at its crossing, the same declared keys at the same tick, or the read
+    /// is refused, so a state-only control ([`WorldModel::carried`]) and the bound memory are read on
+    /// one prepared Word, one receiver and one World clock. Nothing actual is read or written.
+    pub fn world_prospect_of(
+        &self,
+        model: &WorldModel,
+    ) -> Result<Vec<Result<CoupledProspect, HnnError>>, HnnError> {
+        let bound = self.owner.world_model().ok_or(HnnError::Unadmitted {
+            reason: "a World prospect reads the bound World model",
+        })?;
+        if model.keys() != bound.keys() || model.tick() != bound.tick() {
+            return Err(HnnError::Unadmitted {
+                reason: "a matched memory declares the bound memory's keys at its crossing",
+            });
+        }
         let word = self.prospective.controlled_word(&self.word)?;
         let ring = self.prospective.preparation().ring();
         Ok((0..model.keys().len())

@@ -57,8 +57,8 @@
 //! per-step sets. A held key's span belongs to its certified cut, not to the current crossing, and an
 //! incompatible key has none; both are refused. The image answers a declared word: in an actual
 //! encounter each later incident wave depends on the returned ones through the continuing native
-//! source, so the image is a model response, not a certificate of that closed loop (C2's finite
-//! forward cover is owed).
+//! source, so the image is a model response, not a certificate of that closed loop, which the coupled
+//! prospect below answers.
 //!
 //! **The coupled prospect** (C1b-2a, [`WorldModel::coupled_prospect`]). In an actual encounter each
 //! later incident wave depends on the returned ones through the native source, so a declared word
@@ -88,6 +88,20 @@
 //! face eliminates no face hypothesis: the memory is filtered by the port observations `(a, b)` alone,
 //! so no face key is thereby consistent with the observed faces, and none of this is learning.
 //!
+//! **The state-only matched control** (C2, [`WorldModel::carried`]). The consequence of retained actual
+//! World history is read at one common crossing, between the bound memory and a matched control: the
+//! memory from before an absorbed passage, carried through that passage's actual incident waves with
+//! no restriction, `c ← F c + G a` and `N ← F N`. Everything actual is shared: the receiver with its
+//! carry, material and opening, the one World and its clock, and the keys with their charts. The
+//! control removes exactly the restriction by the passage's reflected waves and the eliminations it
+//! made. The absorbed fibre lies in the carried one, so the bound memory's prospect of a later prepared
+//! action lies in the control's ([`super::PreparedPhysicalAction::world_prospect_of`]), and a control
+//! direction that changes a compared station's reading where no retained direction does is a reading
+//! the retained history fixed. Where no retained direction moves a declared face, its grain reading is
+//! the encounter's own reader applied to the predicted raw face, since that reader is a function of
+//! the raw face; the relation for a plural image stays owed. The faces stay port-filtered: a false
+//! face is never ruled out by this comparison.
+//!
 //! **Bits.** The memory's current bits ([`WorldModel::current_bits`]) are every key state's values and
 //! cut and the reached tick; the Resident's state bits charge them at every step, whatever size the
 //! fibres reach. The keys are immutable declarations, held separately as the World's own are.
@@ -97,10 +111,14 @@
 //! mutable model state only: not the immutable key laws, the solves' workspace or process memory. A
 //! coupled passage also keeps the transient post-step states of that one passage (ticks by storage
 //! values), never retained history; a CPU or CUDA memory budget counts that workspace and the rational
-//! carrier sizes beyond the bits. Owed: C2's finite forward cover; the grain-level observation
-//! relation of a declared face (`Face::of_read` at the encounter's grain) and the conditioning of
-//! retained fibres on actual declared face observations; the Ask over keys; learning through the
-//! model; and the World/Robin and all-material first and second variation.
+//! carrier sizes beyond the bits. Owed: the forward cover of a plural fibre at the receiver's grain
+//! (its readings over the fibre, which needs a declared energy bound on it); the grain-level
+//! observation relation of a declared face over a plural image (`Face::of_read` at the encounter's
+//! grain) and the conditioning of retained fibres on actual face observations
+//! (`NativeEncounter::observed` at the compared epochs); the Ask over keys, which would read the
+//! coupled future of the key family per admitted wave where `PreparedPhysicalProbe::ask` reads the
+//! receiving phase family at the native feature; learning through the model; and the World/Robin and
+//! all-material first and second variation.
 
 use crate::hnn::HnnError;
 use crate::hnn::physical::action::WaveJointStep;
@@ -805,6 +823,91 @@ impl WorldModel {
         }
         self.tick = commit.saturating_add(1);
     }
+
+    /// **The state-only matched control of a declared incident word** (C2; the module header): the
+    /// memory as it would stand after the word had no reflected wave restricted it. Every live key's
+    /// fibre is carried by its own charts at the memory's commits, `c ← F c + G a` and `N ← F N`,
+    /// reduced to a basis as an absorbed step's is; a key whose charts cannot be read, or whose
+    /// arithmetic leaves its carrier, is held at its last fibre as an absorbed step holds it; a held or
+    /// incompatible key is unchanged; and the tick advances by the word's length. It returns a new
+    /// memory and reads and writes nothing actual: only the Resident's memory absorbs, and this one is
+    /// never bound.
+    ///
+    /// Carried through the incident waves of an absorbed passage, from the memory that absorbed it,
+    /// the control removes exactly the restriction by that passage's reflected waves and the
+    /// eliminations it made, and nothing else: an absorbed step's `c + N h₀` and `N K` advance into
+    /// `F c + G a + F N h₀` and `F N K`, both in the carried `F c + G a + span(F N)`, so the absorbed
+    /// fibre lies in the carried one at every step.
+    pub fn carried(&self, word: &[Vec<Rat>]) -> Result<Self, HnnError> {
+        let mut carried = self.clone();
+        for incident in word {
+            let commit = carried.tick;
+            for (key, state) in carried.keys.iter().zip(carried.states.iter_mut()) {
+                let KeyState::Live(fibre) = state else {
+                    continue;
+                };
+                if incident.len() != key.ports() {
+                    return Err(HnnError::Unadmitted {
+                        reason: "a carried word declares an incident wave on every external port",
+                    });
+                }
+                let outcome =
+                    key.charts(commit)
+                        .map_err(|_| HeldReason::Charts)
+                        .and_then(|charts| {
+                            advanced(&charts, fibre, incident).map_err(|_| HeldReason::Arithmetic)
+                        });
+                *state = match outcome {
+                    Ok(next) => KeyState::Live(next),
+                    Err(reason) => KeyState::Held {
+                        fibre: fibre.clone(),
+                        certified_tick: commit,
+                        reason,
+                    },
+                };
+            }
+            carried.tick = commit.checked_add(1).ok_or(HnnError::CountOverflow)?;
+        }
+        Ok(carried)
+    }
+}
+
+/// One live key's fibre carried through one incident wave with no restriction (the state-only
+/// matched control, [`WorldModel::carried`]): `c ← F c + G a` and `N ← F N`.
+fn advanced(
+    charts: &ModelCharts,
+    fibre: &StateFibre,
+    incident: &[Rat],
+) -> Result<StateFibre, HnnError> {
+    let sigma = fibre.point.len();
+    let point = add(&charts.f.apply(&fibre.point)?, &charts.g.apply(incident)?);
+    let carried: Vec<Vec<Rat>> = fibre
+        .directions
+        .iter()
+        .map(|direction| charts.f.apply(direction))
+        .collect::<Result<_, _>>()?;
+    Ok(StateFibre {
+        point,
+        directions: basis(sigma, &carried)?,
+    })
+}
+
+/// A carried span reduced to a basis by the rank factorization: a singular `F` may erase
+/// directions, and an empty span stays empty.
+fn basis(sigma: usize, carried: &[Vec<Rat>]) -> Result<Vec<Vec<Rat>>, HnnError> {
+    if carried.is_empty() {
+        return Ok(Vec::new());
+    }
+    let factor = columns(sigma, carried)?.rank_factorization()?;
+    let left = &factor.left;
+    let directions = (0..left.columns())
+        .map(|j| {
+            (0..left.rows())
+                .map(|i| left.get(i, j).cloned())
+                .collect::<Result<Vec<Rat>, _>>()
+        })
+        .collect::<Result<Vec<Vec<Rat>>, _>>()?;
+    Ok(directions)
 }
 
 /// One live key's restriction by `(a, b)` and its advance (the module header).
@@ -835,18 +938,8 @@ fn stepped(
         .iter()
         .map(|k| charts.f.apply(&directions.apply(k)?))
         .collect::<Result<_, _>>()?;
-    let directions = if carried.is_empty() {
-        Vec::new()
-    } else {
-        let factor = columns(sigma, &carried)?.rank_factorization()?;
-        let left = &factor.left;
-        (0..left.columns())
-            .map(|j| {
-                (0..left.rows())
-                    .map(|i| left.get(i, j).cloned())
-                    .collect::<Result<Vec<Rat>, _>>()
-            })
-            .collect::<Result<Vec<Vec<Rat>>, _>>()?
-    };
-    Ok(Stepped::Live(StateFibre { point, directions }))
+    Ok(Stepped::Live(StateFibre {
+        point,
+        directions: basis(sigma, &carried)?,
+    }))
 }

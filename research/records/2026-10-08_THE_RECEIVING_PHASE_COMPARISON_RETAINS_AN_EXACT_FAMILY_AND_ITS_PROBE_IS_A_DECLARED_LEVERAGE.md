@@ -266,10 +266,53 @@ join].
   read and its actual waves were carried by one `k`. Where the waves alone fix `k`, a wrong face
   offset was incompatible, and a key without a face added no rows.
 
-The bounded C2 acceptance (two actual encounters, a prediction cover before the first, and a
-state-only matched control at the continuing crossing) waits on that model and its finite
-forward certificate. The combined World/material derivative remains a separate obligation, and
-v111's zero C/K/D movement stays its failed gate.
+**The consequence of retained World history (C2)** [definition; agent-inferred, October 9; source
+under validation]. Two actual encounters run on one receiver and one World. Before the first, the
+World model's prospect is read over its whole fibre, and one `k` of the World's key carries the
+actual passage.
+- **The matched control.** At the continuing crossing one prepared second action is read from the
+  bound memory and from a state-only matched control (`WorldModel::carried`). The control is the
+  memory from before the first encounter, carried through that encounter's actual incident waves
+  with no restriction: `c ← F c + G a`, `N ← F N`.
+  - Everything actual is shared: the receiver's carry, material and opening, the one World and its
+    clock, and the keys with their charts. `PreparedPhysicalAction::world_prospect_of` refuses a
+    memory off the bound crossing.
+  - The control removes exactly the restriction by the first encounter's reflected waves and the
+    eliminations it made. An absorbed step's `F(c + N h₀) + G a` differs from the carried
+    `F c + G a` by `F N h₀`, and `F N K` lies in `span(F N)`, so the retained fibre lies in the
+    carried one.
+- **The acceptance** (`tests/world_model.rs`,
+  `retained_world_history_fixes_the_next_reading_that_its_state_only_control_leaves_open`):
+  - per key, the retained prospect lies in the control's, point and span exactly. An eliminated
+    key has no retained image while the control still reads one, and a held key is a refusal at its
+    cut;
+  - no retained direction moves the compared station's logits, while a control direction does. Two
+    exact members of the control's image differ in the declared observable: per class after the
+    first, the real grain index relative to the first class's, `⌊L Re f_c⌋ − ⌊L Re f_0⌋`, and per
+    class the phase block `⌊L φ_c⌋` with `φ_c = Im f_c / 2`. The cells' fibres are not read. The
+    relative indices remove only a common offset of whole cells, and a common raw shift that
+    crosses a cell boundary can still move them, so the witness moves a relative row or a phase,
+    never a common-only change;
+  - the second encounter, executed once, reads exactly the retained point's logits, and one `k`
+    carries its actual waves and logits. Its waves equal the retained point's only where no retained
+    direction moves them, and a faced key's reading is the encounter's own reader on the predicted
+    raw face only where no retained direction moves that face. Port work cancels, and both
+    participants continue.
+- **False faces.** The family carries the World's law with a false face. The port filter keeps it
+  live, and it is never counted as eliminated.
+- **Not claimed.**
+  - A selection: both plans read one declared control.
+  - The Ask over keys, which would read the key family's coupled future per admitted wave. The
+    probe's Ask reads the receiving phase family at the native feature.
+  - Face conditioning by the observed faces (`NativeEncounter::observed` at the compared epochs).
+  - The grain readings of a plural raw image.
+  - Learning through the model or through the material: v111's zero C/K/D movement stays its
+    failed gate.
+  - CUDA, and the combined World/material derivative, which remains a separate obligation.
+
+  These checks are C2's operational acceptance, not a definition of learning.
+- **Owed in Lean (#62).** The inclusion of the absorbed fibre in the carried one, and its image under
+  the coupled passage's affine composition.
 
 ## 8. Obligations carried to #62
 
