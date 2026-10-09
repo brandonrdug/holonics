@@ -213,6 +213,30 @@ and the Resident retains it beside the bound World.
 Not joined: the face chart `Cξ⁺ + o`, the Ask over keys, learning through the model, and the
 World/Robin and all-material first and second variation.
 
+**The coupled prospect (C1b-2a)** [definition; agent-inferred, October 9; scoped native acceptance
+at `a739963f6` ([receipt](receipts/2026-10-09-world-model/PUBLICATION.md)), where the whole gate
+failed at an unchanged example whose repair is validated only by the final join].
+
+In an actual encounter, each later incident wave depends on the returned ones through the native
+source. The prepared action's own unrun Word (`Word::prospective_coupled_passage`, opened by
+`ProspectiveControl::controlled_word`) emits `a_t` on the same source frame. A live key answers
+`b_t = P_t ξ_t + Q_t a_t` with `ξ_(t+1) = F_t ξ_t + G_t a_t`, at commit `T + t − 1`. The passage
+`P = (a_t, b_t, R_t x_t)_t` is then affine in the key's fibre, with one `k` over the whole passage
+(`WorldModel::coupled_prospect`, `CoupledProspect`, read per key by
+`PreparedPhysicalAction::world_prospect` before the encounter):
+
+```text
+P(c + N k) = P(c) + Σ_j k_j [P(c + N e_j) − P(c)]
+```
+
+- **Scope.** The admitted exact unsplit quadratic source Word and live native-kind keys. Point fibres
+  agree exactly. The read is read-only: the prepared Word, the World and the memory are unchanged.
+  Held and incompatible keys refuse, and so do plural or obstructed controls.
+- **Accepted.** The encounter's actual waves and its own blind station read (`R x` in the producing
+  frame) were carried by one `k`.
+- **Not claimed.** The World's target face; raw `x` where `R` has a kernel; C2; the Ask; learning;
+  CUDA.
+
 The bounded C2 acceptance (two actual encounters, a prediction cover before the first, and a
 state-only matched control at the continuing crossing) waits on that model and its finite
 forward certificate. The combined World/material derivative remains a separate obligation, and
