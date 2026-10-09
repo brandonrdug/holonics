@@ -69,3 +69,33 @@ This directory publishes the compact receipts of C1b-1, the World's learned mode
     Ask over keys, learning through the model, the World/Robin and all-material variation, CUDA parity, and
     any process or device capacity. The bits do not measure the immutable key laws, solve workspace or
     process memory.
+
+## The joined-source compilation at `0c9cd6714`
+
+The C1b-1 acceptance is pinned to `0a7fa87a4`, on `5864e4f58`. Its join onto published main `887ad60df`
+places the C1b code beside the published diagnostic unit test, so the join was compiled before publication.
+- Source `0c9cd6714` (full `0c9cd67146088ce944353a954ae9e044191810fa`, tree
+  `1c7acd8979c3cfcdffc44049cb08993733975de6`), the merge of the source-unchanged packet `4540649207` onto
+  `887ad60df`. All five C1b source files equal the accepted `0a7fa87a4`; against it the 352 native inputs
+  differ in exactly the diagnostic unit test (`hnn/tests/physical_communication.rs`) and the `paired.rs`
+  header.
+- **Compilation** ([handoff](integration-compile-v1/HANDOFF.md),
+  [validation](integration-compile-v1/VALIDATION.json)). `cargo test -p holonics --lib --no-run`, one Cargo job
+  and four codegen CPUs under the 4 GiB reservation: compiler exit 0, no error, one fresh library-test
+  executable. Its only warning is the pre-existing `dead_code` method `HeldContactVariation::advanced`
+  (`hnn/word/variation.rs`). Compiler wall 34,157,392,129 ns; guarded wall 35,012,583,451 ns against the
+  fixed 65,000,000,000 ns; aggregate CPU 35,832,805,000 ns; peak child resident set 2,146,132 KiB; group peak
+  2,429,689,856 B.
+- **Projected host paths** ([PROJECTION.json](PROJECTION.json)). The compilation built in the integration
+  candidate's own worktree with a private run directory, so its stdout and stderr name two host directories
+  beyond the earlier three. Two placeholders are declared for them in the header, `<candidate-worktree>/` and
+  `<native-run>/`; the stdout replaces `<cargo-registry>/` 50 times, `<candidate-worktree>/` 6 times and
+  `<native-run>/` 51 times, the stderr `<candidate-worktree>/` once. No other byte changes; the placeholders do
+  not occur in the originals, and substituting every prefix back restores each pinned original (checked for
+  all six entries before commit; the four earlier entries are unchanged).
+- **Hashed only:** [integration-compile-v1/OMITTED.md](integration-compile-v1/OMITTED.md); the manifest lists
+  32 files (3,908,248 bytes), among them the executable record, the input and output seals and the stage
+  configuration.
+- **Scope.** Compilation of the joined library tests only: no fixture ran, the native acceptance stays at
+  `0a7fa87a4`, and nothing here extends it to a coupled World future, learning through the model or the
+  World's observed face.

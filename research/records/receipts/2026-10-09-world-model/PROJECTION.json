@@ -1,5 +1,39 @@
 {
   "files": {
+    "integration-compile-v1/c1b-joined-lib-0c9cd6714-20261009-v1.stderr": {
+      "original": {
+        "bytes": 178,
+        "sha256": "30e8cfbf896f27ed7f76ea9a367ae70c00ace2d8045ca1651bff8b4c89b9b718"
+      },
+      "projected": {
+        "bytes": 142,
+        "sha256": "dd3a5ebe9a1edfc1e9e81d8111d99005e3895010cce7b457ca22dcada96b9770"
+      },
+      "replaced": {
+        "<candidate-worktree>/": 1,
+        "<cargo-registry>/": 0,
+        "<native-run>/": 0,
+        "<queue-admission>/": 0,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "integration-compile-v1/c1b-joined-lib-0c9cd6714-20261009-v1.stdout": {
+      "original": {
+        "bytes": 26553,
+        "sha256": "92a1ee376852601368b93d6436fdfd60cb8a4e14125e03c79e49225c25899996"
+      },
+      "projected": {
+        "bytes": 21638,
+        "sha256": "a35b97788ac7f873591a2979ddd7aa2779a4745f9555b964e5e588d8a4c2973d"
+      },
+      "replaced": {
+        "<candidate-worktree>/": 6,
+        "<cargo-registry>/": 50,
+        "<native-run>/": 51,
+        "<queue-admission>/": 0,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
     "native-v1/stages/actual-c1b-build4-20261009-v207.stderr": {
       "original": {
         "bytes": 253,
@@ -62,7 +96,9 @@
     }
   },
   "placeholders": {
+    "<candidate-worktree>/": "the absolute host directory of the integration candidate's git worktree that the joined compilation built in place; the repository path that follows is kept",
     "<cargo-registry>/": "the absolute host directory of the crates.io registry sources; each crate name and version that follows is kept",
+    "<native-run>/": "the absolute host directory of the joined compilation's private run (its copied dependency cache and target); the path that follows is kept",
     "<queue-admission>/": "the absolute host directory holding the sole queue's admissions; the admission label, its source copy and build cache that follow are kept",
     "<repository>/research/records/receipts/": "the main checkout's receipts directory, where the queue wrote the complete packets; the path that follows is the repository path"
   },

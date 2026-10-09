@@ -1,0 +1,124 @@
+{
+  "grade": "PASS: exact joined library-test compilation",
+  "source_commit": "0c9cd67146088ce944353a954ae9e044191810fa",
+  "source_tree": "1c7acd8979c3cfcdffc44049cb08993733975de6",
+  "accepted_source_commit": "0a7fa87a448232a273e7f9375d85f1dd90df649c",
+  "source_inputs": 352,
+  "all_five_C1b_source_files_match_accepted_bytes": true,
+  "changed_vs_accepted_native_inputs": [
+    "crates/holonics/src/hnn/paired.rs",
+    "crates/holonics/src/hnn/tests/physical_communication.rs"
+  ],
+  "source_manifest": {
+    "sha256": "19db679ae0a6dcf18eb29b9b5b8b3f5a3dd16404110f62a32fce3ef68668500c",
+    "bytes": 58560
+  },
+  "requested_command": "cargo test -p holonics --lib --no-run",
+  "effective_argv_sha256": "8cab7b352dbe5824fcc3ac3ab695a708f9a45502e70495f109da1e07822413f2",
+  "effective_command_receipt": {
+    "sha256": "08ae5d6570e34b99d1fa48b027a79530a85a69f3d3c20e8a421bfeff52d65a16",
+    "bytes": 1714
+  },
+  "native_exit": 0,
+  "fresh_library_test_executable": true,
+  "executable": {
+    "sha256": "aeb35e36239675d9641dfde0af80f405d0a20bdba618c56252519769aef1c9d8",
+    "bytes": 76935968
+  },
+  "compiler_wall_ns": 34157392129,
+  "guarded_wall_ns": 35012583451,
+  "projection_ns": 65000000000,
+  "measured_to_projected_ratio": {
+    "numerator": 35012583451,
+    "denominator": 65000000000
+  },
+  "aggregate_CPU_ns": 35832805000,
+  "aggregate_CPU_reading_grain_ns": 1000,
+  "child_CPU_user_us": 31411127,
+  "child_CPU_system_us": 2369222,
+  "peak_child_RSS_KiB": 2146132,
+  "group_peak_bytes": 2429689856,
+  "reservation_bytes": 4294967296,
+  "enforced_cgroup_cap_bytes": 4294967296,
+  "maximum_user_authorized_bytes": 8589934592,
+  "system_floor_bytes": 4294967296,
+  "thread_budget": 4,
+  "cargo_jobs": 1,
+  "compiler_errors": 0,
+  "compiler_warnings": [
+    {
+      "message": "method `advanced` is never used",
+      "level": "warning",
+      "code": {
+        "code": "dead_code",
+        "explanation": null
+      },
+      "primary_spans": [
+        {
+          "byte_end": 9293,
+          "byte_start": 9268,
+          "column_end": 26,
+          "column_start": 1,
+          "expansion": null,
+          "file_name": "crates/holonics/src/hnn/word/variation.rs",
+          "is_primary": false,
+          "label": "method in this implementation",
+          "line_end": 236,
+          "line_start": 236,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 26,
+              "highlight_start": 1,
+              "text": "impl HeldContactVariation {"
+            }
+          ]
+        },
+        {
+          "byte_end": 18786,
+          "byte_start": 18778,
+          "column_end": 27,
+          "column_start": 19,
+          "expansion": null,
+          "file_name": "crates/holonics/src/hnn/word/variation.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 473,
+          "line_start": 473,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 27,
+              "highlight_start": 19,
+              "text": "    pub(crate) fn advanced(&self, word: &Word<'_>, opened: &[EndChange]) -> Result<Self, HnnError> {"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "runtime_fixtures_executed": 0,
+  "prior_22_fixture_acceptance_not_repeated": true,
+  "inputs_unchanged_after_compile": true,
+  "exact_clean_worktree_verified_after_compile": true,
+  "all_leases_released": true,
+  "no_native_process_or_owned_unit_remaining": true,
+  "limits_raised_after_launch": false,
+  "source_edits": false,
+  "publication_performed": false,
+  "process_killing_performed": false,
+  "cache_clearing_performed": false,
+  "system_restart_performed": false,
+  "protected_sessions_or_retired_bridge_used": false,
+  "stdout": {
+    "sha256": "92a1ee376852601368b93d6436fdfd60cb8a4e14125e03c79e49225c25899996",
+    "bytes": 26553
+  },
+  "stderr": {
+    "sha256": "30e8cfbf896f27ed7f76ea9a367ae70c00ace2d8045ca1651bff8b4c89b9b718",
+    "bytes": 178
+  },
+  "receipt_scope": "Compilation only. Prior source/provenance/privacy/atlas and 22-fixture acceptance are reused at their stated source scope; no runtime, learning, GPU, broader library or application acceptance inferred."
+}

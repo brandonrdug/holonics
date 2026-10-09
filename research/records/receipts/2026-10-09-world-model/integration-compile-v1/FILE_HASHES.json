@@ -1,0 +1,136 @@
+{
+  "source_commit": "0c9cd67146088ce944353a954ae9e044191810fa",
+  "source_tree": "1c7acd8979c3cfcdffc44049cb08993733975de6",
+  "files": {
+    "ACTUAL_START_NOTICE.json": {
+      "sha256": "db6ec694cea2c57a4b0fc220cc57224097bed99dd4e9ca671086f911a690cab8",
+      "bytes": 249
+    },
+    "CACHE_PREPARATION.json": {
+      "sha256": "71ae6028a081ffd218266a3585520152834a2ddf2d7709313d293b4f9f32eb2a",
+      "bytes": 410343
+    },
+    "COMMAND.json": {
+      "sha256": "08ae5d6570e34b99d1fa48b027a79530a85a69f3d3c20e8a421bfeff52d65a16",
+      "bytes": 1714
+    },
+    "EXECUTABLE.json": {
+      "sha256": "d275b70b801cc4a1881b5287145e30fa881a55fb832efa3b4633d222181819e2",
+      "bytes": 1374
+    },
+    "FINAL_HOST_STATE.json": {
+      "sha256": "7cff2aaffee4808149fa5c4a126f0dc29e64cc628e13332580bf753daa235f50",
+      "bytes": 393
+    },
+    "HANDOFF.md": {
+      "sha256": "6f5bf1dd12ac9c04716b7100d0d0c963a4257f4adfb83d525127a88b1b3bf218",
+      "bytes": 2416
+    },
+    "HOST_ADMISSION.json": {
+      "sha256": "a5d8ac00c79486ada25366a8d1c546a917d11e8f3a60f7496bfcc8c4644bc6a5",
+      "bytes": 529
+    },
+    "SOURCE_NATIVE_INPUTS.json": {
+      "sha256": "19db679ae0a6dcf18eb29b9b5b8b3f5a3dd16404110f62a32fce3ef68668500c",
+      "bytes": 58560
+    },
+    "VALIDATION.json": {
+      "sha256": "a6e0b01631497e9a7237adf6b5b09aedcb46f1529836e5d658c1a1d4c2179e96",
+      "bytes": 4297
+    },
+    "c1b-joined-lib-0c9cd6714-20261009-v1.acceptance.json": {
+      "sha256": "e980e0b5d04758359184b44a4e889734a3fd1d93cea1466228cfb657dc6580b4",
+      "bytes": 378
+    },
+    "c1b-joined-lib-0c9cd6714-20261009-v1.child-identity.json": {
+      "sha256": "8bf032a77c406b021e92caecfbf4e5331d06c361a72406d12f9f6499b8b2f302",
+      "bytes": 76
+    },
+    "c1b-joined-lib-0c9cd6714-20261009-v1.config.json": {
+      "sha256": "94c279f771f0a66a8e3dd1dd371830357d278d838a44bd1ed314bb9745274d4d",
+      "bytes": 369054
+    },
+    "c1b-joined-lib-0c9cd6714-20261009-v1.external-lease.json": {
+      "sha256": "15c225c2c37fe6842e11b1b2dae05d6b1c9af3b83f647eee070ed41e7c5b1c78",
+      "bytes": 486
+    },
+    "c1b-joined-lib-0c9cd6714-20261009-v1.final.json": {
+      "sha256": "f4122abcf5b2c6c1cdc821e232fe6925c4da27a41f7adeca96214e59cfd4e17e",
+      "bytes": 5014
+    },
+    "c1b-joined-lib-0c9cd6714-20261009-v1.input_seal.json": {
+      "sha256": "7ad1f1350c98ab081a58bbd573f5607e2e6ee0309fd2d5883a5e656afb787672",
+      "bytes": 248539
+    },
+    "c1b-joined-lib-0c9cd6714-20261009-v1.lease-identity.json": {
+      "sha256": "0a70400e21af039c7035375a2bdb4d00f2f3ac31a1f0dc129d1cebb89bb22b3a",
+      "bytes": 563
+    },
+    "c1b-joined-lib-0c9cd6714-20261009-v1.memory-gate.json": {
+      "sha256": "dfbb1789943cd015d56124d362d1c0a31d9317e2d8f204f5056b2b9724fcbd15",
+      "bytes": 120
+    },
+    "c1b-joined-lib-0c9cd6714-20261009-v1.memory-growth.ndjson": {
+      "sha256": "251025005fe07323971da2d358a1582f5fd0e78731248372c0e33ff34d43f692",
+      "bytes": 33598
+    },
+    "c1b-joined-lib-0c9cd6714-20261009-v1.output_seal.json": {
+      "sha256": "1012720dd668c067456f6f6679bf49091bb2d6c4dc4781c5c8e1e6337981e626",
+      "bytes": 2428950
+    },
+    "c1b-joined-lib-0c9cd6714-20261009-v1.publication.json": {
+      "sha256": "86b6ac205b520fd150a138c654f0df8f65504cbadc897a4be4b0a43ec8da2893",
+      "bytes": 2688
+    },
+    "c1b-joined-lib-0c9cd6714-20261009-v1.quiescence.json": {
+      "sha256": "ce4b510fb7dc667b9af3a50871ad7999463b5402b231eeb88852077070761d60",
+      "bytes": 129
+    },
+    "c1b-joined-lib-0c9cd6714-20261009-v1.release.json": {
+      "sha256": "f9f9638a0ca0b042e03a776e5f13632a44699f2cbf1db191bf013a09e8ee155e",
+      "bytes": 174
+    },
+    "c1b-joined-lib-0c9cd6714-20261009-v1.stage-quiescence.json": {
+      "sha256": "9d8862a976e5c50c5deac6126c2b62327beae8b6a250702e175d7a6f5bce3c37",
+      "bytes": 136
+    },
+    "c1b-joined-lib-0c9cd6714-20261009-v1.stderr": {
+      "sha256": "30e8cfbf896f27ed7f76ea9a367ae70c00ace2d8045ca1651bff8b4c89b9b718",
+      "bytes": 178
+    },
+    "c1b-joined-lib-0c9cd6714-20261009-v1.stdout": {
+      "sha256": "92a1ee376852601368b93d6436fdfd60cb8a4e14125e03c79e49225c25899996",
+      "bytes": 26553
+    },
+    "c1b-joined-lib-0c9cd6714-20261009-v1.system-floor.json": {
+      "sha256": "ddc036c113941b1fa7dd0e06d245110f62b43c29057081ab80ecc3580c818eef",
+      "bytes": 266330
+    },
+    "c1b-joined-lib-0c9cd6714-20261009-v1.unit-cleanup.json": {
+      "sha256": "60618a8e23a14ca505e5c15328f51400f95232cc519df3505a8dd4cfcbba29bb",
+      "bytes": 699
+    },
+    "queue-source/bounded_stage_memory_v186.py": {
+      "sha256": "8a35706501cb7e4afde4b9a8ea9f71638cfef5e254ca2bbf4574500e0a00345a",
+      "bytes": 13574
+    },
+    "queue-source/final_stage_memory_v186.py": {
+      "sha256": "ede5f04907a432bab4e22eaaab94a9b8b9e7834e54eb0f27bc5927bca6159f51",
+      "bytes": 11260
+    },
+    "queue-source/leased_stage_memory_v186.py": {
+      "sha256": "3276491e6b7e9afdc6b48f0f9a0d12b39a0627fc269ed65ed22ffbaec0760613",
+      "bytes": 5556
+    },
+    "queue-source/package_receipt.py": {
+      "sha256": "2a3817b0de58a82949a60258df561997899eb31b15014f4b02342305d6b6d95c",
+      "bytes": 7832
+    },
+    "queue-source/prepare_validation.py": {
+      "sha256": "d573ed340da3615548a9fddb568c7bfba66a461894d60f566fffd39e036a2938",
+      "bytes": 6486
+    }
+  },
+  "count": 32,
+  "excludes_self": true
+}
