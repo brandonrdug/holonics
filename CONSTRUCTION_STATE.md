@@ -12,7 +12,8 @@ The October 4 [HNN/Athena foundation supplement](docs/plans/HNN_ATHENA_FOUNDATIO
 the common equations, accepted isolated geometry joins and exact dimensional/decoder checks.
 Its pinned public-source update credits whole-material and resident-passage host continuation,
 while keeping card restore, adaptive retention and useful autonomous output under their actual gates.
-The retained independent briefs are paused with Claude; the product acceptance below is unchanged.
+Since October 8 Claude leads the construction and Epime coordinates and reviews (CLAUDE.md,
+"Working with Epime"); the product acceptance below is unchanged.
 
 ## Current construction
 

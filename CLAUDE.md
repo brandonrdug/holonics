@@ -126,6 +126,9 @@ mathematics, not a style.
   and comparisons as exact orderings or exact differences. Nothing inside a law, an owner or the
   HNN consumes a float.
 - A percentage is a rate, which is motion; state the motion.
+- A margin, score or reading built from contributions is reported as its series, the winding and
+  turning parts with their sum and carry, never collapsed into one number; a predicted or expected
+  class is reported with what it denotes at its receiver (Brandon, October 7).
 - No unjustified literal or magic number enters a law.
 
 [definition] **Retention is a quotient sufficient for the admitted future**
@@ -246,7 +249,8 @@ existing owner and the concrete missing term. A change that adds, moves or retir
 its atlas rows in the same commit.
 
 [project-postulate] **Read the lessons before designing** ([the failures that repeated](research/records/2026-09-29_LESSONS_THE_FAILURES_THAT_REPEATED_AFTER_THEY_WERE_RECORDED.md);
-[the prototypes' lessons](research/records/2026-09-24_LESSONS_FROM_THE_WORKBENCH_AND_ATHENA_PROTOTYPES.md)). Before any design, brief or build, name which recorded failure
+[the prototypes' lessons](research/records/2026-09-24_LESSONS_FROM_THE_WORKBENCH_AND_ATHENA_PROTOTYPES.md);
+[the failures that recurred after them](research/records/2026-10-09_LESSONS_THE_FAILURES_THAT_RECURRED_FROM_SEPTEMBER_30_TO_OCTOBER_9.md)). Before any design, brief or build, name which recorded failure
 each choice could repeat; a choice that repeats one is refused before it is built. The most repeated:
 an authored routine standing in for learning; recitation or an index of contexts counted as
 generation; text run on its codec's grain as the exception (every design is checked against text,
@@ -309,6 +313,11 @@ foreground shell time went to wait loops.
   relaunched with a larger deadline, timeout or budget (the audit found 9 deadline raises and 20
   tool-timeout raises). The next loop changes the law, the partition or the declared read, and says
   why.
+- **Limits come from the workload** (Brandon, October 8). A memory ceiling is set from the peak of
+  what the run materializes, estimated from the workload and then measured, and is at least 8 GiB
+  per job unless a measured peak shows less is needed; a stop at a copied cap measures the cap, not
+  the run. An unmeasured run is planned at one to three minutes, and a longer run is authorized when
+  its cost and value are stated and it is scheduled beside the other workers' runs.
 - **Run independent work together.** The host has 24 cores and 32,746,147,840 bytes of memory.
   Independent runs launch together when their declared threads and resident sets fit beside the
   other workers' declared budgets. Each pin declares its thread budget, and a serial schedule of
@@ -316,7 +325,9 @@ foreground shell time went to wait loops.
 - **Isolate scratch.** A worker's run artifacts live in its own worktree's `.local/` or a
   per-agent directory, never under a shared scratch name. Any artifact a record cites (timing reads, listings,
   states) is copied into that record's receipts directory and committed before the worktree is
-  removed: `.local/` is not tracked, and removing a worktree deletes it.
+  removed: `.local/` is not tracked, and removing a worktree deletes it. Before a worktree is
+  removed, its untracked and ignored files are listed and each is committed, copied or retired by
+  name.
 - **Receipts carry time.** Each run's receipt states its projection, deadline, measured wall time
   and peak resident set, and the record keeps the ratio of measured to projected.
 - **The orchestrator waits on notifications** (task notifications, a Monitor on the mailbox), never
@@ -362,9 +373,10 @@ its output. After a compaction, act on the newest human message, not on a retain
 older one.
 
 [project-postulate] **Delegation.**
-- Claude delegates to at most **three Opus 5.5 workers** on disjoint owner paths, then **one Opus
-  5.5 reviewer that spawns nothing**. Use fewer workers when the work does not split, and a
-  sequential join when a step consumes several returns.
+- Claude delegates to Sonnet 5.5 and Haiku 5.5 workers (Brandon, October 8: Haiku for volume,
+  Sonnet for most work), and to Opus 5.5 workers only to parallelize heavy work: at most **three**
+  on disjoint owner paths, then **one Opus 5.5 reviewer that spawns nothing**. Use fewer workers
+  when the work does not split, and a sequential join when a step consumes several returns.
 - Every brief supplies:
   - the lessons records above, with the recorded failures the brief's work could repeat;
   - this guide, the exact paths, the existing owners, the equations, the consumer and the receipts;
@@ -376,12 +388,29 @@ older one.
     stop, no raised limit, the thread budget and isolated scratch.
 - The primary inspects source and integrates the returns; worker measurements are receipts.
 
+[project-postulate] **Working with Epime** (Brandon, October 5 and 8). Epime is Codex (also called
+Astra), working from [AGENTS.md](AGENTS.md); the two are peers who settle their own split.
+- Since October 8 Claude leads the construction and implements. Epime coordinates: rigor, project
+  organization, issue alignment, elapsed-time checkpoints, source and publication review, the sole
+  native-validation queue and the hardware surfaces. A statement Epime relays as Brandon's is his.
+- They coordinate through the repository mailbox (`python3 tools/agent_mailbox.py`;
+  [its protocol](tools/agent_mailbox.md)); Claude's sender id is `opus`. Before launching work they
+  agree one behavioral objective, its owner and the next checkpoint.
+- Builds, tests and kernel checks that a claim cites run through the sole validation queue. No
+  duplicate build, unchanged retry, push or merge runs without its authorization.
+- Publication goes per pin: Epime reviews the pin read-only, the coordinator gives the go, and one
+  writer merges the approved pins onto current main with `--no-ff`, has the candidate reviewed,
+  pushes it as a fast-forward and returns the remote readback.
+- Brandon's exports of the Epime room, kept outside the repository, are evidence with the same
+  handling as `tools/human_messages.py` output: never committed or published.
+
 [project-postulate] Each campaign has a GitHub issue and cites it in its plan and commits
 (`Refs #n` / `Closes #n`). The milestones are the rebuild's open steps (4–5, 6, 7, 8). The open
 issues are:
 - the rebuild parent #63;
-- steps 4–5, the HNN #73 and device debts #76; campaign 2's contact issues #28, #30, #31 and #48
-  (label `campaign-2`), and campaign 4's serial chain #27 (label `campaign-4`);
+- steps 4–5, the helical code #386 (critical), the HNN #73 and device debts #76; campaign 2's
+  contact issues #28, #30, #31 and #48 (label `campaign-2`), and campaign 4's serial chain #27
+  (label `campaign-4`);
 - step 6, equation extraction #146 and the target laws #20, #22, #23 and #32;
 - step 7, Lean curation #147;
 - step 8, applications #148;
