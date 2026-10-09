@@ -260,11 +260,12 @@ impl ModelKey {
                 row[n + j] = -base.external_target.get(i, j)?.clone();
             }
         }
-        for i in 0..pi {
-            for j in 0..n {
-                rows[n + i][j] = base.flow_coefficient.get(po + i, j)? / &self.admittance[i];
+        for (i, y) in self.admittance.iter().enumerate() {
+            let row = &mut rows[n + i];
+            for (j, entry) in row.iter_mut().enumerate().take(n) {
+                *entry = base.flow_coefficient.get(po + i, j)? / y;
             }
-            rows[n + i][n + i] = Rat::one();
+            row[n + i] = Rat::one();
         }
         let system = ExactRatMatrix::new(rows)?;
         // The actual World's Robin target and return: e + Y⁻¹(F_P z + c_P) = a, b = e − Y⁻¹(F_P z + c_P).
