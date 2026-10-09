@@ -47,5 +47,14 @@ same bounds. The refused admission and every compiler failure are kept.
 - **Hashed only:** each packet's `OMITTED.md`. That covers the copied sources, the compiler requests,
   provider pins and seals, and lifecycle receipts, among them the output seals over the compact limit.
 - **Scope.** Each check certifies the exact source alone, its compiler exit and its public-theorem axiom
-  reports. The library build of the integrated aggregate is a separate gate. No native consumer, HNN
-  behaviour, estimate or target theorem is claimed.
+  reports. No native consumer, HNN behaviour, estimate or target theorem is claimed.
+
+## The integrated aggregate
+
+The library build of the integrated pin passed: `bash tools/lean_check.sh +HolonicsResearch:olean` on
+`deae9b83` (tree `3b9c00f1`), unchanged source, terminal stage 370, 321 normal providers built serially
+by the sole queue ([compact receipt](../2026-10-09-lean-integration-aggregate/AGGREGATE.v1.json): each
+stage's target, exit, wall, CPU, charged peak and projection, and the SHA-256 of the private
+validation, file-hash and exact-reading files it summarizes). The largest charged group peak was
+8,129,134,592 bytes (`2¹⁴ · 496163`) under the 8,589,934,592-byte (`2³³`) job ceiling. Stages 001 and 002 were guard false
+positives, not source failures; the receipt keeps them.

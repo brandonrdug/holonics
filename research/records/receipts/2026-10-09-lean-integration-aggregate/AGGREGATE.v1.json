@@ -1,0 +1,3734 @@
+{
+ "scope": "Compact public receipt of the Lean integration aggregate. The raw stage logs, command environments, resource seals and Lake artifact hashes stay in private custody; their exact files are bound below by SHA-256.",
+ "candidate_commit": "deae9b8334c1163855350810a376e5592a3ec518",
+ "candidate_tree": "3b9c00f1f0187674a9bcddb4cf7c2e95fd14c806",
+ "command": "bash tools/lean_check.sh +HolonicsResearch:olean",
+ "terminal_stage": "stage-370",
+ "actual_aggregate_command_passed": true,
+ "normal_provider_passes": 321,
+ "source_edits": false,
+ "largest_kernel_charged_group_peak_bytes": 8129134592,
+ "maximum_authorized_job_memory_bytes": 8589934592,
+ "minimum_sampled_host_MemAvailable_bytes": 10331541504,
+ "earlier_errors_preserved": "Stages 001/002 were guard false-positives, not source failures; initial memory hard-blocker interpretation withdrawn in aggregate-resource-review-v1. Stage 308 completed a read-only Lake diagnostic but its external controller disappeared before final acceptance; original outer wall/acceptance remain incomplete, exited owned unit accounting and cleanup were recovered, and continuation resumed with a fresh diagnostic. No provider recompilation, limit increase, proof bypass, trace forging, substitute importer, cache clearing, source edit or live process termination.",
+ "private_custody": {
+  "VALIDATION.json": {
+   "sha256": "deb2c5588e3406f6be117b21dcd9c910c0168e90f39d8c633f76f5db34cfdf73",
+   "bytes": 1348305
+  },
+  "FILE_HASHES.json": {
+   "sha256": "f363c91d3cb02057ce83bc07d1bf1b0049d515c475653049540944d31703e5ca",
+   "bytes": 5640299
+  },
+  "EXACT_READINGS.json": {
+   "sha256": "e0128d88f5b4f4276f9bf941f46ae822a423a5b97204d6af8976515c185b88f6",
+   "bytes": 775197
+  },
+  "HANDOFF.md": {
+   "sha256": "07c61b80f62fb616a9e0a8a89dde3a55e17983d37c755ea68539856e7a8fbfca",
+   "bytes": 533
+  }
+ },
+ "stages": [
+  {
+   "stage": "stage-001",
+   "target": "Holonics.Mathematics.PolynomialReading",
+   "exit": null,
+   "guard_wall_ns": 970876491,
+   "CPU_ns": 603892000,
+   "charged_group_peak_bytes": 290209792,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-002",
+   "target": "Holonics.Mathematics.PolynomialReading",
+   "exit": null,
+   "guard_wall_ns": 9552715649,
+   "CPU_ns": 9220304000,
+   "charged_group_peak_bytes": 2403946496,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-003",
+   "target": "Holonics.Mathematics.PolynomialReading",
+   "exit": 0,
+   "guard_wall_ns": 6294757973,
+   "CPU_ns": 6086782000,
+   "charged_group_peak_bytes": 952594432,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-004",
+   "target": "Holonics.Foundation.TowerCarrier",
+   "exit": 0,
+   "guard_wall_ns": 5130436895,
+   "CPU_ns": 4972285000,
+   "charged_group_peak_bytes": 1140744192,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-005",
+   "target": "HolonicsResearch.Geometry.CyclicGrover.CyclicGraphValuation",
+   "exit": 0,
+   "guard_wall_ns": 7799632543,
+   "CPU_ns": 7571537000,
+   "charged_group_peak_bytes": 1658413056,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-006",
+   "target": "HolonicsResearch.Foundation.IwasawaPolynomial",
+   "exit": 0,
+   "guard_wall_ns": 8504644948,
+   "CPU_ns": 8301418000,
+   "charged_group_peak_bytes": 1614671872,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-007",
+   "target": "HolonicsResearch.Geometry.CyclicGrover.IntegralTrace",
+   "exit": 0,
+   "guard_wall_ns": 5263883878,
+   "CPU_ns": 5131601000,
+   "charged_group_peak_bytes": 715079680,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-008",
+   "target": "Holonics.Aeon.Production.FirstLaw.Continuous",
+   "exit": 0,
+   "guard_wall_ns": 12660717037,
+   "CPU_ns": 12328761000,
+   "charged_group_peak_bytes": 3288682496,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-009",
+   "target": "HolonicsResearch.Mathematics.Comma",
+   "exit": 0,
+   "guard_wall_ns": 10875025024,
+   "CPU_ns": 10614168000,
+   "charged_group_peak_bytes": 1814732800,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-010",
+   "target": "HolonicsResearch.Geometry.CyclicGrover.CyclicShift",
+   "exit": 0,
+   "guard_wall_ns": 7844043770,
+   "CPU_ns": 7668350000,
+   "charged_group_peak_bytes": 1043423232,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-011",
+   "target": "Holonics.Foundation.RelationLadder.Comparison",
+   "exit": 0,
+   "guard_wall_ns": 6715279021,
+   "CPU_ns": 6536872000,
+   "charged_group_peak_bytes": 1132302336,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-012",
+   "target": "Holonics.HNN.ReceivingReach",
+   "exit": 0,
+   "guard_wall_ns": 6139808817,
+   "CPU_ns": 6011278000,
+   "charged_group_peak_bytes": 752889856,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-013",
+   "target": "Holonics.Holon.Restriction.Morphism",
+   "exit": 0,
+   "guard_wall_ns": 15192043131,
+   "CPU_ns": 14895542000,
+   "charged_group_peak_bytes": 2392354816,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-014",
+   "target": "Holonics.Transport.ChangingReceiver.Defect",
+   "exit": 0,
+   "guard_wall_ns": 9257232797,
+   "CPU_ns": 9077230000,
+   "charged_group_peak_bytes": 1137815552,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-015",
+   "target": "HolonicsResearch.Hodge.HodgeAffineTriangleBoundarySource",
+   "exit": 0,
+   "guard_wall_ns": 14797237665,
+   "CPU_ns": 14499628000,
+   "charged_group_peak_bytes": 2137985024,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-016",
+   "target": "Holonics.Foundation.Standing.Law",
+   "exit": 0,
+   "guard_wall_ns": 5519318177,
+   "CPU_ns": 5402011000,
+   "charged_group_peak_bytes": 544481280,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-017",
+   "target": "Holonics.HNN.CarriedCuts",
+   "exit": 0,
+   "guard_wall_ns": 6102228131,
+   "CPU_ns": 5999745000,
+   "charged_group_peak_bytes": 488542208,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-018",
+   "target": "HolonicsResearch.Zeta.ModularScatteringResidual",
+   "exit": 0,
+   "guard_wall_ns": 23738928001,
+   "CPU_ns": 23227559000,
+   "charged_group_peak_bytes": 4992913408,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-019",
+   "target": "HolonicsResearch.Holon.RingCellHolonomy",
+   "exit": 0,
+   "guard_wall_ns": 9875120691,
+   "CPU_ns": 9689804000,
+   "charged_group_peak_bytes": 869588992,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-020",
+   "target": "Holonics.Compression.Landmark.Context.SplitOperands",
+   "exit": 0,
+   "guard_wall_ns": 8839215159,
+   "CPU_ns": 8692637000,
+   "charged_group_peak_bytes": 607825920,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-021",
+   "target": "Holonics.Geometry.FrameTransport",
+   "exit": 0,
+   "guard_wall_ns": 15144430130,
+   "CPU_ns": 14892993000,
+   "charged_group_peak_bytes": 1811091456,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-022",
+   "target": "HolonicsResearch.Geometry.FiniteTorusSubgroupReceiver",
+   "exit": 0,
+   "guard_wall_ns": 15053312791,
+   "CPU_ns": 14777514000,
+   "charged_group_peak_bytes": 2049818624,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-023",
+   "target": "Holonics.Transport.HelicalRepair",
+   "exit": 0,
+   "guard_wall_ns": 8345612099,
+   "CPU_ns": 8208063000,
+   "charged_group_peak_bytes": 782675968,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-024",
+   "target": "Holonics.Transport.DeletionReceiver",
+   "exit": 0,
+   "guard_wall_ns": 12359167008,
+   "CPU_ns": 12085842000,
+   "charged_group_peak_bytes": 1708187648,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-025",
+   "target": "Holonics.Transport.HelicalCode",
+   "exit": 0,
+   "guard_wall_ns": 11209154594,
+   "CPU_ns": 11050504000,
+   "charged_group_peak_bytes": 939819008,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-026",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 8669289258,
+   "CPU_ns": 8507919000,
+   "charged_group_peak_bytes": 700416000,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-027",
+   "target": "Holonics.Foundation.PadicTower",
+   "exit": 0,
+   "guard_wall_ns": 4605998469,
+   "CPU_ns": 4486715000,
+   "charged_group_peak_bytes": 415371264,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-028",
+   "target": "HolonicsResearch.Geometry.CyclicGrover.GroverCycle",
+   "exit": 0,
+   "guard_wall_ns": 8395545384,
+   "CPU_ns": 8187973000,
+   "charged_group_peak_bytes": 1314217984,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-029",
+   "target": "Holonics.Objects.Ratio.SelectedQuadratic",
+   "exit": 0,
+   "guard_wall_ns": 5199279430,
+   "CPU_ns": 5092791000,
+   "charged_group_peak_bytes": 466423808,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-030",
+   "target": "Holonics.HNN.ReleaseRun",
+   "exit": 0,
+   "guard_wall_ns": 7282334571,
+   "CPU_ns": 7137744000,
+   "charged_group_peak_bytes": 700600320,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-031",
+   "target": "HolonicsResearch.Hodge.HodgeAffineTriangleSource",
+   "exit": 0,
+   "guard_wall_ns": 18644848241,
+   "CPU_ns": 18336998000,
+   "charged_group_peak_bytes": 2051514368,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-032",
+   "target": "Holonics.Foundation.SectionResidual",
+   "exit": 0,
+   "guard_wall_ns": 5945602042,
+   "CPU_ns": 5825983000,
+   "charged_group_peak_bytes": 616558592,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-033",
+   "target": "Holonics.Physics.TemporalHodgeResidue",
+   "exit": 0,
+   "guard_wall_ns": 11551535550,
+   "CPU_ns": 11336734000,
+   "charged_group_peak_bytes": 1759117312,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-034",
+   "target": "HolonicsResearch.Geometry.EggModular",
+   "exit": 0,
+   "guard_wall_ns": 12119321760,
+   "CPU_ns": 11915197000,
+   "charged_group_peak_bytes": 1349308416,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-035",
+   "target": "Holonics.Holon.Element",
+   "exit": 0,
+   "guard_wall_ns": 11249776528,
+   "CPU_ns": 11060796000,
+   "charged_group_peak_bytes": 1029115904,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-036",
+   "target": "HolonicsResearch.Fluid.NavierStokesTransportedScalarMaximumPrinciple",
+   "exit": 0,
+   "guard_wall_ns": 13374519847,
+   "CPU_ns": 13135111000,
+   "charged_group_peak_bytes": 1284358144,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-037",
+   "target": "Holonics.Foundation.CausalChord",
+   "exit": 0,
+   "guard_wall_ns": 13442108441,
+   "CPU_ns": 13212651000,
+   "charged_group_peak_bytes": 1086431232,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-038",
+   "target": "HolonicsResearch.Mathematics.Sturm",
+   "exit": 0,
+   "guard_wall_ns": 13597038622,
+   "CPU_ns": 13402199000,
+   "charged_group_peak_bytes": 844361728,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-039",
+   "target": "Holonics.Foundation.Standing",
+   "exit": 0,
+   "guard_wall_ns": 11010914933,
+   "CPU_ns": 10791397000,
+   "charged_group_peak_bytes": 1612234752,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-040",
+   "target": "Holonics.Geometry.Motion",
+   "exit": 0,
+   "guard_wall_ns": 21674593829,
+   "CPU_ns": 21029654000,
+   "charged_group_peak_bytes": 2671509504,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-041",
+   "target": "HolonicsResearch.Foundation.DiagonalChainTransport",
+   "exit": 0,
+   "guard_wall_ns": 25350336161,
+   "CPU_ns": 24789594000,
+   "charged_group_peak_bytes": 1803448320,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-042",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 8901211382,
+   "CPU_ns": 8676820000,
+   "charged_group_peak_bytes": 814436352,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-043",
+   "target": "Holonics.Objects.Ratio.SelectedQuadratic.PositiveRoot",
+   "exit": 0,
+   "guard_wall_ns": 7423575638,
+   "CPU_ns": 7222824000,
+   "charged_group_peak_bytes": 1053454336,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-044",
+   "target": "HolonicsResearch.Geometry.CyclicGrover.GroverGraphChart",
+   "exit": 0,
+   "guard_wall_ns": 8658302226,
+   "CPU_ns": 8405227000,
+   "charged_group_peak_bytes": 1460891648,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-045",
+   "target": "HolonicsResearch.Geometry.TurnBoostNormality",
+   "exit": 0,
+   "guard_wall_ns": 10094699445,
+   "CPU_ns": 9870724000,
+   "charged_group_peak_bytes": 1657225216,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-046",
+   "target": "HolonicsResearch.EllipticCurve.EggSource",
+   "exit": 0,
+   "guard_wall_ns": 10039549664,
+   "CPU_ns": 9849642000,
+   "charged_group_peak_bytes": 1361252352,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-047",
+   "target": "HolonicsResearch.Hodge.HodgeAffineTriangleConeSource",
+   "exit": 0,
+   "guard_wall_ns": 9731387775,
+   "CPU_ns": 9571770000,
+   "charged_group_peak_bytes": 942792704,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-048",
+   "target": "HolonicsResearch.Foundation.ProductFactorCurrent",
+   "exit": 0,
+   "guard_wall_ns": 12124632305,
+   "CPU_ns": 11875323000,
+   "charged_group_peak_bytes": 1670803456,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-049",
+   "target": "Holonics.Holon.MomentStorage",
+   "exit": 0,
+   "guard_wall_ns": 8316630358,
+   "CPU_ns": 8135874000,
+   "charged_group_peak_bytes": 932941824,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-050",
+   "target": "Holonics.Transport.ChangingReceiver",
+   "exit": 0,
+   "guard_wall_ns": 9190980303,
+   "CPU_ns": 9029987000,
+   "charged_group_peak_bytes": 1006579712,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-051",
+   "target": "HolonicsResearch.Geometry.HolonicSlingTransport",
+   "exit": 0,
+   "guard_wall_ns": 8538219239,
+   "CPU_ns": 8377250000,
+   "charged_group_peak_bytes": 995971072,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-052",
+   "target": "Holonics.Holon.Law",
+   "exit": 0,
+   "guard_wall_ns": 8681058570,
+   "CPU_ns": 8552184000,
+   "charged_group_peak_bytes": 836116480,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-053",
+   "target": "Holonics.Physics.PartitionedHodgeEnergy",
+   "exit": 0,
+   "guard_wall_ns": 10835645493,
+   "CPU_ns": 10670182000,
+   "charged_group_peak_bytes": 657027072,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-054",
+   "target": "HolonicsResearch.Foundation.RootCount",
+   "exit": 0,
+   "guard_wall_ns": 9287989291,
+   "CPU_ns": 9103381000,
+   "charged_group_peak_bytes": 951095296,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-055",
+   "target": "Holonics.Foundation.NavigatorInference",
+   "exit": 0,
+   "guard_wall_ns": 9258010236,
+   "CPU_ns": 9089598000,
+   "charged_group_peak_bytes": 991379456,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-056",
+   "target": "Holonics.Objects.SourcePorts",
+   "exit": 0,
+   "guard_wall_ns": 11531918345,
+   "CPU_ns": 11367383000,
+   "charged_group_peak_bytes": 797249536,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-057",
+   "target": "HolonicsResearch.Geometry.Navigation",
+   "exit": 0,
+   "guard_wall_ns": 10796255458,
+   "CPU_ns": 10617660000,
+   "charged_group_peak_bytes": 988745728,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-058",
+   "target": "HolonicsResearch.Foundation.AcousticReceiver",
+   "exit": 0,
+   "guard_wall_ns": 9517228603,
+   "CPU_ns": 9321783000,
+   "charged_group_peak_bytes": 1037508608,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-059",
+   "target": "HolonicsResearch.Fluid.NavierStokesAlignedStrainBudget",
+   "exit": 0,
+   "guard_wall_ns": 15675911021,
+   "CPU_ns": 15381943000,
+   "charged_group_peak_bytes": 1859739648,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-060",
+   "target": "Holonics.Compression.Core.FaceMap",
+   "exit": 0,
+   "guard_wall_ns": 13474016781,
+   "CPU_ns": 13270539000,
+   "charged_group_peak_bytes": 1015070720,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-061",
+   "target": "Holonics.Objects.SourceHolon",
+   "exit": 0,
+   "guard_wall_ns": 12200356511,
+   "CPU_ns": 11987304000,
+   "charged_group_peak_bytes": 964075520,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-062",
+   "target": "Holonics.Objects.Deposition",
+   "exit": 0,
+   "guard_wall_ns": 10201851459,
+   "CPU_ns": 10028738000,
+   "charged_group_peak_bytes": 941035520,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-063",
+   "target": "HolonicsResearch.Mathematics.SignChange",
+   "exit": 0,
+   "guard_wall_ns": 10774821515,
+   "CPU_ns": 10614251000,
+   "charged_group_peak_bytes": 770424832,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-064",
+   "target": "Holonics.Objects.RelativeCompleteness",
+   "exit": 0,
+   "guard_wall_ns": 17298151668,
+   "CPU_ns": 17025154000,
+   "charged_group_peak_bytes": 1559519232,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-065",
+   "target": "Holonics.Holon.Deposition",
+   "exit": 0,
+   "guard_wall_ns": 18250953511,
+   "CPU_ns": 18024609000,
+   "charged_group_peak_bytes": 970194944,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-066",
+   "target": "Holonics.Foundation.ContinuingTower",
+   "exit": 0,
+   "guard_wall_ns": 11013200400,
+   "CPU_ns": 10859117000,
+   "charged_group_peak_bytes": 751218688,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-067",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 8951478119,
+   "CPU_ns": 8766283000,
+   "charged_group_peak_bytes": 915648512,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-068",
+   "target": "HolonicsResearch.Geometry.CyclicGrover.GroverAction",
+   "exit": 0,
+   "guard_wall_ns": 8307191223,
+   "CPU_ns": 8077242000,
+   "charged_group_peak_bytes": 1719349248,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-069",
+   "target": "HolonicsResearch.Geometry.CyclicGrover.TowerOperator",
+   "exit": 0,
+   "guard_wall_ns": 5687798456,
+   "CPU_ns": 5561582000,
+   "charged_group_peak_bytes": 611778560,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-070",
+   "target": "Holonics.Objects.Ratio.SelectedQuadratic.SourceRoot",
+   "exit": 0,
+   "guard_wall_ns": 5597913942,
+   "CPU_ns": 5474114000,
+   "charged_group_peak_bytes": 581697536,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-071",
+   "target": "Holonics.Holon.Law.Fisher",
+   "exit": 0,
+   "guard_wall_ns": 12389990507,
+   "CPU_ns": 12081995000,
+   "charged_group_peak_bytes": 2783117312,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-072",
+   "target": "HolonicsResearch.Hodge.HodgeAffineTetrahedronResidualSource",
+   "exit": 0,
+   "guard_wall_ns": 19359913993,
+   "CPU_ns": 18993537000,
+   "charged_group_peak_bytes": 1817755648,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-073",
+   "target": "HolonicsResearch.Foundation.ProductAxisBoundary",
+   "exit": 0,
+   "guard_wall_ns": 14493902257,
+   "CPU_ns": 14219128000,
+   "charged_group_peak_bytes": 1242558464,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-074",
+   "target": "Holonics.Transport.AccumulatedReceiverDefect",
+   "exit": 0,
+   "guard_wall_ns": 9174255672,
+   "CPU_ns": 8919228000,
+   "charged_group_peak_bytes": 905048064,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-075",
+   "target": "Holonics.Computation.AttentionModeCompression",
+   "exit": 0,
+   "guard_wall_ns": 21484667069,
+   "CPU_ns": 20960351000,
+   "charged_group_peak_bytes": 4889845760,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-076",
+   "target": "Holonics.Physics.ConstitutiveModulation",
+   "exit": 0,
+   "guard_wall_ns": 9301755094,
+   "CPU_ns": 9098519000,
+   "charged_group_peak_bytes": 858931200,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-077",
+   "target": "Holonics.Physics.FluidReceiverClosure",
+   "exit": 0,
+   "guard_wall_ns": 9989689866,
+   "CPU_ns": 9812783000,
+   "charged_group_peak_bytes": 940478464,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-078",
+   "target": "Holonics.Physics.Information.CrossEntropyRate",
+   "exit": 0,
+   "guard_wall_ns": 8994847412,
+   "CPU_ns": 8848694000,
+   "charged_group_peak_bytes": 836292608,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-079",
+   "target": "Holonics.Objects.Membrane",
+   "exit": 0,
+   "guard_wall_ns": 12487215027,
+   "CPU_ns": 12262538000,
+   "charged_group_peak_bytes": 1312301056,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-080",
+   "target": "Holonics.Objects.Retention",
+   "exit": 0,
+   "guard_wall_ns": 10528362456,
+   "CPU_ns": 10358762000,
+   "charged_group_peak_bytes": 900853760,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-081",
+   "target": "HolonicsResearch.Fluid.NavierStokesExteriorFaceGenerator",
+   "exit": 0,
+   "guard_wall_ns": 10481135179,
+   "CPU_ns": 10286358000,
+   "charged_group_peak_bytes": 1379442688,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-082",
+   "target": "Holonics.Holon.Conformance",
+   "exit": 0,
+   "guard_wall_ns": 13060113532,
+   "CPU_ns": 12879328000,
+   "charged_group_peak_bytes": 866861056,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-083",
+   "target": "Holonics.Aeon.Production.FirstLaw",
+   "exit": 0,
+   "guard_wall_ns": 11749789916,
+   "CPU_ns": 11474698000,
+   "charged_group_peak_bytes": 2086760448,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-084",
+   "target": "HolonicsResearch.Landmarks.IntegralCokernel",
+   "exit": 0,
+   "guard_wall_ns": 13311912970,
+   "CPU_ns": 13026131000,
+   "charged_group_peak_bytes": 2113183744,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-085",
+   "target": "Holonics.HNN.ModeQuotient",
+   "exit": 0,
+   "guard_wall_ns": 13613197373,
+   "CPU_ns": 13362765000,
+   "charged_group_peak_bytes": 1679028224,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-086",
+   "target": "HolonicsResearch.Foundation.TopologicalReceiver",
+   "exit": 0,
+   "guard_wall_ns": 10652583894,
+   "CPU_ns": 10444710000,
+   "charged_group_peak_bytes": 1356791808,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-087",
+   "target": "Holonics.Foundation.GrainRestriction",
+   "exit": 0,
+   "guard_wall_ns": 9238965813,
+   "CPU_ns": 9049282000,
+   "charged_group_peak_bytes": 1360068608,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-088",
+   "target": "Holonics.Compression.Core.Cost",
+   "exit": 0,
+   "guard_wall_ns": 15312940972,
+   "CPU_ns": 15121649000,
+   "charged_group_peak_bytes": 925999104,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-089",
+   "target": "Holonics.HNN.Normal",
+   "exit": 0,
+   "guard_wall_ns": 15370168535,
+   "CPU_ns": 14991391000,
+   "charged_group_peak_bytes": 907333632,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-090",
+   "target": "Holonics.Foundation.RelationLadder",
+   "exit": 0,
+   "guard_wall_ns": 9710583611,
+   "CPU_ns": 9539308000,
+   "charged_group_peak_bytes": 1046368256,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-091",
+   "target": "Holonics.Foundation.ReceiverAtlas",
+   "exit": 0,
+   "guard_wall_ns": 8731108870,
+   "CPU_ns": 8604662000,
+   "charged_group_peak_bytes": 743686144,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-092",
+   "target": "Holonics.HNN.Moment",
+   "exit": 0,
+   "guard_wall_ns": 17699770368,
+   "CPU_ns": 17411843000,
+   "charged_group_peak_bytes": 1833431040,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-093",
+   "target": "HolonicsResearch.Foundation.PresentationCost",
+   "exit": 0,
+   "guard_wall_ns": 10245510841,
+   "CPU_ns": 10078901000,
+   "charged_group_peak_bytes": 810061824,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-094",
+   "target": "Holonics.Holarchy.Join",
+   "exit": 0,
+   "guard_wall_ns": 31467072797,
+   "CPU_ns": 31128639000,
+   "charged_group_peak_bytes": 944328704,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-095",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 8049162560,
+   "CPU_ns": 7872219000,
+   "charged_group_peak_bytes": 862461952,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-096",
+   "target": "HolonicsResearch.Geometry.CyclicGrover.FiniteCover",
+   "exit": 0,
+   "guard_wall_ns": 5808187704,
+   "CPU_ns": 5686719000,
+   "charged_group_peak_bytes": 545468416,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-097",
+   "target": "HolonicsResearch.Compression.Relabelling",
+   "exit": 0,
+   "guard_wall_ns": 7927461824,
+   "CPU_ns": 7756087000,
+   "charged_group_peak_bytes": 923340800,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-098",
+   "target": "HolonicsResearch.Hodge.HodgeAffineTetrahedronConeSource",
+   "exit": 0,
+   "guard_wall_ns": 11770792028,
+   "CPU_ns": 11567754000,
+   "charged_group_peak_bytes": 923648000,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-099",
+   "target": "HolonicsResearch.Foundation.ProductAugmentation",
+   "exit": 0,
+   "guard_wall_ns": 11126718251,
+   "CPU_ns": 10911128000,
+   "charged_group_peak_bytes": 1132048384,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-100",
+   "target": "Holonics.HNN.RangedMoment",
+   "exit": 0,
+   "guard_wall_ns": 9175991485,
+   "CPU_ns": 9026668000,
+   "charged_group_peak_bytes": 984178688,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-101",
+   "target": "HolonicsResearch.Landmarks",
+   "exit": 0,
+   "guard_wall_ns": 23461253329,
+   "CPU_ns": 22903636000,
+   "charged_group_peak_bytes": 4691496960,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-102",
+   "target": "Holonics.Aeon.Production",
+   "exit": 0,
+   "guard_wall_ns": 8280895357,
+   "CPU_ns": 8136771000,
+   "charged_group_peak_bytes": 963379200,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-103",
+   "target": "Holonics.Physics.ConductiveFluidReflection",
+   "exit": 0,
+   "guard_wall_ns": 8774924501,
+   "CPU_ns": 8634711000,
+   "charged_group_peak_bytes": 826826752,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-104",
+   "target": "Holonics.Objects.CommitRebase",
+   "exit": 0,
+   "guard_wall_ns": 8628182933,
+   "CPU_ns": 8483943000,
+   "charged_group_peak_bytes": 889888768,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-105",
+   "target": "Holonics.Physics.MechanicalReceiver",
+   "exit": 0,
+   "guard_wall_ns": 7538124863,
+   "CPU_ns": 7392306000,
+   "charged_group_peak_bytes": 731930624,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-106",
+   "target": "Holonics.Holon.Restriction",
+   "exit": 0,
+   "guard_wall_ns": 8462167409,
+   "CPU_ns": 8301140000,
+   "charged_group_peak_bytes": 851931136,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-107",
+   "target": "HolonicsResearch.Fluid.NavierStokesTailRelevance",
+   "exit": 0,
+   "guard_wall_ns": 9404353454,
+   "CPU_ns": 9225921000,
+   "charged_group_peak_bytes": 1128124416,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-108",
+   "target": "Holonics.Holon.Reaction",
+   "exit": 0,
+   "guard_wall_ns": 8757195790,
+   "CPU_ns": 8611373000,
+   "charged_group_peak_bytes": 716562432,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-109",
+   "target": "Holonics.HNN.Keys",
+   "exit": 0,
+   "guard_wall_ns": 13202393466,
+   "CPU_ns": 12903803000,
+   "charged_group_peak_bytes": 1726300160,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-110",
+   "target": "Holonics.Transport.HolonicChain",
+   "exit": 0,
+   "guard_wall_ns": 10339122018,
+   "CPU_ns": 10167582000,
+   "charged_group_peak_bytes": 876609536,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-111",
+   "target": "HolonicsResearch.Foundation.Bridge",
+   "exit": 0,
+   "guard_wall_ns": 15312496193,
+   "CPU_ns": 14947645000,
+   "charged_group_peak_bytes": 986644480,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-112",
+   "target": "Holonics.Compression.Core.Resonance",
+   "exit": 0,
+   "guard_wall_ns": 13150093656,
+   "CPU_ns": 12765810000,
+   "charged_group_peak_bytes": 1259208704,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-113",
+   "target": "HolonicsResearch.Foundation.DesignSelection",
+   "exit": 0,
+   "guard_wall_ns": 8500626647,
+   "CPU_ns": 8210265000,
+   "charged_group_peak_bytes": 815452160,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-114",
+   "target": "Holonics.Objects.Ratio",
+   "exit": 0,
+   "guard_wall_ns": 13666443249,
+   "CPU_ns": 13343995000,
+   "charged_group_peak_bytes": 783310848,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-115",
+   "target": "Holonics.HNN.IndexedOpen",
+   "exit": 0,
+   "guard_wall_ns": 16075022171,
+   "CPU_ns": 15720878000,
+   "charged_group_peak_bytes": 1072750592,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-116",
+   "target": "Holonics.Transport.ContinuingTube",
+   "exit": 0,
+   "guard_wall_ns": 9462341399,
+   "CPU_ns": 9307900000,
+   "charged_group_peak_bytes": 882282496,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-117",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 8341653174,
+   "CPU_ns": 8181255000,
+   "charged_group_peak_bytes": 858943488,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-118",
+   "target": "HolonicsResearch.Geometry.CyclicGrover.TowerCover",
+   "exit": 0,
+   "guard_wall_ns": 7284355154,
+   "CPU_ns": 7065595000,
+   "charged_group_peak_bytes": 1423495168,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-119",
+   "target": "HolonicsResearch.Hodge.HodgeAffineDegreeThreeReception",
+   "exit": 0,
+   "guard_wall_ns": 10581302154,
+   "CPU_ns": 10348730000,
+   "charged_group_peak_bytes": 1703895040,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-120",
+   "target": "Holonics.HNN.LeakyCapacity",
+   "exit": 0,
+   "guard_wall_ns": 8815251122,
+   "CPU_ns": 8649249000,
+   "charged_group_peak_bytes": 984002560,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-121",
+   "target": "HolonicsResearch.Foundation.ProductEdgeContraction",
+   "exit": 0,
+   "guard_wall_ns": 8989981732,
+   "CPU_ns": 8838384000,
+   "charged_group_peak_bytes": 805036032,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-122",
+   "target": "Holonics.Aeon",
+   "exit": 0,
+   "guard_wall_ns": 8143203920,
+   "CPU_ns": 7971135000,
+   "charged_group_peak_bytes": 1065013248,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-123",
+   "target": "Holonics.Compression.Core",
+   "exit": 0,
+   "guard_wall_ns": 8205013976,
+   "CPU_ns": 8029646000,
+   "charged_group_peak_bytes": 991899648,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-124",
+   "target": "HolonicsResearch.Fluid.NavierStokesTailBoundedControl",
+   "exit": 0,
+   "guard_wall_ns": 9346584776,
+   "CPU_ns": 9173891000,
+   "charged_group_peak_bytes": 1250152448,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-125",
+   "target": "HolonicsResearch.Fluid.NavierStokesShellStepCost",
+   "exit": 0,
+   "guard_wall_ns": 9747853463,
+   "CPU_ns": 9574212000,
+   "charged_group_peak_bytes": 1048678400,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-126",
+   "target": "Holonics.Holarchy.Receipt",
+   "exit": 0,
+   "guard_wall_ns": 8415666583,
+   "CPU_ns": 8267056000,
+   "charged_group_peak_bytes": 750391296,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-127",
+   "target": "Holonics.HNN.Encoding",
+   "exit": 0,
+   "guard_wall_ns": 25500310381,
+   "CPU_ns": 24903376000,
+   "charged_group_peak_bytes": 6417895424,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-128",
+   "target": "Holonics.Objects.RatioBlock",
+   "exit": 0,
+   "guard_wall_ns": 11490014822,
+   "CPU_ns": 11327895000,
+   "charged_group_peak_bytes": 941940736,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-129",
+   "target": "HolonicsResearch.Foundation.EvaluationDiscipline",
+   "exit": 0,
+   "guard_wall_ns": 7063805336,
+   "CPU_ns": 6953963000,
+   "charged_group_peak_bytes": 763568128,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-130",
+   "target": "Holonics.Holon.Cayley",
+   "exit": 0,
+   "guard_wall_ns": 13170832589,
+   "CPU_ns": 13011640000,
+   "charged_group_peak_bytes": 863891456,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-131",
+   "target": "Holonics.Physics.Fluid.Singularity",
+   "exit": 0,
+   "guard_wall_ns": 10877539349,
+   "CPU_ns": 10709482000,
+   "charged_group_peak_bytes": 884723712,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-132",
+   "target": "Holonics.Objects.RatioPhase",
+   "exit": 0,
+   "guard_wall_ns": 9652529993,
+   "CPU_ns": 9504341000,
+   "charged_group_peak_bytes": 753283072,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-133",
+   "target": "Holonics.Holarchy.View",
+   "exit": 0,
+   "guard_wall_ns": 10896445696,
+   "CPU_ns": 10678953000,
+   "charged_group_peak_bytes": 1067040768,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-134",
+   "target": "HolonicsResearch.Transport.ArtifactRelease",
+   "exit": 0,
+   "guard_wall_ns": 11679239150,
+   "CPU_ns": 11509865000,
+   "charged_group_peak_bytes": 797753344,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-135",
+   "target": "HolonicsResearch.Transport.Fold",
+   "exit": 0,
+   "guard_wall_ns": 14356083487,
+   "CPU_ns": 14166540000,
+   "charged_group_peak_bytes": 872636416,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-136",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 11251416401,
+   "CPU_ns": 10866374000,
+   "charged_group_peak_bytes": 902098944,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-137",
+   "target": "HolonicsResearch.Geometry.CyclicGrover.TraceComposition",
+   "exit": 0,
+   "guard_wall_ns": 11261689248,
+   "CPU_ns": 10860936000,
+   "charged_group_peak_bytes": 3193229312,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-138",
+   "target": "HolonicsResearch.Geometry.CyclicGrover.IntegralCoefficientCover",
+   "exit": 0,
+   "guard_wall_ns": 8860372469,
+   "CPU_ns": 8453648000,
+   "charged_group_peak_bytes": 1302294528,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-139",
+   "target": "HolonicsResearch.Geometry.CyclicGrover.ResidueChart",
+   "exit": 0,
+   "guard_wall_ns": 10175397182,
+   "CPU_ns": 9727250000,
+   "charged_group_peak_bytes": 2890469376,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-140",
+   "target": "Holonics.HNN.ReframedMoment",
+   "exit": 0,
+   "guard_wall_ns": 14269994378,
+   "CPU_ns": 13733001000,
+   "charged_group_peak_bytes": 3318423552,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-141",
+   "target": "HolonicsResearch.Hodge.HodgeAffineFourSourceBoundary",
+   "exit": 0,
+   "guard_wall_ns": 22199484201,
+   "CPU_ns": 21674536000,
+   "charged_group_peak_bytes": 2738200576,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-142",
+   "target": "HolonicsResearch.Foundation.ProductDegreeTwoNormalization",
+   "exit": 0,
+   "guard_wall_ns": 16178555655,
+   "CPU_ns": 15791958000,
+   "charged_group_peak_bytes": 1013370880,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-143",
+   "target": "HolonicsResearch.Transport.ForestRestriction",
+   "exit": 0,
+   "guard_wall_ns": 9384045458,
+   "CPU_ns": 9233174000,
+   "charged_group_peak_bytes": 842436608,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-144",
+   "target": "HolonicsResearch.Fluid.NavierStokesFrontierFeed",
+   "exit": 0,
+   "guard_wall_ns": 9745748022,
+   "CPU_ns": 9572471000,
+   "charged_group_peak_bytes": 1252622336,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-145",
+   "target": "Holonics.Framework.HolonObject",
+   "exit": 0,
+   "guard_wall_ns": 12950303779,
+   "CPU_ns": 12643491000,
+   "charged_group_peak_bytes": 3063992320,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-146",
+   "target": "HolonicsResearch.Fluid.NavierStokesBandCoherence",
+   "exit": 0,
+   "guard_wall_ns": 13536335091,
+   "CPU_ns": 13215968000,
+   "charged_group_peak_bytes": 3383869440,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-147",
+   "target": "HolonicsResearch.Fluid.NavierStokesModalRiccati",
+   "exit": 0,
+   "guard_wall_ns": 11470617313,
+   "CPU_ns": 11248647000,
+   "charged_group_peak_bytes": 1878487040,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-148",
+   "target": "Holonics.Physics.Information.PortWork",
+   "exit": 0,
+   "guard_wall_ns": 12387856851,
+   "CPU_ns": 12101803000,
+   "charged_group_peak_bytes": 2238484480,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-149",
+   "target": "Holonics.Physics.Fluid.Cells",
+   "exit": 0,
+   "guard_wall_ns": 11612954942,
+   "CPU_ns": 11437619000,
+   "charged_group_peak_bytes": 956772352,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-150",
+   "target": "Holonics.Holarchy.Reception",
+   "exit": 0,
+   "guard_wall_ns": 12074717827,
+   "CPU_ns": 11920678000,
+   "charged_group_peak_bytes": 849141760,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-151",
+   "target": "Holonics.Holarchy.Globe",
+   "exit": 0,
+   "guard_wall_ns": 10091704705,
+   "CPU_ns": 9937852000,
+   "charged_group_peak_bytes": 892493824,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-152",
+   "target": "Holonics.HNN.Ratio",
+   "exit": 0,
+   "guard_wall_ns": 11674631298,
+   "CPU_ns": 11515441000,
+   "charged_group_peak_bytes": 802426880,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-153",
+   "target": "Holonics.HNN.Propagation",
+   "exit": 0,
+   "guard_wall_ns": 25043359776,
+   "CPU_ns": 24649443000,
+   "charged_group_peak_bytes": 2675519488,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-154",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 8589452527,
+   "CPU_ns": 8412879000,
+   "charged_group_peak_bytes": 838688768,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-155",
+   "target": "HolonicsResearch.Geometry.CyclicGrover.OwnerPolynomial",
+   "exit": 0,
+   "guard_wall_ns": 7946088288,
+   "CPU_ns": 7752307000,
+   "charged_group_peak_bytes": 1742221312,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-156",
+   "target": "HolonicsResearch.Geometry.CyclicGrover.OwnerChart",
+   "exit": 0,
+   "guard_wall_ns": 6249031634,
+   "CPU_ns": 6114845000,
+   "charged_group_peak_bytes": 1024802816,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-157",
+   "target": "HolonicsResearch.Hodge.HodgeAffineFourReception",
+   "exit": 0,
+   "guard_wall_ns": 11769622416,
+   "CPU_ns": 11508040000,
+   "charged_group_peak_bytes": 1855574016,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-158",
+   "target": "Holonics.HNN.Ratio.Resolution",
+   "exit": 0,
+   "guard_wall_ns": 27368195845,
+   "CPU_ns": 26899456000,
+   "charged_group_peak_bytes": 1704587264,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-159",
+   "target": "Holonics.Physics.Information",
+   "exit": 0,
+   "guard_wall_ns": 9339967589,
+   "CPU_ns": 9026020000,
+   "charged_group_peak_bytes": 1390620672,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-160",
+   "target": "HolonicsResearch.Fluid.NavierStokesModeLagrange",
+   "exit": 0,
+   "guard_wall_ns": 11027671426,
+   "CPU_ns": 10661806000,
+   "charged_group_peak_bytes": 1721282560,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-161",
+   "target": "HolonicsResearch.Fluid.NavierStokesModalArc",
+   "exit": 0,
+   "guard_wall_ns": 9703610261,
+   "CPU_ns": 9439015000,
+   "charged_group_peak_bytes": 1312178176,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-162",
+   "target": "HolonicsResearch.Fluid.NavierStokesBandBarycenter",
+   "exit": 0,
+   "guard_wall_ns": 8805943582,
+   "CPU_ns": 8582276000,
+   "charged_group_peak_bytes": 870170624,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-163",
+   "target": "Holonics.Physics.Spacetime.Einstein",
+   "exit": 0,
+   "guard_wall_ns": 8112141775,
+   "CPU_ns": 7893599000,
+   "charged_group_peak_bytes": 895479808,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-164",
+   "target": "HolonicsResearch.Fluid.NavierStokesModalGronwall",
+   "exit": 0,
+   "guard_wall_ns": 11608365814,
+   "CPU_ns": 11313418000,
+   "charged_group_peak_bytes": 795385856,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-165",
+   "target": "Holonics.HNN.StandingRead",
+   "exit": 0,
+   "guard_wall_ns": 9247453928,
+   "CPU_ns": 8973876000,
+   "charged_group_peak_bytes": 830828544,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-166",
+   "target": "Holonics.Holarchy.Hearing",
+   "exit": 0,
+   "guard_wall_ns": 11185202645,
+   "CPU_ns": 10942775000,
+   "charged_group_peak_bytes": 1623248896,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-167",
+   "target": "Holonics.Physics.Fluid.Body",
+   "exit": 0,
+   "guard_wall_ns": 10708383371,
+   "CPU_ns": 10538300000,
+   "charged_group_peak_bytes": 1058222080,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-168",
+   "target": "HolonicsResearch.Foundation.ProductDegreeTwo",
+   "exit": 0,
+   "guard_wall_ns": 10618403675,
+   "CPU_ns": 10462684000,
+   "charged_group_peak_bytes": 707559424,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-169",
+   "target": "Holonics.Physics.Fluid.ControlVolume",
+   "exit": 0,
+   "guard_wall_ns": 14722396836,
+   "CPU_ns": 14411854000,
+   "charged_group_peak_bytes": 2314481664,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-170",
+   "target": "Holonics.HNN.Word",
+   "exit": 0,
+   "guard_wall_ns": 29075161857,
+   "CPU_ns": 28570513000,
+   "charged_group_peak_bytes": 2282311680,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-171",
+   "target": "Holonics.HNN.Retention",
+   "exit": 0,
+   "guard_wall_ns": 19310566887,
+   "CPU_ns": 18764289000,
+   "charged_group_peak_bytes": 2162925568,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-172",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 10027083135,
+   "CPU_ns": 9796434000,
+   "charged_group_peak_bytes": 748457984,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-173",
+   "target": "HolonicsResearch.Geometry.CyclicGrover.OwnerJoin",
+   "exit": 0,
+   "guard_wall_ns": 6707919615,
+   "CPU_ns": 6477041000,
+   "charged_group_peak_bytes": 1126948864,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-174",
+   "target": "HolonicsResearch.Hodge.HodgeAffineFourResidualSource",
+   "exit": 0,
+   "guard_wall_ns": 10461059085,
+   "CPU_ns": 10246944000,
+   "charged_group_peak_bytes": 1296445440,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-175",
+   "target": "Holonics.HNN.TickBlocks",
+   "exit": 0,
+   "guard_wall_ns": 19009769881,
+   "CPU_ns": 18642150000,
+   "charged_group_peak_bytes": 3663224832,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-176",
+   "target": "Holonics.HNN.CarriedStanding",
+   "exit": 0,
+   "guard_wall_ns": 11274066367,
+   "CPU_ns": 11132791000,
+   "charged_group_peak_bytes": 1083150336,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-177",
+   "target": "Holonics.HNN.Ratio.Certificate",
+   "exit": 0,
+   "guard_wall_ns": 16263249890,
+   "CPU_ns": 16083844000,
+   "charged_group_peak_bytes": 978956288,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-178",
+   "target": "Holonics.Physics.Fluid",
+   "exit": 0,
+   "guard_wall_ns": 7597244658,
+   "CPU_ns": 7460502000,
+   "charged_group_peak_bytes": 979820544,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-179",
+   "target": "HolonicsResearch.Fluid.NavierStokesHalfRadiusReach",
+   "exit": 0,
+   "guard_wall_ns": 8721267056,
+   "CPU_ns": 8566150000,
+   "charged_group_peak_bytes": 1082982400,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-180",
+   "target": "Holonics.Holarchy",
+   "exit": 0,
+   "guard_wall_ns": 9214918720,
+   "CPU_ns": 9031390000,
+   "charged_group_peak_bytes": 1514831872,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-181",
+   "target": "Holonics.Physics.Thermal.ViscousPort",
+   "exit": 0,
+   "guard_wall_ns": 7831146091,
+   "CPU_ns": 7713854000,
+   "charged_group_peak_bytes": 833912832,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-182",
+   "target": "Holonics.Physics.Spacetime.StressEnergy",
+   "exit": 0,
+   "guard_wall_ns": 12025675224,
+   "CPU_ns": 11881326000,
+   "charged_group_peak_bytes": 1013542912,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-183",
+   "target": "Holonics.HNN.LatticeDeposit",
+   "exit": 0,
+   "guard_wall_ns": 12373455461,
+   "CPU_ns": 12235210000,
+   "charged_group_peak_bytes": 906858496,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-184",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 7285881208,
+   "CPU_ns": 7150156000,
+   "charged_group_peak_bytes": 855363584,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-185",
+   "target": "HolonicsResearch.Hodge.HodgeAffineFourConeSource",
+   "exit": 0,
+   "guard_wall_ns": 9342400645,
+   "CPU_ns": 9204890000,
+   "charged_group_peak_bytes": 950026240,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-186",
+   "target": "Holonics.HNN.LatticeDeposit.Rebase",
+   "exit": 0,
+   "guard_wall_ns": 10720992890,
+   "CPU_ns": 10520159000,
+   "charged_group_peak_bytes": 1443471360,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-187",
+   "target": "Holonics.HNN.FiniteDecrease",
+   "exit": 0,
+   "guard_wall_ns": 8584856720,
+   "CPU_ns": 8452271000,
+   "charged_group_peak_bytes": 937811968,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-188",
+   "target": "Holonics.HNN.TickFamily",
+   "exit": 0,
+   "guard_wall_ns": 8669953951,
+   "CPU_ns": 8532351000,
+   "charged_group_peak_bytes": 921600000,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-189",
+   "target": "Holonics.HNN.LatticeDeposit.Freeze",
+   "exit": 0,
+   "guard_wall_ns": 11800063037,
+   "CPU_ns": 11661242000,
+   "charged_group_peak_bytes": 893112320,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-190",
+   "target": "Holonics.HNN.ReceivingPrior",
+   "exit": 0,
+   "guard_wall_ns": 15265356885,
+   "CPU_ns": 15095500000,
+   "charged_group_peak_bytes": 983212032,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-191",
+   "target": "Holonics.HNN.LocusMap",
+   "exit": 0,
+   "guard_wall_ns": 14868296953,
+   "CPU_ns": 14647190000,
+   "charged_group_peak_bytes": 1500131328,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-192",
+   "target": "Holonics.Physics.Thermal",
+   "exit": 0,
+   "guard_wall_ns": 7742642922,
+   "CPU_ns": 7600247000,
+   "charged_group_peak_bytes": 915288064,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-193",
+   "target": "Holonics.Physics.Spacetime",
+   "exit": 0,
+   "guard_wall_ns": 7849494652,
+   "CPU_ns": 7704192000,
+   "charged_group_peak_bytes": 972947456,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-194",
+   "target": "HolonicsResearch.Fluid.NavierStokesTailGronwall",
+   "exit": 0,
+   "guard_wall_ns": 10756720405,
+   "CPU_ns": 10574549000,
+   "charged_group_peak_bytes": 1243987968,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-195",
+   "target": "HolonicsResearch.Fluid.NavierStokesWeightedTailEnergy",
+   "exit": 0,
+   "guard_wall_ns": 10710036105,
+   "CPU_ns": 10553823000,
+   "charged_group_peak_bytes": 1032425472,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-196",
+   "target": "HolonicsResearch.Foundation.IwasawaTower",
+   "exit": 0,
+   "guard_wall_ns": 16872497675,
+   "CPU_ns": 16662315000,
+   "charged_group_peak_bytes": 1531801600,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-197",
+   "target": "Holonics.HNN.LatticeWord",
+   "exit": 0,
+   "guard_wall_ns": 19225304458,
+   "CPU_ns": 19031944000,
+   "charged_group_peak_bytes": 1153298432,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-198",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 8231731776,
+   "CPU_ns": 8087187000,
+   "charged_group_peak_bytes": 753500160,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-199",
+   "target": "Holonics.HNN.PairedDeposit",
+   "exit": 0,
+   "guard_wall_ns": 14363592530,
+   "CPU_ns": 14024743000,
+   "charged_group_peak_bytes": 3306258432,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-200",
+   "target": "Holonics.HNN.StorageResolution",
+   "exit": 0,
+   "guard_wall_ns": 12338198870,
+   "CPU_ns": 12096495000,
+   "charged_group_peak_bytes": 2582261760,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-201",
+   "target": "Holonics.HNN.ChartResidual",
+   "exit": 0,
+   "guard_wall_ns": 12912762771,
+   "CPU_ns": 12657614000,
+   "charged_group_peak_bytes": 2729070592,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-202",
+   "target": "Holonics.HNN.PriorCarry",
+   "exit": 0,
+   "guard_wall_ns": 15795352085,
+   "CPU_ns": 15499053000,
+   "charged_group_peak_bytes": 2589683712,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-203",
+   "target": "Holonics.HNN.CarriedMotion",
+   "exit": 0,
+   "guard_wall_ns": 14265403987,
+   "CPU_ns": 14020875000,
+   "charged_group_peak_bytes": 2570076160,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-204",
+   "target": "Holonics.HNN.TickStanding",
+   "exit": 0,
+   "guard_wall_ns": 15303090285,
+   "CPU_ns": 15055995000,
+   "charged_group_peak_bytes": 2524401664,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-205",
+   "target": "HolonicsResearch.Fluid.NavierStokesIncoherentBandMass",
+   "exit": 0,
+   "guard_wall_ns": 15678055235,
+   "CPU_ns": 15383284000,
+   "charged_group_peak_bytes": 2872004608,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-206",
+   "target": "HolonicsResearch.Hodge.HodgeBarycentricAffineSourceComplex",
+   "exit": 0,
+   "guard_wall_ns": 12699377688,
+   "CPU_ns": 12449096000,
+   "charged_group_peak_bytes": 2461102080,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-207",
+   "target": "Holonics.HNN.TargetFace",
+   "exit": 0,
+   "guard_wall_ns": 17301723590,
+   "CPU_ns": 17026194000,
+   "charged_group_peak_bytes": 2551812096,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-208",
+   "target": "Holonics.HNN.Ring",
+   "exit": 0,
+   "guard_wall_ns": 19707284980,
+   "CPU_ns": 19312771000,
+   "charged_group_peak_bytes": 2455244800,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-209",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 11731267635,
+   "CPU_ns": 11298240000,
+   "charged_group_peak_bytes": 1321144320,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-210",
+   "target": "Holonics.HNN.MovedChart",
+   "exit": 0,
+   "guard_wall_ns": 19189658935,
+   "CPU_ns": 18622007000,
+   "charged_group_peak_bytes": 4906360832,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-211",
+   "target": "Holonics.HNN.PriorMove",
+   "exit": 0,
+   "guard_wall_ns": 15818854448,
+   "CPU_ns": 15495970000,
+   "charged_group_peak_bytes": 4012548096,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-212",
+   "target": "Holonics.HNN.DepositHold",
+   "exit": 0,
+   "guard_wall_ns": 14305069188,
+   "CPU_ns": 14078034000,
+   "charged_group_peak_bytes": 2277519360,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-213",
+   "target": "Holonics.HNN.LoadedRing",
+   "exit": 0,
+   "guard_wall_ns": 13431150160,
+   "CPU_ns": 13225764000,
+   "charged_group_peak_bytes": 2117206016,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-214",
+   "target": "Holonics.HNN.ChainedBalance",
+   "exit": 0,
+   "guard_wall_ns": 13744061417,
+   "CPU_ns": 13536603000,
+   "charged_group_peak_bytes": 1370353664,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-215",
+   "target": "Holonics.HNN.MediumStanding",
+   "exit": 0,
+   "guard_wall_ns": 15466172462,
+   "CPU_ns": 15289349000,
+   "charged_group_peak_bytes": 902725632,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-216",
+   "target": "HolonicsResearch.Hodge.HodgeIteratedBarycentricHomology",
+   "exit": 0,
+   "guard_wall_ns": 8865937768,
+   "CPU_ns": 8757727000,
+   "charged_group_peak_bytes": 985104384,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-217",
+   "target": "HolonicsResearch.Fluid.NavierStokesFourthMomentRiccati",
+   "exit": 0,
+   "guard_wall_ns": 15659045241,
+   "CPU_ns": 15372613000,
+   "charged_group_peak_bytes": 2796974080,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-218",
+   "target": "Holonics.HNN.Floquet",
+   "exit": 0,
+   "guard_wall_ns": 15477249421,
+   "CPU_ns": 15227082000,
+   "charged_group_peak_bytes": 2392715264,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-219",
+   "target": "Holonics.HNN.Contact",
+   "exit": 0,
+   "guard_wall_ns": 16418521955,
+   "CPU_ns": 16251151000,
+   "charged_group_peak_bytes": 1119768576,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-220",
+   "target": "Holonics.HNN.RegionCounts",
+   "exit": 0,
+   "guard_wall_ns": 14504187828,
+   "CPU_ns": 14358146000,
+   "charged_group_peak_bytes": 965648384,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-221",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 12041336616,
+   "CPU_ns": 11812525000,
+   "charged_group_peak_bytes": 1423622144,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-222",
+   "target": "Holonics.HNN.HeldCommits",
+   "exit": 0,
+   "guard_wall_ns": 18071724618,
+   "CPU_ns": 17544857000,
+   "charged_group_peak_bytes": 4734582784,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-223",
+   "target": "Holonics.HNN.PumpCarry",
+   "exit": 0,
+   "guard_wall_ns": 11633393136,
+   "CPU_ns": 11433521000,
+   "charged_group_peak_bytes": 2375450624,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-224",
+   "target": "Holonics.HNN.FactoredMedium",
+   "exit": 0,
+   "guard_wall_ns": 20769588142,
+   "CPU_ns": 20561614000,
+   "charged_group_peak_bytes": 1103540224,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-225",
+   "target": "HolonicsResearch.Hodge.HodgeRefinedCycleCarrier",
+   "exit": 0,
+   "guard_wall_ns": 9264258883,
+   "CPU_ns": 9119118000,
+   "charged_group_peak_bytes": 1133993984,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-226",
+   "target": "Holonics.HNN.ContactBreak",
+   "exit": 0,
+   "guard_wall_ns": 8796384300,
+   "CPU_ns": 8670408000,
+   "charged_group_peak_bytes": 974331904,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-227",
+   "target": "HolonicsResearch.Fluid.NavierStokesMomentSwap",
+   "exit": 0,
+   "guard_wall_ns": 11714411845,
+   "CPU_ns": 11530982000,
+   "charged_group_peak_bytes": 1432805376,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-228",
+   "target": "Holonics.HNN.FloquetPassage",
+   "exit": 0,
+   "guard_wall_ns": 12080798535,
+   "CPU_ns": 11912418000,
+   "charged_group_peak_bytes": 1205932032,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-229",
+   "target": "HolonicsResearch.Mathematics.ArithmeticContract",
+   "exit": 0,
+   "guard_wall_ns": 12329195013,
+   "CPU_ns": 12180250000,
+   "charged_group_peak_bytes": 898347008,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-230",
+   "target": "Holonics.Compression.Landmark.Context.Tree",
+   "exit": 0,
+   "guard_wall_ns": 38087800295,
+   "CPU_ns": 37722915000,
+   "charged_group_peak_bytes": 2106372096,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-231",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 12099635578,
+   "CPU_ns": 11792423000,
+   "charged_group_peak_bytes": 1682219008,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-232",
+   "target": "Holonics.Compression.Landmark.Context.BinaryLog",
+   "exit": 0,
+   "guard_wall_ns": 27617367564,
+   "CPU_ns": 27132368000,
+   "charged_group_peak_bytes": 4721303552,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-233",
+   "target": "Holonics.HNN.RingLoci",
+   "exit": 0,
+   "guard_wall_ns": 27370675666,
+   "CPU_ns": 27005866000,
+   "charged_group_peak_bytes": 1716969472,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-234",
+   "target": "Holonics.Compression.Landmark.Context.Drift",
+   "exit": 0,
+   "guard_wall_ns": 19036345424,
+   "CPU_ns": 18685057000,
+   "charged_group_peak_bytes": 2394877952,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-235",
+   "target": "Holonics.Compression.Landmark.Context.PriorMass",
+   "exit": 0,
+   "guard_wall_ns": 23723562214,
+   "CPU_ns": 23319054000,
+   "charged_group_peak_bytes": 2891177984,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-236",
+   "target": "HolonicsResearch.Hodge.HodgeRefinedTriangleClosedStar",
+   "exit": 0,
+   "guard_wall_ns": 9697101658,
+   "CPU_ns": 9504416000,
+   "charged_group_peak_bytes": 1101656064,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-237",
+   "target": "Holonics.Compression.Landmark.Context.Carrier",
+   "exit": 0,
+   "guard_wall_ns": 21237475107,
+   "CPU_ns": 20848856000,
+   "charged_group_peak_bytes": 3397201920,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-238",
+   "target": "Holonics.Compression.Landmark.Context.Standing",
+   "exit": 0,
+   "guard_wall_ns": 13662382830,
+   "CPU_ns": 13162256000,
+   "charged_group_peak_bytes": 2936135680,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-239",
+   "target": "Holonics.HNN.BankFace",
+   "exit": 0,
+   "guard_wall_ns": 24775543003,
+   "CPU_ns": 24214204000,
+   "charged_group_peak_bytes": 3565719552,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-240",
+   "target": "HolonicsResearch.Fluid.NavierStokesMomentGap",
+   "exit": 0,
+   "guard_wall_ns": 17286929358,
+   "CPU_ns": 16827970000,
+   "charged_group_peak_bytes": 2521640960,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-241",
+   "target": "Holonics.HNN.BornFace",
+   "exit": 0,
+   "guard_wall_ns": 15613081407,
+   "CPU_ns": 15190853000,
+   "charged_group_peak_bytes": 2308157440,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-242",
+   "target": "Holonics.Compression.Landmark.Context.Address",
+   "exit": 0,
+   "guard_wall_ns": 10537239448,
+   "CPU_ns": 10281770000,
+   "charged_group_peak_bytes": 839417856,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-243",
+   "target": "Holonics.Compression.Landmark.Context.LocalWeighing",
+   "exit": 0,
+   "guard_wall_ns": 20716279575,
+   "CPU_ns": 20305185000,
+   "charged_group_peak_bytes": 3963809792,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-244",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 9262624350,
+   "CPU_ns": 9117193000,
+   "charged_group_peak_bytes": 892723200,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-245",
+   "target": "Holonics.HNN.WordDiamond",
+   "exit": 0,
+   "guard_wall_ns": 12982694303,
+   "CPU_ns": 12727874000,
+   "charged_group_peak_bytes": 3255824384,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-246",
+   "target": "Holonics.Compression.Landmark.Context.JoinDrift",
+   "exit": 0,
+   "guard_wall_ns": 16625630896,
+   "CPU_ns": 16316220000,
+   "charged_group_peak_bytes": 3445391360,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-247",
+   "target": "Holonics.HNN.LoadedMedium",
+   "exit": 0,
+   "guard_wall_ns": 24435674772,
+   "CPU_ns": 24037013000,
+   "charged_group_peak_bytes": 4157227008,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-248",
+   "target": "Holonics.Compression.Landmark.Context.StoredDrift",
+   "exit": 0,
+   "guard_wall_ns": 16727023216,
+   "CPU_ns": 16431904000,
+   "charged_group_peak_bytes": 1453481984,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-249",
+   "target": "Holonics.Compression.Landmark.Context.BaseMeasure",
+   "exit": 0,
+   "guard_wall_ns": 22657536401,
+   "CPU_ns": 22300796000,
+   "charged_group_peak_bytes": 3056549888,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-250",
+   "target": "HolonicsResearch.Hodge.HodgeTetrahedralBoundaryCoordinates",
+   "exit": 0,
+   "guard_wall_ns": 12724512654,
+   "CPU_ns": 12452265000,
+   "charged_group_peak_bytes": 2585567232,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-251",
+   "target": "HolonicsResearch.Fluid.NavierStokesYoungFeed",
+   "exit": 0,
+   "guard_wall_ns": 15452397200,
+   "CPU_ns": 15139872000,
+   "charged_group_peak_bytes": 2888577024,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-252",
+   "target": "Holonics.Compression.Landmark.Context.ConvergenceFounding",
+   "exit": 0,
+   "guard_wall_ns": 17118649730,
+   "CPU_ns": 16617125000,
+   "charged_group_peak_bytes": 2625392640,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-253",
+   "target": "Holonics.Compression.Landmark.Context.Population",
+   "exit": 0,
+   "guard_wall_ns": 19108041879,
+   "CPU_ns": 18636979000,
+   "charged_group_peak_bytes": 2356457472,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-254",
+   "target": "Holonics.HNN.ExecutedComparison",
+   "exit": 0,
+   "guard_wall_ns": 26836280042,
+   "CPU_ns": 26322417000,
+   "charged_group_peak_bytes": 2569883648,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-255",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 9387826475,
+   "CPU_ns": 9186164000,
+   "charged_group_peak_bytes": 773124096,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-256",
+   "target": "Holonics.HNN.LoadedMotion",
+   "exit": 0,
+   "guard_wall_ns": 12862591029,
+   "CPU_ns": 12580821000,
+   "charged_group_peak_bytes": 2120192000,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-257",
+   "target": "Holonics.HNN.JointStep",
+   "exit": 0,
+   "guard_wall_ns": 25796034281,
+   "CPU_ns": 25329365000,
+   "charged_group_peak_bytes": 1683263488,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-258",
+   "target": "HolonicsResearch.Fluid.NavierStokesYoungTsum",
+   "exit": 0,
+   "guard_wall_ns": 11829925696,
+   "CPU_ns": 11512767000,
+   "charged_group_peak_bytes": 1921228800,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-259",
+   "target": "HolonicsResearch.Hodge.HodgeTetrahedralBoundaryRadial",
+   "exit": 0,
+   "guard_wall_ns": 14958497819,
+   "CPU_ns": 14628440000,
+   "charged_group_peak_bytes": 2967056384,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-260",
+   "target": "Holonics.Foundation.Unicity",
+   "exit": 0,
+   "guard_wall_ns": 11303908502,
+   "CPU_ns": 11099003000,
+   "charged_group_peak_bytes": 1256923136,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-261",
+   "target": "Holonics.Compression.Landmark.Context.Composition",
+   "exit": 0,
+   "guard_wall_ns": 9157935005,
+   "CPU_ns": 8998511000,
+   "charged_group_peak_bytes": 888492032,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-262",
+   "target": "Holonics.Compression.Landmark.Context.Dormancy",
+   "exit": 0,
+   "guard_wall_ns": 18427016155,
+   "CPU_ns": 18101029000,
+   "charged_group_peak_bytes": 2927177728,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-263",
+   "target": "Holonics.Compression.Landmark.Context.Evolution",
+   "exit": 0,
+   "guard_wall_ns": 14013845081,
+   "CPU_ns": 13846823000,
+   "charged_group_peak_bytes": 987234304,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-264",
+   "target": "Holonics.Compression.Landmark.Context.Compaction",
+   "exit": 0,
+   "guard_wall_ns": 16728739527,
+   "CPU_ns": 16520572000,
+   "charged_group_peak_bytes": 884994048,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-265",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 8479543823,
+   "CPU_ns": 8338114000,
+   "charged_group_peak_bytes": 749735936,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-266",
+   "target": "Holonics.Compression.Landmark.Context.StoredInstance",
+   "exit": 0,
+   "guard_wall_ns": 13152998449,
+   "CPU_ns": 12970265000,
+   "charged_group_peak_bytes": 1064255488,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-267",
+   "target": "Holonics.HNN.LocusStatistics",
+   "exit": 0,
+   "guard_wall_ns": 18598293302,
+   "CPU_ns": 18364872000,
+   "charged_group_peak_bytes": 1005248512,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-268",
+   "target": "Holonics.Framework.Core",
+   "exit": 0,
+   "guard_wall_ns": 13306616056,
+   "CPU_ns": 12986241000,
+   "charged_group_peak_bytes": 2080432128,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-269",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 11605201007,
+   "CPU_ns": 11225893000,
+   "charged_group_peak_bytes": 1489702912,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-270",
+   "target": "Holonics.Framework.Information",
+   "exit": 0,
+   "guard_wall_ns": 18101078725,
+   "CPU_ns": 16191088000,
+   "charged_group_peak_bytes": 5123133440,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-271",
+   "target": "Holonics.Framework.Geometry",
+   "exit": 0,
+   "guard_wall_ns": 12719831985,
+   "CPU_ns": 12339752000,
+   "charged_group_peak_bytes": 2790412288,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-272",
+   "target": "Holonics.Framework.Computation",
+   "exit": 0,
+   "guard_wall_ns": 22525305802,
+   "CPU_ns": 21882015000,
+   "charged_group_peak_bytes": 5667618816,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-273",
+   "target": "Holonics.Framework.Dynamics",
+   "exit": 0,
+   "guard_wall_ns": 20571057665,
+   "CPU_ns": 20067318000,
+   "charged_group_peak_bytes": 3084193792,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-274",
+   "target": "HolonicsResearch.Hodge.HodgeTetrahedralStarContraction",
+   "exit": 0,
+   "guard_wall_ns": 10594439660,
+   "CPU_ns": 10191790000,
+   "charged_group_peak_bytes": 1266348032,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-275",
+   "target": "HolonicsResearch.Fluid.NavierStokesWeightedYoung",
+   "exit": 0,
+   "guard_wall_ns": 16364777360,
+   "CPU_ns": 16053121000,
+   "charged_group_peak_bytes": 2963087360,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-276",
+   "target": "Holonics.Compression.Landmark.Context.Capacity",
+   "exit": 0,
+   "guard_wall_ns": 10531378983,
+   "CPU_ns": 10346916000,
+   "charged_group_peak_bytes": 1223380992,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-277",
+   "target": "Holonics.Compression.Landmark.Context.Merge",
+   "exit": 0,
+   "guard_wall_ns": 12827392273,
+   "CPU_ns": 12618556000,
+   "charged_group_peak_bytes": 1002979328,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-278",
+   "target": "Holonics.HNN",
+   "exit": 0,
+   "guard_wall_ns": 22211926174,
+   "CPU_ns": 21774113000,
+   "charged_group_peak_bytes": 4936556544,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-279",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 8359768329,
+   "CPU_ns": 8258684000,
+   "charged_group_peak_bytes": 718618624,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-280",
+   "target": "Holonics.Framework.Physics",
+   "exit": 0,
+   "guard_wall_ns": 22042471898,
+   "CPU_ns": 21583996000,
+   "charged_group_peak_bytes": 4568514560,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-281",
+   "target": "Holonics.Compression.Landmark.Context.Epoch",
+   "exit": 0,
+   "guard_wall_ns": 11249521044,
+   "CPU_ns": 11091747000,
+   "charged_group_peak_bytes": 997933056,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-282",
+   "target": "HolonicsResearch.Fluid.NavierStokesMomentInterpolation",
+   "exit": 0,
+   "guard_wall_ns": 10724631372,
+   "CPU_ns": 10546822000,
+   "charged_group_peak_bytes": 1015246848,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-283",
+   "target": "HolonicsResearch.Hodge.HodgeCommonStarAffineCarrier",
+   "exit": 0,
+   "guard_wall_ns": 10417124433,
+   "CPU_ns": 10279865000,
+   "charged_group_peak_bytes": 792424448,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-284",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 8670584479,
+   "CPU_ns": 8524361000,
+   "charged_group_peak_bytes": 800129024,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-285",
+   "target": "HolonicsResearch.Hodge.HodgeRefinedEdgeAffineCarrier",
+   "exit": 0,
+   "guard_wall_ns": 14023068374,
+   "CPU_ns": 13746152000,
+   "charged_group_peak_bytes": 2142978048,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-286",
+   "target": "HolonicsResearch.Hodge.HodgeRefinedTriangleAffineCarrier",
+   "exit": 0,
+   "guard_wall_ns": 12349285431,
+   "CPU_ns": 12121225000,
+   "charged_group_peak_bytes": 2508533760,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-287",
+   "target": "Holonics.Compression.Landmark.Context",
+   "exit": 0,
+   "guard_wall_ns": 9410529156,
+   "CPU_ns": 9266514000,
+   "charged_group_peak_bytes": 1287262208,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-288",
+   "target": "HolonicsResearch.Fluid.NavierStokesSixthYoung",
+   "exit": 0,
+   "guard_wall_ns": 20118831982,
+   "CPU_ns": 19666008000,
+   "charged_group_peak_bytes": 4404604928,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-289",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 10731915974,
+   "CPU_ns": 10520229000,
+   "charged_group_peak_bytes": 690089984,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-290",
+   "target": "Holonics.Compression.Landmark",
+   "exit": 0,
+   "guard_wall_ns": 24907371942,
+   "CPU_ns": 24135277000,
+   "charged_group_peak_bytes": 7130423296,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-291",
+   "target": "HolonicsResearch.Fluid.NavierStokesYoungRiccati",
+   "exit": 0,
+   "guard_wall_ns": 12838355912,
+   "CPU_ns": 12566669000,
+   "charged_group_peak_bytes": 3085664256,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-292",
+   "target": "HolonicsResearch.Hodge.HodgeTriangleHomotopyPrism",
+   "exit": 0,
+   "guard_wall_ns": 25675279559,
+   "CPU_ns": 25401653000,
+   "charged_group_peak_bytes": 1789812736,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-293",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 8494814381,
+   "CPU_ns": 8345118000,
+   "charged_group_peak_bytes": 757940224,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-294",
+   "target": "Holonics.Compression",
+   "exit": 0,
+   "guard_wall_ns": 25887939418,
+   "CPU_ns": 25299489000,
+   "charged_group_peak_bytes": 7470911488,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-295",
+   "target": "HolonicsResearch.Fluid.NavierStokesYoungClosure",
+   "exit": 0,
+   "guard_wall_ns": 10580069976,
+   "CPU_ns": 10434294000,
+   "charged_group_peak_bytes": 1018531840,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-296",
+   "target": "HolonicsResearch.Hodge.HodgeLabelEdgeCancellation",
+   "exit": 0,
+   "guard_wall_ns": 9981868103,
+   "CPU_ns": 9829495000,
+   "charged_group_peak_bytes": 1080766464,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-297",
+   "target": "HolonicsResearch.Hodge.HodgeSphereDegreeOneFilling",
+   "exit": 0,
+   "guard_wall_ns": 12316124942,
+   "CPU_ns": 12154962000,
+   "charged_group_peak_bytes": 1109143552,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-298",
+   "target": "HolonicsResearch.Hodge.HodgeLabelWordContraction",
+   "exit": 0,
+   "guard_wall_ns": 164639836584,
+   "CPU_ns": 163303083000,
+   "charged_group_peak_bytes": 4676190208,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-299",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 11365537803,
+   "CPU_ns": 11052379000,
+   "charged_group_peak_bytes": 1748987904,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-300",
+   "target": "Holonics.Framework.Objects",
+   "exit": 0,
+   "guard_wall_ns": 30814625416,
+   "CPU_ns": 29867343000,
+   "charged_group_peak_bytes": 8129134592,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-301",
+   "target": "HolonicsResearch.Hodge.HodgeCommonStarNormalization",
+   "exit": 0,
+   "guard_wall_ns": 13034651070,
+   "CPU_ns": 12616459000,
+   "charged_group_peak_bytes": 2339282944,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-302",
+   "target": "HolonicsResearch.Hodge.HodgeSphereChainCurrent",
+   "exit": 0,
+   "guard_wall_ns": 13010177684,
+   "CPU_ns": 12617341000,
+   "charged_group_peak_bytes": 2447245312,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-303",
+   "target": "HolonicsResearch.Fluid.NavierStokesMomentClosure",
+   "exit": 0,
+   "guard_wall_ns": 17109928462,
+   "CPU_ns": 16703300000,
+   "charged_group_peak_bytes": 2766467072,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-304",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 8786841294,
+   "CPU_ns": 8540459000,
+   "charged_group_peak_bytes": 808493056,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-305",
+   "target": "Holonics.Framework",
+   "exit": 0,
+   "guard_wall_ns": 26597053989,
+   "CPU_ns": 25838456000,
+   "charged_group_peak_bytes": 6393425920,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-306",
+   "target": "HolonicsResearch.Hodge.HodgeSphereHomologyEquivalence",
+   "exit": 0,
+   "guard_wall_ns": 13728934186,
+   "CPU_ns": 13361736000,
+   "charged_group_peak_bytes": 2494844928,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-307",
+   "target": "HolonicsResearch.Fluid.NavierStokesIncoherentSource",
+   "exit": 0,
+   "guard_wall_ns": 16718875721,
+   "CPU_ns": 16351657000,
+   "charged_group_peak_bytes": 2035826688,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-308",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": null,
+   "CPU_ns": 7783795000,
+   "charged_group_peak_bytes": 722104320,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-309",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 11354716613,
+   "CPU_ns": 11089588000,
+   "charged_group_peak_bytes": 1656733696,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-310",
+   "target": "HolonicsResearch.Hodge.HodgeTopologicalProductRealization",
+   "exit": 0,
+   "guard_wall_ns": 14892547318,
+   "CPU_ns": 14513161000,
+   "charged_group_peak_bytes": 4127985664,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-311",
+   "target": "HolonicsResearch.Fluid.NavierStokesShearAnsatz",
+   "exit": 0,
+   "guard_wall_ns": 15938411977,
+   "CPU_ns": 15536272000,
+   "charged_group_peak_bytes": 2035511296,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-312",
+   "target": "HolonicsResearch.Fluid.NavierStokesIncoherentClosure",
+   "exit": 0,
+   "guard_wall_ns": 22895632059,
+   "CPU_ns": 22487749000,
+   "charged_group_peak_bytes": 1490554880,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-313",
+   "target": "HolonicsResearch.Hodge.HodgeProjectiveLineRealization",
+   "exit": 0,
+   "guard_wall_ns": 16850893113,
+   "CPU_ns": 16574722000,
+   "charged_group_peak_bytes": 3025813504,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-314",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 8515096742,
+   "CPU_ns": 8392935000,
+   "charged_group_peak_bytes": 755208192,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-315",
+   "target": "HolonicsResearch.Hodge.HodgeTopologicalSingularCurrent",
+   "exit": 0,
+   "guard_wall_ns": 11441633220,
+   "CPU_ns": 11260851000,
+   "charged_group_peak_bytes": 1255403520,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-316",
+   "target": "HolonicsResearch.Fluid.NavierStokesVelocityMassEnergy",
+   "exit": 0,
+   "guard_wall_ns": 10718128059,
+   "CPU_ns": 10548725000,
+   "charged_group_peak_bytes": 1537122304,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-317",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 8272834610,
+   "CPU_ns": 8143794000,
+   "charged_group_peak_bytes": 713347072,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-318",
+   "target": "HolonicsResearch.Hodge.HodgeSphereProductCurrent",
+   "exit": 0,
+   "guard_wall_ns": 9924702315,
+   "CPU_ns": 9768436000,
+   "charged_group_peak_bytes": 1024630784,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-319",
+   "target": "HolonicsResearch.Fluid.NavierStokesEleventhMomentFromSmoothness",
+   "exit": 0,
+   "guard_wall_ns": 10274753979,
+   "CPU_ns": 10085917000,
+   "charged_group_peak_bytes": 1248317440,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-320",
+   "target": "HolonicsResearch.Fluid.NavierStokesCombBarycenterDefect",
+   "exit": 0,
+   "guard_wall_ns": 12507060994,
+   "CPU_ns": 12251988000,
+   "charged_group_peak_bytes": 1953959936,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-321",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 8255747857,
+   "CPU_ns": 8132581000,
+   "charged_group_peak_bytes": 799121408,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-322",
+   "target": "HolonicsResearch.Hodge.HodgeSphereProductReconstruction",
+   "exit": 0,
+   "guard_wall_ns": 10967065683,
+   "CPU_ns": 10799616000,
+   "charged_group_peak_bytes": 1289465856,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-323",
+   "target": "HolonicsResearch.Fluid.NavierStokesCombParticipation",
+   "exit": 0,
+   "guard_wall_ns": 10117752275,
+   "CPU_ns": 9950099000,
+   "charged_group_peak_bytes": 1292607488,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-324",
+   "target": "HolonicsResearch.Fluid.NavierStokesFourierKirchhoff",
+   "exit": 0,
+   "guard_wall_ns": 11990195404,
+   "CPU_ns": 11802204000,
+   "charged_group_peak_bytes": 1273049088,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-325",
+   "target": "HolonicsResearch.Fluid.NavierStokesEleventhMomentCompactBound",
+   "exit": 0,
+   "guard_wall_ns": 14646033872,
+   "CPU_ns": 14377142000,
+   "charged_group_peak_bytes": 1949401088,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-326",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 9221284584,
+   "CPU_ns": 9093049000,
+   "charged_group_peak_bytes": 670494720,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-327",
+   "target": "HolonicsResearch.Hodge.HodgeSphereProductFourCycle",
+   "exit": 0,
+   "guard_wall_ns": 10917004044,
+   "CPU_ns": 10739893000,
+   "charged_group_peak_bytes": 1302421504,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-328",
+   "target": "HolonicsResearch.Fluid.NavierStokesBandEnergyBudget",
+   "exit": 0,
+   "guard_wall_ns": 10483918322,
+   "CPU_ns": 10305959000,
+   "charged_group_peak_bytes": 1173647360,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-329",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 8104084143,
+   "CPU_ns": 7982388000,
+   "charged_group_peak_bytes": 755097600,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-330",
+   "target": "HolonicsResearch.Hodge.HodgeSphereNormalizedCoefficient",
+   "exit": 0,
+   "guard_wall_ns": 10411213816,
+   "CPU_ns": 10231278000,
+   "charged_group_peak_bytes": 1020534784,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-331",
+   "target": "HolonicsResearch.Fluid.NavierStokesFrontierTransfer",
+   "exit": 0,
+   "guard_wall_ns": 14180748811,
+   "CPU_ns": 13870380000,
+   "charged_group_peak_bytes": 2876162048,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-332",
+   "target": "HolonicsResearch.Fluid.NavierStokesRelevanceBudget",
+   "exit": 0,
+   "guard_wall_ns": 10439911513,
+   "CPU_ns": 10267151000,
+   "charged_group_peak_bytes": 1231540224,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-333",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 8043441971,
+   "CPU_ns": 7927029000,
+   "charged_group_peak_bytes": 748736512,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-334",
+   "target": "HolonicsResearch.Fluid.NavierStokesShellBudget",
+   "exit": 0,
+   "guard_wall_ns": 9482171636,
+   "CPU_ns": 9306219000,
+   "charged_group_peak_bytes": 1176018944,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-335",
+   "target": "HolonicsResearch.Fluid.NavierStokesFrontierVanishing",
+   "exit": 0,
+   "guard_wall_ns": 13389173213,
+   "CPU_ns": 13081801000,
+   "charged_group_peak_bytes": 2563313664,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-336",
+   "target": "HolonicsResearch.Hodge.HodgeProductDiagonal",
+   "exit": 0,
+   "guard_wall_ns": 10456590364,
+   "CPU_ns": 10287326000,
+   "charged_group_peak_bytes": 1371136000,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-337",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 7611992787,
+   "CPU_ns": 7501608000,
+   "charged_group_peak_bytes": 773603328,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-338",
+   "target": "HolonicsResearch.Fluid.NavierStokesBandLimitedRelevance",
+   "exit": 0,
+   "guard_wall_ns": 9160431400,
+   "CPU_ns": 8983351000,
+   "charged_group_peak_bytes": 981741568,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-339",
+   "target": "HolonicsResearch.Fluid.NavierStokesMomentTailRelevance",
+   "exit": 0,
+   "guard_wall_ns": 10751694152,
+   "CPU_ns": 10588611000,
+   "charged_group_peak_bytes": 960196608,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-340",
+   "target": "HolonicsResearch.Hodge.HodgeProductMixedFilling",
+   "exit": 0,
+   "guard_wall_ns": 25909666486,
+   "CPU_ns": 25597056000,
+   "charged_group_peak_bytes": 2541203456,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-341",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 9133800146,
+   "CPU_ns": 8996855000,
+   "charged_group_peak_bytes": 818708480,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-342",
+   "target": "HolonicsResearch.Hodge.HodgeSphereRulingCurrent",
+   "exit": 0,
+   "guard_wall_ns": 11574117352,
+   "CPU_ns": 11343807000,
+   "charged_group_peak_bytes": 2408386560,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-343",
+   "target": "HolonicsResearch.Fluid.NavierStokesBandLimitedDefect",
+   "exit": 0,
+   "guard_wall_ns": 11671959268,
+   "CPU_ns": 11447845000,
+   "charged_group_peak_bytes": 2425581568,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-344",
+   "target": "HolonicsResearch.Fluid.NavierStokesL1MomentLadder",
+   "exit": 0,
+   "guard_wall_ns": 10594225734,
+   "CPU_ns": 10447649000,
+   "charged_group_peak_bytes": 1063624704,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-345",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 8004348323,
+   "CPU_ns": 7870214000,
+   "charged_group_peak_bytes": 817528832,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-346",
+   "target": "HolonicsResearch.Hodge.HodgeProductRulingReconstruction",
+   "exit": 0,
+   "guard_wall_ns": 8967319708,
+   "CPU_ns": 8832228000,
+   "charged_group_peak_bytes": 957140992,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-347",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 7730077224,
+   "CPU_ns": 7613464000,
+   "charged_group_peak_bytes": 832794624,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-348",
+   "target": "HolonicsResearch.Hodge.HodgeProductRulingBoundary",
+   "exit": 0,
+   "guard_wall_ns": 12309950541,
+   "CPU_ns": 12022775000,
+   "charged_group_peak_bytes": 2633527296,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-349",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 7971505088,
+   "CPU_ns": 7828256000,
+   "charged_group_peak_bytes": 837726208,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-350",
+   "target": "HolonicsResearch.Hodge.HodgeProductRulingDecomposition",
+   "exit": 0,
+   "guard_wall_ns": 8634624634,
+   "CPU_ns": 8484416000,
+   "charged_group_peak_bytes": 858906624,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-351",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 7721589628,
+   "CPU_ns": 7600731000,
+   "charged_group_peak_bytes": 727994368,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-352",
+   "target": "HolonicsResearch.Hodge.HodgeProductSingularCohomologyDual",
+   "exit": 0,
+   "guard_wall_ns": 8499984015,
+   "CPU_ns": 8353424000,
+   "charged_group_peak_bytes": 732504064,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-353",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 8580861031,
+   "CPU_ns": 8457574000,
+   "charged_group_peak_bytes": 762576896,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-354",
+   "target": "HolonicsResearch.Hodge.HodgeSurfaceCycleClass",
+   "exit": 0,
+   "guard_wall_ns": 12729218552,
+   "CPU_ns": 12420263000,
+   "charged_group_peak_bytes": 2178621440,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-355",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 8592914298,
+   "CPU_ns": 8454381000,
+   "charged_group_peak_bytes": 812548096,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-356",
+   "target": "HolonicsResearch.Hodge.HodgeProjectiveLineType11Form",
+   "exit": 0,
+   "guard_wall_ns": 13270281736,
+   "CPU_ns": 12980122000,
+   "charged_group_peak_bytes": 2277535744,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-357",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 8512298166,
+   "CPU_ns": 8372896000,
+   "charged_group_peak_bytes": 820420608,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-358",
+   "target": "HolonicsResearch.Hodge.HodgeSurfaceType11Period",
+   "exit": 0,
+   "guard_wall_ns": 13881448672,
+   "CPU_ns": 13638992000,
+   "charged_group_peak_bytes": 2163212288,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-359",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 7866684061,
+   "CPU_ns": 7735801000,
+   "charged_group_peak_bytes": 785723392,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-360",
+   "target": "HolonicsResearch.Hodge.HodgeProjectiveLinePowerType11",
+   "exit": 0,
+   "guard_wall_ns": 12678752708,
+   "CPU_ns": 12435876000,
+   "charged_group_peak_bytes": 1812439040,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-361",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 8091546774,
+   "CPU_ns": 7937909000,
+   "charged_group_peak_bytes": 718635008,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-362",
+   "target": "HolonicsResearch.Hodge.HodgeSpherePowerRulingHomology",
+   "exit": 0,
+   "guard_wall_ns": 18244852294,
+   "CPU_ns": 17995689000,
+   "charged_group_peak_bytes": 1914920960,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-363",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 8131245993,
+   "CPU_ns": 7999412000,
+   "charged_group_peak_bytes": 824365056,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-364",
+   "target": "HolonicsResearch.Hodge.HodgeSpherePowerPairHomology",
+   "exit": 0,
+   "guard_wall_ns": 14211189741,
+   "CPU_ns": 13991455000,
+   "charged_group_peak_bytes": 2203340800,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-365",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 8071284765,
+   "CPU_ns": 7939614000,
+   "charged_group_peak_bytes": 783179776,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-366",
+   "target": "HolonicsResearch.Hodge.HodgePowerComparison",
+   "exit": 0,
+   "guard_wall_ns": 12702943497,
+   "CPU_ns": 12443757000,
+   "charged_group_peak_bytes": 2358272000,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-367",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 7995187623,
+   "CPU_ns": 7849692000,
+   "charged_group_peak_bytes": 850825216,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-368",
+   "target": "HolonicsResearch.Hodge.HodgePowerSegre",
+   "exit": 0,
+   "guard_wall_ns": 10901121370,
+   "CPU_ns": 10720590000,
+   "charged_group_peak_bytes": 1722212352,
+   "projection_ns": 180000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-369",
+   "target": "HolonicsResearch",
+   "exit": 3,
+   "guard_wall_ns": 8519595177,
+   "CPU_ns": 8349891000,
+   "charged_group_peak_bytes": 854036480,
+   "projection_ns": 60000000000,
+   "enforced_cap_bytes": 8589934592
+  },
+  {
+   "stage": "stage-370",
+   "target": "HolonicsResearch",
+   "exit": 0,
+   "guard_wall_ns": 22140113354,
+   "CPU_ns": 21630445000,
+   "charged_group_peak_bytes": 5595856896,
+   "projection_ns": 600000000000,
+   "enforced_cap_bytes": 8589934592
+  }
+ ]
+}
