@@ -13,6 +13,6 @@ This directory publishes a part of the sole validation queue's receipt for `Tran
 - **The complete local packet** stays where the queue wrote it, untracked, under the main
   checkout's `research/records/receipts/2026-10-08-helical-code/`.
 
-The queue's own texts ([native-v1/HANDOFF.md](native-v1/HANDOFF.md), [native-v2/HANDOFF.md](native-v2/HANDOFF.md) and `VALIDATION.json`) are historical receipts written before
+The queue's own texts ([native-v1/VALIDATION.json](native-v1/VALIDATION.json), [native-v2/HANDOFF.md](native-v2/HANDOFF.md) and `VALIDATION.json`) are historical receipts written before
 publication. Where they say the files are "preserved here" or "local and uncommitted", they
 describe that complete local packet.
