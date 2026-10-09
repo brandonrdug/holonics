@@ -213,6 +213,37 @@ and the Resident retains it beside the bound World.
 Not joined: the face chart `Cξ⁺ + o`, the Ask over keys, learning through the model, and the
 World/Robin and all-material first and second variation.
 
+**The coupled prospect (C1b-2a)** [definition; agent-inferred, October 9; source under validation].
+In an actual encounter each later incident wave depends on the returned ones through the native
+source, so a declared word does not give the actual future.
+- `Word::prospective_coupled_passage` runs the prepared action's own controlled opening
+  (`ProspectiveControl::controlled_word`, by `prepare`'s checks and its shared `apply_control`). Each
+  emitted `a_t` is answered by a live key's charts through the existing `return_source_wave`, at
+  commit `T + t − 1`.
+- `WorldModel::coupled_prospect` gives the passage from the fibre's point and each direction's exact
+  change, one `k` for the whole passage. The passage is affine in `ξ_T`, because the admitted Word is
+  the exact unsplit quadratic one; a sum guard checks it.
+- `PreparedPhysicalAction::world_prospect` reads it per key before the encounter, and nothing actual
+  moves.
+- It predicts two distinct values: the port waves and the native receiving logits `R x`, in the
+  producing frame (`ring.rotate(anchor, lift)` under the opening's current, which no reception
+  publication moves). The test stacks the encounter's actual waves and its own blind station read
+  under one `k`.
+- Raw `x` is not observed where `R` has a kernel.
+
+**The key's face (C1b-2b)** [definition; agent-inferred, October 9; source].
+- The World's observed target is its own face `C_S x_S⁺ + C_R x_R⁺ + o` on the step's after-state,
+  never the native readout. A key may declare the face it hypothesizes (`ModelKey::with_face`: zero
+  chart rate, its own split). The prospect predicts that raw face at every compared epoch with the
+  same `k`, and the World's face coefficients are never read.
+- A family may pair one law with several faces, so a true port law is not a true face. A key without
+  a face predicts none, and an undeclared or unobserved face constrains nothing.
+- Two boundaries hold:
+  - the raw affine face is not the grain-level reading (`Face::of_read`) that the encounter compares;
+  - predicting a declared face eliminates no face hypothesis. The memory is filtered by the port
+    observations `(a, b)` alone, so no face key is thereby consistent with the observed faces, and
+    this is not learning.
+
 The bounded C2 acceptance (two actual encounters, a prediction cover before the first, and a
 state-only matched control at the continuing crossing) waits on that model and its finite
 forward certificate. The combined World/material derivative remains a separate obligation, and

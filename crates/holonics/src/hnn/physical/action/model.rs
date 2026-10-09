@@ -83,6 +83,10 @@
 //! same `k` as the waves and the native readout. The World's face coefficients are never read. A true
 //! port law with a wrong face is a different key: a family may pair one law with several faces, and a
 //! key that declares no face predicts none, so an undeclared or unobserved face constrains nothing.
+//! Two boundaries hold. The raw affine face is not the grain-level reading the encounter compares
+//! (`Face::of_read` at its grain), whose relation to it is not joined here. And predicting a declared
+//! face eliminates no face hypothesis: the memory is filtered by the port observations `(a, b)` alone,
+//! so no face key is thereby consistent with the observed faces, and none of this is learning.
 //!
 //! **Bits.** The memory's current bits ([`WorldModel::current_bits`]) are every key state's values and
 //! cut and the reached tick; the Resident's state bits charge them at every step, whatever size the
