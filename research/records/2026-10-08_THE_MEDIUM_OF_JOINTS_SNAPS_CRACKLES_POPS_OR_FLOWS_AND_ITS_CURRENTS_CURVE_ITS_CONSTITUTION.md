@@ -192,6 +192,26 @@ in all 108 coordinates. The per-family and joint pairings hold.
 - The run took 3,229,181,428 ns of child wall time at a peak child RSS of 33,528 KiB. The taught read
   took 346,866,219 ns and the held twin 2,579,041,323 ns.
 
+[measured; Epime's numerical handoff of v134 and the prior control v122, October 9] **The proposal,
+and what was represented.**
+- **The proposal is far below the lattice.** The largest certified proposal entry lies in
+  `[2^-39, 2^-38)` (C) and `[2^-37, 2^-36)` (K, D). That is 22, 20 and 20 binary orders below the
+  half-unit `2^-16` (the lattice unit is `2^-15`). Every `max|d_f|` lies in `[2^-6, 2^-5)`, which is
+  why `2^-10` is the first reach for each family.
+- **Nothing physical moved.** The accepted control v122 at `139f382d2` runs the same HNN
+  production law as `e8795670d`. In it:
+  - the first step moved no C/K/D factor form;
+  - the channel-0 statistics vanished into the remainders;
+  - the later output equals the unmoved-material control.
+
+  Its causal identity, proposal + prior remainder = applied factor + new remainder + released
+  part, holds entry by entry. The certified first move is therefore retained as exact unresolved
+  motion, and no represented physical change follows from it. This is prior evidence read beside
+  the new point tangent, not a v134 factor count.
+- **`ρ` is not a like-for-like looseness bound.** `κ²b` comes from the contact's RHS-stream
+  forcing in its certificate metric. `A` is read with identity parameter and receiving metrics
+  over all 108 raw factor coordinates and 8 realified-logit rows.
+
 [agent-inferred, after Epime's tightened branching] **What binds, and what remains unresolved.**
 - **Binding** on the actual step are the own certificate's curvature `C = s κ²b`, with the uniform
   gain `κ²` shared by the three families, and then the joint halving: C goes from its own `2^-32`
