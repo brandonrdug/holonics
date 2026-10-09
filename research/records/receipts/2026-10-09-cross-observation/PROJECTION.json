@@ -1,0 +1,40 @@
+{
+  "files": {
+    "diagnostic-v1/stages/actual-cross-build-20261009-v201.stderr": {
+      "original": {
+        "bytes": 376,
+        "sha256": "0e701b9876db76ea6d9e0cf9bef67fde0d39ed397b82f8bb1d8a2f058f8c707e"
+      },
+      "projected": {
+        "bytes": 328,
+        "sha256": "9a0e167418c8140298064e95f9e93726af3fb6426918c15a42c37416f1df1800"
+      },
+      "replaced": {
+        "<cargo-registry>/": 0,
+        "<queue-admission>/": 1,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "diagnostic-v1/stages/actual-cross-build-20261009-v201.stdout": {
+      "original": {
+        "bytes": 28211,
+        "sha256": "c25ca6dcaf19fe99f34dd10469d4937149fb218b2074c9d14e5742113beb7a60"
+      },
+      "projected": {
+        "bytes": 23275,
+        "sha256": "9bfcc9bcb304ea4d517b2c3d6683a1f48e4d2940caee77a6c52e19ebef30a0c3"
+      },
+      "replaced": {
+        "<cargo-registry>/": 50,
+        "<queue-admission>/": 57,
+        "<repository>/research/records/receipts/": 0
+      }
+    }
+  },
+  "placeholders": {
+    "<cargo-registry>/": "the absolute host directory of the crates.io registry sources; each crate name and version that follows is kept",
+    "<queue-admission>/": "the absolute host directory holding the sole queue's admissions; the admission label, its source copy and build cache that follow are kept",
+    "<repository>/research/records/receipts/": "the main checkout's receipts directory, where the queue wrote the complete packets; the path that follows is the repository path"
+  },
+  "rule": "each absolute host prefix below is replaced by its placeholder; no other byte changes. The placeholders do not occur in the originals, so substituting each prefix back restores the original bytes, whose sha256 and size are pinned here (and, for files inside a subdirectory, in its unchanged FILE_HASHES.json); checked locally before commit."
+}
