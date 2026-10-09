@@ -123,7 +123,8 @@
 //! ```
 //!
 //! A rolling exact support needs two such sets (the previous and the next); this owner keeps every
-//! level with its back-pointers so that the witnesses are actual members. The forward work is
+//! level with its back-pointers so that the witnesses are actual members, so its memory is
+//! `Σ_k |X_k|` entries, each with its exact prefix count and back-pointer. The forward work is
 //! `Σ_(k<n) |X_k||F_k|` transitions, each an ordered-map lookup. This is polynomial for this
 //! declared independent channel, not a general claim that families are cheap (a coupled constraint,
 //! or a wider channel, has its own bound). The exact member count is kept beside the supports
@@ -673,14 +674,21 @@ impl Damage {
         }
         let mut touched = Vec::new();
         for &(contact, letter) in &self.partner {
-            let position =
-                length
-                    .checked_sub(contact + 1)
-                    .ok_or(CompressionError::IndexOutside {
-                        index: contact,
-                        population: length,
-                    })?;
-            substitute(&mut partner, position, letter, classes, &mut touched)?;
+            // The contact is bounded before it is reversed, so no index arithmetic can overflow.
+            if contact >= length {
+                return Err(CompressionError::IndexOutside {
+                    index: contact,
+                    population: length,
+                }
+                .into());
+            }
+            substitute(
+                &mut partner,
+                length - 1 - contact,
+                letter,
+                classes,
+                &mut touched,
+            )?;
         }
         Ok((strand, partner))
     }
@@ -731,7 +739,7 @@ fn substitute(
 /// it refuses with `EncodingError::Unreached`.
 #[derive(Clone, Debug, PartialEq)]
 pub struct Receiver {
-    helix: CarryHelix,
+    transport: LocatedTransport,
     encoding: Encoding,
     readings: Vec<Option<Vec<Rat>>>,
 }
@@ -758,7 +766,7 @@ impl Receiver {
             });
         }
         Ok(Self {
-            helix: transport.helix().clone(),
+            transport: transport.clone(),
             encoding,
             readings,
         })
@@ -771,13 +779,19 @@ impl Receiver {
 
     /// The helix the receiver was founded on.
     pub fn helix(&self) -> &CarryHelix {
-        &self.helix
+        self.transport.helix()
+    }
+
+    /// The producing transport the receiver was founded on: its quotient is sufficient for the
+    /// futures this transport admits, and for no other transport's without a continuation square.
+    pub fn transport(&self) -> &LocatedTransport {
+        &self.transport
     }
 
     /// **`E e_(x mod D)`**: the reading of a lift's phase. Refused with
     /// `EncodingError::Unreached` outside the reached span.
     pub fn reading(&self, lift: u64) -> Result<&[Rat], DuplexDefect> {
-        let phase = usize::try_from(lift % self.helix.period())
+        let phase = usize::try_from(lift % self.transport.helix().period())
             .expect("a phase below the helix ceiling fits");
         self.readings[phase]
             .as_deref()
@@ -799,7 +813,7 @@ impl Receiver {
             .collect::<Result<Vec<_>, _>>()?;
         Ok(ReceiverClass {
             readings,
-            winding: last / self.helix.period(),
+            winding: last / self.transport.helix().period(),
         })
     }
 }
@@ -1056,16 +1070,23 @@ pub struct Decoder<'a> {
 }
 
 impl<'a> Decoder<'a> {
-    /// A decoder; refused unless the receiver was founded on the transport's helix and the pairing
-    /// is over the transport's classes.
+    /// A decoder; refused unless the receiver was founded on this very producing transport and the
+    /// pairing is over its classes.
+    ///
+    /// [proved-derived] The founded quotient is sufficient only for the futures its own transport
+    /// admits. A different transport on the same helix need not keep it: with the helix `(3, 4)`,
+    /// advances `0, 3, 6, 9` identify the lifts `0` and `1` (every advance keeps them in one cell),
+    /// while an advance `2` sends them to the lifts `2` and `3`, which the receiver separates. A
+    /// changed transport is admitted only through its own continuation square
+    /// `E T_new = U_new E`, which this consumer does not supply.
     pub fn new(
         receiver: &'a Receiver,
         transport: &'a LocatedTransport,
         pairing: &'a Pairing,
     ) -> Result<Self, DuplexDefect> {
-        if receiver.helix != *transport.helix() {
+        if receiver.transport != *transport {
             return Err(DuplexDefect::Declared {
-                reason: "the receiver is founded on the transport's helix",
+                reason: "the receiver is founded on this producing transport (a changed transport needs its continuation square)",
             });
         }
         if pairing.classes() != transport.classes() {

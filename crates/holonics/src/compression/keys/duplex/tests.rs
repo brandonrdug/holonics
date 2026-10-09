@@ -1848,6 +1848,65 @@ fn an_unreached_lift_is_refused_and_never_substituted() {
     );
 }
 
+/// [definition; implemented-exact] **A malformed partner contact is refused before any index
+/// arithmetic.** The contact is bounded against the duplex before it is reversed, so even the
+/// largest machine index returns the typed `IndexOutside`, never an overflow.
+#[test]
+fn a_malformed_partner_contact_is_refused_before_any_index_arithmetic() {
+    let transport = LocatedTransport::new(
+        CarryHelix::new(vec![3, 4]).unwrap(),
+        vec![0, 3, 6, 9],
+        (0..4usize).map(Some).collect(),
+    )
+    .unwrap();
+    let pairing = Pairing::new(vec![3, 2, 1, 0]).unwrap();
+    let strand = transport.regenerate(0, 3).unwrap();
+    let duplex = Duplex::place(&transport, &pairing, 0, &strand).unwrap();
+    for contact in [3, usize::MAX] {
+        assert_eq!(
+            Damage::new(Vec::new(), vec![(contact, 0)]).apply(&duplex, &pairing),
+            Err(DuplexDefect::Compression(CompressionError::IndexOutside {
+                index: contact,
+                population: 3,
+            }))
+        );
+    }
+    eprintln!(
+        "helical-duplex malformed contact: partner contacts 3 and usize::MAX on a duplex of 3 are \
+         refused as IndexOutside before any reversal"
+    );
+}
+
+/// [proved-derived; implemented-exact] **A changed transport on the same helix is refused the
+/// founded quotient.** On the helix `(3, 4)` the advances `0, 3, 6, 9` keep the lifts `0` and `1` in
+/// one cell under every future, so the founded receiver identifies them. Changing one advance to
+/// `2` sends them to the lifts `2` and `3`, which a receiver founded on the changed transport
+/// separates. Helix equality does not preserve the quotient, so the decoder binds the producing
+/// transport and refuses the changed one.
+#[test]
+fn a_changed_transport_on_the_same_helix_is_refused_its_founded_quotient() {
+    let helix = CarryHelix::new(vec![3, 4]).unwrap();
+    let labels: Vec<Option<usize>> = (0..4usize).map(Some).collect();
+    let old = LocatedTransport::new(helix.clone(), vec![0, 3, 6, 9], labels.clone()).unwrap();
+    let new = LocatedTransport::new(helix, vec![0, 3, 2, 9], labels).unwrap();
+    let pairing = Pairing::new(vec![3, 2, 1, 0]).unwrap();
+    let founded = Receiver::found(&old, &[0, 1, 2]).unwrap();
+    assert_eq!(founded.reading(0).unwrap(), founded.reading(1).unwrap());
+    let refounded = Receiver::found(&new, &[0, 1, 2]).unwrap();
+    assert_ne!(refounded.reading(0).unwrap(), refounded.reading(1).unwrap());
+    assert!(matches!(
+        Decoder::new(&founded, &new, &pairing),
+        Err(DuplexDefect::Declared { .. })
+    ));
+    assert!(Decoder::new(&founded, &old, &pairing).is_ok());
+    assert!(Decoder::new(&refounded, &new, &pairing).is_ok());
+    eprintln!(
+        "helical-duplex changed transport: the receiver founded on advances 0, 3, 6, 9 identifies \
+         lifts 0 and 1; one advance changed to 2 separates them, and the decoder refuses the changed \
+         transport its founded quotient"
+    );
+}
+
 /// The development and acceptance statement, printed once per chart so that a reader of the
 /// receipts sees which seeds are which.
 #[test]
