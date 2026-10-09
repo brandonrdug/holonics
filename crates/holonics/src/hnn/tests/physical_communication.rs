@@ -2568,3 +2568,410 @@ fn one_future_communication_keeps_refusal_and_multi_future_admission_honest() {
     };
     assert_eq!(carry, &refused.carry);
 }
+
+/// [agent-inferred, October 9; the medium-of-joints record, section 7] **The finite-decrease
+/// landing, READ on 0279's own flow** (source `[0, 1]`, observed `[0, 1, 3]`, station 2 compared,
+/// then the existing communication on source `[2, 1]` at the same entering end). The W0 flow now
+/// issues ONE declared candidate on its Rest-opened comparison: each reached family at its first
+/// reach, re-read on a transient Word of the same declared passage, admitted only on an exact,
+/// strict improvement (`upper(L′) < lower(L)` with `X′ ≤ X`, or the reading-identity witness with
+/// `X′ < X`); a typed refusal continues on the certified step exactly as before. The outcome,
+/// admitted or refused, is a measurement and is never forced.
+///
+/// It prints `L`, `L′`, `X`, `X′`, the declared exponents, the committed `q` per family and `e`, all
+/// exact, and the four learned-change criteria as the acceptance reader reads them (PASS or
+/// NOT-MET). It asserts only the admission's own laws and trust invariants, never a criterion: the
+/// admission re-reads from its two ratios; the published material, publication and committed reach
+/// are the admitted candidate's (or, refused, the certified successor's); `e` sits at the cut's
+/// absolute tick; the carry identity, lineage and lattice of the applied movement; and the energy
+/// identities the owners guarantee. The admission certifies only that `θ′` reads the declared
+/// same-Rest comparison no worse classically and strictly better in one part; criteria 2 to 4 stay
+/// measured outcomes.
+#[test]
+fn the_finite_decrease_landing_is_read_on_the_complete_contact_return() {
+    use crate::hnn::constitution::{Carrier, FactorGradient, Family, Locus};
+    use crate::hnn::physical::contact::ContactObservation;
+    use crate::hnn::word::continuation::admit;
+    use crate::ratio::Rat;
+    use num_traits::Signed;
+    let started = std::time::Instant::now();
+    let field = field();
+    let initial = contact_material(&field);
+    let current = Current::at_rest(&field);
+    let source = encoded(&field, &[0, 1]);
+    let compared = vec![false, false, true];
+    let observation = || ContactObservation {
+        observed: encoded(&field, &[0, 1, 3]),
+        compared: compared.clone(),
+    };
+    let mut actual =
+        PhysicalReceiver::new(&field, initial.clone(), current.clone(), WordOpening::Rest).unwrap();
+    let mut untouched =
+        PhysicalReceiver::new(&field, initial.clone(), current.clone(), WordOpening::Rest).unwrap();
+    let blind = untouched
+        .communicate_contact(&source, &receiver(), |_| None)
+        .unwrap();
+    let taught = actual
+        .communicate_contact(&source, &receiver(), |boundary| {
+            assert_eq!(
+                boundary, &blind.boundary,
+                "observation cannot enter its earlier forward"
+            );
+            Some(observation())
+        })
+        .unwrap();
+    let taught_ns = started.elapsed().as_nanos();
+    assert!(blind.closes() && taught.closes());
+    assert_eq!(taught.boundary, blind.boundary);
+    assert_eq!(taught.blind_carry, blind.carry);
+    assert_eq!(
+        taught.carry.ticks, 3,
+        "full ticks keep their actual complete crossing"
+    );
+    let publication = taught.comparison.as_ref().unwrap().as_ref().unwrap();
+    let landing = &publication.landing;
+    let material = actual.constitution().clone();
+    let locus = Locus::Channel(0);
+
+    // The landing's exact readings: L and X of the producing comparison, L′ and X′ of the
+    // candidate's re-read, the declared exponents, the committed q, the outcome and e.
+    let code = publication.ratio.code_length().unwrap();
+    let excess = publication.ratio.excess();
+    println!(
+        "finite-decrease landing READING on 0279's own task: L=[{}, {}] X={}",
+        acceptance_exact(&code.lower),
+        acceptance_exact(&code.upper),
+        acceptance_exact(&excess)
+    );
+    match &landing.candidate {
+        Some(candidate) => {
+            let candidate_code = candidate.ratio().code_length().unwrap();
+            println!(
+                "finite-decrease landing candidate: L′=[{}, {}] X′={} support={:?} tick={}",
+                acceptance_exact(&candidate_code.lower),
+                acceptance_exact(&candidate_code.upper),
+                acceptance_exact(&candidate.ratio().excess()),
+                candidate.support(),
+                candidate.tick()
+            );
+            for (key, moved) in &candidate.committed().families {
+                println!("finite-decrease landing committed {key:?}: (entry, q) = {moved:?}");
+            }
+        }
+        None => println!("finite-decrease landing candidate: not read"),
+    }
+    match &landing.declared {
+        Some(declared) => {
+            for (key, step) in declared.families_with_steps() {
+                let reach = step.reach.as_ref();
+                println!(
+                    "finite-decrease landing declared {key:?}: k_f={} k_cert={:?} endpoint={:?} \
+                     proposed (entry, q)={:?}",
+                    step.exponent,
+                    reach.map(|r| r.certified),
+                    reach.map(|r| r.endpoint),
+                    reach.map(|r| &r.reached)
+                );
+            }
+        }
+        None => println!("finite-decrease landing declared exponents: not read"),
+    }
+    match &landing.outcome {
+        Ok(admission) => println!(
+            "finite-decrease landing: ADMITTED ({:?})",
+            admission.admitted()
+        ),
+        Err(refusal) => println!("finite-decrease landing: REFUSED {refusal:?}"),
+    }
+    match &publication.continuation.landing {
+        Some(e) => {
+            let coordinates: Vec<&Rat> = e
+                .difference
+                .storage
+                .iter()
+                .flatten()
+                .chain(e.difference.arrivals.iter().flatten().flatten())
+                .chain(e.difference.states.iter().flatten().flatten())
+                .chain(e.difference.resonators.iter().flatten().flatten().flatten())
+                .collect();
+            let nonzero: Vec<String> = coordinates
+                .iter()
+                .filter(|x| !x.is_zero())
+                .map(|x| acceptance_exact(x))
+                .collect();
+            println!(
+                "finite-decrease landing e = candidate_end - held at tick {}: {} of {} coordinates \
+                 nonzero: [{}]",
+                e.tick,
+                nonzero.len(),
+                coordinates.len(),
+                nonzero.join(", ")
+            );
+        }
+        None => println!("finite-decrease landing e: none (no admitted continuation)"),
+    }
+
+    // Criterion 1, read as the acceptance reader reads it.
+    let lattice = initial.lattice(locus).expect("the contact's lattice");
+    let carried = |xs: &[(Locus, Carrier, usize, Rat)], carrier: Carrier, entry: usize| -> Rat {
+        xs.iter()
+            .filter(|(l, c, i, _)| *l == locus && *c == carrier && *i == entry)
+            .map(|(_, _, _, r)| r.clone())
+            .sum::<Rat>()
+    };
+    let prior_remainders = initial.carried_remainders();
+    let next_remainders = material.carried_remainders();
+    let mut committed_families = 0usize;
+    let (mut lineage, mut on_lattice, mut remainder_split) = (true, true, true);
+    for (f, name) in ["C", "K", "D"].into_iter().enumerate() {
+        let family = Family::Factor(f);
+        let eta = publication.publication.family_step(locus, family);
+        let vanished = publication.publication.vanished.contains(&(locus, family));
+        let (before_factor, after_factor) = match f {
+            0 => (initial.contact_storage(0), material.contact_storage(0)),
+            1 => (initial.contact_stiffness(0), material.contact_stiffness(0)),
+            _ => (
+                initial.contact_dissipation(0),
+                material.contact_dissipation(0),
+            ),
+        };
+        let moved = after_factor != before_factor;
+        let movement = publication
+            .continuation
+            .material
+            .iter()
+            .find(|m| m.contact == 0 && m.family == family)
+            .unwrap_or_else(|| panic!("the actual deposit applied no family-{f} movement"));
+        let reached = publication
+            .comparison_return
+            .factors()
+            .iter()
+            .find(|s| s.gradient.locus() == locus && s.gradient.family() == family)
+            .unwrap_or_else(|| panic!("the actual deposit returned no family-{f} gradient"));
+        let gradient = match &reached.gradient {
+            FactorGradient::Storage { gradient, .. }
+            | FactorGradient::Stiffness { gradient, .. }
+            | FactorGradient::Dissipation { gradient, .. } => gradient,
+            _ => unreachable!("a contact family returns a Gram-factor gradient"),
+        };
+        let statistic = &material.contact_scales(0)[f];
+        let proposed = gradient.scaled(&(&eta / statistic));
+        let coordinates: Vec<_> = movement
+            .factor
+            .entries()
+            .iter()
+            .map(|entry| lattice.div_rem(entry))
+            .collect();
+        let off_lattice = coordinates.iter().filter(|(_, r)| !r.is_zero()).count();
+        on_lattice &= off_lattice == 0;
+        let q_nonzero = coordinates.iter().filter(|(q, _)| !q.is_zero()).count();
+        let q_largest = coordinates
+            .iter()
+            .map(|(q, _)| q.abs())
+            .max()
+            .unwrap_or_default();
+        for (i, (delta, applied)) in proposed
+            .entries()
+            .iter()
+            .zip(movement.factor.entries())
+            .enumerate()
+        {
+            let released = publication
+                .publication
+                .released
+                .iter()
+                .filter(|(l, c, j, _)| *l == locus && *c == Carrier::Factor(f) && *j == i)
+                .map(|(_, _, _, r)| r.clone())
+                .sum::<Rat>();
+            remainder_split &= delta + carried(&prior_remainders, Carrier::Factor(f), i)
+                == applied + carried(&next_remainders, Carrier::Factor(f), i) + released;
+        }
+        lineage &= before_factor.add(&movement.factor).unwrap() == *after_factor;
+        let committed =
+            !vanished && moved && off_lattice == 0 && q_nonzero > 0 && eta.is_positive();
+        committed_families += usize::from(committed);
+        println!(
+            "finite-decrease landing criterion 1 family {name}: published eta={} vanished={vanished} \
+             material_moved={moved}; applied q != 0 at {q_nonzero} of {} entries (largest |q|=\
+             {q_largest}) => {}",
+            acceptance_exact(&eta),
+            coordinates.len(),
+            acceptance_verdict(committed)
+        );
+    }
+    let met1 = committed_families > 0;
+
+    // Criteria 2 to 4: the later communication against the unmoved control at the same entering
+    // end, the energy accounting, and the cold restore.
+    let entering = actual.opening();
+    let common = actual.into_resident();
+    let mut actual = PhysicalReceiver::from_resident(&field, common).unwrap();
+    let other_source = encoded(&field, &[2, 1]);
+    let mut prior =
+        PhysicalReceiver::new(&field, initial.clone(), current.clone(), entering.clone()).unwrap();
+    assert_eq!(prior.opening(), entering, "the control shares the learned point's entering end");
+    let cold = acceptance_cold(&field, &actual, &other_source, &receiver());
+    let next = actual
+        .communicate(&other_source, &receiver(), |_| None)
+        .unwrap();
+    let old_material = prior
+        .communicate(&other_source, &receiver(), |_| None)
+        .unwrap();
+    let difference =
+        acceptance_difference(next.boundary.readings(), old_material.boundary.readings());
+    let compared_stations: Vec<usize> = compared
+        .iter()
+        .enumerate()
+        .filter(|(_, c)| **c)
+        .map(|(station, _)| station)
+        .collect();
+    let compared_present = difference
+        .iter()
+        .any(|(station, _)| compared_stations.contains(station));
+    let compared_changed: usize = difference
+        .iter()
+        .filter(|(station, _)| compared_stations.contains(station))
+        .map(|(_, d)| d.iter().filter(|x| !x.is_zero()).count())
+        .sum();
+    let met2 = compared_present && compared_changed > 0;
+    let continuation = &publication.continuation;
+    let deposit_world = acceptance_world(&taught.opening, &taught.balances, &taught.word);
+    let later_world = acceptance_world(&next.opening, &next.balances, &next.word);
+    let held_work_gap =
+        (&continuation.committed - &continuation.before) - &continuation.deposition_work;
+    let chain_gap = &next.opening.before - &continuation.opening;
+    let identities_exact = deposit_world.closes
+        && later_world.closes
+        && deposit_world.opening_gap.is_zero()
+        && later_world.opening_gap.is_zero()
+        && held_work_gap.is_zero()
+        && chain_gap.is_zero();
+    let met3 = identities_exact && met1;
+    let met4 = match &cold {
+        Ok(restored) => {
+            restored.same_material
+                && restored.same_carry
+                && restored.same_current
+                && restored.later.closes()
+                && restored.later.boundary.readings() == next.boundary.readings()
+                && acceptance_difference(
+                    restored.later.boundary.readings(),
+                    old_material.boundary.readings(),
+                ) == difference
+                && met2
+        }
+        Err(_) => false,
+    };
+    println!(
+        "finite-decrease landing criterion 1 (a reached C/K/D deposit commits q != 0): \
+         {committed_families} of 3 families => {}",
+        acceptance_verdict(met1)
+    );
+    println!(
+        "finite-decrease landing criterion 2 (the later compared-station response differs from the \
+         unmoved-material control): {compared_changed} coordinates differ at {compared_stations:?} \
+         => {}",
+        acceptance_verdict(met2)
+    );
+    println!(
+        "finite-decrease landing criterion 3 (the world and material energy balance closes exactly \
+         on a committed change): identities exact={identities_exact}, chain residual={} => {}",
+        acceptance_exact(&chain_gap),
+        acceptance_verdict(met3)
+    );
+    println!(
+        "finite-decrease landing criterion 4 (the same difference survives a cold restore): \
+         restore={} => {}",
+        match &cold {
+            Ok(restored) => format!(
+                "material={} carry={} current={}",
+                restored.same_material, restored.same_carry, restored.same_current
+            ),
+            Err(refusal) => format!("REFUSED {refusal:?}"),
+        },
+        acceptance_verdict(met4)
+    );
+
+    // The admission's own laws and the trust invariants. None asserts a criterion.
+    if let Some(declared) = &landing.declared {
+        for ((at, _), step) in declared.families_with_steps() {
+            let reach = step.reach.as_ref().expect("the first-reach read claims its families");
+            assert_eq!(*at, locus);
+            assert_eq!(step.exponent, reach.exponent);
+            assert!(reach.certified <= reach.exponent && reach.exponent <= reach.endpoint);
+            assert!(!reach.reached.is_empty() && reach.reached.iter().all(|(_, q)| !q.is_zero()));
+        }
+    }
+    match &landing.outcome {
+        Ok(admission) => {
+            let candidate = landing
+                .candidate
+                .as_ref()
+                .expect("an admitted candidate was read");
+            assert_eq!(candidate, admission.candidate());
+            assert_eq!(admission.ratio(), &publication.ratio);
+            assert_eq!(
+                admit(&publication.ratio, candidate.ratio()),
+                Ok(admission.admitted()),
+                "the admission re-reads from its two ratios"
+            );
+            assert_eq!(&material, candidate.theta(), "the published material is the candidate");
+            assert_eq!(&publication.publication, candidate.publication());
+            for (key, step) in candidate.declared().families_with_steps() {
+                assert_eq!(
+                    candidate.committed().families.get(key),
+                    step.reach.as_ref().map(|reach| &reach.reached),
+                    "the committed reach is the proposed reach"
+                );
+            }
+            let e = continuation
+                .landing
+                .as_ref()
+                .expect("the admitted continuation reads e");
+            assert_eq!(e.tick, taught.carry.ticks, "e sits at the cut's absolute tick");
+        }
+        Err(_) => {
+            assert!(continuation.landing.is_none());
+            let operands =
+                crate::hnn::propagation::Operands::exact_at_cut(&field, &initial, &current).unwrap();
+            let spans = crate::hnn::word::finite_gain::FiniteContactSpans::of(
+                &operands,
+                0,
+                publication.comparison_return.reach().unwrap(),
+            )
+            .unwrap();
+            let (native, reading) = initial
+                .deposited_with_contact_spans(&publication.comparison_return, &spans)
+                .unwrap();
+            assert_eq!(material, native, "a refused landing continues on the certified step");
+            assert_eq!(publication.publication, reading);
+        }
+    }
+    assert!(lineage, "each family's applied factor reaches the resident unchanged");
+    assert!(on_lattice, "every applied movement lies on its family's lattice");
+    assert!(
+        remainder_split,
+        "delta + r_prior = applied + r_next + released, exactly, entry by entry"
+    );
+    assert!(
+        deposit_world.closes && later_world.closes,
+        "the owner's world receipts close"
+    );
+    assert!(
+        deposit_world.opening_gap.is_zero()
+            && later_world.opening_gap.is_zero()
+            && held_work_gap.is_zero(),
+        "the owner's energy identities have no residual"
+    );
+    assert!(next.closes() && old_material.closes());
+    assert_eq!(next.carry.ticks, taught.carry.ticks + 2);
+    assert_eq!(prior.constitution(), &initial, "the control is truly unmoved");
+    println!("finite-decrease landing: every trust assertion passed; the readings above are verified");
+    let met = [met1, met2, met3, met4];
+    println!(
+        "finite-decrease landing: {} of 4 criteria met (a reading, not an acceptance); timing: \
+         taught_ns={taught_ns} elapsed_ns={}",
+        met.iter().filter(|m| **m).count(),
+        started.elapsed().as_nanos()
+    );
+}

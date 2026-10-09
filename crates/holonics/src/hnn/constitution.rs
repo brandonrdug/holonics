@@ -515,6 +515,7 @@
 //! | `HNN/Normal.{lock_face_decides, lock_flip_descends}` | the lock's half-turn ([`LockProposal`], [`Constitution::locked`], `holon::deposition::strictly_better`) |
 //! | `HNN/Normal.{founding_off_node, chain_founding, channel_fixed_node}` | the founding ([`Constitution::initial`]; `Constitution::{fixed_nodes, standing_contrasts}` the tests' readings) |
 //! | `HNN/LatticeDeposit.{quot, rem, div_rem_spec, rem_bounds, quot_eq_zero_of_bounds, fine}` | [`Lattice::div_rem`] (the carry's fine split), [`Lattice::div_rem_coordinate`] (its coarse split) |
+//! | `HNN/FiniteDecrease.{split_spec, split_bounds, quot_ne_zero_of_half_lt, first_reach_endpoint}` | the declared first-reach step: `first_reach_scan`, `Constitution::{first_reach, deposited_with_contact_spans_at}` (crate-internal; one candidate whose only certificate is the a posteriori admission `hnn::word::continuation::FiniteDecrease`) |
 //! | `HNN/LatticeDeposit.{gammaLength, gamma_kraft_lt_one}` | [`gamma_length`] |
 //! | `HNN/LatticeDeposit.{carry, release, carry_accounting, lattice_deposit_accounting, carry_zero, carry_entry_zero, carry_entry_below_grain}` | [`BudgetedCarry`], the separately bounded carriers; physical factors and normalization consume `div_rem_spec`/`rem_bounds` directly |
 //! | `HNN/LatticeDeposit/Rebase.{Carried.rebase, rebase_value_add_rem, rebase_onLattice, history_accounting, history_release_lt, history_within_founding_unit}` | `BudgetedCarry::rebase` (crate-internal), the re-base onto a finer lattice; [`Constitution::rebased`] at a contact's channel, which the declared schedule never calls |
@@ -5678,13 +5679,26 @@ impl Constitution {
     /// channel family through a contact whose conductance has no bound. Every gain but the
     /// receiving map's reads the pumped medium's span factor, and a reach-read ring's own gain
     /// families are held (module header, "The pumped medium's reach").
+    ///
+    /// [definition; agent-inferred, October 9; the medium-of-joints record §7] **Only the exponent
+    /// source differs** between the native certificate and one declared candidate
+    /// ([`StepSource`]): every validation above the step selection (reach, boost, conductance,
+    /// Floquet, the gains, moves and loaded span reads) and the readings below it are shared. A
+    /// declared exponent replaces the own-curvature fixed point and the joint halving; it keeps the
+    /// covector-scale bound `η c ≤ 1`, a lattice and representability check, and refuses a
+    /// violation typed ([`DeclaredStepRefusal::CovectorScale`]), as it refuses a stepping family
+    /// the declaration does not name or a declared family that does not step
+    /// ([`DeclaredStepRefusal::Undeclared`]). A declared step's curvature, bound and joint
+    /// readings are read at its own ray and recorded, never enforced: the a posteriori admission
+    /// (`hnn::word::continuation::FiniteDecrease`) is its certificate.
     fn certify_steps(
         &self,
         reach: Option<&Reach>,
         linear: &[(Locus, LinearLocus, &PreparedStep)],
         factors: &[(Locus, &FactorPrepared)],
         loaded: Option<&crate::hnn::word::finite_gain::FiniteContactSpans>,
-    ) -> Result<CertifiedSteps, HnnError> {
+        source: StepSource<'_>,
+    ) -> Result<Result<CertifiedSteps, DeclaredStepRefusal>, HnnError> {
         /// A normal law's readings at the certificate's faces: its alignment at its floor, its
         /// covector scale, feature moves and unit step's Schur norms at their ceilings, and (the
         /// receiving map's only) its unit step's certified spectral norm.
@@ -5755,7 +5769,9 @@ impl Constitution {
             }
         }
         if parts.is_empty() {
-            return Ok((BTreeMap::new(), None, None, None));
+            return Ok(source
+                .unstepped()
+                .map(|()| (BTreeMap::new(), None, None, None)));
         }
         let reach = reach.ok_or(HnnError::MissingReach)?;
         // A declared boost is refused where the word reads its channel's transit (`Reach::loci`,
@@ -5835,7 +5851,9 @@ impl Constitution {
             held: held.clone(),
         });
         if parts.is_empty() {
-            return Ok((BTreeMap::new(), None, pumped_reading, None));
+            return Ok(source
+                .unstepped()
+                .map(|()| (BTreeMap::new(), None, pumped_reading, None)));
         }
         let place: BTreeMap<(Locus, Family), usize> = parts
             .iter()
@@ -6082,118 +6100,177 @@ impl Constitution {
                 Part::Factor(prepared) => (prepared.alignment.clone(), prepared.covector.clone()),
             }
         };
-        // The first steps: each family's own certificate at the current constitution (its curvature
-        // `C = s κ² b`, the largest dyadic with `ηC ≤ a` and `ηc ≤ 1`).
-        let none = vec![None; parts.len()];
-        let first = reading(&none)?;
-        let mut steps: Vec<Option<CertifiedStep>> = parts
-            .iter()
-            .zip(&first)
-            .map(|((.., part), (gain, moves))| {
-                let (a, c) = alignment(part);
-                CertifiedStep::certify(&a, &(&score * gain * moves), &c)
-            })
-            .collect::<Result<_, _>>()?;
-        loop {
-            let read = reading(&steps)?;
-            // Each family's own certificate at the rays' ends: a step it no longer admits is halved.
-            let mut changed = false;
-            for (step, (gain, moves)) in steps.iter_mut().zip(&read) {
-                let certified = step
-                    .as_mut()
-                    .expect("a positive alignment certifies a step");
-                let curvature = &score * gain * moves;
-                if certified.admits(&curvature) {
-                    certified.curvature = curvature;
-                } else {
-                    *certified = certified.halved();
-                    changed = true;
-                }
-            }
-            if changed {
-                continue;
-            }
-            // The joint moves by the triangle: `m = √(κ² b)` at its dyadic ceiling.
-            let bounds: Vec<Rat> = read
-                .iter()
+        // The joint moves by the triangle: `m = √(κ² b)` at its dyadic ceiling.
+        let bounds_of = |read: &[(Rat, Rat)]| -> Vec<Rat> {
+            read.iter()
                 .map(|(gain, moves)| root_ceiling(&ceiling(&(gain * moves))))
-                .collect();
-            let certified: Vec<&CertifiedStep> = steps
-                .iter()
-                .map(|step| {
-                    step.as_ref()
-                        .expect("a positive alignment certifies a step")
-                })
-                .collect();
-            // The joint certificate reads the realized score's moves: a standing's step stays in
-            // its lobes (module header, "Within a lobe"), where the element reads it not at all, so
-            // its realized move and decrease are both zero and it leaves the joint certificate
-            // (Lean `HNN/Normal.lobe_move_is_null`); its own lock-chart certificate still rates it.
-            let realized: Vec<bool> = parts
-                .iter()
-                .map(|(_, family, _)| *family != Family::Standing)
-                .collect();
-            let joint = JointReading::read(
+                .collect()
+        };
+        // The joint certificate reads the realized score's moves: a standing's step stays in
+        // its lobes (module header, "Within a lobe"), where the element reads it not at all, so
+        // its realized move and decrease are both zero and it leaves the joint certificate
+        // (Lean `HNN/Normal.lobe_move_is_null`); its own lock-chart certificate still rates it.
+        let realized: Vec<bool> = parts
+            .iter()
+            .map(|(_, family, _)| *family != Family::Standing)
+            .collect();
+        let joint_of = |certified: &[&CertifiedStep], bounds: &[Rat]| -> JointReading {
+            JointReading::read(
                 &score,
                 certified
                     .iter()
-                    .zip(&bounds)
+                    .zip(bounds)
                     .zip(&realized)
                     .filter(|(_, realized)| **realized)
                     .map(|((step, bound), _)| (&step.step, &step.alignment, bound)),
-            );
-            if !joint.holds() {
-                // The family whose halving gains the joint certificate most,
-                // `½ η (s m (2 Σ η m − ½ η m) − a)`; the first in the deposit's order at a tie.
-                let total: Rat = certified
+            )
+        };
+        // The exponent source, the only part of the certificate the two sources do not share.
+        let (steps, read, bounds, joint) = match source {
+            StepSource::Certified => {
+                // The first steps: each family's own certificate at the current constitution (its
+                // curvature `C = s κ² b`, the largest dyadic with `ηC ≤ a` and `ηc ≤ 1`).
+                let none = vec![None; parts.len()];
+                let first = reading(&none)?;
+                let mut steps: Vec<Option<CertifiedStep>> = parts
                     .iter()
-                    .zip(&bounds)
-                    .zip(&realized)
-                    .filter(|(_, realized)| **realized)
-                    .map(|((step, bound), _)| &step.step * bound)
-                    .sum();
-                let two = rat(2, 1);
-                let mut worst: Option<(usize, Rat)> = None;
-                for (index, (step, bound)) in certified.iter().zip(&bounds).enumerate() {
-                    if !realized[index] {
+                    .zip(&first)
+                    .map(|((.., part), (gain, moves))| {
+                        let (a, c) = alignment(part);
+                        CertifiedStep::certify(&a, &(&score * gain * moves), &c)
+                    })
+                    .collect::<Result<_, _>>()?;
+                loop {
+                    let read = reading(&steps)?;
+                    // Each family's own certificate at the rays' ends: a step it no longer admits
+                    // is halved.
+                    let mut changed = false;
+                    for (step, (gain, moves)) in steps.iter_mut().zip(&read) {
+                        let certified = step
+                            .as_mut()
+                            .expect("a positive alignment certifies a step");
+                        let curvature = &score * gain * moves;
+                        if certified.admits(&curvature) {
+                            certified.curvature = curvature;
+                        } else {
+                            *certified = certified.halved();
+                            changed = true;
+                        }
+                    }
+                    if changed {
                         continue;
                     }
-                    let moved = &step.step * bound;
-                    let gained = &step.step
-                        * (&score * bound * (&two * &total - &moved / &two) - &step.alignment)
-                        / &two;
-                    if worst.as_ref().is_none_or(|(_, kept)| gained > *kept) {
-                        worst = Some((index, gained));
+                    let bounds = bounds_of(&read);
+                    let certified: Vec<&CertifiedStep> = steps
+                        .iter()
+                        .map(|step| {
+                            step.as_ref()
+                                .expect("a positive alignment certifies a step")
+                        })
+                        .collect();
+                    let joint = joint_of(&certified, &bounds);
+                    if !joint.holds() {
+                        // The family whose halving gains the joint certificate most,
+                        // `½ η (s m (2 Σ η m − ½ η m) − a)`; the first in the deposit's order at a
+                        // tie.
+                        let total: Rat = certified
+                            .iter()
+                            .zip(&bounds)
+                            .zip(&realized)
+                            .filter(|(_, realized)| **realized)
+                            .map(|((step, bound), _)| &step.step * bound)
+                            .sum();
+                        let two = rat(2, 1);
+                        let mut worst: Option<(usize, Rat)> = None;
+                        for (index, (step, bound)) in certified.iter().zip(&bounds).enumerate() {
+                            if !realized[index] {
+                                continue;
+                            }
+                            let moved = &step.step * bound;
+                            let gained = &step.step
+                                * (&score * bound * (&two * &total - &moved / &two)
+                                    - &step.alignment)
+                                / &two;
+                            if worst.as_ref().is_none_or(|(_, kept)| gained > *kept) {
+                                worst = Some((index, gained));
+                            }
+                        }
+                        let (index, _) = worst.expect("a stepping family");
+                        let step = steps[index].as_mut().expect("a stepping family");
+                        *step = step.halved();
+                        continue;
+                    }
+                    break (steps, read, bounds, joint);
+                }
+            }
+            StepSource::Declared(declared) => {
+                // One declared candidate: each stepping family at its declared exponent, the
+                // covector-scale bound kept, nothing halved and nothing searched.
+                let mut steps: Vec<Option<CertifiedStep>> = Vec::with_capacity(parts.len());
+                for (locus, family, part) in &parts {
+                    let Some(exponent) = declared.exponent(*locus, *family) else {
+                        return Ok(Err(DeclaredStepRefusal::Undeclared {
+                            locus: *locus,
+                            family: *family,
+                        }));
+                    };
+                    let (a, c) = alignment(part);
+                    let step = crate::holon::deposition::dyadic(exponent);
+                    if &step * &c > Rat::one() {
+                        return Ok(Err(DeclaredStepRefusal::CovectorScale {
+                            locus: *locus,
+                            family: *family,
+                            exponent,
+                        }));
+                    }
+                    steps.push(Some(CertifiedStep {
+                        exponent,
+                        step,
+                        alignment: a,
+                        curvature: Rat::zero(),
+                        covector: c,
+                    }));
+                }
+                if let Some(&(locus, family)) =
+                    declared.families().find(|key| !place.contains_key(*key))
+                {
+                    return Ok(Err(DeclaredStepRefusal::Undeclared { locus, family }));
+                }
+                // The readings at the declared rays' ends, recorded beside the step.
+                let read = reading(&steps)?;
+                for (step, (gain, moves)) in steps.iter_mut().zip(&read) {
+                    if let Some(step) = step.as_mut() {
+                        step.curvature = &score * gain * moves;
                     }
                 }
-                let (index, _) = worst.expect("a stepping family");
-                let step = steps[index].as_mut().expect("a stepping family");
-                *step = step.halved();
-                continue;
+                let bounds = bounds_of(&read);
+                let certified: Vec<&CertifiedStep> = steps.iter().flatten().collect();
+                let joint = joint_of(&certified, &bounds);
+                (steps, read, bounds, joint)
             }
-            let (readout, amplitude) = gains(&steps);
-            let readings: BTreeMap<(Locus, Family), StepReading> = parts
-                .iter()
-                .zip(&steps)
-                .zip(read)
-                .zip(bounds)
-                .map(|((((locus, family, _), step), (gain, moves)), bound)| {
-                    (
-                        (*locus, *family),
-                        StepReading {
-                            family: *family,
-                            step: step.clone().expect("a positive alignment certifies a step"),
-                            gain,
-                            moves,
-                            bound,
-                            readout: readout.clone(),
-                            amplitude: amplitude.clone(),
-                        },
-                    )
-                })
-                .collect();
-            return Ok((readings, Some(joint), pumped_reading, loaded_read(&steps)?));
-        }
+        };
+        let (readout, amplitude) = gains(&steps);
+        let readings: BTreeMap<(Locus, Family), StepReading> = parts
+            .iter()
+            .zip(&steps)
+            .zip(read)
+            .zip(bounds)
+            .map(|((((locus, family, _), step), (gain, moves)), bound)| {
+                (
+                    (*locus, *family),
+                    StepReading {
+                        family: *family,
+                        step: step.clone().expect("a positive alignment certifies a step"),
+                        gain,
+                        moves,
+                        bound,
+                        readout: readout.clone(),
+                        amplitude: amplitude.clone(),
+                    },
+                )
+            })
+            .collect();
+        Ok(Ok((readings, Some(joint), pumped_reading, loaded_read(&steps)?)))
     }
 
     /// **The successor of a staged deposit** (design (c), `deposit`): each linear locus's step
@@ -6234,7 +6311,8 @@ impl Constitution {
         deposit: &Deposit,
         retained: &BTreeSet<Locus>,
     ) -> Result<(Self, DepositReading), HnnError> {
-        self.deposited_in(deposit,retained,None)
+        self.deposited_in(deposit, retained, None, DepositMode::Certified)?
+            .published()
     }
 
     /// Source-private native contact consumer. ContactCut constructs the witness
@@ -6244,16 +6322,86 @@ impl Constitution {
         loaded:&crate::hnn::word::finite_gain::FiniteContactSpans)
         -> Result<(Self,DepositReading),HnnError>
     {
+        Self::contact_only(deposit)?;
+        self.deposited_in(deposit, &self.held(), Some(loaded), DepositMode::Certified)?
+            .published()
+    }
+
+    /// The finite contact span's scope: no linear step, and every factor step at a channel.
+    fn contact_only(deposit: &Deposit) -> Result<(), HnnError> {
         if !deposit.linear().is_empty() || deposit.factors().iter().any(|s|
             !matches!(s.gradient.locus(),Locus::Channel(_))) {
             return Err(HnnError::Realization { what: "the finite contact span keeps ring and receiving material fixed" });
         }
-        self.deposited_in(deposit,&self.held(),Some(loaded))
+        Ok(())
+    }
+
+    /// [definition; agent-inferred, October 9; the medium-of-joints record §7] **The first reach
+    /// of each reached contact family, read from this native pass's own state**
+    /// ([`first_reach_scan`]). The deposit runs the native law of
+    /// [`Constitution::deposited_with_contact_spans`] through its validations, pass 1 (each
+    /// family's statistic `h′` carried) and its certificate (each family's `k_cert(f)`), and stops
+    /// before pass 2. For each certified family `f` with unit step `d_f = G_f / h′_f` (the boost's
+    /// column signs taken, as pass 2 takes them) it reads, entry by entry, the parts `r_i` pass 2
+    /// would meet (the staged residual and the carried remainder, exactly as `carried_entry` reads
+    /// them) and returns `k_f`, the least `k ≥ k_cert(f)` at which the owner's own split of
+    /// `2^k d_{f,i} + r_i` leaves its cell at some entry. The families are declared together, each
+    /// at its own `k_f`: one joint candidate, no search over candidates. No family with a step
+    /// refuses typed ([`DeclaredStepRefusal::NoReach`]).
+    pub(crate) fn first_reach(
+        &self,
+        deposit: &Deposit,
+        loaded: &crate::hnn::word::finite_gain::FiniteContactSpans,
+    ) -> Result<Result<DeclaredExponents, DeclaredStepRefusal>, HnnError> {
+        Self::contact_only(deposit)?;
+        match self.deposited_in(deposit, &self.held(), Some(loaded), DepositMode::FirstReach)? {
+            DepositOutcome::Reached(declared) => Ok(Ok(declared)),
+            DepositOutcome::Refused(refusal) => Ok(Err(refusal)),
+            DepositOutcome::Published(..) => Err(HnnError::Realization {
+                what: "a first-reach read publishes no successor",
+            }),
+        }
+    }
+
+    /// [definition; agent-inferred, October 9; the medium-of-joints record §7] **The declared-step
+    /// producer**: [`Constitution::deposited_with_contact_spans`] with each family's exponent
+    /// declared instead of certified ([`StepSource::Declared`]), every other law shared (stale,
+    /// reach, locus, carry, solve, storage growth, budget, the loaded span read and `η c ≤ 1`),
+    /// then the native pass 2 unchanged. A family whose exponent is claimed as this pass's first
+    /// reach must commit: after pass 2 its ACTUAL applied movement, read from the produced
+    /// constitution against this one, is nonzero at some entry ([`CommittedReach`]); otherwise the
+    /// candidate refuses typed ([`DeclaredStepRefusal::Uncommitted`]): proposed reach is not
+    /// committed reach. A declared step carries no a priori curvature certificate; the candidate
+    /// it produces is only admitted by `hnn::word::continuation::FiniteDecrease`.
+    pub(crate) fn deposited_with_contact_spans_at(
+        &self,
+        deposit: &Deposit,
+        loaded: &crate::hnn::word::finite_gain::FiniteContactSpans,
+        declared: &DeclaredExponents,
+    ) -> Result<Result<(Self, DepositReading, CommittedReach), DeclaredStepRefusal>, HnnError> {
+        Self::contact_only(deposit)?;
+        match self.deposited_in(
+            deposit,
+            &self.held(),
+            Some(loaded),
+            DepositMode::Declared(declared),
+        )? {
+            DepositOutcome::Published(next, reading, Some(committed)) => {
+                Ok(Ok((next, reading, committed)))
+            }
+            DepositOutcome::Refused(refusal) => Ok(Err(refusal)),
+            DepositOutcome::Published(_, _, None) | DepositOutcome::Reached(_) => {
+                Err(HnnError::Realization {
+                    what: "a declared deposit publishes its successor with its committed reach",
+                })
+            }
+        }
     }
 
     fn deposited_in(&self, deposit:&Deposit, retained:&BTreeSet<Locus>,
-        loaded:Option<&crate::hnn::word::finite_gain::FiniteContactSpans>)
-        -> Result<(Self,DepositReading),HnnError>
+        loaded:Option<&crate::hnn::word::finite_gain::FiniteContactSpans>,
+        mode: DepositMode<'_>)
+        -> Result<DepositOutcome,HnnError>
     {
         if deposit.commit() != self.commit {
             return Err(HnnError::StaleDeposit {
@@ -6386,8 +6534,91 @@ impl Constitution {
                         .map(move |prepared| (*locus, prepared))
                 })
                 .collect();
-            self.certify_steps(deposit.reach(), &linear, &factors, loaded)?
+            let source = match mode {
+                DepositMode::Declared(declared) => StepSource::Declared(declared),
+                DepositMode::Certified | DepositMode::FirstReach => StepSource::Certified,
+            };
+            match self.certify_steps(deposit.reach(), &linear, &factors, loaded, source)? {
+                Ok(steps) => steps,
+                Err(refusal) => return Ok(DepositOutcome::Refused(refusal)),
+            }
         };
+        // [definition; agent-inferred, October 9] The first reach is read here, from this pass's
+        // own state: after pass 1 carried each family's statistic and before pass 2 moves any
+        // entry ([`Constitution::first_reach`]).
+        if matches!(mode, DepositMode::FirstReach) {
+            let mut reached: BTreeMap<(Locus, Family), DeclaredExponent> = BTreeMap::new();
+            for ((locus, steps, material, carries), region) in regions.iter().zip(&ready) {
+                for prepared in &region.factors {
+                    let key = (*locus, prepared.family);
+                    let Some(reading) = certified.get(&key) else {
+                        continue;
+                    };
+                    let Family::Factor(index) = prepared.family else {
+                        return Err(HnnError::Realization {
+                            what: "a first reach is read on a contact factor family",
+                        });
+                    };
+                    let step = steps
+                        .iter()
+                        .find_map(|(at, step)| match step {
+                            LocusStep::Factor(step) if *at == prepared.index => Some(*step),
+                            _ => None,
+                        })
+                        .ok_or(HnnError::Lattice { locus: *locus })?;
+                    // The unit step pass 2 carries: `G` (its columns signed where a boost
+                    // declares a signature, as `factor_step` signs them) over `h′`.
+                    let gradient = match (&step.gradient, material) {
+                        (
+                            FactorGradient::Stiffness { gradient, .. },
+                            Some(LocusMaterial::Channel(channel)),
+                        ) => match &channel.boost {
+                            Some(boost) => signed_columns(gradient, &boost.signature)?,
+                            None => gradient.clone(),
+                        },
+                        (
+                            FactorGradient::Storage { gradient, .. }
+                            | FactorGradient::Dissipation { gradient, .. },
+                            Some(LocusMaterial::Channel(_)),
+                        ) => gradient.clone(),
+                        _ => return Err(HnnError::Lattice { locus: *locus }),
+                    };
+                    let carrier = Carrier::Factor(index);
+                    let entries: Vec<(Rat, Rat)> = gradient
+                        .entries()
+                        .iter()
+                        .enumerate()
+                        .map(|(i, g)| {
+                            let staged = region
+                                .stroke
+                                .as_ref()
+                                .and_then(|at| at.staged.get(&(carrier, i)))
+                                .map_or_else(Rat::zero, |(residual, _)| residual.clone());
+                            let previous = carries
+                                .get(&(*locus, carrier))
+                                .map_or_else(Rat::zero, |carry| carry.at(i));
+                            (g / &prepared.scale, staged + previous)
+                        })
+                        .collect();
+                    let lattice = self.lattice(*locus)?;
+                    if let Some(reach) =
+                        first_reach_scan(&lattice, reading.step.exponent, &entries)?
+                    {
+                        reached.insert(
+                            key,
+                            DeclaredExponent {
+                                exponent: reach.exponent,
+                                reach: Some(reach),
+                            },
+                        );
+                    }
+                }
+            }
+            if reached.is_empty() {
+                return Ok(DepositOutcome::Refused(DeclaredStepRefusal::NoReach));
+            }
+            return Ok(DepositOutcome::Reached(DeclaredExponents { steps: reached }));
+        }
         let mut certified = certified;
         // The standing's fold (module header, "Within a lobe", "At a node"): each standing
         // family's step held inside its lobes, and the crossings its lock chart offered proposed
@@ -6537,6 +6768,61 @@ impl Constitution {
                 loci: grown.into_iter().take(4).map(|(locus, _)| locus).collect(),
             });
         }
+        // [definition; agent-inferred, October 9] Proposed reach is not committed reach: each family
+        // a declaration claims as this pass's first reach must have moved some entry of its
+        // factor, read from the produced constitution against this one.
+        let committed = match mode {
+            DepositMode::Declared(declared) => {
+                let mut families = BTreeMap::new();
+                for (&(locus, family), step) in declared.families_with_steps() {
+                    if step.reach.is_none() {
+                        continue;
+                    }
+                    let (Locus::Channel(contact), Family::Factor(index)) = (locus, family) else {
+                        return Err(HnnError::Realization {
+                            what: "a first reach is claimed on a contact factor family",
+                        });
+                    };
+                    let (before, after) = match index {
+                        0 => (&self.contacts[contact].storage, &next.contacts[contact].storage),
+                        1 => (
+                            &self.contacts[contact].stiffness,
+                            &next.contacts[contact].stiffness,
+                        ),
+                        _ => (
+                            &self.contacts[contact].dissipation,
+                            &next.contacts[contact].dissipation,
+                        ),
+                    };
+                    let lattice = self.lattice(locus)?;
+                    let mut moved = Vec::new();
+                    for (entry, (old, new)) in
+                        before.entries().iter().zip(after.entries()).enumerate()
+                    {
+                        let delta = new - old;
+                        if delta.is_zero() {
+                            continue;
+                        }
+                        let (quotient, remainder) = lattice.div_rem(&delta);
+                        if !remainder.is_zero() {
+                            return Err(HnnError::Realization {
+                                what: "an applied contact factor movement lies on its lattice",
+                            });
+                        }
+                        moved.push((entry, quotient));
+                    }
+                    if moved.is_empty() {
+                        return Ok(DepositOutcome::Refused(DeclaredStepRefusal::Uncommitted {
+                            locus,
+                            family,
+                        }));
+                    }
+                    families.insert((locus, family), moved);
+                }
+                Some(CommittedReach { families })
+            }
+            DepositMode::Certified | DepositMode::FirstReach => None,
+        };
         let reading = DepositReading {
             storage_growth,
             storage_product: next.storage_product.clone(),
@@ -6566,7 +6852,7 @@ impl Constitution {
             pumped,
             loaded,
         };
-        Ok((next, reading))
+        Ok(DepositOutcome::Published(next, reading, committed))
     }
 
     /// [definition; agent-inferred, September 29] **The lobe law at a deposit** (module header,
@@ -7377,6 +7663,243 @@ type CertifiedSteps = (
     Option<PumpedReading>,
     Option<crate::hnn::word::finite_gain::LoadedSpanReading>,
 );
+
+// -------------------------------------------------------------------------------------------
+// the declared first-reach step
+
+/// [definition; agent-inferred, October 9] **Where a deposit's step exponents come from**
+/// ([`Constitution::certify_steps`]): the native certificate (the own-curvature fixed point and
+/// the joint halving), or one declared candidate's exponents. Nothing else differs.
+#[derive(Clone, Copy)]
+enum StepSource<'d> {
+    Certified,
+    Declared(&'d DeclaredExponents),
+}
+
+impl StepSource<'_> {
+    /// A deposit in which no family steps: a declaration then names none.
+    fn unstepped(&self) -> Result<(), DeclaredStepRefusal> {
+        match self {
+            StepSource::Certified => Ok(()),
+            StepSource::Declared(declared) => match declared.families().next() {
+                Some(&(locus, family)) => Err(DeclaredStepRefusal::Undeclared { locus, family }),
+                None => Ok(()),
+            },
+        }
+    }
+}
+
+/// What one pass of the deposit law is asked for: the native successor, the first reach read
+/// before pass 2, or the successor at declared exponents.
+#[derive(Clone, Copy)]
+enum DepositMode<'d> {
+    Certified,
+    FirstReach,
+    Declared(&'d DeclaredExponents),
+}
+
+/// What one pass of the deposit law returns: a successor with its reading (and, for a declared
+/// pass, its committed reach), the first reach, or a declared step's typed refusal.
+enum DepositOutcome {
+    Published(Constitution, DepositReading, Option<CommittedReach>),
+    Reached(DeclaredExponents),
+    Refused(DeclaredStepRefusal),
+}
+
+impl DepositOutcome {
+    /// The native successor; the native pass returns nothing else.
+    fn published(self) -> Result<(Constitution, DepositReading), HnnError> {
+        match self {
+            DepositOutcome::Published(next, reading, _) => Ok((next, reading)),
+            DepositOutcome::Reached(_) | DepositOutcome::Refused(_) => Err(HnnError::Realization {
+                what: "the certified deposit publishes its successor",
+            }),
+        }
+    }
+}
+
+/// [definition; agent-inferred, October 9; the medium-of-joints record §7] **A declared step's
+/// typed refusals** ([`Constitution::first_reach`],
+/// [`Constitution::deposited_with_contact_spans_at`]). None is answered by another exponent,
+/// a halving or a second candidate.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum DeclaredStepRefusal {
+    /// No reached family has a step: nothing can reach the lattice.
+    NoReach,
+    /// The declared exponent breaks the covector-scale bound `η c ≤ 1`.
+    CovectorScale {
+        locus: Locus,
+        family: Family,
+        exponent: i64,
+    },
+    /// A stepping family the declaration does not name, or a declared family that does not step.
+    Undeclared { locus: Locus, family: Family },
+    /// A family claimed at its first reach whose applied factor did not move: proposed reach is
+    /// not committed reach.
+    Uncommitted { locus: Locus, family: Family },
+}
+
+/// [definition; agent-inferred, October 9] **One family's first reach** ([`first_reach_scan`]):
+/// `k_f`, the scan's start `k_cert(f)` and certain end `max(k_cert, k_max)`, and each entry whose
+/// split leaves its cell at `k_f`, with its coordinate `q_i(k_f) ≠ 0` (the proposed reach).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct FirstReach {
+    pub exponent: i64,
+    pub certified: i64,
+    pub endpoint: i64,
+    pub reached: Vec<(usize, BigInt)>,
+}
+
+/// One family's declared exponent, with its first reach when it is claimed as one.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct DeclaredExponent {
+    pub exponent: i64,
+    pub reach: Option<FirstReach>,
+}
+
+/// [definition; agent-inferred, October 9] **The declared exponents of one candidate step**: each
+/// stepping family's `k`, read from this pass by [`Constitution::first_reach`] (each claimed at its
+/// first reach). Simultaneous families are one joint candidate, each at its own exponent. Its only
+/// constructors are the first-reach read and, in the crate's tests, the certified anchor and a
+/// declared refusal fixture.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct DeclaredExponents {
+    steps: BTreeMap<(Locus, Family), DeclaredExponent>,
+}
+
+impl DeclaredExponents {
+    /// A family's declared exponent `k` (the step is `2^k`).
+    pub fn exponent(&self, locus: Locus, family: Family) -> Option<i64> {
+        self.steps.get(&(locus, family)).map(|step| step.exponent)
+    }
+
+    /// A family's first reach, when it is claimed as one.
+    pub fn first_reach(&self, locus: Locus, family: Family) -> Option<&FirstReach> {
+        self.steps
+            .get(&(locus, family))
+            .and_then(|step| step.reach.as_ref())
+    }
+
+    /// The declared families, in order.
+    pub fn families(&self) -> impl Iterator<Item = &(Locus, Family)> + '_ {
+        self.steps.keys()
+    }
+
+    /// The declared families with their exponents and claims.
+    pub fn families_with_steps(
+        &self,
+    ) -> impl Iterator<Item = (&(Locus, Family), &DeclaredExponent)> + '_ {
+        self.steps.iter()
+    }
+
+    /// The certified exponents a native publication took, declared as they are with no reach
+    /// claimed: the anchor at which only the exponent source differs.
+    #[cfg(test)]
+    pub(crate) fn certified(reading: &DepositReading) -> Self {
+        Self {
+            steps: reading
+                .steps
+                .iter()
+                .map(|(locus, step)| {
+                    (
+                        (*locus, step.family),
+                        DeclaredExponent {
+                            exponent: step.step.exponent,
+                            reach: None,
+                        },
+                    )
+                })
+                .collect(),
+        }
+    }
+
+    /// Exponents declared by a test, with no reach claimed (a refusal fixture only).
+    #[cfg(test)]
+    pub(crate) fn declare(exponents: impl IntoIterator<Item = ((Locus, Family), i64)>) -> Self {
+        Self {
+            steps: exponents
+                .into_iter()
+                .map(|(key, exponent)| {
+                    (
+                        key,
+                        DeclaredExponent {
+                            exponent,
+                            reach: None,
+                        },
+                    )
+                })
+                .collect(),
+        }
+    }
+}
+
+/// [definition; agent-inferred, October 9] **The committed reach of a declared step**: for each
+/// family claimed at its first reach, every entry whose factor actually moved, with its applied
+/// lattice coordinate `q ≠ 0`, read from the produced constitution against the producing one.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CommittedReach {
+    pub families: BTreeMap<(Locus, Family), Vec<(usize, BigInt)>>,
+}
+
+/// [definition; agent-inferred, October 9; Lean `HNN/FiniteDecrease.{split_spec, split_bounds,
+/// quot_ne_zero_of_half_lt, first_reach_endpoint}`] **The first reach of one family, entry by
+/// entry from the owner's own split** ([`Lattice::div_rem`]: nearest, ties upward). Each entry
+/// is its unit step `d_i` and the part `r_i` pass 2 meets there (the staged residual and the
+/// carried remainder, with the invariant `−u/2 ≤ r_i < u/2`, refused where it fails). With
+/// `q_i(k)` the coordinate of `2^k d_i + r_i`, the first reach is
+/// `k_f = min { k ≥ k_cert : some q_i(k) ≠ 0 }`. The scan is finite: at `k_max`, the least `k`
+/// with `2^k max_i |d_i| > u`, the widest entry has `|2^k d_i + r_i| > u − u/2`, so its `q_i ≠ 0`,
+/// and the scan has ended by `max(k_cert, k_max)`. `None` when every `d_i = 0`: such a family is
+/// not in the candidate. The split decides, never `max |η d|`: a remainder of the opposite sign
+/// can hold the widest entry in its cell while a narrower entry, its remainder of the same
+/// sign, leaves its own.
+pub(crate) fn first_reach_scan(
+    lattice: &Lattice,
+    certified: i64,
+    entries: &[(Rat, Rat)],
+) -> Result<Option<FirstReach>, HnnError> {
+    let unit = lattice.unit();
+    let half = &unit / rat(2, 1);
+    let below = -half.clone();
+    if entries.iter().any(|(_, r)| *r < below || *r >= half) {
+        return Err(HnnError::Realization {
+            what: "a carried remainder lies in its half-open cell",
+        });
+    }
+    let Some(widest) = entries
+        .iter()
+        .map(|(d, _)| d.abs())
+        .max()
+        .filter(|widest| widest.is_positive())
+    else {
+        return Ok(None);
+    };
+    // The least `k` with `2^k · widest > u`: `⌊log₂(u / widest)⌋ + 1`.
+    let reaching = crate::ratio::disk::floor_log2(&(&unit / &widest)) + 1;
+    let endpoint = certified.max(reaching);
+    for exponent in certified..=endpoint {
+        let step = crate::holon::deposition::dyadic(exponent);
+        let reached: Vec<(usize, BigInt)> = entries
+            .iter()
+            .enumerate()
+            .filter_map(|(entry, (d, r))| {
+                let (quotient, _) = lattice.div_rem(&(&step * d + r));
+                (!quotient.is_zero()).then_some((entry, quotient))
+            })
+            .collect();
+        if !reached.is_empty() {
+            return Ok(Some(FirstReach {
+                exponent,
+                certified,
+                endpoint,
+                reached,
+            }));
+        }
+    }
+    Err(HnnError::Realization {
+        what: "the first-reach scan reaches by its endpoint",
+    })
+}
 
 /// One locus's pass-1 preparation: its budgeted carry (opened by its first step), its linear step's
 /// place, kind and prepared unit step (none when nothing reached the locus), and its factor

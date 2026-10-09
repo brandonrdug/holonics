@@ -17,7 +17,7 @@ use crate::hnn::moment::SourceMoment;
 use crate::hnn::port::{Deposit, WordReturn};
 use crate::hnn::prediction::{DamagedSection, PhysicalRepair, RepairedCell, StationRead, Unresolved};
 use crate::hnn::ratio::HolonRatio;
-use crate::hnn::word::continuation::ContinuationReceipt;
+use crate::hnn::word::continuation::{ContinuationReceipt, Landing};
 use crate::hnn::word::{ FieldBalance, ReceptionCarry, SourceOpeningReceipt, Word, WordBalance};
 use crate::hnn::word::variation::{HeldContactComparison, VariationBudget, VariationReading};
 use crate::hnn::word::variation::gain::{ContactStationResponse, StationResponseReading};
@@ -45,6 +45,15 @@ pub struct ContactPublication {
     /// the actual finite differences in `continuation.material`, not that aggregate count.
     pub publication: DepositReading,
     pub continuation: ContinuationReceipt,
+    /// [agent-inferred, October 9; the medium-of-joints record §7] The finite-decrease landing
+    /// this comparison issued: its declared exponents, its transient candidate's re-read (`L′`,
+    /// `X′`, the candidate `θ′`, its committed reach) and the admission or its typed refusal, a
+    /// measured outcome either way. When admitted, `publication` is the declared candidate's and
+    /// `continuation.landing` carries `e = candidate_end − held`; when refused, including the
+    /// post-admission refusal of the candidate's continuation (`LandingRefusal::Continuation`), the
+    /// continuation is the certified one exactly as before. `ratio` is the producing comparison
+    /// (`L`, `X`).
+    pub landing: Landing,
 }
 
 /// The reached current+delayed covector's actual native material return. The existing loaded
@@ -142,9 +151,11 @@ impl PhysicalReceiver<'_> {
             moment = moment.station_section(self.field, self.resident.current(), g, &section.placed())?;
         }
         let moment = Arc::new(moment);
+        // The opening this Word opens at; the landing reads the same value (a Word records none).
+        let reception = self.resident.reception_opening();
         let (mut word, opening) = Word::open_source_exact_received(self.field,
             self.resident.constitution(), self.resident.current(), moment.clone(),
-            &self.resident.reception_opening())?;
+            &reception)?;
         let opened_at = word.opened_at();
         let held_opening = held.as_ref().map(|j| {
             j.admit_ticks(phases.junction_steps())?;
@@ -247,20 +258,43 @@ impl PhysicalReceiver<'_> {
                         reason: "the native contact observation keeps its producing chart/source and requested partition",
                     });
                 }
-                let (ratio, returned) = word.compare_contacts(receiver_index,
-                    &observed.observed, &observed.compared)?;
+                // [agent-inferred, October 9; the medium-of-joints record §7] The same comparison
+                // and return as `compare_contacts`, and the finite-decrease landing issued from its
+                // cut: at a Rest opening on exact operands, one declared candidate re-read on a
+                // transient Word; a received opening or charted operands issue none.
+                let (ratio, returned, mut landing) = word.compare_contacts_landing(receiver_index,
+                    &observed.observed, &observed.compared, &reception)?;
                 let cut = returned.forward.into_present().ok_or(HnnError::Realization { what: "the reached contact cut" })?;
                 let pullback = returned.pullback.into_present().ok_or(HnnError::Realization { what: "the reached contact covector" })?;
                 let deposit = returned.deposit.into_present().ok_or(HnnError::Realization { what: "the reached contact deposition" })?;
                 let mut charts = self.resident.reception_charts();
-                let (material, returned) = cut.continue_deposited(self.field, self.resident.current(), &moment, &deposit, &mut charts)?;
+                // Admitted: the admitted continuation is prepared on the cut without consuming it.
+                // A refusal there (the held law, a preservation or work check at θ′) is recorded as
+                // the typed post-admission refusal, and the certified continuation then runs on the
+                // same cut exactly as before; so does a refused landing. No step is tried twice.
+                let admitted = match &landing.outcome {
+                    Ok(admission) => Some(cut.prepare_admitted(self.field, self.resident.current(),
+                        &moment, &deposit, admission, &charts)),
+                    Err(_) => None,
+                };
+                let (material, returned) = match admitted {
+                    Some(Ok(prepared)) => cut.finish(prepared, &mut charts),
+                    Some(Err(refusal)) => {
+                        landing.outcome = Err(refusal);
+                        cut.continue_deposited(self.field, self.resident.current(), &moment,
+                            &deposit, &mut charts)?
+                    }
+                    None => cut.continue_deposited(self.field, self.resident.current(), &moment,
+                        &deposit, &mut charts)?,
+                };
                 let next_word = returned.forward.into_present().ok_or(HnnError::Realization { what: "the held current" })?;
                 let carry = next_word.reception_end()?;
                 let publication = returned.deposit.into_present().ok_or(HnnError::Realization { what: "the finite material return" })?;
                 let continuation = returned.receipt;
                 self.resident.publish_reception(Some(material.clone()),
                     HolonState::at(carry, material.commit()), Some(charts), None, section.chart())?;
-                Ok(ContactPublication { ratio, pullback, comparison_return: deposit, publication, continuation })
+                Ok(ContactPublication { ratio, pullback, comparison_return: deposit, publication, continuation,
+                    landing })
             })();
             comparison = joined.map(Some);
             }

@@ -7,6 +7,7 @@ mod contact_residual;
 mod encoding;
 mod executed;
 mod field;
+mod finite_decrease;
 mod floquet;
 mod guards;
 mod keys;
