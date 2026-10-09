@@ -1,0 +1,301 @@
+{
+ "scope": "Compact public receipt of Epime's focused Lean checks of the repairs pin 19a00491 (tree cb315b3c): each repaired owner and its independent importer compiled by one direct Lean process against source-identical dependencies; the raw per-job receipts, argv and host paths stay in private custody, bound by the SHA-256 of the full results file. Two earlier attempts are preserved there: the first was stopped by the queue's inherited one-Lean-child guard, the second by a dependency search-path error; neither read the source.",
+ "source_commit": "19a00491fc5dfcf6839492b8457d1b223c78db44",
+ "source_tree": "cb315b3c46dbc74a0b1d15810de7e7951666d0b0",
+ "passed": true,
+ "source_clean_unchanged_after": true,
+ "private_results": {
+  "sha256": "8ef94e550393e080a59ea2c1a4daecc8d7a143be3d4402b356e4a361b92a3a93",
+  "bytes": 31187
+ },
+ "jobs": [
+  {
+   "module": "Holonics.HNN.SingleHoleResponse.LoadedWord",
+   "importer": false,
+   "passed": true,
+   "exit": 0,
+   "command_wall_ns": 13975243521,
+   "axiom_rows": [
+    [
+     "Holonics.HNN.SingleHoleResponse.absoluteLoaded_response_add",
+     "propext, Classical.choice, Quot.sound"
+    ]
+   ],
+   "standard_axioms_only": true,
+   "peak_child_RSS_KiB": 3733328,
+   "charged_peak_bytes": "4291948544"
+  },
+  {
+   "module": "Holonics.HNN.SingleHoleResponse.NormalizedOpening",
+   "importer": false,
+   "passed": true,
+   "exit": 0,
+   "command_wall_ns": 7760726909,
+   "axiom_rows": [
+    [
+     "Holonics.HNN.SingleHoleResponse.openedState_from_normalized_source",
+     "propext,\n Classical.choice,\n Quot.sound"
+    ]
+   ],
+   "standard_axioms_only": true,
+   "peak_child_RSS_KiB": 3759180,
+   "charged_peak_bytes": "751669248"
+  },
+  {
+   "module": "Holonics.HNN.SingleHoleResponse.ReceivingResponse",
+   "importer": false,
+   "passed": true,
+   "exit": 0,
+   "command_wall_ns": 9086691818,
+   "axiom_rows": [
+    [
+     "Holonics.HNN.SingleHoleResponse.loadedReceiving_response",
+     "propext, Classical.choice, Quot.sound"
+    ]
+   ],
+   "standard_axioms_only": true,
+   "peak_child_RSS_KiB": 3748860,
+   "charged_peak_bytes": "1774841856"
+  },
+  {
+   "module": "Holonics.HNN.SingleHoleResponse.GrainRelease",
+   "importer": false,
+   "passed": true,
+   "exit": 0,
+   "command_wall_ns": 4673378600,
+   "axiom_rows": [
+    [
+     "Holonics.HNN.SingleHoleResponse.exactLeaderUnion_mem_iff",
+     "propext, Classical.choice, Quot.sound"
+    ],
+    [
+     "Holonics.HNN.SingleHoleResponse.exactLeaderUnion_sound",
+     "propext, Classical.choice, Quot.sound"
+    ],
+    [
+     "Holonics.HNN.SingleHoleResponse.constant_face_released_at_zero",
+     "propext,\n Classical.choice,\n Quot.sound"
+    ],
+    [
+     "Holonics.HNN.SingleHoleResponse.holdingLaw_releases_constant_face_at_zero",
+     "propext,\n Classical.choice,\n Quot.sound"
+    ],
+    [
+     "Holonics.HNN.SingleHoleResponse.singletonLeader_holdingLaw_release",
+     "propext,\n Classical.choice,\n Quot.sound"
+    ]
+   ],
+   "standard_axioms_only": true,
+   "peak_child_RSS_KiB": 1914612,
+   "charged_peak_bytes": "814534656"
+  },
+  {
+   "module": "Holonics.HNN.SingleHoleResponse.ComposedConsumer",
+   "importer": false,
+   "passed": true,
+   "exit": 0,
+   "command_wall_ns": 7558761336,
+   "axiom_rows": [
+    [
+     "Holonics.HNN.SingleHoleResponse.normalizedSource_loadedWord_grain_singleton_release",
+     "propext,\n Classical.choice,\n Quot.sound"
+    ]
+   ],
+   "standard_axioms_only": true,
+   "peak_child_RSS_KiB": 3772964,
+   "charged_peak_bytes": "857296896"
+  },
+  {
+   "module": "Holonics.HNN.SingleHoleResponse",
+   "importer": false,
+   "passed": true,
+   "exit": 0,
+   "command_wall_ns": 6797283688,
+   "axiom_rows": [
+    [
+     "Holonics.HNN.SingleHoleResponse.firstComplete_eq_fixed_add_response",
+     "propext,\n Classical.choice,\n Quot.sound"
+    ],
+    [
+     "Holonics.HNN.SingleHoleResponse.pairComplete_eq_fixed_add_response",
+     "propext,\n Classical.choice,\n Quot.sound"
+    ],
+    [
+     "Holonics.HNN.SingleHoleResponse.oneHoleSourceExpansion",
+     "propext, Classical.choice, Quot.sound"
+    ],
+    [
+     "Holonics.HNN.SingleHoleResponse.populationNormalizedOneHoleSourceExpansion",
+     "propext,\n Classical.choice,\n Quot.sound"
+    ],
+    [
+     "Holonics.HNN.SingleHoleResponse.absoluteLoaded_response_add",
+     "propext, Classical.choice, Quot.sound"
+    ],
+    [
+     "Holonics.HNN.SingleHoleResponse.openedState_from_normalized_source",
+     "propext,\n Classical.choice,\n Quot.sound"
+    ],
+    [
+     "Holonics.HNN.SingleHoleResponse.loadedReceiving_response",
+     "propext, Classical.choice, Quot.sound"
+    ],
+    [
+     "Holonics.HNN.SingleHoleResponse.exactLeaderUnion_mem_iff",
+     "propext, Classical.choice, Quot.sound"
+    ],
+    [
+     "Holonics.HNN.SingleHoleResponse.exactLeaderUnion_sound",
+     "propext, Classical.choice, Quot.sound"
+    ],
+    [
+     "Holonics.HNN.SingleHoleResponse.constant_face_released_at_zero",
+     "propext,\n Classical.choice,\n Quot.sound"
+    ],
+    [
+     "Holonics.HNN.SingleHoleResponse.holdingLaw_releases_constant_face_at_zero",
+     "propext,\n Classical.choice,\n Quot.sound"
+    ],
+    [
+     "Holonics.HNN.SingleHoleResponse.singletonLeader_holdingLaw_release",
+     "propext,\n Classical.choice,\n Quot.sound"
+    ],
+    [
+     "Holonics.HNN.SingleHoleResponse.normalizedSource_loadedWord_grain_singleton_release",
+     "propext,\n Classical.choice,\n Quot.sound"
+    ]
+   ],
+   "standard_axioms_only": true,
+   "peak_child_RSS_KiB": 3733288,
+   "charged_peak_bytes": "828022784"
+  },
+  {
+   "module": "Holonics.HNN.SourceReceiverReturn",
+   "importer": false,
+   "passed": true,
+   "exit": 0,
+   "command_wall_ns": 8298958322,
+   "axiom_rows": [
+    [
+     "Holonics.HNN.SourceReceiverReturn.blockTick_apply",
+     "propext, Classical.choice, Quot.sound"
+    ],
+    [
+     "Holonics.HNN.SourceReceiverReturn.wordMapAt_apply",
+     "propext, Classical.choice, Quot.sound"
+    ],
+    [
+     "Holonics.HNN.SourceReceiverReturn.sourceReturnAt_pairing",
+     "propext, Classical.choice, Quot.sound"
+    ],
+    [
+     "Holonics.HNN.SourceReceiverReturn.sourceReturnAt_is_dual_of_sourceRead",
+     "propext,\n Classical.choice,\n Quot.sound"
+    ],
+    [
+     "Holonics.HNN.SourceReceiverReturn.sourceReturnAt_unique",
+     "propext, Classical.choice, Quot.sound"
+    ],
+    [
+     "Holonics.HNN.SourceReceiverReturn.sourceReturnAt_halfTurn",
+     "propext, Classical.choice, Quot.sound"
+    ],
+    [
+     "Holonics.HNN.SourceReceiverReturn.sourceContrast_return",
+     "propext, Classical.choice, Quot.sound"
+    ],
+    [
+     "Holonics.HNN.SourceReceiverReturn.partitionReturn_pairing",
+     "propext, Classical.choice, Quot.sound"
+    ],
+    [
+     "Holonics.HNN.SourceReceiverReturn.normalizedAbsoluteLoaded_sourceReturn",
+     "propext,\n Classical.choice,\n Quot.sound"
+    ]
+   ],
+   "standard_axioms_only": true,
+   "peak_child_RSS_KiB": 3798608,
+   "charged_peak_bytes": "858546176"
+  },
+  {
+   "module": "Holonics.HNN.SingleHoleResponse.NormalizedOpening",
+   "importer": true,
+   "passed": true,
+   "exit": 0,
+   "command_wall_ns": 6722680381,
+   "axiom_rows": [
+    [
+     "Holonics.HNN.SingleHoleResponse.openedState_from_normalized_source",
+     "propext,\n Classical.choice,\n Quot.sound"
+    ]
+   ],
+   "standard_axioms_only": true,
+   "peak_child_RSS_KiB": 3722288,
+   "charged_peak_bytes": "796352512"
+  },
+  {
+   "module": "Holonics.HNN.SingleHoleResponse.ComposedConsumer",
+   "importer": true,
+   "passed": true,
+   "exit": 0,
+   "command_wall_ns": 7516703106,
+   "axiom_rows": [
+    [
+     "Holonics.HNN.SingleHoleResponse.normalizedSource_loadedWord_grain_singleton_release",
+     "propext,\n Classical.choice,\n Quot.sound"
+    ]
+   ],
+   "standard_axioms_only": true,
+   "peak_child_RSS_KiB": 3710368,
+   "charged_peak_bytes": "1350430720"
+  },
+  {
+   "module": "Holonics.HNN.SourceReceiverReturn",
+   "importer": true,
+   "passed": true,
+   "exit": 0,
+   "command_wall_ns": 6964226520,
+   "axiom_rows": [
+    [
+     "Holonics.HNN.SourceReceiverReturn.blockTick_apply",
+     "propext, Classical.choice, Quot.sound"
+    ],
+    [
+     "Holonics.HNN.SourceReceiverReturn.wordMapAt_apply",
+     "propext, Classical.choice, Quot.sound"
+    ],
+    [
+     "Holonics.HNN.SourceReceiverReturn.sourceReturnAt_pairing",
+     "propext, Classical.choice, Quot.sound"
+    ],
+    [
+     "Holonics.HNN.SourceReceiverReturn.sourceReturnAt_is_dual_of_sourceRead",
+     "propext,\n Classical.choice,\n Quot.sound"
+    ],
+    [
+     "Holonics.HNN.SourceReceiverReturn.sourceReturnAt_unique",
+     "propext, Classical.choice, Quot.sound"
+    ],
+    [
+     "Holonics.HNN.SourceReceiverReturn.sourceReturnAt_halfTurn",
+     "propext, Classical.choice, Quot.sound"
+    ],
+    [
+     "Holonics.HNN.SourceReceiverReturn.sourceContrast_return",
+     "propext, Classical.choice, Quot.sound"
+    ],
+    [
+     "Holonics.HNN.SourceReceiverReturn.partitionReturn_pairing",
+     "propext, Classical.choice, Quot.sound"
+    ],
+    [
+     "Holonics.HNN.SourceReceiverReturn.normalizedAbsoluteLoaded_sourceReturn",
+     "propext,\n Classical.choice,\n Quot.sound"
+    ]
+   ],
+   "standard_axioms_only": true,
+   "peak_child_RSS_KiB": 3719212,
+   "charged_peak_bytes": "1089970176"
+  }
+ ]
+}
