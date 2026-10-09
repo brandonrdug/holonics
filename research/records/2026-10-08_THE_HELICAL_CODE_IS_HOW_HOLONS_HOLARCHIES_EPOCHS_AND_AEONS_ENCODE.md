@@ -411,8 +411,8 @@ Its second part states the perfected laws:
        - the release's closed contacts through the founding prior are `[1, 3]`;
        - a save restores the law, its prior and its contacts.
 
-       It is not an end-to-end participating world's comparison. The quadratic's invariance is owed
-       in Lean (#62).
+       It is not an end-to-end participating world's comparison. The quadratic's invariance on the
+       subspace is `projection_quadratic` (Lean `HNN/PairedDeposit`, owed to the queue's check).
 
    **The general partner law and its scope** (`proved-derived` for the identity, owed in Lean).
    - **The identity.** For a uniform tick, an involution `B` and `B E = E σ`, the recurrence face
