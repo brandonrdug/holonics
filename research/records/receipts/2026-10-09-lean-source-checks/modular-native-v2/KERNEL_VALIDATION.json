@@ -1,0 +1,66 @@
+{
+  "kernel_accepted": false,
+  "compiler_exit": 1,
+  "compiler_wall_ns": 22865632233,
+  "axioms": {
+    "Holonics.Zeta.ModularScatteringResidual.modularScattering_eq_xiScatteringChart": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ModularScatteringResidual.modularScattering_eq_gammaR_zeta": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ModularScatteringResidual.logDeriv_xi_two_mul_sub": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ModularScatteringResidual.logDeriv_xiScatteringChart": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ModularScatteringResidual.logDeriv_modularScattering": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ModularScatteringResidual.xiScattering_current_residual": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ModularScatteringResidual.modularScattering_current_residual": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ModularScatteringResidual.xiCurrentRemainder_eq_tail": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ModularScatteringResidual.modularScattering_current_residual_eq_tail": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ModularScatteringResidual.xiCurrentRemainder_pullback_enclosures": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "selector_count_matches": true,
+  "standard_axioms_only": false,
+  "metadata_unchanged": true,
+  "broad_library_checked": false
+}

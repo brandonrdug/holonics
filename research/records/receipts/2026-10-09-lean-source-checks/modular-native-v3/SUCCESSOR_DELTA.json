@@ -1,0 +1,22 @@
+{
+  "predecessor_SHA256": "b79985da156c9c1863b90f6ce9a6d928dc1bf55f54bbfb431128bb1e554baf65",
+  "successor_SHA256": "9c28f550d9531e9ed68cca74596f1b8e61738807e04e23644837e02469dca9d4",
+  "all_theorem_statement_headers_byte_identical": true,
+  "axiom_query_list_byte_identical": true,
+  "public_theorem_count": 10,
+  "public_query_count": 10,
+  "query_names_in_source_order": [
+    "Holonics.Zeta.ModularScatteringResidual.modularScattering_eq_xiScatteringChart",
+    "Holonics.Zeta.ModularScatteringResidual.modularScattering_eq_gammaR_zeta",
+    "Holonics.Zeta.ModularScatteringResidual.logDeriv_xi_two_mul_sub",
+    "Holonics.Zeta.ModularScatteringResidual.logDeriv_xiScatteringChart",
+    "Holonics.Zeta.ModularScatteringResidual.logDeriv_modularScattering",
+    "Holonics.Zeta.ModularScatteringResidual.xiScattering_current_residual",
+    "Holonics.Zeta.ModularScatteringResidual.modularScattering_current_residual",
+    "Holonics.Zeta.ModularScatteringResidual.xiCurrentRemainder_eq_tail",
+    "Holonics.Zeta.ModularScatteringResidual.modularScattering_current_residual_eq_tail",
+    "Holonics.Zeta.ModularScatteringResidual.xiCurrentRemainder_pullback_enclosures"
+  ],
+  "change": "typed derivative normalization inside the existing proof",
+  "diff": "--- \n+++ \n@@ -158,7 +158,9 @@\n       w hw0 hwSub differentiableAt_id (differentiableAt_id.sub_const 1)]\n     rw [logDeriv_id']\n     unfold polarCurrent\n-    rw [logDeriv_apply, ((hasDerivAt_id w).sub_const 1).deriv]\n+    have hdsub : HasDerivAt (fun v : \u2102 => v - 1) 1 w := by\n+      simpa only [id_eq] using (hasDerivAt_id w).sub_const 1\n+    rw [logDeriv_apply, hdsub.deriv]\n   unfold xiScatteringChart\n   rw [logDeriv_mul (f := fun v : \u2102 => v / (v - 1))\n     (g := fun v : \u2102 => riemannXi (2 * v - 1) / riemannXi (2 * v)) w\n"
+}

@@ -1,0 +1,203 @@
+{
+  "files": {
+    "modular-native-v1/HANDOFF.md": {
+      "original": {
+        "bytes": 1404,
+        "sha256": "5029f964a3911a4a2513fb4ffb58a08b0041a57c66706b3fa9b871884f7a3a8a"
+      },
+      "projected": {
+        "bytes": 1348,
+        "sha256": "17582f07678491ce5a9a55b5bff53c5869071d3dcd9346e10d3083dd19d8f207"
+      },
+      "replaced": {
+        "<home>": 0,
+        "<lean-toolchain>/": 0,
+        "<modular-worktree>/": 1,
+        "<torus-worktree>/": 0
+      }
+    },
+    "modular-native-v1/VALIDATION.json": {
+      "original": {
+        "bytes": 4856,
+        "sha256": "0a63a46244f71cafe231385132d490251dd37455052e8229e2cc88390e0791c2"
+      },
+      "projected": {
+        "bytes": 4715,
+        "sha256": "08b304bc213ffb3ea4a6d779404674a698580dbf30a51fd7fea4d95cc9877a80"
+      },
+      "replaced": {
+        "<home>": 1,
+        "<lean-toolchain>/": 2,
+        "<modular-worktree>/": 2,
+        "<torus-worktree>/": 0
+      }
+    },
+    "modular-native-v2/HANDOFF.md": {
+      "original": {
+        "bytes": 1844,
+        "sha256": "50f8fe4347a52f655973b035c9fe8c1531e0c5cba7eb21887168960169bf4df3"
+      },
+      "projected": {
+        "bytes": 1788,
+        "sha256": "d492cc81542983a5554a05b366618d2e53d95d45383fb91292a1c6e9fe66cb9f"
+      },
+      "replaced": {
+        "<home>": 0,
+        "<lean-toolchain>/": 0,
+        "<modular-worktree>/": 1,
+        "<torus-worktree>/": 0
+      }
+    },
+    "modular-native-v2/VALIDATION.json": {
+      "original": {
+        "bytes": 4559,
+        "sha256": "6d0fbfb8f687e8d335704c13fc9afbc0edbddc99dfc65907df323aef5f3c28f2"
+      },
+      "projected": {
+        "bytes": 4474,
+        "sha256": "99b4cfc5bc24dea542b48e1602575feddf82f3d40ce01aee8aa8e333d04de448"
+      },
+      "replaced": {
+        "<home>": 1,
+        "<lean-toolchain>/": 2,
+        "<modular-worktree>/": 1,
+        "<torus-worktree>/": 0
+      }
+    },
+    "modular-native-v3/HANDOFF.md": {
+      "original": {
+        "bytes": 1871,
+        "sha256": "ed469a99e164b9d1faecc833e94b0f3ad80afcd0ffd52fbbd66843a20369a479"
+      },
+      "projected": {
+        "bytes": 1815,
+        "sha256": "39b65666347d8df9dd332d487f70b32c9a0e81ccf9776fb4074aedfa1dc4cffb"
+      },
+      "replaced": {
+        "<home>": 0,
+        "<lean-toolchain>/": 0,
+        "<modular-worktree>/": 1,
+        "<torus-worktree>/": 0
+      }
+    },
+    "modular-native-v3/VALIDATION.json": {
+      "original": {
+        "bytes": 4377,
+        "sha256": "1871d3e5d6ea45600d3801f6409cfb50ac423cbdfc669fb290145b2c3eed1b26"
+      },
+      "projected": {
+        "bytes": 4292,
+        "sha256": "c426e2037374fa7675358a52618d2b2124573781da68cde34e21db0856d42a29"
+      },
+      "replaced": {
+        "<home>": 1,
+        "<lean-toolchain>/": 2,
+        "<modular-worktree>/": 1,
+        "<torus-worktree>/": 0
+      }
+    },
+    "torus-native-v1/HANDOFF.md": {
+      "original": {
+        "bytes": 1544,
+        "sha256": "79be0352f805be1d30a55031155b50ea2fcba27ee9f8961bb1aff9e7e195981c"
+      },
+      "projected": {
+        "bytes": 1490,
+        "sha256": "224a6cbdc3dd2ee508a97ab2fb14bcb6cb1e5bfe48d48aee633d35a1b8262981"
+      },
+      "replaced": {
+        "<home>": 0,
+        "<lean-toolchain>/": 0,
+        "<modular-worktree>/": 0,
+        "<torus-worktree>/": 1
+      }
+    },
+    "torus-native-v1/VALIDATION.json": {
+      "original": {
+        "bytes": 4462,
+        "sha256": "1c3e819d5189637d83f691ae5746a30cbb02a5d505f2da81ed3e73d99195981c"
+      },
+      "projected": {
+        "bytes": 4325,
+        "sha256": "b05dd90b6348c882e1bf93f73f57dc752d2ae72302141d15f6b5abcf21465e43"
+      },
+      "replaced": {
+        "<home>": 1,
+        "<lean-toolchain>/": 2,
+        "<modular-worktree>/": 0,
+        "<torus-worktree>/": 2
+      }
+    },
+    "torus-native-v2/HANDOFF.md": {
+      "original": {
+        "bytes": 1854,
+        "sha256": "db9649049d7b53373b9d4933f4dbf62888e76bc3157ede075393ef03e62aa2bd"
+      },
+      "projected": {
+        "bytes": 1800,
+        "sha256": "b62bfeb8c443141ab9df8a2bb61fc85c7d2ccef750b2074c94f2f07e89d88267"
+      },
+      "replaced": {
+        "<home>": 0,
+        "<lean-toolchain>/": 0,
+        "<modular-worktree>/": 0,
+        "<torus-worktree>/": 1
+      }
+    },
+    "torus-native-v2/VALIDATION.json": {
+      "original": {
+        "bytes": 8635,
+        "sha256": "24e8c6d514b37563d9d50ba867394c928378339bc18345b4f9452bfdd55f2cd3"
+      },
+      "projected": {
+        "bytes": 8552,
+        "sha256": "96c808df16cacf799780b04a909c0f74488eabd4078464443d996accd3472064"
+      },
+      "replaced": {
+        "<home>": 1,
+        "<lean-toolchain>/": 2,
+        "<modular-worktree>/": 0,
+        "<torus-worktree>/": 1
+      }
+    },
+    "torus-native-v3/HANDOFF.md": {
+      "original": {
+        "bytes": 1562,
+        "sha256": "f7969c922098c93d5b0d6360436975bc1c15ba952e922f058f5a85270b29c2cc"
+      },
+      "projected": {
+        "bytes": 1508,
+        "sha256": "c1897f73b7c78194e12163267e24d4f21dbb038d11faa5849f544876b30c9301"
+      },
+      "replaced": {
+        "<home>": 0,
+        "<lean-toolchain>/": 0,
+        "<modular-worktree>/": 0,
+        "<torus-worktree>/": 1
+      }
+    },
+    "torus-native-v3/VALIDATION.json": {
+      "original": {
+        "bytes": 8260,
+        "sha256": "22791136d392e98f48c15a482d4e0ebff4b392787c57be2017fd2fb3608c8035"
+      },
+      "projected": {
+        "bytes": 8177,
+        "sha256": "87c1b7a6001e690ae84ebea39f3139ec2ae88db82bf57ff183772ee2f6ad14bb"
+      },
+      "replaced": {
+        "<home>": 1,
+        "<lean-toolchain>/": 2,
+        "<modular-worktree>/": 0,
+        "<torus-worktree>/": 1
+      }
+    }
+  },
+  "placeholders": {
+    "<home>": "the host user's home directory, as the check's environment declared it (HOME)",
+    "<lean-toolchain>/": "the absolute host directory of the Lean 4.33.0 toolchain the check invoked; the path that follows is kept",
+    "<modular-worktree>/": "the absolute host directory of the modular scattering lane's git worktree, where the check ran from its lean/ directory; the path that follows is kept",
+    "<torus-worktree>/": "the absolute host directory of the finite torus subgroup lane's git worktree, where the check ran from its lean/ directory; the path that follows is kept"
+  },
+  "rule": "each absolute host prefix below is replaced by its placeholder, the longer prefixes first; no other byte changes. The placeholders do not occur in the originals, so substituting each prefix back restores the original bytes, whose sha256 and size are pinned here and in each packet's unchanged FILE_HASHES.json; checked locally before commit."
+}

@@ -1,0 +1,109 @@
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.rankOneNodeHom_apply' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.rankOneNodeHom_intCast' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.rankOneNodeHom_injective' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.card_rankOneSubgroup' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.subgroupAverage_translate' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.subgroupAverage_idempotent' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.rankOneAverage_idempotent' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.mFourier_translate' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.fourier_zsmul' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.fourier_toAddCircle' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.mFourier_rankOneNode' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.sum_stdAddChar_mul' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.rankOne_character_average' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.rankOneAverage_mFourier' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.mFourierCoeff_translate' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.mFourierCoeff_rankOneAverage' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.subgroupAverageCLM_apply' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.hasSum_rankOneAverage_fourier' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.rankOneAverage_sub_haar_eq_dualSpectralResidual' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.subgroupPairKernelMean_eq_average' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.subgroupPairKernelMean_eq_double_sum' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.rankOne_pairKernel_residual' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.nagelTensorWeight_zero' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.nagel_pairKernel_residual' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.subgroupAverage_transport' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.subgroupPairKernelMean_transport' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.transported_pairKernel_residual' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.integerTorusMap_one' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.integerTorusMap_mul' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.fourier_phase_add' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.mFourier_integerTorusMap' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.mFourier_transportedFrequency' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.transported_character_average' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.mFourier_rankOneNode_exp' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.rankOne_exponential_average' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.fibonacci_exponential_average' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.fibonacci_carry_word' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]

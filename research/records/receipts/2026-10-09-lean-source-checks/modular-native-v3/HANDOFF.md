@@ -1,0 +1,9 @@
+# modular v3 exact-source validation
+
+**PASS** at SHA256 `9c28f550d9531e9ed68cca74596f1b8e61738807e04e23644837e02469dca9d4`. Compiler exit 0; 0 errors; all 10 public-theorem axiom queries reported; 0 reports contain `sorryAx`. Standard axioms only: True. Prior v1/v2 failure receipts remain preserved. Statement headers and the full query list match v2.
+
+Command: `lake env lean -j1 HolonicsResearch/Zeta/ModularScatteringResidual.lean`, from `<modular-worktree>/lean`. One CPU and existing cached providers. Compiler wall 15621323402 ns, guarded wall 15948779611 ns, aggregate CPU 8304018000 ns, peak child RSS 6628884 KiB. Fixed deadline 154785618970 ns is unchanged. Measured reservation 6883590144 bytes; enforced ceiling 8589934592 bytes. No limit raised after launch.
+
+Source and sealed local provider metadata remained unchanged. Exact target, transitive Holonics source and cached provider parts, toolchain executables/libraries, Lake manifest; foreign dependency closure is version-declared and consumed from existing cache, not an exhaustive byte seal. Full stdout/stderr, source/command/provider hashes, all axiom reports and lifecycle/resource receipts are retained. The lease is released, owned unit quiescent and no native process remains. Any retained failed-service metadata owns no process or lease. No source edit, dependency build, publication or new design outreach. Acceptance is limited to the exact source check and public-theorem axiom queries; no HNN or new operator claim is made.
+
+The first v3 admission was refused before compiler launch for insufficient measured headroom. Its controller and lease were released. The refused admission is preserved separately; the later admission used fresh sufficient headroom with the same bounds. Lean was invoked only once for this exact v3 source.

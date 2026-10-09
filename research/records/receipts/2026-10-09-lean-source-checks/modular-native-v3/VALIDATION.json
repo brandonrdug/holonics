@@ -1,0 +1,125 @@
+{
+  "outcome": "PASS",
+  "source_SHA256": "9c28f550d9531e9ed68cca74596f1b8e61738807e04e23644837e02469dca9d4",
+  "predecessor_SHA256": "b79985da156c9c1863b90f6ce9a6d928dc1bf55f54bbfb431128bb1e554baf65",
+  "prior_failure_receipts_preserved": [
+    "modular-native-v1",
+    "modular-native-v2"
+  ],
+  "statements_and_full_axiom_query_list_unchanged": true,
+  "public_theorem_count": 10,
+  "axiom_query_count": 10,
+  "all_public_queries_reported": true,
+  "axiom_reports": {
+    "Holonics.Zeta.ModularScatteringResidual.modularScattering_eq_xiScatteringChart": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ModularScatteringResidual.modularScattering_eq_gammaR_zeta": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ModularScatteringResidual.logDeriv_xi_two_mul_sub": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ModularScatteringResidual.logDeriv_xiScatteringChart": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ModularScatteringResidual.logDeriv_modularScattering": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ModularScatteringResidual.xiScattering_current_residual": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ModularScatteringResidual.modularScattering_current_residual": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ModularScatteringResidual.xiCurrentRemainder_eq_tail": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ModularScatteringResidual.modularScattering_current_residual_eq_tail": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ModularScatteringResidual.xiCurrentRemainder_pullback_enclosures": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "standard_axioms_only": true,
+  "sorryAx_report_count": 0,
+  "kernel_accepted": true,
+  "compiler_exit": 0,
+  "error_count": 0,
+  "compiler_wall_ns": 15621323402,
+  "command_wall_ns": 15752694986,
+  "guarded_wall_ns": 15948779611,
+  "aggregate_CPU_ns": 8304018000,
+  "child_CPU_user_us": 2862092,
+  "child_CPU_system_us": 4656354,
+  "peak_child_RSS_KiB": 6628884,
+  "group_memory_peak_bytes": 7958233088,
+  "reservation_bytes": 6883590144,
+  "enforced_ceiling_bytes": 8589934592,
+  "thread_budget": 1,
+  "fixed_deadline_ns": 154785618970,
+  "same_predecessor_fixed_deadline": true,
+  "limits_raised_after_launch": false,
+  "measured_to_projected": [
+    15948779611,
+    154785618970
+  ],
+  "requested_command": "lake env lean -j1 HolonicsResearch/Zeta/ModularScatteringResidual.lean",
+  "command_SHA256": "b5d0feb42e5313a92556ffea0b688fcf0c462636e42e35cd0f9d2e376198c5d2",
+  "actual_compiler_argv": [
+    "/usr/bin/env",
+    "-i",
+    "PATH=<lean-toolchain>/bin:/usr/bin",
+    "HOME=<home>",
+    "LANG=C",
+    "LC_ALL=C",
+    "/usr/bin/timeout",
+    "--signal=TERM",
+    "--kill-after=1s",
+    "152.785618970s",
+    "<lean-toolchain>/bin/lake",
+    "env",
+    "lean",
+    "-j1",
+    "HolonicsResearch/Zeta/ModularScatteringResidual.lean"
+  ],
+  "actual_compiler_argv_SHA256": "8ecfe55d7df6844ea82ee5b24b1af79a83fce2731a48b8e68f28184d364754e2",
+  "cwd": "<modular-worktree>/lean",
+  "source_and_local_provider_metadata_unchanged": true,
+  "provenance_scope": "Exact target, transitive Holonics source and cached provider parts, toolchain executables/libraries, Lake manifest; foreign dependency closure is version-declared and consumed from existing cache, not an exhaustive byte seal.",
+  "all_leases_released": true,
+  "owned_unit_quiescent": true,
+  "owned_unit_absent": true,
+  "retained_failed_unit_metadata_only": [],
+  "no_native_process_remaining": true,
+  "source_edits": false,
+  "dependency_build": false,
+  "publication": false,
+  "new_design_outreach": false,
+  "acceptance_scope": "Exact source elaboration and complete submitted public-theorem standard-axiom audit; no new HNN, physics or operator acceptance",
+  "remaining_blockers": [],
+  "first_v3_admission_refused_before_compiler": true,
+  "refused_admission_child_launched": false,
+  "later_admission_has_fresh_sufficient_headroom": true
+}

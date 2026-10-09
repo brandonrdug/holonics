@@ -1,0 +1,154 @@
+{
+  "files": {
+    "ADMISSION_HOST.json": {
+      "sha256": "c147f8b550ebc362e376ccad9d967dad4b43ba3b0d374c93c960415e57ae3836",
+      "bytes": 237
+    },
+    "COMMAND.txt": {
+      "sha256": "b5d0feb42e5313a92556ffea0b688fcf0c462636e42e35cd0f9d2e376198c5d2",
+      "bytes": 71
+    },
+    "COMPILER_REQUEST.json": {
+      "sha256": "c0382aaab8a9c07ecfab80a5dd4b1d4e56d9972412a01006e2868da8313590af",
+      "bytes": 2138
+    },
+    "EARLY_RESULT_MAIL.txt": {
+      "sha256": "37f2d229cdb6a5decd8c88c51e11491cd4a4e18c9dea79fc9df393d545c58f5d",
+      "bytes": 2758
+    },
+    "HANDOFF.md": {
+      "sha256": "5029f964a3911a4a2513fb4ffb58a08b0041a57c66706b3fa9b871884f7a3a8a",
+      "bytes": 1404
+    },
+    "KERNEL_VALIDATION.json": {
+      "sha256": "52854d4ab9be686f7588c6f41ed0ac124d9a031ae32d9da1ddb61a1dba9c33e1",
+      "bytes": 1843
+    },
+    "ModularScatteringResidual.lean": {
+      "sha256": "623e24300afc046ebe5a13b8fd0a90e35bf4a2aaa4614007a8c12873713bc63b",
+      "bytes": 14153
+    },
+    "SOURCE_PROVIDERS.json": {
+      "sha256": "804e793188a398ca460a1df33fe7029297290fe4e2e932ad5a61e0bc9f40a935",
+      "bytes": 98715
+    },
+    "VALIDATION.json": {
+      "sha256": "0a63a46244f71cafe231385132d490251dd37455052e8229e2cc88390e0791c2",
+      "bytes": 4856
+    },
+    "bounded_stage_memory_v186.py": {
+      "sha256": "53af9940045087e8ae9996a12913c2e86feeaa6349a86fff772428b30d9e89ec",
+      "bytes": 13763
+    },
+    "compiler.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "compiler.stdout": {
+      "sha256": "31dec62404bd5d237894111128d1a4ef36a68cd243b2130ad4853350d2110cfb",
+      "bytes": 2058
+    },
+    "final_stage_memory_v186.py": {
+      "sha256": "ede5f04907a432bab4e22eaaab94a9b8b9e7834e54eb0f27bc5927bca6159f51",
+      "bytes": 11260
+    },
+    "leased_stage_memory_v186.py": {
+      "sha256": "3276491e6b7e9afdc6b48f0f9a0d12b39a0627fc269ed65ed22ffbaec0760613",
+      "bytes": 5556
+    },
+    "modular-scattering-20261009-v1.acceptance.json": {
+      "sha256": "651e88bb095cd4b3acb38f58b8bd11bbaed8d76897b884d4cf83551368fde7cc",
+      "bytes": 379
+    },
+    "modular-scattering-20261009-v1.child-identity.json": {
+      "sha256": "153418f056c3726c862bb232ab525eb5ad724b49a06f28499e08e7608071920f",
+      "bytes": 76
+    },
+    "modular-scattering-20261009-v1.config.json": {
+      "sha256": "cb3f6e81bcfcb77ef633ed8b0a7c32203f7897324fb068e7b7c93e10f559f0ed",
+      "bytes": 40110
+    },
+    "modular-scattering-20261009-v1.external-lease.json": {
+      "sha256": "97eb375f32c043c03a9a7ae9d9651b09858bd3876451d77fb53f9c7c4d58805b",
+      "bytes": 486
+    },
+    "modular-scattering-20261009-v1.failure.json": {
+      "sha256": "04b10725165c0c6875415d7e3170bfc050f94589659be988cc60d59b25d01433",
+      "bytes": 230
+    },
+    "modular-scattering-20261009-v1.final.json": {
+      "sha256": "7788522e306c54b693ea6d42a20201fca2d9819302f44bdc04147d892a07d457",
+      "bytes": 5517
+    },
+    "modular-scattering-20261009-v1.host-preflight.json": {
+      "sha256": "f5a325db8de2bc43198d552011067cc91aeec77ffce7435885be37c06f6af7f5",
+      "bytes": 334
+    },
+    "modular-scattering-20261009-v1.input_seal.json": {
+      "sha256": "adda71b27b8c9e84e803a82301ebbf682bce048c59931299232add0a68592194",
+      "bytes": 26707
+    },
+    "modular-scattering-20261009-v1.lease-identity.json": {
+      "sha256": "f7da79a5661223a73244e24c3068916835a8bc8331057e07897fecf88a508f7d",
+      "bytes": 563
+    },
+    "modular-scattering-20261009-v1.memory-gate.json": {
+      "sha256": "5a1e0b6eee311f9bf495e2bd21a5f0cc830cc37c31645000c95f234233296b0e",
+      "bytes": 120
+    },
+    "modular-scattering-20261009-v1.memory-growth.ndjson": {
+      "sha256": "2b5a6d42db3a65995c47c854eaaf98e745410639e8e5a2e8c0dd04a76e872f97",
+      "bytes": 22143
+    },
+    "modular-scattering-20261009-v1.output_seal.json": {
+      "sha256": "67c45ae2ed10b17864bd8af806c52fd94ca08b370fbd1aef61d70ef9af646df3",
+      "bytes": 1533285
+    },
+    "modular-scattering-20261009-v1.publication.json": {
+      "sha256": "ed92b5f0c0080bd1a1cd3e34861d8e74cbf30ef69ffd35a15caf25b1e39df0c9",
+      "bytes": 3111
+    },
+    "modular-scattering-20261009-v1.quiescence.json": {
+      "sha256": "95f7458d353cff3269c0bb8d6141153a35acca634eeecc152d4974010d941c83",
+      "bytes": 129
+    },
+    "modular-scattering-20261009-v1.release.json": {
+      "sha256": "756eb4b9c09ea2d9ba5299f7403e0174c51be532721ceec29bc718b7bf20d48e",
+      "bytes": 174
+    },
+    "modular-scattering-20261009-v1.stage-quiescence.json": {
+      "sha256": "60acd0558b71c073927772d23e96840e0428d7a034ba134495ba06bf96d7b981",
+      "bytes": 136
+    },
+    "modular-scattering-20261009-v1.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "modular-scattering-20261009-v1.stdout": {
+      "sha256": "06bc0381c362f7f571b4c73e1c3144ee5b4134c0ccf1cd63c3a6bb5ec088a979",
+      "bytes": 3852
+    },
+    "modular-scattering-20261009-v1.system-floor.json": {
+      "sha256": "6e99497358a1eadb81ae3a3c448791f26a66445379a77737d9492ffa19a5420c",
+      "bytes": 181716
+    },
+    "modular-scattering-20261009-v1.unit-cleanup.json": {
+      "sha256": "4461125a5bfed0ef2f1a6cf22b7f8ec6ea29fea36b3f57e5bc85a3afbc13f9d1",
+      "bytes": 748
+    },
+    "package_lean_checks.py": {
+      "sha256": "6c2a8d6eb1090859ef98aa7288d2ad6dca93a3cd59348321ba767d19c0fb44ff",
+      "bytes": 5885
+    },
+    "prepare.py": {
+      "sha256": "9aaf3b28f12c1b2c241985e4188db70c4a4dcf81dd3147d9eeccdb2f7d3e2871",
+      "bytes": 5863
+    },
+    "run_stage.py": {
+      "sha256": "25dbc4ef2bc11a924d5ebd4fdc8fc5be8b3549362a7f978f7763db1260293b87",
+      "bytes": 1488
+    }
+  },
+  "entry_count": 37,
+  "self_excluded": true
+}

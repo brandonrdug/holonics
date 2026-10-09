@@ -1191,3 +1191,5 @@ import HolonicsResearch.Mathematics.PiIterationConstraint
 import HolonicsResearch.Transport.GenerativeTransport
 import HolonicsResearch.Computation.NavigatorObservationScope
 import HolonicsResearch.Compression.Relabelling
+import HolonicsResearch.Geometry.FiniteTorusSubgroupReceiver
+import HolonicsResearch.Zeta.ModularScatteringResidual

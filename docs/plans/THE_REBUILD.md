@@ -1856,7 +1856,9 @@ and #62). The motion primitives add these, each graded and each with its Lean pi
   Prüfer shooting as the leap.
 - **The recovered relations at their consumers** (October 9,
   [record](../../research/records/2026-10-09_THE_RECOVERED_RELATIONS_JOIN_AT_THEIR_RECEIVERS_AND_KEEP_THEIR_REMAINDERS.md)). C2 stays first.
-  Two bounded Lean lanes follow beside existing owners, each with its native consumer undeclared:
+  Two Lean owners beside existing ones are kernel-checked, each alone
+  ([receipts](../../research/records/receipts/2026-10-09-lean-source-checks/PUBLICATION.md)), and each
+  has its native consumer undeclared:
   - the finite torus subgroup receiver (`HolonicsResearch/Geometry/FiniteTorusSubgroupReceiver`):
     the averaging, its dual character mask, idempotence, frame and kernel transport, and the
     complete nonzero dual residual;

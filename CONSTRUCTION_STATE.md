@@ -46,8 +46,10 @@ The helical code, the encoding every Holon carries, is defined in
   station's reading of the next encounter, which a state-only matched control left open; the actual
   encounter read the retained point. No selection and no learning through the model are claimed.
 - **Order of the recovered relations** ([record](research/records/2026-10-09_THE_RECOVERED_RELATIONS_JOIN_AT_THEIR_RECEIVERS_AND_KEEP_THEIR_REMAINDERS.md)): C2 first; then
-  two bounded Lean lanes, a finite torus subgroup receiver and the modular scattering residual; and the turn
-  menu's disjoint-coset fit as the first packing law.
+  two Lean owners, kernel-checked alone and with native consumers undeclared, the finite torus subgroup
+  receiver and the modular scattering residual
+  ([receipts](research/records/receipts/2026-10-09-lean-source-checks/PUBLICATION.md)); and the turn menu's
+  disjoint-coset fit as the first packing law.
 
 **October 9: the first learned landing** (#73; the
 [medium-of-joints record](research/records/2026-10-08_THE_MEDIUM_OF_JOINTS_SNAPS_CRACKLES_POPS_OR_FLOWS_AND_ITS_CURRENTS_CURVE_ITS_CONSTITUTION.md) §7).

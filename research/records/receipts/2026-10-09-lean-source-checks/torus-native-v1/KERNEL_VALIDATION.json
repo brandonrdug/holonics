@@ -1,0 +1,63 @@
+{
+  "kernel_accepted": false,
+  "compiler_exit": 1,
+  "compiler_wall_ns": 7670093179,
+  "axioms": {
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.rankOne_character_average": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.rankOneAverage_idempotent": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.mFourierCoeff_rankOneAverage": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.rankOneAverage_sub_haar_eq_dualSpectralResidual": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.nagel_pairKernel_residual": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.subgroupPairKernelMean_transport": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.transported_pairKernel_residual": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.mFourier_transportedFrequency": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.fibonacci_exponential_average": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "selector_count_matches": true,
+  "standard_axioms_only": false,
+  "metadata_unchanged": true,
+  "broad_library_checked": false
+}
