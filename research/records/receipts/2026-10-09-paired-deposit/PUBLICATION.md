@@ -16,8 +16,9 @@ The joins are [NATIVE_LEAN_JOIN.v1.json](NATIVE_LEAN_JOIN.v1.json) at `9ba6fe000
   - 37 of 39 required fixtures passed: `hnn::paired` 18 (loop 1's measurement and loop 2's
     acceptance among them), `hnn::tests::executed` 11, three of the five pair tests of
     `hnn::tests::prediction`, and `tests/source_entrance.rs` 5.
-  - The two period-60 release consumers stopped at the unchanged fixed bound of 17 CPU seconds
-    before any assertion, so they were incomplete.
+  - The two period-60 release consumers were stopped by the aggregate-CPU guard at its stop
+    threshold of 16,000,000 µs, within the 17,000,000 µs cap (a 1,000,000 µs margin). They had no
+    completed test result and no reported failed assertion, so they were incomplete.
   - Committed: the handoff, the validation, every stage's stdout and stderr of at most 200,000 bytes
     (whole, except the host paths projected below), and `native-v1/FILE_HASHES.json`. The guard
     clippy's stdout (2,737,547 bytes) and the rest of the packet are hashed only in
@@ -40,7 +41,8 @@ The joins are [NATIVE_LEAN_JOIN.v1.json](NATIVE_LEAN_JOIN.v1.json) at `9ba6fe000
       the law's incompatibility with the pairing.
 - **The changed read at `f8ac14ba6`** ([handoff](release-read-v2/HANDOFF.md)).
   - The two consumers were split into one drawn request per test, each phase's time printed, every
-    acceptance unchanged. All four passed once, each under the unchanged 17 CPU seconds.
+    acceptance unchanged. All four passed once, each below the unchanged guard (the 16,000,000 µs
+    stop threshold within the 17,000,000 µs aggregate-CPU cap).
   - Generation took 13,354,665,257 to 14,584,650,014 ns a seed, and the whole test 13,595,929,000 to
     15,031,311,000 CPU ns.
   - The old two-seed tests held two generation units each. No limit was raised.
