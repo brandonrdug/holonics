@@ -347,6 +347,34 @@ history without it.** Not yet measured: the second matched control (the same dep
 asked history), the cold restore of acceptance (c), the queue's claim-bearing run, and any second
 fixture. One fixture and one step are a single instance.
 
+[measured; second admitted developer slot, not claim-bearing] **The loop over four encounters,
+against its twin without landings** (`the_world_loop_is_read_against_its_twin_over_encounters`;
+[receipt](receipts/2026-10-09-material-tangent/LOOP_DEV_TESTS.v1.json)). Code is in bits at the
+grain; the excess is the phase part.
+
+| round | learner's code against the twin's | phase excess, learner − twin | landing read after the round |
+|---|---|---|---|
+| 0 | equal (the same encounter; no landing yet) | 0 | admitted, classical |
+| 1 | **strictly below**, gap in `[2⁻⁸, 2⁻⁷)` | negative, magnitude in `[2⁻¹⁵, 2⁻¹⁴)` | refused: phase worse |
+| 2 | equal enclosure | negative, magnitude in `[2⁻¹⁴, 2⁻¹³)` | refused: phase worse |
+| 3 | equal enclosure | positive, in `[2⁻¹⁶, 2⁻¹⁵)` | refused: equal endpoints |
+
+**The second matched control, the landing without its history**
+(`the_landed_material_is_read_without_its_history`): on a fresh World the landed material and the
+contemporary one read the same code enclosure, and the landed one's phase excess is lower by an
+amount in `[2⁻¹⁷, 2⁻¹⁶)`.
+
+What this measures:
+- The one admitted landing helped the encounter it was admitted for, and its classical gain was
+  specific to the located World state. It vanished without that history, and by round 2 the
+  learner's and twin's codes shared a cell.
+- Later steps along the same kind of descent were refused, each typed. In rounds 1 and 2 the
+  candidate improved nothing classical without worsening the phase excess.
+- The admission did what it is for: no uncertified step entered.
+- The loop's next subject is the refused phase. The descent is the total of series (5), so it trades
+  phase against magnitude, and the admission refuses a phase loss. A descent of the classical part
+  alone, or of the phase part at fixed code, is the separated step to measure next.
+
 **Owed (#62).** The admission's soundness for a receiving face ratio read through a located key:
 `HNN/FiniteDecrease.admission_sound` holds for the exact enclosures; that the key's prospect equals
 the actual encounter is the C1b prospect law under its located point.

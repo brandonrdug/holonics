@@ -829,3 +829,142 @@ fn the_world_landing_reads_the_next_encounter() {
         landed.0, landed.1, unlanded.0, unlanded.1
     );
 }
+
+/// One round of the loop on `receiver`: a teaching encounter on every raw coordinate of contact 0,
+/// its World-sensitive descent, and the World landing read on the next encounter at the same
+/// control. Returns the encounter's actual code enclosure and excess, and the landing's decision.
+fn loop_round(
+    receiver: &mut PhysicalReceiver<'_>,
+    field: &Field,
+    source: &Encoded,
+    control: &[Rat],
+) -> (
+    holonics::ratio::algebraic::ExactInterval,
+    Rat,
+    String,
+) {
+    let theta = receiver.constitution().clone();
+    let coordinates = all_coordinates(&theta);
+    let directions: Vec<MaterialDirection> = coordinates
+        .iter()
+        .map(|c| MaterialDirection::of_coordinate(&theta, c).unwrap())
+        .collect();
+    let preparation = actuator(field);
+    let probe = receiver
+        .prepare_probe(source, &field.receivers()[0], &preparation, &[false, true])
+        .unwrap();
+    let waves = admitted(&probe, 0);
+    let (reception, tangents) = probe
+        .encounter_teaching(&waves, control, &directions)
+        .unwrap();
+    let ActionCommunication::Received(received) = reception.reception else {
+        panic!("the teaching encounter completes");
+    };
+    let returned = &received.comparison.as_ref().unwrap().returned;
+    let code = returned.ratio.code_length().unwrap();
+    let excess = returned.ratio.excess().unwrap();
+    let steps = world_descent(
+        &theta,
+        &coordinates,
+        &tangents,
+        &returned.ratio,
+        &returned.contacts,
+    )
+    .unwrap();
+    let reach = returned.deposit.as_ref().unwrap().reach().unwrap().clone();
+    let opened_at = received.encounter.before_native_tick;
+    let landing = receiver
+        .land_world_descent(
+            steps,
+            reach,
+            opened_at,
+            source,
+            &field.receivers()[0],
+            &preparation,
+            &[false, true],
+            control,
+        )
+        .unwrap();
+    let decision = match landing {
+        WorldLanding::Unreached(refusal) => format!("unreached {refusal:?}"),
+        WorldLanding::Read(reading) => format!("{:?}", reading.decision),
+    };
+    (code, excess, decision)
+}
+
+/// **The loop over several encounters, against its twin without landings.** Each round on the
+/// learner is a teaching encounter, its World-sensitive descent and the landing read on the next
+/// encounter; the twin runs the same encounters at the same control with no landing. Every round's
+/// actual comparison is reported for both, as measured: the learner's material changes only where a
+/// landing was admitted.
+#[test]
+fn the_world_loop_is_read_against_its_twin_over_encounters() {
+    let (field, base, source) = fixture();
+    let declared = Declared::new(&field, base);
+    let theta = declared.at(&Rat::zero());
+    let control = vec![integer(1)];
+    let mut learner = bound(&field, theta.clone(), &source, vec![faced_key(&field)]);
+    let mut twin = bound(&field, theta.clone(), &source, vec![faced_key(&field)]);
+    for round in 0..4 {
+        let (code, excess, decision) = loop_round(&mut learner, &field, &source, &control);
+        let preparation = actuator(&field);
+        let probe = twin
+            .prepare_probe(&source, &field.receivers()[0], &preparation, &[false, true])
+            .unwrap();
+        let waves = admitted(&probe, 0);
+        let reception = probe.encounter(&waves, &control).unwrap();
+        let ActionCommunication::Received(received) = reception.reception else {
+            panic!("the twin's encounter completes");
+        };
+        let ratio = &received.comparison.as_ref().unwrap().returned.ratio;
+        let (twin_code, twin_excess) = (ratio.code_length().unwrap(), ratio.excess().unwrap());
+        println!(
+            "world loop: round {round}: learner code {code:?} excess {excess}; twin code {twin_code:?} excess {twin_excess}; landing {decision}"
+        );
+    }
+}
+
+/// **The same landing without the asked history** (the second matched control of (d)): the
+/// contemporary constitution before the landing and the landed one, each on a fresh World with no
+/// earlier encounter, read at the same control.
+#[test]
+fn the_landed_material_is_read_without_its_history() {
+    let (field, base, source) = fixture();
+    let declared = Declared::new(&field, base);
+    let theta = declared.at(&Rat::zero());
+    let control = vec![integer(1)];
+    let mut receiver = bound(&field, theta.clone(), &source, vec![faced_key(&field)]);
+    let before_landing = {
+        // The teaching round's own receiving deposit precedes the landing; read the constitution
+        // the landing staged its step on.
+        let mut probe_receiver = bound(&field, theta.clone(), &source, vec![faced_key(&field)]);
+        let preparation = actuator(&field);
+        let probe = probe_receiver
+            .prepare_probe(&source, &field.receivers()[0], &preparation, &[false, true])
+            .unwrap();
+        let waves = admitted(&probe, 0);
+        probe.encounter(&waves, &control).unwrap();
+        probe_receiver.constitution().clone()
+    };
+    let (_, _, decision) = loop_round(&mut receiver, &field, &source, &control);
+    let landed = receiver.constitution().clone();
+    println!("world history control: landing {decision}");
+    for (name, material) in [("contemporary", before_landing), ("landed", landed)] {
+        let mut fresh = bound(&field, material, &source, vec![faced_key(&field)]);
+        let preparation = actuator(&field);
+        let probe = fresh
+            .prepare_probe(&source, &field.receivers()[0], &preparation, &[false, true])
+            .unwrap();
+        let waves = admitted(&probe, 0);
+        let reception = probe.encounter(&waves, &control).unwrap();
+        let ActionCommunication::Received(received) = reception.reception else {
+            panic!("the fresh encounter completes");
+        };
+        let ratio = &received.comparison.as_ref().unwrap().returned.ratio;
+        println!(
+            "world history control: {name} on a fresh World: code {:?} excess {}",
+            ratio.code_length().unwrap(),
+            ratio.excess().unwrap()
+        );
+    }
+}
