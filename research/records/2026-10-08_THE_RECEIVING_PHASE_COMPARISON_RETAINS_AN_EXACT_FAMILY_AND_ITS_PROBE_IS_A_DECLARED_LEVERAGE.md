@@ -236,6 +236,9 @@ P(c + N k) = P(c) + Σ_j k_j [P(c + N e_j) − P(c)]
   frame) were carried by one `k`.
 - **Not claimed.** The World's target face; raw `x` where `R` has a kernel; C2; the Ask; learning;
   CUDA.
+- **Owed in Lean (#62).** The affine composition is justified by the admitted exact unsplit quadratic
+  native Word's linear tick together with the key's linear charts. The extra summed-direction passage
+  is a guard on that identity, not a kernel proof; the composition theorem is owed.
 
 The bounded C2 acceptance (two actual encounters, a prediction cover before the first, and a
 state-only matched control at the continuing crossing) waits on that model and its finite
