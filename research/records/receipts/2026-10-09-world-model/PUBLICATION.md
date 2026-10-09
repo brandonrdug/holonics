@@ -333,3 +333,40 @@ once (the record's §7).
     face conditioning by observed faces; the plural raw-to-grain relation; invariance under an arbitrary
     common raw-logit shift (the observable removes only a common offset of whole cells); learning through
     the model or the material; CUDA; or the whole gate at `4bdc5db5f`.
+
+## The C2 final joined gate at `64b7f26a3`
+
+The C2 candidate joins `4bdc5db5f` and its wording successor `7b6a8ed3e` onto main `88c166035`, with the
+receipts above, and the whole gate ran on it once.
+- Source `64b7f26a3` (full `64b7f26a334c86272e1b96e89b0470c27407be28`, tree
+  `02f5bb69abbce6dd75e53b2444ad2b66bc2ad836`). The C2 owners `physical/action.rs` and
+  `physical/action/model.rs` equal the tested `4bdc5db5f`. `tests/world_model.rs` differs from it only in
+  the two reviewed doc comments. Of the 352 native inputs, 351 equal `4bdc5db5f`.
+- **The whole gate passed at `64b7f26a3`** ([handoff](c2-joined-gate-v1/HANDOFF.md),
+  [validation](c2-joined-gate-v1/VALIDATION.json), [join scope](c2-joined-gate-v1/JOIN_SCOPE_PROOF.json)).
+  - `bash tools/gate.sh` exited 0. It ran the workspace all-targets check, the full all-targets guard lints
+    and all 57 guard doctests. The script's own component times were 31,369 ms, 32,193 ms and 41,320 ms.
+  - A fresh `cargo test -p holonics --lib --no-run` then passed and built one library-test executable.
+  - No runtime fixture was repeated. The 26 scoped fixtures stand at `4bdc5db5f`
+    ([reuse](c2-joined-gate-v1/PRODUCER_REUSE.json)).
+- **Stages**, within their fixed projections, released, the 4 GiB reservation enforced, and no limit raised
+  after launch:
+
+  | Stage | Exit | Guarded wall ns | Projection ns | CPU ns | Child RSS KiB |
+  |---|---:|---:|---:|---:|---:|
+  | gate | 0 | 106,565,870,366 | 196,670,000,000 | 109,456,113,000 | 1,735,296 |
+  | joined library tests, compile only | 0 | 43,243,371,495 | 65,000,000,000 | 44,425,199,000 | 2,141,016 |
+
+- **Projected host paths** ([PROJECTION.json](PROJECTION.json)). One more placeholder is declared,
+  `<c2-gate-run>/`, for the gate's private run directory, beside the earlier nine.
+  - `PRODUCER_REUSE.json` replaces `<repository>/research/records/receipts/` once.
+  - The library compile's stdout replaces `<cargo-registry>/` 50 times and `<c2-gate-run>/` 57 times, and
+    its stderr replaces `<c2-gate-run>/` once.
+
+  There is no other byte change. All 34 entries invert to their pinned originals, and no host path remains.
+- **Hashed only:** [c2-joined-gate-v1/OMITTED.md](c2-joined-gate-v1/OMITTED.md). The manifest lists 62
+  files (14,190,551 bytes), and 55 of them (14,146,398 bytes) are hash-only. They include the gate's stderr
+  (364,531 bytes, over the compact limit) and `producer/`'s copies, which are byte-identical to the
+  committed `c2-native-v1` `HANDOFF.md`, `VALIDATION.json` and `FILE_HASHES.json`.
+- **Scope.** Claimed: the repository's whole gate and the joined library-test compilation at this tree. Not
+  claimed: any runtime fixture at this tree, or anything beyond C2's scope above.

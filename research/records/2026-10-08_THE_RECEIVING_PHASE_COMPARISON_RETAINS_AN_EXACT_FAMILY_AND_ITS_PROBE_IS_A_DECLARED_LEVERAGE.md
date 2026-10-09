@@ -268,7 +268,7 @@ join].
 
 **The consequence of retained World history (C2)** [definition; agent-inferred, October 9; scoped
 native acceptance at `4bdc5db5f` ([receipt](receipts/2026-10-09-world-model/PUBLICATION.md)); the
-whole gate is owed at the final join]. Two actual encounters run on one receiver and one World. Before the first, the
+whole gate passed at the final join `64b7f26a3`]. Two actual encounters run on one receiver and one World. Before the first, the
 World model's prospect is read over its whole fibre, and one `k` of the World's key carries the
 actual passage.
 - **The matched control.** At the continuing crossing one prepared second action is read from the

@@ -1,0 +1,123 @@
+{
+  "grade": "Final joined repository Gate 1 and library-test compilation PASS",
+  "source_commit": "64b7f26a334c86272e1b96e89b0470c27407be28",
+  "source_tree": "02f5bb69abbce6dd75e53b2444ad2b66bc2ad836",
+  "source_inputs": 352,
+  "source_manifest": {
+    "sha256": "6b1d19d2145206fc91f972e6eaf8f6d2bd555f630f5630e0376c32200efc95b7",
+    "bytes": 59485
+  },
+  "actual_Git_gate_script": {
+    "sha256": "5f631203f35bdb6525fd4b87ec0555af2ea2ba08f45e6a7962bb77acf84bdd5e",
+    "bytes": 1339
+  },
+  "whole_gate_sh_passed": true,
+  "workspace_all_targets_check_passed": true,
+  "FULL_all_targets_guard_lints_passed": true,
+  "guard_doctests_passed": 57,
+  "gate_component_reported_ms": {
+    "check": 31369,
+    "guard-lints": 32193,
+    "guard-doctests": 41320
+  },
+  "gate_component_time_grain": "Script milliseconds; full invocation nanoseconds and aggregate CPU retained separately",
+  "former_helical_duplex_exit_call_lint_blocker_resolved_at_this_exact_pin": true,
+  "fresh_joined_library_test_compilation_passed": true,
+  "fresh_library_test_executable": {
+    "sha256": "606752ca28c6295a55a4413b4bc0d37ec6713c329ec963f0c751a80ec1fbd533",
+    "bytes": 76938208
+  },
+  "source_unchanged_before_after": true,
+  "C2_production_bytes_match_tested_4bdc5db5": true,
+  "world_test_diff_only_two_reviewed_comments": true,
+  "producer_runtime_results_preserved": 26,
+  "runtime_fixtures_repeated": 0,
+  "prior_C2_scope_not_expanded": true,
+  "exact_worktree_clean_after_runs": true,
+  "results": [
+    {
+      "label": "c2joined-64b7f26a-gate-20261009-v1",
+      "accepted": true,
+      "exit": 0,
+      "command_wall_ns": 104888635721,
+      "guarded_wall_ns": 106565870366,
+      "projection_ns": 196670000000,
+      "measured_to_projected": {
+        "numerator": 106565870366,
+        "denominator": 196670000000
+      },
+      "aggregate_CPU_ns": 109456113000,
+      "child_CPU_user_us": 93701621,
+      "child_CPU_system_us": 9408981,
+      "peak_child_RSS_KiB": 1735296,
+      "group_peak_bytes": 2069340160,
+      "reservation_bytes": 4294967296,
+      "enforced_cap_bytes": 4294967296,
+      "maximum_authorized_bytes": 8589934592,
+      "thread_budget": 4,
+      "stdout": {
+        "sha256": "cdb436fcc856c11da923ef47a6b9f9a38c5213c00b70b0ffb90c0a2416d583d0",
+        "bytes": 5987
+      },
+      "stderr": {
+        "sha256": "8a2f3f6d1710da3ecd387bf74d24b26c10fc4a48b70a590cbfea9bafce67251a",
+        "bytes": 364531
+      },
+      "quiescent_released": true
+    },
+    {
+      "label": "c2joined-64b7f26a-joined-lib-20261009-v1",
+      "accepted": true,
+      "exit": 0,
+      "command_wall_ns": 41662862532,
+      "guarded_wall_ns": 43243371495,
+      "projection_ns": 65000000000,
+      "measured_to_projected": {
+        "numerator": 43243371495,
+        "denominator": 65000000000
+      },
+      "aggregate_CPU_ns": 44425199000,
+      "child_CPU_user_us": 37937571,
+      "child_CPU_system_us": 3039502,
+      "peak_child_RSS_KiB": 2141016,
+      "group_peak_bytes": 2415353856,
+      "reservation_bytes": 4294967296,
+      "enforced_cap_bytes": 4294967296,
+      "maximum_authorized_bytes": 8589934592,
+      "thread_budget": 4,
+      "stdout": {
+        "sha256": "eb4124e32082db2e146915d2d17866a27fa7980135ae7e6aa3142a87c8aead8b",
+        "bytes": 26519
+      },
+      "stderr": {
+        "sha256": "566efe075a5f89691bfca6bbd81917a26a9a31ba7863c72e119ee9ede0336524",
+        "bytes": 349
+      },
+      "quiescent_released": true
+    }
+  ],
+  "commands_manifest": {
+    "sha256": "fb94f046c3e83b876888c3fa0d53954324f5773ec61a3b07aaed4286f7032f1a",
+    "bytes": 2539
+  },
+  "all_projections_fixed_before_launch": true,
+  "limits_raised_after_launch": false,
+  "all_leases_released": true,
+  "no_native_process_or_active_owned_unit_remaining": true,
+  "source_edits": false,
+  "Git_publication": false,
+  "GPU_runtime": false,
+  "cache_clearing": false,
+  "system_changes": false,
+  "private_correspondence_in_packet": false,
+  "remaining_blockers_for_requested_native_gate": [],
+  "not_certified": [
+    "grain Face.of_read coverage",
+    "conditioning retained fibres on actual declared faces",
+    "deployed wrong-face elimination",
+    "Ask",
+    "learning",
+    "CUDA parity",
+    "new unrelated diagnostic runtime reading"
+  ]
+}

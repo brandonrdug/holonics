@@ -1,5 +1,71 @@
 {
   "files": {
+    "c2-joined-gate-v1/PRODUCER_REUSE.json": {
+      "original": {
+        "bytes": 1459,
+        "sha256": "cd2deb814bed9939f7d79e8ffbfde288683c040885000439a735479d0313b6d2"
+      },
+      "projected": {
+        "bytes": 1444,
+        "sha256": "3f9e7335138aa1bba85c0671be17d33cfbc65da1a28c6e2a1259ef9a038d10f9"
+      },
+      "replaced": {
+        "<c2-gate-run>/": 0,
+        "<c2-run>/": 0,
+        "<candidate-worktree>/": 0,
+        "<cargo-registry>/": 0,
+        "<coupled-run>/": 0,
+        "<face-run>/": 0,
+        "<gate-run>/": 0,
+        "<native-run>/": 0,
+        "<queue-admission>/": 0,
+        "<repository>/research/records/receipts/": 1
+      }
+    },
+    "c2-joined-gate-v1/stages/c2joined-64b7f26a-joined-lib-20261009-v1.stderr": {
+      "original": {
+        "bytes": 349,
+        "sha256": "566efe075a5f89691bfca6bbd81917a26a9a31ba7863c72e119ee9ede0336524"
+      },
+      "projected": {
+        "bytes": 304,
+        "sha256": "5937cabdedc39da0175c6013844b2f52267569e201c766ab6a153e925ca2f32a"
+      },
+      "replaced": {
+        "<c2-gate-run>/": 1,
+        "<c2-run>/": 0,
+        "<candidate-worktree>/": 0,
+        "<cargo-registry>/": 0,
+        "<coupled-run>/": 0,
+        "<face-run>/": 0,
+        "<gate-run>/": 0,
+        "<native-run>/": 0,
+        "<queue-admission>/": 0,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "c2-joined-gate-v1/stages/c2joined-64b7f26a-joined-lib-20261009-v1.stdout": {
+      "original": {
+        "bytes": 26519,
+        "sha256": "eb4124e32082db2e146915d2d17866a27fa7980135ae7e6aa3142a87c8aead8b"
+      },
+      "projected": {
+        "bytes": 21754,
+        "sha256": "7a7b4907ae1365630e9fb67617a8375496f163dbd0cbcf2d96df2b0d0e0b8944"
+      },
+      "replaced": {
+        "<c2-gate-run>/": 57,
+        "<c2-run>/": 0,
+        "<candidate-worktree>/": 0,
+        "<cargo-registry>/": 50,
+        "<coupled-run>/": 0,
+        "<face-run>/": 0,
+        "<gate-run>/": 0,
+        "<native-run>/": 0,
+        "<queue-admission>/": 0,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
     "c2-native-v1/stages/c2-4bdc5db5-build-20261009-v1.stderr": {
       "original": {
         "bytes": 223,
@@ -580,6 +646,7 @@
     }
   },
   "placeholders": {
+    "<c2-gate-run>/": "the absolute host directory of the C2 final joined gate's private run (its frozen source, copied dependency cache and target); the path that follows is kept",
     "<c2-run>/": "the absolute host directory of the C2 validation's private run (its frozen source, copied dependency cache and target); the path that follows is kept",
     "<candidate-worktree>/": "the absolute host directory of the integration candidate's git worktree that the joined compilation built in place; the repository path that follows is kept",
     "<cargo-registry>/": "the absolute host directory of the crates.io registry sources; each crate name and version that follows is kept",

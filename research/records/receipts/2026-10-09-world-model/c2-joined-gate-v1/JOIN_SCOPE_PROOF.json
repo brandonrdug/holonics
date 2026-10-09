@@ -1,0 +1,14 @@
+{
+  "accepted_producer": "4bdc5db5f605421402557eed19808f1c3c1cbdcb",
+  "joined_commit": "64b7f26a334c86272e1b96e89b0470c27407be28",
+  "joined_tree": "02f5bb69abbce6dd75e53b2444ad2b66bc2ad836",
+  "native_changed_paths": [
+    "crates/holonics/tests/world_model.rs"
+  ],
+  "production_owner_bytes_identical": true,
+  "test_equal_after_line_comment_removal": true,
+  "runtime_fixtures_repeated": 0,
+  "source_diff": "diff --git a/crates/holonics/tests/world_model.rs b/crates/holonics/tests/world_model.rs\nindex feda7ea8d..8b536a3e4 100644\n--- a/crates/holonics/tests/world_model.rs\n+++ b/crates/holonics/tests/world_model.rs\n@@ -1333,8 +1333,9 @@ fn a_key_with_the_worlds_face_covers_its_observed_face_and_a_wrong_face_does_not\n /// C2's declared observable of realified receiving logits at the receiver's grain `L`: per class after\n /// the first, its real row's grain index relative to the first class's, `\u230aL Re f_c\u230b \u2212 \u230aL Re f_0\u230b`,\n /// read as `carry \u00b7 L + phase class` from the cells; and per class the block `\u230aL \u03c6_c\u230b` of its lifted\n-/// phase `\u03c6_c = Im f_c / 2`. A common logit shift, which no face mass reads, and every cell's\n-/// unresolved fibre are not part of it.\n+/// phase `\u03c6_c = Im f_c / 2`. Every cell's unresolved fibre is not part of it. The relative indices\n+/// remove only a common offset of whole cells: a common raw shift that crosses a cell boundary can\n+/// still move them.\n fn admitted(cells: &[GrainCell], phases: &[Rat], grain: u64) -> (Vec<BigInt>, Vec<BigInt>) {\n     let index = |cell: &GrainCell| &cell.carry * BigInt::from(grain) + BigInt::from(cell.phase);\n     let first = index(&cells[0]);\n@@ -1353,7 +1354,7 @@ fn admitted_of(logits: &[Rat], grain: u64) -> (Vec<BigInt>, Vec<BigInt>) {\n /// A member of a station's image along one change of it: `point` moved until one relative real row has\n /// moved by `2/L` or, where no relative real row moves, one lifted phase by `1/L`. Either crosses a cell\n /// of the declared observable, which the caller reads; `None` when the change moves no relative real\n-/// row and no phase (a common logit shift, which the observable does not read).\n+/// row and no phase: a change common to every real row, which this witness never uses.\n fn crossing(point: &[Rat], change: &[Rat], grain: u64) -> Option<Vec<Rat>> {\n     let scale = Rat::from_integer(BigInt::from(grain));\n     let classes = point.len() / 2;\n",
+  "no_new_Lean_source_in_native_join": true,
+  "parent_review_authorized_gate": true
+}

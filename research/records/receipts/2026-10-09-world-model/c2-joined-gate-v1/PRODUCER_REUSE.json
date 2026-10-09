@@ -1,0 +1,40 @@
+{
+  "source_commit": "4bdc5db5f605421402557eed19808f1c3c1cbdcb",
+  "source_tree": "25328d909cc310951f01bf07e6eefcf2c9c39c19",
+  "source_manifest": {
+    "sha256": "27ac813733b3ec15ff6d8e885f430a7b0e79ddd7a563657b084215e5ea89478f",
+    "bytes": 79054
+  },
+  "original_runtime_acceptance": {
+    "sha256": "18f6629a7ac7bbceae357081084e8e6dcc53c3bb8c2ff78e41bee410582aa9e7",
+    "bytes": 378
+  },
+  "public_receipt": "<repository>/research/records/receipts/2026-10-09-world-model/c2-native-v1",
+  "current_reviewed_public_VALIDATION": {
+    "sha256": "5a590495adcd10934e97283d109eae1d519b701ba7064732aa2692100f68a0f0",
+    "bytes": 21892
+  },
+  "current_reviewed_public_FILE_HASHES": {
+    "sha256": "5968afec36b5df45041cdcaf51f0324309d51158c6a5ca960251567bcfd53bb9",
+    "bytes": 37226
+  },
+  "C2_production_native_bytes_match": true,
+  "world_test_comment_only_diff": true,
+  "fixtures_not_repeated": 26,
+  "prior_doctests_passed": 57,
+  "claim_scope_preserved": [
+    "retained World restrictions fix next declared observable relative to incident-carried matched unbound control",
+    "second action performed once, same actual receiver and continuation",
+    "joint fibres and prospective native covering"
+  ],
+  "not_claimed": [
+    "raw common-shift invariance",
+    "face filtering",
+    "Ask",
+    "learning",
+    "CUDA parity"
+  ],
+  "joined_test_comment_changes_compiled_not_executed": [
+    "crates/holonics/tests/world_model.rs"
+  ]
+}
