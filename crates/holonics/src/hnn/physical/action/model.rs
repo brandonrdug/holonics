@@ -525,8 +525,12 @@ fn stepped(
         let factor = columns(sigma, &carried)?.rank_factorization()?;
         let left = &factor.left;
         (0..left.columns())
-            .map(|j| (0..left.rows()).map(|i| left.get(i, j).cloned()).collect())
-            .collect::<Result<_, _>>()?
+            .map(|j| {
+                (0..left.rows())
+                    .map(|i| left.get(i, j).cloned())
+                    .collect::<Result<Vec<Rat>, _>>()
+            })
+            .collect::<Result<Vec<Vec<Rat>>, _>>()?
     };
     Ok(Stepped::Live(StateFibre { point, directions }))
 }
