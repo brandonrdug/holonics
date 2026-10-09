@@ -247,7 +247,10 @@ P(c + N k) = P(c) + Σ_j k_j [P(c + N e_j) − P(c)]
   native Word's linear tick together with the key's linear charts. The extra summed-direction passage
   is a guard on that identity, not a kernel proof; the composition theorem is owed.
 
-**The key's face (C1b-2b)** [definition; agent-inferred, October 9; source under validation].
+**The key's face (C1b-2b)** [definition; agent-inferred, October 9; scoped native acceptance at
+`1ad7f4988` ([receipt](receipts/2026-10-09-world-model/PUBLICATION.md)), where the whole gate was not
+rerun: its failure is inherited from the unchanged example whose repair is validated only by the final
+join].
 - The World's observed target is its own face `C_S x_S⁺ + C_R x_R⁺ + o` on the step's after-state,
   never the native readout. A key may declare the face it hypothesizes (`ModelKey::with_face`: zero
   chart rate, its own split). The prospect predicts that raw face at every compared epoch with the
@@ -259,6 +262,9 @@ P(c + N k) = P(c) + Σ_j k_j [P(c + N e_j) − P(c)]
   - predicting a declared face eliminates no face hypothesis. The memory is filtered by the port
     observations `(a, b)` alone, so no face key is thereby consistent with the observed faces, and
     this is not learning.
+- **Accepted.** The World's actual raw face at a compared epoch, the encounter's own blind native
+  read and its actual waves were carried by one `k`. Where the waves alone fix `k`, a wrong face
+  offset was incompatible, and a key without a face added no rows.
 
 The bounded C2 acceptance (two actual encounters, a prediction cover before the first, and a
 state-only matched control at the continuing crossing) waits on that model and its finite

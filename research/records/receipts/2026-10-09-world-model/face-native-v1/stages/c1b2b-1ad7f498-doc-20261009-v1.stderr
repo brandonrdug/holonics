@@ -1,0 +1,956 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling syn v3.0.3
+   Compiling thiserror v2.0.19
+   Compiling thiserror-impl v2.0.19
+   Compiling holonics v0.1.0 (<face-run>/native/source-v1/crates/holonics)
+warning: method `anchor_differential_joined` is never used
+   --> crates/holonics/src/hnn/port.rs:942:19
+    |
+850 | impl<'c> Word<'c> {
+    | ----------------- method in this implementation
+...
+942 |     pub(crate) fn anchor_differential_joined(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `seeds` is never used
+    --> crates/holonics/src/hnn/receiving.rs:1606:19
+     |
+1310 | impl SourceObserverView {
+     | ----------------------- method in this implementation
+...
+1606 |     pub(crate) fn seeds(
+     |                   ^^^^^
+
+warning: method `advanced` is never used
+   --> crates/holonics/src/hnn/word/variation.rs:473:19
+    |
+236 | impl HeldContactVariation {
+    | ------------------------- method in this implementation
+...
+473 |     pub(crate) fn advanced(&self, word: &Word<'_>, opened: &[EndChange]) -> Result<Self, HnnError> {
+    |                   ^^^^^^^^
+
+warning: `holonics` (lib) generated 3 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 22.68s
+   Doc-tests holonics
+error[E0624]: associated function `new` is private
+   --> crates/holonics/src/compression/keys/repair.rs:139:29
+    |
+  7 |       let _ = DamagedPassage::new(codes, 256, 0);
+    |                               ^^^ private associated function
+    |
+   ::: <face-run>/native/source-v1/crates/holonics/src/compression/keys/repair.rs:170:5
+    |
+170 | /     pub(crate) fn new(
+171 | |         cells: Vec<Option<usize>>,
+172 | |         classes: usize,
+173 | |         opening: usize,
+174 | |     ) -> Result<Self, CompressionError> {
+    | |_______________________________________- private associated function defined here
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0624`.
+error[E0616]: field `deadline_ms` of struct `exterior::Pin` is private
+ --> crates/holonics/src/exterior_guards.rs:106:9
+  |
+6 |     pin.deadline_ms = 900_000;
+  |         ^^^^^^^^^^^ private field
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0616`.
+error[E0308]: mismatched types
+ --> crates/holonics/src/exterior_guards.rs:21:11
+  |
+7 |     grade(cut.seen);
+  |     ----- ^^^^^^^^ expected `Held`, found `Seen`
+  |     |
+  |     arguments to this function are incorrect
+  |
+note: function defined here
+ --> crates/holonics/src/exterior_guards.rs:18:4
+  |
+4 | fn grade(_truth: exterior::Held) {}
+  |    ^^^^^ ----------------------
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0308`.
+error[E0451]: fields `start` and `bytes` of struct `exterior::Held` are private
+ --> crates/holonics/src/exterior_guards.rs:33:36
+  |
+6 |     let _forged = exterior::Held { start: 0, bytes: cut.seen.bytes().to_vec() };
+  |                                    ^^^^^     ^^^^^ private field
+  |                                    |
+  |                                    private field
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0451`.
+error[E0599]: no method named `bytes` found for struct `exterior::Held` in the current scope
+   --> crates/holonics/src/exterior_guards.rs:45:30
+    |
+  6 |     let _training = cut.held.bytes();
+    |                              ^^^^^ private field, not a method
+    |
+   ::: crates/holonics/src/../../../research/notebook/hnn_design/exterior.rs:122:1
+    |
+122 | pub struct Held {
+    | --------------- method `bytes` not found for this struct
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+    = note: the following trait defines an item `bytes`, perhaps you need to implement it:
+            candidate #1: `std::io::Read`
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0599`.
+error[E0382]: use of moved value: `cut.held`
+   --> crates/holonics/src/exterior_guards.rs:58:18
+    |
+  7 |     let _graded = cut.held.windows(&[start], 48);
+    |                            --------------------- `cut.held` moved due to this method call
+  8 |     let _again = cut.held.windows(&[start], 48);
+    |                  ^^^^^^^^ value used here after move
+    |
+note: `exterior::Held::windows` takes ownership of the receiver `self`, which moves `cut.held`
+   --> crates/holonics/src/../../../research/notebook/hnn_design/exterior.rs:136:20
+    |
+136 |     pub fn windows(self, starts: &[usize], length: usize) -> Vec<Vec<u8>> {
+    |                    ^^^^
+    = note: move occurs because `cut.held` has type `exterior::Held`, which does not implement the `Copy` trait
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0382`.
+error[E0451]: fields `path`, `command`, `projection`, `deadline_ms`, `unit_bound_ms`, `threads` and `commit` of struct `exterior::Pin` are private
+  --> crates/holonics/src/exterior_guards.rs:90:9
+   |
+ 5 |     let _raised = exterior::Pin {
+   |                   ------------- in this type
+ 6 |         path: String::new(),
+   |         ^^^^ private field
+ 7 |         command: "executed text".to_string(),
+   |         ^^^^^^^ private field
+ 8 |         projection: String::new(),
+   |         ^^^^^^^^^^ private field
+ 9 |         deadline_ms: 900_000,
+   |         ^^^^^^^^^^^ private field
+10 |         unit_bound_ms: None,
+   |         ^^^^^^^^^^^^^ private field
+11 |         threads: 8,
+   |         ^^^^^^^ private field
+12 |         commit: String::new(),
+   |         ^^^^^^ private field
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0451`.
+error[E0609]: no field `deposits` on type `&Constitution`
+ --> crates/holonics/src/hnn/constitution.rs:18:11
+  |
+8 |     theta.deposits.len()
+  |           ^^^^^^^^ unknown field
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0609`.
+error[E0308]: mismatched types
+ --> crates/holonics/src/hnn/constitution.rs:4564:54
+  |
+9 |     theta.with_element(0, n.clone(), n.clone(), vec![n]).unwrap()
+  |                                                      ^ expected `(Vec<Ratio<BigInt>>, Vec<Ratio<BigInt>>)`, found `ExactRatMatrix`
+  |
+  = note: expected tuple `(Vec<num_rational::Ratio<num_bigint::bigint::BigInt>>, Vec<num_rational::Ratio<num_bigint::bigint::BigInt>>)`
+            found struct `ExactRatMatrix`
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0308`.
+error[E0451]: fields `cells` and `chart` of struct `Encoded` are private
+ --> crates/holonics/src/hnn/encoding.rs:1046:15
+  |
+7 |     Encoded { cells: Vec::new(), ..other.clone() }
+  |               ^^^^^^^^^^^^^^^^^    ^^^^^^^^^^^^^ field `chart` is private
+  |               |
+  |               private field
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0451`.
+error[E0308]: mismatched types
+ --> crates/holonics/src/hnn/encoding.rs:1054:12
+  |
+8 |     ingest(codes)
+  |     ------ ^^^^^ expected `&Encoded`, found `&[usize]`
+  |     |
+  |     arguments to this function are incorrect
+  |
+  = note: expected reference `&Encoded`
+             found reference `&[usize]`
+note: function defined here
+ --> crates/holonics/src/hnn/encoding.rs:1052:4
+  |
+6 | fn ingest(_: &Encoded) {}
+  |    ^^^^^^ -----------
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0308`.
+error[E0308]: mismatched types
+ --> crates/holonics/src/hnn/encoding.rs:1063:12
+  |
+9 |     ingest(cells)
+  |     ------ ^^^^^ expected `&Encoded`, found `&[Vec<(usize, Ratio<BigInt>)>]`
+  |     |
+  |     arguments to this function are incorrect
+  |
+  = note: expected reference `&Encoded`
+             found reference `&[Vec<(usize, num_rational::Ratio<num_bigint::bigint::BigInt>)>]`
+note: function defined here
+ --> crates/holonics/src/hnn/encoding.rs:1061:4
+  |
+7 | fn ingest(_: &Encoded) {}
+  |    ^^^^^^ -----------
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0308`.
+error[E0277]: the trait bound `Encoded: std::convert::From<Vec<usize>>` is not satisfied
+ --> crates/holonics/src/hnn/encoding.rs:1070:11
+  |
+7 |     codes.into()
+  |           ^^^^ the trait `std::convert::From<Vec<usize>>` is not implemented for `Encoded`
+  |
+  = note: required for `Vec<usize>` to implement `Into<Encoded>`
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0277`.
+error[E0277]: the trait bound `Encoded: std::convert::From<usize>` is not satisfied
+ --> crates/holonics/src/hnn/encoding.rs:1077:10
+  |
+7 |     code.into()
+  |          ^^^^ the trait `std::convert::From<usize>` is not implemented for `Encoded`
+  |
+  = note: required for `usize` to implement `Into<Encoded>`
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0277`.
+error[E0277]: the trait bound `Encoded: std::convert::From<Faces>` is not satisfied
+ --> crates/holonics/src/hnn/encoding.rs:1085:11
+  |
+8 |     faces.into()
+  |           ^^^^ the trait `std::convert::From<Faces>` is not implemented for `Encoded`
+  |
+  = note: required for `Faces` to implement `Into<Encoded>`
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0277`.
+error[E0277]: the trait bound `Encoded: std::convert::From<holonics::hnn::Released>` is not satisfied
+ --> crates/holonics/src/hnn/encoding.rs:1093:14
+  |
+8 |     released.into()
+  |              ^^^^ the trait `std::convert::From<holonics::hnn::Released>` is not implemented for `Encoded`
+  |
+  = note: required for `holonics::hnn::Released` to implement `Into<Encoded>`
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0277`.
+error[E0451]: field `class` of struct `PortCell` is private
+ --> crates/holonics/src/hnn/encoding.rs:974:16
+  |
+7 |     PortCell { class: code }
+  |                ^^^^^ private field
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0451`.
+error[E0308]: mismatched types
+ --> crates/holonics/src/hnn/encoding.rs:982:10
+  |
+8 |     port(code)
+  |     ---- ^^^^ expected `PortCell`, found `usize`
+  |     |
+  |     arguments to this function are incorrect
+  |
+note: function defined here
+ --> crates/holonics/src/hnn/encoding.rs:980:4
+  |
+6 | fn port(_: PortCell) {}
+  |    ^^^^ -----------
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0308`.
+error[E0277]: the trait bound `PortCell: std::convert::From<usize>` is not satisfied
+ --> crates/holonics/src/hnn/encoding.rs:989:10
+  |
+7 |     code.into()
+  |          ^^^^ the trait `std::convert::From<usize>` is not implemented for `PortCell`
+  |
+  = note: required for `usize` to implement `Into<PortCell>`
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0277`.
+error[E0609]: no field `waves` on type `&holonics::hnn::Current`
+ --> crates/holonics/src/hnn/field.rs:2516:22
+  |
+7 |     let _ = &current.waves;
+  |                      ^^^^^ unknown field
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0609`.
+error[E0609]: no field `contacts` on type `&holonics::hnn::Current`
+ --> crates/holonics/src/hnn/field.rs:2523:22
+  |
+7 |     let _ = &current.contacts;
+  |                      ^^^^^^^^ unknown field
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0609`.
+error[E0107]: struct takes 0 lifetime arguments but 1 lifetime argument was supplied
+    --> crates/holonics/src/hnn/field.rs:2530:37
+     |
+   5 | fn borrowed(current: holonics::hnn::Current<'static>) {}
+     |                                     ^^^^^^^--------- help: remove the unnecessary generics
+     |                                     |
+     |                                     expected 0 lifetime arguments
+     |
+note: struct defined here, with 0 lifetime parameters
+    --> <face-run>/native/source-v1/crates/holonics/src/hnn/field.rs:2532:12
+     |
+2532 | pub struct Current {
+     |            ^^^^^^^
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0107`.
+error[E0308]: mismatched types
+    --> crates/holonics/src/hnn/field.rs:1529:40
+     |
+   8 |     let _ = field.selective_step(lift, codes, 0);
+     |                   --------------       ^^^^^ expected `&Encoded`, found `&[usize]`
+     |                   |
+     |                   arguments to this method are incorrect
+     |
+     = note: expected reference `&Encoded`
+                found reference `&[usize]`
+note: method defined here
+    --> <face-run>/native/source-v1/crates/holonics/src/hnn/field.rs:1550:12
+     |
+1550 |     pub fn selective_step(
+     |            ^^^^^^^^^^^^^^
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0308`.
+error[E0308]: mismatched types
+    --> crates/holonics/src/hnn/field.rs:1538:40
+     |
+   9 |     let _ = field.selective_step(lift, cells, 0);
+     |                   --------------       ^^^^^ expected `&Encoded`, found `&[Vec<(usize, Ratio<BigInt>)>]`
+     |                   |
+     |                   arguments to this method are incorrect
+     |
+     = note: expected reference `&Encoded`
+                found reference `&[Vec<(usize, num_rational::Ratio<BigInt>)>]`
+note: method defined here
+    --> <face-run>/native/source-v1/crates/holonics/src/hnn/field.rs:1550:12
+     |
+1550 |     pub fn selective_step(
+     |            ^^^^^^^^^^^^^^
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0308`.
+error[E0599]: no method named `landmarks` found for reference `&impl FieldMaterial` in the current scope
+ --> crates/holonics/src/hnn/field.rs:227:22
+  |
+8 |     let _ = material.landmarks(0);
+  |                      ^^^^^^^^^ method not found in `&impl FieldMaterial`
+  |
+  = help: items from traits can only be used if the type parameter is bounded by the trait
+help: the following trait defines an item `landmarks`, perhaps you need to restrict type parameter `impl FieldMaterial` with it:
+  |
+7 | fn release_reads_the_tree(material: &(impl FieldMaterial + ConstitutionRead)) {
+  |                                      +                   +++++++++++++++++++
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0599`.
+error[E0599]: no method named `population` found for reference `&impl FieldMaterial` in the current scope
+ --> crates/holonics/src/hnn/field.rs:235:22
+  |
+8 |     let _ = material.population(0);
+  |                      ^^^^^^^^^^ method not found in `&impl FieldMaterial`
+  |
+  = help: items from traits can only be used if the type parameter is bounded by the trait
+help: the following trait defines an item `population`, perhaps you need to restrict type parameter `impl FieldMaterial` with it:
+  |
+7 | fn release_reads_the_population(material: &(impl FieldMaterial + ConstitutionRead)) {
+  |                                            +                   +++++++++++++++++++
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0599`.
+error[E0560]: struct `RingDeclaration` has no field named `exponent`
+ --> crates/holonics/src/hnn/field.rs:349:23
+  |
+8 |     RingDeclaration { exponent: holonics::ratio::integer(2), ..ring }
+  |                       ^^^^^^^^ `RingDeclaration` does not have this field
+  |
+  = note: available fields are: `period`, `screw`, `placements`, `lock`, `reflector` ... and 2 others
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0560`.
+error[E0308]: mismatched types
+   --> crates/holonics/src/hnn/keys.rs:380:41
+    |
+  7 |     let _ = locate_keys(field, current, codes, 1);
+    |             -----------                 ^^^^^ expected `&Encoded`, found `&[usize]`
+    |             |
+    |             arguments to this function are incorrect
+    |
+    = note: expected reference `&Encoded`
+               found reference `&[usize]`
+note: function defined here
+   --> <face-run>/native/source-v1/crates/holonics/src/hnn/keys.rs:382:8
+    |
+382 | pub fn locate_keys(
+    |        ^^^^^^^^^^^
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0308`.
+error[E0308]: mismatched types
+   --> crates/holonics/src/hnn/keys.rs:464:37
+    |
+  8 |     let _ = station_pairs(field, 0, codes, 1);
+    |             -------------           ^^^^^ expected `&Encoded`, found `&[usize]`
+    |             |
+    |             arguments to this function are incorrect
+    |
+    = note: expected reference `&Encoded`
+               found reference `&[usize]`
+note: function defined here
+   --> <face-run>/native/source-v1/crates/holonics/src/hnn/keys.rs:466:8
+    |
+466 | pub fn station_pairs(
+    |        ^^^^^^^^^^^^^
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0308`.
+error[E0308]: mismatched types
+    --> crates/holonics/src/hnn/moment.rs:1306:24
+     |
+   8 |     SourceMoment::open(rotation, current)
+     |     ------------------ ^^^^^^^^ expected `&Field`, found `&Transport`
+     |     |
+     |     arguments to this function are incorrect
+     |
+     = note: expected reference `&Field`
+                found reference `&holonics::navigator::Transport`
+note: associated function defined here
+    --> <face-run>/native/source-v1/crates/holonics/src/hnn/moment.rs:1331:12
+     |
+1331 |     pub fn open(field: &Field, current: &Current) -> Self {
+     |            ^^^^
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0308`.
+error[E0308]: mismatched types
+    --> crates/holonics/src/hnn/moment.rs:1405:43
+     |
+   7 |     let _ = moment.ingest(field, current, codes);
+     |                    ------                 ^^^^^ expected `&Encoded`, found `&[usize]`
+     |                    |
+     |                    arguments to this method are incorrect
+     |
+     = note: expected reference `&Encoded`
+                found reference `&[usize]`
+note: method defined here
+    --> <face-run>/native/source-v1/crates/holonics/src/hnn/moment.rs:1415:12
+     |
+1415 |     pub fn ingest(
+     |            ^^^^^^
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0308`.
+error[E0308]: mismatched types
+    --> crates/holonics/src/hnn/moment.rs:1413:43
+     |
+   8 |     let _ = moment.ingest(field, current, cells);
+     |                    ------                 ^^^^^ expected `&Encoded`, found `&[Vec<(usize, Ratio<BigInt>)>]`
+     |                    |
+     |                    arguments to this method are incorrect
+     |
+     = note: expected reference `&Encoded`
+                found reference `&[Vec<(usize, num_rational::Ratio<num_bigint::bigint::BigInt>)>]`
+note: method defined here
+    --> <face-run>/native/source-v1/crates/holonics/src/hnn/moment.rs:1415:12
+     |
+1415 |     pub fn ingest(
+     |            ^^^^^^
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0308`.
+error[E0308]: mismatched types
+   --> crates/holonics/src/hnn/pending.rs:40:36
+    |
+ 14 |     PendingRatio::produce(current, faces, address, phases, 0).unwrap()
+    |     ---------------------          ^^^^^ expected `&SourceMoment`, found `&Faces`
+    |     |
+    |     arguments to this function are incorrect
+    |
+    = note: expected reference `&SourceMoment`
+               found reference `&Faces`
+note: associated function defined here
+   --> <face-run>/native/source-v1/crates/holonics/src/hnn/pending.rs:117:12
+    |
+117 |     pub fn produce(
+    |            ^^^^^^^
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0308`.
+error[E0107]: struct takes 0 lifetime arguments but 1 lifetime argument was supplied
+  --> crates/holonics/src/hnn/pending.rs:47:37
+   |
+ 5 | fn borrowed(pending: holonics::hnn::PendingRatio<'static>) {}
+   |                                     ^^^^^^^^^^^^--------- help: remove the unnecessary generics
+   |                                     |
+   |                                     expected 0 lifetime arguments
+   |
+note: struct defined here, with 0 lifetime parameters
+  --> <face-run>/native/source-v1/crates/holonics/src/hnn/pending.rs:64:12
+   |
+64 | pub struct PendingRatio {
+   |            ^^^^^^^^^^^^
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0107`.
+error[E0308]: mismatched types
+   --> crates/holonics/src/hnn/port.rs:60:28
+    |
+ 11 |     let _ = word.pull_back(&loss, map, &BigInt::from(0), phases);
+    |                  --------- ^^^^^ expected `&RatioCovector`, found `&Vec<Vec<Ratio<BigInt>>>`
+    |                  |
+    |                  arguments to this method are incorrect
+    |
+    = note: expected reference `&RatioCovector`
+               found reference `&Vec<Vec<num_rational::Ratio<BigInt>>>`
+note: method defined here
+   --> <face-run>/native/source-v1/crates/holonics/src/hnn/port.rs:879:12
+    |
+879 |     pub fn pull_back(
+    |            ^^^^^^^^^
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0308`.
+error[E0107]: struct takes 0 lifetime arguments but 1 lifetime argument was supplied
+   --> crates/holonics/src/hnn/port.rs:597:54
+    |
+  5 | fn borrowed(returned: holonics::receiver::reception::InteractionReturn<'static>) {}
+    |                                                      ^^^^^^^^^^^^^^^^^--------- help: remove the unnecessary generics
+    |                                                      |
+    |                                                      expected 0 lifetime arguments
+    |
+note: struct defined here, with 0 lifetime parameters
+   --> <face-run>/native/source-v1/crates/holonics/src/receiver/reception.rs:533:12
+    |
+533 | pub struct InteractionReturn<Fw = (), Pb = (), Dp = (), Ph = (), Rc = Receipt> {
+    |            ^^^^^^^^^^^^^^^^^
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0107`.
+error[E0308]: mismatched types
+   --> crates/holonics/src/hnn/port.rs:606:41
+    |
+  7 |     let _ = port.ingest(resident, None, codes);
+    |                  ------                 ^^^^^ expected `&Encoded`, found `&[usize]`
+    |                  |
+    |                  arguments to this method are incorrect
+    |
+    = note: expected reference `&Encoded`
+               found reference `&[usize]`
+note: method defined here
+   --> <face-run>/native/source-v1/crates/holonics/src/hnn/port.rs:642:8
+    |
+642 |     fn ingest(
+    |        ^^^^^^
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0308`.
+error[E0308]: mismatched types
+   --> crates/holonics/src/hnn/port.rs:614:41
+    |
+  8 |     let _ = port.ingest(resident, None, cells);
+    |                  ------                 ^^^^^ expected `&Encoded`, found `&[Vec<(usize, Ratio<BigInt>)>]`
+    |                  |
+    |                  arguments to this method are incorrect
+    |
+    = note: expected reference `&Encoded`
+               found reference `&[Vec<(usize, num_rational::Ratio<num_bigint::bigint::BigInt>)>]`
+note: method defined here
+   --> <face-run>/native/source-v1/crates/holonics/src/hnn/port.rs:642:8
+    |
+642 |     fn ingest(
+    |        ^^^^^^
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0308`.
+error[E0308]: mismatched types
+   --> crates/holonics/src/hnn/port.rs:621:45
+    |
+  7 |     let _ = port.compare(resident, pending, codes);
+    |                  -------                    ^^^^^ expected `&Encoded`, found `&[usize]`
+    |                  |
+    |                  arguments to this method are incorrect
+    |
+    = note: expected reference `&Encoded`
+               found reference `&[usize]`
+note: method defined here
+   --> <face-run>/native/source-v1/crates/holonics/src/hnn/port.rs:684:8
+    |
+684 |     fn compare(
+    |        ^^^^^^^
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0308`.
+error[E0308]: mismatched types
+ --> crates/holonics/src/hnn/prediction.rs:3232:25
+  |
+8 |     let _: WordReturn = returned;
+  |            ----------   ^^^^^^^^ expected `WordReturn`, found `CurrentSourceReceivingReturn`
+  |            |
+  |            expected due to this
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0308`.
+error[E0451]: field `logits` of struct `RatioCovector` is private
+ --> crates/holonics/src/hnn/ratio.rs:626:21
+  |
+8 |     RatioCovector { logits }
+  |                     ^^^^^^ private field
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0451`.
+error[E0599]: no method named `clone` found for struct `Word<'c>` in the current scope
+ --> crates/holonics/src/hnn/word.rs:93:11
+  |
+7 |     (word.clone(), word)
+  |           ^^^^^ method not found in `Word<'_>`
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0599`.
+error[E0107]: struct takes 0 lifetime arguments but 1 lifetime argument was supplied
+    --> crates/holonics/src/hnn/word.rs:100:35
+     |
+   5 | fn borrowed(field: holonics::hnn::Field<'static>) {}
+     |                                   ^^^^^--------- help: remove the unnecessary generics
+     |                                   |
+     |                                   expected 0 lifetime arguments
+     |
+note: struct defined here, with 0 lifetime parameters
+    --> <face-run>/native/source-v1/crates/holonics/src/hnn/field.rs:1082:12
+     |
+1082 | pub struct Field {
+     |            ^^^^^
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0107`.
+error[E0308]: mismatched types
+   --> crates/holonics/src/physics/wave/chain.rs:645:45
+    |
+ 15 |     let _ = current.return_material(source, forged, reached, clock,
+    |                     ---------------         ^^^^^^ expected `&WaveReceiver`, found `&JointProducer<WaveChain>`
+    |                     |
+    |                     arguments to this method are incorrect
+    |
+    = note: expected reference `&WaveReceiver`
+               found reference `&JointProducer<WaveChain>`
+note: method defined here
+   --> <face-run>/native/source-v1/crates/holonics/src/physics/wave/chain.rs:648:12
+    |
+648 |     pub fn return_material(
+    |            ^^^^^^^^^^^^^^^
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0308`.
+error[E0277]: the trait bound `Authored: population::sealed::Sealed` is not satisfied
+   --> crates/holonics/src/receiver/population.rs:633:19
+    |
+  7 | impl Emitters for Authored {
+    |                   ^^^^^^^^ unsatisfied trait bound
+    |
+help: the trait `population::sealed::Sealed` is not implemented for `Authored`
+   --> crates/holonics/src/receiver/population.rs:632:1
+    |
+  6 | struct Authored;
+    | ^^^^^^^^^^^^^^^
+    = help: the following other types implement trait `population::sealed::Sealed`:
+              ChaseFamily
+              DormantFamily
+              FoundedFamily
+              GratingParity
+              GratingSheet
+              KeyFamily
+              PortedEmitters
+              RotorKeys
+            and 2 others
+note: required by a bound in `Emitters`
+   --> <face-run>/native/source-v1/crates/holonics/src/receiver/population.rs:641:21
+    |
+641 | pub trait Emitters: Sealed + Send {
+    |                     ^^^^^^ required by this bound in `Emitters`
+    = note: `Emitters` is a "sealed trait", because to implement it you also need to implement `holonics::receiver::population::sealed::Sealed`, which is not accessible; this is usually done to force you to use one of the provided types that already implement it
+    = help: the following types implement the trait:
+              holonics::receiver::population::FoundedFamily
+              holonics::receiver::population::ChaseFamily
+              holonics::receiver::population::PortedEmitters
+              holonics::receiver::population::Unheld
+              holonics::receiver::population::Composed
+              holonics::receiver::population::DormantFamily
+              holonics::receiver::population::GratingSheet
+              holonics::receiver::population::GratingParity
+            and 2 others
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0277`.
+error[E0277]: the trait bound `Authored: population::sealed::Sealed` is not satisfied
+   --> crates/holonics/src/receiver/population.rs:503:17
+    |
+ 10 | impl Family for Authored {
+    |                 ^^^^^^^^ unsatisfied trait bound
+    |
+help: the trait `population::sealed::Sealed` is not implemented for `Authored`
+   --> crates/holonics/src/receiver/population.rs:502:1
+    |
+  9 | struct Authored;
+    | ^^^^^^^^^^^^^^^
+    = help: the following other types implement trait `population::sealed::Sealed`:
+              ChaseFamily
+              DormantFamily
+              FoundedFamily
+              GratingParity
+              GratingSheet
+              KeyFamily
+              PortedEmitters
+              RotorKeys
+            and 2 others
+note: required by a bound in `holonics::receiver::population::Family`
+   --> <face-run>/native/source-v1/crates/holonics/src/receiver/population.rs:520:19
+    |
+520 | pub trait Family: Sealed + Send {
+    |                   ^^^^^^ required by this bound in `Family`
+    = note: `Family` is a "sealed trait", because to implement it you also need to implement `holonics::receiver::population::sealed::Sealed`, which is not accessible; this is usually done to force you to use one of the provided types that already implement it
+    = help: the following types implement the trait:
+              holonics::receiver::population::FoundedFamily
+              holonics::receiver::population::ChaseFamily
+              holonics::receiver::population::PortedEmitters
+              holonics::receiver::population::Unheld
+              holonics::receiver::population::Composed
+              holonics::receiver::population::DormantFamily
+              holonics::receiver::population::GratingSheet
+              holonics::receiver::population::GratingParity
+            and 2 others
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0277`.
+error[E0603]: module `sealed` is private
+   --> crates/holonics/src/receiver/population.rs:519:38
+    |
+  6 | impl holonics::receiver::population::sealed::Sealed for Authored {}
+    |                                      ^^^^^^  ------ trait `Sealed` is not publicly re-exported
+    |                                      |
+    |                                      private module
+    |
+note: the module `sealed` is defined here
+   --> <face-run>/native/source-v1/crates/holonics/src/receiver/population.rs:484:1
+    |
+484 | mod sealed {
+    | ^^^^^^^^^^
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0603`.
+error[E0277]: the trait bound `Authored: population::sealed::Sealed` is not satisfied
+   --> crates/holonics/src/receiver/population/composition.rs:111:19
+    |
+  7 | impl Keystone for Authored {
+    |                   ^^^^^^^^ unsatisfied trait bound
+    |
+help: the trait `population::sealed::Sealed` is not implemented for `Authored`
+   --> crates/holonics/src/receiver/population/composition.rs:110:1
+    |
+  6 | struct Authored;
+    | ^^^^^^^^^^^^^^^
+    = help: the following other types implement trait `population::sealed::Sealed`:
+              ChaseFamily
+              DormantFamily
+              FoundedFamily
+              GratingParity
+              GratingSheet
+              KeyFamily
+              PortedEmitters
+              RotorKeys
+            and 2 others
+note: required by a bound in `Keystone`
+   --> <face-run>/native/source-v1/crates/holonics/src/receiver/population/composition.rs:118:21
+    |
+118 | pub trait Keystone: super::Sealed + Send + Sync {
+    |                     ^^^^^^^^^^^^^ required by this bound in `Keystone`
+    = note: `Keystone` is a "sealed trait", because to implement it you also need to implement `holonics::receiver::population::sealed::Sealed`, which is not accessible; this is usually done to force you to use one of the provided types that already implement it
+    = help: the following types implement the trait:
+              holonics::receiver::population::FoundedFamily
+              holonics::receiver::population::ChaseFamily
+              holonics::receiver::population::PortedEmitters
+              holonics::receiver::population::Unheld
+              holonics::receiver::population::Composed
+              holonics::receiver::population::DormantFamily
+              holonics::receiver::population::GratingSheet
+              holonics::receiver::population::GratingParity
+            and 2 others
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0277`.
+error[E0277]: the trait bound `Authored: population::sealed::Sealed` is not satisfied
+   --> crates/holonics/src/receiver/population/composition.rs:201:21
+    |
+  7 | impl PortReader for Authored {
+    |                     ^^^^^^^^ unsatisfied trait bound
+    |
+help: the trait `population::sealed::Sealed` is not implemented for `Authored`
+   --> crates/holonics/src/receiver/population/composition.rs:200:1
+    |
+  6 | struct Authored;
+    | ^^^^^^^^^^^^^^^
+    = help: the following other types implement trait `population::sealed::Sealed`:
+              ChaseFamily
+              DormantFamily
+              FoundedFamily
+              GratingParity
+              GratingSheet
+              KeyFamily
+              PortedEmitters
+              RotorKeys
+            and 2 others
+note: required by a bound in `PortReader`
+   --> <face-run>/native/source-v1/crates/holonics/src/receiver/population/composition.rs:207:23
+    |
+207 | pub trait PortReader: super::Sealed + Send + Sync {
+    |                       ^^^^^^^^^^^^^ required by this bound in `PortReader`
+    = note: `PortReader` is a "sealed trait", because to implement it you also need to implement `holonics::receiver::population::sealed::Sealed`, which is not accessible; this is usually done to force you to use one of the provided types that already implement it
+    = help: the following types implement the trait:
+              holonics::receiver::population::FoundedFamily
+              holonics::receiver::population::ChaseFamily
+              holonics::receiver::population::PortedEmitters
+              holonics::receiver::population::Unheld
+              holonics::receiver::population::Composed
+              holonics::receiver::population::DormantFamily
+              holonics::receiver::population::GratingSheet
+              holonics::receiver::population::GratingParity
+            and 2 others
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0277`.
+error[E0277]: the trait bound `Authored: population::sealed::Sealed` is not satisfied
+   --> crates/holonics/src/receiver/population/dormancy.rs:90:19
+    |
+  7 | impl Emitters for Authored {
+    |                   ^^^^^^^^ unsatisfied trait bound
+    |
+help: the trait `population::sealed::Sealed` is not implemented for `Authored`
+   --> crates/holonics/src/receiver/population/dormancy.rs:89:1
+    |
+  6 | struct Authored;
+    | ^^^^^^^^^^^^^^^
+    = help: the following other types implement trait `population::sealed::Sealed`:
+              ChaseFamily
+              DormantFamily
+              FoundedFamily
+              GratingParity
+              GratingSheet
+              KeyFamily
+              PortedEmitters
+              RotorKeys
+            and 2 others
+note: required by a bound in `Emitters`
+   --> <face-run>/native/source-v1/crates/holonics/src/receiver/population.rs:641:21
+    |
+641 | pub trait Emitters: Sealed + Send {
+    |                     ^^^^^^ required by this bound in `Emitters`
+    = note: `Emitters` is a "sealed trait", because to implement it you also need to implement `holonics::receiver::population::sealed::Sealed`, which is not accessible; this is usually done to force you to use one of the provided types that already implement it
+    = help: the following types implement the trait:
+              holonics::receiver::population::FoundedFamily
+              holonics::receiver::population::ChaseFamily
+              holonics::receiver::population::PortedEmitters
+              holonics::receiver::population::Unheld
+              holonics::receiver::population::Composed
+              holonics::receiver::population::DormantFamily
+              holonics::receiver::population::GratingSheet
+              holonics::receiver::population::GratingParity
+            and 2 others
+
+error[E0277]: the trait bound `Authored: population::sealed::Sealed` is not satisfied
+   --> crates/holonics/src/receiver/population/dormancy.rs:98:18
+    |
+ 15 | impl Layered for Authored {
+    |                  ^^^^^^^^ unsatisfied trait bound
+    |
+help: the trait `population::sealed::Sealed` is not implemented for `Authored`
+   --> crates/holonics/src/receiver/population/dormancy.rs:89:1
+    |
+  6 | struct Authored;
+    | ^^^^^^^^^^^^^^^
+    = help: the following other types implement trait `population::sealed::Sealed`:
+              ChaseFamily
+              DormantFamily
+              FoundedFamily
+              GratingParity
+              GratingSheet
+              KeyFamily
+              PortedEmitters
+              RotorKeys
+            and 2 others
+    = note: required for `Authored` to implement `Emitters`
+note: required by a bound in `Layered`
+   --> <face-run>/native/source-v1/crates/holonics/src/receiver/population/dormancy.rs:104:20
+    |
+104 | pub trait Layered: Emitters + Sync {
+    |                    ^^^^^^^^ required by this bound in `Layered`
+
+error: aborting due to 2 previous errors
+
+For more information about this error, try `rustc --explain E0277`.

@@ -1,0 +1,2 @@
+{"admitted": "c1b2b-1ad7f498-face-development-20261009-v1", "MemAvailable_bytes": 12848005120}
+{"label": "c1b2b-1ad7f498-face-development-20261009-v1", "deferred_lock_busy": false, "final_CPU_ns": 5249899000, "wall_ns": 5549346251, "quiescent": true, "outer_error": null, "passed": true}

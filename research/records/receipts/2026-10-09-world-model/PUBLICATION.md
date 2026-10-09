@@ -158,3 +158,65 @@ opening with each emitted wave answered by a live key's charts: one `k` for the 
 - **Scope.** Not claimed: the World's target face, raw `x` where `R` has a kernel, C2's two-encounter
   acceptance, the Ask, learning through the model, or the whole gate at `a739963f6`. The repaired example is
   compiled only by this candidate's own validation.
+
+## C1b-2b: the key's face at `1ad7f4988`
+
+A key may declare the World face it hypothesizes. The coupled prospect then predicts that raw face at every
+compared epoch under the same `k` as the waves and the native readout (`ModelKey::with_face`, `KeyFace`,
+`WorldModel::coupled_prospect`, `PreparedPhysicalAction::world_prospect`; the record's §7).
+- Source `1ad7f4988` (full `1ad7f498825dcffbbcf4e4509519fea366cceb5b`, tree
+  `a6619d3c6fd00482a40c049a8096cd48ccb2e0d6`), a descendant of C1b-2a's `a739963f6`. Its merge `7119527f4`
+  joins this candidate byte-identical in the four 2b source files: `physical/action.rs`,
+  `physical/action/model.rs`, `word/action.rs` and `tests/world_model.rs`.
+- **Scoped native acceptance** ([handoff](face-native-v1/HANDOFF.md),
+  [validation](face-native-v1/VALIDATION.json)). With 352 frozen native inputs, every scoped stage passed:
+  - the workspace all-targets check;
+  - four freshly built test executables;
+  - 25 unique fixtures, each executed once: the ten of `world_model` (the new face fixture among them),
+    `native_action_return` four, `physical_action` four and seven retention guards;
+  - the guard lints of the affected library and tests;
+  - all 57 guard doctests.
+
+  The passed face fixture reads the World's actual raw face at a compared epoch (`C_S ξ_S⁺ + C_R ξ_R⁺ + o` on
+  the step's after-state), the encounter's own blind native read (`R x`, required to occur) and its actual
+  waves. One `k` of the faced key's prospect, read before the encounter, carries all three. Where the wave
+  columns alone fix `k` (full column rank), a key with the true law and a wrong face offset is incompatible
+  with the actual face. A key without a face adds no face rows and leaves the wave and native passage
+  unchanged.
+- **The whole gate was not rerun at `1ad7f4988`.** Its all-targets guard clippy failure stays bound to
+  `a739963f6` (above). `helical_duplex.rs` is byte-identical at `1ad7f4988` and `a739963f6`, so the producer
+  reused that failure's evidence and did not rerun it. The reused copies in `face-native-v1/inherited-gate/`
+  are hash-only here: they are byte-identical to the committed `coupled-native-v1` `VALIDATION.json`,
+  `LINT_FAILURE_PROVENANCE.json` and `FILE_HASHES.json`, and to that packet's all-targets clippy stderr. The
+  affected guard lints passed, and they do not clear the whole gate. This candidate's final joined gate,
+  with the `ExitCode` repair, is owed and has no result here.
+- **Stages**, each within its fixed projection and released, the 4 GiB reservation enforced, and no limit
+  raised after launch:
+
+  | Stage | Exit | Wall ns | Projection ns | CPU ns | Child RSS KiB |
+  |---|---:|---:|---:|---:|---:|
+  | check | 0 | 27,899,159,150 | 65,000,000,000 | 29,903,743,000 | 1,520,780 |
+  | build | 0 | 56,528,434,979 | 65,000,000,000 | 60,218,461,000 | 2,140,464 |
+  | face development | 0 | 3,984,305,544 | 244,139,459,528 | 5,249,899,000 | 29,124 |
+  | world existing | 0 | 7,928,651,752 | 37,858,749,896 | 9,373,843,000 | 28,552 |
+  | native action | 0 | 602,373,817 | 17,937,222,176 | 1,904,934,000 | 18,312 |
+  | physical action | 0 | 185,652,504 | 17,937,222,176 | 1,378,060,000 | 18,356 |
+  | retention guards | 0 | 286,412,854 | 29,890,138,808 | 1,518,685,000 | 30,324 |
+  | clippy, affected | 0 | 11,271,833,405 | 65,000,000,000 | 12,821,565,000 | 979,704 |
+  | doctests | 0 | 26,999,751,617 | 65,000,000,000 | 29,356,512,000 | 1,410,144 |
+
+  The face development deadline is a counted-work allocation. The later runtime deadlines use the larger of
+  that measured fixture and the prior scoped runtime, all fixed before launch. The affected clippy stderr
+  (315,700 bytes) exceeds the compact limit and is hash-only.
+- **Projected host paths** ([PROJECTION.json](PROJECTION.json)). Seven stage outputs name the validation's
+  private run directory. One more placeholder is declared, `<face-run>/`, beside the earlier six. The seven
+  outputs replace it (1, 86, 2, 132, 26, 1 and 1 times), and the check and build stdout also replace
+  `<cargo-registry>/` 50 times each, with no other byte change. All 21 entries invert to their pinned
+  originals, and no host path remains.
+- **Hashed only:** [face-native-v1/OMITTED.md](face-native-v1/OMITTED.md); the manifest lists 214 files
+  (19,101,834 bytes).
+- **Scope.** Claimed: on a declared raw face, prospective compatibility of the World's actual face, the native
+  read and the waves under one `k`. Not claimed: the grain-level reading of a declared face (`Face::of_read`),
+  conditioning retained fibres on actual face observations, deployed elimination of wrong-face alternatives,
+  C2, the Ask, learning through the model, CUDA, the World/Robin and all-material variation, or the whole gate
+  at `1ad7f4988`.

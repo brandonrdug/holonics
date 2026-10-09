@@ -1,0 +1,623 @@
+{
+  "grade": "Scoped C1b-2b native acceptance PASS; whole repository lint gate unresolved (inherited failure)",
+  "source_commit": "1ad7f498825dcffbbcf4e4509519fea366cceb5b",
+  "source_tree": "a6619d3c6fd00482a40c049a8096cd48ccb2e0d6",
+  "source_inputs": 352,
+  "source_manifest": {
+    "sha256": "6561bfca6e52ea244cc7d48c3e7284fe7e3574655795104e755bd3ebf4c98897",
+    "bytes": 58934
+  },
+  "exact_frozen_Git_bytes_unchanged": true,
+  "workspace_all_targets_check_passed": true,
+  "four_fresh_test_executables": true,
+  "world_model_tests_passed": 10,
+  "affected_guards_passed": 15,
+  "unique_scoped_fixtures_passed": 25,
+  "fixtures": [
+    "a_disconnected_key_is_eliminated_only_by_its_exact_annihilator",
+    "a_held_preimage_or_foreign_clock_changes_neither_actual_participant",
+    "a_key_with_the_worlds_face_covers_its_observed_face_and_a_wrong_face_does_not",
+    "a_non_passive_key_is_held_at_its_certified_cut_while_the_tick_advances",
+    "a_plural_preimage_keeps_its_kernel_and_an_unreachable_request_returns_its_obstruction",
+    "a_prospect_is_refused_without_a_world_model_and_moves_no_participant",
+    "a_unique_preparation_uses_the_full_loaded_opening_and_actual_pump_clock",
+    "actual_prior_world_history_changes_native_carry_and_matched_later_choice",
+    "an_actual_world_face_changes_r_then_the_later_native_prospect",
+    "an_interrupted_encounter_is_absorbed_through_its_executed_steps_without_rollback",
+    "an_unconstrained_request_retains_the_whole_control_domain",
+    "binding_is_refused_without_a_world_off_its_tick_or_off_the_source_frame",
+    "hnn::tests::guards::guard_eleven_refine_and_compare_leave_the_constitution",
+    "hnn::tests::guards::guard_fifteen_the_budget_is_refused_never_rounded",
+    "hnn::tests::guards::guard_fifteen_the_grain_reading_rounds_nothing",
+    "hnn::tests::guards::guard_five_the_collapse_runs_only_at_the_carry_out",
+    "hnn::tests::guards::guard_four_the_constitution_keeps_no_journal",
+    "hnn::tests::guards::guard_nine_the_alphabet_does_not_fix_the_architecture",
+    "hnn::tests::guards::guard_one_the_moment_is_sized_once_and_lossy_past_its_capacity",
+    "paired_actual_faces_keep_mass_phase_and_unobserved_regions",
+    "the_current_receiving_material_changes_the_prospect_and_stale_producing_words_refuse",
+    "the_resident_charges_the_models_current_bits_at_every_encounter",
+    "the_return_image_separates_the_free_and_forced_responses_and_holds_the_actual_returns",
+    "the_world_key_reproduces_every_actual_step_and_its_fibre_is_the_batch_preimage",
+    "the_world_keys_coupled_prospect_holds_the_actual_encounter_before_it_runs"
+  ],
+  "each_scoped_fixture_executed_once": true,
+  "affected_library_and_test_guard_lints_passed": true,
+  "guard_doctests_passed": 57,
+  "whole_gate_sh_passed": false,
+  "all_targets_guard_lints_rerun": false,
+  "inherited_gate_failure_source_unchanged": true,
+  "whole_gate_failure_resolved": false,
+  "inherited_gate_failure": {
+    "lint_failure_path": "crates/holonics/examples/helical_duplex.rs",
+    "line": 189,
+    "error": "use of a disallowed method std::process::exit",
+    "compiler_exit": 101,
+    "unchanged_vs_accepted_C1b_source": true,
+    "pins": {
+      "a739963f68d6085eb41f5ae6a77f306151489e6d": {
+        "sha256": "8be3f1a444ee7c18880008373c1fadcbcbcc578b32ccc37d94d019606cbe5996",
+        "bytes": 7109
+      },
+      "0a7fa87a448232a273e7f9375d85f1dd90df649c": {
+        "sha256": "8be3f1a444ee7c18880008373c1fadcbcbcc578b32ccc37d94d019606cbe5996",
+        "bytes": 7109
+      },
+      "3cfb2b71a": {
+        "sha256": "8be3f1a444ee7c18880008373c1fadcbcbcc578b32ccc37d94d019606cbe5996",
+        "bytes": 7109
+      }
+    },
+    "affected_24_fixtures_passed": true,
+    "whole_gate_sh_not_passed": true,
+    "source_edit_performed": false
+  },
+  "results": [
+    {
+      "label": "c1b2b-1ad7f498-check-20261009-v1",
+      "accepted": true,
+      "exit": 0,
+      "command_wall_ns": 27899159150,
+      "guarded_wall_ns": 29492009244,
+      "projection_ns": 65000000000,
+      "measured_to_projected": {
+        "numerator": 29492009244,
+        "denominator": 65000000000
+      },
+      "aggregate_CPU_ns": 29903743000,
+      "child_CPU_user_us": 25028983,
+      "child_CPU_system_us": 2230709,
+      "peak_child_RSS_KiB": 1520780,
+      "group_peak_bytes": 1730334720,
+      "reservation_bytes": 4294967296,
+      "enforced_cap_bytes": 4294967296,
+      "maximum_authorized_bytes": 8589934592,
+      "thread_budget": 4,
+      "fixtures": [],
+      "stdout": {
+        "sha256": "acd327797d60e1bf93a9f33f92892da972124f218559573a01fd9913730a92f3",
+        "bytes": 46704
+      },
+      "stderr": {
+        "sha256": "1ae6eb5f02ef1a82469e1caa836288c07818403f9a960eb71b5267238524366b",
+        "bytes": 454
+      },
+      "quiescent_released": true
+    },
+    {
+      "label": "c1b2b-1ad7f498-build-20261009-v1",
+      "accepted": true,
+      "exit": 0,
+      "command_wall_ns": 56528434979,
+      "guarded_wall_ns": 58200284588,
+      "projection_ns": 65000000000,
+      "measured_to_projected": {
+        "numerator": 58200284588,
+        "denominator": 65000000000
+      },
+      "aggregate_CPU_ns": 60218461000,
+      "child_CPU_user_us": 51540327,
+      "child_CPU_system_us": 4454411,
+      "peak_child_RSS_KiB": 2140464,
+      "group_peak_bytes": 2405093376,
+      "reservation_bytes": 4294967296,
+      "enforced_cap_bytes": 4294967296,
+      "maximum_authorized_bytes": 8589934592,
+      "thread_budget": 4,
+      "fixtures": [],
+      "stdout": {
+        "sha256": "3570468b3fa7f7bc9747df2ee703d7bdfec2ad3b009da972a430c2a715ba41f4",
+        "bytes": 35597
+      },
+      "stderr": {
+        "sha256": "979ec6d7e7eebaa5163af3fafe8f708b4ffbaa54e20efb2a7735ca2ba5a32490",
+        "bytes": 226
+      },
+      "quiescent_released": true
+    },
+    {
+      "label": "c1b2b-1ad7f498-face-development-20261009-v1",
+      "accepted": true,
+      "exit": 0,
+      "command_wall_ns": 3984305544,
+      "guarded_wall_ns": 5549346251,
+      "projection_ns": 244139459528,
+      "measured_to_projected": {
+        "numerator": 5549346251,
+        "denominator": 244139459528
+      },
+      "aggregate_CPU_ns": 5249899000,
+      "child_CPU_user_us": 3684534,
+      "child_CPU_system_us": 96847,
+      "peak_child_RSS_KiB": 29124,
+      "group_peak_bytes": 705949696,
+      "reservation_bytes": 4294967296,
+      "enforced_cap_bytes": 4294967296,
+      "maximum_authorized_bytes": 8589934592,
+      "thread_budget": 1,
+      "fixtures": [
+        "a_key_with_the_worlds_face_covers_its_observed_face_and_a_wrong_face_does_not"
+      ],
+      "stdout": {
+        "sha256": "e762cf4c3cdb7af90d1e1a2d62a4cf3e8809a071c6ba92f0feed34f59ae8bfdb",
+        "bytes": 202
+      },
+      "stderr": {
+        "sha256": "c7f797a2d557c653d823f8a5dbb22bfb3c322a600897c2b9e52bf7632daccb9c",
+        "bytes": 1250
+      },
+      "quiescent_released": true
+    },
+    {
+      "label": "c1b2b-1ad7f498-world-existing-20261009-v1",
+      "accepted": true,
+      "exit": 0,
+      "command_wall_ns": 7928651752,
+      "guarded_wall_ns": 9770349943,
+      "projection_ns": 37858749896,
+      "measured_to_projected": {
+        "numerator": 9770349943,
+        "denominator": 37858749896
+      },
+      "aggregate_CPU_ns": 9373843000,
+      "child_CPU_user_us": 7322867,
+      "child_CPU_system_us": 221490,
+      "peak_child_RSS_KiB": 28552,
+      "group_peak_bytes": 972259328,
+      "reservation_bytes": 4294967296,
+      "enforced_cap_bytes": 4294967296,
+      "maximum_authorized_bytes": 8589934592,
+      "thread_budget": 1,
+      "fixtures": [
+        "a_disconnected_key_is_eliminated_only_by_its_exact_annihilator",
+        "a_non_passive_key_is_held_at_its_certified_cut_while_the_tick_advances",
+        "a_prospect_is_refused_without_a_world_model_and_moves_no_participant",
+        "an_interrupted_encounter_is_absorbed_through_its_executed_steps_without_rollback",
+        "binding_is_refused_without_a_world_off_its_tick_or_off_the_source_frame",
+        "the_resident_charges_the_models_current_bits_at_every_encounter",
+        "the_return_image_separates_the_free_and_forced_responses_and_holds_the_actual_returns",
+        "the_world_key_reproduces_every_actual_step_and_its_fibre_is_the_batch_preimage",
+        "the_world_keys_coupled_prospect_holds_the_actual_encounter_before_it_runs"
+      ],
+      "stdout": {
+        "sha256": "302e14cd33f50484858d2cd20fcca7320453160bfd7f113ae9bca2860ff66172",
+        "bytes": 880
+      },
+      "stderr": {
+        "sha256": "7cae77e7f34a3e58f1ef44a92b350bb3d2b897ebd8f2c434cec96d36275378eb",
+        "bytes": 1250
+      },
+      "quiescent_released": true
+    },
+    {
+      "label": "c1b2b-1ad7f498-native-action-20261009-v1",
+      "accepted": true,
+      "exit": 0,
+      "command_wall_ns": 602373817,
+      "guarded_wall_ns": 2045739875,
+      "projection_ns": 17937222176,
+      "measured_to_projected": {
+        "numerator": 2045739875,
+        "denominator": 17937222176
+      },
+      "aggregate_CPU_ns": 1904934000,
+      "child_CPU_user_us": 525658,
+      "child_CPU_system_us": 32217,
+      "peak_child_RSS_KiB": 18312,
+      "group_peak_bytes": 652103680,
+      "reservation_bytes": 4294967296,
+      "enforced_cap_bytes": 4294967296,
+      "maximum_authorized_bytes": 8589934592,
+      "thread_budget": 1,
+      "fixtures": [
+        "a_held_preimage_or_foreign_clock_changes_neither_actual_participant",
+        "actual_prior_world_history_changes_native_carry_and_matched_later_choice",
+        "an_actual_world_face_changes_r_then_the_later_native_prospect",
+        "paired_actual_faces_keep_mass_phase_and_unobserved_regions"
+      ],
+      "stdout": {
+        "sha256": "9ecfa9c392ef23ed5e74e8768944319043d6f4d61b5e77875844e29d52337fec",
+        "bytes": 423
+      },
+      "stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "quiescent_released": true
+    },
+    {
+      "label": "c1b2b-1ad7f498-physical-action-20261009-v1",
+      "accepted": true,
+      "exit": 0,
+      "command_wall_ns": 185652504,
+      "guarded_wall_ns": 1474181535,
+      "projection_ns": 17937222176,
+      "measured_to_projected": {
+        "numerator": 1474181535,
+        "denominator": 17937222176
+      },
+      "aggregate_CPU_ns": 1378060000,
+      "child_CPU_user_us": 165700,
+      "child_CPU_system_us": 8523,
+      "peak_child_RSS_KiB": 18356,
+      "group_peak_bytes": 298131456,
+      "reservation_bytes": 4294967296,
+      "enforced_cap_bytes": 4294967296,
+      "maximum_authorized_bytes": 8589934592,
+      "thread_budget": 1,
+      "fixtures": [
+        "a_plural_preimage_keeps_its_kernel_and_an_unreachable_request_returns_its_obstruction",
+        "a_unique_preparation_uses_the_full_loaded_opening_and_actual_pump_clock",
+        "an_unconstrained_request_retains_the_whole_control_domain",
+        "the_current_receiving_material_changes_the_prospect_and_stale_producing_words_refuse"
+      ],
+      "stdout": {
+        "sha256": "5406f75768bdec25082cf8424cc50d62041f49823e181a06186c09b12dd804eb",
+        "bytes": 462
+      },
+      "stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "quiescent_released": true
+    },
+    {
+      "label": "c1b2b-1ad7f498-retention-guards-20261009-v1",
+      "accepted": true,
+      "exit": 0,
+      "command_wall_ns": 286412854,
+      "guarded_wall_ns": 1562793529,
+      "projection_ns": 29890138808,
+      "measured_to_projected": {
+        "numerator": 1562793529,
+        "denominator": 29890138808
+      },
+      "aggregate_CPU_ns": 1518685000,
+      "child_CPU_user_us": 267788,
+      "child_CPU_system_us": 3912,
+      "peak_child_RSS_KiB": 30324,
+      "group_peak_bytes": 152068096,
+      "reservation_bytes": 4294967296,
+      "enforced_cap_bytes": 4294967296,
+      "maximum_authorized_bytes": 8589934592,
+      "thread_budget": 1,
+      "fixtures": [
+        "hnn::tests::guards::guard_eleven_refine_and_compare_leave_the_constitution",
+        "hnn::tests::guards::guard_fifteen_the_budget_is_refused_never_rounded",
+        "hnn::tests::guards::guard_fifteen_the_grain_reading_rounds_nothing",
+        "hnn::tests::guards::guard_five_the_collapse_runs_only_at_the_carry_out",
+        "hnn::tests::guards::guard_four_the_constitution_keeps_no_journal",
+        "hnn::tests::guards::guard_nine_the_alphabet_does_not_fix_the_architecture",
+        "hnn::tests::guards::guard_one_the_moment_is_sized_once_and_lossy_past_its_capacity"
+      ],
+      "stdout": {
+        "sha256": "4cb223164cc52e8f5b96c1a3aec2b780bfd833d38ecd1cb7a038a22923d92ff5",
+        "bytes": 705
+      },
+      "stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "quiescent_released": true
+    },
+    {
+      "label": "c1b2b-1ad7f498-clippy-affected-20261009-v1",
+      "accepted": true,
+      "exit": 0,
+      "command_wall_ns": 11271833405,
+      "guarded_wall_ns": 12639330873,
+      "projection_ns": 65000000000,
+      "measured_to_projected": {
+        "numerator": 12639330873,
+        "denominator": 65000000000
+      },
+      "aggregate_CPU_ns": 12821565000,
+      "child_CPU_user_us": 10243869,
+      "child_CPU_system_us": 792326,
+      "peak_child_RSS_KiB": 979704,
+      "group_peak_bytes": 1318973440,
+      "reservation_bytes": 4294967296,
+      "enforced_cap_bytes": 4294967296,
+      "maximum_authorized_bytes": 8589934592,
+      "thread_budget": 4,
+      "fixtures": [],
+      "stdout": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "sha256": "36d7ed4c4b054c28bc5eee87fa292f29a56c6872e4c1af1269b7b2c51a0f5763",
+        "bytes": 315700
+      },
+      "quiescent_released": true
+    },
+    {
+      "label": "c1b2b-1ad7f498-doc-20261009-v1",
+      "accepted": true,
+      "exit": 0,
+      "command_wall_ns": 26999751617,
+      "guarded_wall_ns": 28486985455,
+      "projection_ns": 65000000000,
+      "measured_to_projected": {
+        "numerator": 28486985455,
+        "denominator": 65000000000
+      },
+      "aggregate_CPU_ns": 29356512000,
+      "child_CPU_user_us": 23231155,
+      "child_CPU_system_us": 3479250,
+      "peak_child_RSS_KiB": 1410144,
+      "group_peak_bytes": 1783885824,
+      "reservation_bytes": 4294967296,
+      "enforced_cap_bytes": 4294967296,
+      "maximum_authorized_bytes": 8589934592,
+      "thread_budget": 4,
+      "fixtures": [],
+      "stdout": {
+        "sha256": "4a2e5c3880d4a33b10a52312b8e7b9746a20ecaff5c60758e7697298b73c6e98",
+        "bytes": 5894
+      },
+      "stderr": {
+        "sha256": "f0f1d98a9c60bea9b1cf91c74b985a86baef5256091f8d1f1aa39f301349b4fb",
+        "bytes": 40054
+      },
+      "quiescent_released": true
+    }
+  ],
+  "commands_manifest": {
+    "sha256": "4396e8cba7fb0d86a1273b1411dc2e71e42c9d3d58c6d4258602232a1e0c6902",
+    "bytes": 12297
+  },
+  "executable_pins": {
+    "native_action_return": {
+      "sha256": "f52e53b30e43d863dc644de514faffcbd94b35cb5d1d10d4c79791845bb2490b",
+      "bytes": 33945632
+    },
+    "physical_action": {
+      "sha256": "0477a9f0b333dbfc0bd89a9e37aff4262a938c6bdec7ebffd082ae39278f5c24",
+      "bytes": 21716544
+    },
+    "world_model": {
+      "sha256": "7f8a703fedb03db9d8bc9d2eafde8fdccf470eed117cb8f65cbdb30cf040d9db",
+      "bytes": 32845672
+    },
+    "holonics": {
+      "sha256": "f705c2463024be69ced2e4e4b47f8321398f037bb32b27aa1b4f1a9b8a3c13d0",
+      "bytes": 76722600
+    }
+  },
+  "compiler_warnings": [
+    {
+      "message": "method `anchor_differential_joined` is never used",
+      "level": "warning",
+      "spans": [
+        {
+          "byte_end": 37640,
+          "byte_start": 37623,
+          "column_end": 18,
+          "column_start": 1,
+          "expansion": null,
+          "file_name": "crates/holonics/src/hnn/port.rs",
+          "is_primary": false,
+          "label": "method in this implementation",
+          "line_end": 850,
+          "line_start": 850,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 18,
+              "highlight_start": 1,
+              "text": "impl<'c> Word<'c> {"
+            }
+          ]
+        },
+        {
+          "byte_end": 42059,
+          "byte_start": 42033,
+          "column_end": 45,
+          "column_start": 19,
+          "expansion": null,
+          "file_name": "crates/holonics/src/hnn/port.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 942,
+          "line_start": 942,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 45,
+              "highlight_start": 19,
+              "text": "    pub(crate) fn anchor_differential_joined("
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "message": "method `seeds` is never used",
+      "level": "warning",
+      "spans": [
+        {
+          "byte_end": 63439,
+          "byte_start": 63416,
+          "column_end": 24,
+          "column_start": 1,
+          "expansion": null,
+          "file_name": "crates/holonics/src/hnn/receiving.rs",
+          "is_primary": false,
+          "label": "method in this implementation",
+          "line_end": 1310,
+          "line_start": 1310,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 24,
+              "highlight_start": 1,
+              "text": "impl SourceObserverView {"
+            }
+          ]
+        },
+        {
+          "byte_end": 75799,
+          "byte_start": 75794,
+          "column_end": 24,
+          "column_start": 19,
+          "expansion": null,
+          "file_name": "crates/holonics/src/hnn/receiving.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 1606,
+          "line_start": 1606,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 24,
+              "highlight_start": 19,
+              "text": "    pub(crate) fn seeds("
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "message": "method `advanced` is never used",
+      "level": "warning",
+      "spans": [
+        {
+          "byte_end": 9293,
+          "byte_start": 9268,
+          "column_end": 26,
+          "column_start": 1,
+          "expansion": null,
+          "file_name": "crates/holonics/src/hnn/word/variation.rs",
+          "is_primary": false,
+          "label": "method in this implementation",
+          "line_end": 236,
+          "line_start": 236,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 26,
+              "highlight_start": 1,
+              "text": "impl HeldContactVariation {"
+            }
+          ]
+        },
+        {
+          "byte_end": 18786,
+          "byte_start": 18778,
+          "column_end": 27,
+          "column_start": 19,
+          "expansion": null,
+          "file_name": "crates/holonics/src/hnn/word/variation.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 473,
+          "line_start": 473,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 27,
+              "highlight_start": 19,
+              "text": "    pub(crate) fn advanced(&self, word: &Word<'_>, opened: &[EndChange]) -> Result<Self, HnnError> {"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "message": "method `advanced` is never used",
+      "level": "warning",
+      "spans": [
+        {
+          "byte_end": 9293,
+          "byte_start": 9268,
+          "column_end": 26,
+          "column_start": 1,
+          "expansion": null,
+          "file_name": "crates/holonics/src/hnn/word/variation.rs",
+          "is_primary": false,
+          "label": "method in this implementation",
+          "line_end": 236,
+          "line_start": 236,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 26,
+              "highlight_start": 1,
+              "text": "impl HeldContactVariation {"
+            }
+          ]
+        },
+        {
+          "byte_end": 18786,
+          "byte_start": 18778,
+          "column_end": 27,
+          "column_start": 19,
+          "expansion": null,
+          "file_name": "crates/holonics/src/hnn/word/variation.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 473,
+          "line_start": 473,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 27,
+              "highlight_start": 19,
+              "text": "    pub(crate) fn advanced(&self, word: &Word<'_>, opened: &[EndChange]) -> Result<Self, HnnError> {"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "all_projections_fixed_before_launch": true,
+  "limits_raised_after_launch": false,
+  "all_leases_released": true,
+  "no_native_process_or_active_owned_unit_remaining": true,
+  "failed_unit_metadata_only": [],
+  "source_edits": false,
+  "Git_publication": false,
+  "GPU_runtime": false,
+  "cache_clearing": false,
+  "system_changes": false,
+  "private_correspondence_in_packet": false,
+  "scope": "Prospective compatibility of actual raw World face C_S x_S+ + C_R x_R+ + offset, actual native blind receiving logits R x, and actual incident/reflected waves under one latent k at a compared after-step state. New fixture requires a non-vacuous actual native read; wrong-face offset rejected where wave columns have full rank; undeclared faces add no constraint and preserve wave/native points and directions.",
+  "not_certified": [
+    "grain Face.of_read target coverage",
+    "conditioning retained fibres on actual declared face observations",
+    "deployed elimination of wrong-face alternatives",
+    "C2 finite forward cover or two-encounter acceptance",
+    "Ask over keys",
+    "learning through the model",
+    "CUDA runtime parity",
+    "World/Robin full first/second material variation"
+  ]
+}
