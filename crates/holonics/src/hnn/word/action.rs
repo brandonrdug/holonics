@@ -302,6 +302,35 @@ impl ProspectiveControl {
     }
 }
 
+impl ProspectiveControl {
+    /// **The controlled Word this control would open**, read without consuming either (the World
+    /// model's coupled prospect, C1b-2a): the unique control applied at the producing opening by the
+    /// same checks and the same shared tail as [`ProspectiveControl::prepare`]. The baseline stays
+    /// unrun; a plural or obstructed fibre is refused.
+    pub fn controlled_word<'c>(&self, baseline: &Word<'c>) -> Result<Word<'c>, HnnError> {
+        if !self.producer.matches(baseline)
+            || baseline.ticks() != 0
+            || baseline.is_ended()
+            || baseline.change()? != self.producer.opening
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "the action consumes its own whole producing source opening",
+            });
+        }
+        let control = self.unique_control().ok_or(HnnError::Unadmitted {
+            reason: "a plural or obstructed control fibre withholds native action release",
+        })?;
+        if self.response.apply(control)? != self.residual {
+            return Err(HnnError::Realization {
+                what: "the released control solves its producing relation",
+            });
+        }
+        let (word, _, _) =
+            apply_control(self.producer.clone(), &self.preparation, baseline, control)?;
+        Ok(word)
+    }
+}
+
 /// [definition; agent-inferred, October 8] **One admitted control applied at the whole producing
 /// opening**: the tail that `ProspectiveControl::prepare` (a request's unique preimage) and
 /// `ProspectiveFeature::prepare_control` (a probe's lattice point) share, moved out of `prepare`

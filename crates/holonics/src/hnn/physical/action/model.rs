@@ -69,8 +69,12 @@
 //! `T`, step `t` read at commit `T + t − 1`. It predicts the port waves and the native station
 //! features with their receiving logits: the native readout, not the World's observed face, whose
 //! key-owned face relation is a separate join. The prepared Word, the actual World and this memory
-//! stay unchanged. [incomplete, the first partial] Only the fibre's point `k = 0` is read here: the
-//! unit columns of `k`, the prepared action's read and the test are owed.
+//! stay unchanged. One `k` moves the whole passage together: the prospect is the passage from the
+//! fibre's point and, per fibre direction, the exact change it makes to every predicted value, read as
+//! the difference of two exact passages. The passage is affine in `ξ_T` because the admitted Word is
+//! the exact unsplit quadratic one (`ActionProducer::of`) and the key's charts are linear; the sum of
+//! the directions is checked against one more passage as a guard. The prepared action reads it before
+//! its encounter ([`super::PreparedPhysicalAction::world_prospect`]).
 //!
 //! **Bits.** The memory's current bits ([`WorldModel::current_bits`]) are every key state's values and
 //! cut and the reached tick; the Resident's state bits charge them at every step, whatever size the
@@ -371,6 +375,87 @@ pub struct ReturnImage {
     pub directions: Vec<Vec<Vec<Rat>>>,
 }
 
+/// [definition] **One fibre direction's change to a coupled passage** (the module header): per
+/// junction step the change of `(a_t, b_t)`, and per compared station the change of its native
+/// feature and logits.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CoupledChange {
+    pub waves: Vec<(Vec<Rat>, Vec<Rat>)>,
+    pub features: Vec<(usize, Vec<Rat>, Vec<Rat>)>,
+}
+
+impl CoupledChange {
+    /// The sum of two changes of one passage's shape.
+    fn plus(&self, other: &Self) -> Result<Self, HnnError> {
+        if self.waves.len() != other.waves.len()
+            || self.features.len() != other.features.len()
+            || self
+                .features
+                .iter()
+                .zip(&other.features)
+                .any(|(left, right)| left.0 != right.0)
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "changes of one coupled passage's shape",
+            });
+        }
+        Ok(Self {
+            waves: self
+                .waves
+                .iter()
+                .zip(&other.waves)
+                .map(|((a, b), (c, d))| (add(a, c), add(b, d)))
+                .collect(),
+            features: self
+                .features
+                .iter()
+                .zip(&other.features)
+                .map(|((station, f, l), (_, g, m))| (*station, add(f, g), add(l, m)))
+                .collect(),
+        })
+    }
+}
+
+/// The exact change from one coupled passage to another of the same shape.
+fn change(moved: &CoupledPassage, point: &CoupledPassage) -> Result<CoupledChange, HnnError> {
+    if moved.waves.len() != point.waves.len()
+        || moved.features.len() != point.features.len()
+        || moved
+            .features
+            .iter()
+            .zip(&point.features)
+            .any(|(left, right)| left.0 != right.0)
+    {
+        return Err(HnnError::Unadmitted {
+            reason: "two coupled passages of one shape",
+        });
+    }
+    Ok(CoupledChange {
+        waves: moved
+            .waves
+            .iter()
+            .zip(&point.waves)
+            .map(|((a, b), (c, d))| (sub(a, c), sub(b, d)))
+            .collect(),
+        features: moved
+            .features
+            .iter()
+            .zip(&point.features)
+            .map(|((station, f, l), (_, g, m))| (*station, sub(f, g), sub(l, m)))
+            .collect(),
+    })
+}
+
+/// [definition] **A live key's coupled prospect** (the module header): the passage from the fibre's
+/// point at the current crossing `tick`, and one change per fibre direction; the predicted values are
+/// `point + Σ_r k_r directions[r]` with one `k` for the whole passage.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CoupledProspect {
+    pub tick: u64,
+    pub point: CoupledPassage,
+    pub directions: Vec<CoupledChange>,
+}
+
 /// [definition] **The World model's memory** (the module header): the declared keys, each key's
 /// state, and the actual tick the memory has reached. No step list is kept.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -474,9 +559,9 @@ impl WorldModel {
         })
     }
 
-    /// **The coupled prospect of a live key at its fibre's point** (the module header): the prepared
-    /// native Word's coupled prospective passage with each emitted wave answered by this key's charts
-    /// from `ξ_T = c`. A held or incompatible key is refused.
+    /// **The coupled prospect of a live key** (the module header): the prepared native Word's coupled
+    /// prospective passage from the fibre's point, and each fibre direction's exact change to every
+    /// predicted wave and feature. A held or incompatible key is refused.
     pub fn coupled_prospect(
         &self,
         key: usize,
@@ -484,9 +569,34 @@ impl WorldModel {
         source_ring: usize,
         phases: &ReceivingPhases,
         compared: &[bool],
-    ) -> Result<CoupledPassage, HnnError> {
+    ) -> Result<CoupledProspect, HnnError> {
         let (model, fibre) = self.live(key)?;
-        self.coupled_from(model, &fibre.point, word, source_ring, phases, compared)
+        let passage =
+            |start: &[Rat]| self.coupled_from(model, start, word, source_ring, phases, compared);
+        let point = passage(&fibre.point)?;
+        let mut directions = Vec::with_capacity(fibre.directions.len());
+        for direction in &fibre.directions {
+            directions.push(change(&passage(&add(&fibre.point, direction))?, &point)?);
+        }
+        if let Some((first, rest)) = directions.split_first() {
+            let mut summed_state = fibre.point.clone();
+            for direction in &fibre.directions {
+                summed_state = add(&summed_state, direction);
+            }
+            let summed = rest
+                .iter()
+                .try_fold(first.clone(), |total, next| total.plus(next))?;
+            if change(&passage(&summed_state)?, &point)? != summed {
+                return Err(HnnError::Unadmitted {
+                    reason: "a coupled passage affine in the model state",
+                });
+            }
+        }
+        Ok(CoupledProspect {
+            tick: self.tick,
+            point,
+            directions,
+        })
     }
 
     /// The declared key `key` and its fibre at the current crossing, refused unless it is live.
