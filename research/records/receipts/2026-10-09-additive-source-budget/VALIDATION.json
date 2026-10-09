@@ -1,0 +1,170 @@
+{
+  "schema": "holonics.public-kernel-receipt-projection.v1",
+  "source_admission": {
+    "base_commit": "3c67beee7f656798f912c974f12c482ea12c5e42",
+    "target": "HolonicsResearch.Fluid.NavierStokesTransportedScalarMaximumPrinciple",
+    "source_pin": {
+      "sha256": "22e65267ba870093c1e9b917fa90d619234ee728eee38443f3df088993a27ea1",
+      "bytes": 32726
+    },
+    "selectors": [
+      "Holonics.Fluid.NavierStokesTransportedScalarMaximumPrinciple.deriv_deriv_nonpos_of_isLocalMax",
+      "Holonics.Fluid.NavierStokesTransportedScalarMaximumPrinciple.laplacian_nonpos_of_isLocalMax",
+      "Holonics.Fluid.NavierStokesTransportedScalarMaximumPrinciple.transportedSubsolution_le_of_le_at",
+      "Holonics.Fluid.NavierStokesTransportedScalarMaximumPrinciple.transportedSubsolution_le_of_initial_le",
+      "Holonics.Fluid.NavierStokesTransportedScalarMaximumPrinciple.transportedScalar_le_of_initial_le",
+      "Holonics.Fluid.NavierStokesTransportedScalarMaximumPrinciple.transportedSubsolution_mul_weight_le_of_le_at",
+      "Holonics.Fluid.NavierStokesTransportedScalarMaximumPrinciple.transportedSubsolution_mul_weight_le_of_initial_le",
+      "Holonics.Fluid.NavierStokesTransportedScalarMaximumPrinciple.abs_transportedScalar_le_of_abs_initial_le",
+      "Holonics.Fluid.NavierStokesTransportedScalarMaximumPrinciple.transportedSubsolution_le_additive_source_budget",
+      "Holonics.Fluid.NavierStokesTransportedScalarMaximumPrinciple.strict_event_absent_of_additive_source_budget",
+      "Holonics.Fluid.NavierStokesTransportedScalarMaximumPrinciple.sustained_source_receiver_event_iff",
+      "Holonics.Fluid.NavierStokesTransportedScalarMaximumPrinciple.arbitrarily_small_sustained_source_crosses"
+    ],
+    "new_queries": [
+      "Holonics.Fluid.NavierStokesTransportedScalarMaximumPrinciple.transportedSubsolution_le_additive_source_budget",
+      "Holonics.Fluid.NavierStokesTransportedScalarMaximumPrinciple.strict_event_absent_of_additive_source_budget",
+      "Holonics.Fluid.NavierStokesTransportedScalarMaximumPrinciple.sustained_source_receiver_event_iff",
+      "Holonics.Fluid.NavierStokesTransportedScalarMaximumPrinciple.arbitrarily_small_sustained_source_crosses"
+    ],
+    "whole_owner": true,
+    "provider_count": 18,
+    "claims_excluded": [
+      "Formal plane PDE/heat-kernel solution or half-space integration",
+      "Engineered computational force perturbation stability",
+      "General real/complex NS regularity or finite-time breakdown",
+      "Uniform spectral gap on R2 times T",
+      "Continuum or refinement-uniform MHD closure"
+    ],
+    "canonical_source": "lean/HolonicsResearch/Fluid/NavierStokesTransportedScalarMaximumPrinciple.lean",
+    "publication_base_commit": "f2c03e8dfff3a0fa153e6b072863625bdbb441cf",
+    "all_public_base_provider_sources_match": true
+  },
+  "kernel_accepted": true,
+  "compiler_exit": 0,
+  "compiler_wall_ns": 11767799416,
+  "queries_required": 12,
+  "queries_reached": 12,
+  "nonstandard_queries": [],
+  "meaningful_error_records": [],
+  "all_query_results": {
+    "Holonics.Fluid.NavierStokesTransportedScalarMaximumPrinciple.deriv_deriv_nonpos_of_isLocalMax": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Fluid.NavierStokesTransportedScalarMaximumPrinciple.laplacian_nonpos_of_isLocalMax": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Fluid.NavierStokesTransportedScalarMaximumPrinciple.transportedSubsolution_le_of_le_at": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Fluid.NavierStokesTransportedScalarMaximumPrinciple.transportedSubsolution_le_of_initial_le": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Fluid.NavierStokesTransportedScalarMaximumPrinciple.transportedScalar_le_of_initial_le": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Fluid.NavierStokesTransportedScalarMaximumPrinciple.transportedSubsolution_mul_weight_le_of_le_at": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Fluid.NavierStokesTransportedScalarMaximumPrinciple.transportedSubsolution_mul_weight_le_of_initial_le": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Fluid.NavierStokesTransportedScalarMaximumPrinciple.abs_transportedScalar_le_of_abs_initial_le": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Fluid.NavierStokesTransportedScalarMaximumPrinciple.transportedSubsolution_le_additive_source_budget": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Fluid.NavierStokesTransportedScalarMaximumPrinciple.strict_event_absent_of_additive_source_budget": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Fluid.NavierStokesTransportedScalarMaximumPrinciple.sustained_source_receiver_event_iff": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Fluid.NavierStokesTransportedScalarMaximumPrinciple.arbitrarily_small_sustained_source_crosses": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "metadata_unchanged": true,
+  "results": [
+    {
+      "unit": "prep",
+      "accepted": true,
+      "wall_ns": 5950572190,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 5379406000,
+      "group_peak_B": 325283840,
+      "group_limit_B": 8589934592,
+      "measured_to_projected": {
+        "numerator": 5950572190,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true
+    },
+    {
+      "unit": "compile",
+      "accepted": true,
+      "wall_ns": 13817982878,
+      "projection_ns": 21132554884,
+      "aggregate_CPU_ns": 8746339000,
+      "group_peak_B": 4678791168,
+      "group_limit_B": 8589934592,
+      "measured_to_projected": {
+        "numerator": 13817982878,
+        "denominator": 21132554884
+      },
+      "quiescent_released": true
+    }
+  ],
+  "importer_launched": false,
+  "prior_failed_sources_and_logs_preserved": true,
+  "no_unchanged_retry_or_within_job_limit_raise": true,
+  "provider_rebuilt": false,
+  "queue_quiescent_released": true,
+  "broad_library_checked": false,
+  "compiler_configuration": {
+    "Lean_version": "4.33.0",
+    "threads": 1,
+    "memory_option_M": 8192,
+    "child_deadline_ns": 17000000000,
+    "aggregate_CPU_limit_ns": 17000000000
+  },
+  "prior_rejected_sources": [
+    {
+      "revision": "v1",
+      "source_sha256": "f6024d3a5a7ec292089a74a88a452b37e2c6756c22c4784661c406af9a129302",
+      "whole_owner_accepted": false,
+      "source_bytes": 32386
+    },
+    {
+      "revision": "v2",
+      "source_sha256": "97732c64729cdfa6b57cb7ed32a3795f81d6696bc030aeb56b3cbc90a1b1a0b5",
+      "whole_owner_accepted": false,
+      "source_bytes": 32605
+    }
+  ]
+}

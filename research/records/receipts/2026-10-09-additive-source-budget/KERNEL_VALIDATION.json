@@ -1,0 +1,71 @@
+{
+  "kernel_accepted": true,
+  "compiler_exit": 0,
+  "compiler_wall_ns": 11767799416,
+  "axioms": {
+    "Holonics.Fluid.NavierStokesTransportedScalarMaximumPrinciple.deriv_deriv_nonpos_of_isLocalMax": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Fluid.NavierStokesTransportedScalarMaximumPrinciple.laplacian_nonpos_of_isLocalMax": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Fluid.NavierStokesTransportedScalarMaximumPrinciple.transportedSubsolution_le_of_le_at": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Fluid.NavierStokesTransportedScalarMaximumPrinciple.transportedSubsolution_le_of_initial_le": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Fluid.NavierStokesTransportedScalarMaximumPrinciple.transportedScalar_le_of_initial_le": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Fluid.NavierStokesTransportedScalarMaximumPrinciple.transportedSubsolution_mul_weight_le_of_le_at": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Fluid.NavierStokesTransportedScalarMaximumPrinciple.transportedSubsolution_mul_weight_le_of_initial_le": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Fluid.NavierStokesTransportedScalarMaximumPrinciple.abs_transportedScalar_le_of_abs_initial_le": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Fluid.NavierStokesTransportedScalarMaximumPrinciple.transportedSubsolution_le_additive_source_budget": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Fluid.NavierStokesTransportedScalarMaximumPrinciple.strict_event_absent_of_additive_source_budget": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Fluid.NavierStokesTransportedScalarMaximumPrinciple.sustained_source_receiver_event_iff": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Fluid.NavierStokesTransportedScalarMaximumPrinciple.arbitrarily_small_sustained_source_crosses": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "selector_count_matches": true,
+  "standard_axioms_only": true,
+  "metadata_unchanged": true,
+  "broad_library_checked": false
+}

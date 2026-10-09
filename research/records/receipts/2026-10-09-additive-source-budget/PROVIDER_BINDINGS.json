@@ -1,0 +1,296 @@
+{
+  "schema": "holonics.public-provider-binding-projection.v1",
+  "public_base_commit": "f2c03e8dfff3a0fa153e6b072863625bdbb441cf",
+  "provider_count": 18,
+  "providers": [
+    {
+      "module": "Holonics.Fluid.NavierStokesTorusVorticity",
+      "canonical_source": "lean/Holonics/Fluid/NavierStokesTorusVorticity.lean",
+      "source_pin": {
+        "bytes": 13430,
+        "sha256": "7b3be9cd7e909fef3aee9438a249727bf750588e48fda4357235fd502a766373"
+      },
+      "object_parts": {
+        "main": {
+          "bytes": 340808,
+          "sha256": "832a35d4e313c7e2be7c41e4f949a6e96213fc84286dd4d2a9650340a945a4dc"
+        }
+      },
+      "native_provenance": "v63 accepted exact source/object binding; archived bytes rehashed",
+      "public_base_source_bytes_equal": true
+    },
+    {
+      "module": "Holonics.Fluid.NavierStokesOpenLifespan",
+      "canonical_source": "lean/Holonics/Fluid/NavierStokesOpenLifespan.lean",
+      "source_pin": {
+        "bytes": 18298,
+        "sha256": "78cf424f4ef30bf1bf7ad5ce0f82654b8e271d3578fe225b582fddc0cb182433"
+      },
+      "object_parts": {
+        "main": {
+          "bytes": 324920,
+          "sha256": "8d02049bd6ebdcc9163a6183da512ba1b5f66a044b8fb7225b98649a898ee43f"
+        }
+      },
+      "native_provenance": "v63 accepted exact source/object binding; archived bytes rehashed",
+      "public_base_source_bytes_equal": true
+    },
+    {
+      "module": "Holonics.Fluid.NavierStokesFiniteTimeVorticity",
+      "canonical_source": "lean/Holonics/Fluid/NavierStokesFiniteTimeVorticity.lean",
+      "source_pin": {
+        "bytes": 24917,
+        "sha256": "1714eb2aabadde8839cba54e0d84b555a86c92f04ded274489f9a3c564fe6f1f"
+      },
+      "object_parts": {
+        "main": {
+          "bytes": 389440,
+          "sha256": "b83665f375d4a46cc663f13699cc341837e9912cebb8a71697c69a90b6f02ec0"
+        }
+      },
+      "native_provenance": "v63 accepted exact source/object binding; archived bytes rehashed",
+      "public_base_source_bytes_equal": true
+    },
+    {
+      "module": "Holonics.Fluid.NavierStokesCurlCommutation",
+      "canonical_source": "lean/Holonics/Fluid/NavierStokesCurlCommutation.lean",
+      "source_pin": {
+        "bytes": 25231,
+        "sha256": "3205063281dc6415b9d9bf0c11d807825bf4665053f9d5973cb09e27a41f7f22"
+      },
+      "object_parts": {
+        "main": {
+          "bytes": 478528,
+          "sha256": "069e81e9c6a92b68cd68772aa33155f669762aca7910c9a81f896a5d8c2fd197"
+        }
+      },
+      "native_provenance": "v63 accepted exact source/object binding; archived bytes rehashed",
+      "public_base_source_bytes_equal": true
+    },
+    {
+      "module": "Holonics.Fluid.NavierStokesPeriodicEnstrophy",
+      "canonical_source": "lean/Holonics/Fluid/NavierStokesPeriodicEnstrophy.lean",
+      "source_pin": {
+        "bytes": 45810,
+        "sha256": "fca84f9099464039de7a36b54ea7a519df7697096582a1df92ccfeff5019b4f4"
+      },
+      "object_parts": {
+        "main": {
+          "bytes": 766528,
+          "sha256": "69237850ede43b3e51e0b18fa24050cfb5844669dbaee33a5916c50e6ecff071"
+        }
+      },
+      "native_provenance": "v63 accepted exact source/object binding; archived bytes rehashed",
+      "public_base_source_bytes_equal": true
+    },
+    {
+      "module": "Holonics.Fluid.NavierStokesPeriodicEnergy",
+      "canonical_source": "lean/Holonics/Fluid/NavierStokesPeriodicEnergy.lean",
+      "source_pin": {
+        "bytes": 47189,
+        "sha256": "acfd2887307e79e4362b8de107ae437fe588eac938d7079a67aed110869014c8"
+      },
+      "object_parts": {
+        "main": {
+          "bytes": 812816,
+          "sha256": "156b10a1a996ad742f5799bb4025af11f29a11bea779ea1db7eac3192c31aa2c"
+        }
+      },
+      "native_provenance": "v63 accepted exact source/object binding; archived bytes rehashed",
+      "public_base_source_bytes_equal": true
+    },
+    {
+      "module": "Holonics.Fluid.NavierStokesPeriodicFlux",
+      "canonical_source": "lean/Holonics/Fluid/NavierStokesPeriodicFlux.lean",
+      "source_pin": {
+        "bytes": 8327,
+        "sha256": "76cd3d8015b37490425947e41a5109f6a01ce18ffdf53d845c95c71642716865"
+      },
+      "object_parts": {
+        "main": {
+          "bytes": 197712,
+          "sha256": "1cbdef4eba24edb9121f4f2d0923f0ff73fb806fec1fc7bedf499d59fec09eed"
+        }
+      },
+      "native_provenance": "v63 accepted exact source/object binding; archived bytes rehashed",
+      "public_base_source_bytes_equal": true
+    },
+    {
+      "module": "Holonics.Fluid.NavierStokesVorticity",
+      "canonical_source": "lean/Holonics/Fluid/NavierStokesVorticity.lean",
+      "source_pin": {
+        "bytes": 42082,
+        "sha256": "3d37c34ec414920162625a40e063b21b7d2d63f15d4f727146181021d7825072"
+      },
+      "object_parts": {
+        "main": {
+          "bytes": 1867048,
+          "sha256": "8a76d742a2dc16a6f3b5e53941b76fb14be2a9059a04d297b898b35f1b08362c"
+        }
+      },
+      "native_provenance": "v63 accepted exact source/object binding; archived bytes rehashed",
+      "public_base_source_bytes_equal": true
+    },
+    {
+      "module": "Holonics.Geometry.Swing",
+      "canonical_source": "lean/Holonics/Geometry/Swing.lean",
+      "source_pin": {
+        "bytes": 11469,
+        "sha256": "945876159a3560dbb8417aaccff4f9e79917004f06cd1369a80a3e94957444c3"
+      },
+      "object_parts": {
+        "main": {
+          "bytes": 673128,
+          "sha256": "73e83321888969f228fddca517f31d8ee848332bf4777ebbb75fa328248e3356"
+        }
+      },
+      "native_provenance": "v63 accepted exact source/object binding; archived bytes rehashed",
+      "public_base_source_bytes_equal": true
+    },
+    {
+      "module": "Holonics.Geometry.AffineSwing",
+      "canonical_source": "lean/Holonics/Geometry/AffineSwing.lean",
+      "source_pin": {
+        "bytes": 2184,
+        "sha256": "09ce73d5bc9766c152c3ccfc3b16a5f9627e5a4b3cda828ef9f1cf9e91b5805f"
+      },
+      "object_parts": {
+        "main": {
+          "bytes": 76576,
+          "sha256": "5bb3f1fc695741756d16e04e35ad714e485f1cb762f43e87fcf46054e7d0cdd9"
+        }
+      },
+      "native_provenance": "v63 accepted exact source/object binding; archived bytes rehashed",
+      "public_base_source_bytes_equal": true
+    },
+    {
+      "module": "Holonics.Foundation.Gluing",
+      "canonical_source": "lean/Holonics/Foundation/Gluing.lean",
+      "source_pin": {
+        "bytes": 6717,
+        "sha256": "5f90c401cae7aa7f40fe42b8dc0a1f181a62e5f44e9bf6dd760bcdb8ccd06828"
+      },
+      "object_parts": {
+        "main": {
+          "bytes": 178288,
+          "sha256": "af6f425d9cbbd6fc31c53263f4953bd3a54b56cbd8b0e5301de48096d55f99cf"
+        }
+      },
+      "native_provenance": "v63 accepted exact source/object binding; archived bytes rehashed",
+      "public_base_source_bytes_equal": true
+    },
+    {
+      "module": "Holonics.Foundation.GluingPassage",
+      "canonical_source": "lean/Holonics/Foundation/GluingPassage.lean",
+      "source_pin": {
+        "bytes": 2831,
+        "sha256": "966612dd5ba3888bd8e57f2ea8c405f8ad188c877430b0c12b42ab301ef09719"
+      },
+      "object_parts": {
+        "main": {
+          "bytes": 70584,
+          "sha256": "4025653894b0f3195c4912ba0ba3923eb0fc400d6b4943c332a4fdd92d485836"
+        }
+      },
+      "native_provenance": "v63 accepted exact source/object binding; archived bytes rehashed",
+      "public_base_source_bytes_equal": true
+    },
+    {
+      "module": "Holonics.Fluid.NavierStokes",
+      "canonical_source": "lean/Holonics/Fluid/NavierStokes.lean",
+      "source_pin": {
+        "bytes": 7565,
+        "sha256": "e7455a3002c215a8c25d11031ae2f862ee3d113a42674ebdb24f2a4db4c80991"
+      },
+      "object_parts": {
+        "main": {
+          "bytes": 177368,
+          "sha256": "bc5b3db92426387ad5622f64bd91a7da63143afc28b3dd7f6493dedaedc02461"
+        }
+      },
+      "native_provenance": "v63 accepted exact source/object binding; archived bytes rehashed",
+      "public_base_source_bytes_equal": true
+    },
+    {
+      "module": "Holonics.Coupling.Coupling",
+      "canonical_source": "lean/Holonics/Coupling/Coupling.lean",
+      "source_pin": {
+        "bytes": 8921,
+        "sha256": "df674bbb6ce13a1664ca7af2342f7fe722f072c5354cba9a3a311026166cfba8"
+      },
+      "object_parts": {
+        "main": {
+          "bytes": 275664,
+          "sha256": "85a29caca39abdcacd122120dae77860928b54872bcf1299f2892393626cf0a3"
+        }
+      },
+      "native_provenance": "v63 accepted exact source/object binding; archived bytes rehashed",
+      "public_base_source_bytes_equal": true
+    },
+    {
+      "module": "Holonics.Geometry.Turn",
+      "canonical_source": "lean/Holonics/Geometry/Turn.lean",
+      "source_pin": {
+        "bytes": 14637,
+        "sha256": "a5999d48f034d1c1acc91871fbdb4008b5958d3f09963db706b04bdc6beb42e0"
+      },
+      "object_parts": {
+        "main": {
+          "bytes": 547568,
+          "sha256": "114abbca0fdad806e8e68167164dbd96eafb86855c5ac3670b94ad1e1d2ed8ea"
+        }
+      },
+      "native_provenance": "v63 accepted exact source/object binding; archived bytes rehashed",
+      "public_base_source_bytes_equal": true
+    },
+    {
+      "module": "Holonics.Foundation.Lineage",
+      "canonical_source": "lean/Holonics/Foundation/Lineage.lean",
+      "source_pin": {
+        "bytes": 9458,
+        "sha256": "d0120d764009f01c3d718fbbbafd1861b07b3710743a85daf8335982f6509577"
+      },
+      "object_parts": {
+        "main": {
+          "bytes": 571656,
+          "sha256": "51f0524c62efa20f8d102fd7df2a1aab47fe635b51f6b6a273fdb73c30b41026"
+        }
+      },
+      "native_provenance": "v63 accepted exact source/object binding; archived bytes rehashed",
+      "public_base_source_bytes_equal": true
+    },
+    {
+      "module": "Holonics.Foundation.Receiver",
+      "canonical_source": "lean/Holonics/Foundation/Receiver.lean",
+      "source_pin": {
+        "bytes": 10544,
+        "sha256": "32695757b94827663d9ad6547a125b2a8b0700ab99b890a64c9bf662da7c69c0"
+      },
+      "object_parts": {
+        "main": {
+          "bytes": 475152,
+          "sha256": "813c23690a648d08ce7754bd736d4647a48b44aadf4b59df334e69b649543e15"
+        }
+      },
+      "native_provenance": "v63 accepted exact source/object binding; archived bytes rehashed",
+      "public_base_source_bytes_equal": true
+    },
+    {
+      "module": "Holonics.Fluid.NavierStokesFiniteTime",
+      "canonical_source": "lean/Holonics/Fluid/NavierStokesFiniteTime.lean",
+      "source_pin": {
+        "bytes": 9286,
+        "sha256": "dfb737b6fd8510405528f14ebc8ee7ae28d2f8f96d22b422e2cf1beb85b6f105"
+      },
+      "object_parts": {
+        "main": {
+          "bytes": 157728,
+          "sha256": "e1740c110d35d68d66935c89bf04afa8ed700d64eb78be945d6287d6df5b5b25"
+        }
+      },
+      "native_provenance": "v63 accepted exact source/object binding; archived bytes rehashed",
+      "public_base_source_bytes_equal": true
+    }
+  ],
+  "scope": "Source pins agree with this public base; object pins identify the reused accepted provider objects, which were not rebuilt."
+}

@@ -489,6 +489,17 @@ without replacing its arithmetic source. At equality G degenerates and that argu
 longer supplies a positive metric. The same pairing/phase/recurrence operations are therefore
 available across these constructions with a precise preserved equation.
 
+[proved-derived; formal-checked] The existing
+[transported-scalar owner](../lean/HolonicsResearch/Fluid/NavierStokesTransportedScalarMaximumPrinciple.lean)
+consumes the full inequality `theta_t+(u·grad)theta ≤ nu Delta theta+S(t)` with
+`A'=S`: under its periodic continuity and differentiability premises, an initial bound at
+`a` returns `theta(x,t) ≤ M+A(t)−A(a)` on `[a,T)`. Its strict-event consumer excludes a
+threshold crossing when that whole accumulated budget stays below or equal to the threshold.
+A derived fluid comparison must first include its pressure, boundary, receiver and stress
+returns in the scalar law it supplies. The
+[source-budget record and receipt](../research/records/2026-10-09_THE_ADDITIVE_SOURCE_BUDGET_ENTERS_THE_EXISTING_FLUID_RECEIVER.md)
+state the exact hypotheses and focused acceptance; this does not provide terminal control.
+
 [open] The unified construction does not yet furnish a terminal-uniform 3D NS regularity
 estimate, the Hodge conjecture's algebraic-cycle realization, the RH source's missing
 zero-location conclusion, or BSD's global rank/order/leading-coefficient relation. Those

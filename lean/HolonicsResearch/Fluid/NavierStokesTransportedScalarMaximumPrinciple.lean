@@ -22,6 +22,11 @@ vorticity transport equation from the momentum law of an `OpenPeriodicSolutionOn
 z-independence of the solution for z-independent data, which requires the uniqueness receipt;
 the vanishing of the third velocity component under that reduction; and the identification of
 the bounded scalar with `criticalVorticityRate`.  None of those relations is asserted here.
+
+The additive-source consumer below retains the primitive of the complete source bound. A small
+source amplitude alone supplies no bound uniform over an unbounded passage. The accompanying
+strict-threshold calculation is a receiver calculation; the actual smooth forced-shear PDE and
+its half-space integral are derived in the October 9 source-budget record, not formalized here.
 -/
 
 noncomputable section
@@ -497,6 +502,101 @@ theorem abs_transportedScalar_le_of_abs_initial_le
   have : -theta x t ≤ M := hlower x t ht
   linarith
 
+/-! ## Additive source budget and the receiver's strict event -/
+
+/-- [proved-derived; source-only] If the complete additive source is bounded by `S(t)` and
+`A' = S`, subtracting `A` gives the existing homogeneous subsolution. The returned bound keeps
+`A(t) - A(a)`; no small spatial source norm removes this accumulated return.
+
+For a difference of two transported scalars with different velocities, `S` must also bound the
+drift defect `-(u - u₀) · ∇theta₀`, as well as the difference of the supplied sources. This is
+not a Navier--Stokes velocity stability or a continuation theorem. -/
+theorem transportedSubsolution_le_additive_source_budget
+    {T nu : ℝ} (hnu : 0 ≤ nu) {a : ℝ} (ha : 0 ≤ a)
+    (theta : Space → ℝ → ℝ) (u : VelocityField) (S A : ℝ → ℝ)
+    (hcont : ContinuousOn (Function.uncurry theta) (Set.univ ×ˢ Set.Ico a T))
+    (hslice : ∀ t ∈ Set.Ioo a T, ContDiff ℝ 2 (fun y => theta y t))
+    (htime : ∀ x, ∀ t ∈ Set.Ioo a T, DifferentiableAt ℝ (theta x) t)
+    (hperiodic : ∀ t ∈ Set.Ico a T, IsOnePeriodic (fun x => theta x t))
+    (hAcont : Continuous A)
+    (hAderiv : ∀ t ∈ Set.Ioo a T, HasDerivAt A (S t) t)
+    (hlaw : ∀ x, ∀ t ∈ Set.Ioo a T,
+      derivWithin (theta x) (openTimeSlab T) t +
+        fderiv ℝ (fun y => theta y t) x (u x t) ≤
+          nu * Δ (fun y => theta y t) x + S t)
+    (M : ℝ) (hM : ∀ x, theta x a ≤ M) :
+    ∀ x, ∀ t ∈ Set.Ico a T, theta x t ≤ M + (A t - A a) := by
+  have hbound := transportedSubsolution_le_of_le_at hnu ha
+    (fun x t => theta x t - A t) u
+    (hcont.sub (hAcont.comp continuous_snd).continuousOn)
+    (fun t ht => (hslice t ht).sub contDiff_const)
+    (fun x t ht => (htime x t ht).sub (hAderiv t ht).differentiableAt)
+    (by
+      intro t ht x i
+      show theta (x + EuclideanSpace.single i 1) t - A t = theta x t - A t
+      have hp := hperiodic t ht x i
+      change theta (x + EuclideanSpace.single i 1) t = theta x t at hp
+      exact congrArg (fun y : ℝ => y - A t) hp)
+    (by
+      intro x t ht
+      have ht0 : 0 < t := lt_of_le_of_lt ha ht.1
+      have hnhds : openTimeSlab T ∈ 𝓝 t :=
+        Filter.mem_of_superset (Ioo_mem_nhds ht0 ht.2) Ioo_subset_Ico_self
+      have hsource := hlaw x t ht
+      rw [derivWithin_of_mem_nhds hnhds] at hsource ⊢
+      have hd := (htime x t ht).hasDerivAt.sub (hAderiv t ht)
+      change HasDerivAt (fun s => theta x s - A s)
+        (deriv (theta x) t - S t) t at hd
+      rw [hd.deriv, fderiv_sub_const]
+      have hΔ : Δ (fun y => theta y t - A t) x = Δ (fun y => theta y t) x := by
+        change Δ ((fun y => theta y t) - (fun _ : Space => A t)) x =
+          Δ (fun y => theta y t) x
+        simpa only [laplacian_const, Pi.zero_apply, sub_zero] using
+          (hslice t ht).contDiffAt.laplacian_sub
+            (contDiffAt_const : ContDiffAt ℝ 2 (fun _ : Space => A t) x)
+      rw [hΔ]
+      linarith)
+    (M - A a) (fun x => sub_le_sub_right (hM x) (A a))
+  intro x t ht
+  have := hbound x t ht
+  linarith
+
+/-- [proved-derived; source-only] Concrete strict-event consumer of the cumulative source
+bound. Equality at the threshold is allowed because the detector event is `threshold < theta`.
+The source budget and initial bound must hold for the whole admitted passage. -/
+theorem strict_event_absent_of_additive_source_budget
+    {theta : Space → ℝ → ℝ} {A : ℝ → ℝ} {a T M threshold : ℝ}
+    (hbound : ∀ x, ∀ t ∈ Set.Ico a T, theta x t ≤ M + (A t - A a))
+    (hbudget : ∀ t ∈ Set.Ico a T, M + (A t - A a) ≤ threshold) :
+    ¬ ∃ x, ∃ t ∈ Set.Ico a T, threshold < theta x t := by
+  rintro ⟨x, t, ht, hevent⟩
+  exact (not_lt_of_ge ((hbound x t ht).trans (hbudget t ht))) hevent
+
+/-- [proved-derived; source-only] The symmetric half-space receiver for the sustained shear
+has face `epsilon * t / 2`. It reaches `1/2` at `t = 1/epsilon` and satisfies the strict event
+exactly after that time. The PDE-to-face identification is an analytic source obligation. -/
+theorem sustained_source_receiver_event_iff {epsilon t : ℝ} (hepsilon : 0 < epsilon) :
+    (1 / 2 : ℝ) < epsilon * t / 2 ↔ 1 / epsilon < t := by
+  constructor
+  · intro h
+    apply (div_lt_iff₀ hepsilon).2
+    nlinarith
+  · intro h
+    have htime := (div_lt_iff₀ hepsilon).1 h
+    nlinarith
+
+/-- [proved-derived; source-only] No positive amplitude tolerance forbids every later strict
+event for the sustained-source face. The source is chosen strictly below the tolerance. -/
+theorem arbitrarily_small_sustained_source_crosses {tolerance : ℝ} (htol : 0 < tolerance) :
+    ∃ epsilon : ℝ, 0 < epsilon ∧ epsilon < tolerance ∧
+      ∃ t : ℝ, 0 ≤ t ∧ (1 / 2 : ℝ) < epsilon * t / 2 := by
+  let epsilon := tolerance / 2
+  have hepsilon : 0 < epsilon := by dsimp [epsilon]; positivity
+  have hsmall : epsilon < tolerance := by dsimp [epsilon]; linarith
+  refine ⟨epsilon, hepsilon, hsmall, 2 / epsilon, (div_pos (by norm_num) hepsilon).le, ?_⟩
+  rw [sustained_source_receiver_event_iff hepsilon]
+  exact (div_lt_div_iff_of_pos_right hepsilon).2 (by norm_num)
+
 section Audit
 
 #print axioms deriv_deriv_nonpos_of_isLocalMax
@@ -507,6 +607,10 @@ section Audit
 #print axioms transportedSubsolution_mul_weight_le_of_le_at
 #print axioms transportedSubsolution_mul_weight_le_of_initial_le
 #print axioms abs_transportedScalar_le_of_abs_initial_le
+#print axioms transportedSubsolution_le_additive_source_budget
+#print axioms strict_event_absent_of_additive_source_budget
+#print axioms sustained_source_receiver_event_iff
+#print axioms arbitrarily_small_sustained_source_crosses
 
 end Audit
 

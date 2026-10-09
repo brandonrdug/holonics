@@ -1,0 +1,66 @@
+{
+  "schema": "holonics.publication-file-seal.v1",
+  "base_commit": "f2c03e8dfff3a0fa153e6b072863625bdbb441cf",
+  "checks": {
+    "accepted_source_exact": true,
+    "selectors_match_twelve_standard_queries": true,
+    "all_eighteen_provider_sources_match_public_base": true,
+    "selected_import_projection_matches_native": true,
+    "added_atlas_rows_unique_eight_fields": true,
+    "new_markdown_links_resolve": true,
+    "private_correspondence_and_machine_path_scan_clear": true,
+    "diff_whitespace_check_passed": true,
+    "detached_research_head_and_tracked_dirty_bytes_preserved": true,
+    "new_compiler_run": false
+  },
+  "files": {
+    "docs/HOLONIC_FLUID_CONSTRUCTION.md": {
+      "sha256": "978388ead896e44ed0f56c2a9f39be5ed1a6c943f960698296e098b75836380e",
+      "bytes": 31356
+    },
+    "docs/atlas/targets.tsv": {
+      "sha256": "ba329e05c760c058724e20cb08e4a3213fa798be9b63edc67bd4616681c2e4f3",
+      "bytes": 700230
+    },
+    "research/records/README.md": {
+      "sha256": "966958da801155a341f065361ac1ae90ed555f78623f0fb34eaece4b3d638dea",
+      "bytes": 169528
+    },
+    "lean/HolonicsResearch/Fluid/NavierStokesTransportedScalarMaximumPrinciple.lean": {
+      "sha256": "22e65267ba870093c1e9b917fa90d619234ee728eee38443f3df088993a27ea1",
+      "bytes": 32726
+    },
+    "research/records/2026-10-09_THE_ADDITIVE_SOURCE_BUDGET_ENTERS_THE_EXISTING_FLUID_RECEIVER.md": {
+      "sha256": "eef34ad5ae48ba51f59fd1ec262f755827c6ca34e52dca324d9c078bba0953b5",
+      "bytes": 6958
+    },
+    "research/records/receipts/2026-10-09-additive-source-budget/KERNEL_VALIDATION.json": {
+      "sha256": "2e8e3d1acb9865270c693ffaa9895575e7dbbe3adde5726ad17ac976053a2ead",
+      "bytes": 2391
+    },
+    "research/records/receipts/2026-10-09-additive-source-budget/PROVENANCE.json": {
+      "sha256": "ccbc3ed20f9bba638e4d1986cebf0f4fe3737ff4824d0a700ad6a2c3d34f5337",
+      "bytes": 3622
+    },
+    "research/records/receipts/2026-10-09-additive-source-budget/PROVIDER_BINDINGS.json": {
+      "sha256": "6b93459eef8bba3be62d237eadfa87a2b0255b779f5560d7b2a24d07ed088c30",
+      "bytes": 11041
+    },
+    "research/records/receipts/2026-10-09-additive-source-budget/SELECTED_IMPORT_BINDINGS.json": {
+      "sha256": "443fce18bf6fa8748aac4a21628dc8d34ac143605e1f1cece15c0cb7369c2155",
+      "bytes": 4407528
+    },
+    "research/records/receipts/2026-10-09-additive-source-budget/VALIDATION.json": {
+      "sha256": "ef2df1a2ff55dd84e840eea4e107c25966de053631b0a269cb0eec6d354291e0",
+      "bytes": 6855
+    },
+    "research/records/receipts/2026-10-09-additive-source-budget/compiler.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "research/records/receipts/2026-10-09-additive-source-budget/compiler.stdout": {
+      "sha256": "b18d1333306a7de1c616c6e854a248d90858e6e10530d74fb031479c937cefbe",
+      "bytes": 1976
+    }
+  }
+}
