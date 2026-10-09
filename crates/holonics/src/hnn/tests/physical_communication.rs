@@ -3211,3 +3211,193 @@ fn a_second_learned_publication_is_read_at_its_received_opening() {
     assert_eq!(control.constitution(), &after_first, "the control holds call 1's material");
     assert_eq!(old.carry.ticks, next.carry.ticks);
 }
+
+/// [agent-inferred, October 9; #73; the lens "learning can be lost"] **A second observation, learned
+/// beside the first, READ.** Call 1 teaches observation A at Rest (source `[0, 1]`, observed
+/// `[0, 1, 3]`, station 2 compared); call 2 teaches a different observation B at the received opening
+/// call 1 left (source `[1, 0]`, observed `[1, 0, 2]`, station 2 compared). Then, at the same entering
+/// end, each source is read blind through fresh receivers on three materials: both learned, A only, and
+/// the initial one.
+///
+/// A READING, never an acceptance. It prints whether call 2 landed and committed `q != 0` against A's
+/// material; B's learned response (both against A only, B's source); A's own learned response (A only
+/// against the initial material, A's source); and what learning B did to A's response (both against A
+/// only, A's source), with each compared-station difference exact. A moved response is reported as
+/// moved; whether it is masked or erased needs a later probe and is not read here. Asserted: trust
+/// invariants only.
+#[test]
+fn a_second_observation_is_learned_beside_the_first() {
+    use crate::hnn::constitution::{Family, Locus};
+    use crate::hnn::encoding::Encoded;
+    use crate::hnn::physical::communication::PhysicalCommunication;
+    use crate::hnn::physical::contact::{ContactCommunication, ContactObservation};
+    use crate::hnn::word::continuation::FiniteDecrease;
+    use crate::ratio::Rat;
+    use num_traits::Signed;
+    let field = field();
+    let initial = contact_material(&field);
+    let current = Current::at_rest(&field);
+    let (source_a, source_b) = (encoded(&field, &[0, 1]), encoded(&field, &[1, 0]));
+    let compared = vec![false, false, true];
+    let observe = |observed: &[usize]| ContactObservation {
+        observed: encoded(&field, observed),
+        compared: compared.clone(),
+    };
+    let mut actual =
+        PhysicalReceiver::new(&field, initial.clone(), current.clone(), WordOpening::Rest).unwrap();
+    let first = actual
+        .communicate_contact(&source_a, &receiver(), |_| Some(observe(&[0, 1, 3])))
+        .unwrap();
+    assert!(first.closes());
+    let after_a = actual.constitution().clone();
+    assert!(
+        matches!(actual.opening(), WordOpening::Received { .. }),
+        "call 2 opens on the carry call 1 published"
+    );
+    let second = actual
+        .communicate_contact(&source_b, &receiver(), |_| Some(observe(&[1, 0, 2])))
+        .unwrap();
+    assert!(second.closes());
+    let after_b = actual.constitution().clone();
+    let outcome = |c: &ContactCommunication| {
+        c.comparison
+            .as_ref()
+            .ok()
+            .and_then(|p| p.as_ref())
+            .map(|p| {
+                p.landing
+                    .outcome
+                    .as_ref()
+                    .map(FiniteDecrease::admitted)
+                    .map_err(|refusal| format!("{refusal:?}"))
+            })
+    };
+    println!(
+        "second observation READING: call 1 (A at Rest) landing {:?}; call 2 (B at the received \
+         opening) landing {:?}",
+        outcome(&first),
+        outcome(&second)
+    );
+
+    // Call 2's committed change against A's material.
+    let publication = second.comparison.as_ref().unwrap().as_ref().unwrap();
+    let locus = Locus::Channel(0);
+    let lattice = initial.lattice(locus).expect("the contact's lattice");
+    let mut committed_families = 0usize;
+    let (mut lineage, mut on_lattice) = (true, true);
+    for (f, name) in ["C", "K", "D"].into_iter().enumerate() {
+        let family = Family::Factor(f);
+        let eta = publication.publication.family_step(locus, family);
+        let vanished = publication.publication.vanished.contains(&(locus, family));
+        let (before, after) = match f {
+            0 => (after_a.contact_storage(0), after_b.contact_storage(0)),
+            1 => (after_a.contact_stiffness(0), after_b.contact_stiffness(0)),
+            _ => (after_a.contact_dissipation(0), after_b.contact_dissipation(0)),
+        };
+        let movement = publication
+            .continuation
+            .material
+            .iter()
+            .find(|m| m.contact == 0 && m.family == family)
+            .unwrap_or_else(|| panic!("call 2 applied no family-{f} movement"));
+        let coordinates: Vec<_> = movement
+            .factor
+            .entries()
+            .iter()
+            .map(|entry| lattice.div_rem(entry))
+            .collect();
+        let off_lattice = coordinates.iter().filter(|(_, r)| !r.is_zero()).count();
+        on_lattice &= off_lattice == 0;
+        let nonzero: Vec<String> = coordinates
+            .iter()
+            .enumerate()
+            .filter(|(_, (q, _))| !q.is_zero())
+            .map(|(i, (q, _))| format!("({i}, {q})"))
+            .collect();
+        lineage &= before.add(&movement.factor).unwrap() == *after;
+        let committed = !vanished
+            && after != before
+            && off_lattice == 0
+            && !nonzero.is_empty()
+            && eta.is_positive();
+        committed_families += usize::from(committed);
+        println!(
+            "second observation call 2 family {name}: eta={} vanished={vanished}; applied q != 0 at \
+             {} of {} entries [{}] => {}",
+            acceptance_exact(&eta),
+            nonzero.len(),
+            coordinates.len(),
+            nonzero.join(", "),
+            acceptance_verdict(committed)
+        );
+    }
+
+    // Blind reads at the same entering end through fresh receivers.
+    let entering = actual.opening();
+    let read = |material: &Constitution, source: &Encoded| {
+        let mut reader =
+            PhysicalReceiver::new(&field, material.clone(), current.clone(), entering.clone())
+                .unwrap();
+        reader.communicate(source, &receiver(), |_| None).unwrap()
+    };
+    let a_both = read(&after_b, &source_a);
+    let a_only = read(&after_a, &source_a);
+    let a_none = read(&initial, &source_a);
+    let b_both = read(&after_b, &source_b);
+    let b_only = read(&after_a, &source_b);
+    let a_again = read(&after_a, &source_a);
+    let at_compared = |learned: &PhysicalCommunication, control: &PhysicalCommunication| {
+        let differences: Vec<(usize, Vec<Rat>)> =
+            acceptance_difference(learned.boundary.readings(), control.boundary.readings())
+                .into_iter()
+                .filter(|(station, _)| compared.get(*station).copied().unwrap_or(false))
+                .collect();
+        let changed = differences
+            .iter()
+            .map(|(_, d)| d.iter().filter(|x| !x.is_zero()).count())
+            .sum::<usize>();
+        let shown = differences
+            .iter()
+            .map(|(station, d)| {
+                let entries = d.iter().map(acceptance_exact).collect::<Vec<_>>();
+                format!("station {station}: [{}]", entries.join(", "))
+            })
+            .collect::<Vec<_>>()
+            .join("; ");
+        (changed, shown)
+    };
+    let (b_learned, b_shown) = at_compared(&b_both, &b_only);
+    let (a_learned, a_shown) = at_compared(&a_only, &a_none);
+    let (a_moved, a_moved_shown) = at_compared(&a_both, &a_only);
+    let (a_kept, a_kept_shown) = at_compared(&a_both, &a_none);
+    println!(
+        "second observation: call 2 committed {committed_families} of 3 families; B's learned \
+         response (both against A only, B's source): {b_learned} compared coordinates differ \
+         [{b_shown}]"
+    );
+    println!(
+        "second observation: A's own learned response (A only against none, A's source): \
+         {a_learned} compared coordinates differ [{a_shown}]"
+    );
+    println!(
+        "second observation: what learning B did to A's response (both against A only, A's \
+         source): {a_moved} compared coordinates moved [{a_moved_shown}]; A's response on both \
+         against none: {a_kept} coordinates differ [{a_kept_shown}]"
+    );
+
+    // Trust invariants only.
+    assert!(lineage, "each family's applied factor reaches the resident unchanged");
+    assert!(on_lattice, "every applied movement lies on its family's lattice");
+    for reading in [&a_both, &a_only, &a_none, &b_both, &b_only, &a_again] {
+        assert!(reading.closes());
+    }
+    assert_eq!(
+        a_again.boundary, a_only.boundary,
+        "identical operands give identical boundaries"
+    );
+    assert_ne!(
+        a_only.boundary.readings(),
+        b_only.boundary.readings(),
+        "the reads are source-sensitive"
+    );
+}
