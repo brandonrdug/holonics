@@ -1855,3 +1855,72 @@ fn the_partner_adds_no_information_at_the_retained_quotient() {
         }
     }
 }
+
+/// [measured, October 9; the helical record §5, "Not built: an equivariant deposition"] **One actual
+/// located-pair deposit takes an equivariant port off its subspace.** On the real constitution with the
+/// declared equivariant port (the founded leader columns completed), port and prior are equivariant and
+/// the partner face reads exactly. One `pair_deposit` of the located pair from port 0 to port 2 moves
+/// column 2 by its slip and leaves column 3 = σ(2) in place, so the next read refuses with the typed
+/// `Equivariance` defect at column 2 against partner 3: the module header's derived claim, run. It is the
+/// measurement that the equivariant deposit (the pair-port reversal law) answers.
+#[test]
+fn one_actual_pair_deposit_takes_the_equivariant_port_off_its_subspace() {
+    use crate::hnn::executed::pair_deposit;
+    use crate::hnn::keys::LocatedPair;
+    let field = declare(
+        vec![
+            ring_declaration(5, vec![0, 1, 2, 3], reflection(5, 0)),
+            ring_declaration(2, vec![0, 1], reflection(2, 0)),
+        ],
+        vec![ContactDeclaration {
+            from: 0,
+            to: 1,
+            channel: vec![(0, 0)],
+            admittance: integer(2),
+            exponent: integer(0),
+        }],
+        vec![0],
+        4,
+        Vec::new(),
+    );
+    let declared = PairingDeclaration::Family {
+        table: vec![(0, 1), (1, 0), (2, 3), (3, 2)],
+    };
+    let founded_port = declared_source_port(&field, 0).unwrap().unwrap();
+    let completed = PairedCarrier::complete_port(&field, 0, &declared, &founded_port).unwrap();
+    let carrier = PairedCarrier::admit(&field, 0, &declared, &completed).unwrap();
+    let placed = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET)
+        .unwrap()
+        .with_ports(0, None, Some(completed.clone()), None)
+        .unwrap();
+    let opening = vec![BigInt::from(5 + 1), BigInt::zero()];
+    let u = vec![2, 0, 1, 3, 3, 0, 2, 1, 0];
+    let strand = run(&field, 0, &opening, None, &u);
+    assert!(carrier
+        .partner_face(&field, &placed, &strand.current, &strand.moment, 4)
+        .unwrap()
+        .is_exact());
+    let located = LocatedPair {
+        offset: 1,
+        map: vec![(0, 2)],
+        cycle: 1,
+        turns: Vec::new(),
+    };
+    let (moved, deposit) = pair_deposit(&field, &placed, &completed, 0, &located).unwrap();
+    assert!(deposit.certificate.holds());
+    eprintln!(
+        "pair deposit: classes {:?}, slip {} -> {}, step {}",
+        deposit.classes, deposit.slip_before, deposit.slip_after, deposit.certificate.step
+    );
+    let refusal = carrier.partner_face(&field, &moved, &strand.current, &strand.moment, 4);
+    eprintln!("re-admission after one pair deposit: {refusal:?}");
+    match refusal {
+        Err(PairedDefect::Equivariance {
+            ring,
+            column,
+            partner,
+            ..
+        }) => assert_eq!((ring, column, partner), (0, 2, 3)),
+        other => panic!("an equivariant port moved by one located pair is refused at its column: {other:?}"),
+    }
+}
