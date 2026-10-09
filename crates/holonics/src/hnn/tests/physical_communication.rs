@@ -848,6 +848,446 @@ fn complete_contact_return_publishes_held_point_before_existing_communication() 
     println!("whole carried existing communication boundary: {:?}", next.boundary);
 }
 
+// The held twin of 0279 on its own operands. Declared once, from the field, and never raised after a
+// run: a refusal at them is the next loop's subject, not a larger limit. The width-six contact
+// carries three raw 6 x 6 Gram factors (C, K, D): 3 * 6 * 6 = 108 = 2^2 * 3^3 parameters.
+const LANDING_TANGENT_PARAMETERS: usize = 3 * 6 * 6;
+// One Word's full state: storage (8 + 6), arriving waves (8 + 6) and the contact's (u, w) (6 + 6),
+// with no loaded resonator: 40 = 2^3 * 5 coordinates, so 108 * 40 = 4320 = 2^5 * 3^3 * 5 retained
+// ratios.
+const LANDING_TANGENT_STATE_COORDINATES: usize = (8 + 6) + (8 + 6) + (6 + 6);
+const LANDING_TANGENT_RATIOS: usize =
+    LANDING_TANGENT_PARAMETERS * LANDING_TANGENT_STATE_COORDINATES;
+// 0279's one Word executes three ticks (`taught.carry.ticks == 3`) and every tick moves every
+// column: 108 * 3 = 324 = 2^2 * 3^4 column-ticks.
+const LANDING_TANGENT_TICKS: usize = 3;
+const LANDING_TANGENT_COLUMN_TICKS: usize = LANDING_TANGENT_PARAMETERS * LANDING_TANGENT_TICKS;
+
+/// [agent-inferred, October 8; the medium-of-joints record, section 7] **The landing tangent read
+/// beside the uniform certificate** on 0279's own operands. A CONDITIONAL DIAGNOSTIC, NEVER A
+/// CERTIFIED LANDING: L1' is a candidate closer, `eps_ray` is uncertified, and a point tangent
+/// cannot authorize a finite deposit. It changes no law and admits no step.
+///
+/// Per family `f` (C, K, D) the numerator is the certificate's own `kb_f = kappa^2 b` (the deposit's
+/// `StepReading::gain * moves`; the step's curvature is `s kb_f` with `s = 1/2`) and the denominator
+/// is `|A d_f|^2`, the squared response at the compared station to the deposit's unit step
+/// `d_f = G_f / h'_f` (so `a_f = |G_f|^2 / h'_f` at the certificate's face). `A` is the held twin's
+/// exact station response at the same producing material, current and Word; `G_f` and `h'_f` are the
+/// actual deposit's descent direction and published statistic. The two are read in different charts
+/// (kappa maps the contact right-hand-side streams; `A` maps raw factors to realified logits at
+/// identity metrics), so the quotient reads whether the uniform certificate could be loose, and is
+/// not a like-for-like bound. With `s = 1/2` and `eps_ray = 0` an own-certificate L1' admits
+/// `eta = 2^-10` exactly when `|A d_f|^2 <= T_f = 2^11 a_f` (jointly, `|A (d_C + d_K + d_D)|^2 <=
+/// 2^11 sum a_f`). A zero `|A d_f|^2` is a kernel or singular case, never a ratio.
+///
+/// The readings print first; the assertions that let them be trusted follow, so a failed assertion
+/// leaves the readings visible but unverified.
+fn landing_tangent_reading(
+    before: &Constitution,
+    after: &Constitution,
+    actual: &crate::hnn::physical::contact::ContactPublication,
+    twin: &crate::hnn::physical::contact::ContactCommunication,
+    admitted: &crate::hnn::word::variation::VariationReading,
+    compared: &[bool],
+) {
+    use crate::hnn::constitution::{FactorGradient, Family, Locus};
+    use crate::holon::deposition::dyadic;
+    use crate::ratio::Rat;
+    use crate::ratio::disk::floor_log2;
+    use crate::ratio::linear::vector::{add, dot};
+    use num_traits::Signed;
+    let locus = Locus::Channel(0);
+    let names = ["C", "K", "D"];
+    // The actual deposit: its certified steps, its descent directions and its published statistics.
+    assert_eq!(actual.comparison_return.commit(), before.commit());
+    assert_eq!(actual.publication.commit, after.commit());
+    let scales = after.contact_scales(0);
+    let steps: Vec<_> = (0..3)
+        .map(|f| {
+            actual
+                .publication
+                .steps
+                .iter()
+                .find(|(at, reading)| *at == locus && reading.family == Family::Factor(f))
+                .map(|(_, reading)| reading)
+                .unwrap_or_else(|| panic!("the actual deposit certified no family-{f} step"))
+        })
+        .collect();
+    let gradients: Vec<_> = (0..3)
+        .map(|f| {
+            let step = actual
+                .comparison_return
+                .factors()
+                .iter()
+                .find(|s| s.gradient.locus() == locus && s.gradient.family() == Family::Factor(f))
+                .unwrap_or_else(|| panic!("the actual deposit returned no family-{f} gradient"));
+            match &step.gradient {
+                FactorGradient::Storage { gradient, .. }
+                | FactorGradient::Stiffness { gradient, .. }
+                | FactorGradient::Dissipation { gradient, .. } => gradient,
+                _ => unreachable!("a contact family returns a Gram-factor gradient"),
+            }
+        })
+        .collect();
+    // The held twin: its complete station response, and the rows of it at the compared stations.
+    let response = twin
+        .station_response
+        .as_ref()
+        .expect("the held twin returns its complete station response");
+    assert_eq!(response.producing_commit, before.commit());
+    let fallback;
+    let selected = match &twin.compared_response {
+        Some(selected) => selected,
+        None => {
+            fallback = response
+                .select(compared)
+                .expect("the compared stations select from the complete response");
+            &fallback
+        }
+    };
+    // The actual comparison's covector at the compared stations.
+    let covector = actual
+        .ratio
+        .covector()
+        .expect("the actual comparison's covector");
+    let g: Vec<Rat> = compared
+        .iter()
+        .enumerate()
+        .filter(|(_, picked)| **picked)
+        .flat_map(|(station, _)| covector.logits()[station].iter().cloned())
+        .collect();
+    assert_eq!(
+        g.len(),
+        selected.matrix.rows(),
+        "the covector and the selected rows share the compared stations"
+    );
+    // The family directions d_f = G_f / h'_f, in the response's own coordinate order.
+    let directions: Vec<Vec<Rat>> = (0..3)
+        .map(|f| {
+            response
+                .coordinates
+                .iter()
+                .map(|c| {
+                    if c.contact == 0 && c.family == f {
+                        gradients[f]
+                            .get(c.row, c.column)
+                            .expect("a returned gradient entry")
+                            / &scales[f]
+                    } else {
+                        Rat::zero()
+                    }
+                })
+                .collect()
+        })
+        .collect();
+    // The owner's transpose identity A^T g = total, re-read against the actual descent direction
+    // -G: how many coordinates of each family differ (none when the readings are sound).
+    let transposed = match response.pullback(&covector) {
+        Ok(pulled) => {
+            let mut differing = [0usize; 3];
+            for (c, got) in response.coordinates.iter().zip(&pulled) {
+                let descent = gradients[c.family]
+                    .get(c.row, c.column)
+                    .expect("a returned gradient entry");
+                if *got != -descent {
+                    differing[c.family] += 1;
+                }
+            }
+            format!(
+                "A^T g differs from -G at {differing:?} coordinates of C, K, D (of {} each)",
+                response.coordinates.len() / 3
+            )
+        }
+        Err(refusal) => format!("A^T g was refused: {refusal:?}"),
+    };
+    let tangents: Vec<_> = directions
+        .iter()
+        .enumerate()
+        .map(|(f, d)| {
+            selected.directional(d).unwrap_or_else(|refusal| {
+                panic!("family {f}: the directional response was refused: {refusal:?}")
+            })
+        })
+        .collect();
+    let sum_direction = add(&add(&directions[0], &directions[1]), &directions[2]);
+    let joint = selected
+        .directional(&sum_direction)
+        .unwrap_or_else(|refusal| {
+            panic!("the summed direction's response was refused: {refusal:?}")
+        });
+    // The certificate's numerator kb_f, |G_f|^2, and the threshold T_f = a_f / (s eta) = 2^11 a_f of
+    // an own-certificate L1' with s = 1/2 and eps_ray = 0 at eta = 2^-10 (the record's landing step).
+    assert_eq!(dyadic(11), integer(1) / (rat(1, 2) * dyadic(-10)));
+    let numerators: Vec<Rat> = steps.iter().map(|step| &step.gain * &step.moves).collect();
+    let gradient_squared: Vec<Rat> = gradients
+        .iter()
+        .map(|gradient| gradient.entries().iter().map(|x| x * x).sum::<Rat>())
+        .collect();
+    let thresholds: Vec<Rat> = steps
+        .iter()
+        .map(|step| dyadic(11) * &step.step.alignment)
+        .collect();
+    let sum_alignment: Rat = steps.iter().map(|step| step.step.alignment.clone()).sum();
+    let joint_threshold = dyadic(11) * &sum_alignment;
+    // The first dyadic step at which this family's largest entry move reaches the half-unit.
+    let half_unit = before.lattice(locus).expect("the contact's lattice").unit() / integer(2);
+    let widest: Vec<Rat> = directions
+        .iter()
+        .map(|d| {
+            d.iter()
+                .map(Signed::abs)
+                .max()
+                .expect("a direction has entries")
+        })
+        .collect();
+    let first_reach: Vec<i64> = widest
+        .iter()
+        .map(|w| {
+            assert!(w.is_positive(), "a certified step has a nonzero direction");
+            let needed = &half_unit / w;
+            let k = floor_log2(&needed);
+            if dyadic(k) == needed { k } else { k + 1 }
+        })
+        .collect();
+    let binary = |x: &Rat| -> String {
+        if x.is_positive() {
+            format!("{x} [floor_log2={}]", floor_log2(x))
+        } else {
+            format!("{x} [no binary exponent]")
+        }
+    };
+    let credit = match &twin.held_comparison {
+        Ok(Some(credit)) => Some(credit),
+        _ => None,
+    };
+    let status = match &twin.held_comparison {
+        Ok(Some(_)) => "returned (the owner checked A^T g = total)".to_string(),
+        Ok(None) => "none".to_string(),
+        Err(refusal) => format!("REFUSED, the readings below are UNVERIFIED: {refusal:?}"),
+    };
+    println!(
+        "landing tangent CONDITIONAL DIAGNOSTIC, NOT A LANDING: L1' is a candidate closer, eps_ray is \
+         uncertified, a point tangent cannot authorize a finite deposit, and no certified landing \
+         exists. kb = kappa^2 b is the certificate's own numerator (contact right-hand-side streams); \
+         |A d|^2 is the held twin's exact station response in identity raw-factor and realified-logit \
+         charts: a reading beside it, never a like-for-like bound."
+    );
+    println!(
+        "landing tangent twin: admitted={admitted:?} run={:?} compared_stations={:?} A_rows={} \
+         A_columns={} |A|^2_enclosure=[{}, {}] held_comparison={status} transpose_identity: {transposed}",
+        credit.map(|c| &c.reading),
+        selected.station_ticks,
+        selected.matrix.rows(),
+        selected.matrix.columns(),
+        selected.lower_squared,
+        selected.upper_squared
+    );
+    for (f, step) in steps.iter().enumerate() {
+        let kb = &numerators[f];
+        let ad2 = &tangents[f].receiving_squared;
+        let order = crate::ratio::compare(ad2, &thresholds[f]);
+        let quotient = if ad2.is_zero() {
+            "kernel/singular (|A d|^2 = 0): no ratio".to_string()
+        } else if !kb.is_positive() {
+            "numerator kb = 0: no ratio".to_string()
+        } else {
+            let rho = kb / ad2;
+            let k = floor_log2(&rho);
+            format!("rho={rho} floor_log2={k} remainder={}", &rho - dyadic(k))
+        };
+        println!(
+            "landing tangent f={f} [{}] certificate: eta=2^{} a={} h'={} |G|^2={} max|d|={} \
+             first_reach_eta=2^{} kb=kappa^2*b={}",
+            names[f],
+            step.step.exponent,
+            binary(&step.step.alignment),
+            scales[f],
+            gradient_squared[f],
+            binary(&widest[f]),
+            first_reach[f],
+            binary(kb)
+        );
+        println!(
+            "landing tangent f={f} [{}] tangent: |A d|^2={} |d|^2={} kb/|A d|^2: {quotient}",
+            names[f],
+            binary(ad2),
+            tangents[f].parameter_squared
+        );
+        println!(
+            "landing tangent f={f} [{}] threshold: T=2^11*a={} needed kb/T={} |A d|^2<=T: {} (exact order {order:?}{})",
+            names[f],
+            binary(&thresholds[f]),
+            binary(&(kb / &thresholds[f])),
+            order.is_le(),
+            if ad2.is_zero() {
+                "; kernel/singular is not a favourable quotient"
+            } else {
+                ""
+            }
+        );
+    }
+    let joint_order = crate::ratio::compare(&joint.receiving_squared, &joint_threshold);
+    println!(
+        "landing tangent joint: |A(d_C+d_K+d_D)|^2={} |d_C+d_K+d_D|^2={} 2^11*sum(a)={} \
+         |A d|^2<=T: {} (exact order {joint_order:?}{}) declared_landing_eta=2^-10 first_reach_eta=2^{}",
+        binary(&joint.receiving_squared),
+        joint.parameter_squared,
+        binary(&joint_threshold),
+        joint_order.is_le(),
+        if joint.receiving_squared.is_zero() {
+            "; kernel/singular is not a favourable quotient"
+        } else {
+            ""
+        },
+        first_reach.iter().max().expect("three families")
+    );
+    // The assertions that let the readings above be trusted.
+    let credit = credit.unwrap_or_else(|| {
+        panic!(
+            "the held twin returned no comparison: {:?}",
+            twin.held_comparison.as_ref().err()
+        )
+    });
+    // The twin is the actual run's comparison on its own Word: the same coordinates and covector,
+    // and a first Word from rest, which carries no earlier column.
+    assert_eq!(credit.coordinates, response.coordinates);
+    assert_eq!(credit.total.len(), response.coordinates.len());
+    assert_eq!(
+        credit.ratio.covector().expect("the twin's covector"),
+        covector,
+        "the twin compares what the actual run compared"
+    );
+    assert!(
+        credit.carried.iter().all(Zero::is_zero),
+        "a first Word from rest carries no earlier column"
+    );
+    response
+        .check_pullback(&covector, &credit.total)
+        .expect("A^T g = total, checked again on the actual covector");
+    // The held total is -(d h') entrywise: the descent direction is -total and d_f = G_f / h'_f.
+    for (i, c) in response.coordinates.iter().enumerate() {
+        assert_eq!(
+            credit.total[i],
+            -(&directions[c.family][i] * &scales[c.family]),
+            "coordinate {i} {c:?}"
+        );
+    }
+    let mut sum_pairing = Rat::zero();
+    for (f, step) in steps.iter().enumerate() {
+        // The certificate's curvature is s kb with s = 1/2, so kb is the deposit's printed kappa^2 b.
+        assert_eq!(
+            &step.step.curvature * integer(2),
+            numerators[f],
+            "family {f}"
+        );
+        // sum_j g_j (A d_f)_j = total . d_f = -|G_f|^2 / h'_f, exactly.
+        let pairing = &gradient_squared[f] / &scales[f];
+        assert_eq!(dot(&g, &tangents[f].response), -&pairing, "family {f}");
+        // a_f is that same |G_f|^2 / h'_f at the certificate's floor.
+        assert!(
+            crate::ratio::compare(&step.step.alignment, &pairing).is_le(),
+            "family {f}"
+        );
+        sum_pairing += pairing;
+    }
+    assert_eq!(dot(&g, &joint.response), -sum_pairing);
+    // The declared budget, derived once and never raised, against what the run reports.
+    assert_eq!(
+        (
+            admitted.parameters,
+            admitted.state_coordinates,
+            admitted.retained_ratios
+        ),
+        (
+            LANDING_TANGENT_PARAMETERS,
+            LANDING_TANGENT_STATE_COORDINATES,
+            LANDING_TANGENT_RATIOS
+        )
+    );
+    assert_eq!(credit.reading.column_ticks, LANDING_TANGENT_COLUMN_TICKS);
+    assert_eq!(
+        (credit.reading.words, credit.reading.next_tick),
+        (1, LANDING_TANGENT_TICKS)
+    );
+    assert!(credit.reading.retained_ratios <= LANDING_TANGENT_RATIOS);
+    assert!(credit.reading.retained_bits <= CAMPAIGN_ONE_BUDGET);
+    assert!(response.matrix.rows() * response.matrix.columns() <= LANDING_TANGENT_RATIOS);
+    assert!(response.matrix_bits <= CAMPAIGN_ONE_BUDGET);
+    println!(
+        "landing tangent: every trust assertion passed; the readings above remain a conditional diagnostic"
+    );
+}
+
+#[test]
+fn the_landing_tangent_is_read_beside_the_uniform_certificate_on_the_complete_contact_return() {
+    use crate::hnn::physical::contact::ContactObservation;
+    use crate::hnn::word::variation::VariationBudget;
+    let field = field();
+    let initial = contact_material(&field);
+    let current = Current::at_rest(&field);
+    let source = encoded(&field, &[0, 1]);
+    let compared = vec![false, false, true];
+    let observation = || ContactObservation {
+        observed: encoded(&field, &[0, 1, 3]),
+        compared: compared.clone(),
+    };
+    // 0279's own runs: the blind forward, then the same Word with its comparison and deposit.
+    let mut untouched =
+        PhysicalReceiver::new(&field, initial.clone(), current.clone(), WordOpening::Rest).unwrap();
+    let blind = untouched
+        .communicate_contact(&source, &receiver(), |_| None)
+        .unwrap();
+    let started = std::time::Instant::now();
+    let mut actual =
+        PhysicalReceiver::new(&field, initial.clone(), current.clone(), WordOpening::Rest).unwrap();
+    let taught = actual
+        .communicate_contact(&source, &receiver(), |_| Some(observation()))
+        .unwrap();
+    let actual_ns = started.elapsed().as_nanos();
+    // The held twin: the same operands and observation, with the exact station response.
+    let started = std::time::Instant::now();
+    let mut twin =
+        PhysicalReceiver::new(&field, initial.clone(), current.clone(), WordOpening::Rest).unwrap();
+    let admitted = twin
+        .begin_held_contact_variation(VariationBudget {
+            ratios: LANDING_TANGENT_RATIOS,
+            bits: CAMPAIGN_ONE_BUDGET,
+            column_ticks: LANDING_TANGENT_COLUMN_TICKS,
+        })
+        .expect("the held twin is admitted within its declared budget");
+    let held = twin
+        .communicate_contact(&source, &receiver(), |_| Some(observation()))
+        .unwrap();
+    let twin_ns = started.elapsed().as_nanos();
+    assert!(blind.closes() && taught.closes() && held.closes());
+    assert_eq!(
+        taught.boundary, blind.boundary,
+        "observation cannot enter its earlier forward"
+    );
+    assert_eq!(
+        held.boundary, blind.boundary,
+        "the held twin's boundary is the blind run's"
+    );
+    assert_eq!(held.blind_carry, blind.carry);
+    assert_eq!(
+        held.carry, held.blind_carry,
+        "a fixed-material twin deposits nothing"
+    );
+    let publication = taught.comparison.as_ref().unwrap().as_ref().unwrap();
+    landing_tangent_reading(
+        &initial,
+        actual.constitution(),
+        publication,
+        &held,
+        &admitted,
+        &compared,
+    );
+    println!(
+        "landing tangent timing: actual_ns={actual_ns} twin_ns={twin_ns} \
+         column_ticks={LANDING_TANGENT_COLUMN_TICKS}"
+    );
+}
+
 #[test]
 fn a_shared_execution_clock_reanchors_the_next_section_without_resetting_its_carry() {
     use crate::hnn::port::ExecutionPort;
