@@ -1,0 +1,21 @@
+--- accepted-source/ActualFiniteBeurlingMellinDomain.lean
++++ lean/HolonicsResearch/Zeta/ActualFiniteBeurlingMellinDomain.lean
+@@ -1,6 +1,6 @@
+ module
+ 
+-public import ActualFiniteBeurlingReceiver
++public import HolonicsResearch.Zeta.ActualFiniteBeurlingReceiver
+ public import Mathlib.Analysis.MellinInversion
+ public import Mathlib.MeasureTheory.Function.Floor
+ public import Mathlib.MeasureTheory.Function.L2Space
+@@ -18,8 +18,8 @@
+ The left half-line uses the actual arithmetic exterior r_N(x)=B_N/x;
+ the right half-line uses ordinary fractional parts, including integers.
+ 
+-CORRECTED / UNRUN after actual v93 rejection: this consumer needs its own
+-sole-queue compiler receipt. Both failed sources/logs remain immutable.
++The private source passed the whole-module v98 native gate. The publication
++receipt records its exact accepted hash and public import-path relocation.
+ No favorable signed bound, uniform-in-N norm decay, zeta Mellin value,
+ Plancherel norm equality, actual-current cancellation or RH is asserted.
+ This is not an Euler-series extension into the critical strip.

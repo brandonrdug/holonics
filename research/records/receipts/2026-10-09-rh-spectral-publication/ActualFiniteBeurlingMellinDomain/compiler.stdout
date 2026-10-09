@@ -1,0 +1,18 @@
+lean/HolonicsResearch/Zeta/ActualFiniteBeurlingMellinDomain.lean:105:14: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+lean/HolonicsResearch/Zeta/ActualFiniteBeurlingMellinDomain.lean:168:16: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+'Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_log_receiver_left' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_log_receiver_l1_l2' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_mellin_convergent' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_mellin_log_fourier' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]

@@ -1,0 +1,78 @@
+{
+  "rows": [
+    [
+      "rh.actual-finite-mobius-source",
+      "navigator, receiver, ratio",
+      "r_N(x)=χ_(0,1](x)+Σ_(1≤n≤N) μ(n){1/(nx)}; x≥1/N ⇒ r_N(x)=B_N/x, B_N=Σ μ(n)/n",
+      "the actual finite signed arithmetic source fixes its own physical cutoff and integer endpoints",
+      "x>0; N∈ℕ for source, N>0 for cutoff; ordinary fract(integer)=0",
+      "L:Zeta/ActualFiniteBeurlingReceiver:actual_nb_receiver; L:Zeta/ActualFiniteBeurlingReceiver:actual_nb_tail_pointwise; L:Zeta/ActualFiniteBeurlingReceiver:phaseRead_eq_linear_sub_floor",
+      "formal-checked",
+      "instance-of:ratio.div-rem"
+    ],
+    [
+      "rh.actual-finite-mobius-log-domain",
+      "receiver, ratio",
+      "g_(N,σ)(u)=exp(−σu)r_N(exp(−u)) ∈ L¹(du)∩L²(du); M(r_N)(s)=F(g_(N,Re s))(Im s/(2π))",
+      "the actual arithmetic exterior pays the full logarithmic Mellin/Fourier domain",
+      "N>0; 0<σ<1; 0<Re s<1; Lebesgue dx and du; fixed N",
+      "L:Zeta/ActualFiniteBeurlingMellinDomain:actual_log_receiver_l1_l2; L:Zeta/ActualFiniteBeurlingMellinDomain:actual_mellin_log_fourier",
+      "formal-checked",
+      "uses:rh.actual-finite-mobius-source"
+    ],
+    [
+      "rh.actual-fractional-zeta-source",
+      "navigator, receiver",
+      "ζ(s)=s/(s−1)−s∫_(1,∞){x}x^(−s−1)dx",
+      "the actual fractional source retains the pole term beyond the L-series convergence half-plane",
+      "Re s>0, s≠1; L-series step only Re s>1; Lebesgue dx",
+      "L:Zeta/ActualFractionalPartZetaSource:actual_regularized_zeta_fraction; L:Zeta/ActualFractionalPartZetaSource:actual_zeta_fraction_integral",
+      "formal-checked",
+      "uses:rh.mellin-horizon"
+    ],
+    [
+      "rh.actual-finite-mobius-mellin-value",
+      "receiver, ratio",
+      "M(r_N)(s)=(1−ζ(s)A_N(s))/s; A_N(s)=Σ_(1≤n≤N) μ(n)/n^s",
+      "the actual finite signed receiver has a convergent full positive-ray Mellin value",
+      "N∈ℕ including0; 0<Re s<1; singleton split at1 only AE; physical step/dilation pointwise",
+      "L:Zeta/ActualFiniteBeurlingMellinValue:actual_fraction_boundary_split_ae; L:Zeta/ActualFiniteBeurlingMellinValue:actual_finite_receiver_hasMellin",
+      "formal-checked",
+      "uses:rh.actual-finite-mobius-source, uses:rh.actual-fractional-zeta-source"
+    ],
+    [
+      "rh.actual-finite-mobius-fourier-value",
+      "receiver, ratio",
+      "F(g_(N,Re s))(Im s/(2π))=(1−ζ(s)A_N(s))/s; g ∈ L¹(du)∩L²(du)",
+      "the actual logarithmic receiver consumes the signed Mellin source with its Fourier normalization",
+      "N>0; 0<Re s<1; full log-line Lebesgue du; no Plancherel or uniform-in-N claim",
+      "L:Zeta/ActualFiniteBeurlingMellinValue:actual_finite_receiver_fourier_value",
+      "formal-checked",
+      "uses:rh.actual-finite-mobius-mellin-value, uses:rh.actual-finite-mobius-log-domain"
+    ],
+    [
+      "rh.actual-finite-mobius-exterior-energy",
+      "receiver, tube",
+      "∫_(0,∞)r_N² dx=∫_(0,1/N]r_N² dx+N B_N²; N B_N²≤∫_(0,∞)r_N² dx",
+      "the complete squared receiver retains its nonnegative arithmetic exterior",
+      "N>0; Lebesgue dx; interior owns cutoff; no complete-energy upper bound",
+      "L:Zeta/ActualBeurlingTailEnergy:actual_full_energy_balance; L:Zeta/ActualBeurlingTailEnergy:actual_tail_energy_le_full",
+      "formal-checked",
+      "uses:rh.actual-finite-mobius-source"
+    ],
+    [
+      "rh.actual-finite-mobius-tail-compensation",
+      "receiver, tube, ratio",
+      "∫_(a,∞)x^(s−1)r_N(x)dx=B_N a^(s−1)/(1−s); norm=|B_N|a^(Re s−1)/‖1−s‖",
+      "the same source returns the omitted complex exterior with phase and denominator explicit",
+      "N>0; a≥1/N; Re s<1; Lebesgue dx; no universal denominator margin",
+      "L:Zeta/ActualBeurlingCompensatedTail:actual_tail_mellin_integral; L:Zeta/ActualBeurlingCompensatedTail:actual_tail_mellin_norm",
+      "formal-checked",
+      "uses:rh.actual-finite-mobius-source, uses:rh.actual-finite-mobius-mellin-value"
+    ]
+  ],
+  "record": "research/records/2026-10-09_THE_ACTUAL_FINITE_MOBIUS_RECEIVER_RETAINS_ITS_MELLIN_VALUE_AND_EXTERIOR.md",
+  "index": "research/records/README.md",
+  "index_route": "Physical realization, forces, mass and source-qualified spectral laws",
+  "grade_scope": "formal-checked refers to pinned accepted private proof sources; canonical import relocation requires sole-queue validation as stated by record and SOURCE_PUBLICATION_JOIN."
+}

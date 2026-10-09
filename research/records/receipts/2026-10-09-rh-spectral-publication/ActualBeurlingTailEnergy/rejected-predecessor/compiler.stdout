@@ -1,0 +1,57 @@
+lean/HolonicsResearch/Zeta/ActualBeurlingTailEnergy.lean:36:64: error: unsolved goals
+N : ℕ
+hN : 0 < N
+x : ℝ
+hx : 1 / ↑N < x
+⊢ harmonicMobius N ^ 2 * (x ^ 2)⁻¹ = harmonicMobius N ^ 2 * x ^ (-2)
+lean/HolonicsResearch/Zeta/ActualBeurlingTailEnergy.lean:38:13: warning: This simp argument is unused:
+  Real.rpow_neg
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [Real.rpow_two, div_eq_mul_inv]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+lean/HolonicsResearch/Zeta/ActualBeurlingTailEnergy.lean:38:28: warning: This simp argument is unused:
+  Real.rpow_two
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [Real.rpow_neg, div_eq_mul_inv]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+lean/HolonicsResearch/Zeta/ActualBeurlingTailEnergy.lean:47:46: error(lean.invalidField): Invalid field `congr_fun`: The environment does not contain `And.congr_fun`, so it is not possible to project the field `congr_fun` from an expression
+  Integrable.const_mul hi (harmonicMobius N ^ 2)
+of type
+  AEStronglyMeasurable (fun x => harmonicMobius N ^ 2 * x ^ (-2)) (volume.restrict (Ioi (1 / ↑N))) ∧
+    HasFiniteIntegral (fun x => harmonicMobius N ^ 2 * x ^ (-2)) (volume.restrict (Ioi (1 / ↑N)))
+lean/HolonicsResearch/Zeta/ActualBeurlingTailEnergy.lean:59:4: error: Type mismatch
+  h
+has type
+  ∫ (t : ℝ) in Ioi (↑N)⁻¹, (t ^ 2)⁻¹ = ↑N
+but is expected to have type
+  ∫ (x : ℝ) in Ioi (1 / ↑N), x ^ (-2) = ↑N
+lean/HolonicsResearch/Zeta/ActualBeurlingTailEnergy.lean:71:37: error: could not synthesize default value for parameter 'hs' using tactics
+lean/HolonicsResearch/Zeta/ActualBeurlingTailEnergy.lean:71:37: error: Tactic `aesop` failed, failed to prove the goal. Some goals were not explored because the maximum rule application depth (30) was reached. Set option 'maxRuleApplicationDepth' to increase the limit.
+Initial goal:
+  N : ℕ
+  hN : 0 < N
+  ⊢ volume (Ioc 0 (1 / ↑N)) ≠ ⊤
+Remaining goals after safe rules:
+  N : ℕ
+  hN : 0 < N
+  ⊢ volume (Ioc 0 (1 / ↑N)) ≠ ⊤
+'Holonics.Zeta.ActualBeurlingTailEnergy.actual_tail_square_integral' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Zeta.ActualBeurlingTailEnergy.actual_full_square_integrable' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Zeta.ActualBeurlingTailEnergy.actual_full_energy_balance' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Zeta.ActualBeurlingTailEnergy.actual_tail_energy_le_full' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]

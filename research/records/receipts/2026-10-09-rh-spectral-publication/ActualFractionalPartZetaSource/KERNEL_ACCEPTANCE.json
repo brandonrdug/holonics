@@ -1,0 +1,31 @@
+{
+  "kernel_accepted": true,
+  "compiler_exit": 0,
+  "compiler_wall_ns": 4283745439,
+  "axioms": {
+    "Holonics.Zeta.ActualFractionalPartZetaSource.actual_fraction_mellin_convergent": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ActualFractionalPartZetaSource.actual_zeta_floor_integral": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ActualFractionalPartZetaSource.actual_regularized_zeta_fraction": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ActualFractionalPartZetaSource.actual_zeta_fraction_integral": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "selector_count_matches": true,
+  "standard_axioms_only": true,
+  "metadata_unchanged": true,
+  "broad_library_checked": false
+}

@@ -1,0 +1,856 @@
+{
+  "date": "2026-10-09",
+  "base_commit": "f2c03e8dfff3a0fa153e6b072863625bdbb441cf",
+  "source_status": "SIX_PRIVATE_SOURCE_MODULES_ACCEPTED; CANONICAL_IMPORT_RELOCATION_RECHECK_OWED",
+  "target_queries_accepted": 11,
+  "prerequisite_queries_accepted": 12,
+  "total_queries_accepted": 23,
+  "accepted_axiom_universe": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "items": [
+    {
+      "module": "ActualFiniteBeurlingReceiver",
+      "version": "v83",
+      "accepted_source_snapshot": "research/records/receipts/2026-10-09-rh-spectral-publication/ActualFiniteBeurlingReceiver/accepted-source.lean",
+      "accepted_source_pin": {
+        "bytes": 6380,
+        "sha256": "1401be5362c873e03d4c641ca44e9b804fc79dc4ece6f3b6d00238339ed76ffc"
+      },
+      "public_owner": "lean/HolonicsResearch/Zeta/ActualFiniteBeurlingReceiver.lean",
+      "public_source_pin": {
+        "bytes": 6464,
+        "sha256": "6f179b9e06944f66782639513c568b79018505e7870543dc5b8c72a5456eb2f1"
+      },
+      "publication_changes": {
+        "import_path_rewrites": [],
+        "historical_status_docblock_updated": true,
+        "all_remaining_bytes_equal": true,
+        "remaining_bytes_sha256": "5ac96c0d2019f5735eb465dffecedbe4ad5ec27a34fbd0c884dd54e78e6edfef"
+      },
+      "public_module_graph_kernel_rechecked": false,
+      "axiom_queries": {
+        "Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_truncated_floor_partition": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_reciprocal_phase_residual": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_nb_receiver": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_nb_tail_pointwise": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      "native_kernel_original": {
+        "label": "ActualFiniteBeurlingReceiver/accepted-join-v83",
+        "bytes": 77886,
+        "sha256": "75c6ccc50f5f1b1c0a1ae02f51ef09d8f75c8ae1e63e46d7ae4a67a5f333fc7d",
+        "projection": "compiler/kernel field only, exact selected fields"
+      },
+      "native_validation_original": {
+        "label": "ActualFiniteBeurlingReceiver/validation-v83",
+        "bytes": 77886,
+        "sha256": "75c6ccc50f5f1b1c0a1ae02f51ef09d8f75c8ae1e63e46d7ae4a67a5f333fc7d"
+      },
+      "native_stdout_original": {
+        "bytes": 971,
+        "sha256": "580afefb6f4169a1253c9e286b48da83a59c359181cc5abfa69f0d13c103a3f0"
+      },
+      "public_stdout_pin": {
+        "bytes": 901,
+        "sha256": "cbacfe8989a7649d962f3ca2794b526b575f472fc7cddf2a2bad3692749e3d1d"
+      },
+      "native_stderr_original": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "public_stderr_pin": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "log_projection": "Only leading absolute source-location paths are replaced with the canonical public owner. The diagnostic body and all axiom printouts are unchanged. Original bytes remain privately immutable.",
+      "accepted_target_object_parts": {
+        "ActualFiniteBeurlingReceiver.ilean": {
+          "bytes": 22316,
+          "sha256": "73cd238541f07bd341ea163258807353495a5bc189d16a36ff2464bc6291a11f"
+        },
+        "ActualFiniteBeurlingReceiver.ir": {
+          "bytes": 2776,
+          "sha256": "e44deadc42ec17651b30874966e285d825d30f21caebd6ecee11c54737d5eb67"
+        },
+        "ActualFiniteBeurlingReceiver.ir.sig": {
+          "bytes": 176,
+          "sha256": "ce045aa0de122e5451b8534d732085a645089e575eb99e9b71e6dacebbac9745"
+        },
+        "ActualFiniteBeurlingReceiver.olean": {
+          "bytes": 30440,
+          "sha256": "20f7bea44c758d5a894076f6ba2bd8d27d2775ad770225c4752814be1f6599aa"
+        },
+        "ActualFiniteBeurlingReceiver.olean.private": {
+          "bytes": 192280,
+          "sha256": "29bc4415704c09979ec493f3b821dbe50c7254afe4a0d3d8d671f889ec9dd8b6"
+        },
+        "ActualFiniteBeurlingReceiver.olean.server": {
+          "bytes": 5240,
+          "sha256": "b8f6e9f95200da77e0f59b94341f629042099d656c59d74d27fa1f02873777e0"
+        }
+      },
+      "provider_seals": [],
+      "ordered_import_graph_original": null,
+      "excluded_private_evidence": "Full import graph, compiled objects, raw private namespace/resource receipts, source requests and mailbox contents. Native originals remain immutable outside Git; no private message is published."
+    },
+    {
+      "module": "ActualFiniteBeurlingMellinDomain",
+      "version": "v98",
+      "accepted_source_snapshot": "research/records/receipts/2026-10-09-rh-spectral-publication/ActualFiniteBeurlingMellinDomain/accepted-source.lean",
+      "accepted_source_pin": {
+        "bytes": 12348,
+        "sha256": "95290e86b295dfb73aa0e6d337a5db5bf45156eeefce2b14cc9d7867f728f313"
+      },
+      "public_owner": "lean/HolonicsResearch/Zeta/ActualFiniteBeurlingMellinDomain.lean",
+      "public_source_pin": {
+        "bytes": 12375,
+        "sha256": "e21d1d84da8964ab3d5bbe0905135a3522b0860d8d91d777d0d9ae6a1cf5a7b0"
+      },
+      "publication_changes": {
+        "import_path_rewrites": [
+          {
+            "from": "public import ActualFiniteBeurlingReceiver",
+            "to": "public import HolonicsResearch.Zeta.ActualFiniteBeurlingReceiver"
+          }
+        ],
+        "historical_status_docblock_updated": true,
+        "all_remaining_bytes_equal": true,
+        "remaining_bytes_sha256": "e72569405e6c03eb761f14ffbef3bfc3ef2c44ed39c45ce15b0e7eb215d029af"
+      },
+      "public_module_graph_kernel_rechecked": false,
+      "axiom_queries": {
+        "Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_log_receiver_left": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_log_receiver_l1_l2": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_mellin_convergent": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_mellin_log_fourier": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      "native_kernel_original": {
+        "label": "ActualFiniteBeurlingMellinDomain/accepted-join-v98",
+        "bytes": 62845,
+        "sha256": "84facecd0329641b71850adbdcb8201ea30b676a265f0b9a9a47d33ffdf79823",
+        "projection": "compiler/kernel field only, exact selected fields"
+      },
+      "native_validation_original": {
+        "label": "ActualFiniteBeurlingMellinDomain/validation-v98",
+        "bytes": 62845,
+        "sha256": "84facecd0329641b71850adbdcb8201ea30b676a265f0b9a9a47d33ffdf79823"
+      },
+      "native_stdout_original": {
+        "bytes": 1110,
+        "sha256": "69f104dbf5a35958d1176a02f78ccfa2b2225bea7a20771c837c31707732c77d"
+      },
+      "public_stdout_pin": {
+        "bytes": 974,
+        "sha256": "a14c498ff8a76ad3709621bcac8fc02310aa8be2ea20320185bb095b5a63b845"
+      },
+      "native_stderr_original": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "public_stderr_pin": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "log_projection": "Only leading absolute source-location paths are replaced with the canonical public owner. The diagnostic body and all axiom printouts are unchanged. Original bytes remain privately immutable.",
+      "accepted_target_object_parts": {
+        "ActualFiniteBeurlingMellinDomain.ilean": {
+          "bytes": 50538,
+          "sha256": "fc7020f23d54cb969ef5a14a5fcb8978a1bb846b0d273b17cf463a98c22d9902"
+        },
+        "ActualFiniteBeurlingMellinDomain.ir": {
+          "bytes": 1944,
+          "sha256": "d66f7d37c37c3d2cffd11b7f05dafa0075d4428f88055b1a7a83371be7284035"
+        },
+        "ActualFiniteBeurlingMellinDomain.ir.sig": {
+          "bytes": 176,
+          "sha256": "aacf4dfbda442dff1b374c610c3da9818d1b46f24445d0ec4b34039d34e66402"
+        },
+        "ActualFiniteBeurlingMellinDomain.olean": {
+          "bytes": 38144,
+          "sha256": "f7d47c664918fe82fc316352bcaff9e02fb37355b9d62581cf44ec703c53b126"
+        },
+        "ActualFiniteBeurlingMellinDomain.olean.private": {
+          "bytes": 264656,
+          "sha256": "c017f7c3f5d14ee7704cf1d57a8fd0c23662d259f355e4185e2d8dcc68fef207"
+        },
+        "ActualFiniteBeurlingMellinDomain.olean.server": {
+          "bytes": 6464,
+          "sha256": "fa8a823506e33bb93e25c51a6c11fb8667718a343b442c0bc54a07b673ef97a2"
+        }
+      },
+      "provider_seals": [],
+      "ordered_import_graph_original": null,
+      "excluded_private_evidence": "Full import graph, compiled objects, raw private namespace/resource receipts, source requests and mailbox contents. Native originals remain immutable outside Git; no private message is published."
+    },
+    {
+      "module": "ActualFractionalPartZetaSource",
+      "version": "v102",
+      "accepted_source_snapshot": "research/records/receipts/2026-10-09-rh-spectral-publication/ActualFractionalPartZetaSource/accepted-source.lean",
+      "accepted_source_pin": {
+        "bytes": 11433,
+        "sha256": "acb70614e4b9fbf206bb050b03aad4abac7e84fcdab1e16c84933bdc35b763af"
+      },
+      "public_owner": "lean/HolonicsResearch/Zeta/ActualFractionalPartZetaSource.lean",
+      "public_source_pin": {
+        "bytes": 11440,
+        "sha256": "a9337cddb217762170556ab46d87a4443580053b383dfafa84d6b8fd2544d5b7"
+      },
+      "publication_changes": {
+        "import_path_rewrites": [],
+        "historical_status_docblock_updated": true,
+        "all_remaining_bytes_equal": true,
+        "remaining_bytes_sha256": "2101a5e2148179b6fedb25c86d7b20627e5d78145568f2a03fe56a22f10927a1"
+      },
+      "public_module_graph_kernel_rechecked": false,
+      "axiom_queries": {
+        "Holonics.Zeta.ActualFractionalPartZetaSource.actual_fraction_mellin_convergent": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Zeta.ActualFractionalPartZetaSource.actual_zeta_floor_integral": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Zeta.ActualFractionalPartZetaSource.actual_regularized_zeta_fraction": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Zeta.ActualFractionalPartZetaSource.actual_zeta_fraction_integral": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      "native_kernel_original": {
+        "label": "ActualFractionalPartZetaSource/accepted-join-v102",
+        "bytes": 63791,
+        "sha256": "4c95f0664ffb12f38dfe61427d9da2720d5f765294c0e5643e95926108b62620",
+        "projection": "compiler/kernel field only, exact selected fields"
+      },
+      "native_validation_original": {
+        "label": "ActualFractionalPartZetaSource/validation-v102",
+        "bytes": 63791,
+        "sha256": "4c95f0664ffb12f38dfe61427d9da2720d5f765294c0e5643e95926108b62620"
+      },
+      "native_stdout_original": {
+        "bytes": 556,
+        "sha256": "f8fa37e065a8336d02fb6e824ac890ef36fb233629162460b64a8db3698798ad"
+      },
+      "public_stdout_pin": {
+        "bytes": 556,
+        "sha256": "f8fa37e065a8336d02fb6e824ac890ef36fb233629162460b64a8db3698798ad"
+      },
+      "native_stderr_original": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "public_stderr_pin": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "log_projection": "Only leading absolute source-location paths are replaced with the canonical public owner. The diagnostic body and all axiom printouts are unchanged. Original bytes remain privately immutable.",
+      "accepted_target_object_parts": {
+        "ActualFractionalPartZetaSource.ilean": {
+          "bytes": 50225,
+          "sha256": "1da3ac5baa04e9d89fe9a57f13f5181052f309a88375083965184baf80fd45e3"
+        },
+        "ActualFractionalPartZetaSource.ir": {
+          "bytes": 2936,
+          "sha256": "59b187a2596eb7fea82a700507dcd74a73d96a46ad6b0aa7caabf7b500256216"
+        },
+        "ActualFractionalPartZetaSource.ir.sig": {
+          "bytes": 176,
+          "sha256": "83f541aafe0cff2910e7dbb64c55350d406086d0d6663df0d62d1a3977ba2ab8"
+        },
+        "ActualFractionalPartZetaSource.olean": {
+          "bytes": 37856,
+          "sha256": "be3a324fecb3d35a35f64f24bf607488560304f0916b37dbc0f585fd0024571e"
+        },
+        "ActualFractionalPartZetaSource.olean.private": {
+          "bytes": 267944,
+          "sha256": "7954823c854e84469753e4f42c8aee09e48ff0569f8b8b4513b1f31b3deba32a"
+        },
+        "ActualFractionalPartZetaSource.olean.server": {
+          "bytes": 6328,
+          "sha256": "3ad60f11c9890d21aa96fee2746e663543ffaa3f4811d4c94a278ac6685d9d72"
+        }
+      },
+      "provider_seals": [],
+      "ordered_import_graph_original": null,
+      "excluded_private_evidence": "Full import graph, compiled objects, raw private namespace/resource receipts, source requests and mailbox contents. Native originals remain immutable outside Git; no private message is published."
+    },
+    {
+      "module": "ActualFiniteBeurlingMellinValue",
+      "version": "v149",
+      "accepted_source_snapshot": "research/records/receipts/2026-10-09-rh-spectral-publication/ActualFiniteBeurlingMellinValue/accepted-source.lean",
+      "accepted_source_pin": {
+        "bytes": 11531,
+        "sha256": "3fecead3d50a617b4a6f66b224dc172e710833e50ea3072744d5a9d10ae3ba78"
+      },
+      "public_owner": "lean/HolonicsResearch/Zeta/ActualFiniteBeurlingMellinValue.lean",
+      "public_source_pin": {
+        "bytes": 11595,
+        "sha256": "e70e696f332339ce5d5de7194c398fc241d10b5c129987233ab779e8f853a00a"
+      },
+      "publication_changes": {
+        "import_path_rewrites": [
+          {
+            "from": "public import ActualFiniteBeurlingMellinDomain",
+            "to": "public import HolonicsResearch.Zeta.ActualFiniteBeurlingMellinDomain"
+          },
+          {
+            "from": "public import ActualFractionalPartZetaSource",
+            "to": "public import HolonicsResearch.Zeta.ActualFractionalPartZetaSource"
+          }
+        ],
+        "historical_status_docblock_updated": true,
+        "all_remaining_bytes_equal": true,
+        "remaining_bytes_sha256": "4abef1f9727e56e3601cffb702c68411d954d890783a8c8a9b477cff9bde0b1d"
+      },
+      "public_module_graph_kernel_rechecked": false,
+      "axiom_queries": {
+        "Holonics.Zeta.ActualFiniteBeurlingMellinValue.actual_fraction_boundary_split_ae": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Zeta.ActualFiniteBeurlingMellinValue.actual_reciprocal_fraction_hasMellin": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Zeta.ActualFiniteBeurlingMellinValue.actual_finite_receiver_hasMellin": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Zeta.ActualFiniteBeurlingMellinValue.actual_finite_receiver_fourier_value": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      "native_kernel_original": {
+        "label": "ActualFiniteBeurlingMellinValue/native-v149/KERNEL_VALIDATION.json",
+        "bytes": 871,
+        "sha256": "7b43ec1d33f578ba243da3844ffce9222c58072dcad7cbe9a74b019c59424fce"
+      },
+      "native_validation_original": {
+        "label": "ActualFiniteBeurlingMellinValue/validation-v149",
+        "bytes": 5831,
+        "sha256": "96a9bde222d0b71096f5f550387adcdad67c0f15e6c416b735c1d5b5b0db51af"
+      },
+      "native_stdout_original": {
+        "bytes": 953,
+        "sha256": "d9c69186f52c58ea869a884fcff3fd0e427fd4520319c982f375c4c859184a0f"
+      },
+      "public_stdout_pin": {
+        "bytes": 874,
+        "sha256": "d307c61755ebc2b7acf0585dcbcd76f2343f9463fe145a51e09730ce580bc191"
+      },
+      "native_stderr_original": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "public_stderr_pin": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "log_projection": "Only leading absolute source-location paths are replaced with the canonical public owner. The diagnostic body and all axiom printouts are unchanged. Original bytes remain privately immutable.",
+      "accepted_target_object_parts": {
+        "ActualFiniteBeurlingMellinValue.ilean": {
+          "bytes": 49912,
+          "sha256": "78fac2ea8889dba8252577ccc76579017ca41980fab83e868bc2c6e4d8947b73"
+        },
+        "ActualFiniteBeurlingMellinValue.ir": {
+          "bytes": 2128,
+          "sha256": "706831d0a2a87df4b467e0c8639f60cc94ac6c2f6e6473857faf463146aed9a2"
+        },
+        "ActualFiniteBeurlingMellinValue.ir.sig": {
+          "bytes": 176,
+          "sha256": "7761d1c712a136367990184f3a8a380c07433a188c26f03ed12ad40f80c15ee8"
+        },
+        "ActualFiniteBeurlingMellinValue.olean": {
+          "bytes": 44024,
+          "sha256": "69ab88665044af00d9d9d848e6f8593f03f2a302c220447f96a2914de1459d82"
+        },
+        "ActualFiniteBeurlingMellinValue.olean.private": {
+          "bytes": 231840,
+          "sha256": "bad59721573c1eab992e9564de683df4f9801af090f56504ed0bb9333592bd2d"
+        },
+        "ActualFiniteBeurlingMellinValue.olean.server": {
+          "bytes": 6032,
+          "sha256": "39a81a6de0a828778dd5ee7dbb9c667029e3b0e4b9827f31cdd1ba4dc7bf4927"
+        }
+      },
+      "provider_seals": [
+        {
+          "module": "ActualFiniteBeurlingMellinDomain",
+          "source_pin": {
+            "sha256": "95290e86b295dfb73aa0e6d337a5db5bf45156eeefce2b14cc9d7867f728f313",
+            "bytes": 12348
+          },
+          "consumed_object_parts": {
+            "ir": {
+              "sha256": "d66f7d37c37c3d2cffd11b7f05dafa0075d4428f88055b1a7a83371be7284035",
+              "bytes": 1944
+            },
+            "ir.sig": {
+              "sha256": "aacf4dfbda442dff1b374c610c3da9818d1b46f24445d0ec4b34039d34e66402",
+              "bytes": 176
+            },
+            "main": {
+              "sha256": "f7d47c664918fe82fc316352bcaff9e02fb37355b9d62581cf44ec703c53b126",
+              "bytes": 38144
+            },
+            "private": {
+              "sha256": "c017f7c3f5d14ee7704cf1d57a8fd0c23662d259f355e4185e2d8dcc68fef207",
+              "bytes": 264656
+            },
+            "server": {
+              "sha256": "fa8a823506e33bb93e25c51a6c11fb8667718a343b442c0bc54a07b673ef97a2",
+              "bytes": 6464
+            }
+          }
+        },
+        {
+          "module": "ActualFractionalPartZetaSource",
+          "source_pin": {
+            "sha256": "acb70614e4b9fbf206bb050b03aad4abac7e84fcdab1e16c84933bdc35b763af",
+            "bytes": 11433
+          },
+          "consumed_object_parts": {
+            "ir": {
+              "sha256": "59b187a2596eb7fea82a700507dcd74a73d96a46ad6b0aa7caabf7b500256216",
+              "bytes": 2936
+            },
+            "ir.sig": {
+              "sha256": "83f541aafe0cff2910e7dbb64c55350d406086d0d6663df0d62d1a3977ba2ab8",
+              "bytes": 176
+            },
+            "main": {
+              "sha256": "be3a324fecb3d35a35f64f24bf607488560304f0916b37dbc0f585fd0024571e",
+              "bytes": 37856
+            },
+            "private": {
+              "sha256": "7954823c854e84469753e4f42c8aee09e48ff0569f8b8b4513b1f31b3deba32a",
+              "bytes": 267944
+            },
+            "server": {
+              "sha256": "3ad60f11c9890d21aa96fee2746e663543ffaa3f4811d4c94a278ac6685d9d72",
+              "bytes": 6328
+            }
+          }
+        },
+        {
+          "module": "ActualFiniteBeurlingReceiver",
+          "source_pin": {
+            "sha256": "1401be5362c873e03d4c641ca44e9b804fc79dc4ece6f3b6d00238339ed76ffc",
+            "bytes": 6380
+          },
+          "consumed_object_parts": {
+            "ir": {
+              "sha256": "e44deadc42ec17651b30874966e285d825d30f21caebd6ecee11c54737d5eb67",
+              "bytes": 2776
+            },
+            "ir.sig": {
+              "sha256": "ce045aa0de122e5451b8534d732085a645089e575eb99e9b71e6dacebbac9745",
+              "bytes": 176
+            },
+            "main": {
+              "sha256": "20f7bea44c758d5a894076f6ba2bd8d27d2775ad770225c4752814be1f6599aa",
+              "bytes": 30440
+            },
+            "private": {
+              "sha256": "29bc4415704c09979ec493f3b821dbe50c7254afe4a0d3d8d671f889ec9dd8b6",
+              "bytes": 192280
+            },
+            "server": {
+              "sha256": "b8f6e9f95200da77e0f59b94341f629042099d656c59d74d27fa1f02873777e0",
+              "bytes": 5240
+            }
+          }
+        }
+      ],
+      "ordered_import_graph_original": {
+        "bytes": 48078093,
+        "sha256": "f6d3dcb381af8579c7ac7e520066de8e2f50bc6f6ea353b53b49b367e1dfbfe8"
+      },
+      "excluded_private_evidence": "Full import graph, compiled objects, raw private namespace/resource receipts, source requests and mailbox contents. Native originals remain immutable outside Git; no private message is published."
+    },
+    {
+      "module": "ActualBeurlingTailEnergy",
+      "version": "v149",
+      "accepted_source_snapshot": "research/records/receipts/2026-10-09-rh-spectral-publication/ActualBeurlingTailEnergy/accepted-source.lean",
+      "accepted_source_pin": {
+        "bytes": 5723,
+        "sha256": "d9cde2614662a63eb02010a0199d2276cbee04bfb34604e8d332aec491713ad1"
+      },
+      "public_owner": "lean/HolonicsResearch/Zeta/ActualBeurlingTailEnergy.lean",
+      "public_source_pin": {
+        "bytes": 5771,
+        "sha256": "ad0cfd974cbcde1451c8379da1d24dbf9fad6a732bcf08d9d877e905dbc85b17"
+      },
+      "publication_changes": {
+        "import_path_rewrites": [
+          {
+            "from": "public import ActualFiniteBeurlingMellinDomain",
+            "to": "public import HolonicsResearch.Zeta.ActualFiniteBeurlingMellinDomain"
+          }
+        ],
+        "historical_status_docblock_updated": true,
+        "all_remaining_bytes_equal": true,
+        "remaining_bytes_sha256": "24cc5800804a5362323c8ffe0d97144df952e41d46e1f97e591c0cf3874c1ecc"
+      },
+      "public_module_graph_kernel_rechecked": false,
+      "axiom_queries": {
+        "Holonics.Zeta.ActualBeurlingTailEnergy.actual_tail_square_integral": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Zeta.ActualBeurlingTailEnergy.actual_full_square_integrable": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Zeta.ActualBeurlingTailEnergy.actual_full_energy_balance": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Zeta.ActualBeurlingTailEnergy.actual_tail_energy_le_full": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      "native_kernel_original": {
+        "label": "ActualBeurlingTailEnergy/native-v149/KERNEL_VALIDATION.json",
+        "bytes": 814,
+        "sha256": "1ba9c19fe163a113ee39514ced6c220a6af10577e5afcce2298688c5939b581b"
+      },
+      "native_validation_original": {
+        "label": "ActualBeurlingTailEnergy/validation-v149",
+        "bytes": 5278,
+        "sha256": "f5ab649d40401cdc06931663786fd17854bb6b0ba6e3fb59cb8c1947982d53ac"
+      },
+      "native_stdout_original": {
+        "bytes": 963,
+        "sha256": "50deeadb09308b0a42983f4e5a5b02141b8c990141fc610062a54420e6c29b64"
+      },
+      "public_stdout_pin": {
+        "bytes": 884,
+        "sha256": "66d2fd3985df4d1cc213d33a2792c609f2fbffd70d5440c85104da3f1a37bf07"
+      },
+      "native_stderr_original": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "public_stderr_pin": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "log_projection": "Only leading absolute source-location paths are replaced with the canonical public owner. The diagnostic body and all axiom printouts are unchanged. Original bytes remain privately immutable.",
+      "accepted_target_object_parts": {
+        "ActualBeurlingTailEnergy.ilean": {
+          "bytes": 22908,
+          "sha256": "a8fa1412ada8cbf4f93e23099cb48f53f37dae849e6b5e6207294a0be93bd171"
+        },
+        "ActualBeurlingTailEnergy.ir": {
+          "bytes": 1680,
+          "sha256": "394965c543eeaa2b2ca37795a65ab8d735f48e0d709dbc5536840f77f702b4e5"
+        },
+        "ActualBeurlingTailEnergy.ir.sig": {
+          "bytes": 176,
+          "sha256": "c0532c968a8e375cf7bed1a4686c00fce4be8aa31c04b8d6b16e056e5f9d0a0e"
+        },
+        "ActualBeurlingTailEnergy.olean": {
+          "bytes": 26240,
+          "sha256": "4704e1596956df995b13384ac9a78ffc1eae3e4d65737fefa96ce4e011254f97"
+        },
+        "ActualBeurlingTailEnergy.olean.private": {
+          "bytes": 194152,
+          "sha256": "b70c10ce766133da241f84036945ce29d58d69985b3f1c91d5f01282d45ae6b0"
+        },
+        "ActualBeurlingTailEnergy.olean.server": {
+          "bytes": 4392,
+          "sha256": "9d4b88e7920d1e43100ab1def8b84bdbe3b95298a42d679cfd764ae14fd25cb2"
+        }
+      },
+      "provider_seals": [
+        {
+          "module": "ActualFiniteBeurlingMellinDomain",
+          "source_pin": {
+            "sha256": "95290e86b295dfb73aa0e6d337a5db5bf45156eeefce2b14cc9d7867f728f313",
+            "bytes": 12348
+          },
+          "consumed_object_parts": {
+            "ir": {
+              "sha256": "d66f7d37c37c3d2cffd11b7f05dafa0075d4428f88055b1a7a83371be7284035",
+              "bytes": 1944
+            },
+            "ir.sig": {
+              "sha256": "aacf4dfbda442dff1b374c610c3da9818d1b46f24445d0ec4b34039d34e66402",
+              "bytes": 176
+            },
+            "main": {
+              "sha256": "f7d47c664918fe82fc316352bcaff9e02fb37355b9d62581cf44ec703c53b126",
+              "bytes": 38144
+            },
+            "private": {
+              "sha256": "c017f7c3f5d14ee7704cf1d57a8fd0c23662d259f355e4185e2d8dcc68fef207",
+              "bytes": 264656
+            },
+            "server": {
+              "sha256": "fa8a823506e33bb93e25c51a6c11fb8667718a343b442c0bc54a07b673ef97a2",
+              "bytes": 6464
+            }
+          }
+        },
+        {
+          "module": "ActualFiniteBeurlingReceiver",
+          "source_pin": {
+            "sha256": "1401be5362c873e03d4c641ca44e9b804fc79dc4ece6f3b6d00238339ed76ffc",
+            "bytes": 6380
+          },
+          "consumed_object_parts": {
+            "ir": {
+              "sha256": "e44deadc42ec17651b30874966e285d825d30f21caebd6ecee11c54737d5eb67",
+              "bytes": 2776
+            },
+            "ir.sig": {
+              "sha256": "ce045aa0de122e5451b8534d732085a645089e575eb99e9b71e6dacebbac9745",
+              "bytes": 176
+            },
+            "main": {
+              "sha256": "20f7bea44c758d5a894076f6ba2bd8d27d2775ad770225c4752814be1f6599aa",
+              "bytes": 30440
+            },
+            "private": {
+              "sha256": "29bc4415704c09979ec493f3b821dbe50c7254afe4a0d3d8d671f889ec9dd8b6",
+              "bytes": 192280
+            },
+            "server": {
+              "sha256": "b8f6e9f95200da77e0f59b94341f629042099d656c59d74d27fa1f02873777e0",
+              "bytes": 5240
+            }
+          }
+        }
+      ],
+      "ordered_import_graph_original": {
+        "bytes": 46511043,
+        "sha256": "e68f83632216a52755332eadfe3bc8ba3be9b261cd781238574d2ab8608722bc"
+      },
+      "excluded_private_evidence": "Full import graph, compiled objects, raw private namespace/resource receipts, source requests and mailbox contents. Native originals remain immutable outside Git; no private message is published."
+    },
+    {
+      "module": "ActualBeurlingCompensatedTail",
+      "version": "v149",
+      "accepted_source_snapshot": "research/records/receipts/2026-10-09-rh-spectral-publication/ActualBeurlingCompensatedTail/accepted-source.lean",
+      "accepted_source_pin": {
+        "bytes": 4190,
+        "sha256": "c49d41c96de94465a3129559c7c80cbd357c194709b102f23b23d4863bef0bbe"
+      },
+      "public_owner": "lean/HolonicsResearch/Zeta/ActualBeurlingCompensatedTail.lean",
+      "public_source_pin": {
+        "bytes": 4312,
+        "sha256": "47efaa76eb9efb6796c2c888b9ba2199fb54f42aeb8891b35106ba525185f25c"
+      },
+      "publication_changes": {
+        "import_path_rewrites": [
+          {
+            "from": "public import ActualFiniteBeurlingMellinDomain",
+            "to": "public import HolonicsResearch.Zeta.ActualFiniteBeurlingMellinDomain"
+          }
+        ],
+        "historical_status_docblock_updated": true,
+        "all_remaining_bytes_equal": true,
+        "remaining_bytes_sha256": "244d592721086c6b3e9b019d00a665ecd62455774b54b4343a74770f7e8b2152"
+      },
+      "public_module_graph_kernel_rechecked": false,
+      "axiom_queries": {
+        "Holonics.Zeta.ActualBeurlingCompensatedTail.actual_tail_mellin_integrable": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Zeta.ActualBeurlingCompensatedTail.actual_tail_mellin_integral": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ],
+        "Holonics.Zeta.ActualBeurlingCompensatedTail.actual_tail_mellin_norm": [
+          "propext",
+          "Classical.choice",
+          "Quot.sound"
+        ]
+      },
+      "native_kernel_original": {
+        "label": "ActualBeurlingCompensatedTail/native-v149/KERNEL_VALIDATION.json",
+        "bytes": 682,
+        "sha256": "e48ef8108d4b5a73aa1bc2dd62ed286a82c1a7ac870438bcf0d288947fb132d5"
+      },
+      "native_validation_original": {
+        "label": "ActualBeurlingCompensatedTail/validation-v149",
+        "bytes": 5048,
+        "sha256": "fa491fae7f52b150d45aed80870cbac05e4fcc8bff2bf20205712cdfcf5b0c51"
+      },
+      "native_stdout_original": {
+        "bytes": 403,
+        "sha256": "3b3461014933744867395be77d7d36b080857bfdc8abb840cd7a7e67bff0816f"
+      },
+      "public_stdout_pin": {
+        "bytes": 403,
+        "sha256": "3b3461014933744867395be77d7d36b080857bfdc8abb840cd7a7e67bff0816f"
+      },
+      "native_stderr_original": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "public_stderr_pin": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "log_projection": "Only leading absolute source-location paths are replaced with the canonical public owner. The diagnostic body and all axiom printouts are unchanged. Original bytes remain privately immutable.",
+      "accepted_target_object_parts": {
+        "ActualBeurlingCompensatedTail.ilean": {
+          "bytes": 15793,
+          "sha256": "32c474ca39752cf75b739993fb5f39703355e43146421ce90e22143da3efbede"
+        },
+        "ActualBeurlingCompensatedTail.ir": {
+          "bytes": 1680,
+          "sha256": "35f226296a26283005df653c96326646e5db7d1e70170bf09476902c08456633"
+        },
+        "ActualBeurlingCompensatedTail.ir.sig": {
+          "bytes": 176,
+          "sha256": "9d1270bbc3f6ff87a409689eb381a1ead9af07c37abca643b43b8f2695010a41"
+        },
+        "ActualBeurlingCompensatedTail.olean": {
+          "bytes": 26624,
+          "sha256": "1c2b14cd3a5c202875d48001fec687e889ca995c7b68633db755f1d76e8b67cd"
+        },
+        "ActualBeurlingCompensatedTail.olean.private": {
+          "bytes": 131920,
+          "sha256": "a0b14a1bc985b4cf0645f6d5cfe5a6e6f53c9803e11fffc9d1194786f9ba9495"
+        },
+        "ActualBeurlingCompensatedTail.olean.server": {
+          "bytes": 3000,
+          "sha256": "87724ef6acbd9f34148edad3b3d09c1cf795547a91d663c1994516df37c89a43"
+        }
+      },
+      "provider_seals": [
+        {
+          "module": "ActualFiniteBeurlingMellinDomain",
+          "source_pin": {
+            "sha256": "95290e86b295dfb73aa0e6d337a5db5bf45156eeefce2b14cc9d7867f728f313",
+            "bytes": 12348
+          },
+          "consumed_object_parts": {
+            "ir": {
+              "sha256": "d66f7d37c37c3d2cffd11b7f05dafa0075d4428f88055b1a7a83371be7284035",
+              "bytes": 1944
+            },
+            "ir.sig": {
+              "sha256": "aacf4dfbda442dff1b374c610c3da9818d1b46f24445d0ec4b34039d34e66402",
+              "bytes": 176
+            },
+            "main": {
+              "sha256": "f7d47c664918fe82fc316352bcaff9e02fb37355b9d62581cf44ec703c53b126",
+              "bytes": 38144
+            },
+            "private": {
+              "sha256": "c017f7c3f5d14ee7704cf1d57a8fd0c23662d259f355e4185e2d8dcc68fef207",
+              "bytes": 264656
+            },
+            "server": {
+              "sha256": "fa8a823506e33bb93e25c51a6c11fb8667718a343b442c0bc54a07b673ef97a2",
+              "bytes": 6464
+            }
+          }
+        },
+        {
+          "module": "ActualFiniteBeurlingReceiver",
+          "source_pin": {
+            "sha256": "1401be5362c873e03d4c641ca44e9b804fc79dc4ece6f3b6d00238339ed76ffc",
+            "bytes": 6380
+          },
+          "consumed_object_parts": {
+            "ir": {
+              "sha256": "e44deadc42ec17651b30874966e285d825d30f21caebd6ecee11c54737d5eb67",
+              "bytes": 2776
+            },
+            "ir.sig": {
+              "sha256": "ce045aa0de122e5451b8534d732085a645089e575eb99e9b71e6dacebbac9745",
+              "bytes": 176
+            },
+            "main": {
+              "sha256": "20f7bea44c758d5a894076f6ba2bd8d27d2775ad770225c4752814be1f6599aa",
+              "bytes": 30440
+            },
+            "private": {
+              "sha256": "29bc4415704c09979ec493f3b821dbe50c7254afe4a0d3d8d671f889ec9dd8b6",
+              "bytes": 192280
+            },
+            "server": {
+              "sha256": "b8f6e9f95200da77e0f59b94341f629042099d656c59d74d27fa1f02873777e0",
+              "bytes": 5240
+            }
+          }
+        }
+      ],
+      "ordered_import_graph_original": {
+        "bytes": 46622286,
+        "sha256": "a7458f8ffb2853ca063886cb5a839c2f0258751c895097babde953c881e86350"
+      },
+      "excluded_private_evidence": "Full import graph, compiled objects, raw private namespace/resource receipts, source requests and mailbox contents. Native originals remain immutable outside Git; no private message is published."
+    }
+  ],
+  "publication_owns_no_native_job": true,
+  "main_shared_files_edited": false,
+  "push_or_merge_performed": false,
+  "compiled_cache_published": false,
+  "private_mailbox_content_published": false,
+  "open_scope": [
+    "Public renamed module import graph requires sole-queue focused validation.",
+    "No whole-library build is claimed.",
+    "No signed norm upper estimate, uniform-in-N decay, Mertens bound, RH, current-cancellation or Lambda upper bound is proved."
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "kernel_accepted": true,
+  "compiler_exit": 0,
+  "compiler_wall_ns": 3962708670,
+  "axioms": {
+    "Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_log_receiver_left": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_log_receiver_l1_l2": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_mellin_convergent": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_mellin_log_fourier": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "selector_count_matches": true,
+  "standard_axioms_only": true,
+  "metadata_unchanged": true,
+  "broad_library_checked": false
+}

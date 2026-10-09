@@ -1,0 +1,25 @@
+--- accepted-source/ActualFiniteBeurlingMellinValue.lean
++++ lean/HolonicsResearch/Zeta/ActualFiniteBeurlingMellinValue.lean
+@@ -1,7 +1,7 @@
+ module
+ 
+-public import ActualFiniteBeurlingMellinDomain
+-public import ActualFractionalPartZetaSource
++public import HolonicsResearch.Zeta.ActualFiniteBeurlingMellinDomain
++public import HolonicsResearch.Zeta.ActualFractionalPartZetaSource
+ public import Mathlib.Data.Complex.BigOperators
+ public import Mathlib.MeasureTheory.Measure.Typeclasses.NullSingletonClass
+ 
+@@ -11,9 +11,9 @@
+ /-!
+ Actual finite signed ordinary-Mobius Mellin value on the full positive ray.
+ 
+-PREPARED / UNRUN. The two imported private source units are whole-module
+-accepted at v98 and v102. Their exact source and full object receipts are
+-required; this consumer still needs its own native gate. V83 stays intact.
++The private source passed the whole-module v149 native gate with four standard-axiom
++queries. Its accepted prerequisite sources are v83, v98 and v102. See the publication
++receipt for exact source hashes and the public import-path relocation.
+ 
+ The reciprocal fractional-part integral is split at y=1. Ordinary
+ fract(1)=0 is retained pointwise. The cached Ioc(0,1) power formula has

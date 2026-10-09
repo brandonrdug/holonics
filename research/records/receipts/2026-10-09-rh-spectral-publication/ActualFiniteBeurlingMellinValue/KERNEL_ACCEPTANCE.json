@@ -1,0 +1,31 @@
+{
+  "kernel_accepted": true,
+  "compiler_exit": 0,
+  "compiler_wall_ns": 8785735932,
+  "axioms": {
+    "Holonics.Zeta.ActualFiniteBeurlingMellinValue.actual_fraction_boundary_split_ae": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ActualFiniteBeurlingMellinValue.actual_reciprocal_fraction_hasMellin": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ActualFiniteBeurlingMellinValue.actual_finite_receiver_hasMellin": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ActualFiniteBeurlingMellinValue.actual_finite_receiver_fourier_value": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "selector_count_matches": true,
+  "standard_axioms_only": true,
+  "metadata_unchanged": true,
+  "broad_library_checked": false
+}

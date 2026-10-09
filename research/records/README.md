@@ -449,6 +449,8 @@ hypotheses when its material or receiver changes.
 
 ## Physical realization, forces, mass and source-qualified spectral laws
 
+- [The actual finite Möbius receiver retains its Mellin value and exterior](2026-10-09_THE_ACTUAL_FINITE_MOBIUS_RECEIVER_RETAINS_ITS_MELLIN_VALUE_AND_EXTERIOR.md) (#62, #63, #147): accepted finite signed source and full-ray Mellin/Fourier value, exact arithmetic exterior energy and complex tail compensation; 11 new and 12 prerequisite standard-axiom queries. Canonical import relocation is staged for sole-queue rechecking; no uniform signed estimate, RH or Lambda bound is claimed.
+
 Read [mass/energy and causal transport](../../docs/MASS_ENERGY_AND_CAUSAL_TRANSPORT.md),
 [the formal framework](../../docs/FORMAL_FRAMEWORK.md) and the RH record below.
 The divisor-source transport of the paper `divisor-source-transport-boundary` is checked in

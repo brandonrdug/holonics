@@ -1,0 +1,66 @@
+{
+  "target": "ActualBeurlingTailEnergy",
+  "kernel_accepted": true,
+  "compiler_exit": 0,
+  "compiler_wall_ns": 7956354403,
+  "queries": {
+    "Holonics.Zeta.ActualBeurlingTailEnergy.actual_tail_square_integral": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ActualBeurlingTailEnergy.actual_full_square_integrable": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ActualBeurlingTailEnergy.actual_full_energy_balance": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ActualBeurlingTailEnergy.actual_tail_energy_le_full": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "standard_axioms_only": true,
+  "metadata_unchanged": true,
+  "import_module_count": 4551,
+  "results": [
+    {
+      "unit": "prep",
+      "accepted": true,
+      "quiescent_released": true,
+      "wall_ns": 6295974350,
+      "projection_ns": 12779337307,
+      "measured_to_projected": {
+        "numerator": 6295974350,
+        "denominator": 12779337307
+      },
+      "aggregate_CPU_ns": 5490618000,
+      "group_peak_B": 596021248,
+      "child_peak_RSS_KiB": 263960
+    },
+    {
+      "unit": "compile",
+      "accepted": true,
+      "quiescent_released": true,
+      "wall_ns": 9783234278,
+      "projection_ns": 21132554884,
+      "measured_to_projected": {
+        "numerator": 9783234278,
+        "denominator": 21132554884
+      },
+      "aggregate_CPU_ns": 5792532000,
+      "group_peak_B": 3479560192,
+      "child_peak_RSS_KiB": 1749412
+    }
+  ],
+  "queue_quiescent_released": true,
+  "provider_rebuilt": false,
+  "full_library_checked": false,
+  "authorized_8GiB_for_new_jobs": true,
+  "no_within_job_deadline_CPU_memory_or_concurrency_raise": true
+}

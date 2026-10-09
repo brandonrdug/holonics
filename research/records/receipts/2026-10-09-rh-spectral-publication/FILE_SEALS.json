@@ -1,0 +1,347 @@
+{
+  "scope": "Canonical sources, source/kernel/diagnostic projections, publication join, replay checker, record, and the canonical-import receipt (its committed files, with diagnostic paths projected). The shared atlas and records index are checked by content (each atlas row once, the record route present), not as whole files, since other publications change them. Excludes this manifest itself and later verification-output/result receipts; Git commit seals the complete tracked publication.",
+  "files": {
+    "lean/HolonicsResearch/Zeta/ActualBeurlingCompensatedTail.lean": {
+      "bytes": 4312,
+      "sha256": "47efaa76eb9efb6796c2c888b9ba2199fb54f42aeb8891b35106ba525185f25c"
+    },
+    "lean/HolonicsResearch/Zeta/ActualBeurlingTailEnergy.lean": {
+      "bytes": 5771,
+      "sha256": "ad0cfd974cbcde1451c8379da1d24dbf9fad6a732bcf08d9d877e905dbc85b17"
+    },
+    "lean/HolonicsResearch/Zeta/ActualFiniteBeurlingMellinDomain.lean": {
+      "bytes": 12375,
+      "sha256": "e21d1d84da8964ab3d5bbe0905135a3522b0860d8d91d777d0d9ae6a1cf5a7b0"
+    },
+    "lean/HolonicsResearch/Zeta/ActualFiniteBeurlingMellinValue.lean": {
+      "bytes": 11595,
+      "sha256": "e70e696f332339ce5d5de7194c398fc241d10b5c129987233ab779e8f853a00a"
+    },
+    "lean/HolonicsResearch/Zeta/ActualFiniteBeurlingReceiver.lean": {
+      "bytes": 6464,
+      "sha256": "6f179b9e06944f66782639513c568b79018505e7870543dc5b8c72a5456eb2f1"
+    },
+    "lean/HolonicsResearch/Zeta/ActualFractionalPartZetaSource.lean": {
+      "bytes": 11440,
+      "sha256": "a9337cddb217762170556ab46d87a4443580053b383dfafa84d6b8fd2544d5b7"
+    },
+    "research/records/2026-10-09_THE_ACTUAL_FINITE_MOBIUS_RECEIVER_RETAINS_ITS_MELLIN_VALUE_AND_EXTERIOR.md": {
+      "bytes": 8457,
+      "sha256": "16ccbfeec4db7cfb6470b596f9864f2f5265b91848f871e61c375d6678546424"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ATLAS_JOIN.json": {
+      "bytes": 4449,
+      "sha256": "22264bf28a1357943b3871c550872a18c4fb061e125ddbc693073561aaba5ed7"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualBeurlingCompensatedTail/KERNEL_ACCEPTANCE.json": {
+      "bytes": 682,
+      "sha256": "e48ef8108d4b5a73aa1bc2dd62ed286a82c1a7ac870438bcf0d288947fb132d5"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualBeurlingCompensatedTail/NATIVE_VALIDATION_PUBLIC.json": {
+      "bytes": 1667,
+      "sha256": "d4c946377ebdb2496d1a1e98bd5689fb7c912da6a8ce25d16c7fda7187513ed5"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualBeurlingCompensatedTail/accepted-source.lean": {
+      "bytes": 4190,
+      "sha256": "c49d41c96de94465a3129559c7c80cbd357c194709b102f23b23d4863bef0bbe"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualBeurlingCompensatedTail/compiler.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualBeurlingCompensatedTail/compiler.stdout": {
+      "bytes": 403,
+      "sha256": "3b3461014933744867395be77d7d36b080857bfdc8abb840cd7a7e67bff0816f"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualBeurlingCompensatedTail/publication-import-comment.diff": {
+      "bytes": 900,
+      "sha256": "0d61632f1a0ad43f1d1605304d8be2fd45a0d786edd1f28af4cb580d48fe8d9b"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualBeurlingCompensatedTail/rejected-predecessor/ActualBeurlingCompensatedTail.lean": {
+      "bytes": 4161,
+      "sha256": "62106f4fc152c401335ec77cc618e80dd595b33947e5dc444e7c0a130e924839"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualBeurlingCompensatedTail/rejected-predecessor/KERNEL_VALIDATION.json": {
+      "bytes": 735,
+      "sha256": "a1d5a3f48d3a39efbe780a959ec94e527d053b6e59de821408b07f3254b6a74b"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualBeurlingCompensatedTail/rejected-predecessor/STATUS.json": {
+      "bytes": 544,
+      "sha256": "b289bbe353f46f3a2a54b1c01a4204406b4c91d00bca110551f0ed7755d58ade"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualBeurlingCompensatedTail/rejected-predecessor/compiler.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualBeurlingCompensatedTail/rejected-predecessor/compiler.stdout": {
+      "bytes": 1706,
+      "sha256": "447e07153d36c3a8af532d117703526b73ebc9030df120f351adba990bd1a672"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualBeurlingTailEnergy/KERNEL_ACCEPTANCE.json": {
+      "bytes": 814,
+      "sha256": "1ba9c19fe163a113ee39514ced6c220a6af10577e5afcce2298688c5939b581b"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualBeurlingTailEnergy/NATIVE_VALIDATION_PUBLIC.json": {
+      "bytes": 1794,
+      "sha256": "aeb6f18a1e6a50b1e90bac7a6e158bad8907e7673417bdc3bd12da93092f86dc"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualBeurlingTailEnergy/accepted-source.lean": {
+      "bytes": 5723,
+      "sha256": "d9cde2614662a63eb02010a0199d2276cbee04bfb34604e8d332aec491713ad1"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualBeurlingTailEnergy/compiler.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualBeurlingTailEnergy/compiler.stdout": {
+      "bytes": 884,
+      "sha256": "66d2fd3985df4d1cc213d33a2792c609f2fbffd70d5440c85104da3f1a37bf07"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualBeurlingTailEnergy/publication-import-comment.diff": {
+      "bytes": 759,
+      "sha256": "83275546ae51f8f645498ff3ef450b1bf64e7a2730e517af31ad695767847c10"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualBeurlingTailEnergy/rejected-predecessor/ActualBeurlingTailEnergy.lean": {
+      "bytes": 5427,
+      "sha256": "9e8f41b663bdb0d77bf1a9a255c68e958a6052da121e6247a83fcc4af75afa79"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualBeurlingTailEnergy/rejected-predecessor/KERNEL_VALIDATION.json": {
+      "bytes": 884,
+      "sha256": "52f98c336129c9a053e46a15821f940e19e86930b897704b3c5c68bcebde8b00"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualBeurlingTailEnergy/rejected-predecessor/STATUS.json": {
+      "bytes": 544,
+      "sha256": "b9a11d42a29e63d92d53e08e60b27711a7415e03002b26af8451834bee7af2b9"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualBeurlingTailEnergy/rejected-predecessor/compiler.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualBeurlingTailEnergy/rejected-predecessor/compiler.stdout": {
+      "bytes": 2676,
+      "sha256": "6db4e0cedc3896b6fd1d46a456d26fea91377b4fe19d19648e0a3546298c96c5"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualFiniteBeurlingMellinDomain/KERNEL_ACCEPTANCE.json": {
+      "bytes": 820,
+      "sha256": "7365b139e19d15a5bc6f6f3b4e7c85f805102e6c40443fd6435bc4b3c24cc1ce"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualFiniteBeurlingMellinDomain/NATIVE_VALIDATION_PUBLIC.json": {
+      "bytes": 2238,
+      "sha256": "a4619c9122b2a68a749084cb94a73e541903dfb146ff7b4f77aa1dc9cd57964c"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualFiniteBeurlingMellinDomain/accepted-source.lean": {
+      "bytes": 12348,
+      "sha256": "95290e86b295dfb73aa0e6d337a5db5bf45156eeefce2b14cc9d7867f728f313"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualFiniteBeurlingMellinDomain/compiler.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualFiniteBeurlingMellinDomain/compiler.stdout": {
+      "bytes": 974,
+      "sha256": "a14c498ff8a76ad3709621bcac8fc02310aa8be2ea20320185bb095b5a63b845"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualFiniteBeurlingMellinDomain/publication-import-comment.diff": {
+      "bytes": 1091,
+      "sha256": "3d4ac2e81929c18645a6a1295ee08a1eb2f66a79ed2c65f14efa971659d0898b"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualFiniteBeurlingMellinValue/KERNEL_ACCEPTANCE.json": {
+      "bytes": 871,
+      "sha256": "7b43ec1d33f578ba243da3844ffce9222c58072dcad7cbe9a74b019c59424fce"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualFiniteBeurlingMellinValue/NATIVE_VALIDATION_PUBLIC.json": {
+      "bytes": 1860,
+      "sha256": "b01788a6b377e967a7ca060b557196f5cb0f681dba5ea845a8ba14c95fe59eba"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualFiniteBeurlingMellinValue/accepted-source.lean": {
+      "bytes": 11531,
+      "sha256": "3fecead3d50a617b4a6f66b224dc172e710833e50ea3072744d5a9d10ae3ba78"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualFiniteBeurlingMellinValue/compiler.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualFiniteBeurlingMellinValue/compiler.stdout": {
+      "bytes": 874,
+      "sha256": "d307c61755ebc2b7acf0585dcbcd76f2343f9463fe145a51e09730ce580bc191"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualFiniteBeurlingMellinValue/publication-import-comment.diff": {
+      "bytes": 1224,
+      "sha256": "6545a129a9fa9324aa39aa43699f8f5117dddeb3eb3dffc6accb9429b8e2df45"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualFiniteBeurlingMellinValue/rejected-predecessor/ActualFiniteBeurlingMellinValue.lean": {
+      "bytes": 11535,
+      "sha256": "59b7481ac49ff62878ed6db2bc8dbad71edc57ac530dcb6b12c96f0ac8a3b1b5"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualFiniteBeurlingMellinValue/rejected-predecessor/KERNEL_VALIDATION.json": {
+      "bytes": 907,
+      "sha256": "4f3c6e9fc3ab3d06aa1fa913ae43814fd13ac077eef12afcc5e59133f1970b82"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualFiniteBeurlingMellinValue/rejected-predecessor/STATUS.json": {
+      "bytes": 545,
+      "sha256": "9308e48022004528565c75ff6d164d7c456cac49207909473f0539a02bf075d7"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualFiniteBeurlingMellinValue/rejected-predecessor/compiler.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualFiniteBeurlingMellinValue/rejected-predecessor/compiler.stdout": {
+      "bytes": 1446,
+      "sha256": "e9665f0612b99515ec30f9514c905d7a777afa6753d6f0a36b5439edae62e38d"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualFiniteBeurlingReceiver/KERNEL_ACCEPTANCE.json": {
+      "bytes": 828,
+      "sha256": "dcb38bf5093bb391abcf40a4bc0fa4f546f46e2da01d293ca4e9cf6d1caba7ce"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualFiniteBeurlingReceiver/NATIVE_VALIDATION_PUBLIC.json": {
+      "bytes": 4827,
+      "sha256": "2e89fe365be632eadf27d3223848871de2f7e5aecfc541a72d4b66ddec198a70"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualFiniteBeurlingReceiver/accepted-source.lean": {
+      "bytes": 6380,
+      "sha256": "1401be5362c873e03d4c641ca44e9b804fc79dc4ece6f3b6d00238339ed76ffc"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualFiniteBeurlingReceiver/compiler.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualFiniteBeurlingReceiver/compiler.stdout": {
+      "bytes": 901,
+      "sha256": "cbacfe8989a7649d962f3ca2794b526b575f472fc7cddf2a2bad3692749e3d1d"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualFiniteBeurlingReceiver/publication-import-comment.diff": {
+      "bytes": 745,
+      "sha256": "ed81dd8d8af620d41d3b3485085973239f8769238b677ef9a159f2e2dea1df11"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualFractionalPartZetaSource/KERNEL_ACCEPTANCE.json": {
+      "bytes": 850,
+      "sha256": "ba508f028cb6a928fdb4e01be4a767d46c9b0905f6071444b36dd096b6077f12"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualFractionalPartZetaSource/NATIVE_VALIDATION_PUBLIC.json": {
+      "bytes": 2261,
+      "sha256": "6b1e7f99c42de750ca75848bd4afce3c09f5aeb7d68e63ed432c9eae6b35fe32"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualFractionalPartZetaSource/accepted-source.lean": {
+      "bytes": 11433,
+      "sha256": "acb70614e4b9fbf206bb050b03aad4abac7e84fcdab1e16c84933bdc35b763af"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualFractionalPartZetaSource/compiler.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualFractionalPartZetaSource/compiler.stdout": {
+      "bytes": 556,
+      "sha256": "f8fa37e065a8336d02fb6e824ac890ef36fb233629162460b64a8db3698798ad"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/ActualFractionalPartZetaSource/publication-import-comment.diff": {
+      "bytes": 648,
+      "sha256": "5ba61c42403a83d6af10aaa2b1f8c38abf6bb2d13d71d9463e8d3c3f93a6c678"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/REPLAY.md": {
+      "bytes": 2916,
+      "sha256": "c36ba960c65defa88711340b779622ea33a3e46f30fcd93f30eed1d451c36e23"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/SOURCE_PUBLICATION_JOIN.json": {
+      "bytes": 35615,
+      "sha256": "e5757006a8a063d652857e94abaabc38d558391946418c8dfface6aed4c932c7"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/FILE_HASHES.json": {
+      "bytes": 75935,
+      "sha256": "a31c8e0f4ffab495e75f562e90d602573f1c3395064a741beeae37fe3d28bb53"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/HANDOFF.md": {
+      "bytes": 1234,
+      "sha256": "7438843f528a84334a7ab1f7217b7f6838fc78244d379f8504bb29b97109e0cc"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/OMITTED.md": {
+      "bytes": 59573,
+      "sha256": "d0451edf413be2a7c17e124379b8b59c9af97908f95cd708606db177c54efbdb"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/PROJECTION.json": {
+      "bytes": 2357,
+      "sha256": "0e5db6c01e5ff657fcd5ad1c46ce9a71ffbf5434d5da9d6334d985e95ba8bc4b"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/VALIDATION.json": {
+      "bytes": 16265,
+      "sha256": "ae9ab39f08f3285acc3d0aa09c94d2833988ce6b7fb94856b32e8f1153ccf5d0"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/admission/ActualBeurlingCompensatedTail/KERNEL_VALIDATION.json": {
+      "bytes": 682,
+      "sha256": "0aa7009c5e172312425e1d600432438ae335281d59eb39e41d5a2324b100f5ec"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/admission/ActualBeurlingCompensatedTail/compiler.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/admission/ActualBeurlingCompensatedTail/compiler.stdout": {
+      "bytes": 403,
+      "sha256": "3b3461014933744867395be77d7d36b080857bfdc8abb840cd7a7e67bff0816f"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/admission/ActualBeurlingTailEnergy/KERNEL_VALIDATION.json": {
+      "bytes": 814,
+      "sha256": "06b9c08cc2d5ecc769e73a1a39495503c1667058f9f848ebfe945b0671f030a4"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/admission/ActualBeurlingTailEnergy/compiler.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/admission/ActualBeurlingTailEnergy/compiler.stdout": {
+      "bytes": 884,
+      "sha256": "66d2fd3985df4d1cc213d33a2792c609f2fbffd70d5440c85104da3f1a37bf07"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/admission/ActualFiniteBeurlingMellinDomain/KERNEL_VALIDATION.json": {
+      "bytes": 820,
+      "sha256": "47b929f97467c4b5be6efc0239f69e552c156af5a6dc59a9c1d839669b1b0209"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/admission/ActualFiniteBeurlingMellinDomain/compiler.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/admission/ActualFiniteBeurlingMellinDomain/compiler.stdout": {
+      "bytes": 974,
+      "sha256": "a14c498ff8a76ad3709621bcac8fc02310aa8be2ea20320185bb095b5a63b845"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/admission/ActualFiniteBeurlingMellinValue/KERNEL_VALIDATION.json": {
+      "bytes": 871,
+      "sha256": "00d0ab3c8f5e0bd3b1551c982dbbcee9e4709fa67f9931067d1fda81dcd7e1e6"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/admission/ActualFiniteBeurlingMellinValue/compiler.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/admission/ActualFiniteBeurlingMellinValue/compiler.stdout": {
+      "bytes": 874,
+      "sha256": "d307c61755ebc2b7acf0585dcbcd76f2343f9463fe145a51e09730ce580bc191"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/admission/ActualFiniteBeurlingReceiver/KERNEL_VALIDATION.json": {
+      "bytes": 828,
+      "sha256": "0abe377300b60a7f84cb8a170e1cda98b72bb8cfb5092136ea4c6164032a3c2f"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/admission/ActualFiniteBeurlingReceiver/compiler.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/admission/ActualFiniteBeurlingReceiver/compiler.stdout": {
+      "bytes": 901,
+      "sha256": "a83ce54c81758eee22c67ab1fcb0ca8c9bfdaa9e11de118c04c85653b8b73746"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/admission/ActualFractionalPartZetaSource/KERNEL_VALIDATION.json": {
+      "bytes": 850,
+      "sha256": "a4fa8fb080d5040ccf9003ecb5676211fcf363a2a07a0a6ec4d678066a565c9e"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/admission/ActualFractionalPartZetaSource/compiler.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/admission/ActualFractionalPartZetaSource/compiler.stdout": {
+      "bytes": 556,
+      "sha256": "f8fa37e065a8336d02fb6e824ac890ef36fb233629162460b64a8db3698798ad"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/verify_publication.py": {
+      "bytes": 6766,
+      "sha256": "c52d545db37e35f1f6334c22be8092e9b058b7c370a9c35db3734c010f86711a"
+    }
+  },
+  "count": 85,
+  "total_bytes": 387167
+}

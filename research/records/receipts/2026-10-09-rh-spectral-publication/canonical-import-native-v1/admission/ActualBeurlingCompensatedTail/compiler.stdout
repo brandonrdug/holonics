@@ -1,0 +1,9 @@
+'Holonics.Zeta.ActualBeurlingCompensatedTail.actual_tail_mellin_integrable' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Zeta.ActualBeurlingCompensatedTail.actual_tail_mellin_integral' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Zeta.ActualBeurlingCompensatedTail.actual_tail_mellin_norm' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
