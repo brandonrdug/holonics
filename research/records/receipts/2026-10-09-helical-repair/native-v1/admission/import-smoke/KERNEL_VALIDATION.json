@@ -1,0 +1,51 @@
+{
+  "kernel_accepted": true,
+  "compiler_exit": 0,
+  "compiler_wall_ns": 8224600457,
+  "axioms": {
+    "Holonics.Transport.HelicalRepair.reach_eq_image_members": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.mem_reach_iff": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.card_reach_le_prod": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.card_reach_le_min": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.diam_tuple_eq_max_support": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.diam_family_eq_max_support": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.diam_class_eq_bot_iff": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.diam_family_eq_zero_iff": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "selector_count_matches": true,
+  "standard_axioms_only": true,
+  "metadata_unchanged": true,
+  "broad_library_checked": false
+}

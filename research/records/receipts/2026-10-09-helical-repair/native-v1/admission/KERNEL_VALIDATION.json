@@ -1,0 +1,278 @@
+{
+  "kernel_accepted": true,
+  "compiler_exit": 0,
+  "compiler_wall_ns": 10534647580,
+  "axioms": {
+    "Holonics.Transport.HelicalRepair.IsMember": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.isMember_nil": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.isMember_cons": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.isMember_length": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.isMember_iff_getElem": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.exists_member": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.consEmb": [
+      "propext"
+    ],
+    "Holonics.Transport.HelicalRepair.members": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.members_nil": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.members_cons": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.mem_members": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.card_members": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.prefixLift": [
+      "propext"
+    ],
+    "Holonics.Transport.HelicalRepair.prefixLift_zero": [
+      "propext"
+    ],
+    "Holonics.Transport.HelicalRepair.prefixLift_cons_succ": [
+      "propext",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.advanceBy": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.mem_advanceBy": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.reachFrom": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.reachFrom_zero": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.reachFrom_nil_succ": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.reachFrom_cons_succ": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.reach": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.reach_zero": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.reachFrom_succ": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.reach_succ": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.mem_reachFrom_iff": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.mem_reach_iff": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.reach_eq_image_members": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.exists_member_through": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.readings_eq_image_reach": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.card_advanceBy_le": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.choiceCount": [
+      "propext",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.choiceCount_length": [
+      "propext",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.card_reachFrom_le": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.card_reach_le_prod": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.card_reach_le_card_members": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.reachFrom_bounds": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.reach_subset_Icc_of_le": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.reach_subset_Icc": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.card_reach_le": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.card_reach_le_min": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.diam": [
+      "propext",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.le_diam": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.diam_le_iff": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.diam_eq_bot_iff": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.diam_comp_of_surj": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.tupleDist": [
+      "propext",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.diam_tuple_eq_max": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.diam_tuple_eq_max_support": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.classTuple": [
+      "propext"
+    ],
+    "Holonics.Transport.HelicalRepair.diam_family_eq_max_support": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.diam_family_eq_bot_iff": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.diam_class_eq_max_support": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.diam_class_eq_bot_iff": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.nnrat_bot_eq_zero": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Transport.HelicalRepair.diam_family_eq_zero_iff": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "selector_count_matches": true,
+  "standard_axioms_only": true,
+  "metadata_unchanged": true,
+  "broad_library_checked": false
+}

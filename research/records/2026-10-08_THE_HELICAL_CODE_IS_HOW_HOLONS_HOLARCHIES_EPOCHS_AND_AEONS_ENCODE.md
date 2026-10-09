@@ -387,6 +387,19 @@ Its second part states the perfected laws:
    - Step 3: the linking reading of a closed duplex and its crossing changes. No current crate
      reads the linking number, and the retired owner is at `13f8c734`.
 
+   **The support and diameter laws, kernel-checked** (`formal-checked`). `Transport/HelicalRepair`
+   was accepted at `5efbb1cc0`: 56 declarations using only standard axioms, and a narrow
+   research-root import check of 8 queries ([receipt](receipts/2026-10-09-helical-repair/native-v1/HANDOFF.md)).
+   - The carried support is exactly the members' prefix lifts, for nonempty factors and `k ≤ n`.
+   - Its size is at most `min(∏_{j<k}|F_j|, k(D−1)+1)` when `A < D`.
+   - The class diameter equals the maximum over the coordinates of each coordinate's diameter on its
+     support, with the terminal carry as one coordinate. It is bottom exactly when every
+     coordinate's reading is constant on its support.
+
+   Accepted scope: independent nonempty factors only. These remain separate: the fit-constrained
+   (pruned) exactness, channel truth coverage, the realization of the actual quotient and receiver,
+   attaining witnesses, work/memory/overflow realization, and the general partner law.
+
 5. **The designed-placement law** (Epime's typed form over `Foundation/CausalRelevance`'s additive
    carrier). `q(P(T_{i,v}u)) = q(P(u))` iff `δ_{i,v}(u) = P(T_{i,v}u) − P(u) ∈ K`, for every admitted
    background `u`. The type `v` is a substitution operator, and the kernel holds its reached

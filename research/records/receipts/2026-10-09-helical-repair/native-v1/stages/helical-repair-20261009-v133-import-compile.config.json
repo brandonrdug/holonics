@@ -1,0 +1,191 @@
+{
+  "label": "helical-repair-20261009-v133-import-compile",
+  "scope_unit": "holonics-prune-admission-helical-repair-20261009-v133-import-compile",
+  "scientific_job": false,
+  "stage_kind": "lean_compile",
+  "cwd": "/home/b/Workspaces/holonics",
+  "scope": "Exact HelicalRepair import-compile; independent carried support and coordinate diameter only",
+  "projection_ns": 21132554884,
+  "aggregate_cpu_limit_us": 17000000,
+  "aggregate_cpu_stop_margin_us": 1000000,
+  "group_memory_max_bytes": 8589934592,
+  "address_space_max_bytes": -1,
+  "minimum_MemAvailable_KiB": 12582912,
+  "system_floor_MemAvailable_KiB": 4194304,
+  "thread_budget": 1,
+  "input_directories": [],
+  "no_new_resource_runner": "Unchanged admission driver provides all lease/lifecycle/aggregate resource controls; argv only calls accepted metadata verifier around the original submitted Lean command.",
+  "forbidden_axioms": [
+    "sorryAx"
+  ],
+  "no_unchanged_failed_read_retry": true,
+  "inputs": [
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/materialize_helical_support_v133.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/import-smoke/COMPILER_REQUEST.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/import-smoke/source-v1/HelicalRepairImportConsumer.lean",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/import-smoke/CONSUMER_SCOPE.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/import-smoke/current-imports.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/import-smoke/import-preparation.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133-import-prep.acceptance.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133-import-prep.release.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133-import-prep.output_seal.json",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/check_lean_owner_v5.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/verify_lean_metadata_v1.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/lean_budget_v5.py",
+    "/home/b/Workspaces/holonics/.local/hodge-cut-cartier-20261003/runner-recovery-02/import_sealer.py",
+    "/usr/bin/python3.14",
+    "/usr/bin/env",
+    "/usr/bin/timeout",
+    "/home/b/.local/lib/lean-4.33.0/bin/lean",
+    "/home/b/.local/lib/lean-4.33.0/lib/lean/libleanshared_1.so",
+    "/home/b/.local/lib/lean-4.33.0/lib/lean/libleanshared.so",
+    "/home/b/.local/lib/lean-4.33.0/lib/lean/libLake_shared.so",
+    "/home/b/.local/lib/lean-4.33.0/lib/lean/libleanshared_2.so",
+    "/home/b/.local/lib/lean-4.33.0/lib/lean/libInit_shared.so",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/final_stage_memory_v120.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/leased_stage_memory_v120.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/bounded_stage_memory_v120.py"
+  ],
+  "outputs": [
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/import-smoke/objects-v1/HelicalRepairImportConsumer.olean",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/import-smoke/objects-v1/HelicalRepairImportConsumer.ilean",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/import-smoke/compiler.stdout",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/import-smoke/compiler.stderr",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/import-smoke/KERNEL_VALIDATION.json"
+  ],
+  "argv": [
+    "/usr/bin/python3.14",
+    "-B",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/check_lean_owner_v5.py",
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/import-smoke/COMPILER_REQUEST.json"
+  ],
+  "source_commit": "5efbb1cc0c2735b676206bc1daf15a0cfe532907",
+  "expected_inputs": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/materialize_helical_support_v133.py": {
+      "sha256": "b65c34bbda393b208eae96a6bc53c4950f79c1fede8508361aa00bfd4e4ccb90",
+      "bytes": 12321
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/import-smoke/COMPILER_REQUEST.json": {
+      "sha256": "054475934231a1623cbf7b702eab6125a52be49c495e3d0ad5dbd58df43d4708",
+      "bytes": 3435
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/import-smoke/source-v1/HelicalRepairImportConsumer.lean": {
+      "sha256": "9cf72456e0c868da27d03a75beb05827f33f87f9be8a944d3cb44c84770c538b",
+      "bytes": 590
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/import-smoke/CONSUMER_SCOPE.json": {
+      "sha256": "de6b1078ae5625c040ab519070644d89ffc94199b9ec0be5c374016c6a503d2f",
+      "bytes": 1127
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/import-smoke/current-imports.json": {
+      "sha256": "bb96caf9af6b07cb88f2e5c8be20e161acbc4533ace6270659dfc3a916cb782b",
+      "bytes": 47658285
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/import-smoke/import-preparation.json": {
+      "sha256": "3351f4e8caae4459f2889cf79c8e50014ae07a8b0dbbad5d38f17ec6cd023f01",
+      "bytes": 1242
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133-import-prep.acceptance.json": {
+      "sha256": "6bc8f8cd611b1d32002993ff2cc6d951ebb730aeb16f38df13bb8f6c19ea609b",
+      "bytes": 378
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133-import-prep.release.json": {
+      "sha256": "aaf11cd390fc5e81a0a864f1895fa98daf1ddfa5cc61c35af0856ee34271569c",
+      "bytes": 175
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133-import-prep.output_seal.json": {
+      "sha256": "32a28cc49586b71897420a9fccdc83858314251787b320a15c5fc3e9c39cd46c",
+      "bytes": 543434
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/check_lean_owner_v5.py": {
+      "sha256": "938113c2385ccafad539de5bcd6252a3ef315261e15ff3312757fb1a95ba723e",
+      "bytes": 2194
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/verify_lean_metadata_v1.py": {
+      "sha256": "cff6b3ce7c52698766dd59eb249c822960c36667c87d7e8e6cc6bae10c5d41ad",
+      "bytes": 772
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/lean_budget_v5.py": {
+      "sha256": "ad9ee8b7658a53011a020e159847ac9b23d4b491e3b262c2f49d23afa43b974e",
+      "bytes": 5550
+    },
+    "/home/b/Workspaces/holonics/.local/hodge-cut-cartier-20261003/runner-recovery-02/import_sealer.py": {
+      "sha256": "b323b6177c66c48d27a6a39ae580220e0c908430d0bbfbc2c33aa6b5b48b36da",
+      "bytes": 13162
+    },
+    "/usr/bin/python3.14": {
+      "sha256": "ac12d99c156d3c0ec708a2baf664d35b74f455572fe35fd57faa420ade5c3845",
+      "bytes": 14424
+    },
+    "/usr/bin/env": {
+      "sha256": "795586b56f6da560c3cf4e25c1a6e4f274a8576906e88d94c207db7255b07163",
+      "bytes": 72408
+    },
+    "/usr/bin/timeout": {
+      "sha256": "1425639cf3339b1117536df91cd4ba3229f8fa84e87322dee24e87121ed3feb3",
+      "bytes": 68320
+    },
+    "/home/b/.local/lib/lean-4.33.0/bin/lean": {
+      "sha256": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550",
+      "bytes": 9024
+    },
+    "/home/b/.local/lib/lean-4.33.0/lib/lean/libleanshared_1.so": {
+      "sha256": "2f96493ac9046f64ec7bcb78102a4c1e7cd9a7042487f246af45eda8a96667f5",
+      "bytes": 6232
+    },
+    "/home/b/.local/lib/lean-4.33.0/lib/lean/libleanshared.so": {
+      "sha256": "f2a36d5e56b936afc07bdbea18542de0bce6a9977ebc325915272c300d992d42",
+      "bytes": 229196736
+    },
+    "/home/b/.local/lib/lean-4.33.0/lib/lean/libLake_shared.so": {
+      "sha256": "feb2914d056638438613284b1f98278579ff8d8d99d0567e9823167806d150c0",
+      "bytes": 12311904
+    },
+    "/home/b/.local/lib/lean-4.33.0/lib/lean/libleanshared_2.so": {
+      "sha256": "2f96493ac9046f64ec7bcb78102a4c1e7cd9a7042487f246af45eda8a96667f5",
+      "bytes": 6232
+    },
+    "/home/b/.local/lib/lean-4.33.0/lib/lean/libInit_shared.so": {
+      "sha256": "2f96493ac9046f64ec7bcb78102a4c1e7cd9a7042487f246af45eda8a96667f5",
+      "bytes": 6232
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/final_stage_memory_v120.py": {
+      "sha256": "b6913802127facc4945da4bbdd0f18cb5457cc8e03765b649653e6cfe12adfc4",
+      "bytes": 11218
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/leased_stage_memory_v120.py": {
+      "sha256": "1191c531c35016eada85739a5ca94dabefd9074c75781e4a20fb28d4b887f1d1",
+      "bytes": 5538
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/bounded_stage_memory_v120.py": {
+      "sha256": "5ebc628494a7bff53f01362475110002eedae3b6395517f394f9972c541eff41",
+      "bytes": 13550
+    }
+  },
+  "explicit_user_8GiB_authorization": true,
+  "allocation_basis": {
+    "declared_units": 1,
+    "largest_prior_complete_compiler_wall_ns": 15278561897,
+    "fixed_child_ns": 17000000000,
+    "fixed_complete_wrapper_ns": 21132554884,
+    "largest_prior_full_import_preparation_wall_ns": 12779337307,
+    "new_elaboration_unmeasured": true,
+    "no_deadline_CPU_or_memory_increase": true,
+    "existing_sole_queue": true
+  },
+  "mathematical_input_identity": {
+    "target": "HelicalRepairImportConsumer",
+    "source_sha256": "9cf72456e0c868da27d03a75beb05827f33f87f9be8a944d3cb44c84770c538b",
+    "consumed_imports_sha256": "dffdb86283b87552a75708b580489f1c8289857b43a0723c0d7a2e99ac93c807"
+  },
+  "expected_axiom_selectors": [
+    "Holonics.Transport.HelicalRepair.reach_eq_image_members",
+    "Holonics.Transport.HelicalRepair.mem_reach_iff",
+    "Holonics.Transport.HelicalRepair.card_reach_le_prod",
+    "Holonics.Transport.HelicalRepair.card_reach_le_min",
+    "Holonics.Transport.HelicalRepair.diam_tuple_eq_max_support",
+    "Holonics.Transport.HelicalRepair.diam_family_eq_max_support",
+    "Holonics.Transport.HelicalRepair.diam_class_eq_bot_iff",
+    "Holonics.Transport.HelicalRepair.diam_family_eq_zero_iff"
+  ]
+}

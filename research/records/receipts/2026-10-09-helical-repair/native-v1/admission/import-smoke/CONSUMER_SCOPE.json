@@ -1,0 +1,25 @@
+{
+  "source_commit": "5efbb1cc0c2735b676206bc1daf15a0cfe532907",
+  "root_pin": {
+    "sha256": "606f939883114966fc39cdcd6fe16bd8c9c0720933936a136504c0ac352ae882",
+    "bytes": 69788
+  },
+  "actual_added_line_number": 298,
+  "actual_added_import": "import Holonics.Transport.HelicalRepair",
+  "consumer_source_pin": {
+    "sha256": "9cf72456e0c868da27d03a75beb05827f33f87f9be8a944d3cb44c84770c538b",
+    "bytes": 590
+  },
+  "expected_selectors": [
+    "Holonics.Transport.HelicalRepair.reach_eq_image_members",
+    "Holonics.Transport.HelicalRepair.mem_reach_iff",
+    "Holonics.Transport.HelicalRepair.card_reach_le_prod",
+    "Holonics.Transport.HelicalRepair.card_reach_le_min",
+    "Holonics.Transport.HelicalRepair.diam_tuple_eq_max_support",
+    "Holonics.Transport.HelicalRepair.diam_family_eq_max_support",
+    "Holonics.Transport.HelicalRepair.diam_class_eq_bot_iff",
+    "Holonics.Transport.HelicalRepair.diam_family_eq_zero_iff"
+  ],
+  "full_research_root_compiled": false,
+  "provider_kernel": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/KERNEL_VALIDATION.json"
+}

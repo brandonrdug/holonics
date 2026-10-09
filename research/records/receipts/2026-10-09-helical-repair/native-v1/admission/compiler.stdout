@@ -1,0 +1,212 @@
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:135:6: warning: Unused tactic linter: `(unfold IsMember; exact List.forall₂_nil_right_iff)` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:135:6: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:143:6: warning: Unused tactic linter: `(unfold IsMember; exact List.forall₂_cons_right_iff)` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:143:6: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:178:8: warning: Unused tactic linter: `(injection h with h1 h2; subst h1; subst h2; rfl)` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:178:8: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:190:6: warning: Unused tactic linter: `simp [members]` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:190:6: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:196:6: warning: Unused tactic linter: `simp [members]` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:196:6: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:256:57: warning: Unused tactic linter: `done` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:257:6: warning: Unused tactic linter: `simp` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:257:6: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:274:6: warning: Unused tactic linter: `(cases F <;> simp [reachFrom])` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:274:6: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:280:6: warning: Unused tactic linter: `simp [reachFrom]` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:280:6: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:286:6: warning: Unused tactic linter: `simp [reachFrom]` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:286:6: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:310:8: warning: Unused tactic linter: `exact absurd hk (Nat.not_lt_zero k)` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:317:10: warning: Unused tactic linter: `simp [reachFrom_cons_succ, reachFrom_zero]` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:322:12: warning: Unused tactic linter: `simpa using hk` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:324:25: warning: Unused tactic linter: `simp` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:310:8: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:317:10: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:322:12: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:324:25: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:374:12: warning: Unused tactic linter: `simpa using hk` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:374:12: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:480:10: warning: Unused tactic linter: `simp` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:480:10: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:529:10: warning: Unused tactic linter: `simp at hy` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:529:10: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:601:8: warning: Unused tactic linter: `exact Finset.le_sup hm'` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:605:8: warning: Unused tactic linter: `exact Finset.le_sup hm` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:601:8: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:605:8: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:623:55: warning: Unused tactic linter: `done` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:624:6: warning: Unused tactic linter: `(rw [← le_bot_iff, diam_le_iff]; simp only [le_bot_iff]; done)` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:624:6: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:671:10: warning: Unused tactic linter: `exact Finset.le_sup hi` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:679:10: warning: Unused tactic linter: `exact Finset.le_sup hi` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:671:10: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:679:10: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:804:6: warning: Unused tactic linter: `exact bot_eq_zero` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:805:6: warning: Unused tactic linter: `simp` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:804:6: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:805:6: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:823:6: warning: Unused tactic linter: `(rw [nnrat_bot_eq_zero] at h; exact h)` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:824:6: warning: Unused tactic linter: `simpa using h` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:823:6: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-repair-20261009-v133/source-v1/Holonics/Transport/HelicalRepair.lean:824:6: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+'Holonics.Transport.HelicalRepair.IsMember' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.isMember_nil' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.isMember_cons' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.isMember_length' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.isMember_iff_getElem' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.exists_member' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.consEmb' depends on axioms: [propext]
+'Holonics.Transport.HelicalRepair.members' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.members_nil' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.members_cons' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.mem_members' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.card_members' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.prefixLift' depends on axioms: [propext]
+'Holonics.Transport.HelicalRepair.prefixLift_zero' depends on axioms: [propext]
+'Holonics.Transport.HelicalRepair.prefixLift_cons_succ' depends on axioms: [propext, Quot.sound]
+'Holonics.Transport.HelicalRepair.advanceBy' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.mem_advanceBy' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.reachFrom' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.reachFrom_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.reachFrom_nil_succ' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.reachFrom_cons_succ' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.reach' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.reach_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.reachFrom_succ' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.reach_succ' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.mem_reachFrom_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.mem_reach_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.reach_eq_image_members' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.exists_member_through' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.readings_eq_image_reach' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.card_advanceBy_le' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.choiceCount' depends on axioms: [propext, Quot.sound]
+'Holonics.Transport.HelicalRepair.choiceCount_length' depends on axioms: [propext, Quot.sound]
+'Holonics.Transport.HelicalRepair.card_reachFrom_le' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.card_reach_le_prod' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.card_reach_le_card_members' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.reachFrom_bounds' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.reach_subset_Icc_of_le' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.reach_subset_Icc' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.card_reach_le' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.card_reach_le_min' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.diam' depends on axioms: [propext, Quot.sound]
+'Holonics.Transport.HelicalRepair.le_diam' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.diam_le_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.diam_eq_bot_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.diam_comp_of_surj' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.tupleDist' depends on axioms: [propext, Quot.sound]
+'Holonics.Transport.HelicalRepair.diam_tuple_eq_max' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.diam_tuple_eq_max_support' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.classTuple' depends on axioms: [propext]
+'Holonics.Transport.HelicalRepair.diam_family_eq_max_support' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.diam_family_eq_bot_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.diam_class_eq_max_support' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.diam_class_eq_bot_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.nnrat_bot_eq_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Transport.HelicalRepair.diam_family_eq_zero_iff' depends on axioms: [propext, Classical.choice, Quot.sound]

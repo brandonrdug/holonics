@@ -1,0 +1,455 @@
+{
+  "files": {
+    "admission/COMPILER_REQUEST.json": {
+      "sha256": "86e56d5ea847916e6b4905a54a083bbec5144d223bc6fb987e826f99746644ad",
+      "bytes": 5976
+    },
+    "admission/KERNEL_VALIDATION.json": {
+      "sha256": "f93cd67856c804d21b734b016b91b8a27e52e36c3df598c261e2cd7d62bee349",
+      "bytes": 7036
+    },
+    "admission/PREPARATION_REQUEST.json": {
+      "sha256": "f863f32f84f7985db80da4b49276b2b4f30c34d1eb55f6619d9a110cc7d9b4a7",
+      "bytes": 5760
+    },
+    "admission/PROVIDER_NAMESPACE.json": {
+      "sha256": "62064abcaccc21bfabe7bcc9c97e0b84fde9ccb1b2460d26ee86aad6a8f944ac",
+      "bytes": 82
+    },
+    "admission/SOURCE_ADMISSION.json": {
+      "sha256": "21bd3855887dc03024f0cb28cab4dd5b58af226dde2f8222366bfdb07e33b2ae",
+      "bytes": 4438
+    },
+    "admission/compiler.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "admission/compiler.stdout": {
+      "sha256": "2e44932235708142f642d5e29790ce424e8d495db4ef32c8ddae20f2085529f6",
+      "bytes": 20854
+    },
+    "admission/current-imports.json": {
+      "sha256": "dbc63860dbe333e7f38f774e33d7deff902b19ba1750a8ea8ceefe98f0c34ebb",
+      "bytes": 46095331
+    },
+    "admission/import-preparation.json": {
+      "sha256": "782656b2f2090e6de729d19359b6737557205b0c149f6749ef8634f537df25fb",
+      "bytes": 1246
+    },
+    "admission/import-smoke/COMPILER_REQUEST.json": {
+      "sha256": "054475934231a1623cbf7b702eab6125a52be49c495e3d0ad5dbd58df43d4708",
+      "bytes": 3435
+    },
+    "admission/import-smoke/CONSUMER_SCOPE.json": {
+      "sha256": "de6b1078ae5625c040ab519070644d89ffc94199b9ec0be5c374016c6a503d2f",
+      "bytes": 1127
+    },
+    "admission/import-smoke/KERNEL_VALIDATION.json": {
+      "sha256": "7d9f8e1a35cc7f6b4c999108ee21276aae2e16af4393db5651c2b84b01706bfe",
+      "bytes": 1295
+    },
+    "admission/import-smoke/PREPARATION_REQUEST.json": {
+      "sha256": "017653facffede8ecb9db85d4673861339880cab92bac3849607bbb1d7c18bc5",
+      "bytes": 6369
+    },
+    "admission/import-smoke/PROVIDER_NAMESPACE.json": {
+      "sha256": "b506eae77c1c3b512e03cef17b48f712d20b83c12433525abe6ba38cada49056",
+      "bytes": 1409
+    },
+    "admission/import-smoke/compiler.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "admission/import-smoke/compiler.stdout": {
+      "sha256": "fa821de332e8eb4d5d43def4301b52a66a31486eb683644b3ebdbbea245a4b7a",
+      "bytes": 925
+    },
+    "admission/import-smoke/current-imports.json": {
+      "sha256": "bb96caf9af6b07cb88f2e5c8be20e161acbc4533ace6270659dfc3a916cb782b",
+      "bytes": 47658285
+    },
+    "admission/import-smoke/import-preparation.json": {
+      "sha256": "3351f4e8caae4459f2889cf79c8e50014ae07a8b0dbbad5d38f17ec6cd023f01",
+      "bytes": 1242
+    },
+    "admission/import-smoke/objects-v1/HelicalRepairImportConsumer.ilean": {
+      "sha256": "ee81d99146376c4712c2c50c635603695e5a16f594da0ac1e1aa4ccdc4566a3b",
+      "bytes": 1452
+    },
+    "admission/import-smoke/objects-v1/HelicalRepairImportConsumer.olean": {
+      "sha256": "f7c5686b7f9e659a39f2cad92b4657a6f250c0d6e168f038d3ff4f30610ecd88",
+      "bytes": 1560
+    },
+    "admission/import-smoke/objects-v1/Holonics/Transport/HelicalRepair.ilean": {
+      "sha256": "199deb0512a2cd9966a4a9dd7985f98d8b1b0f0c6270858cb302914f53df0574",
+      "bytes": 75847
+    },
+    "admission/import-smoke/objects-v1/Holonics/Transport/HelicalRepair.olean": {
+      "sha256": "b0bdf792baf3e35cd824eb662c3fa6e2b8234bd216516fa3c5532a4fb79432bd",
+      "bytes": 846016
+    },
+    "admission/import-smoke/source-v1/HelicalRepairImportConsumer.lean": {
+      "sha256": "9cf72456e0c868da27d03a75beb05827f33f87f9be8a944d3cb44c84770c538b",
+      "bytes": 590
+    },
+    "admission/objects-v1/Holonics/Transport/HelicalRepair.ilean": {
+      "sha256": "199deb0512a2cd9966a4a9dd7985f98d8b1b0f0c6270858cb302914f53df0574",
+      "bytes": 75847
+    },
+    "admission/objects-v1/Holonics/Transport/HelicalRepair.olean": {
+      "sha256": "b0bdf792baf3e35cd824eb662c3fa6e2b8234bd216516fa3c5532a4fb79432bd",
+      "bytes": 846016
+    },
+    "admission/source-v1/Holonics/Transport/HelicalRepair.lean": {
+      "sha256": "5693de32c2df68df00d5032e45700dad7ea882a84e4955856cf557a1b0563153",
+      "bytes": 47513
+    },
+    "admission/submitted/lean/Holonics/Transport/HelicalRepair.lean": {
+      "sha256": "6c87ec3fbab5e93dcb727033c96892e1598c8f145e58cc67c51ce67a2b22bba2",
+      "bytes": 43981
+    },
+    "admission/submitted/lean/HolonicsResearch.lean": {
+      "sha256": "606f939883114966fc39cdcd6fe16bd8c9c0720933936a136504c0ac352ae882",
+      "bytes": 69788
+    },
+    "stages/helical-repair-20261009-v133-module-prep.acceptance.json": {
+      "sha256": "4c5a3c9c3c9964bbf84811c4961fe388ed9cee4cde795e028f9b5996bdfbc249",
+      "bytes": 378
+    },
+    "stages/helical-repair-20261009-v133-module-prep.child-identity.json": {
+      "sha256": "1f548dc905c404d0acb903829d1440aea9153801900bede8ca9b4662c712f79a",
+      "bytes": 78
+    },
+    "stages/helical-repair-20261009-v133-module-prep.config.json": {
+      "sha256": "d791969b327691f2f83780a735090e1ce738bca0d7fc90e5f3424577bba523a4",
+      "bytes": 10645
+    },
+    "stages/helical-repair-20261009-v133-module-prep.external-lease.json": {
+      "sha256": "95aba78945451a6ed892dbcfd515a325e699c019d74ea0647a5a68f339cd5be0",
+      "bytes": 487
+    },
+    "stages/helical-repair-20261009-v133-module-prep.final.json": {
+      "sha256": "6e8355c9412be63ec347ba78479785ea9435999dcbca79174dffc2bc27be5313",
+      "bytes": 5021
+    },
+    "stages/helical-repair-20261009-v133-module-prep.input_seal.json": {
+      "sha256": "ae85a0601b2b5f45f631a61f31d87a3d36418f3bdd4063eb04d28dd665d7eeba",
+      "bytes": 7711
+    },
+    "stages/helical-repair-20261009-v133-module-prep.lease-identity.json": {
+      "sha256": "7b6aab3493f0b407a1310cdd045c7a08f62d62d3983a72f1f0f3db9066a51f43",
+      "bytes": 565
+    },
+    "stages/helical-repair-20261009-v133-module-prep.memory-gate.json": {
+      "sha256": "3954bd99828ce5112286c0f334b8c508ddae4914f2947b614ae74b9650b71ff6",
+      "bytes": 120
+    },
+    "stages/helical-repair-20261009-v133-module-prep.memory-growth.ndjson": {
+      "sha256": "9243ba40df5ef3560873388a5d601e5fdba30870a033db49225e17082340990c",
+      "bytes": 7406
+    },
+    "stages/helical-repair-20261009-v133-module-prep.output_seal.json": {
+      "sha256": "20cb5d02e9c6139c1e8594f6081ac0edc0a331958f607ab5eb0d2573a2b7496d",
+      "bytes": 500247
+    },
+    "stages/helical-repair-20261009-v133-module-prep.publication.json": {
+      "sha256": "29d52da977356258b7c2a9fc55535a499d5ba8a3c70cc994ed37d7273de1b684",
+      "bytes": 3168
+    },
+    "stages/helical-repair-20261009-v133-module-prep.quiescence.json": {
+      "sha256": "00cd8167bf618721ff5014a780a3ccda543ac89ad2163d0d0a3713ee4d0fabe8",
+      "bytes": 130
+    },
+    "stages/helical-repair-20261009-v133-module-prep.release.json": {
+      "sha256": "90832f5691e298d8b19c7f03f54df6338b524197bf8f14287108c80eed7cc0a0",
+      "bytes": 175
+    },
+    "stages/helical-repair-20261009-v133-module-prep.stage-quiescence.json": {
+      "sha256": "8a4118019b79bfe7e2ec5b87d442822b8dd8e129eadbf3ffead6edf53793b4d0",
+      "bytes": 136
+    },
+    "stages/helical-repair-20261009-v133-module-prep.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "stages/helical-repair-20261009-v133-module-prep.stdout": {
+      "sha256": "1dbbb34c063dc1ca5c9be862448afad820dafe06c2afb4152f9c58796a236eeb",
+      "bytes": 2073
+    },
+    "stages/helical-repair-20261009-v133-module-prep.system-floor.json": {
+      "sha256": "1a8db5b9827fb1c19e1e9fd19f1a13781820320c2fd2b334e5fb2a42b2b05868",
+      "bytes": 60240
+    },
+    "stages/helical-repair-20261009-v133-module-prep.unit-cleanup.json": {
+      "sha256": "766643dcbc251f4bded706be7ccdc566c71e4d79c5dcd28177b1f7a8ec6604d7",
+      "bytes": 707
+    },
+    "stages/helical-repair-20261009-v133-module-compile.acceptance.json": {
+      "sha256": "cb913cafeae8b046671549e3f797cde1d5e97f2e476123a2a15080b5665b206c",
+      "bytes": 378
+    },
+    "stages/helical-repair-20261009-v133-module-compile.child-identity.json": {
+      "sha256": "f6010ee8152a9470f406119d30bff1294cc8d40b0061d3ef48b89193c77ddbfd",
+      "bytes": 78
+    },
+    "stages/helical-repair-20261009-v133-module-compile.config.json": {
+      "sha256": "733e19d20e5d3483ee673b103518692d3327fd577406a92c60329032a68b9402",
+      "bytes": 13315
+    },
+    "stages/helical-repair-20261009-v133-module-compile.external-lease.json": {
+      "sha256": "ba0bde3462eeae8fd0a4fcc520546b86b33fdcbdce5a8e31d202341e688c4991",
+      "bytes": 487
+    },
+    "stages/helical-repair-20261009-v133-module-compile.final.json": {
+      "sha256": "8c90c765e37f31c7ad1f5801fdace903453ba68797cb1b9dbc276540006a844f",
+      "bytes": 5073
+    },
+    "stages/helical-repair-20261009-v133-module-compile.input_seal.json": {
+      "sha256": "c52824c4070e3fdfd0683e3c7bc556323d99050659b7fbfb7e734bdb26b78d57",
+      "bytes": 6935
+    },
+    "stages/helical-repair-20261009-v133-module-compile.lease-identity.json": {
+      "sha256": "e3f9d4b53fed925bb9ff8fe8118119a6a1cab42f56a3960481774527650cc1de",
+      "bytes": 565
+    },
+    "stages/helical-repair-20261009-v133-module-compile.memory-gate.json": {
+      "sha256": "8204006f1d9dcf82aab211d6082ab36f4dafaab0e962c665fee2c985078962c8",
+      "bytes": 121
+    },
+    "stages/helical-repair-20261009-v133-module-compile.memory-growth.ndjson": {
+      "sha256": "b76068c747e34e19ce53a4136af4a3bc3c925b435a0ffcc39494f71f7d472fce",
+      "bytes": 11839
+    },
+    "stages/helical-repair-20261009-v133-module-compile.output_seal.json": {
+      "sha256": "cb72855dbc9794257b717dcc4cdc564129721999be2a7c4b234a76e8b56b3207",
+      "bytes": 805758
+    },
+    "stages/helical-repair-20261009-v133-module-compile.publication.json": {
+      "sha256": "05f002eb2eca4cb15b2855b7f75fe59902706d345d0dccdd51fa6f90d37baf3f",
+      "bytes": 3954
+    },
+    "stages/helical-repair-20261009-v133-module-compile.quiescence.json": {
+      "sha256": "03405b7ecb0b2a3b9d1f65bc86df8cc1d28170f387f6c2e91c2153b428f0638b",
+      "bytes": 130
+    },
+    "stages/helical-repair-20261009-v133-module-compile.release.json": {
+      "sha256": "eed5febb8eca55b26e5a60544465787bcacaa5505bec77e899dadb6b6312207b",
+      "bytes": 175
+    },
+    "stages/helical-repair-20261009-v133-module-compile.stage-quiescence.json": {
+      "sha256": "1a1600db1ff1274ac39c88583a46688d01d349a14db4ffaaf86978140b84a12e",
+      "bytes": 136
+    },
+    "stages/helical-repair-20261009-v133-module-compile.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "stages/helical-repair-20261009-v133-module-compile.stdout": {
+      "sha256": "08cd86d280860ae4c96a1283d4fe186d6b7ae7e3986b801d1def31fc45878ef8",
+      "bytes": 26678
+    },
+    "stages/helical-repair-20261009-v133-module-compile.system-floor.json": {
+      "sha256": "ae92560d8f116558da4222312e593cdde59cb4b031e6887166d1bbc86b11bb2b",
+      "bytes": 96724
+    },
+    "stages/helical-repair-20261009-v133-module-compile.unit-cleanup.json": {
+      "sha256": "775628cdeaca818ee66883c75b9ed32fd2a7d9b280068773961f5cfcf8c83160",
+      "bytes": 713
+    },
+    "stages/helical-repair-20261009-v133-import-prep.acceptance.json": {
+      "sha256": "6bc8f8cd611b1d32002993ff2cc6d951ebb730aeb16f38df13bb8f6c19ea609b",
+      "bytes": 378
+    },
+    "stages/helical-repair-20261009-v133-import-prep.child-identity.json": {
+      "sha256": "d16eb7b7e616746761c07d2b1ce88f0e1a0094aaad932cb31eb852552100b230",
+      "bytes": 78
+    },
+    "stages/helical-repair-20261009-v133-import-prep.config.json": {
+      "sha256": "b0187ccaefd65aa544d97fdd8272a154cf93fe4f5f7597c7bebee7e444181892",
+      "bytes": 11560
+    },
+    "stages/helical-repair-20261009-v133-import-prep.external-lease.json": {
+      "sha256": "53a64b25de9b40dcc066bf1bcf49fef0c6b819ea1adf569587e02b8089ae7cbd",
+      "bytes": 487
+    },
+    "stages/helical-repair-20261009-v133-import-prep.final.json": {
+      "sha256": "b49033a5607f6a622231b73e122736713a02bf848cc5dc9f5e9ed5f8b3b8d1bf",
+      "bytes": 5022
+    },
+    "stages/helical-repair-20261009-v133-import-prep.input_seal.json": {
+      "sha256": "c54876e560fafd8c4b4438bb73610d9022bde947a44111e5dd955bcc43b315c4",
+      "bytes": 8281
+    },
+    "stages/helical-repair-20261009-v133-import-prep.lease-identity.json": {
+      "sha256": "619da4a5729eead4e22015445bc4e4c4f360f284e5648c55870643ac2762a44a",
+      "bytes": 565
+    },
+    "stages/helical-repair-20261009-v133-import-prep.memory-gate.json": {
+      "sha256": "1bf4b2b7814648e239acfd40e344fdf5f2d726081432183078f54c21856aee4e",
+      "bytes": 120
+    },
+    "stages/helical-repair-20261009-v133-import-prep.memory-growth.ndjson": {
+      "sha256": "07ac309ce2812621660c10f172d54f657a97f0cf6fb0d574058d6d11317b8ddd",
+      "bytes": 8558
+    },
+    "stages/helical-repair-20261009-v133-import-prep.output_seal.json": {
+      "sha256": "32a28cc49586b71897420a9fccdc83858314251787b320a15c5fc3e9c39cd46c",
+      "bytes": 543434
+    },
+    "stages/helical-repair-20261009-v133-import-prep.publication.json": {
+      "sha256": "50e8e4c1e6dfa20099c12038f74bc2a1caa9faff563187c07b913e110bdcc4b0",
+      "bytes": 3194
+    },
+    "stages/helical-repair-20261009-v133-import-prep.quiescence.json": {
+      "sha256": "1395f757969baf8022d8bb6d54dfea2a9dfe2bdd4576620ec1e7048c3b30fa25",
+      "bytes": 130
+    },
+    "stages/helical-repair-20261009-v133-import-prep.release.json": {
+      "sha256": "aaf11cd390fc5e81a0a864f1895fa98daf1ddfa5cc61c35af0856ee34271569c",
+      "bytes": 175
+    },
+    "stages/helical-repair-20261009-v133-import-prep.stage-quiescence.json": {
+      "sha256": "00194d4dd9eaa2f68dcafab9743926cd77819421c8113533d6616cf6db5a3b11",
+      "bytes": 136
+    },
+    "stages/helical-repair-20261009-v133-import-prep.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "stages/helical-repair-20261009-v133-import-prep.stdout": {
+      "sha256": "3a84355502b88d5ee1318e53d48a8020298498a8119f63c0fb92581396e0db96",
+      "bytes": 2070
+    },
+    "stages/helical-repair-20261009-v133-import-prep.system-floor.json": {
+      "sha256": "1bbe7792af2cf76685faa0ab78f4608d8656b488a66791eddd463d4485ee4d06",
+      "bytes": 69651
+    },
+    "stages/helical-repair-20261009-v133-import-prep.unit-cleanup.json": {
+      "sha256": "8928f1d8a486b8c74a330c41d2f0661dd53035635bc30e69b6cf9633e5b62102",
+      "bytes": 707
+    },
+    "stages/helical-repair-20261009-v133-import-compile.acceptance.json": {
+      "sha256": "4e4e968858a1315e29db43306b3590933cd666d779ab818d4aff191e673dba2a",
+      "bytes": 378
+    },
+    "stages/helical-repair-20261009-v133-import-compile.child-identity.json": {
+      "sha256": "bb976aafe441792c92fb1c70b0becf81c763ab18f0ce9be132f9de9a07af3773",
+      "bytes": 78
+    },
+    "stages/helical-repair-20261009-v133-import-compile.config.json": {
+      "sha256": "337162d0d80fdef165e778e1030166fde3e6ac6794673966d6efd92598869cbe",
+      "bytes": 10846
+    },
+    "stages/helical-repair-20261009-v133-import-compile.external-lease.json": {
+      "sha256": "3bf5fe13fe9f4e3b73974fb1db4eac43fb793d92df71319b18dc72fa69339d4a",
+      "bytes": 487
+    },
+    "stages/helical-repair-20261009-v133-import-compile.final.json": {
+      "sha256": "a4488940276c9ae2386fca48f6d16adc4f119eadec541696cadbdfd8724d8e68",
+      "bytes": 5071
+    },
+    "stages/helical-repair-20261009-v133-import-compile.input_seal.json": {
+      "sha256": "266d8d9063cc55ffa40ca44377f6c82c5f76c3c5ebc233c42932d45c01e76a2c",
+      "bytes": 7004
+    },
+    "stages/helical-repair-20261009-v133-import-compile.lease-identity.json": {
+      "sha256": "f989c04c46390e41a47948a4b68956ff24c32d5fe2b003cddb3223facc50ce28",
+      "bytes": 565
+    },
+    "stages/helical-repair-20261009-v133-import-compile.memory-gate.json": {
+      "sha256": "0980a290e561a014f02423e7dc342d6a805bc81874a9be4790e86b1d40bfa170",
+      "bytes": 121
+    },
+    "stages/helical-repair-20261009-v133-import-compile.memory-growth.ndjson": {
+      "sha256": "e827eb4003b93b66ea5457fc2761f37efc4cabbc42b7b7b1b27c2ba82c158067",
+      "bytes": 9668
+    },
+    "stages/helical-repair-20261009-v133-import-compile.output_seal.json": {
+      "sha256": "e7e1543c98da969e77938ff4db6a6da3fbf5221b53daed3658057ca9a173daca",
+      "bytes": 653223
+    },
+    "stages/helical-repair-20261009-v133-import-compile.publication.json": {
+      "sha256": "ceced9593e1bf19e9a50531c7a5d1b69f3652c4555cfdad4386cc2f37725fecc",
+      "bytes": 4002
+    },
+    "stages/helical-repair-20261009-v133-import-compile.quiescence.json": {
+      "sha256": "d83744ee3c836a3adabc7beeb30a4b6251c41b722329854bb35e2213a6500cb0",
+      "bytes": 130
+    },
+    "stages/helical-repair-20261009-v133-import-compile.release.json": {
+      "sha256": "cc185f52a6f8748721881ca4a36d5db14d5d7be99ff0e6df4cd3ee839c973a2d",
+      "bytes": 175
+    },
+    "stages/helical-repair-20261009-v133-import-compile.stage-quiescence.json": {
+      "sha256": "6b20edcd57127521db927a0eaec0072a0d47d01e3138b4c76d60129213a447c2",
+      "bytes": 136
+    },
+    "stages/helical-repair-20261009-v133-import-compile.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "stages/helical-repair-20261009-v133-import-compile.stdout": {
+      "sha256": "ecbb18b92bb1ef8fda66c94feb5f0e7d52ec3d419416e7d7fa0211a685028500",
+      "bytes": 2273
+    },
+    "stages/helical-repair-20261009-v133-import-compile.system-floor.json": {
+      "sha256": "c9a66cc74d95c46145a97c7826d95c871b75351085ac3345968092eb222bb7f9",
+      "bytes": 79305
+    },
+    "stages/helical-repair-20261009-v133-import-compile.unit-cleanup.json": {
+      "sha256": "5286dd68cc2a296d241806d8445f717f5403aa62184073dc8c53a862e7cb78e0",
+      "bytes": 713
+    },
+    "queue-source/materialize_helical_support_v133.py": {
+      "sha256": "b65c34bbda393b208eae96a6bc53c4950f79c1fede8508361aa00bfd4e4ccb90",
+      "bytes": 12321
+    },
+    "queue-source/package_helical_support_v133.py": {
+      "sha256": "93b15b5a9c6c3eea244b05761db5fa4589681c66f8e8abfb1f5099727e96d8d6",
+      "bytes": 7106
+    },
+    "queue-source/prepare_ns_namespace_v1.py": {
+      "sha256": "85b5a0626525cf14d6dbf8ecf9098ee8804df8facf1cad8c5e2f8eeb36aeea7c",
+      "bytes": 10766
+    },
+    "queue-source/check_namespace_lookup_v1.py": {
+      "sha256": "9210e5aa18f9daeb7ac8ced18e253f08805577119a5f2b5e211017d9a873679c",
+      "bytes": 886
+    },
+    "queue-source/check_lean_owner_v5.py": {
+      "sha256": "938113c2385ccafad539de5bcd6252a3ef315261e15ff3312757fb1a95ba723e",
+      "bytes": 2194
+    },
+    "queue-source/verify_lean_metadata_v1.py": {
+      "sha256": "cff6b3ce7c52698766dd59eb249c822960c36667c87d7e8e6cc6bae10c5d41ad",
+      "bytes": 772
+    },
+    "queue-source/lean_budget_v5.py": {
+      "sha256": "ad9ee8b7658a53011a020e159847ac9b23d4b491e3b262c2f49d23afa43b974e",
+      "bytes": 5550
+    },
+    "queue-source/final_stage_memory_v120.py": {
+      "sha256": "b6913802127facc4945da4bbdd0f18cb5457cc8e03765b649653e6cfe12adfc4",
+      "bytes": 11218
+    },
+    "queue-source/leased_stage_memory_v120.py": {
+      "sha256": "1191c531c35016eada85739a5ca94dabefd9074c75781e4a20fb28d4b887f1d1",
+      "bytes": 5538
+    },
+    "queue-source/bounded_stage_memory_v120.py": {
+      "sha256": "5ebc628494a7bff53f01362475110002eedae3b6395517f394f9972c541eff41",
+      "bytes": 13550
+    },
+    "VALIDATION.json": {
+      "sha256": "e71868b4658afac241809ec4d2115769953f80b1f602baf41561c1fee11fc3ea",
+      "bytes": 3814
+    },
+    "HANDOFF.md": {
+      "sha256": "c981771b0433179bfca67303e0a99d55b059246d16edbfa3a5e536eb9d7d9fd9",
+      "bytes": 3092
+    }
+  },
+  "count": 112,
+  "total_bytes": 98901294,
+  "all_reflink_copies_byte_verified": true
+}
