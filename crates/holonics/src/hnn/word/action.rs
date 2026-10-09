@@ -1005,6 +1005,10 @@ pub struct CoupledPassage {
     pub word: WordBalance,
 }
 
+/// The declared return law of a coupled passage ([`Word::prospective_coupled_passage`]): the returned
+/// wave for each step's emitted one, `(t, a_t) ↦ b_t`.
+pub type WaveReturns<'a> = dyn FnMut(usize, &[Rat]) -> Result<Vec<Rat>, HnnError> + 'a;
+
 impl Word<'_> {
     /// **Run the coupled prospective passage** ([`CoupledPassage`]): a fresh Word on this unrun
     /// Word's actual source opening, opened exactly as [`Word::prospective_feature`] opens its
@@ -1017,7 +1021,7 @@ impl Word<'_> {
         source_ring: usize,
         phases: &ReceivingPhases,
         compared: &[bool],
-        returns: &mut dyn FnMut(usize, &[Rat]) -> Result<Vec<Rat>, HnnError>,
+        returns: &mut WaveReturns<'_>,
     ) -> Result<CoupledPassage, HnnError> {
         let producer = ActionProducer::of(self)?;
         if compared.len() != phases.aperture() {

@@ -83,8 +83,8 @@
 mod model;
 mod world;
 pub use model::{
-    CoupledChange, CoupledProspect, HeldReason, KeyState, ModelCharts, ModelKey, ReturnImage,
-    StateFibre, WorldModel,
+    CoupledChange, CoupledProspect, HeldReason, KeyFace, KeyState, ModelCharts, ModelKey,
+    ReturnImage, StateFibre, WorldModel,
 };
 pub use world::{BoundJointWorld, NativeEncounter, NativeEncounterFailure, WaveJointStep};
 
@@ -257,12 +257,15 @@ impl PreparedPhysicalAction<'_, '_> {
         self.prospective.phases()
     }
 
-    /// **The World model's coupled prospect of this prepared action** (`model`, C1b-2a): per declared
-    /// key, its coupled prospect of the controlled Word's passage, or that key's own refusal (a held
-    /// or incompatible key, or charts it cannot read), so one key never withholds another's. It
-    /// predicts the port waves and the native station features, not the World's observed face. The
-    /// prepared Word stays unrun and nothing actual is read or written; a missing model or a plural
-    /// or obstructed control refuses the whole read.
+    /// **The World model's coupled prospect of this prepared action** (`model`, C1b-2a and C1b-2b):
+    /// per declared key, its coupled prospect of the controlled Word's passage, or that key's own
+    /// refusal (a held or incompatible key, or charts it cannot read), so one key never withholds
+    /// another's. It predicts the port waves and the native station features, and, for a key that
+    /// declares a face, that key's raw face hypothesis at each compared epoch; the actual World's face
+    /// coefficients stay private. The raw face is not the grain-level reading the encounter compares,
+    /// and no face hypothesis is filtered by observed faces. The prepared Word stays unrun and nothing
+    /// actual is read or written; a missing model or a plural or obstructed control refuses the whole
+    /// read.
     pub fn world_prospect(&self) -> Result<Vec<Result<CoupledProspect, HnnError>>, HnnError> {
         let model = self.owner.world_model().ok_or(HnnError::Unadmitted {
             reason: "a World prospect reads the bound World model",
