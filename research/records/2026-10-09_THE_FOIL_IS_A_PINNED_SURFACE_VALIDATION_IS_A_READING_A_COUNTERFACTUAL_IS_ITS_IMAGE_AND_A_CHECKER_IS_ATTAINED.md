@@ -50,6 +50,18 @@ sibling laboratory repository.
 3. **The scalar foil failed (June 17-18).** A scalar `κ → 0` was minimized by a trivial echo
    (`laboratory/src/eros/um/GRABBY_OPERATOR_INCIDENT_2ND.md`). The old Universality Machine's drive
    also injected the full source, not the prediction-subtracted foil.
+   **What the foil never showed.**
+   - The June 13 drop of `κ` from 8 to about 1/20 was an ordinary delta rule on a linear readout.
+     The same numbers were logged before the foil label existed.
+   - No laboratory experiment compared learning on the foil with learning on the raw signal or on
+     the echo.
+   - Fed to the comb as input, the foil scored worse than the raw signal in the laboratory's own
+     review (`laboratory/src/eros/um/PRE_EROS_REVIEW.md`), and the theory's foil learning rule
+     collapsed the comb (`AUDIT.md`).
+   - An input subtraction and a Gram–Schmidt cancellation were both refuted, and the June theory of
+     the foil (`THEORY_AND_EQUATIONS.md`) was superseded on June 24.
+
+   The foil's lasting evidence is §2 item 5, not a learning gain.
 4. **Pins and the swing (June 16 onward).**
    - "Three to observe, four to have a fact": a cross ratio survives every re-chart, so fixing it
      pins the fourth point, and the residual against the actual next point is the foil.
@@ -96,22 +108,33 @@ sibling laboratory repository.
   the mismatch.
   - The method of images makes the counterfactual literal: outside the sheet, the field is the real
     source plus a mirrored image source behind it.
-  - In the objects that mirror is the half-turn `S_a x = 2a − x` (`Geometry/AffineSwing`) and the
-    helical code's dyad. The HNN's partner strand (`hnn::paired`) is an image that must agree: a
-    structural check.
+  - Two cautions (Epime, October 9):
+    - A conductor carries nonzero induced charge exactly while it holds its boundary potential, so a
+      zero boundary residual does not mean an absent surface charge.
+    - The image's sign, strength, its grounded or floating boundary condition, and its Green
+      response come from the boundary problem. The spatial reflection supplies none of them.
+  - The half-turn `S_a x = 2a − x` (`Geometry/AffineSwing`) supplies only the image's geometry. The
+    helical code's dyad, and the HNN's partner strand (`hnn::paired`) that must agree, are a
+    distinct structural check that shares this reflection.
 - **A hydrofoil.** Potential flow around a foil admits a family of solutions, one for each
   circulation `Γ`. The Kutta condition, a pin at the sharp trailing edge, selects the physical one,
   and the lift per span is `L′ = ρVΓ` (Kutta–Joukowski).
   - A pin selects the actual flow among counterfactual ones, and the invariant it selects (a
     circulation, which is a winding) produces the force.
-  - In ideal flow circulation is conserved (Kelvin), so the invariant pins the fact across time.
-    This is the bridge to vortex and toroidal friction dynamics, and to the helical code's winding.
+  - Kelvin's theorem conserves circulation around a material loop in ideal flow. It does not by
+    itself make the start-up selection: Kutta's pin and the shed starting vortex do, through their
+    flow and boundary realization.
+  - Once selected, the conserved circulation is the invariant that pins the fact across time. This
+    is the bridge to vortex and toroidal friction dynamics, and to the helical code's winding.
 - **Spectra.** An absorption edge or an atomic line is an invariant fingerprint, and identifying one
   is resonance: a receiver tuned to the invariant answers only when it is present. In X-ray
   absorption a reference metal foil, measured beside the sample, pins the energy scale.
-- **Music.** Two tones seem right when they lock in phase. Mistuning beats at `|f₁ − f₂|`: an
-  immediate, local, signed signal of wrongness that also points toward the correction. Validation
-  and descent direction come in one reading, which is the parametron's lock and slip.
+- **Music.** Two tones seem right when they lock in phase. Mistuning beats:
+  `cos 2πf₁t + cos 2πf₂t = 2 cos π(f₁ − f₂)t · cos π(f₁ + f₂)t`. The beat rate `|f₁ − f₂|` is
+  immediate and local but unsigned. It flags the wrongness without giving its direction.
+  - The direction of the correction is read from a retained oriented phase relation: the sign of
+    the relative phase drift, read in quadrature.
+  - Flag and direction together are the parametron's lock and slip, read through its pump.
 
 ## 4. Validation is a reading; the counterfactual is an image
 
@@ -201,14 +224,20 @@ and exact bit costs]
   1. Aeons cover a Holarchy's parametric orientation, and localization is the restriction to one
      aeon.
   2. After the passage has walked an aeon, its retained constitution is a finder for the questions
-     supported there. Its attainment is the passage's work through the aeon (the aeon's first law),
-     paid once rather than per query.
+     supported there only when four things are supplied: a declared query family, a constructive
+     output procedure, its support and coverage, and a future-sufficiency witness. Walking alone
+     certifies none of them. When they hold, the finder's attainment is the passage's work through
+     the aeon (the aeon's first law), paid once rather than per query.
   3. "Growing": the answerable questions grow as the passage continues, but only if retention is
      future-sufficient.
   4. Two holarchies share structure only on a common aeon, so local finders must agree on overlaps.
-     Whether they glue across the aeon cover is the global question. The obstruction, a cocycle on
-     triple overlaps (the tower object's "obstructed" gluing), is where hardness concentrates, the
-     same local-to-global shape as RH, Hodge, complex Navier–Stokes and BSD.
+     Whether they glue across the aeon cover is the global question.
+     - An open or failed binary join is its own typed obstruction (the tower object's "obstructed"
+       gluing).
+     - Identifying obstructions with a Čech cocycle on triple overlaps owes the actual restriction
+       and transition maps and their triple-overlap composite.
+     - That hardness concentrates at the obstruction is a proposal, not a theorem. It shares the
+       local-to-global shape of RH, Hodge, complex Navier–Stokes and BSD.
      [The egg pair](2026-10-09_THE_EGGS_ARITHMETIC_TWIST_AND_THE_GAPS_OPERATOR_ARE_DISTINCT_DATA.md) is
      one instance: the same j with different local factors at 11.
 
