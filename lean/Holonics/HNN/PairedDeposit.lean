@@ -33,8 +33,9 @@ partner strand: `Qᵟ E₀ (Σ y) − (E − E₀) (Σ x)`, the **pair-port reve
    `B² = 1` and `Σ² = 1`, `G + B G Σ` lies on the subspace, so a paired source law's step
    `Π_V(G) = ½(G + B G Σ)` keeps the port equivariant; and with `Bᵀ = B`, `Σᵀ = Σ`, `B G Σ` pairs
    with every admissible change `B D = D Σ` exactly as `G` does, `tr((B G Σ)ᵀ D) = tr(Gᵀ D)`, so the
-   projection keeps the reached comparison's work and adds no datum. The quadratic's invariance,
-   `tr(D Σ F Σ Dᵀ) = tr(D F Dᵀ)` for admissible `D`, is owed (#62).
+   projection keeps the reached comparison's work and adds no datum. With `B² = 1` the normal
+   law's quadratic on every admissible change is also unmoved by symmetrizing its arrivals,
+   `tr(D Σ F Σ Dᵀ) = tr(D F Dᵀ)` (`projection_quadratic`).
 
 [proved-derived] Written, not yet kernel-checked; the sole queue's owner check decides. No `sorry`,
 no `axiom`, no `native_decide`.
@@ -46,7 +47,7 @@ no `axiom`, no `native_decide`.
 | `mul_commuting_stays`, `deposit_stays_equivariant` | the paired deposit through `Constitution::stepped_source` |
 | `symmetrized_commutes` | the symmetrized chart in `NormalLaw::prepare` (`SolvedChart::symmetrized`) |
 | `symmetrized_residual`, `rowNorm_smul_le`, `symmetrized_rowNorm_le` | its certificate, read as today by the chart's exact `‖1 − X̂H‖∞` |
-| `projection_equivariant`, `projection_pairing` | the projected step in `NormalLaw::prepare` on a paired source law |
+| `projection_equivariant`, `projection_pairing`, `projection_quadratic` | the projected step and the symmetrized Gram in `NormalLaw::prepare` on a paired source law |
 -/
 
 namespace Holonics.HNN.PairedDeposit
@@ -181,5 +182,25 @@ theorem projection_pairing {B : Matrix n n R} {S : Matrix m m R} {G D : Matrix n
     Matrix.trace (Matrix.transpose (B * G * S) * D) = Matrix.trace (Matrix.transpose G * D) := by
   rw [Matrix.transpose_mul, Matrix.transpose_mul, hSt, hBt, Matrix.mul_assoc, Matrix.mul_assoc, hD,
     Matrix.trace_mul_comm S, Matrix.mul_assoc, Matrix.mul_assoc, hS, Matrix.mul_one]
+
+/-- [proved-derived] **The symmetrized arrivals keep the quadratic**: with `Bᵀ = B`, `Σᵀ = Σ`,
+`B² = 1` and an admissible change `B D = D Σ`, `tr(D (Σ F Σ) Dᵀ) = tr(D F Dᵀ)`, so the normal law's
+quadratic on the subspace reads `F_s = ½(F + Σ F Σ)` as it reads `F`. -/
+theorem projection_quadratic {B : Matrix n n R} {S F : Matrix m m R} {D : Matrix n m R}
+    (hBt : Matrix.transpose B = B) (hSt : Matrix.transpose S = S) (hB : B * B = 1)
+    (hD : B * D = D * S) :
+    Matrix.trace (D * (S * F * S) * Matrix.transpose D) =
+      Matrix.trace (D * F * Matrix.transpose D) := by
+  have hDS : D * S = B * D := hD.symm
+  have hT : S * Matrix.transpose D = Matrix.transpose D * B := by
+    rw [← hSt, ← Matrix.transpose_mul, hDS, Matrix.transpose_mul, hBt]
+  calc Matrix.trace (D * (S * F * S) * Matrix.transpose D)
+      = Matrix.trace (D * S * F * (S * Matrix.transpose D)) := by
+        simp only [Matrix.mul_assoc]
+    _ = Matrix.trace (B * D * F * (Matrix.transpose D * B)) := by rw [hDS, hT]
+    _ = Matrix.trace (B * (D * F * Matrix.transpose D) * B) := by simp only [Matrix.mul_assoc]
+    _ = Matrix.trace (B * B * (D * F * Matrix.transpose D)) := by
+        rw [Matrix.trace_mul_comm (B * (D * F * Matrix.transpose D)) B, ← Matrix.mul_assoc]
+    _ = Matrix.trace (D * F * Matrix.transpose D) := by rw [hB, Matrix.one_mul]
 
 end Holonics.HNN.PairedDeposit

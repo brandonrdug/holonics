@@ -186,7 +186,8 @@
 //!   alignment and moves on that final direction, and is re-admitted after the step
 //!   (`hnn::constitution::NormalLaw::{prepare, deposited}`). `Π_V` is the orthogonal projection of
 //!   this realified Euclidean chart, so the reached comparison's work on every admissible change is
-//!   unchanged and no datum is added; where `Π_V(G) = 0` there is no constrained descent, and the
+//!   unchanged (Lean `projection_pairing`), as is the normal law's quadratic (`projection_quadratic`),
+//!   and no datum is added; where `Π_V(G) = 0` there is no constrained descent, and the
 //!   step is refused rather than read as a match. A feature reaching a class outside the family is
 //!   refused ([`crate::hnn::HnnError::PairedOutside`]). The chart keeps its certificate (Lean
 //!   `symmetrized_rowNorm_le`), which is still computed exactly. On pair features the projection is
