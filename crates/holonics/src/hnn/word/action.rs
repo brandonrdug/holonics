@@ -57,8 +57,8 @@ use crate::hnn::field::{Current, Field, FieldMaterial};
 use crate::hnn::moment::SourceMoment;
 use crate::hnn::propagation::Operands;
 use crate::hnn::receiving::ReceivingPhases;
-use crate::ratio::Rat;
 use crate::ratio::linear::ExactRatMatrix;
+use crate::ratio::{Rat, integer};
 
 /// A fixed declared wave preparation at one existing source-storage port.
 /// Every u in Q^(B.columns) is in this declaration's admitted control domain;
@@ -299,6 +299,35 @@ impl ProspectiveControl {
             injection: receipt.added.clone(),
         };
         Ok((word, receipt, applied))
+    }
+}
+
+impl ProspectiveControl {
+    /// **The controlled Word this control would open**, read without consuming either (the World
+    /// model's coupled prospect, C1b-2a): the unique control applied at the producing opening by the
+    /// same checks and the same shared tail as [`ProspectiveControl::prepare`]. The baseline stays
+    /// unrun; a plural or obstructed fibre is refused.
+    pub fn controlled_word<'c>(&self, baseline: &Word<'c>) -> Result<Word<'c>, HnnError> {
+        if !self.producer.matches(baseline)
+            || baseline.ticks() != 0
+            || baseline.is_ended()
+            || baseline.change()? != self.producer.opening
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "the action consumes its own whole producing source opening",
+            });
+        }
+        let control = self.unique_control().ok_or(HnnError::Unadmitted {
+            reason: "a plural or obstructed control fibre withholds native action release",
+        })?;
+        if self.response.apply(control)? != self.residual {
+            return Err(HnnError::Realization {
+                what: "the released control solves its producing relation",
+            });
+        }
+        let (word, _, _) =
+            apply_control(self.producer.clone(), &self.preparation, baseline, control)?;
+        Ok(word)
     }
 }
 
@@ -955,6 +984,110 @@ impl Word<'_> {
             form,
             prediction_word,
             prediction_balances,
+        })
+    }
+}
+
+/// [definition; agent-inferred, October 9] **A coupled prospective passage** (the World model's
+/// C1b-2a, `physical::action::model`): the native Word's exact passage from its actual unrun opening
+/// when every source wave it emits is answered by a declared return law instead of the actual World.
+/// Per junction step the emitted wave `a_t` and the returned wave `b_t`; at every compared station the
+/// native feature in the receiving frame, formed exactly as [`Word::prospective_feature`] forms it
+/// (`ring.rotate(anchor, lift)`), with its receiving logits. It is the native readout, not the World's
+/// observed face. Transient: it keeps no producer and is never resident history.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CoupledPassage {
+    /// `(a_t, b_t)` for every junction step `t = 1..=ticks`, in order.
+    pub waves: Vec<(Vec<Rat>, Vec<Rat>)>,
+    /// `(station, feature, logits)` for every compared station, in station order.
+    pub features: Vec<(usize, Vec<Rat>, Vec<Rat>)>,
+    /// The passage's released work, closed.
+    pub word: WordBalance,
+}
+
+impl Word<'_> {
+    /// **Run the coupled prospective passage** ([`CoupledPassage`]): a fresh Word on this unrun
+    /// Word's actual source opening, opened exactly as [`Word::prospective_feature`] opens its
+    /// baseline, ticked through the receiving phases' junction steps. After each tick the source
+    /// ring's emitted wave `a_t` is answered by `returns(t, a_t)` through the existing
+    /// `Word::return_source_wave`, with the exterior work `−h Y_s (|b|² − |a|²)/4` that closes
+    /// native power. This Word stays unrun and unchanged, and no actual World is read or written.
+    pub fn prospective_coupled_passage(
+        &self,
+        source_ring: usize,
+        phases: &ReceivingPhases,
+        compared: &[bool],
+        returns: &mut dyn FnMut(usize, &[Rat]) -> Result<Vec<Rat>, HnnError>,
+    ) -> Result<CoupledPassage, HnnError> {
+        let producer = ActionProducer::of(self)?;
+        if compared.len() != phases.aperture() {
+            return Err(HnnError::Shape {
+                what: "the complete receiving partition",
+                expected: phases.aperture(),
+                found: compared.len(),
+            });
+        }
+        let mut word = Word::on_change(
+            self.field,
+            self.operands.clone(),
+            producer.opening.clone(),
+            self.opened_at,
+        )?;
+        word.admit_source_boundary(source_ring)?;
+        let admittance = self.field.ring(source_ring).admittance().clone();
+        let squares = |wave: &[Rat]| wave.iter().map(|x| x * x).sum::<Rat>();
+        let mut waves = Vec::with_capacity(phases.junction_steps());
+        for t in 1..=phases.junction_steps() {
+            word.tick()?;
+            let incident = word.source_wave(source_ring)?.to_vec();
+            let reflected = returns(t, &incident)?;
+            if reflected.len() != incident.len() {
+                return Err(HnnError::Shape {
+                    what: "a declared returned wave on the source ring",
+                    expected: incident.len(),
+                    found: reflected.len(),
+                });
+            }
+            let work = self.field.step() * &admittance * (squares(&reflected) - squares(&incident))
+                / integer(4);
+            let native_tick = word
+                .opened_at()
+                .checked_add(t)
+                .ok_or(HnnError::CountOverflow)?;
+            word.return_source_wave(source_ring, native_tick, &incident, &reflected, &-work)?;
+            waves.push((incident, reflected));
+        }
+        let prediction = WordBalance::of(&word.released()?);
+        if !prediction.closes() || word.field_balances().iter().any(|b| !b.closes()) {
+            return Err(HnnError::Unadmitted {
+                reason: "the coupled prospective passage exposes its actual closed work receipts",
+            });
+        }
+        let map = producer.constitution.receiving_map(phases.ring()).ok_or(
+            HnnError::MissingReceivingMap {
+                ring: phases.ring(),
+            },
+        )?;
+        let ring = self.field.ring(phases.ring());
+        let lift = &producer.current.lift()[phases.ring()];
+        let mut features = Vec::new();
+        for (station, crossing) in phases.epochs().enumerate() {
+            if !compared[station] {
+                continue;
+            }
+            let anchor = word
+                .anchor(crossing, phases.ring())
+                .ok_or(HnnError::WordEnded {
+                    ticks: word.ticks(),
+                })?;
+            let feature = ring.rotate(anchor, lift);
+            let logits = map.apply(&feature)?;
+            features.push((station, feature, logits));
+        }
+        Ok(CoupledPassage {
+            waves,
+            features,
+            word: prediction,
         })
     }
 }

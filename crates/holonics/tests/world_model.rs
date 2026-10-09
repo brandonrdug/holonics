@@ -16,11 +16,11 @@ use holonics::hnn::constitution::CAMPAIGN_ONE_BUDGET;
 use holonics::hnn::field::{ContactDeclaration, CribDeclaration, ReceiverDeclaration};
 use holonics::hnn::physical::PhysicalReceiver;
 use holonics::hnn::physical::action::{
-    ActionCommunication, BoundJointWorld, HeldReason, KeyState, ModelKey, StateFibre,
-    WaveJointStep, WorldModel,
+    ActionCommunication, BoundJointWorld, CoupledProspect, HeldReason, KeyState, ModelKey,
+    PreparedPhysicalAction, StateFibre, WaveJointStep, WorldModel,
 };
 use holonics::hnn::ring::ResonatorMaterial;
-use holonics::hnn::word::action::PortPreparation;
+use holonics::hnn::word::action::{PortPreparation, ProspectiveControl};
 use holonics::hnn::{
     Constitution, Current, Encoded, Field, FieldDeclaration, RingDeclaration, WordOpening,
 };
@@ -868,4 +868,291 @@ fn binding_is_refused_without_a_world_off_its_tick_or_off_the_source_frame() {
             .is_err()
     );
     assert_eq!(receiver.world_model().unwrap().keys(), &[truth()]);
+}
+
+/// Whether one `k` carries a coupled prospect's point onto every actual `(a_t, b_t)` of an
+/// encounter and, where given, onto the actual receiving logits of one compared station: the
+/// stacked change of every value against the stacked directions.
+fn holds(prospect: &CoupledProspect, steps: &[Executed], station: Option<(usize, &[Rat])>) -> bool {
+    if prospect.point.waves.len() != steps.len() {
+        return false;
+    }
+    let mut rows = Vec::new();
+    let mut target = Vec::new();
+    for (t, step) in steps.iter().enumerate() {
+        let (incident, reflected) = &prospect.point.waves[t];
+        for (i, actual) in step.incident.iter().enumerate() {
+            rows.push(
+                prospect
+                    .directions
+                    .iter()
+                    .map(|direction| direction.waves[t].0[i].clone())
+                    .collect::<Vec<Rat>>(),
+            );
+            target.push(actual - &incident[i]);
+        }
+        for (i, actual) in step.reflected.iter().enumerate() {
+            rows.push(
+                prospect
+                    .directions
+                    .iter()
+                    .map(|direction| direction.waves[t].1[i].clone())
+                    .collect::<Vec<Rat>>(),
+            );
+            target.push(actual - &reflected[i]);
+        }
+    }
+    if let Some((compared, actual)) = station {
+        let Some(position) = prospect
+            .point
+            .features
+            .iter()
+            .position(|(read, _, _)| *read == compared)
+        else {
+            return false;
+        };
+        let predicted = &prospect.point.features[position].2;
+        if predicted.len() != actual.len() {
+            return false;
+        }
+        for (i, value) in actual.iter().enumerate() {
+            rows.push(
+                prospect
+                    .directions
+                    .iter()
+                    .map(|direction| direction.features[position].2[i].clone())
+                    .collect::<Vec<Rat>>(),
+            );
+            target.push(value - &predicted[i]);
+        }
+    }
+    ExactRatMatrix::shaped(rows.len(), prospect.directions.len(), rows)
+        .unwrap()
+        .preimage_fibre(&target)
+        .unwrap()
+        .is_some()
+}
+
+/// The native-only prediction of a station's receiving logits under the unique control: the
+/// baseline plus the response, which is how the control was solved (`ProspectiveControl`).
+fn native_logits(control: &ProspectiveControl, station: usize, u: &[Rat]) -> Vec<Rat> {
+    plus(
+        &control.baseline()[station],
+        &control.response().apply(u).unwrap(),
+    )
+}
+
+#[test]
+fn the_world_keys_coupled_prospect_holds_the_actual_encounter_before_it_runs() {
+    let (field, theta, source) = fixture();
+    let mut receiver = receiver(&field, theta);
+    receiver
+        .bind_world(world(
+            &field,
+            source.part(0..0).unwrap(),
+            medium(&unit_storage(), source_input(true)),
+        ))
+        .unwrap();
+    let keys = vec![
+        key(&field, medium(&unit_storage(), source_input(true))),
+        key(&field, medium(&unit_storage(), source_input(false))),
+        key(&field, medium(&singular_storage(), source_input(true))),
+    ];
+    receiver
+        .bind_world_model(WorldModel::found(keys, 0).unwrap())
+        .unwrap();
+    let preparation =
+        PortPreparation::new(&field, 0, ExactRatMatrix::identity(N).unwrap()).unwrap();
+    let request = vec![
+        vec![Rat::zero(); N],
+        vec![rat(1, 4), rat(1, 8), rat(1, 16), rat(-1, 32)],
+    ];
+    let mut predicted = 0;
+    let mut read_features = 0;
+    for _ in 0..3 {
+        let before = receiver.world_model().unwrap().clone();
+        let prepared = receiver
+            .prepare_action(
+                &source,
+                &field.receivers()[0],
+                &preparation,
+                &request,
+                &[false, true],
+            )
+            .unwrap();
+        let Some(control) = prepared.prospective().unique_control().map(<[Rat]>::to_vec) else {
+            // A plural or obstructed control releases nothing, so nothing is predicted.
+            assert!(prepared.world_prospect().is_err());
+            assert!(matches!(
+                prepared.encounter().unwrap(),
+                ActionCommunication::Held { .. }
+            ));
+            continue;
+        };
+        let native = native_logits(prepared.prospective(), 1, &control);
+        let prospects = prepared.world_prospect().unwrap();
+        assert_eq!(prospects.len(), 3);
+        // The prospect reads and writes nothing actual: the prepared Word still executes.
+        let communication = prepared.encounter().unwrap();
+        let steps = steps_of(&communication);
+        // The encounter's own blind read of the compared station, under the producing frame: the
+        // opening's receiving map and lift, which no reception publication moves.
+        let actual_logits = match &communication {
+            ActionCommunication::Received(received) => received
+                .boundary
+                .readings()
+                .iter()
+                .find(|read| read.station == 1)
+                .map(|read| read.read.logits.clone()),
+            _ => None,
+        };
+        assert!(!steps.is_empty());
+        let after = receiver.world_model().unwrap();
+        assert_eq!(after.tick(), before.tick() + steps.len() as u64);
+        // The World's own key is live, and one k carries its prospect onto the actual waves.
+        let truth = prospects[0].as_ref().unwrap();
+        assert_eq!(truth.tick, before.tick());
+        // One k carries the waves and the native readout together.
+        let station = actual_logits.as_deref().map(|logits| (1, logits));
+        assert!(holds(truth, &steps, station));
+        if station.is_some() {
+            read_features += 1;
+        }
+        if truth.directions.is_empty() {
+            for (step, (incident, reflected)) in steps.iter().zip(&truth.point.waves) {
+                assert_eq!((&step.incident, &step.reflected), (incident, reflected));
+            }
+            if let Some(logits) = &actual_logits {
+                assert_eq!(&truth.point.features[0].2, logits);
+            }
+        }
+        // The disconnected key, while live, returns every wave whole; its state reaches nothing,
+        // so its directions change nothing, and its native readout is the native-only prediction.
+        match &before.states()[1] {
+            KeyState::Live(_) => {
+                let disconnected = prospects[1].as_ref().unwrap();
+                assert!(
+                    disconnected
+                        .point
+                        .waves
+                        .iter()
+                        .all(|(incident, reflected)| incident == reflected)
+                );
+                assert!(disconnected.directions.iter().all(|direction| {
+                    direction
+                        .waves
+                        .iter()
+                        .flat_map(|(a, b)| a.iter().chain(b))
+                        .chain(
+                            direction
+                                .features
+                                .iter()
+                                .flat_map(|(_, f, l)| f.iter().chain(l)),
+                        )
+                        .all(Zero::is_zero)
+                }));
+                let [(station, _, logits)] = &disconnected.point.features[..] else {
+                    panic!("one compared station");
+                };
+                assert_eq!(*station, 1);
+                assert_eq!(logits, &native);
+            }
+            _ => assert!(prospects[1].is_err()),
+        }
+        // The non-passive key's charts are refused before any image, live or held.
+        assert!(prospects[2].is_err());
+        predicted += 1;
+    }
+    assert!(predicted > 0);
+    // The compared station's actual readout was measured against the true key's at least once.
+    assert!(read_features > 0);
+}
+
+/// The fixture's action prepared on a receiver, before its encounter.
+fn prepare<'r, 'f>(
+    receiver: &'r mut PhysicalReceiver<'f>,
+    field: &Field,
+    source: &Encoded,
+    preparation: &PortPreparation,
+    request: &[Vec<Rat>],
+) -> PreparedPhysicalAction<'r, 'f> {
+    receiver
+        .prepare_action(
+            source,
+            &field.receivers()[0],
+            preparation,
+            request,
+            &[false, true],
+        )
+        .unwrap()
+}
+
+#[test]
+fn a_prospect_is_refused_without_a_world_model_and_moves_no_participant() {
+    let (field, theta, source) = fixture();
+    let mut read = receiver(&field, theta.clone());
+    let mut unread = receiver(&field, theta);
+    for receiver in [&mut read, &mut unread] {
+        receiver
+            .bind_world(world(
+                &field,
+                source.part(0..0).unwrap(),
+                medium(&unit_storage(), source_input(true)),
+            ))
+            .unwrap();
+    }
+    let preparation =
+        PortPreparation::new(&field, 0, ExactRatMatrix::identity(N).unwrap()).unwrap();
+    let request = vec![
+        vec![Rat::zero(); N],
+        vec![rat(1, 4), rat(1, 8), rat(1, 16), rat(-1, 32)],
+    ];
+    // Without a bound model the read refuses as a whole, and the action still executes.
+    {
+        let prepared = prepare(&mut read, &field, &source, &preparation, &request);
+        assert!(prepared.world_prospect().is_err());
+        steps_of(&prepared.encounter().unwrap());
+    }
+    steps_of(
+        &prepare(&mut unread, &field, &source, &preparation, &request)
+            .encounter()
+            .unwrap(),
+    );
+    let tick = read.participating_world().unwrap().state().commit;
+    assert_eq!(unread.participating_world().unwrap().state().commit, tick);
+    for receiver in [&mut read, &mut unread] {
+        receiver
+            .bind_world_model(
+                WorldModel::found(
+                    vec![key(&field, medium(&unit_storage(), source_input(true)))],
+                    tick,
+                )
+                .unwrap(),
+            )
+            .unwrap();
+    }
+    // With the model, two reads before the encounter return one exact prospect, and the
+    // encounter and the memory then equal those of a receiver that never read it.
+    for _ in 0..2 {
+        let prepared = prepare(&mut read, &field, &source, &preparation, &request);
+        if prepared.prospective().unique_control().is_some() {
+            let first = prepared.world_prospect().unwrap();
+            let second = prepared.world_prospect().unwrap();
+            assert_eq!(first[0].as_ref().unwrap(), second[0].as_ref().unwrap());
+        }
+        let with = steps_of(&prepared.encounter().unwrap());
+        let without = steps_of(
+            &prepare(&mut unread, &field, &source, &preparation, &request)
+                .encounter()
+                .unwrap(),
+        );
+        assert_eq!(with.len(), without.len());
+        for (a, b) in with.iter().zip(&without) {
+            assert_eq!(
+                (&a.incident, &a.reflected, &a.next),
+                (&b.incident, &b.reflected, &b.next)
+            );
+        }
+        assert_eq!(read.world_model().unwrap(), unread.world_model().unwrap());
+    }
 }
