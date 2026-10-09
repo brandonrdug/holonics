@@ -1,0 +1,40 @@
+{
+  "target": "Holonics.HNN.SourceReceiverReturn",
+  "wall_ns": 6298203133,
+  "projection_ns": 12779337307,
+  "peak_RSS_KiB": 253732,
+  "module_count": 5035,
+  "bound_path_count": 30565,
+  "source_prefix_inferred_absence_count": 18535,
+  "complete_ordered_import_part_seal": true,
+  "actual_namespace_lookup_verified": true,
+  "compiler_launched": false,
+  "events": [
+    {
+      "phase": "load only reusable source-SHA headers and present-part byte identities",
+      "wall_ns": 2146411344,
+      "upstream_path_rows_not_individually_validated": 213197,
+      "reusable_present_paths": 30805,
+      "reusable_headers": 5034
+    },
+    {
+      "phase": "resolve and seal every consumed source and ordered object part",
+      "wall_ns": 2558231613,
+      "module_count": 5035,
+      "bound_path_count": 30537,
+      "reused_headers": 5033,
+      "freshly_parsed_headers": 2
+    },
+    {
+      "phase": "independent namespace validation and complete selected metadata postcheck",
+      "wall_ns": 799281844
+    },
+    {
+      "phase": "serialize complete reduced current graph",
+      "wall_ns": 793314653,
+      "bytes": 44917863
+    }
+  ],
+  "unused_upstream_paths_not_reverified": 213197,
+  "same_source_claims_and_resource_enforcement": true
+}

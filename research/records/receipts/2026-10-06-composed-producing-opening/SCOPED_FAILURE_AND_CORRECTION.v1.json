@@ -1,0 +1,12 @@
+{
+  "status": "actual old producing proof failure; source-only direct-opening correction",
+  "source_base": "024b8c619e9c4de56e64a02669b37d05ee05d2ec",
+  "old_compiler_diagnostic": "ComposedConsumer.lean:151:42 unsolved hcomputed additive equality. Original theorem axiom query includes sorryAx because the producing proof failed; no acceptance.",
+  "old_wall_ns": 3895605241,
+  "old_projection_ns": 21132554884,
+  "old_CPU_ns": 3469349000,
+  "old_MemoryPeak_bytes": 767098880,
+  "correction": "Consume hopened.1 c directly under the existing actual receiver/loaded trajectory via congrArg. Same theorem statement, source operands, provider imports, facade, return and axiom selectors. No new theorem hypothesis or axiom.",
+  "dependents": "facade/audit/return UNRUN; accepted five prerequisite owner objects unchanged",
+  "queue_admission": "existing fixed controls; no unchanged failed replay or limit raise"
+}

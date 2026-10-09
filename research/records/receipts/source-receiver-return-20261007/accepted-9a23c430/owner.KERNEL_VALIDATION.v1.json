@@ -1,0 +1,56 @@
+{
+  "kernel_accepted": true,
+  "compiler_exit": 0,
+  "compiler_wall_ns": 10550533324,
+  "axioms": {
+    "Holonics.HNN.SourceReceiverReturn.blockTick_apply": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.SourceReceiverReturn.wordMapAt_apply": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.SourceReceiverReturn.sourceReturnAt_pairing": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.SourceReceiverReturn.sourceReturnAt_is_dual_of_sourceRead": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.SourceReceiverReturn.sourceReturnAt_unique": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.SourceReceiverReturn.sourceReturnAt_halfTurn": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.SourceReceiverReturn.sourceContrast_return": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.SourceReceiverReturn.partitionReturn_pairing": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.SourceReceiverReturn.normalizedAbsoluteLoaded_sourceReturn": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "selector_count_matches": true,
+  "standard_axioms_only": true,
+  "metadata_unchanged": true,
+  "broad_library_checked": false
+}

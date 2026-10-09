@@ -157,22 +157,22 @@ variable {Crossing : Type*}
 /-- Only the declared finite receiving partition contributes. Each crossing keeps its own
 relative tick, phase, anchor and receiving chart. Compatible source duals add, not foreign clocks. -/
 def partitionReturn (compared : Finset Crossing) (T : ℕ → BlockOp K M)
-    (at : Crossing → ℕ) (inject : Source →ₗ[K] ((b : B) → M b))
+    (relativeTick : Crossing → ℕ) (inject : Source →ₗ[K] ((b : B) → M b))
     (anchor : Crossing → ((b : B) → M b) →ₗ[K] Anchor)
     (phase : Crossing → Anchor →ₗ[K] Anchor)
     (receiving : Crossing → Anchor →ₗ[K] Logit) (g : Crossing → Module.Dual K Logit) :
     Module.Dual K Source :=
-  ∑ j ∈ compared, sourceReturnAt T (at j) inject (anchor j) (phase j) (receiving j) (g j)
+  ∑ j ∈ compared, sourceReturnAt T (relativeTick j) inject (anchor j) (phase j) (receiving j) (g j)
 
 theorem partitionReturn_pairing (compared : Finset Crossing) (T : ℕ → BlockOp K M)
-    (at : Crossing → ℕ) (inject : Source →ₗ[K] ((b : B) → M b))
+    (relativeTick : Crossing → ℕ) (inject : Source →ₗ[K] ((b : B) → M b))
     (anchor : Crossing → ((b : B) → M b) →ₗ[K] Anchor)
     (phase : Crossing → Anchor →ₗ[K] Anchor)
     (receiving : Crossing → Anchor →ₗ[K] Logit) (g : Crossing → Module.Dual K Logit)
     (delta : Source) :
-    partitionReturn compared T at inject anchor phase receiving g delta =
+    partitionReturn compared T relativeTick inject anchor phase receiving g delta =
       ∑ j ∈ compared,
-        g j (receiving j (phase j (anchor j (trajectoryAt T (inject delta) (at j))))) := by
+        g j (receiving j (phase j (anchor j (trajectoryAt T (inject delta) (relativeTick j))))) := by
   simp only [partitionReturn, LinearMap.sum_apply, sourceReturnAt_pairing]
 
 end Boundary

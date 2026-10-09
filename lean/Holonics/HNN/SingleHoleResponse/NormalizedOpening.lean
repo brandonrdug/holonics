@@ -53,7 +53,7 @@ theorem openedState_from_normalized_source
         (fun e => ν (Fintype.card Station - offset e)))) ∧
     (∀ c, SourceResponseShape
       (sourceInjection (responseSource edges hole known basis c (ν (Fintype.card Station)) P F Q
-        (fun e => ν (Fintype.card Station - offset e)))) := by
+        (fun e => ν (Fintype.card Station - offset e))))) := by
   have hsplit (c : Label) := populationNormalizedOneHoleSourceExpansion edges hole known basis c
     (Fintype.card Station) offset ν rfl P F Q hedges
   have hopen' (c : Label) : openComplete c = enteredInterior +

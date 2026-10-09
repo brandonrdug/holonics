@@ -1,0 +1,11 @@
+import Holonics.HNN.SourceReceiverReturn
+
+#print axioms Holonics.HNN.SourceReceiverReturn.blockTick_apply
+#print axioms Holonics.HNN.SourceReceiverReturn.wordMapAt_apply
+#print axioms Holonics.HNN.SourceReceiverReturn.sourceReturnAt_pairing
+#print axioms Holonics.HNN.SourceReceiverReturn.sourceReturnAt_is_dual_of_sourceRead
+#print axioms Holonics.HNN.SourceReceiverReturn.sourceReturnAt_unique
+#print axioms Holonics.HNN.SourceReceiverReturn.sourceReturnAt_halfTurn
+#print axioms Holonics.HNN.SourceReceiverReturn.sourceContrast_return
+#print axioms Holonics.HNN.SourceReceiverReturn.partitionReturn_pairing
+#print axioms Holonics.HNN.SourceReceiverReturn.normalizedAbsoluteLoaded_sourceReturn

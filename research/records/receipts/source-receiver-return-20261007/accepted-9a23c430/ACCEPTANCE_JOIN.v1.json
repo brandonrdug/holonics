@@ -1,0 +1,135 @@
+{
+  "source_commit": "9a23c430c49f1ae475207d9638fa3f5b4cbcd0e0",
+  "source_owner": {
+    "path": "lean/Holonics/HNN/SourceReceiverReturn.lean",
+    "bytes": 13154,
+    "sha256": "5d1206bdd3eaf390f00494f42a275361fb0e3e37d9cb6f373921293357ca0a05"
+  },
+  "independent_importer": {
+    "path": "SourceReceiverReturnAudit.lean",
+    "bytes": 696,
+    "sha256": "8a7d0ff4a5e110091a6993cbec1d2c82ee3c4d8171070a74f0357942170b6d5f"
+  },
+  "unique_theorems": 9,
+  "query_executions": 18,
+  "status": "WHOLE_OWNER_AND_INDEPENDENT_IMPORTER_PASS_STANDARD_AXIOMS_ONLY",
+  "rows": [
+    {
+      "role": "owner",
+      "kernel_receipt": "owner.KERNEL_VALIDATION.v1.json",
+      "compiler_stdout": "owner.compiler.v1.stdout",
+      "compiler_stderr": "owner.compiler.v1.stderr",
+      "compiler_wall_ns": 10550533324,
+      "resource_reading": {
+        "postcleanup_acceptance_passed": true,
+        "wall_ns": 12246704542,
+        "projection_ns": 21132554884,
+        "measured_to_projected_ratio": [
+          12246704542,
+          21132554884
+        ],
+        "aggregate_CPU_ns": 6314216000,
+        "group_peak_bytes": 4294967296,
+        "peak_child_RSS_KiB": 3563460,
+        "quiescent_release": true,
+        "scientific_pass_not_inferred_from_resource_pass": true
+      },
+      "compiled_object_parts": {
+        ".olean": {
+          "bytes": 488616,
+          "sha256": "0edc5cd49bc8bf8c086f4323644b34a5889dad37d47a9dc1cc501a3245255cdf"
+        },
+        ".ilean": {
+          "bytes": 21821,
+          "sha256": "da5df0ed89f45f565e3e8f8854b16c65764c8f554d284a0798e423eba0b8a00f"
+        }
+      },
+      "complete_namespace_seal_original": {
+        "bytes": 44917863,
+        "sha256": "2cac524de9b1f4b19583c7bd5caf93408c702d3b079258c9f1e67f006b60fd87"
+      },
+      "provider_namespace_original": {
+        "bytes": 245892,
+        "sha256": "dd355774c2e6f27af668374ea593360c9ef759150039f902f3f610f363ebe0f8"
+      },
+      "compiler_request_original": {
+        "bytes": 3125,
+        "sha256": "d93217945e162bc6b58768505459dc7eacd751934c1d36acdaf218f819bb663b"
+      },
+      "selected_compiler_scope": "Holonics.HNN.SourceReceiverReturn",
+      "selectors": [
+        "Holonics.HNN.SourceReceiverReturn.blockTick_apply",
+        "Holonics.HNN.SourceReceiverReturn.wordMapAt_apply",
+        "Holonics.HNN.SourceReceiverReturn.sourceReturnAt_pairing",
+        "Holonics.HNN.SourceReceiverReturn.sourceReturnAt_is_dual_of_sourceRead",
+        "Holonics.HNN.SourceReceiverReturn.sourceReturnAt_unique",
+        "Holonics.HNN.SourceReceiverReturn.sourceReturnAt_halfTurn",
+        "Holonics.HNN.SourceReceiverReturn.sourceContrast_return",
+        "Holonics.HNN.SourceReceiverReturn.partitionReturn_pairing",
+        "Holonics.HNN.SourceReceiverReturn.normalizedAbsoluteLoaded_sourceReturn"
+      ]
+    },
+    {
+      "role": "independent-importer",
+      "kernel_receipt": "independent-importer.KERNEL_VALIDATION.v1.json",
+      "compiler_stdout": "independent-importer.compiler.v1.stdout",
+      "compiler_stderr": "independent-importer.compiler.v1.stderr",
+      "compiler_wall_ns": 1595207486,
+      "resource_reading": {
+        "postcleanup_acceptance_passed": true,
+        "wall_ns": 3268636056,
+        "projection_ns": 21132554884,
+        "measured_to_projected_ratio": [
+          3268636056,
+          21132554884
+        ],
+        "aggregate_CPU_ns": 3030443000,
+        "group_peak_bytes": 599965696,
+        "peak_child_RSS_KiB": 3723300,
+        "quiescent_release": true,
+        "scientific_pass_not_inferred_from_resource_pass": true
+      },
+      "compiled_object_parts": {
+        ".olean": {
+          "bytes": 1560,
+          "sha256": "25bb788c754c7f1bb61065ce5b41ec56b797df7fcbafe2c443851f0d6cd71650"
+        },
+        ".ilean": {
+          "bytes": 1661,
+          "sha256": "da70b94482e8b933c64be69639793fc9c0a8c7b0018f65437700f64fbe784124"
+        }
+      },
+      "complete_namespace_seal_original": {
+        "bytes": 44945687,
+        "sha256": "bdfd51941e244f4c06ca5821485fdd0abe758648126129c938359398c39dd3da"
+      },
+      "provider_namespace_original": {
+        "bytes": 249612,
+        "sha256": "3bff05e2892b5c7b011b4467bd3a066f75cbb4c3d1dd540472621f544056af61"
+      },
+      "compiler_request_original": {
+        "bytes": 3433,
+        "sha256": "bbb3478c99058032541d79a4703c28a73e86bac22dbb0689625afd0431d64f08"
+      },
+      "selected_compiler_scope": "SourceReceiverReturnAudit",
+      "selectors": [
+        "Holonics.HNN.SourceReceiverReturn.blockTick_apply",
+        "Holonics.HNN.SourceReceiverReturn.wordMapAt_apply",
+        "Holonics.HNN.SourceReceiverReturn.sourceReturnAt_pairing",
+        "Holonics.HNN.SourceReceiverReturn.sourceReturnAt_is_dual_of_sourceRead",
+        "Holonics.HNN.SourceReceiverReturn.sourceReturnAt_unique",
+        "Holonics.HNN.SourceReceiverReturn.sourceReturnAt_halfTurn",
+        "Holonics.HNN.SourceReceiverReturn.sourceContrast_return",
+        "Holonics.HNN.SourceReceiverReturn.partitionReturn_pairing",
+        "Holonics.HNN.SourceReceiverReturn.normalizedAbsoluteLoaded_sourceReturn"
+      ]
+    }
+  ],
+  "accepted_prior_providers_recompiled": false,
+  "150_local_source_bytes_match_accepted_snapshot": true,
+  "source_or_proof_changes_in_this_acceptance_commit": false,
+  "broad_library_checked": false,
+  "native_rational_Encoded_clock_lattice_instantiation_checked": false,
+  "new_axiom_or_sorry_acceptance": false,
+  "prior_failed_source_and_receipts_preserved": true
+}

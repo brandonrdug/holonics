@@ -1,0 +1,13 @@
+'Holonics.HNN.SourceReceiverReturn.blockTick_apply' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.HNN.SourceReceiverReturn.wordMapAt_apply' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.HNN.SourceReceiverReturn.sourceReturnAt_pairing' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.HNN.SourceReceiverReturn.sourceReturnAt_is_dual_of_sourceRead' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.HNN.SourceReceiverReturn.sourceReturnAt_unique' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.HNN.SourceReceiverReturn.sourceReturnAt_halfTurn' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.HNN.SourceReceiverReturn.sourceContrast_return' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.HNN.SourceReceiverReturn.partitionReturn_pairing' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.HNN.SourceReceiverReturn.normalizedAbsoluteLoaded_sourceReturn' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
