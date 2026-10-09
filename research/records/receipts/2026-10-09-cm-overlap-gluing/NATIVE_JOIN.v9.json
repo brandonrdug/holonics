@@ -1,0 +1,85 @@
+{
+  "status": "PASS whole owner59 and exact importer7 standard axioms only",
+  "source_sha256": "2b213f4bcad6cd8bd466729ed9abbb32fecf378526a4cae786b5220c1251fc79",
+  "owner": {
+    "receipt": "research/records/receipts/2026-10-09-cm-overlap-gluing/native-v9-first-read/HANDOFF.md",
+    "compiler_wall_ns": 22043201797,
+    "queries": 59,
+    "results": [
+      {
+        "unit": "prep",
+        "accepted": true,
+        "wall_ns": 6241957996,
+        "projection_ns": 17000000000,
+        "aggregate_CPU_ns": 5277291000,
+        "group_peak_B": 328241152,
+        "group_limit_B": 8589934592,
+        "measured_to_projected": {
+          "numerator": 6241957996,
+          "denominator": 17000000000
+        },
+        "quiescent_released": true
+      },
+      {
+        "unit": "compile",
+        "accepted": true,
+        "wall_ns": 24629226481,
+        "projection_ns": 55692054986,
+        "aggregate_CPU_ns": 15394109000,
+        "group_peak_B": 4709187584,
+        "group_limit_B": 8589934592,
+        "measured_to_projected": {
+          "numerator": 24629226481,
+          "denominator": 55692054986
+        },
+        "quiescent_released": true
+      }
+    ]
+  },
+  "importer": {
+    "receipt": "research/records/receipts/2026-10-09-cm-overlap-gluing/native-v9-import/HANDOFF.md",
+    "compiler_wall_ns": 8590564179,
+    "queries": 7,
+    "results": [
+      {
+        "unit": "prep",
+        "accepted": true,
+        "wall_ns": 5998584626,
+        "projection_ns": 17000000000,
+        "aggregate_CPU_ns": 5223613000,
+        "group_peak_B": 506945536,
+        "group_limit_B": 8589934592,
+        "measured_to_projected": {
+          "numerator": 5998584626,
+          "denominator": 17000000000
+        },
+        "quiescent_released": true
+      },
+      {
+        "unit": "compile",
+        "accepted": true,
+        "wall_ns": 10665492530,
+        "projection_ns": 21132554884,
+        "aggregate_CPU_ns": 5634477000,
+        "group_peak_B": 4635521024,
+        "group_limit_B": 8589934592,
+        "measured_to_projected": {
+          "numerator": 10665492530,
+          "denominator": 21132554884
+        },
+        "quiescent_released": true
+      }
+    ]
+  },
+  "previous_failed_source_and_native_receipts_preserved": true,
+  "full_library_checked": false,
+  "remaining_obligations": [
+    "native Proj chart inclusion square / actual global gluing",
+    "global analytic carrier and periods",
+    "graph/diagonal fundamental H2 currents and Thom/Poincare/Betti comparison",
+    "source-qualified egg arithmetic group transport",
+    "general rational(p,p) cycle lifts / sphere H4 filling / whole-power spanning / BSD"
+  ],
+  "source_edits_or_publication_by_queue": false,
+  "queue_quiescent_released": true
+}

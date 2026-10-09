@@ -1,0 +1,46 @@
+{
+  "kernel_accepted": true,
+  "compiler_exit": 0,
+  "compiler_wall_ns": 8590564179,
+  "axioms": {
+    "Holonics.Hodge.CMGraphSource.cmYOverlap_roundtrip": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmZOverlap_roundtrip": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmActualCubicOverlapRingEquiv": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmActualCubicOverlap_evaluation_square": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmActualCubicOverlap_spec_evaluation_square": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmYOverlapReceiver_actual_point": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Hodge.CMGraphSource.cmZOverlapReceiver_actual_point": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "selector_count_matches": true,
+  "standard_axioms_only": true,
+  "metadata_unchanged": true,
+  "broad_library_checked": false
+}

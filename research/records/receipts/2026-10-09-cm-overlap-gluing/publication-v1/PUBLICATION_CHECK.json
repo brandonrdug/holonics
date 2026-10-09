@@ -1,0 +1,16 @@
+{
+  "status": "PASS exact public source, acceptance, provider/import and atlas/index bindings",
+  "sealed_files_verified": 173,
+  "providers": 117,
+  "owner_queries": 59,
+  "importer_queries": 7,
+  "selected_import_modules": {
+    "owner": 5119,
+    "importer": 5120
+  },
+  "native_or_library_jobs_launched": false,
+  "canonical_relocation_checked": false,
+  "projection_ns": 7482721030,
+  "measured_wall_ns": 81050282,
+  "peak_resident_bytes": 47300608
+}

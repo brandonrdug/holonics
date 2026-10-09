@@ -1,0 +1,212 @@
+{
+  "raw_import_seal_fingerprint": {
+    "sha256": "f0a8a98ec28e0e7452b36c6c42ec0c80a9cc6a1c80479bf7e14990ea8d4d7726",
+    "bytes": 53963535
+  },
+  "target": "CMActualGraphDiagonalAnalyticCutAudit",
+  "module_count": 5120,
+  "ordered_object_namespaces": [
+    {
+      "ordinal": 0,
+      "role": "target namespace"
+    },
+    {
+      "ordinal": 1,
+      "role": "frozen CM provider namespace"
+    },
+    {
+      "ordinal": 2,
+      "role": "package physlib"
+    },
+    {
+      "ordinal": 3,
+      "role": "package cslib"
+    },
+    {
+      "ordinal": 4,
+      "role": "package mathlib"
+    },
+    {
+      "ordinal": 5,
+      "role": "package plausible"
+    },
+    {
+      "ordinal": 6,
+      "role": "package LeanSearchClient"
+    },
+    {
+      "ordinal": 7,
+      "role": "package importGraph"
+    },
+    {
+      "ordinal": 8,
+      "role": "package proofwidgets"
+    },
+    {
+      "ordinal": 9,
+      "role": "package aesop"
+    },
+    {
+      "ordinal": 10,
+      "role": "package Qq"
+    },
+    {
+      "ordinal": 11,
+      "role": "package batteries"
+    },
+    {
+      "ordinal": 12,
+      "role": "toolchain or frozen source namespace"
+    }
+  ],
+  "ordered_source_namespaces": [
+    {
+      "ordinal": 0,
+      "role": "target namespace"
+    },
+    {
+      "ordinal": 1,
+      "role": "toolchain or frozen source namespace"
+    },
+    {
+      "ordinal": 2,
+      "role": "frozen CM provider namespace"
+    },
+    {
+      "ordinal": 3,
+      "role": "package physlib"
+    },
+    {
+      "ordinal": 4,
+      "role": "package cslib"
+    },
+    {
+      "ordinal": 5,
+      "role": "package mathlib"
+    },
+    {
+      "ordinal": 6,
+      "role": "package «doc-gen4»"
+    },
+    {
+      "ordinal": 7,
+      "role": "package plausible"
+    },
+    {
+      "ordinal": 8,
+      "role": "package LeanSearchClient"
+    },
+    {
+      "ordinal": 9,
+      "role": "package importGraph"
+    },
+    {
+      "ordinal": 10,
+      "role": "package proofwidgets"
+    },
+    {
+      "ordinal": 11,
+      "role": "package aesop"
+    },
+    {
+      "ordinal": 12,
+      "role": "package Qq"
+    },
+    {
+      "ordinal": 13,
+      "role": "package batteries"
+    },
+    {
+      "ordinal": 14,
+      "role": "package leansqlite"
+    },
+    {
+      "ordinal": 15,
+      "role": "package Cli"
+    },
+    {
+      "ordinal": 16,
+      "role": "package UnicodeBasic"
+    },
+    {
+      "ordinal": 17,
+      "role": "package BibtexQuery"
+    },
+    {
+      "ordinal": 18,
+      "role": "package MD4Lean"
+    },
+    {
+      "ordinal": 19,
+      "role": "toolchain or frozen source namespace"
+    },
+    {
+      "ordinal": 20,
+      "role": "toolchain or frozen source namespace"
+    }
+  ],
+  "actual_namespace_lookup_verified": true,
+  "hash_reuse_assumptions": "The pinned RH catalog is immutable and its stored digests came from prior byte hashing. Cataloged files remain immutable through preparation and compiler execution; matching presence/size/mtime/ctime permits digest reuse, not a fresh byte read. Postcheck compares lstat/stat metadata and symlink targets without rehashing. This requires truthful filesystem metadata and no privileged or adversarial mutation that preserves/restores all checked stamps.",
+  "metadata_unchanged_during_native_check": true,
+  "publication_scope": "Exact selected module/source/part pins and edges. Host paths/stamps omitted; canonical relocation remains unchecked.",
+  "exact_binding_overlay": {
+    "base": "SELECTED_IMPORT_BINDINGS.owner.json",
+    "unchanged_base_entries": 5118,
+    "replaced": [
+      {
+        "module": "CMActualGraphDiagonalAnalyticCut",
+        "source_sha256": "2b213f4bcad6cd8bd466729ed9abbb32fecf378526a4cae786b5220c1251fc79",
+        "imports": [
+          "CMActualFiniteCutCyclePushforward",
+          "Mathlib.Analysis.Calculus.InverseFunctionTheorem.ContDiff",
+          "Mathlib.Analysis.Calculus.FDeriv.Pow",
+          "Mathlib.Analysis.Calculus.FDeriv.Mul",
+          "Mathlib.Analysis.Calculus.FDeriv.Prod",
+          "Mathlib.Analysis.Calculus.Deriv.Mul",
+          "Mathlib.Analysis.Calculus.Deriv.Prod",
+          "Mathlib.MeasureTheory.Integral.CircleIntegral",
+          "Init"
+        ],
+        "parts": {
+          "main": {
+            "present": true,
+            "sha256": "bc4194520b820f595aac8ccbe986b8d091c2a2ff3795bf62ef25d755f5ecfd03",
+            "hash_source": "fresh-bytes-and-stable-metadata",
+            "bytes": 1857160
+          },
+          "server": {
+            "present": false,
+            "hash_source": "fresh-bytes-and-stable-metadata"
+          },
+          "private": {
+            "present": false,
+            "hash_source": "fresh-bytes-and-stable-metadata"
+          },
+          "ir.sig": {
+            "present": false,
+            "hash_source": "fresh-bytes-and-stable-metadata"
+          },
+          "ir": {
+            "present": false,
+            "hash_source": "fresh-bytes-and-stable-metadata"
+          }
+        },
+        "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/v9/source-v9/CMActualGraphDiagonalAnalyticCut.lean"
+      }
+    ],
+    "added": [
+      {
+        "module": "CMActualGraphDiagonalAnalyticCutAudit",
+        "source_sha256": "61c683a8eaf8c29891072b6d385babf1795e93d9cb8739e1483fc8ba23a77a8e",
+        "imports": [
+          "CMActualGraphDiagonalAnalyticCut",
+          "Init"
+        ],
+        "parts": {},
+        "publication_source": "research/records/receipts/2026-10-09-cm-overlap-gluing/v9/source-v9/CMActualGraphDiagonalAnalyticCutAudit.lean"
+      }
+    ],
+    "removed": [],
+    "construction": "exact field equality checked for every unchanged source/part/import-edge entry; reconstruct as base with replacements/additions/removals"
+  }
+}

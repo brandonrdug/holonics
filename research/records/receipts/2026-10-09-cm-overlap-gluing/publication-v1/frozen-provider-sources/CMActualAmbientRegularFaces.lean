@@ -1,0 +1,8 @@
+import CMActualYRegularFaces
+import CMActualZRegularFaces
+
+noncomputable section
+namespace Holonics.Hodge.CMGraphSource
+#print axioms yGraphPActual_regular_equation
+#print axioms zGraphFactorActual_regular_equation
+end Holonics.Hodge.CMGraphSource

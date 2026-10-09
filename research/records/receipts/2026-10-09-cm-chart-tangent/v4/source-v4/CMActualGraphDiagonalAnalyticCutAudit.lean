@@ -1,0 +1,10 @@
+import CMActualGraphDiagonalAnalyticCut
+
+open Holonics.Hodge.CMGraphSource
+#print axioms cmYToZOverlap_tangentKernel_returns
+#print axioms cmActualCubic_tangentClock_overlap_of_tangent
+#print axioms cmActualCubic_tangentPath_overlap
+#print axioms cmActualCubic_tangentClock_Y_action
+#print axioms cmActualCubic_tangentClock_Z_action
+#print axioms cmActualCubic_overlap_receiver_coordinates
+#print axioms cmActualCubic_overlap_point_actual_action

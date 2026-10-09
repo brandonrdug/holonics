@@ -1,0 +1,209 @@
+CMActualGraphDiagonalAnalyticCut.lean:55:25: warning: This simp argument is unused:
+  Complex.I_sq
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [cmI_cube]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+CMActualGraphDiagonalAnalyticCut.lean:55:10: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+CMActualGraphDiagonalAnalyticCut.lean:55:49: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+CMActualGraphDiagonalAnalyticCut.lean:60:10: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+CMActualGraphDiagonalAnalyticCut.lean:60:39: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+CMActualGraphDiagonalAnalyticCut.lean:218:6: warning: `ext` did not consume the patterns `p`
+
+Note: This linter can be disabled with `set_option linter.unusedRCasesPattern false`
+CMActualGraphDiagonalAnalyticCut.lean:237:6: warning: `ext` did not consume the patterns `p`
+
+Note: This linter can be disabled with `set_option linter.unusedRCasesPattern false`
+'Holonics.Hodge.CMGraphSource.cmYPlanePoint_origin' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmZPlanePoint_origin' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYPlanePoint_actual_action' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmZPlanePoint_actual_action' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYAnalyticGerm_contDiff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmZAnalyticGerm_contDiff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYAnalyticGerm_coordinates' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmZAnalyticGerm_coordinates' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYAnalyticGerm_actual_source' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmZAnalyticGerm_actual_source' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYAnalyticGerm_graph_minus_diagonal' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmZAnalyticGerm_graph_minus_diagonal' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmActualGraphDiagonal_small_radius' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmGraphDiagonalLocalWinding_eq_Y_Serre' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmGraphDiagonalLocalWinding_eq_Z_Serre' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmActualFiniteCutPushforward_eq_two_localWindings' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmActualLocalWinding_source_radius' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmActualFiniteCutPushforward_actual_analytic_source' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+CMActualGraphDiagonalAnalyticCut.lean:672:2: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+CMActualGraphDiagonalAnalyticCut.lean:705:4: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+CMActualGraphDiagonalAnalyticCut.lean:707:4: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+CMActualGraphDiagonalAnalyticCut.lean:721:8: warning: Unused tactic linter: `simp only [Complex.I_sq]` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+CMActualGraphDiagonalAnalyticCut.lean:722:8: warning: Unused tactic linter: `ring` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+CMActualGraphDiagonalAnalyticCut.lean:725:8: warning: Unused tactic linter: `ring` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+CMActualGraphDiagonalAnalyticCut.lean:721:8: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+CMActualGraphDiagonalAnalyticCut.lean:722:8: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+CMActualGraphDiagonalAnalyticCut.lean:725:8: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+CMActualGraphDiagonalAnalyticCut.lean:724:4: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+CMActualGraphDiagonalAnalyticCut.lean:735:18: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+CMActualGraphDiagonalAnalyticCut.lean:802:14: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+CMActualGraphDiagonalAnalyticCut.lean:802:43: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+CMActualGraphDiagonalAnalyticCut.lean:808:56: warning: This simp argument is unused:
+  mul_pow
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [cmZPlaneAction, cmZTangentField, smul_eq_mul, Complex.I_sq]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+CMActualGraphDiagonalAnalyticCut.lean:808:65: warning: This simp argument is unused:
+  Complex.I_sq
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [cmZPlaneAction, cmZTangentField, smul_eq_mul, mul_pow]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+CMActualGraphDiagonalAnalyticCut.lean:809:2: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+CMActualGraphDiagonalAnalyticCut.lean:809:14: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+CMActualGraphDiagonalAnalyticCut.lean:809:43: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+CMActualGraphDiagonalAnalyticCut.lean:857:35: warning: This simp argument is unused:
+  hfirst
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [cmTangentClockReading, hfirstZero, hsecond, htangentFirst, smul_eq_mul]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+'Holonics.Hodge.CMGraphSource.cmYToZOverlap_inverse' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmZToYOverlap_inverse' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYToZOverlap_equation' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYToZOverlap_actual_source' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYToZOverlap_hasDerivAt' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYToZOverlap_tangent_residual' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYToZOverlap_tangent_returns' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYToZOverlap_actual_action' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYToZOverlap_equationTangent_residual' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYToZOverlap_tangentKernel_returns' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYTangentField_tangent' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmZTangentField_tangent' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYTangentField_bezout' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmZTangentField_bezout' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYTangentField_ne_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmZTangentField_ne_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYTangentField_actual_action' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmZTangentField_actual_action' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYToZOverlapTangent_smul' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmTangentClockReading_smul' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmTangentClockReading_reconstructs' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYTangentClockReading_reconstructs' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmZTangentClockReading_reconstructs' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmActualCubic_tangentClock_overlap' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmActualCubic_tangentClock_overlap_of_tangent' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmActualCubic_tangentPath_overlap' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmActualCubic_tangentClock_Y_action' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmActualCubic_tangentClock_Z_action' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmActualCubic_overlap_receiver_coordinates' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmActualCubic_overlap_point_actual_action' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+CMActualGraphDiagonalAnalyticCut.lean:1329:12: error: typeclass instance problem is stuck
+  DivisionMonoid ?m.122
+
+Note: Lean will not try to resolve this typeclass instance problem because the type argument to `DivisionMonoid` is a metavariable. This argument must be fully determined before Lean will try to resolve the typeclass.
+
+Hint: Adding type annotations and supplying implicit arguments to functions can give Lean more information for typeclass resolution. For example, if you have a variable `x` that you intend to be a `Nat`, but Lean reports it as having an unresolved type like `?m`, replacing `x` with `(x : Nat)` can get typeclass resolution un-stuck.
+'Holonics.Hodge.CMGraphSource.cmOverlap_Y_source_of_Z' depends on axioms: [propext, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmOverlap_Z_source_of_Y' depends on axioms: [propext, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYOverlapCoordinates_source' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmZOverlapCoordinates_source' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYOverlap_roundtrip' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmZOverlap_roundtrip' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmActualCubicOverlapRingEquiv' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmActualCubicOverlap_evaluation_square' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmActualCubicOverlap_spec_evaluation_square' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmYOverlapReceiver_actual_point' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Hodge.CMGraphSource.cmZOverlapReceiver_actual_point' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
