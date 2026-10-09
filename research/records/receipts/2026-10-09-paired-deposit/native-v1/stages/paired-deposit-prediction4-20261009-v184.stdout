@@ -1,0 +1,6 @@
+
+running 1 test
+test hnn::tests::prediction::the_pair_gain_is_the_joined_banks_determinant_and_a_neutral_member_does_not_move_it ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1173 filtered out; finished in 0.00s
+

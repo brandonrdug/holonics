@@ -369,7 +369,8 @@ Its second part states the perfected laws:
      port the constitution holds now, and names the first failing column.
    - Term 3. The unit tick is certified from the field: every class of the family fits the source
      ring's lock, and no earlier ring of the carry chain ticks. Letter-selected clocks are refused.
-   - Term 4. Declared pair offsets are refused; the pair-port reversal law is owed.
+   - Term 4. Declared pair offsets are refused at the moment; the moment's pair-port reversal is owed
+     (the deposit's reversal law is step 3, below).
    - Term 5. Located moments are refused; the located moment chart is owed.
    - Term 6. The partner law is read at `SourceMoment::encode` and `open_storage`, through
      `SourceMoment::dyad`. The dyad reflects the counts in phase and complements them in class,
@@ -379,10 +380,25 @@ Its second part states the perfected laws:
    - **Information: redundancy.** At the retained quotient of this undamped carrier the partner face
      is a function of the forward face and `n`. Over 1,365 words, no group of equal length and
      forward face had two partner faces. The partner is a check, not new information.
-   - **Not built: an equivariant deposition.** `pair_deposit` moves `E − E₀` without preserving
-     `B E = E Σ_σ`, so after a reached deposit the partner read refuses at the first failing column.
-     An equivariant deposit needs the reversed-pair adjoint, the pair-port reversal law; mirrored
-     columns are not that law.
+   - **Step 3, the equivariant deposition** (`implemented-exact`, `measured`, October 9; Lean
+     `HNN/PairedDeposit` kernel-checked; the
+     [receipt](receipts/2026-10-09-paired-deposit/PUBLICATION.md); the owner's header, `hnn::paired`,
+     "The paired deposit").
+     - Loop 1 ran the derived defect: one forward `pair_deposit` moves `E − E₀` at its consequence's
+       column alone, and the partner read then refuses at that column against its partner.
+     - Loop 2 built the pair-port reversal law. With `B E₀ = E₀ Σ`, `B E = E Σ` and `B P B = P⁻¹`, the
+       lift of a located pair's slip is the slip of its dyad image read against the clock,
+       `B Δ_y = P^(−δ) E₀ e_(σy) − (E − E₀) e_(σf(y))`. `PairedCarrier::deposit` reads that image by its
+       own law at `−δ`, checks the identity at every pair, puts both orientations into one certified
+       step and re-admits the successor.
+     - On a duplex whose strands move disjoint columns, one deposit closed both strands' slips (8 to 0
+       at `η = 2`) with the port equivariant and the partner face exact, while the forward deposit
+       alone left the subspace.
+     - Where a law's dyad images share columns with its forward reads, three deposits descended toward
+       10, the law's incompatibility with the pairing (remainders `715827883/2³⁰`, `57264483/2³¹`,
+       `5260321/2³⁰` above it).
+     - Mirrored columns are not this law: the image is read, never copied.
+     - Loop 3 carries the pairing to every route as a constraint of the source law.
 
    **The general partner law and its scope** (`proved-derived` for the identity, owed in Lean).
    - **The identity.** For a uniform tick, an involution `B` and `B E = E σ`, the recurrence face
@@ -404,12 +420,11 @@ Its second part states the perfected laws:
      - or a report of redundancy.
 
    **Deferred to later steps, named.**
-   - The next helical step builds on step 2, which is built (above). An actually reached deposit
-     changes `E`. The partner consumer then reads the changed port with its exact relation or typed
-     defect, and the later response is read. An equivariant deposition needs the pair-port reversal
-     law (the reversed-pair adjoint).
-   - Step 3: the linking reading of a closed duplex and its crossing changes. No current crate
-     reads the linking number, and the retired owner is at `13f8c734`.
+   - Step 3, the equivariant deposition, is built on the pair route (above); its general route is
+     loop 3.
+   - Step 4: the linking reading of a closed duplex and its crossing changes. No current crate
+     reads the linking number, and the retired owner is at `13f8c734`. Its consumer in the machine
+     is named before it is built.
 
    **A runnable example** (`implemented-exact`; a known-truth smoke run, not a regression or product
    gate). `crates/holonics/examples/helical_duplex.rs` (`9e8041d0a`), run with

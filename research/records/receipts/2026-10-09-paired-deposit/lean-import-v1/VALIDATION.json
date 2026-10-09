@@ -1,0 +1,130 @@
+{
+  "source_admission": {
+    "source_commit": "9ba6fe000d752556cf0e08694481f18c06d09166",
+    "root_import": "<queue-admission>/paired-deposit-lean-20261009-v183/HNN.submitted.lean",
+    "root_pin": {
+      "sha256": "3d446fe68cf18c81710672ff37d04472a67901106f9adb9023c4f60e3d4f964f",
+      "bytes": 45829
+    },
+    "actual_added_line_number": 11,
+    "actual_added_import": "import Holonics.HNN.PairedDeposit",
+    "consumer_source": "<queue-admission>/paired-deposit-import-20261009-v185/source-v1/PairedDepositImportConsumer.lean",
+    "consumer_pin": {
+      "sha256": "e57728f159b4d0fd08d94377dbbcb8aa1ac6a3b8b88cea04ce6b076427c5545b",
+      "bytes": 517
+    },
+    "expected_selectors": [
+      "Holonics.HNN.PairedDeposit.lift_pow",
+      "Holonics.HNN.PairedDeposit.reversal_identity",
+      "Holonics.HNN.PairedDeposit.mul_commuting_stays",
+      "Holonics.HNN.PairedDeposit.deposit_stays_equivariant",
+      "Holonics.HNN.PairedDeposit.symmetrized_commutes",
+      "Holonics.HNN.PairedDeposit.symmetrized_residual",
+      "Holonics.HNN.PairedDeposit.rowNorm_smul_le",
+      "Holonics.HNN.PairedDeposit.symmetrized_rowNorm_le"
+    ],
+    "full_HNN_aggregate_compiled": false,
+    "exact_HNN_new_import_consumed": true,
+    "native_finite_decrease_validated_separately": true,
+    "accepted_provider_kernel": "<queue-admission>/paired-deposit-lean-20261009-v183/KERNEL_VALIDATION.json",
+    "target": "PairedDepositImportConsumer",
+    "selectors": [
+      "Holonics.HNN.PairedDeposit.lift_pow",
+      "Holonics.HNN.PairedDeposit.reversal_identity",
+      "Holonics.HNN.PairedDeposit.mul_commuting_stays",
+      "Holonics.HNN.PairedDeposit.deposit_stays_equivariant",
+      "Holonics.HNN.PairedDeposit.symmetrized_commutes",
+      "Holonics.HNN.PairedDeposit.symmetrized_residual",
+      "Holonics.HNN.PairedDeposit.rowNorm_smul_le",
+      "Holonics.HNN.PairedDeposit.symmetrized_rowNorm_le"
+    ],
+    "scope": "Exact affected HNN import; accepted paired-deposit law consumed, not full default library."
+  },
+  "kernel_accepted": true,
+  "compiler_exit": 0,
+  "compiler_wall_ns": 5464937742,
+  "queries_required": 8,
+  "queries_reached": 8,
+  "nonstandard_queries": [],
+  "meaningful_error_records": [],
+  "all_query_results": {
+    "Holonics.HNN.PairedDeposit.lift_pow": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.PairedDeposit.reversal_identity": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.PairedDeposit.mul_commuting_stays": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.PairedDeposit.deposit_stays_equivariant": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.PairedDeposit.symmetrized_commutes": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.PairedDeposit.symmetrized_residual": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.PairedDeposit.rowNorm_smul_le": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.PairedDeposit.symmetrized_rowNorm_le": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "metadata_unchanged": true,
+  "results": [
+    {
+      "unit": "prep",
+      "accepted": true,
+      "wall_ns": 5274065974,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 4757002000,
+      "group_peak_B": 347127808,
+      "group_limit_B": 8589934592,
+      "measured_to_projected": {
+        "numerator": 5274065974,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true
+    },
+    {
+      "unit": "compile",
+      "accepted": true,
+      "wall_ns": 7387014755,
+      "projection_ns": 21132554884,
+      "aggregate_CPU_ns": 4528794000,
+      "group_peak_B": 1406992384,
+      "group_limit_B": 8589934592,
+      "measured_to_projected": {
+        "numerator": 7387014755,
+        "denominator": 21132554884
+      },
+      "quiescent_released": true
+    }
+  ],
+  "importer_launched": false,
+  "whole_owner_acceptance_required_before_importer": true,
+  "prior_failed_sources_and_logs_preserved": true,
+  "no_unchanged_retry_or_within_job_limit_raise": true,
+  "current_user_authorized_8GiB": true,
+  "provider_rebuilt": false,
+  "queue_quiescent_released": true
+}

@@ -1,0 +1,16 @@
+
+running 11 tests
+test hnn::tests::executed::a_checkpoint_is_refused_onto_foreign_material_and_when_damaged ... ok
+test hnn::tests::executed::a_continuing_state_carries_the_receptions_end_inside_its_check ... ok
+test hnn::tests::executed::a_port_holding_no_class_refuses_the_pair_deposit ... ok
+test hnn::tests::executed::a_reading_is_zero_or_past_the_lattices_floor ... ok
+test hnn::tests::executed::a_restored_checkpoint_continues_exactly_over_successive_deposits ... ok
+test hnn::tests::executed::the_covector_pairs_with_the_exact_variation_three_ways ... ok
+test hnn::tests::executed::the_covector_predicts_the_executed_growths_change ... ok
+test hnn::tests::executed::the_dominant_multiplier_is_certified_or_refused_by_type ... ok
+test hnn::tests::executed::the_located_pairs_deposit_closes_its_slip_and_its_consumer_holds ... ok
+test hnn::tests::executed::the_monodromys_variation_is_its_derivative_forward_and_in_reverse ... ok
+test hnn::tests::executed::two_members_tied_in_growth_are_both_active ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 1163 filtered out; finished in 15.69s
+

@@ -1,0 +1,4 @@
+order-2 seed 42: field and deposit 44280564 ns
+order-2 seed 42: bank and refinement 80531 ns
+order-2 seed 42: request 71914 ns
+order-2 seed 42: generation 13354665257 ns

@@ -1,0 +1,39 @@
+{
+  "source_commit": "f8ac14ba675b93152a765445def41603d70a4959",
+  "tree": "fb847729b205365d9dc1e6c31bc73bd53fe7389c",
+  "loop2_scoped_gate_accepted": true,
+  "native_current_acceptances": 41,
+  "fresh_seed_acceptances": 4,
+  "unchanged_source_matched_acceptances": 37,
+  "doctest57_source_matched": true,
+  "Lean_owner8_and_HNN_import8_source_matched": true,
+  "previous_incomplete_receipts_preserved": {
+    "path": "<repository>/research/records/receipts/2026-10-09-paired-deposit/NATIVE_LEAN_JOIN.v1.json",
+    "pin": {
+      "sha256": "10f824f80cfbfec17c5f6db326d06b2089160ebbac0427d837e8eef2f864faa9",
+      "bytes": 2610
+    }
+  },
+  "new_completed_source_read": {
+    "path": "<repository>/research/records/receipts/2026-10-09-paired-deposit/release-read-v2/VALIDATION.json",
+    "pin": {
+      "sha256": "e083747958e831855de0f90b3f41f7bdfc828afefe63f23517fb7d8557057fde",
+      "bytes": 9574
+    }
+  },
+  "completed_largest_one_seed_wall_ns": 15151764044,
+  "completed_largest_one_seed_aggregateCPU_ns": 15031311000,
+  "combined_two_seed_workload_projection_ns": 30303528088,
+  "projection_note": "This is new evidence of legitimate finite work, not authorization for an unchanged old test rerun. The four source-partitioned tests already cover both old acceptances. No larger window was required.",
+  "j8_600_answer": "Cargo-j8 rejected for8GiB unproven compiler concurrency;4cores/2jobs supported and actualcompilePASS. Runtime600s unjustified: largestcompleteone-seedstage15151764044ns; two-seedupperprojection30303528088ns. CurrentpartitionedconsumersallPASSwithoriginal17scontrols.",
+  "queue_lease_free": true,
+  "next_ready_source_unvalidated": {
+    "commit": "1f2dda5324acfd5e0f656a6f952e7230b645efd8",
+    "tree": "da9a067dd6552cd714a17f09e8024038b19d2898",
+    "mailbox": "eda78888f2314874976384593374cca0",
+    "scope": "Native whole paired-source law/symmetrized chart/save/restore;10Leanselectors. Requiresfreshsource review/admission; no acceptance inherited fromloop2."
+  },
+  "queue_production_source_edits": false,
+  "publication": false,
+  "no_limits_raised": true
+}

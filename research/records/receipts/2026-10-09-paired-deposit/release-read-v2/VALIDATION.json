@@ -1,0 +1,298 @@
+{
+  "source_commit": "f8ac14ba675b93152a765445def41603d70a4959",
+  "source_tree": "fb847729b205365d9dc1e6c31bc73bd53fe7389c",
+  "whole_native_gate_accepted_via_source_matched_join": true,
+  "four_changed_seed_fixtures_passed": 4,
+  "unchanged_required_native_fixtures_source_matched": 37,
+  "total_required_current_native_fixtures": 41,
+  "57doctests_prior_source_matched": true,
+  "Lean_owner8_and_HNN_import8_prior_source_matched": true,
+  "actual_changed_file": "crates/holonics/src/hnn/tests/prediction.rs",
+  "349other_native_inputs_match": true,
+  "prior_commit": "9ba6fe000d752556cf0e08694481f18c06d09166",
+  "prior_failed_tests_preserved_as_incomplete": [
+    {
+      "name": "paired-deposit-prediction3-20261009-v184",
+      "stop_us": 16000000,
+      "cap_us": 17000000,
+      "CPU_ns": 16093785000,
+      "whole_wall_ns": 16214177135,
+      "child_wall_ns": 15930279870,
+      "peak_RSS_KiB": 23820,
+      "group_peak_B": 44634112,
+      "progress": "Test entered; no phase lines existed, no final test result",
+      "OOM": false,
+      "native_CPU_reading": "whole dedicated cgroup includes test descendants; timeout wait4 childCPU is not wholejobCPU"
+    },
+    {
+      "name": "paired-deposit-prediction5-20261009-v184",
+      "stop_us": 16000000,
+      "cap_us": 17000000,
+      "CPU_ns": 16096903000,
+      "whole_wall_ns": 16235008219,
+      "child_wall_ns": 15950236476,
+      "peak_RSS_KiB": 23552,
+      "group_peak_B": 45527040,
+      "progress": "Test entered; no phase lines existed, no final test result",
+      "OOM": false,
+      "native_CPU_reading": "whole dedicated cgroup includes test descendants; timeout wait4 childCPU is not wholejobCPU"
+    }
+  ],
+  "results": [
+    {
+      "label": "actual-release-prep8-20261009-v189",
+      "accepted": true,
+      "complete_wall_ns": 8982101636,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 6218258000,
+      "aggregate_cpu_limit_us": 17000000,
+      "stop_us": 16000000,
+      "CPU_guard_triggered": false,
+      "child_wall_ns": 8790137985,
+      "child_exit": 0,
+      "child_peak_RSS_KiB": 39916,
+      "group_peak_B": 8551297024,
+      "CPU_affinity": [
+        0
+      ],
+      "expected_names": [],
+      "phases": [],
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 8982101636,
+        "denominator": 17000000000
+      }
+    },
+    {
+      "label": "actual-release-build-20261009-v189",
+      "accepted": true,
+      "complete_wall_ns": 29533979513,
+      "projection_ns": 65000000000,
+      "aggregate_CPU_ns": 36733842000,
+      "aggregate_cpu_limit_us": 128000000,
+      "stop_us": 124000000,
+      "CPU_guard_triggered": false,
+      "child_wall_ns": 27538114731,
+      "child_exit": 0,
+      "child_peak_RSS_KiB": 2224312,
+      "group_peak_B": 2454245376,
+      "CPU_affinity": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "expected_names": [],
+      "phases": [],
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 29533979513,
+        "denominator": 65000000000
+      }
+    },
+    {
+      "label": "period60-order41-20261009-v190",
+      "accepted": true,
+      "complete_wall_ns": 14066072225,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 13903694000,
+      "aggregate_cpu_limit_us": 17000000,
+      "stop_us": 16000000,
+      "CPU_guard_triggered": false,
+      "child_wall_ns": 13717317092,
+      "child_exit": 0,
+      "child_peak_RSS_KiB": 44504,
+      "group_peak_B": 57020416,
+      "CPU_affinity": [
+        0
+      ],
+      "expected_names": [
+        "hnn::tests::prediction::the_release_reads_the_located_pair_and_its_consumer_holds_at_seed_41"
+      ],
+      "phases": [
+        {
+          "receiver": "order-2 seed 41",
+          "phase": "field and deposit",
+          "wall_ns": 44305563
+        },
+        {
+          "receiver": "order-2 seed 41",
+          "phase": "bank and refinement",
+          "wall_ns": 68087
+        },
+        {
+          "receiver": "order-2 seed 41",
+          "phase": "request",
+          "wall_ns": 63029
+        },
+        {
+          "receiver": "order-2 seed 41",
+          "phase": "generation",
+          "wall_ns": 13649931471
+        }
+      ],
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 14066072225,
+        "denominator": 17000000000
+      }
+    },
+    {
+      "label": "period60-order42-20261009-v190",
+      "accepted": true,
+      "complete_wall_ns": 13752788700,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 13595929000,
+      "aggregate_cpu_limit_us": 17000000,
+      "stop_us": 16000000,
+      "CPU_guard_triggered": false,
+      "child_wall_ns": 13408924204,
+      "child_exit": 0,
+      "child_peak_RSS_KiB": 44300,
+      "group_peak_B": 55844864,
+      "CPU_affinity": [
+        0
+      ],
+      "expected_names": [
+        "hnn::tests::prediction::the_release_reads_the_located_pair_and_its_consumer_holds_at_seed_42"
+      ],
+      "phases": [
+        {
+          "receiver": "order-2 seed 42",
+          "phase": "field and deposit",
+          "wall_ns": 44280564
+        },
+        {
+          "receiver": "order-2 seed 42",
+          "phase": "bank and refinement",
+          "wall_ns": 80531
+        },
+        {
+          "receiver": "order-2 seed 42",
+          "phase": "request",
+          "wall_ns": 71914
+        },
+        {
+          "receiver": "order-2 seed 42",
+          "phase": "generation",
+          "wall_ns": 13354665257
+        }
+      ],
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 13752788700,
+        "denominator": 17000000000
+      }
+    },
+    {
+      "label": "period60-fixed41-20261009-v190",
+      "accepted": true,
+      "complete_wall_ns": 14902238664,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 14752884000,
+      "aggregate_cpu_limit_us": 17000000,
+      "stop_us": 16000000,
+      "CPU_guard_triggered": false,
+      "child_wall_ns": 14559607073,
+      "child_exit": 0,
+      "child_peak_RSS_KiB": 44928,
+      "group_peak_B": 124907520,
+      "CPU_affinity": [
+        0
+      ],
+      "expected_names": [
+        "hnn::tests::prediction::the_release_reads_a_located_map_that_fixes_its_antecedent_at_seed_41"
+      ],
+      "phases": [
+        {
+          "receiver": "fixed map seed 41",
+          "phase": "field and deposit",
+          "wall_ns": 248159691
+        },
+        {
+          "receiver": "fixed map seed 41",
+          "phase": "bank and refinement",
+          "wall_ns": 67206
+        },
+        {
+          "receiver": "fixed map seed 41",
+          "phase": "request",
+          "wall_ns": 79749
+        },
+        {
+          "receiver": "fixed map seed 41",
+          "phase": "generation",
+          "wall_ns": 14301629209
+        }
+      ],
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 14902238664,
+        "denominator": 17000000000
+      }
+    },
+    {
+      "label": "period60-fixed42-20261009-v190",
+      "accepted": true,
+      "complete_wall_ns": 15151764044,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 15031311000,
+      "aggregate_cpu_limit_us": 17000000,
+      "stop_us": 16000000,
+      "CPU_guard_triggered": false,
+      "child_wall_ns": 14853695048,
+      "child_exit": 0,
+      "child_peak_RSS_KiB": 45268,
+      "group_peak_B": 46063616,
+      "CPU_affinity": [
+        0
+      ],
+      "expected_names": [
+        "hnn::tests::prediction::the_release_reads_a_located_map_that_fixes_its_antecedent_at_seed_42"
+      ],
+      "phases": [
+        {
+          "receiver": "fixed map seed 42",
+          "phase": "field and deposit",
+          "wall_ns": 260013826
+        },
+        {
+          "receiver": "fixed map seed 42",
+          "phase": "bank and refinement",
+          "wall_ns": 71173
+        },
+        {
+          "receiver": "fixed map seed 42",
+          "phase": "request",
+          "wall_ns": 155191
+        },
+        {
+          "receiver": "fixed map seed 42",
+          "phase": "generation",
+          "wall_ns": 14584650014
+        }
+      ],
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 15151764044,
+        "denominator": 17000000000
+      }
+    }
+  ],
+  "guard_diagnosis": "Old two-seed tests stopped at16CPU seconds because generation of one seed consumes13..15CPU seconds. Source-only seed partition retainsbothseeds and all6stations. Each changedseed now completes beloworiginal17CPU/17wallcontrols. No combinatorial whole-passage enumeration or observedalgorithmdefect.",
+  "resource_decision": {
+    "Cargo_jobs": 2,
+    "compile_CPUcores": 4,
+    "runtime_reference_CPUcores": 1,
+    "memory_limit_B": 8589934592,
+    "compile_window_ns": 65000000000,
+    "runtime_window_ns": 17000000000,
+    "runtime_aggregate_CPU_limit_us": 17000000,
+    "runtime_stop_us": 16000000,
+    "j8_Cargo_rejected": "8compilerjobs unsupportedby2..3GiB percompilerpeaks;4CPU/2jobs completedactualfreshcompile.",
+    "600s_not_justified": "Largestcompleteone-seedstage measuredbelow17s; old2seedconsumerprojection2*largestcompletedseed, ratherthan600. No extendedrunneeded afterdeclaredreadpartition."
+  },
+  "scope": "Paired loop2 laws and exacttwo-terrain fixture plus affected consumers accepted at exactpin via joinedunchangedreceipts. Native symmetrizedchart/NormalLaw compose_return loop3 and device #76 remainseparateowed scope. No broadworkspace runtime or productionmodificationbyqueue.",
+  "queue_all_released": true,
+  "no_limit_raise_or_unchanged_rerun": true
+}

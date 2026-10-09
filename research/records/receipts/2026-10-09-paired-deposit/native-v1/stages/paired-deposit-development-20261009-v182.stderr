@@ -1,0 +1,7 @@
+alternating strand: located offset 1, map [(0, 2), (2, 0)], cycle 2, turns [2]
+control, the forward deposit alone: Err(Equivariance { ring: 0, column: 0, partner: 1, row: 0 })
+paired deposit: forward [(0, 2), (2, 0)], reversed [(1, 3), (3, 1)], slip 8 -> 0, step 2, consumer true
+stepping strand: located offset 1, map [(0, 1), (1, 2), (2, 3), (3, 0)], cycle 4, turns [1, 3]
+stepping strand, paired deposit 1: reversed [(1, 0), (0, 3), (3, 2), (2, 1)], slip 16 -> 11453246123/1073741824, step 1, consumer false
+stepping strand, paired deposit 2: reversed [(1, 0), (0, 3), (3, 2), (2, 1)], slip 11453246123/1073741824 -> 21532100963/2147483648, step 2, consumer false
+stepping strand, paired deposit 3: reversed [(1, 0), (0, 3), (3, 2), (2, 1)], slip 21532100963/2147483648 -> 10742678561/1073741824, step 2, consumer false
