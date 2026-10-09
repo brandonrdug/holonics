@@ -83,8 +83,8 @@
 mod model;
 mod world;
 pub use model::{
-    CoupledChange, CoupledProspect, HeldReason, KeyState, ModelCharts, ModelKey, ReturnImage,
-    StateFibre, WorldModel,
+    CoupledChange, CoupledProspect, HeldReason, KeyFace, KeyState, ModelCharts, ModelKey,
+    ReturnImage, StateFibre, WorldModel,
 };
 pub use world::{BoundJointWorld, NativeEncounter, NativeEncounterFailure, WaveJointStep};
 

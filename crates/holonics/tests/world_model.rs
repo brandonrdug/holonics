@@ -269,6 +269,9 @@ struct Executed {
     incident: Vec<Rat>,
     reflected: Vec<Rat>,
     next: HolonState,
+    /// The World's raw face after the step: the vector the encounter reads at its grain when the
+    /// step's epoch is compared.
+    face: Vec<Rat>,
 }
 
 fn executed(steps: &[WaveJointStep]) -> Vec<Executed> {
@@ -278,6 +281,7 @@ fn executed(steps: &[WaveJointStep]) -> Vec<Executed> {
             incident: step.incident.clone(),
             reflected: step.reflected.clone(),
             next: step.joint.next_state(),
+            face: step.joint.face().to_vec(),
         })
         .collect()
 }
@@ -870,12 +874,18 @@ fn binding_is_refused_without_a_world_off_its_tick_or_off_the_source_frame() {
     assert_eq!(receiver.world_model().unwrap().keys(), &[truth()]);
 }
 
-/// Whether one `k` carries a coupled prospect's point onto every actual `(a_t, b_t)` of an
-/// encounter and, where given, onto the actual receiving logits of one compared station: the
-/// stacked change of every value against the stacked directions.
-fn holds(prospect: &CoupledProspect, steps: &[Executed], station: Option<(usize, &[Rat])>) -> bool {
+/// The stacked system of one coupled prospect against an encounter: every actual `(a_t, b_t)`,
+/// where given the actual receiving logits of one compared station, and where given the World's raw
+/// face at one compared station. Columns are the fibre directions, the target is actual minus point;
+/// `None` when the shapes do not meet.
+fn stacked(
+    prospect: &CoupledProspect,
+    steps: &[Executed],
+    station: Option<(usize, &[Rat])>,
+    face: Option<(usize, &[Rat])>,
+) -> Option<(ExactRatMatrix, Vec<Rat>)> {
     if prospect.point.waves.len() != steps.len() {
-        return false;
+        return None;
     }
     let mut rows = Vec::new();
     let mut target = Vec::new();
@@ -903,17 +913,14 @@ fn holds(prospect: &CoupledProspect, steps: &[Executed], station: Option<(usize,
         }
     }
     if let Some((compared, actual)) = station {
-        let Some(position) = prospect
+        let position = prospect
             .point
             .features
             .iter()
-            .position(|(read, _, _)| *read == compared)
-        else {
-            return false;
-        };
+            .position(|(read, _, _)| *read == compared)?;
         let predicted = &prospect.point.features[position].2;
         if predicted.len() != actual.len() {
-            return false;
+            return None;
         }
         for (i, value) in actual.iter().enumerate() {
             rows.push(
@@ -926,11 +933,41 @@ fn holds(prospect: &CoupledProspect, steps: &[Executed], station: Option<(usize,
             target.push(value - &predicted[i]);
         }
     }
-    ExactRatMatrix::shaped(rows.len(), prospect.directions.len(), rows)
-        .unwrap()
-        .preimage_fibre(&target)
-        .unwrap()
-        .is_some()
+    if let Some((compared, actual)) = face {
+        let position = prospect
+            .faces
+            .iter()
+            .position(|(read, _)| *read == compared)?;
+        let predicted = &prospect.faces[position].1;
+        if predicted.len() != actual.len() {
+            return None;
+        }
+        for (i, value) in actual.iter().enumerate() {
+            rows.push(
+                prospect
+                    .directions
+                    .iter()
+                    .map(|direction| direction.faces[position].1[i].clone())
+                    .collect::<Vec<Rat>>(),
+            );
+            target.push(value - &predicted[i]);
+        }
+    }
+    Some((
+        ExactRatMatrix::shaped(rows.len(), prospect.directions.len(), rows).unwrap(),
+        target,
+    ))
+}
+
+/// Whether one `k` carries a coupled prospect's point onto every given actual value at once.
+fn holds(
+    prospect: &CoupledProspect,
+    steps: &[Executed],
+    station: Option<(usize, &[Rat])>,
+    face: Option<(usize, &[Rat])>,
+) -> bool {
+    stacked(prospect, steps, station, face)
+        .is_some_and(|(matrix, target)| matrix.preimage_fibre(&target).unwrap().is_some())
 }
 
 /// The native-only prediction of a station's receiving logits under the unique control: the
@@ -1014,7 +1051,7 @@ fn the_world_keys_coupled_prospect_holds_the_actual_encounter_before_it_runs() {
         assert_eq!(truth.tick, before.tick());
         // One k carries the waves and the native readout together.
         let station = actual_logits.as_deref().map(|logits| (1, logits));
-        assert!(holds(truth, &steps, station));
+        assert!(holds(truth, &steps, station, None));
         if station.is_some() {
             read_features += 1;
         }
@@ -1155,4 +1192,104 @@ fn a_prospect_is_refused_without_a_world_model_and_moves_no_participant() {
         }
         assert_eq!(read.world_model().unwrap(), unread.world_model().unwrap());
     }
+}
+
+#[test]
+fn a_key_with_the_worlds_face_covers_its_observed_face_and_a_wrong_face_does_not() {
+    let (field, theta, source) = fixture();
+    let mut receiver = receiver(&field, theta);
+    receiver
+        .bind_world(world(
+            &field,
+            source.part(0..0).unwrap(),
+            medium(&unit_storage(), source_input(true)),
+        ))
+        .unwrap();
+    let law = || key(&field, medium(&unit_storage(), source_input(true)));
+    // The World's own face reads the receiver's coordinates; the wrong one adds the offset e_0.
+    let mut offset = vec![Rat::zero(); N];
+    offset[0] = integer(1);
+    let wrong = ReceiverFace::new(
+        ExactRatMatrix::zero(N, N).unwrap(),
+        ExactRatMatrix::identity(N).unwrap(),
+        offset,
+        vec![Rat::zero(); N],
+    )
+    .unwrap();
+    let keys = vec![
+        law()
+            .with_face(ReceiverFace::receiver_state(N, N).unwrap(), N)
+            .unwrap(),
+        law().with_face(wrong, N).unwrap(),
+        law(),
+    ];
+    // A face with a chart rate, or split outside the storage, is refused.
+    assert!(
+        law()
+            .with_face(
+                ReceiverFace::new(
+                    ExactRatMatrix::zero(N, N).unwrap(),
+                    ExactRatMatrix::identity(N).unwrap(),
+                    vec![Rat::zero(); N],
+                    vec![integer(1); N],
+                )
+                .unwrap(),
+                N,
+            )
+            .is_err()
+    );
+    assert!(
+        law()
+            .with_face(ReceiverFace::receiver_state(N, N).unwrap(), 3 * N)
+            .is_err()
+    );
+    receiver
+        .bind_world_model(WorldModel::found(keys, 0).unwrap())
+        .unwrap();
+    let preparation =
+        PortPreparation::new(&field, 0, ExactRatMatrix::identity(N).unwrap()).unwrap();
+    let request = vec![
+        vec![Rat::zero(); N],
+        vec![rat(1, 4), rat(1, 8), rat(1, 16), rat(-1, 32)],
+    ];
+    let (mut covered, mut separated) = (0, 0);
+    for _ in 0..3 {
+        let prepared = prepare(&mut receiver, &field, &source, &preparation, &request);
+        if prepared.prospective().unique_control().is_none() {
+            assert!(matches!(
+                prepared.encounter().unwrap(),
+                ActionCommunication::Held { .. }
+            ));
+            continue;
+        }
+        let epoch = prepared.receiving_phases().epochs().nth(1).unwrap();
+        let prospects = prepared.world_prospect().unwrap();
+        let communication = prepared.encounter().unwrap();
+        let steps = steps_of(&communication);
+        let actual = &steps[epoch - 1].face;
+        let truth = prospects[0].as_ref().unwrap();
+        let faced = prospects[1].as_ref().unwrap();
+        let faceless = prospects[2].as_ref().unwrap();
+        // Only declared faces are predicted, at the compared station only.
+        assert_eq!(truth.faces.len(), 1);
+        assert_eq!(faced.faces.len(), 1);
+        assert!(faceless.faces.is_empty());
+        // The wrong face is the true one shifted by its offset, with the same directions.
+        let mut shifted = truth.faces[0].1.clone();
+        shifted[0] += integer(1);
+        assert_eq!(faced.faces[0].1, shifted);
+        // One k carries the World's own face key onto the waves and the observed face together.
+        let face = Some((1, actual.as_slice()));
+        assert!(holds(truth, &steps, None, face));
+        covered += 1;
+        // Where the waves alone fix k, the true port law with the wrong face fails: no k that the
+        // waves admit can also absorb the face's offset.
+        let (matrix, _) = stacked(truth, &steps, None, None).unwrap();
+        if matrix.rank().unwrap() == truth.directions.len() {
+            assert!(!holds(faced, &steps, None, face));
+            separated += 1;
+        }
+    }
+    assert!(covered > 0);
+    assert!(separated > 0);
 }

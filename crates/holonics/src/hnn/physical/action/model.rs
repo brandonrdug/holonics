@@ -76,6 +76,14 @@
 //! the directions is checked against one more passage as a guard. The prepared action reads it before
 //! its encounter ([`super::PreparedPhysicalAction::world_prospect`]).
 //!
+//! **The key's face** (C1b-2b, [`ModelKey::with_face`]). The World's observed target at a compared
+//! epoch is its own face, `C_S x_S⁺ + C_R x_R⁺ + o` on the step's after-state, never the native
+//! readout. A key may declare the face it hypothesizes, split at its own source extent; the prospect
+//! then predicts that raw face at every compared epoch from the model state after the step, with the
+//! same `k` as the waves and the native readout. The World's face coefficients are never read. A true
+//! port law with a wrong face is a different key: a family may pair one law with several faces, and a
+//! key that declares no face predicts none, so an undeclared or unobserved face constrains nothing.
+//!
 //! **Bits.** The memory's current bits ([`WorldModel::current_bits`]) are every key state's values and
 //! cut and the reached tick; the Resident's state bits charge them at every step, whatever size the
 //! fibres reach. The keys are immutable declarations, held separately as the World's own are.
@@ -97,6 +105,7 @@ use crate::holon::law::{CommitCoefficients, HolonLaw, ReferenceHolon, Scheme};
 use crate::ratio::Rat;
 use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::linear::vector::{add, sub};
+use crate::receiver::reception::ReceiverFace;
 use num_traits::{One, Signed, Zero};
 
 /// [definition] **One key's charts at one step** (the module header): `ξ⁺ = F ξ + G a`,
@@ -115,6 +124,36 @@ pub struct ModelCharts {
 pub struct ModelKey {
     law: ReferenceHolon,
     admittance: Vec<Rat>,
+    face: Option<KeyFace>,
+}
+
+/// [definition] **A key's declared face** (the module header): the observer it hypothesizes for the
+/// World's target face, a [`ReceiverFace`] with zero chart rate read on the model state split at
+/// `source` (the source's coordinates, then the receiver's).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct KeyFace {
+    face: ReceiverFace,
+    source: usize,
+}
+
+impl KeyFace {
+    /// The declared face.
+    pub fn face(&self) -> &ReceiverFace {
+        &self.face
+    }
+
+    /// The source extent at which the model state splits.
+    pub fn source(&self) -> usize {
+        self.source
+    }
+
+    /// The raw face read on one model state.
+    pub fn read(&self, state: &[Rat]) -> Result<Vec<Rat>, HnnError> {
+        let source = state.get(..self.source).ok_or(HnnError::Unadmitted {
+            reason: "a face reads a model state that holds its declared source extent",
+        })?;
+        Ok(self.face.read(source, &state[self.source..])?)
+    }
 }
 
 impl ModelKey {
@@ -131,7 +170,37 @@ impl ModelKey {
                 reason: "a World model key is a midpoint port Holon with a positive wave admittance on every external port",
             });
         }
-        Ok(Self { law, admittance })
+        Ok(Self {
+            law,
+            admittance,
+            face: None,
+        })
+    }
+
+    /// **Declare the face this key hypothesizes** (the module header): admitted only with a zero
+    /// chart rate (the actual World admits no other, `BoundJointWorld::new`), a source extent inside
+    /// the key's storage, and a read that succeeds on the zero state.
+    pub fn with_face(mut self, face: ReceiverFace, source: usize) -> Result<Self, HnnError> {
+        let declared = KeyFace { face, source };
+        if declared
+            .face
+            .chart_rate()
+            .iter()
+            .any(|rate| !rate.is_zero())
+            || source > self.extent()
+            || declared.read(&vec![Rat::zero(); self.extent()]).is_err()
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "a key's face has zero chart rate and reads the key's own state split inside its storage",
+            });
+        }
+        self.face = Some(declared);
+        Ok(self)
+    }
+
+    /// The face this key declares, if any.
+    pub fn face(&self) -> Option<&KeyFace> {
+        self.face.as_ref()
     }
 
     /// The model state's extent `σ` (the law's storage).
@@ -382,6 +451,8 @@ pub struct ReturnImage {
 pub struct CoupledChange {
     pub waves: Vec<(Vec<Rat>, Vec<Rat>)>,
     pub features: Vec<(usize, Vec<Rat>, Vec<Rat>)>,
+    /// Per compared station the change of the key's declared raw face; empty without a face.
+    pub faces: Vec<(usize, Vec<Rat>)>,
 }
 
 impl CoupledChange {
@@ -389,10 +460,16 @@ impl CoupledChange {
     fn plus(&self, other: &Self) -> Result<Self, HnnError> {
         if self.waves.len() != other.waves.len()
             || self.features.len() != other.features.len()
+            || self.faces.len() != other.faces.len()
             || self
                 .features
                 .iter()
                 .zip(&other.features)
+                .any(|(left, right)| left.0 != right.0)
+            || self
+                .faces
+                .iter()
+                .zip(&other.faces)
                 .any(|(left, right)| left.0 != right.0)
         {
             return Err(HnnError::Unadmitted {
@@ -412,18 +489,38 @@ impl CoupledChange {
                 .zip(&other.features)
                 .map(|((station, f, l), (_, g, m))| (*station, add(f, g), add(l, m)))
                 .collect(),
+            faces: self
+                .faces
+                .iter()
+                .zip(&other.faces)
+                .map(|((station, f), (_, g))| (*station, add(f, g)))
+                .collect(),
         })
     }
 }
 
-/// The exact change from one coupled passage to another of the same shape.
-fn change(moved: &CoupledPassage, point: &CoupledPassage) -> Result<CoupledChange, HnnError> {
-    if moved.waves.len() != point.waves.len()
-        || moved.features.len() != point.features.len()
-        || moved
-            .features
+/// One key's passage: the native coupled passage and the key's declared raw faces at the compared
+/// stations (empty without a face).
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct KeyPassage {
+    passage: CoupledPassage,
+    faces: Vec<(usize, Vec<Rat>)>,
+}
+
+/// The exact change from one key passage to another of the same shape.
+fn change(moved: &KeyPassage, point: &KeyPassage) -> Result<CoupledChange, HnnError> {
+    let (m, p) = (&moved.passage, &point.passage);
+    if m.waves.len() != p.waves.len()
+        || m.features.len() != p.features.len()
+        || moved.faces.len() != point.faces.len()
+        || m.features
             .iter()
-            .zip(&point.features)
+            .zip(&p.features)
+            .any(|(left, right)| left.0 != right.0)
+        || moved
+            .faces
+            .iter()
+            .zip(&point.faces)
             .any(|(left, right)| left.0 != right.0)
     {
         return Err(HnnError::Unadmitted {
@@ -431,17 +528,23 @@ fn change(moved: &CoupledPassage, point: &CoupledPassage) -> Result<CoupledChang
         });
     }
     Ok(CoupledChange {
-        waves: moved
+        waves: m
             .waves
             .iter()
-            .zip(&point.waves)
+            .zip(&p.waves)
             .map(|((a, b), (c, d))| (sub(a, c), sub(b, d)))
             .collect(),
-        features: moved
+        features: m
             .features
             .iter()
-            .zip(&point.features)
-            .map(|((station, f, l), (_, g, m))| (*station, sub(f, g), sub(l, m)))
+            .zip(&p.features)
+            .map(|((station, f, l), (_, g, n))| (*station, sub(f, g), sub(l, n)))
+            .collect(),
+        faces: moved
+            .faces
+            .iter()
+            .zip(&point.faces)
+            .map(|((station, f), (_, g))| (*station, sub(f, g)))
             .collect(),
     })
 }
@@ -453,6 +556,9 @@ fn change(moved: &CoupledPassage, point: &CoupledPassage) -> Result<CoupledChang
 pub struct CoupledProspect {
     pub tick: u64,
     pub point: CoupledPassage,
+    /// The key's declared raw face at each compared station from the fibre's point; empty without a
+    /// face.
+    pub faces: Vec<(usize, Vec<Rat>)>,
     pub directions: Vec<CoupledChange>,
 }
 
@@ -594,7 +700,8 @@ impl WorldModel {
         }
         Ok(CoupledProspect {
             tick: self.tick,
-            point,
+            point: point.passage,
+            faces: point.faces,
             directions,
         })
     }
@@ -614,7 +721,8 @@ impl WorldModel {
         Ok((model, fibre))
     }
 
-    /// The coupled passage from one model state `ξ_T`, step `t` answered at commit `T + t − 1`.
+    /// The coupled passage from one model state `ξ_T`, step `t` answered at commit `T + t − 1`,
+    /// with the key's declared raw face read on the state after the step at every compared epoch.
     fn coupled_from(
         &self,
         model: &ModelKey,
@@ -623,9 +731,10 @@ impl WorldModel {
         source_ring: usize,
         phases: &ReceivingPhases,
         compared: &[bool],
-    ) -> Result<CoupledPassage, HnnError> {
+    ) -> Result<KeyPassage, HnnError> {
         let tick = self.tick;
         let mut state = start.to_vec();
+        let mut states = vec![start.to_vec()];
         let mut returns = |t: usize, incident: &[Rat]| -> Result<Vec<Rat>, HnnError> {
             let offset = t
                 .checked_sub(1)
@@ -635,9 +744,24 @@ impl WorldModel {
             let charts = model.charts(commit)?;
             let reflected = add(&charts.p.apply(&state)?, &charts.q.apply(incident)?);
             state = add(&charts.f.apply(&state)?, &charts.g.apply(incident)?);
+            states.push(state.clone());
             Ok(reflected)
         };
-        word.prospective_coupled_passage(source_ring, phases, compared, &mut returns)
+        let passage =
+            word.prospective_coupled_passage(source_ring, phases, compared, &mut returns)?;
+        let mut faces = Vec::new();
+        if let Some(face) = model.face() {
+            for (station, epoch) in phases.epochs().enumerate() {
+                if !compared.get(station).copied().unwrap_or(false) {
+                    continue;
+                }
+                let after = states.get(epoch).ok_or(HnnError::WordEnded {
+                    ticks: states.len() - 1,
+                })?;
+                faces.push((station, face.read(after)?));
+            }
+        }
+        Ok(KeyPassage { passage, faces })
     }
 
     /// **Absorb one actually executed World step** (the module header): every live key is restricted
