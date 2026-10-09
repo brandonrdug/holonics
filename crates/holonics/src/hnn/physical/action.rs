@@ -103,6 +103,7 @@ use crate::hnn::word::action::{
     AppliedPortPreparation, PortPreparation, PortPreparationReceipt, ProspectiveControl,
     ProspectiveFeature,
 };
+use crate::hnn::word::continuation::{MaterialDirection, MaterialTangent};
 use crate::hnn::word::variation::VariationReading;
 use crate::hnn::word::{
     FieldBalance, NativeReceivingReturn, ReceptionCarry, SourceOpeningReceipt, SourceWaveReturn,
@@ -339,6 +340,8 @@ impl PreparedPhysicalAction<'_, '_> {
                 receiver_index,
                 opening,
             },
+            &[],
+            &mut Vec::new(),
         )
     }
 }
@@ -504,6 +507,8 @@ impl<'f> PhysicalReceiver<'f> {
         preparation: PortPreparationReceipt,
         applied: AppliedPortPreparation,
         frame: ActionFrame,
+        directions: &[MaterialDirection],
+        tangents: &mut Vec<MaterialTangent>,
     ) -> Result<ActionCommunication, HnnError> {
         let ActionFrame {
             section,
@@ -527,6 +532,47 @@ impl<'f> PhysicalReceiver<'f> {
             )?;
         let producing = self.constitution().clone();
         let epochs = phases.epochs().collect::<Vec<_>>();
+        // [definition; agent-inferred, October 9; the held-carry record §3] The declared material
+        // tangents ride the actual Word tick by tick, and at its World port the World's tangent
+        // response. The World is foreign; its tangent is located only when the World model holds
+        // exactly one live key, whose charts then stand for it. Otherwise the teaching encounter is
+        // refused before any physical work.
+        let mut located = None;
+        if !directions.is_empty() {
+            let model = self.world_model().ok_or(HnnError::Unadmitted {
+                reason: "a teaching encounter reads its bound World model",
+            })?;
+            let live: Vec<usize> = model
+                .states()
+                .iter()
+                .enumerate()
+                .filter(|(_, state)| matches!(state, KeyState::Live(_)))
+                .map(|(key, _)| key)
+                .collect();
+            let [key] = live[..] else {
+                return Err(HnnError::Unadmitted {
+                    reason: "a teaching encounter needs exactly one live World key: the World's tangent is located only then",
+                });
+            };
+            let located_key = model.keys()[key].clone();
+            for direction in directions {
+                tangents.push(
+                    MaterialTangent::held_opening(&word, producing.commit(), direction.clone())?
+                        .with_port(applied.ring(), located_key.extent()),
+                );
+            }
+            located = Some((located_key, model.tick()));
+        }
+        let mut observe = |word: &Word<'_>, t: usize, _step: &WaveJointStep| -> Result<(), HnnError> {
+            if let Some((key, tick)) = &located {
+                let offset = u64::try_from(t - 1).map_err(|_| HnnError::CountOverflow)?;
+                let charts = key.charts(tick.checked_add(offset).ok_or(HnnError::CountOverflow)?)?;
+                for tangent in tangents.iter_mut() {
+                    tangent.step_through_port(word, &charts.f, &charts.g, &charts.p, &charts.q)?;
+                }
+            }
+            Ok(())
+        };
         let encounter = self.resident.participating_world_mut()?.execute_word(
             &mut word,
             applied.ring(),
@@ -534,6 +580,7 @@ impl<'f> PhysicalReceiver<'f> {
             &epochs,
             applied.compared(),
             phases.grain(),
+            &mut observe,
         );
         // The World model absorbs every actually executed step, completed or interrupted, before
         // any later exit, so its tick never lags the actual World's and no later refusal rolls it
@@ -1390,6 +1437,20 @@ impl PreparedPhysicalProbe<'_, '_> {
         admitted: &AdmittedWaves,
         control: &[Rat],
     ) -> Result<ProbeReception, HnnError> {
+        Ok(self.encounter_teaching(admitted, control, &[])?.0)
+    }
+
+    /// **Execute the probe at one admitted control, carrying material tangents** (the held-carry
+    /// record §3): exactly [`Self::encounter`]'s execution, with one [`MaterialTangent`] per declared
+    /// direction riding the actual Word and, at the World port, the located World key's charts.
+    /// Refused before any physical work unless the World model holds exactly one live key. The
+    /// tangents return at the Word's reception carry, for the next Word's credit.
+    pub fn encounter_teaching(
+        self,
+        admitted: &AdmittedWaves,
+        control: &[Rat],
+        directions: &[MaterialDirection],
+    ) -> Result<(ProbeReception, Vec<MaterialTangent>), HnnError> {
         let Self {
             owner,
             word,
@@ -1425,6 +1486,7 @@ impl PreparedPhysicalProbe<'_, '_> {
         let station = feature.station();
         let grain = feature.phases().grain();
         let (word, preparation, applied) = feature.prepare_control(word, control)?;
+        let mut tangents = Vec::with_capacity(directions.len());
         let reception = owner.execute_prepared(
             word,
             preparation,
@@ -1435,12 +1497,17 @@ impl PreparedPhysicalProbe<'_, '_> {
                 receiver_index,
                 opening,
             },
+            directions,
+            &mut tangents,
         )?;
         let discrepancy = discrepancy_of(&reception, station, grain, prediction.as_ref());
-        Ok(ProbeReception {
-            reception,
-            prediction,
-            discrepancy,
-        })
+        Ok((
+            ProbeReception {
+                reception,
+                prediction,
+                discrepancy,
+            },
+            tangents,
+        ))
     }
 }

@@ -366,6 +366,7 @@ impl BoundJointWorld {
         epochs: &[usize],
         compared: &[bool],
         grain: u64,
+        observer: &mut dyn FnMut(&crate::hnn::word::Word<'_>, usize, &WaveJointStep) -> Result<(), HnnError>,
     ) -> Result<NativeEncounter, NativeEncounterFailure> {
         let before_native_tick = word.opened_at();
         let before_world_tick = self.state.commit;
@@ -415,6 +416,10 @@ impl BoundJointWorld {
                     &step.reflected,
                     &step.port_work,
                 )?;
+                // A consumer reading the tick beside the Word (a material tangent) sees the
+                // executed tick and its actual World exchange, after the return and before the next
+                // tick; it cannot change either participant.
+                observer(word, t, step)?;
                 for (j, (&e, &yes)) in epochs.iter().zip(compared).enumerate() {
                     if yes && e == t {
                         encounter.observed[j] = Some(Face::of_read(

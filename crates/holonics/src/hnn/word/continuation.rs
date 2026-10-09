@@ -1600,6 +1600,9 @@ pub struct MaterialTangent {
     opened_at: usize,
     ticks: usize,
     tangent: EndChange,
+    /// The World port, where the Word meets a participating World: the source ring and the World's
+    /// own state tangent `ψ` (its extent's coordinates). `None` for a Word with no World.
+    port: Option<(usize, Vec<Rat>)>,
 }
 
 impl MaterialTangent {
@@ -1670,7 +1673,45 @@ impl MaterialTangent {
             opened_at: word.opened_at(),
             ticks: 0,
             tangent,
+            port: None,
         })
+    }
+
+    /// The same tangent at a World port on `ring`: the World's state tangent starts at `ψ = 0` of
+    /// `extent` coordinates, a World state no earlier material moved (a held opening of both).
+    pub fn with_port(mut self, ring: usize, extent: usize) -> Self {
+        self.port = Some((ring, vec![Rat::zero(); extent]));
+        self
+    }
+
+    /// **Follow one tick through the World port** (the held-carry record §3, the World-sensitive
+    /// tangent): the native tick ([`Self::step`]), then the World's tangent exchange at the port
+    /// with the World's charts `ξ⁺ = F ξ + G a`, `b = P ξ + Q a` at that tick's commit,
+    /// `δb = P ψ + Q δa`, `ψ ← F ψ + G δa`, where `δa` is the tangent's emitted source storage; the
+    /// returned `δb` replaces it, as `Word::return_source_wave` replaces the storage with the actual
+    /// reflected wave. Call after the Word's actual return of that tick.
+    pub fn step_through_port(
+        &mut self,
+        word: &Word<'_>,
+        f: &ExactRatMatrix,
+        g: &ExactRatMatrix,
+        p: &ExactRatMatrix,
+        q: &ExactRatMatrix,
+    ) -> Result<(), HnnError> {
+        self.step(word)?;
+        let (ring, world) = self.port.as_mut().ok_or(HnnError::Unadmitted {
+            reason: "a World-port tangent declares its port",
+        })?;
+        let incident = self.tangent.storage[*ring].clone();
+        let reflected = add(&p.apply(world)?, &q.apply(&incident)?);
+        *world = add(&f.apply(world)?, &g.apply(&incident)?);
+        self.tangent.storage[*ring] = reflected;
+        Ok(())
+    }
+
+    /// The World's state tangent `ψ`, where the tangent crosses a World port.
+    pub fn world(&self) -> Option<&[Rat]> {
+        self.port.as_ref().map(|(_, world)| world.as_slice())
     }
 
     /// **Follow the Word's next full tick** (eq. 2): call after the Word has executed it.
