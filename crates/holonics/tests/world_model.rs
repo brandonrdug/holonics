@@ -14,15 +14,18 @@ use holonics::geometry::{RatVec3, screw::ScrewGenerator};
 use holonics::hnn::HnnError;
 use holonics::hnn::constitution::CAMPAIGN_ONE_BUDGET;
 use holonics::hnn::field::{ContactDeclaration, CribDeclaration, ReceiverDeclaration};
+use holonics::hnn::phase_family::PhaseImage;
 use holonics::hnn::physical::PhysicalReceiver;
 use holonics::hnn::physical::action::{
-    ActionCommunication, BoundJointWorld, CoupledProspect, HeldReason, KeyState, ModelKey,
-    PreparedPhysicalAction, StateFibre, WaveJointStep, WorldModel,
+    ActionCommunication, ActionReception, BoundJointWorld, CoupledChange, CoupledProspect,
+    HeldReason, KeyState, ModelKey, PreparedPhysicalAction, StateFibre, WaveJointStep, WorldModel,
 };
+use holonics::hnn::ratio::Face;
 use holonics::hnn::ring::ResonatorMaterial;
 use holonics::hnn::word::action::{PortPreparation, ProspectiveControl};
 use holonics::hnn::{
-    Constitution, Current, Encoded, Field, FieldDeclaration, RingDeclaration, WordOpening,
+    Constitution, Current, Encoded, Field, FieldDeclaration, ReceivingRead, RingDeclaration,
+    WordOpening,
 };
 use holonics::holarchy::terrain::KnownTruth;
 use holonics::holon::element::{Pump, PumpSchedule};
@@ -32,8 +35,10 @@ use holonics::navigator::Clock;
 use holonics::ratio::linear::ExactRatMatrix;
 use holonics::ratio::linear::inertia::SymmetricForm;
 use holonics::ratio::{Rat, integer, rat};
+use holonics::receiver::face::GrainCell;
 use holonics::receiver::receipt::{ReceiptLaw, RegionChart};
 use holonics::receiver::reception::{JointLaw, ReceiverFace};
+use num_bigint::BigInt;
 use num_traits::{One, Zero};
 
 /// Each participant's coordinates: the source's and the receiver's.
@@ -87,26 +92,23 @@ fn fixture() -> (Field, Constitution, Encoded) {
         .by_lattice_rule(),
     )
     .unwrap();
-    let mut theta = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET)
+    // The source is terminated by the actual World; only the receiving ring (ring 1) is loaded.
+    let theta = Constitution::initial(&field, CAMPAIGN_ONE_BUDGET)
         .unwrap()
         .with_ports(1, None, None, Some(ExactRatMatrix::identity(4).unwrap()))
-        .unwrap();
-    // The source is terminated by the actual World; only the receiving ring is loaded.
-    for g in [1] {
-        theta = theta
-            .with_ring_resonator(
-                &field,
-                g,
-                ResonatorMaterial::new(
-                    ExactRatMatrix::identity(4).unwrap(),
-                    ExactRatMatrix::identity(4).unwrap().scaled(&rat(1, 8)),
-                    ExactRatMatrix::identity(4).unwrap().scaled(&rat(1, 16)),
-                    None,
-                )
-                .unwrap(),
+        .unwrap()
+        .with_ring_resonator(
+            &field,
+            1,
+            ResonatorMaterial::new(
+                ExactRatMatrix::identity(4).unwrap(),
+                ExactRatMatrix::identity(4).unwrap().scaled(&rat(1, 8)),
+                ExactRatMatrix::identity(4).unwrap().scaled(&rat(1, 16)),
+                None,
             )
-            .unwrap();
-    }
+            .unwrap(),
+        )
+        .unwrap();
     let truth = KnownTruth::uniform(2, 0, 1, 1).unwrap();
     let source = Encoded::identity(&truth, &field).unwrap().remove(0);
     (field, theta, source)
@@ -1326,4 +1328,376 @@ fn a_key_with_the_worlds_face_covers_its_observed_face_and_a_wrong_face_does_not
     assert!(separated > 0);
     // The combined check read the actual native readout at least once, so it is never vacuous.
     assert!(read_natively > 0);
+}
+
+/// C2's declared observable of realified receiving logits at the receiver's grain `L`: per class after
+/// the first, its real row's grain index relative to the first class's, `⌊L Re f_c⌋ − ⌊L Re f_0⌋`,
+/// read as `carry · L + phase class` from the cells; and per class the block `⌊L φ_c⌋` of its lifted
+/// phase `φ_c = Im f_c / 2`. A common logit shift, which no face mass reads, and every cell's
+/// unresolved fibre are not part of it.
+fn admitted(cells: &[GrainCell], phases: &[Rat], grain: u64) -> (Vec<BigInt>, Vec<BigInt>) {
+    let index = |cell: &GrainCell| &cell.carry * BigInt::from(grain) + BigInt::from(cell.phase);
+    let first = index(&cells[0]);
+    (
+        cells[1..].iter().map(|cell| index(cell) - &first).collect(),
+        PhaseImage::block_of(phases, grain),
+    )
+}
+
+/// The declared observable of realified logits, read by the receiver's own reader.
+fn admitted_of(logits: &[Rat], grain: u64) -> (Vec<BigInt>, Vec<BigInt>) {
+    let read = ReceivingRead::of_logits(logits.to_vec(), grain);
+    admitted(&read.cells, &read.phases, grain)
+}
+
+/// A member of a station's image along one change of it: `point` moved until one relative real row has
+/// moved by `2/L` or, where no relative real row moves, one lifted phase by `1/L`. Either crosses a cell
+/// of the declared observable, which the caller reads; `None` when the change moves no relative real
+/// row and no phase (a common logit shift, which the observable does not read).
+fn crossing(point: &[Rat], change: &[Rat], grain: u64) -> Option<Vec<Rat>> {
+    let scale = Rat::from_integer(BigInt::from(grain));
+    let classes = point.len() / 2;
+    let relative = (1..classes)
+        .map(|class| &change[2 * class] - &change[0])
+        .find(|moved| !moved.is_zero())
+        .map(|moved| integer(2) / (&scale * moved));
+    let phase = (0..classes)
+        .map(|class| change[2 * class + 1].clone())
+        .find(|moved| !moved.is_zero())
+        .map(|moved| integer(2) / (&scale * moved));
+    let step = relative.or(phase)?;
+    Some(
+        point
+            .iter()
+            .zip(change)
+            .map(|(value, moved)| value + &step * moved)
+            .collect(),
+    )
+}
+
+/// Every value of a coupled passage in one order: each step's `(a, b)`, each compared station's
+/// feature and logits, then each declared face.
+fn passage_values(
+    waves: &[(Vec<Rat>, Vec<Rat>)],
+    features: &[(usize, Vec<Rat>, Vec<Rat>)],
+    faces: &[(usize, Vec<Rat>)],
+) -> Vec<Rat> {
+    waves
+        .iter()
+        .flat_map(|(a, b)| a.iter().chain(b))
+        .chain(features.iter().flat_map(|(_, f, l)| f.iter().chain(l)))
+        .chain(faces.iter().flat_map(|(_, f)| f.iter()))
+        .cloned()
+        .collect()
+}
+
+/// Whether one coupled prospect lies in another of the same passage's shape: its point in the other's
+/// affine image and every direction of it in the other's span, by exact preimages.
+fn prospect_within(inner: &CoupledProspect, outer: &CoupledProspect) -> bool {
+    let point = |p: &CoupledProspect| passage_values(&p.point.waves, &p.point.features, &p.faces);
+    let change = |d: &CoupledChange| passage_values(&d.waves, &d.features, &d.faces);
+    let base = point(outer);
+    let span: Vec<Vec<Rat>> = outer.directions.iter().map(change).collect();
+    let lies = |value: &[Rat]| {
+        from_columns(value.len(), &span)
+            .preimage_fibre(value)
+            .unwrap()
+            .is_some()
+    };
+    let at = point(inner);
+    at.len() == base.len()
+        && lies(&minus(&at, &base))
+        && inner.directions.iter().all(|d| lies(&change(d)))
+}
+
+/// Whether one affine fibre of states lies in another: its point in the other and its directions in
+/// the other's span.
+fn fibre_within(inner: &StateFibre, outer: &StateFibre) -> bool {
+    let span = from_columns(outer.point.len(), &outer.directions);
+    contains(outer, &inner.point)
+        && inner
+            .directions
+            .iter()
+            .all(|direction| span.preimage_fibre(direction).unwrap().is_some())
+}
+
+/// **The whole state space carried through an incident word, solved at once** from the charts alone:
+/// the forced state from zero and the transported span, with no restriction.
+fn carried_whole(key: &ModelKey, founded: u64, incident: &[Vec<Rat>]) -> StateFibre {
+    let sigma = key.extent();
+    let mut transport = ExactRatMatrix::identity(sigma).unwrap();
+    let mut forced = vec![Rat::zero(); sigma];
+    for (t, wave) in incident.iter().enumerate() {
+        let charts = key.charts(founded + t as u64).unwrap();
+        transport = charts.f.multiply(&transport).unwrap();
+        forced = plus(
+            &charts.f.apply(&forced).unwrap(),
+            &charts.g.apply(wave).unwrap(),
+        );
+    }
+    StateFibre {
+        point: forced,
+        directions: (0..sigma)
+            .map(|j| {
+                (0..sigma)
+                    .map(|i| transport.get(i, j).unwrap().clone())
+                    .collect()
+            })
+            .collect(),
+    }
+}
+
+/// The encounter's own blind read of the compared station 1, in the producing frame.
+fn station_logits(received: &ActionReception) -> Vec<Rat> {
+    received
+        .boundary
+        .readings()
+        .iter()
+        .find(|read| read.station == 1)
+        .map(|read| read.read.logits.clone())
+        .expect("the compared station is read")
+}
+
+/// **C2: retained actual World history fixes the next encounter's reading** (the receiving-phase
+/// record §7, C2; Refs #73). Two actual encounters on one receiver and one World. Before the first,
+/// the World model's prospect is read over its whole fibre, and one `k` of the World's key carries
+/// the actual passage. At the continuing crossing one prepared second action is read from the bound
+/// memory and from its state-only matched control: the memory from before the first encounter
+/// carried through that encounter's actual incident waves with no restriction by its reflected waves
+/// (`WorldModel::carried`). Everything actual is shared: the receiver's carry, material and opening,
+/// the one World and its clock, the keys and their charts.
+///
+/// The bound prospect lies in the control's. No retained direction moves the compared station's
+/// logits, while a control direction does, and two exact control members differ in the declared
+/// observable (`admitted`), so retained history fixed one reading that the control leaves open. The
+/// second encounter then reads exactly that. The family also carries the World's law with a false
+/// face, which the port filter never rules out.
+///
+/// Not witnessed: a selection (both plans read the same declared control), the Ask over keys, face
+/// conditioning by observed faces, the grain readings of a plural raw image, material learning, or
+/// anything beyond this declared World. If the station reading is not fixed after one encounter, that
+/// is a measured negative of this declared future, not a fixture to repair.
+#[test]
+fn retained_world_history_fixes_the_next_reading_that_its_state_only_control_leaves_open() {
+    let (field, theta, source) = fixture();
+    let mut receiver = receiver(&field, theta);
+    receiver
+        .bind_world(world(
+            &field,
+            source.part(0..0).unwrap(),
+            medium(&unit_storage(), source_input(true)),
+        ))
+        .unwrap();
+    let law = || key(&field, medium(&unit_storage(), source_input(true)));
+    let mut offset = vec![Rat::zero(); N];
+    offset[0] = integer(1);
+    let false_face = ReceiverFace::new(
+        ExactRatMatrix::zero(N, N).unwrap(),
+        ExactRatMatrix::identity(N).unwrap(),
+        offset,
+        vec![Rat::zero(); N],
+    )
+    .unwrap();
+    // The declared family: the World's law with its own face, the same law with a false face, and a
+    // disconnected law. The World's membership is this fixture's hypothesis, never a claim.
+    let keys = vec![
+        law()
+            .with_face(ReceiverFace::receiver_state(N, N).unwrap(), N)
+            .unwrap(),
+        law().with_face(false_face, N).unwrap(),
+        key(&field, medium(&unit_storage(), source_input(false))),
+    ];
+    receiver
+        .bind_world_model(WorldModel::found(keys.clone(), 0).unwrap())
+        .unwrap();
+    let preparation =
+        PortPreparation::new(&field, 0, ExactRatMatrix::identity(N).unwrap()).unwrap();
+    let request = vec![
+        vec![Rat::zero(); N],
+        vec![rat(1, 4), rat(1, 8), rat(1, 16), rat(-1, 32)],
+    ];
+
+    // The first encounter, its prospect over the whole fibre read before it runs.
+    let founded = receiver.world_model().unwrap().clone();
+    let first = prepare(&mut receiver, &field, &source, &preparation, &request);
+    assert!(first.prospective().unique_control().is_some());
+    let foreseen = first.world_prospect().unwrap();
+    let ActionCommunication::Received(received) = first.encounter().unwrap() else {
+        panic!("the first encounter completes");
+    };
+    assert!(received.closes());
+    let steps = executed(received.encounter.steps());
+    let logits = station_logits(&received);
+    assert!(holds(
+        foreseen[0].as_ref().unwrap(),
+        &steps,
+        Some((1, logits.as_slice())),
+        None
+    ));
+    let incident: Vec<Vec<Rat>> = steps.iter().map(|step| step.incident.clone()).collect();
+
+    // The state-only matched control, checked against the charts alone.
+    let updated = receiver.world_model().unwrap().clone();
+    let control = founded.carried(&incident).unwrap();
+    assert_eq!(control.keys(), updated.keys());
+    assert_eq!(control.tick(), updated.tick());
+    for (key, state) in keys.iter().zip(control.states()) {
+        let KeyState::Live(fibre) = state else {
+            panic!("every declared key is passive, so the control carries it live: {state:?}");
+        };
+        assert!(same_fibre(
+            fibre,
+            &carried_whole(key, founded.tick(), &incident)
+        ));
+    }
+    // The restriction is the only difference: every retained fibre lies in its control fibre, and a
+    // key the actual reflected waves eliminated is live in the control.
+    for (retained, carried) in updated.states().iter().zip(control.states()) {
+        let KeyState::Live(carried) = carried else {
+            unreachable!("checked above");
+        };
+        match retained {
+            KeyState::Live(retained) => assert!(fibre_within(retained, carried)),
+            KeyState::Incompatible { .. } => {}
+            KeyState::Held { .. } => panic!("no declared key is held: {retained:?}"),
+        }
+    }
+    // The disconnected law returns every wave whole, so an actual step that does not eliminates it.
+    if steps.iter().any(|step| step.reflected != step.incident) {
+        assert!(matches!(updated.states()[2], KeyState::Incompatible { .. }));
+    }
+    // The port filter does not rule out the false face: both faced laws stay live.
+    assert!(matches!(updated.states()[0], KeyState::Live(_)));
+    assert!(matches!(updated.states()[1], KeyState::Live(_)));
+
+    // The continuing crossing: one prepared second action, read from both memories.
+    let second = prepare(&mut receiver, &field, &source, &preparation, &request);
+    assert!(second.prospective().unique_control().is_some());
+    // A memory off the bound crossing is refused.
+    assert!(second.world_prospect_of(&founded).is_err());
+    let retained = second.world_prospect().unwrap();
+    let matched = second.world_prospect_of(&control).unwrap();
+    let grain = second.receiving_phases().grain();
+    // Per key, typed: a live retained key's prospect lies in its control's; an eliminated key has no
+    // retained image, while its control still reads one.
+    for (index, state) in updated.states().iter().enumerate() {
+        match state {
+            KeyState::Live(_) => assert!(prospect_within(
+                retained[index].as_ref().unwrap(),
+                matched[index].as_ref().unwrap()
+            )),
+            _ => {
+                assert!(retained[index].is_err());
+                assert!(matched[index].is_ok());
+            }
+        }
+    }
+    let truth = retained[0].as_ref().unwrap();
+    let open = matched[0].as_ref().unwrap();
+    let position = truth
+        .point
+        .features
+        .iter()
+        .position(|(read, _, _)| *read == 1)
+        .unwrap();
+    let fixed = truth.point.features[position].2.clone();
+    // No retained direction moves the compared station's logits: the retained plan reads one value.
+    assert!(
+        truth
+            .directions
+            .iter()
+            .all(|direction| direction.features[position].2.iter().all(Zero::is_zero))
+    );
+    // A control direction moves them, and two exact members of the control's image, the retained
+    // point and the point moved along it, differ in the declared observable.
+    let member = open
+        .directions
+        .iter()
+        .find_map(|direction| crossing(&fixed, &direction.features[position].2, grain))
+        .expect("a direction the retained history removed moves the station's reading");
+    assert_ne!(admitted_of(&member, grain), admitted_of(&fixed, grain));
+
+    // The second encounter reads what the retained history fixed.
+    let ActionCommunication::Received(received) = second.encounter().unwrap() else {
+        panic!("the second encounter completes");
+    };
+    assert!(received.closes());
+    assert_eq!(
+        received.word.boundary,
+        -received
+            .encounter
+            .steps()
+            .iter()
+            .map(|step| &step.port_work)
+            .sum::<Rat>()
+    );
+    let steps = executed(received.encounter.steps());
+    let logits = station_logits(&received);
+    assert_eq!(logits, fixed);
+    assert_eq!(admitted_of(&logits, grain), admitted_of(&fixed, grain));
+    // One k carries the actual waves and the station's logits together; where no retained direction
+    // moves the waves, they are the retained point's.
+    assert!(holds(truth, &steps, Some((1, logits.as_slice())), None));
+    let waves_fixed = truth.directions.iter().all(|direction| {
+        direction
+            .waves
+            .iter()
+            .all(|(a, b)| a.iter().chain(b).all(Zero::is_zero))
+    });
+    if waves_fixed {
+        for (step, (incident, reflected)) in steps.iter().zip(&truth.point.waves) {
+            assert_eq!((&step.incident, &step.reflected), (incident, reflected));
+        }
+    }
+    // Where no retained direction moves a key's face, its reading is the encounter's own reader on the
+    // predicted raw face; the World's face is observed only at the compared epoch.
+    let observed = received.encounter.observed()[1]
+        .as_ref()
+        .expect("the compared epoch is observed");
+    let faced = |prospect: &CoupledProspect| {
+        let at = prospect
+            .faces
+            .iter()
+            .position(|(read, _)| *read == 1)
+            .unwrap();
+        prospect
+            .directions
+            .iter()
+            .all(|direction| direction.faces[at].1.iter().all(Zero::is_zero))
+            .then(|| {
+                Face::of_read(
+                    &ReceivingRead::of_logits(prospect.faces[at].1.clone(), grain),
+                    grain,
+                )
+                .unwrap()
+            })
+    };
+    if let Some(face) = faced(truth) {
+        assert_eq!(&face, observed);
+    }
+    // The false face is read beside it and never counted as eliminated: it stays live, and where its
+    // face is fixed its declared reading differs from the observed one.
+    let after = receiver.world_model().unwrap();
+    assert!(matches!(after.states()[1], KeyState::Live(_)));
+    if let Some(face) = faced(retained[1].as_ref().unwrap()) {
+        assert_ne!(
+            admitted(face.cells(), face.phases(), grain),
+            admitted(observed.cells(), observed.phases(), grain)
+        );
+    }
+    // Both participants continue: the memory's tick is the World's commit, and the World's native tick
+    // is the receiver's carry.
+    assert_eq!(
+        after.tick(),
+        receiver.participating_world().unwrap().state().commit
+    );
+    assert_eq!(after.tick(), updated.tick() + steps.len() as u64);
+    assert_eq!(
+        receiver
+            .participating_world()
+            .unwrap()
+            .native_tick()
+            .unwrap(),
+        receiver.resident().carried().unwrap().ticks
+    );
 }
