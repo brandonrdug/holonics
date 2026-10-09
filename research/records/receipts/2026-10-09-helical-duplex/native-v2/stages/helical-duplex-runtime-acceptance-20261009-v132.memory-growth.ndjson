@@ -1,0 +1,21 @@
+{"since_start_ns": 4766059, "group_current_bytes": 26656768, "group_peak_bytes": 26656768}
+{"since_start_ns": 105535297, "group_current_bytes": 41459712, "group_peak_bytes": 41803776}
+{"since_start_ns": 206353325, "group_current_bytes": 54558720, "group_peak_bytes": 54558720}
+{"since_start_ns": 306758982, "group_current_bytes": 56176640, "group_peak_bytes": 56176640}
+{"since_start_ns": 406907276, "group_current_bytes": 56926208, "group_peak_bytes": 56926208}
+{"since_start_ns": 507023420, "group_current_bytes": 59023360, "group_peak_bytes": 59023360}
+{"since_start_ns": 607732845, "group_current_bytes": 58900480, "group_peak_bytes": 60067840}
+{"since_start_ns": 708238378, "group_current_bytes": 59949056, "group_peak_bytes": 60067840}
+{"since_start_ns": 808671456, "group_current_bytes": 63086592, "group_peak_bytes": 63090688}
+{"since_start_ns": 909158555, "group_current_bytes": 64397312, "group_peak_bytes": 64397312}
+{"since_start_ns": 1009822966, "group_current_bytes": 65617920, "group_peak_bytes": 65658880}
+{"since_start_ns": 1110555695, "group_current_bytes": 65462272, "group_peak_bytes": 65658880}
+{"since_start_ns": 1210710291, "group_current_bytes": 65462272, "group_peak_bytes": 65658880}
+{"since_start_ns": 1312354357, "group_current_bytes": 65462272, "group_peak_bytes": 65658880}
+{"since_start_ns": 1414314476, "group_current_bytes": 65462272, "group_peak_bytes": 65658880}
+{"since_start_ns": 1516067716, "group_current_bytes": 65445888, "group_peak_bytes": 65658880}
+{"since_start_ns": 1616346816, "group_current_bytes": 65970176, "group_peak_bytes": 65970176}
+{"since_start_ns": 1716426721, "group_current_bytes": 66007040, "group_peak_bytes": 66777088}
+{"since_start_ns": 1816866572, "group_current_bytes": 65761280, "group_peak_bytes": 66793472}
+{"since_start_ns": 1917975776, "group_current_bytes": 65581056, "group_peak_bytes": 66793472}
+{"event": "native_reaped", "since_start_ns": 1963808853, "group_current_bytes": 24543232, "group_peak_bytes": 66793472}

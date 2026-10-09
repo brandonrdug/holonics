@@ -292,6 +292,27 @@ Its second part states the perfected laws:
      a signed representative that moves every later absolute lift. The count stays on the
      acceptance side, never inside the decoder.
 
+   **Accepted** (`implemented-exact`; `measured`, October 8 PDT). The sole queue accepted the corrected
+   source `02658c6c2` with a fresh compile. Gate 1 passed: the workspace check, the guard lints and
+   all 57 library guard doctests. All 21 duplex tests passed in one process, which took 2,228,496,495 ns
+   of wall time against a fixed projection of 30,917,577,474 ns, at a peak child RSS of 48,780 KiB.
+   The receipt is [native-v2](receipts/2026-10-09-helical-duplex/native-v2/HANDOFF.md). The first seal,
+   `c6fcc82a1`, is preserved unexecuted. Its two gaps were fixed before any run: a partner contact
+   reversed before it was bounded, and a receiver bound only to its helix.
+
+   Readings on unseen keys, per chart (text digits, pitch classes, levels):
+   - free family: released/held 3/21, 0/24 and 3/21;
+   - a template frame: all 24 released in each chart, every class equal to the truth's;
+   - fit-constrained: the transport alone resolves 24 of 24 in each chart. This is forced, because
+     the key is known;
+   - coordinated complementary changes, outside the coverage and counted against truth:
+     absorbed/residual 16/152, 12/540 and 11/349;
+   - an exterior model predicted every one of these counts before the run.
+
+   Scope: a known-truth calibration of the chart/contact/quotient composition only. It establishes
+   no key discovery, no generalization to unseen constitution families, no wider channel coverage,
+   no material power, no HNN partner return and no ribbon geometry.
+
    **The three boundary charts**, each with `σ` as its own half-turn. Each is a known-truth
    `SteppedTerrain` over the chart's alphabet. Placement uses the terrain's truth transport, so
    location's cost of `D^|A|` is not spent; location is a separate, built capability.

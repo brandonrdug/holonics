@@ -1,0 +1,261 @@
+{
+  "source_commit": "02658c6c2ddaf94b0bf66eb9c7db91307f1fc2ce",
+  "source_tree": "ca41addd4277ab5d74bfb23c8a84077486161380",
+  "predecessor_commit": "c6fcc82a187174333ca494bf35c1c8cb7062ab56",
+  "original_bundle_preserved_unexecuted": true,
+  "corrected_contracts": [
+    "malformed partner indices including usize::MAX refuse before reversal arithmetic",
+    "receiver binds its producing LocatedTransport; equal helix with changed advances refuses"
+  ],
+  "native_source_file_count": 346,
+  "native_test_count": 21,
+  "expected_test_names": [
+    "compression::keys::duplex::tests::a_changed_transport_on_the_same_helix_is_refused_its_founded_quotient",
+    "compression::keys::duplex::tests::a_malformed_partner_contact_is_refused_before_any_index_arithmetic",
+    "compression::keys::duplex::tests::a_pairing_is_a_fixed_point_free_involution_and_its_complement_reverse_an_anti_automorphism",
+    "compression::keys::duplex::tests::a_repair_family_is_released_exactly_when_every_coordinate_is_constant",
+    "compression::keys::duplex::tests::a_strand_that_is_no_passage_returns_its_located_defect_and_never_a_duplex",
+    "compression::keys::duplex::tests::a_substitution_carries_a_signed_shift_that_moves_every_later_lift",
+    "compression::keys::duplex::tests::a_template_frame_collapses_each_slipped_factor_and_the_round_trip_holds",
+    "compression::keys::duplex::tests::an_empty_fit_constrained_family_is_the_typed_no_compatible_source_defect",
+    "compression::keys::duplex::tests::an_unreached_lift_is_refused_and_never_substituted",
+    "compression::keys::duplex::tests::coordinated_substitutions_are_outside_the_coverage_and_counted_against_the_truth",
+    "compression::keys::duplex::tests::coprime_residues_recover_the_lift_and_the_winding_keeps_the_carry",
+    "compression::keys::duplex::tests::every_supported_state_extends_to_an_actual_member",
+    "compression::keys::duplex::tests::placement_pairs_the_partner_before_the_quotient_on_unseen_keys_and_lengths",
+    "compression::keys::duplex::tests::single_strand_damage_slips_exactly_the_damaged_contacts",
+    "compression::keys::duplex::tests::the_family_diameter_is_the_maximum_over_its_coordinates_and_the_supports_are_exact",
+    "compression::keys::duplex::tests::the_held_witnesses_are_actual_members_that_attain_the_diameter",
+    "compression::keys::duplex::tests::the_lifts_carry_the_winding_and_step_the_phase",
+    "compression::keys::duplex::tests::the_receipts_state_which_seeds_are_development_and_which_are_acceptance",
+    "compression::keys::duplex::tests::the_supports_keep_the_carry_and_the_class_reads_the_winding",
+    "compression::keys::duplex::tests::the_transport_alone_resolves_the_side_when_the_key_is_known",
+    "compression::keys::duplex::tests::the_unit_rate_slip_vanishes_exactly_on_the_complement"
+  ],
+  "all_native_tests_passed": true,
+  "required_gate1_passed": true,
+  "fresh_test_executable": {
+    "row": {
+      "reason": "compiler-artifact",
+      "package_id": "path+file:///home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-20261009-v132/source-v2/crates/holonics#0.1.0",
+      "manifest_path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-20261009-v132/source-v2/crates/holonics/Cargo.toml",
+      "target": {
+        "kind": [
+          "lib"
+        ],
+        "crate_types": [
+          "lib"
+        ],
+        "name": "holonics",
+        "src_path": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-20261009-v132/source-v2/crates/holonics/src/lib.rs",
+        "edition": "2024",
+        "doc": true,
+        "doctest": true,
+        "test": true
+      },
+      "profile": {
+        "opt_level": "0",
+        "debuginfo": 0,
+        "debug_assertions": true,
+        "overflow_checks": true,
+        "test": true
+      },
+      "features": [],
+      "filenames": [
+        "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-20261009-v132/cache-v2/debug/deps/holonics-70b68d2f7e1f6408"
+      ],
+      "executable": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-20261009-v132/cache-v2/debug/deps/holonics-70b68d2f7e1f6408",
+      "fresh": false
+    },
+    "executable_pin": {
+      "sha256": "dc7e3910b055255a9f0e23aba2d43fc284c59561efba5994224c9aa812904e1c",
+      "bytes": 73564784
+    },
+    "source_admission": {
+      "sha256": "28d0b5460b496c7d17d2ce9e4ac211ccead27f7579a49d129d8da14be8c947bd",
+      "bytes": 59785
+    }
+  },
+  "results": [
+    {
+      "unit": "cache-prep",
+      "label": "helical-duplex-cache-prep-20261009-v132",
+      "accepted": true,
+      "quiescence_confirmed": true,
+      "wall_ns": 8622694867,
+      "projection_ns": 17000000000,
+      "measured_to_projected": {
+        "numerator": 8622694867,
+        "denominator": 17000000000
+      },
+      "aggregate_CPU_ns": 5944411000,
+      "aggregate_CPU_limit_us": 17000000,
+      "group_peak_bytes": 3845267456,
+      "child_peak_RSS_KiB": 38968,
+      "CPU_affinity_count": 1,
+      "group_memory_ceiling_bytes": 4294967296
+    },
+    {
+      "unit": "check",
+      "label": "helical-duplex-check-20261009-v132",
+      "accepted": true,
+      "quiescence_confirmed": true,
+      "wall_ns": 25265904584,
+      "projection_ns": 65000000000,
+      "measured_to_projected": {
+        "numerator": 25265904584,
+        "denominator": 65000000000
+      },
+      "aggregate_CPU_ns": 24296117000,
+      "aggregate_CPU_limit_us": 128000000,
+      "group_peak_bytes": 1680130048,
+      "child_peak_RSS_KiB": 1458800,
+      "CPU_affinity_count": 1,
+      "group_memory_ceiling_bytes": 8589934592
+    },
+    {
+      "unit": "build",
+      "label": "helical-duplex-build-20261009-v132",
+      "accepted": true,
+      "quiescence_confirmed": true,
+      "wall_ns": 35431492350,
+      "projection_ns": 65000000000,
+      "measured_to_projected": {
+        "numerator": 35431492350,
+        "denominator": 65000000000
+      },
+      "aggregate_CPU_ns": 34400553000,
+      "aggregate_CPU_limit_us": 128000000,
+      "group_peak_bytes": 2431410176,
+      "child_peak_RSS_KiB": 2049712,
+      "CPU_affinity_count": 1,
+      "group_memory_ceiling_bytes": 8589934592
+    },
+    {
+      "unit": "runtime-index",
+      "label": "helical-duplex-runtime-index-20261009-v132",
+      "accepted": true,
+      "quiescence_confirmed": true,
+      "wall_ns": 302033267,
+      "projection_ns": 17000000000,
+      "measured_to_projected": {
+        "numerator": 302033267,
+        "denominator": 17000000000
+      },
+      "aggregate_CPU_ns": 246102000,
+      "aggregate_CPU_limit_us": 17000000,
+      "group_peak_bytes": 40415232,
+      "child_peak_RSS_KiB": 24760,
+      "CPU_affinity_count": 1,
+      "group_memory_ceiling_bytes": 8589934592
+    },
+    {
+      "unit": "runtime-binding",
+      "label": "helical-duplex-runtime-binding-20261009-v132",
+      "accepted": true,
+      "quiescence_confirmed": true,
+      "wall_ns": 301368312,
+      "projection_ns": 17000000000,
+      "measured_to_projected": {
+        "numerator": 301368312,
+        "denominator": 17000000000
+      },
+      "aggregate_CPU_ns": 263673000,
+      "aggregate_CPU_limit_us": 17000000,
+      "group_peak_bytes": 38350848,
+      "child_peak_RSS_KiB": 24944,
+      "CPU_affinity_count": 1,
+      "group_memory_ceiling_bytes": 8589934592
+    },
+    {
+      "unit": "runtime-development",
+      "label": "helical-duplex-runtime-development-20261009-v132",
+      "accepted": true,
+      "quiescence_confirmed": true,
+      "wall_ns": 1472265594,
+      "projection_ns": 17000000000,
+      "measured_to_projected": {
+        "numerator": 1472265594,
+        "denominator": 17000000000
+      },
+      "aggregate_CPU_ns": 1422267000,
+      "aggregate_CPU_limit_us": 17000000,
+      "group_peak_bytes": 64385024,
+      "child_peak_RSS_KiB": 47020,
+      "CPU_affinity_count": 1,
+      "group_memory_ceiling_bytes": 8589934592
+    },
+    {
+      "unit": "runtime-acceptance",
+      "label": "helical-duplex-runtime-acceptance-20261009-v132",
+      "accepted": true,
+      "quiescence_confirmed": true,
+      "wall_ns": 2228496495,
+      "projection_ns": 30917577474,
+      "measured_to_projected": {
+        "numerator": 2228496495,
+        "denominator": 30917577474
+      },
+      "aggregate_CPU_ns": 2081060000,
+      "aggregate_CPU_limit_us": 30917578,
+      "group_peak_bytes": 66793472,
+      "child_peak_RSS_KiB": 48780,
+      "CPU_affinity_count": 1,
+      "group_memory_ceiling_bytes": 8589934592
+    },
+    {
+      "unit": "clippy",
+      "label": "helical-duplex-clippy-20261009-v132",
+      "accepted": true,
+      "quiescence_confirmed": true,
+      "wall_ns": 34618204262,
+      "projection_ns": 65000000000,
+      "measured_to_projected": {
+        "numerator": 34618204262,
+        "denominator": 65000000000
+      },
+      "aggregate_CPU_ns": 32420386000,
+      "aggregate_CPU_limit_us": 128000000,
+      "group_peak_bytes": 1725743104,
+      "child_peak_RSS_KiB": 1483528,
+      "CPU_affinity_count": 1,
+      "group_memory_ceiling_bytes": 8589934592
+    },
+    {
+      "unit": "doc",
+      "label": "helical-duplex-doc-20261009-v132",
+      "accepted": true,
+      "quiescence_confirmed": true,
+      "wall_ns": 41258881198,
+      "projection_ns": 65000000000,
+      "measured_to_projected": {
+        "numerator": 41258881198,
+        "denominator": 65000000000
+      },
+      "aggregate_CPU_ns": 38482802000,
+      "aggregate_CPU_limit_us": 128000000,
+      "group_peak_bytes": 2111492096,
+      "child_peak_RSS_KiB": 1638200,
+      "CPU_affinity_count": 1,
+      "group_memory_ceiling_bytes": 8589934592
+    }
+  ],
+  "claim_scope": "Declared local-factor/Markov-fit known-truth duplex composition; no learned key discovery, generalization, material power, continuing HNN partner or ribbon geometry claim",
+  "not_accepted": [
+    "learned key discovery or generalization to unseen constitutions",
+    "full damage-channel correction; coordinated complementary damage remains outside coverage",
+    "physical material power or continuing HNN partner return",
+    "located-clock face geometry or ribbon/Lk=Tw+Wr geometry"
+  ],
+  "publication": "Local receipt files only. No push, merge, history rewrite, worktree removal or scientific source mutation.",
+  "raw_doc_summary": [
+    "running 57 tests",
+    "test result: ok. 57 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.65s"
+  ],
+  "guard_doctest_counts": {
+    "passed": 57,
+    "failed": 0,
+    "ignored": 0,
+    "filtered_out": 0
+  }
+}

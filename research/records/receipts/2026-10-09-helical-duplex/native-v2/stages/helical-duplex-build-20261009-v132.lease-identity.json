@@ -1,0 +1,16 @@
+{
+  "requested_absolute_path": "/home/b/Workspaces/holonics/.local/codex-lean-run.lock",
+  "resolved_absolute_path": "/home/b/Workspaces/holonics/.local/codex-lean-run.lock",
+  "opened_fd_path": "/home/b/Workspaces/holonics/.local/codex-lean-run.lock",
+  "device": 55,
+  "inode": 55954599,
+  "opened_readonly": true,
+  "single_nonblocking_acquisition": true,
+  "controller_PID": 3225189,
+  "start_ticks": "17788268",
+  "fd": 3,
+  "acquired": true,
+  "status": "held_by_external_owner",
+  "in_group_controller_PID": 3225216,
+  "verified_before_native_child": true
+}

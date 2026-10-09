@@ -1,0 +1,103 @@
+{
+  "passed": false,
+  "label": "helical-duplex-cache-prep-20261009-v132",
+  "scientific_job": false,
+  "deferred_lock_busy": false,
+  "final_CPU_ns": 5944411000,
+  "CPU_reading_grain_ns": 1000,
+  "aggregate_CPU_limit_us": 17000000,
+  "final_CPU_source": "systemd retained oneshot CPUUsageNSec after all group processes exit",
+  "CPU_kernel_hard_total_limit": false,
+  "sampled_stop_margin_us": 1000000,
+  "aggregate_CPU_within_limit": true,
+  "no_overshoot_accepted": true,
+  "wall_ns": 8622694867,
+  "projection_ns": 17000000000,
+  "wall_source": "external monotonic_ns through final property read",
+  "quiescent": true,
+  "completion_event": "oneshot start job completed; no polling",
+  "unit_properties": {
+    "Description": "Owned holonics admission helical-duplex-cache-prep-20261009-v132 5925d52c5fb41a26a413701d9267b73d",
+    "LoadState": "loaded",
+    "ActiveState": "active",
+    "SubState": "exited",
+    "InvocationID": "4baa162f24644f319332bc1c7b78d261",
+    "Result": "success",
+    "ExecMainStatus": "0",
+    "ControlGroup": "",
+    "MemoryPeak": "3845267456",
+    "CPUUsageNSec": "5944411000",
+    "TasksCurrent": "[not set]"
+  },
+  "outer_error": null,
+  "unit_start_exit": 0,
+  "unit_start_stdout": "",
+  "unit_start_stderr": "",
+  "config": {
+    "sha256": "27f6bcc636bf35422c103f54636c1143f4823b2b1162eb6b225e906d8182a700",
+    "bytes": 151425
+  },
+  "receipt_pins": {
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-cache-prep-20261009-v132.config.json": {
+      "sha256": "27f6bcc636bf35422c103f54636c1143f4823b2b1162eb6b225e906d8182a700",
+      "bytes": 151425
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-cache-prep-20261009-v132.external-lease.json": {
+      "sha256": "60a27dbb68d933ccb4cfa5bf07ccceda37ca9fba1ff9e69e6a86dd06624380bb",
+      "bytes": 487
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-cache-prep-20261009-v132.lease-identity.json": {
+      "sha256": "c530f46c400d5f061fb341e14330086bd04c33d304840dc8a646b3639c710bfa",
+      "bytes": 565
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-cache-prep-20261009-v132.input_seal.json": {
+      "sha256": "163c408e803aca94adca999159bf16511a1fa8ed66d5ee0b48d7a561e90a545a",
+      "bytes": 96960
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-cache-prep-20261009-v132.memory-growth.ndjson": {
+      "sha256": "01dad7bb994daf11872f556a44c2b685cea0300bf08988119ffa164ec1732d35",
+      "bytes": 7767
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-cache-prep-20261009-v132.stdout": {
+      "sha256": "79903f505415313a0bd23d514c896ddbecf1e343de75c91e942cf29d43c17f5b",
+      "bytes": 403
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-cache-prep-20261009-v132.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-cache-prep-20261009-v132.memory-gate.json": {
+      "sha256": "7a5dc59dee049b222b820e913c2844357a74bc3ce22cdb7b6d4709cbd190e215",
+      "bytes": 120
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-cache-prep-20261009-v132.child-identity.json": {
+      "sha256": "410bd03932c3e7173b94b17d4e2c1f11a23153c88a5354a8c174feda41caad83",
+      "bytes": 78
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-cache-prep-20261009-v132.system-floor.json": {
+      "sha256": "412251d505f70cbe1fe7615ef42c0d5c709fb444bb0b193c9aee57689e9569e8",
+      "bytes": 59546
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-cache-prep-20261009-v132.quiescence.json": {
+      "sha256": "301ac5516bb8a18596b9b6db5f672702ac3fa7cd74aa9a7ff3d8319de682c75f",
+      "bytes": 130
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-cache-prep-20261009-v132.output_seal.json": {
+      "sha256": "a3f47a67d1afd065cc2a964c02803144f6f4a1f562bcceb3b8ba1768d724649b",
+      "bytes": 507248
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-cache-prep-20261009-v132.publication.json": {
+      "sha256": "9e4176cf3c7e9e298326c3d6337ef5b5722d272e7bfac52852155f558b3566b7",
+      "bytes": 3153
+    },
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-cache-prep-20261009-v132.stage-quiescence.json": {
+      "sha256": "0c4f90c9f2ddcea0e9e3408c291254b73e5f55e94c0b8702be04f7c6e8cf6b06",
+      "bytes": 136
+    }
+  },
+  "launcher_outside_native_group": true,
+  "lease_owner_outside_capped_group": true,
+  "lease_held_through_final_CPU_read_and_publication": true,
+  "stage_passed_before_cleanup": true,
+  "requires_cleanup_acceptance": true
+}

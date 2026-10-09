@@ -1,0 +1,31 @@
+{
+  "minimum_MemAvailable_KiB": 4194304,
+  "sampling_period_ns": 10000000,
+  "breached": false,
+  "samples": [
+    {
+      "since_start_ns": 5480297,
+      "MemAvailable_KiB": 16463404
+    },
+    {
+      "since_start_ns": 15503105,
+      "MemAvailable_KiB": 16457148
+    },
+    {
+      "since_start_ns": 26444052,
+      "MemAvailable_KiB": 16456508
+    },
+    {
+      "since_start_ns": 37068437,
+      "MemAvailable_KiB": 16460576
+    },
+    {
+      "since_start_ns": 48083072,
+      "MemAvailable_KiB": 16453680
+    },
+    {
+      "since_start_ns": 58211097,
+      "MemAvailable_KiB": 16422100
+    }
+  ]
+}

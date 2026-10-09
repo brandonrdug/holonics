@@ -1,0 +1,17 @@
+{
+  "native_exit": 0,
+  "projection_exceeded": false,
+  "wall_ns": 1186539056,
+  "events": [
+    {
+      "event": "test_completed",
+      "selector": "compression::keys::duplex::tests::the_family_diameter_is_the_maximum_over_its_coordinates_and_the_supports_are_exact",
+      "result": "ok",
+      "unit_wall_ns": 1183199259,
+      "elapsed_ms": 1183
+    }
+  ],
+  "expected_names": [
+    "compression::keys::duplex::tests::the_family_diameter_is_the_maximum_over_its_coordinates_and_the_supports_are_exact"
+  ]
+}

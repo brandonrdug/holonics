@@ -1,0 +1,17 @@
+{
+  "native_argv": [
+    "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-20261009-v132/cache-v2/debug/deps/holonics-70b68d2f7e1f6408",
+    "--exact",
+    "compression::keys::duplex::tests::the_family_diameter_is_the_maximum_over_its_coordinates_and_the_supports_are_exact",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "expected_names": [
+    "compression::keys::duplex::tests::the_family_diameter_is_the_maximum_over_its_coordinates_and_the_supports_are_exact"
+  ],
+  "per_unit_upper_ns": 16000000000,
+  "native_stdout": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-20261009-v132/development.native.stdout",
+  "native_stderr": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-20261009-v132/development.native.stderr",
+  "result": "/home/b/Workspaces/holonics/.local/lean-rust-pruning/admission-v1/helical-duplex-20261009-v132/development.RUNTIME_RESULT.json",
+  "source_commit": "02658c6c2ddaf94b0bf66eb9c7db91307f1fc2ce"
+}

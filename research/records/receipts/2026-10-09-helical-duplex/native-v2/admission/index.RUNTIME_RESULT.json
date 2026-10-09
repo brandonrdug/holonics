@@ -1,0 +1,17 @@
+{
+  "native_exit": 0,
+  "projection_exceeded": false,
+  "wall_ns": 3716573,
+  "events": [
+    {
+      "event": "test_completed",
+      "selector": "compression::keys::duplex::tests::a_malformed_partner_contact_is_refused_before_any_index_arithmetic",
+      "result": "ok",
+      "unit_wall_ns": 2594180,
+      "elapsed_ms": 2
+    }
+  ],
+  "expected_names": [
+    "compression::keys::duplex::tests::a_malformed_partner_contact_is_refused_before_any_index_arithmetic"
+  ]
+}

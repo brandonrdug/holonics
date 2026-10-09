@@ -1,0 +1,7 @@
+
+running 1 test
+test compression::keys::duplex::tests::a_malformed_partner_contact_is_refused_before_any_index_arithmetic ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1140 filtered out; finished in 0.00s
+
+UNIT_EVENT {"event": "test_completed", "selector": "compression::keys::duplex::tests::a_malformed_partner_contact_is_refused_before_any_index_arithmetic", "result": "ok", "unit_wall_ns": 2594180, "elapsed_ms": 2}
