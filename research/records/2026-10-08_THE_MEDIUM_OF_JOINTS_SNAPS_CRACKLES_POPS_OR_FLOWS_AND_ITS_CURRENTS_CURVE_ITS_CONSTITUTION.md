@@ -180,6 +180,45 @@ quotient. The measurement decides only whether the uniform certificate could be 
 finite-change admission nor grain selection. Crackling waits on a certified landing: no threshold
 law can release joints that the certificate keeps pinned below their cells.
 
+[measured, October 8, PDT; queue run v134 at `e8795670d`, trust assertions passed] **The point
+reading.** All held, blind and actual operands and carries matched. `Aᵀg` equals the total exactly
+in all 108 coordinates. The per-family and joint pairings hold.
+- `|A d_f|²` has `floor_log2` −12 (C), −17 (K) and −17 (D), and −12 jointly. Each is strictly below
+  its `T_f = 2^11·a_f`, which lies in `[2^3, 2^4)` for C and `[2^2, 2^3)` for K and D. The joint
+  reading is strictly below `2^11·Σ a_f`.
+- `ρ_f = κ²b/|A d_f|²` lies in `[2^37, 2^38)` for all three families.
+- The first actual lattice reach is at `2^-10` for every family and jointly. The certified steps
+  `2^-33`, `2^-31` and `2^-31` sit 23, 21 and 21 binary orders below it.
+- The run took 3,229,181,428 ns of child wall time at a peak child RSS of 33,528 KiB. The taught read
+  took 346,866,219 ns and the held twin 2,579,041,323 ns.
+
+[agent-inferred, after Epime's tightened branching] **What binds, and what remains unresolved.**
+- **Binding** on the actual step are the own certificate's curvature `C = s κ²b`, with the uniform
+  gain `κ²` shared by the three families, and then the joint halving: C goes from its own `2^-32`
+  to `2^-33`, K from `2^-29` to `2^-31`, D from `2^-30` to `2^-31`. This run did not read the
+  covector-scale bound `ηc ≤ 1` or the committed-storage constraints.
+- At the point, the exact tangent clears the first-reach threshold by 15 binary orders for C and 19
+  for K and D. The gap therefore lies in the uniform certificate and its chart-to-lattice
+  composition, not in an infinitesimal obstruction of the response.
+- **Unresolved, and not established by the reading:**
+  - the like-for-like join, because `κ²b` and `|A d|²` are read in different forcing and metric
+    charts;
+  - the finite-ray remainder of `A` along `[0, 2^-10]` and the simultaneous-family residuals;
+  - the committed-storage checks.
+
+  No larger deposit is admitted. The candidate laws are not exhaustive:
+  - (a) L1′ a priori: the exact-tangent curvature plus a certified bound on the variation of `A`
+    along the executed ray;
+  - (b) a posteriori exact decrease on the current word: evaluate the declared comparison exactly,
+    or exactly enclosed, at the candidate material `θ + ηd`, starting at the first-reach step and
+    halving, for all families jointly. It certifies the actual finite step without a curvature
+    bound. It owes:
+    - the lawfulness of re-evaluating on the current word's own producing operands, which is not
+      a retention tape;
+    - an exact or enclosed score at the grain representative;
+    - the committed-storage checks;
+    - the cost of each trial, measured at 346,866,219 ns per taught read.
+
 **Owed (#62, #73):**
 1. the avalanche carry as a certified deposition, which never raises a limit and never takes an
    uncertified step, with its Lean statement;
