@@ -1,0 +1,142 @@
+{
+  "source_commit": "083640894c87de16a2281bdc2c75f708bf60b697",
+  "source_tree": "5a8edd2c0b80af82137d7f76e61397e60bbedb70",
+  "native_files_git_matched": 348,
+  "scope": "Conditional paired-carrier/source dyad/current-port structural laws only; no learned-code, deposition-equivariance or complete damage-channel claim.",
+  "all_native_stages_passed": true,
+  "test_count": 16,
+  "test_names": [
+    "hnn::paired::tests::a_reflector_is_dihedral_exactly_when_it_is_c_minus_i",
+    "hnn::paired::tests::the_pairing_is_typed_and_a_fixed_point_free_involution_needs_an_even_family",
+    "hnn::paired::tests::campaign_ones_five_classes_admit_no_pairing_and_the_alphabet_is_not_changed_to_fit",
+    "hnn::paired::tests::a_period_four_reflector_that_passes_declare_fails_the_dihedral_relation",
+    "hnn::paired::tests::the_founded_sign_matrix_is_refused_naming_its_first_failing_column",
+    "hnn::paired::tests::the_ring_the_source_and_the_port_shape_are_certified",
+    "hnn::paired::tests::the_admitted_case_builds_each_follower_column_from_its_leader",
+    "hnn::paired::tests::equivariance_names_the_first_failing_column_and_row",
+    "hnn::paired::tests::the_lift_is_an_involution_that_inverts_the_rotor_on_the_carrier",
+    "hnn::paired::tests::the_phase_convention_is_pinned_by_a_hand_computed_anchor",
+    "hnn::paired::tests::the_partner_strands_moment_and_face_are_the_dyad_image_of_the_strands",
+    "hnn::paired::tests::the_partner_read_refuses_where_normalization_or_rounding_would_break_it",
+    "hnn::paired::tests::a_port_that_a_later_change_takes_off_the_equivariant_subspace_is_refused_at_the_read",
+    "hnn::paired::tests::the_real_constitution_is_read_at_its_current_port",
+    "hnn::paired::tests::a_source_ring_behind_a_silent_ring_reads_and_one_behind_a_ticking_ring_is_refused",
+    "hnn::paired::tests::the_partner_adds_no_information_at_the_retained_quotient"
+  ],
+  "all_guard_doctests": 57,
+  "results": [
+    {
+      "unit": "prep8",
+      "passed": true,
+      "quiescence_confirmed": true,
+      "complete_stage_wall_ns": 9405410065,
+      "projection_ns": 17000000000,
+      "measured_to_projected": {
+        "numerator": 9405410065,
+        "denominator": 17000000000
+      },
+      "aggregate_CPU_ns": 6690488000,
+      "group_peak_bytes": 8260976640,
+      "child_wall_ns": 9141840419,
+      "child_peak_RSS_KiB": 39660,
+      "exit_status": 0,
+      "thread_budget": 1,
+      "group_memory_max_bytes": 8589934592
+    },
+    {
+      "unit": "check",
+      "passed": true,
+      "quiescence_confirmed": true,
+      "complete_stage_wall_ns": 29317793509,
+      "projection_ns": 65000000000,
+      "measured_to_projected": {
+        "numerator": 29317793509,
+        "denominator": 65000000000
+      },
+      "aggregate_CPU_ns": 28159142000,
+      "group_peak_bytes": 1627512832,
+      "child_wall_ns": 27284699235,
+      "child_peak_RSS_KiB": 1467820,
+      "exit_status": 0,
+      "thread_budget": 1,
+      "group_memory_max_bytes": 8589934592
+    },
+    {
+      "unit": "clippy",
+      "passed": true,
+      "quiescence_confirmed": true,
+      "complete_stage_wall_ns": 34048892027,
+      "projection_ns": 65000000000,
+      "measured_to_projected": {
+        "numerator": 34048892027,
+        "denominator": 65000000000
+      },
+      "aggregate_CPU_ns": 32978968000,
+      "group_peak_bytes": 1738309632,
+      "child_wall_ns": 32323510128,
+      "child_peak_RSS_KiB": 1496340,
+      "exit_status": 0,
+      "thread_budget": 1,
+      "group_memory_max_bytes": 8589934592
+    },
+    {
+      "unit": "doc",
+      "passed": true,
+      "quiescence_confirmed": true,
+      "complete_stage_wall_ns": 40565530182,
+      "projection_ns": 65000000000,
+      "measured_to_projected": {
+        "numerator": 40565530182,
+        "denominator": 65000000000
+      },
+      "aggregate_CPU_ns": 39451651000,
+      "group_peak_bytes": 2059976704,
+      "child_wall_ns": 38862495170,
+      "child_peak_RSS_KiB": 1660044,
+      "exit_status": 0,
+      "thread_budget": 1,
+      "group_memory_max_bytes": 8589934592
+    },
+    {
+      "unit": "build",
+      "passed": true,
+      "quiescence_confirmed": true,
+      "complete_stage_wall_ns": 39873884535,
+      "projection_ns": 65000000000,
+      "measured_to_projected": {
+        "numerator": 39873884535,
+        "denominator": 65000000000
+      },
+      "aggregate_CPU_ns": 38729340000,
+      "group_peak_bytes": 2392952832,
+      "child_wall_ns": 37934719721,
+      "child_peak_RSS_KiB": 2121132,
+      "exit_status": 0,
+      "thread_budget": 1,
+      "group_memory_max_bytes": 8589934592
+    },
+    {
+      "unit": "runtime",
+      "passed": true,
+      "quiescence_confirmed": true,
+      "complete_stage_wall_ns": 1140254304,
+      "projection_ns": 17000000000,
+      "measured_to_projected": {
+        "numerator": 1140254304,
+        "denominator": 17000000000
+      },
+      "aggregate_CPU_ns": 1067770000,
+      "group_peak_bytes": 28581888,
+      "child_wall_ns": 864792233,
+      "child_peak_RSS_KiB": 25036,
+      "exit_status": 0,
+      "thread_budget": 1,
+      "group_memory_max_bytes": 8589934592
+    }
+  ],
+  "source_changes_by_queue": false,
+  "no_demo_run": true,
+  "raw_runtime_stdout": "stages/actual-h-runtime-20261009-v140.stdout",
+  "raw_runtime_stderr": "stages/actual-h-runtime-20261009-v140.stderr",
+  "public_publication": false
+}
