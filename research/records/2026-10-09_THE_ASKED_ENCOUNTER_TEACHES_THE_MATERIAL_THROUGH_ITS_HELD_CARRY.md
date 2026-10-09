@@ -227,6 +227,28 @@ these ratios at each halving:
 
 For every part, `4ʲ r_j` stays within a factor below 2 across the ladder.
 
+## 3e. One tick law, recovered: the held contact variation already owned it
+
+[source-inspected; a recovery failure, corrected] `Word::contact_first_variation`
+(`word/variation.rs`) already carried exactly the tangent of eq. (2) per raw Gram-factor coordinate:
+the full signed tick, then `propagation::transit_variation` at the coordinate's form derivative. The
+held contact variation (`HeldContactVariation`) carries those columns across Words and assembles
+their factor steps. `MaterialTangent::step` had restated the same law through its own right side and
+`transit_update`. That is the recorded failure of implementing before recovering (CLAUDE.md, recover
+before implementing; the lessons record's item on located owners). The law is now kept once.
+`Word::contact_forms_variation` is the tick at declared form derivatives, and both consumers call it:
+the coordinate columns through `contact_first_variation`, and `MaterialTangent`. Directions are built
+from raw coordinates (`MaterialDirection::of_coordinate`), and `MaterialDirection::right` is
+deleted. `MaterialTangent` remains only for what the held variation does not yet carry: the World
+port (4) and the encounter's station tangents (5).
+
+[proved-derived; a latent defect found by the recovery] The coordinate's form derivative was
+`E fᵀ + f Eᵀ` for all three families. The executed stiffness is `K = b Σ bᵀ` with the contact's
+declared signature `Σ = diag(σ)` (`contact::signed_stiffness`), so the stiffness coordinate's
+derivative is `E Σ bᵀ + b Σ Eᵀ`. The shared `coordinate_forms` now reads the signature. Without a
+declared boost, `Σ = 1` and nothing changes; with one, the held variation's stiffness columns were
+the wrong tangent.
+
 ## 4. The owners it consumes, and the implementation
 
 - `propagation::{transit_solve, transit_update, ContactOperands::solve}` for (1).
@@ -255,3 +277,77 @@ masses held in their cell.
 landing's exact strict improvement admits. A tape kept as retention: the forward route keeps none. An
 authored routine standing in for learning: the direction comes from the World's actual return, and
 nothing task-specific enters. A fixture becoming the goal: (a)–(e) are fixed here before code.
+
+## 5. The landing: experience proposes, the located model admits
+
+[definition; agent-inferred, October 9] The loop's material response (c) lands as follows.
+
+1. **The proposal.** Every raw Gram-factor coordinate of the declared contacts rides the teaching
+   encounter as a tangent. The descent at coordinate `i` is `−dℓ/dε_i`, the negative total of
+   series (5) (`continuation::world_descent`). It is assembled into one factor step per
+   (contact, family) and normalized as `HeldContactComparison` normalizes its reached covector, by
+   the family's within-Word feature energy and covector scale from the encounter's own composed
+   return (`NativeReceivingReturn::contacts`, whose gradients are the World-held reading of the
+   same comparison). The tangents open at a held opening, so they add no opening-column power and
+   no dual bound.
+2. **The step.** The proposal is staged at the contemporary constitution, which already carries
+   the encounter's receiving deposit, with the encounter's own reach. It passes through the native
+   declared-step law: the first reach read from the owner's own split, then the declared-step
+   producer, which commits at least one lattice unit or refuses typed
+   (`Constitution::{first_reach, deposited_with_contact_spans_at}`). The descent was located at the
+   comparison's producing commit. The receiving step that followed changes it only jointly with
+   the contact step, at second order. That is why it is a proposal, and why the admission below,
+   not the step law, decides.
+3. **The admission reads the admitted future.** The candidate `θ′` and the contemporary `θ` each
+   read the *next* encounter, with the same source, receiver, preparation, compared station and
+   control, through the World model's one live key from its located point
+   (`PhysicalReceiver::world_prospect_ratio`). The produced faces are the prospective native
+   logits. The observed faces are the key's declared raw face, read at the receiver's grain
+   exactly as the encounter reads the World's. `decide` (Lean
+   `HNN/FiniteDecrease.admission_sound`) admits only on an exact strict classical improvement with
+   no worse phase excess. The reading-identity witness is not read for receiving face ratios, so a
+   phase-only improvement refuses. A plural key fibre, more than one live key, or a key without a
+   face refuses: the World's future is then not located. This replaces a replay of the past
+   encounter, which would need a frozen opening state of the World (a tape). Nothing is held for
+   replay.
+4. **Publication.** An admitted `θ′` is published with the carried current crossed at held
+   momentum (`C′ w′ = π`, `ReceptionCarry::crossed`). The stored energy's exact change at that
+   crossing is returned as the deposition work, so the energy account closes exactly
+   (acceptance (c)).
+5. **Production (d)** is the actual next encounter on `θ′`. Under the located key the prospect
+   must equal it exactly (the same code enclosure and excess), which checks the model's re-read. It
+   is then read against the matched control, the same history without the landing.
+
+`PhysicalReceiver::land_world_descent` performs steps 2–4. The test
+`the_world_landing_reads_the_next_encounter` (`tests/material_tangent_world.rs`) runs steps 1–5 on
+the fixture and reports the decision as measured. It is never forced.
+
+[measured; local developer read in the slot Epime admitted, not claim-bearing]
+`the_world_landing_reads_the_next_encounter` on the fixture
+([receipt](receipts/2026-10-09-material-tangent/LANDING_DEV_TESTS.v1.json)). One teaching encounter carried
+every raw coordinate of contact 0's three factor families, and their World-sensitive descent was
+staged through the native declared-step law and committed. **The landing was admitted, classically:**
+
+| reading (code in bits, at the grain) | code − 1 | phase excess |
+|---|---|---|
+| next encounter on `θ`, the key's prospect | in `[2⁻⁷, 2⁻⁶)` | `X` |
+| next encounter on `θ′`, the key's prospect | in `[2⁻⁸, 2⁻⁷)` | `X′`, with `X − X′` in `[2⁻¹⁵, 2⁻¹⁴)` |
+
+The candidate's upper endpoint lies below the producing lower endpoint by a gap in `[2⁻⁸, 2⁻⁷)`.
+The held-momentum crossing released stored energy: the deposition work is negative, with magnitude
+in `[2⁻¹², 2⁻¹¹)`, exact in the receipt.
+
+**Production (d), first control.** The actual next encounter on the published `θ′` reproduced the
+key's prospect exactly (equal code enclosure and excess). The matched control, the same history
+without the landing on a fresh twin, reproduced the producing prospect exactly. The landed
+material's actual next comparison lies strictly below the control's (landed upper < control
+lower). **On this fixture the World's actual return changed the contact material through its own
+derivative, and the changed material answered the next encounter strictly better than the same
+history without it.** Not yet measured: the second matched control (the same deposit without the
+asked history), the cold restore of acceptance (c), the queue's claim-bearing run, and any second
+fixture. One fixture and one step are a single instance.
+
+**Owed (#62).** The admission's soundness for a receiving face ratio read through a located key:
+`HNN/FiniteDecrease.admission_sound` holds for the exact enclosures; that the key's prospect equals
+the actual encounter is the C1b prospect law under its located point.
+

@@ -60,7 +60,6 @@ use crate::hnn::constitution::{
     FactorGradient, Family, Locus, Reach,
 };
 use crate::hnn::port::{ChangeCovector, Deposit, WordReturn};
-use crate::ratio::linear::vector::scale;
 use crate::hnn::encoding::Encoded;
 use crate::hnn::field::ReceiverDeclaration;
 use crate::hnn::ratio::{Face, Faces, HolonRatio, RatioCovector, TargetPhases, target_phases};
@@ -1542,32 +1541,33 @@ pub struct MaterialDirection {
 }
 
 impl MaterialDirection {
-    /// **The transit's material right side** (the held-carry record, eq. 1): the derivative of
-    /// `m_a ζ = right` along this direction with the state held,
-    /// `r_δ = 2δC (w − ω) − hδD ω − hδK (u + hω/2)`, at the tick's start state `(u, w)` and its
-    /// executed midpoint `ω`. Its solve `δζ = m_a⁻¹ r_δ` is the transit's material increment.
-    fn right(
-        &self,
-        step: &Rat,
-        displacement: &[Rat],
-        rate: &[Rat],
-        midpoint: &[Rat],
-    ) -> Result<Vec<Rat>, HnnError> {
-        let mut right = vec![Rat::zero(); rate.len()];
-        if let Some(storage) = &self.storage {
-            right = add(
-                &right,
-                &scale(&integer(2), &storage.apply(&sub(rate, midpoint))?),
-            );
-        }
-        if let Some(dissipation) = &self.dissipation {
-            right = sub(&right, &scale(step, &dissipation.apply(midpoint)?));
-        }
-        if let Some(stiffness) = &self.stiffness {
-            let reached = add(displacement, &scale(&(step / integer(2)), midpoint));
-            right = sub(&right, &scale(step, &stiffness.apply(&reached)?));
-        }
-        Ok(right)
+    /// **The direction of one raw Gram-factor coordinate** (`word::variation::coordinate_forms`):
+    /// its family's form derivative, the other two forms fixed.
+    pub fn of_coordinate(
+        theta: &Constitution,
+        coordinate: &super::variation::ContactCoordinate,
+    ) -> Result<Self, HnnError> {
+        let [storage, stiffness, dissipation] =
+            super::variation::coordinate_forms(theta, coordinate)?;
+        Ok(Self {
+            contact: coordinate.contact,
+            storage: (coordinate.family == 0).then_some(storage),
+            stiffness: (coordinate.family == 1).then_some(stiffness),
+            dissipation: (coordinate.family == 2).then_some(dissipation),
+        })
+    }
+
+    /// The three form derivatives `[δC, δK, δD]` at the contact's width, a fixed form zero.
+    fn forms(&self, width: usize) -> Result<[ExactRatMatrix; 3], HnnError> {
+        let form = |f: &Option<ExactRatMatrix>| match f {
+            Some(f) => Ok(f.clone()),
+            None => ExactRatMatrix::zero(width, width),
+        };
+        Ok([
+            form(&self.storage)?,
+            form(&self.stiffness)?,
+            form(&self.dissipation)?,
+        ])
     }
 }
 
@@ -1577,9 +1577,10 @@ impl MaterialDirection {
 ///
 /// - **Within the Word** (eq. 2): `χ_(k+1) = T_k χ_k + b_(a,k)`, where `T_k` is the tick's full
 ///   fixed-operand state map ([`crate::hnn::prediction::physical_signed_tick`]) and `b_(a,k)` the
-///   transit's update of its material increment alone (`transit_update` at `δζ` with zero waves and
-///   zero state: `b_u = hη`, `b_w = 2η`, the channel's arriving waves `∓δζ/h`, `η = (G/2h)δζ`). The
-///   start state `(u_k, w_k)` and midpoint `ω_k` are the Word's own passage record.
+///   transit's variation at the direction's forms with zero state variation
+///   (`propagation::transit_variation`). Both are [`Word::contact_forms_variation`], the one tick
+///   law it shares with the held contact variation's columns. The start state `(u_k, w_k)` and
+///   midpoint `ω_k` are the Word's own passage record.
 /// - **At the opening:** `χ_0 = 0`, the held, parameter-independent opening.
 /// - **Across the passage boundary** (eq. 3, [`Self::opened`]): the linear part of
 ///   [`ReceptionCarry::crossed`] (the arriving waves transmitted at `2G_old/(G_old + G_new)`; the
@@ -1880,34 +1881,10 @@ impl MaterialTangent {
                 reason: "a material tangent follows a full tick, not a last junction",
             });
         }
-        let operands = word.operands();
-        let mut next = crate::hnn::prediction::physical_signed_tick(
-            operands,
-            &self.tangent,
-            self.opened_at + k,
-        )?;
         let a = self.direction.contact;
-        let contact = &operands.contacts()[a];
-        let h = operands.step();
-        let [displacement, rate] = &record.states[a];
-        let right = self
-            .direction
-            .right(h, displacement, rate, &record.rates[a])?;
-        let solved = contact.solve()?.apply(&right)?;
-        let forced = transit_update(
-            contact,
-            h,
-            &solved,
-            &vec![Rat::zero(); next.arrivals[a][0].len()],
-            &vec![Rat::zero(); next.arrivals[a][1].len()],
-            &vec![Rat::zero(); displacement.len()],
-            &vec![Rat::zero(); rate.len()],
-        );
-        next.arrivals[a][0] = add(&next.arrivals[a][0], &forced.arrive_from);
-        next.arrivals[a][1] = add(&next.arrivals[a][1], &forced.arrive_to);
-        next.states[a][0] = add(&next.states[a][0], &forced.displacement);
-        next.states[a][1] = add(&next.states[a][1], &forced.rate);
-        self.tangent = next;
+        let width = word.operands().contacts()[a].width();
+        self.tangent =
+            word.contact_forms_variation(k, &self.tangent, a, &self.direction.forms(width)?)?;
         self.ticks += 1;
         Ok(())
     }
@@ -1973,4 +1950,93 @@ impl MaterialTangent {
     ) -> Result<Rat, HnnError> {
         Ok(opening.pairing(&self.opened(carry, conductances, field)?))
     }
+}
+
+/// [definition; agent-inferred, October 9; the held-carry record §5] **The World-sensitive contact
+/// descent of one encounter's own comparison**: for each declared raw Gram-factor coordinate the
+/// negative total of its tangent's comparison credit (5), assembled into one factor step per
+/// (contact, family). Each step keeps the normalization the held contact comparison gives its
+/// reached covector: the family's within-Word feature energy and covector scale, here read from the
+/// encounter's own composed return (`held`, [`crate::hnn::word::NativeReceivingReturn::contacts`]).
+/// The tangents open at a held opening (`χ_0 = 0`), so no opening column adds power or a dual bound.
+/// It is a proposal: only the landing's admission moves the material. Refused for a coordinate
+/// declared twice, a tangent that does not carry its coordinate's direction, or a family the
+/// composed return did not reach.
+pub fn world_descent(
+    theta: &Constitution,
+    coordinates: &[super::variation::ContactCoordinate],
+    tangents: &[MaterialTangent],
+    ratio: &crate::hnn::ratio::ReceivingFaceRatio,
+    held: &[crate::hnn::constitution::FactorStep],
+) -> Result<Vec<crate::hnn::constitution::FactorStep>, HnnError> {
+    if coordinates.len() != tangents.len() {
+        return Err(HnnError::Shape {
+            what: "one material tangent per declared contact coordinate",
+            expected: coordinates.len(),
+            found: tangents.len(),
+        });
+    }
+    let mut families: std::collections::BTreeMap<(usize, usize), Vec<Vec<Option<Rat>>>> =
+        std::collections::BTreeMap::new();
+    for (coordinate, tangent) in coordinates.iter().zip(tangents) {
+        if tangent.direction() != &MaterialDirection::of_coordinate(theta, coordinate)? {
+            return Err(HnnError::Unadmitted {
+                reason: "each material tangent carries its declared coordinate's direction",
+            });
+        }
+        let a = coordinate.contact;
+        let factor = [
+            theta.contact_storage(a),
+            theta.contact_stiffness(a),
+            theta.contact_dissipation(a),
+        ][coordinate.family];
+        let entries = families
+            .entry((a, coordinate.family))
+            .or_insert_with(|| vec![vec![None; factor.columns()]; factor.rows()]);
+        let slot = &mut entries[coordinate.row][coordinate.column];
+        if slot.is_some() {
+            return Err(HnnError::Unadmitted {
+                reason: "a contact coordinate is declared once",
+            });
+        }
+        *slot = Some(-tangent.comparison_credit(ratio)?.total());
+    }
+    families
+        .into_iter()
+        .map(|((a, family), entries)| {
+            let tag = Family::Factor(family);
+            let reached = held
+                .iter()
+                .find(|s| s.gradient.locus() == Locus::Channel(a) && s.gradient.family() == tag)
+                .ok_or(HnnError::Unadmitted {
+                    reason: "a World-sensitive descent is normalized by its family's reached within-Word metric",
+                })?;
+            let rows = entries.len();
+            let columns = entries.first().map_or(0, Vec::len);
+            let descent = entries
+                .into_iter()
+                .map(|row| row.into_iter().map(|x| x.unwrap_or_else(Rat::zero)).collect())
+                .collect();
+            let gradient = ExactRatMatrix::shaped(rows, columns, descent)?;
+            let gradient = match family {
+                0 => FactorGradient::Storage {
+                    contact: a,
+                    gradient,
+                },
+                1 => FactorGradient::Stiffness {
+                    contact: a,
+                    gradient,
+                },
+                _ => FactorGradient::Dissipation {
+                    contact: a,
+                    gradient,
+                },
+            };
+            Ok(crate::hnn::constitution::FactorStep {
+                gradient,
+                energy: reached.energy.clone(),
+                covector: reached.covector.clone(),
+            })
+        })
+        .collect()
 }

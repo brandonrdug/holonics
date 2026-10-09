@@ -16,12 +16,14 @@ use holonics::hnn::field::{ContactDeclaration, CribDeclaration, ReceiverDeclarat
 use holonics::hnn::physical::PhysicalReceiver;
 use holonics::hnn::physical::action::{
     ActionCommunication, AdmittedWaves, BoundJointWorld, ModelKey, PreparedPhysicalProbe,
-    WorldModel,
+    WorldLanding, WorldModel,
 };
 use holonics::hnn::propagation::Operands;
 use holonics::hnn::ring::ResonatorMaterial;
 use holonics::hnn::word::action::PortPreparation;
-use holonics::hnn::word::continuation::MaterialDirection;
+use holonics::hnn::field::ConstitutionRead;
+use holonics::hnn::word::continuation::{MaterialDirection, world_descent};
+use holonics::hnn::word::variation::ContactCoordinate;
 use holonics::hnn::{
     Constitution, Current, Encoded, Field, FieldDeclaration, RingDeclaration, WordOpening,
 };
@@ -656,4 +658,174 @@ fn the_encounters_comparison_is_credited_through_the_world() {
             );
         }
     }
+}
+
+/// Every raw Gram-factor coordinate of contact 0's three families on `theta`.
+fn all_coordinates(theta: &Constitution) -> Vec<ContactCoordinate> {
+    let width = theta.contact_storage(0).rows();
+    let mut coordinates = Vec::new();
+    for family in 0..3 {
+        let factor = [
+            theta.contact_storage(0),
+            theta.contact_stiffness(0),
+            theta.contact_dissipation(0),
+        ][family];
+        for row in 0..width {
+            for column in 0..factor.columns() {
+                coordinates.push(ContactCoordinate {
+                    contact: 0,
+                    family,
+                    row,
+                    column,
+                });
+            }
+        }
+    }
+    coordinates
+}
+
+/// The second encounter's actual comparison code enclosure and its compared station's raw logits
+/// and World face.
+fn second_comparison(
+    receiver: &mut PhysicalReceiver<'_>,
+    field: &Field,
+    source: &Encoded,
+    control: &[Rat],
+) -> (
+    holonics::ratio::algebraic::ExactInterval,
+    Rat,
+    Vec<Rat>,
+    Vec<Rat>,
+) {
+    let preparation = actuator(field);
+    let probe = receiver
+        .prepare_probe(source, &field.receivers()[0], &preparation, &[false, true])
+        .unwrap();
+    let waves = admitted(&probe, 0);
+    let reception = probe.encounter(&waves, control).unwrap();
+    let ActionCommunication::Received(received) = reception.reception else {
+        panic!("the second encounter completes");
+    };
+    let ratio = &received.comparison.as_ref().unwrap().returned.ratio;
+    let station = ratio.stations()[0];
+    let read = received
+        .boundary
+        .readings()
+        .iter()
+        .find(|read| read.station == station)
+        .unwrap();
+    (
+        ratio.code_length().unwrap(),
+        ratio.excess().unwrap(),
+        read.read.logits.clone(),
+        received.encounter.steps()[read.crossing - 1]
+            .joint
+            .face()
+            .to_vec(),
+    )
+}
+
+/// **The World landing reads the next encounter through the located key** (the held-carry record
+/// §5): one teaching encounter on every raw coordinate of contact 0, the World-sensitive descent of
+/// its own comparison, a declared step through the native first reach, and the located key's
+/// prospect of the next encounter on `θ′` against `θ`. Whatever the decision, it is reported as
+/// measured. When admitted, the actual next encounter is read against the key's prospect (equal
+/// readings, exactly) and against the matched control without the landing.
+#[test]
+fn the_world_landing_reads_the_next_encounter() {
+    let (field, base, source) = fixture();
+    let declared = Declared::new(&field, base);
+    let theta = declared.at(&Rat::zero());
+    let control = vec![integer(1)];
+    let coordinates = all_coordinates(&theta);
+    let directions: Vec<MaterialDirection> = coordinates
+        .iter()
+        .map(|c| MaterialDirection::of_coordinate(&theta, c).unwrap())
+        .collect();
+
+    let mut receiver = bound(&field, theta.clone(), &source, vec![faced_key(&field)]);
+    let preparation = actuator(&field);
+    let probe = receiver
+        .prepare_probe(&source, &field.receivers()[0], &preparation, &[false, true])
+        .unwrap();
+    let waves = admitted(&probe, 0);
+    let (reception, tangents) = probe
+        .encounter_teaching(&waves, &control, &directions)
+        .unwrap();
+    let ActionCommunication::Received(received) = reception.reception else {
+        panic!("the teaching encounter completes");
+    };
+    let returned = &received.comparison.as_ref().unwrap().returned;
+    let steps = world_descent(
+        &theta,
+        &coordinates,
+        &tangents,
+        &returned.ratio,
+        &returned.contacts,
+    )
+    .unwrap();
+    for step in &steps {
+        println!(
+            "world descent: family {:?}, entries {:?}",
+            step.gradient.family(),
+            step.gradient
+                .entries()
+                .map(|x| x.to_string())
+                .collect::<Vec<_>>()
+        );
+    }
+    let reach = returned.deposit.as_ref().unwrap().reach().unwrap().clone();
+    let opened_at = received.encounter.before_native_tick;
+    let landing = receiver
+        .land_world_descent(
+            steps,
+            reach,
+            opened_at,
+            &source,
+            &field.receivers()[0],
+            &preparation,
+            &[false, true],
+            &control,
+        )
+        .unwrap();
+    let reading = match landing {
+        WorldLanding::Unreached(refusal) => {
+            println!("world landing: no family reached its lattice: {refusal:?}");
+            return;
+        }
+        WorldLanding::Read(reading) => reading,
+    };
+    println!(
+        "world landing: producing code {:?} excess {}; proposed code {:?} excess {}; decision {:?}; deposition work {:?}",
+        reading.producing.code_length().unwrap(),
+        reading.producing.excess().unwrap(),
+        reading.proposed.code_length().unwrap(),
+        reading.proposed.excess().unwrap(),
+        reading.decision,
+        reading.deposition_work.as_ref().map(|w| w.to_string()),
+    );
+    if reading.decision.is_err() {
+        return;
+    }
+    // The actual next encounter on θ′, against the key's prospect and the matched control.
+    let landed = second_comparison(&mut receiver, &field, &source, &control);
+    assert_eq!(
+        landed.0,
+        reading.proposed.code_length().unwrap(),
+        "the located key's prospect is the actual next comparison"
+    );
+    assert_eq!(landed.1, reading.proposed.excess().unwrap());
+    let mut matched = bound(&field, theta.clone(), &source, vec![faced_key(&field)]);
+    {
+        let probe = matched
+            .prepare_probe(&source, &field.receivers()[0], &preparation, &[false, true])
+            .unwrap();
+        let waves = admitted(&probe, 0);
+        probe.encounter(&waves, &control).unwrap();
+    }
+    let unlanded = second_comparison(&mut matched, &field, &source, &control);
+    println!(
+        "world production: landed code {:?} excess {}; matched control code {:?} excess {}",
+        landed.0, landed.1, unlanded.0, unlanded.1
+    );
 }

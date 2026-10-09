@@ -90,24 +90,33 @@ pub use world::{BoundJointWorld, NativeEncounter, NativeEncounterFailure, WaveJo
 
 use super::{PhysicalReceiver, communication::PhysicalBoundary};
 use crate::hnn::HnnError;
-use crate::hnn::constitution::{Constitution, DepositReading};
+use crate::hnn::constitution::{
+    CommittedReach, Constitution, DeclaredExponents, DeclaredStepRefusal, DepositReading, FactorStep,
+    Locus, Reach,
+};
 use crate::hnn::encoding::Encoded;
 use crate::hnn::field::{Current, Field, FieldMaterial, ReceiverDeclaration};
 use crate::hnn::moment::SourceMoment;
 use crate::hnn::phase_family::{PhaseFamily, PhaseImage};
+use crate::hnn::port::Deposit;
 use crate::hnn::prediction::{
     DamagedSection, PhysicalRepair, RepairedCell, StationRead, Unresolved,
 };
-use crate::hnn::receiving::ReceivingPhases;
+use crate::hnn::propagation::Operands;
+use crate::hnn::ratio::{Face, Faces, ReceivingFaceRatio};
+use crate::hnn::receiving::{ReceivingPhases, ReceivingRead};
 use crate::hnn::word::action::{
     AppliedPortPreparation, PortPreparation, PortPreparationReceipt, ProspectiveControl,
     ProspectiveFeature,
 };
-use crate::hnn::word::continuation::{MaterialDirection, MaterialTangent};
+use crate::hnn::word::continuation::{
+    AdmissionRefusal, Admitted, MaterialDirection, MaterialTangent, decide,
+};
+use crate::hnn::word::finite_gain::FiniteContactSpans;
 use crate::hnn::word::variation::VariationReading;
 use crate::hnn::word::{
-    FieldBalance, NativeReceivingReturn, ReceptionCarry, SourceOpeningReceipt, SourceWaveReturn,
-    Word, WordBalance,
+    FieldBalance, NativeReceivingReturn, PowerForm, ReceptionCarry, SourceOpeningReceipt,
+    SourceWaveReturn, Word, WordBalance,
 };
 use crate::holon::HolonState;
 use crate::ratio::Rat;
@@ -226,6 +235,27 @@ struct ActionFrame {
     source_length: usize,
     receiver_index: usize,
     opening: SourceOpeningReceipt,
+}
+
+/// [definition; agent-inferred, October 9; the held-carry record §5] **What a World landing read**:
+/// the native declared-step refusal when no family reaches its lattice, or the reading.
+#[derive(Debug)]
+pub enum WorldLanding {
+    Unreached(DeclaredStepRefusal),
+    Read(Box<WorldLandingReading>),
+}
+
+/// The landing's declared step, the two prospects it compared and its decision; with an admitted
+/// candidate, the stored energy's exact change at the held-momentum crossing (`None` when refused).
+#[derive(Debug)]
+pub struct WorldLandingReading {
+    pub declared: DeclaredExponents,
+    pub committed: CommittedReach,
+    pub reading: DepositReading,
+    pub producing: ReceivingFaceRatio,
+    pub proposed: ReceivingFaceRatio,
+    pub decision: Result<Admitted, AdmissionRefusal>,
+    pub deposition_work: Option<Rat>,
 }
 
 /// A bound, unrun preparation. Borrowing the receiver bars interleaved material/current edits.
@@ -491,6 +521,206 @@ impl<'f> PhysicalReceiver<'f> {
             receiver_index,
             opening,
         })
+    }
+
+    /// [definition; agent-inferred, October 9; the held-carry record §5] **The located key's prospect
+    /// of a probe, read as its receiving comparison**: the probe at `control` on `material`, from
+    /// this receiver's present opening, answered by the World model's one live key from its located
+    /// point. The produced faces are the prospective native logits, and the observed faces are the
+    /// key's declared raw face, both read at the receiver's grain exactly as the encounter reads them,
+    /// over the compared stations alone. Refused unless exactly one key is live, its fibre is a
+    /// point, and it declares a face. Nothing actual is read or written.
+    pub fn world_prospect_ratio(
+        &self,
+        material: &Constitution,
+        source: &Encoded,
+        receiver: &ReceiverDeclaration,
+        preparation: &PortPreparation,
+        compared: &[bool],
+        control: &[Rat],
+    ) -> Result<ReceivingFaceRatio, HnnError> {
+        let (_, phases, word, _) =
+            self.action_opening(source, receiver, preparation, compared, material)?;
+        let feature = word.prospective_feature(&phases, preparation, compared)?;
+        if control.len() != feature.preparation().controls() {
+            return Err(HnnError::Shape {
+                what: "the prospect's source wave control",
+                expected: feature.preparation().controls(),
+                found: control.len(),
+            });
+        }
+        let (word, _, applied) = feature.prepare_control(word, control)?;
+        let model = self.world_model().ok_or(HnnError::Unadmitted {
+            reason: "a landing's prospect reads the bound World model",
+        })?;
+        let live: Vec<usize> = model
+            .states()
+            .iter()
+            .enumerate()
+            .filter(|(_, state)| matches!(state, KeyState::Live(_)))
+            .map(|(key, _)| key)
+            .collect();
+        let [key] = live[..] else {
+            return Err(HnnError::Unadmitted {
+                reason: "a landing's prospect reads exactly one live World key",
+            });
+        };
+        let prospect = model.coupled_prospect(key, &word, applied.ring(), &phases, compared)?;
+        if !prospect.directions.is_empty() {
+            return Err(HnnError::Unadmitted {
+                reason: "a landing's prospect reads a located World state: the key's fibre is a point",
+            });
+        }
+        if prospect.faces.len() != prospect.point.features.len() {
+            return Err(HnnError::Unadmitted {
+                reason: "a landing's key declares the face it predicts at every compared station",
+            });
+        }
+        let grain = phases.grain();
+        let mut reads = Vec::with_capacity(prospect.faces.len());
+        let mut observed = Vec::with_capacity(prospect.faces.len());
+        for ((station, _, logits), (face_station, face)) in
+            prospect.point.features.iter().zip(&prospect.faces)
+        {
+            if station != face_station {
+                return Err(HnnError::Unadmitted {
+                    reason: "a prospect's native read and key face share their compared station",
+                });
+            }
+            reads.push(ReceivingRead::of_logits(logits.clone(), grain));
+            observed.push(Some(Face::of_read(
+                &ReceivingRead::of_logits(face.clone(), grain),
+                grain,
+            )?));
+        }
+        let ring = phases.ring();
+        let branch = BigInt::from(
+            self.field
+                .ring(ring)
+                .clock_at(&self.current().lift()[ring])?
+                .winding()
+                .clone(),
+        );
+        ReceivingFaceRatio::compare_partition(Faces::of_reads(&reads, grain)?, observed, branch)
+    }
+
+    /// [definition; agent-inferred, October 9; the held-carry record §5] **The World landing**: one
+    /// declared contact step along a World-sensitive descent, admitted only by the located key's
+    /// prospect of the next encounter.
+    /// - The proposal `steps` ([`crate::hnn::word::continuation::world_descent`]) is staged at the
+    ///   contemporary constitution, with the reach of the encounter that located it (`reach`, Word
+    ///   opened at `opened_at`), through the native declared-step law: the first reach read from the
+    ///   owner's own split, then the declared-step producer
+    ///   (`Constitution::{first_reach, deposited_with_contact_spans_at}`), which commits at least one
+    ///   lattice unit or refuses.
+    /// - The candidate `θ′` and the contemporary `θ` each read the next encounter (`source`,
+    ///   `receiver`, `preparation`, `compared`, `control`) through [`Self::world_prospect_ratio`],
+    ///   and [`crate::hnn::word::continuation::decide`] admits `θ′` only on an exact strict
+    ///   classical improvement with no worse phase excess. The reading-identity witness is not read
+    ///   for receiving face ratios, so a phase-only improvement refuses.
+    /// - An admitted `θ′` is published with the carried current crossed at held momentum
+    ///   (`C′ w′ = π`, [`ReceptionCarry::crossed`]), and the stored energy's exact change at the
+    ///   crossing is returned as the deposition work. A refusal changes nothing.
+    #[allow(clippy::too_many_arguments)]
+    pub fn land_world_descent(
+        &mut self,
+        steps: Vec<FactorStep>,
+        reach: Reach,
+        opened_at: usize,
+        source: &Encoded,
+        receiver: &ReceiverDeclaration,
+        preparation: &PortPreparation,
+        compared: &[bool],
+        control: &[Rat],
+    ) -> Result<WorldLanding, HnnError> {
+        let theta = self.constitution().clone();
+        let mut loci: Vec<Locus> = steps.iter().map(|s| s.gradient.locus()).collect();
+        loci.sort();
+        loci.dedup();
+        let deposit = Deposit::new(theta.commit(), vec![], steps, loci).with_reach(reach.clone());
+        let operands = Operands::exact_at_cut(self.field, &theta, self.current())?;
+        let spans = FiniteContactSpans::of(&operands, opened_at, &reach)?;
+        let declared = match theta.first_reach(&deposit, &spans)? {
+            Ok(declared) => declared,
+            Err(refusal) => return Ok(WorldLanding::Unreached(refusal)),
+        };
+        let (candidate, reading, committed) =
+            match theta.deposited_with_contact_spans_at(&deposit, &spans, &declared)? {
+                Ok(produced) => produced,
+                Err(refusal) => return Ok(WorldLanding::Unreached(refusal)),
+            };
+        let producing =
+            self.world_prospect_ratio(&theta, source, receiver, preparation, compared, control)?;
+        let proposed =
+            self.world_prospect_ratio(&candidate, source, receiver, preparation, compared, control)?;
+        let decision = decide(
+            &producing.code_length()?,
+            &producing.excess()?,
+            &proposed.code_length()?,
+            &proposed.excess()?,
+            false,
+        );
+        let deposition_work = match decision {
+            Err(_) => None,
+            Ok(_) => Some(self.publish_landed(&candidate, source, receiver, preparation, compared)?),
+        };
+        Ok(WorldLanding::Read(Box::new(WorldLandingReading {
+            declared,
+            committed,
+            reading,
+            producing,
+            proposed,
+            decision,
+            deposition_work,
+        })))
+    }
+
+    /// Publish an admitted landing's material with the carried current crossed at held momentum,
+    /// returning the stored energy's exact change at the crossing.
+    fn publish_landed(
+        &mut self,
+        candidate: &Constitution,
+        source: &Encoded,
+        receiver: &ReceiverDeclaration,
+        preparation: &PortPreparation,
+        compared: &[bool],
+    ) -> Result<Rat, HnnError> {
+        let carry = self
+            .resident
+            .carried()
+            .ok_or(HnnError::ContinuingState {
+                what: "a landing crosses the actual carried current",
+            })?
+            .clone();
+        let operands = Operands::exact_at_cut(self.field, candidate, self.current())?;
+        let storage: Vec<&ExactRatMatrix> =
+            operands.contacts().iter().map(|c| c.forms().0).collect();
+        let resonators: Vec<Option<&ExactRatMatrix>> = operands
+            .resonators()
+            .iter()
+            .map(|r| r.as_ref().map(|r| r.material().forms().0))
+            .collect();
+        let crossed = ReceptionCarry {
+            change: carry.crossed(&carry.conductances, &storage, &resonators)?,
+            ..carry.clone()
+        };
+        let before = PowerForm::read(self.field, self.constitution(), self.current())?;
+        let after = PowerForm::read(self.field, candidate, self.current())?;
+        let work = after.power(&crossed.change)? + after.resonator_power(&crossed.change)?
+            - before.power(&carry.change)?
+            - before.resonator_power(&carry.change)?;
+        // The receiving chart the World admitted, read at the present opening on the present
+        // material (the opening a candidate would cross from).
+        let (section, _, _, _) =
+            self.action_opening(source, receiver, preparation, compared, self.constitution())?;
+        self.resident.publish_reception(
+            Some(candidate.clone()),
+            HolonState::at(crossed, candidate.commit()),
+            None,
+            None,
+            section.chart(),
+        )?;
+        Ok(work)
     }
 
     /// [definition; agent-inferred, October 8] **The execution after a control is applied**,
