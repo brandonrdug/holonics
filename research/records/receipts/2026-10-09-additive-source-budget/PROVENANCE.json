@@ -1,0 +1,86 @@
+{
+  "schema": "holonics.public-evidence-provenance.v1",
+  "accepted_source": {
+    "path": "lean/HolonicsResearch/Fluid/NavierStokesTransportedScalarMaximumPrinciple.lean",
+    "sha256": "22e65267ba870093c1e9b917fa90d619234ee728eee38443f3df088993a27ea1",
+    "bytes": 32726
+  },
+  "publication_base_commit": "f2c03e8dfff3a0fa153e6b072863625bdbb441cf",
+  "native_source_base_commit": "3c67beee7f656798f912c974f12c482ea12c5e42",
+  "accepted_target_object_pins": {
+    "olean": {
+      "sha256": "3c61e5318d3e550c05e70a4bd33a24a6d1433df8b20ae65d03525352c8bf1392",
+      "bytes": 821896
+    },
+    "ilean": {
+      "sha256": "86d50958c89985f89f066c1ee2a18552958b03e496b2a7b9fe0d5b32ccce568e",
+      "bytes": 125381
+    }
+  },
+  "native_receipt_fingerprints": [
+    {
+      "native_receipt_role": "VALIDATION.json",
+      "sha256": "2a183e4616df56d9629bef070710167156303b6105e97a0bf7a3b85301b8c984",
+      "bytes": 6808
+    },
+    {
+      "native_receipt_role": "HANDOFF.md",
+      "sha256": "13c4edf8f5df1cb43a23e9e45335d27268ec1a75577da210aa9c1f2cbea9d419",
+      "bytes": 744
+    },
+    {
+      "native_receipt_role": "FILE_HASHES.json",
+      "sha256": "0097d7284e0bf31360bbbd45f1e48a0e26473583a06ee5674a1ad257771344db",
+      "bytes": 17535
+    },
+    {
+      "native_receipt_role": "admission/SOURCE_ADMISSION.json",
+      "sha256": "92b9d01640db4a4550fed92979ec88e1c6be4572178a643d2ab73ecd2b6e8c6e",
+      "bytes": 3207
+    },
+    {
+      "native_receipt_role": "admission/PROVIDER_NAMESPACE.json",
+      "sha256": "d8407d41be09292a78165f56e68acf524f4fe6845ad8fb6a3ed2256515e7943a",
+      "bytes": 26100
+    },
+    {
+      "native_receipt_role": "admission/COMPILER_REQUEST.json",
+      "sha256": "db8a35e2c565e5924ac8515da3bbef4b884f31784f710e1bbd1aa31157039027",
+      "bytes": 4441
+    },
+    {
+      "native_receipt_role": "admission/PREPARATION_REQUEST.json",
+      "sha256": "e099a4f944f4163198c062fb3c6f776100aed4ecd70c9f7141b10547d951e1a0",
+      "bytes": 5821
+    },
+    {
+      "native_receipt_role": "admission/current-imports.json",
+      "sha256": "2981c036d5a5d92cb6cd896d75363d7a875210e708866927e895f7ae921d658e",
+      "bytes": 51599794
+    },
+    {
+      "native_receipt_role": "admission/KERNEL_VALIDATION.json",
+      "sha256": "2e8e3d1acb9865270c693ffaa9895575e7dbbe3adde5726ad17ac976053a2ead",
+      "bytes": 2391
+    },
+    {
+      "native_receipt_role": "admission/compiler.stdout",
+      "sha256": "b18d1333306a7de1c616c6e854a248d90858e6e10530d74fb031479c937cefbe",
+      "bytes": 1976
+    },
+    {
+      "native_receipt_role": "admission/compiler.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  ],
+  "publication_mapping": {
+    "VALIDATION.json": "Field projection of native VALIDATION.json; machine paths and private routing omitted.",
+    "PROVIDER_BINDINGS.json": "All eighteen source/object pins projected from native admission/PROVIDER_NAMESPACE.json, with canonical source paths and public-base byte comparison.",
+    "SELECTED_IMPORT_BINDINGS.json": "All 5072 ordered modules and selected source/object pins projected from native admission/current-imports.json; machine namespace evidence omitted.",
+    "KERNEL_VALIDATION.json": "Exact native admission/KERNEL_VALIDATION.json bytes.",
+    "compiler.stdout": "Exact native successful compiler stdout bytes.",
+    "compiler.stderr": "Exact native empty compiler stderr bytes."
+  },
+  "scope": "A scoped publication of accepted source and technical evidence. Raw requests, private correspondence, machine paths, copied providers and binary objects are not included."
+}
