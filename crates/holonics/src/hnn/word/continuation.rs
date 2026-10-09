@@ -59,7 +59,8 @@ use crate::hnn::constitution::{
     CommittedReach, Constitution, DeclaredExponents, DeclaredStepRefusal, DepositReading,
     FactorGradient, Family, Locus, Reach,
 };
-use crate::hnn::port::{Deposit, WordReturn};
+use crate::hnn::port::{ChangeCovector, Deposit, WordReturn};
+use crate::ratio::linear::vector::scale;
 use crate::hnn::encoding::Encoded;
 use crate::hnn::field::ReceiverDeclaration;
 use crate::hnn::ratio::{Face, Faces, HolonRatio, RatioCovector, TargetPhases, target_phases};
@@ -1523,5 +1524,262 @@ impl ContactCut {
             return refuse(BindingRefusal::Tick);
         }
         Ok(())
+    }
+}
+
+/// [definition; agent-inferred, October 9; the held-carry record §3] **One contact-material
+/// direction**: the derivatives `δC`, `δK`, `δD` of one contact's forms along a declared parameter
+/// direction, in the contact's own coordinates. A factor direction `H` of `C = c cᵀ` reads
+/// `δC = H cᵀ + c Hᵀ`; `D` is analogous, and `K = b Σ bᵀ` reads `δK = H Σ bᵀ + b Σ Hᵀ` at the
+/// declared signature. The finite factor move's `H Σ Hᵀ` is not a tangent term. `None` is a form the
+/// direction leaves fixed.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct MaterialDirection {
+    pub contact: usize,
+    pub storage: Option<ExactRatMatrix>,
+    pub stiffness: Option<ExactRatMatrix>,
+    pub dissipation: Option<ExactRatMatrix>,
+}
+
+impl MaterialDirection {
+    /// **The transit's material right side** (the held-carry record, eq. 1): the derivative of
+    /// `m_a ζ = right` along this direction with the state held,
+    /// `r_δ = 2δC (w − ω) − hδD ω − hδK (u + hω/2)`, at the tick's start state `(u, w)` and its
+    /// executed midpoint `ω`. Its solve `δζ = m_a⁻¹ r_δ` is the transit's material increment.
+    fn right(
+        &self,
+        step: &Rat,
+        displacement: &[Rat],
+        rate: &[Rat],
+        midpoint: &[Rat],
+    ) -> Result<Vec<Rat>, HnnError> {
+        let mut right = vec![Rat::zero(); rate.len()];
+        if let Some(storage) = &self.storage {
+            right = add(
+                &right,
+                &scale(&integer(2), &storage.apply(&sub(rate, midpoint))?),
+            );
+        }
+        if let Some(dissipation) = &self.dissipation {
+            right = sub(&right, &scale(step, &dissipation.apply(midpoint)?));
+        }
+        if let Some(stiffness) = &self.stiffness {
+            let reached = add(displacement, &scale(&(step / integer(2)), midpoint));
+            right = sub(&right, &scale(step, &stiffness.apply(&reached)?));
+        }
+        Ok(right)
+    }
+}
+
+/// [definition; agent-inferred, October 9; the held-carry record §3, eqs. (1)–(3)] **A contact
+/// material's forward tangent, carried beside a Word**: `χ = ∂x/∂θ · H`, the change of the Word's
+/// whole state along one material direction, of the change's own shape.
+///
+/// - **Within the Word** (eq. 2): `χ_(k+1) = T_k χ_k + b_(a,k)`, where `T_k` is the tick's full
+///   fixed-operand state map ([`crate::hnn::prediction::physical_signed_tick`]) and `b_(a,k)` the
+///   transit's update of its material increment alone (`transit_update` at `δζ` with zero waves and
+///   zero state: `b_u = hη`, `b_w = 2η`, the channel's arriving waves `∓δζ/h`, `η = (G/2h)δζ`). The
+///   start state `(u_k, w_k)` and midpoint `ω_k` are the Word's own passage record.
+/// - **At the opening:** `χ_0 = 0`, the held, parameter-independent opening.
+/// - **Across the passage boundary** (eq. 3, [`Self::opened`]): the linear part of
+///   [`ReceptionCarry::crossed`] (the arriving waves transmitted at `2G_old/(G_old + G_new)`; the
+///   contact and resonator states as carried, because for the same material on both sides the two
+///   `δC w` terms cancel, singular `C` included) and every source ring's storage replaced (`Π_int`).
+///   No contact factor enters the source opening.
+///
+/// It retains no Word, event or trajectory: `χ` is overwritten at each tick. The scope is an exact,
+/// unsplit Word on fixed operands with nothing deposited or released between the two Words; a
+/// lattice Word, a deposited parameter or a nonlinear passage owes its own differential and is
+/// refused or out of scope.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct MaterialTangent {
+    direction: MaterialDirection,
+    /// The producing material commit the direction is based at.
+    commit: u64,
+    /// The Word's opening tick and the full ticks the tangent has followed.
+    opened_at: usize,
+    ticks: usize,
+    tangent: EndChange,
+}
+
+impl MaterialTangent {
+    /// **The tangent at a held opening** (`χ_0 = 0`) of an exact, unrun Word, along `direction`,
+    /// based at the producing material `commit`.
+    pub fn held_opening(
+        word: &Word<'_>,
+        commit: u64,
+        direction: MaterialDirection,
+    ) -> Result<Self, HnnError> {
+        if word.operands().lattice().is_some() {
+            return Err(HnnError::Unadmitted {
+                reason: "a material tangent follows an exact, unsplit Word",
+            });
+        }
+        if !word.recorded().is_empty() {
+            return Err(HnnError::Unadmitted {
+                reason: "a material tangent opens with its Word, before any junction step",
+            });
+        }
+        let contacts = word.operands().contacts();
+        let contact = contacts
+            .get(direction.contact)
+            .ok_or(HnnError::Unadmitted {
+                reason: "a material direction names a contact of the Word",
+            })?;
+        let width = contact.width();
+        for form in [
+            &direction.storage,
+            &direction.stiffness,
+            &direction.dissipation,
+        ]
+        .into_iter()
+        .flatten()
+        {
+            if form.rows() != width || form.columns() != width {
+                return Err(HnnError::Shape {
+                    what: "a material direction's form derivative (the contact's width)",
+                    expected: width,
+                    found: form.rows(),
+                });
+            }
+        }
+        let opening = word.change()?;
+        let zero = |v: &Vec<Rat>| vec![Rat::zero(); v.len()];
+        let tangent = EndChange {
+            storage: opening.storage.iter().map(zero).collect(),
+            arrivals: opening
+                .arrivals
+                .iter()
+                .map(|[g, h]| [zero(g), zero(h)])
+                .collect(),
+            states: opening
+                .states
+                .iter()
+                .map(|[u, w]| [zero(u), zero(w)])
+                .collect(),
+            resonators: opening
+                .resonators
+                .iter()
+                .map(|state| state.as_ref().map(|[u, w]| [zero(u), zero(w)]))
+                .collect(),
+            resonator_phases: opening.resonator_phases.clone(),
+        };
+        Ok(Self {
+            direction,
+            commit,
+            opened_at: word.opened_at(),
+            ticks: 0,
+            tangent,
+        })
+    }
+
+    /// **Follow the Word's next full tick** (eq. 2): call after the Word has executed it.
+    pub fn step(&mut self, word: &Word<'_>) -> Result<(), HnnError> {
+        if word.opened_at() != self.opened_at {
+            return Err(HnnError::Unadmitted {
+                reason: "a material tangent follows the Word it opened with",
+            });
+        }
+        let k = self.ticks;
+        let record = word.recorded().get(k).ok_or(HnnError::Unadmitted {
+            reason: "a material tangent follows a full tick the Word has executed",
+        })?;
+        if record.rates.is_empty() {
+            return Err(HnnError::Unadmitted {
+                reason: "a material tangent follows a full tick, not a last junction",
+            });
+        }
+        let operands = word.operands();
+        let mut next = crate::hnn::prediction::physical_signed_tick(
+            operands,
+            &self.tangent,
+            self.opened_at + k,
+        )?;
+        let a = self.direction.contact;
+        let contact = &operands.contacts()[a];
+        let h = operands.step();
+        let [displacement, rate] = &record.states[a];
+        let right = self
+            .direction
+            .right(h, displacement, rate, &record.rates[a])?;
+        let solved = contact.solve()?.apply(&right)?;
+        let forced = transit_update(
+            contact,
+            h,
+            &solved,
+            &vec![Rat::zero(); next.arrivals[a][0].len()],
+            &vec![Rat::zero(); next.arrivals[a][1].len()],
+            &vec![Rat::zero(); displacement.len()],
+            &vec![Rat::zero(); rate.len()],
+        );
+        next.arrivals[a][0] = add(&next.arrivals[a][0], &forced.arrive_from);
+        next.arrivals[a][1] = add(&next.arrivals[a][1], &forced.arrive_to);
+        next.states[a][0] = add(&next.states[a][0], &forced.displacement);
+        next.states[a][1] = add(&next.states[a][1], &forced.rate);
+        self.tangent = next;
+        self.ticks += 1;
+        Ok(())
+    }
+
+    /// The tangent `χ` after the full ticks it has followed: at a Word that ended at a last
+    /// junction, the tangent of its reception carry ([`Word::reception_end`]).
+    pub fn tangent(&self) -> &EndChange {
+        &self.tangent
+    }
+
+    pub fn direction(&self) -> &MaterialDirection {
+        &self.direction
+    }
+
+    pub fn commit(&self) -> u64 {
+        self.commit
+    }
+
+    /// **The tangent at the next opening** (eq. 3): `χ_open = Π_int B_ref χ_carry`, for a Word
+    /// opened on `carry` with the same material, whose contacts take `conductances`. The carry must
+    /// be the one this tangent followed (its tick).
+    pub fn opened(
+        &self,
+        carry: &ReceptionCarry,
+        conductances: &[Rat],
+        field: &Field,
+    ) -> Result<EndChange, HnnError> {
+        if carry.ticks != self.opened_at + self.ticks {
+            return Err(HnnError::Unadmitted {
+                reason: "a material tangent crosses with the carry of the ticks it followed",
+            });
+        }
+        if conductances.len() != carry.conductances.len()
+            || self.tangent.arrivals.len() != conductances.len()
+        {
+            return Err(HnnError::Shape {
+                what: "the next opening's contacts against the carry's",
+                expected: carry.conductances.len(),
+                found: conductances.len(),
+            });
+        }
+        let mut crossed = self.tangent.clone();
+        for (pair, (from, to)) in crossed
+            .arrivals
+            .iter_mut()
+            .zip(carry.conductances.iter().zip(conductances))
+        {
+            for wave in pair.iter_mut() {
+                *wave = transmitted(wave, from, to);
+            }
+        }
+        Ok(interior_of(field, crossed))
+    }
+
+    /// **The delayed material credit** `⟨μ_open, χ_open⟩` (eq. 3): the next Word's full returned
+    /// opening covector paired with this tangent crossed into its opening.
+    pub fn credit(
+        &self,
+        carry: &ReceptionCarry,
+        conductances: &[Rat],
+        field: &Field,
+        opening: &ChangeCovector,
+    ) -> Result<Rat, HnnError> {
+        Ok(opening.pairing(&self.opened(carry, conductances, field)?))
     }
 }
