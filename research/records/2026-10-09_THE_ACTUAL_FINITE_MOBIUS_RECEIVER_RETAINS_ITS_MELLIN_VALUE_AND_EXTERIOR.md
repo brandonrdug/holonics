@@ -20,6 +20,13 @@ the renamed public module graph or a full library build; the sole queue must
 check that graph before integration. The accepted private originals and full
 native evidence remain intact outside Git.
 
+[measured, October 9] The sole queue then checked the renamed public module
+graph: all six canonical owners and their affected import closure passed,
+each relocated source in full on freshly accepted canonical providers, with
+23 of 23 queries on standard axioms only
+([receipt](receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/HANDOFF.md)).
+No full library build is claimed.
+
 ## The actual source and its endpoint
 
 For (N\in\mathbb N), define

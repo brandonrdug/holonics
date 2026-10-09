@@ -14,9 +14,17 @@ seven atlas rows and the existing index route. It runs no Lean compiler.
 canonical research-library owner. `KERNEL_ACCEPTANCE.json` records the
 actual private native gate. The source-status comments and dependency
 import names are the only publication changes; each diff is included.
-The canonical module graph still requires focused validation by the sole
-native queue. Private accepted `.olean` files must not be renamed or treated
-as public module objects. No full library gate is claimed.
+At preparation the canonical module graph still required focused validation by
+the sole native queue. That validation then passed
+([canonical-import-native-v1](canonical-import-native-v1/HANDOFF.md)): all six
+canonical owners and their affected import closure, each relocated source
+checked in full on freshly accepted canonical providers, 23 of 23
+standard-axiom queries. Its compact receipt commits the handoff, validation,
+manifest, kernel results and diagnostics; absolute source-location paths in
+the diagnostics are projected to canonical owner paths, with both hashes in
+`PROJECTION.json`, and every other packet file is hashed in its `OMITTED.md`.
+The verifier above now checks it. Private accepted `.olean` files must not be
+renamed or treated as public module objects. No full library gate is claimed.
 
 `compiler.stdout` and `compiler.stderr` are projections of actual diagnostics:
 only absolute source-location paths are replaced with canonical owner paths.

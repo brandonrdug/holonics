@@ -1,10 +1,6 @@
 {
-  "scope": "Canonical sources, source/kernel/diagnostic projections, publication join, replay checker, record and existing atlas/index bytes. Excludes this manifest itself and later verification-output/result receipts; Git commit seals the complete tracked publication.",
+  "scope": "Canonical sources, source/kernel/diagnostic projections, publication join, replay checker, record, and the canonical-import receipt (its committed files, with diagnostic paths projected). The shared atlas and records index are checked by content (each atlas row once, the record route present), not as whole files, since other publications change them. Excludes this manifest itself and later verification-output/result receipts; Git commit seals the complete tracked publication.",
   "files": {
-    "docs/atlas/targets.tsv": {
-      "bytes": 702269,
-      "sha256": "7b76b1ac25bc6942bfb0134fb1f8682dc8d4c3ee6ca6078fa9daedba0b37c3d8"
-    },
     "lean/HolonicsResearch/Zeta/ActualBeurlingCompensatedTail.lean": {
       "bytes": 4312,
       "sha256": "47efaa76eb9efb6796c2c888b9ba2199fb54f42aeb8891b35106ba525185f25c"
@@ -30,12 +26,8 @@
       "sha256": "a9337cddb217762170556ab46d87a4443580053b383dfafa84d6b8fd2544d5b7"
     },
     "research/records/2026-10-09_THE_ACTUAL_FINITE_MOBIUS_RECEIVER_RETAINS_ITS_MELLIN_VALUE_AND_EXTERIOR.md": {
-      "bytes": 8059,
-      "sha256": "dd96c57b4ee1d0da484008e6447869d72613b31ea23db5a15e43785df955fa37"
-    },
-    "research/records/README.md": {
-      "bytes": 169591,
-      "sha256": "4e512eea0a07e118a6e6238de914796dfe21132b6113c75b9ac76d2735695221"
+      "bytes": 8457,
+      "sha256": "16ccbfeec4db7cfb6470b596f9864f2f5265b91848f871e61c375d6678546424"
     },
     "research/records/receipts/2026-10-09-rh-spectral-publication/ATLAS_JOIN.json": {
       "bytes": 4449,
@@ -246,18 +238,110 @@
       "sha256": "5ba61c42403a83d6af10aaa2b1f8c38abf6bb2d13d71d9463e8d3c3f93a6c678"
     },
     "research/records/receipts/2026-10-09-rh-spectral-publication/REPLAY.md": {
-      "bytes": 2313,
-      "sha256": "5925a3f823e40b50e5ba4be7c6b942a186cd286066139cdf5b6b673a752b94ac"
+      "bytes": 2916,
+      "sha256": "c36ba960c65defa88711340b779622ea33a3e46f30fcd93f30eed1d451c36e23"
     },
     "research/records/receipts/2026-10-09-rh-spectral-publication/SOURCE_PUBLICATION_JOIN.json": {
       "bytes": 35615,
       "sha256": "e5757006a8a063d652857e94abaabc38d558391946418c8dfface6aed4c932c7"
     },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/FILE_HASHES.json": {
+      "bytes": 75935,
+      "sha256": "a31c8e0f4ffab495e75f562e90d602573f1c3395064a741beeae37fe3d28bb53"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/HANDOFF.md": {
+      "bytes": 1234,
+      "sha256": "7438843f528a84334a7ab1f7217b7f6838fc78244d379f8504bb29b97109e0cc"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/OMITTED.md": {
+      "bytes": 59573,
+      "sha256": "d0451edf413be2a7c17e124379b8b59c9af97908f95cd708606db177c54efbdb"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/PROJECTION.json": {
+      "bytes": 2357,
+      "sha256": "0e5db6c01e5ff657fcd5ad1c46ce9a71ffbf5434d5da9d6334d985e95ba8bc4b"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/VALIDATION.json": {
+      "bytes": 16265,
+      "sha256": "ae9ab39f08f3285acc3d0aa09c94d2833988ce6b7fb94856b32e8f1153ccf5d0"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/admission/ActualBeurlingCompensatedTail/KERNEL_VALIDATION.json": {
+      "bytes": 682,
+      "sha256": "0aa7009c5e172312425e1d600432438ae335281d59eb39e41d5a2324b100f5ec"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/admission/ActualBeurlingCompensatedTail/compiler.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/admission/ActualBeurlingCompensatedTail/compiler.stdout": {
+      "bytes": 403,
+      "sha256": "3b3461014933744867395be77d7d36b080857bfdc8abb840cd7a7e67bff0816f"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/admission/ActualBeurlingTailEnergy/KERNEL_VALIDATION.json": {
+      "bytes": 814,
+      "sha256": "06b9c08cc2d5ecc769e73a1a39495503c1667058f9f848ebfe945b0671f030a4"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/admission/ActualBeurlingTailEnergy/compiler.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/admission/ActualBeurlingTailEnergy/compiler.stdout": {
+      "bytes": 884,
+      "sha256": "66d2fd3985df4d1cc213d33a2792c609f2fbffd70d5440c85104da3f1a37bf07"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/admission/ActualFiniteBeurlingMellinDomain/KERNEL_VALIDATION.json": {
+      "bytes": 820,
+      "sha256": "47b929f97467c4b5be6efc0239f69e552c156af5a6dc59a9c1d839669b1b0209"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/admission/ActualFiniteBeurlingMellinDomain/compiler.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/admission/ActualFiniteBeurlingMellinDomain/compiler.stdout": {
+      "bytes": 974,
+      "sha256": "a14c498ff8a76ad3709621bcac8fc02310aa8be2ea20320185bb095b5a63b845"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/admission/ActualFiniteBeurlingMellinValue/KERNEL_VALIDATION.json": {
+      "bytes": 871,
+      "sha256": "00d0ab3c8f5e0bd3b1551c982dbbcee9e4709fa67f9931067d1fda81dcd7e1e6"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/admission/ActualFiniteBeurlingMellinValue/compiler.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/admission/ActualFiniteBeurlingMellinValue/compiler.stdout": {
+      "bytes": 874,
+      "sha256": "d307c61755ebc2b7acf0585dcbcd76f2343f9463fe145a51e09730ce580bc191"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/admission/ActualFiniteBeurlingReceiver/KERNEL_VALIDATION.json": {
+      "bytes": 828,
+      "sha256": "0abe377300b60a7f84cb8a170e1cda98b72bb8cfb5092136ea4c6164032a3c2f"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/admission/ActualFiniteBeurlingReceiver/compiler.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/admission/ActualFiniteBeurlingReceiver/compiler.stdout": {
+      "bytes": 901,
+      "sha256": "a83ce54c81758eee22c67ab1fcb0ca8c9bfdaa9e11de118c04c85653b8b73746"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/admission/ActualFractionalPartZetaSource/KERNEL_VALIDATION.json": {
+      "bytes": 850,
+      "sha256": "a4fa8fb080d5040ccf9003ecb5676211fcf363a2a07a0a6ec4d678066a565c9e"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/admission/ActualFractionalPartZetaSource/compiler.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "research/records/receipts/2026-10-09-rh-spectral-publication/canonical-import-native-v1/admission/ActualFractionalPartZetaSource/compiler.stdout": {
+      "bytes": 556,
+      "sha256": "f8fa37e065a8336d02fb6e824ac890ef36fb233629162460b64a8db3698798ad"
+    },
     "research/records/receipts/2026-10-09-rh-spectral-publication/verify_publication.py": {
-      "bytes": 4775,
-      "sha256": "26b847709b56dc2d15200a0ca0f0971baaeadc643a163591883c86af6a9a7073"
+      "bytes": 6766,
+      "sha256": "c52d545db37e35f1f6334c22be8092e9b058b7c370a9c35db3734c010f86711a"
     }
   },
-  "count": 64,
-  "total_bytes": 1091214
+  "count": 85,
+  "total_bytes": 387167
 }

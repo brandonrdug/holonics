@@ -70,6 +70,40 @@ def main():
             failed = json.loads(rejected.read_text())
             assert failed["compiler_exit"] == 1 and not failed["kernel_accepted"]
     assert count == 23
+    # The canonical module graph, checked by the sole native queue after this preparation: each
+    # canonical owner's kernel result, its projected printouts, and the packet manifest's seals.
+    canonical = HERE / "canonical-import-native-v1"
+    projection = json.loads((canonical / "PROJECTION.json").read_text())
+    manifest = json.loads((canonical / "FILE_HASHES.json").read_text())["files"]
+
+    def manifest_sha(relative):
+        entry = manifest[relative]
+        return entry["sha256"] if isinstance(entry, dict) else entry
+
+    for name in ("HANDOFF.md", "VALIDATION.json"):
+        assert seal(canonical / name)["sha256"] == manifest_sha(name), name
+    rechecked = 0
+    for item in joined["items"]:
+        module = item["module"]
+        admitted = canonical / "admission" / module
+        kernel = json.loads((admitted / "KERNEL_VALIDATION.json").read_text())
+        assert kernel["kernel_accepted"] and kernel["compiler_exit"] == 0
+        assert kernel["standard_axioms_only"] and kernel["selector_count_matches"]
+        assert kernel["axioms"] == item["axiom_queries"]
+        printed = re.findall(
+            r"'([^']+)' depends on axioms: \[([^\]]*)\]",
+            (admitted / "compiler.stdout").read_text(),
+        )
+        observed = {name: [x.strip() for x in names.split(",")] for name, names in printed}
+        assert observed == kernel["axioms"]
+        assert all(value == axioms for value in observed.values())
+        stdout = f"admission/{module}/compiler.stdout"
+        assert seal(admitted / "compiler.stdout") == projection["files"][stdout]["projected"]
+        assert projection["files"][stdout]["original"]["sha256"] == manifest_sha(stdout)
+        for name in ("KERNEL_VALIDATION.json", "compiler.stderr"):
+            assert seal(admitted / name)["sha256"] == manifest_sha(f"admission/{module}/{name}")
+        rechecked += len(observed)
+    assert rechecked == 23
     assert joined["target_queries_accepted"] == 11
     assert joined["prerequisite_queries_accepted"] == 12
     atlas = json.loads((HERE / "ATLAS_JOIN.json").read_text())
@@ -98,7 +132,8 @@ def main():
             assert "/home/" not in content and "/Users/" not in content, path
             assert "mailbox_request" not in content and "\"body\":" not in content, path
     print("PASS: 6 source mappings, 23 native standard-axiom printouts, 7 atlas rows, index route, file seals.")
-    print("PUBLIC MODULE GRAPH: recheck owed; no Lean compiler or whole-library check was run here.")
+    print("PUBLIC MODULE GRAPH: rechecked by the sole native queue (canonical-import-native-v1, 23 printouts);")
+    print("no Lean compiler or whole-library check was run here.")
 
 
 if __name__ == "__main__":

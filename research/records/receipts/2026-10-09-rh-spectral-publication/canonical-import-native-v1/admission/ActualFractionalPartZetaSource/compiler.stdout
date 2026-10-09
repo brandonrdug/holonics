@@ -1,0 +1,12 @@
+'Holonics.Zeta.ActualFractionalPartZetaSource.actual_fraction_mellin_convergent' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Zeta.ActualFractionalPartZetaSource.actual_zeta_floor_integral' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Zeta.ActualFractionalPartZetaSource.actual_regularized_zeta_fraction' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Zeta.ActualFractionalPartZetaSource.actual_zeta_fraction_integral' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]

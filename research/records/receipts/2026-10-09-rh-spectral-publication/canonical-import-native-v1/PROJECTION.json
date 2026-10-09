@@ -1,0 +1,71 @@
+{
+  "files": {
+    "admission/ActualBeurlingCompensatedTail/compiler.stdout": {
+      "original": {
+        "bytes": 403,
+        "sha256": "3b3461014933744867395be77d7d36b080857bfdc8abb840cd7a7e67bff0816f"
+      },
+      "projected": {
+        "bytes": 403,
+        "sha256": "3b3461014933744867395be77d7d36b080857bfdc8abb840cd7a7e67bff0816f"
+      },
+      "replaced": 0
+    },
+    "admission/ActualBeurlingTailEnergy/compiler.stdout": {
+      "original": {
+        "bytes": 994,
+        "sha256": "b92e0ea9b96a4ec871a9295488efc8b1ba0a6daab930cb2a086f10a2fde539c8"
+      },
+      "projected": {
+        "bytes": 884,
+        "sha256": "66d2fd3985df4d1cc213d33a2792c609f2fbffd70d5440c85104da3f1a37bf07"
+      },
+      "replaced": 1
+    },
+    "admission/ActualFiniteBeurlingMellinDomain/compiler.stdout": {
+      "original": {
+        "bytes": 1194,
+        "sha256": "c17efa43a0e0a2a4b2ca4975331fde4eb7887e7fbab2fe7d4ad4d2a210a516b6"
+      },
+      "projected": {
+        "bytes": 974,
+        "sha256": "a14c498ff8a76ad3709621bcac8fc02310aa8be2ea20320185bb095b5a63b845"
+      },
+      "replaced": 2
+    },
+    "admission/ActualFiniteBeurlingMellinValue/compiler.stdout": {
+      "original": {
+        "bytes": 984,
+        "sha256": "32c045a50b41da74f949d21cbb34d682b01d979eb6e9682d53c95b41f2b4e1a0"
+      },
+      "projected": {
+        "bytes": 874,
+        "sha256": "d307c61755ebc2b7acf0585dcbcd76f2343f9463fe145a51e09730ce580bc191"
+      },
+      "replaced": 1
+    },
+    "admission/ActualFiniteBeurlingReceiver/compiler.stdout": {
+      "original": {
+        "bytes": 1011,
+        "sha256": "82ebb68382b6c381c39c4b692afa19df3a787252b2531e24baf7239de4acc7e3"
+      },
+      "projected": {
+        "bytes": 901,
+        "sha256": "a83ce54c81758eee22c67ab1fcb0ca8c9bfdaa9e11de118c04c85653b8b73746"
+      },
+      "replaced": 1
+    },
+    "admission/ActualFractionalPartZetaSource/compiler.stdout": {
+      "original": {
+        "bytes": 556,
+        "sha256": "f8fa37e065a8336d02fb6e824ac890ef36fb233629162460b64a8db3698798ad"
+      },
+      "projected": {
+        "bytes": 556,
+        "sha256": "f8fa37e065a8336d02fb6e824ac890ef36fb233629162460b64a8db3698798ad"
+      },
+      "replaced": 0
+    }
+  },
+  "rule": "each absolute source-location prefix of the queue source copy is replaced by lean/, the canonical owner path; no other byte changes"
+}

@@ -1,0 +1,473 @@
+{
+  "commit": "61eab5e66159ef2dd58daa7305dde5e0c2ebf0bc",
+  "status": "PASS six canonical owners and affected import closure",
+  "kernel_accepted": true,
+  "modules": [
+    {
+      "module": "HolonicsResearch.Zeta.ActualFiniteBeurlingReceiver",
+      "source_pin": {
+        "bytes": 6464,
+        "sha256": "6f179b9e06944f66782639513c568b79018505e7870543dc5b8c72a5456eb2f1"
+      },
+      "status": "PASS",
+      "required_queries": [
+        "Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_truncated_floor_partition",
+        "Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_reciprocal_phase_residual",
+        "Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_nb_receiver",
+        "Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_nb_tail_pointwise"
+      ],
+      "kernel": {
+        "kernel_accepted": true,
+        "compiler_exit": 0,
+        "compiler_wall_ns": 4209528776,
+        "axioms": {
+          "Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_truncated_floor_partition": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_reciprocal_phase_residual": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_nb_receiver": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_nb_tail_pointwise": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ]
+        },
+        "selector_count_matches": true,
+        "standard_axioms_only": true,
+        "metadata_unchanged": true,
+        "broad_library_checked": false
+      },
+      "resources": [
+        {
+          "phase": "prep",
+          "accepted": true,
+          "wall_ns": 4080418560,
+          "projection_ns": 12779337307,
+          "aggregate_CPU_ns": 3712961000,
+          "group_peak_B": 284307456,
+          "group_limit_B": 8589934592,
+          "measured_to_projected": {
+            "numerator": 4080418560,
+            "denominator": 12779337307
+          },
+          "quiescent_released": true
+        },
+        {
+          "phase": "compile",
+          "accepted": true,
+          "wall_ns": 5467934767,
+          "projection_ns": 21132554884,
+          "aggregate_CPU_ns": 3221129000,
+          "group_peak_B": 1681477632,
+          "group_limit_B": 8589934592,
+          "measured_to_projected": {
+            "numerator": 5467934767,
+            "denominator": 21132554884
+          },
+          "quiescent_released": true
+        }
+      ],
+      "fresh_canonical_objects_used_for_imports": true,
+      "old_private_acceptance_inherited": false
+    },
+    {
+      "module": "HolonicsResearch.Zeta.ActualFiniteBeurlingMellinDomain",
+      "source_pin": {
+        "bytes": 12375,
+        "sha256": "e21d1d84da8964ab3d5bbe0905135a3522b0860d8d91d777d0d9ae6a1cf5a7b0"
+      },
+      "status": "PASS",
+      "required_queries": [
+        "Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_log_receiver_left",
+        "Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_log_receiver_l1_l2",
+        "Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_mellin_convergent",
+        "Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_mellin_log_fourier"
+      ],
+      "kernel": {
+        "kernel_accepted": true,
+        "compiler_exit": 0,
+        "compiler_wall_ns": 3962708670,
+        "axioms": {
+          "Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_log_receiver_left": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_log_receiver_l1_l2": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_mellin_convergent": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "Holonics.Zeta.ActualFiniteBeurlingReceiver.actual_mellin_log_fourier": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ]
+        },
+        "selector_count_matches": true,
+        "standard_axioms_only": true,
+        "metadata_unchanged": true,
+        "broad_library_checked": false
+      },
+      "resources": [
+        {
+          "phase": "prep",
+          "accepted": true,
+          "wall_ns": 5819704898,
+          "projection_ns": 12779337307,
+          "aggregate_CPU_ns": 5300502000,
+          "group_peak_B": 319954944,
+          "group_limit_B": 8589934592,
+          "measured_to_projected": {
+            "numerator": 5819704898,
+            "denominator": 12779337307
+          },
+          "quiescent_released": true
+        },
+        {
+          "phase": "compile",
+          "accepted": true,
+          "wall_ns": 5803946575,
+          "projection_ns": 21132554884,
+          "aggregate_CPU_ns": 4678810000,
+          "group_peak_B": 953356288,
+          "group_limit_B": 8589934592,
+          "measured_to_projected": {
+            "numerator": 5803946575,
+            "denominator": 21132554884
+          },
+          "quiescent_released": true
+        }
+      ],
+      "fresh_canonical_objects_used_for_imports": true,
+      "old_private_acceptance_inherited": false
+    },
+    {
+      "module": "HolonicsResearch.Zeta.ActualFractionalPartZetaSource",
+      "source_pin": {
+        "bytes": 11440,
+        "sha256": "a9337cddb217762170556ab46d87a4443580053b383dfafa84d6b8fd2544d5b7"
+      },
+      "status": "PASS",
+      "required_queries": [
+        "Holonics.Zeta.ActualFractionalPartZetaSource.actual_fraction_mellin_convergent",
+        "Holonics.Zeta.ActualFractionalPartZetaSource.actual_zeta_floor_integral",
+        "Holonics.Zeta.ActualFractionalPartZetaSource.actual_regularized_zeta_fraction",
+        "Holonics.Zeta.ActualFractionalPartZetaSource.actual_zeta_fraction_integral"
+      ],
+      "kernel": {
+        "kernel_accepted": true,
+        "compiler_exit": 0,
+        "compiler_wall_ns": 5154031506,
+        "axioms": {
+          "Holonics.Zeta.ActualFractionalPartZetaSource.actual_fraction_mellin_convergent": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "Holonics.Zeta.ActualFractionalPartZetaSource.actual_zeta_floor_integral": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "Holonics.Zeta.ActualFractionalPartZetaSource.actual_regularized_zeta_fraction": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "Holonics.Zeta.ActualFractionalPartZetaSource.actual_zeta_fraction_integral": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ]
+        },
+        "selector_count_matches": true,
+        "standard_axioms_only": true,
+        "metadata_unchanged": true,
+        "broad_library_checked": false
+      },
+      "resources": [
+        {
+          "phase": "prep",
+          "accepted": true,
+          "wall_ns": 5740294814,
+          "projection_ns": 12779337307,
+          "aggregate_CPU_ns": 5307373000,
+          "group_peak_B": 322134016,
+          "group_limit_B": 8589934592,
+          "measured_to_projected": {
+            "numerator": 5740294814,
+            "denominator": 12779337307
+          },
+          "quiescent_released": true
+        },
+        {
+          "phase": "compile",
+          "accepted": true,
+          "wall_ns": 7012483760,
+          "projection_ns": 21132554884,
+          "aggregate_CPU_ns": 5045723000,
+          "group_peak_B": 1348628480,
+          "group_limit_B": 8589934592,
+          "measured_to_projected": {
+            "numerator": 7012483760,
+            "denominator": 21132554884
+          },
+          "quiescent_released": true
+        }
+      ],
+      "fresh_canonical_objects_used_for_imports": true,
+      "old_private_acceptance_inherited": false
+    },
+    {
+      "module": "HolonicsResearch.Zeta.ActualFiniteBeurlingMellinValue",
+      "source_pin": {
+        "bytes": 11595,
+        "sha256": "e70e696f332339ce5d5de7194c398fc241d10b5c129987233ab779e8f853a00a"
+      },
+      "status": "PASS",
+      "required_queries": [
+        "Holonics.Zeta.ActualFiniteBeurlingMellinValue.actual_fraction_boundary_split_ae",
+        "Holonics.Zeta.ActualFiniteBeurlingMellinValue.actual_reciprocal_fraction_hasMellin",
+        "Holonics.Zeta.ActualFiniteBeurlingMellinValue.actual_finite_receiver_hasMellin",
+        "Holonics.Zeta.ActualFiniteBeurlingMellinValue.actual_finite_receiver_fourier_value"
+      ],
+      "kernel": {
+        "kernel_accepted": true,
+        "compiler_exit": 0,
+        "compiler_wall_ns": 2885446172,
+        "axioms": {
+          "Holonics.Zeta.ActualFiniteBeurlingMellinValue.actual_fraction_boundary_split_ae": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "Holonics.Zeta.ActualFiniteBeurlingMellinValue.actual_reciprocal_fraction_hasMellin": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "Holonics.Zeta.ActualFiniteBeurlingMellinValue.actual_finite_receiver_hasMellin": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "Holonics.Zeta.ActualFiniteBeurlingMellinValue.actual_finite_receiver_fourier_value": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ]
+        },
+        "selector_count_matches": true,
+        "standard_axioms_only": true,
+        "metadata_unchanged": true,
+        "broad_library_checked": false
+      },
+      "resources": [
+        {
+          "phase": "prep",
+          "accepted": true,
+          "wall_ns": 5928491073,
+          "projection_ns": 12779337307,
+          "aggregate_CPU_ns": 5441509000,
+          "group_peak_B": 319954944,
+          "group_limit_B": 8589934592,
+          "measured_to_projected": {
+            "numerator": 5928491073,
+            "denominator": 12779337307
+          },
+          "quiescent_released": true
+        },
+        {
+          "phase": "compile",
+          "accepted": true,
+          "wall_ns": 4760076920,
+          "projection_ns": 21132554884,
+          "aggregate_CPU_ns": 4063970000,
+          "group_peak_B": 553680896,
+          "group_limit_B": 8589934592,
+          "measured_to_projected": {
+            "numerator": 4760076920,
+            "denominator": 21132554884
+          },
+          "quiescent_released": true
+        }
+      ],
+      "fresh_canonical_objects_used_for_imports": true,
+      "old_private_acceptance_inherited": false
+    },
+    {
+      "module": "HolonicsResearch.Zeta.ActualBeurlingTailEnergy",
+      "source_pin": {
+        "bytes": 5771,
+        "sha256": "ad0cfd974cbcde1451c8379da1d24dbf9fad6a732bcf08d9d877e905dbc85b17"
+      },
+      "status": "PASS",
+      "required_queries": [
+        "Holonics.Zeta.ActualBeurlingTailEnergy.actual_tail_square_integral",
+        "Holonics.Zeta.ActualBeurlingTailEnergy.actual_full_square_integrable",
+        "Holonics.Zeta.ActualBeurlingTailEnergy.actual_full_energy_balance",
+        "Holonics.Zeta.ActualBeurlingTailEnergy.actual_tail_energy_le_full"
+      ],
+      "kernel": {
+        "kernel_accepted": true,
+        "compiler_exit": 0,
+        "compiler_wall_ns": 5603251864,
+        "axioms": {
+          "Holonics.Zeta.ActualBeurlingTailEnergy.actual_tail_square_integral": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "Holonics.Zeta.ActualBeurlingTailEnergy.actual_full_square_integrable": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "Holonics.Zeta.ActualBeurlingTailEnergy.actual_full_energy_balance": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "Holonics.Zeta.ActualBeurlingTailEnergy.actual_tail_energy_le_full": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ]
+        },
+        "selector_count_matches": true,
+        "standard_axioms_only": true,
+        "metadata_unchanged": true,
+        "broad_library_checked": false
+      },
+      "resources": [
+        {
+          "phase": "prep",
+          "accepted": true,
+          "wall_ns": 5755594718,
+          "projection_ns": 12779337307,
+          "aggregate_CPU_ns": 5288498000,
+          "group_peak_B": 318713856,
+          "group_limit_B": 8589934592,
+          "measured_to_projected": {
+            "numerator": 5755594718,
+            "denominator": 12779337307
+          },
+          "quiescent_released": true
+        },
+        {
+          "phase": "compile",
+          "accepted": true,
+          "wall_ns": 7414431472,
+          "projection_ns": 21132554884,
+          "aggregate_CPU_ns": 4741489000,
+          "group_peak_B": 2127663104,
+          "group_limit_B": 8589934592,
+          "measured_to_projected": {
+            "numerator": 7414431472,
+            "denominator": 21132554884
+          },
+          "quiescent_released": true
+        }
+      ],
+      "fresh_canonical_objects_used_for_imports": true,
+      "old_private_acceptance_inherited": false
+    },
+    {
+      "module": "HolonicsResearch.Zeta.ActualBeurlingCompensatedTail",
+      "source_pin": {
+        "bytes": 4312,
+        "sha256": "47efaa76eb9efb6796c2c888b9ba2199fb54f42aeb8891b35106ba525185f25c"
+      },
+      "status": "PASS",
+      "required_queries": [
+        "Holonics.Zeta.ActualBeurlingCompensatedTail.actual_tail_mellin_integrable",
+        "Holonics.Zeta.ActualBeurlingCompensatedTail.actual_tail_mellin_integral",
+        "Holonics.Zeta.ActualBeurlingCompensatedTail.actual_tail_mellin_norm"
+      ],
+      "kernel": {
+        "kernel_accepted": true,
+        "compiler_exit": 0,
+        "compiler_wall_ns": 3497987830,
+        "axioms": {
+          "Holonics.Zeta.ActualBeurlingCompensatedTail.actual_tail_mellin_integrable": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "Holonics.Zeta.ActualBeurlingCompensatedTail.actual_tail_mellin_integral": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ],
+          "Holonics.Zeta.ActualBeurlingCompensatedTail.actual_tail_mellin_norm": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+          ]
+        },
+        "selector_count_matches": true,
+        "standard_axioms_only": true,
+        "metadata_unchanged": true,
+        "broad_library_checked": false
+      },
+      "resources": [
+        {
+          "phase": "prep",
+          "accepted": true,
+          "wall_ns": 5475373952,
+          "projection_ns": 12779337307,
+          "aggregate_CPU_ns": 5075501000,
+          "group_peak_B": 315179008,
+          "group_limit_B": 8589934592,
+          "measured_to_projected": {
+            "numerator": 5475373952,
+            "denominator": 12779337307
+          },
+          "quiescent_released": true
+        },
+        {
+          "phase": "compile",
+          "accepted": true,
+          "wall_ns": 5305768017,
+          "projection_ns": 21132554884,
+          "aggregate_CPU_ns": 3781560000,
+          "group_peak_B": 1006170112,
+          "group_limit_B": 8589934592,
+          "measured_to_projected": {
+            "numerator": 5305768017,
+            "denominator": 21132554884
+          },
+          "quiescent_released": true
+        }
+      ],
+      "fresh_canonical_objects_used_for_imports": true,
+      "old_private_acceptance_inherited": false
+    }
+  ],
+  "standard_queries_accepted": 23,
+  "queries_required": 23,
+  "full_library_checked": false,
+  "unchanged_prior_failed_sources_and_receipts_preserved": true,
+  "no_resource_deadline_heartbeat_or_concurrency_raise": true,
+  "source_edits_or_push_or_merge_by_queue": false,
+  "remaining_obligations": [
+    "No signed norm upper estimate, uniform-in-N decay, Mertens bound, RH, current-cancellation or Lambda upper bound is proved."
+  ],
+  "queue_quiescent_released": true
+}
