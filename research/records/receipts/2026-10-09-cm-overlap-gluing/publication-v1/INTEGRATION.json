@@ -1,0 +1,18 @@
+{
+  "schema": "hodge-cm-publication-integration-v1",
+  "publication_base_commit": "f2c03e8dfff3a0fa153e6b072863625bdbb441cf",
+  "native_source_base_commit": "3c67beee7f656798f912c974f12c482ea12c5e42",
+  "integration_base_commit": "eb4a4303b46f0465fc4376c7455a6bfa1c537ad6",
+  "source_changed": false,
+  "shared_indexes_checked_by_content": [
+    "docs/atlas/targets.tsv",
+    "research/records/README.md"
+  ],
+  "index_routes": [
+    "- [The accepted CM overlap preserves its source bindings for publication](2026-10-09_THE_ACCEPTED_CM_OVERLAP_PRESERVES_ITS_SOURCE_BINDINGS_FOR_PUBLICATION.md) (#62, #147): exact v9 owner59/importer7 accepted with standard axioms. Inverse localized chart maps, all-function Spec reception and tangent-clock transport retain their source premises. Frozen provider/import pins and failed predecessors are preserved; canonical relocation, Proj inclusion/global gluing, periods/H2/Betti and general algebraic-cycle conclusions remain open.",
+    "- [The actual CM tangent current returns its clock through the chart overlap](2026-10-09_THE_ACTUAL_CM_TANGENT_CURRENT_RETURNS_ITS_CLOCK_THROUGH_THE_CHART_OVERLAP.md): mathematical source and consumer retained; final v9 acceptance and publication limits joined above.",
+    "- [The actual CM overlap returns every localized function to its source](2026-10-09_THE_ACTUAL_CM_OVERLAP_RETURNS_EVERY_LOCALIZED_FUNCTION_TO_ITS_SOURCE.md): mathematical source and consumer retained; final v9 acceptance and publication limits joined above.",
+    "- [The actual CM native failures repair the producing proofs without changing the source](2026-10-09_THE_ACTUAL_CM_NATIVE_FAILURES_REPAIR_THE_PRODUCING_PROOFS_WITHOUT_CHANGING_THE_SOURCE.md): mathematical source and consumer retained; final v9 acceptance and publication limits joined above."
+  ],
+  "note": "The publication was prepared on its publication base and is integrated on the current main named here. The shared atlas and records index carry other publications rows and routes, so they leave the whole-file seals and are checked by content: each of the five atlas rows exactly once with a unique id, and each of the four index routes exactly once with resolving links. Every accepted source, provider snapshot, import binding and receipt is unchanged."
+}

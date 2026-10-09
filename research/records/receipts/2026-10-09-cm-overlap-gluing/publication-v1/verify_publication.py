@@ -90,24 +90,28 @@ for role in ['owner', 'importer']:
 assert not join['full_library_checked']
 assert provenance['remaining_obligations'] == join['remaining_obligations']
 
+# The shared indexes are checked by content, not as whole files: other publications add their own
+# rows and routes to them (INTEGRATION.json). The publication base stays the historical provenance.
 atlas = read(pub / 'ATLAS_JOIN.json')
-base = subprocess.run(['git', 'show', provenance['publication_base_commit'] + ':docs/atlas/targets.tsv'],
-                      cwd=root, check=True, capture_output=True, text=True).stdout
-current = (root / 'docs/atlas/targets.tsv').read_text()
-old = {x.split('\t')[0]: x for x in base.splitlines() if x}
-new = {x.split('\t')[0]: x for x in current.splitlines() if x}
-assert all(new[k] == v for k, v in old.items())
-assert set(new) - set(old) == set(atlas['keys'])
-assert all(new[row.split('\t')[0]] == row for row in atlas['rows'])
+integration = read(pub / 'INTEGRATION.json')
+assert integration['publication_base_commit'] == provenance['publication_base_commit']
+assert not integration['source_changed']
+current = (root / 'docs/atlas/targets.tsv').read_text().splitlines()
+ids = [x.split('\t')[0] for x in current if x]
+assert set(atlas['keys']) == {row.split('\t')[0] for row in atlas['rows']}
+for row in atlas['rows']:
+    assert current.count(row) == 1, row.split('\t')[0]
+    assert ids.count(row.split('\t')[0]) == 1, row.split('\t')[0]
+index = (root / 'research/records/README.md').read_text().splitlines()
+for route in integration['index_routes']:
+    assert index.count(route) == 1, route[:80]
+    for target in re.findall(r'\]\(([^)]+)\)', route):
+        if not target.startswith(('https:', 'http:', '#')):
+            assert (root / 'research/records' / target.split('#')[0]).exists(), target
 for item in seals:
     path = root / item['path']
     if path.suffix == '.md':
         content = path.read_text()
-        if item['path'] == 'research/records/README.md':
-            old_index = subprocess.run(['git', 'show', provenance['publication_base_commit'] + ':research/records/README.md'],
-                                       cwd=root, check=True, capture_output=True, text=True).stdout
-            assert content.startswith(old_index)
-            content = content[len(old_index):]
         for target in re.findall(r'\]\(([^)]+)\)', content):
             if target.startswith(('https:', 'http:', '#')):
                 continue
@@ -119,9 +123,12 @@ receipt = {'status': 'PASS exact public source, acceptance, provider/import and 
            'selected_import_modules': {'owner': 5119, 'importer': 5120},
            'native_or_library_jobs_launched': False,
            'canonical_relocation_checked': False,
+           'publication_base_commit': provenance['publication_base_commit'],
+           'integration_base_commit': integration['integration_base_commit'],
+           'shared_indexes_checked_by_content': integration['shared_indexes_checked_by_content'],
            'projection_ns': 7482721030,
            'measured_wall_ns': time.perf_counter_ns() - start,
            'peak_resident_bytes': resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * 1024}
 assert receipt['measured_wall_ns'] < receipt['projection_ns']
-(root / pub / 'PUBLICATION_CHECK.json').write_text(json.dumps(receipt, indent=2) + '\n')
+(root / pub / 'INTEGRATION_CHECK.json').write_text(json.dumps(receipt, indent=2) + '\n')
 print(json.dumps(receipt))

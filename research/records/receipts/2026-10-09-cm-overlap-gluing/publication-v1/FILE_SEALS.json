@@ -1,10 +1,5 @@
 [
   {
-    "path": "docs/atlas/targets.tsv",
-    "sha256": "b1e03310b4b493308ce9321c8aee301e931b7ef16bdcd10b768e50b86c335a43",
-    "bytes": 703995
-  },
-  {
     "path": "research/records/2026-10-09_THE_ACCEPTED_CM_OVERLAP_PRESERVES_ITS_SOURCE_BINDINGS_FOR_PUBLICATION.md",
     "sha256": "ffe32314762f409ccf86b88dcbf388040abc579b7041ec041f2bba7dda77cb12",
     "bytes": 2883
@@ -23,11 +18,6 @@
     "path": "research/records/2026-10-09_THE_ACTUAL_CM_TANGENT_CURRENT_RETURNS_ITS_CLOCK_THROUGH_THE_CHART_OVERLAP.md",
     "sha256": "65da74314f4e45cf3892418b5354c4f1c2e51c9360dc1319b4e8dc29ece3c6ce",
     "bytes": 11423
-  },
-  {
-    "path": "research/records/README.md",
-    "sha256": "ecd68a196923b9aa259d3f9aabe35af41b90cef38c22d42bd0e3fb5e7d36dc83",
-    "bytes": 170458
   },
   {
     "path": "research/records/receipts/2026-10-07-cm-actual-analytic-cut/source-v1/CMActualGraphDiagonalAnalyticCut.lean",
@@ -801,8 +791,8 @@
   },
   {
     "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/verify_publication.py",
-    "sha256": "be011797e7e86d1ec437642ce753bdf0d5f76e089f7922b0ee1523e95f4721ef",
-    "bytes": 6581
+    "sha256": "029e8f602ee79c6d14f4764f0dd7aecc0cce899258cb4951c2a8d354ed18307a",
+    "bytes": 6992
   },
   {
     "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/v5/source-v5/CMActualGraphDiagonalAnalyticCut.lean",
@@ -863,5 +853,10 @@
     "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/v9/source-v9/CMActualGraphDiagonalAnalyticCutAudit.lean",
     "sha256": "61c683a8eaf8c29891072b6d385babf1795e93d9cb8739e1483fc8ba23a77a8e",
     "bytes": 393
+  },
+  {
+    "path": "research/records/receipts/2026-10-09-cm-overlap-gluing/publication-v1/INTEGRATION.json",
+    "sha256": "6445607da27142fbfca3193dde8181f21dfb2e6b801ada42a57ede32d4738f0f",
+    "bytes": 2283
   }
 ]
