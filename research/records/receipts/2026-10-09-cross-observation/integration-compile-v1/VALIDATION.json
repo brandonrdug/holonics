@@ -1,0 +1,52 @@
+{
+  "source_commit": "089e126fa47d206fe27ee2b75d8274e582c8180e",
+  "source_tree": "2de53b2e9e4e0c59830d5b34e144a2714118d42b",
+  "source_inputs": 350,
+  "grade": "Final joined library-test compilation passed",
+  "command": "cargo test -p holonics --lib --no-run",
+  "fresh_library_test_executable": true,
+  "runtime_fixtures_executed": 0,
+  "historical_diagnostic_runtime_source": "6fd119c0ddc951c906f8dc3d09aa27077ed782ed",
+  "historical_runtime_not_extended_to_joined_tree": true,
+  "learning_acceptance_certified": false,
+  "results": [
+    {
+      "label": "diagnostic-join-prep-20261009-v211",
+      "exit": 0,
+      "wall_ns": 9354248328,
+      "projection_ns": 17000000000,
+      "child_wall_ns": 9119080230,
+      "aggregate_CPU_ns": 7016377000,
+      "peak_child_RSS_KiB": 39676,
+      "group_peak_bytes": 4294967296,
+      "group_ceiling_bytes": 4294967296,
+      "thread_budget": 1,
+      "measured_to_projected": {
+        "numerator": 9354248328,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true
+    },
+    {
+      "label": "diagnostic-join-build-20261009-v211",
+      "exit": 0,
+      "wall_ns": 37280624560,
+      "projection_ns": 65000000000,
+      "child_wall_ns": 35236952616,
+      "aggregate_CPU_ns": 38164822000,
+      "peak_child_RSS_KiB": 2126380,
+      "group_peak_bytes": 2385571840,
+      "group_ceiling_bytes": 4294967296,
+      "thread_budget": 4,
+      "measured_to_projected": {
+        "numerator": 37280624560,
+        "denominator": 65000000000
+      },
+      "quiescent_released": true
+    }
+  ],
+  "all_quiescent_released": true,
+  "limits_raised_after_launch": false,
+  "production_edits_by_queue": false,
+  "publication_by_queue": false
+}

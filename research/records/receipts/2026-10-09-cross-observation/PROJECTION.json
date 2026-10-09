@@ -29,6 +29,36 @@
         "<queue-admission>/": 57,
         "<repository>/research/records/receipts/": 0
       }
+    },
+    "integration-compile-v1/stages/diagnostic-join-build-20261009-v211.stderr": {
+      "original": {
+        "bytes": 227,
+        "sha256": "82470195296080cc7e69df7991acd87e51ffa2b67143515246ef11c8e7ed92c1"
+      },
+      "projected": {
+        "bytes": 179,
+        "sha256": "cf9091ac517f9d31fc78201d459bb9533995f8a72e462adceefe7bdb33deed25"
+      },
+      "replaced": {
+        "<cargo-registry>/": 0,
+        "<queue-admission>/": 1,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "integration-compile-v1/stages/diagnostic-join-build-20261009-v211.stdout": {
+      "original": {
+        "bytes": 28377,
+        "sha256": "0f2a3d91e6cae01f9241a8ad4fc224369e5355a70fe1fcd9a4525094fc3c1fd2"
+      },
+      "projected": {
+        "bytes": 23441,
+        "sha256": "f729b32911161a8a5d9123acaff41906495e62d61bc57107936adc539c12c440"
+      },
+      "replaced": {
+        "<cargo-registry>/": 50,
+        "<queue-admission>/": 57,
+        "<repository>/research/records/receipts/": 0
+      }
     }
   },
   "placeholders": {

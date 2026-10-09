@@ -82,3 +82,27 @@ beside the first (Refs #73).
   - Not graded, and not claimed: improvement, retention, masking versus erasure, unseen-family
     generalization, World-sensitive choice, and any learning acceptance.
   - No full test suite, clippy, doctest or workspace gate was rerun.
+
+## The joined-source compilation at `089e126fa`
+
+The diagnostic's acceptance is pinned to `6fd119c0d`, whose base predates main's later crates. Its join onto
+published main `0d87efb27` was compiled before publication.
+- Source `089e126fa` (full `089e126fa47d206fe27ee2b75d8274e582c8180e`, tree
+  `2de53b2e9e4e0c59830d5b34e144a2714118d42b`), the merge of the packet `16752c791` onto `0d87efb27`.
+- **Compilation** ([handoff](integration-compile-v1/HANDOFF.md),
+  [validation](integration-compile-v1/VALIDATION.json)). `cargo test -p holonics --lib --no-run` freshly built
+  the library-test executable from 350 frozen native inputs; compiler exit 0. Its only warning is the
+  pre-existing `dead_code` method `HeldContactVariation::advanced` (`hnn/word/variation.rs`).
+  - `diagnostic-join-prep-20261009-v211` (one core, no compiler): wall 9,354,248,328 ns against a projection
+    of 17,000,000,000 ns; aggregate CPU 7,016,377,000 ns; child peak resident set 39,676 KiB.
+  - `diagnostic-join-build-20261009-v211` (one Cargo job, four codegen CPUs, the 4 GiB reservation): wall
+    37,280,624,560 ns against 65,000,000,000 ns; aggregate CPU 38,164,822,000 ns; group peak 2,385,571,840 B;
+    child peak resident set 2,126,380 KiB.
+  - Both stages ended quiescent and released; no limit was raised after launch.
+- **Projected host paths** ([PROJECTION.json](PROJECTION.json)): the build stage's stdout and stderr, over
+  `<queue-admission>/` (57 and 1 times) and `<cargo-registry>/` (50 times in the stdout); checked as above.
+- **Hashed only:** [integration-compile-v1/OMITTED.md](integration-compile-v1/OMITTED.md); the manifest lists
+  404 files (92,147,618 bytes), among them the frozen sources, the executable and the withheld mailbox
+  handoffs.
+- **Scope.** A compilation of the joined library tests only: no fixture ran (`runtime_fixtures_executed` 0),
+  the runtime diagnostic is not extended to the joined tree, and no learning acceptance is certified.
