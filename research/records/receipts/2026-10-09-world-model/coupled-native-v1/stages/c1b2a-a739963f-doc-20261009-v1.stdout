@@ -1,0 +1,63 @@
+
+running 57 tests
+test crates/holonics/src/compression/keys/repair.rs - compression::keys::repair::DamagedPassage (line 135) - compile fail ... ok
+test crates/holonics/src/exterior_guards.rs - exterior_guards (line 101) - compile fail ... ok
+test crates/holonics/src/exterior_guards.rs - exterior_guards (line 112) ... ok
+test crates/holonics/src/exterior_guards.rs - exterior_guards (line 123) ... ok
+test crates/holonics/src/exterior_guards.rs - exterior_guards (line 15) - compile fail ... ok
+test crates/holonics/src/exterior_guards.rs - exterior_guards (line 181) ... ok
+test crates/holonics/src/exterior_guards.rs - exterior_guards (line 250) ... ok
+test crates/holonics/src/exterior_guards.rs - exterior_guards (line 28) - compile fail ... ok
+test crates/holonics/src/exterior_guards.rs - exterior_guards (line 40) - compile fail ... ok
+test crates/holonics/src/exterior_guards.rs - exterior_guards (line 51) - compile fail ... ok
+test crates/holonics/src/exterior_guards.rs - exterior_guards (line 65) - compile ... ok
+test crates/holonics/src/exterior_guards.rs - exterior_guards (line 85) - compile fail ... ok
+test crates/holonics/src/hnn/constitution.rs - hnn::constitution (line 13) - compile fail ... ok
+test crates/holonics/src/hnn/constitution.rs - hnn::constitution::Constitution::with_element (line 4558) - compile fail ... ok
+test crates/holonics/src/hnn/encoding.rs - hnn::encoding::Encoded (line 1042) - compile fail ... ok
+test crates/holonics/src/hnn/encoding.rs - hnn::encoding::Encoded (line 1049) - compile fail ... ok
+test crates/holonics/src/hnn/encoding.rs - hnn::encoding::Encoded (line 1057) - compile fail ... ok
+test crates/holonics/src/hnn/encoding.rs - hnn::encoding::Encoded (line 1066) - compile fail ... ok
+test crates/holonics/src/hnn/encoding.rs - hnn::encoding::Encoded (line 1073) - compile fail ... ok
+test crates/holonics/src/hnn/encoding.rs - hnn::encoding::Encoded (line 1080) - compile fail ... ok
+test crates/holonics/src/hnn/encoding.rs - hnn::encoding::Encoded (line 1088) - compile fail ... ok
+test crates/holonics/src/hnn/encoding.rs - hnn::encoding::Encoded (line 1099) ... ok
+test crates/holonics/src/hnn/encoding.rs - hnn::encoding::PortCell (line 970) - compile fail ... ok
+test crates/holonics/src/hnn/encoding.rs - hnn::encoding::PortCell (line 977) - compile fail ... ok
+test crates/holonics/src/hnn/encoding.rs - hnn::encoding::PortCell (line 985) - compile fail ... ok
+test crates/holonics/src/hnn/field.rs - hnn::field::Current (line 2512) - compile fail ... ok
+test crates/holonics/src/hnn/field.rs - hnn::field::Current (line 2519) - compile fail ... ok
+test crates/holonics/src/hnn/field.rs - hnn::field::Current (line 2528) - compile fail ... ok
+test crates/holonics/src/hnn/field.rs - hnn::field::Field::selective_step (line 1524) - compile fail ... ok
+test crates/holonics/src/hnn/field.rs - hnn::field::Field::selective_step (line 1532) - compile fail ... ok
+test crates/holonics/src/hnn/field.rs - hnn::field::FieldMaterial (line 222) - compile fail ... ok
+test crates/holonics/src/hnn/field.rs - hnn::field::FieldMaterial (line 230) - compile fail ... ok
+test crates/holonics/src/hnn/field.rs - hnn::field::FieldMaterial (line 240) ... ok
+test crates/holonics/src/hnn/field.rs - hnn::field::RingDeclaration (line 344) - compile fail ... ok
+test crates/holonics/src/hnn/keys.rs - hnn::keys::locate_keys (line 376) - compile fail ... ok
+test crates/holonics/src/hnn/keys.rs - hnn::keys::station_pairs (line 459) - compile fail ... ok
+test crates/holonics/src/hnn/moment.rs - hnn::moment::SourceMoment (line 1301) - compile fail ... ok
+test crates/holonics/src/hnn/moment.rs - hnn::moment::SourceMoment::ingest (line 1401) - compile fail ... ok
+test crates/holonics/src/hnn/moment.rs - hnn::moment::SourceMoment::ingest (line 1408) - compile fail ... ok
+test crates/holonics/src/hnn/pending.rs - hnn::pending (line 29) - compile fail ... ok
+test crates/holonics/src/hnn/pending.rs - hnn::pending (line 45) - compile fail ... ok
+test crates/holonics/src/hnn/port.rs - hnn::port (line 52) - compile fail ... ok
+test crates/holonics/src/hnn/port.rs - hnn::port::ExecutionPort (line 595) - compile fail ... ok
+test crates/holonics/src/hnn/port.rs - hnn::port::ExecutionPort (line 602) - compile fail ... ok
+test crates/holonics/src/hnn/port.rs - hnn::port::ExecutionPort (line 609) - compile fail ... ok
+test crates/holonics/src/hnn/port.rs - hnn::port::ExecutionPort (line 617) - compile fail ... ok
+test crates/holonics/src/hnn/prediction.rs - hnn::prediction::CurrentSourceReceivingReturn (line 3227) - compile fail ... ok
+test crates/holonics/src/hnn/ratio.rs - hnn::ratio::RatioCovector (line 621) - compile fail ... ok
+test crates/holonics/src/hnn/word.rs - hnn::word (line 89) - compile fail ... ok
+test crates/holonics/src/hnn/word.rs - hnn::word (line 98) - compile fail ... ok
+test crates/holonics/src/physics/wave/chain.rs - physics::wave::chain::WaveChain::return_material (line 633) - compile fail ... ok
+test crates/holonics/src/receiver/population.rs - receiver::population::Emitters (line 629) - compile fail ... ok
+test crates/holonics/src/receiver/population.rs - receiver::population::Family (line 496) - compile fail ... ok
+test crates/holonics/src/receiver/population.rs - receiver::population::Family (line 516) - compile fail ... ok
+test crates/holonics/src/receiver/population/composition.rs - receiver::population::composition::Keystone (line 107) - compile fail ... ok
+test crates/holonics/src/receiver/population/composition.rs - receiver::population::composition::PortReader (line 197) - compile fail ... ok
+test crates/holonics/src/receiver/population/dormancy.rs - receiver::population::dormancy::Layered (line 86) - compile fail ... ok
+
+test result: ok. 57 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.85s
+
+all doctests ran in 2.87s; merged doctests compilation took 0.02s

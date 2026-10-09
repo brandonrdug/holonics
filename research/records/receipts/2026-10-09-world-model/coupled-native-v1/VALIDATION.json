@@ -1,0 +1,725 @@
+{
+  "grade": "Scoped C1b-2a runtime acceptance PASS; whole repository lint gate FAIL",
+  "source_commit": "a739963f68d6085eb41f5ae6a77f306151489e6d",
+  "source_tree": "c05b77cc19289652ea14b903b7efcad74728f78d",
+  "source_inputs": 352,
+  "source_manifest": {
+    "sha256": "0b7ab7790d7c55ff2fb93f50e6c86b56e8d3f4e25e2b6c89bc64d1e5bad65870",
+    "bytes": 58546
+  },
+  "exact_frozen_Git_bytes_unchanged": true,
+  "workspace_all_targets_check_passed": true,
+  "four_fresh_test_executables": true,
+  "world_model_tests_passed": 9,
+  "affected_guards_passed": 15,
+  "unique_scoped_fixtures_passed": 24,
+  "fixtures": [
+    "a_disconnected_key_is_eliminated_only_by_its_exact_annihilator",
+    "a_held_preimage_or_foreign_clock_changes_neither_actual_participant",
+    "a_non_passive_key_is_held_at_its_certified_cut_while_the_tick_advances",
+    "a_plural_preimage_keeps_its_kernel_and_an_unreachable_request_returns_its_obstruction",
+    "a_prospect_is_refused_without_a_world_model_and_moves_no_participant",
+    "a_unique_preparation_uses_the_full_loaded_opening_and_actual_pump_clock",
+    "actual_prior_world_history_changes_native_carry_and_matched_later_choice",
+    "an_actual_world_face_changes_r_then_the_later_native_prospect",
+    "an_interrupted_encounter_is_absorbed_through_its_executed_steps_without_rollback",
+    "an_unconstrained_request_retains_the_whole_control_domain",
+    "binding_is_refused_without_a_world_off_its_tick_or_off_the_source_frame",
+    "hnn::tests::guards::guard_eleven_refine_and_compare_leave_the_constitution",
+    "hnn::tests::guards::guard_fifteen_the_budget_is_refused_never_rounded",
+    "hnn::tests::guards::guard_fifteen_the_grain_reading_rounds_nothing",
+    "hnn::tests::guards::guard_five_the_collapse_runs_only_at_the_carry_out",
+    "hnn::tests::guards::guard_four_the_constitution_keeps_no_journal",
+    "hnn::tests::guards::guard_nine_the_alphabet_does_not_fix_the_architecture",
+    "hnn::tests::guards::guard_one_the_moment_is_sized_once_and_lossy_past_its_capacity",
+    "paired_actual_faces_keep_mass_phase_and_unobserved_regions",
+    "the_current_receiving_material_changes_the_prospect_and_stale_producing_words_refuse",
+    "the_resident_charges_the_models_current_bits_at_every_encounter",
+    "the_return_image_separates_the_free_and_forced_responses_and_holds_the_actual_returns",
+    "the_world_key_reproduces_every_actual_step_and_its_fibre_is_the_batch_preimage",
+    "the_world_keys_coupled_prospect_holds_the_actual_encounter_before_it_runs"
+  ],
+  "each_scoped_fixture_executed_once": true,
+  "all_targets_guard_lints_passed": false,
+  "affected_library_and_test_guard_lints_passed": true,
+  "guard_doctests_passed": 57,
+  "whole_gate_sh_passed": false,
+  "gate_components_executed_without_duplicate_workspace_check": true,
+  "whole_gate_blocker": {
+    "lint_failure_path": "crates/holonics/examples/helical_duplex.rs",
+    "line": 189,
+    "error": "use of a disallowed method std::process::exit",
+    "compiler_exit": 101,
+    "unchanged_vs_accepted_C1b_source": true,
+    "pins": {
+      "a739963f68d6085eb41f5ae6a77f306151489e6d": {
+        "sha256": "8be3f1a444ee7c18880008373c1fadcbcbcc578b32ccc37d94d019606cbe5996",
+        "bytes": 7109
+      },
+      "0a7fa87a448232a273e7f9375d85f1dd90df649c": {
+        "sha256": "8be3f1a444ee7c18880008373c1fadcbcbcc578b32ccc37d94d019606cbe5996",
+        "bytes": 7109
+      },
+      "3cfb2b71a": {
+        "sha256": "8be3f1a444ee7c18880008373c1fadcbcbcc578b32ccc37d94d019606cbe5996",
+        "bytes": 7109
+      }
+    },
+    "affected_24_fixtures_passed": true,
+    "whole_gate_sh_not_passed": true,
+    "source_edit_performed": false
+  },
+  "runtime_development_reads": [
+    "c1b2a-a739963f-coupled-development-20261009-v2",
+    "c1b2a-a739963f-nondestructive-development-20261009-v1"
+  ],
+  "all_projections_fixed_before_launch": true,
+  "limits_raised_after_launch": false,
+  "launcher_syntax_failure_preserved": {
+    "label": "c1b2a-a739963f-coupled-development-20261009-v1",
+    "fixture_executions": 0,
+    "cause": "Unsupported GNU timeout us duration suffix; exited before Cargo/test invocation. Corrected syntax only with unchanged deadline and caps."
+  },
+  "result_count": 12,
+  "results": [
+    {
+      "label": "c1b2a-a739963f-check-20261009-v1",
+      "accepted": true,
+      "exit": 0,
+      "command_wall_ns": 27401353431,
+      "guarded_wall_ns": 28851654435,
+      "projection_ns": 65000000000,
+      "measured_to_projected": {
+        "numerator": 28851654435,
+        "denominator": 65000000000
+      },
+      "aggregate_CPU_ns": 29047080000,
+      "child_CPU_user_us": 24562134,
+      "child_CPU_system_us": 2152183,
+      "peak_child_RSS_KiB": 1528624,
+      "group_peak_bytes": 1668378624,
+      "reservation_bytes": 4294967296,
+      "enforced_cap_bytes": 4294967296,
+      "maximum_authorized_bytes": 8589934592,
+      "thread_budget": 4,
+      "fixtures": [],
+      "stdout": {
+        "sha256": "f82c72cd1bb8f4eef982d8d4cb675bd8d6fe312a3d0811693826fb4dd762bb87",
+        "bytes": 46704
+      },
+      "stderr": {
+        "sha256": "5ed11d4c7f89c44d2b514c1ea376489c4a46185b9d8f812aa58d42c5b6415a4d",
+        "bytes": 454
+      },
+      "quiescent_released": true
+    },
+    {
+      "label": "c1b2a-a739963f-build-20261009-v1",
+      "accepted": true,
+      "exit": 0,
+      "command_wall_ns": 53195231405,
+      "guarded_wall_ns": 54869678864,
+      "projection_ns": 65000000000,
+      "measured_to_projected": {
+        "numerator": 54869678864,
+        "denominator": 65000000000
+      },
+      "aggregate_CPU_ns": 56027692000,
+      "child_CPU_user_us": 48426246,
+      "child_CPU_system_us": 4163257,
+      "peak_child_RSS_KiB": 2111620,
+      "group_peak_bytes": 2356232192,
+      "reservation_bytes": 4294967296,
+      "enforced_cap_bytes": 4294967296,
+      "maximum_authorized_bytes": 8589934592,
+      "thread_budget": 4,
+      "fixtures": [],
+      "stdout": {
+        "sha256": "0996f1f060e99fd25e4b3126580a09341103cd93e9ca6be76185756082674b41",
+        "bytes": 35596
+      },
+      "stderr": {
+        "sha256": "09e3285920b361f27c40d0578fd04d6597888e9ea4e1b1ed0314f0f8776f6473",
+        "bytes": 195
+      },
+      "quiescent_released": true
+    },
+    {
+      "label": "c1b2a-a739963f-coupled-development-20261009-v2",
+      "accepted": true,
+      "exit": 0,
+      "command_wall_ns": 2219163368,
+      "guarded_wall_ns": 3660162936,
+      "projection_ns": 135718806008,
+      "measured_to_projected": {
+        "numerator": 3660162936,
+        "denominator": 135718806008
+      },
+      "aggregate_CPU_ns": 3453759000,
+      "child_CPU_user_us": 2026010,
+      "child_CPU_system_us": 78137,
+      "peak_child_RSS_KiB": 28708,
+      "group_peak_bytes": 765542400,
+      "reservation_bytes": 4294967296,
+      "enforced_cap_bytes": 4294967296,
+      "maximum_authorized_bytes": 8589934592,
+      "thread_budget": 1,
+      "fixtures": [
+        "the_world_keys_coupled_prospect_holds_the_actual_encounter_before_it_runs"
+      ],
+      "stdout": {
+        "sha256": "8f37596158e2e74312fa0b82c5c0c4e9bdbdbeb147be1958030b820252d7bfb2",
+        "bytes": 198
+      },
+      "stderr": {
+        "sha256": "92ba6570ab4b3e0cad7e86b2d88a900c255a3e2ddbfa7b88a9d4742077612e1b",
+        "bytes": 1250
+      },
+      "quiescent_released": true
+    },
+    {
+      "label": "c1b2a-a739963f-nondestructive-development-20261009-v1",
+      "accepted": true,
+      "exit": 0,
+      "command_wall_ns": 3001755880,
+      "guarded_wall_ns": 4291479185,
+      "projection_ns": 183971396176,
+      "measured_to_projected": {
+        "numerator": 4291479185,
+        "denominator": 183971396176
+      },
+      "aggregate_CPU_ns": 4122371000,
+      "child_CPU_user_us": 2784876,
+      "child_CPU_system_us": 70503,
+      "peak_child_RSS_KiB": 28912,
+      "group_peak_bytes": 402722816,
+      "reservation_bytes": 4294967296,
+      "enforced_cap_bytes": 4294967296,
+      "maximum_authorized_bytes": 8589934592,
+      "thread_budget": 1,
+      "fixtures": [
+        "a_prospect_is_refused_without_a_world_model_and_moves_no_participant"
+      ],
+      "stdout": {
+        "sha256": "8a8d13d52ce2bc24c0961e0c3986014934595e1fb2f76c6c7594e2aee7db12d7",
+        "bytes": 193
+      },
+      "stderr": {
+        "sha256": "2e62ea022db684b91d6838f450e0c320736a294538737ae3b5eb1f9a0ea1dd19",
+        "bytes": 1250
+      },
+      "quiescent_released": true
+    },
+    {
+      "label": "c1b2a-a739963f-world-existing-20261009-v1",
+      "accepted": true,
+      "exit": 0,
+      "command_wall_ns": 2612187044,
+      "guarded_wall_ns": 3726131844,
+      "projection_ns": 17534143576,
+      "measured_to_projected": {
+        "numerator": 3726131844,
+        "denominator": 17534143576
+      },
+      "aggregate_CPU_ns": 3676631000,
+      "child_CPU_user_us": 2425221,
+      "child_CPU_system_us": 65977,
+      "peak_child_RSS_KiB": 28652,
+      "group_peak_bytes": 26681344,
+      "reservation_bytes": 4294967296,
+      "enforced_cap_bytes": 4294967296,
+      "maximum_authorized_bytes": 8589934592,
+      "thread_budget": 1,
+      "fixtures": [
+        "a_disconnected_key_is_eliminated_only_by_its_exact_annihilator",
+        "a_non_passive_key_is_held_at_its_certified_cut_while_the_tick_advances",
+        "an_interrupted_encounter_is_absorbed_through_its_executed_steps_without_rollback",
+        "binding_is_refused_without_a_world_off_its_tick_or_off_the_source_frame",
+        "the_resident_charges_the_models_current_bits_at_every_encounter",
+        "the_return_image_separates_the_free_and_forced_responses_and_holds_the_actual_returns",
+        "the_world_key_reproduces_every_actual_step_and_its_fibre_is_the_batch_preimage"
+      ],
+      "stdout": {
+        "sha256": "92319e8531907f14317d1f6bffeeecfdb5616bea8ba1d4ae3fcd2e164c197a22",
+        "bytes": 713
+      },
+      "stderr": {
+        "sha256": "fa76bf39bc4a1c4b04828de58048ef7659b9b8d347ee5734d4d0a9792c4290fd",
+        "bytes": 1250
+      },
+      "quiescent_released": true
+    },
+    {
+      "label": "c1b2a-a739963f-native-action-20261009-v1",
+      "accepted": true,
+      "exit": 0,
+      "command_wall_ns": 575311025,
+      "guarded_wall_ns": 1697533828,
+      "projection_ns": 10876653472,
+      "measured_to_projected": {
+        "numerator": 1697533828,
+        "denominator": 10876653472
+      },
+      "aggregate_CPU_ns": 1653169000,
+      "child_CPU_user_us": 519616,
+      "child_CPU_system_us": 25478,
+      "peak_child_RSS_KiB": 18368,
+      "group_peak_bytes": 19976192,
+      "reservation_bytes": 4294967296,
+      "enforced_cap_bytes": 4294967296,
+      "maximum_authorized_bytes": 8589934592,
+      "thread_budget": 1,
+      "fixtures": [
+        "a_held_preimage_or_foreign_clock_changes_neither_actual_participant",
+        "actual_prior_world_history_changes_native_carry_and_matched_later_choice",
+        "an_actual_world_face_changes_r_then_the_later_native_prospect",
+        "paired_actual_faces_keep_mass_phase_and_unobserved_regions"
+      ],
+      "stdout": {
+        "sha256": "3aedffefc93376b134e2c3b5bc20d217bcc82823884414c578d1a1c8056e33e9",
+        "bytes": 423
+      },
+      "stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "quiescent_released": true
+    },
+    {
+      "label": "c1b2a-a739963f-physical-action-20261009-v1",
+      "accepted": true,
+      "exit": 0,
+      "command_wall_ns": 183929055,
+      "guarded_wall_ns": 1323936078,
+      "projection_ns": 10876653472,
+      "measured_to_projected": {
+        "numerator": 1323936078,
+        "denominator": 10876653472
+      },
+      "aggregate_CPU_ns": 1277125000,
+      "child_CPU_user_us": 158392,
+      "child_CPU_system_us": 14664,
+      "peak_child_RSS_KiB": 18360,
+      "group_peak_bytes": 18833408,
+      "reservation_bytes": 4294967296,
+      "enforced_cap_bytes": 4294967296,
+      "maximum_authorized_bytes": 8589934592,
+      "thread_budget": 1,
+      "fixtures": [
+        "a_plural_preimage_keeps_its_kernel_and_an_unreachable_request_returns_its_obstruction",
+        "a_unique_preparation_uses_the_full_loaded_opening_and_actual_pump_clock",
+        "an_unconstrained_request_retains_the_whole_control_domain",
+        "the_current_receiving_material_changes_the_prospect_and_stale_producing_words_refuse"
+      ],
+      "stdout": {
+        "sha256": "5406f75768bdec25082cf8424cc50d62041f49823e181a06186c09b12dd804eb",
+        "bytes": 462
+      },
+      "stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "quiescent_released": true
+    },
+    {
+      "label": "c1b2a-a739963f-retention-guards-20261009-v1",
+      "accepted": true,
+      "exit": 0,
+      "command_wall_ns": 283926508,
+      "guarded_wall_ns": 1432157393,
+      "projection_ns": 17534143576,
+      "measured_to_projected": {
+        "numerator": 1432157393,
+        "denominator": 17534143576
+      },
+      "aggregate_CPU_ns": 1387497000,
+      "child_CPU_user_us": 259343,
+      "child_CPU_system_us": 8490,
+      "peak_child_RSS_KiB": 30568,
+      "group_peak_bytes": 19861504,
+      "reservation_bytes": 4294967296,
+      "enforced_cap_bytes": 4294967296,
+      "maximum_authorized_bytes": 8589934592,
+      "thread_budget": 1,
+      "fixtures": [
+        "hnn::tests::guards::guard_eleven_refine_and_compare_leave_the_constitution",
+        "hnn::tests::guards::guard_fifteen_the_budget_is_refused_never_rounded",
+        "hnn::tests::guards::guard_fifteen_the_grain_reading_rounds_nothing",
+        "hnn::tests::guards::guard_five_the_collapse_runs_only_at_the_carry_out",
+        "hnn::tests::guards::guard_four_the_constitution_keeps_no_journal",
+        "hnn::tests::guards::guard_nine_the_alphabet_does_not_fix_the_architecture",
+        "hnn::tests::guards::guard_one_the_moment_is_sized_once_and_lossy_past_its_capacity"
+      ],
+      "stdout": {
+        "sha256": "4cb223164cc52e8f5b96c1a3aec2b780bfd833d38ecd1cb7a038a22923d92ff5",
+        "bytes": 705
+      },
+      "stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "quiescent_released": true
+    },
+    {
+      "label": "c1b2a-a739963f-clippy-20261009-v1",
+      "accepted": false,
+      "exit": 101,
+      "command_wall_ns": 10312081621,
+      "guarded_wall_ns": 11693659533,
+      "projection_ns": 65000000000,
+      "measured_to_projected": {
+        "numerator": 11693659533,
+        "denominator": 65000000000
+      },
+      "aggregate_CPU_ns": 11773525000,
+      "child_CPU_user_us": 9439060,
+      "child_CPU_system_us": 685032,
+      "peak_child_RSS_KiB": 981860,
+      "group_peak_bytes": 1275797504,
+      "reservation_bytes": 4294967296,
+      "enforced_cap_bytes": 4294967296,
+      "maximum_authorized_bytes": 8589934592,
+      "thread_budget": 4,
+      "fixtures": [],
+      "stdout": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "sha256": "19cfb0c0c363fe3d22d6c8b84e4a5ef587ba9be1e507e7f359bd5452f3cfa9e3",
+        "bytes": 315264
+      },
+      "quiescent_released": true
+    },
+    {
+      "label": "c1b2a-a739963f-doc-20261009-v1",
+      "accepted": true,
+      "exit": 0,
+      "command_wall_ns": 24370429705,
+      "guarded_wall_ns": 25803726535,
+      "projection_ns": 65000000000,
+      "measured_to_projected": {
+        "numerator": 25803726535,
+        "denominator": 65000000000
+      },
+      "aggregate_CPU_ns": 26265342000,
+      "child_CPU_user_us": 21065027,
+      "child_CPU_system_us": 2983991,
+      "peak_child_RSS_KiB": 1413436,
+      "group_peak_bytes": 1681084416,
+      "reservation_bytes": 4294967296,
+      "enforced_cap_bytes": 4294967296,
+      "maximum_authorized_bytes": 8589934592,
+      "thread_budget": 4,
+      "fixtures": [],
+      "stdout": {
+        "sha256": "92dd0fc17029456ec30589016f517a5f727fe3e590eee211201598c01514d6ca",
+        "bytes": 5894
+      },
+      "stderr": {
+        "sha256": "56538468cdede0433761469b64294723af003b34b06e95db1de2021944e6100c",
+        "bytes": 40054
+      },
+      "quiescent_released": true
+    },
+    {
+      "label": "c1b2a-a739963f-clippy-affected-20261009-v1",
+      "accepted": true,
+      "exit": 0,
+      "command_wall_ns": 6966837336,
+      "guarded_wall_ns": 8384437314,
+      "projection_ns": 65000000000,
+      "measured_to_projected": {
+        "numerator": 8384437314,
+        "denominator": 65000000000
+      },
+      "aggregate_CPU_ns": 8314040000,
+      "child_CPU_user_us": 5946852,
+      "child_CPU_system_us": 864676,
+      "peak_child_RSS_KiB": 709184,
+      "group_peak_bytes": 1189912576,
+      "reservation_bytes": 4294967296,
+      "enforced_cap_bytes": 4294967296,
+      "maximum_authorized_bytes": 8589934592,
+      "thread_budget": 4,
+      "fixtures": [],
+      "stdout": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "sha256": "9eefaf4f1a2ba381357fecc3e89cd17d6af58802fd0bcb6f7f21dc3d37405528",
+        "bytes": 316786
+      },
+      "quiescent_released": true
+    },
+    {
+      "label": "c1b2a-a739963f-coupled-development-20261009-v1",
+      "accepted": false,
+      "exit": 125,
+      "command_wall_ns": 3584780,
+      "guarded_wall_ns": 1190607030,
+      "projection_ns": 135718806008,
+      "measured_to_projected": {
+        "numerator": 1190607030,
+        "denominator": 135718806008
+      },
+      "aggregate_CPU_ns": 1133739000,
+      "child_CPU_user_us": 0,
+      "child_CPU_system_us": 1343,
+      "peak_child_RSS_KiB": 18368,
+      "group_peak_bytes": 21393408,
+      "reservation_bytes": 4294967296,
+      "enforced_cap_bytes": 4294967296,
+      "maximum_authorized_bytes": 8589934592,
+      "thread_budget": 1,
+      "fixtures": [],
+      "stdout": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "sha256": "4d47e68bba85c423216b5c11411281f88dd08204ea7446c811109cec9573c655",
+        "bytes": 97
+      },
+      "quiescent_released": true
+    }
+  ],
+  "commands_manifest": {
+    "sha256": "1ca401883b737ae44ced84ac5143fdf144e45e8741201b2da8940075385a070e",
+    "bytes": 16957
+  },
+  "executable_pins": {
+    "world_model": {
+      "sha256": "88db989fd4e004b8239608a5059b612569d5dc3520d12f28bb61fcf5444cb4a3",
+      "bytes": 32758856
+    },
+    "native_action_return": {
+      "sha256": "d057fc01ddb9ab6e7fc6189ea125126a0d5a129e88fc464d7f9160d35a861ac8",
+      "bytes": 33944800
+    },
+    "physical_action": {
+      "sha256": "3ea682321918456460e5f7e7d80c09eb27623dd7af97a27e46e848001acb44d6",
+      "bytes": 21715672
+    },
+    "holonics": {
+      "sha256": "6d9a38c3aecfb64701a3e4049be1fe17eaddf3cbe38bdcc2f08bb3f8ce565832",
+      "bytes": 76723504
+    }
+  },
+  "compiler_warnings": [
+    {
+      "message": "method `anchor_differential_joined` is never used",
+      "level": "warning",
+      "spans": [
+        {
+          "byte_end": 37640,
+          "byte_start": 37623,
+          "column_end": 18,
+          "column_start": 1,
+          "expansion": null,
+          "file_name": "crates/holonics/src/hnn/port.rs",
+          "is_primary": false,
+          "label": "method in this implementation",
+          "line_end": 850,
+          "line_start": 850,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 18,
+              "highlight_start": 1,
+              "text": "impl<'c> Word<'c> {"
+            }
+          ]
+        },
+        {
+          "byte_end": 42059,
+          "byte_start": 42033,
+          "column_end": 45,
+          "column_start": 19,
+          "expansion": null,
+          "file_name": "crates/holonics/src/hnn/port.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 942,
+          "line_start": 942,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 45,
+              "highlight_start": 19,
+              "text": "    pub(crate) fn anchor_differential_joined("
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "message": "method `seeds` is never used",
+      "level": "warning",
+      "spans": [
+        {
+          "byte_end": 63439,
+          "byte_start": 63416,
+          "column_end": 24,
+          "column_start": 1,
+          "expansion": null,
+          "file_name": "crates/holonics/src/hnn/receiving.rs",
+          "is_primary": false,
+          "label": "method in this implementation",
+          "line_end": 1310,
+          "line_start": 1310,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 24,
+              "highlight_start": 1,
+              "text": "impl SourceObserverView {"
+            }
+          ]
+        },
+        {
+          "byte_end": 75799,
+          "byte_start": 75794,
+          "column_end": 24,
+          "column_start": 19,
+          "expansion": null,
+          "file_name": "crates/holonics/src/hnn/receiving.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 1606,
+          "line_start": 1606,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 24,
+              "highlight_start": 19,
+              "text": "    pub(crate) fn seeds("
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "message": "method `advanced` is never used",
+      "level": "warning",
+      "spans": [
+        {
+          "byte_end": 9293,
+          "byte_start": 9268,
+          "column_end": 26,
+          "column_start": 1,
+          "expansion": null,
+          "file_name": "crates/holonics/src/hnn/word/variation.rs",
+          "is_primary": false,
+          "label": "method in this implementation",
+          "line_end": 236,
+          "line_start": 236,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 26,
+              "highlight_start": 1,
+              "text": "impl HeldContactVariation {"
+            }
+          ]
+        },
+        {
+          "byte_end": 18786,
+          "byte_start": 18778,
+          "column_end": 27,
+          "column_start": 19,
+          "expansion": null,
+          "file_name": "crates/holonics/src/hnn/word/variation.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 473,
+          "line_start": 473,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 27,
+              "highlight_start": 19,
+              "text": "    pub(crate) fn advanced(&self, word: &Word<'_>, opened: &[EndChange]) -> Result<Self, HnnError> {"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "message": "method `advanced` is never used",
+      "level": "warning",
+      "spans": [
+        {
+          "byte_end": 9293,
+          "byte_start": 9268,
+          "column_end": 26,
+          "column_start": 1,
+          "expansion": null,
+          "file_name": "crates/holonics/src/hnn/word/variation.rs",
+          "is_primary": false,
+          "label": "method in this implementation",
+          "line_end": 236,
+          "line_start": 236,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 26,
+              "highlight_start": 1,
+              "text": "impl HeldContactVariation {"
+            }
+          ]
+        },
+        {
+          "byte_end": 18786,
+          "byte_start": 18778,
+          "column_end": 27,
+          "column_start": 19,
+          "expansion": null,
+          "file_name": "crates/holonics/src/hnn/word/variation.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 473,
+          "line_start": 473,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 27,
+              "highlight_start": 19,
+              "text": "    pub(crate) fn advanced(&self, word: &Word<'_>, opened: &[EndChange]) -> Result<Self, HnnError> {"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "all_leases_released": true,
+  "no_native_process_or_active_unit_remaining": true,
+  "failed_unit_metadata_only": [
+    "holonics-prune-admission-c1b2a-a739963f-clippy-20261009-v1.service",
+    "holonics-prune-admission-c1b2a-a739963f-coupled-development-20261009-v1.service"
+  ],
+  "source_edits": false,
+  "Git_publication": false,
+  "cache_clearing": false,
+  "system_changes": false,
+  "private_correspondence_in_packet": false,
+  "scope": "Declared live law/admittance keys: prospect read before encounter contains all actual incident/reflected port waves and actual native receiving logits R x in the producing frame under one correlated shared k. Point fibres give exact equality; incompatible/non-passive keys and plural controls refuse; reads leave actual participants and memory unchanged.",
+  "not_certified": [
+    "World target-face coverage",
+    "Raw native x separately observed where R has a kernel",
+    "C2 finite forward cover or two-encounter acceptance",
+    "Ask over keys",
+    "Learning through the model",
+    "CUDA runtime parity",
+    "World/Robin full first/second material variation"
+  ]
+}

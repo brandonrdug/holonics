@@ -1,0 +1,4 @@
+    Checking holonics v0.1.0 (<coupled-run>/native/source-v1/crates/holonics)
+   Compiling holonics-cuda v0.1.0 (<coupled-run>/native/source-v1/crates/holonics-cuda)
+warning: holonics-cuda@0.1.0: compiled the HNN kernels, sources 0487ca77d04595a1518db8a997af0773091fc06fa17f386f622a37abb89de42f
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 27.38s

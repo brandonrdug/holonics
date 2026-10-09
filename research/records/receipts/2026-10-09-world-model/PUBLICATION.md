@@ -10,9 +10,9 @@ This directory publishes the compact receipts of C1b-1, the World's learned mode
 - The C1b-1 source against `5864e4f58`: the new owner `hnn::physical::action::model`, its ingestion in
   `physical/action.rs`, the Resident's retention, binding and bit charge in `hnn/reference.rs` and
   `hnn/reference/interaction.rs`, the owner's test `crates/holonics/tests/world_model.rs`, and §7 of the record.
-- The published source is byte-identical to `0a7fa87a4`. Its `model.rs` module header still reads
-  "[source under review, not yet compiled or run]", written before this acceptance; the current grading
-  is this note and the record's §7.
+- The C1b-1 source was published byte-identical to `0a7fa87a4`, whose `model.rs` header read "[source
+  under review, not yet compiled or run]" from before that acceptance. Since C1b-2a (`a739963f6`, below) the
+  header points to the record's §7, which carries the current grading.
 
 - **Native acceptance at `0a7fa87a4`** ([handoff](native-v1/HANDOFF.md),
   [validation](native-v1/VALIDATION.json)).
@@ -99,3 +99,62 @@ places the C1b code beside the published diagnostic unit test, so the join was c
 - **Scope.** Compilation of the joined library tests only: no fixture ran, the native acceptance stays at
   `0a7fa87a4`, and nothing here extends it to a coupled World future, learning through the model or the
   World's observed face.
+
+## C1b-2a: the coupled prospect at `a739963f6`
+
+The World model's coupled prospect, read before an encounter, runs the prepared action's own controlled
+opening with each emitted wave answered by a live key's charts: one `k` for the whole passage
+(`Word::prospective_coupled_passage`, `ProspectiveControl::controlled_word`, `WorldModel::coupled_prospect`,
+`PreparedPhysicalAction::world_prospect`; the record's §7).
+- Source `a739963f6` (full `a739963f68d6085eb41f5ae6a77f306151489e6d`, tree
+  `c05b77cc19289652ea14b903b7efcad74728f78d`), on the C1b-1 receipts successor `3cfb2b71a`. It joins this
+  main byte-identical in all six C1b source files.
+- **Scoped native acceptance** ([handoff](coupled-native-v1/HANDOFF.md),
+  [validation](coupled-native-v1/VALIDATION.json)). With 352 frozen native inputs, every scoped stage passed:
+  - the workspace all-targets check;
+  - four freshly built test executables;
+  - 24 unique fixtures, each executed once: the nine of `world_model` (the two new coupled fixtures among
+    them), `native_action_return` four, `physical_action` four and seven retention guards;
+  - the guard lints of the affected library and tests;
+  - all 57 guard doctests.
+
+  In the passed coupled fixture, the encounter's actual incident and reflected waves and its own blind read
+  of the compared station (the native receiving logits `R x`, in the producing frame) are carried by one `k`
+  of the World key's prospect, read before the encounter, and match it exactly at a point fibre.
+- **The whole gate failed, and that failure stays bound to `a739963f6`.** The all-targets guard clippy exited
+  101 on one error: `std::process::exit` at `crates/holonics/examples/helical_duplex.rs:189`, denied by guard 7
+  ([provenance](coupled-native-v1/LINT_FAILURE_PROVENANCE.json)). That file is byte-identical at
+  `a739963f6`, `0a7fa87a4` and `3cfb2b71a`, so the failure is not a C1b change. The repair in this candidate
+  makes the example's `main` return a `std::process::ExitCode`: the same message, then `FAILURE`, else
+  `SUCCESS`. An ordinary exterior status return preserves the boundary receipt and lets owned resources end
+  normally. The two clippy stderr files (all targets 315,264 bytes, affected 316,786 bytes) exceed the
+  compact limit and are hash-only.
+- **Stages**, each within its fixed projection and released, the 4 GiB reservation enforced, and no limit
+  raised after launch:
+
+  | Stage | Exit | Wall ns | Projection ns | CPU ns | Child RSS KiB |
+  |---|---:|---:|---:|---:|---:|
+  | check | 0 | 27,401,353,431 | 65,000,000,000 | 29,047,080,000 | 1,528,624 |
+  | build | 0 | 53,195,231,405 | 65,000,000,000 | 56,027,692,000 | 2,111,620 |
+  | coupled development v2 | 0 | 2,219,163,368 | 135,718,806,008 | 3,453,759,000 | 28,708 |
+  | nondestructive development | 0 | 3,001,755,880 | 183,971,396,176 | 4,122,371,000 | 28,912 |
+  | world existing | 0 | 2,612,187,044 | 17,534,143,576 | 3,676,631,000 | 28,652 |
+  | native action | 0 | 575,311,025 | 10,876,653,472 | 1,653,169,000 | 18,368 |
+  | physical action | 0 | 183,929,055 | 10,876,653,472 | 1,277,125,000 | 18,360 |
+  | retention guards | 0 | 283,926,508 | 17,534,143,576 | 1,387,497,000 | 30,568 |
+  | clippy, all targets | 101 | 10,312,081,621 | 65,000,000,000 | 11,773,525,000 | 981,860 |
+  | clippy, affected | 0 | 6,966,837,336 | 65,000,000,000 | 8,314,040,000 | 709,184 |
+  | doctests | 0 | 24,370,429,705 | 65,000,000,000 | 26,265,342,000 | 1,413,436 |
+
+  The first launch of the coupled development fixture (v1) exited 125 before Cargo ran: its timeout carried
+  the unsupported `us` suffix. It ran no fixture and is preserved; v2 corrected only the syntax, with the
+  same deadline and caps.
+- **Projected host paths** ([PROJECTION.json](PROJECTION.json)). Eight stage outputs name the validation's
+  private run directory. One more placeholder is declared, `<coupled-run>/`, beside the earlier five. They
+  replace it, and `<cargo-registry>/` in the check and build stdout, with no other byte change. All fourteen
+  entries invert to their pinned originals, and no host path remains.
+- **Hashed only:** [coupled-native-v1/OMITTED.md](coupled-native-v1/OMITTED.md); the manifest lists 262 files
+  (21,121,913 bytes).
+- **Scope.** Not claimed: the World's target face, raw `x` where `R` has a kernel, C2's two-encounter
+  acceptance, the Ask, learning through the model, or the whole gate at `a739963f6`. The repaired example is
+  compiled only by this candidate's own validation.

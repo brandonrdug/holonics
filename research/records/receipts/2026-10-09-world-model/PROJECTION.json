@@ -1,5 +1,149 @@
 {
   "files": {
+    "coupled-native-v1/stages/c1b2a-a739963f-build-20261009-v1.stderr": {
+      "original": {
+        "bytes": 195,
+        "sha256": "09e3285920b361f27c40d0578fd04d6597888e9ea4e1b1ed0314f0f8776f6473"
+      },
+      "projected": {
+        "bytes": 152,
+        "sha256": "75bd0d83f848bb8e5c8f154ec6545fead576d485f49866ed76d1a54abbea7a49"
+      },
+      "replaced": {
+        "<candidate-worktree>/": 0,
+        "<cargo-registry>/": 0,
+        "<coupled-run>/": 1,
+        "<native-run>/": 0,
+        "<queue-admission>/": 0,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "coupled-native-v1/stages/c1b2a-a739963f-build-20261009-v1.stdout": {
+      "original": {
+        "bytes": 35596,
+        "sha256": "0996f1f060e99fd25e4b3126580a09341103cd93e9ca6be76185756082674b41"
+      },
+      "projected": {
+        "bytes": 29698,
+        "sha256": "7c5f4a43602ba3387120a87ac372597e864c878f9d20a687f0361ce4a572d650"
+      },
+      "replaced": {
+        "<candidate-worktree>/": 0,
+        "<cargo-registry>/": 50,
+        "<coupled-run>/": 86,
+        "<native-run>/": 0,
+        "<queue-admission>/": 0,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "coupled-native-v1/stages/c1b2a-a739963f-check-20261009-v1.stderr": {
+      "original": {
+        "bytes": 454,
+        "sha256": "5ed11d4c7f89c44d2b514c1ea376489c4a46185b9d8f812aa58d42c5b6415a4d"
+      },
+      "projected": {
+        "bytes": 368,
+        "sha256": "bb3042202b128f06cabbb838e3857de7e53908a21f653899e28b10628688aab8"
+      },
+      "replaced": {
+        "<candidate-worktree>/": 0,
+        "<cargo-registry>/": 0,
+        "<coupled-run>/": 2,
+        "<native-run>/": 0,
+        "<queue-admission>/": 0,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "coupled-native-v1/stages/c1b2a-a739963f-check-20261009-v1.stdout": {
+      "original": {
+        "bytes": 46704,
+        "sha256": "f82c72cd1bb8f4eef982d8d4cb675bd8d6fe312a3d0811693826fb4dd762bb87"
+      },
+      "projected": {
+        "bytes": 38828,
+        "sha256": "bb546c611f2ad9ab2b5daeddc36bae82ee648c6666fd34491a87133130a7f256"
+      },
+      "replaced": {
+        "<candidate-worktree>/": 0,
+        "<cargo-registry>/": 50,
+        "<coupled-run>/": 132,
+        "<native-run>/": 0,
+        "<queue-admission>/": 0,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "coupled-native-v1/stages/c1b2a-a739963f-coupled-development-20261009-v2.stderr": {
+      "original": {
+        "bytes": 1250,
+        "sha256": "92ba6570ab4b3e0cad7e86b2d88a900c255a3e2ddbfa7b88a9d4742077612e1b"
+      },
+      "projected": {
+        "bytes": 1207,
+        "sha256": "4a2e99577dca2a5562bb3ae03e2a94a99647f2c4425816cd418525e6d02e1d3b"
+      },
+      "replaced": {
+        "<candidate-worktree>/": 0,
+        "<cargo-registry>/": 0,
+        "<coupled-run>/": 1,
+        "<native-run>/": 0,
+        "<queue-admission>/": 0,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "coupled-native-v1/stages/c1b2a-a739963f-doc-20261009-v1.stderr": {
+      "original": {
+        "bytes": 40054,
+        "sha256": "56538468cdede0433761469b64294723af003b34b06e95db1de2021944e6100c"
+      },
+      "projected": {
+        "bytes": 38936,
+        "sha256": "f257e2544ac28b3349cd8ed2e44d11a1ba281aced756186b5ca1ee0dfe078c3e"
+      },
+      "replaced": {
+        "<candidate-worktree>/": 0,
+        "<cargo-registry>/": 0,
+        "<coupled-run>/": 26,
+        "<native-run>/": 0,
+        "<queue-admission>/": 0,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "coupled-native-v1/stages/c1b2a-a739963f-nondestructive-development-20261009-v1.stderr": {
+      "original": {
+        "bytes": 1250,
+        "sha256": "2e62ea022db684b91d6838f450e0c320736a294538737ae3b5eb1f9a0ea1dd19"
+      },
+      "projected": {
+        "bytes": 1207,
+        "sha256": "6e9355230e16ac5d24c5454183b07846196a1723e1411b43e0ce0208ee48a377"
+      },
+      "replaced": {
+        "<candidate-worktree>/": 0,
+        "<cargo-registry>/": 0,
+        "<coupled-run>/": 1,
+        "<native-run>/": 0,
+        "<queue-admission>/": 0,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "coupled-native-v1/stages/c1b2a-a739963f-world-existing-20261009-v1.stderr": {
+      "original": {
+        "bytes": 1250,
+        "sha256": "fa76bf39bc4a1c4b04828de58048ef7659b9b8d347ee5734d4d0a9792c4290fd"
+      },
+      "projected": {
+        "bytes": 1207,
+        "sha256": "83e5f12af16db6d06b99bee80fe5f10233bd9e21e01bf58abc4c8e0b1dd371cb"
+      },
+      "replaced": {
+        "<candidate-worktree>/": 0,
+        "<cargo-registry>/": 0,
+        "<coupled-run>/": 1,
+        "<native-run>/": 0,
+        "<queue-admission>/": 0,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
     "integration-compile-v1/c1b-joined-lib-0c9cd6714-20261009-v1.stderr": {
       "original": {
         "bytes": 178,
@@ -98,6 +242,7 @@
   "placeholders": {
     "<candidate-worktree>/": "the absolute host directory of the integration candidate's git worktree that the joined compilation built in place; the repository path that follows is kept",
     "<cargo-registry>/": "the absolute host directory of the crates.io registry sources; each crate name and version that follows is kept",
+    "<coupled-run>/": "the absolute host directory of the C1b-2a validation's private run (its frozen source, copied dependency cache and target); the path that follows is kept",
     "<native-run>/": "the absolute host directory of the joined compilation's private run (its copied dependency cache and target); the path that follows is kept",
     "<queue-admission>/": "the absolute host directory holding the sole queue's admissions; the admission label, its source copy and build cache that follow are kept",
     "<repository>/research/records/receipts/": "the main checkout's receipts directory, where the queue wrote the complete packets; the path that follows is the repository path"

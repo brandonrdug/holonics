@@ -1,0 +1,2 @@
+{"admitted": "c1b2a-a739963f-retention-guards-20261009-v1", "MemAvailable_bytes": 12522287104}
+{"label": "c1b2a-a739963f-retention-guards-20261009-v1", "deferred_lock_busy": false, "final_CPU_ns": 1387497000, "wall_ns": 1432157393, "quiescent": true, "outer_error": null, "passed": true}

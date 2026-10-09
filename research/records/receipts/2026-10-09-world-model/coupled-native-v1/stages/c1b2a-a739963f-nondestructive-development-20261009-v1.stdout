@@ -1,0 +1,6 @@
+
+running 1 test
+test a_prospect_is_refused_without_a_world_model_and_moves_no_participant ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 8 filtered out; finished in 2.97s
+

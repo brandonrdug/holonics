@@ -1,0 +1,24 @@
+{
+  "lint_failure_path": "crates/holonics/examples/helical_duplex.rs",
+  "line": 189,
+  "error": "use of a disallowed method std::process::exit",
+  "compiler_exit": 101,
+  "unchanged_vs_accepted_C1b_source": true,
+  "pins": {
+    "a739963f68d6085eb41f5ae6a77f306151489e6d": {
+      "sha256": "8be3f1a444ee7c18880008373c1fadcbcbcc578b32ccc37d94d019606cbe5996",
+      "bytes": 7109
+    },
+    "0a7fa87a448232a273e7f9375d85f1dd90df649c": {
+      "sha256": "8be3f1a444ee7c18880008373c1fadcbcbcc578b32ccc37d94d019606cbe5996",
+      "bytes": 7109
+    },
+    "3cfb2b71a": {
+      "sha256": "8be3f1a444ee7c18880008373c1fadcbcbcc578b32ccc37d94d019606cbe5996",
+      "bytes": 7109
+    }
+  },
+  "affected_24_fixtures_passed": true,
+  "whole_gate_sh_not_passed": true,
+  "source_edit_performed": false
+}
