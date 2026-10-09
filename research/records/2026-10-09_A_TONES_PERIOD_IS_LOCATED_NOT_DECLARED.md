@@ -188,9 +188,17 @@ and refuses the rest with their typed readings.
   that writing is received as oriented packing over time (Brandon's points): none is built.
 - That a generic tone is located (§2, §6), or noise, polyphony, a superposition, or any real
   recording.
-- That the period is the lift's cycle in general: a frame whose lift cycle is a multiple of the
-  emission's period would read the multiple; the key fibre of the read passage is printed so that
-  this is visible.
+- That a finite read determines an unknown source's future, or that the frame family is a generic
+  period detector. The cycle itself does not over-read: [agent-inferred; Epime, October 9] on a fully
+  labelled closed orbit the lift's first-return length `N` equals the emitted orbit's least period
+  `p`, under the owners' own hypotheses (`g = D/cells ≤ D/2`, `c(ℓ) = ⌊ℓ/g⌋`, `λ` injective). `p`
+  divides `N` (`Compression/Landmark/Context/Evolution.leastPeriod_dvd`). The advance depends only on
+  the emitted class, so each `p`-block advances by the same `S` and `ℓ_(jp) = ℓ_0 + jS (mod D)`.
+  These states all emit `ℓ_0`'s class, so by injectivity they lie in one cell, an interval of `g`
+  consecutive residues. If `S ≢ 0`, they form a coset of the subgroup of index `h = gcd(S, D) ≤ D/2`,
+  whose canonical residues span `D − h ≥ D/2 > g − 1`. That is impossible, so `S ≡ 0`, the lift
+  returns after `p`, and `N = p`. Owed (#62) as a Lean statement beside `CarryWord`, whose
+  constant-rate reading is not this state-dependent advance.
 - The pair-law cross-check at `δ = P` on the admitted passage, and a field derived from the located
   frame (the tests declare it by hand).
 - Anything run: the predictions come from a replica. Lean for the cycle and the period (#62).
