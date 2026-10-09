@@ -1,0 +1,79 @@
+{
+  "files": {
+    "native-v1/stages/actual-second-build-20261009-v174.stderr": {
+      "original": {
+        "bytes": 225,
+        "sha256": "684ab6d770881fe50b7211d7e9211616e5cde30ea455b90b2e99f6337f7751bf"
+      },
+      "projected": {
+        "bytes": 177,
+        "sha256": "b6485d4dbdcb6f7d11d7ba64aafd61d85c80fc4db36541522c6812a99231d905"
+      },
+      "replaced": {
+        "<cargo-registry>/": 0,
+        "<queue-admission>/": 1
+      }
+    },
+    "native-v1/stages/actual-second-build-20261009-v174.stdout": {
+      "original": {
+        "bytes": 28263,
+        "sha256": "6dbfa5e0a07fde920626c30f3aec29bad8722a5051ece68b21cdcded30ae3680"
+      },
+      "projected": {
+        "bytes": 23327,
+        "sha256": "e3738056b47e100c3e9dae0d97592ccbd5c2114b8fe6130f60db13ff0cd84d8d"
+      },
+      "replaced": {
+        "<cargo-registry>/": 50,
+        "<queue-admission>/": 57
+      }
+    },
+    "native-v1/stages/actual-second-check-20261009-v174.stderr": {
+      "original": {
+        "bytes": 255,
+        "sha256": "64324d8f059a5bae1b32d0ae0d1cd8638d6fe44a044c8a2c2c3249554a8acf84"
+      },
+      "projected": {
+        "bytes": 207,
+        "sha256": "560249ef27bef423fbbbc12c752f4545ec751ecc8a6e73e9b937b64a7beae319"
+      },
+      "replaced": {
+        "<cargo-registry>/": 0,
+        "<queue-admission>/": 1
+      }
+    },
+    "native-v1/stages/actual-second-check-20261009-v174.stdout": {
+      "original": {
+        "bytes": 38834,
+        "sha256": "f47de77a54fbb78521f672cd41afab316fe4f5a00346520edd4857b34fe4c1bb"
+      },
+      "projected": {
+        "bytes": 32698,
+        "sha256": "c4048d9b176255b0d6744a4bea8a3ff864906115c300deecefa1a5e1051a8f6b"
+      },
+      "replaced": {
+        "<cargo-registry>/": 50,
+        "<queue-admission>/": 82
+      }
+    },
+    "native-v1/stages/actual-second-clippy-20261009-v174.stderr": {
+      "original": {
+        "bytes": 224,
+        "sha256": "a10109af7a0a0e5e0ebec233e12bba2d5a765c52160a8694a81b5cb2fa7189a5"
+      },
+      "projected": {
+        "bytes": 176,
+        "sha256": "b0ee83a8c9efb5f2d958290cab8f2d86f26d5d091b0070c00eaf375df8dbabd3"
+      },
+      "replaced": {
+        "<cargo-registry>/": 0,
+        "<queue-admission>/": 1
+      }
+    }
+  },
+  "placeholders": {
+    "<cargo-registry>/": "the absolute host directory of the crates.io registry sources; each crate name and version that follows is kept",
+    "<queue-admission>/": "the absolute host directory holding the sole queue's admissions; the admission label, its source copy (source-v1) and build cache (cache-v2) that follow are kept"
+  },
+  "rule": "each absolute host prefix below is replaced by its placeholder; no other byte changes. The placeholders do not occur in the originals, so substituting each prefix back restores the original bytes, whose sha256 and size are pinned here and in the unchanged FILE_HASHES.json of each subdirectory (checked locally before publication)."
+}

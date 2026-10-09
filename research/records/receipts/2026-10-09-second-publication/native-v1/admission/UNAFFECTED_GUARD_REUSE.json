@@ -1,0 +1,11 @@
+{
+  "changed_file": "crates/holonics/src/hnn/tests/physical_communication.rs",
+  "actual_compile_consumer": "hnn/mod.rs198-199 #[cfg(test)] pub(crate)mod tests; tests/mod.rs22 mod physical_communication",
+  "production_and_Cargo_toolchain_inputs_unchanged_from_received2c_except_single_cfg_test_file": true,
+  "guard_doctests_57_receipt": "research/records/receipts/2026-10-09-received-opening/native-v1/VALIDATION.json",
+  "Lean_owner15_and_import15_receipts": "research/records/receipts/2026-10-09-received-opening/NATIVE_LEAN_JOIN.v1.json",
+  "Lean_exact_source_sha256": "3a911d53f07a16df0e90c6ff47f1e12fd7600771501c8ecfda9b0af97c10ad4d",
+  "unaffected_doc_and_Lean_guards_reused_without_rerun": true,
+  "new_cfg_test_build_check_arithmeticclippy_and_exact_fixture_freshly_verified": true,
+  "worktree_source_after_run_clean_and_all347nativeinputs_matched": true
+}

@@ -279,6 +279,50 @@ learned-change criteria remain NOT-MET.
 - **Scope.** One fixture and its declared comparison, not general learning. Received openings, the
   held variation and charted operands still refuse.
 
+[definition; agent-inferred, October 9] **The landing at a received opening.**
+- **The objective.** A constitution that changes at a cut holds momentum, so "`θ′` in force from this
+  Word's opening" re-enters the Word's own received carry through `θ′`. Each contact's rate crosses
+  at held momentum, `C(θ′) w′ = π`, displacements and storage as carried, arriving waves at
+  conductances no contact factor moves (`ReceptionCarry::crossed`, the law publication applies). At
+  the producing `θ` that crossing is the identity. The re-read reads this objective, `L_open(θ′)`.
+  The fixed-rate objective is not realizable: holding `w` across a changed `C` needs a momentum jump
+  with no source.
+- **The admission** is unchanged and exact, so it is sound for any proposal. The Word records its own
+  opening by value, and the landing refuses any other declaration, a completely absorbing opening, or
+  a clock that is not the opening's own.
+- **The proposal** stays the existing deposit, whose pullback keeps no opening dual. At a received
+  opening it is the fixed-rate covector: a proposal for `L_open`, not its first variation. That first
+  variation adds `−Σ_a ⟨C_a⁻¹ μ_(w,a), dC_a w_a⟩` and needs an initial-state term in the step's
+  certificate (`FiniteContactSpans`); both are owed, so the ordinary certified step is unchanged.
+- **Lean.** `HNN/FiniteDecrease.held_crossing_{identity, at_producing, rest}`:
+  `C (w′ − w) = −(C′ − C) w′` for any finite step, with no invertibility; the identity at the
+  producing constitution where `C` is injective; and Rest unmoved where `C′` is injective. The Rust
+  crossing returns `w` itself whenever `C w = π` (the zero-target short circuit of `held_rate`), a
+  singular `C` included, which the Lean statement does not cover.
+- **Measured** (native PASS at `2c5943c23`, Lean owner and import kernel-checked;
+  [receipt](receipts/2026-10-09-received-opening/PUBLICATION.md)). On 0279's carry after a full first
+  Word (3 ticks, one contact moving), the landing re-entered the received opening through `θ′` and
+  admitted the candidate on its phase part, at first reaches C `2⁻¹¹`, K `2⁻¹⁰`, D `2⁻¹¹`, reaching 2, 9
+  and 2 entries; the held momentum and the finite crossing identity held exactly. The fixture reads
+  the candidate and publishes nothing, so a learned publication at a received opening, and its later
+  response, are not yet measured. All 14 finite-decrease and 21 physical fixtures pass.
+
+[measured, October 9; native PASS at `8121219ef`;
+[receipt](receipts/2026-10-09-second-publication/PUBLICATION.md)] **The second learned publication.**
+- **The passage.** On 0279's own task the first call landed at Rest and published; the second call
+  repeated the observation at the received opening the first left. Its landing re-entered that
+  opening through `θ′` and was admitted on its phase part at first reaches C `2⁻¹³`, K `2⁻¹⁴`,
+  D `2⁻¹³`, and published.
+- **The reader**, applied to the second publication against the first's material: 4 of 4. Each
+  family committed exactly one lattice unit of 36 (C entry 26 by +1, K entry 28 by −1, D entry 25 by
+  −1); the compared station's later response differs from the control holding the first
+  publication's material in 8 realified coordinates; the energy closes exactly with held-work and
+  chain residuals 0; a cold restore reproduces the material, carry, current and the difference.
+- **The defect.** `e` is nonzero in all 40 coordinates at tick 6, as at the first landing.
+- **Scope.** One fixture, two publications on one declared observation; not general learning. The
+  proposal stays the fixed-rate covector, and this admission did not need `J_open`, which stays owed
+  with its certificate.
+
 **Owed (#62, #73):**
 1. the avalanche carry as a certified deposition, which never raises a limit and never takes an
    uncertified step, with its Lean statement;

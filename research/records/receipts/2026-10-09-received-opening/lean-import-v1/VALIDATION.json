@@ -1,0 +1,179 @@
+{
+  "source_admission": {
+    "source_commit": "2c5943c234420bdf2657d0f7237d00df88f0099e",
+    "root_import": "<queue-admission>/received-opening-lean-20261009-v169/HNN.submitted.lean",
+    "root_pin": {
+      "sha256": "c30a7d9a6222fa31890b065d2e2889dd50623fd196487cf4719ebe2d6de63264",
+      "bytes": 45795
+    },
+    "actual_added_line_number": 10,
+    "actual_added_import": "import Holonics.HNN.FiniteDecrease",
+    "consumer_source": "<queue-admission>/received-opening-import-20261009-v171/source-v1/FiniteDecreaseImportConsumer.lean",
+    "consumer_pin": {
+      "sha256": "e7cf4d29f2927d1db372ba8602877b94fbfe3e6511c35e968eccf4327e39ddd7",
+      "bytes": 961
+    },
+    "expected_selectors": [
+      "Holonics.HNN.FiniteDecrease.split_spec",
+      "Holonics.HNN.FiniteDecrease.split_bounds",
+      "Holonics.HNN.FiniteDecrease.quot_ne_zero_of_half_lt",
+      "Holonics.HNN.FiniteDecrease.first_reach_endpoint",
+      "Holonics.HNN.FiniteDecrease.zero_direction_stays",
+      "Holonics.HNN.FiniteDecrease.codeLength_shift",
+      "Holonics.HNN.FiniteDecrease.cellCode_gauge",
+      "Holonics.HNN.FiniteDecrease.Station.code_eq_cells",
+      "Holonics.HNN.FiniteDecrease.witness_code_eq",
+      "Holonics.HNN.FiniteDecrease.witness_total_eq",
+      "Holonics.HNN.FiniteDecrease.admission_sound",
+      "Holonics.HNN.FiniteDecrease.equal_endpoints_need_the_witness",
+      "Holonics.HNN.FiniteDecrease.held_crossing_identity",
+      "Holonics.HNN.FiniteDecrease.held_crossing_at_producing",
+      "Holonics.HNN.FiniteDecrease.held_crossing_rest"
+    ],
+    "full_HNN_aggregate_compiled": false,
+    "exact_HNN_new_import_consumed": true,
+    "native_finite_decrease_validated_separately": true,
+    "accepted_provider_kernel": "<queue-admission>/received-opening-lean-20261009-v169/KERNEL_VALIDATION.json",
+    "target": "FiniteDecreaseImportConsumer",
+    "selectors": [
+      "Holonics.HNN.FiniteDecrease.split_spec",
+      "Holonics.HNN.FiniteDecrease.split_bounds",
+      "Holonics.HNN.FiniteDecrease.quot_ne_zero_of_half_lt",
+      "Holonics.HNN.FiniteDecrease.first_reach_endpoint",
+      "Holonics.HNN.FiniteDecrease.zero_direction_stays",
+      "Holonics.HNN.FiniteDecrease.codeLength_shift",
+      "Holonics.HNN.FiniteDecrease.cellCode_gauge",
+      "Holonics.HNN.FiniteDecrease.Station.code_eq_cells",
+      "Holonics.HNN.FiniteDecrease.witness_code_eq",
+      "Holonics.HNN.FiniteDecrease.witness_total_eq",
+      "Holonics.HNN.FiniteDecrease.admission_sound",
+      "Holonics.HNN.FiniteDecrease.equal_endpoints_need_the_witness",
+      "Holonics.HNN.FiniteDecrease.held_crossing_identity",
+      "Holonics.HNN.FiniteDecrease.held_crossing_at_producing",
+      "Holonics.HNN.FiniteDecrease.held_crossing_rest"
+    ],
+    "scope": "Exact affected HNN import; accepted finite-decrease law consumed, not full default library."
+  },
+  "kernel_accepted": true,
+  "compiler_exit": 0,
+  "compiler_wall_ns": 8085679208,
+  "queries_required": 15,
+  "queries_reached": 15,
+  "nonstandard_queries": [],
+  "meaningful_error_records": [],
+  "all_query_results": {
+    "Holonics.HNN.FiniteDecrease.split_spec": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.FiniteDecrease.split_bounds": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.FiniteDecrease.quot_ne_zero_of_half_lt": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.FiniteDecrease.first_reach_endpoint": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.FiniteDecrease.zero_direction_stays": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.FiniteDecrease.codeLength_shift": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.FiniteDecrease.cellCode_gauge": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.FiniteDecrease.Station.code_eq_cells": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.FiniteDecrease.witness_code_eq": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.FiniteDecrease.witness_total_eq": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.FiniteDecrease.admission_sound": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.FiniteDecrease.equal_endpoints_need_the_witness": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.FiniteDecrease.held_crossing_identity": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.FiniteDecrease.held_crossing_at_producing": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.FiniteDecrease.held_crossing_rest": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "metadata_unchanged": true,
+  "results": [
+    {
+      "unit": "prep",
+      "accepted": true,
+      "wall_ns": 5259454924,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 4758242000,
+      "group_peak_B": 307400704,
+      "group_limit_B": 8589934592,
+      "measured_to_projected": {
+        "numerator": 5259454924,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true
+    },
+    {
+      "unit": "compile",
+      "accepted": true,
+      "wall_ns": 10051617696,
+      "projection_ns": 21132554884,
+      "aggregate_CPU_ns": 5707834000,
+      "group_peak_B": 4474216448,
+      "group_limit_B": 8589934592,
+      "measured_to_projected": {
+        "numerator": 10051617696,
+        "denominator": 21132554884
+      },
+      "quiescent_released": true
+    }
+  ],
+  "importer_launched": false,
+  "whole_owner_acceptance_required_before_importer": true,
+  "prior_failed_sources_and_logs_preserved": true,
+  "no_unchanged_retry_or_within_job_limit_raise": true,
+  "current_user_authorized_8GiB": true,
+  "provider_rebuilt": false,
+  "queue_quiescent_released": true
+}

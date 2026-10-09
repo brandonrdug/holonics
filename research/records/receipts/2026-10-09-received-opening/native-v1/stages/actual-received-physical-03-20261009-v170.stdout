@@ -1,0 +1,7 @@
+
+running 1 test
+test hnn::tests::physical_communication::continuing_contact_comparison_deposits_and_rebases_without_resetting_delayed_credit ... continuing physical publications=3 actual_factor_families_moved=0
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1158 filtered out; finished in 0.61s
+

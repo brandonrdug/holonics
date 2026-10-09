@@ -1,0 +1,7 @@
+
+running 1 test
+test hnn::tests::physical_communication::communication_refuses_changed_source_or_partition_without_deposition_and_keeps_the_blind_end ... unit communication source/partition refusal elapsed_ns=43239734
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1158 filtered out; finished in 0.04s
+

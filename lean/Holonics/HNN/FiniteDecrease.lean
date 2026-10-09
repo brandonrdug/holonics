@@ -18,16 +18,18 @@ priori curvature certificate, for ONE declared candidate per deposit, by an a po
   pass carries there. The scan is finite: at the least `k_max` with `2^k_max max_i |d_i| > u`, the
   widest entry's split is nonzero (`first_reach_endpoint`).
 * **The re-read** (`hnn::word::continuation::Word::compare_contacts_landing`): a transient Word of
-  the same declared passage (source, Rest opening, junction steps, receiver, targets, mask) reads the
-  candidate's comparison.
+  the same declared passage (source, the Word's own opening, junction steps, receiver, targets,
+  mask) reads the candidate's comparison. A received carry enters it through `θ′` at held momentum
+  (`hnn::word::ReceptionCarry::crossed`, §4 below); Rest stays Rest.
 * **The admission** (`hnn::word::continuation::{decide, reading_identity, FiniteDecrease}`): with
   `L`, `L′` the producing and candidate code enclosures and `X`, `X′` their exact phase excesses,
   admit iff `upper(L′) < lower(L)` and `X′ ≤ X`, or the reading-identity witness holds and
   `X′ < X`.
 
-[proved-derived] What is written here, as stated and not yet kernel-checked: the proofs are owed
-to the queue's library build (`bash tools/lean_check.sh`), and no grade above `proved-derived` is
-claimed until it accepts them.
+[formal-checked for §1–§3; proved-derived for §4] The sole queue accepted §1–§3 as a module and
+through its `HNN` import, twelve queries on standard axioms only
+(`research/records/receipts/2026-10-09-finite-decrease/`); the full library build has not been
+run. §4 is written, not yet kernel-checked.
 
 1. **The split** (`split_spec`, `split_bounds`, consuming `LatticeDeposit.{div_rem_spec,
    rem_bounds}`): `q·u + r = x` with `−u/2 ≤ r < u/2`.
@@ -45,10 +47,16 @@ claimed until it accepts them.
    lengths, either case gives "no worse in both parts and strictly better in one":
    `(ℓ′ ≤ ℓ ∧ X′ ≤ X) ∧ (ℓ′ < ℓ ∨ X′ < X)`. **Equal endpoints without the witness admit nothing**
    (`equal_endpoints_need_the_witness`).
+5. **The held crossing** (`held_crossing_identity`, `held_crossing_at_producing`,
+   `held_crossing_rest`): with `C w = π` at the producing constitution and `C′ w′ = π` at the
+   candidate's, the opening moves by exactly `C (w′ − w) = −(C′ − C) w′`; where `C` is injective the
+   crossing at the producing constitution is the identity, and at Rest (`π = 0`) an injective `C′`
+   moves nothing.
 
 [agent-inferred] **What it does not claim.** The admission certifies only the declared re-read
-comparison on the Rest opening; it asserts neither that the held continuation `C′w′ = Cw` improves
-nor that any later perception changes. That the Rust's enclosures hold the true code lengths is
+comparison on the Word's own opening, `θ′` in force from its opening cut; it asserts neither that
+the held continuation `C′w′ = Cw` improves nor that any later perception changes, nor anything about
+`θ′` over earlier Words, which nothing retains. That the Rust's enclosures hold the true code lengths is
 `HNN/Ratio.face_code_length_within_grain` and the owner's enclosure arithmetic; that the transient
 Word re-reads the declared comparison is the Rust's construction, checked by its fixtures
 (`hnn::tests::finite_decrease`).
@@ -58,6 +66,7 @@ Word re-reads the declared comparison is the Rust's construction, checked by its
 | `split_spec`, `split_bounds`, `quot_ne_zero_of_half_lt`, `first_reach_endpoint`, `zero_direction_stays` | `hnn::constitution::first_reach_scan` over `Lattice::div_rem` |
 | `cellExponent`, `cellCode`, `gauge`, `codeLength_shift`, `cellCode_gauge`, `Station`, `Witness`, `witness_code_eq`, `witness_total_eq` | `hnn::word::continuation::reading_identity` over `hnn::ratio::Face` |
 | `Enclosure`, `strictlyBetter`, `Admission`, `admission_sound`, `equal_endpoints_need_the_witness` | `hnn::word::continuation::decide` with `holon::deposition::strictly_better` |
+| `held_crossing_identity`, `held_crossing_at_producing`, `held_crossing_rest` | `hnn::word::ReceptionCarry::crossed` over its held rate (`C′ δ = π − C′ w`) |
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/
@@ -243,5 +252,36 @@ theorem equal_endpoints_need_the_witness {L : Enclosure} {X X' : ℚ} (hL : L.lo
   rintro (⟨hs, -⟩ | ⟨hf, -⟩)
   · exact absurd hs (not_lt.mpr hL)
   · exact hf
+
+/-! ## 4. The held crossing at a received opening
+
+A constitution that changes at a cut holds momentum. A candidate re-read on a received carry
+enters it through `θ′` with `C′ w′ = π`, the carry having been published with `C w = π`. -/
+
+section HeldCrossing
+
+variable {R : Type*} [CommRing R] {n : Type*} [Fintype n]
+
+/-- [proved-derived] **The finite held crossing**: `C w = π` and `C′ w′ = π` give
+`C (w′ − w) = −(C′ − C) w′`, exactly and for any finite step. -/
+theorem held_crossing_identity {C C' : Matrix n n R} {w w' π : n → R}
+    (h : C.mulVec w = π) (h' : C'.mulVec w' = π) :
+    C.mulVec (w' - w) = -((C' - C).mulVec w') := by
+  rw [Matrix.mulVec_sub, h, Matrix.sub_mulVec, h']
+  abel
+
+/-- [proved-derived] **At the producing constitution the crossing is the identity** wherever its
+`C` is injective: `C w = π` and `C w′ = π` force `w′ = w`. -/
+theorem held_crossing_at_producing {C : Matrix n n R} {w w' π : n → R}
+    (hinj : Function.Injective C.mulVec) (h : C.mulVec w = π) (h' : C.mulVec w' = π) :
+    w' = w :=
+  hinj (h'.trans h.symm)
+
+/-- [proved-derived] **At Rest nothing moves**: `C′ w′ = 0` with `C′` injective forces `w′ = 0`. -/
+theorem held_crossing_rest {C' : Matrix n n R} {w' : n → R}
+    (hinj : Function.Injective C'.mulVec) (h' : C'.mulVec w' = 0) : w' = 0 :=
+  hinj (by rw [h', Matrix.mulVec_zero])
+
+end HeldCrossing
 
 end Holonics.HNN.FiniteDecrease
