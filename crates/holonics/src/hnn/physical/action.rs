@@ -258,33 +258,28 @@ impl PreparedPhysicalAction<'_, '_> {
     }
 
     /// **The World model's coupled prospect of this prepared action** (`model`, C1b-2a): per declared
-    /// key, a live key's coupled prospect of the controlled Word's passage, or `None` for a held or
-    /// incompatible key. It predicts the port waves and the native station features, not the
-    /// World's observed face. The prepared Word stays unrun and nothing actual is read or written; a
-    /// plural or obstructed control is refused.
-    pub fn world_prospect(&self) -> Result<Vec<Option<CoupledProspect>>, HnnError> {
+    /// key, its coupled prospect of the controlled Word's passage, or that key's own refusal (a held
+    /// or incompatible key, or charts it cannot read), so one key never withholds another's. It
+    /// predicts the port waves and the native station features, not the World's observed face. The
+    /// prepared Word stays unrun and nothing actual is read or written; a missing model or a plural
+    /// or obstructed control refuses the whole read.
+    pub fn world_prospect(&self) -> Result<Vec<Result<CoupledProspect, HnnError>>, HnnError> {
         let model = self.owner.world_model().ok_or(HnnError::Unadmitted {
             reason: "a World prospect reads the bound World model",
         })?;
         let word = self.prospective.controlled_word(&self.word)?;
         let ring = self.prospective.preparation().ring();
-        model
-            .states()
-            .iter()
-            .enumerate()
-            .map(|(key, state)| match state {
-                KeyState::Live(_) => model
-                    .coupled_prospect(
-                        key,
-                        &word,
-                        ring,
-                        self.prospective.phases(),
-                        self.prospective.compared(),
-                    )
-                    .map(Some),
-                _ => Ok(None),
+        Ok((0..model.keys().len())
+            .map(|key| {
+                model.coupled_prospect(
+                    key,
+                    &word,
+                    ring,
+                    self.prospective.phases(),
+                    self.prospective.compared(),
+                )
             })
-            .collect()
+            .collect())
     }
 
     /// Execute against the one actual World retained by this receiver's common Resident.
