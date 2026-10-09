@@ -843,8 +843,9 @@ impl Resident {
 
     /// The exact bits of the resident's state: the lift point, the active suffix address, the open
     /// moments, the pending ratios with their emitted logits, the staged deposits, the first law's
-    /// arrived operand, the constitution and the executed charts ([`Charts`], the representation
-    /// of the solves the words execute).
+    /// arrived operand, the constitution, the executed charts ([`Charts`], the representation
+    /// of the solves the words execute), the participating World's current and the World model's
+    /// current key states.
     pub fn state_bits(&self) -> u64 {
         let lift: u64 = self
             .current
@@ -868,6 +869,7 @@ impl Resident {
             + self.held_contact_variation.as_ref().map_or(0, |j| j.reading().retained_bits)
             + receiving_chart
             + self.participating_world.as_ref().map_or(0, |world| world.current_bits())
+            + self.world_model.as_ref().map_or(0, |model| model.current_bits())
             + pending
             + staged
             + arrived

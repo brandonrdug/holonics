@@ -82,7 +82,7 @@
 
 mod model;
 mod world;
-pub use model::{HeldReason, KeyState, ModelCharts, ModelKey, StateFibre, WorldModel};
+pub use model::{HeldReason, KeyState, ModelCharts, ModelKey, ReturnImage, StateFibre, WorldModel};
 pub use world::{BoundJointWorld, NativeEncounter, NativeEncounterFailure, WaveJointStep};
 
 use super::{PhysicalReceiver, communication::PhysicalBoundary};
