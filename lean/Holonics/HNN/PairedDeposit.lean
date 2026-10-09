@@ -1,4 +1,5 @@
 import Holonics.HNN.FiniteDecrease
+import Holonics.HNN.LatticeWord
 
 /-!
 # HNN.PairedDeposit: the pair-port reversal law and the equivariant deposit
@@ -22,9 +23,12 @@ partner strand: `Qᵟ E₀ (Σ y) − (E − E₀) (Σ x)`, the **pair-port reve
    with its reversed partner) and the chart `X` commutes with `Σ`, the step `E + η G X` keeps
    `B E = E Σ`.
 4. **The symmetrized chart commutes** (`symmetrized_commutes`): with `Σ² = 1`, `X + Σ X Σ` commutes
-   with `Σ`, so `½(X + Σ X Σ)` is a chart the deposit can use. (That it keeps the chart's certified
-   bound `‖1 − X H‖ ≤ δ` whenever `Σ H = H Σ`, for a norm invariant under permutation similarity, is
-   proved-derived in the design and owed here.)
+   with `Σ`, so `½(X + Σ X Σ)` is a chart the deposit can use.
+5. **The symmetrized chart keeps its certificate** (`symmetrized_residual`, `symmetrized_rowNorm_le`):
+   with `Σ² = 1` and `Σ H = H Σ`, `1 − ½(X + Σ X Σ) H = ½(1 − X H) + ½ Σ(1 − X H)Σ`, so a chart
+   certified `‖1 − X H‖∞ ≤ δ` (`HNN/LatticeWord.rowNorm`, the certificate the Rust chart computes)
+   gives a symmetrized chart certified by the same `δ` whenever `‖Σ‖∞ ≤ 1`, as for a permutation
+   matrix. No invariance of the norm is needed: submultiplicativity (`rowNorm_mul_le`) suffices.
 
 [proved-derived] Written, not yet kernel-checked; the sole queue's owner check decides. No `sorry`,
 no `axiom`, no `native_decide`.
@@ -34,7 +38,8 @@ no `axiom`, no `native_decide`.
 | `lift_pow` | `hnn::paired::PairedCarrier::lift` against the ring's transport |
 | `reversal_identity` | the reversed located pair beside `hnn::executed::pair_slip` |
 | `mul_commuting_stays`, `deposit_stays_equivariant` | the paired deposit through `Constitution::stepped_source` |
-| `symmetrized_commutes` | the symmetrized chart in `NormalLaw::prepare` |
+| `symmetrized_commutes` | the symmetrized chart in `NormalLaw::prepare` (owed, loop 3 of step 3) |
+| `symmetrized_residual`, `rowNorm_smul_le`, `symmetrized_rowNorm_le` | its certificate, read as today by the chart's exact `‖1 − X̂H‖∞` |
 -/
 
 namespace Holonics.HNN.PairedDeposit
@@ -88,5 +93,66 @@ theorem symmetrized_commutes {S X : Matrix m m R} (hS : S * S = 1) :
     (X + S * X * S) * S = S * (X + S * X * S) := by
   rw [Matrix.add_mul, Matrix.mul_add, Matrix.mul_assoc (S * X) S S, hS, Matrix.mul_one,
     ← Matrix.mul_assoc S (S * X) S, ← Matrix.mul_assoc S S X, hS, Matrix.one_mul, add_comm]
+
+/-! ## The symmetrized chart keeps its certificate -/
+
+section SymmetrizedBound
+
+open Holonics.HNN.LatticeWord (rowNorm rowNorm_nonneg rowNorm_le row_sum_le_rowNorm rowNorm_add_le
+  rowNorm_mul_le)
+
+/-- [proved-derived] **The symmetrized chart's residual** is the mean of the chart's residual and its
+conjugate: with `Σ² = 1` and `Σ H = H Σ`,
+`1 − ½(X + Σ X Σ) H = ½(1 − X H) + ½ Σ(1 − X H)Σ`. -/
+theorem symmetrized_residual {S X H : Matrix m m ℚ} (hS : S * S = 1) (hH : S * H = H * S) :
+    1 - ((1 / 2 : ℚ) • (X + S * X * S)) * H =
+      (1 / 2 : ℚ) • (1 - X * H) + (1 / 2 : ℚ) • (S * (1 - X * H) * S) := by
+  have key : S * (1 - X * H) * S = 1 - S * X * S * H := by
+    simp only [Matrix.mul_sub, Matrix.sub_mul, Matrix.mul_one, hS]
+    simp only [Matrix.mul_assoc, ← hH]
+  have half : (1 / 2 : ℚ) • (1 : Matrix m m ℚ) + (1 / 2 : ℚ) • (1 : Matrix m m ℚ) = 1 := by
+    rw [← add_smul]
+    norm_num
+  rw [key, Matrix.smul_mul, Matrix.add_mul, smul_add, smul_sub, smul_sub]
+  calc (1 : Matrix m m ℚ) - ((1 / 2 : ℚ) • (X * H) + (1 / 2 : ℚ) • (S * X * S * H))
+      = ((1 / 2 : ℚ) • (1 : Matrix m m ℚ) + (1 / 2 : ℚ) • (1 : Matrix m m ℚ)) -
+          ((1 / 2 : ℚ) • (X * H) + (1 / 2 : ℚ) • (S * X * S * H)) := by rw [half]
+    _ = (1 / 2 : ℚ) • (1 : Matrix m m ℚ) - (1 / 2 : ℚ) • (X * H) +
+          ((1 / 2 : ℚ) • (1 : Matrix m m ℚ) - (1 / 2 : ℚ) • (S * X * S * H)) := by abel
+
+/-- [proved-derived] A scaled chart's certificate scales by the scalar's absolute value. -/
+theorem rowNorm_smul_le {p q : Type*} [Fintype p] [Fintype q] (c : ℚ) (A : Matrix p q ℚ) :
+    rowNorm (c • A) ≤ |c| * rowNorm A := by
+  refine rowNorm_le (mul_nonneg (abs_nonneg c) (rowNorm_nonneg A)) fun i => ?_
+  calc ∑ j, |(c • A) i j| = |c| * ∑ j, |A i j| := by
+        simp only [Matrix.smul_apply, smul_eq_mul, abs_mul, Finset.mul_sum]
+    _ ≤ |c| * rowNorm A := mul_le_mul_of_nonneg_left (row_sum_le_rowNorm A i) (abs_nonneg c)
+
+/-- [proved-derived] **The symmetrized chart keeps its certificate**: with `Σ² = 1`, `Σ H = H Σ` and
+`‖Σ‖∞ ≤ 1`, a chart certified `‖1 − X H‖∞ ≤ δ` gives `‖1 − ½(X + Σ X Σ) H‖∞ ≤ δ`. -/
+theorem symmetrized_rowNorm_le {S X H : Matrix m m ℚ} {δ : ℚ} (hS : S * S = 1)
+    (hH : S * H = H * S) (hσ : rowNorm S ≤ 1) (hX : rowNorm (1 - X * H) ≤ δ) :
+    rowNorm (1 - ((1 / 2 : ℚ) • (X + S * X * S)) * H) ≤ δ := by
+  rw [symmetrized_residual hS hH]
+  have hδ : 0 ≤ δ := (rowNorm_nonneg _).trans hX
+  have hleft : rowNorm (S * (1 - X * H)) ≤ δ :=
+    (rowNorm_mul_le _ _).trans
+      ((mul_le_mul_of_nonneg_right hσ (rowNorm_nonneg _)).trans (by rw [one_mul]; exact hX))
+  have hconj : rowNorm (S * (1 - X * H) * S) ≤ δ :=
+    calc rowNorm (S * (1 - X * H) * S) ≤ rowNorm (S * (1 - X * H)) * rowNorm S :=
+          rowNorm_mul_le _ _
+      _ ≤ δ * 1 := mul_le_mul hleft hσ (rowNorm_nonneg S) hδ
+      _ = δ := mul_one δ
+  calc rowNorm ((1 / 2 : ℚ) • (1 - X * H) + (1 / 2 : ℚ) • (S * (1 - X * H) * S))
+      ≤ rowNorm ((1 / 2 : ℚ) • (1 - X * H)) + rowNorm ((1 / 2 : ℚ) • (S * (1 - X * H) * S)) :=
+        rowNorm_add_le _ _
+    _ ≤ |(1 / 2 : ℚ)| * δ + |(1 / 2 : ℚ)| * δ :=
+        add_le_add ((rowNorm_smul_le _ _).trans (mul_le_mul_of_nonneg_left hX (abs_nonneg _)))
+          ((rowNorm_smul_le _ _).trans (mul_le_mul_of_nonneg_left hconj (abs_nonneg _)))
+    _ = δ := by
+        rw [abs_of_pos (by norm_num : (0 : ℚ) < 1 / 2)]
+        ring
+
+end SymmetrizedBound
 
 end Holonics.HNN.PairedDeposit

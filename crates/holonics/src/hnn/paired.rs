@@ -176,8 +176,8 @@
 //!   successor is re-admitted inside the deposit, and a port that left the subspace is refused
 //!   ([`PairedDefect::Deposited`]).
 //! - **Not built here: the symmetrized chart.** Where other deposits have made the Gram non-diagonal,
-//!   `X̂` need not commute with `Σ`; `½(X̂ + Σ X̂ Σ)` does (Lean `symmetrized_commutes`; its certified
-//!   bound is owed, #62). It is built with its first consumer, the comparison's general route
+//!   `X̂` need not commute with `Σ`; `½(X̂ + Σ X̂ Σ)` does (Lean `symmetrized_commutes`), and it keeps
+//!   the chart's certificate `‖1 − X̂H‖∞ ≤ δ` when `Σ H = H Σ` (Lean `symmetrized_rowNorm_le`). It is built with its first consumer, the comparison's general route
 //!   (`compose_return`); until then the re-admission refuses such a deposit, typed.
 //!
 //! [proved-derived] On the equivariant subspace `|Δ^R| = |Δ_y|` (`B` permutes coordinates), so the
@@ -204,7 +204,7 @@
 //! | the port carries the pairing, `B E = E Σ_σ` | owed (#62) | [`PairedCarrier::certify`], [`PairedCarrier::equivariant_port`] |
 //! | the partner's counts are the strand's reflected and complemented | owed (#62) | [`SourceMoment::dyad`], [`PairedCarrier::partner_moment`] |
 //! | `s(0)(σ̄u) = B P^(−(n−1)) s(0)(u)`, `m̃(σ̄u) = B P^(c₀) m̃(u)` | `Transport/HelicalCode.{strandFace_complementReverse_nat, face_complementReverse, partner_map_involutive}` (the bridge to the moment is owed, #62) | [`PairedCarrier::partner_face`], [`PairedCarrier::half_turn`] |
-//! | the pair-port reversal law `B Δ_y = Δ^R` and the equivariant deposit; the symmetrized chart commutes | `HNN/PairedDeposit.{lift_pow, reversal_identity, mul_commuting_stays, deposit_stays_equivariant, symmetrized_commutes}` (the symmetrized chart's certified bound is owed, #62) | [`PairedCarrier::deposit`], `hnn::executed::{oriented_slip, deposit_reads}` |
+//! | the pair-port reversal law `B Δ_y = Δ^R` and the equivariant deposit; the symmetrized chart commutes | `HNN/PairedDeposit.{lift_pow, reversal_identity, mul_commuting_stays, deposit_stays_equivariant, symmetrized_commutes, symmetrized_residual, symmetrized_rowNorm_le}` | [`PairedCarrier::deposit`], `hnn::executed::{oriented_slip, deposit_reads}` |
 //!
 //! **Recorded failures checked.** An authored routine standing in for learning: the port's follower
 //! columns are the code's own relation `E(σa) = B E(a)` on a free leader, never a decoder or a table.
