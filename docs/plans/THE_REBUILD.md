@@ -1,6 +1,6 @@
 # The rebuild
 
-**Status: active, September 28.** Tracked in #63. This plan is the one order. The laws live in their
+**Status: active, September 28; its issue order updated October 9.** Tracked in #63. This plan is the one order. The laws live in their
 guides and owners; [CONSTRUCTION_STATE](../../CONSTRUCTION_STATE.md) is the position; the
 [construction record](../../research/records/2026-09-28_THE_REBUILDS_CONSTRUCTION_RECORD_STEPS_ZERO_TO_FIVE_THE_CAMPAIGNS_AND_THE_FORWARD_PLAN.md)
 keeps the history this plan replaced: steps 0–8, the step-4 design and its five campaigns, and the
@@ -9,8 +9,9 @@ forward plan F0–F6 as it stood.
 The October 4 [HNN/Athena foundation supplement](HNN_ATHENA_FOUNDATION.md) supplies the common
 material, moving geometry, coupled dynamics, power/phase and future-observability equations.
 It credits pinned host passage continuation, retains the exact missing consumers and canonical
-proof-integration gates, and fixes the next bounded nonzero reached-deposit relation. The independent
-briefs are retained with Claude paused. This plan remains the construction order and product gates.
+proof-integration gates, and fixes the next bounded nonzero reached-deposit relation. Since October 8
+Claude leads the construction and Epime coordinates and reviews. This plan remains the construction
+order and product gates.
 
 ## The unified plan (September 28)
 
@@ -72,6 +73,21 @@ Its corrections are folded in.
 
 Each item fixes its owners, its consumer equation, its acceptance and its failure branch before it is
 measured, and keeps every inherited gate below verbatim.
+
+#### The issue order (October 9)
+
+[definition; agreed by Claude and Epime, October 9, and recorded in #63] The open work runs in this
+dependency order: the helical code #386 with the owed statements it needs in #62, then the HNN's
+learning loop #73, then applications #148, then the device #76. The library spine's S4 feeds S5 and
+S6, and source phase and a useful output come before cold restore.
+- **The helical code changes this order** ([its record](../../research/records/2026-10-08_THE_HELICAL_CODE_IS_HOW_HOLONS_HOLARCHIES_EPOCHS_AND_AEONS_ENCODE.md)
+  §1). It is the encoding every Holon carries, so the HNN's source port, pairing and receivers are
+  built on it, not beside it.
+- **A learned change is a committed change.** A fixture that lets every C/K/D representative stay
+  unchanged passes at its grain and witnesses no learning. The finite-decrease landing made the first
+  committed change, on 0279
+  ([the medium-of-joints record](../../research/records/2026-10-08_THE_MEDIUM_OF_JOINTS_SNAPS_CRACKLES_POPS_OR_FLOWS_AND_ITS_CURRENTS_CURVE_ITS_CONSTITUTION.md)
+  §7).
 
 #### U0. Consolidate (no new law) — carried out September 28
 

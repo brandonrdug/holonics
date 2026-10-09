@@ -1,5 +1,9 @@
 # HNN and Athena: the common foundation and its consuming joins
 
+**Status, October 9:** the pause recorded below ended on October 8, when Brandon handed the lead to
+Claude; Epime coordinates and reviews. The order lives in [THE_REBUILD](THE_REBUILD.md), and the
+briefs of §7 are Claude's to take up or retire.
+
 **Date:** October 4, 2026 (morning source reconciliation). **Disposition:** local consolidation; Claude paused;
 no training, external issue mutation, push or merge. **Refs:** [#63](https://github.com/brandonrdug/holonics/issues/63),
 [#73](https://github.com/brandonrdug/holonics/issues/73), [#62](https://github.com/brandonrdug/holonics/issues/62),
