@@ -1,0 +1,33 @@
+HolonicsResearch/Zeta/ModularScatteringResidual.lean:94:4: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+'Holonics.Zeta.ModularScatteringResidual.modularScattering_eq_xiScatteringChart' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Zeta.ModularScatteringResidual.modularScattering_eq_gammaR_zeta' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Zeta.ModularScatteringResidual.logDeriv_xi_two_mul_sub' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Zeta.ModularScatteringResidual.logDeriv_xiScatteringChart' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Zeta.ModularScatteringResidual.logDeriv_modularScattering' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Zeta.ModularScatteringResidual.xiScattering_current_residual' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Zeta.ModularScatteringResidual.modularScattering_current_residual' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Zeta.ModularScatteringResidual.xiCurrentRemainder_eq_tail' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Zeta.ModularScatteringResidual.modularScattering_current_residual_eq_tail' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Zeta.ModularScatteringResidual.xiCurrentRemainder_pullback_enclosures' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]

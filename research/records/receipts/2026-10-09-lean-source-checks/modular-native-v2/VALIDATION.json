@@ -1,0 +1,129 @@
+{
+  "outcome": "FAILED",
+  "exact_source_SHA256": "b79985da156c9c1863b90f6ce9a6d928dc1bf55f54bbfb431128bb1e554baf65",
+  "predecessor_SHA256": "623e24300afc046ebe5a13b8fd0a90e35bf4a2aaa4614007a8c12873713bc63b",
+  "failed_predecessor_receipt": "research/records/receipts/2026-10-09-lean-source-checks/modular-native-v1",
+  "only_two_proof_bodies_changed": true,
+  "statements_hypotheses_domains_polar_cutoff_and_queries_unchanged": true,
+  "requested_command": "lake env lean -j1 HolonicsResearch/Zeta/ModularScatteringResidual.lean",
+  "command_SHA256": "b5d0feb42e5313a92556ffea0b688fcf0c462636e42e35cd0f9d2e376198c5d2",
+  "actual_compiler_argv": [
+    "/usr/bin/env",
+    "-i",
+    "PATH=<lean-toolchain>/bin:/usr/bin",
+    "HOME=<home>",
+    "LANG=C",
+    "LC_ALL=C",
+    "/usr/bin/timeout",
+    "--signal=TERM",
+    "--kill-after=1s",
+    "152.785618970s",
+    "<lean-toolchain>/bin/lake",
+    "env",
+    "lean",
+    "-j1",
+    "HolonicsResearch/Zeta/ModularScatteringResidual.lean"
+  ],
+  "actual_compiler_argv_SHA256": "8ecfe55d7df6844ea82ee5b24b1af79a83fce2731a48b8e68f28184d364754e2",
+  "cwd": "<modular-worktree>/lean",
+  "compiler_exit": 1,
+  "compiler_wall_ns": 22865632233,
+  "command_wall_ns": 23060970215,
+  "guarded_wall_ns": 23243525627,
+  "fixed_deadline_ns": 154785618970,
+  "measured_to_projected": [
+    23243525627,
+    154785618970
+  ],
+  "aggregate_CPU_ns": 9940521000,
+  "child_CPU_user_us": 2969930,
+  "child_CPU_system_us": 5843460,
+  "peak_child_RSS_KiB": 6722256,
+  "group_memory_peak_bytes": 8589934592,
+  "reservation_bytes": 6878314496,
+  "enforced_ceiling_bytes": 8589934592,
+  "reservation_basis": "Largest actual prior compiler RSS peak 6717104 KiB",
+  "thread_budget": 1,
+  "public_theorem_count": 10,
+  "submitted_query_count": 10,
+  "all_ten_public_theorem_queries_reported": true,
+  "axiom_reports": {
+    "Holonics.Zeta.ModularScatteringResidual.modularScattering_eq_xiScatteringChart": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ModularScatteringResidual.modularScattering_eq_gammaR_zeta": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ModularScatteringResidual.logDeriv_xi_two_mul_sub": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ModularScatteringResidual.logDeriv_xiScatteringChart": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ModularScatteringResidual.logDeriv_modularScattering": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ModularScatteringResidual.xiScattering_current_residual": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ModularScatteringResidual.modularScattering_current_residual": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ModularScatteringResidual.xiCurrentRemainder_eq_tail": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ModularScatteringResidual.modularScattering_current_residual_eq_tail": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ModularScatteringResidual.xiCurrentRemainder_pullback_enclosures": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "standard_axioms_only": false,
+  "sorryAx_present": true,
+  "kernel_accepted": false,
+  "source_and_sealed_local_provider_metadata_unchanged": true,
+  "provenance_scope": "Exact target, transitive Holonics source and cached provider parts, toolchain executables/libraries, Lake manifest; foreign dependency closure is version-declared and consumed from existing cache, not an exhaustive byte seal.",
+  "errors": 1,
+  "limits_raised_after_launch": false,
+  "same_predecessor_fixed_deadline": true,
+  "foreign_library_rebuilt": false,
+  "lease_released": true,
+  "unit_absent_after_cleanup": false,
+  "owned_unit_quiescent_after_cleanup": true,
+  "retained_failed_unit_metadata_only": [
+    "holonics-prune-admission-modular-scattering-repair-20261009-v1.service"
+  ],
+  "no_native_process_remaining": true,
+  "scientific_source_edits": false,
+  "publication": false,
+  "RH_operator_or_HNN_acceptance": false,
+  "remaining_blockers_for_exact_source_check": [
+    "Compiler or declared axiom acceptance failed; see full compiler output"
+  ]
+}

@@ -1,0 +1,7 @@
+# torus v3 exact-source validation
+
+**PASS** at SHA256 `325bf52bbaa69ee2ca0ef0924bef2799f8b41d93756c41c6d4a5a791b81b8144`. Compiler exit 0; 0 errors; all 37 public-theorem axiom queries reported; 0 reports contain `sorryAx`. Standard axioms only: True. Prior v1/v2 failure receipts remain preserved. Statement headers and the full query list match v2.
+
+Command: `lake env lean -j1 HolonicsResearch/Geometry/FiniteTorusSubgroupReceiver.lean`, from `<torus-worktree>/lean`. One CPU and existing cached providers. Compiler wall 13505240845 ns, guarded wall 13893168366 ns, aggregate CPU 7849511000 ns, peak child RSS 3805680 KiB. Fixed deadline 91287144808 ns is unchanged. Measured reservation 4294967296 bytes; enforced ceiling 8589934592 bytes. No limit raised after launch.
+
+Source and sealed local provider metadata remained unchanged. Exact target, transitive Holonics source and cached provider parts, toolchain executables/libraries, Lake manifest; foreign dependency closure is version-declared and consumed from existing cache, not an exhaustive byte seal. Full stdout/stderr, source/command/provider hashes, all axiom reports and lifecycle/resource receipts are retained. The lease is released, owned unit quiescent and no native process remains. Any retained failed-service metadata owns no process or lease. No source edit, dependency build, publication or new design outreach. Acceptance is limited to the exact source check and public-theorem axiom queries; no HNN or new operator claim is made.

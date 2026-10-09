@@ -1,0 +1,222 @@
+HolonicsResearch/Geometry/FiniteTorusSubgroupReceiver.lean:65:49: warning: This simp argument is unused:
+  zsmul_add
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [torusSlopeMap]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+HolonicsResearch/Geometry/FiniteTorusSubgroupReceiver.lean:77:2: error: No goals to be solved
+HolonicsResearch/Geometry/FiniteTorusSubgroupReceiver.lean:107:15: error(lean.unknownIdentifier): Unknown constant `Equiv.addRight_apply`
+HolonicsResearch/Geometry/FiniteTorusSubgroupReceiver.lean:107:4: error: `simp` made no progress
+HolonicsResearch/Geometry/FiniteTorusSubgroupReceiver.lean:241:26: warning: `MeasureTheory.integral_finset_sum` has been deprecated: Use `MeasureTheory.integral_finsetSum` instead
+HolonicsResearch/Geometry/FiniteTorusSubgroupReceiver.lean:242:2: error: unsolved goals
+N : ℕ
+inst✝ : NeZero N
+h : ℤ
+f : C(GeometricTwoTorus, ℂ)
+k : Frequency
+hrearrange :
+  ∀ (x : GeometricTwoTorus),
+    (UnitAddTorus.mFourier (-k)) x * ((↑N)⁻¹ * ∑ m, f (x + (rankOneNodeHom N h) m)) =
+      (↑N)⁻¹ * ∑ m, (UnitAddTorus.mFourier (-k)) x * f (x + (rankOneNodeHom N h) m)
+⊢ (if ↑N ∣ dualContact h k then 1 else 0) * UnitAddTorus.mFourierCoeff (⇑f) k =
+    (if ↑N ∣ dualContact h k then 1 else 0) * ∫ (t : UnitAddTorus (Fin 2)), (UnitAddTorus.mFourier (-k)) t * f t
+HolonicsResearch/Geometry/FiniteTorusSubgroupReceiver.lean:301:7: error: typeclass instance problem is stuck
+  NeZero ?m.104
+
+Note: Lean will not try to resolve this typeclass instance problem because the third type argument to `NeZero` is a metavariable. This argument must be fully determined before Lean will try to resolve the typeclass.
+
+Hint: Adding type annotations and supplying implicit arguments to functions can give Lean more information for typeclass resolution. For example, if you have a variable `x` that you intend to be a `Nat`, but Lean reports it as having an unresolved type like `?m`, replacing `x` with `(x : Nat)` can get typeclass resolution un-stuck.
+HolonicsResearch/Geometry/FiniteTorusSubgroupReceiver.lean:368:12: error: typeclass instance problem is stuck
+  NeZero ?m.51
+
+Note: Lean will not try to resolve this typeclass instance problem because the third type argument to `NeZero` is a metavariable. This argument must be fully determined before Lean will try to resolve the typeclass.
+
+Hint: Adding type annotations and supplying implicit arguments to functions can give Lean more information for typeclass resolution. For example, if you have a variable `x` that you intend to be a `Nat`, but Lean reports it as having an unresolved type like `?m`, replacing `x` with `(x : Nat)` can get typeclass resolution un-stuck.
+HolonicsResearch/Geometry/FiniteTorusSubgroupReceiver.lean:419:2: error: failed to synthesize
+  Fintype ℝ
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.
+HolonicsResearch/Geometry/FiniteTorusSubgroupReceiver.lean:417:74: error: unsolved goals
+x : Fin 2
+i : ℝ
+x✝ : Fin 2
+⊢ 1 x✝ 0 • Pi.single x (↑i) 0 + 1 x✝ 1 • Pi.single x (↑i) 1 = Pi.single x (↑i) x✝
+Try this:
+  [apply] abel_nf
+HolonicsResearch/Geometry/FiniteTorusSubgroupReceiver.lean:422:78: error: unsolved goals
+A B : Matrix (Fin 2) (Fin 2) ℤ
+x : Fin 2
+i : ℝ
+x✝ : Fin 2
+⊢ { toFun := fun x i => A i 0 • B 0 0 • x 0 + (A i 1 • B 1 0 • x 0 + (A i 0 • B 0 1 • x 1 + A i 1 • B 1 1 • x 1)),
+        map_zero' := ⋯ }
+      ((AddMonoidHom.single (fun i => UnitAddCircle) x) ((QuotientAddGroup.mk' (AddSubgroup.zmultiples 1)) i)) x✝ =
+    { toFun := fun x i => A i 0 • x 0 + A i 1 • x 1, map_zero' := ⋯ }
+      ({ toFun := fun x i => B i 0 • x 0 + B i 1 • x 1, map_zero' := ⋯ }
+        ((AddMonoidHom.single (fun i => UnitAddCircle) x) ((QuotientAddGroup.mk' (AddSubgroup.zmultiples 1)) i)))
+      x✝
+HolonicsResearch/Geometry/FiniteTorusSubgroupReceiver.lean:425:62: warning: This simp argument is unused:
+  zsmul_add
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [integerTorusMap, AddMonoidHom.coe_mk, AddMonoidHom.comp_apply, Matrix.mul_apply, Fin.sum_univ_two,
+    add_zsmul, mul_zsmul]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+HolonicsResearch/Geometry/FiniteTorusSubgroupReceiver.lean:436:31: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  ↑?A * ↑?B
+in the target expression
+  (integerTorusMap ((↑A)⁻¹ * ↑A)) x = x
+
+N : ℕ
+inst✝ : NeZero N
+A : Matrix.SpecialLinearGroup (Fin 2) ℤ
+x : GeometricTwoTorus
+⊢ (integerTorusMap ((↑A)⁻¹ * ↑A)) x = x
+
+Note: The target expression is not type-correct under the `implicit` transparency level, which may have triggered the failure. This is usually caused by unfolding of semireducible definitions in prior tactic steps. Use `set_option linter.tacticCheckInstances true` to investigate the source of the issue.
+Full error:
+  Application type mismatch: The argument
+    A
+  has type
+    Matrix.SpecialLinearGroup (Fin 2) ℤ
+  but is expected to have type
+    { A // A.det = 1 }
+  in the application
+    ↑A
+HolonicsResearch/Geometry/FiniteTorusSubgroupReceiver.lean:442:31: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  ↑?A * ↑?B
+in the target expression
+  (integerTorusMap (↑A * (↑A)⁻¹)) x = x
+
+N : ℕ
+inst✝ : NeZero N
+A : Matrix.SpecialLinearGroup (Fin 2) ℤ
+x : GeometricTwoTorus
+⊢ (integerTorusMap (↑A * (↑A)⁻¹)) x = x
+
+Note: The target expression is not type-correct under the `implicit` transparency level, which may have triggered the failure. This is usually caused by unfolding of semireducible definitions in prior tactic steps. Use `set_option linter.tacticCheckInstances true` to investigate the source of the issue.
+Full error:
+  Application type mismatch: The argument
+    A
+  has type
+    Matrix.SpecialLinearGroup (Fin 2) ℤ
+  but is expected to have type
+    { A // A.det = 1 }
+  in the application
+    ↑A
+HolonicsResearch/Geometry/FiniteTorusSubgroupReceiver.lean:455:42: error: elaboration function for `Mathlib.Tactic.subscriptTerm` has not been implemented
+  ᵥ
+HolonicsResearch/Geometry/FiniteTorusSubgroupReceiver.lean:457:42: warning: This simp argument is unused:
+  fourier_phase_add
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [UnitAddTorus.mFourier, ContinuousMap.coe_mk, Fin.prod_univ_two, integerTorusMap,
+    AddMonoidHom.coe_mk, fourier_zsmul, Matrix.mulVec, dotProduct, Fin.sum_univ_two, Matrix.transpose_apply,
+    fourier_add]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+HolonicsResearch/Geometry/FiniteTorusSubgroupReceiver.lean:457:61: warning: This simp argument is unused:
+  fourier_zsmul
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [UnitAddTorus.mFourier, ContinuousMap.coe_mk, Fin.prod_univ_two, integerTorusMap,
+    AddMonoidHom.coe_mk, fourier_phase_add, Matrix.mulVec, dotProduct, Fin.sum_univ_two, Matrix.transpose_apply,
+    fourier_add]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+HolonicsResearch/Geometry/FiniteTorusSubgroupReceiver.lean:458:4: warning: This simp argument is unused:
+  Matrix.mulVec
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [UnitAddTorus.mFourier, ContinuousMap.coe_mk, Fin.prod_univ_two, integerTorusMap,
+    AddMonoidHom.coe_mk, fourier_phase_add, fourier_zsmul, dotProduct, Fin.sum_univ_two, Matrix.transpose_apply,
+    fourier_add]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+HolonicsResearch/Geometry/FiniteTorusSubgroupReceiver.lean:458:19: warning: This simp argument is unused:
+  dotProduct
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [UnitAddTorus.mFourier, ContinuousMap.coe_mk, Fin.prod_univ_two, integerTorusMap,
+    AddMonoidHom.coe_mk, fourier_phase_add, fourier_zsmul, Matrix.mulVec, Fin.sum_univ_two, Matrix.transpose_apply,
+    fourier_add]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+HolonicsResearch/Geometry/FiniteTorusSubgroupReceiver.lean:458:31: warning: This simp argument is unused:
+  Fin.sum_univ_two
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [UnitAddTorus.mFourier, ContinuousMap.coe_mk, Fin.prod_univ_two, integerTorusMap,
+    AddMonoidHom.coe_mk, fourier_phase_add, fourier_zsmul, Matrix.mulVec, dotProduct, Matrix.transpose_apply,
+    fourier_add]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+HolonicsResearch/Geometry/FiniteTorusSubgroupReceiver.lean:458:49: warning: This simp argument is unused:
+  Matrix.transpose_apply
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [UnitAddTorus.mFourier, ContinuousMap.coe_mk, Fin.prod_univ_two, integerTorusMap,
+    AddMonoidHom.coe_mk, fourier_phase_add, fourier_zsmul, Matrix.mulVec, dotProduct, Fin.sum_univ_two, fourier_add]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+HolonicsResearch/Geometry/FiniteTorusSubgroupReceiver.lean:458:73: warning: This simp argument is unused:
+  fourier_add
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [UnitAddTorus.mFourier, ContinuousMap.coe_mk, Fin.prod_univ_two, integerTorusMap,
+    AddMonoidHom.coe_mk, fourier_phase_add, fourier_zsmul, Matrix.mulVec, dotProduct, Fin.sum_univ_two,
+    Matrix.transpose_apply]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+HolonicsResearch/Geometry/FiniteTorusSubgroupReceiver.lean:465:50: error: elaboration function for `Mathlib.Tactic.subscriptTerm` has not been implemented
+  ᵥ
+HolonicsResearch/Geometry/FiniteTorusSubgroupReceiver.lean:471:6: warning: declaration uses `sorry`
+HolonicsResearch/Geometry/FiniteTorusSubgroupReceiver.lean:467:8: warning: declaration uses `sorry`
+HolonicsResearch/Geometry/FiniteTorusSubgroupReceiver.lean:472:2: warning: Unused tactic linter: `change UnitAddTorus.mFourier k ((slTorusEquiv A).symm (slTorusEquiv A x)) = _` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+HolonicsResearch/Geometry/FiniteTorusSubgroupReceiver.lean:473:2: warning: Unused tactic linter: `rw [AddEquiv.symm_apply_apply]` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+HolonicsResearch/Geometry/FiniteTorusSubgroupReceiver.lean:472:2: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+HolonicsResearch/Geometry/FiniteTorusSubgroupReceiver.lean:473:2: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.rankOne_character_average' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.rankOneAverage_idempotent' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.mFourierCoeff_rankOneAverage' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.rankOneAverage_sub_haar_eq_dualSpectralResidual' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.nagel_pairKernel_residual' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.subgroupPairKernelMean_transport' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.transported_pairKernel_residual' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.mFourier_transportedFrequency' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'Holonics.Geometry.FiniteTorusSubgroupReceiver.fibonacci_exponential_average' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]

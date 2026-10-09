@@ -1,0 +1,146 @@
+{
+  "files": {
+    "COMMAND.txt": {
+      "sha256": "4ee60121d6c87901b31d27f94fd3a9290f40bf9a783faaa12a199cd7c9364381",
+      "bytes": 77
+    },
+    "COMPILER_REQUEST.json": {
+      "sha256": "720c05217652be3dd078f145fbc0143705b0982c40aa8062be1b54318bc16da2",
+      "bytes": 1684
+    },
+    "EARLY_RESULT_MAIL.txt": {
+      "sha256": "2e97a2c71b221ccdbf2a26be4a33702caa401a00653e9e3040f3bb8af2de88d2",
+      "bytes": 12809
+    },
+    "FiniteTorusSubgroupReceiver.lean": {
+      "sha256": "190b46e8d9cb19a238cb101417dd832fb0985eb63cb835219c236519daa0dd19",
+      "bytes": 26113
+    },
+    "HANDOFF.md": {
+      "sha256": "79be0352f805be1d30a55031155b50ea2fcba27ee9f8961bb1aff9e7e195981c",
+      "bytes": 1544
+    },
+    "KERNEL_VALIDATION.json": {
+      "sha256": "9447d1d95c9a4f7b293046ec61ca77bc7bd4a4e8f91bf8234e26ff676e4488c1",
+      "bytes": 1751
+    },
+    "SOURCE_PROVIDERS.json": {
+      "sha256": "bc2387a75d5cde63de84d72397e73ac8c81e41dd32dc0bc5e3c5e7f1a8121683",
+      "bytes": 162433
+    },
+    "VALIDATION.json": {
+      "sha256": "1c3e819d5189637d83f691ae5746a30cbb02a5d505f2da81ed3e73d99195981c",
+      "bytes": 4462
+    },
+    "bounded_stage_memory_v186.py": {
+      "sha256": "53af9940045087e8ae9996a12913c2e86feeaa6349a86fff772428b30d9e89ec",
+      "bytes": 13763
+    },
+    "compiler.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "compiler.stdout": {
+      "sha256": "42570e9e29d64d1586b0c58ec0d1dbe295366560387118b71ea4b859fe6c9f6e",
+      "bytes": 12117
+    },
+    "final_stage_memory_v186.py": {
+      "sha256": "ede5f04907a432bab4e22eaaab94a9b8b9e7834e54eb0f27bc5927bca6159f51",
+      "bytes": 11260
+    },
+    "leased_stage_memory_v186.py": {
+      "sha256": "3276491e6b7e9afdc6b48f0f9a0d12b39a0627fc269ed65ed22ffbaec0760613",
+      "bytes": 5556
+    },
+    "prepare.py": {
+      "sha256": "8c4d922feb1648a1e2ad046578d5183ee7812b8c8f0267f1479f45f4eb3141b0",
+      "bytes": 5937
+    },
+    "run_stage.py": {
+      "sha256": "25dbc4ef2bc11a924d5ebd4fdc8fc5be8b3549362a7f978f7763db1260293b87",
+      "bytes": 1488
+    },
+    "torus-subgroup-20261009-v1.acceptance.json": {
+      "sha256": "46f178a9171e79c90d0828effba47a7f2481112d95ecbf8e01f6cd4af1368c31",
+      "bytes": 379
+    },
+    "torus-subgroup-20261009-v1.child-identity.json": {
+      "sha256": "fba140206c193eedbe4b6e80eea0cc2c516fbdff4e6eada4232c1e7bd1b8d42c",
+      "bytes": 76
+    },
+    "torus-subgroup-20261009-v1.config.json": {
+      "sha256": "449796b18afa61169b9401f27e6585952dae6855ab7f8627450e9b6e4c56339a",
+      "bytes": 61828
+    },
+    "torus-subgroup-20261009-v1.external-lease.json": {
+      "sha256": "157272e839eae07be67bdcba7a44e5a66d593b674ee3b3a5f6358ff84152abd4",
+      "bytes": 486
+    },
+    "torus-subgroup-20261009-v1.failure.json": {
+      "sha256": "82dc03c6f66e8e5aaf187db4039b006ffc2fe00d8ec33497eb91bc0d42a51cfa",
+      "bytes": 226
+    },
+    "torus-subgroup-20261009-v1.final.json": {
+      "sha256": "b1dff56b359329b75bc3a25ae1d7b8eb4722f212a173b459c259092a96fa2ca5",
+      "bytes": 5374
+    },
+    "torus-subgroup-20261009-v1.host-preflight.json": {
+      "sha256": "9d55d1a1f556348edf076376ec4cba6afd5fa9af4c10e7a7171feb600c930b8b",
+      "bytes": 330
+    },
+    "torus-subgroup-20261009-v1.input_seal.json": {
+      "sha256": "52673fd89ade3c255386dfaa7e9c9cc008f5115cc5939f7c65c0661212524f2d",
+      "bytes": 40990
+    },
+    "torus-subgroup-20261009-v1.lease-identity.json": {
+      "sha256": "2d4a647f093d7b2f802a2f907c61457acb55421ae3cd7daa84aa92c9bdc4dd61",
+      "bytes": 563
+    },
+    "torus-subgroup-20261009-v1.memory-gate.json": {
+      "sha256": "94e9ef5bf6e22bcc003bfeb069917384885f31a18c99a009abf70e470921cc97",
+      "bytes": 120
+    },
+    "torus-subgroup-20261009-v1.memory-growth.ndjson": {
+      "sha256": "e9e10be9d76269dff83a5039ede6f8f2f4c0a2992c859002852f4d4b30df093a",
+      "bytes": 7712
+    },
+    "torus-subgroup-20261009-v1.output_seal.json": {
+      "sha256": "3d2cbd7d3d928d98bf77e300a4d21a4be3efd1c0590c03cd7746f6fcda419fab",
+      "bytes": 519044
+    },
+    "torus-subgroup-20261009-v1.publication.json": {
+      "sha256": "c238bdfbc8ee6f38a8412d8f29991d5b30b2f7c55832dc9dc74caa25ce32a5f8",
+      "bytes": 3020
+    },
+    "torus-subgroup-20261009-v1.quiescence.json": {
+      "sha256": "4ef3329e45ceeaa94036871c69de25791776614bd73d3d7d7063caefa05fdb31",
+      "bytes": 129
+    },
+    "torus-subgroup-20261009-v1.release.json": {
+      "sha256": "9c683a57c727dfd125ae4d91b1d9bf1204ab704330c6c251b10df3252c69854c",
+      "bytes": 174
+    },
+    "torus-subgroup-20261009-v1.stage-quiescence.json": {
+      "sha256": "84d0540e2ce470783cde0a03f89e67ebf29be24443e50798329ad031222e1f09",
+      "bytes": 136
+    },
+    "torus-subgroup-20261009-v1.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "torus-subgroup-20261009-v1.stdout": {
+      "sha256": "486c0df4d33f210a96eaa87edbcf6128e10b9e36590eccdb67e8e7efab499015",
+      "bytes": 13843
+    },
+    "torus-subgroup-20261009-v1.system-floor.json": {
+      "sha256": "bda2727e84058084bcdbe3a61d5b526048d90852bf31cfc9ea26b27e3f191307",
+      "bytes": 61332
+    },
+    "torus-subgroup-20261009-v1.unit-cleanup.json": {
+      "sha256": "3e34661c285b5472ca1e3fd66ee3d2d4dc9fe0a7e74cf8f86886ba39ad2d2bfe",
+      "bytes": 739
+    }
+  },
+  "entry_count": 35,
+  "self_excluded": true
+}

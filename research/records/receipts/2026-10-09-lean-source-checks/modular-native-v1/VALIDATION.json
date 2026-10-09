@@ -1,0 +1,136 @@
+{
+  "outcome": "FAILED",
+  "source": "<modular-worktree>/lean/HolonicsResearch/Zeta/ModularScatteringResidual.lean",
+  "source_sha256": "623e24300afc046ebe5a13b8fd0a90e35bf4a2aaa4614007a8c12873713bc63b",
+  "requested_command": "lake env lean -j1 HolonicsResearch/Zeta/ModularScatteringResidual.lean",
+  "requested_command_sha256": "b5d0feb42e5313a92556ffea0b688fcf0c462636e42e35cd0f9d2e376198c5d2",
+  "actual_compiler_argv": [
+    "/usr/bin/env",
+    "-i",
+    "PATH=<lean-toolchain>/bin:/usr/bin",
+    "HOME=<home>",
+    "LANG=C",
+    "LC_ALL=C",
+    "/usr/bin/timeout",
+    "--signal=TERM",
+    "--kill-after=1s",
+    "152.785618970s",
+    "<lean-toolchain>/bin/lake",
+    "env",
+    "lean",
+    "-j1",
+    "HolonicsResearch/Zeta/ModularScatteringResidual.lean"
+  ],
+  "actual_compiler_argv_SHA256": "8ecfe55d7df6844ea82ee5b24b1af79a83fce2731a48b8e68f28184d364754e2",
+  "cwd": "<modular-worktree>/lean",
+  "compiler_exit": 1,
+  "compiler_wall_ns": 22321786202,
+  "command_wall_ns": 22442983795,
+  "guarded_wall_ns": 22627688775,
+  "aggregate_CPU_ns": 10058001000,
+  "child_CPU_user_us": 3068005,
+  "child_CPU_system_us": 5863736,
+  "peak_child_RSS_KiB": 6717104,
+  "group_memory_peak_bytes": 8589934592,
+  "reservation_bytes": 4294967296,
+  "enforced_ceiling_bytes": 8589934592,
+  "system_floor_breached": false,
+  "OOM_kill_count": 0,
+  "fixed_deadline_ns": 154785618970,
+  "measured_to_projected": [
+    22627688775,
+    154785618970
+  ],
+  "timing_budget_exceeded": false,
+  "failure_is_elaboration": true,
+  "error_count": 2,
+  "public_theorem_count": 10,
+  "submitted_query_count": 10,
+  "axiom_reports": {
+    "Holonics.Zeta.ModularScatteringResidual.modularScattering_eq_xiScatteringChart": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ModularScatteringResidual.modularScattering_eq_gammaR_zeta": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ModularScatteringResidual.logDeriv_xi_two_mul_sub": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ModularScatteringResidual.logDeriv_xiScatteringChart": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ModularScatteringResidual.logDeriv_modularScattering": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ModularScatteringResidual.xiScattering_current_residual": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ModularScatteringResidual.modularScattering_current_residual": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ModularScatteringResidual.xiCurrentRemainder_eq_tail": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ModularScatteringResidual.modularScattering_current_residual_eq_tail": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Zeta.ModularScatteringResidual.xiCurrentRemainder_pullback_enclosures": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "sorryAx_report_count": 6,
+  "submitted_queries_complete": true,
+  "all_public_theorem_query_coverage": true,
+  "kernel_accepted": false,
+  "source_and_sealed_local_provider_metadata_unchanged": true,
+  "input_seal_unchanged": true,
+  "provenance_scope": "Exact target, transitive Holonics source and cached provider parts, toolchain executables/libraries, Lake manifest; foreign dependency closure is version-declared and consumed from existing cache, not an exhaustive byte seal.",
+  "foreign_library_rebuilt": false,
+  "one_CPU": true,
+  "lease_released": true,
+  "unit_quiescent": true,
+  "unit_cleanup": {
+    "Description": "Owned holonics admission modular-scattering-20261009-v1 99a84f44b49888cfe45d6fe47929617a",
+    "LoadState": "loaded",
+    "ActiveState": "failed",
+    "SubState": "failed",
+    "InvocationID": "0829801af71a4ede8a0239882c320c24",
+    "Result": "exit-code",
+    "ExecMainStatus": "125",
+    "ControlGroup": "",
+    "MemoryPeak": "8589934592",
+    "CPUUsageNSec": "10058001000",
+    "TasksCurrent": "[not set]"
+  },
+  "scientific_source_edits": false,
+  "compiler_reruns": 0,
+  "publication": false,
+  "retired_bridge_or_protected_session_operations": false,
+  "reservation_estimate_error": "Prior matching compiler RSS peak 3793292 KiB supported a 4 GiB reservation; this import-heavy file measured 6717104 KiB. The 8 GiB ceiling held, there was no OOM kill and the 4 GiB system floor stayed intact. Actual peak retained for subsequent admission estimates."
+}

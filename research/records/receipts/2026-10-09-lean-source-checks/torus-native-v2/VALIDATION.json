@@ -1,0 +1,265 @@
+{
+  "outcome": "FAILED",
+  "exact_source_SHA256": "f71efe93d0dacd7e29b0f1d33d881284605eae7c5fd0c12b4e2b3eadefc6679e",
+  "predecessor_SHA256": "190b46e8d9cb19a238cb101417dd832fb0985eb63cb835219c236519daa0dd19",
+  "failed_predecessor_receipt": "research/records/receipts/2026-10-09-lean-source-checks/torus-native-v1",
+  "all37_statement_headers_unchanged_after_explicit_matrix_notation": true,
+  "all37_queries_match_public_theorem_names": true,
+  "requested_command": "lake env lean -j1 HolonicsResearch/Geometry/FiniteTorusSubgroupReceiver.lean",
+  "command_SHA256": "4ee60121d6c87901b31d27f94fd3a9290f40bf9a783faaa12a199cd7c9364381",
+  "actual_compiler_argv": [
+    "/usr/bin/env",
+    "-i",
+    "PATH=<lean-toolchain>/bin:/usr/bin",
+    "HOME=<home>",
+    "LANG=C",
+    "LC_ALL=C",
+    "/usr/bin/timeout",
+    "--signal=TERM",
+    "--kill-after=1s",
+    "89.287144808s",
+    "<lean-toolchain>/bin/lake",
+    "env",
+    "lean",
+    "-j1",
+    "HolonicsResearch/Geometry/FiniteTorusSubgroupReceiver.lean"
+  ],
+  "actual_compiler_argv_SHA256": "f93ac51c0d8ace3fffbd0d27be459cae75f95ad783152f7897ea7a3482740cb8",
+  "cwd": "<torus-worktree>/lean",
+  "compiler_exit": 1,
+  "compiler_wall_ns": 16290268458,
+  "command_wall_ns": 16495218485,
+  "guarded_wall_ns": 16721050352,
+  "fixed_deadline_ns": 91287144808,
+  "measured_to_projected": [
+    16721050352,
+    91287144808
+  ],
+  "aggregate_CPU_ns": 9129579000,
+  "child_CPU_user_us": 4262372,
+  "child_CPU_system_us": 3959137,
+  "peak_child_RSS_KiB": 3864344,
+  "group_memory_peak_bytes": 5109354496,
+  "reservation_bytes": 4294967296,
+  "enforced_ceiling_bytes": 8589934592,
+  "reservation_basis": "Actual torus predecessor compiler RSS peak3779500KiB fits4GiB",
+  "thread_budget": 1,
+  "public_theorem_count": 37,
+  "submitted_query_count": 37,
+  "all_37_public_theorem_queries_reported": true,
+  "axiom_reports": {
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.rankOneNodeHom_apply": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.rankOneNodeHom_intCast": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.rankOneNodeHom_injective": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.card_rankOneSubgroup": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.subgroupAverage_translate": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.subgroupAverage_idempotent": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.rankOneAverage_idempotent": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.mFourier_translate": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.fourier_zsmul": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.fourier_toAddCircle": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.mFourier_rankOneNode": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.sum_stdAddChar_mul": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.rankOne_character_average": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.rankOneAverage_mFourier": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.mFourierCoeff_translate": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.mFourierCoeff_rankOneAverage": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.subgroupAverageCLM_apply": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.hasSum_rankOneAverage_fourier": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.rankOneAverage_sub_haar_eq_dualSpectralResidual": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.subgroupPairKernelMean_eq_average": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.subgroupPairKernelMean_eq_double_sum": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.rankOne_pairKernel_residual": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.nagelTensorWeight_zero": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.nagel_pairKernel_residual": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.subgroupAverage_transport": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.subgroupPairKernelMean_transport": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.transported_pairKernel_residual": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.integerTorusMap_one": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.integerTorusMap_mul": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.fourier_phase_add": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.mFourier_integerTorusMap": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.mFourier_transportedFrequency": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.transported_character_average": [
+      "propext",
+      "sorryAx",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.mFourier_rankOneNode_exp": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.rankOne_exponential_average": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.fibonacci_exponential_average": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.Geometry.FiniteTorusSubgroupReceiver.fibonacci_carry_word": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "standard_axioms_only": false,
+  "sorryAx_present": true,
+  "kernel_accepted": false,
+  "source_and_sealed_local_provider_metadata_unchanged": true,
+  "provenance_scope": "Exact target, transitive Holonics source and cached provider parts, toolchain executables/libraries, Lake manifest; foreign dependency closure is version-declared and consumed from existing cache, not an exhaustive byte seal.",
+  "errors": 3,
+  "limits_raised_after_launch": false,
+  "same_predecessor_fixed_deadline": true,
+  "foreign_library_rebuilt": false,
+  "lease_released": true,
+  "unit_absent_after_cleanup": false,
+  "owned_unit_quiescent_after_cleanup": true,
+  "retained_failed_unit_metadata_only": [
+    "holonics-prune-admission-torus-subgroup-repair-20261009-v1.service"
+  ],
+  "no_native_process_remaining": true,
+  "scientific_source_edits": false,
+  "publication": false,
+  "HNN_or_new_operator_acceptance": false,
+  "remaining_blockers_for_exact_source_check": [
+    "Compiler or declared axiom acceptance failed; see full compiler output"
+  ]
+}
