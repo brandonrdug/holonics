@@ -848,6 +848,1211 @@ fn complete_contact_return_publishes_held_point_before_existing_communication() 
     println!("whole carried existing communication boundary: {:?}", next.boundary);
 }
 
+// The held twin of 0279 on its own operands. Declared once, from the field, and never raised after a
+// run: a refusal at them is the next loop's subject, not a larger limit. The width-six contact
+// carries three raw 6 x 6 Gram factors (C, K, D): 3 * 6 * 6 = 108 = 2^2 * 3^3 parameters.
+const LANDING_TANGENT_PARAMETERS: usize = 3 * 6 * 6;
+// One Word's full state: storage (8 + 6), arriving waves (8 + 6) and the contact's (u, w) (6 + 6),
+// with no loaded resonator: 40 = 2^3 * 5 coordinates, so 108 * 40 = 4320 = 2^5 * 3^3 * 5 retained
+// ratios.
+const LANDING_TANGENT_STATE_COORDINATES: usize = (8 + 6) + (8 + 6) + (6 + 6);
+const LANDING_TANGENT_RATIOS: usize =
+    LANDING_TANGENT_PARAMETERS * LANDING_TANGENT_STATE_COORDINATES;
+// 0279's one Word executes three ticks (`taught.carry.ticks == 3`) and every tick moves every
+// column: 108 * 3 = 324 = 2^2 * 3^4 column-ticks.
+const LANDING_TANGENT_TICKS: usize = 3;
+const LANDING_TANGENT_COLUMN_TICKS: usize = LANDING_TANGENT_PARAMETERS * LANDING_TANGENT_TICKS;
+
+/// [agent-inferred, October 8; the medium-of-joints record, section 7] **The landing tangent read
+/// beside the uniform certificate** on 0279's own operands. A CONDITIONAL DIAGNOSTIC, NEVER A
+/// CERTIFIED LANDING: L1' is a candidate closer, `eps_ray` is uncertified, and a point tangent
+/// cannot authorize a finite deposit. It changes no law and admits no step.
+///
+/// Per family `f` (C, K, D) the numerator is the certificate's own `kb_f = kappa^2 b` (the deposit's
+/// `StepReading::gain * moves`; the step's curvature is `s kb_f` with `s = 1/2`) and the denominator
+/// is `|A d_f|^2`, the squared response at the compared station to the deposit's unit step
+/// `d_f = G_f / h'_f` (so `a_f = |G_f|^2 / h'_f` at the certificate's face). `A` is the held twin's
+/// exact station response at the same producing material, current and Word; `G_f` and `h'_f` are the
+/// actual deposit's descent direction and published statistic. The two are read in different charts
+/// (kappa maps the contact right-hand-side streams; `A` maps raw factors to realified logits at
+/// identity metrics), so the quotient reads whether the uniform certificate could be loose, and is
+/// not a like-for-like bound. With `s = 1/2` and `eps_ray = 0` an own-certificate L1' admits
+/// `eta = 2^-10` exactly when `|A d_f|^2 <= T_f = 2^11 a_f` (jointly, `|A (d_C + d_K + d_D)|^2 <=
+/// 2^11 sum a_f`). A zero `|A d_f|^2` is a kernel or singular case, never a ratio.
+///
+/// The readings print first; the assertions that let them be trusted follow, so a failed assertion
+/// leaves the readings visible but unverified.
+fn landing_tangent_reading(
+    before: &Constitution,
+    after: &Constitution,
+    actual: &crate::hnn::physical::contact::ContactPublication,
+    twin: &crate::hnn::physical::contact::ContactCommunication,
+    admitted: &crate::hnn::word::variation::VariationReading,
+    compared: &[bool],
+) {
+    use crate::hnn::constitution::{FactorGradient, Family, Locus};
+    use crate::holon::deposition::dyadic;
+    use crate::ratio::Rat;
+    use crate::ratio::disk::floor_log2;
+    use crate::ratio::linear::vector::{add, dot};
+    use num_traits::Signed;
+    let locus = Locus::Channel(0);
+    let names = ["C", "K", "D"];
+    // The actual deposit: its certified steps, its descent directions and its published statistics.
+    assert_eq!(actual.comparison_return.commit(), before.commit());
+    assert_eq!(actual.publication.commit, after.commit());
+    let scales = after.contact_scales(0);
+    let steps: Vec<_> = (0..3)
+        .map(|f| {
+            actual
+                .publication
+                .steps
+                .iter()
+                .find(|(at, reading)| *at == locus && reading.family == Family::Factor(f))
+                .map(|(_, reading)| reading)
+                .unwrap_or_else(|| panic!("the actual deposit certified no family-{f} step"))
+        })
+        .collect();
+    let gradients: Vec<_> = (0..3)
+        .map(|f| {
+            let step = actual
+                .comparison_return
+                .factors()
+                .iter()
+                .find(|s| s.gradient.locus() == locus && s.gradient.family() == Family::Factor(f))
+                .unwrap_or_else(|| panic!("the actual deposit returned no family-{f} gradient"));
+            match &step.gradient {
+                FactorGradient::Storage { gradient, .. }
+                | FactorGradient::Stiffness { gradient, .. }
+                | FactorGradient::Dissipation { gradient, .. } => gradient,
+                _ => unreachable!("a contact family returns a Gram-factor gradient"),
+            }
+        })
+        .collect();
+    // The held twin: its complete station response, and the rows of it at the compared stations.
+    let response = twin
+        .station_response
+        .as_ref()
+        .expect("the held twin returns its complete station response");
+    assert_eq!(response.producing_commit, before.commit());
+    let fallback;
+    let selected = match &twin.compared_response {
+        Some(selected) => selected,
+        None => {
+            fallback = response
+                .select(compared)
+                .expect("the compared stations select from the complete response");
+            &fallback
+        }
+    };
+    // The actual comparison's covector at the compared stations.
+    let covector = actual
+        .ratio
+        .covector()
+        .expect("the actual comparison's covector");
+    let g: Vec<Rat> = compared
+        .iter()
+        .enumerate()
+        .filter(|(_, picked)| **picked)
+        .flat_map(|(station, _)| covector.logits()[station].iter().cloned())
+        .collect();
+    assert_eq!(
+        g.len(),
+        selected.matrix.rows(),
+        "the covector and the selected rows share the compared stations"
+    );
+    // The family directions d_f = G_f / h'_f, in the response's own coordinate order.
+    let directions: Vec<Vec<Rat>> = (0..3)
+        .map(|f| {
+            response
+                .coordinates
+                .iter()
+                .map(|c| {
+                    if c.contact == 0 && c.family == f {
+                        gradients[f]
+                            .get(c.row, c.column)
+                            .expect("a returned gradient entry")
+                            / &scales[f]
+                    } else {
+                        Rat::zero()
+                    }
+                })
+                .collect()
+        })
+        .collect();
+    // The owner's transpose identity A^T g = total, re-read against the actual descent direction
+    // -G: how many coordinates of each family differ (none when the readings are sound).
+    let transposed = match response.pullback(&covector) {
+        Ok(pulled) => {
+            let mut differing = [0usize; 3];
+            for (c, got) in response.coordinates.iter().zip(&pulled) {
+                let descent = gradients[c.family]
+                    .get(c.row, c.column)
+                    .expect("a returned gradient entry");
+                if *got != -descent {
+                    differing[c.family] += 1;
+                }
+            }
+            format!(
+                "A^T g differs from -G at {differing:?} coordinates of C, K, D (of {} each)",
+                response.coordinates.len() / 3
+            )
+        }
+        Err(refusal) => format!("A^T g was refused: {refusal:?}"),
+    };
+    let tangents: Vec<_> = directions
+        .iter()
+        .enumerate()
+        .map(|(f, d)| {
+            selected.directional(d).unwrap_or_else(|refusal| {
+                panic!("family {f}: the directional response was refused: {refusal:?}")
+            })
+        })
+        .collect();
+    let sum_direction = add(&add(&directions[0], &directions[1]), &directions[2]);
+    let joint = selected
+        .directional(&sum_direction)
+        .unwrap_or_else(|refusal| {
+            panic!("the summed direction's response was refused: {refusal:?}")
+        });
+    // The certificate's numerator kb_f, |G_f|^2, and the threshold T_f = a_f / (s eta) = 2^11 a_f of
+    // an own-certificate L1' with s = 1/2 and eps_ray = 0 at eta = 2^-10 (the record's landing step).
+    assert_eq!(dyadic(11), integer(1) / (rat(1, 2) * dyadic(-10)));
+    let numerators: Vec<Rat> = steps.iter().map(|step| &step.gain * &step.moves).collect();
+    let gradient_squared: Vec<Rat> = gradients
+        .iter()
+        .map(|gradient| gradient.entries().iter().map(|x| x * x).sum::<Rat>())
+        .collect();
+    let thresholds: Vec<Rat> = steps
+        .iter()
+        .map(|step| dyadic(11) * &step.step.alignment)
+        .collect();
+    let sum_alignment: Rat = steps.iter().map(|step| step.step.alignment.clone()).sum();
+    let joint_threshold = dyadic(11) * &sum_alignment;
+    // The first dyadic step at which this family's largest entry move reaches the half-unit.
+    let half_unit = before.lattice(locus).expect("the contact's lattice").unit() / integer(2);
+    let widest: Vec<Rat> = directions
+        .iter()
+        .map(|d| {
+            d.iter()
+                .map(Signed::abs)
+                .max()
+                .expect("a direction has entries")
+        })
+        .collect();
+    let first_reach: Vec<i64> = widest
+        .iter()
+        .map(|w| {
+            assert!(w.is_positive(), "a certified step has a nonzero direction");
+            let needed = &half_unit / w;
+            let k = floor_log2(&needed);
+            if dyadic(k) == needed { k } else { k + 1 }
+        })
+        .collect();
+    let binary = |x: &Rat| -> String {
+        if x.is_positive() {
+            format!("{x} [floor_log2={}]", floor_log2(x))
+        } else {
+            format!("{x} [no binary exponent]")
+        }
+    };
+    let credit = match &twin.held_comparison {
+        Ok(Some(credit)) => Some(credit),
+        _ => None,
+    };
+    let status = match &twin.held_comparison {
+        Ok(Some(_)) => "returned (the owner checked A^T g = total)".to_string(),
+        Ok(None) => "none".to_string(),
+        Err(refusal) => format!("REFUSED, the readings below are UNVERIFIED: {refusal:?}"),
+    };
+    println!(
+        "landing tangent CONDITIONAL DIAGNOSTIC, NOT A LANDING: L1' is a candidate closer, eps_ray is \
+         uncertified, a point tangent cannot authorize a finite deposit, and no certified landing \
+         exists. kb = kappa^2 b is the certificate's own numerator (contact right-hand-side streams); \
+         |A d|^2 is the held twin's exact station response in identity raw-factor and realified-logit \
+         charts: a reading beside it, never a like-for-like bound."
+    );
+    println!(
+        "landing tangent twin: admitted={admitted:?} run={:?} compared_stations={:?} A_rows={} \
+         A_columns={} |A|^2_enclosure=[{}, {}] held_comparison={status} transpose_identity: {transposed}",
+        credit.map(|c| &c.reading),
+        selected.station_ticks,
+        selected.matrix.rows(),
+        selected.matrix.columns(),
+        selected.lower_squared,
+        selected.upper_squared
+    );
+    for (f, step) in steps.iter().enumerate() {
+        let kb = &numerators[f];
+        let ad2 = &tangents[f].receiving_squared;
+        let order = crate::ratio::compare(ad2, &thresholds[f]);
+        let quotient = if ad2.is_zero() {
+            "kernel/singular (|A d|^2 = 0): no ratio".to_string()
+        } else if !kb.is_positive() {
+            "numerator kb = 0: no ratio".to_string()
+        } else {
+            let rho = kb / ad2;
+            let k = floor_log2(&rho);
+            format!("rho={rho} floor_log2={k} remainder={}", &rho - dyadic(k))
+        };
+        println!(
+            "landing tangent f={f} [{}] certificate: eta=2^{} a={} h'={} |G|^2={} max|d|={} \
+             first_reach_eta=2^{} kb=kappa^2*b={}",
+            names[f],
+            step.step.exponent,
+            binary(&step.step.alignment),
+            scales[f],
+            gradient_squared[f],
+            binary(&widest[f]),
+            first_reach[f],
+            binary(kb)
+        );
+        println!(
+            "landing tangent f={f} [{}] tangent: |A d|^2={} |d|^2={} kb/|A d|^2: {quotient}",
+            names[f],
+            binary(ad2),
+            tangents[f].parameter_squared
+        );
+        println!(
+            "landing tangent f={f} [{}] threshold: T=2^11*a={} needed kb/T={} |A d|^2<=T: {} (exact order {order:?}{})",
+            names[f],
+            binary(&thresholds[f]),
+            binary(&(kb / &thresholds[f])),
+            order.is_le(),
+            if ad2.is_zero() {
+                "; kernel/singular is not a favourable quotient"
+            } else {
+                ""
+            }
+        );
+    }
+    let joint_order = crate::ratio::compare(&joint.receiving_squared, &joint_threshold);
+    println!(
+        "landing tangent joint: |A(d_C+d_K+d_D)|^2={} |d_C+d_K+d_D|^2={} 2^11*sum(a)={} \
+         |A d|^2<=T: {} (exact order {joint_order:?}{}) declared_landing_eta=2^-10 first_reach_eta=2^{}",
+        binary(&joint.receiving_squared),
+        joint.parameter_squared,
+        binary(&joint_threshold),
+        joint_order.is_le(),
+        if joint.receiving_squared.is_zero() {
+            "; kernel/singular is not a favourable quotient"
+        } else {
+            ""
+        },
+        first_reach.iter().max().expect("three families")
+    );
+    // The assertions that let the readings above be trusted.
+    let credit = credit.unwrap_or_else(|| {
+        panic!(
+            "the held twin returned no comparison: {:?}",
+            twin.held_comparison.as_ref().err()
+        )
+    });
+    // The twin is the actual run's comparison on its own Word: the same coordinates and covector,
+    // and a first Word from rest, which carries no earlier column.
+    assert_eq!(credit.coordinates, response.coordinates);
+    assert_eq!(credit.total.len(), response.coordinates.len());
+    assert_eq!(
+        credit.ratio.covector().expect("the twin's covector"),
+        covector,
+        "the twin compares what the actual run compared"
+    );
+    assert!(
+        credit.carried.iter().all(Zero::is_zero),
+        "a first Word from rest carries no earlier column"
+    );
+    response
+        .check_pullback(&covector, &credit.total)
+        .expect("A^T g = total, checked again on the actual covector");
+    // The held total is -(d h') entrywise: the descent direction is -total and d_f = G_f / h'_f.
+    for (i, c) in response.coordinates.iter().enumerate() {
+        assert_eq!(
+            credit.total[i],
+            -(&directions[c.family][i] * &scales[c.family]),
+            "coordinate {i} {c:?}"
+        );
+    }
+    let mut sum_pairing = Rat::zero();
+    for (f, step) in steps.iter().enumerate() {
+        // The certificate's curvature is s kb with s = 1/2, so kb is the deposit's printed kappa^2 b.
+        assert_eq!(
+            &step.step.curvature * integer(2),
+            numerators[f],
+            "family {f}"
+        );
+        // sum_j g_j (A d_f)_j = total . d_f = -|G_f|^2 / h'_f, exactly.
+        let pairing = &gradient_squared[f] / &scales[f];
+        assert_eq!(dot(&g, &tangents[f].response), -&pairing, "family {f}");
+        // a_f is that same |G_f|^2 / h'_f at the certificate's floor.
+        assert!(
+            crate::ratio::compare(&step.step.alignment, &pairing).is_le(),
+            "family {f}"
+        );
+        sum_pairing += pairing;
+    }
+    assert_eq!(dot(&g, &joint.response), -sum_pairing);
+    // The declared budget, derived once and never raised, against what the run reports.
+    assert_eq!(
+        (
+            admitted.parameters,
+            admitted.state_coordinates,
+            admitted.retained_ratios
+        ),
+        (
+            LANDING_TANGENT_PARAMETERS,
+            LANDING_TANGENT_STATE_COORDINATES,
+            LANDING_TANGENT_RATIOS
+        )
+    );
+    assert_eq!(credit.reading.column_ticks, LANDING_TANGENT_COLUMN_TICKS);
+    assert_eq!(
+        (credit.reading.words, credit.reading.next_tick),
+        (1, LANDING_TANGENT_TICKS)
+    );
+    assert!(credit.reading.retained_ratios <= LANDING_TANGENT_RATIOS);
+    assert!(credit.reading.retained_bits <= CAMPAIGN_ONE_BUDGET);
+    assert!(response.matrix.rows() * response.matrix.columns() <= LANDING_TANGENT_RATIOS);
+    assert!(response.matrix_bits <= CAMPAIGN_ONE_BUDGET);
+    println!(
+        "landing tangent: every trust assertion passed; the readings above remain a conditional diagnostic"
+    );
+}
+
+#[test]
+fn the_landing_tangent_is_read_beside_the_uniform_certificate_on_the_complete_contact_return() {
+    use crate::hnn::physical::contact::ContactObservation;
+    use crate::hnn::word::variation::VariationBudget;
+    let field = field();
+    let initial = contact_material(&field);
+    let current = Current::at_rest(&field);
+    let source = encoded(&field, &[0, 1]);
+    let compared = vec![false, false, true];
+    let observation = || ContactObservation {
+        observed: encoded(&field, &[0, 1, 3]),
+        compared: compared.clone(),
+    };
+    // 0279's own runs: the blind forward, then the same Word with its comparison and deposit.
+    let mut untouched =
+        PhysicalReceiver::new(&field, initial.clone(), current.clone(), WordOpening::Rest).unwrap();
+    let blind = untouched
+        .communicate_contact(&source, &receiver(), |_| None)
+        .unwrap();
+    let started = std::time::Instant::now();
+    let mut actual =
+        PhysicalReceiver::new(&field, initial.clone(), current.clone(), WordOpening::Rest).unwrap();
+    let taught = actual
+        .communicate_contact(&source, &receiver(), |_| Some(observation()))
+        .unwrap();
+    let actual_ns = started.elapsed().as_nanos();
+    // The held twin: the same operands and observation, with the exact station response.
+    let started = std::time::Instant::now();
+    let mut twin =
+        PhysicalReceiver::new(&field, initial.clone(), current.clone(), WordOpening::Rest).unwrap();
+    let admitted = twin
+        .begin_held_contact_variation(VariationBudget {
+            ratios: LANDING_TANGENT_RATIOS,
+            bits: CAMPAIGN_ONE_BUDGET,
+            column_ticks: LANDING_TANGENT_COLUMN_TICKS,
+        })
+        .expect("the held twin is admitted within its declared budget");
+    let held = twin
+        .communicate_contact(&source, &receiver(), |_| Some(observation()))
+        .unwrap();
+    let twin_ns = started.elapsed().as_nanos();
+    assert!(blind.closes() && taught.closes() && held.closes());
+    assert_eq!(
+        taught.boundary, blind.boundary,
+        "observation cannot enter its earlier forward"
+    );
+    assert_eq!(
+        held.boundary, blind.boundary,
+        "the held twin's boundary is the blind run's"
+    );
+    assert_eq!(held.blind_carry, blind.carry);
+    assert_eq!(
+        held.carry, held.blind_carry,
+        "a fixed-material twin deposits nothing"
+    );
+    let publication = taught.comparison.as_ref().unwrap().as_ref().unwrap();
+    landing_tangent_reading(
+        &initial,
+        actual.constitution(),
+        publication,
+        &held,
+        &admitted,
+        &compared,
+    );
+    println!(
+        "landing tangent timing: actual_ns={actual_ns} twin_ns={twin_ns} \
+         column_ticks={LANDING_TANGENT_COLUMN_TICKS}"
+    );
+}
+
+// The learned-change acceptance, READ on 0279's own task (issue #73's gate; the medium-of-joints
+// record, section 7). A reading, never an acceptance: it prints what the machine does and asserts
+// only what makes its readings trustworthy.
+
+/// An exact value beside its binary exponent: never a decimal or a float.
+fn acceptance_exact(x: &crate::ratio::Rat) -> String {
+    use num_traits::Signed;
+    if x.is_zero() {
+        "0".to_string()
+    } else if x.is_positive() {
+        format!("{x} [floor_log2={}]", crate::ratio::disk::floor_log2(x))
+    } else {
+        format!(
+            "{x} [floor_log2 of the magnitude={}]",
+            crate::ratio::disk::floor_log2(&-x)
+        )
+    }
+}
+
+fn acceptance_verdict(met: bool) -> &'static str {
+    if met { "PASS" } else { "NOT-MET" }
+}
+
+/// One word's world accounting, from its own receipts and every term exact. The opening is
+/// `E_after - E_before = imposed - absorbed`; the defects are the owner's executed residuals, each
+/// within its certified bound.
+struct AcceptanceWorld {
+    moved: crate::ratio::Rat,
+    supplied: crate::ratio::Rat,
+    opening_gap: crate::ratio::Rat,
+    ticks: usize,
+    tick_defects: crate::ratio::Rat,
+    tick_bound: crate::ratio::Rat,
+    word_defects: crate::ratio::Rat,
+    word_bound: crate::ratio::Rat,
+    closes: bool,
+}
+
+fn acceptance_world(
+    opening: &crate::hnn::word::SourceOpeningReceipt,
+    balances: &[crate::hnn::word::FieldBalance],
+    word: &crate::hnn::word::WordBalance,
+) -> AcceptanceWorld {
+    use crate::ratio::Rat;
+    let moved = &opening.after - &opening.before;
+    let supplied = &opening.imposed - &opening.absorbed;
+    AcceptanceWorld {
+        opening_gap: &moved - &supplied,
+        moved,
+        supplied,
+        ticks: balances.len(),
+        tick_defects: balances
+            .iter()
+            .map(|b| b.residual() + &b.resonator_chart + &b.resonator_split)
+            .sum::<Rat>(),
+        tick_bound: balances
+            .iter()
+            .map(|b| &b.bound + &b.resonator_bound)
+            .sum::<Rat>(),
+        word_defects: word.residual(),
+        word_bound: word.bound.clone(),
+        closes: opening.closes()
+            && balances.iter().all(crate::hnn::word::FieldBalance::closes)
+            && word.closes(),
+    }
+}
+
+/// The later response's exact difference from a control's, station by station:
+/// `learned.logits - control.logits`, over the same stations, crossings and ticks.
+fn acceptance_difference(
+    learned: &[crate::hnn::prediction::StationRead],
+    control: &[crate::hnn::prediction::StationRead],
+) -> Vec<(usize, Vec<crate::ratio::Rat>)> {
+    assert_eq!(
+        learned.len(),
+        control.len(),
+        "the learned and control boundaries read the same stations"
+    );
+    learned
+        .iter()
+        .zip(control)
+        .map(|(l, c)| {
+            assert_eq!(
+                (l.station, l.crossing, l.tick),
+                (c.station, c.crossing, c.tick)
+            );
+            assert_eq!(l.read.logits.len(), c.read.logits.len());
+            let delta = l
+                .read
+                .logits
+                .iter()
+                .zip(&c.read.logits)
+                .map(|(a, b)| a - b)
+                .collect::<Vec<_>>();
+            (l.station, delta)
+        })
+        .collect()
+}
+
+/// The later communication of a physical point restored cold from exact text.
+struct AcceptanceCold {
+    text_bytes: usize,
+    same_material: bool,
+    same_carry: bool,
+    same_current: bool,
+    later: crate::hnn::physical::communication::PhysicalCommunication,
+}
+
+/// Save a receiver's physical point as exact text and mount it on a fresh founding, then run the
+/// later communication on the mounted point. This is the narrower material-and-carry remount the
+/// owner declares for a constitution-only save (`Reference::mount_continued`): the whole-passage
+/// save `Resident::continuing_state` refuses a receiving resident (`reference/passage.rs`, its
+/// receiving chart), so this is the only cold path a `PhysicalReceiver` has. The mount reads only
+/// the immutable field, a fresh founding constitution at the declared budget, the declared source
+/// frame at rest and the saved text: no predecessor material, carry, chart or current is borrowed.
+fn acceptance_cold(
+    field: &Field,
+    live: &PhysicalReceiver<'_>,
+    source: &crate::hnn::encoding::Encoded,
+    receiver: &ReceiverDeclaration,
+) -> Result<AcceptanceCold, crate::hnn::HnnError> {
+    use crate::hnn::constitution::ContinuingState;
+    use crate::hnn::reference::Reference;
+    let resident = live.resident();
+    let saved = resident
+        .constitution()
+        .continuing_state(field.sources()[0])?
+        .with_carry(resident.carried().cloned());
+    let text = saved.to_text();
+    let state = ContinuingState::from_text(&text)?;
+    let founding = Constitution::initial(field, resident.constitution().budget())?;
+    let restored = Reference::campaign_one().mount_continued(
+        field,
+        &Current::at_rest(field),
+        founding,
+        &state,
+    )?;
+    let same_material = restored.constitution() == resident.constitution();
+    let same_carry = restored.carried() == resident.carried();
+    let same_current = restored.current() == resident.current();
+    let mut cold = PhysicalReceiver::from_resident(field, restored)?;
+    let later = cold.communicate(source, receiver, |_| None)?;
+    Ok(AcceptanceCold {
+        text_bytes: text.len(),
+        same_material,
+        same_carry,
+        same_current,
+        later,
+    })
+}
+
+/// [agent-inferred, October 8; the medium-of-joints record, section 7; issue #73's gate] **The
+/// learned-change acceptance, READ on 0279's own task, family, material, receivers and observation**
+/// (`complete_contact_return_publishes_held_point_before_existing_communication`: source `[0, 1]`,
+/// observed `[0, 1, 3]`, station 2 compared, then the existing communication on source `[2, 1]` at
+/// the same entering end). A READING, NEVER AN ACCEPTANCE: the criteria below were fixed before any
+/// law change, this test asserts none of them and prints a label for each, and it is renamed into an
+/// asserting acceptance only when a certified landing makes all four hold.
+///
+/// 1. **Committed change.** A reached C/K/D deposit commits a nonzero lattice coordinate `q != 0`
+///    under its certified step: the family is not in `publication.publication.vanished`, its
+///    material moved, and every applied entry lies on the family's lattice (a movement off the
+///    lattice has no lattice coordinate, so it is refused as a reading and asserted against).
+///    [agent-inferred] The criterion is met when at least one reached family commits;
+///    each family's label is printed beside it, so a stricter all-three reading is visible.
+/// 2. **Later response.** The later response at the declared compared station (mask
+///    `[false, false, true]`, station 2) differs from the unmoved-material control by an exact
+///    nonzero amount, with station, crossing and tick identity checked. The whole field's
+///    difference is printed as a diagnostic only; a change at another station never passes the
+///    criterion.
+/// 3. **Energy accounting.** The world and material energy balance closes exactly: the opening
+///    receipt `E_after - E_before = imposed - absorbed` of the deposit's word and of the later word,
+///    the executed defects within their certified bounds, and the continuation's
+///    `committed - before = deposition_work` (its `opening_difference` is read, not checked: the
+///    owner defines it as `opening - committed`). [agent-inferred] The chain link joins the two
+///    balances: the later word opens on exactly the energy the deposit opened
+///    (`next.opening.before = continuation.opening`, both the power of the held change under the
+///    successor material at the same lift). The owners refuse a receipt that does not close, so
+///    the opening and held-work identities are zero on any receipt returned, and are asserted;
+///    the chain link is the one independent link, derived here rather than guaranteed by an owner,
+///    so it is printed and counted but not asserted. A closure over a deposit that committed
+///    nothing accounts for no learned change, so the criterion is met only when criterion 1 is (a
+///    no-change pass is never reported as learning).
+/// 4. **Cold continuation.** The same later-response difference survives a cold restore from exact
+///    text. It is met only when the restore reproduced the live material, carry and current, the
+///    cold word closes, the restored later response equals the live one, their differences from
+///    the control are equal, and that difference is nonzero (criterion 2). Equal output alone is
+///    not evidence that the saved point was restored.
+///    `PhysicalReceiver` has no whole-passage cold path (`Resident::continuing_state` refuses its
+///    receiving chart), so the restore is the narrower material-and-carry remount, and this test
+///    prints that refusal beside it.
+///
+/// The assertions are trust invariants only: the observation never enters its earlier forward;
+/// identical operands give identical boundaries (twice live, and across a cold restore of the
+/// unmoved control and of the learned point whenever the restore reproduces the live operands);
+/// the control is truly unmoved, at the learned point's entering end; the later response is
+/// source-sensitive (so equality with the control is not an insensitive output); the exact
+/// remainder, statistic and lineage identities of the deposit; and the energy identities wherever
+/// the owner guarantees them.
+///
+/// Recorded failures this reading refuses to repeat: a no-change pass reported as learning
+/// (criteria 3 and 4 need a committed change and a nonzero difference); an authored outcome (the
+/// only input is 0279's own observation, and every printed value is the machine's); a raised limit
+/// (every budget is the one the live material declares); a scalar or bit count read as progress (the
+/// count below counts named criteria, and says it is not an acceptance); cold continuation faked by
+/// reusing live state (the restored point is read back from exact text onto a fresh founding).
+#[test]
+fn the_learned_change_acceptance_is_read_on_the_complete_contact_return() {
+    use crate::hnn::constitution::{Carrier, FactorGradient, Family, Locus};
+    use crate::hnn::physical::contact::ContactObservation;
+    use crate::ratio::Rat;
+    use num_traits::Signed;
+    let started = std::time::Instant::now();
+    // 0279's own task, family, material, receivers and observation, unchanged.
+    let field = field();
+    let initial = contact_material(&field);
+    let current = Current::at_rest(&field);
+    let source = encoded(&field, &[0, 1]);
+    let compared = vec![false, false, true];
+    let observation = || ContactObservation {
+        observed: encoded(&field, &[0, 1, 3]),
+        compared: compared.clone(),
+    };
+    let mut actual =
+        PhysicalReceiver::new(&field, initial.clone(), current.clone(), WordOpening::Rest).unwrap();
+    let mut untouched =
+        PhysicalReceiver::new(&field, initial.clone(), current.clone(), WordOpening::Rest).unwrap();
+    let blind = untouched
+        .communicate_contact(&source, &receiver(), |_| None)
+        .unwrap();
+    let taught = actual
+        .communicate_contact(&source, &receiver(), |boundary| {
+            assert_eq!(
+                boundary, &blind.boundary,
+                "observation cannot enter its earlier forward"
+            );
+            Some(observation())
+        })
+        .unwrap();
+    assert!(blind.closes() && taught.closes());
+    assert_eq!(taught.boundary, blind.boundary);
+    assert_eq!(taught.blind_carry, blind.carry);
+    assert_eq!(
+        taught.carry.ticks, 3,
+        "full ticks keep their actual complete crossing"
+    );
+    let publication = taught.comparison.as_ref().unwrap().as_ref().unwrap();
+    let material = actual.constitution().clone();
+    let entering = actual.opening();
+    // 0279's resident hand-off, then its controls on the learned point's entering end.
+    let common = actual.into_resident();
+    assert_eq!(common.constitution(), &material);
+    assert_eq!(common.current(), &current);
+    assert_eq!(common.carried(), Some(&taught.carry));
+    assert!(common.carry_error().is_none());
+    let mut actual = PhysicalReceiver::from_resident(&field, common).unwrap();
+    let other_source = encoded(&field, &[2, 1]);
+    let mut prior =
+        PhysicalReceiver::new(&field, initial.clone(), current.clone(), entering.clone()).unwrap();
+    // A determinism control on identical operands, never a selection among releases.
+    let mut again =
+        PhysicalReceiver::new(&field, initial.clone(), current.clone(), entering.clone()).unwrap();
+    let mut other =
+        PhysicalReceiver::new(&field, material.clone(), current.clone(), entering.clone()).unwrap();
+    assert_eq!(
+        prior.opening(),
+        entering,
+        "the control shares the learned point's entering end"
+    );
+    // The cold save is taken from the post-deposit point, before that point communicates again.
+    let passage = actual.resident().continuing_state(field.sources()[0]);
+    let cold = acceptance_cold(&field, &actual, &other_source, &receiver());
+    // The same cold mechanism on the unmoved control, which isolates it from any learned change.
+    let cold_control = acceptance_cold(&field, &prior, &other_source, &receiver());
+    let next = actual
+        .communicate(&other_source, &receiver(), |_| None)
+        .unwrap();
+    let old_material = prior
+        .communicate(&other_source, &receiver(), |_| None)
+        .unwrap();
+    let old_again = again
+        .communicate(&other_source, &receiver(), |_| None)
+        .unwrap();
+    let old_source = other.communicate(&source, &receiver(), |_| None).unwrap();
+
+    println!(
+        "learned-change acceptance READING on 0279's own task: source [0, 1], observed [0, 1, 3], \
+         compared {compared:?} (the producing chart and the source prefix stay intact: the owner \
+         admitted the comparison), then the existing communication on source [2, 1] at the same \
+         entering end. The criteria were fixed before any law change: (1) a reached C/K/D deposit \
+         commits q != 0 under its certified step; (2) the later response differs from the \
+         unmoved-material control by an exact nonzero amount; (3) the world and material energy \
+         balance closes exactly on a committed change; (4) that difference survives a cold restore. \
+         The three families deposit together and the owner offers no single-family control, so \
+         criterion 1 is read per family (C, K, D) and criteria 2 to 4 jointly."
+    );
+
+    // Criterion 1: a reached C/K/D deposit commits q != 0 under its certified step.
+    let locus = Locus::Channel(0);
+    let lattice = initial.lattice(locus).expect("the contact's lattice");
+    let half_unit = lattice.unit() / integer(2);
+    let half_reading = acceptance_exact(&half_unit);
+    let prior_remainders = initial.carried_remainders();
+    let next_remainders = material.carried_remainders();
+    let carried = |xs: &[(Locus, Carrier, usize, Rat)], carrier: Carrier, entry: usize| -> Rat {
+        xs.iter()
+            .filter(|(l, c, i, _)| *l == locus && *c == carrier && *i == entry)
+            .map(|(_, _, _, r)| r.clone())
+            .sum::<Rat>()
+    };
+    let released = |carrier: Carrier, entry: usize| -> Rat {
+        publication
+            .publication
+            .released
+            .iter()
+            .filter(|(l, c, i, _)| *l == locus && *c == carrier && *i == entry)
+            .map(|(_, _, _, r)| r.clone())
+            .sum::<Rat>()
+    };
+    let mut committed_families = 0usize;
+    let mut lineage = true;
+    let mut remainder_split = true;
+    let mut statistic_split = true;
+    let mut on_lattice = true;
+    for (f, name) in ["C", "K", "D"].into_iter().enumerate() {
+        let family = Family::Factor(f);
+        let eta = publication.publication.family_step(locus, family);
+        let vanished = publication.publication.vanished.contains(&(locus, family));
+        let (before_factor, after_factor) = match f {
+            0 => (initial.contact_storage(0), material.contact_storage(0)),
+            1 => (initial.contact_stiffness(0), material.contact_stiffness(0)),
+            _ => (
+                initial.contact_dissipation(0),
+                material.contact_dissipation(0),
+            ),
+        };
+        let moved = after_factor != before_factor;
+        let movement = publication
+            .continuation
+            .material
+            .iter()
+            .find(|m| m.contact == 0 && m.family == family)
+            .unwrap_or_else(|| panic!("the actual deposit applied no family-{f} movement"));
+        let reached = publication
+            .comparison_return
+            .factors()
+            .iter()
+            .find(|s| s.gradient.locus() == locus && s.gradient.family() == family)
+            .unwrap_or_else(|| panic!("the actual deposit returned no family-{f} gradient"));
+        let gradient = match &reached.gradient {
+            FactorGradient::Storage { gradient, .. }
+            | FactorGradient::Stiffness { gradient, .. }
+            | FactorGradient::Dissipation { gradient, .. } => gradient,
+            _ => unreachable!("a contact family returns a Gram-factor gradient"),
+        };
+        let statistic = &material.contact_scales(0)[f];
+        // This fixture's stiffness signature is the identity, as in the neighbouring controls.
+        let proposed = gradient.scaled(&(&eta / statistic));
+        // The applied lattice coordinates q of the movement the deposit actually committed.
+        let coordinates: Vec<_> = movement
+            .factor
+            .entries()
+            .iter()
+            .map(|entry| lattice.div_rem(entry))
+            .collect();
+        let entries = coordinates.len();
+        let off_lattice = coordinates.iter().filter(|(_, r)| !r.is_zero()).count();
+        on_lattice &= off_lattice == 0;
+        let q_nonzero = coordinates.iter().filter(|(q, _)| !q.is_zero()).count();
+        let q_largest = coordinates
+            .iter()
+            .map(|(q, _)| q.abs())
+            .max()
+            .unwrap_or_default();
+        // How far the proposed move (with the prior remainder it meets) is from the half-unit.
+        let largest_with_prior = proposed
+            .entries()
+            .iter()
+            .enumerate()
+            .map(|(i, d)| (d + carried(&prior_remainders, Carrier::Factor(f), i)).abs())
+            .max()
+            .unwrap_or_else(Rat::zero);
+        let shortfall = largest_with_prior
+            .is_positive()
+            .then(|| &half_unit / &largest_with_prior);
+        // The exact remainder split of the deposit, entry by entry: delta + r_prior = applied +
+        // r_next + released, and the applied factor reaches the resident unchanged.
+        for (i, (delta, applied)) in proposed
+            .entries()
+            .iter()
+            .zip(movement.factor.entries())
+            .enumerate()
+        {
+            remainder_split &= delta + carried(&prior_remainders, Carrier::Factor(f), i)
+                == applied
+                    + carried(&next_remainders, Carrier::Factor(f), i)
+                    + released(Carrier::Factor(f), i);
+        }
+        lineage &= before_factor.add(&movement.factor).unwrap() == *after_factor;
+        statistic_split &= &reached.energy + carried(&prior_remainders, Carrier::FactorScale(f), 0)
+            == statistic - &initial.contact_scales(0)[f]
+                + carried(&next_remainders, Carrier::FactorScale(f), 0)
+                + released(Carrier::FactorScale(f), 0);
+        let unresolved: Vec<Rat> = next_remainders
+            .iter()
+            .filter(|(l, c, _, _)| *l == locus && *c == Carrier::Factor(f))
+            .map(|(_, _, _, r)| r.clone())
+            .collect();
+        let unresolved_entries = unresolved.len();
+        let unresolved_nonzero = unresolved.iter().filter(|r| !r.is_zero()).count();
+        let unresolved_largest = unresolved
+            .iter()
+            .map(Signed::abs)
+            .max()
+            .unwrap_or_else(Rat::zero);
+        let committed =
+            !vanished && moved && off_lattice == 0 && q_nonzero > 0 && eta.is_positive();
+        committed_families += usize::from(committed);
+        let eta_reading = acceptance_exact(&eta);
+        let largest_reading = acceptance_exact(&largest_with_prior);
+        let shortfall_reading = shortfall
+            .as_ref()
+            .map_or("no positive proposed move".to_string(), acceptance_exact);
+        let unresolved_reading = acceptance_exact(&unresolved_largest);
+        let verdict = acceptance_verdict(committed);
+        println!(
+            "learned-change acceptance criterion 1 family {name}: certified eta={eta_reading} \
+             vanished={vanished} material_moved={moved}; applied lattice coordinates q != 0 at \
+             {q_nonzero} of {entries} entries (largest |q|={q_largest}, entries off the lattice=\
+             {off_lattice}); half_unit={half_reading}; largest |proposed + prior remainder|=\
+             {largest_reading}; half_unit/largest={shortfall_reading} (above 1 is the factor by \
+             which the move falls short of its cell); unresolved after the deposit: \
+             {unresolved_nonzero} of {unresolved_entries} entries nonzero, largest |r|=\
+             {unresolved_reading} => {verdict}"
+        );
+    }
+    let met1 = committed_families > 0;
+    println!(
+        "learned-change acceptance criterion 1 (a reached C/K/D deposit commits q != 0): \
+         {committed_families} of 3 families committed => {}",
+        acceptance_verdict(met1)
+    );
+
+    // Criterion 2: the later compared-station response against the unmoved-material control.
+    let difference =
+        acceptance_difference(next.boundary.readings(), old_material.boundary.readings());
+    let total_coordinates: usize = difference.iter().map(|(_, d)| d.len()).sum();
+    let changed_coordinates: usize = difference
+        .iter()
+        .map(|(_, d)| d.iter().filter(|x| !x.is_zero()).count())
+        .sum();
+    let squared: Rat = difference
+        .iter()
+        .flat_map(|(_, d)| d.iter())
+        .map(|x| x * x)
+        .sum();
+    // The criterion reads the declared compared station only; the field difference is diagnostic.
+    let compared_stations: Vec<usize> = compared
+        .iter()
+        .enumerate()
+        .filter(|(_, c)| **c)
+        .map(|(station, _)| station)
+        .collect();
+    let compared_present = difference
+        .iter()
+        .any(|(station, _)| compared_stations.contains(station));
+    let compared_changed: usize = difference
+        .iter()
+        .filter(|(station, _)| compared_stations.contains(station))
+        .map(|(_, d)| d.iter().filter(|x| !x.is_zero()).count())
+        .sum();
+    let met2 = compared_present && compared_changed > 0;
+    let cells_equal = next
+        .boundary
+        .readings()
+        .iter()
+        .zip(old_material.boundary.readings())
+        .all(|(a, b)| a.read.cells == b.read.cells);
+    let leaders_learned: Vec<_> = next
+        .boundary
+        .readings()
+        .iter()
+        .map(|r| r.leaders())
+        .collect();
+    let leaders_control: Vec<_> = old_material
+        .boundary
+        .readings()
+        .iter()
+        .map(|r| r.leaders())
+        .collect();
+    let difference_reading = if met2 {
+        difference
+            .iter()
+            .map(|(station, d)| {
+                let entries = d.iter().map(acceptance_exact).collect::<Vec<_>>();
+                format!("station {station}: [{}]", entries.join(", "))
+            })
+            .collect::<Vec<_>>()
+            .join("; ")
+    } else {
+        format!("all {total_coordinates} logit coordinates are equal")
+    };
+    let squared_reading = acceptance_exact(&squared);
+    // The cells that respond: a class is realified as its (Re, Im) logits, so class c is
+    // coordinates 2c and 2c + 1.
+    let distinguishing: Vec<(usize, Vec<usize>)> = difference
+        .iter()
+        .map(|(station, d)| {
+            let classes = (0..d.len() / 2)
+                .filter(|&c| !d[2 * c].is_zero() || !d[2 * c + 1].is_zero())
+                .collect::<Vec<_>>();
+            (*station, classes)
+        })
+        .collect();
+    let attribution = if met2 && !met1 {
+        " (no family committed, so this difference is not attributed to a landing)"
+    } else {
+        ""
+    };
+    println!(
+        "learned-change acceptance criterion 2 (the later response differs from the unmoved-material \
+         control): at the compared station(s) {compared_stations:?} (present={compared_present}), \
+         {compared_changed} coordinates differ; diagnostic over the whole field: \
+         {changed_coordinates} of {total_coordinates} realified logit coordinates differ; \
+         difference (learned - control) = {difference_reading}; |difference|^2={squared_reading}; \
+         distinguishing classes by station={distinguishing:?}; grain cells equal={cells_equal}; \
+         leaders learned={leaders_learned:?} control={leaders_control:?}{attribution} => {}",
+        acceptance_verdict(met2)
+    );
+
+    // Criterion 3: the world and material energy balance.
+    let continuation = &publication.continuation;
+    let deposit_world = acceptance_world(&taught.opening, &taught.balances, &taught.word);
+    let later_world = acceptance_world(&next.opening, &next.balances, &next.word);
+    let held_work_gap =
+        (&continuation.committed - &continuation.before) - &continuation.deposition_work;
+    // The chain link between the two balances: the deposit hands the later word the energy it
+    // opened (both are the power of the held change under the successor material, at the same
+    // lift), so the later opening starts exactly where the deposit left the energy.
+    let chain_gap = &next.opening.before - &continuation.opening;
+    let identities_exact = deposit_world.closes
+        && later_world.closes
+        && deposit_world.opening_gap.is_zero()
+        && later_world.opening_gap.is_zero()
+        && held_work_gap.is_zero()
+        && chain_gap.is_zero();
+    let identity_residual: Rat = [
+        &deposit_world.opening_gap,
+        &later_world.opening_gap,
+        &held_work_gap,
+        &chain_gap,
+    ]
+    .into_iter()
+    .map(|gap| gap.abs())
+    .sum();
+    let met3 = identities_exact && met1;
+    for (what, world) in [
+        ("deposit word", &deposit_world),
+        ("later word", &later_world),
+    ] {
+        let moved = acceptance_exact(&world.moved);
+        let supplied = acceptance_exact(&world.supplied);
+        let gap = acceptance_exact(&world.opening_gap);
+        let ticks = world.ticks;
+        let tick_defects = acceptance_exact(&world.tick_defects);
+        let tick_bound = acceptance_exact(&world.tick_bound);
+        let word_defects = acceptance_exact(&world.word_defects);
+        let word_bound = acceptance_exact(&world.word_bound);
+        let closes = world.closes;
+        println!(
+            "learned-change acceptance criterion 3 {what}: opening E_after - E_before={moved} \
+             imposed - absorbed={supplied} residual={gap}; executed defects over {ticks} ticks=\
+             {tick_defects} within bound {tick_bound}; whole-word defects={word_defects} within \
+             bound {word_bound}; the owner's receipts close={closes}"
+        );
+    }
+    let held_before = acceptance_exact(&continuation.before);
+    let held_committed = acceptance_exact(&continuation.committed);
+    let held_work = acceptance_exact(&continuation.deposition_work);
+    let held_gap = acceptance_exact(&held_work_gap);
+    let opened_difference = acceptance_exact(&continuation.opening_difference);
+    let chain_residual = acceptance_exact(&chain_gap);
+    let storage_growth = acceptance_exact(&publication.publication.storage_growth);
+    let storage_product = acceptance_exact(&publication.publication.storage_product);
+    let momentum_growth = continuation
+        .held_momentum_growth
+        .as_ref()
+        .map_or("none (no uniform bound)".to_string(), acceptance_exact);
+    println!(
+        "learned-change acceptance criterion 3 material: before={held_before} \
+         committed={held_committed} deposition_work={held_work} (committed - before - work \
+         residual={held_gap}); the owner's opening difference (opening - committed, its own \
+         definition)={opened_difference}; chain link (the later word's opening E_before - the \
+         deposit's opened energy)={chain_residual}; certified storage_growth={storage_growth} \
+         storage_product={storage_product} held_momentum_growth={momentum_growth}"
+    );
+    let vacuity = if identities_exact && !met1 {
+        " (the identities close exactly over a deposit that committed nothing: a no-change \
+         closure, not reported as learning)"
+    } else {
+        ""
+    };
+    let identity_residual_reading = acceptance_exact(&identity_residual);
+    println!(
+        "learned-change acceptance criterion 3 (the world and material energy balance closes \
+         exactly on a committed change): identities close exactly={identities_exact} (sum of the \
+         absolute opening, held-work and chain residuals={identity_residual_reading}) \
+         committed change present={met1}{vacuity} => {}",
+        acceptance_verdict(met3)
+    );
+
+    // Criterion 4: the same later-response difference survives a cold restore.
+    // Whether the fresh founding shares the live material's declared identity, which the owner's
+    // `Constitution::continued` requires of the opening a state is restored onto.
+    let founding_matches = Constitution::initial(&field, material.budget())
+        .map(|founding| founding.material_identity() == material.material_identity());
+    let passage_reading = match &passage {
+        Ok(_) => "admitted (the whole passage was saved)".to_string(),
+        Err(refusal) => format!("REFUSED {refusal:?}"),
+    };
+    let (survives, cold_reading) = match &cold {
+        Err(refusal) => (
+            false,
+            format!("the narrower material-and-carry cold remount was REFUSED {refusal:?}"),
+        ),
+        Ok(restored) => {
+            // The cold difference is comparable only when the restored carry reproduces the
+            // entering end, so that the stations, crossings and ticks are the same.
+            let same_difference = restored.same_carry
+                && acceptance_difference(
+                    restored.later.boundary.readings(),
+                    old_material.boundary.readings(),
+                ) == difference;
+            let same_response = restored.later.boundary.readings() == next.boundary.readings();
+            let bytes = restored.text_bytes;
+            let (material_back, carry_back, current_back) = (
+                restored.same_material,
+                restored.same_carry,
+                restored.same_current,
+            );
+            let closes = restored.later.closes();
+            (
+                material_back
+                    && carry_back
+                    && current_back
+                    && closes
+                    && same_response
+                    && same_difference
+                    && met2,
+                format!(
+                    "the narrower material-and-carry cold remount ({bytes} bytes of exact text, a \
+                     fresh founding at the declared budget): restored material == live \
+                     {material_back}, carry == live {carry_back}, current == live \
+                     {current_back}; cold later response == live later response \
+                     {same_response}; cold difference == live difference {same_difference}; the \
+                     cold word closes={closes}"
+                ),
+            )
+        }
+    };
+    let cold_control_reading = match &cold_control {
+        Err(refusal) => format!("REFUSED {refusal:?}"),
+        Ok(restored) => {
+            let reproduced = restored.same_material && restored.same_carry && restored.same_current;
+            let same_boundary = restored.later.boundary == old_material.boundary;
+            format!(
+                "operands reproduced={reproduced}, later boundary equals the live control's=\
+                 {same_boundary}"
+            )
+        }
+    };
+    let met4 = survives;
+    println!(
+        "learned-change acceptance criterion 4 (the same later-response difference survives a \
+         cold restore): whole-passage Resident::continuing_state on this physical resident: \
+         {passage_reading}; fresh founding shares the live material's declared identity=\
+         {founding_matches:?}; {cold_reading}; the same cold mechanism on the unmoved control: \
+         {cold_control_reading}; difference nonzero={met2} => {}",
+        acceptance_verdict(met4)
+    );
+
+    // The assertions that let the readings above be trusted. None asserts that a criterion is met.
+    assert_eq!(publication.comparison_return.commit(), initial.commit());
+    assert_eq!(publication.publication.commit, material.commit());
+    assert!(
+        lineage,
+        "each family's applied factor reaches the resident unchanged"
+    );
+    assert!(
+        on_lattice,
+        "every applied movement lies on its family's lattice, so q reads a lattice coordinate"
+    );
+    assert!(
+        remainder_split,
+        "delta + r_prior = applied + r_next + released, exactly, entry by entry"
+    );
+    assert!(
+        statistic_split,
+        "the reached energy splits into applied statistic, retained and released parts"
+    );
+    assert!(
+        deposit_world.closes && later_world.closes,
+        "the owner's world receipts close"
+    );
+    assert!(
+        deposit_world.opening_gap.is_zero()
+            && later_world.opening_gap.is_zero()
+            && held_work_gap.is_zero(),
+        "the owner's energy identities have no residual"
+    );
+    assert!(next.closes() && old_material.closes() && old_again.closes() && old_source.closes());
+    assert_eq!(next.carry.ticks, taught.carry.ticks + 2);
+    assert_eq!(old_material.carry.ticks, next.carry.ticks);
+    assert_eq!(
+        prior.constitution(),
+        &initial,
+        "the control is truly unmoved"
+    );
+    assert_eq!(again.constitution(), &initial);
+    assert_eq!(
+        old_again.boundary, old_material.boundary,
+        "identical operands give identical boundaries"
+    );
+    assert_eq!(old_again.carry, old_material.carry);
+    assert_ne!(
+        next.boundary.readings(),
+        old_source.boundary.readings(),
+        "the later response is source-sensitive, so equality with the control is not an \
+         insensitive output"
+    );
+    if let Ok(restored) = &cold {
+        let reproduced = restored.same_material && restored.same_carry && restored.same_current;
+        if reproduced {
+            assert_eq!(
+                restored.later.boundary, next.boundary,
+                "identical operands give identical boundaries across a cold restore"
+            );
+            assert_eq!(restored.later.carry, next.carry);
+        }
+    }
+    if let Ok(restored) = &cold_control {
+        let reproduced = restored.same_material && restored.same_carry && restored.same_current;
+        if reproduced {
+            assert_eq!(
+                restored.later.boundary, old_material.boundary,
+                "identical operands give identical boundaries across a cold restore of the control"
+            );
+            assert_eq!(restored.later.carry, old_material.carry);
+        }
+    }
+    println!(
+        "learned-change acceptance: every trust assertion passed; the readings above are verified"
+    );
+    println!(
+        "learned-change acceptance timing: elapsed_ns={}",
+        started.elapsed().as_nanos()
+    );
+    let met = [met1, met2, met3, met4];
+    let count = met.iter().filter(|m| **m).count();
+    println!(
+        "learned-change acceptance: {count} of 4 criteria met (NOT accepted until 4 of 4 under a \
+         certified step)"
+    );
+}
+
 #[test]
 fn a_shared_execution_clock_reanchors_the_next_section_without_resetting_its_carry() {
     use crate::hnn::port::ExecutionPort;
@@ -1362,4 +2567,411 @@ fn one_future_communication_keeps_refusal_and_multi_future_admission_honest() {
         panic!("blind end retained")
     };
     assert_eq!(carry, &refused.carry);
+}
+
+/// [agent-inferred, October 9; the medium-of-joints record, section 7] **The finite-decrease
+/// landing, READ on 0279's own flow** (source `[0, 1]`, observed `[0, 1, 3]`, station 2 compared,
+/// then the existing communication on source `[2, 1]` at the same entering end). The W0 flow now
+/// issues ONE declared candidate on its Rest-opened comparison: each reached family at its first
+/// reach, re-read on a transient Word of the same declared passage, admitted only on an exact,
+/// strict improvement (`upper(L′) < lower(L)` with `X′ ≤ X`, or the reading-identity witness with
+/// `X′ < X`); a typed refusal continues on the certified step exactly as before. The outcome,
+/// admitted or refused, is a measurement and is never forced.
+///
+/// It prints `L`, `L′`, `X`, `X′`, the declared exponents, the committed `q` per family and `e`, all
+/// exact, and the four learned-change criteria as the acceptance reader reads them (PASS or
+/// NOT-MET). It asserts only the admission's own laws and trust invariants, never a criterion: the
+/// admission re-reads from its two ratios; the published material, publication and committed reach
+/// are the admitted candidate's (or, refused, the certified successor's); `e` sits at the cut's
+/// absolute tick; the carry identity, lineage and lattice of the applied movement; and the energy
+/// identities the owners guarantee. The admission certifies only that `θ′` reads the declared
+/// same-Rest comparison no worse classically and strictly better in one part; criteria 2 to 4 stay
+/// measured outcomes.
+#[test]
+fn the_finite_decrease_landing_is_read_on_the_complete_contact_return() {
+    use crate::hnn::constitution::{Carrier, FactorGradient, Family, Locus};
+    use crate::hnn::physical::contact::ContactObservation;
+    use crate::hnn::word::continuation::admit;
+    use crate::ratio::Rat;
+    use num_traits::Signed;
+    let started = std::time::Instant::now();
+    let field = field();
+    let initial = contact_material(&field);
+    let current = Current::at_rest(&field);
+    let source = encoded(&field, &[0, 1]);
+    let compared = vec![false, false, true];
+    let observation = || ContactObservation {
+        observed: encoded(&field, &[0, 1, 3]),
+        compared: compared.clone(),
+    };
+    let mut actual =
+        PhysicalReceiver::new(&field, initial.clone(), current.clone(), WordOpening::Rest).unwrap();
+    let mut untouched =
+        PhysicalReceiver::new(&field, initial.clone(), current.clone(), WordOpening::Rest).unwrap();
+    let blind = untouched
+        .communicate_contact(&source, &receiver(), |_| None)
+        .unwrap();
+    let taught = actual
+        .communicate_contact(&source, &receiver(), |boundary| {
+            assert_eq!(
+                boundary, &blind.boundary,
+                "observation cannot enter its earlier forward"
+            );
+            Some(observation())
+        })
+        .unwrap();
+    let taught_ns = started.elapsed().as_nanos();
+    assert!(blind.closes() && taught.closes());
+    assert_eq!(taught.boundary, blind.boundary);
+    assert_eq!(taught.blind_carry, blind.carry);
+    assert_eq!(
+        taught.carry.ticks, 3,
+        "full ticks keep their actual complete crossing"
+    );
+    let publication = taught.comparison.as_ref().unwrap().as_ref().unwrap();
+    let landing = &publication.landing;
+    let material = actual.constitution().clone();
+    let locus = Locus::Channel(0);
+
+    // The landing's exact readings: L and X of the producing comparison, L′ and X′ of the
+    // candidate's re-read, the declared exponents, the committed q, the outcome and e.
+    let code = publication.ratio.code_length().unwrap();
+    let excess = publication.ratio.excess();
+    println!(
+        "finite-decrease landing READING on 0279's own task: L=[{}, {}] X={}",
+        acceptance_exact(&code.lower),
+        acceptance_exact(&code.upper),
+        acceptance_exact(&excess)
+    );
+    match &landing.candidate {
+        Some(candidate) => {
+            let candidate_code = candidate.ratio().code_length().unwrap();
+            println!(
+                "finite-decrease landing candidate: L′=[{}, {}] X′={} support={:?} tick={}",
+                acceptance_exact(&candidate_code.lower),
+                acceptance_exact(&candidate_code.upper),
+                acceptance_exact(&candidate.ratio().excess()),
+                candidate.support(),
+                candidate.tick()
+            );
+            for (key, moved) in &candidate.committed().families {
+                println!("finite-decrease landing committed {key:?}: (entry, q) = {moved:?}");
+            }
+        }
+        None => println!("finite-decrease landing candidate: not read"),
+    }
+    match &landing.declared {
+        Some(declared) => {
+            for (key, step) in declared.families_with_steps() {
+                let reach = step.reach.as_ref();
+                println!(
+                    "finite-decrease landing declared {key:?}: k_f={} k_cert={:?} endpoint={:?} \
+                     proposed (entry, q)={:?}",
+                    step.exponent,
+                    reach.map(|r| r.certified),
+                    reach.map(|r| r.endpoint),
+                    reach.map(|r| &r.reached)
+                );
+            }
+        }
+        None => println!("finite-decrease landing declared exponents: not read"),
+    }
+    match &landing.outcome {
+        Ok(admission) => println!(
+            "finite-decrease landing: ADMITTED ({:?})",
+            admission.admitted()
+        ),
+        Err(refusal) => println!("finite-decrease landing: REFUSED {refusal:?}"),
+    }
+    match &publication.continuation.landing {
+        Some(e) => {
+            let coordinates: Vec<&Rat> = e
+                .difference
+                .storage
+                .iter()
+                .flatten()
+                .chain(e.difference.arrivals.iter().flatten().flatten())
+                .chain(e.difference.states.iter().flatten().flatten())
+                .chain(e.difference.resonators.iter().flatten().flatten().flatten())
+                .collect();
+            let nonzero: Vec<String> = coordinates
+                .iter()
+                .filter(|x| !x.is_zero())
+                .map(|x| acceptance_exact(x))
+                .collect();
+            println!(
+                "finite-decrease landing e = candidate_end - held at tick {}: {} of {} coordinates \
+                 nonzero: [{}]",
+                e.tick,
+                nonzero.len(),
+                coordinates.len(),
+                nonzero.join(", ")
+            );
+        }
+        None => println!("finite-decrease landing e: none (no admitted continuation)"),
+    }
+
+    // Criterion 1, read as the acceptance reader reads it.
+    let lattice = initial.lattice(locus).expect("the contact's lattice");
+    let carried = |xs: &[(Locus, Carrier, usize, Rat)], carrier: Carrier, entry: usize| -> Rat {
+        xs.iter()
+            .filter(|(l, c, i, _)| *l == locus && *c == carrier && *i == entry)
+            .map(|(_, _, _, r)| r.clone())
+            .sum::<Rat>()
+    };
+    let prior_remainders = initial.carried_remainders();
+    let next_remainders = material.carried_remainders();
+    let mut committed_families = 0usize;
+    let (mut lineage, mut on_lattice, mut remainder_split) = (true, true, true);
+    for (f, name) in ["C", "K", "D"].into_iter().enumerate() {
+        let family = Family::Factor(f);
+        let eta = publication.publication.family_step(locus, family);
+        let vanished = publication.publication.vanished.contains(&(locus, family));
+        let (before_factor, after_factor) = match f {
+            0 => (initial.contact_storage(0), material.contact_storage(0)),
+            1 => (initial.contact_stiffness(0), material.contact_stiffness(0)),
+            _ => (
+                initial.contact_dissipation(0),
+                material.contact_dissipation(0),
+            ),
+        };
+        let moved = after_factor != before_factor;
+        let movement = publication
+            .continuation
+            .material
+            .iter()
+            .find(|m| m.contact == 0 && m.family == family)
+            .unwrap_or_else(|| panic!("the actual deposit applied no family-{f} movement"));
+        let reached = publication
+            .comparison_return
+            .factors()
+            .iter()
+            .find(|s| s.gradient.locus() == locus && s.gradient.family() == family)
+            .unwrap_or_else(|| panic!("the actual deposit returned no family-{f} gradient"));
+        let gradient = match &reached.gradient {
+            FactorGradient::Storage { gradient, .. }
+            | FactorGradient::Stiffness { gradient, .. }
+            | FactorGradient::Dissipation { gradient, .. } => gradient,
+            _ => unreachable!("a contact family returns a Gram-factor gradient"),
+        };
+        let statistic = &material.contact_scales(0)[f];
+        let proposed = gradient.scaled(&(&eta / statistic));
+        let coordinates: Vec<_> = movement
+            .factor
+            .entries()
+            .iter()
+            .map(|entry| lattice.div_rem(entry))
+            .collect();
+        let off_lattice = coordinates.iter().filter(|(_, r)| !r.is_zero()).count();
+        on_lattice &= off_lattice == 0;
+        let q_nonzero = coordinates.iter().filter(|(q, _)| !q.is_zero()).count();
+        let q_largest = coordinates
+            .iter()
+            .map(|(q, _)| q.abs())
+            .max()
+            .unwrap_or_default();
+        for (i, (delta, applied)) in proposed
+            .entries()
+            .iter()
+            .zip(movement.factor.entries())
+            .enumerate()
+        {
+            let released = publication
+                .publication
+                .released
+                .iter()
+                .filter(|(l, c, j, _)| *l == locus && *c == Carrier::Factor(f) && *j == i)
+                .map(|(_, _, _, r)| r.clone())
+                .sum::<Rat>();
+            remainder_split &= delta + carried(&prior_remainders, Carrier::Factor(f), i)
+                == applied + carried(&next_remainders, Carrier::Factor(f), i) + released;
+        }
+        lineage &= before_factor.add(&movement.factor).unwrap() == *after_factor;
+        let committed =
+            !vanished && moved && off_lattice == 0 && q_nonzero > 0 && eta.is_positive();
+        committed_families += usize::from(committed);
+        println!(
+            "finite-decrease landing criterion 1 family {name}: published eta={} vanished={vanished} \
+             material_moved={moved}; applied q != 0 at {q_nonzero} of {} entries (largest |q|=\
+             {q_largest}) => {}",
+            acceptance_exact(&eta),
+            coordinates.len(),
+            acceptance_verdict(committed)
+        );
+    }
+    let met1 = committed_families > 0;
+
+    // Criteria 2 to 4: the later communication against the unmoved control at the same entering
+    // end, the energy accounting, and the cold restore.
+    let entering = actual.opening();
+    let common = actual.into_resident();
+    let mut actual = PhysicalReceiver::from_resident(&field, common).unwrap();
+    let other_source = encoded(&field, &[2, 1]);
+    let mut prior =
+        PhysicalReceiver::new(&field, initial.clone(), current.clone(), entering.clone()).unwrap();
+    assert_eq!(prior.opening(), entering, "the control shares the learned point's entering end");
+    let cold = acceptance_cold(&field, &actual, &other_source, &receiver());
+    let next = actual
+        .communicate(&other_source, &receiver(), |_| None)
+        .unwrap();
+    let old_material = prior
+        .communicate(&other_source, &receiver(), |_| None)
+        .unwrap();
+    let difference =
+        acceptance_difference(next.boundary.readings(), old_material.boundary.readings());
+    let compared_stations: Vec<usize> = compared
+        .iter()
+        .enumerate()
+        .filter(|(_, c)| **c)
+        .map(|(station, _)| station)
+        .collect();
+    let compared_present = difference
+        .iter()
+        .any(|(station, _)| compared_stations.contains(station));
+    let compared_changed: usize = difference
+        .iter()
+        .filter(|(station, _)| compared_stations.contains(station))
+        .map(|(_, d)| d.iter().filter(|x| !x.is_zero()).count())
+        .sum();
+    let met2 = compared_present && compared_changed > 0;
+    let continuation = &publication.continuation;
+    let deposit_world = acceptance_world(&taught.opening, &taught.balances, &taught.word);
+    let later_world = acceptance_world(&next.opening, &next.balances, &next.word);
+    let held_work_gap =
+        (&continuation.committed - &continuation.before) - &continuation.deposition_work;
+    let chain_gap = &next.opening.before - &continuation.opening;
+    let identities_exact = deposit_world.closes
+        && later_world.closes
+        && deposit_world.opening_gap.is_zero()
+        && later_world.opening_gap.is_zero()
+        && held_work_gap.is_zero()
+        && chain_gap.is_zero();
+    let met3 = identities_exact && met1;
+    let met4 = match &cold {
+        Ok(restored) => {
+            restored.same_material
+                && restored.same_carry
+                && restored.same_current
+                && restored.later.closes()
+                && restored.later.boundary.readings() == next.boundary.readings()
+                && acceptance_difference(
+                    restored.later.boundary.readings(),
+                    old_material.boundary.readings(),
+                ) == difference
+                && met2
+        }
+        Err(_) => false,
+    };
+    println!(
+        "finite-decrease landing criterion 1 (a reached C/K/D deposit commits q != 0): \
+         {committed_families} of 3 families => {}",
+        acceptance_verdict(met1)
+    );
+    println!(
+        "finite-decrease landing criterion 2 (the later compared-station response differs from the \
+         unmoved-material control): {compared_changed} coordinates differ at {compared_stations:?} \
+         => {}",
+        acceptance_verdict(met2)
+    );
+    println!(
+        "finite-decrease landing criterion 3 (the world and material energy balance closes exactly \
+         on a committed change): identities exact={identities_exact}, chain residual={} => {}",
+        acceptance_exact(&chain_gap),
+        acceptance_verdict(met3)
+    );
+    println!(
+        "finite-decrease landing criterion 4 (the same difference survives a cold restore): \
+         restore={} => {}",
+        match &cold {
+            Ok(restored) => format!(
+                "material={} carry={} current={}",
+                restored.same_material, restored.same_carry, restored.same_current
+            ),
+            Err(refusal) => format!("REFUSED {refusal:?}"),
+        },
+        acceptance_verdict(met4)
+    );
+
+    // The admission's own laws and the trust invariants. None asserts a criterion.
+    if let Some(declared) = &landing.declared {
+        for ((at, _), step) in declared.families_with_steps() {
+            let reach = step.reach.as_ref().expect("the first-reach read claims its families");
+            assert_eq!(*at, locus);
+            assert_eq!(step.exponent, reach.exponent);
+            assert!(reach.certified <= reach.exponent && reach.exponent <= reach.endpoint);
+            assert!(!reach.reached.is_empty() && reach.reached.iter().all(|(_, q)| !q.is_zero()));
+        }
+    }
+    match &landing.outcome {
+        Ok(admission) => {
+            let candidate = landing
+                .candidate
+                .as_ref()
+                .expect("an admitted candidate was read");
+            assert_eq!(candidate, admission.candidate());
+            assert_eq!(admission.ratio(), &publication.ratio);
+            assert_eq!(
+                admit(&publication.ratio, candidate.ratio()),
+                Ok(admission.admitted()),
+                "the admission re-reads from its two ratios"
+            );
+            assert_eq!(&material, candidate.theta(), "the published material is the candidate");
+            assert_eq!(&publication.publication, candidate.publication());
+            for (key, step) in candidate.declared().families_with_steps() {
+                assert_eq!(
+                    candidate.committed().families.get(key),
+                    step.reach.as_ref().map(|reach| &reach.reached),
+                    "the committed reach is the proposed reach"
+                );
+            }
+            let e = continuation
+                .landing
+                .as_ref()
+                .expect("the admitted continuation reads e");
+            assert_eq!(e.tick, taught.carry.ticks, "e sits at the cut's absolute tick");
+        }
+        Err(_) => {
+            assert!(continuation.landing.is_none());
+            let operands =
+                crate::hnn::propagation::Operands::exact_at_cut(&field, &initial, &current).unwrap();
+            let spans = crate::hnn::word::finite_gain::FiniteContactSpans::of(
+                &operands,
+                0,
+                publication.comparison_return.reach().unwrap(),
+            )
+            .unwrap();
+            let (native, reading) = initial
+                .deposited_with_contact_spans(&publication.comparison_return, &spans)
+                .unwrap();
+            assert_eq!(material, native, "a refused landing continues on the certified step");
+            assert_eq!(publication.publication, reading);
+        }
+    }
+    assert!(lineage, "each family's applied factor reaches the resident unchanged");
+    assert!(on_lattice, "every applied movement lies on its family's lattice");
+    assert!(
+        remainder_split,
+        "delta + r_prior = applied + r_next + released, exactly, entry by entry"
+    );
+    assert!(
+        deposit_world.closes && later_world.closes,
+        "the owner's world receipts close"
+    );
+    assert!(
+        deposit_world.opening_gap.is_zero()
+            && later_world.opening_gap.is_zero()
+            && held_work_gap.is_zero(),
+        "the owner's energy identities have no residual"
+    );
+    assert!(next.closes() && old_material.closes());
+    assert_eq!(next.carry.ticks, taught.carry.ticks + 2);
+    assert_eq!(prior.constitution(), &initial, "the control is truly unmoved");
+    println!("finite-decrease landing: every trust assertion passed; the readings above are verified");
+    let met = [met1, met2, met3, met4];
+    println!(
+        "finite-decrease landing: {} of 4 criteria met (a reading, not an acceptance); timing: \
+         taught_ns={taught_ns} elapsed_ns={}",
+        met.iter().filter(|m| **m).count(),
+        started.elapsed().as_nanos()
+    );
 }

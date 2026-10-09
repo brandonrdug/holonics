@@ -8,15 +8,47 @@
 //! stationary chart is a receiver analysis, not the executed state. Ring/pump/source-map changes
 //! need their own transported return and are not silently treated as contact-coordinate changes
 //! here.
+//!
+//! [definition; agent-inferred, October 9; the medium-of-joints record §7, passed by Epime's
+//! source review] **The finite-decrease landing.** The certified contact step sits 20 to 22 binary
+//! orders below the material lattice's half-unit, so its applied factor change is zero and the move
+//! stays in the remainder. The landing is an a posteriori admission of ONE declared candidate per
+//! deposit:
+//! - the native deposit law declares each reached family's first reach `k_f`, the least
+//!   `k ≥ k_cert(f)` at which the owner's own split of `2^k d_{f,i} + r_i` leaves its cell at some
+//!   entry (`Constitution::first_reach`), and produces the candidate `θ′` at those exponents with
+//!   every other law shared (`Constitution::deposited_with_contact_spans_at`);
+//! - a transient Word of the same declared passage re-reads the comparison on `θ′`: the same source,
+//!   the exact Rest opening, the same junction steps, receiver, targets and mask ([`Word::compare_contacts_landing`]);
+//! - [`FiniteDecrease`] is issued only on an exact, strict improvement of that comparison:
+//!   `upper(L′) < lower(L)` with `X′ ≤ X`, or the reading-identity witness with `X′ < X`
+//!   ([`decide`], [`reading_identity`]; Lean `HNN/FiniteDecrease.admission_sound`).
+//!
+//! The claim is only this: `θ′` reads the declared same-Rest comparison no worse classically and
+//! strictly better in one part. It is not a claim that the held continuation, a later perception or
+//! any unseen comparison improves; those remain measured outcomes. The scope is a Rest-opened,
+//! source-opened, contact-only comparison on exact operands: a received opening, the held-variation
+//! route and charted operands refuse, typed ([`LandingRefusal`]). For a Rest-opened Word the
+//! comparison return deposits the within-Word pullback only (no `J_open` term), so the fixed-opening
+//! re-read is the objective the direction descends, and a contact-factor candidate has the
+//! identical source injection (`SourceMoment::open_storage` reads no contact factor).
 
 use std::sync::Arc;
 
+use num_bigint::BigInt;
+
 use super::*;
-use crate::hnn::constitution::{Constitution, DepositReading, FactorGradient, Family, Locus, Reach};
+use crate::hnn::constitution::{
+    CommittedReach, Constitution, DeclaredExponents, DeclaredStepRefusal, DepositReading,
+    FactorGradient, Family, Locus, Reach,
+};
 use crate::hnn::port::{Deposit, WordReturn};
 use crate::hnn::encoding::Encoded;
-use crate::hnn::ratio::{Faces, HolonRatio, RatioCovector, target_phases};
+use crate::hnn::field::ReceiverDeclaration;
+use crate::hnn::ratio::{Face, Faces, HolonRatio, RatioCovector, TargetPhases, target_phases};
 use crate::hnn::retention::Diamond;
+use crate::holon::deposition::strictly_better;
+use crate::ratio::algebraic::ExactInterval;
 use crate::receiver::reception::{Component, InteractionReturn};
 
 /// The full-tick source-bound contact cut, promoted from ContactCut's private producer checks.
@@ -34,6 +66,23 @@ pub struct ContactCut {
     next_tick: usize,
     released: Remainders,
     deposit: Option<Deposit>,
+    /// The comparison a Rest-opened landing issued this cut for ([`Word::compare_contacts_landing`]); `None` on every
+    /// other route, whose cut no [`FiniteDecrease`] binds.
+    landing: Option<LandingBinding>,
+    /// Set by the held-variation route's binding, which the landing does not admit.
+    held: bool,
+}
+
+/// What the landing's comparison bound into its cut: the receiver, the targets and mask, the
+/// producing ratio and the Rest opening.
+#[derive(Clone, Debug, PartialEq)]
+struct LandingBinding {
+    receiver: usize,
+    declaration: ReceiverDeclaration,
+    targets: Encoded,
+    compared: Vec<bool>,
+    ratio: HolonRatio,
+    opening: WordOpening,
 }
 
 /// Separate material work from the opening split and from the subsequent executed balance.
@@ -52,6 +101,21 @@ pub struct ContinuationReceipt {
     /// held-momentum bound, distinct from publication.storage_growth's held-rate bound.
     /// None withholds a uniform bound; actual held-state work remains explicitly charged.
     pub held_momentum_growth: Option<Rat>,
+    /// With an admitted landing ([`ContactCut::continue_admitted`]): the exact
+    /// `e = candidate_end − held`, both at `θ′` and at the same absolute tick. `None` otherwise.
+    pub landing: Option<LandingDifference>,
+}
+
+/// [definition; agent-inferred, October 9] **Where the transient candidate ends against where the
+/// held continuation starts**: `e = candidate_end.change − held.change`, every coordinate of the
+/// complete [`EndChange`] (storage, arriving waves, contact and resonator states), both at the
+/// admitted `θ′` and at the same absolute tick; the resonator phases are their common phases. It is
+/// a reading of the gap between the re-read passage and the actual continuing motion, not a claim
+/// that the continuation improves.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct LandingDifference {
+    pub tick: usize,
+    pub difference: EndChange,
 }
 
 /// One reached contact family's actual finite reaction:
@@ -200,15 +264,37 @@ impl<'c> Word<'c> {
         (HolonRatio, InteractionReturn<ContactCut, WordReturn, Deposit, Vec<Option<usize>>, Remainders>),
         HnnError,
     > {
+        self.compare_contacts_read(receiver, targets, compared)
+            .map(|(ratio, returned, _)| (ratio, returned))
+    }
+
+    /// [`Word::compare_contacts`], with what it read beside its return: the producer binding, the
+    /// receiving phases, the target classes and phases, and the junction steps it ran. The landing
+    /// re-reads the same declared comparison from these ([`Word::compare_contacts_landing`]).
+    fn compare_contacts_read(
+        self,
+        receiver: usize,
+        targets: &Encoded,
+        compared: &[bool],
+    ) -> Result<
+        (
+            HolonRatio,
+            InteractionReturn<ContactCut, WordReturn, Deposit, Vec<Option<usize>>, Remainders>,
+            ComparedRead,
+        ),
+        HnnError,
+    > {
         let (theta, current, source, support) = self.native_source.as_ref().ok_or(HnnError::Shape {
             what: "a native comparison requires its source producer", expected: 1, found: 0,
         })?.clone();
         let field = self.field;
+        let ticks = self.ticks();
         let (phases, faces) = self.contact_receiving(receiver)?;
         let classes: Vec<usize> = targets.classes_read().collect();
+        let target_reading = target_phases(field, current.lift(), phases.ring(), targets)?;
         let ratio = HolonRatio::compare_partition(
             faces, &classes,
-            &target_phases(field, current.lift(), phases.ring(), targets)?,
+            &target_reading,
             compared,
         )?;
         let returned = self.return_contact(
@@ -262,11 +348,19 @@ impl<'c> Word<'c> {
                 loci: diamond.retained(field),
             });
         cut.deposit = Some(deposit.clone());
+        let read = ComparedRead {
+            current,
+            source,
+            phases,
+            classes,
+            target_phases: target_reading,
+            ticks,
+        };
         Ok((ratio, InteractionReturn {
             forward: Component::Present(cut), pullback: Component::Present(back),
             deposit: Component::Present(deposit), order: returned.order,
             phases: returned.phases, receipt: returned.receipt,
-        }))
+        }, read))
     }
 
     /// Capture the actual full-tick end before consuming this Word's adjoint. Both ordinary
@@ -318,6 +412,8 @@ impl<'c> Word<'c> {
         Ok(ContactCut {
             released,
             deposit: None,
+            landing: None,
+            held: false,
             field: self.field.clone(),
             producing: producing.clone(),
             current: current.clone(),
@@ -364,6 +460,9 @@ impl ContactCut {
     /// covector once the native cut has been issued.
     pub(super) fn bind_comparison(mut self, deposit:Deposit) -> Self {
         self.deposit = Some(deposit);
+        // The held-variation route's combined covector pairs the opening's `J_open`; no landing
+        // admits its cut ([`LandingRefusal::HeldVariation`]).
+        self.held = true;
         self
     }
 
@@ -406,6 +505,96 @@ impl ContactCut {
         ),
         HnnError,
     > {
+        let prepared = self.prepare(field, current, source, deposit, charts, None)?;
+        Ok(self.finish(prepared, charts))
+    }
+
+    /// [definition; agent-inferred, October 9] **The admitted continuation**: the same laws as
+    /// [`ContactCut::continue_deposited`], on the admitted candidate `θ′` instead of the certified
+    /// successor: [`ContactCut::prepare_admitted`], then [`ContactCut::finish`]. The admission
+    /// certifies only the declared re-read comparison; the held continuation's outcome is not
+    /// asserted, and a refusal here is returned, never answered by another step.
+    pub fn continue_admitted<'c>(
+        self,
+        field: &'c Field,
+        current: &Current,
+        source: &Arc<SourceMoment>,
+        deposit: &Deposit,
+        admission: &FiniteDecrease,
+        charts: &mut Charts,
+    ) -> Result<(Constitution, Continued<'c>), LandingRefusal> {
+        let prepared = self.prepare_admitted(field, current, source, deposit, admission, charts)?;
+        Ok(self.finish(prepared, charts))
+    }
+
+    /// [definition; agent-inferred, October 9] **The admitted continuation, prepared without
+    /// consuming the cut.** It first checks that every binding of the admission equals this cut's
+    /// own ([`BindingRefusal`]: the producing `θ` as a whole value, the source by identity and
+    /// value, the Rest opening, both supports, the cut's change and absolute ticks, the deposit, the
+    /// receiver, targets, mask, the producing ratio and the candidate's tick). It then recomputes
+    /// `θ′` with the declared-step producer and requires its full equality, material and carries,
+    /// with the admitted `θ′`, its publication and its committed reach
+    /// ([`BindingRefusal::Candidate`]), and re-reads the admission's decision from its two ratios
+    /// ([`BindingRefusal::Decision`]). Every existing check and the held law `C′w′ = Cw` then run
+    /// unchanged on `θ′` (the one fallible body both continuations share), with
+    /// `e = candidate_end − held` ([`LandingDifference`]). A refusal of that body at `θ′` (the held
+    /// law, a preservation check, the held-momentum growth, the work closure, the next Word) is the
+    /// typed post-admission refusal [`LandingRefusal::Continuation`]. The cut is untouched either
+    /// way, so the route that issued the admission continues on the certified step exactly as before.
+    pub(crate) fn prepare_admitted<'c>(
+        &self,
+        field: &'c Field,
+        current: &Current,
+        source: &Arc<SourceMoment>,
+        deposit: &Deposit,
+        admission: &FiniteDecrease,
+        charts: &Charts,
+    ) -> Result<PreparedContinuation<'c>, LandingRefusal> {
+        self.binds(admission, source, deposit)?;
+        let reach = deposit.reach().ok_or(HnnError::MissingReach)?;
+        let spans = super::finite_gain::FiniteContactSpans::of(&self.operands, self.opened_at, reach)?;
+        let (successor, publication, committed) = self
+            .producing
+            .deposited_with_contact_spans_at(deposit, &spans, &admission.candidate.declared)?
+            .map_err(LandingRefusal::Declared)?;
+        if successor != admission.candidate.theta
+            || publication != admission.candidate.publication
+            || committed != admission.candidate.committed
+        {
+            return Err(LandingRefusal::Binding(BindingRefusal::Candidate));
+        }
+        // The admission's decision re-read from its two bound ratios.
+        if admit(&admission.ratio, &admission.candidate.ratio) != Ok(admission.admitted) {
+            return Err(LandingRefusal::Binding(BindingRefusal::Decision));
+        }
+        let declared = DeclaredSuccessor {
+            successor,
+            publication,
+            end: admission.candidate.end.clone(),
+            tick: admission.candidate.tick,
+        };
+        self.prepare(field, current, source, deposit, charts, Some(declared))
+            .map_err(|reason| LandingRefusal::Continuation {
+                admitted: admission.admitted,
+                reason,
+            })
+    }
+
+    /// The one fallible body of both continuations, read without consuming the cut: the native
+    /// successor (or the admitted declared one), its operands and preservation checks, the applied
+    /// material movements, the held-momentum growth, the held law `C′w′ = Cw` and its work closure,
+    /// the admitted `e`, and the next Word on the held change. Nothing is published here: the charts
+    /// are read, and [`ContactCut::finish`] alone moves the cut's released remainders and pump phases
+    /// and assigns the charts.
+    fn prepare<'c>(
+        &self,
+        field: &'c Field,
+        current: &Current,
+        source: &Arc<SourceMoment>,
+        deposit: &Deposit,
+        charts: &Charts,
+        declared: Option<DeclaredSuccessor>,
+    ) -> Result<PreparedContinuation<'c>, HnnError> {
         if field != &self.field || current != &self.current || !Arc::ptr_eq(source, &self.source) {
             return Err(HnnError::Shape {
                 what: "the contact continuation keeps its field/current/source producer",
@@ -419,22 +608,7 @@ impl ContactCut {
                 expected: 1, found: 0,
             });
         }
-        if deposit
-            .loci()
-            .iter()
-            .any(|locus| !matches!(locus, crate::hnn::constitution::Locus::Channel(_)))
-            || !deposit.linear().is_empty()
-            || !deposit.landmarks().is_empty()
-            || !deposit.receiving().is_empty()
-            || deposit.factors().iter().any(|step| {
-                !matches!(
-                    step.gradient,
-                    FactorGradient::Storage { .. }
-                        | FactorGradient::Stiffness { .. }
-                        | FactorGradient::Dissipation { .. }
-                )
-            })
-        {
+        if !contact_only(deposit) {
             return Err(HnnError::Shape {
                 what: "this native return changes contact factors in their same physical coordinates",
                 expected: deposit.factors().len(),
@@ -444,15 +618,24 @@ impl ContactCut {
         #[cfg(test)] let started = std::time::Instant::now();
         #[cfg(test)] eprintln!("unit certificate begin elapsed_ms=0");
         // The exact contact route reads the entire loaded field, at the producing
-        // absolute clock, rather than multiplying undriven local ring certificates.
-        let (successor, publication) = if self.operands.lattice().is_none() {
-            let spans = super::finite_gain::FiniteContactSpans::of(&self.operands, self.opened_at,
-                deposit.reach().ok_or(HnnError::MissingReach)?)?;
-            self.producing.deposited_with_contact_spans(deposit, &spans)?
-        } else {
-            // Historical charted consumer keeps its conditional certificate. It issues
-            // no loaded witness: rounding/split residual inputs are not covered here.
-            self.producing.deposited(deposit)?
+        // absolute clock, rather than multiplying undriven local ring certificates. An admitted
+        // landing supplies its declared successor, recomputed and compared whole by the caller.
+        let (successor, publication, landing) = match declared {
+            Some(DeclaredSuccessor { successor, publication, end, tick }) => {
+                (successor, publication, Some((end, tick)))
+            }
+            None => {
+                let (successor, publication) = if self.operands.lattice().is_none() {
+                    let spans = super::finite_gain::FiniteContactSpans::of(&self.operands, self.opened_at,
+                        deposit.reach().ok_or(HnnError::MissingReach)?)?;
+                    self.producing.deposited_with_contact_spans(deposit, &spans)?
+                } else {
+                    // Historical charted consumer keeps its conditional certificate. It issues
+                    // no loaded witness: rounding/split residual inputs are not covered here.
+                    self.producing.deposited(deposit)?
+                };
+                (successor, publication, None)
+            }
         };
         #[cfg(test)] eprintln!("unit certificate end elapsed_ms={}", started.elapsed().as_millis());
         let mut next_charts = charts.clone();
@@ -527,6 +710,24 @@ impl ContactCut {
         let old = PowerForm::read(field, &self.producing, current)?;
         let new = PowerForm::read(field, &successor, current)?;
         let held = old.held(&new, &self.change)?;
+        // [definition; agent-inferred, October 9] The admitted candidate's end against the held
+        // change, both at the successor and at the same absolute tick: `e = candidate − held`.
+        let landing = match landing {
+            Some((end, tick)) => {
+                if tick != self.next_tick {
+                    return Err(HnnError::Shape {
+                        what: "the landing's candidate ends at the held change's absolute tick",
+                        expected: self.next_tick,
+                        found: tick,
+                    });
+                }
+                Some(LandingDifference {
+                    tick,
+                    difference: end_difference(&end, &held.change)?,
+                })
+            }
+            None => None,
+        };
         let before = old.power(&self.change)? + old.resonator_power(&self.change)?;
         let committed = new.power(&held.change)? + new.resonator_power(&held.change)?;
         let deposition_work = held.deposition;
@@ -552,9 +753,45 @@ impl ContactCut {
         let opened = word.change()?;
         let opening = new.power(&opened)? + new.resonator_power(&opened)?;
         let opening_difference = &opening - &committed;
-        let released = self.released;
+        Ok(PreparedContinuation {
+            successor,
+            publication,
+            next_charts,
+            word,
+            before,
+            committed,
+            deposition_work,
+            opening,
+            opening_difference,
+            material,
+            held_momentum_growth,
+            landing,
+        })
+    }
+
+    /// The infallible end of both continuations: it moves the cut's released remainders and last
+    /// pump phases into the return and assigns the prepared charts, and nothing else.
+    pub(crate) fn finish<'c>(
+        self,
+        prepared: PreparedContinuation<'c>,
+        charts: &mut Charts,
+    ) -> (Constitution, Continued<'c>) {
+        let PreparedContinuation {
+            successor,
+            publication,
+            next_charts,
+            word,
+            before,
+            committed,
+            deposition_work,
+            opening,
+            opening_difference,
+            material,
+            held_momentum_growth,
+            landing,
+        } = prepared;
         *charts = next_charts;
-        Ok((
+        (
             successor,
             InteractionReturn {
                 forward: Component::Present(word),
@@ -568,11 +805,687 @@ impl ContactCut {
                     deposition_work,
                     opening,
                     opening_difference,
-                    released,
+                    released: self.released,
                     material,
                     held_momentum_growth,
+                    landing,
                 },
             },
+        )
+    }
+}
+
+/// [definition; agent-inferred, October 9] **A continuation with every fallible law already read
+/// on its cut and nothing consumed**: the successor and its publication, the prepared charts, the
+/// next Word on the held change, and the receipt's readings. Only [`ContactCut::prepare_admitted`]
+/// and the certified continuation's own body build one, and only [`ContactCut::finish`] spends it.
+pub(crate) struct PreparedContinuation<'c> {
+    successor: Constitution,
+    publication: DepositReading,
+    next_charts: Charts,
+    word: Word<'c>,
+    before: Rat,
+    committed: Rat,
+    deposition_work: Rat,
+    opening: Rat,
+    opening_difference: Rat,
+    material: Vec<ContactMaterialMove>,
+    held_momentum_growth: Option<Rat>,
+    landing: Option<LandingDifference>,
+}
+
+/// The continuation's return: the held next Word, the publication and the receipt.
+pub type Continued<'c> =
+    InteractionReturn<Word<'c>, (), DepositReading, Vec<Option<usize>>, ContinuationReceipt>;
+
+/// What a contact comparison read beside its return ([`Word::compare_contacts`]): the current
+/// and source of its producer binding, the receiving phases, the target classes and phases read in
+/// the cut's frame, and the junction steps the Word ran. The landing re-reads the same declared
+/// comparison from these; nothing here is retained past the comparison.
+struct ComparedRead {
+    current: Current,
+    source: Arc<SourceMoment>,
+    phases: ReceivingPhases,
+    classes: Vec<usize>,
+    target_phases: TargetPhases,
+    ticks: usize,
+}
+
+/// An admitted landing's declared successor and its candidate's end, passed to the one body.
+struct DeclaredSuccessor {
+    successor: Constitution,
+    publication: DepositReading,
+    end: EndChange,
+    tick: usize,
+}
+
+/// The native contact return's scope: every locus a channel, no linear, landmark or receiving
+/// step, and every factor step a contact's `C`, `K` or `D` in its own physical coordinates.
+fn contact_only(deposit: &Deposit) -> bool {
+    deposit
+        .loci()
+        .iter()
+        .all(|locus| matches!(locus, Locus::Channel(_)))
+        && deposit.linear().is_empty()
+        && deposit.landmarks().is_empty()
+        && deposit.receiving().is_empty()
+        && deposit.factors().iter().all(|step| {
+            matches!(
+                step.gradient,
+                FactorGradient::Storage { .. }
+                    | FactorGradient::Stiffness { .. }
+                    | FactorGradient::Dissipation { .. }
+            )
+        })
+}
+
+/// `a − b` in every coordinate of two ends of one field at one pump phase; refused where their
+/// shapes or phases differ.
+fn end_difference(a: &EndChange, b: &EndChange) -> Result<EndChange, HnnError> {
+    let refuse = || HnnError::Shape {
+        what: "a landing difference reads two ends of one field at one pump phase",
+        expected: 0,
+        found: 1,
+    };
+    if a.resonator_phases != b.resonator_phases
+        || a.storage.len() != b.storage.len()
+        || a.arrivals.len() != b.arrivals.len()
+        || a.states.len() != b.states.len()
+        || a.resonators.len() != b.resonators.len()
+    {
+        return Err(refuse());
+    }
+    let wave = |x: &[Rat], y: &[Rat]| -> Result<Vec<Rat>, HnnError> {
+        if x.len() != y.len() {
+            return Err(refuse());
+        }
+        Ok(x.iter().zip(y).map(|(p, q)| p - q).collect())
+    };
+    let pair = |x: &[Vec<Rat>; 2], y: &[Vec<Rat>; 2]| -> Result<[Vec<Rat>; 2], HnnError> {
+        Ok([
+            wave(x[0].as_slice(), y[0].as_slice())?,
+            wave(x[1].as_slice(), y[1].as_slice())?,
+        ])
+    };
+    Ok(EndChange {
+        storage: a
+            .storage
+            .iter()
+            .zip(&b.storage)
+            .map(|(x, y)| wave(x.as_slice(), y.as_slice()))
+            .collect::<Result<_, _>>()?,
+        arrivals: a
+            .arrivals
+            .iter()
+            .zip(&b.arrivals)
+            .map(|(x, y)| pair(x, y))
+            .collect::<Result<_, _>>()?,
+        states: a
+            .states
+            .iter()
+            .zip(&b.states)
+            .map(|(x, y)| pair(x, y))
+            .collect::<Result<_, _>>()?,
+        resonators: a
+            .resonators
+            .iter()
+            .zip(&b.resonators)
+            .map(|(x, y)| match (x, y) {
+                (Some(x), Some(y)) => pair(x, y).map(Some),
+                (None, None) => Ok(None),
+                _ => Err(refuse()),
+            })
+            .collect::<Result<_, _>>()?,
+        resonator_phases: a.resonator_phases.clone(),
+    })
+}
+
+// -------------------------------------------------------------------------------------------
+// the finite-decrease landing
+
+impl<'c> Word<'c> {
+    /// [definition; agent-inferred, October 9] **The comparison, its deposit, and the landing it
+    /// issues** (the W0 flow's route, `hnn::physical::contact`). The comparison and its return are
+    /// exactly [`Word::compare_contacts`]'s, and its cut binds this comparison (receiver, targets,
+    /// mask, producing ratio, opening). `opening` is the one this Word was opened at, declared by
+    /// its opener: [`Word`] records none and [`ContactCut`] keeps none, so the caller that opened the
+    /// Word passes the very value it opened with. A received opening, or a Word whose clock did not
+    /// open at zero, issues no candidate and refuses typed ([`LandingRefusal::ReceivedOpening`]), as
+    /// charted operands do ([`LandingRefusal::ChartedOperands`]).
+    ///
+    /// At a Rest opening on exact operands the landing reads ONE declared candidate: the native
+    /// deposit law's first reach `k_f` per reached family (`Constitution::first_reach`), its
+    /// candidate `θ′` (`Constitution::deposited_with_contact_spans_at`), and a transient Word on `θ′`
+    /// with its own producer, the exact Rest opening and the same source, run for the same junction
+    /// steps, read at the same receiver and compared with the same targets and mask
+    /// ([`HolonRatio::compare_partition`]). Its support must equal the producing support. The
+    /// candidate's end change and absolute tick are captured before it is dropped. The landing is
+    /// admitted ([`FiniteDecrease`]) only on [`decide`]'s exact strict improvement; every other
+    /// outcome is a typed refusal ([`LandingRefusal`]), a measurement, never retried. A refusal of
+    /// the landing never refuses the comparison: the cut and the deposit return either way.
+    pub(crate) fn compare_contacts_landing(
+        self,
+        receiver: usize,
+        targets: &Encoded,
+        compared: &[bool],
+        opening: &WordOpening,
+    ) -> Result<
+        (
+            HolonRatio,
+            InteractionReturn<ContactCut, WordReturn, Deposit, Vec<Option<usize>>, Remainders>,
+            Landing,
+        ),
+        HnnError,
+    > {
+        let field = self.field;
+        let declaration = field.receivers().get(receiver).cloned().ok_or(HnnError::Shape {
+            what: "the native admitted receiver",
+            expected: field.receivers().len(),
+            found: receiver,
+        })?;
+        let (ratio, returned, read) = self.compare_contacts_read(receiver, targets, compared)?;
+        let InteractionReturn { forward, pullback, deposit, order, phases, receipt } = returned;
+        let mut cut = forward.into_present().ok_or(HnnError::Realization {
+            what: "the actual compared contact cut",
+        })?;
+        let issued = deposit.into_present().ok_or(HnnError::Realization {
+            what: "the actual compared contact deposit",
+        })?;
+        cut.landing = Some(LandingBinding {
+            receiver,
+            declaration: declaration.clone(),
+            targets: targets.clone(),
+            compared: compared.to_vec(),
+            ratio: ratio.clone(),
+            opening: opening.clone(),
+        });
+        let mut landing = Landing {
+            declared: None,
+            candidate: None,
+            outcome: Err(LandingRefusal::Unconstrained),
+        };
+        landing.outcome = cut.land(
+            field,
+            &issued,
+            &ratio,
+            &read,
+            opening,
+            (receiver, &declaration),
+            (targets, compared),
+            (&mut landing.declared, &mut landing.candidate),
+        );
+        Ok((
+            ratio,
+            InteractionReturn {
+                forward: Component::Present(cut),
+                pullback,
+                deposit: Component::Present(issued),
+                order,
+                phases,
+                receipt,
+            },
+            landing,
         ))
+    }
+}
+
+/// [definition; agent-inferred, October 9] **The landing a Rest-opened comparison issues**: the
+/// declared exponents when the first reach was read, the transient candidate when it was read, and
+/// the admission or its typed refusal. Every value is the machine's; none is retained.
+#[derive(Debug)]
+pub struct Landing {
+    pub declared: Option<DeclaredExponents>,
+    pub candidate: Option<LandingCandidate>,
+    pub outcome: Result<FiniteDecrease, LandingRefusal>,
+}
+
+/// [definition; agent-inferred, October 9] **The transient candidate as read**: its declared
+/// exponents, its `θ′` with the declared publication and committed reach, its comparison on the
+/// same Rest-opened passage, its opening support, and its end change and absolute tick, captured
+/// before its Word was dropped. Only the landing builds one.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct LandingCandidate {
+    pub(crate) declared: DeclaredExponents,
+    pub(crate) theta: Constitution,
+    pub(crate) publication: DepositReading,
+    pub(crate) committed: CommittedReach,
+    pub(crate) ratio: HolonRatio,
+    pub(crate) support: Vec<usize>,
+    pub(crate) end: EndChange,
+    pub(crate) tick: usize,
+}
+
+impl LandingCandidate {
+    pub fn declared(&self) -> &DeclaredExponents {
+        &self.declared
+    }
+    pub fn theta(&self) -> &Constitution {
+        &self.theta
+    }
+    pub fn publication(&self) -> &DepositReading {
+        &self.publication
+    }
+    pub fn committed(&self) -> &CommittedReach {
+        &self.committed
+    }
+    pub fn ratio(&self) -> &HolonRatio {
+        &self.ratio
+    }
+    pub fn support(&self) -> &[usize] {
+        &self.support
+    }
+    pub fn end(&self) -> &EndChange {
+        &self.end
+    }
+    pub fn tick(&self) -> usize {
+        self.tick
+    }
+}
+
+/// Which case of the admission held (Lean `HNN/FiniteDecrease.admission_sound`).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Admitted {
+    /// `upper(L′) < lower(L)` and `X′ ≤ X`: strictly better classically, no worse in phase.
+    Classical,
+    /// The reading-identity witness and `X′ < X`: the same code, strictly better in phase.
+    Phase,
+}
+
+/// [definition; agent-inferred, October 9; Lean `HNN/FiniteDecrease.admission_sound`] **The
+/// finite-decrease admission of one declared candidate.** Its claim is only this: the candidate
+/// `θ′` reads the declared same-Rest comparison (the same source, Rest opening, junction steps,
+/// receiver, targets and mask) no worse classically and strictly better in one part, exactly:
+/// `upper(L′) < lower(L)` with `X′ ≤ X`, or equal code expressions (the reading-identity witness)
+/// with `X′ < X`. It does not claim that the held continuation improves, that a later perception
+/// changes, or that any other comparison descends; those stay measured outcomes. It is the
+/// certificate of the declared step, and nothing moves without it.
+///
+/// Issued only by [`Word::compare_contacts_landing`], the comparison consumer of the cut whose
+/// deposit it binds; its fields are crate-private and it has no public constructor. It binds by
+/// equality, never by a commit counter: the full producing `θ` and candidate `θ′` with their carries,
+/// the declared exponents and each family's committed reach, the source (identity and value), the
+/// Rest opening and both supports, the cut's change and absolute ticks, the deposit, the receiving
+/// declaration and index, the targets and mask, both evaluated ratios, and the candidate's end
+/// change and tick ([`ContactCut::continue_admitted`]).
+#[derive(Clone, Debug, PartialEq)]
+pub struct FiniteDecrease {
+    pub(crate) producing: Constitution,
+    pub(crate) source: Arc<SourceMoment>,
+    pub(crate) opening: WordOpening,
+    pub(crate) support: Vec<usize>,
+    pub(crate) change: EndChange,
+    pub(crate) opened_at: usize,
+    pub(crate) next_tick: usize,
+    pub(crate) deposit: Deposit,
+    pub(crate) receiver: usize,
+    pub(crate) declaration: ReceiverDeclaration,
+    pub(crate) targets: Encoded,
+    pub(crate) compared: Vec<bool>,
+    pub(crate) ratio: HolonRatio,
+    pub(crate) candidate: LandingCandidate,
+    pub(crate) admitted: Admitted,
+}
+
+impl FiniteDecrease {
+    /// Which case admitted the candidate.
+    pub fn admitted(&self) -> Admitted {
+        self.admitted
+    }
+    /// The producing comparison.
+    pub fn ratio(&self) -> &HolonRatio {
+        &self.ratio
+    }
+    /// The candidate as read.
+    pub fn candidate(&self) -> &LandingCandidate {
+        &self.candidate
+    }
+    /// The declared exponents.
+    pub fn declared(&self) -> &DeclaredExponents {
+        &self.candidate.declared
+    }
+    /// Each claimed family's committed reach.
+    pub fn committed(&self) -> &CommittedReach {
+        &self.candidate.committed
+    }
+}
+
+/// [definition; agent-inferred, October 9] **Why a landing was not admitted**, typed. Each is a
+/// measurement of this one candidate: none is answered by a larger limit, a halving or a second
+/// candidate.
+#[derive(Debug, PartialEq)]
+pub enum LandingRefusal {
+    /// A shared native law refused (its owner's own typed refusal).
+    Native(HnnError),
+    /// The producing Word opened on a received carry, whose comparison pairs the opening's
+    /// `J_open`: outside the fixed-opening re-read.
+    ReceivedOpening,
+    /// Charted (lattice or split) operands: outside the exact scope.
+    ChartedOperands,
+    /// The held-variation route's cut.
+    HeldVariation,
+    /// A deposit that is not contact-only.
+    ContactOnly,
+    /// No compared station or no reached family: nothing was compared or nothing steps.
+    Unconstrained,
+    /// The declared step's own refusal.
+    Declared(DeclaredStepRefusal),
+    /// The candidate's passage differs from the producing one (receiving phases, opening tick or
+    /// absolute end tick).
+    Passage,
+    /// The candidate's opening support differs from the producing support.
+    Support,
+    /// The exact comparison did not strictly improve.
+    Admission(AdmissionRefusal),
+    /// An admission does not bind this cut.
+    Binding(BindingRefusal),
+    /// [definition; agent-inferred, October 9] **A post-admission refusal**: the admitted
+    /// candidate's continuation refused at `θ′` (the held law, a preservation check, the
+    /// held-momentum growth, the work closure or the next Word), with its native reason. The cut
+    /// was not consumed, and the route that issued the admission continues on the certified step.
+    Continuation { admitted: Admitted, reason: HnnError },
+}
+
+impl From<HnnError> for LandingRefusal {
+    fn from(refusal: HnnError) -> Self {
+        LandingRefusal::Native(refusal)
+    }
+}
+
+/// The admission's typed refusals ([`decide`]).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum AdmissionRefusal {
+    /// `X′ > X`: the phase part grew.
+    PhaseWorse,
+    /// `upper(L) < lower(L′)`: the classical part grew.
+    CodeWorse,
+    /// Identical code endpoints without the reading-identity witness: equal endpoints are not
+    /// equal codes.
+    EqualEndpoints,
+    /// The code enclosures overlap: the inequality is not separated.
+    Overlap,
+    /// The witness holds and `X′ = X`: neither part strictly improved.
+    Unchanged,
+}
+
+/// The binding's typed refusals ([`ContactCut::continue_admitted`]).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum BindingRefusal {
+    /// The cut was not issued by a landing comparison.
+    ForeignCut,
+    Producing,
+    Source,
+    Opening,
+    Support,
+    Cut,
+    Deposit,
+    Receiver,
+    Targets,
+    Mask,
+    Ratio,
+    Tick,
+    /// The admission's decision does not re-read from its two ratios.
+    Decision,
+    /// The recomputed `θ′`, publication or committed reach is not the admitted one.
+    Candidate,
+}
+
+/// The gauge-normalized cells of one face, `(n_c − n_max, k_c)` for every class, `n_max` the
+/// largest carry VALUE at the station, as [`Face`] normalizes (no argmax class is read). The
+/// unresolved fibre is never read.
+fn gauge(face: &Face) -> Option<Vec<(BigInt, u64)>> {
+    let top = face.cells().iter().map(|cell| &cell.carry).max()?;
+    Some(
+        face.cells()
+            .iter()
+            .map(|cell| (&cell.carry - top, cell.phase))
+            .collect(),
+    )
+}
+
+/// [definition; agent-inferred, October 9; Lean `HNN/FiniteDecrease.witness_code_eq`] **The exact
+/// reading-identity witness**: at every compared station the grain `L`, the target class, the
+/// target phase and the branch are the same, and every class's gauge-normalized cell
+/// `(n_c − n_max, k_c)` is equal. Equal inputs give equal exact code expressions
+/// (`log₂ Z − (n_c − n_max) − k_c/L`, `Z = Σ_d 2^(n_d − n_max) θ^(k_d)`). The fibre is never read as a
+/// value, and identical enclosure endpoints alone never count as equality.
+pub(crate) fn reading_identity(producing: &HolonRatio, candidate: &HolonRatio) -> bool {
+    if producing.stations() != candidate.stations()
+        || producing.phases().len() != candidate.phases().len()
+    {
+        return false;
+    }
+    producing
+        .stations()
+        .iter()
+        .zip(producing.phases().iter().zip(candidate.phases()))
+        .all(|(&station, (ours, theirs))| {
+            let (Some(face), Some(other)) = (
+                producing.faces().faces.get(station),
+                candidate.faces().faces.get(station),
+            ) else {
+                return false;
+            };
+            face.grain() == other.grain()
+                && ours.target == theirs.target
+                && ours.target_phase == theirs.target_phase
+                && ours.branch == theirs.branch
+                && gauge(face) == gauge(other)
+        })
+}
+
+/// [definition; agent-inferred, October 9; Lean `HNN/FiniteDecrease.admission_sound`] **The
+/// admission**: with `L`, `L′` the producing and candidate code enclosures and `X`, `X′` their exact
+/// phase excesses, admit iff `upper(L′) < lower(L)` and `X′ ≤ X`
+/// ([`strictly_better`]`(L, L′)`), or the witness holds and `X′ < X`. Everything else refuses,
+/// typed: `X′ > X`, the candidate's code strictly above, identical endpoints without the witness,
+/// overlap, and an unchanged witnessed reading.
+pub(crate) fn decide(
+    code: &ExactInterval,
+    excess: &Rat,
+    candidate_code: &ExactInterval,
+    candidate_excess: &Rat,
+    witness: bool,
+) -> Result<Admitted, AdmissionRefusal> {
+    if candidate_excess > excess {
+        return Err(AdmissionRefusal::PhaseWorse);
+    }
+    if strictly_better(code, candidate_code) {
+        return Ok(Admitted::Classical);
+    }
+    if witness {
+        return if candidate_excess < excess {
+            Ok(Admitted::Phase)
+        } else {
+            Err(AdmissionRefusal::Unchanged)
+        };
+    }
+    if strictly_better(candidate_code, code) {
+        return Err(AdmissionRefusal::CodeWorse);
+    }
+    if candidate_code == code {
+        return Err(AdmissionRefusal::EqualEndpoints);
+    }
+    Err(AdmissionRefusal::Overlap)
+}
+
+/// The admission read from two evaluated ratios: their code enclosures, exact excesses and the
+/// reading-identity witness ([`decide`]).
+pub(crate) fn admit(producing: &HolonRatio, candidate: &HolonRatio) -> Result<Admitted, LandingRefusal> {
+    let witness = reading_identity(producing, candidate);
+    decide(
+        &producing.code_length()?,
+        &producing.excess(),
+        &candidate.code_length()?,
+        &candidate.excess(),
+        witness,
+    )
+    .map_err(LandingRefusal::Admission)
+}
+
+impl ContactCut {
+    /// The landing of this cut's comparison (see [`Word::compare_contacts_landing`]).
+    #[allow(clippy::too_many_arguments)]
+    fn land(
+        &self,
+        field: &Field,
+        deposit: &Deposit,
+        ratio: &HolonRatio,
+        read: &ComparedRead,
+        opening: &WordOpening,
+        (receiver, declaration): (usize, &ReceiverDeclaration),
+        (targets, compared): (&Encoded, &[bool]),
+        (declared, candidate): (&mut Option<DeclaredExponents>, &mut Option<LandingCandidate>),
+    ) -> Result<FiniteDecrease, LandingRefusal> {
+        if self.held {
+            return Err(LandingRefusal::HeldVariation);
+        }
+        // Scope: the fixed-opening re-read is the descended objective only at rest.
+        if !matches!(opening, WordOpening::Rest) || self.opened_at != 0 {
+            return Err(LandingRefusal::ReceivedOpening);
+        }
+        if self.operands.lattice().is_some()
+            || self.operands.rings().iter().any(|ring| ring.chart().is_some())
+            || self.operands.contacts().iter().any(|contact| contact.chart().is_some())
+        {
+            return Err(LandingRefusal::ChartedOperands);
+        }
+        if !contact_only(deposit) {
+            return Err(LandingRefusal::ContactOnly);
+        }
+        if ratio.stations().is_empty() || deposit.factors().is_empty() {
+            return Err(LandingRefusal::Unconstrained);
+        }
+        // The declared step, produced by the native deposit law at its first reach.
+        let reach = deposit.reach().ok_or(HnnError::MissingReach)?;
+        let spans = super::finite_gain::FiniteContactSpans::of(&self.operands, self.opened_at, reach)?;
+        let exponents = self
+            .producing
+            .first_reach(deposit, &spans)?
+            .map_err(LandingRefusal::Declared)?;
+        *declared = Some(exponents.clone());
+        let (theta, publication, committed) = self
+            .producing
+            .deposited_with_contact_spans_at(deposit, &spans, &exponents)?
+            .map_err(LandingRefusal::Declared)?;
+        // The transient candidate Word: its own producer, the exact Rest opening, the same source,
+        // the same junction steps, receiver, targets and mask.
+        let (mut word, _) = Word::open_source_exact_received(
+            field,
+            &theta,
+            &read.current,
+            Arc::clone(&read.source),
+            &WordOpening::Rest,
+        )?;
+        word.run(read.ticks)?;
+        let (phases, faces) = word.contact_receiving(receiver)?;
+        if phases != read.phases {
+            return Err(LandingRefusal::Passage);
+        }
+        let candidate_ratio =
+            HolonRatio::compare_partition(faces, &read.classes, &read.target_phases, compared)?;
+        let support = word
+            .native_source
+            .as_ref()
+            .map(|(_, _, _, support)| support.clone())
+            .ok_or(HnnError::Realization {
+                what: "the candidate Word keeps its source producer",
+            })?;
+        // Its end and absolute tick, captured before the Word is dropped.
+        let end = word.contact_cut()?;
+        if end.opened_at != self.opened_at || end.next_tick != self.next_tick {
+            return Err(LandingRefusal::Passage);
+        }
+        let read_candidate = LandingCandidate {
+            declared: exponents,
+            theta,
+            publication,
+            committed,
+            ratio: candidate_ratio,
+            support,
+            end: end.change,
+            tick: end.next_tick,
+        };
+        *candidate = Some(read_candidate.clone());
+        if read_candidate.support != self.opening_support {
+            return Err(LandingRefusal::Support);
+        }
+        let admitted = admit(ratio, &read_candidate.ratio)?;
+        Ok(FiniteDecrease {
+            producing: self.producing.clone(),
+            source: Arc::clone(&self.source),
+            opening: WordOpening::Rest,
+            support: self.opening_support.clone(),
+            change: self.change.clone(),
+            opened_at: self.opened_at,
+            next_tick: self.next_tick,
+            deposit: deposit.clone(),
+            receiver,
+            declaration: declaration.clone(),
+            targets: targets.clone(),
+            compared: compared.to_vec(),
+            ratio: ratio.clone(),
+            candidate: read_candidate,
+            admitted,
+        })
+    }
+
+    /// Every binding of an admission against this cut's own, typed ([`BindingRefusal`]).
+    fn binds(
+        &self,
+        admission: &FiniteDecrease,
+        source: &Arc<SourceMoment>,
+        deposit: &Deposit,
+    ) -> Result<(), LandingRefusal> {
+        if self.held {
+            return Err(LandingRefusal::HeldVariation);
+        }
+        let Some(landing) = &self.landing else {
+            return Err(LandingRefusal::Binding(BindingRefusal::ForeignCut));
+        };
+        let refuse = |refusal: BindingRefusal| -> Result<(), LandingRefusal> {
+            Err(LandingRefusal::Binding(refusal))
+        };
+        if admission.producing != self.producing {
+            return refuse(BindingRefusal::Producing);
+        }
+        if !Arc::ptr_eq(&admission.source, &self.source)
+            || !Arc::ptr_eq(source, &self.source)
+            || *admission.source != *self.source
+        {
+            return refuse(BindingRefusal::Source);
+        }
+        if admission.opening != WordOpening::Rest || landing.opening != WordOpening::Rest {
+            return refuse(BindingRefusal::Opening);
+        }
+        if admission.support != self.opening_support
+            || admission.candidate.support != self.opening_support
+        {
+            return refuse(BindingRefusal::Support);
+        }
+        if admission.change != self.change
+            || admission.opened_at != self.opened_at
+            || admission.next_tick != self.next_tick
+        {
+            return refuse(BindingRefusal::Cut);
+        }
+        if &admission.deposit != deposit || self.deposit.as_ref() != Some(deposit) {
+            return refuse(BindingRefusal::Deposit);
+        }
+        if admission.receiver != landing.receiver || admission.declaration != landing.declaration {
+            return refuse(BindingRefusal::Receiver);
+        }
+        if admission.targets != landing.targets {
+            return refuse(BindingRefusal::Targets);
+        }
+        if admission.compared != landing.compared {
+            return refuse(BindingRefusal::Mask);
+        }
+        if admission.ratio != landing.ratio {
+            return refuse(BindingRefusal::Ratio);
+        }
+        if admission.candidate.tick != self.next_tick {
+            return refuse(BindingRefusal::Tick);
+        }
+        Ok(())
     }
 }

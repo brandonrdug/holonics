@@ -775,9 +775,11 @@ fn the_chained_balance_closes_on_a_pumped_field() {
 /// state the word opens on. A read on fresh charts (`Charts::new()`) is another certified
 /// representative: where a deposit moved an operator and its kept chart still certifies within the
 /// target, the warm start keeps it (no step), and the cold start reaches another lattice point at
-/// the same target. On this fold-free chain it separates at window 6 (face 0, cell 0: fibre
-/// `4177/2^19` on the kept charts, `4181/2^19` on fresh ones; every grain cell equal, the logits
-/// within `7/2^17`), the probe that keeps the charts in the retained quotient.
+/// the same target. The read takes the carried representatives, so a fresh read separates exactly
+/// where some split straddles a tie of the transients' lattice; `chart::witness` constructs one,
+/// which is what keeps the charts in the retained quotient. On this fold-free chain the release law
+/// separated at window 6 (receipts of October 5: face 0, cell 0, fibre `4177/2^19` against
+/// `4181/2^19`); under the exact carry no window straddles a tie (v122), and the count is printed.
 #[test]
 fn the_carry_passes_each_receptions_end_to_the_next() {
     use crate::hnn::{Absorption, Charts, PendingRatio, WordOpening};
@@ -847,10 +849,13 @@ fn the_carry_passes_each_receptions_end_to_the_next() {
             let (_, on) = ratio.read_on(&field, &theta, &mut charts, &opening).unwrap();
             assert_eq!(faces, on);
             assert_eq!(&charts, resident.charts(), "the read keeps the refine's charts");
+            let mut fresh_charts = Charts::new();
             let (_, fresh) = ratio
-                .read_on(&field, &theta, &mut Charts::new(), &opening)
+                .read_on(&field, &theta, &mut fresh_charts, &opening)
                 .unwrap();
             separated += usize::from(fresh != faces);
+            // Diagnosis only: whether the kept charts differ from cold ones at all.
+            eprintln!("carry-chain charts window={} kept_equals_fresh={}", receptions + 1, charts == fresh_charts);
             let moving = |carry: &crate::hnn::ReceptionCarry| {
                 let change = &carry.change;
                 change
@@ -904,9 +909,14 @@ fn the_carry_passes_each_receptions_end_to_the_next() {
     }
     // The carried interior moves the read once the constitution reads the receiving ring.
     assert!(moved >= 1 && position > 0);
-    // Fresh charts separate from the kept ones on this chain (window 6), so the kept charts are a
-    // retained operand: the quotient must not merge two residents that differ only in them.
-    assert!(separated >= 1);
+    // The kept charts are a retained operand: the read takes the junction's carried
+    // representatives, and two certified charts of one operator can split one image differently
+    // (`chart::witness`), so the quotient must not merge two residents that differ only in them.
+    // Whether this chain's images straddle a tie is a reading, not the law: under the release law
+    // (receipts of October 5) the fresh read separated at window 6; under the exact carry
+    // (cacb0d037) the measured chain reads the kept and fresh charts equal in all fourteen windows
+    // (v122), with no straddled tie (October 8 trace; the former failure receipts are kept).
+    eprintln!("carry-chain separations by fresh charts: {separated} of {receptions}");
     // The carry mounts beside a declared constitution (§2.4), and only under a carrying reception:
     // the rest limit refuses it. That mount is the narrower remount: it holds no kept chart, so its
     // next word is the uninterrupted chain's only where the kept charts are their operators' cold
@@ -938,9 +948,10 @@ fn the_carry_passes_each_receptions_end_to_the_next() {
 /// constitution (`Reference::mount_continued`). The restored resident's reception is the
 /// uninterrupted one's at every window, faces, compare and deposit alike, and leaves the same
 /// constitution, carry and charts:
-/// `compare(refine(mount_continued(save(r)), m, φ), t) = compare(refine(r, m, φ), t)`. From window 6
-/// on, a deposit has moved operators whose kept charts a cold start does not reproduce (a read on
-/// fresh charts separates there), so the equality rests on the charts the passage carries.
+/// `compare(refine(mount_continued(save(r)), m, φ), t) = compare(refine(r, m, φ), t)`. Deposits
+/// move operators whose kept charts a cold start does not reproduce, and certified charts can split
+/// one image differently (`chart::witness`), so the equality rests on the charts the passage
+/// carries; whether this chain's reads straddle a tie is printed (none under the exact carry, v122).
 #[test]
 fn a_cold_restore_continues_the_carry_chain_where_the_kept_charts_have_moved() {
     use crate::hnn::constitution::{Constitution, ContinuingState};
@@ -983,10 +994,13 @@ fn a_cold_restore_continues_the_carry_chain_where_the_kept_charts_have_moved() {
                 },
                 None => WordOpening::Rest,
             };
+            let mut fresh_charts = Charts::new();
             let (_, fresh) = ratio
-                .read_on(&field, resident.constitution(), &mut Charts::new(), &word_opening)
+                .read_on(&field, resident.constitution(), &mut fresh_charts, &word_opening)
                 .unwrap();
             let (whole, refined) = reference.refine(&mut resident, &moment, &phases).unwrap();
+            // Diagnosis only: whether the kept charts differ from cold ones at all.
+            eprintln!("cold-restore charts window={receptions} kept_equals_fresh={}", resident.charts() == &fresh_charts);
             let (cold, restored_refined) =
                 reference.refine(&mut restored, &moment, &phases).unwrap();
             assert_eq!(restored_refined.forward, refined.forward);
@@ -1027,7 +1041,11 @@ fn a_cold_restore_continues_the_carry_chain_where_the_kept_charts_have_moved() {
         }
     }
     assert_eq!(receptions, 14);
-    assert!(separated >= 1, "a cold start separates from the kept charts on this chain");
+    // The restore's exactness rests on the charts the passage carries (`chart::witness`: certified
+    // charts can split one image differently). On this chain under the exact carry no window
+    // straddles a tie, so the separation by fresh charts is a reading here (v122: 0 of 14), not an
+    // assertion (October 8 trace; the former failure receipts are kept).
+    eprintln!("cold-restore separations by fresh charts: {separated} of {receptions}");
 }
 
 /// The reception carry §8: several pending ratios are one chain in refine order. Each refine runs
