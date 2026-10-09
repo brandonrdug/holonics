@@ -144,7 +144,27 @@ child RSS 2,622,224 KiB; [receipt](receipts/2026-10-09-material-tangent/DEV_TEST
 (`4 r_(j+1) ≤ r_j`, and `r_j < 5 r_(j+1)`), and `4ʲ r_j` keeps one integer part across the ladder:
 `5` within one Word, `4` across the crossing into the next opening. The tangent is the passage's
 derivative at second order, including the same-`C` crossing that cancels both `δC w` terms. The
-World-port tangent (4) has its own test, `tests/material_tangent_world.rs`, queued.
+World-port tangent (4) passed its own test on `23ea9d78` (sources identical to `578225b7`; exit 0;
+81,041,698,365 ns wall; peak child RSS 1,629,408 KiB;
+[receipt](receipts/2026-10-09-material-tangent/WORLD_DEV_TESTS.v1.json)). The World's state tangent
+`ψ`, carried through the actual Word and the World model's one live key, matches the actual World run
+on `θ ± εH`: each halving of `ε` divides the central residual by a ratio in `(63/16, 4)` that rises
+toward 4, and `4ʲ r_j` stays in `(1/2, 1)`. With two live keys the teaching encounter is refused and
+the World's commit does not move.
+
+## 3c. Selection on this field: two measured negatives, and what they mean
+
+[measured] The World-family Ask's acceptance (`tests/world_ask.rs` at `c65cd8b8`) failed: one
+declared encounter eliminates both alternatives, because the World's own initial motion sits in port
+pair 0 and every declared alternative differs there. The dormant-mode successor (`cbd41c47`) measured
+the deeper reason: the passive (`u = 0`) encounter alone excites all four World ports, so no
+alternative law differing on any port pair survives passive experience. [definition; agent-inferred]
+For linear port hypotheses whose returns are affine in the wave, an Ask can only split what the
+history left dormant. On this field and source the history leaves nothing dormant, and the World key
+is located by experience alone. That is the location the material tangent (§3a) needs: on this field
+the loop is **experience → location → material response → production**, with selection reserved for
+fields whose history is not persistently exciting (a narrowband source, a history shorter than the
+key's state, or nonlinear keys). The Ask stays on its branch until such a field is declared.
 
 ## 4. The owners it consumes, and the implementation
 
