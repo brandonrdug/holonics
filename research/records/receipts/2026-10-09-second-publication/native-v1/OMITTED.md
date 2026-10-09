@@ -1,6 +1,6 @@
 # Omitted packet files
 
-These 444 files (99,388,138 bytes) of the complete local packet are hashed in
+These 443 files (99,387,270 bytes) of the complete local packet are hashed in
 [FILE_HASHES.json](FILE_HASHES.json) and not committed: copied source, compiled objects, tooling, cache
 seals and stage provenance. They were not reviewed for publication. The complete packet stays untracked under
 the main checkout.
@@ -14,7 +14,6 @@ the main checkout.
 | `admission/SOURCE_ADMISSION.json` | 79440 | `bf8182ba0cabf1ef278e40e64805c4d62f1f12abb7ddf0406d20be221d09baad` |
 | `admission/SOURCE_NATIVE_INPUTS.json` | 57926 | `87b2d33e4802aa737b676fe8743614b16094abe19bacf4b27be92fcd95735608` |
 | `admission/SOURCE_REVIEW_ADMISSION.json` | 1684 | `aa74d61e6dbfc20017a0376a296dfc31d926d31853afd3199d68f33fbd2f9b2d` |
-| `admission/UNAFFECTED_GUARD_REUSE.json` | 868 | `0c57fb68489042267ea47e71ba5ed1bdf70bb3d24fd939a785cb1268e7429ed6` |
 | `admission/source-v1/Cargo.lock` | 4292 | `4380186a0b5ed33a0c6ef3b15822c215072016af539446727800dcd501bde00a` |
 | `admission/source-v1/Cargo.toml` | 1160 | `a9ff455bcb89885c74f5758dd782ec4d3c89bbd31018e89333c4d476ea2dc40f` |
 | `admission/source-v1/accelerators/README.md` | 563 | `71fee2b8489e99c6bd06dba3be0b49e57c770dbb2db8b2187df496c24eb7ccda` |

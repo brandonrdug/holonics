@@ -11,8 +11,11 @@ and resource controls and outcomes.
   ([stdout](native-v1/stages/actual-second-runtime-20261009-v175.stdout)). The production source and
   the Lean owner are the received-landing pin's, unchanged, so its 35 fixtures, 57 doctests and Lean
   checks were not rerun. Committed: the handoff, validation, every stage's stdout and stderr of at
-  most 200,000 bytes, and `native-v1/FILE_HASHES.json`; the clippy stdout and the rest of the packet
-  are hashed only in [OMITTED.md](native-v1/OMITTED.md).
+  most 200,000 bytes, `native-v1/admission/UNAFFECTED_GUARD_REUSE.json` (the reuse of the
+  received-landing pin's unchanged guards) and `native-v1/FILE_HASHES.json`; the clippy stdout and the
+  rest of the packet are hashed only in [OMITTED.md](native-v1/OMITTED.md). The join also names the
+  early copies of the runtime stdout and stderr, kept under `actual-reading-v1/` and byte-identical to
+  the `native-v1` stage's.
 - **The reading: 4 of 4.** On 0279's own task the first call landed at Rest and published; the
   second call repeated the observation at the received opening the first left, landed (both
   `Ok(Phase)`) and published, at first reaches C `2⁻¹³`, K `2⁻¹⁴`, D `2⁻¹³`.
