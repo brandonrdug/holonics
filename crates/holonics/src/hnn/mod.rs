@@ -51,6 +51,12 @@
 //!   Fibre and separator;
 //! - [`moment`]: the phase-binned [`SourceMoment`] on closing source rings, its pair buffer, the
 //!   pair port read over the whole offset moment (no held cell), and its capacity `n*`;
+//! - [`paired`] (the helical code, step 2): the paired carrier. A ring's reflector `F_g` is admitted
+//!   as a dihedral reflection of its rotor (`F(F(i)+1) = i−1`), its realified lift `B_g` inverts the
+//!   rotor on the carrier, and a typed class pairing `σ` is carried by the source port exactly where
+//!   `B_g E_g = E_g Σ_σ`, which every read re-certifies on the port it reads. The partner strand's
+//!   face is read through the actual moment ([`SourceMoment::dyad`], then `encode` and
+//!   `open_storage`), never beside it;
 //! - [`propagation`]: the junction Swing, the ring element's Cayley step with its contrast port,
 //!   the contact's midpoint two-port, the global power and the causal cone;
 //! - [`word`]: a [`Word`], one evaluation at one cut's fixed operands, opening at zero change and
@@ -115,6 +121,7 @@
 //! | the causal cone | `HNN/Word.word_tick_cone` (the concrete tick) | [`Word::support`] |
 //! | the word on declared lattices: certified inverse charts, error feedback, the executed adjoint, the balance up to the residual | `HNN/LatticeWord.{nsStep, rounded_refinement_certificate, roundedIter_certificate, warm_start_certificate, inverse_chart_deviation, feedback_tick, carried_word_accounting, executed_adjoint_unique, executed_adjoint_deviation, cayley_chart_energy}` | [`chart`], [`Word`], [`Word::pull_back`], [`propagation::TickBalance`] |
 //! | the moment | `HNN/Moment.{encoderMoment_contract, encoder_covector_tape_free, closingRing_moment_is_phaseBinned, exteriorOffset_independent_of_E, selective_position, moment_capacity}`; the capacity on the located clock and the retained leaky coordinates `HNN/RangedMoment.SourceDecl.located_moment_capacity`, `HNN/LeakyCapacity.joint_card_bound`; the open that reads no held cell `HNN/Encoding.{whole_pair_read_counts, whole_pair_read_offset_moment}` | [`SourceMoment`], [`moment::capacity`], [`moment::capacity_located`], [`moment::SourceCapacity::checked_of`] |
+//! | the paired carrier: a ring's reflector as a dihedral reflection of its rotor, its realified lift, a class pairing carried by an equivariant source port, and the partner strand's face read through the actual moment (the helical code, step 2) | `Transport/HelicalCode.{dihedral_swap, dihedral_reflection_sq, dihedral_conj, strandFace_complementReverse_nat, face_complementReverse}`; the bridge `moment l = U^(n−1)·strandFace U⁻¹ (I∘E) l` is owed (#62) | [`paired::PairedCarrier`], [`SourceMoment::dyad`] |
 //! | Holonic Encoding (U6) | `HNN/Encoding.{injection_square, encoding_reduced_recurrence, moment_reduced_recurrence, encoding_separator, encoding_descends_iff}`, `Compression/Landmark/Context/Birth.founding_intertwines` | [`encoding`] |
 //! | the receiving face: the landmark tree's face at each phase's causal address, read at the grain, plus the wave (the region table and the landmark tree; the region table is the depth-one forced case of the whole-cell emission, kept in Lean, not of the digit tree) | `HNN/RegionCounts.{grain_log_iff_pow_bounds, grain_code_residual, combined_face_pullback}`, `Compression/Landmark/Context/Tree.{depth_one_is_the_whole_cell_table, release_rule}` | [`receiving`], [`ReceivingRead::combined`], [`ActiveAddress`]; the grain read is [`crate::receiver::face::grain_exponent`]'s |
 //! | the receiving face compresses landmarks: the tree's path face, its opened-path deposit and telescope, the executed dyadic face (the landmark tree) | `Compression/Landmark/Context/Tree.{path_face_normalized, weight_step, landmark_step, path_telescope_exact, depth_one_is_the_whole_cell_table, executed_split_laws, cell_faces_partition, digit_log_residual}` (the owner's header has the rest) | [`crate::compression::landmark::context`] |
@@ -150,6 +157,7 @@ pub mod executed;
 pub mod field;
 pub mod keys;
 pub mod moment;
+pub mod paired;
 pub mod pending;
 pub mod phase_family;
 pub mod port;

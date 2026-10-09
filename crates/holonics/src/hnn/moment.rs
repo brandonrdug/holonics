@@ -191,6 +191,37 @@
 //! apart, never read as the whole moment's. No amplitude bound uniform over all counts holds:
 //! zero-tick drives grow a coordinate as `nU` at any modulus.
 //!
+//! [definition; agent-inferred, October 8; the
+//! [record](../../../../research/records/2026-10-08_THE_HELICAL_CODE_IS_HOW_HOLONS_HOLARCHIES_EPOCHS_AND_AEONS_ENCODE.md),
+//! §5, step 2] **The partner strand's moment** ([`SourceMoment::dyad`]; `hnn::paired` certifies its
+//! operands). A cell is counted at the phase its ring reaches **after** its step, so on a unit-tick
+//! passage opened at phase `s`, letter `k` of a word `u` of length `n` sits at phase `s + k + 1`. The
+//! partner `σ̄(u)_k = σ(u_(n−1−k))`, opened at `s′`, puts strand letter `j` at phase `s′ + n − j`, so
+//! its counts are the strand's reflected in the phase and complemented in the class:
+//!
+//! ```text
+//! M′[t][c] = M[c₀ − t][σ(c)]        c₀ = s + s′ + n + 1 (mod d)        n′ = n        ν̂(n′) = ν̂(n)
+//! ```
+//!
+//! [proved-derived] That is a bijection of the retained counts, the half-turn `t ↦ c₀ − t` of the
+//! phase circle (an involution when `s` and `s′` are exchanged), and it needs no port. The moment
+//! [`SourceMoment::dyad`] forms is exactly this one and nothing else, so [`SourceMoment::encode`] and
+//! [`SourceMoment::open_storage`] are the partner's face: no second recurrence stands beside them.
+//! Under the dihedral lift `B` of the ring's reflector and a port with `B E = E Σ_σ`, the faces are
+//! `m̃(σ̄u) = B P^(c₀) m̃(u)` and `s(0)(σ̄u) = B P^(−(n−1)) s(0)(u)` (`hnn::paired`).
+//!
+//! **Where normalization or rounding would break it, the partner is refused, typed**
+//! ([`DyadRefusal`]). At modulus one `ν̂(n)` is one scalar of the population, the partner has the same
+//! `n`, and the chart rounds the same number on both sides, so it commutes with the lift exactly and no
+//! residual arises. The leaky count does not: each tick rounds every decayed coordinate to the nearest
+//! lattice point in the order of the ages, and a reversed passage reverses its ages. A transport below
+//! one weighs a datum `ρ^a/Σ ρ^(a_k)` from the ages its phases read, which reverse with the passage,
+//! and `B(ρP)B = ρP⁻¹` is not `(ρP)⁻¹`. The pair ports read an oriented offset moment whose orientation
+//! reverses under the dyad (the pair `y → x` becomes `σx → σy`); its reversal law is not built. A
+//! located clock keeps no digits, a continued section and a reframe are not the moment's own passage,
+//! a ring that did not tick once a cell has no unit-tick phase relation, and a count of a class outside
+//! the paired family has no complement.
+//!
 //! | Lean `HNN/Moment` | Rust |
 //! |---|---|
 //! | `closingRing_moment_is_phaseBinned`, `selective_position` | [`SourceMoment::ingest`] |
@@ -203,6 +234,7 @@
 //! | `HNN/Prediction.{placed_at_station, joint_residue_determines_position}` (a locked datum at its station's residue; a ring of period `∏ dᵢ`, pairwise coprime, places each datum at its joint residue class); `HNN/IndexedOpen.{passage_population, passage_read, passage_weight_one_population, separate_populations_ratio, transportedWeight, transported_weight_mass, transported_weight_frame_invariant, transported_weight_unitary, passage_weight_split_invariant, decayed_weight_antitone, decayed_weight_frame_free, decayed_weight_lossless, lossless_term_modulus, dissipative_term_modulus}` (the section continues the passage; each datum at its transported weight) | [`SourceMoment::continued`], [`SourceMoment::phase_weights`], [`SourceMoment::open_parts`] |
 //! | `HNN/IndexedOpen.{framedWeight, framed_weight_mass, framed_weight_pos, framed_weight_one_sided, framed_weight_ratio, framed_weight_le_pow, oneway_later_weight_ratio, framed_weight_symmetric, framed_weight_translation, framed_weight_lossless}` (a candidate reads the span from its own station, each datum at its two-sided transport distance; the one-way law on data no later than the station) | `hnn::prediction::BankPlacement::{weights, storage, modulus_derivative}`; [`SourceMoment::phase_weights`] is the law read from the span's last datum |
 //! | `HNN/IndexedOpen.{nearest_sub_le, leaky_tick_eq_nearest, leaky_count_error_le, leaky_count_ingest, leaky_lattice_le_half_chart, leaky_read_error, campaign_one_founding, leaky_read_exceeds_chart_unit}` (the leaky count: the ingest's counts within half a chart unit over any length, a section's rounded entry adding half a lattice unit, the read's error carried by the mass) | `Leaky::{decay, enter, normalized}`, [`SourceMoment::open_with`], [`SourceMoment::normalized_counts`] |
+//! | `Transport/HelicalCode.{strandFace_complementReverse_nat, face_complementReverse, partner_map_involutive}` (the partner's face on a uniform tick, for an additive carrier involution `J` with `J E = E σ` and `J Ĝ J = Ĝ⁻¹`; the bridge `moment l = U^(n−1)·strandFace U⁻¹ (I∘E) l` is owed, #62) | [`SourceMoment::dyad`], [`DyadRefusal`]; `hnn::paired::PairedCarrier::partner_face` |
 
 use std::collections::BTreeMap;
 
@@ -2436,6 +2468,207 @@ impl SourceMoment {
             .sum();
         let cell = crate::compression::cost::ceil_log2(&BigUint::from(self.alphabet)) + 1;
         counts + cell * self.window.len() as u64
+    }
+}
+
+// -------------------------------------------------------------------------------------------
+// the partner strand's moment
+
+/// [definition; agent-inferred, October 8] **Why a moment is not a strand the dyad reads**
+/// ([`SourceMoment::dyad`]; module header, "The partner strand's moment"). Each refusal names the
+/// carrier, ring or count that would break the reflection; nothing is rounded, substituted or
+/// completed.
+#[derive(Debug, PartialEq, thiserror::Error)]
+pub enum DyadRefusal {
+    /// The class map does not cover the moment's classes.
+    #[error("the class map covers {found} classes; the moment counts {expected}")]
+    ClassMap { expected: usize, found: usize },
+    /// The class map is not an involution of its classes.
+    #[error(
+        "the class map is not an involution at class {class}: the complement of its complement is not the class"
+    )]
+    NotInvolution { class: usize },
+    /// A located occurrence was counted: its digits are not retained.
+    #[error(
+        "the moment counted a located occurrence: the located clock's digits are not retained, so no uniform tick can be read from its counts"
+    )]
+    Located,
+    /// The moment is reframed: its ticks are not its own passage's.
+    #[error("the moment is reframed: its ticks are not those of its own passage")]
+    Reframed,
+    /// The field has another source ring than the one reflected.
+    #[error(
+        "ring {ring} is not the field's only source ring: the dyad moment reflects one source ring's counts"
+    )]
+    Sources { ring: usize },
+    /// The field declares pair offsets: the oriented pair port's reversal law is not built.
+    #[error(
+        "the field declares pair offsets {offsets:?}: the oriented pair port reverses under the dyad and its reversal law is not built"
+    )]
+    PairOffsets { offsets: Vec<usize> },
+    /// The ring's counts are leaky: they round in the order of their ages.
+    #[error(
+        "ring {ring}'s counts are leaky: each tick rounds the decayed counts in the order of their ages, and a reversed passage reverses its ages"
+    )]
+    Leaky { ring: usize },
+    /// A count of a class outside the paired family.
+    #[error(
+        "ring {ring} counted {count} cells of class {class} at phase {phase}, outside the paired family"
+    )]
+    Outside {
+        ring: usize,
+        phase: usize,
+        class: usize,
+        count: u64,
+    },
+    /// The ring did not tick once a cell.
+    #[error("ring {ring} ticked {ticks} times over {cells} cells: the dyad reads one tick a cell")]
+    Ticks { ring: usize, cells: u64, ticks: u64 },
+    /// The partner's opening phase lies outside the ring's period.
+    #[error("the partner's opening phase {phase} lies outside ring {ring}'s period {period}")]
+    Opening {
+        ring: usize,
+        phase: u64,
+        period: u64,
+    },
+    /// The moment itself is outside its proved ingest-only carrier, or lacks the ring.
+    #[error(transparent)]
+    Moment(Box<HnnError>),
+}
+
+impl From<HnnError> for DyadRefusal {
+    fn from(error: HnnError) -> Self {
+        Self::Moment(Box::new(error))
+    }
+}
+
+impl SourceMoment {
+    /// [definition; agent-inferred, October 8] **The partner strand's moment**: the moment the
+    /// partner `σ̄(u)` of this strand would have, opened at phase `opening` of source ring `ring`,
+    /// formed from this moment's counts alone (module header, "The partner strand's moment"). With
+    /// `n` cells counted, the strand opened at `s` and `image[c] = Some(σ(c))`,
+    ///
+    /// ```text
+    /// first′[t][c] = first[c₀ − t][σ(c)]      c₀ = s + s′ + n + 1 (mod d),  s′ = opening,  first′[t][c] = 0 off the family
+    /// start′ = s′     end′ = s′ + n (mod d)     ticks′ = cells′ = n      opening′ = the strand's, ring re-keyed to s′
+    /// ```
+    ///
+    /// so [`SourceMoment::encode`] and [`SourceMoment::open_storage`] of the result (with a lift
+    /// point of `opening′ + n` on `ring`) are the partner's face, read through the actual path. On a
+    /// unit-tick passage it is equal, as a value, to the moment ingest of `σ̄(u)` from a Current
+    /// re-keyed to `s′` makes (the owner's tests). `image` is `σ` on the classes the pairing admits
+    /// and `None` elsewhere, an involution on its family.
+    ///
+    /// Refused, typed ([`DyadRefusal`]), unless the moment is this field's own single-source
+    /// ingest-only passage at modulus one (`current` is its reached lift point, checked by the same
+    /// carrier the capacity reads): not located, not reframed, no declared pair offsets, not leaky,
+    /// no count outside the family, and one tick a cell. A refusal names what would break the
+    /// reflection, and nothing is rounded.
+    pub fn dyad(
+        &self,
+        field: &Field,
+        current: &Current,
+        ring: usize,
+        image: &[Option<usize>],
+        opening: u64,
+    ) -> Result<SourceMoment, DyadRefusal> {
+        let a = self.alphabet;
+        if image.len() != a {
+            return Err(DyadRefusal::ClassMap {
+                expected: a,
+                found: image.len(),
+            });
+        }
+        for (class, partner) in image.iter().enumerate() {
+            if let Some(partner) = *partner
+                && image.get(partner).copied().flatten() != Some(class)
+            {
+                return Err(DyadRefusal::NotInvolution { class });
+            }
+        }
+        if self.located {
+            return Err(DyadRefusal::Located);
+        }
+        if self.reframed {
+            return Err(DyadRefusal::Reframed);
+        }
+        if field.sources() != [ring].as_slice() {
+            return Err(DyadRefusal::Sources { ring });
+        }
+        if !self.offsets.is_empty() {
+            return Err(DyadRefusal::PairOffsets {
+                offsets: self.offsets.clone(),
+            });
+        }
+        self.admit_ingest_carrier(field, current)?;
+        let counts = self.counts(ring)?;
+        if counts.leaky.is_some() {
+            return Err(DyadRefusal::Leaky { ring });
+        }
+        for phase in 0..counts.period {
+            for (class, &count) in counts.first[phase * a..(phase + 1) * a].iter().enumerate() {
+                if count != 0 && image[class].is_none() {
+                    return Err(DyadRefusal::Outside {
+                        ring,
+                        phase,
+                        class,
+                        count,
+                    });
+                }
+            }
+        }
+        if counts.ticks != self.cells {
+            return Err(DyadRefusal::Ticks {
+                ring,
+                cells: self.cells,
+                ticks: counts.ticks,
+            });
+        }
+        let period = counts.period as u64;
+        if opening >= period {
+            return Err(DyadRefusal::Opening {
+                ring,
+                phase: opening,
+                period,
+            });
+        }
+        let d = counts.period;
+        let c0 = ((counts.start + opening + 1 + self.cells % period) % period) as usize;
+        let mut first = vec![0u64; d * a];
+        for phase in 0..d {
+            let source = (c0 + d - phase) % d;
+            for (class, partner) in image.iter().enumerate() {
+                if let Some(partner) = *partner {
+                    first[phase * a + class] = counts.first[source * a + partner];
+                }
+            }
+        }
+        let width = BigInt::from(counts.period);
+        let mut opened = self.opening.clone();
+        opened[ring] = (&self.opening[ring] / &width) * &width + BigInt::from(opening);
+        Ok(SourceMoment {
+            alphabet: a,
+            offsets: self.offsets.clone(),
+            rings: vec![RingCounts {
+                ring,
+                period: d,
+                first,
+                offset: Vec::new(),
+                start: opening,
+                end: (opening + self.cells % period) % period,
+                ticks: self.cells,
+                extent: 0,
+                leaky: None,
+            }],
+            window: self.window.clone(),
+            cursor: self.cursor,
+            cells: self.cells,
+            opening: opened,
+            clock_cells: self.cells,
+            reframed: false,
+            located: false,
+            partition: self.partition.clone(),
+        })
     }
 }
 
