@@ -1,0 +1,42 @@
+{
+  "source_commit": "1ad7f498825dcffbbcf4e4509519fea366cceb5b",
+  "source_tree": "a6619d3c6fd00482a40c049a8096cd48ccb2e0d6",
+  "source_manifest": {
+    "sha256": "6561bfca6e52ea244cc7d48c3e7284fe7e3574655795104e755bd3ebf4c98897",
+    "bytes": 58934
+  },
+  "original_runtime_acceptance": {
+    "sha256": "70137d360da0155791f013d6fe1c6fadc8a83df58176659151abbdbc845c1716",
+    "bytes": 378
+  },
+  "public_receipt": "<repository>/research/records/receipts/2026-10-09-world-model/face-native-v1",
+  "current_reviewed_public_VALIDATION": {
+    "sha256": "ec238fda53f2909aec9b30dc9e60cd87e53fcf3163c804a62ca691f6dfd49167",
+    "bytes": 22414
+  },
+  "current_reviewed_public_FILE_HASHES": {
+    "sha256": "750f24be2d294d9f597703f13559dd0cd3ccea2b2e5420a4a3db305fd414ab46",
+    "bytes": 38155
+  },
+  "C1b_native_bytes_match": true,
+  "fixtures_not_repeated": 25,
+  "prior_doctests_passed": 57,
+  "claim_scope_preserved": [
+    "joint actual raw World face/native blind read/waves under one k",
+    "wrong-face rejection conditional on full-rank waves",
+    "undeclared-face neutrality"
+  ],
+  "not_claimed": [
+    "grain Face.of_read coverage",
+    "conditioning retained fibres on actual faces",
+    "deployed wrong-face elimination",
+    "C2",
+    "Ask",
+    "learning",
+    "CUDA parity"
+  ],
+  "joined_baseline_changes_compiled_not_executed": [
+    "crates/holonics/src/hnn/paired.rs",
+    "crates/holonics/src/hnn/tests/physical_communication.rs"
+  ]
+}

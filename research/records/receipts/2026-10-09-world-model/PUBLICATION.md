@@ -220,3 +220,50 @@ compared epoch under the same `k` as the waves and the native readout (`ModelKey
   conditioning retained fibres on actual face observations, deployed elimination of wrong-face alternatives,
   C2, the Ask, learning through the model, CUDA, the World/Robin and all-material variation, or the whole gate
   at `1ad7f4988`.
+
+## The final joined gate at `d96cdbd86`
+
+The combined candidate joins C1b-2a and C1b-2b onto published main `97c00ce9f`, with the repaired example,
+and the whole gate ran on it once.
+- Source `d96cdbd86` (full `d96cdbd86bc3ced02049682b1acbdd8512797d95`, tree
+  `0ad64ee86f09c336939982aabb308adf90d95940`). On `97c00ce9f` it carries the merge `9bd63beca` of `a739963f6`,
+  the example repair `bf425a34e`, the merge `7119527f4` of `1ad7f4988`, and the record, atlas and receipt
+  commits above. All six C1b owner and test paths equal the tested `1ad7f4988`. Against it, the 352 native
+  inputs differ in exactly three paths: the example's exterior status return, a documentation comment in
+  `hnn/paired.rs`, and main's added diagnostic test in `hnn/tests/physical_communication.rs`.
+- **The whole gate passed at `d96cdbd86`** ([handoff](joined-gate-v1/HANDOFF.md),
+  [validation](joined-gate-v1/VALIDATION.json), [join scope](joined-gate-v1/JOIN_SCOPE_PROOF.json)).
+  - `bash tools/gate.sh` exited 0. It ran the workspace all-targets check, the full all-targets guard lints
+    (with the repaired `helical_duplex` example) and all 57 guard doctests. The script's own component times
+    were 29,256 ms, 29,488 ms and 36,307 ms.
+  - A fresh `cargo test -p holonics --lib --no-run` then passed and built one library-test executable. The
+    added diagnostic test was compiled, not run.
+  - This pass is bound to `d96cdbd86` alone. The failure at `a739963f6` and its inheritance, not rerun, at
+    `1ad7f4988` stand as recorded above.
+- **Stages**, within their fixed projections, released, the 4 GiB reservation enforced, and no limit raised
+  after launch:
+
+  | Stage | Exit | Wall ns | Projection ns | CPU ns | Child RSS KiB |
+  |---|---:|---:|---:|---:|---:|
+  | gate | 0 | 95,060,959,909 | 196,670,000,000 | 99,768,498,000 | 1,696,416 |
+  | joined library tests, compile only | 0 | 34,970,983,050 | 65,000,000,000 | 37,263,247,000 | 2,149,012 |
+
+  The gate's projection is three sequential compile units, each at the largest measured 64,890,000,000 ns,
+  plus a 2,000,000,000 ns lifecycle allowance. To admit that grouped projection, the queue's resource guard
+  copies changed only their sealed native-build wall and CPU ceilings. Monitoring, sealing, accounting, stop,
+  cleanup and the lease are unchanged (`RESOURCE_POLICY_JOIN.json`, hash-only).
+- **No runtime fixture was repeated.** The C1b-2a and C1b-2b acceptances stand at their producer pins, and
+  the joined packet's `producer/` copies are byte-identical to the committed `face-native-v1` `HANDOFF.md`,
+  `VALIDATION.json` and `FILE_HASHES.json` ([reuse](joined-gate-v1/PRODUCER_REUSE.json)).
+- **Projected host paths** ([PROJECTION.json](PROJECTION.json)). One more placeholder is declared,
+  `<gate-run>/`, for the gate's private run directory, beside the earlier seven.
+  - `PRODUCER_REUSE.json` replaces `<repository>/research/records/receipts/` once.
+  - The library compile's stdout replaces `<cargo-registry>/` 50 times and `<gate-run>/` 57 times, and its
+    stderr replaces `<gate-run>/` once.
+
+  There is no other byte change. All 24 entries invert to their pinned originals, and no host path remains.
+- **Hashed only:** [joined-gate-v1/OMITTED.md](joined-gate-v1/OMITTED.md). The manifest lists 62 files
+  (12,978,731 bytes), and 55 of them (12,937,056 bytes) are hash-only, among them the gate's stderr (365,761
+  bytes, over the compact limit) and the `producer/` copies.
+- **Scope.** Claimed: the repository's whole gate and the joined library-test compilation at this tree. Not
+  claimed: any runtime fixture at this tree, or anything beyond the C1b-2a and C1b-2b scopes above.

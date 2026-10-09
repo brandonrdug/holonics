@@ -1,0 +1,123 @@
+{
+  "grade": "Final joined repository Gate 1 and library-test compilation PASS",
+  "source_commit": "d96cdbd86bc3ced02049682b1acbdd8512797d95",
+  "source_tree": "0ad64ee86f09c336939982aabb308adf90d95940",
+  "source_inputs": 352,
+  "source_manifest": {
+    "sha256": "0a13b6b8652f5c6a047804c02a8ce99ccf514c7a12b01570588c58420cc7c409",
+    "bytes": 59597
+  },
+  "actual_Git_gate_script": {
+    "sha256": "5f631203f35bdb6525fd4b87ec0555af2ea2ba08f45e6a7962bb77acf84bdd5e",
+    "bytes": 1339
+  },
+  "whole_gate_sh_passed": true,
+  "workspace_all_targets_check_passed": true,
+  "FULL_all_targets_guard_lints_passed": true,
+  "guard_doctests_passed": 57,
+  "gate_component_reported_ms": {
+    "check": 29256,
+    "guard-lints": 29488,
+    "guard-doctests": 36307
+  },
+  "gate_component_time_grain": "Script milliseconds; full invocation nanoseconds and aggregate CPU retained separately",
+  "former_helical_duplex_exit_call_lint_blocker_resolved_at_this_exact_pin": true,
+  "fresh_joined_library_test_compilation_passed": true,
+  "fresh_library_test_executable": {
+    "sha256": "eefdaeaa2f4551e7c1afebeb0e8279d75ed6dd30f9377b7ef982c356f177f6a7",
+    "bytes": 76938208
+  },
+  "source_unchanged_before_after": true,
+  "C1b_owner_and_test_bytes_match_tested_1ad7f498": true,
+  "producer_runtime_results_preserved": 25,
+  "runtime_fixtures_repeated": 0,
+  "prior_C1b_scope_not_expanded": true,
+  "exact_worktree_clean_after_runs": true,
+  "results": [
+    {
+      "label": "c1b2ab-d96cdbd8-gate-20261009-v1",
+      "accepted": true,
+      "exit": 0,
+      "command_wall_ns": 95060959909,
+      "guarded_wall_ns": 96701624687,
+      "projection_ns": 196670000000,
+      "measured_to_projected": {
+        "numerator": 96701624687,
+        "denominator": 196670000000
+      },
+      "aggregate_CPU_ns": 99768498000,
+      "child_CPU_user_us": 85419732,
+      "child_CPU_system_us": 8935808,
+      "peak_child_RSS_KiB": 1696416,
+      "group_peak_bytes": 2093301760,
+      "reservation_bytes": 4294967296,
+      "enforced_cap_bytes": 4294967296,
+      "maximum_authorized_bytes": 8589934592,
+      "thread_budget": 4,
+      "stdout": {
+        "sha256": "5853132e43fc56954c8dcc23857c32a80ff795c0b064a7326f07cae3fd8d24dd",
+        "bytes": 5987
+      },
+      "stderr": {
+        "sha256": "d1b4276f2c787892633973beab02c70bbbbd918362d5471cbac8ab528b470a68",
+        "bytes": 365761
+      },
+      "quiescent_released": true
+    },
+    {
+      "label": "c1b2ab-d96cdbd8-joined-lib-20261009-v1",
+      "accepted": true,
+      "exit": 0,
+      "command_wall_ns": 34970983050,
+      "guarded_wall_ns": 36730938130,
+      "projection_ns": 65000000000,
+      "measured_to_projected": {
+        "numerator": 36730938130,
+        "denominator": 65000000000
+      },
+      "aggregate_CPU_ns": 37263247000,
+      "child_CPU_user_us": 31718151,
+      "child_CPU_system_us": 2769802,
+      "peak_child_RSS_KiB": 2149012,
+      "group_peak_bytes": 2394591232,
+      "reservation_bytes": 4294967296,
+      "enforced_cap_bytes": 4294967296,
+      "maximum_authorized_bytes": 8589934592,
+      "thread_budget": 4,
+      "stdout": {
+        "sha256": "7d192cc78120d10c08c2dcecc807058c12353e3a5a04687a9d6fad895addf792",
+        "bytes": 26348
+      },
+      "stderr": {
+        "sha256": "e071d4d965900c2c888d37178d300118959248ba23dcc31136db82f2ce3a3447",
+        "bytes": 346
+      },
+      "quiescent_released": true
+    }
+  ],
+  "commands_manifest": {
+    "sha256": "8d5565d848fb0720eccf11e773a8772d802df138d3a2f26f193b4c0725dff799",
+    "bytes": 2523
+  },
+  "all_projections_fixed_before_launch": true,
+  "limits_raised_after_launch": false,
+  "all_leases_released": true,
+  "no_native_process_or_active_owned_unit_remaining": true,
+  "source_edits": false,
+  "Git_publication": false,
+  "GPU_runtime": false,
+  "cache_clearing": false,
+  "system_changes": false,
+  "private_correspondence_in_packet": false,
+  "remaining_blockers_for_requested_native_gate": [],
+  "not_certified": [
+    "grain Face.of_read coverage",
+    "conditioning retained fibres on actual declared faces",
+    "deployed wrong-face elimination",
+    "C2",
+    "Ask",
+    "learning",
+    "CUDA parity",
+    "new unrelated diagnostic runtime reading"
+  ]
+}

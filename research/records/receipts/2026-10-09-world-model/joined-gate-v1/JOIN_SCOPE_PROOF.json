@@ -1,0 +1,9 @@
+{
+  "paired_change_documentation_only": true,
+  "paired_runtime_code_sha256": "8be55c52544e7cc0c45cae0f31d23dcc031eff3418bb135c94b1a0a7a985eb7e",
+  "helical_operation_prefix_unchanged": true,
+  "helical_operation_prefix_sha256": "37b4431b367414fc5d3595f438e5eb1eaf9123b5f6fb8691c95910e9ea9aac2c",
+  "example_change": "Exterior main keeps the error text and returns ExitCode FAILURE/SUCCESS instead of calling process::exit",
+  "new_diagnostic_is_compile_only": true,
+  "C1b_runtime_fixtures_repeated": 0
+}

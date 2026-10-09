@@ -311,6 +311,66 @@
         "<repository>/research/records/receipts/": 0
       }
     },
+    "joined-gate-v1/PRODUCER_REUSE.json": {
+      "original": {
+        "bytes": 1466,
+        "sha256": "90ebc34e25bb9be34f9f0604641dc049d8bf70c5065406149c8288c735fdfc47"
+      },
+      "projected": {
+        "bytes": 1451,
+        "sha256": "73031567acb48e17c3433b0f28cec8d166b466e6d41499949d04705724a12683"
+      },
+      "replaced": {
+        "<candidate-worktree>/": 0,
+        "<cargo-registry>/": 0,
+        "<coupled-run>/": 0,
+        "<face-run>/": 0,
+        "<gate-run>/": 0,
+        "<native-run>/": 0,
+        "<queue-admission>/": 0,
+        "<repository>/research/records/receipts/": 1
+      }
+    },
+    "joined-gate-v1/stages/c1b2ab-d96cdbd8-joined-lib-20261009-v1.stderr": {
+      "original": {
+        "bytes": 346,
+        "sha256": "e071d4d965900c2c888d37178d300118959248ba23dcc31136db82f2ce3a3447"
+      },
+      "projected": {
+        "bytes": 301,
+        "sha256": "d98b985eb8ec758676252f0b41e9b5e7db47eda6aa4e4db2d0fcf7e4397a626d"
+      },
+      "replaced": {
+        "<candidate-worktree>/": 0,
+        "<cargo-registry>/": 0,
+        "<coupled-run>/": 0,
+        "<face-run>/": 0,
+        "<gate-run>/": 1,
+        "<native-run>/": 0,
+        "<queue-admission>/": 0,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "joined-gate-v1/stages/c1b2ab-d96cdbd8-joined-lib-20261009-v1.stdout": {
+      "original": {
+        "bytes": 26348,
+        "sha256": "7d192cc78120d10c08c2dcecc807058c12353e3a5a04687a9d6fad895addf792"
+      },
+      "projected": {
+        "bytes": 21583,
+        "sha256": "3f039c08a87a75edc027d7fcf8f521ae2336ec039e8e11a5213aff2bd557de92"
+      },
+      "replaced": {
+        "<candidate-worktree>/": 0,
+        "<cargo-registry>/": 50,
+        "<coupled-run>/": 0,
+        "<face-run>/": 0,
+        "<gate-run>/": 57,
+        "<native-run>/": 0,
+        "<queue-admission>/": 0,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
     "native-v1/stages/actual-c1b-build4-20261009-v207.stderr": {
       "original": {
         "bytes": 253,
@@ -377,6 +437,7 @@
     "<cargo-registry>/": "the absolute host directory of the crates.io registry sources; each crate name and version that follows is kept",
     "<coupled-run>/": "the absolute host directory of the C1b-2a validation's private run (its frozen source, copied dependency cache and target); the path that follows is kept",
     "<face-run>/": "the absolute host directory of the C1b-2b validation's private run (its frozen source, copied dependency cache and target); the path that follows is kept",
+    "<gate-run>/": "the absolute host directory of the final joined gate's private run (its frozen source, copied dependency cache and target); the path that follows is kept",
     "<native-run>/": "the absolute host directory of the joined compilation's private run (its copied dependency cache and target); the path that follows is kept",
     "<queue-admission>/": "the absolute host directory holding the sole queue's admissions; the admission label, its source copy and build cache that follow are kept",
     "<repository>/research/records/receipts/": "the main checkout's receipts directory, where the queue wrote the complete packets; the path that follows is the repository path"
