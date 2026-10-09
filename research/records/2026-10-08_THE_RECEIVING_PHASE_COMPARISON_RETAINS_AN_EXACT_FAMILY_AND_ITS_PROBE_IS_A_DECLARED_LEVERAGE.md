@@ -220,12 +220,17 @@ at `a739963f6` ([receipt](receipts/2026-10-09-world-model/PUBLICATION.md)), wher
 failed at an unchanged example whose repair is validated only by the final join].
 
 In an actual encounter, each later incident wave depends on the returned ones through the native
-source. The prepared action's own unrun Word (`Word::prospective_coupled_passage`, opened by
-`ProspectiveControl::controlled_word`) emits `a_t` on the same source frame. A live key answers
-`b_t = P_t ξ_t + Q_t a_t` with `ξ_(t+1) = F_t ξ_t + G_t a_t`, at commit `T + t − 1`. The passage
-`P = (a_t, b_t, R_t x_t)_t` is then affine in the key's fibre, with one `k` over the whole passage
-(`WorldModel::coupled_prospect`, `CoupledProspect`, read per key by
-`PreparedPhysicalAction::world_prospect` before the encounter):
+source. The prepared action's own unrun Word (`Word::prospective_coupled_passage`) runs on its
+controlled opening, which `ProspectiveControl::controlled_word` reads by `prepare`'s own checks and
+its shared `apply_control`, consuming nothing. It emits `a_t` on the same source frame. A live key
+answers through the existing `return_source_wave`: `b_t = P_t ξ_t + Q_t a_t` with
+`ξ_(t+1) = F_t ξ_t + G_t a_t`, at commit `T + t − 1`. The passage `P = (a_t, b_t, R_t x_t)_t` is then
+affine in the key's fibre, with one `k` over the whole passage (`WorldModel::coupled_prospect`,
+`CoupledProspect`, read per key by `PreparedPhysicalAction::world_prospect` before the encounter).
+The passage from the fibre's point and each direction's exact change are read as differences of exact
+passages, and one further summed-direction passage guards them. `R_t x_t` is the native receiving
+readout in the producing frame, `ring.rotate(anchor, lift)` under the opening's current, which no
+reception publication moves:
 
 ```text
 P(c + N k) = P(c) + Σ_j k_j [P(c + N e_j) − P(c)]
