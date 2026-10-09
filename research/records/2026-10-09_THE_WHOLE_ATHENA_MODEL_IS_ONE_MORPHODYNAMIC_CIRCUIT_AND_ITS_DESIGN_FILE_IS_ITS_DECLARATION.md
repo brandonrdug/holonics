@@ -60,7 +60,7 @@ declaration (§7).
 | W World | the participating terrain and its current; actions enter it and consequences return | `hnn/physical/action/world.rs` (the Robin termination `a = e + Y⁻¹f`), `hnn/physical/action.rs` (Ask on the phase family), `hnn/word/{world_boundary,action,action_return}.rs` | [P] the native relation is certified, but there is no World prediction |
 | C Codec | the boundary chart from World samples to letters, one per modality | `hnn/encoding.rs` (`Encoded`, `check_step`); Lean `HNN/Encoding` | [P] text and pitch/amplitude charts only; image, acoustic and motor codecs owed |
 | S Strand | the source's face on a navigator's helix, `m = Σ_k Ĝ(τ(k))⁻¹E(u_k)` | `hnn/moment.rs` (`SourceMoment`); Lean `HNN/Moment` | [R] |
-| P Pairing | the partner strand by a fixed-point-free involution `σ` through pair contacts; the dihedral `⟨S, U⟩` | `compression/keys/duplex.rs`; `hnn/paired.rs` (`083640894`, native PASS, publication pending); Lean `Transport/HelicalCode` | [P] structural on the HNN carrier; equivariant deposition owed (the pair-port reversal law) |
+| P Pairing | the partner strand by a fixed-point-free involution `σ` through pair contacts; the dihedral `⟨S, U⟩` | `compression/keys/duplex.rs`; `hnn/paired.rs` (the partner face; the paired deposit and the paired source law, [receipt](receipts/2026-10-09-paired-deposit/PUBLICATION.md)); Lean `Transport/HelicalCode`, `HNN/PairedDeposit` | [P] the equivariant deposition is built and measured on the pair routes and on general features at the normal law; a participating world's comparison is not measured |
 | Fr Frames | receivers' residue partitions read with whole winding and epoch | `compression/keys/transport.rs`; Lean `HNN/Prediction.joint_residue_determines_position` | [R] |
 | Dc Decoder | the receiver's quotient (its kernel fixed by the admitted future) and the designed placement | `receiver/face.rs`; Lean `Foundation/CausalRelevance`, `Transport/HelicalRepair` | [P] the designed-placement law owed (#62) |
 | Tp Topology | the linking number of closed strands, `Lk = Tw + Wr` | Lean `Foundation/TopologicalReceiver` (conditional) | [O] no crate reads it |
@@ -93,7 +93,7 @@ declaration (§7).
 | F → R | reception `I_C(\|H_S⟩, \|H_R⟩) = (\|H′_S⟩, \|H′_R⟩, f_R)` | [P] |
 | R → A | exact phase statistics absorbed per receipt; the family and its leverage | [P] |
 | R, A → Q | `ℓ = log R` and `R⁻¹dR` through the operands that produced the forward carriers | [R] |
-| Q → M | deposition only from covectors that reached the locus; the certified step; `learned_energy_balance`; proposal + prior remainder = applied + new remainder + released | [P] applied part zero today (§5, item 4) |
+| Q → M | deposition only from covectors that reached the locus; the certified step; `learned_energy_balance`; proposal + prior remainder = applied + new remainder + released | [P] the finite-decrease landing commits lattice changes on one fixture (§5, item 4) |
 | M → F | the next passage reads the deposited constitution, with the held momentum `C′w′ = Cw` and the moving-metric work `½xᵀĠx` | [P] |
 | F, A → Rel | release by sections of the request's sheets; Ask executes the most distinguishing admitted probe | [P] |
 | Rel → W → C | the action current and its returned wave through the admittance termination: reflection `(Y − G)/(Y + G)` at the junction | [P] |
@@ -103,8 +103,9 @@ declaration (§7).
 | F ⇄ Dv | the card readout equals the host's advance line for line | [P] |
 
 **Declared circuits.** Each keeps its clock and retained interior.
-1. **Learning:** `F → R → Q → M → F` on reception epochs. [P] Closed on the host; the contacts sit in the
-   no-event regime.
+1. **Learning:** `F → R → Q → M → F` on reception epochs. [P] Closed on the host. Since the finite-decrease
+   landing a deposit commits lattice changes on one fixture, and a second publication at its received
+   opening reads 4 of 4 (§5, item 4).
 2. **Perception, selection and consequence:**
    `M → R → A → Rel(Ask) → W → C → S → F → R → Q → M`. This is the loop through which learning changes
    later learning. [P]
@@ -162,9 +163,21 @@ of Athena's state.
    - The balances close over no committed change.
    - A cold restore reproduces material, carry and current with zero difference.
 
-   Every circuit through M therefore carries no represented change. The repair is M's element relation: a
-   finite-decrease admission for a first-reach step on Rest-opened Words. Its design passed source review,
-   and the build is in progress (#73).
+   Every circuit through M therefore carried no represented change at that pin (`6f0bd8dfd`,
+   [receipt](receipts/2026-10-09-acceptance-reader/PUBLICATION.md)). The repair was M's element relation: a
+   finite-decrease admission for a first-reach step on Rest-opened Words (#73).
+
+   [measured, October 9, after this record was first written] That landing is built and published.
+   - On 0279 it admitted the phase candidate at `η = 2⁻¹⁰`, and the four learned-change criteria held
+     ([receipt](receipts/2026-10-09-finite-decrease/PUBLICATION.md)).
+   - The landing then re-read a Word's own received opening
+     ([receipt](receipts/2026-10-09-received-opening/PUBLICATION.md)).
+   - A second publication at that opening read 4 of 4
+     ([receipt](receipts/2026-10-09-second-publication/PUBLICATION.md)).
+
+   The circuits through M now carry a represented change on that one fixture, with one observation
+   repeated. The 0 of 4 above stays the historical reading at its source pin. Learning across different
+   observations and families, the World's reflected return and the complete model stay open.
 5. **Goals are boundary declarations.** On the Rel → W edge a goal is a magnitude cell, a phase grain and a
    quantifier. The edge admits it when the goal's cell meets the image of the control map.
 6. **Embedding and context are not nodes.** An embedding is the learned metric of the receivers' frames,
@@ -234,8 +247,10 @@ of Athena's state.
 
 Epime reviews this diagram against the owners. The first concrete gaps, in the order the diagram exposes
 them:
-1. Q → M: the finite-decrease landing (in build).
-2. P: equivariant deposition (the pair-port reversal law).
+1. Q → M: the finite-decrease landing (built and published, with its received openings and second
+   publication; §5, item 4).
+2. P: equivariant deposition (built and published: the paired deposit and the paired source law; a
+   participating world's comparison remains).
 3. R: the population at power ports.
 4. F: the glued cell complex and the receiver-region view.
 5. G: resonant key location with soft keys (the #123 joins).
