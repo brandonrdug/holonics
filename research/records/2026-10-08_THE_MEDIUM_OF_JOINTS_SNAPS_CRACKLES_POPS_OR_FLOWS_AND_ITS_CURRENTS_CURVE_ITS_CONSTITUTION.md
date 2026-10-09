@@ -197,8 +197,11 @@ in all 108 coordinates. The per-family and joint pairings hold.
   gain `κ²` shared by the three families, and then the joint halving: C goes from its own `2^-32`
   to `2^-33`, K from `2^-29` to `2^-31`, D from `2^-30` to `2^-31`. This run did not read the
   covector-scale bound `ηc ≤ 1` or the committed-storage constraints.
-- At the point, the exact tangent clears the first-reach threshold by 15 binary orders for C and 19
-  for K and D. The gap therefore lies in the uniform certificate and its chart-to-lattice
+- At the point, the exact tangent clears the first-reach threshold. The exact floors are
+  `floor_log2(T_f/|A d_f|²)` = 15 (C), 18 (K), 18 (D) and 15 jointly, taken from the raw rationals
+  in `POINT_READINGS.json`. The separately rounded coordinates `T` = (3, 2, 2, 4) and the
+  response's (−12, −17, −17, −12) differ by 15, 19, 19 and 16, but those differences are not the
+  ratio's floor. The gap therefore lies in the uniform certificate and its chart-to-lattice
   composition, not in an infinitesimal obstruction of the response.
 - **Unresolved, and not established by the reading:**
   - the like-for-like join, because `κ²b` and `|A d|²` are read in different forcing and metric
@@ -209,15 +212,31 @@ in all 108 coordinates. The per-family and joint pairings hold.
   No larger deposit is admitted. The candidate laws are not exhaustive:
   - (a) L1′ a priori: the exact-tangent curvature plus a certified bound on the variation of `A`
     along the executed ray;
-  - (b) a posteriori exact decrease on the current word: evaluate the declared comparison exactly,
-    or exactly enclosed, at the candidate material `θ + ηd`, starting at the first-reach step and
-    halving, for all families jointly. It certifies the actual finite step without a curvature
-    bound. It owes:
-    - the lawfulness of re-evaluating on the current word's own producing operands, which is not
-      a retention tape;
-    - an exact or enclosed score at the grain representative;
-    - the committed-storage checks;
-    - the cost of each trial, measured at 346,866,219 ns per taught read.
+  - (b) a posteriori exact decrease. Epime's source review (October 8) narrows it.
+    - **Allowed in principle:** a declared, transient finite-candidate read before publication, on a
+      fresh candidate's own forward operands and comparison, with the same declared source,
+      moment, receiver, target and support, and no override of the receiver or the target.
+    - **Forbidden:**
+      - reusing a historical producing Word as retained state;
+      - changing material while reading its old fixed midpoints;
+      - building `θ + ηd` outside the owner and assigning it as a successor;
+      - any blind automatic halving loop.
+    - **What it owes:**
+      - the actual finite objective and opening transformation, since the held comparison's total
+        includes the opening return paired with the carried `J_open`. A fixed-opening replay of a
+        rest-start fixture establishes only that fixture;
+      - a new, proved finite-decrease admission relation consumed inside
+        `ContactCut::continue_deposited`, beside its field and current identity, source, deposit,
+        reach, storage, power and commit checks, which exact score decrease cannot bypass;
+      - explicit simultaneous families, the quantized score kept apart from the grain
+        representative, and the carried lattice and remainders;
+      - enclosures that separate the inequality, so that overlapping endpoints refuse;
+      - its own declared read and development projection, because the cost of a trial is
+        unmeasured; 346,866,219 ns is only the baseline taught read.
+
+[measured; queue terminal validation of `e8795670d`, October 8] All four native tests passed: the
+landing tangent, the chart witness and both carry chains. Split gate 1 passed. The four
+learned-change criteria remain NOT-MET.
 
 **Owed (#62, #73):**
 1. the avalanche carry as a certified deposition, which never raises a limit and never takes an
