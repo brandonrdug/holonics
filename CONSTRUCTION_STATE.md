@@ -29,8 +29,13 @@ The retained independent briefs are paused with Claude; the product acceptance b
 - **Received openings (October 9):** the landing now re-reads the Word's own received opening through `θ′` at held
   momentum; on 0279's carry it admitted a candidate on its phase part
   ([receipt](research/records/receipts/2026-10-09-received-opening/PUBLICATION.md)). That fixture publishes nothing.
-- **Still owed:** a learned publication at a received opening and its later response, the opening's held-crossing
-  term `J_open` with its certificate, the World-sensitive circuit, and generation learning from its own release.
+- **The second publication (October 9):** a second call at the received opening landed and published; the four
+  criteria, read against the first publication's material, are 4 of 4: one lattice unit committed per family, the
+  compared station's later response moved in 8 coordinates, the energy closed exactly and a cold restore reproduced
+  it ([receipt](research/records/receipts/2026-10-09-second-publication/PUBLICATION.md)). One fixture, one
+  observation repeated.
+- **Still owed:** the opening's held-crossing term `J_open` with its certificate, learning across different
+  observations and families, the World-sensitive circuit, and generation learning from its own release.
 
 **October 6 HNN integration.** The [blind receiving return](research/records/2026-10-06_THE_BLIND_RECEIVING_RETURN_IS_JOINED_BUT_RELEASE_NEEDS_THE_EXECUTED_COUPLED_DOMAIN.md)
 now consumes its actual continuing Word's pullback and the existing normal deposition at R.

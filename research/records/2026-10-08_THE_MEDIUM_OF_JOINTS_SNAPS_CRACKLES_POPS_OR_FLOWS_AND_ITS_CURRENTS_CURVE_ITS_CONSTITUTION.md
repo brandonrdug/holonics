@@ -307,6 +307,22 @@ learned-change criteria remain NOT-MET.
   the candidate and publishes nothing, so a learned publication at a received opening, and its later
   response, are not yet measured. All 14 finite-decrease and 21 physical fixtures pass.
 
+[measured, October 9; native PASS at `8121219ef`;
+[receipt](receipts/2026-10-09-second-publication/PUBLICATION.md)] **The second learned publication.**
+- **The passage.** On 0279's own task the first call landed at Rest and published; the second call
+  repeated the observation at the received opening the first left. Its landing re-entered that
+  opening through `θ′` and was admitted on its phase part at first reaches C `2⁻¹³`, K `2⁻¹⁴`,
+  D `2⁻¹³`, and published.
+- **The reader**, applied to the second publication against the first's material: 4 of 4. Each
+  family committed exactly one lattice unit of 36 (C entry 26 by +1, K entry 28 by −1, D entry 25 by
+  −1); the compared station's later response differs from the control holding the first
+  publication's material in 8 realified coordinates; the energy closes exactly with held-work and
+  chain residuals 0; a cold restore reproduces the material, carry, current and the difference.
+- **The defect.** `e` is nonzero in all 40 coordinates at tick 6, as at the first landing.
+- **Scope.** One fixture, two publications on one declared observation; not general learning. The
+  proposal stays the fixed-rate covector, and this admission did not need `J_open`, which stays owed
+  with its certificate.
+
 **Owed (#62, #73):**
 1. the avalanche carry as a certified deposition, which never raises a limit and never takes an
    uncertified step, with its Lean statement;

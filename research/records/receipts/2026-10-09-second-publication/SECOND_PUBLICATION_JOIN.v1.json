@@ -1,0 +1,147 @@
+{
+  "status": "PASS actual second-publication reading and affected guards",
+  "source_commit": "8121219ef7f32a0cf94b5efcdfb74a3e0fecedd8",
+  "source_tree": "6caa819c7e785afc3fe109ea45d6cb12a78db16e",
+  "reading": {
+    "source_commit": "8121219ef7f32a0cf94b5efcdfb74a3e0fecedd8",
+    "source_tree": "6caa819c7e785afc3fe109ea45d6cb12a78db16e",
+    "actual_second_publication": true,
+    "call1": "Ok(Phase)",
+    "call2": "Ok(Phase)",
+    "C_K_D_declared_exponents": [
+      -13,
+      -14,
+      -13
+    ],
+    "committed_families": 3,
+    "each_family_entries": 36,
+    "each_family_nonzero_q_entries": 1,
+    "C_K_D_nonzero_declared_reach_coordinates_and_q": [
+      [
+        26,
+        1
+      ],
+      [
+        28,
+        -1
+      ],
+      [
+        25,
+        -1
+      ]
+    ],
+    "e_tick": 6,
+    "e_nonzero_coordinates": 40,
+    "e_total_coordinates": 40,
+    "later_compared_station_changed_coordinates": 8,
+    "energy_identities_closed_exactly": true,
+    "held_work_residual": 0,
+    "chain_residual": 0,
+    "cold_material_carry_current_equal_live": true,
+    "cold_response_and_difference_equal_live": true,
+    "criteria_met": 4,
+    "criteria_required": 4,
+    "complete_wall_ns": 3777887842,
+    "child_wall_ns": 3464241952,
+    "aggregate_CPU_ns": 3676358000,
+    "child_peak_RSS_KiB": 34180,
+    "group_peak_B": 41435136,
+    "fixed_projection_ns": 17000000000,
+    "quiescent_released": true,
+    "scope": "One declared two-publication synthetic physical contact fixture; no complete opening derivative/World/bank/CUDA/generation/whole-family generalization claim"
+  },
+  "fresh_guard_results": [
+    {
+      "label": "actual-second-prep8-20261009-v174",
+      "accepted": true,
+      "complete_wall_ns": 9042519721,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 6392200000,
+      "group_peak_B": 3172978688,
+      "child_wall_ns": 8850360647,
+      "child_peak_RSS_KiB": 39500,
+      "measured_to_projected": {
+        "numerator": 9042519721,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": []
+    },
+    {
+      "label": "actual-second-build-20261009-v174",
+      "accepted": true,
+      "complete_wall_ns": 36465704898,
+      "projection_ns": 65000000000,
+      "aggregate_CPU_ns": 35388970000,
+      "group_peak_B": 2400075776,
+      "child_wall_ns": 34601793205,
+      "child_peak_RSS_KiB": 2089560,
+      "measured_to_projected": {
+        "numerator": 36465704898,
+        "denominator": 65000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": []
+    },
+    {
+      "label": "actual-second-check-20261009-v174",
+      "accepted": true,
+      "complete_wall_ns": 22772525132,
+      "projection_ns": 65000000000,
+      "aggregate_CPU_ns": 21842489000,
+      "group_peak_B": 1667297280,
+      "child_wall_ns": 20960124383,
+      "child_peak_RSS_KiB": 1472084,
+      "measured_to_projected": {
+        "numerator": 22772525132,
+        "denominator": 65000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": []
+    },
+    {
+      "label": "actual-second-clippy-20261009-v174",
+      "accepted": true,
+      "complete_wall_ns": 31538066204,
+      "projection_ns": 65000000000,
+      "aggregate_CPU_ns": 30578095000,
+      "group_peak_B": 1723473920,
+      "child_wall_ns": 29867954941,
+      "child_peak_RSS_KiB": 1476756,
+      "measured_to_projected": {
+        "numerator": 31538066204,
+        "denominator": 65000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": []
+    },
+    {
+      "label": "actual-second-runtime-20261009-v175",
+      "accepted": true,
+      "complete_wall_ns": 3777887842,
+      "projection_ns": 17000000000,
+      "aggregate_CPU_ns": 3676358000,
+      "group_peak_B": 41435136,
+      "child_wall_ns": 3464241952,
+      "child_peak_RSS_KiB": 34180,
+      "measured_to_projected": {
+        "numerator": 3777887842,
+        "denominator": 17000000000
+      },
+      "quiescent_released": true,
+      "expected_test_names": [
+        "hnn::tests::physical_communication::a_second_learned_publication_is_read_at_its_received_opening"
+      ]
+    }
+  ],
+  "full_source_raw_executable_resource_receipt": "research/records/receipts/2026-10-09-second-publication/native-v1/HANDOFF.md",
+  "actual_reading_stdout": "research/records/receipts/2026-10-09-second-publication/actual-reading-v1/actual-second-runtime-20261009-v175.stdout",
+  "actual_reading_stderr": "research/records/receipts/2026-10-09-second-publication/actual-reading-v1/actual-second-runtime-20261009-v175.stderr",
+  "unaffected_guards_reuse": "research/records/receipts/2026-10-09-second-publication/native-v1/admission/UNAFFECTED_GUARD_REUSE.json",
+  "production_source_and_Lean_unchanged": true,
+  "prior35_runtime_fixtures_not_rerun": true,
+  "all_bounds_unchanged": true,
+  "queue_quiescent_released": true,
+  "source_edits_push_merge_or_publication_by_queue": false,
+  "scope": "One declared two-publication synthetic physical contact fixture; no complete opening derivative/World/bank/CUDA/generation/whole-family generalization claim"
+}
