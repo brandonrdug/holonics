@@ -5,8 +5,12 @@ tree `c130586f`; Refs #73 #62).
 
 - **Native** ([handoff](native-v1/HANDOFF.md), [validation](native-v1/VALIDATION.json)). Committed:
   - the gate's handoff and validation (check, guard lints, all 57 guard doctests);
-  - every one of the 11 finite-decrease and 21 physical-communication fixtures' whole stdout and
-    stderr, and the development read;
+  - the whole stdout and stderr of the 11 finite-decrease fixtures (ten runtime stages and the
+    development read, which is the eleventh, the 0279 landing outcome) and of the 21
+    physical-communication fixtures, except physical fixture 09's stdout. At 400,329 bytes that
+    stdout is above the compact limit of 200,000 bytes and is hashed only, in
+    [OMITTED.md](native-v1/OMITTED.md) (SHA-256
+    `894249bede15ce95c7932dd1aee888c33ecbf681abbe9367b8eddcd8bf35cf61`); its stderr is committed;
   - `native-v1/FILE_HASHES.json`.
 
   The actual 0279 complete return admitted the phase candidate at `η = 2⁻¹⁰`. All four learned-change
