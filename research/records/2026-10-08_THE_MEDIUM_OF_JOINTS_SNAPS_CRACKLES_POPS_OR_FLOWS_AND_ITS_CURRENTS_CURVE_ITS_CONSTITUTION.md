@@ -295,7 +295,10 @@ learned-change criteria remain NOT-MET.
   variation adds `−Σ_a ⟨C_a⁻¹ μ_(w,a), dC_a w_a⟩` and needs an initial-state term in the step's
   certificate (`FiniteContactSpans`); both are owed, so the ordinary certified step is unchanged.
 - **Lean.** `HNN/FiniteDecrease.held_crossing_{identity, at_producing, rest}`:
-  `C (w′ − w) = −(C′ − C) w′`, the identity at the producing constitution, and Rest unmoved.
+  `C (w′ − w) = −(C′ − C) w′` for any finite step, with no invertibility; the identity at the
+  producing constitution where `C` is injective; and Rest unmoved where `C′` is injective. The Rust
+  crossing returns `w` itself whenever `C w = π` (the zero-target short circuit of `held_rate`), a
+  singular `C` included, which the Lean statement does not cover.
 - **Measured:** nothing yet. The native gate, the fixtures (0279's received carry) and the Lean owner
   go to the sole queue.
 

@@ -151,7 +151,8 @@ impl PhysicalReceiver<'_> {
             moment = moment.station_section(self.field, self.resident.current(), g, &section.placed())?;
         }
         let moment = Arc::new(moment);
-        // The opening this Word opens at; the landing reads the same value (a Word records none).
+        // The opening this Word opens at. The Word records it (`opened_on`), and the landing re-reads
+        // only that same value.
         let reception = self.resident.reception_opening();
         let (mut word, opening) = Word::open_source_exact_received(self.field,
             self.resident.constitution(), self.resident.current(), moment.clone(),

@@ -41,7 +41,8 @@
 //! `w′_a = w_a + δ_a` with `C_a(θ′) δ_a = π_a − C_a(θ′) w_a`; displacements and storage as carried;
 //! arriving waves transmitted at conductances no contact factor moves), at the carry's own clock.
 //! At the producing `θ` that crossing is the identity, because the resident publishes only
-//! `C_θ w = π`. A momentum outside `range C_a(θ′)` refuses the candidate (`HnnError::HeldMomentum`).
+//! `C_θ w = π` and `held_rate` returns `w` itself when its target `π − C w` is zero (a short circuit
+//! that holds for a singular `C` too; the Lean `held_crossing_at_producing` assumes `C` injective). A momentum outside `range C_a(θ′)` refuses the candidate (`HnnError::HeldMomentum`).
 //! The proposal is the existing deposit, whose pullback keeps no opening dual (no `J_open` term): it
 //! holds the opening rate fixed, which is the re-read's own objective at Rest, where every rate is
 //! zero. At a received opening it is only a proposal for the held-crossing objective, and the exact
