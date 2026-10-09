@@ -1,0 +1,70 @@
+{
+  "files": {
+    "native-v1/stages/actual-c1b-build4-20261009-v207.stderr": {
+      "original": {
+        "bytes": 253,
+        "sha256": "657afc71584969c1208606d60a622b51d83fe391a3f40c60233fab3a2b4fc25c"
+      },
+      "projected": {
+        "bytes": 205,
+        "sha256": "dc8f2308f8ca6f4743eb36fe1fe28abcb806cc99e3704060de1f2dbd0e5c88bd"
+      },
+      "replaced": {
+        "<cargo-registry>/": 0,
+        "<queue-admission>/": 1,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "native-v1/stages/actual-c1b-build4-20261009-v207.stdout": {
+      "original": {
+        "bytes": 38096,
+        "sha256": "67f35bb0df115e7c00dcd12e635cddffff5cbe4534552f2d299fb8bc3d13418d"
+      },
+      "projected": {
+        "bytes": 31768,
+        "sha256": "8fced2bb077d1561760fb65b9273db37b351fa5dbcff65625993fb3dd1fecb66"
+      },
+      "replaced": {
+        "<cargo-registry>/": 50,
+        "<queue-admission>/": 86,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "native-v1/stages/actual-c1b-check4-20261009-v207.stderr": {
+      "original": {
+        "bytes": 531,
+        "sha256": "9a403f231ebefe9904e682421253f43e85952a91017e76cd3e2b3b4d7ae72e45"
+      },
+      "projected": {
+        "bytes": 435,
+        "sha256": "a7b76335547955e85f865bc0428bdf94aa69864776213ced711009e3515b8cc7"
+      },
+      "replaced": {
+        "<cargo-registry>/": 0,
+        "<queue-admission>/": 2,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "native-v1/stages/actual-c1b-check4-20261009-v207.stdout": {
+      "original": {
+        "bytes": 50450,
+        "sha256": "7f8d08008f55a618af64616828610d43e2cf8b0ee8f05df3a5a98b3fec5e1cc6"
+      },
+      "projected": {
+        "bytes": 41914,
+        "sha256": "1b1b2550d14adcf6ff52a3aaa544ea28555ba57e3aa7744f29061f471254dcd4"
+      },
+      "replaced": {
+        "<cargo-registry>/": 50,
+        "<queue-admission>/": 132,
+        "<repository>/research/records/receipts/": 0
+      }
+    }
+  },
+  "placeholders": {
+    "<cargo-registry>/": "the absolute host directory of the crates.io registry sources; each crate name and version that follows is kept",
+    "<queue-admission>/": "the absolute host directory holding the sole queue's admissions; the admission label, its source copy and build cache that follow are kept",
+    "<repository>/research/records/receipts/": "the main checkout's receipts directory, where the queue wrote the complete packets; the path that follows is the repository path"
+  },
+  "rule": "each absolute host prefix below is replaced by its placeholder; no other byte changes. The placeholders do not occur in the originals, so substituting each prefix back restores the original bytes, whose sha256 and size are pinned here (and, for files inside a subdirectory, in its unchanged FILE_HASHES.json); checked locally before commit."
+}

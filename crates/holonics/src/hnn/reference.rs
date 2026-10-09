@@ -514,6 +514,9 @@ pub struct Resident {
     receiving_chart: Option<Encoded>,
     /// Actual participating World law/current on its common native clock. No step history.
     participating_world: Option<crate::hnn::physical::action::BoundJointWorld>,
+    /// The World's learned model beside the actual World (`physical::action::model`): every key's
+    /// fibre at the current crossing and the tick it reached; no step list.
+    world_model: Option<crate::hnn::physical::action::WorldModel>,
     /// [definition; agent-inferred, October 4; record B §8] **What the admitted future's words open
     /// on** (the port's declared reception, [`Reception::opens`]): the retention a re-base of the
     /// contacts' grain is admitted against ([`Resident::refine_contact_grain`]).
@@ -840,8 +843,9 @@ impl Resident {
 
     /// The exact bits of the resident's state: the lift point, the active suffix address, the open
     /// moments, the pending ratios with their emitted logits, the staged deposits, the first law's
-    /// arrived operand, the constitution and the executed charts ([`Charts`], the representation
-    /// of the solves the words execute).
+    /// arrived operand, the constitution, the executed charts ([`Charts`], the representation
+    /// of the solves the words execute), the participating World's current and the World model's
+    /// current key states.
     pub fn state_bits(&self) -> u64 {
         let lift: u64 = self
             .current
@@ -865,6 +869,7 @@ impl Resident {
             + self.held_contact_variation.as_ref().map_or(0, |j| j.reading().retained_bits)
             + receiving_chart
             + self.participating_world.as_ref().map_or(0, |world| world.current_bits())
+            + self.world_model.as_ref().map_or(0, |model| model.current_bits())
             + pending
             + staged
             + arrived
@@ -1065,6 +1070,7 @@ impl Reference {
             held_contact_variation: None,
             receiving_chart: None,
             participating_world: None,
+            world_model: None,
             opens: self.reception.opens(),
         })
     }

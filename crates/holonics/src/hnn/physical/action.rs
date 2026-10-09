@@ -80,7 +80,9 @@
 //! bound, the affine feature read `x(u) = x0 + J u` with `R J` the response, and the shared
 //! application of an admitted control; the phase family's own are listed in `hnn::phase_family`.
 
+mod model;
 mod world;
+pub use model::{HeldReason, KeyState, ModelCharts, ModelKey, ReturnImage, StateFibre, WorldModel};
 pub use world::{BoundJointWorld, NativeEncounter, NativeEncounterFailure, WaveJointStep};
 
 use super::{PhysicalReceiver, communication::PhysicalBoundary};
@@ -301,6 +303,16 @@ impl<'f> PhysicalReceiver<'f> {
         self.resident.participating_world()
     }
 
+    /// Bind the World's learned model beside the bound World ([`WorldModel`]).
+    pub fn bind_world_model(&mut self, model: WorldModel) -> Result<(), HnnError> {
+        self.resident.bind_world_model(model)
+    }
+
+    /// The World's learned model, where one is bound.
+    pub fn world_model(&self) -> Option<&WorldModel> {
+        self.resident.world_model()
+    }
+
     /// Bind one actual earlier R for an exterior matched-control reading. No old current,
     /// normal statistics, World state or Word is replayed by this snapshot.
     pub fn receiving_snapshot(
@@ -472,6 +484,13 @@ impl<'f> PhysicalReceiver<'f> {
             applied.compared(),
             phases.grain(),
         );
+        // The World model absorbs every actually executed step, completed or interrupted, before
+        // any later exit, so its tick never lags the actual World's and no later refusal rolls it
+        // back (`model`, the receiving-phase record §7).
+        self.resident.absorb_world_steps(match &encounter {
+            Ok(encounter) => encounter.steps(),
+            Err(failure) => failure.partial.steps(),
+        });
         // Keep every actually executed physical state, including an interrupted interaction.
         // Neither a rejected comparison nor a World refusal is permission to rewind a trial.
         let carry = word.reception_end()?;

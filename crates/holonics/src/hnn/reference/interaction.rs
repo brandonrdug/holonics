@@ -55,6 +55,59 @@ impl Resident {
         self.participating_world.as_ref()
     }
 
+    /// The World's learned model, where one is bound (`physical::action::model`).
+    pub fn world_model(&self) -> Option<&crate::hnn::physical::action::WorldModel> {
+        self.world_model.as_ref()
+    }
+
+    /// **Bind the World's learned model** beside the bound World: refused without a World, with a
+    /// model already bound, when the model's founded tick is not the World's actual tick, or when a
+    /// key is off the source's declared frame: the bound source ring's realified width (the wave the
+    /// World admits on its external ports), its admittance on every port, and the field's step
+    /// (`physical::action::model`, Admission).
+    pub(crate) fn bind_world_model(&mut self,
+        model: crate::hnn::physical::action::WorldModel) -> Result<(), HnnError>
+    {
+        let world = self.participating_world.as_ref().ok_or(HnnError::Unadmitted {
+            reason: "a World model is bound beside an actual retained participating World",
+        })?;
+        let [source] = self.field.sources() else {
+            return Err(HnnError::Unadmitted {
+                reason: "a World model reads one bound source ring's wave frame",
+            });
+        };
+        let ring = self.field.ring(*source);
+        if self.world_model.is_some() || model.tick() != world.state().commit {
+            return Err(HnnError::Unadmitted {
+                reason: "one World model, founded at the bound World's actual tick",
+            });
+        }
+        if model.keys().iter().any(|key| {
+            key.ports() != ring.width()
+                || key.admittance().iter().any(|y| y != ring.admittance())
+                || key.step() != self.field.step()
+        }) {
+            return Err(HnnError::Unadmitted {
+                reason: "every World model key on the source ring's wave width, admittance and step; no transport between frames is declared",
+            });
+        }
+        self.world_model = Some(model);
+        Ok(())
+    }
+
+    /// **Absorb an encounter's actually executed steps** into the World model, completed or
+    /// interrupted. It cannot fail: a key's own failure holds that key, and the memory's tick
+    /// advances with every step.
+    pub(crate) fn absorb_world_steps(&mut self,
+        steps: &[crate::hnn::physical::action::WaveJointStep])
+    {
+        if let Some(model) = self.world_model.as_mut() {
+            for step in steps {
+                model.absorb(step);
+            }
+        }
+    }
+
     pub(crate) fn participating_world_mut(&mut self)
         -> Result<&mut crate::hnn::physical::action::BoundJointWorld, HnnError>
     {
