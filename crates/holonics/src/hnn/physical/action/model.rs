@@ -64,9 +64,12 @@
 //! cut and the reached tick; the Resident's state bits charge them at every step, whatever size the
 //! fibres reach. The keys are immutable declarations, held separately as the World's own are.
 //!
-//! [incomplete, C1b-1] Not yet joined here: the owner's test, the record's §7 update and the atlas row
-//! handoff. Owed beyond C1b-1: C2's finite forward cover, the Ask over keys, learning through the
-//! model, and the World/Robin and all-material first and second variation.
+//! [source under review, not yet compiled or run] The owner's test is `tests/world_model.rs`, the
+//! receiving-phase record's §7 states this owner, and its atlas rows are handed to the integration
+//! reviewer; none of them has run. The bits read the mutable model state only: not the immutable key
+//! laws, the solves' workspace or process memory. Owed beyond C1b-1: C2's finite forward cover, the
+//! face chart `Cξ⁺ + o`, the Ask over keys, learning through the model, and the World/Robin and
+//! all-material first and second variation.
 
 use crate::hnn::HnnError;
 use crate::hnn::physical::action::WaveJointStep;
