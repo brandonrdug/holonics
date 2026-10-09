@@ -2975,3 +2975,239 @@ fn the_finite_decrease_landing_is_read_on_the_complete_contact_return() {
         started.elapsed().as_nanos()
     );
 }
+
+/// [agent-inferred, October 9; the medium-of-joints record §7; #73] **The second learned publication,
+/// READ on 0279's own task.** Call 1 is L's first landing at Rest (source `[0, 1]`, observed
+/// `[0, 1, 3]`, station 2 compared). Call 2 repeats that observation on the published material, at the
+/// received opening call 1 left: its landing re-reads the Word's own received opening through `θ′` at
+/// held momentum. The existing communication on source `[2, 1]` then reads the later response, beside a
+/// control holding call 1's material at the same entering end.
+///
+/// A READING, never an acceptance. The four criteria of
+/// `the_learned_change_acceptance_is_read_on_the_complete_contact_return`, applied to the SECOND
+/// publication (its committed change measured against call 1's material), are printed PASS or
+/// NOT-MET, and none is asserted: (1) a reached C/K/D deposit commits `q != 0` at call 2; (2) the later
+/// compared-station response differs from the control; (3) the world and material energy balance
+/// closes exactly over that committed change; (4) the same difference survives a cold restore. The
+/// assertions are trust invariants only: the opening call 2 entered, each applied movement's lineage
+/// and lattice, the owner's energy identities, and the control's material.
+#[test]
+fn a_second_learned_publication_is_read_at_its_received_opening() {
+    use crate::hnn::constitution::{Family, Locus};
+    use crate::hnn::physical::contact::ContactObservation;
+    use crate::hnn::word::continuation::FiniteDecrease;
+    use crate::ratio::Rat;
+    use num_traits::Signed;
+    let field = field();
+    let initial = contact_material(&field);
+    let current = Current::at_rest(&field);
+    let source = encoded(&field, &[0, 1]);
+    let compared = vec![false, false, true];
+    let observation = || ContactObservation {
+        observed: encoded(&field, &[0, 1, 3]),
+        compared: compared.clone(),
+    };
+    let mut actual =
+        PhysicalReceiver::new(&field, initial.clone(), current.clone(), WordOpening::Rest).unwrap();
+    let first = actual
+        .communicate_contact(&source, &receiver(), |_| Some(observation()))
+        .unwrap();
+    assert!(first.closes());
+    let first_outcome = first
+        .comparison
+        .as_ref()
+        .unwrap()
+        .as_ref()
+        .unwrap()
+        .landing
+        .outcome
+        .as_ref()
+        .map(FiniteDecrease::admitted)
+        .map_err(|refusal| format!("{refusal:?}"));
+    let after_first = actual.constitution().clone();
+    assert!(
+        matches!(actual.opening(), WordOpening::Received { .. }),
+        "call 2 opens on the carry call 1 published"
+    );
+    let second = actual
+        .communicate_contact(&source, &receiver(), |_| Some(observation()))
+        .unwrap();
+    assert!(second.closes());
+    let publication = second.comparison.as_ref().unwrap().as_ref().unwrap();
+    let after_second = actual.constitution().clone();
+    let landing = &publication.landing;
+    println!(
+        "second publication READING on 0279's own task: call 1 at Rest landed {first_outcome:?}; \
+         call 2 at the received opening: declared {:?}, outcome {:?}",
+        landing.declared,
+        landing
+            .outcome
+            .as_ref()
+            .map(FiniteDecrease::admitted)
+            .map_err(|refusal| format!("{refusal:?}"))
+    );
+    match &publication.continuation.landing {
+        Some(e) => {
+            let coordinates: Vec<&Rat> = e
+                .difference
+                .storage
+                .iter()
+                .flatten()
+                .chain(e.difference.arrivals.iter().flatten().flatten())
+                .chain(e.difference.states.iter().flatten().flatten())
+                .chain(e.difference.resonators.iter().flatten().flatten().flatten())
+                .collect();
+            let nonzero = coordinates.iter().filter(|x| !x.is_zero()).count();
+            println!(
+                "second publication e = candidate_end - held at tick {}: {nonzero} of {} coordinates \
+                 nonzero",
+                e.tick,
+                coordinates.len()
+            );
+        }
+        None => println!("second publication e: none (no admitted continuation at call 2)"),
+    }
+
+    // Criterion 1 at call 2: the committed change against call 1's material.
+    let locus = Locus::Channel(0);
+    let lattice = initial.lattice(locus).expect("the contact's lattice");
+    let mut committed_families = 0usize;
+    let (mut lineage, mut on_lattice) = (true, true);
+    for (f, name) in ["C", "K", "D"].into_iter().enumerate() {
+        let family = Family::Factor(f);
+        let eta = publication.publication.family_step(locus, family);
+        let vanished = publication.publication.vanished.contains(&(locus, family));
+        let (before, after) = match f {
+            0 => (after_first.contact_storage(0), after_second.contact_storage(0)),
+            1 => (after_first.contact_stiffness(0), after_second.contact_stiffness(0)),
+            _ => (
+                after_first.contact_dissipation(0),
+                after_second.contact_dissipation(0),
+            ),
+        };
+        let moved = after != before;
+        let movement = publication
+            .continuation
+            .material
+            .iter()
+            .find(|m| m.contact == 0 && m.family == family)
+            .unwrap_or_else(|| panic!("the second deposit applied no family-{f} movement"));
+        let coordinates: Vec<_> = movement
+            .factor
+            .entries()
+            .iter()
+            .map(|entry| lattice.div_rem(entry))
+            .collect();
+        let off_lattice = coordinates.iter().filter(|(_, r)| !r.is_zero()).count();
+        on_lattice &= off_lattice == 0;
+        let q_nonzero = coordinates.iter().filter(|(q, _)| !q.is_zero()).count();
+        lineage &= before.add(&movement.factor).unwrap() == *after;
+        let committed =
+            !vanished && moved && off_lattice == 0 && q_nonzero > 0 && eta.is_positive();
+        committed_families += usize::from(committed);
+        println!(
+            "second publication criterion 1 family {name}: eta={} vanished={vanished} \
+             material_moved={moved}; applied q != 0 at {q_nonzero} of {} entries => {}",
+            acceptance_exact(&eta),
+            coordinates.len(),
+            acceptance_verdict(committed)
+        );
+    }
+    let met1 = committed_families > 0;
+
+    // Criterion 2: the later response against call 1's material at the same entering end.
+    let entering = actual.opening();
+    let mut control =
+        PhysicalReceiver::new(&field, after_first.clone(), current.clone(), entering).unwrap();
+    let other_source = encoded(&field, &[2, 1]);
+    let cold = acceptance_cold(&field, &actual, &other_source, &receiver());
+    let next = actual
+        .communicate(&other_source, &receiver(), |_| None)
+        .unwrap();
+    let old = control
+        .communicate(&other_source, &receiver(), |_| None)
+        .unwrap();
+    let difference = acceptance_difference(next.boundary.readings(), old.boundary.readings());
+    let is_compared = |station: usize| compared.get(station).copied().unwrap_or(false);
+    let compared_present = difference.iter().any(|(station, _)| is_compared(*station));
+    let compared_changed: usize = difference
+        .iter()
+        .filter(|(station, _)| is_compared(*station))
+        .map(|(_, d)| d.iter().filter(|x| !x.is_zero()).count())
+        .sum();
+    let met2 = compared_present && compared_changed > 0;
+    println!(
+        "second publication criterion 2: {compared_changed} compared-station coordinates differ \
+         from call 1's material (present={compared_present}) => {}",
+        acceptance_verdict(met2)
+    );
+
+    // Criterion 3: the world and material energy balance over the second committed change.
+    let continuation = &publication.continuation;
+    let deposit_world = acceptance_world(&second.opening, &second.balances, &second.word);
+    let later_world = acceptance_world(&next.opening, &next.balances, &next.word);
+    let held_work_gap =
+        (&continuation.committed - &continuation.before) - &continuation.deposition_work;
+    let chain_gap = &next.opening.before - &continuation.opening;
+    let identities = deposit_world.closes
+        && later_world.closes
+        && deposit_world.opening_gap.is_zero()
+        && later_world.opening_gap.is_zero()
+        && held_work_gap.is_zero()
+        && chain_gap.is_zero();
+    let met3 = identities && met1;
+    println!(
+        "second publication criterion 3: identities close exactly={identities} (held work \
+         residual {}, chain residual {}) committed change present={met1} => {}",
+        acceptance_exact(&held_work_gap),
+        acceptance_exact(&chain_gap),
+        acceptance_verdict(met3)
+    );
+
+    // Criterion 4: the same difference survives a cold restore of the post-call-2 point.
+    let (met4, cold_reading) = match &cold {
+        Err(refusal) => (false, format!("cold remount REFUSED {refusal:?}")),
+        Ok(restored) => {
+            let same_difference = restored.same_carry
+                && acceptance_difference(restored.later.boundary.readings(), old.boundary.readings())
+                    == difference;
+            let same_response = restored.later.boundary.readings() == next.boundary.readings();
+            let closes = restored.later.closes();
+            (
+                restored.same_material
+                    && restored.same_carry
+                    && restored.same_current
+                    && closes
+                    && same_response
+                    && same_difference
+                    && met2,
+                format!(
+                    "restored material/carry/current == live: {}/{}/{}; cold later response == \
+                     live {same_response}; cold difference == live {same_difference}; closes \
+                     {closes}",
+                    restored.same_material, restored.same_carry, restored.same_current
+                ),
+            )
+        }
+    };
+    println!(
+        "second publication criterion 4: {cold_reading} => {}",
+        acceptance_verdict(met4)
+    );
+    let met = [met1, met2, met3, met4].iter().filter(|m| **m).count();
+    println!("second publication READING: {met} of 4 criteria met (a reading, not an acceptance)");
+
+    // Trust invariants only; no criterion is asserted.
+    assert!(lineage, "each family's applied factor reaches the resident unchanged");
+    assert!(on_lattice, "every applied movement lies on its family's lattice");
+    assert!(deposit_world.closes && later_world.closes, "the owner's world receipts close");
+    assert!(
+        deposit_world.opening_gap.is_zero()
+            && later_world.opening_gap.is_zero()
+            && held_work_gap.is_zero(),
+        "the owner's energy identities have no residual"
+    );
+    assert!(next.closes() && old.closes());
+    assert_eq!(control.constitution(), &after_first, "the control holds call 1's material");
+    assert_eq!(old.carry.ticks, next.carry.ticks);
+}
