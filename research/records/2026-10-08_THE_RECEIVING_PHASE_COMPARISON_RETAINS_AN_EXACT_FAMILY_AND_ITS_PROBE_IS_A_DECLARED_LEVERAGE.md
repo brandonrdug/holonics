@@ -170,6 +170,48 @@ memory window, and inference never imports the actual World's coefficients.
 - The memory's state advances through every actual World step, even when a comparison or
   deposit refuses.
 
+**The C1b-1 source** [definition; agent-inferred, October 9; source under review, not yet compiled
+or run]. The owner is [`hnn::physical::action::model`](../../crates/holonics/src/hnn/physical/action/model.rs),
+and the Resident retains it beside the bound World.
+- **Keys.** `ModelKey` declares a midpoint port Holon law with its wave admittances. Its charts at
+  commit `t` are read on unit columns of the law's own `prepare_commit` and the World's Robin
+  coupling. That owner's identity justifies the reading: the commit operator does not depend on the
+  state, and its target and flow constant are linear in it.
+- **Admission.** At binding every key must be on the source's declared frame: the source ring's
+  realified width as its port count, that ring's admittance on every port, and the field's step. A
+  key off that frame is refused as a declaration, never read as an observation's incompatibility,
+  and no transport between frames is claimed.
+- **The filter.** Each key is `Live(c + N k)`, `Held` (its last certified fibre, its certified cut
+  and the reason) or `Incompatible` (the tick and the exact annihilator). Each executed step
+  restricts the fibre by the complete preimage of `(P N) h = b − P c − Q a`, then advances it by
+  `c ← F(c + N h₀) + G a` and `N ← F N K`. Only an exact annihilator eliminates a key; a chart or
+  carrier failure holds it.
+- **Ingestion.** `execute_prepared` absorbs the encounter's executed steps, completed or
+  interrupted, immediately after `execute_word` and before any later fallible exit. The memory's
+  tick is the World's commit, and no step list is kept.
+- **The return image.** Over a declared future word, a live key returns:
+  - the free response `P_(T+j) Φ_j c`;
+  - the forced response;
+  - each direction's free response over the whole word, with one `k` moving every step.
+
+  The image answers a declared word; the closed loop through the native source is C2's.
+- **Bits.** Every key state's values and cut, and the reached tick, are charged in the Resident's
+  state bits at every step.
+- **The test source** ([`tests/world_model.rs`](../../crates/holonics/tests/world_model.rs)) checks
+  against:
+  - the World's executed states;
+  - the batch preimage pushed forward;
+  - a disconnected key's closed-form charts;
+  - a non-passive key's closed-form singular commit;
+  - a model-free receiver in lockstep, for the bits;
+  - a pumped World's interrupted encounter;
+  - the binding refusals.
+
+  It has not run.
+
+Not joined: the face chart `Cξ⁺ + o`, the Ask over keys, learning through the model, and the
+World/Robin and all-material first and second variation.
+
 The bounded C2 acceptance (two actual encounters, a prediction cover before the first, and a
 state-only matched control at the continuing crossing) waits on that model and its finite
 forward certificate. The combined World/material derivative remains a separate obligation, and
