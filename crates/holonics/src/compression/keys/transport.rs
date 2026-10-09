@@ -87,6 +87,7 @@
 //! | the relabelling law `L(π∘x) = L(x)` | owed (#62) | the owner's relabelling test |
 //! | the restriction's fixed point is the joint fibre's projection on a chain | owed (#62, the repair owner's item) | [`LiftRestriction::certified`] |
 //! | the residual reopens the source | `Transport/Fold.reopen_apply_fold`, `residual_injective_on_fibre` | [`lift_reopen`], [`read_residual`] |
+//! | a located navigator's closed cycle: first return of the lift, `Σ A = winding · D` (a period read from a located transport, `keys::frames`) | owed (#62) | [`LocatedTransport::cycle`], [`Cycle`] |
 
 use num_bigint::BigUint;
 use num_traits::{One, Zero};
@@ -365,6 +366,25 @@ impl SteppedTerrain {
 // -------------------------------------------------------------------------------------------
 // the located transport
 
+/// [definition; agent-inferred, October 9] **A located navigator's closed cycle**
+/// ([`LocatedTransport::cycle`]): the lift's first return to its key under the located step
+/// `F(ℓ) = ℓ + A(λ(c(ℓ)))`, and the whole windings the joint clock turns over it.
+///
+/// ```text
+/// ℓ_0 = key,  ℓ_(k+1) = ℓ_k + A(λ(c(ℓ_k))),   length = min { n ≥ 1 : ℓ_n ≡ ℓ_0 (mod D) }
+/// Σ_(k<length) A(λ(c(ℓ_k))) = winding · D                    the helix is circle plus carry
+/// ```
+///
+/// `F` is a map of the finite `ℤ/D`, so a key on a cycle returns within `D` steps; a key on a
+/// transient, or an orbit that meets an unlabelled cell, has no cycle and is refused (`None`).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Cycle {
+    /// The steps to the first return, `n ≥ 1`.
+    pub length: u64,
+    /// The whole windings of the joint clock over the cycle, `Σ A = winding · D`.
+    pub winding: u64,
+}
+
 /// [definition] **A located transport** (module header): the helix, each class's advance and the
 /// labels (cell to class, injective).
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -523,6 +543,30 @@ impl LocatedTransport {
         (0..self.helix.period())
             .filter(|&key| self.regenerate(key, passage.len()).as_deref() == Some(passage))
             .collect()
+    }
+
+    /// **The closed cycle of a key** ([`Cycle`]): the lift from `key` stepped by the located
+    /// transport until it first returns to `key mod D`, with the whole windings the sum of the
+    /// advances turns. It reads the located transport and its labels only, never a sample: an
+    /// orbit that meets an unlabelled cell, or a key on a transient (no return within `D` steps),
+    /// has no cycle and returns `None`.
+    pub fn cycle(&self, key: u64) -> Option<Cycle> {
+        let period = self.helix.period();
+        let start = key % period;
+        let mut lift = start;
+        let mut total: u64 = 0;
+        for step in 1..=period {
+            let advance = self.advances[self.emit(lift)?];
+            total = total.checked_add(advance)?;
+            lift = (lift + advance) % period;
+            if lift == start {
+                return Some(Cycle {
+                    length: step,
+                    winding: total / period,
+                });
+            }
+        }
+        None
     }
 
     /// **The driven reading's patches** (module header, the code): stepping the lift by each actual

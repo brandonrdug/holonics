@@ -51,6 +51,7 @@ use crate::navigator::Clock;
 
 pub mod duplex;
 mod edges;
+pub mod frames;
 pub mod local;
 pub mod repair;
 pub mod transport;

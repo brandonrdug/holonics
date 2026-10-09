@@ -1,0 +1,56 @@
+sawtooth period 7 (rings <= 6, 4 classes, 21 samples): {'narrow': 5, 'empty': 0, 'plural': 6, 'open': 0, 'one': 1}; cycles read [7]
+  frame (2, 5) one: advances (1, 1, 1, 4) labels (0, 1, 2, 3, None) keys [0] cycle 7 winding 1
+  frame (3, 4) plural (2 gauge classes)
+  frame (3, 5) plural (2 gauge classes)
+  frame (4, 5) plural (8 gauge classes)
+  frame (5, 4) plural (14 gauge classes)
+  frame (5, 6) plural (14 gauge classes)
+  frame (6, 5) plural (32 gauge classes)
+sawtooth period 12 (rings <= 6, 4 classes, 36 samples): {'narrow': 5, 'empty': 6, 'plural': 0, 'open': 0, 'one': 1}; cycles read [12]
+  frame (3, 4) one: advances (1, 1, 1, 1) labels (0, 1, 2, 3) keys [0] cycle 12 winding 1
+Thue-Morse (rings <= 6, 2 classes, 128 samples): {'narrow': 0, 'empty': 12, 'plural': 0, 'open': 0, 'one': 0}; cycles read []
+sawtooth period 7 (rings <= 9, 4 classes, 21 samples): {'narrow': 9, 'empty': 0, 'plural': 26, 'open': 0, 'one': 3}; cycles read [7]
+  frame (2, 5) one: advances (1, 1, 1, 4) labels (0, 1, 2, 3, None) keys [0] cycle 7 winding 1
+  frame (2, 7) one: advances (1, 1, 1, 8) labels (0, 1, 2, 3, None, None, None) keys [0] cycle 7 winding 1
+  frame (2, 9) one: advances (1, 1, 1, 12) labels (0, 1, 2, 3, None, None, None, None, None) keys [0] cycle 7 winding 1
+  frame (3, 4) plural (2 gauge classes)
+  frame (3, 5) plural (2 gauge classes)
+  frame (3, 7) plural (2 gauge classes)
+  frame (3, 8) plural (2 gauge classes)
+  frame (4, 5) plural (8 gauge classes)
+  frame (4, 7) plural (8 gauge classes)
+  frame (4, 9) plural (8 gauge classes)
+  frame (5, 4) plural (14 gauge classes)
+  frame (5, 6) plural (14 gauge classes)
+  frame (5, 7) plural (14 gauge classes)
+  frame (5, 8) plural (14 gauge classes)
+  frame (5, 9) plural (14 gauge classes)
+  frame (6, 5) plural (32 gauge classes)
+  frame (6, 7) plural (32 gauge classes)
+  frame (7, 4) plural (50 gauge classes)
+  frame (7, 5) plural (50 gauge classes)
+  frame (7, 6) plural (50 gauge classes)
+  frame (7, 8) plural (50 gauge classes)
+  frame (7, 9) plural (50 gauge classes)
+  frame (8, 5) plural (93 gauge classes)
+  frame (8, 7) plural (93 gauge classes)
+  frame (8, 9) plural (93 gauge classes)
+  frame (9, 4) plural (136 gauge classes)
+  frame (9, 5) plural (136 gauge classes)
+  frame (9, 7) plural (136 gauge classes)
+  frame (9, 8) plural (136 gauge classes)
+triangle period 7 (rings <= 6, 4 classes, 21 samples): {'narrow': 5, 'empty': 0, 'plural': 6, 'open': 0, 'one': 1}; cycles read [7]
+  frame (2, 5) one: advances (4, 5, 7, 1) labels (0, None, 1, 3, 2) keys [0] cycle 7 winding 3
+  frame (3, 4) plural (4 gauge classes)
+  frame (3, 5) plural (4 gauge classes)
+  frame (4, 5) plural (11 gauge classes)
+  frame (5, 4) plural (24 gauge classes)
+  frame (5, 6) plural (24 gauge classes)
+  frame (6, 5) plural (47 gauge classes)
+square period 7 (rings <= 6, 2 classes, 21 samples): {'narrow': 0, 'empty': 11, 'plural': 0, 'open': 0, 'one': 1}; cycles read [7]
+  frame (5, 2) one: advances (2, 1) labels (0, 1) keys [0] cycle 7 winding 1
+sawtooth step 2 period 8 (rings <= 6, 4 classes, 24 samples): {'narrow': 5, 'empty': 5, 'plural': 2, 'open': 0, 'one': 0}; cycles read []
+  frame (3, 4) plural (2 gauge classes)
+  frame (5, 4) plural (12 gauge classes)
+sawtooth step 3 period 9 (rings <= 6, 3 classes, 27 samples): {'narrow': 2, 'empty': 10, 'plural': 0, 'open': 0, 'one': 0}; cycles read []
+quantized triangle period 12 (rings <= 6, 4 classes, 36 samples): {'narrow': 5, 'empty': 7, 'plural': 0, 'open': 0, 'one': 0}; cycles read []
