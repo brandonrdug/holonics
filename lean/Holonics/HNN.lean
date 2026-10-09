@@ -8,6 +8,7 @@ import Holonics.HNN.LatticeDeposit
 import Holonics.HNN.LatticeDeposit.Freeze
 import Holonics.HNN.LatticeDeposit.Rebase
 import Holonics.HNN.FiniteDecrease
+import Holonics.HNN.PairedDeposit
 import Holonics.HNN.LatticeWord
 import Holonics.HNN.Ratio
 import Holonics.HNN.Ratio.Resolution
