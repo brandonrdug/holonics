@@ -170,8 +170,8 @@ memory window, and inference never imports the actual World's coefficients.
 - The memory's state advances through every actual World step, even when a comparison or
   deposit refuses.
 
-**The C1b-1 source** [definition; agent-inferred, October 9; source under review, not yet compiled
-or run]. The owner is [`hnn::physical::action::model`](../../crates/holonics/src/hnn/physical/action/model.rs),
+**The C1b-1 source** [definition; agent-inferred, October 9; native scoped checks passed at
+`0a7fa87a4`, [receipt](receipts/2026-10-09-world-model/PUBLICATION.md)]. The owner is [`hnn::physical::action::model`](../../crates/holonics/src/hnn/physical/action/model.rs),
 and the Resident retains it beside the bound World.
 - **Keys.** `ModelKey` declares a midpoint port Holon law with its wave admittances. Its charts at
   commit `t` are read on unit columns of the law's own `prepare_commit` and the World's Robin
@@ -207,7 +207,8 @@ and the Resident retains it beside the bound World.
   - a pumped World's interrupted encounter;
   - the binding refusals.
 
-  It has not run.
+  All seven passed once at `0a7fa87a4`, with the fifteen affected fixtures, after the workspace
+  all-targets check.
 
 Not joined: the face chart `Cξ⁺ + o`, the Ask over keys, learning through the model, and the
 World/Robin and all-material first and second variation.
