@@ -1,0 +1,17 @@
+{"phase": "precompile sealed JSON read", "wall_ns": 274444872}
+{"phase": "precompile metadata", "wall_ns": 344304104}
+'Holonics.HNN.PairedDeposit.lift_pow' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.HNN.PairedDeposit.reversal_identity' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.HNN.PairedDeposit.mul_commuting_stays' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.HNN.PairedDeposit.deposit_stays_equivariant' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.HNN.PairedDeposit.symmetrized_commutes' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.HNN.PairedDeposit.symmetrized_residual' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.HNN.PairedDeposit.rowNorm_smul_le' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.HNN.PairedDeposit.symmetrized_rowNorm_le' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.HNN.PairedDeposit.projection_equivariant' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.HNN.PairedDeposit.projection_pairing' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Holonics.HNN.PairedDeposit.projection_quadratic' depends on axioms: [propext, Classical.choice, Quot.sound]
+{"phase": "Lean compiler", "wall_ns": 6977577603, "exit": 0}
+{"phase": "postcompile sealed JSON read", "wall_ns": 273537022}
+{"phase": "postcompile metadata", "wall_ns": 340214496}
+{"kernel_accepted": true, "compiler_exit": 0, "compiler_wall_ns": 6977577603, "axioms": {"Holonics.HNN.PairedDeposit.lift_pow": ["propext", "Classical.choice", "Quot.sound"], "Holonics.HNN.PairedDeposit.reversal_identity": ["propext", "Classical.choice", "Quot.sound"], "Holonics.HNN.PairedDeposit.mul_commuting_stays": ["propext", "Classical.choice", "Quot.sound"], "Holonics.HNN.PairedDeposit.deposit_stays_equivariant": ["propext", "Classical.choice", "Quot.sound"], "Holonics.HNN.PairedDeposit.symmetrized_commutes": ["propext", "Classical.choice", "Quot.sound"], "Holonics.HNN.PairedDeposit.symmetrized_residual": ["propext", "Classical.choice", "Quot.sound"], "Holonics.HNN.PairedDeposit.rowNorm_smul_le": ["propext", "Classical.choice", "Quot.sound"], "Holonics.HNN.PairedDeposit.symmetrized_rowNorm_le": ["propext", "Classical.choice", "Quot.sound"], "Holonics.HNN.PairedDeposit.projection_equivariant": ["propext", "Classical.choice", "Quot.sound"], "Holonics.HNN.PairedDeposit.projection_pairing": ["propext", "Classical.choice", "Quot.sound"], "Holonics.HNN.PairedDeposit.projection_quadratic": ["propext", "Classical.choice", "Quot.sound"]}, "selector_count_matches": true, "standard_axioms_only": true, "metadata_unchanged": true, "broad_library_checked": false}

@@ -285,6 +285,36 @@
         "<repository>/research/records/receipts/": 0
       }
     },
+    "quadratic-owner11-import11-v1/owner/compiler.stdout": {
+      "original": {
+        "bytes": 3315,
+        "sha256": "b49ed521c29084a4ec5466172f4db4996be97aef66e758cac1c404989a34e607"
+      },
+      "projected": {
+        "bytes": 3123,
+        "sha256": "8090aa2d0a017c182ae8997ba234201c14af7372f3eac7efbcb5572f68e0d035"
+      },
+      "replaced": {
+        "<cargo-registry>/": 0,
+        "<queue-admission>/": 4,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
+    "quadratic-owner11-import11-v1/stages/paired-deposit-lean-20261009-v203-compile.stdout": {
+      "original": {
+        "bytes": 4892,
+        "sha256": "74130a80a02a2571516eb16df3ffb5077571d7db530c1ff07a99b9569aa03cff"
+      },
+      "projected": {
+        "bytes": 4700,
+        "sha256": "b4c18008d9e541e0301cfa95b9761ee049d1679b727961f723176ad23c86c8fd"
+      },
+      "replaced": {
+        "<cargo-registry>/": 0,
+        "<queue-admission>/": 4,
+        "<repository>/research/records/receipts/": 0
+      }
+    },
     "release-read-v2/stages/actual-release-build-20261009-v189.stderr": {
       "original": {
         "bytes": 378,

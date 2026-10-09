@@ -1,0 +1,170 @@
+{
+  "source_commit": "54192a0ecb3d3b4a6cc98afa648c072357326271",
+  "source_tree": "8fe82a01e70c7458834817c657b903d6bd46f533",
+  "grade": "kernel-checked conditional restricted normal-law quadratic",
+  "owner_queries": 11,
+  "exact_HNN_import_queries": 11,
+  "new_theorem": "Holonics.HNN.PairedDeposit.projection_quadratic",
+  "axioms": {
+    "Holonics.HNN.PairedDeposit.lift_pow": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.PairedDeposit.reversal_identity": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.PairedDeposit.mul_commuting_stays": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.PairedDeposit.deposit_stays_equivariant": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.PairedDeposit.symmetrized_commutes": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.PairedDeposit.symmetrized_residual": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.PairedDeposit.rowNorm_smul_le": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.PairedDeposit.symmetrized_rowNorm_le": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.PairedDeposit.projection_equivariant": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.PairedDeposit.projection_pairing": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "Holonics.HNN.PairedDeposit.projection_quadratic": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ]
+  },
+  "current_FiniteDecrease_raw_SHA256": "3a911d53f07a16df0e90c6ff47f1e12fd7600771501c8ecfda9b0af97c10ad4d",
+  "source_matched_imports_only": true,
+  "unchanged_dependency_rebuilt": false,
+  "full_HNN_or_Framework_aggregate_compiled": false,
+  "remaining_distinct_scope": [
+    "World/material second variation",
+    "end-to-end World comparison",
+    "CUDA parity",
+    "linking geometry"
+  ],
+  "results": [
+    {
+      "label": "paired-deposit-lean-20261009-v203-prep",
+      "accepted": true,
+      "complete_wall_ns": 6642917799,
+      "fixed_projection_ns": 17000000000,
+      "child_wall_ns": 5777143821,
+      "child_exit": 0,
+      "aggregate_CPU_ns": 5355110000,
+      "aggregate_CPU_limit_us": 17000000,
+      "group_peak_B": 579121152,
+      "child_peak_RSS_KiB": 198600,
+      "group_memory_max_B": 8589934592,
+      "CPU_affinity": [
+        0
+      ],
+      "declared_CPU_cores": 1,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 6642917799,
+        "denominator": 17000000000
+      }
+    },
+    {
+      "label": "paired-deposit-lean-20261009-v203-compile",
+      "accepted": true,
+      "complete_wall_ns": 12576611237,
+      "fixed_projection_ns": 21132554884,
+      "child_wall_ns": 12090041169,
+      "child_exit": 0,
+      "aggregate_CPU_ns": 7429071000,
+      "aggregate_CPU_limit_us": 17000000,
+      "group_peak_B": 4666949632,
+      "child_peak_RSS_KiB": 3793292,
+      "group_memory_max_B": 8589934592,
+      "CPU_affinity": [
+        0
+      ],
+      "declared_CPU_cores": 1,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 12576611237,
+        "denominator": 21132554884
+      }
+    },
+    {
+      "label": "paired-deposit-import-20261009-v204-prep",
+      "accepted": true,
+      "complete_wall_ns": 5380366232,
+      "fixed_projection_ns": 17000000000,
+      "child_wall_ns": 4864168839,
+      "child_exit": 0,
+      "aggregate_CPU_ns": 4852792000,
+      "aggregate_CPU_limit_us": 17000000,
+      "group_peak_B": 307671040,
+      "child_peak_RSS_KiB": 198576,
+      "group_memory_max_B": 8589934592,
+      "CPU_affinity": [
+        0
+      ],
+      "declared_CPU_cores": 1,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 5380366232,
+        "denominator": 17000000000
+      }
+    },
+    {
+      "label": "paired-deposit-import-20261009-v204-compile",
+      "accepted": true,
+      "complete_wall_ns": 9035862789,
+      "fixed_projection_ns": 21132554884,
+      "child_wall_ns": 8545085369,
+      "child_exit": 0,
+      "aggregate_CPU_ns": 5579651000,
+      "aggregate_CPU_limit_us": 17000000,
+      "group_peak_B": 2405392384,
+      "child_peak_RSS_KiB": 3636576,
+      "group_memory_max_B": 8589934592,
+      "CPU_affinity": [
+        0
+      ],
+      "declared_CPU_cores": 1,
+      "quiescent_released": true,
+      "measured_to_projected": {
+        "numerator": 9035862789,
+        "denominator": 21132554884
+      }
+    }
+  ],
+  "all_quiescent_released": true,
+  "limits_raised_after_launch": false,
+  "public_publication_by_queue": false,
+  "issue_or_checklist_closed_by_queue": false,
+  "production_edits_by_queue": false
+}
