@@ -279,6 +279,26 @@ learned-change criteria remain NOT-MET.
 - **Scope.** One fixture and its declared comparison, not general learning. Received openings, the
   held variation and charted operands still refuse.
 
+[definition; agent-inferred, October 9] **The landing at a received opening.**
+- **The objective.** A constitution that changes at a cut holds momentum, so "`θ′` in force from this
+  Word's opening" re-enters the Word's own received carry through `θ′`. Each contact's rate crosses
+  at held momentum, `C(θ′) w′ = π`, displacements and storage as carried, arriving waves at
+  conductances no contact factor moves (`ReceptionCarry::crossed`, the law publication applies). At
+  the producing `θ` that crossing is the identity. The re-read reads this objective, `L_open(θ′)`.
+  The fixed-rate objective is not realizable: holding `w` across a changed `C` needs a momentum jump
+  with no source.
+- **The admission** is unchanged and exact, so it is sound for any proposal. The Word records its own
+  opening by value, and the landing refuses any other declaration, a completely absorbing opening, or
+  a clock that is not the opening's own.
+- **The proposal** stays the existing deposit, whose pullback keeps no opening dual. At a received
+  opening it is the fixed-rate covector: a proposal for `L_open`, not its first variation. That first
+  variation adds `−Σ_a ⟨C_a⁻¹ μ_(w,a), dC_a w_a⟩` and needs an initial-state term in the step's
+  certificate (`FiniteContactSpans`); both are owed, so the ordinary certified step is unchanged.
+- **Lean.** `HNN/FiniteDecrease.held_crossing_{identity, at_producing, rest}`:
+  `C (w′ − w) = −(C′ − C) w′`, the identity at the producing constitution, and Rest unmoved.
+- **Measured:** nothing yet. The native gate, the fixtures (0279's received carry) and the Lean owner
+  go to the sole queue.
+
 **Owed (#62, #73):**
 1. the avalanche carry as a certified deposition, which never raises a limit and never takes an
    uncertified step, with its Lean statement;

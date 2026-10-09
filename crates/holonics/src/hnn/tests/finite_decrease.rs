@@ -31,9 +31,10 @@ use crate::hnn::word::continuation::{
 };
 use crate::hnn::word::finite_gain::FiniteContactSpans;
 use crate::hnn::HnnError;
-use crate::hnn::word::{Absorption, EndChange, Word, WordOpening};
+use crate::hnn::word::{Absorption, EndChange, ReceptionCarry, Word, WordOpening};
 use crate::holon::deposition::dyadic;
 use crate::ratio::algebraic::ExactInterval;
+use crate::ratio::linear::ExactRatMatrix;
 use crate::ratio::disk::floor_log2;
 use crate::ratio::{Rat, integer, rat};
 
@@ -93,6 +94,17 @@ fn opened<'f>(
     current: &Current,
     source: &[usize],
 ) -> (Arc<SourceMoment>, Word<'f>) {
+    opened_on(field, theta, current, source, &WordOpening::Rest)
+}
+
+/// The same W0 flow on a declared opening (Rest, or a received carry).
+fn opened_on<'f>(
+    field: &'f Field,
+    theta: &Constitution,
+    current: &Current,
+    source: &[usize],
+    opening: &WordOpening,
+) -> (Arc<SourceMoment>, Word<'f>) {
     let declared = receiver();
     let chart = encoded(field, source);
     let section =
@@ -111,7 +123,7 @@ fn opened<'f>(
         theta,
         current,
         Arc::clone(&moment),
-        &WordOpening::Rest,
+        opening,
     )
     .unwrap();
     word.run(phases.junction_steps()).unwrap();
@@ -131,11 +143,16 @@ struct Issued {
 }
 
 fn issued(field: &Field, theta: &Constitution, current: &Current) -> Issued {
-    let (moment, word) = opened(field, theta, current, &[0, 1]);
+    issued_on(field, theta, current, &WordOpening::Rest)
+}
+
+/// The same comparison on a Word opened on `opening`, declared to the landing as that opening.
+fn issued_on(field: &Field, theta: &Constitution, current: &Current, opening: &WordOpening) -> Issued {
+    let (moment, word) = opened_on(field, theta, current, &[0, 1], opening);
     let targets = encoded(field, &[0, 1, 3]);
     let compared = vec![false, false, true];
     let (ratio, returned, landing) = word
-        .compare_contacts_landing(0, &targets, &compared, &WordOpening::Rest)
+        .compare_contacts_landing(0, &targets, &compared, opening)
         .unwrap();
     let cut = returned.forward.into_present().unwrap();
     let deposit = returned.deposit.into_present().unwrap();
@@ -606,10 +623,11 @@ fn the_admission_is_an_exact_strict_improvement_and_refuses_typed() {
 // -------------------------------------------------------------------------------------------
 // the issue site and the binding
 
-/// A received opening issues no candidate, and the comparison and deposit are exactly
-/// `compare_contacts`'s on the same Word.
+/// An opening that is not the Word's own (here a received carry declared for a Word entered at
+/// Rest) issues no candidate, and the comparison and deposit are exactly `compare_contacts`'s on
+/// the same Word.
 #[test]
-fn a_received_opening_issues_no_candidate() {
+fn an_opening_that_is_not_the_words_own_issues_no_candidate() {
     let field = field();
     let theta = contact_material(&field);
     let current = Current::at_rest(&field);
@@ -625,7 +643,7 @@ fn a_received_opening_issues_no_candidate() {
         .compare_contacts_landing(0, &targets, &compared, &received)
         .unwrap();
     assert!(landing.declared.is_none() && landing.candidate.is_none());
-    assert_eq!(landing.outcome.err(), Some(LandingRefusal::ReceivedOpening));
+    assert_eq!(landing.outcome.err(), Some(LandingRefusal::Opening));
     let (_, plain) = opened(&field, &theta, &current, &[0, 1]);
     let (plain_ratio, plain_returned) = plain.compare_contacts(0, &targets, &compared).unwrap();
     assert_eq!(ratio, plain_ratio);
@@ -917,4 +935,149 @@ fn the_landing_on_0279_is_a_measured_outcome() {
             assert!(returned.receipt.landing.is_none());
         }
     }
+}
+
+// -------------------------------------------------------------------------------------------
+// a received opening
+
+/// 0279's carry after one full comparison Word at rest on `θ`: the producing reference the next
+/// Word opens on (`π_a = C_a w_a` with `θ`'s storage).
+fn received_carry(field: &Field, theta: &Constitution, current: &Current) -> ReceptionCarry {
+    let (_, ended) = opened(field, theta, current, &[0, 1]);
+    ended.reception_end().unwrap()
+}
+
+/// The references a carry crosses into ([`ReceptionCarry::crossed`]): each contact's conductance
+/// and storage form and each resonator's capacity, of exact operands at the cut.
+fn crossing(operands: &Operands) -> (Vec<Rat>, Vec<&ExactRatMatrix>, Vec<Option<&ExactRatMatrix>>) {
+    let contacts = operands.contacts();
+    (
+        contacts.iter().map(|c| c.conductance().clone()).collect(),
+        contacts.iter().map(|c| c.forms().0).collect(),
+        operands
+            .resonators()
+            .iter()
+            .map(|r| r.as_ref().map(|r| r.material().forms().0))
+            .collect(),
+    )
+}
+
+/// At the producing `θ` a received carry crosses as the identity: the resident publishes only
+/// `C_θ w = π`, and no conductance moved.
+#[test]
+fn a_carry_crosses_into_its_producing_constitution_unchanged() {
+    let field = field();
+    let theta = contact_material(&field);
+    let current = Current::at_rest(&field);
+    let carry = received_carry(&field, &theta, &current);
+    let moving = carry
+        .change
+        .states
+        .iter()
+        .filter(|state| state[1].iter().any(|w| !w.is_zero()))
+        .count();
+    println!("0279 carry: ticks={} contacts with a nonzero rate={moving}", carry.ticks);
+    let operands = Operands::exact_at_cut(&field, &theta, &current).unwrap();
+    let (conductances, storage, resonators) = crossing(&operands);
+    assert_eq!(
+        carry.crossed(&conductances, &storage, &resonators).unwrap(),
+        carry.change
+    );
+}
+
+/// [agent-inferred, October 9] **A received opening reads its landing** from the carry crossed into
+/// `θ′` at held momentum. The outcome is a measurement: admitted or refused, typed, but never the
+/// opening refusal, since the declared opening is the Word's own. When a candidate was read, its
+/// opening holds the momentum exactly, `C(θ′) w′ = π`, and so the finite crossing identity
+/// `C(θ)(w′ − w) = −(C(θ′) − C(θ)) w′` holds, and it ends at the cut's tick.
+#[test]
+fn a_received_opening_reads_its_landing_from_the_crossed_carry() {
+    let field = field();
+    let theta = contact_material(&field);
+    let current = Current::at_rest(&field);
+    let carry = received_carry(&field, &theta, &current);
+    let received = WordOpening::Received {
+        carry: carry.clone(),
+        absorption: Absorption::Nothing,
+    };
+    let issued = issued_on(&field, &theta, &current, &received);
+    println!(
+        "0279 received landing: declared={:?} outcome={:?}",
+        issued.landing.declared,
+        issued.landing.outcome.as_ref().map(FiniteDecrease::admitted)
+    );
+    if let Err(refusal) = &issued.landing.outcome {
+        println!("0279 received landing refused: {refusal:?}");
+        assert_ne!(
+            refusal,
+            &LandingRefusal::Opening,
+            "the Word's own received opening is re-read"
+        );
+    }
+    let Some(candidate) = &issued.landing.candidate else {
+        return;
+    };
+    assert_eq!(candidate.tick(), issued.cut.next_tick());
+    let before = Operands::exact_at_cut(&field, &theta, &current).unwrap();
+    let after = Operands::exact_at_cut(&field, candidate.theta(), &current).unwrap();
+    let (conductances, storage, resonators) = crossing(&after);
+    let crossed = carry.crossed(&conductances, &storage, &resonators).unwrap();
+    for (a, (old, new)) in before.contacts().iter().zip(after.contacts()).enumerate() {
+        let (c, c_new) = (old.forms().0, new.forms().0);
+        let (w, w_new) = (&carry.change.states[a][1], &crossed.states[a][1]);
+        assert_eq!(
+            c_new.apply(w_new).unwrap(),
+            carry.momenta[a],
+            "C(θ′) w′ = π at contact {a}"
+        );
+        let jump: Vec<Rat> = w_new.iter().zip(w).map(|(x, y)| x - y).collect();
+        let held: Vec<Rat> = c_new
+            .subtract(c)
+            .unwrap()
+            .apply(w_new)
+            .unwrap()
+            .into_iter()
+            .map(|x| -x)
+            .collect();
+        assert_eq!(
+            c.apply(&jump).unwrap(),
+            held,
+            "C(θ)(w′ − w) = −(C(θ′) − C(θ)) w′ at contact {a}"
+        );
+    }
+    if let Ok(admission) = &issued.landing.outcome {
+        assert_eq!(admission.candidate(), candidate);
+        assert_eq!(
+            admit(&issued.ratio, candidate.ratio()),
+            Ok(admission.admitted())
+        );
+    }
+}
+
+/// An admission binds its opening by value: one declaring Rest does not bind a cut whose Word was
+/// opened on a received carry.
+#[test]
+fn an_admission_binds_its_opening_by_value() {
+    let field = field();
+    let theta = contact_material(&field);
+    let current = Current::at_rest(&field);
+    let carry = received_carry(&field, &theta, &current);
+    let received = WordOpening::Received {
+        carry,
+        absorption: Absorption::Nothing,
+    };
+    let issued = issued_on(&field, &theta, &current, &received);
+    let admission = forged(&field, &theta, &current, &issued);
+    assert_eq!(admission.opening, WordOpening::Rest);
+    let Issued {
+        moment,
+        cut,
+        deposit,
+        ..
+    } = issued;
+    assert_eq!(
+        cut.continue_admitted(&field, &current, &moment, &deposit, &admission, &mut Charts::new())
+            .err(),
+        Some(LandingRefusal::Binding(BindingRefusal::Opening))
+    );
 }

@@ -189,6 +189,11 @@ pub struct Word<'c> {
         // Support read at the actual opening, before any tick; never the cut-end support.
         Vec<usize>,
     )>,
+    /// [definition; agent-inferred, October 9] The opening this Word was entered on by
+    /// [`Word::open_exact_received`], by value: the finite-decrease landing re-reads the Word's
+    /// comparison from it and refuses any other. `None` for every other opener. It is the Word's
+    /// own present input, released with the Word, never a retained record.
+    opened_on: Option<WordOpening>,
     field: &'c Field,
     operands: Operands,
     clock: Clock,
@@ -1875,7 +1880,8 @@ impl<'c> Word<'c> {
             .map(|(ring, wave)| form.ring_power(ring, wave))
             .sum();
         let interior = interior_of(field, before_change);
-        let word = Self::continuing(field, operands, &interior, &injection, opened_at)?;
+        let mut word = Self::continuing(field, operands, &interior, &injection, opened_at)?;
+        word.opened_on = Some(opening.clone());
         let after_change = word.change()?;
         let after = form.power(&after_change)? + form.resonator_power(&after_change)?;
         let imposed: Rat = injection
@@ -2268,6 +2274,7 @@ impl<'c> Word<'c> {
         }
         let mut word = Self {
             native_source: None,
+            opened_on: None,
             field,
             operands,
             clock,
@@ -3077,6 +3084,7 @@ impl<'c> Word<'c> {
     pub(crate) fn keep(self) -> KeptWord {
         let Word {
             native_source: _,
+            opened_on: _,
             field: _,
             operands,
             clock,
@@ -3266,6 +3274,7 @@ impl KeptWord {
         } = self;
         Word {
             native_source: None,
+            opened_on: None,
             field,
             operands,
             clock,

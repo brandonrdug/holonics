@@ -260,8 +260,9 @@ impl PhysicalReceiver<'_> {
                 }
                 // [agent-inferred, October 9; the medium-of-joints record §7] The same comparison
                 // and return as `compare_contacts`, and the finite-decrease landing issued from its
-                // cut: at a Rest opening on exact operands, one declared candidate re-read on a
-                // transient Word; a received opening or charted operands issue none.
+                // cut: on exact operands, at Rest or on the received carry this Word opened on, one
+                // declared candidate re-read on a transient Word from that opening entered through
+                // `θ′` (the carry crossed at held momentum); charted operands issue none.
                 let (ratio, returned, mut landing) = word.compare_contacts_landing(receiver_index,
                     &observed.observed, &observed.compared, &reception)?;
                 let cut = returned.forward.into_present().ok_or(HnnError::Realization { what: "the reached contact cut" })?;

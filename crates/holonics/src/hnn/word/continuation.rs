@@ -19,19 +19,35 @@
 //!   entry (`Constitution::first_reach`), and produces the candidate `θ′` at those exponents with
 //!   every other law shared (`Constitution::deposited_with_contact_spans_at`);
 //! - a transient Word of the same declared passage re-reads the comparison on `θ′`: the same source,
-//!   the exact Rest opening, the same junction steps, receiver, targets and mask ([`Word::compare_contacts_landing`]);
+//!   the Word's own opening (below), the same junction steps, receiver, targets and mask
+//!   ([`Word::compare_contacts_landing`]);
 //! - [`FiniteDecrease`] is issued only on an exact, strict improvement of that comparison:
 //!   `upper(L′) < lower(L)` with `X′ ≤ X`, or the reading-identity witness with `X′ < X`
 //!   ([`decide`], [`reading_identity`]; Lean `HNN/FiniteDecrease.admission_sound`).
 //!
-//! The claim is only this: `θ′` reads the declared same-Rest comparison no worse classically and
-//! strictly better in one part. It is not a claim that the held continuation, a later perception or
-//! any unseen comparison improves; those remain measured outcomes. The scope is a Rest-opened,
-//! source-opened, contact-only comparison on exact operands: a received opening, the held-variation
-//! route and charted operands refuse, typed ([`LandingRefusal`]). For a Rest-opened Word the
-//! comparison return deposits the within-Word pullback only (no `J_open` term), so the fixed-opening
-//! re-read is the objective the direction descends, and a contact-factor candidate has the
-//! identical source injection (`SourceMoment::open_storage` reads no contact factor).
+//! The claim is only this: `θ′`, in force from this Word's opening cut, reads the declared comparison
+//! no worse classically and strictly better in one part. It is not a claim that the held
+//! continuation, a later perception or any unseen comparison improves; those remain measured
+//! outcomes. The scope is a source-opened, contact-only comparison on exact operands, opened at Rest
+//! or on a received carry with nothing absorbed: a completely absorbing opening, an opening that is
+//! not the Word's own, the held-variation route and charted operands refuse, typed
+//! ([`LandingRefusal`]). A contact-factor candidate has the identical source injection
+//! (`SourceMoment::open_storage` reads no contact factor).
+//!
+//! [definition; agent-inferred, October 9; the held law, `PowerForm::held`] **The opening the
+//! candidate re-reads.** A constitution that changes at a cut holds momentum, `C′w′ = π`, so the only
+//! realizable "`θ′` in force from this opening" re-opens the Word's own opening through `θ′`: Rest
+//! stays Rest, and a received carry crosses into `θ′` at held momentum (`ReceptionCarry::crossed`,
+//! `w′_a = w_a + δ_a` with `C_a(θ′) δ_a = π_a − C_a(θ′) w_a`; displacements and storage as carried;
+//! arriving waves transmitted at conductances no contact factor moves), at the carry's own clock.
+//! At the producing `θ` that crossing is the identity, because the resident publishes only
+//! `C_θ w = π`. A momentum outside `range C_a(θ′)` refuses the candidate (`HnnError::HeldMomentum`).
+//! The proposal is the existing deposit, whose pullback keeps no opening dual (no `J_open` term): it
+//! holds the opening rate fixed, which is the re-read's own objective at Rest, where every rate is
+//! zero. At a received opening it is only a proposal for the held-crossing objective, and the exact
+//! admission alone decides. Making it that objective's first variation needs the opening's
+//! held-crossing term `−Σ_a ⟨C_a⁻¹ μ_(w,a), dC_a w_a⟩` in the deposit and an initial-state term in the
+//! step's certificate (`FiniteContactSpans`); both are owed (#73).
 
 use std::sync::Arc;
 
@@ -66,15 +82,18 @@ pub struct ContactCut {
     next_tick: usize,
     released: Remainders,
     deposit: Option<Deposit>,
-    /// The comparison a Rest-opened landing issued this cut for ([`Word::compare_contacts_landing`]); `None` on every
-    /// other route, whose cut no [`FiniteDecrease`] binds.
+    /// The Word's own opening, by value ([`Word::open_exact_received`]); `None` when another opener
+    /// entered the Word, whose cut no landing re-reads.
+    opening: Option<WordOpening>,
+    /// The comparison a landing issued this cut for ([`Word::compare_contacts_landing`]); `None` on
+    /// every other route, whose cut no [`FiniteDecrease`] binds.
     landing: Option<LandingBinding>,
     /// Set by the held-variation route's binding, which the landing does not admit.
     held: bool,
 }
 
 /// What the landing's comparison bound into its cut: the receiver, the targets and mask, the
-/// producing ratio and the Rest opening.
+/// producing ratio and the opening, by value.
 #[derive(Clone, Debug, PartialEq)]
 struct LandingBinding {
     receiver: usize,
@@ -412,6 +431,7 @@ impl<'c> Word<'c> {
         Ok(ContactCut {
             released,
             deposit: None,
+            opening: self.opened_on.clone(),
             landing: None,
             held: false,
             field: self.field.clone(),
@@ -530,7 +550,7 @@ impl ContactCut {
     /// [definition; agent-inferred, October 9] **The admitted continuation, prepared without
     /// consuming the cut.** It first checks that every binding of the admission equals this cut's
     /// own ([`BindingRefusal`]: the producing `θ` as a whole value, the source by identity and
-    /// value, the Rest opening, both supports, the cut's change and absolute ticks, the deposit, the
+    /// value, the opening by value, both supports, the cut's change and absolute ticks, the deposit, the
     /// receiver, targets, mask, the producing ratio and the candidate's tick). It then recomputes
     /// `θ′` with the declared-step producer and requires its full equality, material and carries,
     /// with the admitted `θ′`, its publication and its committed reach
@@ -947,16 +967,18 @@ impl<'c> Word<'c> {
     /// [definition; agent-inferred, October 9] **The comparison, its deposit, and the landing it
     /// issues** (the W0 flow's route, `hnn::physical::contact`). The comparison and its return are
     /// exactly [`Word::compare_contacts`]'s, and its cut binds this comparison (receiver, targets,
-    /// mask, producing ratio, opening). `opening` is the one this Word was opened at, declared by
-    /// its opener: [`Word`] records none and [`ContactCut`] keeps none, so the caller that opened the
-    /// Word passes the very value it opened with. A received opening, or a Word whose clock did not
-    /// open at zero, issues no candidate and refuses typed ([`LandingRefusal::ReceivedOpening`]), as
-    /// charted operands do ([`LandingRefusal::ChartedOperands`]).
+    /// mask, producing ratio, opening). `opening` is the one the caller declares this Word was opened
+    /// at; it must equal, by value, the opening the Word itself records ([`Word::open_exact_received`]).
+    /// Any other declaration, a completely absorbing opening, or a clock that is not the opening's
+    /// own (zero at Rest, the carry's ticks on a received carry) issues no candidate and refuses typed
+    /// ([`LandingRefusal::Opening`]), as charted operands do ([`LandingRefusal::ChartedOperands`]).
     ///
-    /// At a Rest opening on exact operands the landing reads ONE declared candidate: the native
+    /// At a Rest opening, or a received carry with nothing absorbed, on exact operands the landing
+    /// reads ONE declared candidate: the native
     /// deposit law's first reach `k_f` per reached family (`Constitution::first_reach`), its
     /// candidate `θ′` (`Constitution::deposited_with_contact_spans_at`), and a transient Word on `θ′`
-    /// with its own producer, the exact Rest opening and the same source, run for the same junction
+    /// with its own producer, the same opening entered through `θ′` (a received carry crosses at held
+    /// momentum; module header) and the same source, run for the same junction
     /// steps, read at the same receiver and compared with the same targets and mask
     /// ([`HolonRatio::compare_partition`]). Its support must equal the producing support. The
     /// candidate's end change and absolute tick are captured before it is dropped. The landing is
@@ -1029,7 +1051,7 @@ impl<'c> Word<'c> {
     }
 }
 
-/// [definition; agent-inferred, October 9] **The landing a Rest-opened comparison issues**: the
+/// [definition; agent-inferred, October 9] **The landing a comparison issues**: the
 /// declared exponents when the first reach was read, the transient candidate when it was read, and
 /// the admission or its typed refusal. Every value is the machine's; none is retained.
 #[derive(Debug)]
@@ -1041,7 +1063,7 @@ pub struct Landing {
 
 /// [definition; agent-inferred, October 9] **The transient candidate as read**: its declared
 /// exponents, its `θ′` with the declared publication and committed reach, its comparison on the
-/// same Rest-opened passage, its opening support, and its end change and absolute tick, captured
+/// same passage from the same opening, its opening support, and its end change and absolute tick, captured
 /// before its Word was dropped. Only the landing builds one.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct LandingCandidate {
@@ -1093,8 +1115,9 @@ pub enum Admitted {
 
 /// [definition; agent-inferred, October 9; Lean `HNN/FiniteDecrease.admission_sound`] **The
 /// finite-decrease admission of one declared candidate.** Its claim is only this: the candidate
-/// `θ′` reads the declared same-Rest comparison (the same source, Rest opening, junction steps,
-/// receiver, targets and mask) no worse classically and strictly better in one part, exactly:
+/// `θ′`, in force from the Word's opening cut, reads the declared comparison (the same source, the
+/// same opening entered through `θ′`, junction steps, receiver, targets and mask) no worse
+/// classically and strictly better in one part, exactly:
 /// `upper(L′) < lower(L)` with `X′ ≤ X`, or equal code expressions (the reading-identity witness)
 /// with `X′ < X`. It does not claim that the held continuation improves, that a later perception
 /// changes, or that any other comparison descends; those stay measured outcomes. It is the
@@ -1104,7 +1127,7 @@ pub enum Admitted {
 /// deposit it binds; its fields are crate-private and it has no public constructor. It binds by
 /// equality, never by a commit counter: the full producing `θ` and candidate `θ′` with their carries,
 /// the declared exponents and each family's committed reach, the source (identity and value), the
-/// Rest opening and both supports, the cut's change and absolute ticks, the deposit, the receiving
+/// opening by value and both supports, the cut's change and absolute ticks, the deposit, the receiving
 /// declaration and index, the targets and mask, both evaluated ratios, and the candidate's end
 /// change and tick ([`ContactCut::continue_admitted`]).
 #[derive(Clone, Debug, PartialEq)]
@@ -1156,9 +1179,9 @@ impl FiniteDecrease {
 pub enum LandingRefusal {
     /// A shared native law refused (its owner's own typed refusal).
     Native(HnnError),
-    /// The producing Word opened on a received carry, whose comparison pairs the opening's
-    /// `J_open`: outside the fixed-opening re-read.
-    ReceivedOpening,
+    /// An opening the landing does not re-read: a declaration that is not the Word's own opening
+    /// (by value), a completely absorbing carry, or a clock that is not the opening's own.
+    Opening,
     /// Charted (lattice or split) operands: outside the exact scope.
     ChartedOperands,
     /// The held-variation route's cut.
@@ -1339,9 +1362,20 @@ impl ContactCut {
         if self.held {
             return Err(LandingRefusal::HeldVariation);
         }
-        // Scope: the fixed-opening re-read is the descended objective only at rest.
-        if !matches!(opening, WordOpening::Rest) || self.opened_at != 0 {
-            return Err(LandingRefusal::ReceivedOpening);
+        // Scope: the Word's own opening, Rest at zero or a received carry with nothing absorbed at
+        // the carry's ticks; the candidate re-enters it through `θ′` (module header).
+        if self.opening.as_ref() != Some(opening) {
+            return Err(LandingRefusal::Opening);
+        }
+        let own_clock = match opening {
+            WordOpening::Rest => self.opened_at == 0,
+            WordOpening::Received { carry, absorption: Absorption::Nothing } => {
+                carry.ticks == self.opened_at
+            }
+            WordOpening::Received { absorption: Absorption::Complete, .. } => false,
+        };
+        if !own_clock {
+            return Err(LandingRefusal::Opening);
         }
         if self.operands.lattice().is_some()
             || self.operands.rings().iter().any(|ring| ring.chart().is_some())
@@ -1367,14 +1401,15 @@ impl ContactCut {
             .producing
             .deposited_with_contact_spans_at(deposit, &spans, &exponents)?
             .map_err(LandingRefusal::Declared)?;
-        // The transient candidate Word: its own producer, the exact Rest opening, the same source,
-        // the same junction steps, receiver, targets and mask.
+        // The transient candidate Word: its own producer, the same opening entered through `θ′`
+        // (Rest, or the carry crossed at held momentum; a momentum `θ′` cannot hold refuses), the
+        // same source, the same junction steps, receiver, targets and mask.
         let (mut word, _) = Word::open_source_exact_received(
             field,
             &theta,
             &read.current,
             Arc::clone(&read.source),
-            &WordOpening::Rest,
+            opening,
         )?;
         word.run(read.ticks)?;
         let (phases, faces) = word.contact_receiving(receiver)?;
@@ -1413,7 +1448,7 @@ impl ContactCut {
         Ok(FiniteDecrease {
             producing: self.producing.clone(),
             source: Arc::clone(&self.source),
-            opening: WordOpening::Rest,
+            opening: opening.clone(),
             support: self.opening_support.clone(),
             change: self.change.clone(),
             opened_at: self.opened_at,
@@ -1454,7 +1489,7 @@ impl ContactCut {
         {
             return refuse(BindingRefusal::Source);
         }
-        if admission.opening != WordOpening::Rest || landing.opening != WordOpening::Rest {
+        if admission.opening != landing.opening || self.opening.as_ref() != Some(&landing.opening) {
             return refuse(BindingRefusal::Opening);
         }
         if admission.support != self.opening_support
