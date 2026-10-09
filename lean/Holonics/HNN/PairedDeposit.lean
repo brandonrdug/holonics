@@ -44,7 +44,7 @@ no `axiom`, no `native_decide`.
 | `lift_pow` | `hnn::paired::PairedCarrier::lift` against the ring's transport |
 | `reversal_identity` | the reversed located pair beside `hnn::executed::pair_slip` |
 | `mul_commuting_stays`, `deposit_stays_equivariant` | the paired deposit through `Constitution::stepped_source` |
-| `symmetrized_commutes` | the symmetrized chart in `NormalLaw::prepare` (owed, loop 3 of step 3) |
+| `symmetrized_commutes` | the symmetrized chart in `NormalLaw::prepare` (`SolvedChart::symmetrized`) |
 | `symmetrized_residual`, `rowNorm_smul_le`, `symmetrized_rowNorm_le` | its certificate, read as today by the chart's exact `‖1 − X̂H‖∞` |
 | `projection_equivariant`, `projection_pairing` | the projected step in `NormalLaw::prepare` on a paired source law |
 -/

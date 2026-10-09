@@ -2079,8 +2079,11 @@ fn the_paired_deposit_learns_both_strands_and_keeps_the_port_equivariant() {
 }
 
 /// [measured, October 9; helical step 3, loop 3; the module header, "Every route on a paired source
-/// law" and "One founding prior"] **A paired source law keeps its port on the subspace through every
-/// route.** On the real constitution founded with the paired source law ([`PairedCarrier::found`]):
+/// law" and "One founding prior"] **A paired source law keeps its port on the subspace on the pair
+/// route and for general features at the law.** It reads the actual pair routes and general features
+/// deposited directly at the normal law; it is a source integration of the law, not a measured
+/// end-to-end comparison through `compose_return` in a participating world. On the real constitution
+/// founded with the paired source law ([`PairedCarrier::found`]):
 /// - the founding prior is one decoder: `founding_prior` completes the field's declared port by the
 ///   law's symmetry to the carrier's prior, and the unpaired constitution reads the declared port;
 /// - the forward pair deposit alone, which took a plain port off its subspace (loop 1, the loop 2
@@ -2095,7 +2098,7 @@ fn the_paired_deposit_learns_both_strands_and_keeps_the_port_equivariant() {
 /// - a learned law is never re-founded, and a save restores the law with its symmetry, its founding
 ///   prior and its closed contacts.
 #[test]
-fn a_paired_source_law_keeps_its_port_on_the_subspace_through_every_route() {
+fn a_paired_source_law_keeps_its_port_on_the_subspace_on_pair_and_general_deposits() {
     use crate::hnn::HnnError;
     use crate::hnn::constitution::{
         BudgetedCarry, ContinuingState, Locus, Sample, founding_prior,
