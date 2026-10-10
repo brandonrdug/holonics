@@ -1,0 +1,119 @@
+{
+ "exceptions": [
+  {
+   "file": "VALIDATION.json",
+   "key": "stages",
+   "reason": "kept as its allowlisted projection (strings that are not hashes, ids or exact numbers dropped inside it)"
+  },
+  {
+   "file": "VALIDATION.json",
+   "key": "resources",
+   "reason": "kept as its allowlisted projection (strings that are not hashes, ids or exact numbers dropped inside it)"
+  },
+  {
+   "file": "VALIDATION.json",
+   "key": "binaries",
+   "reason": "kept as its allowlisted projection (strings that are not hashes, ids or exact numbers dropped inside it)"
+  },
+  {
+   "file": "VALIDATION.json",
+   "key": "allocation",
+   "reason": "kept as its allowlisted projection (strings that are not hashes, ids or exact numbers dropped inside it)"
+  },
+  {
+   "file": "VALIDATION.json",
+   "key": "supplemental_allocation",
+   "reason": "kept as its allowlisted projection (strings that are not hashes, ids or exact numbers dropped inside it)"
+  },
+  {
+   "file": "VALIDATION.json",
+   "key": "headroom_at_core_admission",
+   "reason": "kept as its allowlisted projection (strings that are not hashes, ids or exact numbers dropped inside it)"
+  },
+  {
+   "file": "VALIDATION.json",
+   "key": "headroom_at_contact_admission",
+   "reason": "kept as its allowlisted projection (strings that are not hashes, ids or exact numbers dropped inside it)"
+  },
+  {
+   "file": "VALIDATION.json",
+   "key": "acoustic_readout",
+   "reason": "kept as its allowlisted projection (strings that are not hashes, ids or exact numbers dropped inside it)"
+  },
+  {
+   "file": "VALIDATION.json",
+   "key": "receiving_stage_readout",
+   "reason": "kept as its allowlisted projection (strings that are not hashes, ids or exact numbers dropped inside it)"
+  },
+  {
+   "file": "VALIDATION.json",
+   "key": "Contact_scope_correction",
+   "reason": "kept as its allowlisted projection (strings that are not hashes, ids or exact numbers dropped inside it)"
+  },
+  {
+   "file": "VALIDATION.json",
+   "key": "record_only_correction",
+   "reason": "kept as its allowlisted projection (strings that are not hashes, ids or exact numbers dropped inside it)"
+  },
+  {
+   "file": "VALIDATION.json",
+   "key": "worker_original_raw_receipts_preserved",
+   "reason": "kept as its allowlisted projection (strings that are not hashes, ids or exact numbers dropped inside it)"
+  },
+  {
+   "file": "VALIDATION.json",
+   "key": "all_lease_releases",
+   "reason": "kept as its allowlisted projection (strings that are not hashes, ids or exact numbers dropped inside it)"
+  },
+  {
+   "file": "VALIDATION.json",
+   "key": "privacy",
+   "reason": "no allowlisted value (prose or a private string); dropped"
+  },
+  {
+   "file": "FAILED_GATE_ATTEMPT.json",
+   "key": "root",
+   "reason": "no allowlisted value (prose or a private string); dropped"
+  },
+  {
+   "file": "FAILED_GATE_ATTEMPT.json",
+   "key": "manifest",
+   "reason": "kept as its allowlisted projection (strings that are not hashes, ids or exact numbers dropped inside it)"
+  },
+  {
+   "file": "FAILED_GATE_ATTEMPT.json",
+   "key": "result",
+   "reason": "kept as its allowlisted projection (strings that are not hashes, ids or exact numbers dropped inside it)"
+  },
+  {
+   "file": "PRIOR_ATTEMPT.json",
+   "key": "root",
+   "reason": "no allowlisted value (prose or a private string); dropped"
+  },
+  {
+   "file": "CONTACT_SCOPE_CORRECTION.json",
+   "key": "preserved_raw_inference",
+   "reason": "no allowlisted value (prose or a private string); dropped"
+  },
+  {
+   "file": "MATERIALIZATION_REPAIR.json",
+   "key": "prior_root",
+   "reason": "no allowlisted value (prose or a private string); dropped"
+  },
+  {
+   "file": "FILE_HASHES.json",
+   "key": "binaries/acoustic_encoding-<cargo-hash>",
+   "reason": "a cargo metadata-hash suffix in the file name written as <cargo-hash>; its SHA-256 and size unchanged"
+  },
+  {
+   "file": "FILE_HASHES.json",
+   "key": "binaries/holonics-<cargo-hash>",
+   "reason": "a cargo metadata-hash suffix in the file name written as <cargo-hash>; its SHA-256 and size unchanged"
+  },
+  {
+   "file": "FILE_HASHES.json",
+   "key": "binaries/source_entrance-<cargo-hash>",
+   "reason": "a cargo metadata-hash suffix in the file name written as <cargo-hash>; its SHA-256 and size unchanged"
+  }
+ ]
+}

@@ -1,0 +1,49 @@
+{
+ "note": "Allowlisted projection (project_allow.py): only declared evidence, reading and custody fields are kept; nested values only as booleans, integers, exact rationals, commit/tree ids and SHA-256 bindings, beside the declared prose fields that pass the same check; keys naming argv, environment, paths, mail, threads, messages, reviewers or process ids are dropped. Private originals stay in local custody, bound here by size and SHA-256.",
+ "originals": {
+  "HANDOFF.md": {
+   "sha256": "2a4952222e328458bb66362217850497363cc9e471f4466802095afcae1e013a",
+   "bytes": 2070
+  },
+  "CONTACT_LAUNCH_FAILURE.json": {
+   "sha256": "d4d607b1558912858697ed2d0b87595c3d5231f6da3211350acd76c687bd4242",
+   "bytes": 407
+  },
+  "RECORD_ONLY_SUCCESSOR.json": {
+   "sha256": "aa4d740cc9c27bc15e1ee662a10bc8a0d1faf8c9f7a70408fe6bc84a08daa0d3",
+   "bytes": 482
+  },
+  "CONSUMER_SCOPE.json": {
+   "sha256": "70529335bbe37387df6a6ab2b95b4f462b30ba85814d079b3c2ce1d1dd35912c",
+   "bytes": 3640
+  },
+  "CONSUMER_DEFINITION_BINDINGS.json": {
+   "sha256": "22993e7af1c4abd5497cb30a95855589f26bb46434d64e02675d4db0a17c24df",
+   "bytes": 1171
+  },
+  "VALIDATION.json": {
+   "sha256": "d2343e6c29d3a715d9485277077335fc5838f83afac1fc23bbc8cbeb46c0fe98",
+   "bytes": 369401
+  },
+  "FAILED_GATE_ATTEMPT.json": {
+   "sha256": "a2aea929cf8fc5c83522eb7759aacdc2a598e30645e4acac97938224a583cd0f",
+   "bytes": 82213
+  },
+  "PRIOR_ATTEMPT.json": {
+   "sha256": "cb14e82a3d382faf8c9581a7cd59aea2e5bda88ba3e9af7d064223ab61376c8b",
+   "bytes": 64027
+  },
+  "CONTACT_SCOPE_CORRECTION.json": {
+   "sha256": "d461ad338609c2cff9a8c76b915c1e9665131f65c1ac7bcfa93c45b3ce13c498",
+   "bytes": 1022
+  },
+  "MATERIALIZATION_REPAIR.json": {
+   "sha256": "03ba94337da85b13be7151a036ff4f0cfba89859d3020b58ba4fad13166a3856",
+   "bytes": 468
+  },
+  "FILE_HASHES.json": {
+   "sha256": "c44359ff69ebb48e505cc487ff9341cac6864deda5ad1ceffe4a80971e2934fc",
+   "bytes": 40344
+  }
+ }
+}

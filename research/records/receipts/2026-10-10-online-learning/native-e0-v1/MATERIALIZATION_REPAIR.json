@@ -1,0 +1,13 @@
+{
+ "same_commit_and_tree": true,
+ "fullarchive_not_partial": true,
+ "all_Cargo_external_example_and_include_owners_present": true,
+ "no_native_source_body_changed": true,
+ "prior_failed_gate_evidence_to_bind_after_exit": true,
+ "bounds_unchanged": {
+  "gate": 152151901055,
+  "acoustic": 194961654253,
+  "receiving": 140266475475,
+  "source": 209192238203
+ }
+}

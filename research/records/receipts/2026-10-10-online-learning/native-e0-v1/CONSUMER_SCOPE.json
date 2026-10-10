@@ -1,0 +1,64 @@
+{
+  "acoustic_expected_names": [
+    "a_sawtooth_of_undeclared_period_seven_is_located_and_admitted",
+    "a_sawtooth_of_undeclared_period_twelve_is_located_and_admitted",
+    "several_frames_read_one_cycle_for_the_same_tone",
+    "an_aperiodic_source_is_refused_not_given_a_period",
+    "a_periodic_tone_is_held_or_located_never_given_a_wrong_period",
+    "relabelling_the_sample_alphabet_moves_no_reading",
+    "the_located_tone_enters_a_field_declared_on_its_rings",
+    "a_rings_departed_section_word_enters_the_field_on_its_located_helix_and_decodes_whole",
+    "a_departed_section_word_enters_as_its_runs_in_the_cycles_chart_with_its_departures_the_residual",
+    "the_field_learns_a_rings_section_word_online",
+    "the_field_decodes_the_tone_from_its_released_face"
+  ],
+  "source_expected_names": [
+    "same_phase_intact_swap_has_one_native_source_moment_and_one_physical_motion",
+    "sparse_source_moments_enter_the_actual_loaded_port_with_exact_work",
+    "exact_source_reentry_preserves_the_entered_interior_and_counts_source_once",
+    "nonzero_offset_moments_drive_the_actual_loaded_port_without_marginal_source",
+    "an_observed_pair_deposit_changes_the_later_continuing_loaded_response"
+  ],
+  "receiving_required_suffixes": [
+    "a_located_register_retains_its_advance_law_warm_and_cold",
+    "the_field_declares_its_receivers_letter_family",
+    "the_receiving_maps_descent_and_its_priors_move_are_read_apart",
+    "the_letter_partitions_are_finite_and_their_codes_injective"
+  ],
+  "decoder_operands": "ToneContext anddelimitedstream only; contextprefix28, chart/dictionary/frame/field/letters/reference/grainpolicy/opening/ring/clocks/range supplieduncharged. Releasedodometermasses\u2192chartclass\u2192ordinaladvance\u2192land\u2192admittedSectionWord\u2192ownstate driveinterval index\u2192exactsample.",
+  "consumer_equation": "decode_tone(prefix_only_ToneContext,emitted_delimited_stream)=whole120sampletonewindow",
+  "scope": "Conditional exactreconstruction; O3frozenprefix periodicfamily continuation and actualdeclarationinclusiveC3; Contactboundpairinjectivity/warmcoldadvance/invalidinput atomicrefusal. M2stageaccounting, not receivingcertificate. No completecostcompression/unrestrictedproduction.",
+  "recorded_failures_avoided": [
+    "Counts called consumer: rawtypedreadout plus sourceEqassertions.",
+    "Contemporary comparison mistaken for stageaccounting: M2identity only.",
+    "Wholeword source sideinfo countedunseen: suppliedprefixcontext explicit.",
+    "Liveworktree contamination: exactgitarchive noGitwrites.",
+    "Inherited shorttimeout/own guardcontention: measuredprojection and separatedcore."
+  ],
+  "source_bindings": {
+    "crates/holonics/tests/acoustic_encoding.rs": {
+      "sha256": "6100016e9ec54fdd6030bd9b3e6273d41794426f409e8f25b3f13c2621d1f4f7",
+      "bytes": 77450
+    },
+    "crates/holonics/src/hnn/tests/receiving.rs": {
+      "sha256": "26e3f7d0de4597b9fa2f297ebfd4136c6a869f1f3db7a8d8067710a0d582af59",
+      "bytes": 83416
+    },
+    "crates/holonics/src/hnn/field.rs": {
+      "sha256": "85c00e23d2862056009d60886c9e0757d4ecb9ccaae5f919317a3af2de4bdea0",
+      "bytes": 123542
+    },
+    "crates/holonics/src/hnn/receiving.rs": {
+      "sha256": "88d9da4e1471d420a4d89baac48f8c41d41ddd3920bc631defb1af6a13de6bed",
+      "bytes": 106758
+    },
+    "crates/holonics/src/hnn/reference.rs": {
+      "sha256": "eb63e4fd93eb79b15c1195ecbcedfdb711479be5df9331f3940eef610f05dc61",
+      "bytes": 225042
+    },
+    "crates/holonics/src/hnn/ring.rs": {
+      "sha256": "1b870a617ebf772a0d9e1545cda2c947588e8f49c8f51d5ee8d444c450f7aa57",
+      "bytes": 185141
+    }
+  }
+}

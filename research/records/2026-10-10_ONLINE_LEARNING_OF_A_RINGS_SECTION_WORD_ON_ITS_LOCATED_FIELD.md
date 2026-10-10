@@ -804,3 +804,31 @@ Not to be done:
 
 Its acceptance is fixed in a dated record before code. Its Lean counterpart, the certified move's
 inequality, goes to #62 if it is not proved with it.
+
+## 15. Native acceptance at `e0d0c499`
+
+[measured] The sole validation queue ran the candidate from a whole-tree immutable archive, unchanged before and
+after ([publication note](receipts/2026-10-10-online-learning/native-e0-v1/PUBLICATION.md),
+[validation](receipts/2026-10-10-online-learning/native-e0-v1/VALIDATION.json)).
+- **Passed:** gate (63 guard doctests), `acoustic_encoding` 11, receiving 38, source entrance 5, and one exterior
+  Contact declaration fixture.
+  - The Contact fixture distinguishes six unreduced bound declarations, including `(1, 2)` and `(2, 4)`.
+  - It narrows an inference the core receiving readout had drawn too broadly.
+- **Failed attempts, preserved:**
+  - two exports failed before the passing one: the first was refused by the membership preflight, and the
+    second omitted the notebook paths the build reads, so its gate failed;
+  - the supplemental Contact run was refused once at its output path before it started.
+
+  None was replaced. Each stage passed within its fixed projection, and no limit was raised.
+- **What is accepted**, conditionally:
+  - frozen-prefix periodic-family learning with the declaration-inclusive charged C3 (§10);
+  - the released face to an admitted `SectionWord` to exact tone samples from a supplied, uncharged
+    `ToneContext` and a delimited 703-bit stream (§12, §14);
+  - the retained advance law with its pre-mutation refusals (§10, §13);
+  - the prior's stage accounting (§11, §13).
+- **What is not accepted:** M2 is accounting, not a receiving-comparison certificate. No complete-cost
+  compression, unseen-family discovery or unrestricted production is claimed. Strict all-target Clippy remains
+  unresolved, and no all-quality-checks claim is made.
+- **Excluded.** The record-only correction of §13 (`099b1d22`) is published with this candidate and is not the
+  tested tree. The receiving prior's certification (§14's owner decision) is a separate change outside this
+  publication.

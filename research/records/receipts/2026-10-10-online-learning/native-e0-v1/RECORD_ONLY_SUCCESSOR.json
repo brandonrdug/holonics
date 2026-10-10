@@ -1,0 +1,11 @@
+{
+  "commit": "099b1d2212280907477824693fd35e6054dbc427",
+  "source_unchanged": true,
+  "only_changed_path": "research/records/2026-10-10_ONLINE_LEARNING_OF_A_RINGS_SECTION_WORD_ON_ITS_LOCATED_FIELD.md",
+  "identity": {
+    "sha256": "70b824632b305330d6a630d2a473cae14802f336bd6941ae8970832fd7231ac3",
+    "bytes": 53825
+  },
+  "not_the_tested_tree": true,
+  "corrected_nonzero_ranges": "at commits17..19,2^-16<=abs(r)<2^-8 and2^-24<abs(e)<=2^-17; nonzero releasedtails included"
+}

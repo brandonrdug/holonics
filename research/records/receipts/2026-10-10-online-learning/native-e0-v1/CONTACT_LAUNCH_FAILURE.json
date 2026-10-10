@@ -1,0 +1,7 @@
+{
+  "UTC": "2026-10-10T15:32:46.376124+00:00",
+  "native_started": false,
+  "lease_acquired": false,
+  "reason": "Supplemental outer_entry output path collided with preserved core joint-controller stdout; exclusive-open refused before common lease or native Popen. Core receipts unchanged.",
+  "repair": "Isolated contact-controller stdout/stderr names; source/library/memory/time projections unchanged."
+}

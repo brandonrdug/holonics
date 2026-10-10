@@ -1,0 +1,36 @@
+{
+  "source_identity": {
+    "sha256": "6100016e9ec54fdd6030bd9b3e6273d41794426f409e8f25b3f13c2621d1f4f7",
+    "bytes": 77450
+  },
+  "definitions": {
+    "clean_section_word": {
+      "line": 1157,
+      "sha256": "3b76559076fbf867ab66db374dc8a2ba00251ca09d56e1a9bfbde7387e5250fe",
+      "bytes": 1936
+    },
+    "decode_tone": {
+      "line": 1481,
+      "sha256": "869788c29079600e54d079d447bb11638621d847a7e60919c29aebb67723f0e8",
+      "bytes": 3234
+    },
+    "the_field_learns_a_rings_section_word_online": {
+      "line": 1213,
+      "sha256": "a6d627e35492cc817eabae9c30965eda001ced39c1c3b2fc22a6bd0ef126a5d1",
+      "bytes": 6399
+    },
+    "the_field_decodes_the_tone_from_its_released_face": {
+      "line": 1552,
+      "sha256": "4412191c4ce69a072b832b378e9d73ca37c6c4ef881b1b644090c1a41613b738",
+      "bytes": 4227
+    },
+    "ToneContext": {
+      "line": 1391,
+      "sha256": "a34c29125210ef88c081e6bbb1ee42af86c0557d96fe52852ba1d4d3ee0991d0"
+    }
+  },
+  "actual_source_Eq_and_section_admission_bound": true,
+  "context_supplied_and_uncharged": true,
+  "M2_wholeword_chart_is_stage_fixture_not_O3_unseen_source_claim": true,
+  "no_source_edits": true
+}

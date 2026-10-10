@@ -1,0 +1,34 @@
+{
+ "supersedes_interpretation_of_key": "Contact_bound_injectivity_bound_to_passed_declaration_fixture",
+ "correction": "The core receiving fixtures validate Contact letter-code injectivity and declaration admission, but do not compare proportional unreduced bound declarations. The separate exterior fixture now directly exercises six bound pairs through the actual fresh Field::describe owner, including (1,2) and (2,4). This is finite native evidence; general injectivity is the source argument from separately coded exact integers.",
+ "native_witnesses": [
+  [
+   1,
+   2
+  ],
+  [
+   2,
+   4
+  ],
+  [
+   1,
+   4
+  ],
+  [
+   2,
+   2
+  ],
+  [
+   2,
+   8
+  ],
+  [
+   4,
+   16
+  ]
+ ],
+ "fixture": [
+  "distinct_unreduced_contact_bounds_have_distinct_field_declarations"
+ ],
+ "candidate_source_unchanged": true
+}
