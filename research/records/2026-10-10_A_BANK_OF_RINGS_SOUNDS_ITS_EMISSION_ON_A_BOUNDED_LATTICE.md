@@ -757,7 +757,7 @@ Gate 1 passed at `ec1b950a`.
 [definition; agent-inferred, October 10] The quarter-turn cell leaves the in-cell index dominant
 (§19). The cell gains one exact sign test, whether `|w′| ≥ |u′|`. With the class's signs `(s_w, s_u)`
 this is `s_w w′ − s_u u′ ≥ 0`, one more half-line on the sample, read by the same affine image. It
-costs one more bit per turning tick in the word (the origin carries none). The header carries a
+costs one more bit per non-origin tick in the word (the origin carries none). The header carries a
 one-bit flag, and the decoder checks the octant it read as it checks the class. This is a finer
 section chart, still exact by signs, and declared like `RAYS`; it is not learned.
 
