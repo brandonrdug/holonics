@@ -516,3 +516,56 @@ object there is the non-turning near-return, whose cycle carries no winding, and
 reads it: what it holds (its cycle's advances and defects) and whether its period, not a winding,
 is the located clock. L1 to L5 are not attempted on a located bank built from resonances. Building
 it would repeat the recorded failure of an authored stand-in: a bank chosen to look located.
+
+## 15. The architecture choice: the source through the ring's inverse tick, keyed on its own section word
+
+[definition; agent-inferred, October 10; the decision for the 23:30 observation] No further ring-bank
+variant. §8–§13 measure why: declared or resonance-located rings forget, and their moments cost more
+than the samples. The source obligation, `source = decode(located_keys, constitution, frame, clock) +
+R_source`, does not need a bank. It needs one ring's retained quotient, its exact inverse, and keys
+located on the ring's own symbols by the existing key and repair owners.
+
+- **The retained quotient.** One ring's carried state, its phase-carried moment on the lattice:
+  `s_(n+1) = T s_n + B x_n + ρ_n`. It suffices for the ring's future (the retention law), and it
+  determines the source exactly through the **inverse tick**,
+  `x_n = B⁺ (s_(n+1) − T s_n − ρ_n)`, where `B` drives one real coordinate and `B⁺` is its exact left
+  inverse there.
+- **What the decoder consumes.** The state trajectory factors exactly as cell × fibre. The cell is
+  the section symbol `(class, Δℓ)` at the quarter-turn grain with its carry (`hnn::dynamic_section`,
+  which emerge from the ring's dynamics, with no authored alphabet). The fibre is the position inside
+  the cell (the `GrainCell`'s unresolved fibre).
+  - The section word is regenerated exactly from a key located on it: the near-return's cycle as the
+    pair relation at offset `τ` (`compression::keys::repair::PairRelation`), its defects as the
+    residual (`residual_code`), and `reopen` returning the word (`43788fb9`; Lean
+    `Transport/Fold.reopen_apply_fold`).
+  - The fibre is coded at a declared grain.
+- **How the forcing reaches the decoder.** Free checkpoint evolution (§7, §12) loses the forcing that
+  arrives inside an epoch. Here it arrives twice: where it changes the cell sequence it is the
+  word's defects, already in the residual code; inside a cell it is the fibre. With the fibre at the
+  lattice grain, `ŝ = s` and `x̂ = x` exactly. With a coarser fibre,
+  `R_source[n] = B⁺(Δ_T (s − ŝ))[n]` exactly, where `Δ_T s = s_(n+1) − T s_n − ρ_n`. `R_bank` is not
+  used.
+- **Both lengths, together.** The shared decoder (the ring's `T`, `B`, `Y`, the lattice and the
+  section chart), the key's code, the defects' code, the fibre's code at its grain, and `R_source`
+  at the PCM grain, summed against `16 · N`.
+
+**The concrete missing interfaces.**
+- `hnn::section_lock::NearReturn → compression::keys::repair::{PairRelation, DamagedPassage}`: the
+  section word as the repair owners' passage (its classes the advances `{−2, …, 2}`), so that
+  `key_code`, `residual_code` and `reopen` give the paid exact codes in place of §11's own gamma count.
+- The inverse tick at the port, `x_n = B⁺(s_(n+1) − T s_n − ρ_n)` on `hnn::wave::WavePort` (source
+  read back from the carried state), with the consumer test `inverse_tick(port's states) = samples`
+  exactly on the lattice port.
+
+**The receiver equation, for review.**
+`x_n = B⁺(ŝ_(n+1) − T ŝ_n − ρ̂_n) + R_source[n]`, with
+`ŝ = cell(reopen(key_code, residual_code)) ⊕ fibre(grain)`.
+
+**The next measurement.** The grain at which the fibre's code plus `R_source` falls below the
+samples' own length, or a measurement that it does not, and where.
+
+**Existing owners.**
+- `compression::keys::{frames (1c6da214), transport, repair (43788fb9), duplex}`.
+- `hnn::keys` and `hnn::moment` (`68fb967d`; `SourceMoment`, the field's own phase-carried moment,
+  whose bridge to the strand face is owed in #62).
+- `hnn::dynamic_section` (`b043cb8e`) and `hnn::section_lock` (`c55faacf`, the near-return above).
