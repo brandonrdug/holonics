@@ -552,3 +552,204 @@ tests pass (00:11:46–00:13:02, exit 0, child peak 2,028,788 KiB;
 the two-observation delayed credit consumes. Pairing it with the second encounter's comparison
 (`comparison_credit` on the continued tangent) and landing on it are the next build.
 
+
+## 7. The credit of two observations, and its landing over both waves
+
+[definition; agent-inferred, October 10; acceptance fixed before code] The stretch of §1 asked that the
+first deposit change the second Ask. On this field that half stays reserved (§3c: the second Ask has
+nothing dormant to partition). Its other half is measurable here: **learning across two observations
+at different waves, landed as one step**. Two encounters run at the admitted waves `u₁ = 1`, then
+`u₂ = −1`, with nothing landed between them. The second encounter carries the first's tangents,
+continued (§6).
+
+**The credit.** For each declared coordinate, the credit is `credit(T₁; r₁) + credit(T₂; r₂)`. Here
+`T₁` is the first encounter's tangent with its comparison `r₁`, and `T₂` is the continued tangent with
+the second comparison `r₂`, each at its own frozen covector. It is the derivative of the two
+comparisons with the receiving relation each encounter publishes held as an exterior control: the
+learner's own deposit is not differentiated (§6, as in `ContactVariationAction`). The second
+comparison's produced logits read `R · P^τ v` through the relation the first encounter published, so
+the end-to-end derivative also has a path through that deposit, which the credit does not carry.
+Law (6) is applied to the summed credit per family.
+
+**Acceptance.** On the published fixture (World, key, actuator, admitted lattice):
+- **(a) The credit identity.** On `θ ± εH`, `ε = 2⁻⁴ … 2⁻⁸`, the observed-phase part of both
+  observations is confirmed end to end to second order (it reads the World's face, not the receiving
+  relation). The produced parts are confirmed by their composition: `χ` and `ψ` across two encounters
+  to second order (§6), read through the station read at the held relation (§3d). The end-to-end
+  central difference of the produced parts, which includes the receiving deposit's path, is reported
+  beside them as measured, never as the credit.
+- **(b) The binding is a chain.** A two-observation proposal is admitted only when:
+  - each observation's tangents rode its own encounter;
+  - consecutive encounters are consecutive on the Word and World clocks (the later opens where the
+    earlier ended);
+  - every later tangent is the earlier one continued (same direction, the same origin opening);
+  - the receiver stands where the last encounter left it.
+  Refused: the swapped order; fresh tangents at the second encounter in place of continued ones; a
+  gap between the encounters.
+- **(c) The landing over both waves.** One declared step along law (6) on the summed credit, staged
+  where the last encounter left the receiver. The located key's prospect of the next encounter is read
+  at each wave from the present opening. The grain scan raises until either prospect's reading moves.
+  The step is admitted only when, at each wave, the decision is admitted or exactly unchanged (the
+  witness with an equal excess), and at least one wave is admitted. The decision is reported as
+  measured. When admitted, the actual next encounter at each wave, read on identical replays, equals
+  its prospect exactly, and is read against the no-deposit twin at that wave.
+- **(d) Against the continued credit alone.** The same chain is landed on the second observation's
+  continued credit alone, and reported as measured beside (c).
+
+Not claimed: selection (the first deposit does not change the second Ask on this field); the receiving
+deposit's derivative; any provenance across receivers (§6's limit stands).
+
+### 7a. Measured: the credit is exact; its step improves what it credits; the prospects refuse it
+
+[measured; developer reads under the common lease, not claim-bearing; `tests/material_tangent_world.rs`]
+
+**Built.**
+- `MaterialTangent::origin` names the held opening a tangent started from, and every continuation
+  keeps it.
+- `world_descent` sums the observations' credits per coordinate before law (6).
+- `PhysicalReceiver::world_proposal` binds a chain of observations. Its first observation's tangents
+  share one origin at or before its own opening, so a continued tangent alone is the delayed credit
+  of its encounter.
+- `land_world_descent` reads the located key's prospect at each admitted wave and admits through
+  `decide_over`.
+- `WorldLandingReading` carries the declared candidate and one `WaveProspect` per wave.
+
+**(b) The chain binds** (`a_two_observation_proposal_binds_a_chain`). The chain in its order is
+admitted. The swapped order is refused, and so are fresh tangents at the second encounter. A
+continued tangent offered across a gap is refused where it would ride: `rebind` admits only the
+Word that opens on its carry.
+
+**(a) The credit is exact** (`the_two_observation_credit_is_read_at_its_consumer`). All three parts are
+confirmed to second order on `ε = 2⁻⁴ … 2⁻⁸`: magnitude, produced phase and observed phase, for both
+observations together and for the continued credit alone. From `ε = 2⁻⁵` on, each halving divides
+every residual by a ratio in `(63/16, 65/16)`. The acceptance required this only of the observed
+phase. The produced parts hold too, and the reason was measured: the receiving relation the first
+encounter publishes does not move. Its central change on `θ ± εH` is `1/64` at `ε = 2⁻⁴` and exactly
+`0` from `2⁻⁵` on. (At `ε = 2⁻⁴` the relation's own step moves, and the first halving of the magnitude
+residual is correspondingly larger than four.) The receiving deposit is a lattice step, locally constant in the material, so its
+path contributes nothing at first order here. Holding it as an exterior control loses nothing on
+this fixture; that is a measurement, not a law.
+
+**(c), (d) The landings are refused** (`the_two_observation_landing_reads_both_waves`). Changes are
+read on the located key's prospects from the present opening at `u = 1` and `u = −1`, and on the two
+credited encounters re-entered from the initial material with only the candidate's contact factors:
+
+| landing | grain raise | prospect `u = 1` | prospect `u = −1` | credited encounters |
+|---|---|---|---|---|
+| both observations | none moved the code inputs | code equal; excess up by `[2⁻¹⁸, 2⁻¹⁷)`: `PhaseWorse` | code equal; excess up by `[2⁻¹⁷, 2⁻¹⁶)`: `PhaseWorse` | codes equal; excess `−[2⁻¹⁶, 2⁻¹⁵)` and `+[2⁻¹⁴, 2⁻¹³)`, sum `+[2⁻¹⁵, 2⁻¹⁴)` |
+| continued credit alone | 5 | code equal; excess up by `[2⁻¹², 2⁻¹¹)`: `PhaseWorse` | excess down by `[2⁻¹³, 2⁻¹²)`, but code up by `[2⁻¹⁰, 2⁻⁹)` at both endpoints: `CodeWorse` | both codes strictly lower, both excesses lower, sum `−[2⁻⁹, 2⁻⁸)` |
+
+Neither landing is admitted, and nothing is published.
+
+**The mechanism.**
+- The continued credit's step does what a descent should: on the passages it credits, it lowers
+  both the code and the phase excess.
+- The admission does not read those passages. It reads the located key's prospect of the next
+  encounter from the present opening, a different comparison, and there the same step is worse at
+  both waves.
+- The credit describes the experienced passages re-entered from their origin. The admitted future
+  starts where the receiver now stands. On this field they disagree.
+- With both observations, the summed step never moves the prospects' code inputs at the grain. Its
+  phase change, zero at first order by law (6), is positive at second order at the lattice's first
+  reach, on the credited passages and on both prospects alike.
+- The single-observation landing of §5 agreed with its prospect on fixture 1. There the credited
+  encounter and the prospect share a wave and nearly a state, so that agreement was a property of
+  the fixture, not of the law.
+
+**What it changes.**
+- The admission must keep reading the future: re-entering the past from its origin would need the
+  origin state retained, a frozen cut the retention law refuses.
+- So the step should descend what the admission reads: the located key's prospect at each admitted
+  wave, differentiated from the present opening. The opening's own tangent is the crossing at held
+  momentum, `C′ w′ = π`, so `δw = −C⁻¹ δC w`. The tick law (§3e) carries it through the prospective
+  Word, and the key's charts stand for the World (§3a).
+- The key is located to a point, and its prospect equals the actual next comparison exactly (§5).
+  That derivative is therefore the derivative of the actual next comparison.
+- The experienced comparisons keep their role: they locate the key and publish the receiving
+  relation and the carry. That is the next loop, recorded here before it is built.
+
+All fourteen World tests pass: 01:42:54–01:43:53, exit 0, measured 58,474,035,026 ns against a
+300 s projection ([receipt](receipts/2026-10-09-material-tangent/TWO_OBSERVATION_DEV_TESTS.v1.json)).
+
+### 7b. The admitted future, descended: learning across two observations lands at both waves
+
+[definition; agent-inferred, October 10] §7a's mechanism fixes the law: **the step descends the
+comparisons the landing admits by.** The experienced encounters locate the World key and publish the
+receiving relation and the carry. The material's step then descends the located key's prospect of the
+next encounter at every admitted wave, from where the receiver now stands. Since the key is located
+to a point, its prospect is the actual next comparison exactly (§5), so this is the derivative of the
+next comparison itself. The experience is the condition of that derivative, and retention keeps no
+past passage to re-enter (§7a).
+
+**Built.**
+- `Word::prospective_coupled_passage` takes a `PassageObserver`. It sees the Word after each step's
+  return and before the next tick, where a consumer beside an actual encounter sees it.
+- `WorldModel::located_prospect_with_tangents` runs the coupled passage from the key's located
+  point. The material tangents ride it through the key's charts at the commits its returns read
+  (`MaterialTangent::step_through_port`, §3a). Each is held at every compared station with the
+  observed face's tangent through the key's declared face. This is the actual encounter's tangent law,
+  with the key standing for the World in both. Stations are numbered as the prospect's comparison
+  numbers them: by rank among the compared ones.
+- `PhysicalReceiver::world_prospect_taught` returns the prospect's comparison and its tangents, which
+  open held at the present opening (`χ₀ = 0`).
+- `PhysicalReceiver::located_prospect` exposes the raw prospect behind `world_prospect_ratio`, and
+  `prospect_ratio` holds the comparison they share.
+- `PhysicalReceiver::world_prospect_proposal` sums the prospects' credits over the admitted waves and
+  applies law (6) (`world_descent`). It is staged where the latest encounter left the receiver, with
+  that encounter's reach, opening clock and normalization (`bound_proposal`, shared with
+  `world_proposal`).
+- The landing is unchanged: `land_world_descent` over both waves, `decide_over`.
+- **Law (6) over several observations** (`common_descent` behind `world_descent`). The admission
+  reads every wave's comparison on its own (`decide_over`). The step starts at `−Σ_o L_o` and is
+  projected exactly off the span of every per-observation gradient it would raise at first order:
+  classical ones first, then phase ones, one at a time, re-projecting until none is raised. With one
+  observation this is law (6) exactly: `⟨L, −L⟩ ≤ 0` never violates, and `X` is projected off iff
+  `⟨L, X⟩ < 0`. The single-observation loops read the same decisions round for round. §7a's
+  landings were measured under the summed law (6) at `b38645c7`. Under the common descent, the
+  experience-credit landing over both observations is still refused: `PhaseWorse` at both waves, the
+  same as in §7a.
+
+**Measured** ([developer reads, not claim-bearing](receipts/2026-10-09-material-tangent/PROSPECT_DEV_TESTS.v1.json)).
+All sixteen World tests pass: 01:58:23–01:59:29, exit 0, measured 65,783,518,355 ns against a 300 s
+projection.
+
+- **The prospect's credit at its consumer** (`the_prospect_is_credited_at_its_consumer`). After the
+  same two encounters, the prospect at each wave was taught along one storage direction. On
+  `θ ± εH` (the present receiving relation kept), its three parts are confirmed to second order at
+  both waves: from `ε = 2⁻⁵` on, each halving divides every residual by a ratio in `(63/16, 65/16)`.
+  Two defects were found on the way, and both are recorded:
+  - The station numbering. The prospect's comparison numbers stations by rank among the compared
+    ones; the actual encounter's ratio uses the full index.
+  - The opening term. Held at `χ₀ = 0`, the residuals stayed constant as `ε` halved, at about a
+    quarter of the credit: a missing first-order term. The prospective Word opens on the actual carry
+    crossed into the varied material at held momentum, `C′ w′ = π`, so a storage direction moves the
+    opening rate by `C δw = −δC w` (`MaterialTangent::crossed_at_held_momentum`). The conductances
+    are the rings', so the carried waves do not move. A continued tangent needs no such term: there
+    the crossing joins the same material and is the identity.
+- **The landing over both waves** (`the_prospect_landing_reads_both_waves`). The step was declared
+  at grain raise 2 and **admitted**, `Classical`:
+
+| wave | prospect: code | prospect: excess | decision | actual next, against the no-deposit twin |
+|---|---|---|---|---|
+| `u = 1` | equal (witnessed) | down by `[2⁻²⁰, 2⁻¹⁹)` | `Phase` | equal code; excess lower by `[2⁻²⁰, 2⁻¹⁹)` |
+| `u = −1` | strictly below at both endpoints, by `[2⁻⁸, 2⁻⁷)` | down by `[2⁻¹³, 2⁻¹²)` | `Classical` | strictly lower code, gap `[2⁻⁸, 2⁻⁷)`; excess lower by `[2⁻¹³, 2⁻¹²)` |
+
+The actual next encounter at each wave, read on identical replays, equals its prospect exactly. The
+deposition work at the held-momentum crossing is positive, in `[2⁻⁴, 2⁻³)`.
+
+**Two refusals on the way to this law.**
+- With the exact credit and the summed law (6), wave `u = 1`'s excess rose by `[2⁻²⁰, 2⁻¹⁹)` while
+  `u = −1` improved. The summed projection holds only the summed phase still at first order, and the
+  admission reads each wave on its own. The common descent was derived from that admission.
+- Before the opening term was added, the inexact credit's step was also admitted. That result is not
+  counted: its credit had failed its own consumer identity.
+
+**What this establishes, and what it does not.**
+- On this fixture, learning across two observations at different waves lands as one certified step.
+  The experience locates the key, and the step descends the located key's prospects of the next
+  encounter at both waves. The changed material answers better at both, against the no-deposit twin.
+  This is §1's stretch with its selection half reserved (§3c).
+- The prospect is exact here because the key's fibre is a point. With a plural fibre, a prospect is
+  a family and this derivative is not defined; that case is refused, not approximated.
+- One fixture and one round. A loop of such landings and a second fixture are the next measurement.
+

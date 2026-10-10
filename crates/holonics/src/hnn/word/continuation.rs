@@ -1365,6 +1365,28 @@ pub(crate) fn decide(
     Err(AdmissionRefusal::Overlap)
 }
 
+/// [definition; agent-inferred, October 10; the held-carry record §7] **The admission over several
+/// waves**: one candidate read at each admitted wave's prospect ([`decide`] per wave). Admitted only
+/// when every wave is admitted or exactly unchanged (the witness with an equal excess) and at least
+/// one is admitted; `Classical` when any wave's code strictly improved. The first other refusal is
+/// returned; all unchanged is `Unchanged`.
+pub(crate) fn decide_over(
+    decisions: &[Result<Admitted, AdmissionRefusal>],
+) -> Result<Admitted, AdmissionRefusal> {
+    let mut admitted = None;
+    for decision in decisions {
+        match decision {
+            Ok(Admitted::Classical) => admitted = Some(Admitted::Classical),
+            Ok(Admitted::Phase) => {
+                admitted.get_or_insert(Admitted::Phase);
+            }
+            Err(AdmissionRefusal::Unchanged) => {}
+            Err(refusal) => return Err(*refusal),
+        }
+    }
+    admitted.ok_or(AdmissionRefusal::Unchanged)
+}
+
 /// The admission read from two evaluated ratios: their code enclosures, exact excesses and the
 /// reading-identity witness ([`decide`]).
 pub(crate) fn admit(producing: &HolonRatio, candidate: &HolonRatio) -> Result<Admitted, LandingRefusal> {
@@ -1654,6 +1676,9 @@ pub struct MaterialTangent {
     /// The applied source wave of the encounter the tangent rides (its control's identity), bound at
     /// that encounter's execution; empty before.
     source: Vec<Rat>,
+    /// The held opening the tangent started from: its producing commit and opening tick. A
+    /// continuation keeps it, so a chain of observations names the one opening it descends from.
+    origin: (u64, usize),
 }
 
 /// [definition; agent-inferred, October 9] **The tangent at one compared station** of the encounter
@@ -1769,6 +1794,7 @@ impl MaterialTangent {
             stations: Vec::new(),
             forms,
             source: Vec::new(),
+            origin: (commit, word.opened_at()),
         })
     }
 
@@ -1794,7 +1820,45 @@ impl MaterialTangent {
             stations: Vec::new(),
             forms: self.forms.clone(),
             source: Vec::new(),
+            origin: self.origin,
         })
+    }
+
+    /// [definition; agent-inferred, October 10; the held-carry record §7b] **The opening's own
+    /// tangent where a Word opens on a carry crossed into this material at held momentum**
+    /// (`ReceptionCarry::crossed`, `C′ w′ = π`): at fixed carried momentum `π`, a storage direction
+    /// `δC` at the direction's contact `a` moves the opening rate by `δw_a`, with
+    /// `C_a δw_a = −δC w_a` (the preimage the crossing's own law takes, `held_rate`), where `w_a` is
+    /// the rate the Word opened with. The conductances are the rings' (`G_a = 2^(n_a) Y_a`), so the
+    /// carried waves do not move; a stiffness or dissipation direction moves nothing at the opening.
+    /// Call on a fresh held opening, before any tick.
+    pub fn crossed_at_held_momentum(mut self, word: &Word<'_>) -> Result<Self, HnnError> {
+        if self.ticks != 0 {
+            return Err(HnnError::Unadmitted {
+                reason: "the opening's crossing tangent is read at the opening, before any tick",
+            });
+        }
+        let Some(delta) = &self.direction.storage else {
+            return Ok(self);
+        };
+        let a = self.direction.contact;
+        let opening = word.change()?;
+        let rate = &opening
+            .states
+            .get(a)
+            .ok_or(HnnError::Unadmitted {
+                reason: "a storage direction names a contact of its Word",
+            })?[1];
+        let target: Vec<Rat> = delta.apply(rate)?.into_iter().map(|x| -x).collect();
+        if target.iter().all(Zero::is_zero) {
+            return Ok(self);
+        }
+        let (jump, _) = self.forms[0]
+            .preimage_fibre(&target)?
+            .ok_or(HnnError::HeldMomentum { contact: a })?;
+        let state = &mut self.tangent.states[a][1];
+        *state = add(state, &jump);
+        Ok(self)
     }
 
     /// **Rebind a continued tangent to the Word it now rides**, before any junction step: the same
@@ -2030,6 +2094,12 @@ impl MaterialTangent {
         self.opened_at
     }
 
+    /// The held opening the tangent started from (its producing commit and opening tick), kept by
+    /// every continuation.
+    pub fn origin(&self) -> (u64, usize) {
+        self.origin
+    }
+
     /// The full ticks the tangent has followed.
     pub fn ticks(&self) -> usize {
         self.ticks
@@ -2084,9 +2154,62 @@ impl MaterialTangent {
     }
 }
 
-/// [definition; agent-inferred, October 9; the held-carry record §5a] **The World-sensitive contact
-/// descent of one encounter's own comparison**, one factor step per (contact, family), in the
-/// admission's own order. The admission is lexicographic: a strict classical improvement with no
+/// [definition; agent-inferred, October 10; the held-carry record §7b] **Law (6) over several
+/// observations: the common descent.** Each observation `o` has a classical gradient `L_o` and a
+/// phase gradient `X_o` over one family's entries, and the admission reads each observation's
+/// comparison on its own (`decide_over`). The step starts at `−Σ_o L_o` and is projected, exactly,
+/// off the span of every gradient it would raise at first order: classical ones first, then phase
+/// ones, adding one violated gradient at a time and re-projecting `−Σ_o L_o` until none is raised.
+/// The result `d` has `⟨L_o, d⟩ ≤ 0` and `⟨X_o, d⟩ ≤ 0` for every observation, with equality on
+/// the projected ones; it is zero when the violated gradients span the start. With one observation
+/// it is law (6) exactly: `⟨L, −L⟩ ≤ 0` never violates, and `X` is projected off iff
+/// `⟨L, X⟩ < 0`, giving `−L + (⟨L, X⟩/|X|²) X`.
+fn common_descent(classical: &[Vec<Rat>], phase: &[Vec<Rat>]) -> Vec<Rat> {
+    let width = classical.first().map_or(0, Vec::len);
+    let dot = |a: &[Rat], b: &[Rat]| a.iter().zip(b).map(|(x, y)| x * y).sum::<Rat>();
+    let mut start = vec![Rat::zero(); width];
+    for gradient in classical {
+        for (s, g) in start.iter_mut().zip(gradient) {
+            *s -= g;
+        }
+    }
+    // An exact orthogonal basis of the projected gradients (Gram–Schmidt over the rationals).
+    let mut basis: Vec<Vec<Rat>> = Vec::new();
+    let project = |basis: &[Vec<Rat>], v: &[Rat]| -> Vec<Rat> {
+        let mut out = v.to_vec();
+        for q in basis {
+            let coefficient = dot(&out, q) / dot(q, q);
+            for (o, x) in out.iter_mut().zip(q) {
+                *o -= &coefficient * x;
+            }
+        }
+        out
+    };
+    let constraints: Vec<&Vec<Rat>> = classical.iter().chain(phase).collect();
+    let mut used = vec![false; constraints.len()];
+    loop {
+        let descent = project(&basis, &start);
+        let violated = constraints
+            .iter()
+            .enumerate()
+            .find(|(k, c)| !used[*k] && dot(c, &descent) > Rat::zero());
+        let Some((k, c)) = violated else {
+            return descent;
+        };
+        used[k] = true;
+        let orthogonal = project(&basis, c);
+        if !orthogonal.iter().all(Zero::is_zero) {
+            basis.push(orthogonal);
+        }
+    }
+}
+
+/// [definition; agent-inferred, October 9; the held-carry record §5a, §7] **The World-sensitive
+/// contact descent of a chain of observations' comparisons**, one factor step per (contact, family),
+/// in the admission's own order. Each observation is its tangents (one per coordinate) with its own
+/// comparison; a chain's later tangents are the earlier ones continued, and the credits of all
+/// observations are read per observation by the common descent ([`common_descent`]), law (6) over
+/// several observations (one observation is the October 9 case exactly). The admission is lexicographic: a strict classical improvement with no
 /// worse phase excess, or, at an exactly equal code, a smaller excess. For each declared raw
 /// Gram-factor coordinate the tangent's comparison credit (5) gives the classical gradient `g_L` (its
 /// magnitude part) and the phase gradient `g_X` (its two phase parts). Per family the step is the
@@ -2096,31 +2219,42 @@ impl MaterialTangent {
 /// `⟨g_L, d⟩ = −|g_L|² + ⟨g_L, g_X⟩²/|g_X|² ≤ 0`. Both bounds hold per family, so they hold for any
 /// positive per-family step. A family with `d = 0` contributes no step. Each step keeps the
 /// normalization the held contact comparison gives its reached covector: the family's within-Word
-/// feature energy and covector scale, read from the encounter's own composed return (`held`). The
-/// tangents open at a held opening (`χ_0 = 0`). It is a proposal: only the landing's admission moves
+/// feature energy and covector scale, read from the last encounter's own composed return (`held`).
+/// The first observation's tangents open at a held opening (`χ_0 = 0`). It is a proposal: only the landing's admission moves
 /// the material. Refused for a coordinate declared twice, a tangent that does not carry its
 /// coordinate's direction, or a family the composed return did not reach.
 pub fn world_descent(
     field: &Field,
     theta: &Constitution,
     coordinates: &[super::variation::ContactCoordinate],
-    tangents: &[MaterialTangent],
-    ratio: &crate::hnn::ratio::ReceivingFaceRatio,
+    observations: &[(&[MaterialTangent], &crate::hnn::ratio::ReceivingFaceRatio)],
     held: &[crate::hnn::constitution::FactorStep],
 ) -> Result<Vec<crate::hnn::constitution::FactorStep>, HnnError> {
-    if coordinates.len() != tangents.len() {
+    if observations.is_empty() {
+        return Err(HnnError::Unadmitted {
+            reason: "a World-sensitive descent reads at least one observation",
+        });
+    }
+    if let Some((tangents, _)) = observations
+        .iter()
+        .find(|(tangents, _)| tangents.len() != coordinates.len())
+    {
         return Err(HnnError::Shape {
             what: "one material tangent per declared contact coordinate",
             expected: coordinates.len(),
             found: tangents.len(),
         });
     }
-    // Per family, each entry's classical and phase gradients.
-    type Entries = Vec<Vec<Option<(Rat, Rat)>>>;
+    // Per family, each entry's classical and phase gradients, one pair per observation.
+    type Entries = Vec<Vec<Option<Vec<(Rat, Rat)>>>>;
     let mut families: std::collections::BTreeMap<(usize, usize), Entries> =
         std::collections::BTreeMap::new();
-    for (coordinate, tangent) in coordinates.iter().zip(tangents) {
-        if tangent.direction() != &MaterialDirection::of_coordinate(field, theta, coordinate)? {
+    for (index, coordinate) in coordinates.iter().enumerate() {
+        let direction = MaterialDirection::of_coordinate(field, theta, coordinate)?;
+        if observations
+            .iter()
+            .any(|(tangents, _)| tangents[index].direction() != &direction)
+        {
             return Err(HnnError::Unadmitted {
                 reason: "each material tangent carries its declared coordinate's direction",
             });
@@ -2140,31 +2274,35 @@ pub fn world_descent(
                 reason: "a contact coordinate is declared once",
             });
         }
-        let credit = tangent.comparison_credit(ratio)?;
-        *slot = Some((
-            credit.magnitude.clone(),
-            &credit.produced_phase + &credit.observed_phase,
-        ));
+        // Each observation's credit at its own frozen covector.
+        let mut credits = Vec::with_capacity(observations.len());
+        for (tangents, ratio) in observations {
+            let credit = tangents[index].comparison_credit(ratio)?;
+            credits.push((
+                credit.magnitude.clone(),
+                &credit.produced_phase + &credit.observed_phase,
+            ));
+        }
+        *slot = Some(credits);
     }
     let mut steps = Vec::new();
     for ((a, family), entries) in families {
         let rows = entries.len();
         let columns = entries.first().map_or(0, Vec::len);
-        let pairs: Vec<(Rat, Rat)> = entries
+        let zero = vec![(Rat::zero(), Rat::zero()); observations.len()];
+        let entries: Vec<Vec<(Rat, Rat)>> = entries
             .into_iter()
             .flatten()
-            .map(|x| x.unwrap_or_else(|| (Rat::zero(), Rat::zero())))
+            .map(|x| x.unwrap_or_else(|| zero.clone()))
             .collect();
-        let dot = |f: &dyn Fn(&(Rat, Rat)) -> Rat| pairs.iter().map(f).sum::<Rat>();
-        // ⟨g_L, g_X⟩ and |g_X|², exact; the projection's coefficient when they conflict.
-        let conflict = dot(&|(l, x)| l * x);
-        let phase = dot(&|(_, x)| x * x);
-        let lift = if conflict < Rat::zero() && !phase.is_zero() {
-            conflict / phase
-        } else {
-            Rat::zero()
-        };
-        let descent: Vec<Rat> = pairs.iter().map(|(l, x)| &lift * x - l).collect();
+        // Each observation's classical and phase gradients over the family's entries.
+        let classical: Vec<Vec<Rat>> = (0..observations.len())
+            .map(|o| entries.iter().map(|e| e[o].0.clone()).collect())
+            .collect();
+        let phase: Vec<Vec<Rat>> = (0..observations.len())
+            .map(|o| entries.iter().map(|e| e[o].1.clone()).collect())
+            .collect();
+        let descent = common_descent(&classical, &phase);
         if descent.iter().all(Zero::is_zero) {
             continue;
         }

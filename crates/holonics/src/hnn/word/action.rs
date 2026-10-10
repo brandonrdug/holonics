@@ -1009,6 +1009,11 @@ pub struct CoupledPassage {
 /// wave for each step's emitted one, `(t, a_t) ↦ b_t`.
 pub type WaveReturns<'a> = dyn FnMut(usize, &[Rat]) -> Result<Vec<Rat>, HnnError> + 'a;
 
+/// [definition; agent-inferred, October 10; the held-carry record §7b] A reader beside a coupled
+/// passage: it sees the Word after step `t`'s return and before the next tick, exactly where a
+/// consumer beside an actual encounter sees it, and cannot change the Word.
+pub type PassageObserver<'a> = dyn FnMut(&Word<'_>, usize) -> Result<(), HnnError> + 'a;
+
 impl Word<'_> {
     /// **Run the coupled prospective passage** ([`CoupledPassage`]): a fresh Word on this unrun
     /// Word's actual source opening, opened exactly as [`Word::prospective_feature`] opens its
@@ -1022,6 +1027,7 @@ impl Word<'_> {
         phases: &ReceivingPhases,
         compared: &[bool],
         returns: &mut WaveReturns<'_>,
+        observer: &mut PassageObserver<'_>,
     ) -> Result<CoupledPassage, HnnError> {
         let producer = ActionProducer::of(self)?;
         if compared.len() != phases.aperture() {
@@ -1059,6 +1065,7 @@ impl Word<'_> {
                 .checked_add(t)
                 .ok_or(HnnError::CountOverflow)?;
             word.return_source_wave(source_ring, native_tick, &incident, &reflected, &-work)?;
+            observer(&word, t)?;
             waves.push((incident, reflected));
         }
         let prediction = WordBalance::of(&word.released()?);

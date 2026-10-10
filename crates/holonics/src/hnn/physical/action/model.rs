@@ -846,8 +846,17 @@ impl WorldModel {
         compared: &[bool],
     ) -> Result<CoupledProspect, HnnError> {
         let (model, fibre) = self.live(key)?;
-        let passage =
-            |start: &[Rat]| self.coupled_from(model, start, word, source_ring, phases, compared);
+        let passage = |start: &[Rat]| {
+            self.coupled_from(
+                model,
+                start,
+                word,
+                source_ring,
+                phases,
+                compared,
+                &mut |_: &Word<'_>, _: usize| -> Result<(), HnnError> { Ok(()) },
+            )
+        };
         let point = passage(&fibre.point)?;
         let mut directions = Vec::with_capacity(fibre.directions.len());
         for direction in &fibre.directions {
@@ -890,8 +899,82 @@ impl WorldModel {
         Ok((model, fibre))
     }
 
+    /// [definition; agent-inferred, October 10; the held-carry record §7b] **The located prospect
+    /// with its material tangents**: the coupled passage from the key's located point, with each
+    /// tangent riding it tick by tick through the key's charts at the same commits the passage's
+    /// returns read (`MaterialTangent::step_through_port`), and held at every compared station with
+    /// the observed face's tangent read through the key's declared face, each station numbered by
+    /// its rank among the compared ones as the prospect's comparison numbers it. It is the actual encounter's
+    /// tangent law (`PhysicalReceiver::execute_prepared`) on the prospective Word: the key stands for
+    /// the World in both. Refused unless the key is live, its fibre is a point, and it declares a face.
+    pub fn located_prospect_with_tangents(
+        &self,
+        key: usize,
+        word: &Word<'_>,
+        source_ring: usize,
+        phases: &ReceivingPhases,
+        compared: &[bool],
+        tangents: &mut [crate::hnn::word::continuation::MaterialTangent],
+    ) -> Result<CoupledProspect, HnnError> {
+        let (model, fibre) = self.live(key)?;
+        if !fibre.directions.is_empty() {
+            return Err(HnnError::Unadmitted {
+                reason: "a prospect's tangents ride a located World state: the key's fibre is a point",
+            });
+        }
+        let face = model.face().ok_or(HnnError::Unadmitted {
+            reason: "a prospect's tangents read the key's declared face",
+        })?;
+        let tick = self.tick;
+        let epochs: Vec<usize> = phases.epochs().collect();
+        let mut observer = |word: &Word<'_>, t: usize| -> Result<(), HnnError> {
+            let offset = t
+                .checked_sub(1)
+                .and_then(|offset| u64::try_from(offset).ok())
+                .ok_or(HnnError::CountOverflow)?;
+            let charts = model.charts(tick.checked_add(offset).ok_or(HnnError::CountOverflow)?)?;
+            for tangent in tangents.iter_mut() {
+                tangent.step_through_port(word, &charts.f, &charts.g, &charts.p, &charts.q)?;
+                for (station, (&epoch, &yes)) in epochs.iter().zip(compared).enumerate() {
+                    if !yes || epoch != t {
+                        continue;
+                    }
+                    let observed = match tangent.world() {
+                        Some(psi) => Some(sub(
+                            &face.read(psi)?,
+                            &face.read(&vec![Rat::zero(); psi.len()])?,
+                        )),
+                        None => None,
+                    };
+                    // Numbered as the prospect's comparison numbers its stations: by rank among
+                    // the compared ones (`PhysicalReceiver::world_prospect_ratio`).
+                    let rank = compared[..station].iter().filter(|&&c| c).count();
+                    tangent.observe_station(word, phases.ring(), rank, observed)?;
+                }
+            }
+            Ok(())
+        };
+        let point = self.coupled_from(
+            model,
+            &fibre.point,
+            word,
+            source_ring,
+            phases,
+            compared,
+            &mut observer,
+        )?;
+        Ok(CoupledProspect {
+            tick: self.tick,
+            point: point.passage,
+            faces: point.faces,
+            directions: Vec::new(),
+        })
+    }
+
     /// The coupled passage from one model state `ξ_T`, step `t` answered at commit `T + t − 1`,
-    /// with the key's declared raw face read on the state after the step at every compared epoch.
+    /// with the key's declared raw face read on the state after the step at every compared epoch,
+    /// and `observer` beside the Word after each step's return.
+    #[allow(clippy::too_many_arguments)]
     fn coupled_from(
         &self,
         model: &ModelKey,
@@ -900,6 +983,7 @@ impl WorldModel {
         source_ring: usize,
         phases: &ReceivingPhases,
         compared: &[bool],
+        observer: &mut crate::hnn::word::action::PassageObserver<'_>,
     ) -> Result<KeyPassage, HnnError> {
         let tick = self.tick;
         let mut state = start.to_vec();
@@ -916,8 +1000,13 @@ impl WorldModel {
             states.push(state.clone());
             Ok(reflected)
         };
-        let passage =
-            word.prospective_coupled_passage(source_ring, phases, compared, &mut returns)?;
+        let passage = word.prospective_coupled_passage(
+            source_ring,
+            phases,
+            compared,
+            &mut returns,
+            observer,
+        )?;
         let mut faces = Vec::new();
         if let Some(face) = model.face() {
             for (station, epoch) in phases.epochs().enumerate() {

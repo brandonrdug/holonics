@@ -98,6 +98,24 @@ The helical code, the encoding every Holon carries, is defined in
   two-encounter credit's landing, provenance carrying the located key's identity, more fixtures,
   and the World-sensitive Ask on a field where selection is informative.
 
+**October 10: learning across two observations lands at both waves** (#73; the
+[held-carry record](research/records/2026-10-09_THE_ASKED_ENCOUNTER_TEACHES_THE_MATERIAL_THROUGH_ITS_HELD_CARRY.md)
+§7–§7b; developer reads, not yet the queue's).
+- **The credit of a chain:** two encounters at different waves, `u = 1` then `u = −1`, are credited
+  as one. The chain binds consecutive clocks and continued tangents of one origin. The credit is exact
+  to second order on every part.
+- **The past refuses, the future admits:** stepping on the experienced credit lowers code and phase on
+  the passages it credits, but the prospects of the next encounter refuse it at both waves.
+  - The step now descends the located key's prospect at every admitted wave, from the present
+    opening. Its tangents ride the prospective Word through the key's charts, and the opening adds
+    the held-momentum crossing.
+  - Law (6) over several waves (the common descent) projects off every per-wave gradient the step
+    would raise.
+  - The landing is admitted at both waves: `u = 1` by phase, `u = −1` classically, with a strict code
+    gain in `[2⁻⁸, 2⁻⁷)`. The actual next encounters equal the prospects, and both beat the
+    no-deposit twin.
+- **Still owed:** a loop of such landings, a second fixture, and the queue's runs.
+
 **October 6 HNN integration.** The [blind receiving return](research/records/2026-10-06_THE_BLIND_RECEIVING_RETURN_IS_JOINED_BUT_RELEASE_NEEDS_THE_EXECUTED_COUPLED_DOMAIN.md)
 now consumes its actual continuing Word's pullback and the existing normal deposition at R.
 The committed physical lane passes two teaching controls and retained carry: a reached deposit
