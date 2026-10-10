@@ -20,7 +20,8 @@
 //! which no symbol advances the lift crossed no ray at all and is **Silent** (a ring at rest, the
 //! origin, has no class and is never started: it is Silent by being at rest). A ring that crosses
 //! rays but never the section, and repeats (`W = 0`), is not Silent: it is a lock without rotation
-//! and keeps its cycle, with an empty arrival word.
+//! and keeps its cycle, with an empty arrival word. `W = 0` alone does not empty the word: a cycle
+//! `(3, +1, +1), (0, −1, −1)` arrives and departs, and its signed arrivals cancel.
 //!
 //! [definition] **The observed word is the lock's content; the rate is a face.** The cycle's symbols
 //! and the signed arrival word (which ticks of the cycle arrive at the section, and with which sign)
@@ -39,12 +40,21 @@
 //! the joint is silent. A joint period over half the window is refused: the window does not show it
 //! twice.
 //!
-//! [proved-derived] **The lift's net over a cycle is whole by the class recursion.** The reader's own
-//! symbols satisfy `class_(k+1) = class_k + Δℓ_k (mod 4)`, so a word that repeats in the class has a
-//! net lift `≡ 0 (mod 4)`; [`LockRefusal::Fractional`] is the typed form of that law for hand-fed
-//! symbols that break the recursion (the half-turn-blind reading of the record's X3, which closes a
-//! half-wave antisymmetric tone on half a turn, would read here). It is unreachable from a reader's
-//! stream. Likewise the least period of the tuple word is the lcm of the rings' least periods when
+//! [definition] **A section word is admitted only with its chart relations** ([`SectionWord::new`]).
+//! Each symbol has `class ∈ {0, 1, 2, 3}`, `Δℓ ∈ {−2, …, 2}` (a chord's advance,
+//! [`crate::hnn::dynamic_section::chord`]) and `crossing = ⌊(class + Δℓ)/4⌋`, and consecutive symbols
+//! keep the class recursion `class_(k+1) = class_k + Δℓ_k (mod 4)`. A word that breaks one is refused
+//! [`LockRefusal::NotASectionWord`] at its first broken tick, before Silent or a period is read. The
+//! reader's own stream satisfies all four by [`SectionReader::advance`]. A repeated class and a whole
+//! net lift do not certify the crossings: `(0, 2, 0), (2, 2, 0)` repeated closes the class recursion
+//! with `W = 1` and declares no arrival, while its second tick lands on `4` and crosses `+1`.
+//!
+//! [proved-derived] **The lift's net over a cycle is whole, and the signed arrivals sum to it.** By the
+//! class recursion, `Σ_(k<τ) Δℓ_k = 4 Σ_(k<τ) crossing_k + class_τ − class_0`, and an admitted word of
+//! period `τ ≤ L/2` has `class_τ = class_0`. So `W = Σ_(k<τ) crossing_k`: the winding is the signed
+//! count of the observed arrivals (the half-turn-blind reading of the record's X3, which closes a
+//! half-wave antisymmetric tone on half a turn, is refused at admission). Likewise the least period of
+//! the tuple word is the lcm of the rings' least periods when
 //! the lcm is at most half the window (Fine–Wilf: a window of length `τ_b + p` with periods `τ_b`
 //! and `p` has period `gcd`); the joint reading checks it ([`JointRefusal::Disagrees`]).
 //!
@@ -64,7 +74,7 @@
 //!
 //! | Law | Lean | Rust |
 //! |---|---|---|
-//! | a closed class cycle has a whole winding; the carry is kept | `Geometry/PhaseCarry.closed_loop_has_integer_winding` | [`Lock::winding`], [`LockRefusal::Fractional`] |
+//! | a closed class cycle has a whole winding, the signed count of its arrivals; the carry is kept | `Geometry/PhaseCarry.closed_loop_has_integer_winding` | [`SectionWord::new`], [`Lock::winding`] |
 //! | the mean rate is a face, not the section word; a constant-rate word is balanced | `Aeon/Clock/CarryWord.carry_balanced`; `Aeon/Clock/Lock.lock_at_address` | [`Lock::mean_rate_face`], [`Lock::arrival_word`] |
 //! | the joint period is the lcm of the rings' | owed (#62) | [`JointLock`] |
 
@@ -72,7 +82,7 @@ use num_bigint::BigInt;
 use thiserror::Error;
 
 use crate::aeon::TwoClocks;
-use crate::hnn::dynamic_section::{SectionReader, SectionRefusal, SectionSymbol, quadrant};
+use crate::hnn::dynamic_section::{RAYS, SectionReader, SectionRefusal, SectionSymbol, quadrant};
 use crate::ratio::Rat;
 
 /// [definition] **Why a window has no lock.** Typed; a period is never invented.
@@ -86,9 +96,12 @@ pub enum LockRefusal {
         "no period of at most {max_period} ticks (half the {length}-tick window) repeats the settled symbol word"
     )]
     Unlocked { max_period: usize, length: usize },
-    /// The repeating cycle's net lift is not a multiple of four: not whole turns.
-    #[error("the cycle of {period} ticks turns the lift by {net}, not a whole number of turns")]
-    Fractional { period: usize, net: i64 },
+    /// The word breaks a chart relation of the section's symbols at `tick` (module header).
+    #[error("the word is not a section word: tick {tick} breaks {relation:?}")]
+    NotASectionWord {
+        tick: usize,
+        relation: SectionRelation,
+    },
     /// The dynamic section refused a tick of the window (the origin, a chord through it).
     #[error(transparent)]
     Section(#[from] SectionRefusal),
@@ -103,6 +116,58 @@ pub enum LockRefusal {
     /// The declared window cannot show any period twice.
     #[error("a window of {length} ticks cannot show a period twice")]
     Window { length: usize },
+}
+
+/// [definition] **The chart relation a section word breaks** (module header).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum SectionRelation {
+    /// `class ∉ {0, 1, 2, 3}`.
+    Class,
+    /// `Δℓ ∉ {−2, …, 2}`: no chord passes more than two rays.
+    Advance,
+    /// `crossing ≠ ⌊(class + Δℓ)/4⌋`.
+    Crossing,
+    /// `class_(k+1) ≠ class_k + Δℓ_k (mod 4)`: the next tick does not start where this one lands.
+    Recursion,
+}
+
+/// [definition] **A section word**: one ring's symbols, one per tick, admitted only when every chart
+/// relation holds (module header). Its symbols are private: a word is built by
+/// [`SectionWord::new`] or by the [`LockReader`] from the ring's own states.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct SectionWord {
+    symbols: Vec<SectionSymbol>,
+}
+
+impl SectionWord {
+    /// **Admit a word** of symbols, refused at the first tick that breaks a chart relation.
+    pub fn new(symbols: Vec<SectionSymbol>) -> Result<Self, LockRefusal> {
+        let rays = i8::try_from(RAYS).unwrap_or(i8::MAX);
+        for (tick, symbol) in symbols.iter().enumerate() {
+            let broken = |relation| LockRefusal::NotASectionWord { tick, relation };
+            if symbol.class >= RAYS {
+                return Err(broken(SectionRelation::Class));
+            }
+            if !(-2..=2).contains(&symbol.advance) {
+                return Err(broken(SectionRelation::Advance));
+            }
+            let landed = i8::try_from(symbol.class).unwrap_or(i8::MAX) + symbol.advance;
+            if symbol.crossing != landed.div_euclid(rays) {
+                return Err(broken(SectionRelation::Crossing));
+            }
+            if let Some(next) = symbols.get(tick + 1)
+                && i8::try_from(next.class).unwrap_or(i8::MAX) != landed.rem_euclid(rays)
+            {
+                return Err(broken(SectionRelation::Recursion));
+            }
+        }
+        Ok(Self { symbols })
+    }
+
+    /// The symbols, one per tick.
+    pub fn symbols(&self) -> &[SectionSymbol] {
+        &self.symbols
+    }
 }
 
 /// [definition] **The declared read window**: the settle tick and the number of ticks read after it.
@@ -143,8 +208,8 @@ impl LockWindow {
 pub enum Settled {
     /// The ring was at rest, the origin, through the whole window.
     Rest,
-    /// The symbols of the window, one per tick.
-    Word(Vec<SectionSymbol>),
+    /// The symbols of the window, one per tick, admitted as a section word.
+    Word(SectionWord),
 }
 
 /// [definition] **An arrival at the section** within a cycle: the tick and the sign of the crossing.
@@ -219,12 +284,12 @@ impl Lock {
 
 impl Settled {
     /// **Read the lock** of a window (module header). Silent when nothing crossed a ray, Unlocked
-    /// when no period of at most half the window repeats the word, Fractional when the repeating
-    /// cycle's net lift is not whole turns.
+    /// when no period of at most half the window repeats the word. The word was admitted with its
+    /// chart relations, so the cycle's net lift is whole turns.
     pub fn lock(&self, window: &LockWindow) -> Result<Lock, LockRefusal> {
         let symbols = match self {
             Self::Rest => return Err(LockRefusal::Silent),
-            Self::Word(symbols) => symbols,
+            Self::Word(word) => word.symbols(),
         };
         if symbols.len() != window.length {
             return Err(LockRefusal::Incomplete {
@@ -241,10 +306,21 @@ impl Settled {
         })?;
         let cycle = symbols[..period].to_vec();
         let net: i64 = cycle.iter().map(|symbol| i64::from(symbol.advance)).sum();
-        if net % 4 != 0 {
-            return Err(LockRefusal::Fractional { period, net });
-        }
-        let winding = net / 4;
+        // whole by the admitted class recursion, and the signed count of the arrivals (module header)
+        let winding = net / i64::from(RAYS);
+        debug_assert_eq!(
+            winding * i64::from(RAYS),
+            net,
+            "an admitted cycle turns whole"
+        );
+        debug_assert_eq!(
+            winding,
+            cycle
+                .iter()
+                .map(|symbol| i64::from(symbol.crossing))
+                .sum::<i64>(),
+            "the winding is the signed count of the arrivals"
+        );
         let address = Rat::new(
             BigInt::from(winding),
             BigInt::from(u64::try_from(period).unwrap_or(u64::MAX)),
@@ -348,7 +424,10 @@ impl LockReader {
             });
         }
         Ok(match self.stage {
-            Stage::Reading(_) => Settled::Word(self.symbols),
+            // the reader's own symbols keep every chart relation (`SectionReader::advance`)
+            Stage::Reading(_) => Settled::Word(SectionWord {
+                symbols: self.symbols,
+            }),
             Stage::Rest | Stage::Waiting => Settled::Rest,
         })
     }
@@ -413,10 +492,12 @@ impl JointLock {
             };
         }
         // the tuple of the locked rings' symbols, tick by tick
-        let words: Vec<&Vec<SectionSymbol>> = rings
+        let words: Vec<&[SectionSymbol]> = rings
             .iter()
             .filter_map(|settled| match settled {
-                Settled::Word(symbols) if symbols.iter().any(|s| s.advance != 0) => Some(symbols),
+                Settled::Word(word) if word.symbols().iter().any(|s| s.advance != 0) => {
+                    Some(word.symbols())
+                }
                 _ => None,
             })
             .collect();
@@ -467,13 +548,36 @@ mod tests {
     /// The cycle repeated over a window of `length`.
     fn word(cycle: &[(u8, i8)], length: usize) -> Settled {
         Settled::Word(
-            (0..length)
-                .map(|k| {
-                    let (class, advance) = cycle[k % cycle.len()];
-                    symbol(class, advance)
-                })
-                .collect(),
+            SectionWord::new(
+                (0..length)
+                    .map(|k| {
+                        let (class, advance) = cycle[k % cycle.len()];
+                        symbol(class, advance)
+                    })
+                    .collect(),
+            )
+            .unwrap(),
         )
+    }
+
+    /// Symbols `(class, advance, crossing)` as declared, repeated over a window of `length`.
+    fn declared(cycle: &[(u8, i8, i8)], length: usize) -> Vec<SectionSymbol> {
+        (0..length)
+            .map(|k| {
+                let (class, advance, crossing) = cycle[k % cycle.len()];
+                SectionSymbol {
+                    class,
+                    advance,
+                    crossing,
+                }
+            })
+            .collect()
+    }
+
+    /// The signed arrivals of a lock's cycle sum to its winding (module header).
+    fn arrivals_sum_to_winding(lock: &Lock) {
+        let sum: i64 = lock.arrival_word().iter().map(|&c| i64::from(c)).sum();
+        assert_eq!(sum, lock.winding());
     }
 
     fn window() -> LockWindow {
@@ -530,7 +634,7 @@ mod tests {
     }
 
     #[test]
-    fn a_lock_without_rotation_is_a_lock_with_an_empty_arrival_word() {
+    fn a_rocking_lock_that_never_reaches_the_section_has_an_empty_arrival_word() {
         // rocking between classes 1 and 2 across the ray 2, never the section: W = 0, no face
         let cycle = [(1, 1), (2, 0), (2, -1), (1, 0)];
         let lock = word(&cycle, 24).lock(&window()).unwrap();
@@ -539,6 +643,37 @@ mod tests {
         assert!(lock.arrivals().is_empty());
         assert_eq!(*lock.address(), Rat::new(0.into(), 1.into()));
         assert!(lock.mean_rate_face().is_none());
+    }
+
+    #[test]
+    fn a_lock_without_rotation_can_arrive_and_depart() {
+        // (3, +1, +1), (0, −1, −1): back to class 3, net lift 0, the arrivals +1 then −1 cancel
+        let cycle = [(3, 1), (0, -1)];
+        let lock = word(&cycle, 24).lock(&window()).unwrap();
+        assert_eq!((lock.period(), lock.winding()), (2, 0));
+        assert_eq!(lock.arrival_word(), [1, -1]);
+        assert_eq!(
+            lock.arrivals(),
+            [
+                Arrival { tick: 10, sign: 1 },
+                Arrival { tick: 11, sign: -1 }
+            ]
+        );
+        assert!(lock.mean_rate_face().is_none());
+        arrivals_sum_to_winding(&lock);
+    }
+
+    #[test]
+    fn the_signed_arrivals_of_a_cycle_sum_to_its_winding() {
+        let cycles: [&[(u8, i8)]; 4] = [
+            &[(1, 1), (2, 1), (3, 1), (0, 1), (1, 1), (2, -2), (0, 1)],
+            &[(2, 1), (3, 1), (0, 2), (2, 2), (0, 1), (1, -1), (0, 2)],
+            &[(2, 1), (3, 1), (0, 2), (2, 2), (0, 1), (1, -2), (3, -1)],
+            &[(0, -1), (3, -2), (1, -1), (0, -1), (3, 1), (0, 1), (1, -1)],
+        ];
+        for cycle in cycles {
+            arrivals_sum_to_winding(&word(cycle, 24).lock(&window()).unwrap());
+        }
     }
 
     #[test]
@@ -571,20 +706,46 @@ mod tests {
     }
 
     #[test]
-    fn a_cycle_that_is_not_whole_turns_is_fractional() {
-        // hand-fed symbols that break the class recursion: net lift 2 per cycle
-        let broken = Settled::Word(vec![
-            SectionSymbol {
-                class: 0,
-                advance: 2,
-                crossing: 0,
-            };
-            24
-        ]);
+    fn a_word_that_breaks_a_chart_relation_is_not_admitted() {
+        let refused = |tick, relation| Err(LockRefusal::NotASectionWord { tick, relation });
+        // the review's witness: (0, 2, 0), (2, 2, 0) repeated closes the class recursion with W = 1
+        // and declares no arrival; its second tick lands on 4 and crosses +1
         assert_eq!(
-            broken.lock(&window()),
-            Err(LockRefusal::Fractional { period: 1, net: 2 })
+            SectionWord::new(declared(&[(0, 2, 0), (2, 2, 0)], 4)),
+            refused(1, SectionRelation::Crossing)
         );
+        // with the crossing it owes, the same word is admitted and locks at τ = 2, W = 1
+        let honest =
+            Settled::Word(SectionWord::new(declared(&[(0, 2, 0), (2, 2, 1)], 24)).unwrap());
+        let lock = honest.lock(&window()).unwrap();
+        assert_eq!((lock.period(), lock.winding()), (2, 1));
+        assert_eq!(lock.arrival_word(), [0, 1]);
+        // a half-turn per tick from class 0 back to class 0 breaks the recursion (net lift 2)
+        assert_eq!(
+            SectionWord::new(declared(&[(0, 2, 0)], 24)),
+            refused(0, SectionRelation::Recursion)
+        );
+        assert_eq!(
+            SectionWord::new(declared(&[(4, 0, 1)], 2)),
+            refused(0, SectionRelation::Class)
+        );
+        assert_eq!(
+            SectionWord::new(declared(&[(0, 3, 0), (3, 1, 1)], 2)),
+            refused(0, SectionRelation::Advance)
+        );
+        // the reader's own stream is admitted: one ray per tick around the circle
+        let points = [[1, 0], [0, 1], [-1, 0], [0, -1], [1, 0]].map(|[w, u]| {
+            [
+                Rat::new(BigInt::from(w), 1.into()),
+                Rat::new(BigInt::from(u), 1.into()),
+            ]
+        });
+        let mut reader = SectionReader::at(points[0].clone()).unwrap();
+        let stream: Vec<SectionSymbol> = points[1..]
+            .iter()
+            .map(|point| reader.advance(point.clone()).unwrap())
+            .collect();
+        assert!(SectionWord::new(stream).is_ok());
     }
 
     #[test]
@@ -593,7 +754,7 @@ mod tests {
             LockWindow::new(0, 1),
             Err(LockRefusal::Window { length: 1 })
         );
-        let short = Settled::Word(vec![symbol(0, 1); 5]);
+        let short = word(&consistent(&[1, 1, 1, 1]), 5);
         assert_eq!(
             short.lock(&window()),
             Err(LockRefusal::Incomplete { have: 5, need: 24 })
@@ -618,9 +779,9 @@ mod tests {
             JointLock::read(&window(), &[Settled::Rest, Settled::Rest]),
             Err(JointRefusal::Silent)
         );
-        let aperiodic: Vec<(u8, i8)> = (0..24)
-            .map(|k| ((k % 4) as u8, 1 - (k / 12) as i8))
-            .collect();
+        // twelve quarter-turns and then rest at class 0: no period of at most 12 repeats it
+        let advances: Vec<i8> = (0..24).map(|k| if k < 12 { 1 } else { 0 }).collect();
+        let aperiodic = consistent(&advances);
         let rings = [word(&four, 24), word(&aperiodic, 24)];
         assert!(matches!(
             JointLock::read(&window(), &rings),

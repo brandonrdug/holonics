@@ -71,3 +71,15 @@ Codex's review repairs (passive admission, the full reflected vector):
     BOUNDED start 01:00:30 end 01:00:31 exit 0 wall_ns 80730643 child_peak_rss_kib 28280          6 passed (test binary already built)
 15. RUSTC_BOOTSTRAP=1 cargo test --doc hnn::wave
     BOUNDED start 01:00:31 end 01:00:57 exit 0 wall_ns 26383352501 child_peak_rss_kib 2180600      6 passed
+
+Codex's second review repair (the section word's admission, §14). Projection per command: at most 420 s
+(the largest earlier unit was 53 s), memory under 2^32 bytes; each under the common lease.
+16. cargo test -p holonics --lib hnn::section_lock -- --test-threads=4
+    BOUNDED start 01:18:22 end 01:18:57 exit 101 wall_ns 34935232118 child_peak_rss_kib 3133624    9 passed, 1 failed:
+    the joint test's unlocked fixture (k mod 4, 1 - floor(k/12)) was itself a forged word, refused at admission (§14)
+17. cargo test -p holonics --lib hnn::section_lock -- --test-threads=4   (the fixture rebuilt as a section word)
+    BOUNDED start 01:19:34 end 01:19:46 exit 0 wall_ns 12635124144 child_peak_rss_kib 2734616     10 passed
+18. cargo test -p holonics --test acoustic_wave_port -- --test-threads=4
+    BOUNDED start 01:19:46 end 01:20:22 exit 0 wall_ns 35561334993 child_peak_rss_kib 2176468     15 passed
+19. cargo clippy -p holonics --all-targets -- -D warnings (stricter than the gate's guard lints)
+    exited nonzero on findings in files this repair does not touch; none in hnn/section_lock.rs or hnn/mod.rs

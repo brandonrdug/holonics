@@ -306,7 +306,7 @@ tuned. The reading, exact equality of symbols, no tolerance:
 
 ```text
 τ        the least τ ≤ 60 (half the window) with s_k = s_(k+τ) for every k < 120 − τ      else Unlocked
-W        (Σ_(k<τ) Δℓ_k)/4, whole turns                                                       else Fractional
+W        (Σ_(k<τ) Δℓ_k)/4, whole turns (Fractional, retired in §14: the admitted word turns whole)
 address  W/τ in lowest terms;  arrival word = the signed crossings of one cycle, as observed
 Silent   no symbol of the window advances the lift
 joint    the lcm of the locked rings' τ, silent rings skipped, any other refusal refuses it;
@@ -334,10 +334,10 @@ joint    the lcm of the locked rings' τ, silent rings skipped, any other refusa
   with `W = 0` (the replica's "lock without rotation"). Read literally, "no section arrival" would call it
   Silent and lose its cycle. It is a lock with an empty arrival word and no mean-rate face. A ring at rest
   (the origin has no class) is never started: it is Silent by being at rest (zero input).
-- **Fractional is typed and unreachable from a reader's stream.** The reader's symbols satisfy
-  `class_(k+1) = class_k + Δℓ_k (mod 4)`, so a word that repeats in the class has a net lift `≡ 0 (mod 4)`.
-  The refusal is the typed form of the replica's assertion L9 for symbols that break the recursion (hand-fed,
-  or the half-turn-blind reading of X3 that closes on half a turn); the unit test feeds such symbols.
+- **Fractional was typed and unreachable from a reader's stream** (superseded in §14). The reader's symbols
+  satisfy `class_(k+1) = class_k + Δℓ_k (mod 4)`, so a word that repeats in the class has a net lift
+  `≡ 0 (mod 4)`. The refusal was the typed form of the replica's assertion L9 for hand-fed symbols that break
+  the recursion. It did not check the crossings, and §14 replaces it with the admission of the word.
 - **The read window is the declared finite read set**, held at most 120 symbols and dropped with the reading;
   it is not retention of the stream. `LockReader::observe` is atomic, ignores ticks before the settle tick and
   after the window, refuses a ring that was at rest at the settle tick and leaves rest inside the window
@@ -383,7 +383,7 @@ and addresses equal the replica's own `run_output.txt` at `35d59516` (F1 `W = 1,
   Unlocked on all three; zero input is `Silent` on all three and for the joint; a wave that starts at tick 130
   leaves a ring at rest at the settle tick and is refused `NotSettled`; a reader offered 201 of the 241 states
   is refused `Incomplete`. Unit tests (explicit symbol words): `Silent` for no ray crossed, the 13-cycle
-  `Unlocked` and the 12-cycle locked at exactly half the window, `Fractional { period: 1, net: 2 }`, the
+  `Unlocked` and the 12-cycle locked at exactly half the window, `Fractional { period: 1, net: 2 }` (retired in §14), the
   rocking lock with `W = 0`, the departure `−1` in an arrival word, and the joint (4 and 6 give 12; a silent
   ring skipped; all silent `Silent`; an unlocked ring refuses it; 4, 6 and 5 give 60 `Beyond`).
 
@@ -472,3 +472,56 @@ coordinate reflects nothing.
   the plane; they are not classes of a founded encoding, not located, and not shown invariant under relabelling,
   so two rings reading equal labels have not thereby read the same symbol. (§6: the first rung's frames hold the
   word.)
+
+## 14. The second review: a forged word was admitted, and the word now carries its certificate
+
+[source-inspected; Codex, independent review of `aeeb0ee8`] Both §13 repairs hold. The review found one more
+defect: `Settled::Word(Vec<SectionSymbol>)` was publicly constructible, and `Settled::lock` read its symbols
+without checking that they were a section's. The witness, in a four-tick window, repeats
+`(class, advance, crossing) = (0, 2, 0), (2, 2, 0)`. The class recursion closes and the net lift is `4`, so the old
+reading admitted a lock of period `2` and winding `1` with the arrival word `[0, 0]`. The second tick lands on
+`2 + 2 = 4` and must cross `+1`. The lock reader trusted content that only the reader's own stream guaranteed.
+
+[definition; agent-inferred] **The repair is private construction.** `Settled::Word` now holds a `SectionWord`,
+whose symbols are private and which is admitted only by `SectionWord::new` (or built by the `LockReader` from the
+ring's own states). The admission checks four chart relations at every tick and refuses
+`LockRefusal::NotASectionWord { tick, relation }` at the first broken one:
+- `class ∈ {0, 1, 2, 3}`;
+- `Δℓ ∈ {−2, …, 2}` (a chord turns less than half a turn: `dynamic_section::chord`);
+- `crossing = ⌊(class + Δℓ)/4⌋`;
+- the class recursion `class_(k+1) = class_k + Δℓ_k (mod 4)`.
+
+The reason for private construction over validating inside `lock`: the joint reading and any later consumer of a
+word read the same symbols, and a certificate in the type reaches them all.
+
+[proved-derived] **The winding is the signed count of the arrivals.** Summing
+`class_(k+1) = class_k + Δℓ_k − 4·crossing_k` over a cycle of an admitted word of period `τ ≤ L/2` (so
+`class_τ = class_0`) gives `Σ Δℓ_k = 4 Σ crossing_k`, so `W = Σ_(k<τ) crossing_k`. `Fractional` became
+unreachable for every admitted word and is retired; its old hand-fed case `(0, 2, 0)` repeated is now refused at
+tick `0` (`Recursion`). `Settled::lock` keeps the two identities as debug assertions.
+
+**Zero winding does not empty the arrival word.** The atlas row `hnn.section-lock` said that a lock of winding `0`
+has an empty arrival word. That holds for F3's ring `t = 2`, which rocks across the ray 2 and never reaches the
+section, and it is not a law: `(3, +1, +1), (0, −1, −1)` returns to class 3 with net lift `0` and arrives and
+departs, `[+1, −1]`. The row, the module header and the rocking test's name now keep the two apart.
+
+Tests (unit, `hnn::section_lock`):
+- `a_word_that_breaks_a_chart_relation_is_not_admitted`: the review's witness is refused at tick `1`
+  (`Crossing`), and the same word with the crossing it owes locks at `τ = 2`, `W = 1`, arrivals `[0, 1]`. The
+  half-turn word is refused (`Recursion`), as are a class `4` (`Class`) and an advance `3` (`Advance`). A reader's
+  own stream around the circle is admitted.
+- `a_lock_without_rotation_can_arrive_and_depart`: the zero-winding witness locks at `τ = 2`, `W = 0`, arrivals
+  `[+1, −1]` at ticks 10 and 11, no face.
+- `the_signed_arrivals_of_a_cycle_sum_to_its_winding`: four cycles, including the record's rings `t = 1, 2, 3`
+  and a negative winding.
+- `a_rocking_lock_that_never_reaches_the_section_has_an_empty_arrival_word` (renamed from
+  `a_lock_without_rotation_is_a_lock_with_an_empty_arrival_word`; its assertions are unchanged).
+
+The admission also refused one of the original fixtures. The joint test's unlocked ring,
+`(k mod 4, 1 − ⌊k/12⌋)`, steps from class `0` to class `1` with no advance at tick 13: a forged word that had
+stood in for an unlocked one. It is now a section word with the same role: twelve quarter-turns, then rest at
+class 0, which no period of at most 12 repeats. The ring still refuses the joint (`Ring { ring: 1 }`). The other
+unit tests and the integration tests are unchanged, and they build words through `SectionWord::new` or the
+reader. The finite window stays a hypothesis: a lock is a repetition inside the declared window, not a proof that
+the steady state is periodic beyond it.
+
