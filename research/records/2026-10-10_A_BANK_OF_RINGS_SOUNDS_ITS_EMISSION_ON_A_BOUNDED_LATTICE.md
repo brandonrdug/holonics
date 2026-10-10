@@ -946,10 +946,20 @@ frames):
   18 frames carry the cycle, and `regenerate(key, L)` with the 6 defects substituted equals the
   window's word exactly.
 
-`acoustic_encoding` passes 8 of 8. The ring's own section word now enters the field through the
-existing located route, with its departures as substitutions. That is the join loop 2's deposition
-consumes. W3, the census of located windows on the recording with the located description's bits
-against the spelled cycle's, is the next reading.
+`acoustic_encoding` passes 8 of 8. **Narrowed** (Codex's review of `f06ff2b0`):
+- The test checked the located chart through `Encoded::through` against a wide one-ring field
+  (`wide_field`, period 16), not the located two-ring helix. It never called `Field::admit` or
+  ingestion, so neither field entry nor deposition's consumption is established by §26.
+- Its decoder recovered the advance word only (`Δℓ + 2`), not the section word's start class,
+  crossings, placement and clock.
+- It checked the base cycle's lifts and then substituted the departures; the departed passage itself
+  was never admitted.
+- What §26 establishes: the observed cycle's chart (its own ordinals, a support restriction and
+  relabelling, not a permutation of five classes), the located regeneration of the cycle, and the
+  advance word with its substitutions. No key is forced and the family is not enlarged: 18 frames
+  carry and 20 are empty, of the same 38.
+
+§28 builds the consumer.
 
 ## 27. W3: the recording's windows through the located navigator's own code (reading fixed before the run)
 
@@ -1046,3 +1056,98 @@ Both runs finished inside the fixed 180 s deadline
 
 The route is a measured join on 162 of the 3468 windows read. It is not a compression of the
 recording.
+
+## 28. The departed section word through the field on its located helix (acceptance fixed before code)
+
+[definition; agent-inferred, October 10] This replaces §26's test, on the same tone, ring and window:
+F1, `t = 1`, window `(120, 120)`, clean and with the one departure.
+
+**The passage.** The dictionary is the actual word's advances in order of first occurrence, so every
+departure's advance is a class. The passage is the actual word's ordinals. The cycle is the
+near-return's, read in the same dictionary.
+
+**Acceptance, for each tone.**
+- **F1, field entry.** Every frame of `FrameFamily::pairs(9)` that carries the cycle founds the
+  *actual* passage, departures included, through the located chart (`PassageChart::located` opens it
+  at the key with the fewest patches). The passage is then:
+  1. encoded on `field_on(helix.periods())`;
+  2. admitted by `Field::admit`;
+  3. ingested by the reference port (`Reference::mount` at rest, then `ingest`), which consumes all
+     `L` cells or reports its carry-out with the cells it consumed.
+
+  At least one frame carries.
+- **F2, the pair at the ring's own distance cap.** The menus read distances `δ ∈ [1, d − 1]` on the
+  receiving ring of period `d`. `pairs(9)` already declares receiving periods 8 and 9, so the family
+  is not widened. On each carrying frame with `d > τ`:
+  - the pair location (`PairLocation::open` on the receiving ring, observing `damaged_station_pairs`
+    of the admitted passage with its departure cells erased) locates a pair `(δ, f)`;
+  - its key is priced by `key_code(relation, d)`;
+  - the restriction releases every erased departure cell to the cycle's class.
+
+  The repair therefore returns a departure to the cycle: `residual_code` of the actual word is
+  refused `NotRegenerated` on the departed tone, and is empty on the clean one. A substitution is not
+  an erasure, and the substitution residual is what carries it. A frame with `d ≤ τ` is reported as
+  it is, never answered with a larger family.
+- **F3, the whole word decoded.**
+  - **The emission:** a header (settle tick and window length, the placement; the ring's declared
+    `t` and hop, the clock), the start class (2 bits), the frame index (`⌈log₂ 38⌉` bits), the
+    dictionary (3 bits per class), and `located_code(transport, [actual])`, whose patches are the
+    substitution residual.
+  - **The independent decoder** reads only the emission and the declared family. It takes the frame
+    by its index, the ordinals by `read_located`, the advances through the dictionary, and the
+    classes and crossings by `dynamic_section::land` from the start class.
+  - **What must hold:** the decoder returns a `SectionWord` equal to the window's, every symbol's
+    class, advance and crossing, with equal `winding()`, and the header's placement and clock read
+    back equal.
+- **Where F2 and F3 sit** (derived before the run from the owners' laws). `located_code` ranks a
+  bijection: the receiving cells must equal the classes (`shape_refusal`). F3 is therefore read on
+  the carrying frames whose receiving period equals the dictionary's size. F2 needs `d > τ`, so for
+  a cycle of few classes (`τ = 7`, two classes) the two readings sit on different frames of the same
+  family. Each is reported on its own frames. A refusal of either is measured and named; it is not
+  answered by widening the family or the ceiling.
+- **F4, charged together.** The emission's bits, apart from the common header, are reported beside
+  the near-return's `L_τ + 2` (with the start class) and the spelled `3L + 2`, with the pair's key
+  bits beside them. No compression is claimed unless the emission is strictly shorter.
+
+**What stays unbound.** The section word is the states' quotient by their ray cells. Its fibre is
+each state's amplitude and phase inside its cell, and through the inverse tick
+(`ResonatorOperands::inverse_step`) the samples. F3 does not decode that fibre, so F3 is not a source
+codec. The codec that binds the fibre takes the cell codec's index per tick (§18–§20), with the
+cells supplied by the decoded word. It is §29's subject, charged against the octant codec.
+
+### 28, measured: the clean word enters and decodes whole; the departed word is refused by its own chart
+
+[measured] ([receipt](receipts/2026-10-10-acoustic-release/S28_SECTION_WORD_FIELD.v1.json); developer
+reads.) `acoustic_encoding` passes 8 of 8 on the third run. The first two runs failed, both in **my
+adapter**:
+1. I declared the pair's relation over the dictionary's 2 classes. The admitted passage's classes
+   are the chart's indices (`Encoded::classes_read`, here 8), so F2 now reads in them.
+2. The departed tone then carried on no frame (below).
+
+**Clean tone** (`τ = 7`, dictionary `[1, −2]`, 18 of 38 frames carry, 20 empty):
+- **F1 met.** All 18 carrying frames found, encode, admit (`Field::admit` on
+  `field_on(helix.periods())`) and ingest the passage through the reference port.
+- **F2 met.** On the 4 carrying frames with `d > 7` (`[7, 8]`, `[7, 9]`, `[8, 9]`, `[9, 8]`), the
+  pair located from the admitted passage is `δ = 7` with the identity map, the only surviving
+  distance. Its key is 35 bits at `d = 8` and 39 bits at `d = 9`. The repair's residual is empty.
+- **F3 met.** On the 2 carrying frames with `d = 2` (`[7, 2]`, `[9, 2]`), the independent decoder
+  returns the whole `SectionWord` (start class, every class, advance and crossing, the winding)
+  with its placement and clock.
+- **F4.** The emission after its 28-bit header is 37 bits on `[7, 2]` (located code 20) and 40 bits
+  on `[9, 2]` (located code 23). That is against the near-return's `L_τ + 2 = 29` and the spelled
+  `3L + 2 = 362`: longer than the near-return by 8 and 11 bits, as §23 expected for a short cycle.
+
+**Departed tone — F1 NOT MET.**
+- The six departures are `(60, −1)`, `(61, 0)`, `(62, 2)`, `(63, 0)`, `(68, 2)` and `(75, 2)`.
+  Every one is an advance **outside the cycle's support** `{+1, −2}`, so the five-class dictionary
+  holds 3 classes the cycle never reads.
+- A located member has no transport for a class it never read: its gauge is plural, never guessed.
+  The location over five classes is plural on 12 frames, empty on 13 and narrow on 13, and carries
+  on none.
+- So the departed passage is **not a passage of the cycle's located chart**. Its departures are the
+  chart's cokernel, and `Encoded` has no slot for a cell outside its chart. This is no defect of the
+  owners: an encoding that admitted such a cell would fabricate its transport.
+- The test now asserts the refusal, typed: only a dictionary wider than the cycle's support carries
+  on no frame. F2 and F3 are not read on the departed tone.
+
+The failure is §28a's subject.

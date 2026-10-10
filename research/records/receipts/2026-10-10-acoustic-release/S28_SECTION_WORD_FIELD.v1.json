@@ -1,0 +1,57 @@
+{
+  "scope": "Local developer reads by opus under the common lease (announced), not claim-bearing: bank record section 28, the departed section word through the field on its located helix.",
+  "runs": [
+    {
+      "scope": "first run: FAILED at my F2 adapter (the relation declared over the dictionary's 2 classes; the admitted passage has the chart's 8)",
+      "log_sha256": "8647b33425a8d68f5892daaff07cb2860d65f164de99df62757cb79e19d80d33",
+      "deadline_s": 240,
+      "lines": [
+        "test a_rings_departed_section_word_enters_the_field_on_its_located_helix_and_decodes_whole ... §28 (clean): τ 7, departures [], dictionary [1, -2] (2 classes), near-return bits (27, 360); tally FrameTally { narrow: 0, empty: 20, plural: 0, open: 0, one: 18 }",
+        "  F3 frame [7, 2] (index 22): emission 37 bits after a 28-bit header (located code 20), against near-return 29 and spelled 362",
+        "thread 'a_rings_departed_section_word_enters_the_field_on_its_located_helix_and_decodes_whole' (1599186) panicked at crates/holonics/tests/acoustic_encoding.rs:773:70:",
+        "called `Result::unwrap()` on an `Err` value: Extent { what: \"a pair relation over the passage's classes\", expected: 8, found: 2 }",
+        "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 7 filtered out; finished in 2.90s",
+        "BOUNDED start 07:35:53 end 07:36:18 exit 101 wall_ns 25521089814 child_peak_rss_kib 2203960"
+      ]
+    },
+    {
+      "scope": "second run, F2 read in the chart's own classes: clean met; departed FAILED, no frame carries (the test asserted F1 then)",
+      "log_sha256": "6a0d4049a79f8f84f273cb687275254433a5ea38d728ff61df0744ecd88bf086",
+      "deadline_s": 240,
+      "lines": [
+        "test a_rings_departed_section_word_enters_the_field_on_its_located_helix_and_decodes_whole ... §28 (clean): τ 7, departures [], dictionary [1, -2] (2 classes), near-return bits (27, 360); tally FrameTally { narrow: 0, empty: 20, plural: 0, open: 0, one: 18 }",
+        "  F3 frame [7, 2] (index 22): emission 37 bits after a 28-bit header (located code 20), against near-return 29 and spelled 362",
+        "  F2 frame [7, 8] (index 27, 8 chart classes): pair (δ 7, map [(0, 0), (1, 1)]), key 35 bits, surviving distances [7]",
+        "  F2 frame [7, 9] (index 28, 9 chart classes): pair (δ 7, map [(0, 0), (1, 1)]), key 39 bits, surviving distances [7]",
+        "  F2 frame [8, 9] (index 32, 9 chart classes): pair (δ 7, map [(0, 0), (1, 1)]), key 39 bits, surviving distances [7]",
+        "  F3 frame [9, 2] (index 33): emission 40 bits after a 28-bit header (located code 23), against near-return 29 and spelled 362",
+        "  F2 frame [9, 8] (index 37, 8 chart classes): pair (δ 7, map [(0, 0), (1, 1)]), key 35 bits, surviving distances [7]",
+        "  (clean) frames entered 18, paired 4, emitted 2",
+        "§28 (departed): τ 7, departures [60, 61, 62, 63, 68, 75], dictionary [1, -2, -1, 0, 2] (5 classes), near-return bits (73, 360); tally FrameTally { narrow: 13, empty: 13, plural: 12, open: 0, one: 0 }",
+        "  (departed) frames entered 0, paired 0, emitted 0",
+        "thread 'a_rings_departed_section_word_enters_the_field_on_its_located_helix_and_decodes_whole' (1599831) panicked at crates/holonics/tests/acoustic_encoding.rs:853:9:",
+        "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 7 filtered out; finished in 8.36s",
+        "BOUNDED start 07:36:51 end 07:37:00 exit 101 wall_ns 8974536668 child_peak_rss_kib 731188"
+      ]
+    },
+    {
+      "scope": "third run, the departed tone's refusal asserted as measured: acoustic_encoding 8 of 8",
+      "log_sha256": "a730830f844d96fa5ac2b7ba3357ba87816045777e35c3122e5b68220086e463",
+      "deadline_s": 240,
+      "lines": [
+        "test a_rings_departed_section_word_enters_the_field_on_its_located_helix_and_decodes_whole ... §28 (clean): τ 7, departures [], dictionary [1, -2] (2 classes), near-return bits (27, 360); tally FrameTally { narrow: 0, empty: 20, plural: 0, open: 0, one: 18 }",
+        "  F3 frame [7, 2] (index 22): emission 37 bits after a 28-bit header (located code 20), against near-return 29 and spelled 362",
+        "  F2 frame [7, 8] (index 27, 8 chart classes): pair (δ 7, map [(0, 0), (1, 1)]), key 35 bits, surviving distances [7]",
+        "  F2 frame [7, 9] (index 28, 9 chart classes): pair (δ 7, map [(0, 0), (1, 1)]), key 39 bits, surviving distances [7]",
+        "  F2 frame [8, 9] (index 32, 9 chart classes): pair (δ 7, map [(0, 0), (1, 1)]), key 39 bits, surviving distances [7]",
+        "  F3 frame [9, 2] (index 33): emission 40 bits after a 28-bit header (located code 23), against near-return 29 and spelled 362",
+        "  F2 frame [9, 8] (index 37, 8 chart classes): pair (δ 7, map [(0, 0), (1, 1)]), key 35 bits, surviving distances [7]",
+        "  (clean) frames entered 18, paired 4, emitted 2",
+        "§28 (departed): τ 7, departures [(60, -1), (61, 0), (62, 2), (63, 0), (68, 2), (75, 2)], dictionary [1, -2, -1, 0, 2] (5 classes), near-return bits (73, 360); tally FrameTally { narrow: 13, empty: 13, plural: 12, open: 0, one: 0 }",
+        "  (departed) no frame carries: the dictionary's 5 classes include 3 the cycle never reads",
+        "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.11s",
+        "BOUNDED start 07:38:31 end 07:38:41 exit 0 wall_ns 9661533059 child_peak_rss_kib 732164"
+      ]
+    }
+  ]
+}

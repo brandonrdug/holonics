@@ -571,26 +571,126 @@ fn section_ring(t: i64) -> holonics::hnn::ring::ResonatorOperands {
     ResonatorOperands::at_cut(0, &material, &(integer(1) / (integer(4) * &a)), &integer(1), None).unwrap()
 }
 
-/// **A ring's section word enters the field through its located cycle** (bank record §23, §26; W1 and
-/// W2). The ring `t = 1` is driven by the replica's F1 tone, clean and with one departure after the
-/// settle allowance; its settled window's near-return cycle, read by equality as its own advances'
-/// ordinals in order of first occurrence (the relabelling law; the tone's chart reads its samples so),
-/// is located on the declared two-ring frames (`FrameFamily::pairs(9)`). On every carrying frame the
-/// located chart is founded and admitted (`Encoded::through`), the squares hold, every stepped lift
-/// passes `check_step`, and the located navigator regenerates the cycle, which with the near-return's
-/// defects substituted is the window's word exactly. The defects are substitutions, not erasures.
+/// Bits naming one of `count` values.
+fn index_bits(count: usize) -> usize {
+    (usize::BITS - count.saturating_sub(1).leading_zeros()) as usize
+}
+
+/// The emission's exterior plumbing: `value` in `width` bits, most significant first.
+fn push(bits: &mut Vec<bool>, value: usize, width: usize) {
+    bits.extend((0..width).rev().map(|k| (value >> k) & 1 == 1));
+}
+
+fn pull(bits: &mut impl Iterator<Item = bool>, width: usize) -> usize {
+    (0..width).fold(0, |value, _| (value << 1) | usize::from(bits.next().expect("the emission holds the field")))
+}
+
+/// Elias gamma of `n ≥ 1`.
+fn push_gamma(bits: &mut Vec<bool>, n: usize) {
+    let width = (usize::BITS - n.leading_zeros()) as usize;
+    bits.extend(std::iter::repeat_n(false, width - 1));
+    push(bits, n, width);
+}
+
+fn pull_gamma(bits: &mut impl Iterator<Item = bool>) -> usize {
+    let mut zeros = 0;
+    while !bits.next().expect("the emission holds the gamma code") {
+        zeros += 1;
+    }
+    (0..zeros).fold(1, |value, _| (value << 1) | usize::from(bits.next().expect("the gamma body")))
+}
+
+/// What the independent decoder of §28 returns: the placement (settle tick, window length), the clock
+/// (the ring's declared `t` and hop), and the whole section word.
+#[derive(Debug, PartialEq, Eq)]
+struct DecodedSection {
+    settle: usize,
+    length: usize,
+    ring: usize,
+    hop: usize,
+    word: holonics::hnn::section_lock::SectionWord,
+}
+
+/// **The independent decoder** (bank record §28 F3): it reads only the emission and the declared frame
+/// family. The header gives the placement and clock; the start class is two bits; the frame index
+/// names the helix; the dictionary maps each ordinal to its advance; `read_located` returns the
+/// ordinals; the classes and crossings follow from the start class by the owner's carry law
+/// (`dynamic_section::land`), and the word is admitted by `SectionWord::new`.
+fn decode_section(emission: &[bool], family: &FrameFamily) -> DecodedSection {
+    use holonics::compression::keys::transport::read_located;
+    use holonics::hnn::dynamic_section::{SectionSymbol, land};
+    use holonics::hnn::section_lock::SectionWord;
+    let mut bits = emission.iter().copied();
+    let settle = pull_gamma(&mut bits) - 1;
+    let length = pull_gamma(&mut bits);
+    let ring = pull_gamma(&mut bits);
+    let hop = pull_gamma(&mut bits);
+    let start = u8::try_from(pull(&mut bits, 2)).unwrap();
+    let helix = &family.frames()[pull(&mut bits, index_bits(family.frames().len()))];
+    let classes = pull_gamma(&mut bits);
+    let dictionary: Vec<i8> = (0..classes)
+        .map(|_| i8::try_from(pull(&mut bits, 3)).unwrap() - 2)
+        .collect();
+    let rest: Vec<bool> = bits.collect();
+    let ordinals = read_located(helix, classes, &rest, &[length]).unwrap().remove(0);
+    let mut class = start;
+    let symbols = ordinals
+        .iter()
+        .map(|&o| {
+            let advance = dictionary[o];
+            let (crossing, landed) = land(class, advance).unwrap();
+            let symbol = SectionSymbol { class, advance, crossing };
+            class = landed;
+            symbol
+        })
+        .collect();
+    DecodedSection {
+        settle,
+        length,
+        ring,
+        hop,
+        word: SectionWord::new(symbols).unwrap(),
+    }
+}
+
+/// **A ring's departed section word enters the field on its located helix, the pair is read at the
+/// ring's own distance cap, and the emission decodes the whole word** (bank record §28, which
+/// replaces §26's test, narrowed by the review of `f06ff2b0`). The ring `t = 1` under the replica's
+/// F1 tone, clean and with one departure after the settle allowance; the dictionary is the actual
+/// word's advances in order of first occurrence (a support restriction and relabelling), the
+/// passage the actual word's ordinals, the cycle the near-return's.
+/// - F1: on every frame of `FrameFamily::pairs(9)` carrying the cycle, the actual passage (its
+///   departures included) is founded by the located chart, encoded on `field_on(helix.periods())`,
+///   admitted (`Field::admit`) and ingested by the reference port.
+/// - F2: on carrying frames whose receiving period `d` exceeds `τ`, the pair located from the
+///   admitted passage with its departures erased releases each departure cell to the cycle's class;
+///   the repair's residual of the actual word is refused `NotRegenerated` where a departure exists
+///   (a substitution is not an erasure) and is empty on the clean tone.
+/// - F3: on carrying frames whose receiving cells equal the classes (`located_code`'s bijection), the
+///   emission (header, start class, frame index, dictionary, located code with its patches) is read
+///   back by [`decode_section`] to the whole window's `SectionWord`, its placement and its clock.
+/// - F4: the emission's bits apart from the header beside the near-return's `L_τ + 2` and the spelled
+///   `3L + 2`, with the pair's key bits.
 #[test]
-fn a_rings_section_word_enters_the_field_through_its_located_cycle() {
+fn a_rings_departed_section_word_enters_the_field_on_its_located_helix_and_decodes_whole() {
+    use holonics::compression::CompressionError;
+    use holonics::compression::keys::repair::{CellRelease, DamagedPassage, key_code, residual_code, restrict};
+    use holonics::compression::keys::transport::located_code;
+    use holonics::hnn::keys::{PairLocation, damaged_station_pairs};
     use holonics::hnn::section_lock::{LockReader, LockWindow, Settled};
     use holonics::hnn::wave::{MatchedWave, WavePort};
+    use holonics::hnn::{Current, ExecutionPort, Reference};
     let f1 = [-9i64, -9, -2, -2, 5, 5, 12];
-    let window = LockWindow::new(120, 120).unwrap();
+    let (settle, length, ring_t, hop) = (120usize, 120usize, 1usize, 1usize);
+    let window = LockWindow::new(settle, length).unwrap();
+    let family = FrameFamily::pairs(9).unwrap();
+    let frame_width = index_bits(family.frames().len());
     for (name, departure) in [("clean", None), ("departed", Some((180usize, 7i64)))] {
         let mut tone: Vec<i64> = (0..240).map(|k| f1[k % 7]).collect();
         if let Some((k, d)) = departure {
             tone[k] += d;
         }
-        let operands = section_ring(1);
+        let operands = section_ring(ring_t as i64);
         let wave = MatchedWave::new(
             operands.admittance().clone(),
             operands.hop().clone(),
@@ -600,8 +700,8 @@ fn a_rings_section_word_enters_the_field_through_its_located_cycle() {
         let mut port = WavePort::at_rest(operands, 0).unwrap();
         let mut reader = LockReader::new(window);
         reader.observe(port.phase_point()).unwrap();
-        let ticks: Vec<_> = port.receive(&wave).unwrap().map(Result::unwrap).collect();
-        for tick in &ticks {
+        for tick in port.receive(&wave).unwrap() {
+            let tick = tick.unwrap();
             reader.observe([tick.step.state[1][0].clone(), tick.step.state[0][0].clone()]).unwrap();
         }
         let settled = reader.finish().unwrap();
@@ -609,56 +709,163 @@ fn a_rings_section_word_enters_the_field_through_its_located_cycle() {
         let Settled::Word(word) = &settled else {
             panic!("the ring left rest")
         };
-        let class = |advance: i8| usize::try_from(advance + 2).unwrap();
-        let actual: Vec<usize> = word.symbols().iter().map(|s| class(s.advance)).collect();
+        let advances: Vec<i8> = word.symbols().iter().map(|s| s.advance).collect();
+        let mut dictionary: Vec<i8> = Vec::new();
+        for &a in &advances {
+            if !dictionary.contains(&a) {
+                dictionary.push(a);
+            }
+        }
+        let classes = dictionary.len();
+        let actual: Vec<usize> = advances
+            .iter()
+            .map(|&a| dictionary.iter().position(|&s| s == a).unwrap())
+            .collect();
         let tau = near.period();
-        let periodic: Vec<usize> = (0..window.length()).map(|k| actual[k % tau]).collect();
-        // Location reads only equality (the relabelling law): the passage's classes are its own
-        // advances' ordinals in order of first occurrence, as the tone's chart reads its samples.
-        let mut seen: Vec<usize> = Vec::new();
-        for &c in &periodic {
-            if !seen.contains(&c) {
-                seen.push(c);
-            }
-        }
-        let ordinal = |c: usize| seen.iter().position(|&s| s == c).unwrap();
-        let passage: Vec<usize> = periodic.iter().map(|&c| ordinal(c)).collect();
-        let family = FrameFamily::pairs(9).unwrap();
-        let location = family.locate(seen.len(), &[passage.clone()]).unwrap();
-        let field = wide_field();
-        let mut carried = 0;
-        for (helix, carrying) in location.carrying() {
-            let located = PassageChart::located(carrying.location(), &[passage.clone()]).unwrap();
-            let encoding = Encoding::found(&located).unwrap();
-            encoding.squares(&located).unwrap();
-            let encoded = Encoded::through(&encoding, &located, &field, &[passage.clone()]).unwrap();
-            let transport = carrying.transport();
-            let lifts = transport.lifts(carrying.key(), &passage).unwrap();
-            for k in 0..passage.len() {
-                encoded[0]
-                    .check_step(k, lifts[k] % helix.period(), lifts[k + 1] % helix.period())
-                    .unwrap();
-            }
-            let mut regenerated: Vec<usize> = transport
-                .regenerate(carrying.key(), passage.len())
-                .unwrap()
-                .into_iter()
-                .map(|o| seen[o])
-                .collect();
-            for &(k, advance) in near.defects() {
-                regenerated[k] = class(advance);
-            }
-            assert_eq!(regenerated, actual, "W2 on frame {:?} ({name})", helix.periods());
-            carried += 1;
-        }
+        let departures: Vec<usize> = near.defects().iter().map(|&(k, _)| k).collect();
+        let cycle: Vec<usize> = (0..tau)
+            .map(|j| actual[(j..length).step_by(tau).find(|k| !departures.contains(k)).unwrap()])
+            .collect();
+        let periodic: Vec<usize> = (0..length).map(|k| cycle[k % tau]).collect();
+        let location = family.locate(classes, &[periodic.clone()]).unwrap();
         println!(
-            "located section word ({name}): τ {tau}, defects {}, near-return bits {:?}, frames carrying {carried} of {}; tally {:?}",
-            near.defects().len(),
+            "§28 ({name}): τ {tau}, departures {:?}, dictionary {:?} ({classes} classes), near-return bits {:?}; tally {:?}",
+            near.defects(),
+            dictionary,
             near.bits(),
-            family.frames().len(),
             location.tally()
         );
-        println!("  the cycle's own classes: {} ({:?})", seen.len(), seen);
-        assert!(carried > 0, "W1: some declared frame carries the cycle ({name})");
+        // A class the cycle never reads has no transport in a located member (its gauge is plural,
+        // never guessed): a dictionary wider than the cycle's support carries on no frame (§28, measured).
+        let mut support: Vec<usize> = cycle.clone();
+        support.sort_unstable();
+        support.dedup();
+        if location.carrying().next().is_none() {
+            assert!(
+                classes > support.len(),
+                "F1 ({name}): only a dictionary wider than the cycle's support is refused"
+            );
+            println!(
+                "  ({name}) no frame carries: the dictionary's {classes} classes include {} the cycle never reads",
+                classes - support.len()
+            );
+            continue;
+        }
+        let (mut entered, mut paired, mut emitted) = (0, 0, 0);
+        for (helix, carrying) in location.carrying() {
+            let frame = family.frames().iter().position(|h| h.periods() == helix.periods()).unwrap();
+            // F1: the actual passage enters the field declared on the frame's own rings.
+            let located = PassageChart::located(carrying.location(), &[actual.clone()])
+                .unwrap_or_else(|e| panic!("F1 ({name}) frame {:?}: the located chart refuses the actual passage: {e}", helix.periods()));
+            let encoding = Encoding::found(&located).unwrap();
+            let field = field_on(helix.periods());
+            let encoded = Encoded::through(&encoding, &located, &field, &[actual.clone()]).unwrap();
+            field.admit(&encoded[0]).unwrap();
+            let reference = Reference::new(64, u64::MAX);
+            let mut resident = reference.mount(&field, &Current::at_rest(&field)).unwrap();
+            let (_, ingest) = reference.ingest(&mut resident, None, &encoded[0]).unwrap();
+            let ingested = ingest.forward.into_present().expect("the ingest's forward is present");
+            assert!(
+                ingested.cells == length || ingested.carry_out,
+                "F1 ({name}) frame {:?}: ingested {} of {length} without a carry-out",
+                helix.periods(),
+                ingested.cells
+            );
+            entered += 1;
+            // F2: the pair at the receiving ring's own distance cap.
+            let d = helix.cells() as usize;
+            let receiving = helix.periods().len() - 1;
+            if d > tau {
+                // The admitted passage's own classes are the chart's indices (`classes_read`), over
+                // the chart's class count: the pair is read in them, not in the dictionary's ordinals.
+                let cells: Vec<usize> = encoded[0].classes_read().collect();
+                let chart_classes = encoded[0].classes();
+                let cycle_cells: Vec<usize> = (0..tau)
+                    .map(|j| cells[(j..length).step_by(tau).find(|k| !departures.contains(k)).unwrap()])
+                    .collect();
+                let damaged = DamagedPassage::encoded(&encoded[0], &departures, 1).unwrap();
+                let mut pair = PairLocation::open(&field, receiving);
+                for (_, readings) in damaged_station_pairs(&field, receiving, &damaged).unwrap() {
+                    pair.observe(&readings);
+                }
+                let survivors = pair.survivors();
+                match survivors.located() {
+                    Some(located_pair) => {
+                        let relation = located_pair.relation(&field, receiving, chart_classes).unwrap();
+                        let key = key_code(&relation, d).unwrap();
+                        let releases = restrict(&damaged, &relation).unwrap().release().unwrap();
+                        for &k in &departures {
+                            assert_eq!(
+                                releases[k],
+                                CellRelease::Released(cycle_cells[k % tau]),
+                                "F2 ({name}) frame {:?}: the departure cell {k} is released to the cycle's class",
+                                helix.periods()
+                            );
+                        }
+                        let residual = residual_code(&cells, &damaged, &relation);
+                        if departures.is_empty() {
+                            assert_eq!(residual.unwrap(), Vec::<bool>::new(), "F2 ({name}): nothing is held");
+                        } else {
+                            assert!(
+                                matches!(residual, Err(CompressionError::NotRegenerated { .. })),
+                                "F2 ({name}): a substitution is not an erasure; got {residual:?}"
+                            );
+                        }
+                        println!(
+                            "  F2 frame {:?} (index {frame}, {chart_classes} chart classes): pair (δ {}, map {:?}), key {} bits, surviving distances {:?}",
+                            helix.periods(),
+                            located_pair.offset,
+                            located_pair.map,
+                            key.len(),
+                            survivors.distances()
+                        );
+                        paired += 1;
+                    }
+                    None => println!(
+                        "  F2 frame {:?} (index {frame}): no pair located; surviving distances {:?} of {} read",
+                        helix.periods(),
+                        survivors.distances(),
+                        survivors.read
+                    ),
+                }
+            }
+            // F3: the emission, read back by the independent decoder.
+            if d == classes {
+                let code = located_code(carrying.transport(), &[actual.clone()]).unwrap();
+                let mut emission = Vec::new();
+                push_gamma(&mut emission, settle + 1);
+                push_gamma(&mut emission, length);
+                push_gamma(&mut emission, ring_t);
+                push_gamma(&mut emission, hop);
+                let header = emission.len();
+                push(&mut emission, usize::from(word.start_class().unwrap()), 2);
+                push(&mut emission, frame, frame_width);
+                push_gamma(&mut emission, classes);
+                for &a in &dictionary {
+                    push(&mut emission, usize::try_from(a + 2).unwrap(), 3);
+                }
+                emission.extend(&code);
+                let decoded = decode_section(&emission, &family);
+                assert_eq!(
+                    decoded,
+                    DecodedSection { settle, length, ring: ring_t, hop, word: word.clone() },
+                    "F3 ({name}) frame {:?}: the emission decodes the whole word, its placement and clock",
+                    helix.periods()
+                );
+                assert_eq!(decoded.word.winding(), word.winding());
+                let (near_bits, raw_bits) = near.bits();
+                println!(
+                    "  F3 frame {:?} (index {frame}): emission {} bits after a {header}-bit header (located code {}), against near-return {} and spelled {}",
+                    helix.periods(),
+                    emission.len() - header,
+                    code.len(),
+                    near_bits + 2,
+                    raw_bits + 2
+                );
+                emitted += 1;
+            }
+        }
+        println!("  ({name}) frames entered {entered}, paired {paired}, emitted {emitted}");
+        assert!(entered > 0, "F1 ({name}): some declared frame carries the cycle");
     }
 }
