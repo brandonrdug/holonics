@@ -78,6 +78,17 @@
 //! - [`ring`] (campaign 2): the ring's parametron resonator at its storage port (its mode storage
 //!   `Q = diag(K, C)`, its pump and sheets), its rotor clock's epoch ticks, and the junction's
 //!   reference change;
+//! - [`wave`] (the acoustic line, second rung): a [`wave::MatchedWave`], the incident wave of a
+//!   source matched to a loaded ring's port (an exact amplitude with a power pairing, never an
+//!   [`Encoded`] and never convertible into one), and [`wave::WavePort`], the unpumped ring
+//!   continuing across its stream with its mode state as the carried quotient;
+//! - [`dynamic_section`] (the acoustic line, second rung): the signed crossing of a ring's own
+//!   `(w, u)` state through its four quarter-turn rays, with the lift carried
+//!   ([`dynamic_section::SectionReader`]), read as the aeon's reading and its section's ticks;
+//! - [`section_lock`] (the acoustic line, second rung, items 4 and 5): the lock reader, a consumer of
+//!   the dynamic section's stream (the least period of the settled symbol word, the winding and the
+//!   address, the observed arrival word kept with the mean-rate face beside it) and the joint period
+//!   of several rings;
 //! - [`contact`] (campaign 2): the contact's transfer and site kind, its certified boost, its lock
 //!   address and its break receipt, with [`contact_readings`], the lock and site readings the
 //!   receiving join consumes;
@@ -130,6 +141,9 @@
 //! | the ring's mode tick, its pump and sheets, its clock, the junction's reference change (campaign 2) | `HNN/Ring.{ring_tick_conserves_mode_energy, ring_descriptor_tick_conserves, ring_cayley_denominator_nonsingular, ring_tick_executed_energy_balance, two_port_reference_balance, ring_crossings_are_epoch_ticks, pump_period_is_cycle, pump_half_turn_invariant, pump_blind_to_sheets, locked_sheet_receiver_face}` | [`ring`] |
 //! | the contact's transfer and site kind, its boost, its lock address, its break (campaign 2) | `HNN/Contact.{contact_transfer_kind_by_storage_sign, contact_mode_transfer, contact_boost_solve_or_singular_direction, contact_signed_storage_balance, contact_lock_address, lockAddress_unique, least_denominator_unique, lockAddress_closes}`, `HNN/ContactBreak.{break_release_balance, break_iff_release_covers_gluing, griffith_closed_port_case, parting_returns_gluing_defect}` | [`contact`], [`contact_readings`] (`Field::parted_holarchy` the tests') |
 //! | the loaded tick's field/resonator balance, separate element and returned-wave splits, the word's balance across the gain commit (the loaded resonator) | `HNN/Ring.{loaded_word_stage_balance, loaded_tick_executed_interconnection_balance}`, `HNN/Word.{field_commit_deposition}` | [`word::FieldBalance`], [`word::WordBalance`], [`word::PowerForm`] |
+//! | a matched wave at a loaded ring's port: the executed tick's balance with the wave's `(hY/4)(a² − b²)` booked as boundary work, the ring continuing across the stream (a wave is not an `Encoded`) | `HNN/Ring.ring_tick_executed_energy_balance`; the matched port and the continuing state owed (#62) | [`wave::MatchedWave`], [`wave::WavePort`], [`wave::ReceivedTick::closes`] |
+//! | the dynamic section: a ring's state point crossing its quarter-turn rays, the lift `ℓ` (class plus carry) with its advance, the signed crossing of the ring section, the polarity `ℓ(−z) = ℓ(z) + 2` | `Geometry/PhaseCarry.winding_add`, `Aeon/Clock/Epoch.signed_count_is_flux`; the chord's advance and the polarity owed (#62) | [`dynamic_section::SectionReader`], [`dynamic_section::chord`] |
+//! | the lock: a section word admitted with its chart relations (class, advance, crossing, class recursion), the least period of a ring's settled symbol word, the winding of its cycle (whole turns, the signed count of its arrivals), the address `W/τ`, the observed arrival word, `TwoClocks(W/τ)` only as the mean-rate face beside it; the joint period (the lcm) | `Geometry/PhaseCarry.closed_loop_has_integer_winding`, `Aeon/Clock/CarryWord.carry_balanced`, `Aeon/Clock/Lock.lock_at_address`; the joint period owed (#62) | [`section_lock::SectionWord::new`], [`section_lock::Settled::lock`], [`section_lock::Lock`], [`section_lock::JointLock`], [`section_lock::LockReader`] |
 //! | the ring's navigator | `Holon/Navigator.{mapRotor_order, map_pow_mod_order, map_turn_lossless}` | [`Ring::navigator`] over `navigator::Transport::Map` |
 //! | the block incidence, the contrast map read from its blocks, and the Holarchy chart | `Holon/Complex.{blockIncidence, block_flat_closed}`, `Holarchy/Join.interconnect` | [`Field::connection`], [`Field::contrast`], [`Field::holarchy`] |
 //! | the port's returns | `Holarchy/Reception.InteractionReturn` (the owner's, generic in its payloads) | [`ExecutionPort`] |
@@ -152,6 +166,7 @@
 pub mod chart;
 pub mod constitution;
 pub mod contact;
+pub mod dynamic_section;
 pub mod encoding;
 pub mod executed;
 pub mod field;
@@ -171,6 +186,8 @@ pub mod reference;
 pub mod retention;
 pub(crate) mod state_text;
 pub mod ring;
+pub mod section_lock;
+pub mod wave;
 pub mod word;
 
 pub use chart::{ChartKey, ChartReading, ChartStart, ChartWords, Charts, Remainders, WordLattice};
@@ -477,6 +494,10 @@ pub enum HnnError {
     UncertifiedResonator { ring: usize, phase: usize },
     #[error("ring {ring}'s resonator material is malformed: {what}")]
     Resonator { ring: usize, what: &'static str },
+    /// [definition; agent-inferred, October 9] A matched wave the port does not take
+    /// (`hnn::wave`): not matched to the port, or a tick whose balance does not close.
+    #[error("the matched wave refused: {what}")]
+    Wave { what: &'static str },
     #[error("ring {ring}'s Floquet certificate is refused: {refusal:?}")]
     UncertifiedFloquet {
         ring: usize,

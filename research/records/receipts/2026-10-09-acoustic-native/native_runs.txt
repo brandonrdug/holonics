@@ -1,0 +1,85 @@
+Native runs of the acoustic line, second rung, October 9 (one worker, one thread budget of -j 2 per command).
+Every command: flock <repository>/.local/codex-lean-run.lock python3 .local/run_bounded.py
+  timeout 300 env CARGO_TARGET_DIR=<worktree>/.local/target [RUSTC_BOOTSTRAP=1] cargo <sub> -p holonics --offline -j 2 <args>
+The deadline of every command was 300 s and was never raised; the BOUNDED wall excludes the wait on the shared lease.
+Projection: none declared for the first command (a cold build); for the later ones the first command's wall,
+29,086,782,095 ns (the cold build of the crate with its dependencies and the 7 tests of the first rung).
+
+1. cargo test --test acoustic_encoding -- --test-threads=1 --nocapture              (the first rung, unchanged source)
+   BOUNDED start 00:03:00 end 00:03:29 exit 0 wall_ns 29086782095 child_peak_rss_kib 1879148
+   7 passed; 0 failed; 0 ignored
+
+2. cargo check                                                                       (hnn::wave and hnn::dynamic_section added)
+   BOUNDED start 00:15:35 end 00:15:43 exit 0 wall_ns 8318930113 child_peak_rss_kib 950228
+
+3. cargo test --test acoustic_wave_port -- --test-threads=1 --nocapture              (first run of the second rung's tests)
+   BOUNDED start 00:23:51 end 00:24:31 exit 101 wall_ns 40771358836 child_peak_rss_kib 1920236
+   7 tests: 6 passed, 1 FAILED: the_polarity_of_the_wave_is_the_half_turn_of_the_lift, at the assertion that the
+   signed crossing of the section is the same for x and -x (left 1, right 0). The assertion was wrong, not the
+   code: the half-turn takes the section ray to the opposite ray. Ratio of wall to the projection:
+   40771358836 / 29086782095.
+
+4. cargo test --test acoustic_wave_port -- --test-threads=1 --nocapture              (polarity assertion replaced by the opposite-ray law; the symbol-word probe added)
+   BOUNDED start 00:32:49 end 00:33:09 exit 0 wall_ns 19799312149 child_peak_rss_kib 699976
+   8 passed; 0 failed; 0 ignored. The probe printed:
+   ring t = 1 symbol word, 5 classes [(1, 1), (2, 1), (3, 1), (0, 1), (2, -2)], 21 symbols
+   [0, 1, 2, 3, 0, 4, 3, 0, 1, 2, 3, 0, 4, 3, 0, 1, 2, 3, 0, 4, 3]:
+   FrameTally { narrow: 7, empty: 0, plural: 5, open: 0, one: 0 }; held: no frame carries it
+
+5. cargo test --lib hnn::dynamic_section -- --test-threads=1
+   BOUNDED start 00:33:15 end 00:33:56 exit 0 wall_ns 40620247907 child_peak_rss_kib 2322340
+   6 passed (the owner's unit tests; 1182 filtered out)
+
+6. RUSTC_BOOTSTRAP=1 cargo test --doc hnn::wave                                      (the guards' doctests, error codes checked)
+   BOUNDED start 00:34:09 end 00:34:36 exit 0 wall_ns 26459825484 child_peak_rss_kib 1614168
+   6 passed: 5 compile_fail (E0451, E0277, E0277, E0308, E0308) and 1 lawful form
+
+Python (not the lane): symbol_word_prediction.py, timeout 300 s, exit 124: the bound-6 scan finished and printed its
+reading (prediction for the probe in run 4); the bound-9 scan did not finish in the deadline and is reported
+incomplete, not relaunched.
+
+Final state (after rustfmt of the three new files and the word "source" for the matched source; commit time):
+7. cargo test --test acoustic_wave_port -- --test-threads=1 --nocapture
+   BOUNDED start 00:37:55 end 00:38:37 exit 0 wall_ns 42140869653 child_peak_rss_kib 1777808     8 passed
+8. RUSTC_BOOTSTRAP=1 cargo test --doc hnn::wave
+   BOUNDED start 00:38:43 end 00:39:10 exit 0 wall_ns 26807868512 child_peak_rss_kib 1801004     6 passed
+9. cargo test --lib hnn::dynamic_section -- --test-threads=1
+   BOUNDED start 00:39:16 end 00:39:23 exit 0 wall_ns 7053940828 child_peak_rss_kib 1562540      6 passed
+Run 4's last 8 passed on the pre-format source; runs 7 to 9 are the committed source. Not run (not permitted by the
+brief): tools/gate.sh, clippy (the guard lints), the whole suite, lake. The new files declare no float and no
+disallowed type, but the lint is unrun.
+
+Also: cargo check (after the word change), BOUNDED start 00:37:35 end 00:37:39 exit 0 wall_ns 3375129044 child_peak_rss_kib 614832.
+
+Task 3 (the lock reader and the joint period):
+10. cargo test --lib hnn::section_lock -- --test-threads=1
+    BOUNDED start 00:48:27 end 00:49:00 exit 0 wall_ns 32787183357 child_peak_rss_kib 2451528     8 passed
+11. cargo test --test acoustic_wave_port -- --test-threads=1
+    BOUNDED start 00:51:52 end 00:53:01 exit 0 wall_ns 69207995081 child_peak_rss_kib 2070748     13 passed (8 earlier, 5 new)
+Python (not the lane): lock_predictions.py, timeout 300 s, exit 0, written to lock_predictions_output.txt before runs 10 and 11.
+Both runs read the committed source of the lock reader; no assertion was edited after a run. clippy, tools/gate.sh,
+the whole suite and lake were not run.
+
+Codex's review repairs (passive admission, the full reflected vector):
+12. cargo test --test acoustic_wave_port -- --test-threads=1
+    BOUNDED start 00:59:18 end 01:00:11 exit 0 wall_ns 52741765872 child_peak_rss_kib 1493916     15 passed (the 13 and the two witnesses)
+    (a malformed loop invocation of the two lib commands exited 1 in about 0.05 s with no cargo work:
+     BOUNDED start 01:00:17 end 01:00:17 exit 1 wall_ns 52414725 and 33006356; they are not test runs)
+13. cargo test --lib hnn::section_lock -- --test-threads=1
+    BOUNDED start 01:00:24 end 01:00:30 exit 0 wall_ns 6286146867 child_peak_rss_kib 1599108      8 passed
+14. cargo test --lib hnn::dynamic_section -- --test-threads=1
+    BOUNDED start 01:00:30 end 01:00:31 exit 0 wall_ns 80730643 child_peak_rss_kib 28280          6 passed (test binary already built)
+15. RUSTC_BOOTSTRAP=1 cargo test --doc hnn::wave
+    BOUNDED start 01:00:31 end 01:00:57 exit 0 wall_ns 26383352501 child_peak_rss_kib 2180600      6 passed
+
+Codex's second review repair (the section word's admission, §14). Projection per command: at most 420 s
+(the largest earlier unit was 53 s), memory under 2^32 bytes; each under the common lease.
+16. cargo test -p holonics --lib hnn::section_lock -- --test-threads=4
+    BOUNDED start 01:18:22 end 01:18:57 exit 101 wall_ns 34935232118 child_peak_rss_kib 3133624    9 passed, 1 failed:
+    the joint test's unlocked fixture (k mod 4, 1 - floor(k/12)) was itself a forged word, refused at admission (§14)
+17. cargo test -p holonics --lib hnn::section_lock -- --test-threads=4   (the fixture rebuilt as a section word)
+    BOUNDED start 01:19:34 end 01:19:46 exit 0 wall_ns 12635124144 child_peak_rss_kib 2734616     10 passed
+18. cargo test -p holonics --test acoustic_wave_port -- --test-threads=4
+    BOUNDED start 01:19:46 end 01:20:22 exit 0 wall_ns 35561334993 child_peak_rss_kib 2176468     15 passed
+19. cargo clippy -p holonics --all-targets -- -D warnings (stricter than the gate's guard lints)
+    exited nonzero on findings in files this repair does not touch; none in hnn/section_lock.rs or hnn/mod.rs
