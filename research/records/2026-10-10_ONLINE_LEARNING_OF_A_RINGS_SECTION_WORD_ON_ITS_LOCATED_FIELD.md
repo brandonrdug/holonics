@@ -594,3 +594,41 @@ C3″ assertions; the receiving tests 37 of 37; the cold-restore tests 4 of 4.) 
 - The end-to-end code against the near-return or the cell codec, charging the prefix, the chart and
   the letters together, is the decoder's (§9), not this table's.
 - The map and carry attribution of §8 remains an owner question for the 16:30 checkpoint.
+
+### 9, measured (D1–D3, 14:42 UTC): the field decodes the tone's window exactly
+
+[measured] ([receipt](receipts/2026-10-10-online-learning/D1_FIELD_DECODES_TONE.v1.json); developer read,
+20187414662 ns, frame `[7, 2]`, the clocked receivers, the chart pinned from the first 28 cells.) The
+first build failed to compile on my test (E0502: a boxed callback held the code past its pass); the
+callback was taken by reference.
+
+**The owner moved.** `ResonatorOperands::drive_interval` is now the one owner of the cell's drive
+interval (§16, §18, §20). The example's codec calls it at the PCM grain, and its 2000-tick read emits
+the same 28072 bits, decode exact.
+
+- **D1 met.**
+  - The independent decoder is given the bits, the declared field, frame, letters and ring, and the
+    window's opening state.
+  - It replays the field online from the cells it decodes: refine, release, decode the class under
+    the released face's exact masses, compare, deposit, ingest.
+  - It reads every cell, decodes each tick's landing class by the carry law (`land`), and decodes
+    each sample as its index in the landing cell's drive interval. Each sample is checked to land in
+    the decoded cell.
+  - **Every sample of the 120-tick window equals the tone's.**
+- **D2, charged.**
+  - Class bits: **25** for the 92 continuation cells, under the field's faces with the interval
+    code's finishing included, plus the 28 prefix cells at one bit each.
+  - Index bits, the within-cell fibre: **669** over the 120 ticks.
+  - The near-return describes the same word's advances in 27 bits, but it reads the whole window
+    at once; the field's 25 bits are an online code, each cell coded before it is read.
+- **D3: no hold.** Every face was released at its grain.
+
+**Reading.** The retained-field decoding route runs end to end on the tone:
+- the field's own released face carries the cell's class, at 25 bits for 92 cells;
+- the within-cell fibre is a charged index, not a chosen sample;
+- the decoder replays every deposit from what it has decoded.
+
+**Scope.** One clean periodic tone, the chart from a 28-cell prefix of the same word, and the window's
+opening state given. It is not the recording, not the departed word, and not generation. A comparison
+of the whole charge (prefix, chart, letters, opening, classes and indices) against §29's codec on the
+same ticks is the next measurement.
