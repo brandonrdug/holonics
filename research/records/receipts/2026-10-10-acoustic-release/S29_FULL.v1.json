@@ -1,0 +1,25 @@
+{
+  "scope": "Local developer reads by opus under the common lease (announced with workload, measured upper cost, bottleneck and the new information), not claim-bearing: bank record section 29, the full read, debug binary of the example at f7dd904dc, two concurrent processes.",
+  "runs": [
+    {
+      "scope": "full read, ring 20, all 93680 ticks, quarter grain",
+      "log_sha256": "cffd5602a149bc976d2fc7935fb30b82967d649f17259efdd788dfec6afc1208",
+      "deadline_s": 500,
+      "projection": "93680/2000 x 10122472169 ns (the octant development read, the larger)",
+      "lines": [
+        "nrcodec ring 20 (octant grain: false): 93680 ticks; emitted 1461697 bits before padding; the cell codec on the same stream and grain 1481047 bits; blocks of 20 ticks: 4684 read, 1899 admitted, their words 89906 bits replacing 113940 cell bits, flags 4684 bits; emitted 182713 bytes = 1461704 bits; raw 1498880 bits; decode equals the source exactly: true; encoded at 224442 ms, decoded at 456182 ms",
+        "BOUNDED start 07:51:08 end 07:58:45 exit 0 wall_ns 456191187415 child_peak_rss_kib 13268"
+      ]
+    },
+    {
+      "scope": "full read, ring 20, all 93680 ticks, octant grain",
+      "log_sha256": "06a64e3befe0916d10516314713c9490fd28231e7a082a73c00aae95d725bfae",
+      "deadline_s": 500,
+      "projection": "93680/2000 x 10122472169 ns (the octant development read, the larger)",
+      "lines": [
+        "nrcodec ring 20 (octant grain: true): 93680 ticks; emitted 1344943 bits before padding; the cell codec on the same stream and grain 1364293 bits; blocks of 20 ticks: 4684 read, 1899 admitted, their words 89906 bits replacing 113940 cell bits, flags 4684 bits; emitted 168118 bytes = 1344944 bits; raw 1498880 bits; decode equals the source exactly: true; encoded at 234827 ms, decoded at 476974 ms",
+        "BOUNDED start 07:51:08 end 07:59:05 exit 0 wall_ns 476984164367 child_peak_rss_kib 13872"
+      ]
+    }
+  ]
+}

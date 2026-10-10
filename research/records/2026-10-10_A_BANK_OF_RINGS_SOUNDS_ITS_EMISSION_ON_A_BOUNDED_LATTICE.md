@@ -1295,3 +1295,44 @@ refuse a code cut short (`LockRefusal::Code`).
   the cell codec.
 
 The census's whole-recording admission is higher (2550 of 5222 windows), so the full read decides C2.
+
+### 29, measured: the section word's cells shorten the whole recording's code exactly
+
+[measured] ([receipt](receipts/2026-10-10-acoustic-release/S29_FULL.v1.json); developer read at
+`f7dd904dc`.) The run was announced with its grounds: the workload, the measured upper cost, the
+debug build's exact rational step as the bottleneck, and the new information it would establish. It
+covers ring 20, all 93680 recorded ticks, at both grains, as two concurrent processes.
+
+- **C1 met at both grains.** The independent decode equals the source exactly. At every tick the
+  regenerated state lands in the cell read, and the inverse tick returns the sample.
+- **C2:**
+
+| Grain | Emitted, before padding | Cell codec, same stream and grain | Difference | Raw PCM |
+|---|---|---|---|---|
+| quarter | 1461697 | 1481047 | 19350 fewer | 1498880 |
+| octant | 1344943 | 1364293 | 19350 fewer | 1498880 |
+
+- At both grains, 1899 of the 4684 blocks of 20 ticks are admitted. Their words take 89906 bits in
+  place of 113940 cell bits, and the flags cost 4684 bits:
+  `113940 − 89906 − 4684 = 19350`.
+- The byte-padded emissions are 182713 bytes (1461704 bits) and 168118 bytes (1344944 bits). The
+  published cell codec runs emitted 185131 bytes (1481048 bits) and 170537 bytes (1364296 bits).
+- **Time.**
+  - Quarter grain: wall 456191187415 ns, peak RSS 13268 KiB.
+  - Octant grain: wall 476984164367 ns, peak RSS 13872 KiB.
+  - The projection was `93680/2000 × 10122472169` ns. The octant run passed it by less than 3 s,
+    inside the fixed 500 s deadline: a projection error, recorded.
+
+**Reading.** On the whole recording, the ring's section word supplies its own cells in fewer bits than
+the cell codec spends on them. The code is strictly shorter, by 19350 bits at each grain, and the
+decode is exact. The census predicted a reduction of this order (§29's expectation), and on the first
+2000 ticks the flags outweighed it (development read).
+
+**Scope.**
+- The reduction is the class stream's near-return structure: the declared ring's own cycles, read in
+  the declared window, measured on encoder-produced bytes.
+- It is not learned content. No material moved, and the index of every sample, which is the fibre,
+  is unchanged.
+- It binds the section word to the source. The cells inside an admitted window are the word's
+  landings, and the samples follow by the cell's interval and the inverse tick.
+- Loop 2 (§24) is where the ring's material would learn from this length.
