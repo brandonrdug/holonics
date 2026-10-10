@@ -1142,7 +1142,7 @@ fn a_departed_section_word_enters_as_its_runs_in_the_cycles_chart_with_its_depar
 }
 
 // -------------------------------------------------------------------------------------------
-// the field continues the section word (the retained-release record §1)
+// the field learns the section word online (the online-learning record §1)
 
 /// The clean F1 section word of the ring `t = 1` over the window `(120, 120)`: its advances, its
 /// own ordinals (the dictionary in order of first occurrence) and the near-return's period.
@@ -1185,7 +1185,7 @@ fn clean_section_word() -> (Vec<usize>, Vec<i8>, usize) {
     (ordinals, dictionary, tau)
 }
 
-/// **The field continues a ring's section word from what it retains** (the retained-release record
+/// **The field learns a ring's section word online** (the online-learning record
 /// §1). On each carrying frame whose receiving cells equal the cycle's support, the word enters the
 /// field declared on the frame's rings; after its first cycle, each later cell is coded at the
 /// receiver's refined face before it is read (prequential): the learner then compares and
@@ -1196,8 +1196,10 @@ fn clean_section_word() -> (Vec<usize>, Vec<i8>, usize) {
 /// actual class's mass above ½, on cells `106 … 119`) is measured not met (§3) and asserted as
 /// measured: the learner continues the cycle's composition, not its position.
 #[test]
-fn the_field_continues_a_rings_section_word_from_what_it_retains() {
+fn the_field_learns_a_rings_section_word_online() {
+    use holonics::hnn::constitution::Locus;
     use holonics::hnn::field::ConstitutionRead;
+    use holonics::hnn::port::ReceiptDetail;
     use holonics::hnn::{Current, ExecutionPort, Handle, Reference};
     use num_traits::Zero;
     use std::time::Instant;
@@ -1230,20 +1232,40 @@ fn the_field_continues_a_rings_section_word_from_what_it_retains() {
             let (moment, _) = ingest_whole(&reference, &mut resident, None, &encoded.part(0..tau).unwrap());
             let phases = resident.admitted()[0].clone();
             let (mut lower, mut upper) = (rat(0, 1), rat(0, 1));
+            let (mut tree_sum, mut combined_sum) = (rat(0, 1), rat(0, 1));
             for n in tau..length {
                 let (pending, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
                 let (staged, compared) = reference
                     .compare(&mut resident, pending, &encoded.part(n..n + 1).unwrap())
                     .unwrap();
-                // The receiver's code of cell n: its population over the tree's and the combined
-                // face, scored at the compare, before this cell's deposit.
-                let code = compared.forward.present().unwrap().code_length().unwrap();
+                // The receiver's population code of cell n (the compare's receipt), beside the
+                // landmark tree's face alone and the combined face (the Holon ratio's), all at the
+                // same standing, before this cell's deposit.
+                let (code, tree) = match &compared.receipt.detail {
+                    ReceiptDetail::Compare { code_length, tree, .. } => (code_length.clone(), tree[0].clone()),
+                    _ => panic!("a compare's receipt"),
+                };
+                let combined = compared.forward.present().unwrap().code_length().unwrap();
                 if n >= length / 2 {
                     lower = lower + &code.lower;
                     upper = upper + &code.upper;
+                    tree_sum = tree_sum + &tree.upper;
+                    combined_sum = combined_sum + &combined.upper;
                 }
+                let receiving = field.rings().len() - 1;
+                let map_before = resident.constitution().receiving_map(receiving).cloned();
                 if learner {
-                    reference.deposit(&mut resident, staged).unwrap();
+                    let deposited = reference.deposit(&mut resident, staged).unwrap();
+                    let commit = resident.constitution().commit();
+                    if (16..=20).contains(&commit) {
+                        let reading = deposited.deposit.into_present().unwrap();
+                        let steps: Vec<_> = reading.steps.iter().filter(|(locus, _)| matches!(locus, Locus::ReceivingMap(_))).collect();
+                        let released: Vec<_> = reading.released.iter().filter(|(locus, ..)| matches!(locus, Locus::ReceivingMap(_))).collect();
+                        println!("§diag commit {commit} cell {n}: R before {:?}", map_before.as_ref().map(|m| m.entries().to_vec()));
+                        println!("§diag commit {commit}: R after {:?}", resident.constitution().receiving_map(receiving).map(|m| m.entries().to_vec()));
+                        println!("§diag commit {commit}: R steps {steps:?}");
+                        println!("§diag commit {commit}: R released tails {released:?}; vanished {:?}", reading.vanished);
+                    }
                     if n >= length - 2 * tau && code.upper < rat(1, 1) {
                         continued += 1;
                     }
@@ -1251,23 +1273,25 @@ fn the_field_continues_a_rings_section_word_from_what_it_retains() {
                     reference.discard(&mut resident, Handle::Staged(staged)).unwrap();
                 }
                 let (_, closed) = ingest_whole(&reference, &mut resident, Some(moment), &encoded.part(n..n + 1).unwrap());
-                let receiving = field.rings().len() - 1;
                 let r_moved = resident
                     .constitution()
                     .receiving_map(receiving)
                     .map(|map| map.entries().iter().any(|entry| !entry.is_zero()));
                 println!(
-                    "§1 frame {:?} {} cell {n}: actual {:?}, code [{}, {}]; aeons closed {closed}, commit {}, R moved {:?} ({} ms)",
+                    "§1 frame {:?} {} cell {n}: actual {:?}, population [{}, {}], tree upper {}, combined upper {}; aeons closed {closed}, commit {}, R nonzero {:?} ({} ms)",
                     helix.periods(),
                     if learner { "learner" } else { "twin" },
                     denotes[chart[n]],
                     code.lower,
                     code.upper,
+                    tree.upper,
+                    combined.upper,
                     resident.constitution().commit(),
                     r_moved,
                     started.elapsed().as_millis()
                 );
             }
+            println!("§1 frame {:?} {}: cells {}..{} upper sums, tree {tree_sum}, combined {combined_sum}", helix.periods(), if learner { "learner" } else { "twin" }, length / 2, length);
             sums.push((lower, upper));
         }
         println!(

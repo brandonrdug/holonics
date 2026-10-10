@@ -1,6 +1,9 @@
-# The field continues a ring's section word from what it retains
+# Online learning of a ring's section word on its located field
 
-Refs #386 #73 #148. October 10. Follows the
+Refs #386 #73 #148. October 10. Renamed after Codex's source review of `6d13dd9c`: this record is the
+**online-learning consumer** (refine, compare, deposit or discard, ingest, the receiver's code
+scored). It calls no `ExecutionPort::release` and decodes no released cell or sample, so it makes no
+retained-release claim. The original findings and receipts are kept as they were measured. Follows the
 [bank record](2026-10-10_A_BANK_OF_RINGS_SOUNDS_ITS_EMISSION_ON_A_BOUNDED_LATTICE.md) §28–§29, where a
 ring's section word enters the field declared on its located helix and is ingested whole.
 
@@ -65,7 +68,7 @@ read it.
 **The read.** A development read on the first 30 cells of one frame gives the time per cell, and
 the whole word's projection follows from it.
 
-## 2. The first read failed on my adapter: I read the wrong face
+## 2. The first read failed on my adapter: I read the wrong face (the correction below is itself corrected in §4)
 
 [measured] Developer read, frame `[7, 2]` only, 6886603002 ns. The test panicked at C1 after the
 first frame.
@@ -94,9 +97,9 @@ Two causes were located from the deposit's own reading:
   code enclosure has `upper < 1` at every cell.
 - C1 is unchanged.
 
-## 3. Measured: the field learns the word's composition, not its position
+## 3. Measured: the field learns the word's composition, not its position (its C1 numbers are the combined face's; §4)
 
-[measured] ([receipt](receipts/2026-10-10-retained-release/R1_FIELD_CONTINUES.v1.json); developer
+[measured] ([receipt](receipts/2026-10-10-online-learning/R1_FIRST_READS.v1.json); developer
 reads.) Both frames, with the corrected reading. `acoustic_encoding` passes 10 of 10, wall
 33272140661 ns.
 
@@ -132,3 +135,67 @@ over sixty cells. It does not continue the cycle's position.
   field.
 
 The C2 assertion records the measurement (`continued < 2τ`); it does not claim the acceptance.
+
+## 4. Corrections from the source review of `6d13dd9c`, and the reading repeated
+
+[measured] Codex's read-only review gave GO to the mechanics:
+- each cell's refine precedes its compare, and the deposit or discard precedes its ingest;
+- learner and twin are independent residents;
+- aperture 1 puts no target into its own address;
+- only `deposit` publishes the population, the tree and the material.
+
+It found a **blocker in my source-to-record claim**, and I confirm it:
+- §2's "correction" read `HolonRatio::code_length`, the **combined face's** code `q_C`, tree grain
+  logits included. It did not read the population.
+- The population's code is the compare's receipt, `ReceiptDetail::Compare { code_length, .. }`.
+- So §2's "population" and §3's C1 numbers are the **combined face's**. That is a narrower scope than
+  I stated, and they stand only under that name.
+
+**The reading, repeated with all three codes side by side** ([receipt](receipts/2026-10-10-online-learning/R1_THREE_CODES.v1.json)). Developer read, both frames,
+33181231084 ns. Each value below is the upper sum over cells `60 … 119` in units of `2^(−96)` bits;
+the lower ends and the per-cell series are in the receipt.
+
+| Frame | Population (`ReceiptDetail::Compare`) | Landmark tree's face alone | Combined face |
+|---|---|---|---|
+| `[7, 2]` | `2782450455824146995580402192893` | `2781621769690068407681731676749` | `2786561512655894101770945273637` |
+| `[9, 2]` | `2782553182213765847538783259461` | `2781621769690068407681731676749` | `2786561512655894101770945273637` |
+
+The twin codes exactly 60 bits under every face.
+
+- **C1 met on the receiver's population code**, on both frames: strictly below the twin's 60.
+- **The learning is carried by the landmark tree.** Its face alone is the lowest of the three.
+
+**C2 is the majority baseline.** 12 of 14 is exactly what always betting `+1` scores: the cycle has
+six `+1`s and one `−2`. The learner has not exceeded the cycle's composition.
+
+**The receiving map's path, corrected.** §2 and §3 said `R` was "released to zero below its grain".
+That was my reading of the `released` list, and it is withdrawn. The deposits at commits 16–20 show:
+- the first deposits built `R` up to entries `±1/64` and `±1/128` (the map lattice `2^(−7)`, from
+  the receiving width 4; the face grain `1/16` is a different grain);
+- each later certified step moved entries one lattice unit, `1/128`, toward zero, until all were
+  zero at commit 18;
+- after that, every step's moves stay below one unit. The `released` lists are each step's sub-unit
+  tails, which leave the carried entry unchanged (atlas `hnn.below-grain-released`).
+
+So the descent itself removed `R`. On these cells, the map's reached feature did not lower the
+combined code. "Zero for good" holds only on the measured prefix.
+
+**Further scope, from the review.**
+- The location, chart and `τ` are founded from the whole clean word before the loop. The causal
+  prediction is conditional on that already-located chart; it is not blind discovery from the
+  first seven cells.
+- The source and the receiver are the same last ring. The receiving read rotates that ring's anchor
+  only, so the longer ring's phase must reach it through contact and carry dynamics. Nothing here
+  shows that it separates cycle positions.
+- The copied contact declarations (`Y = 2`, `β = 2`, quarter-turns) may attenuate the hidden ring's
+  influence.
+- The population `2^24` sets precision, not the normalization.
+- The test asserts C1, and `continued < 2τ` as measured; it does not enforce 12 of 14, both
+  frames, or C2.
+
+**The next observation on the phase path** (named by its measurement): the receiving map's
+reached feature, per cell. That is the vector `R` multiplies in `R · P_R^(τ_R) v_R`. The questions
+are whether it separates the cycle's seven positions at all, and why the certified steps descend
+`R` to zero. The applied step, the carry, the tail and any prior move are read at commit 18.
+Its acceptance will be fixed here before code. No depth increase, no authored cycle routine, and no
+borrowed contact-only law for `R`.

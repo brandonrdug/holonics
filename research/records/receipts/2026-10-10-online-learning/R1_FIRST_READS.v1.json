@@ -1,5 +1,5 @@
 {
-  "scope": "Local developer reads by opus under the common lease (announced), not claim-bearing: the retained-release record sections 2-3. The diagnostic log r1_test_2 (aeons, commit, R per cell) is summarized in section 2.",
+  "scope": "Local developer reads by opus under the common lease (announced), not claim-bearing: the online-learning record (first named the retained-release record) sections 2-3. The diagnostic log r1_test_2 (aeons, commit, R per cell) is summarized in section 2.",
   "runs": [
     {
       "scope": "compile of acoustic_encoding on main 67ddf98b plus the new test",
