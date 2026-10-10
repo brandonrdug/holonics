@@ -48,3 +48,5 @@ Final state (after rustfmt of the three new files and the word "source" for the 
 Run 4's last 8 passed on the pre-format source; runs 7 to 9 are the committed source. Not run (not permitted by the
 brief): tools/gate.sh, clippy (the guard lints), the whole suite, lake. The new files declare no float and no
 disallowed type, but the lint is unrun.
+
+Also: cargo check (after the word change), BOUNDED start 00:37:35 end 00:37:39 exit 0 wall_ns 3375129044 child_peak_rss_kib 614832.
