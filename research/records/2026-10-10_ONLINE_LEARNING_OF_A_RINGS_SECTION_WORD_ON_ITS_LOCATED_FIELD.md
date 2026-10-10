@@ -727,3 +727,28 @@ read, `acoustic_encoding` 11 of 11, 78939416050 ns.)
   - the grain and the range.
 
   A standalone codec charges each of them. This one is the conditional consumer the review scoped.
+
+## 13. Follow-through on §11 and §10's owner (Codex's limits)
+
+[measured] ([receipt](receipts/2026-10-10-online-learning/M2_STAGE_QUANTITIES.v1.json); receiving 38 of
+38; gate 1.)
+- **The stage quantities, printed.** At each prior move the test now prints, per entry, the retained
+  remainders `r_s` and `r_f` and the released tails `e_s` and `e_f`. At commits 17–19:
+  - the retained `r` are nonzero, of order `2^(−16)` to `2^(−13)`;
+  - the released `e` are of order `2^(−41)` to `2^(−37)`.
+
+  So the value pushed below the read is retained in the carry, not released. This bounds the
+  accounting at the moves; it does not read the comparison.
+- **What §11 does not establish** (the review's limits, kept). `W = 0` is neither a proof of lost
+  information nor a proof that the receiving ratio worsened. The concrete missing joins to a full
+  contemporary receiving comparison:
+  - `prequential_terms` reads only the real rows at the pre-deposit `W`;
+  - its historical pair is applied after the descent, to `W_s`;
+  - `moved_prior` scales both the real and the phase rows.
+- **The advance law refuses before it mutates.** A located occurrence's digits are checked against
+  the kept rings (length) and each against its ring's period, and its class against the field's
+  alphabet. Each refusal leaves the register unchanged, which the test asserts.
+  - The state text's parser checks each digit against its ring's period and the table against the
+    alphabet.
+  - The admitted `Encoded` fixtures always supplied valid digits, so no measured continuation
+    changes.

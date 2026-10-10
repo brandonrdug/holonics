@@ -615,6 +615,17 @@ impl LetterReader {
         };
         // A register that keeps no ring (the cell-only family) reads no clock: no law to retain.
         let digits = if self.rings.is_empty() { None } else { digits };
+        if let Some(digits) = digits {
+            // Refused before anything moves: the kept rings' digits, each below its ring's period.
+            if digits.len() < self.rings.len()
+                || self.rings.iter().zip(digits).any(|(ring, &digit)| digit >= ring.period)
+            {
+                return Err(route("a located occurrence's digits on the kept rings, each below its ring's period"));
+            }
+            if cell >= self.rings[0].ports.len() {
+                return Err(route("a located occurrence's class within the field's alphabet"));
+            }
+        }
         match (digits, &mut self.advances) {
             (Some(digits), advances) => {
                 let kept = digits[..self.rings.len()].to_vec();
@@ -952,14 +963,22 @@ impl ActiveAddress {
                             .split('.')
                             .map(|digit| value(Some(&digit), what))
                             .collect::<Result<Vec<u64>, HnnError>>()?;
-                        if digits.len() != self.reader.rings.len() {
-                            return refused("a class's digits on the register's kept rings");
+                        if digits.len() != self.reader.rings.len()
+                            || self.reader.rings.iter().zip(&digits).any(|(ring, &digit)| digit >= ring.period)
+                        {
+                            return refused("a class's digits on the register's kept rings, each below its ring's period");
                         }
                         Ok(Some(digits))
                     })
                     .collect::<Result<Vec<_>, HnnError>>()?,
             )
         };
+        if let Some(table) = &advances {
+            let alphabet = self.reader.rings.first().map_or(0, |ring| ring.ports.len());
+            if table.len() > alphabet {
+                return refused("the advance law's classes within the field's alphabet");
+            }
+        }
         self.reader.advances = advances;
         let kind_words = keyed(next("the register's held site kinds")?, "site-kinds", what)?;
         let kinds = if kind_words.as_slice() == ["-"] {

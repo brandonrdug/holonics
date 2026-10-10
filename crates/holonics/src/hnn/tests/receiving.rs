@@ -1682,6 +1682,10 @@ fn a_located_register_retains_its_advance_law_warm_and_cold() {
     let mut disagreeing = warm.clone();
     assert!(disagreeing.receive_at(0, Some(&digits(1))).is_err(), "one chart's digits per class");
     assert!(warm.receive(0).is_err(), "no identity step after a located one");
+    let before = warm.reader().clone();
+    assert!(warm.receive_at(4, Some(&[period, 0, 0, 0])).is_err(), "a digit at or past its ring's period");
+    assert!(warm.receive_at(4, Some(&[])).is_err(), "digits short of the kept rings");
+    assert_eq!(warm.reader(), &before, "a refused occurrence moves nothing");
 }
 
 /// **The receiving map's stages separated at a prior's move** (the online-learning record §11;
@@ -1828,6 +1832,16 @@ fn the_receiving_maps_descent_and_its_priors_move_are_read_apart() {
                 w0.iter().map(ToString::to_string).collect::<Vec<_>>(),
                 ws.iter().map(ToString::to_string).collect::<Vec<_>>(),
                 wf.iter().map(ToString::to_string).collect::<Vec<_>>()
+            );
+            let stage = |v: &[Rat]| v.iter().map(ToString::to_string).collect::<Vec<_>>();
+            let tails = |released: &[(Locus, Carrier, usize, Rat)]| (0..wf.len()).map(|i| tail_of(released, i).to_string()).collect::<Vec<_>>();
+            println!(
+                "§11 commit {}: retained r_s {:?}; released e_s {:?}; retained r_f {:?}; released e_f {:?}",
+                after.commit(),
+                stage(&rs),
+                tails(&stepped_reading.released),
+                stage(&rf),
+                tails(&reading.released)
             );
             assert!(ledger, "the move's ledger at commit {}", after.commit());
         }
