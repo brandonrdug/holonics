@@ -1193,3 +1193,4 @@ import HolonicsResearch.Computation.NavigatorObservationScope
 import HolonicsResearch.Compression.Relabelling
 import HolonicsResearch.Geometry.FiniteTorusSubgroupReceiver
 import HolonicsResearch.Zeta.ModularScatteringResidual
+import HolonicsResearch.Zeta.ModularScatteringPairedTail
