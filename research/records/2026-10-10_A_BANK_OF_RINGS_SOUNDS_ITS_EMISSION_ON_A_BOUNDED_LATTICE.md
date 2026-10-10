@@ -480,3 +480,19 @@ therefore takes its rings from those returns, not from a declaration.
 - **Bits read as progress:** L4 reports both lengths and claims only a strict inequality, with the
   decoder paid.
 - **Echo counted as generation:** the decode is called a decode of keys, never a generation.
+
+## 14. Obligations owed to #62
+
+1. **The port on a lattice** (`WavePort::on_lattice`): a passive ring's tick with an exact solve and
+   error-feedback splits of rate and state closes
+   `E′ − E = (hY/4)(|a|² − |b|²) − hωDω + chart + split`, with `|chart| ≤ chart_bound` and
+   `|split| ≤ split_bound`, and every carried state entry lies on the lattice (`HNN/Ring`'s
+   `ring_tick_executed_energy_balance` and `feedback_tick` are the parts it composes).
+2. **The seated key** (`WavePort::seat`): the whole-stream balance with seats,
+   `E_end = ΣW − ΣhωDω + Σ(chart + split) + Σ(E(key) − E(before))`.
+3. **The near-return** (`Settled::near_return`): `decode(cycle_τ, defects_τ) = word` for every
+   admitted window. A word with least exact period `τ₀` and whole winding is admitted at a length of
+   at most `γ(τ₀) + 3τ₀ + 1`. The cycle's winding is `closed_loop_winding` of its advances, and the
+   defects' lift is `Σ_D (Δℓ_k − Δℓ_(k mod τ))`.
+4. **The lattice moment law** (§12): `s_n = T^(n−m) s_m + Σ_(m≤j<n) T^(n−1−j) (B x_j + ρ_j)` for the
+   port on a lattice, with `ρ_j` the tick's split.
