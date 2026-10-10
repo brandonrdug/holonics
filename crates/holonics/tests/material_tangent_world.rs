@@ -35,7 +35,7 @@ use holonics::ratio::linear::inertia::SymmetricForm;
 use holonics::ratio::{Rat, integer, rat};
 use holonics::receiver::receipt::{ReceiptLaw, RegionChart};
 use holonics::receiver::reception::{JointLaw, ReceiverFace};
-use num_traits::{Signed, Zero};
+use num_traits::{One, Signed, Zero};
 
 /// Each participant's coordinates: the source's and the receiver's.
 const N: usize = 4;
@@ -2911,10 +2911,11 @@ fn the_cycle_landing_is_read_over_a_second_trajectory() {
 
 // ---- The adjoint through the World port (the held-carry record §7j) ----
 
-/// **The World-port return is the tangents' credit** (§7j (a)): after twelve encounters, the next
-/// encounter's prospect taught along every raw coordinate of contact 0, and its return through the
-/// World port. For every coordinate, the World-sensitive return's contact gradient entry against the
-/// forward tangent's whole credit (magnitude and both phase parts), reported with their exact ratio.
+/// **The World-port return is the tangents' credit** (§7j (a), §7l): after twelve encounters, the
+/// next encounter's prospect taught along every raw coordinate of contact 0, and its return through
+/// the World port. For every coordinate, the World-sensitive return's contact gradient entry is
+/// exactly −1 times the forward tangent's whole credit (magnitude and both phase parts); storage
+/// through the opening's crossing tick, stiffness and dissipation through the ticks alone.
 #[test]
 fn the_world_return_is_the_tangents_credit() {
     let (field, base, source) = fixture();
@@ -2969,6 +2970,7 @@ fn the_world_return_is_the_tangents_credit() {
             native,
             if total.is_zero() { "∞".to_string() } else { (entry / &total).to_string() }
         );
+        assert_eq!(entry, &-total, "coordinate {coordinate:?}");
     }
 }
 
@@ -3004,4 +3006,141 @@ fn the_second_passage_over_forty_encounters() {
             .map(|(k, _)| k)
             .collect::<Vec<_>>()
     );
+}
+
+// ---- The blocker, classified (the held-carry record §7m) ----
+
+/// `x`'s exact dyadic enclosure: `0`, or its sign with `[2^k, 2^(k+1))`.
+fn enclosure(x: &Rat) -> String {
+    if x.is_zero() {
+        return "0".to_string();
+    }
+    let sign = if x < &Rat::zero() { "−" } else { "" };
+    let k = floor_log2(&x.abs());
+    format!("{sign}[2^{k}, 2^{})", k + 1)
+}
+
+/// The largest `k` with `2^k ≤ x`, for `x > 0`, exact.
+fn floor_log2(x: &Rat) -> i64 {
+    let mut k = x.numer().bits() as i64 - x.denom().bits() as i64;
+    while holonics::holon::deposition::dyadic(k) > *x {
+        k -= 1;
+    }
+    while holonics::holon::deposition::dyadic(k + 1) <= *x {
+        k += 1;
+    }
+    k
+}
+
+/// **Lattice reach, incompatible directions, or omitted coupling?** (§7m): on fixture 1's
+/// fixed-readout orbit after twelve encounters, per contact family, the two orbit encounters'
+/// classical and phase gradients over the family's raw coordinates read exactly: their norms, their
+/// inner product and the parallel defect `|a|²|b|² − ⟨a,b⟩²` (zero exactly when the directions are
+/// parallel), the minimum-norm point `m` of `[a, b]` with its `λ`, and the family's covector scale
+/// `c` through the World port with the largest certified exponent `k_c` (`2^(k_c) c ≤ 1`). Nothing is
+/// stepped; the objective and its comparisons are those of §7k.
+#[test]
+fn the_cycle_blocker_is_classified() {
+    let (field, base, source) = fixture();
+    let mut receiver = bound(
+        &field,
+        Declared::new(&field, base).at(&Rat::zero()),
+        &source,
+        vec![faced_key(&field)],
+    );
+    plain_passage(&mut receiver, &field, &source, 12);
+    let present = receiver.constitution().clone();
+    let preparation = actuator(&field);
+    let [first, second] = chain_controls();
+    let schedule: [&[Rat]; 2] = [&first, &second];
+    let coordinates = all_coordinates(&present);
+    let directions: Vec<MaterialDirection> = coordinates
+        .iter()
+        .map(|c| MaterialDirection::of_coordinate(&field, &present, c).unwrap())
+        .collect();
+    let reading = receiver
+        .world_cycle(
+            &present,
+            &source,
+            &field.receivers()[0],
+            &preparation,
+            &[false, true],
+            &schedule,
+            &directions,
+        )
+        .unwrap();
+    assert_eq!(reading.encounters.len(), 2);
+    let dot = |x: &[Rat], y: &[Rat]| x.iter().zip(y).map(|(p, q)| p * q).sum::<Rat>();
+    for family in 0..3 {
+        let indices: Vec<usize> = coordinates
+            .iter()
+            .enumerate()
+            .filter(|(_, c)| c.family == family)
+            .map(|(d, _)| d)
+            .collect();
+        let read = |e: usize, part: usize| -> Vec<Rat> {
+            indices
+                .iter()
+                .map(|d| {
+                    let (classical, phase) = &reading.credits[e][*d];
+                    if part == 0 { classical.clone() } else { phase.clone() }
+                })
+                .collect()
+        };
+        let (l0, l1, a, b) = (read(0, 0), read(1, 0), read(0, 1), read(1, 1));
+        let (aa, bb, ab) = (dot(&a, &a), dot(&b, &b), dot(&a, &b));
+        let defect = &(&aa * &bb) - &(&ab * &ab);
+        let difference: Vec<Rat> = b.iter().zip(&a).map(|(p, q)| p - q).collect();
+        let length = dot(&difference, &difference);
+        let lambda = if length.is_zero() {
+            Rat::zero()
+        } else {
+            let raw = dot(&difference, &b) / &length;
+            raw.clamp(Rat::zero(), Rat::one())
+        };
+        let m: Vec<Rat> = a
+            .iter()
+            .zip(&b)
+            .map(|(p, q)| &lambda * p + (Rat::one() - &lambda) * q)
+            .collect();
+        let mm = dot(&m, &m);
+        let widest = m.iter().map(|x| x.abs()).max().unwrap_or_else(Rat::zero);
+        let covector = reading
+            .encounters
+            .iter()
+            .flat_map(|e| &e.world_contacts)
+            .filter(|s| {
+                s.gradient.family() == holonics::hnn::constitution::Family::Factor(family)
+            })
+            .map(|s| s.covector.clone())
+            .max()
+            .unwrap_or_else(Rat::zero);
+        // The largest `k` with `2^k c ≤ 1`: `−j` when `c = 2^j` exactly, `−j − 1` otherwise.
+        let certified = if covector.is_zero() {
+            "unbounded".to_string()
+        } else {
+            let j = floor_log2(&covector);
+            let exact = holonics::holon::deposition::dyadic(j) == covector;
+            (if exact { -j } else { -j - 1 }).to_string()
+        };
+        println!(
+            "blocker: family {family}: classical |L0|² {} |L1|² {}; phase |a|² {} |b|² {} ⟨a,b⟩ {}; parallel defect {} (exactly parallel: {}); λ = {}; |m|² {}; |m|²·min(|a|²,|b|²)⁻¹ {}; widest |m_i| {}; covector scale c {}; k_c {certified}",
+            enclosure(&dot(&l0, &l0)),
+            enclosure(&dot(&l1, &l1)),
+            enclosure(&aa),
+            enclosure(&bb),
+            enclosure(&ab),
+            enclosure(&defect),
+            defect.is_zero(),
+            lambda,
+            enclosure(&mm),
+            if aa.is_zero() || bb.is_zero() {
+                "∞".to_string()
+            } else {
+                enclosure(&(&mm / aa.clone().min(bb.clone())))
+            },
+            enclosure(&widest),
+            enclosure(&covector),
+        );
+    }
 }

@@ -1,0 +1,13 @@
+{
+ "scope": "Local developer gate 1 by opus under the common lease, not claim-bearing, on the worktree with the_cycle_blocker_is_classified first written. FAILED, retained as measured: the test helper `enclosure` used a named format argument inside a positional expression (error E0425 `k` not in scope), so the workspace check and the guard lints could not compile the test target; the guard doctests passed.",
+ "stages": [
+  "gate check: FAILED (4441 ms)",
+  "gate guard-lints: FAILED (20058 ms)",
+  "gate guard-doctests: ok (23289 ms)"
+ ],
+ "wall_ns": 47801576222,
+ "deadline_s": 300,
+ "child_peak_rss_kib": 2355172,
+ "exit": 1,
+ "repair": "the helper binds k before formatting; cargo check -p holonics --tests then exit 0 (wall_ns 4105177429)"
+}

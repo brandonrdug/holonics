@@ -65,7 +65,7 @@
 //! return that consumes the word.
 
 use num_bigint::BigInt;
-use num_traits::{One, Zero};
+use num_traits::{One, Signed, Zero};
 
 use crate::aeon::Reading;
 use crate::compression::{CompressionError, ResonanceSplit, resonance_split};
@@ -73,9 +73,9 @@ use crate::hnn::HnnError;
 use crate::hnn::encoding::Encoded;
 use crate::hnn::chart::{ChartReading, Remainders, carry};
 use crate::hnn::constitution::{
-    DepositReading, FactorStep, LandmarkStep, Lattice, LinearStep, Locus, Reach,
+    Constitution, DepositReading, FactorStep, LandmarkStep, Lattice, LinearStep, Locus, Reach,
 };
-use crate::hnn::field::{Current, Field, Ring};
+use crate::hnn::field::{ConstitutionRead, Current, Field, Ring};
 use crate::hnn::keys::KeyLocation;
 use crate::hnn::moment::{Ingested, SourceCapacity};
 use crate::hnn::propagation::{
@@ -1176,6 +1176,96 @@ fn reverse(
     let (mut back, opening) = reverse_core_joined(word, anchors, None, world)?;
     back.reads = reads;
     Ok((back, opening))
+}
+
+/// [definition; agent-inferred, October 10; the held-carry record §7l] **The opening's crossing,
+/// returned as the storage solve it is**: a Word that opens on a carry crossed at held momentum
+/// (`C_a w_a = π_a`, [`crate::hnn::word::continuation::MaterialTangent::crossed_at_held_momentum`])
+/// moves its opening rate with the storage, `C_a δw_a = −δC w_a`. With the opening covector `ū_a`
+/// on that rate and `C_aᵀ z = ū_a`, the storage covector gains `∂ℓ/∂C = −z w_aᵀ`, the storage tick
+/// term `2 r̄ (w − ω)ᵀ` of [`crate::hnn::reference::compose_contact`] at `r̄ = −z/2`, `w = w_a`,
+/// `ω = 0`. It enters the storage family alone.
+///
+/// The solve is the crossing's own ([`crate::hnn::word`]'s `held_rate`), with its refusal: the
+/// transit reads `w` only through `C w`, so `ū_a ∈ range C_aᵀ` and `z` is any point of its fibre
+/// (`ker C_aᵀ` pairs to zero with every admitted target `−δC w_a ∈ range C_a`); a covector off that
+/// range, or a target off `range C_a`, is refused as the crossing refuses a momentum.
+///
+/// Its normalization is the reached-contact metric's
+/// ([`crate::hnn::word::variation::ReachedContactMetric`]): the opening columns' squared norm in
+/// the native wave chart (`w/G_a`), one column `δw_a` per raw storage coordinate of the contact, and
+/// the opening dual's l1 bound in that chart (`|ū_a|·G_a`), read on the columns' support, the
+/// contact's opening rate. Per contact whose opening rate and its covector are both nonzero:
+/// `r̄ = −z/2`, `w_a` (the state before the contact's first transit) and the two metric terms.
+pub(crate) struct OpeningCrossing {
+    pub contact: usize,
+    pub solved: Vec<Rat>,
+    pub rate: Vec<Rat>,
+    pub column_power: Rat,
+    pub dual_bound: Rat,
+}
+
+pub(crate) fn opening_crossings(
+    word: &Word<'_>,
+    theta: &Constitution,
+    opening: &ChangeCovector,
+    back: &WordReturn,
+) -> Result<Vec<OpeningCrossing>, HnnError> {
+    use crate::hnn::word::continuation::MaterialDirection;
+    use crate::hnn::word::variation::ContactCoordinate;
+    let field = word.field();
+    let half = Rat::new(BigInt::from(-1), BigInt::from(2));
+    let mut crossings = Vec::new();
+    for (a, contact) in word.operands().contacts().iter().enumerate() {
+        let Some(first) = back.transits[a].first() else {
+            continue;
+        };
+        let (rate, covector) = (&first.rate, &opening.states[a][1]);
+        if rate.iter().all(Zero::is_zero) || covector.iter().all(Zero::is_zero) {
+            continue;
+        }
+        let (storage, _, _) = contact.forms();
+        let (z, _) = storage
+            .transpose()?
+            .preimage_fibre(covector)?
+            .ok_or(HnnError::HeldMomentum { contact: a })?;
+        let conductance = contact.conductance();
+        let factor = theta.contact_storage(a);
+        let mut column_power = Rat::zero();
+        for row in 0..factor.rows() {
+            for column in 0..factor.columns() {
+                let coordinate = ContactCoordinate {
+                    contact: a,
+                    family: 0,
+                    row,
+                    column,
+                };
+                let direction = MaterialDirection::of_coordinate(field, theta, &coordinate)?;
+                let Some(delta) = direction.storage else {
+                    continue;
+                };
+                let target: Vec<Rat> = delta.apply(rate)?.into_iter().map(|x| -x).collect();
+                if target.iter().all(Zero::is_zero) {
+                    continue;
+                }
+                let (jump, _) = storage
+                    .preimage_fibre(&target)?
+                    .ok_or(HnnError::HeldMomentum { contact: a })?;
+                column_power += jump
+                    .iter()
+                    .map(|x| (x / conductance) * (x / conductance))
+                    .sum::<Rat>();
+            }
+        }
+        crossings.push(OpeningCrossing {
+            contact: a,
+            solved: z.iter().map(|x| x * &half).collect(),
+            rate: rate.clone(),
+            column_power,
+            dual_bound: covector.iter().map(|x| (x * conductance).abs()).sum(),
+        });
+    }
+    Ok(crossings)
 }
 
 /// **The reverse sweep** over a word's own per-tick waves (module header, "The word's return"):

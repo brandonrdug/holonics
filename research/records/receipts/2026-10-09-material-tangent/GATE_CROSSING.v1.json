@@ -1,0 +1,12 @@
+{
+ "scope": "Local developer gate 1 by opus under the common lease, not claim-bearing, on the worktree after the helper repair (the source of the successor commit).",
+ "stages": [
+  "gate check: ok (2582 ms)",
+  "gate guard-lints: ok (8829 ms)",
+  "gate guard-doctests: ok (24768 ms)"
+ ],
+ "bounded": [
+  "BOUNDED start 04:16:05 end 04:16:41 exit 0 wall_ns 36201602251 child_peak_rss_kib 1898928"
+ ],
+ "deadline_s": 300
+}

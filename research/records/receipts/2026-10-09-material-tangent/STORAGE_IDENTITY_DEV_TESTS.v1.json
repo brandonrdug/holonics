@@ -1,0 +1,20 @@
+{
+ "scope": "Local developer read by opus under the common lease, not claim-bearing: the_world_return_is_the_tangents_credit with the opening's crossing tick (section 7l), on the worktree above 8f08503d3. Build exit 0 (wall_ns 8612109900); test exit 0.",
+ "projection": "deadline 60 s from the earlier read of the same test",
+ "wall_ns": 19560646399,
+ "deadline_s": 60,
+ "child_peak_rss_kib": 28412,
+ "stdout_sha256": "3e72c70935274e720cae3bf3f6c4c5f7d5faac2136a0fd78a5b385879c0fff4d",
+ "ratios": {
+  "family 0 (storage)": [
+   "-1"
+  ],
+  "family 1 (stiffness)": [
+   "-1"
+  ],
+  "family 2 (dissipation)": [
+   "-1"
+  ]
+ },
+ "coordinates": 48
+}

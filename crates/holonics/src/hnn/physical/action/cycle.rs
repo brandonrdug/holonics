@@ -217,8 +217,10 @@ impl PhysicalReceiver<'_> {
             &mut state_seeds,
         )?;
         // The run's receiving publications (record §7h) must leave the readout as it is: the cycle is
-        // the fixed-readout one, the same map at every repetition only while `R` does not move.
-        if !self.same_readout(&first.material, material) {
+        // the fixed-readout one, the same map at every repetition only while `R` does not move. Each
+        // publication is read against the material it was deposited on (§7l): equal ends alone do
+        // not certify that `R` stayed fixed within the run.
+        if !first.readout_fixed || !self.same_readout(&first.material, material) {
             return Err(HnnError::Unadmitted {
                 reason: "a cycle's run leaves its readout as it is: its receiving publications do not move R",
             });
@@ -324,7 +326,7 @@ impl PhysicalReceiver<'_> {
             &second.end,
             second.end_state.clone(),
         )?;
-        if !self.same_readout(&second.material, material) {
+        if !second.readout_fixed || !self.same_readout(&second.material, material) {
             return Err(HnnError::Unadmitted {
                 reason: "a cycle's orbit leaves its readout as it is: its receiving publications do not move R",
             });
@@ -389,7 +391,7 @@ impl PhysicalReceiver<'_> {
 
     /// The same readout on both materials: every receiving ring's receiving map and carrier equal,
     /// and the contact material untouched (a receiving publication is an observer translation).
-    fn same_readout(&self, after: &Constitution, before: &Constitution) -> bool {
+    pub(super) fn same_readout(&self, after: &Constitution, before: &Constitution) -> bool {
         self.field.receivers().iter().all(|r| {
             after.receiving_map(r.ring) == before.receiving_map(r.ring)
                 && after.receiving_carrier(r.ring) == before.receiving_carrier(r.ring)

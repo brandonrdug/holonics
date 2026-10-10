@@ -100,7 +100,7 @@ The helical code, the encoding every Holon carries, is defined in
 
 **October 10: learning across two observations lands at both waves** (#73; the
 [held-carry record](research/records/2026-10-09_THE_ASKED_ENCOUNTER_TEACHES_THE_MATERIAL_THROUGH_ITS_HELD_CARRY.md)
-§7–§7b; developer reads, not yet the queue's).
+§7–§7l; developer reads, not yet the queue's).
 - **The credit of a chain:** two encounters at different waves, `u = 1` then `u = −1`, are credited
   as one. The chain binds consecutive clocks and continued tangents of one origin. The credit is exact
   to second order on every part.
@@ -119,7 +119,21 @@ The helical code, the encoding every Holon carries, is defined in
   improves its own next encounter, but the trajectory against the never-landing twin is mixed. That
   is the measured blocker: one-step admissions do not compose. The next law is the chained prospect
   of the actual schedule over a declared horizon.
-- **Still owed:** the schedule's chained prospect and its loop, and the queue's runs.
+- **The schedule and its cycle (§7e–§7h):** the chained prospect of the actual schedule, with the
+  receiving publication joined between encounters, equals the actual next two encounters exactly.
+  Once the readout `R` stops moving, the repeated schedule has an exact closed orbit
+  `x* = x_p + (I − M)⁻¹(F(x_p) − x_p)` with its credit along every material direction (fixture 1,
+  dimension 40), and the passage's code enclosures arrive at it.
+- **The World-port adjoint (§7j, §7l):** the reverse sweep now carries the covector through the
+  World's observed face and the opening's held-momentum crossing. For all 48 contact coordinates the
+  return's gradient is exactly −1 times the forward tangent's credit. The crossing's normalization is
+  the reached-contact metric. The fixed-readout cycle now reads `R` at every publication.
+- **The blocker, by measurement (§7i, §7k, §7m):** on fixture 1's orbit, the classical gradients are
+  exactly 0, and the two waves' phase gradients are positively aligned in every family, so a strict
+  common descent exists. The certified step does not reach the material lattice: for stiffness,
+  `k_c = 7` against a first reach at 8, one dyadic order (`CovectorScale`). Fixture 2's readout keeps
+  moving over forty encounters, so it has no fixed-readout cycle. Learner equals twin on both.
+- **Still owed:** the joint cycle with `R`'s deposits, and the queue's runs.
 
 **October 6 HNN integration.** The [blind receiving return](research/records/2026-10-06_THE_BLIND_RECEIVING_RETURN_IS_JOINED_BUT_RELEASE_NEEDS_THE_EXECUTED_COUPLED_DOMAIN.md)
 now consumes its actual continuing Word's pullback and the existing normal deposition at R.

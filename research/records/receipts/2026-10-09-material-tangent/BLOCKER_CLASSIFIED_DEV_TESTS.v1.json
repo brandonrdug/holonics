@@ -1,0 +1,16 @@
+{
+ "scope": "Local developer read by opus under the common lease, not claim-bearing: the_cycle_blocker_is_classified on fixture 1 after twelve encounters, all 48 raw coordinates of contact 0, nothing stepped. Projection: deadline 300 s (unmeasured; the cycle with 48 directions).",
+ "build_wall_ns": 22243149628,
+ "wall_ns": 26364711654,
+ "deadline_s": 300,
+ "child_peak_rss_kib": 28744,
+ "stdout_sha256": "8e9a5e93c81e9b1de1ca4bc238a365050262d9024338351b00dc74758c0f4185",
+ "lines": [
+  "BOUNDED start 04:15:17 end 04:15:39 exit 0 wall_ns 22243149628 child_peak_rss_kib 2214036",
+  "blocker: family 0: classical |L0|² 0 |L1|² 0; phase |a|² [2^-10, 2^-9) |b|² [2^-9, 2^-8) ⟨a,b⟩ [2^-10, 2^-9); parallel defect [2^-20, 2^-19) (exactly parallel: false); λ = 1; |m|² [2^-10, 2^-9); |m|²·min(|a|²,|b|²)⁻¹ [2^0, 2^1); widest |m_i| [2^-6, 2^-5); covector scale c [2^-4, 2^-3); k_c 3",
+  "blocker: family 1: classical |L0|² 0 |L1|² 0; phase |a|² [2^-14, 2^-13) |b|² [2^-13, 2^-12) ⟨a,b⟩ [2^-14, 2^-13); parallel defect [2^-29, 2^-28) (exactly parallel: false); λ = 1; |m|² [2^-14, 2^-13); |m|²·min(|a|²,|b|²)⁻¹ [2^0, 2^1); widest |m_i| [2^-8, 2^-7); covector scale c [2^-8, 2^-7); k_c 7",
+  "blocker: family 2: classical |L0|² 0 |L1|² 0; phase |a|² [2^-13, 2^-12) |b|² [2^-12, 2^-11) ⟨a,b⟩ [2^-13, 2^-12); parallel defect [2^-27, 2^-26) (exactly parallel: false); λ = 1; |m|² [2^-13, 2^-12); |m|²·min(|a|²,|b|²)⁻¹ [2^0, 2^1); widest |m_i| [2^-8, 2^-7); covector scale c [2^-8, 2^-7); k_c 7",
+  "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 34 filtered out; finished in 26.28s",
+  "BOUNDED start 04:15:39 end 04:16:05 exit 0 wall_ns 26364711654 child_peak_rss_kib 28744"
+ ]
+}

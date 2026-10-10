@@ -1078,9 +1078,14 @@ Its transpose, swept backward with `λ_b` the covector the sweep holds on the ov
 `μ` the World's covector (zero after the last tick):
 
 ```text
-μ_t   = F_tᵀ μ_(t+1) + P_tᵀ λ_b(t) + Hᵀ φ_j        (φ_j the observed face's covector at station j's tick)
-s̄_r(t) = Q_tᵀ λ_b(t) + G_tᵀ μ_(t+1)                  replaces the zeroing; then the native tick's transpose as now
+μ̃_(t+1) = μ_(t+1) + Hᵀ φ_j                           (φ_j the observed face's covector at station j, read after step t)
+s̄_r(t)  = Q_tᵀ λ_b(t) + G_tᵀ μ̃_(t+1)                 replaces the zeroing; then the native tick's transpose as now
+μ_t      = F_tᵀ μ̃_(t+1) + P_tᵀ λ_b(t)
 ```
+
+(Corrected October 10 on Codex's source review: the face reads `ξ_(t_j + 1)`, so its covector joins
+`μ_(t+1)` before the `G` and `F` transposes, as the implementation does; the first printing added it
+after `Fᵀ`.)
 
 The observed face's covector is the comparison's own: `φ_j = −Im g_j` on the imaginary logit
 entries (series (5)'s observed phase, with its sign), and `0` on the real ones.
@@ -1161,3 +1166,124 @@ on, at every `u = −1` encounter. No fixed-readout cycle exists on this fixture
 cycle owner's refusal there is the law working. A cycle on it would have to be the joint cycle, with
 `R`'s deposits part of the orbit, and only if `R` itself recurs, which forty encounters do not show.
 
+
+### 7l. The storage identity, the boundary's normalization, and the readout at every publication
+
+[definition; agent-inferred, October 10] §7j left storage owed: the forward tangent moves the opening
+rate with the storage (`C_a δw_a = −δC w_a`, the held-momentum crossing of §7b), while the World
+return started from a fixed opening and discarded its opening covector. The crossing is itself a
+storage solve, so its adjoint is a solve's. With `ū_a` the return's opening covector on contact `a`'s
+rate and `C_aᵀ z = ū_a`, the full credit is the within-Word credit plus the opening pairing, and the
+storage covector gains `∂ℓ/∂C = −z w_aᵀ`. That is the storage tick term `2 r̄ (w − ω)ᵀ` of
+`compose_contact` at `r̄ = −z/2`, `w = w_a`, `ω = 0`. It enters the storage family alone and is pulled
+onto the factor as the ticks' terms are (`hnn::port::opening_crossings`,
+`hnn::reference::join_crossing`).
+
+- **The same solve law.** The crossing's own solve (`held_rate`) fixes `w` only modulo `ker C_a`, which
+  no later tick reads, since the transit reads `w` only through `C w`. Hence `ū_a ∈ range C_aᵀ`, and
+  `z` is any point of its fibre: `ker C_aᵀ` pairs to zero with every admitted target
+  `−δC w_a ∈ range C_a`. A covector off that range, or a target off `range C_a`, is refused
+  (`HeldMomentum`), exactly where the crossing refuses a momentum. No inverse is assumed.
+- **Its own normalization.** The enlarged return is not certified by the within-Word energy and
+  covector scale. Its bound is the existing owner's law for an opening's dual, the reached-contact
+  metric of `hnn::word::variation`: the storage step's energy gains the opening columns' squared norm
+  in the native wave chart (`Σ_c |δw_c / G_a|²`, one column per raw storage coordinate), and its
+  covector ceiling gains the opening dual's l1 bound in that chart (`Σ |ū_a|·G_a`), read on the
+  columns' support (the contact's opening rate, the only part of the opening a storage direction
+  moves). Stiffness and dissipation move nothing at the opening, so their steps keep their
+  within-Word metric.
+- **The readout at every publication.** The fixed-readout cycle (§7h) compared only each run's end
+  material with its start. Equal ends do not certify that `R` stayed fixed within the run. Each run
+  now reads every receiving publication against the material it was deposited on
+  (`ScheduleRound::readout_fixed`), and the cycle refuses unless all of them leave the readout
+  unchanged.
+
+**Scope (Codex's review).**
+- The 48-entry identity is the next encounter's return at the present opening.
+- The cycle's credit (§7g) adds the implicit orbit shift `(I − M)⁻¹ δF`, and the cycle's
+  World-sensitive normalization (§7j) is formed from per-encounter sweeps whose terminal World
+  covector is zero. That normalization is therefore a per-encounter bound, not yet the adjoint of
+  the cycle credit. Joining the orbit shift (the native and World boundary duals carried across the
+  round) or deriving its bound is owed before a cycle landing's step is claimed certified. The cycle
+  landing is unreached (§7k), so no claim rests on it now.
+- The receiving tangents hold `R` exterior (`MaterialTangent::rebind`). The forward prediction with a
+  moving `R` is exact (§7h), and its derivative remains conditional on a locally fixed receiving
+  publication.
+
+**Acceptance, fixed before the run.** `the_world_return_is_the_tangents_credit` asserts, for all 48
+raw coordinates of contact 0 (16 per family) after twelve encounters, that the World return's
+gradient entry is exactly −1 times the forward tangent's whole credit.
+
+[measured] **The acceptance passes** ([receipt](receipts/2026-10-09-material-tangent/STORAGE_IDENTITY_DEV_TESTS.v1.json)).
+For all 48 coordinates, the gradient entry is exactly −1 times the whole credit. The 16 storage
+coordinates, which §7j left apart by the opening term, now meet it as well. Taken before the
+restructuring above (then the crossing term rode one extra transit tick, sharing its covector scale
+with all three families), with the same gradient.
+
+[measured] **At the restructured source** ([receipt](receipts/2026-10-09-material-tangent/FULL_SUITE_CROSSING.v1.json)):
+33 of 33 pass (one filtered, the second fixture's cycle trajectory, which reached its deadline in
+§7i). The 48 ratios are exactly −1. Against the whole suite at `deb51f40`
+([receipt](receipts/2026-10-09-material-tangent/FULL_SUITE_deb51f40.v1.json), 33 of 33), only the 16
+storage lines of the identity test changed. Every other printed reading is identical, including
+fixture 1's cycle landing: unreached, `CovectorScale` for stiffness at exponent 8. The crossing
+enlarges the storage family alone, and no landing decision moved. An intermediate run of the
+superseded structure was stopped by hand at 31 of 33 (none failed), and the receipt names it.
+
+### 7m. The blocker, classified: lattice reach, incompatible directions, or omitted coupling
+
+[definition; agent-inferred, October 10] Codex asked that the next progress tell §7k's refusal apart
+by its actual source, with the objective and its comparisons fixed. The three are distinct and
+exactly readable on fixture 1's orbit after twelve encounters, per contact family, from the orbit
+credits already formed (`the_cycle_blocker_is_classified`; nothing is stepped):
+
+- **Incompatible directions.** The two orbit encounters' phase gradients `a`, `b` over the family's
+  raw coordinates admit a strict common descent exactly when the minimum-norm point `m` of `[a, b]`
+  is nonzero. `m = 0` exactly when they are exactly opposed: parallel defect
+  `|a|²|b|² − ⟨a, b⟩² = 0` with `⟨a, b⟩ < 0`. Then no step at any grain lowers both phases at first
+  order. That is a Pareto-stationary orbit, a property of the objective and not of the lattice.
+- **Lattice reach.** With `m ≠ 0`, a common descent exists at first order. The landing refuses when
+  the first exponent at which the step commits a lattice unit (§7k: 8 for stiffness) exceeds the
+  certified exponent `k_c`, the largest `k` with `2^k c ≤ 1` for the family's covector scale `c`
+  through the World port. The gap `8 − k_c` measures how much finer the material grain would have
+  to be.
+- **Omitted coupling.** This is read from source, not from a number. The cycle's normalization omits
+  the orbit shift's adjoint (§7l, scope), and the receiving tangents hold `R` exterior. The orbit's
+  classical gradients `L0`, `L1` are read beside it: §7i found the orbit's summed classical credit
+  exactly 0, and this reading says whether each encounter's is.
+
+**Acceptance, fixed before the run.** The reading prints, per family: `|L0|², |L1|²`, `|a|², |b|²`,
+`⟨a, b⟩`, the parallel defect and whether it is exactly zero, `λ`, `|m|²` and its ratio to the smaller
+of `|a|², |b|²`, the widest entry of `m`, and `c` with `k_c`, all as exact dyadic enclosures. It
+classifies each family by the rules above and changes no law.
+
+[measured] **The reading** ([receipt](receipts/2026-10-09-material-tangent/BLOCKER_CLASSIFIED_DEV_TESTS.v1.json)),
+fixture 1's orbit after twelve encounters, as exact dyadic enclosures:
+
+| family | `\|L0\|²`, `\|L1\|²` | `\|a\|²` | `\|b\|²` | `⟨a, b⟩` | parallel defect | `λ` | `\|m\|²` | widest `\|m_i\|` | `c` | `k_c` |
+|---|---|---|---|---|---|---|---|---|---|---|
+| storage | 0, 0 | `[2⁻¹⁰, 2⁻⁹)` | `[2⁻⁹, 2⁻⁸)` | `[2⁻¹⁰, 2⁻⁹)` | `[2⁻²⁰, 2⁻¹⁹)` | 1 | `[2⁻¹⁰, 2⁻⁹)` | `[2⁻⁶, 2⁻⁵)` | `[2⁻⁴, 2⁻³)` | 3 |
+| stiffness | 0, 0 | `[2⁻¹⁴, 2⁻¹³)` | `[2⁻¹³, 2⁻¹²)` | `[2⁻¹⁴, 2⁻¹³)` | `[2⁻²⁹, 2⁻²⁸)` | 1 | `[2⁻¹⁴, 2⁻¹³)` | `[2⁻⁸, 2⁻⁷)` | `[2⁻⁸, 2⁻⁷)` | 7 |
+| dissipation | 0, 0 | `[2⁻¹³, 2⁻¹²)` | `[2⁻¹², 2⁻¹¹)` | `[2⁻¹³, 2⁻¹²)` | `[2⁻²⁷, 2⁻²⁶)` | 1 | `[2⁻¹³, 2⁻¹²)` | `[2⁻⁸, 2⁻⁷)` | `[2⁻⁸, 2⁻⁷)` | 7 |
+
+**Classified.**
+- **Not incompatible directions.** In every family `⟨a, b⟩ > 0`, and the parallel defect is nonzero.
+  The minimum-norm point is `a` itself (`λ = 1`, `⟨a, b⟩ ≥ |a|²`), so `−a` lowers both orbit
+  encounters' phase at first order. The orbit is not Pareto-stationary.
+- **Lattice reach, by one dyadic order.** For stiffness, the family §7k's refusal names, the certified
+  exponent is `k_c = 7` (`c ∈ [2⁻⁸, 2⁻⁷)`), while the step first commits a lattice unit at exponent 8.
+  The widest descent entry lies in the same enclosure as `c`. A certified step `2^k ≤ 1/c` then moves
+  each entry by less than one unit, so the step reaches only when the descent's entries exceed its
+  covector scale. The material grain is one binary order too coarse for the certified common descent.
+- **Omitted coupling.** Each orbit encounter's classical gradient is exactly 0, not only their sum,
+  so on this orbit the classical level carries nothing and the phase alone can be descended. The
+  orbit shift's adjoint and `R`'s exterior hold (§7l) are the omitted terms named in source. They
+  bound the normalization's scope, not the direction, which comes from the exact forward credits.
+
+**Correction (October 10).** §7k said the two waves' phase gradients "nearly oppose". That was my
+inference from the refusal, not a reading, and the reading contradicts it: they are positively
+aligned in every family. The §7k refusal itself stands as measured. §7j's account of the
+projection-stage worsening at encounter 0 ("projecting off encounter 0's phase holds its first-order
+change at zero") is not supported either. With `⟨a, b⟩ > 0`, `−(a + b)` raises neither wave at first
+order, so no projection acts. The measured worsening of `[2⁻¹⁰, 2⁻⁹)` at exponent 7 is therefore
+second order or lattice rounding of a step that commits about one unit, so the committed change is
+not `2⁷ d`. Which of the two is not yet read.

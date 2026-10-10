@@ -334,6 +334,9 @@ pub(crate) struct ScheduleRound {
     pub(crate) tangents: Vec<MaterialTangent>,
     /// The material after the run's receiving publications.
     pub(crate) material: Constitution,
+    /// [§7l] Whether every receiving publication within the run left the readout as it was
+    /// (each one read against the material it was deposited on, not only the run's ends).
+    pub(crate) readout_fixed: bool,
 }
 
 /// [definition; agent-inferred, October 10; the held-carry record §7f] **The admitted future a
@@ -1183,6 +1186,7 @@ impl<'f> PhysicalReceiver<'f> {
         let mut carried: Option<(ReceptionCarry, Vec<MaterialTangent>)> = None;
         let mut encounters = Vec::with_capacity(schedule.len());
         let mut last_end = None;
+        let mut readout_fixed = true;
         for control in schedule {
             let (_, phases, word, _) = self.action_opening_on(
                 source, receiver, preparation, compared, &material, &opening,
@@ -1279,7 +1283,9 @@ impl<'f> PhysicalReceiver<'f> {
                 Some(&port),
             )?;
             if let Some(deposit) = returned.deposit.as_ref() {
-                material = material.deposited(deposit)?.0;
+                let next = material.deposited(deposit)?.0;
+                readout_fixed &= self.same_readout(&next, &material);
+                material = next;
             }
             let end = prospect.point.end.clone();
             tick = tick
@@ -1312,6 +1318,7 @@ impl<'f> PhysicalReceiver<'f> {
             end_tick: tick,
             tangents,
             material,
+            readout_fixed,
         })
     }
 

@@ -6,7 +6,7 @@
 //! remain bound to the Word.  No requested consequence is used as an observed target.
 
 use super::*;
-use crate::hnn::constitution::{LinearLocus, Locus, Reach};
+use crate::hnn::constitution::{FactorStep, LinearLocus, Locus, Reach};
 use crate::hnn::port::{ChangeCovector, Deposit, WordReturn, WorldPort};
 use crate::hnn::ratio::{Face, ReceivingFaceRatio};
 use crate::hnn::retention::Diamond;
@@ -83,13 +83,16 @@ impl Word<'_> {
             None => None,
             Some(port) => {
                 let adjoint = port.adjoint(&covector, &phases, applied.compared())?;
-                let (through, _) = self.pull_back_world(
+                let (through, opening) = self.pull_back_world(
                     &covector,
                     &map,
                     &current.lift()[phases.ring()],
                     &phases,
                     &adjoint,
                 )?;
+                // [§7l] The opening's held-momentum crossing, the storage solve the opening is.
+                let crossings =
+                    crate::hnn::port::opening_crossings(&self, &theta, &opening, &through)?;
                 let composed = crate::hnn::reference::compose_return(
                     field,
                     &theta,
@@ -99,13 +102,15 @@ impl Word<'_> {
                     &source,
                     &through,
                 )?;
-                Some(
-                    composed
-                        .factors
-                        .into_iter()
-                        .filter(|step| matches!(step.gradient.locus(), Locus::Channel(_)))
-                        .collect(),
-                )
+                let mut steps: Vec<FactorStep> = composed
+                    .factors
+                    .into_iter()
+                    .filter(|step| matches!(step.gradient.locus(), Locus::Channel(_)))
+                    .collect();
+                for crossing in &crossings {
+                    crate::hnn::reference::join_crossing(&theta, crossing, &mut steps)?;
+                }
+                Some(steps)
             }
         };
         let (pullback, opening) = self.pull_back_full(

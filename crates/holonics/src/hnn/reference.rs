@@ -2953,6 +2953,46 @@ pub(crate) fn compose_contact(
     ))
 }
 
+/// [definition; agent-inferred, October 10; the held-carry record §7l] **The opening's crossing
+/// joined to contact `a`'s storage step** ([`crate::hnn::port::opening_crossings`]): its term
+/// `2 r̄ w_aᵀ` pulled onto the storage factor as the ticks' are in [`compose_contact`], the step's
+/// energy raised by the opening columns' power and its covector ceiling by the opening dual's bound
+/// (the reached-contact metric). A contact whose storage family the return did not reach is left.
+pub(crate) fn join_crossing(
+    constitution: &Constitution,
+    crossing: &crate::hnn::port::OpeningCrossing,
+    steps: &mut [FactorStep],
+) -> Result<(), HnnError> {
+    use crate::ratio::linear::vector::{IntegralMatrix, integral};
+    let a = crossing.contact;
+    let Some(step) = steps.iter_mut().find(|step| {
+        matches!(&step.gradient, FactorGradient::Storage { contact, .. } if *contact == a)
+    }) else {
+        return Ok(());
+    };
+    let factor = constitution.contact_storage(a);
+    let k = crossing.rate.len();
+    let two = integer(2);
+    let (solved, rate) = (integral(&crossing.solved), integral(&crossing.rate));
+    let pulled = IntegralMatrix::outer_sum(k, k, [(&two, &solved, &rate)])
+        .symmetric_times(factor, true)?;
+    let FactorGradient::Storage { gradient, .. } = &mut step.gradient else {
+        unreachable!("the step was found as a storage step");
+    };
+    let mut joined = Vec::with_capacity(gradient.rows());
+    for (i, row) in pulled.iter().enumerate() {
+        let mut out = Vec::with_capacity(row.len());
+        for (j, term) in row.iter().enumerate() {
+            out.push(gradient.get(i, j)? + term);
+        }
+        joined.push(out);
+    }
+    *gradient = matrix_of(joined, factor.columns())?;
+    step.energy += &crossing.column_power;
+    step.covector += &crossing.dual_bound;
+    Ok(())
+}
+
 /// The sheet classes `σ_ρ = sign(Δ_r[ρ])` (`sign 0 = +1`) of ring `g`'s standing contrast
 /// ([`Field::standing_contrast`]).
 fn sheet_classes(
