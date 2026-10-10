@@ -969,3 +969,80 @@ For each admitted near-return window of a ring:
 **Reading rule.** The located bits are reported against the same windows' spelled near-return bits.
 §23's expectation stands: for short cycles the located description is the longer one. The route is
 claimed as a join and never as compression unless the located bits are strictly fewer.
+
+**The development read** (ring 20, the recording's first 2000 ticks, debug binary, one thread). It read 16
+windows: 4 located, 0 shape-refused, 12 not located. The located bits were 235 against the same
+windows' spelled 224, so on these windows the located description is the longer one, as §23 expected.
+Wall time was 3858294942 ns, peak RSS 13836 KiB.
+
+### 27a. The full read was INCOMPLETE at its deadline, and the projection error
+
+The full read ran rings 0, 8, 16 and 20 over all 93680 recorded ticks, one thread each.
+- It was projected at about 200 s from the development read's 1929147471/1000 ns per tick.
+- Its deadline was fixed at 300 s.
+- It stopped at that deadline: exit 124, wall 300001503956 ns, child peak RSS 20044 KiB.
+- **INCOMPLETE.** No ring's result was read.
+
+The last progress lines:
+
+| Ring | Ticks | Elapsed | Slowest measured interval |
+|---|---|---|---|
+| 0 | 88620 | 34006 ms | 3028 ms over 7596 ticks |
+| 8 | 88059 | 59777 ms | 9342 ms over 7897 ticks |
+| 16 | 88023 | 139762 ms | 18298 ms over 8029 ticks |
+| 20 | 64008 | 243049 ms | 32906 ms over 8001 ticks |
+
+**Two causes, both mine.**
+1. **The projection came from an unrepresentative unit.** A window's cost depends on whether it is
+   located: locating means trying every carrying frame and coding and reading back the word.
+   - In the recording's first 2000 ticks, 12 of 16 windows were not located.
+   - The voice later locates more of its windows. Ring 20's 64008 ticks took 243049 ms, against
+     the development read's projection of 15435108915471/125 ns for that count. That is the
+     projection error, recorded as such.
+   - A development read for a content-dependent unit must be taken where the content is, or
+     projected from the slowest measured interval.
+2. **The driver withheld finished results.** It printed every ring's result only after all rings
+   joined. Rings 0, 8 and 16 were past their last chunk line by 139762 ms, and at most 5657 ticks
+   remained in each. Their results were still lost with the process.
+   - [agent-inferred] Repaired: each ring prints its result when its own pass ends, so a deadline
+     stop keeps the rings that finished.
+
+**The next read changes what is declared, not the limit.** Its deadline stays at 180 s, and it runs
+two processes, 4 threads in all:
+- rings 0, 8 and 16 over the whole recording;
+- ring 20 over its first 40000 ticks.
+
+Each projection is the full read's measured elapsed at its last progress line, plus the slowest
+measured interval's rate over the ticks that remain:
+- ring 16: 139762 ms plus 5657 ticks at 18298/8029 ms per tick, about 153 s;
+- ring 20: 122678 ms to tick 32004, plus 7996 ticks at 32906/8001 ms per tick, about 156 s.
+
+Ring 20's whole recording projects past three minutes at its measured rate. It is declared on a
+prefix and is not relaunched whole.
+
+### 27b. Measured: the declared split read (developer read)
+
+Both runs finished inside the fixed 180 s deadline
+([receipt](receipts/2026-10-10-acoustic-release/W3_LOCATED_WINDOWS.v1.json)):
+- (a) wall 146513953189 ns against the projection's 175094412/1147 ms, peak RSS 13836 KiB;
+- (b) wall 158126089092 ns against 1244663054/8001 ms, peak RSS 18804 KiB. Run (b) overran its
+  projection by less than 2563 ms. That is a projection error; the deadline held.
+
+| Ring | Ticks read | Windows | Located | Shape-refused | Not located | Located bits | Spelled bits, same windows |
+|---|---|---|---|---|---|---|---|
+| 0 | 93680 | 147 | 0 | 0 | 147 | 0 | 0 |
+| 8 | 93680 | 606 | 0 | 0 | 606 | 0 | 0 |
+| 16 | 93680 | 1932 | 84 | 0 | 1848 | 6766 | 7557 |
+| 20 | 40000 | 783 | 78 | 2 | 703 | 4752 | 3978 |
+
+**Reading, by §27's rule.**
+- **Ring 16:** the located code is strictly shorter on its 84 located windows, by 791 bits. Over the
+  ring's 1932 windows that is no compression: a flag naming which windows take the located code costs
+  more than 791 bits (one bit per window is 1932 bits).
+- **Ring 20:** the located code is longer on its 78 located windows, by 774 bits, as §23 expected
+  for short cycles.
+- **Rings 0 and 8:** no window was located. Their longer windows carry cycles that no declared pair
+  frame carries.
+
+The route is a measured join on 162 of the 3468 windows read. It is not a compression of the
+recording.

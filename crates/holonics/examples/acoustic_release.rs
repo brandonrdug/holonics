@@ -983,20 +983,14 @@ fn main() {
         .map(|b| rat(1, 50) * (0..b).fold(Rat::one(), |x, _| x * rat(6, 5)))
         .collect();
     if let Some(rings) = w3_rings {
-        // Record §27: W3 on the chosen rings, one thread each.
-        let lines: Vec<String> = std::thread::scope(|scope| {
-            let handles: Vec<_> = rings
-                .iter()
-                .map(|&b| {
-                    let (ladder, stream) = (&ladder, &stream);
-                    scope.spawn(move || w3_pass(b, &ladder[b], stream, started))
-                })
-                .collect();
-            handles.into_iter().map(|h| h.join().expect("a ring's W3 pass")).collect()
+        // Record §27: W3 on the chosen rings, one thread each. Each ring prints its result when its pass ends
+        // (§27a: a deadline stop keeps the rings that finished).
+        std::thread::scope(|scope| {
+            for &b in &rings {
+                let (ladder, stream) = (&ladder, &stream);
+                scope.spawn(move || println!("{} (elapsed {} ms)", w3_pass(b, &ladder[b], stream, started), started.elapsed().as_millis()));
+            }
         });
-        for line in lines {
-            println!("{line}");
-        }
         println!("w3: elapsed {} ms", started.elapsed().as_millis());
         return;
     }
