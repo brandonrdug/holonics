@@ -950,3 +950,22 @@ frames):
 existing located route, with its departures as substitutions. That is the join loop 2's deposition
 consumes. W3, the census of located windows on the recording with the located description's bits
 against the spelled cycle's, is the next reading.
+
+## 27. W3: the recording's windows through the located navigator's own code (reading fixed before the run)
+
+[definition; agent-inferred, October 10] The transport owner already has an actual code for a located
+navigator, `located_code` and `read_located` (`compression::keys::transport`). It writes the transport
+per receiving cell, the labels, the key, and the **patches** where the word departs from the
+regeneration, which are exactly §23's substitutions. The owner prices them, not this record.
+
+For each admitted near-return window of a ring:
+1. The cycle, read as its own advances' ordinals, is located on `FrameFamily::pairs(9)`.
+2. On every carrying frame whose shape the code admits (its cells equal the classes), the window's
+   *actual* word is coded by `located_code`, and `read_located` must return it exactly.
+3. The located length is the shortest such code, plus the frame's index (`⌈log₂ 38⌉ = 6` bits) and
+   the ordinal map (3 bits per class).
+4. Each window is counted as located, carried but shape-refused, or not located.
+
+**Reading rule.** The located bits are reported against the same windows' spelled near-return bits.
+§23's expectation stands: for short cycles the located description is the longer one. The route is
+claimed as a join and never as compression unless the located bits are strictly fewer.

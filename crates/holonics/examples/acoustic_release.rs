@@ -599,6 +599,93 @@ fn phase_address(
     (class, path, lo, hi)
 }
 
+/// [definition; agent-inferred, October 10; the bank record §27] **W3, one ring's located windows**:
+/// for each admitted near-return window of ring `b` (§11's windows, four of its turns), the cycle is
+/// read as its own advances' ordinals (the relabelling law) and located on the declared two-ring
+/// frames (`FrameFamily::pairs(9)`); on each carrying frame whose shape the navigator's code admits
+/// (its cells equal the classes), the window's actual word is coded by the owner's
+/// `located_code` (transport, labels, key and patches, the patches being the departures) and read
+/// back by `read_located`, which must return the word; the located length is the shortest such code
+/// plus the frame's index (`⌈log₂ 38⌉`) and the ordinal map (`3` bits per class). Returns, per ring,
+/// the windows read, located, not located (by the frames' readings) and shape-refused, with the
+/// located bits against the same windows' spelled near-return bits.
+fn w3_pass(b: usize, t: &Rat, stream: &[Rat], started: Instant) -> String {
+    use holonics::compression::keys::frames::FrameFamily;
+    use holonics::compression::keys::transport::{located_code, read_located};
+    let operands = declared_ring(t);
+    let lattice = Lattice::new(STATE_LATTICE);
+    let (_, turn_ticks) = half_memory(&operands, lattice);
+    let window = LockWindow::new(0, 4 * turn_ticks).unwrap();
+    let family = FrameFamily::pairs(9).unwrap();
+    let frame_bits = u64::from(usize::BITS - (family.frames().len() - 1).leading_zeros());
+    let mut port = WavePort::on_lattice(operands.clone(), 0, lattice).unwrap();
+    let mut reader = LockReader::new(window);
+    let (mut read, mut located, mut unlocated, mut shape) = (0u64, 0u64, 0u64, 0u64);
+    let (mut located_bits, mut spelled_bits) = (0u64, 0u64);
+    for (n, sample) in stream.iter().enumerate() {
+        let wave = MatchedWave::new(operands.admittance().clone(), operands.hop().clone(), vec![sample.clone()]).unwrap();
+        let tick = port.receive(&wave).unwrap().next().unwrap().unwrap();
+        if reader.observe([tick.step.state[1][0].clone(), tick.step.state[0][0].clone()]).is_err() {
+            reader = LockReader::new(window);
+            continue;
+        }
+        if reader.seen() < window.length() + 1 {
+            continue;
+        }
+        let full = std::mem::replace(&mut reader, LockReader::new(window));
+        let Ok(settled @ Settled::Word(_)) = full.finish() else { continue };
+        let Ok(near) = settled.near_return(&window) else { continue };
+        let Settled::Word(word) = &settled else { unreachable!() };
+        read += 1;
+        let advances: Vec<i8> = word.symbols().iter().map(|s| s.advance).collect();
+        let mut seen: Vec<i8> = Vec::new();
+        for &a in &advances {
+            if !seen.contains(&a) {
+                seen.push(a);
+            }
+        }
+        let ordinal = |a: i8| seen.iter().position(|&s| s == a).unwrap();
+        let actual: Vec<usize> = advances.iter().map(|&a| ordinal(a)).collect();
+        let tau = near.period();
+        let periodic: Vec<usize> = (0..actual.len()).map(|k| actual[k % tau]).collect();
+        let classes = seen.len();
+        let (near_bits, _) = near.bits();
+        let mut best: Option<u64> = None;
+        let mut carried_any = false;
+        if classes >= 2 {
+            if let Ok(location) = family.locate(classes, &[periodic.clone()]) {
+                for (helix, carrying) in location.carrying() {
+                    carried_any = true;
+                    let transport = carrying.transport();
+                    if transport.classes() as u64 != helix.cells() {
+                        continue;
+                    }
+                    let Ok(code) = located_code(transport, &[actual.clone()]) else { continue };
+                    let back = read_located(helix, classes, &code, &[actual.len()]).expect("the located code reads back");
+                    assert_eq!(back, vec![actual.clone()], "ring {b}: read_located returns the window's word at tick {n}");
+                    let bits = code.len() as u64 + frame_bits + 3 * classes as u64;
+                    best = Some(best.map_or(bits, |kept: u64| kept.min(bits)));
+                }
+            }
+        }
+        match best {
+            Some(bits) => {
+                located += 1;
+                located_bits += bits;
+                spelled_bits += near_bits;
+            }
+            None if carried_any => shape += 1,
+            None => unlocated += 1,
+        }
+        if n % CHUNK < window.length() + 1 {
+            println!("w3 ring {b}: ticks {} elapsed {} ms", n + 1, started.elapsed().as_millis());
+        }
+    }
+    format!(
+        "w3 ring {b}: windows read {read}; located {located}; carried but shape-refused {shape}; not located {unlocated}; located bits {located_bits} against the same windows' spelled near-return bits {spelled_bits}"
+    )
+}
+
 /// Bits needed for an index into `count` values (`0` when one value).
 fn index_width(count: &BigInt) -> u64 {
     if *count <= BigInt::one() { 0 } else { (count - 1u32).bits() }
@@ -875,6 +962,10 @@ fn main() {
         .map(|x| x.trim_end_matches(",fine").parse().unwrap());
     let fine = args.get(5).is_some_and(|x| x.ends_with(",fine"));
     let phase_ring: Option<usize> = args.get(5).and_then(|x| x.strip_prefix("phase=")).map(|x| x.parse().unwrap());
+    let w3_rings: Option<Vec<usize>> = args
+        .get(5)
+        .and_then(|x| x.strip_prefix("w3="))
+        .map(|x| x.split(',').map(|r| r.parse().unwrap()).collect());
     let started = Instant::now();
     let (rate, pcm) = read_wav(input);
     let scale = Rat::new(BigInt::one(), BigInt::one() << PCM as usize);
@@ -891,6 +982,24 @@ fn main() {
     let ladder: Vec<Rat> = (0..RINGS)
         .map(|b| rat(1, 50) * (0..b).fold(Rat::one(), |x, _| x * rat(6, 5)))
         .collect();
+    if let Some(rings) = w3_rings {
+        // Record §27: W3 on the chosen rings, one thread each.
+        let lines: Vec<String> = std::thread::scope(|scope| {
+            let handles: Vec<_> = rings
+                .iter()
+                .map(|&b| {
+                    let (ladder, stream) = (&ladder, &stream);
+                    scope.spawn(move || w3_pass(b, &ladder[b], stream, started))
+                })
+                .collect();
+            handles.into_iter().map(|h| h.join().expect("a ring's W3 pass")).collect()
+        });
+        for line in lines {
+            println!("{line}");
+        }
+        println!("w3: elapsed {} ms", started.elapsed().as_millis());
+        return;
+    }
     if let Some(b) = phase_ring {
         // Record §21: the sample as the ring's phase address; emit, decode independently, compare.
         let (bytes, class_bits, path_bits, index_bits) = phase_encode(b, &ladder[b], &stream, rate);
