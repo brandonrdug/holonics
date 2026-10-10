@@ -26,15 +26,21 @@ fixes only what can be checked exactly.
   part of the reflected wave the ring produces: the direct reflection `a` is the source's own. The
   rendered sample is one feedback tick at the 16-bit PCM lattice,
   `g·Σ_b e_b + r_(n−1) = q_n 2^(−15) + r_n` with `|r_n| ≤ 2^(−16)`. The gain `g` is the largest `2^(−k)`
-  that keeps every `|q_n| ≤ 2^15 − 1`: a normalization at the exterior boundary, read from the
-  emission's own peak.
+  with `g · peak ≤ 1 − 2^(−14)`, the declared headroom ceiling, a normalization at the exterior
+  boundary read from the emission's own peak; the ceiling guarantees every `|q_n| ≤ 2^15 − 1` after
+  one feedback tick. It is maximal under that ceiling, not among every gain whose samples fit
+  (corrected October 10 on Codex's review: a single amplitude `1 − 2^(−15)` fits at gain `1`, while
+  the ceiling selects `1/2`).
 - **A3, the stream is one.** Receiving the recording in chunks leaves the same states, remainders and
   render as receiving it whole.
 - **A4, the output.** A 16-bit mono file at the recording's rate: the recording's length followed by
   one second of continuation (incident `a = 0`, the rings emitting what they hold).
 
 **Not claimed:** that the bank is learned or located (it is declared, §2); that anything is
-generated, predicted or recognized; any quality or fidelity reading. The output is the bank's
+generated, predicted or recognized; any quality or fidelity reading. The boundedness is for the fixed
+rational bank and the fixed PCM grain; the chunk equivalence (A3) is for a shared gain and the
+continued state; the whole window's PCM remainder accounts for the summed quantization error, not
+for any reconstruction of the source. The output is the bank's
 response, a release of its dynamics, and is never compared with an invented control.
 
 ## 2. The declared bank, and each choice with its reason
