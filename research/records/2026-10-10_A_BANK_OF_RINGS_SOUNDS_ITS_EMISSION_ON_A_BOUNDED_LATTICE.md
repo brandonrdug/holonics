@@ -765,3 +765,15 @@ section chart, still exact by signs, and declared like `RAYS`; it is not learned
 length at the octant grain against the quarter-turn grain on the same ring and ticks, with the
 decode exact in both. Neither length is read as learned content. Both are the section chart's
 grain against the uniform samples.
+
+[measured] **The octant pays** ([receipt](receipts/2026-10-10-acoustic-release/OCTANT_CODEC.v1.json)):
+464561780139 ns against a projection of 465 s (deadline 480 s). Gate 1 passed at `39304646`. Ring 20
+over the 93680 ticks emitted 170537 bytes, which is **1364296** bits with the header and padding,
+against the quarter-turn cell's 1481048 and the samples' 1498880. That is 116752 fewer than the
+quarter turn and 134584 fewer than the samples. The decode is exact on every sample, and the cell
+(class and octant) and the inverse tick held at every tick.
+
+The quadrant's two sign tests often leave the interval open on one side. The octant's mixed test
+`s_w w′ − s_u u′` closes it, which is why one bit buys more than one bit's narrowing. The margin is
+still the section chart's grain against the uniform samples, not learned content. §21 takes the
+grain's limit as the principle: refine the cell by mediants until the sample is determined.
