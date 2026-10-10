@@ -1059,3 +1059,42 @@ step needs is the scale of the covector arriving at the family through **both** 
 tangents only, that covector is not formed. Deriving it, by an adjoint through the World port or by
 a bound read from the tangents, is the next source issue. The step size is never chosen in its place.
 
+### 7j. The adjoint through the World port (acceptance fixed before code)
+
+[definition; agent-inferred, October 10] The native reverse sweep (`port::reverse_core_joined`)
+treats each actual source return as exterior. At every tick with a return it zeroes the covector on
+the overwritten source storage, with the note *no World adjoint … is inferred*. The World-sensitive
+step needs the covector that reaches each family through both paths (§7i), so the sweep gains the
+World port through the located key's charts at the commits the returns read. The forward tick is
+§3a's:
+
+```text
+a_t = s_r(t)                  the source ring's storage after the native tick (the emitted wave)
+ξ_(t+1) = F_t ξ_t + G_t a_t   the World's state           b_t = P_t ξ_t + Q_t a_t   overwrites s_r(t)
+f_j = H ξ_(t_j + 1)           the key's declared face, read after the step at each compared station j
+```
+
+Its transpose, swept backward with `λ_b` the covector the sweep holds on the overwritten storage and
+`μ` the World's covector (zero after the last tick):
+
+```text
+μ_t   = F_tᵀ μ_(t+1) + P_tᵀ λ_b(t) + Hᵀ φ_j        (φ_j the observed face's covector at station j's tick)
+s̄_r(t) = Q_tᵀ λ_b(t) + G_tᵀ μ_(t+1)                  replaces the zeroing; then the native tick's transpose as now
+```
+
+The observed face's covector is the comparison's own: `φ_j = −Im g_j` on the imaginary logit
+entries (series (5)'s observed phase, with its sign), and `0` on the real ones.
+
+**Acceptance, fixed before code:**
+- **(a) The consumer identity.** For every declared contact coordinate, the adjoint's pairing with the
+  coordinate's forcing equals the forward tangent's comparison credit exactly, magnitude plus both
+  phase parts, on the published fixture after twelve encounters, at the present opening and at the
+  cycle's orbit. Exact equality, not a ladder.
+- **(b) The normalization.** The covector scale `c = max_t |g_t|_∞` read from the World-sensitive
+  return is positive on fixture 1's orbit, where the native-only return's is zero (§7i).
+- **(c) The landing, reported as measured.** With that normalization, the cycle landing on fixture 1,
+  then the fourteen-round trajectory against the twin.
+
+The World adjoint is the key's, and exact only where the key is located to a point (§3a). The
+native-only return stays the exterior-return law wherever no key is located.
+
