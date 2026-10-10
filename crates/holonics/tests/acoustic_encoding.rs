@@ -1234,6 +1234,7 @@ fn the_field_learns_a_rings_section_word_online() {
             let encoding = Encoding::found(&located).unwrap();
             let chart_bits = located_code(carrying.transport(), &[actual[..prefix].to_vec()]).unwrap().len();
             let mut learner_sums = Vec::new();
+            let mut letters_charge_clocked = 0i64;
             for clocked in [false, true] {
                 let plain = field_on(helix.periods());
                 let field = if clocked {
@@ -1304,6 +1305,9 @@ fn the_field_learns_a_rings_section_word_online() {
                     assert!(continued < 2 * tau, "cell letters alone: the majority read (§3, §4)");
                 }
                 learner_sums.push(sums[0].clone());
+                if clocked {
+                    letters_charge_clocked = letters_charge;
+                }
             }
             println!(
                 "§10 settle {settle} frame {:?}: C3'' the clocked learner's upper {} against the cell-only learner's lower {}",
@@ -1311,7 +1315,10 @@ fn the_field_learns_a_rings_section_word_online() {
                 learner_sums[1].1,
                 learner_sums[0].0
             );
-            assert!(learner_sums[1].1 < learner_sums[0].0, "C3'': the clock letter lowers the learner's code");
+            // C3'' charged: the clocked learner's code plus the letters' declaration in the field's
+            // code lies below the cell-only learner's (§10, §13).
+            let charged = &learner_sums[1].1 + integer(letters_charge_clocked);
+            assert!(charged < learner_sums[0].0, "C3'': the clock letter lowers the learner's code, its charge included");
         }
     }
     assert!(read > 0);
@@ -1493,14 +1500,23 @@ fn decode_tone(context: &ToneContext, stream: &[bool]) -> Vec<num_bigint::BigInt
         }
         context.prefix_ordinals.iter().map(|o| of.iter().find(|(x, _)| x == o).unwrap().1).collect()
     };
+    // Each decoded chart cell denotes an advance (its ordinal's label in the dictionary); the
+    // section symbols follow by the carry law from the opening's class, and the word is admitted.
     let start = quadrant(&[context.opening[1][0].clone(), context.opening[0][0].clone()]).unwrap();
     let mut class = start;
-    let mut landings = Vec::with_capacity(context.length);
+    let mut symbols = Vec::with_capacity(context.length);
     for &cell in prefix_classes.iter().chain(&continuation) {
-        let (_, landed) = land(class, context.dictionary[ordinal_of[cell].unwrap()]).unwrap();
-        landings.push(landed);
+        let advance = context.dictionary[ordinal_of[cell].unwrap()];
+        let (crossing, landed) = land(class, advance).unwrap();
+        symbols.push(holonics::hnn::dynamic_section::SectionSymbol { class, advance, crossing });
         class = landed;
     }
+    let word = holonics::hnn::section_lock::SectionWord::new(symbols).expect("the decoded symbols are a section word");
+    let landings: Vec<u8> = word
+        .symbols()
+        .iter()
+        .map(|symbol| land(symbol.class, symbol.advance).unwrap().1)
+        .collect();
     let zero = ResonatorRemainders::default();
     let mut state = context.opening.clone();
     let mut samples = Vec::with_capacity(context.length);

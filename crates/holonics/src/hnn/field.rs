@@ -2296,11 +2296,11 @@ impl Field {
                         naturals(&mut code, &[0, *ring as u64, *grain]);
                     }
                     crate::hnn::receiving::Feature::Contact { contact, bound } => {
+                        // The bound's `P` and `Q` coded apart, never reduced: `(1, 2)` and `(2, 4)`
+                        // are different lock families.
                         naturals(&mut code, &[1, *contact as u64]);
-                        rational(
-                            &mut code,
-                            &Rat::new(BigInt::from(bound.numerator.clone()), BigInt::from(bound.denominator.clone())),
-                        );
+                        rational(&mut code, &Rat::from_integer(BigInt::from(bound.numerator.clone())));
+                        rational(&mut code, &Rat::from_integer(BigInt::from(bound.denominator.clone())));
                     }
                 }
             }

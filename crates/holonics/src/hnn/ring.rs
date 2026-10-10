@@ -1413,9 +1413,12 @@ impl ResonatorOperands {
     /// the integers `k` of the drives `x = k · grain` inside `range` for which the point lands in the
     /// quadrant `class` (`w′` and `u′` signed by the class; `None`, the origin: both zero) and, where
     /// `octant` is declared, on its half `|w′| ≥ |u′|` (`true`) or `<` (`false`), read as
-    /// `s_w w′ − s_u u′` by the class's signs. Each cut is widened by one value at each end, so a
-    /// lattice's rounding of the landing is inside it; the consumer checks the landing it decodes.
-    /// Refused where the exact step refuses.
+    /// `s_w w′ − s_u u′` by the class's signs. Each cut is widened by one value at each end: an
+    /// enclosure of the drives that land in the cell, not its exact least fibre. On the exact law
+    /// the widening covers the cut's own boundary; on a lattice it covers the landing's rounding only
+    /// where that rounding moves the cut by at most one value at the declared grain (the consumer
+    /// states that scale). The consumer checks the landing it decodes. Refused where the exact step
+    /// refuses.
     pub fn drive_interval(
         &self,
         tick: usize,

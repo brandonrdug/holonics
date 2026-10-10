@@ -668,8 +668,10 @@ at commit 18.
     read.
   - From commit 20 on, the descent's step, which also shrinks as each move lifts the Gram by `2^k`,
     no longer reaches one unit of the map.
-  - The prior's exponent then climbs by one per commit without end. This is the Lean module's own
-    item 3, "the code falls toward the zero map without end".
+  - The prior's exponent then climbs by one per commit, to `97` at commit 106, where the measured
+    sequence ends. The Lean module's item 3 reads "toward the zero map without end", but
+    `LocatedPrior::member` holds at `RESIDUAL_SHIFT`. So the climb is bounded by the carrier, and only
+    the measured prefix is claimed (§14).
 
 [definition] **The owner question, answered from the owners.**
 - **The prior's move is an actual amplitude change of the map, not a read-preserving
@@ -752,3 +754,51 @@ read, `acoustic_encoding` 11 of 11, 78939416050 ns.)
     alphabet.
   - The admitted `Encoded` fixtures always supplied valid digits, so no measured continuation
     changes.
+
+## 14. Precision from the D1 and O3/M1 reviews, and the next owner decision
+
+[definition] Codex's scoped GOs (D1 at `83f14e23`; O3 and M1 at `1a7af330`) stand with these
+precisions, applied here and in the source:
+- **The class code's operand.** The interval code runs under the released combined face's rational
+  odometer chart `p̃` (`Face::odometer_masses`), not the algebraic mass `p̂` nor the compare-scored
+  population. The 25 bits are an actual interval-code length under `p̃`, and the release reads no
+  target before those masses are taken.
+- **§9, step 4, corrected.** A decoded class is a **chart cell denoting an advance**, not a landing
+  class. The decoder composes chart cell, ordinal's label in the dictionary, advance, then `land`
+  from the opening's class to give the landing. It now builds the `SectionSymbol`s, admits the
+  `SectionWord` (`SectionWord::new`), and reads the landings from it. §9's uniform comparator was
+  stale: the continuation is `92 = 2²·23` cells after the 28-cell prefix, not 113.
+- **D2 is partial, not met under its first acceptance.**
+  - The opening state is computed from the tone and supplied in memory, with no encoding or charge.
+  - No stream yet frames the prefix, the chart and dictionary, the opening, the class code and the
+    indices together.
+  - Under the fixed 6-bit sample range, the 722-bit payload (`25 + 28 + 669`) already exceeds the
+    window's `720 = 2⁴·3²·5` raw bits before any context.
+  - This retracts no part of D1 and makes no compression claim.
+- **`drive_interval` is a widened enclosure** checked by the landing, not an exact least fibre. Its
+  lattice statement needs the scale bound at its consumer (the doc now says so). The tone's
+  reconstruction is on the exact law, with no missing carry operand.
+- **C3″ is asserted charged:** the clocked code plus the letters' 17 bits lies below the cell-only
+  code. The measured readings already met it (`11/2 + 17 < 67/2`).
+- **`Field::describe` codes a contact slot's bound `(P, Q)` as two integers, never reduced.** Before,
+  `(1, 2)` and `(2, 4)` collapsed although their lock families differ.
+- **§11's "without end" is scoped to the measured prefix**, which ends at exponent 97;
+  `LocatedPrior::member` holds at `RESIDUAL_SHIFT`.
+
+[definition; agent-inferred] **The decision on the receiving prior (owner question, §11).** The
+reviewer proposes an atomic prior candidate certified on the actual post-descent receiving operands.
+**I take it, as the next owner change, after the current candidate enters the queue:**
+- the one located prior member is formed privately as a candidate;
+- a receiving-comparison certificate is bound to the post-descent producing operands and the actual
+  carried candidate, class and phase included, at the grain, with the released tail;
+- if it certifies, the move commits;
+- if not, the prior holds with its typed reason, and the certified descent commits unchanged.
+
+Not to be done:
+- silently move only the Gram;
+- freeze the prior to pass this fixture;
+- raise a precision;
+- borrow the contact-only finite-decrease admission unchanged.
+
+Its acceptance is fixed in a dated record before code. Its Lean counterpart, the certified move's
+inequality, goes to #62 if it is not proved with it.

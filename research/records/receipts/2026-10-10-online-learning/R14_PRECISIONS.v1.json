@@ -1,0 +1,31 @@
+{
+  "scope": "Local developer reads by opus under the common lease, not claim-bearing: the online-learning record section 14.",
+  "runs": [
+    {
+      "scope": "acoustic_encoding 11 of 11 after the section 14 repairs (C3 charged assertion, the admitted SectionWord in the decoder)",
+      "log_sha256": "6cb767155e069af855105cc4f4e4e355385a616813b14b0e24c2a5943b91fb1e",
+      "lines": [
+        "test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 54.02s",
+        "BOUNDED start 15:00:21 end 15:01:39 exit 0 wall_ns 78316945520 child_peak_rss_kib 2244632"
+      ]
+    },
+    {
+      "scope": "receiving 38 of 38 (the contact bound coded apart)",
+      "log_sha256": "b7562f2f29f22d75173852aeb54140befd68eefba22f0245b98e59ee8088e458",
+      "lines": [
+        "test result: ok. 38 passed; 0 failed; 0 ignored; 0 measured; 1170 filtered out; finished in 6.57s",
+        "BOUNDED start 15:01:39 end 15:01:53 exit 0 wall_ns 14247566474 child_peak_rss_kib 1574940"
+      ]
+    },
+    {
+      "scope": "gate 1",
+      "log_sha256": "a23ee2be6411a88c5bced56122df4c2fb4e721831203812b2e883ad300d77ffb",
+      "lines": [
+        "gate check: ok (3607 ms)",
+        "gate guard-lints: ok (9439 ms)",
+        "gate guard-doctests: ok (26927 ms)",
+        "BOUNDED start 15:01:53 end 15:02:33 exit 0 wall_ns 39990591980 child_peak_rss_kib 1992808"
+      ]
+    }
+  ]
+}
