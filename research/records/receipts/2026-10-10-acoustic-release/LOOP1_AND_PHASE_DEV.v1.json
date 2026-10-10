@@ -1,0 +1,20 @@
+{
+ "scope": "Local developer reads by opus under the common lease (announced), not claim-bearing.",
+ "loop1_W1": {
+  "log_sha256": "c90c2fc940029a74552be4f236884f842502c128d767ec4148d8bc14435b11b9",
+  "lines": [
+   "located section word (clean): τ 7, defects 0, near-return bits (27, 360), frames carrying 0 of 38; tally FrameTally { narrow: 13, empty: 13, plural: 12, open: 0, one: 0 }",
+   "test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 7 filtered out; finished in 1.74s",
+   "BOUNDED start 07:00:34 end 07:00:36 exit 101 wall_ns 1840679026 child_peak_rss_kib 28492"
+  ],
+  "reading": "W1 not met: the near-return cycle (tau 7, 0 defects) of the ring t = 1 under F1 is carried by none of FrameFamily::pairs(9)'s 38 frames: narrow 13, empty 13, plural 12, open 0, one 0. The first version of the test asserted a carrying frame and FAILED (exit 101); it is rewritten to pin the typed reading."
+ },
+ "phase_address_dev": {
+  "log_sha256": "917bba7796a6acdbc44940f35e114c7a840cb8b3b12ded24230e6e6c8e7171a6",
+  "lines": [
+   "phase ring 20: 2000 ticks; class bits 6000; Farey path bits 20458; index bits (still lines and capped descents) 30; emitted 3320 bytes = 26560 bits; raw 32000 bits; decode equals the source exactly: true; encoded at 7745 ms, decoded at 14988 ms",
+   "BOUNDED start 07:00:56 end 07:01:11 exit 0 wall_ns 14989974078 child_peak_rss_kib 13300"
+  ],
+  "reading": "2000 ticks on ring 20: 26560 emitted bits (class 6000, Farey path 20458, index 30, header and padding) against the octant's 24440 and the quarter turn's 28032 on the same ticks; decode exact. No full run."
+ }
+}

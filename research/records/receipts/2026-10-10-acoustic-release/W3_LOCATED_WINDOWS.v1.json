@@ -1,0 +1,102 @@
+{
+  "scope": "Local developer reads by opus under the common lease (announced), not claim-bearing: W3, the recording's windows through the located navigator's own code (bank record sections 27, 27a, 27b). Debug binary of the example at 9a930d20a, with the per-ring result print repaired for the split reads.",
+  "runs": [
+    {
+      "scope": "development read: ring 20, first 2000 ticks, 1 thread",
+      "log_sha256": "2ae4fd8c5fb4683ae3ed65f78ddd012892b905268745c338807a8130c2ffa796",
+      "deadline_s": 120,
+      "projection": null,
+      "lines": [
+        "release: 2000 recorded ticks + 500 continuation ticks at 16000 per second, 24 rings on 1 threads",
+        "w3 ring 20: windows read 16; located 4; carried but shape-refused 0; not located 12; located bits 235 against the same windows' spelled near-return bits 224",
+        "w3: elapsed 3856 ms",
+        "BOUNDED start 07:14:19 end 07:14:23 exit 0 wall_ns 3858294942 child_peak_rss_kib 13836"
+      ]
+    },
+    {
+      "scope": "full read: rings 0,8,16,20 over all 93680 ticks, 4 threads. INCOMPLETE at its deadline (exit 124); no ring result read",
+      "log_sha256": "8d92fcfd7b234ff0b6d40fa2af4fe1ffb3d3ef39313357cd603f4d5bee58024c",
+      "deadline_s": 300,
+      "projection": "about 200 s from the development read",
+      "lines": [
+        "release: 93680 recorded ticks + 16000 continuation ticks at 16000 per second, 24 rings on 4 threads",
+        "w3 ring 16: ticks 37 elapsed 176 ms",
+        "w3 ring 8: ticks 149 elapsed 254 ms",
+        "w3 ring 0: ticks 633 elapsed 465 ms",
+        "w3 ring 0: ticks 8229 elapsed 2960 ms",
+        "w3 ring 8: ticks 8046 elapsed 4646 ms",
+        "w3 ring 0: ticks 16458 elapsed 6081 ms",
+        "w3 ring 0: ticks 24054 elapsed 9109 ms",
+        "w3 ring 8: ticks 16092 elapsed 9380 ms",
+        "w3 ring 16: ticks 8029 elapsed 11962 ms",
+        "w3 ring 0: ticks 32283 elapsed 12242 ms",
+        "w3 ring 8: ticks 24138 elapsed 14017 ms",
+        "w3 ring 0: ticks 40512 elapsed 15457 ms",
+        "w3 ring 0: ticks 48108 elapsed 18360 ms",
+        "w3 ring 8: ticks 32035 elapsed 19922 ms",
+        "w3 ring 0: ticks 56337 elapsed 21471 ms",
+        "w3 ring 16: ticks 16021 elapsed 23858 ms",
+        "w3 ring 8: ticks 40081 elapsed 24591 ms",
+        "w3 ring 0: ticks 64566 elapsed 24702 ms",
+        "w3 ring 0: ticks 72162 elapsed 27730 ms",
+        "w3 ring 8: ticks 48127 elapsed 29137 ms",
+        "w3 ring 0: ticks 80391 elapsed 30928 ms",
+        "w3 ring 0: ticks 88620 elapsed 34006 ms",
+        "w3 ring 20: ticks 8001 elapsed 37787 ms",
+        "w3 ring 8: ticks 56024 elapsed 38479 ms",
+        "w3 ring 8: ticks 64070 elapsed 43307 ms",
+        "w3 ring 8: ticks 72116 elapsed 47898 ms",
+        "w3 ring 8: ticks 80013 elapsed 52386 ms",
+        "w3 ring 16: ticks 40034 elapsed 59448 ms",
+        "w3 ring 8: ticks 88059 elapsed 59777 ms",
+        "w3 ring 16: ticks 64010 elapsed 97837 ms",
+        "w3 ring 16: ticks 72002 elapsed 111110 ms",
+        "w3 ring 20: ticks 32004 elapsed 122678 ms",
+        "w3 ring 16: ticks 80031 elapsed 129408 ms",
+        "w3 ring 16: ticks 88023 elapsed 139762 ms",
+        "w3 ring 20: ticks 48006 elapsed 179307 ms",
+        "w3 ring 20: ticks 56007 elapsed 210143 ms",
+        "w3 ring 20: ticks 64008 elapsed 243049 ms",
+        "BOUNDED start 07:16:46 end 07:21:46 exit 124 wall_ns 300001503956 child_peak_rss_kib 20044"
+      ]
+    },
+    {
+      "scope": "split read (a): rings 0,8,16 over all 93680 ticks, 3 threads, repaired driver",
+      "log_sha256": "da85537809bb5b63c8bff2cc3ef20f0681c49b27ce0717336baa324056c7ebbd",
+      "deadline_s": 180,
+      "projection": "175094412/1147 ms",
+      "lines": [
+        "release: 93680 recorded ticks + 16000 continuation ticks at 16000 per second, 24 rings on 3 threads",
+        "w3 ring 0: windows read 147; located 0; carried but shape-refused 0; not located 147; located bits 0 against the same windows' spelled near-return bits 0 (elapsed 35436 ms)",
+        "w3 ring 8: windows read 606; located 0; carried but shape-refused 0; not located 606; located bits 0 against the same windows' spelled near-return bits 0 (elapsed 62518 ms)",
+        "w3 ring 16: windows read 1932; located 84; carried but shape-refused 0; not located 1848; located bits 6766 against the same windows' spelled near-return bits 7557 (elapsed 146511 ms)",
+        "w3: elapsed 146511 ms",
+        "BOUNDED start 07:26:14 end 07:28:41 exit 0 wall_ns 146513953189 child_peak_rss_kib 13836"
+      ]
+    },
+    {
+      "scope": "split read (b): ring 20 over its first 40000 ticks, 1 thread, repaired driver",
+      "log_sha256": "342b5054c2d487f23eaad77b47cf6035a215aefa9b5948afd0d3e7988d38983e",
+      "deadline_s": 180,
+      "projection": "1244663054/8001 ms",
+      "lines": [
+        "release: 40000 recorded ticks + 10000 continuation ticks at 16000 per second, 24 rings on 1 threads",
+        "w3 ring 20: windows read 783; located 78; carried but shape-refused 2; not located 703; located bits 4752 against the same windows' spelled near-return bits 3978 (elapsed 158123 ms)",
+        "w3: elapsed 158123 ms",
+        "BOUNDED start 07:26:14 end 07:28:53 exit 0 wall_ns 158126089092 child_peak_rss_kib 18804"
+      ]
+    },
+    {
+      "scope": "gate 1 on the repaired driver",
+      "log_sha256": "bc42421aa682bd5d45cd6aa1d66bb6466606fc90e0aa731c2c1cfe3e5703b04e",
+      "deadline_s": 120,
+      "projection": "55266985837 ns (last measured gate)",
+      "lines": [
+        "gate check: ok (2859 ms)",
+        "gate guard-lints: ok (9009 ms)",
+        "gate guard-doctests: ok (22886 ms)",
+        "BOUNDED start 07:29:30 end 07:30:05 exit 0 wall_ns 34762167785 child_peak_rss_kib 2445940"
+      ]
+    }
+  ]
+}

@@ -514,6 +514,178 @@ fn cell_interval(
     (lo, hi)
 }
 
+/// The next phase point's exact image, affine in the sample: `(w′, u′) = (w₀ + w_m x, u₀ + u_m x)`, read
+/// by two exact-law steps of the ring owner (record §21).
+fn next_image(operands: &ResonatorOperands, n: usize, u: &[Rat], w: &[Rat]) -> [Rat; 4] {
+    use holonics::hnn::ring::ResonatorRemainders;
+    let zero = ResonatorRemainders::default();
+    let rate = |a: Rat| operands.step(n, &[a, Rat::zero()], [u, w], &zero, None).unwrap().rate;
+    let (r0, r1) = (rate(Rat::zero()), rate(Rat::one()));
+    let m0 = &r1[0] - &r0[0];
+    let hop = operands.hop();
+    [
+        integer(2) * &r0[0] - &w[0],
+        integer(2) * &m0,
+        &u[0] + hop * &r0[0],
+        hop * &m0,
+    ]
+}
+
+/// Exact PCM bounds of `a + b x ⋈ 0` for `x = v 2^(−15)` (`⋈`: `≥` when `strict` is false, `>` when
+/// true; `holds` false negates it), met with `[lo, hi]`.
+fn half_line(a: &Rat, b: &Rat, holds: bool, strict: bool, lo: &mut BigInt, hi: &mut BigInt) {
+    if b.is_zero() {
+        return;
+    }
+    // a + b x ≥ 0 (or > 0); its negation is a + b x < 0 (or ≤ 0): flip the sign and the strictness.
+    let (a, b, strict) = if holds { (a.clone(), b.clone(), strict) } else { (-a, -b, !strict) };
+    let root = -(&a / &b) * Rat::from_integer(BigInt::one() << PCM as usize);
+    if b.is_positive() {
+        let bound = if strict { root.floor().to_integer() + 1 } else { root.ceil().to_integer() };
+        *lo = lo.clone().max(bound);
+    } else {
+        let bound = if strict { root.ceil().to_integer() - 1 } else { root.floor().to_integer() };
+        *hi = hi.clone().min(bound);
+    }
+}
+
+/// [definition; agent-inferred, October 10; the bank record §21] **The sample as the ring's phase
+/// address.** The class of the next state's exact image (`w > 0, u ≥ 0` for class 0, and so on round
+/// the quadrants, `dynamic_section::quadrant`'s convention), then the Stern–Brocot descent of its slope
+/// `σ = (s_u u′)/(s_w w′)`: at node `p/q` the bit is `σ ≥ p/q`, the exact sign test
+/// `q s_u u′ − p s_w w′ ≥ 0`. Each test is a half-line on the sample, met exactly; the descent stops
+/// when the interval holds one PCM value. The bits are the Farey address of the ring's phase to the
+/// grain the sample needs, and nothing else is coded. `decide` gives each bit (the encoder from the
+/// actual sample, the decoder from the stream); returns the class code, the path and the value.
+fn phase_address(
+    image: &[Rat; 4],
+    mut class_of: impl FnMut() -> u8,
+    mut decide: impl FnMut(&Rat, &Rat) -> bool,
+) -> (u8, Vec<bool>, BigInt, BigInt) {
+    let [w0, wm, u0, um] = image;
+    let (mut lo, mut hi) = (BigInt::from(-32768), BigInt::from(32767));
+    let class = class_of();
+    // class: (w sign holds, w strict), (u sign holds, u strict) per quadrant, as `quadrant` reads.
+    match class {
+        0 => { half_line(w0, wm, true, true, &mut lo, &mut hi); half_line(u0, um, true, false, &mut lo, &mut hi); }
+        1 => { half_line(w0, wm, false, true, &mut lo, &mut hi); half_line(u0, um, true, true, &mut lo, &mut hi); }
+        2 => { half_line(w0, wm, false, false, &mut lo, &mut hi); half_line(u0, um, false, true, &mut lo, &mut hi); }
+        3 => { half_line(w0, wm, true, false, &mut lo, &mut hi); half_line(u0, um, false, false, &mut lo, &mut hi); }
+        _ => {
+            // the origin: both coordinates zero.
+            half_line(w0, wm, true, false, &mut lo, &mut hi); half_line(w0, wm, false, true, &mut lo, &mut hi);
+            half_line(u0, um, true, false, &mut lo, &mut hi); half_line(u0, um, false, true, &mut lo, &mut hi);
+        }
+    }
+    let mut path = Vec::new();
+    // A sample whose line passes through the origin (u₀ w_m = w₀ u_m, the ring at rest among them)
+    // moves no slope: the descent reads nothing there, and the index codes what remains.
+    let moves = u0 * wm != w0 * um;
+    if class < 4 && moves {
+        let (sw, su) = match class { 0 => (1i64, 1i64), 1 => (-1, 1), 2 => (-1, -1), _ => (1, -1) };
+        let (sw, su) = (integer(sw), integer(su));
+        let (mut a, mut b, mut c, mut d) = (BigInt::from(0), BigInt::one(), BigInt::one(), BigInt::from(0));
+        while lo < hi && path.len() < 256 {
+            let (p, q) = (&a + &c, &b + &d);
+            let (pr, qr) = (Rat::from_integer(p.clone()), Rat::from_integer(q.clone()));
+            let big_a = &qr * &su * u0 - &pr * &sw * w0;
+            let big_b = &qr * &su * um - &pr * &sw * wm;
+            let up = decide(&big_a, &big_b);
+            path.push(up);
+            half_line(&big_a, &big_b, up, false, &mut lo, &mut hi);
+            if up { a = p; b = q; } else { c = p; d = q; }
+        }
+    }
+    (class, path, lo, hi)
+}
+
+/// [definition; agent-inferred, October 10; the bank record §27] **W3, one ring's located windows**:
+/// for each admitted near-return window of ring `b` (§11's windows, four of its turns), the cycle is
+/// read as its own advances' ordinals (the relabelling law) and located on the declared two-ring
+/// frames (`FrameFamily::pairs(9)`); on each carrying frame whose shape the navigator's code admits
+/// (its cells equal the classes), the window's actual word is coded by the owner's
+/// `located_code` (transport, labels, key and patches, the patches being the departures) and read
+/// back by `read_located`, which must return the word; the located length is the shortest such code
+/// plus the frame's index (`⌈log₂ 38⌉`) and the ordinal map (`3` bits per class). Returns, per ring,
+/// the windows read, located, not located (by the frames' readings) and shape-refused, with the
+/// located bits against the same windows' spelled near-return bits.
+fn w3_pass(b: usize, t: &Rat, stream: &[Rat], started: Instant) -> String {
+    use holonics::compression::keys::frames::FrameFamily;
+    use holonics::compression::keys::transport::{located_code, read_located};
+    let operands = declared_ring(t);
+    let lattice = Lattice::new(STATE_LATTICE);
+    let (_, turn_ticks) = half_memory(&operands, lattice);
+    let window = LockWindow::new(0, 4 * turn_ticks).unwrap();
+    let family = FrameFamily::pairs(9).unwrap();
+    let frame_bits = u64::from(usize::BITS - (family.frames().len() - 1).leading_zeros());
+    let mut port = WavePort::on_lattice(operands.clone(), 0, lattice).unwrap();
+    let mut reader = LockReader::new(window);
+    let (mut read, mut located, mut unlocated, mut shape) = (0u64, 0u64, 0u64, 0u64);
+    let (mut located_bits, mut spelled_bits) = (0u64, 0u64);
+    for (n, sample) in stream.iter().enumerate() {
+        let wave = MatchedWave::new(operands.admittance().clone(), operands.hop().clone(), vec![sample.clone()]).unwrap();
+        let tick = port.receive(&wave).unwrap().next().unwrap().unwrap();
+        if reader.observe([tick.step.state[1][0].clone(), tick.step.state[0][0].clone()]).is_err() {
+            reader = LockReader::new(window);
+            continue;
+        }
+        if reader.seen() < window.length() + 1 {
+            continue;
+        }
+        let full = std::mem::replace(&mut reader, LockReader::new(window));
+        let Ok(settled @ Settled::Word(_)) = full.finish() else { continue };
+        let Ok(near) = settled.near_return(&window) else { continue };
+        let Settled::Word(word) = &settled else { unreachable!() };
+        read += 1;
+        let advances: Vec<i8> = word.symbols().iter().map(|s| s.advance).collect();
+        let mut seen: Vec<i8> = Vec::new();
+        for &a in &advances {
+            if !seen.contains(&a) {
+                seen.push(a);
+            }
+        }
+        let ordinal = |a: i8| seen.iter().position(|&s| s == a).unwrap();
+        let actual: Vec<usize> = advances.iter().map(|&a| ordinal(a)).collect();
+        let tau = near.period();
+        let periodic: Vec<usize> = (0..actual.len()).map(|k| actual[k % tau]).collect();
+        let classes = seen.len();
+        let (near_bits, _) = near.bits();
+        let mut best: Option<u64> = None;
+        let mut carried_any = false;
+        if classes >= 2 {
+            if let Ok(location) = family.locate(classes, &[periodic.clone()]) {
+                for (helix, carrying) in location.carrying() {
+                    carried_any = true;
+                    let transport = carrying.transport();
+                    if transport.classes() as u64 != helix.cells() {
+                        continue;
+                    }
+                    let Ok(code) = located_code(transport, &[actual.clone()]) else { continue };
+                    let back = read_located(helix, classes, &code, &[actual.len()]).expect("the located code reads back");
+                    assert_eq!(back, vec![actual.clone()], "ring {b}: read_located returns the window's word at tick {n}");
+                    let bits = code.len() as u64 + frame_bits + 3 * classes as u64;
+                    best = Some(best.map_or(bits, |kept: u64| kept.min(bits)));
+                }
+            }
+        }
+        match best {
+            Some(bits) => {
+                located += 1;
+                located_bits += bits;
+                spelled_bits += near_bits;
+            }
+            None if carried_any => shape += 1,
+            None => unlocated += 1,
+        }
+        if n % CHUNK < window.length() + 1 {
+            println!("w3 ring {b}: ticks {} elapsed {} ms", n + 1, started.elapsed().as_millis());
+        }
+    }
+    format!(
+        "w3 ring {b}: windows read {read}; located {located}; carried but shape-refused {shape}; not located {unlocated}; located bits {located_bits} against the same windows' spelled near-return bits {spelled_bits}"
+    )
+}
+
 /// Bits needed for an index into `count` values (`0` when one value).
 fn index_width(count: &BigInt) -> u64 {
     if *count <= BigInt::one() { 0 } else { (count - 1u32).bits() }
@@ -616,6 +788,265 @@ fn codec_decode(bytes: &[u8], ladder: &[Rat]) -> Result<(u32, Vec<i16>), String>
     Ok((rate, out))
 }
 
+/// The census window of ring `operands` (record §11): four of its turns.
+fn census_block(operands: &ResonatorOperands) -> usize {
+    4 * half_memory(operands, Lattice::new(STATE_LATTICE)).1
+}
+
+/// **The encoder of record §29**: the cell codec's header, then the stream in blocks of the census
+/// window, each with one flag bit. A block that opens off the origin and whose section word's
+/// near-return is admitted is written as the owner's `NearReturn::code`, then per tick the octant bit
+/// (when declared) and the index; any other block as the cell codec, per tick. Returns the bytes and
+/// the reading: the emitted bits, the cell codec's bits on the same stream and grain (counted from
+/// the same per-tick widths), the blocks read and admitted.
+fn nr_encode(b: usize, t: &Rat, stream: &[Rat], rate: u32, fine: bool) -> (Vec<u8>, String) {
+    use holonics::hnn::dynamic_section::{land, quadrant};
+    use holonics::hnn::section_lock::{LockReader, LockWindow, Settled};
+    let operands = declared_ring(t);
+    let lattice = Lattice::new(STATE_LATTICE);
+    let block = census_block(&operands);
+    let window = LockWindow::new(0, block).unwrap();
+    let mut port = WavePort::on_lattice(operands.clone(), 0, lattice).unwrap();
+    let pcm = Rat::from_integer(BigInt::one() << PCM as usize);
+    let mut bits = Vec::new();
+    push_bits(&mut bits, b as u64, 5);
+    push_bits(&mut bits, u64::from(rate), 32);
+    push_bits(&mut bits, stream.len() as u64, 32);
+    push_bits(&mut bits, u64::from(fine), 1);
+    let mut cell_codec = bits.len() as u64;
+    let (mut blocks, mut admitted, mut word_bits, mut replaced) = (0u64, 0u64, 0u64, 0u64);
+    for start in (0..stream.len()).step_by(block) {
+        let end = (start + block).min(stream.len());
+        blocks += 1;
+        let mut reader = LockReader::new(window);
+        let mut reading = reader.observe(port.phase_point()).is_ok();
+        // Per tick: the cell, the octant half, the index and its width.
+        let mut ticks: Vec<(Option<u8>, Option<bool>, u64, u64)> = Vec::with_capacity(end - start);
+        for (n, sample) in stream.iter().enumerate().take(end).skip(start) {
+            let [u, w] = port.state().map(<[Rat]>::to_vec);
+            let wave = MatchedWave::new(operands.admittance().clone(), operands.hop().clone(), vec![sample.clone()]).unwrap();
+            let tick = port.receive(&wave).unwrap().next().unwrap().unwrap();
+            let next = [tick.step.state[1][0].clone(), tick.step.state[0][0].clone()];
+            reading = reading && reader.observe(next.clone()).is_ok();
+            let class = quadrant(&next);
+            let octant = (fine && class.is_some()).then(|| next[0].abs() >= next[1].abs());
+            let (lo, hi) = cell_interval(&operands, n, &u, &w, class, octant);
+            let v = (sample * &pcm).to_integer();
+            assert!(lo <= v && v <= hi, "ring {b}: the sample lies in its cell's interval at tick {n}");
+            ticks.push((class, octant, (&v - &lo).to_u64().unwrap(), index_width(&(&hi - &lo + 1))));
+        }
+        let near = (reading && end - start == block)
+            .then(|| reader.finish().ok())
+            .flatten()
+            .and_then(|settled| match &settled {
+                Settled::Word(word) => settled.near_return(&window).ok().map(|near| (near, word.clone())),
+                Settled::Rest => None,
+            });
+        for &(_, octant, _, width) in &ticks {
+            cell_codec += 3 + u64::from(octant.is_some()) + width;
+        }
+        match near {
+            Some((near, word)) => {
+                // The word's landings are the ticks' cells: the code supplies them.
+                for (symbol, &(class, ..)) in word.symbols().iter().zip(&ticks) {
+                    assert_eq!(Some(land(symbol.class, symbol.advance).unwrap().1), class, "ring {b}: a landing is its tick's cell");
+                }
+                admitted += 1;
+                bits.push(true);
+                let code = near.code();
+                word_bits += code.len() as u64;
+                replaced += 3 * ticks.len() as u64;
+                bits.extend(&code);
+                for &(_, octant, index, width) in &ticks {
+                    if let Some(wide) = octant {
+                        bits.push(wide);
+                    }
+                    push_bits(&mut bits, index, width);
+                }
+            }
+            None => {
+                bits.push(false);
+                for &(class, octant, index, width) in &ticks {
+                    push_bits(&mut bits, u64::from(class.unwrap_or(4)), 3);
+                    if let Some(wide) = octant {
+                        bits.push(wide);
+                    }
+                    push_bits(&mut bits, index, width);
+                }
+            }
+        }
+    }
+    let reading = format!(
+        "emitted {} bits before padding; the cell codec on the same stream and grain {cell_codec} bits; blocks of {block} ticks: {blocks} read, {admitted} admitted, their words {word_bits} bits replacing {replaced} cell bits, flags {blocks} bits",
+        bits.len()
+    );
+    let bytes = bits
+        .chunks(8)
+        .map(|byte| byte.iter().enumerate().fold(0u8, |acc, (k, bit)| acc | (u8::from(*bit) << (7 - k))))
+        .collect();
+    (bytes, reading)
+}
+
+/// **The independent decoder of record §29**: from the bytes and the declared ladder alone. Per
+/// block it reads the flag; a set flag reads the word by `NearReturn::read` from the class of the
+/// state the block opens on (its own state), and the word's landings are the ticks' cells; a clear
+/// flag reads each tick's cell. Each tick's sample is recovered from the interval its own state
+/// gives, forward-ticked, checked to land in the cell read, and checked by the inverse tick.
+fn nr_decode(bytes: &[u8], ladder: &[Rat]) -> Result<(u32, Vec<i16>), String> {
+    use holonics::hnn::dynamic_section::{land, quadrant};
+    use holonics::hnn::ring::ResonatorRemainders;
+    use holonics::hnn::section_lock::NearReturn;
+    let bits: Vec<bool> = bytes.iter().flat_map(|byte| (0..8).map(move |k| (byte >> (7 - k)) & 1 == 1)).collect();
+    let mut at = 0usize;
+    let b = read_bits(&bits, &mut at, 5) as usize;
+    let rate = read_bits(&bits, &mut at, 32) as u32;
+    let ticks = read_bits(&bits, &mut at, 32) as usize;
+    let fine = read_bits(&bits, &mut at, 1) == 1;
+    let operands = declared_ring(ladder.get(b).ok_or("a ring of the declared ladder")?);
+    let lattice = Lattice::new(STATE_LATTICE);
+    let block = census_block(&operands);
+    let mut port = WavePort::on_lattice(operands.clone(), 0, lattice).unwrap();
+    let scale = Rat::new(BigInt::one(), BigInt::one() << PCM as usize);
+    let mut out = Vec::with_capacity(ticks);
+    let mut before = ResonatorRemainders::default();
+    for start in (0..ticks).step_by(block) {
+        let end = (start + block).min(ticks);
+        let flagged = read_bits(&bits, &mut at, 1) == 1;
+        let cells: Option<Vec<u8>> = if flagged {
+            let opening = quadrant(&port.phase_point()).ok_or("a flagged block opens off the origin")?;
+            let mut rest = bits[at..].iter().copied();
+            let left = rest.len();
+            let word = NearReturn::read(&mut rest, opening, end - start).map_err(|e| e.to_string())?;
+            at += left - rest.len();
+            Some(
+                word.symbols()
+                    .iter()
+                    .map(|symbol| land(symbol.class, symbol.advance).map(|(_, landed)| landed))
+                    .collect::<Result<_, _>>()
+                    .map_err(|e| e.to_string())?,
+            )
+        } else {
+            None
+        };
+        for n in start..end {
+            let [u, w] = port.state().map(<[Rat]>::to_vec);
+            let class = match &cells {
+                Some(cells) => Some(cells[n - start]),
+                None => {
+                    let code = read_bits(&bits, &mut at, 3) as u8;
+                    (code < 4).then_some(code)
+                }
+            };
+            let octant = (fine && class.is_some()).then(|| read_bits(&bits, &mut at, 1) == 1);
+            let (lo, hi) = cell_interval(&operands, n, &u, &w, class, octant);
+            let index = read_bits(&bits, &mut at, index_width(&(&hi - &lo + 1)));
+            let v = &lo + BigInt::from(index);
+            let x = Rat::from_integer(v.clone()) * &scale;
+            let wave = MatchedWave::new(operands.admittance().clone(), operands.hop().clone(), vec![x.clone()]).unwrap();
+            let tick = port.receive(&wave).unwrap().next().unwrap().map_err(|e| e.to_string())?;
+            let next = [tick.step.state[1][0].clone(), tick.step.state[0][0].clone()];
+            if quadrant(&next) != class || octant.is_some_and(|wide| (next[0].abs() >= next[1].abs()) != wide) {
+                return Err(format!("tick {n}: the regenerated state leaves the cell read"));
+            }
+            let drive = operands
+                .inverse_step(n, [&u, &w], [&tick.step.state[0], &tick.step.state[1]], &before, tick.step.remainders(), Some(&lattice))
+                .map_err(|e| e.to_string())?;
+            if drive != vec![x.clone(), Rat::zero()] {
+                return Err(format!("tick {n}: the inverse tick does not return the sample"));
+            }
+            before = tick.step.remainders().clone();
+            out.push(v.to_i16().ok_or("a 16-bit sample")?);
+        }
+    }
+    Ok((rate, out))
+}
+
+/// **The phase-address encoder** (record §21): header (ring 5, rate 32, ticks 32), then per tick the
+/// class of the next state's exact image (3 bits), its Farey path (one bit per node), and the index in
+/// what remains when the descent could not finish (a still line, or the cap).
+fn phase_encode(b: usize, t: &Rat, stream: &[Rat], rate: u32) -> (Vec<u8>, u64, u64, u64) {
+    use holonics::hnn::dynamic_section::quadrant;
+    let operands = declared_ring(t);
+    let lattice = Lattice::new(STATE_LATTICE);
+    let mut port = WavePort::on_lattice(operands.clone(), 0, lattice).unwrap();
+    let pcm = Rat::from_integer(BigInt::one() << PCM as usize);
+    let mut bits = Vec::new();
+    push_bits(&mut bits, b as u64, 5);
+    push_bits(&mut bits, u64::from(rate), 32);
+    push_bits(&mut bits, stream.len() as u64, 32);
+    let (mut class_bits, mut path_bits, mut index_bits) = (0u64, 0u64, 0u64);
+    for (n, sample) in stream.iter().enumerate() {
+        let [u, w] = port.state().map(<[Rat]>::to_vec);
+        let image = next_image(&operands, n, &u, &w);
+        let x = sample.clone();
+        let point = [&image[0] + &image[1] * &x, &image[2] + &image[3] * &x];
+        let (class, path, lo, hi) = phase_address(
+            &image,
+            || quadrant(&point).unwrap_or(4),
+            |a, b| a + b * &x >= Rat::zero(),
+        );
+        let v = (&x * &pcm).to_integer();
+        assert!(lo <= v && v <= hi, "ring {b}: the phase address holds the sample at tick {n}");
+        push_bits(&mut bits, u64::from(class), 3);
+        for bit in &path {
+            bits.push(*bit);
+        }
+        let width = index_width(&(&hi - &lo + 1));
+        push_bits(&mut bits, (&v - &lo).to_u64().unwrap(), width);
+        class_bits += 3;
+        path_bits += path.len() as u64;
+        index_bits += width;
+        let wave = MatchedWave::new(operands.admittance().clone(), operands.hop().clone(), vec![x]).unwrap();
+        port.receive(&wave).unwrap().next().unwrap().unwrap();
+    }
+    let bytes = bits.chunks(8)
+        .map(|byte| byte.iter().enumerate().fold(0u8, |acc, (k, bit)| acc | (u8::from(*bit) << (7 - k))))
+        .collect();
+    (bytes, class_bits, path_bits, index_bits)
+}
+
+/// **The phase-address decoder**: from the bytes and the header's declared ring alone, from rest, per
+/// tick it reads the class and replays the Farey descent on its own state's exact image, reading one
+/// bit per node, until one value remains; that value is the sample; it forward-ticks and checks the
+/// ring's inverse tick against it.
+fn phase_decode(bytes: &[u8], ladder: &[Rat]) -> Result<(u32, Vec<i16>), String> {
+    use holonics::hnn::ring::ResonatorRemainders;
+    let bits: Vec<bool> = bytes.iter().flat_map(|byte| (0..8).map(move |k| (byte >> (7 - k)) & 1 == 1)).collect();
+    let mut at = 0usize;
+    let b = read_bits(&bits, &mut at, 5) as usize;
+    let rate = read_bits(&bits, &mut at, 32) as u32;
+    let ticks = read_bits(&bits, &mut at, 32) as usize;
+    let operands = declared_ring(ladder.get(b).ok_or("a ring of the declared ladder")?);
+    let lattice = Lattice::new(STATE_LATTICE);
+    let mut port = WavePort::on_lattice(operands.clone(), 0, lattice).unwrap();
+    let scale = Rat::new(BigInt::one(), BigInt::one() << PCM as usize);
+    let mut out = Vec::with_capacity(ticks);
+    let mut before = ResonatorRemainders::default();
+    for n in 0..ticks {
+        let [u, w] = port.state().map(<[Rat]>::to_vec);
+        let image = next_image(&operands, n, &u, &w);
+        let class = read_bits(&bits, &mut at, 3) as u8;
+        let (_, _, lo, hi) = phase_address(&image, || class, |_, _| {
+            let bit = bits[at];
+            at += 1;
+            bit
+        });
+        let v = &lo + BigInt::from(read_bits(&bits, &mut at, index_width(&(&hi - &lo + 1))));
+        let x = Rat::from_integer(v.clone()) * &scale;
+        let wave = MatchedWave::new(operands.admittance().clone(), operands.hop().clone(), vec![x.clone()]).unwrap();
+        let tick = port.receive(&wave).unwrap().next().unwrap().map_err(|e| e.to_string())?;
+        let drive = operands
+            .inverse_step(n, [&u, &w], [&tick.step.state[0], &tick.step.state[1]], &before, tick.step.remainders(), Some(&lattice))
+            .map_err(|e| e.to_string())?;
+        if drive != vec![x, Rat::zero()] {
+            return Err(format!("tick {n}: the inverse tick does not return the sample"));
+        }
+        before = tick.step.remainders().clone();
+        out.push(v.to_i16().ok_or("a 16-bit sample")?);
+    }
+    Ok((rate, out))
+}
+
 /// [definition; agent-inferred, October 10; the bank record §16] **The source coded through one
 /// ring's cells**: per recorded tick, given the ring's exact carried state, the drive's image is
 /// affine in the sample (`ω = ω₀ + x m`, read by two exact-law steps), so the next state's cell (its
@@ -703,6 +1134,15 @@ fn main() {
         .and_then(|x| x.strip_prefix("codec="))
         .map(|x| x.trim_end_matches(",fine").parse().unwrap());
     let fine = args.get(5).is_some_and(|x| x.ends_with(",fine"));
+    let phase_ring: Option<usize> = args.get(5).and_then(|x| x.strip_prefix("phase=")).map(|x| x.parse().unwrap());
+    let nr_ring: Option<usize> = args
+        .get(5)
+        .and_then(|x| x.strip_prefix("nrcodec="))
+        .map(|x| x.trim_end_matches(",fine").parse().unwrap());
+    let w3_rings: Option<Vec<usize>> = args
+        .get(5)
+        .and_then(|x| x.strip_prefix("w3="))
+        .map(|x| x.split(',').map(|r| r.parse().unwrap()).collect());
     let started = Instant::now();
     let (rate, pcm) = read_wav(input);
     let scale = Rat::new(BigInt::one(), BigInt::one() << PCM as usize);
@@ -719,6 +1159,54 @@ fn main() {
     let ladder: Vec<Rat> = (0..RINGS)
         .map(|b| rat(1, 50) * (0..b).fold(Rat::one(), |x, _| x * rat(6, 5)))
         .collect();
+    if let Some(rings) = w3_rings {
+        // Record §27: W3 on the chosen rings, one thread each. Each ring prints its result when its pass ends
+        // (§27a: a deadline stop keeps the rings that finished).
+        std::thread::scope(|scope| {
+            for &b in &rings {
+                let (ladder, stream) = (&ladder, &stream);
+                scope.spawn(move || println!("{} (elapsed {} ms)", w3_pass(b, &ladder[b], stream, started), started.elapsed().as_millis()));
+            }
+        });
+        println!("w3: elapsed {} ms", started.elapsed().as_millis());
+        return;
+    }
+    if let Some(b) = phase_ring {
+        // Record §21: the sample as the ring's phase address; emit, decode independently, compare.
+        let (bytes, class_bits, path_bits, index_bits) = phase_encode(b, &ladder[b], &stream, rate);
+        let encoded = started.elapsed().as_millis();
+        let (decoded_rate, samples) = phase_decode(&bytes, &ladder).expect("the bytes decode");
+        let exact = decoded_rate == rate && samples.len() == stream.len()
+            && samples.iter().zip(&pcm).all(|(a, b)| a == b);
+        println!(
+            "phase ring {b}: {} ticks; class bits {class_bits}; Farey path bits {path_bits}; index bits (still lines and capped descents) {index_bits}; emitted {} bytes = {} bits; raw {} bits; decode equals the source exactly: {exact}; encoded at {encoded} ms, decoded at {} ms",
+            stream.len(),
+            bytes.len(),
+            8 * bytes.len(),
+            16 * stream.len(),
+            started.elapsed().as_millis()
+        );
+        assert!(exact, "the independent decode equals the source");
+        return;
+    }
+    if let Some(b) = nr_ring {
+        // Record §29: the section word supplies the cells; emit, decode independently, compare.
+        let (bytes, reading) = nr_encode(b, &ladder[b], &stream, rate, fine);
+        let encoded = started.elapsed().as_millis();
+        let (decoded_rate, samples) = nr_decode(&bytes, &ladder).expect("the bytes decode");
+        let exact = decoded_rate == rate && samples.len() == pcm.len().min(stream.len())
+            && samples.iter().zip(&pcm).all(|(a, b)| a == b);
+        println!(
+            "nrcodec ring {b} (octant grain: {fine}): {} ticks; {reading}; emitted {} bytes = {} bits; raw {} bits; decode equals the source exactly: {exact}; encoded at {encoded} ms, decoded at {} ms",
+            stream.len(),
+            bytes.len(),
+            8 * bytes.len(),
+            16 * stream.len(),
+            started.elapsed().as_millis()
+        );
+        assert!(exact, "the independent decode equals the source");
+        return;
+    }
     if let Some(b) = codec_ring {
         // Record §18's consumer: emit the bytes, decode them independently, compare exactly.
         let bytes = codec_encode(b, &ladder[b], &stream, rate, fine);

@@ -159,6 +159,9 @@ pub enum LockRefusal {
     /// The declared window cannot show any period twice.
     #[error("a window of {length} ticks cannot show a period twice")]
     Window { length: usize },
+    /// A near-return's code ended early or named a field outside its range ([`NearReturn::read`]).
+    #[error("the near-return code is malformed: {what}")]
+    Code { what: &'static str },
 }
 
 /// [definition] **The chart relation a section word breaks** (module header).
@@ -475,25 +478,145 @@ impl NearReturn {
     /// **The word, decoded**: the cycle repeated over the window with the defects substituted, the
     /// classes and crossings by the recursion from the opening class ([`land`]).
     pub fn decode(&self) -> Result<SectionWord, LockRefusal> {
-        let mut advances: Vec<i8> = (0..self.length)
-            .map(|k| self.cycle[k % self.cycle.len()])
-            .collect();
-        for &(k, advance) in &self.defects {
-            advances[k] = advance;
-        }
-        let mut class = self.start_class;
-        let mut symbols = Vec::with_capacity(self.length);
-        for advance in advances {
-            let (crossing, landed) = land(class, advance)?;
-            symbols.push(SectionSymbol {
-                class,
-                advance,
-                crossing,
-            });
-            class = landed;
-        }
-        SectionWord::new(symbols)
+        word_of(self.start_class, &self.cycle, self.length, &self.defects)
     }
+
+    /// [definition; agent-inferred, October 10; the bank record §29] **The emitted code**, written
+    /// exactly as `L_τ` prices it: `γ(τ)`; the cycle's `τ` advances, `Δℓ + 2` in 3 bits each;
+    /// `γ(|D| + 1)`; then each defect's `γ(gap)` (from the previous defect, the first from `−1`) and
+    /// its advance in 3 bits. Its length is [`NearReturn::bits`]' first reading. The start class and
+    /// the window length are not written: the reader's consumer holds them (the state the window
+    /// opens on, the declared window).
+    pub fn code(&self) -> Vec<bool> {
+        let mut bits = Vec::new();
+        write_gamma(&mut bits, self.cycle.len());
+        for &advance in &self.cycle {
+            write_advance(&mut bits, advance);
+        }
+        write_gamma(&mut bits, self.defects.len() + 1);
+        let mut last: Option<usize> = None;
+        for &(k, advance) in &self.defects {
+            write_gamma(&mut bits, last.map_or(k + 1, |previous| k - previous));
+            write_advance(&mut bits, advance);
+            last = Some(k);
+        }
+        bits
+    }
+
+    /// **Read a near-return's code** ([`NearReturn::code`]) back into the window's word, given the
+    /// class the window opens on and the window's length. Refused [`LockRefusal::Code`] where the
+    /// bits end early, an advance leaves `{−2, …, 2}`, the period exceeds the window, or a defect
+    /// falls outside it; the word is admitted by [`SectionWord::new`].
+    pub fn read(
+        bits: &mut impl Iterator<Item = bool>,
+        start_class: u8,
+        length: usize,
+    ) -> Result<SectionWord, LockRefusal> {
+        let tau = read_gamma(bits)?;
+        if tau > length {
+            return Err(LockRefusal::Code {
+                what: "a period longer than the window",
+            });
+        }
+        let cycle = (0..tau)
+            .map(|_| read_advance(bits))
+            .collect::<Result<Vec<_>, _>>()?;
+        let count = read_gamma(bits)? - 1;
+        let mut defects = Vec::with_capacity(count);
+        let mut last: Option<usize> = None;
+        for _ in 0..count {
+            let gap = read_gamma(bits)?;
+            let k = last.map_or(gap - 1, |previous| previous + gap);
+            if k >= length {
+                return Err(LockRefusal::Code {
+                    what: "a defect outside the window",
+                });
+            }
+            defects.push((k, read_advance(bits)?));
+            last = Some(k);
+        }
+        word_of(start_class, &cycle, length, &defects)
+    }
+}
+
+/// The window's word from its opening class, cycle and defects: the cycle repeated over `length`
+/// ticks, the defects substituted, the classes and crossings by [`land`].
+fn word_of(
+    start_class: u8,
+    cycle: &[i8],
+    length: usize,
+    defects: &[(usize, i8)],
+) -> Result<SectionWord, LockRefusal> {
+    if cycle.is_empty() {
+        return Err(LockRefusal::Code {
+            what: "an empty cycle",
+        });
+    }
+    let mut advances: Vec<i8> = (0..length).map(|k| cycle[k % cycle.len()]).collect();
+    for &(k, advance) in defects {
+        advances[k] = advance;
+    }
+    let mut class = start_class;
+    let mut symbols = Vec::with_capacity(length);
+    for advance in advances {
+        let (crossing, landed) = land(class, advance)?;
+        symbols.push(SectionSymbol {
+            class,
+            advance,
+            crossing,
+        });
+        class = landed;
+    }
+    SectionWord::new(symbols)
+}
+
+/// `n ≥ 1` in Elias gamma: `⌊log₂ n⌋` zeros, then `n` in binary.
+fn write_gamma(bits: &mut Vec<bool>, n: usize) {
+    let width = usize::BITS - n.leading_zeros();
+    bits.extend((1..width).map(|_| false));
+    bits.extend((0..width).rev().map(|k| (n >> k) & 1 == 1));
+}
+
+fn read_gamma(bits: &mut impl Iterator<Item = bool>) -> Result<usize, LockRefusal> {
+    let ended = LockRefusal::Code {
+        what: "the bits end inside a gamma code",
+    };
+    let mut zeros = 0u32;
+    while !bits.next().ok_or(ended.clone())? {
+        zeros += 1;
+        if zeros >= usize::BITS {
+            return Err(LockRefusal::Code {
+                what: "a gamma code past the carrier",
+            });
+        }
+    }
+    let mut n = 1usize;
+    for _ in 0..zeros {
+        n = (n << 1) | usize::from(bits.next().ok_or(ended.clone())?);
+    }
+    Ok(n)
+}
+
+/// An advance `Δℓ ∈ {−2, …, 2}` as `Δℓ + 2` in [`ADVANCE_BITS`] bits.
+fn write_advance(bits: &mut Vec<bool>, advance: i8) {
+    let value = u8::try_from(advance + 2).expect("an advance lies in {-2, ..., 2}");
+    bits.extend((0..ADVANCE_BITS).rev().map(|k| (value >> k) & 1 == 1));
+}
+
+fn read_advance(bits: &mut impl Iterator<Item = bool>) -> Result<i8, LockRefusal> {
+    let mut value = 0u8;
+    for _ in 0..ADVANCE_BITS {
+        let bit = bits.next().ok_or(LockRefusal::Code {
+            what: "the bits end inside an advance",
+        })?;
+        value = (value << 1) | u8::from(bit);
+    }
+    if value > 4 {
+        return Err(LockRefusal::Code {
+            what: "an advance outside {-2, ..., 2}",
+        });
+    }
+    Ok(i8::try_from(value).expect("at most 4") - 2)
 }
 
 /// The Elias gamma length of `n ≥ 1`, `2⌊log₂ n⌋ + 1`.

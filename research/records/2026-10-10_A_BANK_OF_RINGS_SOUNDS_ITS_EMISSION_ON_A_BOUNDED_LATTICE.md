@@ -777,3 +777,562 @@ The quadrant's two sign tests often leave the interval open on one side. The oct
 `s_w w′ − s_u u′` closes it, which is why one bit buys more than one bit's narrowing. The margin is
 still the section chart's grain against the uniform samples, not learned content. §21 takes the
 grain's limit as the principle: refine the cell by mediants until the sample is determined.
+
+## 21. The sample as the ring's phase address (acceptance fixed before code is run)
+
+[definition; agent-inferred, October 10] §20's octant is one step of a refinement whose limit is the
+principle. Every exact sign test that refines a cell is a line through the origin of the phase plane,
+and the lines through the origin are ordered by slope. Refining by mediants walks the Stern–Brocot
+tree: the Farey address that the elementary objects give the pair contact's lock. For the next state:
+
+- Its exact image `(w′, u′) = (w₀ + w_m x, u₀ + u_m x)` is read by two exact-law steps of the ring
+  owner. Testing the image, not the rounded carry, makes every bound exact: no widening, so the
+  descent can end at one value.
+- Its class is its quadrant (3 bits). Within the class, its slope `σ = (s_u u′)/(s_w w′)` descends the
+  Stern–Brocot tree. At node `p/q` the bit is `σ ≥ p/q`, the exact half-line `q s_u u′ − p s_w w′ ≥ 0`
+  on the sample.
+- The descent stops when one PCM value remains, and both sides stop at the same node. The bits are
+  the ring's phase address to the grain the sample needs.
+- A **still line**, `u₀ w_m = w₀ u_m`, is the ring at rest among others. There the slope does not move
+  with the sample, so no descent is read and the remaining index is coded. Coding the remaining index
+  also covers a descent that reaches its cap of 256 nodes.
+
+**Acceptance.**
+- **F1.** `phase_decode(phase_encode(x)) = x` on every sample, with the ring's inverse tick checked at
+  every tick.
+- **F2.** The emitted bits are reported in their three parts (class, Farey path, index) against
+  `1498880` and against §20's 1364296 on the same ring and ticks.
+- **F3.** The path's length per tick, as a distribution read in the receipt.
+- **Reading rule.** As in §16, §19 and §20, a margin against the uniform samples is the section's
+  grain, not learned content. What §21 adds is that the code is made of nothing but the ring's own
+  dynamic symbols (its class and its Farey phase address) wherever the line moves.
+
+## 22. The order of the next loops (decided from the mathematics, October 10)
+
+[definition; agent-inferred] The codec's emitted symbols (the ring's class and its Farey phase
+address) are codes produced by the field's own dynamics. By guard 9 they are the lawful way into the
+field: a sample never becomes `Encoded`, but a section word may be located. The order follows.
+
+1. **The section word through the located route, into the repair owners.** The route is
+   `FrameFamily::locate → PassageChart::located → Encoding::found → Encoded::through`, then
+   `hnn::keys::PairLocation` and `repair::{key_code, residual_code, reopen}`. The squares
+   `DE = ρ, ET = UE, EB = J` hold on the located chart, where the injection is empty. The consumer is
+   the codec, with the class bits replaced by the word's key and residual. Acceptance:
+   - `reopen = word`;
+   - `through` admits the chart, with `check_step` on every stepped lift;
+   - exact decode;
+   - the charged length reported against the fixed-grain codec.
+2. **The ring's material learns from the code length.** The comparison is the next epoch's length.
+   Its smooth face is the log of each interval width, whose endpoints are roots of half-lines affine
+   in the image. The step is a certified deposition on the ring's own material, made epoch by epoch
+   from decoded data only, so the decoder replays it and the decode stays exact. Acceptance: on
+   unseen later epochs, the depositing ring's emitted bits are strictly below a never-depositing
+   twin's, with the decode exact.
+3. **The joint credit of those deposits.** It is `[f_s f_r; g_s g_r]` over the prospective epochs,
+   through the material branch's prospect, schedule and cycle owners. Acceptance: agreement with the
+   actual depositing run's forward perturbation to second order.
+
+§21's finer grain does not by itself establish the learning join; it supplies the word that loop 1
+locates. Loop 2 needs loop 1's length as its comparison, and loop 3 needs loop 2's `g`.
+
+## 23. Loop 1's design, from the owners' actual interfaces (acceptance fixed before code)
+
+[definition; agent-inferred, October 10] **The route.**
+1. A near-return window's cycle, its advances as classes `Δℓ + 2 ∈ {0, …, 4}`, repeated over the
+   window, is a periodic passage.
+2. `FrameFamily::pairs(bound).locate(5, [passage])` reads it on every declared two-ring frame, and
+   `FrameLocation::period` returns the located period.
+3. A carrying frame's location gives `PassageChart::located`, then `Encoding::found`, then
+   `Encoded::through`. The squares `DE = ρ, ET = UE` hold by construction, and `EB = J` holds with an
+   empty injection.
+
+**The defects are substitutions, not erasures.** `compression::keys::repair` repairs *erasures*
+consistent with the located relation (`DamagedPassage::encoded`; `residual_code` refuses a truth that
+leaves its family). A near-return's defect *breaks* the relation: the cycle predicts one advance, and
+the word holds another. So the defects do not enter the repair owner as erasures. They are the helical
+code's substitutions, "absorbed iff the reached difference lies in the kernel" (elementary objects,
+the helical code). The residual is the defect list itself, its positions and advances, and the decoder
+reopens by `transport.regenerate(key, L)` followed by the substitutions.
+
+**The cost, stated before measuring.** A located transport is described by its frame (an index in the
+family), its key (a lift on `ℤ/D`) and its per-class digits. That is at least `5 ⌈log₂ D⌉` bits, more
+than the cycle spelled out at `3τ` bits whenever `τ` is short. §13 measured that most of this speech's
+cycles have period 1. The located route will therefore **not** shorten the code on this recording, and
+that will be measured, not assumed. What it buys is the join: the word enters the field as `Encoded`
+through the located chart, which loop 2's deposition needs. A sample never enters the field, and a
+located section word may.
+
+**Acceptance.**
+- **W1.** For every admitted near-return window whose cycle a frame carries, `Encoded::through`
+  admits the located chart, with the squares checked by the owner and `check_step` on every stepped
+  lift.
+- **W2.** `regenerate(key, L)` with the defects substituted equals the window's word exactly.
+- **W3.** Per ring: the windows located, the windows no frame carries (each typed: narrow, empty,
+  plural, open), and the located description's bits against the spelled cycle's, as exact integers.
+
+## 24. Loop 2's acceptance: the ring's material learns from its own code length (fixed before code)
+
+[definition; agent-inferred, October 10, with the reviewer's two design checks] The codec of §19 and
+§20 is fixed-material: the ring's `K` (its turn) and its port coupling `a` (its memory) are declared.
+Loop 2 lets the ring's own material move by deposition, epoch by epoch, so that the cells narrow the
+samples more. Its comparison is the codec's own length, its law is the existing certified deposition,
+and its decoder replays every deposit.
+
+- **The comparison.** Over an epoch, the emitted bits are `Σ_n (cell bits + ⌈log₂ count_n⌉)`. The
+  smooth face is `Σ_n log₂ (hi_n − lo_n + 1)`, whose endpoints are the roots `−a/b` of half-lines
+  affine in the image `(w₀, w_m, u₀, u_m)`. Those depend on the material through the ring's step.
+  The learning covector is `d(face)/d(material)` through the step's tangent in the material (the
+  `f_r` block), read along the epoch.
+- **The law.** The certified step on the ring's own material (`K`, and the port coupling through
+  `Y`), committing at least one lattice unit or refusing (`DeclaredStepRefusal`).
+- **Causality (the reviewer's check 1).** The deposit at the end of epoch `k` reads only samples the
+  decoder has already decoded in epochs `≤ k`. The shared initial material, the epoch length and
+  every choice the step makes (its exponent, its family) are either declared context or charged in
+  the bits. Nothing is chosen from future data and then left out of the code. The decoder replays
+  each deposit from its own decoded samples, and the decode stays exact.
+- **The twin (the reviewer's check 2).** The same codec with the material held fixed. The comparison
+  is the total emitted bits, with the charged side information included, and the exact
+  reconstruction of both. The receivers' local criteria (each epoch's length, each ring's) are
+  reported apart, never collapsed into one reward.
+
+**Acceptance.**
+- **A1.** `decode(encode(x)) = x` for the depositing codec, with every deposit replayed.
+- **A2.** On the recording's later epochs, which no deposit has read before it is coded, the
+  depositing ring's emitted bits against the twin's, epoch by epoch, as exact integers. Learning is
+  claimed only where the depositing ring is strictly below the twin, net of its charged side
+  information.
+- **A3.** Every refused step is typed and reported, never answered by a larger step.
+- **A4.** The joint credit of the deposits is loop 3's. Here the deposit admits on the next epoch's
+  measured length only. No `g_s` or `f_r` beyond one epoch is claimed.
+
+## 25. Measured: loop 1's W1 and §21's phase address
+
+[measured] ([receipt](receipts/2026-10-10-acoustic-release/LOOP1_AND_PHASE_DEV.v1.json); developer
+reads.)
+
+- **W1 is not met.** The ring `t = 1` under the replica's F1, in its settled window, near-returns at
+  `τ = 7` with no defect (27 bits against 360). Its cycle of advances, as 5 classes repeated over the
+  window, is carried by none of `FrameFamily::pairs(9)`'s 38 declared two-ring frames: 13 are
+  narrow, 13 empty, 12 plural, and none carries it. This is the tone record's §2 finding: a generic
+  word is located on no single declared helix. W2 is vacuous. The first test asserted a carrying
+  frame and failed. It now pins the typed reading. The declared family's bound is **not** widened
+  after the failure: the next subject is why a 5-class period-7 cycle is plural or empty on every
+  pair frame, read from the typed fibres.
+- **The phase address is exact, and a worse code than the octant.** Over 2000 ticks of ring 20 it
+  emits 26560 bits: 6000 class, 20458 Farey path, 30 index for the still lines, plus header and
+  padding. On the same ticks the octant emits 24440 and the quarter turn 28032. A mediant descent
+  splits the slope space, not the sample's interval, so each Farey bit narrows less than an index
+  bit: about 10.2 path bits per tick against the octant's about 8.2 index bits. No full run is made,
+  because the comparison is settled. What §21 shows is narrower: the sample can be coded by nothing
+  but the ring's own dynamic symbols wherever its line moves, at a cost this measurement reads.
+
+## 26. Loop 1's W1 and W2 met, after correcting my adapter
+
+[measured] ([receipt](receipts/2026-10-10-acoustic-release/LOOP1_LOCATED_WORD.v1.json).) §25's
+failure was in **my adapter**, not in the route. I declared all five advance classes as the alphabet,
+but location reads only equality: its relabelling law (`compression::keys::transport`) says each
+frame's reading on `π ∘ x` is its reading on `x`. The tone route accordingly reads its samples as
+ordinals in order of first occurrence. The ring `t = 1` under F1 turns so that its cycle shows only
+**two** advances (`Δℓ = +1` and `−2`), so 13 frames were narrow only because of my declaration.
+
+With the cycle read as its own ordinals, the frame family and its bound unchanged (`pairs(9)`, 38
+frames):
+
+- **Clean tone.** `τ = 7`, 0 defects. **18 of 38** frames carry the cycle, and the other 20 are empty.
+  On every carrying frame the located chart is founded and admitted (`Encoded::through`), the
+  squares hold, every stepped lift passes `check_step`, and `regenerate(key, L)` equals the window's
+  word exactly. W1 and W2 are met.
+- **Departed tone** (one sample raised by 7 after the settle allowance). `τ = 7`, 6 defects. The same
+  18 frames carry the cycle, and `regenerate(key, L)` with the 6 defects substituted equals the
+  window's word exactly.
+
+`acoustic_encoding` passes 8 of 8. **Narrowed** (Codex's review of `f06ff2b0`):
+- The test checked the located chart through `Encoded::through` against a wide one-ring field
+  (`wide_field`, period 16), not the located two-ring helix. It never called `Field::admit` or
+  ingestion, so neither field entry nor deposition's consumption is established by §26.
+- Its decoder recovered the advance word only (`Δℓ + 2`), not the section word's start class,
+  crossings, placement and clock.
+- It checked the base cycle's lifts and then substituted the departures; the departed passage itself
+  was never admitted.
+- What §26 establishes: the observed cycle's chart (its own ordinals, a support restriction and
+  relabelling, not a permutation of five classes), the located regeneration of the cycle, and the
+  advance word with its substitutions. No key is forced and the family is not enlarged: 18 frames
+  carry and 20 are empty, of the same 38.
+
+§28 builds the consumer.
+
+## 27. W3: the recording's windows through the located navigator's own code (reading fixed before the run)
+
+[definition; agent-inferred, October 10] The transport owner already has an actual code for a located
+navigator, `located_code` and `read_located` (`compression::keys::transport`). It writes the transport
+per receiving cell, the labels, the key, and the **patches** where the word departs from the
+regeneration, which are exactly §23's substitutions. The owner prices them, not this record.
+
+For each admitted near-return window of a ring:
+1. The cycle, read as its own advances' ordinals, is located on `FrameFamily::pairs(9)`.
+2. On every carrying frame whose shape the code admits (its cells equal the classes), the window's
+   *actual* word is coded by `located_code`, and `read_located` must return it exactly.
+3. The located length is the shortest such code, plus the frame's index (`⌈log₂ 38⌉ = 6` bits) and
+   the ordinal map (3 bits per class).
+4. Each window is counted as located, carried but shape-refused, or not located.
+
+**Reading rule.** The located bits are reported against the same windows' spelled near-return bits.
+§23's expectation stands: for short cycles the located description is the longer one. The route is
+claimed as a join and never as compression unless the located bits are strictly fewer.
+
+**The development read** (ring 20, the recording's first 2000 ticks, debug binary, one thread). It read 16
+windows: 4 located, 0 shape-refused, 12 not located. The located bits were 235 against the same
+windows' spelled 224, so on these windows the located description is the longer one, as §23 expected.
+Wall time was 3858294942 ns, peak RSS 13836 KiB.
+
+### 27a. The full read was INCOMPLETE at its deadline, and the projection error
+
+The full read ran rings 0, 8, 16 and 20 over all 93680 recorded ticks, one thread each.
+- It was projected at about 200 s from the development read's 1929147471/1000 ns per tick.
+- Its deadline was fixed at 300 s.
+- It stopped at that deadline: exit 124, wall 300001503956 ns, child peak RSS 20044 KiB.
+- **INCOMPLETE.** No ring's result was read.
+
+The last progress lines:
+
+| Ring | Ticks | Elapsed | Slowest measured interval |
+|---|---|---|---|
+| 0 | 88620 | 34006 ms | 3028 ms over 7596 ticks |
+| 8 | 88059 | 59777 ms | 9342 ms over 7897 ticks |
+| 16 | 88023 | 139762 ms | 18298 ms over 8029 ticks |
+| 20 | 64008 | 243049 ms | 32906 ms over 8001 ticks |
+
+**Two causes, both mine.**
+1. **The projection came from an unrepresentative unit.** A window's cost depends on whether it is
+   located: locating means trying every carrying frame and coding and reading back the word.
+   - In the recording's first 2000 ticks, 12 of 16 windows were not located.
+   - The voice later locates more of its windows. Ring 20's 64008 ticks took 243049 ms, against
+     the development read's projection of 15435108915471/125 ns for that count. That is the
+     projection error, recorded as such.
+   - A development read for a content-dependent unit must be taken where the content is, or
+     projected from the slowest measured interval.
+2. **The driver withheld finished results.** It printed every ring's result only after all rings
+   joined. Rings 0, 8 and 16 were past their last chunk line by 139762 ms, and at most 5657 ticks
+   remained in each. Their results were still lost with the process.
+   - [agent-inferred] Repaired: each ring prints its result when its own pass ends, so a deadline
+     stop keeps the rings that finished.
+
+**The next read changes what is declared, not the limit.** Its deadline stays at 180 s, and it runs
+two processes, 4 threads in all:
+- rings 0, 8 and 16 over the whole recording;
+- ring 20 over its first 40000 ticks.
+
+Each projection is the full read's measured elapsed at its last progress line, plus the slowest
+measured interval's rate over the ticks that remain:
+- ring 16: 139762 ms plus 5657 ticks at 18298/8029 ms per tick, about 153 s;
+- ring 20: 122678 ms to tick 32004, plus 7996 ticks at 32906/8001 ms per tick, about 156 s.
+
+Ring 20's whole recording projects past three minutes at its measured rate. It is declared on a
+prefix and is not relaunched whole.
+
+### 27b. Measured: the declared split read (developer read)
+
+Both runs finished inside the fixed 180 s deadline
+([receipt](receipts/2026-10-10-acoustic-release/W3_LOCATED_WINDOWS.v1.json)):
+- (a) wall 146513953189 ns against the projection's 175094412/1147 ms, peak RSS 13836 KiB;
+- (b) wall 158126089092 ns against 1244663054/8001 ms, peak RSS 18804 KiB. Run (b) overran its
+  projection by less than 2563 ms. That is a projection error; the deadline held.
+
+| Ring | Ticks read | Windows | Located | Shape-refused | Not located | Located bits | Spelled bits, same windows |
+|---|---|---|---|---|---|---|---|
+| 0 | 93680 | 147 | 0 | 0 | 147 | 0 | 0 |
+| 8 | 93680 | 606 | 0 | 0 | 606 | 0 | 0 |
+| 16 | 93680 | 1932 | 84 | 0 | 1848 | 6766 | 7557 |
+| 20 | 40000 | 783 | 78 | 2 | 703 | 4752 | 3978 |
+
+**Reading, by §27's rule.**
+- **Ring 16:** the located code is strictly shorter on its 84 located windows, by 791 bits. Over the
+  ring's 1932 windows that is no compression: a flag naming which windows take the located code costs
+  more than 791 bits (one bit per window is 1932 bits).
+- **Ring 20:** the located code is longer on its 78 located windows, by 774 bits, as §23 expected
+  for short cycles.
+- **Rings 0 and 8:** no window was located. Their longer windows carry cycles that no declared pair
+  frame carries.
+
+The route is a measured join on 162 of the 3468 windows read. It is not a compression of the
+recording.
+
+## 28. The departed section word through the field on its located helix (acceptance fixed before code)
+
+[definition; agent-inferred, October 10] This replaces §26's test, on the same tone, ring and window:
+F1, `t = 1`, window `(120, 120)`, clean and with the one departure.
+
+**The passage.** The dictionary is the actual word's advances in order of first occurrence, so every
+departure's advance is a class. The passage is the actual word's ordinals. The cycle is the
+near-return's, read in the same dictionary.
+
+**Acceptance, for each tone.**
+- **F1, field entry.** Every frame of `FrameFamily::pairs(9)` that carries the cycle founds the
+  *actual* passage, departures included, through the located chart (`PassageChart::located` opens it
+  at the key with the fewest patches). The passage is then:
+  1. encoded on `field_on(helix.periods())`;
+  2. admitted by `Field::admit`;
+  3. ingested by the reference port (`Reference::mount` at rest, then `ingest`), which consumes all
+     `L` cells or reports its carry-out with the cells it consumed.
+
+  At least one frame carries.
+- **F2, the pair at the ring's own distance cap.** The menus read distances `δ ∈ [1, d − 1]` on the
+  receiving ring of period `d`. `pairs(9)` already declares receiving periods 8 and 9, so the family
+  is not widened. On each carrying frame with `d > τ`:
+  - the pair location (`PairLocation::open` on the receiving ring, observing `damaged_station_pairs`
+    of the admitted passage with its departure cells erased) locates a pair `(δ, f)`;
+  - its key is priced by `key_code(relation, d)`;
+  - the restriction releases every erased departure cell to the cycle's class.
+
+  The repair therefore returns a departure to the cycle: `residual_code` of the actual word is
+  refused `NotRegenerated` on the departed tone, and is empty on the clean one. A substitution is not
+  an erasure, and the substitution residual is what carries it. A frame with `d ≤ τ` is reported as
+  it is, never answered with a larger family.
+- **F3, the whole word decoded.**
+  - **The emission:** a header (settle tick and window length, the placement; the ring's declared
+    `t` and hop, the clock), the start class (2 bits), the frame index (`⌈log₂ 38⌉` bits), the
+    dictionary (3 bits per class), and `located_code(transport, [actual])`, whose patches are the
+    substitution residual.
+  - **The independent decoder** reads only the emission and the declared family. It takes the frame
+    by its index, the ordinals by `read_located`, the advances through the dictionary, and the
+    classes and crossings by `dynamic_section::land` from the start class.
+  - **What must hold:** the decoder returns a `SectionWord` equal to the window's, every symbol's
+    class, advance and crossing, with equal `winding()`, and the header's placement and clock read
+    back equal.
+- **Where F2 and F3 sit** (derived before the run from the owners' laws). `located_code` ranks a
+  bijection: the receiving cells must equal the classes (`shape_refusal`). F3 is therefore read on
+  the carrying frames whose receiving period equals the dictionary's size. F2 needs `d > τ`, so for
+  a cycle of few classes (`τ = 7`, two classes) the two readings sit on different frames of the same
+  family. Each is reported on its own frames. A refusal of either is measured and named; it is not
+  answered by widening the family or the ceiling.
+- **F4, charged together.** The emission's bits, apart from the common header, are reported beside
+  the near-return's `L_τ + 2` (with the start class) and the spelled `3L + 2`, with the pair's key
+  bits beside them. No compression is claimed unless the emission is strictly shorter.
+
+**What stays unbound.** The section word is the states' quotient by their ray cells. Its fibre is
+each state's amplitude and phase inside its cell, and through the inverse tick
+(`ResonatorOperands::inverse_step`) the samples. F3 does not decode that fibre, so F3 is not a source
+codec. The codec that binds the fibre takes the cell codec's index per tick (§18–§20), with the
+cells supplied by the decoded word. It is §29's subject, charged against the octant codec.
+
+### 28, measured: the clean word enters and decodes whole; the departed word is refused by its own chart
+
+[measured] ([receipt](receipts/2026-10-10-acoustic-release/S28_SECTION_WORD_FIELD.v1.json); developer
+reads.) `acoustic_encoding` passes 8 of 8 on the third run. The first two runs failed, both in **my
+adapter**:
+1. I declared the pair's relation over the dictionary's 2 classes. The admitted passage's classes
+   are the chart's indices (`Encoded::classes_read`, here 8), so F2 now reads in them.
+2. The departed tone then carried on no frame (below).
+
+**Clean tone** (`τ = 7`, dictionary `[1, −2]`, 18 of 38 frames carry, 20 empty):
+- **F1 met.** All 18 carrying frames found, encode, admit (`Field::admit` on
+  `field_on(helix.periods())`) and ingest the passage through the reference port.
+- **F2 met.** On the 4 carrying frames with `d > 7` (`[7, 8]`, `[7, 9]`, `[8, 9]`, `[9, 8]`), the
+  pair located from the admitted passage is `δ = 7` with the identity map, the only surviving
+  distance. Its key is 35 bits at `d = 8` and 39 bits at `d = 9`. The repair's residual is empty.
+- **F3 met.** On the 2 carrying frames with `d = 2` (`[7, 2]`, `[9, 2]`), the independent decoder
+  returns the whole `SectionWord` (start class, every class, advance and crossing, the winding)
+  with its placement and clock.
+- **F4.** The emission after its 28-bit header is 37 bits on `[7, 2]` (located code 20) and 40 bits
+  on `[9, 2]` (located code 23). That is against the near-return's `L_τ + 2 = 29` and the spelled
+  `3L + 2 = 362`: longer than the near-return by 8 and 11 bits, as §23 expected for a short cycle.
+
+**Departed tone — F1 NOT MET.**
+- The six departures are `(60, −1)`, `(61, 0)`, `(62, 2)`, `(63, 0)`, `(68, 2)` and `(75, 2)`.
+  Every one is an advance **outside the cycle's support** `{+1, −2}`, so the five-class dictionary
+  holds 3 classes the cycle never reads.
+- A located member has no transport for a class it never read: its gauge is plural, never guessed.
+  The location over five classes is plural on 12 frames, empty on 13 and narrow on 13, and carries
+  on none.
+- So the departed passage is **not a passage of the cycle's located chart**. Its departures are the
+  chart's cokernel, and `Encoded` has no slot for a cell outside its chart. This is no defect of the
+  owners: an encoding that admitted such a cell would fabricate its transport.
+- The test now asserts the refusal, typed: only a dictionary wider than the cycle's support carries
+  on no frame. F2 and F3 are not read on the departed tone.
+
+The failure is §28a's subject.
+
+## 28a. The departed word enters as its runs in the cycle's chart, its departures the residual (acceptance fixed before code)
+
+[definition; agent-inferred, October 10] §28 measured that a departure outside the cycle's support has
+no class in the cycle's located chart. The encoding law then fixes how the departed window enters:
+- **What enters.** Only the cells the chart has: the window's maximal runs of cells inside the
+  support `S`, the cycle's own classes. Each run is a passage opened at its own located key.
+- **What does not.** The departures are the chart's cokernel. They do not enter the field; they are
+  the residual, each named by its position and its advance in the five advances.
+- Nothing is fabricated: every actual chart cell is ingested, and no departure is replaced by a
+  chart class.
+
+This differs from §28's F1 in one respect, which the measurement forced: the passage that enters is
+the window's runs, not the whole window. The tone, ring and window are §28's, departed.
+
+**Acceptance.**
+- **R1, the runs enter.** The dictionary is `S`, the cycle's advances in order of first occurrence.
+  The cycle located in `S` must carry on the same 18 frames as the clean tone. On every carrying
+  frame:
+  - the runs are founded together by `PassageChart::located`, each at its own least key with the
+    fewest patches;
+  - they are encoded on `field_on(helix.periods())` and each is admitted;
+  - the reference port ingests them in clock order, the first opening a moment and each later run
+    continuing it.
+
+  A refusal of the continuation is reported typed, and R1 is then not met. The field's clock does
+  not advance across a departure: no transport for it is known.
+- **R2, the pair.** On carrying frames with `d > τ`, the pair is located from the stations of all
+  the admitted runs. Each run's repair residual must be empty, since a run holds no departure.
+- **R3, the whole word.** On carrying frames with `d = |S|`, the emission is:
+  1. the header, the start class, the frame index and the dictionary;
+  2. the departures: `γ(|D| + 1)`, then for each departure `γ(gap)` and its advance in 3 bits;
+  3. `located_code(transport, runs)`.
+
+  The independent decoder derives the run lengths from the departures and the window length, reads
+  the runs by `read_located`, interleaves the departures, and must return the whole `SectionWord`
+  with its placement and clock.
+- **R4, charged.** The emission's bits after the header are reported beside the near-return's
+  `L_τ + 2 = 75` and the spelled `3L + 2 = 362`.
+
+### 28a, measured: the departed word enters as its runs and decodes whole; §28's F1 corrected
+
+[measured] ([receipt](receipts/2026-10-10-acoustic-release/S28A_RUNS_IN_THE_CHART.v1.json); developer
+reads.) `acoustic_encoding` passes 9 of 9.
+
+**A correction to §28's F1, found by this loop.** The reference port's ingest stops after the
+occurrence whose step carries the joint clock out, and then refuses any further cell until
+`close_aeon`. §28's check accepted that stop as entry, so its "ingested" covered only the cells up to
+the first carry-out. This loop's first run showed it: on frame `[6, 5]`, after the first run's stop,
+the port refused the next run, "the aeon awaits close_aeon".
+- Both tests now ingest **whole**: at each carry-out the aeon is closed over the admitted receiving
+  phases, and the rest of the passage (`Encoded::part`) continues the same moment.
+- The clean tone's 120 cells close **17 aeons** on every one of its 18 frames: the joint clock
+  carries out about once per cycle of the located helix.
+- §28's F1 is met on that reading, and its other readings are unchanged.
+
+**R1 met.**
+- The support is `S = {+1, −2}`. The departures `60, 61, 62, 63, 68, 75` are exactly the cells
+  outside it.
+- The runs are `[0, 60)`, `[64, 68)`, `[69, 75)` and `[76, 120)`.
+- The cycle in `S` carries on the same 18 frames.
+- On every one of them, the four runs are founded together, each at its own key, admitted and
+  ingested whole into one moment. That closes 14 aeons on 17 frames and 15 on one.
+- No departure enters the field.
+
+**R2 met.** On the 4 frames with `d > 7`, the pair located from all the runs' stations is `δ = 7`
+with the identity map, the only survivor. Every run's repair residual is empty.
+
+**R3 met.** On `[7, 2]` and `[9, 2]`, the independent decoder returns the whole departed
+`SectionWord` with its placement and clock.
+
+**R4.**
+
+| Frame | Emission after header | Start, frame, dictionary, departures | Runs' located code |
+|---|---|---|---|
+| `[7, 2]` | 96 bits | 64 | 32 |
+| `[9, 2]` | 102 bits | 64 | 38 |
+
+The near-return's `L_τ + 2` is 75 bits and the spelled `3L + 2` is 362. The emission is longer than
+the near-return by 21 and 27 bits. The departures cost the same in both (position and advance); the
+excess is the runs' four keys, the frame index and the dictionary.
+
+**What §28–§28a establish.** A ring's section word, clean or departed, enters the field declared on
+its located helix through the actual admission and ingestion owners, across its aeons. Its pair is
+read at the ring's own distance cap, and its emission decodes the whole word.
+- On this short cycle the located description costs more than the near-return. No compression is
+  claimed.
+- The amplitude and phase fibre, and through it the samples, stays unbound. That is §29's subject.
+
+## 29. The source codec with its cells supplied by the ring's section word (acceptance fixed before code)
+
+[definition; agent-inferred, October 10] The cell codec (§18–§20) writes, for each tick, the next
+state's cell (its quadrant, 3 bits, or the origin) and then the sample's index in that cell's
+interval. Within a settled window, that cell is the landing class of the section word's symbol. The
+section word therefore supplies the cell stream, and the index is the fibre: each state's amplitude
+and phase inside its cell, and through the inverse tick, the sample. This binds what §28 left
+unbound, on the recording itself.
+
+**The code.**
+- The ring's stream is tiled into blocks of the census window, four of the ring's turns
+  (`half_memory`). The last block may be shorter.
+- Each block carries one flag bit:
+  - **Flag set.** The block opens on a state off the origin, and its section word's near-return is
+    admitted. The emission is the owner's `NearReturn::code` (`L_τ` bits); then, per tick, the octant
+    bit when the octant grain is declared, and the index.
+  - **Flag clear.** Per tick, as the cell codec: the 3-bit cell, the octant bit and the index.
+- The start class is not written: the decoder holds the state the block opens on. Neither is the
+  window: the decoder derives it from the declared ring.
+
+**Acceptance.**
+- **C1, exact.** An independent decoder, given only the bytes and the declared ladder, returns every
+  PCM sample exactly. Per tick, the regenerated state lands in the cell it read (from the decoded
+  word or from the cell bits), and the inverse tick returns the sample.
+- **C2, charged.** Reported together:
+  - the emitted bits;
+  - the cell codec's bits on the same stream and grain, counted by the encoder from the same
+    per-tick widths;
+  - the blocks read and admitted;
+  - the raw 16-bit PCM.
+
+  The difference from the cell codec is claimed exactly as measured. It is the class stream's
+  near-return structure (the ring's own cycles), not learned content, and the indices are unchanged.
+- **The read.** Ring 20 (the codec's ring), quarter and octant grain:
+  - a development read of 2000 ticks;
+  - then a declared prefix of 20000 ticks, projected from that read;
+  - the whole recording only by its own stated authorization: the octant codec's full run took
+    464561780139 ns.
+
+**Expected from the census** (§11's N3 on ring 20: 2550 of 5222 windows admitted, 127525 bits
+against 153000 spelled over them): a saving on the cell stream of a few percent of the cell bits,
+less one flag per block. That is small beside the indices. It is stated now so that the
+measurement can correct it.
+
+**Development read** ([receipt](receipts/2026-10-10-acoustic-release/S29_DEV.v1.json)): ring 20, the
+recording's first 2000 ticks. The near-return tests also assert `|code| = L_τ` and the read-back, and
+refuse a code cut short (`LockRefusal::Code`).
+- **C1 met at both grains.** The decode equals the source exactly.
+- **C2 at the quarter grain:** 28072 bits emitted against the cell codec's 28029.
+- **C2 at the octant grain:** 24479 against 24436.
+- At both grains 12 of the 100 blocks are admitted. Their words take 663 bits in place of 720 cell
+  bits, and the 100 flag bits outweigh the 57 saved. On this prefix the code is 43 bits longer than
+  the cell codec.
+
+The census's whole-recording admission is higher (2550 of 5222 windows), so the full read decides C2.
+
+### 29, measured: the section word's cells shorten the whole recording's code exactly
+
+[measured] ([receipt](receipts/2026-10-10-acoustic-release/S29_FULL.v1.json); developer read at
+`f7dd904dc`.) The run was announced with its grounds: the workload, the measured upper cost, the
+debug build's exact rational step as the bottleneck, and the new information it would establish. It
+covers ring 20, all 93680 recorded ticks, at both grains, as two concurrent processes.
+
+- **C1 met at both grains.** The independent decode equals the source exactly. At every tick the
+  regenerated state lands in the cell read, and the inverse tick returns the sample.
+- **C2:**
+
+| Grain | Emitted, before padding | Cell codec, same stream and grain | Difference | Raw PCM |
+|---|---|---|---|---|
+| quarter | 1461697 | 1481047 | 19350 fewer | 1498880 |
+| octant | 1344943 | 1364293 | 19350 fewer | 1498880 |
+
+- At both grains, 1899 of the 4684 blocks of 20 ticks are admitted. Their words take 89906 bits in
+  place of 113940 cell bits, and the flags cost 4684 bits:
+  `113940 − 89906 − 4684 = 19350`.
+- The byte-padded emissions are 182713 bytes (1461704 bits) and 168118 bytes (1344944 bits). The
+  published cell codec runs emitted 185131 bytes (1481048 bits) and 170537 bytes (1364296 bits).
+- **Time.**
+  - Quarter grain: wall 456191187415 ns, peak RSS 13268 KiB.
+  - Octant grain: wall 476984164367 ns, peak RSS 13872 KiB.
+  - The projection was `93680/2000 × 10122472169` ns. The octant run passed it by less than 3 s,
+    inside the fixed 500 s deadline: a projection error, recorded.
+
+**Reading.** On the whole recording, the ring's section word supplies its own cells in fewer bits than
+the cell codec spends on them. The code is strictly shorter, by 19350 bits at each grain, and the
+decode is exact. The census predicted a reduction of this order (§29's expectation), and on the first
+2000 ticks the flags outweighed it (development read).
+
+**Scope.**
+- The reduction is the class stream's near-return structure: the declared ring's own cycles, read in
+  the declared window, measured on encoder-produced bytes.
+- It is not learned content. No material moved, and the index of every sample, which is the fibre,
+  is unchanged.
+- It binds the section word to the source. The cells inside an admitted window are the word's
+  landings, and the samples follow by the cell's interval and the inverse tick.
+- Loop 2 (§24) is where the ring's material would learn from this length.
