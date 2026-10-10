@@ -1824,6 +1824,49 @@ impl MaterialTangent {
         })
     }
 
+    /// [definition; agent-inferred, October 10; the held-carry record §7g] **A state tangent**: the
+    /// passage's change along a change `χ₀` of its opening state and `ψ₀` of the World's state across
+    /// `ring`'s port, with no material direction. The tick law's material term vanishes, so it carries
+    /// the passage's linear part alone (`χ_(k+1) = T_k χ_k`, eq. 2). `contact` names the contact whose
+    /// executed forms its crossings compare. `χ₀` has the opening change's own shape.
+    pub fn state_seed(
+        word: &Word<'_>,
+        commit: u64,
+        contact: usize,
+        chi: EndChange,
+        psi: Vec<Rat>,
+        ring: usize,
+    ) -> Result<Self, HnnError> {
+        let direction = MaterialDirection {
+            contact,
+            storage: None,
+            stiffness: None,
+            dissipation: None,
+        };
+        let mut tangent = Self::held_opening(word, commit, direction)?;
+        let shaped = chi.storage.len() == tangent.tangent.storage.len()
+            && chi
+                .storage
+                .iter()
+                .zip(&tangent.tangent.storage)
+                .all(|(a, b)| a.len() == b.len())
+            && chi.arrivals.len() == tangent.tangent.arrivals.len()
+            && chi.states.len() == tangent.tangent.states.len()
+            && chi.resonators.len() == tangent.tangent.resonators.len();
+        if !shaped {
+            return Err(HnnError::Unadmitted {
+                reason: "a state tangent's opening change has the Word's own shape",
+            });
+        }
+        let phases = tangent.tangent.resonator_phases.clone();
+        tangent.tangent = EndChange {
+            resonator_phases: phases,
+            ..chi
+        };
+        tangent.port = Some((ring, psi));
+        Ok(tangent)
+    }
+
     /// [definition; agent-inferred, October 10; the held-carry record §7b] **The opening's own
     /// tangent where a Word opens on a carry crossed into this material at held momentum**
     /// (`ReceptionCarry::crossed`, `C′ w′ = π`): at fixed carried momentum `π`, a storage direction
@@ -2163,13 +2206,62 @@ impl MaterialTangent {
 /// The result `d` has `⟨L_o, d⟩ ≤ 0` and `⟨X_o, d⟩ ≤ 0` for every observation, with equality on
 /// the projected ones; it is zero when the violated gradients span the start. With one observation
 /// it is law (6) exactly: `⟨L, −L⟩ ≤ 0` never violates, and `X` is projected off iff
-/// `⟨L, X⟩ < 0`, giving `−L + (⟨L, X⟩/|X|²) X`.
+/// `⟨L, X⟩ < 0`, giving `−L + (⟨L, X⟩/|X|²) X`. When no classical descent is left (the start
+/// projects to zero), the descent takes the admission's next term, the phase: for two observations
+/// the negated minimum-norm point of their phase gradients' segment, a strict common descent
+/// (record §7k); otherwise `−Σ_o X_o` projected the same way. The classical gradients stay
+/// constraints.
 fn common_descent(classical: &[Vec<Rat>], phase: &[Vec<Rat>]) -> Vec<Rat> {
-    let width = classical.first().map_or(0, Vec::len);
+    let constraints: Vec<&Vec<Rat>> = classical.iter().chain(phase).collect();
+    let descent = projected_descent(classical, &constraints);
+    if !descent.iter().all(Zero::is_zero) {
+        return descent;
+    }
+    // [agent-inferred, October 10; the held-carry record §7i, §7k] The admission is lexicographic:
+    // with no classical descent left, the next term is the phase. The admission reads each
+    // observation's phase on its own and refuses any that rises, so the step is a strict common
+    // descent of the phases: the negated minimum-norm point of their convex hull (two observations,
+    // exact), which lowers every observation's phase at first order. Every classical gradient
+    // stays a constraint.
+    if phase.len() == 2 {
+        let common = minimum_norm_pair(&phase[0], &phase[1]);
+        let classical_constraints: Vec<&Vec<Rat>> = classical.iter().collect();
+        return projected_descent(&[common], &classical_constraints);
+    }
+    projected_descent(phase, &constraints)
+}
+
+/// The minimum-norm point of the segment `[a, b]`, exact: `λ a + (1 − λ) b` with
+/// `λ = clamp(⟨b − a, b⟩ / |b − a|², 0, 1)` (`b` itself when `a = b`).
+fn minimum_norm_pair(a: &[Rat], b: &[Rat]) -> Vec<Rat> {
+    use num_traits::One;
+    let dot = |x: &[Rat], y: &[Rat]| x.iter().zip(y).map(|(p, q)| p * q).sum::<Rat>();
+    let difference: Vec<Rat> = b.iter().zip(a).map(|(p, q)| p - q).collect();
+    let length = dot(&difference, &difference);
+    if length.is_zero() {
+        return b.to_vec();
+    }
+    let mut lambda = dot(&difference, b) / length;
+    if lambda < Rat::zero() {
+        lambda = Rat::zero();
+    }
+    if lambda > Rat::one() {
+        lambda = Rat::one();
+    }
+    a.iter()
+        .zip(b)
+        .map(|(p, q)| &lambda * p + (Rat::one() - &lambda) * q)
+        .collect()
+}
+
+/// `−Σ start` projected, exactly, off the span of every constraint it would raise at first order,
+/// one violated constraint at a time in their order, re-projecting until none is raised.
+fn projected_descent(start: &[Vec<Rat>], constraints: &[&Vec<Rat>]) -> Vec<Rat> {
+    let width = start.first().map_or(0, Vec::len);
     let dot = |a: &[Rat], b: &[Rat]| a.iter().zip(b).map(|(x, y)| x * y).sum::<Rat>();
-    let mut start = vec![Rat::zero(); width];
-    for gradient in classical {
-        for (s, g) in start.iter_mut().zip(gradient) {
+    let mut origin = vec![Rat::zero(); width];
+    for gradient in start {
+        for (s, g) in origin.iter_mut().zip(gradient) {
             *s -= g;
         }
     }
@@ -2185,10 +2277,9 @@ fn common_descent(classical: &[Vec<Rat>], phase: &[Vec<Rat>]) -> Vec<Rat> {
         }
         out
     };
-    let constraints: Vec<&Vec<Rat>> = classical.iter().chain(phase).collect();
     let mut used = vec![false; constraints.len()];
     loop {
-        let descent = project(&basis, &start);
+        let descent = project(&basis, &origin);
         let violated = constraints
             .iter()
             .enumerate()
@@ -2245,10 +2336,7 @@ pub fn world_descent(
             found: tangents.len(),
         });
     }
-    // Per family, each entry's classical and phase gradients, one pair per observation.
-    type Entries = Vec<Vec<Option<Vec<(Rat, Rat)>>>>;
-    let mut families: std::collections::BTreeMap<(usize, usize), Entries> =
-        std::collections::BTreeMap::new();
+    let mut credits = Vec::with_capacity(coordinates.len());
     for (index, coordinate) in coordinates.iter().enumerate() {
         let direction = MaterialDirection::of_coordinate(field, theta, coordinate)?;
         if observations
@@ -2259,6 +2347,46 @@ pub fn world_descent(
                 reason: "each material tangent carries its declared coordinate's direction",
             });
         }
+        let mut per = Vec::with_capacity(observations.len());
+        for (tangents, ratio) in observations {
+            let credit = tangents[index].comparison_credit(ratio)?;
+            per.push((
+                credit.magnitude.clone(),
+                &credit.produced_phase + &credit.observed_phase,
+            ));
+        }
+        credits.push(per);
+    }
+    descent_from_credits(theta, coordinates, &credits, held)
+}
+
+/// [definition; agent-inferred, October 10; the held-carry record §7g] **The descent from declared
+/// credits**: [`world_descent`]'s law on credits already formed, one `(classical, phase)` pair per
+/// observation for each declared coordinate (the cycle's credits are combinations of tangents' credits,
+/// not one tangent's). Refused for a coordinate declared twice, unequal observation counts, or a
+/// family the held return did not reach.
+pub fn descent_from_credits(
+    theta: &Constitution,
+    coordinates: &[super::variation::ContactCoordinate],
+    credits: &[Vec<(Rat, Rat)>],
+    held: &[crate::hnn::constitution::FactorStep],
+) -> Result<Vec<crate::hnn::constitution::FactorStep>, HnnError> {
+    let observations = credits.first().map_or(0, Vec::len);
+    if credits.len() != coordinates.len()
+        || observations == 0
+        || credits.iter().any(|c| c.len() != observations)
+    {
+        return Err(HnnError::Shape {
+            what: "one credit per observation for each declared coordinate",
+            expected: coordinates.len(),
+            found: credits.len(),
+        });
+    }
+    // Per family, each entry's classical and phase gradients, one pair per observation.
+    type Entries = Vec<Vec<Option<Vec<(Rat, Rat)>>>>;
+    let mut families: std::collections::BTreeMap<(usize, usize), Entries> =
+        std::collections::BTreeMap::new();
+    for (coordinate, per) in coordinates.iter().zip(credits) {
         let a = coordinate.contact;
         let factor = [
             theta.contact_storage(a),
@@ -2274,32 +2402,23 @@ pub fn world_descent(
                 reason: "a contact coordinate is declared once",
             });
         }
-        // Each observation's credit at its own frozen covector.
-        let mut credits = Vec::with_capacity(observations.len());
-        for (tangents, ratio) in observations {
-            let credit = tangents[index].comparison_credit(ratio)?;
-            credits.push((
-                credit.magnitude.clone(),
-                &credit.produced_phase + &credit.observed_phase,
-            ));
-        }
-        *slot = Some(credits);
+        *slot = Some(per.clone());
     }
     let mut steps = Vec::new();
     for ((a, family), entries) in families {
         let rows = entries.len();
         let columns = entries.first().map_or(0, Vec::len);
-        let zero = vec![(Rat::zero(), Rat::zero()); observations.len()];
+        let zero = vec![(Rat::zero(), Rat::zero()); observations];
         let entries: Vec<Vec<(Rat, Rat)>> = entries
             .into_iter()
             .flatten()
             .map(|x| x.unwrap_or_else(|| zero.clone()))
             .collect();
         // Each observation's classical and phase gradients over the family's entries.
-        let classical: Vec<Vec<Rat>> = (0..observations.len())
+        let classical: Vec<Vec<Rat>> = (0..observations)
             .map(|o| entries.iter().map(|e| e[o].0.clone()).collect())
             .collect();
-        let phase: Vec<Vec<Rat>> = (0..observations.len())
+        let phase: Vec<Vec<Rat>> = (0..observations)
             .map(|o| entries.iter().map(|e| e[o].1.clone()).collect())
             .collect();
         let descent = common_descent(&classical, &phase);

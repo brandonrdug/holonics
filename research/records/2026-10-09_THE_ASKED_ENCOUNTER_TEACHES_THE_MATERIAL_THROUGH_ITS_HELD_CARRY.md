@@ -753,3 +753,537 @@ deposition work at the held-momentum crossing is positive, in `[2⁻⁴, 2⁻³)
   a family and this derivative is not defined; that case is refused, not approximated.
 - One fixture and one round. A loop of such landings and a second fixture are the next measurement.
 
+### 7c. The controls, and the loop: one step improves its own next encounter, not the trajectory
+
+[measured; developer reads, not claim-bearing;
+[receipt](receipts/2026-10-09-material-tangent/PROSPECT_LOOP_DEV_TESTS.v1.json)] Epime's review of
+`324f6138` kept §7b's claim narrow: one admitted step after two observed waves, with no no-history
+control, which does not show that both observations are needed. The landing test now asserts the
+admission and the per-wave production against the twin in the admission's order, so a refusal fails
+it. The controls:
+
+- **One observation is enough** (`the_prospect_landing_after_one_observation`). After the first
+  encounter alone (`u = 1`), the prospect landing is admitted, `Classical` at grain raise 0:
+  - `u = 1`: code strictly lower by `[2⁻⁸, 2⁻⁷)`, excess lower by `[2⁻¹⁴, 2⁻¹³)`;
+  - `u = −1`: `Phase`, excess lower by `[2⁻¹⁶, 2⁻¹⁵)` at equal code.
+
+  The step descends the future from the present opening, so the experience matters here only by
+  locating the key. The second observation is not necessary on this fixture.
+- **Without its history** (`the_prospect_landed_material_is_read_without_its_history`). The
+  contemporary material and the landed one were each read on a fresh World with no earlier encounter,
+  at both waves. At `u = 1` the landed material is **worse**: equal code, excess higher by
+  `[2⁻¹⁵, 2⁻¹⁴)`. At `u = −1` it is better: equal code, excess lower by `[2⁻¹², 2⁻¹¹)`. The gain
+  belongs to the state the receiver stands in, as a descent of that state's future would.
+- **The loop against its twin** (`the_prospect_loop_is_read_against_its_twin`, `…_on_a_second_fixture`).
+  Five rounds per fixture. A round is the two chain encounters and the prospect landing; the twin runs
+  the same encounters with no landing. Below, each round's encounters are learner against twin in the
+  admission's order. "Better" means a strictly lower code with no higher excess, or an equal code with
+  a lower excess.
+
+| round | fixture 1, `u = 1` | fixture 1, `u = −1` | its landing | fixture 2, `u = 1` | fixture 2, `u = −1` | its landing |
+|---|---|---|---|---|---|---|
+| 0 | equal | equal | Classical (raise 2) | equal | equal | Phase |
+| 1 | better (excess `−[2⁻²⁰, 2⁻¹⁹)`) | code lower `[2⁻¹⁰, 2⁻⁹)`, excess higher `[2⁻¹⁰, 2⁻⁹)` | Classical (raise 5) | better (`−[2⁻¹⁷, 2⁻¹⁶)`) | better (`−[2⁻¹⁷, 2⁻¹⁶)`) | PhaseWorse |
+| 2 | code **above** by `[2⁻⁸, 2⁻⁷)`, excess lower | overlap, excess higher `[2⁻⁷, 2⁻⁶)` | Phase | worse (`+[2⁻¹⁴, 2⁻¹³)`) | better (`−[2⁻¹⁵, 2⁻¹⁴)`) | Classical (raise 4) |
+| 3 | worse (`+[2⁻¹¹, 2⁻¹⁰)`) | overlap, excess higher | Phase | code lower `[2⁻¹⁰, 2⁻⁹)`, excess higher | better (`−[2⁻¹⁰, 2⁻⁹)`) | PhaseWorse |
+| 4 | overlap, excess higher `[2⁻¹⁰, 2⁻⁹)` | code lower `[2⁻¹⁰, 2⁻⁹)`, excess higher | PhaseWorse | worse (`+[2⁻¹¹, 2⁻¹⁰)`) | code **above** by `[2⁻¹¹, 2⁻¹⁰)`, excess lower | PhaseWorse |
+
+**The mechanism.**
+- Every admitted landing improves the learner's next encounter against **its own** no-landing
+  counterfactual, which is exactly what it was admitted on. The improvement is checked: the actual
+  next comparison equals the prospect.
+- Against the never-landing twin, the trajectory is mixed and is not dominated. On fixture 1 the
+  learner's code at `u = 1` is strictly above the twin's by round 2.
+- Two causes are named, and neither is a defect of the step:
+  1. **The schedule.** The prospect at `u = −1` assumes that wave is next, but the round runs `u = 1`
+     first, so the second wave's admitted future is not the one the round reads.
+  2. **The horizon.** The admission sees one encounter ahead. A step that helps the next encounter can
+     cost later ones, and the twin comparison accumulates those costs.
+- One-step admissions do not compose into a trajectory gain. That is the measured blocker.
+
+**The next law** (agent-inferred, recorded before it is built). The admitted future is the schedule
+the receiver will actually follow: the round's encounters in order, read as one chained prospect. The
+second encounter's prospect is read from the first's prospective end, with the tangents continued
+across it. The horizon is a declared number of rounds of that schedule, and the step descends their
+summed comparisons with the common descent. The twin comparison over rounds stays the production
+measure.
+
+**Projection error.** The first loop run reached its 300 s deadline at about 33 s per round, against
+a projected 5 s. It is reported incomplete. The deadline was not raised; the loop was split per
+fixture, and the two halves ran in parallel within it.
+
+### 7d. The horizon, not the schedule: the material is admitted on its cycle
+
+[measured; developer reads, not claim-bearing;
+[receipt](receipts/2026-10-09-material-tangent/PER_ENCOUNTER_LOOP_DEV_TESTS.v1.json)]
+`per_encounter_loop` removes the schedule mismatch of §7c. Before every encounter after the first, it
+lands on the prospect of that very encounter, the one that comes next. Over ten encounters
+alternating `u = 1, −1` on both fixtures, against the twin:
+- Fixture 1: the learner is better at encounters 1 and 4. It is **worse** (equal code, higher excess)
+  at encounters 2, 3, 6, 7 and 8, most of them right after an admitted `Phase` landing. Encounter 5 is
+  unresolved, and encounter 9 has a lower code with a higher excess.
+- Fixture 2: better at encounters 2, 3, 5, 7 and 9, worse at 4 and 8, a lower code with a higher
+  excess at 6, and equal at 1.
+
+Some landings are refused or unreached: `EqualEndpoints`, `PhaseWorse`, and an unreached
+`CovectorScale`.
+
+Each admitted landing improves the next encounter against the learner's own no-landing
+counterfactual, and the actual next comparison is that prospect. With the schedule matched, the
+trajectory against the never-landing twin is still mixed, so the cause is the **horizon**. The
+material persists into every later encounter. A step judged on the next encounter alone reshapes the
+transient it leaves behind, and later encounters pay for it.
+
+**The next law** (agent-inferred, recorded before it is built; it replaces §7c's "declared number of
+rounds").
+- The schedule repeated is a **cycle**: a closed loop whose reading is completeness, not duration
+  (the [aeon, epoch and cycle record](2026-09-24_THE_AEON_EPOCH_AND_CYCLE_STANDARDIZE_THE_PASSAGE_OF_TIME.md)).
+- With the key located, one round of the schedule is an affine map of the joint state (the native
+  carry and the World key's state), `x ↦ M x + c`. Each prospective passage is exactly linear in its
+  opening and its returns, and the key's charts are affine.
+- Its closed orbit is the exact fixed point `x* = (I − M)⁻¹ c` wherever `1` is not an eigenvalue of
+  `M`. It depends on the material alone, not on the transient state the receiver stands in.
+- The material is admitted on the comparisons read on that orbit, and the step descends them. The
+  orbit's tangent is `(I − M) δx* = δM x* + δc` (the implicit function law). It reuses the prospect's
+  tangent law (§7b) with the opening at `x*`.
+- An admitted step then never worsens the cycle's own reading. Successive admissions are monotone on
+  it, and a trajectory that converges to the orbit inherits the gain. The twin's orbit is the first
+  material's.
+- Refused when `1` is an eigenvalue of `M` (no unique closed orbit). Convergence to the orbit is a
+  property of the dissipation, to be read from `M`'s spectrum, not assumed.
+
+### 7e. The readings recur once the receiving relation stops moving
+
+[measured; developer reads, not claim-bearing;
+[receipt](receipts/2026-10-09-material-tangent/PASSAGE_DEV_TESTS.v1.json)] The cycle law of §7d
+assumes an orbit exists, so two reads were made before it was built.
+
+- **The receiving relation learns at nearly every encounter at first** (`the_receiving_relation_between_encounters`).
+  Over ten plain encounters alternating `u = 1, −1`, the receiving publication moved `R` at every
+  encounter on fixture 1, and at nine of ten on fixture 2 (all but the last). The never-landing twin
+  is therefore not a still learner: its readout learns as the learner's does. The comparisons of
+  §7c and §7d are small material effects (`[2⁻²⁰, 2⁻¹¹)`) on a common drift that is larger: the
+  excess rose by up to `[2⁻⁶, 2⁻⁵)` between repeats of a wave, for learner and twin alike.
+- **Then it stops moving, and the readings recur** (`the_passage_over_forty_encounters`, fixture 1).
+  This is finite measured recurrence at the receiver's grain, not an exact state periodicity, an
+  indefinite settlement of `R` or a certificate of convergence (Epime's precision).
+  - `R` moves at encounters 0 to 9 and at none of encounters 10 to 39.
+  - From about encounter 23 on, the exact code enclosures repeat two apart, and the excess's dyadic
+    brackets recur: at `u = 1`, excess in `[2⁻⁷, 2⁻⁶)`; at `u = −1`, in `[2⁻⁶, 2⁻⁵)`. The exact
+    rational excesses still change two apart (Epime's precision). Only the brackets recur, not the
+    complete exact receipt.
+  - The recurring readings are **worse** than the opening: the excess began at `[2⁻⁹, 2⁻⁸)` and
+    `[2⁻⁷, 2⁻⁶)`.
+
+**What it means for the law.**
+- While `R` does not move, the joint native and World passage under the repeated schedule is the
+  affine round map of §7d. The readings recur at the grain on this fixture. An exact closed orbit
+  still needs its own owner: `I − M` invertible on its stated domain, the admitted future including
+  any receiving deposits, and no convergence claimed beyond what is measured.
+- Before settlement, `R`'s deposits are lattice steps driven by each comparison. They are part of
+  the admitted future, and a prospect that holds `R` fixed is exact only once `R` no longer moves.
+- The recurring readings being worse than the opening is the plainest target the loop has had.
+- The forty-encounter read held the common lease for 136.75 s while the queue waited to launch.
+  Developer reads that long are scheduled between the queue's runs, not across them.
+
+### 7f. The schedule's chained prospect: exact after the receiving relation stops moving
+
+[definition; agent-inferred, October 10] The admitted future of a schedule is its encounters in
+order. `PhysicalReceiver::world_prospect_schedule` builds it:
+- Each prospective encounter opens on the previous one's prospective end carry. `CoupledPassage::end`
+  is the Word's `reception_end`; `action_opening_on` opens on a declared carry.
+- The key continues from its prospective end state at the clock its passage reached
+  (`WorldModel::located_passage_with_tangents`, `coupled_at`).
+- The tangents open at the present opening and are continued across every later opening (eq. 3,
+  `MaterialTangent::continued`, `rebind`). The material is the same on both sides of those
+  crossings.
+- Each encounter returns its comparison, its tangents and its raw prospect (`ScheduledProspect`).
+  `world_prospect_taught` is the schedule of one encounter.
+- `world_schedule_proposal` descends every encounter's credit with the common descent.
+- `land_world_descent_on` admits on a declared `AdmittedFuture`: independent waves from the present
+  opening (§7b), or the schedule. `land_world_descent` is its waves case.
+
+The receiving relation is the material's own throughout. That is exact while `R` does not move, and
+it is not a prediction of `R`'s deposits.
+
+[measured; developer reads, not claim-bearing;
+[receipt](receipts/2026-10-09-material-tangent/SCHEDULE_DEV_TESTS.v1.json)]
+- **The chained prospect is the actual schedule once `R` stops moving**
+  (`the_schedule_prospect_is_the_actual_schedule`). After twelve encounters, both encounters of the
+  next round (`u = 1`, then `u = −1`) equal their prospects exactly, in code enclosure and excess.
+  After two encounters, while `R` still moves, the first equals its prospect and the second does not.
+- **The schedule's credit is exact at its consumer** (`the_schedule_is_credited_at_its_consumer`). The
+  two encounters' credits along one storage direction, summed, are confirmed to second order on
+  `θ ± εH` (the present `R` kept), `ε = 2⁻⁴ … 2⁻⁸`.
+- **The one-round schedule loop** (`the_schedule_loop_is_read_against_its_twin`, `…_on_a_second_fixture`;
+  learner and twin each start after twelve encounters):
+  - On fixture 1, every landing is unreached (`NoReach`: no family reaches its lattice), so learner
+    and twin read identically.
+  - On fixture 2, round 0's landing is admitted (`Phase` at both encounters) and improves both of
+    them against the twin: excess lower by `[2⁻¹⁵, 2⁻¹⁴)` and `[2⁻¹², 2⁻¹¹)`. In every later round,
+    `u = 1` is worse than the twin (excess higher by `[2⁻¹⁵, 2⁻¹²)`), and `u = −1` is better or has a
+    higher code with a lower excess. The landings of rounds 1 to 3 are refused (`PhaseWorse`).
+
+**What it shows.** A one-round horizon fixes the schedule mismatch and keeps the horizon effect: a
+step admitted on its own round costs the rounds after it. The cycle owner of §7d stays the next law,
+with Epime's conditions:
+- `I − M` invertible on a stated domain;
+- the admitted future including any receiving deposits, or restricted to where `R` does not move;
+- no convergence claimed beyond what is measured.
+
+### 7g. The cycle of the schedule: an exact closed orbit, its credit, and where the passage goes
+
+[definition; agent-inferred, October 10] `hnn::physical::action::cycle` builds §7d's law on §7f's
+schedule run (`round_from`).
+- **The round map.** One run of the repeated schedule is affine in the joint opening state
+  `x = (χ, ξ)`: the native opening change, flattened, and the key's state.
+- **`M`.** Its columns are state tangents (`MaterialTangent::state_seed`: `χ₀ = eᵢ` or `ψ₀ = eⱼ`, no
+  material term) ridden through one run, each read at the next opening (eq. 3) and in the World's
+  state.
+- **The closed orbit** is `x* = x_p + (I − M)⁻¹ (F(x_p) − x_p)`. It is opened by a carry whose crossing
+  into the same material is the identity (`π_a = C_a w_a`).
+- **Its credit along a material direction** is `credit(T_H; r_e) + Σᵢ (δx*)ᵢ credit(Sᵢ; r_e)` with
+  `(I − M) δx* = δF`. The tangents are linear in their opening, so this combination is exact.
+- **The descent from these credits** is `descent_from_credits`, the common descent on credits
+  already formed. `world_descent` is now its tangents case.
+- `world_cycle_proposal` and `AdmittedFuture::Cycle` admit on the orbit's encounters.
+
+**Checked, each a refusal when it fails:**
+- the key's charts recur one run later;
+- the pump phases recur at the next opening;
+- `I − M` is invertible;
+- the opening on `x*` is exactly `x*`;
+- the run from `x*` returns to `x*` exactly;
+- its state tangents give the same `M`.
+
+**Not claimed:** convergence of the actual passage (the spectrum of `M` is not certified), or
+anything about `R`'s deposits. The cycle holds the receiving material fixed. It is the fixed-`R`
+orbit.
+
+[measured; developer reads, not claim-bearing;
+[receipt](receipts/2026-10-09-material-tangent/CYCLE_DEV_TESTS.v1.json)]
+- **The cycle closes and its credit is exact** (`the_cycle_closes_and_is_credited_at_its_consumer`,
+  fixture 1, after twelve encounters). The round map's dimension is 40, and every check passes. The
+  orbit's encounters read code within `2⁻⁹⁶` of `1` at both waves (one enclosure), with excess in
+  `[2⁻⁷, 2⁻⁶)` at `u = 1` and `[2⁻⁶, 2⁻⁵)` at `u = −1`. Along one storage direction the orbit's
+  classical credit is exactly `0`, and its phase credit is confirmed to second order on `θ ± εH`: from
+  `ε = 2⁻⁵` on, each halving divides the residual by a ratio in `(63/16, 65/16)`.
+- **The orbit is where the passage goes** (`the_cycle_is_where_the_passage_goes`). The orbit computed
+  after encounter 12 was compared with the actual readings of encounters 38 and 39 of the same
+  passage, with no landing. The code enclosures are equal at both. The excesses lie in the orbit's
+  brackets and are still approaching them: actual minus orbit is `−[2⁻¹⁵, 2⁻¹⁴)` at `u = 1` and
+  `−[2⁻¹⁰, 2⁻⁹)` at `u = −1`. Over these encounters the exact closed orbit of the fixed-`R` schedule is
+  where the passage's readings go. That is a measurement on one fixture, not a convergence
+  certificate.
+
+**The next source issue** (Epime's review, October 10). The schedule run, and the cycle on it, carry
+one immutable material. The actual execution constructs the observed receiving return, deposits it,
+and publishes the receiving material before the next encounter. The after-2 mismatch of §7f measures
+exactly that omission. The prospective run must join the existing receiving publication and its
+retained update state. Alternatively, a fixed-receiving admitted future must be made enforceable. A
+longer horizon does not repair it.
+
+### 7h. The receiving publication joined, and the fixed-readout cycle
+
+[definition; agent-inferred, October 10; Epime's review d79924aa] The schedule run now makes the
+receiving publication between its encounters the way the actual execution makes it:
+- `Word::prospective_coupled_passage` returns its own Word, keeping the source binding;
+- the observed receiving return is formed from that Word against the key's predicted faces
+  (`return_observed_receiving`);
+- the deposit is published on the material the next encounter opens and reads on.
+
+It is an observer translation: no producing propagation or power form changes.
+
+[measured; developer reads, not claim-bearing]
+- **The mismatch closes.** After two encounters, while `R` still moves, the chained prospect now
+  equals both actual encounters exactly. Before the join, the second differed (§7f).
+- **The retained state never stands still.** One actual encounter's publication was diffed after 12
+  and after 30 encounters. The receiving relation's Gram statistics grow at every encounter, and its
+  solved chart's exponent rises by one at each (28 to 29 at encounter 12; 46 to 47 at 30), while the
+  readout `R` stays fixed at the grain. A cycle that required the whole material unchanged refused, as
+  it should. The exact cycle is therefore the **fixed-readout** cycle:
+  - the run from `x_p` and the orbit's run must leave `R`, its carrier and every contact factor
+    unchanged;
+  - the accumulating statistics are not claimed still;
+  - a deposit that moves `R` ends the cycle.
+  With that check, the cycle closes on fixture 1 after 12 encounters, and its credit is still second
+  order.
+
+### 7i. One cycle landing, then the trajectory: the descent's next term, and the normalization it lacks
+
+[measured; developer reads, not claim-bearing] `cycle_trajectory`: learner and twin each run twelve
+encounters; the learner lands once on `AdmittedFuture::Cycle`; then both run fourteen rounds with no
+further landing.
+- **Fixture 2:** refused. `R` still moves during the round after twelve encounters (its readout
+  check). This test reached its 300 s deadline after 12 of 14 rounds and is reported incomplete.
+- **Fixture 1, under law (6) as it stood:** unreached (`NoReach`). On the orbit the classical credit
+  is exactly zero. Law (6) only descends the classical part, holding phase as a constraint, so the
+  step is zero. Learner and twin read identically for all fourteen rounds.
+
+[definition; agent-inferred] **The descent is lexicographic, like the admission.** When the classical
+start projects to zero, `common_descent` takes the next term, `−Σ_o X_o`, projected the same way, with
+every classical and phase gradient still a constraint. With a classical gradient present, nothing
+changes.
+
+[measured] Under the lexicographic descent, fixture 1's cycle step exists. The landing then refuses
+it: *a World landing's families carry a positive covector scale, which bounds their step*. Each
+step's normalization (its `FactorStep` energy and covector scale) is read from the encounter's own
+classical contact return, and on the orbit that covector scale is zero. Learner and twin again read
+identically.
+
+**The blocker, by its measurement.** On fixture 1's orbit the code is flat at the grain, and the phase
+excess is the objective left: it is worse on the orbit than at the opening (§7e). The step that would
+descend it has no declared normalization, because the normalization is classical. The next source
+issue is a phase step's normalization: the bound `2^k c ≤ 1` read on the phase part of the reached
+covector. It must be derived from the declared normalization's own law (`FactorStep`, record §5c),
+not chosen.
+
+**The regression under the lexicographic descent** (all World tests but the fixture-2 trajectory run
+in parallel, 03:09:34–03:15:52, measured 377,987,199,462 ns against a 450 s deadline projected from the
+measured per-test maxima). Thirty tests passed and one failed: the fixture-1 schedule loop, whose
+landing now returns the same covector-scale refusal as an error where the test unwrapped it. The test
+now reports it. Exactly one earlier reading changed: the fixture-2 single-observation loop at round 1
+went from `unreached NoReach` to `PhaseWorse` at grain raise 5. A step now exists and is refused, so no
+landing is admitted either way. Every other loop decision is identical.
+
+Receipt for §7h and §7i: [CYCLE_TRAJECTORY_DEV_TESTS](receipts/2026-10-09-material-tangent/CYCLE_TRAJECTORY_DEV_TESTS.v1.json) (developer reads, not claim-bearing).
+
+**Where the zero scale comes from** (source-inspected, `word/action_return.rs`,
+`return_observed_receiving`). The held contact steps that normalize a World-sensitive descent are
+the composed return of the comparison's covector, pulled back through the native readout
+(`pull_back_full` through `R`, then `reference::compose_return`). The World-sensitive credit reaches the
+material by two paths: the produced read through `R`, and the observed face through the World's
+state (§3d). The held return sees only the first. On fixture 1's orbit that native pullback vanishes,
+so `c = max_t |g_t|_∞` is zero, while the face path still carries the gradient. The normalization the
+step needs is the scale of the covector arriving at the family through **both** paths. With forward
+tangents only, that covector is not formed. Deriving it, by an adjoint through the World port or by
+a bound read from the tangents, is the next source issue. The step size is never chosen in its place.
+
+### 7j. The adjoint through the World port (acceptance fixed before code)
+
+[definition; agent-inferred, October 10] The native reverse sweep (`port::reverse_core_joined`)
+treats each actual source return as exterior. At every tick with a return it zeroes the covector on
+the overwritten source storage, with the note *no World adjoint … is inferred*. The World-sensitive
+step needs the covector that reaches each family through both paths (§7i), so the sweep gains the
+World port through the located key's charts at the commits the returns read. The forward tick is
+§3a's:
+
+```text
+a_t = s_r(t)                  the source ring's storage after the native tick (the emitted wave)
+ξ_(t+1) = F_t ξ_t + G_t a_t   the World's state           b_t = P_t ξ_t + Q_t a_t   overwrites s_r(t)
+f_j = H ξ_(t_j + 1)           the key's declared face, read after the step at each compared station j
+```
+
+Its transpose, swept backward with `λ_b` the covector the sweep holds on the overwritten storage and
+`μ` the World's covector (zero after the last tick):
+
+```text
+μ̃_(t+1) = μ_(t+1) + Hᵀ φ_j                           (φ_j the observed face's covector at station j, read after step t)
+s̄_r(t)  = Q_tᵀ λ_b(t) + G_tᵀ μ̃_(t+1)                 replaces the zeroing; then the native tick's transpose as now
+μ_t      = F_tᵀ μ̃_(t+1) + P_tᵀ λ_b(t)
+```
+
+(Corrected October 10 on Codex's source review: the face reads `ξ_(t_j + 1)`, so its covector joins
+`μ_(t+1)` before the `G` and `F` transposes, as the implementation does; the first printing added it
+after `Fᵀ`.)
+
+The observed face's covector is the comparison's own: `φ_j = −Im g_j` on the imaginary logit
+entries (series (5)'s observed phase, with its sign), and `0` on the real ones.
+
+**Acceptance, fixed before code:**
+- **(a) The consumer identity.** For every declared contact coordinate, the adjoint's pairing with the
+  coordinate's forcing equals the forward tangent's comparison credit exactly, magnitude plus both
+  phase parts, on the published fixture after twelve encounters, at the present opening and at the
+  cycle's orbit. Exact equality, not a ladder.
+- **(b) The normalization.** The covector scale `c = max_t |g_t|_∞` read from the World-sensitive
+  return is positive on fixture 1's orbit, where the native-only return's is zero (§7i).
+- **(c) The landing, reported as measured.** With that normalization, the cycle landing on fixture 1,
+  then the fourteen-round trajectory against the twin.
+
+The World adjoint is the key's, and exact only where the key is located to a point (§3a). The
+native-only return stays the exterior-return law wherever no key is located.
+
+**Built (§7j).**
+- `port::WorldPort` (the source ring, the key's charts per tick, the face's linear part `H`) forms the
+  `WorldAdjoint` from a comparison's covector.
+- `reverse_core_joined` carries the World's covector across every source return in place of zeroing
+  it.
+- `Word::pull_back_world` is the return through both paths.
+- `return_observed_receiving` takes an optional port. It runs the World sweep beside the native one,
+  so the receiving deposit stays the actual execution's, and returns `world_contacts`.
+- The schedule run builds the port for each prospective encounter. `ScheduledProspect::world_contacts`
+  holds the result, and the cycle proposal normalizes with it: per contact family, energies summed and
+  the largest covector scale.
+- Actual execution passes no port and is unchanged.
+
+[measured; developer reads, not claim-bearing;
+[receipt](receipts/2026-10-09-material-tangent/WORLD_ADJOINT_DEV_TESTS.v1.json)]
+- **(a) The consumer identity** (`the_world_return_is_the_tangents_credit`, fixture 1, the next
+  encounter's prospect after twelve encounters).
+  - For all 32 stiffness and dissipation coordinates, the World return's gradient entry equals
+    **exactly −1 times** the forward tangent's whole credit.
+  - The native part of every credit (magnitude plus produced phase) is exactly `0` at this state:
+    the whole gradient runs through the World's face. That is why the native-only normalization was
+    zero (§7i).
+  - For the 16 storage coordinates the ratio is not `−1`. The forward storage tangent also carries the
+    held-momentum crossing at the opening (`C δw = −δC w`, §7b), which the within-Word sweep does not
+    include. That identity is owed through the sweep's opening covector. (a) holds for stiffness and
+    dissipation, and is open for storage.
+- **(b) The normalization is positive.** With the World-sensitive steps, fixture 1's cycle landing
+  reaches a declared step (first reach at exponent 7, grain raise 0) where the native-only steps
+  refused.
+- **(c) The landing on the orbit.** The step improves the orbit's second encounter (excess down by
+  `[2⁻⁷, 2⁻⁶)`) and worsens its first (up by `[2⁻¹⁰, 2⁻⁹)`): refused, `PhaseWorse`. Learner and twin
+  read identically. This run reached its 300 s deadline after round 13 of 14 and is reported
+  incomplete.
+
+### 7k. The phase level's common descent, and the trade-off at the material grain
+
+[definition; agent-inferred, October 10] The phase stage of §7i projected the summed phase gradient
+off any wave's phase gradient it would raise. That holds the projected wave's first-order change at
+zero, so curvature then raises it, and the admission refuses: (c) above. Within one lexicographic
+level the admission reads every wave on its own. The step should therefore be a **strict common
+descent**, the negated minimum-norm point of the waves' phase gradients' convex hull (two observations
+here, exact: `λ = clamp(⟨b − a, b⟩/|b − a|², 0, 1)`). It lowers every wave's phase at first order. This
+is not the retired min-norm hull of §5a, which mixed the classical and phase levels and broke their
+order. This one stays within the phase level, and the classical gradients remain constraints.
+
+[measured] Under it, fixture 1's cycle landing is **unreached**: `CovectorScale` for the stiffness
+family at exponent 8. On the orbit the two waves' phase gradients nearly oppose, so their common
+strict descent is small. Reaching one lattice unit of material along it would need a step beyond
+the certified bound `2^k c ≤ 1`. Learner and twin read identically for the eight declared rounds; the
+read was cut from 14 rounds to 8 on the measured rate, not by raising the deadline.
+
+**The blocker, by its measurement.** On fixture 1's fixed-readout orbit the two waves trade phase
+against each other. At the material's lattice, no admitted step lowers both. The material's grain,
+not the descent, now bounds the cycle on this fixture. Not yet read: the second fixture's cycle,
+which needs more encounters before its readout stops moving, and the storage identity.
+
+**The second fixture's readout does not stop** ([receipt](receipts/2026-10-09-material-tangent/SECOND_PASSAGE_DEV_TESTS.v1.json),
+`the_second_passage_over_forty_encounters`). Over forty plain encounters alternating `u = 1, −1`,
+`R` moved at encounters 0–8, 11, 13, 17–19, 23, 26, 27, 29, 31, 33, 35, 37 and 39: from encounter 29
+on, at every `u = −1` encounter. No fixed-readout cycle exists on this fixture in this window, and the
+cycle owner's refusal there is the law working. A cycle on it would have to be the joint cycle, with
+`R`'s deposits part of the orbit, and only if `R` itself recurs, which forty encounters do not show.
+
+
+### 7l. The storage identity, the boundary's normalization, and the readout at every publication
+
+[definition; agent-inferred, October 10] §7j left storage owed: the forward tangent moves the opening
+rate with the storage (`C_a δw_a = −δC w_a`, the held-momentum crossing of §7b), while the World
+return started from a fixed opening and discarded its opening covector. The crossing is itself a
+storage solve, so its adjoint is a solve's. With `ū_a` the return's opening covector on contact `a`'s
+rate and `C_aᵀ z = ū_a`, the full credit is the within-Word credit plus the opening pairing, and the
+storage covector gains `∂ℓ/∂C = −z w_aᵀ`. That is the storage tick term `2 r̄ (w − ω)ᵀ` of
+`compose_contact` at `r̄ = −z/2`, `w = w_a`, `ω = 0`. It enters the storage family alone and is pulled
+onto the factor as the ticks' terms are (`hnn::port::opening_crossings`,
+`hnn::reference::join_crossing`).
+
+- **The same solve law.** The crossing's own solve (`held_rate`) fixes `w` only modulo `ker C_a`, which
+  no later tick reads, since the transit reads `w` only through `C w`. Hence `ū_a ∈ range C_aᵀ`, and
+  `z` is any point of its fibre: `ker C_aᵀ` pairs to zero with every admitted target
+  `−δC w_a ∈ range C_a`. A covector off that range, or a target off `range C_a`, is refused
+  (`HeldMomentum`), exactly where the crossing refuses a momentum. No inverse is assumed.
+- **Its own normalization.** The enlarged return is not certified by the within-Word energy and
+  covector scale. Its bound is the existing owner's law for an opening's dual, the reached-contact
+  metric of `hnn::word::variation`: the storage step's energy gains the opening columns' squared norm
+  in the native wave chart (`Σ_c |δw_c / G_a|²`, one column per raw storage coordinate), and its
+  covector ceiling gains the opening dual's l1 bound in that chart (`Σ |ū_a|·G_a`), read on the
+  columns' support (the contact's opening rate, the only part of the opening a storage direction
+  moves). Stiffness and dissipation move nothing at the opening, so their steps keep their
+  within-Word metric.
+- **The readout at every publication.** The fixed-readout cycle (§7h) compared only each run's end
+  material with its start. Equal ends do not certify that `R` stayed fixed within the run. Each run
+  now reads every receiving publication against the material it was deposited on
+  (`ScheduleRound::readout_fixed`), and the cycle refuses unless all of them leave the readout
+  unchanged.
+
+**Scope (Codex's review).**
+- The 48-entry identity is the next encounter's return at the present opening.
+- The cycle's credit (§7g) adds the implicit orbit shift `(I − M)⁻¹ δF`, and the cycle's
+  World-sensitive normalization (§7j) is formed from per-encounter sweeps whose terminal World
+  covector is zero. That normalization is therefore a per-encounter bound, not yet the adjoint of
+  the cycle credit. Joining the orbit shift (the native and World boundary duals carried across the
+  round) or deriving its bound is owed before a cycle landing's step is claimed certified. The cycle
+  landing is unreached (§7k), so no claim rests on it now.
+- The receiving tangents hold `R` exterior (`MaterialTangent::rebind`). The forward prediction with a
+  moving `R` is exact (§7h), and its derivative remains conditional on a locally fixed receiving
+  publication.
+
+**Acceptance, fixed before the run.** `the_world_return_is_the_tangents_credit` asserts, for all 48
+raw coordinates of contact 0 (16 per family) after twelve encounters, that the World return's
+gradient entry is exactly −1 times the forward tangent's whole credit.
+
+[measured] **The acceptance passes** ([receipt](receipts/2026-10-09-material-tangent/STORAGE_IDENTITY_DEV_TESTS.v1.json)).
+For all 48 coordinates, the gradient entry is exactly −1 times the whole credit. The 16 storage
+coordinates, which §7j left apart by the opening term, now meet it as well. Taken before the
+restructuring above (then the crossing term rode one extra transit tick, sharing its covector scale
+with all three families), with the same gradient.
+
+[measured] **At the restructured source** ([receipt](receipts/2026-10-09-material-tangent/FULL_SUITE_CROSSING.v1.json)):
+33 of 33 pass (one filtered, the second fixture's cycle trajectory, which reached its deadline in
+§7i). The 48 ratios are exactly −1. Against the whole suite at `deb51f40`
+([receipt](receipts/2026-10-09-material-tangent/FULL_SUITE_deb51f40.v1.json), 33 of 33), only the 16
+storage lines of the identity test changed. Every other printed reading is identical, including
+fixture 1's cycle landing: unreached, `CovectorScale` for stiffness at exponent 8. The crossing
+enlarges the storage family alone, and no landing decision moved. An intermediate run of the
+superseded structure was stopped by hand at 31 of 33 (none failed), and the receipt names it.
+
+### 7m. The blocker, classified: lattice reach, incompatible directions, or omitted coupling
+
+[definition; agent-inferred, October 10] Codex asked that the next progress tell §7k's refusal apart
+by its actual source, with the objective and its comparisons fixed. The three are distinct and
+exactly readable on fixture 1's orbit after twelve encounters, per contact family, from the orbit
+credits already formed (`the_cycle_blocker_is_classified`; nothing is stepped):
+
+- **Incompatible directions.** The two orbit encounters' phase gradients `a`, `b` over the family's
+  raw coordinates admit a strict common descent exactly when the minimum-norm point `m` of `[a, b]`
+  is nonzero. `m = 0` exactly when they are exactly opposed: parallel defect
+  `|a|²|b|² − ⟨a, b⟩² = 0` with `⟨a, b⟩ < 0`. Then no step at any grain lowers both phases at first
+  order. That is a Pareto-stationary orbit, a property of the objective and not of the lattice.
+- **Lattice reach.** With `m ≠ 0`, a common descent exists at first order. The landing refuses when
+  the first exponent at which the step commits a lattice unit (§7k: 8 for stiffness) exceeds the
+  certified exponent `k_c`, the largest `k` with `2^k c ≤ 1` for the family's covector scale `c`
+  through the World port. The gap `8 − k_c` measures how much finer the material grain would have
+  to be.
+- **Omitted coupling.** This is read from source, not from a number. The cycle's normalization omits
+  the orbit shift's adjoint (§7l, scope), and the receiving tangents hold `R` exterior. The orbit's
+  classical gradients `L0`, `L1` are read beside it: §7i found the orbit's summed classical credit
+  exactly 0, and this reading says whether each encounter's is.
+
+**Acceptance, fixed before the run.** The reading prints, per family: `|L0|², |L1|²`, `|a|², |b|²`,
+`⟨a, b⟩`, the parallel defect and whether it is exactly zero, `λ`, `|m|²` and its ratio to the smaller
+of `|a|², |b|²`, the widest entry of `m`, and `c` with `k_c`, all as exact dyadic enclosures. It
+classifies each family by the rules above and changes no law.
+
+[measured] **The reading** ([receipt](receipts/2026-10-09-material-tangent/BLOCKER_CLASSIFIED_DEV_TESTS.v1.json)),
+fixture 1's orbit after twelve encounters, as exact dyadic enclosures:
+
+| family | `\|L0\|²`, `\|L1\|²` | `\|a\|²` | `\|b\|²` | `⟨a, b⟩` | parallel defect | `λ` | `\|m\|²` | widest `\|m_i\|` | `c` | `k_c` |
+|---|---|---|---|---|---|---|---|---|---|---|
+| storage | 0, 0 | `[2⁻¹⁰, 2⁻⁹)` | `[2⁻⁹, 2⁻⁸)` | `[2⁻¹⁰, 2⁻⁹)` | `[2⁻²⁰, 2⁻¹⁹)` | 1 | `[2⁻¹⁰, 2⁻⁹)` | `[2⁻⁶, 2⁻⁵)` | `[2⁻⁴, 2⁻³)` | 3 |
+| stiffness | 0, 0 | `[2⁻¹⁴, 2⁻¹³)` | `[2⁻¹³, 2⁻¹²)` | `[2⁻¹⁴, 2⁻¹³)` | `[2⁻²⁹, 2⁻²⁸)` | 1 | `[2⁻¹⁴, 2⁻¹³)` | `[2⁻⁸, 2⁻⁷)` | `[2⁻⁸, 2⁻⁷)` | 7 |
+| dissipation | 0, 0 | `[2⁻¹³, 2⁻¹²)` | `[2⁻¹², 2⁻¹¹)` | `[2⁻¹³, 2⁻¹²)` | `[2⁻²⁷, 2⁻²⁶)` | 1 | `[2⁻¹³, 2⁻¹²)` | `[2⁻⁸, 2⁻⁷)` | `[2⁻⁸, 2⁻⁷)` | 7 |
+
+**Classified.**
+- **Not incompatible directions.** In every family `⟨a, b⟩ > 0`, and the parallel defect is nonzero.
+  The minimum-norm point is `a` itself (`λ = 1`, `⟨a, b⟩ ≥ |a|²`), so `−a` lowers both orbit
+  encounters' phase at first order. The orbit is not Pareto-stationary.
+- **Lattice reach, by one dyadic order.** For stiffness, the family §7k's refusal names, the certified
+  exponent is `k_c = 7` (`c ∈ [2⁻⁸, 2⁻⁷)`), while the step first commits a lattice unit at exponent 8.
+  The widest descent entry lies in the same enclosure as `c`. A certified step `2^k ≤ 1/c` then moves
+  each entry by less than one unit, so the step reaches only when the descent's entries exceed its
+  covector scale. The material grain is one binary order too coarse for the certified common descent.
+- **Omitted coupling.** Each orbit encounter's classical gradient is exactly 0, not only their sum,
+  so on this orbit the classical level carries nothing and the phase alone can be descended. The
+  orbit shift's adjoint and `R`'s exterior hold (§7l) are the omitted terms named in source. They
+  bound the normalization's scope, not the direction, which comes from the exact forward credits.
+
+**Correction (October 10).** §7k said the two waves' phase gradients "nearly oppose". That was my
+inference from the refusal, not a reading, and the reading contradicts it: they are positively
+aligned in every family. The §7k refusal itself stands as measured. §7j's account of the
+projection-stage worsening at encounter 0 ("projecting off encounter 0's phase holds its first-order
+change at zero") is not supported either. With `⟨a, b⟩ > 0`, `−(a + b)` raises neither wave at first
+order, so no projection acts. The measured worsening of `[2⁻¹⁰, 2⁻⁹)` at exponent 7 is therefore
+second order or lattice rounding of a step that commits about one unit, so the committed change is
+not `2⁷ d`. Which of the two is not yet read.

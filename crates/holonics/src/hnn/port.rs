@@ -65,7 +65,7 @@
 //! return that consumes the word.
 
 use num_bigint::BigInt;
-use num_traits::{One, Zero};
+use num_traits::{One, Signed, Zero};
 
 use crate::aeon::Reading;
 use crate::compression::{CompressionError, ResonanceSplit, resonance_split};
@@ -73,9 +73,9 @@ use crate::hnn::HnnError;
 use crate::hnn::encoding::Encoded;
 use crate::hnn::chart::{ChartReading, Remainders, carry};
 use crate::hnn::constitution::{
-    DepositReading, FactorStep, LandmarkStep, Lattice, LinearStep, Locus, Reach,
+    Constitution, DepositReading, FactorStep, LandmarkStep, Lattice, LinearStep, Locus, Reach,
 };
-use crate::hnn::field::{Current, Field, Ring};
+use crate::hnn::field::{ConstitutionRead, Current, Field, Ring};
 use crate::hnn::keys::KeyLocation;
 use crate::hnn::moment::{Ingested, SourceCapacity};
 use crate::hnn::propagation::{
@@ -883,7 +883,7 @@ impl<'c> Word<'c> {
         lift: &BigInt,
         phases: &ReceivingPhases,
     ) -> Result<WordReturn, HnnError> {
-        Ok(reverse(&self, covector, map, lift, phases)?.0)
+        Ok(reverse(&self, covector, map, lift, phases, None)?.0)
     }
 
     /// The same receiving return, retaining its complete opening dual. A held-material
@@ -896,7 +896,22 @@ impl<'c> Word<'c> {
         lift: &BigInt,
         phases: &ReceivingPhases,
     ) -> Result<(WordReturn, ChangeCovector), HnnError> {
-        reverse(&self, covector, map, lift, phases)
+        reverse(&self, covector, map, lift, phases, None)
+    }
+
+    /// [definition; agent-inferred, October 10; the held-carry record §7j] **The return through the
+    /// World port**: [`Self::pull_back_full`] with the World's transpose joined at every source
+    /// return ([`WorldAdjoint`]), so the covector that reaches each family is the comparison's
+    /// through both paths, the native read and the World's observed face.
+    pub(crate) fn pull_back_world(
+        &self,
+        covector: &RatioCovector,
+        map: &ExactRatMatrix,
+        lift: &BigInt,
+        phases: &ReceivingPhases,
+        world: &WorldAdjoint,
+    ) -> Result<(WordReturn, ChangeCovector), HnnError> {
+        reverse(self, covector, map, lift, phases, Some(world))
     }
 
     /// [definition; agent-inferred] **A continuing word's return** (U6's native generation; its
@@ -935,7 +950,7 @@ impl<'c> Word<'c> {
         self,
         anchors: Vec<Vec<Option<Vec<Rat>>>>,
     ) -> Result<(WordReturn, ChangeCovector), HnnError> {
-        reverse_core_joined(&self, anchors, None)
+        reverse_core_joined(&self, anchors, None, None)
     }
 
     /// Declaration/control differential of the same joined anchors, with no retained Word.
@@ -948,7 +963,7 @@ impl<'c> Word<'c> {
                 reason: "an exact Word for a joined receiving differential",
             });
         }
-        Ok(reverse_core_joined(self, anchors, None)?.1)
+        Ok(reverse_core_joined(self, anchors, None, None)?.1)
     }
 }
 
@@ -1039,12 +1054,85 @@ type Arriving = (usize, usize, Vec<Rat>, Vec<Rat>, Rat);
 /// contact's part.
 type JunctionReverse = (Vec<Rat>, Vec<Rat>, Vec<Arriving>);
 
+/// [definition; agent-inferred, October 10; the held-carry record §7j] **The World port's
+/// transpose**: the located key's charts at the commit each source return read (index `t` for the
+/// return at tick `t + 1`), and the observed face's covector on the World's state after each tick
+/// (`Hᵀ φ_j` at a compared station's tick, else `None`). The reverse sweep then carries the
+/// covector through the World instead of holding the returned wave exterior:
+/// `s̄_r = Qᵀ λ_b + Gᵀ μ′`, `μ = Fᵀ μ′ + Pᵀ λ_b`.
+#[derive(Clone, Debug)]
+pub(crate) struct WorldAdjoint {
+    pub(crate) ring: usize,
+    /// `[F, G, P, Q]` per tick.
+    pub(crate) charts: Vec<[ExactRatMatrix; 4]>,
+    pub(crate) face: Vec<Option<Vec<Rat>>>,
+    pub(crate) extent: usize,
+}
+
+/// [definition; agent-inferred, October 10; the held-carry record §7j] **The World port of a
+/// passage**: the source ring, the located key's charts `[F, G, P, Q]` at each tick's commit, and
+/// the key's declared face's linear part `H` (the face is affine in the World's state). With a
+/// comparison's covector it forms the [`WorldAdjoint`]: at each compared station's tick, the observed
+/// face's covector `Hᵀ φ_j`, `φ_j = −Im g_j` on the imaginary logit entries (series (5)'s observed
+/// phase, with its sign) and `0` on the real ones.
+#[derive(Clone, Debug)]
+pub(crate) struct WorldPort {
+    pub(crate) ring: usize,
+    pub(crate) charts: Vec<[ExactRatMatrix; 4]>,
+    pub(crate) face: ExactRatMatrix,
+    pub(crate) extent: usize,
+}
+
+impl WorldPort {
+    pub(crate) fn adjoint(
+        &self,
+        covector: &RatioCovector,
+        phases: &ReceivingPhases,
+        compared: &[bool],
+    ) -> Result<WorldAdjoint, HnnError> {
+        let steps = self.charts.len();
+        let transpose = self.face.transpose()?;
+        let mut face: Vec<Option<Vec<Rat>>> = vec![None; steps];
+        for (j, epoch) in phases.epochs().enumerate() {
+            if !compared.get(j).copied().unwrap_or(false) {
+                continue;
+            }
+            let g = covector.logits().get(j).ok_or(HnnError::Shape {
+                what: "a covector entry per compared station",
+                expected: phases.aperture(),
+                found: covector.logits().len(),
+            })?;
+            let phi: Vec<Rat> = g
+                .iter()
+                .enumerate()
+                .map(|(i, x)| if i % 2 == 1 { -x.clone() } else { Rat::zero() })
+                .collect();
+            let t = epoch.checked_sub(1).ok_or(HnnError::Unadmitted {
+                reason: "a compared station reads after a World step",
+            })?;
+            let slot = face.get_mut(t).ok_or(HnnError::WordEnded { ticks: steps })?;
+            let pulled = transpose.apply(&phi)?;
+            *slot = Some(match slot.take() {
+                Some(held) => add(&held, &pulled),
+                None => pulled,
+            });
+        }
+        Ok(WorldAdjoint {
+            ring: self.ring,
+            charts: self.charts.clone(),
+            face,
+            extent: self.extent,
+        })
+    }
+}
+
 fn reverse(
     word: &Word<'_>,
     covector: &RatioCovector,
     map: &ExactRatMatrix,
     lift: &BigInt,
     phases: &ReceivingPhases,
+    world: Option<&WorldAdjoint>,
 ) -> Result<(WordReturn, ChangeCovector), HnnError> {
     let field = word.field();
     let steps = word.recorded().len();
@@ -1077,9 +1165,107 @@ fn reverse(
             .ok_or(HnnError::WordEnded { ticks: steps })?;
         reads.push((receiving_ring.rotate(anchor, lift), gradient));
     }
-    let (mut back, opening) = reverse_core(word, read_covector, receiving, None)?;
+    let anchors = read_covector
+        .into_iter()
+        .map(|seed| {
+            let mut joined = vec![None; field.rings().len()];
+            joined[receiving] = seed;
+            joined
+        })
+        .collect();
+    let (mut back, opening) = reverse_core_joined(word, anchors, None, world)?;
     back.reads = reads;
     Ok((back, opening))
+}
+
+/// [definition; agent-inferred, October 10; the held-carry record §7l] **The opening's crossing,
+/// returned as the storage solve it is**: a Word that opens on a carry crossed at held momentum
+/// (`C_a w_a = π_a`, [`crate::hnn::word::continuation::MaterialTangent::crossed_at_held_momentum`])
+/// moves its opening rate with the storage, `C_a δw_a = −δC w_a`. With the opening covector `ū_a`
+/// on that rate and `C_aᵀ z = ū_a`, the storage covector gains `∂ℓ/∂C = −z w_aᵀ`, the storage tick
+/// term `2 r̄ (w − ω)ᵀ` of [`crate::hnn::reference::compose_contact`] at `r̄ = −z/2`, `w = w_a`,
+/// `ω = 0`. It enters the storage family alone.
+///
+/// The solve is the crossing's own ([`crate::hnn::word`]'s `held_rate`), with its refusal: the
+/// transit reads `w` only through `C w`, so `ū_a ∈ range C_aᵀ` and `z` is any point of its fibre
+/// (`ker C_aᵀ` pairs to zero with every admitted target `−δC w_a ∈ range C_a`); a covector off that
+/// range, or a target off `range C_a`, is refused as the crossing refuses a momentum.
+///
+/// Its normalization is the reached-contact metric's
+/// ([`crate::hnn::word::variation::ReachedContactMetric`]): the opening columns' squared norm in
+/// the native wave chart (`w/G_a`), one column `δw_a` per raw storage coordinate of the contact, and
+/// the opening dual's l1 bound in that chart (`|ū_a|·G_a`), read on the columns' support, the
+/// contact's opening rate. Per contact whose opening rate and its covector are both nonzero:
+/// `r̄ = −z/2`, `w_a` (the state before the contact's first transit) and the two metric terms.
+pub(crate) struct OpeningCrossing {
+    pub contact: usize,
+    pub solved: Vec<Rat>,
+    pub rate: Vec<Rat>,
+    pub column_power: Rat,
+    pub dual_bound: Rat,
+}
+
+pub(crate) fn opening_crossings(
+    word: &Word<'_>,
+    theta: &Constitution,
+    opening: &ChangeCovector,
+    back: &WordReturn,
+) -> Result<Vec<OpeningCrossing>, HnnError> {
+    use crate::hnn::word::continuation::MaterialDirection;
+    use crate::hnn::word::variation::ContactCoordinate;
+    let field = word.field();
+    let half = Rat::new(BigInt::from(-1), BigInt::from(2));
+    let mut crossings = Vec::new();
+    for (a, contact) in word.operands().contacts().iter().enumerate() {
+        let Some(first) = back.transits[a].first() else {
+            continue;
+        };
+        let (rate, covector) = (&first.rate, &opening.states[a][1]);
+        if rate.iter().all(Zero::is_zero) || covector.iter().all(Zero::is_zero) {
+            continue;
+        }
+        let (storage, _, _) = contact.forms();
+        let (z, _) = storage
+            .transpose()?
+            .preimage_fibre(covector)?
+            .ok_or(HnnError::HeldMomentum { contact: a })?;
+        let conductance = contact.conductance();
+        let factor = theta.contact_storage(a);
+        let mut column_power = Rat::zero();
+        for row in 0..factor.rows() {
+            for column in 0..factor.columns() {
+                let coordinate = ContactCoordinate {
+                    contact: a,
+                    family: 0,
+                    row,
+                    column,
+                };
+                let direction = MaterialDirection::of_coordinate(field, theta, &coordinate)?;
+                let Some(delta) = direction.storage else {
+                    continue;
+                };
+                let target: Vec<Rat> = delta.apply(rate)?.into_iter().map(|x| -x).collect();
+                if target.iter().all(Zero::is_zero) {
+                    continue;
+                }
+                let (jump, _) = storage
+                    .preimage_fibre(&target)?
+                    .ok_or(HnnError::HeldMomentum { contact: a })?;
+                column_power += jump
+                    .iter()
+                    .map(|x| (x / conductance) * (x / conductance))
+                    .sum::<Rat>();
+            }
+        }
+        crossings.push(OpeningCrossing {
+            contact: a,
+            solved: z.iter().map(|x| x * &half).collect(),
+            rate: rate.clone(),
+            column_power,
+            dual_bound: covector.iter().map(|x| (x * conductance).abs()).sum(),
+        });
+    }
+    Ok(crossings)
 }
 
 /// **The reverse sweep** over a word's own per-tick waves (module header, "The word's return"):
@@ -1107,13 +1293,14 @@ fn reverse_core(
         joined[receiving] = seed;
         joined
     }).collect();
-    reverse_core_joined(word, anchors, end)
+    reverse_core_joined(word, anchors, end, None)
 }
 
 fn reverse_core_joined(
     word: &Word<'_>,
     mut read_covector: Vec<Vec<Option<Vec<Rat>>>>,
     end: Option<&ChangeCovector>,
+    world: Option<&WorldAdjoint>,
 ) -> Result<(WordReturn, ChangeCovector), HnnError> {
     crate::hnn::word::work::reached(crate::hnn::word::work::Event::ReturnAttempt);
     let field = word.field();
@@ -1217,6 +1404,17 @@ fn reverse_core_joined(
             .collect(),
         None => rest_resonators.clone(),
     };
+    // The World's covector after the sweep's current tick (§7j): zero after the last.
+    if let Some(world) = world
+        && (world.charts.len() != steps || world.face.len() != steps)
+    {
+        return Err(HnnError::Shape {
+            what: "the World port's charts and face covectors, one per executed tick",
+            expected: steps,
+            found: world.charts.len(),
+        });
+    }
+    let mut world_bar = world.map(|w| zeros(w.extent));
     for t in (0..steps).rev() {
         let record = &records[t];
         // The step's junctions, read from its own record at the anchors the word carried: the
@@ -1252,8 +1450,27 @@ fn reverse_core_joined(
             // The actual exterior returned wave is held in this R-only conditional return.
             // Reverse its overwrite before the native element/loaded stage. No World adjoint
             // or full material derivative is inferred from this conditional source costate.
+            if let (Some(world), Some(mu)) = (world, world_bar.as_mut())
+                && let Some(face) = &world.face[t]
+            {
+                *mu = add(mu, face);
+            }
             for returned in word.source_returns().iter().filter(|returned| returned.tick == t + 1) {
-                storage_bar[returned.ring].fill(Rat::zero());
+                match (world, world_bar.as_mut()) {
+                    (Some(world), Some(mu)) if world.ring == returned.ring => {
+                        // [§7j] Through the World port: the returned wave b = P ξ + Q a overwrote
+                        // the emitted wave a, and ξ′ = F ξ + G a.
+                        let [f, g, p, q] = &world.charts[t];
+                        let lambda = storage_bar[returned.ring].clone();
+                        let emitted = add(
+                            &q.transpose()?.apply(&lambda)?,
+                            &g.transpose()?.apply(mu)?,
+                        );
+                        *mu = add(&f.transpose()?.apply(mu)?, &p.transpose()?.apply(&lambda)?);
+                        storage_bar[returned.ring] = emitted;
+                    }
+                    _ => storage_bar[returned.ring].fill(Rat::zero()),
+                }
             }
             // Reverse the loaded storage-port stage first. Its drive covector then enters the
             // element transpose, so the junction and contact receive the complete loaded path.

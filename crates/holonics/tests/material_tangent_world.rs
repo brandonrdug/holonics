@@ -15,8 +15,8 @@ use holonics::hnn::constitution::CAMPAIGN_ONE_BUDGET;
 use holonics::hnn::field::{ContactDeclaration, CribDeclaration, ReceiverDeclaration};
 use holonics::hnn::physical::PhysicalReceiver;
 use holonics::hnn::physical::action::{
-    ActionCommunication, ActionReception, AdmittedWaves, BoundJointWorld, ModelKey,
-    PreparedPhysicalProbe, WorldLanding, WorldModel,
+    ActionCommunication, ActionReception, AdmittedFuture, AdmittedWaves, BoundJointWorld,
+    ModelKey, PreparedPhysicalProbe, WorldLanding, WorldModel,
 };
 use holonics::hnn::propagation::Operands;
 use holonics::hnn::ring::ResonatorMaterial;
@@ -35,7 +35,7 @@ use holonics::ratio::linear::inertia::SymmetricForm;
 use holonics::ratio::{Rat, integer, rat};
 use holonics::receiver::receipt::{ReceiptLaw, RegionChart};
 use holonics::receiver::reception::{JointLaw, ReceiverFace};
-use num_traits::{Signed, Zero};
+use num_traits::{One, Signed, Zero};
 
 /// Each participant's coordinates: the source's and the receiver's.
 const N: usize = 4;
@@ -2000,9 +2000,9 @@ fn the_prospect_landing_reads_both_waves() {
             wave.decision
         );
     }
-    if reading.decision.is_err() {
-        return;
-    }
+    // [measured, October 10; the record §7b] On this fixture the landing over both waves is
+    // admitted; kept as the fixture's regression of the measured outcome.
+    assert!(reading.decision.is_ok(), "the measured prospect landing is admitted");
     for (index, control) in controls.iter().enumerate() {
         let (mut replay, _) = land_prospect(&field, &theta, &source);
         let landed = second_comparison(&mut replay, &field, &source, control);
@@ -2020,6 +2020,1127 @@ fn the_prospect_landing_reads_both_waves() {
             "prospect production: wave {index}: landed code {:?} excess {}; twin code {:?} excess {}",
             landed.0, landed.1, unlanded.0, unlanded.1
         );
+        // Production in the admission's own order, at this wave: strictly below in code, or an
+        // equal code (the wave's witness) with a strictly smaller phase excess.
+        assert_eq!(unlanded.0, wave.producing.code_length().unwrap());
+        assert_eq!(unlanded.1, wave.producing.excess().unwrap());
+        assert!(
+            landed.0.upper < unlanded.0.lower
+                || (matches!(wave.decision, Ok(Admitted::Phase)) && landed.1 < unlanded.1),
+            "the landed next comparison is better than the twin's at wave {index}"
+        );
     }
 }
 
+/// **The prospect landing without its history** (§7b, the no-history control): the contemporary
+/// material the landing staged on (after the two encounters) and the landed one, each on a fresh
+/// World with no earlier encounter, read at both waves. Reported as measured.
+#[test]
+fn the_prospect_landed_material_is_read_without_its_history() {
+    let (field, base, source) = fixture();
+    let declared = Declared::new(&field, base);
+    let theta = declared.at(&Rat::zero());
+    let contemporary = {
+        let mut receiver = bound(&field, theta.clone(), &source, vec![faced_key(&field)]);
+        experience(&mut receiver, &field, &source);
+        receiver.constitution().clone()
+    };
+    let (landed_receiver, landing) = land_prospect(&field, &theta, &source);
+    let WorldLanding::Read(reading) = landing else {
+        panic!("the measured prospect landing reaches its lattice");
+    };
+    assert!(reading.decision.is_ok(), "the measured prospect landing is admitted");
+    let landed = landed_receiver.constitution().clone();
+    for (index, control) in chain_controls().iter().enumerate() {
+        let read = |material: &Constitution| {
+            let mut fresh = bound(&field, material.clone(), &source, vec![faced_key(&field)]);
+            let comparison = second_comparison(&mut fresh, &field, &source, control);
+            (comparison.0, comparison.1)
+        };
+        let (c_code, c_excess) = read(&contemporary);
+        let (l_code, l_excess) = read(&landed);
+        println!(
+            "prospect history control: wave {index}: contemporary on a fresh World code {c_code:?} excess {c_excess}; landed on a fresh World code {l_code:?} excess {l_excess}"
+        );
+    }
+}
+
+/// **One observation or two** (§7b): the same prospect landing after only the first encounter
+/// (`u = 1`), read at both waves. Reported as measured: it says whether the second observation
+/// changes the step on this fixture.
+#[test]
+fn the_prospect_landing_after_one_observation() {
+    let (field, base, source) = fixture();
+    let declared = Declared::new(&field, base);
+    let theta = declared.at(&Rat::zero());
+    let [first, second] = chain_controls();
+    let mut receiver = bound(&field, theta.clone(), &source, vec![faced_key(&field)]);
+    let preparation = actuator(&field);
+    let last = {
+        let probe = receiver
+            .prepare_probe(&source, &field.receivers()[0], &preparation, &[false, true])
+            .unwrap();
+        let waves = admitted(&probe, 0);
+        let reception = probe.encounter(&waves, &first).unwrap();
+        let ActionCommunication::Received(last) = reception.reception else {
+            panic!("the encounter completes");
+        };
+        last
+    };
+    let coordinates = all_coordinates(receiver.constitution());
+    let proposal = receiver.world_prospect_proposal(
+        &coordinates,
+        &source,
+        &field.receivers()[0],
+        &preparation,
+        &[false, true],
+        &[&first, &second],
+        &last,
+    );
+    let proposal = match proposal {
+        Ok(proposal) => proposal,
+        Err(refusal) => {
+            println!("prospect after one observation: proposal refused {refusal:?}");
+            return;
+        }
+    };
+    let landing = receiver
+        .land_world_descent(
+            proposal,
+            &source,
+            &field.receivers()[0],
+            &preparation,
+            &[false, true],
+            &[&first, &second],
+        )
+        .unwrap();
+    match landing {
+        WorldLanding::Unreached(refusal) => {
+            println!("prospect after one observation: unreached {refusal:?}")
+        }
+        WorldLanding::Read(reading) => {
+            println!(
+                "prospect after one observation: grain raise {:?}; decision {:?}",
+                reading.grain_raise, reading.decision
+            );
+            for wave in &reading.waves {
+                println!(
+                    "prospect after one observation: wave {:?}: producing code {:?} excess {}; proposed code {:?} excess {}; decision {:?}",
+                    wave.control.iter().map(|x| x.to_string()).collect::<Vec<_>>(),
+                    wave.producing.code_length().unwrap(),
+                    wave.producing.excess().unwrap(),
+                    wave.proposed.code_length().unwrap(),
+                    wave.proposed.excess().unwrap(),
+                    wave.decision
+                );
+            }
+        }
+    }
+}
+
+/// One round of the prospect loop on `receiver`: the two chain encounters, then the step descending
+/// both waves' prospects and its landing. Returns each encounter's actual code and excess, and the
+/// landing's decision.
+fn prospect_round(
+    receiver: &mut PhysicalReceiver<'_>,
+    field: &Field,
+    source: &Encoded,
+) -> (
+    Vec<(holonics::ratio::algebraic::ExactInterval, Rat)>,
+    String,
+) {
+    let [first, second] = chain_controls();
+    let preparation = actuator(field);
+    let mut read = Vec::new();
+    let mut last = None;
+    for control in [&first, &second] {
+        let probe = receiver
+            .prepare_probe(source, &field.receivers()[0], &preparation, &[false, true])
+            .unwrap();
+        let waves = admitted(&probe, 0);
+        let reception = probe.encounter(&waves, control).unwrap();
+        let ActionCommunication::Received(received) = reception.reception else {
+            panic!("the encounter completes");
+        };
+        let ratio = &received.comparison.as_ref().unwrap().returned.ratio;
+        read.push((ratio.code_length().unwrap(), ratio.excess().unwrap()));
+        last = Some(received);
+    }
+    let last = last.unwrap();
+    let coordinates = all_coordinates(receiver.constitution());
+    let decision = match receiver.world_prospect_proposal(
+        &coordinates,
+        source,
+        &field.receivers()[0],
+        &preparation,
+        &[false, true],
+        &[&first, &second],
+        &last,
+    ) {
+        Err(refusal) => format!("proposal refused {refusal:?}"),
+        Ok(proposal) => match receiver
+            .land_world_descent(
+                proposal,
+                source,
+                &field.receivers()[0],
+                &preparation,
+                &[false, true],
+                &[&first, &second],
+            )
+            .unwrap()
+        {
+            WorldLanding::Unreached(refusal) => format!("unreached {refusal:?}"),
+            WorldLanding::Read(reading) => format!(
+                "{:?} at grain raise {:?} (waves {:?})",
+                reading.decision,
+                reading.grain_raise,
+                reading.waves.iter().map(|w| w.decision).collect::<Vec<_>>()
+            ),
+        },
+    };
+    (read, decision)
+}
+
+/// One fixture's prospect loop over five rounds, against its twin with no landing (§7c).
+fn prospect_loop(name: &str, second: bool) {
+    let (field, base, source) = fixture();
+    let theta = if second {
+        second_material(&field, base)
+    } else {
+        Declared::new(&field, base).at(&Rat::zero())
+    };
+    let make = |theta: &Constitution| {
+        if second {
+            bound_second(&field, theta.clone(), &source)
+        } else {
+            bound(&field, theta.clone(), &source, vec![faced_key(&field)])
+        }
+    };
+    let mut learner = make(&theta);
+    let mut twin = make(&theta);
+    for round in 0..5 {
+        let (read, decision) = prospect_round(&mut learner, &field, &source);
+        let mut twin_read = Vec::new();
+        for control in chain_controls() {
+            let comparison = second_comparison(&mut twin, &field, &source, &control);
+            twin_read.push((comparison.0, comparison.1));
+        }
+        for (wave, ((code, excess), (t_code, t_excess))) in read.iter().zip(&twin_read).enumerate() {
+            println!(
+                "prospect loop ({name}): round {round}: wave {wave}: learner code {code:?} excess {excess}; twin code {t_code:?} excess {t_excess}"
+            );
+        }
+        println!("prospect loop ({name}): round {round}: landing {decision}");
+    }
+}
+
+/// **The prospect loop over rounds, against its twin** (§7c), first fixture: each round on the
+/// learner is the two chain encounters and the prospect landing; the twin runs the same encounters
+/// with no landing. Every round's actual comparisons at both waves are reported, as measured.
+#[test]
+fn the_prospect_loop_is_read_against_its_twin() {
+    prospect_loop("first", false);
+}
+
+/// The same loop on the second fixture (§7c).
+#[test]
+fn the_prospect_loop_is_read_on_a_second_fixture() {
+    prospect_loop("second", true);
+}
+
+/// One fixture's schedule-consistent loop (§7d): before every encounter after the first, a landing
+/// on that very encounter's prospect (one wave, the one that comes next), then the encounter. The
+/// twin runs the same encounters with no landing. Each encounter is reported against the twin.
+fn per_encounter_loop(name: &str, second: bool) {
+    let (field, base, source) = fixture();
+    let theta = if second {
+        second_material(&field, base)
+    } else {
+        Declared::new(&field, base).at(&Rat::zero())
+    };
+    let make = |theta: &Constitution| {
+        if second {
+            bound_second(&field, theta.clone(), &source)
+        } else {
+            bound(&field, theta.clone(), &source, vec![faced_key(&field)])
+        }
+    };
+    let mut learner = make(&theta);
+    let mut twin = make(&theta);
+    let preparation = actuator(&field);
+    let schedule: Vec<Vec<Rat>> = (0..5).flat_map(|_| chain_controls()).collect();
+    let mut last: Option<ActionReception> = None;
+    for (k, control) in schedule.iter().enumerate() {
+        let decision = match &last {
+            None => "none (first encounter)".to_string(),
+            Some(last) => {
+                let coordinates = all_coordinates(learner.constitution());
+                match learner.world_prospect_proposal(
+                    &coordinates,
+                    &source,
+                    &field.receivers()[0],
+                    &preparation,
+                    &[false, true],
+                    &[control],
+                    last,
+                ) {
+                    Err(refusal) => format!("proposal refused {refusal:?}"),
+                    Ok(proposal) => match learner
+                        .land_world_descent(
+                            proposal,
+                            &source,
+                            &field.receivers()[0],
+                            &preparation,
+                            &[false, true],
+                            &[control],
+                        )
+                        .unwrap()
+                    {
+                        WorldLanding::Unreached(refusal) => format!("unreached {refusal:?}"),
+                        WorldLanding::Read(reading) => {
+                            format!("{:?} at grain raise {:?}", reading.decision, reading.grain_raise)
+                        }
+                    },
+                }
+            }
+        };
+        let probe = learner
+            .prepare_probe(&source, &field.receivers()[0], &preparation, &[false, true])
+            .unwrap();
+        let waves = admitted(&probe, 0);
+        let reception = probe.encounter(&waves, control).unwrap();
+        let ActionCommunication::Received(received) = reception.reception else {
+            panic!("the encounter completes");
+        };
+        let ratio = &received.comparison.as_ref().unwrap().returned.ratio;
+        let (code, excess) = (ratio.code_length().unwrap(), ratio.excess().unwrap());
+        last = Some(received);
+        let (t_code, t_excess, _, _) = second_comparison(&mut twin, &field, &source, control);
+        println!(
+            "per-encounter loop ({name}): encounter {k} (u = {}): landing before it {decision}; learner code {code:?} excess {excess}; twin code {t_code:?} excess {t_excess}",
+            control[0]
+        );
+    }
+}
+
+/// **The schedule-consistent loop** (§7d), first fixture: a landing on each next encounter's own
+/// prospect before it, over ten encounters alternating `u = 1, −1`, against the twin.
+#[test]
+fn the_per_encounter_loop_is_read_against_its_twin() {
+    per_encounter_loop("first", false);
+}
+
+/// The same on the second fixture (§7d).
+#[test]
+fn the_per_encounter_loop_is_read_on_a_second_fixture() {
+    per_encounter_loop("second", true);
+}
+
+/// **Does the receiving relation move between encounters?** (§7d, a design read for the cycle):
+/// over ten plain encounters alternating `u = 1, −1` on both fixtures, whether each encounter's
+/// receiving publication changed `R`, reported as measured.
+#[test]
+fn the_receiving_relation_between_encounters() {
+    let (field, base, source) = fixture();
+    for (name, second) in [("first", false), ("second", true)] {
+        let theta = if second {
+            second_material(&field, base.clone())
+        } else {
+            Declared::new(&field, base.clone()).at(&Rat::zero())
+        };
+        let mut receiver = if second {
+            bound_second(&field, theta, &source)
+        } else {
+            bound(&field, theta, &source, vec![faced_key(&field)])
+        };
+        let preparation = actuator(&field);
+        let mut moved = Vec::new();
+        for k in 0..10 {
+            let control = &chain_controls()[k % 2];
+            let probe = receiver
+                .prepare_probe(&source, &field.receivers()[0], &preparation, &[false, true])
+                .unwrap();
+            let waves = admitted(&probe, 0);
+            let reception = probe.encounter(&waves, control).unwrap();
+            let ActionCommunication::Received(received) = reception.reception else {
+                panic!("the encounter completes");
+            };
+            let comparison = received.comparison.as_ref().unwrap();
+            moved.push(comparison.receiving_before != comparison.receiving_after);
+        }
+        println!("receiving relation ({name}): moved at encounters {moved:?}");
+    }
+}
+
+/// **Does the passage settle?** (§7e, a design read for the cycle): forty plain encounters
+/// alternating `u = 1, −1` on the first fixture, each encounter's comparison and whether its
+/// receiving publication moved `R`, reported as measured.
+#[test]
+fn the_passage_over_forty_encounters() {
+    let (field, base, source) = fixture();
+    let theta = Declared::new(&field, base).at(&Rat::zero());
+    let mut receiver = bound(&field, theta, &source, vec![faced_key(&field)]);
+    let preparation = actuator(&field);
+    for k in 0..40 {
+        let control = &chain_controls()[k % 2];
+        let probe = receiver
+            .prepare_probe(&source, &field.receivers()[0], &preparation, &[false, true])
+            .unwrap();
+        let waves = admitted(&probe, 0);
+        let reception = probe.encounter(&waves, control).unwrap();
+        let ActionCommunication::Received(received) = reception.reception else {
+            panic!("the encounter completes");
+        };
+        let comparison = received.comparison.as_ref().unwrap();
+        let ratio = &comparison.returned.ratio;
+        println!(
+            "passage: encounter {k} (u = {}): code {:?} excess {}; R moved {}",
+            control[0],
+            ratio.code_length().unwrap(),
+            ratio.excess().unwrap(),
+            comparison.receiving_before != comparison.receiving_after
+        );
+    }
+}
+
+// ---- The schedule's chained prospect (the held-carry record §7f) ----
+
+/// `count` plain encounters alternating `u = 1, −1`, the last kept as the latest reception.
+fn plain_passage(
+    receiver: &mut PhysicalReceiver<'_>,
+    field: &Field,
+    source: &Encoded,
+    count: usize,
+) -> ActionReception {
+    let preparation = actuator(field);
+    let mut last = None;
+    for k in 0..count {
+        let control = &chain_controls()[k % 2];
+        let probe = receiver
+            .prepare_probe(source, &field.receivers()[0], &preparation, &[false, true])
+            .unwrap();
+        let waves = admitted(&probe, 0);
+        let reception = probe.encounter(&waves, control).unwrap();
+        let ActionCommunication::Received(received) = reception.reception else {
+            panic!("the encounter completes");
+        };
+        last = Some(received);
+    }
+    last.unwrap()
+}
+
+/// **The schedule's chained prospect is the actual schedule** (§7f, §7h): after `count` encounters,
+/// the located key's prospect of the next two encounters (`u = 1`, then `u = −1`) is read, with the
+/// receiving publication between them joined, then the two encounters actually run. Both are asserted
+/// equal to their prospects, after two encounters (while the receiving relation still moves) and after
+/// twelve.
+#[test]
+fn the_schedule_prospect_is_the_actual_schedule() {
+    let (field, base, source) = fixture();
+    let theta = Declared::new(&field, base).at(&Rat::zero());
+    let preparation = actuator(&field);
+    let [first, second] = chain_controls();
+    for count in [2, 12] {
+        let mut receiver = bound(&field, theta.clone(), &source, vec![faced_key(&field)]);
+        plain_passage(&mut receiver, &field, &source, count);
+        let present = receiver.constitution().clone();
+        let prospects = receiver
+            .world_prospect_schedule(
+                &present,
+                &source,
+                &field.receivers()[0],
+                &preparation,
+                &[false, true],
+                &[&first, &second],
+                &[],
+            )
+            .unwrap();
+        for (k, control) in [&first, &second].iter().enumerate() {
+            let actual = second_comparison(&mut receiver, &field, &source, control);
+            let prospect = &prospects[k].ratio;
+            let equal = actual.0 == prospect.code_length().unwrap()
+                && actual.1 == prospect.excess().unwrap();
+            println!(
+                "schedule prospect: after {count} encounters: encounter {k}: actual equals prospect {equal}"
+            );
+            assert!(equal, "the chained prospect is the actual encounter {k} after {count}");
+        }
+    }
+}
+
+/// **The schedule's credit at its consumer** (§7f): after twelve encounters, the chained prospect of
+/// `u = 1` then `u = −1` taught along one storage direction; the two encounters' credits summed. On
+/// `θ ± εH` (the present receiving relation kept) the two prospects' parts at their frozen covectors
+/// confirm it to second order on `ε = 2⁻⁴ … 2⁻⁸`.
+#[test]
+fn the_schedule_is_credited_at_its_consumer() {
+    let (field, base, source) = fixture();
+    let declared = Declared::new(&field, base);
+    let direction = declared.storage_direction(&field);
+    let mut receiver = bound(
+        &field,
+        declared.at(&Rat::zero()),
+        &source,
+        vec![faced_key(&field)],
+    );
+    plain_passage(&mut receiver, &field, &source, 12);
+    let present = receiver.constitution().clone();
+    let preparation = actuator(&field);
+    let [first, second] = chain_controls();
+    let taught = receiver
+        .world_prospect_schedule(
+            &present,
+            &source,
+            &field.receivers()[0],
+            &preparation,
+            &[false, true],
+            &[&first, &second],
+            &[direction],
+        )
+        .unwrap();
+    let mut credit = [Rat::zero(), Rat::zero(), Rat::zero()];
+    let mut covectors = Vec::new();
+    for scheduled in &taught {
+        let c = scheduled.tangents[0].comparison_credit(&scheduled.ratio).unwrap();
+        credit[0] += &c.magnitude;
+        credit[1] += &c.produced_phase;
+        credit[2] += &c.observed_phase;
+        covectors.push(scheduled.ratio.covector().unwrap().logits().to_vec());
+    }
+    println!(
+        "schedule credit: magnitude {}, produced phase {}, observed phase {}",
+        credit[0], credit[1], credit[2]
+    );
+    let parts_at = |epsilon: &Rat| -> [Rat; 3] {
+        let scheduled = receiver
+            .world_prospect_schedule(
+                &declared.on(&present, epsilon),
+                &source,
+                &field.receivers()[0],
+                &preparation,
+                &[false, true],
+                &[&first, &second],
+                &[],
+            )
+            .unwrap();
+        let mut total = [Rat::zero(), Rat::zero(), Rat::zero()];
+        for (k, scheduled) in scheduled.iter().enumerate() {
+            let logits: Vec<StationLogits> = scheduled
+                .prospect
+                .point
+                .features
+                .iter()
+                .zip(&scheduled.prospect.faces)
+                .enumerate()
+                .map(|(rank, ((_, _, logits), (_, face)))| StationLogits {
+                    station: rank,
+                    produced: logits.clone(),
+                    observed: face.clone(),
+                })
+                .collect();
+            let p = parts(&covectors[k], &logits);
+            for i in 0..3 {
+                total[i] += &p[i];
+            }
+        }
+        total
+    };
+    let mut residuals: Vec<(Rat, [Rat; 3])> = Vec::new();
+    for j in 4..9 {
+        let epsilon = rat(1, 1i64 << j);
+        let up = parts_at(&epsilon);
+        let down = parts_at(&-epsilon.clone());
+        let two = integer(2) * &epsilon;
+        let r: [Rat; 3] = std::array::from_fn(|k| ((&up[k] - &down[k]) / &two - &credit[k]).abs());
+        println!("schedule credit: ε = 2^-{j}: central residuals {} {} {}", r[0], r[1], r[2]);
+        residuals.push((epsilon, r));
+    }
+    for k in 0..3 {
+        let (first_epsilon, first) = &residuals[0];
+        let scaled_first = &first[k] / (first_epsilon * first_epsilon);
+        for pair in residuals.windows(2) {
+            assert!(
+                pair[1].1[k].clone() * integer(2) <= pair[0].1[k],
+                "part {k}: the residual halves at least"
+            );
+        }
+        for (epsilon, residual) in &residuals {
+            assert!(
+                &residual[k] / (epsilon * epsilon) <= &scaled_first * integer(2),
+                "part {k}: the residual stays O(ε²)"
+            );
+        }
+    }
+}
+
+/// One fixture's schedule loop (§7f): learner and twin each run twelve plain encounters (the
+/// receiving relation settles); then each round the learner lands on the chained prospect of the
+/// round's two encounters (`u = 1`, then `u = −1`) and runs them; the twin runs them with no landing.
+fn schedule_loop(name: &str, second: bool) {
+    let (field, base, source) = fixture();
+    let theta = if second {
+        second_material(&field, base)
+    } else {
+        Declared::new(&field, base).at(&Rat::zero())
+    };
+    let make = |theta: &Constitution| {
+        if second {
+            bound_second(&field, theta.clone(), &source)
+        } else {
+            bound(&field, theta.clone(), &source, vec![faced_key(&field)])
+        }
+    };
+    let mut learner = make(&theta);
+    let mut twin = make(&theta);
+    let mut last = plain_passage(&mut learner, &field, &source, 12);
+    plain_passage(&mut twin, &field, &source, 12);
+    let preparation = actuator(&field);
+    let [first, second_wave] = chain_controls();
+    let schedule: [&[Rat]; 2] = [&first, &second_wave];
+    for round in 0..4 {
+        let coordinates = all_coordinates(learner.constitution());
+        let decision = match learner.world_schedule_proposal(
+            &coordinates,
+            &source,
+            &field.receivers()[0],
+            &preparation,
+            &[false, true],
+            &schedule,
+            &last,
+        ) {
+            Err(refusal) => format!("proposal refused {refusal:?}"),
+            Ok(proposal) => match learner.land_world_descent_on(
+                proposal,
+                &source,
+                &field.receivers()[0],
+                &preparation,
+                &[false, true],
+                AdmittedFuture::Schedule(&schedule),
+            ) {
+                Err(refusal) => format!("landing refused {refusal:?}"),
+                Ok(WorldLanding::Unreached(refusal)) => format!("unreached {refusal:?}"),
+                Ok(WorldLanding::Read(reading)) => format!(
+                    "{:?} at grain raise {:?} (encounters {:?})",
+                    reading.decision,
+                    reading.grain_raise,
+                    reading.waves.iter().map(|w| w.decision).collect::<Vec<_>>()
+                ),
+            },
+        };
+        println!("schedule loop ({name}): round {round}: landing {decision}");
+        for (k, control) in schedule.iter().enumerate() {
+            let probe = learner
+                .prepare_probe(&source, &field.receivers()[0], &preparation, &[false, true])
+                .unwrap();
+            let waves = admitted(&probe, 0);
+            let reception = probe.encounter(&waves, control).unwrap();
+            let ActionCommunication::Received(received) = reception.reception else {
+                panic!("the encounter completes");
+            };
+            let ratio = &received.comparison.as_ref().unwrap().returned.ratio;
+            let (code, excess) = (ratio.code_length().unwrap(), ratio.excess().unwrap());
+            last = received;
+            let (t_code, t_excess, _, _) = second_comparison(&mut twin, &field, &source, control);
+            println!(
+                "schedule loop ({name}): round {round}: encounter {k}: learner code {code:?} excess {excess}; twin code {t_code:?} excess {t_excess}"
+            );
+        }
+    }
+}
+
+/// **The schedule loop against its twin** (§7f), first fixture.
+#[test]
+fn the_schedule_loop_is_read_against_its_twin() {
+    schedule_loop("first", false);
+}
+
+/// The same on the second fixture (§7f).
+#[test]
+fn the_schedule_loop_is_read_on_a_second_fixture() {
+    schedule_loop("second", true);
+}
+
+// ---- The cycle of the schedule (the held-carry record §7g) ----
+
+/// **The cycle closes, and its credit is exact** (§7g): after twelve encounters, the closed orbit of
+/// the repeated schedule (`u = 1`, `u = −1`) on the present material, with the orbit's credit along
+/// one storage direction. On `θ ± εH` (the present receiving relation kept) the two orbit encounters'
+/// parts at their frozen covectors confirm the credit to second order on `ε = 2⁻⁴ … 2⁻⁸`.
+#[test]
+fn the_cycle_closes_and_is_credited_at_its_consumer() {
+    let (field, base, source) = fixture();
+    let declared = Declared::new(&field, base);
+    let direction = declared.storage_direction(&field);
+    let mut receiver = bound(
+        &field,
+        declared.at(&Rat::zero()),
+        &source,
+        vec![faced_key(&field)],
+    );
+    plain_passage(&mut receiver, &field, &source, 12);
+    let present = receiver.constitution().clone();
+    let preparation = actuator(&field);
+    let [first, second] = chain_controls();
+    let schedule: [&[Rat]; 2] = [&first, &second];
+    let reading = receiver
+        .world_cycle(
+            &present,
+            &source,
+            &field.receivers()[0],
+            &preparation,
+            &[false, true],
+            &schedule,
+            &[direction],
+        )
+        .unwrap();
+    println!("cycle: dimension {}", reading.dimension);
+    let mut credit = [Rat::zero(), Rat::zero()];
+    let mut covectors = Vec::new();
+    for (k, encounter) in reading.encounters.iter().enumerate() {
+        credit[0] += &reading.credits[k][0].0;
+        credit[1] += &reading.credits[k][0].1;
+        covectors.push(encounter.ratio.covector().unwrap().logits().to_vec());
+        println!(
+            "cycle: orbit encounter {k}: code {:?} excess {}",
+            encounter.ratio.code_length().unwrap(),
+            encounter.ratio.excess().unwrap()
+        );
+    }
+    println!("cycle credit: classical {}, phase {}", credit[0], credit[1]);
+    let parts_at = |epsilon: &Rat| -> [Rat; 2] {
+        let reading = receiver
+            .world_cycle(
+                &declared.on(&present, epsilon),
+                &source,
+                &field.receivers()[0],
+                &preparation,
+                &[false, true],
+                &schedule,
+                &[],
+            )
+            .unwrap();
+        let mut total = [Rat::zero(), Rat::zero()];
+        for (k, encounter) in reading.encounters.iter().enumerate() {
+            let logits: Vec<StationLogits> = encounter
+                .prospect
+                .point
+                .features
+                .iter()
+                .zip(&encounter.prospect.faces)
+                .enumerate()
+                .map(|(rank, ((_, _, logits), (_, face)))| StationLogits {
+                    station: rank,
+                    produced: logits.clone(),
+                    observed: face.clone(),
+                })
+                .collect();
+            let p = parts(&covectors[k], &logits);
+            total[0] += &p[0];
+            total[1] += &p[1] + &p[2];
+        }
+        total
+    };
+    let mut residuals: Vec<(Rat, [Rat; 2])> = Vec::new();
+    for j in 4..9 {
+        let epsilon = rat(1, 1i64 << j);
+        let up = parts_at(&epsilon);
+        let down = parts_at(&-epsilon.clone());
+        let two = integer(2) * &epsilon;
+        let r: [Rat; 2] = std::array::from_fn(|k| ((&up[k] - &down[k]) / &two - &credit[k]).abs());
+        println!("cycle credit: ε = 2^-{j}: central residuals {} {}", r[0], r[1]);
+        residuals.push((epsilon, r));
+    }
+    for k in 0..2 {
+        let (first_epsilon, first) = &residuals[0];
+        let scaled_first = &first[k] / (first_epsilon * first_epsilon);
+        for pair in residuals.windows(2) {
+            assert!(
+                pair[1].1[k].clone() * integer(2) <= pair[0].1[k],
+                "part {k}: the residual halves at least"
+            );
+        }
+        for (epsilon, residual) in &residuals {
+            assert!(
+                &residual[k] / (epsilon * epsilon) <= &scaled_first * integer(2),
+                "part {k}: the residual stays O(ε²)"
+            );
+        }
+    }
+}
+
+/// **Where the passage goes** (§7g): the orbit computed after twelve encounters, against the actual
+/// readings of encounters 38 and 39 of the same passage (no landing). Reported as measured: whether
+/// the actual readings reach the orbit's at the receiver's grain, and their exact differences.
+#[test]
+fn the_cycle_is_where_the_passage_goes() {
+    let (field, base, source) = fixture();
+    let theta = Declared::new(&field, base).at(&Rat::zero());
+    let mut receiver = bound(&field, theta, &source, vec![faced_key(&field)]);
+    plain_passage(&mut receiver, &field, &source, 12);
+    let present = receiver.constitution().clone();
+    let preparation = actuator(&field);
+    let [first, second] = chain_controls();
+    let schedule: [&[Rat]; 2] = [&first, &second];
+    let reading = receiver
+        .world_cycle(
+            &present,
+            &source,
+            &field.receivers()[0],
+            &preparation,
+            &[false, true],
+            &schedule,
+            &[],
+        )
+        .unwrap();
+    plain_passage(&mut receiver, &field, &source, 26);
+    for (k, control) in schedule.iter().enumerate() {
+        let actual = second_comparison(&mut receiver, &field, &source, control);
+        let orbit = &reading.encounters[k].ratio;
+        println!(
+            "cycle limit: encounter {}: actual code {:?} excess {}; orbit code {:?} excess {}; equal code {}",
+            38 + k,
+            actual.0,
+            actual.1,
+            orbit.code_length().unwrap(),
+            orbit.excess().unwrap(),
+            actual.0 == orbit.code_length().unwrap()
+        );
+    }
+}
+
+/// One fixture's cycle landing over the trajectory (§7g, §7h): learner and twin each run twelve
+/// plain encounters; the learner lands once on the fixed-readout cycle of the schedule
+/// (`AdmittedFuture::Cycle`); then both run fourteen rounds of the schedule with no further landing.
+/// Every round is reported learner against twin, and the last round against the orbits the landing
+/// read (the candidate's and the contemporary's).
+fn cycle_trajectory(name: &str, second: bool) {
+    let (field, base, source) = fixture();
+    let theta = if second {
+        second_material(&field, base)
+    } else {
+        Declared::new(&field, base).at(&Rat::zero())
+    };
+    let make = |theta: &Constitution| {
+        if second {
+            bound_second(&field, theta.clone(), &source)
+        } else {
+            bound(&field, theta.clone(), &source, vec![faced_key(&field)])
+        }
+    };
+    let mut learner = make(&theta);
+    let mut twin = make(&theta);
+    let last = plain_passage(&mut learner, &field, &source, 12);
+    plain_passage(&mut twin, &field, &source, 12);
+    let preparation = actuator(&field);
+    let [first, second_wave] = chain_controls();
+    let schedule: [&[Rat]; 2] = [&first, &second_wave];
+    let coordinates = all_coordinates(learner.constitution());
+    let landing = learner
+        .world_cycle_proposal(
+            &coordinates,
+            &source,
+            &field.receivers()[0],
+            &preparation,
+            &[false, true],
+            &schedule,
+            &last,
+        )
+        .and_then(|proposal| {
+            learner.land_world_descent_on(
+                proposal,
+                &source,
+                &field.receivers()[0],
+                &preparation,
+                &[false, true],
+                AdmittedFuture::Cycle(&schedule),
+            )
+        });
+    match &landing {
+        Err(refusal) => {
+            println!("cycle trajectory ({name}): landing refused {refusal:?}");
+        }
+        Ok(WorldLanding::Unreached(refusal)) => {
+            println!("cycle trajectory ({name}): landing unreached {refusal:?}");
+        }
+        Ok(WorldLanding::Read(reading)) => {
+            println!(
+                "cycle trajectory ({name}): landing {:?} at grain raise {:?} (orbit encounters {:?})",
+                reading.decision,
+                reading.grain_raise,
+                reading.waves.iter().map(|w| w.decision).collect::<Vec<_>>()
+            );
+            println!(
+                "cycle trajectory ({name}): declared step {:?}; deposition work {:?}",
+                reading.declared,
+                reading.deposition_work.as_ref().map(|w| w.to_string())
+            );
+            for (k, wave) in reading.waves.iter().enumerate() {
+                println!(
+                    "cycle trajectory ({name}): orbit encounter {k}: contemporary code {:?} excess {}; candidate code {:?} excess {}",
+                    wave.producing.code_length().unwrap(),
+                    wave.producing.excess().unwrap(),
+                    wave.proposed.code_length().unwrap(),
+                    wave.proposed.excess().unwrap()
+                );
+            }
+        }
+    }
+    // Eight rounds: the measured rate (about 21 s a round with the landing) fits the deadline.
+    for round in 0..8 {
+        for (k, control) in schedule.iter().enumerate() {
+            let (code, excess, _, _) = second_comparison(&mut learner, &field, &source, control);
+            let (t_code, t_excess, _, _) = second_comparison(&mut twin, &field, &source, control);
+            println!(
+                "cycle trajectory ({name}): round {round}: encounter {k}: learner code {code:?} excess {excess}; twin code {t_code:?} excess {t_excess}"
+            );
+        }
+    }
+}
+
+/// **One cycle landing, then the trajectory** (§7g, §7h), first fixture.
+#[test]
+fn the_cycle_landing_is_read_over_the_trajectory() {
+    cycle_trajectory("first", false);
+}
+
+/// The same on the second fixture.
+#[test]
+fn the_cycle_landing_is_read_over_a_second_trajectory() {
+    cycle_trajectory("second", true);
+}
+
+// ---- The adjoint through the World port (the held-carry record §7j) ----
+
+/// **The World-port return is the tangents' credit** (§7j (a), §7l): after twelve encounters, the
+/// next encounter's prospect taught along every raw coordinate of contact 0, and its return through
+/// the World port. For every coordinate, the World-sensitive return's contact gradient entry is
+/// exactly −1 times the forward tangent's whole credit (magnitude and both phase parts); storage
+/// through the opening's crossing tick, stiffness and dissipation through the ticks alone.
+#[test]
+fn the_world_return_is_the_tangents_credit() {
+    let (field, base, source) = fixture();
+    let theta = Declared::new(&field, base).at(&Rat::zero());
+    let mut receiver = bound(&field, theta, &source, vec![faced_key(&field)]);
+    plain_passage(&mut receiver, &field, &source, 12);
+    let present = receiver.constitution().clone();
+    let preparation = actuator(&field);
+    let [first, _] = chain_controls();
+    let coordinates = all_coordinates(&present);
+    let directions: Vec<MaterialDirection> = coordinates
+        .iter()
+        .map(|c| MaterialDirection::of_coordinate(&field, &present, c).unwrap())
+        .collect();
+    let scheduled = receiver
+        .world_prospect_schedule(
+            &present,
+            &source,
+            &field.receivers()[0],
+            &preparation,
+            &[false, true],
+            &[&first],
+            &directions,
+        )
+        .unwrap();
+    let encounter = &scheduled[0];
+    // The prospect's comparison numbers stations by rank; the return's covector reads the full
+    // partition. Both are the same comparison of the same passage.
+    for (coordinate, tangent) in coordinates.iter().zip(&encounter.tangents) {
+        let credit = tangent.comparison_credit(&encounter.ratio).unwrap();
+        let total = &(&credit.magnitude + &credit.produced_phase) + &credit.observed_phase;
+        let native = &credit.magnitude + &credit.produced_phase;
+        let step = encounter
+            .world_contacts
+            .iter()
+            .find(|s| s.gradient.family() == holonics::hnn::constitution::Family::Factor(coordinate.family))
+            .unwrap();
+        let entries: Vec<Rat> = step.gradient.entries().cloned().collect();
+        let columns = match coordinate.family {
+            0 => present.contact_storage(0).columns(),
+            1 => present.contact_stiffness(0).columns(),
+            _ => present.contact_dissipation(0).columns(),
+        };
+        let entry = &entries[coordinate.row * columns + coordinate.column];
+        println!(
+            "world return: family {} ({}, {}): gradient {} credit {} native-part {} ratio {}",
+            coordinate.family,
+            coordinate.row,
+            coordinate.column,
+            entry,
+            total,
+            native,
+            if total.is_zero() { "∞".to_string() } else { (entry / &total).to_string() }
+        );
+        assert_eq!(entry, &-total, "coordinate {coordinate:?}");
+    }
+}
+
+
+/// **When does the second fixture's readout stop moving?** (§7k): forty plain encounters on the
+/// second fixture, whether each receiving publication moved `R`, reported as measured.
+#[test]
+fn the_second_passage_over_forty_encounters() {
+    let (field, base, source) = fixture();
+    let theta = second_material(&field, base);
+    let mut receiver = bound_second(&field, theta, &source);
+    let preparation = actuator(&field);
+    let mut moved = Vec::new();
+    for k in 0..40 {
+        let control = &chain_controls()[k % 2];
+        let probe = receiver
+            .prepare_probe(&source, &field.receivers()[0], &preparation, &[false, true])
+            .unwrap();
+        let waves = admitted(&probe, 0);
+        let reception = probe.encounter(&waves, control).unwrap();
+        let ActionCommunication::Received(received) = reception.reception else {
+            panic!("the encounter completes");
+        };
+        let comparison = received.comparison.as_ref().unwrap();
+        moved.push(comparison.receiving_before != comparison.receiving_after);
+    }
+    println!(
+        "second passage: R moved at {:?}",
+        moved
+            .iter()
+            .enumerate()
+            .filter(|(_, m)| **m)
+            .map(|(k, _)| k)
+            .collect::<Vec<_>>()
+    );
+}
+
+// ---- The blocker, classified (the held-carry record §7m) ----
+
+/// `x`'s exact dyadic enclosure: `0`, or its sign with `[2^k, 2^(k+1))`.
+fn enclosure(x: &Rat) -> String {
+    if x.is_zero() {
+        return "0".to_string();
+    }
+    let sign = if x < &Rat::zero() { "−" } else { "" };
+    let k = floor_log2(&x.abs());
+    format!("{sign}[2^{k}, 2^{})", k + 1)
+}
+
+/// The largest `k` with `2^k ≤ x`, for `x > 0`, exact.
+fn floor_log2(x: &Rat) -> i64 {
+    let mut k = x.numer().bits() as i64 - x.denom().bits() as i64;
+    while holonics::holon::deposition::dyadic(k) > *x {
+        k -= 1;
+    }
+    while holonics::holon::deposition::dyadic(k + 1) <= *x {
+        k += 1;
+    }
+    k
+}
+
+/// **Lattice reach, incompatible directions, or omitted coupling?** (§7m): on fixture 1's
+/// fixed-readout orbit after twelve encounters, per contact family, the two orbit encounters'
+/// classical and phase gradients over the family's raw coordinates read exactly: their norms, their
+/// inner product and the parallel defect `|a|²|b|² − ⟨a,b⟩²` (zero exactly when the directions are
+/// parallel), the minimum-norm point `m` of `[a, b]` with its `λ`, and the family's covector scale
+/// `c` through the World port with the largest certified exponent `k_c` (`2^(k_c) c ≤ 1`). Nothing is
+/// stepped; the objective and its comparisons are those of §7k.
+#[test]
+fn the_cycle_blocker_is_classified() {
+    let (field, base, source) = fixture();
+    let mut receiver = bound(
+        &field,
+        Declared::new(&field, base).at(&Rat::zero()),
+        &source,
+        vec![faced_key(&field)],
+    );
+    plain_passage(&mut receiver, &field, &source, 12);
+    let present = receiver.constitution().clone();
+    let preparation = actuator(&field);
+    let [first, second] = chain_controls();
+    let schedule: [&[Rat]; 2] = [&first, &second];
+    let coordinates = all_coordinates(&present);
+    let directions: Vec<MaterialDirection> = coordinates
+        .iter()
+        .map(|c| MaterialDirection::of_coordinate(&field, &present, c).unwrap())
+        .collect();
+    let reading = receiver
+        .world_cycle(
+            &present,
+            &source,
+            &field.receivers()[0],
+            &preparation,
+            &[false, true],
+            &schedule,
+            &directions,
+        )
+        .unwrap();
+    assert_eq!(reading.encounters.len(), 2);
+    let dot = |x: &[Rat], y: &[Rat]| x.iter().zip(y).map(|(p, q)| p * q).sum::<Rat>();
+    for family in 0..3 {
+        let indices: Vec<usize> = coordinates
+            .iter()
+            .enumerate()
+            .filter(|(_, c)| c.family == family)
+            .map(|(d, _)| d)
+            .collect();
+        let read = |e: usize, part: usize| -> Vec<Rat> {
+            indices
+                .iter()
+                .map(|d| {
+                    let (classical, phase) = &reading.credits[e][*d];
+                    if part == 0 { classical.clone() } else { phase.clone() }
+                })
+                .collect()
+        };
+        let (l0, l1, a, b) = (read(0, 0), read(1, 0), read(0, 1), read(1, 1));
+        let (aa, bb, ab) = (dot(&a, &a), dot(&b, &b), dot(&a, &b));
+        let defect = &(&aa * &bb) - &(&ab * &ab);
+        let difference: Vec<Rat> = b.iter().zip(&a).map(|(p, q)| p - q).collect();
+        let length = dot(&difference, &difference);
+        let lambda = if length.is_zero() {
+            Rat::zero()
+        } else {
+            let raw = dot(&difference, &b) / &length;
+            raw.clamp(Rat::zero(), Rat::one())
+        };
+        let m: Vec<Rat> = a
+            .iter()
+            .zip(&b)
+            .map(|(p, q)| &lambda * p + (Rat::one() - &lambda) * q)
+            .collect();
+        let mm = dot(&m, &m);
+        let widest = m.iter().map(|x| x.abs()).max().unwrap_or_else(Rat::zero);
+        let covector = reading
+            .encounters
+            .iter()
+            .flat_map(|e| &e.world_contacts)
+            .filter(|s| {
+                s.gradient.family() == holonics::hnn::constitution::Family::Factor(family)
+            })
+            .map(|s| s.covector.clone())
+            .max()
+            .unwrap_or_else(Rat::zero);
+        // The largest `k` with `2^k c ≤ 1`: `−j` when `c = 2^j` exactly, `−j − 1` otherwise.
+        let certified = if covector.is_zero() {
+            "unbounded".to_string()
+        } else {
+            let j = floor_log2(&covector);
+            let exact = holonics::holon::deposition::dyadic(j) == covector;
+            (if exact { -j } else { -j - 1 }).to_string()
+        };
+        println!(
+            "blocker: family {family}: classical |L0|² {} |L1|² {}; phase |a|² {} |b|² {} ⟨a,b⟩ {}; parallel defect {} (exactly parallel: {}); λ = {}; |m|² {}; |m|²·min(|a|²,|b|²)⁻¹ {}; widest |m_i| {}; covector scale c {}; k_c {certified}",
+            enclosure(&dot(&l0, &l0)),
+            enclosure(&dot(&l1, &l1)),
+            enclosure(&aa),
+            enclosure(&bb),
+            enclosure(&ab),
+            enclosure(&defect),
+            defect.is_zero(),
+            lambda,
+            enclosure(&mm),
+            if aa.is_zero() || bb.is_zero() {
+                "∞".to_string()
+            } else {
+                enclosure(&(&mm / aa.clone().min(bb.clone())))
+            },
+            enclosure(&widest),
+            enclosure(&covector),
+        );
+    }
+}
