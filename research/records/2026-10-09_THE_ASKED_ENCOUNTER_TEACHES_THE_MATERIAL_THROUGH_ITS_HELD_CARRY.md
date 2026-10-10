@@ -552,3 +552,49 @@ tests pass (00:11:46–00:13:02, exit 0, child peak 2,028,788 KiB;
 the two-observation delayed credit consumes. Pairing it with the second encounter's comparison
 (`comparison_credit` on the continued tangent) and landing on it are the next build.
 
+
+## 7. The credit of two observations, and its landing over both waves
+
+[definition; agent-inferred, October 10; acceptance fixed before code] The stretch of §1 asked that the
+first deposit change the second Ask. On this field that half stays reserved (§3c: the second Ask has
+nothing dormant to partition). Its other half is measurable here: **learning across two observations
+at different waves, landed as one step**. Two encounters run at the admitted waves `u₁ = 1`, then
+`u₂ = −1`, with nothing landed between them. The second encounter carries the first's tangents,
+continued (§6).
+
+**The credit.** For each declared coordinate, the credit is `credit(T₁; r₁) + credit(T₂; r₂)`. Here
+`T₁` is the first encounter's tangent with its comparison `r₁`, and `T₂` is the continued tangent with
+the second comparison `r₂`, each at its own frozen covector. It is the derivative of the two
+comparisons with the receiving relation each encounter publishes held as an exterior control: the
+learner's own deposit is not differentiated (§6, as in `ContactVariationAction`). The second
+comparison's produced logits read `R · P^τ v` through the relation the first encounter published, so
+the end-to-end derivative also has a path through that deposit, which the credit does not carry.
+Law (6) is applied to the summed credit per family.
+
+**Acceptance.** On the published fixture (World, key, actuator, admitted lattice):
+- **(a) The credit identity.** On `θ ± εH`, `ε = 2⁻⁴ … 2⁻⁸`, the observed-phase part of both
+  observations is confirmed end to end to second order (it reads the World's face, not the receiving
+  relation). The produced parts are confirmed by their composition: `χ` and `ψ` across two encounters
+  to second order (§6), read through the station read at the held relation (§3d). The end-to-end
+  central difference of the produced parts, which includes the receiving deposit's path, is reported
+  beside them as measured, never as the credit.
+- **(b) The binding is a chain.** A two-observation proposal is admitted only when:
+  - each observation's tangents rode its own encounter;
+  - consecutive encounters are consecutive on the Word and World clocks (the later opens where the
+    earlier ended);
+  - every later tangent is the earlier one continued (same direction, the same origin opening);
+  - the receiver stands where the last encounter left it.
+  Refused: the swapped order; fresh tangents at the second encounter in place of continued ones; a
+  gap between the encounters.
+- **(c) The landing over both waves.** One declared step along law (6) on the summed credit, staged
+  where the last encounter left the receiver. The located key's prospect of the next encounter is read
+  at each wave from the present opening. The grain scan raises until either prospect's reading moves.
+  The step is admitted only when, at each wave, the decision is admitted or exactly unchanged (the
+  witness with an equal excess), and at least one wave is admitted. The decision is reported as
+  measured. When admitted, the actual next encounter at each wave, read on identical replays, equals
+  its prospect exactly, and is read against the no-deposit twin at that wave.
+- **(d) Against the continued credit alone.** The same chain is landed on the second observation's
+  continued credit alone, and reported as measured beside (c).
+
+Not claimed: selection (the first deposit does not change the second Ask on this field); the receiving
+deposit's derivative; any provenance across receivers (§6's limit stands).
