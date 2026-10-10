@@ -753,3 +753,62 @@ deposition work at the held-momentum crossing is positive, in `[2⁻⁴, 2⁻³)
   a family and this derivative is not defined; that case is refused, not approximated.
 - One fixture and one round. A loop of such landings and a second fixture are the next measurement.
 
+### 7c. The controls, and the loop: one step improves its own next encounter, not the trajectory
+
+[measured; developer reads, not claim-bearing;
+[receipt](receipts/2026-10-09-material-tangent/PROSPECT_LOOP_DEV_TESTS.v1.json)] Epime's review of
+`324f6138` kept §7b's claim narrow: one admitted step after two observed waves, with no no-history
+control, which does not show that both observations are needed. The landing test now asserts the
+admission and the per-wave production against the twin in the admission's order, so a refusal fails
+it. The controls:
+
+- **One observation is enough** (`the_prospect_landing_after_one_observation`). After the first
+  encounter alone (`u = 1`), the prospect landing is admitted, `Classical` at grain raise 0:
+  - `u = 1`: code strictly lower by `[2⁻⁸, 2⁻⁷)`, excess lower by `[2⁻¹⁴, 2⁻¹³)`;
+  - `u = −1`: `Phase`, excess lower by `[2⁻¹⁶, 2⁻¹⁵)` at equal code.
+
+  The step descends the future from the present opening, so the experience matters here only by
+  locating the key. The second observation is not necessary on this fixture.
+- **Without its history** (`the_prospect_landed_material_is_read_without_its_history`). The
+  contemporary material and the landed one were each read on a fresh World with no earlier encounter,
+  at both waves. At `u = 1` the landed material is **worse**: equal code, excess higher by
+  `[2⁻¹⁵, 2⁻¹⁴)`. At `u = −1` it is better: equal code, excess lower by `[2⁻¹², 2⁻¹¹)`. The gain
+  belongs to the state the receiver stands in, as a descent of that state's future would.
+- **The loop against its twin** (`the_prospect_loop_is_read_against_its_twin`, `…_on_a_second_fixture`).
+  Five rounds per fixture. A round is the two chain encounters and the prospect landing; the twin runs
+  the same encounters with no landing. Below, each round's encounters are learner against twin in the
+  admission's order. "Better" means a strictly lower code with no higher excess, or an equal code with
+  a lower excess.
+
+| round | fixture 1, `u = 1` | fixture 1, `u = −1` | its landing | fixture 2, `u = 1` | fixture 2, `u = −1` | its landing |
+|---|---|---|---|---|---|---|
+| 0 | equal | equal | Classical (raise 2) | equal | equal | Phase |
+| 1 | better (excess `−[2⁻²⁰, 2⁻¹⁹)`) | code lower `[2⁻¹⁰, 2⁻⁹)`, excess higher `[2⁻¹⁰, 2⁻⁹)` | Classical (raise 5) | better (`−[2⁻¹⁷, 2⁻¹⁶)`) | better (`−[2⁻¹⁷, 2⁻¹⁶)`) | PhaseWorse |
+| 2 | code **above** by `[2⁻⁸, 2⁻⁷)`, excess lower | overlap, excess higher `[2⁻⁷, 2⁻⁶)` | Phase | worse (`+[2⁻¹⁴, 2⁻¹³)`) | better (`−[2⁻¹⁵, 2⁻¹⁴)`) | Classical (raise 4) |
+| 3 | worse (`+[2⁻¹¹, 2⁻¹⁰)`) | overlap, excess higher | Phase | code lower `[2⁻¹⁰, 2⁻⁹)`, excess higher | better (`−[2⁻¹⁰, 2⁻⁹)`) | PhaseWorse |
+| 4 | overlap, excess higher `[2⁻¹⁰, 2⁻⁹)` | code lower `[2⁻¹⁰, 2⁻⁹)`, excess higher | PhaseWorse | worse (`+[2⁻¹¹, 2⁻¹⁰)`) | code **above** by `[2⁻¹¹, 2⁻¹⁰)`, excess lower | PhaseWorse |
+
+**The mechanism.**
+- Every admitted landing improves the learner's next encounter against **its own** no-landing
+  counterfactual, which is exactly what it was admitted on. The improvement is checked: the actual
+  next comparison equals the prospect.
+- Against the never-landing twin, the trajectory is mixed and is not dominated. On fixture 1 the
+  learner's code at `u = 1` is strictly above the twin's by round 2.
+- Two causes are named, and neither is a defect of the step:
+  1. **The schedule.** The prospect at `u = −1` assumes that wave is next, but the round runs `u = 1`
+     first, so the second wave's admitted future is not the one the round reads.
+  2. **The horizon.** The admission sees one encounter ahead. A step that helps the next encounter can
+     cost later ones, and the twin comparison accumulates those costs.
+- One-step admissions do not compose into a trajectory gain. That is the measured blocker.
+
+**The next law** (agent-inferred, recorded before it is built). The admitted future is the schedule
+the receiver will actually follow: the round's encounters in order, read as one chained prospect. The
+second encounter's prospect is read from the first's prospective end, with the tangents continued
+across it. The horizon is a declared number of rounds of that schedule, and the step descends their
+summed comparisons with the common descent. The twin comparison over rounds stays the production
+measure.
+
+**Projection error.** The first loop run reached its 300 s deadline at about 33 s per round, against
+a projected 5 s. It is reported incomplete. The deadline was not raised; the loop was split per
+fixture, and the two halves ran in parallel within it.
+

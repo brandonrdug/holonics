@@ -114,7 +114,12 @@ The helical code, the encoding every Holon carries, is defined in
   - The landing is admitted at both waves: `u = 1` by phase, `u = −1` classically, with a strict code
     gain in `[2⁻⁸, 2⁻⁷)`. The actual next encounters equal the prospects, and both beat the
     no-deposit twin.
-- **Still owed:** a loop of such landings, a second fixture, and the queue's runs.
+- **Controls and the loop (§7c):** one observation is enough on this fixture, and without its
+  history the landed material is worse at `u = 1`. Over five rounds on two fixtures, every landing
+  improves its own next encounter, but the trajectory against the never-landing twin is mixed. That
+  is the measured blocker: one-step admissions do not compose. The next law is the chained prospect
+  of the actual schedule over a declared horizon.
+- **Still owed:** the schedule's chained prospect and its loop, and the queue's runs.
 
 **October 6 HNN integration.** The [blind receiving return](research/records/2026-10-06_THE_BLIND_RECEIVING_RETURN_IS_JOINED_BUT_RELEASE_NEEDS_THE_EXECUTED_COUPLED_DOMAIN.md)
 now consumes its actual continuing Word's pullback and the existing normal deposition at R.

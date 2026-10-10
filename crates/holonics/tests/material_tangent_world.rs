@@ -2000,9 +2000,9 @@ fn the_prospect_landing_reads_both_waves() {
             wave.decision
         );
     }
-    if reading.decision.is_err() {
-        return;
-    }
+    // [measured, October 10; the record §7b] On this fixture the landing over both waves is
+    // admitted; kept as the fixture's regression of the measured outcome.
+    assert!(reading.decision.is_ok(), "the measured prospect landing is admitted");
     for (index, control) in controls.iter().enumerate() {
         let (mut replay, _) = land_prospect(&field, &theta, &source);
         let landed = second_comparison(&mut replay, &field, &source, control);
@@ -2020,6 +2020,231 @@ fn the_prospect_landing_reads_both_waves() {
             "prospect production: wave {index}: landed code {:?} excess {}; twin code {:?} excess {}",
             landed.0, landed.1, unlanded.0, unlanded.1
         );
+        // Production in the admission's own order, at this wave: strictly below in code, or an
+        // equal code (the wave's witness) with a strictly smaller phase excess.
+        assert_eq!(unlanded.0, wave.producing.code_length().unwrap());
+        assert_eq!(unlanded.1, wave.producing.excess().unwrap());
+        assert!(
+            landed.0.upper < unlanded.0.lower
+                || (matches!(wave.decision, Ok(Admitted::Phase)) && landed.1 < unlanded.1),
+            "the landed next comparison is better than the twin's at wave {index}"
+        );
     }
+}
+
+/// **The prospect landing without its history** (§7b, the no-history control): the contemporary
+/// material the landing staged on (after the two encounters) and the landed one, each on a fresh
+/// World with no earlier encounter, read at both waves. Reported as measured.
+#[test]
+fn the_prospect_landed_material_is_read_without_its_history() {
+    let (field, base, source) = fixture();
+    let declared = Declared::new(&field, base);
+    let theta = declared.at(&Rat::zero());
+    let contemporary = {
+        let mut receiver = bound(&field, theta.clone(), &source, vec![faced_key(&field)]);
+        experience(&mut receiver, &field, &source);
+        receiver.constitution().clone()
+    };
+    let (landed_receiver, landing) = land_prospect(&field, &theta, &source);
+    let WorldLanding::Read(reading) = landing else {
+        panic!("the measured prospect landing reaches its lattice");
+    };
+    assert!(reading.decision.is_ok(), "the measured prospect landing is admitted");
+    let landed = landed_receiver.constitution().clone();
+    for (index, control) in chain_controls().iter().enumerate() {
+        let read = |material: &Constitution| {
+            let mut fresh = bound(&field, material.clone(), &source, vec![faced_key(&field)]);
+            let comparison = second_comparison(&mut fresh, &field, &source, control);
+            (comparison.0, comparison.1)
+        };
+        let (c_code, c_excess) = read(&contemporary);
+        let (l_code, l_excess) = read(&landed);
+        println!(
+            "prospect history control: wave {index}: contemporary on a fresh World code {c_code:?} excess {c_excess}; landed on a fresh World code {l_code:?} excess {l_excess}"
+        );
+    }
+}
+
+/// **One observation or two** (§7b): the same prospect landing after only the first encounter
+/// (`u = 1`), read at both waves. Reported as measured: it says whether the second observation
+/// changes the step on this fixture.
+#[test]
+fn the_prospect_landing_after_one_observation() {
+    let (field, base, source) = fixture();
+    let declared = Declared::new(&field, base);
+    let theta = declared.at(&Rat::zero());
+    let [first, second] = chain_controls();
+    let mut receiver = bound(&field, theta.clone(), &source, vec![faced_key(&field)]);
+    let preparation = actuator(&field);
+    let last = {
+        let probe = receiver
+            .prepare_probe(&source, &field.receivers()[0], &preparation, &[false, true])
+            .unwrap();
+        let waves = admitted(&probe, 0);
+        let reception = probe.encounter(&waves, &first).unwrap();
+        let ActionCommunication::Received(last) = reception.reception else {
+            panic!("the encounter completes");
+        };
+        last
+    };
+    let coordinates = all_coordinates(receiver.constitution());
+    let proposal = receiver.world_prospect_proposal(
+        &coordinates,
+        &source,
+        &field.receivers()[0],
+        &preparation,
+        &[false, true],
+        &[&first, &second],
+        &last,
+    );
+    let proposal = match proposal {
+        Ok(proposal) => proposal,
+        Err(refusal) => {
+            println!("prospect after one observation: proposal refused {refusal:?}");
+            return;
+        }
+    };
+    let landing = receiver
+        .land_world_descent(
+            proposal,
+            &source,
+            &field.receivers()[0],
+            &preparation,
+            &[false, true],
+            &[&first, &second],
+        )
+        .unwrap();
+    match landing {
+        WorldLanding::Unreached(refusal) => {
+            println!("prospect after one observation: unreached {refusal:?}")
+        }
+        WorldLanding::Read(reading) => {
+            println!(
+                "prospect after one observation: grain raise {:?}; decision {:?}",
+                reading.grain_raise, reading.decision
+            );
+            for wave in &reading.waves {
+                println!(
+                    "prospect after one observation: wave {:?}: producing code {:?} excess {}; proposed code {:?} excess {}; decision {:?}",
+                    wave.control.iter().map(|x| x.to_string()).collect::<Vec<_>>(),
+                    wave.producing.code_length().unwrap(),
+                    wave.producing.excess().unwrap(),
+                    wave.proposed.code_length().unwrap(),
+                    wave.proposed.excess().unwrap(),
+                    wave.decision
+                );
+            }
+        }
+    }
+}
+
+/// One round of the prospect loop on `receiver`: the two chain encounters, then the step descending
+/// both waves' prospects and its landing. Returns each encounter's actual code and excess, and the
+/// landing's decision.
+fn prospect_round(
+    receiver: &mut PhysicalReceiver<'_>,
+    field: &Field,
+    source: &Encoded,
+) -> (
+    Vec<(holonics::ratio::algebraic::ExactInterval, Rat)>,
+    String,
+) {
+    let [first, second] = chain_controls();
+    let preparation = actuator(field);
+    let mut read = Vec::new();
+    let mut last = None;
+    for control in [&first, &second] {
+        let probe = receiver
+            .prepare_probe(source, &field.receivers()[0], &preparation, &[false, true])
+            .unwrap();
+        let waves = admitted(&probe, 0);
+        let reception = probe.encounter(&waves, control).unwrap();
+        let ActionCommunication::Received(received) = reception.reception else {
+            panic!("the encounter completes");
+        };
+        let ratio = &received.comparison.as_ref().unwrap().returned.ratio;
+        read.push((ratio.code_length().unwrap(), ratio.excess().unwrap()));
+        last = Some(received);
+    }
+    let last = last.unwrap();
+    let coordinates = all_coordinates(receiver.constitution());
+    let decision = match receiver.world_prospect_proposal(
+        &coordinates,
+        source,
+        &field.receivers()[0],
+        &preparation,
+        &[false, true],
+        &[&first, &second],
+        &last,
+    ) {
+        Err(refusal) => format!("proposal refused {refusal:?}"),
+        Ok(proposal) => match receiver
+            .land_world_descent(
+                proposal,
+                source,
+                &field.receivers()[0],
+                &preparation,
+                &[false, true],
+                &[&first, &second],
+            )
+            .unwrap()
+        {
+            WorldLanding::Unreached(refusal) => format!("unreached {refusal:?}"),
+            WorldLanding::Read(reading) => format!(
+                "{:?} at grain raise {:?} (waves {:?})",
+                reading.decision,
+                reading.grain_raise,
+                reading.waves.iter().map(|w| w.decision).collect::<Vec<_>>()
+            ),
+        },
+    };
+    (read, decision)
+}
+
+/// One fixture's prospect loop over five rounds, against its twin with no landing (§7c).
+fn prospect_loop(name: &str, second: bool) {
+    let (field, base, source) = fixture();
+    let theta = if second {
+        second_material(&field, base)
+    } else {
+        Declared::new(&field, base).at(&Rat::zero())
+    };
+    let make = |theta: &Constitution| {
+        if second {
+            bound_second(&field, theta.clone(), &source)
+        } else {
+            bound(&field, theta.clone(), &source, vec![faced_key(&field)])
+        }
+    };
+    let mut learner = make(&theta);
+    let mut twin = make(&theta);
+    for round in 0..5 {
+        let (read, decision) = prospect_round(&mut learner, &field, &source);
+        let mut twin_read = Vec::new();
+        for control in chain_controls() {
+            let comparison = second_comparison(&mut twin, &field, &source, &control);
+            twin_read.push((comparison.0, comparison.1));
+        }
+        for (wave, ((code, excess), (t_code, t_excess))) in read.iter().zip(&twin_read).enumerate() {
+            println!(
+                "prospect loop ({name}): round {round}: wave {wave}: learner code {code:?} excess {excess}; twin code {t_code:?} excess {t_excess}"
+            );
+        }
+        println!("prospect loop ({name}): round {round}: landing {decision}");
+    }
+}
+
+/// **The prospect loop over rounds, against its twin** (§7c), first fixture: each round on the
+/// learner is the two chain encounters and the prospect landing; the twin runs the same encounters
+/// with no landing. Every round's actual comparisons at both waves are reported, as measured.
+#[test]
+fn the_prospect_loop_is_read_against_its_twin() {
+    prospect_loop("first", false);
+}
+
+/// The same loop on the second fixture (§7c).
+#[test]
+fn the_prospect_loop_is_read_on_a_second_fixture() {
+    prospect_loop("second", true);
 }
 
