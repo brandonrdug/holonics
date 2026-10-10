@@ -1098,6 +1098,9 @@ pub struct Field {
     capacity: Capacity,
     /// The located clock's certificate (`rate_g = d_g`), derived once at the declaration.
     located_capacity: Capacity,
+    /// The receivers' declared letter family ([`Field::with_letter_family`]; the cell-only family
+    /// unless declared).
+    letters: crate::hnn::receiving::FeatureFamily,
     distances: Vec<Vec<Option<usize>>>,
     lattices: BTreeMap<Locus, Lattice>,
     /// The word's declared precisions by rule ([`WordLattice::by_rule`]); `None` only for the
@@ -1285,10 +1288,61 @@ impl Field {
             population: declared.population,
             capacity,
             located_capacity,
+            letters: crate::hnn::receiving::FeatureFamily::cells(),
             distances,
             lattices,
             word,
         })
+    }
+
+    /// [definition; agent-inferred, October 10; the online-learning record §7] **The receivers'
+    /// letter family, declared**: the feature slots every receiver's address bundles carry after
+    /// their cell (`hnn::receiving`, "The receiving letters"), read by the reader and the tree's
+    /// declaration alike (`hnn::receiving::letter_family`). A field declares none by default, the
+    /// cell-only family campaign 2's harness chose. Refused, the field unchanged, where a phase slot
+    /// names a ring the field does not have or a grain below 2 or not dividing that ring's period,
+    /// or a contact slot names a contact the field does not have.
+    pub fn with_letter_family(
+        mut self,
+        family: crate::hnn::receiving::FeatureFamily,
+    ) -> Result<Self, HnnError> {
+        use crate::hnn::receiving::Feature;
+        for feature in family.features() {
+            match feature {
+                Feature::Phase { ring, grain } => {
+                    let period = self.rings.get(*ring).map(|declared| declared.period).ok_or(
+                        HnnError::Shape {
+                            what: "a phase letter's ring among the field's rings",
+                            expected: self.rings.len(),
+                            found: *ring,
+                        },
+                    )?;
+                    if *grain < 2 || period % *grain != 0 {
+                        return Err(HnnError::Shape {
+                            what: "a phase letter's grain of at least 2 dividing its ring's period",
+                            expected: usize::try_from(period).unwrap_or(usize::MAX),
+                            found: usize::try_from(*grain).unwrap_or(usize::MAX),
+                        });
+                    }
+                }
+                Feature::Contact { contact, .. } => {
+                    if *contact >= self.contacts.len() {
+                        return Err(HnnError::Shape {
+                            what: "a contact letter's contact among the field's contacts",
+                            expected: self.contacts.len(),
+                            found: *contact,
+                        });
+                    }
+                }
+            }
+        }
+        self.letters = family;
+        Ok(self)
+    }
+
+    /// The receivers' declared letter family ([`Field::with_letter_family`]).
+    pub fn letter_family(&self) -> &crate::hnn::receiving::FeatureFamily {
+        &self.letters
     }
 
     /// The port chart the rings read.

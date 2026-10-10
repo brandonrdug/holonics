@@ -204,6 +204,12 @@ fn wide_field() -> Field {
 /// A field declared on a frame's own rings, in carry order, with the receiving ring the source:
 /// the field `Field::admit` accepts a located passage into (its helix is the field's rings).
 fn field_on(periods: &[u64]) -> Field {
+    field_on_receiving(periods, periods.len() - 1)
+}
+
+/// [`field_on`] with its receiver declared on ring `receiving` (the online-learning record §6: the
+/// ring whose clock carries the located cycle); the source ring stays the last.
+fn field_on_receiving(periods: &[u64], receiving: usize) -> Field {
     let last = periods.len() - 1;
     let rings = periods
         .iter()
@@ -235,7 +241,7 @@ fn field_on(periods: &[u64]) -> Field {
             alphabet: periods[last] as usize,
             step: integer(1),
             exponent_grain: 1,
-            receivers: vec![receiver(last, 1)],
+            receivers: vec![receiver(receiving, 1)],
             crib: CribDeclaration {
                 window: 16,
                 offset: 1,
@@ -1200,6 +1206,7 @@ fn the_field_learns_a_rings_section_word_online() {
     use holonics::hnn::constitution::Locus;
     use holonics::hnn::field::ConstitutionRead;
     use holonics::hnn::port::ReceiptDetail;
+    use holonics::hnn::receiving::{Feature, FeatureFamily};
     use holonics::hnn::{Current, ExecutionPort, Handle, Reference};
     use holonics::ratio::Rat;
     use num_traits::Zero;
@@ -1216,9 +1223,18 @@ fn the_field_learns_a_rings_section_word_online() {
             continue;
         }
         frames += 1;
+        let mut population_sums = Vec::new();
+        for clocked in [false, true] {
+        let receiving_ring = helix.periods().len() - 1;
         let located = PassageChart::located(carrying.location(), &[actual.clone()]).unwrap();
         let encoding = Encoding::found(&located).unwrap();
-        let field = field_on(helix.periods());
+        // §7: the clocked field's receivers address by the hidden ring's phase class beside the cell.
+        let field = if clocked {
+            let letter = Feature::Phase { ring: 0, grain: helix.periods()[0] };
+            field_on(helix.periods()).with_letter_family(FeatureFamily::new(vec![letter]).unwrap()).unwrap()
+        } else {
+            field_on(helix.periods())
+        };
         let encoded = Encoded::through(&encoding, &located, &field, &[actual.clone()]).unwrap().remove(0);
         let chart: Vec<usize> = encoded.classes_read().collect();
         let mut denotes = vec![None; encoded.classes()];
@@ -1235,6 +1251,7 @@ fn the_field_learns_a_rings_section_word_online() {
             let (mut lower, mut upper) = (rat(0, 1), rat(0, 1));
             let (mut tree_sum, mut combined_sum) = (rat(0, 1), rat(0, 1));
             let mut features: Vec<(usize, Option<Vec<Rat>>)> = Vec::new();
+            let mut prior_moves: Vec<(u64, u32, u32)> = Vec::new();
             for n in tau..length {
                 let (pending, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
                 let (staged, compared) = reference
@@ -1262,22 +1279,15 @@ fn the_field_learns_a_rings_section_word_online() {
                     tree_sum = tree_sum + &tree.upper;
                     combined_sum = combined_sum + &combined.upper;
                 }
-                let receiving = field.rings().len() - 1;
-                let map_before = resident.constitution().receiving_map(receiving).cloned();
+                let receiving = receiving_ring;
                 if learner {
                     let deposited = reference.deposit(&mut resident, staged).unwrap();
                     let commit = resident.constitution().commit();
-                    if (17..=18).contains(&commit) {
-                        println!("§dump commit {commit}: {:?}", deposited.deposit);
-                    }
-                    if (16..=20).contains(&commit) {
-                        let reading = deposited.deposit.into_present().unwrap();
-                        let steps: Vec<_> = reading.steps.iter().filter(|(locus, _)| matches!(locus, Locus::ReceivingMap(_))).collect();
-                        let released: Vec<_> = reading.released.iter().filter(|(locus, ..)| matches!(locus, Locus::ReceivingMap(_))).collect();
-                        println!("§diag commit {commit} cell {n}: R before {:?}", map_before.as_ref().map(|m| m.entries().to_vec()));
-                        println!("§diag commit {commit}: R after {:?}", resident.constitution().receiving_map(receiving).map(|m| m.entries().to_vec()));
-                        println!("§diag commit {commit}: R steps {steps:?}");
-                        println!("§diag commit {commit}: R released tails {released:?}; vanished {:?}", reading.vanished);
+                    let reading = deposited.deposit.into_present().unwrap();
+                    for (locus, chart_reading) in &reading.charts {
+                        if let (Locus::ReceivingMap(_), Some(moved)) = (locus, &chart_reading.prior) {
+                            prior_moves.push((commit, moved.from, moved.to));
+                        }
                     }
                     if n >= length - 2 * tau && code.upper < rat(1, 1) {
                         continued += 1;
@@ -1291,7 +1301,7 @@ fn the_field_learns_a_rings_section_word_online() {
                     .receiving_map(receiving)
                     .map(|map| map.entries().iter().any(|entry| !entry.is_zero()));
                 println!(
-                    "§1 frame {:?} {} cell {n}: actual {:?}, population [{}, {}], tree upper {}, combined upper {}; aeons closed {closed}, commit {}, R nonzero {:?} ({} ms)",
+                    "§1 frame {:?} clocked {clocked} receiver {receiving_ring} {} cell {n}: actual {:?}, population [{}, {}], tree upper {}, combined upper {}; aeons closed {closed}, commit {}, R nonzero {:?} ({} ms)",
                     helix.periods(),
                     if learner { "learner" } else { "twin" },
                     denotes[chart[n]],
@@ -1304,7 +1314,7 @@ fn the_field_learns_a_rings_section_word_online() {
                     started.elapsed().as_millis()
                 );
             }
-            println!("§1 frame {:?} {}: cells {}..{} upper sums, tree {tree_sum}, combined {combined_sum}", helix.periods(), if learner { "learner" } else { "twin" }, length / 2, length);
+            println!("§1 frame {:?} clocked {clocked} receiver {receiving_ring} {}: cells {}..{} upper sums, tree {tree_sum}, combined {combined_sum}; receiving prior moves {prior_moves:?}", helix.periods(), if learner { "learner" } else { "twin" }, length / 2, length);
             // §5 (O1): the feature's classes against the cycle's positions.
             let who = if learner { "learner" } else { "twin" };
             let at = |n: usize| features.iter().find(|(m, _)| *m == n).and_then(|(_, f)| f.clone());
@@ -1322,19 +1332,19 @@ fn the_field_learns_a_rings_section_word_online() {
                 }
             }
             println!(
-                "§5 frame {:?} {who}: features read {} (no nonzero g at {unread}); the -2 cells' features {} of which {shared} also occur at a +1 cell; repeats with the cycle on the second half: {periodic}; distinct among the last cycle's seven: {}",
+                "§5 frame {:?} clocked {clocked} receiver {receiving_ring} {who}: features read {} (no nonzero g at {unread}); the -2 cells' features {} of which {shared} also occur at a +1 cell; repeats with the cycle on the second half: {periodic}; distinct among the last cycle's seven: {}",
                 helix.periods(),
                 features.len(),
                 minus.len(),
                 distinct.len()
             );
             for n in length - tau..length {
-                println!("§5 frame {:?} {who} cell {n} ({:?}): f {:?}", helix.periods(), dictionary[actual[n]], at(n));
+                println!("§5 frame {:?} clocked {clocked} receiver {receiving_ring} {who} cell {n} ({:?}): f {:?}", helix.periods(), dictionary[actual[n]], at(n));
             }
             sums.push((lower, upper));
         }
         println!(
-            "§1 frame {:?}: cells {}..{} summed code, learner [{}, {}] against twin [{}, {}]; continued {continued} of {}",
+            "§1 frame {:?} clocked {clocked} receiver {receiving_ring}: cells {}..{} summed code, learner [{}, {}] against twin [{}, {}]; continued {continued} of {}",
             helix.periods(),
             length / 2,
             length,
@@ -1345,9 +1355,21 @@ fn the_field_learns_a_rings_section_word_online() {
             2 * tau
         );
         assert!(sums[0].1 < sums[1].0, "C1: the learner codes the second half below the twin");
-        // C2 is measured, not met (record §3): the learner codes the cycle's +1 cells below one bit
-        // and its −2 cell above, so it carries the cycle's composition, not its position.
-        assert!(continued < 2 * tau);
+        if !clocked {
+            // C2 is measured, not met (record §3, §4): with cell letters only, the learner carries
+            // the cycle's composition, not its position (the majority baseline).
+            assert!(continued < 2 * tau);
+        }
+        println!("§7 frame {:?} clocked {clocked}: continued {continued} of {}", helix.periods(), 2 * tau);
+        population_sums.push(sums[0].clone());
+        }
+        println!(
+            "§7 frame {:?}: C3'' the clocked learner's population upper {} against the cell-only learner's lower {}: below {}",
+            helix.periods(),
+            population_sums[1].1,
+            population_sums[0].0,
+            population_sums[1].1 < population_sums[0].0
+        );
     }
     assert!(frames > 0);
 }

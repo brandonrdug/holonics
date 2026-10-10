@@ -453,6 +453,10 @@ pub struct LetterReader {
     kinds: Option<Vec<SiteKind>>,
     /// Each contact's ends `(g, h)`, for the contact slots.
     ends: Vec<(usize, usize)>,
+    /// [definition; agent-inferred, October 10; the online-learning record §7] Whether the reader
+    /// has stepped by a located occurrence's digits ([`LetterReader::tick_at`]): a known target read
+    /// without its digits then refuses ([`ActiveAddress::phase`]).
+    located: bool,
 }
 
 impl LetterReader {
@@ -464,6 +468,7 @@ impl LetterReader {
             clocks: Vec::new(),
             kinds: None,
             ends: Vec::new(),
+            located: false,
         }
     }
 
@@ -515,6 +520,7 @@ impl LetterReader {
             family,
             clocks: rings.iter().map(|ring| ring.rest.clone()).collect(),
             rings,
+            located: false,
             kinds: None,
             ends: field
                 .contacts()
@@ -592,19 +598,29 @@ impl LetterReader {
     }
 
     /// **One cell's selective step on the kept rings** (`hnn::field::Field::selective_step`):
-    /// ring `g`'s clock advances `[port_g(x) ∈ N_g]` plus its predecessor's carry, and its jumps
-    /// are the carry it sends on. Returns whether the last ring carried out.
-    fn step(&mut self, cell: usize) -> bool {
+    /// ring `g`'s clock advances its advance on the cell plus its predecessor's carry, and its jumps
+    /// are the carry it sends on. The advance is the occurrence's located digit `a_g(c)` on the
+    /// located route (`hnn::encoding::Encoded::advance`, as the lift point's step reads it,
+    /// `Field::advance_of`), else its lock's fit `[port_g(x) ∈ N_g]`. Returns whether the last ring
+    /// carried out.
+    fn step(&mut self, cell: usize, digits: Option<&[u64]>) -> bool {
+        if digits.is_some() {
+            self.located = true;
+        }
         let mut carry = 0u64;
-        for (ring, clock) in self.rings.iter().zip(self.clocks.iter_mut()) {
-            let fits = ring
-                .ports
-                .get(cell)
-                .and_then(|&port| ring.lock.get(port))
-                .copied()
-                .unwrap_or(false);
+        for (g, (ring, clock)) in self.rings.iter().zip(self.clocks.iter_mut()).enumerate() {
+            let advance = match digits {
+                Some(digits) => digits[g],
+                None => u64::from(
+                    ring.ports
+                        .get(cell)
+                        .and_then(|&port| ring.lock.get(port))
+                        .copied()
+                        .unwrap_or(false),
+                ),
+            };
             carry = clock
-                .advance(&BigUint::from(u64::from(fits) + carry))
+                .advance(&BigUint::from(advance + carry))
                 .to_u64()
                 .expect(
                     "a ring of period at least 2 advanced at most two ticks jumps at most once",
@@ -652,7 +668,13 @@ impl LetterReader {
     /// slot from its reading; at the joint clock's carry-out the windings then restart, as the next
     /// aeon opens there.
     pub fn tick(&mut self, cell: usize) -> Result<Letter, HnnError> {
-        let carry_out = self.step(cell);
+        self.tick_at(cell, None)
+    }
+
+    /// [`LetterReader::tick`] of an occurrence with its located digits (`None` on the identity
+    /// route): the clock steps as the lift point does on that route.
+    pub fn tick_at(&mut self, cell: usize, digits: Option<&[u64]>) -> Result<Letter, HnnError> {
+        let carry_out = self.step(cell, digits);
         if self.family.is_empty() {
             return Ok(Letter::Cell(cell));
         }
@@ -775,7 +797,13 @@ impl ActiveAddress {
     /// **Receive one cell**: its tick's letter, read by the register's reader after the tick (its
     /// contacts' readings included), becomes the newest, and the oldest leaves.
     pub fn receive(&mut self, cell: usize) -> Result<(), HnnError> {
-        let letter = self.reader.tick(cell)?;
+        self.receive_at(cell, None)
+    }
+
+    /// [`ActiveAddress::receive`] of an occurrence with its located digits (`None` on the identity
+    /// route), so the register's clock stays the lift point's on the located route.
+    pub fn receive_at(&mut self, cell: usize, digits: Option<&[u64]>) -> Result<(), HnnError> {
+        let letter = self.reader.tick_at(cell, digits)?;
         if !self.letters.is_empty() {
             self.letters.pop();
             self.letters.insert(0, letter);
@@ -933,6 +961,16 @@ impl ActiveAddress {
     /// `j` is never read.
     pub fn phase(&self, known: &[usize], j: usize) -> Result<Vec<Letter>, HnnError> {
         let depth = self.letters.len();
+        // A located register's clock steps by each occurrence's digits; its known targets arrive
+        // as classes only, so a clock-lettered register refuses to read them (apertures above one
+        // on the located route are owed; the online-learning record §7).
+        if self.reader.located && !self.reader.family.is_empty() && j.min(known.len()) > 0 {
+            return Err(HnnError::Shape {
+                what: "a located register's known targets with their digits (aperture above one on the located route)",
+                expected: 0,
+                found: j.min(known.len()),
+            });
+        }
         let mut reader = self.reader.clone();
         let mut window = known[..j.min(known.len())]
             .iter()
@@ -958,7 +996,8 @@ impl ActiveAddress {
     }
 }
 
-/// [definition; agent-inferred] **The field's declared letter family** (campaign 2, decided on the
+/// [definition; agent-inferred] **The field's declared letter family** (`Field::with_letter_family`;
+/// the online-learning record §7). Its default, the cell-only family, is campaign 2's (decided on the
 /// development cells by the development harness, the notebook's retired
 /// [`hnn_landmark`](https://github.com/brandonrdug/holonics/blob/d4596102/research/notebook/hnn_design/hnn_landmark.rs)):
 /// the receiving letters every receiver's tree is addressed by. The harness's receipt (the notebook
@@ -967,8 +1006,8 @@ impl ActiveAddress {
 /// clock-only family and no contact
 /// family coded below the constant-slot control of its slots by its description charge (every
 /// `Δ_letters` decided positive), so no letter carried information the preceding cells do not.
-pub fn letter_family(_field: &Field) -> FeatureFamily {
-    FeatureFamily::cells()
+pub fn letter_family(field: &Field) -> FeatureFamily {
+    field.letter_family().clone()
 }
 
 /// [definition; agent-inferred, U5] **The receiver's epochs over `n` cells at aperture `A`**
@@ -1022,7 +1061,7 @@ pub fn clock_letters(
             reader.hold_kinds(kinds[at].clone())?;
         }
         let step = current.step(field, cells, at)?;
-        letters.push(reader.tick(cell)?);
+        letters.push(reader.tick_at(cell, cells.advance(at))?);
         if step.carry_out {
             let end = at + 1;
             let from = end.saturating_sub(crib.window).max(aeon_start);

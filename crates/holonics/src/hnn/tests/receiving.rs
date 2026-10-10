@@ -1616,3 +1616,32 @@ fn cold_restore_handle_exhaustion_is_typed_before_new_ingest_work() {
     assert_eq!(restored.constitution(), &before_material);
     assert_eq!(restored.ledger().balance(), &before_balance);
 }
+
+/// **The field declares its receivers' letter family** (`Field::with_letter_family`; the
+/// online-learning record §7): a field declares the cell-only family unless it says otherwise, and
+/// `letter_family` reads the field's declaration; a phase slot on ring 0 at a grain dividing its
+/// period is admitted and read back; a phase slot on a ring the field does not have, or at a grain
+/// that does not divide the ring's period, and a contact slot past the field's contacts are refused.
+#[test]
+fn the_field_declares_its_receivers_letter_family() {
+    use crate::hnn::receiving::{Feature, FeatureFamily, letter_family};
+    let field = campaign_field();
+    assert_eq!(letter_family(&field), FeatureFamily::cells());
+    let period = field.ring(0).period();
+    let phase = FeatureFamily::new(vec![Feature::Phase { ring: 0, grain: period }]).unwrap();
+    let declared = field.clone().with_letter_family(phase.clone()).unwrap();
+    assert_eq!(letter_family(&declared), phase);
+    let rings = field.rings().len();
+    let outside = FeatureFamily::new(vec![Feature::Phase { ring: rings, grain: 2 }]).unwrap();
+    assert!(field.clone().with_letter_family(outside).is_err());
+    let coprime = (2..=period + 1).find(|g| period % g != 0).unwrap();
+    let undivided = FeatureFamily::new(vec![Feature::Phase { ring: 0, grain: coprime }]).unwrap();
+    assert!(field.clone().with_letter_family(undivided).is_err());
+    let contacts = field.contacts().len();
+    let beyond = FeatureFamily::new(vec![Feature::contact(&field, 0)]).unwrap();
+    let missing = match beyond.features()[0].clone() {
+        Feature::Contact { bound, .. } => FeatureFamily::new(vec![Feature::Contact { contact: contacts, bound }]).unwrap(),
+        Feature::Phase { .. } => unreachable!(),
+    };
+    assert!(field.with_letter_family(missing).is_err());
+}

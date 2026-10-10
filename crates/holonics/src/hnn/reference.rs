@@ -1314,8 +1314,8 @@ impl ExecutionPort for Reference {
         // since the aeon's opening, which the carry-out moves to its own lift point), and its
         // contact letters' site kinds then refresh from the published constitution, after the
         // ingest and never inside it (`hnn::receiving::LetterReader`).
-        for code in cells.classes_read().take(ingested.cells) {
-            resident.address.receive(code)?;
+        for (at, code) in cells.classes_read().take(ingested.cells).enumerate() {
+            resident.address.receive_at(code, cells.advance(at))?;
         }
         let opening = if ingested.carry_out {
             resident.current.lift()
