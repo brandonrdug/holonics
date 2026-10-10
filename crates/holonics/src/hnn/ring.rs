@@ -1405,6 +1405,76 @@ impl ResonatorOperands {
         self.phases[phase].solve.apply(right)
     }
 
+    /// [definition; agent-inferred, October 10; the bank record §16, §18, §20; the online-learning
+    /// record §9] **The drive's interval for a landing cell**: at word tick `tick`, from the state
+    /// `[u, w]`, the drive `x` on coordinate `coordinate` moves the next phase point affinely,
+    /// `(w′, u′) = (w₀ + w_m x, u₀ + u_m x)` (two exact-law steps, at drive 0 and 1, read the
+    /// image), so the cell the point lands in is an interval of drives cut by half-lines. Returns
+    /// the integers `k` of the drives `x = k · grain` inside `range` for which the point lands in the
+    /// quadrant `class` (`w′` and `u′` signed by the class; `None`, the origin: both zero) and, where
+    /// `octant` is declared, on its half `|w′| ≥ |u′|` (`true`) or `<` (`false`), read as
+    /// `s_w w′ − s_u u′` by the class's signs. Each cut is widened by one value at each end: an
+    /// enclosure of the drives that land in the cell, not its exact least fibre. On the exact law
+    /// the widening covers the cut's own boundary; on a lattice it covers the landing's rounding only
+    /// where that rounding moves the cut by at most one value at the declared grain (the consumer
+    /// states that scale). The consumer checks the landing it decodes. Refused where the exact step
+    /// refuses.
+    pub fn drive_interval(
+        &self,
+        tick: usize,
+        coordinate: usize,
+        state: [&[Rat]; 2],
+        class: Option<u8>,
+        octant: Option<bool>,
+        grain: &Rat,
+        range: (BigInt, BigInt),
+    ) -> Result<(BigInt, BigInt), HnnError> {
+        let zero = ResonatorRemainders::default();
+        let rate = |a: Rat| -> Result<Vec<Rat>, HnnError> {
+            let mut drive = vec![Rat::zero(); self.width()];
+            drive[coordinate] = a;
+            Ok(self.step(tick, &drive, state, &zero, None)?.rate)
+        };
+        let (r0, r1) = (rate(Rat::zero())?, rate(Rat::one())?);
+        let m0 = &r1[coordinate] - &r0[coordinate];
+        let hop = &self.step;
+        let (w0, wm) = (integer(2) * &r0[coordinate] - &state[1][coordinate], integer(2) * &m0);
+        let (u0, um) = (&state[0][coordinate] + hop * &r0[coordinate], hop * &m0);
+        let (mut lo, mut hi) = range;
+        let mut bound = |a: &Rat, b: &Rat, side: i8| {
+            // side 1: a + b x ≥ 0; −1: ≤ 0; 0: = 0 (both).
+            if b.is_zero() {
+                return;
+            }
+            let root = -(a / b) / grain;
+            let (floor, ceil) = (root.floor().to_integer() - 1, root.ceil().to_integer() + 1);
+            if side == 0 {
+                lo = lo.clone().max(floor);
+                hi = hi.clone().min(ceil);
+            } else if b.is_positive() == (side > 0) {
+                lo = lo.clone().max(floor);
+            } else {
+                hi = hi.clone().min(ceil);
+            }
+        };
+        let (sw, su) = match class {
+            Some(0) => (1, 1),
+            Some(1) => (-1, 1),
+            Some(2) => (-1, -1),
+            Some(3) => (1, -1),
+            _ => (0, 0),
+        };
+        bound(&w0, &wm, sw);
+        bound(&u0, &um, su);
+        if let (Some(wide), true) = (octant, sw != 0) {
+            let (sw, su) = (integer(i64::from(sw)), integer(i64::from(su)));
+            let a = &sw * &w0 - &su * &u0;
+            let b = &sw * &wm - &su * &um;
+            bound(&a, &b, if wide { 1 } else { -1 });
+        }
+        Ok((lo, hi))
+    }
+
     /// Every chart's reading (none under the exact law).
     pub fn charts(&self) -> Vec<ResonatorChart> {
         self.phases

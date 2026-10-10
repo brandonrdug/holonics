@@ -1,0 +1,68 @@
+{
+  "scope": "Local developer reads by opus under the common lease (announced), not claim-bearing: the online-learning record section 10.",
+  "runs": [
+    {
+      "scope": "the causal read: chart pinned from a 28-cell prefix, two openings, both frames, before the advance law retention",
+      "log_sha256": "cd220eb531b56682011b4464af3118124c90a08851edaf8bbf7c9b97e9433362",
+      "lines": [
+        "test the_field_learns_a_rings_section_word_online ... §10 settle 120 frame [7, 2] clocked false: τ 7 from the 28-cell prefix; cells 60..120 population, learner [2857733934824548370059649432297/79228162514264337593543950336, 2857733934824548380622809926471/79228162514264337593543950336] against twin [60, 60]; continued 12 of 14; the -2 cells [(110, Ratio { numer: 208129580049174463458977033473, denom: 79228162514264337593543950336 }), (117, Ratio { numer: 3209153368831512236063997895, denom: 1237940039285380274899124224 })]; letters charge 0 bits; frozen chart 18 bits (7572 ms)",
+        "§10 settle 120 frame [7, 2] clocked true: τ 7 from the 28-cell prefix; cells 60..120 population, learner [416846346925360903220296716287/79228162514264337593543950336, 416846346925360909324204368383/79228162514264337593543950336] against twin [60, 60]; continued 14 of 14; the -2 cells [(110, Ratio { numer: 4850144368544275235347529849, denom: 79228162514264337593543950336 }), (117, Ratio { numer: 4467916325367592292118202179, denom: 79228162514264337593543950336 })]; letters charge 17 bits; frozen chart 18 bits (11686 ms)",
+        "§10 settle 120 frame [7, 2]: C3'' the clocked learner's upper 416846346925360909324204368383/79228162514264337593543950336 against the cell-only learner's lower 2857733934824548370059649432297/79228162514264337593543950336",
+        "§10 settle 120 frame [9, 2] clocked false: τ 7 from the 28-cell prefix; cells 60..120 population, learner [1428659232794933247792747567225/39614081257132168796771975168, 2857318465589866501543934735965/79228162514264337593543950336] against twin [60, 60]; continued 12 of 14; the -2 cells [(110, Ratio { numer: 208112843202550710739919815179, denom: 79228162514264337593543950336 }), (117, Ratio { numer: 205494321308029177142293565027, denom: 79228162514264337593543950336 })]; letters charge 0 bits; frozen chart 21 bits (15936 ms)",
+        "§10 settle 120 frame [9, 2] clocked true: τ 7 from the 28-cell prefix; cells 60..120 population, learner [416862018412160523609103952557/79228162514264337593543950336, 208431009206080265219731653611/39614081257132168796771975168] against twin [60, 60]; continued 14 of 14; the -2 cells [(110, Ratio { numer: 4848715650416838754114005443, denom: 79228162514264337593543950336 }), (117, Ratio { numer: 4466431538423121298317318929, denom: 79228162514264337593543950336 })]; letters charge 17 bits; frozen chart 21 bits (20214 ms)",
+        "§10 settle 120 frame [9, 2]: C3'' the clocked learner's upper 208431009206080265219731653611/39614081257132168796771975168 against the cell-only learner's lower 1428659232794933247792747567225/39614081257132168796771975168",
+        "§10 settle 123 frame [7, 2] clocked false: τ 7 from the 28-cell prefix; cells 60..120 population, learner [2673174889195880292421834864839/79228162514264337593543950336, 1336587444597940147288224759715/39614081257132168796771975168] against twin [60, 60]; continued 12 of 14; the -2 cells [(107, Ratio { numer: 203762959256635481770175431107, denom: 79228162514264337593543950336 }), (114, Ratio { numer: 201645464629897985262700727493, denom: 79228162514264337593543950336 })]; letters charge 0 bits; frozen chart 18 bits (27814 ms)",
+        "§10 settle 123 frame [7, 2] clocked true: τ 7 from the 28-cell prefix; cells 60..120 population, learner [205800657326865291224004548299/39614081257132168796771975168, 102900328663432646532734397083/19807040628566084398385987584] against twin [60, 60]; continued 14 of 14; the -2 cells [(107, Ratio { numer: 2427928906122876718658841099, denom: 39614081257132168796771975168 }), (114, Ratio { numer: 4473857525402767679613859741, denom: 79228162514264337593543950336 })]; letters charge 17 bits; frozen chart 18 bits (31899 ms)",
+        "§10 settle 123 frame [7, 2]: C3'' the clocked learner's upper 102900328663432646532734397083/19807040628566084398385987584 against the cell-only learner's lower 2673174889195880292421834864839/79228162514264337593543950336",
+        "§10 settle 123 frame [9, 2] clocked false: τ 7 from the 28-cell prefix; cells 60..120 population, learner [335219353895218477137244013743/9903520314283042199192993792, 670438707790436954694392015375/19807040628566084398385987584] against twin [60, 60]; continued 12 of 14; the -2 cells [(107, Ratio { numer: 204282645180132647658607787219, denom: 79228162514264337593543950336 }), (114, Ratio { numer: 101082636135369370350236008649, denom: 39614081257132168796771975168 })]; letters charge 0 bits; frozen chart 21 bits (36225 ms)",
+        "§10 settle 123 frame [9, 2] clocked true: τ 7 from the 28-cell prefix; cells 60..120 population, learner [378895015296043214816996399319/79228162514264337593543950336, 2960117307000337745194253423/618970019642690137449562112] against twin [60, 60]; continued 14 of 14; the -2 cells [(107, Ratio { numer: 2453018231584170598039212973, denom: 19807040628566084398385987584 }), (114, Ratio { numer: 9289369280096320941034493515, denom: 79228162514264337593543950336 })]; letters charge 17 bits; frozen chart 21 bits (40725 ms)",
+        "§10 settle 123 frame [9, 2]: C3'' the clocked learner's upper 2960117307000337745194253423/618970019642690137449562112 against the cell-only learner's lower 335219353895218477137244013743/9903520314283042199192993792",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 40.73s",
+        "BOUNDED start 14:28:32 end 14:29:18 exit 0 wall_ns 46043566872 child_peak_rss_kib 1084520"
+      ]
+    },
+    {
+      "scope": "receiving tests with the retained advance law: 37 of 37 (warm and cold equivalence included)",
+      "log_sha256": "ea28a84881413575b02e88d76cd4878787345b0835d4ea1b1cffe80321a77679",
+      "lines": [
+        "test result: ok. 37 passed; 0 failed; 0 ignored; 0 measured; 1170 filtered out; finished in 6.43s",
+        "BOUNDED start 14:31:54 end 14:32:21 exit 0 wall_ns 26494224929 child_peak_rss_kib 2854924"
+      ]
+    },
+    {
+      "scope": "acoustic_encoding 10 of 10 and resident_cold_restore 4 of 4 after the retention",
+      "log_sha256": "1cfd4e8c9f990c46c9cf9c9ce9c95290e3a316eaa396d2d48b3b507bc3746f9e",
+      "lines": [
+        "test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 41.31s",
+        "test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s",
+        "BOUNDED start 14:32:28 end 14:33:23 exit 0 wall_ns 55590636060 child_peak_rss_kib 2038368"
+      ]
+    },
+    {
+      "scope": "a mistyped cargo filter invocation: no test ran (exit 1), kept as it happened",
+      "log_sha256": "e32a47ff11505d3c1410793cdb94600948f5ccd3bb4e8ccb0822b77a911c6d40",
+      "lines": [
+        "error: unexpected argument 'port' found",
+        "BOUNDED start 14:33:24 end 14:33:24 exit 1 wall_ns 46725409 child_peak_rss_kib 28160"
+      ]
+    },
+    {
+      "scope": "the HNN unit suite: 410 of 410",
+      "log_sha256": "7f5ffc11b659f13f7af7f83d1011132a81acf374dbc10435504e747b27b2cd51",
+      "lines": [
+        "test result: ok. 410 passed; 0 failed; 0 ignored; 0 measured; 797 filtered out; finished in 269.91s",
+        "BOUNDED start 14:33:30 end 14:38:00 exit 0 wall_ns 270070380073 child_peak_rss_kib 1020052"
+      ]
+    },
+    {
+      "scope": "gate 1",
+      "log_sha256": "b463b42f9b42fdb9ab33fb8635de7ec924b325d68e440d03b7f517e6e724a806",
+      "lines": [
+        "gate check: ok (4731 ms)",
+        "gate guard-lints: ok (10440 ms)",
+        "gate guard-doctests: ok (26322 ms)",
+        "BOUNDED start 14:38:23 end 14:39:04 exit 0 wall_ns 41507991429 child_peak_rss_kib 1997920"
+      ]
+    }
+  ]
+}

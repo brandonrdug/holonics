@@ -458,8 +458,8 @@ fn gain_exponent(peak: &Rat) -> i64 {
 
 /// The interval of PCM integers a sample may take so that ring `operands`, at tick `n` from state
 /// `[u, w]`, lands in `class` (`None`: the origin), widened by one value at each end for the
-/// lattice's rounding (record §16, §18). Shared by the encoder and the independent decoder: it reads
-/// only the declared ring, the clock and the decoder's own state.
+/// lattice's rounding (record §16, §18): the ring owner's `ResonatorOperands::drive_interval` at the
+/// PCM grain `2^(−15)` over the 16-bit range. Shared by the encoder and the independent decoder.
 fn cell_interval(
     operands: &ResonatorOperands,
     n: usize,
@@ -468,50 +468,10 @@ fn cell_interval(
     class: Option<u8>,
     octant: Option<bool>,
 ) -> (BigInt, BigInt) {
-    use holonics::hnn::ring::ResonatorRemainders;
-    let zero = ResonatorRemainders::default();
-    let rate = |a: Rat| operands.step(n, &[a, Rat::zero()], [u, w], &zero, None).unwrap().rate;
-    let (r0, r1) = (rate(Rat::zero()), rate(Rat::one()));
-    let m0 = &r1[0] - &r0[0];
-    let hop = operands.hop();
-    let (w0, wm) = (integer(2) * &r0[0] - &w[0], integer(2) * &m0);
-    let (u0, um) = (&u[0] + hop * &r0[0], hop * &m0);
-    let pcm = Rat::from_integer(BigInt::one() << PCM as usize);
-    let (mut lo, mut hi) = (BigInt::from(-32768), BigInt::from(32767));
-    let mut bound = |a: &Rat, b: &Rat, side: i8| {
-        // side 1: a + b x ≥ 0; −1: ≤ 0; 0: = 0 (both).
-        if b.is_zero() {
-            return;
-        }
-        let root = -(a / b) * &pcm;
-        let (floor, ceil) = (root.floor().to_integer() - 1, root.ceil().to_integer() + 1);
-        if side == 0 {
-            lo = lo.clone().max(floor);
-            hi = hi.clone().min(ceil);
-        } else if b.is_positive() == (side > 0) {
-            lo = lo.clone().max(floor);
-        } else {
-            hi = hi.clone().min(ceil);
-        }
-    };
-    let (sw, su) = match class {
-        Some(0) => (1, 1),
-        Some(1) => (-1, 1),
-        Some(2) => (-1, -1),
-        Some(3) => (1, -1),
-        _ => (0, 0),
-    };
-    bound(&w0, &wm, sw);
-    bound(&u0, &um, su);
-    // Record §20: the octant half, `|w′| ≥ |u′|` (`true`) or `<` (`false`), read with the class's
-    // signs as `sw·w′ − su·u′`, one more half-line on the sample.
-    if let (Some(wide), true) = (octant, sw != 0) {
-        let (sw, su) = (integer(i64::from(sw)), integer(i64::from(su)));
-        let a = &sw * &w0 - &su * &u0;
-        let b = &sw * &wm - &su * &um;
-        bound(&a, &b, if wide { 1 } else { -1 });
-    }
-    (lo, hi)
+    let grain = Rat::new(BigInt::one(), BigInt::one() << PCM as usize);
+    operands
+        .drive_interval(n, 0, [u, w], class, octant, &grain, (BigInt::from(-32768), BigInt::from(32767)))
+        .unwrap()
 }
 
 /// The next phase point's exact image, affine in the sample: `(w′, u′) = (w₀ + w_m x, u₀ + u_m x)`, read

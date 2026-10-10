@@ -1,0 +1,44 @@
+{
+  "scope": "Local developer reads by opus under the common lease (announced), not claim-bearing: the online-learning record section 9, measured.",
+  "runs": [
+    {
+      "scope": "first decoder build: an E0502 compile failure of my test (a boxed callback borrowed the code past its pass); not run",
+      "log_sha256": "13a5859c91e626e7d75ce0f4a4ae2e1c1da00d8ab77f5b181a54875f46228eea",
+      "lines": [
+        "   Compiling thiserror v2.0.19",
+        "   Compiling thiserror-impl v2.0.19",
+        "error[E0502]: cannot borrow `code` as immutable because it is also borrowed as mutable",
+        "For more information about this error, try `rustc --explain E0502`.",
+        "error: could not compile `holonics` (test \"acoustic_encoding\") due to 1 previous error",
+        "BOUNDED start 14:41:25 end 14:41:49 exit 101 wall_ns 23862387128 child_peak_rss_kib 2217524"
+      ]
+    },
+    {
+      "scope": "the decoder test: D1 exact, D2 charges, D3 holds",
+      "log_sha256": "e732287e444ead91f005d45b5a6bb57347a3695ac6cf6e37dcaab2098e6197ef",
+      "lines": [
+        "test the_field_decodes_the_tone_from_its_released_face ... §9 frame [7, 2]: D2 class bits 25 for cells 28..120 (+ 28 prefix cells at one bit each), index bits 669 for 120 ticks; holds 0 (decoder 0); the near-return codes the word in (27, 360)",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 19.15s",
+        "BOUNDED start 14:41:59 end 14:42:20 exit 0 wall_ns 20187414662 child_peak_rss_kib 773176"
+      ]
+    },
+    {
+      "scope": "gate 1 with the ring owner drive_interval",
+      "log_sha256": "ea1a1f8809e1b0439e9aca9267407d2c5095151141c3fa5fd25d2933526ec978",
+      "lines": [
+        "gate check: ok (4028 ms)",
+        "gate guard-lints: ok (9982 ms)",
+        "gate guard-doctests: ok (26267 ms)",
+        "BOUNDED start 14:42:33 end 14:43:14 exit 0 wall_ns 40291783050 child_peak_rss_kib 1807912"
+      ]
+    },
+    {
+      "scope": "the section 29 codec through the moved interval owner, 2000 ticks: the same 28072 bits, decode exact",
+      "log_sha256": "f60454c1b768cfeb1e11ebc13fe4b38a7c2c04f7ca72615386496d6524b65a50",
+      "lines": [
+        "nrcodec ring 20 (octant grain: false): 2000 ticks; emitted 28072 bits before padding; the cell codec on the same stream and grain 28029 bits; blocks of 20 ticks: 100 read, 12 admitted, their words 663 bits replacing 720 cell bits, flags 100 bits; emitted 3509 bytes = 28072 bits; raw 32000 bits; decode equals the source exactly: true; encoded at 5089 ms, decoded at 10210 ms",
+        "BOUNDED start 14:43:39 end 14:43:49 exit 0 wall_ns 10213046646 child_peak_rss_kib 13080"
+      ]
+    }
+  ]
+}

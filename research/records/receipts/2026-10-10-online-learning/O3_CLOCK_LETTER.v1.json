@@ -1,0 +1,87 @@
+{
+  "scope": "Local developer reads by opus under the common lease (announced), not claim-bearing: the online-learning record section 7 (O3).",
+  "runs": [
+    {
+      "scope": "the owner test: the field declares its receivers letter family",
+      "log_sha256": "9c64d07df9bb9c0d07adfab250b2936ff3ea07ee4e7a7aa7db258b2affe827ea",
+      "lines": [
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1205 filtered out; finished in 0.00s",
+        "BOUNDED start 14:16:26 end 14:17:04 exit 0 wall_ns 37577883113 child_peak_rss_kib 2841776"
+      ]
+    },
+    {
+      "scope": "first clocked read: REFUSED by the port, the register clock against the lift point (the register stepped the identity route on a located passage)",
+      "log_sha256": "55c6c85dd09f5f4176ae9109ea2c48d02573ee8c8c4a99a6279f7119f5b88ff1",
+      "lines": [
+        "§1 frame [7, 2] clocked false receiver 1 learner: cells 60..120 upper sums, tree 2781621769690068407681731676749/79228162514264337593543950336, combined 2786561512655894101770945273637/79228162514264337593543950336; receiving prior moves [(1, 0, 0), (2, 0, 0), (3, 0, 0), (4, 0, 0), (5, 0, 0), (6, 0, 1), (7, 1, 2), (8, 2, 3), (9, 3, 4), (10, 4, 5), (11, 5, 6), (12, 6, 3), (13, 3, 4), (14, 4, 5), (15, 5, 6), (16, 6, 7), (17, 7, 8), (18, 8, 9), (19, 9, 10), (20, 10, 11), (21, 11, 12), (22, 12, 13), (23, 13, 14), (24, 14, 15), (25, 15, 16), (26, 16, 17), (27, 17, 18), (28, 18, 19), (29, 19, 20), (30, 20, 21), (31, 21, 22), (32, 22, 23), (33, 23, 24), (34, 24, 25), (35, 25, 26), (36, 26, 27), (37",
+        "§1 frame [7, 2] clocked false receiver 1 twin: cells 60..120 upper sums, tree 60, combined 60; receiving prior moves []",
+        "§1 frame [7, 2] clocked false receiver 1: cells 60..120 summed code, learner [173903153489009186413498752659/4951760157141521099596496896, 2782450455824146995580402192893/79228162514264337593543950336] against twin [60, 60]; continued 12 of 14",
+        "thread 'the_field_learns_a_rings_section_word_online' (1926582) panicked at crates/holonics/tests/acoustic_encoding.rs:597:33:",
+        "the port refuses a part of 7 cells: the address register's clock against the lift point: expected 2, found 0",
+        "BOUNDED start 14:17:09 end 14:17:30 exit 101 wall_ns 21150147719 child_peak_rss_kib 2098712"
+      ]
+    },
+    {
+      "scope": "after the register steps by located digits: the receiving tests 36 of 36",
+      "log_sha256": "7b07688ae5dbcf9ae1f18c2bea2f8d1ab4f21f1449611e2618977d7400f11a90",
+      "lines": [
+        "test result: ok. 36 passed; 0 failed; 0 ignored; 0 measured; 1170 filtered out; finished in 6.44s",
+        "BOUNDED start 14:19:01 end 14:19:26 exit 0 wall_ns 24966028270 child_peak_rss_kib 2797180"
+      ]
+    },
+    {
+      "scope": "the clocked read on both frames: C1, C2 14 of 14, C3",
+      "log_sha256": "6fd196b1b56415e25d1625a08ebf83f6e37641b79e70aa9bcb6f4511f764ac81",
+      "lines": [
+        "§1 frame [7, 2] clocked false receiver 1 learner: cells 60..120 upper sums, tree 2781621769690068407681731676749/79228162514264337593543950336, combined 2786561512655894101770945273637/79228162514264337593543950336; receiving prior moves [(1, 0, 0), (2, 0, 0), (3, 0, 0), (4, 0, 0), (5, 0, 0), (6, 0, 1), (7, 1, 2), (8, 2, 3), (9, 3, 4), (10, 4, 5), (11, 5, 6), (12, 6, 3), (13, 3, 4), (14, 4, 5), (15, 5, 6), (16, 6, 7), (17, 7, 8), (18, 8, 9), (19, 9, 10), (20, 10, 11), (21, 11, 12), (22, 12, 13), (23, 13, 14), (24, 14, 15), (25, 15, 16), (26, 16, 17), (27, 17, 18), (28, 18, 19), (29, 19, 20), (30, 20, 21), (31, 21, 22), (32, 22, 23), (33, 23, 24), (34, 24, 25), (35, 25, 26), (36, 26, 27), (37",
+        "§1 frame [7, 2] clocked false receiver 1 twin: cells 60..120 upper sums, tree 60, combined 60; receiving prior moves []",
+        "§1 frame [7, 2] clocked false receiver 1: cells 60..120 summed code, learner [173903153489009186413498752659/4951760157141521099596496896, 2782450455824146995580402192893/79228162514264337593543950336] against twin [60, 60]; continued 12 of 14",
+        "§7 frame [7, 2] clocked false: continued 12 of 14",
+        "§1 frame [7, 2] clocked true receiver 1 learner cell 12: actual Some(-2), population [168112931831556519821728290573/39614081257132168796771975168, 168112931831556519838875178221/39614081257132168796771975168], tree upper 543865556888342724272758165717/158456325028528675187087900672, combined upper 211870153630757966210175586797/39614081257132168796771975168; aeons closed 0, commit 6, R nonzero Some(true) (5224 ms)",
+        "§1 frame [7, 2] clocked true receiver 1 learner cell 19: actual Some(-2), population [234454696436924656694355622771/79228162514264337593543950336, 234454696436924656740758663107/79228162514264337593543950336], tree upper 13622505270992140153631003483/4951760157141521099596496896, combined upper 286979728636972119676293558081/79228162514264337593543950336; aeons closed 0, commit 13, R nonzero Some(true) (5504 ms)",
+        "§1 frame [7, 2] clocked true receiver 1 learner cell 103: actual Some(-2), population [4159455878643293286933048427/79228162514264337593543950336, 4159455878643293539960603181/79228162514264337593543950336], tree upper 8313794542554953277521322401/158456325028528675187087900672, combined upper 4170749447609639695329661643/79228162514264337593543950336; aeons closed 0, commit 97, R nonzero Some(false) (8838 ms)",
+        "§1 frame [7, 2] clocked true receiver 1 learner cell 110: actual Some(-2), population [3866749768074556856415102649/79228162514264337593543950336, 3866749768074557126833546071/79228162514264337593543950336], tree upper 1937508887753768452828159031/39614081257132168796771975168, combined upper 957581739613986659447501791/19807040628566084398385987584; aeons closed 0, commit 104, R nonzero Some(false) (9117 ms)",
+        "§1 frame [7, 2] clocked true receiver 1 learner cell 117: actual Some(-2), population [3636624065099927902837193747/79228162514264337593543950336, 909156016274982047381353683/19807040628566084398385987584], tree upper 7257884328858379100756389603/158456325028528675187087900672, combined upper 3670512794494146999121697603/79228162514264337593543950336; aeons closed 0, commit 111, R nonzero Some(false) (9390 ms)",
+        "§1 frame [7, 2] clocked true receiver 1 learner: cells 60..120 upper sums, tree 593206514298023522650520443521/158456325028528675187087900672, combined 296460844406673192945080723875/79228162514264337593543950336; receiving prior moves [(1, 0, 0), (2, 0, 0), (3, 0, 0), (4, 0, 0), (5, 0, 0), (6, 0, 1), (7, 1, 2), (8, 2, 3), (9, 3, 4), (10, 4, 5), (11, 5, 6), (12, 6, 3), (13, 3, 4), (14, 4, 5), (15, 5, 6), (16, 6, 7), (17, 7, 8), (18, 8, 9), (19, 9, 10), (20, 10, 11), (21, 11, 12), (22, 12, 13), (23, 13, 14), (24, 14, 15), (25, 15, 16), (26, 16, 17), (27, 17, 18), (28, 18, 19), (29, 19, 20), (30, 20, 21), (31, 21, 22), (32, 22, 23), (33, 23, 24), (34, 24, 25), (35, 25, 26), (36, 26, 27), (37, ",
+        "§1 frame [7, 2] clocked true receiver 1 twin: cells 60..120 upper sums, tree 60, combined 60; receiving prior moves []",
+        "§1 frame [7, 2] clocked true receiver 1: cells 60..120 summed code, learner [148288478835922874514586366821/39614081257132168796771975168, 296576957671845762176133800329/79228162514264337593543950336] against twin [60, 60]; continued 14 of 14",
+        "§7 frame [7, 2] clocked true: continued 14 of 14",
+        "§7 frame [7, 2]: C3'' the clocked learner's population upper 296576957671845762176133800329/79228162514264337593543950336 against the cell-only learner's lower 173903153489009186413498752659/4951760157141521099596496896: below true",
+        "§1 frame [9, 2] clocked false receiver 1 learner: cells 60..120 upper sums, tree 2781621769690068407681731676749/79228162514264337593543950336, combined 2786561512655894101770945273637/79228162514264337593543950336; receiving prior moves [(1, 0, 0), (2, 0, 0), (3, 0, 0), (4, 0, 0), (5, 0, 0), (6, 0, 1), (7, 1, 2), (8, 2, 3), (9, 3, 4), (10, 4, 5), (11, 5, 6), (12, 6, 3), (13, 3, 4), (14, 4, 5), (15, 5, 6), (16, 6, 7), (17, 7, 8), (18, 8, 9), (19, 9, 10), (20, 10, 11), (21, 11, 12), (22, 12, 13), (23, 13, 14), (24, 14, 15), (25, 15, 16), (26, 16, 17), (27, 17, 18), (28, 18, 19), (29, 19, 20), (30, 20, 21), (31, 21, 22), (32, 22, 23), (33, 23, 24), (34, 24, 25), (35, 25, 26), (36, 26, 27), (37",
+        "§1 frame [9, 2] clocked false receiver 1 twin: cells 60..120 upper sums, tree 60, combined 60; receiving prior moves []",
+        "§1 frame [9, 2] clocked false receiver 1: cells 60..120 summed code, learner [2782553182213765833045676755799/79228162514264337593543950336, 2782553182213765847538783259461/79228162514264337593543950336] against twin [60, 60]; continued 12 of 14",
+        "§7 frame [9, 2] clocked false: continued 12 of 14",
+        "§1 frame [9, 2] clocked true receiver 1 learner cell 12: actual Some(-2), population [331678477122440470728855308229/79228162514264337593543950336, 331678477122440470760373476457/79228162514264337593543950336], tree upper 543865556888342724272758165717/158456325028528675187087900672, combined upper 414090441506683420087815285967/79228162514264337593543950336; aeons closed 0, commit 6, R nonzero Some(true) (15527 ms)",
+        "§1 frame [9, 2] clocked true receiver 1 learner cell 19: actual Some(-2), population [117667458858734120675469412239/39614081257132168796771975168, 235334917717468241397972649481/79228162514264337593543950336], tree upper 13622505270992140153631003483/4951760157141521099596496896, combined upper 286979728636972119676293558081/79228162514264337593543950336; aeons closed 0, commit 13, R nonzero Some(true) (15820 ms)",
+        "§1 frame [9, 2] clocked true receiver 1 learner cell 103: actual Some(-2), population [4159690545024227621220848181/79228162514264337593543950336, 2079845272512113947970718911/39614081257132168796771975168], tree upper 8313794542554953277521322401/158456325028528675187087900672, combined upper 4170749447609639695329661643/79228162514264337593543950336; aeons closed 0, commit 97, R nonzero Some(false) (19239 ms)",
+        "§1 frame [9, 2] clocked true receiver 1 learner cell 110: actual Some(-2), population [483248969625855604678148589/9903520314283042199192993792, 1932995878503422565559729779/39614081257132168796771975168], tree upper 1937508887753768452828159031/39614081257132168796771975168, combined upper 957581739613986659447501791/19807040628566084398385987584; aeons closed 0, commit 104, R nonzero Some(false) (19527 ms)",
+        "§1 frame [9, 2] clocked true receiver 1 learner cell 117: actual Some(-2), population [113666516965812411539039917/2475880078570760549798248448, 3637328542905997480714159445/79228162514264337593543950336], tree upper 7257884328858379100756389603/158456325028528675187087900672, combined upper 3670512794494146999121697603/79228162514264337593543950336; aeons closed 0, commit 111, R nonzero Some(false) (19806 ms)",
+        "§1 frame [9, 2] clocked true receiver 1 learner: cells 60..120 upper sums, tree 593206514298023522650520443521/158456325028528675187087900672, combined 296460844406673192945080723875/79228162514264337593543950336; receiving prior moves [(1, 0, 0), (2, 0, 0), (3, 0, 0), (4, 0, 0), (5, 0, 0), (6, 0, 1), (7, 1, 2), (8, 2, 3), (9, 3, 4), (10, 4, 5), (11, 5, 6), (12, 6, 3), (13, 3, 4), (14, 4, 5), (15, 5, 6), (16, 6, 7), (17, 7, 8), (18, 8, 9), (19, 9, 10), (20, 10, 11), (21, 11, 12), (22, 12, 13), (23, 13, 14), (24, 14, 15), (25, 15, 16), (26, 16, 17), (27, 17, 18), (28, 18, 19), (29, 19, 20), (30, 20, 21), (31, 21, 22), (32, 22, 23), (33, 23, 24), (34, 24, 25), (35, 25, 26), (36, 26, 27), (37, ",
+        "§1 frame [9, 2] clocked true receiver 1 twin: cells 60..120 upper sums, tree 60, combined 60; receiving prior moves []",
+        "§1 frame [9, 2] clocked true receiver 1: cells 60..120 summed code, learner [4633977272769413591120739187/1237940039285380274899124224, 18535909091077655255947001381/4951760157141521099596496896] against twin [60, 60]; continued 14 of 14",
+        "§7 frame [9, 2] clocked true: continued 14 of 14",
+        "§7 frame [9, 2]: C3'' the clocked learner's population upper 18535909091077655255947001381/4951760157141521099596496896 against the cell-only learner's lower 2782553182213765833045676755799/79228162514264337593543950336: below true",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 22.33s",
+        "BOUNDED start 14:19:26 end 14:20:02 exit 0 wall_ns 35627074605 child_peak_rss_kib 2174996"
+      ]
+    },
+    {
+      "scope": "gate 1",
+      "log_sha256": "f25bcff7ca957b38f1b3480ce9ca2cd35165b9eaf7c476818ef0e53f93fd4044",
+      "lines": [
+        "gate check: ok (7500 ms)",
+        "gate guard-lints: ok (13011 ms)",
+        "gate guard-doctests: ok (27346 ms)",
+        "BOUNDED start 14:20:19 end 14:21:07 exit 0 wall_ns 47873214752 child_peak_rss_kib 1854624"
+      ]
+    },
+    {
+      "scope": "acoustic_encoding 10 of 10",
+      "log_sha256": "a1a2f129fdc756cebb7524f8f6f0ec56dd0d800d5fea3688efc10fabf1fd2909",
+      "lines": [
+        "test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 24.16s",
+        "BOUNDED start 14:21:07 end 14:21:57 exit 0 wall_ns 49972991716 child_peak_rss_kib 1971436"
+      ]
+    }
+  ]
+}

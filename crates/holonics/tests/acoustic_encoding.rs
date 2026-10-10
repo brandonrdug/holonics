@@ -204,6 +204,12 @@ fn wide_field() -> Field {
 /// A field declared on a frame's own rings, in carry order, with the receiving ring the source:
 /// the field `Field::admit` accepts a located passage into (its helix is the field's rings).
 fn field_on(periods: &[u64]) -> Field {
+    field_on_receiving(periods, periods.len() - 1)
+}
+
+/// [`field_on`] with its receiver declared on ring `receiving` (the online-learning record §6: the
+/// ring whose clock carries the located cycle); the source ring stays the last.
+fn field_on_receiving(periods: &[u64], receiving: usize) -> Field {
     let last = periods.len() - 1;
     let rings = periods
         .iter()
@@ -235,7 +241,7 @@ fn field_on(periods: &[u64]) -> Field {
             alphabet: periods[last] as usize,
             step: integer(1),
             exponent_grain: 1,
-            receivers: vec![receiver(last, 1)],
+            receivers: vec![receiver(receiving, 1)],
             crib: CribDeclaration {
                 window: 16,
                 offset: 1,
@@ -1139,4 +1145,515 @@ fn a_departed_section_word_enters_as_its_runs_in_the_cycles_chart_with_its_depar
     }
     println!("  §28a: frames entered 18 (aeons closed per frame {aeons:?}), paired {paired}, emitted {emitted}");
     assert!(emitted > 0, "R3: some carrying frame's code ranks the support");
+}
+
+// -------------------------------------------------------------------------------------------
+// the field learns the section word online (the online-learning record §1)
+
+/// The clean F1 section word of the ring `t = 1` over the window opening at `settle` and running
+/// `length` ticks: its advances read as their own ordinals (the dictionary in order of first
+/// occurrence), and the near-return's period of the word's first `prefix` ticks alone (the
+/// development prefix; the online-learning record §10).
+fn clean_section_word(settle: usize, length: usize, prefix: usize) -> (Vec<usize>, Vec<i8>, usize) {
+    use holonics::hnn::section_lock::{LockReader, LockWindow, Settled};
+    use holonics::hnn::wave::{MatchedWave, WavePort};
+    let f1 = [-9i64, -9, -2, -2, 5, 5, 12];
+    let tone: Vec<i64> = (0..settle + length).map(|k| f1[k % 7]).collect();
+    let read = |window: LockWindow| -> Settled {
+        let operands = section_ring(1);
+        let wave = MatchedWave::new(
+            operands.admittance().clone(),
+            operands.hop().clone(),
+            tone.iter().map(|&x| integer(x)).collect(),
+        )
+        .unwrap();
+        let mut port = WavePort::at_rest(operands, 0).unwrap();
+        let mut reader = LockReader::new(window);
+        reader.observe(port.phase_point()).unwrap();
+        for tick in port.receive(&wave).unwrap() {
+            let tick = tick.unwrap();
+            reader.observe([tick.step.state[1][0].clone(), tick.step.state[0][0].clone()]).unwrap();
+        }
+        reader.finish().unwrap()
+    };
+    let development = LockWindow::new(settle, prefix).unwrap();
+    let tau = read(development).near_return(&development).unwrap().period();
+    let Settled::Word(word) = read(LockWindow::new(settle, length).unwrap()) else {
+        panic!("the ring left rest")
+    };
+    // The dictionary is read from the development prefix alone (the online-learning record §12): a
+    // later advance outside it has no ordinal, and is refused rather than added.
+    let mut dictionary: Vec<i8> = Vec::new();
+    for symbol in &word.symbols()[..prefix] {
+        if !dictionary.contains(&symbol.advance) {
+            dictionary.push(symbol.advance);
+        }
+    }
+    let ordinals = word
+        .symbols()
+        .iter()
+        .map(|symbol| dictionary.iter().position(|&a| a == symbol.advance).expect("an advance of the prefix's dictionary"))
+        .collect();
+    (ordinals, dictionary, tau)
+}
+
+/// **The field learns a ring's section word online, its chart pinned from a development prefix**
+/// (the online-learning record §1–§10). For two openings of the clean F1 window (`settle` 120 and
+/// 123, a shifted phase of the same cycle), the cycle's period and the located chart are read from
+/// the word's first 28 cells only and frozen; the field declared on each carrying frame whose
+/// receiving cells equal the support ingests the prefix, then each later cell is coded at the
+/// receiver's population (the compare's receipt) before it is read: the learner deposits, the twin
+/// discards its staged deposit. The receiver addresses by cells alone, or by cells and the hidden
+/// ring's phase class (`Phase(0, d_0)`, the located navigator's clock, read after each received
+/// cell). Asserts, on cells `60 … 119`: C1, the learner below its twin; with the clock letter, C2″
+/// (every cell of the last two cycles below one bit) and C3″ (the clocked learner's code below the
+/// cell-only learner's); and reports the letters' description charge (`Field::describe`) and the
+/// frozen chart's located code beside them.
+#[test]
+fn the_field_learns_a_rings_section_word_online() {
+    use holonics::compression::keys::transport::located_code;
+    use holonics::hnn::port::ReceiptDetail;
+    use holonics::hnn::receiving::{Feature, FeatureFamily};
+    use holonics::hnn::{Current, ExecutionPort, Handle, Reference};
+    use std::time::Instant;
+    let (length, prefix) = (120usize, 28usize);
+    let started = Instant::now();
+    let mut read = 0;
+    for settle in [120usize, 123] {
+        let (actual, dictionary, tau) = clean_section_word(settle, length, prefix);
+        // The development prefix alone founds the chart: its cycle, located and frozen.
+        let periodic: Vec<usize> = (0..prefix).map(|k| actual[k % tau]).collect();
+        let family = FrameFamily::pairs(9).unwrap();
+        let location = family.locate(dictionary.len(), &[periodic.clone()]).unwrap();
+        for (helix, carrying) in location.carrying() {
+            if helix.cells() as usize != dictionary.len() {
+                continue;
+            }
+            read += 1;
+            let located = PassageChart::located(carrying.location(), &[actual[..prefix].to_vec()]).unwrap();
+            let encoding = Encoding::found(&located).unwrap();
+            let chart_bits = located_code(carrying.transport(), &[actual[..prefix].to_vec()]).unwrap().len();
+            let mut learner_sums = Vec::new();
+            let mut letters_charge_clocked = 0i64;
+            for clocked in [false, true] {
+                let plain = field_on(helix.periods());
+                let field = if clocked {
+                    let letter = Feature::Phase { ring: 0, grain: helix.periods()[0] };
+                    plain.clone().with_letter_family(FeatureFamily::new(vec![letter]).unwrap()).unwrap()
+                } else {
+                    plain.clone()
+                };
+                let letters_charge = field.describe(u64::MAX, 64).len() as i64 - plain.describe(u64::MAX, 64).len() as i64;
+                let encoded = Encoded::through(&encoding, &located, &field, &[actual.clone()]).unwrap().remove(0);
+                let mut sums = Vec::new();
+                let mut continued = 0;
+                let mut minus = Vec::new();
+                for learner in [true, false] {
+                    let reference = Reference::new(64, u64::MAX);
+                    let mut resident = reference.mount(&field, &Current::at_rest(&field)).unwrap();
+                    let (moment, _) = ingest_whole(&reference, &mut resident, None, &encoded.part(0..prefix).unwrap());
+                    let phases = resident.admitted()[0].clone();
+                    let (mut lower, mut upper) = (rat(0, 1), rat(0, 1));
+                    for n in prefix..length {
+                        let (pending, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
+                        let (staged, compared) = reference
+                            .compare(&mut resident, pending, &encoded.part(n..n + 1).unwrap())
+                            .unwrap();
+                        let code = match &compared.receipt.detail {
+                            ReceiptDetail::Compare { code_length, .. } => code_length.clone(),
+                            _ => panic!("a compare's receipt"),
+                        };
+                        if n >= length / 2 {
+                            lower = lower + &code.lower;
+                            upper = upper + &code.upper;
+                        }
+                        if learner {
+                            reference.deposit(&mut resident, staged).unwrap();
+                            if n >= length - 2 * tau {
+                                if code.upper < rat(1, 1) {
+                                    continued += 1;
+                                }
+                                if dictionary[actual[n]] == -2 {
+                                    minus.push((n, code.clone()));
+                                }
+                            }
+                        } else {
+                            reference.discard(&mut resident, Handle::Staged(staged)).unwrap();
+                        }
+                        ingest_whole(&reference, &mut resident, Some(moment), &encoded.part(n..n + 1).unwrap());
+                    }
+                    sums.push((lower, upper));
+                }
+                println!(
+                    "§10 settle {settle} frame {:?} clocked {clocked}: τ {tau} from the {prefix}-cell prefix; cells {}..{} population, learner [{}, {}] against twin [{}, {}]; continued {continued} of {}; the -2 cells {:?}; letters charge {letters_charge} bits; frozen chart {chart_bits} bits ({} ms)",
+                    helix.periods(),
+                    length / 2,
+                    length,
+                    sums[0].0,
+                    sums[0].1,
+                    sums[1].0,
+                    sums[1].1,
+                    2 * tau,
+                    minus.iter().map(|(n, c)| (*n, c.upper.clone())).collect::<Vec<_>>(),
+                    started.elapsed().as_millis()
+                );
+                assert!(sums[0].1 < sums[1].0, "C1: the learner codes the second half below its twin");
+                if clocked {
+                    assert_eq!(continued, 2 * tau, "C2'': the clocked learner codes the last two cycles below one bit");
+                    assert!(letters_charge > 0, "the declared letters are charged in the field's code");
+                } else {
+                    assert!(continued < 2 * tau, "cell letters alone: the majority read (§3, §4)");
+                }
+                learner_sums.push(sums[0].clone());
+                if clocked {
+                    letters_charge_clocked = letters_charge;
+                }
+            }
+            println!(
+                "§10 settle {settle} frame {:?}: C3'' the clocked learner's upper {} against the cell-only learner's lower {}",
+                helix.periods(),
+                learner_sums[1].1,
+                learner_sums[0].0
+            );
+            // C3'' charged: the clocked learner's code plus the letters' declaration in the field's
+            // code lies below the cell-only learner's (§10, §13).
+            let charged = &learner_sums[1].1 + integer(letters_charge_clocked);
+            assert!(charged < learner_sums[0].0, "C3'': the clock letter lowers the learner's code, its charge included");
+        }
+    }
+    assert!(read > 0);
+}
+
+// -------------------------------------------------------------------------------------------
+// the field decodes the tone (the online-learning record §9)
+
+/// The clean F1 tone's samples over ticks `0 … settle + length`.
+fn clean_tone(settle: usize, length: usize) -> Vec<i64> {
+    let f1 = [-9i64, -9, -2, -2, 5, 5, 12];
+    (0..settle + length).map(|k| f1[k % 7]).collect()
+}
+
+/// **The exact interval code** (the boundary codec of §9): a code point narrowed by each cell's
+/// exact mass, its codeword the shortest dyadic inside the final interval. Exact rationals; the
+/// field's face is the model and the code learns nothing.
+struct IntervalCode {
+    low: holonics::ratio::Rat,
+    width: holonics::ratio::Rat,
+}
+
+impl IntervalCode {
+    fn new() -> Self {
+        Self { low: rat(0, 1), width: rat(1, 1) }
+    }
+
+    /// Narrow by class `class` under the masses `p` (summing to one).
+    fn narrow(&mut self, p: &[holonics::ratio::Rat], class: usize) {
+        let below: holonics::ratio::Rat = p[..class].iter().fold(rat(0, 1), |sum, mass| sum + mass);
+        self.low = &self.low + &self.width * below;
+        self.width = &self.width * &p[class];
+    }
+
+    /// The shortest dyadic `m / 2^k` in `[low, low + width)`, as its `k` bits.
+    fn finish(&self) -> Vec<bool> {
+        use num_bigint::BigInt;
+        let high = &self.low + &self.width;
+        let mut k = 0usize;
+        loop {
+            let scale = holonics::ratio::Rat::from_integer(BigInt::from(1) << k);
+            let m = (&self.low * &scale).ceil();
+            if m < &high * &scale {
+                let m = m.to_integer();
+                return (0..k).rev().map(|bit| (&m >> bit) % 2 == BigInt::from(1)).collect();
+            }
+            k += 1;
+        }
+    }
+
+    /// The decoder's class under `p` at the code point `point`, and its narrowing.
+    fn decode(&mut self, p: &[holonics::ratio::Rat], point: &holonics::ratio::Rat) -> usize {
+        let mut below = rat(0, 1);
+        for (class, mass) in p.iter().enumerate() {
+            let next = &below + mass;
+            if *point < &self.low + &self.width * &next {
+                self.narrow(p, class);
+                return class;
+            }
+            below = next;
+        }
+        unreachable!("the code point lies in the unit interval")
+    }
+}
+
+/// What the tone's decoder is given (the online-learning record §9, §12): the declared field (its
+/// frame, letters and receiver), the located chart and its encoding founded from the prefix, the
+/// prefix's cells as ordinals, the prefix's dictionary, the ring and the window's opening state,
+/// the window's clocks, and the sample grid. Nothing of the word after the prefix.
+struct ToneContext {
+    field: Field,
+    encoding: Encoding,
+    located: PassageChart,
+    prefix_ordinals: Vec<usize>,
+    dictionary: Vec<i8>,
+    operands: holonics::hnn::ring::ResonatorOperands,
+    opening: [Vec<holonics::ratio::Rat>; 2],
+    settle: usize,
+    length: usize,
+    grain: holonics::ratio::Rat,
+    range: (num_bigint::BigInt, num_bigint::BigInt),
+}
+
+impl ToneContext {
+    /// One ordinal as a one-cell passage through the chart.
+    fn cell(&self, ordinal: usize) -> Encoded {
+        Encoded::through(&self.encoding, &self.located, &self.field, &[vec![ordinal]]).unwrap().remove(0)
+    }
+
+    /// The chart's class of each ordinal and back, read from the prefix alone.
+    fn classes(&self) -> Vec<Option<usize>> {
+        let prefix = Encoded::through(&self.encoding, &self.located, &self.field, &[self.prefix_ordinals.clone()])
+            .unwrap()
+            .remove(0);
+        let mut ordinal_of = vec![None; prefix.classes()];
+        for (class, &ordinal) in prefix.classes_read().zip(&self.prefix_ordinals) {
+            ordinal_of[class] = Some(ordinal);
+        }
+        ordinal_of
+    }
+
+    /// **The field's online pass** over the continuation: per cell the released face's exact masses
+    /// (or the uniform masses of a typed hold), the class `choose` returns, then compare, deposit and
+    /// ingest of that class. Returns the classes and the holds.
+    fn field_pass(&self, choose: &mut dyn FnMut(usize, &[holonics::ratio::Rat]) -> usize) -> (Vec<usize>, usize) {
+        use holonics::hnn::{Current, ExecutionPort, Reference};
+        use holonics::receiver::release::{BeyondTolerance, DecisionRule, WithinTolerance};
+        let releasing = DecisionRule::new("release at the grain", WithinTolerance::Release, BeyondTolerance::Hold);
+        let ordinal_of = self.classes();
+        let reference = Reference::new(64, u64::MAX);
+        let mut resident = reference.mount(&self.field, &Current::at_rest(&self.field)).unwrap();
+        let prefix = Encoded::through(&self.encoding, &self.located, &self.field, &[self.prefix_ordinals.clone()])
+            .unwrap()
+            .remove(0);
+        let (moment, _) = ingest_whole(&reference, &mut resident, None, &prefix);
+        let phases = resident.admitted()[0].clone();
+        let mut classes = Vec::new();
+        let mut held = 0;
+        for n in self.prefix_ordinals.len()..self.length {
+            let (pending, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
+            let released = reference.release(&mut resident, &pending, &releasing).unwrap();
+            let masses = match released.forward.into_present() {
+                Some(faces) => faces.faces[0].odometer_masses().unwrap(),
+                None => {
+                    held += 1;
+                    vec![rat(1, prefix.classes() as i64); prefix.classes()]
+                }
+            };
+            let class = choose(n, &masses);
+            let target = self.cell(ordinal_of[class].unwrap());
+            assert_eq!(target.classes_read().next(), Some(class));
+            let (staged, _) = reference.compare(&mut resident, pending, &target).unwrap();
+            reference.deposit(&mut resident, staged).unwrap();
+            ingest_whole(&reference, &mut resident, Some(moment), &target);
+            classes.push(class);
+        }
+        (classes, held)
+    }
+}
+
+/// Elias gamma of `n ≥ 1` onto a bit stream, and its reader.
+fn gamma_push(bits: &mut Vec<bool>, n: usize) {
+    let width = (usize::BITS - n.leading_zeros()) as usize;
+    bits.extend(std::iter::repeat_n(false, width - 1));
+    bits.extend((0..width).rev().map(|k| (n >> k) & 1 == 1));
+}
+
+fn gamma_pull(bits: &mut impl Iterator<Item = bool>) -> usize {
+    let mut zeros = 0;
+    while !bits.next().expect("a gamma code") {
+        zeros += 1;
+    }
+    (0..zeros).fold(1, |value, _| (value << 1) | usize::from(bits.next().expect("a gamma body")))
+}
+
+/// **The tone's decoder** (§9, §12): from the context and one self-delimiting stream alone (the class
+/// code's length in Elias gamma, the class code, then each tick's index in its landing cell's drive
+/// interval), the window's samples. It replays the field from the classes it decodes, decodes each
+/// landing by the carry law, and checks each decoded sample's landing.
+fn decode_tone(context: &ToneContext, stream: &[bool]) -> Vec<num_bigint::BigInt> {
+    use holonics::hnn::dynamic_section::{land, quadrant};
+    use holonics::hnn::ring::ResonatorRemainders;
+    use num_bigint::BigInt;
+    let mut bits = stream.iter().copied();
+    let length = gamma_pull(&mut bits) - 1;
+    let class_bits: Vec<bool> = (0..length).map(|_| bits.next().unwrap()).collect();
+    let point = class_bits.iter().fold((rat(0, 1), rat(1, 2)), |(value, unit), &bit| {
+        (if bit { value + &unit } else { value }, unit / integer(2))
+    }).0;
+    let mut decoding = IntervalCode::new();
+    let (continuation, _) = context.field_pass(&mut |_, masses| decoding.decode(masses, &point));
+    let ordinal_of = context.classes();
+    let prefix_classes: Vec<usize> = {
+        let mut of: Vec<(usize, usize)> = Vec::new();
+        for (class, ordinal) in ordinal_of.iter().enumerate() {
+            if let Some(ordinal) = ordinal {
+                of.push((*ordinal, class));
+            }
+        }
+        context.prefix_ordinals.iter().map(|o| of.iter().find(|(x, _)| x == o).unwrap().1).collect()
+    };
+    // Each decoded chart cell denotes an advance (its ordinal's label in the dictionary); the
+    // section symbols follow by the carry law from the opening's class, and the word is admitted.
+    let start = quadrant(&[context.opening[1][0].clone(), context.opening[0][0].clone()]).unwrap();
+    let mut class = start;
+    let mut symbols = Vec::with_capacity(context.length);
+    for &cell in prefix_classes.iter().chain(&continuation) {
+        let advance = context.dictionary[ordinal_of[cell].unwrap()];
+        let (crossing, landed) = land(class, advance).unwrap();
+        symbols.push(holonics::hnn::dynamic_section::SectionSymbol { class, advance, crossing });
+        class = landed;
+    }
+    let word = holonics::hnn::section_lock::SectionWord::new(symbols).expect("the decoded symbols are a section word");
+    let landings: Vec<u8> = word
+        .symbols()
+        .iter()
+        .map(|symbol| land(symbol.class, symbol.advance).unwrap().1)
+        .collect();
+    let zero = ResonatorRemainders::default();
+    let mut state = context.opening.clone();
+    let mut samples = Vec::with_capacity(context.length);
+    for k in 0..context.length {
+        let n = context.settle + k;
+        let (lo, hi) = context
+            .operands
+            .drive_interval(n, 0, [&state[0], &state[1]], Some(landings[k]), None, &context.grain, context.range.clone())
+            .unwrap();
+        let width = (&hi - &lo).bits() as usize;
+        let index = (0..width).fold(BigInt::from(0), |value, _| (value << 1) + BigInt::from(u8::from(bits.next().unwrap())));
+        let sample = &lo + index;
+        let step = context
+            .operands
+            .step(n, &[holonics::ratio::Rat::from_integer(sample.clone()), rat(0, 1)], [&state[0], &state[1]], &zero, None)
+            .unwrap();
+        assert_eq!(quadrant(&[step.state[1][0].clone(), step.state[0][0].clone()]), Some(landings[k]), "the landing at tick {n}");
+        samples.push(sample);
+        state = [step.state[0].clone(), step.state[1].clone()];
+    }
+    assert!(bits.next().is_none(), "the stream ends with the window");
+    samples
+}
+
+/// **The field decodes the tone from its released face** (the online-learning record §9, §12). On frame
+/// `[7, 2]`, with the clocked receivers and the chart pinned from the word's first 28 cells, the
+/// encoder runs the learner online and writes one self-delimiting stream: the class code under the
+/// field's released faces (interval-coded, its length in Elias gamma), then each tick's index in its
+/// landing cell's drive interval (the within-cell fibre). The decoder (`decode_tone`) is given that
+/// stream and the declared context (`ToneContext`: nothing of the word after the prefix) and returns
+/// every sample of the window exactly (D1); the charges are reported (D2) and every hold (D3).
+#[test]
+fn the_field_decodes_the_tone_from_its_released_face() {
+    use holonics::hnn::dynamic_section::quadrant;
+    use holonics::hnn::receiving::{Feature, FeatureFamily};
+    use holonics::hnn::ring::ResonatorRemainders;
+    use num_bigint::BigInt;
+    let (settle, length, prefix) = (120usize, 120usize, 28usize);
+    let (actual, dictionary, tau) = clean_section_word(settle, length, prefix);
+    let tone = clean_tone(settle, length);
+    let periodic: Vec<usize> = (0..prefix).map(|k| actual[k % tau]).collect();
+    let family = FrameFamily::pairs(9).unwrap();
+    let location = family.locate(dictionary.len(), &[periodic]).unwrap();
+    let (helix, carrying) = location
+        .carrying()
+        .find(|(helix, _)| helix.periods() == [7, 2])
+        .expect("the frame [7, 2] carries the prefix's cycle");
+    let located = PassageChart::located(carrying.location(), &[actual[..prefix].to_vec()]).unwrap();
+    let encoding = Encoding::found(&located).unwrap();
+    let letter = Feature::Phase { ring: 0, grain: helix.periods()[0] };
+    let field = field_on(helix.periods()).with_letter_family(FeatureFamily::new(vec![letter]).unwrap()).unwrap();
+    let operands = section_ring(1);
+    let opening = {
+        let mut port = holonics::hnn::wave::WavePort::at_rest(operands.clone(), 0).unwrap();
+        let wave = holonics::hnn::wave::MatchedWave::new(
+            operands.admittance().clone(),
+            operands.hop().clone(),
+            tone[..settle].iter().map(|&x| integer(x)).collect(),
+        )
+        .unwrap();
+        for tick in port.receive(&wave).unwrap() {
+            tick.unwrap();
+        }
+        port.state().map(<[holonics::ratio::Rat]>::to_vec)
+    };
+    let context = ToneContext {
+        field,
+        encoding,
+        located,
+        prefix_ordinals: actual[..prefix].to_vec(),
+        dictionary,
+        operands,
+        opening,
+        settle,
+        length,
+        grain: rat(1, 1),
+        range: (BigInt::from(-32), BigInt::from(31)),
+    };
+    // The encoder: the actual continuation's classes through the chart, coded under the field's faces.
+    let ordinal_of = context.classes();
+    let class_of = |ordinal: usize| ordinal_of.iter().position(|o| *o == Some(ordinal)).unwrap();
+    let mut code = IntervalCode::new();
+    let (classes, held) = context.field_pass(&mut |n, masses| {
+        let class = class_of(actual[n]);
+        code.narrow(masses, class);
+        class
+    });
+    let class_bits = code.finish();
+    let mut index_bits: Vec<bool> = Vec::new();
+    let mut state = context.opening.clone();
+    let zero = ResonatorRemainders::default();
+    for k in 0..length {
+        let n = settle + k;
+        let step = context.operands.step(n, &[integer(tone[n]), rat(0, 1)], [&state[0], &state[1]], &zero, None).unwrap();
+        let landing = quadrant(&[step.state[1][0].clone(), step.state[0][0].clone()]);
+        let (lo, hi) = context
+            .operands
+            .drive_interval(n, 0, [&state[0], &state[1]], landing, None, &context.grain, context.range.clone())
+            .unwrap();
+        let index = BigInt::from(tone[n]) - &lo;
+        let width = (&hi - &lo).bits() as usize;
+        index_bits.extend((0..width).rev().map(|bit| (&index >> bit) % 2 == BigInt::from(1)));
+        state = [step.state[0].clone(), step.state[1].clone()];
+    }
+    let mut stream = Vec::new();
+    gamma_push(&mut stream, class_bits.len() + 1);
+    let framing = stream.len();
+    stream.extend(&class_bits);
+    stream.extend(&index_bits);
+    // The decoder: the context and the stream only.
+    let samples = decode_tone(&context, &stream);
+    let expected: Vec<BigInt> = tone[settle..].iter().map(|&x| BigInt::from(x)).collect();
+    assert_eq!(samples, expected, "D1: every sample of the window, exactly");
+    assert_eq!(classes.len(), length - prefix);
+    println!(
+        "§9 frame [7, 2]: D2 stream {} bits = framing {framing} + class code {} (cells {prefix}..{length}) + indices {} ({length} ticks); the prefix's {prefix} cells are context (one bit each if sent); holds {held}; the near-return codes the word in {:?}",
+        stream.len(),
+        class_bits.len(),
+        index_bits.len(),
+        settled_near_bits(settle, length)
+    );
+}
+
+/// The near-return's description of the clean window (§28's reading), `(L_τ, 3L)`.
+fn settled_near_bits(settle: usize, length: usize) -> (u64, u64) {
+    use holonics::hnn::section_lock::{LockReader, LockWindow};
+    use holonics::hnn::wave::{MatchedWave, WavePort};
+    let tone = clean_tone(settle, length);
+    let window = LockWindow::new(settle, length).unwrap();
+    let operands = section_ring(1);
+    let wave = MatchedWave::new(operands.admittance().clone(), operands.hop().clone(), tone.iter().map(|&x| integer(x)).collect()).unwrap();
+    let mut port = WavePort::at_rest(operands, 0).unwrap();
+    let mut reader = LockReader::new(window);
+    reader.observe(port.phase_point()).unwrap();
+    for tick in port.receive(&wave).unwrap() {
+        let tick = tick.unwrap();
+        reader.observe([tick.step.state[1][0].clone(), tick.step.state[0][0].clone()]).unwrap();
+    }
+    reader.finish().unwrap().near_return(&window).unwrap().bits()
 }

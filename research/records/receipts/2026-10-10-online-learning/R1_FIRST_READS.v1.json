@@ -1,0 +1,63 @@
+{
+  "scope": "Local developer reads by opus under the common lease (announced), not claim-bearing: the online-learning record (first named the retained-release record) sections 2-3. The diagnostic log r1_test_2 (aeons, commit, R per cell) is summarized in section 2.",
+  "runs": [
+    {
+      "scope": "compile of acoustic_encoding on main 67ddf98b plus the new test",
+      "log_sha256": "d5d7102efdf35cf47251845db528b70d1e055747d686f3ad484684fa75d4f734",
+      "lines": [
+        "BOUNDED start 10:10:28 end 10:10:50 exit 0 wall_ns 21628182013 child_peak_rss_kib 2481016"
+      ]
+    },
+    {
+      "scope": "first read, frame [7,2]: FAILED C1, my adapter read the refined combined face",
+      "log_sha256": "03065a0e2d082e17551fb379b05b03a4f65c944bffc66ee2e1e801d0bba058fd",
+      "lines": [
+        "test the_field_continues_a_rings_section_word_from_what_it_retains ... §1 frame [7, 2] learner cell 7: actual Some(1), code [1, 1], greatest [Some(1), Some(-2)] (39 ms)",
+        "§1 frame [7, 2] learner cell 8: actual Some(1), code [8439728308899975886746633897/9903520314283042199192993792, 67517826471199807098694361773/79228162514264337593543950336], greatest [Some(1)] (112 ms)",
+        "§1 frame [7, 2] learner cell 24: actual Some(1), code [38389547585908931236815683939/39614081257132168796771975168, 19194773792954465618803499803/19807040628566084398385987584], greatest [Some(1)] (1130 ms)",
+        "§1 frame [7, 2] learner cell 25: actual Some(1), code [1, 1], greatest [Some(1), Some(-2)] (1168 ms)",
+        "§1 frame [7, 2] learner cell 119: actual Some(1), code [1, 1], greatest [Some(1), Some(-2)] (4749 ms)",
+        "§1 frame [7, 2]: cells 60..120 summed code, learner [60, 60] against twin [60, 60]; continued 0 of 14",
+        "thread 'the_field_continues_a_rings_section_word_from_what_it_retains' (1751305) panicked at crates/holonics/tests/acoustic_encoding.rs:1276:9:",
+        "BOUNDED start 10:10:54 end 10:11:01 exit 101 wall_ns 6886603002 child_peak_rss_kib 27756"
+      ]
+    },
+    {
+      "scope": "diagnostic: the deposit reading at cells 21..27 (R released below grain at commit 18)",
+      "log_sha256": "4a3cfe13c2b2fa950b7f8e459bf35105990c9d08472b270e80fa713c09fdb7ab",
+      "lines": [
+        "§1 deposit at cell 24: Present(DepositReading { storage_growth: Ratio { numer: 0, denom: 1 }, storage_product: Ratio { numer: 1, denom: 1 }, steps: [(SourcePort(1), StepReading { family: Map, step: CertifiedStep { exponent: 9, step: Ratio { numer: 512, denom: 1 }, alignment: Ratio { numer: 4708716992537605037, denom: 9671406556917033397649408 }, curvature: Ratio { numer: 6704285286594477750612598515954503458575, denom: 748288838313422294120286634350736906063837462003712 }, covector: Ratio { numer: 1, denom: 512 } }, gain: Ratio { numer: 504463292069948281225, denom: 604462909807314587353088 }, moves: Ratio { numer: 13289936833827880407, denom: 618970019642690137449562112 }, bound: Ratio { numer: 4766025819, denom: 1125899906842624 }, readout: Ratio { numer: 504463292069948281225, denom: 1208925819614629174706176 }, amplitude: Ratio { numer: 1, denom: 1 } }), (ReceivingMap(1), StepReading { family: Map, step: CertifiedStep { exponent: 0, step: Ratio { numer: 1, denom: 1 }, alignment: Ratio { numer: 218949679023096157, denom: 147573952589676412928 }, curvature: Ratio { numer: 14011957241541748419, denom: 604462909807314587353088 }, covector: Ratio { numer: 1, denom: 1 } }, gain: Rati",
+        "§1 deposit at cell 25: Present(DepositReading { storage_growth: Ratio { numer: 0, denom: 1 }, storage_product: Ratio { numer: 1, denom: 1 }, steps: [(ReceivingMap(1), StepReading { family: Map, step: CertifiedStep { exponent: 0, step: Ratio { numer: 1, denom: 1 }, alignment: Ratio { numer: 10779328152204378073, denom: 9444732965739290427392 }, curvature: Ratio { numer: 8291509757501982199, denom: 604462909807314587353088 }, covector: Ratio { numer: 1, denom: 1 } }, gain: Ratio { numer: 1, denom: 1 }, moves: Ratio { numer: 8291509757501982199, denom: 302231454903657293676544 }, bound: Ratio { numer: 5758996357, denom: 1099511627776 }, readout: Ratio { numer: 44370747904631459689, denom: 4835703278458516698824704 }, amplitude: Ratio { numer: 1, denom: 1 } })], joint: Some(JointReading { curvature: Ratio { numer: 33166039039939271449, denom: 2417851639229258349412352 }, decrease: Ratio { numer: 10779328152204378073, denom: 9444732965739290427392 } }), amplitude: Some(Ratio { numer: 1, denom: 1 }), commit: 19, bits: 7214, budget: 18446744073709551615, loci: [Junction(1), SourcePort(1), ReceivingMap(1), Conductance(0)], released: [(SourcePort(1), Gram, 0, Ratio { numer: -6447, denom: 45",
+        "BOUNDED start 10:12:37 end 10:12:45 exit 101 wall_ns 7381421522 child_peak_rss_kib 767928"
+      ]
+    },
+    {
+      "scope": "reading corrected to the population code at compare, frame [7,2]: C1 met, C2 12 of 14 (the test then asserted C2)",
+      "log_sha256": "c5ab273392835f68851bb4c56f7b85c597b9776c803703b134ad5019ca0a986f",
+      "lines": [
+        "§1 frame [7, 2]: cells 60..120 summed code, learner [2786561512655894101540777339391/79228162514264337593543950336, 2786561512655894101770945273637/79228162514264337593543950336] against twin [60, 60]; continued 12 of 14",
+        "BOUNDED start 10:13:36 end 10:13:44 exit 101 wall_ns 7371016752 child_peak_rss_kib 764860"
+      ]
+    },
+    {
+      "scope": "both frames, C2 recorded as measured: acoustic_encoding 10 of 10",
+      "log_sha256": "61279fd4743df8e8c7756b983b7520542dafd3fca6c82ddb8cc9b796f9ad15d9",
+      "lines": [
+        "§1 frame [7, 2] learner cell 12: actual Some(-2), code [221550039673528380912784682035/39614081257132168796771975168, 443100079347056761828981318607/79228162514264337593543950336]; aeons closed 0, commit 6, R moved Some(true) (232 ms)",
+        "§1 frame [7, 2] learner cell 19: actual Some(-2), code [79796926157046158366486119733/19807040628566084398385987584, 319187704628184633470921081455/79228162514264337593543950336]; aeons closed 0, commit 13, R moved Some(true) (500 ms)",
+        "§1 frame [7, 2] learner cell 103: actual Some(-2), code [25522461632175953440970200941/9903520314283042199192993792, 204179693057407627531765023781/79228162514264337593543950336]; aeons closed 0, commit 97, R moved Some(false) (3645 ms)",
+        "§1 frame [7, 2] learner cell 110: actual Some(-2), code [200072836609431665706777441537/79228162514264337593543950336, 200072836609431665710751374245/79228162514264337593543950336]; aeons closed 0, commit 104, R moved Some(false) (3908 ms)",
+        "§1 frame [7, 2] learner cell 117: actual Some(-2), code [200072836609431665706777441537/79228162514264337593543950336, 200072836609431665710751374245/79228162514264337593543950336]; aeons closed 0, commit 111, R moved Some(false) (4170 ms)",
+        "§1 frame [7, 2]: cells 60..120 summed code, learner [2786561512655894101540777339391/79228162514264337593543950336, 2786561512655894101770945273637/79228162514264337593543950336] against twin [60, 60]; continued 12 of 14",
+        "§1 frame [9, 2] learner cell 12: actual Some(-2), code [433410729518596384484603470747/79228162514264337593543950336, 433410729518596384488159815555/79228162514264337593543950336]; aeons closed 0, commit 6, R moved Some(true) (5015 ms)",
+        "§1 frame [9, 2] learner cell 19: actual Some(-2), code [154958133807699183430424093229/39614081257132168796771975168, 154958133807699183433008231289/39614081257132168796771975168]; aeons closed 0, commit 13, R moved Some(true) (5291 ms)",
+        "§1 frame [9, 2] learner cell 103: actual Some(-2), code [25522461632175953440970200941/9903520314283042199192993792, 204179693057407627531765023781/79228162514264337593543950336]; aeons closed 0, commit 97, R moved Some(false) (8535 ms)",
+        "§1 frame [9, 2] learner cell 110: actual Some(-2), code [200072836609431665706777441537/79228162514264337593543950336, 200072836609431665710751374245/79228162514264337593543950336]; aeons closed 0, commit 104, R moved Some(false) (8805 ms)",
+        "§1 frame [9, 2] learner cell 117: actual Some(-2), code [200072836609431665706777441537/79228162514264337593543950336, 200072836609431665710751374245/79228162514264337593543950336]; aeons closed 0, commit 111, R moved Some(false) (9073 ms)",
+        "§1 frame [9, 2]: cells 60..120 summed code, learner [2786561512655894101540777339391/79228162514264337593543950336, 2786561512655894101770945273637/79228162514264337593543950336] against twin [60, 60]; continued 12 of 14",
+        "test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 32.66s",
+        "BOUNDED start 10:14:13 end 10:14:46 exit 0 wall_ns 33272140661 child_peak_rss_kib 767880"
+      ]
+    }
+  ]
+}
