@@ -1098,3 +1098,59 @@ entries (series (5)'s observed phase, with its sign), and `0` on the real ones.
 The World adjoint is the key's, and exact only where the key is located to a point (§3a). The
 native-only return stays the exterior-return law wherever no key is located.
 
+**Built (§7j).**
+- `port::WorldPort` (the source ring, the key's charts per tick, the face's linear part `H`) forms the
+  `WorldAdjoint` from a comparison's covector.
+- `reverse_core_joined` carries the World's covector across every source return in place of zeroing
+  it.
+- `Word::pull_back_world` is the return through both paths.
+- `return_observed_receiving` takes an optional port. It runs the World sweep beside the native one,
+  so the receiving deposit stays the actual execution's, and returns `world_contacts`.
+- The schedule run builds the port for each prospective encounter. `ScheduledProspect::world_contacts`
+  holds the result, and the cycle proposal normalizes with it: per contact family, energies summed and
+  the largest covector scale.
+- Actual execution passes no port and is unchanged.
+
+[measured; developer reads, not claim-bearing;
+[receipt](receipts/2026-10-09-material-tangent/WORLD_ADJOINT_DEV_TESTS.v1.json)]
+- **(a) The consumer identity** (`the_world_return_is_the_tangents_credit`, fixture 1, the next
+  encounter's prospect after twelve encounters).
+  - For all 32 stiffness and dissipation coordinates, the World return's gradient entry equals
+    **exactly −1 times** the forward tangent's whole credit.
+  - The native part of every credit (magnitude plus produced phase) is exactly `0` at this state:
+    the whole gradient runs through the World's face. That is why the native-only normalization was
+    zero (§7i).
+  - For the 16 storage coordinates the ratio is not `−1`. The forward storage tangent also carries the
+    held-momentum crossing at the opening (`C δw = −δC w`, §7b), which the within-Word sweep does not
+    include. That identity is owed through the sweep's opening covector. (a) holds for stiffness and
+    dissipation, and is open for storage.
+- **(b) The normalization is positive.** With the World-sensitive steps, fixture 1's cycle landing
+  reaches a declared step (first reach at exponent 7, grain raise 0) where the native-only steps
+  refused.
+- **(c) The landing on the orbit.** The step improves the orbit's second encounter (excess down by
+  `[2⁻⁷, 2⁻⁶)`) and worsens its first (up by `[2⁻¹⁰, 2⁻⁹)`): refused, `PhaseWorse`. Learner and twin
+  read identically. This run reached its 300 s deadline after round 13 of 14 and is reported
+  incomplete.
+
+### 7k. The phase level's common descent, and the trade-off at the material grain
+
+[definition; agent-inferred, October 10] The phase stage of §7i projected the summed phase gradient
+off any wave's phase gradient it would raise. That holds the projected wave's first-order change at
+zero, so curvature then raises it, and the admission refuses: (c) above. Within one lexicographic
+level the admission reads every wave on its own. The step should therefore be a **strict common
+descent**, the negated minimum-norm point of the waves' phase gradients' convex hull (two observations
+here, exact: `λ = clamp(⟨b − a, b⟩/|b − a|², 0, 1)`). It lowers every wave's phase at first order. This
+is not the retired min-norm hull of §5a, which mixed the classical and phase levels and broke their
+order. This one stays within the phase level, and the classical gradients remain constraints.
+
+[measured] Under it, fixture 1's cycle landing is **unreached**: `CovectorScale` for the stiffness
+family at exponent 8. On the orbit the two waves' phase gradients nearly oppose, so their common
+strict descent is small. Reaching one lattice unit of material along it would need a step beyond
+the certified bound `2^k c ≤ 1`. Learner and twin read identically for the eight declared rounds; the
+read was cut from 14 rounds to 8 on the measured rate, not by raising the deadline.
+
+**The blocker, by its measurement.** On fixture 1's fixed-readout orbit the two waves trade phase
+against each other. At the material's lattice, no admitted step lowers both. The material's grain,
+not the descent, now bounds the cycle on this fixture. Not yet read: the second fixture's cycle,
+which needs more encounters before its readout stops moving, and the storage identity.
+

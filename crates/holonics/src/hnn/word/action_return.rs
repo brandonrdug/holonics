@@ -7,7 +7,7 @@
 
 use super::*;
 use crate::hnn::constitution::{LinearLocus, Locus, Reach};
-use crate::hnn::port::{ChangeCovector, Deposit, WordReturn};
+use crate::hnn::port::{ChangeCovector, Deposit, WordReturn, WorldPort};
 use crate::hnn::ratio::{Face, ReceivingFaceRatio};
 use crate::hnn::retention::Diamond;
 use num_bigint::BigInt;
@@ -26,6 +26,10 @@ pub struct NativeReceivingReturn {
     /// reading, and their within-Word feature energy and covector scale normalize a World-sensitive
     /// descent of the same comparison. Not deposited here.
     pub contacts: Vec<crate::hnn::constitution::FactorStep>,
+    /// [agent-inferred, October 10; the held-carry record §7j] With a World port: the same contact
+    /// families' factor steps of the return through the World's transpose, the covector reaching
+    /// each family through both paths. `None` without a port.
+    pub world_contacts: Option<Vec<crate::hnn::constitution::FactorStep>>,
 }
 
 impl Word<'_> {
@@ -34,6 +38,7 @@ impl Word<'_> {
         receiver: usize,
         applied: &action::AppliedPortPreparation,
         observed: Vec<Option<Face>>,
+        world: Option<&WorldPort>,
     ) -> Result<NativeReceivingReturn, HnnError> {
         applied.verify_producer(&self)?;
         let (theta, current, source, support) = self
@@ -65,17 +70,50 @@ impl Word<'_> {
         );
         let ratio = ReceivingFaceRatio::compare_partition(faces, observed, branch)?;
         let covector = ratio.covector()?;
+        let map = theta
+            .receiving_map(phases.ring())
+            .ok_or(HnnError::Unadmitted {
+                reason: "the producing receiving relation of the observed comparison",
+            })?
+            .clone();
+        let diamond = Diamond::opened(field, &phases, &support);
+        // [§7j] Through the World port, beside the native return: the contact families' steps of
+        // the covector that reaches them by both paths. The native return below is unchanged.
+        let world_contacts = match world {
+            None => None,
+            Some(port) => {
+                let adjoint = port.adjoint(&covector, &phases, applied.compared())?;
+                let (through, _) = self.pull_back_world(
+                    &covector,
+                    &map,
+                    &current.lift()[phases.ring()],
+                    &phases,
+                    &adjoint,
+                )?;
+                let composed = crate::hnn::reference::compose_return(
+                    field,
+                    &theta,
+                    &diamond,
+                    current.lift(),
+                    &current,
+                    &source,
+                    &through,
+                )?;
+                Some(
+                    composed
+                        .factors
+                        .into_iter()
+                        .filter(|step| matches!(step.gradient.locus(), Locus::Channel(_)))
+                        .collect(),
+                )
+            }
+        };
         let (pullback, opening) = self.pull_back_full(
             &covector,
-            theta
-                .receiving_map(phases.ring())
-                .ok_or(HnnError::Unadmitted {
-                    reason: "the producing receiving relation of the observed comparison",
-                })?,
+            &map,
             &current.lift()[phases.ring()],
             &phases,
         )?;
-        let diamond = Diamond::opened(field, &phases, &support);
         let composed = crate::hnn::reference::compose_return(
             field,
             &theta,
@@ -155,6 +193,7 @@ impl Word<'_> {
             opening,
             deposit,
             contacts,
+            world_contacts,
         })
     }
 }

@@ -883,7 +883,7 @@ impl<'c> Word<'c> {
         lift: &BigInt,
         phases: &ReceivingPhases,
     ) -> Result<WordReturn, HnnError> {
-        Ok(reverse(&self, covector, map, lift, phases)?.0)
+        Ok(reverse(&self, covector, map, lift, phases, None)?.0)
     }
 
     /// The same receiving return, retaining its complete opening dual. A held-material
@@ -896,7 +896,22 @@ impl<'c> Word<'c> {
         lift: &BigInt,
         phases: &ReceivingPhases,
     ) -> Result<(WordReturn, ChangeCovector), HnnError> {
-        reverse(&self, covector, map, lift, phases)
+        reverse(&self, covector, map, lift, phases, None)
+    }
+
+    /// [definition; agent-inferred, October 10; the held-carry record §7j] **The return through the
+    /// World port**: [`Self::pull_back_full`] with the World's transpose joined at every source
+    /// return ([`WorldAdjoint`]), so the covector that reaches each family is the comparison's
+    /// through both paths, the native read and the World's observed face.
+    pub(crate) fn pull_back_world(
+        &self,
+        covector: &RatioCovector,
+        map: &ExactRatMatrix,
+        lift: &BigInt,
+        phases: &ReceivingPhases,
+        world: &WorldAdjoint,
+    ) -> Result<(WordReturn, ChangeCovector), HnnError> {
+        reverse(self, covector, map, lift, phases, Some(world))
     }
 
     /// [definition; agent-inferred] **A continuing word's return** (U6's native generation; its
@@ -935,7 +950,7 @@ impl<'c> Word<'c> {
         self,
         anchors: Vec<Vec<Option<Vec<Rat>>>>,
     ) -> Result<(WordReturn, ChangeCovector), HnnError> {
-        reverse_core_joined(&self, anchors, None)
+        reverse_core_joined(&self, anchors, None, None)
     }
 
     /// Declaration/control differential of the same joined anchors, with no retained Word.
@@ -948,7 +963,7 @@ impl<'c> Word<'c> {
                 reason: "an exact Word for a joined receiving differential",
             });
         }
-        Ok(reverse_core_joined(self, anchors, None)?.1)
+        Ok(reverse_core_joined(self, anchors, None, None)?.1)
     }
 }
 
@@ -1039,12 +1054,85 @@ type Arriving = (usize, usize, Vec<Rat>, Vec<Rat>, Rat);
 /// contact's part.
 type JunctionReverse = (Vec<Rat>, Vec<Rat>, Vec<Arriving>);
 
+/// [definition; agent-inferred, October 10; the held-carry record §7j] **The World port's
+/// transpose**: the located key's charts at the commit each source return read (index `t` for the
+/// return at tick `t + 1`), and the observed face's covector on the World's state after each tick
+/// (`Hᵀ φ_j` at a compared station's tick, else `None`). The reverse sweep then carries the
+/// covector through the World instead of holding the returned wave exterior:
+/// `s̄_r = Qᵀ λ_b + Gᵀ μ′`, `μ = Fᵀ μ′ + Pᵀ λ_b`.
+#[derive(Clone, Debug)]
+pub(crate) struct WorldAdjoint {
+    pub(crate) ring: usize,
+    /// `[F, G, P, Q]` per tick.
+    pub(crate) charts: Vec<[ExactRatMatrix; 4]>,
+    pub(crate) face: Vec<Option<Vec<Rat>>>,
+    pub(crate) extent: usize,
+}
+
+/// [definition; agent-inferred, October 10; the held-carry record §7j] **The World port of a
+/// passage**: the source ring, the located key's charts `[F, G, P, Q]` at each tick's commit, and
+/// the key's declared face's linear part `H` (the face is affine in the World's state). With a
+/// comparison's covector it forms the [`WorldAdjoint`]: at each compared station's tick, the observed
+/// face's covector `Hᵀ φ_j`, `φ_j = −Im g_j` on the imaginary logit entries (series (5)'s observed
+/// phase, with its sign) and `0` on the real ones.
+#[derive(Clone, Debug)]
+pub(crate) struct WorldPort {
+    pub(crate) ring: usize,
+    pub(crate) charts: Vec<[ExactRatMatrix; 4]>,
+    pub(crate) face: ExactRatMatrix,
+    pub(crate) extent: usize,
+}
+
+impl WorldPort {
+    pub(crate) fn adjoint(
+        &self,
+        covector: &RatioCovector,
+        phases: &ReceivingPhases,
+        compared: &[bool],
+    ) -> Result<WorldAdjoint, HnnError> {
+        let steps = self.charts.len();
+        let transpose = self.face.transpose()?;
+        let mut face: Vec<Option<Vec<Rat>>> = vec![None; steps];
+        for (j, epoch) in phases.epochs().enumerate() {
+            if !compared.get(j).copied().unwrap_or(false) {
+                continue;
+            }
+            let g = covector.logits().get(j).ok_or(HnnError::Shape {
+                what: "a covector entry per compared station",
+                expected: phases.aperture(),
+                found: covector.logits().len(),
+            })?;
+            let phi: Vec<Rat> = g
+                .iter()
+                .enumerate()
+                .map(|(i, x)| if i % 2 == 1 { -x.clone() } else { Rat::zero() })
+                .collect();
+            let t = epoch.checked_sub(1).ok_or(HnnError::Unadmitted {
+                reason: "a compared station reads after a World step",
+            })?;
+            let slot = face.get_mut(t).ok_or(HnnError::WordEnded { ticks: steps })?;
+            let pulled = transpose.apply(&phi)?;
+            *slot = Some(match slot.take() {
+                Some(held) => add(&held, &pulled),
+                None => pulled,
+            });
+        }
+        Ok(WorldAdjoint {
+            ring: self.ring,
+            charts: self.charts.clone(),
+            face,
+            extent: self.extent,
+        })
+    }
+}
+
 fn reverse(
     word: &Word<'_>,
     covector: &RatioCovector,
     map: &ExactRatMatrix,
     lift: &BigInt,
     phases: &ReceivingPhases,
+    world: Option<&WorldAdjoint>,
 ) -> Result<(WordReturn, ChangeCovector), HnnError> {
     let field = word.field();
     let steps = word.recorded().len();
@@ -1077,7 +1165,15 @@ fn reverse(
             .ok_or(HnnError::WordEnded { ticks: steps })?;
         reads.push((receiving_ring.rotate(anchor, lift), gradient));
     }
-    let (mut back, opening) = reverse_core(word, read_covector, receiving, None)?;
+    let anchors = read_covector
+        .into_iter()
+        .map(|seed| {
+            let mut joined = vec![None; field.rings().len()];
+            joined[receiving] = seed;
+            joined
+        })
+        .collect();
+    let (mut back, opening) = reverse_core_joined(word, anchors, None, world)?;
     back.reads = reads;
     Ok((back, opening))
 }
@@ -1107,13 +1203,14 @@ fn reverse_core(
         joined[receiving] = seed;
         joined
     }).collect();
-    reverse_core_joined(word, anchors, end)
+    reverse_core_joined(word, anchors, end, None)
 }
 
 fn reverse_core_joined(
     word: &Word<'_>,
     mut read_covector: Vec<Vec<Option<Vec<Rat>>>>,
     end: Option<&ChangeCovector>,
+    world: Option<&WorldAdjoint>,
 ) -> Result<(WordReturn, ChangeCovector), HnnError> {
     crate::hnn::word::work::reached(crate::hnn::word::work::Event::ReturnAttempt);
     let field = word.field();
@@ -1217,6 +1314,17 @@ fn reverse_core_joined(
             .collect(),
         None => rest_resonators.clone(),
     };
+    // The World's covector after the sweep's current tick (§7j): zero after the last.
+    if let Some(world) = world
+        && (world.charts.len() != steps || world.face.len() != steps)
+    {
+        return Err(HnnError::Shape {
+            what: "the World port's charts and face covectors, one per executed tick",
+            expected: steps,
+            found: world.charts.len(),
+        });
+    }
+    let mut world_bar = world.map(|w| zeros(w.extent));
     for t in (0..steps).rev() {
         let record = &records[t];
         // The step's junctions, read from its own record at the anchors the word carried: the
@@ -1252,8 +1360,27 @@ fn reverse_core_joined(
             // The actual exterior returned wave is held in this R-only conditional return.
             // Reverse its overwrite before the native element/loaded stage. No World adjoint
             // or full material derivative is inferred from this conditional source costate.
+            if let (Some(world), Some(mu)) = (world, world_bar.as_mut())
+                && let Some(face) = &world.face[t]
+            {
+                *mu = add(mu, face);
+            }
             for returned in word.source_returns().iter().filter(|returned| returned.tick == t + 1) {
-                storage_bar[returned.ring].fill(Rat::zero());
+                match (world, world_bar.as_mut()) {
+                    (Some(world), Some(mu)) if world.ring == returned.ring => {
+                        // [§7j] Through the World port: the returned wave b = P ξ + Q a overwrote
+                        // the emitted wave a, and ξ′ = F ξ + G a.
+                        let [f, g, p, q] = &world.charts[t];
+                        let lambda = storage_bar[returned.ring].clone();
+                        let emitted = add(
+                            &q.transpose()?.apply(&lambda)?,
+                            &g.transpose()?.apply(mu)?,
+                        );
+                        *mu = add(&f.transpose()?.apply(mu)?, &p.transpose()?.apply(&lambda)?);
+                        storage_bar[returned.ring] = emitted;
+                    }
+                    _ => storage_bar[returned.ring].fill(Rat::zero()),
+                }
             }
             // Reverse the loaded storage-port stage first. Its drive covector then enters the
             // element transpose, so the junction and contact receive the complete loaded path.

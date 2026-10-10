@@ -319,6 +319,8 @@ pub struct ScheduledProspect {
     pub ratio: ReceivingFaceRatio,
     pub tangents: Vec<MaterialTangent>,
     pub prospect: CoupledProspect,
+    /// The contact families' steps of this encounter's return through the World port (§7j).
+    pub world_contacts: Vec<FactorStep>,
 }
 
 /// One run of a schedule ([`PhysicalReceiver::round_from`]): its encounters, the end carry, the
@@ -723,6 +725,17 @@ impl<'f> PhysicalReceiver<'f> {
         received: &ActionReception,
         descend: impl FnOnce(&Constitution, &[FactorStep]) -> Result<Vec<FactorStep>, HnnError>,
     ) -> Result<WorldProposal, HnnError> {
+        self.bound_normalized(received, None, descend)
+    }
+
+    /// [`Self::bound_with`], normalized by `held` in place of the latest encounter's own contact
+    /// steps when declared (the cycle's World-sensitive steps, §7j).
+    pub(crate) fn bound_normalized(
+        &self,
+        received: &ActionReception,
+        held: Option<&[FactorStep]>,
+        descend: impl FnOnce(&Constitution, &[FactorStep]) -> Result<Vec<FactorStep>, HnnError>,
+    ) -> Result<WorldProposal, HnnError> {
         let comparison = received
             .comparison
             .as_ref()
@@ -758,7 +771,7 @@ impl<'f> PhysicalReceiver<'f> {
             .ok_or(HnnError::Unadmitted {
                 reason: "a World proposal reads its encounter's own reach",
             })?;
-        let steps = descend(self.constitution(), &returned.contacts)?;
+        let steps = descend(self.constitution(), held.unwrap_or(&returned.contacts))?;
         Ok(WorldProposal {
             steps,
             reach,
@@ -853,7 +866,27 @@ impl<'f> PhysicalReceiver<'f> {
         let credits: Vec<Vec<(Rat, Rat)>> = (0..directions.len())
             .map(|d| reading.credits.iter().map(|per| per[d].clone()).collect())
             .collect();
-        self.bound_with(received, |theta, held| {
+        // [agent-inferred, October 10; §7j] The orbit's encounters normalize the step: per contact
+        // family, the feature energies summed and the largest covector scale, each read through the
+        // World port.
+        let mut held: Vec<FactorStep> = Vec::new();
+        for encounter in &reading.encounters {
+            for step in &encounter.world_contacts {
+                match held.iter_mut().find(|h| {
+                    h.gradient.locus() == step.gradient.locus()
+                        && h.gradient.family() == step.gradient.family()
+                }) {
+                    Some(h) => {
+                        h.energy = &h.energy + &step.energy;
+                        if step.covector > h.covector {
+                            h.covector = step.covector.clone();
+                        }
+                    }
+                    None => held.push(step.clone()),
+                }
+            }
+        }
+        self.bound_normalized(received, Some(&held), |theta, held| {
             descent_from_credits(theta, coordinates, &credits, held)
         })
     }
@@ -1206,7 +1239,45 @@ impl<'f> PhysicalReceiver<'f> {
                     grain,
                 )?);
             }
-            let returned = executed.return_observed_receiving(receiver_index, &applied, observed)?;
+            // The key's World port over this passage (§7j): its charts at each tick's commit and its
+            // face's linear part, so the return also reads the covector through the World.
+            let steps = prospect.point.waves.len();
+            let located = &model.keys()[key];
+            let charts = (0..steps)
+                .map(|t| {
+                    let commit = tick
+                        .checked_add(u64::try_from(t).map_err(|_| HnnError::CountOverflow)?)
+                        .ok_or(HnnError::CountOverflow)?;
+                    let c = located.charts(commit)?;
+                    Ok([c.f, c.g, c.p, c.q])
+                })
+                .collect::<Result<Vec<_>, HnnError>>()?;
+            let face = located.face().ok_or(HnnError::Unadmitted {
+                reason: "a schedule's World port reads the key's declared face",
+            })?;
+            let zero = face.read(&vec![Rat::zero(); extent])?;
+            let columns = (0..extent)
+                .map(|i| {
+                    let mut unit = vec![Rat::zero(); extent];
+                    unit[i] = Rat::from_integer(1.into());
+                    Ok(sub(&face.read(&unit)?, &zero))
+                })
+                .collect::<Result<Vec<_>, HnnError>>()?;
+            let rows = (0..zero.len())
+                .map(|r| columns.iter().map(|c| c[r].clone()).collect())
+                .collect();
+            let port = crate::hnn::port::WorldPort {
+                ring: applied.ring(),
+                charts,
+                face: ExactRatMatrix::new(rows)?,
+                extent,
+            };
+            let returned = executed.return_observed_receiving(
+                receiver_index,
+                &applied,
+                observed,
+                Some(&port),
+            )?;
             if let Some(deposit) = returned.deposit.as_ref() {
                 material = material.deposited(deposit)?.0;
             }
@@ -1225,6 +1296,7 @@ impl<'f> PhysicalReceiver<'f> {
                 ratio,
                 tangents: tangents.clone(),
                 prospect,
+                world_contacts: returned.world_contacts.clone().unwrap_or_default(),
             });
             last_end = Some(end.clone());
             carried = Some((end, tangents));
@@ -1720,6 +1792,7 @@ impl<'f> PhysicalReceiver<'f> {
                 receiver_index,
                 &applied,
                 encounter.observed().to_vec(),
+                None,
             )?;
             let before = producing
                 .receiving_map(phases.ring())

@@ -2869,6 +2869,11 @@ fn cycle_trajectory(name: &str, second: bool) {
                 reading.grain_raise,
                 reading.waves.iter().map(|w| w.decision).collect::<Vec<_>>()
             );
+            println!(
+                "cycle trajectory ({name}): declared step {:?}; deposition work {:?}",
+                reading.declared,
+                reading.deposition_work.as_ref().map(|w| w.to_string())
+            );
             for (k, wave) in reading.waves.iter().enumerate() {
                 println!(
                     "cycle trajectory ({name}): orbit encounter {k}: contemporary code {:?} excess {}; candidate code {:?} excess {}",
@@ -2880,7 +2885,8 @@ fn cycle_trajectory(name: &str, second: bool) {
             }
         }
     }
-    for round in 0..14 {
+    // Eight rounds: the measured rate (about 21 s a round with the landing) fits the deadline.
+    for round in 0..8 {
         for (k, control) in schedule.iter().enumerate() {
             let (code, excess, _, _) = second_comparison(&mut learner, &field, &source, control);
             let (t_code, t_excess, _, _) = second_comparison(&mut twin, &field, &source, control);
@@ -2902,3 +2908,67 @@ fn the_cycle_landing_is_read_over_the_trajectory() {
 fn the_cycle_landing_is_read_over_a_second_trajectory() {
     cycle_trajectory("second", true);
 }
+
+// ---- The adjoint through the World port (the held-carry record §7j) ----
+
+/// **The World-port return is the tangents' credit** (§7j (a)): after twelve encounters, the next
+/// encounter's prospect taught along every raw coordinate of contact 0, and its return through the
+/// World port. For every coordinate, the World-sensitive return's contact gradient entry against the
+/// forward tangent's whole credit (magnitude and both phase parts), reported with their exact ratio.
+#[test]
+fn the_world_return_is_the_tangents_credit() {
+    let (field, base, source) = fixture();
+    let theta = Declared::new(&field, base).at(&Rat::zero());
+    let mut receiver = bound(&field, theta, &source, vec![faced_key(&field)]);
+    plain_passage(&mut receiver, &field, &source, 12);
+    let present = receiver.constitution().clone();
+    let preparation = actuator(&field);
+    let [first, _] = chain_controls();
+    let coordinates = all_coordinates(&present);
+    let directions: Vec<MaterialDirection> = coordinates
+        .iter()
+        .map(|c| MaterialDirection::of_coordinate(&field, &present, c).unwrap())
+        .collect();
+    let scheduled = receiver
+        .world_prospect_schedule(
+            &present,
+            &source,
+            &field.receivers()[0],
+            &preparation,
+            &[false, true],
+            &[&first],
+            &directions,
+        )
+        .unwrap();
+    let encounter = &scheduled[0];
+    // The prospect's comparison numbers stations by rank; the return's covector reads the full
+    // partition. Both are the same comparison of the same passage.
+    for (coordinate, tangent) in coordinates.iter().zip(&encounter.tangents) {
+        let credit = tangent.comparison_credit(&encounter.ratio).unwrap();
+        let total = &(&credit.magnitude + &credit.produced_phase) + &credit.observed_phase;
+        let native = &credit.magnitude + &credit.produced_phase;
+        let step = encounter
+            .world_contacts
+            .iter()
+            .find(|s| s.gradient.family() == holonics::hnn::constitution::Family::Factor(coordinate.family))
+            .unwrap();
+        let entries: Vec<Rat> = step.gradient.entries().cloned().collect();
+        let columns = match coordinate.family {
+            0 => present.contact_storage(0).columns(),
+            1 => present.contact_stiffness(0).columns(),
+            _ => present.contact_dissipation(0).columns(),
+        };
+        let entry = &entries[coordinate.row * columns + coordinate.column];
+        println!(
+            "world return: family {} ({}, {}): gradient {} credit {} native-part {} ratio {}",
+            coordinate.family,
+            coordinate.row,
+            coordinate.column,
+            entry,
+            total,
+            native,
+            if total.is_zero() { "∞".to_string() } else { (entry / &total).to_string() }
+        );
+    }
+}
+

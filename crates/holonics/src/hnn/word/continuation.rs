@@ -2207,18 +2207,51 @@ impl MaterialTangent {
 /// the projected ones; it is zero when the violated gradients span the start. With one observation
 /// it is law (6) exactly: `⟨L, −L⟩ ≤ 0` never violates, and `X` is projected off iff
 /// `⟨L, X⟩ < 0`, giving `−L + (⟨L, X⟩/|X|²) X`. When no classical descent is left (the start
-/// projects to zero), the descent takes the admission's next term: `−Σ_o X_o` projected the same
-/// way, every classical and phase gradient still a constraint (record §7i).
+/// projects to zero), the descent takes the admission's next term, the phase: for two observations
+/// the negated minimum-norm point of their phase gradients' segment, a strict common descent
+/// (record §7k); otherwise `−Σ_o X_o` projected the same way. The classical gradients stay
+/// constraints.
 fn common_descent(classical: &[Vec<Rat>], phase: &[Vec<Rat>]) -> Vec<Rat> {
     let constraints: Vec<&Vec<Rat>> = classical.iter().chain(phase).collect();
     let descent = projected_descent(classical, &constraints);
     if !descent.iter().all(Zero::is_zero) {
         return descent;
     }
-    // [agent-inferred, October 10; the held-carry record §7i] The admission is lexicographic: with
-    // no classical descent left, the next term is the phase. Start at `−Σ_o X_o`, every classical and
-    // phase gradient still a constraint.
+    // [agent-inferred, October 10; the held-carry record §7i, §7k] The admission is lexicographic:
+    // with no classical descent left, the next term is the phase. The admission reads each
+    // observation's phase on its own and refuses any that rises, so the step is a strict common
+    // descent of the phases: the negated minimum-norm point of their convex hull (two observations,
+    // exact), which lowers every observation's phase at first order. Every classical gradient
+    // stays a constraint.
+    if phase.len() == 2 {
+        let common = minimum_norm_pair(&phase[0], &phase[1]);
+        let classical_constraints: Vec<&Vec<Rat>> = classical.iter().collect();
+        return projected_descent(&[common], &classical_constraints);
+    }
     projected_descent(phase, &constraints)
+}
+
+/// The minimum-norm point of the segment `[a, b]`, exact: `λ a + (1 − λ) b` with
+/// `λ = clamp(⟨b − a, b⟩ / |b − a|², 0, 1)` (`b` itself when `a = b`).
+fn minimum_norm_pair(a: &[Rat], b: &[Rat]) -> Vec<Rat> {
+    use num_traits::One;
+    let dot = |x: &[Rat], y: &[Rat]| x.iter().zip(y).map(|(p, q)| p * q).sum::<Rat>();
+    let difference: Vec<Rat> = b.iter().zip(a).map(|(p, q)| p - q).collect();
+    let length = dot(&difference, &difference);
+    if length.is_zero() {
+        return b.to_vec();
+    }
+    let mut lambda = dot(&difference, b) / length;
+    if lambda < Rat::zero() {
+        lambda = Rat::zero();
+    }
+    if lambda > Rat::one() {
+        lambda = Rat::one();
+    }
+    a.iter()
+        .zip(b)
+        .map(|(p, q)| &lambda * p + (Rat::one() - &lambda) * q)
+        .collect()
 }
 
 /// `−Σ start` projected, exactly, off the span of every constraint it would raise at first order,
