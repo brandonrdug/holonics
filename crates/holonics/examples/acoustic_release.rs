@@ -456,12 +456,88 @@ fn gain_exponent(peak: &Rat) -> i64 {
     k
 }
 
+/// [definition; agent-inferred, October 10; the bank record §16] **The source coded through one
+/// ring's cells**: per recorded tick, given the ring's exact carried state, the drive's image is
+/// affine in the sample (`ω = ω₀ + x m`, read by two exact-law steps), so the next state's cell (its
+/// quadrant, `hnn::dynamic_section::quadrant`) bounds the sample to an interval of PCM values,
+/// widened by one value at each end for the lattice's rounding. The code is the section word at
+/// `⌈log₂ 5⌉ = 3` bits per tick plus the sample's index in its interval, `⌈log₂ count⌉` bits: it
+/// decodes losslessly (`R_source = 0`). Returns the ticks, the word bits, the index bits and the
+/// ticks whose interval held one value.
+fn interval_pass(b: usize, t: &Rat, stream: &[Rat], started: Instant) -> (u64, u64, u64, u64) {
+    use holonics::hnn::dynamic_section::quadrant;
+    use holonics::hnn::ring::ResonatorRemainders;
+    let operands = declared_ring(t);
+    let lattice = Lattice::new(STATE_LATTICE);
+    let (admittance, hop) = (operands.admittance().clone(), operands.hop().clone());
+    let mut port = WavePort::on_lattice(operands.clone(), 0, lattice).unwrap();
+    let pcm = Rat::from_integer(BigInt::one() << PCM as usize);
+    let (low, high) = (BigInt::from(-32768), BigInt::from(32767));
+    let (mut word_bits, mut index_bits, mut single) = (0u64, 0u64, 0u64);
+    let zero = ResonatorRemainders::default();
+    for (n, sample) in stream.iter().enumerate() {
+        let [u, w] = port.state().map(<[Rat]>::to_vec);
+        let rate = |a: Rat| {
+            operands
+                .step(n, &[a, Rat::zero()], [&u, &w], &zero, None)
+                .unwrap()
+                .rate
+        };
+        let (r0, r1) = (rate(Rat::zero()), rate(Rat::one()));
+        let m: Vec<Rat> = r1.iter().zip(&r0).map(|(a, b)| a - b).collect();
+        // The next phase point of coordinate 0, affine in x: w′ = 2ω − w, u′ = u + hω.
+        let (w0, wm) = (integer(2) * &r0[0] - &w[0], integer(2) * &m[0]);
+        let (u0, um) = (&u[0] + &hop * &r0[0], &hop * &m[0]);
+        let wave = MatchedWave::new(admittance.clone(), hop.clone(), vec![sample.clone()]).unwrap();
+        let tick = port.receive(&wave).unwrap().next().unwrap().unwrap();
+        let next = [tick.step.state[1][0].clone(), tick.step.state[0][0].clone()];
+        let class = quadrant(&next);
+        // Each sign condition on a + b·x is a half-line in v = x·2^15; the cell is their meet.
+        let (mut lo, mut hi) = (low.clone(), high.clone());
+        let mut bound = |a: &Rat, b: &Rat, positive: Option<bool>| {
+            // positive: Some(true) a + b x ≥ 0 side, Some(false) ≤ 0 side; widened by one value.
+            let Some(up) = positive else { return };
+            if b.is_zero() {
+                return;
+            }
+            let root = -(a / b) * &pcm;
+            let rises = b.is_positive() == up;
+            if rises {
+                lo = lo.clone().max(root.floor().to_integer() - 1);
+            } else {
+                hi = hi.clone().min(root.ceil().to_integer() + 1);
+            }
+        };
+        match class {
+            Some(0) => { bound(&w0, &wm, Some(true)); bound(&u0, &um, Some(true)); }
+            Some(1) => { bound(&w0, &wm, Some(false)); bound(&u0, &um, Some(true)); }
+            Some(2) => { bound(&w0, &wm, Some(false)); bound(&u0, &um, Some(false)); }
+            Some(3) => { bound(&w0, &wm, Some(true)); bound(&u0, &um, Some(false)); }
+            _ => {}
+        }
+        let v = (sample * &pcm).to_integer();
+        assert!(lo <= v && v <= hi, "ring {b}: the sample lies in its cell's interval at tick {n}");
+        let count: BigInt = &hi - &lo + 1;
+        let bits = if count <= BigInt::one() { 0 } else { (count - 1u32).bits() };
+        if bits == 0 {
+            single += 1;
+        }
+        index_bits += bits;
+        word_bits += 3;
+        if n % CHUNK == CHUNK - 1 {
+            println!("interval ring {b}: ticks {} elapsed {} ms", n + 1, started.elapsed().as_millis());
+        }
+    }
+    (stream.len() as u64, word_bits, index_bits, single)
+}
+
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let (input, output) = (&args[1], &args[2]);
     let limit: Option<usize> = args.get(3).map(|x| x.parse().unwrap()).filter(|x| *x > 0);
     let threads: usize = args.get(4).map_or(12, |x| x.parse().unwrap());
     let census_only = args.get(5).is_some_and(|x| x == "census");
+    let interval_only = args.get(5).is_some_and(|x| x == "interval");
     let started = Instant::now();
     let (rate, pcm) = read_wav(input);
     let scale = Rat::new(BigInt::one(), BigInt::one() << PCM as usize);
@@ -478,6 +554,29 @@ fn main() {
     let ladder: Vec<Rat> = (0..RINGS)
         .map(|b| rat(1, 50) * (0..b).fold(Rat::one(), |x, _| x * rat(6, 5)))
         .collect();
+    if interval_only {
+        // Record §16: rings 0, 4, …, 20, the recorded ticks only, one thread each.
+        let chosen: Vec<usize> = (0..RINGS).step_by(4).collect();
+        let readings: Vec<(usize, (u64, u64, u64, u64))> = std::thread::scope(|scope| {
+            let handles: Vec<_> = chosen
+                .iter()
+                .map(|&b| {
+                    let (ladder, stream) = (&ladder, &stream);
+                    scope.spawn(move || (b, interval_pass(b, &ladder[b], stream, started)))
+                })
+                .collect();
+            handles.into_iter().map(|h| h.join().expect("a ring's interval pass")).collect()
+        });
+        for (b, (ticks, word, index, single)) in readings {
+            println!(
+                "interval ring {b}: ticks {ticks}; word bits {word}; index bits {index}; total {}; raw {}; ticks with one admissible value {single}",
+                word + index,
+                16 * ticks
+            );
+        }
+        println!("interval: elapsed {} ms", started.elapsed().as_millis());
+        return;
+    }
     let mut passes: Vec<Option<Pass>> = (0..RINGS).map(|_| None).collect();
     std::thread::scope(|scope| {
         let mut handles = Vec::new();

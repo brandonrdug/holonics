@@ -597,3 +597,55 @@ states and remainders, returns exactly its incident amplitude on the driven coor
 the quadrature. A pair of states two ticks apart is refused. `acoustic_wave_port` passes 23 of 23,
 and gate 1 is ok. The source is exactly one ring's inverse tick once its state and remainders are
 known. The remaining question is §15's next measurement, at what grain they can be known.
+
+## 16. The source through one ring's cells (§15's measurement; reading fixed before the result)
+
+[definition; agent-inferred, October 10] With the inverse tick exact (§15), the source is coded
+losslessly through one ring's dynamic symbols, and nothing outside the ring's own law enters.
+
+- Given the ring's exact carried state `s_n`, the drive's image is affine in the sample,
+  `ω = ω₀ + x m`. The two exact-law steps that read `ω₀` and `m` are the ring owner's own `step`.
+- So the next state's cell, its quadrant at the section, bounds the sample to an interval of PCM
+  values. The interval is widened by one value at each end for the lattice's rounding.
+- The code per tick is the section word's symbol, at `3` bits, plus the sample's index in its
+  interval, at `⌈log₂ count⌉` bits.
+- The decoder holds the same state, reads the cell, computes the same interval, reads the index,
+  recovers `x_n` exactly and steps. `R_source = 0`, and the residual is the index code itself.
+- It was run on rings 0, 4, …, 20 over the recording's 93680 ticks.
+
+**Reading rule (fixed at launch).** A ring's dynamic symbols carry the source more cheaply than the
+samples only if `word bits + index bits < 16 · 93680 = 1498880`. Otherwise the measurement names how
+much the cells narrow each sample (the index bits) against what the cells cost (the word bits).
+Under ideal codes the chain rule makes the two factorizations equal, so a gain here can come only
+from the uniform 16-bit samples' own slack against the cells' narrowing. That is not learned
+structure, and it is never read as such. The word is spelled at 3 bits per tick, without §11's
+near-return, whose period-1 cycles (§13) would describe the same sparse crossings.
+
+[measured] **The reading** ([receipt](receipts/2026-10-10-acoustic-release/CELL_INTERVAL.v1.json)):
+228710618817 ns against a projection of 110 to 190 s (deadline 300 s). The projection's upper end
+was exceeded, and that is reported as its error. Gate 1 is ok. Every sample of every ring lay inside
+its cell's interval, so the code is lossless and `R_source = 0`.
+
+| ring | word bits | index bits | total | against `1498880` |
+|---|---|---|---|---|
+| 0 | 281040 | 1489416 | 1770456 | `+271576` |
+| 4 | 281040 | 1464248 | 1745288 | `+246408` |
+| 8 | 281040 | 1422112 | 1703152 | `+204272` |
+| 12 | 281040 | 1360269 | 1641309 | `+142429` |
+| 16 | 281040 | 1267860 | 1548900 | `+50020` |
+| 20 | 281040 | 1199937 | **1480977** | **`−17903`** |
+
+- **The cells narrow the sample more as the ring turns faster.** Ring 0's cells leave about 15.9 bits
+  per sample (`1489416 / 93680`); ring 20's leave about 12.8 (`1199937 / 93680`). No tick of any ring
+  had a single admissible value.
+- **Ring 20 meets the inequality**, by 17903 bits. By the rule fixed at launch, this is the cells'
+  narrowing against the uniform 16-bit samples' slack, at a word cost spelled at 3 bits per tick. It
+  is not learned structure and not compression of the speech's content. It shows that the ring's own
+  dynamic symbols, its cells, carry part of the source's information at a cost below what they
+  narrow, through one exact inverse.
+- **What it settles for the architecture.** §15's decoder works losslessly through one ring's cells,
+  with nothing authored. Its lengths are dominated by the index, the within-cell position. The
+  next law must narrow that further from the ring's own dynamics: a finer section grain than the
+  quarter turn (more rays) or a pair of rings read jointly (the helical duplex, where one ring's cell
+  constrains the other's), each paid in the word. The finer grain is the cheaper join, because
+  `dynamic_section`'s `RAYS` is already the declared grain of the section chart.
