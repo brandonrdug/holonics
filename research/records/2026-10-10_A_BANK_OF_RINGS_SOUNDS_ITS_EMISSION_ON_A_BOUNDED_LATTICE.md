@@ -705,3 +705,49 @@ recovered history, and refined it.
    coherent for this family (`m < 7`, `δ = 2^(−32)`, `h = 1`: a boundary error under `7/2^17 < 1`
    PCM integer), a certificate still unimplemented. Ring 20's estimated `1480977` against `1498880`
    remains uniform PCM slack.
+
+## 19. The emitted cell codec and its independent decoder (§18's consumer; reading fixed before the full run)
+
+[definition; agent-inferred, October 10] `codec_encode` and `codec_decode` in
+`examples/acoustic_release.rs`.
+
+- **The encoder's bytes.** A header (the ring's index, 5 bits; the sample rate, 32 bits; the tick
+  count, 32 bits). Then, per tick, the next state's cell (3 bits: class 0 to 3, or 4 for the origin)
+  and the sample's index in that cell's interval (`⌈log₂ count⌉` bits). The bits are packed into
+  bytes and the last byte is zero-padded. Termination is the declared tick count.
+- **The decoder.** It reads only the bytes and the declared ring of the header. It starts at the
+  declared rest state on the lattice `2^(−32)`. Per tick it computes the interval from its own state
+  (`cell_interval`, the same function the encoder uses, reading only the ring, the clock and the
+  state), reads the cell and the index, and recovers the sample. It then forward-ticks the port,
+  which regenerates the state and its carried remainders. It checks that the regenerated state lies
+  in the cell it read, and that the ring's inverse tick (`inverse_step` on the lattice, with the
+  carried remainders) returns the sample.
+
+**The consumer equation.** `codec_decode(codec_encode(x)) = x` exactly, on every sample. The charged
+length is `8 · bytes`, header and padding included, against `16 · N`.
+
+**Development read.** Ring 20 over 2000 ticks, 9436104373 ns: 3504 bytes, which is 28032 bits against
+32000. The decode is exact, and the cell and the inverse tick held at every tick.
+
+**Reading rule (fixed before the full run).** The full run over the 93680 recorded ticks reports the
+emitted bits against `1498880` and the exact equality. As in §16, a margin below `16 · N` is the
+cells' narrowing against the uniform samples' slack, reached by the ring's own dynamics through one
+exact inverse. It is not learned structure, and it is never read as compression of the speech's
+content.
+
+[measured] **The full run** ([receipt](receipts/2026-10-10-acoustic-release/CELL_CODEC.v1.json)):
+441252911580 ns against a projection of 442 s (deadline 480 s), with a peak resident set of 13672 KiB.
+Gate 1 passed at `ec1b950a`.
+
+- **The consumer equation holds.** `codec_decode(codec_encode(x)) = x` on all 93680 samples. At
+  every tick the regenerated state lay in the cell read, and the ring's inverse tick returned the
+  sample.
+- **The charged length.** 185131 bytes, which is **1481048** bits with the header and padding
+  included, against `16 · 93680 = 1498880`: `17832` bits fewer. §16's estimate of 1480977 differs by
+  71 bits, the 69-bit header and 2 bits of padding.
+- **What it is.** The source decoded exactly from one declared ring's own cells and the sample's
+  index within them, at a length 17832 bits under the uniform 16-bit samples. By the fixed rule this
+  margin is the cells' narrowing against the uniform samples' slack. It is not learned structure and
+  not compression of the speech's content. It is §15's architecture working end to end, at its
+  consumer, on the recording: source, cells and index, exact decode, nothing authored. The decode is
+  the recording itself, so there is nothing new to hear.
