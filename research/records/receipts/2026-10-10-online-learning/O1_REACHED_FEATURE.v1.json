@@ -1,0 +1,99 @@
+{
+  "scope": "Local developer read by opus under the common lease (announced), not claim-bearing: the online-learning record section 5 (O1), the receiving map reached feature per cell for learner and twin on both frames, and the deposit readings at commits 17-18 (prior moves extracted; full dumps bound by the log hash).",
+  "runs": [
+    {
+      "log_sha256": "8499ee26f02e49f2cd2d9193ddeaba8f23009e3c6abc30ab413353420845394b",
+      "deadline_s": 240,
+      "lines": [
+        "§diag commit 16 cell 22: R before Some([Ratio { numer: 1, denom: 64 }, Ratio { numer: -1, denom: 64 }, Ratio { numer: 1, denom: 128 }, Ratio { numer: -1, denom: 128 }, Ratio { numer: 1, denom: 128 }, Ratio { numer: -1, denom: 128 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -1, denom: 64 }, Ratio { numer: 1, denom: 64 }, Ratio { numer: -1, denom: 128 }, Ratio { numer: 1, denom: 128 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }])",
+        "§diag commit 16: R after Some([Ratio { numer: 1, denom: 128 }, Ratio { numer: -1, denom: 128 }, Ratio { numer: 1, denom: 128 }, Ratio { numer: -1, denom: 128 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -1, denom: 128 }, Ratio { numer: 1, denom: 128 }, Ratio { numer: -1, denom: 128 }, Ratio { numer: 1, denom: 128 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }])",
+        "§diag commit 17 cell 23: R before Some([Ratio { numer: 1, denom: 128 }, Ratio { numer: -1, denom: 128 }, Ratio { numer: 1, denom: 128 }, Ratio { numer: -1, denom: 128 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -1, denom: 128 }, Ratio { numer: 1, denom: 128 }, Ratio { numer: -1, denom: 128 }, Ratio { numer: 1, denom: 128 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }])",
+        "§diag commit 17: R after Some([Ratio { numer: 1, denom: 128 }, Ratio { numer: -1, denom: 128 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -1, denom: 128 }, Ratio { numer: 1, denom: 128 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }])",
+        "§diag commit 18 cell 24: R before Some([Ratio { numer: 1, denom: 128 }, Ratio { numer: -1, denom: 128 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -1, denom: 128 }, Ratio { numer: 1, denom: 128 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }])",
+        "§diag commit 18: R after Some([Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }])",
+        "§diag commit 19 cell 25: R before Some([Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }])",
+        "§diag commit 19: R after Some([Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }])",
+        "§5 frame [7, 2] learner: features read 113 (no nonzero g at 0); the -2 cells' features 16 of which 7 also occur at a +1 cell; repeats with the cycle on the second half: false; distinct among the last cycle's seven: 7",
+        "§5 frame [7, 2] learner cell 113 (1): f Some([Ratio { numer: 657, denom: 1024 }, Ratio { numer: -667, denom: 1024 }, Ratio { numer: 53, denom: 128 }, Ratio { numer: -443, denom: 1024 }])",
+        "§5 frame [7, 2] learner cell 114 (1): f Some([Ratio { numer: 525, denom: 512 }, Ratio { numer: -267, denom: 256 }, Ratio { numer: 339, denom: 512 }, Ratio { numer: -355, denom: 512 }])",
+        "§5 frame [7, 2] learner cell 115 (1): f Some([Ratio { numer: 525, denom: 512 }, Ratio { numer: -267, denom: 256 }, Ratio { numer: 679, denom: 1024 }, Ratio { numer: -355, denom: 512 }])",
+        "§5 frame [7, 2] learner cell 116 (1): f Some([Ratio { numer: 309, denom: 256 }, Ratio { numer: -157, denom: 128 }, Ratio { numer: 25, denom: 32 }, Ratio { numer: -837, denom: 1024 }])",
+        "§5 frame [7, 2] learner cell 117 (-2): f Some([Ratio { numer: 1235, denom: 1024 }, Ratio { numer: -157, denom: 128 }, Ratio { numer: 801, denom: 1024 }, Ratio { numer: -419, denom: 512 }])",
+        "§5 frame [7, 2] learner cell 118 (1): f Some([Ratio { numer: 1051, denom: 1024 }, Ratio { numer: -1069, denom: 1024 }, Ratio { numer: 675, denom: 1024 }, Ratio { numer: -707, denom: 1024 }])",
+        "§5 frame [7, 2] learner cell 119 (1): f Some([Ratio { numer: 657, denom: 1024 }, Ratio { numer: -667, denom: 1024 }, Ratio { numer: 423, denom: 1024 }, Ratio { numer: -221, denom: 512 }])",
+        "§5 frame [7, 2] twin: features read 113 (no nonzero g at 0); the -2 cells' features 16 of which 10 also occur at a +1 cell; repeats with the cycle on the second half: false; distinct among the last cycle's seven: 7",
+        "§5 frame [7, 2] twin cell 113 (1): f Some([Ratio { numer: 1, denom: 4 }, Ratio { numer: -1, denom: 4 }, Ratio { numer: 23, denom: 128 }, Ratio { numer: -183, denom: 1024 }])",
+        "§5 frame [7, 2] twin cell 114 (1): f Some([Ratio { numer: 205, denom: 512 }, Ratio { numer: -205, denom: 512 }, Ratio { numer: 147, denom: 512 }, Ratio { numer: -147, denom: 512 }])",
+        "§5 frame [7, 2] twin cell 115 (1): f Some([Ratio { numer: 205, denom: 512 }, Ratio { numer: -205, denom: 512 }, Ratio { numer: 37, denom: 128 }, Ratio { numer: -37, denom: 128 }])",
+        "§5 frame [7, 2] twin cell 116 (1): f Some([Ratio { numer: 241, denom: 512 }, Ratio { numer: -241, denom: 512 }, Ratio { numer: 349, denom: 1024 }, Ratio { numer: -349, denom: 1024 }])",
+        "§5 frame [7, 2] twin cell 117 (-2): f Some([Ratio { numer: 241, denom: 512 }, Ratio { numer: -241, denom: 512 }, Ratio { numer: 175, denom: 512 }, Ratio { numer: -175, denom: 512 }])",
+        "§5 frame [7, 2] twin cell 118 (1): f Some([Ratio { numer: 205, denom: 512 }, Ratio { numer: -205, denom: 512 }, Ratio { numer: 291, denom: 1024 }, Ratio { numer: -291, denom: 1024 }])",
+        "§5 frame [7, 2] twin cell 119 (1): f Some([Ratio { numer: 1, denom: 4 }, Ratio { numer: -1, denom: 4 }, Ratio { numer: 183, denom: 1024 }, Ratio { numer: -183, denom: 1024 }])",
+        "§diag commit 16 cell 22: R before Some([Ratio { numer: 1, denom: 64 }, Ratio { numer: -1, denom: 64 }, Ratio { numer: 1, denom: 128 }, Ratio { numer: -1, denom: 128 }, Ratio { numer: 1, denom: 128 }, Ratio { numer: -1, denom: 128 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -1, denom: 64 }, Ratio { numer: 1, denom: 64 }, Ratio { numer: -1, denom: 128 }, Ratio { numer: 1, denom: 128 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }])",
+        "§diag commit 16: R after Some([Ratio { numer: 1, denom: 128 }, Ratio { numer: -1, denom: 128 }, Ratio { numer: 1, denom: 128 }, Ratio { numer: -1, denom: 128 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -1, denom: 128 }, Ratio { numer: 1, denom: 128 }, Ratio { numer: -1, denom: 128 }, Ratio { numer: 1, denom: 128 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }])",
+        "§diag commit 17 cell 23: R before Some([Ratio { numer: 1, denom: 128 }, Ratio { numer: -1, denom: 128 }, Ratio { numer: 1, denom: 128 }, Ratio { numer: -1, denom: 128 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -1, denom: 128 }, Ratio { numer: 1, denom: 128 }, Ratio { numer: -1, denom: 128 }, Ratio { numer: 1, denom: 128 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }])",
+        "§diag commit 17: R after Some([Ratio { numer: 1, denom: 128 }, Ratio { numer: -1, denom: 128 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -1, denom: 128 }, Ratio { numer: 1, denom: 128 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }])",
+        "§diag commit 18 cell 24: R before Some([Ratio { numer: 1, denom: 128 }, Ratio { numer: -1, denom: 128 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: -1, denom: 128 }, Ratio { numer: 1, denom: 128 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }])",
+        "§diag commit 18: R after Some([Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }])",
+        "§diag commit 19 cell 25: R before Some([Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }])",
+        "§diag commit 19: R after Some([Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }, Ratio { numer: 0, denom: 1 }])",
+        "§5 frame [9, 2] learner: features read 113 (no nonzero g at 0); the -2 cells' features 16 of which 0 also occur at a +1 cell; repeats with the cycle on the second half: false; distinct among the last cycle's seven: 6",
+        "§5 frame [9, 2] learner cell 113 (1): f Some([Ratio { numer: 635, denom: 1024 }, Ratio { numer: -161, denom: 256 }, Ratio { numer: 395, denom: 1024 }, Ratio { numer: -211, denom: 512 }])",
+        "§5 frame [9, 2] learner cell 114 (1): f Some([Ratio { numer: 635, denom: 1024 }, Ratio { numer: -161, denom: 256 }, Ratio { numer: 99, denom: 256 }, Ratio { numer: -423, denom: 1024 }])",
+        "§5 frame [9, 2] learner cell 115 (1): f Some([Ratio { numer: 1015, denom: 1024 }, Ratio { numer: -515, denom: 512 }, Ratio { numer: 317, denom: 512 }, Ratio { numer: -339, denom: 512 }])",
+        "§5 frame [9, 2] learner cell 116 (1): f Some([Ratio { numer: 1015, denom: 1024 }, Ratio { numer: -515, denom: 512 }, Ratio { numer: 317, denom: 512 }, Ratio { numer: -339, denom: 512 }])",
+        "§5 frame [9, 2] learner cell 117 (-2): f Some([Ratio { numer: 1193, denom: 1024 }, Ratio { numer: -303, denom: 256 }, Ratio { numer: 747, denom: 1024 }, Ratio { numer: -799, denom: 1024 }])",
+        "§5 frame [9, 2] learner cell 118 (1): f Some([Ratio { numer: 127, denom: 128 }, Ratio { numer: -1031, denom: 1024 }, Ratio { numer: 315, denom: 512 }, Ratio { numer: -337, denom: 512 }])",
+        "§5 frame [9, 2] learner cell 119 (1): f Some([Ratio { numer: 635, denom: 1024 }, Ratio { numer: -161, denom: 256 }, Ratio { numer: 197, denom: 512 }, Ratio { numer: -211, denom: 512 }])",
+        "§5 frame [9, 2] twin: features read 113 (no nonzero g at 0); the -2 cells' features 16 of which 0 also occur at a +1 cell; repeats with the cycle on the second half: false; distinct among the last cycle's seven: 7",
+        "§5 frame [9, 2] twin cell 113 (1): f Some([Ratio { numer: 1, denom: 4 }, Ratio { numer: -1, denom: 4 }, Ratio { numer: 23, denom: 128 }, Ratio { numer: -183, denom: 1024 }])",
+        "§5 frame [9, 2] twin cell 114 (1): f Some([Ratio { numer: 1, denom: 4 }, Ratio { numer: -1, denom: 4 }, Ratio { numer: 23, denom: 128 }, Ratio { numer: -23, denom: 128 }])",
+        "§5 frame [9, 2] twin cell 115 (1): f Some([Ratio { numer: 205, denom: 512 }, Ratio { numer: -205, denom: 512 }, Ratio { numer: 37, denom: 128 }, Ratio { numer: -37, denom: 128 }])",
+        "§5 frame [9, 2] twin cell 116 (1): f Some([Ratio { numer: 205, denom: 512 }, Ratio { numer: -205, denom: 512 }, Ratio { numer: 297, denom: 1024 }, Ratio { numer: -297, denom: 1024 }])",
+        "§5 frame [9, 2] twin cell 117 (-2): f Some([Ratio { numer: 241, denom: 512 }, Ratio { numer: -241, denom: 512 }, Ratio { numer: 175, denom: 512 }, Ratio { numer: -175, denom: 512 }])",
+        "§5 frame [9, 2] twin cell 118 (1): f Some([Ratio { numer: 205, denom: 512 }, Ratio { numer: -205, denom: 512 }, Ratio { numer: 291, denom: 1024 }, Ratio { numer: -291, denom: 1024 }])",
+        "§5 frame [9, 2] twin cell 119 (1): f Some([Ratio { numer: 1, denom: 4 }, Ratio { numer: -1, denom: 4 }, Ratio { numer: 183, denom: 1024 }, Ratio { numer: -183, denom: 1024 }])",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 11.77s",
+        "BOUNDED start 14:08:42 end 14:09:17 exit 0 wall_ns 34395027142 child_peak_rss_kib 2506160"
+      ],
+      "receiving_prior_moves_at_dumped_commits": [
+        [
+          "§dump commit 17: Prese",
+          [
+            [
+              "7",
+              "8"
+            ]
+          ]
+        ],
+        [
+          "§dump commit 18: Prese",
+          [
+            [
+              "8",
+              "9"
+            ]
+          ]
+        ],
+        [
+          "§dump commit 17: Prese",
+          [
+            [
+              "7",
+              "8"
+            ]
+          ]
+        ],
+        [
+          "§dump commit 18: Prese",
+          [
+            [
+              "8",
+              "9"
+            ]
+          ]
+        ]
+      ]
+    }
+  ]
+}

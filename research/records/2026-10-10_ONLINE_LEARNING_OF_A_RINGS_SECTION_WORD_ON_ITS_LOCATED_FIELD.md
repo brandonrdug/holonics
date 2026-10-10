@@ -199,3 +199,71 @@ are whether it separates the cycle's seven positions at all, and why the certifi
 `R` to zero. The applied step, the carry, the tail and any prior move are read at commit 18.
 Its acceptance will be fixed here before code. No depth increase, no authored cycle routine, and no
 borrowed contact-only law for `R`.
+
+## 5. O1: does the receiving map's reached feature separate the cycle's positions? (acceptance fixed before code)
+
+[definition; agent-inferred, October 10, 14:15 UTC] The receiving map `R` acts on the reached
+feature `f = P_R^(τ_R) v_R(e)`: the receiving ring's propagated state at the anchor. R's gradient at
+a compare is `g fᵀ` (`Pullback::receiving`), where `g` is the logit covector
+(`HolonRatio::covector`). For any `i` with `g_i ≠ 0`, `f = (g fᵀ)_(i,·) / g_i`, read exactly with no
+new owner. The cycle's position is `n mod 7`; its `−2` sits at `n ≡ 5 (mod 7)`.
+
+**The readings**, per cell `n ≥ τ`, for both the learner and the twin:
+- `f_n` exactly;
+- its equality classes over the cells;
+- whether `f_n` repeats with the cycle (`f_n = f_(n+7)`) on the word's second half;
+- the number of distinct values among the seven positions.
+
+**The commit-18 decomposition.** The whole `DepositReading` at the commits that zero `R` is dumped,
+read side by side with `R` before and after:
+- the applied step and its moves;
+- the carried entries and the sub-unit tails (the `released` list, `Map` and `Gram`);
+- any `vanished` locus.
+
+**Acceptance (a reading, not a learning claim).**
+- **O1a.** For the twin, whose `R` and source material stay declared, the classes of `f` are
+  reported, and the question is settled exactly: does `f` take a value at the `−2` positions that
+  it takes at no `+1` position? A **yes** means a linear `R` can in principle single out the
+  position; a **no** means this field's receiving read does not carry the cycle's position, and the
+  blocker is the receiving read, not `R`'s steps.
+- **O1b.** The same for the learner, where the source port `E` moves under deposits.
+- **O1c.** At the commits that zero `R`, every entry's applied move is accounted to its step and
+  its tail, and any prior move is named.
+
+No depth, receiver or contact declaration is changed in this read.
+
+### 5, measured (O1, 14:10 UTC)
+
+[measured] ([receipt](receipts/2026-10-10-online-learning/O1_REACHED_FEATURE.v1.json); developer read,
+34395027142 ns, both frames.)
+
+**O1a and O1b: the feature carries the position only at a fine scale.**
+- `f` has the form `(a, −a, b, −b)`. Over the last cycle `a` takes only `1/4`, `205/512` and
+  `241/512`, rising and falling with the cycle, and the `−2` cell sits where `a` peaks.
+- **On `[7, 2]`:**
+  - 10 of the 16 `−2` cells share their feature exactly with some `+1` cell (twin), and 7 of 16
+    for the learner. Exact equality alone refutes separation there: a linear `R` gives those cells
+    the same logits.
+  - In the last cycle, the `−2` cell 117 has `(a, b) = (241/512, 175/512)`, and its `+1` neighbour
+    116 has `(241/512, 349/1024)`: equal `a`, and `b` differing by `1/1024`.
+- **On `[9, 2]`:** no `−2` feature equals any `+1` feature, for either run.
+- On neither frame does `f` repeat with the cycle on the second half; it drifts. The last cycle's
+  seven positions show 7 distinct values (6 for the learner on `[9, 2]`).
+
+**Reading.** Where the receiving read carries the cycle's position at all, it carries it at the
+scale of `2^(−10)` in `f`. The receiving map steps on its lattice `2^(−7)`, and the face reads at
+grain `1/16`. To lift a `2^(−10)` feature difference to one face-grain unit of logit, `R` would need
+entries of order `2^6 = 64`.
+
+**O1c: `R` is zeroed by its prior's moves, not by the descent.**
+- At commit 17 the receiving map's chart reads `PriorMove { from: 7, to: 8 }`, and at commit 18
+  `PriorMove { from: 8, to: 9 }`.
+- Each move rescales the carried `W + r` by its new prior scale. That carries `R`'s entries
+  (`±1/128` before commit 18) below the `2^(−7)` lattice, to zero.
+- The certified steps' own moves stay below one unit throughout.
+- §4's "the descent itself removed `R`" is withdrawn: the prior moves removed it.
+
+**What O2 reads next** (choice (a) of the plan): the receiving map's prior-move law
+(`NormalLaw::moved_prior`, `LocatedPrior`), and why its exponent rises at every commit here; then,
+whether the learned `R` survives a move when its information sits below the new unit (`W` against
+`r`). No declaration is changed until that law is read.

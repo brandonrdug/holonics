@@ -1201,6 +1201,7 @@ fn the_field_learns_a_rings_section_word_online() {
     use holonics::hnn::field::ConstitutionRead;
     use holonics::hnn::port::ReceiptDetail;
     use holonics::hnn::{Current, ExecutionPort, Handle, Reference};
+    use holonics::ratio::Rat;
     use num_traits::Zero;
     use std::time::Instant;
     let (actual, dictionary, tau) = clean_section_word();
@@ -1233,6 +1234,7 @@ fn the_field_learns_a_rings_section_word_online() {
             let phases = resident.admitted()[0].clone();
             let (mut lower, mut upper) = (rat(0, 1), rat(0, 1));
             let (mut tree_sum, mut combined_sum) = (rat(0, 1), rat(0, 1));
+            let mut features: Vec<(usize, Option<Vec<Rat>>)> = Vec::new();
             for n in tau..length {
                 let (pending, _) = reference.refine(&mut resident, &moment, &phases).unwrap();
                 let (staged, compared) = reference
@@ -1246,6 +1248,14 @@ fn the_field_learns_a_rings_section_word_online() {
                     _ => panic!("a compare's receipt"),
                 };
                 let combined = compared.forward.present().unwrap().code_length().unwrap();
+                // §5 (O1): the receiving map's reached feature, f = (g fᵀ)_(i,·) / g_i.
+                let g = compared.forward.present().unwrap().covector().unwrap().logits()[0].clone();
+                let gradient = compared.pullback.present().unwrap().receiving.1.entries().to_vec();
+                let width = gradient.len() / g.len();
+                let feature: Option<Vec<Rat>> = g.iter().position(|gi| !gi.is_zero()).map(|i| {
+                    gradient[i * width..(i + 1) * width].iter().map(|entry| entry / &g[i]).collect()
+                });
+                features.push((n, feature));
                 if n >= length / 2 {
                     lower = lower + &code.lower;
                     upper = upper + &code.upper;
@@ -1257,6 +1267,9 @@ fn the_field_learns_a_rings_section_word_online() {
                 if learner {
                     let deposited = reference.deposit(&mut resident, staged).unwrap();
                     let commit = resident.constitution().commit();
+                    if (17..=18).contains(&commit) {
+                        println!("§dump commit {commit}: {:?}", deposited.deposit);
+                    }
                     if (16..=20).contains(&commit) {
                         let reading = deposited.deposit.into_present().unwrap();
                         let steps: Vec<_> = reading.steps.iter().filter(|(locus, _)| matches!(locus, Locus::ReceivingMap(_))).collect();
@@ -1292,6 +1305,32 @@ fn the_field_learns_a_rings_section_word_online() {
                 );
             }
             println!("§1 frame {:?} {}: cells {}..{} upper sums, tree {tree_sum}, combined {combined_sum}", helix.periods(), if learner { "learner" } else { "twin" }, length / 2, length);
+            // §5 (O1): the feature's classes against the cycle's positions.
+            let who = if learner { "learner" } else { "twin" };
+            let at = |n: usize| features.iter().find(|(m, _)| *m == n).and_then(|(_, f)| f.clone());
+            let minus: Vec<Vec<Rat>> = features.iter().filter(|(n, f)| f.is_some() && dictionary[actual[*n]] == -2).map(|(_, f)| f.clone().unwrap()).collect();
+            let plus: Vec<Vec<Rat>> = features.iter().filter(|(n, f)| f.is_some() && dictionary[actual[*n]] == 1).map(|(_, f)| f.clone().unwrap()).collect();
+            let shared = minus.iter().filter(|f| plus.contains(f)).count();
+            let unread = features.iter().filter(|(_, f)| f.is_none()).count();
+            let periodic = (length / 2..length - tau).all(|n| at(n) == at(n + tau));
+            let mut distinct: Vec<Vec<Rat>> = Vec::new();
+            for n in length - tau..length {
+                if let Some(f) = at(n) {
+                    if !distinct.contains(&f) {
+                        distinct.push(f);
+                    }
+                }
+            }
+            println!(
+                "§5 frame {:?} {who}: features read {} (no nonzero g at {unread}); the -2 cells' features {} of which {shared} also occur at a +1 cell; repeats with the cycle on the second half: {periodic}; distinct among the last cycle's seven: {}",
+                helix.periods(),
+                features.len(),
+                minus.len(),
+                distinct.len()
+            );
+            for n in length - tau..length {
+                println!("§5 frame {:?} {who} cell {n} ({:?}): f {:?}", helix.periods(), dictionary[actual[n]], at(n));
+            }
             sums.push((lower, upper));
         }
         println!(
