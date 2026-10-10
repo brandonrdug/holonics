@@ -84,12 +84,13 @@ The helical code, the encoding every Holon carries, is defined in
   - Admission reads the located key's prospect of the next encounter, with a witness for exactly
     equal code.
   - The landed material is published at held momentum with its exact deposition work.
-- **Measured (developer reads, one fixture):** over six encounters against a twin without landings,
-  four of six landings were admitted (three for the phase, one classical). The learner was never
-  worse in the admission's order, and after the classical landing its code was strictly below the
-  twin's. Without its history the landing's classical gain vanished.
+- **Measured (developer reads, two fixtures):** over six encounters against a twin without landings,
+  the first fixture admitted four of six landings (three for the phase, one classical) and the second
+  admitted one, a classical one, after four typed refusals. On both fixtures the learner was never worse
+  in the admission's order, and after the classical landing its code was strictly below the twin's.
+  Without its history the first fixture's classical gain vanished.
 - **Still owed:** the queue's claim-bearing runs of the latest pins, a cold restore, the
-  two-encounter credit's landing, provenance carrying the located key's identity, a second fixture,
+  two-encounter credit's landing, provenance carrying the located key's identity, more fixtures,
   and the World-sensitive Ask on a field where selection is informative.
 
 **October 6 HNN integration.** The [blind receiving return](research/records/2026-10-06_THE_BLIND_RECEIVING_RETURN_IS_JOINED_BUT_RELEASE_NEEDS_THE_EXECUTED_COUPLED_DOMAIN.md)

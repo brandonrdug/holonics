@@ -479,6 +479,29 @@ typed, and no uncertified step entered. This is one fixture, one declared bank o
 one World. The queue's claim-bearing run, the cold restore, the two-observation delayed credit and any
 second fixture remain.
 
+## 5d. A second fixture
+
+[measured; developer read under the common lease, not claim-bearing]
+`the_world_loop_is_read_on_a_second_fixture`. The World medium has a non-uniform storage
+(`diag(1, 2, 1, 3, 2, 1, 3, 1)`) and the native contact has different factors (storage `(3 + i)/4`
+with upper `1/8`, stiffness `1/(1 + i)` with upper `1/16`, dissipation `1/4`). Both were declared
+before any reading; the laws and the reading are the same as the first fixture's
+([receipt](receipts/2026-10-09-material-tangent/SECOND_FIXTURE_DEV_TESTS.v1.json)):
+
+| round | learner's code against the twin's | learner's excess − twin's | landing read after the round |
+|---|---|---|---|
+| 0 | equal | 0 | refused: code worse (the reading moved at raise 3) |
+| 1 | equal | 0 | unreached: no family reached its lattice |
+| 2 | equal | 0 | refused: phase worse |
+| 3 | equal | 0 | refused: phase worse |
+| 4 | equal | 0 | **classical** (moved at raise 3) |
+| 5 | **strictly below, gap in `[2⁻¹⁰, 2⁻⁹)`** | below, in `[2⁻¹¹, 2⁻¹⁰)` | refused: equal endpoints (moved at raise 4) |
+
+The grain reach declared a worse move in round 0 and the admission refused it, so the scan does not
+select improvements. As on the first fixture, the learner is never worse than its twin in the
+admission's order, and its one classical landing gives a strict code gain at the next encounter. Two
+fixtures with one World law and one contact each remain a small sample.
+
 ## 6. The tangent continues into the next encounter
 
 [definition; agent-inferred, October 9] The stretch of §1 needs a credit that crosses encounters.

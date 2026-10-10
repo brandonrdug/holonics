@@ -1175,3 +1175,72 @@ fn co_clock_twins_cannot_swap_tangents() {
         refused.as_ref().err()
     );
 }
+
+/// A second declared World medium: a non-uniform diagonal storage, declared before any reading.
+fn second_storage() -> Vec<Rat> {
+    [1, 2, 1, 3, 2, 1, 3, 1].iter().map(|&n| integer(n)).collect()
+}
+
+/// A receiver on the second World, with its own key (the World's law) declaring the World's face.
+fn bound_second<'f>(field: &'f Field, theta: Constitution, source: &Encoded) -> PhysicalReceiver<'f> {
+    let mut receiver =
+        PhysicalReceiver::new(field, theta, Current::at_rest(field), WordOpening::Rest).unwrap();
+    receiver
+        .bind_world(world(
+            field,
+            source.part(0..0).unwrap(),
+            medium(&second_storage(), source_input(true)),
+        ))
+        .unwrap();
+    let key = key(field, medium(&second_storage(), source_input(true)))
+        .with_face(ReceiverFace::receiver_state(N, N).unwrap(), N)
+        .unwrap();
+    receiver
+        .bind_world_model(WorldModel::found(vec![key], 0).unwrap())
+        .unwrap();
+    receiver
+}
+
+/// The second fixture's native contact factors, declared before any reading.
+fn second_material(field: &Field, base: Constitution) -> Constitution {
+    let width = Operands::exact_at_cut(field, &base, &Current::at_rest(field))
+        .unwrap()
+        .contacts()[0]
+        .width();
+    base.with_channel(
+        0,
+        factor(width, |i| rat(3 + i as i64, 4), rat(1, 8)),
+        factor(width, |i| rat(1, 1 + i as i64), rat(1, 16)),
+        factor(width, |_| rat(1, 4), Rat::zero()),
+    )
+    .unwrap()
+}
+
+/// **The loop on a second fixture, against its twin** (the record §5c): a different World medium
+/// and different native contact factors, the same laws and the same reading as the first fixture's
+/// loop. Reported as measured.
+#[test]
+fn the_world_loop_is_read_on_a_second_fixture() {
+    let (field, base, source) = fixture();
+    let theta = second_material(&field, base);
+    let control = vec![integer(1)];
+    let mut learner = bound_second(&field, theta.clone(), &source);
+    let mut twin = bound_second(&field, theta.clone(), &source);
+    for round in 0..6 {
+        let (code, excess, decision) = loop_round(&mut learner, &field, &source, &control);
+        let preparation = actuator(&field);
+        let probe = twin
+            .prepare_probe(&source, &field.receivers()[0], &preparation, &[false, true])
+            .unwrap();
+        let waves = admitted(&probe, 0);
+        let reception = probe.encounter(&waves, &control).unwrap();
+        let ActionCommunication::Received(received) = reception.reception else {
+            panic!("the twin's encounter completes");
+        };
+        let ratio = &received.comparison.as_ref().unwrap().returned.ratio;
+        let (twin_code, twin_excess) = (ratio.code_length().unwrap(), ratio.excess().unwrap());
+        println!(
+            "second loop: round {round}: learner code {code:?} excess {excess}; twin code {twin_code:?} excess {twin_excess}; landing {decision}"
+        );
+    }
+}
