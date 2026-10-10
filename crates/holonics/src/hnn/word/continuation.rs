@@ -1824,6 +1824,49 @@ impl MaterialTangent {
         })
     }
 
+    /// [definition; agent-inferred, October 10; the held-carry record §7g] **A state tangent**: the
+    /// passage's change along a change `χ₀` of its opening state and `ψ₀` of the World's state across
+    /// `ring`'s port, with no material direction. The tick law's material term vanishes, so it carries
+    /// the passage's linear part alone (`χ_(k+1) = T_k χ_k`, eq. 2). `contact` names the contact whose
+    /// executed forms its crossings compare. `χ₀` has the opening change's own shape.
+    pub fn state_seed(
+        word: &Word<'_>,
+        commit: u64,
+        contact: usize,
+        chi: EndChange,
+        psi: Vec<Rat>,
+        ring: usize,
+    ) -> Result<Self, HnnError> {
+        let direction = MaterialDirection {
+            contact,
+            storage: None,
+            stiffness: None,
+            dissipation: None,
+        };
+        let mut tangent = Self::held_opening(word, commit, direction)?;
+        let shaped = chi.storage.len() == tangent.tangent.storage.len()
+            && chi
+                .storage
+                .iter()
+                .zip(&tangent.tangent.storage)
+                .all(|(a, b)| a.len() == b.len())
+            && chi.arrivals.len() == tangent.tangent.arrivals.len()
+            && chi.states.len() == tangent.tangent.states.len()
+            && chi.resonators.len() == tangent.tangent.resonators.len();
+        if !shaped {
+            return Err(HnnError::Unadmitted {
+                reason: "a state tangent's opening change has the Word's own shape",
+            });
+        }
+        let phases = tangent.tangent.resonator_phases.clone();
+        tangent.tangent = EndChange {
+            resonator_phases: phases,
+            ..chi
+        };
+        tangent.port = Some((ring, psi));
+        Ok(tangent)
+    }
+
     /// [definition; agent-inferred, October 10; the held-carry record §7b] **The opening's own
     /// tangent where a Word opens on a carry crossed into this material at held momentum**
     /// (`ReceptionCarry::crossed`, `C′ w′ = π`): at fixed carried momentum `π`, a storage direction
@@ -2245,10 +2288,7 @@ pub fn world_descent(
             found: tangents.len(),
         });
     }
-    // Per family, each entry's classical and phase gradients, one pair per observation.
-    type Entries = Vec<Vec<Option<Vec<(Rat, Rat)>>>>;
-    let mut families: std::collections::BTreeMap<(usize, usize), Entries> =
-        std::collections::BTreeMap::new();
+    let mut credits = Vec::with_capacity(coordinates.len());
     for (index, coordinate) in coordinates.iter().enumerate() {
         let direction = MaterialDirection::of_coordinate(field, theta, coordinate)?;
         if observations
@@ -2259,6 +2299,46 @@ pub fn world_descent(
                 reason: "each material tangent carries its declared coordinate's direction",
             });
         }
+        let mut per = Vec::with_capacity(observations.len());
+        for (tangents, ratio) in observations {
+            let credit = tangents[index].comparison_credit(ratio)?;
+            per.push((
+                credit.magnitude.clone(),
+                &credit.produced_phase + &credit.observed_phase,
+            ));
+        }
+        credits.push(per);
+    }
+    descent_from_credits(theta, coordinates, &credits, held)
+}
+
+/// [definition; agent-inferred, October 10; the held-carry record §7g] **The descent from declared
+/// credits**: [`world_descent`]'s law on credits already formed, one `(classical, phase)` pair per
+/// observation for each declared coordinate (the cycle's credits are combinations of tangents' credits,
+/// not one tangent's). Refused for a coordinate declared twice, unequal observation counts, or a
+/// family the held return did not reach.
+pub fn descent_from_credits(
+    theta: &Constitution,
+    coordinates: &[super::variation::ContactCoordinate],
+    credits: &[Vec<(Rat, Rat)>],
+    held: &[crate::hnn::constitution::FactorStep],
+) -> Result<Vec<crate::hnn::constitution::FactorStep>, HnnError> {
+    let observations = credits.first().map_or(0, Vec::len);
+    if credits.len() != coordinates.len()
+        || observations == 0
+        || credits.iter().any(|c| c.len() != observations)
+    {
+        return Err(HnnError::Shape {
+            what: "one credit per observation for each declared coordinate",
+            expected: coordinates.len(),
+            found: credits.len(),
+        });
+    }
+    // Per family, each entry's classical and phase gradients, one pair per observation.
+    type Entries = Vec<Vec<Option<Vec<(Rat, Rat)>>>>;
+    let mut families: std::collections::BTreeMap<(usize, usize), Entries> =
+        std::collections::BTreeMap::new();
+    for (coordinate, per) in coordinates.iter().zip(credits) {
         let a = coordinate.contact;
         let factor = [
             theta.contact_storage(a),
@@ -2274,32 +2354,23 @@ pub fn world_descent(
                 reason: "a contact coordinate is declared once",
             });
         }
-        // Each observation's credit at its own frozen covector.
-        let mut credits = Vec::with_capacity(observations.len());
-        for (tangents, ratio) in observations {
-            let credit = tangents[index].comparison_credit(ratio)?;
-            credits.push((
-                credit.magnitude.clone(),
-                &credit.produced_phase + &credit.observed_phase,
-            ));
-        }
-        *slot = Some(credits);
+        *slot = Some(per.clone());
     }
     let mut steps = Vec::new();
     for ((a, family), entries) in families {
         let rows = entries.len();
         let columns = entries.first().map_or(0, Vec::len);
-        let zero = vec![(Rat::zero(), Rat::zero()); observations.len()];
+        let zero = vec![(Rat::zero(), Rat::zero()); observations];
         let entries: Vec<Vec<(Rat, Rat)>> = entries
             .into_iter()
             .flatten()
             .map(|x| x.unwrap_or_else(|| zero.clone()))
             .collect();
         // Each observation's classical and phase gradients over the family's entries.
-        let classical: Vec<Vec<Rat>> = (0..observations.len())
+        let classical: Vec<Vec<Rat>> = (0..observations)
             .map(|o| entries.iter().map(|e| e[o].0.clone()).collect())
             .collect();
-        let phase: Vec<Vec<Rat>> = (0..observations.len())
+        let phase: Vec<Vec<Rat>> = (0..observations)
             .map(|o| entries.iter().map(|e| e[o].1.clone()).collect())
             .collect();
         let descent = common_descent(&classical, &phase);

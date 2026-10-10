@@ -868,9 +868,10 @@ assumes an orbit exists, so two reads were made before it was built.
   This is finite measured recurrence at the receiver's grain, not an exact state periodicity, an
   indefinite settlement of `R` or a certificate of convergence (Epime's precision).
   - `R` moves at encounters 0 to 9 and at none of encounters 10 to 39.
-  - From about encounter 23 on, every reading recurs with period 2 at the receiver's grain: at
-    `u = 1` code in `[2⁰, 2¹)` and excess in `[2⁻⁷, 2⁻⁶)`; at `u = −1` code in `[2⁰, 2¹)` and excess
-    in `[2⁻⁶, 2⁻⁵)`.
+  - From about encounter 23 on, the exact code enclosures repeat two apart, and the excess's dyadic
+    brackets recur: at `u = 1`, excess in `[2⁻⁷, 2⁻⁶)`; at `u = −1`, in `[2⁻⁶, 2⁻⁵)`. The exact
+    rational excesses still change two apart (Epime's precision). Only the brackets recur, not the
+    complete exact receipt.
   - The recurring readings are **worse** than the opening: the excess began at `[2⁻⁹, 2⁻⁸)` and
     `[2⁻⁷, 2⁻⁶)`.
 
@@ -929,4 +930,56 @@ with Epime's conditions:
 - `I − M` invertible on a stated domain;
 - the admitted future including any receiving deposits, or restricted to where `R` does not move;
 - no convergence claimed beyond what is measured.
+
+### 7g. The cycle of the schedule: an exact closed orbit, its credit, and where the passage goes
+
+[definition; agent-inferred, October 10] `hnn::physical::action::cycle` builds §7d's law on §7f's
+schedule run (`round_from`).
+- **The round map.** One run of the repeated schedule is affine in the joint opening state
+  `x = (χ, ξ)`: the native opening change, flattened, and the key's state.
+- **`M`.** Its columns are state tangents (`MaterialTangent::state_seed`: `χ₀ = eᵢ` or `ψ₀ = eⱼ`, no
+  material term) ridden through one run, each read at the next opening (eq. 3) and in the World's
+  state.
+- **The closed orbit** is `x* = x_p + (I − M)⁻¹ (F(x_p) − x_p)`. It is opened by a carry whose crossing
+  into the same material is the identity (`π_a = C_a w_a`).
+- **Its credit along a material direction** is `credit(T_H; r_e) + Σᵢ (δx*)ᵢ credit(Sᵢ; r_e)` with
+  `(I − M) δx* = δF`. The tangents are linear in their opening, so this combination is exact.
+- **The descent from these credits** is `descent_from_credits`, the common descent on credits
+  already formed. `world_descent` is now its tangents case.
+- `world_cycle_proposal` and `AdmittedFuture::Cycle` admit on the orbit's encounters.
+
+**Checked, each a refusal when it fails:**
+- the key's charts recur one run later;
+- the pump phases recur at the next opening;
+- `I − M` is invertible;
+- the opening on `x*` is exactly `x*`;
+- the run from `x*` returns to `x*` exactly;
+- its state tangents give the same `M`.
+
+**Not claimed:** convergence of the actual passage (the spectrum of `M` is not certified), or
+anything about `R`'s deposits. The cycle holds the receiving material fixed. It is the fixed-`R`
+orbit.
+
+[measured; developer reads, not claim-bearing;
+[receipt](receipts/2026-10-09-material-tangent/CYCLE_DEV_TESTS.v1.json)]
+- **The cycle closes and its credit is exact** (`the_cycle_closes_and_is_credited_at_its_consumer`,
+  fixture 1, after twelve encounters). The round map's dimension is 40, and every check passes. The
+  orbit's encounters read code within `2⁻⁹⁶` of `1` at both waves (one enclosure), with excess in
+  `[2⁻⁷, 2⁻⁶)` at `u = 1` and `[2⁻⁶, 2⁻⁵)` at `u = −1`. Along one storage direction the orbit's
+  classical credit is exactly `0`, and its phase credit is confirmed to second order on `θ ± εH`: from
+  `ε = 2⁻⁵` on, each halving divides the residual by a ratio in `(63/16, 65/16)`.
+- **The orbit is where the passage goes** (`the_cycle_is_where_the_passage_goes`). The orbit computed
+  after encounter 12 was compared with the actual readings of encounters 38 and 39 of the same
+  passage, with no landing. The code enclosures are equal at both. The excesses lie in the orbit's
+  brackets and are still approaching them: actual minus orbit is `−[2⁻¹⁵, 2⁻¹⁴)` at `u = 1` and
+  `−[2⁻¹⁰, 2⁻⁹)` at `u = −1`. Over these encounters the exact closed orbit of the fixed-`R` schedule is
+  where the passage's readings go. That is a measurement on one fixture, not a convergence
+  certificate.
+
+**The next source issue** (Epime's review, October 10). The schedule run, and the cycle on it, carry
+one immutable material. The actual execution constructs the observed receiving return, deposits it,
+and publishes the receiving material before the next encounter. The after-2 mismatch of §7f measures
+exactly that omission. The prospective run must join the existing receiving publication and its
+retained update state. Alternatively, a fixed-receiving admitted future must be made enforceable. A
+longer horizon does not repair it.
 

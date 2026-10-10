@@ -2664,3 +2664,151 @@ fn the_schedule_loop_is_read_on_a_second_fixture() {
     schedule_loop("second", true);
 }
 
+// ---- The cycle of the schedule (the held-carry record §7g) ----
+
+/// **The cycle closes, and its credit is exact** (§7g): after twelve encounters, the closed orbit of
+/// the repeated schedule (`u = 1`, `u = −1`) on the present material, with the orbit's credit along
+/// one storage direction. On `θ ± εH` (the present receiving relation kept) the two orbit encounters'
+/// parts at their frozen covectors confirm the credit to second order on `ε = 2⁻⁴ … 2⁻⁸`.
+#[test]
+fn the_cycle_closes_and_is_credited_at_its_consumer() {
+    let (field, base, source) = fixture();
+    let declared = Declared::new(&field, base);
+    let direction = declared.storage_direction(&field);
+    let mut receiver = bound(
+        &field,
+        declared.at(&Rat::zero()),
+        &source,
+        vec![faced_key(&field)],
+    );
+    plain_passage(&mut receiver, &field, &source, 12);
+    let present = receiver.constitution().clone();
+    let preparation = actuator(&field);
+    let [first, second] = chain_controls();
+    let schedule: [&[Rat]; 2] = [&first, &second];
+    let reading = receiver
+        .world_cycle(
+            &present,
+            &source,
+            &field.receivers()[0],
+            &preparation,
+            &[false, true],
+            &schedule,
+            &[direction],
+        )
+        .unwrap();
+    println!("cycle: dimension {}", reading.dimension);
+    let mut credit = [Rat::zero(), Rat::zero()];
+    let mut covectors = Vec::new();
+    for (k, encounter) in reading.encounters.iter().enumerate() {
+        credit[0] += &reading.credits[k][0].0;
+        credit[1] += &reading.credits[k][0].1;
+        covectors.push(encounter.ratio.covector().unwrap().logits().to_vec());
+        println!(
+            "cycle: orbit encounter {k}: code {:?} excess {}",
+            encounter.ratio.code_length().unwrap(),
+            encounter.ratio.excess().unwrap()
+        );
+    }
+    println!("cycle credit: classical {}, phase {}", credit[0], credit[1]);
+    let parts_at = |epsilon: &Rat| -> [Rat; 2] {
+        let reading = receiver
+            .world_cycle(
+                &declared.on(&present, epsilon),
+                &source,
+                &field.receivers()[0],
+                &preparation,
+                &[false, true],
+                &schedule,
+                &[],
+            )
+            .unwrap();
+        let mut total = [Rat::zero(), Rat::zero()];
+        for (k, encounter) in reading.encounters.iter().enumerate() {
+            let logits: Vec<StationLogits> = encounter
+                .prospect
+                .point
+                .features
+                .iter()
+                .zip(&encounter.prospect.faces)
+                .enumerate()
+                .map(|(rank, ((_, _, logits), (_, face)))| StationLogits {
+                    station: rank,
+                    produced: logits.clone(),
+                    observed: face.clone(),
+                })
+                .collect();
+            let p = parts(&covectors[k], &logits);
+            total[0] += &p[0];
+            total[1] += &p[1] + &p[2];
+        }
+        total
+    };
+    let mut residuals: Vec<(Rat, [Rat; 2])> = Vec::new();
+    for j in 4..9 {
+        let epsilon = rat(1, 1i64 << j);
+        let up = parts_at(&epsilon);
+        let down = parts_at(&-epsilon.clone());
+        let two = integer(2) * &epsilon;
+        let r: [Rat; 2] = std::array::from_fn(|k| ((&up[k] - &down[k]) / &two - &credit[k]).abs());
+        println!("cycle credit: ε = 2^-{j}: central residuals {} {}", r[0], r[1]);
+        residuals.push((epsilon, r));
+    }
+    for k in 0..2 {
+        let (first_epsilon, first) = &residuals[0];
+        let scaled_first = &first[k] / (first_epsilon * first_epsilon);
+        for pair in residuals.windows(2) {
+            assert!(
+                pair[1].1[k].clone() * integer(2) <= pair[0].1[k],
+                "part {k}: the residual halves at least"
+            );
+        }
+        for (epsilon, residual) in &residuals {
+            assert!(
+                &residual[k] / (epsilon * epsilon) <= &scaled_first * integer(2),
+                "part {k}: the residual stays O(ε²)"
+            );
+        }
+    }
+}
+
+/// **Where the passage goes** (§7g): the orbit computed after twelve encounters, against the actual
+/// readings of encounters 38 and 39 of the same passage (no landing). Reported as measured: whether
+/// the actual readings reach the orbit's at the receiver's grain, and their exact differences.
+#[test]
+fn the_cycle_is_where_the_passage_goes() {
+    let (field, base, source) = fixture();
+    let theta = Declared::new(&field, base).at(&Rat::zero());
+    let mut receiver = bound(&field, theta, &source, vec![faced_key(&field)]);
+    plain_passage(&mut receiver, &field, &source, 12);
+    let present = receiver.constitution().clone();
+    let preparation = actuator(&field);
+    let [first, second] = chain_controls();
+    let schedule: [&[Rat]; 2] = [&first, &second];
+    let reading = receiver
+        .world_cycle(
+            &present,
+            &source,
+            &field.receivers()[0],
+            &preparation,
+            &[false, true],
+            &schedule,
+            &[],
+        )
+        .unwrap();
+    plain_passage(&mut receiver, &field, &source, 26);
+    for (k, control) in schedule.iter().enumerate() {
+        let actual = second_comparison(&mut receiver, &field, &source, control);
+        let orbit = &reading.encounters[k].ratio;
+        println!(
+            "cycle limit: encounter {}: actual code {:?} excess {}; orbit code {:?} excess {}; equal code {}",
+            38 + k,
+            actual.0,
+            actual.1,
+            orbit.code_length().unwrap(),
+            orbit.excess().unwrap(),
+            actual.0 == orbit.code_length().unwrap()
+        );
+    }
+}
+
