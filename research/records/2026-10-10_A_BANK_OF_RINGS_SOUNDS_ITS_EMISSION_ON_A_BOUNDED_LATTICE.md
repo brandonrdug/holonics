@@ -1239,3 +1239,59 @@ read at the ring's own distance cap, and its emission decodes the whole word.
 - On this short cycle the located description costs more than the near-return. No compression is
   claimed.
 - The amplitude and phase fibre, and through it the samples, stays unbound. That is §29's subject.
+
+## 29. The source codec with its cells supplied by the ring's section word (acceptance fixed before code)
+
+[definition; agent-inferred, October 10] The cell codec (§18–§20) writes, for each tick, the next
+state's cell (its quadrant, 3 bits, or the origin) and then the sample's index in that cell's
+interval. Within a settled window, that cell is the landing class of the section word's symbol. The
+section word therefore supplies the cell stream, and the index is the fibre: each state's amplitude
+and phase inside its cell, and through the inverse tick, the sample. This binds what §28 left
+unbound, on the recording itself.
+
+**The code.**
+- The ring's stream is tiled into blocks of the census window, four of the ring's turns
+  (`half_memory`). The last block may be shorter.
+- Each block carries one flag bit:
+  - **Flag set.** The block opens on a state off the origin, and its section word's near-return is
+    admitted. The emission is the owner's `NearReturn::code` (`L_τ` bits); then, per tick, the octant
+    bit when the octant grain is declared, and the index.
+  - **Flag clear.** Per tick, as the cell codec: the 3-bit cell, the octant bit and the index.
+- The start class is not written: the decoder holds the state the block opens on. Neither is the
+  window: the decoder derives it from the declared ring.
+
+**Acceptance.**
+- **C1, exact.** An independent decoder, given only the bytes and the declared ladder, returns every
+  PCM sample exactly. Per tick, the regenerated state lands in the cell it read (from the decoded
+  word or from the cell bits), and the inverse tick returns the sample.
+- **C2, charged.** Reported together:
+  - the emitted bits;
+  - the cell codec's bits on the same stream and grain, counted by the encoder from the same
+    per-tick widths;
+  - the blocks read and admitted;
+  - the raw 16-bit PCM.
+
+  The difference from the cell codec is claimed exactly as measured. It is the class stream's
+  near-return structure (the ring's own cycles), not learned content, and the indices are unchanged.
+- **The read.** Ring 20 (the codec's ring), quarter and octant grain:
+  - a development read of 2000 ticks;
+  - then a declared prefix of 20000 ticks, projected from that read;
+  - the whole recording only by its own stated authorization: the octant codec's full run took
+    464561780139 ns.
+
+**Expected from the census** (§11's N3 on ring 20: 2550 of 5222 windows admitted, 127525 bits
+against 153000 spelled over them): a saving on the cell stream of a few percent of the cell bits,
+less one flag per block. That is small beside the indices. It is stated now so that the
+measurement can correct it.
+
+**Development read** ([receipt](receipts/2026-10-10-acoustic-release/S29_DEV.v1.json)): ring 20, the
+recording's first 2000 ticks. The near-return tests also assert `|code| = L_τ` and the read-back, and
+refuse a code cut short (`LockRefusal::Code`).
+- **C1 met at both grains.** The decode equals the source exactly.
+- **C2 at the quarter grain:** 28072 bits emitted against the cell codec's 28029.
+- **C2 at the octant grain:** 24479 against 24436.
+- At both grains 12 of the 100 blocks are admitted. Their words take 663 bits in place of 720 cell
+  bits, and the 100 flag bits outweigh the 57 saved. On this prefix the code is 43 bits longer than
+  the cell codec.
+
+The census's whole-recording admission is higher (2550 of 5222 windows), so the full read decides C2.

@@ -1,0 +1,39 @@
+{
+  "scope": "Local developer reads by opus under the common lease (announced), not claim-bearing: bank record section 29, development reads.",
+  "runs": [
+    {
+      "scope": "the near-return tests with the code length and read-back asserted",
+      "log_sha256": "ea4be4bbed6ea75aa5702c7aa48e037e882223cf834e4c5379cb8be29e266e33",
+      "lines": [
+        "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 23 filtered out; finished in 16.47s",
+        "BOUNDED start 07:48:28 end 07:49:07 exit 0 wall_ns 38847458377 child_peak_rss_kib 2406580"
+      ]
+    },
+    {
+      "scope": "development read, ring 20, 2000 ticks, quarter grain",
+      "log_sha256": "1eb30798435fc18a62372c20ebff6fecd3ecd42219774ff201e7901c9624eb43",
+      "lines": [
+        "nrcodec ring 20 (octant grain: false): 2000 ticks; emitted 28072 bits before padding; the cell codec on the same stream and grain 28029 bits; blocks of 20 ticks: 100 read, 12 admitted, their words 663 bits replacing 720 cell bits, flags 100 bits; emitted 3509 bytes = 28072 bits; raw 32000 bits; decode equals the source exactly: true; encoded at 4786 ms, decoded at 9646 ms",
+        "BOUNDED start 07:49:21 end 07:49:30 exit 0 wall_ns 9648147133 child_peak_rss_kib 13164"
+      ]
+    },
+    {
+      "scope": "development read, ring 20, 2000 ticks, octant grain",
+      "log_sha256": "6c8740936c4f8c1255c5e44a2dee79c79e64f7a97aab419fbfad68c452d23ce5",
+      "lines": [
+        "nrcodec ring 20 (octant grain: true): 2000 ticks; emitted 24479 bits before padding; the cell codec on the same stream and grain 24436 bits; blocks of 20 ticks: 100 read, 12 admitted, their words 663 bits replacing 720 cell bits, flags 100 bits; emitted 3060 bytes = 24480 bits; raw 32000 bits; decode equals the source exactly: true; encoded at 5056 ms, decoded at 10120 ms",
+        "BOUNDED start 07:49:21 end 07:49:31 exit 0 wall_ns 10122472169 child_peak_rss_kib 13732"
+      ]
+    },
+    {
+      "scope": "gate 1 on the section 29 source",
+      "log_sha256": "66954fb8c072581b084c2a77c9b9a48ab27a38f4b4f3ea43c58969a4ff2716bb",
+      "lines": [
+        "gate check: ok (4045 ms)",
+        "gate guard-lints: ok (9488 ms)",
+        "gate guard-doctests: ok (24496 ms)",
+        "BOUNDED start 07:49:48 end 07:50:26 exit 0 wall_ns 38053968423 child_peak_rss_kib 2264632"
+      ]
+    }
+  ]
+}

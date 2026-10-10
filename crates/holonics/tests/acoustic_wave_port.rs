@@ -31,7 +31,7 @@ use holonics::hnn::HnnError;
 use holonics::hnn::dynamic_section::{RAYS, SectionReader, SectionRefusal, SectionSymbol, chord};
 use holonics::hnn::ring::{PumpDeclaration, PumpStep, ResonatorMaterial, ResonatorOperands};
 use holonics::hnn::section_lock::{
-    Arrival, JointLock, JointRefusal, Lock, LockReader, LockRefusal, LockWindow, SectionRelation,
+    Arrival, JointLock, JointRefusal, Lock, LockReader, LockRefusal, LockWindow, NearReturn, SectionRelation,
     SectionWord, Settled,
 };
 use holonics::hnn::wave::{MatchedWave, ReceivedTick, WavePort};
@@ -1214,6 +1214,11 @@ fn the_near_return_decodes_its_window_and_the_exact_lock_is_its_zero_defect_case
                 assert_eq!(&near.decode().unwrap(), word, "N1: the decode is the window's word");
                 let (bits, raw) = near.bits();
                 assert!(bits < raw);
+                // §29: the emitted code has the priced length and reads back the word.
+                let code = near.code();
+                assert_eq!(code.len() as u64, bits, "the code is L_τ bits");
+                let read = NearReturn::read(&mut code.iter().copied(), word.start_class().unwrap(), lock_window().length());
+                assert_eq!(&read.unwrap(), word, "the code reads back the window's word");
             }
             if let Ok(lock) = exact {
                 let near = near.expect("N2: an exact lock is admitted as a near-return");
@@ -1245,6 +1250,16 @@ fn a_near_periodic_window_keeps_its_departure_as_defects() {
     };
     assert_eq!(&near.decode().unwrap(), word);
     assert!(!near.defects().is_empty());
+    // §29: the code keeps the defects; a code cut short is refused, typed.
+    let code = near.code();
+    assert_eq!(code.len() as u64, near.bits().0);
+    let start = word.start_class().unwrap();
+    let length = lock_window().length();
+    assert_eq!(&NearReturn::read(&mut code.iter().copied(), start, length).unwrap(), word);
+    assert!(matches!(
+        NearReturn::read(&mut code[..code.len() - 1].iter().copied(), start, length),
+        Err(LockRefusal::Code { .. })
+    ));
     let exact = settled(&run(&integer(1), &cycle_of(&F1, SAMPLES))).unwrap();
     let clean = exact.lock(&lock_window()).unwrap();
     let (bits, raw) = near.bits();
