@@ -70,6 +70,28 @@ The helical code, the encoding every Holon carries, is defined in
 - **Still owed:** the opening's held-crossing term `J_open` with its certificate, learning across different
   observations and families, the World-sensitive circuit, and generation learning from its own release.
 
+**October 9: the World teaches the contact material** (#73; the
+[held-carry record](research/records/2026-10-09_THE_ASKED_ENCOUNTER_TEACHES_THE_MATERIAL_THROUGH_ITS_HELD_CARRY.md)).
+- **The tangent:** a contact direction's forward tangent shares the held variation's one tick law
+  (`Word::contact_forms_variation`). It crosses the World port through the one live key, is credited
+  with the encounter's own comparison through the World's face, and continues into the next
+  encounter. Each is checked against the actual World at second order. The queue passed the credit
+  (4f248fac).
+- **The landing:** experience proposes and the located model admits.
+  - The proposal is bound to its encounter (`PhysicalReceiver::world_proposal`).
+  - The descent follows the admission's order (§5a).
+  - The step is declared at the first reach of the receiver's grain (§5c).
+  - Admission reads the located key's prospect of the next encounter, with a witness for exactly
+    equal code.
+  - The landed material is published at held momentum with its exact deposition work.
+- **Measured (developer reads, one fixture):** over six encounters against a twin without landings,
+  four of six landings were admitted (three for the phase, one classical). The learner was never
+  worse in the admission's order, and after the classical landing its code was strictly below the
+  twin's. Without its history the landing's classical gain vanished.
+- **Still owed:** the queue's claim-bearing runs of the latest pins, a cold restore, the
+  two-encounter credit's landing, provenance carrying the located key's identity, a second fixture,
+  and the World-sensitive Ask on a field where selection is informative.
+
 **October 6 HNN integration.** The [blind receiving return](research/records/2026-10-06_THE_BLIND_RECEIVING_RETURN_IS_JOINED_BUT_RELEASE_NEEDS_THE_EXECUTED_COUPLED_DOMAIN.md)
 now consumes its actual continuing Word's pullback and the existing normal deposition at R.
 The committed physical lane passes two teaching controls and retained carry: a reached deposit
