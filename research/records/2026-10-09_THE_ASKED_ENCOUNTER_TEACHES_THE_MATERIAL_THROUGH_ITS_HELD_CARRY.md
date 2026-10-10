@@ -479,3 +479,29 @@ typed, and no uncertified step entered. This is one fixture, one declared bank o
 one World. The queue's claim-bearing run, the cold restore, the two-observation delayed credit and any
 second fixture remain.
 
+## 6. The tangent continues into the next encounter
+
+[definition; agent-inferred, October 9] The stretch of §1 needs a credit that crosses encounters.
+`MaterialTangent::continued` crosses a tangent's carry into the next opening by eq. (3),
+`χ_open = Π_int B_ref χ_carry`. It keeps the World's state tangent `ψ` as it is, because the World's
+state persists between encounters and steps only during them. `rebind` then ties the continued
+tangent to the next Word, refusing unless the opening tick, the contact's executed forms and the
+change's shape are all the same. The receiving publication between the encounters moves the commit,
+never the contact. The receiving map is a readout, held as an exterior control that the tangent does
+not differentiate (the learner's own deposit is not differentiated, as in
+`ContactVariationAction`). `PreparedPhysicalProbe::encounter_continued` carries the continued
+tangents through the next encounter's World port. Each tangent is also bound to its encounter's
+applied source wave, so co-clock twins taught at different controls cannot swap tangents
+(`co_clock_twins_cannot_swap_tangents`). **Provenance limit:** the binding does not carry the located
+key's identity, so arbitrary-encounter provenance across receivers with different keys is not
+certified (written beside `PhysicalReceiver::world_proposal`).
+
+[measured; developer read under the common lease, not claim-bearing]
+`the_tangent_continues_into_the_next_encounter`: after two encounters on `θ ± εH`, the World's
+configuration and the native carry both confirm `ψ` and `χ` to second order on `ε = 2⁻⁴ … 2⁻⁸`. Each
+halving divides the World residual and the carry residual by a ratio in `(63/16, 4)`. All nine World
+tests pass (00:11:46–00:13:02, exit 0, child peak 2,028,788 KiB;
+[receipt](receipts/2026-10-09-material-tangent/CONTINUED_DEV_TESTS.v1.json)). This is the derivative
+the two-observation delayed credit consumes. Pairing it with the second encounter's comparison
+(`comparison_credit` on the continued tangent) and landing on it are the next build.
+

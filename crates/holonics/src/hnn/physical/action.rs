@@ -406,6 +406,7 @@ impl PreparedPhysicalAction<'_, '_> {
                 opening,
             },
             &[],
+            Vec::new(),
             &mut Vec::new(),
         )
     }
@@ -560,11 +561,17 @@ impl<'f> PhysicalReceiver<'f> {
     /// [definition; agent-inferred, October 9; the held-carry record §5] **Bind a World-sensitive
     /// proposal to the encounter that located it.** `received` is this receiver's latest teaching
     /// encounter, and `tangents` are the tangents it carried, one per raw coordinate. Every tangent
-    /// must have ridden that encounter: based at its producing commit, opened at its Word's opening
-    /// tick and followed to its last tick. The receiver must still stand where that encounter left it:
+    /// must have ridden that encounter: based at its producing commit, bound to its applied source
+    /// wave (the control's identity, which co-clock twins at different controls do not share),
+    /// opened at its Word's opening tick and followed to its last tick. The receiver must still stand where that encounter left it:
     /// the material at the encounter's own receiving publication (or the producing commit when it
     /// published nothing), the World model at the encounter's World tick, and the carried current the
     /// encounter published.
+    /// **Provenance limit** (Epime's review): the binding identifies the encounter by its producing
+    /// commit, applied source wave, Word clock, World tick and carry. It does not carry the located
+    /// World key's identity, so two receivers whose different located keys share commit, clock,
+    /// control and carry could swap tangents. Arbitrary-encounter provenance is not certified; the
+    /// paired single-receiver use is.
     /// The descent is assembled on the present material ([`world_descent`]); a coordinate whose
     /// contact factor has changed no longer matches its tangent's direction and refuses. The ratio,
     /// the normalizing contact steps, the reach and the opening clock are all read from `received`
@@ -588,6 +595,7 @@ impl<'f> PhysicalReceiver<'f> {
         if producing_commit != received.applied.producing_commit()
             || tangents.iter().any(|t| {
                 t.commit() != producing_commit
+                    || t.source() != received.applied.actual_source_wave()
                     || t.opened_at() != received.encounter.before_native_tick
                     || t.opened_at() + t.ticks() != received.encounter.after_native_tick
             })
@@ -917,6 +925,7 @@ impl<'f> PhysicalReceiver<'f> {
         applied: AppliedPortPreparation,
         frame: ActionFrame,
         directions: &[MaterialDirection],
+        continued: Vec<MaterialTangent>,
         tangents: &mut Vec<MaterialTangent>,
     ) -> Result<ActionCommunication, HnnError> {
         let ActionFrame {
@@ -947,7 +956,12 @@ impl<'f> PhysicalReceiver<'f> {
         // exactly one live key, whose charts then stand for it. Otherwise the teaching encounter is
         // refused before any physical work.
         let mut located = None;
-        if !directions.is_empty() {
+        if !directions.is_empty() && !continued.is_empty() {
+            return Err(HnnError::Unadmitted {
+                reason: "a teaching encounter opens its tangents or continues them, not both",
+            });
+        }
+        if !directions.is_empty() || !continued.is_empty() {
             let model = self.world_model().ok_or(HnnError::Unadmitted {
                 reason: "a teaching encounter reads its bound World model",
             })?;
@@ -969,6 +983,20 @@ impl<'f> PhysicalReceiver<'f> {
                     MaterialTangent::held_opening(&word, producing.commit(), direction.clone())?
                         .with_port(applied.ring(), located_key.extent()),
                 );
+            }
+            // [agent-inferred; the record §6] A continued tangent crosses into this Word at its
+            // opening (eq. 3) and keeps the World's state tangent, across the same port.
+            for mut tangent in continued {
+                tangent.rebind(&word, producing.commit())?;
+                if tangent.port() != Some((applied.ring(), located_key.extent())) {
+                    return Err(HnnError::Unadmitted {
+                        reason: "a continued tangent crosses the same World port with the same key extent",
+                    });
+                }
+                tangents.push(tangent);
+            }
+            for tangent in tangents.iter_mut() {
+                tangent.bind_source(applied.actual_source_wave());
             }
             located = Some((located_key, model.tick()));
         }
@@ -1885,6 +1913,30 @@ impl PreparedPhysicalProbe<'_, '_> {
         control: &[Rat],
         directions: &[MaterialDirection],
     ) -> Result<(ProbeReception, Vec<MaterialTangent>), HnnError> {
+        self.encounter_with_tangents(admitted, control, directions, Vec::new())
+    }
+
+    /// **Execute the probe carrying tangents continued from the previous encounter** (the
+    /// held-carry record §6): exactly [`Self::encounter`]'s execution, with each tangent of the
+    /// previous teaching encounter crossed into this Word's opening
+    /// ([`MaterialTangent::continued`]) and rebound to it, the World's state tangent carried. Refused
+    /// before any physical work unless the World model holds exactly one live key.
+    pub fn encounter_continued(
+        self,
+        admitted: &AdmittedWaves,
+        control: &[Rat],
+        continued: Vec<MaterialTangent>,
+    ) -> Result<(ProbeReception, Vec<MaterialTangent>), HnnError> {
+        self.encounter_with_tangents(admitted, control, &[], continued)
+    }
+
+    fn encounter_with_tangents(
+        self,
+        admitted: &AdmittedWaves,
+        control: &[Rat],
+        directions: &[MaterialDirection],
+        continued: Vec<MaterialTangent>,
+    ) -> Result<(ProbeReception, Vec<MaterialTangent>), HnnError> {
         let Self {
             owner,
             word,
@@ -1932,6 +1984,7 @@ impl PreparedPhysicalProbe<'_, '_> {
                 opening,
             },
             directions,
+            continued,
             &mut tangents,
         )?;
         let discrepancy = discrepancy_of(&reception, station, grain, prediction.as_ref());

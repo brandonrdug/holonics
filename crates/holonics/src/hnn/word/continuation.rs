@@ -1648,6 +1648,12 @@ pub struct MaterialTangent {
     /// The tangent's reading at each compared station of its own encounter, bounded by the
     /// receiver's aperture and consumed by that encounter's comparison.
     stations: Vec<StationTangent>,
+    /// The direction's contact's executed forms `(C, K, D)` at the opening it was based on: a
+    /// continuation crosses only into a Word whose contact material is the same.
+    forms: [ExactRatMatrix; 3],
+    /// The applied source wave of the encounter the tangent rides (its control's identity), bound at
+    /// that encounter's execution; empty before.
+    source: Vec<Rat>,
 }
 
 /// [definition; agent-inferred, October 9] **The tangent at one compared station** of the encounter
@@ -1730,6 +1736,8 @@ impl MaterialTangent {
                 });
             }
         }
+        let (c, k, d) = contact.forms();
+        let forms = [c.clone(), k.clone(), d.clone()];
         let opening = word.change()?;
         let zero = |v: &Vec<Rat>| vec![Rat::zero(); v.len()];
         let tangent = EndChange {
@@ -1759,7 +1767,87 @@ impl MaterialTangent {
             tangent,
             port: None,
             stations: Vec::new(),
+            forms,
+            source: Vec::new(),
         })
+    }
+
+    /// [definition; agent-inferred, October 9; the held-carry record §6] **The tangent continued
+    /// into the next encounter**: eq. (3)'s crossing `χ_open = Π_int B_ref χ_carry` of this tangent's
+    /// carry into the next opening, with the World's state tangent `ψ` carried as it is (the World's
+    /// state persists between encounters), and the station readings cleared. The continued tangent is
+    /// rebound to the next Word at its opening ([`Self::rebind`]); until then it carries the commit it
+    /// was based at.
+    pub fn continued(
+        &self,
+        carry: &ReceptionCarry,
+        conductances: &[Rat],
+        field: &Field,
+    ) -> Result<Self, HnnError> {
+        Ok(Self {
+            direction: self.direction.clone(),
+            commit: self.commit,
+            opened_at: carry.ticks,
+            ticks: 0,
+            tangent: self.opened(carry, conductances, field)?,
+            port: self.port.clone(),
+            stations: Vec::new(),
+            forms: self.forms.clone(),
+            source: Vec::new(),
+        })
+    }
+
+    /// **Rebind a continued tangent to the Word it now rides**, before any junction step: the same
+    /// opening tick, the same contact material (the executed contact forms unchanged), the change's
+    /// own shape, and the Word's producing commit. A receiving publication between the encounters
+    /// changes the commit, never the contact; the receiving map stays an exterior control the tangent
+    /// does not differentiate.
+    pub(crate) fn rebind(&mut self, word: &Word<'_>, commit: u64) -> Result<(), HnnError> {
+        let contact = word
+            .operands()
+            .contacts()
+            .get(self.direction.contact)
+            .ok_or(HnnError::Unadmitted {
+                reason: "a continued tangent names a contact of its next Word",
+            })?;
+        let (c, k, d) = contact.forms();
+        let opening = word.change()?;
+        let shaped = opening.storage.len() == self.tangent.storage.len()
+            && opening
+                .storage
+                .iter()
+                .zip(&self.tangent.storage)
+                .all(|(a, b)| a.len() == b.len())
+            && opening.arrivals.len() == self.tangent.arrivals.len()
+            && opening.states.len() == self.tangent.states.len();
+        if word.opened_at() != self.opened_at
+            || !word.recorded().is_empty()
+            || word.operands().lattice().is_some()
+            || [c, k, d] != [&self.forms[0], &self.forms[1], &self.forms[2]]
+            || !shaped
+        {
+            return Err(HnnError::Unadmitted {
+                reason: "a continued tangent rides the next exact Word from its own opening, on the same contact material",
+            });
+        }
+        self.commit = commit;
+        Ok(())
+    }
+
+    /// Bind the applied source wave of the encounter this tangent rides, at that encounter's
+    /// execution.
+    pub(crate) fn bind_source(&mut self, wave: &[Rat]) {
+        self.source = wave.to_vec();
+    }
+
+    /// The applied source wave of the encounter the tangent rode (empty before it rode one).
+    pub fn source(&self) -> &[Rat] {
+        &self.source
+    }
+
+    /// The tangent's World port: its ring and the World state tangent's extent.
+    pub fn port(&self) -> Option<(usize, usize)> {
+        self.port.as_ref().map(|(ring, world)| (*ring, world.len()))
     }
 
     /// The same tangent at a World port on `ring`: the World's state tangent starts at `ψ = 0` of

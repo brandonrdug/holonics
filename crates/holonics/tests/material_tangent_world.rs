@@ -1002,3 +1002,176 @@ fn a_world_proposal_refuses_another_encounters_tangents() {
         refused.as_ref().err()
     );
 }
+
+/// A change's coordinates in one exact list: storage, arrivals, contact states, resonator states.
+fn flat(change: &holonics::hnn::word::EndChange) -> Vec<Rat> {
+    let mut out: Vec<Rat> = change.storage.iter().flatten().cloned().collect();
+    for [a, b] in change.arrivals.iter().chain(&change.states) {
+        out.extend(a.iter().cloned());
+        out.extend(b.iter().cloned());
+    }
+    for [a, b] in change.resonators.iter().flatten() {
+        out.extend(a.iter().cloned());
+        out.extend(b.iter().cloned());
+    }
+    out
+}
+
+/// The World's configuration and the native carry after two encounters at `control` on `theta`.
+fn after_two(
+    field: &Field,
+    theta: Constitution,
+    source: &Encoded,
+    control: &[Rat],
+) -> (Vec<Rat>, Vec<Rat>) {
+    let mut receiver = bound(field, theta, source, vec![faced_key(field)]);
+    let preparation = actuator(field);
+    let mut carry = None;
+    for _ in 0..2 {
+        let probe = receiver
+            .prepare_probe(source, &field.receivers()[0], &preparation, &[false, true])
+            .unwrap();
+        let waves = admitted(&probe, 0);
+        let reception = probe.encounter(&waves, control).unwrap();
+        let ActionCommunication::Received(received) = reception.reception else {
+            panic!("the encounter completes");
+        };
+        carry = Some(received.carry.change.clone());
+    }
+    (
+        receiver
+            .participating_world()
+            .unwrap()
+            .state()
+            .configuration
+            .clone(),
+        flat(&carry.unwrap()),
+    )
+}
+
+/// **The tangent continues into the next encounter** (the held-carry record §6): one teaching
+/// encounter, its tangent crossed into the next opening with the World's state tangent carried, and
+/// the next encounter carrying it. The World's state and the native carry after both encounters, run
+/// on `θ ± εH`, confirm `ψ` and `χ` to second order on `ε = 2⁻⁴ … 2⁻⁸`. The receiving publication
+/// between the encounters is a readout and moves neither.
+#[test]
+fn the_tangent_continues_into_the_next_encounter() {
+    let (field, base, source) = fixture();
+    let declared = Declared::new(&field, base);
+    let direction = declared.storage_direction(&field);
+    let control = vec![integer(1)];
+    let mut receiver = bound(
+        &field,
+        declared.at(&Rat::zero()),
+        &source,
+        vec![faced_key(&field)],
+    );
+    let preparation = actuator(&field);
+    let probe = receiver
+        .prepare_probe(&source, &field.receivers()[0], &preparation, &[false, true])
+        .unwrap();
+    let waves = admitted(&probe, 0);
+    let (reception, tangents) = probe
+        .encounter_teaching(&waves, &control, &[direction])
+        .unwrap();
+    let ActionCommunication::Received(first) = reception.reception else {
+        panic!("the first encounter completes");
+    };
+    let continued: Vec<_> = tangents
+        .iter()
+        .map(|t| {
+            t.continued(&first.carry, &first.carry.conductances, &field)
+                .unwrap()
+        })
+        .collect();
+    let probe = receiver
+        .prepare_probe(&source, &field.receivers()[0], &preparation, &[false, true])
+        .unwrap();
+    let waves = admitted(&probe, 0);
+    let (reception, tangents) = probe.encounter_continued(&waves, &control, continued).unwrap();
+    assert!(matches!(
+        reception.reception,
+        ActionCommunication::Received(_)
+    ));
+    let psi = tangents[0].world().unwrap().to_vec();
+    let chi = flat(tangents[0].tangent());
+    let mut residuals: Vec<(Rat, Rat, Rat)> = Vec::new();
+    for j in 4..9 {
+        let epsilon = rat(1, 1i64 << j);
+        let (up_world, up_carry) = after_two(&field, declared.at(&epsilon), &source, &control);
+        let (down_world, down_carry) =
+            after_two(&field, declared.at(&-epsilon.clone()), &source, &control);
+        let two = integer(2) * &epsilon;
+        let central = |up: &[Rat], down: &[Rat], t: &[Rat]| {
+            l1(&up
+                .iter()
+                .zip(down)
+                .zip(t)
+                .map(|((a, b), t)| (a - b) / &two - t)
+                .collect::<Vec<_>>())
+        };
+        let rw = central(&up_world, &down_world, &psi);
+        let rc = central(&up_carry, &down_carry, &chi);
+        println!("continued tangent: ε = 2^-{j}: World residual {rw}; carry residual {rc}");
+        residuals.push((epsilon, rw, rc));
+    }
+    let picks: [fn(&(Rat, Rat, Rat)) -> Rat; 2] = [|r| r.1.clone(), |r| r.2.clone()];
+    for pick in picks {
+        let (first_epsilon, _, _) = &residuals[0];
+        let scaled_first = pick(&residuals[0]) / (first_epsilon * first_epsilon);
+        for pair in residuals.windows(2) {
+            assert!(
+                pick(&pair[1]) * integer(2) <= pick(&pair[0]),
+                "the residual halves at least"
+            );
+        }
+        for r in &residuals {
+            assert!(
+                pick(r) / (&r.0 * &r.0) <= &scaled_first * integer(2),
+                "the residual stays O(ε²)"
+            );
+        }
+    }
+}
+
+/// **Co-clock twins at different controls cannot swap tangents.** Two fresh receivers at the same
+/// producing commit and clock, taught at different admitted controls: the first's tangents with the
+/// second's reception are refused, because each tangent is bound to its encounter's applied source
+/// wave.
+#[test]
+fn co_clock_twins_cannot_swap_tangents() {
+    let (field, base, source) = fixture();
+    let declared = Declared::new(&field, base);
+    let theta = declared.at(&Rat::zero());
+    let coordinates = all_coordinates(&theta);
+    let directions: Vec<MaterialDirection> = coordinates
+        .iter()
+        .map(|c| MaterialDirection::of_coordinate(&field, &theta, c).unwrap())
+        .collect();
+    let preparation = actuator(&field);
+    let teach = |control: &[Rat]| {
+        let mut receiver = bound(&field, theta.clone(), &source, vec![faced_key(&field)]);
+        let probe = receiver
+            .prepare_probe(&source, &field.receivers()[0], &preparation, &[false, true])
+            .unwrap();
+        let waves = admitted(&probe, 0);
+        let (reception, tangents) = probe
+            .encounter_teaching(&waves, control, &directions)
+            .unwrap();
+        let ActionCommunication::Received(received) = reception.reception else {
+            panic!("the teaching encounter completes");
+        };
+        (receiver, received, tangents)
+    };
+    let (_, _, first_tangents) = teach(&[integer(1)]);
+    let (second, second_received, second_tangents) = teach(&[integer(-1)]);
+    assert!(second
+        .world_proposal(&coordinates, &second_tangents, &second_received)
+        .is_ok());
+    let refused = second.world_proposal(&coordinates, &first_tangents, &second_received);
+    assert!(
+        matches!(refused, Err(HnnError::Unadmitted { .. })),
+        "refused: {:?}",
+        refused.as_ref().err()
+    );
+}
