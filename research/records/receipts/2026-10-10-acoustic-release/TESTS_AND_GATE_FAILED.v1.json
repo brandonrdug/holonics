@@ -1,0 +1,23 @@
+{
+ "scope": "Local developer reads by opus under the common lease, not claim-bearing, on the acoustic release worktree before the exterior allowance.",
+ "wave_tests": {
+  "result": [
+   "test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 11.24s"
+  ],
+  "bounded": [
+   "BOUNDED start 04:28:21 end 04:28:34 exit 0 wall_ns 12297377256 child_peak_rss_kib 718936"
+  ],
+  "deadline_s": 420
+ },
+ "gate_failed": {
+  "stages": [
+   "gate check: ok (13940 ms)",
+   "gate guard-lints: FAILED (20682 ms)",
+   "gate guard-doctests: ok (25096 ms)"
+  ],
+  "bounded": [
+   "BOUNDED start 04:28:34 end 04:29:33 exit 1 wall_ns 59734552042 child_peak_rss_kib 2361192"
+  ],
+  "cause": "guard 7: examples/acoustic_release.rs called std::fs::read and std::fs::write without the exterior boundary's allowance (crates/holonics/clippy.toml: an exterior boundary allows them where it reads). Repaired by #[allow(clippy::disallowed_methods, reason = ...)] on the two codec functions only."
+ }
+}

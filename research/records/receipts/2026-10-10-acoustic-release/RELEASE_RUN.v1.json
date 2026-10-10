@@ -1,0 +1,82 @@
+{
+ "scope": "Local developer run by opus under the common lease, not claim-bearing: examples/acoustic_release (debug build) on a private 16-bit mono 16000 Hz speech recording (LibriSpeech-derived; its path is withheld from the public receipt; the render is not committed). 24 declared rings, lattice 2^-32, 12 threads.",
+ "development_read": {
+  "ticks": "2000 recorded + 500 continuation",
+  "wall_ns": 4771919974,
+  "slowest_thread_ms_per_2500_ticks": 4412,
+  "child_peak_rss_kib": 16644
+ },
+ "projection": "109680 ticks x 1.77 ms (slowest thread's two rings, development read) = 194 s, plus the render at 0.142 ms per tick = 16 s; deadline 300 s",
+ "wall_ns": 207570405132,
+ "deadline_s": 300,
+ "child_peak_rss_kib": 209036,
+ "exit": 0,
+ "measured_over_projected": "207570405132 ns against about 210000000000 ns",
+ "stdout_sha256": "7e90d7501b8dbff2d645f5e4d153b99af52edbd6b2ec079df5dbfff8494ad6c0",
+ "rings": [
+  "ring 0: t = 1/50; E_end 0; ΣW −[2^-26, 2^-25); ΣhωDω 0; Σ(chart + split) [2^-26, 2^-25); whole-stream balance closes: true; widest state entry bits 75; widest remainder bits 65; widest |remainder| [2^-34, 2^-33)",
+  "ring 1: t = 3/125; E_end 0; ΣW [2^-28, 2^-27); ΣhωDω 0; Σ(chart + split) −[2^-28, 2^-27); whole-stream balance closes: true; widest state entry bits 75; widest remainder bits 71; widest |remainder| [2^-34, 2^-33)",
+  "ring 2: t = 18/625; E_end 0; ΣW [2^-27, 2^-26); ΣhωDω 0; Σ(chart + split) −[2^-27, 2^-26); whole-stream balance closes: true; widest state entry bits 74; widest remainder bits 75; widest |remainder| [2^-34, 2^-33)",
+  "ring 3: t = 108/3125; E_end 0; ΣW [2^-30, 2^-29); ΣhωDω 0; Σ(chart + split) −[2^-30, 2^-29); whole-stream balance closes: true; widest state entry bits 73; widest remainder bits 81; widest |remainder| [2^-34, 2^-33)",
+  "ring 4: t = 648/15625; E_end 0; ΣW [2^-28, 2^-27); ΣhωDω 0; Σ(chart + split) −[2^-28, 2^-27); whole-stream balance closes: true; widest state entry bits 73; widest remainder bits 87; widest |remainder| [2^-34, 2^-33)",
+  "ring 5: t = 3888/78125; E_end 0; ΣW [2^-29, 2^-28); ΣhωDω 0; Σ(chart + split) −[2^-29, 2^-28); whole-stream balance closes: true; widest state entry bits 72; widest remainder bits 91; widest |remainder| [2^-34, 2^-33)",
+  "ring 6: t = 23328/390625; E_end [2^-70, 2^-69); ΣW −[2^-27, 2^-26); ΣhωDω 0; Σ(chart + split) [2^-27, 2^-26); whole-stream balance closes: true; widest state entry bits 72; widest remainder bits 93; widest |remainder| [2^-34, 2^-33)",
+  "ring 7: t = 139968/1953125; E_end [2^-63, 2^-62); ΣW −[2^-27, 2^-26); ΣhωDω 0; Σ(chart + split) [2^-27, 2^-26); whole-stream balance closes: true; widest state entry bits 72; widest remainder bits 107; widest |remainder| [2^-34, 2^-33)",
+  "ring 8: t = 839808/9765625; E_end [2^-63, 2^-62); ΣW [2^-27, 2^-26); ΣhωDω 0; Σ(chart + split) −[2^-27, 2^-26); whole-stream balance closes: true; widest state entry bits 72; widest remainder bits 115; widest |remainder| [2^-34, 2^-33)",
+  "ring 9: t = 5038848/48828125; E_end 0; ΣW −[2^-28, 2^-27); ΣhωDω 0; Σ(chart + split) [2^-28, 2^-27); whole-stream balance closes: true; widest state entry bits 71; widest remainder bits 125; widest |remainder| [2^-34, 2^-33)",
+  "ring 10: t = 30233088/244140625; E_end [2^-63, 2^-62); ΣW [2^-30, 2^-29); ΣhωDω 0; Σ(chart + split) −[2^-30, 2^-29); whole-stream balance closes: true; widest state entry bits 70; widest remainder bits 135; widest |remainder| [2^-34, 2^-33)",
+  "ring 11: t = 181398528/1220703125; E_end [2^-65, 2^-64); ΣW [2^-29, 2^-28); ΣhωDω 0; Σ(chart + split) −[2^-29, 2^-28); whole-stream balance closes: true; widest state entry bits 70; widest remainder bits 143; widest |remainder| [2^-34, 2^-33)",
+  "ring 12: t = 1088391168/6103515625; E_end [2^-66, 2^-65); ΣW −[2^-29, 2^-28); ΣhωDω 0; Σ(chart + split) [2^-29, 2^-28); whole-stream balance closes: true; widest state entry bits 69; widest remainder bits 153; widest |remainder| [2^-34, 2^-33)",
+  "ring 13: t = 6530347008/30517578125; E_end [2^-61, 2^-60); ΣW [2^-30, 2^-29); ΣhωDω 0; Σ(chart + split) −[2^-30, 2^-29); whole-stream balance closes: true; widest state entry bits 68; widest remainder bits 163; widest |remainder| [2^-34, 2^-33)",
+  "ring 14: t = 39182082048/152587890625; E_end [2^-63, 2^-62); ΣW [2^-29, 2^-28); ΣhωDω 0; Σ(chart + split) −[2^-29, 2^-28); whole-stream balance closes: true; widest state entry bits 68; widest remainder bits 171; widest |remainder| [2^-34, 2^-33)",
+  "ring 15: t = 235092492288/762939453125; E_end [2^-60, 2^-59); ΣW −[2^-29, 2^-28); ΣhωDω 0; Σ(chart + split) [2^-29, 2^-28); whole-stream balance closes: true; widest state entry bits 67; widest remainder bits 181; widest |remainder| [2^-34, 2^-33)",
+  "ring 16: t = 1410554953728/3814697265625; E_end [2^-62, 2^-61); ΣW [2^-32, 2^-31); ΣhωDω 0; Σ(chart + split) −[2^-32, 2^-31); whole-stream balance closes: true; widest state entry bits 66; widest remainder bits 191; widest |remainder| [2^-34, 2^-33)",
+  "ring 17: t = 8463329722368/19073486328125; E_end [2^-61, 2^-60); ΣW [2^-29, 2^-28); ΣhωDω 0; Σ(chart + split) −[2^-29, 2^-28); whole-stream balance closes: true; widest state entry bits 65; widest remainder bits 199; widest |remainder| [2^-34, 2^-33)",
+  "ring 18: t = 50779978334208/95367431640625; E_end [2^-61, 2^-60); ΣW −[2^-29, 2^-28); ΣhωDω 0; Σ(chart + split) [2^-29, 2^-28); whole-stream balance closes: true; widest state entry bits 65; widest remainder bits 209; widest |remainder| [2^-34, 2^-33)",
+  "ring 19: t = 304679870005248/476837158203125; E_end [2^-60, 2^-59); ΣW [2^-30, 2^-29); ΣhωDω 0; Σ(chart + split) −[2^-30, 2^-29); whole-stream balance closes: true; widest state entry bits 64; widest remainder bits 219; widest |remainder| [2^-34, 2^-33)",
+  "ring 20: t = 1828079220031488/2384185791015625; E_end [2^-60, 2^-59); ΣW −[2^-32, 2^-31); ΣhωDω 0; Σ(chart + split) [2^-32, 2^-31); whole-stream balance closes: true; widest state entry bits 64; widest remainder bits 229; widest |remainder| [2^-34, 2^-33)",
+  "ring 21: t = 10968475320188928/11920928955078125; E_end [2^-59, 2^-58); ΣW [2^-28, 2^-27); ΣhωDω 0; Σ(chart + split) −[2^-28, 2^-27); whole-stream balance closes: true; widest state entry bits 65; widest remainder bits 239; widest |remainder| [2^-34, 2^-33)",
+  "ring 22: t = 65810851921133568/59604644775390625; E_end [2^-59, 2^-58); ΣW [2^-33, 2^-32); ΣhωDω 0; Σ(chart + split) −[2^-33, 2^-32); whole-stream balance closes: true; widest state entry bits 64; widest remainder bits 249; widest |remainder| [2^-34, 2^-33)",
+  "ring 23: t = 394865111526801408/298023223876953125; E_end [2^-60, 2^-59); ΣW [2^-27, 2^-26); ΣhωDω 0; Σ(chart + split) −[2^-27, 2^-26); whole-stream balance closes: true; widest state entry bits 64; widest remainder bits 257; widest |remainder| [2^-34, 2^-33)"
+ ],
+ "render": [
+  "release: 93680 recorded ticks + 16000 continuation ticks at 16000 per second, 24 rings on 12 threads",
+  "render: emission peak [2^-1, 2^0); gain 2^0; final remainder [2^-35, 2^-34); 109680 samples written; elapsed 207528 ms"
+ ],
+ "rendered_file": {
+  "frames": 109680,
+  "rate": 16000,
+  "peak": 19242,
+  "per_second_sum_of_squares_and_peak": [
+   [
+    84300621938,
+    19242
+   ],
+   [
+    192651157656,
+    16358
+   ],
+   [
+    121257520412,
+    15025
+   ],
+   [
+    142463995040,
+    16000
+   ],
+   [
+    95539722630,
+    14125
+   ],
+   [
+    49067397092,
+    16490
+   ],
+   [
+    130,
+    1
+   ]
+  ]
+ },
+ "remainder_bits_against_development_read": "equal for 23 of 24 rings; ring 22 reads 249 bits over the whole stream against 248 over the first 2500 ticks (numerator and denominator bits together; every remainder's magnitude is below 2^-33 throughout)"
+}

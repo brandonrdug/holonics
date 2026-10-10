@@ -975,3 +975,84 @@ fn rest_is_silent_and_a_ring_that_has_not_settled_is_refused() {
         })
     ));
 }
+
+// -------------------------------------------------------------------------------------------
+// the port on a lattice (the bank record, 2026-10-10)
+
+/// **The bounded carry** (bank record A1): the declared ring `t = 1` on the lattice `2^(−32)`, driven
+/// by F1 and then left to ring. Every tick closes with its chart and split terms within their
+/// bounds, every carried state entry lies on the lattice, every carried remainder is at most half a
+/// unit, the whole stream's balance closes exactly, and the emission is `−(2/Y) ω`. On the exact law
+/// the same stream's state denominators grow; on the lattice its widest entry does not exceed what
+/// the first ticks reach.
+#[test]
+fn the_port_on_a_lattice_carries_a_bounded_state_and_every_tick_closes() {
+    use holonics::hnn::constitution::Lattice;
+    use num_traits::Signed;
+    let lattice = Lattice::new(32);
+    let operands = declared_ring(&integer(1));
+    let mut samples: Vec<i64> = stream(1, SAMPLES);
+    samples.extend(std::iter::repeat_n(0, SAMPLES));
+    let wave = matched(&operands, &samples);
+    let mut port = WavePort::on_lattice(operands.clone(), 0, lattice).unwrap();
+    let (mut work, mut dissipation, mut defect) = (Rat::zero(), Rat::zero(), Rat::zero());
+    let mut widest = Vec::new();
+    for received in port.receive(&wave).unwrap() {
+        let tick = received.unwrap();
+        assert!(tick.closes(), "tick {}", tick.tick);
+        assert_eq!(tick.lattice, Some(32));
+        let mut bits = 0;
+        for x in tick.step.state.iter().flatten() {
+            assert!(lattice.contains(x), "tick {}: the state lies on the lattice", tick.tick);
+            bits = bits.max(x.denom().bits());
+        }
+        widest.push(bits);
+        for r in tick.step.remainders().all() {
+            assert!(r.abs() * integer(2) <= lattice.unit(), "a carried remainder is at most half a unit");
+        }
+        let emission = tick.emission();
+        let expected = -(integer(2) / operands.admittance()) * &tick.step.rate[0];
+        assert_eq!(emission[0], expected);
+        work += &tick.boundary_work;
+        dissipation += &tick.step.dissipation;
+        defect += &tick.step.chart + &tick.step.split;
+    }
+    assert_eq!(port.ticks(), 2 * SAMPLES);
+    assert_eq!(port.stored_energy().unwrap(), &work - &dissipation + &defect);
+    // The state's denominators never exceed the lattice's.
+    assert!(widest.iter().all(|bits| *bits <= 33));
+    // The exact law's state on the same stream: its denominators grow with the ticks.
+    let exact = run(&integer(1), &stream(1, SAMPLES));
+    let first = exact.ticks[9].step.state[0][0].denom().bits();
+    let last = exact.ticks[SAMPLES - 1].step.state[0][0].denom().bits();
+    assert!(last > first, "the exact law's state grows: {first} then {last} bits");
+}
+
+/// **The stream is one on the lattice** (bank record A3): received in chunks, the lattice port
+/// carries the same states, remainders and ticks as received whole.
+#[test]
+fn the_lattice_port_carries_its_remainders_across_chunks() {
+    use holonics::hnn::constitution::Lattice;
+    let lattice = Lattice::new(32);
+    let operands = declared_ring(&integer(1));
+    let all = stream(1, SAMPLES);
+    let mut whole = WavePort::on_lattice(operands.clone(), 0, lattice).unwrap();
+    let whole_ticks: Vec<ReceivedTick> = whole
+        .receive(&matched(&operands, &all))
+        .unwrap()
+        .map(Result::unwrap)
+        .collect();
+    let mut port = WavePort::on_lattice(operands.clone(), 0, lattice).unwrap();
+    let mut ticks = Vec::new();
+    let mut at = 0;
+    for length in [1, 6, 113, 120] {
+        for received in port.receive(&matched(&operands, &all[at..at + length])).unwrap() {
+            ticks.push(received.unwrap());
+        }
+        at += length;
+        assert_eq!(port.remainders(), whole_ticks[at - 1].step.remainders());
+    }
+    assert_eq!(ticks, whole_ticks);
+    assert_eq!(port.state(), whole.state());
+    assert_eq!(port.remainders(), whole.remainders());
+}
